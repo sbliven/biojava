@@ -296,7 +296,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 
 	if (delegateRenderers.size() == 0)
 	{
-	    return maxDepth;
+	    return maxDepth + 1.0f;
 	}
 	else
 	{
@@ -305,7 +305,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 		maxDepth = Math.max(maxDepth, ((AbstractBeadRenderer) ri.next()).getDepth(context));
 	    }
 
-	    return maxDepth;
+	    return maxDepth + 1.0f;
 	}
     }
 
