@@ -40,7 +40,7 @@ import java.net.Socket ;
 public class PDBSRSReader extends PDBFileReader {  
     
 
-    private  BufferedReader getBufferedReader() 
+    private  BufferedReader getBufferedReader(String pdbId) 
 	throws IOException
     {
 	// getz -view PDBdata '[pdb:5pti] 
@@ -81,9 +81,9 @@ public class PDBSRSReader extends PDBFileReader {
 	input  = new DataInputStream(client.getInputStream());
 	BufferedReader buf = new BufferedReader (new InputStreamReader (input));
 	
-	System.out.println("sending: --pdb " + pdb_code.toLowerCase());
+	System.out.println("sending: --pdb " + pdbId.toLowerCase());
 	output = new PrintStream(client.getOutputStream());	  
-	output.println("--pdb "+ pdb_code.toLowerCase());
+	output.println("--pdb "+ pdbId.toLowerCase());
 	output.flush();
 	
 	// check if return is O.K.
@@ -93,7 +93,7 @@ public class PDBSRSReader extends PDBFileReader {
 	buf.reset();
 	if ( line.equals("no match")) {
 	    System.out.println("first line: " + line );
-	    throw new IOException("no pdb with code "+pdb_code.toLowerCase() +" found");	    
+	    throw new IOException("no pdb with code "+pdbId.toLowerCase() +" found");	    
 	}
 	
 	return buf ;
@@ -103,15 +103,14 @@ public class PDBSRSReader extends PDBFileReader {
 
 
      /** load a structure from from SRS installation using wgetz
-     * requires pdb_code to be set earlier...
      */
-    public synchronized Structure getStructure() 
+    public  Structure getStructureById(String pdbId) 
 	throws IOException
     {
 	
 	BufferedReader buf ;
 	//inStream = getInputStream();
-	buf = getBufferedReader() ;
+	buf = getBufferedReader(pdbId) ;
 	/*String line = buf.readLine ();	
 	while (line != null) {
 	    System.out.println (line);
@@ -129,34 +128,7 @@ public class PDBSRSReader extends PDBFileReader {
 	    ex.printStackTrace();
 	}
 
-	notifyAll();
-	return s ;
-	
+	return s ;	
     }
-
-    /** open filename and returns
-     * a PDBStructure object. 
-     * Overrides PDBFileReader.getStructure.
-     */
-    public synchronized Structure getStructure(String filename) 
-	throws IOException
-    {
-	
-	pdb_code = filename ;
-	Structure s = null ;
-	try {
-	    s = getStructure();
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    throw new IOException();
-	}
-
-	notifyAll();
-	return s ;
-
-
-    }
-
-
 
 }

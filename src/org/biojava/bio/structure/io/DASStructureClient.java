@@ -1,4 +1,3 @@
-
 /*
  *                    BioJava development code
  *
@@ -42,7 +41,6 @@ import java.io.*;
  */
 public class DASStructureClient implements StructureIO { 
 
-    String pdb_code              ;
     String serverurl             ;
     StructureImpl structure      ;
     
@@ -51,7 +49,7 @@ public class DASStructureClient implements StructureIO {
      */
 
     public DASStructureClient() {
-	pdb_code = null ;
+
 	serverurl = "http://127.0.0.1:8080/dazzle/mystruc/structure?query=";
     }
 
@@ -61,7 +59,7 @@ public class DASStructureClient implements StructureIO {
      * @param url  a String ...
      */
     public DASStructureClient(String url) {
-	pdb_code = null ;
+
 	serverurl = url;
     }
 
@@ -69,49 +67,18 @@ public class DASStructureClient implements StructureIO {
 
     // the interfaced procedures: //
     
-    /** 
-     * set the PDB code of a structure.
-     * @see #getId
-     */
-    public void setId(String id) {
-	pdb_code = id ;   
-    }
-
-    /** 
-     * get the PDB code of a structure.
-     *
-     * @return a String representing the id value
-     * @see #setId
-     */
-    public String getId() {
-	return pdb_code ;  
-    }
-    
-
-    /** 
-     * Connect to a DAS-structure service and retreive data.     
-     *
-     * @param pdb_code  a String, representing a PDB code e.g. 5pti
-     * @return a Structure object
-     * @throws IOException ...     
-     */
-    public Structure getStructure(String pdb_code) 
-	throws IOException
-    {
-	setId(pdb_code);
-	return getStructure();
-    }
 
 
     /** 
      * if pdb code is set (setId):
      * connect to a DAS-structure service and retreive data.  
      *
+     * @param pdb_code  a String, representing a PDB code e.g. 5pti
      * @return the Structure object
      * @throws IOException ...
      */
  
-    public Structure getStructure()
+    public Structure getStructureById(String pdb_code)
 	throws IOException 
     {
 	
