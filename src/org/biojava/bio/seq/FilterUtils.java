@@ -26,9 +26,9 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.biojava.bio.*;
-import org.biojava.bio.seq.filter.WalkerFactory;
-import org.biojava.bio.seq.filter.Visitor;
-import org.biojava.bio.seq.filter.Walker;
+import org.biojava.utils.walker.WalkerFactory;
+import org.biojava.utils.walker.Visitor;
+import org.biojava.utils.walker.Walker;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.LocationTools;
 

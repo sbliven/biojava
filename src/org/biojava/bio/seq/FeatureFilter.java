@@ -32,7 +32,7 @@ import org.biojava.bio.CardinalityConstraint;
 import org.biojava.bio.CollectionConstraint;
 import org.biojava.bio.PropertyConstraint;
 import org.biojava.bio.seq.homol.SimilarityPairFeature;
-import org.biojava.bio.seq.filter.WalkerFactory;
+import org.biojava.utils.walker.WalkerFactory;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
 

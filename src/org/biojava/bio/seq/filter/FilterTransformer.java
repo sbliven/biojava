@@ -1,5 +1,7 @@
 package org.biojava.bio.seq.filter;
 
+import org.biojava.utils.walker.Visitor;
+
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FilterUtils;
 
