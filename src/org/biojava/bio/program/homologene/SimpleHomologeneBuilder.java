@@ -32,16 +32,16 @@ public class SimpleHomologeneBuilder implements HomologeneBuilder
 {
     HomologeneDB db = null;
 
-    OrthologyTemplate orthologyTmpl = null;
+    OrthoPairTemplate orthologyTmpl = null;
 
     OrthologueTemplate orthologueTmpl = null;
 
-    HomoloGroup group = null;
+    OrthoPairSet group = null;
 
     private int level = 0;
 
 
-    private class OrthologyTemplate
+    private class OrthoPairTemplate
     {
         Orthologue     firstOrtho;
         Orthologue     secondOrtho;
@@ -70,15 +70,15 @@ public class SimpleHomologeneBuilder implements HomologeneBuilder
     {
         if (level != 1) return;
 
-        group = db.createHomoloGroup();
+        group = db.createOrthoPairSet();
         level++;
     }
 
-    public void startOrthology()
+    public void startOrthoPair()
     {
         if (level != 2) return;
 
-        orthologyTmpl = new OrthologyTemplate();
+        orthologyTmpl = new OrthoPairTemplate();
         level++;
     }
 
@@ -151,7 +151,7 @@ public class SimpleHomologeneBuilder implements HomologeneBuilder
         orthologueTmpl = null;
     }
 
-    public void addOrthologyProperty(String key, String value)
+    public void addOrthoPairProperty(String key, String value)
     {
         if (level != 3) return;
 
@@ -176,7 +176,7 @@ public class SimpleHomologeneBuilder implements HomologeneBuilder
            }
     }
 
-    public void endOrthology()
+    public void endOrthoPair()
     {
         if (level !=3) return;
         level--;
@@ -187,27 +187,27 @@ public class SimpleHomologeneBuilder implements HomologeneBuilder
             || (orthologyTmpl.secondOrtho == null)) 
         {
             System.out.println(orthologyTmpl.type + " " + orthologyTmpl.firstOrtho + " " + orthologyTmpl.secondOrtho);
-            System.out.println("endOrthology test failed"); return;
+            System.out.println("endOrthoPair test failed"); return;
         }
 
         if (orthologyTmpl.type == SimilarityType.CURATED) {
             if (orthologyTmpl.ref == null) return;
 
-            Orthology orthology = db.createOrthology(
+            OrthoPair orthology = db.createOrthoPair(
                 orthologyTmpl.firstOrtho,
                 orthologyTmpl.secondOrtho,
                 orthologyTmpl.ref);
 
-            group.addOrthology(orthology);
+            group.addOrthoPair(orthology);
         }
         else {
-            Orthology orthology = db.createOrthology(
+            OrthoPair orthology = db.createOrthoPair(
                 orthologyTmpl.firstOrtho,
                 orthologyTmpl.secondOrtho,
                 orthologyTmpl.type,
                 orthologyTmpl.percentIdentity);
 
-            group.addOrthology(orthology);
+            group.addOrthoPair(orthology);
         }
 
     }

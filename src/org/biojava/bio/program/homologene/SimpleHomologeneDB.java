@@ -28,7 +28,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Collections;
 
-public class SimpleHomologeneDB implements HomologeneDB
+import org.biojava.utils.ChangeVetoException;
+
+public class SimpleHomologeneDB 
+    extends SimpleOrthoPairCollection 
+    implements HomologeneDB
 {
 
     // every Orthologue is stored in a Set
@@ -37,9 +41,6 @@ public class SimpleHomologeneDB implements HomologeneDB
 
     // orthologies are also stored in a set
     private Set orthologySet = new HashSet();
-
-    // Homologene Groups are also stored in a set
-    Set groups = new HashSet();
 
     // indices
     private Map orthologyByTaxonID = new HashMap();
@@ -73,67 +74,50 @@ public class SimpleHomologeneDB implements HomologeneDB
         return (Orthologue) orthologueByHomologeneID.get(homologeneID);
     }
 
-    public Orthology createOrthology(Orthologue first, Orthologue second, SimilarityType type, double percentIdentity)
+    public OrthoPair createOrthoPair(Orthologue first, Orthologue second, SimilarityType type, double percentIdentity)
     {
-        Orthology newOrthology = new SimpleOrthology(first, second, type, percentIdentity);
+        OrthoPair newOrthoPair = new SimpleOrthoPair(first, second, type, percentIdentity);
 
         // index it
-        indexByTaxonID(first.getTaxonID(), newOrthology);
-        indexByTaxonID(second.getTaxonID(), newOrthology);
-        indexBySimilarityType(type, newOrthology);
+        indexByTaxonID(first.getTaxonID(), newOrthoPair);
+        indexByTaxonID(second.getTaxonID(), newOrthoPair);
+        indexBySimilarityType(type, newOrthoPair);
 
-        orthologySet.add(newOrthology);
+        orthologySet.add(newOrthoPair);
 
-        return newOrthology;
+        return newOrthoPair;
     }
 
     // should implement a uniqueness check here later!!!!
 
-    public Orthology createOrthology(Orthologue first, Orthologue second, String ref)
+    public OrthoPair createOrthoPair(Orthologue first, Orthologue second, String ref)
     {
-        Orthology newOrthology = new SimpleOrthology(first, second, ref);
+        OrthoPair newOrthoPair = new SimpleOrthoPair(first, second, ref);
 
         // index it
-        indexByTaxonID(first.getTaxonID(), newOrthology);
-        indexByTaxonID(second.getTaxonID(), newOrthology);
-        indexBySimilarityType(SimilarityType.CURATED, newOrthology);
+        indexByTaxonID(first.getTaxonID(), newOrthoPair);
+        indexByTaxonID(second.getTaxonID(), newOrthoPair);
+        indexBySimilarityType(SimilarityType.CURATED, newOrthoPair);
 
-        orthologySet.add(newOrthology);
+        orthologySet.add(newOrthoPair);
 
-        return newOrthology;
+        return newOrthoPair;
     }
 
-    public HomoloGroup createHomoloGroup()
+    public OrthoPairSet createOrthoPairSet()
     {
-        HomoloGroup newGroup = new SimpleHomoloGroup();
+        OrthoPairSet newGroup = new SimpleOrthoPairSet();
         groups.add(newGroup);        
 
         return newGroup;
     }
 
-    public HomoloGroupSet getHomoloGroups()
+    public OrthoPairCollection getOrthoPairSets()
     {
-        return new HomoloGroupSet(Collections.unmodifiableSet(groups));
+        return new SimpleOrthoPairCollection(Collections.unmodifiableSet(groups));
     }
 
-    public HomoloGroupSet filter(HomoloGroupFilter filters)
-    {
-        HomoloGroupSet results = new HomoloGroupSet();
-
-        // this method uses its privileged access to groups
-        for (Iterator groupsI = groups.iterator();
-               groupsI.hasNext(); )
-        {
-            HomoloGroup group = (HomoloGroup) groupsI.next();
-
-            if (filters.accept(group)) {
-                results.add(group);
-            }
-        }
-        return results;
-    }
-
-    private void indexByTaxonID(int taxonID, Orthology orthology)
+    private void indexByTaxonID(int taxonID, OrthoPair orthology)
     {
         Integer taxonIDIndex = new Integer(taxonID);
         Set indexSet = (Set) orthologyByTaxonID.get(taxonIDIndex);
@@ -146,7 +130,7 @@ public class SimpleHomologeneDB implements HomologeneDB
         indexSet.add(orthology);
     }
 
-    private void removeFromTaxonIDIndex(int taxonID, Orthology orthology)
+    private void removeFromTaxonIDIndex(int taxonID, OrthoPair orthology)
     {
         Integer taxonIDIndex = new Integer(taxonID);
         Set indexSet = (Set) orthologyByTaxonID.get(taxonIDIndex);
@@ -156,7 +140,7 @@ public class SimpleHomologeneDB implements HomologeneDB
         }
     }
 
-    private void indexBySimilarityType(SimilarityType type, Orthology orthology)
+    private void indexBySimilarityType(SimilarityType type, OrthoPair orthology)
     {
         Set indexSet = (Set) orthologyBySimilarityType.get(type);
 
@@ -168,7 +152,7 @@ public class SimpleHomologeneDB implements HomologeneDB
         indexSet.add(orthology);
     }
 
-    private void removeFromSimilarityTypeIndex(SimilarityType type, Orthology orthology)
+    private void removeFromSimilarityTypeIndex(SimilarityType type, OrthoPair orthology)
     {
         Set indexSet = (Set) orthologyBySimilarityType.get(type);
 

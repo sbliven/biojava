@@ -49,14 +49,14 @@ public interface HomologeneBuilder
     public void startDB();
 
     /**
-     * indicates start of data for a HomoloGroup
+     * indicates start of data for a OrthoPairSet
      */
     public void startGroup();
 
     /**
-     * indicates start of data for an Orthology
+     * indicates start of data for an OrthoPair
      */
-    public void startOrthology();
+    public void startOrthoPair();
 
     /**
      * indicates start of data for an orthologue
@@ -74,14 +74,14 @@ public interface HomologeneBuilder
     public void endOrthologue();
  
     /**
-     * add a property to the current Orthology
+     * add a property to the current OrthoPair
      */
-    public void addOrthologyProperty(String key, String value);
+    public void addOrthoPairProperty(String key, String value);
 
     /**
-     * end of data for this Orthology
+     * end of data for this OrthoPair
      */
-    public void endOrthology();
+    public void endOrthoPair();
 
     /**
      * add title information to an Orthologue

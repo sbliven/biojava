@@ -181,24 +181,24 @@ public class HomologeneTools
                                 // validate numeric format
                                 Double.parseDouble(finale);
 
-                                builder.startOrthology();
-                                builder.addOrthologyProperty(HomologeneBuilder.PERCENTIDENTITY, finale);
-                                builder.addOrthologyProperty(HomologeneBuilder.SIMILARITYTYPE, HomologeneBuilder.MULTIPLE);
+                                builder.startOrthoPair();
+                                builder.addOrthoPairProperty(HomologeneBuilder.PERCENTIDENTITY, finale);
+                                builder.addOrthoPairProperty(HomologeneBuilder.SIMILARITYTYPE, HomologeneBuilder.MULTIPLE);
                             }
                             else if (type.equals("b")) {
 
                                 // validate numeric format
                                 Integer.parseInt(finale);
 
-                                builder.startOrthology();
-                                builder.addOrthologyProperty(HomologeneBuilder.PERCENTIDENTITY, finale);
-                                builder.addOrthologyProperty(HomologeneBuilder.SIMILARITYTYPE, HomologeneBuilder.TWIN);
+                                builder.startOrthoPair();
+                                builder.addOrthoPairProperty(HomologeneBuilder.PERCENTIDENTITY, finale);
+                                builder.addOrthoPairProperty(HomologeneBuilder.SIMILARITYTYPE, HomologeneBuilder.TWIN);
                             }
                             else if (type.equals("c")) {
 
-                                builder.startOrthology();
-                                builder.addOrthologyProperty(HomologeneBuilder.SIMILARITYTYPE, HomologeneBuilder.CURATED);
-                                builder.addOrthologyProperty(HomologeneBuilder.PERCENTIDENTITY, finale);
+                                builder.startOrthoPair();
+                                builder.addOrthoPairProperty(HomologeneBuilder.SIMILARITYTYPE, HomologeneBuilder.CURATED);
+                                builder.addOrthoPairProperty(HomologeneBuilder.PERCENTIDENTITY, finale);
                             }
 
                             // add the orthologues
@@ -216,13 +216,13 @@ public class HomologeneTools
                             builder.addOrthologueProperty(HomologeneBuilder.ACCESSION, access1);
                             builder.endOrthologue();
 
-                            builder.endOrthology();
+                            builder.endOrthoPair();
                         }
                     }
                 }
                 catch (NumberFormatException nfe) {
                     nfe.printStackTrace();
-                    builder.endOrthology();
+                    builder.endOrthoPair();
                     continue;
                 }
             }

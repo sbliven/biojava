@@ -16,12 +16,12 @@ package org.biojava.bio.program.homologene;
 public interface HomologeneDB
 {
     /**
-     * an iterator for HomoloGroups
+     * an iterator for OrthoPairSets
      */
-    public interface HomoloGroupIterator
+    public interface OrthoPairSetIterator
     {
         public boolean hasNext();
-        public HomoloGroup nextGroup();
+        public OrthoPairSet nextGroup();
     }
 
     /**
@@ -37,26 +37,26 @@ public interface HomologeneDB
     /**
      * create a computed orthology entry
      */
-    public Orthology createOrthology(Orthologue first, Orthologue second, SimilarityType type, double percentIdentity);
+    public OrthoPair createOrthoPair(Orthologue first, Orthologue second, SimilarityType type, double percentIdentity);
 
     /**
      * create a curated orthology entry
      */
-    public Orthology createOrthology(Orthologue first, Orthologue second, String ref);
+    public OrthoPair createOrthoPair(Orthologue first, Orthologue second, String ref);
 
     /**
      * create a Homologene Group
      */
-    public HomoloGroup createHomoloGroup();    
+    public OrthoPairSet createOrthoPairSet();    
 
     /**
      * get the HomologeneGroups in this database
      */
-    public HomoloGroupSet getHomoloGroups();
+    public OrthoPairCollection getOrthoPairSets();
 
     /**
      * filter the database for a specified group
      */
-    public HomoloGroupSet filter(HomoloGroupFilter filters);
+    public OrthoPairCollection filter(OrthoPairSetFilter filters);
 }
 
