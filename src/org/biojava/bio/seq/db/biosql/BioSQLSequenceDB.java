@@ -130,6 +130,7 @@ public class BioSQLSequenceDB implements SequenceDB {
 		PreparedStatement createdb = conn.prepareStatement("insert into biodatabase (name) values ( ? )");
 		createdb.setString(1, biodatabase);
 		createdb.executeUpdate();
+        conn.commit();
 		createdb.close();
 
 		dbid = getDBHelper().getInsertID(conn, "biodatabase", "biodatabase_id");
@@ -151,6 +152,12 @@ public class BioSQLSequenceDB implements SequenceDB {
         throws Exception
     {
         return ontologySQL.getOntology(name);
+    }
+    
+    public Ontology addOntology(Ontology onto)
+        throws Exception
+    {
+        return ontologySQL.addOntology(onto);
     }
     
     public String getName() {
@@ -257,7 +264,7 @@ public class BioSQLSequenceDB implements SequenceDB {
 
 	    PreparedStatement create_bioentry = conn.prepareStatement(
                     "insert into bioentry " +
-                    "(biodatabase_id, display_id, accession, entry_version, division) " +
+                    "(biodatabase_id, name, accession, version, division) " +
 		    "values (?, ?, ?, ?, ?)");
 	    create_bioentry.setInt(1, dbid);
 	    create_bioentry.setString(2, seqName);
@@ -306,7 +313,7 @@ public class BioSQLSequenceDB implements SequenceDB {
 		create_fragment.close();
 	    } else {
 		PreparedStatement create_biosequence = conn.prepareStatement("insert into biosequence " +
-									     "(bioentry_id, seq_version, seq_length, biosequence_str, molecule) " +
+									     "(bioentry_id, version, length, seq, alphabet) " +
 									     "values (?, ?, ?, ?, ?)");
 		create_biosequence.setInt(1, bioentry_id);
 		create_biosequence.setInt(2, version);
@@ -315,7 +322,6 @@ public class BioSQLSequenceDB implements SequenceDB {
 		create_biosequence.setString(5, seqAlpha.getName());
 		create_biosequence.executeUpdate();
 		create_biosequence.close();
-		int biosequence_id = getDBHelper().getInsertID(conn, "biosequence", "biosequence_id");
 	    }
 
 	    // System.err.println("Stored sequence");
@@ -362,6 +368,8 @@ public class BioSQLSequenceDB implements SequenceDB {
 	    // Magic for taxonomy.  Move this!
 	    //
 
+        /*
+        
 	    if(ann.containsProperty(OrganismParser.PROPERTY_ORGANISM)) {
                 Taxon taxon = (Taxon) ann.getProperty(OrganismParser.PROPERTY_ORGANISM);
                 Annotation ta = taxon.getAnnotation();
@@ -414,6 +422,8 @@ public class BioSQLSequenceDB implements SequenceDB {
                 create_bioentry_taxa.executeUpdate();
                 create_bioentry_taxa.close();
 	    }
+        
+        */
 
 	    conn.commit();
 	    pool.putConnection(conn);
@@ -432,7 +442,7 @@ public class BioSQLSequenceDB implements SequenceDB {
     public Sequence getSequence(String id)
         throws BioException, IllegalIDException
     {
-	return getSequence(id, -1);
+        return getSequence(id, -1);
     }
 
     Sequence getSequence(String id, int bioentry_id)
@@ -488,19 +498,18 @@ public class BioSQLSequenceDB implements SequenceDB {
 	    }
 
 	    if (seq == null) {
-		PreparedStatement get_biosequence = conn.prepareStatement("select biosequence_id, molecule, seq_length " +
+		PreparedStatement get_biosequence = conn.prepareStatement("select alphabet, length " +
 									  "from   biosequence " +
 									  "where  bioentry_id = ?");
 		get_biosequence.setInt(1, bioentry_id);
 		ResultSet rs = get_biosequence.executeQuery();
 		if (rs.next()) {
-		    int biosequence_id = rs.getInt(1);
-		    String molecule = rs.getString(2);
-                    int length = rs.getInt(3);
-                    if (rs.wasNull()) {
-                        length = -1;
-                    }
-		    seq = new BioSQLSequence(this, id, bioentry_id, biosequence_id, molecule, length);
+            String molecule = rs.getString(1);
+            int length = rs.getInt(2);
+            if (rs.wasNull()) {
+                length = -1;
+            }
+            seq = new BioSQLSequence(this, id, bioentry_id, molecule, length);
 		}
 		get_biosequence.close();
 	    }
@@ -569,21 +578,22 @@ public class BioSQLSequenceDB implements SequenceDB {
 	    conn = pool.takeConnection();
 	    conn.setAutoCommit(false);
 
-	    PreparedStatement get_sequence = conn.prepareStatement("select bioentry.bioentry_id, biosequence.biosequence_id " +
-								   "from bioentry, biosequence " +
-								   "where bioentry.accession = ? and " +
-								   "      biosequence.bioentry_id = bioentry.bioentry_id");
+	    PreparedStatement get_sequence = conn.prepareStatement("select bioentry.bioentry_id " +
+								   "from bioentry " +
+								   "where bioentry.accession = ?"
+                                   );
 	    get_sequence.setString(1, id);
 	    ResultSet rs = get_sequence.executeQuery();
 	    boolean exists;
 	    if ((exists = rs.next())) {
 		int bioentry_id = rs.getInt(1);
-		int biosequence_id = rs.getInt(2);
 
+        /*
                 PreparedStatement delete_taxa = conn.prepareStatement("delete from bioentry_taxa where bioentry_id = ?");
                 delete_taxa.setInt(1, bioentry_id);
                 delete_taxa.executeUpdate();
                 delete_taxa.close();
+                */
 
                 PreparedStatement delete_reference = conn.prepareStatement("delete from bioentry_reference where bioentry_id = ?");
                 delete_reference.setInt(1, bioentry_id);
@@ -653,8 +663,8 @@ public class BioSQLSequenceDB implements SequenceDB {
                 delete_features.executeUpdate();
                 delete_features.close();
 
-                PreparedStatement delete_biosequence = conn.prepareStatement("delete from biosequence where biosequence_id = ?");
-		delete_biosequence.setInt(1, biosequence_id);
+                PreparedStatement delete_biosequence = conn.prepareStatement("delete from biosequence where bioentry_id = ?");
+		delete_biosequence.setInt(1, bioentry_id);
 		delete_biosequence.executeUpdate();
 		delete_biosequence.close();
 
@@ -787,48 +797,34 @@ public class BioSQLSequenceDB implements SequenceDB {
     }
     }
 
-    int intern_seqfeature_source(Connection conn, String s)
-        throws SQLException
-    {
-	PreparedStatement get = conn.prepareStatement("select seqfeature_source_id from seqfeature_source where source_name = ?");
-	get.setString(1, s);
-	ResultSet rs = get.executeQuery();
-	if (rs.next()) {
-	    int id = rs.getInt(1);
-	    get.close();
-	    return id;
-	}
-	get.close();
-
-	PreparedStatement insert = conn.prepareStatement("insert into seqfeature_source (source_name) values ( ? )");
-	insert.setString(1, s);
-	insert.executeUpdate();
-	insert.close();
-
-	int id = getDBHelper().getInsertID(conn, "seqfeature_source", "seqfeature_source_id");
-	return id;
-    }
-
+    /**
+     * Legacy method -- will go eventually
+     */
+    
     int intern_ontology_term(Connection conn, String s)
         throws SQLException
     {
-	PreparedStatement get = conn.prepareStatement("select ontology_term_id from ontology_term where term_name = ?");
-	get.setString(1, s);
-	ResultSet rs = get.executeQuery();
-	if (rs.next()) {
-	    int id = rs.getInt(1);
-	    get.close();
-	    return id;
-	}
-	get.close();
-
-	PreparedStatement insert = conn.prepareStatement("insert into ontology_term (term_name) values ( ? )");
-	insert.setString(1, s);
-	insert.executeUpdate();
-	insert.close();
-
-	int id = getDBHelper().getInsertID(conn, "ontology_term", "ontology_term_id");
-	return id;
+        int guano_id = ontologySQL.ontologyID(ontologySQL.getLegacyOntology());
+        
+        PreparedStatement get = conn.prepareStatement("select ontology_term_id from ontology_term where ontology_id = ? and name = ?");
+        get.setInt(1, guano_id);
+        get.setString(2, s);
+        ResultSet rs = get.executeQuery();
+        if (rs.next()) {
+            int id = rs.getInt(1);
+            get.close();
+            return id;
+        }
+        get.close();
+        
+        PreparedStatement insert = conn.prepareStatement("insert into ontology_term (name, ontology_id) values ( ?, ? )");
+        insert.setString(1, s);
+        insert.setInt(2, guano_id);
+        insert.executeUpdate();
+        insert.close();
+        
+        int id = getDBHelper().getInsertID(conn, "ontology_term", "ontology_term_id");
+        return id;
     }
 
     Map ontologyTermCache = new HashMap();
@@ -842,7 +838,7 @@ public class BioSQLSequenceDB implements SequenceDB {
                 try {
                     conn = pool.takeConnection();
                     PreparedStatement get_terms = conn.prepareStatement(
-                            "select ontology_term_id, term_name " +
+                            "select ontology_term_id, name " +
                             "  from ontology_term"
                     );
                     ResultSet rs = get_terms.executeQuery();
@@ -860,34 +856,6 @@ public class BioSQLSequenceDB implements SequenceDB {
         }
     }
         
-    Map seqfeatureSourceCache = new HashMap();
-    
-    String getSeqfeatureSource(int termId) {
-        synchronized(seqfeatureSourceCache) {
-            Integer termKey = new Integer(termId);
-            if (!seqfeatureSourceCache.containsKey(termKey)) {
-                seqfeatureSourceCache.clear();
-                Connection conn = null;
-                try {
-                    conn = pool.takeConnection();
-                    PreparedStatement get_terms = conn.prepareStatement(
-                            "select seqfeature_source_id, source_name " +
-                            "  from seqfeature_source"
-                    );
-                    ResultSet rs = get_terms.executeQuery();
-                    while (rs.next()) {
-                        seqfeatureSourceCache.put(new Integer(rs.getInt(1)),
-                                              rs.getString(2).trim());
-                    }
-                    get_terms.close();
-                    pool.putConnection(conn);
-                } catch (SQLException ex) {
-                    throw new BioRuntimeException(ex, "Error fetching annotations");
-                }                                                         
-            }
-            return (String) seqfeatureSourceCache.get(termKey);
-        }
-    }
     
     private boolean hierarchyChecked = false;
     private boolean hierarchySupported = false;

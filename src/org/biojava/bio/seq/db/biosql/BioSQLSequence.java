@@ -50,7 +50,6 @@ class BioSQLSequence
     private BioSQLSequenceDB seqDB;
     private String name;
     private int bioentry_id = -1;
-    private int biosequence_id;
     private Annotation annotation;
     private Alphabet alphabet;
     private RealizingFeatureHolder features;
@@ -72,7 +71,6 @@ class BioSQLSequence
     BioSQLSequence(BioSQLSequenceDB seqDB,
 	           String name,
 	           int bioentry_id,
-                   int biosequence_id,
                    String alphaName,
                    int length)
 	throws BioException
@@ -80,7 +78,6 @@ class BioSQLSequence
 	this.seqDB = seqDB;
 	this.name = name;
 	this.bioentry_id = bioentry_id;
-	this.biosequence_id = biosequence_id;
         this.length = length;
 
 	try {
@@ -162,17 +159,13 @@ class BioSQLSequence
         throws BioRuntimeException
     {
 	if (symbols == null) {
-	    if (biosequence_id < 0) {
-		throw new BioError("Assertion failed: can only lazy-fetch sequence if from a biosequence entry");
-	    }
-
 	    try {
 		Connection conn = seqDB.getPool().takeConnection();
 		
-		PreparedStatement get_symbols = conn.prepareStatement("select biosequence_str " +
+		PreparedStatement get_symbols = conn.prepareStatement("select seq " +
 								      "from   biosequence " +
-								      "where  biosequence_id = ?");
-		get_symbols.setInt(1, biosequence_id);
+								      "where  entry_id = ?");
+		get_symbols.setInt(1, bioentry_id);
 		ResultSet rs = get_symbols.executeQuery();
 		String seqString = null;
 		if (rs.next()) {

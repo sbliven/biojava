@@ -54,6 +54,8 @@ class OntologySQL {
     private Map blessedExternalAliases;
     private Map blessedExternalTerms;
     
+    private Ontology guano;
+    
     {
         ontologiesByID = new HashMap();
         ontologiesByName = new HashMap();
@@ -65,6 +67,10 @@ class OntologySQL {
         blessedExternalTerms = new HashMap();
     }
 
+    Ontology getLegacyOntology() {
+        return guano;
+    }
+    
     public Ontology getOntology(String name)
         throws NoSuchElementException
     {
@@ -85,11 +91,118 @@ class OntologySQL {
         
         persistOntology(ont);
         
+        OntologyMonitor om = new OntologyMonitor(ont);
+        monitors.put(ont, om);
+        ont.addChangeListener(om, ChangeType.UNKNOWN);
+        
         return ont;
     }
     
-    public Ontology addOntology(Ontology ontology) {
-        return ontology;
+    public Ontology addOntology(Ontology old)
+        throws AlreadyExistsException
+    {
+        if (ontologiesByName.containsKey(old.getName())) {
+            throw new AlreadyExistsException("This BioSQL database already contains an ontology of name " + old.getName());
+        }
+        
+        Connection conn = null; 
+        try {
+            conn = seqDB.getPool().takeConnection();
+            conn.setAutoCommit(false);
+            Ontology ont = new Ontology.Impl(old.getName(), old.getDescription());
+            persistOntology(conn, ont);
+            
+            Map localTerms = new HashMap();
+            for (Iterator i = old.getTerms().iterator(); i.hasNext(); ) {
+                Term t = (Term) i.next();
+                Term localTerm;
+                if (t instanceof RemoteTerm) {
+                    localTerm = ont.importTerm(((RemoteTerm) t).getRemoteTerm());
+                } else {
+                    localTerm = ont.createTerm(t.getName(), t.getDescription());
+                    persistTerm(conn, localTerm);
+                }
+                localTerms.put(t, localTerm);
+            }
+            for (Iterator i = old.getTriples(null, null, null).iterator(); i.hasNext(); ) {
+                Triple t = (Triple) i.next();
+                Triple localT = ont.createTriple(
+                    (Term) localTerms.get(t.getSubject()),
+                    (Term) localTerms.get(t.getObject()),
+                    (Term) localTerms.get(t.getRelation())
+                );
+                    
+                persistTriple(conn, ont, localT);
+            }
+            
+            conn.commit();
+            
+            OntologyMonitor om = new OntologyMonitor(ont);
+            monitors.put(ont, om);
+            ont.addChangeListener(om, ChangeType.UNKNOWN);
+            
+            return ont;
+        } catch (SQLException ex) {
+            boolean rolledback = false;
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                    rolledback = true;
+                } catch (SQLException ex2) {}
+            }
+            throw new BioRuntimeException(ex, "Error removing from BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""));
+        } catch (AlreadyExistsException ex) {
+            throw new BioError(ex, "Unexpected ontology duplication error");
+        } catch (ChangeVetoException ex) {
+            throw new BioError(ex, "Unexpected veto altering internal Ontology object");
+        }
+    }
+    
+    public void addCore(Connection conn)
+        throws SQLException
+    {
+        System.err.println("*** Importing a core ontology -- hope this is okay");
+        
+        try {
+            conn.setAutoCommit(false);
+            Ontology old = OntoTools.getCoreOntology();
+            Ontology ont = new Ontology.Impl("__core_ontology", "BioSQL core ontology (imported by BioJava)");
+            persistOntology(conn, ont);
+            
+            Map localTerms = new HashMap();
+            for (Iterator i = old.getTerms().iterator(); i.hasNext(); ) {
+                Term t = (Term) i.next();
+                Term localTerm;
+                if (t instanceof RemoteTerm) {
+                    localTerm = ont.importTerm(((RemoteTerm) t).getRemoteTerm());
+                } else {
+                    localTerm = ont.createTerm(t.getName(), t.getDescription());
+                    persistTerm(conn, localTerm);
+                }
+                localTerms.put(t, localTerm);
+            }
+            for (Iterator i = old.getTriples(null, null, null).iterator(); i.hasNext(); ) {
+                Triple t = (Triple) i.next();
+                Triple localT = ont.createTriple(
+                (Term) localTerms.get(t.getSubject()),
+                (Term) localTerms.get(t.getObject()),
+                (Term) localTerms.get(t.getRelation())
+                );
+                
+                persistTriple(conn, ont, localT);
+            }
+            
+            conn.commit();
+            
+            OntologyMonitor om = new OntologyMonitor(ont);
+            monitors.put(ont, om);
+            ont.addChangeListener(om, ChangeType.UNKNOWN);
+            blessExternal(ont, old);
+        } catch (AlreadyExistsException ex) {
+            throw new BioError(ex, "Unexpected ontology duplication error");
+        } catch (ChangeVetoException ex) {
+            throw new BioError(ex, "Unexpected veto altering internal Ontology object");
+        }
     }
     
     private void loadTerms(Ontology ont, int id)
@@ -107,6 +220,9 @@ class OntologySQL {
             int term_id = rs.getInt(1);
             String name = rs.getString(2);
             String description = rs.getString(3);
+            if (description == null) {
+                description = "";
+            }
             
             Term t = ont.createTerm(name, description);
             Integer tid = new Integer(term_id);
@@ -119,7 +235,7 @@ class OntologySQL {
         seqDB.getPool().putConnection(conn);
         conn = null;
         
-        if (ont.getName().equals("core_ontology")) {
+        if (ont.getName().equals("__core_ontology")) {
             blessExternal(ont, OntoTools.getCoreOntology());
         }
     }
@@ -197,6 +313,16 @@ class OntologySQL {
                 OntologyMonitor om = new OntologyMonitor(ont);
                 monitors.put(ont, om);
                 ont.addChangeListener(om, ChangeType.UNKNOWN);
+            }
+            
+            if (!ontologiesByName.containsKey("__core_ontology")) {
+                addCore(conn);
+            }
+            
+            if (ontologiesByName.containsKey("__biojava_guano")) {
+                guano = getOntology("__biojava_guano");
+            } else {
+                guano = createOntology("__biojava_guano", "Namespace for old, but still useful, shit imported from ontology-less BioJava data models");
             }
         } catch (AlreadyExistsException ex) {
             throw new BioException(ex, "Duplicate term name in BioSQL");
@@ -401,12 +527,10 @@ class OntologySQL {
         Integer tid = new Integer(id);
         ontologiesByID.put(tid, ont);
         ontologiesByName.put(ont.getName(), ont);
-        OntologyMonitor om = new OntologyMonitor(ont);
-        monitors.put(ont, om);
-        ont.addChangeListener(om, ChangeType.UNKNOWN);
+        
     }
     
-    private int ontologyID(Ontology ont) {
+    int ontologyID(Ontology ont) {
         for (Iterator i = ontologiesByID.entrySet().iterator(); i.hasNext(); ) {
             Map.Entry me = (Map.Entry) i.next();
             if (me.getValue().equals(ont)) {
@@ -416,14 +540,18 @@ class OntologySQL {
         throw new BioError("Couldn't find ontology " + ont.getName());
     }
     
-    private int termID(Term t) {
+    int termID(Term t) {
         while (t instanceof RemoteTerm) {
             t = ((RemoteTerm) t).getRemoteTerm();
         }
         if (blessedExternalAliases.containsKey(t)) {
             t = (Term) blessedExternalAliases.get(t);
         }
-        return ((Integer) IDsByTerm.get(t)).intValue();
+        try {
+            return ((Integer) IDsByTerm.get(t)).intValue();
+        } catch (NullPointerException ex) {
+            throw new BioError(ex, "Error looking up biosqlized ID for " + t.toString());
+        }
     }
     
 }

@@ -71,6 +71,8 @@ class BioSQLSequenceAnnotation
 	    // Handle all the hacky special cases first
 	    //
       
+      /*
+      
 	    PreparedStatement get_taxa = conn.prepareStatement(
 			"select taxa.full_lineage, taxa.common_name, taxa.ncbi_taxa_id " +
 			"from bioentry_taxa, taxa " +
@@ -89,19 +91,21 @@ class BioSQLSequenceAnnotation
 		underlyingAnnotation.setProperty(OrganismParser.PROPERTY_ORGANISM, taxon);
 	    }
 
+        */
+        
 	    //
 	    // General-purpose tagvalue data.
 	    //
 
 	    if (seqDB.isBioentryPropertySupported()) {
 		PreparedStatement get_properties = conn.prepareStatement(
-			"select ontology_term.term_name as qn, bioentry_qualifier_value.qualifier_value " + /*, bioentry_property.property_rank as rank " + */
+			"select ontology_term.name as qn, bioentry_qualifier_value.value " + /*, bioentry_property.property_rank as rank " + */
 			"  from bioentry_qualifier_value, ontology_term " +
 			" where bioentry_qualifier_value.bioentry_id = ? " +
 			"   and ontology_term.ontology_term_id = bioentry_qualifier_value.ontology_term_id " /* + */
 			/* " order by qn, rank" */);
 		get_properties.setInt(1, bioentry_id);
-		rs = get_properties.executeQuery();
+		ResultSet rs = get_properties.executeQuery();
 		while (rs.next()) {
 		    String key = rs.getString(1).trim();   // HACK due to stupid schema change
 		    String value = rs.getString(2);
@@ -127,9 +131,9 @@ class BioSQLSequenceAnnotation
 	    throw new BioRuntimeException(ex, "Error fetching annotations");
 	} catch (ChangeVetoException ex) {
 	    throw new BioError(ex);
-	} catch (CircularReferenceException ex) {
+	} /* catch (CircularReferenceException ex) {
 	    throw new BioError(ex);
-	}
+	} */
     }
 
     public Object getProperty(Object key)

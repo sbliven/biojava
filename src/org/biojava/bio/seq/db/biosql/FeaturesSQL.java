@@ -85,8 +85,8 @@ class FeaturesSQL {
         if (overlappingRegion == null && immediateChildrenOfParent < 0 && featureID < 0) {
             get_features = conn.prepareStatement(
 			        "select seqfeature.seqfeature_id, " +
-                    "       seqfeature.seqfeature_key_id, " +
-                    "       seqfeature.seqfeature_source_id " +
+                    "       seqfeature.type_term_id, " +
+                    "       seqfeature.source_term_id " +
                     "  from seqfeature " +
                     " where seqfeature.bioentry_id = ?"
 			);
@@ -94,14 +94,14 @@ class FeaturesSQL {
         } else if (overlappingRegion != null) {
             get_features = conn.prepareStatement(
 			        "select seqfeature.seqfeature_id, " +
-                    "       seqfeature.seqfeature_key_id, " +
-                    "       seqfeature.seqfeature_source_id " +
+                    "       seqfeature.type_term_id, " +
+                    "       seqfeature.source_term_id " +
                     "  from seqfeature_location, seqfeature " +
                     " where seqfeature.bioentry_id = ? and " +
                     "       seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
-                    "       seqfeature_location.seq_end >= ? and " +
-                    "       seqfeature_location.seq_start <= ? " +
-                    " group by seqfeature.seqfeature_id, seqfeature.seqfeature_key_id, seqfeature.seqfeature_source_id"
+                    "       seqfeature_location.start_pos >= ? and " +
+                    "       seqfeature_location.end_pos <= ? " +
+                    " group by seqfeature.seqfeature_id, seqfeature.type_term_id, seqfeature.source_term_id"
              );
              get_features.setInt(1, bioentry_id);
              get_features.setInt(2, overlappingRegion.getMin());
@@ -109,8 +109,8 @@ class FeaturesSQL {
         } else if (immediateChildrenOfParent >= 0) {
             get_features = conn.prepareStatement(
 			        "select seqfeature.seqfeature_id, " +
-                    "       seqfeature.seqfeature_key_id, " +
-                    "       seqfeature.seqfeature_source_id " +
+                    "       seqfeature.type_term_id, " +
+                    "       seqfeature.source_term_id " +
                     "  from seqfeature, seqfeature_relationship " +
                     " where seqfeature.seqfeature_id = seqfeature_relationship.child_seqfeature_id and " +
                     "       seqfeature_relationship.parent_seqfeature_id = ?"
@@ -119,8 +119,8 @@ class FeaturesSQL {
         } else if (featureID >= 0) {
 	        get_features = conn.prepareStatement(
 			        "select seqfeature.seqfeature_id, " +
-                    "       seqfeature.seqfeature_key_id, " +
-                    "       seqfeature.seqfeature_source_id, " +
+                    "       seqfeature.type_term_id, " +
+                    "       seqfeature.source_term_id, " +
                     "       seqfeature.bioentry_id " + 
                     "  from seqfeature " +
                     " where seqfeature.seqfeature_id = ?"
@@ -135,7 +135,7 @@ class FeaturesSQL {
             int feature_id = rs.getInt(1);
             StrandedFeature.Template templ = new StrandedFeature.Template();
             templ.type = seqDB.getOntologyTerm(rs.getInt(2));
-            templ.source = seqDB.getSeqfeatureSource(rs.getInt(3));
+            templ.source = seqDB.getOntologyTerm(rs.getInt(3));
             templ.annotation = new BioSQLFeatureAnnotation(seqDB, feature_id);
             // templ.annotation = new SmallAnnotation();
             fmap.put(new Integer(feature_id), templ);
@@ -154,7 +154,7 @@ class FeaturesSQL {
             get_annotations = conn.prepareStatement(
 		            "select seqfeature_qualifier_value.seqfeature_id, " +
                     "       seqfeature_qualifier_value.ontology_term_id, " +
-                    "       seqfeature_qualifier_value.qualifier_value " +
+                    "       seqfeature_qualifier_value.value " +
                     "  from seqfeature, seqfeature_qualifier_value " +
                     " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id and " +
                     "       seqfeature.bioentry_id = ?"
@@ -164,7 +164,7 @@ class FeaturesSQL {
            get_annotations = conn.prepareStatement(
 		            "select seqfeature_qualifier_value.seqfeature_id, " +
                     "       seqfeature_qualifier_value.ontology_term_id, " +
-                    "       seqfeature_qualifier_value.qualifier_value " +
+                    "       seqfeature_qualifier_value.value " +
                     "  from seqfeature, seqfeature_qualifier_value, seqfeature_location " +
                     " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id and " +
                     "       seqfeature.bioentry_id = ? and" +
@@ -173,7 +173,7 @@ class FeaturesSQL {
                     "       seqfeature_location.seq_start <= ? " +
                     "       group by seqfeature_qualifier_value.seqfeature_id, " +
                     "                seqfeature_qualifier_value.ontology_term_id, " +
-                    "                seqfeature_qualifier_value.qualifier_value"
+                    "                seqfeature_qualifier_value.value"
            );
            get_annotations.setInt(1, bioentry_id);
            get_annotations.setInt(2, overlappingRegion.getMin());
@@ -182,7 +182,7 @@ class FeaturesSQL {
             get_annotations = conn.prepareStatement(
            		   "select seqfeature_qualifier_value.seqfeature_id, " +
                    "       seqfeature_qualifier_value.ontology_term_id, " +
-                   "       seqfeature_qualifier_value.qualifier_value " +
+                   "       seqfeature_qualifier_value.value " +
                    "  from seqfeature_qualifier_value, seqfeature_relationship " +
                    " where seqfeature_qualifier_value.seqfeature_id = seqfeature_relationship.child_seqfeature_id and " +
                    "       seqfeature_relationship.parent_seqfeature_id = ?"
@@ -192,7 +192,7 @@ class FeaturesSQL {
            get_annotations = conn.prepareStatement(
 		            "select seqfeature_qualifier_value.seqfeature_id, " +
                     "       seqfeature_qualifier_value.ontology_term_id, " +
-                    "       seqfeature_qualifier_value.qualifier_value " +
+                    "       seqfeature_qualifier_value.value " +
                     "  from seqfeature_qualifier_value " +
                     " where seqfeature_qualifier_value.seqfeature_id = ?"
             );
@@ -255,9 +255,9 @@ class FeaturesSQL {
             get_locations = conn.prepareStatement(
 		            "select seqfeature_location.seqfeature_location_id, " +
                     "       seqfeature_location.seqfeature_id, " +
-                    "       seqfeature_location.seq_start, " +
-                    "       seqfeature_location.seq_end, " +
-                    "       seqfeature_location.seq_strand " +
+                    "       seqfeature_location.start_pos, " +
+                    "       seqfeature_location.end_pos, " +
+                    "       seqfeature_location.strand " +
                     "  from seqfeature, seqfeature_location " +
                     " where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
                     "       seqfeature.bioentry_id = ?"
@@ -267,20 +267,20 @@ class FeaturesSQL {
            get_locations = conn.prepareStatement(
 		           "select seqfeature_location.seqfeature_location_id, " +
                    "       seqfeature_location.seqfeature_id, " +
-                   "       seqfeature_location.seq_start, " +
-                   "       seqfeature_location.seq_end, " +
-                   "       seqfeature_location.seq_strand " +
+                   "       seqfeature_location.start_pos, " +
+                   "       seqfeature_location.end_pos, " +
+                   "       seqfeature_location.strand " +
                    "  from seqfeature_location, seqfeature_location as sfl2, seqfeature " +
                    " where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
                    "       seqfeature.bioentry_id = ? and " +
                    "       sfl2.seqfeature_id = seqfeature.seqfeature_id and " +
-                   "       sfl2.seq_end >= ? and " +
-                   "       sfl2.seq_start <= ? " +
+                   "       sfl2.end_pos >= ? and " +
+                   "       sfl2.start_pos <= ? " +
                    " group by seqfeature_location.seqfeature_location_id, " +
                    "          seqfeature_location.seqfeature_id, " +
-                   "          seqfeature_location.seq_start, " +
-                   "          seqfeature_location.seq_end, " +
-                   "          seqfeature_location.seq_strand"
+                   "          seqfeature_location.start_pos, " +
+                   "          seqfeature_location.end_pos, " +
+                   "          seqfeature_location.strand"
            );
            get_locations.setInt(1, bioentry_id);
            get_locations.setInt(2, overlappingRegion.getMin());
@@ -289,9 +289,9 @@ class FeaturesSQL {
            get_locations = conn.prepareStatement(
 		           "select seqfeature_location.seqfeature_location_id, " +
                    "       seqfeature_location.seqfeature_id, " +
-                   "       seqfeature_location.seq_start, " +
-                   "       seqfeature_location.seq_end, " +
-                   "       seqfeature_location.seq_strand " +
+                   "       seqfeature_location.start_pos, " +
+                   "       seqfeature_location.end_pos, " +
+                   "       seqfeature_location.strand " +
                    "  from seqfeature_location, seqfeature_relationship " +
                    " where seqfeature_location.seqfeature_id = seqfeature_relationship.child_seqfeature_id and " +
                    "       seqfeature_relationship.parent_seqfeature_id = ?"
@@ -301,9 +301,9 @@ class FeaturesSQL {
            get_locations = conn.prepareStatement(
 		            "select seqfeature_location.seqfeature_location_id, " +
                     "       seqfeature_location.seqfeature_id, " +
-                    "       seqfeature_location.seq_start, " +
-                    "       seqfeature_location.seq_end, " +
-                    "       seqfeature_location.seq_strand " +
+                    "       seqfeature_location.start_pos, " +
+                    "       seqfeature_location.end_pos, " +
+                    "       seqfeature_location.strand " +
                     "  from seqfeature_location " +
                     " where seqfeature_location.seqfeature_id = ?");
            get_locations.setInt(1, featureID);
@@ -470,8 +470,8 @@ class FeaturesSQL {
                         " where parent_seqfeature_id = seqfeature.seqfeature_id and " +
                         "       seqfeature.bioentry_id = ? and " +
                         "       seqfeature_location.seqfeature_id = parent_seqfeature_id and " +
-                        "       seqfeature_location.seq_end >= ? and " +
-                        "       seqfeature_location.seq_start <= ? " +
+                        "       seqfeature_location.end_pos >= ? and " +
+                        "       seqfeature_location.start_pos <= ? " +
                         "       group by parent_seqfeature_id, child_seqfeature_id"
                  );
                  get_hierarchy.setInt(1, bioentry_id);
@@ -576,7 +576,7 @@ class FeaturesSQL {
 	    
 	    int seqfeature_key = seqDB.intern_ontology_term(conn, type);
 	    PreparedStatement update_key = conn.prepareStatement("update seqfeature " + 
-                                                                 "   set seqfeature_key_id = ? " +
+                                                                 "   set type_term_id = ? " +
 								 " where seqfeature_id = ?");
 	    update_key.setInt(1, seqfeature_key);
 	    update_key.setInt(2, feature_id);
@@ -604,9 +604,9 @@ class FeaturesSQL {
 	    conn = seqDB.getPool().takeConnection();
 	    conn.setAutoCommit(false);
 	    
-	    int seqfeature_source = seqDB.intern_seqfeature_source(conn, source);
+	    int seqfeature_source = seqDB.intern_ontology_term(conn, source);
 	    PreparedStatement update_source = conn.prepareStatement("update seqfeature " + 
-								    "   set seqfeature_source_id = ? " +
+								    "   set source_term_id = ? " +
 								    " where seqfeature_id = ?");
 	    update_source.setInt(1, seqfeature_source);
 	    update_source.setInt(2, feature_id);
@@ -644,7 +644,7 @@ class FeaturesSQL {
 
 	    PreparedStatement add_locationspan = conn.prepareStatement(
                     "insert into seqfeature_location " +
-	            "       (seqfeature_id, seq_start, seq_end, seq_strand, location_rank) " +
+	            "       (seqfeature_id, start_pos, end_pos, strand, rank) " +
     		    "values (?, ?, ?, ?, ?)"
 	    );
 
@@ -757,11 +757,11 @@ class FeaturesSQL {
 	    }
 	} else {
 	    int seqfeature_key = seqDB.intern_ontology_term(conn, f.getType());
-	    int seqfeature_source = seqDB.intern_seqfeature_source(conn, f.getSource());
+	    int seqfeature_source = seqDB.intern_ontology_term(conn, f.getSource());
 
 	    PreparedStatement add_feature = conn.prepareStatement(
 		"insert into seqfeature "+
-		"       (bioentry_id, seqfeature_key_id, seqfeature_source_id) " +
+		"       (bioentry_id, type_term_id, source_term_id) " +
 		"values (?, ?,  ?)"
 	    );
 	    add_feature.setInt(1, bioentry_id);
@@ -776,7 +776,7 @@ class FeaturesSQL {
 	if (!locationWritten) {
 	    PreparedStatement add_locationspan = conn.prepareStatement(
                     "insert into seqfeature_location " +
-	            "       (seqfeature_id, seq_start, seq_end, seq_strand, location_rank) " +
+	            "       (seqfeature_id, start_pos, end_pos, strand, rank) " +
     		    "values (?, ?, ?, ?, ?)"
 	    );
 
@@ -824,7 +824,7 @@ class FeaturesSQL {
 	if (parent_id >= 0) {
 	    PreparedStatement add_hierarchy = conn.prepareStatement(
 		"insert into seqfeature_relationship "+
-		"       (parent_seqfeature_id, child_seqfeature_id, relationship_type_id) " +
+		"       (parent_seqfeature_id, child_seqfeature_id, ontology_term_id) " +
 		"values (?, ?, ?)"
 		);
 	    add_hierarchy.setInt(1, parent_id);
@@ -926,7 +926,7 @@ class FeaturesSQL {
         PreparedStatement insert_new;
         if (seqDB.isSPASupported()) {
             insert_new= conn.prepareStatement("insert into seqfeature_qualifier_value " +
-                                              "       (seqfeature_id, ontology_term_id, qualifier_rank, qualifier_value) " +
+                                              "       (seqfeature_id, ontology_term_id, rank, value) " +
                     					      "values (?, intern_ontology_term( ? ), ?, ?)");
             if (value instanceof Collection) {
                 int cnt = 0;
@@ -947,7 +947,7 @@ class FeaturesSQL {
             insert_new.close();
         } else {
             insert_new = conn.prepareStatement("insert into seqfeature_qualifier_value " +
-                                               "       (seqfeature_id, ontology_term_id, qualifier_rank, qualifier_value) " +
+                                               "       (seqfeature_id, ontology_term_id, rank, value) " +
 			  	 	                           "values (?, ?, ?, ?)");
 	        int sfq = seqDB.intern_ontology_term(conn, keyString);
             if (value instanceof Collection) {

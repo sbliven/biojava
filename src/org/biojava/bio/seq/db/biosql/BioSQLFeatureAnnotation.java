@@ -62,7 +62,7 @@ class BioSQLFeatureAnnotation
 	try {
 	    Connection conn = seqDB.getPool().takeConnection();
 
-	    PreparedStatement get_annotations = conn.prepareStatement("select ontology_term.term_name, seqfeature_qualifier_value.qualifier_value " +
+	    PreparedStatement get_annotations = conn.prepareStatement("select ontology_term.name, seqfeature_qualifier_value.value " +
 								      "  from ontology_term, seqfeature_qualifier_value " +
 								      " where seqfeature_qualifier_value.seqfeature_id = ? and " +
 								      "       ontology_term.ontology_term_id = seqfeature_qualifier_value.ontology_term_id");
