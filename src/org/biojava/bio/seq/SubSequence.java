@@ -102,6 +102,23 @@ public class SubSequence implements Sequence {
     {
         this(seq, start, end, null, false);
     }
+    
+    /**
+     * Construct a new SubSequence of the specified sequence.
+     *
+     * @param seq A sequence to view
+     * @param start The start of the range to view
+     * @param end The end of the range to view
+     * @param name Name for the subsequence
+     * @throws IndexOutOfBoundsException is the start or end position is illegal.
+     */
+    public SubSequence(Sequence seq,
+		       final int start,
+		       final int end,
+               final String name) 
+    {
+        this(seq, start, end, null, false, name);
+    }
 
     /**
      * Construct a new SubSequence of the specified sequence.
@@ -120,12 +137,34 @@ public class SubSequence implements Sequence {
 		       final FeatureFilter ff,
 		       final boolean recurse) 
     {
+        this(seq, start, end, ff, recurse, seq.getName() + " (" + start + " - " + end + ")");
+    }
+    
+    /**
+     * Construct a new SubSequence of the specified sequence with a new name.
+     *
+     * @param seq A sequence to view
+     * @param start The start of the range to view
+     * @param end The end of the range to view
+     * @param ff A FeatureFilter to apply when cropping the sequence
+     * @param recurse Recursion flag when filtering
+     * @param name Name for the subsequence
+     * @throws IndexOutOfBoundsException is the start or end position is illegal.
+     */
+
+    public SubSequence(Sequence seq,
+		       final int start,
+		       final int end,
+		       final FeatureFilter ff,
+		       final boolean recurse,
+               final String name) 
+    {
         this.parent = seq;
 	this.start = start;
 	this.end = end;
 
 	symbols = seq.subList(start, end);
-	name = seq.getName() + " (" + start + " - " + end + ")";
+	this.name = name;
 	uri = seq.getURN() + "?start=" + start + ";end=" + end;
 	annotation = seq.getAnnotation();
 
