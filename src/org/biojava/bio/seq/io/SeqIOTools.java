@@ -38,6 +38,7 @@ import org.biojava.utils.*;
  * @author Mark Schreiber
  * @author Nimesh Singh
  * @author Matthew Pocock
+ * @author Keith James
  * @since 1.1
  */
 public final class SeqIOTools  {
@@ -428,7 +429,7 @@ public final class SeqIOTools  {
         throws BioException {
         switch (fileType) {
             case SeqIOConstants.FASTA_DNA:
-                return getFastaBuilderFactory();
+            case SeqIOConstants.FASTA_RNA:
             case SeqIOConstants.FASTA_AA:
                 return getFastaBuilderFactory();
             case SeqIOConstants.EMBL_DNA:
@@ -464,6 +465,8 @@ public final class SeqIOTools  {
             default:
                 throw new BioException("Unknown file type '"
                                        + fileType
+                                       + "' which indicates alphabet type '"
+                                       + alphaType
                                        + "'");
         }
     }
@@ -605,7 +608,7 @@ public final class SeqIOTools  {
         throws BioException {
         switch(fileType) {
             case SeqIOConstants.FASTA_DNA:
-                return new FastaFormat();
+            case SeqIOConstants.FASTA_RNA:
             case SeqIOConstants.FASTA_AA:
                 return new FastaFormat();
             case SeqIOConstants.EMBL:

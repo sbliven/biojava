@@ -216,6 +216,8 @@ public class BioStoreFactory {
         keys.remove(keyName);
     }
 
+    
+
     /**
      * <code>createBioStore</code> creates a <code>BioStore</code>
      * reflecting the current state of the factory and returns a

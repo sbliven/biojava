@@ -32,7 +32,7 @@ import org.biojava.bio.seq.db.*;
  */
 public class BioSQLSequenceDBProvider implements SequenceDBProvider {
     public String getName() {
-	return "biosql";
+        return "biosql";
     }
 
     public SequenceDBLite getSequenceDB(Map config)
@@ -40,29 +40,44 @@ public class BioSQLSequenceDBProvider implements SequenceDBProvider {
     {
 	String location = (String) config.get("location");
 	if (location == null) {
-	    throw new RegistryException("BioSQL databases require a `location' option");
+	    throw new RegistryException("BioSQL provider requires"
+                                    + " a 'location' parameter");
 	}
 
-	String userName = (String) config.get("userName");
-	if (userName == null) {
-	    throw new RegistryException("BioSQL databases require a `userName' option");
+	String dbName = (String) config.get("dbname");
+	if (dbName == null) {
+	    throw new RegistryException("BioSQL provider requires"
+                                    + " a 'dbname' parameter");
 	}
 
-	String password = (String) config.get("password");
-	if (password == null) {
-	    password = "";
-	}
-
-	String biodatabase = (String) config.get("biodatabase");
+	String biodatabase = (String) config.get("biodbname");
 	if (biodatabase == null) {
-	    throw new RegistryException("BioSQL database require a `biodatabase' option");
+	    throw new RegistryException("BioSQL provider requires"
+                                    + " a 'biodbname' parameter");
+	}
+
+	String userName = (String) config.get("user");
+	if (userName == null) {
+	    throw new RegistryException("BioSQL provider requires"
+                                    + " a 'user' parameter");
+	}
+
+	String password = (String) config.get("passwd");
+	if (password == null) {
+	    throw new RegistryException("BioSQL provider requires"
+                                    + " a 'passwd' parameter");
+	}
+
+	String driver = (String) config.get("driver");
+	if (driver== null) {
+	    throw new RegistryException("BioSQL provider requires"
+                                    + " a 'driver' parameter");
 	}
 
 	return new BioSQLSequenceDB(location,
-				    userName,
-				    password,
-				    biodatabase,
-				    false);
-
+                                userName,
+                                password,
+                                biodatabase,
+                                false);
     }
 }

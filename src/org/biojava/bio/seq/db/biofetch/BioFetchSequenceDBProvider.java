@@ -37,30 +37,26 @@ import org.biojava.bio.seq.db.*;
  * @author Thomas Down
  * @since 1.3
  */
-
 public class BioFetchSequenceDBProvider implements SequenceDBProvider {
     public String getName() {
-	return "biofetch";
+        return "biofetch";
     }
 
     public SequenceDBLite getSequenceDB(Map config)
         throws RegistryException, BioException
     {
-	String prefix = (String) config.get("location");
-	if (prefix == null) {
-	    throw new RegistryException("BioFetch requires prefix");
-	}
+        String location = (String) config.get("location");
+        if (location == null) {
+            throw new RegistryException("BioFetch provider requires"
+                                        + " a location parameter");
+        }
 
-	String type = (String) config.get("format");
-	if (type == null) {
-	    throw new RegistryException("BioFetch requires type");
-	}
+        String dbName = (String) config.get("dbname");
+        if (dbName == null) {
+            throw new RegistryException("BioFetch provider requires"
+                                        + " a dbname parameter");
+        }
 
-	String db = (String) config.get("biodatabase");
-	if (db == null) {
-	    throw new RegistryException("BioFetch requires biodatabase paramter");
-	}
-
-	return new BioFetchSequenceDB(prefix, type, db);
+        return new BioFetchSequenceDB(location, dbName);
     }
 }

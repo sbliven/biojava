@@ -34,101 +34,120 @@ import org.biojava.bio.seq.io.*;
 
 /**
  * Simple SequenceDB implementation backed by a BioFetch (HTTP)
- * server
+ * server.
  *
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Greg Cox
  * @since 1.3
  */
-
 public class BioFetchSequenceDB
   extends
     Unchangeable
   implements
-    SequenceDBLite
-{
-    private final String prefix;
-    private final String type;
-    private final String db;
+    SequenceDBLite {
+    private final String location;
+    private final String dbName;
 
     /**
-     * Construct a BioFetchSequenceDB which connects to the specified BioFetch server.
+     * Construct a BioFetchSequenceDB which connects to the specified
+     * BioFetch server.
      *
-     * @param prefix The base URL of the server.
-     * @param type The type of entry to be retrieved (currently only "embl" is supported).
-     * @param db The database name to use.
+     * @param location The base URL of the server.
+     * @param dbName The database name to use.
      */
-    
-    public BioFetchSequenceDB(String prefix,
-			                  String type,
-                              String db)
-    {
-        this.prefix = prefix;
-        this.type = type;
-        this.db = db;
+    public BioFetchSequenceDB(String location,
+			                  String dbName) {
+        this.location = location;
+        this.dbName = dbName;
     }
 
     public String getName() {
-	return db;
+        return dbName;
     }
 
-
-    public void addSequence(Sequence seq)
-        throws ChangeVetoException
-    {
-	throw new ChangeVetoException("Can't add sequences to XEMBL");
+    public void addSequence(Sequence seq)  throws ChangeVetoException {
+        throw new ChangeVetoException("Failed to add sequence."
+                                      + " Sequences may not be added"
+                                      + " to a biofetch database");
     }
 
-    public void removeSequence(String id)
-        throws ChangeVetoException
-    {
-	throw new ChangeVetoException("Can't remove sequences from XEMBL");
+    public void removeSequence(String id) throws ChangeVetoException {
+        throw new ChangeVetoException("Failed to add sequence."
+                                      + " Sequences may not be removed"
+                                      + " from a biofetch database");
     }
 
     public Sequence getSequence(String id)
         throws BioException, IllegalIDException
     {
-	StringBuffer uri = new StringBuffer(prefix);
-	uri.append('?');
-	uri.append("style=raw;");
-	uri.append("format=");
-	uri.append(type);
-	uri.append(";db=");
-	uri.append(db);
-	uri.append(";id=");
-	uri.append(id);
+        String format = "";
 
-	try {
-	    HttpURLConnection huc = (HttpURLConnection) new URL(uri.substring(0)).openConnection();
-	    huc.connect();
-	    BufferedReader data = new BufferedReader(new InputStreamReader(huc.getInputStream()));
-	    data.mark(1000);
-	    String firstLine = data.readLine();
-	    if (firstLine.startsWith("Content-")) {
-		data.readLine();
-		firstLine = data.readLine();
-	    }
-	    StringTokenizer toke = new StringTokenizer(firstLine);
-	    String first = toke.nextToken();
-	    if ("ERROR".equals(first)) {
-		int errorCode = Integer.parseInt(toke.nextToken());
-		if (errorCode == 4) {
-		    throw new IllegalIDException("No such ID " + id + " in database " + getName());
-		} else {
-		    throw new BioException("Error fetching from BioFetch: firstLine");
-		}
-	    }
+        if (dbName.equals("embl"))
+            format = "embl";
+        if (dbName.equals("genbank"))
+            format = "genbank";
+        else if (dbName.equals("swiss"))
+            format = "swissprot";
+        else if (dbName.equals("refseq"))
+            throw new BioException("Sequence database "
+                                   + dbName
+                                   + " is not supported");
 
-	    data.reset();
-	    if ("embl".equals(type)) {
-		SequenceIterator si = SeqIOTools.readEmbl(data);
-		return si.nextSequence();
-	    } else {
-		throw new BioException("Unknown format " + type);
-	    }
-	} catch (IOException ex) {
-	    throw new BioException(ex, "Error reading data from BioFetch");
-	}
+        StringBuffer uri = new StringBuffer(location);
+        uri.append('?');
+        uri.append("style=raw;");
+        uri.append("format=");
+        uri.append(format);
+        uri.append(";db=");
+        uri.append(dbName);
+        uri.append(";id=");
+        uri.append(id);
+
+        try {
+            HttpURLConnection huc =
+                (HttpURLConnection) new URL(uri.substring(0)).openConnection();
+            huc.connect();
+            BufferedReader data =
+                new BufferedReader(new InputStreamReader(huc.getInputStream()));
+            data.mark(1000);
+
+            String firstLine = data.readLine();
+            if (firstLine.startsWith("Content-")) {
+                data.readLine();
+                firstLine = data.readLine();
+            }
+
+            StringTokenizer toke = new StringTokenizer(firstLine);
+            String first = toke.nextToken();
+            if ("ERROR".equals(first)) {
+                int errorCode = Integer.parseInt(toke.nextToken());
+                if (errorCode == 4) {
+                    throw new IllegalIDException("No such ID "
+                                                 + id
+                                                 + " in database "
+                                                 + getName());
+                } else {
+                    throw new BioException("Error fetching from BioFetch:"
+                                           + firstLine);
+                }
+            }
+
+            data.reset();
+
+            SequenceIterator si = SeqIOTools.readEmbl(data);
+
+            if (dbName.equals("embl"))
+                si = SeqIOTools.readEmbl(data);
+            else if (dbName.equals("genbank"))
+                si = SeqIOTools.readGenbank(data);
+            else if (dbName.equals("swiss"))
+                si = SeqIOTools.readSwissprot(data);
+
+            return si.nextSequence();
+
+        } catch (IOException ex) {
+            throw new BioException(ex, "Error reading data from BioFetch");
+        }
     }
 }
