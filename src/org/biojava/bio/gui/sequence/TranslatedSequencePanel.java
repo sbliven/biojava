@@ -238,14 +238,14 @@ public class TranslatedSequencePanel extends JComponent
      * Creates a new <code>TranslatedSequencePanel</code> with the
      * default settings (direction HORIZONTAL, scale 10.0 pixels per
      * symbol, symbol translation 0, leading border 0.0, trailing
-     * border 0.0, 12 point serif font).
+     * border 0.0, 12 point sanserif font).
      */
     public TranslatedSequencePanel()
     {
         super();
 
         if (getFont() == null)
-            setFont(new Font("serif", Font.PLAIN, 12));
+            setFont(new Font("sanserif", Font.PLAIN, 12));
 
         direction   = HORIZONTAL;
         scale       = 10.0;
@@ -673,8 +673,8 @@ public class TranslatedSequencePanel extends JComponent
             clip.y = 0.0;
             // Set the width to visible symbols + the delegate
             // renderer's minimum trailer (which may have something in
-            // it to render)
-            clip.width = sequenceToGraphics(getVisibleSymbolCount())
+            // it to render).
+            clip.width = sequenceToGraphics(getVisibleSymbolCount() + 1)
                 + renderer.getMinimumTrailer(this);
             clip.height = renderer.getDepth(this);
 
@@ -688,8 +688,8 @@ public class TranslatedSequencePanel extends JComponent
             clip.width = renderer.getDepth(this);
             // Set the height to visible symbols + the delegate
             // renderer's minimum trailer (which may have something in
-            // it to render)
-            clip.height = sequenceToGraphics(getVisibleSymbolCount())
+            // it to render).
+            clip.height = sequenceToGraphics(getVisibleSymbolCount() + 1)
                 + renderer.getMinimumTrailer(this);
 
             g2.translate(0.0, leadingBorder.getSize());

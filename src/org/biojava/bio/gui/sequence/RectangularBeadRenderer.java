@@ -25,11 +25,7 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
-import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Rectangle2D;
-import javax.swing.JComponent;
 
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.symbol.Location;
@@ -50,32 +46,35 @@ import org.biojava.utils.ChangeVetoException;
 public class RectangularBeadRenderer extends AbstractBeadRenderer
     implements FeatureRenderer
 {
+    protected Rectangle2D rect;
+
     /**
-     * Creates a new <code>RectangularBeadRenderer</code> object.
+     * Creates a new <code>RectangularBeadRenderer</code>.
      *
-     * @param beadDepth a <code>double</code> value.
-     * @param beadDisplacement a <code>double</code> value.
-     * @param beadOutline a <code>Paint</code> object.
-     * @param beadFill a <code>Paint</code> object.
-     * @param beadStroke a <code>Stroke</code> object.
+     * @param beadDepth a <code>double</code>.
+     * @param beadDisplacement a <code>double</code>.
+     * @param beadOutline a <code>Paint</code>.
+     * @param beadFill a <code>Paint</code>.
+     * @param beadStroke a <code>Stroke</code>.
      */
-    public RectangularBeadRenderer(double beadDepth,
-				   double beadDisplacement,
-				   Paint  beadOutline,
-				   Paint  beadFill,
-				   Stroke beadStroke)
+    public RectangularBeadRenderer(final double beadDepth,
+				   final double beadDisplacement,
+				   final Paint  beadOutline,
+				   final Paint  beadFill,
+				   final Stroke beadStroke)
     {
 	super(beadDepth, beadDisplacement, beadOutline, beadFill, beadStroke);
+        rect = new Rectangle2D.Double();
     }
 
     /**
      * <code>renderBead</code> renders features as simple rectangle.
      *
-     * @param g a <code>Graphics2D</code> context.
+     * @param g2 a <code>Graphics2D</code>.
      * @param f a <code>Feature</code> to render.
      * @param context a <code>SequenceRenderContext</code> context.
      */
-    protected void renderBead(final Graphics2D            g,
+    protected void renderBead(final Graphics2D            g2,
 			      final Feature               f,
 			      final SequenceRenderContext context)
     {
@@ -85,54 +84,52 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
 	int max = loc.getMax();
 	int dif = max - min;
 
-	Shape shape;
-
 	if (context.getDirection() == context.HORIZONTAL)
 	{
 	    double  posXW = context.sequenceToGraphics(min);
 	    double  posYN = beadDisplacement;
-	    double  width = Math.max(((double) (dif + 1)) * context.getScale(), 1.0f);
-	    double height = Math.min(beadDepth, width / 2.0f);
+	    double  width = Math.max(((double) (dif + 1)) * context.getScale(), 1.0);
+	    double height = Math.min(beadDepth, width / 2.0);
 
 	    // If the bead height occupies less than the full height
 	    // of the renderer, move it down so that it is central
 	    if (height < beadDepth)
-		posYN += ((beadDepth - height) / 2.0f);
+		posYN += ((beadDepth - height) / 2.0);
 
-	    shape = new Rectangle2D.Double(posXW, posYN,
-                                           Math.floor(width),
-                                           Math.floor(height));
+	    rect.setRect(posXW, posYN,
+                         Math.floor(width),
+                         Math.floor(height));
 	}
 	else
 	{
 	    double  posXW = beadDisplacement;
 	    double  posYN = context.sequenceToGraphics(min);
-	    double height = Math.max(((double) dif + 1) * context.getScale(), 1.0f);
-	    double  width = Math.min(beadDepth, height / 2.0f);
+	    double height = Math.max(((double) dif + 1) * context.getScale(), 1.0);
+	    double  width = Math.min(beadDepth, height / 2.0);
 
 	    if (width < beadDepth)
-		posXW += ((beadDepth - width) /  2.0f);
+		posXW += ((beadDepth - width) /  2.0);
 
-	    shape = new Rectangle2D.Double(posXW, posYN,
-                                           Math.floor(width),
-                                           Math.floor(height));
+	    rect.setRect(posXW, posYN,
+                         Math.floor(width),
+                         Math.floor(height));
 	}
 
-	g.setPaint(beadFill);
-	g.fill(shape);
+	g2.setPaint(beadFill);
+	g2.fill(rect);
 
-	g.setStroke(beadStroke);
-	g.setPaint(beadOutline);
-	g.draw(shape);
+	g2.setStroke(beadStroke);
+	g2.setPaint(beadOutline);
+	g2.draw(rect);
     }
 
     /**
      * <code>getDepth</code> calculates the depth required by this
      * renderer to display its beads.
      *
-     * @param context a <code>SequenceRenderContext</code> object.
+     * @param context a <code>SequenceRenderContext</code>.
      *
-     * @return a <code>double</code> value.
+     * @return a <code>double</code>.
      */
     public double getDepth(final SequenceRenderContext context)
     {

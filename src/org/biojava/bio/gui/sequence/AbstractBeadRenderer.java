@@ -147,17 +147,17 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
     /**
      * Creates a new <code>AbstractBeadRenderer</code> object.
      *
-     * @param beadDepth a <code>double</code> value.
-     * @param beadDisplacement a <code>double</code> value.
-     * @param beadOutline a <code>Paint</code> object.
-     * @param beadFill a <code>Paint</code> object.
-     * @param beadStroke a <code>Stroke</code> object.
+     * @param beadDepth a <code>double</code>.
+     * @param beadDisplacement a <code>double</code>.
+     * @param beadOutline a <code>Paint</code>.
+     * @param beadFill a <code>Paint</code>.
+     * @param beadStroke a <code>Stroke</code>.
      */
-    AbstractBeadRenderer(double beadDepth,
-			 double beadDisplacement,
-			 Paint  beadOutline,
-			 Paint  beadFill,
-			 Stroke beadStroke)
+    AbstractBeadRenderer(final double beadDepth,
+			 final double beadDisplacement,
+			 final Paint  beadOutline,
+			 final Paint  beadFill,
+			 final Stroke beadStroke)
     {
 	this.beadDepth        = beadDepth;
 	this.beadDisplacement = beadDisplacement;
@@ -173,11 +173,11 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * <code>processMouseEvent</code> defines the behaviour on
      * revieving a mouse event.
      *
-     * @param holder a <code>FeatureHolder</code> object.
-     * @param context a <code>SequenceRenderContext</code> object.
-     * @param mEvent a <code>MouseEvent</code> object.
+     * @param holder a <code>FeatureHolder</code>.
+     * @param context a <code>SequenceRenderContext</code>.
+     * @param mEvent a <code>MouseEvent</code>.
      *
-     * @return a <code>FeatureHolder</code> object.
+     * @return a <code>FeatureHolder</code>.
      */
     public FeatureHolder processMouseEvent(final FeatureHolder         holder,
 					   final SequenceRenderContext context,
@@ -195,7 +195,9 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * @param f a <code>Feature</code> to render.
      * @param context a <code>SequenceRenderContext</code> context.
      */
-    public void renderFeature(Graphics2D g, Feature f, SequenceRenderContext context)
+    public void renderFeature(final Graphics2D            g2,
+                              final Feature               f,
+                              final SequenceRenderContext context)
     {
 	// Check the cache first
 	if (cache.containsKey(f))
@@ -205,7 +207,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 	    AbstractBeadRenderer cachedRenderer =
 		(AbstractBeadRenderer) cache.get(f);
 
-	    cachedRenderer.renderBead(g, f, context);
+	    cachedRenderer.renderBead(g2, f, context);
 	    return;
 	}
 
@@ -220,14 +222,14 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 		FeatureRenderer delegate =
 		    (AbstractBeadRenderer) delegates.get(filter);
 
-		delegate.renderFeature(g, f, context);
+		delegate.renderFeature(g2, f, context);
 		return;
 	    }
 	}
 
 	cache.put(f, this);
 	// System.err.println("Rendering: " + f);
-	renderBead(g, f, context);
+	renderBead(g2, f, context);
     }
 
     /**
@@ -239,8 +241,8 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * with respect to each other (a feature may not be rendered more
      * than once).
      *
-     * @param filter an <code>OptimizableFilter</code> object.
-     * @param renderer a <code>FeatureRenderer</code> object.
+     * @param filter an <code>OptimizableFilter</code>.
+     * @param renderer a <code>FeatureRenderer</code>.
      *
      * @exception IllegalArgumentException if the filter is not
      * disjoint with existing delegate filters.
@@ -285,18 +287,18 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * delegates (as is likely if it has any) they can call this
      * method using <code>super.getDepth()</code>.
      *
-     * @param context a <code>SequenceRenderContext</code> object.
+     * @param context a <code>SequenceRenderContext</code>.
      *
-     * @return a <code>double</code> value.
+     * @return a <code>double</code>.
      */
     public double getDepth(final SequenceRenderContext context)
     {
 	Collection delegateRenderers = delegates.values();
-	double maxDepth = 0.0d;
+	double maxDepth = 0.0;
 
 	if (delegateRenderers.size() == 0)
 	{
-	    return maxDepth + 1.0f;
+	    return maxDepth + 1.0;
 	}
 	else
 	{
@@ -305,7 +307,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 		maxDepth = Math.max(maxDepth, ((AbstractBeadRenderer) ri.next()).getDepth(context));
 	    }
 
-	    return maxDepth + 1.0f;
+	    return maxDepth + 1.0;
 	}
     }
 
@@ -313,7 +315,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * <code>getBeadDepth</code> returns the depth of a single bead
      * produced by this renderer.
      *
-     * @return a <code>double</code> value.
+     * @return a <code>double</code>.
      */
     public double getBeadDepth()
     {
@@ -324,7 +326,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * <code>setBeadDepth</code> sets the depth of a single bead
      * produced by this renderer.
      *
-     * @param depth a <code>double</code> value.
+     * @param depth a <code>double</code>.
      *
      * @exception ChangeVetoException if an error occurs.
      */
@@ -357,7 +359,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * indicates displacment downwards (for horizontal renderers) or
      * to the right (for vertical renderers).
      *
-     * @return a <code>double</code> value.
+     * @return a <code>double</code>.
      */
     public double getBeadDisplacement()
     {
@@ -370,11 +372,12 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * indicates displacment downwards (for horizontal renderers) or
      * to the right (for vertical renderers).
      *
-     * @param displacement a <code>double</code> value.
+     * @param displacement a <code>double</code>.
      *
      * @exception ChangeVetoException if an error occurs.
      */
-    public void setBeadDisplacement(final double displacement) throws ChangeVetoException
+    public void setBeadDisplacement(final double displacement)
+        throws ChangeVetoException
     {
 	if (hasListeners())
 	{
@@ -400,7 +403,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
     /**
      * <code>getBeadOutline</code> returns the bead outline paint.
      *
-     * @return a <code>Paint</code> value.
+     * @return a <code>Paint</code>.
      */
     public Paint getBeadOutline()
     {
@@ -410,7 +413,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
     /**
      * <code>setBeadOutline</code> sets the bead outline paint.
      *
-     * @param outline a <code>Paint</code> value.
+     * @param outline a <code>Paint</code>.
      *
      * @exception ChangeVetoException if an error occurs.
      */
@@ -440,7 +443,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
     /**
      * <code>getBeadStroke</code> returns the bead outline stroke.
      *
-     * @return a <code>Stroke</code> value.
+     * @return a <code>Stroke</code>.
      */
     public Stroke getBeadStroke()
     {
@@ -450,11 +453,11 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
     /**
      * <code>setBeadStroke</code> sets the bead outline stroke.
      *
-     * @param outline a <code>Stroke</code> value.
+     * @param outline a <code>Stroke</code>.
      *
      * @exception ChangeVetoException if an error occurs.
      */
-    public void setBeadStroke(final Stroke outline) throws ChangeVetoException
+    public void setBeadStroke(final Stroke stroke) throws ChangeVetoException
     {
 	if (hasListeners())
 	{
@@ -463,24 +466,24 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 	    {
 		ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.LAYOUT,
 						 null, null,
-						 new ChangeEvent(this, OUTLINE,
-								 outline,
+						 new ChangeEvent(this, STROKE,
+								 stroke,
 								 beadStroke));
 		cs.firePreChangeEvent(ce);
-		beadStroke = outline;
+		beadStroke = stroke;
 		cs.firePostChangeEvent(ce);
 	    }
 	}
 	else
 	{
-	    beadStroke = outline;
+	    beadStroke = stroke;
 	}
     } 
 
     /**
      * <code>getBeadFill</code> returns the bead fill paint.
      *
-     * @return a <code>Paint</code> value.
+     * @return a <code>Paint</code>.
      */
     public Paint getBeadFill()
     {
@@ -490,7 +493,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
     /**
      * <code>setBeadFill</code> sets the bead fill paint.
      *
-     * @param fill a <code>Paint</code> value.
+     * @param fill a <code>Paint</code>.
      *
      * @exception ChangeVetoException if an error occurs.
      */
@@ -521,11 +524,11 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * <code>renderBead</code> should be overridden by the concrete
      * <code>BeadRenderer</code>.
      *
-     * @param g a <code>Graphics2D</code> contevt.
+     * @param g2 a <code>Graphics2D</code>.
      * @param f a <code>Feature</code> to render.
      * @param context a <code>SequenceRenderContext</code> context.
      */
-    protected abstract void renderBead(final Graphics2D            g,
+    protected abstract void renderBead(final Graphics2D            g2,
 				       final Feature               f,
 				       final SequenceRenderContext context);
 
