@@ -76,6 +76,15 @@ public class CodonPrefTools
         catch (IllegalSymbolException ise) {}
     }
 
+    private static class LoadEverythingSelector implements CodonPrefFilter
+    {
+        public boolean isRequired(String id) { return true; }
+        public void put(CodonPref codonPref)
+        {
+            prefMap.put(codonPref.getName(), codonPref);
+        }
+    }
+
     /**
      * get the specified codon preference.
      */
@@ -92,67 +101,8 @@ public class CodonPrefTools
                 "org/biojava/bio/symbol/CodonPrefTables.xml"
             );
 
-            DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document doc = parser.parse(prefStream);
-
-            // get tables for each species
-            NodeList children = doc.getDocumentElement().getChildNodes();
-
-            for (int i=0; i<children.getLength(); i++) {
-                Node cnode = children.item(i);
-
-                if (!(cnode instanceof Element)) continue;
-
-                Element child = (Element) cnode;
-
-                String name = child.getNodeName();
-
-                // the node must be a CodonPref record
-                if (!name.equals("CodonPref")) continue;
-
-                // pick up the id and genetic code
-                String codonPrefId = child.getAttribute("id");
-                String geneticCodeId = child.getAttribute("geneticCodeId");
-
-                // now handle each codon frequency entry
-                NodeList freqs = child.getChildNodes();
-
-                // create a Count object for the job
-                Count freqCounts = new IndexedCount(RNATools.getCodonAlphabet());
-
-                for (int j=0; j < freqs.getLength(); j++) {
-                    // load each entry
-                    Node freq = freqs.item(j);
-
-                    if (!(freq instanceof Element)) continue;
-
-                    Element freqElement = (Element) freq;
-
-                    // get attributes
-                    String codonString = freqElement.getAttribute("codon");
-                    String freqString = freqElement.getAttribute("value");
-
-                    // create codon
-                    SymbolList codonSL = RNATools.createRNA(codonString);
-
-                    if (codonSL.length() !=3) throw new BioError("'" + codonString + "' is not a valid codon!");
-
-                    AtomicSymbol codon = (AtomicSymbol) RNATools.getCodonAlphabet().getSymbol(codonSL.toList());
-
-                    // recover frequency value too
-                    double freqValue = Double.parseDouble(freqString);
-                    freqCounts.increaseCount(codon, freqValue);
-
-                }
-
-                // turn the Counts into a Distribution
-                Distribution freqDistribution = DistributionTools.countToDistribution(freqCounts);
-
-                // create a CodonPref object
-                CodonPref newCodonPref = new SimpleCodonPref(geneticCodeId, freqDistribution, codonPrefId);
-
-                prefMap.put(codonPrefId, newCodonPref);
-            }
+            CodonPrefFilter select = new LoadEverythingSelector();
+            readFromXML(prefStream, select);
         }
         catch (Exception e) { e.printStackTrace(); }
     }
@@ -203,6 +153,102 @@ public class CodonPrefTools
         xw.closeTag("CodonPref");
         xw.closeTag("CodonPrefs");
     }
+
+    public static CodonPref readFromXML(InputStream prefStream, String name)
+        throws BioException
+    {
+        CodonPrefFilter.FilterByName filter = new CodonPrefFilter.FilterByName(name);
+
+        readFromXML(prefStream, filter);
+
+        return filter.getCodonPref();
+    }
+
+    public static void readFromXML(InputStream prefStream, CodonPrefFilter filter)
+        throws BioException
+    {
+        try {
+            DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document doc = parser.parse(prefStream);
+
+            // get tables for each species
+            NodeList children = doc.getDocumentElement().getChildNodes();
+
+            for (int i=0; i<children.getLength(); i++) {
+                Node cnode = children.item(i);
+
+                if (!(cnode instanceof Element)) continue;
+
+                Element child = (Element) cnode;
+
+                String name = child.getNodeName();
+
+                // the node must be a CodonPref record
+                if (!name.equals("CodonPref")) continue;
+
+                // pick up the id and genetic code
+                String codonPrefId = child.getAttribute("id");
+                String geneticCodeId = child.getAttribute("geneticCodeId");
+
+                // is this entry one we want?
+                if (!filter.isRequired(codonPrefId)) continue;
+
+                // now handle each codon frequency entry
+                NodeList freqs = child.getChildNodes();
+
+                // create a Count object for the job
+                Count freqCounts = new IndexedCount(RNATools.getCodonAlphabet());
+
+                for (int j=0; j < freqs.getLength(); j++) {
+                    // load each entry
+                    Node freq = freqs.item(j);
+
+                    if (!(freq instanceof Element)) continue;
+
+                    Element freqElement = (Element) freq;
+
+                    // get attributes
+                    String codonString = freqElement.getAttribute("codon");
+                    String freqString = freqElement.getAttribute("value");
+
+                    // create codon
+                    SymbolList codonSL = RNATools.createRNA(codonString);
+
+                    if (codonSL.length() !=3) throw new BioException("'" + codonString + "' is not a valid codon!");
+
+                    AtomicSymbol codon = (AtomicSymbol) RNATools.getCodonAlphabet().getSymbol(codonSL.toList());
+
+                    // recover frequency value too
+                    double freqValue = Double.parseDouble(freqString);
+                    freqCounts.increaseCount(codon, freqValue);
+
+                }
+
+                // turn the Counts into a Distribution
+                Distribution freqDistribution = DistributionTools.countToDistribution(freqCounts);
+
+                // create a CodonPref object
+                CodonPref newCodonPref = new SimpleCodonPref(geneticCodeId, freqDistribution, codonPrefId);
+
+                filter.put(newCodonPref);
+            }
+        }
+        catch (Exception e) {
+            throw new BioException(e);
+        }
+    }
+
+    /**
+     * reads in a file in Codon Usage Database format and
+     * translate it into our XML format
+     * These can be obtained from the 
+     * <a href="http://www.kazusa.or.jp/codon/">Codon Usage Database</a>
+     */
+    public void translateCUD()
+    {
+
+    }
+
 
     /**
      * converts a String representation of a codon to its Symbol
