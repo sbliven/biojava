@@ -85,10 +85,23 @@ public class TagDelegator
   throws ParserException {
     parser = (TagValueParser) parsers.get(tag);
     listener = (TagValueListener) listeners.get(tag);
-    
-    super.startTag(tag);
+
+    if(parser == null && listener != null) {
+      listener.startTag(tag);
+    } else {
+      super.startTag(tag);
+    }
   }
-  
+
+  public void endTag()
+  throws ParserException {
+    if(parser == null && listener != null) {
+      listener.endTag();
+    } else {
+      super.endTag();
+    }
+  }
+
   public void value(TagValueContext tvc, Object value)
   throws ParserException {
     if(parser != null) {

@@ -6,7 +6,7 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.program.tagvalue.*;
 
-public class ParseEmbl {
+public class ParseSwissprot {
   public static void main(String[] args)
   throws Exception {
     BufferedReader reader = new BufferedReader(
@@ -17,11 +17,11 @@ public class ParseEmbl {
     
     TagValueListener listener = null;
     if(args.length > 1 && args[1].startsWith("val")) {
-      listener = new AnnotationBuilder(Formats.EMBL_TYPE);
+      listener = new AnnotationBuilder(Formats.SWISSPROT_TYPE);
     } else {
       listener = new Echo();
     }
-    ParserListener pl = Formats.createEmblParserListener(listener);
+    ParserListener pl = Formats.createSwissprotParserListener(listener);
 
     Parser parser = new Parser();
     

@@ -38,6 +38,7 @@ public class RegexSplitter
    */
   public RegexSplitter(Pattern pattern, int matchGroup) {
     this.pattern = pattern;
+    this.matchGroup = matchGroup;
   }
   
   public List split(Object value) {

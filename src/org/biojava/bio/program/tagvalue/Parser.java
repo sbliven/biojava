@@ -101,7 +101,10 @@ public class Parser {
         }
         
         // not a continuation of a previous tag - unwrap stack
-        if(tv.isNewTag() || !tv.getTag().equals(frame.tag)) {
+        if(
+          tv.isNewTag() ||
+          (tv.getTag() != null && !tv.getTag().equals(frame.tag))
+        ) {
           // remove all stack frames which have been obsoleted by this tag
           Frame top;
           for(top = (Frame) pop(stack); top != frame; top = (Frame) pop(stack)) {

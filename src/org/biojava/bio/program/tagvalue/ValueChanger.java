@@ -64,8 +64,8 @@ public class ValueChanger
   private ChangeTable.Changer changer;
   private ChangeTable.Splitter splitter;
   
-  public ValueChanger() {
-    super();
+  public ValueChanger(TagValueListener delegate) {
+    super(delegate);
   }
 
   /** 
@@ -129,8 +129,13 @@ public class ValueChanger
   
   public void startTag(Object tag)
   throws ParserException {
-    this.changer = changeTable.getChanger(tag);
-    this.splitter = changeTable.getSplitter(tag);
+    if(changeTable != null) {
+      this.changer = changeTable.getChanger(tag);
+      this.splitter = changeTable.getSplitter(tag);
+    } else {
+      this.changer = null;
+      this.splitter = null;
+    }
     
     if(this.changer == null) {
       this.changer = defaultC;
