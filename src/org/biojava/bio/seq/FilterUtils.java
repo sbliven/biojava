@@ -26,6 +26,7 @@ import java.util.*;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.bio.BioException;
 import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.LocationTools;
 
 /**
  * A set of FeatureFilter algebraic operations.
@@ -137,6 +138,54 @@ public class FilterUtils {
 	// *SIGH* we don't have a proof here...
 
 	return false;
+    }
+    
+    /**
+     * Try to determine the minimal location which all features matching a given
+     * filter must overlap.
+     *
+     * @param ff A feature filter
+     * @returns the minimal location which any features matching <code>ff</code>
+     *          must overlap, or <code>null</code> if no proof is possible
+     *          (normally indicates that the filter has nothing to do with
+     *          location).
+     * @since 1.2
+     */
+
+    public static Location extractOverlappingLocation(FeatureFilter ff) {
+	if (ff instanceof FeatureFilter.OverlapsLocation) {
+	    return ((FeatureFilter.OverlapsLocation) ff).getLocation();
+	} else if (ff instanceof FeatureFilter.ContainedByLocation) {
+	    return ((FeatureFilter.ContainedByLocation) ff).getLocation();
+	} else if (ff instanceof FeatureFilter.And) {
+	    FeatureFilter.And ffa = (FeatureFilter.And) ff;
+	    Location l1 = extractOverlappingLocation(ffa.getChild1());
+	    Location l2 = extractOverlappingLocation(ffa.getChild2());
+
+	    if (l1 != null) {
+		if (l2 != null) {
+		    return l1.intersection(l2);
+		} else {
+		    return l1;
+		}
+	    } else {
+		if (l2 != null) {
+		    return l2;
+		} else {
+		    return null;
+		}
+	    }
+	} else if (ff instanceof FeatureFilter.Or) {
+	    FeatureFilter.Or ffo = (FeatureFilter.Or) ff;
+	    Location l1 = extractOverlappingLocation(ffo.getChild1());
+	    Location l2 = extractOverlappingLocation(ffo.getChild2());
+	    
+	    if (l1 != null && l2 != null) {
+		return LocationTools.union(l1, l2);
+	    }
+	}
+
+	return null;
     }
   
   /**
