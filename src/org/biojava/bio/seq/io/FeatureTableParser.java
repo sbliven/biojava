@@ -135,10 +135,13 @@ public class FeatureTableParser {
                 // consists of whitespace-delimited words. Therefore a
                 // space should be inserted at EOL otherwise words will
                 // get fused (unless there is a space already there)
-                if ((featureBuf.toString().indexOf(" ") >= 0) &&
-                    featureBuf.toString().charAt(featureBuf.length()-1) != ' ')
+                if (((featureBuf.toString().indexOf(" ") >= 0) ||
+                     (line.toString().indexOf(" ") >= 0)) &&
+                    featureBuf.toString().charAt(featureBuf.length()-1) != ' '){
                     featureBuf.append(" ");
+                }
                 featureBuf.append(line);
+                
 
                 int eq = featureBuf.toString().indexOf("=");
                 if (featureBuf.charAt(eq + 1) != '"' ||
