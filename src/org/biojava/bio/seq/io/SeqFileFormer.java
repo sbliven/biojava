@@ -30,12 +30,9 @@ import org.biojava.bio.symbol.Location;
 /**
  * Objects implementing the <code>SeqFileFormer</code> interface are
  * responsible for the detailed formatting of sequence data prior to
- * writing to a <code>PrintStream</code>. They are typically
- * dynamically loaded by a <code>SequenceFormat</code> implementation
- * when a complex file format needs to be written. Example
- * implementations are <code>EmblFileFormer</code> and
- * <code>GenbankFileFormer</code>. Some file formats, such as Fasta,
- * are very simple and don't require a <code>SeqFileFormer</code>.
+ * writing to a <code>PrintStream</code>. Some file formats, such as
+ * Fasta, are very simple and don't require a
+ * <code>SeqFileFormer</code>.
  *
  * @author Keith James
  * @since 1.2

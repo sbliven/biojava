@@ -43,22 +43,7 @@ import org.biojava.bio.seq.io.game12.*;
  */
 public class GAMEFormat implements SequenceFormat
 {
-    static {
-        Set validFormats = new HashSet();
-        validFormats.add("GAME1.2");
-        SequenceFormat.FORMATS.put(FastaFormat.class.getName(),
-                                   validFormats);
-    }
-
-    public String getDefaultFormat()
-    {
-        return "GAME1.2";
-    }
-
-    public Set getFormats()
-    {
-        return (Set) SequenceFormat.FORMATS.get(this.getClass().getName());
-    }
+    public static final String DEFAULT = "GAME1.2";
 
     /**
      * this version only reads annotations (no symbols)
@@ -93,6 +78,18 @@ public class GAMEFormat implements SequenceFormat
     public void writeSequence(Sequence seq, String format, PrintStream os)
     {
 
+    }
+
+    /**
+     * <code>getDefaultFormat</code> returns the String identifier for
+     * the default format.
+     *
+     * @return a <code>String</code>.
+     * @deprecated
+     */
+    public String getDefaultFormat()
+    {
+        return DEFAULT;
     }
 }
 

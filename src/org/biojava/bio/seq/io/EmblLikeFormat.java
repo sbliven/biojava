@@ -63,15 +63,7 @@ public class EmblLikeFormat
             ParseErrorSource,
             ParseErrorListener
 {
-    static
-    {
-        Set validFormats = new HashSet();
-        validFormats.add("Embl");
-        validFormats.add("Swissprot");
-
-        SequenceFormat.FORMATS.put(EmblLikeFormat.class.getName(),
-                                   validFormats);
-    }
+    public static final String DEFAULT = "EMBL";
 
     private boolean elideSymbols = false;
     private Vector mListeners = new Vector();
@@ -231,49 +223,40 @@ public class EmblLikeFormat
     public void writeSequence(Sequence seq, PrintStream os)
         throws IOException
     {
-        String defaultFormat = getDefaultFormat();
-
-        try
-        {
-            SeqFileFormer former = SeqFileFormerFactory.makeFormer(defaultFormat);
-            former.setPrintStream(os);
-
-            SeqIOEventEmitter.getSeqIOEvents(seq, former);
-        }
-        catch (BioException be)
-        {
-            throw new IOException(be.getMessage());
-        }
+        writeSequence(seq, getDefaultFormat(), os);
     }
 
+    /**
+     * <code>writeSequence</code> writes a sequence to the specified
+     * <code>PrintStream</code>, using the specified format.
+     *
+     * @param seq a <code>Sequence</code> to write out.
+     * @param format a <code>String</code> indicating which sub-format
+     * of those available from a particular
+     * <code>SequenceFormat</code> implemention to use when
+     * writing.
+     * @param os a <code>PrintStream</code> object.
+     *
+     * @exception IOException if an error occurs.
+     * @deprecated use writeSequence(Sequence seq, PrintStream os)
+     */
     public void writeSequence(Sequence seq, String format, PrintStream os)
 	throws IOException
     {
-        String requestedFormat = new String(format);
-        boolean          found = false;
+        SeqFileFormer former;
 
-        String [] formats = (String []) getFormats().toArray(new String[0]);
-
-        // Allow client programmers to use whichever case they like
-        for (int i = 0; i < formats.length; i++)
-        {
-            if (formats[i].equalsIgnoreCase(format))
-            {
-                requestedFormat = formats[i];
-                found = true;
-            }
-        }
-
-        if (! found)
-            throw new IOException("Failed to write: an invalid file format '"
-                                  + format
-                                  + "' was requested");
+        if (format.equalsIgnoreCase("EMBL"))
+            former = new EmblFileFormer();
+        else if (format.equalsIgnoreCase("SWISSPROT"))
+            former = new SwissprotFileFormer();
+        else
+            throw new IllegalArgumentException("Unknown format '"
+                                               + format
+                                               + "'");
+        former.setPrintStream(os);
 
         try
         {
-            SeqFileFormer former = SeqFileFormerFactory.makeFormer(requestedFormat);
-            former.setPrintStream(os);
-
             SeqIOEventEmitter.getSeqIOEvents(seq, former);
         }
         catch (BioException be)
@@ -282,14 +265,17 @@ public class EmblLikeFormat
         }
     }
 
-    public Set getFormats()
-    {
-        return (Set) SequenceFormat.FORMATS.get(this.getClass().getName());
-    }
-
+    /**
+     * <code>getDefaultFormat</code> returns the String identifier for
+     * the default format written by a <code>SequenceFormat</code>
+     * implementation.
+     *
+     * @return a <code>String</code>.
+     * @deprecated
+     */
     public String getDefaultFormat()
     {
-        return "Embl";
+        return DEFAULT;
     }
 
     /**

@@ -23,13 +23,13 @@ package org.biojava.bio.seq.io;
 
 import java.io.*;
 
+import org.apache.regexp.*;
+
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.db.*;
 import org.biojava.utils.*;
-import org.apache.regexp.*;
-
 
 /**
  * A set of convenience methods for handling common file formats.
@@ -356,7 +356,8 @@ public final class SeqIOTools  {
                 return guessMsfType(seqFile);
             }
         } catch (RESyntaxException e) {
-            System.out.println("guessFileType -- Problem with regular expression matching for:" + seqFile);
+            // FIXME (kj): don't just swallow exceptions and don't print from lib
+            System.out.println("guessFileType -- Problem with regular expression matching for:" + seqFile);            
         }
 
         //Reads the file to guess based on content
@@ -453,6 +454,7 @@ public final class SeqIOTools  {
                 return MSFPROTEIN;
             }
             else {
+                // FIXME (kj): don't print from lib
                 System.out.println("guessFileType -- Could not guess file type.");
                 return UNKNOWN;
             }
@@ -604,6 +606,7 @@ public final class SeqIOTools  {
             case FASTAALIGNPROTEIN:
                 return (new FastaAlignmentFormat()).read(br);
             default:
+                // FIXME (kj): throw exception and don't return null
                 System.out.println("fileToAlign -- File type not recognized.");
                 return null;
         }
@@ -627,6 +630,8 @@ public final class SeqIOTools  {
             case GENPEPT:
                 return SeqIOTools.readGenpept(br);
             default:
+                // FIXME (kj): throw exception and don't return null
+                // and don't print from lib - sheesh!
                 System.out.println("fileToSeq -- File type not recognized.");
                 return null;
         }
@@ -654,6 +659,7 @@ public final class SeqIOTools  {
                 seqToFile(fileType, os, (SequenceIterator) biojava);
                 break;
             default:
+                // FIXME (kj): throw exception and don't print from lib
                 System.out.println("biojavaToFile -- File type not recognized.");
         }
     }
@@ -676,6 +682,7 @@ public final class SeqIOTools  {
                 (new FastaAlignmentFormat()).writeProtein(os, align);
                 break;
             default:
+                // FIXME (kj): throw exception and don't print from lib
                 System.out.println("alignToFile -- File type not recognized.");
         }
     }
@@ -703,6 +710,7 @@ public final class SeqIOTools  {
                 SeqIOTools.writeGenpept(os, seq);
                 break;
             default:
+                // FIXME (kj): throw exception and don't print from lib
                 System.out.println("seqToFile -- File type not recognized.");
         }
     }

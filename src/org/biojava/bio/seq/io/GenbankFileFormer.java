@@ -94,28 +94,18 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
         }
     }
 
-    static
-    {
-        SeqFileFormerFactory.addFactory("Genbank", new GenbankFileFormer.Factory());
-    }
-
-    private static class Factory extends SeqFileFormerFactory
-    {
-        protected SeqFileFormer make()
-        {
-            return new GenbankFileFormer(System.out);
-        }
-    }
-
     /**
-     * Private <code>GenbankFileFormer</code> constructor. Instances
-     * are made by the <code>Factory</code>.
+     * Creates a new <code>GenbankFileFormer</code> using
+     * <code>System.out</code> stream.
      */
-    protected GenbankFileFormer() { }
+    protected GenbankFileFormer()
+    {
+        this(System.out);
+    }
 
     /**
-     * Creates a new <code>GenbankFileFormer</code> object. Instances
-     * are made by the <code>Factory</code>.
+     * Creates a new <code>GenbankFileFormer</code> using the
+     * specified stream.
      *
      * @param stream a <code>PrintStream</code>.
      */
@@ -185,6 +175,10 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
                 }
             }
 
+            // FIXME: (kj) shouldn't be printing sequence properties
+            // in addSymbols method. If you filter out symbols you
+            // lose all sequence properties too.
+
             // Print out sequence properties in order
             locusLineCreator(length);
             if (idb != null) {stream.println(idb); }
@@ -235,9 +229,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 
             for (int i = 0; i < lineLens.length; i++)
             {
-                // Empty the sequence buffer
                 sq.setLength(0);
-                // Empty the utility buffer
                 ub.setLength(0);
 
                 // How long is this chunk?
@@ -408,19 +400,23 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
         StringBuffer temp = new StringBuffer();
 
         if (value == null) {
+            // FIXME: (kj) unsafe cast to String
             temp.append((String) key);
         }
         else if (value instanceof ArrayList) {
             Iterator iter = ((ArrayList) value).iterator();
+            // FIXME: (kj) unsafe cast to String
             temp.append((String) key + " " + iter.next());
             while (iter.hasNext()) {
                 temp.append(nl + "            " + iter.next());
             }
         }
         else {
+            // FIXME: (kj) unsafe cast to String
             StringTokenizer valueToke = new StringTokenizer((String) value, " ");
             int fullline = 80;
             int length = 0;
+            // FIXME: (kj) unsafe cast to String
             temp.append((String) key);
             if (valueToke.hasMoreTokens()) {
                 String token = valueToke.nextToken();
@@ -460,6 +456,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
     }
 
     private StringBuffer fixLength(StringBuffer temp, int length) {
+        // FIXME: (kj) check performance
         while (temp.length() < length) {
             temp.append(" ");
         }

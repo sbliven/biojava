@@ -88,33 +88,24 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
         }
     }
 
-    static
-    {
-        SeqFileFormerFactory.addFactory("Embl", new EmblFileFormer.Factory());
-    }
-
-    private static class Factory extends SeqFileFormerFactory
-    {
-        protected SeqFileFormer make()
-        {
-            return new EmblFileFormer(System.out);
-        }
-    }
-
     /**
-     * Private <code>EmblFileFormer</code> constructor. Instances are
-     * made by the <code>Factory</code>.
+     * Creates a new <code>EmblFileFormer</code> using
+     * <code>System.out</code> stream.
      */
-    private EmblFileFormer() { }
+    protected EmblFileFormer()
+    {
+        this(System.out);
+    }
 
     /**
-     * Creates a new <code>EmblFileFormer</code> object. Instances are
-     * made by the <code>Factory</code>.
+     * Creates a new <code>EmblFileFormer</code> using the specified
+     * stream.
      *
      * @param stream a <code>PrintStream</code>.
      */
-    private EmblFileFormer(PrintStream stream)
+    protected EmblFileFormer(PrintStream stream)
     {
+        super();
         this.stream = stream;
     }
 
@@ -178,6 +169,11 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
                         oCount++;
                 }
             }
+
+            // FIXME: (kj) shouldn't be printing features and sequence
+            // properties in addSymbols method. If you filter out
+            // symbols you lose all features and sequence properties
+            // too.
 
             // My Changes are here
             if (idb != null) {stream.println(idb); stream.println("XX");}
@@ -374,17 +370,20 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
         StringBuffer temp = new StringBuffer();
 
         if (value == null) {
+            // FIXME: (kj) unsafe cast to String
             temp.append((String) key);
         }
         else if (value instanceof ArrayList) {
             Iterator iter = ((ArrayList) value).iterator();
             while (iter.hasNext()) {
+                // FIXME: (kj) unsafe cast to String
                 temp.append((String) key + "   " + iter.next());
                 if (iter.hasNext())
                     temp.append(nl);
             }
         }
         else {
+            // FIXME: (kj) unsafe cast to String
             StringTokenizer valueToke = new StringTokenizer((String) value, " ");
             int fullline = 80;
             int length = 0;
@@ -392,6 +391,7 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
                 String token = valueToke.nextToken();
 
                 while (true) {
+                    // FIXME: (kj) unsafe cast to String
                     temp.append((String) key + "  ");
                     length = (temp.length() % (fullline + 1)) + token.length() + 1;
                     if (temp.length() % (fullline + 1) == 0) length = 81 + token.length();
@@ -413,6 +413,7 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
                     }
                     else {
                         temp.append(nl);
+                        // FIXME: (kj) unsafe cast to String
                         temp.append((String) key + "   " + token);
                         break;
                     }

@@ -465,8 +465,8 @@ class AbstractGenEmblFileFormer
      * each line.
      * @param wrapWidth an <code>int</code> indicating the number of
      * columns per line.
-     * @param joinType Only used if the location is a compound location.  It is
-     * prepended to the list of locations.
+     * @param joinType Only used if the location is a compound
+     * location. It is prepended to the list of locations.
      *
      * @return a <code>StringBuffer</code>.
      */

@@ -48,7 +48,7 @@ import org.biojava.bio.symbol.Symbol;
  *
  * @author Nimesh Singh</a>
  */
-public class GenpeptFileFormer extends AbstractGenEmblFileFormer
+class GenpeptFileFormer extends AbstractGenEmblFileFormer
     implements SeqFileFormer
 {
     private PrintStream stream;
@@ -79,7 +79,6 @@ public class GenpeptFileFormer extends AbstractGenEmblFileFormer
     private StringBuffer mdatb = new StringBuffer();
     private StringBuffer divb = new StringBuffer();
 
-
     //End of my changes here
 
     private SymbolTokenization proteinTokenization;
@@ -92,34 +91,25 @@ public class GenpeptFileFormer extends AbstractGenEmblFileFormer
 	}
     }
 
-    static
-    {
-	SeqFileFormerFactory.addFactory("Genpept", new GenpeptFileFormer.Factory());
-    }
-
-    private static class Factory extends SeqFileFormerFactory
-    {
-	protected SeqFileFormer make()
-	{
-	    return new GenpeptFileFormer(System.out);
-	}
-    }
-
     /**
-     * Private <code>GenpeptFileFormer</code> constructor. Instances
-     * are made by the <code>Factory</code>.
+     * Creates a new <code>GenpeptFileFormer</code> using
+     * <code>System.out</code> stream.
      */
-    protected GenpeptFileFormer() { }
+    protected GenpeptFileFormer()
+    {
+        super();
+        stream = System.out;
+    }
 
     /**
-     * Creates a new <code>GenpeptFileFormer</code> object. Instances
-     * are made by the <code>Factory</code>.
+     * Creates a new <code>GenpeptFileFormer</code> using the
+     * specified stream.
      *
      * @param stream a <code>PrintStream</code>.
      */
     protected GenpeptFileFormer(PrintStream stream)
     {
-	this.stream = stream;
+        this.stream = stream;
     }
 
     public PrintStream getPrintStream()
@@ -190,36 +180,34 @@ public class GenpeptFileFormer extends AbstractGenEmblFileFormer
 	    char [] emptyLine = new char [80];
 
 	    for (int i = 0; i < lineLens.length; i++)
-		{
-		    // Empty the sequence buffer
-		    sq.setLength(0);
-		    // Empty the utility buffer
-		    ub.setLength(0);
+            {
+                sq.setLength(0);
+                ub.setLength(0);
 
-		    // How long is this chunk?
-		    int len = lineLens[i];
+                // How long is this chunk?
+                int len = lineLens[i];
 
-		    // Prep the whitespace
-		    Arrays.fill(emptyLine, ' ');
-		    sq.append(emptyLine);
+                // Prep the whitespace
+                Arrays.fill(emptyLine, ' ');
+                sq.append(emptyLine);
 
-		    // Prepare a Symbol array same length as chunk
-		    Symbol [] sa = new Symbol [len];
+                // Prepare a Symbol array same length as chunk
+                Symbol [] sa = new Symbol [len];
 
-		    // Get symbols and format into blocks of tokens
-		    System.arraycopy(syms, start + (i * 60), sa, 0, len);
+                // Get symbols and format into blocks of tokens
+                System.arraycopy(syms, start + (i * 60), sa, 0, len);
 
-		    String blocks = (formatTokenBlock(ub, sa, 10, proteinTokenization)).toString();
+                String blocks = (formatTokenBlock(ub, sa, 10, proteinTokenization)).toString();
 
-		    sq.replace(10, blocks.length() + 10, blocks);
+                sq.replace(10, blocks.length() + 10, blocks);
 
-		    // Calculate the running residue count and add to the line
-		    String count = Integer.toString((i * 60) + 1);
-		    sq.replace((9 - count.length()), 9, count);
+                // Calculate the running residue count and add to the line
+                String count = Integer.toString((i * 60) + 1);
+                sq.replace((9 - count.length()), 9, count);
 
-		    // Print formatted sequence line
-		    stream.println(sq);
-		}
+                // Print formatted sequence line
+                stream.println(sq);
+            }
 
 	    // Print end of entry
 	    stream.println("//");
@@ -227,7 +215,6 @@ public class GenpeptFileFormer extends AbstractGenEmblFileFormer
 	    throw new IllegalAlphabetException(ex, "Protein not tokenizing");
 	}
     }
-
 
     private String sequenceBufferCreator(Object key, Object value) {
         StringBuffer temp = new StringBuffer();

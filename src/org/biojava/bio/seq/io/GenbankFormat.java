@@ -30,8 +30,8 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 /**
- * Format reader for GenBank files. Converted from the old style io to the
- * new by working from <code>EmblLikeFormat</code>
+ * Format reader for GenBank files. Converted from the old style io to
+ * the new by working from <code>EmblLikeFormat</code>.
  *
  * @author Thomas Down
  * @author Thad	Welch
@@ -42,21 +42,13 @@ import org.biojava.bio.seq.*;
  * @author Matthew Pocock
  * @author Ron Kuhn
  */
-
 public class GenbankFormat
         implements SequenceFormat,
                    Serializable,
                    org.biojava.utils.ParseErrorListener,
                    org.biojava.utils.ParseErrorSource
 {
-    static
-    {
-        Set validFormats = new HashSet();
-        validFormats.add("Genbank");
-
-        SequenceFormat.FORMATS.put(GenbankFormat.class.getName(),
-                                   validFormats);
-    }
+    public static final String DEFAULT = "GENBANK";
 
     protected static final String END_SEQUENCE_TAG = "//";
     protected static final String FEATURE_TAG = "FEATURES";
@@ -145,67 +137,60 @@ public class GenbankFormat
     public void	writeSequence(Sequence seq, PrintStream os)
 	throws IOException
     {
-	String defaultFormat = getDefaultFormat();
-
-	try
-	{
-	    SeqFileFormer former = SeqFileFormerFactory.makeFormer(defaultFormat);
-	    former.setPrintStream(os);
-
-	    SeqIOEventEmitter.getSeqIOEvents(seq, former);
-	}
-	catch (BioException bex)
-	{
-	    throw new IOException(bex.getMessage());
-	}
+        writeSequence(seq, getDefaultFormat(), os);
     }
 
+    /**
+     * <code>writeSequence</code> writes a sequence to the specified
+     * <code>PrintStream</code>, using the specified format.
+     *
+     * @param seq a <code>Sequence</code> to write out.
+     * @param format a <code>String</code> indicating which sub-format
+     * of those available from a particular
+     * <code>SequenceFormat</code> implemention to use when
+     * writing.
+     * @param os a <code>PrintStream</code> object.
+     *
+     * @exception IOException if an error occurs.
+     * @deprecated use writeSequence(Sequence seq, PrintStream os)
+     */
     public void writeSequence(Sequence seq, String format, PrintStream os)
 	throws IOException
     {
-	String requestedFormat = new String(format);
-	boolean          found = false;
+        SeqFileFormer former;
 
-	String [] formats = (String []) getFormats().toArray(new String[0]);
+        if (format.equalsIgnoreCase("GENBANK"))
+            former = new GenbankFileFormer();
+        else if (format.equalsIgnoreCase("GENPEPT"))
+            former = new GenpeptFileFormer();
+        else if (format.equalsIgnoreCase("REFSEQ:PROTEIN"))
+            former = new ProteinRefSeqFileFormer();
+        else
+            throw new IllegalArgumentException("Unknown format '"
+                                               + format
+                                               + "'");
+        former.setPrintStream(os);
 
-	// Allow client programmers to use whichever case they like
-	for (int i = 0; i < formats.length; i++)
-	{
-	    if (formats[i].equalsIgnoreCase(format))
-	    {
-		requestedFormat = formats[i];
-		found = true;
-	    }
-	}
-
-	if (! found)
-	{
-	    throw new IOException("Failed to write: an invalid file format '"
-				  + format
-				  + "' was requested");
-	}
-
-	try
-	{
-	    SeqFileFormer former = SeqFileFormerFactory.makeFormer(requestedFormat);
-	    former.setPrintStream(os);
-
-	    SeqIOEventEmitter.getSeqIOEvents(seq, former);
-	}
-	catch (BioException be)
-	{
-	    throw new IOException(be.getMessage());
-	}
+        try
+        {
+            SeqIOEventEmitter.getSeqIOEvents(seq, former);
+        }
+        catch (BioException be)
+        {
+            throw new IOException(be.getMessage());
+        }
     }
 
-    public Set getFormats()
-    {
-	return (Set) SequenceFormat.FORMATS.get(this.getClass().getName());
-    }
-
+    /**
+     * <code>getDefaultFormat</code> returns the String identifier for
+     * the default format.
+     *
+     * @return a <code>String</code>.
+     * @deprecated
+     */
     public String getDefaultFormat()
     {
-	return "Genbank";
+        return DEFAULT;
     }
 
     /**
@@ -216,7 +201,7 @@ public class GenbankFormat
      */
     public synchronized void addParseErrorListener(ParseErrorListener theListener)
     {
-        if(mListeners.contains(theListener) == false)
+        if (mListeners.contains(theListener) == false)
         {
             mListeners.addElement(theListener);
         }
@@ -231,7 +216,7 @@ public class GenbankFormat
     public synchronized void removeParseErrorListener(
             ParseErrorListener theListener)
     {
-        if(mListeners.contains(theListener) == true)
+        if (mListeners.contains(theListener) == true)
         {
             mListeners.removeElement(theListener);
         }
@@ -265,27 +250,28 @@ public class GenbankFormat
             listeners = (Vector)mListeners.clone();
         }
 
-        for (int index = 0; index < listeners.size(); index++)
+        int lnrCount = listeners.size();
+        for (int index = 0; index < lnrCount; index++)
         {
             ParseErrorListener client = (ParseErrorListener)listeners.elementAt(index);
             client.BadLineParsed(theEvent);
         }
     }
 
+    public boolean getElideSymbols()
+    {
+        return elideSymbols;
+    }
 
-
-  public boolean getElideSymbols() {
-    return elideSymbols;
-  }
-
-  /**
-   * Use this method to toggle reading of sequence data. If you're only
-   * interested in header data set to true.
-   * @param elideSymbols set to true if you don't want the sequence data.
-   */
-  public void setElideSymbols(boolean elideSymbols) {
-    this.elideSymbols = elideSymbols;
-  }
+    /**
+     * Use this method to toggle reading of sequence data. If you're only
+     * interested in header data set to true.
+     * @param elideSymbols set to true if you don't want the sequence data.
+     */
+    public void setElideSymbols(boolean elideSymbols)
+    {
+        this.elideSymbols = elideSymbols;
+    }
 }
 
 /**
@@ -330,7 +316,7 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
 
 	this.symParser = theSymbolParser;
 	this.streamParser = symParser.parseStream(listener);
-    ((ParseErrorSource)(this.listener)).addParseErrorListener(this);
+        ((ParseErrorSource)(this.listener)).addParseErrorListener(this);
     }
 
     /**
@@ -369,9 +355,9 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
 	{
 	    status = SEQUENCE;
 	    this.saveSeqAnno();
-		// Additional commit to push the final feature off the stack
-        headerTag = line;
-        this.saveSeqAnno();
+            // Additional commit to push the final feature off the stack
+            headerTag = line;
+            this.saveSeqAnno();
 	}
 	else if (line.startsWith(GenbankFormat.END_SEQUENCE_TAG))
 	{
@@ -400,7 +386,7 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
     public synchronized void addParseErrorListener(
             ParseErrorListener theListener)
     {
-        if(mListeners.contains(theListener) == false)
+        if (mListeners.contains(theListener) == false)
         {
             mListeners.addElement(theListener);
         }
@@ -415,7 +401,7 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
     public synchronized void removeParseErrorListener(
             ParseErrorListener theListener)
     {
-        if(mListeners.contains(theListener) == true)
+        if (mListeners.contains(theListener) == true)
         {
             mListeners.removeElement(theListener);
         }
@@ -431,10 +417,11 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
         Vector listeners;
         synchronized(this)
         {
-            listeners = (Vector)mListeners.clone();
+            listeners = (Vector) mListeners.clone();
         }
 
-        for (int index = 0; index < listeners.size(); index++)
+        int lnrCount = listeners.size();
+        for (int index = 0; index < lnrCount; index++)
         {
             ParseErrorListener client =
                     (ParseErrorListener)listeners.elementAt(index);
@@ -464,7 +451,7 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
 
 	while (parseStart < cline.length)
 	{
-	    while((parseStart < cline.length) &&
+	    while ((parseStart < cline.length) &&
 		  ((cline[parseStart] == ' ') ||
 		   (Character.isDigit(cline[parseStart]))))
 	    {
@@ -503,7 +490,7 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
 	throws ParseException
     {
 	// Check the line is really a feature line
-	if(line.startsWith(GenbankFormat.FEATURE_LINE_PREFIX))
+	if (line.startsWith(GenbankFormat.FEATURE_LINE_PREFIX))
 	{
 	    this.saveSeqAnno();
 	    // Flag value as a feature line for GenbankProcessor. By a
@@ -529,17 +516,17 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
     private void processHeaderLine(String line)
         throws ParseException
     {
-        if(line.startsWith(GenbankFormat.LOCUS_TAG))
+        if (line.startsWith(GenbankFormat.LOCUS_TAG))
         {
         	// Genbank changed the format of the Locus line for release 127.
         	// The new format is incompatible with the old.
-        	if(this.isLocusLinePre127(line))
+        	if (this.isLocusLinePre127(line))
         	{
-        		this.parseLocusLinePre127(line);
+                    this.parseLocusLinePre127(line);
         	}
         	else
         	{
-        		this.parseLocusLinePost127(line);
+                    this.parseLocusLinePost127(line);
         	}
         }
         else if (line.startsWith(GenbankFormat.VERSION_TAG))
@@ -553,7 +540,7 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
 
             if (lineTokens.hasMoreTokens()) {
                 String nextToken = lineTokens.nextToken();
-                if(nextToken.startsWith(GenbankFormat.GI_TAG))
+                if (nextToken.startsWith(GenbankFormat.GI_TAG))
                 {
                     this.saveSeqAnno();
                     headerTag = GenbankFormat.GI_TAG; // Possibly should be UID?
@@ -639,7 +626,7 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
         }
 
         StringTokenizer locusTokens = new StringTokenizer(theLine);
-        if((locusTokens.countTokens() == 8) || (locusTokens.countTokens() == 7))
+        if ((locusTokens.countTokens() == 8) || (locusTokens.countTokens() == 7))
         {
             // While Genbank 127 documentation doesn't allow the strand tag to
             // be optional, some files don't have it.  A key assumption here is
@@ -665,7 +652,7 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
             {
                 String strandString = locusTokens.nextToken();
                 StringTokenizer strandTokens = new StringTokenizer(strandString, "-");
-                if(strandTokens.countTokens() > 1)
+                if (strandTokens.countTokens() > 1)
                 {
                     saveSeqAnno2(GenbankFormat.STRAND_NUMBER_TAG, strandTokens.nextToken());
                 }
@@ -700,7 +687,7 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
     private void saveSeqAnno()
 	throws ParseException
     {
-	if (!headerTag.equals(""))
+	if (! headerTag.equals(""))
 	{ // save tag and its text
 	    listener.addSequenceProperty(headerTag, headerTagText.substring(0));
 	    headerTag = "";
@@ -715,16 +702,16 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
      * @param value The value of the associated tag
      * @throws ParseException Thrown when an error occurs parsing the file
      */
-	private void saveSeqAnno2(String tag, String value)
-	throws ParseException
-	{
-		value = value.trim();	// strip whitespace
-		if (value.length() > 0) {
-			this.saveSeqAnno();
-			headerTag = tag;
-	    	headerTagText = new StringBuffer(value);
-		}
-	}
+    private void saveSeqAnno2(String tag, String value)
+        throws ParseException
+    {
+        value = value.trim();	// strip whitespace
+        if (value.length() > 0) {
+            this.saveSeqAnno();
+            headerTag = tag;
+            headerTagText = new StringBuffer(value);
+        }
+    }
 
     /**
      * @return does the line contain a header tag.
@@ -733,30 +720,28 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
     private boolean hasHeaderTag(String line)
     {
 	boolean isHeaderTag = false;
-	char[] l = line.toCharArray();
-  int len = Math.min(l.length, TAG_LENGTH); // handles empty lines better
-	for (int i = 0; i < len; i++)
+
+	char [] lar = line.toCharArray();
+        int len = Math.min(lar.length, TAG_LENGTH); // handles empty lines better
+	for (int i = 0; i < len && i < lar.length; i++)
 	{
-	    try
-	    {
-	    	if(l[i] != ' ')
-		    {
-			isHeaderTag = true;
-			break;
-			}
-		}
-		catch(ArrayIndexOutOfBoundsException e)
-		{
-			isHeaderTag = false;
-		}
-	}
+            if (lar[i] != ' ')
+            {
+                isHeaderTag = true;
+                break;
+            }
+        }
+
 	return isHeaderTag;
     }
 
-    public boolean getElideSymbols() {
-      return elideSymbols;
+    public boolean getElideSymbols()
+    {
+        return elideSymbols;
     }
-    public void setElideSymbols(boolean elideSymbols) {
-      this.elideSymbols = elideSymbols;
+
+    public void setElideSymbols(boolean elideSymbols)
+    {
+        this.elideSymbols = elideSymbols;
     }
 }

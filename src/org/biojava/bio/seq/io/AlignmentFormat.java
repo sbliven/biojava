@@ -25,9 +25,16 @@ import java.io.*;
 import org.biojava.bio.symbol.*;
 
 public interface AlignmentFormat {
-  /**
-  *Read in an alignment from a buffered reader object
-  * @param reader the reader from which to read in the alignment
-  */
-  public Alignment read(BufferedReader reader);
+
+    public static final int UNKNOWN = 0;
+    public static final int     RAW = 1;
+    public static final int   FASTA = 2;
+    public static final int CLUSTAL = 3;
+    public static final int     MSF = 4;
+
+    /**
+     * Read in an alignment from a buffered reader object
+     * @param reader the reader from which to read in the alignment
+     */
+    public Alignment read(BufferedReader reader);
 }

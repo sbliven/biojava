@@ -50,22 +50,14 @@ public class FastaFormat implements SequenceFormat,
                                     org.biojava.utils.ParseErrorListener,
                                     org.biojava.utils.ParseErrorSource
 {
-  
-    static {
-        Set validFormats = new HashSet();
-        validFormats.add("Fasta");
-
-        SequenceFormat.FORMATS.put(FastaFormat.class.getName(),
-                                   validFormats);
-    }
+    public static final String DEFAULT = "FASTA";
 
   /**
-    * Constant string which is the property key used to notify
-    * listeners of the description lines of FASTA sequences.
-    */
-    
+   * Constant string which is the property key used to notify
+   * listeners of the description lines of FASTA sequences.
+   */
   public final static String PROPERTY_DESCRIPTIONLINE = "description_line";
-  
+
   private Vector mListeners = new Vector();
 
   /**
@@ -79,7 +71,7 @@ public class FastaFormat implements SequenceFormat,
    * @return the line width
    */
   public int getLineWidth() {
-    return lineWidth;
+      return lineWidth;
   }
 
   /**
@@ -90,9 +82,8 @@ public class FastaFormat implements SequenceFormat,
    *
    * @param width the new line width
    */
-
   public void setLineWidth(int width) {
-    this.lineWidth = width;
+      this.lineWidth = width;
   }
 
   public boolean readSequence(
@@ -194,7 +185,6 @@ public class FastaFormat implements SequenceFormat,
      * sequence's annotation bundle contains PROPERTY_DESCRIPTIONLINE,
      * this is used verbatim.  Otherwise, the sequence's name is used.
      */
-
     protected String describeSequence(Sequence seq) {
 	String description = null;
         Annotation seqAnn = seq.getAnnotation();
@@ -209,53 +199,52 @@ public class FastaFormat implements SequenceFormat,
     }
 
     public void writeSequence(Sequence seq, PrintStream os)
-	throws IOException
-    {
+	throws IOException {
 	os.print(">");
 	os.println(describeSequence(seq));
 
-	//  int length = seq.length();
-//    	for(int i = 1; i <= length; i++) {
-//    	    os.write(seq.symbolAt(i).getToken());
-//    	    if( (i % lineWidth) == 0)
-//    		os.println();
-//    	}
-//    	if( (length % lineWidth) != 0)
-//    	    os.println();
+        int length = seq.length();
 
-	for(int pos = 1; pos <= seq.length(); pos += lineWidth) {
-	    int end = Math.min(pos + lineWidth - 1, seq.length());
+	for (int pos = 1; pos <= length; pos += lineWidth) {
+	    int end = Math.min(pos + lineWidth - 1, length);
 	    os.println(seq.subStr(pos, end));
 	}
     }
 
+    /**
+     * <code>writeSequence</code> writes a sequence to the specified
+     * <code>PrintStream</code>, using the specified format.
+     *
+     * @param seq a <code>Sequence</code> to write out.
+     * @param format a <code>String</code> indicating which sub-format
+     * of those available from a particular
+     * <code>SequenceFormat</code> implemention to use when
+     * writing.
+     * @param os a <code>PrintStream</code> object.
+     *
+     * @exception IOException if an error occurs.
+     * @deprecated use writeSequence(Sequence seq, PrintStream os)
+     */
     public void writeSequence(Sequence seq, String format, PrintStream os)
-        throws IOException {
-        String requestedFormat = new String(format);
-        boolean          found = false;
-
-        String [] formats = (String []) getFormats().toArray(new String[0]);
-
-        for (int i = 0; i < formats.length; i++) {
-            found = found || (formats[i].compareTo(format) == 0);
-        }
-
-        if (! found)
-            throw new IOException("Failed to write: an invalid file format '"
-                                  + format
-                                  + "' was requested");
-
+        throws IOException
+    {
+        if (! format.equalsIgnoreCase(getDefaultFormat()))
+            throw new IllegalArgumentException("Unknown format '"
+                                               + format
+                                               + "'");
         writeSequence(seq, os);
     }
 
-    public Set getFormats()
-    {
-        return (Set) SequenceFormat.FORMATS.get(this.getClass().getName());
-    }
-
+    /**
+     * <code>getDefaultFormat</code> returns the String identifier for
+     * the default format.
+     *
+     * @return a <code>String</code>.
+     * @deprecated
+     */
     public String getDefaultFormat()
     {
-        return "Fasta";
+        return DEFAULT;
     }
 
     /**
@@ -264,10 +253,8 @@ public class FastaFormat implements SequenceFormat,
      *
      * @param theListener Listener to be added.
      */
-    public synchronized void addParseErrorListener(ParseErrorListener theListener)
-    {
-        if(mListeners.contains(theListener) == false)
-        {
+    public synchronized void addParseErrorListener(ParseErrorListener theListener) {
+        if (mListeners.contains(theListener) == false) {
             mListeners.addElement(theListener);
         }
     }
@@ -278,11 +265,8 @@ public class FastaFormat implements SequenceFormat,
      *
      * @param theListener Listener to be removed.
      */
-    public synchronized void removeParseErrorListener(
-            ParseErrorListener theListener)
-    {
-        if(mListeners.contains(theListener) == true)
-        {
+    public synchronized void removeParseErrorListener(ParseErrorListener theListener) {
+        if (mListeners.contains(theListener) == true) {
             mListeners.removeElement(theListener);
         }
     }
@@ -296,8 +280,7 @@ public class FastaFormat implements SequenceFormat,
      *
      * @param theEvent The event that contains the bad line and token.
      */
-    public void BadLineParsed(org.biojava.utils.ParseErrorEvent theEvent)
-    {
+    public void BadLineParsed(org.biojava.utils.ParseErrorEvent theEvent) {
         notifyParseErrorEvent(theEvent);
     }
 
@@ -307,16 +290,13 @@ public class FastaFormat implements SequenceFormat,
      *
      * @param theEvent The event to be handed to the listeners.
      */
-    protected void notifyParseErrorEvent(ParseErrorEvent theEvent)
-    {
+    protected void notifyParseErrorEvent(ParseErrorEvent theEvent) {
         Vector listeners;
-        synchronized(this)
-        {
+        synchronized(this) {
             listeners = (Vector)mListeners.clone();
         }
 
-        for (int index = 0; index < listeners.size(); index++)
-        {
+        for (int index = 0; index < listeners.size(); index++) {
             ParseErrorListener client = (ParseErrorListener)listeners.elementAt(index);
             client.BadLineParsed(theEvent);
         }

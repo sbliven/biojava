@@ -48,6 +48,8 @@ import org.biojava.bio.symbol.Symbol;
 */
 public class SeqIOEventEmitter
 {
+    private static Symbol [] symProto = new Symbol [0];
+
     /**
      * <code>SeqIOEventEmitter</code> can not be instantiated.
      */
@@ -117,7 +119,7 @@ public class SeqIOEventEmitter
 
             // Add symbols
             listener.addSymbols(seq.getAlphabet(),
-                                (Symbol []) seq.toList().toArray(new Symbol [0]),
+                                (Symbol []) seq.toList().toArray(symProto),
                                 0,
                                 seq.length());
 	    
