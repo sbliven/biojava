@@ -210,6 +210,8 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 			CodeUtils.ACC_PUBLIC | CodeUtils.ACC_SUPER
     );
 
+		System.err.println("*** Generating " + pclass.getName());
+
 		List baseInitArgsList = new ArrayList();
 		baseInitArgsList.add(baseClass == ProjectedStrandedFeatureWrapper.class ?
 				     IntrospectedCodeClass.forClass(StrandedFeature.class) :
@@ -229,11 +231,10 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 		GeneratedCodeMethod init = pclass.createMethod("<init>",
 							       IntrospectedCodeClass.forClass(Void.TYPE),
 							       new CodeClass[] {
-                       faceClassC,
-                       IntrospectedCodeClass.forClass(
-                         ProjectedFeatureHolder.class
-                       )
-                     },
+								   faceClassC,
+								   IntrospectedCodeClass.forClass(
+									     ProjectedFeatureHolder.class
+									                         )},
 							       CodeUtils.ACC_PUBLIC);
 		InstructionVector iv = new InstructionVector();
 		iv.add(ByteCode.make_aload(init.getThis()));
