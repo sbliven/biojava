@@ -46,7 +46,7 @@ import org.biojava.bio.symbol.Symbol;
  * Genpept entries for writing to a <code>PrintStream</code>. It is based
  * on GenbankFileFormer.
  *
- * @author Nimesh Singh</a>
+ * @author Nimesh Singh
  */
 class GenpeptFileFormer extends AbstractGenEmblFileFormer
     implements SeqFileFormer
