@@ -183,7 +183,7 @@ public class FastaSearchParser implements SearchParser
 
 		    if (line.startsWith(" >"))
 		    {
-			handler.setQuerySeq(line.substring(2));
+			handler.setQuerySeq(line.substring(2, line.indexOf(" ")));
 		    }
 
 		    // This token marks the line describing the query
