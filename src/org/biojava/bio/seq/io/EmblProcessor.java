@@ -82,7 +82,7 @@ public class EmblProcessor
     public static final String PROPERTY_EMBL_ACCESSIONS = "embl_accessions";
 
     private boolean mBadFeature = false;
-	private Vector mListeners = new Vector();
+    private Vector mListeners = new Vector();
 
     /**
      * Factory which wraps SequenceBuilders in an EmblProcessor
@@ -110,12 +110,20 @@ public class EmblProcessor
     }
 
     public void endSequence() throws ParseException {
+        // Avoids leaving a null name and null URI if there is no
+        // accession number. If accession number is vital, failure of
+        // test of accessions.size() > 0 should throw a
+        // ParseException.
+        String  id = "";
+        String uri = "";
 	if (accessions.size() > 0) {
-	    String id = (String) accessions.get(0);
-	    getDelegate().setName(id);
-	    getDelegate().setURI("urn:sequence/embl:" + id);
+	    id = (String) accessions.get(0);
+            uri = "urn:sequence/embl:" + id;
 	    getDelegate().addSequenceProperty(PROPERTY_EMBL_ACCESSIONS, accessions);
 	}
+
+        getDelegate().setName(id);
+        getDelegate().setURI(uri);
 	getDelegate().endSequence();
     }
 

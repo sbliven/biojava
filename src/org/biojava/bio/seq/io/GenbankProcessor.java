@@ -77,17 +77,25 @@ public class GenbankProcessor extends SequenceBuilderFilter
 		features = new FeatureTableParser(this, "GenBank");
 	}
 
-	public void endSequence() throws ParseException
-	{
-		if (accessions.size() > 0)
-		{
-			String id = (String) accessions.get(0);
-			getDelegate().setName(id);
-			getDelegate().setURI("urn:sequence/genbank:" + id);
-			getDelegate().addSequenceProperty(PROPERTY_GENBANK_ACCESSIONS, accessions);
-		}
-		getDelegate().endSequence();
-	}
+    public void endSequence() throws ParseException
+    {
+        // Avoids leaving a null name and null URI if there is no
+        // accession number. If accession number is vital, failure of
+        // test of accessions.size() > 0 should throw a
+        // ParseException.
+        String  id = "";
+        String uri = "";
+        if (accessions.size() > 0)
+        {
+            id = (String) accessions.get(0);
+            uri = "urn:sequence/genbank:" + id;
+            getDelegate().addSequenceProperty(PROPERTY_GENBANK_ACCESSIONS, accessions);
+        }
+
+        getDelegate().setName(id);
+        getDelegate().setURI(uri);
+        getDelegate().endSequence();
+    }
 
 	public void addSequenceProperty(Object key, Object value) throws ParseException
 	{
