@@ -14,7 +14,7 @@ import org.biojava.bio.seq.tools.*;
 public class TestOrderNResidueList {
   public static void main(String [] args)
   throws Exception {
-    ResidueList res = createResidueList(10);
+    ResidueList res = SeqTools.createResidueList(10);
     
     for(int o = 1; o < 6; o++) {
       ResidueList view = new OrderNResidueList(res, o);
@@ -24,14 +24,5 @@ public class TestOrderNResidueList {
       }
       System.out.println("\n");
     }
-  }
-  
-  public static ResidueList createResidueList(int length)
-  throws IllegalResidueException {
-    List l = new ArrayList(length);
-    for(int i = 0; i < length; i++) {
-      l.add(DNATools.forIndex((int) (4.0*Math.random())));
-    }
-    return new SimpleResidueList(DNATools.getAlphabet(), l);
   }
 }

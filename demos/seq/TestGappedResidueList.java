@@ -35,10 +35,12 @@ import org.biojava.bio.dp.*;
 
 /**
  * This demonstrates gapped sequences as a view onto an ungapped sequence.
+ *
+ * @author Matthew Pocock
  */
 public class TestGappedResidueList {
   public static void main(String [] args) throws Exception {
-    ResidueList res = createResidueList(10);
+    ResidueList res = SeqTools.createResidueList(10);
     final int trials = 10;
     
     System.out.println("Starting with:\n" + res.seqString());
@@ -69,14 +71,5 @@ public class TestGappedResidueList {
 //      gl.dumpBlocks();
       System.out.println(gl.seqString());
     }
-  }
-  
-  public static ResidueList createResidueList(int length)
-  throws IllegalResidueException {
-    List l = new ArrayList(length);
-    for(int i = 0; i < length; i++) {
-      l.add(DNATools.forIndex((int) (4.0*Math.random())));
-    }
-    return new SimpleResidueList(DNATools.getAlphabet(), l);
   }
 }
