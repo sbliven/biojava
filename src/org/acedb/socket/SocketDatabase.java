@@ -108,9 +108,9 @@ class SocketDatabase implements Database {
 
 	String file = url.getFile();
 
-	if (file == null || file.length() == 0)
-	    return allClasses();
 	StringTokenizer toke = new StringTokenizer(file, "/");
+	if (toke.countTokens() == 0)
+	    return allClasses();
 	if (toke.countTokens() == 1) {
 	    String clazz = toke.nextToken();
 	    resultSet = allClasses().retrieve(clazz);
