@@ -40,7 +40,9 @@ public class RadialBaseKernel implements SVMKernel {
     public double evaluate(Object a, Object b) {
       SVMKernel k = getKernel();
       double w = getWidth();
-      return Math.exp(-Math.abs(k.evaluate(a, a) - k.evaluate(b, b)) / ( w * w ));
+      return Math.exp(-Math.abs(2.0 * k.evaluate(a, b) - k.evaluate(a, a) -
+                                k.evaluate(b, b)
+                               ) / ( w * w ));
     }
 
     public double getWidth() {

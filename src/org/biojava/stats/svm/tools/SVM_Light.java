@@ -58,7 +58,7 @@ public class SVM_Light {
       StringBuffer sb = new StringBuffer();
       boolean first = true;
 
-      for (int i = 0; i <= v.size(); ++i) {
+      for (int i = 0; i < v.size(); ++i) {
         double x = v.getValueAtIndex(i);
 
         if (first) {

@@ -70,4 +70,8 @@ public class DiagonalCachingKernel implements SVMKernel {
       return parent.evaluate(x, y);
     }
   }
+  
+  public String toString() {
+    return parent.toString();
+  }
 }

@@ -56,4 +56,8 @@ public class CachingKernel implements SVMKernel {
 	    return a.hashCode() + b.hashCode();
 	}
     }
+    
+  public String toString() {
+    return parent.toString();
+  }
 }
