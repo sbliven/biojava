@@ -58,4 +58,6 @@ public interface Orthologue
      * get the Accession ID associated with this orthologue.
      */
     public String getAccession();
+
+    public void setTitle(String title);
 }

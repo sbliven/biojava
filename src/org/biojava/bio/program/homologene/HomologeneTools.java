@@ -23,6 +23,15 @@ package org.biojava.bio.program.homologene;
 
 import java.net.URL;
 import java.util.Iterator;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import javax.naming.OperationNotSupportedException;
 
 /**
  * Homologene is a NCBI dataset that curates sets
@@ -65,11 +74,148 @@ public class HomologeneTools
     }
 
     /**
-     * instantiate a HomologeneDB
+     * instantiate a HomologeneDB.
+     * <p>
+     * Currently, only file protocol support is available.
      */
-    public static void instantiateDB(URL url)
+    public static void instantiateDB(URL url, HomologeneBuilder builder)
+        throws OperationNotSupportedException, FileNotFoundException, IOException
     {
+        boolean inDB = false;
+        boolean inGroup = false;
 
+
+        if (!url.getProtocol().equals("file"))
+            throw new OperationNotSupportedException();
+
+        // open the file
+        BufferedReader rdr = new BufferedReader(
+            new FileReader(url.getPath())
+            );
+
+        // the file assumes implicitly that a group has started
+        builder.startDB();
+        builder.startGroup();
+
+        inDB = inGroup = true;
+
+        // read loop
+        Pattern titlePattern = Pattern.compile("TITLE\\s(\\d+)_(\\d+)=(\\S+)\\s(.*)");
+        Pattern orthoPattern = Pattern.compile("^\\s*(\\d+)\\s*\\|\\s*(\\d+)\\s*\\|([Bbc]{1})\\|(.*)\\|\\s*(\\d+)\\s*\\|(.*)\\|(.*)\\|\\s*(\\d+)\\s*\\|(.*)\\|(.*)");
+        String currLine;
+        while ((currLine = rdr.readLine()) != null) {
+
+            // parse current line
+            if (currLine.startsWith(">")) {
+                // start new group
+                if (inGroup) builder.endGroup();
+                builder.startGroup();
+            }
+            else if (currLine.startsWith("TITLE")) {
+                try {
+                    // parse the line
+                    Matcher m = titlePattern.matcher(currLine);
+
+                    if (m.matches()) {
+                        if (m.groupCount() != 4) continue;
+
+                        // pick up the groups
+                        int taxonID = Integer.parseInt(m.group(1));
+                        String homologeneID = m.group(2);
+                        String sym = m.group(3);
+                        String title = m.group(4);
+
+                        builder.addTitle(taxonID, homologeneID.trim(), title.trim());
+                    }
+                }
+                catch (NumberFormatException nfe) {
+                    continue;
+                }
+            }
+            else {
+                // this is a orthology line
+
+                try {
+                    // parse the line
+                    Matcher m = orthoPattern.matcher(currLine);
+
+                    if (m.matches()) {
+                        System.out.println("=======================orthology line: " + m.groupCount() + "=====================");
+                        if (m.groupCount() != 10) continue;
+                        // pick up the groups
+                        String taxonID0 = m.group(1); System.out.println(taxonID0);
+                        String taxonID1 = m.group(2); System.out.println(taxonID1);
+                        String type = m.group(3); System.out.println(type);
+                        String locus0 = m.group(4); System.out.println(locus0);
+                        String homoID0 = m.group(5); System.out.println(homoID0);
+                        String access0 = m.group(6); System.out.println(access0);
+                        String locus1 = m.group(7); System.out.println(locus1);
+                        String homoID1 = m.group(8); System.out.println(homoID1);
+                        String access1 = m.group(9); System.out.println(access1);
+                        String finale = m.group(10); System.out.println(finale);
+
+                        // validate numeric formats
+                        Integer.parseInt(taxonID0);
+                        Integer.parseInt(taxonID1);
+
+                        // validate the similarity type before proceeding
+                        if (   (type.equals("B")) 
+                            || (type.equals("b"))
+                            || (type.equals("c")) ) {
+
+                            if (type.equals("B")) {
+
+                                // validate numeric format
+                                Integer.parseInt(finale);
+
+                                builder.startOrthology();
+                                builder.addOrthologyProperty(HomologeneBuilder.PERCENTIDENTITY, finale);
+                                builder.addOrthologyProperty(HomologeneBuilder.SIMILARITYTYPE, HomologeneBuilder.MULTIPLE);
+                            }
+                            else if (type.equals("b")) {
+
+                                // validate numeric format
+                                Integer.parseInt(finale);
+
+                                builder.startOrthology();
+                                builder.addOrthologyProperty(HomologeneBuilder.PERCENTIDENTITY, finale);
+                                builder.addOrthologyProperty(HomologeneBuilder.SIMILARITYTYPE, HomologeneBuilder.TWIN);
+                            }
+                            else if (type.equals("c")) {
+
+                                builder.startOrthology();
+                                builder.addOrthologyProperty(HomologeneBuilder.SIMILARITYTYPE, HomologeneBuilder.CURATED);
+                                builder.addOrthologyProperty(HomologeneBuilder.PERCENTIDENTITY, finale);
+                            }
+
+                            // add the orthologues
+                            builder.startOrthologue();
+                            builder.addOrthologueProperty(HomologeneBuilder.TAXONID, taxonID0);
+                            builder.addOrthologueProperty(HomologeneBuilder.LOCUSID, locus0);
+                            builder.addOrthologueProperty(HomologeneBuilder.HOMOID, homoID0);
+                            builder.addOrthologueProperty(HomologeneBuilder.ACCESSION, access0);
+                            builder.endOrthologue();
+
+                            builder.startOrthologue();
+                            builder.addOrthologueProperty(HomologeneBuilder.TAXONID, taxonID1);
+                            builder.addOrthologueProperty(HomologeneBuilder.LOCUSID, locus1);
+                            builder.addOrthologueProperty(HomologeneBuilder.HOMOID, homoID1);
+                            builder.addOrthologueProperty(HomologeneBuilder.ACCESSION, access1);
+                            builder.endOrthologue();
+
+                        }
+                    }
+                }
+                catch (NumberFormatException nfe) {
+                    builder.endOrthology();
+                    continue;
+                }
+            }
+        }
+
+        // EOF
+        if (inGroup) builder.endGroup();
+        if (inDB) builder.endDB();
     }
 }
 

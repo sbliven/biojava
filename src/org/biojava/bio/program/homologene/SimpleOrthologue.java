@@ -74,7 +74,7 @@ public class SimpleOrthologue implements Orthologue
     public String getHomologeneID() { return homologeneID; }
     public String getAccession() { return accession; }
 
-    void setTitle(String title) { this.title = title; }
+    public void setTitle(String title) { this.title = title; }
     void setTaxon(Taxon taxon) { this.taxon = taxon; }
     void setLocusID(String locusID) { this.locusID = locusID.trim(); }
     void setHomologeneID(String homologeneID) { this.homologeneID = homologeneID.trim(); }

@@ -199,7 +199,10 @@ public class SimpleHomologeneBuilder implements HomologeneBuilder
 
     public void addTitle(int taxonID, String homologeneID, String title)
     {
+        // retrieve the Orthologue
+        Orthologue ortho = db.getOrthologue(homologeneID);
 
+        ortho.setTitle(title);
     }
 
     public void endGroup()
@@ -216,5 +219,9 @@ public class SimpleHomologeneBuilder implements HomologeneBuilder
         level--;
     }
 
+    public HomologeneDB getDB()
+    {
+        return db;
+    }
 }
 
