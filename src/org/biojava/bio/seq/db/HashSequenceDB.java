@@ -60,8 +60,14 @@ public class HashSequenceDB
     return name;
   }
 
-  public Sequence getSequence(String id) {
-    return (Sequence) sequenceByID.get(id);
+  public Sequence getSequence(String id) 
+      throws IllegalIDException
+  {
+      Sequence seq = (Sequence) sequenceByID.get(id);
+      if (seq == null) {
+          throw new IllegalIDException("Sequence with ID " + id + " could not be found");
+      }
+      return seq;
   }
 
   public Set ids() {
