@@ -202,7 +202,9 @@ public class SimpleHomologeneBuilder implements HomologeneBuilder
         // retrieve the Orthologue
         Orthologue ortho = db.getOrthologue(homologeneID);
 
-        ortho.setTitle(title);
+        if (ortho != null) {
+            ortho.setTitle(title);
+        }
     }
 
     public void endGroup()

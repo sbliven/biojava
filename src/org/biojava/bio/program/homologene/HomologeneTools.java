@@ -140,19 +140,19 @@ public class HomologeneTools
                     Matcher m = orthoPattern.matcher(currLine);
 
                     if (m.matches()) {
-                        System.out.println("=======================orthology line: " + m.groupCount() + "=====================");
+//                        System.out.println("=======================orthology line: " + m.groupCount() + "=====================");
                         if (m.groupCount() != 10) continue;
                         // pick up the groups
-                        String taxonID0 = m.group(1); System.out.println(taxonID0);
-                        String taxonID1 = m.group(2); System.out.println(taxonID1);
-                        String type = m.group(3); System.out.println(type);
-                        String locus0 = m.group(4); System.out.println(locus0);
-                        String homoID0 = m.group(5); System.out.println(homoID0);
-                        String access0 = m.group(6); System.out.println(access0);
-                        String locus1 = m.group(7); System.out.println(locus1);
-                        String homoID1 = m.group(8); System.out.println(homoID1);
-                        String access1 = m.group(9); System.out.println(access1);
-                        String finale = m.group(10); System.out.println(finale);
+                        String taxonID0 = m.group(1).trim();//System.out.println(taxonID0);
+                        String taxonID1 = m.group(2).trim();//System.out.println(taxonID1);
+                        String type = m.group(3).trim();//System.out.println(type);
+                        String locus0 = m.group(4).trim();
+                        String homoID0 = m.group(5).trim();
+                        String access0 = m.group(6).trim();
+                        String locus1 = m.group(7).trim(); 
+                        String homoID1 = m.group(8).trim();
+                        String access1 = m.group(9).trim();
+                        String finale = m.group(10).trim();//System.out.println(finale);
 
                         // validate numeric formats
                         Integer.parseInt(taxonID0);
@@ -166,7 +166,7 @@ public class HomologeneTools
                             if (type.equals("B")) {
 
                                 // validate numeric format
-                                Integer.parseInt(finale);
+                                Double.parseDouble(finale);
 
                                 builder.startOrthology();
                                 builder.addOrthologyProperty(HomologeneBuilder.PERCENTIDENTITY, finale);
@@ -203,6 +203,7 @@ public class HomologeneTools
                             builder.addOrthologueProperty(HomologeneBuilder.ACCESSION, access1);
                             builder.endOrthologue();
 
+                            builder.endOrthology();
                         }
                     }
                 }
