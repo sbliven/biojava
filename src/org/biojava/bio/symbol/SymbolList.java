@@ -30,7 +30,7 @@ import org.biojava.utils.*;
 
 /**
  * A sequence of symbols that belong to an alphabet.
- * <P>
+ * <p>
  * This uses biological coordinates (1 to length).
  *
  * @author Matthew Pocock
@@ -48,7 +48,7 @@ public interface SymbolList extends Changeable {
   
   /**
    * The alphabet that this SymbolList is over.
-   * <P>
+   * <p>
    * Every symbol within this SymbolList is a member of this alphabet.
    * <code>alphabet.contains(symbol) == true</code>
    * for each symbol that is within this sequence.
@@ -95,7 +95,7 @@ public interface SymbolList extends Changeable {
   
   /**
    * Return a new SymbolList for the symbols start to end inclusive.
-   * <P>
+   * <p>
    * The resulting SymbolList will count from 1 to (end-start + 1) inclusive, and
    * refer to the symbols start to end of the original sequence.
    *
@@ -106,7 +106,7 @@ public interface SymbolList extends Changeable {
     
   /**
    * Stringify this symbol list.
-   * <P>
+   * <p>
    * It is expected that this will use the symbol's token to render each
    * symbol. It should be parsable back into a SymbolList using the default
    * token parser for this alphabet.
@@ -117,7 +117,7 @@ public interface SymbolList extends Changeable {
   
   /**
    * Return a region of this symbol list as a String.
-   * <P>
+   * <p>
    * This should use the same rules as seqString.
    *
    * @param start  the first symbol to include

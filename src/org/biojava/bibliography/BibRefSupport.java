@@ -31,16 +31,19 @@ import org.biojava.utils.*;
 import java.util.*;
 
 /**
+ * <p>
  * This interface defines supporting utilities for working with
  * bibliographic repositories.
+ * </p>
  *
- *<P>
+ * <p>
  * The fundamental part of this interface deals with the controlled
  * vocabularies. However, the <tt>BibRefSupport</tt> interface is here
  * just a gateway to other Java interfaces defined in a separate
  * package {@link org.biojava.utils.candy}.
+ * </p>
  *
- *<P>
+ * <p>
  * The controlled vocabularies are used in order to find names of
  * all available attributes of the given bibliographic repository, to
  * find all possible values of some attributes, and to specify
@@ -48,21 +51,24 @@ import java.util.*;
  * methods {@link #getVocabularyFinder getVocabularyFinder}, {@link
  * #getSupportedValues getSupportedValues}, and {@link
  * #getSupportedCriteria getSupportedCriteria}.
+ * </p>
  *
- *<P>
+ * <p>
  * The other <em>raison d'etre</em> for the BibRefSupport interface is
  * to have a place where some common constants can be put in. The
  * constants specify common vocabulary names (examples are {@link
  * #RESOURCE_TYPES} or {@link #JOURNAL_TITLES}, explicitly defined
  * bibliographic resource types (for example, {@link #TYPE_BOOK} or
  * {@link #TYPE_ARTICLE}), and few other things.
+ * </p>
  *
- *<P>
+ * <p>
  * And finally, there are some methods allowing to improve an
  * efficient access to the supporting resources by calling explicitly
  * {@link #connect connect} and {@link #disconnect disconnect}.
+ * </p>
  *
- *<P>
+ * <p>
  * It was an intention to separate completely methods dealing with
  * bibliographic repositories (as defined in interface {@link
  * BibRefQuery}) and methods helping with other things (as defined
@@ -72,9 +78,11 @@ import java.util.*;
  * improved when the client loads separately all controlled
  * vocabularies and use them locally while the access to the
  * bibliographic repository is still remote.
+ * </p>
  *
- *<P>
  *<H3>The implementation is advised to used the following constructor</h3>
+ *
+ * <p>
  *<pre>
  *    public NameOfAnImplementation (String[] args, Hashtable props) {...}
  *</pre>
@@ -82,10 +90,13 @@ import java.util.*;
  *    specific parameters and properties. However, some properties are
  *    more probable to be used - the suggested names for them are defined
  *    also in this interface (e.g. {@link #INIT_PROP_LOG}).
- *<P>
+ * </p>
+ *
+ * <p>
  * The use of this constructor makes easier to load dynamically different
  * supporting implementations.
- *<P>
+ * </p>
+ *
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
  * @version $Id$
  */
@@ -194,13 +205,17 @@ public interface BibRefSupport {
     //
 
     /**
+     * <p>
      * A part of a vocabulary name. It is usually coupled together
      * with a bibliographic resource type to give a full vocabulary
      * name. For example: {@link BibRefSupport#TYPE_JOURNAL_ARTICLE
      * JournalArticle}/ATTR_PROPERTIES.
-     *<P>
+     * </p>
+     *
+     * <p>
      * The vocabulary contains property names for the given resource
      * type as defined in {@link BibRef#properties}.
+     * </p>
      */
     static final String ATTR_PROPERTIES = "properties";
 
@@ -223,58 +238,76 @@ public interface BibRefSupport {
     //
 
     /**
-     * A role of an attribute.  
-     *<P>
+     * <p>
+     * A role of an attribute.
+     * </p>
+     *
+     * <p>
      * The introspection mechanism (provided by using controlled
      * vocabularies) allows to find what attributes are available in
      * the repository. The attributes which can be used in query
      * methods should be identified by putting this constant into
      * their vocabulary entry (somewhere in the {@link
      * CandyEntry#description description} field).
+     * </p>
      */
     static final String ROLE_ATTR_QUERYABLE   = "queryable";
 
     /**
-     * A role of an attribute.  
-     *<P>
+     * <p>
+     * A role of an attribute.
+     * </p>
+     *
+     * <p>
      * The introspection mechanism (provided by using controlled
      * vocabularies) allows to find what attributes are available in
      * the repository. The attributes which can be used in retrieval
      * methods should be identified by putting this constant into
      * their vocabulary entry (somewhere in the {@link
      * CandyEntry#description description} field).
+     * </p>
      */
     static final String ROLE_ATTR_RETRIEVABLE = "retrievable";
 
     /**
+     * <p>
      * A property name ("<b>log</b>").
-     *<p>
+     * </p>
+     * 
+     * <p>
      * Used for passing an instance dealing with logging.
+     * </p>
      */
     static final String INIT_PROP_LOG = "log";
 
     /**
+     * <p>
      * A property name ("<b>bibrefsupport</b>").
-     *<p>
+     * </p>
+     * 
+     * <p>
      * Used for passing an instance of a class implementing this
      * interface. It is recommended to pass this property, for
      * example, in the constructor of an implementation of the {@link
      * BibRefQuery} interace}.
+     * </p>
      */
     static final String INIT_PROP_SUPPORT = "bibrefsupport";
 
 
     /**************************************************************************
+     * <p>
      * It creates a connection to an object providing the supporting
      * utilities, or/and it makes all necessary initialization steps
      * needed for further communication.
-     *
-     *<P>
+     * </p>
+     * 
+     * <p>
      * However, there should be no need to call this method
      * explicitly, the other methods should do it automatically before
      * they need to use any supporting utility.
-     *
-     *<P>
+     * </p>
+     * 
      * @throws NestedException if the connection/initialization cannot
      * be established
      *************************************************************************/
@@ -294,17 +327,19 @@ public interface BibRefSupport {
     void disconnect();
 
     /**************************************************************************
+     * <p>
      * It returns an object representing a central place where all
      * controlled vocabularies can be received from and shared by all
      * users.
-     *
-     *<P>
+     * </p>
+     * 
+     * <p>
      * The controlled vocabularies are used for finding names of
      * all available attributes of the given bibliographic repository,
      * for finding all possible values of some attributes, and for
      * specifying availability of the ordering and searching criteria.
-     *
-     *<P>
+     * </p>
+     * 
      * @return an instance implementing {@link CandyFinder} interface
      * @throws NestedException if the vocabulary finder cannot be found
      *************************************************************************/
@@ -312,17 +347,19 @@ public interface BibRefSupport {
 	throws NestedException;
 
     /**************************************************************************
+     * <p>
      * It returns a controlled vocabulary containing all possible
      * values of the attribute given in <tt>attrName</tt> in the
      * context given in <tt>resourceType</tt>. It is up to the
      * implementation to define the context.
-     *
-     *<P>
+     * </p>
+     * 
+     * <p>
      * Specifically, for <tt>attrName</tt> equals to {@link
      * #ATTR_PROPERTIES} it returns a vocabulary containing attribute
      * names available for the given citation type.
-     *
-     *<P>
+     * </p>
+     * 
      * @param resourceType is usually a name of a citation type (e.g. "Book",
      *        "JournalArticle"), see {@link #TYPE_BOOK}, etc., but can define
      *        other contexts as well (e.g. "Person" as defined by constant
@@ -337,9 +374,11 @@ public interface BibRefSupport {
 	throws NestedException;
 
     /**************************************************************************
+     * <p>
      * It returns all supported searching and sorting criteria for the
      * whole bibliographic repository.
-     *<P>
+     * </p>
+     * 
      * @see #getSupportedCriteria(String) getSupportedCriteria for a repository subset
      * @return available criteria
      * @throws NestedException if something bad happened
@@ -348,9 +387,11 @@ public interface BibRefSupport {
 	throws NestedException;
 
     /**************************************************************************
+     * <p>
      * It returns all supported searching and sorting criteria in the given
      * repository subset.
-     *<P>
+     * </p>
+     * 
      * @see #getSupportedCriteria getSupportedCriteria regardless of repository subsets
      * @param repositorySubset a name of a repository subset as used in
      *                         {@link BiblioEntryStatus#repositorySubset}, and
@@ -364,16 +405,19 @@ public interface BibRefSupport {
 	throws NestedException;
 
     /*************************************************************************
+     * <p>
      * It merges all given collections together. The result should
      * eliminate redundancy - which usually means removing the same
      * citations.
-     *
-     * <P>
+     * </p>
+     * 
+     * <p>
      * The merging process can be influenced by specifying some
      * <tt>properties</tt> (but they are not defined by this
      * interface, they depend on the implementation).
-     *
-     * <P>
+     * </p>
+     * 
+     * <p>
      * <em>
      * Note that the merging is independent on the repository, or repositories
      * where the collections come from. The main raison d'etre is actually
@@ -382,7 +426,8 @@ public interface BibRefSupport {
      * query it, for example, if it is a "virtual" collection). So it can
      * be quite difficult to implement this method :-(.
      * </em>
-     * <P>
+     * </p>
+     * 
      * @param collections to be merged together
      * @param properties define features how to do merging
      * @return a merged collection

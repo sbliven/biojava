@@ -30,12 +30,16 @@ import org.biojava.utils.*;
 import java.util.*;
 
 /**
+ * <p>
  * A circular view onto another Sequence object.  The class allows for
  * reinterpretation of locations and indices onto the sequence to allow for
  * overlapping of the origin. The origin is assumed to be the first symbol.
  * Future versions may support changing the origin.
+ * </p>
  *
- * <p>This code is currently experimental</p>
+ * <p>
+ * This code is currently experimental
+ * </p>
  *
  * @author Mark Schreiber
  * @version 1.1
@@ -43,20 +47,24 @@ import java.util.*;
  */
 
 public class CircularView extends ViewSequence{
-
   public CircularView(Sequence seq, FeatureRealizer fr){
     super(seq, fr);
   }
+
   public CircularView(Sequence seq){
     super(seq);
   }
 
   /**
+   * <p>
    * Over rides ViewSequence. Allows any integer index, positive or negative
    * to return a symbol via the equation
    * <CODE>index = ((index -1) % length)+1</CODE>
+   * </p>
    *
+   * <p>
    * Note that an index of 0 will throw an IllegalArgumentException.
+   * </p>
    */
   public Symbol symbolAt(int index){
 
@@ -67,13 +75,19 @@ public class CircularView extends ViewSequence{
   }
 
   /**
+   * <p>
    * Over rides ViewSequence. Allows any integer index, positive or negative
    * to return a symbol via the equation
    * <CODE>index = ((index -1) % length)+1</CODE>
+   * </p>
    *
-   * Will return a linear String which can ,if nescessary, span the origin.
+   * <p>
+   * Will return a linear String which can, if nescessary, span the origin.
+   * </p>
    *
+   * <p>
    * Note that an index of 0 will throw an IllegalArgumentException.
+   * </p>
    */
   public String subStr(int start, int end){
     if(start == 0 || end == 0){
@@ -99,6 +113,7 @@ public class CircularView extends ViewSequence{
    * Over rides ViewSequence to allow the use of locations that have
    * coordinates outside of the sequence length (which are needed to
    * describe locations that overlap the origin of a circular sequence).
+   *
    * @author Mark Schreiber
    * @since 1.2
    */
@@ -115,13 +130,19 @@ public class CircularView extends ViewSequence{
     }
 
   /**
+   * <p>
    * Over rides ViewSequence. Allows any integer index, positive or negative
    * to return a symbol via the equation
    * <CODE>index = ((index -1) % length)+1</CODE>
+   * </p>
    *
+   * <p>
    * Will return a linear SymbolList which can ,if nescessary, span the origin.
+   * </p>
    *
+   * <p>
    * Note that an index of 0 will throw an IllegalArgumentException.
+   * </p>
    */
   public SymbolList subList(int start, int end){
     if(start == 0 || end == 0){
@@ -156,3 +177,4 @@ public class CircularView extends ViewSequence{
     }
   }
 }
+

@@ -32,18 +32,23 @@ import org.biojava.utils.*;
 import org.biojava.utils.io.RandomAccessReader;
 
 /**
- * <p>This class implements SequenceDB on top of a set of sequence files
- * and sequence offsets within these files.</p>
+ * <p>
+ * This class implements SequenceDB on top of a set of sequence files
+ * and sequence offsets within these files.
+ * </p>
  *
  * <p> This class is primarily responsible for managing the sequence
  * IO, such as calculating the sequence file offsets, and parsing
  * individual sequences based upon file offsets. The actual persistant
  * storage of all this information is delegated to an instance of
- * <code>IndexStore</code>.</p>
+ * <code>IndexStore</code>.
+ * </p>
  *
- * <p>Note: We may be able to improve the indexing speed further by
+ * <p>
+ * Note: We may be able to improve the indexing speed further by
  * discarding all feature creation & annotation requests during index
- * parsing.</p>
+ * parsing.
+ * </p>
  *
  * @author Matthew Pocock
  * @author Thomas Down
@@ -60,7 +65,7 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
      * Create an IndexedSequenceDB by specifying both the IDMaker and
      * IndexStore used.
      *
-     * <P>
+     * <p>
      * The IDMaker will be used to calculate the ID for each
      * Sequence. It will delegate the storage and retrieval of the
      * sequence offsets to the IndexStore.
@@ -76,7 +81,7 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
     /**
      * Create an IndexedSequenceDB by specifying IndexStore used.
      *
-     * <P>
+     * <p>
      * IDMaker.byName will be used to calculate the ID for each
      * Sequence. It will delegate the storage and retrieval of the
      * sequence offsets to the IndexStore.

@@ -27,7 +27,7 @@ import org.biojava.bio.dist.*;
 
 /**
  * A log odds weight matrix.
- * <P>
+ * <p>
  * The weight matrix uses computer-coordinates. Thus, a 10 column weight matrix
  * has columns (0 - 9). I guess that if you try to access columns outside the
  * logical range, the implementation may throw an IndexOutOfBoundsException.
@@ -49,7 +49,7 @@ public interface WeightMatrix {
   
   /**
    * Retrieve a column as an EmissionState.
-   * <P>
+   * <p>
    * To find the emission probability for Symbol sym at column col use:
    * <code>wm.getColumn(col).getWeight(sym)</code>.
    *

@@ -28,13 +28,17 @@ import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.utils.ObjectUtil;
 
 /**
- * <p>A simple implementation of interface SeqSimilaritySearchHit that
+ * <p>
+ * A simple implementation of interface SeqSimilaritySearchHit that
  * takes care of all the housekeeping. Objects of this class are
- * immutable.</p>
+ * immutable.
+ * </p>
  *
- * <p>It is up to the user to define the meaning of the hit's
+ * <p>
+ * It is up to the user to define the meaning of the hit's
  * query/subject start/end/strand with respect to its constituent
- * sub-hits.</p>
+ * sub-hits.
+ * </p>
  * 
  * @author <a href="mailto:Gerald.Loeffler@vienna.at">Gerald
  * Loeffler</a> for the <a href="http://www.imp.univie.ac.at">IMP</a>

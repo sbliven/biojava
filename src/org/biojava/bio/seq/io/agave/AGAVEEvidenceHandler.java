@@ -29,7 +29,7 @@ import org.xml.sax.*;
 
  /**
   *
-  *@author Hanning Ni    Doubletwist Inc
+  * @author Hanning Ni    Doubletwist Inc
   */
 public class AGAVEEvidenceHandler
                extends StAXFeatureHandler implements AGAVEEvidenceCallbackItf
@@ -88,6 +88,5 @@ public class AGAVEEvidenceHandler
           throw new SAXException( e.getMessage() ) ;
       }
   }
-
 }
 

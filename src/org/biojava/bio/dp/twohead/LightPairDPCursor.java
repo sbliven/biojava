@@ -32,7 +32,7 @@ import org.biojava.bio.dp.*;
 
 /**
  * A LIGHT implementation of PairDPCursor.
- * <P>
+ * <p>
  * This object manages memory that is linear on the length of the shortest
  * sequence. It does not maintain any data beyond that necessary for the next
  * round of calcCell invocations.

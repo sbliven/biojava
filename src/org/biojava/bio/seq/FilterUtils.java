@@ -145,7 +145,7 @@ public class FilterUtils {
      * filter must overlap.
      *
      * @param ff A feature filter
-     * @returns the minimal location which any features matching <code>ff</code>
+     * @return the minimal location which any features matching <code>ff</code>
      *          must overlap, or <code>null</code> if no proof is possible
      *          (normally indicates that the filter has nothing to do with
      *          location).
@@ -191,14 +191,14 @@ public class FilterUtils {
   /**
    * Takes a feature filter and returns the reverse-polish representation of the
    * tree.
-   * <P>
+   * <p>
    * The list is traversed from left to right. Each atomic filter can be
    * evaluated directly to be replaced by a set of features. Each logical
    * operator grabs the required number of result sets from emediately before it
    * in the list and replaces itself and these with the result of it acting
    * upon these sets. In the end, the list should be left with a sing result
    * set which contains all matching features.
-   * <P>
+   * <p>
    * By definition, the attomic filter operations can be performed in any order.
    *
    * @param filt the FeatureFilter to flatten

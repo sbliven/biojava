@@ -25,14 +25,14 @@ import org.biojava.bio.*;
 
 /**
  * The interface for things that listen to GFF event streams.
- * <P>
+ * <p>
  * This allows the GFF push model to run over large collections of GFF, filter
  * them and access other resources without requiring vast numbers of GFF
  * records to be in memory at any one time.
- * <P>
+ * <p>
  * The stream includes both GFF records and comment lines. A particular
  * handeler may choose to discard either of these.
- * <P>
+ * <p>
  * It is assumed that a particular handler will only be used to listen to
  * a single stream of events in a single thread. Particular implementations
  * may not impose this restriction.
@@ -53,7 +53,7 @@ public interface GFFDocumentHandler {
 
   /**
    * Indicates that the current GFF document has now ended.
-   * <P>
+   * <p>
    * This gives you the chance to flush results, or do calculations if
    * you wish.
    */
@@ -61,7 +61,7 @@ public interface GFFDocumentHandler {
   
   /**
    * A comment line has been encountered.
-   * <P>
+   * <p>
    * <span class="arg">comment</span> has already had the leading '<code>#</code>'
    * removed, and may have had leading-and-trailing whitespace trimmed.
    *
@@ -71,7 +71,7 @@ public interface GFFDocumentHandler {
   
   /**
    * A record line has been encountered.
-   * <P>
+   * <p>
    * It is already preseneted to you into a <span class="type">GFFRecord</span> object.
    *
    * @param record  the <span class="type">GFFRecord</span> containing all the info

@@ -28,7 +28,7 @@ import org.biojava.bio.*;
 
 /**
  * A simple implementation of an Alignment.
- * <P>
+ * <p>
  * This is a simple-stupid implementation that is made from a set of same-lengthed
  * SymbolList objects each with an associated label. It does not handle differently
  * lengthed sequences and doesn't contain any gap-editing concepts.
@@ -100,7 +100,7 @@ extends AbstractSymbolList implements Alignment, Serializable {
   
   /**
    * Generate an alignment from a list of SymbolLists.
-   * <P>
+   * <p>
    * The SymbolLists must all be of the same length.
    *
    * @param labelToResList  the label-to-symbol list mapping

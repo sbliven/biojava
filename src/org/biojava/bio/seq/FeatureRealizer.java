@@ -29,9 +29,11 @@ import org.biojava.bio.*;
  * this interface is intended for use primarily by Sequence
  * implementors.  Normal users can generally ignore it.
  *
- * <p>There is no requirement that Sequence implementations
+ * <p>
+ * There is no requirement that Sequence implementations
  * use FeatureRealizers to construct their features, but common
- * implementations such as SimpleSequence and ViewSequence do.</p>
+ * implementations such as SimpleSequence and ViewSequence do.
+ * </p>
  *
  * @author Thomas Down
  */
@@ -44,7 +46,7 @@ public interface FeatureRealizer {
      * @param template A description of the desired feature.
      * @param parent The FeatureHolder which is to be the Feature's
      *               immediate parent.
-     * @returns A newly constructed feature, to be added to the sequence.
+     * @return A newly constructed feature, to be added to the sequence.
      * @throws BioException If the feature could not be constructed.
      */
 

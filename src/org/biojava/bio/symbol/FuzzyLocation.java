@@ -30,7 +30,7 @@ import org.biojava.bio.*;
 
 /**
  * A 'fuzzy' location a-la Embl fuzzy locations.
- * <P>
+ * <p>
  * Fuzzy locations have propreties that indicate that they may start before min
  * and end after max. However, this in no way affects how they interact with
  * other locations.

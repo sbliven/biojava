@@ -29,7 +29,7 @@ package org.biojava.bibliography;
 /**
  * The criteria define how the matching or ordering should be done
  * during queries.
- *<P>
+ *
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
  * @version $Id$
  */
@@ -43,10 +43,13 @@ public class BiblioCriterion {
     public static final int SORT_CRITERION  = 1;
 
     /**
+     * <p>
      * Each Criterion is identified by its name.
      * A list of criteria names is used in methods for querying and sorting
      * (see {@link BibRefQuery} interface).
-     *<P>
+     * </p>
+     *
+     * <p>
      * The implementations are advised to use descriptive names.
      * For example, the names for matching can be:
      * <pre>
@@ -66,6 +69,7 @@ public class BiblioCriterion {
      * Not every implementation is supposed to have the capability of matching by regular
      * expressions but those who have can specify (and document), for example, criterion
      * with name <tt>regular expression</tt>.
+     * </p>
      */
     public String name;
 
@@ -76,10 +80,14 @@ public class BiblioCriterion {
     public int type = QUERY_CRITERION;
 
     /**
+     * <p>
      * A list of other criteria names that this criterion is mutually exclusive with.
-     *<p>
+     * </p>
+     *
+     * <p>
      * For example, a sort criterion <tt>ascending</tt> will probably have
      * <tt>descending</tt> in this list.
+     * </p>
      */
     public String[] mutuallyExclusiveWith;
 

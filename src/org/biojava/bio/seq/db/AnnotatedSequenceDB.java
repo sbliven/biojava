@@ -48,8 +48,8 @@ implements SequenceDB, Serializable {
     this.annotator = a;
   }
   
-    /**
-    *Get the original sequenceDB from this annotated sequenceDB.
+   /**
+    * Get the original sequenceDB from this annotated sequenceDB.
     */
 
   public SequenceDB getParent() {
@@ -83,9 +83,9 @@ implements SequenceDB, Serializable {
     };
   }
   
-    /**
-    *Apply the annotation to a sequence.
-    *@param seq the sequence to annotate.
+   /**
+    * Apply the annotation to a sequence.
+    * @param seq the sequence to annotate.
     */
 
   protected Sequence doAnnotation(Sequence seq) throws BioException  {

@@ -32,7 +32,8 @@ import org.xml.sax.*;
 /**
  *
  * Handles the AGAVE &lt;chromosome&gt; element
- *@author Hanning Ni     Doubletwist Inc
+ *
+ * @author Hanning Ni     Doubletwist Inc
  */
 public class AGAVEChromosomeHandler
                extends StAXFeatureHandler  implements AGAVEChromosomeCallbackItf, SequenceHandler
@@ -57,7 +58,7 @@ public class AGAVEChromosomeHandler
        // ignore it , view
        super.addHandler(new ElementRecognizer.ByLocalName("view"),
          AGAVEViewPropHandler.AGAVE_VIEW_PROP_HANDLER_FACTORY);
-       // <note>
+      // <note>
        super.addHandler(new ElementRecognizer.ByLocalName("contig"),
          AGAVEContigHandler.AGAVE_CONTIG_HANDLER_FACTORY);
   }

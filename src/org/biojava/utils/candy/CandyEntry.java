@@ -29,13 +29,17 @@ package org.biojava.utils.candy;
 import java.util.*;
 
 /**
+ * <p>
  * This is a basic container for a vocabulary entry. It consists only
  * of the basic attributes which is sufficient for the vocabularies
  * providing string-type contents.
- *<P>
+ * </p>
+ *
+ * <p>
  * However, it may still accomodate more complex data types using
  * the {@link #extras} member.
- *<P> 
+ * </p>
+ * 
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
  * @version $Id$
  */
@@ -65,8 +69,10 @@ public class CandyEntry {
         this (entry, description, null);
     }
 
-    /** It creates an entry instance with given name, value and
-     *  additional properties. */
+    /**
+     * It creates an entry instance with given name, value and
+     * additional properties.
+     */
     public CandyEntry (String entry, String description, Hashtable extras) {
 	this.entry = entry;
 	this.description = description;

@@ -31,15 +31,19 @@ import org.biojava.bio.BioException;
 import org.biojava.utils.ParserException;
 
 /**
- * <p><code>FastaSearchParser</code> objects provide Fasta search
+ * <p>
+ * <code>FastaSearchParser</code> objects provide Fasta search
  * parsing functionality for the '-m 10' output format (see the Fasta
  * documentation). Data are passed to a SearchContentHandler which
  * coordinates its interpretation and creation of objects representing
- * the result.</p>
+ * the result.
+ * </p>
  *
- * <p>If the search output contains no hits only the header data will
+ * <p>
+ * If the search output contains no hits only the header data will
  * be sent to the handler before the dataset ends. The handler is
- * responsible for dealing with this state.</p>
+ * responsible for dealing with this state.
+ * </p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.1

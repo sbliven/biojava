@@ -27,13 +27,17 @@ import org.biojava.utils.*;
 import org.xml.sax.*;
 
 /**
+ * <p>
  * StAX handler for any element which just contains a string representation of
- * an booleaneger.
- * <P>
+ * an boolean.
+ * </p>
+ *
+ * <p>
  * This calss collects the string data, and when it is complete, passes it to
  * the (abstract) setBooleanValue method.  Typical use of this class is as
  * a base for a small (often anonymous) class which takes the boolean value
  * and stores it in some variable.
+ * </p>
  *
  * @author Matthew Pocock
  * @since 1.2
@@ -73,10 +77,14 @@ public abstract class BooleanElementHandlerBase extends StAXContentHandlerBase {
   }
 
   /**
+   * <p>
    * Override this method to do something useful with the
    * boolean we collect.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This method will be invoked by endElement with the fully parsed boolean.
+   * </p>
    *
    * @param boolean  the fully parsed boolean
    * @throws SAXException if for any reason the boolean is not palatable

@@ -31,16 +31,17 @@ import java.util.*;
 import java.beans.*;
 
 /**
+ * <p>
  * This interface defines functionality of a controlled vocabulary.
  * The implementation is supposed to behave as a Java bean
  * (regarding accessing vocabulary properties).
+ * </p>
  *
- *<P>
+ * <p>
  * Each vocabulary consists of (usually many) vocabulary entries
  * which are represented by {@link CandyEntry CandyEntries}.
+ * </p>
  *
- *<P> 
- * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
  * @version $Id$
  */
 
@@ -49,7 +50,7 @@ public interface CandyVocabulary
 
     /*************************************************************************
      * It checks if a given entry exists in this vocabulary.
-     * <P>
+     *
      * @param name of a vocabulary entry to be checked
      * @return true if the given entry exists in this vocabulary
      * @throws NestedException if the vocabulary is suddenly not available
@@ -59,7 +60,7 @@ public interface CandyVocabulary
 
     /*************************************************************************
      * It returns a selected vocabulary entry.
-     * <P>
+     *
      * @see #getAllEntries getAllEntries
      * @param name a name of a vocabulary entry to be looked up
      * @return a vocabulary entry
@@ -70,7 +71,7 @@ public interface CandyVocabulary
 
     /*************************************************************************
      * It returns all available vocabulary entries.
-     * <P>
+     *
      * @see #getEntryByName getEntryByName
      * @return an Enumeration object containing all available entries
      * @throws NestedException if the vocabulary is suddenly not available
@@ -80,7 +81,7 @@ public interface CandyVocabulary
 
     /*************************************************************************
      * It return all names (entry identifiers) available in this vocabulary.
-     * <P>
+     *
      * @return an Enumeration object containing all available names
      * @throws NestedException if the vocabulary is suddenly not available
      *************************************************************************/
@@ -89,7 +90,7 @@ public interface CandyVocabulary
 
     /*************************************************************************
      * It frees all resources related to this vocabulary.
-     * <P>
+     *
      * @throws NestedException if the vocabulary is suddenly not available
      *************************************************************************/
     void destroy()
@@ -155,11 +156,16 @@ public interface CandyVocabulary
      */
     boolean isCaseSensitive() throws NestedException;
 
-    /** A property name.
-     *<P>
-     *  An implementation may use this boolean property to make sure that
-     *  returned vocabulary entries are in the same order as they were
-     *  read from its original source.
+    /**
+     * <p>
+     * A property name.
+     * </p>
+     *
+     * <p>
+     * An implementation may use this boolean property to make sure that
+     * returned vocabulary entries are in the same order as they were
+     * read from its original source.
+     * </p>
      */
     static final String CANDIES_NOT_SORTED = "candies_not_sorted";
 

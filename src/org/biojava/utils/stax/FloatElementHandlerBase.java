@@ -29,7 +29,7 @@ import org.xml.sax.*;
 /**
  * StAX handler for any element which just contains a string representation of
  * a float.
- * <P>
+ * <p>
  * This class collects the string data, and when it is complete, passes it to
  * the (abstract) setFloatValue method.  Typical use of this class is as
  * a base for a small (often anonymous) class which takes the float value
@@ -79,7 +79,7 @@ public abstract class FloatElementHandlerBase extends StAXContentHandlerBase {
   /**
    * Override this method to do something useful with the
    * float we collect.
-   * <P>
+   * <p>
    * This method will be invoked by endElement with the fully parsed float.
    *
    * @param float  the fully parsed float

@@ -31,9 +31,10 @@ import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
 
 /**
+ * <p>
  * Implements IndexStore as a serialized file for the java data and a 
  * tab-delimited file of offsets.
- * <P>
+ * </p>
  * The tab-delimited file looks like:
  * <pre>
  * fileNumber \t offset \t id \n

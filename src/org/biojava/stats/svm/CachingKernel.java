@@ -9,13 +9,17 @@ package org.biojava.stats.svm;
 import java.util.*;
 
 /**
+ * <p>
  * Caches the results of a nested kernel so that k(a, b) need only be calculated
  * once.
- * <P>
+ * </p>
+ *
+ * <p>
  * This kernel is thread-safe. However, care must be taken when setting the
  * nested kernel that no other thread is retrieving values at the same time.
  * This would cause a race condition in which the newly flushed cache may
  * contain a value from the previous kernel.
+ * </p>
  *
  * @author Thomas Down
  * @author Matthew Pocock

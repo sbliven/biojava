@@ -25,7 +25,7 @@ import java.io.*;
 
 /**
  * Simple implementation for specifying markup styles.
- * Has 3 modes of operation: SHOW_ALL, SHOW_SAME & SHOW_DIFF<P>
+ * Has 3 modes of operation: SHOW_ALL, SHOW_SAME & SHOW_DIFF<p>
  *
  * SHOW_ALL  - returns the default style for all given residues.
  * SHOW_SAME - only returns a markup style if the <B>styles</B> for both
@@ -45,7 +45,7 @@ import java.io.*;
  *	oStyler.addStyle( "T", oRed );
  *	oStyler.addStyle( "C", oRed );
  *	oStyler.addStyle( "G", oRed );
- * </CODE><P>
+ * </CODE><p>
  *
  * 2. Alternatively the styles could be specified in a java properties file
  *    and loaded by calling <CODE>readColourMapFromProperties( poFilename )</CODE>,
@@ -67,7 +67,7 @@ import java.io.*;
  * </PRE> 
  *
  * Note this is simply character based, so if you want to colour gaps then
- * you need to specify a colour for the gap character.<P>
+ * you need to specify a colour for the gap character.<p>
  *
  * If no colour is specified for a character then it is uncoloured.
  *
@@ -111,7 +111,7 @@ public class SimpleAlignmentStyler extends AbstractAlignmentStyler {
     private int iStyle = 0;
 
     /**
-     * Creates a new <CODE>SimpleAlignmentStyler</CODE> instance<P>
+     * Creates a new <CODE>SimpleAlignmentStyler</CODE> instance<p>
      *
      * The int flag should be one of SimpleAlignmentStyler.SHOW_ALL,
      * SimpleAlignmentStyler.SHOW_SAME or
@@ -189,7 +189,7 @@ public class SimpleAlignmentStyler extends AbstractAlignmentStyler {
 
     /**
      * Return the styles for the two aligned characters.
-     * ( in the form of predefined font classes ).<P>
+     * ( in the form of predefined font classes ).<p>
      *
      * Null is acceptable value for no style.
      *

@@ -203,7 +203,7 @@ public class SuffixTree implements Serializable {
   
   /**
    * A node in the suffix tree.
-   * <P>
+   * <p>
    * This class is realy stupid & delegates most work off to a SuffixTree so
    * that it is as small (in memory-per-object terms) as possible.
    *

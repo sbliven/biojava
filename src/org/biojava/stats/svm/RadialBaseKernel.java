@@ -25,11 +25,11 @@ package org.biojava.stats.svm;
 /**
  * This kernel computes the radial base kernel that corresponds to a gausian
  * distribution. 
- * <P>
+ * <p>
  * The formula for this is <code>exp( -||a - b|| / (2* width ^ 2))</code>. The
  * term a-b can be represented in an arbitrary feature space by using a nested
  * kernel k, and becomes <code>k(a, a) + k(b, b) - 2 * k(a, b)</code>.
- * <P>
+ * <p>
  * As k(x, x) is required repeatedly, I suggest using a DiagonalCachingKernel as
  * the immediately nested kernel function.
  *

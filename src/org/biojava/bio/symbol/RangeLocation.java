@@ -27,7 +27,7 @@ import java.util.*;
 /**
  * A simple implementation of Location that contains all points between
  * getMin and getMax inclusive.
- * <P>
+ * <p>
  * This will in practice be the most commonly used pure-java implementation.
  *
  * @author Matthew Pocock

@@ -47,7 +47,7 @@ public class BioIndex implements IndexStore {
     }
     
     // create directory
-    indexDirectory.createNewFile();
+    indexDirectory.mkdirs();
     
     // create BIOINDEX.dat
     {
@@ -132,6 +132,7 @@ public class BioIndex implements IndexStore {
 
     // read in the global config
     {
+      System.out.println("Global");
       Map config = new HashMap();
       BufferedReader fi = new BufferedReader(
         new FileReader(
@@ -150,6 +151,7 @@ public class BioIndex implements IndexStore {
     
     // set up file set
     {
+      System.out.println("Files");
       fileCount = 0;
       fileIDToFile = new File[4];
       

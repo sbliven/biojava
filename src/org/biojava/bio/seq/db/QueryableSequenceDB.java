@@ -29,7 +29,7 @@ import org.biojava.bio.seq.*;
 
 /**
  * An extention to SequenceDB that allows features to be extracted using a FeatureFilter.
- * <P>
+ * <p>
  * <em>Note:</em> This is transient and unsupported API, and may be removed or replaced at any time.
  *
  * @author Matthew Pocock

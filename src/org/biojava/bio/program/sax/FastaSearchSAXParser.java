@@ -47,15 +47,19 @@ import org.biojava.bio.program.search.SearchParser;
  * '-m 10' format output from the the Fasta search program (see the
  * Fasta documentation for details of this format).
  *
- * <p>The SAX2 events produced are as if the input to the parser was
+ * <p>
+ * The SAX2 events produced are as if the input to the parser was
  * an XML file validating against the biojava
  * BlastLikeDataSetCollection DTD. There is no requirement for an
- * intermediate conversion of native output to XML format.</p>
+ * intermediate conversion of native output to XML format.
+ * </p>
  *
- * <p>This class is backed by the
+ * <p>
+ * This class is backed by the
  * <code>org.biojava.bio.program.search.FastaSearchParser</code>
  * parser, so changes to that class will be reflected in the output
- * from this one.</p>
+ * from this one.
+ * </p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2

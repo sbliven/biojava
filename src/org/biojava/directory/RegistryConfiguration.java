@@ -7,8 +7,8 @@ import java.util.*;
 /**
  * This class encapsulates all the parsing of the registry configuration 
  * file
- *@author Brian Gilman
- *@version $Revision$
+ * @author Brian Gilman
+ * @version $Revision$
  */
 
 

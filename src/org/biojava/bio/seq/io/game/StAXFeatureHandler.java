@@ -126,7 +126,7 @@ public class StAXFeatureHandler extends StAXContentHandlerBase
 /**
  *  generates a very basic Template for the feature with
  *  SmallAnnotation in the annotation field.
- *  <P>
+ *  <p>
  *  Override if you wish a more specialised Template.
  *
  */

@@ -28,7 +28,7 @@ import org.xml.sax.*;
 
 /**
  *
- *@author Hanning Ni    Doubletwist Inc
+ * @author Hanning Ni    Doubletwist Inc
  */
 public class AGAVEComputationHandler
                extends StAXFeatureHandler
@@ -50,7 +50,7 @@ public class AGAVEComputationHandler
 
 
   /**
-   * currently we do not handler <computation> as subtag of sciobj yet
+   * currently we do not handler &gt;computation&lt; as subtag of sciobj yet
    */
   public void startElementHandler(
                 String nsURI,
@@ -58,11 +58,9 @@ public class AGAVEComputationHandler
                 String qName,
                 Attributes attrs)
                 throws SAXException
+
   {
          throw new SAXException( "tag <computation> is not supported as sub-tag of sciobj yet") ;
   }
 
-
-
 }
-

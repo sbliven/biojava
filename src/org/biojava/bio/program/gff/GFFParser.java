@@ -238,7 +238,7 @@ public class GFFParser {
     /**
      * Parse <span class="arg">attValList</span> into a
      * <span class="type">Map</span> of attributes and value lists.
-     * <P>
+     * <p>
      * The resulting <span class="type">Map</span> will have
      * <span class="type">String</span> keys, with
      * <span class="type">List</span> values. If there are no values

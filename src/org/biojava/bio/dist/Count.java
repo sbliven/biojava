@@ -27,21 +27,29 @@ import org.biojava.bio.symbol.*;
 import org.biojava.utils.*;
 
 /**
+ * <p>
  * An encapsulation of a count over the Symbols within an alphabet.
- * <P>
+ * </p>
+ *
+ * <p>
  * A Count is effectively a vector of counts from an Alphabet.
+ * </p>
  *
  * @author Matthew Pocock
  */
 public interface Count extends Changeable {
   /**
+   * <p>
    * Whenever a component count changes the values that would be returned by
    * getCount, they should fire a ChangeEvent with this object as the type.
-   * <P>
+   * </p>
+   *
+   * <p>
    * If the whole count changes, then the change and previous fields of
    * the ChangeEvent should be left null. If only a single weight is modified,
    * then change should be of the form Object[] { symbol, new Double(newVal) }
    * and previous should be of the form Object[] { symbol, new Double(oldVal) }
+   * </p>
    */
   public static final ChangeType COUNTS = new ChangeType(
     "distribution weights changed",

@@ -26,11 +26,11 @@ import org.biojava.bio.symbol.*;
 
 /**
  * A sequence.
- * <P>
+ * <p>
  * This interface is a symbol list, so it contains symbols. It is annotatable
  * so that you can add annotation to it, and it is a FeatureHolder so that you
  * can add information about specific regions.
- * <P>
+ * <p>
  * It is expected that there may be several implementations of this interface,
  * each of which may be fairly heavy-weight. It takes the SymbolList interface
  * that is nice mathematically, and turns it into a biologically useful object.
@@ -64,7 +64,7 @@ public interface Sequence extends SymbolList, FeatureHolder, Annotatable {
   
   /**
    * The name of this sequence.
-   * <P>
+   * <p>
    * The name may contain spaces or odd characters.
    *
    * @return the name as a String

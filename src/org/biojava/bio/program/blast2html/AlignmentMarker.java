@@ -25,31 +25,47 @@ import java.util.*;
 import java.awt.Color;
 
 /**
- * Class to do simple HTML colouring of sequence alignments.<P>
+ * <p>
+ * Class to do simple HTML colouring of sequence alignments.
+ * </p>
  *
+ * <p>
  * For any particular alignment position, the colouring depends only on the two
- * characters at that position. The decision is made in two stages:-<P>
- * 
- * 1. Whether to colour or not in the <CODE>ColourCommand.isColoured()</CODE>
- *    method<BR>
- * 2. what the colours are in the <CODE>AlignmentStyler.getStyle()</CODE> 
- *    method<P>
+ * characters at that position. The decision is made in two stages:-
+ * <ol>
+ *   <li>Whether to colour or not in the <CODE>ColourCommand.isColoured()</CODE>
+ *    method</li>
+ *   <li>what the colours are in the <CODE>AlignmentStyler.getStyle()</CODE> 
+ *    method</li>
+ * </ol>
+ * </p>
  *
+ * <p>
  * This allows simple choices to highlight the mismatches, the identities or
- * simply colour up everything.<P>
+ * simply colour up everything.
+ * </p>
  * 
- * The current implemention of step 2. is a simple colour lookup.<P>
+ * <p>
+ * The current implemention of step 2. is a simple colour lookup.
+ * </p>
  *
- * Limitations:<P>
+ * <p>
+ * Limitations:
+ * </p>
  *
+ * <p>
  * As the FONT styles need to be defined before being used in the HTML, 
  * it means the all colours to be used have to calculated up front. 
+ * </p>
  *
+ * <p>
  * The position in the alignment is not passed in so position dependent
  * colouring ( say against a HMM profile ) would be involve either
  * changing the interfaces or implementing them such that they knew the
  * required information via another route.
+ * </p>
  *
+ * <p><pre>
  * Primary author -
  *                 Colin Hardman      (CAT)
  * Other authors  -
@@ -62,9 +78,12 @@ import java.awt.Color;
  *
  * Copyright 2001 Cambridge Antibody Technology Group plc.
  * All Rights Reserved.
+ * </pre></p>
  *
+ * <p>
  * This code released to the biojava project, May 2001
  * under the LGPL license.
+ * </p>
  *
  * @author Cambridge Antibody Technology Group plc
  * @version 1.0
@@ -126,11 +145,16 @@ public class AlignmentMarker {
 
     
     /**
-     * Delegate to the AlignmentStyler<P>
+     * <p>
+     * Delegate to the AlignmentStyler
+     * </p>
      *
+     * <p>
      * Returns a fragment of HTML that defines the FONT
-     * styles to be used in the alignment markup.<P>
+     * styles to be used in the alignment markup.
+     * </p>
      * 
+     * <p>
      * For example:
      * <PRE>
      * FONT.C2-S{background-color:#FFFC50;color:#000000}
@@ -140,6 +164,8 @@ public class AlignmentMarker {
      * FONT.C1-S{background-color:#FFCA50;color:#000000}
      * FONT.C5-S{background-color:#A5A5FF;color:#000000}
      * </PRE>
+     * </p>
+     *
      * @return String - the HTML
      */
     String getAlignmentStyles() {
@@ -238,9 +264,14 @@ public class AlignmentMarker {
     }
 
     /**
-     * Apply the new style to the output.<P>
+     * <p>
+     * Apply the new style to the output.
+     * </p>
+     *
+     * <p>
      * Takes care of runs of the same style and
      * changing styles.
+     * </p>
      *
      * @param poCurrentStyle  <code>String</code> - the current style
      * @param poNewStyle      <code>String</code> - the new style
@@ -284,6 +315,5 @@ public class AlignmentMarker {
 	}
     }
 }
-
 
 

@@ -26,7 +26,7 @@ import java.util.*;
 
 /**
  * An SVM classifier model.
- * <P>
+ * <p>
  * This is the interface for objects that contain the model for a binary
  * classification task.
  *

@@ -29,9 +29,9 @@ import org.biojava.bio.dist.*;
 
 /**
  * A markov model.
- * <P>
+ * <p>
  * All probablities are in log space.
- * <P>
+ * <p>
  * This interface models a subset of hidden markov models with an explicit start
  * and end state. In principle, these can be combined together, so that a state
  * within one model may be an entire model in its own right, wired via
@@ -41,7 +41,7 @@ import org.biojava.bio.dist.*;
 public interface MarkovModel extends Changeable {
   /**
    * Signals that the architecture of the model is changing.
-   * <P>
+   * <p>
    * For a transition creation, the changed field should be a two element
    * array containing the source and destination states of the new transition,
    * and the previous field should be null. Likewise for the removal of a
@@ -55,7 +55,7 @@ public interface MarkovModel extends Changeable {
   
   /**
    * Signals that one or more parameters have altered.
-   * <P>
+   * <p>
    * If it is clear which parameter has changed, then this should be in the
    * current and/or previous field. Otherwise, these should be null.
    */
@@ -72,10 +72,10 @@ public interface MarkovModel extends Changeable {
 
   /**
    * FiniteAlphabet of the states.
-   * <P>
+   * <p>
    * We are modeling a finite-state-machine, so there will be a finite set of
    * states.
-   * <P>
+   * <p>
    * The MagicalState returned by getMagicalState is always contained
    * within this as the start/end state.
    *
@@ -90,7 +90,7 @@ public interface MarkovModel extends Changeable {
   
   /**
    * The number of heads on this model.
-   * <P>
+   * <p>
    * Each head consumes a single SymbolList. A single-head model just consumes/
    * emits a single sequence. A two-head model performs alignment between two
    * sequences (e.g. smith-waterman). Models with more heads do more interesting
@@ -110,7 +110,7 @@ public interface MarkovModel extends Changeable {
 
   /**
    * Set the probability distribution over the transitions from 'source'.
-   * <P>
+   * <p>
    * This should throw an IllegalAlphabetException if the source alphabet in
    * 'dist' is not the same alphabet as returned by transitionsFrom(source).
    *
@@ -155,7 +155,7 @@ public interface MarkovModel extends Changeable {
   
   /**
    * Makes a transition between two states legal.
-   * <P>
+   * <p>
    * This should inform each TransitionListener that a transition is to be
    * created using preCreateTransition, and if none of the listeners fire a
    * ChangeVetoException, it should create the transition, and then inform each
@@ -171,7 +171,7 @@ public interface MarkovModel extends Changeable {
    
   /**
    * Breaks a transition between two states legal.
-   * <P>
+   * <p>
    * This should inform each TransitionListener that a transition is to be
    * broken using preDestroyTransition, and if none of the listeners fire a
    * ChangeVetoException, it should break the transition, and then inform each
@@ -198,7 +198,7 @@ public interface MarkovModel extends Changeable {
 
   /**
    * Remove a state from the model.
-   * <P>
+   * <p>
    * States should not be removed untill they are involved in no transitions.
    * This is to avoid producing corrupted models by accident.
    *

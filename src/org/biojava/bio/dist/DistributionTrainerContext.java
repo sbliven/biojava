@@ -33,6 +33,8 @@ import org.biojava.bio.symbol.*;
 public interface DistributionTrainerContext {
     /**
      * Return the number of pseudocounts added to the distribution when training.
+     *
+     * @return the null model weight
      */
 
   public double getNullModelWeight();
@@ -41,26 +43,36 @@ public interface DistributionTrainerContext {
      * Set the number of pseudocounts to add when training the distribution.
      * These counts are added in proportion to the null model of the distribution
      * being trained.
+     *
+     * @param weight the new null model weight
      */
 
   public void setNullModelWeight(double weight);
   
   /**
-  * Register a distribution object with this context.
-  * <P>
-  * This method is a request to the context to register dist. If dist is already
-  * registered then this method should do nothing. If it is not registered, then
-  * it should invoke dist.registerWithTrainer
-  *
-  * @param dist the Distribution to register
-  */
+   * <p>
+   * Register a distribution object with this context.
+   * </p>
+   *
+   * <p>
+   * This method is a request to the context to register dist. If dist is already
+   * registered then this method should do nothing. If it is not registered, then
+   * it should invoke dist.registerWithTrainer
+   * </p>
+   *
+   * @param dist the Distribution to register
+   */
   void registerDistribution(Distribution dist);
   
   /**
+   * <p>
    * Register a Distribution and an associated DistributionTrainer object.
-   * <P>
+   * </p>
+   *
+   * <p>
    * In the registerWithTrainer method of a Distribution, it should associate
    * itself with a trainer using this method.
+   * </p>
    *
    * @param dist the distribution to be registered.
    * @param trainer the distribution's trainer object to be registered.
@@ -69,15 +81,20 @@ public interface DistributionTrainerContext {
   
   /**
   * Return the Distribution trainer object from the current context.
+  *
   * @param dist the Distribution whose trainer is required.
   */
    DistributionTrainer getTrainer(Distribution dist);
   
   /**
+   * <p>
    * Registers that sym was counted in this state.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This method may be called multiple times with the same symbol. In this
    * case, the times should be summed.
+   * </p>
    *
    * @param dist the Distribution that the symbol was associated with
    * @param sym the Symbol seen
@@ -90,10 +107,14 @@ public interface DistributionTrainerContext {
   throws IllegalSymbolException;
   
   /**
+   * <p>
    * Trains the Distribution, given a null model.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This will use the information collected with multiple addCount calls, and
    * the null model to generate the new weights.
+   * </p>
    *
    * @param nullModel the null model Distribution
    * @param weight  how many lots of the null model to add

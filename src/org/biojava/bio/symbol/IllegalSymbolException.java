@@ -26,12 +26,12 @@ import org.biojava.bio.*;
 
 /**
  * The exception to indicate that a symbol is not valid within a context.
- * <P>
+ * <p>
  * The usual reason for throwing an IllegalSymbolException is that you are
  * trying to add a symbol to a sequence with an alpabet that does not contain
  * the symbol. This is the sequence/alphabet equivalent of a ClassCastException
  * for objects.
- * <P>
+ * <p>
  * Frequently, these excepions are actualy generated from Alphabet.validate.
  *
  * @author Matthew Pocock

@@ -127,7 +127,7 @@ public final class RNATools {
 
   /**
    * Return an integer index for a symbol - compatible with forIndex.
-   * <P>
+   * <p>
    * The index for a symbol is stable accross virtual machines & invocations.
    *
    * @param sym  the Symbol to index
@@ -151,7 +151,7 @@ public final class RNATools {
 
   /**
    * Return the symbol for an index - compatible with index.
-   * <P>
+   * <p>
    * The index for a symbol is stable accross virtual machines & invocations.
    *
    * @param index  the index to look up

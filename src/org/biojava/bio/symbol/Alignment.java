@@ -27,19 +27,22 @@ import org.biojava.utils.*;
 
 /**
  * An alignment containing multiple <span class="type">SymbolList</span>s.
- * <P>
+ * <p>
  * The alignment can be thought of as a rectangular array of
  * <span class="type">Symbol</span>s. Each
  * row is indexed by a label and each column is indexed by offset (counting from
  * 1).
- * <P>
+ * <p>
  * Alternatively, it can be thought of as a <span class="type">SymbolList</span>
  * where each <span class="type">Symbol</span> is
  * a list of <span class="type">Symbol</span>s in that column.
- * <P>
+ * <p>
  * To create gapped alignments, use <span class="type">SymbolList</span>s with
  * gaps. The most flexible way to do this will be to leverage
  * <span class="type">GappedSymbolList</span> objects.
+ *
+ * @author Matthew Pocock
+ * @since 1.1
  */
 public interface Alignment extends SymbolList {
   /**
@@ -55,12 +58,16 @@ public interface Alignment extends SymbolList {
   );
   
   /**
+   * <p>
    * The list of SymbolLists in the alignment.
-   * <P>
+   * </p>
+   *
+   * <p>
    * The index in the list is the same as the index in the alignment.
    * Each SymbolList object will only be in the alignment once. However, a
    * single underlying SymbolList may have more than one view within an
    * alignment, each represented by a different GappedSymbolList.
+   * </p>
    *
    * @return  the List of all SymbolLists in the alignment
    */
@@ -88,12 +95,16 @@ public interface Alignment extends SymbolList {
   throws NoSuchElementException;
   
   /**
+   * <p>
    * Make a view onto this alignment.
-   * <P>
+   * </p>
+   *
+   * <p>
    * If labels is null, then each label will be kept. Otherwise, only those in
    * labels will be kept.
    * If loc is null, then the entire length of the alignment will be kept.
    * If loc is not null, then only the columns within the location will be kept.
+   * </p>
    *
    * @param labels the Set of sequences to include by label
    * @param loc the Location to include

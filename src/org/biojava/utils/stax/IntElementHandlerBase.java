@@ -29,7 +29,7 @@ import org.xml.sax.*;
 /**
  * StAX handler for any element which just contains a string representation of
  * an integer.
- * <P>
+ * <p>
  * This class collects the string data, and when it is complete, passes it to
  * the (abstract) setIntValue method.  Typical use of this class is as
  * a base for a small (often anonymous) class which takes the int value
@@ -79,7 +79,7 @@ public abstract class IntElementHandlerBase extends StAXContentHandlerBase {
   /**
    * Override this method to do something useful with the
    * int we collect.
-   * <P>
+   * <p>
    * This method will be invoked by endElement with the fully parsed int.
    *
    * @param val  the fully parsed int

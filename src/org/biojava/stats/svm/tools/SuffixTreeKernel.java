@@ -31,7 +31,7 @@ import org.biojava.stats.svm.SVMKernel;
 /**
  * Computes the dot-product of two suffix-trees as the sum of the products
  * of the counts of all nodes they have in common.
- * <P>
+ * <p>
  * This implementation allows you to scale the sub-space for each word length
  * independently.
  *
@@ -67,7 +67,7 @@ public class SuffixTreeKernel implements SVMKernel, Serializable {
    * Calculate the dot product between the
    * <span class="type">SuffixTree</span>s <span class="arg">a</span> and
    * <span class="arg">b</span>.
-   * <P>
+   * <p>
    * This is the sum of the dot products of each subspace for a given word
    * length. Each subspace is scaled using the
    * <span class="type">DepthScaler</span> returned by
@@ -93,7 +93,7 @@ public class SuffixTreeKernel implements SVMKernel, Serializable {
    * Recursive method to compute the dot product of the
    * <span class="type">SuffixTree.SuffixNode</span>s
    * <span class="arg">n1</span> and <span class="arg">n2</span>.
-   * <P>
+   * <p>
    * This scales <span class="arg">n1</span>.
    * <span class="method">getNumber</span><code>()</code> *
    * <span class="arg">n2</span>.

@@ -31,23 +31,31 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.io.*;
 
 /**
+ * <p>
  * The set of AtomicSymbols which can be concatenated together to make a
  * SymbolList.
- * <P>
+ * </p>
+ *
+ * <p>
  * A non-atomic symbol is considered to be contained within this alphabet if
  * all of the atomic symbols that it could match are members of this alphabet.
+ * </p>
  *
  * @author Matthew Pocock
  */
 public interface Alphabet extends Annotatable {
   /** 
+   * <p>
    * This ChangeType indicates that some symbols have been added or removed from
    * the alphabet. The current and previous fields should indicate what symbols
    * were there originally, and what they have been replaced with.
-   * <P>
+   * <p>
+   *
+   * <p>
    * If the alphabet wishes to propagate that the symbol has changed state, then
    * previous and current should be null, but the chainedEvent property should
    * rever to the ChangeEvent on the unerlying Symbol.
+   * </p>
    */
   public static ChangeType SYMBOLS = new ChangeType(
     "The set of symbols in this alphabet has changed.",
@@ -77,17 +85,22 @@ public interface Alphabet extends Annotatable {
    * Return an ordered List of the alphabets which make up this
    * compound alphabet.  The returned list should be immutable.
    *
+   * @return a List of alphabets
    */
   List getAlphabets();
 
   /**
+   * <p>
    * Get a symbol from the Alphabet which corresponds
    * to the specified ordered list of symbols.
-   * <P>
+   * </p>
+   *
+   * <p>
    * The symbol at i in the list must be a member of the i'th alphabet in
    * getAlphabets. If all of the symbols in rl are attomic, then the resulting
    * symbol will also be atomic. If any one of them is an ambiguity symbol then
-   * the resulting symbol will be the apropreate ambiguity symbol. 
+   * the resulting symbol will be the apropreate ambiguity symbol.
+   * </p>
    *
    * @param rl A list of Symbol instances
    * @throws IllegalSymbolException if the members of rl are
@@ -98,10 +111,14 @@ public interface Alphabet extends Annotatable {
   throws IllegalSymbolException;
 
   /**
+   * <p>
    * Get a symbol that represents the set of symbols in syms.
-   * <P>
+   * </p>
+   *
+   * <p>
    * Syms must be a set of Symbol instances each of which is contained within
    * this alphabet. This method is used to retrieve ambiguity symbols.
+   * </p>
    *
    * @param syms  the Set of Symbols that will be found in getMatches of the
    *            returned symbol
@@ -111,22 +128,30 @@ public interface Alphabet extends Annotatable {
   throws IllegalSymbolException;
   
   /**
+   * <p>
    * Get the 'gap' ambiguity symbol that is most apropreate for this alphabet.
-   * <P>
+   * </p>
+   *
+   * <p>
    * In general, this will be a BasisSymbol that represents a list of
    * AlphabetManager.getGapSymbol() the same length as the getAlphabets list.
+   * </p>
    *
    * @return the apropreate gap Symbol instance
    */
   Symbol getGapSymbol();
   
   /**
+   * <p>
    * Returns whether or not this Alphabet contains the symbol.
-   * <P>
+   * </p>
+   *
+   * <p>
    * An alphabet contains an ambiguity symbol iff the ambiguity symbol's
    * getMemberAlphabet() returns an alphabet that is a proper sub-set of this
    * alphabet. That means that every one of the symbols that could mach the
    * ambiguity symbol is also a member of this alphabet.
+   * </p>
    *
    * @param s the Symbol to check
    * @return  boolean true if the Alphabet contains the symbol and false otherwise
@@ -134,13 +159,17 @@ public interface Alphabet extends Annotatable {
   boolean contains(Symbol s);
 
   /**
+   * <p>
    * Throws a precanned IllegalSymbolException if the symbol is not contained
    * within this Alphabet.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This function is used all over the code to validate symbols as they enter
    * a method. Also, the code is littered with catches for
    * IllegalSymbolException. There is a preferred style of handling this,
    * which should be covererd in the package documentation.
+   * </p>
    *
    * @param s the Symbol to validate
    * @throws  IllegalSymbolException if r is not contained in this alphabet
@@ -148,16 +177,22 @@ public interface Alphabet extends Annotatable {
   void validate(Symbol s) throws IllegalSymbolException;
   
   /**
+   * <p>
    * Get a parser by name.
-   * <P>
+   * </p>
+   *
+   * <p>
    * The parser returned is guaranteed to return Symbols and SymbolLists that
    * conform to this alphabet.
-   * <P>
+   * </p>
+   *
+   * <p>
    * Every alphabet should have a SymbolParser under the name 'token' that
    * uses the symbol token characters to translate a string into a
    * SymbolList. Likewise, there should be a SymbolParser under the name
    * 'name' that uses symbol names to identify symbols. Any other names may
    * also be defined, but the behaviour of that parser is not defined here.
+   * </p>
    *
    * @param name  the name of the parser
    * @return  a parser for that name

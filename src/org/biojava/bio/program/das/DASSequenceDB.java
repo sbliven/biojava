@@ -38,10 +38,14 @@ import org.xml.sax.helpers.*;
 import org.w3c.dom.*;
 
 /**
+ * <p>
  * Collection of sequences retrieved from the DAS network.
+ * </p>
  *
- * <p>The DAS-specific parts of this API are still subject
- * to change.</p>
+ * <p>
+ * The DAS-specific parts of this API are still subject
+ * to change.
+ * </p>
  *
  * @author Thomas Down
  * @since 1.1

@@ -40,12 +40,14 @@ import org.biojava.bio.seq.*;
  * be constructed from SymbolLists which are known to be immutable.
  * </p>
  *
- * <p>By default, features attached to a SimpleSequence are 
+ * <p>
+ * By default, features attached to a SimpleSequence are 
  * realized as simple in-memory implementations using
  * <code>SimpleFeatureRealizer.DEFAULT</code>.  If you need
  * alternative feature realization behaviour, any
  * <code>FeatureRealizer</code> implementation may be
- * supplied at construction-time.</p>
+ * supplied at construction-time.
+ * </p>
  *
  * @author Matthew Pocock
  * @author Thomas Down

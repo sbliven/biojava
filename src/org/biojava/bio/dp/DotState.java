@@ -25,11 +25,15 @@ package org.biojava.bio.dp;
 import org.biojava.bio.symbol.*;
 
 /**
+ * <p>
  * A Dot state.
- * <P>
+ * </p>
+ *
+ * <p>
  * Dot states emit no sequence. They are there purely to make the wireing
  * of the model look neater, and to cut down the number of combinatorial
  * transitions that can so easily swamp models.
+ * </p>
  */
 public interface DotState extends State {
 }

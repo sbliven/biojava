@@ -30,7 +30,7 @@ import org.biojava.bio.*;
 
 /**
  * A biological location.
- * <P>
+ * <p>
  * The location will contain some symbols between getMin and getMax inclusive.
  * It is not required to contain all locations within this range. It is meant
  * to contain getMin or getMax. In the event that an operation would produce an
@@ -48,7 +48,7 @@ public interface Location {
   /**
    * Create a new instance of Location with all of the same decorators as this
    * instance but with the data stored in <code>loc</code>.
-   * <P>
+   * <p>
    * The default behavior is to return <loc>loc</loc> unchanged. If the class is
    * a location decorator then it should instantiate an instance of the same
    * type that decorates <code>loc</code>.
@@ -62,7 +62,7 @@ public interface Location {
   /**
    * Checks the decorator chain for an instance of <class>decoratorClass</class>
    * and return it if found.
-   * <P>
+   * <p>
    * The default behavior is to return null. If the current object is a
    * decorator and is an instance of <class>decoratorClass</class> it should
    * return itself. Otherwise, the decorator should chain this method onto the
@@ -89,7 +89,7 @@ public interface Location {
   /**
    * Checks if these two locations overlap, using this location's
    * concept of overlapping.
-   * <P>
+   * <p>
    * Abstractly, two locations overlap if they both contain any point.
    *
    * @param l	the Location to check
@@ -99,7 +99,7 @@ public interface Location {
   boolean overlaps(Location l);
   /**
    * Checks if this location contains the other.
-   * <P>
+   * <p>
    * Abstractly, a location contains another if every point in the
    * other location is contained within this one.
    *
@@ -118,7 +118,7 @@ public interface Location {
   
   /**
    * Checks if this location is equivalent to the other.
-   * <P>
+   * <p>
    * Abstractly, a location is equal to another if for every point in one
    * it is also in the other. This is equivalent to
    * a.contains(b) && b.contains(a). You should call LocationTools.areEqual
@@ -175,13 +175,13 @@ public interface Location {
   
   /**
    * Return an Iterator over the set of maximal contiguous sub-locations.
-   * <P>
+   * <p>
    * Given any location, it can be considered to contain zero or more
    * maximal contiguous blocks of width 1 or greater. The empty location is
    * composed from nothing. A contiguous location is composed from itself.
    * A non-contiguous location is composed from contiguous blocks seperated by
    * gaps.
-   * <P>
+   * <p>
    * This method should return an Iterator over these maximally contiguous blocks
    * starting with the left-most block, and finishing at the right-most block.
    *
@@ -192,12 +192,12 @@ public interface Location {
 
   /**
    * The empty range.
-   * <P>
+   * <p>
    * This object contains nothing. Its minimum value is Integer.MAX_VALUE.
    * Its maximum value is Integer.MIN_VALUE. It overlaps nothing. It is
    * equal to nothing. Intersection results in the empty range. Union
    * results in the argument range. Symbols returns an empty array.
-   * <P>
+   * <p>
    * Every day, in every way, empty becomes more and more boring.
    */
   static final Location empty = new EmptyLocation();

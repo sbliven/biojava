@@ -35,13 +35,13 @@ import java.util.List;
 /**
  * The interface for things that can render a line of information about a
  * sequence.
- * <P>
+ * <p>
  * Renderers are always activated within the context of a particular sequence
  * panel. A single Renderer can be shared among many sequence panels, or added
  * multiple times to the same panel. The renderer is required to request how
  * much leading and trailing space it requires, as well as the depth (space
  * orthogonal to the direction in which the sequence is rendered).
- * <P>
+ * <p>
  * The leading and trailing distances are the number of pixels overhang needed
  * to cleanly render any line of sequence information. For example, a ruler will
  * need trailing space to render the total sequence length at the end.
@@ -63,7 +63,7 @@ public interface SequenceRenderer {
   
   /**
    * Retrieve the depth of this renderer when rendering src.
-   * <P>
+   * <p>
    * The depth may vary between sequence panels - for example based upon
    * sequence length. Each line of information in the SequenceRendererContext
    * only renders a region of the sequence. The depth for one complete line may
@@ -79,7 +79,7 @@ public interface SequenceRenderer {
 
   /**
    * Retrieve the minimum leading distance for this renderer when rendering src.
-   * <P>
+   * <p>
    * The leading distance may vary between sequence panels - for example based
    * upon sequence length.
    *
@@ -90,7 +90,7 @@ public interface SequenceRenderer {
     
   /**
    * Retrieve the minimum trailing distance for this renderer when rendering src.
-   * <P>
+   * <p>
    * The trailing distance may vary between sequence panels - for example based
    * upon sequence length.
    *
@@ -101,12 +101,12 @@ public interface SequenceRenderer {
   
   /**
    * Produce a SequenceViewerEvent in response to a mouse gesture.
-   * <P>
+   * <p>
    * A SequenceRenderer that performs any form of coordinate remapping should
    * ensure that it appropriately transforms the mouse event. However, in the
    * SequenceViewerEvent returned, the MouseEvent should be in untransformed
    * coordinates.
-   * <P>
+   * <p>
    * The SequenceRenderer implementation should append itself to the path list
    * before constructing the SequenceViewerEvent.
    *

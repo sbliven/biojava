@@ -25,7 +25,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Renders HTML version of blast-like output.<P>
+ * Renders HTML version of blast-like output.<p>
  *
  * Makes an assumption that the gap character is '-',
  * should parameterize.
@@ -96,7 +96,7 @@ public class HTMLRenderer  {
 
     /**
      * Creates an HTMLRenderer, that outputs the HTML to the specified 
-     * PrintWriter. <P>
+     * PrintWriter. <p>
      *
      * The style definition is expected to defines the following styles
      * <UL>
@@ -507,7 +507,7 @@ public class HTMLRenderer  {
 		out.print( oURLGenerator.toLink( oDetailHit.oHitId.id, 
 						 oOptions ));
 	    }
-	    out.println( "</P></td>" );
+	    out.println( "</p></td>" );
 	    out.println( "</tr>" );
 	}
 

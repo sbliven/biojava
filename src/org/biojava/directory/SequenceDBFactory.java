@@ -12,10 +12,10 @@ import org.biojava.bio.seq.db.biosql.*;
 /**
  * SequsnceDBFactory is a factory which gets implementations
  * of the biojava SequenceDB interface
- *@author Brian Gilman
- @Design Pattern Singleton, Factory
- @version $Revision$
-*/
+ *
+ * @author Brian Gilman
+ * @version $Revision$
+ */
 
 
 public class SequenceDBFactory {

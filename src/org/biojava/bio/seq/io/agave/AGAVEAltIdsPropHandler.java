@@ -26,7 +26,7 @@ import java.util.*;
 /**
  * Deals with alternate sequence IDs
  * 
- *@author Hanning Ni     Doubletwist Inc
+ * @author Hanning Ni     Doubletwist Inc
  */
 public class AGAVEAltIdsPropHandler
                extends StAXPropertyHandler implements AGAVEDbIdCallbackItf
@@ -67,5 +67,5 @@ public class AGAVEAltIdsPropHandler
         cve.printStackTrace();
       }
    }
-
 }
+

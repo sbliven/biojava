@@ -27,7 +27,7 @@ import org.biojava.bio.symbol.*;
 public interface AlignmentFormat {
   /**
   *Read in an alignment from a buffered reader object
-  *@param reader the reader from which to read in the alignment
+  * @param reader the reader from which to read in the alignment
   */
   public Alignment read(BufferedReader reader);
 }

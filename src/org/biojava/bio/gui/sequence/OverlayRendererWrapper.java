@@ -39,7 +39,7 @@ import java.util.List;
  * an Overlay Marker interface that will indicate to 
  * LayeredRenderer that subsequent renderers should overdraw
  * the same space as the wrapped renderer.
- * <P>
+ * <p>
  * Extensively plagiarised from SequenceRendererWrapper.java.
  *
  * @author     David Huen

@@ -30,16 +30,20 @@ import org.biojava.utils.*;
 import java.util.*;
 
 /**
+ * <p>
  * This class and its sub-classes define active participants of the process
  * of creation and dissemination of the bibliographic resources. The most
  * obvious examples are authors, but it includes also publishers and other
  * contributors.
- *<P>
+ * </p>
+ *
+ * <p>
  * The participants can be people, organizations, or even software services
  * (mainly used for new digital resources). This specification does not provide
  * any unique identifiers for these providers (but does not preclude having such
  * identifiers as {@link #properties dynamic properties}).
- *<P>
+ * </p>
+ *
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
  * @version $Id$
  */

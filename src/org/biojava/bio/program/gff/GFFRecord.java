@@ -27,10 +27,10 @@ import org.biojava.bio.seq.StrandedFeature;
 
 /**
  * A single GFF record.
- * <P>
+ * <p>
  * This object has fields for each GFF field. It also defines a couple of
  * useful constants.
- * <P>
+ * <p>
  * GFF is described at http://www.sanger.ac.uk/Software/formats/GFF/
  *
  * @author Matthew Pocock
@@ -39,7 +39,7 @@ import org.biojava.bio.seq.StrandedFeature;
 public interface GFFRecord {
   /**
    * The sequence name field.
-   * <P>
+   * <p>
    * This should be the name of the sequence that this GFF record is within.
    *
    * @return the name of the sequence
@@ -48,7 +48,7 @@ public interface GFFRecord {
   
   /**
    * The source, or creator of this feature.
-   * <P>
+   * <p>
    * This is usualy a program name.
    *
    * @return the feature source
@@ -57,7 +57,7 @@ public interface GFFRecord {
   
   /**
    * The feature type filed.
-   * <P>
+   * <p>
    * This is something like "exon" - usualy corresponds to an EMBL term.
    *
    * @return the feature type
@@ -80,7 +80,7 @@ public interface GFFRecord {
   
   /**
    * The score of the feature.
-   * <P>
+   * <p>
    * For sequences that have no score, this will be set to
    * <span class="type">GFFRecord</span>.<span class="const">NO_SCORE</span>.
    *
@@ -90,7 +90,7 @@ public interface GFFRecord {
   
   /**
    * The strand of the feature.
-   * <P>
+   * <p>
    * This will be one of <span class="type">GFFRecord</span>.<span class="const">POSITIVE_STRAND</span>,
    * <span class="type">GFFRecord</span>.<span class="const">NEGATIVE_STRAND</span>,
    * or <span class="type">GFFRecord</span>.<span class="const">NO_STRAND</span>.
@@ -101,7 +101,7 @@ public interface GFFRecord {
   
   /**
    * The frame of the feature.
-   * <P>
+   * <p>
    * This will be one of <code>{1, 2, 3}</code> or
    * <span class="type">GFFRecord</span>.<span class="const">NO_FRAME</span>.
    *
@@ -111,7 +111,7 @@ public interface GFFRecord {
   
   /**
    * A <span class="type">Map</span> containing the group / attribute information.
-   * <P>
+   * <p>
    * This will be a <span class="type">Map</span> of group-names to
    * <span class="type">List</span> objects.
    *

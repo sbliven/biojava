@@ -41,11 +41,13 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 
 /**
- * <p><code>CrosshairRenderer</code> draws a crosshair, optionally
+ * <p>
+ * <code>CrosshairRenderer</code> draws a crosshair, optionally
  * with coordinates. The crosshair is set to a sequence position by a
  * click and then stays there through scrolls/rescales until the next
  * click. See the <code>processMouseEvent</code> documentation for
- * details of responses to various mouse actions.</p>
+ * details of responses to various mouse actions.
+ * </p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
@@ -186,7 +188,6 @@ public class CrosshairRenderer extends AbstractChangeable
      * lines.
      *
      * @param outline a <code>Paint</code>.
-     *
      * @exception ChangeVetoException if an error occurs.
      */
     public void setOutline(final Paint outline) throws ChangeVetoException
@@ -213,10 +214,13 @@ public class CrosshairRenderer extends AbstractChangeable
     }
 
     /**
-     * <p><code>processMouseEvent</code> processes any
-     * <code>MouseEvent</code>s directed to the renderer.</p>
+     * <p>
+     * <code>processMouseEvent</code> processes any
+     * <code>MouseEvent</code>s directed to the renderer.
+     * </p>
      *
-     * <p>Mouse actions are as follows (all are button-1 only):
+     * <p>
+     * Mouse actions are as follows (all are button-1 only):
      * <ul>
      *  <li>Click sets the crosshair position and returns an event
      *      whose target object is the <code>Point</code> in sequence
@@ -230,6 +234,7 @@ public class CrosshairRenderer extends AbstractChangeable
      *  <li>Move same as Click, except that the <code>Point</code> is
      *      not set and the target is null</li>
      * </ul>
+     * </p>
      *
      * @param context a <code>PairwiseRenderContext</code>.
      * @param me a <code>MouseEvent</code>.

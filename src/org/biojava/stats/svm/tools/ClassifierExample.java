@@ -207,7 +207,7 @@ public class ClassifierExample {
 
     /**
      * Set the Shape to represent the positive points.
-     * <P>
+     * <p>
      * The shape should be positioned so that 0, 0 is the center or focus.
      *
      * @param posShape the Shape to use
@@ -228,7 +228,7 @@ public class ClassifierExample {
 
     /**
      * Set the Shape to represent the negative points.
-     * <P>
+     * <p>
      * The shape should be positioned so that 0, 0 is the center or focus.
      *
      * @param posShape the Shape to use
@@ -258,7 +258,7 @@ public class ClassifierExample {
 
     /**
      * Learn a model from the current points.
-     * <P>
+     * <p>
      * This may take some time for complicated models.
      */
     public void classify() {
@@ -288,7 +288,7 @@ public class ClassifierExample {
 
     /**
      * Make a new PointClassifier.
-     * <P>
+     * <p>
      * Hooks up the mouse listener & cursor.
      * Chooses default colors & Shapes.
      */

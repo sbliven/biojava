@@ -7,10 +7,10 @@ import java.util.*;
  * number of items, at the expense of scalability. Not recomended for more than
  * 20-30 items.
  *
- * <P>
+ * <p>
  * This implementation has the useful property that the iteration order is the
  * same as the order in which the items are added.
- * </P>
+ * </p>
  *
  * @author Matthew Pocock
  */

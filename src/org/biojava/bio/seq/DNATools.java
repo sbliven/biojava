@@ -123,8 +123,10 @@ public final class DNATools {
    * Return an integer index for a symbol - compatible with
    * <code>forIndex</code>.
    *
-   * <p>The index for a symbol is stable accross virtual machines &
-   * invocations.</p>
+   * <p>
+   * The index for a symbol is stable accross virtual machines &
+   * invocations.
+   * </p>
    *
    * @param sym  the Symbol to index
    * @return the index for that symbol
@@ -150,8 +152,10 @@ public final class DNATools {
   /**
    * Return the symbol for an index - compatible with <code>index</code>.
    *
-   * <p>The index for a symbol is stable accross virtual machines &
-   * invocations.</p>
+   * <p>
+   * The index for a symbol is stable accross virtual machines &
+   * invocations.
+   * </p>
    *
    * @param index  the index to look up
    * @return       the symbol at that index

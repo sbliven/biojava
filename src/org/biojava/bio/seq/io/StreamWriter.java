@@ -33,7 +33,7 @@ import org.biojava.bio.seq.*;
 /**
  * Writes all of the sequences from a SequenceIterator to a stream with a
  * particular format.
- * <P>
+ * <p>
  * This can be wired from a StreamReader to make a simple file-format conversion
  * utility, or can be used to write out the sequences in a database to disk.
  *

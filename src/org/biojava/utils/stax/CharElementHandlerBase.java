@@ -27,13 +27,17 @@ import org.biojava.utils.*;
 import org.xml.sax.*;
 
 /**
+ * <p>
  * StAX handler for any element which just contains a string representation of
  * a char.
- * <P>
+ * </p>
+ *
+ * <p>
  * This calss collects the string data, and when it is complete, passes it to
  * the (abstract) setCharValue method.  Typical use of this class is as
  * a base for a small (often anonymous) class which takes the char value
  * and stores it in some variable.
+ * </p>
  *
  * @author Matthew Pocock
  * @since 1.2
@@ -79,10 +83,14 @@ public abstract class CharElementHandlerBase extends StAXContentHandlerBase {
   }
 
   /**
+   * <p>
    * Override this method to do something useful with the
    * char we collect.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This method will be invoked by endElement with the fully parsed char.
+   * </p>
    *
    * @param char  the fully parsed char
    * @throws SAXException if for any reason the char is not palatable

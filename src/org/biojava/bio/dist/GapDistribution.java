@@ -31,7 +31,7 @@ import org.biojava.bio.symbol.*;
 
 /**
  * This distribution emits gap symbols.
- * <P>
+ * <p>
  * It is a useful thing to have around for pair-wise alignment, as you can
  * build a PairDistribution that emits gaps in one sequence and Symbols in the
  * other. The GapDistriution will always emit with a probability of 1, as every

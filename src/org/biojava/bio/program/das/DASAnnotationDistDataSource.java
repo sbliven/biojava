@@ -44,8 +44,10 @@ import org.w3c.dom.*;
 import org.biojava.utils.stax.*;
 
 /**
+ * <p>
  * View of DAS data suitable for integration via the
  * meta-DAS system.
+ * </p>
  *
  * <p>
  * This class represents an alternative view on DAS data, designed

@@ -29,7 +29,10 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
+ * <p>
  * An abstract implementation of Distribution.
+ * </p>
+ *
  * <p>
  * You will need to over-ride <code>getWeight()</code> for a simple
  * implementation. You may also wish to over-ride the other methods if the
@@ -99,11 +102,15 @@ public abstract class AbstractDistribution implements Distribution {
   throws IllegalSymbolException, ChangeVetoException;
 
   /**
+   * <p>
    * Set the weight of a given symbol in this distribution.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This implementation informs all listeners of the change, and then calls
    * setWeightImpl to make the actual change. Sub-classes should over-ride
    * setWeightImpl to implement the actual storage of the weights.
+   * </p>
    */
   final public void setWeight(Symbol sym, double weight)
   throws IllegalSymbolException, ChangeVetoException {
@@ -177,11 +184,15 @@ public abstract class AbstractDistribution implements Distribution {
   }
 
   /**
+   * <p>
    * Retrieve the weight for this distribution.
-   * <P>
+   * </p>
+   *
+   * <p>
    * Performs the standard munge to handle ambiguity symbols. The actual weights
    * for each attomic symbol should be calculated by the getWeightImpl
    * functions.
+   * </p>
    *
    * @param amb the Symbol to find the probability of
    * @return the probability that one of the symbols matching amb was emitted

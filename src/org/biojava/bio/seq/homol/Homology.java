@@ -28,12 +28,15 @@ import org.biojava.utils.*;
 import org.biojava.bio.seq.*;
 
 /**
- * <p>Signifies that two or more features are homologous.</p> 
+ * <p>
+ * Signifies that two or more features are homologous.
+ * </p> 
  *
  * <p> Blast hits or local multiple-sequence alignments can be
  * represented as a set of features on sequences that have an
  * alignment. The features will probably implement
- * HomologyFeature.</p>
+ * HomologyFeature.
+ * </p>
  *
  * @author Matthew Pocock
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>

@@ -32,15 +32,15 @@ import org.biojava.bio.seq.*;
 
 /**
  * Parses a stream into sequences.
- * <P>
+ * <p>
  * This object implements SequenceIterator, so you can loop over each sequence
  * produced. It consumes a stream, and uses a SequenceFormat to extract each
  * sequence from the stream.
- * <P>
+ * <p>
  * It is assumed that the stream contains sequences that can be handled by the
  * one format, and that they are not seperated other than by delimiters that the
  * format can handle.
- * <P>
+ * <p>
  * Sequences are instantiated when they are requested by nextSequence, not
  * before, so it is safe to use this object to parse a gigabyte fasta file, and
  * do sequence-by-sequence processing, while being guaranteed that StreamReader
@@ -81,7 +81,7 @@ public class StreamReader implements SequenceIterator, org.biojava.utils.ParseEr
 
     /**
      * Pull the next sequence out of the stream.
-     * <P>
+     * <p>
      * This method will delegate parsing from the stream to a SequenceFormat
      * object, and then return the resulting sequence.
      *
@@ -133,7 +133,7 @@ public class StreamReader implements SequenceIterator, org.biojava.utils.ParseEr
 	 * This method determines the behaviour when a bad line is processed.
 	 * Some options are to log the error, throw an exception, ignore it
 	 * completely, or pass the event through.
-	 * <P>
+	 * <p>
 	 * This method should be overwritten when different behavior is desired.
 	 *
 	 * @param theEvent The event that contains the bad line and token.

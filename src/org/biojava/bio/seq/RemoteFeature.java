@@ -31,7 +31,7 @@ import org.biojava.bio.seq.db.*;
 /**
  * A feature that indicates that there is some remote feature that can't be
  * represented entirely on a single Sequence.
- * <P>
+ * <p>
  * These are the sort of features that represent things like the horible Embl
  * remote feature spans (such as AL24199:100..200). The method getRemoteFeature
  * should return a Feature on another Sequence that properly represents the
@@ -57,7 +57,7 @@ public interface RemoteFeature extends Feature {
   /**
    * Retrieve the Feature on some assembly Sequence that can represent this
    * RemoteFeature properly.
-   * <P>
+   * <p>
    * This method should be equivalent to calling
    * <code>getResolver().resolve(this)</code>.
    *
@@ -108,7 +108,7 @@ public interface RemoteFeature extends Feature {
   /**
    * The interface for objects that actually can take a RemoteFeature and
    * return a Sequence object with the feature resolved into a real feature.
-   * <P>
+   * <p>
    * An implementation may choose to create a new Assembly from Sequences
    * in a SequenceDB instance, or to return some existing larger Sequence that
    * the sequence parent of the Feature is part of. This interface should ensure
@@ -122,7 +122,7 @@ public interface RemoteFeature extends Feature {
   public static interface Resolver {
     /**
      * Resolve rFeat.
-     * <P>
+     * <p>
      * This method returns a Feature that represents the RemoteFeature rFeat on
      * some Sequence where all of the Regions can be represented localy. This
      * may be an assembly of the parent sequence of rFeat and each of the
@@ -137,7 +137,7 @@ public interface RemoteFeature extends Feature {
 
   /**
    * A tuple of Location and sequence ID.
-   * <P>
+   * <p>
    * For local locations, the Region is just a wrapper for a Location. For
    * remote Regions, it also contains a String representing the Sequence ID of
    * the remote Location.
@@ -182,7 +182,7 @@ public interface RemoteFeature extends Feature {
 
     /**
      * Return whether this Region is remote or local.
-     * <P>
+     * <p>
      * If this returns true, getSeqID() will return the ID of the remote
      * sequence. Otherwise, getSeqID() will return null.
      *

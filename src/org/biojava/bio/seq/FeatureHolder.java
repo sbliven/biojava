@@ -28,7 +28,7 @@ import org.biojava.bio.*;
 
 /**
  * The interface for objects that contain features.
- * <P>
+ * <p>
  * Feature holders abstract the containment of a feature from the objects
  * that implements both the real container or the features. FeatureHolders are
  * like sets of features.

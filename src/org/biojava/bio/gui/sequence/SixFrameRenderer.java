@@ -38,7 +38,7 @@ import java.util.Vector;
  * classes.
  *
  * Suitable for use with CDS features particularly.
- * <P>
+ * <p>
  * Partly based on Matthew Pocock's ZiggyFeatureRenderer.
  *
  * @author David Huen
@@ -167,8 +167,8 @@ public class SixFrameRenderer
  * This method is called to initialise the renderer for a
  * spliced transcript.
  *
- * @ param strand the strand that the transcipt is on.
- * @ phase the initial translation phase of transcript coding region.
+ * @param strand the strand that the transcipt is on.
+ * @param phase the initial translation phase of transcript coding region.
  *
  */
   public void startZiggy(StrandedFeature.Strand strand, int phase) {

@@ -27,7 +27,7 @@ import java.util.*;
 
 /**
  * A general perpose Exception that can wrap another exception.
- * <P>
+ * <p>
  * It is common practice in BioJava to throw a NestedException or a subclass of it
  * when something goes wrong. The exception can be used to catch another
  * throwable, thus keeping a complete record of where the original error

@@ -27,7 +27,7 @@ import java.io.Serializable;
 
 /**
  * An implementation of a sparse vector.
- * <P>
+ * <p>
  * Memory is only allocated for dimensions that have non-zero values.
  *
  * @author Thomas Down
@@ -51,7 +51,7 @@ public class SparseVector implements Serializable {
 
     /**
      * The number of used dimensions.
-     * <P>
+     * <p>
      * This is the total number of non-zero dimensions. It is not equal to the
      * number of the highest indexed dimension.
      *
@@ -63,7 +63,7 @@ public class SparseVector implements Serializable {
     
     /**
      * Set the value at a particular dimension.
-     * <P>
+     * <p>
      * This silently handles the case when previously there was no value at dim.
      * It does not contract the sparse array if you set a value to zero.
      *
@@ -132,7 +132,7 @@ public class SparseVector implements Serializable {
 
     /**
      * Retrieve the dimension at a specific index.
-     * <P>
+     * <p>
      * E.g., if the sparse vector had dimensions 5, 11, 12, 155 set to non-zero
      * values then <code>sv.getDimAtIndex(2)</code> would return 12.
      *
@@ -151,7 +151,7 @@ public class SparseVector implements Serializable {
     
     /**
      * Retrieve the value at a specific index.
-     * <P>
+     * <p>
      * E.g., if the sparse vector contained the data 5->0.1, 11->100, 12->8.5, 155->-10
      * then <code>sv.geValueAtIndex(2)</code> would return 8.5.
      *
@@ -249,7 +249,7 @@ public class SparseVector implements Serializable {
       
       /**
        * Evaluate the kernel function between two SparseVectors.
-       * <P>
+       * <p>
        * This function is equivalent to:
        * <br>
        * <code>k(a, b) = sum_i ( a_i * b_i * nv_i )</code>
@@ -295,7 +295,7 @@ public class SparseVector implements Serializable {
       
       /**
        * Generate a normalizing kernel defined by the SparseVectors in vectors.
-       * <P>
+       * <p>
        * It will set up a normalizing vector that has weight that will scale
        * each element so that the average score is 1.
        */

@@ -29,14 +29,21 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.io.*;
 
 /**
- * An abstract implementation of Alphabet.
- * <P>
+ * <p>
+ * An abstract implementation of <code>Alphabet</code>.
+ * </p>
+ *
+ * <p>
  * This provides the frame-work for maintaining the SymbolParser <-> name
  * mappings and also for the ChangeListeners.
- * <P>
+ * </p>
+ *
+ * <p>
  * This class is for developers to derive from, not for use directly.
+ * </p>
  *
  * @author Matthew Pocock
+ * @since 1.1
  */
 public abstract class AbstractAlphabet implements FiniteAlphabet {
   private final Map tokenizationsByName;
@@ -61,18 +68,19 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
   }
   
   /**
+   * <p>
    * Assigns a symbol parser to a String object.
-   * <P>
-   * Afterwards, the parser can be retrieved using the getParser method.
+   * </p>
    *
-   * @param name Name of the string to associate with a parser
-   * @param parser The parser to associate your String with
+   * <p>
+   * Afterwards, the parser can be retrieved using the getParser method.
+   * </p>
    */
   public void putTokenization(String name, SymbolTokenization parser) {
     tokenizationsByName.put(name, parser);
   }
-
-    public SymbolTokenization getTokenization(String name)
+  
+  public SymbolTokenization getTokenization(String name)
 	throws NoSuchElementException, BioException
     {
 	SymbolTokenization toke = (SymbolTokenization) tokenizationsByName.get(name);

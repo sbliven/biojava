@@ -37,13 +37,17 @@ import org.biojava.utils.*;
 import org.biojava.utils.bytecode.*;
 
 /**
+ * <p>
  * The first port of call for retrieving standard alphabets.
- * <P>
+ * </p>
+ *
+ * <p>
  * The alphabet interfaces themselves don't give you a lot of help in actually
  * getting an alphabet instance. This is where the AlphabetManager comes in
  * handy. It helps out in serialization, generating derived alphabets and
  * building CrossProductAlphabet instances. It also contains limited support for
  * parsing complex alphabet names back into the alphabets.
+ * </p>
  *
  * @author Matthew Pocock
  * @author Thomas Down
@@ -148,10 +152,10 @@ public final class AlphabetManager {
     }
     return alpha;
   }
-    /**
-    *Retrieve the symbol represented a String object
+   /**
+    * Retrieve the symbol represented a String object
     *
-    *@param name of the string whose symbol you want to get
+    * @param name of the string whose symbol you want to get
     * @throws NoSuchElementException if the string name is invalid.
     */
   static public Symbol symbolForName(String name)
@@ -183,18 +187,24 @@ public final class AlphabetManager {
   }
 
   /**
+   * <p>
    * Get the special `gap' Symbol.
-   * <P>
+   * </p>
+   *
+   * <p>
    * The gap symbol is a Symbol that has an empty alphabet of matches. As such
    *, ever alphabet contains gap, as there is no symbol that matches gap, so
    * there is no case where an alphabet doesn't contain a symbol that matches
    * gap.
-   * <P>
+   * </p>
+   *
+   * <p>
    * Gap can be thought of as an empty sub-space within the space of all
    * possible symbols. If you are working in a cross-product alphabet, you
    * should chose wether to use gap to represent 'no symbol', or a basis symbol
    * of the apropreate size built entirely of gaps to represent 'no symbol in
    * each of the slots'. Perhaps this could be explained better.
+   * </p>
    *
    * @return the system-wide symbol that represents a gap
    */
@@ -202,6 +212,20 @@ public final class AlphabetManager {
     return gapSymbol;
   }
 
+  /**
+   * <p>
+   * Get the gap symbol apropreate to this list of alphabets.
+   * </p>
+   *
+   * <p>
+   * The gap symbol with have the same shape a the alphabet list. It will be as
+   * long as the list, and if any of the alphabets in the list have a dimension
+   * greater than 1, it will also insert the apropreate gap there.
+   * </p>
+   *
+   * @param alphas  List of alphabets
+   * @return the apropreate gap symbol for the alphabet list
+   */
   static public Symbol getGapSymbol(List alphas) {
     SizeQueen sq = new SizeQueen(alphas);
     Symbol s = (Symbol) gapBySize.get(sq);
@@ -239,10 +263,14 @@ public final class AlphabetManager {
   }
 
   /**
+   * <p>
    * Generate a new AtomicSymbol instance with a token, name and Annotation.
-   * <P>
+   * </p>
+   *
+   * <p>
    * Use this method if you wish to create an AtomicSymbol instance. Initialy it
    * will not be a member of any alphabet.
+   * </p>
    *
    * @param token  the Char token returned by getToken()
    * @param name  the String returned by getName()
@@ -257,11 +285,15 @@ public final class AlphabetManager {
   }
 
   /**
+   * <p>
    * Generates a new Symbol instance that represents the tuple of Symbols in
    * symList.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This method is most usefull for writing Alphabet implementations. It should
    * not be invoked by casual users. Use alphabet.getSymbol(List) instead.
+   * </p>
    *
    * @param token   the Symbol's token
    * @param symList a list of Symbol objects
@@ -340,11 +372,15 @@ public final class AlphabetManager {
   }
 
   /**
+   * <p>
    * Generates a new Symbol instance that represents the tuple of Symbols in
    * symList.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This method is most usefull for writing Alphabet implementations. It should
    * not be invoked by users. Use alphabet.getSymbol(Set) instead.
+   * </p>
    *
    * @param token   the Symbol's token
    * @param name    the Symbol's name
@@ -482,19 +518,27 @@ public final class AlphabetManager {
   }
 
   /**
+   * <p>
    * Retrieve a CrossProductAlphabet instance over the alphabets in aList.
-   * <P>
+   * </p>
+   *
+   * <p>
    * If all of the alphabets in aList implements FiniteAlphabet then the
    * method will return a FiniteAlphabet. Otherwise, it returns a non-finite
    * alphabet.
-   * <P>
+   * </p>
+   *
+   * <p>
    * If you call this method twice with a list containing the same alphabets,
    * it will return the same alphabet. This promotes the re-use of alphabets
    * and helps to maintain the 'flyweight' principal for finite alphabet
    * symbols.
-   * <P>
+   * </p>
+   *
+   * <p>
    * The resulting alphabet cpa will be retrievable via
    * AlphabetManager.alphabetForName(cpa.getName())
+   * </p>
    *
    * @param aList a list of Alphabet objects
    * @return a CrossProductAlphabet that is over the alphabets in aList
@@ -504,22 +548,32 @@ public final class AlphabetManager {
   }
 
   /**
+   * <p>
    * Retrieve a CrossProductAlphabet instance over the alphabets in aList.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This method is most usefull for implementors of cross-product alphabets,
    * allowing them to safely build the matches alphabets for ambiguity symbols.
-   * <P>
+   * </p>
+   *
+   * <p>
    * If all of the alphabets in aList implements FiniteAlphabet then the
    * method will return a FiniteAlphabet. Otherwise, it returns a non-finite
    * alphabet.
-   * <P>
+   * </p>
+   *
+   * <p>
    * If you call this method twice with a list containing the same alphabets,
    * it will return the same alphabet. This promotes the re-use of alphabets
    * and helps to maintain the 'flyweight' principal for finite alphabet
    * symbols.
-   * <P>
+   * </p>
+   *
+   * <p>
    * The resulting alphabet cpa will be retrievable via
    * AlphabetManager.alphabetForName(cpa.getName())
+   * </p>
    *
    * @param aList a list of Alphabet objects
    * @param parent a parent alphabet
@@ -609,13 +663,17 @@ public final class AlphabetManager {
   }
 
   /**
+   * <p>
    * Return a list of BasisSymbol instances that uniquely sum up all
    * AtomicSymbol
    * instances in symSet. If the symbol can't be represented by a single list of
    * BasisSymbol instances, return null.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This method is most usefull for implementers of Alphabet and Symbol. It
    * probably should not be invoked by users.
+   * </p>
    *
    * @param symSet  the Set of AtomicSymbol instances
    * @param alpha   the Alphabet instance that the Symbols are from
@@ -652,11 +710,15 @@ public final class AlphabetManager {
 
 
   /**
+   * <p>
    * Initialize the static AlphabetManager resources.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This parses the resource
    * <code>org/biojava/bio/seq/tools/AlphabetManager.xml</code>
    * and builds a basic set of alphabets.
+   * </p>
    */
   static {
     nameToAlphabet = new HashMap();
@@ -1050,12 +1112,16 @@ public final class AlphabetManager {
     }
 
   /**
+   * <p>
    * The class representing the Gap symbol.
-   * <P>
+   * </p>
+   *
+   * <p>
    * The gap is quite special. It is an ambiguity symbol with an empty alphabet.
    * This means that it notionaly represents an unfilled slot in a sequence.
    * It should be a singleton, hence the
    * placement in AlphabetManager and also the method normalize.
+   * </p>
    *
    * @author Matthew Pocock
    */

@@ -30,14 +30,14 @@ import org.biojava.bio.seq.*;
 
 /**
  * This implementation of SymbolList wraps another one, allowing you to insert gaps.
- * <P>
+ * <p>
  * You could make a SymbolList that contains gaps directly. However, this
  * leaves you with a nasty problem if you wish to support gap-edit operations. Also, the original
  * SymbolList must either be coppied or lost.
- * <P>
+ * <p>
  * GappedSymbolList solves these problems. It wraps up a source sequence, and views it through
  * a data-structure that places gaps. You can add and remove the gaps by using the public API.
- * <P>
+ * <p>
  * For gap-insert operations, the insert index is the position that will become a gap. The
  * symbol currently there will move to a higher index. To insert leading gaps, add gaps at index
  * 1. To insert trailing gaps, add gaps at index length+1.
@@ -100,7 +100,7 @@ extends AbstractSymbolList implements Serializable {
 
   /**
    * Finds the index of the Block containing indx within the view ranges.
-   * <P>
+   * <p>
    * If indx is not within a view block, then it is the index of a gap. The method will
    * return -(indx+1) where indx is the block emediately following the gap.
    *
@@ -196,7 +196,7 @@ extends AbstractSymbolList implements Serializable {
   
   /**
    * Finds the index of the Block before the gap at indx within the view range.
-   * <P>
+   * <p>
    * If indx is in-fact a real symbol, then there will be no Block before it. In this
    * case, the method returns -2. It returns -1 if indx is within the leading gaps and
    * blocks.size()-1 if it is within the trailing gaps.
@@ -249,7 +249,7 @@ extends AbstractSymbolList implements Serializable {
   
   /**
    * Coordinate conversion from view to source.
-   * <P>
+   * <p>
    * If the index can be projected onto the source, the index it projects onto
    * is returned. If it falls within a gap, then the index of the first symbol
    * after the run of gaps is negated and returned. If the index is after the
@@ -321,7 +321,7 @@ extends AbstractSymbolList implements Serializable {
   
   /**
    * Renumber the view indexes from block, adding delta to each offset.
-   * <P>
+   * <p>
    * This adjusts viewStart and viewEnd to be += delta for each block i->blocks.size(), 
    * and sets the total length to += delta.
    *
@@ -338,7 +338,7 @@ extends AbstractSymbolList implements Serializable {
   
   /**
    * Add a single gap at pos within the view coordintates.
-   * <P>
+   * <p>
    * this.symbolAt(pos) will then return gap. Adding a gap at 1 will prepend gaps. Adding
    * a gap at (length+1) will append a gap.
    *
@@ -352,7 +352,7 @@ extends AbstractSymbolList implements Serializable {
 
   /**
    * Add length gaps at pos within the view coordinates.
-   * <P>
+   * <p>
    * this.symbolAt(i) will then return gap for i = (pos .. pos+count-1).
    * Adding gaps at 1 will prepend gaps. Adding
    * gaps at (length+1) will append gaps.
@@ -582,7 +582,7 @@ extends AbstractSymbolList implements Serializable {
 
   /**
    * Return the index of the first Symbol that is not a Gap character.
-   * <P>
+   * <p>
    * All symbols before firstNonGap are leading gaps. firstNonGap is effectively
    * the index in the view of symbol 1 in the original sequence.
    *
@@ -595,7 +595,7 @@ extends AbstractSymbolList implements Serializable {
   
   /**
    * Return the index of the last Symbol that is not a Gap character.
-   * <P>
+   * <p>
    * All symbols after lastNonGap untill length are trailing gaps.
    * lastNonGap is effectively the index in the view of symbol length
    * in the original sequence.
@@ -609,7 +609,7 @@ extends AbstractSymbolList implements Serializable {
   
   /**
    * Get list of the un-gapped region of the SymbolList.
-   * <P>
+   * <p>
    * The gapped symbol list can be represented as a list of ungapped regions.
    * Given a list of start-stop pairs in the ungapped coordinate system each
    * with a corresponding pair of start-stop pairs in the gapped view, the
@@ -647,7 +647,7 @@ extends AbstractSymbolList implements Serializable {
   
   /**
    * An aligned block.
-   * <P>
+   * <p>
    * The alignment is actualy stoored as a list of these objects. Each block is
    * contiguous with the next in the source fields, but may be gapped in the
    * view fields.

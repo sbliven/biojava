@@ -42,12 +42,12 @@ import java.util.List; // useful trick to 'hide' javax.swing.List
 
 /**
  * A panel that displays a Sequence.
- * <P>
+ * <p>
  * A SequencePoster can either display the sequence from left-to-right
  * (HORIZONTAL) or from top-to-bottom (VERTICAL). It has an associated scale
  * which is the number of pixels per symbol. It also has a lines property that
  * controls how to wrap the sequence off one end and onto the other.
- * <P>
+ * <p>
  * Each line in the SequencePoster is broken down into a list of strips,
  * each rendered by an individual SequenceRenderer object.
  * You could add a SequenceRenderer that draws on genes, another that
@@ -343,7 +343,7 @@ Changeable {
   /**
    * Set the number of pixels to leave blank between each block of sequence
    * information.
-   * <P>
+   * <p>
    * If the SeqeuncePanel chooses to display the sequence information split
    * across multiple lines, then the spacer parameter indicates how many pixles
    * will seperate each line.
@@ -369,7 +369,7 @@ Changeable {
   
   /**
    * Set the scale.
-   * <P>
+   * <p>
    * The scale parameter is interpreted as the number of pixels per symbol. This
    * may take on a wide range of values - for example, to render the symbols as
    * text, you will need a scale of > 8, where as to render chromosome 1 you
@@ -441,7 +441,7 @@ Changeable {
   
   /**
    * Paint this component.
-   * <P>
+   * <p>
    * This calls the paint method of the currently registered SequenceRenderer
    * after setting up the graphics appropriately.
    */

@@ -31,10 +31,16 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.dp.onehead.*;
 
 /**
+ * <p>
  * Train a hidden markov model using a sampling algorithm.
- * 
- * <p>Note: this class currently only works for one-head models.
  * </p>
+ * 
+ * <p>
+ * Note: this class currently only works for one-head models.
+ * </p>
+ *
+ * @author Matthew Pocock
+ * @since 1.0
  */
 public class BaumWelchSampler extends AbstractTrainer implements Serializable {
   protected double singleSequenceIteration(

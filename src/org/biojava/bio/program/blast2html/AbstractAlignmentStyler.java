@@ -26,13 +26,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
+ * <p>
  * Abstract implementation of <code>AlignmentStyler</code>, contains
  * utility methods for generating a set of HTML styles from a list of
- * RGB colours.<P>
+ * RGB colours.
+ * </p>
  *
+ * <p>
  * Thus <code>getAlignmentStyles()</code> is implemented and all that
  * remains to be implemented is the <code>getStyle</code> method.
  *
+ * <pre>
  * Primary author -
  *                 Colin Hardman      (CAT)
  * Other authors  -
@@ -45,9 +49,13 @@ import java.util.Iterator;
  *
  * Copyright 2001 Cambridge Antibody Technology Group plc.
  * All Rights Reserved.
+ * </pre>
+ * </p>
  *
+ * <p>
  * This code released to the biojava project, May 2001
  * under the LGPL license.
+ * </p>
  *
  * @author Cambridge Antibody Technology Group plc
  * @version 1.0
@@ -62,8 +70,11 @@ public abstract class AbstractAlignmentStyler implements AlignmentStyler {
 
 
     /**
+     * <p>
      * Stores mapping from a Colour to a FONT Class.
+     * </p>
      *
+     * <p>
      * For example:
      * <PRE>
      *
@@ -72,7 +83,7 @@ public abstract class AbstractAlignmentStyler implements AlignmentStyler {
      * #000000  C1-S
      *
      * </PRE>
-     *
+     * </p>
      */
     protected HashMap oColourClassMap = new HashMap();
 
@@ -84,8 +95,11 @@ public abstract class AbstractAlignmentStyler implements AlignmentStyler {
     protected int iNumberOfColours = 0;
 
     /**
+     * <p>
      * Map between Char and the Colour class.
+     * </p>
      *
+     * <p>
      * Eg.
      * <PRE>
      *
@@ -94,15 +108,18 @@ public abstract class AbstractAlignmentStyler implements AlignmentStyler {
      * A        C1-S
      *
      * </PRE>
-     *
+     * </p>
      */
     protected HashMap oColourMap = new HashMap();
 
 
     /**
+     * <p>
      * Returns a fragment of HTML that defines the FONT
-     * styles to be used in the alignment markup.<P>
+     * styles to be used in the alignment markup.
+     * </p>
      * 
+     * <p>
      * For example:
      * <PRE>
      * FONT.C2-S{background-color:#FFFC50;color:#000000}
@@ -111,8 +128,9 @@ public abstract class AbstractAlignmentStyler implements AlignmentStyler {
      * FONT.C0-S{background-color:#50FF78;color:#000000}
      * FONT.C1-S{background-color:#FFCA50;color:#000000}
      * FONT.C5-S{background-color:#A5A5FF;color:#000000}
-     *
      * </PRE>
+     * </p>
+     *
      * @return String - the HTML
      */
     public String getAlignmentStyles() {
@@ -135,10 +153,14 @@ public abstract class AbstractAlignmentStyler implements AlignmentStyler {
     }
 
     /**
+     * <p>
      * Return the styles for the two aligned characters.
-     * ( in the form of predefined font classes ).<P>
+     * ( in the form of predefined font classes ).
+     * </p>
      *
+     * <p>
      * Null is acceptable value for no style.
+     * </p>
      *
      * @param poFirst - the first char in the alignment
      * @param poSecond - the second char in the alignment
@@ -164,12 +186,16 @@ public abstract class AbstractAlignmentStyler implements AlignmentStyler {
     }
 
     /**
+     * <p>
      * Returns the colour class for the specified colour ( in hex )
      * If one is not already defined for that colour then a new
-     * class is created and returned.<P>
+     * class is created and returned.
+     * </p>
      *
+     * <p>
      * Colour specification is R G B in hex ie
      * FF00FF is r = 255, g = 0, b = 255.
+     * </p>
      *
      * @param poColour - a colour, eg 'C8FFC8'
      * @return String - the colour class, eg 'C1-S'

@@ -29,7 +29,7 @@ import java.util.*;
 
 /**
  *
- *@author Hanning Ni    Doubletwist Inc
+ * @author Hanning Ni    Doubletwist Inc
  */
 public class AGAVEMapLocationPropHandler  extends StAXPropertyHandler
 {
@@ -95,3 +95,4 @@ public class AGAVEMapLocationPropHandler  extends StAXPropertyHandler
       }
   }
 }
+

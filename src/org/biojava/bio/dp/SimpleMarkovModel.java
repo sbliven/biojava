@@ -96,7 +96,7 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
 
   /**
    * Use this methods to customize the transition probabilities.
-   * <P>
+   * <p>
    * By default, the distribution P(destination | source) is a totaly free
    * distribution. This allows the different probabilities to vary. If you
    * wish to change this behaviour (for example, to make one set of transition

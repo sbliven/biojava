@@ -25,8 +25,11 @@ package org.biojava.bio;
 import org.biojava.utils.*;
 
 /**
+ * <p>
  * Inidcates that an object has an associated annotation.
- * <P>
+ * </p>
+ *
+ * <p>
  * Many BioJava objects will have associated unstructured data. This should be
  * stored in an Annotation instance. However, the BioJava object itself will
  * probably not want to extend the Annotation interface directly, but rather
@@ -36,6 +39,7 @@ import org.biojava.utils.*;
  * should always create a protected or private field containing an instance of
  * AnnotationForwarder, and register it as a ChangeListener with the associated
  * Annotation delegate instance.
+ * </p>
  *
  * <pre>
  * public class Foo extends AbstractChangeable implements Annotatable {
@@ -84,13 +88,17 @@ public interface Annotatable extends Changeable {
   Annotation getAnnotation();
 
   /**
+   * <p>
    * A helper class so that you don't have to worry about forwarding events from
    * the Annotation object to the Annotatable one.
-   * <P>
+   * </p>
+   *
+   * <p>
    * Once a listener is added to your Annotatable that is interested in
    * ANNOTATION events, then instantiate one of these and add it as a listener
    * to the annotation object. It will forward the events to your listeners and
    * translate them accordingly.
+   * </p>
    *
    * @author Matthew Pocock
    */

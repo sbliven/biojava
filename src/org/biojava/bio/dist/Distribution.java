@@ -27,32 +27,42 @@ import org.biojava.bio.symbol.*;
 import org.biojava.utils.*;
 
 /**
+ * <p>
  * An encapsulation of a probability distribution over the Symbols within an
  * alphabet.
- * <P>
+ * </p>
+ *
+ * <p>
  * A distribution can be implemented as a map from symbol to probability. It is
  * more correct to think of them as being integrals or sums over probability
  * dencity funcitons. In this world view, getWeight should look at the
  * getMatches of the symbol it is given and then perform the apropreate sum or
  * integral to return the probability of something within that set of symbols
  * being emitted.
- * <P>
+ * </p>
+ *
+ * <p>
  * This interface should handle the case of emitting an ambiguity symbol.
  * This should be just the sum of the probabiltiy of emitting each matching
  * symbol. It is up to the code using the Distribution instance to divide out
  * the null model appropreately.
+ * </p>
  *
  * @author Matthew Pocock
  */
 public interface Distribution extends Changeable {
   /**
+   * <p>
    * Whenever a distribution changes the values that would be returned by
    * getWeight, they should fire a ChangeEvent with this object as the type.
-   * <P>
+   * </p>
+   *
+   * <p>
    * If the whole distribution changes, then the change and previous fields of
    * the ChangeEvent should be left null. If only a single weight is modified,
    * then change should be of the form Object[] { symbol, new Double(newVal) }
    * and previous should be of the form Object[] { symbol, new Double(oldVal) }
+   * </p>
    */
   public static final ChangeType WEIGHTS = new ChangeType(
     "distribution weights changed",
@@ -61,12 +71,16 @@ public interface Distribution extends Changeable {
   );
 
   /**
+   * <p>
    * Whenever the null model distribution changes the values that would be
    * returned by getWeight, either by being edited or by being replaced, a
    * ChangeEvent with this object as the type should be thrown.
-   * <P>
+   * </p>
+   *
+   * <p>
    * If the null model has changed its weights, then the ChangeEvent should
-   * refer back to the ChangeEvent from the null model. 
+   * refer back to the ChangeEvent from the null model.
+   * </p>
    */
   public static final ChangeType NULL_MODEL = new ChangeType(
     "distribution null model changed",
@@ -82,10 +96,14 @@ public interface Distribution extends Changeable {
   Alphabet getAlphabet();
     
   /**
+   * <p>
    * Return the probability that Symbol s is emited by this spectrum.
-   * <P>
+   * </p>
+   *
+   * <p>
    * If the symbol is  ambiguou, then it is the sum of the probability that
    * each one of the matching symbols was emitted.
+   * </p>
    *
    * @param s the Symbol emitted
    * @return  the probability of emitting that symbol
@@ -133,8 +151,11 @@ public interface Distribution extends Changeable {
   throws IllegalAlphabetException, ChangeVetoException;
   
   /**
+   * <p>
    * Register this distribution with a training context.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This should be invoked from within dtc.addDistribution(). This method
    * is responsible for constructing a suitable DistributionTrainer instance
    * and registering it by calling
@@ -142,6 +163,7 @@ public interface Distribution extends Changeable {
    * view onto another distribution, it can force the other to be registered by
    * calling dtc.addDistribution(other), and can then get on with registering
    * it's own trainer.
+   * </p>
    *
    * @param dtc the DistributionTrainerContext with witch to register a trainer
    */

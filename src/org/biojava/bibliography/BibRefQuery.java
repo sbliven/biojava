@@ -31,18 +31,23 @@ import java.util.*;
 import java.io.*;
 
 /**
+ * <p>
  * The interface <em>BibRefQuery</em> is a fundamental part of the Bibliographic Query
  * Service. It allows searching for and retrieving citations from a bibliographic
  * repository. The result of the query methods is again of type BibRefQuery which
  * allows further to refine the query. When the caller is satisfied with the query
  * results, the retrieval methods can be used to get either a list of citations (of type
  * {@link BibRef}), or an XML document representing citations. 
- *<P>
+ * </p>
+ *
+ * <p>
  * Squeezing all query and retrieval methods into one interface allows to build very
  * flexible systems, both distributed (where the client and repository parts are
  * executed on different computers) and stand-alone (both parts are linked
  * together into one process).
- *<P>
+ * </p>
+ *
+ * <p>
  *<table border=0 cellpadding=10>
  *<tr><td valign="top">
  * For example, this picture shows a client linked together
@@ -70,10 +75,11 @@ import java.io.*;
  * <img src="doc-files/BibRefQuery_soap.jpg" align="left">
  *</th></tr>
  *</table>
- *<p>
- *
+ * </p>
  *
  * <h3>The implementation is advised to used the following constructor</h3>
+ *
+ * <p>
  *<pre>
  *    public <em>NameOfAnImplementation</em> (String[] args, Hashtable props) {...}
  *</pre>
@@ -81,33 +87,43 @@ import java.io.*;
  *    specific parameters and properties. However, some properties are
  *    more probable to be used - the suggested names for them are defined
  *    either in this interface or in the "sister" interface {@link BibRefSupport}.
- *<P>
+ * </p>
+ *
+ * <p>
  * The use of this constructor makes easier to load dynamically different
  * implementations.
- *<P>
+ * </p>
+ *
+ * <p>
  * The methods of the <em>BibRefQuery</em> interface can be divided into three groups.
  * The first group deals with connections to bibliographic repositories - here are
  * methods {@link #connect connect}, {@link #disconnect disconnect}, {@link #destroy destroy},
  * {@link #getCollectionId getCollectionId}, and {@link #isReady isReady}.
- *<p>
+ * </p>
+ *
+ * <p>
  * The second and the most interesting group contains the query methods.
  * As mentioned above, these methods (mostly) return an another query collection
  * which is again query-able. Here belong methods {@link #find find}, {@link #findByAuthor findByAuthor},
  * {@link #findById findById}, {@link #query query}, {@link #getBibRefCount getBibRefCount}, and {@link #sort sort}.
- *<p>
+ * </p>
+ *
+ * <p>
  * The last group has methods for retrieving citations from the resulting query collection.
  * The retrieval methods also allow to return citations not fully populated with all
  * available attribute data (for example, the long abstracts can be asked for only later).
  * Here belong methods {@link #getAllBibRefs getAllBibRefs}, {@link #getBibRefs getBibRefs},
  * {@link #getAllIDs getAllIDs}, {@link #getAllBibRefsAsXML getAllBibRefsAsXML},
  * {@link #getBibRefsAsXML getBibRefsAsXML}, and {@link #getBibRefAsXML getBibRefAsXML}. 
- *<p>
- *
+ * </p>
  *
  * <a name="how_attr_names">
  *<h3>Simple and Qualified Attribute Names</h3>
+ * <p>
  * There are several places where method arguments represent attribute names:
- *<P>
+ * </p>
+ *
+ * <p>
  *<ul>
  *   <li> In query methods, such as {@link #find find}, a list of attributes that should be
  *        searched.
@@ -116,12 +132,16 @@ import java.io.*;
  *        the <em>excluded</em> attribute lists used in several methods.
  *   <li> The results may be ordered by one or more attributes (method {@link #sort sort}).
  *</ul>
- *<P>
+ * </p>
+ *
+ * <p>
  * Therefore, this interface defines several rules how to specify attribute names whenever
  * they have to be expressed as strings. The existence of these rules will make the
  * implementations interoperable. But, of course, they can be ignored if the interoperability
  * is not an issue.
- *<P>
+ * </p>
+ *
+ * <p>
  * The following rules define how to create stringified names for individual attributes.
  *<ol>
  *  <li> The best recommended practice is to find attribute names from a controlled
@@ -165,28 +185,36 @@ import java.io.*;
  *       is the same as  <tt>Book__location</tt>,  and  <tt>journalarticle__issue</tt>  equals to
  *       <tt>JournalArticle__issue</tt>.
  *</ol>
- *
+ * </p>
  *
  *<a name="how_criteria">
  *<h3>Query Matching and Ordering Criteria</h3>
+ * <p>
  * Several methods dealing with queries and sorting use a list of criteria.
  * The criteria define how the matching or ordering should be done.
- *<P>
+ * </p>
+ *
+ * <p>
  * Each criterion is fully defined by an instance of {@link BiblioCriterion}.
  * Such definitions can be obtained from a controlled vocabulary - see
  * {@link BibRefSupport#getSupportedCriteria()}.
- *<P>
+ * </p>
+ *
+ * <p>
  * Because each criterion is uniquely identifiable by its name, the querying and
  * sorting methods use only lists of criteria names, not lists of full criteria
  * definitions. 
- *
+ * </p>
  *
  *<a name="how_excluded">
  *<h3>Excluded and Only-included attributes</h3>
+ * <p>
  * Several methods use parameter with <em>excluded</em> attributes, or a
  * parameter with <em>only-included</em> attributes.
  * There are two different meanings and uses of such attributes lists.
- *<P>
+ * </p>
+ *
+ * <p>
  * The first meaning is used by the query methods. They return a new query collection.
  * From the practical and performance reasons it may be sometimes useful to define
  * <b>in advance</b> that the citations representing the resulting query collection
@@ -196,7 +224,9 @@ import java.io.*;
  * This, using the <em>excluded</em> list in the query method means that the
  * resulting query collection will never have all attributes fully filled with data
  * (unless, of course, the implementation ignores the <em>excluded</em> list).
- *<P>
+ * </p>
+ *
+ * <p>
  * The second meaning is for the retrieval methods. They return citations from
  * a current query collection and can decide that only some attributes in the returned
  * citations are filled with data (such parameter list is always named <em>onlyAttrs</em>).
@@ -204,7 +234,9 @@ import java.io.*;
  * but it is a <b>post-act</b> decision because the query collection has already all
  * data and only does not return them now, but the next retrieval method (on the 
  * same collection) can retrieve them.
- *<P>
+ * </p>
+ *
+ * <p>
  * The both uses may be applied in different scenarios, and their efficiency is
  * very dependent on the repository implementation. Sometimes the creation of a
  * query collection already includes heavy data manipulation - therefore, the
@@ -212,7 +244,8 @@ import java.io.*;
  * collection is more or less a virtual collection and the real data transfer
  * is applied only when the citations are being retrieved. In this case, the later
  * scenario may be more efficient.
- *<P>
+ * </p>
+ *
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
  * @version $Id$
  * @see BibRef
@@ -223,12 +256,17 @@ import java.io.*;
 public interface BibRefQuery {
 
     /**
+     * <p>
      * A property name specifying a list of excluded attribute names
      * (the type of the property value should be <tt>String[]</tt>).
-     *<P>
+     * </p>
+     *
+     * <p>
      * The list is used to define attributes which are not returned in the
      * resulting citations (see discussion on
      * <a href="#how_excluded">excluded attributes</a>).
+     * </p>
+     *
      * @see #find find
      * @see #query query
      */
@@ -238,48 +276,61 @@ public interface BibRefQuery {
      * A property name specifying a list of searching and ordering criteria
      * names (type of the property value should be <tt>String[]</tt>). See
      * discussion on <a href="#how_criteria">criteria</a>.
+     *
      * @see #find find
      * @see #query query
      */
     static final String PROP_CRITERIONS     = "criterions";
 
     /**************************************************************************
+     * <p>
      * It returns an identification of the current query collection.
-     *<P>
+     * </p>
+     *
+     * <p>
      * At the beginning, the identification usually contain a bibliographic
      * repository name or its contents description. But later, usually after
      * {@link #connect} or after the first query, the identification may contain
      * information rich enough to be able to re-create the whole collection
      * (e.g. it can contain IDs of all records in the given collection).
-     *<P>
+     * </p>
+     *
+     * <p>
      * An implementation is not required to provide a persistent collection
      * identification. However, if it does provide, it should also be
      * able to accept the same identifier in the {@link #connect(byte[]) connect}
      * method, and to use it to re-create the same collection.
-     *<P>
+     * </p>
+     *
      * @return an identification of the current collection (may be null)
      *************************************************************************/
     byte[] getCollectionId();
 
     /**************************************************************************
+     * <p>
      * It creates a connection to a bibliographic repository, or/and it makes
      * all necessary initialization steps needed for further communication.
-     *<P>
+     * </p>
+     *
+     * <p>
      * However, there should be no need to call this method explicitly,
      * the other methods should do it automatically before they need something
      * from the repository.
-     *<P>
+     * </p>
+     *
      * @throws NestedException if the connection cannot be established
      *************************************************************************/
     void connect()
 	throws NestedException;
 
     /**************************************************************************
+     * <p>
      * It creates a connection to a bibliographic repository, or/and it makes
      * all necessary initialization steps needed for further communication,
      * and it makes the collection described by <tt>collectionId</tt>
      * the current collection.
-     *<P>
+     * </p>
+     *
      * @see #connect connect without parameters
      * @param collectionId a (usually persistent) token allowing to re-create
      *        a collection; the parameter is the same as an identifier returned
@@ -297,25 +348,33 @@ public interface BibRefQuery {
     boolean isReady();
 
     /**************************************************************************
+     * <p>
      * It disconnects from the repository.
-     *<P>
+     * </p>
+     *
+     * <p>
      * The caller can use this method to announce that the current query
      * collection will not be needed soon. However, it may still be possible
      * to connect to it later again.
-     *<p>
+     * </p>
+     *
      * @see #destroy destroy for more permanent action
      *************************************************************************/
     void disconnect();
 
     /*************************************************************************
+     * <p>
      * It frees all resources related to this query collection.
-     *<p>
+     * </p>
+     *
+     * <p>
      * The caller explicitly announces no interest in the current
      * query collection at all. The existence of two separate
      * methods {@link #disconnect} and <tt>destroy</tt> allows more flexibility
      * for cases where an implementation deals with, for example,
      * temporary repositories. 
-     * <P>
+     * </p>
+     *
      * @see #disconnect disconnect for less permanent action
      * @throws NestedException if the connection to the repository is broken
      *************************************************************************/
@@ -323,18 +382,25 @@ public interface BibRefQuery {
 	throws NestedException;
 
     /*************************************************************************
+     * <p>
      * The easiest direct method for querying a repository.
-     *<P>
+     * </p>
+     *
+     * <p>
      * It is modeled on examples of web-based searches: A caller can specify
      * virtually anything in the list of keywords  and the implementation tries
      * to search for these in as many attributes as possible and reasonable,
      * applying logical AND between them. However, a caller can also specifically
      * limit the search only to attributes specified in the  searched  list.
-     *<P>
+     * </p>
+     *
+     * <p>
      * <em>Note that there is no real query language used by this method,
      * therefore, this method is not suitable for queries requiring
      * logical operators (others than AND).</em>
-     *<P>
+     * </p>
+     *
+     * <p>
      * The query result can be influenced by the additional properties:
      * <ul>
      *  <li> Property {@link #PROP_EXCLUDED_ATTRS} is of type <tt>String[]</tt>
@@ -348,7 +414,8 @@ public interface BibRefQuery {
      *       and return here the criteria really used for the query.
      *       See also discussion about <a href="#how_criteria">criteria</a>.
      * </ul>
-     * <P>
+     * </p>
+     *
      * @param keywords keyword or phrases that are being looked for
      * @param attrs attributes names that should be searched; if this list is
      *              empty the implementation should search all reasonable
@@ -363,8 +430,11 @@ public interface BibRefQuery {
 	throws NestedException;
 
     /*************************************************************************
+     * <p>
      * This is a convenient method for a common query.
-     *<P>
+     * </p>
+     *
+     * <p>
      * The search is done only for attributes having non empty values in
      * parameter  <tt>author</tt>.  For example, a search for citations written
      * by authors with surname  <tt>Doe</tt>  can be specified by sending an
@@ -372,7 +442,9 @@ public interface BibRefQuery {
      * <tt>Doe</tt>  and with other attributes empty. Or, a search for
      * institution  <tt>EBI</tt>  can be specified by sending an instance of
      * <tt>BiblioOrganization</tt> with <tt>name</tt> containing  <tt>EBI</tt>. 
-     *<P>
+     * </p>
+     *
+     * <p>
      * The query result can be influenced by the additional properties:
      * <ul>
      *  <li> Property {@link #PROP_EXCLUDED_ATTRS} is of type <tt>String[]</tt>
@@ -386,7 +458,8 @@ public interface BibRefQuery {
      *       and return here the criteria really used for the query.
      *       See also discussion about <a href="#how_criteria">criteria</a>.
      * </ul>
-     * <P>
+     * </p>
+     *
      * @see #find find
      * @see BiblioPerson
      * @see BiblioOrganisation
@@ -402,12 +475,16 @@ public interface BibRefQuery {
 	throws NestedException;
 
     /*************************************************************************
+     * <p>
      * This is a convenient method returning just one citation.
-     *<P>
+     * </p>
+     *
+     * <p>
      * It queries the current collection in order to find and to retrieve
      * a citation with the given identifier. It depends on the implementation
      * what could be used as an identifier - see {@link BibRef#identifier}.
-     * <P>
+     * </p>
+     *
      * @see #findById(String,String[]) findById with limited returned attributes
      * @param bibRefId an identifier of a citation that is being looked for
      * @return a found bibliographic reference (citation)
@@ -418,30 +495,40 @@ public interface BibRefQuery {
 	throws NestedException;
 
     /*************************************************************************
+     * <p>
      * This is a convenient method returning just one citation, perhaps with
      * a limited number of attributes.
-     *<P>
+     * </p>
+     *
+     * <p>
      * It queries the current collection in order to find and to retrieve
      * a citation with the given identifier. It depends on the implementation
      * what could be used as an identifier - see {@link BibRef#identifier}.
-     * <P>
+     * </p>
+     *
+     * <p>
      * The returned citation will contain at least attributes whose names are
      * specified by the parameter <tt>onlyAttrs</tt> (see discussion on
      * <a href="#how_excluded">only-included attributes</a>.
-     * <P>
+     * </p>
+     *
+     * <p>
      * It is meant to provide more lightweight citation. The
      * implementation may provide more attributes than specified in
      * <tt>onlyAttrs</tt> (e.g. it is always recommended to include an
      * attribute representing a unique identifier of the citation even
      * if it is not asked for).
-     * <P>
+     * </p>
+     *
+     * <p>
      * Note that one can ask only for attributes that are available in the
      * current collection. If the collection was already created
      * <em>without</em> some attributes (using property
      * {@link #PROP_EXCLUDED_ATTRS}, e.g in method {@link #find find}) one cannot
      * expect to get them even if they are asked for by the parameter
      * <tt>onlyAttrs</tt>.
-     * <P>
+     * </p>
+     *
      * @see #findById(String) findById
      * @param bibRefId an identifier of a citation that is being looked for
      * @param onlyAttrs a list of attribute names; at least these attributes
@@ -454,18 +541,25 @@ public interface BibRefQuery {
 	throws NestedException;
 
     /*************************************************************************
+     * <p>
      * It queries the current collection using a query language.
-     *<P>
+     * </p>
+     *
+     * <p>
      * Use this method when the simple {@link #find find} method is not sufficient.
      * For example, when more logical or relational operators are needed
      * to express the query,
-     *<p>
+     * </p>
+     *
+     * <p>
      * This specification does not propose any specific query language
      * to use (but may in the future). Roughly speaking, the query
      * method takes a <tt>query</tt> string and passes it to the repository
      * implementation, and if the implementation understands the query
      * the world is saved.
-     *<p>
+     * </p>
+     *
+     * <p>
      * Again, the query result can be influenced by the additional properties:
      * <ul>
      *  <li> Property {@link #PROP_EXCLUDED_ATTRS} is of type <tt>String[]</tt>
@@ -479,7 +573,8 @@ public interface BibRefQuery {
      *       and return here the criteria really used for the query.
      *       See also discussion about <a href="#how_criteria">criteria</a>.
      * </ul>
-     * <P>
+     * </p>
+     *
      * @see #find find
      * @param query an expression in a query language
      * @param properties specify attributes excluded from the results and
@@ -492,8 +587,10 @@ public interface BibRefQuery {
 	throws NestedException;
 
     /*************************************************************************
+     * <p>
      * It returns the number of citations in the current collection.
-     * <P>
+     * </p>
+     *
      * @return the size of this collection
      * @throws NestedException if a connection with the repository is broken
      *************************************************************************/
@@ -501,18 +598,24 @@ public interface BibRefQuery {
 	throws NestedException;
 
     /*************************************************************************
+     * <p>
      * It sorts the current collection and returns another collection which is
      * a sorted copy of the current collection.
-     *<P>
+     * </p>
+     *
+     * <p>
      * This is not strictly speaking a query method but it also returns
      * a query collection.
-     * <P>
+     * </p>
+     *
+     * <p>
      * The sorting result can be influenced by an additional property
      * {@link #PROP_CRITERIONS} (of type <tt>String[]</tt>) containing
      * a list of sorting criteria names. The caller specifies here
      * what criteria she wishes, and this method can change this property
      * and return here the criteria really used for sorting.
-     * <P>
+     * </p>
+     *
      * @param orderedBy a list of attribute names that the collection should
      *                  be sorted by
      * @return a sorted collection
@@ -523,15 +626,19 @@ public interface BibRefQuery {
 	throws NestedException;
 
     /*************************************************************************
+     * <p>
      * It returns all citations from the current collection as a
      * (possibly big) array. Obviously, the repository implementation
      * may limit the number of returned records.
-     *<P>
+     * </p>
+     *
+     * <p>
      * Some attributes may be missing (empty) if the property
      * {@link #PROP_EXCLUDED_ATTRS} was used for creating the current
      * collection. See discussion on
      * <a href="#how_excluded">excluded attributes</a>.
-     * <P>
+     * </p>
+     *
      * @see #getAllBibRefs(String[]) getAllBibRefs with limited returned attributes
      * @return all citations from the current collection
      * @throws NestedException if the collection is too large, or if the connection
@@ -541,9 +648,12 @@ public interface BibRefQuery {
 	throws NestedException;
 
     /*************************************************************************
+     * <p>
      * It returns all citations from the current collection as a
      * (possibly big) array, perhaps with a limited number of attributes.
-     *<P>
+     * </p>
+     *
+     * <p>
      * The returned citations will contain at least attributes whose names are
      * specified by the parameter <tt>onlyAttrs</tt>. It is meant to provide
      * more lightweight citations. The implementation may provide more
@@ -551,14 +661,17 @@ public interface BibRefQuery {
      * good to include an attribute representing a unique identifier of a
      * citation even if it is not asked for). See discussion on
      * <a href="#how_excluded">only-included attributes</a>.
-     * <P>
+     * </p>
+     *
+     * <p>
      * Note that one can ask only for attributes that are available in the
      * current collection. If the collection was already created
      * <em>without</em> some attributes (using property
      * {@link #PROP_EXCLUDED_ATTRS}, e.g in method {@link #find find}) one
      * cannot expect to get them even if they are asked for by the parameter
      * <tt>onlyAttrs</tt>.
-     * <P>
+     * </p>
+     *
      * @see #getAllBibRefs getAllBibRefs with all attributes
      * @see #getAllIDs getAllIDs
      * @return all citations from the current collection
@@ -569,8 +682,10 @@ public interface BibRefQuery {
 	throws NestedException;
 
     /*************************************************************************
+     * <p>
      * A convenient method returning just identifiers of all current citations.
-     * <P>
+     * </p>
+     *
      * @return a list of all identifiers
      * @throws NestedException if the collection is too large, or if the connection
      *        to the repository is broken
@@ -579,14 +694,18 @@ public interface BibRefQuery {
 	throws NestedException;
 
     /*************************************************************************
+     * <p>
      * It returns an enumeration of all citations from the current collection.
      * The type of elements in the enumeration is {@link BibRef} (or of its
      * sub-classes).
-     *<P>
+     * </p>
+     *
+     * <p>
      * Some attributes may be missing (empty) if the property
      * {@link #PROP_EXCLUDED_ATTRS} was used for creating the current
      * collection.
-     * <P>
+     * </p>
+     *
      * @see #getAllBibRefs getAllBibRefs
      * @return an iterator over all citations
      * @throws NestedException if the connection to the repository is broken
@@ -595,25 +714,31 @@ public interface BibRefQuery {
 	throws NestedException;
 
     /*************************************************************************
+     * <p>
      * It returns an enumeration of all citations from the current collection,
      * perhaps with a limited number of attributes.
      * The type of elements in the enumeration is {@link BibRef} (or of its
      * sub-classes).
-     * <P>
+     * </p>
+     *
+     * <p>
      * The citations available through the enumeration will contain at least
      * attributes whose names are specified by the parameter <tt>onlyAttrs</tt>.
      * It is meant to provide more lightweight citations. The implementation
      * may provide more attributes than specified in <tt>onlyAttrs</tt> (e.g.
      * it may be always good to include an attribute representing a unique
      * identifier of a citation even if it is not asked for).
-     * <P>
+     * </p>
+     *
+     * <p>
      * Note that one can ask only for attributes that are available in the
      * current collection. If the collection was already created
      * <em>without</em> some attributes (using property
      * {@link #PROP_EXCLUDED_ATTRS}, e.g in method {@link #find find}) one cannot
      * expect to get them even if they are asked for by the parameter
      * <tt>onlyAttrs</tt>.
-     * <P>
+     * </p>
+     *
      * @see #getAllBibRefs getAllBibRefs
      * @see #getBibRefs getBibRefs with all attributes
      * @return an iterator over all citations
@@ -623,13 +748,17 @@ public interface BibRefQuery {
 	throws NestedException;
 
     /*************************************************************************
+     * <p>
      * It returns all citations from the current collection as an XML stream.
      * The contents of such XML stream is widely repository dependent.
-     *<P>
+     * </p>
+     *
+     * <p>
      * Some attributes may be missing (empty) if the property
      * {@link #PROP_EXCLUDED_ATTRS} was used for creating the current
      * collection.
-     * <P>
+     * </p>
+     *
      * @see #getAllBibRefs getAllBibRefs
      * @return an XML data stream containing all citations from the current
      *         collection
@@ -640,15 +769,19 @@ public interface BibRefQuery {
 	throws NestedException;
 
     /*************************************************************************
+     * <p>
      * It returns an enumeration of all citations from the current collection.
      * The type of elements in the enumeration is <tt>String</tt>.
      * Each element represents one citation as an XML string.
      * The contents of such XML string is widely repository dependent.
-     *<P>
+     * </p>
+     *
+     * <p>
      * Some attributes may be missing (empty) if the property
      * {@link #PROP_EXCLUDED_ATTRS} was used for creating the current
      * collection.
-     * <P>
+     * </p>
+     *
      * @see #getBibRefs getBibRefs
      * @see #getAllBibRefsAsXML getAllBibRefsAsXML
      * @return an iterator over all citations
@@ -658,13 +791,17 @@ public interface BibRefQuery {
 	throws NestedException;
 
     /*************************************************************************
+     * <p>
      * A convenient utility method converting a given citation to its
      * XML representation. It is useful, for example, in cases when a
      * program annotates citations on-the-fly and needs them in the
      * same XML format.
-     *<P>
+     * </p>
+     *
+     * <p>
      * The XML format depends on the repository where the citation comes from.
-     * <P>
+     * </p>
+     *
      * @param bibRef a citation being converted into an XML format
      * @return an XML representation of <tt>bibRef</tt>
      * @throws NestedException if the implementation needs it :-)

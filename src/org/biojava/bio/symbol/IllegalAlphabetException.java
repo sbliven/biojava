@@ -25,11 +25,15 @@ package org.biojava.bio.symbol;
 import org.biojava.bio.*;
 
 /**
+ * <p>
  * The exception to indicate that an invalid alphabet has been used.
- * <P>
+ * </p>
+ *
+ * <p>
  * The usual reason for throwing an IllegalAlphabetException is that you are
  * trying to parse a SymbolList into a method that only works for some
  * alphabets, but not for the alphabet associated with that SymbolList.
+ * </p>
  *
  * @author Matthew Pocock
  */

@@ -27,13 +27,17 @@ import org.biojava.utils.*;
 import org.xml.sax.*;
 
 /**
+ * <p>
  * StAX handler for any element which just contains a string representation of
  * a byte.
- * <P>
+ * </p>
+ *
+ * <p>
  * This calss collects the string data, and when it is complete, passes it to
  * the (abstract) setByteValue method.  Typical use of this class is as
  * a base for a small (often anonymous) class which takes the byte value
  * and stores it in some variable.
+ * </p>
  *
  * @author Matthew Pocock
  * @since 1.2
@@ -77,10 +81,14 @@ public abstract class ByteElementHandlerBase extends StAXContentHandlerBase {
   }
 
   /**
+   * <p>
    * Override this method to do something useful with the
    * byte we collect.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This method will be invoked by endElement with the fully parsed byte.
+   * </p>
    *
    * @param byte  the fully parsed byte
    * @throws SAXException if for any reason the byte is not palatable

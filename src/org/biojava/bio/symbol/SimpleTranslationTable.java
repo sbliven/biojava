@@ -86,7 +86,7 @@ public class SimpleTranslationTable implements TranslationTable, Serializable {
   /**
    * Create a new translation table that will translate symbols from source to
    * target.
-   * <P>
+   * <p>
    * The source alphabet must be finite, as a Map object is used to associate
    * a source Symbol with a target Symbol.
    * The target alphabet need not be finite.
@@ -103,10 +103,10 @@ public class SimpleTranslationTable implements TranslationTable, Serializable {
   /**
    * Create a new translation table that will translate symbols from source to
    * target.
-   * <P>
+   * <p>
    * The Map transMap should contain keys in the source alphabet with values in
    * the target alphabet. However, this is not currently checked.
-   * <P>
+   * <p>
    * The source alphabet must be finite, as a Map object is used to associate
    * a source Symbol with a target Symbol.
    * The target alphabet need not be finite.

@@ -40,7 +40,7 @@ public interface SymbolReader {
      * @param start a start offset within the buffer.
      * @param length the maximum number of Symbols to read.
      * 
-     * @returns the number of Symbols which were actually read.
+     * @return the number of Symbols which were actually read.
      *
      * @throws IOException if an error occured on the stream, or the
      *                     end of the stream has already been reached.

@@ -33,7 +33,7 @@ import org.biojava.bio.symbol.*;
  * This defines the objects that IndexedSequenceDB uses to store all of the
  * database state, such as name, format, sequence builder and the actual file
  * offsets.
- * <P>
+ * <p>
  * In general, these objects should be transactional. Calls to store should add
  * the index to temporary storage. When commit is invoked, these indices should
  * all be added to the permanent storage. When rollback is invoked, these
@@ -45,10 +45,10 @@ import org.biojava.bio.symbol.*;
 public interface IndexStore {
   /**
    * Add the Index to the store.
-   * <P>
+   * <p>
    * This method should be transactional. If the store fails, the IndexStore
    * should be left in its original state.
-   * <P>
+   * <p>
    * If the file of the Index is not known yet, it is the
    * responsibility of the IndexStore to add it to the set returned by
    * getFiles.
@@ -89,7 +89,7 @@ public interface IndexStore {
   
   /**
    * Retrieve the set of all current IDs.
-   * <P>
+   * <p>
    * This set should either be immutable, or modifiable totally
    * separately from the IndexStore.
    *
@@ -104,7 +104,7 @@ public interface IndexStore {
   
   /**
    * Retrieve the format of the index file.
-   * <P>
+   * <p>
    * This set should either be immutable, or modifiable totally
    * separately from the IndexStore.
    *

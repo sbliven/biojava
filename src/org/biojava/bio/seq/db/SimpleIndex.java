@@ -25,7 +25,7 @@ import java.io.File;
 
 /**
  * This is a no-frills implementation of the Index interface.
- * <P>
+ * <p>
  * The file, start and ID are explicitly maintained as immutable properties of
  * the index. This implementation should be appropriate for many indexing
  * schemes. However, some schemes may wish to implement this interface as a

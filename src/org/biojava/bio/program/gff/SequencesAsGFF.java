@@ -49,7 +49,7 @@ public class SequencesAsGFF {
   
   /**
    * Return the current <span class="type">FeatureFilter</span>.
-   * <P>
+   * <p>
    * This is the object that will accept or reject individual features.
    *
    * @return the current <span class="type">FeatureFilter</span>

@@ -239,7 +239,7 @@ public class GenbankFormat
      * This method determines the behaviour when a bad line is processed.
      * Some options are to log the error, throw an exception, ignore it
      * completely, or pass the event through.
-     * <P>
+     * <p>
      * This method should be overwritten when different behavior is desired.
      *
      * @param theEvent The event that contains the bad line and token.
@@ -319,7 +319,7 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
      * This method determines the behaviour when a bad line is processed.
      * Some options are to log the error, throw an exception, ignore it
      * completely, or pass the event through.
-     * <P>
+     * <p>
      * This method should be overwritten when different behavior is desired.
      *
      * @param theEvent The event that contains the bad line and token.

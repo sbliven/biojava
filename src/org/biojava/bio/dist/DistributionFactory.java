@@ -31,11 +31,15 @@ import org.biojava.bio.seq.DNATools;
 import org.biojava.utils.*;
 
 /**
+ * <p>
  * A thing that can make Distributions.
- * <P>
+ * </p>
+ *
+ * <p>
  * This decouples programs from needing to know what implementation of Distribution
  * to instantiate for a given alphabet. It also lets you parameterise model creation
  * for things like profile HMMs.
+ * </p>
  *
  * @author Matthew Pocock
  */
@@ -51,18 +55,26 @@ public interface DistributionFactory {
   throws IllegalAlphabetException;
   
   /**
+   * <p>
    * The default DistributionFactory object.
-   * <P>
+   * </p>
+   *
+   * <p>
    * You may wish to alias this within your scripts with something like:
    * DistributionFactory dFact = DistributionFactory.DEFAULT; dFact.createDistribution(...);
+   * </p>
    */
   static DistributionFactory DEFAULT = new DefaultDistributionFactory();
   
   /**
+   * <p>
    * The default DistributionFactory implementation.
-   * <P>
+   * </p>
+   *
+   * <p>
    * It knows about hand-optimized implementations for some alphabets (like DNA)
    * without the optimized classes needing to be exposed from the DP package.
+   * </p>
    *
    * @author Matthew Pocock
    */

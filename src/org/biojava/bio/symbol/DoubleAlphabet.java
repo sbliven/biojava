@@ -31,16 +31,22 @@ import org.biojava.utils.*;
 import org.biojava.bio.seq.io.*;
 
 /**
+ * <p>
  * An efficient implementation of an Alphabet over the infinite set of double
  * values.
- * <P>
+ * </p>
+ *
+ * <p>
  * This class can be used to represent lists of floating-point numbers as a
  * SymbolList with the alphabet DoubleAlphabet. These lists can then be
  * annotated with features, or fed into dynamic-programming algorithms, or
  * processed as per any other SymbolList object.
- * <P>
+ * </p>
+ *
+ * <p>
  * Object identity can not be used to decide if two DoubleResidue objects are
  * the same. You must use the equals method, or compare doubleValue manually.
+ * </p>
  *
  * @author Matthew Pocock
  */
@@ -56,10 +62,14 @@ public class DoubleAlphabet implements Alphabet, Serializable {
   }
   
   /**
+   * <p>
    * Retrieve a SymbolList view of an array of doubles.
-   * <P>
+   * </p>
+   *
+   * <p>
    * The returned object is a view onto the underlying array, and does not copy
    * it. Changes made to the original array will alter the resulting SymbolList.
+   * </p>
    *
    * @param dArray  the array of doubles to view
    * @return a SymbolList over the DoubleAlphabet that represent the values in
@@ -162,7 +172,7 @@ public class DoubleAlphabet implements Alphabet, Serializable {
   
   /**
    * A single double value.
-   * <P>
+   *
    * @author Matthew Pocock
    */
   public static class DoubleSymbol implements AtomicSymbol, Serializable {

@@ -29,10 +29,12 @@ package org.biojava.bibliography;
 import java.util.*;
 
 /**
+ * <p>
  * A class describing journals. The citations referring to the journal articles
  * have a reference to this class. There are only few explicit attributes defined,
  * the rest are accessible using {@link #properties dynamic properties}.
- *<P>
+ * </p>
+ *
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
  * @version $Id$
  */
@@ -55,22 +57,32 @@ public class BiblioJournal {
     public String name;
 
     /**
+     * <p>
      * A standard number for journals.
-     * <P>
+     * </p>
+     *
+     * <p>
      * Be aware, however, that in the real world even this attribute may change over time.
      * Therefore, it is not suitable as a primary unique identifier for journals.
+     * </p>
      */
     public String issn;
 
     /**
+     * <p>
      * An abbreviation of the journal title.
-     *<p>
+     * </p>
+     *
+     * <p>
      * Note that some repositories use more abbreviation systems. For such cases,
      * use {@link #properties dynamic properties} for additional abbreviations.
-     *<p>
+     * </p>
+     *
+     * <p>
      * An example for biological journals is in
      * <a href="http://arachne.prl.msu.edu/journams/">Biological Journals and Abbreviations</a>.
-     *<P>
+     * </p>
+     *
      * A controlled vocabulary with abbreviation should be named
      * {@link BibRefSupport#JOURNAL_ABBREV}.
      */

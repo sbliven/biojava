@@ -28,7 +28,7 @@ import org.biojava.utils.*;
 import org.xml.sax.*;
 
 /**
- *@author Hanning Ni    Doubletwist Inc
+ * @author Hanning Ni    Doubletwist Inc
  */
 public class AGAVEGeneHandler
                extends StAXFeatureHandler implements AGAVEFeatureCallbackItf
@@ -158,6 +158,5 @@ public class AGAVEGeneHandler
          cve.printStackTrace() ;
       }
    }
-
-
 }
+

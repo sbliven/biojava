@@ -22,15 +22,21 @@ package org.biojava.bio.program.blast2html;
 
 
 /**
+ * <p>
  * Interface for specifying whether a particular pair
- * of residues/bases should be coloured.<P>
+ * of residues/bases should be coloured.
+ * </p>
  *
+ * <p>
  * This can be independent of the method that
- * chooses which colour.<P>
+ * chooses which colour.
+ * </p>
  *
- * Example usage: highlight mismatches only.<P>
+ * <p>
+ * Example usage: highlight mismatches only.
+ * </p>
  *
- *
+ * <p><pre>
  * Primary author -
  *                 Colin Hardman      (CAT)
  * Other authors  -
@@ -43,9 +49,12 @@ package org.biojava.bio.program.blast2html;
  *
  * Copyright 2001 Cambridge Antibody Technology Group plc.
  * All Rights Reserved.
+ * </pre></p>
  *
+ * <p>
  * This code released to the biojava project, May 2001
  * under the LGPL license.
+ * </p>
  *
  * @author Cambridge Antibody Technology Group plc
  * @version 1.0

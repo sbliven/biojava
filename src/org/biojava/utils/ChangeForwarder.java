@@ -27,6 +27,7 @@ package org.biojava.utils;
  * a sequence implementation.
  *
  * @author Matthew Pocock
+ * @since 1.1
  */
 public class ChangeForwarder implements ChangeListener {
   private final Object source;
@@ -37,18 +38,36 @@ public class ChangeForwarder implements ChangeListener {
     this.changeSupport = changeSupport;
   }
   
+  /**
+   * Retrieve the 'source' object for <code>ChangeEvent</code>s fired by this forwarder.
+   *
+   * @return the source Object
+   */
   public Object getSource() { return source; }
+  
+  /**
+   * Return the underlying <code>ChangeSupport</code> instance that can be used to
+   * fire <code>ChangeEvent</code>s and mannage listeners.
+   *
+   * @return the ChangeSupport delegate
+   */
   public ChangeSupport changeSupport() { return changeSupport; }
   
   /**
+   * <p>
    * Return the new event to represent the originating event ce.
-   * <P>
+   * </p>
+   *
+   * <p>
    * The returned ChangeEvent is the event that will be fired, and should be
    * built from information in the original event. If it is null, then no event
    * will be fired.
-   * <P>
+   * </p>
+   *
+   * <p>
    * The default implementation just constructs a ChangeEvent of the same type
    * that chains back to ce.
+   * </p>
    *
    * @param ce  the originating ChangeEvent
    * @return a new ChangeEvent to pass on, or null if no event should be sent

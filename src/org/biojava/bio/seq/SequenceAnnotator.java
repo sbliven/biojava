@@ -28,7 +28,8 @@ import org.biojava.bio.symbol.*;
 /**
  * An object which adds some additional information to a Sequence.
  *
- * <p>There are two approaches which can be taken to adding features
+ * <p>
+ * There are two approaches which can be taken to adding features
  * to a sequence:
  *
  * <ol><li>Directly adding features to a Sequence which implements
@@ -38,7 +39,8 @@ import org.biojava.bio.symbol.*;
  *
  * At present, this interface supports both these mechanisms.  It
  * is the responsibility of the implementor to document which approach
- * is taken.</p>
+ * is taken.
+ * </p>
  *
  * @author Thomas Down
  */
@@ -48,7 +50,7 @@ public interface SequenceAnnotator {
      * Return an annotated version of a sequence.
      *
      * @param seq The sequence to be annotated.
-     * @returns An annotated version of <code>seq</code> (may be the
+     * @return An annotated version of <code>seq</code> (may be the
      *          same object).
      * @throws IllegalAlphabetException If the sequence is over
      *                                  an inappropriate alphabet for

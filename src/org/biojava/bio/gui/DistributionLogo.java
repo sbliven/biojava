@@ -83,10 +83,14 @@ public class DistributionLogo extends JComponent {
   }
   
   /**
+   * <p>
    * Set the dist to render.
-   * <P>
+   * </p>
+   *
+   * <p>
    * The dist must be over a FiniteAlphabet so that we can draw the numbers
    * for each Symbol.
+   * </p>
    *
    * @param dist the new Distribution to render
    */
@@ -106,9 +110,13 @@ public class DistributionLogo extends JComponent {
   }
   
   /**
+   * <p>
    * Set the logo painter.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This will alter the way that the dist is rendered to screen.
+   * </p>
    *
    * @param logoPainter the new logoPainter
    */
@@ -127,9 +135,13 @@ public class DistributionLogo extends JComponent {
   }
   
   /**
+   * <p>
    * Set the symbol style.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This will change the outline and fill paints for the logos
+   * </p>
    *
    * @param style the new SymbolStyle to use
    */
@@ -199,9 +211,13 @@ public class DistributionLogo extends JComponent {
   }
   
   /**
+   * <p>
    * Calculates the total information of the dist in bits.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This calculates <code>totalBits - sum_r(entropy(r))</code>
+   * </p>
    *
    * @return  the total information in the dist
    */

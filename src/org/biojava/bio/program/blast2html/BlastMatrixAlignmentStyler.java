@@ -25,28 +25,40 @@ import java.io.*;
 import java.awt.Color;
 
 /**
+ * <p>
  * In addition to marking up the two sequences in the same way as
  * <CODE>SimpleAlignmentStyler</CODE> this styles the markup between
- * the two sequences based on a Blast Matrix score.<P>
+ * the two sequences based on a Blast Matrix score.
+ * </p>
  *
+ * <p>
  * The colouring algorithm has a linear range of hues between blue and red,
  * from positive to negative scores with saturation affected by the
- * square of the difference from the mean score. <P.
+ * square of the difference from the mean score.
+ * </p>
  *
+ * <p>
  * So high scoring matches will be dark blue and large negative scoring 
  * pairs will result in dark red. Scores in the middle will have a hue 
- * between red and blue and be very pale.<P>
+ * between red and blue and be very pale.
+ * </p>
  *
- * 
+ * <p>
  * <CODE>BlastMatrixAlignmentStyler</CODE> reads the colourmap specified by
- * the property -DcolourMap for colouring the query and subject sequences.<P>
+ * the property -DcolourMap for colouring the query and subject sequences.
+ * </p>
  *
+ * <p>
  * In addition will colour the consensus using a scale based on a
- * specified BLAST format scoring matrix.<P>
+ * specified BLAST format scoring matrix.
+ * </p>
  *
+ * <p>
  * The location of the blast matrix is specified by,
- * -DblastMatrix=<filename> <P>
+ * -DblastMatrix=<filename>
+ * </p>
  *
+ * <p><pre>
  * Primary author -
  *                 Colin Hardman      (CAT)
  * Other authors  -
@@ -59,9 +71,12 @@ import java.awt.Color;
  *
  * Copyright 2001 Cambridge Antibody Technology Group plc.
  * All Rights Reserved.
+ * </pre></p>
  *
+ * <p>
  * This code released to the biojava project, May 2001
  * under the LGPL license.
+ * </p>
  *
  * @author Cambridge Antibody Technology Group plc
  * @version 1.0
@@ -101,9 +116,11 @@ class BlastMatrixAlignmentStyler extends SimpleAlignmentStyler {
 
 
     /**
-     * Read the blast matrix into 2 data structures:-<BR>
-     * - array of chatacters in matrix ( aoChars );
-     * - 2D array of scores ( aoScore );
+     * Read the blast matrix into 2 data structures:
+     * <ul>
+     *   <li>array of chatacters in matrix ( aoChars );</li>
+     *   <li>2D array of scores ( aoScore );</li>
+     * </ul>
      *
      * @param poFileName - the filename of the matrix
      * @exception IOException if an error occurs
@@ -208,11 +225,11 @@ class BlastMatrixAlignmentStyler extends SimpleAlignmentStyler {
 
 	/*
 	 * For each pair calculate a normalised score, scale so between
-	 * 0.0-0.33.<P>
+	 * 0.0-0.33.<p>
 	 * The hue is then 1.0 - this value.<BR>
 	 *
 	 * Higher saturation is weighted towards the extremes by taking the
-	 * square of the deviation from the mean and multipling it by 20.<P>
+	 * square of the deviation from the mean and multipling it by 20.<p>
 	 *
 	 * Consensus colours are put into the colour map as '!AA' '!AC' etc
 	 * ie prefixed with an '!'
@@ -264,10 +281,14 @@ class BlastMatrixAlignmentStyler extends SimpleAlignmentStyler {
     }  
 
     /**
+     * <p>
      * Return the styles for the two aligned characters.
-     * ( in the form of predefined font classes ).<P>
+     * ( in the form of predefined font classes ).
+     * </p>
      *
+     * <p>
      * Null is acceptable value for no style.
+     * </p>
      *
      * @param poFirst - the first char in the alignment
      * @param poSecond - the second char in the alignment

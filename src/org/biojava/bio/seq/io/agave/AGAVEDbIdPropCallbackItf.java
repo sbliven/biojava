@@ -22,7 +22,7 @@ package org.biojava.bio.seq.io.agave;
 
 /**
  *
- *@author Hanning Ni    Doubletwist Inc
+ * @author Hanning Ni    Doubletwist Inc
  */
 public interface AGAVEDbIdPropCallbackItf
 {

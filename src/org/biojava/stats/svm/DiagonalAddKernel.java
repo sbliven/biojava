@@ -49,7 +49,7 @@ public class DiagonalAddKernel extends NestedKernel {
   
   /**
    * Return the dot product of a, b.
-   * <P>
+   * <p>
    * This is equal to
    * <code>k(a, b) + d(a, b) * ||class(a)|| / (||class||)</code>
    * where d(a, b) is zero if a != b, and 1 if a == b. class(a) is the set of all

@@ -40,21 +40,21 @@ public class ProfileHMM extends SimpleMarkovModel {
   
   /**
    * Match states array.
-   * <P>
+   * <p>
    * matchStates[0] == matchStates[columns+1] == magicalState().
    */
   private final EmissionState [] matchStates;
   
   /**
    * Insert states array.
-   * <P>
+   * <p>
    * From 0 .. columns().
    */
   private final EmissionState [] insertStates;
   
   /**
    * Delete states array.
-   * <P>
+   * <p>
    * From 0 .. columns()-1 corresponding to indexes 1..columns().
    */
   private final DotState [] deleteStates;
@@ -70,7 +70,7 @@ public class ProfileHMM extends SimpleMarkovModel {
   
   /**
    * Retrieve the match state at column indx.
-   * <P>
+   * <p>
    * The first match state is at index 1, and the last match state is at
    * column columns(). The states at index 0 and columns()+1 are both the
    * magical state. This is so that the whole model backbone can be addressed
@@ -93,7 +93,7 @@ public class ProfileHMM extends SimpleMarkovModel {
   
   /**
    * Retrieves the insert state at column indx.
-   * <P>
+   * <p>
    * Insert_0 is the insert that is accessible directly from the magical state.
    * Insert_1..columns() are 'above' each propper match state. There is no
    * insert state above the magical state at the end of the model, as insert_columns
@@ -116,7 +116,7 @@ public class ProfileHMM extends SimpleMarkovModel {
 
   /**
    * Retrieves the delete state for column indx.
-   * <P>
+   * <p>
    * Delete states are 'above' the match state that they delete. There is no
    * delete state for the magical state at either the beginning or end of the
    * model, so the delete state indx can range within (1..columns()).
@@ -138,7 +138,7 @@ public class ProfileHMM extends SimpleMarkovModel {
   
   /**
    * Create a new ProfileHMM.
-   * <P>
+   * <p>
    * The profile will be over the Alphabet alpha. It will have 'columns' match states,
    * 'columns' delete states and 'columns'+1 insert states. The match states will be
    * created by matchFactory, and the insert states will be created by

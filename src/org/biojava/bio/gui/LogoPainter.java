@@ -26,7 +26,7 @@ import java.awt.Graphics;
 
 /**
  * The interface for something that will draw the sequence logo for a state.
- * <P>
+ * <p>
  * A StateLogo object claims the screen realestate for rendering, and does the
  * calculations for sizes & information and the like. The LogoPainter renders
  * this information onto a graphics context. It is given the StateLog to render,

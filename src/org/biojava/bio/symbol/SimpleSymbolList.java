@@ -33,17 +33,17 @@ import org.biojava.bio.seq.io.*;
 /**
  * Basic implementation of SymbolList.  This
  * is currently backed by a normal Java array.
- *  <P>
+ *  <p>
  * SimpleSymbolList is now editable. edit() has been implemented
  * in a way that edits are relatively inefficient, but symbolAt() is
  * very efficient. 
- * </P>
- * <P>
+ * </p>
+ * <p>
  * A new constructor SimpleSymbolList(SymbolParser,String) has
  * been added so you can now simply turn a String into a SymbolList.
  * This is mostly to provide a simple way to create a SymbolList for
  * people just trying to get their feet wet. So here is an example.
- * </P>
+ * </p>
  * <code>
  * String seqString = "gaattc";
  * FiniteAlphabet dna = (FiniteAlphabet) AlphabetManager.alphabetForName("DNA");
@@ -51,18 +51,18 @@ import org.biojava.bio.seq.io.*;
  * SymbolList mySl = new SimpleSymbolList (parser,seqString);
  * System.out.println("Look at my sequence " + mySl.seqString());
  * </code>
- * <P>
+ * <p>
  * with the right parser you should be able to make a protein sequence
  * from the String "AspAlaValIleAsp"
- * </P>
- * <P>
+ * </p>
+ * <p>
  * subList() is implemented such that subLists are views of the original until
  * such time as the underlying SymbolList is edited in a way that would modify
  * the subList, at which point the subList gets its own array of Symbols and
  * does not reflect the edit to the original. When subList() is called on another 
  * subList (which is a veiw SimpleSymbolList) the new SimpleSymbolList is a view
  * of the original, not the subList.
- * </P>
+ * </p>
  * 
  * @author Thomas Down
  * @author David Waring

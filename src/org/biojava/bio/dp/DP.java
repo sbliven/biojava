@@ -31,24 +31,32 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 
 /**
+ * <p>
  * Objects that can perform dymamic programming operations upon sequences with
  * HMMs.
- * <P>
+ * </p>
+ *
+ * <p>
  * The three main DP operations are Forwards, Backwards and Viterbi. Forwards
  * and Backwards calculate the probability of the sequences having been made in
  * any way by the model. Viterbi finds the most supported way that the sequence
  * could have been made.
- * <P>
+ * </p>
+ *
+ * <p>
  * Each of the functions can return the dynamic-programming matrix containing
  * the intermediate results. This may be useful for model training, or for
  * visualisation.
- * <P>
+ * </p>
+ *
+ * <p>
  * Each of the funcitons can be calculated using the model probabilities, the
  * null-model probabilities or the odds (ratio between the two). For Forwards
  * and Backwards, the odds calculations produce numbers with questionable basis
  * in reality. For Viterbi with odds, you will recieve the path through the
  * model that is most different from the null model, and supported by the
  * probabilities.
+ * </p>
  *
  * @author Matthew Pocock
  * @author Thomas Down
@@ -430,16 +438,20 @@ public abstract class DP {
   }
 
   /**
-    * Generates an alignment from a model.
-    * <P>
-    * If the length is set to -1 then the model length will be sampled
-    * using the model's transition to the end state. If the length is
-    * fixed using length, then the transitions to the end state are implicitly
-    * invoked.
-    *
-    * @param length  the length of the sequence to generate
-    * @return  a StatePath generated at random
-    */
+   * <p>
+   * Generates an alignment from a model.
+   * </p>
+   *
+   * <p>
+   * If the length is set to -1 then the model length will be sampled
+   * using the model's transition to the end state. If the length is
+   * fixed using length, then the transitions to the end state are implicitly
+   * invoked.
+   * </p>
+   *
+   * @param length  the length of the sequence to generate
+   * @return  a StatePath generated at random
+   */
   public StatePath generate(int length)
   throws IllegalSymbolException, BioException {
     List tokenList = new ArrayList();

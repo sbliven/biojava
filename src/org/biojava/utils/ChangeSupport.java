@@ -25,11 +25,16 @@ import java.util.*;
 import java.lang.ref.*;
 
 /**
+ * <p>
  * A utility class to provide management for informing ChangeListeners of
  * ChangeEvents.
- * <P>
+ * </p>
+ *
+ * <p>
  * This is loosely modelled after the standard PropertyChangeEvent objects.
- * <P>
+ * </p>
+ *
+ * <p>
  * For an object to correctly fire these events, they must follow a broad
  * outline like this:
  * <code><pre>
@@ -43,8 +48,12 @@ import java.lang.ref.*;
  *   }
  * }
  * </pre></code>
+ * </p>
+ *
+ * <p>
  * The methods that delegate adding and removing listeners to a ChangeSupport
  * must take responsibility for synchronizing on the delegate.
+ * </p>
  *
  * @author Matthew Pocock
  * @author Thomas Down
@@ -186,11 +195,15 @@ public class ChangeSupport {
     }
 
   /**
+   * <p>
    * Inform the listeners that a change is about to take place using their
    * firePreChangeEvent methods.
-   * <P>
+   * </p>
+   *
+   * <p>
    * Listeners will be informed if they were interested in all types of event,
    * or if ce.getType() is equal to the type they are registered for.
+   * </p>
    *
    * @param ce  the ChangeEvent to pass on
    * @throws ChangeVetoException if any of the listeners veto this change
@@ -224,11 +237,15 @@ public class ChangeSupport {
   }
 
   /**
+   * <p>
    * Inform the listeners that a change has taken place using their
    * firePostChangeEvent methods.
-   * <P>
+   * </p>
+   *
+   * <p>
    * Listeners will be informed if they were interested in all types of event,
    * or if ce.getType() is equal to the type they are registered for.
+   * </p>
    *
    * @param ce  the ChangeEvent to pass on
    */

@@ -48,7 +48,8 @@ import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.utils.ChangeVetoException;
 
 /**
- * <p><code>SimilarityPairBuilder</code> annotates query and subject
+ * <p>
+ * <code>SimilarityPairBuilder</code> annotates query and subject
  * <code>Sequence</code> with <code>SimilarityPairFeature</code>s
  * created from SAX events supplied via a
  * <code>SeqSimilarityAdapter</code>. The objective is to describe a
@@ -58,10 +59,13 @@ import org.biojava.utils.ChangeVetoException;
  * an explicit distinction between query and subject sequences in the
  * alignment. The SAX events should describe elements conforming to
  * the BioJava BlastLikeDataSetCollection DTD. Suitable sources are
- * <code>BlastLikeSAXParser</code> or <code>FastaSAXParser</code>.</p>
+ * <code>BlastLikeSAXParser</code> or <code>FastaSAXParser</code>.
+ * </p>
  *
- * <p>Annotated <code>ViewSequence</code>s wrapping both query and
- * subject sequences are created.</p>
+ * <p>
+ * Annotated <code>ViewSequence</code>s wrapping both query and
+ * subject sequences are created.
+ * </p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2

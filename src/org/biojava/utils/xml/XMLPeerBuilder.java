@@ -18,11 +18,11 @@ import java.util.*;
  * Object to represent a particular element, it first constructs
  * Objects for all child elelments.
  *
- * <P>
+ * <p>
  * Currently, Text nodes are automatically converted to Java strings
  * and treated as normal children.  Treatment of Text may be
  * configurable in a future release.
- * </P>
+ * </p>
  *
  * @author Thomas Down
  */

@@ -24,18 +24,24 @@ package org.biojava.bio.symbol;
 import org.biojava.utils.*;
 
 /**
+ * <p>
  * Map between Symbols and index numbers.
- * <P>
+ * </p>
+ *
+ * <p>
  * The Symbols will all come from a single finite alphabet. The indices will
  * range from 0 to getAlphabet().size()-1 inclusive with each symbol having a
  * unique index. The resulting table can be used to look up array indices by
  * symbol, which in many cases will be more efficient than performing a Map
  * operation on, for example, a HashMap.
- * <P>
+ * </p>
+ *
+ * <p>
  * An index should do whatever is necessary to stay synchronized with its
  * alphabet. It may chose to modify the index table with the alphabet, or to
  * veto all changes to the alphabet that would invalidate the indexing
  * scheim.
+ * </p>
  *
  * @author Thomas Down
  * @author Matthew pocock
@@ -44,11 +50,15 @@ import org.biojava.utils.*;
 
 public interface AlphabetIndex extends Changeable {
   /**
+   * <p>
    * Indicates that the index is changing, probably due to the underlying
    * alphabet changing.
-   * <P>
+   * </p>
+   *
+   * <p>
    * The previous & changed fields should be arrays of symbols in the order they
    * are indexed in the unmodified and modified indices respectively.
+   * </p>
    */
   public static ChangeType INDEX = new ChangeType(
     "The alphabet being indexed has changed.",

@@ -34,7 +34,7 @@ import org.biojava.bio.dist.*;
 public interface ModelTrainer extends DistributionTrainerContext {
   /**
    * Registers an HMM with this trainer.
-   * <P>
+   * <p>
    * If the model has been already registered, then this method should do
    * nothing. If it has not been registered, then this method should loop over
    * every state in the model and register the Distribution returned by

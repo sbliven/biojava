@@ -30,7 +30,7 @@ import org.biojava.bio.symbol.*;
 public interface TransitionTrainer {
   /**
    * Add 'count' to the transition from->to.
-   * <P>
+   * <p>
    * This method may be called multiple times with the same from,to pair in
    * which case, the times should be summed.
    *
@@ -44,7 +44,7 @@ public interface TransitionTrainer {
   /**
    * Trains the transition, given an expected probability, and a weight for
    * that probability.
-   * <P>
+   * <p>
    * This is equivalent to adding a count of nullModel * weight to each
    * transition and then training with a weight of 0.
    *

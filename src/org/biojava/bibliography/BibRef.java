@@ -30,12 +30,15 @@ import org.biojava.utils.*;
 import java.util.*;
 
 /**
+ * <p>
  * This class is a core class of the bibliographic data model - it
  * represents a bibliographic reference, a citation.
  * It is a super-class for all specialized citation types, but it
  * can also be instantiated and represent an additional specialized
  * citation type.
- * <P>
+ * </p>
+ *
+ * <p>
  * The <em>BibRef</em> class has several explicit attributes, which are
  * reasonably general and which originate from the
  * <a href="http://dublincore.org">Dublin Core Metadata</a>, and a
@@ -54,7 +57,9 @@ import java.util.*;
  *        the <tt>String</tt> type is the best choice). The more exotic types
  *        are used, the less interoperability between implementations is likely.
  * </ul>
- * <P>
+ * </p>
+ *
+ * <p>
  * The <em>BibRef</em> class is a parent class for derived classes representing bibliographic
  * references to specialized bibliographic resources. The following classes are
  * defined explicitly:
@@ -67,19 +72,26 @@ import java.util.*;
  *   {@link BiblioProceeding},
  *   {@link BiblioTechReport}, and
  *   {@link BiblioWebResource}
- *<P>
+ * </p>
+ *
+ * <p>
  * The active participants of the process of creation and dissemination of the
  * bibliographic resources are defined by the class {@link BiblioProvider} and its
  * sub-classes. The participants can be people, organizations, or even software
  * services (mainly used for new digital resources). The most obvious examples
- * are authors, but it includes also publishers and other contributors. 
- *<P>
+ * are authors, but it includes also publishers and other contributors.
+ * </p>
+ *
+ * <p>
  * And finally, there is a class {@link BiblioJournal} describing journals.
  * The citations referring to the journal articles have a reference to this class. 
- *<P>
+ * </p>
+ *
+ * <p>
  * This is an overview of all participating classes and their attributes:
  * <img src="doc-files/bibobjects_java.jpg">.
- *<P>
+ * </p>
+ *
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
  * @version $Id$
  */
@@ -100,8 +112,11 @@ public class BibRef {
     public String identifier;
 
     /**
+     * <p>
      * It defines the nature or genre of the cited resource.
-     * <P>
+     * </p>
+     *
+     * <p>
      * A recommended best practice is to use only values from a controlled vocabulary
      * named as defined in {@link BibRefSupport#RESOURCE_TYPES}.
      * Syntactically, and because of making query navigation easier, the value of this
@@ -112,18 +127,25 @@ public class BibRef {
      * not defined by specialized sub-classes (for example,  letters, practical guideline,
      * or archives), and therefore they do not have predefined names in
      * {@link BibRefSupport} interface.
-     *<P>
+     * </p>
+     *
+     * <p>
      * <em>Note that for the description of the physical or digital manifestation of the
      * cited resource there is an attribute {@link #format}.</em>
+     * </p>
      */
     public String type;
 
     /**
+     * <p>
      * It is an array of identifiers, all of them pointing to <em>the same cited source</em>
      * but usually stored in different bibliographic repositories.
-     *<P>
+     * </p>
+     *
+     * <p>
      * <em>Note that this attribute is not for referencing citations to other documents
      * that are related to the cited document.</em>
+     * </p>
      */
     public String[] crossReferences;
 
@@ -152,22 +174,30 @@ public class BibRef {
     public BiblioScope coverage;
 
     /**
+     * <p>
      * The authors and contributors are responsible for creating the contents of the cited resource.
      * There is no formal definition of how this responsibility is divided between them. However,
      * the authors are usually primary creators while contributors may be illustrators, translators,
      * or other creative providers.
-     *<P>
+     * </p>
+     *
+     * <p>
      * The authors are in an ordered array (to be able to find the first author).
+     * </p>
      */
     public BiblioProvider[] authors;
 
     /**
+     * <p>
      * The authors and contributors are responsible for creating the contents of the cited resource.
      * There is no formal definition of how this responsibility is divided between them. However,
      * the authors are usually primary creators while contributors may be illustrators, translators,
      * or other creative providers.
-     *<P>
+     * </p>
+     *
+     * <p>
      * The contributors are in an ordered array (to be able to find the first contributor).
+     * </p>
      */
     public BiblioProvider[] contributors;
 
@@ -177,29 +207,38 @@ public class BibRef {
     public BiblioProvider publisher;
 
     /**
+     * <p>
      * It specifies information about rights over the cited resource.
      * Typically, it contains a rights management statement for the resource, or it refers
      * to a service providing such information. Rights information often encompasses
      * <a href="http://www.itds.treas.gov/ITDS/ITTA/ipr.html">Intellectual Property Rights</a>,
      * Copyright, and various Property Rights.
-     *<P>
+     * </p>
+     *
+     * <p>
      * If the attribute is empty, no assumptions can be made about the status of these and
      * other rights with respect to the cited resource.
+     * </p>
      */
     public String rights;
 
     /**
+     * <p>
      * Defines a date associated with an event in the life cycle of the cited resource
      * when this resource became available. Usually, it is a date of publishing. However,
      * for not yet published resources, it can be a date of creation.
-     *<P>
+     * </p>
+     *
+     * <p>
      * The suggested encoding is as defined in a W3C NOTE  
      * <a href="http://www.w3.org/TR/NOTE-datetime">Date and Time Formats</a>.
      * This NOTE defines a profile of <a href="http://www.iso.ch/markete/8601.pdf">ISO8601 standard</a>.
      * ISO8601 describes a large number of date/time formats and the NOTE reduces the scope and restricts
      * the supported formats to a small number. The profile offers a number of options from which this
      * attribute should contain/permit only the following ones:
-     *<P>
+     * </p>
+     *
+     * <p>
      * <dl>
      *   <dt> Year
      *   <dd> YYYY (e.g., 2000)
@@ -210,35 +249,50 @@ public class BibRef {
      *   <dt> Complete date plus hours, minutes, and seconds
      *   <dd> YYYY-MM-DDThh:mm:ssZ (e.g., 2000-12-31T23:59:59Z)
      * </dl>
-     *<P>
+     * </p>
+     *
+     * <p>
      * Exactly the components shown here must be present, with exactly this punctuation.
      * Note that the <b>T</b> appears literally in the string, to indicate the beginning
      * of the time element, as specified in ISO 8601.
-     *<P>
+     * </p>
+     *
+     * <p>
      * Times are expressed in UTC (Coordinated Universal Time), with a special UTC designator
      * (<em>Z</em>), again as specified in ISO 8601.
-     *<P>
+     * </p>
+     *
+     * <p>
      * For query purposes, the format with fewer details is considered
      * as having all possible values in place of missing details. Thus, YYYY-MM would mean
      * all dates and times in the given month.
+     * </p>
      */
     public String date;
 
     /**
+     * <p>
      * It defines a language of the intellectual contents of the cited resource.
      * The recommendation is to use values as defined by
      * <a href="http://www.ietf.org/rfc/rfc1766.txt">RFC1766</a> which includes a two-letter
      * <em>Language Code</em> (taken from the ISO639 standard), followed optionally by a two-letter
      * <em>Country Code</em> (taken from the ISO3166 standard).
-     *<P>
+     * </p>
+     *
+     * <p>
      * For example, <tt>en</tt>  for English,
      * <tt>fr</tt> for French, or <tt>en-uk</tt>  for English used in the United Kingdom.
-     *<P>
+     * </p>
+     *
+     * <p>
      * Another possibility is to use
      * <a href="http://lcweb.loc.gov/marc/languages">MARC List of Languages</a>.
-     *<P>
+     * </p>
+     *
+     * <p>
      * In any case, the name of the used controlled vocabulary should be equal to
      * {@link BibRefSupport#LANGUAGES}.
+     * </p>
      */
     public String language;
 

@@ -28,7 +28,7 @@ import org.biojava.utils.*;
 
 /**
  * A no-frills implementation of Annotation that is just a wrapper around a Map.
- * <P>
+ * <p>
  * It will allow you to set any property, but will throw exceptions if you try
  * to retrieve a property that is not set.
  *
@@ -43,7 +43,7 @@ public class SimpleAnnotation implements Annotation, Serializable {
 
   /**
    * The properties map.
-   * <P>
+   * <p>
    * This may be null if no property values have yet been set.
    */
   private Map properties;
@@ -62,7 +62,7 @@ public class SimpleAnnotation implements Annotation, Serializable {
   /**
    * A convenience method to see if we have allocated the properties map yet.
    *
-   * @returns true if properties is set and false otherwise
+   * @return true if properties is set and false otherwise
    */
   protected final boolean propertiesAllocated() {
     return properties != null;

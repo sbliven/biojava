@@ -32,8 +32,10 @@ import org.biojava.bio.seq.*;
 /**
  * Annotates a sequence with hits to a weight-matrix.
  *
- * <p>This SequenceAnnotator implementation returns a new
- * ViewSequence wrapping the underlying Sequence</p>
+ * <p>
+ * This SequenceAnnotator implementation returns a new
+ * ViewSequence wrapping the underlying Sequence
+ * </p>
  *
  * @author Matthew Pocock
  * @author Thomas Down

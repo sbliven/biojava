@@ -30,18 +30,20 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.io.*;
 
 /**  
+ * <p>
  * Abstract helper implementation of the SymbolList core interface.
  * To produce a concrete SymbolList implementation, you need only
  * implement the <code>getAlphabet</code>, <code>length</code> and
  * <code>symbolAt</code> methods.  Iterators and sublists are
  * handled for you automatically.
+ * </p>
  *
- * <P>
+ * <p>
  * This class makes many custom SymbolList implementations
  * very quick to implement.
  * See org.biojava.bio.seq.tools.ComplementSymbolList
  * for an example of this.
- * </P>
+ * </p>
  *
  * <p>
  * To make a mutable SymbolList, override the implementation of edit to perform
@@ -54,7 +56,6 @@ import org.biojava.bio.seq.io.*;
  * @author     Thomas Down 
  * @author     Matthew Pocock
  */
-
 
 public abstract class AbstractSymbolList
 extends AbstractChangeable
@@ -96,11 +97,14 @@ implements SymbolList {
   }
   
   /**
-   *  
+   * <p>
    * An Iterator over each Symbol in a range of a SymbolList.
-   * <P>
+   * </p>
+   *
+   * <p>
    * Objects of this type are returned by
    * <code>AbstractSymbolList.iterator</code>.
+   * </p>
    *
    * @author     Thomas Down 
    */
@@ -143,10 +147,14 @@ implements SymbolList {
   }
 
   /**
+   * <p>
    * Implements a list view of a SymbolList.
-   * <P>
+   * </p>
+   *
+   * <p>
    * Objects of this type are instantiated by
    * <code>AbstractSymbolList.subList</code>.
+   * </p>
    *
    * @author     Thomas Down 
    * @author     Matthew Pocock
@@ -253,45 +261,34 @@ implements SymbolList {
   }
 
   /**
-   *  
+   * <p>
    * Implements a list view of a SymbolList.
-   * <P>
+   * </p>
+   *
+   * <p>
    * Objects of this type are instantiated by
    * <code>AbstractSymbolList.asList</code>.
+   * </p>
    *
    * @author     Thomas Down 
-   *
    */
 
   private static class ListView extends AbstractList implements Serializable {
     private SymbolList rl;
 
     /**
-     *  Constructor for the ListView object 
+     * Build a new ListView to view a SymbolList as a list.
      *
-     * @param  rl  Description of Parameter 
+     * @param  symList  the SymbolList to view 
      */
 
-    ListView(SymbolList rl) {
-      this.rl = rl;
+    ListView(SymbolList symList) {
+      this.rl = symList;
     }
-
-    /**
-     *  Description of the Method 
-     *
-     * @param  pos  Description of Parameter 
-     * @return      Description of the Returned Value 
-     */
 
     public Object get(int pos) {
       return rl.symbolAt(pos + 1);
     }
-
-    /**
-     *  Description of the Method 
-     *
-     * @return    Description of the Returned Value 
-     */
 
     public int size() {
       return rl.length();
@@ -303,6 +300,8 @@ implements SymbolList {
    * This adapter screens all edit events to see if they overlap with a window
    * of interest. If they do, then a new edit event is built for the overlapping
    * region and pased on to all listeners.
+   *
+   * @author Matthew Pocock
    */
   public class EditScreener extends ChangeForwarder {
     protected final int min;
@@ -340,7 +339,12 @@ implements SymbolList {
       return null;
     }
   }
-    
+  
+  /**
+   * This translates edit events that fall within a window into window co-ordinates.
+   *
+   * @author Matthew Pocock
+   */
   public class EditTranslater extends EditScreener {
     public EditTranslater(
       Object source, ChangeSupport cs,

@@ -86,13 +86,16 @@ public final class SymbolListViews {
      * This method allows you to translate from one alphabet into another, so
      * for example, you could translate from DNA-triplets into amino-acids. You
      * could also translate from DNA-dinucleotide into the 'twist' structural
-     * metric, or any other translation that takes your fancy.</p>
+     * metric, or any other translation that takes your fancy.
+     * </p>
      * <p>
      * The actual mapping from source to view Symbol is encapsulated in a
-     * TranslationTable object.</p>
+     * TranslationTable object.
+     * </p>
      * <p>
      * The translated SymbolList will be the same length as the source, and each
-     * Symbol in the view will correspond to a single Symbol in the source.</p>
+     * Symbol in the view will correspond to a single Symbol in the source.
+     * </p>
      *
      * @param symbols a SymbolList to translate.
      * @param table a translation table for mapping symbols.

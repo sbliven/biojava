@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
  * Encapsulates the rendering info for a single line of the display.
- * <P>
+ * <p>
  * The single line of info may be divided into multiple regions, each rendered
  * by their own SequenceRenderer. It is the job of this class to cache the
  * information about how much space each one wants, and how much space they want

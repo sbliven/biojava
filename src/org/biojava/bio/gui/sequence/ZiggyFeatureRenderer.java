@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * A feature renderer that draws non-contiguous features as a set of boxes
  * joined by zig-zags.
- * <P>
+ * <p>
  * This is applicable to rendering cds's or non-contiguous homologies for
  * example.
  *

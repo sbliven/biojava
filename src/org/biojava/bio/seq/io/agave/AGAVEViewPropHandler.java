@@ -1,4 +1,4 @@
-  /*
+/*
  *                    BioJava development code
  *
  * This code may be freely distributed and modified under the
@@ -26,8 +26,10 @@ import java.util.Vector;
 
 /**
  * move view attributes into annotation properties:
- * <p>start --> view_start
- * <p>end --> view_end
+ * <p>
+ * start --> view_start
+ * <p>
+ * end --> view_end
  *
  *  @author Hanning Ni    Doubletwist Inc
  */
@@ -62,5 +64,5 @@ public class AGAVEViewPropHandler
         throw new SAXException( e.getMessage() ) ;
       }
   }
-
 }
+

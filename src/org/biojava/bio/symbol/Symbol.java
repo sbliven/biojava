@@ -28,15 +28,15 @@ import org.biojava.bio.*;
 
 /**
  * A single symbol.
- * <P>
+ * <p>
  * This is the atomic unit of a SymbolList, or a sequence. It allows
  * for fine-grain fly-weighting, so that there can be one instance
  * of each symbol that is referenced multiple times.
- * <P>
+ * <p>
  * Symbols from finite alphabets are identifiable using the == operator.
  * Symbols from infinite alphabets may have some specific API to test for
  * equality, but should realy over-ride the equals() method.
- * <P>
+ * <p>
  * Some symbols represent a single token in the sequence. For example, there is
  * a Symbol instance for adenine in DNA, and another one for cytosine.
  * Symbols can potentialy represent sets of Symbols. For example, n represents
@@ -49,19 +49,19 @@ import org.biojava.bio.*;
  * It is also possible to build a Symbol instance that represents all stop
  * codons {taa, tag, tga}, which can not be represented in terms of a
  * single ambiguous n'tuple.
- * <P>
+ * <p>
  * There are three Symbol interfaces. Symbol is the most generic. It has the
  * methods getToken and getName so that the Symbol can be textualy represented.
  * In addition, it defines getMatches that returns an Alphabet over all the
  * AtomicSymbol instances that match the Symbol (N would return an Alphabet
  * containing {A, G, C, T}, and Gap would return {}).
- * <P>
+ * <p>
  * BasisSymbol instances can always be represented by an n'tuple of BasisSymbol
  * instances. It adds the method getSymbols so that you can retrieve this list.
  * For example, the tuple [ant] is a BasisSymbol, as it is uniquely specified
  * with those three BasisSymbol instances a, n and t. n is a BasisSymbol
  * instance as it is uniquely represented by itself.
- * <P>
+ * <p>
  * AtomicSymbol instances specialize BasisSymbol by guaranteeing that getMatches
  * returns a set containing only that instance. That is, they are indivisable.
  * The DNA nucleotides are instances of AtomicSymbol, as are individual codons.
@@ -84,7 +84,7 @@ public interface Symbol extends Annotatable {
   
   /**
    * The alphabet containing the symbols matched by this ambiguity symbol.
-   * <P>
+   * <p>
    * This alphabet contains all of, and only, the symbols matched by this
    * symbol. For example, the symbol representing the DNA
    * ambiguity code for W would contain the symbol for A and T from the DNA

@@ -29,10 +29,10 @@ import org.biojava.bio.symbol.*;
 
 /**
  * A filter for accepting or rejecting a feature.
- * <P>
+ * <p>
  * This may implement arbitrary rules, or be based upon the feature's
  * annotation, type, location or source.
- * <P>
+ * <p>
  * If the filter is to be used in a remote process, it is recognized that it may
  * be serialized and sent over to run remotely, rather than each feature being
  * retrieved locally.
@@ -58,7 +58,7 @@ public interface FeatureFilter extends Serializable {
 
   /**
    * The class that accepts all features.
-   * <P>
+   * <p>
    * Use the FeatureFilter.all member.
    *
    * @author Thomas Down
@@ -96,7 +96,7 @@ public interface FeatureFilter extends Serializable {
 
   /**
    * The class that accepts no features.
-   * <P>
+   * <p>
    * Use the FeatureFilter.none member.
    *
    * @author Matthew Pocock

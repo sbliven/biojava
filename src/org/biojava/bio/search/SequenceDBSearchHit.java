@@ -32,17 +32,21 @@ import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ObjectUtil;
 
 /**
- * <p><code>SequenceDBSearchHit</code> objects represent a similarity
+ * <p>
+ * <code>SequenceDBSearchHit</code> objects represent a similarity
  * search hit of a query sequence to a sequence referenced in a
  * SequenceDB object. The core data (score, E-value, P-value) have
  * accessors, while supplementary data are stored in the Annotation
  * object. Supplementary data are typically the more loosely formatted
  * details which vary from one search program to another (and between
- * versions of those programs).</p>
+ * versions of those programs).
+ * </p>
  *
- * <p>It is up to the user to define the meaning of the hit's
+ * <p>
+ * It is up to the user to define the meaning of the hit's
  * query/subject start/end/strand with respect to its constituent
- * sub-hits. One approach could be:</p>
+ * sub-hits. One approach could be:
+ * </p>
  *
  * <ul>
  * <li>Hit query/subject start == start of first sub-hit</li>

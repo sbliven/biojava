@@ -27,9 +27,11 @@
 package org.biojava.bibliography;
 
 /**
+ * <p>
  * It represents an organisation dealing with the bibliographic
  * resources.
- *<P>
+ * </p>
+ *
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
  * @version $Id$
  */

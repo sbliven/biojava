@@ -30,15 +30,17 @@ import org.biojava.utils.*;
 import java.beans.*;
 
 /**
+ * <p>
  * This interface is a main entry point to a set of controlled
  * vocabularies.
+ * </p>
  *
- *<P>
+ * <p>
  * The implementation is supposed to behave as a Java bean (usually an
  * invisible bean unless it implements some additional GUI methods
  * which are not defined in this interface).
+ * </p>
  *
- *<P> 
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
  * @version $Id$
  */
@@ -47,16 +49,18 @@ public interface CandyFinder
     extends PropertyChangeListener {
 
     /**************************************************************************
+     * <p>
      * It creates a connection to an object representing a vocabulary
      * finder, or/and it makes all necessary initialization steps
      * needed for further communication.
+     * </p>
      *
-     *<P>
+     * <p>
      * However, there should be no need to call this method
      * explicitly, the other methods should do it automatically before
      * they need to use the finder.
+     * </p>
      *
-     *<P>
      * @throws NestedException if the connection/initialization cannot
      *         be established
      *************************************************************************/
@@ -75,10 +79,12 @@ public interface CandyFinder
     void disconnect();
 
     /*************************************************************************
+     * <p>
      * It returns names of all vocabularies known to this vocabulary
      * finder. Any of the returned names can be later used in the method
      * {@link #getVocabularyByName getVocabularyByName}.
-     * <P>
+     * </p>
+     *
      * @return a list of available vocabulary names
      * @throws NestedException if the finder fails to communicate
      *         with its vocabularies
@@ -87,7 +93,7 @@ public interface CandyFinder
 
     /*************************************************************************
      * It returns a selected vocabulary.
-     * <P>
+     *
      * @see #getAllVocabularyNames
      * @param name a name of a vocabulary to be returned
      * @return a selected vocabulary
@@ -99,7 +105,7 @@ public interface CandyFinder
 
     /*************************************************************************
      * It returns all available vocabularies.
-     * <P>
+     *
      * @return all available vocabularies
      * @throws NestedException if the finder fails to communicate
      *         with its vocabularies
@@ -108,7 +114,7 @@ public interface CandyFinder
 
     /*************************************************************************
      * It returns the number of available vocabularies.
-     *<P>
+     *
      * @throws NestedException if the finder fails to communicate
      *         with its vocabularies
      *************************************************************************/
@@ -130,11 +136,16 @@ public interface CandyFinder
     // Property names
     //
 
-    /** A property name.
-     *<P>
+    /**
+     * <p>
+     * A property name.
+     * </p>
+     *
+     * <p>
      * Its value is of type {@link CandyVocabulary}.
      * It this property is set a given vocabulary becomes part of
      * this finder.
+     * </p>
      */
     static final String PROP_VOCABULARY = CandyVocabulary.PROP_VOCABULARY;
 
@@ -144,7 +155,7 @@ public interface CandyFinder
 
     /*************************************************************************
      * It returns a name of this vocabulary finder.
-     *<P>
+     *
      * @throws NestedException if the finder fails to return its name
      *************************************************************************/
     String getFinderName() throws NestedException;

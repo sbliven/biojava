@@ -43,23 +43,28 @@ import org.biojava.utils.cache.CacheMap;
 import org.biojava.utils.cache.FixedSizeMap;
 
 /**
- * <p><code>PairwiseFilteringRenderer</code> wraps a
+ * <p>
+ * <code>PairwiseFilteringRenderer</code> wraps a
  * <code>PairwiseSequenceRenderer</code> and filters the
  * <code>PairwiseRenderContext</code>s passed to it. The renderer
  * receives a new <code>PairwiseRenderContext</code> which has had
  * both of its <code>FeatureHolder</code>s filtered with the
  * <code>FeatureFilter</code>.<p>
  *
- * <p>Instances of this class cache up to 5 of the derived
+ * <p>
+ * Instances of this class cache up to 5 of the derived
  * <code>PairwiseRenderContext</code>s. Therefore cycling through up
  * to 5 different <code>FeatureFilter</code>s will only be hitting the
  * cache rather than recalculating everthing. Should the
  * <code>FeatureHolder</code>s themselves change, the cache will be
  * flushed. As only the features overlapping the context's range are
- * filtered, changing the range will also result in re-filtering.</p>
+ * filtered, changing the range will also result in re-filtering.
+ * </p>
  *
- * <p>This class is based on <code>FilteringRenderer</code> and
- * credit for the design should go to its author.</p>
+ * <p>
+ * This class is based on <code>FilteringRenderer</code> and
+ * credit for the design should go to its author.
+ * </p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @author Matthew Pocock

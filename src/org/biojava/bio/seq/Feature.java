@@ -73,7 +73,7 @@ public interface Feature extends FeatureHolder, Annotatable {
 
     /**
      * The location of this feature.
-     * <P>
+     * <p>
      * The location may be complicated, or simply a range.
      * The annotation is assumed to apply to all the region contained
      * within the location.
@@ -96,10 +96,10 @@ public interface Feature extends FeatureHolder, Annotatable {
   
     /**
      * Return a list of symbols that are contained in this feature.
-     * <P>
+     * <p>
      * The symbols may not be contiguous in the original sequence, but they
      * will be concatenated together in the resulting SymbolList.
-     * <P>
+     * <p>
      * The order of the Symbols within the resulting symbol list will be 
      * according to the concept of ordering within the location object.
      *
@@ -146,7 +146,7 @@ public interface Feature extends FeatureHolder, Annotatable {
     
     /**
      * Template class for a plain feature.
-     * <P>
+     * <p>
      * This just has fields for representing the properties of a basic Feature. Each
      * sub-interface should provide a template class that inherits off this, and
      * the constructor or factory methods should make a particular feature

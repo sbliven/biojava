@@ -84,7 +84,7 @@ public class GappedPhredSequence extends PhredSequence {
 
   /**
    * Add a single gap at pos within the source coordintates.
-   * <P>
+   * <p>
    * this.symbolAt(pos) will then return gap. Adding a gap at 1 will prepend gaps. Adding
    * a gap at (length+1) will append a gap.
    *
@@ -98,7 +98,7 @@ public class GappedPhredSequence extends PhredSequence {
 
   /**
    * Add a single gap at pos within the view coordintates.
-   * <P>
+   * <p>
    * this.symbolAt(pos) will then return gap. Adding a gap at 1 will prepend gaps. Adding
    * a gap at (length+1) will append a gap.
    *
@@ -148,7 +148,7 @@ public class GappedPhredSequence extends PhredSequence {
 
   /**
    * Return the index of the first Symbol that is not a Gap character.
-   * <P>
+   * <p>
    * All symbols before firstNonGap are leading gaps. firstNonGap is effectively
    * the index in the view of symbol 1 in the original sequence.
    *

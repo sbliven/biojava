@@ -25,10 +25,10 @@ package org.biojava.bio.symbol;
 /**
  * A translation table that can also translate from the target to source
  * alphabet.
- * <P>
+ * <p>
  * I guess this is encapsulates an invertible function, and the untranslate
  * method is the inverse operation to translate.
- * <P>
+ * <p>
  * It is assumed that untranslate(translate(x)) = x for all x in the source
  * alphabet, and that translate(untranslate(y)) = y for all y in the target
  * alphabet. Note, one interesting sub-set of reversible transforms are of the

@@ -4,11 +4,11 @@ import java.util.*;
 
 /**
  * Caches the leading diagonal of a kernel matrix.
- * <P>
+ * <p>
  * Several kernels need to repeatedly access k(x,x) to do things like
  * normalization, or to calculate distances. This kernel wraps k so that these
  * leading diagonal elements do not need to be calculated each time.
- * <P>
+ * <p>
  * This kernel is thread-safe. However, care must be taken when setting the
  * nested kernel that no other thread is retrieving values at the same time.
  * This would cause a race condition in which the newly flushed cache may
@@ -41,9 +41,13 @@ public class DiagonalCachingKernel extends NestedKernel {
   }
   
   /**
+   * <p>
    * Set the kernel to nest.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This will flush the cache.
+   * </p>
    *
    * @param k  the kernel to nest.
    */
@@ -55,11 +59,15 @@ public class DiagonalCachingKernel extends NestedKernel {
   }
 
   /**
+   * <p>
    * Returns the kernel product of two Objects.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This returns <code>getNestedKernel.evaluate(x, y)</code>. If
    * <code>x.equals(y)</code> then it will cache the result first time, and do
    * a hash table look up to retrieve the value in subsequent calls.
+   * </p>
    */
   public double evaluate(Object x, Object y) {
     if(x.equals(y)) {

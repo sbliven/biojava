@@ -62,7 +62,7 @@ public interface SymbolTokenization extends Annotatable {
 
     /**
      * Returns the symbol for a single token.
-     * <P>
+     * <p>
      * The Symbol will be a member of the alphabet. If the token is not recognized
      * as mapping to a symbol, an exception will be thrown.
      *

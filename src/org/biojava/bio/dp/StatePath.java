@@ -29,7 +29,7 @@ import org.biojava.bio.symbol.*;
  * Extends the Alignment interface so that it is explicitly used to represent
  * a state path through an HMM, and the associated emitted sequence and
  * likelihoods.
- * <P>
+ * <p>
  * A state path should have the following structure:
  * <bq>
  * STATES -> list of all states used by the machine

@@ -33,7 +33,7 @@ import org.biojava.bio.dist.*;
 
 /**
  * Start/end state for HMMs.
- * <P>
+ * <p>
  * All MagicalState objects emit over MAGICAL_ALPHABET, which only contains
  * MAGICAL_STATE.
  *

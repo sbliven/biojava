@@ -25,10 +25,14 @@ package org.biojava.stats.svm;
 import java.util.*;
 
 /**
+ * <p>
  * An abstract implementation of an SVMModel.
- * <P>
+ * </p>
+ *
+ * <p>
  * You only need implement items, itemTargets and getTarget to make a
  * read-only implementation.
+ * </p>
  *
  * @author Matthew Pocock
  */

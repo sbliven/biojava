@@ -33,12 +33,12 @@ import org.biojava.utils.*;
 /**
  * An efficient implementation of an Alphabet over the infinite set of integer
  * values.
- * <P>
+ * <p>
  * This class can be used to represent lists of integer numbers as a
  * SymbolList with the alphabet IntegerAlphabet. These lists can then be
  * annotated with features, or fed into dynamic-programming algorithms, or
  * processed as per any other SymbolList object.
- * <P>
+ * <p>
  * Object identity can not be used to decide if two IntegerResidue objects are
  * the same. You must use the equals method, or compare intValue manually.
  *
@@ -61,7 +61,7 @@ public class IntegerAlphabet implements Alphabet, Serializable {
 
   /**
    * Retrieve a SymbolList view of an array of integers.
-   * <P>
+   * <p>
    * The returned object is a view onto the underlying array, and does not copy
    * it. Changes made to the original array will alter the symulting SymbolList.
    *
@@ -155,7 +155,7 @@ public class IntegerAlphabet implements Alphabet, Serializable {
 
   /**
    * A single int value.
-   * <P>
+   * <p>
    * @author Matthew Pocock
    */
   public static class IntegerSymbol implements AtomicSymbol, Serializable {

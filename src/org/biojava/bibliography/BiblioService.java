@@ -27,10 +27,12 @@
 package org.biojava.bibliography;
 
 /**
+ * <p>
  * It represents a service dealing with the bibliographic
  * resources. It may identify a program name or some other
  * (usually) electronic agent who provides the cited resource.
- *<P>
+ * </p>
+ *
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
  * @version $Id$
  */

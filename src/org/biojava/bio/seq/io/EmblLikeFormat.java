@@ -30,19 +30,25 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 /**
+ * <p>
  * Format processor for handling EMBL records and similar files.  This
  * takes a very simple approach: all `normal' attribute lines are
  * passed to the listener as a tag (first two characters) and a value
  * (the rest of the line from the 6th character onwards).  Any data
  * between the special `SQ' line and the "//" entry terminator is
  * passed as a SymbolReader.
+ * </p>
  *
- * <p>This low-level format processor should normally be used in
+ * <p>
+ * This low-level format processor should normally be used in
  * conjunction with one or more `filter' objects, such as
- * EmblProcessor.</p>
+ * EmblProcessor.
+ * </p>
  *
- * <p>Many ideas borrowed from the old EmblFormat processor by Thomas
- * Down and Thad Welch.</p>
+ * <p>
+ * Many ideas borrowed from the old EmblFormat processor by Thomas
+ * Down and Thad Welch.
+ * </p>
  *
  * @author Thomas Down
  * @author Greg Cox
@@ -71,13 +77,17 @@ public class EmblLikeFormat
     private Vector mListeners = new Vector();
 
     /**
+     * <p>
      * Should we ignore the symbols (SQ) part of the entry? If this
      * property is set to <code>true</code>, the parser will never
      * call addSymbols on the <code>SeqIOListener</code>, but parsing
      * will be faster if you're only interested in header information.
+     * </p>
      *
-     * <p>This property also allows the header to be parsed for files
-     * which have invalid sequence data.</p>
+     * <p>
+     * This property also allows the header to be parsed for files
+     * which have invalid sequence data.
+     * </p>
      */
     public void setElideSymbols(boolean b)
     {
@@ -283,11 +293,15 @@ public class EmblLikeFormat
     }
 
 	/**
+   * <p>
 	 * This method determines the behaviour when a bad line is processed.
 	 * Some options are to log the error, throw an exception, ignore it
 	 * completely, or pass the event through.
-	 * <P>
+   * </p>
+   *
+	 * <p>
 	 * This method should be overwritten when different behavior is desired.
+   * </p>
 	 *
 	 * @param theEvent The event that contains the bad line and token.
 	 */

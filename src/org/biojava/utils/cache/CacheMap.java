@@ -22,10 +22,14 @@
 package org.biojava.utils.cache;
 
 /**
+ * <p>
  * Interface for managing caches of objects fetchable by key.
- * <P>
+ * </p>
+ *
+ * <p>
  * The map may chose to remove a mapping, for example to free memory, or if the
  * data has become too old to be useful.
+ * </p>
  *
  * @author Matthew Pocock
  * @since 1.1
@@ -49,5 +53,10 @@ public interface CacheMap {
    */
   public Object get(Object key);
   
-  public void remove(Object o);
+  /**
+   * Explicitly remove an object.
+   *
+   * @param value  the item to remove
+   */
+  public void remove(Object value);
 }

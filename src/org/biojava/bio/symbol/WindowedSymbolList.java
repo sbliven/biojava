@@ -29,7 +29,7 @@ import org.biojava.bio.seq.*;
 
 /**
  * A view of windows onto another SymbolList.
- * <P>
+ * <p>
  * In practice, what this means is that you can view a DNA sequence as codons which
  * do not overlap.
  *

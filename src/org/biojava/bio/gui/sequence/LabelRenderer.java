@@ -30,7 +30,7 @@ import org.biojava.bio.seq.*;
 /**
  * The interface for things that can render labels for a line of information
  * about a sequence.
- * <P>
+ * <p>
  * Renderers are always activated within the context of a particular
  * SequenceRenderContext.
  * A single LabelRenderer can be shared among many sequence panels, or added

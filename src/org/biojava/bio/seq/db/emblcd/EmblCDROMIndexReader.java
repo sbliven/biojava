@@ -25,12 +25,14 @@ import java.io.InputStream;
 import java.io.IOException;
 
 /**
- * <p><code>EmblCDROMIndexReader</code> is an abstract class whose
+ * <p>
+ * <code>EmblCDROMIndexReader</code> is an abstract class whose
  * concrete subclasses read EMBL CD-ROM format indices from an
  * underlying <code>InputStream</code>. This format is used by the
  * EMBOSS package for database indexing (see programs dbiblast,
  * dbifasta, dbiflat and dbigcg). Indexing produces four binary files
- * with a simple format:</p>
+ * with a simple format:
+ * </p>
  * 
  * <ul>
  *   <li>division.lkp : master index</li>
@@ -39,19 +41,25 @@ import java.io.IOException;
  *   <li>   acnum.hit : accession number auxiliary index</li>
  * </ul>
  *
- * <p>Internally EMBOSS checks for Big-endian architechtures and
+ * <p>
+ * Internally EMBOSS checks for Big-endian architechtures and
  * switches the byte order to Little-endian. This means trouble if you
  * try to read the file using <code>DataInputStream</code>, but at
  * least the binaries are consistent across architechtures. This class
- * carries out the necessary conversion.</p>
+ * carries out the necessary conversion.
+ * </p>
  *
- * <p>The EMBL CD-ROM format stores the date in 4 bytes. One byte is
+ * <p>
+ * The EMBL CD-ROM format stores the date in 4 bytes. One byte is
  * unused (the first one), leaving one byte for the day, one for the
- * month and one (!) for the year.</p>
+ * month and one (!) for the year.
+ * </p>
  *
- * <p>For further information see the EMBOSS documentation, or for a
+ * <p>
+ * For further information see the EMBOSS documentation, or for a
  * full description, the source code of the dbi programs and the Ajax
- * library.</p>
+ * library.
+ * </p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2

@@ -29,7 +29,7 @@ import org.biojava.bio.seq.*;
 
 /**
  * Interface for objects that define how to make an ID for a sequence.
- * <P>
+ * <p>
  * Nine times out of ten, you will use one of HashSequenceDB.byURN or
  * HashSequenceDB.byName, but once in a blue-moon, you will want some other
  * systematic way of retrieveing Sequences. This interface is here to allow
@@ -38,7 +38,7 @@ import org.biojava.bio.seq.*;
 public interface IDMaker {
   /**
    * Calculate the id for a sequence.
-   * <P>
+   * <p>
    * Each unique sequence should return a unique ID.
    *
    * @param seq the sequence to ID

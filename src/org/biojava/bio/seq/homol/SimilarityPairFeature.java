@@ -43,12 +43,15 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 
 /**
- * <p><code>SimilarityPairFeature</code> describes a pairwise
+ * <p>
+ * <code>SimilarityPairFeature</code> describes a pairwise
  * similarity between two nucleotide sequences (as it extends
  * <code>StrandedFeature</code>). It is analagous to, and based on,
- * the BioPerl Bio::SeqFeature::SimilarityPair.</p>
+ * the BioPerl Bio::SeqFeature::SimilarityPair.
+ * </p>
  *
- * <p>It is different from <code>HomologyFeature</code> in that it
+ * <p>
+ * It is different from <code>HomologyFeature</code> in that it
  * expresses a relationship between only two sequence regions (rather
  * than >= 2), with one clearly defined as the query sequence and the
  * other as the subject (database hit). These are identified by
@@ -56,13 +59,16 @@ import org.biojava.utils.Changeable;
  * <code>Alignment</code>. <code>HomologyFeature</code> identifies the
  * related sequence regions by means of an <code>Homology</code>
  * instance which contains an <code>Alignment</code> which uses the
- * <code>HomologyFeature</code>s themselves as labels.</p>
+ * <code>HomologyFeature</code>s themselves as labels.
+ * </p>
  *
- * <p>In cases where there is no alignment available, for example when
+ * <p>
+ * In cases where there is no alignment available, for example when
  * MSPCrunch output or GFF have been used, the
  * <code>EmptyPairwiseAlignment</code> in the EMPTY_PAIRWISE field may
  * be used. This may also be useful if an implementation elides the
- * alignment data for some reason.</p>
+ * alignment data for some reason.
+ * </p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2

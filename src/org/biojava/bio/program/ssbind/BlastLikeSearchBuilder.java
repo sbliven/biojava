@@ -55,17 +55,21 @@ import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.utils.ChangeVetoException;
 
 /**
- * <p><code>BlastLikeSearchBuilder</code> will create
+ * <p>
+ * <code>BlastLikeSearchBuilder</code> will create
  * <code>SeqSimilaritySearchResult</code>s from SAX events via a
  * <code>SeqSimilarityAdapter</code>. The SAX events should describe
  * elements conforming to the BioJava BlastLikeDataSetCollection
  * DTD. Suitable sources are <code>BlastLikeSAXParser</code> or
  * <code>FastaSAXParser</code>. The result objects are placed in the
- * <code>List</code> supplied to the constructor.</p>
+ * <code>List</code> supplied to the constructor.
+ * </p>
  *
- * <p>The start/end/strand of <code>SeqSimilaritySearchHit</code>s are
+ * <p>
+ * The start/end/strand of <code>SeqSimilaritySearchHit</code>s are
  * calculated from their constituent
- * <code>SeqSimilaritySearchSubHit</code>s as follows:</p>
+ * <code>SeqSimilaritySearchSubHit</code>s as follows:
+ * </p>
  *
  * <ul>
  * <li>The query start is the lowest query start coordinate of its

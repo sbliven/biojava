@@ -36,7 +36,7 @@ package org.biojava.bio.gui.sequence;
  * This is a dummy interface to permit identification of renderers whose
  * output is to be overlaid along the lines of the Marker Interface 
  * pattern.
- *<P>
+ *<p>
  * It has no methods or variables.
  *
  * @author David Huen

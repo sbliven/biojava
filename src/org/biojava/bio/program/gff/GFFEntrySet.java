@@ -31,7 +31,7 @@ import org.biojava.bio.seq.*;
 
 /**
  * A set of entries and comments as a representation of a GFF file.
- * <P>
+ * <p>
  * This is an intermediate storage solution for GFF stuff. It lets you
  * collect together an arbitrary set of GFF records and comments, and then
  * do something with them later.
@@ -54,7 +54,7 @@ public class GFFEntrySet {
 
   /**
    * Loop over all lines in the set.
-   * <P>
+   * <p>
    * The <span class="type">Iterator</span>
    * will return <span class="type">String</span> and <span class="type">
    * GFFRecord</span> objects in the order that they were added to this set.
@@ -67,7 +67,7 @@ public class GFFEntrySet {
 
   /**
    * Add a comment to the end of this set.
-   * <P>
+   * <p>
    * This should be the text of the comment, without the leading
    * '<code>#</code>'.
    *
@@ -102,9 +102,11 @@ public class GFFEntrySet {
    * returned by this method currently adds new features to an
    * existing sequence (assuming it implements MutableFeatureHolder).
    *
-   * <p>Sequences are only annotated if their getName() method returns
+   * <p>
+   * Sequences are only annotated if their getName() method returns
    * a name equal to the sequence name field of one or more records
-   * in this GFFEntrySet.</p>
+   * in this GFFEntrySet.
+   * </p>
    *
    * @return an <span class="type">SequenceAnnotator</span> that adds GFF features
    */

@@ -8,7 +8,7 @@ package org.biojava.stats.svm;
 
 /**
  * Performs a normalization on the results of a nested kernel.
- * <P>
+ * <p>
  * This is equivalent to making the locations in feature space of the nested
  * kernel unit vectors lying on a unit sphere. The dot product in feature space
  * then becomes just <code>cos theta</code> rather than
@@ -16,7 +16,7 @@ package org.biojava.stats.svm;
  * a in the feature space of kernel k is <code>sqrt( k(a, a) )</code>, so that
  * the normalizing kernel ends up calculating
  * <code>k(a, b) / sqrt( k(a, a) * k(b, b) )</code>.
- * <P>
+ * <p>
  * As the values of k(x, x) are required repeatedly, it may be worth making the
  * nested kernel a DiagonalCachingKernel.
  *

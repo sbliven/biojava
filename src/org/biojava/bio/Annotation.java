@@ -29,18 +29,26 @@ import java.lang.reflect.*;
 import org.biojava.utils.*;
 
 /**
+ * <p>
  * Arbitrary annotation associated with one or more objects.
- * <P>
+ * </p>
+ *
+ * <p>
  * Biological information often does not fit design patterns very well, and can
  * be a jumble of facts and relationships. Annotation objects provide a standard
  * way for you to store this mess as a property of an object.
- * <P>
+ * </p>
+ *
+ * <p>
  * Annotations may contain keys that have Annotations as values. In this way,
  * annotations can be shared among multiple Annotatable objects, and you can
  * represent semi-structured data.
- * <P>
+ * </p>
+ *
+ * <p>
  * It is perfectly possible to wrap up almost any tree-like or flat data
  * structure as Annotation.
+ * </p>
  *
  * @author Matthew Pocock
  */
@@ -55,10 +63,14 @@ public interface Annotation extends Changeable {
   );
   
   /**
+   * <p>
    * Retrieve the value of a property by key.
-   * <P>
+   * </p>
+   *
+   * <p>
    * Unlike the Map collections, it will complain if the key does not exist. It
    * will only return null if the key is defined and has value null.
+   * </p>
    *
    * @param key  the key of the property to retrieve
    * @return  the object associated with that key
@@ -67,11 +79,15 @@ public interface Annotation extends Changeable {
   Object getProperty(Object key) throws NoSuchElementException;
   
   /**
+   * <p>
    * Set the value of a property.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This method throws an exception if either properties can not be
    * added to this object, or that this particular property is immutable or
    * illegal within the implementation.
+   * </p>
    *
    * @param key the key object
    * @param value the new value for this key
@@ -100,7 +116,7 @@ public interface Annotation extends Changeable {
   
   /**
    * Retern a map that contains the same key/values as this Annotation.
-   * <P>
+   * <p>
    * If the annotation changes, the map may not reflect this.  The Map
    * may be unmodifiable.
    *
@@ -109,11 +125,15 @@ public interface Annotation extends Changeable {
   Map asMap();
    
   /**
+   * <p>
    * A really useful empty and immutable annotation object.
-   * <P>
+   * </p>
+   *
+   * <p>
    * Use this instead of null when you really don't want an object or an
    * implementation to have annotation even though it should implement
    * Annotatable.
+   * </p>
    */
   static final Annotation EMPTY_ANNOTATION = new EmptyAnnotation();
   

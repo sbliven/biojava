@@ -46,19 +46,23 @@ public abstract class SeqFileFormerFactory
     private static Map factories = new HashMap();
 
     /**
-     * <p><code>addFactory</code> installs the static factories
+     * <p>
+     * <code>addFactory</code> installs the static factories
      * subclassed from <code>SeqFileFormerFactory</code> into its
      * factories hash, indexed by file format name. This method is
      * called from within a static block in each implementation of
      * <code>SeqFileFormer</code>. Thus, when the class is dynamically
-     * loaded its factory is automatically installed.</p>
+     * loaded its factory is automatically installed.
+     * </p>
      *
-     * <p>The valid arguments are described in the public static final
+     * <p>
+     * The valid arguments are described in the public static final
      * <code>Map</code> </code>SequenceFormat.FORMATS</code>. Those
      * currently available are Embl or Genbank. Capitalization is
-     * important.</p>
-
-     * <p>How the public methods see this depends on the
+     * important.
+     * </p>
+     * <p>
+     * How the public methods see this depends on the
      * implementation of <code>SequenceFormat</code>; see the
      * <code>writeSequence</code> method in each
      * implementation. Current implementations are
@@ -66,7 +70,8 @@ public abstract class SeqFileFormerFactory
      * argument to <code>writeSequence</code> using
      * <code>equalsIgnoreCase()</code> before calling this method
      * (which <strong>is</strong> case-sensitive) with the correct
-     * case.</p>
+     * case.
+     * </p>
      *
      * @param format a <code>String</code> identifer which specifies
      * the file format name.

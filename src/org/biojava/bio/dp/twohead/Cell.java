@@ -24,14 +24,19 @@ package org.biojava.bio.dp.twohead;
 import org.biojava.bio.dp.BackPointer;
 
 /**
+ * <p>
  * A single cell in the DP matrix.
- * <P>
+ * </p>
+ *
+ * <p>
  * The cell is divided into parallel arrays for the cell scores, backpointers
  * and emission probabilities. The scores and backpointer arrays are as long
  * as the number of states in the model. The emissions array is as long as
  * the number of emitting states in the model.
+ * </p>
  *
  * @author Matthew Pocock
+ * @since 1.2
  */
 public final class Cell {
   public double [] scores;

@@ -139,7 +139,7 @@ public class SimpleGFFRecord implements GFFRecord {
   
   /**
    * Set the score to <span class="arg">score</source>.
-   * <P>
+   * <p>
    * The score must be a double, inclusive of <code>0</code>.
    * If you wish to indicate that there is no score, then use
    * <span class="type">GFFRecord</span>.<span class="const">NO_SCORE</span>.
@@ -169,7 +169,7 @@ public class SimpleGFFRecord implements GFFRecord {
   
   /**
    * Set the frame to <span class="arg">frame</source>.
-   * <P>
+   * <p>
    * The score must be  one of <code>{0, 1, 2}</code> or
    * <span class="type">GFFRecord</span>.<span class="const">NO_FRAME</span>.
    *
@@ -192,7 +192,7 @@ public class SimpleGFFRecord implements GFFRecord {
   /**
    * Replace the group-attribute <span class="type">Map</span> with 
    * <span class="arg">ga</span>.
-   * <P>
+   * <p>
    * To efficiently add a key, call <span class="method">getGroupAttributes()</span>
    * and modify the <span class="type">Map</span>.
    *
@@ -211,7 +211,7 @@ public class SimpleGFFRecord implements GFFRecord {
   
   /**
    * Set the comment to <span class="arg">comment</source>.
-   * <P>
+   * <p>
    * If you set it to null, then the comment for this line will be ignored.
    *
    * @param the new comment

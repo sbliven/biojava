@@ -24,22 +24,25 @@ package org.biojava.bio.symbol;
 import java.util.*;
 
 /**
- * Title:        CircularLocationTools<p>
- * Description:  A class to hide the messiness of CircularLocs from LocationTools<p>
- * Copyright:    Copyright (c) 2001<p>
- * @author Mark Schreiber
- * @author Greg Cox
- * @version 1.0
+ * <p>
+ * A class to hide the messiness of CircularLocs from LocationTools
+ * </p>
  *
+ * <p>
  * <b>WARNING</b> All binary operations on CircularLocations are currently assumed to
  * be performed on Locations from the same sequence, or sequences of the same
  * length. To enforce this binary operations will currently only accept circular
  * locations of the same length.
+ * </p>
+ *
+ * @author Mark Schreiber
+ * @author Greg Cox
+ * @version 1.0
  */
 
 final class CircularLocationTools {
   /**
-   * translates coordinates from circular into linear
+   * Translates coordinates from circular into linear
    *
    * @param val The circular coordinate
    * @param length The lenght of the circular molecule
@@ -52,7 +55,11 @@ final class CircularLocationTools {
   }
 
   /**
-   * Makes a circular location, called by LocationTools
+   * Makes a circular location, called by LocationTools.
+   *
+   * @param min  minimum index of location
+   * @param max  maximum index of Location
+   * @param seqLength  used to work out if the feature wraps arround the origin
    */
   protected static CircularLocation makeCircLoc(int min, int max, int seqLength){
     if(min == 0|| max == 0 || seqLength == 0){
@@ -85,7 +92,8 @@ final class CircularLocationTools {
    * Tests a location to see if it overlaps the origin of the circular
    * molecule to which it belongs. The origin is taken to be position
    * one.
-   * @returns true if it does overlap or if it contains the entire sequence
+   *
+   * @return true if it does overlap or if it contains the entire sequence
    */
   protected static boolean overlapsOrigin(CircularLocation loc){
     if(loc.getWrapped() instanceof CompoundLocation){
@@ -109,6 +117,9 @@ final class CircularLocationTools {
 
   /**
    * Tests if the specified location is an instance of CircularLocation.
+   *
+   * @param loc  Locatoin to test
+   * @return true if it is a circular location
    */
   protected static boolean isCircular(Location loc){
 	boolean toReturn = false;

@@ -29,7 +29,7 @@ import org.xml.sax.*;
 /**
  * StAX handler for any element which just contains a string representation of
  * a long.
- * <P>
+ * <p>
  * This calss collects the string data, and when it is complete, passes it to
  * the (abstract) setLongValue method.  Typical use of this class is as
  * a base for a small (often anonymous) class which takes the long value
@@ -79,7 +79,7 @@ public abstract class LongElementHandlerBase extends StAXContentHandlerBase {
   /**
    * Override this method to do something useful with the
    * long we collect.
-   * <P>
+   * <p>
    * This method will be invoked by endElement with the fully parsed long.
    *
    * @param long  the fully parsed long

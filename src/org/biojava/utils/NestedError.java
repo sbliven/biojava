@@ -33,7 +33,7 @@ import java.util.*;
 
 /**
  * A general purpose Error that can wrap another Throwable object.
- * <P>
+ * <p>
  * NestedError is an Error that should be thrown whenever some exceptional and
  * unforseable event takes place. For example, sometimes exceptions can be
  * thrown by a given method, but not when the calling method is a member of

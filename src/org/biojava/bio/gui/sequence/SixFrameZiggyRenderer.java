@@ -40,7 +40,7 @@ import java.util.List;
 /**
  * A feature renderer that computes the data necessary to render
  * multi-exon transcripts without CDS data.
- * <P>
+ * <p>
  * The actual drawing is done by a child renderer.  In this case,
  * SixFrameRenderer is used, which can use data from this renderer
  * to display transcripts in the correct translation frames.

@@ -26,7 +26,8 @@ package org.biojava.stats.svm;
  * Optimization algorithm.  See "A Tutorial on Support Vector Regression"
  * by Smola and Scholkopf.
  *
- * <P>WARNING: This doesn't work right now -- use and fix (both
+ * <p>
+ * WARNING: This doesn't work right now -- use and fix (both
  * at own risk...)
  *
  * @author Matthew Pocock

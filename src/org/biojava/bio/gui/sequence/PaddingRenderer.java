@@ -64,7 +64,7 @@ extends SequenceRendererWrapper {
   
   /**
    * Build a new PaddingRenderer with zero padding.
-   * <P>
+   * <p>
    * This will cause a rendering effect equivalent to missing out the padding
    * renderer all together.
    */
@@ -94,7 +94,7 @@ extends SequenceRendererWrapper {
   
   /**
    * Set the padding.
-   * <P>
+   * <p>
    * The padding will be added to the area before and after that required to
    * render the delegate renderer.
    *

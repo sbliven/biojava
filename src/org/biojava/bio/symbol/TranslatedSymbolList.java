@@ -29,15 +29,15 @@ import org.biojava.bio.seq.*;
 
 /**
  * Provides a 'translated' view of an underlying SymbolList.
- * <P>
+ * <p>
  * This class allows you to translate from one alphabet into another, so
  * for example, you could translate from DNA-triplets into amino-acids. You
  * could also translate from DNA-dinucleotide into the 'twist' structural
  * metric, or any other translation that takes your fancy.
- * <P>
+ * <p>
  * The actual mapping from source to view Symbol is encapsulated in a
  * TranslationTable object.
- * <P>
+ * <p>
  * The TranslatedSymbolList will be the same length as the source, and each
  * Symbol in the view will correspond to a single Symbol in the source.
  *

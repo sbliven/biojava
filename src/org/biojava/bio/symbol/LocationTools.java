@@ -12,7 +12,7 @@ import java.util.*;
 final public class LocationTools {
   /**
    * Return the union of two locations.
-   * <P>
+   * <p>
    * The union will be a Location instance that contains every index contained
    * by either locA or locB.
    *
@@ -64,7 +64,7 @@ final public class LocationTools {
 
   /**
    * Return the intersection of two locations.
-   * <P>
+   * <p>
    * The intersection will be a Location instance that contains every index
    * contained by both locA and locB.
    *
@@ -117,7 +117,7 @@ final public class LocationTools {
 
   /**
    * Returns whether the two locations overlap or not.
-   * <P>
+   * <p>
    * Two locations overlap if they contain at least one index in common.
    *
    * @param locA  the first Location
@@ -197,7 +197,7 @@ final public class LocationTools {
 
   /**
    * Return whether two locations are equal.
-   * <P>
+   * <p>
    * They are equal if both a contains b and b contains a. Equivalently, they
    * are equal if for every point p, locA.contains(p) == locB.contains(p).
    *
@@ -258,7 +258,7 @@ final public class LocationTools {
   /**
    * Create a Location instance from the list of contiguous locations in
    * locList.
-   * <P>
+   * <p>
    * If the list is empty then Location.empty will be produced. If it is just
    * one element long, then this will be returned as-is. If there are multiple
    * locations then they will be sorted and then used to construct a
@@ -346,7 +346,7 @@ final public class LocationTools {
 
   /**
    * Return a contiguous Location from min to max.
-   * <P>
+   * <p>
    * If min == max then a PointLocation will be made, otherwise, a RangeLocation
    * will be returned.
    *

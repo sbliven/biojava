@@ -21,13 +21,18 @@
 package org.biojava.bio.program.blast2html;
 
 /**
+ * <p>
  * Interface for specifying both the overall set of possible
  * markup styles and the particular style for any pair
- * of residues/bases <P>
+ * of residues/bases.
+ * </p>
  *
+ * <p>
  * This can be independent of the choice of whether to apply a style
  * to a pair, by using the <code>ColourCommand</code> interface.
+ * </p>
  *
+ * <p><pre>
  * Primary author -
  *                 Colin Hardman      (CAT)
  * Other authors  -
@@ -40,9 +45,12 @@ package org.biojava.bio.program.blast2html;
  *
  * Copyright 2001 Cambridge Antibody Technology Group plc.
  * All Rights Reserved.
+ * </pre></p>
  *
+ * <p>
  * This code released to the biojava project, May 2001
  * under the LGPL license.
+ * </p>
  *
  * @author Cambridge Antibody Technology Group plc
  * @version 1.0
@@ -52,9 +60,12 @@ interface AlignmentStyler {
 
 
     /**
+     * <p>
      * Returns a fragment of HTML that defines the FONT
-     * styles to be used in the alignment markup.<P>
+     * styles to be used in the alignment markup.
+     * </p>
      * 
+     * <p>
      * For example:
      * <PRE>
      * FONT.C2-S{background-color:#FFFC50;color:#000000}
@@ -63,23 +74,27 @@ interface AlignmentStyler {
      * FONT.C0-S{background-color:#50FF78;color:#000000}
      * FONT.C1-S{background-color:#FFCA50;color:#000000}
      * FONT.C5-S{background-color:#A5A5FF;color:#000000}
+     * </PRE></p>
      *
-     * </PRE>
      * @return String - the HTML
      */
     String getAlignmentStyles();
 
     /**
+     * <p>
      * Modifies in place the styles for the two aligned characters and
-     * the consensus ( in the form of predefined font classes ).<P>
+     * the consensus ( in the form of predefined font classes ).
+     * </p>
      *
+     * <p>
      * Null is acceptable value for no style.
+     * </p>
      *
      * @param poFirst - the first char in the alignment
      * @param poSecond - the second char in the alignment
      * @param poStyleHolder - an array to hold the styles, 
      *                       [0] = first, 
-     *                       [1] = second
+     *                       [1] = second,
      *                       [2] = markup
      *                        
      */

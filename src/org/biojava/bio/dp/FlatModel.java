@@ -32,11 +32,11 @@ import org.biojava.bio.dist.*;
 
 /**
  * A model that guarantees to only contain emission states and dot states.
- * <P>
+ * <p>
  * A flat model is essentialy a view onto a more complicated model that makes it
  * appear to only contain emission states and dot states. States that emit models
  * and other exotica are expressed purely in terms of these two state types.
- * <P>
+ * <p>
  * You can train the resulting flat model, and the underlying models will be altered.
  */
 class FlatModel implements MarkovModel, Serializable {

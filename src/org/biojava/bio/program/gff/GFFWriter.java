@@ -30,7 +30,7 @@ import org.biojava.bio.seq.StrandedFeature;
 /**
  * Listens to a stream of GFF events and writes the lines to a
  * <span class="type">PrintWriter</span>.
- * <P>
+ * <p>
  * This will ignore all exceptions. Perhaps the error-handling needs to move into
  * an error handling interface?
  *

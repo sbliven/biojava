@@ -29,11 +29,13 @@ package org.biojava.bibliography;
 import java.util.*;
 
 /**
+ * <p>
  * It represent an extent or scope of the content of the cited resource.
  * It can include spatial location (a place name or geographic co-ordinates),
  * temporal period (a period label, date, or date range), or both.
  * Finally, it can have additional dynamic properties such as jurisdiction.
- *<P>
+ * </p>
+ *
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
  * @version $Id$
  */
@@ -51,13 +53,17 @@ public class BiblioScope {
     public Hashtable properties = new Hashtable();
 
     /**
+     * <p>
      * It defines a spatial location of the cited resource.
-     *<P>
+     * </p>
+     *
+     * <p>
      * This specification does not suggest any rules for representing geographical
      * names but implementations may consider 
      * <a href="http://shiva.pub.getty.edu/tgn_browser/">Getty Thesaurus of Geographic Names</a>, or
      * <a href="http://lcweb.loc.gov/marc/countries/">MARC lists of countries</a> and
      * <a href="http://lcweb.loc.gov/marc/geoareas/">MARC list of geographical areas</a>.
+     * </p>
      */
     public String spatialLocation;
 

@@ -32,16 +32,20 @@ import org.biojava.bio.seq.*;
 /**
  * Defines what a sequence format does.
  *
- * <p>Sequence formats are responsible for both reading and writing a
+ * <p>
+ * Sequence formats are responsible for both reading and writing a
  * sequence in a format, presumably in such a way as the written
- * record can be read back in by the same formatter.</p>
+ * record can be read back in by the same formatter.
+ * </p>
  *
- * <p>Where possible, the methods are parameterised so that they
+ * <p>
+ * Where possible, the methods are parameterised so that they
  * don't need any knowledge of the specific implementation of Sequence
  * they are reading or writing. E.g. it should be possible to
  * parameterise readSequence to read from a Genbank stream and
  * construct Ensembl CORBA objects, just by specifying an Ensembl
- * SequenceFactory.</p>
+ * SequenceFactory.
+ * </p>
  *
  * @author Matthew Pocock
  * @author Thomas Down
@@ -51,27 +55,33 @@ import org.biojava.bio.seq.*;
 public interface SequenceFormat
 {
     /**
-     * <p>This is where the various <code>SequenceFormat</code>
+     * <p>
+     * This is where the various <code>SequenceFormat</code>
      * implementations should register the names of the formats they
      * are able to write. The Map key should be the implementation's
      * classname and the values a Set of Strings describing the
-     * formats.</p>
+     * formats.
+     * </p>
      *
-     * <p>E.g. org.biojava.bio.seq.io.EmblLikeFormat</p>
+     * <p>
+     * E.g. org.biojava.bio.seq.io.EmblLikeFormat
+     * </p>
      *
      * <ul>
      * <li>Key: org.biojava.bio.seq.io.EmblLikeFormat</li>
      * <li>Values: "Embl", "Swissprot"</li>
      * </ul>
      *
-     * <p>When writeSequence() is called with the format argument
+     * <p>
+     * When writeSequence() is called with the format argument
      * "EMBL" (the parameter is not case-sensitive) the
      * <code>SeqFileFormerFactory</code> checks the values registered
      * here against the argument. As the format "Embl" is registered,
      * it attempts to load a class named "EmblFileFormer". If
      * successful, the factory method returns an instance of this
      * class and writeSequence() uses this to write formatted strings
-     * to the PrintStream.</p>
+     * to the PrintStream.
+     * </p>
      */
     public static final Map FORMATS = new HashMap();
 

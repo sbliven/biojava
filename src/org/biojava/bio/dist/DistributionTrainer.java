@@ -26,17 +26,27 @@ import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
 
 /**
+ * <p>
  * An object that can be used to train a distribution up.
- * <P>
+ * </p>
+ *
+ * <p>
  * This lets the distribution implementation handle counts or distributions
  * in the best way possible.
+ * </p>
+ *
+ * @author Matthew Pocock
  */
 public interface DistributionTrainer {
   /**
+   * <p>
    * Registers that sym was counted in this state.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This method may be called multiple times with the same symbol. In this
    * case, the times should be summed.
+   * </p>
    *
    * @param dtc the DistributionTrainerContext within which the count was added
    * @param sym the Symbol seen
@@ -46,11 +56,15 @@ public interface DistributionTrainer {
   throws IllegalSymbolException;
   
   /**
+   * <p>
    * Get the current count for this state.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This method may be called multiple times with the same symbol. Each time
    * it should return the agregate of the counts added with addCount since the
    * last invocation of clearCounts.
+   * </p>
    *
    * @param dtc the DistributionTrainerContext within which the count was added
    * @param sym the Symbol seen
@@ -60,12 +74,18 @@ public interface DistributionTrainer {
   throws IllegalSymbolException;
   
   /**
+   * <p>
    * Trains the Distribution, given a null model.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This will use the information collected with multiple addCount calls, and
    * the null model to generate the new weights.
-   * <P>
+   * </p>
+   *
+   * <p>
    * This method should not modify the underlying counts.
+   * </p>
    *
    * @param weight  how many lots of the null model to add
    * @throws ChangeVetoException if the distribution could not have its weights

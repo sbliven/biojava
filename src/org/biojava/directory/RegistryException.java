@@ -4,8 +4,8 @@ package org.biojava.directory;
 /**
  * Class which gets thrown when the registry
  * cannot find an implementation of the sequenceDB
- *@author Brian Gilman
- *@version $Revision$
+ * @author Brian Gilman
+ * @version $Revision$
  */
 
 

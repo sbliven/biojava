@@ -48,10 +48,16 @@ public interface ChangeListener extends EventListener {
   final static ChangeListener LOG_TO_OUT = new LoggingListener(System.out);
    
   /**
-   * Called before a change takes place. 
-   * <P>
+   * <p>
+   * Called before a change takes place.
+   * </p>
+   *
+   * <p>
    * This is your chance to stop the change by throwing a ChangeVetoException.
-   * This method does not indicate that the change will definitely take place.
+   * This method does not indicate that the change will definitely take place,
+   * so it is not recomended that you take any positive action within this
+   * handler.
+   * </p>
    *
    * @param  cev                      
    * An event encapsulating the change which is about 
@@ -67,7 +73,14 @@ public interface ChangeListener extends EventListener {
 
 
   /**
-   *  Called when a change has just taken place.
+   * <p>
+   * Called when a change has just taken place.
+   * </p>
+   *
+   * <p>
+   * This method is the place to perform any behavior in response to the
+   * change event.
+   * </p>
    *
    * @param  cev  
    * An event encapsulating the change which has 
@@ -111,15 +124,32 @@ public interface ChangeListener extends EventListener {
     }
   }
   
+  /**
+   * A listener that writes information about the event stream to a PrintStream.
+   * 
+   * @author Matthew Pocock
+   * @since 1.1
+   */
   public class LoggingListener implements ChangeListener {
     private PrintStream out;
     private String prefix;
     
+    /**
+     * Create a LoggingListener that will log all events to 'out'.
+     *
+     * @param out the PrintStream to log events to
+     */
     public LoggingListener(PrintStream out) {
       this.out = out;
       this.prefix = null;
     }
     
+    /**
+     * Create a LoggingListener that will log all events to 'out' with a prefix.
+     *
+     * @param out the PrintStream to log events to
+     * @param prefix the prefix to attach to each line of the log
+     */
     public LoggingListener(PrintStream out, String prefix) {
       this.out = out;
       this.prefix = prefix;

@@ -27,7 +27,7 @@ import org.biojava.bio.*;
 
 /**
  * An iterator over a bag of sequences.
- * <P>
+ * <p>
  * java.util.Iterator was not appropriate here, as we need specific exceptions
  * to be thrown, and as much type-safety as possible. However, we have made it
  * as compliant with Iterator as we could so that there is a minimal learning

@@ -81,7 +81,7 @@ public class PhredFormat implements SequenceFormat, Serializable {
 
     /**
      * Set the line width.
-     * <P>
+     * <p>
      * When writing, the lines of sequence will never be longer than the line
      * width.
      *

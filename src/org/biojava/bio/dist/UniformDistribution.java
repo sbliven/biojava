@@ -48,7 +48,7 @@ implements Serializable {
   }
    /**
   *Assign a background distribution
-  *@param nullModel the background distribution to assign
+  * @param nullModel the background distribution to assign
   */
   protected void setNullModelImpl(Distribution nullModel)
   throws IllegalAlphabetException {

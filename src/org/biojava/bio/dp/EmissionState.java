@@ -28,23 +28,31 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 
 /**
+ * <p>
  * A state in a markov process that has an emission spectrum.
- * <P>
+ * </p>
+ *
+ * <p>
  * These states have an associated Distribution. Within an HMM, these are the
  * states that actualy make your observed sequence. They also must supply
  * training behaviour to set the emission spectrum up.
+ * </p>
  *
  * @author Matthew Pocock
  */
 public interface EmissionState extends State, Trainable, Changeable {
   /**
+   * <p>
    * This signals that the distribution associate with an EmissionState has
    * been altered.
-   * <P>
+   * </p>
+   *
+   * <p>
    * If the distribution has changed its weights, then the event'e
    * getChainedEvent method will return the event fired by the distribution. If
    * one distribution has been replaced by another, then the new and old
    * Distributions will be in current and previous, respectively.
+   * </p>
    */
   public static final ChangeType DISTRIBUTION = new ChangeType(
     "The associated ditribution has changed",
@@ -53,10 +61,14 @@ public interface EmissionState extends State, Trainable, Changeable {
   );
   
   /**
+   * <p>
    * This signals that the advance array has been altered.
-   * <P>
+   * </p>
+   *
+   * <p>
    * current and previous should hold the current and previous advances,
    * respectively.
+   * </p>
    */
   public static final ChangeType ADVANCE = new ChangeType(
     "The associated advance array has changed",
@@ -88,11 +100,15 @@ public interface EmissionState extends State, Trainable, Changeable {
   public void setAdvance(int[] advance) throws ChangeVetoException;
   
   /**
+   * <p>
    * Get the Distribution associated with this state.
-   * <P>
+   * </p>
+   *
+   * <p>
    * If the state is to be added to an HMM, then the state's emission spectrum
    * must be compatible with the HMM - that is, their emission alphabets must
    * match.
+   * </p>
    *
    * @return the current Distribution object used by this state
    */

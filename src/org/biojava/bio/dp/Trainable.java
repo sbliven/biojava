@@ -10,7 +10,7 @@ import org.biojava.bio.BioException;
 public interface Trainable {
   /**
    * Perform any registration that is necessary with mt.
-   * <P>
+   * <p>
    * This may include registering handlers for transition or emission counts,
    * or registering other Trainable objects with the ModelTrainer.
    *

@@ -58,14 +58,17 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 
 /**
- * <p><code>AbstractBeadRenderer</code> is an abstract base
+ * <p>
+ * <code>AbstractBeadRenderer</code> is a an abstract base
  * class for the creation of <code>FeatureRenderer</code>s which use a
  * 'string of beads' metaphor for displaying features. Each subclass
  * of <code>AbstractBeadRenderer</code> should override the
  * abstract method <code>renderBead()</code> and provide the drawing
- * routine for its particular bead type.</p>
+ * routine for its particular bead type.
+ * </p>
  *
- * <p>A concrete <code>BeadRenderer</code> may render a series
+ * <p>
+ * A concrete <code>BeadRenderer</code> may render a series
  * of features in more than one style by delegating to other
  * <code>BeadRenderer</code>s for the additional style(s). This
  * is achieved using the <code>setDelegateRenderer()</code> method
@@ -533,19 +536,23 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 				       final SequenceRenderContext context);
 
     /**
-     * <p><code>Cache</code> to hold the direct mapping of
+     * <p>
+     * <code>Cache</code> to hold the direct mapping of
      * <code>Feature</code>s to their renderers. This is used to
      * bypass recursion through the delegate renderers once the
      * relationship has been established by an initial recursive
-     * search.</p>
+     * search.
+     * </p>
      *
-     * <p>The <code>Feature</code>s register themselves with a
+     * <p>
+     * The <code>Feature</code>s register themselves with a
      * <code>ChangeListener</code> in the cache. When a feature
      * changes its rendered representation may need to be updated, so
      * the listener removes the feature from the cache. Currently
      * features are immutable, apart from their Annotation, so the
      * cache only listens for changes there. Features forward
-     * ChangeEvents from their Annotation.</p>
+     * ChangeEvents from their Annotation.
+     * </p>
      *
      * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
      * @since 1.2

@@ -28,7 +28,7 @@ import org.biojava.utils.*;
 
 /**
  * Adds the concept of 'strand' to features.
- * <P>
+ * <p>
  * Strandedness only applies to some types of sequence, such as DNA. Any
  * implementation should blow chunks to avoid being added to a sequence for
  * which strand is a foreign concept.
@@ -38,7 +38,7 @@ import org.biojava.utils.*;
 public interface StrandedFeature extends Feature {
   /**
    * Retrieve the strand that this feature lies upon.
-   * <P>
+   * <p>
    * This will be one of StrandedFeature.POSITIVE or NEGATIVE.
    *
    * @return one of the Strand constants
@@ -47,13 +47,13 @@ public interface StrandedFeature extends Feature {
   
   /**
    * Return a list of symbols that are contained in this feature.
-   * <P>
+   * <p>
    * The symbols may not be contiguous in the original sequence, but they
    * will be concatenated together in the resulting SymbolList.
-   * <P>
+   * <p>
    * The order of the Symbols within the resulting symbol list will be 
    * according to the concept of ordering within the location object.
-   * <P>
+   * <p>
    * If the feature is on the negative strand then the SymbolList will be
    * reverse-complemented as appropriate.
    *
@@ -90,7 +90,7 @@ public interface StrandedFeature extends Feature {
   
   /**
    * Class to represent the 'strandedness' of a feature.
-   * <P>
+   * <p>
    * Strandedness may be re-used in other situations, but basically what it means
    * is whether the feature has directionality, and if it does, does it travel
    * from its location min to max, or max to min.

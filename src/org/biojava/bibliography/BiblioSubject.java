@@ -29,9 +29,11 @@ package org.biojava.bibliography;
 import java.util.*;
 
 /**
+ * <p>
  * It represents the topic of the content of the cited resource.
  * It can be expressed in one or more ways.
- *<P>
+ * </p>
+ *
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
  * @version $Id$
  */
@@ -58,7 +60,7 @@ public class BiblioSubject {
 
     /**
      * The source of {@link #subjectHeadings subject headings}.
-     * Fo example:
+     * For example:
      * <dl>
      *   <dt> <tt>SEARS</tt>
      *   <dd> for <em>Sears List of Subject Headings</em>
@@ -71,12 +73,16 @@ public class BiblioSubject {
     public String subjectHeadingsSource;
 
     /**
+     * <p>
      * Classification code (call number) is usually either Dewey decimal or
      * Congress classification. But this specification does not prescribe it.
-     *<P>
+     * </p>
+     *
+     * <p>
      * Note that the classification codes are unique (unlike some subject headings).
      * Therefore, they can be even expressed as identifiers using the same notation
      * as used for the {@link BibRef#identifier citation identifiers}.
+     * </p>
      */
     public Hashtable codes = new Hashtable();
 

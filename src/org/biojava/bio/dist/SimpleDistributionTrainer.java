@@ -31,7 +31,7 @@ import org.biojava.bio.symbol.*;
 
 /**
  * A simple implemenation of a distribution trainer.
- * <P>
+ * <p>
  * This requires the distribuiton being trained to have a working setWeight
  * method that doesn't throw an UnsupportedOperationExcepiton.
  *

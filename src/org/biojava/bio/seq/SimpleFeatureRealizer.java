@@ -66,9 +66,11 @@ public class SimpleFeatureRealizer implements FeatureRealizer, Serializable {
      * class MUST have a public constructor of the form
      * (Sequence, FeatureHolder, Feature.Template).
      *
-     * <p>A newly added implementation takes precendence over
+     * <p>
+     * A newly added implementation takes precendence over
      * any existing implementations if a template can be realized
-     * by more than one implementation.</p>
+     * by more than one implementation.
+     * </p>
      * 
      * @param template The class of templates to implement.
      * @param impl A class of Feature which can be used to implement these templates.

@@ -26,7 +26,7 @@ import org.biojava.bio.symbol.*;
 
 /**
  * The interface for objects that will manufacture sequences.
- * <P>
+ * <p>
  * The factory layer is in here as sequences are potentialy heavy-weight, so we
  * want to decouple their possibly complicated creation from the code that wants
  * to make them.

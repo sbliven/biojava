@@ -47,7 +47,7 @@ public class SequenceViewerEvent extends EventObject {
    * Get the list of SequenceRenderer instances that were passed through to
    * produce this event
    *
-   * @returns a List of SequenceRenderer instances
+   * @return a List of SequenceRenderer instances
    */
   public List getPath() {
     return path;

@@ -27,7 +27,7 @@ import org.biojava.bio.*;
 
 /**
  * A single symbol.
- * <P>
+ * <p>
  * min and max equal the location of the single symbol.
  *
  * @author Matthew Pocock

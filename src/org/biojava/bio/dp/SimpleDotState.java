@@ -29,7 +29,7 @@ import org.biojava.bio.symbol.*;
 
 /**
  * A Dot state that you can make and use.
- * <P>
+ * <p>
  * Dot states emit no sequence. They are there purely to make the wireing
  * of the model look neater, and to cut down the number of combinatorial
  * transitions that can so easily swamp models.

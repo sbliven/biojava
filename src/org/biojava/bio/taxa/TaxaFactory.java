@@ -67,11 +67,11 @@ public interface TaxaFactory {
   /**
    * Add a taxa as a child to a parent.
    *
-   * <P>
+   * <p>
    * The TaxaFactory may chose to add the child directly, or make a new
    * object which is .equals() compatable with child. The actual Taxa instance
    * inserted into the child set is returned by the add method.
-   * </P>
+   * </p>
    *
    * @param parent the parent Taxa to add the child to
    * @param child  the Taxa to add as a child
@@ -87,11 +87,11 @@ public interface TaxaFactory {
   /**
    * Remove a taxa as a child to this one.
    *
-   * <P>
+   * <p>
    * This Taxa should attempt to remove a child that is .equals() compatable
    * with child. If it is sucessful, it should return the Taxa instance that
    * was removed. If not, it should return null.
-   * </P>
+   * </p>
    *
    * @param parent the parent Taxa to remove the child from
    * @param child  the Taxa to remove as a child

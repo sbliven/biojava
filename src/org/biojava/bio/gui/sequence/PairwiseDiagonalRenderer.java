@@ -51,24 +51,29 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 
 /**
- * <p><code>PairwiseDiagonalRenderer</code> renders a region of
+ * <p>
+ * <code>PairwiseDiagonalRenderer</code> renders a region of
  * similarity between two sequences as a straight line. The effect
  * produced is similar to dotplot. This implementation requires that
  * these regions be represented by
  * <code>SimilarityPairFeature</code>s.<p>
  *
- * <p>Drawing outside the visible area using a range of valid
+ * <p>
+ * Drawing outside the visible area using a range of valid
  * <code>double</code>s may cause Java to hang (Sun JDK 1.3.1 on
  * Linux, Compaq JDK 1.3.1 on Tru64, but not Sun JDK 1.4.0-beta2-b77
  * on Linux). I got round this by manual clipping of the lines to the
  * clip area. The code uses an implementation of the Cohen-Sutherland
  * line-clipping algorithm which clips lines to within a
- * rectangle.</p>
+ * rectangle.
+ * </p>
  *
- * <p>The clipping code is taken from Computer Graphics for Java
+ * <p>
+ * The clipping code is taken from Computer Graphics for Java
  * Programmers by Leen Ammeraal (1998, ISBN 0-471-98142-7) and
  * cosmetically altered to support Java2D objects. Any bugs introduced
- * are my responsibility.</p>
+ * are my responsibility.
+ * </p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2

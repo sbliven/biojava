@@ -41,7 +41,8 @@ import org.biojava.utils.*;
  * <li>Throw an IgnoreRecordException.  This line of the GFF
  * file will be ignored, but parsing will not be aborted</li>
  * <li>Return a value for the field.
- * </ul></p>
+ * </ul>
+ * </p>
  *
  * @author Thomas Down
  * @author Matthew Pocock
@@ -52,7 +53,7 @@ public interface GFFErrorHandler {
      * The `start' field of the GFF entry was not a valid value.
      *
      * @param token The start token found.
-     * @returns A parsed value, if this is possible
+     * @return A parsed value, if this is possible
      * @throws ParserException If parsing should be aborted
      * @throws IgnoreRecordException If this record should be silently skipped.
      */
@@ -64,7 +65,7 @@ public interface GFFErrorHandler {
      * The `end' field of the GFF entry was not a valid value.
      *
      * @param token The end token found.
-     * @returns A parsed value, if this is possible
+     * @return A parsed value, if this is possible
      * @throws ParserException If parsing should be aborted
      * @throws IgnoreRecordException If this record should be silently skipped.
      */
@@ -76,7 +77,7 @@ public interface GFFErrorHandler {
      * The `score' field of the GFF entry was not a valid value.
      *
      * @param token The score token found.
-     * @returns A parsed value, if this is possible
+     * @return A parsed value, if this is possible
      * @throws ParserException If parsing should be aborted
      * @throws IgnoreRecordException If this record should be silently skipped.
      */
@@ -88,7 +89,7 @@ public interface GFFErrorHandler {
      * The `frame' field of the GFF entry was not a valid value.
      *
      * @param token The frame token found.
-     * @returns A parsed value, if this is possible
+     * @return A parsed value, if this is possible
      * @throws ParserException If parsing should be aborted
      * @throws IgnoreRecordException If this record should be silently skipped.
      */
@@ -100,7 +101,7 @@ public interface GFFErrorHandler {
      * The `strand' field of the GFF entry was not a valid value.
      *
      * @param token The strand token found.
-     * @returns A parsed value, if this is possible
+     * @return A parsed value, if this is possible
      * @throws ParserException If parsing should be aborted
      * @throws IgnoreRecordException If this record should be silently skipped.
      */

@@ -56,30 +56,40 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 
 /**
- * <p><code>TranslatedSequencePanel</code> is a panel that displays a
+ * <p>
+ * <code>TranslatedSequencePanel</code> is a panel that displays a
  * Sequence. Its features are that it will always draw at low pixel
  * coordinates when using Java2D to render very long sequences and it
- * is quite fast.</p>
+ * is quite fast.
+ * </p>
  *
- * <p>A <code>TranslatedSequencePanel</code> can either display the
+ * <p>
+ * A <code>TranslatedSequencePanel</code> can either display the
  * sequence from left-to-right (HORIZONTAL) or from top-to-bottom
  * (VERTICAL). It has an associated scale which is the number of
  * pixels per symbol and a translation which is the number of
  * <code>Symbol</code>s to skip before rendering starts. In order to
  * produce a scrolling effect, the <code>setSymbolTranslation</code>
  * method may be hooked up to an <code>Adjustable</code> such as
- * <code>JScrollBar</code> or to an event listener.</p>
+ * <code>JScrollBar</code> or to an event listener.
+ * </p>
  *
- * <p>The exact number of <code>Symbol</code>s rendered depends on the
+ * <p>
+ * The exact number of <code>Symbol</code>s rendered depends on the
  * width of the panel and the scale. Resizing the panel will cause the
- * number of <code>Symbol</code>s rendered to change accordingly.</p>
+ * number of <code>Symbol</code>s rendered to change accordingly.
+ * </p>
  *
- * <p>The panel will fill its background to the <code>Color</code>
+ * <p>
+ * The panel will fill its background to the <code>Color</code>
  * defined by the <code>setBackground()</code> method provided that
- * it has been defined as opaque using <code>setOpaque()</code>.</p>
+ * it has been defined as opaque using <code>setOpaque()</code>.
+ * </p>
  *
- * <p>The change event handling code is based on the original panel
- * and other BioJava components by Matthew and Thomas</p>.
+ * <p>
+ * The change event handling code is based on the original panel
+ * and other BioJava components by Matthew and Thomas.
+ * </p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @author Matthew Pocock

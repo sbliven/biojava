@@ -26,8 +26,10 @@ import java.io.*;
 import org.biojava.bio.*;
 
 /**
+ * <p>
  * A complex location. It is made up from multiple sub-locations and is essentially
  * the point-wise union of the child locations.
+ * </p>
  * 
  * <p>
  * <strong>NOTE:</strong> It is no longer possible to directly construct
@@ -63,14 +65,20 @@ implements Location, Serializable {
     locations = new ArrayList();
   }
   
-  /** 
+  /**
+   * <p>
    * Generate a new CompoundLocation from a list of locations.
-   * <P>
+   * </p>
+   *
+   * <p>
    * You will nearly always want to generate these beasts using the
    * Location.union method.
-   * <P>
+   * </p>
+   *
+   * <p>
    * The locations list should contain contiguous locations, sorted by getMin()
    * and guaranteed to be non-overlapping.
+   * </p>
    *
    * @param locations a list of Location instances to combine into a single
    *        compound location

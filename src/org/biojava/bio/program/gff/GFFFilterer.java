@@ -28,10 +28,10 @@ import org.biojava.bio.*;
  * An object that filters a stream of GFF, forwarding some
  * <span class="type">GFFRecord</span>s to a
  * listening <span class="type">GFFDocumentHandler</span>, and dropping others.
- * <P>
+ * <p>
  * The choice to forward or drop is made by a
  * <span class="type">GFFRecordFilter</span>.
- * <P>
+ * <p>
  * Unless otherwise stated, all methods forward to the listening handler without
  * altering the arguments in any way.
  *

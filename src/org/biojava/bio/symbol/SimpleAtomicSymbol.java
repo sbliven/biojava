@@ -30,7 +30,7 @@ import org.biojava.bio.*;
 
 /**
  * A no-frills implementation of AtomicSymbol.
- * <P>
+ * <p>
  * In general, you should use the methods in AlphabetManager to instantiate
  * Symbol objects. However, this class is public with a protected constructor
  * to help out when you need to implement and extend AtomicSymbol.

@@ -25,10 +25,14 @@ package org.biojava.stats.svm;
 import java.util.*;
 
 /**
+ * <p>
  * Abstract implementation of SVMClassifierModel.
- * <P>
+ * </p>
+ *
+ * <p>
  * To implement a read-only implementation, you need only implement
  * getThreshold and getAlpha.
+ * </p>
  *
  * @author Matthew Pocock
  */
