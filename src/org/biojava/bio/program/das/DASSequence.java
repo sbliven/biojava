@@ -502,8 +502,12 @@ public class DASSequence
 		if (length() > SYMBOL_TILE_THRESHOLD) {
 		    AssembledSymbolList asl = new AssembledSymbolList();
 		    int tileStart = 1;
-		    while (tileStart < length()) {
+		    while (tileStart <= length()) {
 			int tileEnd = Math.min(tileStart + SYMBOL_TILE_SIZE - 1, length());
+			if ((length() - tileEnd) < 1000) {
+			    // snap the tiny bit onto the end of the last tile
+			    tileEnd = length();
+			}
 			Location l = new RangeLocation(tileStart, tileEnd);
 			SymbolList symbols = new DASRawSymbolList(this,
 								  new Segment(getName(), tileStart, tileEnd));
