@@ -43,8 +43,9 @@ public class AceTreeView {
 	String objName = args[5];
 
 	Ace.registerDriver(new org.acedb.socket.SocketDriver());
-	URL _dbURL = new URL("acedb://" + host + ":" + port);
-  AceURL dbURL = new AceURL(_dbURL, user, passwd, null);
+	// URL _dbURL = new URL("acedb://" + host + ":" + port);
+	// AceURL dbURL = new AceURL(_dbURL, user, passwd, null);
+	AceURL dbURL = new AceURL("acedb://" + user + ':' + passwd + '@' + host + ':' + port);
 	AceURL seqURL = dbURL.relativeURL(clazzName + "/" + objName);
 	AceObject seqObj = (AceObject) Ace.fetch(seqURL);
 	AceTreeModel tm = new AceTreeModel(seqObj);
