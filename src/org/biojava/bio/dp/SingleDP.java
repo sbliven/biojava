@@ -330,7 +330,7 @@ class SingleDP extends DP {
           if(l < getDotStatesIndex()) {
             break;
           }
-          System.out.println("Processing dot-state transition");
+          //System.out.println("Processing dot-state transition");
           if(currentCol[l] != Double.NEGATIVE_INFINITY) {
             score += Math.exp(trs[lc] + currentCol[l] - constant);
           }
@@ -456,7 +456,7 @@ class SingleDP extends DP {
           }
           currentCol[l] = transProb;
           if(prev != -1) {
-            System.out.println(states[prev].getName() + "->" + states[l]);
+            //System.out.println(states[prev].getName() + "->" + states[l].getName());
             newPointers[l] = new BackPointer(
               states[l],
               newPointers[prev],
@@ -488,7 +488,7 @@ class SingleDP extends DP {
           }
           currentCol[l] = transProb;
           if(prev != -1) {
-            System.out.println(states[prev].getName() + "->" + states[l]);
+            //System.out.println(states[prev].getName() + "->" + states[l].getName());
             newPointers[l] = new BackPointer(
               states[l],
               newPointers[prev],

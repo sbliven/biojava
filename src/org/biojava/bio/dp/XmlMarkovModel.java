@@ -94,8 +94,7 @@ public class XmlMarkovModel {
     for(int i = 0; i < states.getLength(); i++) {
       Element stateE = (Element) states.item(i);
       String name = stateE.getAttribute("name");
-      AbstractState state = StateFactory.createState(seqAlpha);
-      state.setName(name);
+      AbstractState state = StateFactory.createState(seqAlpha, name);
       nameToState.put(name, state);
       NodeList weights = stateE.getElementsByTagName("weight");
       for(int j = 0; j < weights.getLength(); j++) {

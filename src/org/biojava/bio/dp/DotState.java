@@ -31,12 +31,5 @@ import org.biojava.bio.seq.*;
  * of the model look neater, and to cut down the number of combinatorial
  * transitions that can so easily swamp models.
  */
-public class DotState extends SimpleResidue implements State {
-  public DotState(char symbol, String name, Annotation annotation) {
-    super(symbol, name, annotation);
-  }
-  
-  public DotState(String name) {
-    super(name.charAt(0), name, Annotation.EMPTY_ANNOTATION);
-  }
+public interface DotState extends State {
 }

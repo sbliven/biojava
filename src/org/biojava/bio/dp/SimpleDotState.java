@@ -22,28 +22,21 @@
 
 package org.biojava.bio.dp;
 
-import java.util.*;
 import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.tools.*;
 
-public class StateFactory {
-  public static AbstractState createState(
-    Alphabet alpha,
-    String name
-  ) {
-    AbstractState state;
-    
-    if(alpha == DNATools.getAlphabet()) {
-      state = new DNAState();
-    } else if(alpha == DNATools.getAmbiguity()) {
-      state = new AmbiguityState();
-    } else {
-      state = new SimpleState(alpha);
-    }
-    state.setName(name);
-    
-    return state;
+/**
+ * A Dot state that you can make and use.
+ * <P>
+ * Dot states emit no sequence. They are there purely to make the wireing
+ * of the model look neater, and to cut down the number of combinatorial
+ * transitions that can so easily swamp models.
+ */
+public class SimpleDotState extends SimpleResidue implements DotState {
+  public SimpleDotState(char symbol, String name, Annotation annotation) {
+    super(symbol, name, annotation);
+  }
+  
+  public SimpleDotState(String name) {
+    super(name.charAt(0), name, Annotation.EMPTY_ANNOTATION);
   }
 }
-
-
