@@ -143,6 +143,8 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
     BufferedReader            oContents;
     String                    oLine;
 
+    this.changeState(STARTUP);
+
     //Use method form superclass
     oContents = this.getContentStream(poSource);
     //This sets contentHandler document for XSLT

@@ -282,61 +282,55 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
         //consensus line
 
         if (iEnd <= poLine.length()) {
-        oParsedSeq = poLine.substring(iOffset,iEnd);
+	    oParsedSeq = poLine.substring(iOffset,iEnd);
         } else {
-        //could fix this by padding with white-space
-        //currently this problem is a known BUG/FEATURE.
-        throw (new SAXException(
-        "Failed to parse what the framework supposes " +
-        " to be a consensus line in an alignment due to " +
-           "the source program not outputing expected white space." +
-        " Tried to access character " + iEnd + " in a String " +
-        "of length " + poLine.length() + ". The String is show " +
-        "below. If it is not a consensus line, the parser " +
-        "has become confused due to the presense of unknown " +
-        "content in the output.\n" + poLine));
-        }
-        //System.out.println("|"+oParsedSeq+"|");
+	    int iLen = iEnd - poLine.length();
+	    char[] oPadding = new char[ iLen ];
+	    Arrays.fill( oPadding,
+			 0,
+			 iLen,
+			 ' ' );
+	    oParsedSeq = poLine.substring( iOffset).concat
+		( new String( oPadding ) );
+	}
     }
     
     //get startIds for query and subject
     if (iState == ON_FIRST_SEGMENT) {
         //here if on first block of an alignment
         if (poLine.startsWith("QUERY:")) {
-        oQueryStartId.append(oStartId);
-        oQueryStopId.append(oStopId);
-        oQuery.append(oParsedSeq);
-        tJustDoneQuery     = true;
-        tJustDoneConsensus = false;
-        tJustDoneHit       = false;
-        return;
+	    oQueryStartId.append(oStartId);
+	    oQueryStopId.append(oStopId);
+	    oQuery.append(oParsedSeq);
+	    tJustDoneQuery     = true;
+	    tJustDoneConsensus = false;
+	    tJustDoneHit       = false;
+	    return;
         }
         if (poLine.startsWith("SBJCT:")) {
-        oHitStartId.append(oStartId);
-        oHitStopId.append(oStopId);
-        oHit.append(oParsedSeq);
+	    oHitStartId.append(oStartId);
+	    oHitStopId.append(oStopId);
+	    oHit.append(oParsedSeq);
 
-        if (!tJustDoneConsensus) {
+	    if (!tJustDoneConsensus) {
 
-            //handle rare case of a totally blank
-            //consensus line -- currently known BUG/FEATURE
+		//handle rare case of a totally blank
+		//consensus line
+		char[] oPadding = new char[ iEnd-iOffset ];
+		Arrays.fill( oPadding,
+			     0,
+			     iEnd-iOffset,
+			     ' ' );
+		oMatchConsensus.append( new String( oPadding) );
+	    }
 
-            //implement this with StringBuffer(char[],int,int)
-            //and a template array of blanks
-            throw (new SAXException(
-            "Failed parsing the consensus line of an alignment." +
-        " Cannot currently deal with consensus lines that" +
-        " are blank."));
+	    tJustDoneQuery     = false;
+	    tJustDoneConsensus = false;
+	    tJustDoneHit       = true;
 
-        }
-
-        tJustDoneQuery     = false;
-        tJustDoneConsensus = false;
-        tJustDoneHit       = true;
-
-        //here finished with block
-        this.changeState(DONE_FIRST_SEGMENT);
-        return;
+	    //here finished with block
+	    this.changeState(DONE_FIRST_SEGMENT);
+	    return;
         }
         oMatchConsensus.append(oParsedSeq);
 
@@ -351,20 +345,38 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
     if (iState == DONE_FIRST_SEGMENT) {
         
         if (poLine.startsWith("QUERY:")) {
-        oQueryStopId.setLength(0);
-        oQueryStopId.append(oStopId);
-        oQuery.append(oParsedSeq);
-        return;
+	    oQueryStopId.setLength(0);
+	    oQueryStopId.append(oStopId);
+	    oQuery.append(oParsedSeq);
+	    tJustDoneQuery     = true;
+	    tJustDoneConsensus = false;
+	    return;
         }
         if (poLine.startsWith("SBJCT:")) {
-        oHitStopId.setLength(0);
-        oHitStopId.append(oStopId);
-        oHit.append(oParsedSeq);
-        //here finished with block
-        return;
+	    oHitStopId.setLength(0);
+	    oHitStopId.append(oStopId);
+	    oHit.append(oParsedSeq);
+	    //here finished with block
+	    if (!tJustDoneConsensus) {
+
+		//handle rare case of a totally blank
+		//consensus line
+		char[] oPadding = new char[ iEnd-iOffset ];
+		Arrays.fill( oPadding,
+			     0,
+			     iEnd-iOffset,
+			     ' ' );
+		oMatchConsensus.append( new String( oPadding) );
+		
+	    }
+	    tJustDoneQuery     = false;
+	    tJustDoneConsensus = false;
+	    return;
         }
         //get here if on a match consensus
         oMatchConsensus.append(oParsedSeq);
+        tJustDoneQuery     = false;
+        tJustDoneConsensus = true;
         return;
     } //end if inAlignment
     }

@@ -277,7 +277,6 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
             //interpret line and send messages accordingly
             this.interpretHSP(oLine);
             oLine = oContents.readLine();
-        
         } // end while
 
         //output final HSP of collection
@@ -324,6 +323,7 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
      * @param poLine     A String representation of the line
      */
     private void interpretHSP(String poLine) throws SAXException {
+
 
     //System.out.println("HSPLine:>".concat(poLine));
     //System.out.println("GlobalState:>".concat(iState));
