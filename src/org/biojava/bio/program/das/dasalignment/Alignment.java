@@ -22,51 +22,53 @@
 
 package org.biojava.bio.program.das.dasalignment;
 
-import org.biojava.bio.program.ssbind.* ;
-import org.biojava.bio.* ;
-import org.biojava.bio.CollectionConstraint.AllValuesIn ;
-import java.util.* ;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.biojava.bio.Annotation;
+import org.biojava.bio.AnnotationType;
+import org.biojava.bio.CardinalityConstraint;
+import org.biojava.bio.CollectionConstraint;
+import org.biojava.bio.PropertyConstraint;
 
 /**
  * Alignment object to contain/manage a DAS alignment.  
  * @see also DAS specification at http://wwwdev.sanger.ac.uk/xml/das/documentation/new_spec.html
-
+ *
  * @author Andreas Prlic
+ * @since 1.4
  */
 
-
 public class Alignment {
- 
-    ArrayList objects ;
+    private List objects;
+    private List scores;
+    private List blocks;
 
-    ArrayList scores  ;
+    private static final AnnotationType objectType;
+    private static final AnnotationType scoreType;
+    private static final AnnotationType blockType;
+    private static final AnnotationType segmentType;
     
-    ArrayList blocks ;
+    static {
+		objectType  = getObjectAnnotationType() ;	
+		scoreType   = getScoreAnnotationType()  ;
+		segmentType = getSegmentAnnotationType();
+		blockType   = getBlockAnnotationType()  ;
+    }
     
-
-    AnnotationType objectType ;
-    AnnotationType scoreType  ;
-    AnnotationType blockType  ;
-    AnnotationType segmentType  ;
+    /**
+     * Construct a new empty Alignment object.
+     */
     
     public Alignment() {
-	objects  = new ArrayList();
-	scores   = new ArrayList() ;
-	blocks   = new ArrayList() ;
-
-	// define the Annotation types used for object score and block:
-	
-	objectType  = getObjectAnnotationType() ;	
-	scoreType   = getScoreAnnotationType()  ;
-	//segmentType is initialized in getBlockAnnotationType
-	blockType   = getBlockAnnotationType()  ;
-
-	
+		objects  = new ArrayList();
+		scores   = new ArrayList() ;
+		blocks   = new ArrayList() ;
     }
 
     /** define the alignment Score Annotation Type */
-    public AnnotationType getScoreAnnotationType() {
-	AnnotationType annType ;
+    public static AnnotationType getScoreAnnotationType() {
+        AnnotationType annType ;
 	
 	    annType  = new AnnotationType.Impl();
 
@@ -80,55 +82,52 @@ public class Alignment {
     }
 
     /** define the alignment Block Annotation Type */
-    public AnnotationType getBlockAnnotationType() {
-	AnnotationType annType ;
+    public static AnnotationType getBlockAnnotationType() {
+		AnnotationType annType ;
+		
+		annType  = new AnnotationType.Impl();
+		annType.setConstraints("blockOrder",
+				       new PropertyConstraint.ByClass(String.class),
+				       CardinalityConstraint.ONE ) ;
+		annType.setConstraints("blockScore",
+				       new PropertyConstraint.ByClass(String.class),
+				       CardinalityConstraint.ANY ) ;
 	
-	segmentType = getSegmentAnnotationType();
-
-	annType  = new AnnotationType.Impl();
-	annType.setConstraints("blockOrder",
-			       new PropertyConstraint.ByClass(String.class),
-			       CardinalityConstraint.ONE ) ;
-	annType.setConstraints("blockScore",
-			       new PropertyConstraint.ByClass(String.class),
-			       CardinalityConstraint.ANY ) ;
-
-	PropertyConstraint prop = new PropertyConstraint.ByAnnotationType(segmentType) ;
-
-	annType.setConstraint("segments",
-			       new CollectionConstraint.AllValuesIn(prop,CardinalityConstraint.ANY)) ;
+		PropertyConstraint prop = new PropertyConstraint.ByAnnotationType(segmentType) ;
 	
-	return annType ;
+		annType.setConstraint("segments",
+				       new CollectionConstraint.AllValuesIn(prop,CardinalityConstraint.ANY)) ;
+		
+		return annType ;
     }
 
       /** define the alignment Segment Annotation Type */
-    public AnnotationType getSegmentAnnotationType() {
-	AnnotationType annType ;
-	
-	annType  = new AnnotationType.Impl();
-	annType.setConstraints("intObjectId",
-			       new PropertyConstraint.ByClass(String.class),
-			       CardinalityConstraint.ONE ) ;
-	annType.setConstraints("start",
-			       new PropertyConstraint.ByClass(String.class),
-			       CardinalityConstraint.ANY ) ;
-	annType.setConstraints("end",
-			       new PropertyConstraint.ByClass(String.class),
-			       CardinalityConstraint.ANY) ;
-	annType.setConstraints("strand",
-			       new PropertyConstraint.ByClass(String.class),
-			       CardinalityConstraint.ANY ) ;
-	annType.setConstraints("cigar",
-			       new PropertyConstraint.ByClass(String.class),
-			       CardinalityConstraint.ANY ) ;
-	
-	return annType ;
+    public static AnnotationType getSegmentAnnotationType() {
+		AnnotationType annType ;
+		
+		annType  = new AnnotationType.Impl();
+		annType.setConstraints("intObjectId",
+				       new PropertyConstraint.ByClass(String.class),
+				       CardinalityConstraint.ONE ) ;
+		annType.setConstraints("start",
+				       new PropertyConstraint.ByClass(String.class),
+				       CardinalityConstraint.ANY ) ;
+		annType.setConstraints("end",
+				       new PropertyConstraint.ByClass(String.class),
+				       CardinalityConstraint.ANY) ;
+		annType.setConstraints("strand",
+				       new PropertyConstraint.ByClass(String.class),
+				       CardinalityConstraint.ANY ) ;
+		annType.setConstraints("cigar",
+				       new PropertyConstraint.ByClass(String.class),
+				       CardinalityConstraint.ANY ) ;
+		
+		return annType ;
     }
 
 
     /** define the alignment object Annotation Type */
-    public AnnotationType getObjectAnnotationType() {
-
+    public static AnnotationType getObjectAnnotationType() {
 	AnnotationType annType;
 	
 	annType  = new AnnotationType.Impl();
@@ -167,28 +166,27 @@ public class Alignment {
     
     
     public void addObject(Annotation object)
-	throws DASException
+		throws DASException
     {
-	// check if object is valid, throws DASException ...
-	//checkObjectHash(object);
-	if(objectType.instanceOf(object)) {
-	    objects.add(object) ;
-	}  else {
-	    throw new 
-		IllegalArgumentException(
-					 "Expecting an annotation conforming to: " +
-					 objectType + " but got: " + object
-					 );
-	}
-
+		// check if object is valid, throws DASException ...
+		//checkObjectHash(object);
+		if(objectType.instanceOf(object)) {
+		    objects.add(object) ;
+		}  else {
+		    throw new 
+			IllegalArgumentException(
+						 "Expecting an annotation conforming to: " +
+						 objectType + " but got: " + object
+						 );
+		}
     }
 
-    public ArrayList getObjects(){
-	return objects ;
+    public List getObjects(){
+        return objects ;
     }
 
     public void addScore(Annotation score)
-	throws DASException
+		throws DASException
     {
 	//checkScoreHash(score) ;
 
@@ -204,12 +202,12 @@ public class Alignment {
 
     }
     
-    public ArrayList getScores(){
-	return scores ;
+    public List getScores(){
+        return scores ;
     }
 
     public void addBlock(Annotation block)
-	throws DASException
+		throws DASException
     {
 	//checkBlockList(segment);
 	//blocks.add(segment);
@@ -227,8 +225,8 @@ public class Alignment {
     }
 
 
-    public ArrayList getBlocks() {
-	return blocks;
+    public List getBlocks() {
+        return blocks;
     }
     
     public String toString() {
