@@ -125,6 +125,9 @@ public class Ace {
         for(int i = sb.length()-1; i >= 0; i--) {
           if(sb.charAt(i) == '%') {
             sb.setCharAt(i, '-');
+          } else if(sb.charAt(i) == '-') {
+            sb.insert(i, '-');
+            i++;
           }
         }
         s = sb.toString();
@@ -137,7 +140,11 @@ public class Ace {
         StringBuffer sb = new StringBuffer(s);
         for(int i = sb.length()-1; i >= 0; i--) {
           if(sb.charAt(i) == '-') {
-            sb.setCharAt(i, '%');
+            if(sb.charAt(i+1) == '-') {
+              sb.delete(i, i+1);
+            } else {
+              sb.setCharAt(i, '%');
+            }
           }
         }
         s = sb.toString();
