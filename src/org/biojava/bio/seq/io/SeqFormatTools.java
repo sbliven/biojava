@@ -370,7 +370,7 @@ public class SeqFormatTools
      *
      * @return a <code>String</code> representation of the location.
      */
-    static String formatFuzzyRange(final FuzzyLocation fl)
+    public static String formatFuzzyRange(final FuzzyLocation fl)
     {
 	StringBuffer fb = new StringBuffer();
 
@@ -425,7 +425,7 @@ public class SeqFormatTools
      *
      * @return a <code>String</code> representation of the location.
      */
-    static String formatFuzzyPoint(final FuzzyPointLocation fpl)
+    public static String formatFuzzyPoint(final FuzzyPointLocation fpl)
     {
 	StringBuffer fb = new StringBuffer();
 
@@ -460,7 +460,7 @@ public class SeqFormatTools
      *
      * @return a <code>String</code> representation of the location.
      */
-    static String formatRange(final RangeLocation rl)
+    public static String formatRange(final RangeLocation rl)
     {
 	StringBuffer fb = new StringBuffer();
 
@@ -480,7 +480,7 @@ public class SeqFormatTools
      *
      * @return a <code>String</code> representation of the location.
      */
-    static String formatPoint(final PointLocation pl)
+    public static String formatPoint(final PointLocation pl)
     {
 	return Integer.toString(pl.getMin());
     }
@@ -506,7 +506,7 @@ public class SeqFormatTools
      * Maps, one for features, one for qualifiers. The file describes
      * which qualifiers are optional or mandatory for a feature type
      * and which qualifiers are written within quotes (or
-     * parantheses).  The DTD used by the XML file is stored in the
+     * parantheses). The DTD used by the XML file is stored in the
      * file's internal subset.
      *
      * @param featureDataFile a <code>String</code> indicating the
