@@ -89,6 +89,8 @@ public class AcePerlParser {
       obj = new StaticModelNode(va, parent);
     } else if (ty.equals("model-reference")) {
       obj = new StaticModelReference(va, parent);
+    } else if (ty.equals("model-include")) {
+      obj = new StaticModelInclude(va, parent);
     } else if (ty.equals("model-type")) {
       obj = new StaticModelType(va, parent);
     } else {
@@ -147,6 +149,9 @@ public class AcePerlParser {
         String str = s.trim();
         if(str.startsWith("?")) {
           ty = "model-reference";
+          str = str.substring(1);
+        } else if(s.startsWith("#")) {
+          ty = "model-include";
           str = str.substring(1);
         } else if(
           s.equals("Text") ||

@@ -150,6 +150,7 @@ class SocketDatabase implements Database {
 	    try {
 		res = _allClasses();
 	    } catch (AceException ex) {
+        ex.printStackTrace();
 		if (! ex.isRecoverable())
 		    throw ex;
 	    }
@@ -178,6 +179,10 @@ class SocketDatabase implements Database {
 		    }
 		}
 		allClassesSet = set;
+  } catch (AceException ae) {
+    if(!ae.isRecoverable())
+      sock = null;
+    throw ae;
 	    } finally {
 		if (sock != null)
 		    putSocket(sock);
@@ -195,6 +200,7 @@ class SocketDatabase implements Database {
 	    try {
 		res = _select(clazz, namePattern);
 	    } catch (AceException ex) {
+        ex.printStackTrace();
 		if (! ex.isRecoverable())
 		    throw ex;
 	    }
@@ -249,6 +255,10 @@ class SocketDatabase implements Database {
         nameList,
 				dbURL.relativeURL(clazz + '?' + namePattern)
       );
+  } catch (AceException ae) {
+    if(!ae.isRecoverable())
+      sock = null;
+    throw ae;
 	} finally {
 	    if (sock != null)
 		putSocket(sock);
@@ -267,6 +277,7 @@ class SocketDatabase implements Database {
 	    try {
 		res = _getObject(clazz, name);
 	    } catch (AceException ex) {
+        ex.printStackTrace();
 		if (! ex.isRecoverable())
 		    throw ex;
 	    }
@@ -312,6 +323,10 @@ class SocketDatabase implements Database {
 
 	    String obj = sock.transact("show -p");
 	    o = parser.parseObject(obj);
+  } catch (AceException ae) {
+    if(!ae.isRecoverable())
+      sock = null;
+    throw ae;
 	} finally {
       if(sock != null)
   	    putSocket(sock);
