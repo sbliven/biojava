@@ -25,6 +25,13 @@ import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.utils.*;
 
+/**
+ * Thrown to indicate that a term or triple can't be added to an ontology
+ * because it is already present.
+ *
+ * @author Thomas Down
+ */
+
 public class AlreadyExistsException extends OntologyException {
     public AlreadyExistsException() {
         super();

@@ -378,7 +378,6 @@ public interface Ontology extends Changeable {
         }
         
         private void addTriple(Triple t) {
-            System.err.println("Adding " + t);
             triples.add(t);
             pushTriple(subjectTriples, t.getSubject(), t);
             pushTriple(objectTriples, t.getObject(), t);
@@ -386,10 +385,8 @@ public interface Ontology extends Changeable {
         }
         
         private void pushTriple(Map m, Term key, Triple t) {
-            System.err.println("Pushing " + t + " for " + key);
             Set s = (Set) m.get(key);
             if (s == null) {
-                System.err.println("New map");
                 s = new HashSet();
                 m.put(key, s);
             }

@@ -24,6 +24,8 @@ public final class OntoTools {
   public static final Term REFLEXIVE;
   public static final Term EQUIVALENCE;
   public static final Term PARTIAL_ORDER;
+  public static final Term PART_OF;
+  public static final Term INVERSE;
   
   static {
     DEFAULT_FACTORY = new OntologyFactory() {
@@ -53,6 +55,8 @@ public final class OntoTools {
       REFLEXIVE = CORE_ONTOLOGY.getTermByName("reflexive");
       EQUIVALENCE = CORE_ONTOLOGY.getTermByName("equivalence");
       PARTIAL_ORDER = CORE_ONTOLOGY.getTermByName("partial-order");
+      PART_OF = CORE_ONTOLOGY.getTermByName("part-of");
+      INVERSE = CORE_ONTOLOGY.getTermByName("inverse");
     } catch (Exception e) {
       throw new BioError(e, "Could not initialize OntoTools");
     }

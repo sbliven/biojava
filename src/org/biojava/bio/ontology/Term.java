@@ -71,18 +71,18 @@ public interface Term extends Annotatable {
      */
     
     public String getDescription();
-    
-    /**
-     * Simple in-memory implementation of an ontology term.
-     *
-     * @for.developer This can be used to implement Ontology.createTerm
-     */
      
     /**
      * Return the ontology in which this term exists.
      */
      
     public Ontology getOntology();
+    
+    /**
+     * Simple in-memory implementation of an ontology term.
+     *
+     * @for.developer This can be used to implement Ontology.createTerm
+     */
     
     public final static class Impl extends AbstractTerm implements Term {
         private final String name;

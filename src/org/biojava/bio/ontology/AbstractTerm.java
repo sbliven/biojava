@@ -26,7 +26,10 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
- * A term in an ontology
+ * Abstract implementation of term
+ *
+ * @for.developers This provides basic change-forwarding functionality from
+ *                 the annotation and ontology properties.
  *
  * @author Thomas Down
  * @since 1.4
