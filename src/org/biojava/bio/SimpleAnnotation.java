@@ -35,12 +35,7 @@ import org.biojava.utils.*;
  * @author Matthew Pocock
  * @author Greg Cox
  */
-public class SimpleAnnotation implements Annotation, Serializable {
-  /**
-   * The object to do the hard work of informing others of changes.
-   */
-  protected transient ChangeSupport changeSupport = null;
-
+public class SimpleAnnotation extends AbstractAnnotation {
   /**
    * The properties map.
    * <p>
@@ -48,185 +43,27 @@ public class SimpleAnnotation implements Annotation, Serializable {
    */
   private Map properties;
 
-  /**
-   * Retrieves properties, potentially creating it if it was null.
-   *
-   * @return the properties Map
-   */
   protected final Map getProperties() {
-    if(!propertiesAllocated())
+    if(!propertiesAllocated()) {
       properties = new HashMap();
+    }
     return properties;
   }
 
-  /**
-   * A convenience method to see if we have allocated the properties map yet.
-   *
-   * @return true if properties is set and false otherwise
-   */
   protected final boolean propertiesAllocated() {
     return properties != null;
   }
 
-  /**
-   * @param key The key whose property to retrieve.
-   * @throws NoSuchElementException if the property 'key' does not exist
-   */
-  public Object getProperty(Object key) throws NoSuchElementException {
-    if(propertiesAllocated()) {
-      Map prop = getProperties();
-      if(prop.containsKey(key)) {
-        return prop.get(key);
-      }
-    }
-    throw new NoSuchElementException("Property " + key + " unknown");
-  }
-
-  public void setProperty(Object key, Object value)
-  throws ChangeVetoException {
-    if(changeSupport == null) {
-      getProperties().put(key, value);
-    } else {
-      Map properties = getProperties();
-      ChangeEvent ce = new ChangeEvent(
-        this,
-        Annotation.PROPERTY,
-        new Object[] { key, value },
-        new Object[] { key, properties.get(key)}
-      );
-      synchronized(changeSupport) {
-        changeSupport.firePreChangeEvent(ce);
-        properties.put(key, value);
-        changeSupport.firePostChangeEvent(ce);
-      }
-    }
-  }
-
-  public boolean containsProperty(Object key) {  
-    if(propertiesAllocated()) {
-      return properties.containsKey(key);
-    } else {
-      return false;
-    }
-  }
- 
-  public Set keys() {
-    if(propertiesAllocated()) {
-      return properties.keySet();
-    } else {
-      return Collections.EMPTY_SET;
-    }
-  }
-
-  public String toString() {
-    StringBuffer sb = new StringBuffer("{");
-    Map prop = getProperties();
-    Iterator i = prop.keySet().iterator();
-    if(i.hasNext()) {
-      Object key = i.next();
-      sb.append(key + "=" + prop.get(key));
-    }
-    while(i.hasNext()) {
-      Object key = i.next();
-      sb.append("," + key + "=" + prop.get(key));
-    }
-    sb.append("}");
-    return sb.toString();
-  }
-
-  public Map asMap() {
-    return new HashMap(getProperties());
-  }
-
-  public void addChangeListener(ChangeListener cl) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl);
-    }
-  }
-
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl, ct);
-    }
-  }
-
-  public void removeChangeListener(ChangeListener cl) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl);
-      }
-    }
-  }
-
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl, ct);
-      }
-    }
-  }
-
   public SimpleAnnotation() {
+    super();
   }
-
-  public SimpleAnnotation(Annotation ann) throws IllegalArgumentException {
-    if(ann == null) {
-      throw new IllegalArgumentException(
-        "Null annotation not allowed. Use Annotation.EMPTY_ANNOTATION instead."
-      );
-    }
-    if(ann == Annotation.EMPTY_ANNOTATION) {
-      return;
-    }
-    Map properties = getProperties();
-    for(Iterator i = ann.keys().iterator(); i.hasNext(); ) {
-      Object key = i.next();
-      try {
-        properties.put(key, ann.getProperty(key));
-      } catch (IllegalArgumentException iae) {
-        throw new BioError(
-          iae,
-          "Property was there and then disappeared: " + key
-        );
-      }
-    }
+  
+  public SimpleAnnotation(Annotation ann)
+  throws IllegalArgumentException {
+    super(ann);
   }
-
-  public SimpleAnnotation(Map annMap) {
-    if(annMap == null) {
-      throw new IllegalArgumentException(
-        "Null annotation Map not allowed. Use an empy map instead."
-      );
-    }
-    if(annMap.isEmpty()) {
-      return;
-    }
-
-    Map properties = getProperties();
-    for(Iterator i = annMap.keySet().iterator(); i.hasNext(); ) {
-      Object key = i.next();
-      properties.put(key, annMap.get(key));
-    }
+  
+  public SimpleAnnotation(Map map) {
+    super(map);
   }
-
-    
-    public int hashCode() {
-	return asMap().hashCode();
-    }
-
-    public boolean equals(Object o) {
-	if (! (o instanceof Annotation)) {
-	    return false;
-	}
-
-	return ((Annotation) o).asMap().equals(asMap());
-    }
 }
