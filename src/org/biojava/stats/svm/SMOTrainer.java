@@ -335,6 +335,7 @@ public class SMOTrainer {
     
     public void setAlpha(int i, double a) {
       alphas[i] = a;
+      System.out.println("Setting " + i + ": " + getItem(i) + " -> " + getAlpha(i) * getTarget(i));
       model.setAlpha(getItem(i), getAlpha(i) * getTarget(i));
     }
     
@@ -404,9 +405,10 @@ public class SMOTrainer {
       Iterator itemI = itemSet.iterator();
       for (int i = 0; itemI.hasNext(); ++i) {
         Object item = itemI.next();
+        System.out.println("Caching " + i + ": " + item + " -> " + item.hashCode());
         items[i] = item;
-        alphas[i] = model.getAlpha(item);
         targets[i] = target.getTarget(item);
+        alphas[i] = model.getAlpha(item) / targets[i];
         E[i] = - targets[i];
       }
     }
