@@ -112,7 +112,7 @@ public class EmblFormat implements SequenceFormat {
 	    // Any tagprocessors which might need some cleaning
 	    // up if a different tag is encountered.
 
-	    if (featureStatus != WITHOUT || !(tag.equals("FT")))
+	    if (featureStatus != WITHOUT && !(tag.equals("FT")))
 		endFeature();
 
 	    if (tag.equals("AC")) {
@@ -139,6 +139,8 @@ public class EmblFormat implements SequenceFormat {
 	}
 
 	private void featureData(String line) throws SeqException {
+	    // System.out.println(line);
+	    // System.out.println(featureStatus);
 	    switch (featureStatus) {
 	    case LOCATION:
 		featureBuf.append(line);
@@ -149,6 +151,7 @@ public class EmblFormat implements SequenceFormat {
 		break;
 	    case WITHIN:
 		if (line.charAt(0) == '/') {
+		    // System.out.println("got '/', quotes = " + countChar(line, '"'));
 		    if (countChar(line, '"') % 2 == 0)
 			processAttribute(line);
 		    else {
@@ -193,7 +196,7 @@ public class EmblFormat implements SequenceFormat {
 	    int level = 0;
 	    while (toke.hasMoreTokens()) {
 		String t = toke.nextToken();
-		System.err.println(t);
+		// System.err.println(t);
 		if (t.equals("join")) {
 		    joining = true;
 		    result = new CompoundLocation();
@@ -210,7 +213,7 @@ public class EmblFormat implements SequenceFormat {
 		} else if (t.equals("<")) {
 		} else if (t.equals(" ")) {
 		} else {
-		    System.err.println("Range! " + ranging);
+		    // System.err.println("Range! " + ranging);
 		    // This ought to be an actual oordinate.
 		    int pos = -1;
 		    try {
@@ -247,6 +250,7 @@ public class EmblFormat implements SequenceFormat {
 	}
 
 	private void processAttribute(String attr) throws SeqException {
+	    // System.err.println(attr);
 	    int eqPos = attr.indexOf('=');
 	    if (eqPos == -1) {
 		featureAttributes.put(attr.substring(1), Boolean.TRUE);
@@ -330,17 +334,17 @@ class BasicFeatureBuilder implements EmblFormat.FeatureBuilder {
 						 Location loc,
 						 int strandHint,
 						 Map attrs) {
-	Feature.Template t = new Feature.Template();
+	StrandedFeature.Template t = new StrandedFeature.Template();
+	t.annotation = new SimpleAnnotation();
+	for (Iterator i = attrs.entrySet().iterator(); i.hasNext(); ) {
+	    Map.Entry e = (Map.Entry) i.next();
+	    t.annotation.setProperty(e.getKey(), e.getValue());
+	}
+
 	t.location = loc;
 	t.type = type;
 	t.source = "EMBL file";
-	t.annotation = Annotation.EMPTY_ANNOTATION;
-	// t.strand = strandHint;
-
-	for (Iterator i = attrs.entrySet().iterator(); i.hasNext(); ) {
-	    Map.Entry e = (Map.Entry) i.next();
-	    System.out.println("" + e.getKey() + " : " + e.getValue());
-	}
+	t.strand = strandHint;
 
 	return t;
     }
