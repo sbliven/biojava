@@ -175,7 +175,7 @@ public class FastaFormat implements SequenceFormat, Serializable {
 
 	int length = seq.length();
 	for(int i = 1; i <= length; i++) {
-	    os.print(seq.symbolAt(i).getToken());
+	    os.write(seq.symbolAt(i).getToken());
 	    if( (i % lineWidth) == 0)
 		os.println();
 	}
