@@ -240,7 +240,7 @@ class DASComponentFeature
 	    }
 
 
-	    projectedFeatures = ProjectedFeatureHolder.projectFeatureHolder(getComponentSequence(), this, translation, flip);
+	    projectedFeatures = new ProjectedFeatureHolder(getComponentSequence(), this, translation, flip);
 	}
 	return projectedFeatures;
     }
