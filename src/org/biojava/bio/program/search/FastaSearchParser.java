@@ -183,7 +183,19 @@ public class FastaSearchParser implements SearchParser
 
 		    if (line.startsWith(" >"))
 		    {
-			handler.setQuerySeq(line.substring(2, line.indexOf(" ")));
+			String trimmed = line.trim();
+
+			// Index of first space
+			int i = trimmed.indexOf(" ");
+
+			// If there was a space in the line
+			// e.g. '>foo : bar baz'
+			if (i > 0)
+			    handler.setQuerySeq(trimmed.substring(1, i));
+			// If there was no space
+			// e.g. '>foo'
+			else
+			    handler.setQuerySeq(trimmed.substring(1));
 		    }
 
 		    // This token marks the line describing the query
