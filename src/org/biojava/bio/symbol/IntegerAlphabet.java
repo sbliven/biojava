@@ -250,6 +250,23 @@ public final class IntegerAlphabet
       this.val = val;
       this.matches = new SingletonAlphabet(this);
     }
+
+    public int hashCode(){
+      int result = 17;
+      result = 37*result+intValue();
+      return result;
+    }
+
+    public boolean equals(Object o){
+      if(o == this) return true;
+      if(o instanceof IntegerSymbol){
+        IntegerSymbol i = (IntegerSymbol) o;
+        if (i.intValue() == this.intValue()) {
+          return true;
+        }
+      }
+      return false;
+    }
   }
 
   /**
@@ -312,12 +329,12 @@ public final class IntegerAlphabet
     public String getName() {
       return name;
     }
-    
+
     protected boolean containsImpl(AtomicSymbol sym) {
       if(!IntegerAlphabet.getInstance().contains(sym)) {
         return false;
       }
-      
+
       IntegerSymbol is = (IntegerSymbol) sym;
       return is.intValue() >= min && is.intValue() <= max;
     }

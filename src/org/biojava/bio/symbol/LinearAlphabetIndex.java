@@ -26,16 +26,16 @@ class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
   public LinearAlphabetIndex(FiniteAlphabet alpha) {
     // lock the alphabet
     alpha.addChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
-    
+
     this.alpha = alpha;
-    
+
     this.symbols = buildIndex(alpha);
-    
+
     alpha.addChangeListener(
       indexBuilder = new IndexRebuilder(),
       Alphabet.SYMBOLS
     );
-    
+
     this.addChangeListener(
       adapter = new ChangeAdapter() {
         public void postChange(ChangeEvent ce) {
@@ -44,42 +44,42 @@ class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
       },
       AlphabetIndex.INDEX
     );
-    
+
     // unlock the alphabet
     alpha.removeChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
   }
-  
+
   public LinearAlphabetIndex(Symbol[] syms)
   throws BioException {
     Set si = new HashSet();
     Symbol[] symbols = new Symbol[syms.length];
     for(int i = 0; i < syms.length; i++) {
       Symbol s = syms[i];
-      symbols[i] = s; 
+      symbols[i] = s;
       si.add(s);
     }
-    
+
     this.alpha = new SimpleAlphabet(si);
     alpha.addChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
     this.symbols = symbols;
   }
-  
+
   private Symbol[] buildIndex(FiniteAlphabet alpha) {
     Symbol[] symbols = new Symbol[alpha.size()];
-    
+
     int i = 0;
     Iterator s = alpha.iterator();
     while(s.hasNext()) {
       symbols[i++] = (Symbol) s.next();
     }
-    
+
     return symbols;
   }
 
   public FiniteAlphabet getAlphabet() {
     return alpha;
   }
-  
+
   public Symbol symbolForIndex(int i) throws IndexOutOfBoundsException {
     try {
       return symbols[i];
@@ -87,7 +87,7 @@ class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
       throw new IndexOutOfBoundsException("Can't find symbol for index " + i);
     }
   }
-  
+
   public int indexForSymbol(Symbol s) throws IllegalSymbolException {
     for(int i = 0; i < symbols.length; i++) {
       if(s == symbols[i]) {
@@ -105,25 +105,25 @@ class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
       throw new IllegalSymbolException("Symbol must be atomic to be indexed.");
     }
   }
-  
+
   protected class IndexRebuilder extends ChangeForwarder {
     public IndexRebuilder() {
       super(
-	    LinearAlphabetIndex.this,
-		LinearAlphabetIndex.this.getChangeSupport(AlphabetIndex.INDEX)
+            LinearAlphabetIndex.this,
+                LinearAlphabetIndex.this.getChangeSupport(AlphabetIndex.INDEX)
       );
     }
-    
+
     public ChangeEvent generateEvent(ChangeEvent ce)
     throws ChangeVetoException {
       if(ce.getType() != Alphabet.SYMBOLS) {
         return null;
       }
 
-      /*      
+      /*
       Object change = ce.getChange();
       Object previous = ce.getPrevious();
-      
+
       if( (change == null) || (previous != null) ) {
         throw new ChangeVetoException(
           ce,
@@ -131,7 +131,7 @@ class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
           "or the alphabet has substantialy changed"
         );
       }
-      
+
       if(! (change instanceof AtomicSymbol) ) {
         throw new ChangeVetoException(
           ce,
@@ -139,7 +139,7 @@ class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
         );
       }
       */
-      
+
       return new ChangeEvent(
         getSource(), AlphabetIndex.INDEX,
         // fixme: buildIndex should be called using the proposed new alphabet
