@@ -37,6 +37,7 @@ import org.biojava.bio.symbol.*;
  * be serialized and sent over to run remotely, rather than each feature being
  * retrieved localy.
  *
+ * @since 1.0
  * @author Matthew Pocock
  * @author Thomas Down
  */
@@ -58,8 +59,12 @@ public interface FeatureFilter extends Serializable {
    * The class that accepts all features.
    * <P>
    * Use the FeatureFilter.all member.
+   *
+   * @author Thomas Down
+   * @author Matthew Pocock
+   * @since 1.0
    */
-  public static class AcceptAllFilter implements FeatureFilter {
+  public final static class AcceptAllFilter implements FeatureFilter {
     public boolean accept(Feature f) { return true; }
   };
 
@@ -67,8 +72,9 @@ public interface FeatureFilter extends Serializable {
    * Construct one of these to filter features by type.
    *
    * @author Matthew Pocock
+   * @since 1.0
    */
-  public static class ByType implements FeatureFilter {
+  final public static class ByType implements FeatureFilter {
     private String type;
     
     public String getType() {
@@ -97,8 +103,9 @@ public interface FeatureFilter extends Serializable {
    * Construct one of these to filter features by source.
    *
    * @author Matthew Pocock
+   * @since 1.0
    */
-  public static class BySource implements FeatureFilter {
+  public final static class BySource implements FeatureFilter {
     private String source;
     
     public String getSource() {
@@ -125,7 +132,7 @@ public interface FeatureFilter extends Serializable {
      * @since 1.1
      */
 
-    public static class ByClass implements FeatureFilter {
+    public final static class ByClass implements FeatureFilter {
 	private Class clazz;
 
 	public ByClass(Class clazz) {
@@ -145,8 +152,9 @@ public interface FeatureFilter extends Serializable {
    *  A filter that returns all features contained within a location.
    *
    * @author Matthew Pocock
+   * @since 1.0
    */
-  public static class ContainedByLocation implements FeatureFilter {
+  public final static class ContainedByLocation implements FeatureFilter {
     private Location loc;
 
     public Location getLocation() {
@@ -174,8 +182,9 @@ public interface FeatureFilter extends Serializable {
    *  A filter that returns all features overlapping a location.
    *
    * @author Matthew Pocock
+   * @since 1.0
    */
-  public static class OverlapsLocation implements FeatureFilter {
+  public final static class OverlapsLocation implements FeatureFilter {
     private Location loc;
     
     public Location getLocation() {
@@ -204,8 +213,9 @@ public interface FeatureFilter extends Serializable {
    *
    * @author Thomas Down
    * @author Matthew Pocock
+   * @since 1.0
    */
-  public static class Not implements FeatureFilter {
+  public final static class Not implements FeatureFilter {
     FeatureFilter child;
 
     public FeatureFilter getChild() {
@@ -226,8 +236,9 @@ public interface FeatureFilter extends Serializable {
    *
    * @author Thomas Down
    * @author Matthew Pocock
+   * @since 1.0
    */
-  public static class And implements FeatureFilter {
+  public final static class And implements FeatureFilter {
     FeatureFilter c1, c2;
 
     public FeatureFilter getChild1() {
@@ -253,8 +264,9 @@ public interface FeatureFilter extends Serializable {
    *
    * @author Thomas Down
    * @author Matthew Pocock
+   * @since 1.0
    */
-  public static class Or implements FeatureFilter {
+  public final static class Or implements FeatureFilter {
     FeatureFilter c1, c2;
 
     public FeatureFilter getChild1() {
@@ -279,8 +291,9 @@ public interface FeatureFilter extends Serializable {
    * Retrieve features that contain a given annotation with a given value.
    *
    * @author Matthew Pocock
+   * @since 1.1
    */
-  public class ByAnnotation implements FeatureFilter {
+  public final static class ByAnnotation implements FeatureFilter {
     private Object key;
     private Object value;
     
@@ -328,8 +341,9 @@ public interface FeatureFilter extends Serializable {
    * Retrieve features that contain a given annotation with any value.
    *
    * @author Matthew Pocock
+   * @since 1.1
    */
-  public class HasAnnotation implements FeatureFilter {
+  public final static class HasAnnotation implements FeatureFilter {
     private Object key;
     
     /**
@@ -362,8 +376,9 @@ public interface FeatureFilter extends Serializable {
    * Accept features with a given strandedness.
    *
    * @author Matthew Pocock
+   * @since 1.1
    */
-  public class StrandFilter implements FeatureFilter {
+  public final static class StrandFilter implements FeatureFilter {
     private StrandedFeature.Strand strand;
     
     /**
