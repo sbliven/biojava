@@ -76,6 +76,10 @@ public interface FeatureFilter extends Serializable {
     public boolean isDisjoint(FeatureFilter filt) {
       return filt instanceof AcceptNoneFilter;
     }
+
+      public String toString() {
+	  return "All";
+      }
   }
 
   /**
@@ -103,6 +107,10 @@ public interface FeatureFilter extends Serializable {
     public boolean isDisjoint(FeatureFilter filt) {
       return true;
     }
+
+       public String toString() {
+	  return "None";
+      }
   }
   
   /**
@@ -151,6 +159,10 @@ public interface FeatureFilter extends Serializable {
         !getType().equals(((ByType) filt).getType())
       );
     }
+
+       public String toString() {
+	  return "ByType(" + type + ")";
+       }
   }
 
   /**
@@ -194,6 +206,10 @@ public interface FeatureFilter extends Serializable {
         !getSource().equals(((BySource) filt).getSource())
       );
     }
+
+      public String toString() {
+	  return "BySource(" + source + ")";
+       }
   }
 
   /**
@@ -243,6 +259,10 @@ public interface FeatureFilter extends Serializable {
       }
       return (feat instanceof AcceptNoneFilter);
     }
+
+      public String toString() {
+	  return "ByClass(" + clazz.getName() + ")";
+       }
   }
 
   /**
@@ -302,6 +322,10 @@ public interface FeatureFilter extends Serializable {
       
       return (filt instanceof AcceptNoneFilter);
     }
+
+      public String toString() {
+	  return "ContainedBy(" + loc.toString() + ")";
+       }
   }
   
   /**
@@ -354,6 +378,10 @@ public interface FeatureFilter extends Serializable {
 	} 
 	return (filt instanceof AcceptNoneFilter);
     }
+
+      public String toString() {
+	  return "Overlaps(" + loc.toString() + ")";
+       }
   }
   
   /**
@@ -395,6 +423,10 @@ public interface FeatureFilter extends Serializable {
     public boolean isDisjoint(FeatureFilter filt) {
       return FilterUtils.areProperSubset(filt, getChild());
     }
+
+      public String toString() {
+	  return "Not(" + child.toString() + ")";
+      }
   }
 
   /**
@@ -443,6 +475,10 @@ public interface FeatureFilter extends Serializable {
         FilterUtils.areDisjoint(getChild2(), filt)
       );
     }
+
+      public String toString() {
+	  return "And(" + c1.toString() + " , " + c2.toString() + ")";
+       }
   }
 
   /**
@@ -478,6 +514,10 @@ public interface FeatureFilter extends Serializable {
         (((And) o).getChild1() == this.getChild1()) &&
         (((And) o).getChild2() == this.getChild2());
     }
+
+      public String toString() {
+	  return "And(" + c1.toString() + " , Not(" + c2.toString() + "))";
+       }
   }
 
   /**
@@ -526,6 +566,10 @@ public interface FeatureFilter extends Serializable {
         FilterUtils.areDisjoint(getChild2(), filt)
       );
     }
+
+      public String toString() {
+	  return "Or(" + c1.toString() + " , " + c2.toString() + ")";
+       }
   }
   
   /**
