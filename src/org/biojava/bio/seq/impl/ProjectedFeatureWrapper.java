@@ -112,9 +112,15 @@ public class ProjectedFeatureWrapper implements Feature {
     protected FeatureHolder getProjectedFeatures() {
 	if (projectedFeatures == null) {
 	    projectedFeatures = new ProjectedFeatureHolder(feature,
-							   this, holder.getTranslation());
+							   this,
+							   holder.getTranslation(),
+							   holder.isOppositeStrand());
 	}
 	return projectedFeatures;
+    }
+
+    protected ProjectedFeatureHolder getProjectingFeatureHolder() {
+	return holder;
     }
 
     public Iterator features() {

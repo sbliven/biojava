@@ -88,7 +88,9 @@ public class PointLocation implements Location, Serializable {
   }
   
   public Location translate(int dist) {
-    return new PointLocation(this.point + dist);
+      if (dist == 0)
+	  return this;
+      return new PointLocation(this.point + dist);
   }
   
   public PointLocation(int point) {

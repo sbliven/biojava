@@ -207,6 +207,10 @@ public class CompoundLocation implements Location, Serializable {
   }
 
   public Location translate(int dist) {
+      if (dist == 0) {
+	  return this;
+      }
+
     List res = new ArrayList();
 
     for(Iterator i = locations.iterator(); i.hasNext(); )

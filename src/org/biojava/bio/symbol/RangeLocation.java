@@ -99,7 +99,10 @@ public class RangeLocation implements Location, Serializable {
   }
 
   public Location translate(int dist) {
-    return new RangeLocation(getMin() + dist, getMax() + dist);
+      if (dist == 0)
+	  return this;
+
+      return new RangeLocation(getMin() + dist, getMax() + dist);
   }
   
   public boolean isContiguous() {

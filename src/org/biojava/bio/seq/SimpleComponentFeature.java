@@ -60,6 +60,10 @@ class SimpleComponentFeature implements ComponentFeature {
 	    throw new BioException("Component and container locations must contain an equal number of symbols.");
 	}
 
+	if (!temp.location.isContiguous() || temp.componentLocation.isContiguous()) {
+	    throw new BioException("Can only include contiguous segments in an assembly [may change in future]");
+	}
+	
 	this.parent = parent;
 	
 	this.location = temp.location;
@@ -72,8 +76,15 @@ class SimpleComponentFeature implements ComponentFeature {
 	this.componentSequence = temp.componentSequence;
 	this.componentLocation = temp.componentLocation;
 
-	this.translation = temp.location.getMin() - temp.componentLocation.getMin();
-	this.projectedFeatures = new ProjectedFeatureHolder(componentSequence, this, translation);
+	if (temp.strand == StrandedFeature.NEGATIVE) {
+	    this.translation = temp.location.getMax() - temp.componentLocation.getMin() + 1;
+	    this.projectedFeatures = new ProjectedFeatureHolder(componentSequence, this, translation, true);
+	} else if (temp.strand == StrandedFeature.POSITIVE) {
+	    this.translation = temp.location.getMin() - temp.componentLocation.getMin();
+	    this.projectedFeatures = new ProjectedFeatureHolder(componentSequence, this, translation, false);
+	} else {
+	    throw new BioException("Strand must be specified when creating a ComponentFeature");
+	}
     }
 
     public Feature.Template makeTemplate() {
@@ -151,10 +162,10 @@ class SimpleComponentFeature implements ComponentFeature {
     }
 
     protected FeatureHolder getProjectedFeatures() {
-	if (projectedFeatures == null) {
-	    projectedFeatures = new ProjectedFeatureHolder(componentSequence,
-							   this, translation);
-	}
+	//  if (projectedFeatures == null) {
+//  	    projectedFeatures = new ProjectedFeatureHolder(componentSequence,
+//  							   this, translation);
+//  	}
 	return projectedFeatures;
     }
 

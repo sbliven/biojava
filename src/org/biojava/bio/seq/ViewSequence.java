@@ -72,7 +72,7 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
 	seqDelegate = seq;
 	addedFeatures = new SimpleFeatureHolder();
 	exposedFeatures = new MergeFeatureHolder();
-	exposedFeatures.addFeatureHolder(new ProjectedFeatureHolder(seqDelegate, this, 0));
+	exposedFeatures.addFeatureHolder(new ProjectedFeatureHolder(seqDelegate, this, 0, false));
 	exposedFeatures.addFeatureHolder(addedFeatures);
 
 	name = seqDelegate.getName();  // Is this sensible?

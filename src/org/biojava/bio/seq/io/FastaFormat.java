@@ -173,13 +173,18 @@ public class FastaFormat implements SequenceFormat, Serializable {
 	os.print(">");
 	os.println(describeSequence(seq));
 
-	int length = seq.length();
-  	for(int i = 1; i <= length; i++) {
-  	    os.write(seq.symbolAt(i).getToken());
-  	    if( (i % lineWidth) == 0)
-  		os.println();
-  	}
-  	if( (length % lineWidth) != 0)
-  	    os.println();
+	//  int length = seq.length();
+//    	for(int i = 1; i <= length; i++) {
+//    	    os.write(seq.symbolAt(i).getToken());
+//    	    if( (i % lineWidth) == 0)
+//    		os.println();
+//    	}
+//    	if( (length % lineWidth) != 0)
+//    	    os.println();
+
+	for(int pos = 1; pos <= seq.length() + 1; pos += lineWidth) {
+	    int end = Math.min(pos + lineWidth - 1, seq.length());
+	    os.println(seq.subStr(pos, end));
+	}
     }
 }

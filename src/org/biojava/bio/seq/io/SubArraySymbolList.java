@@ -74,7 +74,7 @@ class SubArraySymbolList extends AbstractSymbolList {
 
     public Symbol symbolAt(int pos) {
 	if (pos < 1 || pos > length)
-	    throw new IndexOutOfBoundsException();
+	    throw new IndexOutOfBoundsException("Index out of range: " + pos);
 	return array[offset + pos - 1];
     }
 }
