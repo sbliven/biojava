@@ -241,10 +241,12 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
       }
     }
 
+    ((SimpleAlphabet) stateAlphabet()).addSymbol(toAdd);
     FiniteAlphabet fa = new SimpleAlphabet("Transitions from " + toAdd.getName());
     transFrom.put(toAdd, fa);
     transTo.put(toAdd, new SimpleAlphabet("Transitions to " + toAdd.getName()));
     transWeights.put(toAdd, new SimpleDistribution(fa));
+    ((SimpleAlphabet) stateAlphabet()).addSymbol(toAdd);
     
     if(toAdd instanceof EmissionState) {
       Distribution dist = ((EmissionState) toAdd).getDistribution();
