@@ -87,17 +87,24 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
     }
     return parser;
   }
-  
-  public final Symbol getAmbiguity(Set syms)
-  throws IllegalSymbolException {
+
+  public Symbol getAmbiguity(Set syms)
+      throws IllegalSymbolException 
+  {
     return AlphabetManager.createSymbol(
-      '*', "?", Annotation.EMPTY_ANNOTATION,
+      '*', Annotation.EMPTY_ANNOTATION,
       syms, this
     );
   }
   
   public final Symbol getSymbol(List syms)
   throws IllegalSymbolException {
+      if (syms.size() == 1) {
+	  Symbol s = (Symbol) syms.get(0);
+	  validate(s);
+	  return s;
+      }
+
     List alphas = getAlphabets();
     
     if(alphas.size() != syms.size()) {
@@ -123,7 +130,7 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
       return getSymbolImpl(syms);
     } else {
       return AlphabetManager.createSymbol(
-        '*', "?", Annotation.EMPTY_ANNOTATION,
+        '*', Annotation.EMPTY_ANNOTATION,
         syms, this
       );
     }

@@ -27,7 +27,7 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 public class SimpleModelInState
-extends SimpleAtomicSymbol
+extends FundamentalAtomicSymbol
 implements ModelInState {
   private MarkovModel model;
   
@@ -36,7 +36,7 @@ implements ModelInState {
   }
   
   public SimpleModelInState(MarkovModel model, String name) {
-    super(name.charAt(0), name, null);
+    super(name, name.charAt(0), null);
     this.model = model;
   }
 }

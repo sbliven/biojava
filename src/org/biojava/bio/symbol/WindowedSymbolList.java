@@ -35,7 +35,7 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  */
-public class WindowedSymbolList
+class WindowedSymbolList
 extends AbstractSymbolList implements Serializable {
   /**
    * The source sequence that we will transliterate.

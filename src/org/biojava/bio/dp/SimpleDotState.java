@@ -35,12 +35,12 @@ import org.biojava.bio.symbol.*;
  * transitions that can so easily swamp models.
  */
 public class SimpleDotState
-extends SimpleAtomicSymbol implements DotState, Serializable {
+extends FundamentalAtomicSymbol implements DotState, Serializable {
   public SimpleDotState(char symbol, String name, Annotation annotation) {
-    super(symbol, name, annotation);
+    super(name, symbol, annotation);
   }
   
   public SimpleDotState(String name) {
-    super(name.charAt(0), name, Annotation.EMPTY_ANNOTATION);
+    super(name, name.charAt(0), Annotation.EMPTY_ANNOTATION);
   }
 }

@@ -88,7 +88,7 @@ implements Serializable {
         public Symbol parseToken(String token) throws IllegalSymbolException {
           Symbol sym = (Symbol) nameToSymbol.get(token);
           if(sym == null) {
-            sym = new SimpleAtomicSymbol(token.charAt(0), token, null);
+            sym = AlphabetManager.createSymbol(token.charAt(0), token, null);
             try {
               addSymbol(sym);
             } catch (ChangeVetoException cve) {
@@ -118,13 +118,14 @@ implements Serializable {
 	    throw new BioError(ex);
           }
         }
+
         public Symbol parseToken(String token)
         throws IllegalSymbolException {
           char c = token.charAt(0);
           Character ch = new Character(c);
           Symbol s = (Symbol) tokenToSymbol.get(ch);
           if(s == null) {
-            s = new SimpleAtomicSymbol(c, token, null);
+            s = AlphabetManager.createSymbol(c, token, null);
             try {
               addSymbol(s);
             } catch (ChangeVetoException cve) {

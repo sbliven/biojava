@@ -38,10 +38,9 @@ implements BasisSymbol {
   protected List symbols;
   
   protected SimpleBasisSymbol(
-    char token, String name, Annotation annotation,
-    List symbols
+    char token, Annotation annotation, List symbols
   ) throws IllegalSymbolException {
-    this(token, name, annotation);
+    this(token, annotation);
     if(symbols == null) {
       throw new NullPointerException("symbols can't be null");
     }
@@ -54,24 +53,25 @@ implements BasisSymbol {
   }
   
   protected SimpleBasisSymbol(
-    char token, String name, Annotation annotation
+    char token, Annotation annotation
   ) {
-    super(token, name, annotation);
+    super(token, annotation);
   }
   
   public SimpleBasisSymbol(
-    char token, String name, Annotation annotation,
+    char token, Annotation annotation,
     Alphabet matches
   ) {
-    this(token, name, annotation);
+    this(token, annotation);
     this.matches = matches;
+    this.symbols = Collections.nCopies(1, this);
   }
   
   public SimpleBasisSymbol(
-    char token, String name, Annotation annotation,
+    char token, Annotation annotation,
     List symbols, Alphabet matches
   ) throws IllegalSymbolException {
-    this(token, name, annotation, symbols);
+    this(token, annotation, symbols);
     this.symbols = symbols;
     this.matches = matches;
   }

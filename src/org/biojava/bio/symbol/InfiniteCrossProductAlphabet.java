@@ -134,10 +134,7 @@ class InfiniteCrossProductAlphabet implements Alphabet, Serializable {
       }
     }
     
-    return AlphabetManager.createSymbol(
-      tokenSeed++, "?", Annotation.EMPTY_ANNOTATION,
-      sList, this
-    );
+    return AlphabetManager.createSymbol('?', Annotation.EMPTY_ANNOTATION, sList, this);
   }
 
   public SymbolParser getParser(String name)

@@ -225,7 +225,7 @@ public final class RNATools {
    */
   public static SymbolList complement(SymbolList list)
   throws IllegalAlphabetException {
-    return new TranslatedSymbolList(list, complementTable());
+    return SymbolListViews.translate(list, complementTable());
   }
 
   /**
@@ -237,7 +237,7 @@ public final class RNATools {
    */
   public static SymbolList reverseComplement(SymbolList list)
   throws IllegalAlphabetException {
-    return new TranslatedSymbolList(new ReverseSymbolList(list), complementTable());
+    return SymbolListViews.translate(SymbolListViews.reverse(list), complementTable());
   }
   
   /**
@@ -249,7 +249,7 @@ public final class RNATools {
    */
    public static SymbolList transcribe(SymbolList list)
    throws IllegalAlphabetException {
-     return new TranslatedSymbolList(list, transcriptionTable());
+     return SymbolListViews.translate(list, transcriptionTable());
    }
   
   /**
@@ -297,7 +297,7 @@ public final class RNATools {
    */
   public static SymbolList translate(SymbolList syms)
   throws IllegalAlphabetException {
-    return new TranslatedSymbolList(syms, getGeneticCode("UNIVERSAL"));
+    return SymbolListViews.translate(syms, getGeneticCode("UNIVERSAL"));
   }
   
   private static void loadGeneticCodes() {

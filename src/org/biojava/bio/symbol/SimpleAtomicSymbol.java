@@ -40,23 +40,11 @@ import org.biojava.bio.*;
 public class SimpleAtomicSymbol extends SimpleBasisSymbol
 implements AtomicSymbol {  
   protected SimpleAtomicSymbol(
-    char token, String name, Annotation annotation
-  ) {
-    super(token, name, annotation);
-  }
-  
-  protected SimpleAtomicSymbol(
-    char token, String name, Annotation annotation,
-    List syms
+    char token, Annotation annotation, List syms
   ) throws IllegalSymbolException {
-    super(token, name, annotation, syms);
+    super(token, annotation, syms);
   }
-  
-  protected List createSymbols() {
-    List syms = new SingletonList(this);
-    return syms;
-  }
-  
+
   protected Alphabet createMatches() {
     return new SingletonAlphabet(this);
   }

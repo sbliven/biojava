@@ -36,23 +36,20 @@ import org.biojava.bio.*;
 class SimpleSymbol extends AbstractSymbol
 implements Symbol, Serializable {
   private final char token;
-  private final String name;
   private final Annotation annotation;
   protected Alphabet matches;
   
-  protected SimpleSymbol(
-    char token, String name, Annotation annotation
-  ) {
+  protected SimpleSymbol(char token, Annotation annotation) 
+  {
     this.token = token;
-    this.name = name;
     this.annotation = new SimpleAnnotation(annotation);
   }
   
   public SimpleSymbol(
-    char token, String name, Annotation annotation,
+    char token, Annotation annotation,
     Alphabet matches
   ) {
-    this(token, name, annotation);
+    this(token, annotation);
     if(matches == null) {
       throw new NullPointerException(
         "Can't construct SimpleSymbol with a null matches alphabet"
@@ -64,10 +61,6 @@ implements Symbol, Serializable {
   
   public char getToken() {
     return token;
-  }
-  
-  public String getName() {
-    return name;
   }
   
   public Annotation getAnnotation() {
@@ -86,4 +79,45 @@ implements Symbol, Serializable {
       "Assertion Failure: Matches alphabet is null in " + this
     );
   }
+
+    public String getName() {
+	Alphabet a = getMatches();
+
+	if (this instanceof BasisSymbol) {
+	    List l = ((BasisSymbol) this).getSymbols();
+	    if (l.size() > 1) {
+		StringBuffer sb = new StringBuffer();
+		sb.append('(');
+		for (Iterator si = l.iterator(); si.hasNext(); ) {
+		    Symbol sym = (Symbol) si.next();
+		    sb.append(sym.getName());
+		    if (si.hasNext())
+			sb.append(' ');
+		}
+		sb.append(')');
+		return sb.toString();
+	    }
+	} 
+
+	if (a instanceof FiniteAlphabet) {
+	    FiniteAlphabet fa = (FiniteAlphabet) a;
+	    if (fa.size() <= 1)
+		return null;
+
+	    StringBuffer sb = new StringBuffer();
+	    sb.append('[');
+	    for (Iterator si = fa.iterator();
+		 si.hasNext(); )
+		{
+		    Symbol sym = (Symbol) si.next();
+		    sb.append(sym.getName());
+		    if (si.hasNext())
+			sb.append(' ');
+		}
+	    sb.append(']');
+	    return sb.toString();
+	} else {
+	    return "Infinite";
+	}
+    }
 }

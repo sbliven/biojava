@@ -81,4 +81,8 @@ implements Symbol {
       }
     }
   }  
+
+    public String toString() {
+	return getClass().getName() + ": " + getName();
+    }
 }

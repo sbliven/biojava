@@ -127,7 +127,7 @@ implements Serializable {
     if(s == null) {
       List l = new ArrayList(sList);
       s = (AtomicSymbol) AlphabetManager.createSymbol(
-        tokenSeed++, ""+tokenSeed, Annotation.EMPTY_ANNOTATION, l, this
+        tokenSeed++, Annotation.EMPTY_ANNOTATION, l, this
       );
       knownSymbols.put(new ListWrapper(s.getSymbols()), s);
     }

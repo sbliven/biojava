@@ -43,7 +43,7 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  */
-public class TranslatedSymbolList
+class TranslatedSymbolList
 extends AbstractSymbolList implements SymbolList {
   /**
    * The source symbol list to translate.

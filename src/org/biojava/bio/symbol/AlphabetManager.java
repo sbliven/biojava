@@ -141,7 +141,7 @@ public final class AlphabetManager {
   static public AtomicSymbol createSymbol(
     char token, String name, Annotation annotation
   ) {
-    AtomicSymbol as = new SimpleAtomicSymbol(token, name, annotation);
+    AtomicSymbol as = new FundamentalAtomicSymbol(name, token, annotation);
     return as;
   }
 
@@ -150,13 +150,12 @@ public final class AlphabetManager {
    * symList.
    *
    * @param token   the Symbol's token
-   * @param name    the Symbol's name
    * @param symList a list of Symbol objects
    * @param alpha   the Alphabet that this Symbol will reside in
    * @return a Symbol that encapsulates that List
    */
   static public Symbol createSymbol(
-    char token, String name, Annotation annotation,
+    char token, Annotation annotation,
     List symList, Alphabet alpha
   ) throws IllegalSymbolException {
     Iterator i = symList.iterator();
@@ -173,20 +172,17 @@ public final class AlphabetManager {
     }
 
     if(atomC == symList.size()) {
-      return new SimpleAtomicSymbol(
-        token, name, Annotation.EMPTY_ANNOTATION,
-        symList
-      );
+      return new SimpleAtomicSymbol(token, annotation, symList);
     } else if(basis == symList.size()) {
       return new SimpleBasisSymbol(
-        token, name, Annotation.EMPTY_ANNOTATION,
+        token, annotation,
         symList, new SimpleAlphabet(
           expandMatches(alpha, symList, new ArrayList())
         )
       );
     } else {
       return new SimpleSymbol(
-        token, name, Annotation.EMPTY_ANNOTATION,
+        token, annotation,
         new SimpleAlphabet(
           expandBasis(alpha, symList, new ArrayList())
         )
@@ -239,7 +235,7 @@ public final class AlphabetManager {
    * @return a Symbol that encapsulates that List
    */
   static public Symbol createSymbol(
-    char token, String name, Annotation annotation,
+    char token, Annotation annotation,
     Set symSet, Alphabet alpha
   ) throws IllegalSymbolException {
     if(symSet.size() == 0) {
@@ -289,19 +285,18 @@ public final class AlphabetManager {
     } else {
       if(len == 1) {
         return new SimpleBasisSymbol(
-          token, name, annotation,
-          new SimpleAlphabet(asSet)
+          token, annotation, new SimpleAlphabet(asSet)
         );
       } else {
         List fs = factorize(alpha, asSet);
         if(fs == null) {
           return new SimpleSymbol(
-            token, name, annotation,
+            token, annotation,
             new SimpleAlphabet(asSet)
           );
         } else {
           return new SimpleBasisSymbol(
-            token, name, annotation,
+            token, annotation,
             fs, new SimpleAlphabet(
               expandBasis(alpha, fs, new ArrayList())
             )
@@ -412,6 +407,12 @@ public final class AlphabetManager {
   static public Alphabet getCrossProductAlphabet(
     List aList, Alphabet parent
   ) {
+    // This trap means that the `product' operator can be
+    // safely applied to a single alphabet.
+      
+    if (aList.size() == 1)
+	return (Alphabet) aList.get(0);
+
     if(crossProductAlphabets == null) {
       crossProductAlphabets = new HashMap();
     }
@@ -623,7 +624,7 @@ public final class AlphabetManager {
     }
 
     AtomicSymbol sym = new WellKnownSymbol(
-      alpha, token, name, Annotation.EMPTY_ANNOTATION
+      alpha, token, name, new SimpleAnnotation()
     );
     try {
       sym.getAnnotation().setProperty("description", description);
@@ -681,7 +682,7 @@ public final class AlphabetManager {
         Symbol s = (Symbol) nameToSym.get(refName);
         if(s == null) {
           throw new IllegalSymbolException(
-            "Got symbol ref to " + refName + " but it doesn't match anythin"
+            "Got symbol ref to " + refName + " but it doesn't match anything"
           );
         }
         syms.add(s);
@@ -689,7 +690,7 @@ public final class AlphabetManager {
     }
 
     Symbol sym = createSymbol(
-      token, name, Annotation.EMPTY_ANNOTATION,
+      token, Annotation.EMPTY_ANNOTATION,
       syms, alpha
     );
     return sym;
@@ -784,12 +785,12 @@ public final class AlphabetManager {
      * serialized data.
      */
 
-    private static class WellKnownSymbol extends SimpleAtomicSymbol
+    private static class WellKnownSymbol extends FundamentalAtomicSymbol
                                           implements Serializable
     {
       WellKnownAlphabet alpha;
       public WellKnownSymbol(WellKnownAlphabet alpha, char token, String name, Annotation a) {
-        super(token, name, a);
+        super(name, token, a);
         this.alpha = alpha;
       }
 
@@ -840,14 +841,37 @@ public final class AlphabetManager {
    *
    * @author Matthew Pocock
    */
-  private static class GapSymbol
-  extends SimpleSymbol {
-    public GapSymbol() {
-      super(
-        '-', "gap", Annotation.EMPTY_ANNOTATION,
-        Alphabet.EMPTY_ALPHABET
-      );
-    }
+  private static class GapSymbol implements Symbol, Serializable {
+      public GapSymbol() {
+      }
+
+      public String getName() {
+	  return "gap";
+      }
+
+      public char getToken() {
+	  return '-';
+      }
+
+      public Annotation getAnnotation() {
+	  return Annotation.EMPTY_ANNOTATION;
+      }
+
+      public Alphabet getMatches() {
+	  return Alphabet.EMPTY_ALPHABET;
+      }
+
+      public void addChangeListener(ChangeListener cl) {
+      }
+      
+      public void addChangeListener(ChangeListener cl, ChangeType ct) {
+      }
+
+      public void removeChangeListener(ChangeListener cl) {
+      }
+      
+      public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+      }
   }
   
   /**

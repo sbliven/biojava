@@ -214,7 +214,7 @@ public final class DNATools {
    */
   public static SymbolList complement(SymbolList list)
   throws IllegalAlphabetException {
-    return new TranslatedSymbolList(list, complementTable());
+    return SymbolListViews.translate(list, complementTable());
   }
 
   /**
@@ -226,7 +226,7 @@ public final class DNATools {
    */
   public static SymbolList reverseComplement(SymbolList list)
   throws IllegalAlphabetException {
-    return new TranslatedSymbolList(new ReverseSymbolList(list), complementTable());
+    return SymbolListViews.translate(SymbolListViews.reverse(list), complementTable());
   }
   
   /**

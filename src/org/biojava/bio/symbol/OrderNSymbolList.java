@@ -35,8 +35,8 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  */
-public class OrderNSymbolList
-extends AbstractSymbolList implements Serializable {
+
+class OrderNSymbolList extends AbstractSymbolList implements Serializable {
   /**
    * The source sequence that we will transliterate.
    */

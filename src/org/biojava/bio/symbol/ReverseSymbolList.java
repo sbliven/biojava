@@ -32,7 +32,7 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  */
-public class ReverseSymbolList
+class ReverseSymbolList
 extends AbstractSymbolList implements Serializable {
   /**
    * The source sequence that we will transliterate.
