@@ -48,6 +48,25 @@ import java.util.Calendar;
  * A PDB file parser.
  * @author Andreas Prlic
  *
+ * <p>
+ * Q: How can I get a Structure object from a PDB file?
+ * </p>
+ * <p>
+ * A:
+ * <pre>
+ String filename =  "path/to/pdbfile.ent" ;
+
+ PDBFileReader pdbreader = new PDBFileReader();
+
+ try{
+      	Structure struc = pdbreader.getStructure(filename);
+	System.out.println(struc);
+ } catch (Exception e) {
+ 	e.printStackTrace();
+ }
+ </pre>
+ *
+ *
  */
 public class PDBFileReader implements StructureIOFile {
 
@@ -272,17 +291,17 @@ public class PDBFileReader implements StructureIOFile {
 	if ( recordName.equals("ATOM") ) {
 	    if (aminoCode1!=null) {
 
-		AminoAcid aa = new AminoAcid() ;
+		AminoAcidImpl aa = new AminoAcidImpl() ;
 		aa.setAminoType(aminoCode1);
 		group = aa ;
 	    } else {
 		// it is a nucleotidee
-		Nucleotide nu = new Nucleotide();
+		NucleotideImpl nu = new NucleotideImpl();
 		group = nu;
 	    }
 	}
 	else {
-	    group = new Hetatom();
+	    group = new HetatomImpl();
 	}
 	//System.out.println("new group type: "+ group.getType() );
 	return  group ;

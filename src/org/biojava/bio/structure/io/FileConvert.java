@@ -214,7 +214,7 @@ public class FileConvert {
 		    
 		    // do for all atoms:
 		    //Atom[] atoms  = gr.getAtoms();
-		    ArrayList atoms = gr.getAtoms();
+		    ArrayList atoms = (ArrayList) gr.getAtoms();
 		    for (int atomnr=0;atomnr<atoms.size();atomnr++){
 			Atom atom = (Atom)atoms.get(atomnr);
 			xw.openTag("atom");
