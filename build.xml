@@ -102,7 +102,7 @@
     <property name="build.classes.dir" value="${build.dir}/classes" />
 
     <!-- Javac properties -->
-    <property name="javac.depend" value="true" />
+    <property name="javac.depend" value="false" />
     <property name="javac.debug" value="true" />
     <property name="javac.deprecation" value="false" />
 
@@ -545,6 +545,8 @@
       doctitle="${Name.taglets}"
       maxmemory="96m">
       <fileset dir="${build.src.taglets}" />
+      <link href="http://java.sun.com/j2se/1.4.2/docs/api/" offline="false" />
+      <link href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/javadoc/doclet/" />
     </javadoc>
   </target>
 
@@ -561,6 +563,7 @@
       windowtitle="${Name.grammars} API"
       doctitle="${Name.grammars}"
       maxmemory="96m">
+      <link href="http://java.sun.com/j2se/1.4.2/docs/api/" offline="false"/>
     </javadoc>
   </target>
 
@@ -569,7 +572,7 @@
     <javadoc
       packagenames="${packages}"
       sourcepath="${build.src.biojava}"
-      classpath="${classpath}"
+      classpath="${classpath}:${jar.grammars}"
       destdir="${build.docs.biojava}"
       author="true"
       version="true"
@@ -577,6 +580,8 @@
       windowtitle="${Name.biojava} API"
       doctitle="${Name.biojava}"
       maxmemory="96m">
+       <link href="http://java.sun.com/j2se/1.4.2/docs/api/" offline="false"/>
+       <link href="../grammars" />
        <group title="Core biological packages"
               packages="org.biojava.bio:org.biojava.bio.dist:org.biojava.bio.search:org.biojava.bio.seq:org.biojava.bio.seq.db:org.biojava.bio.seq.genomic:org.biojava.bio.seq.io:org.biojava.bio.symbol:org.biojava.bio.alignment:org.biojava.directory:org.biojava.bibliography:org.biojava.bio.taxa" />
 
@@ -619,6 +624,8 @@
       windowtitle="${Name.demos} API"
       doctitle="${Name.demos}"
       maxmemory="96m">
+      <link href="http://java.sun.com/j2se/1.4.2/docs/api/" offline="false"/>
+      <link href="../biojava"/>
       <taglet name="UserLevel" path="${build.dest.taglets}" />
       <taglet name="MetaData" path="${build.dest.taglets}:${classpath}" />
     </javadoc>
@@ -637,6 +644,8 @@
       windowtitle="${Name.apps} API"
       doctitle="${Name.apps}"
       maxmemory="96m">
+      <link href="http://java.sun.com/j2se/1.4.2/docs/api/" offline="false"/>
+      <link href="../biojava"/>
       <taglet name="UserLevel" path="${build.dest.taglets}" />
       <taglet name="MetaData" path="${build.dest.taglets}:${classpath}" />
     </javadoc>
