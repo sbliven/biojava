@@ -50,9 +50,10 @@ class CrossProductAlphabetIndex extends AbstractChangeable
 implements AlphabetIndex, ChangeListener, Serializable
 {	
 	// The alphabet we are indexing
-	FiniteAlphabet	Alpha 	 	= null;
+	final FiniteAlphabet	Alpha;
 	// list holding AlphabetIndexes for the alphabets making upp the alphabet we index
-	List		alphaIndexes 	= null;
+	List		alphaIndexes;
+  List    revIndexes;
 
 	public CrossProductAlphabetIndex( FiniteAlphabet theAlpha ) {
 		// the alpha we index over
@@ -61,6 +62,8 @@ implements AlphabetIndex, ChangeListener, Serializable
 		Alpha.addChangeListener( this, Alphabet.SYMBOLS );
 		// we need this to compute the index
 		alphaIndexes = buildIndexList( theAlpha );
+    revIndexes = new ArrayList(alphaIndexes);
+    Collections.reverse(revIndexes);
 	}
 
 	public FiniteAlphabet getAlphabet() {
@@ -68,7 +71,7 @@ implements AlphabetIndex, ChangeListener, Serializable
 	}
 
 	/**
-	* This just takes teh alphabet, and splits it up into its sub alphabets
+	* This just takes the alphabet, and splits it up into its sub alphabets
 	* then gets an AlphabetIndex for each sub alphabet and stores that in an
 	* List. This list is then used for the index computation
 	*/
@@ -94,19 +97,17 @@ implements AlphabetIndex, ChangeListener, Serializable
 	public void postChange( ChangeEvent cE ) {
 		// ok, alphabet have changed, so we better rebuild or list of AlphabetIndexes 
 		alphaIndexes = buildIndexList( Alpha );
+    revIndexes = new ArrayList(alphaIndexes);
+    Collections.reverse(revIndexes);
 	}
 
 	public int indexForSymbol( Symbol s ) throws IllegalSymbolException {
-		// make sure the symbol realy is in the alphabet we index
-		// this is DOG slow on big alphabets, we can check that index and symbol iterators
-		// have the same number of entries, but that is crap, as its not sure it will be correct combo
-		// off symbol and index, so all this is waste of time!
-		if( ! Alpha.contains( s ) ) {
-			throw new IllegalSymbolException( "This symbol is not contained in the alphabet this index covers" );
-		}
-	
-		// ok, split the symbol upp into its factors, do we need to check its a BasisSymbols or something ?
+		// ok, split the symbol upp into its factors
 		List	factors = ( ( BasisSymbol )s ).getSymbols();
+    if(factors.size() != getAlphabet().size()) {
+      getAlphabet().validate(s);
+    }
+
 		int	index	= 0; // this is the index we want to compute
 		
 		// iterate over each factor symbol, and at the same time iterate over the AlphabetIndexList
@@ -115,25 +116,35 @@ implements AlphabetIndex, ChangeListener, Serializable
 		Iterator indexIt  = alphaIndexes.iterator();
 		Iterator symbolIt = factors.iterator();
 		
-		while( symbolIt.hasNext() ) {
-			Symbol 		currentSymbol 	= ( Symbol )symbolIt.next();
-			AlphabetIndex 	currentAlphaInd = ( AlphabetIndex )indexIt.next();
-			FiniteAlphabet	currentAlphabet	= currentAlphaInd.getAlphabet();
-	
-			index = index * currentAlphabet.size() + currentAlphaInd.indexForSymbol( currentSymbol );
-		}
-		return( index );
+    try {
+      while( symbolIt.hasNext() ) {
+        Symbol 		currentSymbol 	= ( Symbol )symbolIt.next();
+        AlphabetIndex 	currentAlphaInd = ( AlphabetIndex )indexIt.next();
+        FiniteAlphabet	currentAlphabet	= currentAlphaInd.getAlphabet();
+        
+        index = index * currentAlphabet.size() + currentAlphaInd.indexForSymbol( currentSymbol );
+      }
+    } catch (IllegalSymbolException ise) {
+      getAlphabet().validate(s);
+    }
+    
+    if(symbolIt.hasNext()) {
+      getAlphabet().validate(s);
+      throw new BioError("Assertion failure: Ran out of indexers for symbols");
+    }
+    
+		return index;
 	}
 
 	public Symbol symbolForIndex( int index ) throws IndexOutOfBoundsException {
 		List	symbols	= new ArrayList();
 		try { 
-			for ( Iterator it = alphaIndexes.iterator() ; it.hasNext() ; ) {
+			for ( Iterator it = revIndexes.iterator() ; it.hasNext() ; ) {
 				AlphabetIndex	curAlpIndex 	= ( AlphabetIndex ) it.next();
 				int		curAlpSize 	= curAlpIndex.getAlphabet().size();
 				int		curSymIndValue 	= index % curAlpSize;
 				index = index / curAlpSize;
-				symbols.add( curAlpIndex.symbolForIndex( curSymIndValue ) );
+				symbols.add( 0, curAlpIndex.symbolForIndex( curSymIndValue ) );
 			}
 		
 			return( Alpha.getSymbol( symbols ) );
