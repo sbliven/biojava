@@ -49,14 +49,7 @@ import org.biojava.bio.seq.io.*;
 
 public class PhredFormat implements SequenceFormat, Serializable {
 
-    static
-    {
-        Set validFormats = new HashSet();
-        validFormats.add("Phred");
-
-        SequenceFormat.FORMATS.put(PhredFormat.class.getName(),
-                                   validFormats);
-    }
+    public static final String DEFAULT = "PHRED";
 
     /**
      * Constant string which is the property key used to notify
@@ -191,10 +184,11 @@ public class PhredFormat implements SequenceFormat, Serializable {
     }
 
     /**
-     * This method will print symbols to the line width followed by a new line etc.
-     * NOTE that an integer symbol does not always correspond to one character therefore
-     * a line width of sixty will print sixty characters followed by a new line. Not nescessarily
-     * sixty integers.
+     * This method will print symbols to the line width followed by a
+     * new line etc.  NOTE that an integer symbol does not always
+     * correspond to one character therefore a line width of sixty
+     * will print sixty characters followed by a new line. Not
+     * necessarily sixty integers.
      */
     public void writeSequence(Sequence seq, PrintStream os)
         throws IOException
@@ -203,40 +197,52 @@ public class PhredFormat implements SequenceFormat, Serializable {
         os.println(describeSequence(seq));
 
         StringBuffer line = new StringBuffer();
-        for(int i = 1, linesPrinted = 1; i <= seq.length(); i++){
-          int val = ((IntegerAlphabet.IntegerSymbol)seq.symbolAt(i)).intValue();
-          String s = Integer.toString(val);
-          if((line.length() + s.length()) > lineWidth){
-            os.println(line.substring(0));
-            line = new StringBuffer();
-          }
-          line.append(s + " ");
+        int seqLen = seq.length();
+
+        for (int i = 1, linesPrinted = 1; i <= seqLen; i++) {
+            int val = ((IntegerAlphabet.IntegerSymbol)seq.symbolAt(i)).intValue();
+            String s = Integer.toString(val);
+            if ((line.length() + s.length()) > lineWidth) {
+                os.println(line.substring(0));
+                line = new StringBuffer();
+            }
+            line.append(s + " ");
         }
     }
 
+    /**
+     * <code>writeSequence</code> writes a sequence to the specified
+     * <code>PrintStream</code>, using the specified format.
+     *
+     * @param seq a <code>Sequence</code> to write out.
+     * @param format a <code>String</code> indicating which sub-format
+     * of those available from a particular
+     * <code>SequenceFormat</code> implemention to use when
+     * writing.
+     * @param os a <code>PrintStream</code> object.
+     *
+     * @exception IOException if an error occurs.
+     * @deprecated use writeSequence(Sequence seq, PrintStream os)
+     */
     public void writeSequence(Sequence seq, String format, PrintStream os)
         throws IOException
     {
-        String requestedFormat = new String(format);
-        boolean          found = false;
-
-        String [] formats = (String []) getFormats().toArray(new String[0]);
-
-        if (! found)
-            throw new IOException("Unable to write: an invalid file format '"
-                                  + format
-                                  + "' was requested");
-
+        if (! format.equalsIgnoreCase(getDefaultFormat()))
+            throw new IllegalArgumentException("Unknown format '"
+                                               + format
+                                               + "'");
         writeSequence(seq, os);
     }
 
-    public Set getFormats()
-    {
-        return (Set) SequenceFormat.FORMATS.get(this.getClass().getName());
-    }
-
+    /**
+     * <code>getDefaultFormat</code> returns the String identifier for
+     * the default format.
+     *
+     * @return a <code>String</code>.
+     * @deprecated
+     */
     public String getDefaultFormat()
     {
-        return "Phred";
+        return DEFAULT;
     }
 }
