@@ -213,7 +213,7 @@
        <group title="User Interface Components"
               packages="org.biojava.bio.gui:org.biojava.bio.gui.sequence" />
        <group title="Developers' Packages"
-              packages="org.biojava.bio.seq.impl:org.biojava.utils:org.biojava.utils.cache:org.biojava.utils.contract:org.biojava.utils.xml:org.biojava.utils.query:org.biojava.utils.stax"
+              packages="org.biojava.bio.seq.impl:org.biojava.utils:org.biojava.utils.cache:org.biojava.utils.contract:org.biojava.utils.xml:org.biojava.utils.query:org.biojava.utils.stax:org.biojava.bio.seq.projection"
 />
        <group title="External Tools"
               packages="org.biojava.bio.program:org.biojava.bio.program.das:org.biojava.bio.program.gff:org.biojava.bio.program.sax:org.biojava.bio.program.seach:org.biojava.bio.program.xml:org.biojava.bio.seq.io.game:org.biojava.bio.program.search:org.biojava.bio.program.xff:org.biojava.bio.program.ssbind"
