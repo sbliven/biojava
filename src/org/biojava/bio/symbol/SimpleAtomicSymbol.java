@@ -45,7 +45,7 @@ public class SimpleAtomicSymbol implements AtomicSymbol {
     }
     this.token = token;
     this.name = name;
-    this.annotation = annotation;
+    this.annotation = new SimpleAnnotation(annotation);
     this.alphabet = new SingletonAlphabet(this);
   }
   
