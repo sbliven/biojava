@@ -6,6 +6,7 @@ import java.util.*;
  * Repository for binary operators on Location instances.
  * @author Matthew Pocock
  * @author Greg Cox
+ * @author Thomas Down
  * @since 1.2
  */
 final public class LocationTools {
@@ -53,45 +54,7 @@ final public class LocationTools {
         locList.add(i.next());
       }
 
-      // sort these blocks
-      Collections.sort(locList, Location.naturalOrder);
-
-      // merge into this list...
-      List joinList = new ArrayList();
-
-      // start iterating over sorted list.
-      // last is used as loop variable. We must be careful about zero lengthed
-      // lists and also careful to merge overlaps before adding to joinList.
-      Iterator i = locList.iterator();
-      Location last = Location.empty;
-
-      // prime last
-      if(i.hasNext()) {
-        last = (Location) i.next();
-      }
-
-      // merge or add last with next location
-      while(i.hasNext()) {
-        Location cur = (Location) i.next();
-        if(last.overlaps(cur)) {
-          int min = Math.min(last.getMin(), cur.getMin());
-          int max = Math.max(last.getMax(), cur.getMax());
-          last = buildLoc(min, max);
-        } else {
-          joinList.add(last);
-          last = cur;
-        }
-      }
-
-      // handle the end of the loop
-      if(last == Location.empty) {
-        return Location.empty;
-      } else {
-        joinList.add(last);
-      }
-
-      // now make the apropreate Location instance
-      return buildLoc(joinList);
+      return _union(locList);
     }
   }
 
@@ -276,10 +239,10 @@ final public class LocationTools {
    * locations then they will be sorted and then used to construct a
    * CompoundLocation.
    *
-   * @param locList a List<Location> which are guaranteed to be contiguous
+   * @param locList a List<Location>, where each element is a contiguous location.
    * @return a new Location instance
    */
-  protected static Location buildLoc(List locList) {
+  static Location buildLoc(List locList) {
     Collections.sort(locList, Location.naturalOrder);
 
     if(locList.size() == 0) {
@@ -290,6 +253,71 @@ final public class LocationTools {
       return new CompoundLocation(locList);
     }
   }
+
+    /**
+     * The n-way union of a Collection of locations.  Returns a Location
+     * which covers every point covered by at least one of the locations
+     * in <code>locs</code>
+     *
+     * @param locs A collection of locations.
+     * @return A union location
+     * @throws ClassCastException if the collection contains non-Location objects.
+     */
+
+    public static Location union(Collection locs) {
+	List locList = new ArrayList();
+	for (Iterator li = locs.iterator(); li.hasNext(); ) {
+	    Location loc = (Location) li.next();
+	    for (Iterator bi = loc.blockIterator(); bi.hasNext(); ) {
+		locList.add(bi.next());
+	    }
+	}
+
+	return _union(locList);
+    }
+
+
+    private static Location _union(List locList) {
+      // sort these blocks
+      Collections.sort(locList, Location.naturalOrder);
+
+      // merge into this list...
+      List joinList = new ArrayList();
+
+      // start iterating over sorted list.
+      // last is used as loop variable. We must be careful about zero lengthed
+      // lists and also careful to merge overlaps before adding to joinList.
+      Iterator i = locList.iterator();
+      Location last = Location.empty;
+
+      // prime last
+      if(i.hasNext()) {
+        last = (Location) i.next();
+      }
+
+      // merge or add last with next location
+      while(i.hasNext()) {
+        Location cur = (Location) i.next();
+        if(last.overlaps(cur)) {
+          int min = Math.min(last.getMin(), cur.getMin());
+          int max = Math.max(last.getMax(), cur.getMax());
+          last = buildLoc(min, max);
+        } else {
+          joinList.add(last);
+          last = cur;
+        }
+      }
+
+      // handle the end of the loop
+      if(last == Location.empty) {
+        return Location.empty;
+      } else {
+        joinList.add(last);
+      }
+
+      // now make the apropreate Location instance
+      return buildLoc(joinList);
+    }
 
   /**
    * Return a contiguous Location from min to max.

@@ -28,9 +28,11 @@ import org.biojava.bio.*;
 /**
  * A complex location. It is made up from multiple sub-locations and is essentially
  * the point-wise union of the child locations.
- * <P>
- * Currently this is implemented very badly. I need a maths person to look over
- * it, and sort stuff out.
+ * 
+ * <p>
+ * <strong>NOTE:</strong> It is no longer possible to directly construct
+ * CompoundLocations.  Use LocationTools.union instead.
+ * </p>
  *
  * @author Matthew Pocock
  * @author Thomas Down
@@ -73,7 +75,7 @@ implements Location, Serializable {
    * @param locations a list of Location instances to combine into a single
    *        compound location
    */
-  public CompoundLocation(List locs) {
+  CompoundLocation(List locs) {
     Location minL = (Location) locs.get(0);
     Location maxL = (Location) locs.get(locs.size() - 1);
     
