@@ -275,7 +275,7 @@
       srcdir="${build.src.main}"
       destdir="${build.dest.main}"
       classpath="${classpath}"
-      deprecation="false"
+      deprecation="true"
       depend="no"
       debug="true"
     />
