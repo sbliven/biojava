@@ -88,15 +88,17 @@ public class SequenceDumper {
 
     // dump annotation
     Annotation annotation = sequence.getAnnotation();
-    Set keys = annotation.keys();
+    if (annotation != null) {
+      Set keys = annotation.keys();
  
-    // iterate over keys
-    Iterator ki = keys.iterator();
-    System.out.println("  <annotation>");
-    while (ki.hasNext()) {
-      Object key = ki.next();
-      Object value = annotation.getProperty(key);
-      System.out.println("  " + key + " " + value);
+      // iterate over keys
+      Iterator ki = keys.iterator();
+      System.out.println("  <annotation>");
+      while (ki.hasNext()) {
+        Object key = ki.next();
+        Object value = annotation.getProperty(key);
+        System.out.println("  " + key + " " + value);
+      }
     }
 
     // dump sequence summary
