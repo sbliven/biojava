@@ -36,9 +36,9 @@ public class SearchProfile {
       dumpDP(dp);
 
       Sequence[] seq1 = {seqDB.sequenceIterator().nextSequence()};
-      System.out.println("Viterbi: " + dp.viterbi(seq1, ScoreType.ODDS).getScore());
-      System.out.println("Forward: " + dp.forward(seq1, ScoreType.ODDS));
-      System.out.println("Backward: " + dp.backward(seq1, ScoreType.ODDS));
+      System.out.println("Viterbi: " + dp.viterbi(seq1, ScoreType.PROBABILITY).getScore());
+      System.out.println("Forward: " + dp.forward(seq1, ScoreType.PROBABILITY));
+      System.out.println("Backward: " + dp.backward(seq1, ScoreType.PROBABILITY));
 
       System.out.println("Training whole profile");
       TrainingAlgorithm ta = new BaumWelchTrainer(dp);
@@ -46,10 +46,10 @@ public class SearchProfile {
         public boolean isTrainingComplete(TrainingAlgorithm ta) {
           System.out.println("Cycle " + ta.getCycle() + " completed");
           System.out.println("Score: " + ta.getCurrentScore());
-          if (ta.getCycle() == 5) {
-            return true;
-          } else {
+          if (ta.getCycle() < 5) {
             return false;
+          } else {
+            return true;
           }
         }
       });
@@ -58,9 +58,9 @@ public class SearchProfile {
       for (SequenceIterator si = seqDB.sequenceIterator(); si.hasNext();) {
         Sequence seq = si.nextSequence();
         SymbolList[] rl = {seq};
-        StatePath statePath = dp.viterbi(rl, ScoreType.ODDS);
-        double fScore = dp.forward(rl, ScoreType.ODDS);
-        double bScore = dp.backward(rl, ScoreType.ODDS);
+        StatePath statePath = dp.viterbi(rl, ScoreType.PROBABILITY);
+        double fScore = dp.forward(rl, ScoreType.PROBABILITY);
+        double bScore = dp.backward(rl, ScoreType.PROBABILITY);
 
         System.out.println(
                 seq.getName() +

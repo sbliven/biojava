@@ -42,12 +42,12 @@ import org.biojava.bio.search.*;
  *
  * # echo events that are left after all hits with expectedValue greater
  * # than 0.1 have been removed
- * java ProcessBlastReport \
+ * java ssbind.ProcessBlastReport blastFile.out \
  *    "ssbind.FilterByValue(maxVal=0.1 keyName=expectedValue)" \
  *    ssbind.Echoer
  *
  * # echo the percentageIdentity of all alignments between 100 and 200 in length
- * java ProcessBlastReport \
+ * java ssbind.ProcessBlastReport blastFile.out \
  *   "ssbind.FilterByValue(minVal=100 maxVal=200 keyName=alignmentSize)" \
  *   "ssbind.PropertyEchoer(keyName=percentageIdentity)"
  * </pre>

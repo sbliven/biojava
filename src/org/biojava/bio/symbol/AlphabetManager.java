@@ -354,7 +354,7 @@ public final class AlphabetManager {
    *
    * @param token  the Char token returned by getToken() (ignpred as of BioJava 1.2)
    * @param name  the String returned by getName()
-   * @param annotatin the Annotation returned by getAnnotation()
+   * @param annotation the Annotation returned by getAnnotation()
    * @return a new AtomicSymbol instance
    * @deprecated Use the two-arg version of this method instead.
    */
@@ -496,7 +496,7 @@ public final class AlphabetManager {
    * </p>
    *
    * @param token   the Symbol's token [ignored since 1.2]
-   * @param name    the Symbol's name
+   * @param annotation    the Symbol's Annotation
    * @param symSet  a Set of Symbol objects
    * @param alpha   the Alphabet that this Symbol will reside in
    * @return a Symbol that encapsulates that List
@@ -520,7 +520,7 @@ public final class AlphabetManager {
    * not be invoked by users. Use alphabet.getSymbol(Set) instead.
    * </p>
    *
-   * @param name    the Symbol's name
+   * @param annotation the Symbol's Annotation
    * @param symSet  a Set of Symbol objects
    * @param alpha   the Alphabet that this Symbol will reside in
    * @return a Symbol that encapsulates that List
@@ -1201,17 +1201,25 @@ public final class AlphabetManager {
                      dm.delegate(new MappingHandler(true));
                  } else if (localName.equals("ambiguityMapping")) {
                      dm.delegate(new MappingHandler(false));
+                 } else if (localName.equals("gapSymbolMapping")) {
+                     dm.delegate(new MappingHandler(false, true));
                  } else {
                      throw new SAXException("Unknown element in characterTokenization: " + localName);
                  }
              }
 
              private class MappingHandler extends StAXContentHandlerBase {
+                 public MappingHandler(boolean isAtomic, boolean isPureGap) {
+                   this.isAtomic = isAtomic;
+                   this.isPureGap = isPureGap;
+                 }
+
                  public MappingHandler(boolean isAtomic) {
-                     this.isAtomic = isAtomic;
+                     this(isAtomic, false);
                  }
 
                  boolean isAtomic;
+                 boolean isPureGap;
                  Set symbols = new HashSet();
                  char c = '\0';
                  int level = 0;
@@ -1252,13 +1260,18 @@ public final class AlphabetManager {
                  public void endTree()
                      throws SAXException
                  {
-                     try {
-                         Symbol ambiSym = toke.getAlphabet().getAmbiguity(symbols);
-                         toke.bindSymbol(ambiSym, c);
-                     } catch (IllegalSymbolException ex) {
-                         ex.printStackTrace();
-                         throw new SAXException("IllegalSymbolException binding mapping for " + c);
+                     Symbol ambiSym;
+                     if(isPureGap) {
+                         ambiSym = getGapSymbol();
+                     } else {
+                         try {
+                             ambiSym = toke.getAlphabet().getAmbiguity(symbols);
+                         } catch (IllegalSymbolException ex) {
+                             throw (SAXException)
+                                     new SAXException("IllegalSymbolException binding mapping for " + c).initCause(ex);
+                         }
                      }
+                     toke.bindSymbol(ambiSym, c);
                  }
              }
          }

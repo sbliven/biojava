@@ -24,7 +24,7 @@
   <!ATTLIST symbolref
     name	CDATA	#REQUIRED>
     
-  <!ELEMENT characterTokenization ((atomicMapping|ambiguityMapping)*)>
+  <!ELEMENT characterTokenization ((atomicMapping|ambiguityMapping|gapSymbolMapping)*)>
   <!ATTLIST characterTokenization
    name CDATA #REQUIRED
    caseSensitive CDATA #REQUIRED>
@@ -34,6 +34,9 @@
    token CDATA #REQUIRED>
   <!ELEMENT ambiguityMapping (symbolref*)>
   <!ATTLIST ambiguityMapping 
+   token CDATA #REQUIRED>
+  <!ELEMENT gapSymbolMapping EMPTY>
+  <!ATTLIST gapSymbolMapping
    token CDATA #REQUIRED>
 
 ]>
@@ -157,14 +160,13 @@
 
       <!-- A gap by any other name would still smell so... gappy? -->
       
-      <ambiguityMapping token="~">
-      </ambiguityMapping>
-
       <ambiguityMapping token=".">
       </ambiguityMapping>
       
       <ambiguityMapping token=" ">
       </ambiguityMapping>
+
+      <gapSymbolMapping token="~" />>
     </characterTokenization>
   </alphabet>
 
@@ -264,11 +266,10 @@
         <!-- Gap is the empty set -->
       </ambiguityMapping>
 
-      <ambiguityMapping token="~">
-      </ambiguityMapping>
-
       <ambiguityMapping token=".">
       </ambiguityMapping>
+
+      <gapSymbolMapping token="~" />>
     </characterTokenization>
   </alphabet>
 
@@ -375,11 +376,10 @@
         <!-- Gap is the empty set -->
       </ambiguityMapping>
 
-      <ambiguityMapping token="~">
-      </ambiguityMapping>
-
       <ambiguityMapping token=".">
       </ambiguityMapping>
+
+      <gapSymbolMapping token="~" />>
     </characterTokenization>
   </alphabet>
 
@@ -570,11 +570,10 @@
       <ambiguityMapping token="-">
       </ambiguityMapping>
 
-      <ambiguityMapping token="~">
-      </ambiguityMapping>
-
       <ambiguityMapping token=".">
       </ambiguityMapping>
+
+      <gapSymbolMapping token="~" />>
     </characterTokenization>
   </alphabet>
 
@@ -736,11 +735,10 @@
       <ambiguityMapping token="-">
       </ambiguityMapping>
 
-      <ambiguityMapping token="~">
-      </ambiguityMapping>
-
       <ambiguityMapping token=".">
       </ambiguityMapping>
+
+      <gapSymbolMapping token="~" />>
     </characterTokenization>
 
   </alphabet>
@@ -818,6 +816,8 @@
 
       <ambiguityMapping token="-">
       </ambiguityMapping>
+
+      <gapSymbolMapping token="~" />>
     </characterTokenization>
   </alphabet>
 

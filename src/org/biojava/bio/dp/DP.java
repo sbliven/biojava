@@ -261,6 +261,7 @@ public abstract class DP {
           int[][] transitions,
           ScoreType scoreType
           ) {
+System.out.println("forwardTransitionScores");
     int stateCount = states.length;
     double[][] scores = new double[stateCount][];
 
@@ -616,6 +617,7 @@ public abstract class DP {
 
     public void postChange(ChangeEvent ce) {
       if (ce.getType().isMatchingType(MarkovModel.ARCHITECTURE)) {
+        System.out.println("architecture alterred");
         states = null;
       }
 
