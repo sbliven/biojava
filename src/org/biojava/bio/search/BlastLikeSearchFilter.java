@@ -59,7 +59,7 @@ import org.biojava.utils.walker.WalkerFactory;
  * <p>
  * <u>Some keys used by SearchContentHandlers</u><br>
  * <u>SearchProperties</u><br>
- * <table>
+ * <table border="1Â">
  * <tr>
  * <td>KEY_QUERY_ID</td>
  * <td>value from setQueryID</td>
