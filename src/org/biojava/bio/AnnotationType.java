@@ -362,6 +362,40 @@ public interface AnnotationType {
         throws ChangeVetoException;
 
     /**
+     * Set the comment for the whole AnnotationType.
+     * This is human-readable text.
+     *
+     * @param comment  the new comment
+     */
+    public void setComment(String comment);
+    
+    /**
+     * Get the comment for the whole AnnotationType.
+     * This is human-readable text.
+     *
+     * @return the comment
+     */
+    public String getComment();
+    
+    /**
+     * Set the comment for a particular property.
+     * This is a human-readable description of the property.
+     *
+     * @param property the property to comment on
+     * @param comment  the comment
+     */
+    public void setComment(Object property, String comment);
+    
+    /**
+     * Get the comment for a particular property.
+     * This is a human-readable description of the property.
+     *
+     * @param property the property to get a comment for
+     * @param comment  the comment
+     */
+    public String getComment(Object property);
+    
+    /**
      * <p>An abstract base class useful for implementing AnnotationType
      * instances.</p>
      *
@@ -503,13 +537,17 @@ public interface AnnotationType {
         }
 
         public String toString() {
-          StringBuffer sb = new StringBuffer("AnnotationType: {");
+          StringBuffer sb = new StringBuffer(
+            "AnnotationType: " +
+            getComment() +
+            " {"
+          );
 
           for(Iterator i = getProperties().iterator(); i.hasNext(); ) {
             Object key = i.next();
             CollectionConstraint cc = getConstraint(key);
 
-            sb.append(" [" + key + ", " + cc + "]");
+            sb.append(" [" + ", " + cc + " " + key + "]");
           }
           sb.append(" [*, " + getDefaultConstraint() + "]");
 
@@ -556,6 +594,8 @@ public interface AnnotationType {
     public class Impl extends AnnotationType.Abstract {
         private Map cons;
         private CollectionConstraint unknown;
+        private String comment;
+        private Map comments;
 
         /**
          * Create a new Impl with no constraints.
@@ -563,6 +603,8 @@ public interface AnnotationType {
         public Impl() {
             cons = new SmallMap();
             unknown = CollectionConstraint.ANY;
+            comment = "";
+            comments = new SmallMap();
         }
 
         /**
@@ -612,6 +654,22 @@ public interface AnnotationType {
 
         public Set getProperties() {
             return cons.keySet();
+        }
+        
+        public void setComment(String comment) {
+          this.comment = comment;
+        }
+        
+        public String getComment() {
+          return comment;
+        }
+        
+        public void setComment(Object key, String comment) {
+          comments.put(key, comment);
+        }
+        
+        public String getComment(Object key) {
+          return (String) comments.get(key);
         }
     }
 }
