@@ -34,7 +34,7 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  */
-public class MagicalState implements State {
+public class MagicalState implements EmissionState {
   /**
    * The residue that implicitly exists at the beginning and end of every
    * ResidueList (index 0 and length+1).

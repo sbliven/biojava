@@ -37,68 +37,163 @@ import org.biojava.bio.seq.tools.*;
  */
 
 public class PairwiseDP {
-    /**
-     * Magical state for use with pairwise DP (NOTE: this is different
-     * from DP.MAGICAL_STATE).
-     */
+    private MarkovModel mm;
+    private EmissionState magicalState;
+    private Residue magicalResidue;
 
-    public final static State MAGICAL_STATE =  new MagicalState('?', DP.MAGICAL_RESIDUE);
+    public PairwiseDP(MarkovModel mm) {
+	this.mm = mm;
+	magicalState = mm.magicalState();
+	magicalResidue = MagicalState.MAGICAL_RESIDUE;
+    }
 
-    public static EmissionState [] stateList(Alphabet alpha)
+    public State[] stateList()
+	throws IllegalResidueException, IllegalTransitionException
+    {
+	Alphabet alpha = mm.stateAlphabet();
+
+	List emissionStates = new ArrayList();
+	HMMOrderByTransition comp = new HMMOrderByTransition(mm);
+	List dotStates = new LinkedList();
+	for (Iterator addStates = alpha.residues().iterator(); addStates.hasNext(); ) {
+	    Object state = addStates.next();
+	    if (state instanceof EmissionState)
+		emissionStates.add(state);
+	    else {
+		ListIterator checkOld = dotStates.listIterator();
+		int insertPos = -1;
+		while (checkOld.hasNext() && insertPos == -1) {
+		    Object oldState = checkOld.next();
+		    if (comp.compare(state, oldState) == comp.LESS_THAN)
+			insertPos = checkOld.nextIndex() - 1;
+		}
+		if (insertPos >= 0)
+		    dotStates.add(insertPos, state);
+		else
+		    dotStates.add(0, state);
+	    }
+	}
+
+	State[] sl = new State[emissionStates.size() + dotStates.size()];
+	int i = 0;
+	for (Iterator si = emissionStates.iterator(); si.hasNext(); ) {
+	    sl[i++] = (State) si.next();
+	}
+	for (Iterator si = dotStates.iterator(); si.hasNext(); ) {
+	    sl[i++] = (State) si.next();
+	}
+	return sl;
+    }
+
+    private static class HMMOrderByTransition {
+	public final static Object GREATER_THAN = new Object();
+	public final static Object LESS_THAN = new Object();
+	public final static Object EQUAL = new Object();
+	public final static Object DISJOINT = new Object();
+
+	private MarkovModel mm;
+
+	HMMOrderByTransition(MarkovModel mm) {
+	    this.mm = mm;
+	}
+
+	public Object compare(Object o1, Object o2) 
+	    throws IllegalTransitionException,
+		   IllegalResidueException
+	{
+	    if (o1 == o2)
+		return EQUAL;
+	    State s1 = (State) o1;
+	    State s2 = (State) o2;
+
+	    if (transitionsTo(s1, s2))
+		return LESS_THAN;
+	    if (transitionsTo(s2, s1))
+		return GREATER_THAN;
+
+	    return DISJOINT;
+	}
+
+	private boolean transitionsTo(State from, State to)
+	    throws IllegalTransitionException,
+		   IllegalResidueException
+	{
+	    Set checkedSet = new HashSet();
+	    Set workingSet = mm.transitionsFrom(from);
+	    while (workingSet.size() > 0) {
+		Set newWorkingSet = new HashSet();
+		for (Iterator i = workingSet.iterator(); i.hasNext(); ) {
+		    State s = (State) i.next();
+		    if (s instanceof EmissionState)
+			continue;
+		    if (s == from)
+			throw new IllegalTransitionException(from, from, "Loop in dot states.");
+		    if (s == to)
+			return true;
+		    for (Iterator j = mm.transitionsFrom(s).iterator(); j.hasNext(); ) {
+			State s2 = (State) j.next();
+			if (!workingSet.contains(s2) && !checkedSet.contains(s2))
+			    newWorkingSet.add(s2);
+		    }
+		    checkedSet.add(s);
+		}
+		workingSet = newWorkingSet;
+	    }
+
+	    return false;
+	}
+    }
+
+    public int [][] forwardTransitions(State [] states) 
+	throws IllegalResidueException
+    {
+	int stateCount = states.length;
+	int [][] transitions = new int[stateCount][];
+
+	for (int i = 0; i < stateCount; i++) {
+	    int [] tmp = new int[stateCount];
+	    int len = 0;
+	    Set trans = mm.transitionsTo(states[i]);
+	    // System.out.println("trans has size " + trans.size());
+	    for (int j = 0; j < stateCount; j++) {
+		if (trans.contains(states[j])) {
+		    // System.out.println(states[j].getName() + " -> " + states[i].getName());
+		    tmp[len++] = j;
+		}
+	    }
+	    int [] tmp2 = new int[len];
+	    for (int j = 0; j < len; j++)
+		tmp2[j] = tmp[j];
+	    transitions[i] = tmp2;
+	}
+	
+	return transitions;
+    }
+
+    public double [][] forwardTransitionScores(State [] states,
+					       int [][] transitions) 
 	throws IllegalResidueException 
     {
-	return (EmissionState [])
-            alpha.residues().toList().toArray(new EmissionState[0]);
+	int stateCount = states.length;
+	double [][] scores = new double[stateCount][];
+
+	for (int i = 0; i < stateCount; i++) {
+	    State is = states[i];
+	    scores[i] = new double[transitions[i].length];
+	    for (int j = 0; j < scores[i].length; j++) {
+		try {
+		    scores[i][j] = mm.getTransitionScore(states[transitions[i][j]], is);
+		} catch (IllegalTransitionException ite) {
+		    throw new BioError(ite,
+				       "Transition listed in transitions array has dissapeared.");
+		}
+		// System.out.println(states[transitions[i][j]].getName() + " -> " + states[i].getName()
+		//                   + " = " + scores[i][j]);
+	    }
+	}
+
+	return scores;
     }
-
-    public static int [][] forwardTransitions(MarkovModel model,
-      EmissionState [] states) throws IllegalResidueException {
-    int stateCount = states.length;
-    int [][] transitions = new int[stateCount][];
-
-    for (int i = 0; i < stateCount; i++) {
-      int [] tmp = new int[stateCount];
-      int len = 0;
-      Set trans = model.transitionsTo(states[i]);
-      // System.out.println("trans has size " + trans.size());
-      for (int j = 0; j < stateCount; j++) {
-        if (trans.contains(states[j])) {
-          // System.out.println(states[j].getName() + " -> " + states[i].getName());
-          tmp[len++] = j;
-        }
-      }
-      int [] tmp2 = new int[len];
-      for (int j = 0; j < len; j++)
-        tmp2[j] = tmp[j];
-      transitions[i] = tmp2;
-    }
-
-    return transitions;
-  }
-
-      public static double [][] forwardTransitionScores(MarkovModel model,
-      EmissionState [] states,
-      int [][] transitions) throws IllegalResidueException {
-    int stateCount = states.length;
-    double [][] scores = new double[stateCount][];
-
-    for (int i = 0; i < stateCount; i++) {
-      State is = states[i];
-      scores[i] = new double[transitions[i].length];
-      for (int j = 0; j < scores[i].length; j++) {
-        try {
-          scores[i][j] = model.getTransitionScore(states[transitions[i][j]], is);
-        } catch (IllegalTransitionException ite) {
-          throw new BioError(ite,
-            "Transition listed in transitions array has dissapeared.");
-        }
-        // System.out.println(states[transitions[i][j]].getName() + " -> " + states[i].getName()
-        //                   + " = " + scores[i][j]);
-      }
-    }
-
-    return scores;
-  }
 
     private static Residue getResWrapper(CrossProductAlphabet a, List l) 
         throws IllegalAlphabetException
@@ -109,49 +204,49 @@ public class PairwiseDP {
 //  	    System.out.println(blah.getName());
 //  	}
 
-	if (l.contains(DP.MAGICAL_RESIDUE)) {
+	if (l.contains(MagicalState.MAGICAL_RESIDUE)) {
 	    for (Iterator i = l.iterator(); i.hasNext(); )
-		if (i.next() != DP.MAGICAL_RESIDUE)
+		if (i.next() != MagicalState.MAGICAL_RESIDUE)
 		    return null;
-	    return DP.MAGICAL_RESIDUE;
+	    return MagicalState.MAGICAL_RESIDUE;
 	}
 	return a.getResidue(l);
     }
 
     private final static int[] ia00 = {0, 0};
 
-    public double forward(MarkovModel mm, ResidueList seq0, ResidueList seq1) 
+    public double forward(ResidueList seq0, ResidueList seq1) 
         throws Exception
     {
 	Forward f = new Forward();
-	return f.runForward(mm, seq0, seq1);
+	return f.runForward(seq0, seq1);
     }
 
 private class Forward {
     private int[][] transitions;
     private double[][] transitionScores;
-    private EmissionState[] states;
+    private State[] states;
     private PairDPCursor cursor;
     private CrossProductAlphabet alpha;
 
-    public double runForward(MarkovModel mm, ResidueList seq0, ResidueList seq1) 
+    public double runForward(ResidueList seq0, ResidueList seq1) 
         throws Exception
     {
-	states = stateList(mm.stateAlphabet());
+	states = stateList();
 	cursor = new PairDPCursor(seq0, seq1, states.length, false);
-	alpha = (CrossProductAlphabet) mm.queryAlphabet();
+	alpha = (CrossProductAlphabet) mm.emissionAlphabet();
 
 	// Forward initialization
 
 	double[] col = cursor.getColumn(ia00);
 	for (int l = 0; l < states.length; ++l)
-	    col[l] = (states[l] == PairwiseDP.MAGICAL_STATE) ? 0.0 :
+	    col[l] = (states[l] == magicalState) ? 0.0 :
 	                Double.NEGATIVE_INFINITY;
 
 	// Recurse
 
-	transitions = forwardTransitions(mm, states);
-	transitionScores = forwardTransitionScores(mm, states, transitions);
+	transitions = forwardTransitions(states);
+	transitionScores = forwardTransitionScores(states, transitions);
 
 	while (cursor.canAdvance(0) || cursor.canAdvance(1)) {
 	    if (cursor.canAdvance(0)) {
@@ -176,7 +271,7 @@ private class Forward {
 	colId[1] = cursor.getPos(1);
 	col = cursor.getColumn(colId);
 	int l = 0;
-	while (states[l] != PairwiseDP.MAGICAL_STATE)
+	while (states[l] != magicalState)
 	    ++l;
 
 	return col[l];
@@ -226,20 +321,26 @@ private class Forward {
 	throws Exception
     {
 	double[] curCol = (double[]) matrix[0][0];
+	int[] advance;
 	for (int l = 0; l < states.length; ++l) {
 	    // System.out.println("State = " + states[l].getName());
 
-	    int[] advance = states[l].getAdvance();
+	    if (states[l] instanceof EmissionState)
+		advance = ((EmissionState) states[l]).getAdvance();
+	    else
+		advance = ia00;
 	    Residue res = resMatrix[advance[0]][advance[1]];
 	    double weight = Double.NEGATIVE_INFINITY;
 	    if (res == null) {
 		weight = Double.NEGATIVE_INFINITY;
-	    } else if (res == DP.MAGICAL_RESIDUE) {
+	    } else if (! (states[l] instanceof EmissionState)) {
+		weight = 0.0;
+	    } else if (res == MagicalState.MAGICAL_RESIDUE) {
 		try {
-		    weight = states[l].getWeight(res);
+		    weight = ((EmissionState) states[l]).getWeight(res);
 		} catch (Exception ex) {}
 	    } else {
-		weight = states[l].getWeight(res);
+		weight = ((EmissionState) states[l]).getWeight(res);
 	    }
 
 	    if (weight == Double.NEGATIVE_INFINITY) {
@@ -262,8 +363,13 @@ private class Forward {
 
 		double[] sourceScores = new double[tr.length];
 		for (int ci = 0; ci < tr.length; ++ci) {
-		    advance = states[tr[ci]].getAdvance();
-		    double[] sCol = (double[]) matrix[advance[0]][advance[1]];
+		    double[] sCol;
+		    if (states[tr[ci]] instanceof EmissionState) {
+			advance = ((EmissionState)states[tr[ci]]).getAdvance();
+		        sCol = (double[]) matrix[advance[0]][advance[1]];
+		    } else {
+			sCol = (double[]) matrix[0][0];
+		    }
 		    sourceScores[ci] = sCol[tr[ci]];
 		}
 
@@ -293,41 +399,39 @@ private class Forward {
 
     // VITERBI!
 
-    public StatePath viterbi(MarkovModel mm, ResidueList s0, ResidueList s1) 
+    public StatePath viterbi(ResidueList s0, ResidueList s1) 
         throws Exception
     {
 	Viterbi v = new Viterbi();
-	return v.runViterbi(mm, s0, s1);
+	return v.runViterbi(s0, s1);
     }
 
 
 private class Viterbi { 
     private int[][] transitions;
     private double[][] transitionScores;
-    private EmissionState[] states;
+    private State[] states;
     private PairDPCursor cursor;
     private CrossProductAlphabet alpha;
 
-    public StatePath runViterbi(MarkovModel mm,
-			      ResidueList seq0,
-			      ResidueList seq1) 
+    public StatePath runViterbi(ResidueList seq0, ResidueList seq1) 
         throws Exception
     {
-	states = stateList(mm.stateAlphabet());
+	states = stateList();
 	cursor = new PairDPCursor(seq0, seq1, states.length, true);
-	alpha = (CrossProductAlphabet) mm.queryAlphabet();
+	alpha = (CrossProductAlphabet) mm.emissionAlphabet();
 
 	// Forward initialization
 
 	double[] col = cursor.getColumn(ia00);
 	for (int l = 0; l < states.length; ++l)
-	    col[l] = (states[l] == PairwiseDP.MAGICAL_STATE) ? 0.0 :
+	    col[l] = (states[l] == magicalState) ? 0.0 :
 	                Double.NEGATIVE_INFINITY;
 
 	// Recurse
 
-	transitions = forwardTransitions(mm, states);
-	transitionScores = forwardTransitionScores(mm, states, transitions);
+	transitions = forwardTransitions(states);
+	transitionScores = forwardTransitionScores(states, transitions);
 
 	while (cursor.canAdvance(0) || cursor.canAdvance(1)) {
 	    if (cursor.canAdvance(0)) {
@@ -352,7 +456,7 @@ private class Viterbi {
 	colId[1] = cursor.getPos(1);
 	col = cursor.getColumn(colId);
 	int l = 0;
-	while (states[l] != PairwiseDP.MAGICAL_STATE)
+	while (states[l] != magicalState)
 	    ++l;
 
 	// Traceback...  
@@ -430,21 +534,27 @@ private class Viterbi {
 	throws Exception
     {
 	double[] curCol = (double[]) matrix[0][0];
+	int[] advance;
 	BackPointer[] curBPs = (BackPointer[]) bpMatrix[0][0];
 	for (int l = 0; l < states.length; ++l) {
 	    // System.out.println("State = " + states[l].getName());
 
-	    int[] advance = states[l].getAdvance();
+	    if (states[l] instanceof EmissionState)
+		advance = ((EmissionState) states[l]).getAdvance();
+	    else
+		advance = ia00;
 	    Residue res = resMatrix[advance[0]][advance[1]];
 	    double weight = Double.NEGATIVE_INFINITY;
 	    if (res == null) {
 		weight = Double.NEGATIVE_INFINITY;
-	    } else if (res == DP.MAGICAL_RESIDUE) {
+	    } else if (! (states[l] instanceof EmissionState)) {
+		weight = 0.0;
+	    } else if (res == MagicalState.MAGICAL_RESIDUE) {
 		try {
-		    weight = states[l].getWeight(res);
+		    weight = ((EmissionState) states[l]).getWeight(res);
 		} catch (Exception ex) {}
 	    } else {
-		weight = states[l].getWeight(res);
+		weight = ((EmissionState) states[l]).getWeight(res);
 	    }
 
 	    if (weight == Double.NEGATIVE_INFINITY) {
@@ -469,9 +579,16 @@ private class Viterbi {
 		double[] sourceScores = new double[tr.length];
 		BackPointer[] oldBPs = new BackPointer[tr.length];
 		for (int ci = 0; ci < tr.length; ++ci) {
-		    advance = states[tr[ci]].getAdvance();
-		    double[] sCol = (double[]) matrix[advance[0]][advance[1]];
-		    BackPointer[] bpCol = (BackPointer[]) bpMatrix[advance[0]][advance[1]];
+		    double[] sCol;
+		    BackPointer[] bpCol;
+		    if (states[tr[ci]] instanceof EmissionState) {
+			advance = ((EmissionState)states[tr[ci]]).getAdvance();
+		        sCol = (double[]) matrix[advance[0]][advance[1]];
+			bpCol = (BackPointer[]) bpMatrix[advance[0]][advance[1]];
+		    } else {
+			sCol = (double[]) matrix[0][0];
+			bpCol = (BackPointer[]) bpMatrix[0][0];
+		    }
 		    sourceScores[ci] = sCol[tr[ci]];
 		    oldBPs[ci] = bpCol[tr[ci]];
 		}
@@ -502,58 +619,6 @@ private class Viterbi {
 	}
     }
 }
-
-
-    private static class MagicalState implements EmissionState {
-	private char c;
-	private Residue r;
-	private int[] advance = {1, 1};
-	
-	public MagicalState(char c, Residue r) {
-	    this.c = c;
-	    this.r = r;
-	}
-
-	public char getSymbol() {
-	    return c;
-	}
-
-	public String getName() {
-	    return c + "";
-	}
-
-	public Annotation getAnnotation() {
-	    return Annotation.EMPTY_ANNOTATION;
-	}
-
-	public Alphabet alphabet() {
-	    return DP.MAGICAL_ALPHABET;
-	}
-
-	public double getWeight(Residue r) throws IllegalResidueException {
-	    if (r != this.r)
-		return Double.NEGATIVE_INFINITY;
-	    return 0;
-	}
-
-	public void setWeight(Residue r, double w) throws IllegalResidueException,
-	UnsupportedOperationException {
-	    alphabet().validate(r);
-	    throw new UnsupportedOperationException(
-						    "The weights are immutable: " + r.getName() + " -> " + w);
-	}
-
-	public Residue sampleResidue() {
-	    return r;
-	}
-
-	public void registerWithTrainer(ModelTrainer modelTrainer) {
-	}
-
-	public int[] getAdvance() {
-	    return advance;
-	}
-    }    
 
 private static class BackPointer {
     State state;
@@ -677,7 +742,7 @@ private static class PairDPCursor {
 
     public Residue residue(int dim, int poz) {
 	if (poz == 0 || poz > seqs[dim].length())
-	    return DP.MAGICAL_RESIDUE;
+	    return MagicalState.MAGICAL_RESIDUE;
 	return seqs[dim].residueAt(poz);
     }
 
