@@ -78,7 +78,7 @@ public class FastaAlignmentFormat implements AlignmentFormat {
         }
         else {
             System.out.println("FastaAlignment.write -- File type not recognized.");
-            System.exit(0);
+            return;
         }
 
         while (labels.hasNext()) {

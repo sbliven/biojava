@@ -232,7 +232,7 @@ public class MSFAlignmentFormat {
         }
         else {
             System.out.println("MSFAlignment.write -- File type not recognized.");
-            System.exit(0);
+            return;
         }
         out.print("  .." + nl);
         out.println();
