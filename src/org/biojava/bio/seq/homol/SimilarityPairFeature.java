@@ -20,7 +20,7 @@
  */
 
 package org.biojava.bio.seq.homol;
- 
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -30,6 +30,8 @@ import java.util.Set;
 
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.seq.AlignmentSequenceIterator;
 import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.Edit;
@@ -232,6 +234,10 @@ public interface SimilarityPairFeature extends StrandedFeature
             throws IndexOutOfBoundsException,IllegalAlphabetException, ChangeVetoException
         {
             throw new ChangeVetoException("You can't edit the empty symbol list");
+        }
+
+        public SequenceIterator sequenceIterator() {
+            return new AlignmentSequenceIterator(this);
         }
     }
 }

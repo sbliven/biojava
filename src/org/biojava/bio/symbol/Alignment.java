@@ -24,6 +24,7 @@ package org.biojava.bio.symbol;
 import java.util.*;
 
 import org.biojava.utils.*;
+import org.biojava.bio.seq.*;
 
 /**
  * An alignment containing multiple <span class="type">SymbolList</span>s.
@@ -56,7 +57,7 @@ public interface Alignment extends SymbolList {
     "org.biojava.bio.symbol.Alignment",
     "CONTENT"
   );
-  
+
   /**
    * <p>
    * The list of SymbolLists in the alignment.
@@ -72,7 +73,7 @@ public interface Alignment extends SymbolList {
    * @return  the List of all SymbolLists in the alignment
    */
   List getLabels();
-  
+
   /**
    * Retrieve a symbol by label and column.
    *
@@ -83,7 +84,7 @@ public interface Alignment extends SymbolList {
    */
   Symbol symbolAt(Object label, int column)
   throws NoSuchElementException;
-  
+
   /**
    * Retrieve a single row of the alignment by label.
    *
@@ -93,7 +94,7 @@ public interface Alignment extends SymbolList {
    */
   SymbolList symbolListForLabel(Object label)
   throws NoSuchElementException;
-  
+
   /**
    * <p>
    * Make a view onto this alignment.
@@ -113,5 +114,13 @@ public interface Alignment extends SymbolList {
    */
   Alignment subAlignment(Set labels, Location loc)
   throws NoSuchElementException;
+
+  /**
+   * Creates a SequenceIterator over the SymbolLists in the alignment.  The labels
+   * become the urns and names of the new Sequences.
+   *
+   * @return a SequenceIterator
+   */
+  SequenceIterator sequenceIterator();
 }
 

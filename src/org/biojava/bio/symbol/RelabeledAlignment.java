@@ -24,6 +24,7 @@ package org.biojava.bio.symbol;
 import java.util.*;
 
 import org.biojava.utils.*;
+import org.biojava.bio.seq.*;
 
 /**
  * An alignment that relabels another alignment.
@@ -36,7 +37,7 @@ public class RelabeledAlignment
 {
   private Alignment delegate;
   private Map labelMap = new HashMap();
-  
+
   public RelabeledAlignment(Alignment delegate) {
     this.delegate = delegate;
     for(Iterator i = delegate.getLabels().iterator(); i.hasNext(); ) {
@@ -44,63 +45,67 @@ public class RelabeledAlignment
       labelMap.put(label, label);
     }
   }
-  
+
   public List getLabels() {
     return new ArrayList(labelMap.keySet());
   }
-  
+
   public Symbol symbolAt(Object label, int column)
   throws NoSuchElementException {
     return delegate.symbolAt(map(label), column);
   }
-  
+
   public SymbolList symbolListForLabel(Object label)
   throws NoSuchElementException {
     return delegate.symbolListForLabel(map(label));
   }
-  
+
   public Alignment subAlignment(Set labels, Location loc)
   throws NoSuchElementException {
     return new RelabeledAlignment(delegate.subAlignment(map(labels), loc));
   }
-  
+
   public String seqString() {
     return delegate.seqString();
   }
-  
+
   public String subStr(int min, int max) {
     return delegate.subStr(min, max);
   }
-  
+
   public Alphabet getAlphabet() {
     return delegate.getAlphabet();
   }
-  
+
   public Iterator iterator() {
     return delegate.iterator();
   }
-  
+
   public int length() {
     return delegate.length();
   }
-  
+
   public List toList() {
     return delegate.toList();
   }
-  
+
   public SymbolList subList(int min, int max) {
     return delegate.subList(min, max);
   }
-  
+
   public Symbol symbolAt(int pos) {
     return delegate.symbolAt(pos);
   }
-  
+
   public void edit(Edit edit)
   throws IllegalAlphabetException, ChangeVetoException {
     delegate.edit(edit);
   }
-  
+
+  public SequenceIterator sequenceIterator() {
+    return new AlignmentSequenceIterator(this);
+  }
+
   protected Set map(Set labels) {
     Set set = new HashSet();
     for(Iterator i = labels.iterator(); i.hasNext(); ) {
@@ -108,7 +113,7 @@ public class RelabeledAlignment
     }
     return set;
   }
-  
+
   protected Object map(Object label) {
     return labelMap.get(label);
   }

@@ -28,6 +28,7 @@ import java.util.*;
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.*;
 
 /**
  * A no-frills implementation of StatePath.
@@ -41,11 +42,11 @@ public class SimpleStatePath
 {
   private final double score;
   private final Alignment delegate;
-  
+
   public double getScore() {
     return score;
   }
-  
+
   public SimpleStatePath(
     double score,
     SymbolList sequence,
@@ -54,60 +55,60 @@ public class SimpleStatePath
   ) throws IllegalArgumentException {
     this.score = score;
     Map map = new HashMap();
-    map.put(StatePath.SEQUENCE, sequence); 
-    map.put(StatePath.STATES, states); 
+    map.put(StatePath.SEQUENCE, sequence);
+    map.put(StatePath.STATES, states);
     map.put(StatePath.SCORES, scores);
     this.delegate = new SimpleAlignment(map);
   }
-  
+
   public Alphabet getAlphabet() {
     return delegate.getAlphabet();
   }
-  
+
   public List getLabels() {
     return delegate.getLabels();
   }
-  
+
   public int length() {
     return delegate.length();
   }
-  
+
   public Alignment subAlignment(Set labels, Location loc)
   throws NoSuchElementException {
     return delegate.subAlignment(labels, loc);
   }
-  
+
   public Symbol symbolAt(int col)
   throws IndexOutOfBoundsException {
     return delegate.symbolAt(col);
   }
-  
+
   public Symbol symbolAt(Object label, int col)
   throws IndexOutOfBoundsException, NoSuchElementException {
     return delegate.symbolAt(label, col);
   }
-  
+
   public SymbolList symbolListForLabel(Object label)
   throws NoSuchElementException {
     return delegate.symbolListForLabel(label);
   }
-  
+
   public Iterator iterator() {
     return delegate.iterator();
   }
-  
+
   public SymbolList subList(int start, int end) {
     return delegate.subList(start, end);
   }
-  
+
   public List toList() {
     return delegate.toList();
   }
-  
+
   public String seqString() {
     return delegate.seqString();
   }
-  
+
   public String subStr(int start, int end)
   throws IndexOutOfBoundsException {
     return delegate.subStr(start, end);
@@ -116,6 +117,10 @@ public class SimpleStatePath
   public void edit(Edit edit)
   throws IllegalAlphabetException, IndexOutOfBoundsException, ChangeVetoException {
     throw new ChangeVetoException("Can't edit SimpleStatePath");
+  }
+
+  public SequenceIterator sequenceIterator() {
+    return delegate.sequenceIterator();
   }
 
 }

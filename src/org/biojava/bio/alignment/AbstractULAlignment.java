@@ -22,7 +22,7 @@
 /**
  * <p>AbstractULAlignment is an abstract base class for alignments
  * where the constituent sequences have unequal lengths.</p>
- * 
+ *
  * @author David Waring
  */
 
@@ -33,15 +33,16 @@ import java.util.*;
 import java.io.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.*;
 import org.biojava.utils.*;
 
 
 public abstract class AbstractULAlignment extends AbstractSymbolList implements UnequalLengthAlignment{
-    
+
     protected Alphabet alphabet;
     /** this will return the ambiguity symbol associated with all symbols in that column
     */
-    
+
     public Symbol symbolAt(int index) {
         try {
           return alphabet.getSymbol(new ColAsList(index));
@@ -52,7 +53,7 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
           );
         }
     }
-  
+
     public List labelsAt(int column){
         return labelsInRange(new RangeLocation(column,column));
     }
@@ -62,7 +63,7 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
         Location seqLoc;
         Object label;
         List labelList = new Vector();
-                     
+
         for (Iterator labelIterator = labels.iterator();labelIterator.hasNext();){
             label = labelIterator.next();
             seqLoc = locInAlignment(label);
@@ -72,7 +73,11 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
         }
         return labelList;
     }
-    
+
+    public SequenceIterator sequenceIterator() {
+        return new AlignmentSequenceIterator(this);
+    }
+
     protected void debug(String s){
         System.out.println(s);
     }
@@ -80,7 +85,7 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
     * leftMost and rightMost return labels. If there are more than one
     * that start at the same location it returns the longest, if they are
     * the same length it returns the first one it found;
-    */        
+    */
     public Object leftMost(){
         List labels = getLabels();
         Object leftMost = null;
@@ -108,8 +113,8 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
         }
         return leftMost();
     }
-    
-    
+
+
     public Object rightMost(){
         List labels = getLabels();
         Object rightMost = null;
@@ -141,53 +146,53 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
     public Alignment subAlignment(Set labels, Location loc) throws IndexOutOfBoundsException{
         return new SubULAlignment(labels,loc);
     }
-    
-    
+
+
     public SortedSet orderedLables(Comparator comp){
         TreeSet orderedSet = new TreeSet(comp);
         orderedSet.addAll(getLabels());
         return orderedSet;
     }
-    
 
 
 
 
 
-    
+
+
    //////////////////////////////////////////////
    //////////////////////////////////////////////
    // INNER CLASSES
    //////////////////////////////////////////////
    //////////////////////////////////////////////
-   
+
     private final class ColAsList extends AbstractList implements Serializable {
         private final int col;
         private List labels;
-        
+
         public ColAsList(int col) {
           this.col = col;
           labels = getLabels();
         }
-        
+
         protected ColAsList() {
           this.col = 0;
         }
-        
+
         public Object get(int indx) {
           return symbolAt(labels.get(indx), col);
         }
-        
+
         public int size() {
           return labels.size();
         }
-    }    
+    }
 
     /**
     * Orders by location left to right. If they both start at the same location (o1.getMin() == o2.getMin())
     * it the larger of the two considered to the Left
     */
-    
+
     public class LeftRightLocationComparator implements Comparator{
        public int compare(Object o1, Object o2){
             int ret = 1;
@@ -195,9 +200,9 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
             loc1 = locInAlignment(o1);
             loc2 = locInAlignment(o2);
             if (loc1.getMin() > loc2.getMin()){
-                ret = 1;                
+                ret = 1;
             }else if (loc1.getMin() < loc2.getMin()){
-                ret = -1;                
+                ret = -1;
             }else if (loc1.getMin() == loc2.getMin()){
                 int s1 = (loc1.getMax() - loc1.getMin()) + 1;
                 int s2 = (loc2.getMax() - loc2.getMin()) + 1;
@@ -216,13 +221,13 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
     ///////////////
     // This inner class should take care of all subAlignments
     ///////////////
-    
+
     public class SubULAlignment extends AbstractSymbolList implements UnequalLengthAlignment{
         private int start,end;
         private List subLabels;  // will be left null if constructed with null Set of labels
                                  // this allows labels added to underlying Alignment to be seen
                                  // unless it was constructed with a Set of labels  NOT
-        
+
         public SubULAlignment (Set labels, Location loc) throws IndexOutOfBoundsException{
             this.start = loc.getMin();
             this.end = loc.getMax();
@@ -230,19 +235,19 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
                 throw new IndexOutOfBoundsException();
             }
             if (labels != null){
-                subLabels = new ArrayList();               
+                subLabels = new ArrayList();
                 subLabels.addAll(labels);
             }else{
                 subLabels = AbstractULAlignment.this.labelsInRange(new RangeLocation(start,end));
             }
 
         }
-        
-        /** 
+
+        /**
         * realPosition is the position in the underlying Alignment corresponding to
         * a position in the subAlignment
         */
-        
+
         private int realPosition(int pos){
             return pos + start - 1;
         }
@@ -252,22 +257,22 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
         public int length(){
             return end - start + 1;
         }
-        
+
         /**
         * The location of an individual SymbolList relative to overall Alignment
-        */        
+        */
         public Location locInAlignment(Object label){
             Location origLoc = AbstractULAlignment.this.locInAlignment(label);
             int min = origLoc.getMin() - start + 1;
             int max = origLoc.getMax() - start + 1;
             return new RangeLocation(min,max);
         }
-        
+
         public Alignment subAlignment(Set labels, Location loc) throws NoSuchElementException{
             int min = realPosition(loc.getMin());
             int max = realPosition(loc.getMax());
             // if the Subalignment has a limited subLabel we want to keep labels of the sub sub aligment limited to that list too
-            
+
             if (labels == null){
                 labels = new TreeSet(subLabels);
             }else{
@@ -291,7 +296,7 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
         public List labelsAt(int column) throws IndexOutOfBoundsException {
             return labelsInRange(new RangeLocation(column,column));
         }
-                
+
         public List labelsInRange(Location loc) throws IndexOutOfBoundsException {
 //            debug ("looking for labelsInRange " + loc.getMin() + "-" + loc.getMax());
             int min = realPosition(loc.getMin());
@@ -309,32 +314,36 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
 //                 }
 //            }
 //            return sLabels;
-                
+
         }
-        
-                
-            
+
+
+
         /////////////////////////
         // methods from Interface Alignment
         ////////////////////////
         public List getLabels(){
             return subLabels;
         }
-        
+
         public Symbol symbolAt(Object label, int column) throws NoSuchElementException{
            return AbstractULAlignment.this.symbolAt(label,realPosition(column));
         }
-        
+
         public Symbol symbolAt(int column) throws NoSuchElementException{
            return AbstractULAlignment.this.symbolAt(realPosition(column));
         }
-        
+
         public SymbolList symbolListForLabel(Object label) throws NoSuchElementException{
            return AbstractULAlignment.this.symbolListForLabel(label);
         }
-        
+
         public Alphabet getAlphabet(){
            return AbstractULAlignment.this.getAlphabet();
+        }
+
+        public SequenceIterator sequenceIterator() {
+            return new AlignmentSequenceIterator(this);
         }
     }
 }

@@ -25,6 +25,7 @@ import java.util.*;
 import java.io.*;
 
 import org.biojava.bio.*;
+import org.biojava.bio.seq.*;
 
 /**
  * A simple implementation of an Alignment.
@@ -146,6 +147,15 @@ extends AbstractSymbolList implements Alignment, Serializable {
 
     this.alphabet = AlphabetManager.getCrossProductAlphabet(alphaList);
     this.length = length;
+  }
+
+  /**
+   * Returns a SequenceIterator over the SymbolLists in this alignment.
+   *
+   * @author Nimesh Singh
+   */
+  public SequenceIterator sequenceIterator() {
+    return new AlignmentSequenceIterator(this);
   }
 
   /**
