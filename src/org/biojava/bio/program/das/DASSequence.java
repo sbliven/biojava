@@ -235,7 +235,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    for (Iterator i = structure.features(); i.hasNext(); ) {
 		DASComponentFeature dcf = (DASComponentFeature) i.next();
 		DASSequence seq = dcf.getSequenceLazy();
-		if (seq == null) {
+		if (seq != null) {
 		    seq.removeAnnotationSource(dataSourceURL);
 		}
 	    }
