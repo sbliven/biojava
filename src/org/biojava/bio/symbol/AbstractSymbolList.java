@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.BioRuntimeException;
@@ -174,7 +173,7 @@ implements SymbolList {
    */
 
   private class SymbolIterator implements Iterator, Serializable {
-    private int min, max;
+    private int max;
     private int pos;
 
     /**
@@ -186,7 +185,6 @@ implements SymbolList {
      */
 
     public SymbolIterator(int min, int max) {
-      this.min = min;
       this.max = max;
       pos = min;
     }
@@ -230,7 +228,7 @@ implements SymbolList {
     private int start, end;
 
     private transient EditTranslater editTranslater = null;
-    private transient Annotatable.AnnotationForwarder annotationForwarder = null;
+    private transient ChangeForwarder annotationForwarder = null;
 
     public SubList(int start, int end) {
       this.start = start;
@@ -316,7 +314,8 @@ implements SymbolList {
         ((changeType == null) || (changeType == Annotation.PROPERTY)) &&
         (annotationForwarder == null)
       ) {
-        annotationForwarder = new Annotatable.AnnotationForwarder(this, cs);
+        annotationForwarder =
+                new ChangeForwarder.Retyper(this, cs, Annotation.PROPERTY);
         AbstractSymbolList.this.addChangeListener(annotationForwarder, Annotation.PROPERTY);
       }
 
@@ -326,7 +325,6 @@ implements SymbolList {
     /**
      * Provides logical equality for two SymbolLists that share the same list
      * of canonical symbols
-     * @author Mark Schreiber
      */
     public boolean equals(Object o){
       if(this == o) return true;//just for optimality

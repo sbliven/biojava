@@ -27,6 +27,7 @@ import org.biojava.bio.Annotation;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeForwarder;
 
 /**
  * The base-class for Symbol implementations.
@@ -40,7 +41,7 @@ public abstract class AbstractSymbol
   implements
     Symbol
 {
-  protected transient Annotatable.AnnotationForwarder annotationForwarder = null;
+  protected transient ChangeForwarder annotationForwarder = null;
   
   protected ChangeSupport getChangeSupport(ChangeType changeType) {
     ChangeSupport changeSupport = super.getChangeSupport(changeType);
@@ -49,7 +50,8 @@ public abstract class AbstractSymbol
       (changeType.isMatchingType(Annotatable.ANNOTATION) || Annotatable.ANNOTATION.isMatchingType(changeType)) &&
       (annotationForwarder == null)
     ) {
-      annotationForwarder = new Annotatable.AnnotationForwarder(this, changeSupport);
+      annotationForwarder =
+              new ChangeForwarder.Retyper(this, changeSupport, Annotation.PROPERTY);
       getAnnotation().addChangeListener(annotationForwarder, Annotation.PROPERTY);
     }
     

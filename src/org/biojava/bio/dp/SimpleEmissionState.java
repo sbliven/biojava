@@ -179,7 +179,7 @@ public class SimpleEmissionState
             annotationForwarder == null &&
             ct.isMatchingType(Annotatable.ANNOTATION))
     {
-      annotationForwarder = new Annotatable.AnnotationForwarder(this, cs);
+      annotationForwarder = new ChangeForwarder.Retyper(this, cs, Annotation.PROPERTY);
       getAnnotation().addChangeListener(
           annotationForwarder,
           Annotatable.ANNOTATION);

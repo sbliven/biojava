@@ -183,6 +183,9 @@ public interface Distribution extends Changeable {
    *
    * @author Matthew Pocock
    * @since 1.1
+   * @deprecated use
+   *    <code>new ChangeForwarder.Retyper(this, cs, Annotation.PROPERTY)</code>
+   *    instead
    */
   public class NullModelForwarder extends ChangeForwarder {
     /**

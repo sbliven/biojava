@@ -37,11 +37,7 @@ import org.biojava.bio.seq.projection.Projection;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.bio.symbol.*;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.*;
 
 /**
  * View a sub-section of a given sequence object, including all the
@@ -73,7 +69,7 @@ public class SubSequence
   private transient ProjectedFeatureHolder features;
   private transient ChangeSupport changeSupport;
   private transient ChangeListener seqListener;
-  protected transient Annotatable.AnnotationForwarder annotationForwarder;
+  protected transient ChangeForwarder annotationForwarder;
 
   private void allocChangeSupport() {
     if (seqListener == null) {
@@ -282,8 +278,8 @@ public class SubSequence
     }
 
     if (annotationForwarder == null && ct == Annotatable.ANNOTATION) {
-      annotationForwarder = new Annotatable.AnnotationForwarder(
-              this, changeSupport);
+      annotationForwarder =
+              new ChangeForwarder.Retyper(this, changeSupport, Annotation.PROPERTY);
       getAnnotation().addChangeListener(annotationForwarder,
                                         Annotatable.ANNOTATION);
     }

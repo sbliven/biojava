@@ -133,10 +133,8 @@ implements
       (annotationForwarder == null) &&
       (ct.isMatchingType(Annotatable.ANNOTATION) || Annotatable.ANNOTATION.isMatchingType(ct))
     ) {
-      annotationForwarder = new Annotatable.AnnotationForwarder(
-        this,
-        cs
-      );
+      annotationForwarder =
+              new ChangeForwarder.Retyper(this, cs, Annotation.PROPERTY);
       getAnnotation().addChangeListener(
         annotationForwarder,
         Annotatable.ANNOTATION

@@ -36,23 +36,22 @@ import org.biojava.utils.Changeable;
  * BioJava object itself will probably not want to extend the
  * Annotation interface directly, but rather delegate off that
  * functionality to an Annotation property. The Annotatable interface
- * indicates that there is an Annoation porperty. It also provides an
- * inner class called AnnotationForwarder. When implementing
+ * indicates that there is an Annoation porperty. When implementing
  * Annotatable, you should always create a protected or private field
- * containing an instance of AnnotationForwarder, and register it as a
+ * containing an instance of ChangeForwarder, and register it as a
  * ChangeListener with the associated Annotation delegate
  * instance.</p>
  *
  * <pre>
  * public class Foo extends AbstractChangeable implements Annotatable {
  *   private Annotation ann; // the associated annotation delegate
- *   protected ChangeListener annFor; // the event forwarder
+ *   protected ChangeForwarder annFor; // the event forwarder
  *
  *   public Foo() {
  *     // make the ann delegate
  *     ann = new SimpleAnnotation();
  *
- *     annFor = new Annotatable.AnnotationForwarder(
+ *     annFor = new ChangeForwarder.Retyper(this, cs, Annotation.PROPERTY);(
  *       this, // this is the source of the new events
  *       getChangeSupport(Annotatable.ANNOTATION) // the type of the events
  *     );
@@ -120,6 +119,10 @@ public interface Annotatable extends Changeable {
    *
    * @for.developer This will ease the pain of letting your Annotatable tell its
    * listeners about changes in the Annotation.
+   *
+   * @deprecated use
+   *   <code>new ChangeForwarder.Retyper(source, cs, Annotation.PROPERTY)</code>
+   *   instead
    */
   static class AnnotationForwarder extends ChangeForwarder {
     /**

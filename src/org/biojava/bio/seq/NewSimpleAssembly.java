@@ -36,10 +36,7 @@ import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.*;
 
 /**
  * A Sequence which is assembled from other sequences contained
@@ -73,7 +70,7 @@ public class NewSimpleAssembly
     private NewAssembledSymbolList assembly;
 
     private FeatureRealizer featureRealizer = org.biojava.bio.seq.impl.FeatureImpl.DEFAULT;
-    protected transient AnnotationForwarder annotationForwarder;
+    protected transient ChangeForwarder annotationForwarder;
 
     {
 	assembly = new NewAssembledSymbolList();
@@ -257,9 +254,8 @@ public class NewSimpleAssembly
 
       if(annotationForwarder == null &&
         (ct == null || ct == Annotatable.ANNOTATION)){
-        annotationForwarder = new Annotatable.AnnotationForwarder(
-            this,
-            cs);
+        annotationForwarder =
+                new ChangeForwarder.Retyper(this, cs, Annotation.PROPERTY);
         getAnnotation().addChangeListener(
             annotationForwarder,
             Annotatable.ANNOTATION);

@@ -27,11 +27,7 @@ import java.util.List;
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.StrandedFeature.Strand;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ObjectUtil;
+import org.biojava.utils.*;
 
 /**
  * <p><code>SequenceDBSearchHit</code> objects represent a similarity
@@ -58,6 +54,7 @@ import org.biojava.utils.ObjectUtil;
  * </ul>
  *
  * @author Keith James
+ * @author Matthew Pocock
  * @since 1.1
  * @deprecated SimpleSeqSimilaritySearchHit has been made Annotatable
  * and is now functionally identical.
@@ -68,7 +65,7 @@ import org.biojava.utils.ObjectUtil;
 public class SequenceDBSearchHit extends AbstractChangeable
     implements SeqSimilaritySearchHit, Annotatable
 {
-    protected transient AnnotationForwarder annotationForwarder;
+    protected transient ChangeForwarder annotationForwarder;
     private double     score;
     private double     pValue;
     private double     eValue;
@@ -96,19 +93,19 @@ public class SequenceDBSearchHit extends AbstractChangeable
      * hit, which may be NaN.
      * @param pValue a <code>double</code> value; the P-value of the
      * hit, which may be NaN.
-     * @param qStart the start of the first sub-hit on the query
+     * @param queryStart the start of the first sub-hit on the query
      * sequence.
-     * @param qEnd the end of the last sub-hit on the query
+     * @param queryEnd the end of the last sub-hit on the query
      * sequence.
-     * @param qStrand the strand of the sub-hits on the query
+     * @param queryStrand the strand of the sub-hits on the query
      * sequence, which may be null for protein similarities. If they
      * are not all positive or all negative, then this should be the
      * unknown strand.
-     * @param sStart the start of the first sub-hit on the subject
+     * @param subjectStart the start of the first sub-hit on the subject
      * sequence.
-     * @param sEnd the end of the last sub-hit on the subject
+     * @param subjectEnd the end of the last sub-hit on the subject
      * sequence.
-     * @param sStrand the strand of the sub-hits on the subject
+     * @param subjectStrand the strand of the sub-hits on the subject
      * sequence, which may be null for protein similarities. If they
      * are not all positive or all negative, then this should be the
      * unknown strand.
@@ -293,7 +290,7 @@ public class SequenceDBSearchHit extends AbstractChangeable
             (ct.isMatchingType(Annotatable.ANNOTATION) || Annotatable.ANNOTATION.isMatchingType(ct)))
         {
             annotationForwarder =
-                new Annotatable.AnnotationForwarder(this, cs);
+                new ChangeForwarder.Retyper(this, cs, Annotation.PROPERTY);
             getAnnotation().addChangeListener(annotationForwarder,
                                               Annotatable.ANNOTATION);
         }

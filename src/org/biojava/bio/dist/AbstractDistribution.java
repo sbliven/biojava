@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.biojava.bio.BioError;
+import org.biojava.bio.Annotation;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetIndex;
 import org.biojava.bio.symbol.AlphabetManager;
@@ -38,11 +39,7 @@ import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.*;
 
 /**
  * An abstract implementation of Distribution.
@@ -76,7 +73,7 @@ public abstract class AbstractDistribution
   /**
    * Forwarder for modifications to the null model.
    */
-  protected transient Distribution.NullModelForwarder nullModelForwarder = null;
+  protected transient ChangeForwarder nullModelForwarder = null;
 
   /**
    * Used for serialization.
@@ -110,7 +107,8 @@ public abstract class AbstractDistribution
       ((Distribution.NULL_MODEL.isMatchingType(ct)) || (ct.isMatchingType(Distribution.NULL_MODEL))) &&
       nullModelForwarder == null
     ) {
-      nullModelForwarder = new Distribution.NullModelForwarder(this, changeSupport);
+      nullModelForwarder =
+              new ChangeForwarder.Retyper(this, changeSupport, Distribution.NULL_MODEL);
       getNullModel().addChangeListener(nullModelForwarder, Distribution.WEIGHTS);
     }
 

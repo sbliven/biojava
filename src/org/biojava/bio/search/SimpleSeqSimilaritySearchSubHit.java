@@ -25,11 +25,7 @@ import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Alignment;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ObjectUtil;
+import org.biojava.utils.*;
 
 /**
  * <p><code>SimpleSeqSimilaritySearchSubHit</code> objects represent
@@ -43,7 +39,7 @@ import org.biojava.utils.ObjectUtil;
 public class SimpleSeqSimilaritySearchSubHit extends AbstractChangeable
     implements SeqSimilaritySearchSubHit
 {
-    protected transient AnnotationForwarder annotationForwarder;
+    protected transient ChangeForwarder annotationForwarder;
 
     private double    score;
     private double    pValue;
@@ -268,7 +264,7 @@ public class SimpleSeqSimilaritySearchSubHit extends AbstractChangeable
             (ct.isMatchingType(Annotatable.ANNOTATION) || Annotatable.ANNOTATION.isMatchingType(ct)))
         {
             annotationForwarder =
-                new Annotatable.AnnotationForwarder(this, cs);
+                new ChangeForwarder.Retyper(this, cs, Annotation.PROPERTY);
             getAnnotation().addChangeListener(annotationForwarder,
                                               Annotatable.ANNOTATION);
         }

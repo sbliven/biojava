@@ -65,11 +65,7 @@ import org.biojava.bio.symbol.LocationTools;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.*;
 import org.biojava.utils.cache.CacheReference;
 import org.xml.sax.XMLReader;
 
@@ -120,7 +116,7 @@ public class DASSequence
     private static final int SYMBOL_TILE_THRESHOLD = 100000;
     private static final int SYMBOL_TILE_SIZE = 20000;
 
-    protected transient AnnotationForwarder annotationForwarder;
+    protected transient ChangeForwarder annotationForwarder;
 
     private DASSequenceDB parentdb;
     private URL dataSourceURL;
@@ -324,9 +320,7 @@ public class DASSequence
 
       if(annotationForwarder == null &&
         (ct == null || ct == Annotatable.ANNOTATION)){
-        annotationForwarder = new Annotatable.AnnotationForwarder(
-            this,
-            cs);
+        annotationForwarder = new ChangeForwarder.Retyper(this, cs, Annotation.PROPERTY);
         getAnnotation().addChangeListener(
             annotationForwarder,
             Annotatable.ANNOTATION);

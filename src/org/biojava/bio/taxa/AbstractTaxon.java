@@ -23,12 +23,7 @@ package org.biojava.bio.taxa;
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.SmallAnnotation;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.*;
 
 /**
  * <p>An abstract implementation of Taxon.</p>
@@ -68,10 +63,8 @@ public abstract class AbstractTaxon
       (annotationForwarder == null) &&
       (ct == null || ct == Annotatable.ANNOTATION)
     ) {
-      annotationForwarder = new Annotatable.AnnotationForwarder(
-        this,
-        cs
-      );
+      annotationForwarder =
+              new ChangeForwarder.Retyper(this, cs, Annotation.PROPERTY);
       getAnnotation().addChangeListener(
         annotationForwarder,
         Annotatable.ANNOTATION

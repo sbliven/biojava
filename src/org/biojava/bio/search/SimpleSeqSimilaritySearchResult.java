@@ -29,11 +29,7 @@ import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.db.SequenceDB;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ObjectUtil;
+import org.biojava.utils.*;
 
 /**
  * <code>SimpleSeqSimilaritySearchResult</code> objects represent a
@@ -56,7 +52,7 @@ import org.biojava.utils.ObjectUtil;
 public class SimpleSeqSimilaritySearchResult extends AbstractChangeable
     implements SeqSimilaritySearchResult
 {
-    protected transient AnnotationForwarder annotationForwarder;
+    protected transient ChangeForwarder annotationForwarder;
 
     private Sequence   querySequence;
     private SequenceDB sequenceDB;
@@ -211,7 +207,7 @@ public class SimpleSeqSimilaritySearchResult extends AbstractChangeable
             (ct.isMatchingType(Annotatable.ANNOTATION) || Annotatable.ANNOTATION.isMatchingType(ct)))
         {
             annotationForwarder =
-                new Annotatable.AnnotationForwarder(this, cs);
+                new ChangeForwarder.Retyper(this, cs, Annotation.PROPERTY);
             getAnnotation().addChangeListener(annotationForwarder,
                                               Annotatable.ANNOTATION);
         }

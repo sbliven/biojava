@@ -32,6 +32,7 @@ import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.Annotation;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeForwarder;
 import org.biojava.utils.ChangeSupport;
@@ -58,7 +59,7 @@ implements OrderNDistribution{
    * The listener that will forward events from the underlying distributions to
    * listeners for this distribution.
    */
-  protected transient WeigthForwarder weightForwarder = null;
+  protected transient ChangeForwarder weightForwarder = null;
   
   protected ChangeSupport getChangeSupport(ChangeType ct) {
     ChangeSupport changeSupport = super.getChangeSupport(ct);
@@ -67,7 +68,8 @@ implements OrderNDistribution{
       ( (Distribution.WEIGHTS.isMatchingType(ct)) || (ct.isMatchingType(Distribution.WEIGHTS)) ) &&
       weightForwarder == null
     ) {
-      weightForwarder = new WeigthForwarder(this, changeSupport);
+      weightForwarder =
+              new ChangeForwarder.Retyper(this, changeSupport, Distribution.WEIGHTS);
       for(Iterator i = conditionedDistributions().iterator(); i.hasNext(); ) {
         Distribution dist = (Distribution) i.next();
         dist.addChangeListener(weightForwarder, Distribution.WEIGHTS);
@@ -251,23 +253,6 @@ implements OrderNDistribution{
       throw new ChangeVetoException(
         "Can't set the null model for NthOrderDistribution.UniformNullModel"
       );
-    }
-  }
-  
-  private class WeigthForwarder extends ChangeForwarder {
-    public WeigthForwarder(Object source, ChangeSupport cs) {
-      super(source, cs);
-    }
-    
-    protected ChangeEvent generateEvent(ChangeEvent ce) {
-      if(ce.getType() == Distribution.WEIGHTS) {
-        return new ChangeEvent(
-          getSource(),
-          Distribution.WEIGHTS,
-          ce
-        );
-      }
-      return null;
     }
   }
 }

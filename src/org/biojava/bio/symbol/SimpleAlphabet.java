@@ -31,10 +31,7 @@ import java.util.Set;
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.SimpleAnnotation;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.SingletonList;
+import org.biojava.utils.*;
 
 /**
  * A simple no-frills implementation of the FiniteAlphabet interface.
@@ -48,8 +45,9 @@ implements Serializable {
   private String name;
   private Annotation annotation;
   private final Set symbols;
-  private final Set ambig;
-  protected transient Annotatable.AnnotationForwarder annotationForwarder;
+  private final Set ambig; // fixme: retaining this to keep serialisation
+                           // working - it is no longer used
+  protected transient ChangeForwarder annotationForwarder;
 
     //BE SURE TO CHANGE THIS VALUE IF YOU CHANGE THE IMPLEMENTATION
     //SUCH THAT SERIALIZATION WILL FAIL.
@@ -103,7 +101,7 @@ implements Serializable {
       symbols.remove(s);
     } else {
       FiniteAlphabet sa = (FiniteAlphabet) s.getMatches();
-      Iterator i = ((FiniteAlphabet) sa).iterator();
+      Iterator i = sa.iterator();
       while(i.hasNext()) {
         Symbol sym = (Symbol) i.next();
         symbols.remove(sym);
@@ -156,9 +154,8 @@ implements Serializable {
     if(annotationForwarder == null &&
       (ct.isMatchingType(Annotatable.ANNOTATION) || Annotatable.ANNOTATION.isMatchingType(ct)))
     {
-      annotationForwarder = new Annotatable.AnnotationForwarder(
-          this,
-          cs);
+      annotationForwarder =
+              new ChangeForwarder.Retyper(this, cs, Annotation.PROPERTY);
       getAnnotation().addChangeListener(
           annotationForwarder,
           Annotatable.ANNOTATION);
