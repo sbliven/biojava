@@ -85,12 +85,12 @@ public class Ace {
      */
 
     public static AceSet fetch(AceURL url) throws AceException {
-	Database db = (Database) databases.get(url);
+	Database db = getDatabase(url);
 	return db.fetch(url);
     }
 
     public static Connection getConnection(AceURL url) throws AceException {
-	Database db = (Database) databases.get(url);
+	Database db = getDatabase(url);
 	return db.getConnection();
     }
     

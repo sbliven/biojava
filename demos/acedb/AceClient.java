@@ -49,11 +49,11 @@ public class AceClient {
       String port = args[1];
       String user = args[2];
       String passwd = args[3];
-      DatabaseManager.registerDriver(new SocketDriver());
-      URL dbURL = new URL("acedb://" + host + ":" + port + "/");
+      Ace.registerDriver(new SocketDriver());
+      URL _dbURL = new URL("acedb://" + host + ":" + port + "/");
+      AceURL dbURL = new AceURL(_dbURL, user, passwd, null);
       System.out.println("Connecting to " + dbURL);
-      Database sacchDB = DatabaseManager.getDatabase(dbURL, user, passwd);
-      Connection aceCon = sacchDB.getConnection();
+      Connection aceCon = Ace.getConnection(dbURL);
       System.out.println("Connected:");
       BufferedReader in = new BufferedReader(
         new InputStreamReader(System.in)

@@ -110,13 +110,20 @@ class SocketDatabase implements Database {
 
 	if (file == null || file.length() == 0)
 	    return allClasses();
-	StringTokenizer toke = new StringTokenizer(file);
+	StringTokenizer toke = new StringTokenizer(file, "/");
 	if (toke.countTokens() == 1) {
 	    String clazz = toke.nextToken();
 	    resultSet = allClasses().retrieve(clazz);
 	} else {
 	    String clazz = toke.nextToken();
+      if(clazz == null) {
+        throw new AceException("Couldn't extract class name from URL " + file);
+      }
 	    String objname = toke.nextToken();
+      if(objname == null) {
+        throw new AceException("Couldn't extract class name from URL " + file);
+      }
+      
 	    resultSet = getObject(clazz, objname);
 
 	    while (toke.hasMoreTokens()) {
@@ -211,6 +218,9 @@ class SocketDatabase implements Database {
     public AceObject getObject(String clazz, String name) 
             throws AceException
     {
+      if(clazz == null) {
+        throw new NullPointerException("Class name was null");
+      }
 	String cacheName = clazz + ":" + name;
 	AceObject o = (AceObject) getFromCache(cacheName);
 	if (o != null)
@@ -223,7 +233,7 @@ class SocketDatabase implements Database {
 	    String result = sock.transact("find " + clazz + " " +
 					  name);
 	    if (result.indexOf("// Found 1 object") < 0) {
-		throw new AceException("Couldn't get object "+cacheName);
+		throw new AceException("Couldn't find object " + cacheName + " - does it exist?");
 	    }
 
 	    String obj = sock.transact("show -p");

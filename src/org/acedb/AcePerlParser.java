@@ -79,9 +79,11 @@ public class AcePerlParser {
           Ace.rootURL(parent.toURL()).relativeURL(cl)
         );
 	    } else {
+        System.out.println("db url is " + parentDB.toURL());
+        System.out.println("relative url is " + parentDB.toURL().relativeURL(cl));
         obj = new StaticAceObject(
           va, 
-		      parent
+		      Ace.fetch(parentDB.toURL().relativeURL(cl))
         );
 	    }
     } else /* if (ty.equals("tg")) */ {

@@ -31,6 +31,7 @@ import org.acedb.*;
 
 public class AceTreeView {
     public static void main(String[] args) throws Exception {
+      try {
 	if (args.length != 6)
 	    throw new RuntimeException("AceTreeView hostname port username class object");
 
@@ -41,12 +42,12 @@ public class AceTreeView {
 	String clazzName = args[4];
 	String objName = args[5];
 
-	DatabaseManager.registerDriver(new org.acedb.socket.SocketDriver());
-	URL dbURL = new URL("acedb://" + host + ":" + port);
-	Database myDB = DatabaseManager.getDatabase(dbURL, user, passwd);
-	AceType.ClassType seqClass = AceType.getClassType(myDB, clazzName);
-	AceSet resultSet = myDB.select(seqClass, objName);
-	AceTreeModel tm = new AceTreeModel((AceObject) resultSet.iterator().next());
+	Ace.registerDriver(new org.acedb.socket.SocketDriver());
+	URL _dbURL = new URL("acedb://" + host + ":" + port);
+  AceURL dbURL = new AceURL(_dbURL, user, passwd, null);
+	AceURL seqURL = dbURL.relativeURL(clazzName + "/" + objName);
+	AceObject seqObj = (AceObject) Ace.fetch(seqURL);
+	AceTreeModel tm = new AceTreeModel(seqObj);
 
 	JFrame myFrame = new JFrame("ACeDB " + clazzName + " " + objName);
 	JTree myTree = new JTree();
@@ -57,7 +58,11 @@ public class AceTreeView {
 	myFrame.pack();
 	myFrame.setVisible(true);
 	System.out.println("Going...");
+    } catch (Throwable t) {
+      t.printStackTrace();
     }
+    }
+    
 }
 
 
@@ -89,6 +94,7 @@ class AceTreeModel implements TreeModel {
     }
 
     public Object getChild(Object parent, int indx) {
+      try {
 	AceNode p = (AceNode) parent;
 	if (indx >= p.size())
 	    return null;
@@ -96,10 +102,17 @@ class AceTreeModel implements TreeModel {
 	while ((indx--) > 0)
 	    i.next();
 	return i.next();
+      } catch (AceException ae) {
+        throw new AceError(ae, "Pants");
+      }
     }
 
     public int getChildCount(Object parent) {
+      try {
 	return ((AceSet) parent).size();
+      } catch (AceException ae) {
+        throw new AceError(ae, "Pants");
+      }
     }
 
     public boolean isLeaf(Object parent) {
@@ -110,11 +123,15 @@ class AceTreeModel implements TreeModel {
     }
 
     public int getIndexOfChild(Object parent, Object child) {
+      try {
 	int i = 0;
 	Iterator it = ((AceSet) parent).iterator();
 	while (it.hasNext() && (it.next() != child))
 	    ++i;
 	return i;
+      } catch (AceException ae) {
+        throw new AceError(ae, "Pants");
+      }
     }
 
     public void addTreeModelListener(TreeModelListener l) {

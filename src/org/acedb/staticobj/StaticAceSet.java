@@ -68,12 +68,43 @@ public class StaticAceSet implements AceSet {
 
     public AceSet retrieve(String name) throws AceException {
       AceSet result = null;
-      if (subSets != null)
+      if (subSets != null) {
   	    result = (AceSet) subSets.get(name);
-      if(result == null)
-        throw new AceException("Could not find child with the name '" +
-                               name
-        );
+      
+        if(result == null) {
+          StringBuffer classes = new StringBuffer();
+          Iterator ni = subSets.keySet().iterator();
+          if(ni.hasNext()) {
+            Object obj = ni.next();
+            classes.append("\t'" + obj.toString() + "'=>'" + subSets.get(obj) + "'");
+            if(obj == name) {
+              classes.append(" == ");
+            }
+            if(obj.equals(name)) {
+              classes.append(" equals ");
+            }
+          }
+          while(ni.hasNext()) {
+            Object obj = ni.next();
+            classes.append(
+              "\n\t'" + obj.toString() + "'=>'" + subSets.get(obj) + "'" +
+              "\n\t'" + name + "'" + ", " + obj.getClass().getName()
+            );
+            if(obj == name) {
+              classes.append(" == ");
+            }
+            if(name.equals(obj)) {
+              classes.append(" equals ");
+            }
+          }
+          throw new AceException(
+            "Could not find child with the name '" +
+            name + "'" +
+            " and valid objects have the names:\n" +
+            classes.toString()
+          );
+        }
+      }
       return result;
     }
 

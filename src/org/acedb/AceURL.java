@@ -70,7 +70,7 @@ public class AceURL {
         protocol,
         host,
         port,
-        file + "/" + fragment,
+        (file == null) ? fragment : file + "/" + fragment,
         null,
         null,
         userInfo,
