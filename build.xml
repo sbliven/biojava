@@ -54,9 +54,15 @@
                classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTest"
                property="junit.support" />
 
+    <available classpath="${env.classpath}"
+               classname="java.nio.Buffer"
+               property="java14">
+    </available>
+
     <property name="readme" value="./README" />
     <property name="license" value="./LICENSE" />
     <property name="src.dir" value="./src" />
+    <property name="src14.dir" value="./src-1.4" />
     <property name="tests.dir" value="./tests" />
     <property name="reports.dir" value="./reports" />
     <property name="manifest.dir" value="./manifest" />
@@ -87,7 +93,7 @@
   </target>
 
   <!-- Prepares the source code -->
-  <target name="prepare-src" depends="init,prepare">
+  <target name="prepare-core" depends="init,prepare">
 
     <!-- Creates directories -->
     <mkdir dir="${build.src.main}" />
@@ -128,6 +134,16 @@
     </copy>
   </target>
 
+  <target name="prepare-14" if="java14">
+    <copy todir="${build.src.main}">
+      <fileset dir="${src14.dir}">
+        <exclude name="**/CVS/**" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="prepare-src" depends="init,prepare-core,prepare-14" />
+
   <!-- Compiles the source directory -->
   <target name="compile" depends="init,prepare-src">
     <javac
@@ -160,7 +176,7 @@
       jarfile="${build.dir}/${name}.jar"
       basedir="${build.dest.main}"
       manifest="${build.src.main}/${manifest.file}"
-      includes="org/**"
+      includes="**"
     />
   </target>
 
@@ -184,6 +200,30 @@
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
         <fileset dir="${build.dest.tests}">
           <include name="**/*Test*" />
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+
+  <target name="seqtests" depends="init,compile-tests" if="junit.support">
+    <junit printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
+      <formatter type="plain" usefile="true" />
+      <classpath>
+        <!-- classes specified in this file -->
+        <pathelement path="${classpath}" />
+        <!-- classes specified in system classpath -->
+        <pathelement path="${env.classpath}" />
+        <!-- main classes from build -->
+        <pathelement path="${build.dest.main}" />
+        <!-- test classes from build -->
+        <pathelement path="${build.dest.tests}" />
+        <!-- test data from build -->
+        <pathelement path="${build.src.tests}" />
+      </classpath>
+      <!-- The junit task doesn't support 'if' so we test for JUnit here -->
+      <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
+        <fileset dir="${build.dest.tests}">
+          <include name="org/biojava/bio/seq/*Test*" />
         </fileset>
       </batchtest>
     </junit>
