@@ -98,10 +98,14 @@ public class MotifTools
                     if (! stack.isEmpty() && stack.peek().equals(result))
                     {
                         stack.push(result);
+                        regex = extendRegex(stack, regex);
                     }
-
-                    regex = extendRegex(stack, regex);
-                    regex.append(result);
+                    else
+                    {
+                        regex = extendRegex(stack, regex);
+                        stack.push(result);
+                        regex = extendRegex(stack, regex);
+                    }
                 }
 
                 sb.setLength(0);
