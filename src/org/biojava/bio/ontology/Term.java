@@ -34,11 +34,11 @@ import org.biojava.bio.*;
  * <p>
  * Terms are things that represent things. They are the same sort of thing as a
  * Java object or a prolog atom. A sub-set of terms are themselves relations.
- * This means that they are used to describe associations betwee pairs of terms.
+ * This means that they are used to describe associations between pairs of terms.
  * Since all terms can be described, it is possible (and indeed encouraged) to
  * describe relations. As a minimum, you should consider saying if they are
- * identiy or partial order relations, or if they are transative, reflexive,
- * symetrical, anti-symetrical or anything else you know about them. This gives
+ * identity or partial order relations, or if they are transitive, reflexive,
+ * symmetrical, anti-symmetrical or anything else you know about them. This gives
  * the inference engine some chance of working out what is going on.
  * </p>
  *
@@ -50,7 +50,7 @@ import org.biojava.bio.*;
 public interface Term extends Annotatable {
     /**
      * ChangeType which indicates that this term's ontology has been
-     * alterred
+     * altered
      */
     
     public static final ChangeType ONTOLOGY = new ChangeType(

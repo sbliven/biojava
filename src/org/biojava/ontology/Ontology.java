@@ -26,7 +26,7 @@ import org.biojava.utils.*;
 
 /**
  * An ontology.  This is just a set of Term objects, and a set of
- * Triple object describing relationships between these terms.
+ * Triple objects describing relationships between these terms.
  * This class does not itself contain any reasoning functionality.
  *
  * @author Thomas Down

@@ -52,7 +52,7 @@ public interface Triple {
     public Term getRelation();
     
     /**
-     * The hashcode for a Tripple.
+     * The hashcode for a Triple.
      *
      * <p>This <em>must</em> be implemented as:
      * <pre>
@@ -61,17 +61,17 @@ public interface Triple {
               31 * 31 * getRelation().hashCode();
      * </pre>
      * If you do not implement hashcode in this way then you have no guarantee
-     * that your Triple objects will be found in an otology and that they will
+     * that your Triple objects will be found in an ontology and that they will
      * not be duplicated.
      * </p>
      */
     public int hashCode();
     
     /**
-     * Check to see if an object is an equivalent Tripple.
+     * Check to see if an object is an equivalent Triple.
      *
      * <p>
-     * Two tripples are equivalent if they have the same subject, object and
+     * Two triples are equivalent if they have the same subject, object and
      * relation fields.
      * <pre>
      * if (! (o instanceof Triple)) {
@@ -82,8 +82,8 @@ public interface Triple {
      *        to.getObject() == getObject() &&
      *        to.getRelation() == getRelation();
      * </pre>
-     * If you do not implement hashcode in this way then you have no guarantee
-     * that your Triple objects will be found in an otology and that they will
+     * If you do not implement equals in this way then you have no guarantee
+     * that your Triple objects will be found in an ontology and that they will
      * not be duplicated.
      * </p>
      */

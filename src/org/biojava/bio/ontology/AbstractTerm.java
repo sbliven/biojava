@@ -28,8 +28,8 @@ import org.biojava.bio.*;
 /**
  * Abstract implementation of term
  *
- * @for.developers This provides basic change-forwarding functionality from
- *                 the annotation and ontology properties.
+ * @for.developer This provides basic change-forwarding functionality from
+ *                the annotation and ontology properties.
  *
  * @author Thomas Down
  * @since 1.4

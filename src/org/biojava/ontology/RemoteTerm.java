@@ -40,7 +40,7 @@ import org.biojava.bio.*;
  * <p>
  * The imported term will have the same name as the original term. They are
  * implicitly identical to each other. The most common use of imports will be
- * to slurp in the "core" ontology so that opperations such as <code>is-a</code>
+ * to slurp in the "core" ontology so that operations such as <code>is-a</code>
  * and <code>has-a</code> are available.
  * </p>
  *

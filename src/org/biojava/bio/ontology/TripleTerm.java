@@ -32,7 +32,7 @@ import org.biojava.bio.*;
  * In order to describe a relation, it is important to both describe it at the
  * level of general properties (such as symmetry) and also at the level of
  * constraints on the complete set of Terms that are part of that relation.
- * TripleTerm allows you to reason over Triples, or over sets of Tripples.
+ * TripleTerm allows you to reason over Triples, or over sets of Triples.
  * For example, you could state that Triples involving is-a and has-a in your
  * ontology are exclusive. That is, you chose to either allow is-a or has-a
  * relations between any pair of terms, but not both. By using the size

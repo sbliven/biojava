@@ -34,7 +34,7 @@ import org.biojava.bio.*;
  * information to an Ontology containing an OntologyTerm stating how the
  * OntologyTerm's Ontology relates to other entities. This allows
  * classifications of Ontologies to be built. You could say that GO is a
- * biological ontoloogy, as is SO or perhaps declar something about the source
+ * biological ontology, as is SO or perhaps declare something about the source
  * of the information.
  * </p>
  *

@@ -68,7 +68,7 @@ public final class OntoTools {
   /**
    * Get the Ontology that defines our core "central dogma".
    *
-   * This contains deffinitions that we have to have, such as <code>any</code>,
+   * This contains definitions that we have to have, such as <code>any</code>,
    * <code>relation</code>, <code>is-a</code> and <code>transient</code>.
    *
    * @return the "core" Ontology
@@ -156,7 +156,7 @@ public final class OntoTools {
    * Get a Set of Triples satisfying some constraints.
    *
    * <p>
-   * This will find all tripples where each component of the triple inherits
+   * This will find all triples where each component of the triple inherits
    * from those provided. You may use OntoTools.ANY to accept any Term for that
    * component. This differs from the similar method in Ontology, as
    * Ontology.getTriples() finds exact matches for each component not set to

@@ -7,7 +7,7 @@ import java.util.Set;
  *
  * <p>
  * Some ontology implementations will be able to compute some derived properties
- * very quicly because of how they store their data. This is likely to out
+ * very quickly because of how they store their data. This is likely to out-
  * perform generic implementations of algorithms using the Ontology interface
  * to get the same result. If an Ontology implements OntologyOps, it is
  * publishing that it can provide some common operations. The ontology engine
@@ -20,20 +20,20 @@ import java.util.Set;
  */
 public interface OntologyOps {
   /**
-   * Calculate the transative closure on an ontology for all tripples where
+   * Calculate the transitive closure on an ontology for all tripples where
    * they are castable to the terms given.
    *
    * <p>
-   * Transitive closures are extremely usefull for many problems involving
-   * interogation of ontologies. Given a relation, it is transitive if
-   * <code>a R b and b R c implies a R c</code>. Normaly, the ontology will
+   * Transitive closures are extremely useful for many problems involving
+   * interrogation of ontologies. Given a relation, it is transitive if
+   * <code>a R b and b R c implies a R c</code>. Normally, the ontology will
    * store just the first two entries. It is the responsibility of the ontology
    * engine to prove the third one from the first two given that the relation R
    * is transitive.
    * </p>
    *
    * <p>
-   * Tripples are considered as being worth returning if their subject, object
+   * Triples are considered as being worth returning if their subject, object
    * and relation fields all map to the corresponding parameters by an 
    * <code>is-a</code> relationship. The relation to expand is given as
    * toFollow. Again, the method should follow all relations that are instances
@@ -83,9 +83,9 @@ public interface OntologyOps {
    * </p>
    *
    * <p>
-   * It is important that the <code>is-a</code> can be calculated independantly
+   * It is important that the <code>is-a</code> can be calculated independently
    * of transitiveClosure, as transitiveClosure relies upon <code>is-a</code>
-   * to work and <code>is-a</code> needs to potentialy walk the inheritance tree
+   * to work and <code>is-a</code> needs to potentially walk the inheritance tree
    * to evaluate.
    * </p>
    *
@@ -104,6 +104,4 @@ public interface OntologyOps {
    */
   public boolean isa(Term subject, Term object)
   throws OntologyException;
-  
-  
 }

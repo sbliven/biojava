@@ -26,7 +26,7 @@ import org.biojava.bio.ontology.*;
  * </p>
  *
  * <p>
- * Term names normaly will be just a term name like <code>relation</code> or
+ * Term names normally will be just a term name like <code>relation</code> or
  * <code>person</code>. There are also terms that represent collections of
  * triples. For example, here is the declaration for the 'triple' type in
  * the core ontology.
@@ -44,7 +44,7 @@ import org.biojava.bio.ontology.*;
  *
  * <p>
  * The first four lines just associate triple with some type with a relation
- * (e.g. is-a or has-a). The fith line says that something must have a size of
+ * (e.g. is-a or has-a). The fifth line says that something must have a size of
  * three. The 'something' is <code>(triple,has-a,any)	size	3</code> and is
  * short-hand for a collection of triples that state that the source must be
  * <code>triple</code>, the target must be <code>any</code> and the relation
@@ -57,7 +57,7 @@ import org.biojava.bio.ontology.*;
 public class TabDelimParser {
   /**
    * Parse an ontology from a reader.
-   * The reader will be emptied of text. It is the callers responsibility to
+   * The reader will be emptied of text. It is the caller's responsibility to
    * close the reader.
    *
    * @param in  the BufferedReader to read from
