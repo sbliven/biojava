@@ -21,7 +21,7 @@ public class CreateSPIndex {
     BioStore store = bsf.createBioStore();
     
     for(int i = 1; i < args.length; i++) {
-      File spFile = new File(args[1]);
+      File spFile = new File(args[i]);
       Indexer indexer = new Indexer(spFile, store);
       indexer.setPrimaryKeyName("ID");
       indexer.addSeccondaryKey("AC");
