@@ -13,6 +13,7 @@
 
     compile
     compile-tests compiles JUnit tests
+    compile-demos compiles the demo files
     package       builds the biojava.jar file (default)
     runtests      runs JUnit tests
     javadocs
@@ -64,6 +65,8 @@
     <property name="src.dir" value="./src" />
     <property name="src14.dir" value="./src-1.4" />
     <property name="tests.dir" value="./tests" />
+    <property name="demos.dir" value="./demos" />
+    <property name="demos14.dir" value="./demos-1.4" />
     <property name="reports.dir" value="./reports" />
     <property name="manifest.dir" value="./manifest" />
     <property name="manifest.file" value="defaultmanifest.txt" />
@@ -78,6 +81,8 @@
     <!-- Subdirectories for tests source and classes -->
     <property name="build.src.tests" value="./ant-build/src/tests" />
     <property name="build.dest.tests" value="./ant-build/classes/tests" />
+    <property name="build.src.demos" value="./ant-build/src/demos" />
+    <property name="build.dest.demos" value="./ant-build/classes/demos" />
     <!-- Subdirectory for Javadocs -->
     <property name="build.javadocs" value="./ant-build/docs" />
     <!-- Subdirectory for test reports -->
@@ -101,6 +106,8 @@
     <mkdir dir="${build.src.tests}" />
     <mkdir dir="${build.dest.tests}" />
     <mkdir dir="${reports.tests}" />
+    <mkdir dir="${build.src.demos}" />
+    <mkdir dir="${build.dest.demos}" />
 
     <!-- Copies src files -->
     <!-- copydir src="${src.dir}" dest="${build.src}" excludes="CVS,cvs"/ -->
@@ -113,6 +120,13 @@
     <!-- Copies test src files -->
     <copy todir="${build.src.tests}">
       <fileset dir="${tests.dir}">
+        <exclude name="**/CVS/**" />
+      </fileset>
+    </copy>
+
+    <!-- Copies demos files -->
+    <copy todir="${build.src.demos}">
+      <fileset dir="${demos.dir}">
         <exclude name="**/CVS/**" />
       </fileset>
     </copy>
@@ -142,7 +156,15 @@
     </copy>
   </target>
 
-  <target name="prepare-src" depends="init,prepare-core,prepare-14" />
+  <target name="prepare-14demos" if="java14">
+    <copy todir="${build.src.demos}">
+      <fileset dir="${demo14.dir}">
+        <exclude name="**/CVS/**" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="prepare-src" depends="init,prepare-core,prepare-14,prepare-14" />
 
   <!-- Compiles the source directory -->
   <target name="compile" depends="init,prepare-src">
@@ -161,6 +183,20 @@
     <javac
       srcdir="${build.src.tests}"
       destdir="${build.dest.tests}"
+      deprecation="true"
+      depend="yes">
+      <classpath>
+        <pathelement path="${classpath}" />
+        <pathelement path="${build.dest.main}" />
+      </classpath>
+    </javac>
+  </target>
+
+  <!-- Compiles the demos directory -->
+  <target name="compile-demos" depends="init,prepare-src,compile">
+    <javac
+      srcdir="${build.src.demos}"
+      destdir="${build.dest.demos}"
       deprecation="true"
       depend="yes">
       <classpath>
@@ -247,10 +283,10 @@
        <group title="Core Packages"
               packages="org.biojava.bio:org.biojava.bio.dist:org.biojava.bio.search:org.biojava.bio.seq:org.biojava.bio.seq.db:org.biojava.bio.seq.genomic:org.biojava.bio.seq.io:org.biojava.bio.symbol"
 />
-  
+
        <group title="Sequence databases and formats"
               packages="org.biojava.bio.seq.io.agave:org.biojava.bio.seq.io.game:org.biojava.bio.program.das:org.biojava.bio.seq.ragbag:org.biojava.bio.seq.db.emblcd:org.biojava.bio.program.xff" />
-     
+
        <group title="User Interface Components"
               packages="org.biojava.bio.gui:org.biojava.bio.gui.sequence" />
 
