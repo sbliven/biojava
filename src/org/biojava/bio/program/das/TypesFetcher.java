@@ -143,9 +143,9 @@ class TypesFetcher implements Fetcher {
 	    // int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
 	    int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
 	    if (status == 0) {
-		throw new BioError("Not a DAS server: " + fURL.toString());
+		throw new BioRuntimeException("Not a DAS server: " + fURL.toString());
 	    } else if (status != 200) {
-		throw new BioError("DAS error (status code = " + status + ") fetching " + fURL.toString() + " with query " + queryString);
+		throw new BioRuntimeException("DAS error (status code = " + status + ") fetching " + fURL.toString() + " with query " + queryString);
 	    }
 
             // determine if I'm getting a gzipped reply

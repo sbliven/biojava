@@ -100,7 +100,7 @@ public class DASSequenceDB implements SequenceDB {
 	    try {
 		dataSourceURL = new URL(s + "/");
 	    } catch (MalformedURLException ex) {
-		throw new BioError(ex, "Assertion failure: trivial URI manipulation failed");
+		throw new BioRuntimeException(ex, "Assertion failure: trivial URI manipulation failed");
 	    }
 	}
 	this.dataSourceURL = dataSourceURL;
@@ -229,13 +229,13 @@ public class DASSequenceDB implements SequenceDB {
 
 		rootIDs = Collections.unmodifiableSet(ids);
 	    } catch (SAXException ex) {
-		throw new BioError(ex, "Exception parsing DAS XML");
+		throw new BioRuntimeException(ex, "Exception parsing DAS XML");
 	    } catch (IOException ex) {
-		throw new BioError(ex, "Error connecting to DAS server");
+		throw new BioRuntimeException(ex, "Error connecting to DAS server");
 	    } catch (NumberFormatException ex) {
-		throw new BioError(ex);
+		throw new BioRuntimeException(ex, "Error parsing number");
 	    } catch (BioException ex) {
-		throw new BioError(ex);
+		throw new BioRuntimeException(ex);
 	    }
 	}
 

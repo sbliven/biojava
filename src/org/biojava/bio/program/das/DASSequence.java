@@ -142,11 +142,8 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	public void endSequence() {
 	    structure = structureF;
 	    if (structure.countFeatures() > 0) {
-		System.err.println("*** We have structure: " + getName());
 		features.addFeatureHolder(structure);
-	    } else {
-		System.err.println("*** No structure: " + getName());
-	    }
+	    } 
 	}
 
 	public void addSequenceProperty(Object key, Object value)
@@ -403,7 +400,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
       try {
 	return getSymbols().iterator();
       } catch (BioException be) {
-        throw new BioError(be, "Can't iterate over symbols");
+        throw new BioRuntimeException(be, "Can't iterate over symbols");
       }
     }
 
@@ -423,7 +420,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 		
 	    return length;
 	} catch (BioException be) {
-	    throw new BioError(be, "Can't calculate length");
+	    throw new BioRuntimeException(be, "Can't calculate length");
 	}
     }
 
@@ -431,7 +428,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	try {
 	    return getSymbols().seqString();
 	} catch (BioException be) {
-	    throw new BioError(be, "Can't create seqString");
+	    throw new BioRuntimeException(be, "Can't create seqString");
 	}
     }
 
@@ -439,7 +436,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	try {
 	    return getSymbols().subStr(start, end);
 	} catch (BioException be) {
-	    throw new BioError(be, "Can't create substring");
+	    throw new BioRuntimeException(be, "Can't create substring");
 	}
     }
 
@@ -447,7 +444,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	try {
 	    return getSymbols().subList(start, end);
 	} catch (BioException be) {
-	    throw new BioError(be, "Can't create subList");
+	    throw new BioRuntimeException(be, "Can't create subList");
 	}
     }
 
@@ -455,7 +452,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	try {
 	    return getSymbols().symbolAt(pos);
 	} catch (BioException be) {
-	    throw new BioError(be, "Can't fetch symbol");
+	    throw new BioRuntimeException(be, "Can't fetch symbol");
 	}
     }
 
@@ -463,7 +460,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	try {
 	    return getSymbols().toList();
 	} catch (BioException be) {
-	    throw new BioError(be, "Can't create list");
+	    throw new BioRuntimeException(be, "Can't create list");
 	}
     }
 
@@ -532,9 +529,9 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
 
 	    if (status == 0)
-		throw new BioError("Not a DAS server");
+		throw new BioRuntimeException("Not a DAS server");
 	    else if (status != 200)
-		throw new BioError("DAS error (status code = " + status + ")");
+		throw new BioRuntimeException("DAS error (status code = " + status + ")");
 
 	    SequenceBuilder sb = new SimpleSequenceBuilder();
 	    sb.setURI(epURL.toString());
@@ -564,11 +561,11 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    SymbolList sl = sb.makeSequence();
 	    return sl;
 	} catch (SAXException ex) {
-	    throw new BioError(ex, "Exception parsing DAS XML");
+	    throw new BioRuntimeException(ex, "Exception parsing DAS XML");
 	} catch (IOException ex) {
-	    throw new BioError(ex, "Error connecting to DAS server");
+	    throw new BioRuntimeException(ex, "Error connecting to DAS server");
 	} catch (BioException ex) {
-	    throw new BioError(ex);
+	    throw new BioRuntimeException(ex);
 	} finally {
 	    DAS.completedActivity(this);
 	}
@@ -657,7 +654,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	try {
 	    return new URL(dataSourceURL, "?ref=" + seqID).toString();
 	} catch (MalformedURLException ex) {
-	    throw new BioError(ex);
+	    throw new BioRuntimeException(ex);
 	}
     }
 
@@ -670,7 +667,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	registerFeatureFetchers();
 	return features.features();
       } catch (BioException be) {
-        throw new BioError(be, "Couldn't create features iterator");
+        throw new BioRuntimeException(be, "Couldn't create features iterator");
       }
     }
 
@@ -724,7 +721,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    
 	    return features.filter(ff, recurse);
 	} catch (BioException be) {
-	    throw new BioError(be, "Can't filter");
+	    throw new BioRuntimeException(be, "Can't filter");
 	}
     }
 

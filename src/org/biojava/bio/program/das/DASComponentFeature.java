@@ -84,7 +84,7 @@ class DASComponentFeature implements ComponentFeature {
 	    try {
 		componentID = (String) temp.annotation.getProperty("sequence.id");
 	    } catch (NoSuchElementException ex) {
-		throw new BioError("No sequence.id property");
+		throw new BioRuntimeException("No sequence.id property");
 	    }
 	}
 
@@ -138,7 +138,7 @@ class DASComponentFeature implements ComponentFeature {
 	    try {
 		syms = DNATools.reverseComplement(syms);
 	    } catch (IllegalAlphabetException ex) {
-		throw new BioError(ex);
+		throw new BioRuntimeException(ex);
 	    }
 	}
 	return syms;
@@ -153,7 +153,7 @@ class DASComponentFeature implements ComponentFeature {
 	    try {
 		componentSequence = parent.getParentDB()._getSequence(componentID, parent.dataSourceURLs());
 	    } catch (Exception ex) {
-		throw new BioError(ex, "Couldn't create child DAS sequence");
+		throw new BioRuntimeException(ex, "Couldn't create child DAS sequence");
 	    }
 	}
 	return componentSequence;
@@ -212,7 +212,7 @@ class DASComponentFeature implements ComponentFeature {
     }
 
     public Feature.Template makeTemplate() {
-	throw new BioError("FIXME");
+	throw new BioRuntimeException("FIXME");
     }
 
     // 

@@ -35,7 +35,7 @@ import org.biojava.utils.stax.*;
 import org.xml.sax.*;
 
 /**
- * StAX handler which parses DASGFF features.
+ * StAX handler for parsing a single DASGFF feature.
  *
  * @author Thomas Down
  * @since 1.2
@@ -55,6 +55,8 @@ public class DASGFFFeatureHandler extends StAXContentHandlerBase {
     private boolean isReferenceFeature = false;
     private String category = null;
     private List groups = new ArrayList();
+    private List targets = new ArrayList();
+    private List links = new ArrayList();
 
     public DASGFFFeatureHandler(SeqIOListener siol) {
 	this.featureListener = siol;
@@ -105,6 +107,12 @@ public class DASGFFFeatureHandler extends StAXContentHandlerBase {
 			orientation = s.trim();
 		    }
 		} );
+	} else if ("NOTE".equals(localName)) {
+	} else if ("LINK".equals(localName)) {
+	    dm.delegate(new LinkHandler());
+	} else if ("TARGET".equals(localName)) {
+	    Target targetHandler = new Target();
+	    dm.delegate(targetHandler);
 	} else if ("GROUP".equals(localName)) {
 	    Group groupHandler = new Group();
 	    dm.delegate(groupHandler);
@@ -121,11 +129,6 @@ public class DASGFFFeatureHandler extends StAXContentHandlerBase {
 			   StAXContentHandler handler)
 	 throws SAXException
     {
-	if (handler != null) {
-	    if (handler instanceof Group) {
-		groups.add(handler);
-	    }
-	}
     }
 
     public void endTree()
@@ -133,10 +136,10 @@ public class DASGFFFeatureHandler extends StAXContentHandlerBase {
     {
 	Feature.Template temp;
 	if (isReferenceFeature && category.equals("component")) {
-	    if (groups.size() != 1) {
-		throw new SAXException("Expecting 1 GROUP element in a component feature [FIXME?]");
+	    if (targets.size() != 1) {
+		throw new SAXException("Expecting 1 TARGET element in a component feature [FIXME?]");
 	    }
-	    Group targetGroup = (Group) groups.get(0);
+	    Target targetGroup = (Target) targets.get(0);
 	    if (targetGroup.target_id == null) {
 		throw new SAXException("Target must be specified for component features");
 	    }
@@ -155,8 +158,6 @@ public class DASGFFFeatureHandler extends StAXContentHandlerBase {
 	    }
 
 	    temp = ctemp;
-
-	    System.err.println("*** Parsed a componentFeature: " + targetGroup.target_id);
 	} else if (orientation.equals("+") || orientation.equals("-")) {
 	    StrandedFeature.Template stemp = new StrandedFeature.Template();
 	    stemp.strand = orientation.equals("+") ? StrandedFeature.POSITIVE :
@@ -186,6 +187,9 @@ public class DASGFFFeatureHandler extends StAXContentHandlerBase {
 	    if (f_label != null && f_label.length() > 0) {
 		temp.annotation.setProperty(DASSequence.PROPERTY_FEATURELABEL, f_label);
 	    }
+	    if (links.size() > 0) {
+		temp.annotation.setProperty(DASSequence.PROPERTY_LINKS, links);
+	    }
 	} catch (ChangeVetoException ex) {
 	    throw new BioError(ex);
 	}
@@ -198,14 +202,40 @@ public class DASGFFFeatureHandler extends StAXContentHandlerBase {
 	}
     }
 
-    private class Group extends StAXContentHandlerBase {
-	String gid;
-	String note;
-	String link;
-	String link_text;
+    private class Target extends StAXContentHandlerBase {
 	String target_id;
 	int target_start;
 	int target_stop;
+
+	public void startElement(String nsURI,
+				 String localName,
+				 String qName,
+				 Attributes attrs,
+				 DelegationManager dm)
+	    throws SAXException
+	{
+	    if ("TARGET".equals(localName)) {
+		target_id = attrs.getValue("id");
+		if (target_id == null) {
+		    target_id = attrs.getValue("ref");
+		}
+		try {
+		    target_start = Integer.parseInt(attrs.getValue("start"));
+		    target_stop = Integer.parseInt(attrs.getValue("stop"));
+		} catch (NumberFormatException ex) {
+		    throw new SAXException("Bad start/stop parsing TARGET");
+		}
+	    } 
+	}
+
+	public void endTree() {
+	    targets.add(this);
+	}
+    }
+
+    private class Group extends StAXContentHandlerBase {
+	String gid;
+	String note;
 
 	public void startElement(String nsURI,
 				 String localName,
@@ -223,24 +253,40 @@ public class DASGFFFeatureHandler extends StAXContentHandlerBase {
 		    }
 		} );
 	    } else if ("LINK".equals(localName)) {
+		dm.delegate(new LinkHandler());
+	    } else if ("TARGET".equals(localName)) {
+		dm.delegate(new Target());
+	    } 
+	}
+
+	public void endTree() {
+	    groups.add(this);
+	}
+    }
+
+    private class LinkHandler extends StAXContentHandlerBase {
+	String link;
+	String link_text;
+
+	public void startElement(String nsURI,
+				 String localName,
+				 String qName,
+				 Attributes attrs,
+				 DelegationManager dm)
+	    throws SAXException
+	{
+	    if ("LINK".equals(localName)) {
 		link = attrs.getValue("href");
 		dm.delegate(new StringElementHandlerBase() {
-		    protected void setStringValue(String s) {
-		        link_text = s.trim();
-		    }
-		} );
-	    } else if ("TARGET".equals(localName)) {
-		target_id = attrs.getValue("id");
-		if (target_id == null) {
-		    target_id = attrs.getValue("ref");
-		}
-		try {
-		    target_start = Integer.parseInt(attrs.getValue("start"));
-		    target_stop = Integer.parseInt(attrs.getValue("stop"));
-		} catch (NumberFormatException ex) {
-		    throw new SAXException("Bad start/stop parsing TARGET");
-		}
-	    } 
+			protected void setStringValue(String s) {
+			    link_text = s.trim();
+			}
+		    } );
+	    }
+	}
+
+	public void endTree() {
+	    links.add(new DASLink(link, link_text));
 	}
     }
 }
