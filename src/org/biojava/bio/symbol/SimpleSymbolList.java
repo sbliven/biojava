@@ -229,12 +229,12 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
      */
 
     public Symbol symbolAt(int pos) {
-      if (pos > length || pos < 1) {
-        throw new IndexOutOfBoundsException(
-          "Can't access " + pos +
-          " as it is not within 1.." + length
-        );
-      }
+//        if (pos > length || pos < 1) {
+//          throw new IndexOutOfBoundsException(
+//            "Can't access " + pos +
+//            " as it is not within 1.." + length
+//          );
+//        }
       return symbols[viewOffset + pos - 1];
     }
     

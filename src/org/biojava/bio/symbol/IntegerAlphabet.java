@@ -52,7 +52,9 @@ import org.biojava.utils.*;
  *
  * @author Matthew Pocock
  * @author Mark Schreiber
+ * @author Thomas Down
  */
+
 public final class IntegerAlphabet
   extends
     Unchangeable
@@ -126,12 +128,10 @@ public final class IntegerAlphabet
    * Canonicalization map for ints and references to symbols.
    */
     private Map intToSymRef;
-    private Map symRefToInt;
     private ReferenceQueue queue;
   
   private IntegerAlphabet() {
       intToSymRef = new HashMap();
-      symRefToInt = new HashMap();
       queue = new ReferenceQueue();
   }
   
@@ -142,14 +142,9 @@ public final class IntegerAlphabet
    * @return a IntegerSymbol embodying val
    */
   public synchronized IntegerSymbol getSymbol(int val) {
-      Reference qref;
-      while ((qref = queue.poll()) != null) {
-	  // System.out.println("Clearing queue");
-	  Integer qi = (Integer) symRefToInt.get(qref);
-	  if (qi != null) {
-	      intToSymRef.remove(qi);
-	      symRefToInt.remove(qref);
-	  }
+      KeyedWeakReference qref;
+      while ((qref = (KeyedWeakReference) queue.poll()) != null) {
+	  intToSymRef.remove(qref.getKey());
 	  qref.clear();
       }
 
@@ -158,11 +153,9 @@ public final class IntegerAlphabet
       IntegerSymbol sym; // stop premature reference clearup
     
       if(ref == null || ref.get() == null) {
-	  // how accessible do we want this? Soft or Weak?
 	  sym = new IntegerSymbol(val);
-	  ref = new WeakReference(sym, queue);
+	  ref = new KeyedWeakReference(i, sym, queue);
 	  intToSymRef.put(i, ref);
-	  symRefToInt.put(ref, i);
 	  return sym;
       } else {
 	  return (IntegerSymbol) ref.get();

@@ -51,7 +51,9 @@ import org.biojava.bio.seq.io.*;
  * </p>
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
+
 public final class DoubleAlphabet
   extends
     Unchangeable
@@ -100,9 +102,15 @@ public final class DoubleAlphabet
     return INSTANCE;
   }
 
-  private List alphabets = null;
-  private Map doubleToSymRef;
+    private List alphabets = null;
+    private Map doubleToSymRef;
+    private ReferenceQueue queue;
   
+    private DoubleAlphabet() {
+	doubleToSymRef = new HashMap();
+	queue = new ReferenceQueue();
+    }
+
   /**
    * Retrieve the Symbol for a double.
    *
@@ -110,16 +118,24 @@ public final class DoubleAlphabet
    * @return a DoubleSymbol embodying val
    */
   public DoubleSymbol getSymbol(double val) {
-    Double d = new Double(val);
-    Reference ref = (Reference) doubleToSymRef.get(d);
-    Symbol sym; // stop premature reference clearup
-    
-    if(ref == null || ref.get() == null) {
-      ref = new SoftReference(sym = new DoubleSymbol(val));
-      doubleToSymRef.put(d, ref);
-    }
-    
-    return (DoubleSymbol) ref.get();
+      KeyedWeakReference qref;
+      while ((qref = (KeyedWeakReference) queue.poll()) != null) {
+	  doubleToSymRef.remove(qref.getKey());
+	  qref.clear();
+      }
+
+      Double d = new Double(val);
+      Reference ref = (Reference) doubleToSymRef.get(d);
+      DoubleSymbol sym; 
+      
+      if(ref == null || ref.get() == null) {
+	  sym = new DoubleSymbol(val);
+	  ref = new KeyedWeakReference(d, sym, queue);
+	  doubleToSymRef.put(d, ref);
+	  return sym;
+      } else {
+	  return (DoubleSymbol) ref.get();
+      }
   }
  
   public Annotation getAnnotation() {
