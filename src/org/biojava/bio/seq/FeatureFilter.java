@@ -357,4 +357,47 @@ public interface FeatureFilter extends Serializable {
       }
     }
   }
+  
+  /**
+   * Accept features with a given strandedness.
+   *
+   * @author Matthew Pocock
+   */
+  public class StrandFilter implements FeatureFilter {
+    private StrandedFeature.Strand strand;
+    
+    /**
+     * Build a new filter that matches all features of a given strand.
+     *
+     * @param strand the Strand to match
+     */
+    public StrandFilter(StrandedFeature.Strand strand) {
+      this.strand = strand;
+    }
+    
+    /**
+     * Retrieve the strand this matches.
+     *
+     * @return the Strand matched
+     */
+    public StrandedFeature.Strand getStrand() {
+      return strand;
+    }
+    
+    /**
+     * Accept the Feature if it is an instance of StrandedFeature and matches
+     * the value of getStrand().
+     *
+     * @param f the Feature to check
+     * @return true if the strand matches, or false otherwise
+     */
+    public boolean accept(Feature f) {
+      if(f instanceof StrandedFeature) {
+        StrandedFeature sf = (StrandedFeature) f;
+        return sf.getStrand() == strand;
+      } else {
+        return strand == StrandedFeature.UNKNOWN;
+      }
+    }
+  }
 }
