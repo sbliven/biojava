@@ -81,6 +81,22 @@ public interface Atom {
      */    
     public double[] getCoords() ;
     
+    /** set the X coordinate
+     * @param x  a double
+     */
+    public void setX(double x);
+
+    /** set the Y coordinate
+     * @param y  a double
+     */
+    public void setY(double y);
+
+    /** set the Z coordinate
+     * @param z  a double
+     
+     */
+    public void setZ(double z);
+
     /** get cordinate X. 
      * @return a double
      */    

@@ -97,6 +97,16 @@ public class AtomImpl implements Atom {
      */
     public double[] getCoords()            { return coords ; }
 
+    public void setX(double x) {
+	coords[0] = x ;
+    }
+    public void setY(double y) {
+	coords[1] = y ;
+    }
+    public void setZ(double z) {
+	coords[2] = z ;
+    }
+    
     /** get the X coordinate. */
     public double getX() { return coords[0]; }
 
