@@ -695,4 +695,91 @@ public class FilterUtils {
       filters.add(filt);
     }
   }
+  
+  /**
+   * <p>This is a general framework method for transforming one filter into another.
+   * This method will handle the logical elements of a query (and, or, not) and delegate
+   * all the domain-specific munging to a FilterTransformer object.</p>
+   *
+   * <p>The transformer could flip strands and locations of elements of a filter, add or
+   * remove attributes required in annotations, or systematically alter feature types
+   * or sources.</p>
+   *
+   * @param ff  the FeatureFilter to transform
+   * @param trans  a FilterTransformer encapsulating rules about how to transform filters
+   */
+  public static FeatureFilter transformFilter(FeatureFilter ff, FilterTransformer trans) {
+    if(ff == null) {
+      throw new NullPointerException("Can't transform null filters");
+    }
+    
+    if(ff instanceof FeatureFilter.And) {
+      FeatureFilter.And and = (FeatureFilter.And) ff;
+      return and(
+        transformFilter(and.getChild1(), trans),
+        transformFilter(and.getChild2(), trans)
+      );
+    } else if(ff instanceof FeatureFilter.Or) {
+      FeatureFilter.Or or = (FeatureFilter.Or) ff;
+      return or(
+        transformFilter(or.getChild1(), trans),
+        transformFilter(or.getChild2(), trans)
+      );
+    } else if(ff instanceof FeatureFilter.Not) {
+      return not(((FeatureFilter.Not) ff).getChild());
+    } else {
+      FeatureFilter tf = trans.transform(ff);
+      if(tf != null) {
+        return tf;
+      } else {
+        return ff;
+      }
+    }
+  }
+  
+  /**
+   * An object able to transform some FeatureFilter instances sytematically into others.
+   *
+   * @author Matthew Pocock
+   */
+  public interface FilterTransformer {
+    /**
+     * Transform a filter, or return null if it can not be transformed.
+     *
+     * @param filter  the FeatureFilter to attempt to transform
+     * @return a transformed filter, or null
+     */
+    public FeatureFilter transform(FeatureFilter filt);
+  }
+  
+  /**
+   * An implementation of FilterTransformer that attempts to transform by one transformer,
+   * and if that fails, by another.
+   *
+   * @author Matthew Pocock
+   */
+  public class DelegatingTransformer
+  implements FilterTransformer {
+    FilterTransformer t1;
+    FilterTransformer t2;
+    
+    /**
+     * Create a new DelegatingTransformer that will apply t1 and then t2 if t1 fails.
+     *
+     * @param t1 the first FilterTransformer to try
+     * @param t2 the seccond FilterTransformer to try
+     */
+    public DelegatingTransformer(FilterTransformer t1, FilterTransformer t2) {
+      this.t1 = t1;
+      this.t2 = t2;
+    }
+    
+    public FeatureFilter transform(FeatureFilter ff) {
+      FeatureFilter res = t1.transform(ff);
+      if(res == null) {
+        res = t2.transform(ff);
+      }
+      return res;
+    }
+  }
 }

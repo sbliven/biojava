@@ -630,6 +630,17 @@ final public class LocationTools {
       }
   }
 
+  /**
+   * <p>Flips a location relative to a length.</p>
+   *
+   * <p>It is very common in biological sequences to represent locations on a sequence and then reverse that
+   * sequence. This method allows locations in the original coordinate space to be transformed int
+   * locations in the reverse one.</p>
+   *
+   * @param loc  the Location to flip
+   * @param len  the length of the region to flip within
+   * @return  a flipped view of the location
+   */
   public static Location flip(Location loc, int len) {
       if(loc instanceof PointLocation) {
           return new PointLocation(len - loc.getMin() + 1);

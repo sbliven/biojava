@@ -195,49 +195,49 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
      */
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	Map results = new SmallMap();
-	for (Iterator fhi = featureHolders.entrySet().iterator(); fhi.hasNext(); ) {
-	    Map.Entry me = (Map.Entry) fhi.next();
-	    FeatureHolder fh = (FeatureHolder) me.getKey();
-	    FeatureFilter mf = (FeatureFilter) me.getValue();
-	    if (recurse) {
-		Location ffl = extractInterestingLocation(ff);
-		if (ffl != null && FilterUtils.areDisjoint(mf, new FeatureFilter.OverlapsLocation(ffl))) {
-		    continue;
-		}
-	    } else {
-		if (FilterUtils.areDisjoint(mf, ff)) {
-		    // Nothing interesting here...
-		    continue;
-		}
-	    }
-
-	    if (recurse) {
-		FeatureHolder filterResult = fh.filter(ff, true);
-		if (filterResult.countFeatures() > 0) {
-		    results.put(filterResult, FeatureFilter.all);
-		}
-	    } else {
-		if (FilterUtils.areProperSubset(mf, ff)) {
-		    results.put(fh, mf);
-		} else {
-		    FeatureHolder filterResult = fh.filter(ff, false);
-		    if (filterResult.countFeatures() != 0) {
-			results.put(filterResult, new FeatureFilter.And(mf, ff));
-		    }
-		}
-	    }
-	}
-
-	if (results.size() == 0) {
-	    return FeatureHolder.EMPTY_FEATURE_HOLDER;
-	} else if (results.size() == 1) {
-	    return (FeatureHolder) results.keySet().iterator().next();
-	} else {
-	    return new MergeFeatureHolder(results);
-	}
+      Map results = new SmallMap();
+      for (Iterator fhi = featureHolders.entrySet().iterator(); fhi.hasNext(); ) {
+        Map.Entry me = (Map.Entry) fhi.next();
+        FeatureHolder fh = (FeatureHolder) me.getKey();
+        FeatureFilter mf = (FeatureFilter) me.getValue();
+        if (recurse) {
+          Location ffl = extractInterestingLocation(ff);
+          if (ffl != null && FilterUtils.areDisjoint(mf, new FeatureFilter.OverlapsLocation(ffl))) {
+            continue;
+          }
+        } else {
+          if (FilterUtils.areDisjoint(mf, ff)) {
+            // Nothing interesting here...
+            continue;
+          }
+        }
+        
+        if (recurse) {
+          FeatureHolder filterResult = fh.filter(ff, true);
+          if (filterResult.countFeatures() > 0) {
+            results.put(filterResult, FeatureFilter.all);
+          }
+        } else {
+          if (FilterUtils.areProperSubset(mf, ff)) {
+            results.put(fh, mf);
+          } else {
+            FeatureHolder filterResult = fh.filter(ff, false);
+            if (filterResult.countFeatures() != 0) {
+              results.put(filterResult, FilterUtils.optimize(FilterUtils.and(mf, ff)));
+            }
+          }
+        }
+      }
+      
+      if (results.size() == 0) {
+        return FeatureHolder.EMPTY_FEATURE_HOLDER;
+      } else if (results.size() == 1) {
+        return (FeatureHolder) results.keySet().iterator().next();
+      } else {
+        return new MergeFeatureHolder(results);
+      }
     }
-
+    
     /**
      * Get a map of featureHolders to filters.  This might well go away
      * once we have more sophisticated optimizable filters.
