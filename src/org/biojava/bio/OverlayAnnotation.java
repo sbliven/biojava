@@ -116,6 +116,14 @@ public class OverlayAnnotation implements Annotation, Serializable {
       return parent.getProperty(key);
   }
 
+    private Object getPropertySilent(Object key) {
+	try {
+	    return getProperty(key);
+	} catch (NoSuchElementException ex) {
+	    return null;
+	}
+    }
+
   /**
    * Return a <code>Set</code> containing all key objects
    * visible in this annotation.  The <code>Set</code> is
