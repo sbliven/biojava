@@ -22,6 +22,8 @@
 package org.biojava.bio.seq.db.biosql;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -32,8 +34,27 @@ import java.sql.Statement;
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author Len Trigg
  */
 public class MySQLDBHelper extends DBHelper {
+
+    private final DeleteStyle mDeleteStyle;
+
+    public MySQLDBHelper(Connection connection) {
+        DeleteStyle deleteStyle = DELETE_GENERIC;
+        try {
+            DatabaseMetaData metadata = connection.getMetaData();
+            int major = metadata.getDatabaseMajorVersion();
+            int minor = metadata.getDatabaseMinorVersion();
+            if ((major > 4) || ((major == 4) && (minor >= 2))) {
+                deleteStyle = DELETE_MYSQL4;
+            }
+        } catch (SQLException e) {
+            System.err.println("Exception getting DatabaseMetaData:" +  e.getMessage());
+            // Stick with generic style
+        }
+        mDeleteStyle = deleteStyle;
+    }
 
     // Inherit docs
     public int getInsertID(Connection conn,
@@ -58,6 +79,6 @@ public class MySQLDBHelper extends DBHelper {
 
     // Inherit docs
     public DeleteStyle getDeleteStyle() {
-	return DELETE_MYSQL4;
+        return mDeleteStyle;
     }
 }
