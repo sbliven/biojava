@@ -29,6 +29,7 @@
 package org.biojava.bio;
 
 import java.io.*;
+import java.util.*;
 
 /**
  * A general perpose Exception that can wrap another exception.
@@ -74,27 +75,47 @@ public class BioException extends Exception {
   	if (subThrowable != null) {
       StringWriter sw1 = new StringWriter();
 	    subThrowable.printStackTrace(new PrintWriter(sw1));
-      String mes = sw1.toString();
+      String mes1 = sw1.toString();
       StringWriter sw2 = new StringWriter();
-      super.printStackTrace(new PrintWriter( new PrintWriter(sw2)));
+      super.printStackTrace(new PrintWriter(sw2));
       String mes2 = sw2.toString();
-      // count lines in mes2
-      int lines = 0;
-      int index = -1;
-      while( (index = mes2.indexOf("\n", index)) > 0) {
-        lines++;
-        index++;
+
+      try {
+        List lines1 = lineSplit(new BufferedReader(new StringReader(mes1)));
+        List lines2 = lineSplit(new BufferedReader(new StringReader(mes2)));
+      
+        ListIterator li1 = lines1.listIterator(lines1.size());
+        ListIterator li2 = lines2.listIterator(lines2.size());
+      
+        while(li1.hasPrevious() && li2.hasPrevious()) {
+          Object s1 = li1.previous();
+          Object s2 = li2.previous();
+          
+          if(s1.equals(s2)) {
+            li1.remove();
+          } else {
+            break;
+          }
+        }
+        for(Iterator i = lines1.iterator(); i.hasNext(); ) {
+          System.out.println(i.next());
+        }
+        pw.print("rethrown as ");
+        pw.print(mes2);
+      } catch (IOException ioe) {
+        throw new Error("Coudn't merge stack-traces");
       }
-      // trim mes
-      index = mes.length();
-      for(int i = 1; i < lines ; i++)
-        index = mes.lastIndexOf("\n", index-1);
-      pw.println(mes.substring(0, index));
-      pw.print("rethrown as ");
-      pw.print(mes2);
     } else {
       super.printStackTrace(pw);
     }
     pw.flush();
+  }
+  
+  private List lineSplit(BufferedReader in) throws IOException {
+    List lines = new ArrayList();
+    for(String line = in.readLine(); line != null; line = in.readLine()) {
+      lines.add(line);
+    }
+    return lines;
   }
 }
