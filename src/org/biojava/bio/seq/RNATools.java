@@ -304,7 +304,7 @@ public final class RNATools {
   private static void loadGeneticCodes() {
     try {
       InputStream tablesStream = RNATools.class.getClassLoader().getResourceAsStream(
-        "org/biojava/bio/symbol/TranslationTables.xml"
+        "org/biojava/bio/seq/TranslationTables.xml"
       );
       if(tablesStream == null ) {
         throw new BioError("Couldn't locate TranslationTables.xml.");
@@ -346,7 +346,20 @@ public final class RNATools {
               Element te = (Element) tn;
               String from = te.getAttribute("from");
               String to = te.getAttribute("to");
-              AtomicSymbol fromS = (AtomicSymbol) sourceP.parseToken(from);
+
+	      //
+	      // Not the most elegant solution, but I wanted this working
+	      // quickly for 1.1.  It's been broken for ages.
+	      //     -td 26/i/20001
+	      //
+
+	      SymbolList fromSymbols = RNATools.createRNA(from);
+	      if (fromSymbols.length() != 3) {
+		  throw new BioError("`" + from + "' is not a valid codon");
+	      }
+	      
+              // AtomicSymbol fromS = (AtomicSymbol) sourceP.parseToken(from);
+	      AtomicSymbol fromS = (AtomicSymbol) sourceA.getSymbol(fromSymbols.toList());
               AtomicSymbol toS   = (AtomicSymbol) targetP.parseToken(to);
               table.setTranslation(fromS, toS);
             }
