@@ -103,7 +103,6 @@ public class BioStore implements IndexStore {
       String prop = "fileid_" + i;
       String val = file.getFile().toString() + "\t" + length;
       metaData.setProperty(prop, val);
-      System.out.println(prop + " -> " + val);
     }
   }
   

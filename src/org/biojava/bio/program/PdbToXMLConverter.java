@@ -94,8 +94,8 @@ public class PdbToXMLConverter {
 	 * to configure the XMLEmitter to output qualified names (see below).
 	 */
 	try {
-	    oParser.setFeature("http://xml.org/features/namespaces",true);
-	    oParser.setFeature("http://xml.org/features/namespace-prefixes",
+	    oParser.setFeature("http://xml.org/sax/features/namespaces",true);
+	    oParser.setFeature("http://xml.org/sax/features/namespace-prefixes",
 			       true);
 
 	} catch (Exception e) {

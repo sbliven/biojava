@@ -6,6 +6,9 @@ import org.biojava.bio.*;
 import org.biojava.utils.*;
 
 /**
+ * Builds an Annotation tree from TagValue events using an AnnotationType to
+ * work out which fields are of what type.
+ *
  * @author Matthew pocock
  */
 public class AnnotationBuilder

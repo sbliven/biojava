@@ -29,7 +29,10 @@ public class TestSwissprotOrg
                 SimpleSequenceBuilder.FACTORY,
                 // SimpleTaxaFactory.GLOBAL, // in-memory implementation
                 WeakTaxaFactory.GLOBAL, // only guarantees the bits you need exist
-                "OC"
+                EbiFormat.getInstance(),
+                "OC",
+                "OS",
+                "OX"
               )
             );
 			Alphabet alpha = ProteinTools.getAlphabet();
@@ -41,10 +44,16 @@ public class TestSwissprotOrg
 			{
 				Sequence seq = seqI.nextSequence();
 				System.out.println(seq.getName() + " has " + seq.countFeatures() + " features");
-                System.out.println("Species:");
-                System.out.println("\t" + seq.getAnnotation().getProperty(OrganismParser.PROPERTY_ORGANISM));
-                
-                //break;
+        System.out.println("Species:");
+        Taxa taxa = (Taxa) seq.getAnnotation().getProperty(OrganismParser.PROPERTY_ORGANISM);
+        System.out.println("\t" + taxa);
+        for(Iterator i = taxa.getAnnotation().asMap().entrySet().iterator(); i.hasNext(); ) {
+          Map.Entry ent = (Map.Entry) i.next();
+          System.out.println("\t : " + ent.getKey() + " -> " + ent.getValue());
+        }
+        
+        
+        //break;
 			}
 		}
 		catch (Throwable t)
