@@ -78,5 +78,23 @@ public interface ProjectionContext {
      */
 
     public FeatureHolder projectChildFeatures(Feature f, FeatureHolder parent);
+
+    /**
+     * Delegate for createFeature
+     *
+     * @since 1.3
+     */
+
+    public Feature createFeature(Feature f, Feature.Template templ)
+        throws BioException, ChangeVetoException;
+
+    /**
+     * Delegate for removeFeature
+     *
+     * @since 1.3
+     */
+
+    public void removeFeature(Feature f, Feature dyingChild)
+        throws ChangeVetoException;
 }
 

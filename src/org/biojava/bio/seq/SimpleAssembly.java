@@ -48,7 +48,7 @@ public class SimpleAssembly
     protected transient ChangeSupport changeSupport = null;
     private String name;
     private String uri;
-    private Annotation annotation;
+    private Annotation annotation = new SimpleAnnotation();
     private SimpleFeatureHolder features;
     private AssembledSymbolList assembly;
 

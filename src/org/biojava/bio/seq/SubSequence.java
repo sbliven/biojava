@@ -169,13 +169,13 @@ public class SubSequence implements Sequence {
     public Feature createFeature(Feature.Template templ)
         throws BioException, ChangeVetoException
     {
-	throw new ChangeVetoException("Can't create features on SubSequence");
+	return createFeatureTranslated(parent, templ);
     }
 
     public void removeFeature(Feature f) 
         throws ChangeVetoException
     {
-	throw new ChangeVetoException("Can't remove features from SubSequence");
+	removeProjectedFeature(parent, f);
     }
 
     protected FeatureHolder getFeatures() {
@@ -213,13 +213,57 @@ public class SubSequence implements Sequence {
       return this.parent;
     }
 
+    //
+    // Guts
+    //
+
+    private Feature createFeatureTranslated(FeatureHolder creatrix, Feature.Template templ) 
+        throws BioException, ChangeVetoException
+    {
+	Location oldLoc = templ.location;
+	templ.location = templ.location.translate(start - 1);
+	try {
+	    return creatrix.createFeature(templ);
+	} finally {
+	    templ.location = oldLoc;
+	}
+    }
+
+    private void removeProjectedFeature(FeatureHolder parentFH, Feature f)
+        throws ChangeVetoException
+    {
+	if (! (f instanceof Projection)) {
+	    throw new ChangeVetoException("Can't remove feature -- doesn't appear to be an appropriate projection");
+	}
+
+	parentFH.removeFeature(((Projection) f).getViewedFeature());
+    }
+
     private class CroppedFeatureSet extends LazyFeatureHolder {
-	FeatureHolder features;
-	FeatureHolder featureParent;
+	private FeatureHolder features;
+	private FeatureHolder featureParent;
+	private ChangeListener flusher;
 
 	private CroppedFeatureSet(FeatureHolder features, FeatureHolder featureParent) {
 	    this.features = features;
 	    this.featureParent = featureParent;
+	    this.flusher = new ChangeListener() {
+		    public void preChange(ChangeEvent cev)
+		        throws ChangeVetoException
+		    {
+			if (changeSupport != null) {
+			    changeSupport.firePreChangeEvent(cev);
+			}
+		    }
+
+		    public void postChange(ChangeEvent cev) {
+			flushFeatures();
+			if (changeSupport != null) {
+			    changeSupport.firePostChangeEvent(cev);
+			}
+		    }
+		} ;
+	    features.addChangeListener(flusher, FeatureHolder.FEATURES);
 	}
 
 	protected FeatureHolder createFeatureHolder() {
@@ -245,7 +289,20 @@ public class SubSequence implements Sequence {
 		}
 
 		public FeatureHolder projectChildFeatures(Feature f, FeatureHolder parent) {
-		    return ProjectedFeatureHolder.projectFeatureHolder(f, parent, 1 - start, false);
+		    // return ProjectedFeatureHolder.projectFeatureHolder(f, parent, 1 - start, false);
+		    return new CroppedFeatureSet(f, parent);
+		}
+
+		public Feature createFeature(Feature f, Feature.Template templ)
+		    throws ChangeVetoException, BioException
+		{
+		    return createFeatureTranslated(f, templ);
+		}
+		    
+		public void removeFeature(Feature f, Feature f2)
+		    throws ChangeVetoException
+		{
+		    removeProjectedFeature(f, f2);
 		}
 	    } ;
 

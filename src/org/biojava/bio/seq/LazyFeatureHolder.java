@@ -51,6 +51,10 @@ public abstract class LazyFeatureHolder implements FeatureHolder {
 
     protected abstract FeatureHolder createFeatureHolder();
 
+    protected void flushFeatures() {
+	featureHolder = null;
+    }
+
     private FeatureHolder getFeatureHolder() {
 	if (featureHolder == null) {
 	    featureHolder = createFeatureHolder();

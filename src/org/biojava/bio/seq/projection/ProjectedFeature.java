@@ -148,15 +148,15 @@ class ProjectedFeature implements Feature, Projection {
     }
 
     public Feature createFeature(Feature.Template temp)
-        throws ChangeVetoException
+        throws ChangeVetoException, BioException
     {
-	throw new ChangeVetoException("Can't create subfeatures of projected features (yet).");
+	return context.createFeature(feature, temp);
     }
 
     public void removeFeature(Feature f) 
         throws ChangeVetoException
     {
-	throw new ChangeVetoException("Can't alter projected features (yet).");
+	context.removeFeature(feature, f);
     }
         
     public void addChangeListener(ChangeListener cl) {
