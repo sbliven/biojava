@@ -58,12 +58,12 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 
 /**
- * <code>AbstractBeadRenderer</code> is a an abstract base
+ * <p><code>AbstractBeadRenderer</code> is a an abstract base
  * class for the creation of <code>FeatureRenderer</code>s which use a
  * 'string of beads' metaphor for displaying features. Each subclass
  * of <code>AbstractBeadRenderer</code> should override the
  * abstract method <code>renderBead()</code> and provide the drawing
- * routine for its particular bead type.
+ * routine for its particular bead type.</p>
  *
  * <p>A concrete <code>BeadRenderer</code> may render a series
  * of features in more than one style by delegating to other

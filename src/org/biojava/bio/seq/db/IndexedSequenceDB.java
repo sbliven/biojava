@@ -24,31 +24,30 @@ package org.biojava.bio.seq.db;
 import java.io.*;
 import java.util.*;
 
-import org.biojava.utils.*;
 import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
+import org.biojava.bio.symbol.*;
+import org.biojava.utils.*;
+import org.biojava.utils.io.RandomAccessReader;
 
 /**
- * This class implements SequenceDB on top of a set of sequence files
- * and sequence offsets within these files.
+ * <p>This class implements SequenceDB on top of a set of sequence files
+ * and sequence offsets within these files.</p>
  *
- * <P>
- *
- * This Class is primarily responsible for managing the sequence IO,
- * such as calculating the sequence file offsets, and parsing
+ * <p> This class is primarily responsible for managing the sequence
+ * IO, such as calculating the sequence file offsets, and parsing
  * individual sequences based upon file offsets. The actual persistant
  * storage of all this information is delegated to an instance of
- * IndexStore.
+ * <code>IndexStore</code>.</p>
  *
- * <P> Note: We may be able to improve the indexing speed further by
+ * <p>Note: We may be able to improve the indexing speed further by
  * discarding all feature creation & annotation requests during index
- * parsing.
+ * parsing.</p>
  *
  * @author Matthew Pocock
  * @author Thomas Down
- * @author Keith James (docs)
+ * @author Keith James
  */
 
 public final class IndexedSequenceDB extends AbstractSequenceDB
@@ -186,29 +185,33 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
     }
   
     public Sequence getSequence(String id)
-    throws IllegalIDException, BioException {
-	try {
+    throws IllegalIDException, BioException
+    {
+	try
+        {
 	    Index indx = indexStore.fetch(id);
-	    FileReader fr = new FileReader(indx.getFile());
+
+            RandomAccessReader rar =
+		new RandomAccessReader(new RandomAccessFile(indx.getFile(), "r"));
+
 	    long toSkip = indx.getStart();
-	    while (toSkip > 0) {
-		long skipped = fr.skip(toSkip);
-		if (skipped < 0)
-		    throw new IOException("Reached end of file");
-		toSkip -= skipped;
-	    }
-	    BufferedReader br = new BufferedReader(fr);
-	    SequenceBuilder sb = indexStore.getSBFactory().makeSequenceBuilder();
-	    indexStore.getFormat().readSequence(
-              br,
-              indexStore.getSymbolParser(),
-              sb
-            );
+	    if (toSkip > rar.length())
+		throw new BioException("Reached end of file");
+	    rar.seek(toSkip);
+
+	    SequenceBuilder sb =
+		indexStore.getSBFactory().makeSequenceBuilder();
+
+	    indexStore.getFormat().readSequence(new BufferedReader(rar),
+						indexStore.getSymbolParser(),
+						sb);
 	    Sequence seq = sb.makeSequence();
-	    // putReader(s.file, raf);
-	    br.close();
+
+	    rar.close();
 	    return seq;
-	} catch (IOException ioe) {
+	}
+        catch (IOException ioe)
+        {
 	    throw new BioException(ioe, "Couldn't grab region of file"); 
 	}
     }
