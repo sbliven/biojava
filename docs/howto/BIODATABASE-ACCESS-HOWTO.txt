@@ -278,3 +278,6 @@ abbreviated to one letter format:
 ChangeLog
 
 $Log$
+Revision 1.1  2003/03/14 14:58:30  kdj
+Imported from BioPerl, appropriate modifications
+
