@@ -305,7 +305,7 @@ public class BioIndex implements IndexStore {
   // seqID(\w+) \t fileID(\w+) \t start(\d+) \t length(\d+) ' ' * \n
   private abstract class FileAsList
   extends AbstractList
-  implements RandomAccess, Commitable {
+    implements /* RandomAccess, */ Commitable {
     private RandomAccessFile mappedFile;
     private int commitedRecords;
     private int lastIndx;
