@@ -252,7 +252,8 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
     }
 
     public FeatureHolder filter(FeatureFilter ff) {
-        FeatureFilter childFilter = new FeatureFilter.Not(new FeatureFilter.IsTopLevel());
+        FeatureFilter childFilter = new FeatureFilter.And(new FeatureFilter.ContainedByLocation(getLocation()),
+                                                          new FeatureFilter.Not(new FeatureFilter.IsTopLevel()));
                                                           
         if (FilterUtils.areDisjoint(ff, childFilter)) {
             return FeatureHolder.EMPTY_FEATURE_HOLDER;
@@ -262,7 +263,12 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
     }
     
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-        return getFeatures().filter(ff, recurse);
+        FeatureFilter childFilter = new FeatureFilter.ContainedByLocation(getLocation());
+        if (FilterUtils.areDisjoint(ff, childFilter)) {
+            return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        } else {
+            return getFeatures().filter(ff, recurse);
+        }
     }
 
     private class FeatureReceiver extends BioSQLFeatureReceiver {
