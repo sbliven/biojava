@@ -146,13 +146,20 @@ implements SequenceRenderer, PropertyChangeListener {
 
   protected FeatureHolder getFeatures(SequenceRenderContext sp) {
     SymbolList sl = sp.getSequence();
-    if (! (sl instanceof Sequence))
-	return FeatureHolder.EMPTY_FEATURE_HOLDER;
+    if (! (sl instanceof Sequence)) {
+      return FeatureHolder.EMPTY_FEATURE_HOLDER;
+    }
     Sequence seq = (Sequence) sl;
     FeatureHolder fh = (FeatureHolder) featureCache.get(seq);
     if(fh == null) {
-      featureCache.put(seq, fh = seq.filter(filter, false));
+      /* requires mutability events so that if the sequence changes features, the
+      feature cache is invalidated */
+      // featureCache.put(seq, fh = seq.filter(filter, false));
+      // workaround
+      fh = seq.filter(filter, false);
     }
+    
+    
     return fh;
   }
     
