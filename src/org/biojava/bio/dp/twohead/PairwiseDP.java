@@ -269,6 +269,7 @@ public class PairwiseDP extends DP implements Serializable {
     //System.out.println("Parse 1");
     for(BackPointer bpi = bp.back; bpi != TERMINAL_BP; bpi = bpi.back) {
       try {
+        //System.out.println("bp.back" + bp.back);
       /*System.out.print(
         "Processing " + bpi.state.getName()
       );*/
