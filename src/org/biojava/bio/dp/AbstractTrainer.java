@@ -48,8 +48,8 @@ public abstract class AbstractTrainer implements TrainingAlgorithm {
   }
   
   protected abstract double singleSequenceIteration(DP dp, ModelTrainer trainer,
-                                                    Sequence seq)
-  throws IllegalResidueException;
+                                                    ResidueList resList)
+  throws IllegalResidueException, IllegalTransitionException, IllegalAlphabetException;
   
   /**
    * Trains the sequences in db until stopper says to finnish.

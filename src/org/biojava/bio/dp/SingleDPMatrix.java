@@ -43,7 +43,7 @@ class SingleDPMatrix implements DPMatrix {
     return resList;
   }
   
-  public double score() {
+  public double getScore() {
     return score;
   }
   
@@ -55,11 +55,11 @@ class SingleDPMatrix implements DPMatrix {
     return scores[index[1]][index[0]];
   }
   
-  public SingleDPMatrix(MarkovModel model, State [] states, ResidueList resList) {
-    this.model = model;
-    this.states = states;
+  public SingleDPMatrix(DP dp, ResidueList resList) {
+    this.model = dp.getModel();
+    this.states = dp.getStates();
     this.resList = new ResidueList [] { resList };
     this.score = Double.NEGATIVE_INFINITY;
-    this.scores = new double[resList.length()][states.length];
+    this.scores = new double[resList.length() + 2][states.length];
   }
 }

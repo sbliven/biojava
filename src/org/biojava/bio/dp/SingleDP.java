@@ -85,7 +85,7 @@ class SingleDP extends DP {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
     
-    SingleDPMatrix matrix = new SingleDPMatrix(getModel(), getStates(), seq[0]);
+    SingleDPMatrix matrix = new SingleDPMatrix(this, seq[0]);
     DPCursor dpCursor = new MatrixCursor(matrix, seq[0].iterator(), +1);
     matrix.score = forward(dpCursor);
     
@@ -98,7 +98,7 @@ class SingleDP extends DP {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
     
-    SingleDPMatrix matrix = new SingleDPMatrix(getModel(), getStates(), seq[0]);
+    SingleDPMatrix matrix = new SingleDPMatrix(this, seq[0]);
     DPCursor dpCursor = new MatrixCursor(matrix, new ReverseIterator(seq[0]), -1);
     matrix.score = backward(dpCursor);
     

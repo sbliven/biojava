@@ -28,6 +28,6 @@ public interface DPMatrix {
   State [] States();
   MarkovModel model();
   ResidueList [] resList();
-  double score();
+  double getScore();
   double getCell(int [] index) throws IndexOutOfBoundsException;
 }

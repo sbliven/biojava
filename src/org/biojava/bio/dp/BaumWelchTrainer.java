@@ -26,71 +26,104 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.seq.*;
 
 public class BaumWelchTrainer extends AbstractTrainer {
-  protected double singleSequenceIteration(DP dp, ModelTrainer trainer,
-                                           Sequence seq)
-  throws IllegalResidueException {
+  protected double singleSequenceIteration(
+    DP dp, ModelTrainer trainer,
+    ResidueList resList
+  ) throws IllegalResidueException, IllegalTransitionException, IllegalAlphabetException {
     System.out.println("Training");
-    EmissionState [] states = dp.getStates();
+    State [] states = dp.getStates();
     int [][] forwardTransitions = dp.getForwardTransitions();
     double [][] forwardTransitionScores = dp.getForwardTransitionScores();    
     int [][] backwardTransitions = dp.getBackwardTransitions();
     double [][] backwardTransitionScores = dp.getBackwardTransitionScores();    
-    
-    double [][] fm = new double [seq.length() + 2][states.length];
-    double [][] bm = new double [seq.length() + 2][states.length];
-
-    DPCursor fc = new MatrixCursor(states, seq,
-                                   seq.iterator(), fm, +1);
-    DPCursor bc = new MatrixCursor(states, seq,
-                                   new DP.ReverseIterator(seq), bm, -1);
-
+    ResidueList [] rll = { resList };
     System.out.println("Forward");
-    dp.forward_initialize(fc);
-    dp.forward_recurse(fc);
-    double fs = dp.forward_termination(fc);
+    SingleDPMatrix fm = (SingleDPMatrix) dp.forwardMatrix(rll);
+    double fs = fm.getScore();
 
     System.out.println("Backward");
-    dp.backward_initialize(bc);
-    dp.backward_recurse(bc);
-    double bs = dp.backward_termination(bc);
+    SingleDPMatrix bm = (SingleDPMatrix) dp.backwardMatrix(rll);
+    double bs = bm.getScore();
 
     System.out.println("State training");
     // state trainer
-    for (int i = 1; i <= seq.length(); i++) {
-      Residue res = seq.residueAt(i);
-      double [] fCol = fm[i];
-      double [] bCol = bm[i];
-      for (int s = 0; s < states.length; s++) {
+    for (int i = 1; i <= resList.length(); i++) {
+      Residue res = resList.residueAt(i);
+      for (int s = 0; s < dp.getDotStatesIndex(); s++) {
         if (! (states[s] instanceof MagicalState)) {
-          trainer.addStateCount(states[s], res,
-                                Math.exp(fCol[s] + bCol[s] - fs));
+          trainer.addStateCount(
+            (EmissionState) states[s],
+            res,
+            Math.exp(fm.scores[i][s] + bm.scores[i][s] - fs)
+          );
         }
       }
     }
 
     System.out.println("Transition training");
     // transition trainer
-    for (int i = 0; i <= seq.length(); i++) {
-      Residue res = (i < seq.length()) ? seq.residueAt(i + 1) :
+    for (int i = 0; i <= resList.length(); i++) {
+      Residue res = (i < resList.length()) ? resList.residueAt(i + 1) :
                     MagicalState.MAGICAL_RESIDUE;
-      double [] fCol = fm[i];
-      double [] bCol = bm[i + 1];
-      for (int s = 0; s < states.length; s++) {
+      for (int s = 0; s < states.length; s++) {  // any -> emission transitions
         int [] ts = backwardTransitions[s];
         double [] tss = backwardTransitionScores[s];
         for (int tc = 0; tc < ts.length; tc++) {
           int t = ts[tc];
-          double weight = states[t].getWeight(res);
+          if(t >= dp.getDotStatesIndex()) {
+            break;
+          }
+          double weight = ((EmissionState) states[t]).getWeight(res);
           if (weight != Double.NEGATIVE_INFINITY) {
             try {
               trainer.addTransitionCount(
                 states[s], states[t],
-                Math.exp(fCol[s] + tss[tc] + weight + bCol[t] - fs)
-                );
+                Math.exp(fm.scores[i][s] + tss[tc] + weight + bm.scores[i+1][t] - fs)
+              );
             } catch (IllegalTransitionException ite) {
-              throw new BioError(ite,
-                "Transition in backwardTransitions[][] dissapeared");
+              throw new BioError(
+                ite,
+                "Transition in backwardTransitions[][] dissapeared"
+              );
             }
+          }
+        }
+      }
+      double [] mo = new double[states.length - dp.getDotStatesIndex()];
+      for(int s = 0; s < mo.length; s++) {
+        int ss = s + dp.getDotStatesIndex();
+        int [] ts = backwardTransitions[s];
+        double [] tss = backwardTransitionScores[s];
+        mo[s] = fm.scores[i][ss];
+        for(int tc = 0; tc < ts.length; tc++) {
+          int t = ts[tc];
+          if(t < dp.getDotStatesIndex()) {
+            continue;
+          }
+          if(t >= ss) {
+            break;
+          }
+          mo[s] -= (fm.scores[i][ss] + tss[t]);
+        }
+      }
+      for (int s = dp.getDotStatesIndex(); s < states.length; s++) {  // emission -> emission transitions
+        int [] ts = backwardTransitions[s];
+        double [] tss = backwardTransitionScores[s];
+        for (int tc = 0; tc < ts.length; tc++) {
+          int t = ts[tc];
+          if(t >= dp.getDotStatesIndex()) {
+            break;
+          }
+          try {
+            trainer.addTransitionCount(
+              states[s], states[t],
+              Math.exp(mo[s + dp.getDotStatesIndex()] + tss[tc] + bm.scores[i][t] - fs)
+            );
+          } catch (IllegalTransitionException ite) {
+            throw new BioError(
+              ite,
+              "Transition in backwardTransitions[][] dissapeared"
+            );
           }
         }
       }
