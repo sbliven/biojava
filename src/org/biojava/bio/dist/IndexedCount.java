@@ -173,11 +173,11 @@ public class IndexedCount implements Count {
   }
   
   public IndexedCount(FiniteAlphabet fa) {
-    this.indexer = AlphabetManager.getAlphabetIndex(fa);
-    this.counts = new double[fa.size()];
+    this(AlphabetManager.getAlphabetIndex(fa));
   }
   
   public IndexedCount(AlphabetIndex indexer) {
+    indexer.addChangeListener(ChangeListener.ALWAYS_VETO, AlphabetIndex.INDEX);
     this.indexer = indexer;
     this.counts = new double[indexer.getAlphabet().size()];
   }

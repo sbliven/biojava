@@ -16,13 +16,14 @@ import org.biojava.bio.symbol.*;
 class IndexedNthOrderDistribution extends AbstractOrderNDistribution {
   private transient Distribution[] dists;
   private transient AlphabetIndex index;
-
   IndexedNthOrderDistribution(CrossProductAlphabet alpha, DistributionFactory df)
        throws IllegalAlphabetException {
     super(alpha);
 
     FiniteAlphabet conditioning = (FiniteAlphabet) getConditioningAlphabet();
     index = AlphabetManager.getAlphabetIndex(conditioning);
+    index.addChangeListener(ChangeListener.ALWAYS_VETO, AlphabetIndex.INDEX);
+
     // Throws if alpha isn't indexable
     dists = new Distribution[conditioning.size()];
 
@@ -93,9 +94,11 @@ class IndexedNthOrderDistribution extends AbstractOrderNDistribution {
   
   private void readObject(ObjectInputStream in)
   throws IOException, ClassNotFoundException {
+
     index = AlphabetManager.getAlphabetIndex(
       (FiniteAlphabet) getConditioningAlphabet()
     );
+    index.addChangeListener(ChangeListener.ALWAYS_VETO, AlphabetIndex.INDEX);
     int len = index.getAlphabet().size();
     dists = new Distribution[len];
     for(int i  = 0; i < len; i++) {
@@ -108,4 +111,3 @@ class IndexedNthOrderDistribution extends AbstractOrderNDistribution {
     }
   }
 }
-

@@ -38,7 +38,7 @@ import org.biojava.bio.symbol.*;
 
 public final class SimpleDistribution extends AbstractDistribution implements Serializable {
   private transient AlphabetIndex indexer;
-  private double []weights;
+  private double[] weights = null;
   private Distribution nullModel;
   
   public Alphabet getAlphabet() {
@@ -56,15 +56,25 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
   
   public double getWeight(Symbol s)
   throws IllegalSymbolException {
-    if(s instanceof AtomicSymbol) {
-      return weights[indexer.indexForSymbol(s)];
+    if(weights == null) {
+      return Double.NaN;
     } else {
-      return getAmbiguityWeight(s);
+      if(s instanceof AtomicSymbol) {
+        return weights[indexer.indexForSymbol(s)];
+      } else {
+        return getAmbiguityWeight(s);
+      }
     }
   }
 
   protected void setWeightImpl(Symbol s, double w)
   throws IllegalSymbolException, ChangeVetoException {
+    if(weights == null) {
+      weights = new double[indexer.getAlphabet().size()];
+      for(int i = 0; i < weights.length; i++) {
+        weights[i] = Double.NaN;
+      }
+    }
     if(!(s instanceof AtomicSymbol)) {
       throw new IllegalSymbolException(
         "Can't set the weight for an ambiguity symbol " + s.getName()
@@ -81,10 +91,20 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
   
   public SimpleDistribution(FiniteAlphabet alphabet) {
     this.indexer = AlphabetManager.getAlphabetIndex(alphabet);
-    this.weights =  new double[alphabet.size()];
-    for(int i = 0; i < alphabet.size(); i++) {
-      weights[i] = Double.NaN;
-    }
+    indexer.addChangeListener(
+      new ChangeAdapter() {
+        public void preChange(ChangeEvent ce) throws ChangeVetoException {
+          if(weights != null) {
+            throw new ChangeVetoException(
+              ce,
+              "Can't allow the index to change as we have probabilities."
+            );
+          }
+        }
+      },
+      AlphabetIndex.INDEX
+    );
+    
     try {
       setNullModel(new UniformDistribution(alphabet));
     } catch (Exception e) {

@@ -28,7 +28,8 @@ package org.biojava.utils;
  * @author Matthew Pocock
  */
 public class ChangeAdapter implements ChangeListener {
-  public void preChange(ChangeEvent ce) {}
+  public void preChange(ChangeEvent ce)
+  throws ChangeVetoException {}
   
   public void postChange(ChangeEvent ce) {}
 }
