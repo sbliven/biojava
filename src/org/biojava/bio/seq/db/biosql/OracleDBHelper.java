@@ -23,22 +23,49 @@
 package org.biojava.bio.seq.db.biosql;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.sql.DataSource;
 import org.biojava.bio.BioRuntimeException;
-//import org.biojava.utils.JDBCConnectionPool;
+
 
 /**
  * This is a <code>DBHelper</code> that provides support for Oracle
  * databases.
  *
  * @author Len Trigg
+ * @author Eric Haugen
  */
 public class OracleDBHelper extends DBHelper {
 
+    private final JoinStyle mJoinStyle;
+
+    public OracleDBHelper(Connection connection) {
+        JoinStyle joinStyle = JOIN_GENERIC;
+        try {
+            DatabaseMetaData metadata = connection.getMetaData();
+            String version = metadata.getDatabaseProductVersion();
+            if ((version != null) && version.startsWith("Oracle8")) {
+                joinStyle = JOIN_ORACLE8;
+            }
+        } catch (SQLException e) {
+            System.err.println("Exception getting DatabaseMetaData:" +  e.getMessage());
+            // Stick with generic style
+        }
+        mJoinStyle = joinStyle;
+    }
+
+
+    // Inherit docs
+    public JoinStyle getJoinStyle() {
+        return mJoinStyle;
+    }
+
+
+    // Inherit docs
     public int getInsertID(Connection conn, String table, String columnName) throws SQLException {
         Statement st = null;
         ResultSet rs = null;
@@ -62,13 +89,8 @@ public class OracleDBHelper extends DBHelper {
         }
     }
 
-
-    // Not sure if one of the other delete styles could be used here
-    public DeleteStyle getDeleteStyle() {
-	return DELETE_GENERIC;
-    }
-
-
+    
+    // Inherit docs
     public boolean containsTable(DataSource ds, String tablename) {
         if (ds == null) {
             throw new NullPointerException("Require a datasource.");
@@ -78,7 +100,7 @@ public class OracleDBHelper extends DBHelper {
         } 
         //System.err.println("Checking for table existence: " + tablename);
         Connection conn = null;
-				try {
+        try {
             boolean present;
             conn = ds.getConnection();
             PreparedStatement ps = conn.prepareStatement("select rownum from " + tablename + " where rownum < 1");
@@ -91,8 +113,8 @@ public class OracleDBHelper extends DBHelper {
             } finally {
                 ps.close();
                 if (conn != null) {
-									conn.close();
-								}
+                    conn.close();
+                }
             }
             return present;
         } catch (SQLException ex) {
