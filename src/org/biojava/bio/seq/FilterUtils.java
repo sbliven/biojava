@@ -93,6 +93,7 @@ public class FilterUtils {
       } else if (sub instanceof FeatureFilter.Not) {
         // How do we prove this one?
       } else if (sub instanceof OptimizableFilter) {
+          // The works okay for ByFeature, too.
         return ((OptimizableFilter) sub).isProperSubset(sup);
       }
       
@@ -156,6 +157,10 @@ public class FilterUtils {
       } else if (b instanceof FeatureFilter.Not) {
         FeatureFilter not_b = ((FeatureFilter.Not) b).getChild();
         return areProperSubset(a, not_b);
+      } else if (a instanceof FeatureFilter.ByFeature) {
+          return ((FeatureFilter.ByFeature) a).isDisjoint(b);
+      } else if (b instanceof FeatureFilter.ByFeature) {
+          return ((FeatureFilter.ByFeature) b).isDisjoint(a);
       } else if (a instanceof OptimizableFilter) {
         return ((OptimizableFilter) a).isDisjoint(b);
       } else if (b instanceof OptimizableFilter) {

@@ -1421,6 +1421,54 @@ public interface FeatureFilter extends Serializable {
             return ff instanceof ByChild || ff instanceof ByDescendant || ff instanceof AcceptNoneFilter;
         }
     }
+    
+    // Note: this implements OptimizableFilter, but cheats :-).  Consequently,
+    // other optimizablefilters don't know anything about it.  The convenience
+    // methods on FilterUtils give ByFeature a higher precedence to make
+    // sure this works out.
+    
+    /**
+     * Accept only features which are equal to the specified feature
+     *
+     * @author Thomas Down
+     * @since 1.3
+     */
+    
+    public static final class ByFeature implements OptimizableFilter {
+        private final Feature feature;
+        
+        public ByFeature(Feature f) {
+            this.feature = f;
+        }
+        
+        public Feature getFeature() {
+            return feature;
+        }
+        
+        public boolean accept(Feature f) {
+            return f.equals(feature);
+        }
+        
+        public boolean isProperSubset(FeatureFilter ff) {
+            return ff.accept(feature);
+        }
+        
+        public boolean isDisjoint(FeatureFilter ff) {
+            return !ff.accept(feature);
+        }
+        
+        public int hashCode() {
+            return feature.hashCode() + 65;
+        }
+        
+        public boolean equals(Object o) {
+            if (o instanceof FeatureFilter.ByFeature) {
+                return ((FeatureFilter.ByFeature) o).getFeature().equals(feature);
+            } else {
+                return false;
+            }
+        }
+    }
 }
 
 interface ByHierarchy extends FeatureFilter {
