@@ -22,6 +22,7 @@
 package org.biojava.bio.program.gff;
 
 import java.util.Map;
+import java.util.Comparator;
 
 import org.biojava.bio.seq.StrandedFeature;
 
@@ -139,5 +140,28 @@ public interface GFFRecord {
    * @deprecated  Use GFFTools.NO_FRAME instead
    */
   public static int NO_FRAME = GFFTools.NO_FRAME;
+  
+  /**
+   * Comparator which defines a useful sort order for GFF records.
+   * GFFRecord properties are considered in the following order
+   *
+   * <ol>
+   * <li>Sequence name</li>
+   * <li>Feature start</li>
+   * <li>Feature end</li>
+   * <li>Feature type</li>
+   * <li>Feature source</li>
+   * <li>The complete GFF line corresponding to this record</li>
+   * </ol>
+   *
+   * <p>
+   * Two records are equal iff their GFF lines are character-for-character
+   * identical.
+   * </p>
+   *
+   * @since 1.4
+   */
+  
+  public static final Comparator NATURAL_ORDER = new GFFComparator();
 }
 
