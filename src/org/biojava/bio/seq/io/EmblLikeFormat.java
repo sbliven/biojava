@@ -174,7 +174,10 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
 	    }
 	}
 
-	throw new IOException("Premature end of stream for EMBL");
+	if (sparser != null)
+	    sparser.close();
+
+	throw new IOException("Premature end of stream or missing end tag '//' for EMBL");
     }
 
     /**

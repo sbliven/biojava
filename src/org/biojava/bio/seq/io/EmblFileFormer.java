@@ -238,6 +238,10 @@ public class EmblFileFormer implements SeqFileFormer
         // Default is to quote unknown qualifiers
         String     form = "quoted";
 
+	// Don't print internal data structures
+	if (key.equals(Feature.PROPERTY_DATA_KEY))
+	    return;
+
         if (qualifierData.containsKey(key))
             form = (String) ((Map) qualifierData.get(key)).get("form");
 
