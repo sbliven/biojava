@@ -1,0 +1,190 @@
+package org.biojava.bio.search;
+
+
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.*;
+import org.biojava.bio.*;
+
+import java.util.*;
+
+/**
+ * Title:        KnuthMorrisPrattSearch<p>
+ * Description:  An object to find exact subsequences within a sequence<p>
+ * Copyright:    Copyright (c) 2002<p>
+ * Company:      AgResearch<p>
+ *
+ * Reference: KNUTH D.E., MORRIS (Jr) J.H., PRATT V.R., 1977,
+ * Fast pattern matching in strings, SIAM Journal on Computing 6(1):323-350.
+ *
+ * @author Mark Schreiber
+ * @version 1.0
+ */
+
+public final class KnuthMorrisPrattSearch {
+  private int[] kmpNext;// the table that defines the border lengths.
+  private SymbolList pattern;
+
+  /**
+   * Constructs a KMP matcher to find exact occurances of
+   * <code>pattern</code> in <code>text</code> using the
+   * Knuth-Morris-Pratt algorithm.<p>
+   *
+   * A new class should be constructed for each occurance of
+   * <code>pattern</code>.<p>
+   *
+   * USAGE:<p>
+   * When the object is constructed the <code>findMatches()</code>
+   * method would be called. This will return an int[] giving the offsets
+   * (ie the location of the first symbol of each match in the text).
+   * The <code>getKMPNextTable()</code> returns the table of border lengths
+   * used in the algorithm. This method is protected as it is unlikely it
+   * will be needed except for debugging.<p>
+   *
+   * The algorithm finds exact matches therefor ambiguity symbols will match
+   * only themselves. The class cannot perform regular expressions. The class
+   * operates on all alphabets thus if searching for a DNA pattern you should
+   * compile both the pattern and its reverse complement.<p>
+   *
+   * <b>WARNING the behaivour of a pattern containing gaps is undefined
+   *  it's not recommended that you try it.</b>
+   */
+  public KnuthMorrisPrattSearch(SymbolList pattern) {
+    Alphabet alpha = pattern.getAlphabet();
+    ArrayList rList = new ArrayList(pattern.toList());
+
+    /*
+     *need to perform this hack to make the kmpNext capable of dealing with
+     *overlapping patterns, unfortunately it means the behaivour of a pattern
+     *containing a gap is unspecified.
+     */
+    rList.add(alpha.getGapSymbol());
+    try{
+      this.pattern = new SimpleSymbolList(alpha, rList);
+    }catch(Exception e){
+      //really shouldn't happen
+      throw new BioError(e, "Couldn't make KMP pattern");
+    }
+
+
+    kmpNext = new int[this.pattern.length()];
+    compilePattern();
+  }
+
+  private void compilePattern(){
+    int k = pattern.length()-1;
+    //System.out.println("k = "+k);
+    int i = 0;
+    int j = kmpNext[0] = -1;
+
+    while(i < k){
+      while (j > -1 && pattern.symbolAt(i+1) != pattern.symbolAt(j+1)){
+        j = kmpNext[j];
+      }
+      i++; j++;
+      if(pattern.symbolAt(i+1) == pattern.symbolAt(j+1)){
+        //System.out.println("i = "+i+" j = "+j);
+        kmpNext[i] = kmpNext[j];
+      }else{
+        //System.out.println("i = "+i+" j = "+j);
+        kmpNext[i] = j;
+      }
+    }
+  }
+
+
+  /**
+   * This will return an int[] giving the offsets of the matches in <code>text</code>
+   * (ie the location of the first symbol of each match in the <code>text</code>).
+   */
+  public int[] findMatches(SymbolList text){
+    List matches = new ArrayList();
+    int n; // the length of the text
+    int m; //the length of the pattern
+    int i = 0;
+    int j = 0;
+
+    m = this.pattern.length()-1; //-1 to remove the gap at the end hack
+    if(text instanceof CircularView){
+      n = text.length()+pattern.length() -1; //allow wrap around
+    }else{
+      n = text.length();
+    }
+
+    //find the matches
+    while(j < n){
+      while( i  > -1 && pattern.symbolAt(i+1) != text.symbolAt(j+1))
+        i = kmpNext[i];
+      i++;
+      j++;
+      if(i >= m){
+        //match found, add 1 for SymbolList coordinates.
+        matches.add(new Integer(j - i +1));
+        i = kmpNext[i];
+      }
+    }
+
+    //turn matches into an int[]
+    int[] mat = new int[matches.size()];
+    for (int x = 0; x < mat.length; x++) {
+      mat[x] = ((Integer)matches.get(x)).intValue();
+    }
+    return mat;
+  }
+
+  /**
+   * Returns the table of border lengths
+   */
+  protected int[] getKmpNextTable(){
+    return kmpNext;
+  }
+
+  /**
+   * Demo and Test method
+   */
+  public static void main(String[] args) throws Exception{
+    KnuthMorrisPrattSearch kmp1;
+    int[] table;
+    int[] matches;
+
+
+    SymbolList pattern = DNATools.createDNA("gcagagag");
+    SymbolList pattern2 = DNATools.createDNA("agag");
+    SymbolList text = DNATools.createDNA("gcatcgcagagagtatacagtacg");
+
+    //check pattern
+    kmp1 = new KnuthMorrisPrattSearch(pattern);
+
+    table = kmp1.getKmpNextTable();
+    System.out.println(pattern.seqString());
+    for (int i = 0; i < table.length; i++) {
+      System.out.print(table[i] +" ");
+    }
+    //table should be -1 0 0 -1 1 -1 1 -1
+    System.out.println("");
+    matches = kmp1.findMatches(text);
+    System.out.print("Matches at: ");
+    for (int i = 0; i < matches.length; i++) {
+      System.out.print(matches[i]+" ");
+    }
+    //matches should be at 6.
+    System.out.println("\n");
+
+    //check pattern2
+    kmp1 = new KnuthMorrisPrattSearch(pattern2);
+    table = kmp1.getKmpNextTable();
+    System.out.println(pattern2.seqString());
+    for (int i = 0; i < table.length; i++) {
+      System.out.print(table[i] +" ");
+    }
+    System.out.println("");
+    //table should be    -1  0 -1  0  2
+
+    matches = kmp1.findMatches(text);
+    System.out.print("Matches at: ");
+    for (int i = 0; i < matches.length; i++) {
+      System.out.print(matches[i]+" ");
+    }
+    //matches should be at 8 and 10
+    System.out.println("\n");
+  }
+}
