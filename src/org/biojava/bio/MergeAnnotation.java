@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -43,12 +44,15 @@ import org.biojava.utils.ChangeVetoException;
 /**
  * Merged view onto a list of underlying Annotation objects.
  * Currently immutable (but reflects changes to underlying objects). Annotations
- * near the beginning of the list will have properties that take precedence.
+ * near the beginning of the list will have properties that take
+ * precedence. It is possible to get the ordering of the annotations, or to
+ * change it by removing and re-adding methods.
  * This Annotation implementation is immutable.
  *
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Greg Cox
+ * @author Francois Pepin
  * @since 1.2
  *
  * @for.developer Use these when you have a list of Annotation instances that
@@ -71,8 +75,45 @@ public class MergeAnnotation
     mergeSet = new ArrayList();
   }
 
+    /**
+   * ChangeType of ChangeEvent fired before and after an annotation is added
+   * to MergeAnnotation.
+   *
+   */
+  public static final ChangeType ANNOTATION_CHANGED = new ChangeType(
+    "annotation added",
+    "org.biojava.bio.MergeAnnotation",
+    "ANNOTATION_CHANGED"
+  );
+  
   /**
-   * Add a new Annotation to the list to be merged.
+   * ChangeType of ChangeEvent fired before and after an annotation is added
+   * to MergeAnnotation.
+   *
+   */
+  public static final ChangeType ANNOTATION_ADD = new ChangeType(
+    "annotation added from List",
+    "org.biojava.bio.MergeAnnotation",
+    "ANNOTATION_ADD",
+    ANNOTATION_CHANGED
+  );
+
+    /**
+   * ChangeType of ChangeEvent fired before and after an annotation is added
+   * to MergeAnnotation.
+   *
+   */
+  public static final ChangeType ANNOTATION_REMOVE = new ChangeType(
+    "annotation deleted from List",
+    "org.biojava.bio.MergeAnnotation",
+    "ANNOTATION_REMOVE",
+    ANNOTATION_CHANGED
+  );
+
+
+  
+  /**
+   * Add a new Annotation to to the end of the list to be merged.
    *
    * @for.powerUser  Use this to alter the Annotations being merged
    *
@@ -81,9 +122,55 @@ public class MergeAnnotation
    */
   public void addAnnotation(Annotation ann)
           throws ChangeVetoException {
-    mergeSet.add(ann);
+     if(!hasListeners())
+       mergeSet.add(ann);
+     else{
+       ChangeEvent ce = new ChangeEvent(this,MergeAnnotation.ANNOTATION_ADD,ann);
+       ChangeSupport changeSupport = super.getChangeSupport(MergeAnnotation.ANNOTATION_ADD);
+       synchronized(changeSupport) {
+        changeSupport.firePreChangeEvent(ce);
+        mergeSet.add(ann);
+        changeSupport.firePostChangeEvent(ce);
+      }
+     }
   }
 
+  /**
+   * Gets an unmodifiable view of the list of Annotations that are part of the
+   * MergeAnnotation. Lower indices Annotation have precedence if 2
+   * Annotations share the same property.
+   * 
+   * @return an unmodifiable <code>List</code> of the Annotations that form
+   * this MergeAnnotation.
+   */
+  public List getAnnotations()
+  {
+    return Collections.unmodifiableList(mergeSet);
+  }
+
+  /**
+   * Remove an Annotation from the list. This can be used to change the
+   * ordering of the Annotations by re-adding it later.
+   *
+   * @param ann an <code>Annotation</code> to be removed.
+   * @exception ChangeVetoException if an error occurs
+   */
+  public void removeAnnotation(Annotation ann)
+    throws ChangeVetoException {
+    if(!hasListeners())
+       mergeSet.remove(ann);
+     else{
+       ChangeEvent ce = new ChangeEvent(this,MergeAnnotation.ANNOTATION_REMOVE,ann);
+       ChangeSupport changeSupport = super.getChangeSupport(MergeAnnotation.ANNOTATION_REMOVE);
+       synchronized(changeSupport) {
+         changeSupport.firePreChangeEvent(ce);
+         mergeSet.remove(ann);
+         changeSupport.firePostChangeEvent(ce);
+       }
+     }
+  }
+  
+  
   protected ChangeSupport getChangeSupport(ChangeType changeType) {
     ChangeSupport changeSupport = super.getChangeSupport(changeType);
 
@@ -139,7 +226,7 @@ public class MergeAnnotation
     Set s = new HashSet();
     for (Iterator i = mergeSet.iterator(); i.hasNext();) {
       Annotation a = (Annotation) i.next();
-      s.add(a.keys());
+      s.addAll(a.keys());
     }
     return s;
   }
