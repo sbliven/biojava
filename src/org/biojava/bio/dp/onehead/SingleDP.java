@@ -323,8 +323,8 @@ public class SingleDP extends DP implements Serializable {
               double t = trs[kc];
               
               if(states[l]== getModel().magicalState())  {
-                System.out.print("magic " + "lastCol[k]=" + lastCol[k] + " , ");
-                System.out.println("t=" + t);
+		  // System.out.print("magic " + "lastCol[k]=" + lastCol[k] + " , ");
+		  // System.out.println("t=" + t);
               }
               
               score += Math.exp(t + (lastCol[k] - constant));
@@ -335,13 +335,13 @@ public class SingleDP extends DP implements Serializable {
           // new_l = emission_l(sym) * sum_k(transition(k, l) * old_k)
           currentCol[l] = (weight + Math.log(score)) + constant;
           
-          System.out.println("currentCol[" + states[l].getName() + "]=" + currentCol[l]);
+          // System.out.println("currentCol[" + states[l].getName() + "]=" + currentCol[l]);
 
           if(states[l] == getModel().magicalState())  {
-               System.out.print("magic\t");
-               System.out.print("Weight " + weight + "\t");
-               System.out.print(", score " + score + " = " + Math.log(score) + "\t");
-               System.out.println(", constant " + constant);             
+	      // System.out.print("magic\t");
+	      //System.out.print("Weight " + weight + "\t");
+              // System.out.print(", score " + score + " = " + Math.log(score) + "\t");
+              // System.out.println(", constant " + constant);             
           }
         }
       }

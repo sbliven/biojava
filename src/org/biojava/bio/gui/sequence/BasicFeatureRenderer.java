@@ -178,9 +178,31 @@ implements FeatureRenderer {
   ) {
     Shape s = null;
     Location loc = f.getLocation();
-    float min = (float) src.sequenceToGraphics(loc.getMin());
-    float max = (float) src.sequenceToGraphics(loc.getMax());
     float depth = (float) (arrowSize + 2.0 * arrowScoop);
+
+    double minD, maxD;
+    if (src.getScale() > 1.0) {
+	minD = src.sequenceToGraphics(loc.getMin());
+	maxD = src.sequenceToGraphics(loc.getMax() + 1) - 1.0;
+    } else {
+	minD = src.sequenceToGraphics(loc.getMin());
+	maxD = src.sequenceToGraphics(loc.getMax());
+    }
+    float min = (float) minD;
+    float max = (float) maxD;
+
+    float minBounds = (float) src.sequenceToGraphics(src.getRange().getMin() - 1);
+    float maxBounds = (float) src.sequenceToGraphics(src.getRange().getMax() + 1);
+    Shape bounds;
+    if (src.getDirection() == src.HORIZONTAL) {
+	bounds = new Rectangle2D.Double(minBounds, 0, maxBounds - minBounds, depth);
+    } else {
+	bounds = new Rectangle2D.Double(0, minBounds, depth, maxBounds - minBounds);
+    }
+
+    // System.err.println("Drawing feature " + f.getType() + " min= " + min + "      max=" + max);
+
+    
     if( (max - min) >= arrowSize) {
       if (f instanceof StrandedFeature) {
         StrandedFeature.Strand strand = ((StrandedFeature) f).getStrand();
@@ -194,28 +216,28 @@ implements FeatureRenderer {
           float maxX = max;
           if(strand == StrandedFeature.POSITIVE) {
             float midX = maxX - (float) arrowSize;
-            GeneralPath path = new GeneralPath();
-            path.moveTo(minX, minYS);
-            path.lineTo(midX, minYS);
-            path.lineTo(midX, minY);
-            path.lineTo(maxX, midY);
-            path.lineTo(midX, maxY);
-            path.lineTo(midX, maxYS);
-            path.lineTo(minX, maxYS);
-            path.closePath();
-            s = path;
+	    GeneralPath path = new GeneralPath();
+	    path.moveTo(minX, minYS);
+	    path.lineTo(midX, minYS);
+	    path.lineTo(midX, minY);
+	    path.lineTo(maxX, midY);
+	    path.lineTo(midX, maxY);
+	    path.lineTo(midX, maxYS);
+	    path.lineTo(minX, maxYS);
+	    path.closePath();
+	    s = path;
           } else if(strand == StrandedFeature.NEGATIVE) {
             float midX = minX + (float) arrowSize;
-            GeneralPath path = new GeneralPath();
-            path.moveTo(maxX, minYS);
-            path.lineTo(midX, minYS);
-            path.lineTo(midX, minY);
-            path.lineTo(minX, midY);
-            path.lineTo(midX, maxY);
-            path.lineTo(midX, maxYS);
-            path.lineTo(maxX, maxYS);
-            path.closePath();
-            s = path;
+	    GeneralPath path = new GeneralPath();
+	    path.moveTo(maxX, minYS);
+	    path.lineTo(midX, minYS);
+	    path.lineTo(midX, minY);
+	    path.lineTo(minX, midY);
+	    path.lineTo(midX, maxY);
+	    path.lineTo(midX, maxYS);
+	    path.lineTo(maxX, maxYS);
+	    path.closePath();
+	    s = path;
           }
         } else { // vertical
           float minX = 0.0f;
@@ -260,13 +282,23 @@ implements FeatureRenderer {
         s = new Rectangle2D.Double(0, min, 2.0*arrowScoop + arrowSize, Math.max(1.0, max-min));
       }
     }
+    
+    if (!bounds.contains(s.getBounds())) {
+	//	System.err.println("Edgeclipping");
+
+	s = new Area(s);
+	((Area) s).intersect(new Area(bounds));
+    }
+
     if(fill != null) {
       g.setPaint(fill);
       g.fill(s);
     }
-    if ( (outline != null) && ( (max - min) > 4.0) ) {
+    if ( (outline != null) && ( (maxD - minD) > 4.0) ) {
       g.setPaint(outline);
       g.draw(s);
+    } else {
+	//	System.err.println("Not drawing outline...");
     }
   }
   

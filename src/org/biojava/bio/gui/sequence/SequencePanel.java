@@ -496,33 +496,40 @@ Changeable {
 
   public void resizeAndValidate() {
     //System.out.println("resizeAndValidate starting");
-    Dimension d = null;
+    Dimension mind = null;
+    Dimension maxd = null;
     
     if(!isActive()) {
       // System.out.println("No sequence");
       // no sequence - collapse down to no size at all
       leadingBorder.setSize(0.0);
       trailingBorder.setSize(0.0);
-      d = new Dimension(0, 0);
+      mind = maxd = new Dimension(0, 0);
     } else {
       double minAcross = sequenceToGraphics(range.getMin());
       double maxAcross = sequenceToGraphics(range.getMax());
+      double maxDropAcross = sequenceToGraphics(range.getMax() - 1);
       double lb = renderer.getMinimumLeader(this);
       double tb = renderer.getMinimumTrailer(this);
       double alongDim =
         (maxAcross - minAcross) +
         lb + tb;
+      double alongDropDim = 
+	(maxDropAcross - minAcross) + 
+	lb + tb;
       double depth = renderer.getDepth(this);
       if(direction == HORIZONTAL) {
-        d = new Dimension((int) Math.ceil(alongDim), (int) Math.ceil(depth));
+	  mind = new Dimension((int) Math.ceil(alongDropDim), (int) Math.ceil(depth));
+	  maxd = new Dimension((int) Math.ceil(alongDim), (int) Math.ceil(depth));
       } else {
-        d = new Dimension((int) Math.ceil(depth), (int) Math.ceil(alongDim));
+	  mind = new Dimension((int) Math.ceil(depth), (int) Math.ceil(alongDropDim));
+	  maxd = new Dimension((int) Math.ceil(depth), (int) Math.ceil(alongDim));
       }
     }
     
-    setMinimumSize(d);
-    setPreferredSize(d);
-    setMaximumSize(d);
+    setMinimumSize(mind);
+    setPreferredSize(maxd);
+    setMaximumSize(maxd);
     revalidate();
     // System.out.println("resizeAndValidate ending");
   }
