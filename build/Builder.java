@@ -244,7 +244,7 @@ public class Builder {
     
     public static int compile(List filenames) throws IOException {
 	String[] command = new String[7 + filenames.size()];
-	command[0] = "/usr/opt/java122/bin/javac";
+	command[0] = "javac";
 	command[1] = "-classpath";
 	command[2] = makePath(new String[] {"class", "xml.jar"});
 	command[3] = "-sourcepath";
