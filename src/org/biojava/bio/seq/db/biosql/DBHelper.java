@@ -63,8 +63,8 @@ public abstract class DBHelper {
 	        return new MySQLDBHelper();
 	    } else if (protocol.equals("postgresql")) {
 		return new PostgreSQLDBHelper();
-// 	    } else if (protocol.equals("oracle")) {
-// 		return new OracleDBHelper();
+ 	    } else if (protocol.equals("oracle")) {
+ 		return new OracleDBHelper();
 	    }
 	}
 
