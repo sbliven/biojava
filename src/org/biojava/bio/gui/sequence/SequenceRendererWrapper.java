@@ -86,7 +86,7 @@ implements SequenceRenderer, Serializable {
         this.renderer = renderer;
         if(renderer instanceof Changeable) {
           Changeable c = (Changeable) renderer;
-          c.removeChangeListener(rendForwarder);
+          c.addChangeListener(rendForwarder);
         }
         cs.firePostChangeEvent(ce);
       }

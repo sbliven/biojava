@@ -113,16 +113,29 @@ public interface ChangeListener extends EventListener {
   
   public class LoggingListener implements ChangeListener {
     private PrintStream out;
+    private String prefix;
     
     public LoggingListener(PrintStream out) {
       this.out = out;
+      this.prefix = null;
+    }
+    
+    public LoggingListener(PrintStream out, String prefix) {
+      this.out = out;
+      this.prefix = prefix;
     }
     
     public void preChange(ChangeEvent cev) throws ChangeVetoException {
+      if(prefix != null) {
+        out.print(prefix);
+      }
       out.println("preChange for event " + cev);
     }
     
     public void postChange(ChangeEvent cev) {
+      if(prefix != null) {
+        out.print(prefix);
+      }
       out.println("postChange for event " + cev);
     }
   }

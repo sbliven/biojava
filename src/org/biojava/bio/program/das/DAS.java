@@ -67,21 +67,21 @@ public class DAS extends AbstractChangeable {
 	activityListeners.remove(al);
     }
 
-    static synchronized void startedActivity(Object source) {
+    public static synchronized void startedActivity(Object source) {
 	for (Iterator i = activityListeners.iterator(); i.hasNext(); ) {
 	    ActivityListener al = (ActivityListener) i.next();
 	    al.startedActivity(source);
 	}
     }
 
-    static synchronized void completedActivity(Object source) {
+    public static synchronized void completedActivity(Object source) {
 	for (Iterator i = activityListeners.iterator(); i.hasNext(); ) {
 	    ActivityListener al = (ActivityListener) i.next();
 	    al.completedActivity(source);
 	}
     }
 
-    static synchronized void activityProgress(Object source, int current, int target) {
+    public static synchronized void activityProgress(Object source, int current, int target) {
 	for (Iterator i = activityListeners.iterator(); i.hasNext(); ) {
 	    ActivityListener al = (ActivityListener) i.next();
 	    al.activityProgress(source, current, target);
@@ -109,6 +109,7 @@ public class DAS extends AbstractChangeable {
   throws BioException, ChangeVetoException {
     try {
       URL dsnURL = new URL(dasURL, "dsn");
+      DAS.startedActivity(dsnURL);
       HttpURLConnection huc = (HttpURLConnection) dsnURL.openConnection();
       huc.connect();
       int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
@@ -165,6 +166,7 @@ public class DAS extends AbstractChangeable {
           }
         }
       }
+      DAS.completedActivity(dsnURL);
     } catch (MalformedURLException me) {
       throw new BioException(me, "Can't build DAS url");
     } catch (IOException ioe) {

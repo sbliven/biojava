@@ -55,7 +55,10 @@ implements FeatureRenderer, java.io.Serializable {
     if(hasListeners()) {
       ChangeSupport cs = getChangeSupport(SequenceRenderContext.REPAINT);
       synchronized(cs) {
-        ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.REPAINT);
+        ChangeEvent ce = new ChangeEvent(
+          this, SequenceRenderContext.REPAINT,
+          p, this.fill
+        );
         cs.firePreChangeEvent(ce);
         this.fill = p;
         cs.firePostChangeEvent(ce);

@@ -88,7 +88,7 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
 	// intended to center text in band
         double fudgeDown = 0.0;
         if (direction == src.HORIZONTAL) {
-          fudgeAcross = 0.0 /*- maxBounds.getCenterX()*/;
+          fudgeAcross = - maxBounds.getCenterX();
           fudgeDown = depth * 0.5 - maxBounds.getCenterY();
         } else {
           fudgeAcross = depth * 0.5 - maxBounds.getCenterX();
