@@ -77,148 +77,150 @@ public class SimpleSeqSimilaritySearchSubHit
      * null.
      */
     public SimpleSeqSimilaritySearchSubHit(double    score,
-					   double    eValue,
-					   double    pValue,
+                                           double    eValue,
+                                           double    pValue,
                                            int       queryStart,
-					   int       queryEnd,
-					   Strand    queryStrand,
-					   int       subjectStart,
-					   int       subjectEnd,
-					   Strand    subjectStrand,
-					   Alignment alignment)
+                                           int       queryEnd,
+                                           Strand    queryStrand,
+                                           int       subjectStart,
+                                           int       subjectEnd,
+                                           Strand    subjectStrand,
+                                           Alignment alignment)
     {
-        if(Double.isNaN(score)) {
-	    throw new IllegalArgumentException("score was NaN");
-	}
+        if (Double.isNaN(score))
+        {
+            throw new IllegalArgumentException("score was NaN");
+        }
         // pValue may be NaN
-	// eValue may be NaN
-	if(alignment == null) {
-	    throw new IllegalArgumentException("alignment was null");
-	}
+        // eValue may be NaN
+        if (alignment == null)
+        {
+            throw new IllegalArgumentException("alignment was null");
+        }
 
-	this.score         = score;
-	this.pValue        = pValue;
-	this.eValue        = eValue;
-	this.queryStart    = queryStart;
-	this.queryEnd      = queryEnd;
-	this.queryStrand   = queryStrand;
-	this.subjectStart  = subjectStart;
-	this.subjectEnd    = subjectEnd;
-	this.subjectStrand = subjectStrand;
-	this.alignment     = alignment;
+        this.score         = score;
+        this.pValue        = pValue;
+        this.eValue        = eValue;
+        this.queryStart    = queryStart;
+        this.queryEnd      = queryEnd;
+        this.queryStrand   = queryStrand;
+        this.subjectStart  = subjectStart;
+        this.subjectEnd    = subjectEnd;
+        this.subjectStrand = subjectStrand;
+        this.alignment     = alignment;
     }
   
     public double getScore()
     {
-	return score;
+        return score;
     }
 
     public double getPValue()
     {
-	return pValue;
+        return pValue;
     }
   
     public double getEValue()
     {
-	return eValue;
+        return eValue;
     }
 
     public int getQueryStart()
     {
-	return queryStart;
+        return queryStart;
     }
 
     public int getQueryEnd()
     {
-	return queryEnd;
+        return queryEnd;
     }
 
     public Strand getQueryStrand()
     {
-	return queryStrand;
+        return queryStrand;
     }
 
     public int getSubjectStart()
     {
-	return subjectStart;
+        return subjectStart;
     }
 
     public int getSubjectEnd()
     {
-	return subjectEnd;
+        return subjectEnd;
     }
 
     public Strand getSubjectStrand()
     {
-	return subjectStrand;
+        return subjectStrand;
     }
 
     public Alignment getAlignment()
     {
-	return alignment;
+        return alignment;
     }
 
     public String toString()
     {
-	return "SimpleSeqSimilaritySearchSubHit with score " + getScore();
+        return "SimpleSeqSimilaritySearchSubHit with score " + getScore();
     }
   
     public boolean equals(Object o)
     {
-	if (o == this) return true;
+        if (o == this) return true;
     
-	// if this class is a direct sub-class of Object:
-	if (o == null) return false;
-	if (! o.getClass().equals(this.getClass())) return false;
+        // if this class is a direct sub-class of Object:
+        if (o == null) return false;
+        if (! o.getClass().equals(this.getClass())) return false;
     
-	SimpleSeqSimilaritySearchSubHit that = (SimpleSeqSimilaritySearchSubHit) o;
+        SimpleSeqSimilaritySearchSubHit that = (SimpleSeqSimilaritySearchSubHit) o;
     
-	// only compare fields of this class (not of super-classes):
-	if (! ObjectUtil.equals(this.score, that.score))
-	    return false;
-	if (! ObjectUtil.equals(this.pValue, that.pValue))
-	    return false;
-	if (! ObjectUtil.equals(this.eValue, that.eValue))
-	    return false;
-	if (! ObjectUtil.equals(this.queryStart, that.queryStart))
-	    return false;
-	if (! ObjectUtil.equals(this.queryEnd, that.queryEnd))
-	    return false;
-	if (! ObjectUtil.equals(this.queryStrand, that.queryStrand))
-	    return false;
-	if (! ObjectUtil.equals(this.subjectStart, that.subjectStart))
-	    return false;
-	if (! ObjectUtil.equals(this.subjectEnd, that.subjectEnd))
-	    return false;
-	if (! ObjectUtil.equals(this.subjectStrand, that.subjectStrand))
-	    return false;
+        // only compare fields of this class (not of super-classes):
+        if (! ObjectUtil.equals(this.score, that.score))
+            return false;
+        if (! ObjectUtil.equals(this.pValue, that.pValue))
+            return false;
+        if (! ObjectUtil.equals(this.eValue, that.eValue))
+            return false;
+        if (! ObjectUtil.equals(this.queryStart, that.queryStart))
+            return false;
+        if (! ObjectUtil.equals(this.queryEnd, that.queryEnd))
+            return false;
+        if (! ObjectUtil.equals(this.queryStrand, that.queryStrand))
+            return false;
+        if (! ObjectUtil.equals(this.subjectStart, that.subjectStart))
+            return false;
+        if (! ObjectUtil.equals(this.subjectEnd, that.subjectEnd))
+            return false;
+        if (! ObjectUtil.equals(this.subjectStrand, that.subjectStrand))
+            return false;
     
-	// this and that are identical if we made it 'til here
-	return true;
+        // this and that are identical if we made it 'til here
+        return true;
     }
   
     public int hashCode()
     {
-	// if this class is a direct sub-class of Object:
-	int hc = 0;
+        // if this class is a direct sub-class of Object:
+        int hc = 0;
 
-	// only take into account fields of this class (not of super-class):
-	hc = ObjectUtil.hashCode(hc, score);
-	hc = ObjectUtil.hashCode(hc, pValue);
-	hc = ObjectUtil.hashCode(hc, eValue);
-	hc = ObjectUtil.hashCode(hc, queryStart);
-	hc = ObjectUtil.hashCode(hc, queryEnd);
-	hc = ObjectUtil.hashCode(hc, queryStrand);
-	hc = ObjectUtil.hashCode(hc, subjectStart);
-	hc = ObjectUtil.hashCode(hc, subjectEnd);
-	hc = ObjectUtil.hashCode(hc, subjectStrand);
+        // only take into account fields of this class (not of super-class):
+        hc = ObjectUtil.hashCode(hc, score);
+        hc = ObjectUtil.hashCode(hc, pValue);
+        hc = ObjectUtil.hashCode(hc, eValue);
+        hc = ObjectUtil.hashCode(hc, queryStart);
+        hc = ObjectUtil.hashCode(hc, queryEnd);
+        hc = ObjectUtil.hashCode(hc, queryStrand);
+        hc = ObjectUtil.hashCode(hc, subjectStart);
+        hc = ObjectUtil.hashCode(hc, subjectEnd);
+        hc = ObjectUtil.hashCode(hc, subjectStrand);
 
-	return hc;
+        return hc;
     }
   
     public Object clone()
     {
-	// this is an immutable class so we can return ourselves
-	return this;
+        // this is an immutable class so we can return ourselves
+        return this;
     }
 }

@@ -40,7 +40,7 @@ public interface SeqSimilaritySearchHit
    * Return the overall score of this hit in the units defined by the
    * search algorithm.
    * @return the overall score of this hit. This is a mandatory piece
-   * of information and may hence not be NaN.
+   * of information and hence may not be NaN.
    */
     public double getScore();
 
@@ -131,7 +131,7 @@ public interface SeqSimilaritySearchHit
      * worst.
      * @return a List of SeqSimilaritySearchSubHit objects containing
      * all sub-hits for this hit.  Never returns null and the List is
-     * guaranteed to contain at least 1 entry.
+     * guaranteed to contain at least one entry.
      */
     public List getSubHits();
 

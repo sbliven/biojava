@@ -52,8 +52,8 @@ public class SimpleSeqSimilaritySearchResult
    * this search result, which may not be null.
    * @param querySequence the query sequence that gave rise to this
    * search result, which may not be null.
-   * @param sequenceDB the sequence database against the search that
-   * produced this results was done, which may not be null.
+   * @param sequenceDB the sequence database against which the search
+   * was conducted, which may not be null.
    * @param searchParameters the search parameters used in the search
    * that produced this result, which may be null. If not null, the
    * getter for this property returns an unmodifiable view of this
@@ -63,35 +63,38 @@ public class SimpleSeqSimilaritySearchResult
    * returns an unmodifiable view of this object.
    */
     public SimpleSeqSimilaritySearchResult(SymbolList querySequence,
-					   SequenceDB sequenceDB,
-					   Map        searchParameters,
-					   List       hits)
+                                           SequenceDB sequenceDB,
+                                           Map        searchParameters,
+                                           List       hits)
     {
-	if (querySequence == null) {
-	    throw new IllegalArgumentException("querySequence was null");
-	}
-	if (sequenceDB == null) {
-	    throw new IllegalArgumentException("sequenceDB was null");
-	}
-	// searchParameters may be null
-	if (hits == null) {
-	    throw new IllegalArgumentException("hits was null");
-	}
+        if (querySequence == null)
+        {
+            throw new IllegalArgumentException("querySequence was null");
+        }
+        if (sequenceDB == null)
+        {
+            throw new IllegalArgumentException("sequenceDB was null");
+        }
+        // searchParameters may be null
+        if (hits == null)
+        {
+            throw new IllegalArgumentException("hits was null");
+        }
 
-	this.querySequence    = querySequence;
-	this.sequenceDB       = sequenceDB;
-	this.searchParameters = searchParameters;
-	this.hits             = hits;
+        this.querySequence    = querySequence;
+        this.sequenceDB       = sequenceDB;
+        this.searchParameters = searchParameters;
+        this.hits             = hits;
     }
 
     public SymbolList getQuerySequence()
     {
-	return querySequence;
+        return querySequence;
     }
 
     public SequenceDB getSequenceDB()
     {
-	return sequenceDB;
+        return sequenceDB;
     }
 
     /**
@@ -99,7 +102,7 @@ public class SimpleSeqSimilaritySearchResult
      */
     public Map getSearchParameters()
     {
-	return (searchParameters == null ? null : Collections.unmodifiableMap(searchParameters));
+        return (searchParameters == null ? null : Collections.unmodifiableMap(searchParameters));
     }
 
     /**
@@ -107,55 +110,55 @@ public class SimpleSeqSimilaritySearchResult
      */
     public List getHits()
     {
-	return Collections.unmodifiableList(hits);
+        return Collections.unmodifiableList(hits);
     }
 
     public String toString()
     {
-	return "SimpleSeqSimilaritySearchResult of " + getQuerySequence() + " against " + getSequenceDB();
+        return "SimpleSeqSimilaritySearchResult of " + getQuerySequence() + " against " + getSequenceDB();
     }
   
     public boolean equals(Object o)
     {
-	if (o == this) return true;
+        if (o == this) return true;
     
-	// if this class is a direct sub-class of Object:
-	if (o == null) return false;
-	if (! o.getClass().equals(this.getClass())) return false;
+        // if this class is a direct sub-class of Object:
+        if (o == null) return false;
+        if (! o.getClass().equals(this.getClass())) return false;
+
+        SimpleSeqSimilaritySearchResult that = (SimpleSeqSimilaritySearchResult) o;
+
+        // only compare fields of this class (not of super-classes):
+        if (! ObjectUtil.equals(this.querySequence, that.querySequence))
+            return false;
+        if (! ObjectUtil.equals(this.sequenceDB, that.sequenceDB))
+            return false;
+        if (! ObjectUtil.equals(this.searchParameters, that.searchParameters))
+            return false;
+        if (! ObjectUtil.equals(this.hits, that.hits))
+            return false;
     
-	SimpleSeqSimilaritySearchResult that = (SimpleSeqSimilaritySearchResult) o;
-    
-	// only compare fields of this class (not of super-classes):
-	if (! ObjectUtil.equals(this.querySequence, that.querySequence))
-	    return false;
-	if (! ObjectUtil.equals(this.sequenceDB, that.sequenceDB))
-	    return false;
-	if (! ObjectUtil.equals(this.searchParameters, that.searchParameters))
-	    return false;
-	if (! ObjectUtil.equals(this.hits, that.hits))
-	    return false;
-    
-	// this and that are identical if we made it 'til here
-	return true;
+        // this and that are identical if we made it 'til here
+        return true;
     }
   
     public int hashCode()
     {
-	// if this class is a direct sub-class of Object:
-	int hc = 0;
+        // if this class is a direct sub-class of Object:
+        int hc = 0;
 
-	// only take into account fields of this class (not of super-class):
-	hc = ObjectUtil.hashCode(hc, querySequence);
-	hc = ObjectUtil.hashCode(hc, sequenceDB);
-	hc = ObjectUtil.hashCode(hc, searchParameters);
-	hc = ObjectUtil.hashCode(hc, hits);
+        // only take into account fields of this class (not of super-class):
+        hc = ObjectUtil.hashCode(hc, querySequence);
+        hc = ObjectUtil.hashCode(hc, sequenceDB);
+        hc = ObjectUtil.hashCode(hc, searchParameters);
+        hc = ObjectUtil.hashCode(hc, hits);
 
-	return hc;
+        return hc;
     }
   
   public Object clone()
     {
-	// this is an immutable class so we can return ourselves
-	return this;
+        // this is an immutable class so we can return ourselves
+        return this;
     }
 }

@@ -74,7 +74,7 @@ public class SimpleSeqSimilaritySearchHit
      * sequence.
      * @param qStrand the strand of the sub-hits on the query
      * sequence, which may be null for protein similarities. If they
-     * are no all positive or all negative, then this should be the
+     * are not all positive or all negative, then this should be the
      * unknown strand.
      * @param sStart the start of the first sub-hit on the subject
      * sequence.
@@ -91,8 +91,8 @@ public class SimpleSeqSimilaritySearchHit
      * containing all sub-hits for this hit, which may not be null.
      */
     public SimpleSeqSimilaritySearchHit(double score,
-					double eValue,
-					double pValue,
+                                        double eValue,
+                                        double pValue,
                                         int    qStart,
                                         int    qEnd,
                                         Strand qStrand,
@@ -100,46 +100,49 @@ public class SimpleSeqSimilaritySearchHit
                                         int    sEnd,
                                         Strand sStrand,
                                         String sequenceID,
-					List   subHits)
+                                        List   subHits)
     {
-	if (Double.isNaN(score)) {
-	    throw new IllegalArgumentException("score was NaN");
-	}
-	// pValue may be NaN
-	// eValue may be NaN
-	if (sequenceID == null) {
-	    throw new IllegalArgumentException("sequenceID was null");
-	}
-	if (subHits == null) {
-	    throw new IllegalArgumentException("subHits was null");
-	}
+        if (Double.isNaN(score))
+        {
+            throw new IllegalArgumentException("score was NaN");
+        }
+        // pValue may be NaN
+        // eValue may be NaN
+        if (sequenceID == null)
+        {
+            throw new IllegalArgumentException("sequenceID was null");
+        }
+        if (subHits == null)
+        {
+            throw new IllegalArgumentException("subHits was null");
+        }
 
-	this.score      = score;
-	this.pValue     = pValue;
-	this.eValue     = eValue;
-	this.sequenceID = sequenceID;
+        this.score      = score;
+        this.pValue     = pValue;
+        this.eValue     = eValue;
+        this.sequenceID = sequenceID;
         this.qStart     = qStart;
         this.qEnd       = qEnd;
         this.qStrand    = qStrand;
         this.sStart     = sStart;
         this.sEnd       = sEnd;
         this.sStrand    = sStrand;
-	this.subHits    = subHits;
+        this.subHits    = subHits;
     }
 
     public double getScore()
     {
-	return score;
+        return score;
     }
 
     public double getPValue()
     {
-	return pValue;
+        return pValue;
     }
   
     public double getEValue()
     {
-	return eValue;
+        return eValue;
     }
 
     public int getQueryStart()
@@ -174,7 +177,7 @@ public class SimpleSeqSimilaritySearchHit
 
     public String getSequenceID()
     {
-	return sequenceID;
+        return sequenceID;
     }
   
     /**
@@ -182,59 +185,59 @@ public class SimpleSeqSimilaritySearchHit
      */
     public List getSubHits()
     {
-	return Collections.unmodifiableList(subHits);
+        return Collections.unmodifiableList(subHits);
     }
 
     public String toString()
     {
-	return "SequenceDBSearchHit to " + getSequenceID()
-	    + " with score " + getScore();
+        return "SequenceDBSearchHit to " + getSequenceID()
+            + " with score " + getScore();
     }
   
     public boolean equals(Object o)
     {
-	if (o == this) return true;
+        if (o == this) return true;
     
-	// if this class is a direct sub-class of Object:
-	if (o == null) return false;
-	if (! o.getClass().equals(this.getClass())) return false;
+        // if this class is a direct sub-class of Object:
+        if (o == null) return false;
+        if (! o.getClass().equals(this.getClass())) return false;
     
-	SimpleSeqSimilaritySearchHit that = (SimpleSeqSimilaritySearchHit) o;
+        SimpleSeqSimilaritySearchHit that = (SimpleSeqSimilaritySearchHit) o;
     
-	// only compare fields of this class (not of super-classes):
-	if (! ObjectUtil.equals(this.score, that.score))
-	    return false;
-	if (! ObjectUtil.equals(this.pValue, that.pValue))
-	    return false;
-	if (! ObjectUtil.equals(this.eValue, that.eValue))
-	    return false;
-	if (! ObjectUtil.equals(this.sequenceID, that.sequenceID))
-	    return false;
-	if (! ObjectUtil.equals(this.subHits, that.subHits))
-	    return false;
+        // only compare fields of this class (not of super-classes):
+        if (! ObjectUtil.equals(this.score, that.score))
+            return false;
+        if (! ObjectUtil.equals(this.pValue, that.pValue))
+            return false;
+        if (! ObjectUtil.equals(this.eValue, that.eValue))
+            return false;
+        if (! ObjectUtil.equals(this.sequenceID, that.sequenceID))
+            return false;
+        if (! ObjectUtil.equals(this.subHits, that.subHits))
+            return false;
     
-	// this and that are identical if we made it 'til here
-	return true;
+        // this and that are identical if we made it 'til here
+        return true;
     }
   
     public int hashCode()
     {
-	// if this class is a direct sub-class of Object:
-	int hc = 0;
+        // if this class is a direct sub-class of Object:
+        int hc = 0;
 
-	// only take into account fields of this class (not of super-class):
-	hc = ObjectUtil.hashCode(hc, score);
-	hc = ObjectUtil.hashCode(hc, pValue);
-	hc = ObjectUtil.hashCode(hc, eValue);
-	hc = ObjectUtil.hashCode(hc, sequenceID);
-	hc = ObjectUtil.hashCode(hc, subHits);
+        // only take into account fields of this class (not of super-class):
+        hc = ObjectUtil.hashCode(hc, score);
+        hc = ObjectUtil.hashCode(hc, pValue);
+        hc = ObjectUtil.hashCode(hc, eValue);
+        hc = ObjectUtil.hashCode(hc, sequenceID);
+        hc = ObjectUtil.hashCode(hc, subHits);
 
-	return hc;
+        return hc;
     }
   
     public Object clone()
     {
-	// this is an immutable class so we can return ourselves
-	return this;
+        // this is an immutable class so we can return ourselves
+        return this;
     }
 }

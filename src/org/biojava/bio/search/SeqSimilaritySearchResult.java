@@ -40,8 +40,7 @@ public interface SeqSimilaritySearchResult
 {
 
     /**
-     * Return the sequence with which the search that produced this
-     * search result was performed.
+     * Return the query sequence which was used to perform the search.
      * @return the SymbolList object used to search the
      * SequenceDB. Never returns null.
      */

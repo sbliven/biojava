@@ -58,68 +58,72 @@ public class SequenceDBSearchResult extends AbstractChangeable
     private Annotation annotation;
 
     /**
-     * Creates a new <code>SequenceDBSearchResult</code> object.
+     * Creates a new <code>SequenceDBSearchResult</code>.
      *
-     * @param sequenceDB a <code>SequenceDB</code> object.
-     * @param searchParameters a <code>Map</code> object.
-     * @param querySeq a <code>SymbolList</code> object.
-     * @param annotation an <code>Annotation</code> object.
-     * @param hits a <code>List</code> object.
+     * @param sequenceDB a <code>SequenceDB</code>.
+     * @param searchParameters a <code>Map</code>.
+     * @param querySeq a <code>SymbolList</code>.
+     * @param annotation an <code>Annotation</code>.
+     * @param hits a <code>List</code>.
      */
     public SequenceDBSearchResult(final SequenceDB sequenceDB,
-				  final Map        searchParameters,
-				  final SymbolList querySeq,
-				  final Annotation annotation,
-				  final List       hits)
+                                  final Map        searchParameters,
+                                  final SymbolList querySeq,
+                                  final Annotation annotation,
+                                  final List       hits)
     {
-	if (querySeq  == null) {
-	    throw new IllegalArgumentException("querySeq was null");
-	}
-	if (sequenceDB == null) {
-	    throw new IllegalArgumentException("sequenceDB was null");
-	}
-	// searchParameters may be null
-	if (annotation == null) {
-	    throw new IllegalArgumentException("annotation was null");
-	}
-	if(hits == null) {
-	    throw new IllegalArgumentException("hits was null");
-	}
+        if (querySeq  == null)
+        {
+            throw new IllegalArgumentException("querySeq was null");
+        }
+        if (sequenceDB == null)
+        {
+            throw new IllegalArgumentException("sequenceDB was null");
+        }
+        // searchParameters may be null
+        if (annotation == null)
+        {
+            throw new IllegalArgumentException("annotation was null");
+        }
+        if (hits == null)
+        {
+            throw new IllegalArgumentException("hits was null");
+        }
 
-	this.sequenceDB       = sequenceDB;
-	this.searchParameters = searchParameters;
-	this.querySeq         = querySeq;
-	this.hits             = hits;
-	this.annotation       = annotation;
+        this.sequenceDB       = sequenceDB;
+        this.searchParameters = searchParameters;
+        this.querySeq         = querySeq;
+        this.hits             = hits;
+        this.annotation       = annotation;
 
-	// Lock the sequenceDB by vetoing all changes
-	this.sequenceDB.addChangeListener(ChangeListener.ALWAYS_VETO);
+        // Lock the sequenceDB by vetoing all changes
+        this.sequenceDB.addChangeListener(ChangeListener.ALWAYS_VETO);
 
-	// Lock the querySeq by vetoing all changes
-	this.querySeq.addChangeListener(ChangeListener.ALWAYS_VETO);
+        // Lock the querySeq by vetoing all changes
+        this.querySeq.addChangeListener(ChangeListener.ALWAYS_VETO);
 
-	// Lock the annotation by vetoing all changes to properties
-	this.annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
+        // Lock the annotation by vetoing all changes to properties
+        this.annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
     }
 
     public SymbolList getQuerySequence()
     {
-	return querySeq;
+        return querySeq;
     }
 
     public SequenceDB getSequenceDB()
     {
-	return sequenceDB;
+        return sequenceDB;
     }
 
     public Map getSearchParameters()
     {
-	return (searchParameters == null ? null : Collections.unmodifiableMap(searchParameters));
+        return (searchParameters == null ? null : Collections.unmodifiableMap(searchParameters));
     }
 
     public List getHits()
     {
-	return Collections.unmodifiableList(hits);
+        return Collections.unmodifiableList(hits);
     }
 
     /**
@@ -130,50 +134,50 @@ public class SequenceDBSearchResult extends AbstractChangeable
      */
     public Annotation getAnnotation()
     {
-	return annotation;
+        return annotation;
     }
 
     public boolean equals(final Object other)
     {
-	if (other == this) return true;
-	if (other == null) return false;
+        if (other == this) return true;
+        if (other == null) return false;
 
-	// Eliminate other if its class is not the same
-	if (! other.getClass().equals(this.getClass())) return false;
+        // Eliminate other if its class is not the same
+        if (! other.getClass().equals(this.getClass())) return false;
 
-	// Downcast and compare fields
-	SequenceDBSearchResult that = (SequenceDBSearchResult) other;
+        // Downcast and compare fields
+        SequenceDBSearchResult that = (SequenceDBSearchResult) other;
 
-	if (! ObjectUtil.equals(this.querySeq, that.querySeq))
-	    return false;
-	if (! ObjectUtil.equals(this.sequenceDB, that.sequenceDB))
-	    return false;
-	if (! ObjectUtil.equals(this.searchParameters, that.searchParameters))
-	    return false;
-	if (! ObjectUtil.equals(this.hits, that.hits))
-	    return false;
-	if (! ObjectUtil.equals(this.annotation, that.annotation))
-	    return false;
+        if (! ObjectUtil.equals(this.querySeq, that.querySeq))
+            return false;
+        if (! ObjectUtil.equals(this.sequenceDB, that.sequenceDB))
+            return false;
+        if (! ObjectUtil.equals(this.searchParameters, that.searchParameters))
+            return false;
+        if (! ObjectUtil.equals(this.hits, that.hits))
+            return false;
+        if (! ObjectUtil.equals(this.annotation, that.annotation))
+            return false;
 
-	return true;
+        return true;
     }
 
     public int hashCode()
     {
-	int hc = 0;
+        int hc = 0;
 
-	hc = ObjectUtil.hashCode(hc, querySeq);
-	hc = ObjectUtil.hashCode(hc, sequenceDB);
-	hc = ObjectUtil.hashCode(hc, searchParameters);
-	hc = ObjectUtil.hashCode(hc, hits);
-	hc = ObjectUtil.hashCode(hc, annotation);
+        hc = ObjectUtil.hashCode(hc, querySeq);
+        hc = ObjectUtil.hashCode(hc, sequenceDB);
+        hc = ObjectUtil.hashCode(hc, searchParameters);
+        hc = ObjectUtil.hashCode(hc, hits);
+        hc = ObjectUtil.hashCode(hc, annotation);
 
-	return hc;
+        return hc;
     }
 
     public String toString()
     {
-	return "SequenceDBSearchResult of " + getQuerySequence()
-	    + " against " + getSequenceDB();
+        return "SequenceDBSearchResult of " + getQuerySequence()
+            + " against " + getSequenceDB();
     }
 }

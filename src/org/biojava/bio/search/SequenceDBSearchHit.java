@@ -107,7 +107,7 @@ public class SequenceDBSearchHit extends AbstractChangeable
      * sequence.
      * @param sStrand the strand of the sub-hits on the subject
      * sequence, which may be null for protein similarities. If they
-     * are no all positive or all negative, then this should be the
+     * are not all positive or all negative, then this should be the
      * unknown strand.
      * @param subHits a <code>List</code> object containing the
      * subhits, which may not be null. They should be sorted in the
@@ -116,8 +116,8 @@ public class SequenceDBSearchHit extends AbstractChangeable
      * not be null.
      */
     public SequenceDBSearchHit(final double     score,
-			       final double     eValue,
-			       final double     pValue,
+                               final double     eValue,
+                               final double     pValue,
                                final int        queryStart,
                                final int        queryEnd,
                                final Strand     queryStrand,
@@ -125,54 +125,58 @@ public class SequenceDBSearchHit extends AbstractChangeable
                                final int        subjectEnd,
                                final Strand     subjectStrand,
                                final String     sequenceID,
-			       final Annotation annotation,
+                               final Annotation annotation,
                                final List       subHits)
     {
-        if (Double.isNaN(score)) {
-	    throw new IllegalArgumentException("score was NaN");
-	}
-	// pValue may be NaN
-	// eValue may be NaN
-	if (sequenceID == null) {
-	    throw new IllegalArgumentException("sequenceID was null");
-	}
-	if (annotation == null) {
-	    throw new IllegalArgumentException("annotation was null");
-	}
-	if (subHits == null) {
-	    throw new IllegalArgumentException("subHits was null");
-	}
+        if (Double.isNaN(score))
+        {
+            throw new IllegalArgumentException("score was NaN");
+        }
+        // pValue may be NaN
+        // eValue may be NaN
+        if (sequenceID == null)
+        {
+            throw new IllegalArgumentException("sequenceID was null");
+        }
+        if (annotation == null)
+        {
+            throw new IllegalArgumentException("annotation was null");
+        }
+        if (subHits == null)
+        {
+            throw new IllegalArgumentException("subHits was null");
+        }
 
-	this.sequenceID    = sequenceID;
-	this.score         = score;
-	this.eValue        = eValue;
-	this.pValue        = pValue;
+        this.sequenceID    = sequenceID;
+        this.score         = score;
+        this.eValue        = eValue;
+        this.pValue        = pValue;
         this.queryStart    = queryStart;
         this.queryEnd      = queryEnd;
         this.queryStrand   = queryStrand;
         this.subjectStart  = subjectStart;
         this.subjectEnd    = subjectEnd;
         this.subjectStrand = subjectStrand;
-	this.subHits       = subHits;
-	this.annotation    = annotation;
+        this.subHits       = subHits;
+        this.annotation    = annotation;
 
-	// Lock the annotation by vetoing all changes
-	this.annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
+        // Lock the annotation by vetoing all changes
+        this.annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
     }
 
     public double getScore()
     {
-	return score;
+        return score;
     }
 
     public double getPValue()
     {
-	return pValue;
+        return pValue;
     }
 
     public double getEValue()
     {
-	return eValue;
+        return eValue;
     }
 
     public int getQueryStart()
@@ -207,12 +211,12 @@ public class SequenceDBSearchHit extends AbstractChangeable
 
     public String getSequenceID()
     {
-	return sequenceID;
+        return sequenceID;
     }
 
     public List getSubHits()
     {
-	return Collections.unmodifiableList(subHits);
+        return Collections.unmodifiableList(subHits);
     }
 
     /**
@@ -223,50 +227,50 @@ public class SequenceDBSearchHit extends AbstractChangeable
      */
     public Annotation getAnnotation()
     {
-	return annotation;
+        return annotation;
     }
 
     public boolean equals(final Object other)
     {
-	if (other == this) return true;
-	if (other == null) return false;
+        if (other == this) return true;
+        if (other == null) return false;
 
-	// Eliminate other if its class is not the same
-	if (! other.getClass().equals(this.getClass())) return false;
+        // Eliminate other if its class is not the same
+        if (! other.getClass().equals(this.getClass())) return false;
     
-	// Downcast and compare fields
-	SequenceDBSearchHit that = (SequenceDBSearchHit) other;
+        // Downcast and compare fields
+        SequenceDBSearchHit that = (SequenceDBSearchHit) other;
 
-	if (! ObjectUtil.equals(this.score, that.score))
-	    return false;
-	if (! ObjectUtil.equals(this.pValue, that.pValue))
-	    return false;
-	if (! ObjectUtil.equals(this.eValue, that.eValue))
-	    return false;
-	if (! ObjectUtil.equals(this.sequenceID, that.sequenceID))
-	    return false;
-	if (! ObjectUtil.equals(this.subHits, that.subHits))
-	    return false;
+        if (! ObjectUtil.equals(this.score, that.score))
+            return false;
+        if (! ObjectUtil.equals(this.pValue, that.pValue))
+            return false;
+        if (! ObjectUtil.equals(this.eValue, that.eValue))
+            return false;
+        if (! ObjectUtil.equals(this.sequenceID, that.sequenceID))
+            return false;
+        if (! ObjectUtil.equals(this.subHits, that.subHits))
+            return false;
     
-	return true;
+        return true;
     }
   
     public int hashCode()
     {
-	int hc = 0;
+        int hc = 0;
 
-	hc = ObjectUtil.hashCode(hc, score);
-	hc = ObjectUtil.hashCode(hc, pValue);
-	hc = ObjectUtil.hashCode(hc, eValue);
-	hc = ObjectUtil.hashCode(hc, sequenceID);
-	hc = ObjectUtil.hashCode(hc, subHits);
+        hc = ObjectUtil.hashCode(hc, score);
+        hc = ObjectUtil.hashCode(hc, pValue);
+        hc = ObjectUtil.hashCode(hc, eValue);
+        hc = ObjectUtil.hashCode(hc, sequenceID);
+        hc = ObjectUtil.hashCode(hc, subHits);
 
-	return hc;
+        return hc;
     }
 
     public String toString()
     {
-	return "SequenceDBSearchHit to " + getSequenceID()
-	    + " with score " + getScore();
+        return "SequenceDBSearchHit to " + getSequenceID()
+            + " with score " + getScore();
     }
 }

@@ -74,7 +74,7 @@ public interface SeqSimilaritySearcher
      * @param db the sequence database against which the similarity
      * search will be performed.  May not be null otherwise an
      * IllegalArgumentException is thrown. Must also be an element of
-     * the set of searchable dbs returnes by getSearchableDBs().
+     * the set of searchable dbs returned by getSearchableDBs().
      * @param searchParameters parameters that customize the
      * search. Null must always be a legal value for this argument and
      * results in a default search being performed. If this map

@@ -47,7 +47,7 @@ public interface SeqSimilaritySearchSubHit
      * Return the score of this sub-hit in the units defined by the
      * search algorithm.
      * @return the score of this sub-hit. This is a mandatory piece of
-     * information and may hence not be NaN.
+     * information and hence may not be NaN.
      */
     public double getScore();
 
