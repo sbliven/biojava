@@ -61,7 +61,7 @@ public class StructureImpl implements Structure {
 	models 		= new ArrayList() ;
 	name 		= ""              ;
 	nmrflag 	= false ;
-
+	header = new HashMap();
     }
 
 
