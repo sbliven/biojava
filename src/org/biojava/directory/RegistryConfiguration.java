@@ -27,31 +27,34 @@ public class RegistryConfiguration{
 	BufferedReader in = new BufferedReader(new FileReader(configFileLocation));
 	String line = "";
 	String dbName = "";
-	HashMap params = null;
+	String key = "";
+	String value = "";
 	config = new HashMap();
+	Map currentDB = null;
 	
 	while((line = in.readLine()) != null){
 	    
-	    if(line.indexOf("[") > -1){
-		dbName = line.substring(1, line.indexOf("]"));
-		
-		System.out.println(dbName);
-		config.put(dbName, new HashMap()); //instantiate new hashtable 
-		//for this tag
-	    }else{
-		StringTokenizer strTok = new StringTokenizer(line, "=");
-		//here we assume that there are only key = value pairs in the
-		//config file
-		String key = strTok.nextToken();
-		String value = strTok.nextToken();
-		System.out.println(key + " " + value);
-		
-		if(config.containsKey(dbName)){
-		    config.put(dbName, params.put(key, value));
+	    //System.out.println(line);
+	    if(line.trim().length() > 0){
+		if(line.indexOf("[") > -1){
+		    dbName = line.substring(1, line.indexOf("]"));
+		    currentDB = new HashMap();
+		    config.put(dbName, currentDB); //instantiate new hashtable 
+		    //for this tag
+		    
 		}else{
-		    params = new HashMap();
+		    StringTokenizer strTok = new StringTokenizer(line, "=");
+		    //here we assume that there are only key = value pairs in the
+		    //config file
+		    key = strTok.nextToken();
+		    if(strTok.hasMoreTokens()){
+			value = strTok.nextToken();
+		    }else{
+			value = "";
+		    }
+		    
+		    currentDB.put(key.trim(), value.trim());    
 		}
-
 	    }
 	}
 	return config;

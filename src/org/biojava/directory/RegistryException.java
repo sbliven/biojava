@@ -1,9 +1,6 @@
 package org.biojava.directory;
 
 
-import org.biojava.seq.seqdb.*;
-
-
 /**
  * Class which gets thrown when the registry
  * cannot find an implementation of the sequenceDB
