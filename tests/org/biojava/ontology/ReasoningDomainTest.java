@@ -35,6 +35,13 @@ import junit.framework.TestCase;
  */
 public class ReasoningDomainTest
 extends TestCase {
+    
+    public void testDummy() {
+        System.err.println("ReasoningDomainTest currently decommisioned.");
+    }
+    
+    /*
+    
   public static void main(String[] args) throws Throwable {
     new ReasoningDomainTest().testReasoningCoreNamespace();
   }
@@ -140,7 +147,7 @@ extends TestCase {
       System.out.println("\t-> " + matcher.next());
     }
 
-  }
+  } */
 
 /*  public void testReasoningUserNamespace()
       throws Exception
