@@ -22,12 +22,12 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A state in a markov process.
  * <P>
  * This signals that this object can sit inside a model.
  */
-public interface State extends Residue {
+public interface State extends Symbol {
 }

@@ -59,7 +59,7 @@ public class StreamWriter {
     while(ss.hasNext()) {
       try {
         format.writeSequence(ss.nextSequence(), os);
-      } catch (SeqException se) {
+      } catch (BioException se) {
         se.printStackTrace();
       }
     }

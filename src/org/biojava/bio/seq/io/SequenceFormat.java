@@ -48,20 +48,20 @@ public interface SequenceFormat {
    * <P>
    * The format is responsible for converting characters in a stream into a
    * complete sequence. It should read from the stream contained in 
-   * <code>context</code>, parse the residue characters using
+   * <code>context</code>, parse the symbol characters using
    * <code>resParser</code> and generate a sequence from the resulting
-   * residue list using <code>sf</code>. Any non-sequence information within
+   * symbol list using <code>sf</code>. Any non-sequence information within
    * the format should be read in either as features, or as annotation.
    *
    * @param context the context to parse from
-   * @param resParser the parser to parse chars to Residue objects
+   * @param resParser the parser to parse chars to Symbol objects
    * @param sf the sequence factory for generating a full sequence
    * @return the resulting sequence
    */
   Sequence readSequence(StreamReader.Context context,
-                        ResidueParser resParser,
+                        SymbolParser resParser,
                         SequenceFactory sf)
-         throws SeqException, IllegalResidueException, IOException;
+         throws BioException, IllegalSymbolException, IOException;
 
   void writeSequence(Sequence seq, PrintStream os) throws IOException;
 }

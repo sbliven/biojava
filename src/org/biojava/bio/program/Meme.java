@@ -50,15 +50,15 @@ public class Meme {
     return seqIDs;
   }
 
-  public Meme(InputStream is, ResidueParser resParser)
-         throws IOException, IllegalResidueException {
+  public Meme(InputStream is, SymbolParser resParser)
+         throws IOException, IllegalSymbolException {
     StreamTokenizer st = new StreamTokenizer(
       new BufferedReader(new InputStreamReader(is)));
     st.eolIsSignificant(true);
     st.wordChars('*', '*');
     st.parseNumbers();
 
-    ResidueList res = null;
+    SymbolList res = null;
 
    ALPHABET:
     while( true ) {
@@ -144,7 +144,7 @@ public class Meme {
               break READMOTIF;
             break;
           case st.TT_NUMBER:
-            matrix.setWeight(res.residueAt(r+1), c, st.nval);
+            matrix.setWeight(res.symbolAt(r+1), c, st.nval);
             r++;
             break;
         }

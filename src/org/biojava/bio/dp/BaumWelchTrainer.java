@@ -23,13 +23,14 @@
 package org.biojava.bio.dp;
 
 import org.biojava.bio.BioError;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 public class BaumWelchTrainer extends AbstractTrainer {
   protected double singleSequenceIteration(
     ModelTrainer trainer,
-    ResidueList resList
-  ) throws IllegalResidueException, IllegalTransitionException, IllegalAlphabetException {
+    SymbolList resList
+  ) throws IllegalSymbolException, IllegalTransitionException, IllegalAlphabetException {
     System.out.println("Training");
     DP dp = getDP();
     State [] states = dp.getStates();
@@ -38,7 +39,7 @@ public class BaumWelchTrainer extends AbstractTrainer {
     int [][] backwardTransitions = dp.getBackwardTransitions();
     double [][] backwardTransitionScores = dp.getBackwardTransitionScores();    
     
-    ResidueList [] rll = { resList };
+    SymbolList [] rll = { resList };
     
     System.out.println("Forward");
     SingleDPMatrix fm = (SingleDPMatrix) dp.forwardMatrix(rll);
@@ -53,7 +54,7 @@ public class BaumWelchTrainer extends AbstractTrainer {
     System.out.println("State training");
     // state trainer
     for (int i = 1; i <= resList.length(); i++) {
-      Residue res = resList.residueAt(i);
+      Symbol res = resList.symbolAt(i);
       for (int s = 0; s < dp.getDotStatesIndex(); s++) {
         if (! (states[s] instanceof MagicalState)) {
           trainer.addStateCount(
@@ -68,7 +69,7 @@ public class BaumWelchTrainer extends AbstractTrainer {
     System.out.println("Transition training");
     // transition trainer
     for (int i = 0; i <= resList.length(); i++) {
-      Residue res = (i < resList.length()) ? resList.residueAt(i + 1) :
+      Symbol res = (i < resList.length()) ? resList.symbolAt(i + 1) :
                     MagicalState.MAGICAL_RESIDUE;
       for (int s = 0; s < states.length; s++) {  // any -> emission transitions
         int [] ts = backwardTransitions[s];

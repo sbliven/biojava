@@ -55,9 +55,9 @@ public class GenbankFormat implements SequenceFormat {
     }
 
     public Sequence readSequence(StreamReader.Context context,
-				 ResidueParser resParser,
+				 SymbolParser resParser,
 				 SequenceFactory sf)
-	throws IllegalResidueException, IOException, SeqException
+	throws IllegalSymbolException, IOException, BioException
     {
 	GenbankContext ctx = new GenbankContext(resParser, sf);
 
@@ -88,25 +88,25 @@ public class GenbankFormat implements SequenceFormat {
 
 	private int status;
 
-	private ResidueParser resParser;
+	private SymbolParser resParser;
 	private SequenceFactory sf;
 
-	private List residues;
+	private List symbols;
 	private FeatureTableParser features;
 
 	private String accession;
 
-	GenbankContext(ResidueParser resParser, SequenceFactory sf) {
+	GenbankContext(SymbolParser resParser, SequenceFactory sf) {
 	    this.resParser = resParser;
 	    this.sf = sf;
 
-	    residues = new ArrayList();
+	    symbols = new ArrayList();
 	    features = new FeatureTableParser(featureBuilder);
 	    status = HEADER;
 	}
 
-	void processLine(String line) throws SeqException,
-	                                     IllegalResidueException
+	void processLine(String line) throws BioException,
+	                                     IllegalSymbolException
 	{
 	    if (line.startsWith("FEATURES")) {
 		status = FEATURES;
@@ -136,7 +136,7 @@ public class GenbankFormat implements SequenceFormat {
 	}
 
 	private void processSeqLine(String line)
-	    throws IllegalResidueException 
+	    throws IllegalSymbolException 
 	{
 	    StringTokenizer st = new StringTokenizer(line);
 	    while(st.hasMoreTokens()) {
@@ -144,15 +144,15 @@ public class GenbankFormat implements SequenceFormat {
 
 		char c = token.charAt(token.length()-1);
 		if(!Character.isDigit(c)) {
-		    residues.addAll(resParser.parse(token).toList());
+		    symbols.addAll(resParser.parse(token).toList());
 		}
 	    }
 	}
 
-	Sequence makeSequence() throws SeqException {
+	Sequence makeSequence() throws BioException {
 	    Sequence ss;
-	    ss = sf.createSequence(new SimpleResidueList(
-				   resParser.alphabet(),residues),
+	    ss = sf.createSequence(new SimpleSymbolList(
+				   resParser.alphabet(),symbols),
 				    "urn:whatever",
 				    accession,
 				    Annotation.EMPTY_ANNOTATION);

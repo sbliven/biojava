@@ -29,8 +29,8 @@ public class FeatureAdapter implements Feature {
     return location;
   }
   
-  public ResidueList getResidues() {
-    return getLocation().residues(parent);
+  public SymbolList getSymbols() {
+    return getLocation().symbols(parent);
   }
   
   public String getSource() {

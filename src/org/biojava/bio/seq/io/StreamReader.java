@@ -53,9 +53,9 @@ public class StreamReader implements SequenceIterator {
   private Context context;
   
   /**
-   * The residue parser.
+   * The symbol parser.
    */
-  private ResidueParser resParser;
+  private SymbolParser resParser;
   
   /**
    * The sequenc format.
@@ -75,17 +75,17 @@ public class StreamReader implements SequenceIterator {
    *
    * @return the next Sequence
    * @throws NoSuchElementException if the end of the stream has been hit
-   * @throws SeqException if for any reason the next sequence could not be read
+   * @throws BioException if for any reason the next sequence could not be read
    */
   public Sequence nextSequence()
-         throws NoSuchElementException, SeqException  {
+         throws NoSuchElementException, BioException  {
     if(context.isStreamEmpty())
       throw new NoSuchElementException("Stream is empty");
 
     try {
       return format.readSequence(context, resParser, sf);
     } catch (Exception e) {
-      throw new SeqException(e, "Could not read sequence");
+      throw new BioException(e, "Could not read sequence");
     }
   }
 
@@ -94,7 +94,7 @@ public class StreamReader implements SequenceIterator {
   }
 
   public StreamReader(InputStream is, SequenceFormat format,
-                      ResidueParser resParser,
+                      SymbolParser resParser,
                       SequenceFactory sf)  {
     context = new Context(is);
     this.format = format;
@@ -103,7 +103,7 @@ public class StreamReader implements SequenceIterator {
   }
 
   public StreamReader(BufferedReader reader, SequenceFormat format,
-                      ResidueParser resParser,
+                      SymbolParser resParser,
                       SequenceFactory sf)  {
     context = new Context(reader);
     this.format = format;

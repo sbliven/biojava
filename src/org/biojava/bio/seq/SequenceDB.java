@@ -22,6 +22,7 @@
 package org.biojava.bio.seq;
 
 import java.util.*;
+import org.biojava.bio.*;
 
 /**
  * A database of sequences.
@@ -38,9 +39,9 @@ public interface SequenceDB {
    *
    * @param the id to retrieve by
    * @return  the Sequence with that id
-   * @throws SeqException if for any reason the sequence could not be retrieved
+   * @throws BioException if for any reason the sequence could not be retrieved
    */
-  Sequence getSequence(String id) throws SeqException;
+  Sequence getSequence(String id) throws BioException;
   
   /**
    * Get an imutable set of all of the IDs in the database. The ids are legal

@@ -25,8 +25,9 @@ package org.acedb.seq;
 import java.util.*;
 
 import org.acedb.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.tools.*;
 
 /**
  * @author Matthew Pocock
@@ -35,7 +36,7 @@ import org.biojava.bio.seq.tools.*;
 public class AceSequence implements Sequence {
   protected AceObject seqObj;
   private String name;
-  private ResidueList resList;
+  private SymbolList resList;
   private Annotation annotation;
   private SimpleMutableFeatureHolder fHolder;
   
@@ -63,15 +64,15 @@ public class AceSequence implements Sequence {
     return resList.length();
   }
   
-  public Residue residueAt(int index) {
-    return resList.residueAt(index);
+  public Symbol symbolAt(int index) {
+    return resList.symbolAt(index);
   }
   
   public List toList() {
     return resList.toList();
   }
   
-  public ResidueList subList(int start, int end) {
+  public SymbolList subList(int start, int end) {
     return resList.subList(start, end);
   }
   
@@ -106,7 +107,7 @@ public class AceSequence implements Sequence {
     throw new UnsupportedOperationException("ACeDB sequences can't be modified");
   }
     
-  public AceSequence(Database aceDB, String id) throws AceException, SeqException {
+  public AceSequence(Database aceDB, String id) throws AceException, BioException {
     this.name = id;
     this.fHolder = new SimpleMutableFeatureHolder();
     
@@ -119,7 +120,7 @@ public class AceSequence implements Sequence {
       Connection con = aceDB.getConnection();
       String selectString = con.transact("Find Sequence " + id);
       String dnaString = con.transact("dna");
-      ResidueParser rParser = alphabet().getParser("symbol");
+      SymbolParser rParser = alphabet().getParser("symbol");
       List rl = new ArrayList();
       StringTokenizer st = new StringTokenizer(dnaString, "\n");
       while(st.hasMoreElements()) {
@@ -130,7 +131,7 @@ public class AceSequence implements Sequence {
           rl.addAll(rParser.parse(line).toList());
         }
       }
-      resList = new SimpleResidueList(alphabet(), rl);
+      resList = new SimpleSymbolList(alphabet(), rl);
       con.dispose();
       
       // Feature template for stuff
@@ -191,7 +192,7 @@ public class AceSequence implements Sequence {
         }
       }
     } catch (Exception ex) {
-      if(ex instanceof AceException || ex instanceof SeqException)
+      if(ex instanceof AceException || ex instanceof BioException)
         throw (AceException) ex;
       throw new AceException(ex, "Fatal error constructing sequence for " + id);
     }

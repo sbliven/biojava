@@ -23,7 +23,7 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 public class SimpleWeightMatrix implements WeightMatrix {
   private int cols;
@@ -38,15 +38,15 @@ public class SimpleWeightMatrix implements WeightMatrix {
     return alpha;
   }
 
-  public double getWeight(Residue res, int column)
-         throws IllegalResidueException {
+  public double getWeight(Symbol res, int column)
+         throws IllegalSymbolException {
     alphabet().validate(res);
     double [] w = (double []) weights.get(res);
     return w[column];
   }
 
-  public void setWeight(Residue res, int column, double val)
-         throws IllegalResidueException {
+  public void setWeight(Symbol res, int column, double val)
+         throws IllegalSymbolException {
     alphabet().validate(res);
     double [] w = (double []) weights.get(res);
     w[column] = val;
@@ -59,9 +59,9 @@ public class SimpleWeightMatrix implements WeightMatrix {
   public SimpleWeightMatrix(FiniteAlphabet alpha, int cols) {
     this.alpha = alpha;
     this.cols = cols;
-    ResidueList res = alpha.residues();
+    SymbolList res = alpha.symbols();
     for(int i = 0; i < res.length(); i++) {
-      weights.put(res.residueAt(i+1), new double[cols]);
+      weights.put(res.symbolAt(i+1), new double[cols]);
     }
   }
 }

@@ -22,7 +22,7 @@ public class SequenceIteratorAdapter implements SequenceIterator {
   }
   
   public Sequence nextSequence()
-  throws NoSuchElementException, SeqException {
+  throws NoSuchElementException, BioException {
     try {
       PrimarySeq ps = getPrimarySeqIterator().next();
       SequenceAdapter sa = new SequenceAdapter(ps);
@@ -30,15 +30,15 @@ public class SequenceIteratorAdapter implements SequenceIterator {
     } catch (EndOfStream eos) {
       throw new NoSuchElementException(eos.getMessage());
     } catch (UnableToProcess utp) {
-      throw new SeqException(
+      throw new BioException(
         utp, "Could not create SequenceAdapter for CORBA sequence"
       );
     } catch (IllegalAlphabetException iae) {
-      throw new SeqException(
+      throw new BioException(
         iae, "Could not create SequenceAdapter for CORBA sequence"
       );
-    } catch (IllegalResidueException ire) {
-      throw new SeqException(
+    } catch (IllegalSymbolException ire) {
+      throw new BioException(
         ire, "Could not create SequenceAdapter for CORBA sequence"
       );
     }

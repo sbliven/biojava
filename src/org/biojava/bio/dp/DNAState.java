@@ -24,8 +24,8 @@ package org.biojava.bio.dp;
 
 import java.util.*;
 
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.tools.DNATools;
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.DNATools;
 
 /**
  * A state in a markov process.
@@ -45,16 +45,16 @@ public class DNAState extends AbstractState {
     return advance;
   }
 
-  public double getWeight(Residue r)
-  throws IllegalResidueException {
+  public double getWeight(Symbol r)
+  throws IllegalSymbolException {
     if(r == MagicalState.MAGICAL_RESIDUE)
       return Double.NEGATIVE_INFINITY;
     alphabet().validate(r);
     return scores[DNATools.index(r)];
   }
 
-  public void setWeight(Residue r, double score)
-  throws IllegalResidueException {
+  public void setWeight(Symbol r, double score)
+  throws IllegalSymbolException {
     if(r == MagicalState.MAGICAL_RESIDUE)
       return;
     alphabet().validate(r);
@@ -75,24 +75,24 @@ public class DNAState extends AbstractState {
   private class DNAStateTrainer implements StateTrainer {
     double c [] = new double[4];
       
-    public void addCount(Residue res, double counts)
-    throws IllegalResidueException {
+    public void addCount(Symbol res, double counts)
+    throws IllegalSymbolException {
       if(res instanceof MagicalState)
         return;
-      // System.out.println("Added count " + name() + " -> " + res.getSymbol() + " = "
+      // System.out.println("Added count " + name() + " -> " + res.getToken() + " = "
       //                    + counts + ", " + c[DNATools.index(res)]);
       c[DNATools.index(res)] += counts;
     }
       
     public void train(EmissionState nullModel, double weight)
-    throws IllegalResidueException {
+    throws IllegalSymbolException {
       double sum = 0.0;
       for(int i = 0; i < c.length; i++) {
-        Residue r = DNATools.forIndex(i);
+        Symbol r = DNATools.forIndex(i);
         sum += c[i] += Math.exp(nullModel.getWeight(r))*weight;
       }
       for(int i = 0; i < c.length; i++) {
-        Residue r = DNATools.forIndex(i);
+        Symbol r = DNATools.forIndex(i);
         setWeight(r, Math.log(c[i] / sum) );
       }
     }

@@ -9,7 +9,7 @@ public class SeqImpl
 extends PrimarySeqImpl
 implements _Seq_Operations {
   public Sequence getSequence() {
-    return (Sequence) getResidueList();
+    return (Sequence) getSymbolList();
   }
   
   public SeqImpl(Sequence sequence)

@@ -42,7 +42,7 @@ public class BarLogoPainter implements LogoPainter {
   public void paintLogo(Graphics g, StateLogo sl) {
     Graphics2D g2 = (Graphics2D) g;
     EmissionState state = sl.getState();
-    ResidueStyle style = sl.getStyle();
+    SymbolStyle style = sl.getStyle();
     
     Rectangle bounds = sl.getBounds();
     double width = bounds.getWidth();
@@ -55,12 +55,12 @@ public class BarLogoPainter implements LogoPainter {
       Iterator i = ((FiniteAlphabet) state.alphabet()).iterator();
       i.hasNext();
     ) {
-      Residue r = (Residue) i.next();
+      Symbol r = (Symbol) i.next();
       double rh = 0.0;
      
       try {
         rh = Math.exp(state.getWeight(r)) * scale;
-      } catch (IllegalResidueException ire) {
+      } catch (IllegalSymbolException ire) {
         throw new BioError(ire, "State alphabet has changed while painting");
       }
       
@@ -68,14 +68,14 @@ public class BarLogoPainter implements LogoPainter {
       
       try {
         g2.setPaint(style.fillPaint(r));
-      } catch (IllegalResidueException ire) {
+      } catch (IllegalSymbolException ire) {
         g2.setPaint(Color.black);
       }
       g2.fill(outline);
       
       try {
         g2.setPaint(style.outlinePaint(r));
-      } catch (IllegalResidueException ire) {
+      } catch (IllegalSymbolException ire) {
         g2.setPaint(Color.gray);
       }
       g2.draw(outline);

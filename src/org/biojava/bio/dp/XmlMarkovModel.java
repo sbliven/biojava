@@ -27,13 +27,12 @@ import java.util.*;
 
 import org.w3c.dom.*;
 
-import org.biojava.bio.BioError;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.tools.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 public class XmlMarkovModel {
   public static WeightMatrix readMatrix(Element root)
-  throws IllegalResidueException, IllegalAlphabetException, SeqException {
+  throws IllegalSymbolException, IllegalAlphabetException, BioException {
     Element alphaE = (Element) root.getElementsByTagName("alphabet").item(0);
     Alphabet sa = AlphabetManager.instance().alphabetForName(
       alphaE.getAttribute("name"));
@@ -44,8 +43,8 @@ public class XmlMarkovModel {
       );
     }
     FiniteAlphabet seqAlpha = (FiniteAlphabet) sa;
-    ResidueParser symParser = seqAlpha.getParser("symbol");
-    ResidueParser nameParser = seqAlpha.getParser("name");
+    SymbolParser symParser = seqAlpha.getParser("symbol");
+    SymbolParser nameParser = seqAlpha.getParser("name");
     
     int columns = 0;
     NodeList colL = root.getElementsByTagName("col");
@@ -64,7 +63,7 @@ public class XmlMarkovModel {
       for(int j = 0; j < weights.getLength(); j++) {
         Element weightE = (Element) weights.item(j);
         String resName = weightE.getAttribute("res");
-        Residue res;
+        Symbol res;
         if(resName.length() > 1)
           res = nameParser.parseToken(resName);
         else
@@ -77,7 +76,7 @@ public class XmlMarkovModel {
   }
   
   public static MarkovModel readModel(Element root)
-  throws SeqException, IllegalResidueException, IllegalAlphabetException {
+  throws BioException, IllegalSymbolException, IllegalAlphabetException {
     if(root.getTagName().equals("WeightMatrix")) {
       return new WMAsMM(readMatrix(root));
     }
@@ -93,8 +92,8 @@ public class XmlMarkovModel {
       advance[i] = 1;
     }
       
-    ResidueParser nameParser = null;
-    ResidueParser symbolParser = null;
+    SymbolParser nameParser = null;
+    SymbolParser symbolParser = null;
     
     try {
       nameParser = seqAlpha.getParser("name");
@@ -107,7 +106,7 @@ public class XmlMarkovModel {
     }
     
     if(nameParser == null && symbolParser == null) {
-      throw new SeqException(
+      throw new BioException(
         "Couldn't find a parser for alphabet " +
         seqAlpha.getName()
       );
@@ -128,7 +127,7 @@ public class XmlMarkovModel {
       for(int j = 0; j < weights.getLength(); j++) {
         Element weightE = (Element) weights.item(j);
         String resName = weightE.getAttribute("res");
-        Residue res;
+        Symbol res;
         if(resName.length() == 1) {
           if(symbolParser != null) {
             res = symbolParser.parseToken(resName);
@@ -172,7 +171,7 @@ public class XmlMarkovModel {
     for(int i = 0; i < matrix.columns(); i++) {
       out.println("  <col indx=\"" + (i+1) + "\">");
       for(Iterator ri = resA.iterator(); ri.hasNext(); ) {
-        Residue r = (Residue) ri.next();
+        Symbol r = (Symbol) ri.next();
         out.println("    <weight res=\"" + r.getName() +
                              "\" prob=\"" + matrix.getWeight(r, i) + "\"/>");
         }
@@ -187,9 +186,9 @@ public class XmlMarkovModel {
     model = DP.flatView(model);
     FiniteAlphabet stateA = model.stateAlphabet();
     FiniteAlphabet resA = (FiniteAlphabet) model.emissionAlphabet();
-    ResidueList stateR = stateA.residues();
+    SymbolList stateR = stateA.symbols();
     List stateL = stateR.toList();
-    ResidueList resR = resA.residues();
+    SymbolList resR = resA.symbols();
     
     out.println("<MarkovModel heads=\"" + model.heads() + "\">");
     out.println("<alphabet name=\"" + resA.getName() + "\"/>");
@@ -202,7 +201,7 @@ public class XmlMarkovModel {
         if(s instanceof EmissionState) {
           EmissionState es = (EmissionState) s;
           for(Iterator resI = resR.iterator(); resI.hasNext(); ) {
-            Residue r = (Residue) resI.next();
+            Symbol r = (Symbol) resI.next();
             out.println("    <weight res=\"" + r.getName() +
                         "\" prob=\"" + Math.exp(es.getWeight(r)) + "\"/>");
           }
@@ -220,7 +219,7 @@ public class XmlMarkovModel {
     out.println("</MarkovModel>");
   }
   
-  static private void printTransitions(MarkovModel model, State from, PrintStream out) throws IllegalResidueException {
+  static private void printTransitions(MarkovModel model, State from, PrintStream out) throws IllegalSymbolException {
     for(Iterator i = model.transitionsFrom(from).iterator(); i.hasNext(); ) {
       State to = (State) i.next();
       try {

@@ -24,6 +24,8 @@ package org.biojava.bio.dp;
 
 import java.util.*;
 
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 /**
@@ -37,7 +39,7 @@ public class WeightMatrixAnnotator extends AbstractAnnotator {
   private double threshold;
 
   public boolean annotate(Sequence seq)
-         throws IllegalResidueException, SeqException {
+         throws IllegalSymbolException, BioException {
     if(!(seq instanceof MutableFeatureHolder)) {
       return false;
     }

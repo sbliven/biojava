@@ -5,7 +5,7 @@ import org.biojava.bio.seq.*;
 import org.Biocorba.Seqcore.*;
 
 /**
- * Implements a CORBA PrimarySeq object by adapting a biojava ResidueList.
+ * Implements a CORBA PrimarySeq object by adapting a biojava SymbolList.
  */
 public class PrimarySeqImpl
 extends AnonymousSeqImpl
@@ -14,7 +14,7 @@ implements _PrimarySeq_Operations {
   private String primaryID;
   private String accessionNumber;
 
-  public PrimarySeqImpl(ResidueList resList,
+  public PrimarySeqImpl(SymbolList resList,
                     String displayID, String primaryID, String accessionNumber)
   throws IllegalAlphabetException {
     super(resList);
@@ -23,12 +23,12 @@ implements _PrimarySeq_Operations {
     this.accessionNumber = accessionNumber;
   }
   
-  public PrimarySeqImpl(ResidueList resList, String id)
+  public PrimarySeqImpl(SymbolList resList, String id)
   throws IllegalAlphabetException {
     this(resList, id, id, id);
   }
   
-  public PrimarySeqImpl(ResidueList resList)
+  public PrimarySeqImpl(SymbolList resList)
   throws IllegalAlphabetException {
     this(resList, resList.toString(), resList.toString(), resList.toString());
   }

@@ -25,12 +25,11 @@ package org.biojava.bio.dp;
 import java.util.*;
 
 import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.tools.DoubleAlphabet;
+import org.biojava.bio.symbol.*;
 
 public abstract class DP {
   public static MarkovModel flatView(MarkovModel model)
-  throws IllegalAlphabetException, IllegalResidueException {
+  throws IllegalAlphabetException, IllegalSymbolException {
     for(Iterator i = model.stateAlphabet().iterator(); i.hasNext(); ) {
       State s = (State) i.next();
       if(
@@ -45,7 +44,7 @@ public abstract class DP {
   }
   
   public static State[] stateList(MarkovModel mm)
-  throws IllegalResidueException, IllegalTransitionException,
+  throws IllegalSymbolException, IllegalTransitionException,
   BioException
   {
     FiniteAlphabet alpha = mm.stateAlphabet();
@@ -118,7 +117,7 @@ public abstract class DP {
     }
 
     public Object compare(Object o1, Object o2)
-    throws IllegalTransitionException, IllegalResidueException {
+    throws IllegalTransitionException, IllegalSymbolException {
 	    if (o1 == o2) {
        return EQUAL;
       }
@@ -136,7 +135,7 @@ public abstract class DP {
     }
 
     private boolean transitionsTo(State from, State to)
-	  throws IllegalTransitionException, IllegalResidueException {
+	  throws IllegalTransitionException, IllegalSymbolException {
 	    Set checkedSet = new HashSet();
 	    Set workingSet = mm.transitionsFrom(from);
 	    while (workingSet.size() > 0) {
@@ -172,7 +171,7 @@ public abstract class DP {
   public static int [][] forwardTransitions(
     MarkovModel model,
     State [] states
-  ) throws IllegalResidueException {
+  ) throws IllegalSymbolException {
     int stateCount = states.length;
     int [][] transitions = new int[stateCount][];
 
@@ -198,7 +197,7 @@ public abstract class DP {
     MarkovModel model,
     State [] states,
     int [][] transitions
-  ) throws IllegalResidueException {
+  ) throws IllegalSymbolException {
     int stateCount = states.length;
     double [][] scores = new double[stateCount][];
 
@@ -219,7 +218,7 @@ public abstract class DP {
   }
 
   public static int [][] backwardTransitions(MarkovModel model,
-     State [] states) throws IllegalResidueException {
+     State [] states) throws IllegalSymbolException {
     int stateCount = states.length;
     int [][] transitions = new int[stateCount][];
 
@@ -242,7 +241,7 @@ public abstract class DP {
 
   public static double [][] backwardTransitionScores(MarkovModel model,
     State [] states,
-    int [][] transitions) throws IllegalResidueException {
+    int [][] transitions) throws IllegalSymbolException {
     int stateCount = states.length;
     double [][] scores = new double[stateCount][];
 
@@ -298,7 +297,7 @@ public abstract class DP {
     return backwardTransitionScores;
   }
   
-  public DP(MarkovModel model) throws IllegalResidueException,
+  public DP(MarkovModel model) throws IllegalSymbolException,
                                     IllegalTransitionException,
                                     BioException
   {
@@ -321,30 +320,30 @@ public abstract class DP {
     dotStatesIndex = i;
   }
 
-  public abstract double forward(ResidueList [] resList)
-  throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException;
+  public abstract double forward(SymbolList [] resList)
+  throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;
   
-  public abstract double backward(ResidueList [] resList)
-  throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException;
+  public abstract double backward(SymbolList [] resList)
+  throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;
 
-  public abstract DPMatrix forwardMatrix(ResidueList [] resList)
-  throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException;
+  public abstract DPMatrix forwardMatrix(SymbolList [] resList)
+  throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;
   
-  public abstract DPMatrix backwardMatrix(ResidueList [] resList)
-  throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException;
+  public abstract DPMatrix backwardMatrix(SymbolList [] resList)
+  throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;
 
-  public abstract DPMatrix forwardMatrix(ResidueList [] resList, DPMatrix matrix)
-  throws IllegalArgumentException, IllegalResidueException,
+  public abstract DPMatrix forwardMatrix(SymbolList [] resList, DPMatrix matrix)
+  throws IllegalArgumentException, IllegalSymbolException,
   IllegalAlphabetException, IllegalTransitionException;
   
-  public abstract DPMatrix backwardMatrix(ResidueList [] resList, DPMatrix matrix)
-  throws IllegalArgumentException, IllegalResidueException,
+  public abstract DPMatrix backwardMatrix(SymbolList [] resList, DPMatrix matrix)
+  throws IllegalArgumentException, IllegalSymbolException,
   IllegalAlphabetException, IllegalTransitionException;
     
-  public abstract StatePath viterbi(ResidueList [] resList)
-  throws IllegalResidueException, IllegalArgumentException, IllegalAlphabetException, IllegalTransitionException;
+  public abstract StatePath viterbi(SymbolList [] resList)
+  throws IllegalSymbolException, IllegalArgumentException, IllegalAlphabetException, IllegalTransitionException;
   
-  public DPMatrix forwardsBackwards(ResidueList [] resList)
+  public DPMatrix forwardsBackwards(SymbolList [] resList)
   throws BioException {
     try {
       System.out.println("Making backward matrix");
@@ -366,7 +365,7 @@ public abstract class DP {
           return fMatrix.model();
         }
       
-        public ResidueList [] resList() {
+        public SymbolList [] resList() {
           return fMatrix.resList();
         }
       
@@ -391,16 +390,16 @@ public abstract class DP {
     * @return  a StatePath generated at random
     */
   public StatePath generate(int length)
-  throws IllegalResidueException, SeqException {
+  throws IllegalSymbolException, BioException {
     List scoreList = new ArrayList();
-    SimpleResidueList tokens = new SimpleResidueList(model.emissionAlphabet());
-    SimpleResidueList states = new SimpleResidueList(model.stateAlphabet());
+    SimpleSymbolList tokens = new SimpleSymbolList(model.emissionAlphabet());
+    SimpleSymbolList states = new SimpleSymbolList(model.stateAlphabet());
 
     double totScore = 0.0;
     double resScore = 0.0;
     int i = length;
     State oldState;
-    Residue token;
+    Symbol token;
 
     oldState = model.sampleTransition(model.magicalState());
     try {
@@ -411,11 +410,11 @@ public abstract class DP {
     }
     if (oldState instanceof EmissionState) {
       EmissionState eState = (EmissionState) oldState;
-      token = eState.sampleResidue();
+      token = eState.sampleSymbol();
       resScore += eState.getWeight(token);
-      states.addResidue(oldState);
-      tokens.addResidue(token);
-      scoreList.add(DoubleAlphabet.getResidue(resScore));
+      states.addSymbol(oldState);
+      tokens.addSymbol(token);
+      scoreList.add(DoubleAlphabet.getSymbol(resScore));
       totScore += resScore;
       resScore = 0.0;
       i--;
@@ -439,11 +438,11 @@ public abstract class DP {
 
       if (newState instanceof EmissionState) {
         EmissionState eState = (EmissionState) newState;
-        token = eState.sampleResidue();
+        token = eState.sampleSymbol();
         resScore += eState.getWeight(token);
-        states.addResidue(newState);
-        tokens.addResidue(token);
-        scoreList.add(DoubleAlphabet.getResidue(resScore));
+        states.addSymbol(newState);
+        tokens.addSymbol(token);
+        scoreList.add(DoubleAlphabet.getSymbol(resScore));
         totScore += resScore;
         resScore = 0.0;
         i--;
@@ -454,21 +453,21 @@ public abstract class DP {
     List resListList = new ArrayList(3);
     resListList.add(tokens);
     resListList.add(states);
-    resListList.add(new SimpleResidueList(DoubleAlphabet.INSTANCE, scoreList));
+    resListList.add(new SimpleSymbolList(DoubleAlphabet.INSTANCE, scoreList));
     
     Map labelToResList = new HashMap();
     labelToResList.put(StatePath.SEQUENCE, tokens);
     labelToResList.put(StatePath.STATES, states);
     labelToResList.put(StatePath.SCORES,
-                       new SimpleResidueList(DoubleAlphabet.INSTANCE, scoreList));
+                       new SimpleSymbolList(DoubleAlphabet.INSTANCE, scoreList));
     return new SimpleStatePath(totScore, labelToResList);
   }
 
   public static class ReverseIterator implements Iterator {
-    private ResidueList res;
+    private SymbolList res;
     private int index;
 
-    public ReverseIterator(ResidueList res) {
+    public ReverseIterator(SymbolList res) {
       this.res = res;
       index = res.length();
     }
@@ -478,7 +477,7 @@ public abstract class DP {
     }
 
     public Object next() {
-      return res.residueAt(index--);
+      return res.symbolAt(index--);
     }
 
     public void remove() throws UnsupportedOperationException {

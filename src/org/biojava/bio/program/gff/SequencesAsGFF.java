@@ -99,7 +99,7 @@ public class SequencesAsGFF {
   protected void doProcessSequence(Sequence seq,
                                    GFFDocumentHandler handler,
                                    String id) 
-  throws SeqException, BioException {
+  throws BioException, BioException {
     Iterator fi = seq.filter(getFeatureFilter(), getRecurse()).features();
       
     while(fi.hasNext()) {
@@ -158,7 +158,7 @@ public class SequencesAsGFF {
    *                <span class="arg">seq</span>
    */
   public void processSequence(Sequence seq, GFFDocumentHandler handler) 
-  throws SeqException, BioException {
+  throws BioException, BioException {
     handler.startDocument();
     doProcessSequence(seq, handler, seq.getName());
     handler.endDocument();
@@ -175,7 +175,7 @@ public class SequencesAsGFF {
    *                <span class="arg">seqDB</span>
    */
   public void processDB(SequenceDB seqDB, GFFDocumentHandler handler)
-  throws SeqException, BioException {
+  throws BioException, BioException {
     handler.startDocument();
     for(Iterator i = seqDB.ids().iterator(); i.hasNext(); ) {
       String id = (String) i.next();

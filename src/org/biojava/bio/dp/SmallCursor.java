@@ -23,14 +23,14 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 public class SmallCursor extends AbstractCursor {
-  private final ResidueList resList;
+  private final SymbolList resList;
   private double [] currentC;
   private double [] lastC;
   
-  public ResidueList resList() {
+  public SymbolList resList() {
     return resList;
   }
   
@@ -54,7 +54,7 @@ public class SmallCursor extends AbstractCursor {
     currentC = v;
   }
   
-  public SmallCursor(State [] states, ResidueList resList, Iterator resIterator) {
+  public SmallCursor(State [] states, SymbolList resList, Iterator resIterator) {
     super(resIterator);
     this.resList = resList;
     

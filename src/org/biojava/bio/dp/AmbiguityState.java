@@ -24,15 +24,15 @@ package org.biojava.bio.dp;
 
 import java.util.*;
 
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.tools.DNATools;
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.DNATools;
 
 /**
  * A state in a markov process.
  * <P>
  * This implementation is optimized for DNA-AMBIGUITY. It maintains
- * probabilities for each DNA residue, and then blends them for the ambiguity
- * residues.
+ * probabilities for each DNA symbol, and then blends them for the ambiguity
+ * symbols.
  */
 public class AmbiguityState extends AbstractState {
   private static int[] advance = {1};
@@ -43,24 +43,24 @@ public class AmbiguityState extends AbstractState {
     score = new double[16];
   }
   
-  public double getWeight(Residue r) throws IllegalResidueException {
+  public double getWeight(Symbol r) throws IllegalSymbolException {
     if(r == MagicalState.MAGICAL_RESIDUE)
       return Double.NEGATIVE_INFINITY;
     alphabet().validate(r);
     return score[calcIndex(r)];
   }
 
-  public void setWeight(Residue r, double score) throws IllegalResidueException {
+  public void setWeight(Symbol r, double score) throws IllegalSymbolException {
     if(r == MagicalState.MAGICAL_RESIDUE)
       return;
     alphabet().validate(r);
     this.score[calcIndex(r)] = score;
   }
 
-  private int calcIndex(Residue r) throws IllegalResidueException {
+  private int calcIndex(Symbol r) throws IllegalSymbolException {
     int index = 0;
     for(Iterator i = DNATools.forAmbiguity(r).iterator(); i.hasNext();) {
-      Residue ir = (Residue) i.next();
+      Symbol ir = (Symbol) i.next();
       if(ir == DNATools.a())
         index += 1;
       else if(ir == DNATools.g())
@@ -91,33 +91,33 @@ public class AmbiguityState extends AbstractState {
   private class AmbiguousStateTrainer implements StateTrainer {
     double c [] =  new double[4];
       
-    public void addCount(Residue res, double counts) throws IllegalResidueException {
+    public void addCount(Symbol res, double counts) throws IllegalSymbolException {
       if(res instanceof MagicalState)
         return;
         
-      ResidueList resList = DNATools.forAmbiguity(res);
+      SymbolList resList = DNATools.forAmbiguity(res);
       double size = resList.length();
       counts /= size;
       for(Iterator i = resList.iterator(); i.hasNext();) {
-        c[DNATools.index((Residue) i.next())] += counts;
+        c[DNATools.index((Symbol) i.next())] += counts;
       }
     }
       
-    public void train(EmissionState nullModel, double weight) throws IllegalResidueException {
+    public void train(EmissionState nullModel, double weight) throws IllegalSymbolException {
       double sum = 0.0;
       for(int i = 0; i < c.length; i++) {
-        Residue r = DNATools.forIndex(i);
+        Symbol r = DNATools.forIndex(i);
         sum += c[i] += Math.exp(nullModel.getWeight(r))*weight;
       }
       for(int i = 0; i < c.length; i++) {
-        Residue r = DNATools.forIndex(i);
+        Symbol r = DNATools.forIndex(i);
         c[i] /= sum;
       }
       for(Iterator i = DNATools.getAmbiguity().iterator(); i.hasNext();) {
         sum = 0.0;
-        Residue ir = (Residue) i.next();
+        Symbol ir = (Symbol) i.next();
         for(Iterator j = DNATools.forAmbiguity(ir).iterator(); j.hasNext();) {
-          Residue jr = (Residue) j.next();
+          Symbol jr = (Symbol) j.next();
           sum += c[DNATools.index(jr)];
         }
         setWeight(ir, Math.log(sum));

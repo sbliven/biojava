@@ -23,17 +23,17 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 public class SimpleStateTrainer implements StateTrainer {
   private final EmissionState state;
   private final Map c;
 
-  public void addCount(Residue res, double count) throws IllegalResidueException {
+  public void addCount(Symbol res, double count) throws IllegalSymbolException {
     Double d = (Double) c.get(res);
     if (d == null) {
-      throw new IllegalResidueException(
-        "Residue " + res.getName() +
+      throw new IllegalSymbolException(
+        "Symbol " + res.getName() +
         " not found in " + state.alphabet().getName() +
         " within state " + state.getName()
       );
@@ -50,13 +50,13 @@ public class SimpleStateTrainer implements StateTrainer {
   public void train(
     EmissionState nullModel,
     double weight
-  ) throws IllegalResidueException {
+  ) throws IllegalSymbolException {
     if(nullModel != null) {
       for (
         Iterator i = ((FiniteAlphabet) state.alphabet()).iterator();
         i.hasNext();
       ) {
-        Residue r = (Residue) i.next();
+        Symbol r = (Symbol) i.next();
         addCount(r, Math.exp(nullModel.getWeight(r) + weight));
       }
     }
@@ -66,7 +66,7 @@ public class SimpleStateTrainer implements StateTrainer {
       Iterator i = ((FiniteAlphabet) state.alphabet()).iterator();
       i.hasNext();
     ) {
-      Residue r = (Residue) i.next();
+      Symbol r = (Symbol) i.next();
       sum += ((Double) c.get(r)).doubleValue();
     }
     //System.out.println(state.getName() + ": sum=" + sum);
@@ -74,7 +74,7 @@ public class SimpleStateTrainer implements StateTrainer {
       Iterator i = ((FiniteAlphabet) state.alphabet()).iterator();
       i.hasNext();
     ) {
-      Residue res = (Residue) i.next();
+      Symbol res = (Symbol) i.next();
       Double d = (Double) c.get(res);
       /*System.out.println(
         state.getName() + ": Setting " + res.getName() +
@@ -93,7 +93,7 @@ public class SimpleStateTrainer implements StateTrainer {
       Iterator i = ((FiniteAlphabet) state.alphabet()).iterator();
       i.hasNext();
     ) {
-      Residue res = (Residue) i.next();
+      Symbol res = (Symbol) i.next();
       c.put(res, new Double(0.0));
     }
   }

@@ -63,7 +63,7 @@ public class StateLogo extends JComponent {
   /**
    * The style property.
    */
-  private ResidueStyle style = new PlainStyle(Color.black, Color.gray);
+  private SymbolStyle style = new PlainStyle(Color.black, Color.gray);
   
   /**
    * Retrieve the currently rendered state.
@@ -78,7 +78,7 @@ public class StateLogo extends JComponent {
    * Set the state to render.
    * <P>
    * The state must be over a FiniteAlphabet so that we can draw the numbers
-   * for each Residue.
+   * for each Symbol.
    *
    * @param state the new EmissionState to render
    */
@@ -112,20 +112,20 @@ public class StateLogo extends JComponent {
   /**
    * Retrieve the current style.
    *
-   * @return the current ResidueStyle
+   * @return the current SymbolStyle
    */
-  public ResidueStyle getStyle() {
+  public SymbolStyle getStyle() {
     return style;
   }
   
   /**
-   * Set the residue style.
+   * Set the symbol style.
    * <P>
    * This will change the outline and fill paints for the logos
    *
-   * @param style the new ResidueStyle to use
+   * @param style the new SymbolStyle to use
    */
-  public void setStyle(ResidueStyle style) {
+  public void setStyle(SymbolStyle style) {
     firePropertyChange("style", this.style, style);
     this.style = style;
   }
@@ -153,12 +153,12 @@ public class StateLogo extends JComponent {
   }
   
   /**
-   * Calculate the information content of a residue in bits.
+   * Calculate the information content of a symbol in bits.
    *
-   * @param r the residue to calculate for
-   * @throws IllegalResidueException if r is not within the state.
+   * @param r the symbol to calculate for
+   * @throws IllegalSymbolException if r is not within the state.
    */
-  public double entropy(Residue r) throws IllegalResidueException {
+  public double entropy(Symbol r) throws IllegalSymbolException {
     EmissionState state = getState();
     double lp = state.getWeight(r);
     double p = Math.exp(lp);
@@ -190,12 +190,12 @@ public class StateLogo extends JComponent {
       Iterator i = ((FiniteAlphabet) eState.alphabet()).iterator();
       i.hasNext();
     ) {
-      Residue r = (Residue) i.next();
+      Symbol r = (Symbol) i.next();
       try {
         inf -= entropy(r);
-      } catch (IllegalResidueException ire) {
+      } catch (IllegalSymbolException ire) {
         throw new BioError(ire,
-        "Residue evaporated while calculating information");
+        "Symbol evaporated while calculating information");
       }
     }
     

@@ -22,7 +22,7 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A Dot state.

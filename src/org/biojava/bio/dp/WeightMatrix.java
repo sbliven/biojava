@@ -22,7 +22,7 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A log odds weight matrix.
@@ -32,7 +32,7 @@ import org.biojava.bio.seq.*;
  * logical range, the implementation may throw an IndexOutOfBoundsException.
  * <P>
  * A weight matrix is always over a finite alphabet of symbols, so that you can think
- * of each row of the matrix as being for a different residue.
+ * of each row of the matrix as being for a different symbol.
  */
 public interface WeightMatrix {
   /**
@@ -43,32 +43,32 @@ public interface WeightMatrix {
   FiniteAlphabet alphabet();
   
   /**
-   * Return the weight for a given residue at a given column.
+   * Return the weight for a given symbol at a given column.
    * <P>
-   * This is the log-probability or log-odds of observing a given residue
+   * This is the log-probability or log-odds of observing a given symbol
    * at a given position.
    *
-   * @param res the Residue
+   * @param res the Symbol
    * @param column  the column
    * @return  the weight
-   * @throws  IllegalResidueException if the residue is not part of the alphabet
+   * @throws  IllegalSymbolException if the symbol is not part of the alphabet
    */
-  double getWeight(Residue res, int column) throws IllegalResidueException;
+  double getWeight(Symbol res, int column) throws IllegalSymbolException;
   
   /**
-   * Sets the weight for a given residue at a given column.
+   * Sets the weight for a given symbol at a given column.
    * <P>
-   * This is the log-probability or log-odds of observing a given residue
+   * This is the log-probability or log-odds of observing a given symbol
    * at a given position.
    *
-   * @param res the Residue
+   * @param res the Symbol
    * @param column  the column
    * @param weight  the new weight
-   * @throws  IllegalResidueException if the residue is not part of the alphabet
+   * @throws  IllegalSymbolException if the symbol is not part of the alphabet
    * @throws UnsupportedOperationException if the weight-matrix is read-only
    */
-  void setWeight(Residue res, int column, double weight)
-         throws IllegalResidueException, UnsupportedOperationException;
+  void setWeight(Symbol res, int column, double weight)
+         throws IllegalSymbolException, UnsupportedOperationException;
   
   /**
    * The number of columns modeled by the weight matrix.

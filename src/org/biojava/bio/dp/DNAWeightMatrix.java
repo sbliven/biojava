@@ -24,8 +24,8 @@ package org.biojava.bio.dp;
 
 import java.util.*;
 
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.tools.DNATools;
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.DNATools;
 
 public class DNAWeightMatrix implements WeightMatrix {
   private double [][] weights;
@@ -34,13 +34,13 @@ public class DNAWeightMatrix implements WeightMatrix {
     return DNATools.getAlphabet();
   }
 
-  public double getWeight(Residue res, int column)
-         throws IllegalResidueException {
+  public double getWeight(Symbol res, int column)
+         throws IllegalSymbolException {
     return weights[DNATools.index(res)][column];
   }
 
-  public void setWeight(Residue res, int column, double val)
-         throws IllegalResidueException {
+  public void setWeight(Symbol res, int column, double val)
+         throws IllegalSymbolException {
     weights[DNATools.index(res)][column] = val;
   }
 
@@ -48,13 +48,13 @@ public class DNAWeightMatrix implements WeightMatrix {
     return weights[0].length;
   }
 
-  public double score(ResidueList resList)
-         throws IllegalResidueException {
+  public double score(SymbolList resList)
+         throws IllegalSymbolException {
     double score = 0;
     int cols = columns();
 
     for(int c = 0; c < cols; c++)
-      score += getWeight(resList.residueAt(c+1), c);
+      score += getWeight(resList.symbolAt(c+1), c);
 
     return score;
   }

@@ -24,37 +24,37 @@ package org.biojava.bio.dp;
 
 import java.util.*;
 import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.tools.*;
 
 class SingleDP extends DP {
   /**
-    * Scores the ResidueList from residue 1 to residue columns with a weight
+    * Scores the SymbolList from symbol 1 to symbol columns with a weight
     * matrix.
     *
     * @param matrix  the weight matrix used to evaluate the sequences
-    * @param resList the ResidueList to assess
+    * @param resList the SymbolList to assess
     * @return  the log probability or likelyhood of this weight matrix
-    *          having generated residues 1 to columns of resList
+    *          having generated symbols 1 to columns of resList
     */
-  public static double scoreWeightMatrix(WeightMatrix matrix, ResidueList resList)
-  throws IllegalResidueException {
+  public static double scoreWeightMatrix(WeightMatrix matrix, SymbolList resList)
+  throws IllegalSymbolException {
     double score = 0;
     int cols = matrix.columns();
 
     for (int c = 0; c < cols; c++)
-      score += matrix.getWeight(resList.residueAt(c + 1), c);
+      score += matrix.getWeight(resList.symbolAt(c + 1), c);
 
     return score;
   }
 
   public SingleDP(MarkovModel flat)
-  throws IllegalResidueException, IllegalTransitionException, BioException {
+  throws IllegalSymbolException, IllegalTransitionException, BioException {
     super(flat);
   }
   
-  public double forward(ResidueList [] seq)
-  throws IllegalResidueException, IllegalAlphabetException, IllegalResidueException {
+  public double forward(SymbolList [] seq)
+  throws IllegalSymbolException, IllegalAlphabetException, IllegalSymbolException {
     if(seq.length != 1) {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
@@ -66,8 +66,8 @@ class SingleDP extends DP {
     return forward(dpCursor);
   }
   
-  public double backward(ResidueList [] seq)
-  throws IllegalResidueException, IllegalAlphabetException, IllegalResidueException {
+  public double backward(SymbolList [] seq)
+  throws IllegalSymbolException, IllegalAlphabetException, IllegalSymbolException {
     if(seq.length != 1) {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
@@ -79,8 +79,8 @@ class SingleDP extends DP {
     return backward(dpCursor);
   }
 
-  public DPMatrix forwardMatrix(ResidueList [] seq)
-  throws IllegalResidueException, IllegalAlphabetException, IllegalResidueException {
+  public DPMatrix forwardMatrix(SymbolList [] seq)
+  throws IllegalSymbolException, IllegalAlphabetException, IllegalSymbolException {
     if(seq.length != 1) {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
@@ -92,8 +92,8 @@ class SingleDP extends DP {
     return matrix;
   }
   
-  public DPMatrix backwardMatrix(ResidueList [] seq)
-  throws IllegalResidueException, IllegalAlphabetException, IllegalResidueException {
+  public DPMatrix backwardMatrix(SymbolList [] seq)
+  throws IllegalSymbolException, IllegalAlphabetException, IllegalSymbolException {
     if(seq.length != 1) {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
@@ -105,9 +105,9 @@ class SingleDP extends DP {
     return matrix;
   }
   
-  public DPMatrix forwardMatrix(ResidueList [] seq, DPMatrix matrix)
-  throws IllegalArgumentException, IllegalResidueException,
-  IllegalAlphabetException, IllegalResidueException {
+  public DPMatrix forwardMatrix(SymbolList [] seq, DPMatrix matrix)
+  throws IllegalArgumentException, IllegalSymbolException,
+  IllegalAlphabetException, IllegalSymbolException {
     if(seq.length != 1) {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
@@ -119,9 +119,9 @@ class SingleDP extends DP {
     return sm;
   }
 
-  public DPMatrix backwardMatrix(ResidueList [] seq, DPMatrix matrix)
-  throws IllegalArgumentException, IllegalResidueException,
-  IllegalAlphabetException, IllegalResidueException {
+  public DPMatrix backwardMatrix(SymbolList [] seq, DPMatrix matrix)
+  throws IllegalArgumentException, IllegalSymbolException,
+  IllegalAlphabetException, IllegalSymbolException {
     if(seq.length != 1) {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
@@ -134,21 +134,21 @@ class SingleDP extends DP {
   }
 
   private double forward(DPCursor dpCursor)
-  throws IllegalResidueException {
+  throws IllegalSymbolException {
     forward_initialize(dpCursor);
     forward_recurse(dpCursor);
     return forward_termination(dpCursor);
   }
 
   private double backward(DPCursor dpCursor)
-  throws IllegalResidueException {
+  throws IllegalSymbolException {
     backward_initialize(dpCursor);
     backward_recurse(dpCursor);
     return backward_termination(dpCursor);
   }
 
   private void forward_initialize(DPCursor dpCursor)
-    throws IllegalResidueException {
+    throws IllegalSymbolException {
     double [] v = dpCursor.currentCol();
     State [] states = getStates();
 
@@ -162,7 +162,7 @@ class SingleDP extends DP {
   }
 
   private void backward_initialize(DPCursor dpCursor)
-    throws IllegalResidueException {
+    throws IllegalSymbolException {
     double [] v = dpCursor.currentCol();
     State [] states = getStates();
 
@@ -176,7 +176,7 @@ class SingleDP extends DP {
   }
 
   private void forward_recurse(DPCursor dpCursor)
-    throws IllegalResidueException {
+    throws IllegalSymbolException {
     State [] states = getStates();
     int stateCount = states.length;
     int [][] transitions = getForwardTransitions();
@@ -187,7 +187,7 @@ class SingleDP extends DP {
       // _index++;
       // System.out.println("\n*** Index=" + _index + " ***");
       dpCursor.advance();
-      Residue res = dpCursor.currentRes();
+      Symbol res = dpCursor.currentRes();
 //      System.out.println("Consuming " + res.getName());
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
@@ -260,7 +260,7 @@ class SingleDP extends DP {
   }
 
   private void backward_recurse(DPCursor dpCursor)
-    throws IllegalResidueException {
+    throws IllegalSymbolException {
     State [] states = getStates();
     int stateCount = states.length;
     int [][] transitions = getBackwardTransitions();
@@ -268,7 +268,7 @@ class SingleDP extends DP {
 
     while (dpCursor.canAdvance()) {
       dpCursor.advance();
-      Residue res = dpCursor.lastRes();
+      Symbol res = dpCursor.lastRes();
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
 //System.out.println(res.getName());
@@ -325,7 +325,7 @@ class SingleDP extends DP {
   }
 
   private double forward_termination(DPCursor dpCursor)
-    throws IllegalResidueException {
+    throws IllegalSymbolException {
     double [] scores = dpCursor.currentCol();
     State [] states = getStates();
 
@@ -337,7 +337,7 @@ class SingleDP extends DP {
   }
 
   private double backward_termination(DPCursor dpCursor)
-    throws IllegalResidueException {
+    throws IllegalSymbolException {
     double [] scores = dpCursor.currentCol();
     State [] states = getStates();
 
@@ -348,15 +348,15 @@ class SingleDP extends DP {
     return scores[l];
   }
   
-  public StatePath viterbi(ResidueList [] resList)
-  throws IllegalResidueException {
-    ResidueList r = resList[0];
+  public StatePath viterbi(SymbolList [] resList)
+  throws IllegalSymbolException {
+    SymbolList r = resList[0];
     DPCursor dpCursor = new SmallCursor(getStates(), r, r.iterator());
     return viterbi(dpCursor);
   }
 
   private StatePath viterbi(DPCursor dpCursor)
-  throws IllegalResidueException {
+  throws IllegalSymbolException {
     int seqLength = dpCursor.length();
     State [] states = getStates();
 
@@ -383,9 +383,9 @@ class SingleDP extends DP {
     }
 
     // viterbi
-    while (dpCursor.canAdvance()) { // residue i
+    while (dpCursor.canAdvance()) { // symbol i
       dpCursor.advance();
-      Residue res = dpCursor.currentRes();
+      Symbol res = dpCursor.currentRes();
       //System.out.println(res.getName());
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
@@ -478,7 +478,7 @@ class SingleDP extends DP {
       b2 = b2.back;
     };
 
-    GappedResidueList resView = new GappedResidueList(dpCursor.resList());
+    GappedSymbolList resView = new GappedSymbolList(dpCursor.resList());
     double [] scores = new double[len];
     List stateList = new ArrayList(len);
     for (int j = 0; j < len; j++) {
@@ -516,7 +516,7 @@ class SingleDP extends DP {
     Map labelToResList = new HashMap();
     labelToResList.put(StatePath.SEQUENCE, resView);
     labelToResList.put(StatePath.STATES,
-                       new SimpleResidueList(getModel().stateAlphabet(), stateList));
+                       new SimpleSymbolList(getModel().stateAlphabet(), stateList));
     labelToResList.put(StatePath.SCORES,
                        DoubleAlphabet.fromArray(scores));
     return new SimpleStatePath(bestScore, labelToResList);

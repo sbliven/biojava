@@ -22,7 +22,7 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * Storage structure for intermediate values from a pairwise
@@ -33,15 +33,15 @@ import org.biojava.bio.seq.*;
 
 public class PairDPMatrix implements DPMatrix {
     private State[] states;
-    private ResidueList[] seqs;
+    private SymbolList[] seqs;
     private double[][][] scores;
     private MarkovModel model;
     private double finalScore;
 
-    public PairDPMatrix(DP dp, ResidueList seq0, ResidueList seq1) {
+    public PairDPMatrix(DP dp, SymbolList seq0, SymbolList seq1) {
         model = dp.getModel();
 	states = dp.getStates();
-	seqs = new ResidueList[2];
+	seqs = new SymbolList[2];
 	seqs[0] = seq0;
 	seqs[1] = seq1;
 	finalScore = Double.NEGATIVE_INFINITY;
@@ -56,7 +56,7 @@ public class PairDPMatrix implements DPMatrix {
 	return model;
     }
 
-    public ResidueList[] resList() {
+    public SymbolList[] resList() {
 	return seqs;
     }
 

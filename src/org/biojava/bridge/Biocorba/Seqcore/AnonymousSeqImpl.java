@@ -8,15 +8,15 @@ import org.biojava.bridge.GNOME.*;
 public class AnonymousSeqImpl
 extends UnknownImpl
 implements _AnonymousSeq_Operations {
-  private ResidueList resList;
+  private SymbolList resList;
   
-  public ResidueList getResidueList() {
+  public SymbolList getSymbolList() {
     return resList;
   }
   
   private SeqType seqType;
   
-  public AnonymousSeqImpl(ResidueList resList) throws IllegalAlphabetException {
+  public AnonymousSeqImpl(SymbolList resList) throws IllegalAlphabetException {
     String alphaName = resList.alphabet().getName();
     seqType = null;
     if(alphaName.equals("DNA")) {
@@ -37,18 +37,18 @@ implements _AnonymousSeq_Operations {
   }
 
   public int length(org.omg.CORBA.portable.ObjectImpl anonymousSeq) {
-    return getResidueList().length();
+    return getSymbolList().length();
   }
 
   public String get_seq(org.omg.CORBA.portable.ObjectImpl anonymousSeq)
   throws RequestTooLarge {
-    return getResidueList().seqString();
+    return getSymbolList().seqString();
   }
 
   public String get_subseq(org.omg.CORBA.portable.ObjectImpl anonymousSeq, int start, int end)
   throws OutOfRange, RequestTooLarge {
     try {
-      return getResidueList().subStr(start, end);
+      return getSymbolList().subStr(start, end);
     } catch (IndexOutOfBoundsException e) {
       throw new OutOfRange(e.toString());
     }

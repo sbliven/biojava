@@ -24,24 +24,24 @@ package org.biojava.bio.gui;
 
 import java.awt.Paint;
 import java.awt.Color;
-import org.biojava.bio.seq.Residue;
-import org.biojava.bio.seq.IllegalResidueException;
+import org.biojava.bio.seq.Symbol;
+import org.biojava.bio.seq.IllegalSymbolException;
 
 /**
- * A simple implementation of ResidueStyle that just uses a single paint for
+ * A simple implementation of SymbolStyle that just uses a single paint for
  * outlines and a single paint for filling.
  *
  * @author Matthew Pocock
  */
-public class PlainStyle implements ResidueStyle {
+public class PlainStyle implements SymbolStyle {
   private Paint outlinePaint;
   private Paint fillPaint;
   
-  public Paint outlinePaint(Residue r) {
+  public Paint outlinePaint(Symbol r) {
     return outlinePaint;
   }
   
-  public Paint fillPaint(Residue r) {
+  public Paint fillPaint(Symbol r) {
     return fillPaint;
   }
   

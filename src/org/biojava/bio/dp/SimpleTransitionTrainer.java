@@ -24,9 +24,8 @@ package org.biojava.bio.dp;
 
 import java.util.*;
 
-import org.biojava.bio.BioError;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.tools.DNATools;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A simple implementation of a TransitionTrainer.
@@ -46,7 +45,7 @@ public class SimpleTransitionTrainer implements TransitionTrainer {
           State t = (State) j.next();
           transCounts.put(new Transition(s, t), new Double(0.0));
         }
-      } catch (IllegalResidueException ire) {
+      } catch (IllegalSymbolException ire) {
         throw new BioError(ire, "State " + s.getName() +
                            " listed in alphabet " +
                            model.stateAlphabet().getName() + " dissapeared.");
@@ -55,7 +54,7 @@ public class SimpleTransitionTrainer implements TransitionTrainer {
   }
   
   public void addCount(State from, State to, double count)
-  throws IllegalResidueException, IllegalTransitionException {
+  throws IllegalSymbolException, IllegalTransitionException {
     model.stateAlphabet().validate(from);
     model.stateAlphabet().validate(to);
 
@@ -68,8 +67,8 @@ public class SimpleTransitionTrainer implements TransitionTrainer {
   }
   
   public void train(double nullModel, double weight)
-  throws IllegalResidueException {
-    State [] states = (State []) model.stateAlphabet().residues().toList().toArray(new State[0]);
+  throws IllegalSymbolException {
+    State [] states = (State []) model.stateAlphabet().symbols().toList().toArray(new State[0]);
     double [] scores = new double[states.length];
     double pseudocount = nullModel * weight;
     

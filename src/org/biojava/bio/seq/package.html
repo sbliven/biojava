@@ -17,11 +17,11 @@ multiple times using the flyweight design pattern.
 <P>
 The model we use is as follows:
 <br>
-Residue - A token
+Symbol - A token
 <br>
 Alphabet - A set of tokens
 <br>
-ResidueList - A string over an alphabet of tokens
+SymbolList - A string over an alphabet of tokens
 <p>
 Throughout the seq package, Annotation and Annotatable are used
 to stoor and retrieve annotations. These apply to the entire
@@ -30,7 +30,7 @@ stooring data that does not easily fit the object model.
 <p>
 Once we have got these abstract definitions in place, we can move
 onto representing biologicaly useful sequences. These are defined
-by the Sequence interface. It inherits the ResidueList interface
+by the Sequence interface. It inherits the SymbolList interface
 for stooring the sequence. It also implements Annotatable which
 allows annotation to be attached to the entire sequence. Lastly,
 it implements FeatureHolder so that it can contain features.

@@ -25,8 +25,7 @@ package org.acedb.seq;
 import java.util.*;
 
 import org.acedb.*;
-import org.biojava.bio.seq.*;
-
+import org.biojava.bio.*;
 /**
  * @author Matthew Pocock
  */

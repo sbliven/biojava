@@ -55,9 +55,9 @@ public class EmblFormat implements SequenceFormat {
     }
 
     public Sequence readSequence(StreamReader.Context context,
-				 ResidueParser resParser,
+				 SymbolParser resParser,
 				 SequenceFactory sf)
-	throws IllegalResidueException, IOException, SeqException
+	throws IllegalSymbolException, IOException, BioException
     {
 	EmblContext ctx = new EmblContext(resParser, sf);
 
@@ -94,26 +94,26 @@ public class EmblFormat implements SequenceFormat {
 	private final static int LOCATION=2;
 	private final static int ATTRIBUTE=3;
 
-	private ResidueParser resParser;
+	private SymbolParser resParser;
 	private SequenceFactory sf;
 
-	private List residues;
+	private List symbols;
 	private FeatureTableParser features;
 
 	private Annotation annotation;
 	private List accession;
 
-	EmblContext(ResidueParser resParser, SequenceFactory sf) {
+	EmblContext(SymbolParser resParser, SequenceFactory sf) {
 	    this.resParser = resParser;
 	    this.sf = sf;
 
-	    residues = new ArrayList();
+	    symbols = new ArrayList();
 	    features = new FeatureTableParser(featureBuilder);
 	    annotation = new SimpleAnnotation();
 	    accession = new ArrayList();
 	}
 
-	void processLine(String line) throws SeqException {
+	void processLine(String line) throws BioException {
 	    String tag = line.substring(0, 2);
 
 	    // Any tagprocessors which might need some cleaning
@@ -140,22 +140,22 @@ public class EmblFormat implements SequenceFormat {
 	    }
 	}
 
-	void processSeqLine(String line) throws IllegalResidueException {
+	void processSeqLine(String line) throws IllegalSymbolException {
 	    StringTokenizer st = new StringTokenizer(line);
 	    while(st.hasMoreTokens()) {
 		String token = st.nextToken();
 		if(st.hasMoreTokens()) {
-		    residues.addAll(resParser.parse(token).toList());
+		    symbols.addAll(resParser.parse(token).toList());
 		} else {
 		    char c = token.charAt(token.length()-1);
 		    if(!Character.isDigit(c)) {
-			residues.addAll(resParser.parse(token).toList());
+			symbols.addAll(resParser.parse(token).toList());
 		    }
 		}
 	    }
 	}
 
-	Sequence makeSequence() throws SeqException {
+	Sequence makeSequence() throws BioException {
 	    Sequence ss;
 	    String primaryAcc = "unknown";
 
@@ -164,8 +164,8 @@ public class EmblFormat implements SequenceFormat {
 		annotation.setProperty("embl_accessions", accession);
 	    }
 
-	    ss = sf.createSequence(new SimpleResidueList(
-				   resParser.alphabet(),residues),
+	    ss = sf.createSequence(new SimpleSymbolList(
+				   resParser.alphabet(),symbols),
 				    "urn:sequence/embl:" + primaryAcc,
 				    primaryAcc,
 				    annotation);

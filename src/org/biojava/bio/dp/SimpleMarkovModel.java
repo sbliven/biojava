@@ -23,8 +23,8 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
-import org.biojava.bio.BioError;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 public class SimpleMarkovModel implements MarkovModel {
   private final Alphabet emissionAlpha;
@@ -49,7 +49,7 @@ public class SimpleMarkovModel implements MarkovModel {
   public MagicalState magicalState() { return magicalState; }
 
   public double getTransitionScore(State from, State to)
-  throws IllegalResidueException, IllegalTransitionException {
+  throws IllegalSymbolException, IllegalTransitionException {
     stateAlphabet().validate(from);
     stateAlphabet().validate(to);
 
@@ -61,7 +61,7 @@ public class SimpleMarkovModel implements MarkovModel {
     throw new IllegalTransitionException(from, to);
   }
 
-  public State sampleTransition(State from) throws IllegalResidueException {
+  public State sampleTransition(State from) throws IllegalSymbolException {
     stateAlphabet().validate(from);
     
     double p = Math.random();
@@ -71,7 +71,7 @@ public class SimpleMarkovModel implements MarkovModel {
         if( (p -= Math.exp(getTransitionScore(from, s))) <= 0 )
         return s;
       }
-    } catch (IllegalResidueException ire) {
+    } catch (IllegalSymbolException ire) {
     } catch (IllegalTransitionException ite) {
       throw new BioError(ite, "Transition listend in transitionsFrom(" +
                          from.getName() + "has dissapeared.");
@@ -90,14 +90,14 @@ public class SimpleMarkovModel implements MarkovModel {
                            from.getName() + "has dissapeared.");
       }
     }
-    throw new IllegalResidueException("Could not find transition from state " +
+    throw new IllegalSymbolException("Could not find transition from state " +
                                       from.getName() +
                                       ". Do the probabilities sum to 1?" +
                                       "\np=" + p + "\n" + sb.toString());
   }
   
   public void setTransitionScore(State from, State to, double value)
-  throws IllegalResidueException, IllegalTransitionException {
+  throws IllegalSymbolException, IllegalTransitionException {
     stateAlphabet().validate(from);
     stateAlphabet().validate(to);
 
@@ -112,7 +112,7 @@ public class SimpleMarkovModel implements MarkovModel {
   }
 
   public void createTransition(State from, State to)
-  throws IllegalResidueException {
+  throws IllegalSymbolException {
     stateAlphabet().validate(from);
     stateAlphabet().validate(to);
     
@@ -125,7 +125,7 @@ public class SimpleMarkovModel implements MarkovModel {
   }
   
   public void destroyTransition(State from, State to)
-  throws IllegalResidueException {
+  throws IllegalSymbolException {
     stateAlphabet().validate(from);
     stateAlphabet().validate(to);
     
@@ -137,53 +137,53 @@ public class SimpleMarkovModel implements MarkovModel {
   }
   
   public boolean containsTransition(State from, State to)
-  throws IllegalResidueException {
+  throws IllegalSymbolException {
     stateAlphabet().validate(from);
     stateAlphabet().validate(to);
     return transitionsFrom(from).contains(to);
   }
   
-  public Set transitionsFrom(State from) throws IllegalResidueException {
+  public Set transitionsFrom(State from) throws IllegalSymbolException {
     stateAlphabet().validate(from);
     
     Set s = (Set) transFrom.get(from);
     if(s == null)
-      throw new IllegalResidueException("State " + from.getName() +
+      throw new IllegalSymbolException("State " + from.getName() +
                                         " not known in states " +
                                         stateAlphabet().getName());
     return s;
   }
     
-  public Set transitionsTo(State to) throws IllegalResidueException {
+  public Set transitionsTo(State to) throws IllegalSymbolException {
     stateAlphabet().validate(to);
 
     Set s = (Set) transTo.get(to);
     if(s == null)
-      throw new IllegalResidueException("State " + to +
+      throw new IllegalSymbolException("State " + to +
                                         " not known in states " +
                                         stateAlphabet().getName());
     return s;
   }
 
-  public void addState(State toAdd) throws IllegalResidueException {
+  public void addState(State toAdd) throws IllegalSymbolException {
     if(toAdd instanceof MagicalState) {
-      throw new IllegalResidueException("Can not add a MagicalState");
+      throw new IllegalSymbolException("Can not add a MagicalState");
     }
     
     if(stateAlphabet().contains(toAdd)) {
-      throw new IllegalResidueException("We already contain " + toAdd.getName());
+      throw new IllegalSymbolException("We already contain " + toAdd.getName());
     }
     
-    ((SimpleAlphabet) stateAlphabet()).addResidue(toAdd);
+    ((SimpleAlphabet) stateAlphabet()).addSymbol(toAdd);
     transFrom.put(toAdd, new HashSet());
     transTo.put(toAdd, new HashSet());
   }
   
   public void removeState(State toGo)
-  throws IllegalResidueException, IllegalTransitionException {
+  throws IllegalSymbolException, IllegalTransitionException {
     stateAlphabet().validate(toGo);
     if(toGo instanceof MagicalState) {
-      throw new IllegalResidueException("You can not remove the MagicalState");
+      throw new IllegalSymbolException("You can not remove the MagicalState");
     }
     Set t;
     if(!(t = transitionsFrom(toGo)).isEmpty()) {
@@ -202,7 +202,7 @@ public class SimpleMarkovModel implements MarkovModel {
       );
     }
 
-    ((SimpleAlphabet) stateAlphabet()).removeResidue(toGo);
+    ((SimpleAlphabet) stateAlphabet()).removeSymbol(toGo);
     transFrom.remove(toGo);
     transTo.remove(toGo);
   }
@@ -213,11 +213,11 @@ public class SimpleMarkovModel implements MarkovModel {
     this.magicalState = MagicalState.getMagicalState(heads);
     
     try {
-      ((SimpleAlphabet) stateAlpha).addResidue(magicalState);
-    } catch (IllegalResidueException ire) {
+      ((SimpleAlphabet) stateAlpha).addSymbol(magicalState);
+    } catch (IllegalSymbolException ire) {
       throw new BioError(
         ire,
-        "Alphabet went screwey on me & wouldn't accept the magical residue"
+        "Alphabet went screwey on me & wouldn't accept the magical symbol"
       );
     }
 
@@ -226,7 +226,7 @@ public class SimpleMarkovModel implements MarkovModel {
   }
 
   public void registerWithTrainer(ModelTrainer modelTrainer)
-  throws SeqException {
+  throws BioException {
     if(modelTrainer.getTrainerForModel(this) == null) {
       TransitionTrainer tTrainer = new SimpleTransitionTrainer(this);
       modelTrainer.registerTrainerForModel(this, tTrainer);
@@ -240,8 +240,8 @@ public class SimpleMarkovModel implements MarkovModel {
             State t = (State) j.next();
             modelTrainer.registerTrainerForTransition(s, t, tTrainer, s, t);
           }
-        } catch (IllegalResidueException ire) {
-          throw new SeqException(
+        } catch (IllegalSymbolException ire) {
+          throw new BioException(
             ire,
             "State " + s.getName() +
             " listed in alphabet " +

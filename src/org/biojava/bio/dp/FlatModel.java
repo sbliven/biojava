@@ -24,8 +24,8 @@ package org.biojava.bio.dp;
 
 import java.util.*;
 
-import org.biojava.bio.BioError;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A model that guarantees to only contain emission states and dot states.
@@ -63,7 +63,7 @@ class FlatModel extends ModelView {
   private void addAState(State s) {
     //System.out.println("Adding state: " + s.getName());
     try {
-      stateAlpha.addResidue(s);
+      stateAlpha.addSymbol(s);
       super.addState(s);
     } catch (Exception e) {
       throw new BioError(e, "Something got stuffed up while adding state " + s.getName());
@@ -71,7 +71,7 @@ class FlatModel extends ModelView {
   }
   
   public FlatModel(MarkovModel model)
-  throws IllegalResidueException, IllegalAlphabetException {
+  throws IllegalSymbolException, IllegalAlphabetException {
     this.source = model;
     this.stateAlpha = new SimpleAlphabet();
     
@@ -145,11 +145,11 @@ class FlatModel extends ModelView {
             toM.put(((Wrapper) t).getWrapped(), esw);
             //System.out.println("Added wrapped emission state " + esw.getName());
           } else { // unknown eventuality
-            throw new IllegalResidueException(s, "Don't know how to handle state: " + s.getName());
+            throw new IllegalSymbolException(s, "Don't know how to handle state: " + s.getName());
           }
         }
       } else { // unknown eventuality
-        throw new IllegalResidueException(s, "Don't know how to handle state: " + s.getName());
+        throw new IllegalSymbolException(s, "Don't know how to handle state: " + s.getName());
       }
     }
 
@@ -248,7 +248,7 @@ class FlatModel extends ModelView {
   }
   
   public void createTransition(State from, State to)
-  throws IllegalResidueException, UnsupportedOperationException {
+  throws IllegalSymbolException, UnsupportedOperationException {
     Alphabet a = stateAlphabet();
     a.validate(from);
     a.validate(to);
@@ -256,7 +256,7 @@ class FlatModel extends ModelView {
   }
 
   public void destroyTransition(State from, State to)
-  throws IllegalResidueException, UnsupportedOperationException {
+  throws IllegalSymbolException, UnsupportedOperationException {
     Alphabet a = stateAlphabet();
     a.validate(from);
     a.validate(to);
@@ -264,7 +264,7 @@ class FlatModel extends ModelView {
   }
 
   public void setTransitionScore(State from, State to, double score)
-  throws IllegalResidueException, IllegalTransitionException,
+  throws IllegalSymbolException, IllegalTransitionException,
   UnsupportedOperationException {
     throw new UnsupportedOperationException("setTransitionScore not supported by FlatModel");
   }
@@ -287,8 +287,8 @@ class FlatModel extends ModelView {
     private final State wrapped;
     private final String extra;
     
-    public char getSymbol() {
-      return wrapped.getSymbol();
+    public char getToken() {
+      return wrapped.getToken();
     }
     
     public String getName() {
@@ -321,11 +321,11 @@ class FlatModel extends ModelView {
   public static class EmissionWrapper
   extends StateView
   implements Wrapper {
-    public Residue sourceToView(Residue r) {
+    public Symbol sourceToView(Symbol r) {
       return r;
     }
     
-    public Residue viewToSource(Residue r) {
+    public Symbol viewToSource(Symbol r) {
       return r;
     }
     

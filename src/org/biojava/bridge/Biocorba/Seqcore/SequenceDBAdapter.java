@@ -18,22 +18,22 @@ public class SequenceDBAdapter implements SequenceDB {
   }
   
   public Sequence getSequence(String id)
-  throws SeqException {
+  throws BioException {
     try {
       PrimarySeq primarySeq = getPrimarySeqDB().get_PrimarySeq(id);
       return new SequenceAdapter(primarySeq);
     } catch (UnableToProcess utp) {
-      throw new SeqException(
+      throw new BioException(
         utp,
         "Could not retrieve sequence from CORBA database " +
         getPrimarySeqDB().database_name()
       );
     } catch (IllegalAlphabetException iae) {
-      throw new SeqException(iae, "Unable to create SequenceAdapter");
-    } catch (IllegalResidueException ire) {
-      throw new SeqException(ire, "Unable to create SequenceAdapter");
-    } catch (SeqException se) {
-      throw new SeqException(se, "Unable to create SequenceAdapter");
+      throw new BioException(iae, "Unable to create SequenceAdapter");
+    } catch (IllegalSymbolException ire) {
+      throw new BioException(ire, "Unable to create SequenceAdapter");
+    } catch (BioException se) {
+      throw new BioException(se, "Unable to create SequenceAdapter");
     }
   }
   

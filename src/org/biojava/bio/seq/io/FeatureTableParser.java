@@ -58,14 +58,14 @@ class FeatureTableParser {
 	featureAttributes = new HashMap();
     }
 
-    public void startFeature(String type) throws SeqException {
+    public void startFeature(String type) throws BioException {
 	featureType = type;
 	featureStatus = LOCATION;
 	featureBuf.setLength(0);
 	featureAttributes.clear();    
     }
 
-    public void featureData(String line) throws SeqException {
+    public void featureData(String line) throws BioException {
 	// System.out.println(line);
 	// System.out.println(featureStatus);
 	switch (featureStatus) {
@@ -87,7 +87,7 @@ class FeatureTableParser {
 		    featureStatus = ATTRIBUTE;
 		}
 	    } else {
-		throw new SeqException("Invalid line in feature body: "+line);
+		throw new BioException("Invalid line in feature body: "+line);
 	    }
 	    break;
 	case ATTRIBUTE:
@@ -100,7 +100,7 @@ class FeatureTableParser {
 	}
     }
 
-    public void endFeature() throws SeqException {
+    public void endFeature() throws BioException {
 	features.add(fb.buildFeatureTemplate(featureType, 
 					     featureLocation,
 					     featureStrand,
@@ -109,7 +109,7 @@ class FeatureTableParser {
 	
     }
 
-    private Location parseLocation(String loc) throws SeqException {
+    private Location parseLocation(String loc) throws BioException {
 	boolean joining = false;
 	boolean complementing = false;
 	boolean isComplement = false;
@@ -146,7 +146,7 @@ class FeatureTableParser {
 		try {
 		    pos = Integer.parseInt(t);
 		} catch (NumberFormatException ex) {
-		    throw new SeqException("bad locator: " + t + " " + loc);
+		    throw new BioException("bad locator: " + t + " " + loc);
 		}
 
 		if (ranging == false) {
@@ -158,7 +158,7 @@ class FeatureTableParser {
 			((CompoundLocation) result).addLocation(rl);
 		    } else {
 			if (result != null)
-			    throw new SeqException();
+			    throw new BioException();
 			result = rl;
 		    }
 		    ranging = false;
@@ -167,7 +167,7 @@ class FeatureTableParser {
 	    }
 	}
 	if (level != 0)
-	    throw new SeqException("Mismatched parentheses: " + loc);
+	    throw new BioException("Mismatched parentheses: " + loc);
 	
 	if (ranging) {
 	    Location rl = new PointLocation(start);
@@ -175,7 +175,7 @@ class FeatureTableParser {
 		((CompoundLocation) result).addLocation(rl);
 	    } else {
 		if (result != null)
-		    throw new SeqException();
+		    throw new BioException();
 		result = rl;
 	    }
 	}
@@ -186,13 +186,13 @@ class FeatureTableParser {
 	    featureStrand = StrandedFeature.POSITIVE;
 
 	if (result == null) {
-	    throw new SeqException("Location null: " + loc);
+	    throw new BioException("Location null: " + loc);
 	}
 
 	return result;
     }
 
-    private void processAttribute(String attr) throws SeqException {
+    private void processAttribute(String attr) throws BioException {
 	// System.err.println(attr);
 	int eqPos = attr.indexOf('=');
 	if (eqPos == -1) {

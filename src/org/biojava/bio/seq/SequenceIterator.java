@@ -23,6 +23,7 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 import java.io.IOException;
+import org.biojava.bio.*;
 
 /**
  * An iterator over a bag of sequences.
@@ -48,7 +49,7 @@ public interface SequenceIterator {
    * @return the next Sequence
    * @throws NoSuchElementException if you call nextSequence when hasNext
    *                                returns false
-   * @throws SeqException if for any reason the sequence could not be retrieved
+   * @throws BioException if for any reason the sequence could not be retrieved
    */
-  Sequence nextSequence() throws NoSuchElementException, SeqException;
+  Sequence nextSequence() throws NoSuchElementException, BioException;
 }

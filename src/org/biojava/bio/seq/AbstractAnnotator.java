@@ -22,6 +22,7 @@
 package org.biojava.bio.seq;
 
 import java.util.*;
+import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
@@ -33,7 +34,7 @@ import org.biojava.bio.symbol.*;
 public abstract class AbstractAnnotator implements Annotator {
 
   public SequenceDB annotate(SequenceDB sdb)
-        throws IllegalSymbolException, SeqException {
+        throws IllegalSymbolException, BioException {
     HashSequenceDB hitDB = new HashSequenceDB(null);
 
     for(Iterator i = sdb.ids().iterator(); i.hasNext(); ) {

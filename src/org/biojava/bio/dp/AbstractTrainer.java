@@ -22,6 +22,8 @@
 
 package org.biojava.bio.dp;
 
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 public abstract class AbstractTrainer implements TrainingAlgorithm {
@@ -48,15 +50,15 @@ public abstract class AbstractTrainer implements TrainingAlgorithm {
   }
   
   protected abstract double singleSequenceIteration(ModelTrainer trainer,
-                                                    ResidueList resList)
-  throws IllegalResidueException, IllegalTransitionException, IllegalAlphabetException;
+                                                    SymbolList resList)
+  throws IllegalSymbolException, IllegalTransitionException, IllegalAlphabetException;
   
   /**
    * Trains the sequences in db until stopper says to finnish.
    */
   public void train(SequenceDB db, EmissionState nullModel,
                     double nullWeight, StoppingCriteria stopper)
-  throws IllegalResidueException, SeqException {
+  throws IllegalSymbolException, BioException {
     try {
       ModelTrainer trainer =
         new SimpleModelTrainer(dp.getModel(), nullModel, nullWeight, 0.000001, 1.0);
@@ -72,7 +74,7 @@ public abstract class AbstractTrainer implements TrainingAlgorithm {
         trainer.clearCounts();
       } while(!stopper.isTrainingComplete(this));
     } catch (Exception e) {
-      throw new SeqException(e, "Unable to train");
+      throw new BioException(e, "Unable to train");
     }
   }
   

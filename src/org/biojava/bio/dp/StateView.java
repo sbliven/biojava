@@ -24,8 +24,8 @@ package org.biojava.bio.dp;
 
 import java.util.*;
 
-import org.biojava.bio.BioError;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A State that alters something about an underlying state.
@@ -36,33 +36,33 @@ public abstract class StateView implements EmissionState {
   private final EmissionState source;
   
   /**
-   * Translates Residue r from the view alphabet into the corresponding symbol
+   * Translates Symbol r from the view alphabet into the corresponding symbol
    * in the source state alphabet.
    *
    * @param r the Reisdue to translate
    * @return the translated version
-   * @throws IllegalResidueException if r can't be translated
+   * @throws IllegalSymbolException if r can't be translated
    */
-  public abstract Residue viewToSource(Residue r)
-  throws IllegalResidueException;
+  public abstract Symbol viewToSource(Symbol r)
+  throws IllegalSymbolException;
   
   /**
-   * Translates Residue r from the source state alphabet into the corresponding
+   * Translates Symbol r from the source state alphabet into the corresponding
    * symbol in the view alphabet.
    *
    * @param r the Reisdue to translate
    * @return the translated version
-   * @throws IllegalResidueException if r can't be translated
+   * @throws IllegalSymbolException if r can't be translated
    */
-  public abstract Residue sourceToView(Residue r)
-  throws IllegalResidueException;
+  public abstract Symbol sourceToView(Symbol r)
+  throws IllegalSymbolException;
 
   public EmissionState getSource() {
     return source;
   }
 
-  public char getSymbol() {
-    return source.getSymbol();
+  public char getToken() {
+    return source.getToken();
   }
     
   public String getName() {
@@ -74,7 +74,7 @@ public abstract class StateView implements EmissionState {
   }
     
   public void registerWithTrainer(ModelTrainer trainer)
-  throws SeqException {
+  throws BioException {
     Set stateT = trainer.trainersForState(this);
     if(stateT.isEmpty()) {
       source.registerWithTrainer(trainer);
@@ -88,31 +88,31 @@ public abstract class StateView implements EmissionState {
     }
   }
     
-  public Residue sampleResidue() {
+  public Symbol sampleSymbol() {
     try {
-      return sourceToView(source.sampleResidue());
-    } catch (IllegalResidueException ire) {
+      return sourceToView(source.sampleSymbol());
+    } catch (IllegalSymbolException ire) {
       throw new BioError(
         ire,
-        "Could not sample residue as it couldn't be translated"
+        "Could not sample symbol as it couldn't be translated"
       );
     }
   }
     
-  public double getWeight(Residue r)
-  throws IllegalResidueException {
+  public double getWeight(Symbol r)
+  throws IllegalSymbolException {
     try {
       return source.getWeight(viewToSource(r));
-    } catch (IllegalResidueException ire) {
-      throw new IllegalResidueException(
+    } catch (IllegalSymbolException ire) {
+      throw new IllegalSymbolException(
         ire,
         "Could not retrieve weight for " + r.getName() + " in " + getName()
       );
     }
   }
     
-  public void setWeight(Residue r, double weight)
-  throws IllegalResidueException {
+  public void setWeight(Symbol r, double weight)
+  throws IllegalSymbolException {
     source.setWeight(viewToSource(r), weight);
   }
     
@@ -127,13 +127,13 @@ public abstract class StateView implements EmissionState {
   private class Trainer implements StateTrainer {
     private final StateTrainer st;
     
-    public void addCount(Residue res, double times)
-    throws IllegalResidueException {
+    public void addCount(Symbol res, double times)
+    throws IllegalSymbolException {
       st.addCount(viewToSource(res), times);
     }
     
     public void train(EmissionState nullModel, double weight)
-    throws IllegalResidueException {
+    throws IllegalSymbolException {
       st.train(nullModel, weight);
     }
     

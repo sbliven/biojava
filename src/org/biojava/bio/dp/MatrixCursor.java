@@ -23,7 +23,7 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 public class MatrixCursor extends AbstractCursor {
   private final SingleDPMatrix matrix;
@@ -35,7 +35,7 @@ public class MatrixCursor extends AbstractCursor {
     return matrix.resList()[0].length() + 2;
   }
   
-  public ResidueList resList() {
+  public SymbolList resList() {
     return matrix.resList()[0];
   }
   

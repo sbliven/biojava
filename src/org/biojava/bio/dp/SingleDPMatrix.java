@@ -22,13 +22,13 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 class SingleDPMatrix implements DPMatrix {
   private final State [] states;
   private final MarkovModel model;
-  private final ResidueList [] resList;
-  final double [][] scores; // [residue][state]
+  private final SymbolList [] resList;
+  final double [][] scores; // [symbol][state]
   double score;
  
   public State [] States() {
@@ -39,7 +39,7 @@ class SingleDPMatrix implements DPMatrix {
     return model;
   }
   
-  public ResidueList [] resList() {
+  public SymbolList [] resList() {
     return resList;
   }
   
@@ -55,10 +55,10 @@ class SingleDPMatrix implements DPMatrix {
     return scores[index[1]][index[0]];
   }
   
-  public SingleDPMatrix(DP dp, ResidueList resList) {
+  public SingleDPMatrix(DP dp, SymbolList resList) {
     this.model = dp.getModel();
     this.states = dp.getStates();
-    this.resList = new ResidueList [] { resList };
+    this.resList = new SymbolList [] { resList };
     this.score = Double.NEGATIVE_INFINITY;
     this.scores = new double[resList.length() + 2][states.length];
   }

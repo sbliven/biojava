@@ -23,9 +23,10 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
-public class SimpleModelInState extends SimpleResidue implements ModelInState {
+public class SimpleModelInState extends SimpleSymbol implements ModelInState {
   private MarkovModel model;
   
   public MarkovModel getModel() {
@@ -33,7 +34,7 @@ public class SimpleModelInState extends SimpleResidue implements ModelInState {
   }
   
   public void registerWithTrainer(ModelTrainer modelTrainer)
-  throws SeqException {
+  throws BioException {
     getModel().registerWithTrainer(modelTrainer);
   }
   

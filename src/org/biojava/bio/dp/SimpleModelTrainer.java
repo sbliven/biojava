@@ -23,8 +23,8 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
-
-import org.biojava.bio.seq.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 public class SimpleModelTrainer implements ModelTrainer {
   private Transition _tran;
@@ -78,11 +78,11 @@ public class SimpleModelTrainer implements ModelTrainer {
     modelToTrainer = new HashMap();
   }
   
-  public void addStateCount(EmissionState s, Residue r, double count)
-  throws IllegalResidueException {
+  public void addStateCount(EmissionState s, Symbol r, double count)
+  throws IllegalSymbolException {
     Set trainerSet = (Set) stateToTrainer.get(s);
     if(trainerSet == null) {
-      throw new IllegalResidueException(
+      throw new IllegalSymbolException(
         "No trainers associated with state " +
         s.getName() + " while training " + model.stateAlphabet().getName()
       );
@@ -93,7 +93,7 @@ public class SimpleModelTrainer implements ModelTrainer {
   }
   
   public void addTransitionCount(State from, State to, double count)
-  throws IllegalResidueException, IllegalTransitionException {
+  throws IllegalSymbolException, IllegalTransitionException {
     _tran.from = from;
     _tran.to = to;
     Double countD = (Double) transitionToCount.get(_tran);
@@ -106,7 +106,7 @@ public class SimpleModelTrainer implements ModelTrainer {
   }
 
   public void train()
-  throws IllegalResidueException, IllegalTransitionException {
+  throws IllegalSymbolException, IllegalTransitionException {
     // train all states
     for(Iterator i = getAllStateTrainers().iterator(); i.hasNext();) {
       StateTrainer st = (StateTrainer) i.next();
@@ -176,14 +176,16 @@ public class SimpleModelTrainer implements ModelTrainer {
     return allStateTrainers;
   }
   
-  public void registerTrainerForTransition(State from, State to,
-                                           TransitionTrainer trainer,
-                                           State source, State destination)
-  throws SeqException {
+  public void registerTrainerForTransition(
+    State from, State to,
+    TransitionTrainer trainer,
+    State source,
+    State destination
+  ) throws BioException {
     if(trainer == null)
       throw new NullPointerException("Attempted to use a null trainer");
     if(!getAllTransitionTrainers().contains(trainer))
-      throw new SeqException("Trainer not registered.");
+      throw new BioException("Trainer not registered.");
       
     _tran.from = from;
     _tran.to = to;
@@ -216,9 +218,9 @@ public class SimpleModelTrainer implements ModelTrainer {
   
   public void registerTrainerForModel(MarkovModel model,
                                       TransitionTrainer trainer)
-  throws SeqException {
+  throws BioException {
     if(allTransitionTrainers.contains(model))
-      throw new SeqException("Trainer already associated with the model");
+      throw new BioException("Trainer already associated with the model");
     modelToTrainer.put(model, trainer);
     allTransitionTrainers.add(trainer);
   }
@@ -227,7 +229,7 @@ public class SimpleModelTrainer implements ModelTrainer {
     MarkovModel model,
     EmissionState nullState, double nullStateWeight,
     double transCounts, double transCountWeight
-  ) throws SeqException {
+  ) throws BioException {
     this.model = model;
     this.nullState = nullState;
     this.nullStateWeight = nullStateWeight;

@@ -22,7 +22,7 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * An object that can be used to train the transitions within a MarkovModel.
@@ -39,7 +39,7 @@ public interface TransitionTrainer {
    * @param count   the number of counts to add
    */
   void addCount(State from, State to, double count)
-  throws IllegalResidueException, IllegalTransitionException;
+  throws IllegalSymbolException, IllegalTransitionException;
   
   /**
    * Trains the transition, given an expected probability, and a weight for
@@ -51,7 +51,7 @@ public interface TransitionTrainer {
    * @param nullModel the nullModel to use
    * @param weight  how many lots of the null model to add
    */
-  void train(double nullModel, double weight) throws IllegalResidueException;
+  void train(double nullModel, double weight) throws IllegalSymbolException;
   
   /**
    * Clears all of the counts to zero.

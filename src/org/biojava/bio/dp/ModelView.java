@@ -24,8 +24,8 @@ package org.biojava.bio.dp;
 
 import java.util.*;
 
-import org.biojava.bio.BioError;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A model that exposes some translated view of another model.
@@ -55,7 +55,7 @@ public abstract class ModelView implements MarkovModel {
     transTo.put(s, new HashSet());
   }
   
-  public State sampleTransition(State from) throws IllegalResidueException {
+  public State sampleTransition(State from) throws IllegalSymbolException {
     stateAlphabet().validate(from);
     
     double p = Math.random();
@@ -65,7 +65,7 @@ public abstract class ModelView implements MarkovModel {
         if( (p -= Math.exp(getTransitionScore(from, s))) <= 0 )
         return s;
       }
-    } catch (IllegalResidueException ire) {
+    } catch (IllegalSymbolException ire) {
     } catch (IllegalTransitionException ite) {
       throw new BioError(ite, "Transition listend in transitionsFrom(" +
                          from.getName() + "has dissapeared.");
@@ -84,7 +84,7 @@ public abstract class ModelView implements MarkovModel {
                            from.getName() + "has dissapeared.");
       }
     }
-    throw new IllegalResidueException("Could not find transition from state " +
+    throw new IllegalSymbolException("Could not find transition from state " +
                                       from.getName() +
                                       ". Do the probabilities sum to 1?" +
                                       "\np=" + p + "\n" + sb.toString());
@@ -92,7 +92,7 @@ public abstract class ModelView implements MarkovModel {
 
 
   protected ModelTransition getMT(State from, State to)
-  throws IllegalResidueException {
+  throws IllegalSymbolException {
     stateAlphabet().validate(from);
     stateAlphabet().validate(to);
     
@@ -103,20 +103,20 @@ public abstract class ModelView implements MarkovModel {
   }
   
   public boolean containsTransition(State from, State to)
-  throws IllegalResidueException {
+  throws IllegalSymbolException {
     return getMT(from, to) != null;
   }
   
-  public Set transitionsFrom(State from) throws IllegalResidueException {
+  public Set transitionsFrom(State from) throws IllegalSymbolException {
     return (Set) transFrom.get(from);
   }
   
-  public Set transitionsTo(State to) throws IllegalResidueException {
+  public Set transitionsTo(State to) throws IllegalSymbolException {
     return (Set) transTo.get(to);
   }
   
   public double getTransitionScore(State from, State to)
-  throws IllegalResidueException, IllegalTransitionException {
+  throws IllegalSymbolException, IllegalTransitionException {
     ModelTransition mt = getMT(from, to);
     if(mt != null) {
       return mt.model.getTransitionScore(mt.from, mt.to);
@@ -125,7 +125,7 @@ public abstract class ModelView implements MarkovModel {
   }
 
   public void registerWithTrainer(ModelTrainer modelTrainer)
-  throws SeqException {
+  throws BioException {
     TransitionTrainer thisT = modelTrainer.getTrainerForModel(this);
     if(thisT == null) {
       getSource().registerWithTrainer(modelTrainer);
@@ -148,8 +148,8 @@ public abstract class ModelView implements MarkovModel {
               s, t, tt, mt.from, mt.to
             );
           }
-        } catch (IllegalResidueException ire) {
-          throw new SeqException(ire, "Residue dissapeard on me: " + s.getName());
+        } catch (IllegalSymbolException ire) {
+          throw new BioException(ire, "Symbol dissapeard on me: " + s.getName());
         }
       }
     }
@@ -158,7 +158,7 @@ public abstract class ModelView implements MarkovModel {
   protected void createTransition(
     State from, State to,
     MarkovModel within, State source, State dest
-  ) throws IllegalResidueException {
+  ) throws IllegalSymbolException {
     stateAlphabet().validate(from);
     stateAlphabet().validate(to);
     
@@ -175,7 +175,7 @@ public abstract class ModelView implements MarkovModel {
       Set t = (Set) transTo.get(to);
       f.add(to);
       t.add(from);
-    } catch (IllegalResidueException ire) {
+    } catch (IllegalSymbolException ire) {
       throw new BioError(
         ire,
         "Something is fucked up in ModelView.\nCreating " +
@@ -206,7 +206,7 @@ public abstract class ModelView implements MarkovModel {
     public final State to;
     
     public ModelTransition(MarkovModel model, State from, State to)
-    throws IllegalResidueException, IllegalArgumentException {
+    throws IllegalSymbolException, IllegalArgumentException {
       if(model == null) {
         throw new IllegalArgumentException("Can't use a null model");
       }
@@ -221,12 +221,12 @@ public abstract class ModelView implements MarkovModel {
   
   public class ViewTransitionTrainer implements TransitionTrainer {
     public void addCount(State from, State to, double count)
-    throws IllegalResidueException, IllegalTransitionException {
+    throws IllegalSymbolException, IllegalTransitionException {
       return;
     }
     
     public void train(double nullModel, double weight)
-    throws IllegalResidueException {
+    throws IllegalSymbolException {
       return;
     }
     

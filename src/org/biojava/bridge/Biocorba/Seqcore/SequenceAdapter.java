@@ -7,7 +7,7 @@ import org.biojava.bio.seq.tools.*;
 import org.Biocorba.Seqcore.*;
 
 public class SequenceAdapter
-extends ResidueListAdapter
+extends SymbolListAdapter
 implements Sequence {
   private FeatureHolder fHolder;
   
@@ -25,7 +25,7 @@ implements Sequence {
   }
   
   public SequenceAdapter(PrimarySeq primarySeq)
-  throws IllegalAlphabetException, IllegalResidueException, SeqException {
+  throws IllegalAlphabetException, IllegalSymbolException, BioException {
     super(primarySeq);
     if(!(primarySeq instanceof Seq)) {
       fHolder = FeatureHolder.EMPTY_FEATURE_HOLDER;

@@ -23,8 +23,8 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.tools.*;
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.DNATools;
 
 /**
  * A thing that can make states.

@@ -35,11 +35,11 @@ public class AceSequenceDB implements SequenceDB {
   protected Database aceDB;
   protected AceSet seqSet;
   
-  public Sequence getSequence(String id) throws SeqException {
+  public Sequence getSequence(String id) throws BioException {
     try {
       return new AceSequence(aceDB, id);
     } catch (AceException ae) {
-      throw new SeqException(ae, "unable to retrieve sequence " + id);
+      throw new BioException(ae, "unable to retrieve sequence " + id);
     }
   }
   
@@ -69,7 +69,7 @@ public class AceSequenceDB implements SequenceDB {
         return id.hasNext();
       }
       
-      public Sequence nextSequence() throws SeqException {
+      public Sequence nextSequence() throws BioException {
         return getSequence((String) id.next());
       }
     };

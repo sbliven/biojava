@@ -102,7 +102,7 @@ public class GFFEntrySet {
    */
   public Annotator getAnnotator() {
     return new AbstractAnnotator() {
-      public boolean annotate(Sequence seq) throws SeqException {
+      public boolean annotate(Sequence seq) throws BioException {
         Feature.Template plain = new Feature.Template();
         StrandedFeature.Template stranded = new StrandedFeature.Template();
         plain.annotation = Annotation.EMPTY_ANNOTATION;

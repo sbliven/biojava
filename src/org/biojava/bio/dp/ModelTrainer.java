@@ -24,23 +24,24 @@ package org.biojava.bio.dp;
 
 import java.util.*;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * Encapsulates the training of an entire model.
  */
 public interface ModelTrainer {
   /**
-   * Adds some counts to a state for a given residue.
+   * Adds some counts to a state for a given symbol.
    */
-  void addStateCount(EmissionState s, Residue r, double count)
-  throws IllegalResidueException;
+  void addStateCount(EmissionState s, Symbol r, double count)
+  throws IllegalSymbolException;
   
   /**
    * Adds some counts to the transition between two states.
    */
   void addTransitionCount(State from, State to, double count)
-  throws IllegalResidueException, IllegalTransitionException;
+  throws IllegalSymbolException, IllegalTransitionException;
 
   /**
    * Trains up the transitions in this model with the counts so far.
@@ -48,7 +49,7 @@ public interface ModelTrainer {
    * After training, the counts are all reset to zero.
    */
   void train()
-  throws IllegalResidueException, IllegalTransitionException;
+  throws IllegalSymbolException, IllegalTransitionException;
 
   /**
    * Clears all of the counts, ready for re-training.
@@ -100,13 +101,13 @@ public interface ModelTrainer {
    * @param trainer the TransitionTrainer to add to the list of trainers
    * @param source  the source state for the trainer
    * @param destination the destination state for the trainer
-   * @throws SeqException if the trainer is not yet registered
+   * @throws BioException if the trainer is not yet registered
    * @throws NullPointerException if any of the arguments are null
    */
   void registerTrainerForTransition(State from, State to,
                                     TransitionTrainer trainer,
                                     State source, State destination)
-  throws SeqException;
+  throws BioException;
 
   /**
    * Retrieves a Set of TransitionTrainers associated with a transition between
@@ -137,8 +138,8 @@ public interface ModelTrainer {
    *
    * @param model the MarkovModel to train
    * @param trainer the trainer that will train the model
-   * @throws SeqException if the model already has a trainer associated
+   * @throws BioException if the model already has a trainer associated
    */
   void registerTrainerForModel(MarkovModel model, TransitionTrainer trainer)
-  throws SeqException;
+  throws BioException;
 }

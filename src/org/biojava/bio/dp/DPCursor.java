@@ -22,17 +22,17 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * Encapsulates the dynamic programmming matrix, and the context within algorithms work.
- * The cursor should put DP.MAGICAL_STATE residues at either end of the sequence.
+ * The cursor should put DP.MAGICAL_STATE symbols at either end of the sequence.
  */
 interface DPCursor {
   /**
-   * The residue list being looped over.
+   * The symbol list being looped over.
    */
-  ResidueList resList();
+  SymbolList resList();
   
   /**
    * The length of the sequence.
@@ -52,14 +52,14 @@ interface DPCursor {
   double [] lastCol();
   
   /**
-   * The current residue.
+   * The current symbol.
    */
-  Residue currentRes();
+  Symbol currentRes();
   
   /**
-   * The previous residue.
+   * The previous symbol.
    */
-  Residue lastRes();
+  Symbol lastRes();
     
   /**
    * Can we advance?

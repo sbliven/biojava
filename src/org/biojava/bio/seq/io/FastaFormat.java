@@ -96,9 +96,9 @@ public class FastaFormat implements SequenceFormat {
   }
 
   public Sequence readSequence(StreamReader.Context context,
-                               ResidueParser resParser,
+                               SymbolParser resParser,
                                SequenceFactory sf)
-         throws IllegalResidueException, IOException {
+         throws IllegalSymbolException, IOException {
     final BufferedReader in = context.getReader();
     StringBuffer sb = new StringBuffer();
 
@@ -134,7 +134,7 @@ public class FastaFormat implements SequenceFormat {
     }
 
     String [] urnName = fdr.parseURNName(description);
-    Sequence seq = sf.createSequence(new SimpleResidueList(resParser.alphabet(),
+    Sequence seq = sf.createSequence(new SimpleSymbolList(resParser.alphabet(),
                                                            resList), 
                                      urnName[0], urnName[1], null);
     fdr.parseAnnotation(description, seq.getAnnotation());
@@ -147,7 +147,7 @@ public class FastaFormat implements SequenceFormat {
 
     int length = seq.length();
     for(int i = 1; i <= length; i++) {
-      os.print(seq.residueAt(i).getSymbol());
+      os.print(seq.symbolAt(i).getToken());
       if( (i % lineWidth) == 0)
         os.print("\n");
     }

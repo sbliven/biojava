@@ -61,7 +61,7 @@ public class SimpleSequence extends SimpleSymbolList
    * @param template the Feature.Template that defines what to make
    */
   protected static Feature createFeatureFromTemplate(Sequence parent, Feature.Template template)
-  throws SeqException {
+  throws BioException {
     for(Iterator i = templateClassToFeatureClass.iterator(); i.hasNext(); ) {
       TemplateFeature tf = (TemplateFeature) i.next();
       if(tf.templateClass.isInstance(template)) {
@@ -69,15 +69,15 @@ public class SimpleSequence extends SimpleSymbolList
           Object [] args = { parent, template };
           return (Feature) tf.con.newInstance(args);
         } catch (InstantiationException ie) {
-          throw new SeqException(ie);
+          throw new BioException(ie);
         } catch (IllegalAccessException iae) {
-          throw new SeqException(iae);
+          throw new BioException(iae);
         } catch (InvocationTargetException ite) {
-          throw new SeqException(ite);
+          throw new BioException(ite);
         }
       }
     }
-    throw new SeqException("Could not find feature associated with " + template);
+    throw new BioException("Could not find feature associated with " + template);
   }
   
   /**
@@ -167,7 +167,7 @@ public class SimpleSequence extends SimpleSymbolList
   }
 
   public Feature createFeature(MutableFeatureHolder fh, Feature.Template template)
-  throws SeqException {
+  throws BioException {
     Feature f = createFeatureFromTemplate(this, template);
     if(fh == this) {
       fh = this.getFeatureHolder();

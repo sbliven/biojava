@@ -22,9 +22,9 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.tools.*;
 import java.util.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * Simple state for representing matches in multiheaded HMMs.
@@ -60,7 +60,7 @@ public class UniformMatchState implements EmissionState {
 	}
 	
 	ungappedSize = subAlpha.size();
-	if (subAlpha.contains(AlphabetManager.instance().getGapResidue()))
+	if (subAlpha.contains(AlphabetManager.instance().getGapSymbol()))
 	    ungappedSize--;
 
 	advance = new int[alpha.getAlphabets().size()];
@@ -76,10 +76,10 @@ public class UniformMatchState implements EmissionState {
 	return alpha;
     }
 
-    public double getWeight(Residue r) throws IllegalResidueException {
+    public double getWeight(Symbol r) throws IllegalSymbolException {
 	alpha.validate(r);
-	List srl = ((CrossProductResidue) r).getResidues();
-	if (srl.contains(AlphabetManager.instance().getGapResidue()))
+	List srl = ((CrossProductSymbol) r).getSymbols();
+	if (srl.contains(AlphabetManager.instance().getGapSymbol()))
 	    return Double.NEGATIVE_INFINITY;
 	Iterator i = srl.iterator();
         Object first = i.next();
@@ -89,12 +89,12 @@ public class UniformMatchState implements EmissionState {
 	return matchWeight;
     }
 
-    public void setWeight(Residue r, double w) throws IllegalResidueException, UnsupportedOperationException
+    public void setWeight(Symbol r, double w) throws IllegalSymbolException, UnsupportedOperationException
     {
 	throw new UnsupportedOperationException();
     }
 
-    public Residue sampleResidue() {
+    public Symbol sampleSymbol() {
 	throw new UnsupportedOperationException();
     }
 
@@ -109,7 +109,7 @@ public class UniformMatchState implements EmissionState {
 	this.name = name;
     }
 
-    public char getSymbol() {
+    public char getToken() {
 	return name.charAt(0);
     }
 

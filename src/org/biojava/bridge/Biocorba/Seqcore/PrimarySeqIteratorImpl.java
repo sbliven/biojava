@@ -25,7 +25,7 @@ implements _PrimarySeqIterator_Operations {
       return pst;
     } catch (NoSuchElementException e) {
       throw new EndOfStream();
-    } catch (SeqException se) {
+    } catch (BioException se) {
       throw new UnableToProcess(se.getMessage());
     } catch (IllegalAlphabetException iae) {
       throw new UnableToProcess(iae.getMessage());

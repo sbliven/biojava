@@ -23,8 +23,8 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
-import org.biojava.bio.BioError;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * Wraps a weight matrix up so that it appears to be a very simple hmm.
@@ -54,7 +54,7 @@ public class WMAsMM implements MarkovModel {
   }
   
   public double getTransitionScore(State from, State to)
-  throws IllegalResidueException, IllegalTransitionException {
+  throws IllegalSymbolException, IllegalTransitionException {
     if(containsTransition(from, to)) {
       return 0.0;
     }
@@ -69,7 +69,7 @@ public class WMAsMM implements MarkovModel {
   }
   
   public State sampleTransition(State from)
-  throws IllegalResidueException {
+  throws IllegalSymbolException {
     Alphabet sAlpha = stateAlphabet();
     sAlpha.validate(from);
     
@@ -84,7 +84,7 @@ public class WMAsMM implements MarkovModel {
   }
   
   public Set transitionsFrom(State from)
-  throws IllegalResidueException {
+  throws IllegalSymbolException {
     Alphabet sAlpha = stateAlphabet();
     sAlpha.validate(from);
 
@@ -99,7 +99,7 @@ public class WMAsMM implements MarkovModel {
   }
     
   public Set transitionsTo(State to)
-  throws IllegalResidueException {
+  throws IllegalSymbolException {
     Alphabet sAlpha = stateAlphabet();
     sAlpha.validate(to);
 
@@ -114,7 +114,7 @@ public class WMAsMM implements MarkovModel {
   }
   
   public void registerWithTrainer(ModelTrainer modelTrainer)
-  throws SeqException {
+  throws BioException {
     for(Iterator i = stateAlphabet().iterator(); i.hasNext(); ) {
       EmissionState s = (EmissionState) i.next();
       s.registerWithTrainer(modelTrainer);
@@ -134,9 +134,9 @@ public class WMAsMM implements MarkovModel {
   }
   
   public void addState(State toAdd)
-  throws IllegalResidueException, UnsupportedOperationException {
+  throws IllegalSymbolException, UnsupportedOperationException {
     if(stateAlphabet().contains(toAdd)) {
-      throw new IllegalResidueException(
+      throw new IllegalSymbolException(
         toAdd, 
         "Can't add a state to a model that already contains it"
       );
@@ -146,14 +146,14 @@ public class WMAsMM implements MarkovModel {
   }
   
   public void removeState(State toAdd)
-  throws IllegalResidueException, UnsupportedOperationException {
+  throws IllegalSymbolException, UnsupportedOperationException {
     stateAlphabet().validate(toAdd);
     
     throw new UnsupportedOperationException("removeState not supported by " + getClass());
   }
 
   public boolean containsTransition(State from, State to)
-  throws IllegalResidueException {
+  throws IllegalSymbolException {
     Alphabet sAlpha = stateAlphabet();
     sAlpha.validate(from);
     sAlpha.validate(to);
@@ -174,15 +174,15 @@ public class WMAsMM implements MarkovModel {
     return false;
   }
   
-  public WMAsMM(WeightMatrix wm) throws IllegalResidueException {
+  public WMAsMM(WeightMatrix wm) throws IllegalSymbolException {
     this.wm = wm;
     this.stateList = new WMState[wm.columns()];
     SimpleAlphabet sa = new SimpleAlphabet();
-    sa.addResidue(magicalState);
+    sa.addSymbol(magicalState);
     this.stateAlpha = sa;
     for(int i = 0; i < wm.columns(); i++) {
       stateList[i] = new WMState(wm.alphabet(), i);
-      sa.addResidue(stateList[i]);
+      sa.addSymbol(stateList[i]);
       stateList[i].setName( "" + (i+1) );
     }
     sa.setName("Weight Matrix columns");
@@ -199,13 +199,13 @@ public class WMAsMM implements MarkovModel {
       return advance;
     }
     
-    public double getWeight(Residue res)
-    throws IllegalResidueException {
+    public double getWeight(Symbol res)
+    throws IllegalSymbolException {
       return wm.getWeight(res, index());
     }
     
-    public void setWeight(Residue res, double weight)
-    throws IllegalResidueException {
+    public void setWeight(Symbol res, double weight)
+    throws IllegalSymbolException {
       wm.setWeight(res, index(), weight);
     }
     

@@ -27,16 +27,16 @@ import java.awt.Color;
 import java.util.*;
 
 import org.biojava.bio.BioError;
-import org.biojava.bio.seq.Residue;
-import org.biojava.bio.seq.IllegalResidueException;
+import org.biojava.bio.seq.Symbol;
+import org.biojava.bio.seq.IllegalSymbolException;
 import org.biojava.bio.seq.tools.DNATools;
 
 /**
- * A simple implementation of ResidueStyle optimized for DNA.
+ * A simple implementation of SymbolStyle optimized for DNA.
  *
  * @author Matthew Pocock
  */
-public class DNAStyle implements ResidueStyle {
+public class DNAStyle implements SymbolStyle {
   private Map outlinePaint;
   private Map fillPaint;
   
@@ -45,24 +45,24 @@ public class DNAStyle implements ResidueStyle {
     fillPaint = new HashMap();
   }
   
-  public Paint outlinePaint(Residue r) throws IllegalResidueException {
+  public Paint outlinePaint(Symbol r) throws IllegalSymbolException {
     DNATools.getAlphabet().validate(r);
     return (Paint) outlinePaint.get(r);
   }
   
-  public Paint fillPaint(Residue r) throws IllegalResidueException {
+  public Paint fillPaint(Symbol r) throws IllegalSymbolException {
     DNATools.getAlphabet().validate(r);
     return (Paint) fillPaint.get(r);
   }
   
-  public void setOutlinePaint(Residue r, Paint paint)
-  throws IllegalResidueException {
+  public void setOutlinePaint(Symbol r, Paint paint)
+  throws IllegalSymbolException {
     DNATools.getAlphabet().validate(r);
     outlinePaint.put(r, paint);
   }
 
-  public void setFillPaint(Residue r, Paint paint)
-  throws IllegalResidueException {
+  public void setFillPaint(Symbol r, Paint paint)
+  throws IllegalSymbolException {
     DNATools.getAlphabet().validate(r);
     fillPaint.put(r, paint);
   }
@@ -77,8 +77,8 @@ public class DNAStyle implements ResidueStyle {
       setFillPaint(DNATools.g(), Color.blue);
       setOutlinePaint(DNATools.c(), Color.black);
       setFillPaint(DNATools.c(), Color.yellow);
-    } catch (IllegalResidueException ire) {
-      throw new BioError(ire, "DNA residues dissapeared from DNA alphabet");
+    } catch (IllegalSymbolException ire) {
+      throw new BioError(ire, "DNA symbols dissapeared from DNA alphabet");
     }
   }
 }

@@ -22,7 +22,8 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A Dot state that you can make and use.
@@ -31,7 +32,7 @@ import org.biojava.bio.seq.*;
  * of the model look neater, and to cut down the number of combinatorial
  * transitions that can so easily swamp models.
  */
-public class SimpleDotState extends SimpleResidue implements DotState {
+public class SimpleDotState extends SimpleSymbol implements DotState {
   public SimpleDotState(char symbol, String name, Annotation annotation) {
     super(symbol, name, annotation);
   }

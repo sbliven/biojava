@@ -23,7 +23,8 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A markov model.
@@ -63,7 +64,7 @@ public interface MarkovModel {
   /**
    * The number of heads on this model.
    * <P>
-   * Each head consumes a single ResidueList. A single-head model just consumes/
+   * Each head consumes a single SymbolList. A single-head model just consumes/
    * emits a single sequence. A two-head model performs alignment between two
    * sequences (e.g. smith-waterman). Models with more heads do more interesting
    * things.
@@ -76,45 +77,45 @@ public interface MarkovModel {
    * @param from  the State currently occupied
    * @param to  the State to move to
    * @return the transition score from->to
-   * @throws IllegalResidueException if either from or to are not legal states
+   * @throws IllegalSymbolException if either from or to are not legal states
    * @throws IllegalTransitionException if there is no transition between the states
    */
   double getTransitionScore(State from, State to)
-  throws IllegalResidueException, IllegalTransitionException;
+  throws IllegalSymbolException, IllegalTransitionException;
 
   /**
    * Returns whether a transition is possible in the model.
    *
    * @param from  the State currently occupied
    * @param to  the State to move to
-   * @throws IllegalResidueException if either from or to are not legal states
+   * @throws IllegalSymbolException if either from or to are not legal states
    */
   boolean containsTransition(State from, State to)
-  throws IllegalResidueException;
+  throws IllegalSymbolException;
 
   /**
    * Makes a transition between two states legal.
    *
    * @param from  the State currently occupied
    * @param to  the State to move to
-   * @throws IllegalResidueException if either from or to are not legal states
+   * @throws IllegalSymbolException if either from or to are not legal states
    * @throws UnsupportedOperationException if an implementation does not allow
    *         transitions to be created
    */
    void createTransition(State from, State to)
-   throws IllegalResidueException, UnsupportedOperationException;
+   throws IllegalSymbolException, UnsupportedOperationException;
    
   /**
    * Breaks a transition between two states legal.
    *
    * @param from  the State currently occupied
    * @param to  the State to move to
-   * @throws IllegalResidueException if either from or to are not legal states
+   * @throws IllegalSymbolException if either from or to are not legal states
    * @throws UnsupportedOperationException if an implementation does not allow
    *         transitions to be destroyed
    */
    void destroyTransition(State from, State to)
-   throws IllegalResidueException, UnsupportedOperationException;
+   throws IllegalSymbolException, UnsupportedOperationException;
 
    /**
    * Set the transition score associated with a transition.
@@ -122,7 +123,7 @@ public interface MarkovModel {
    * @param from  the source State
    * @param to  the destination State
    * @param score the new score for the transition
-   * @throws IllegalResidueException if either from or to are not states in the
+   * @throws IllegalSymbolException if either from or to are not states in the
    *         model
    * @throws IllegalTransitionException if the transition does not exist in the
    *         model
@@ -130,7 +131,7 @@ public interface MarkovModel {
    *         transition scores to be altered
    */
   void setTransitionScore(State from, State to, double score)
-  throws IllegalResidueException, IllegalTransitionException,
+  throws IllegalSymbolException, IllegalTransitionException,
   UnsupportedOperationException;
   
   /**
@@ -140,9 +141,9 @@ public interface MarkovModel {
    *
    * @param from  the starting state
    * @return  a State sampled from all states reachable from 'from'
-   * @throws  IllegalResidueException if 'from' is not a state within this model
+   * @throws  IllegalSymbolException if 'from' is not a state within this model
    */
-  State sampleTransition(State from) throws IllegalResidueException;
+  State sampleTransition(State from) throws IllegalSymbolException;
   
   /**
    * Returns a Set of all legal transitions from a state.
@@ -150,7 +151,7 @@ public interface MarkovModel {
    * @param from  the starting state
    * @return  a List of State objects
    */
-  Set transitionsFrom(State from) throws IllegalResidueException;
+  Set transitionsFrom(State from) throws IllegalSymbolException;
   
   /**
    * Returns a Set of all legal transitions to a state.
@@ -158,7 +159,7 @@ public interface MarkovModel {
    * @param from  the destination state
    * @return  a List of State objects
    */
-  Set transitionsTo(State to) throws IllegalResidueException;
+  Set transitionsTo(State to) throws IllegalSymbolException;
   
   /**
    * Adds a state to the model.
@@ -166,10 +167,10 @@ public interface MarkovModel {
    * @param newState  the state to add
    * @throws UnsupportedOperationException if this MarkovModel doesn't allow
    *         states to be added
-   * @throws IllegalResidueException if the state is not valid or is a MagicalState
+   * @throws IllegalSymbolException if the state is not valid or is a MagicalState
    */
   void addState(State newState)
-  throws UnsupportedOperationException, IllegalResidueException;
+  throws UnsupportedOperationException, IllegalSymbolException;
 
   /**
    * Remove a state from the model.
@@ -180,14 +181,14 @@ public interface MarkovModel {
    * @param toGo  the state to remove
    * @throws UnsupportedOperationException if the MarkovModel doesn't allow
    *         states to be removed
-   * @throws IllegalResidueException if the residue is not part of this model
+   * @throws IllegalSymbolException if the symbol is not part of this model
    *         or a MagicalState
    * @throws IllegalTransitionException if the state is currently involved in
    *         any transitions
    */
   void removeState(State toGo)
   throws UnsupportedOperationException, IllegalTransitionException,
-  IllegalResidueException;
+  IllegalSymbolException;
   
   /**
    * Register this model with a trainer.
@@ -195,5 +196,5 @@ public interface MarkovModel {
    * A model may be registered with multiple trainers.
    */
   void registerWithTrainer(ModelTrainer mt)
-  throws SeqException;
+  throws BioException;
 }

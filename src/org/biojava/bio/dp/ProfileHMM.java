@@ -22,7 +22,7 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 public class ProfileHMM extends SimpleMarkovModel {
   /**
@@ -155,7 +155,7 @@ public class ProfileHMM extends SimpleMarkovModel {
   public ProfileHMM(
     Alphabet alpha, int columns,
     StateFactory matchFactory, StateFactory insertFactory
-  ) throws IllegalResidueException, IllegalTransitionException,
+  ) throws IllegalSymbolException, IllegalTransitionException,
   IllegalAlphabetException {
     super(1, alpha);
     

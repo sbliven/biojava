@@ -22,53 +22,54 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A state in a markov process that has an emission spectrum.
  * <P>
- * These states emit residues with a probability distribution over an alphabet.
+ * These states emit symbols with a probability distribution over an alphabet.
  * They are the states that actualy make your observed sequence. They also must supply
  * training behaviour to set the emission spectrum up.
  */
 public interface EmissionState extends State {
   /**
-   * The alphabet from which this state emits residues.
+   * The alphabet from which this state emits symbols.
    *
    * @return  the Alphabet associated with this state
    */
   public Alphabet alphabet();
   
   /**
-   * Return the log probability or odds that Residue r is emited by this state.
+   * Return the log probability or odds that Symbol r is emited by this state.
    *
-   * @param r the Residue emitted
-   * @return  the log-odds of emitting that residue
-   * @throws IllegalResidueException if r is not from this state's alphabet
+   * @param r the Symbol emitted
+   * @return  the log-odds of emitting that symbol
+   * @throws IllegalSymbolException if r is not from this state's alphabet
    */
-  public double getWeight(Residue r) throws IllegalResidueException;
+  public double getWeight(Symbol r) throws IllegalSymbolException;
   
   /**
-   * Set the log probability or odds that Residue r is emited by this state.
+   * Set the log probability or odds that Symbol r is emited by this state.
    *
-   * @param r the Residue emitted
-   * @param w  the log-odds of emitting that residue
-   * @throws IllegalResidueException if r is not from this state's alphabet
+   * @param r the Symbol emitted
+   * @param w  the log-odds of emitting that symbol
+   * @throws IllegalSymbolException if r is not from this state's alphabet
    * @throws IllegalOperationException if this state does not allow weights to be tampered with
    */
-  public void setWeight(Residue r, double w)
-  throws IllegalResidueException, UnsupportedOperationException;
+  public void setWeight(Symbol r, double w)
+  throws IllegalSymbolException, UnsupportedOperationException;
 
   /**
-   * Sample a residue from this state's probability distribution.
+   * Sample a symbol from this state's probability distribution.
    *
-   * @return the residue sampled
+   * @return the symbol sampled
    */
-  public Residue sampleResidue();
+  public Symbol sampleSymbol();
 
     /**
-     * Determine the number of residues this state advances along
-     * one or more residue lists.  In the simple case, this method
+     * Determine the number of symbols this state advances along
+     * one or more symbol lists.  In the simple case, this method
      * should almost always return {1} if it is a true `emmision'
      * state, or {0} if it is a dot state which only emits a gap
      * character.  For pairwise HMMs, it will normally return {1, 1}
@@ -91,6 +92,6 @@ public interface EmissionState extends State {
    * @return a StateTrainer
    */
   public void registerWithTrainer(ModelTrainer mt)
-  throws SeqException;
+  throws BioException;
 
 }

@@ -115,7 +115,7 @@ public class TextLogoPainter implements LogoPainter {
   public void paintLogo(Graphics g, StateLogo sl) {
     Graphics2D g2 = (Graphics2D) g;
     EmissionState state = sl.getState();
-    ResidueStyle style = sl.getStyle();
+    SymbolStyle style = sl.getStyle();
     
     Rectangle bounds = sl.getBounds();
     double width = bounds.getWidth();
@@ -130,18 +130,18 @@ public class TextLogoPainter implements LogoPainter {
         Iterator i = ((FiniteAlphabet) state.alphabet()).iterator();
         i.hasNext();
       ) {
-        Residue r = (Residue) i.next();
+        Symbol r = (Symbol) i.next();
         info.add(new ResVal(r, Math.exp(state.getWeight(r)) * scale));
       }
-    } catch (IllegalResidueException ire) {
-      throw new BioError(ire, "Residue dissapeared from state alphabet");
+    } catch (IllegalSymbolException ire) {
+      throw new BioError(ire, "Symbol dissapeared from state alphabet");
     }
     
     FontRenderContext frc = g2.getFontRenderContext();
     for(Iterator i = info.iterator(); i.hasNext();) {
       ResVal rv = (ResVal) i.next();
       
-      GlyphVector gv = logoFont.createGlyphVector(frc, rv.getResidue().getSymbol() + "");
+      GlyphVector gv = logoFont.createGlyphVector(frc, rv.getToken().getToken() + "");
       Shape outline = gv.getOutline();
       Rectangle2D oBounds = outline.getBounds2D();
       
@@ -152,15 +152,15 @@ public class TextLogoPainter implements LogoPainter {
       outline = at.createTransformedShape(outline);
       
       try {
-        g2.setPaint(style.fillPaint(rv.getResidue()));
-      } catch (IllegalResidueException ire) {
+        g2.setPaint(style.fillPaint(rv.getToken()));
+      } catch (IllegalSymbolException ire) {
         g2.setPaint(Color.black);
       }
       g2.fill(outline);
       
       try {
-        g2.setPaint(style.outlinePaint(rv.getResidue()));
-      } catch (IllegalResidueException ire) {
+        g2.setPaint(style.outlinePaint(rv.getToken()));
+      } catch (IllegalSymbolException ire) {
         g2.setPaint(Color.gray);
       }
       g2.draw(outline);
@@ -175,28 +175,28 @@ public class TextLogoPainter implements LogoPainter {
   }
   
   /**
-   * A residue/information tuple.
+   * A symbol/information tuple.
    */
   private static class ResVal {
-    private Residue residue;
+    private Symbol symbol;
     private double value;
     
-    public final Residue getResidue() {
-      return residue;
+    public final Symbol getToken() {
+      return symbol;
     }
     
     public final double getValue() {
       return value;
     }
     
-    public ResVal(Residue res, double val) {
-      residue = res;
+    public ResVal(Symbol res, double val) {
+      symbol = res;
       value = val;
     }
   }
 
   /**
-   * The comparator for comparing residue/information tuples.
+   * The comparator for comparing symbol/information tuples.
    */
   private static class ResValComparator implements Comparator {
     public final int compare(Object o1, Object o2) {

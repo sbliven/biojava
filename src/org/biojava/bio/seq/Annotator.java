@@ -45,7 +45,7 @@ public interface Annotator {
    * @return a database of all modified sequences
    */
   public SequenceDB annotate(SequenceDB sdb)
-  throws IllegalSymbolException, SeqException;
+  throws IllegalSymbolException, BioException;
   
   /**
    * Annotate this single sequence.
@@ -54,5 +54,5 @@ public interface Annotator {
    * annotated.
    */
   public boolean annotate(Sequence seq)
-  throws IllegalSymbolException, SeqException;
+  throws IllegalSymbolException, BioException;
 }

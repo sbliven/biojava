@@ -23,7 +23,7 @@
 package org.biojava.bio.dp;
 
 import java.util.Map;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A no-frills implementation of StatePath.

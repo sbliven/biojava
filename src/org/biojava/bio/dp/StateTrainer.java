@@ -22,7 +22,7 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * An object that can be used to train a state up.
@@ -34,13 +34,13 @@ public interface StateTrainer {
   /**
    * Registers that res was counted in this state.
    * <P>
-   * This method may be called multiple times with the same residue. In this
+   * This method may be called multiple times with the same symbol. In this
    * case, the times should be summed.
    *
-   * @param res the Residue seen
+   * @param res the Symbol seen
    * @param times the number of times to add
    */
-  void addCount(Residue res, double times) throws IllegalResidueException;
+  void addCount(Symbol res, double times) throws IllegalSymbolException;
   
   /**
    * Trains the state, given a null model.
@@ -51,7 +51,7 @@ public interface StateTrainer {
    * @param nullModel the nullModel to use
    * @param weight  how many lots of the null model to add
    */
-  void train(EmissionState nullModel, double weight) throws IllegalResidueException;
+  void train(EmissionState nullModel, double weight) throws IllegalSymbolException;
   
   /**
    * Clears all of the counts to zero.

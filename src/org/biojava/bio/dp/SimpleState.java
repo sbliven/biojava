@@ -24,29 +24,29 @@ package org.biojava.bio.dp;
 
 import java.util.*;
 import org.biojava.bio.BioError;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 public class SimpleState extends AbstractState {
-  private Map residueToProb = new HashMap();
+  private Map symbolToProb = new HashMap();
   public final int [] advance;
   
   public final int [] getAdvance() {
     return advance;
   }
   
-  public double getWeight(Residue r) throws IllegalResidueException {
+  public double getWeight(Symbol r) throws IllegalSymbolException {
     if(r == MagicalState.MAGICAL_RESIDUE) {
       return Double.NEGATIVE_INFINITY;
     }
     try {
       alphabet().validate(r);
-    } catch (IllegalResidueException ire) {
-      throw new IllegalResidueException(
+    } catch (IllegalSymbolException ire) {
+      throw new IllegalSymbolException(
         ire,
         "Couldn't retrieve weight in state " + getName()
       );
     }
-    Double d = (Double) residueToProb.get(r);
+    Double d = (Double) symbolToProb.get(r);
     if(d == null) {
       return Double.NEGATIVE_INFINITY;
     } else {
@@ -54,12 +54,12 @@ public class SimpleState extends AbstractState {
     }
   }
 
-  public void setWeight(Residue r, double val) throws IllegalResidueException {
+  public void setWeight(Symbol r, double val) throws IllegalSymbolException {
     alphabet().validate(r);
     if(Double.isNaN(val)) {
       throw new Error("Can't set weight for " + r.getName() + " to " + val);
     }
-    residueToProb.put(r, new Double(val));
+    symbolToProb.put(r, new Double(val));
   }
   
   public SimpleState(FiniteAlphabet alpha, int [] advance) {

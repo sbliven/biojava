@@ -22,6 +22,8 @@
 
 package org.biojava.bio.dp;
 
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 public interface TrainingAlgorithm {
@@ -35,5 +37,5 @@ public interface TrainingAlgorithm {
    */
   void train(SequenceDB db, EmissionState nullModel,
              double nullWeight, StoppingCriteria stopper)
-  throws IllegalResidueException, SeqException;
+  throws IllegalSymbolException, BioException;
 }

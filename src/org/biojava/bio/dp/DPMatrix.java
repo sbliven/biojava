@@ -22,12 +22,12 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 public interface DPMatrix {
   State [] States();
   MarkovModel model();
-  ResidueList [] resList();
+  SymbolList [] resList();
   double getScore();
   double getCell(int [] index) throws IndexOutOfBoundsException;
 }

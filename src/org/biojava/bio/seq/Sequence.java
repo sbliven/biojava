@@ -69,5 +69,5 @@ public interface Sequence extends SymbolList, FeatureHolder, Annotatable {
    *         are of no use
    */
   Feature createFeature(MutableFeatureHolder fh, Feature.Template featureTemplate)
-  throws UnsupportedOperationException, IllegalArgumentException, SeqException;
+  throws UnsupportedOperationException, IllegalArgumentException, BioException;
 }

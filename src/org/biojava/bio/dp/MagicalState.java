@@ -24,7 +24,7 @@ package org.biojava.bio.dp;
 
 import java.util.*;
 import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * Start/end state for HMMs.
@@ -36,10 +36,10 @@ import org.biojava.bio.seq.*;
  */
 public class MagicalState implements EmissionState {
   /**
-   * The residue that implicitly exists at the beginning and end of every
-   * ResidueList (index 0 and length+1).
+   * The symbol that implicitly exists at the beginning and end of every
+   * SymbolList (index 0 and length+1).
    */
-  public static final Residue MAGICAL_RESIDUE;
+  public static final Symbol MAGICAL_RESIDUE;
 
   /**
    * The alphabet that contains only MAGICAL_RESIDUE.
@@ -53,13 +53,13 @@ public class MagicalState implements EmissionState {
   protected static final Map stateCache;
   
   static {
-    MAGICAL_RESIDUE = new SimpleResidue('!', "mMagical", null);
+    MAGICAL_RESIDUE = new SimpleSymbol('!', "mMagical", null);
     MAGICAL_ALPHABET = new SimpleAlphabet();
 
     try {
-      ((SimpleAlphabet) MAGICAL_ALPHABET).addResidue(MAGICAL_RESIDUE);
+      ((SimpleAlphabet) MAGICAL_ALPHABET).addSymbol(MAGICAL_RESIDUE);
       ((SimpleAlphabet) MAGICAL_ALPHABET).setName("Magical Alphabet");
-    } catch (IllegalResidueException ire) {
+    } catch (IllegalSymbolException ire) {
       throw new BioError(
         ire,
         "Could not complete static intialization of MagicalState"
@@ -88,7 +88,7 @@ public class MagicalState implements EmissionState {
     }
   }
 
-  public char getSymbol() {
+  public char getToken() {
     return '!';
   }
 
@@ -104,20 +104,20 @@ public class MagicalState implements EmissionState {
     return MAGICAL_ALPHABET;
   }
 
-  public double getWeight(Residue r) throws IllegalResidueException {
+  public double getWeight(Symbol r) throws IllegalSymbolException {
     if (r != MAGICAL_RESIDUE)
       return Double.NEGATIVE_INFINITY;
     return 0.0;
   }
 
-  public void setWeight(Residue r, double w) throws IllegalResidueException,
+  public void setWeight(Symbol r, double w) throws IllegalSymbolException,
   UnsupportedOperationException {
     alphabet().validate(r);
     throw new UnsupportedOperationException(
       "The weights are immutable: " + r.getName() + " -> " + w);
   }
 
-  public Residue sampleResidue() {
+  public Symbol sampleSymbol() {
     return MAGICAL_RESIDUE;
   }
 

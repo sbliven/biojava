@@ -25,12 +25,11 @@ package org.biojava.bio.dp;
 import java.util.*;
 
 import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.tools.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * Algorithms for dynamic programming (alignments) between pairs
- * of ResidueLists.
+ * of SymbolLists.
  * Based on a single-head DP implementation by Matt Pocock.
  *
  * @author Thomas Down
@@ -39,15 +38,15 @@ import org.biojava.bio.seq.tools.*;
 
 public class PairwiseDP extends DP {
     private EmissionState magicalState;
-    private Residue magicalResidue;
+    private Symbol magicalSymbol;
 
-    public PairwiseDP(MarkovModel mm) throws IllegalResidueException,
+    public PairwiseDP(MarkovModel mm) throws IllegalSymbolException,
                                            IllegalTransitionException,
                                            BioException
     {
 	super(mm);
 	magicalState = mm.magicalState();
-	magicalResidue = MagicalState.MAGICAL_RESIDUE;
+	magicalSymbol = MagicalState.MAGICAL_RESIDUE;
     }
 
     private final static int[] ia00 = {0, 0};
@@ -56,8 +55,8 @@ public class PairwiseDP extends DP {
     // BACKWARD
     //
 
-    public double backward(ResidueList[] seqs) 
-        throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    public double backward(SymbolList[] seqs) 
+        throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
 //  	if (seqs.length != 2)
 //  	    throw new IllegalArgumentException("This DP object only runs on pairs.");
@@ -69,8 +68,8 @@ public class PairwiseDP extends DP {
 	return backwardMatrix(seqs).getScore();
     }
 
-    public DPMatrix backwardMatrix(ResidueList[] seqs) 
-	throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    public DPMatrix backwardMatrix(SymbolList[] seqs) 
+	throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
 	if (seqs.length != 2)
 	    throw new IllegalArgumentException("This DP object only runs on pairs.");
@@ -83,8 +82,8 @@ public class PairwiseDP extends DP {
 	return matrix;
     }
 
-    public DPMatrix backwardMatrix(ResidueList[] seqs, DPMatrix d) 
-	throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    public DPMatrix backwardMatrix(SymbolList[] seqs, DPMatrix d) 
+	throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
 	return backwardMatrix(seqs);
     }
@@ -97,8 +96,8 @@ public class PairwiseDP extends DP {
     private PairDPCursor cursor;
     private CrossProductAlphabet alpha;
 
-    public double runBackward(ResidueList seq0, ResidueList seq1, PairDPCursor curs) 
-        throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    public double runBackward(SymbolList seq0, SymbolList seq1, PairDPCursor curs) 
+        throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
       states = getStates();
       cursor = curs;
@@ -148,39 +147,39 @@ public class PairwiseDP extends DP {
     private List ress = new ArrayList();
     private double[][][] matrix = new double [2][2][];
     private double[][][] emission = new double [2][2][];
-    private Residue[][] resMatrix = new Residue[2][2];
-    private Residue[][] resMatrixF = new Residue[2][2];
+    private Symbol[][] resMatrix = new Symbol[2][2];
+    private Symbol[][] resMatrixF = new Symbol[2][2];
     private int[] colId = new int[2];
 
     private void backwardPrepareCol(int i, int j)
-    throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
       // System.out.println("*** (" + i + "," + j + ")");
 
       ress.clear();
-      ress.add(cursor.residue(0, i+1));
-      ress.add(cursor.residue(1, j+1));
+      ress.add(cursor.symbol(0, i+1));
+      ress.add(cursor.symbol(1, j+1));
       resMatrix[1][1] = getResWrapper(alpha, ress);
       ress.clear();
-      ress.add(cursor.residue(0, i + 1));
-      ress.add(AlphabetManager.instance().getGapResidue());
+      ress.add(cursor.symbol(0, i + 1));
+      ress.add(AlphabetManager.instance().getGapSymbol());
       resMatrix[1][0] = getResWrapper(alpha, ress);
       ress.clear();
-      ress.add(AlphabetManager.instance().getGapResidue());
-      ress.add(cursor.residue(1, j + 1));
+      ress.add(AlphabetManager.instance().getGapSymbol());
+      ress.add(cursor.symbol(1, j + 1));
       resMatrix[0][1] = getResWrapper(alpha, ress);
 
       ress.clear();
-      ress.add(cursor.residue(0, i));
-      ress.add(cursor.residue(1, j));
+      ress.add(cursor.symbol(0, i));
+      ress.add(cursor.symbol(1, j));
       resMatrixF[1][1] = getResWrapper(alpha, ress);
       ress.clear();
-      ress.add(cursor.residue(0, i));
-      ress.add(AlphabetManager.instance().getGapResidue());
+      ress.add(cursor.symbol(0, i));
+      ress.add(AlphabetManager.instance().getGapSymbol());
       resMatrixF[1][0] = getResWrapper(alpha, ress);
       ress.clear();
-      ress.add(AlphabetManager.instance().getGapResidue());
-      ress.add(cursor.residue(1, j));
+      ress.add(AlphabetManager.instance().getGapSymbol());
+      ress.add(cursor.symbol(1, j));
       resMatrixF[0][1] = getResWrapper(alpha, ress);
 
       colId[0] = i;
@@ -209,7 +208,7 @@ public class PairwiseDP extends DP {
     }
 
     private void backwardCalcStepMatrix()
-    throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
       double[] curCol = matrix[0][0];
       int[] advance;
@@ -240,7 +239,7 @@ public class PairwiseDP extends DP {
           State destS = states[destI];
           if (destS instanceof EmissionState) {
             advance = ((EmissionState)destS).getAdvance();
-            Residue res = resMatrix[advance[0]][advance[1]];
+            Symbol res = resMatrix[advance[0]][advance[1]];
             if (res == null) {
               weight = Double.NEGATIVE_INFINITY;
             } else if (! (destS instanceof EmissionState)) {
@@ -282,8 +281,8 @@ public class PairwiseDP extends DP {
     // FORWARD
     // 
 
-    public double forward(ResidueList[] seqs) 
-        throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    public double forward(SymbolList[] seqs) 
+        throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
 	if (seqs.length != 2)
 	    throw new IllegalArgumentException("This DP object only runs on pairs.");
@@ -293,8 +292,8 @@ public class PairwiseDP extends DP {
 	return f.runForward(seqs[0], seqs[1], cursor);
     }
 
-    public DPMatrix forwardMatrix(ResidueList[] seqs) 
-	throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    public DPMatrix forwardMatrix(SymbolList[] seqs) 
+	throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
 	if (seqs.length != 2)
 	    throw new IllegalArgumentException("This DP object only runs on pairs.");
@@ -307,20 +306,20 @@ public class PairwiseDP extends DP {
 	return matrix;
     }
 
-    public DPMatrix forwardMatrix(ResidueList[] seqs, DPMatrix d) 
-	throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    public DPMatrix forwardMatrix(SymbolList[] seqs, DPMatrix d) 
+	throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
 	return forwardMatrix(seqs);
     }
 
     private static List gappedResList = new ArrayList();
 
-    private static Residue getResWrapper(CrossProductAlphabet a, List l) 
-        throws IllegalResidueException
+    private static Symbol getResWrapper(CrossProductAlphabet a, List l) 
+        throws IllegalSymbolException
     {
 //      System.out.println(a.getName() + " getting:");
 //      for (Iterator i = l.iterator(); i.hasNext(); ) {
-//          Residue blah = (Residue) i.next();
+//          Symbol blah = (Symbol) i.next();
 //          System.out.println(blah.getName());
 //      }
 
@@ -328,7 +327,7 @@ public class PairwiseDP extends DP {
 	    return null;
 
         if (l.contains(MagicalState.MAGICAL_RESIDUE)) {
-	    Residue gr = AlphabetManager.instance().getGapResidue();
+	    Symbol gr = AlphabetManager.instance().getGapSymbol();
 
 	    gappedResList.clear();
 	    boolean gotOther = false;
@@ -342,11 +341,11 @@ public class PairwiseDP extends DP {
 		}   
 	    }
 	    if (gotOther)
-		return a.getResidue(gappedResList);
+		return a.getSymbol(gappedResList);
 	    else
 		return MagicalState.MAGICAL_RESIDUE;
         }
-        return a.getResidue(l);
+        return a.getSymbol(l);
     }
 
   private class Forward {
@@ -357,8 +356,8 @@ public class PairwiseDP extends DP {
     private CrossProductAlphabet alpha;
     private boolean initializationHack = true;
 
-    public double runForward(ResidueList seq0, ResidueList seq1, PairDPCursor curs) 
-        throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    public double runForward(SymbolList seq0, SymbolList seq1, PairDPCursor curs) 
+        throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
 	states = getStates();
 	cursor = curs;
@@ -409,28 +408,28 @@ public class PairwiseDP extends DP {
 
     private List ress = new ArrayList();
     private double[][][] matrix = new double[2][2][];
-    private Residue[][] resMatrix = new Residue[2][2];
+    private Symbol[][] resMatrix = new Symbol[2][2];
     private int[] colId = new int[2];
 
     private void forwardPrepareCol(int i, int j)
-	throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+	throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
 	// System.out.println("*** (" + i + "," + j + ")");
 
 	ress.clear();
-	ress.add(cursor.residue(0, i));
-	ress.add(cursor.residue(1, j));
-	// resMatrix[1][1] = alpha.getResidue(ress);
+	ress.add(cursor.symbol(0, i));
+	ress.add(cursor.symbol(1, j));
+	// resMatrix[1][1] = alpha.getSymbol(ress);
 	resMatrix[1][1] = getResWrapper(alpha, ress);
 	ress.clear();
-	ress.add(cursor.residue(0, i));
-	ress.add(AlphabetManager.instance().getGapResidue());
-	// resMatrix[1][0] = alpha.getResidue(ress);
+	ress.add(cursor.symbol(0, i));
+	ress.add(AlphabetManager.instance().getGapSymbol());
+	// resMatrix[1][0] = alpha.getSymbol(ress);
 	resMatrix[1][0] = getResWrapper(alpha, ress);
 	ress.clear();
-	ress.add(AlphabetManager.instance().getGapResidue());
-	ress.add(cursor.residue(1, j));
-	// resMatrix[0][1] = alpha.getResidue(ress);
+	ress.add(AlphabetManager.instance().getGapSymbol());
+	ress.add(cursor.symbol(1, j));
+	// resMatrix[0][1] = alpha.getSymbol(ress);
 	resMatrix[0][1] = getResWrapper(alpha, ress);
 
 	colId[0] = i;
@@ -448,7 +447,7 @@ public class PairwiseDP extends DP {
     }
 
     private void forwardCalcStepMatrix()
-    throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
       double[] curCol = matrix[0][0];
       int[] advance;
@@ -464,7 +463,7 @@ public class PairwiseDP extends DP {
 
         if (states[l] instanceof EmissionState) {
           advance = ((EmissionState) states[l]).getAdvance();
-          Residue res = resMatrix[advance[0]][advance[1]];
+          Symbol res = resMatrix[advance[0]][advance[1]];
 		
       		if (res == null) {
             weight = Double.NEGATIVE_INFINITY;
@@ -524,8 +523,8 @@ public class PairwiseDP extends DP {
     // VITERBI!
     //
 
-    public StatePath viterbi(ResidueList[] seqs) 
-        throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    public StatePath viterbi(SymbolList[] seqs) 
+        throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
 	if (seqs.length != 2)
 	    throw new IllegalArgumentException("This DP object only runs on pairs.");
@@ -543,8 +542,8 @@ private class Viterbi {
     private CrossProductAlphabet alpha;
     private boolean initializationHack = true;
 
-    public StatePath runViterbi(ResidueList seq0, ResidueList seq1) 
-        throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    public StatePath runViterbi(SymbolList seq0, SymbolList seq1) 
+        throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
 	states = getStates();
 	cursor = new LightPairDPCursor(seq0, seq1, states.length, true);
@@ -600,8 +599,8 @@ private class Viterbi {
 	bp = bp.back; // skip final MagicalState match
 	while (bp != null) {
 	    statel.add(bp.state);
-	    resl.add(bp.residue);
-	    scorel.add(DoubleAlphabet.getResidue(bp.score));
+	    resl.add(bp.symbol);
+	    scorel.add(DoubleAlphabet.getSymbol(bp.score));
 	    bp = bp.back;
 	}
 	Collections.reverse(statel);
@@ -609,11 +608,11 @@ private class Viterbi {
 	Collections.reverse(scorel);
 	Map labelToList = new HashMap();
 	labelToList.put(StatePath.SEQUENCE,
-			new SimpleResidueList(alpha, resl));
+			new SimpleSymbolList(alpha, resl));
 	labelToList.put(StatePath.STATES, 
-			new SimpleResidueList(getModel().stateAlphabet(), statel));
+			new SimpleSymbolList(getModel().stateAlphabet(), statel));
 	labelToList.put(StatePath.SCORES,
-			new SimpleResidueList(DoubleAlphabet.getInstance(),
+			new SimpleSymbolList(DoubleAlphabet.getInstance(),
 					      scorel));
 	return new SimpleStatePath(col[l], labelToList);
     }
@@ -621,28 +620,28 @@ private class Viterbi {
     private List ress = new ArrayList();
     private double[][][] matrix = new double[2][2][];
     private BackPointer[][][] bpMatrix = new BackPointer[2][2][];
-    private Residue[][] resMatrix = new Residue[2][2];
+    private Symbol[][] resMatrix = new Symbol[2][2];
     private int[] colId = new int[2];
 
     private void viterbiPrepareCol(int i, int j)
-	throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+	throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
 	// System.out.println("*** (" + i + "," + j + ")");
 
 	ress.clear();
-	ress.add(cursor.residue(0, i));
-	ress.add(cursor.residue(1, j));
-	// resMatrix[1][1] = alpha.getResidue(ress);
+	ress.add(cursor.symbol(0, i));
+	ress.add(cursor.symbol(1, j));
+	// resMatrix[1][1] = alpha.getSymbol(ress);
 	resMatrix[1][1] = getResWrapper(alpha, ress);
 	ress.clear();
-	ress.add(cursor.residue(0, i));
-	ress.add(AlphabetManager.instance().getGapResidue());
-	// resMatrix[1][0] = alpha.getResidue(ress);
+	ress.add(cursor.symbol(0, i));
+	ress.add(AlphabetManager.instance().getGapSymbol());
+	// resMatrix[1][0] = alpha.getSymbol(ress);
 	resMatrix[1][0] = getResWrapper(alpha, ress);
 	ress.clear();
-	ress.add(AlphabetManager.instance().getGapResidue());
-	ress.add(cursor.residue(1, j));
-	// resMatrix[0][1] = alpha.getResidue(ress);
+	ress.add(AlphabetManager.instance().getGapSymbol());
+	ress.add(cursor.symbol(1, j));
+	// resMatrix[0][1] = alpha.getSymbol(ress);
 	resMatrix[0][1] = getResWrapper(alpha, ress);
 
 	colId[0] = i;
@@ -663,7 +662,7 @@ private class Viterbi {
     }
 
     private void viterbiCalcStepMatrix()
-    throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
       double[] curCol = (double[]) matrix[0][0];
       int[] advance;
@@ -681,7 +680,7 @@ private class Viterbi {
           advance = ia00;
         }
         
-	    Residue res = resMatrix[advance[0]][advance[1]];
+	    Symbol res = resMatrix[advance[0]][advance[1]];
 	    double weight = Double.NEGATIVE_INFINITY;
 	    if (res == null) {
 		weight = Double.NEGATIVE_INFINITY;
@@ -762,13 +761,13 @@ private class Viterbi {
     State state;
     BackPointer back;
     double score;
-    Residue residue;
+    Symbol symbol;
     
-    BackPointer(State state, BackPointer back, double score, Residue residue) {
+    BackPointer(State state, BackPointer back, double score, Symbol symbol) {
       this.state = state;
       this.back = back;
       this.score = score;
-      this.residue = residue;
+      this.symbol = symbol;
     }
   }
 
@@ -777,7 +776,7 @@ private class Viterbi {
     int getPos(int dim);
     boolean canAdvance(int dim);
     void advance(int dim);
-    Residue residue(int dim, int poz);
+    Symbol symbol(int dim, int poz);
     double[] getColumn(int[] coords);
     double[] getCurrentColumn();
     BackPointer[] getBackPointers(int[] coords);
@@ -796,7 +795,7 @@ private class Viterbi {
     private BackPointer[][] s2prevBP;
     
     private int[] pos;
-    private ResidueList[] seqs;
+    private SymbolList[] seqs;
     private int numStates;
 
     private double[] zeroCol;
@@ -805,8 +804,8 @@ private class Viterbi {
     private BackPointer[] zeroColBP;
 
     public LightPairDPCursor(
-      ResidueList seq1,
-			ResidueList seq2,
+      SymbolList seq1,
+			SymbolList seq2,
 			int states, boolean bp
     ) {
       this.storeBPs = bp;
@@ -836,7 +835,7 @@ private class Viterbi {
 
     	pos = new int[2];
       pos[0] = pos[1] = 0;
-      seqs = new ResidueList[2];
+      seqs = new SymbolList[2];
       seqs[0] = seq1;
       seqs[1] = seq2;
     }
@@ -898,11 +897,11 @@ private class Viterbi {
       }
     }
 
-    public Residue residue(int dim, int poz) {
+    public Symbol symbol(int dim, int poz) {
       if (poz == 0 || poz > seqs[dim].length()) {
         return MagicalState.MAGICAL_RESIDUE;
       } else {
-        return seqs[dim].residueAt(poz);
+        return seqs[dim].symbolAt(poz);
       }
     }
 
@@ -979,7 +978,7 @@ private class Viterbi {
 
   private static class MatrixPairDPCursor implements PairDPCursor {
     private int[] pos;
-    private ResidueList[] seqs;
+    private SymbolList[] seqs;
     private int numStates;
 
     private double[] zeroCol;
@@ -987,8 +986,8 @@ private class Viterbi {
     private double[][][] sMatrix;
 
     public MatrixPairDPCursor(
-      ResidueList seq1,
-			ResidueList seq2,
+      SymbolList seq1,
+			SymbolList seq2,
 			PairDPMatrix matrix
     ) {
       numStates = matrix.States().length;
@@ -1002,7 +1001,7 @@ private class Viterbi {
 
       pos = new int[2];
       pos[0] = pos[1] = 0;
-      seqs = new ResidueList[2];
+      seqs = new SymbolList[2];
       seqs[0] = seq1;
       seqs[1] = seq2;
     }
@@ -1019,11 +1018,11 @@ private class Viterbi {
       pos[dim]++;
     }
 
-    public Residue residue(int dim, int poz) {
+    public Symbol symbol(int dim, int poz) {
       if (poz == 0 || poz > seqs[dim].length()) {
         return MagicalState.MAGICAL_RESIDUE;
       } else {
-        return seqs[dim].residueAt(poz);
+        return seqs[dim].symbolAt(poz);
       }
     }
 
@@ -1052,7 +1051,7 @@ private class Viterbi {
 
   private class BackMatrixPairDPCursor implements PairDPCursor {
     private int[] pos;
-    private ResidueList[] seqs;
+    private SymbolList[] seqs;
     private int numStates;
 
     private double[] zeroCol;
@@ -1062,8 +1061,8 @@ private class Viterbi {
     private double[][][] eMatrix;
 
     public BackMatrixPairDPCursor(
-      ResidueList seq1,
-      ResidueList seq2,
+      SymbolList seq1,
+      SymbolList seq2,
       PairDPMatrix matrix
     ) {
       State[] states = matrix.States();
@@ -1085,7 +1084,7 @@ private class Viterbi {
       pos = new int[2];
       pos[0] = seq1.length() + 1;
       pos[1] = seq2.length() + 1;
-      seqs = new ResidueList[2];
+      seqs = new SymbolList[2];
       seqs[0] = seq1;
       seqs[1] = seq2;
     }
@@ -1102,14 +1101,14 @@ private class Viterbi {
       pos[dim]--;
     }
 
-    public Residue residue(int dim, int poz) {
+    public Symbol symbol(int dim, int poz) {
       if (poz > seqs[dim].length() + 1) {
         return null;
       }
       if (poz == 0 || poz > seqs[dim].length()) {
         return MagicalState.MAGICAL_RESIDUE;
       }
-      return seqs[dim].residueAt(poz);
+      return seqs[dim].symbolAt(poz);
     }
 
     public double[] getColumn(int[] coords) {

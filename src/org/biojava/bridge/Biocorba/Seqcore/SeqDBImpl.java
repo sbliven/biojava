@@ -19,7 +19,7 @@ implements _SeqDB_Operations {
       _Seq_Tie st = new _Seq_Tie(si);
       seqDB._orb().connect(st);
       return st;
-    } catch (SeqException se) {
+    } catch (BioException se) {
       throw new UnableToProcess(se.getMessage());
     } catch (IllegalAlphabetException iae) {
       throw new UnableToProcess(iae.getMessage());

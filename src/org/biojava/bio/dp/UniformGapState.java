@@ -22,9 +22,9 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.tools.*;
 import java.util.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * Simple state for representing gaps in multiheaded HMMs.
@@ -34,10 +34,10 @@ import java.util.*;
  */
 
 public class UniformGapState implements EmissionState {
-    private final static Residue GAP;
+    private final static Symbol GAP;
 
     static {
-	GAP = AlphabetManager.instance().getGapResidue();
+	GAP = AlphabetManager.instance().getGapSymbol();
     }
 
     private final CrossProductAlphabet alpha;
@@ -64,7 +64,7 @@ public class UniformGapState implements EmissionState {
 	}
 	
 	if (! subAlpha.contains(GAP)) {
-	    throw new IllegalAlphabetException("Alphabet " + subAlpha.getName() + " does not contain the Gap special Residue.");
+	    throw new IllegalAlphabetException("Alphabet " + subAlpha.getName() + " does not contain the Gap special Symbol.");
 	}
 
 	if (advance.length != alpha.getAlphabets().size())
@@ -89,11 +89,11 @@ public class UniformGapState implements EmissionState {
 	return alpha;
     }
 
-    public double getWeight(Residue r) throws IllegalResidueException {
+    public double getWeight(Symbol r) throws IllegalSymbolException {
 	alpha.validate(r);
-	List srl = ((CrossProductResidue) r).getResidues();
+	List srl = ((CrossProductSymbol) r).getSymbols();
 	for (int i = 0; i < advance.length; ++i) {
-	    Residue sr = (Residue) srl.get(i);
+	    Symbol sr = (Symbol) srl.get(i);
 	    if (sr==GAP && advance[i] > 0)
 		return Double.NEGATIVE_INFINITY;
 	    if (sr != GAP && advance[i] == 0)
@@ -102,12 +102,12 @@ public class UniformGapState implements EmissionState {
 	return gapScore;
     }
 
-    public void setWeight(Residue r, double w) throws IllegalResidueException, UnsupportedOperationException
+    public void setWeight(Symbol r, double w) throws IllegalSymbolException, UnsupportedOperationException
     {
 	throw new UnsupportedOperationException();
     }
 
-    public Residue sampleResidue() {
+    public Symbol sampleSymbol() {
 	throw new UnsupportedOperationException();
     }
 
@@ -122,7 +122,7 @@ public class UniformGapState implements EmissionState {
 	this.name = name;
     }
 
-    public char getSymbol() {
+    public char getToken() {
 	return name.charAt(0);
     }
 
