@@ -196,7 +196,7 @@ public class IsoelectricPointCalc
         ComputeObject computeObj = new ChargeCalculator(peptide, hasFreeNTerm, hasFreeCTerm);
 
         // solve the charge equation
-        double pI = BinarySearch.solve(1.0, 13.0, 0.001, computeObj);
+        double pI = BinarySearch.solve(0.3, 13.7, 0.001, computeObj);
 
         return pI;
 
