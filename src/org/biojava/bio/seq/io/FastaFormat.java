@@ -40,7 +40,7 @@ public class FastaFormat implements SequenceFormat {
   /**
    * The default description reader.
    */
-  private static final DEFAULT_DESCRIPTION_READER;
+  private static final FastaDescriptionReader DEFAULT_DESCRIPTION_READER;
   
   static {
     DEFAULT_DESCRIPTION_READER = new DefaultDescriptionReader();
