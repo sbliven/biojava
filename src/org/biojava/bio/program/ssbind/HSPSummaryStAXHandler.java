@@ -96,7 +96,7 @@ public class HSPSummaryStAXHandler extends SeqSimilarityStAXHandler
 
         attr = attrs.getValue("hitSequenceType");
         if (attr != null)
-            sch.addSubHitProperty("hitSequenceType", attr);
+            sch.addSubHitProperty("subjectSequenceType", attr);
 
         // These are not explicitly set by BLASTP
         attr = attrs.getValue("queryStrand");

@@ -136,7 +136,7 @@ public class HitStAXHandler extends SeqSimilarityStAXHandler
                                  DelegationManager dm)
         throws SAXException
         {
-            ssContext.getSearchContentHandler().addHitProperty("HitId", attr.getValue("id"));
+            ssContext.getSearchContentHandler().addHitProperty("subjectId", attr.getValue("id"));
         }
     }
 
@@ -164,7 +164,7 @@ public class HitStAXHandler extends SeqSimilarityStAXHandler
     {
         protected void setStringValue(String s)
         {
-            ssContext.getSearchContentHandler().addHitProperty("desc", s);
+            ssContext.getSearchContentHandler().addHitProperty("subjectDescription", s);
         }
     }
 

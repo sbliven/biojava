@@ -82,17 +82,21 @@ import org.biojava.bio.seq.db.*;
  * </tr>
  * <tr>
  *   <td>program</td>
- *   <td>either this value or the hitSequenceType value must be set. This can take values
+ *   <td>either this value or the subjectSequenceType value must be set. This can take values
  *       acceptable to AlphabetResolver. These are BLASTN, BLASTP, BLASTX, TBLASTN,
  *       TBLASTX, DNA and PROTEIN. </td>
  * </tr>
  * <tr>
- *   <td>hitSequenceType</td>
+ *   <td>subjectSequenceType</td>
  *   <td>type of sequence that hit is. Can be DNA or PROTEIN.</td>
  * </tr>
  * <tr>
- *   <td>HitId</td>
+ *   <td>subjectId</td>
  *   <td>id of sequence that is hit</td>
+ * </tr>
+ * <tr>
+ *   <td>subjectDescription</td>
+ *   <td>description of sequence that is hit</td>
  * </tr>
  * <tr>
  *   <td>queryStrand</td>
@@ -399,8 +403,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         if (sStrand == null)
             nullSubjectStrand = true;
 
-        // Compare all other values. Note --i > 0 as we are comparing
-        // all the index 0 value
+        // Compare all other values
         for (int i = subs.length; --i > 0;)
         {
             Strand qS = subs[i].getQueryStrand();
@@ -435,7 +438,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         if (nullSubjectStrand)
             sStrand = null;
 
-        String subjectID = (String) hitData.get("HitId");
+        String subjectID = (String) hitData.get("subjectId");
 
         return new SimpleSeqSimilaritySearchHit(sc, ev, pv,
                                                 qStart, qEnd, qStrand,
@@ -460,8 +463,8 @@ public class BlastLikeSearchBuilder implements SearchBuilder
             String identifier;
 
             // Try explicit sequence type first
-            if (subHitData.containsKey("hitSequenceType"))
-                identifier = (String) subHitData.get("hitSequenceType");
+            if (subHitData.containsKey("subjectSequenceType"))
+                identifier = (String) subHitData.get("subjectSequenceType");
             // Otherwise try to resolve from the program name (only
             // works for Blast)
             else if (resultPreAnnotation.containsKey("program"))
@@ -563,7 +566,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
 
         tokenBuffer = new StringBuffer(1024);
         tokenBuffer.append((String) subHitData.remove("subjectSequence"));
-        labelMap.put(hitData.get("HitId"),
+        labelMap.put(hitData.get("subjectId"),
                      new SimpleSymbolList(tokenParser, tokenBuffer.substring(0)));
 
         return new SimpleSeqSimilaritySearchSubHit(sc, ev, pv,
