@@ -82,15 +82,15 @@ import org.biojava.utils.walker.WalkerFactory;
  * <table border="1" > 
 * <tr>
  * <td>subjectId</td>
- * <td></td>
+ * <td>String.  Identity of subject (target) sequence.</td>
  * </tr>
  * <tr>
- * <td>subjectSequenceLengt</td>
- * <td></td>
+ * <td>subjectSequenceLength</td>
+ * <td>String representation of integer value</td>
  * </tr>
  * <tr>
  * <td>subjectDescription</td>
- * <td></td>
+ * <td>String.</td>
  * </tr>
  * <tr>
  * <td></td>
