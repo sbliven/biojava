@@ -17,8 +17,20 @@ import java.util.Iterator;
 class EmptySymbolList
 extends Unchangeable
 implements SymbolList, Serializable {
+  private Alphabet alphabet;
+
+  EmptySymbolList()
+  {
+    this.alphabet = Alphabet.EMPTY_ALPHABET;
+  }
+
+  EmptySymbolList(Alphabet alpha)
+  {
+    this.alphabet = alpha;
+  }
+
   public Alphabet getAlphabet() {
-    return Alphabet.EMPTY_ALPHABET;
+    return alphabet;
   }
 
   public int length() {

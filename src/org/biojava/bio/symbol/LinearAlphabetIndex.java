@@ -49,8 +49,8 @@ class LinearAlphabetIndex
 {
   private /*final*/ Reference alphaRef;
   private Symbol[] symbols;
-  private ChangeListener indexBuilder;  // todo: not used - can we nuke this?
-  private ChangeListener adapter;       // todo: not used - can we nuke this?
+  private ChangeListener indexBuilder; // todo: not used - can we nuke this? MRP
+  private ChangeListener adapter;      // todo: not used - can we nuke this? MRP
 
   // hack for bug in compaq 1.2?
   protected ChangeSupport getChangeSupport(ChangeType ct) {

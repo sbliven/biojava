@@ -93,6 +93,10 @@ import org.biojava.bio.symbol.ChunkedSymbolList;
  * implementation allows for faster SymbolList creation and access
  * for small sequences while allowing a more space-efficient
  * implementation to be selected for large sequences.
+ * <p>
+ * <b>NOTE:</b> This class is inherantly not threadsafe. You should create one
+ * instance for each symbol list you wish to manufacture, and then you should
+ * throw that instance away.
  *
  * @author David Huen
  */
@@ -101,8 +105,8 @@ public class ChunkedSymbolListFactory
     /**
      * operating mode
      */
-    final private static int AUTO_SELECT = 1;
-    final private static int SUPPLIED_FACTORY = 2;
+    private final static int AUTO_SELECT = 1;
+    private final static int SUPPLIED_FACTORY = 2;
     private final static int CHUNK_SIZE = 1<<14;
 
     private final SymbolListFactory userSymListFactory;
@@ -303,7 +307,7 @@ public class ChunkedSymbolListFactory
             // no.  The only chunk if any is at headChunk.
             if (headChunkPos == 0) {
                 // no symbols!
-                return SymbolList.EMPTY_LIST;
+                return SymbolListViews.emptyList(alfa);
             }
             else {
                 // we do have ONE chunk to deal with.
@@ -315,7 +319,7 @@ public class ChunkedSymbolListFactory
                 }
 
                 // now return a SubArraySymbolList
-                return new SubArraySymbolList(headChunk, headChunkPos, 0, alfa);
+                return new SimpleSymbolList(headChunk, headChunkPos, alfa);
             }
         }
         else {

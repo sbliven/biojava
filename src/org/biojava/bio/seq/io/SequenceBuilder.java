@@ -36,6 +36,10 @@ import org.biojava.bio.seq.Sequence;
  * SequenceBuilder.
  * </p>
  *
+ * <b>Note:</b> These are one-shot objects that can be used just once to make
+ * one sequence. After that, they should be discarded. The usual way to get a
+ * supply of these is via a SequenceBuilderFactory.
+ *
  * @author Thomas Down
  * @since 1.1 [newio proposal]
  */

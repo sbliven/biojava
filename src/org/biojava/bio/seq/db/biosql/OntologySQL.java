@@ -61,8 +61,11 @@ import org.biojava.utils.ChangeVetoException;
 class OntologySQL {
 
   private static HashMap ONTOLOGIES = new HashMap();
-  
-  static synchronized OntologySQL getOntologySQL(DataSource source, DBHelper dbHelper) throws BioException, SQLException {
+
+  static synchronized OntologySQL getOntologySQL(DataSource source,
+                                                 DBHelper dbHelper)
+          throws BioException, SQLException
+  {
     OntologySQL ontologySQL = (OntologySQL) ONTOLOGIES.get(source);
     if (ontologySQL == null) {
       ontologySQL = new OntologySQL(source, dbHelper);
@@ -273,20 +276,20 @@ class OntologySQL {
           throws SQLException, OntologyException, ChangeVetoException
   {
     Connection conn = source.getConnection();
-    String query =  
+    String query =
         " SELECT term.term_id, term.name, term.definition, " +
         "       term_relationship.term_relationship_id, " +
         "       term_relationship.subject_term_id, " +
         "       term_relationship.object_term_id, " +
         "       term_relationship.predicate_term_id ";
     if (dbHelper.getJoinStyle() == DBHelper.JOIN_ORACLE8) {
-      query += 
+      query +=
         "FROM term, term_relationship_term, term_relationship " +
         "     WHERE term.term_id = term_relationship_term.term_id (+) " +
         "     AND term_relationship_term.term_relationship_id = term_relationship.term_relationship_id (+) " +
         "AND term.ontology_id = ? ";
     } else {
-      query += 
+      query +=
         "FROM term LEFT OUTER JOIN term_relationship_term " +
         "     ON term.term_id = term_relationship_term.term_id LEFT OUTER JOIN term_relationship " +
         "     ON term_relationship_term.term_relationship_id = term_relationship.term_relationship_id " +
@@ -314,7 +317,7 @@ class OntologySQL {
         t = ont.createTerm(name, description);
       } else {
         int subject_term_id = rs.getInt(5);
-        int object_term_id = rs.getInt(6); 
+        int object_term_id = rs.getInt(6);
         int predicate_term_id = rs.getInt(7);
 
         //System.err.println("Loading triple: " + term_relation_id + " -> " + subject_term_id + ", " + object_term_id + ", " + predicate_term_id);

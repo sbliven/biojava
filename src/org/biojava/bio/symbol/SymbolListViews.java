@@ -28,7 +28,7 @@ package org.biojava.bio.symbol;
  * @author Matthew Pocock
  * @since 1.1
  */
- 
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -48,7 +48,7 @@ import org.biojava.utils.Unchangeable;
 
 public final class SymbolListViews {
   private SymbolListViews() {}
-  
+
     /**
      * An n-th order view of another SymbolList.
      * <p>
@@ -60,7 +60,7 @@ public final class SymbolListViews {
      * @param order The window size
      */
 
-    public static SymbolList orderNSymbolList(SymbolList source, int order) 
+    public static SymbolList orderNSymbolList(SymbolList source, int order)
         throws IllegalAlphabetException
     {
 	if (order == 1)
@@ -124,19 +124,19 @@ public final class SymbolListViews {
     {
 	return new TranslatedSymbolList(symbols, table);
     }
-    
+
     /**
      * Construct an alignment of the SymbolLists contained in the values collection
      * of <code>labelToSymList</code>.
      *
      * @param labelToSymList A Map containing label -> SymbolList mappings
      */
-    
+
     public static Alignment alignment(Map labelToSymList)
     throws IllegalArgumentException {
       return new SimpleAlignment(labelToSymList);
     }
-    
+
     /**
      * View a SymbolList over a cross-product Alphabet as an Alignment.
      *
@@ -144,13 +144,13 @@ public final class SymbolListViews {
      *               as the order <code>symList</code>'s Alphabet.
      * @param symList a SymbolList over a cross-product alphabet.
      */
-     
-    
+
+
     public static Alignment alignment(List labels, SymbolList symList)
     throws IllegalArgumentException {
       return new SymListAsAlignment(labels, symList);
     }
-    
+
     /**
      * View a portion of a SymbolList.  Unlike SymbolList.subList, this
      * method is guarenteed to return a view, which will change when
@@ -162,7 +162,7 @@ public final class SymbolListViews {
      * @throws IllegalArgumentException if the start or end points fall outside the parent SymbolList.
      * @since 1.4
      */
-     
+
     public static SymbolList subList(SymbolList parent, int start, int end)
         throws IllegalArgumentException
     {
@@ -171,7 +171,7 @@ public final class SymbolListViews {
                 "Sublist index out of bounds " + parent.length() + ":" + start + "," + end
             );
         }
-        
+
         if (end < start) {
             throw new IllegalArgumentException(
                 "end must not be lower than start: start=" + start + ", end=" + end
@@ -179,69 +179,81 @@ public final class SymbolListViews {
         }
         return new SubList(parent, start, end);
     }
-    
+
+  /**
+   * Get a new immutable, empty symbol list with the given alphabet.
+   *
+   * @since 1.4
+   * @param alpha   the Alphabet this symbol list is over
+   * @return  a new empty SymbolList
+   */
+  public static SymbolList emptyList(Alphabet alpha)
+  {
+    return new EmptySymbolList(alpha);
+  }
+
     private static class SymListAsAlignment
     extends Unchangeable
     implements Alignment {
       private final SymbolList symList;
       private final List labels;
-      
+
       public SymListAsAlignment(List labels, SymbolList symList) {
         if(labels.size() != symList.getAlphabet().getAlphabets().size()) {
           throw new IllegalArgumentException("There must be one label per symbol list");
         }
-        
+
         this.labels = Collections.unmodifiableList(new ArrayList(labels));
         this.symList = symList;
       }
-      
+
       public List getLabels() {
         return labels;
       }
-      
+
       public SequenceIterator sequenceIterator() {
         throw new UnsupportedOperationException("This method sucks");
       }
-    
+
       public Iterator symbolListIterator() {
         return new Alignment.SymbolListIterator(this);
       }
-      
+
       public Symbol symbolAt(Object label, int column) {
         BasisSymbol sym = (BasisSymbol) symList.symbolAt(column);
         return (Symbol) sym.getSymbols().get(labels.indexOf(label));
       }
-      
+
       public SymbolList symbolListForLabel(Object label) {
         return new IndexedSymbolList(symList, labels.indexOf(label));
       }
-      
+
       public Alphabet getAlphabet() {
         return symList.getAlphabet();
       }
-      
+
       public Iterator iterator() {
         return symList.iterator();
       }
-      
+
       public int length() {
         return symList.length();
       }
-      
+
       public String seqString() {
         return symList.seqString();
       }
-      
+
       public SymbolList subList(int start, int end)
       throws IndexOutOfBoundsException {
         return symList.subList(start, end);
       }
-      
+
       public String subStr(int start, int end)
       throws IndexOutOfBoundsException {
         return symList.subStr(start, end);
       }
-      
+
       public void edit(Edit edit)
       throws
         IndexOutOfBoundsException,
@@ -250,44 +262,44 @@ public final class SymbolListViews {
       {
         symList.edit(edit);
       }
-      
+
       public List toList() {
         return symList.toList();
       }
-      
+
       public Symbol symbolAt(int indx)
       throws IndexOutOfBoundsException {
         return symList.symbolAt(indx);
       }
-      
+
       public Alignment subAlignment(Set labels, Location loc) {
         throw new UnsupportedOperationException("Fixme: this needs to be implemented");
       }
     }
-    
+
     private static class IndexedSymbolList
     extends AbstractSymbolList {
       private final int indx;
       private final SymbolList symList;
-      
+
       public IndexedSymbolList(SymbolList symList, int indx)
       throws IllegalArgumentException {
         if(indx >= symList.getAlphabet().getAlphabets().size()) {
           throw new IllegalArgumentException("index too high");
         }
-        
+
         this.indx = indx;
         this.symList = symList;
       }
-      
+
       public Alphabet getAlphabet() {
         return (Alphabet) symList.getAlphabet().getAlphabets().get(indx);
       }
-      
+
       public int length() {
         return symList.length();
       }
-      
+
       public Symbol symbolAt(int indx)
       throws IndexOutOfBoundsException {
         return (Symbol) ((BasisSymbol) symList.symbolAt(indx)).getSymbols().get(this.indx);

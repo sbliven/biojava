@@ -155,7 +155,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                             String biodatabase,
                             boolean create)
         throws BioException {
-        
+
         try {
             dataSource = JDBCPooledDataSource.getDataSource(dbDriver, dbURL, dbUser, dbPass);
         } catch (Exception ex) {
@@ -163,7 +163,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         }
         this.initDb(biodatabase, create);
     }
-    
+
     /**
      * Connect to a BioSQL database.
      *
@@ -183,7 +183,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                             String biodatabase,
                             boolean create)
         throws BioException {
-        
+
         try {
             Driver drv = DriverManager.getDriver(dbURL);
             dataSource = JDBCPooledDataSource.getDataSource(drv.getClass().getName(), dbURL, dbUser, dbPass);
@@ -197,12 +197,12 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                             String biodatabase,
                             boolean create)
         throws BioException {
-        
+
         dataSource = ds;
         this.initDb(biodatabase, create);
     }
-    
-    void initDb(String biodatabase, boolean create) 
+
+    void initDb(String biodatabase, boolean create)
         throws BioException {
 
         // Create helpers
@@ -214,16 +214,16 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         try {
             Connection conn = dataSource.getConnection();
             conn.setAutoCommit(false);
-            
+
             // DBHelper needs to be initialized before checks and ontologies are created
             helper = DBHelper.getDBHelper(conn);
-            
+
             // Check that BioSQL database schema is post-Singapore
             if (! isDbSchemaSupported()) {
                 throw new BioException("This database appears to be an old (pre-Singapore) BioSQL."
                                        + " If you need to access it, try an older BioJava snapshot (1.3pre1 or earlier)");
             }
-            
+
             if (! isBioentryPropertySupported()) {
                 throw new BioException("This database appears to be an old (pre-Cape-Town) BioSQL."
                                        + " If you need to access it, try an older BioJava snapshot");
@@ -237,7 +237,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
             } catch (SQLException ex) {
                 throw new BioException("Error accessing ontologies", ex);
             }
-            
+
             PreparedStatement getID = conn.prepareStatement("select * from biodatabase where name = ?");
             getID.setString(1, biodatabase);
             ResultSet rs = getID.executeQuery();
@@ -252,14 +252,14 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 rs.close();
                 getID.close();
             }
-            
+
             if (create) {
                 PreparedStatement createdb = conn.prepareStatement("insert into biodatabase (name) values ( ? )");
                 createdb.setString(1, biodatabase);
                 createdb.executeUpdate();
                 conn.commit();
                 createdb.close();
-                
+
                 dbid = getDBHelper().getInsertID(conn, "biodatabase", "biodatabase_id");
             } else {
                 throw new BioException("Biodatabase " + biodatabase + " doesn't exist");
@@ -310,12 +310,12 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         throws ChangeVetoException, BioException
     {
         int version = 1;
-        
+
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
-            
+
             PreparedStatement create_bioentry = conn.prepareStatement(
                                                                       "insert into bioentry " +
                                                                       "(biodatabase_id, display_id, accession, entry_version, division) " +
@@ -327,7 +327,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
             create_bioentry.setString(5, "?");
             create_bioentry.executeUpdate();
             create_bioentry.close();
-            
+
             int bioentry_id = getDBHelper().getInsertID(conn, "bioentry", "bioentry_id");
 
             PreparedStatement create_dummy = conn.prepareStatement("insert into biosequence " +
@@ -371,7 +371,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         throws ChangeVetoException, BioException {
         String seqName = idmaker.calcID(seq);
         int version = 1;
-        
+
         Alphabet seqAlpha = seq.getAlphabet();
         SymbolTokenization seqToke;
         try {
@@ -517,7 +517,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         } else {
             throw new BioError("Neither a name nor an internal ID was supplied");
         }
-        
+
         if (seq != null) {
             return seq;
         }
@@ -638,7 +638,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 throw new BioException("There are still references to sequence with ID " + id + " from this database.");
             }
         }
-        
+
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
@@ -651,9 +651,9 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
             ResultSet rs = get_sequence.executeQuery();
             boolean exists;
             if ((exists = rs.next())) {
-                
+
                 // For MySQL4 (default is to use InnoDB tables), delete is via a CASCADE
-                // so only have to delete from bioentry to get all references to that 
+                // so only have to delete from bioentry to get all references to that
                 // bioentry deleted
                 DBHelper.DeleteStyle dstyle = getDBHelper().getDeleteStyle();
                 int bioentry_id = rs.getInt(1);
@@ -680,7 +680,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                     delete_qv.close();
 
                     ArrayList generic_ids = null;  // default delete style will cache seqfeature_id's that need to be deleted
-            
+
                     PreparedStatement delete_locs;
                     if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
                         delete_locs = conn.prepareStatement("delete from location" +
@@ -751,18 +751,18 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                     delete_features.setInt(1, bioentry_id);
                     delete_features.executeUpdate();
                     delete_features.close();
-                
-                    PreparedStatement delete_biosequence = 
+
+                    PreparedStatement delete_biosequence =
                         conn.prepareStatement("delete from biosequence where bioentry_id = ?");
 
                     delete_biosequence.setInt(1, bioentry_id);
                     delete_biosequence.executeUpdate();
                     delete_biosequence.close();
                 } // End of if for non-MYSQL4 deletion
-                
+
                 // All DB types must delete the bioentry via its id
                 // MySQL4 only needs to delete this, as it will cascade delete all references to it
-                PreparedStatement delete_entry = 
+                PreparedStatement delete_entry =
                     conn.prepareStatement("delete from bioentry where bioentry_id = ?");
                 delete_entry.setInt(1, bioentry_id);
                 int status = delete_entry.executeUpdate();
@@ -836,7 +836,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         if (key.equals(OrganismParser.PROPERTY_ORGANISM)) {
             int taxon_id = TaxonSQL.putTaxon(conn, getDBHelper(), (Taxon) value);
             if (taxon_id != -1) {
-                PreparedStatement set_taxon = conn.prepareStatement("update bioentry set taxon_id = ? " 
+                PreparedStatement set_taxon = conn.prepareStatement("update bioentry set taxon_id = ? "
                                                                     + " where bioentry_id = ?");
                 set_taxon.setInt(1, taxon_id);
                 set_taxon.setInt(2, bioentry_id);

@@ -31,6 +31,7 @@ import org.biojava.utils.walker.Visitor;
 import org.biojava.utils.walker.Walker;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.LocationTools;
+import org.biojava.bio.symbol.RangeLocation;
 
 /**
  * A set of FeatureFilter algebraic operations.
@@ -296,6 +297,10 @@ public class FilterUtils {
 
   public final static FeatureFilter overlapsLocation(Location loc) {
     return new FeatureFilter.OverlapsLocation(loc);
+  }
+
+  public final static FeatureFilter overlapsExtent(Location loc) {
+    return new FeatureFilter.OverlapsExtent(loc);
   }
 
   public final static FeatureFilter bySequenceName(String name) {
