@@ -342,8 +342,8 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 		Location compound = Location.empty;
 		for (Iterator i = oldLoc.blockIterator(); i.hasNext(); ) {
 		    Location oldBlock = (Location) i.next();
-		    compound = compound.union(new RangeLocation(translate - oldLoc.getMax(),
-								translate - oldLoc.getMin()));
+		    compound = compound.union(new RangeLocation(translate - oldBlock.getMax(),
+								translate - oldBlock.getMin()));
 		}
 		return compound;
 	    }
