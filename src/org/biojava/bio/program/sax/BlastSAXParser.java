@@ -716,7 +716,7 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 	    }
 	    return oLine;
 	}
-	return poLine;;
+	return poLine;
 
     //    this.endElement(new QName(this,this.prefix("Detail")));
 
