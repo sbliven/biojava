@@ -14,7 +14,7 @@ import org.biojava.bio.seq.io.*;
 import org.biojava.bio.seq.impl.*;
 
 public class XFFTools {
-    public static void annotateGFF(File xffFile, final Sequence sequence)
+    public static void annotateXFF(File xffFile, final Sequence sequence)
     throws IOException, SAXException, BioException {
         
         SequenceBuilder sb = new SequenceBuilderBase() {
@@ -34,15 +34,15 @@ public class XFFTools {
         sb.makeSequence();
     }
     
-    public static FeatureHolder readGFF(File xffFile, String seqID, FiniteAlphabet alpha)
+    public static FeatureHolder readXFF(File xffFile, String seqID, FiniteAlphabet alpha)
     throws IOException, SAXException, BioException {
         SymbolList dummy = new DummySymbolList(alpha, Integer.MAX_VALUE);
         Sequence ourSeq = new SimpleSequence(dummy, seqID, seqID, new SmallAnnotation());
-        annotateGFF(xffFile, ourSeq);
+        annotateXFF(xffFile, ourSeq);
         return ourSeq;
     }
     
-    public static void writeGFF(File xffFile, FeatureHolder features)
+    public static void writeXFF(File xffFile, FeatureHolder features)
     throws IOException {
         PrintWriter xffPR = new PrintWriter(new FileWriter(xffFile));
         XMLWriter xmlWriter = new PrettyXMLWriter(xffPR);
