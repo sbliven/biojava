@@ -178,7 +178,6 @@ public class XmlMarkovModel {
       double prob = Double.parseDouble(transitionE.getAttribute("prob"));
       try {
         model.createTransition(from, to);
-        model.getWeights(from).setWeight(to, prob);
       } catch (IllegalSymbolException ite) {
         throw new BioError(
           ite, 
@@ -194,6 +193,27 @@ public class XmlMarkovModel {
       }
     }
     
+	for(int i = 0; i < transitions.getLength(); i++) {
+      Element transitionE = (Element) transitions.item(i);
+      State from = (State) nameToState.get(transitionE.getAttribute("from"));
+      State to = (State) nameToState.get(transitionE.getAttribute("to"));
+      double prob = Double.parseDouble(transitionE.getAttribute("prob"));
+      try {
+        model.getWeights(from).setWeight(to, prob);
+      } catch (IllegalSymbolException ite) {
+        throw new BioError(
+          ite, 
+          "We should have unlimited write-access to this model. " +
+          "Something is very wrong."
+        );
+      } catch (ChangeVetoException cve) {
+        throw new BioError(
+          cve, 
+          "We should have unlimited write-access to this model. " +
+          "Something is very wrong."
+        );
+      }
+    }
     return model;
   }
  
