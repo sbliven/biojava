@@ -83,7 +83,7 @@ public class Digest {
     /** Adds peptides as features to the Sequence in this class.
      * For Example:
      * <CODE>
-     * Protease protease = Protease.getProteaseByName(Protease.TRYPSIN);
+     * 
      *         Sequence sequence = ...
      *         Digest bioJavaDigest = new Digest();
      *
