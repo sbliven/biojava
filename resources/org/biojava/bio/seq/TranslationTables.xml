@@ -1,5 +1,5 @@
 <tables>
-  <table name="UNIVERSAL" source="(DNA x DNA x DNA)" target="PROTEIN-TERM">
+  <table name="UNIVERSAL" source="(RNA x RNA x RNA)" target="PROTEIN-TERM">
     <translate from="uuu" to="phe"/>
     <translate from="uuc" to="phe"/>
     <translate from="uua" to="leu"/>
@@ -68,4 +68,4 @@
     <translate from="gga" to="gly"/>
     <translate from="ggg" to="gly"/>
   </table>
-</tables
+</tables>
