@@ -66,6 +66,7 @@ import org.biojava.bio.seq.io.*;
  *
  * @author Thomas Down
  * @author David Waring
+ * @author David Huen (another constructor)
  */
 
 public class SimpleSymbolList extends AbstractSymbolList implements ChangeListener, Serializable {
@@ -182,6 +183,21 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
         for (int i = 0; i < length; ++i) {
             symbols[i] = sl.symbolAt(i + 1);
         }
+        this.isView = false;
+        this.viewOffset = 0;
+        addListener();
+    }
+
+    /**
+     * Construct a SimpleSymbolList given the Symbol array that backs it.
+     * Used primarily with the chunked SymbolList builder but could be used
+     * elsewhere too.
+     */
+    public SimpleSymbolList(Symbol [] symbols, int length, Alphabet alphabet)
+    {
+        this.symbols = symbols;
+        this.length = length;
+        this.alphabet = alphabet;
         this.isView = false;
         this.viewOffset = 0;
         addListener();
