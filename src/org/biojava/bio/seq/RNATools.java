@@ -321,7 +321,8 @@ public final class RNATools {
 
   /**
    * Transcribe DNA into RNA.
-   *
+   * @deprecated The naming of this method is confusing and inconsistent use either DNATools.toRNA(SymbolList list) or
+   * DNATools.transcribeToRNA(SymbolList list) depending on the desired behaivour.
    * @param list the SymbolList to transcribe
    * @return a SymbolList that is the transcribed view
    * @throws IllegalAlphabetException if the list is not DNA

@@ -46,6 +46,7 @@ import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.ReversibleTranslationTable;
+import org.biojava.bio.symbol.SimpleReversibleTranslationTable;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
@@ -70,6 +71,7 @@ public final class DNATools {
   static private final AtomicSymbol c;
   static private final AtomicSymbol t;
   static private final Symbol n;
+  static private final SimpleReversibleTranslationTable transcriptionTable;
 
 
   static private Map symbolToComplement;
@@ -106,8 +108,15 @@ public final class DNATools {
 
 
       complementTable = new DNAComplementTranslationTable();
-    } catch (Throwable t) {
-      throw new BioError("Unable to initialize DNATools", t);
+      
+      transcriptionTable = new SimpleReversibleTranslationTable(getDNA(), RNATools.getRNA());
+      transcriptionTable.setTranslation(a, RNATools.a());
+      transcriptionTable.setTranslation(c, RNATools.c());
+      transcriptionTable.setTranslation(g, RNATools.g());
+      transcriptionTable.setTranslation(t, RNATools.u());
+      
+    } catch (Throwable th) {
+      throw new BioError("Unable to initialize DNATools", th);
     }
   }
 
@@ -386,7 +395,7 @@ public final class DNATools {
           }
 
     public Symbol untranslate(Symbol s)
-          throws IllegalSymbolException	{
+          throws IllegalSymbolException {
             return DNATools.complement(s);
           }
 
@@ -416,7 +425,7 @@ public final class DNATools {
 
         return dist;
     }
-	// these exceptions are just plain impossible!!!
+        // these exceptions are just plain impossible!!!
     catch (IllegalSymbolException ise) { return null; }
     catch (ChangeVetoException cve) { return null; }
   }
@@ -434,6 +443,37 @@ public final class DNATools {
   {
     return new PairDistribution(getDNADistribution(fractionGC0), getDNADistribution(fractionGC1));
   }
+  
+  /**
+   * Converts a <code>SymbolList</code> from the DNA <code>Alphabet</code> to the
+   * RNA <code>Alphabet</code>.
+   * @param syms the <code>SymbolList</code> to convert to RNA
+   * @return a view on <code>syms</code> where <code>Symbols</code> have been converted to RNA.
+   * Most significantly t's are now u's. The 5' to 3' order of the Symbols is conserved.
+   * @since 1.4
+   * @throws IllegalAlphabetException if <code>syms</code> is not DNA.
+   */
+   public static SymbolList toRNA(SymbolList syms)throws IllegalAlphabetException{
+     return SymbolListViews.translate(syms, transcriptionTable);
+   }
+   
+   /**
+    * Transcribes DNA to RNA. The method more closely represents the biological reality
+    * than <code>toRNA(SymbolList syms)</code> does. The presented DNA <code>SymbolList</code> 
+    * is assumed to be the template strand in the 5' to 3' orientation. The resulting
+    * RNA is transcribed from this template effectively a reverse complement in the RNA alphabet.
+    * The method is equivalent to calling <code>reverseComplement()</code> and <code>toRNA()</code> in sequence.
+    * <p>If you are dealing with cDNA sequences that you want converted to RNA you would be 
+    * better off calling <code>toRNA(SymbolList syms)</code>
+    * @param syms the <code>SymbolList</code> to convert to RNA
+    * @return a view on <code>syms</code> where <code>Symbols</code> have been converted to RNA.
+    * @since 1.4
+    * @throws IllegalAlphabetException if <code>syms</code> is not DNA.
+    */
+   public static SymbolList transcribeToRNA(SymbolList syms) throws IllegalAlphabetException{
+     syms = reverseComplement(syms);
+     return toRNA(syms);
+   }
 }
 
 
