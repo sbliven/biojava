@@ -34,11 +34,12 @@ import org.biojava.bio.*;
  *
  * <p>
  * <strong>FIXME:</strong> Note that this is currently rather incomplete, 
- * and doesn't handle any of the header information sensibly.
+ * and doesn't handle any of the header information sensibly except for
+ * ID and AC.
  * </p>
  *
  * @author Thomas Down
- * @author Matthew Pocock (feature table parsing)
+ * @author Matthew Pocock
  * @since 1.1
  */
 
@@ -80,7 +81,7 @@ public class SwissprotProcessor extends SequenceBuilderFilter {
     featureValue = new StringBuffer();
   }
 
-  public void endSequence() {
+  public void endSequence() throws ParseException {
     if (accessions.size() > 0) {
       String id = (String) accessions.get(0);
       getDelegate().setName(id);
@@ -94,8 +95,12 @@ public class SwissprotProcessor extends SequenceBuilderFilter {
     getDelegate().endSequence();
   }
 
-  public void addSequenceProperty(String key, Object value) {
-    if (key.equals("AC")) {
+  public void addSequenceProperty(Object key, Object value) throws ParseException {
+    if (key.equals("ID")) {
+      String line = (String) value;
+      int space = line.indexOf(' ');
+      String id = line.substring(0, space);
+    } else if (key.equals("AC")) {
       String acc= value.toString();
       StringTokenizer toke = new StringTokenizer(acc, "; ");
       while (toke.hasMoreTokens()) {
@@ -156,7 +161,7 @@ public class SwissprotProcessor extends SequenceBuilderFilter {
     }
   }
   
-  protected void flushFeature() {
+  protected void flushFeature() throws ParseException {
     int l = featureValue.length();
     if(l >= 0) {
       if(featureValue.charAt(l-1) == '.') {

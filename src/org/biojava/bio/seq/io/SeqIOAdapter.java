@@ -33,14 +33,30 @@ import org.biojava.bio.symbol.*;
  */
 
 public class SeqIOAdapter implements SeqIOListener {
-  public void startSequence()                                   {}
-  public void endSequence()                                     {}
-  public void setName(String name)                              {}
-  public void setURI(String uri)                                {}
+  public void startSequence()
+  throws ParseException {}
+  
+  public void endSequence()
+  throws ParseException {}
+  
+  public void setName(String name)
+  throws ParseException {}
+  
+  public void setURI(String uri)
+  throws ParseException {}
+  
   public void addSymbols(Alphabet alpha, Symbol[] syms, int start, int length)
-  throws IllegalAlphabetException                               {}
-  public void addSequenceProperty(String key, Object value)     {}
-  public void startFeature(Feature.Template templ)              {}
-  public void endFeature()                                      {}
-  public void addFeatureProperty(String key, Object value)      {}
+  throws IllegalAlphabetException {}
+  
+  public void addSequenceProperty(Object key, Object value)
+  throws ParseException {}
+  
+  public void startFeature(Feature.Template templ)
+  throws ParseException {}
+  
+  public void endFeature()
+  throws ParseException {}
+  
+  public void addFeatureProperty(Object key, Object value)
+  throws ParseException {}
 }

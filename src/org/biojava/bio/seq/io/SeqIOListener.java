@@ -30,7 +30,8 @@ import org.biojava.bio.symbol.*;
  * parser.
  *
  * @author Thomas Down
- * @since 1.1 [newio proposal]
+ * @author Matthew Pocock
+ * @since 1.1
  */
 
 public interface SeqIOListener {
@@ -39,26 +40,29 @@ public interface SeqIOListener {
      * to enforce the life-cycles of SeqIOListener objects.
      */
 
-    public void startSequence();
+    public void startSequence() throws ParseException;
 
     /**
      * Notify the listener that processing of the sequence is complete.
      */
 
-    public void endSequence();
+    public void endSequence() throws ParseException;
 
     /**
      * Notify the listener that the current sequence is generally known
      * by a particular name.
+     *
+     * @param the String that should be returned by getName for the sequence
+     * being parsed
      */
 
-    public void setName(String name);
+    public void setName(String name) throws ParseException;
 
     /**
      * Notify the listener of a URI identifying the current sequence.
      */
 
-    public void setURI(String uri);
+    public void setURI(String uri) throws ParseException;
 
     /**
      * Notify the listener of symbol data.  All symbols passed to
@@ -84,7 +88,7 @@ public interface SeqIOListener {
      * be stored as an entry in the sequence's annotation bundle.
      */
 
-    public void addSequenceProperty(String key, Object value);
+    public void addSequenceProperty(Object key, Object value) throws ParseException;
 
     /**
      * Notify the listener that a new feature object is starting.
@@ -93,17 +97,17 @@ public interface SeqIOListener {
      * of features, it should maintain a stack of `open' features.
      */
 
-    public void startFeature(Feature.Template templ);
+    public void startFeature(Feature.Template templ) throws ParseException;
 
     /**
      * Mark the end of data associated with one specific feature.
      */
 
-    public void endFeature();
+    public void endFeature() throws ParseException;
 
     /**
      * Notify the listener of a feature property.
      */
 
-    public void addFeatureProperty(String key, Object value);
+    public void addFeatureProperty(Object key, Object value) throws ParseException;
 }

@@ -95,38 +95,8 @@ public class SimpleSequenceBuilder implements SequenceBuilder {
      * </ul>
      */
 
-    public void addSequenceProperty(String key, Object value) {
-	if (value == null)
-	    return;
-
-	Object oldValue = null;
-	Object newValue = value;
-
-	try {
-	    oldValue = annotation.getProperty(key);
-	} catch (NoSuchElementException ex) {}
-
-	if (oldValue != null) {
-	    if (oldValue instanceof String) {
-		newValue = ((String) oldValue) + " " + newValue.toString();
-	    } else {
-		if (oldValue instanceof Collection) {
-		    ((Collection) oldValue).add(newValue);
-		    newValue = oldValue;
-		} else {
-		    List nvList = new ArrayList();
-		    nvList.add(oldValue);
-		    nvList.add(newValue);
-		    newValue = nvList;
-		}
-	    }
-	} 
-
-	try {
-	    annotation.setProperty(key, value);
-	} catch (ChangeVetoException ex) {
-	    throw new BioError(ex, "Annotation should be modifiable");
-	}
+    public void addSequenceProperty(Object key, Object value) {
+      addProperty(annotation, key, value);
     }
 
     public void startFeature(Feature.Template templ) {
@@ -144,7 +114,22 @@ public class SimpleSequenceBuilder implements SequenceBuilder {
 	featureStack.add(t2);
     }
 
-    public void addFeatureProperty(String key, Object value) {
+    public void addFeatureProperty(Object key, Object value)
+    throws ParseException {
+      try {
+        int stackSize = featureStack.size();
+        
+        TemplateWithChildren top =
+        (TemplateWithChildren) featureStack.get(stackSize - 1);
+        
+        addProperty(top.template.annotation, key, value);
+      } catch (IndexOutOfBoundsException ioobe) {
+        throw new ParseException(
+          ioobe,
+          "Attempted to add annotation to a feature when no startFeature " +
+          "had been invoked"
+        );
+      }
     }
 
     public void endFeature() {
@@ -179,6 +164,40 @@ public class SimpleSequenceBuilder implements SequenceBuilder {
 	    if (twc.children != null) {
 		makeChildFeatures(f, twc.children);
 	    }
+	}
+    }
+    
+    protected void addProperty(Annotation ann, Object key, Object value) {
+	if (value == null)
+	    return;
+
+	Object oldValue = null;
+	Object newValue = value;
+
+	try {
+	    oldValue = ann.getProperty(key);
+	} catch (NoSuchElementException ex) {}
+
+	if (oldValue != null) {
+	    if (oldValue instanceof String) {
+		newValue = ((String) oldValue) + " " + newValue.toString();
+	    } else {
+		if (oldValue instanceof Collection) {
+		    ((Collection) oldValue).add(newValue);
+		    newValue = oldValue;
+		} else {
+		    List nvList = new ArrayList();
+		    nvList.add(oldValue);
+		    nvList.add(newValue);
+		    newValue = nvList;
+		}
+	    }
+	} 
+
+	try {
+	    ann.setProperty(key, value);
+	} catch (ChangeVetoException ex) {
+	    throw new BioError(ex, "Annotation should be modifiable");
 	}
     }
 

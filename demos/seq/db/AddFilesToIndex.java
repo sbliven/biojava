@@ -42,8 +42,12 @@ public class AddFilesToIndex {
         throw new Exception("Use: indexName file1 file2 file...");
       }
       String indexName = args[0];
-      File indexFile = new File(indexName + ".index");
-      IndexedSequenceDB seqDB = IndexedSequenceDB.openDB(indexFile);
+      File indexFile = new File(indexName);
+      
+      TabIndexStore tis = TabIndexStore.open(indexFile);
+      
+      IndexedSequenceDB seqDB = new IndexedSequenceDB(tis);
+      
       for(int i = 1; i < args.length; i++) {
         System.out.print("Adding: " + args[i] + "...");
         seqDB.addFile(new File(args[i]));

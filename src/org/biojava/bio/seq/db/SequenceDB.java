@@ -64,9 +64,10 @@ public interface SequenceDB extends Changeable {
    *
    * @param the id to retrieve by
    * @return  the Sequence with that id
-   * @throws BioException if for any reason the sequence could not be retrieved
+   * @throws IllegalIDException if the database doesn't know about the id
+   * @throws BioException if there was a failure in retrieving the sequence
    */
-  Sequence getSequence(String id) throws BioException;
+  Sequence getSequence(String id) throws IllegalIDException, BioException;
   
   /**
    * Get an imutable set of all of the IDs in the database. The ids are legal
@@ -88,21 +89,24 @@ public interface SequenceDB extends Changeable {
    * Adds a sequence to the database.
    *
    * @param seq the Sequence to add
+   * @throws IllegalIDException if a uniqe ID could not be generated for seq
    * @throws BioException if something goes wrong with adding the sequence
    * @throws ChangeVetoException  if either the database does not allow
    *         sequences to be added or the modification was vetoed
    */
   void addSequence(Sequence seq)
-  throws BioException, ChangeVetoException;
+  throws IllegalIDException, BioException, ChangeVetoException;
   
   /**
    * Remove the sequence associated with an ID from the database.
    *
    * @param id  the ID of the sequence to remove
-   * @throws  BioException  if the id can't be found
+   * @throws  IllegalIDException if there is no sequence for the ID
+   * @throws  BioException if something failed while removing the sequence for
+   *          that ID
    * @throws  ChangeVetoException  if either the database does not allow
    *          sequences to be removed or the modification was vetoed
    */
   void removeSequence(String id)
-  throws BioException, ChangeVetoException;
+  throws IllegalIDException, BioException, ChangeVetoException;
 }

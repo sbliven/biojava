@@ -57,19 +57,19 @@ public class SequenceBuilderFilter implements SequenceBuilder {
     return delegate;
   }
   
-  public void startSequence() {
+  public void startSequence() throws ParseException {
     delegate.startSequence();
   }
   
-  public void endSequence() {
+  public void endSequence() throws ParseException {
     delegate.endSequence();
   }
   
-  public void setName(String name) {
+  public void setName(String name) throws ParseException {
     delegate.setName(name);
   }
   
-  public void setURI(String uri) {
+  public void setURI(String uri) throws ParseException {
     delegate.setURI(uri);
   }
   
@@ -78,19 +78,19 @@ public class SequenceBuilderFilter implements SequenceBuilder {
     delegate.addSymbols(alpha, syms, start, length);
   }
   
-  public void addSequenceProperty(String key, Object value) {
+  public void addSequenceProperty(Object key, Object value) throws ParseException {
     delegate.addSequenceProperty(key, value);
   }
   
-  public void startFeature(Feature.Template templ) {
+  public void startFeature(Feature.Template templ) throws ParseException {
     delegate.startFeature(templ);
   }
   
-  public void endFeature() {
+  public void endFeature() throws ParseException {
     delegate.endFeature();
   }
   
-  public void addFeatureProperty(String key, Object value) {
+  public void addFeatureProperty(Object key, Object value) throws ParseException {
     delegate.addFeatureProperty(key, value);
   }
   

@@ -42,8 +42,12 @@ public class FetchSequence {
         throw new Exception("Use: indexName id1 id2 ... idn");
       }
       String indexName = args[0];
-      File indexFile = new File(indexName + ".index");
-      IndexedSequenceDB seqDB = IndexedSequenceDB.openDB(indexFile);
+      File indexFile = new File(indexName);
+      
+      TabIndexStore tis = TabIndexStore.open(indexFile);
+      
+      IndexedSequenceDB seqDB = new IndexedSequenceDB(tis);
+      
       for(int i = 1; i < args.length; i++) {
         Sequence seq = seqDB.getSequence(args[i]);
         System.out.println(seq.getName());

@@ -33,6 +33,7 @@ import org.biojava.bio.seq.db.*;
  * This demo file is a simple implementation of an index file generator.
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
 
 public class CreateIndex {
@@ -42,7 +43,8 @@ public class CreateIndex {
         throw new Exception("Use: indexName format alphabet");
       }
       String indexName = args[0];
-      File indexFile = new File(indexName+".index");
+      File indexFile = new File(indexName);
+      File indexList = new File(indexName + ".list");
       String formatName = args[1];
       String alphaName = args[2];
       Alphabet alpha = resolveAlphabet(alphaName);
@@ -63,13 +65,13 @@ public class CreateIndex {
 	  throw new Exception("Format must be one of {embl, fasta, swissprot}");
       }
       
-      IndexedSequenceDB seqDB = IndexedSequenceDB.createDB(
-        indexName,
+      TabIndexStore tis = new TabIndexStore(
         indexFile,
+        indexList,
+        indexName,
         sFormat,
         sFact,
-        sParser,
-        IDMaker.byName
+        sParser
       );
     } catch (Throwable t) {
       t.printStackTrace();

@@ -42,8 +42,11 @@ public class ListSeqsInIndex {
         throw new Exception("Use: indexName");
       }
       String indexName = args[0];
-      File indexFile = new File(indexName + ".index");
-      IndexedSequenceDB seqDB = IndexedSequenceDB.openDB(indexFile);
+      File indexFile = new File(indexName);
+      
+      TabIndexStore tis = TabIndexStore.open(indexFile);
+      
+      IndexedSequenceDB seqDB = new IndexedSequenceDB(tis);
       for(Iterator i = seqDB.ids().iterator(); i.hasNext(); ) {
         System.out.println(i.next());
       }

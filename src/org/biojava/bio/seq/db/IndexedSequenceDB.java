@@ -31,8 +31,16 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 
 /**
- * This class reads in a file or a set of files containing sequence data.  It
- * contains methods for automatically indexing these sequences.
+ * This class implements SequenceDB on top of a set of sequence files and
+ * sequence offsets within these files.
+ * <P>
+ * This Class is primarily responsible for managing the sequence IO, such as
+ * calculating the sequence file offsets, and parsing individual sequences based
+ * upon file offsets. The actual persistant stoorage of all this information is
+ * delegated to an instance of IndexStore.
+ * <P>
+ * Note: We may be able to improve the indexing speed further by discarding all
+ * feature creation & annotation requestes during index parsing.
  *
  * @author Matthew Pocock
  * @author Thomas Down
@@ -41,155 +49,47 @@ import org.biojava.bio.seq.io.*;
 public final class IndexedSequenceDB extends AbstractSequenceDB
     implements SequenceDB, Serializable 
 {
-    private final String name;
     private final IDMaker idMaker;
-    private final File indexFile;
-    private final Set files;
-    private final SequenceFormat format;
-    private final SequenceBuilderFactory sbFact;
-    private final SymbolParser symParser;
-    private final Map idToSource; // seqID -> Source {file, start}
-    private transient Map fileToReaders; // file -> set ( readers )
-  
-    {
-	fileToReaders = new HashMap();
-	idToSource = new HashMap();
-    }
-
+    private final IndexStore indexStore;
+    
     /**
-     * Open an index at indexFile.
+     * Create an IndexedSequenceDB by specifying both the IDMaker and IndexStore
+     * used.
      * <P>
-     * If indexFile exists, it will just load the indexes from there. If it
-     * does not exist, a new index file will be created.
+     * The IDMaker will be used to calculate the ID for each Sequence. It will
+     * dellegate the stoorage and retrieval of the sequence offsets to the
+     * IndexStore.
      *
-     * @param the File to use for persistantly storing the indexes
-     * @throws IOException if for any reason indexFile can't be used
+     * @param idMaker  the IDMaker used to calculate Sequence IDs
+     * @param indexStore  the IndexStore delegate
      */
-
-    public static IndexedSequenceDB openDB(File indexFile)
-	throws IOException, BioException {
-	if(indexFile.exists()) {
-	    FileInputStream fis = new FileInputStream(
-						      indexFile
-						      );
-	    try {
-		ObjectInputStream p = new ObjectInputStream(fis);
-		IndexedSequenceDB isd = (IndexedSequenceDB) p.readObject();
-		fis.close();
-		return isd;
-	    } catch (ClassNotFoundException cnfe) {
-		throw new BioException(cnfe, "Couldn't load index file: " + indexFile);
-	    }
-	} else {
-	    throw new BioException(
-				   "Couldn't open index as it doesn't exist: " + indexFile
-				   );
-	}
+    public IndexedSequenceDB(IDMaker idMaker, IndexStore indexStore) {
+      this.idMaker = idMaker;
+      this.indexStore = indexStore;
     }
-  
+    
     /**
-     *Create a sequence database
-     *@param name a name for the database
-     *@param indexFile the indexed file of sequences
-     *@param format the kind of format being read in e.g. EMBL/FASTA
-     *@param sFact the sequence factory object for generating sequence objects from the file.
-     *@param symParser the SymbolParser object for the sequences read in e.g. DNA or RNA parsers.
-     *@param idMaker sets the idMaker to map the set of sequences encountered.      
-     */
-    public static IndexedSequenceDB createDB(String name,
-					     File indexFile,  
-					     SequenceFormat format,
-					     SequenceBuilderFactory sbFact,
-					     SymbolParser symParser,
-					     IDMaker idMaker) 
-	throws IOException, BioException 
-    {
-	if(!indexFile.exists()) {
-	    try {
-		IndexedSequenceDB isd = new IndexedSequenceDB(name,
-							      indexFile,
-							      format,
-							      sbFact,
-							      symParser,
-							      idMaker);
-		isd.commit();
-		return isd;
-	    } catch (Throwable t) {
-		if(indexFile.exists()) {
-		    if(!indexFile.delete()) {
-			throw new BioException(t, "Could not create index file. Failed to remove it");
-		    }
-		}
-		throw new BioException(t, "Could not create index file");
-	    }
-	} else {
-	    throw new BioException("Couldn't create index file as it already exists: " + indexFile);
-	}
-    }
-
-    private IndexedSequenceDB(String name,
-			      File indexFile,
-			      SequenceFormat format,
-			      SequenceBuilderFactory sbFact,
-			      SymbolParser symParser,
-			      IDMaker idMaker) 
-    {
-	this.name = name;
-	this.indexFile = indexFile;
-	this.format = format;
-	this.sbFact = sbFact;
-	this.symParser = symParser;
-	this.idMaker = idMaker;
-	this.files = new HashSet();
-    }
-
-    private RandomAccessFile getReader(File f) throws IOException {
-	if(fileToReaders == null) {
-	    fileToReaders = new HashMap();
-	}
-	synchronized(fileToReaders) {
-	    Set readers = (Set) fileToReaders.get(f);
-	    if(readers == null) {
-		fileToReaders.put(f, readers = new HashSet());
-	    }
-	    if(readers.isEmpty()) {
-		return new RandomAccessFile(f, "r");
-	    } else {
-		RandomAccessFile raf = (RandomAccessFile) readers.iterator().next();
-		readers.remove(raf);
-		return raf;
-	    }
-	}
-    }
-
-
-    /**
-     *set a reading context to the database.
-     *@param f the file which will be read.
-     *@param raf the random access file object for the reader
-     */
-    private void putReader(File f, RandomAccessFile raf) {
-	if(fileToReaders == null) {
-	    fileToReaders = new HashMap();
-	}
-	synchronized(fileToReaders) {
-	    Set readers = (Set) fileToReaders.get(f);
-	    if(readers == null) {
-		fileToReaders.put(f, readers = new HashSet());
-	    }
-	    readers.add(raf);
-	}
-    }
-      
-    /**
-     * Retrieve an unmodifiable set of files.
+     * Create an IndexedSequenceDB by specifying IndexStore used.
+     * <P>
+     * IDMaker.byName will be used to calculate the ID for each Sequence. It
+     * will dellegate the stoorage and retrieval of the sequence offsets to the
+     * IndexStore.
      *
-     * @return a Set of all files indexed by this indexer
+     * @param indexStore  the IndexStore delegate
      */
-    public Set getFiles() {
-	return Collections.unmodifiableSet(files);
+    public IndexedSequenceDB(IndexStore indexStore) {
+      this(IDMaker.byName, indexStore);
     }
-
+    
+    /**
+     * Retrieve the IndexStore.
+     *
+     * @return the IndexStore delegate
+     */
+    public IndexStore getIndexStore() {
+      return indexStore;
+    }
+    
     /**
      * Add sequences from a file to the sequence database.  This method works
      * on an "all or nothing" principle.  If it can successfully interpret the
@@ -207,131 +107,76 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
      */
   
     public void addFile(File seqFile)
-	throws IOException, BioException, ChangeVetoException 
+	throws IllegalIDException, BioException, ChangeVetoException 
     {
-	seqFile = seqFile.getAbsoluteFile();
-	CountedBufferedReader bReader = new CountedBufferedReader(new FileReader(seqFile)); 
-	HashMap index = new HashMap();
-	long pos = bReader.getFilePointer();
-	boolean hasNextSequence = true;
-	while(hasNextSequence) {
-	    SequenceBuilder sb = new ElideSymbolsSequenceBuilder(sbFact.makeSequenceBuilder());
-	    hasNextSequence = format.readSequence(bReader, symParser, sb);
-	    Sequence seq = sb.makeSequence();
-	    Source s = new Source(seqFile, pos);
-	    String id = idMaker.calcID(seq);
-	    if(index.containsKey(id)) {
-		throw new BioError(
-				   "Sequences must have unique IDs: " + id +
-				   " in file " + seqFile + " at " + pos
-				   );
-	    }
-	    if(idToSource.containsKey(id)) {
-		Source t = (Source) idToSource.get(id);
-		throw new BioError("Sequences must have unique IDs: " + id +
-				   " in file " + seqFile + " at " + pos +
-				   " conflicts with " + t.file + " at " + t.start
-				   );
-	    }
-	    index.put(id, s);
-	    pos = bReader.getFilePointer();
-	}
-    
-	if(changeSupport == null) {
-	    idToSource.putAll(index);
-	} else {
-	    ChangeEvent ce = new ChangeEvent(
-					     this,
-					     SequenceDB.SEQUENCES,
-					     index,
-					     null
-					     );
-	    changeSupport.firePreChangeEvent(ce);
-	    idToSource.putAll(index);
-	    changeSupport.firePostChangeEvent(ce);
-	}
-	commit();
+      boolean completed = false; // initialy assume that we will fail
+      try {
+        seqFile = seqFile.getAbsoluteFile();
+        CountedBufferedReader bReader = new CountedBufferedReader(new FileReader(seqFile));
+        SequenceFormat format = indexStore.getFormat();
+        SymbolParser symParser = indexStore.getSymbolParser();
+        SequenceBuilderFactory sbFact = indexStore.getSBFactory();
+        long pos = bReader.getFilePointer();
+        boolean hasNextSequence = true;
+        while(hasNextSequence) {
+          SequenceBuilder sb = new ElideSymbolsSequenceBuilder(sbFact.makeSequenceBuilder());
+          hasNextSequence = format.readSequence(bReader, symParser, sb);
+          Sequence seq = sb.makeSequence();
+          String id = idMaker.calcID(seq);
+          pos = bReader.getFilePointer();
+          
+          indexStore.store(new SimpleIndex(seqFile, pos, id));
+        }
+        
+        if(changeSupport == null) {
+          indexStore.commit();
+        } else {
+            ChangeEvent ce = new ChangeEvent(
+                this,
+                SequenceDB.SEQUENCES
+            );
+            changeSupport.firePreChangeEvent(ce);
+            indexStore.commit();
+            changeSupport.firePostChangeEvent(ce);
+        }
+        completed = true; // we completed succesfuly
+      } catch (IOException ioe) {
+        throw new BioException(ioe, "Failed to read sequence file");
+      } finally {
+        if(!completed) { // if there was a failure, discard changes
+          indexStore.rollback();
+        }
+      }
     }
 
-    private static class ElideSymbolsSequenceBuilder implements SequenceBuilder {
-	private final SequenceBuilder delegate;
-
+    /**
+     * SequenceBuilder implementation that explicitly discards the Symbols
+     *
+     * @author Thomas Down
+     * @author Matthew Pocock
+     */
+    private static class ElideSymbolsSequenceBuilder extends SequenceBuilderFilter {
 	public ElideSymbolsSequenceBuilder(SequenceBuilder delegate) {
-	    this.delegate = delegate;
+	    super(delegate);
 	}
-
-	public void startSequence() {
-	    delegate.startSequence();
-	}
-
-	public void endSequence() {
-	    delegate.endSequence();
-	}
-
-	public void setName(String name) {
-	    delegate.setName(name);
-	}
-
-	public void setURI(String uri) {
-	    delegate.setURI(uri);
-	}
-
+        
+        /**
+         * Just ignore the symbols
+         */
 	public void addSymbols(Alphabet alpha, Symbol[] syms, int start, int length) {
 	}
-
-	public void addSequenceProperty(String key, Object value) {
-	    delegate.addSequenceProperty(key, value);
-	}
-
-	public void startFeature(Feature.Template templ) {
-	    delegate.startFeature(templ);
-	}
-
-	public void endFeature() {
-	    delegate.endFeature();
-	}
-
-	public void addFeatureProperty(String key, Object value) {
-	    delegate.addFeatureProperty(key, value);
-	}
-
-	public Sequence makeSequence() throws BioException {
-	    return delegate.makeSequence();
-	}
-    }
-
-    /**
-     *Remove a file from the database
-     *@param seqFile the file to remove
-     */
-    public void removeFile(File seqFile) throws IOException {
-	files.remove(seqFile);
-	commit();
-    }
-  
-    /**
-     * Commits the state of this indexed seq db to indexFile.
-     */
-    private void commit() throws IOException {
-	FileOutputStream fos = new FileOutputStream(indexFile);
-	ObjectOutputStream p = new ObjectOutputStream(fos);
-	p.writeObject(this);
-	p.flush();
-	fos.close();
     }
   
     public String getName() {
-	return this.name;
+	return indexStore.getName();
     }
   
-    public Sequence getSequence(String id) throws BioException {
+    public Sequence getSequence(String id)
+    throws IllegalIDException, BioException {
 	try {
-	    Source s = (Source) idToSource.get(id);
-	    if(s == null) {
-		throw new BioException("Couldn't find sequence for id " + id);
-	    }
-	    FileReader fr = new FileReader(s.file);
-	    long toSkip = s.start;
+	    Index indx = indexStore.fetch(id);
+	    FileReader fr = new FileReader(indx.getFile());
+	    long toSkip = indx.getStart();
 	    while (toSkip > 0) {
 		long skipped = fr.skip(toSkip);
 		if (skipped < 0)
@@ -340,8 +185,12 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
 	    }
 	    BufferedReader br = new BufferedReader(fr);
 
-	    SequenceBuilder sb = sbFact.makeSequenceBuilder();
-	    format.readSequence(br, symParser, sb);
+	    SequenceBuilder sb = indexStore.getSBFactory().makeSequenceBuilder();
+	    indexStore.getFormat().readSequence(
+              br,
+              indexStore.getSymbolParser(),
+              sb
+            );
 	    Sequence seq = sb.makeSequence();
 	    // putReader(s.file, raf);
 	    br.close();
@@ -353,7 +202,7 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
   
     public SequenceIterator sequenceIterator() {
 	return new SequenceIterator() {
-	    private Iterator idI = ids().iterator();
+	    private Iterator idI = indexStore.getIDs().iterator();
 	    
 	    public boolean hasNext() {
 		return idI.hasNext();
@@ -366,22 +215,9 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
     }
   
     public Set ids() {
-	return Collections.unmodifiableSet(idToSource.keySet());
+	return indexStore.getIDs();
     }
   
-    /**
-     * A useful tuple to locate an individual record.
-     */
-    private final class Source implements Serializable {
-	public final File file;
-	public final long start;
-	
-	public Source(File file, long start) {
-	    this.file = file;
-	    this.start = start;
-	}
-    }
-    
     private static class CountedBufferedReader extends BufferedReader {
 	private final static int DEFAULT_BUFFER_SIZE = 1 << 14;
 
@@ -601,80 +437,4 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
 	}
     }
 
-    private class HackedBufferedReader extends BufferedReader {
-	private final RandomAccessFile raf;
-	private long marker;
-	
-	public HackedBufferedReader(File file)
-	    throws IOException {
-	    this(new RandomAccessFile(file, "r"));
-	}
-	
-	public HackedBufferedReader(RandomAccessFile raf)
-	    throws IOException {
-	    super(new Reader() {
-		public void close() {}
-		public int read(char[] cbuf, int off, int len) { return 0; }
-	    });
-	    this.raf = raf;
-	}
-    
-	public long getFilePointer() throws IOException {
-	    return raf.getFilePointer();
-	}
-    
-	public void close() throws IOException {
-	    raf.close();
-	}
-    
-	public void mark(int readAheadLimit) throws IOException {
-	    marker = raf.getFilePointer();
-	}
-    
-	public boolean markSupported() {
-	    return true;
-	}
-    
-	public int read() throws IOException {
-	    return raf.read();
-	}
-    
-	public int read(char[] cbuf) throws IOException {
-	    return read(cbuf, 0, cbuf.length);
-	}
-    
-	public int read(char[] cbuf, int off, int len) throws IOException {
-	    for(int i = off; i < off+len; i++) {
-		int b = raf.read();
-		if (b < 0) {
-		    if (i == 0)
-			return - 1;
-		    else 
-			return i - off;
-		}
-
-		cbuf[i] = (char) b;	
-	    }
-	    return len;
-	}
-    
-	public String readLine() throws IOException {
-	    return raf.readLine();
-	}
-    
-	public boolean ready() {
-	    return true;
-	}
-    
-	public void reset() throws IOException {
-	    raf.seek(marker);
-	}
-	
-	public long skip(long n) throws IOException {
-	    for(int i = 0; i < n; i++) {
-		raf.read();
-	    }
-	    return n;
-	}
-    }
 }
