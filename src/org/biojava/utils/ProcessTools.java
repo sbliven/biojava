@@ -88,7 +88,7 @@ public class ProcessTools {
         throws IOException
     {
       try {
-          return exec(args, input, stdout, stderr, 0L);
+          return exec(args, null, null, input, stdout, stderr, 0L);
         } catch (ProcessTimeoutException ex) {
             throw new Error("Assertion failed: unexpected process timeout");
         }
@@ -99,6 +99,8 @@ public class ProcessTools {
      * it if the specified timeout expires first.
      *
      * @param args the command line to execute.
+     * @param envp environment variables for the child process, or <code>null</code> to inherit the current set.
+     * @param dir working directory for the child process, or <code>null</code> to inherit the current directory.
      * @param input data to present to the process' standard input, or <code>null</code> if the process does not require input.
      * @param stdout a <code>Writer</code> which will be filled with data from the process' output stream, or <code>null</code> to ignore output.
      * @param stderr a <code>Writer</code> which will be filled with data from the process' error stream, or <code>null</code> to ignore output.
@@ -110,6 +112,8 @@ public class ProcessTools {
      
   public static int exec(
         String[] args,
+        String[] envp,
+        File dir,
         Reader input,
         Writer stdout,
         Writer stderr,
@@ -117,7 +121,7 @@ public class ProcessTools {
     )
         throws IOException, ProcessTimeoutException
     {
-        Process proc = Runtime.getRuntime().exec(args);
+        Process proc = Runtime.getRuntime().exec(args, envp, dir);
         CharPump outPump;
         
         CharPump inPump, errPump;
@@ -162,13 +166,14 @@ public class ProcessTools {
             throw new IOException("Error waiting for process to complete");
         }
         
-        checkException(outPump, "Output to child");
-        checkException(inPump, "Input from child");
-        checkException(errPump, "Errors from child");
-        
         if (tb != null && tb.fired()) {
+            // ProcessTimeoutException trumps any IOExceptions, since odd exceptions
+            // may be generated after the process is destroyed.
             throw new ProcessTimeoutException(rc);
         } else {
+            checkException(outPump, "Output to child");
+            checkException(inPump, "Input from child");
+            checkException(errPump, "Errors from child");
             return rc;
         }
     }
@@ -199,7 +204,7 @@ public class ProcessTools {
         throws IOException
   {
       try {
-            return exec(command, input, stdout, stderr, 0L);
+            return exec(command, null, null, input, stdout, stderr, 0L);
       } catch (ProcessTimeoutException ex) {
             throw new Error("Assertion failed: unexpected process timeout");
       }
@@ -226,6 +231,8 @@ public class ProcessTools {
    */
   public static int exec(
                          String command,
+                         String[] envp,
+                         File dir,
                          Reader input,
                          Writer stdout,
                          Writer stderr,
@@ -264,7 +271,7 @@ public class ProcessTools {
 		 cmd[token++] = tokenString;
 	     }
 	 }
-         return exec(cmd,input,stdout,stderr, timeout);
+         return exec(cmd, envp, dir, input,stdout,stderr, timeout);
   }
   
     /**
