@@ -100,6 +100,14 @@ public class SSBindCase extends TestCase
     protected void tearDown() throws Exception
     {
         searchStream.close();
+        
+        searchStream = null;
+        queryDB = null;
+        dbInstallation = null;
+        adapter = null;
+        searchResults = null;
+        topHitSeqID = null;
+        botHitSeqID = null;
     }
 
     public void testResultCount()
