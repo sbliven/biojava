@@ -155,7 +155,7 @@ public final class LifeScienceIdentifier
     
     public int hashCode()
     {
-        return (this.toString().hashCode());
+      return toString().hashCode();
     }
     
     public String toString()

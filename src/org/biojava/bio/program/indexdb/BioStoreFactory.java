@@ -205,6 +205,10 @@ public class BioStoreFactory {
         keys.put(keyName, new Integer(length));
     }
 
+    public Set getKeys() {
+      return keys.keySet();
+    }
+
     /**
      * <code>removeKey</code> removes the specified
      * key.

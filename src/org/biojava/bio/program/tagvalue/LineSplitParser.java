@@ -86,6 +86,9 @@ public class LineSplitParser
     GENBANK.setContinueOnEmptyTag(true);
     GENBANK.setMergeSameTag(false);
   }
+
+  // properties
+  //
   
   private String endOfRecord = null;
   
@@ -98,10 +101,22 @@ public class LineSplitParser
   private boolean continueOnEmptyTag;
   
   private boolean mergeSameTag;
+
+  // state
+  //
   
   private String tag;
   
   public LineSplitParser() {}
+
+  public LineSplitParser(LineSplitParser parser) {
+    this.endOfRecord = parser.endOfRecord;
+    this.splitOffset = parser.splitOffset;
+    this.trimTag = parser.trimTag;
+    this.trimValue = parser.trimValue;
+    this.continueOnEmptyTag = parser.continueOnEmptyTag;
+    this.mergeSameTag = parser.mergeSameTag;
+  }
   
   /**
    * Set the string indicating that a record has ended.

@@ -452,7 +452,7 @@ public interface AnnotationType {
             if (cons.accept(value)) {
                 ann.setProperty(property, value);
             } else {
-                throw new ChangeVetoException("Setting property " + property + " to " + value + " would violate constraints");
+                throw new ChangeVetoException("Setting property " + property + " to " + value + " would violate constraints in " + cons);
             }
         }
 

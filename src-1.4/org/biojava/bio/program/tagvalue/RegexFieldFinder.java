@@ -10,6 +10,16 @@ extends TagValueWrapper {
   private final String[] tags;
   private final boolean inLine;
 
+  /**
+   * Creates a new RegexFiledFinder.
+   *
+   * @param delegate  the TagValueListener to forward events to
+   * @param pattern a Pattern to match to values
+   * @param tags an array of Strings giving tag names for each group in the
+   *        pattern
+   * @param inLine if false, an entire sub-document will be generated for
+   *        the parent tag
+   */
   public RegexFieldFinder(
     TagValueListener delegate,
     Pattern pattern,
