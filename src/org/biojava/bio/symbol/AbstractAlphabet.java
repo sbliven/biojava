@@ -102,7 +102,8 @@ public abstract class AbstractAlphabet
    * </p>
    *
    * <p>
-   * Afterwards, the parser can be retrieved using the getParser method.
+   * Afterwards, the parser can be retrieved using the
+   * getTokenization(Sting name) method.
    * </p>
    */
   public void putTokenization(String name, SymbolTokenization parser) {
@@ -110,33 +111,33 @@ public abstract class AbstractAlphabet
   }
 
   public SymbolTokenization getTokenization(String name)
-	throws NoSuchElementException, BioException
+        throws NoSuchElementException, BioException
     {
-	SymbolTokenization toke = (SymbolTokenization) tokenizationsByName.get(name);
-	if(toke == null) {
-	    if(name.equals("name")) {
-		if (getAlphabets().size() == 1) {
-		    toke = new NameTokenization(this);
-		} else {
-		    toke = new CrossProductTokenization(this);
-		}
-		putTokenization(name, toke);
-	    } else if (name.equals("default")) {
-              
+        SymbolTokenization toke = (SymbolTokenization) tokenizationsByName.get(name);
+        if(toke == null) {
+            if(name.equals("name")) {
+                if (getAlphabets().size() == 1) {
+                    toke = new NameTokenization(this);
+                } else {
+                    toke = new CrossProductTokenization(this);
+                }
+                putTokenization(name, toke);
+            } else if (name.equals("default")) {
+
               if (tokenizationsByName.containsKey("token"))
                 toke= (SymbolTokenization)tokenizationsByName.get("token");
               else
                 toke= (SymbolTokenization)getTokenization("name");
               putTokenization(name, toke);
-              
+
             }
             else
             {
-		throw new NoSuchElementException("There is no tokenization '" + name +
-						 "' defined in alphabet " + getName());
-	    }
-	}
-	return toke;
+                throw new NoSuchElementException("There is no tokenization '" + name +
+                                                 "' defined in alphabet " + getName());
+            }
+        }
+        return toke;
     }
 
     public final Symbol getAmbiguity(Set syms)
@@ -154,31 +155,31 @@ public abstract class AbstractAlphabet
                 for (Iterator i = syms.iterator(); i.hasNext(); ) {
                     validate((Symbol) i.next());
                 }
-                
-                
+
+
                 s = getAmbiguityImpl(syms);
                 ambCache.put(new HashSet(syms), s);
-            } 
+            }
             return s;
         }
     }
-    
+
     /**
      * Backend for getAmbiguity, called when it is actually necessarly to create a new symbol.
      * By default, calls AlphabetManager.createSymbol.
      *
      * @since 1.3
      */
-    
+
     protected Symbol getAmbiguityImpl(Set syms)
         throws IllegalSymbolException
     {
         return AlphabetManager.createSymbol(
                     Annotation.EMPTY_ANNOTATION,
                     syms, this
-                );  
+                );
     }
-    
+
   public final Symbol getSymbol(List syms)
   throws IllegalSymbolException {
     if (syms.size() == 1) {
@@ -308,7 +309,7 @@ public abstract class AbstractAlphabet
   protected abstract boolean containsImpl(AtomicSymbol s);
 
   /*
-  
+
   public boolean equals(Object o) {
     if(o == this) {
       return true;
@@ -334,7 +335,7 @@ public abstract class AbstractAlphabet
   }
 
   */
-  
+
   public String toString() {
     return getName();
   }

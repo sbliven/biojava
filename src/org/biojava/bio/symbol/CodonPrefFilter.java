@@ -23,10 +23,13 @@ package org.biojava.bio.symbol;
 
 import java.io.PrintWriter;
 import java.io.IOException;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.biojava.bio.symbol.CodonPref;
 import org.biojava.utils.xml.PrettyXMLWriter;
 import org.biojava.bio.BioException;
+
 
 public interface CodonPrefFilter
 {
@@ -39,6 +42,27 @@ public interface CodonPrefFilter
      * handles storage of a CodonPref object
      */
     public void put(CodonPref codonPref) throws BioException;
+
+
+    public class AcceptAll implements CodonPrefFilter {
+      List filteredCodonPrefs;
+
+      public AcceptAll(){
+        filteredCodonPrefs = new ArrayList();
+      }
+
+      public boolean isRequired(String name){
+        return true;
+      }
+
+      public void put(CodonPref codonPref){
+        filteredCodonPrefs.add(codonPref);
+      }
+
+      public List getCodonPrefs(){
+        return filteredCodonPrefs;
+      }
+    }
 
     public class ByName implements CodonPrefFilter
     {

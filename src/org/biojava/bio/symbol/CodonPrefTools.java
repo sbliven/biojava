@@ -59,6 +59,7 @@ import org.biojava.utils.xml.PrettyXMLWriter;
  * An utility class for codon preferences
  *
  * @author David Huen
+ * @author Mark Schreiber
  * @since 1.3
  */
 public class CodonPrefTools
@@ -186,6 +187,15 @@ public class CodonPrefTools
         return filter.getCodonPref();
     }
 
+    public static CodonPref[] readFromXML(InputStream prefStream) throws BioException{
+      CodonPrefFilter.AcceptAll filter = new CodonPrefFilter.AcceptAll();
+      readFromXML(prefStream, filter);
+
+      List l = filter.getCodonPrefs();
+      CodonPref[] cp = new CodonPref[l.size()];
+      return (CodonPref[])l.toArray(cp);
+    }
+
     /**
      * read an CodonPref XML stream and handle it with a CodonPrefFilter object.
      */
@@ -266,7 +276,7 @@ public class CodonPrefTools
     /**
      * reads in a file in Codon Usage Database format and
      * translate it into our XML format
-     * These can be obtained from the 
+     * These can be obtained from the
      * <a href="http://www.kazusa.or.jp/codon/">Codon Usage Database</a>.
      * <p>
      * Note that the output assumes that the universal genetic code is
