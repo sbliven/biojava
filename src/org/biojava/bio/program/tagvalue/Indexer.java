@@ -76,6 +76,7 @@ implements TagValueListener {
   private String primaryKey;
   private Object tag;
   private long offset;
+  private int depth;
   
   /**
    * Build a new Indexer.
@@ -89,6 +90,7 @@ implements TagValueListener {
     this.reader = new CountedBufferedReader(new FileReader(file));
     this.indexStore = indexStore;
     this.seccondaryKeys = new SmallMap();
+    this.depth = 0;
   }
   
   /**
@@ -157,12 +159,16 @@ implements TagValueListener {
   }
   
   public void startRecord() {
-    offset = reader.getFilePointer();
-    primaryKey = null;
-    for(Iterator i = seccondaryKeys.values().iterator(); i.hasNext(); ) {
-      List list = (List) i.next();
-      list.clear();
+    if(depth == 0) {
+      offset = reader.getFilePointer();
+      primaryKey = null;
+      for(Iterator i = seccondaryKeys.values().iterator(); i.hasNext(); ) {
+        List list = (List) i.next();
+        list.clear();
+      }
     }
+    
+    depth++;
   }
   
   public void startTag(Object tag) {
@@ -185,7 +191,8 @@ implements TagValueListener {
   public void endRecord()
   throws ParserException
   {
-    //try {
+    depth--;
+    if(depth == 0) {
       if(primaryKey == null) {
         throw new NullPointerException("No primary key");
       }
@@ -198,9 +205,7 @@ implements TagValueListener {
         primaryKey,
         seccondaryKeys
       );
-    //} catch (NestedException ne) {
-    //  throw new ParserException(ne);
-    //}
+    }
   }
 }
 
