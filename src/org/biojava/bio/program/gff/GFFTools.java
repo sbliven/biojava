@@ -26,6 +26,7 @@ import java.io.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
+import org.biojava.bio.seq.*;
 
 /**
  * @author Mark Schreiber
@@ -35,7 +36,13 @@ import org.biojava.bio.*;
 public class GFFTools {
 
  /**
-  * Reads a GFFEntrySet from a file with no filtering
+  * Reads a <code>GFFEntrySet</code> from a file with no filtering
+  * @param fileName the file containing the GFF
+  * @throws FileNotFoundException if file is not found
+  * @throws ParserException if format is wrong
+  * @throws BioException if format is wrong
+  * @throws IOException if file reading error occurs
+  * @return a <code>GFFEntrySet</code> encapsulating the records read from the file
   */
   public static GFFEntrySet readGFF(String fileName)
     throws FileNotFoundException, ParserException, BioException, IOException
@@ -45,6 +52,13 @@ public class GFFTools {
 
   /**
    * Reads a GFFEntrySet from a file with the specified filter
+   * @param fileName the file containing the GFF
+   * @param recFilt the filter to use
+   * @throws FileNotFoundException if file is not found
+   * @throws ParserException if format is wrong
+   * @throws BioException if format is wrong
+   * @throws IOException if file reading error occurs
+   * @return a <code>GFFEntrySet</code> encapsulating the records read from the file
    */
   public static GFFEntrySet readGFF(String fileName, GFFRecordFilter recFilt)
     throws FileNotFoundException, ParserException, BioException, IOException
@@ -58,6 +72,9 @@ public class GFFTools {
 
   /**
    * Writes a GFFEntrySet to a file
+   * @param fileName the file to write to
+   * @param ents the entries to write
+   * @throws IOException if file writing fails
    */
   public static void writeGFF(String fileName, GFFEntrySet ents)
     throws IOException
@@ -67,5 +84,24 @@ public class GFFTools {
       writer.recordLine((GFFRecord)line.next());
     }
     writer.endDocument();
+  }
+
+  /**
+   * Annotates a sequence with the features from a GFF entry set
+   * @param seq the <code>Sequence</code> to annotate.
+   * @param ents the the GFF features to annotate it with.
+   * @return a reference to a newly annotated sequence.
+   */
+  public static Sequence annotateSequence(Sequence seq, GFFEntrySet ents){
+    Sequence annotated;
+    try {
+      annotated = ents.getAnnotator().annotate(seq);
     }
+    catch (ChangeVetoException ex) {
+      throw new BioError(ex,"Assertion Error: Unable to annotate sequence");
+    }catch (BioException ex) {
+      throw new BioError(ex,"Assertion Error: Unable to annotate sequence");
+    }
+    return annotated;
+  }
 }
