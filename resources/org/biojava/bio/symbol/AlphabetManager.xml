@@ -155,10 +155,15 @@
         <!-- Gap is the empty set -->
       </ambiguityMapping>
 
+      <!-- A gap by any other name would still smell so... gappy? -->
+      
       <ambiguityMapping token="~">
       </ambiguityMapping>
 
       <ambiguityMapping token=".">
+      </ambiguityMapping>
+      
+      <ambiguityMapping token=" ">
       </ambiguityMapping>
     </characterTokenization>
   </alphabet>
@@ -187,6 +192,20 @@
         <symbolref name="uracil"/>
       </atomicMapping>
 
+      <ambiguityMapping token="n">
+        <symbolref name="guanine" />
+	    <symbolref name="adenine" />
+	    <symbolref name="cytosine" />
+	    <symbolref name="uracil" />
+      </ambiguityMapping>
+      
+      <ambiguityMapping token="x">
+        <symbolref name="guanine" />
+	    <symbolref name="adenine" />
+	    <symbolref name="cytosine" />
+	    <symbolref name="uracil" />
+      </ambiguityMapping>
+      
       <ambiguityMapping token="-">
         <!-- Gap is the empty set -->
       </ambiguityMapping>
