@@ -48,6 +48,7 @@ public class SwissprotProcessor extends SequenceBuilderFilter
 {
 	public static final String PROPERTY_SWISSPROT_ACCESSIONS = "swissprot.accessions";
 	public static final String PROPERTY_SWISSPROT_COMMENT = "swissprot.comment";
+         public static final String PROPERTY_SWISSPROT_FEATUREATTRIBUTE = "swissprot.featureattribute";
 
 	private boolean mBadFeature = false;
 

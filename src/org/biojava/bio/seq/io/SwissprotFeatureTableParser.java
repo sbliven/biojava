@@ -33,69 +33,54 @@ import org.biojava.bio.seq.*;
 /**
  * Simple parser for swissprot feature tables.
  *
- * <p>
- * This has been partially re-written for newio, but would probably
- * benefit from a few more changes.  In particular, it should notify
- * startFeature as early as possible, then use addFeatureProperty.
- * </p>
- *
  * @author Greg Cox (Based heavily off of FeatureTableParser)
+ * @author Thomas Down
  */
 
-class SwissprotFeatureTableParser extends FeatureTableParser
+/*
+ * Thomas Down refactored to remove dependancy on FeatureTableParser, since we
+ *             weren't actually reusing very much code, and FeatureTableParser
+ *             changed quite a bit when it went fully-newio.
+ */
+
+class SwissprotFeatureTableParser
 {
-	SwissprotFeatureTableParser(SeqIOListener listener, String source)
-	{
-		super(listener, source);
-	}
+    private SeqIOListener listener;
+    private String featureSource;
 
-	public void startFeature(String type) throws BioException
-	{
-		super.startFeature(type);
-	}
+    private boolean inFeature = false;
+    private Feature.Template featureTemplate;
+    private StringBuffer descBuf;
 
-	public void featureData(String line) throws BioException
+    {
+	descBuf = new StringBuffer();
+    }
+
+    SwissprotFeatureTableParser(SeqIOListener listener, String source)
+    {
+	this.listener = listener;
+	this.featureSource = source;
+    }
+
+    public void startFeature(String type)
+	throws BioException
+    {
+	featureTemplate = new Feature.Template();
+	featureTemplate.source = featureSource;
+	featureTemplate.type = type;
+	descBuf.setLength(0);
+	inFeature = true;
+    }
+
+	public void featureData(String line) 
+	    throws BioException
 	{
 		boolean newFeature = false;
 		// Check if there is a location section.
 		if(line.charAt(5) != ' ')
 		{
 			StringTokenizer tokens = new StringTokenizer(line);
-			super.featureLocation = this.getLocation(tokens);
-//			String startLocation = tokens.nextToken();
-//			boolean startIsFuzzy = false;
-//			if(startLocation.indexOf('<') != -1)
-//			{
-//				startLocation = startLocation.substring(1);
-//				startIsFuzzy = true;
-//			}
-//			Integer startIndex = new Integer(startLocation);
-//
-//			String endLocation = tokens.nextToken();
-//			boolean endIsFuzzy = false;
-//			if(endLocation.indexOf('<') != -1)
-//			{
-//				endLocation = endLocation.substring(1);
-//				endIsFuzzy = true;
-//			}
-//			Integer endIndex = new Integer(endLocation);
-//
-//			Location theLocation;
-//			if(endIndex.equals(startIndex))
-//			{
-//				theLocation = new PointLocation(startIndex.intValue());
-//			}
-//			else
-//			{
-//				theLocation = new RangeLocation(startIndex.intValue(), endIndex.intValue());
-//			}
-//
-//			if(startIsFuzzy || endIsFuzzy)
-//			{
-//				theLocation = new FuzzyLocation(theLocation, startIsFuzzy, endIsFuzzy);
-//			}
-//
-//			super.featureLocation = theLocation;
+			featureTemplate.location = getLocation(tokens);
 
 			if(line.length() >= 20)
 			{
@@ -110,51 +95,35 @@ class SwissprotFeatureTableParser extends FeatureTableParser
 
 		if(newFeature == true)
 		{
-			featureBuf.setLength(0);
+			descBuf.setLength(0);
 		}
-		featureBuf.append(" " + line.trim());
+		descBuf.append(" " + line.trim());
 		newFeature = false;
 	}
 
 	public void endFeature()
-	throws BioException
+	    throws BioException
 	{
-		featureAttributes.put(featureBuf.toString(), "");
-		super.endFeature();
-	}
-
-	protected Feature.Template buildFeatureTemplate(String type,
-							Location loc,
-						    StrandedFeature.Strand strandHint,
-						    String source,
-							Map attrs)
-	{
-		Feature.Template t = new Feature.Template();
-		t.annotation = new SimpleAnnotation();
-		for (Iterator i = attrs.entrySet().iterator(); i.hasNext(); )
-		{
-			Map.Entry e = (Map.Entry) i.next();
-			try
-			{
-				t.annotation.setProperty(e.getKey(), e.getValue());
-			}
-			catch (ChangeVetoException cve)
-			{
-				throw new BioError(cve,
-						"Assertion Failure: Couldn't set up the annotation");
-	    	}
+	    if (descBuf.length() > 0) {
+		featureTemplate.annotation = new SimpleAnnotation();
+		try {
+		    featureTemplate.annotation.setProperty(SwissprotProcessor.PROPERTY_SWISSPROT_FEATUREATTRIBUTE, descBuf.toString());
+		} catch (ChangeVetoException ex) {
+		    throw new BioException(ex, "Couldn't alter annotation");
 		}
+	    } else {
+		featureTemplate.annotation = Annotation.EMPTY_ANNOTATION;
+	    }
 
-		t.location = loc;
-		t.type = type;
-		t.source = source;
-
-		return t;
+	    listener.startFeature(featureTemplate);
+	    listener.endFeature();
+	    
+	    inFeature = false;
 	}
 
-	public boolean inFeature()
+        public boolean inFeature()
 	{
-		return super.inFeature();
+	    return inFeature;
 	}
 
 	/**
@@ -175,18 +144,21 @@ class SwissprotFeatureTableParser extends FeatureTableParser
 		boolean endIsFuzzy = endIndex.isFuzzy;
 
 		Location theLocation;
-		if(endPoint.equals(startPoint))
-		{
-			theLocation = new PointLocation(startPoint.intValue());
-		}
-		else
-		{
-			theLocation = new RangeLocation(startPoint.intValue(), endPoint.intValue());
-		}
-
-		if(startIsFuzzy || endIsFuzzy)
-		{
-			theLocation = new FuzzyLocation(theLocation, startIsFuzzy, endIsFuzzy);
+		if(startIsFuzzy || endIsFuzzy) {
+		    theLocation = new FuzzyLocation(startIsFuzzy ? Integer.MIN_VALUE : startPoint.intValue(),
+						    endIsFuzzy ? Integer.MAX_VALUE : endPoint.intValue(),
+						    startPoint.intValue(),
+						    endPoint.intValue(),
+						    FuzzyLocation.RESOLVE_INNER);
+		} else {
+		    if(endPoint.equals(startPoint))
+			{
+			    theLocation = new PointLocation(startPoint.intValue());
+			}
+		    else
+			{
+			    theLocation = new RangeLocation(startPoint.intValue(), endPoint.intValue());
+			}
 		}
 
 		return theLocation;

@@ -34,12 +34,6 @@ import org.biojava.bio.seq.*;
  * Simple parser for feature tables.  This is shared between
  * the EMBL and GENBANK format readers.
  *
- * <p>
- * This has been partially re-written for newio, but would probably
- * benefit from a few more changes.  In particular, it should notify
- * startFeature as early as possible, then use addFeatureProperty.
- * </p>
- *
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Greg Cox
@@ -48,47 +42,53 @@ import org.biojava.bio.seq.*;
 /*
  * Greg Cox: Changed private fields and methods to protected so that
  * SwissProtFeatureTableParser could subclass and snag the implementation
+ *
+ * Thomas Down: Post 1.1, finally got round to refactoring this to be
+ *              a `nice' player in the newio world.  Needless to say,
+ *              this simplified things quite a bit...
  */
 
 class FeatureTableParser {
     private final static int WITHOUT=0;
-    protected final static int WITHIN=1;
-    protected final static int LOCATION=2;
-    protected final static int ATTRIBUTE=3;
+    private final static int WITHIN=1;
+    private final static int LOCATION=2;
+    private final static int ATTRIBUTE=3;
 
-    protected int featureStatus = WITHOUT;
-    protected StringBuffer featureBuf;
+    private int featureStatus = WITHOUT;
+    private StringBuffer featureBuf;
+    private StrandedFeature.Template featureTemplate;
 
-    private String featureType;
-    protected Location featureLocation;
-    protected Map featureAttributes;
-    private StrandedFeature.Strand featureStrand;
     private String featureSource;
-
     private SeqIOListener listener;
 
     FeatureTableParser(SeqIOListener listener, String source) {
 	this.listener = listener;
 	this.featureSource = source;
+
 	featureBuf = new StringBuffer();
-	featureAttributes = new HashMap();
     }
 
+    //
+    // Interface which the processors use to call us
+    //
+
     public void startFeature(String type) throws BioException {
-	featureType = type;
 	featureStatus = LOCATION;
 	featureBuf.setLength(0);
-	featureAttributes.clear();
+
+	featureTemplate = new StrandedFeature.Template();
+	featureTemplate.type = type;
+	featureTemplate.source = featureSource;
+	featureTemplate.annotation = new SimpleAnnotation();
     }
 
     public void featureData(String line) throws BioException {
-	// System.out.println(line);
-	// System.out.println(featureStatus);
 	switch (featureStatus) {
 	case LOCATION:
 	    featureBuf.append(line);
 	    if (countChar(featureBuf, '(') == countChar(featureBuf, ')')) {
-		featureLocation = parseLocation(featureBuf.toString());
+		parseLocation(featureBuf.toString(), featureTemplate);
+		listener.startFeature(featureTemplate);
 		featureStatus = WITHIN;
 	    }
 	    break;
@@ -119,50 +119,32 @@ class FeatureTableParser {
     public void endFeature()
 	throws BioException
     {
-	listener.startFeature(buildFeatureTemplate(featureType,
-						   featureLocation,
-						   featureStrand,
-						   featureSource,
-						   featureAttributes));
 	listener.endFeature();
 	featureStatus = WITHOUT;
     }
 
-    protected Feature.Template buildFeatureTemplate(String type,
-						    Location loc,
-						    StrandedFeature.Strand strandHint,
-						    String source,
-						    Map attrs)
-    {
-	StrandedFeature.Template t = new StrandedFeature.Template();
-	t.annotation = new SimpleAnnotation();
-	for (Iterator i = attrs.entrySet().iterator(); i.hasNext(); ) {
-	    Map.Entry e = (Map.Entry) i.next();
-	    try {
-		t.annotation.setProperty(e.getKey(), e.getValue());
-	    } catch (ChangeVetoException cve) {
-		throw new BioError(
-				   cve,
-				   "Assertion Failure: Couldn't set up the annotation"
-				   );
-	    }
-	}
-
-	t.location = loc;
-	t.type = type;
-	t.source = source;
-	t.strand = strandHint;
-
-	return t;
+    public boolean inFeature() {
+	return (featureStatus != WITHOUT);
     }
 
-    private Location parseLocation(String loc) throws BioException {
+    //
+    // Internal stuff
+    //
+
+    /**
+     * Parse an EMBL location and fill in the location and strand fields of the
+     * template.  This is still a bit simplistic.
+     */
+
+    private void parseLocation(String loc, StrandedFeature.Template fillin) 
+	throws BioException 
+    {
 	    boolean joining = false;
 	    boolean complementing = false;
 	    boolean isComplement = false;
 	    boolean ranging = false;
 	    boolean fuzzyMin = false;
-        boolean fuzzyMax = false;
+	    boolean fuzzyMax = false;
 
 	    int start = -1;
 
@@ -214,9 +196,15 @@ class FeatureTableParser {
 		    ranging = true;
 		} else {
 		    Location rl = new RangeLocation(start, pos);
-            if (fuzzyMin || fuzzyMax) {
-                rl = new FuzzyLocation(rl, fuzzyMin, fuzzyMax);
-            }
+		    if (fuzzyMin || fuzzyMax) {
+			rl = new FuzzyLocation(fuzzyMin ? Integer.MIN_VALUE : start,
+					       fuzzyMax ? Integer.MAX_VALUE : pos,
+					       start,
+					       pos,
+					       FuzzyLocation.RESOLVE_INNER);
+		    } else {
+			rl = new RangeLocation(start, pos);
+		    }
 
 		    if (joining) {
 			locationList.add(rl);
@@ -252,9 +240,9 @@ class FeatureTableParser {
 	}
 
 	if (isComplement) {
-	    featureStrand = StrandedFeature.NEGATIVE;
+	    fillin.strand = StrandedFeature.NEGATIVE;
 	} else {
-	    featureStrand = StrandedFeature.POSITIVE;
+	    fillin.strand = StrandedFeature.POSITIVE;
 	}
 
 	if (result == null) {
@@ -264,14 +252,19 @@ class FeatureTableParser {
 	    result = new CompoundLocation(locationList);
 	}
 
-	return result;
+	fillin.location = result;
     }
 
-    protected void processAttribute(String attr) throws BioException {
+    /**
+     * Process the a string corresponding to a feature-table attribute, and fire
+     * it off to our listener.
+     */
+
+    private void processAttribute(String attr) throws BioException {
 	// System.err.println(attr);
 	int eqPos = attr.indexOf('=');
 	if (eqPos == -1) {
-	    featureAttributes.put(attr.substring(1), Boolean.TRUE);
+	    listener.addFeatureProperty(attr.substring(1), Boolean.TRUE);
 	} else {
 	    String tag = attr.substring(1, eqPos);
 	    eqPos++;
@@ -297,15 +290,11 @@ class FeatureTableParser {
 		}
 		val = sb.toString();
 	    }
-	    featureAttributes.put(tag, val);
+	    listener.addFeatureProperty(tag, val);
 	}
     }
 
-    public boolean inFeature() {
-	return (featureStatus != WITHOUT);
-    }
-
-    protected int countChar(StringBuffer s, char c) {
+    private int countChar(StringBuffer s, char c) {
 	int cnt = 0;
 	for (int i = 0; i < s.length(); ++i)
 	    if (s.charAt(i) == c)
@@ -313,7 +302,7 @@ class FeatureTableParser {
 	return cnt;
     }
 
-    protected int countChar(String s, char c) {
+    private int countChar(String s, char c) {
 	int cnt = 0;
 	for (int i = 0; i < s.length(); ++i)
 	    if (s.charAt(i) == c)
