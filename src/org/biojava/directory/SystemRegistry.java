@@ -131,16 +131,12 @@ public class SystemRegistry {
         List registryPath = new ArrayList();
 
         String customPath = System.getProperty(OBDA_SEARCH_ENV);
-        if (customPath != null)
-        {
+        if (customPath != null) {
             StringTokenizer st = new StringTokenizer(customPath, "+");
-            while (st.hasMoreTokens())
-            {
+            while (st.hasMoreTokens()) {
                 registryPath.add(st.nextToken());
             }
-        }
-        else
-        {
+        } else {
             String userHome = System.getProperty("user.home");
             if (userHome != null) {
                 registryPath.add("file://"
