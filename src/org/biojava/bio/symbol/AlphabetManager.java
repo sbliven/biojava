@@ -1596,7 +1596,11 @@ public final class AlphabetManager {
       if(size <= generateIndexSize) {
         ai = new LinearAlphabetIndex(alpha);
       } else {
-        ai = new HashedAlphabetIndex(alpha);
+        if(alpha.getAlphabets().size() > 1) {
+          ai = new CrossProductAlphabetIndex(alpha);
+        } else {
+          ai = new HashedAlphabetIndex(alpha);
+        }
       }
       alphabetToIndex.put(alpha, ai);
     }

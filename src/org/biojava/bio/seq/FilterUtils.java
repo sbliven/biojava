@@ -278,6 +278,10 @@ public class FilterUtils {
     return new FeatureFilter.OverlapsLocation(loc);
   }
   
+  public final static FeatureFilter bySequenceName(String name) {
+    return new FeatureFilter.BySequenceName(name);
+  }
+  
   public final static FeatureFilter not(FeatureFilter filter) {
     return new FeatureFilter.Not(filter);
   }
