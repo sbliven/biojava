@@ -356,7 +356,7 @@ abstract class AbstractNativeAppSAXParser
      */
     public String getURIFromPrefix(String poPrefix) {
 
-	if (oPrefixMap.containsKey(poPrefix) == true) {
+	if (oPrefixMap.containsKey(poPrefix)) {
 	    return (String)oPrefixMap.get(poPrefix);
 	} else {
 	    return null;

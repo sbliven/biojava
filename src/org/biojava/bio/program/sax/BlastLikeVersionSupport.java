@@ -74,16 +74,16 @@ final class BlastLikeVersionSupport {
     public static final int    V2_0              = 300;
 
 
-    public final static int STRICT = 0;
-    public final static int LAZY   = 1;
+    public static final int STRICT = 0;
+    public static final int LAZY   = 1;
 
     //set default parsing mode
-    private static      int iMode                = STRICT;
-    private static      int    iProgram          = UNKNOWN;
-    private static      int    iVersion          = UNKNOWN;
-    private static      String oProgramString    = "unknown";
-    private static      String oVersionString    = "unknown";
-    private static      String oProgramStub;
+    private static   int iMode               = BlastLikeVersionSupport.STRICT;
+    private static   int    iProgram         = BlastLikeVersionSupport.UNKNOWN;
+    private static   int    iVersion         = BlastLikeVersionSupport.UNKNOWN;
+    private static   String oProgramString   = "unknown";
+    private static   String oVersionString   = "unknown";
+    private static   String oProgramStub;
 
     public BlastLikeVersionSupport() {
     }
@@ -117,10 +117,10 @@ final class BlastLikeVersionSupport {
 	     //if get here, program version is unsupported
 	     //return false if mode is strict, true if LAZY
 
-	     if (this.getMode() == STRICT) {
+	     if (this.getMode() == BlastLikeVersionSupport.STRICT) {
 		 return false; 
 	     }
-	     if (this.getMode() == LAZY) {
+	     if (this.getMode() == BlastLikeVersionSupport.LAZY) {
 		 return true; 
 	     }
 	     
@@ -153,10 +153,10 @@ final class BlastLikeVersionSupport {
 	 //if get here, the program version is unsupported
 	 //return false if mode is strict, true if LAZY
 
-	 if (this.getMode() == STRICT) {
+	 if (this.getMode() == BlastLikeVersionSupport.STRICT) {
 	     return false; 
 	 }
-	 if (this.getMode() == LAZY) {
+	 if (this.getMode() == BlastLikeVersionSupport.LAZY) {
 	     return true; 
 	 }
 
@@ -310,7 +310,7 @@ final class BlastLikeVersionSupport {
      * @param piMode	 Should be one of ParsingMode.STRICT
      * or ParsingMode.LAZY.
      */
-    public static void setMode(int piMode) {
+    public void setMode(int piMode) {
 	iMode = piMode;
     }
 
@@ -321,7 +321,7 @@ final class BlastLikeVersionSupport {
      *
      * @return int	 The current parsing mode.
      */
-    public static int getMode() {
+    public int getMode() {
 	return iMode;
     }
 

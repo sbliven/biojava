@@ -24,7 +24,6 @@ import java.util.*;
 
 import java.io.*;
 
-import org.xml.sax.ContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -57,15 +56,12 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
     private AttributesImpl       oAtts            = new AttributesImpl();
     private QName                oAttQName        = new QName(this);     
     private char[]               aoChars;
-    private ArrayList            oBuffer          = new ArrayList();
     private ArrayList            oAlignment;
-    private StringBuffer         oStringBuffer    = new StringBuffer();
     private String               oLine;
     private String               oSeq;
     private StringBuffer         oQuery           = new StringBuffer();
     private StringBuffer         oHit             = new StringBuffer();
     private StringBuffer         oMatchConsensus  = new StringBuffer();
-    private StringBuffer         oSequence        = new StringBuffer();
     private StringBuffer         oStartId         = new StringBuffer();
     private StringBuffer         oStopId          = new StringBuffer();
     private StringBuffer         oHitStartId      = new StringBuffer();
@@ -121,7 +117,8 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 	tJustDoneConsensus = false;
 	tJustDoneHit       = false;
 	//Loop over all alignment lines
-	for (int i = 0; i < oAlignment.size();i++) {
+    int iAlSize = oAlignment.size();
+	for (int i = 0; i < iAlSize;i++) {
 	    //System.out.println(oAlignment.get(i));
 	    oLine = (String)oAlignment.get(i);
 	    this.parseLine(oLine);
@@ -323,7 +320,7 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 		oHitStopId.append(oStopId);
 		oHit.append(oParsedSeq);
 
-		if (tJustDoneConsensus == false) {
+		if (!tJustDoneConsensus) {
 
 		    //handle rare case of a totally blank
 		    //consensus line -- currently known BUG/FEATURE

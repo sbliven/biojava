@@ -2,7 +2,6 @@ package org.biojava.bio.program.sax;
 
 import java.util.*;
 
-import org.xml.sax.SAXException;
 
 /**
  * Support for SAX2 configuration of namespace support
@@ -34,14 +33,14 @@ interface NamespaceConfigurationIF {
     /**
      * Support SAX2 configuration of namespace support of parser.
      */
-    public boolean getNamespacePrefixes();
+    boolean getNamespacePrefixes();
     /**
      * Gets the URI for a namespace prefix, given that prefix,
      * or null if the prefix is not recognised.
      *
      * @param poPrefix a <code>String</code> The namespace prefix.
      */
-    public String getURIFromPrefix(String poPrefix);
+    String getURIFromPrefix(String poPrefix);
 
 
 }

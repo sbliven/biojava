@@ -23,7 +23,6 @@ package org.biojava.bio.program.sax;
 import java.util.*;
 import java.io.*;
 
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
@@ -130,7 +129,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 		}
 
 		boolean tFoundFirstAtom = false;
-		if (tIsModel == false) {
+		if (!tIsModel) {
 		    //System.out.println("No MODEL records");
 		    for (int i = 0; i < oRecordList.size(); i++) {
 			oRecord = (String)oRecordList.get(i);

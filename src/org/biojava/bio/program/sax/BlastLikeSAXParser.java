@@ -26,7 +26,6 @@ import org.biojava.bio.program.sax.BlastSAXParser;
 import java.util.*;
 import java.io.*;
 
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -112,9 +111,7 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
 
 
     private AttributesImpl          oAtts     = new AttributesImpl();
-    private ArrayList               oHeader   = new ArrayList();
     private QName                   oAttQName = new QName(this);     
-    private char[]                  aoChars;
     private int                     iState;
     private boolean                 tValidFormat  = false;
 

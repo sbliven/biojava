@@ -24,7 +24,6 @@ import java.util.*;
 
 import java.io.*;
 
-import org.xml.sax.ContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -158,7 +157,8 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 		StringTokenizer oSt = new StringTokenizer(poLine);
 
 		//zip through tokens up to last one
-		for (int i = 0; i < oSt.countTokens(); i++) {
+	    int iTmpTokenCount = oSt.countTokens() - 1;
+		for (int i = 0; i < iTmpTokenCount; i++) {
 		    oSt.nextToken();
 		}
 		//last token is the length
@@ -486,7 +486,8 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 	this.startElement(new QName(this,"biojava:RawOutput"),
 			  (Attributes)oAtts);
 
-	for (int i = 0; i < oBuffer.size();i++) {
+	int iTmpBufferSize = oBuffer.size();
+	for (int i = 0; i < iTmpBufferSize;i++) {
 	    //aoChars = ((String)oBuffer.get(i)).trim().toCharArray();
 	    aoChars = ((String)oBuffer.get(i)).toCharArray();
 	    this.characters(aoChars,0,aoChars.length);

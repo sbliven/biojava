@@ -25,7 +25,6 @@ import org.biojava.bio.program.sax.*;
 import java.util.*;
 import java.io.*;
 
-import org.xml.sax.ContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -75,7 +74,6 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
     private char[]               aoLineSeparator;
     private String[]             aoKeys;
     private String[]             aoArrayType        = new String[1];
-    private String               oEndOfFileTag;
     private HashMap              oMap               = new HashMap();
     private int                  iState;
     private int                  iVer;
@@ -378,7 +376,8 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 	//Cycle through ArrayList and send character array data to
 	//XML ContentHandler.
 
-	for (int i = 0; i < poList.size(); i++) {
+    int iTmpListSize = poList.size();
+	for (int i = 0; i < iTmpListSize; i++) {
 	    //System.out.println("RAW:" + (String)poList.get(i));
 	    aoChars = ((String)poList.get(i)).toCharArray();
 	    this.characters(aoLineSeparator,0,1);
