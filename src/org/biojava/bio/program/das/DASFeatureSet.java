@@ -117,6 +117,14 @@ class DASFeatureSet implements FeatureHolder {
     }
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+	if (FilterUtils.areDisjoint(ff,
+				    new FeatureFilter.ByAnnotation(DASSequence.PROPERTY_ANNOTATIONSERVER,
+								   dataSourceString)
+				   )) 
+	{
+	    return FeatureHolder.EMPTY_FEATURE_HOLDER;
+	}
+
 	return getFeatures().filter(ff, recurse);
     }
     
