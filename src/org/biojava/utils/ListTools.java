@@ -8,7 +8,7 @@ public class ListTools {
       case 0:
         return Collections.EMPTY_LIST;
       case 1:
-        return Collections.singletonList(l.get(0));
+        return Collections.nCopies(1, l.get(0));
       case 2:
         Doublet d = new Doublet(l.get(0), l.get(1));
         return d;
@@ -25,7 +25,7 @@ public class ListTools {
       case 0:
         return Collections.EMPTY_LIST;
       case 1:
-        return Collections.singletonList(a[0]);
+        return Collections.nCopies(1, a[0]);
       case 2:
         Doublet d = new Doublet(a[0],a[1]);
         return d;
