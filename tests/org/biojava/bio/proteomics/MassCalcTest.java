@@ -23,18 +23,24 @@ package org.biojava.bio.proteomics;
 
 import junit.framework.TestCase;
 
-import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.SymbolPropertyTable;
 
 /**
  * <code>MassCalcTest</code> tests molecular mass calculation.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  */
 public class MassCalcTest extends TestCase
 {
+    protected FiniteAlphabet protAlpha;
+
     protected double monoH = 1.0078250;
     protected double  avgH = 1.00794;
 
@@ -46,9 +52,13 @@ public class MassCalcTest extends TestCase
 
     protected SymbolList syms1;
 
-    protected void setUp() throws IllegalSymbolException
+    protected void setUp() throws BioException
     {
-        syms1 = ProteinTools.createProtein("A");
+        protAlpha = (FiniteAlphabet)
+            AlphabetManager.alphabetForName("PROTEIN");
+        SymbolTokenization protToke = protAlpha.getTokenization("token");
+
+        syms1 = new SimpleSymbolList(protToke, "A");
     }
 
     public MassCalcTest(String name)
