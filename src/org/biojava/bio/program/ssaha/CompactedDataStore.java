@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 
+import org.biojava.bio.*;
 import org.biojava.bio.BioError;
 import org.biojava.bio.symbol.*;
 
@@ -136,14 +137,24 @@ public class CompactedDataStore implements DataStore {
     SearchListener listener
   ) {
     try {
-      int word = PackingFactory.primeWord(symList, wordLength, packing);
-      listener.startSearch(seqID);
-      fireHits(word, 1, listener);
-      for(int j = wordLength + 1; j <= symList.length(); j++) {
-        word = PackingFactory.nextWord(symList, word, j, wordLength, packing);
-        fireHits(word, j - wordLength + 1, listener);
-      }
-      listener.endSearch(seqID);
+	int word = 0;
+	int lengthFromUnknown = 0;
+	listener.startSearch(seqID);
+	for(int pos = 1; pos <= symList.length(); pos++) {
+	    word = word >> (int) packing.wordSize();
+	    int p = packing.pack(symList.symbolAt(pos));
+	    if (p < 0) {
+		lengthFromUnknown = 0;
+	    } else {
+		lengthFromUnknown++;
+		word |= (int) p << ((int) (wordLength - 1) * packing.wordSize());
+	    }
+	    
+	    if (lengthFromUnknown >= wordLength) {
+		fireHits(word, pos - wordLength + 1, listener);
+	    }
+	}
+	listener.endSearch(seqID);
     } catch (IllegalSymbolException ise) {
       throw new BioError("Assertion Failure: Symbol dissapeared");
     }
