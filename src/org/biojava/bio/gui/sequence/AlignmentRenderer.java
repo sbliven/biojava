@@ -108,11 +108,11 @@ public class AlignmentRenderer implements SequenceRenderer, PropertyChangeListen
 	    int dir = ctx.getDirection();
 	    if (dir == ctx.HORIZONTAL) {
 		g.translate(0.0, offset);
-		subSeqBox.setRect(seqBox.getX(), seqBox.getY() + offset,
+		subSeqBox.setRect(seqBox.getX(), seqBox.getY(),
 				  seqBox.getWidth(), depth);
 	    } else {
 		g.translate(offset, 0.0);
-		subSeqBox.setRect(seqBox.getX() + offset, seqBox.getY(),
+		subSeqBox.setRect(seqBox.getX(), seqBox.getY(),
 				  depth, seqBox.getHeight());
 	    }
 
