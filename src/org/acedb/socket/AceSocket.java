@@ -66,24 +66,18 @@ class AceSocket implements Connection {
 	    String pad = transact("bonjour");
 	    String userPasswd = md5Sum(user, passwd);
 	    String token = md5Sum(userPasswd, pad);
-	    transact(user + " " + token);
-	    
+	    String repl = transact(user + " " + token);
+	    if (!repl.startsWith("et bonjour a vous"))
+		throw new AceException("Couldn't connect ("+repl+")");
 	} catch (IOException ex) {
 	    throw new AceException(ex);
 	}
     }
 
-    private int byteSwap(int i) {
-	// return ((i & 0xff) << 24) | ((i & 0xff00) << 8) | ((i & 0xff0000) >>> 8) | ((i & 0xff000000) >>> 24);
-	return i;
-    }
-
     public String transact(String s) throws AceException {
-	// System.err.println(">>> " + s);
 	try {
 	    writeMessage(MSGREQ, s);
 	    String reply = readMessage();
-	    // System.err.println("<<< " + reply);
 	    return reply;
 	} catch (IOException ex) {
 	    throw new AceException(ex);
@@ -91,8 +85,6 @@ class AceSocket implements Connection {
     }
 
     private void writeMessage(String type, String s) throws IOException {
-	// System.out.println("writeMessage: " + s);
-
 	dos.writeInt(OK_MAGIC);
 	dos.writeInt(s.length() + 1);
 	dos.writeInt(serverVersion); // ???Server version???
@@ -107,22 +99,15 @@ class AceSocket implements Connection {
 	dos.writeBytes(s);
 	dos.write(0);
 	dos.flush();
-
-	// System.out.println("writeMessageDone "+dos.size());
     }
 
     private String readMessage() throws IOException {
 	int magic = dis.readInt();
-	// System.out.println("readmagic = " + magic);
 	int length = dis.readInt();
-	// System.out.println("length = " + length);
 
 	int rServerVersion = dis.readInt(); 
-	// System.out.println("rServerVersion = " + rServerVersion);
 	int rClientId = dis.readInt();
-	// System.out.println("rClientId = " + rClientId);
 	int rMaxBytes = dis.readInt();
-	// System.out.println("rMaxBytes = " + rMaxBytes);
 	byte[] typeb = new byte[30];
 	dis.readFully(typeb);
 	String type = new String(typeb);
