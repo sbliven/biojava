@@ -22,7 +22,7 @@
 package org.biojava.bio.symbol;
 
 import org.biojava.bio.BioException;
-import org.biojava.utils.ParserException;
+import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SymbolTokenization;
 
 /**
@@ -135,7 +135,7 @@ public class PatternMaker
      * Convert String into a PatternSearch.Pattern object in the specified alphabet.
      */
     public static PatternSearch.Pattern parsePattern(String patternTxt, FiniteAlphabet alfa)
-        throws BioException, IllegalSymbolException, IllegalAlphabetException, ParserException
+        throws BioException, IllegalSymbolException, IllegalAlphabetException, ParseException
     {
         Context ctxt = new Context();
         ctxt.toke = new Tokenizer(patternTxt);
@@ -174,7 +174,7 @@ public class PatternMaker
                     ctxt.pattern.addPattern(thisP);
                     break;
                 default:
-                    throw new ParserException(ctxt.toke.getToken() + " is not valid at this point.");
+                    throw new ParseException(ctxt.toke.getToken() + " is not valid at this point.");
             }
         }
 
@@ -182,7 +182,7 @@ public class PatternMaker
     }
 
     private static Range getIterations(Context ctxt)
-        throws ParserException
+        throws ParseException
     {
         Range range = new Range();
 
@@ -210,7 +210,7 @@ public class PatternMaker
                         onSecondArg = true;
                     }
                     else {
-                        throw new ParserException("only two arguments permitted.");
+                        throw new ParseException("only two arguments permitted.");
                     }
                     break;
                 case Tokenizer.RIGHT_BRACE:
@@ -224,15 +224,15 @@ public class PatternMaker
                     }
                     return range;
                 default:
-                    throw new ParserException(ctxt.toke.getToken() + " is not valid at this point.");
+                    throw new ParseException(ctxt.toke.getToken() + " is not valid at this point.");
             }
         }
 
-        throw new ParserException("unexpected error.");
+        throw new ParseException("unexpected error.");
     }
 
     private static PatternSearch.Pattern parsePattern(Context ctxt)
-        throws IllegalSymbolException, IllegalAlphabetException, ParserException
+        throws IllegalSymbolException, IllegalAlphabetException, ParseException
     {
         // consume left bracket
         ctxt.toke.getToken();
@@ -274,14 +274,14 @@ public class PatternMaker
                     if (hasContent)
                         return pattern;
                     else    
-                        throw new ParserException("empty pattern!");
+                        throw new ParseException("empty pattern!");
 
                 default:
-                    throw new ParserException(ctxt.toke.getToken() + " is not valid at this point.");
+                    throw new ParseException(ctxt.toke.getToken() + " is not valid at this point.");
             }
         }
 
-        throw new ParserException("unexpected error.");
+        throw new ParseException("unexpected error.");
     }
 }
 

@@ -145,6 +145,14 @@ public class PatternSearch
             this.max = max;
         }
 
+        /**
+         * Set the label for this pattern.
+         */
+        public void setLabel(String label)
+        {
+            this.label = label;
+        }
+
         private List getPatternList()
         {
             return patternList;
