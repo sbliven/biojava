@@ -26,7 +26,7 @@ package org.biojava.bio.structure;
 import java.util.List ;
 import java.util.Map  ;
 
-/* *
+/**
  * 
  * Interface for a structure object. Provides access to the data of a PDB file.
  *
@@ -36,7 +36,7 @@ import java.util.Map  ;
  */
 public interface Structure {
 	
-    /* returns an identical copy of this structure 
+    /** returns an identical copy of this structure 
        public Structure clone();
     */
     
@@ -75,8 +75,8 @@ public interface Structure {
        <pre>
        COLUMNS         DATA TYPE        FIELD           DEFINITION
        ---------------------------------------------------------------------------------
-       1 -  6         Record name      "CONECT"
-       7 - 11         Integer          serial          Atom serial number
+        1 -  6         Record name      "CONECT"
+        7 - 11         Integer          serial          Atom serial number
        12 - 16         Integer          serial          Serial number of bonded atom
        17 - 21         Integer          serial          Serial number of bonded atom
        22 - 26         Integer          serial          Serial number of bonded atom
@@ -124,7 +124,7 @@ public interface Structure {
     /** test if this structure is an nmr structure */
     public boolean isNmr() ;
     
-    /* set NMR flag */
+    /** set NMR flag */
     public void setNmr(boolean nmr);
     
 
