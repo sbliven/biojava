@@ -92,7 +92,12 @@ extends AbstractSymbolList implements Serializable {
     }
     
     try {
-      return alpha.getSymbol(source.subList(index, index+order-1).toList());
+      // changed to this form to avoid constructing the sub-list objects
+      Symbol [] syms = new Symbol[order];
+      for(int i = 0; i < order; i++) {
+        syms[i] = source.symbolAt(index + i);
+      }
+      return alpha.getSymbol(Arrays.asList(syms));
     } catch (IllegalSymbolException iae) {
       throw new BioError(iae, "Alphabet changed underneath me");
     }
