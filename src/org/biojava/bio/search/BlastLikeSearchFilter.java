@@ -305,6 +305,9 @@ public interface BlastLikeSearchFilter
         public void evaluate(Node fch) {}
     }
 
+    /**
+     * Applies test to the value specified by the key in search properties.
+     */
     public static final class BySearchProperty
         extends AbstractBlastLikeSearchFilter
     {
@@ -324,6 +327,9 @@ public interface BlastLikeSearchFilter
         }
     }
 
+    /**
+     * Applies test to the value specified by the key in hit properties.
+     */
     public static final class ByHitProperty
         extends AbstractBlastLikeSearchFilter
     {
@@ -343,6 +349,9 @@ public interface BlastLikeSearchFilter
         }
     }
 
+    /**
+     * Applies test to the value specified by the key in subhit properties.
+     */
     public static final class BySubHitProperty
         extends AbstractBlastLikeSearchFilter
     {
