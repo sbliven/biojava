@@ -30,45 +30,50 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A no-frills implementation of ReversibleTranslationTable that uses two Maps
- * to map between symbols in a finite source alphabet into a finite target
- * alphabet.
+ * A no-frills implementation of TranslationTable that uses a Map to map from
+ * symbols in a finite source alphabet into a target alphabet.
  *
  * @author Matthew Pocock
+ * @author David Huen (refactoring)
  */
-public class SimpleReversibleTranslationTable
-extends SimpleTranslationTable
-implements ReversibleTranslationTable, Serializable {
-  /**
-   * Map from targets to source symbols
-   */
-  private Map revMap;
+public class SimpleReversibleTranslationTable 
+      extends AbstractReversibleTranslationTable
+      implements Serializable {
+  private final Map transMap;
+  private final Map revMap;
+  private final FiniteAlphabet source;
+  private final Alphabet target;
 
+  public Alphabet getSourceAlphabet() {
+    return source;
+  }
+
+  public Alphabet getTargetAlphabet() {
+    return target;
+  }
+
+  protected Symbol doTranslate(Symbol sym) {
+    return (Symbol) transMap.get(sym);
+  }
+
+  protected Symbol doUntranslate(Symbol sym) {
+    return (Symbol) revMap.get(sym);
+  }
+
+  /**
+   * Alter the translation mapping.
+   *
+   * @param from source AtomicSymbol
+   * @param to   target AtomicSymbol to be returned by translate(from)
+   * @throws IllegalSymbolException if either from is not in the source
+   *         alphabet or to is not in the target alphabet
+   */
   public void setTranslation(AtomicSymbol from, AtomicSymbol to)
   throws IllegalSymbolException {
-    super.setTranslation(from, to);
+    source.validate(from);
+    target.validate(to);
+    transMap.put(from, to);
     revMap.put(to, from);
-  }
-  
-  public Symbol untranslate(Symbol sym)
-  throws IllegalSymbolException {
-    Symbol s = (Symbol) revMap.get(sym);
-    if(s == null) {
-      if(s instanceof AtomicSymbol) {
-        getTargetAlphabet().validate(sym);
-        throw new IllegalSymbolException(
-          "Unable to map " + sym.getName()
-        );
-      } else {
-        Set syms = new HashSet();
-        for(Iterator i = ((FiniteAlphabet) s.getMatches()).iterator(); i.hasNext(); ) {
-          Symbol is = (Symbol) i.next();
-          syms.add(this.untranslate(is));
-        }
-        s = getSourceAlphabet().getAmbiguity(syms);
-      }
-    }
-    return s;
   }
 
   /**
@@ -78,10 +83,10 @@ implements ReversibleTranslationTable, Serializable {
    * @param target the target FiniteAlphabet
    * @throws IllegalAlphabetException if the alphabets are of different sizes
    */
-  public SimpleReversibleTranslationTable(
-    FiniteAlphabet source, FiniteAlphabet target
-  ) throws IllegalAlphabetException {
-    super(source, target);
+  public SimpleReversibleTranslationTable(FiniteAlphabet source, FiniteAlphabet target) 
+    throws IllegalAlphabetException
+  {
+
     if(source.size() != target.size()) {
       throw new IllegalAlphabetException(
         "Couldn't create translation table as " +
@@ -91,6 +96,9 @@ implements ReversibleTranslationTable, Serializable {
       );
     }
 
+    this.source = source;
+    this.target = target;
+    this.transMap = new HashMap();
     this.revMap = new HashMap();
   }
 }
