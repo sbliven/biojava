@@ -75,7 +75,11 @@ public class DASSequenceDB implements SequenceDB {
 	try {
 	    URL epURL = new URL(dataSourceURL, "entry_points");
 	    HttpURLConnection huc = (HttpURLConnection) epURL.openConnection();
-	    huc.connect();
+            try {
+              huc.connect();
+            } catch (Exception e) {
+              throw new BioException(e, "Can't connect to " + epURL);
+            }
 	    int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
 	    if (status == 0)
 		throw new BioException("Not a DAS server");
