@@ -207,7 +207,7 @@ public class FastaFormat implements SequenceFormat, Serializable {
 		    if (br.skip(i) != i)
 			throw new IOException("Couldn't reset to start of next sequence");
 		    return;
-		} else if (c != '\n') {
+		} else if (c != '\n' && c != '\r') {
 		    cache[cacheMax++] = c;
 		}
 	    }
