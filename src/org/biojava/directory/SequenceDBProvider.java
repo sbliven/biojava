@@ -7,5 +7,5 @@ import org.biojava.bio.seq.db.*;
 
 public interface SequenceDBProvider {
     public String getName();
-    public SequenceDB getSequenceDB(Map config) throws RegistryException, BioException;
+    public SequenceDBLite getSequenceDB(Map config) throws RegistryException, BioException;
 }

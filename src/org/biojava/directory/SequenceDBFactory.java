@@ -70,7 +70,7 @@ public class SequenceDBFactory {
 	return instance;
     }
 
-    public SequenceDB getDatabase(String dbName) throws RegistryException, BioException{
+    public SequenceDBLite getDatabase(String dbName) throws RegistryException, BioException{
 	
 	Map dbConfig = null;
 	String providerName = "";
