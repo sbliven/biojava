@@ -133,17 +133,10 @@ public interface Term extends Annotatable {
         }
 
       public int hashCode() {
-        int value = 31;
+        int value = 17;
         if(getName() != null)
-          value = 31 * (getName().hashCode() +5);
-        if(getDescription() != null)
-          value = 31 * (getDescription().hashCode() + 7);
-        if(getAnnotation() != null)
-          value = 31 * (getAnnotation().hashCode() + 11);
-
-        //System.out.println("value = "+ (-91 * value));
-
-        return -91 * value;
+          value *= 31 * getName().hashCode();
+        return 17 * value;
       }
 
       public boolean equals(Object obj)
