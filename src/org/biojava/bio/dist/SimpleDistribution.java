@@ -20,7 +20,7 @@
  */
 
 
-package org.biojava.bio.dp;
+package org.biojava.bio.dist;
 
 import java.util.*;
 import java.io.Serializable;
@@ -83,7 +83,7 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
     weight.put(s, d);
   }
   
-  public void registerWithTrainer(ModelTrainer trainer) {
+  public void registerWithTrainer(org.biojava.bio.dp.ModelTrainer trainer) {
 /*    try {
       trainer.registerTrainerForDistribution(new SimpleDistributionTrainer(this));
     } catch (IllegalAlphabetException iae) {

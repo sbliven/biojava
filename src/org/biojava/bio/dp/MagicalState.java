@@ -28,6 +28,7 @@ import java.lang.reflect.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.dist.*;
 import org.biojava.utils.*;
 
 /**
@@ -101,8 +102,8 @@ public final class MagicalState extends SimpleEmissionState {
     
     public double getWeight(Symbol sym) throws IllegalSymbolException {
       return sym == AlphabetManager.instance().getGapSymbol()
-        ? 0.0
-        : Double.NEGATIVE_INFINITY;
+        ? 1.0
+        : 0.0;
     }
 
     public void setWeight(Symbol s, double w) throws IllegalSymbolException,
@@ -121,7 +122,8 @@ public final class MagicalState extends SimpleEmissionState {
       return AlphabetManager.instance().getGapSymbol();
     }
 
-    public void registerWithTrainer(ModelTrainer modelTrainer) {
+    public void registerWithTrainer(DistributionTrainerContext dtc) {
+      dtc.registerDistributionTrainer(this, IgnoreCountsTrainer.getInstance());
     }
     
     public MagicalDistribution(Alphabet alpha) {

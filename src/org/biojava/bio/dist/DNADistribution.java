@@ -20,7 +20,7 @@
  */
 
 
-package org.biojava.bio.dp;
+package org.biojava.bio.dist;
 
 import java.util.*;
 import java.io.Serializable;
@@ -107,25 +107,17 @@ extends AbstractDistribution implements Serializable {
     }
   }
   
-  public void registerWithTrainer(ModelTrainer modelTrainer) {
-/*    Set trainerSet = modelTrainer.trainersForState(this);
-    if(trainerSet.isEmpty()) {
-      modelTrainer.registerTrainerForState(this, new DNADistributionTrainer());
-    }*/
+  public void registerWithTrainer(DistributionTrainerContext dtc) {
+    dtc.registerDistributionTrainer(this, new DNADistributionTrainer());
   }
-////////
-// won't work correctly for ambiguity symbols!!!!!!
-////////
-/*  private class DNADistributionTrainer implements DistributionTrainer, Serializable {
+
+  private class DNADistributionTrainer implements DistributionTrainer, Serializable {
     double c [] = new double[4];
       
-    public void addCount(Symbol res, double counts)
-    throws IllegalSymbolException {
-      if(res instanceof MagicalState)
-        return;
-      // System.out.println("Added count " + name() + " -> " + res.getToken() + " = "
-      //                    + counts + ", " + c[DNATools.index(res)]);
-      c[DNATools.index(res)] += counts;
+    public void addCount(
+      DistributionTrainerContext dtc, Symbol sym, double counts
+    ) throws IllegalSymbolException {
+      c[DNATools.index(sym)] += counts;
     }
       
     public void train(Distribution nullModel, double weight)
@@ -133,11 +125,11 @@ extends AbstractDistribution implements Serializable {
       double sum = 0.0;
       for(int i = 0; i < c.length; i++) {
         Symbol s = DNATools.forIndex(i);
-        sum += c[i] += (nullModel == null) ? 0.0 : Math.exp(nullModel.getWeight(s))*weight;
+        sum += c[i] + nullModel.getWeight(s)*weight;
       }
       for(int i = 0; i < c.length; i++) {
         Symbol s = DNATools.forIndex(i);
-        setWeight(s, Math.log(c[i] / sum) );
+        setWeight(s, (c[i] + nullModel.getWeight(s)*weight) / sum );
       }
     }
       
@@ -145,5 +137,5 @@ extends AbstractDistribution implements Serializable {
       for(int i = 0; i < c.length; i++)
         c[i] = 0;
     }
-  }*/
+  }
 }

@@ -27,6 +27,7 @@ import java.io.Serializable;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.dist.*;
 
 /**
  * A model that guarantees to only contain emission states and dot states.

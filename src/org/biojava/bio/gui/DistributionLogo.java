@@ -29,7 +29,7 @@ import javax.swing.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
-import org.biojava.bio.dp.*;
+import org.biojava.bio.dist.*;
 
 /**
  * The gui component for rendering a DistributionLogo. By default, this uses the text
@@ -160,8 +160,8 @@ public class DistributionLogo extends JComponent {
    */
   public double entropy(Symbol r) throws IllegalSymbolException {
     Distribution dist = getDistribution();
-    double lp = dist.getWeight(r);
-    double p = Math.exp(lp);
+    double p = dist.getWeight(r);
+    double lp = Math.log(p);
     
     return -p * lp / bits;
   }

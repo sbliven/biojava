@@ -20,7 +20,7 @@
  */
 
 
-package org.biojava.bio.dp;
+package org.biojava.bio.dist;
 
 import java.util.*;
 import java.io.Serializable;
@@ -36,7 +36,11 @@ implements DistributionTrainer, Serializable {
     this.c = new HashMap();
   }
 
-  public void addCount(Symbol sym, double count) throws IllegalSymbolException {
+  public void addCount(
+    DistributionTrainerContext dtc,
+    Symbol sym,
+    double count
+  ) throws IllegalSymbolException {
     Double d = (Double) c.get(sym);
     if (d == null) {
       throw new IllegalSymbolException(
@@ -57,23 +61,15 @@ implements DistributionTrainer, Serializable {
     Distribution nullModel,
     double weight
   ) throws IllegalSymbolException {
-    if(nullModel != null) {
-      for (
-        Iterator i = ((FiniteAlphabet) dis.getAlphabet()).iterator();
-        i.hasNext();
-      ) {
-        Symbol s = (Symbol) i.next();
-        addCount(s, Math.exp(nullModel.getWeight(s) + weight));
-      }
-    }
-    
     double sum = 0.0;
     for(
       Iterator i = ((FiniteAlphabet) dis.getAlphabet()).iterator();
       i.hasNext();
     ) {
       Symbol s = (Symbol) i.next();
-      sum += ((Double) c.get(s)).doubleValue();
+      Double d = (Double) c.get(s);
+      sum += d.doubleValue() +
+             nullModel.getWeight(s) * weight;
     }
     //System.out.println(state.getName() + ": sum=" + sum);
     for(
@@ -82,15 +78,10 @@ implements DistributionTrainer, Serializable {
     ) {
       Symbol sym = (Symbol) i.next();
       Double d = (Double) c.get(sym);
-      /*System.out.println(
-        state.getName() + ": Setting " + sym.getName() +
-        " counts to " + d
-      );*/
       dis.setWeight(
         sym,
-        Math.log(d.doubleValue() / sum)
+        (d.doubleValue() + nullModel.getWeight(sym) * weight) / sum
       );
-      //System.out.println(state.getName() + ": Done");
     }
   }
 

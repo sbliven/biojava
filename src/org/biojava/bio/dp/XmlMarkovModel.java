@@ -29,6 +29,7 @@ import org.w3c.dom.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.dist.*;
 
 public class XmlMarkovModel {
   public static WeightMatrix readMatrix(Element root)
@@ -68,7 +69,7 @@ public class XmlMarkovModel {
           res = nameParser.parseToken(resName);
         else
           res = symParser.parseToken(resName);
-        wm.getColumn(indx).setWeight(res, Math.log(Double.parseDouble(weightE.getAttribute("prob"))));
+        wm.getColumn(indx).setWeight(res, Double.parseDouble(weightE.getAttribute("prob")));
       }      
     }
     
@@ -145,7 +146,7 @@ public class XmlMarkovModel {
             res = symbolParser.parseToken(resName);
           }
         }          
-        dis.setWeight(res, Math.log(Double.parseDouble(weightE.getAttribute("prob"))));
+        dis.setWeight(res, Double.parseDouble(weightE.getAttribute("prob")));
       }
       model.addState(state);
     }
@@ -218,7 +219,7 @@ public class XmlMarkovModel {
           for(Iterator resI = resR.iterator(); resI.hasNext(); ) {
             Symbol r = (Symbol) resI.next();
             out.println("    <weight res=\"" + r.getName() +
-                        "\" prob=\"" + Math.exp(dis.getWeight(r)) + "\"/>");
+                        "\" prob=\"" + dis.getWeight(r) + "\"/>");
           }
         }
         out.println("  </state>");

@@ -26,6 +26,7 @@ import java.io.Serializable;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.dist.*;
 
 public class SimpleEmissionState
 implements EmissionState, Serializable {

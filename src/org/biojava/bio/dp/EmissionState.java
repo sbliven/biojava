@@ -24,6 +24,7 @@ package org.biojava.bio.dp;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.dist.*;
 
 /**
  * A state in a markov process that has an emission spectrum.

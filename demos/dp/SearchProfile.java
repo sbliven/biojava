@@ -7,6 +7,7 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
+import org.biojava.bio.dist.*;
 import org.biojava.bio.dp.*;
 
 public class SearchProfile {
@@ -138,7 +139,7 @@ public class SearchProfile {
           j.hasNext();
         ) {
           Symbol r = (Symbol) j.next();
-          mt.addStateCount(es, r, Math.random());
+          mt.addCount(es.getDistribution(), r, Math.random());
         }
       }
       for(Iterator j = model.transitionsFrom(s).iterator(); j.hasNext(); ) {

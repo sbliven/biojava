@@ -23,6 +23,7 @@
 package org.biojava.bio.dp;
 
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.dist.*;
 
 /**
  * A log odds weight matrix.

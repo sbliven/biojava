@@ -30,7 +30,7 @@ import java.util.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
-import org.biojava.bio.dp.*;
+import org.biojava.bio.dist.*;
 
 /**
  * A logo painter that paints in bars. The total height of the bars is
@@ -59,7 +59,7 @@ public class BarLogoPainter implements LogoPainter {
       double rh = 0.0;
      
       try {
-        rh = Math.exp(dis.getWeight(r)) * scale;
+        rh = dis.getWeight(r) * scale;
       } catch (IllegalSymbolException ire) {
         throw new BioError(ire, "State alphabet has changed while painting");
       }

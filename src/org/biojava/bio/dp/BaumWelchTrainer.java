@@ -26,6 +26,7 @@ import java.io.Serializable;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.dist.*;
 import org.biojava.bio.seq.*;
 
 public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
@@ -57,8 +58,8 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
         double [] fsc = fm.scores[i];
         double [] bsc = bm.scores[i];
         if (! (states[s] instanceof MagicalState)) {
-          trainer.addStateCount(
-            (EmissionState) states[s],
+          trainer.addCount(
+            ((EmissionState) states[s]).getDistribution(),
             res,
             Math.exp(fsc[s] + bsc[s] - fs)
           );

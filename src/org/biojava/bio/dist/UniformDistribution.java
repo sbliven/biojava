@@ -20,7 +20,7 @@
  */
 
 
-package org.biojava.bio.dp;
+package org.biojava.bio.dist;
 
 import java.util.*;
 import java.io.Serializable;
@@ -73,12 +73,12 @@ extends AbstractDistribution implements Serializable {
     return weight;
   }
   
-  public void registerWithTrainer(ModelTrainer trainer) {
+  public void registerWithTrainer(org.biojava.bio.dp.ModelTrainer trainer) {
   }
   
   private UniformDistribution(FiniteAlphabet alphabet) {
     this.alphabet = alphabet;
-    this.weight = -Math.log(alphabet.size());
+    this.weight = 1.0 / (double) alphabet.size();
     this.nullModel = this;
   }
 }

@@ -23,6 +23,7 @@ package dp;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.dist.*;
 import org.biojava.bio.dp.*;
 
 /**
@@ -81,10 +82,10 @@ public class Dice
 	//set up emission probabilities.
 	for(int i=0;i<rolls.length;i++)
 	{
-	    fairD.setWeight(rolls[i],-Math.log(6));
-	    loadedD.setWeight(rolls[i],-Math.log(10));
+	    fairD.setWeight(rolls[i],1.0/6.0);
+	    loadedD.setWeight(rolls[i], 0.1);
 	}
-	loadedD.setWeight(rolls[5],-Math.log(2));
+	loadedD.setWeight(rolls[5],0.5);
 	
 	//set up transition scores.
 	casino.setTransitionScore(casino.magicalState(),fairS,  Math.log(0.8));

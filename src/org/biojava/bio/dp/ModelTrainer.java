@@ -26,23 +26,12 @@ import java.util.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.dist.*;
 
 /**
  * Encapsulates the training of an entire model.
  */
-public interface ModelTrainer {
-  /**
-   * Adds some counts to a state for a given symbol.
-   *
-   * @param s  the EmissionState that emitted the symbol
-   * @param r  the Symbol that was emitted
-   * @param count  the number of counts to add
-   * @throws IllegalSymbolException if r is not emitted by s or if s is not a
-   *         state known by this trainer
-   */
-  void addStateCount(EmissionState s, Symbol r, double count)
-  throws IllegalSymbolException;
-  
+public interface ModelTrainer extends DistributionTrainerContext {
   /**
    * Adds some counts to the transition between two states.
    *
@@ -74,35 +63,6 @@ public interface ModelTrainer {
    * Clears all of the counts, ready for re-training.
    */
   void clearCounts();
-  
-  /**
-   * Register a DistributionTrainer as being associated with a state.
-   * <P>
-   * More than one trainer may be associated with the same state, in which
-   * case any counts will be added to each trainer.
-   * More than one state may be associated with the same trainer, in which
-   * case the trainer is responsible for each state.
-   *
-   * @param state the EmissionState to associate with a trainer
-   * @param trainer the trainer to add to the list of trainers for the state
-   */
-  void registerTrainerForState(EmissionState state, DistributionTrainer trainer);
-  
-  /**
-   * Retrieves a Set of DistributionTrainers associated with an emission state.
-   * <P>
-   * Do not change the Set returned.
-   *
-   * @param state the state for which to retrieve trainers
-   * @return  a Set, possibly empty, of DistributionTrainers that will be informed of
-   *          counts for the state
-   */
-  Set trainersForState(EmissionState state);
-  
-  /**
-   * Return a Set of all the DistributionTrainer objects used by this ModelTrainer.
-   */
-  Set getAllDistributionTrainers();
   
   /**
    * Register a TransitionTrainer, a source and a destination state with a
@@ -140,11 +100,6 @@ public interface ModelTrainer {
    * @return  a Set, possibly empty, of TrainerTransition objects
    */
   Set trainersForTransition(State from, State to);
-  
-  /**
-   * Return a set of all TransitionTrainers used by this ModelTrainer.
-   */
-  Set getAllTransitionTrainers();
   
   /**
    * Retrieve the TransitionTrainer associated with a model, or null if

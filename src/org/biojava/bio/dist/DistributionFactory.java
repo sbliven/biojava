@@ -20,7 +20,7 @@
  */
 
 
-package org.biojava.bio.dp;
+package org.biojava.bio.dist;
 
 import java.util.*;
 import java.io.*;

@@ -20,7 +20,7 @@
  */
 
 
-package org.biojava.bio.dp;
+package org.biojava.bio.dist;
 
 import java.util.*;
 
@@ -60,10 +60,12 @@ public abstract class AbstractDistribution implements Distribution {
     for(Iterator i = fa.iterator(); i.hasNext(); ) {
       Symbol sym = (Symbol) i.next();
       double nm = getNullModel().getWeight(sym);
-      sum += Math.exp(getWeight(sym) + nm);
-      div += Math.exp(nm);
+      sum += getWeight(sym) * nm;
+      div += nm;
     }
-    return Math.log(sum / div);
+    return (sum == 0.0)
+      ? 0.0
+      : sum / div;
   }
   
   /**
@@ -79,7 +81,7 @@ public abstract class AbstractDistribution implements Distribution {
     try {
       for(Iterator i = ((FiniteAlphabet) getAlphabet()).iterator(); i.hasNext(); ) {
         Symbol s = (Symbol) i.next();
-        p -= Math.exp(getWeight(s));
+        p -= getWeight(s);
         if( p <= 0) {
           return s;
         }
@@ -88,7 +90,7 @@ public abstract class AbstractDistribution implements Distribution {
       StringBuffer sb = new StringBuffer();
       for(Iterator i = ((FiniteAlphabet) this.getAlphabet()).iterator(); i.hasNext(); ) {
         Symbol s = (Symbol) i.next();
-        double w = Math.exp(getWeight(s));
+        double w = getWeight(s);
         sb.append("\t" + s.getName() + " -> " + w + "\n");
       }
       throw new BioError(
@@ -102,5 +104,9 @@ public abstract class AbstractDistribution implements Distribution {
         "things changed beneath me!"
       );
     }
+  }
+  
+  public void registerWithTrainer(DistributionTrainerContext dtc) {
+    dtc.registerDistributionTrainer(this, IgnoreCountsTrainer.getInstance());
   }
 }

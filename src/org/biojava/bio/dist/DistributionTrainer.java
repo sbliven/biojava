@@ -20,7 +20,7 @@
  */
 
 
-package org.biojava.bio.dp;
+package org.biojava.bio.dist;
 
 import org.biojava.bio.symbol.*;
 
@@ -37,16 +37,20 @@ public interface DistributionTrainer {
    * This method may be called multiple times with the same symbol. In this
    * case, the times should be summed.
    *
+   * @param dtc the DistributionTrainerContext within which the count was added
    * @param sym the Symbol seen
    * @param times the number of times to add
    */
-  void addCount(Symbol res, double times) throws IllegalSymbolException;
+  void addCount(DistributionTrainerContext dtc, Symbol res, double times)
+  throws IllegalSymbolException;
   
   /**
    * Trains the Distribution, given a null model.
    * <P>
    * This will use the information collected with multiple addCount calls, and
    * the null model to generate the new weights.
+   * <P>
+   * This method should not modify the underlying counts.
    *
    * @param nullModel the null model Distribution
    * @param weight  how many lots of the null model to add

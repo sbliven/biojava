@@ -30,7 +30,7 @@ import java.util.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
-import org.biojava.bio.dp.*;
+import org.biojava.bio.dist.*;
 
 /**
  * A logo painter that paints in stacked letters.
@@ -131,7 +131,7 @@ public class TextLogoPainter implements LogoPainter {
         i.hasNext();
       ) {
         Symbol r = (Symbol) i.next();
-        info.add(new ResVal(r, Math.exp(dis.getWeight(r)) * scale));
+        info.add(new ResVal(r, dis.getWeight(r) * scale));
       }
     } catch (IllegalSymbolException ire) {
       throw new BioError(ire, "Symbol dissapeared from dis alphabet");

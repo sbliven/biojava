@@ -27,19 +27,12 @@ import java.io.Serializable;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.dist.*;
 
-public class SimpleModelTrainer implements ModelTrainer, Serializable {
+public class SimpleModelTrainer
+extends SimpleDistributionTrainerContext
+implements ModelTrainer, Serializable {
   private Transition _tran;
-  
-  /**
-   * state -> Set <DistributionTrainer>
-   */
-  private Map stateToTrainer;
-  
-  /**
-   * The set of all DistributionTrainers.
-   */
-  private Set allDistributionTrainers;
   
   /**
    * Transition -> Set <TrainerTransition>
@@ -72,26 +65,10 @@ public class SimpleModelTrainer implements ModelTrainer, Serializable {
   
   {
     _tran = new Transition(null, null);
-    stateToTrainer = new HashMap();
-    allDistributionTrainers = new HashSet();
     transitionToTrainer = new HashMap();
     transitionToCount = new HashMap();
     allTransitionTrainers = new HashSet();
     modelToTrainer = new HashMap();
-  }
-  
-  public void addStateCount(EmissionState s, Symbol r, double count)
-  throws IllegalSymbolException {
-    Set trainerSet = (Set) stateToTrainer.get(s);
-    if(trainerSet == null) {
-      throw new IllegalSymbolException(
-        "No trainers associated with state " +
-        s.getName() + " while training " + model.stateAlphabet().getName()
-      );
-    }                                  
-    for(Iterator i = trainerSet.iterator(); i.hasNext();) {
-      ((DistributionTrainer) i.next()).addCount(r, count);
-    }
   }
   
   public void addTransitionCount(State from, State to, double count)
@@ -109,11 +86,7 @@ public class SimpleModelTrainer implements ModelTrainer, Serializable {
 
   public void train()
   throws IllegalSymbolException, IllegalTransitionException {
-    // train all states
-    for(Iterator i = getAllDistributionTrainers().iterator(); i.hasNext();) {
-      DistributionTrainer st = (DistributionTrainer) i.next();
-      st.train(nullModel, nullModelWeight);
-    }
+    trainDistributions();
     
     // dispurse all transition counts
     for(Iterator i = transitionToTrainer.keySet().iterator(); i.hasNext();) {
@@ -140,10 +113,7 @@ public class SimpleModelTrainer implements ModelTrainer, Serializable {
   }
 
   public void clearCounts() {
-    // clear all states
-    for(Iterator i = getAllDistributionTrainers().iterator(); i.hasNext();) {
-      ((DistributionTrainer) i.next()).clearCounts();
-    }
+    super.clearDistributionCounts();
     
     // clear all counts in transitionToCount
     for(Iterator i = transitionToCount.keySet().iterator(); i.hasNext();) {
@@ -154,28 +124,6 @@ public class SimpleModelTrainer implements ModelTrainer, Serializable {
     for(Iterator i = getAllTransitionTrainers().iterator(); i.hasNext();) {
       ((TransitionTrainer) i.next()).clearCounts();
     }
-  }
-  
-  public void registerTrainerForState(EmissionState state,
-                                      DistributionTrainer trainer) {
-    Set trainerSet = (Set) stateToTrainer.get(state);
-    if(trainerSet == null) {
-      trainerSet = new HashSet();
-      stateToTrainer.put(state, trainerSet);
-    }
-    trainerSet.add(trainer);
-    allDistributionTrainers.add(trainer);
-  }
-  
-  public Set trainersForState(EmissionState state) {
-    Set trainerSet = (Set) stateToTrainer.get(state);
-    if(trainerSet == null)
-      return Collections.EMPTY_SET;
-    return trainerSet;
-  }
-  
-  public Set getAllDistributionTrainers() {
-    return allDistributionTrainers;
   }
   
   public void registerTrainerForTransition(
@@ -246,8 +194,8 @@ public class SimpleModelTrainer implements ModelTrainer, Serializable {
     double transCounts, double transCountWeight
   ) throws BioException {
     this.model = model;
-    this.nullModel = nullModel;
-    this.nullModelWeight = nullModelWeight;
+    setNullModel(nullModel);
+    setNullModelWeight(nullModelWeight);
     this.transCounts = transCounts;
     this.transCountWeight = transCountWeight;
     model.registerWithTrainer(this);

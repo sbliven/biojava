@@ -27,6 +27,7 @@ import java.io.Serializable;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.dist.*;
 import org.biojava.bio.seq.*;
 
 class SingleDP extends DP implements Serializable {
@@ -56,7 +57,7 @@ class SingleDP extends DP implements Serializable {
       for(int i = 0; i < dsi; i++) {
         EmissionState es = (EmissionState) states[i];
         Distribution dis = es.getDistribution();
-        em[i] = dis.getWeight(sym);
+        em[i] = Math.log(dis.getWeight(sym));
       }
       emissions.put(sym, em);
     }

@@ -26,6 +26,7 @@ import java.util.*;
 import java.io.Serializable;
 
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.dist.*;
 
 public class SimpleWeightMatrix implements WeightMatrix, Serializable {
   private Distribution [] columns;
