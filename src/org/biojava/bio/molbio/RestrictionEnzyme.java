@@ -371,6 +371,17 @@ public class RestrictionEnzyme implements Serializable
             return BLUNT;
     }
 
+    public int hashCode()
+    {
+        return name.hashCode() ^ forwardRegex.hashCode();
+    }
+
+    public boolean equals(Object o)
+    {
+        return (o instanceof RestrictionEnzyme)
+            && name.equals(((RestrictionEnzyme) o).getName());
+    }
+
     public String toString()
     {
         return summary;
