@@ -151,9 +151,9 @@ public class FastaFormat implements SequenceFormat {
     for(int i = 1; i <= length; i++) {
       os.print(seq.symbolAt(i).getToken());
       if( (i % lineWidth) == 0)
-        os.print("\n");
+        os.println();
     }
     if( (length % lineWidth) != 0)
-      os.print("\n");
+      os.println();
   }
 }

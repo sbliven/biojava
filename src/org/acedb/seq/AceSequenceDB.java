@@ -27,6 +27,7 @@ import java.util.*;
 import org.acedb.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.db.*;
 
 /**
  * An implementation of SequenceDB that lets either an entire ACeDB database,

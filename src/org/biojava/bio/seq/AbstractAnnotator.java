@@ -24,6 +24,7 @@ package org.biojava.bio.seq;
 import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.db.*;
 
 /**
  * An abstract implemenation of Annotator that takes care of the loop-over-db
@@ -31,6 +32,9 @@ import org.biojava.bio.symbol.*;
  *
  * @author Matthew Pocock
  * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A>
+ *
+ * @deprecated Tagged for removal.  If you use this class, please
+ *             e-mail biojava-l@biojava.org.
  */
 public abstract class AbstractAnnotator implements Annotator {
 

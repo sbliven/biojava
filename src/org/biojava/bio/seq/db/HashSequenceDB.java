@@ -19,9 +19,10 @@
  *
  */
 
-package org.biojava.bio.seq;
+package org.biojava.bio.seq.db;
 
 import java.util.*;
+import org.biojava.bio.seq.*;
 import java.io.Serializable;
 
 /**

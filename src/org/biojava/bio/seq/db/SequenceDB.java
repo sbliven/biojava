@@ -19,10 +19,11 @@
  *
  */
 
-package org.biojava.bio.seq;
+package org.biojava.bio.seq.db;
 
 import java.util.*;
 import org.biojava.bio.*;
+import org.biojava.bio.seq.*;
 
 /**
  * A database of sequences.
@@ -33,6 +34,7 @@ import org.biojava.bio.*;
  *
  * @author Matthew Pocock
  * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A>
+ * @author Thomas Down
  */
 public interface SequenceDB {
   /**

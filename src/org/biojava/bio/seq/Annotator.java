@@ -25,6 +25,8 @@ import java.util.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.db.*;
 
 /**
  * Annotates a database of annotated sequences, returning all sequences
@@ -34,6 +36,9 @@ import org.biojava.bio.symbol.*;
  * domains in proteins, genes in genomes and all sorts of other things.
  *
  * @author Matthew Pocock
+ *
+ * @deprecated This interface is tagged for removal.  If you use it,
+ *             please e-mail biojava-l@biojava.org.
  */
 public interface Annotator {
   /**

@@ -27,6 +27,7 @@ import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.db.*;
 
 /**
  * Turns a sequence database into a GFF event stream.
