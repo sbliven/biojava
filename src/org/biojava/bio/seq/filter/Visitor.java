@@ -6,7 +6,7 @@ import org.biojava.bio.seq.FeatureFilter;
  * Things that will be shown filters.
  *
  * <p>
- * Visitors will be shown filters by Walker intances. The walker will take care
+ * Visitors will be shown filters by Walker instances. The walker will take care
  * of traversing filters like And, Or and ByParent that wrap other filters.
  * </p>
  *
@@ -72,7 +72,7 @@ import org.biojava.bio.seq.FeatureFilter;
  * children will follow the normal pattern. So, the handler for
  * <code>FeatureFilter.And</code> will be
  * <pre>public void and(FeatureFilter.And)</pre>
- * In the case where all handlers return intances of some class, the handlers
+ * In the case where all handlers return instances of some class, the handlers
  * for filters with children will contain one extra argument per child. So, the
  * handler in this case would be
  * <pre>public Bar and(FeatureFilter.And, Bar, Bar)</pre>
