@@ -19,12 +19,13 @@
  *
  */
 
-package org.biojava.bio.symbol;
+package org.biojava.stats.svm.tools;
 
 import java.util.BitSet;
 import java.io.*;
 
 //import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.stats.svm.SVMKernel;
 
 /**
@@ -85,7 +86,7 @@ public class SuffixTreeKernel implements SVMKernel, Serializable {
     SuffixTree.SuffixNode n1 = st1.getRoot();
     SuffixTree.SuffixNode n2 = st2.getRoot();
       
-    return dot(n1, n2, st1.getAlphabet().size(), 0);
+    return dot(st1, n1, st2, n2, st1.getAlphabet().size(), 0);
   }
   
   /**
@@ -101,14 +102,18 @@ public class SuffixTreeKernel implements SVMKernel, Serializable {
    * (<span class="arg">depth</span>), and then returns the sum of this and the
    * dot products for all children of the suffix nodes.
    */
-  private double dot(SuffixTree.SuffixNode n1,
-                     SuffixTree.SuffixNode n2, int size, int depth)
+  private double dot(SuffixTree st1,
+		     SuffixTree.SuffixNode n1,
+		     SuffixTree st2,
+                     SuffixTree.SuffixNode n2,
+		     int size,
+		     int depth)
   {
     double scale = getDepthScaler().getScale(depth);
     double dot = n1.getNumber() * n2.getNumber() * scale * scale;
     for(int i = 0; i < size; i++) {
       if(n1.hasChild(i) && n2.hasChild(i)) {
-        dot += dot(n1.getChild(i), n2.getChild(i), size, depth+1);
+        dot += dot(st1, st1.getChild(n1, i), st2, st2.getChild(n2, i), size, depth+1);
       }
     }
     return dot;
