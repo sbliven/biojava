@@ -49,7 +49,7 @@ public interface SequenceDB extends Changeable {
   public static final ChangeType SEQUENCES = new ChangeType(
     "Sequences have been added or removed from the database",
     "org.biojava.bio.seq.db.SequenceDB",
-    "SEQUENCE"
+    "SEQUENCES"
   );
   
   /**
