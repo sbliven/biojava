@@ -63,10 +63,12 @@ extends AbstractDistribution implements Serializable {
         " and this distribution's alphabet is " + getAlphabet().getName()
       );
     }
+    if(this.nullModel != null) {
+      this.nullModel.removeChangeListener(nullModelListener);
+    }
     if(changeSupport == null) {
       // if there are no listners yet, don't g through the overhead of
       // synchronized regions or of trying to inform them.
-      this.nullModel.removeChangeListener(nullModelListener);
       this.nullModel = nullModel;
       nullModel.addChangeListener(nullModelListener);
     } else {
@@ -77,9 +79,6 @@ extends AbstractDistribution implements Serializable {
         nullModel,
         this.nullModel
       );
-      if(this.nullModel != null) {
-        this.nullModel.removeChangeListener(nullModelListener);
-      }
       synchronized(changeSupport) {
         changeSupport.firePreChangeEvent(ce);
         this.nullModel = nullModel;
