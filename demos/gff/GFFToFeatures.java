@@ -51,9 +51,9 @@ public class GFFToFeatures {
       System.out.println("Dumping sequence features as GFF");
       PrintWriter out = new PrintWriter(new OutputStreamWriter(System.out));
       GFFWriter writer = new GFFWriter(out);
-      SequenceDBAsGFF seqDBAsGFF = new SequenceDBAsGFF();
+      SequencesAsGFF seqsAsGFF = new SequencesAsGFF();
       
-      seqDBAsGFF.processDB(seqDB, writer);
+      seqsAsGFF.processDB(seqDB, writer);
       
     } catch (Exception e) {
       e.printStackTrace();
