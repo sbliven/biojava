@@ -43,4 +43,9 @@ public class MySQLDBHelper implements DBHelper {
 	}
 	return id;
     }
+
+
+    public DeleteStyle getDeleteStyle() {
+	return DELETE_MYSQL4;
+    }
 }

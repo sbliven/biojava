@@ -25,8 +25,26 @@ import java.sql.*;
 import java.util.*;
 
 public interface DBHelper {
+    public static final class DeleteStyle {
+	private final String name;
+
+	private DeleteStyle(String name) {
+	    this.name = name;
+	}
+
+	public String toString() {
+	    return "DBHelper.DeleteStyle: " + name;
+	}
+    }
+
+    public final static DeleteStyle DELETE_POSTGRESQL = new DeleteStyle("Postgresql");;
+    public final static DeleteStyle DELETE_MYSQL4 = new DeleteStyle("Mysql 4.02 or later");
+    public final static DeleteStyle DELETE_GENERIC = new DeleteStyle("Portable SQL");
+
     public int getInsertID(Connection conn,
 			   String table,
 			   String columnName)
 	throws SQLException;
+
+    public DeleteStyle getDeleteStyle();
 }

@@ -72,4 +72,9 @@ public class PostgreSQLDBHelper implements DBHelper {
 	}
 	return id;
     }
+
+    
+    public DeleteStyle getDeleteStyle() {
+	return DELETE_POSTGRESQL;
+    }
 }

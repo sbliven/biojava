@@ -579,23 +579,49 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
                 delete_qv.executeUpdate();
                 delete_qv.close();
 
-                PreparedStatement delete_locs = conn.prepareStatement("delete from seqfeature_location " +
-                                                                       " where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
-                                                                       "       seqfeature.bioentry_id = ?");
+		DBHelper.DeleteStyle dstyle = getDBHelper().getDeleteStyle();
+
+                PreparedStatement delete_locs;
+		if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
+		    delete_locs = conn.prepareStatement("delete from seqfeature_location " +
+							" where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
+							"       seqfeature.bioentry_id = ?");
+		} else {
+		    delete_locs = conn.prepareStatement("delete from seqfeature_location " +
+							" using seqfeature_location, seqfeature " + 
+							" where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
+							"       seqfeature.bioentry_id = ?");
+		}
                 delete_locs.setInt(1, bioentry_id);
                 delete_locs.executeUpdate();
                 delete_locs.close();
 
-                PreparedStatement delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value " +
-                                                                      " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id " +
-                                                                      "   and seqfeature.bioentry_id = ?");
+                PreparedStatement delete_fqv;
+		if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
+		    delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value " +
+						       " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id " +
+						       "   and seqfeature.bioentry_id = ?");
+		} else {
+		    delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value " +
+						       " using seqfeature_qualifier_value, seqfeature " + 
+						       " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id " +
+						       "   and seqfeature.bioentry_id = ?");
+		}
                 delete_fqv.setInt(1, bioentry_id);
                 delete_fqv.executeUpdate();
                 delete_fqv.close();
 
-                PreparedStatement delete_rel = conn.prepareStatement("delete from seqfeature_relationship " +
-                                                                     " where parent_seqfeature_id = seqfeature.seqfeature_id " +
-                                                                     "   and seqfeature.bioentry_id = ?");
+                PreparedStatement delete_rel;
+		if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
+		    delete_rel = conn.prepareStatement("delete from seqfeature_relationship " +
+						       " where parent_seqfeature_id = seqfeature.seqfeature_id " +
+						       "   and seqfeature.bioentry_id = ?");
+		} else {
+		    delete_rel = conn.prepareStatement("delete from seqfeature_relationship " +
+						       " using seqfeature_relationship, seqfeature " + 
+						       " where parent_seqfeature_id = seqfeature.seqfeature_id " +
+						       "   and seqfeature.bioentry_id = ?");
+		}
                 delete_rel.setInt(1, bioentry_id);
                 delete_rel.executeUpdate();
                 delete_rel.close();

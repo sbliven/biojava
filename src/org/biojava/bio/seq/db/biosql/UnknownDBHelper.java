@@ -32,4 +32,8 @@ public class UnknownDBHelper implements DBHelper {
     {
 	throw new SQLException("No DBHelper for this database -- can't write objects");
     }
+
+    public DeleteStyle getDeleteStyle() {
+	return DELETE_GENERIC;
+    }
 }
