@@ -61,5 +61,11 @@ public interface HomoloGroup
      * get the taxa represented in this group
      */
     public Set getTaxa();
+
+    /**
+     * get the lowest level of identity observed
+     * in this Group
+     */
+    public double getMinIdentity();
 }
 

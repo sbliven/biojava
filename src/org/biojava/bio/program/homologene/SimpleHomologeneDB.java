@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Collections;
 
 public class SimpleHomologeneDB implements HomologeneDB
 {
@@ -107,6 +109,28 @@ public class SimpleHomologeneDB implements HomologeneDB
         groups.add(newGroup);        
 
         return newGroup;
+    }
+
+    public HomoloGroupSet getHomoloGroups()
+    {
+        return new HomoloGroupSet(Collections.unmodifiableSet(groups));
+    }
+
+    public HomoloGroupSet filter(HomoloGroupFilter filters)
+    {
+        HomoloGroupSet results = new HomoloGroupSet();
+
+        // this method uses its privileged access to groups
+        for (Iterator groupsI = groups.iterator();
+               groupsI.hasNext(); )
+        {
+            HomoloGroup group = (HomoloGroup) groupsI.next();
+
+            if (filters.accept(group)) {
+                results.add(group);
+            }
+        }
+        return results;
     }
 
     private void indexByTaxonID(int taxonID, Orthology orthology)

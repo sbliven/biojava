@@ -114,16 +114,27 @@ public class SimpleHomologeneBuilder implements HomologeneBuilder
     public void endOrthologue()
     {
         if (level != 4) return;
+        level--;
 
         // validate the template
-        if ((orthologueTmpl.taxonID != -9999) 
-           || (orthologueTmpl.homologeneID != null)
-           || (orthologueTmpl.accession != null))
+        if ((orthologueTmpl.taxonID == -9999) 
+           || (orthologueTmpl.homologeneID == null)
+           || (orthologueTmpl.accession == null))
+        {
+//            System.out.println(orthologueTmpl.taxonID + " " + orthologueTmpl.homologeneID + " " + orthologueTmpl.accession);
+//            System.out.println("endOrthologue test failed");
             return;
-
+        }
         // get the taxon
         Taxon taxon;
-        if ((taxon = HomologeneTools.getTaxon(orthologueTmpl.taxonID)) == null) return;
+        if ((taxon = HomologeneTools.getTaxon(orthologueTmpl.taxonID)) == null) 
+        {
+            try {
+//                System.out.println("failed taxon lookup for " + orthologueTmpl.taxonID);
+                taxon = HomologeneTools.createTaxon(orthologueTmpl.taxonID, "Unknown species " + orthologueTmpl.taxonID);
+            }
+            catch (DuplicateTaxonException dte) {}
+        }
 
         // create the Orthologue
         Orthologue orthologue;
@@ -138,7 +149,6 @@ public class SimpleHomologeneBuilder implements HomologeneBuilder
             orthologyTmpl.secondOrtho = orthologue;
  
         orthologueTmpl = null;
-        level--;
     }
 
     public void addOrthologyProperty(String key, String value)
@@ -159,7 +169,7 @@ public class SimpleHomologeneBuilder implements HomologeneBuilder
                }
            }
            else if (key.equals(PERCENTIDENTITY)) {
-               orthologyTmpl.percentIdentity = Integer.parseInt(value);
+               orthologyTmpl.percentIdentity = Double.parseDouble(value);
            }
            else if (key.equals(REFERENCE)) {
                orthologyTmpl.ref = value;
@@ -169,12 +179,20 @@ public class SimpleHomologeneBuilder implements HomologeneBuilder
     public void endOrthology()
     {
         if (level !=3) return;
+        level--;
 
         // validate template
-        if (orthologyTmpl.type == null) return;
-        if ((orthologyTmpl.firstOrtho == null) || (orthologyTmpl.secondOrtho == null)) return;
+        if ((orthologyTmpl.type == null) 
+            || (orthologyTmpl.firstOrtho == null) 
+            || (orthologyTmpl.secondOrtho == null)) 
+        {
+            System.out.println(orthologyTmpl.type + " " + orthologyTmpl.firstOrtho + " " + orthologyTmpl.secondOrtho);
+            System.out.println("endOrthology test failed"); return;
+        }
 
         if (orthologyTmpl.type == SimilarityType.CURATED) {
+            if (orthologyTmpl.ref == null) return;
+
             Orthology orthology = db.createOrthology(
                 orthologyTmpl.firstOrtho,
                 orthologyTmpl.secondOrtho,
@@ -183,7 +201,6 @@ public class SimpleHomologeneBuilder implements HomologeneBuilder
             group.addOrthology(orthology);
         }
         else {
-            if (orthologyTmpl.ref == null) return;
             Orthology orthology = db.createOrthology(
                 orthologyTmpl.firstOrtho,
                 orthologyTmpl.secondOrtho,
@@ -191,10 +208,8 @@ public class SimpleHomologeneBuilder implements HomologeneBuilder
                 orthologyTmpl.percentIdentity);
 
             group.addOrthology(orthology);
-            
         }
 
-        level--;
     }
 
     public void addTitle(int taxonID, String homologeneID, String title)

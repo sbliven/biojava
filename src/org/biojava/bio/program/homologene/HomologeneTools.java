@@ -93,23 +93,25 @@ public class HomologeneTools
             new FileReader(url.getPath())
             );
 
-        // the file assumes implicitly that a group has started
-        builder.startDB();
-        builder.startGroup();
-
-        inDB = inGroup = true;
+        // the file may or may not have a ">" at the start
 
         // read loop
         Pattern titlePattern = Pattern.compile("TITLE\\s(\\d+)_(\\d+)=(\\S+)\\s(.*)");
-        Pattern orthoPattern = Pattern.compile("^\\s*(\\d+)\\s*\\|\\s*(\\d+)\\s*\\|([Bbc]{1})\\|(.*)\\|\\s*(\\d+)\\s*\\|(.*)\\|(.*)\\|\\s*(\\d+)\\s*\\|(.*)\\|(.*)");
+        Pattern orthoPattern = Pattern.compile("^(\\d+)\\s*\\|\\s*(\\d+)\\s*\\|([Bbc]{1})\\|(.*)\\|\\s*(\\d+)\\s*\\|(.*)\\|(.*)\\|\\s*(\\d+)\\s*\\|(.*)\\|(.*)");
         String currLine;
         while ((currLine = rdr.readLine()) != null) {
 
             // parse current line
             if (currLine.startsWith(">")) {
                 // start new group
-                if (inGroup) builder.endGroup();
-                builder.startGroup();
+                if (!inDB) {
+                    builder.startDB();
+                    inDB = true;
+                }
+                if (inGroup) {
+                    builder.endGroup();
+                }
+                builder.startGroup(); inGroup = true;
             }
             else if (currLine.startsWith("TITLE")) {
                 try {
@@ -134,13 +136,24 @@ public class HomologeneTools
             }
             else {
                 // this is a orthology line
-
+                // but we can't be certain if it's trash so we defer
+                // doing startDB and startGroup
                 try {
                     // parse the line
                     Matcher m = orthoPattern.matcher(currLine);
 
                     if (m.matches()) {
-//                        System.out.println("=======================orthology line: " + m.groupCount() + "=====================");
+
+                        // this is a orthology line
+                        if (!inDB) {
+                            builder.startDB();
+                            inDB = true;
+                        }
+                        if (!inGroup) {
+                            builder.startGroup();
+                            inGroup = true;
+                        }
+
                         if (m.groupCount() != 10) continue;
                         // pick up the groups
                         String taxonID0 = m.group(1).trim();//System.out.println(taxonID0);
@@ -208,6 +221,7 @@ public class HomologeneTools
                     }
                 }
                 catch (NumberFormatException nfe) {
+                    nfe.printStackTrace();
                     builder.endOrthology();
                     continue;
                 }

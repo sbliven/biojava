@@ -16,6 +16,15 @@ package org.biojava.bio.program.homologene;
 public interface HomologeneDB
 {
     /**
+     * an iterator for HomoloGroups
+     */
+    public interface HomoloGroupIterator
+    {
+        public boolean hasNext();
+        public HomoloGroup nextGroup();
+    }
+
+    /**
      * create a orthologue
      */
     public Orthologue createOrthologue(Taxon taxon, String locusID, String homologeneID, String accession);
@@ -39,5 +48,15 @@ public interface HomologeneDB
      * create a Homologene Group
      */
     public HomoloGroup createHomoloGroup();    
+
+    /**
+     * get the HomologeneGroups in this database
+     */
+    public HomoloGroupSet getHomoloGroups();
+
+    /**
+     * filter the database for a specified group
+     */
+    public HomoloGroupSet filter(HomoloGroupFilter filters);
 }
 
