@@ -41,7 +41,7 @@ import org.biojava.bio.seq.io.game12.*;
  *
  * @author David Huen
  */
-class GAMEFormat implements SequenceFormat
+public class GAMEFormat implements SequenceFormat
 {
     static {
         Set validFormats = new HashSet();
