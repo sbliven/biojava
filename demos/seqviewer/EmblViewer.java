@@ -70,6 +70,14 @@ public class EmblViewer {
       public double getDepth(SequenceRenderContext context) {
         return Math.max(fr.getDepth(context), split.getDepth(context));
       }
+      
+      public FeatureHolder processMouseEvent(
+        FeatureHolder hits,
+        SequenceRenderContext src,
+        MouseEvent me
+      ) {
+        return hits;
+      }
     };
     FeatureBlockSequenceRenderer features = new FeatureBlockSequenceRenderer();
     FeatureBlockSequenceRenderer repeats = new FeatureBlockSequenceRenderer();

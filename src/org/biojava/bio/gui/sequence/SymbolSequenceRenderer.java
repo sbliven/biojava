@@ -117,6 +117,6 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
     } else {
       pos = src.graphicsToSequence(me.getY());
     }
-    return new SequenceViewerEvent(this, new Integer(pos), me, path);
+    return new SequenceViewerEvent(this, null, pos, me, path);
   }
 }

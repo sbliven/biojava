@@ -170,10 +170,8 @@ implements SequenceRenderer {
     
     return new SequenceViewerEvent(
       this,
-      new Object[] {
-        new Integer(pos),
-        hits
-      },
+      hits,
+      pos,
       me,
       path
     );
