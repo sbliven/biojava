@@ -27,6 +27,7 @@ import org.biojava.bio.seq.*;
 
 /**
  * This class makes PackedSymbolLists.
+ * It could be refactored into the PackedSymbolList class eventually.
  *
  * @author David Huen
  */
