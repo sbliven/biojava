@@ -43,6 +43,8 @@ public abstract class ViewSequenceFactory
     protected SequenceDBInstallation subjectDBs;
     // Holder for all query sequences
     protected SequenceDB querySeqHolder;
+    // Identifier for database
+    protected String databaseID;
 
     // Cache which holds view(s) of query sequence(s) which have
     // been instantiated for annotation
@@ -101,11 +103,16 @@ public abstract class ViewSequenceFactory
         this.subjectDBs = subjectDBs;
     }
 
+    public void setDatabaseID(String databaseID)
+    {
+        this.databaseID = databaseID;
+    }
+
     protected Sequence makeQueryViewSequence(String queryID)
         throws BioException
     {
         if (querySeqHolder == null)
-            throw new BioException("Running BlastLikeHomologyBuilder with null query SequenceDB");
+            throw new BioException("Running with null query SequenceDB");
 
         if (queryViewCache.containsKey(queryID))
         {
@@ -133,16 +140,16 @@ public abstract class ViewSequenceFactory
         throws BioException
     {
         if (subjectDBs == null)
-            throw new BioException("Running BlastLikeHomologyBuilder with null subject SequenceDB installation");
+            throw new BioException("Running with null subject SequenceDB installation");
 
-        SequenceDBLite subjectDB = subjectDBs.getSequenceDB(subjectID);
+        SequenceDBLite subjectDB = subjectDBs.getSequenceDB(databaseID);
 
         // It shouldn't happen, but it can with some implementations
         // of SequenceDBInstallation
         if (subjectDB == null)
             throw new BioException("Failed to retrieve database from installation using ID '"
-                                   + subjectID
-                                   + "' (sequence was null)");
+                                   + databaseID
+                                   + "' (database was null)");
 
         if (subjectViewCache.containsKey(subjectID))
         {

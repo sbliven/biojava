@@ -82,7 +82,6 @@ public class SimilarityPairBuilder extends ViewSequenceFactory
 
     // Identifiers for query and database
     private String queryID;
-    private String databaseID;
 
     // Data holders for search result properties
     private Map resultData;
@@ -132,11 +131,6 @@ public class SimilarityPairBuilder extends ViewSequenceFactory
     public void setQueryID(String queryID)
     {
         this.queryID = queryID;
-    }
-
-    public void setDatabaseID(String databaseID)
-    {
-        this.databaseID = databaseID;
     }
 
     public boolean getMoreSearches()
