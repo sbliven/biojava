@@ -120,7 +120,7 @@
   </feature>
   <feature key="CDS">
     <qualifier name="citation" form="quoted" mandatory="false"/>
-    <qualifier name="codon" form="paren" mandatory="false"/>
+    <qualifier name="codon" form="bare" mandatory="false"/>
     <qualifier name="codon_start" form="bare" mandatory="false"/>
     <qualifier name="db_xref" form="quoted" mandatory="false"/>
     <qualifier name="EC_number" form="quoted" mandatory="false"/>
@@ -138,7 +138,7 @@
     <qualifier name="pseudo" form="empty" mandatory="false"/>
     <qualifier name="standard_name" form="quoted" mandatory="false"/>
     <qualifier name="translation" form="quoted" mandatory="false"/>
-    <qualifier name="transl_except" form="paren" mandatory="false"/>
+    <qualifier name="transl_except" form="bare" mandatory="false"/>
     <qualifier name="transl_table" form="bare" mandatory="false"/>
     <qualifier name="usedin" form="bare" mandatory="false"/>
   </feature>
@@ -860,7 +860,7 @@
     <qualifier name="usedin" form="bare" mandatory="false"/>
   </feature>
   <feature key="tRNA">
-    <qualifier name="anticodon" form="paren" mandatory="false"/>
+    <qualifier name="anticodon" form="bare" mandatory="false"/>
     <qualifier name="citation" form="quoted" mandatory="false"/>
     <qualifier name="db_xref" form="quoted" mandatory="false"/>
     <qualifier name="evidence" form="bare" mandatory="false"/>
