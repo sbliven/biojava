@@ -24,6 +24,7 @@ package org.biojava.bio.dp;
 
 import java.util.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.tools.*;
 
 class SingleDP extends DP {
   /**
@@ -158,12 +159,13 @@ class SingleDP extends DP {
 
   private void backward_initialize(DPCursor dpCursor)
     throws IllegalResidueException {
-    double [] v = dpCursor.currentCol();
+    double [] vc = dpCursor.currentCol();
+    double [] vl = dpCursor.lastCol();
     State [] states = getStates();
 
     // new_l = transition(start, l)
     for (int l = 0; l < states.length; l++) {
-      v[l] = (states[l] == getModel().magicalState()) ? 0.0 : Double.NEGATIVE_INFINITY;
+      vc[l] = vl[l] = 0.0; //(states[l] == getModel().magicalState()) ? 0.0 : Double.NEGATIVE_INFINITY;
     }
   }
 
@@ -290,8 +292,9 @@ class SingleDP extends DP {
       Residue res = dpCursor.lastRes();
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
-
+//System.out.println(res.getName());
       for (int k = 0; k < stateCount; k++) {
+//System.out.println(states[k].getName());
         int [] tr = transitions[k];
         double [] trs = transitionScore[k];
         double score = 0.0;
@@ -303,30 +306,39 @@ class SingleDP extends DP {
           ci++;
         }
         double constant = (ci < tr.length) ? lastCol[tr[ci]] : 0.0;
-
-        for (int lc = 0; lc < tr.length; lc++) {
+//System.out.println("Chosen constant: " + constant);
+        for (int lc = 0; lc < tr.length; lc++) { // any->emission
           int l = tr[lc];
           if(l >= getDotStatesIndex()) {
             break;
           }
+//System.out.println(states[k].getName() + " -> " + states[l].getName());
           double weight = ((EmissionState) states[l]).getWeight(res);
-          if (currentCol[l] != Double.NEGATIVE_INFINITY &&
-              weight != Double.NEGATIVE_INFINITY) {
+//System.out.println("weight = " + weight);
+          if (
+            lastCol[l] != Double.NEGATIVE_INFINITY &&
+            weight != Double.NEGATIVE_INFINITY
+          ) {
             double t = trs[lc];
-            score += Math.exp(t + currentCol[l] + weight - constant);
+            score += Math.exp(t + lastCol[l] + weight - constant);
+//System.out.println("Score changed to: " + score);
           }
         }
-        for(int lc = tr.length-1; lc >= 0; lc--) {
+//System.out.println("Score = " + score);
+        for(int lc = tr.length-1; lc >= 0; lc--) { // dot->dot
           int l = tr[lc];
           if(l < getDotStatesIndex()) {
             break;
           }
+          System.out.println("Processing dot-state transition");
           if(currentCol[l] != Double.NEGATIVE_INFINITY) {
             score += Math.exp(trs[lc] + currentCol[l] - constant);
           }
         }
         // new_k = sum_l( transition(k, l) * old_l * emission_l(res) )
+//System.out.println("Score = " + score);
         currentCol[k] = Math.log(score) + constant;
+//System.out.println("currentCol = " + currentCol[k]);
       }
     }
   }
@@ -377,26 +389,27 @@ class SingleDP extends DP {
     // initialize
     for (int l = 0; l < stateCount; l++) {
       double [] v = dpCursor.currentCol();
-      if(states[l] == getModel().magicalState()) {
-        System.out.println("Initializing start state to 0.0");
-      }
+      //if(states[l] == getModel().magicalState()) {
+        //System.out.println("Initializing start state to 0.0");
+      //}
       v[l] = (states[l] == getModel().magicalState()) ? 0.0 : Double.NEGATIVE_INFINITY;
+      oldPointers[l] = newPointers[l] = new BackPointer(states[l], null, 1.0);
     }
 
     // viterbi
     while (dpCursor.canAdvance()) { // residue i
       dpCursor.advance();
       Residue res = dpCursor.currentRes();
-      System.out.println(res.getName());
+      //System.out.println(res.getName());
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
       for (int l = 0; l < getDotStatesIndex(); l++) { // emission states
         double emission = ((EmissionState) states[l]).getWeight(res);
         int [] tr = transitions[l];
-        System.out.println("Considering " + tr.length + " alternatives");
+        //System.out.println("Considering " + tr.length + " alternatives");
         double [] trs = transitionScore[l];
         if (emission == Double.NEGATIVE_INFINITY) {
-          System.out.println(states[l].getName() + ": impossible emission");
+          //System.out.println(states[l].getName() + ": impossible emission");
           currentCol[l] = Double.NEGATIVE_INFINITY;
           newPointers[l] = null;
         } else {
@@ -415,11 +428,11 @@ class SingleDP extends DP {
           }
           currentCol[l] = transProb + emission;
           if(prev != -1) {
-            System.out.println(states[prev].getName() + "->" + states[l].getName());
+            //System.out.println(states[prev].getName() + "->" + states[l].getName());
             newPointers[l] = new BackPointer(states[l], oldPointers[prev],
                                              trans + emission);
           } else {
-            System.out.println(states[l].getName() + ": Nowhere to come from");
+            //System.out.println(states[l].getName() + ": Nowhere to come from");
           }
         }
       }
@@ -501,26 +514,50 @@ class SingleDP extends DP {
       }
     }
 
-    // trace back ruit
-    List stateList = new ArrayList(seqLength);
-    List scoreList = new ArrayList(seqLength);
-    for (int j = 0; j < seqLength; j++) {
+    int len = 0;
+    BackPointer b2 = best;
+    // trace back ruit to check out size of path
+    while(b2 != null) {
+      if(! (b2.state instanceof MagicalState)) {
+        len++;
+      }
+      b2 = b2.back;
+    };
+    
+    //System.out.println("Counted backpointers. Alignment of length " + len);
+
+    GappedResidueList resView = new GappedResidueList(dpCursor.resList());
+    double [] scores = new double[len];
+    List stateList = new ArrayList(len);
+    for (int j = 0; j < len; j++) {
       stateList.add(null);
-      scoreList.add(null);
     }
 
-    for (int j = seqLength - 1; j >= 0; j--) {
-      stateList.set(j, best.state);
-      scoreList.set(j, DoubleAlphabet.getResidue(best.score));
-      best = best.back;
-    };
+    b2 = best;
+    int ri = dpCursor.resList().length()+1;
+    while(b2 != null) {
+      len--;
+      //System.out.println("At " + len + " state=" + b2.state.getName() + ", score=" + b2.score + ", back=" + b2.back);
+      if(b2.state instanceof MagicalState) {
+        b2 = b2.back;
+        continue;
+      }
+      stateList.set(len, b2.state);
+      if(b2.state instanceof DotState) {
+        resView.addGapInSource(ri);
+      } else {
+        ri--;
+      }
+      scores[len] = b2.score;
+      b2 = b2.back;
+    }
 
     Map labelToResList = new HashMap();
-    labelToResList.put(StatePath.SEQUENCE, dpCursor.resList());
+    labelToResList.put(StatePath.SEQUENCE, resView);
     labelToResList.put(StatePath.STATES,
                        new SimpleResidueList(getModel().stateAlphabet(), stateList));
     labelToResList.put(StatePath.SCORES,
-                       new SimpleResidueList(DoubleAlphabet.INSTANCE, scoreList));
+                       DoubleAlphabet.fromArray(scores));
     return new SimpleStatePath(bestScore, labelToResList);
   }
 

@@ -107,7 +107,7 @@ public class MagicalState implements EmissionState {
   public double getWeight(Residue r) throws IllegalResidueException {
     if (r != MAGICAL_RESIDUE)
       return Double.NEGATIVE_INFINITY;
-    return 0;
+    return 0.0;
   }
 
   public void setWeight(Residue r, double w) throws IllegalResidueException,

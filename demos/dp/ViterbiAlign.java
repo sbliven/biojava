@@ -102,9 +102,17 @@ public class ViterbiAlign {
           seqI.hasNext(); )
       {
         Sequence seq = seqI.nextSequence();
-        StatePath statePath = dp.viterbi(new ResidueList [] { seq });
+        ResidueList [] rl = { seq };
+        StatePath statePath = dp.viterbi(rl);
+        double fScore = dp.forward(rl);
+        double bScore = dp.backward(rl);
       
-        System.out.println(seq.getName());
+        System.out.println(
+          seq.getName() +
+          " viterbi: " + statePath.getScore() +
+          ", forwards: " + fScore +
+          ", backwards: " + bScore
+        );
         for(int i = 0; i <= statePath.length() / 60; i++) {
           for(int j = i*60; j < Math.min((i+1)*60, seq.length()); j++) {
             System.out.print(statePath.residueAt(StatePath.SEQUENCE, j+1).getSymbol()); 

@@ -28,10 +28,13 @@ import org.biojava.bio.seq.*;
 
 public class DoubleAlphabet implements Alphabet {
   public static final DoubleAlphabet INSTANCE = new DoubleAlphabet();
+  public static ResidueList fromArray(double [] dArray) {
+    return new DoubleArray(dArray);
+  }
 
-    public static DoubleAlphabet getInstance() {
-	return INSTANCE;
-    }
+  public static DoubleAlphabet getInstance() {
+    return INSTANCE;
+  }
 
   public static DoubleResidue getResidue(double val) {
     return new DoubleResidue(val);
@@ -46,10 +49,12 @@ public class DoubleAlphabet implements Alphabet {
   }
   
   public void validate(Residue r) throws IllegalResidueException {
-    if(!contains(r))
+    if(!contains(r)) {
       throw new IllegalResidueException(
-      "Only residues of type DoubleAlphabet.DoubleResidue are valid for this alphabet.\n" +
-      "(" + r.getClass() + ") " + r.getName());
+        "Only residues of type DoubleAlphabet.DoubleResidue are valid for this alphabet.\n" +
+        "(" + r.getClass() + ") " + r.getName()
+      );
+    }
   }
   
   public String getName() {
@@ -71,18 +76,18 @@ public class DoubleAlphabet implements Alphabet {
   private DoubleAlphabet() {
   }
   
-  public static class DoubleResidue {
+  public static class DoubleResidue implements Residue {
     private double val;
     
     public Annotation getAnnotation() {
       return Annotation.EMPTY_ANNOTATION;
     }
     
-    public String name() {
+    public String getName() {
       return val + "";
     }
     
-    public char symbol() {
+    public char getSymbol() {
       return '#';
     }
     
@@ -92,6 +97,26 @@ public class DoubleAlphabet implements Alphabet {
     
     protected DoubleResidue(double val) {
       this.val = val;
+    }
+  }
+  
+  private static class DoubleArray extends AbstractResidueList {
+    private final double [] dArray;
+    
+    public Alphabet alphabet() {
+      return INSTANCE;
+    }
+    
+    public Residue residueAt(int i) {
+      return new DoubleResidue(dArray[i]);
+    }
+    
+    public int length() {
+      return dArray.length;
+    }
+    
+    public DoubleArray(double [] dArray) {
+      this.dArray = dArray;
     }
   }
 }
