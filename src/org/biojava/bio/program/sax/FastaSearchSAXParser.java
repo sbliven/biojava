@@ -63,17 +63,17 @@ import org.biojava.bio.program.search.SearchParser;
 public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
     implements SearchContentHandler
 {
-    private SearchParser  fastaParser;
-    private Map      searchProperties;
-    private Map         hitProperties;
+    private SearchParser   fastaParser;
+    private Map       searchProperties;
+    private Map          hitProperties;
 
     private String  querySeqIdentifier;
     private String subjectDBIdentifier;
 
-    private AttributesImpl attributes;
-    private QName               qName;
+    private AttributesImpl  attributes;
+    private QName                qName;
 
-    private boolean    firstHit = true;
+    private boolean firstHit = true;
 
     // For formatting rounded numbers
     private NumberFormat nFormat;
@@ -82,8 +82,8 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
     private String nl;
 
     // For creating character events
-    private String  stringOut;
-    private char []   charOut;
+    private String stringOut;
+    private char []  charOut;
 
     /**
      * Creates a new <code>FastaSearchSAXParser</code> instance.
@@ -140,13 +140,13 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	    // End the BlastLikeDataSetCollection
 	    endElement(new QName(this, this.prefix("BlastLikeDataSetCollection")));
 	}
-	catch (BioException bex)
+	catch (BioException be)
 	{
-	    throw new SAXException(bex);
+	    throw new SAXException(be);
 	}
-	catch (ParserException pex)
+	catch (ParserException pe)
 	{
-	    throw new SAXException(pex);
+	    throw new SAXException(pe);
 	}
     }
 
@@ -480,7 +480,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 		if (hitPropKeys[i].endsWith("Tokens"))
 		    continue;
 		props.append(hitPropKeys[i] + ": ");
-		props.append(hitProperties.get(hitPropKeys[i]).toString() + nl);
+		props.append((String) hitProperties.get(hitPropKeys[i]) + nl);
 	    }
 
 	    charOut = new char [props.length()];
