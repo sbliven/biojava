@@ -38,7 +38,7 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.io.SymbolTokenization ;
 
 
-/** a class to Parse the XML response of a DAS structure service 
+/** a class to Parse the XML response of a DAS structure service. 
  * returns a Structure object
  */
 public class DASStructureXMLResponseParser  extends DefaultHandler{
@@ -76,7 +76,11 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
 
     }
     
-    public StructureImpl get_structure() {
+    /**
+     * returns the Structure object.
+     * @return a Structure object
+     */
+    public Structure get_structure() {
 	return structure ;
     }
 
@@ -177,7 +181,7 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
 	Group group;
 
 	if ( type.equals("amino")){
-	    AminoAcid aa = new AminoAcid() ;
+	    AminoAcidImpl aa = new AminoAcidImpl() ;
 
 	    Character aminoCode1 = null;
 	    try{
@@ -191,10 +195,10 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
 	    group = aa ;
 	} else if ( type.equals("nucleotide")) {
 	    // it is a nucleotidee
-	    Nucleotide nu = new Nucleotide();
+	    NucleotideImpl nu = new NucleotideImpl();
 	    group = nu;
 	} else {
-	    group = new Hetatom();
+	    group = new HetatomImpl();
 	}
 	
 	try{

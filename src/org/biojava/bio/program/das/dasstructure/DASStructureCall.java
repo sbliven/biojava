@@ -47,22 +47,38 @@ import org.xml.sax.*;
 import javax.xml.parsers.*;
 import java.util.Calendar;
 
-
+/**
+ *  Calls a DAS - Structure server.
+ *
+ * @author Andreas Prlic
+ * @version %I% %G%
+ * @since 1.4
+ */
 public class DASStructureCall {
     
     String serverurl;
 
+    /**
+     * Constructs a DASStructureCall object.
+     */
 
     public DASStructureCall() {
 	serverurl = "" ;
     }
     
-    
+    /**
+     * Constructs a DASStructureCall object.
+     *
+     * @param url  a String ...
+     */
     public DASStructureCall(String url){
 	serverurl = url;
     }
 
-
+    /**
+     * Returns a time stamp .
+     * @return a String representing the current system time 
+     */
     protected String getTimeStamp(){
 
 	Calendar cal = Calendar.getInstance() ;
@@ -75,16 +91,28 @@ public class DASStructureCall {
     }
 
     
-    /** set url of structure service */
+    /** set url of structure service. 
+     * @param s  a String specifying the serverurl value
+     * @see #getServerurl
+     */
     public void   setServerurl(String s) { serverurl=s;     }
 
-    /** get url of structure service */
+    /** get url of structure service.
+
+     * @return a Structure object
+     * @throws IOException ...
+     * @see #setServerurl
+    */
     public String getServerurl(        ) { return serverurl;}
     
 
     /** connect to a DAS structure service and retreive 3D data.
 	return a biojava Structure object
-    */
+	*
+	* @param pdb_code  a String
+	* @return a Structure object
+	* @throws IOException ...
+	*/
     
     public Structure getStructure(String pdb_code)
 	throws IOException
@@ -167,7 +195,7 @@ public class DASStructureCall {
     
     /** parse the Response of a DAS Structure service and return a
      * biojava Structure */
-    private StructureImpl parseDASResponse(InputStream inStream) 
+    private Structure parseDASResponse(InputStream inStream) 
 	throws IOException, SAXException
     {
 	
