@@ -1,19 +1,13 @@
 Before use, untar seqdir.tgz and virtdir.tgz.  This is the test data.
 
-To check function of the RagbagSequence class:-
-java TestRagbagSequence seqdir/AE003462.2.game testfeature.game
-
-You should see the annotation in Annotation/ applied to the feature tree of 
-AE003462.2.game.
-
 To check the function of RagbagDirectoryHandler on concrete sequences:-
-java TestRagbagDirectory seqdir
+java TestRagbagAssembly seqdir
 
 This will instantiate an in-memory object where annotations in Annotation/ are applied to 
 seqdir/AE003462.2.game.
 
 To test the function of RagbagDirectoryHandler on virtual sequences:-
-java TestRagbagDirectory virtdir
+java TestRagbagAssembly virtdir
 
 This will construct a virtual sequence (SimpleAssembly) onto which the three sequences 
 comprising the left tip of the Drosophila X-chromosome are mapped. The format of 
