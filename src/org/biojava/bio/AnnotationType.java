@@ -18,6 +18,8 @@ import org.biojava.utils.*;
  * @author Matthew Pocock
  */
 public interface AnnotationType {
+    public static final AnnotationType ANY = new AnyAnnotationType();
+
   /**
    * Validate an Annotation against this AnnotationType.
    *
@@ -67,25 +69,7 @@ public interface AnnotationType {
   
   public void setProperty(Annotation ann, Object property, Object value)
   throws ChangeVetoException;
-  
-  public static final AnnotationType ANY = new AnnotationType() {
-    public boolean instanceOf(Annotation ann) {
-      return true;
-    }
-    public boolean subTypeOf(AnnotationType subType) {
-      return true;
-    }
-    public PropertyConstraint getPropertyConstraint(Object key) {
-      return PropertyConstraint.ANY;
-    }
-    public Set getProperties() {
-      return Collections.EMPTY_SET;
-    }
-    public void setProperty(Annotation ann, Object property, Object value)
-    throws ChangeVetoException {
-      getPropertyConstraint(property).setProperty(ann, property, value);
-    }
-  };
+ 
   
   /**
    * <p>
@@ -163,4 +147,23 @@ public interface AnnotationType {
       getPropertyConstraint(property).setProperty(ann, property, value);
     }
   }
+}
+
+class AnyAnnotationType implements AnnotationType {
+    public boolean instanceOf(Annotation ann) {
+      return true;
+    }
+    public boolean subTypeOf(AnnotationType subType) {
+      return true;
+    }
+    public PropertyConstraint getPropertyConstraint(Object key) {
+      return PropertyConstraint.ANY;
+    }
+    public Set getProperties() {
+      return Collections.EMPTY_SET;
+    }
+    public void setProperty(Annotation ann, Object property, Object value)
+    throws ChangeVetoException {
+      getPropertyConstraint(property).setProperty(ann, property, value);
+    }
 }
