@@ -22,6 +22,7 @@
 
 package org.biojava.bio.seq;
 
+import org.biojava.bio.*;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -34,9 +35,12 @@ import java.util.*;
  *
  * @author Matthew Pocock
  */
-public class SimpleSequence extends SimpleResidueList implements Sequence {
+public class SimpleSequence extends SimpleResidueList 
+                            implements Sequence, MutableFeatureHolder 
+{
   protected static List templateClassToFeatureClass;
   public static void addFeatureImplementation(TemplateFeature tf) {
+      System.err.println("Adding " + tf.templateClass.getName());
     templateClassToFeatureClass.add(0, tf);
   }
   
@@ -44,7 +48,7 @@ public class SimpleSequence extends SimpleResidueList implements Sequence {
   throws SeqException {
     for(Iterator i = templateClassToFeatureClass.iterator(); i.hasNext(); ) {
       TemplateFeature tf = (TemplateFeature) i.next();
-      if(template.getClass().isInstance(tf.templateClass)) {
+      if(tf.templateClass.isInstance(template)) {
         try {
           Object [] args = { parent, template };
           return (Feature) tf.con.newInstance(args);
@@ -65,6 +69,17 @@ public class SimpleSequence extends SimpleResidueList implements Sequence {
    */
   static {
     templateClassToFeatureClass = new ArrayList();
+
+    try {
+	addFeatureImplementation(new TemplateFeature(
+						     Feature.Template.class, SimpleFeature.class
+						     ));
+	addFeatureImplementation(new TemplateFeature(
+						     StrandedFeature.Template.class, SimpleStrandedFeature.class
+						     ));
+    } catch (Exception ex) {
+	throw new BioError("Couldn't register feature impls");
+    }
   }
   
   private FeatureFactory fFact;
@@ -142,6 +157,14 @@ public class SimpleSequence extends SimpleResidueList implements Sequence {
     return f;
   }
 
+    public void addFeature(Feature f) {
+	throw new UnsupportedOperationException();
+    }
+
+    public void removeFeature(Feature f) {
+	featureHolder.removeFeature(f);
+    }
+
   /**
    * Create a SimpleSequence with the residues and alphabet of res, and the
    * sequence properties listed.
@@ -158,17 +181,22 @@ public class SimpleSequence extends SimpleResidueList implements Sequence {
     this.annotation = annotation;
   }
   
-  private static Class [] conTypes = { Sequence.class, Feature.Template.class };
-  public static class TemplateFeature {
-   public Class templateClass;
-    public Class featureClass;
-    public Constructor con;
+
+    public static class TemplateFeature {
+	public Class templateClass;
+	public Class featureClass;
+	public Constructor con;
     
-    public TemplateFeature(Class templateClass, Class featureClass)
-    throws NoSuchMethodException {
-      this.templateClass = templateClass;
-      this.featureClass = featureClass;
-      this.con = featureClass.getConstructor(conTypes);
+	public TemplateFeature(Class templateClass, Class featureClass)
+	    throws NoSuchMethodException 
+	{
+	    Class[] conTypes = new Class[2];
+	    conTypes[0] = Sequence.class;
+	    conTypes[1] = templateClass;
+
+	    this.templateClass = templateClass;
+	    this.featureClass = featureClass;
+	    this.con = featureClass.getConstructor(conTypes);
+	}
     }
-  }
 }

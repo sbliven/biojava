@@ -33,22 +33,6 @@ import org.biojava.bio.seq.tools.*;
 public class SimpleStrandedFeature
 extends SimpleFeature
 implements StrandedFeature {
-  /**
-   * Register SimpleStrandedFeature with SimpleSequence as being good for
-   * StrandedFeature.Template objects.
-   */
-  static {
-    try {
-      SimpleSequence.addFeatureImplementation(
-        new SimpleSequence.TemplateFeature(
-          StrandedFeature.Template.class, SimpleStrandedFeature.class
-        )
-      );
-    } catch (NoSuchMethodException msme) {
-      throw new org.biojava.bio.BioError(msme, "Could not find apropreate constructor");
-    }
-  }
-
   private int strand;
     
   public int getStrand() {
@@ -75,7 +59,7 @@ implements StrandedFeature {
                                StrandedFeature.Template template)
   throws IllegalArgumentException, IllegalAlphabetException {
     super(sourceSeq, template);
-    if(strand != POSITIVE && strand != NEGATIVE) {
+    if(template.strand != POSITIVE && template.strand != NEGATIVE) {
       throw new IllegalArgumentException(
         "strand was not POSITIVE or NEGATIVE but " + strand
       );

@@ -28,90 +28,320 @@ import java.util.*;
 import org.biojava.bio.seq.*;
 
 /**
- * IO module for embl files.
- * <P>
- * This is a realy bad skeletal implementation. It can read the AC line and the
- * sequence only. It does not yet write.
- * <P>
- * Would anybody like to write this?
+ * Format reader for EMBL files.
  *
- * @author Matthew Pocock
+ * @author Thomas Down
  */
+
 public class EmblFormat implements SequenceFormat {
-  public Sequence readSequence(StreamReader.Context context, ResidueParser resParser, SequenceFactory sf)
-  throws IllegalResidueException, IOException {
-    final BufferedReader in = context.getReader();
-    
-    String accession;
-    String line;
-    
-    while(true) {
-      line = in.readLine();
-      if(line == null) {
-        context.streamEmpty();
-        throw new IOException("Premature end of stream encountered");
-      }
-      if(line.startsWith("AC")) {
-        accession = line.substring(5, line.length()-1);
-        break;
-      }
-    }
-    
-    do {
-      line = in.readLine();
-      if(line == null) {
-        context.streamEmpty();
-        throw new IOException("Premature end of stream encountered");
-      }
-    } while(!line.startsWith("SQ"));
+    private FeatureBuilder featureBuilder;
 
-    line = in.readLine();
-    if(line == null) {
-      context.streamEmpty();
-      throw new IOException("Premature end of stream encountered");
+    public EmblFormat() {
+	featureBuilder = new BasicFeatureBuilder();
     }
-    
-    List resList = new ArrayList();
-    while(line != null && !line.startsWith("//")) {
-      StringTokenizer st = new StringTokenizer(line, " ", false);
-      while(st.hasMoreTokens()) {
-        String token = st.nextToken();
-        if(st.hasMoreTokens()) {
-          resList.addAll(resParser.parse(token).toList());
-        } else {
-          char c = token.charAt(token.length()-1);
-          if(!Character.isDigit(c)) {
-            resList.addAll(resParser.parse(token).toList());
-          }
-        }
-      }
-      line = in.readLine();
-    }
-    
-    if(line != null) {
-      do {
-        in.mark(180);
-        line = in.readLine();
-      } while(line != null && line.trim().length() == 0);
-      if(line == null) {
-        context.streamEmpty();
-      } else {
-        in.reset();
-      }
-    }
-    
-    Annotation ann = new SimpleAnnotation();
-    ann.setProperty("id", accession);
-    return sf.createSequence(new SimpleResidueList(resParser.alphabet(),
-                                                   resList), 
-                             "urn://sequence:embl/" + accession, accession, ann);
-  }
 
-  /**
-   * This is not implemented. It does not write anything to the stream.
-   */
-  public void writeSequence(Sequence seq, PrintStream os)
-  throws IOException {
-    
-  }
+    public Sequence readSequence(StreamReader.Context context,
+				 ResidueParser resParser,
+				 SequenceFactory sf)
+	throws IllegalResidueException, IOException, SeqException
+    {
+	EmblContext ctx = new EmblContext(resParser, sf);
+
+	BufferedReader in = context.getReader();
+	String line;
+	boolean isSeq = false;
+
+	while ((line = in.readLine()) != null) {
+	    if (line.startsWith("//")) {
+		in.mark(2);
+		if (in.read() == -1)
+		    context.streamEmpty();
+		else
+		    in.reset();
+		return ctx.makeSequence();
+	    }
+	    
+	    if (isSeq) {
+		ctx.processSeqLine(line);
+	    } else {
+		ctx.processLine(line);
+		if (line.startsWith("SQ"))
+		    isSeq = true;
+	    }
+	}
+
+	context.streamEmpty();
+	throw new IOException("Premature end of stream for EMBL");
+    }
+
+    private class EmblContext {
+	private final static int WITHOUT=0;
+	private final static int WITHIN=1;
+	private final static int LOCATION=2;
+	private final static int ATTRIBUTE=3;
+
+	private ResidueParser resParser;
+	private SequenceFactory sf;
+
+	private List residues;
+
+	private int featureStatus;
+	private List features;
+	private StringBuffer featureBuf;
+
+	private String featureType;
+	private Location featureLocation;
+	private Map featureAttributes;
+	private int featureStrand;
+
+	private String accession;
+
+	EmblContext(ResidueParser resParser, SequenceFactory sf) {
+	    this.resParser = resParser;
+	    this.sf = sf;
+
+	    residues = new ArrayList();
+	    features = new ArrayList();
+	    featureBuf = new StringBuffer();
+	    featureAttributes = new HashMap();
+	}
+
+	void processLine(String line) throws SeqException {
+	    String tag = line.substring(0, 2);
+
+	    // Any tagprocessors which might need some cleaning
+	    // up if a different tag is encountered.
+
+	    if (featureStatus != WITHOUT || !(tag.equals("FT")))
+		endFeature();
+
+	    if (tag.equals("AC")) {
+		accession = line.substring(5, line.length()-1);
+	    } else if (tag.equals("FT")) {
+		if (line.charAt(5) != ' ') {
+		    // Has a featureType field -- should be a new feature
+		    if (featureStatus != WITHOUT)
+			endFeature();
+
+		    startFeature(line.substring(5, 20).trim());
+		    // featureData(line.substring(21));
+		} 
+		featureData(line.substring(21));  
+	    }
+	}
+
+	private void startFeature(String type) throws SeqException {
+	    featureType = type;
+	    featureStatus = LOCATION;
+	    featureBuf.setLength(0);
+	    featureAttributes.clear();
+	    
+	}
+
+	private void featureData(String line) throws SeqException {
+	    switch (featureStatus) {
+	    case LOCATION:
+		featureBuf.append(line);
+		if (countChar(featureBuf, '(') == countChar(featureBuf, ')')) {
+		    featureLocation = parseLocation(featureBuf.toString());
+		    featureStatus = WITHIN;
+		}
+		break;
+	    case WITHIN:
+		if (line.charAt(0) == '/') {
+		    if (countChar(line, '"') % 2 == 0)
+			processAttribute(line);
+		    else {
+			featureBuf.setLength(0);
+			featureBuf.append(line);
+			featureStatus = ATTRIBUTE;
+		    }
+		} else {
+		    throw new SeqException("Invalid line in feature body: "+line);
+		}
+		break;
+	    case ATTRIBUTE:
+		featureBuf.append(line);
+		if (countChar(featureBuf, '"') == 2) {
+		    processAttribute(featureBuf.toString());
+		    featureStatus = WITHIN;
+		}
+		break;
+	    }
+	}
+
+	private void endFeature() throws SeqException {
+	    features.add(featureBuilder.buildFeatureTemplate(featureType, 
+							     featureLocation,
+							     featureStrand,
+							   featureAttributes));
+	    featureStatus = WITHOUT;
+			 
+	}
+
+	private Location parseLocation(String loc) throws SeqException {
+	    boolean joining = false;
+	    boolean complementing = false;
+	    boolean isComplement = false;
+	    boolean ranging = false;
+
+	    int start = -1;
+
+	    Location result = null;
+
+	    StringTokenizer toke = new StringTokenizer(loc, "(),. ><", true);
+	    int level = 0;
+	    while (toke.hasMoreTokens()) {
+		String t = toke.nextToken();
+		System.err.println(t);
+		if (t.equals("join")) {
+		    joining = true;
+		    result = new CompoundLocation();
+		} else if (t.equals("complement")) {
+		    complementing = true;
+		    isComplement = true;
+		} else if (t.equals("(")) {
+		    ++level;
+		} else if (t.equals(")")) {
+		    --level;
+		} else if (t.equals(".")) {
+		} else if (t.equals(",")) {
+		} else if (t.equals(">")) {
+		} else if (t.equals("<")) {
+		} else if (t.equals(" ")) {
+		} else {
+		    System.err.println("Range! " + ranging);
+		    // This ought to be an actual oordinate.
+		    int pos = -1;
+		    try {
+			pos = Integer.parseInt(t);
+		    } catch (NumberFormatException ex) {
+			throw new SeqException("bad locator: " + t);
+		    }
+
+		    if (ranging == false) {
+			start = pos;
+			ranging = true;
+		    } else {
+			Location rl = new RangeLocation(start, pos);
+			if (joining) {
+			    ((CompoundLocation) result).addLocation(rl);
+			} else {
+			    if (result != null)
+				throw new SeqException();
+			    result = rl;
+			}
+			ranging = false;
+			complementing = false;
+		    }
+		}
+	    }
+	    if (level != 0)
+		throw new SeqException("Mismatched parentheses: " + loc);
+
+	    if (isComplement)
+		featureStrand = StrandedFeature.NEGATIVE;
+	    else
+		featureStrand = StrandedFeature.POSITIVE;
+	    return result;
+	}
+
+	private void processAttribute(String attr) throws SeqException {
+	    int eqPos = attr.indexOf('=');
+	    if (eqPos == -1) {
+		featureAttributes.put(attr.substring(1), Boolean.TRUE);
+	    } else {
+		String tag = attr.substring(1, eqPos);
+		eqPos++;
+		if (attr.charAt(eqPos) == '"')
+		    ++eqPos;
+		int max = attr.length();
+		if (attr.charAt(max - 1) == '"')
+		    --max;
+		featureAttributes.put(tag, attr.substring(eqPos, max));
+	    }
+	}
+
+	void processSeqLine(String line) throws IllegalResidueException {
+	    StringTokenizer st = new StringTokenizer(line);
+	    while(st.hasMoreTokens()) {
+		String token = st.nextToken();
+		if(st.hasMoreTokens()) {
+		    residues.addAll(resParser.parse(token).toList());
+		} else {
+		    char c = token.charAt(token.length()-1);
+		    if(!Character.isDigit(c)) {
+			residues.addAll(resParser.parse(token).toList());
+		    }
+		}
+	    }
+	}
+
+	Sequence makeSequence() throws SeqException {
+	    Sequence ss;
+	    ss = sf.createSequence(new SimpleResidueList(
+				   resParser.alphabet(),residues),
+				    "urn:whatever",
+				    accession,
+				    Annotation.EMPTY_ANNOTATION);
+	    for (Iterator i = features.iterator(); i.hasNext(); ) {
+		ss.createFeature((MutableFeatureHolder) ss, (Feature.Template) i.next());
+	    }
+	    return ss;
+	}
+
+	private int countChar(StringBuffer s, char c) {
+	    int cnt = 0;
+	    for (int i = 0; i < s.length(); ++i)
+		if (s.charAt(i) == c)
+		    ++cnt;
+	    return cnt;
+	}
+
+	private int countChar(String s, char c) {
+	    int cnt = 0;
+	    for (int i = 0; i < s.length(); ++i)
+		if (s.charAt(i) == c)
+		    ++cnt;
+	    return cnt;
+	}
+    }
+
+    /**
+     * This is not implemented. It does not write anything to the stream.
+     */
+    public void writeSequence(Sequence seq, PrintStream os)
+	throws IOException 
+    {
+	throw new RuntimeException("Can't write in EMBL format...");
+    }
+
+    public static interface FeatureBuilder {
+	public Feature.Template buildFeatureTemplate(String type,
+						     Location loc,
+						     int strandHint,
+						     Map attrs);
+    }
+}
+
+
+class BasicFeatureBuilder implements EmblFormat.FeatureBuilder {
+    public Feature.Template buildFeatureTemplate(String type,
+						 Location loc,
+						 int strandHint,
+						 Map attrs) {
+	Feature.Template t = new Feature.Template();
+	t.location = loc;
+	t.type = type;
+	t.source = "EMBL file";
+	t.annotation = Annotation.EMPTY_ANNOTATION;
+	// t.strand = strandHint;
+
+	for (Iterator i = attrs.entrySet().iterator(); i.hasNext(); ) {
+	    Map.Entry e = (Map.Entry) i.next();
+	    System.out.println("" + e.getKey() + " : " + e.getValue());
+	}
+
+	return t;
+    }
 }

@@ -61,7 +61,7 @@ public interface SequenceFormat {
   Sequence readSequence(StreamReader.Context context,
                         ResidueParser resParser,
                         SequenceFactory sf)
-         throws IllegalResidueException, IOException;
+         throws SeqException, IllegalResidueException, IOException;
 
   void writeSequence(Sequence seq, PrintStream os) throws IOException;
 }
