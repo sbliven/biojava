@@ -62,11 +62,11 @@ public class SequenceDBSearchResult extends AbstractChangeable
      * @param annotation an <code>Annotation</code> object.
      * @param hits a <code>List</code> object.
      */
-    public SequenceDBSearchResult(SequenceDB sequenceDB,
-				  Map        searchParameters,
-				  SymbolList querySeq,
-				  Annotation annotation,
-				  List       hits)
+    public SequenceDBSearchResult(final SequenceDB sequenceDB,
+				  final Map        searchParameters,
+				  final SymbolList querySeq,
+				  final Annotation annotation,
+				  final List       hits)
     {
 	Contract.pre(querySeq   != null, "querySeq was null");
 	Contract.pre(sequenceDB != null, "sequenceDB was null");
@@ -121,7 +121,7 @@ public class SequenceDBSearchResult extends AbstractChangeable
 	return annotation;
     }
 
-    public boolean equals(Object other)
+    public boolean equals(final Object other)
     {
 	if (other == this) return true;
 	if (other == null) return false;

@@ -30,7 +30,9 @@ import org.biojava.bio.symbol.*;
 
 /**
  * <code>EmblFileFormer</code> performs the detailed formatting of
- * EMBL entries for writing to a PrintStream.
+ * EMBL entries for writing to a PrintStream. There is some code
+ * dupication with <code>GenbankFileFormer</code> which could be
+ * factored out.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
@@ -76,7 +78,7 @@ public class EmblFileFormer implements SeqFileFormer
      *
      * @param stream a <code>PrintStream</code> object.
      */
-    private EmblFileFormer(PrintStream stream)
+    private EmblFileFormer(final PrintStream stream)
     {
 	this.stream = stream;
     }
@@ -86,35 +88,23 @@ public class EmblFileFormer implements SeqFileFormer
 	return stream;
     }
 
-    public void setPrintStream(PrintStream stream)
+    public void setPrintStream(final PrintStream stream)
     {
 	this.stream = stream;
     }
 
-    public void setName(String id) throws ParseException
-    {
-	// stream.println("ID   " + id);
-    }
+    public void setName(final String id) throws ParseException { }
 
-    public void startSequence() throws ParseException
-    {
+    public void startSequence() throws ParseException { }
 
-    }
+    public void endSequence() throws ParseException { }
 
-    public void endSequence() throws ParseException
-    {
+    public void setURI(final String uri) throws ParseException { }
 
-    }
-
-    public void setURI(String uri) throws ParseException
-    {
-	// stream.println("URI   " + uri);
-    }
-
-    public void addSymbols(Alphabet alpha,
-			   Symbol[] syms,
-			   int      start,
-			   int      length)
+    public void addSymbols(final Alphabet alpha,
+			   final Symbol[] syms,
+			   final int      start,
+			   final int      length)
 	throws IllegalAlphabetException
     {
 	int aCount = 0;
@@ -203,12 +193,9 @@ public class EmblFileFormer implements SeqFileFormer
 	stream.println("//");
     }
 
-    public void addSequenceProperty(Object key,
-				    Object value)
+    public void addSequenceProperty(final Object key, final Object value)
 	throws ParseException
     {
-	// stream.println("Key: " + key + " Value: " + value);
-
 	if (key.equals(EmblProcessor.PROPERTY_EMBL_ACCESSIONS))
 	{
 	    StringBuffer sb = new StringBuffer("AC   ");
@@ -221,7 +208,7 @@ public class EmblFileFormer implements SeqFileFormer
 	}
     }
 
-    public void startFeature(Feature.Template templ)
+    public void startFeature(final Feature.Template templ)
 	throws ParseException
     {
 	// There are 19 spaces in the leader
@@ -240,13 +227,9 @@ public class EmblFileFormer implements SeqFileFormer
 	stream.println(lb);
     }
 
-    public void endFeature() throws ParseException
-    {
+    public void endFeature() throws ParseException { }
 
-    }
-
-    public void addFeatureProperty(Object key,
-				   Object value)
+    public void addFeatureProperty(final Object key, final Object value)
 	throws ParseException
     {
 	// There are 19 spaces in the leader
@@ -254,10 +237,36 @@ public class EmblFileFormer implements SeqFileFormer
 	// Default is to quote unknown qualifiers
 	String     form = "quoted";
 
-	StringBuffer tb = new StringBuffer("/" + key);
-
 	if (qualifierData.containsKey(key))
 	    form = (String) ((Map) qualifierData.get(key)).get("form");
+
+	// The value may be a collection if several qualifiers of the
+	// same type are present in a feature
+	if (Collection.class.isInstance(value))
+	{
+	    for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
+	    {
+		String qualifer = makeStringsByForm(key, vi.next(), form);
+		stream.println(SeqFormatTools.formatQualifierBlock(qualifer,
+								   leader,
+								   80));
+	    }
+	}
+	else
+	{
+	    String qualifer = makeStringsByForm(key, value, form);
+	    stream.println(SeqFormatTools.formatQualifierBlock(qualifer,
+							       leader,
+							       80));
+	}
+    }
+
+    private String makeStringsByForm(final Object key,
+				     final Object value,
+				     final String form)
+	throws ParseException
+    {
+	StringBuffer tb = new StringBuffer("/" + key);
 
 	// This is a slight simplification. There are some types of
 	// qualifier which are unquoted unless they contain
@@ -267,12 +276,10 @@ public class EmblFileFormer implements SeqFileFormer
 	else if (form.equals("bare"))
 	    tb.append("=" + value);
 	else if (form.equals("paren"))
-		 tb.append("(" + value + ")");
+	    tb.append("(" + value + ")");
 	else if (! form.equals("empty"))
 	    throw new ParseException("Unrecognised qualifier format: " + form);
 
-	stream.println(SeqFormatTools.formatQualifierBlock(tb.toString(),
-							   leader,
-							   80));
+	return tb.toString();
     }
 }

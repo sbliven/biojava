@@ -192,18 +192,9 @@ public class FuzzyPointLocation implements Location, Serializable
 	if (dist == 0)
 	    return this;
 
-	try
-	{
-	    return new FuzzyPointLocation(this.min + dist,
-					  this.max + dist,
-					  this.resolver);
-	}
-	catch (IndexOutOfBoundsException ioe)
-	{
-	    ioe.printStackTrace();
-	}
-
-	return this;
+	return new FuzzyPointLocation(this.min + dist,
+				      this.max + dist,
+				      this.resolver);
     }
 
     public String toString()

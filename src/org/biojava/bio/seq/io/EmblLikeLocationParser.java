@@ -101,7 +101,7 @@ class EmblLikeLocationParser
      *
      * @exception BioException if an error occurs.
      */
-    Object [] parseLocation(String location)
+    Object [] parseLocation(final String location)
 	throws BioException
     {
 	this.location = location;
@@ -232,10 +232,6 @@ class EmblLikeLocationParser
 	    // lies entirely outside the current entry
 	    if (unboundMin || unboundMax)
 	    {
-		// Range of form: <123 or >123 or <>123
-  		// throw new BioException("Unbounded point locations currently not supported: "
-  		//		       + location);
-
 		subLocations.add(new FuzzyPointLocation(unboundMin ? Integer.MIN_VALUE : innerMin,
 							unboundMax ? Integer.MAX_VALUE : innerMax,
 							FuzzyPointLocation.RESOLVE_AVERAGE));
@@ -255,9 +251,6 @@ class EmblLikeLocationParser
 	// Range of form: (123.567)
 	else if (startCoords.size() == 2 && endCoords.isEmpty())
 	{
-  	    // throw new BioException("Fuzzy point locations currently not supported: "
-	    //		   + location);
-
 	    innerMin = outerMin = ((Integer) startCoords.get(0)).intValue();
 	    innerMax = outerMax = ((Integer) startCoords.get(1)).intValue();
 
@@ -341,9 +334,12 @@ class EmblLikeLocationParser
 
 	startCoords.clear();
 	endCoords.clear();
-	unboundMin = unboundMax = false;
-	isPointLoc = true;
-	fuzzyCoord = false;
+
+	isPointLoc   = true;
+	unboundMin   = false;
+	unboundMax   = false;
+	fuzzyCoord   = false;
+	isComplement = false;
     }
 
     /**
@@ -383,7 +379,7 @@ class EmblLikeLocationParser
 	}
     }
 
-    private int countChar(String s, char c)
+    private int countChar(final String s, final char c)
     {
 	int cnt = 0;
 	for (int i = 0; i < s.length(); ++i)

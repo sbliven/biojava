@@ -83,8 +83,8 @@ public class FastaSearchBuilder implements SearchBuilder
      * output should correspond to the ID of a Sequence within this
      * database.
      */
-    public FastaSearchBuilder(SequenceDBInstallation subjectDBs,
-			      SequenceDB             querySeqHolder)
+    public FastaSearchBuilder(final SequenceDBInstallation subjectDBs,
+			      final SequenceDB             querySeqHolder)
     {
 	this.subjectDBs     = subjectDBs;
 	this.querySeqHolder = querySeqHolder;
@@ -119,7 +119,7 @@ public class FastaSearchBuilder implements SearchBuilder
      *
      * @exception BioException if the sequence cannot be obtained.
      */
-    void setQuerySeq(String querySeqID)
+    void setQuerySeq(final String querySeqID)
 	throws BioException
     {
 	try
@@ -145,7 +145,7 @@ public class FastaSearchBuilder implements SearchBuilder
      *
      * @exception BioException if the database cannot be obtained.
      */
-    void setSubjectDB(String subjectDBFileName)
+    void setSubjectDB(final String subjectDBFileName)
 	throws BioException
     {
 	// System.out.println("Setting subject DB with filename/ID: " + subjectDBFileName);
@@ -194,7 +194,7 @@ public class FastaSearchBuilder implements SearchBuilder
      *
      * @param resultData a <code>Map</code> object.
      */
-    void setSearchResultData(Map resultData)
+    void setSearchResultData(final Map resultData)
     {
 	searchParameters = resultData;
     }
@@ -206,7 +206,7 @@ public class FastaSearchBuilder implements SearchBuilder
      *
      * @param resultPreAnnotation a <code>Map</code> object.
      */
-    void setSearchAnnotationData(Map resultPreAnnotation)
+    void setSearchAnnotationData(final Map resultPreAnnotation)
     {
 	this.resultPreAnnotation = resultPreAnnotation;
     }
@@ -217,7 +217,7 @@ public class FastaSearchBuilder implements SearchBuilder
      *
      * @param hitData a <code>Map</code> object.
      */
-    void setHitData(Map hitData)
+    void setHitData(final Map hitData)
     {
 	this.hitData = hitData;
     }
@@ -229,7 +229,7 @@ public class FastaSearchBuilder implements SearchBuilder
      *
      * @param hitPreAnnotation a <code>Map</code> object.
      */
-    void setHitAnnotationData(Map hitPreAnnotation)
+    void setHitAnnotationData(final Map hitPreAnnotation)
     {
 	this.hitPreAnnotation = hitPreAnnotation;
     }
@@ -243,8 +243,8 @@ public class FastaSearchBuilder implements SearchBuilder
      *
      * @return a <code>SeqSimilaritySearchHit</code> object.
      */
-    private SeqSimilaritySearchHit createHit(Map        dataMap,
-					     Annotation hitAnnotation)
+    private SeqSimilaritySearchHit createHit(final Map        dataMap,
+					     final Annotation hitAnnotation)
 	throws BioException
     {
 	String subjectSeqID  = (String) dataMap.get("id");
@@ -289,7 +289,7 @@ public class FastaSearchBuilder implements SearchBuilder
      *
      * @return an <code>Annotation</code> object.
      */
-    private Annotation createAnnotation(Map preAnnotation)
+    private Annotation createAnnotation(final Map preAnnotation)
     {
 	Annotation annotation = new SimpleAnnotation();
 	Set annotationKeySet  = preAnnotation.keySet();
@@ -325,8 +325,8 @@ public class FastaSearchBuilder implements SearchBuilder
      * @exception IllegalSymbolException if tokens from the sequence
      * are not recognised in the chosen alphabet.
      */
-    private Alignment createAlignment(String subjectSeqID,
-				      Map dataMap)
+    private Alignment createAlignment(final String subjectSeqID,
+				      final Map dataMap)
 	throws IllegalSymbolException
     {
 	String seqType = (String) dataMap.get("query");
@@ -379,7 +379,7 @@ public class FastaSearchBuilder implements SearchBuilder
      * @return a <code>String</code> value consisting of a subsequence
      * containing only the interesting alignment.
      */
-    private String prepSeqTokens(String name, Map dataMap)
+    private String prepSeqTokens(final String name, final Map dataMap)
     {
 	// System.out.println("dataMap: " + dataMap);
 

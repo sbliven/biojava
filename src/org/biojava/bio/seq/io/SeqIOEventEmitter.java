@@ -53,7 +53,8 @@ public class SeqIOEventEmitter
      * @param seq a <code>Sequence</code> object.
      * @param listener a <code>SeqIOListener</code> object.
      */
-    public static void getSeqIOEvents(Sequence seq, SeqIOListener listener)
+    public static void getSeqIOEvents(final Sequence      seq,
+				      final SeqIOListener listener)
 	throws BioException
     {
 	try
@@ -138,7 +139,7 @@ public class SeqIOEventEmitter
      * @param fh a <code>FeatureHolder</code> object.
      * @return a <code>List</code> value.
      */
-    private static List getSubFeatures(FeatureHolder fh)
+    private static List getSubFeatures(final FeatureHolder fh)
     {
 	List subfeat = new ArrayList();
 

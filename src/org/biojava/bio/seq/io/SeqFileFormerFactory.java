@@ -55,7 +55,7 @@ public abstract class SeqFileFormerFactory
      * @param factory a <code>SeqFileFormerFactory</code> to be
      * installed.
      */
-    static void addFactory(String format, SeqFileFormerFactory factory)
+    static void addFactory(final String format, final SeqFileFormerFactory factory)
     {
 	factories.put(format, factory);
     }
@@ -74,7 +74,7 @@ public abstract class SeqFileFormerFactory
      * @exception BioException if a non-existent file format is
      * requested.
      */
-    public static final SeqFileFormer makeFormer(String format)
+    public static final SeqFileFormer makeFormer(final String format)
 	throws BioException
     {
 	// If there is no Factory for this format load the class

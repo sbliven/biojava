@@ -53,10 +53,10 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
      * @param alignment an <code>Alignment</code> object containing
      * the alignemnt described by the subhit region.
      */
-    public SequenceDBSearchSubHit(double    score,
-				  double    eValue,
-				  double    pValue,
-				  Alignment alignment)
+    public SequenceDBSearchSubHit(final double    score,
+				  final double    eValue,
+				  final double    pValue,
+				  final Alignment alignment)
     {
 	this.score     = score;
 	this.pValue    = eValue;
@@ -92,7 +92,7 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
 	return "SequenceDBSearchSubHit with score " + getScore();
     }
   
-    public boolean equals(Object other)
+    public boolean equals(final Object other)
     {
 	if (other == this) return true;
 	if (other == null) return false;

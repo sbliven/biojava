@@ -70,12 +70,12 @@ public class SequenceDBSearchHit extends AbstractChangeable
      * @param annotation an <code>Annotation</code> object. If null a
      * new SimpleAnnotation object is created internally.
      */
-    public SequenceDBSearchHit(String     sequenceID,
-			       double     score,
-			       double     eValue,
-			       double     pValue,
-			       List       subHits,
-			       Annotation annotation)
+    public SequenceDBSearchHit(final String     sequenceID,
+			       final double     score,
+			       final double     eValue,
+			       final double     pValue,
+			       final List       subHits,
+			       final Annotation annotation)
     {
 	Contract.pre(sequenceID != null, "sequenceID was null");
 	Contract.pre(! Double.isNaN(score), "score was NaN");
@@ -130,7 +130,7 @@ public class SequenceDBSearchHit extends AbstractChangeable
 	return annotation;
     }
 
-    public boolean equals(Object other)
+    public boolean equals(final Object other)
     {
 	if (other == this) return true;
 	if (other == null) return false;

@@ -61,7 +61,7 @@ class GappedSymbolListBuilder
      * @param alpha a <code>FiniteAlphabet</code> object into which
      * the sequence tokens will be parsed
      */
-    GappedSymbolListBuilder(FiniteAlphabet alpha)
+    GappedSymbolListBuilder(final FiniteAlphabet alpha)
     {
 	this.parser = new TokenParser(alpha);
     }
@@ -76,7 +76,7 @@ class GappedSymbolListBuilder
      * GappedSymbolList with an ungapped underlying sequence and all
      * the gaps added in the gapped view.
      */
-    SymbolList makeGappedSymbolList(StringBuffer tokeBuffer)
+    SymbolList makeGappedSymbolList(final StringBuffer tokeBuffer)
     {
 	gapIndices = new int [128];
 
@@ -135,7 +135,7 @@ class GappedSymbolListBuilder
      * @param gapIndex an <code>int</code> value indicating the
      * position of this gap within the sequence
      */
-    private void recordGap(int gapCount, int gapIndex)
+    private void recordGap(final int gapCount, final int gapIndex)
     {
 	// System.out.println("Recording gap at: " + gapIndex);
 

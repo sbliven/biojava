@@ -132,8 +132,8 @@ public class FastaSearchParser implements SearchParser
      * @exception ParserException if the parser fails to parse a
      * line.
      */
-    public boolean parseSearch(BufferedReader       reader,
-			       SearchContentHandler scHandler)
+    public boolean parseSearch(final BufferedReader       reader,
+			       final SearchContentHandler scHandler)
 	throws IOException, BioException, ParserException
     {
 	boolean foundQuerySeqID = false;
@@ -372,7 +372,7 @@ public class FastaSearchParser implements SearchParser
      *
      * @return a Set object.
      */
-    private static Set fillSet(String [] tokenArray, Set set)
+    private static Set fillSet(final String [] tokenArray, final Set set)
     {
 	for (int i = 0; i < tokenArray.length; i++)
 	    set.add(tokenArray[i]);
@@ -390,7 +390,7 @@ public class FastaSearchParser implements SearchParser
      *
      * @exception ParserException if an error occurs. 
      */
-    private String parseID(String line)
+    private String parseID(final String line)
 	throws ParserException
     {
 	StringTokenizer st = new StringTokenizer(line);
@@ -428,7 +428,7 @@ public class FastaSearchParser implements SearchParser
      *
      * @exception ParserException if an error occurs.
      */
-    private String parseDB(String line)
+    private String parseDB(final String line)
 	throws ParserException
     {
 	StringTokenizer st = new StringTokenizer(line);
@@ -472,7 +472,9 @@ public class FastaSearchParser implements SearchParser
      *
      * @exception ParserException if an error occurs.
      */
-    private boolean parseLine(String line, Set tokenSet, Map dataMap)
+    private boolean parseLine(final String line,
+			      final Set    tokenSet,
+			      final Map    dataMap)
 	throws ParserException
     {
 	int idTokenStart = line.indexOf(";");
@@ -537,7 +539,9 @@ public class FastaSearchParser implements SearchParser
      * @return a <code>boolean</code> value, true if the line was
      * parsed successfully.
      */
-    private boolean parseSequence(String line, String name, Map dataMap)
+    private boolean parseSequence(final String line,
+				  final String name,
+				  final Map    dataMap)
     {
 	if (line.startsWith(";"))
 	{
@@ -600,7 +604,7 @@ public class FastaSearchParser implements SearchParser
      *
      * @return an <code>Integer</code> coordinate.
      */
-    private Integer parseCoord(String line)
+    private Integer parseCoord(final String line)
     {
 	int sepIndex = line.lastIndexOf(":");
 	String coord = line.substring(sepIndex + 1);

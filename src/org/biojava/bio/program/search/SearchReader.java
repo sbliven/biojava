@@ -60,9 +60,9 @@ public class SearchReader implements Iterator
      * @param parser a <code>SearchParser</code> object to perform the
      * parsing.
      */
-    public SearchReader(BufferedReader reader,
-			SearchBuilder  handler,
-			SearchParser   parser)
+    public SearchReader(final BufferedReader reader,
+			final SearchBuilder  handler,
+			final SearchParser   parser)
     {
 	this.reader  = reader;
 	this.handler = handler;

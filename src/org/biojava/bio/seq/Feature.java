@@ -29,9 +29,12 @@ import org.biojava.bio.symbol.*;
 
 /**
  * A feature within a sequence, or nested within another feature.
- * <P>
- * Features contain annotation and a location. The type of the feature
- * is something like 'Repeat' or 'BetaStrand'. The source of the feature is
+ *
+ *<p> Features contain annotation and a location. The type of the
+ * feature is something like 'Repeat' or 'BetaStrand'. Where the
+ * feature has been read from an EMBL or Genbank source the type will
+ * be the same as the feature key in the feature table e.g. 'gene',
+ * 'CDS', 'repeat_unit', 'misc_feature'. The source of the feature is
  * something like 'genscan', 'repeatmasker' or 'made-up'.</p>
  *
  * <p>
@@ -45,7 +48,7 @@ import org.biojava.bio.symbol.*;
  * or <code>Feature</code>.
  * </p>
  *
- * <P>
+ * <p>
  * We may need some standardisation for what the fields mean. In particular, we
  * should be compliant where sensible with GFF.
  * </p>
@@ -114,7 +117,7 @@ public interface Feature extends FeatureHolder, Annotatable {
 
     /**
      * Return the <code>Sequence</code> object to which this feature
-     * is (ultimately) attached.  For top level features, this will be
+     * is (ultimately) attached. For top level features, this will be
      * equal to the <code>FeatureHolder</code> returned by
      * <code>getParent</code>.
      *
@@ -168,7 +171,16 @@ public interface Feature extends FeatureHolder, Annotatable {
 	    Feature f1 = (Feature) o1;
 	    Feature f2 = (Feature) o2;
 
-	    return f1.getLocation().getMin() - f2.getLocation().getMin();
+	    // We don't subtract one coordinate from another as one or
+	    // both may be set to Integer.MAX_VALUE/Integer.MIN_VALUE
+	    // and the result could wrap around. Convert to Long if
+	    // necessary.
+	    if (f1.getLocation().getMin() > f2.getLocation().getMin())
+		return 1;
+	    else if ( f1.getLocation().getMin() < f2.getLocation().getMin())
+		return -1;
+	    else
+		return 0;
 	}
     }
 }

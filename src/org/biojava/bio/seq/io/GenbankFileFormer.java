@@ -30,7 +30,9 @@ import org.biojava.bio.symbol.*;
 
 /**
  * <code>GenbankFileFormer</code> performs the detailed formatting of
- * Genbank entries for writing to a <code>PrintStream</code>.
+ * Genbank entries for writing to a <code>PrintStream</code>. There is
+ * some code dupication with <code>EmblFileFormer</code> which could
+ * be factored out.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
@@ -91,25 +93,13 @@ public class GenbankFileFormer implements SeqFileFormer
 	this.stream = stream;
     }
 
-    public void setName(String id) throws ParseException
-    {
-	// stream.println("ID   " + id);
-    }
+    public void setName(String id) throws ParseException { }
 
-    public void startSequence() throws ParseException
-    {
+    public void startSequence() throws ParseException { }
 
-    }
+    public void endSequence() throws ParseException { }
 
-    public void endSequence() throws ParseException
-    {
-
-    }
-
-    public void setURI(String uri) throws ParseException
-    {
-	// stream.println("URI   " + uri);
-    }
+    public void setURI(String uri) throws ParseException { }
 
     public void addSymbols(Alphabet alpha,
 			   Symbol[] syms,
@@ -202,12 +192,9 @@ public class GenbankFileFormer implements SeqFileFormer
     }
 
 
-    public void addSequenceProperty(Object key,
-				    Object value)
+    public void addSequenceProperty(Object key, Object value)
 	throws ParseException
     {
-	// stream.println("Key: " + key + " Value: " + value);
-
 	if (key.equals(GenbankProcessor.PROPERTY_GENBANK_ACCESSIONS))
 	{
 	    StringBuffer sb = new StringBuffer("ACCESSION   ");
@@ -238,13 +225,9 @@ public class GenbankFileFormer implements SeqFileFormer
 	stream.println(lb);
     }
 
-    public void endFeature() throws ParseException
-    {
+    public void endFeature() throws ParseException { }
 
-    }
-
-    public void addFeatureProperty(Object key,
-				   Object value)
+    public void addFeatureProperty(Object key, Object value)
 	throws ParseException
     {
 	// There are 21 spaces in the leader
@@ -257,18 +240,39 @@ public class GenbankFileFormer implements SeqFileFormer
 	if (qualifierData.containsKey(key))
 	    form = (String) ((Map) qualifierData.get(key)).get("form");
 
+	// The value may be a collection if several qualifiers of the
+	// same type are present in a feature
+	if (Collection.class.isInstance(value))
+	{
+	    for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
+	    {
+		tb.append(makeStringsByForm(vi.next(), form));
+	    }
+	}
+	else
+	{
+	    tb.append(makeStringsByForm(value, form));
+	}
+	stream.println(SeqFormatTools.formatQualifierBlock(tb.toString(),
+							   leader,
+							   80));
+    }
+
+    private String makeStringsByForm(Object value, String form)
+	throws ParseException
+    {
 	// This is a slight simplification. There are some types of
 	// qualifier which are unquoted unless they contain
 	// spaces. We all love special cases, don't we?
 	if (form.equals("quoted"))
-	    tb.append("=\"" + value + "\"");
+	    return "=\"" + value + "\"";
 	else if (form.equals("bare"))
-	    tb.append("=" + value);
-	else if (! form.equals("empty"))
-	    throw new ParseException("Unrecognised qualifier format: " + form);
+	    return "=" + value;
+	else if (form.equals("paren"))
+	    return "(" + value + ")";
+	else if (form.equals("empty"))
+	    return "";
 
-	stream.println(SeqFormatTools.formatQualifierBlock(tb.toString(),
-							   leader,
-							   80));
+	throw new ParseException("Unrecognised qualifier format: " + form);
     }
 }

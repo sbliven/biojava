@@ -179,9 +179,9 @@ public class SimpleSequenceBuilder implements SequenceBuilder {
 	} catch (NoSuchElementException ex) {}
 
 	if (oldValue != null) {
-	    if (oldValue instanceof String) {
-		newValue = ((String) oldValue) + " " + newValue.toString();
-	    } else {
+//  	    if (oldValue instanceof String) {
+//  		newValue = ((String) oldValue) + " " + newValue.toString();
+//  	    } else {
 		if (oldValue instanceof Collection) {
 		    ((Collection) oldValue).add(newValue);
 		    newValue = oldValue;
@@ -191,7 +191,7 @@ public class SimpleSequenceBuilder implements SequenceBuilder {
 		    nvList.add(newValue);
 		    newValue = nvList;
 		}
-	    }
+		//	    }
 	}
 
 	try {
