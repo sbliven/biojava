@@ -74,7 +74,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     public static final String PROPERTY_FEATURELABEL = "org.biojava.bio.program.das.feature_label";
     public static final String PROPERTY_LINKS = "org.biojava.bio.program.das.links";
 
-    public static final int SIZE_THRESHOLD = 5000000;
+    public static final int SIZE_THRESHOLD = 500000;
     
     private DASSequenceDB parentdb;
     private Alphabet alphabet = DNATools.getDNA();
@@ -300,7 +300,9 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	registerLocalFeatureFetchers();
 
         FeatureHolder structure = getStructure();
-	if (length() < SIZE_THRESHOLD) {
+	if (length() < SIZE_THRESHOLD && structure.countFeatures() > 0) {
+	    System.err.println("Hmmmm, doing whole assembly");
+
 	    List sequences = new ArrayList();
 	    for (Iterator fi = structure.features(); fi.hasNext(); ) {
 		ComponentFeature cf = (ComponentFeature) fi.next();
@@ -319,7 +321,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	registerLocalFeatureFetchers();
 	
         FeatureHolder structure = getStructure();
-	if (structure.countFeatures() > 0 && (l.getMax() - l.getMin()) < SIZE_THRESHOLD) {
+	if (structure.countFeatures() > 0) {
 	    FeatureHolder componentsBelow = structure.filter(new FeatureFilter.OverlapsLocation(l), false);
 
 	    Map sequencesToRegions = new HashMap();
@@ -335,7 +337,6 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 			partNeeded = partNeeded.translate(cf.getComponentLocation().getMin() - cf.getLocation().getMin());
 			sequencesToRegions.put(cseq, partNeeded);
 		    } else {
-			// FIXME: Couldn't work out the appropriate xform.
 			sequencesToRegions.put(cseq, null);
 		    }
 		}
@@ -576,11 +577,15 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    // Otherwise they want /real/ features, I'm afraid...
 	    //
 	    
-	    Location ffl = extractInterestingLocation(ff);
-	    if (ffl != null) {
-		registerFeatureFetchers(ffl);
+	    if (recurse) {
+		Location ffl = extractInterestingLocation(ff);
+		if (ffl != null) {
+		    registerFeatureFetchers(ffl);
+		} else {
+		    registerFeatureFetchers();
+		}
 	    } else {
-		registerFeatureFetchers();
+		registerLocalFeatureFetchers();
 	    }
 	    
 	    return features.filter(ff, recurse);
