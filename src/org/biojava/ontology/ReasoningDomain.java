@@ -752,7 +752,7 @@ extends Changeable {
               Triple matches = (Triple) tci.next();
               Term tc = matches.getSubject();
 
-              if(tripleExists(term, tc, OntoTools.INSTANCEOF)) {
+              if(tripleExists(tested, tc, OntoTools.INSTANCEOF)) {
                 shouldKeep = true;
                 break;
               }
@@ -777,46 +777,58 @@ extends Changeable {
       Ontology closure = (Ontology) _closures.get(resolveRemote(relation));
 
       if(closure == null) {
-        closure = OntoTools.getDefaultFactory().createOntology(
-                "closure over: " + subject + ", " + object + ", " + relation,
-                null);
-      
-        Set triples = getTriples(null, null, relation);
-        Set terms = new HashSet();
-        for(Iterator i = triples.iterator(); i.hasNext(); ) {
-          Triple t = (Triple) i.next();
-          terms.add(resolveRemote(t.getSubject()));
-          terms.add(resolveRemote(t.getObject()));
-          terms.add(resolveRemote(t.getRelation()));
-        }
-        
-        for(Iterator i = terms.iterator(); i.hasNext(); ) {
-          Term t = (Term) i.next();
-          Term rt = closure.importTerm(t, null);
+        try {
+          closure = OntoTools.getDefaultFactory().createOntology(
+                  "closure over: " + subject + ", " + object + ", " + relation,
+                  null);
 
-          closure.createTriple(rt, rt, relation, null, null);
-        }
+          Set triples = getTriples(null, null, relation);
+          Set terms = new HashSet();
+          for(Iterator i = triples.iterator(); i.hasNext(); ) {
+            Triple t = (Triple) i.next();
+            terms.add(resolveRemote(t.getSubject()));
+            terms.add(resolveRemote(t.getObject()));
+            terms.add(resolveRemote(t.getRelation()));
+          }
 
-        for(Iterator i = triples.iterator(); i.hasNext(); ) {
-          Triple t = (Triple) i.next();
-          closure.createTriple(closure.importTerm(t.getSubject(), null),
-                               closure.importTerm(t.getObject(), null),
-                               closure.importTerm(t.getRelation(), null),
-                               null,
-                               null);
-        }
+          for(Iterator i = terms.iterator(); i.hasNext(); ) {
+            Term t = (Term) i.next();
+            Term rt = closure.importTerm(t, null);
 
-        for(Iterator i = closure.getTriples(null, null, relation).iterator();
-            i.hasNext();
-        ) {
-          Triple t = (Triple) i.next();
-          objectClosure(t.getSubject(), t.getObject(), relation, closure);
+            closure.createTriple(rt, rt, relation, null, null);
+          }
+
+          for(Iterator i = triples.iterator(); i.hasNext(); ) {
+            Triple t = (Triple) i.next();
+            closure.createTriple(closure.importTerm(t.getSubject(), null),
+                                 closure.importTerm(t.getObject(), null),
+                                 closure.importTerm(t.getRelation(), null),
+                                 null,
+                                 null);
+          }
+
+          for(Iterator i = closure.getTriples(null, null, relation).iterator();
+              i.hasNext();
+                  ) {
+            Triple t = (Triple) i.next();
+            objectClosure(t.getSubject(), t.getObject(), relation, closure);
+          }
+        } catch (ChangeVetoException e) {
+          throw new AssertionFailure(e);
+        } catch (AlreadyExistsException e) {
+          throw new AssertionFailure(e);
+        } catch (OntologyException e) {
+          throw new AssertionFailure(e);
         }
       }
 
-      if(subject != null) subject = closure.importTerm(subject, null);
-      if(object != null) object = closure.importTerm(object, null);
-      if(relation != null) relation = closure.importTerm(relation, null);
+      try {
+        if(subject != null) subject = closure.importTerm(subject, null);
+        if(object != null) object = closure.importTerm(object, null);
+        if(relation != null) relation = closure.importTerm(relation, null);
+      } catch (ChangeVetoException e) {
+        throw new AssertionFailure(e);
+      }
 
       return closure.getTriples(subject, object, relation);
     }
@@ -831,7 +843,13 @@ extends Changeable {
         Term t = (Term) i.next();
         if(t != subject && t != object) {
           objectClosure(subject, t, relation, closure);
-          closure.createTriple(subject, t, relation, null, null);
+          try {
+            closure.createTriple(subject, t, relation, null, null);
+          } catch (AlreadyExistsException e) {
+            throw new AssertionFailure(e);
+          } catch (ChangeVetoException e) {
+            throw new AssertionFailure(e);
+          }
         }
       }
     }
