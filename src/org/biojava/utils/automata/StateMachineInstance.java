@@ -13,5 +13,7 @@ public interface StateMachineInstance
      *         should continue to receive input.
      */
     public boolean transit(int symIdx);
+    public StateMachineFactory parent();
+    public int getStart();
 }
 

@@ -142,6 +142,12 @@ public class PatternMaker
         symtoke = alfa.getTokenization("token");
     }
 
+    /**
+     * Compiles the regex described by patternString into a DFA.
+     * The DFA can subsequently be converted into a state
+     * state machine for searching. 
+     * <b>This is the main work method for this class.</b>
+     */
     static FiniteAutomaton compilePattern(String patternString, FiniteAlphabet alfa)
         throws BioException, AutomatonException
     {
