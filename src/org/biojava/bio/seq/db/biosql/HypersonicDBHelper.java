@@ -61,11 +61,6 @@ public class HypersonicDBHelper extends DBHelper {
     }
 
 
-    // Not sure if one of the other delete styles could be used here
-    public DeleteStyle getDeleteStyle() {
-	return DELETE_GENERIC;
-    }
-
     // Inherit docs
     public boolean containsTable(DataSource ds, String tablename) {
         if (ds == null) {
@@ -75,7 +70,7 @@ public class HypersonicDBHelper extends DBHelper {
             throw new IllegalArgumentException("Invalid table name given");
         } 
         //System.err.println("Checking for table existence: " + tablename);
-				Connection conn = null;
+        Connection conn = null;
         try {
             boolean present;
             conn = ds.getConnection();
@@ -92,8 +87,8 @@ public class HypersonicDBHelper extends DBHelper {
                     ps.close();
                 }
                 if (conn != null) {
-									conn.close();
-								}
+                    conn.close();
+                }
             }
             return present;
         } catch (SQLException ex) {
