@@ -66,59 +66,19 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
     private final FeatureHolder wrapped;
     private final FeatureHolder parent;
     private final int translate;
-    private FeatureHolder projectedFeatures;
-    private boolean oppositeStrand;
-    private boolean cachingProjections = true;
+    private final boolean oppositeStrand;
 
     private FeatureFilter filter;
 
     private ChangeListener underlyingFeaturesChange;
-    private PFHContext projectionContext;
-
-    private static Location extractInterestingLocation(FeatureFilter ff) {
-	if (ff instanceof FeatureFilter.OverlapsLocation) {
-	    return ((FeatureFilter.OverlapsLocation) ff).getLocation();
-	} else if (ff instanceof FeatureFilter.ContainedByLocation) {
-	    return ((FeatureFilter.ContainedByLocation) ff).getLocation();
-	} else if (ff instanceof FeatureFilter.And) {
-	    FeatureFilter.And ffa = (FeatureFilter.And) ff;
-	    Location l1 = extractInterestingLocation(ffa.getChild1());
-	    Location l2 = extractInterestingLocation(ffa.getChild2());
-
-	    if (l1 != null) {
-		if (l2 != null) {
-		    return LocationTools.intersection(l1,l2);
-		} else {
-		    return l1;
-		}
-	    } else {
-		if (l2 != null) {
-		    return l2;
-		} else {
-		    return null;
-		}
-	    }
-	}
-
-	// Don't know how this filter relates to location.
-
-	return null;
-    }
-    
+    private PFHContext projectionContext;    
 
     public static FeatureHolder projectFeatureHolder(FeatureHolder fh,
 						     FeatureHolder parent, 
 						     int translation,
 						     boolean flip)
     {
-	if (fh instanceof DASOptimizableFeatureHolder) {
-	    return new ProjectedOptimizedFeatureHolder((DASOptimizableFeatureHolder) fh,
-						       parent,
-						       translation,
-						       flip);
-	} else {
-	    return new ProjectedFeatureHolder(fh, parent, translation, flip);
-	}    
+	    return new ProjectedFeatureHolder(fh, parent, translation, flip);    
     }
 
     /**
@@ -141,64 +101,44 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
      */
 
     public ProjectedFeatureHolder(FeatureHolder fh,
-				  FeatureFilter filter,
-				  FeatureHolder parent, 
-				  int translation,
-				  boolean oppositeStrand) 
+				                  FeatureFilter filter,
+                                  FeatureHolder parent, 
+                                  int translation,
+                                  boolean oppositeStrand) 
     {
-	this.wrapped = fh;
-	this.parent = parent;
-	this.translate = translation;
-	this.oppositeStrand = oppositeStrand;
-	this.filter = filter;
+        this.wrapped = fh;
+        this.parent = parent;
+        this.translate = translation;
+        this.oppositeStrand = oppositeStrand;
+        this.filter = filter;
 
-	this.projectionContext = new PFHContext();
+        this.projectionContext = new PFHContext();
 
-	underlyingFeaturesChange = new ChangeListener() {
-	    public void preChange(ChangeEvent e)
-		throws ChangeVetoException 
-	    {
-		if (hasListeners()) {
-		    getChangeSupport(FeatureHolder.FEATURES).firePreChangeEvent(new ChangeEvent(this,
+        underlyingFeaturesChange = new ChangeListener() {
+            public void preChange(ChangeEvent e)
+                throws ChangeVetoException 
+            {
+                if (hasListeners()) {
+                        getChangeSupport(FeatureHolder.FEATURES).firePreChangeEvent(new ChangeEvent(this,
 								     FeatureHolder.FEATURES,
 								     e.getChange(),
 								     e.getPrevious(),
 								     e));
-		}
-	    }
+                }
+            }
 
-	    public void postChange(ChangeEvent e) {
-		projectedFeatures = null; // Flush all the cached projections --
-		                          // who knows what might have changed.
+            public void postChange(ChangeEvent e) {
+               if (hasListeners()) {
+                   getChangeSupport(FeatureHolder.FEATURES).firePostChangeEvent(new ChangeEvent(this,
+								    FeatureHolder.FEATURES,
+								    e.getChange(),
+								    e.getPrevious(),
+                                    e));
+               }
+            }
+        } ;
 
-		if (hasListeners()) {
-		    getChangeSupport(FeatureHolder.FEATURES).firePostChangeEvent(new ChangeEvent(this,
-								      FeatureHolder.FEATURES,
-								      e.getChange(),
-								      e.getPrevious(),
-								      e));
-		}
-	    }
-	} ;
-
-	wrapped.addChangeListener(underlyingFeaturesChange);
-    }
-
-    public boolean isCachingProjections() {
-	return cachingProjections;
-    }
-
-    /**
-     * Determine whether or not the projected features should be cached.
-     * This is a temporary optimization, and might go away once feature
-     * filtering is more intelligent.
-     *
-     * @since 1.2
-     */
-
-    public void setIsCachingProjections(boolean b) {
-	cachingProjections = b;
-	projectedFeatures = null;
+        wrapped.addChangeListener(underlyingFeaturesChange);
     }
 
     /**
@@ -224,345 +164,193 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 				  int translation,
 				  boolean oppositeStrand) 
     {
-	this(fh, null, parent, translation, oppositeStrand);
+        this(fh, null, parent, translation, oppositeStrand);
     }
-
-    protected FeatureHolder getProjectedFeatures() {
-	if (projectedFeatures != null) {
-	    return projectedFeatures;
-	}
-
-	FeatureHolder toProject = wrapped;
-	if (filter != null) {
-	    toProject = toProject.filter(filter, false);
-	}
-
-	SimpleFeatureHolder sfh = new SimpleFeatureHolder();
-	for (Iterator i = toProject.features(); i.hasNext(); ) {
-	    Feature f = (Feature) i.next();
-	    Feature wf = ProjectionEngine.DEFAULT.projectFeature(f, projectionContext);
-	    try {
-		sfh.addFeature(wf);
-	    } catch (ChangeVetoException cve) {
-		throw new BioError(
-				   cve,
-				   "Assertion failure: Should be able to manipulate this FeatureHolder"
-				   );
-	    }
-	}
-
-	if (cachingProjections) {
-	    projectedFeatures = sfh;
-	}
-
-	return sfh;
-    }
-
+    
     public int countFeatures() {
-	if (filter != null) {
-	    return getProjectedFeatures().countFeatures();
-	} else {
-	    return wrapped.countFeatures();
-	}
+        if (filter != null) {
+            return wrapped.filter(filter, false).countFeatures();
+        } else {
+            return wrapped.countFeatures();
+        }
     }
 
     public Iterator features() {
-	return getProjectedFeatures().features();
+        final Iterator wrappedIterator;
+        if (filter == null) {
+            wrappedIterator = wrapped.features();
+        } else {
+            wrappedIterator = wrapped.filter(filter, false).features();
+        }
+        return new Iterator() {
+            public boolean hasNext() {
+                return wrappedIterator.hasNext();
+            }
+            
+            public Object next() {
+                return projectFeature((Feature) wrappedIterator.next());
+            }
+            
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        } ;
     }
     
     public boolean containsFeature(Feature f) {
-      return getProjectedFeatures().containsFeature(f);
+        for (Iterator fi = features(); fi.hasNext(); ) {
+            if (f.equals(fi.next())) {
+                return true;
+            }
+        }
+        return false;
     }
 
+    public FeatureHolder filter(FeatureFilter ff) {
+        return filter(ff, true); // bit of a hack for now.
+    }
+    
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	return getProjectedFeatures().filter(ff, recurse);
+        ff = transformFilter(ff);
+        if (filter != null) {
+            ff = new FeatureFilter.And(ff, filter);
+        }
+        FeatureHolder toProject = wrapped.filter(ff, recurse);
+        return new ProjectedFeatureHolder(toProject, parent, translate, oppositeStrand);
     }
     
-    public Feature projectFeature(Feature f){
-        return ProjectionEngine.DEFAULT.projectFeature(f, projectionContext);
+    private FeatureFilter transformFilter(FeatureFilter ff) {
+        FeatureFilter ff2 = _transformFilter(ff);
+        if (ff2 == null) {
+            System.err.println("Null filter!");
+        }
+        return ff2;
     }
     
-    public Location getProjectedLocation(Location oldLoc) {
-	if (oppositeStrand) {
-	    if (oldLoc.isContiguous()) {
-            if (oldLoc instanceof PointLocation){
-                return new PointLocation(translate - oldLoc.getMin());
+    private FeatureFilter _transformFilter(FeatureFilter ff) {
+        if (ff instanceof FeatureFilter.And) {
+            FeatureFilter ff1 = ((FeatureFilter.And) ff).getChild1();
+            FeatureFilter ff2 = ((FeatureFilter.And) ff).getChild2();
+            return new FeatureFilter.And(transformFilter(ff1), transformFilter(ff2));
+        } else if (ff instanceof FeatureFilter.Or) {
+            FeatureFilter ff1 = ((FeatureFilter.Or) ff).getChild1();
+            FeatureFilter ff2 = ((FeatureFilter.Or) ff).getChild2();
+            return new FeatureFilter.Or(transformFilter(ff1), transformFilter(ff2));
+        } else if (ff instanceof FeatureFilter.Not) {
+            return new FeatureFilter.Not(transformFilter(((FeatureFilter.Not) ff).getChild()));
+        } else if (ff instanceof FeatureFilter.OverlapsLocation) {
+            return new FeatureFilter.OverlapsLocation(transformLocation(((FeatureFilter.OverlapsLocation) ff).getLocation()));
+        } else if (ff instanceof FeatureFilter.ContainedByLocation) {
+            return new FeatureFilter.ContainedByLocation(transformLocation(((FeatureFilter.ContainedByLocation) ff).getLocation()));
+        } else if (ff instanceof FeatureFilter.StrandFilter) {
+            return new FeatureFilter.StrandFilter(transformStrand(((FeatureFilter.StrandFilter) ff).getStrand()));
+        } else {
+            // should check for unknown cases.
+            
+            return ff;
+        }
+    }
+    
+    private Location transformLocation(Location oldLoc) {
+        if (oppositeStrand) {
+            if (oldLoc.isContiguous()) {
+                if (oldLoc instanceof PointLocation){
+                    return new PointLocation(translate - oldLoc.getMin());
+                } else {
+                    return new RangeLocation(translate - oldLoc.getMax(),
+    	                                     translate - oldLoc.getMin());
+                }
             } else {
-    		    return new RangeLocation(translate - oldLoc.getMax(),
-    					 translate - oldLoc.getMin());
-    	    }
-	    } else {
-		Location compound = Location.empty;
-		Vector locList = new Vector();
-		for (Iterator i = oldLoc.blockIterator(); i.hasNext(); ) {
-		    Location oldBlock = (Location) i.next();
-		    locList.addElement(new RangeLocation(translate - oldBlock.getMax(),
-								translate - oldBlock.getMin()));
-		}
-		compound = LocationTools.union(locList);
-		return compound;
-	    }
-	} else {
-	    return oldLoc.translate(translate);
-	}
+                Location compound = Location.empty;
+                List locList = new ArrayList();
+                for (Iterator i = oldLoc.blockIterator(); i.hasNext(); ) {
+                    Location oldBlock = (Location) i.next();
+                    locList.add(new RangeLocation(translate - oldBlock.getMax(),
+                    		      			translate - oldBlock.getMin()));
+                }
+                compound = LocationTools.union(locList);
+                return compound;
+            }
+        } else {
+            return oldLoc.translate(translate);
+        }
+    }
+    
+    private StrandedFeature.Strand transformStrand(StrandedFeature.Strand s) {
+        if (isOppositeStrand()) {
+            if (s == StrandedFeature.POSITIVE) {
+                return StrandedFeature.NEGATIVE;
+            } else if (s == StrandedFeature.NEGATIVE) {
+                return StrandedFeature.POSITIVE;
+            } else {
+                return StrandedFeature.UNKNOWN;
+            }
+        } else {
+            return s;
+        }
+    }
+    
+    public Feature projectFeature(Feature f) {
+        return ProjectionEngine.DEFAULT.projectFeature(f, projectionContext);
     }
 
     public int getTranslation() {
-	return translate;
+        return translate;
     }
 
     public boolean isOppositeStrand() {
-	return oppositeStrand;
+        return oppositeStrand;
     }
 
     public FeatureHolder getParent() {
-	return parent;
+        return parent;
     }
-    
-	public StrandedFeature.Strand getProjectedStrand(StrandedFeature.Strand s) {
-	    if (isOppositeStrand()) {
-		if (s == StrandedFeature.POSITIVE) {
-		    return StrandedFeature.NEGATIVE;
-		} else if (s == StrandedFeature.NEGATIVE) {
-		    return StrandedFeature.POSITIVE;
-		} else {
-		    return StrandedFeature.UNKNOWN;
-		}
-	    } else {
-		return s;
-	    }
-	}
         
     /**
      * ProjectionContext implementation tied to a given ProjectedFeatureHolder
      */
 
     private class PFHContext implements ProjectionContext {
-	public FeatureHolder getParent(Feature f) {
-	    return parent;
-	}	    
+        public FeatureHolder getParent(Feature f) {
+            return parent;
+        }	    
 
-	public Sequence getSequence(Feature f) {
-	    FeatureHolder fh = parent;
-	    while (fh instanceof Feature) {
-		    fh = ((Feature) fh).getParent();
+        public Sequence getSequence(Feature f) {
+            FeatureHolder fh = parent;
+            while (fh instanceof Feature) {
+                fh = ((Feature) fh).getParent();
+            }
+            return (Sequence) fh;
+        }
+
+        public Location getLocation(Feature f) {
+            Location oldLoc = f.getLocation();
+            return transformLocation(oldLoc);
+        }
+
+        public StrandedFeature.Strand getStrand(StrandedFeature sf) {
+            StrandedFeature.Strand s = sf.getStrand();
+            return transformStrand(s);
+        }
+
+        public Annotation getAnnotation(Feature f) {
+            return f.getAnnotation();
+        }
+
+        public FeatureHolder projectChildFeatures(Feature f, FeatureHolder parent) {
+            return projectFeatureHolder(f, parent, getTranslation(), isOppositeStrand());
+        }
+
+        public Feature createFeature(Feature f, Feature.Template templ) 
+	        throws ChangeVetoException
+        {
+            throw new ChangeVetoException("Can't create features in this projection");
+        }
+
+        public void removeFeature(Feature f, Feature f2) 
+                throws ChangeVetoException
+	    {
+	        throw new ChangeVetoException("Can't create features in this projection");
 	    }
-	    return (Sequence) fh;
-	}
-
-	public Location getLocation(Feature f) {
-	    Location oldLoc = f.getLocation();
-
-	if (oppositeStrand) {
-	    if (oldLoc.isContiguous()) {
-            if (oldLoc instanceof PointLocation){
-                return new PointLocation(translate - oldLoc.getMin());
-            } else {
-    		    return new RangeLocation(translate - oldLoc.getMax(),
-    					 translate - oldLoc.getMin());
-    	    }
-	    } else {
-		    Location compound = Location.empty;
-    		Vector locList = new Vector();
-    		for (Iterator i = oldLoc.blockIterator(); i.hasNext(); ) {
-    		    Location oldBlock = (Location) i.next();
-    		    locList.addElement(new RangeLocation(translate - oldBlock.getMax(),
-    								translate - oldBlock.getMin()));
-    		}
-    		compound = LocationTools.union(locList);
-		    return compound;
-		}
-	    } else {
-		return oldLoc.translate(translate);
-	    }
-	}
-
-	public StrandedFeature.Strand getStrand(StrandedFeature sf) {
-	    if (isOppositeStrand()) {
-		StrandedFeature.Strand s = sf.getStrand();
-		if (s == StrandedFeature.POSITIVE) {
-		    return StrandedFeature.NEGATIVE;
-		} else if (s == StrandedFeature.NEGATIVE) {
-		    return StrandedFeature.POSITIVE;
-		} else {
-		    return StrandedFeature.UNKNOWN;
-		}
-	    } else {
-		return sf.getStrand();
-	    }
-	}
-
-	public Annotation getAnnotation(Feature f) {
-	    return f.getAnnotation();
-	}
-
-	public FeatureHolder projectChildFeatures(Feature f, FeatureHolder parent) {
-	    return projectFeatureHolder(f, parent, getTranslation(), isOppositeStrand());
-	}
-
-	public Feature createFeature(Feature f, Feature.Template templ) 
-	    throws ChangeVetoException
-	{
-	    throw new ChangeVetoException("Can't create features in this projection");
-	}
-
-	public void removeFeature(Feature f, Feature f2) 
-	    throws ChangeVetoException
-	{
-	    throw new ChangeVetoException("Can't create features in this projection");
-	}
-    }
-
-
-    private static class ProjectedOptimizedFeatureHolder extends AbstractFeatureHolder implements DASOptimizableFeatureHolder {
-	private final DASOptimizableFeatureHolder wrapped;
-	private final FeatureHolder parent;
-	private final int translate;
-	private boolean oppositeStrand;
-
-	private MergeFeatureHolder mfh = null;
-	private ChangeListener underlyingFeaturesChange;
-
-	public ProjectedOptimizedFeatureHolder(DASOptimizableFeatureHolder fh,
-					       FeatureHolder parent, 
-					       int translation,
-					       boolean oppositeStrand) 
-	{
-	    this.wrapped = fh;
-	    this.parent = parent;
-	    this.translate = translation;
-	    this.oppositeStrand = oppositeStrand;
-
-	    underlyingFeaturesChange = new ChangeListener() {
-		    public void preChange(ChangeEvent e)
-			throws ChangeVetoException 
-		    {
-			if (hasListeners()) {
-			    getChangeSupport(FeatureHolder.FEATURES).firePreChangeEvent(new ChangeEvent(this,
-									     FeatureHolder.FEATURES,
-									     e.getChange(),
-									     e.getPrevious(),
-									     e));
-			}
-		    }
-		    
-		    public void postChange(ChangeEvent e) {
-			mfh = null; // Flush all the cached projections --
-			// who knows what might have changed.
-			
-			// System.err.println("*** Flushing cache on optimized projection...");
-
-			if (hasListeners()) {
-			    getChangeSupport(FeatureHolder.FEATURES).firePostChangeEvent(new ChangeEvent(this,
-									      FeatureHolder.FEATURES,
-									      e.getChange(),
-									      e.getPrevious(),
-									      e));
-			}
-		    }
-		} ;
-
-	    wrapped.addChangeListener(underlyingFeaturesChange, ChangeType.UNKNOWN);
-	    
-	}
-
-	protected MergeFeatureHolder getProjectedFeatures() {
-	    if (mfh == null) {
-		try {
-		    Set optimizableFilters = wrapped.getOptimizableFilters();
-		    mfh = new MergeFeatureHolder();
-		    for (Iterator i = optimizableFilters.iterator(); i.hasNext(); ) {
-			FeatureFilter potFilter = (FeatureFilter) i.next();
-			FeatureHolder potHolder = wrapped.getOptimizedSubset(potFilter);
-			
-			FeatureFilter projectedPotFilter = potFilter;
-			// System.err.println("projecting for: " + potFilter);
-			if (extractInterestingLocation(projectedPotFilter) != null) {
-			    if (projectedPotFilter instanceof FeatureFilter.ContainedByLocation) {
-				if (oppositeStrand) {
-				    System.err.println("*** Warning: flipped projection, can't fixup!");
-				    projectedPotFilter = FeatureFilter.all;
-				} else {
-				    Location loc = ((FeatureFilter.ContainedByLocation) projectedPotFilter).getLocation();
-				    projectedPotFilter = new FeatureFilter.ContainedByLocation(loc.translate(translate));
-				}
-			    } else {
-				System.err.println("*** Warning: complex location-filter, can't fixup!");
-				projectedPotFilter = FeatureFilter.all;
-			    }   
-			}
-			
-			FeatureHolder projectedPotHolder = projectFeatureHolder(potHolder,
-										parent,
-										translate,
-										oppositeStrand);
-			mfh.addFeatureHolder(projectedPotHolder, projectedPotFilter);
-		    }
-		} catch (BioException bex) {
-		    throw new BioRuntimeException(bex);
-		} catch (ChangeVetoException cve) {
-		    throw new BioError(cve, "Change to internal featureset vetoed!");
-		}
-	    }
-
-	    return mfh;
-	}
-
-	public int countFeatures() {
-	    return wrapped.countFeatures();
-	}
-	
-	public Iterator features() {
-	    return getProjectedFeatures().features();
-	}
-	
-	public boolean containsFeature(Feature f) {
-	    return getProjectedFeatures().containsFeature(f);
-	}
-
-	public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	    return getProjectedFeatures().filter(ff, recurse);
-	}
-
-	public Set getOptimizableFilters() {
-	    Map mm = getProjectedFeatures().getMergeMap();
-	    Set osf = new HashSet();
-	    for (Iterator i = mm.values().iterator(); i.hasNext(); ) {
-		osf.add(i.next());
-	    }
-	    
-	    return osf;
-	}
-
-	public FeatureHolder getOptimizedSubset(FeatureFilter ff) 
-	    throws BioException
-	{
-	    List ss = new ArrayList();
-	    Map mm = getProjectedFeatures().getMergeMap();
-	    for (Iterator i = mm.entrySet().iterator(); i.hasNext(); ) {
-		Map.Entry me = (Map.Entry) i.next();
-		FeatureHolder fh = (FeatureHolder) me.getKey();
-		FeatureFilter tff = (FeatureFilter) me.getValue();
-		if (tff.equals(ff)) {
-		    ss.add(fh);
-		}
-	    }
-	    
-	    if (ss.size() == 0) {
-		throw new BioException("No optimized subset matching: " + ff);
-	    } else if (ss.size() == 1) {
-		return (FeatureHolder) ss.get(0);
-	    } else {
-		MergeFeatureHolder mfh = new MergeFeatureHolder();
-		for (Iterator i = ss.iterator(); i.hasNext(); ) {
-		    try {
-			mfh.addFeatureHolder((FeatureHolder) i.next());
-		    } catch (ChangeVetoException cve) {
-			throw new BioError(cve, "Change to internal featureset vetoed!");
-		    }
-		}
-		return mfh;
-	    }
-	}
     }
 }
