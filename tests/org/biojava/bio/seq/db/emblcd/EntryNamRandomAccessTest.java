@@ -31,34 +31,32 @@ import java.net.URL;
 import junit.framework.TestCase;
 
 /**
- * <code>EntryNamIdxReaderTest</code> tests reading of the binary
- * entrynam.idx file type.
+ * <code>EntryNamRandomAccessTest</code> tests random access reading
+ * of the binary entrynam.idx file type.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
  */
-public class EntryNamIdxReaderTest extends TestCase
+public class EntryNamRandomAccessTest extends TestCase
 {
-    protected EntryNamIdxReader ent;
+    protected EntryNamRandomAccess rand;
 
     protected String [] seqID;
     protected long []   rPos;
     protected long []   sPos;
     protected int  []   fileNum;
 
-    public EntryNamIdxReaderTest(String name)
+    public EntryNamRandomAccessTest(String name)
     {
         super(name);
     }
 
     protected void setUp() throws Exception
     {
-        URL url = EntryNamIdxReaderTest.class.getResource("entrynam.idx");
+        URL url = EntryNamRandomAccessTest.class.getResource("entrynam.idx");
+        File  f = new File(url.getFile());
 
-        BufferedInputStream bis = new BufferedInputStream(new
-            FileInputStream(new File(url.getFile())));
-
-        ent = new EntryNamIdxReader(bis);
+        rand =  new EntryNamRandomAccess(f, 300, 30, 30);
 
         // First 10 sequence IDs.
         seqID   = new String [] {"NMA0001", "NMA0003", "NMA0004", "NMA0007", "NMA0011",
@@ -75,49 +73,24 @@ public class EntryNamIdxReaderTest extends TestCase
 
     protected void tearDown() throws Exception
     {
-        ent.close();
+        rand.close();
     }
 
-    public void testReadFileLength()
-    {
-        assertTrue(1200 == ent.readFileLength());
-    }
-
-    public void testReadRecordCount()
-    {
-        assertTrue(30 == ent.readRecordCount());
-    }
-
-    public void testReadRecordLength()
-    {
-        assertTrue(30 == ent.readRecordLength());
-    }
-
-    public void testReadDBName()
-    {
-        assertEquals("protDB", ent.readDBName());
-    }
-
-    public void testReadDBRelease()
-    {
-        assertEquals("0.1", ent.readDBRelease());
-    }
-
-    public void testReadDBDate()
-    {
-        assertEquals("0:0:0", ent.readDBDate());
-    }
-
-    public void testReadRecord() throws IOException
+    public void testFindRecord() throws IOException
     {
         for (int i = 0; i < 10; i++)
         {
-            Object [] rec = ent.readRecord();
+            Object [] rec = rand.findRecord(seqID[i]);
 
             assertEquals(seqID[i],     (String)  rec[0]);
             assertEquals(rPos[i],     ((Long)    rec[1]).longValue());
             assertEquals(0,           ((Long)    rec[2]).longValue());
             assertEquals(fileNum[i],  ((Integer) rec[3]).intValue());
         }
+    }
+
+    public void testGetFile()
+    {
+        assertEquals("entrynam.idx", rand.getFile().getName());
     }
 }
