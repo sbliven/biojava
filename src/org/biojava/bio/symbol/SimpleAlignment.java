@@ -110,10 +110,15 @@ extends AbstractSymbolList implements Alignment, Serializable {
    * @throws IllegalArgumentException if the SymbolLists are not the same
    *         length
    */
-  public SimpleAlignment(Map labelToResList) throws IllegalArgumentException {
+  public SimpleAlignment(Map labelToResList)
+  throws IllegalArgumentException {
+    if(labelToResList.isEmpty()) {
+      throw new IllegalArgumentException("Can't create an alignment with no sequences");
+    };
+
     this.labels = Collections.unmodifiableList(new ArrayList(labelToResList.keySet()));
     this.labelToSymbolList = labelToResList;
-
+    
     int length = -1;
     List alphaList = new ArrayList();
     for(Iterator li = labels.iterator(); li.hasNext(); ) {
