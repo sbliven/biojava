@@ -32,6 +32,8 @@ import java.net.HttpURLConnection;
 import java.io.*;
 import java.net.URL;
 import java.util.Properties ;
+import java.util.zip.GZIPInputStream;
+
 
 
 import org.xml.sax.helpers.*;
@@ -101,10 +103,19 @@ public class DASAlignmentCall {
 	
 	    HttpURLConnection huc = null;
 	    huc = (HttpURLConnection) url.openConnection();	    
-	    
+	    // should make communication much faster!
+	    huc.setRequestProperty("Accept-Encoding", "gzip");
+	
 	    System.out.println("response code " +huc.getResponseCode());
+	    String contentEncoding = huc.getContentEncoding();
 	    inStream = huc.getInputStream(); 
-	    
+	    if (contentEncoding != null) {
+                if (contentEncoding.indexOf("gzip") != -1) {
+		    // we have gzip encoding
+		    inStream = new GZIPInputStream(inStream);
+		    System.out.println("using gzip encoding!");
+                }
+            }
 
 	return inStream;
 	
