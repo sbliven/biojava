@@ -50,6 +50,8 @@ class DistributedSequence implements Sequence{
 			DistDataSource seqSource,
 			Set featureSources)
     {
+	System.err.println("*** Constructing DistributedSequence: " + id);
+
 	this.id = id;
 	this.seqSource = seqSource;
 	this.featureSources = featureSources;

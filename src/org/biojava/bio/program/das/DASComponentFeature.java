@@ -256,6 +256,7 @@ class DASComponentFeature implements ComponentFeature, DASOptimizableFeatureHold
 	temp.source = getSource();
 	temp.location = getLocation();
 	temp.annotation = getAnnotation();
+	temp.strand = getStrand();
 	temp.componentLocation = getComponentLocation();
 	temp.componentSequenceName = componentID;
 	// temp.componentSequence = getComponentSequence();

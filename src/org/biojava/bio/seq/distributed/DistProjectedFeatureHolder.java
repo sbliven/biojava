@@ -146,6 +146,10 @@ class DistProjectedFeatureHolder extends AbstractFeatureHolder {
 		    }
 		    cft.componentSequence = null;    // We need to go back though the DistDB for the
 		                                     // proper component sequence to use here.
+		    if (cft.componentSequenceName == null) {
+			throw new NullPointerException("Can't get component sequence name");
+		    }
+
 		    try {
 			wf = new DistComponentFeature((DistributedSequence) parent,
 						      cft);

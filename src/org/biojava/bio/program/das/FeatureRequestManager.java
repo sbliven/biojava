@@ -72,6 +72,10 @@ class FeatureRequestManager {
 				  String type,
 				  String category)
     {
+	if (id == null) {
+	    throw new NullPointerException("Null ID, you nutter!");
+	}
+
 	Segment seg;
 	if (loc != null) {
 	    seg = new Segment(id, loc.getMin(), loc.getMax());

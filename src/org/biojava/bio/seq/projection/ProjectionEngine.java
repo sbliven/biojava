@@ -243,7 +243,8 @@ public class ProjectionEngine {
 		    } else if (rtype == CodeUtils.TYPE_INT ||
 			       rtype == CodeUtils.TYPE_SHORT ||
 			       rtype == CodeUtils.TYPE_CHAR ||
-			       rtype == CodeUtils.TYPE_BYTE) {
+			       rtype == CodeUtils.TYPE_BYTE ||
+			       rtype == CodeUtils.TYPE_BOOLEAN) {
 			returni = ByteCode.make_ireturn();
 		    } else if (rtype == CodeUtils.TYPE_LONG) {
 			returni = ByteCode.make_lreturn();
