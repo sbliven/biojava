@@ -48,6 +48,7 @@ import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.LocationTools;
 import org.biojava.utils.ChangeAdapter;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeListener;
@@ -488,7 +489,7 @@ public class SequencePanel
 
           Shape oldClip = g2.getClip();
           g2.clip(clip);
-          renderer.paint(g2, this);
+          renderer.paint(g2, new PaintContext());
           g2.setClip(oldClip);
           g2.setTransform(oldTransform);
   }
@@ -698,5 +699,72 @@ public class SequencePanel
 
     return hc;
     }
+
+  private class PaintContext
+          implements SequenceRenderContext
+  {
+    private final RangeLocation range;
+
+    public PaintContext() {
+      this.range = (RangeLocation) LocationTools.intersection(
+              SequencePanel.this.getRange(),
+              new RangeLocation(1, SequencePanel.this.getSequence().length()));
+    }
+
+    public RangeLocation getRange()
+    {
+      return range;
+    }
+
+    public int getDirection()
+    {
+      return SequencePanel.this.getDirection();
+    }
+
+    public double getScale()
+    {
+      return SequencePanel.this.getScale();
+    }
+
+    public double sequenceToGraphics(int i)
+    {
+      return SequencePanel.this.sequenceToGraphics(i);
+    }
+
+    public int graphicsToSequence(double d)
+    {
+      return SequencePanel.this.graphicsToSequence(d);
+    }
+
+    public int graphicsToSequence(Point2D point)
+    {
+      return SequencePanel.this.graphicsToSequence(point);
+    }
+
+    public SymbolList getSymbols()
+    {
+      return SequencePanel.this.getSymbols();
+    }
+
+    public FeatureHolder getFeatures()
+    {
+      return SequencePanel.this.getFeatures();
+    }
+
+    public SequenceRenderContext.Border getLeadingBorder()
+    {
+      return SequencePanel.this.getLeadingBorder();
+    }
+
+    public SequenceRenderContext.Border getTrailingBorder()
+    {
+      return SequencePanel.this.getTrailingBorder();
+    }
+
+    public Font getFont()
+    {
+      return SequencePanel.this.getFont();
+    }
+  }
 }
 
