@@ -24,6 +24,10 @@ final public class LocationTools {
   	if(isDecorated(locA) || isDecorated(locB))
   	{
   		handleDecorations(locA, locB);
+  		if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
+  		{
+  			return BetweenLocationTools.union(locA, locB);
+  		}
   	}
 
     if(
@@ -72,7 +76,11 @@ final public class LocationTools {
 
     if(isDecorated(locA) || isDecorated(locB))
     {
-	handleDecorations(locA, locB);
+		handleDecorations(locA, locB);
+		if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
+		{
+			return BetweenLocationTools.intersection(locA, locB);
+		}
     }
     if(locA.isContiguous() && locB.isContiguous()) {
       // handle easy case of solid locations
@@ -120,6 +128,10 @@ final public class LocationTools {
   	if(isDecorated(locA) || isDecorated(locB))
   	{
   		handleDecorations(locA, locB);
+		if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
+		{
+			return BetweenLocationTools.overlaps(locA, locB);
+		}
   	}
     if(locA.isContiguous() && locB.isContiguous()) {
       // if they are both solid, return whether the extents overlap
@@ -154,6 +166,10 @@ final public class LocationTools {
   	if(isDecorated(locA) || isDecorated(locB))
   	{
   		handleDecorations(locA, locB);
+		if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
+		{
+			return BetweenLocationTools.contains(locA, locB);
+		}
   	}
     if(locA.isContiguous() && locB.isContiguous()) {
       // both solid - check the extents
@@ -193,6 +209,10 @@ final public class LocationTools {
   	if(isDecorated(locA) || isDecorated(locB))
   	{
   		handleDecorations(locA, locB);
+		if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
+		{
+			return BetweenLocationTools.areEqual(locA, locB);
+		}
   	}
     // simple check - if one is broken and the other isn't, they aren't equal.
     if(locA.isContiguous() != locB.isContiguous()) {
@@ -373,11 +393,15 @@ final public class LocationTools {
   }
 
   /**
-   * Currently only CircularLocations are handled and only if
+   * Currently CircularLocations are handled if and only if
    * CircularLocationTools.safeOperation returns true. For this to be true
    * the locations must have the same sequence length.
    *
-   * @todo Handle other decorations.
+   * BetweenLocations are handled in all cases.  Overlap cases, such as
+   * between, circular locations have indeterminate behavior.
+   *
+   * The default behavior is to not handle decorators.  Any new decorators
+   * will have to re-visit this method
    */
   protected static void handleDecorations(Location locA, Location locB){
     if(CircularLocationTools.isCircular(locA)|| CircularLocationTools.isCircular(locB)){
@@ -387,7 +411,12 @@ final public class LocationTools {
                 " Non-Circular locations, or CircularLocations"+
                 " from sequences of differing length are currently unsupported.");
         }
-      }else{
+      }
+    else if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
+    {
+    	// Intentionally blank
+    }
+    else{
 	throw new ClassCastException("Decorated locations are not handled in this version");
       }
   }
