@@ -215,7 +215,7 @@
               packages="org.biojava.bio.gui:org.biojava.bio.gui.sequence" />
 
        <group title="External Tools"
-              packages="org.biojava.bio.program:org.biojava.bio.program.gff:org.biojava.bio.program.sax:org.biojava.bio.program.xml:org.biojava.bio.program.blast2html:org.biojava.bio.program.search:org.biojava.bio.program.ssbind:org.biojava.bio.program.phred"
+              packages="org.biojava.bio.program:org.biojava.bio.program.abi:org.biojava.bio.program.gff:org.biojava.bio.program.sax:org.biojava.bio.program.xml:org.biojava.bio.program.blast2html:org.biojava.bio.program.search:org.biojava.bio.program.ssbind:org.biojava.bio.program.phred"
 />
        <group title="Dynamic Programming Packages"
               packages="org.biojava.bio.dp:org.biojava.bio.dp.onehead:org.biojava.bio.dp.twohead"
