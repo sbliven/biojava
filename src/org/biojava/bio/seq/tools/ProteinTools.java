@@ -35,6 +35,7 @@ public class ProteinTools {
       AlphabetManager am = AlphabetManager.instance();
       proteinAlpha = (FiniteAlphabet) am.alphabetForName("PROTEIN");
       SimpleAlphabet xAlpha = new SimpleAlphabet();
+      xAlpha.setName(proteinAlpha.getName() + "+X");
       for(Iterator i = proteinAlpha.residues().iterator(); i.hasNext(); ) {
         xAlpha.addResidue((Residue) i.next());
       }

@@ -13,7 +13,7 @@ javadoc \
  -sourcepath src \
  -classpath xml.jar:class \
  -d docs/api \
- -private -use -version -author \
+ -use -version -author \
  -windowtitle "Biojava API documentation" \
  -group "Core Packages" ${PACKAGES_CORE} \
  -group "Development Packages" ${PACKAGES_DEVELOPMENT} \

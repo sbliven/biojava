@@ -133,7 +133,10 @@ class SimpleCrossProductAlphabet implements FiniteAlphabet, CrossProductAlphabet
     gopher.l = l;
     CrossProductResidue r = (CrossProductResidue) ourResidues.get(gopher);
     if (r == null) {
-	    throw new IllegalAlphabetException();
+      throw new IllegalAlphabetException(
+        "Unable to find CrossProduct residue for " +
+        l + " in alphabet " + getName()
+      );
     }
     return r;
   }

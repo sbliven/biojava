@@ -51,12 +51,14 @@ public class SimpleStateTrainer implements StateTrainer {
     EmissionState nullModel,
     double weight
   ) throws IllegalResidueException {
-    for (
-      Iterator i = ((FiniteAlphabet) state.alphabet()).residues().iterator();
-      i.hasNext();
-    ) {
-      Residue r = (Residue) i.next();
-      addCount(r, Math.exp(nullModel.getWeight(r) + weight));
+    if(nullModel != null) {
+      for (
+        Iterator i = ((FiniteAlphabet) state.alphabet()).residues().iterator();
+        i.hasNext();
+      ) {
+        Residue r = (Residue) i.next();
+        addCount(r, Math.exp(nullModel.getWeight(r) + weight));
+      }
     }
     
     double sum = 0.0;
