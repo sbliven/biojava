@@ -56,6 +56,9 @@ import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.OverlayMap;
 import org.biojava.utils.Unchangeable;
+import org.biojava.utils.lsid.Identifiable;
+import org.biojava.utils.lsid.LifeScienceIdentifier;
+import org.biojava.utils.lsid.LifeScienceIdentifierParseException;
 import org.biojava.utils.stax.DelegationManager;
 import org.biojava.utils.stax.SAX2StAXAdaptor;
 import org.biojava.utils.stax.StAXContentHandler;
@@ -65,6 +68,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+
 
 /**
  * Utility methods for working with Alphabets.  Also acts as a registry for
@@ -80,6 +84,7 @@ import org.xml.sax.XMLReader;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ * @author Mark Schreiber
  */
 
 public final class AlphabetManager {
@@ -156,7 +161,8 @@ public final class AlphabetManager {
   }
 
   static private Map nameToAlphabet;
-  static private Map nameToSymbol;
+  //static private Map nameToSymbol;
+  static private Map lsidToSymbol;
   static private Map crossProductAlphabets;
   static private Map ambiguitySymbols;
   static private GapSymbol gapSymbol;
@@ -189,14 +195,31 @@ public final class AlphabetManager {
     *
     * @param name of the string whose symbol you want to get
     * @throws NoSuchElementException if the string name is invalid.
+    * @deprecated use symbolForLifeScienceID() instead
     */
   static public Symbol symbolForName(String name)
   throws NoSuchElementException {
-    Symbol s = (Symbol) nameToSymbol.get(name);
+    String ls = "urn:lsid:biojava.org:symbol:"+name;
+    LifeScienceIdentifier lsid = null;
+    try {
+      lsid = LifeScienceIdentifier.valueOf(ls);
+    } catch (LifeScienceIdentifierParseException ex) {
+      throw new BioError("Cannot construct LSID for "+name, ex);
+    }
+    Symbol s = (Symbol) lsidToSymbol.get(lsid);
     if(s == null) {
-      throw new NoSuchElementException("Could not find symbol under the name " + name);
+      throw new NoSuchElementException("Could not find symbol under the name " + lsid);
     }
     return s;
+  }
+
+  /**
+   * Retreives the Symbol for the LSID
+   * @param lsid the URN for the Symbol
+   * @return a reference to the Symbol
+   */
+  static public Symbol symbolForLifeScienceID(LifeScienceIdentifier lsid){
+    return (Symbol)lsidToSymbol.get(lsid);
   }
 
   /**
@@ -881,7 +904,8 @@ public final class AlphabetManager {
    */
   static {
     nameToAlphabet = new HashMap();
-    nameToSymbol = new HashMap();
+    //nameToSymbol = new HashMap();
+    lsidToSymbol = new HashMap();
     ambiguitySymbols = new HashMap();
 
     gapSymbol = new GapSymbol();
@@ -975,24 +999,29 @@ public final class AlphabetManager {
                  }
                  dm.delegate(new AlphabetHandler(name, parentAlpha));
              } else {
-                 throw new SAXException("Unknown element in alphabetManager: " + localName);
+                 throw new SAXException(
+                         "Unknown element in alphabetManager: " +
+                         localName);
              }
          }
 
          public void endElement(String nsURI,
-                                            String localName,
+                                String localName,
                                 String qName,
                                 StAXContentHandler delegate)
             throws SAXException
          {
              if (delegate instanceof SymbolHandler) {
                  SymbolHandler sh = (SymbolHandler) delegate;
-                 String name = sh.getName();
+                 //String name = sh.getName();
+                 LifeScienceIdentifier lsid = sh.getLSID();
                  Symbol symbol = sh.getSymbol();
-                 if (nameToSymbol.containsKey("name")) {
-                     throw new SAXException("There is already a top-level symbol named " + name);
+                 if (lsidToSymbol.containsKey(lsid)) {
+                     throw new SAXException(
+                     "There is already a top-level symbol named "
+                     + lsid);
                  }
-                 nameToSymbol.put(name, symbol);
+                 lsidToSymbol.put(lsid, symbol);
              } else if (delegate instanceof AlphabetHandler) {
                  AlphabetHandler ah = (AlphabetHandler) delegate;
                  String name = ah.getName();
@@ -1003,11 +1032,17 @@ public final class AlphabetManager {
 
          private class SymbolHandler extends StAXContentHandlerBase {
              private String name;
+             private LifeScienceIdentifier lsid;
              private Symbol symbol;
              private Annotation annotation = new SmallAnnotation();
 
-             public SymbolHandler(String name) {
-                 this.name = name;
+             public SymbolHandler(String id) {
+                try {
+                  lsid = LifeScienceIdentifier.valueOf(id);
+                  name = lsid.getObjectId();
+                } catch (LifeScienceIdentifierParseException ex) {
+                  throw new BioError("Malformed LSID - "+name, ex);
+                }
              }
 
              public void startElement(String nsURI,
@@ -1039,8 +1074,9 @@ public final class AlphabetManager {
                     new FundamentalAtomicSymbol(
                         name,
                         annotation
-                    )
-                 );
+                    ),
+                    lsid
+                  );
              }
 
              Symbol getSymbol() {
@@ -1050,11 +1086,15 @@ public final class AlphabetManager {
              String getName() {
                  return name;
              }
+
+             LifeScienceIdentifier getLSID(){
+               return lsid;
+             }
          }
 
          private class AlphabetHandler extends StAXContentHandlerBase {
              private String name;
-             private Map localSymbols;
+             //private Map localSymbols;
              private WellKnownAlphabet alpha;
              private ImmutableWellKnownAlphabetWrapper alphaWrapper;
 
@@ -1072,25 +1112,27 @@ public final class AlphabetManager {
 
              public AlphabetHandler(String name, FiniteAlphabet parent) {
                  this.name = name;
-                 localSymbols = new OverlayMap(nameToSymbol);
+                 //localSymbols = new OverlayMap(nameToSymbol);
                  alpha = new WellKnownAlphabet();
                  alpha.setName(name);
                  alphaWrapper = new ImmutableWellKnownAlphabetWrapper(alpha);
                  if (parent != null) {
                      for (Iterator i = parent.iterator(); i.hasNext(); ) {
-                         Symbol sym = (Symbol) i.next();
+                         WellKnownAtomicSymbol sym =
+                             (WellKnownAtomicSymbol) i.next();
                          try {
                              alpha.addSymbol(sym);
                          } catch (Exception ex) {
-                             throw new BioError( "Couldn't initialize alphabet from parent", ex);
+                             throw new BioError(
+                               "Couldn't initialize alphabet from parent", ex);
                          }
-                         localSymbols.put(sym.getName(), sym);
+                         lsidToSymbol.put(sym.getIdentifier(), sym);
                      }
                  }
              }
 
              public void startElement(String nsURI,
-                                                 String localName,
+                                     String localName,
                                      String qName,
                                      Attributes attrs,
                                      DelegationManager dm)
@@ -1103,15 +1145,23 @@ public final class AlphabetManager {
                      dm.delegate(new SymbolHandler(name));
                  } else if (localName.equals("symbolref")) {
                      String name = attrs.getValue("name");
-                     Symbol sym = (Symbol) localSymbols.get(name);
+                    LifeScienceIdentifier lsid = null;
+                    try {
+                      lsid =
+                          LifeScienceIdentifier.valueOf(name);
+                    } catch (LifeScienceIdentifierParseException ex) {
+                      throw new SAXException("Couldn't form a LSID from "+name);
+                    }
+                     Symbol sym = (Symbol) lsidToSymbol.get(lsid);
                      if (sym == null) {
-                         throw new SAXException("Reference to non-existent symbol " + name);
+                         throw new SAXException(
+                           "Reference to non-existent symbol " + name);
                      }
                      addSymbol(sym);
                  } else if (localName.equals("characterTokenization")) {
                      String name = attrs.getValue("name");
                      boolean caseSensitive = "true".equals(attrs.getValue("caseSensitive"));
-                     dm.delegate(new CharacterTokenizationHandler(name, alphaWrapper, localSymbols, caseSensitive));
+                     dm.delegate(new CharacterTokenizationHandler(name, alphaWrapper, lsidToSymbol, caseSensitive));
                  } else if (localName.equals("description")) {
                      dm.delegate(new StringElementHandlerBase() {
                          protected void setStringValue(String s) {
@@ -1135,9 +1185,10 @@ public final class AlphabetManager {
              {
                  if (delegate instanceof SymbolHandler) {
                      SymbolHandler sh = (SymbolHandler) delegate;
-                     String name = sh.getName();
+                     //String name = sh.getName();
                      Symbol symbol = sh.getSymbol();
-                     localSymbols.put(name, symbol);
+                     LifeScienceIdentifier lsid = sh.getLSID();
+                     lsidToSymbol.put(lsid, symbol);
                      addSymbol(symbol);
                  } else if (delegate instanceof CharacterTokenizationHandler) {
                      CharacterTokenizationHandler cth = (CharacterTokenizationHandler) delegate;
@@ -1182,8 +1233,8 @@ public final class AlphabetManager {
                  this.name = name;
                  this.localSymbols = new HashMap();
                  for (Iterator i = alpha.iterator(); i.hasNext(); ) {
-                     Symbol sym = (Symbol) i.next();
-                     this.localSymbols.put(sym.getName(), sym);
+                     WellKnownAtomicSymbol sym = (WellKnownAtomicSymbol) i.next();
+                     this.localSymbols.put(sym.getIdentifier(), sym);
                  }
                  toke = new CharacterTokenization(alpha, caseSensitive);
              }
@@ -1236,7 +1287,13 @@ public final class AlphabetManager {
                      } else {
                          if (localName.equals("symbolref")) {
                              String name = attrs.getValue("name");
-                             Symbol sym = (Symbol) localSymbols.get(name);
+                             LifeScienceIdentifier lsid = null;
+                             try {
+                               lsid = LifeScienceIdentifier.valueOf(name);
+                             } catch (LifeScienceIdentifierParseException ex) {
+                               throw new SAXException("Cannot for LSID from " + name);
+                             }
+                             Symbol sym = (Symbol) localSymbols.get(lsid);
                              if (sym == null) {
                                  throw new SAXException("Reference to non-existent symbol " + name);
                              }
@@ -1493,9 +1550,19 @@ public final class AlphabetManager {
      * serialized data.
      */
 
-    private static class WellKnownAtomicSymbol extends WellKnownBasisSymbol implements AtomicSymbol {
-        WellKnownAtomicSymbol(AtomicSymbol symbol) {
+    private static class WellKnownAtomicSymbol
+        extends WellKnownBasisSymbol
+        implements AtomicSymbol, Identifiable {
+
+        LifeScienceIdentifier lsid;
+
+        WellKnownAtomicSymbol(AtomicSymbol symbol, LifeScienceIdentifier lsid) {
             super(symbol);
+            this.lsid = lsid;
+        }
+
+        public LifeScienceIdentifier getIdentifier(){
+          return lsid;
         }
 
         public Alphabet getMatches() {
@@ -1503,19 +1570,19 @@ public final class AlphabetManager {
         }
 
         private Object writeReplace() {
-            return new OPH(getName());
+            return new OPH(getIdentifier());
         }
 
         private static class OPH implements Serializable {
-            private String name;
+            private LifeScienceIdentifier name;
 
-            public OPH(String name) {
+            public OPH(LifeScienceIdentifier name) {
                 this.name = name;
             }
 
             private Object readResolve() throws ObjectStreamException {
                 try {
-                    return symbolForName(name);
+                    return symbolForLifeScienceID(name);
                 } catch (NoSuchElementException ex) {
                     throw new InvalidObjectException(
                         "Couldn't resolve symbol:" + name
