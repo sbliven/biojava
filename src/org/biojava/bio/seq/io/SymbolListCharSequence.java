@@ -30,17 +30,14 @@ import org.biojava.bio.BioException;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.symbol.ReversibleTranslationTable;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.SymbolListViews;
 
 /**
  * <code>SymbolListCharSequence</code> is a <code>CharSequence</code>
  * implementation which wraps a <code>SymbolList</code>. It is present
  * primarily to support regular expression matching over
- * <code>SymbolList</code>s as it avoids creating a copy. However, it
- * is pretty slow.
+ * <code>SymbolList</code>s as it avoids creating a copy.
  *
  * @author Keith James
  */
@@ -112,7 +109,7 @@ public class SymbolListCharSequence implements CharSequence
 
     public CharSequence subSequence(int start, int end)
     {
-        return new SymbolListCharSequence(syms.subList(start, end),
+        return new SymbolListCharSequence(syms.subList(start + 1, end + 1),
                                           alphaTokens);
     }
 
