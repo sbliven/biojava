@@ -55,7 +55,7 @@ public class SmallCursor extends AbstractCursor {
     currentC = v;
   }
   
-  public SmallCursor(EmissionState [] states, int length, ResidueList resList, Iterator resIterator) {
+  public SmallCursor(State [] states, int length, ResidueList resList, Iterator resIterator) {
     super(resIterator);
     this.length = length;
     

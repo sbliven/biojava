@@ -26,25 +26,25 @@ import java.util.*;
 import org.biojava.bio.seq.*;
 
 public class MatrixCursor extends AbstractCursor {
-  private ResidueList resList;
-  private double [][] matrix;
+  private final SingleDPMatrix matrix;
+  private final int dir;
+
   private int index;
-  private int dir;
   
   public int length() {
-    return matrix[0].length - 1;
+    return matrix.scores[0].length - 1;
   }
   
   public ResidueList resList() {
-    return resList;
+    return matrix.resList()[0];
   }
   
   public double [] currentCol() {
-    return matrix[index];
+    return matrix.scores[index];
   }
   
   public double [] lastCol() {
-    return matrix[index-dir];
+    return matrix.scores[index-dir];
   }
 
   public void advance() {
@@ -52,22 +52,17 @@ public class MatrixCursor extends AbstractCursor {
     index += dir;    
   }
   
-  public MatrixCursor(EmissionState [] states, ResidueList resList,
-                      Iterator resIterator,
-                      double [][] matrix, int dir) throws IllegalArgumentException {
+  public MatrixCursor(
+    SingleDPMatrix matrix,
+    Iterator resIterator,
+    int dir
+  ) throws IllegalArgumentException {
     super(resIterator);
     
-    if(matrix.length != (resList.length() + 2) ||
-       matrix[0].length != states.length)
-      throw new IllegalArgumentException("Incorrectly sized matrix");
-    if(dir != -1 && dir != 1)
-      throw new IllegalArgumentException("dir must be -1 or +1, not '" + dir + "'");
-      
     this.matrix = matrix;
     this.dir = dir;
     this.index = (dir == 1) ?
                     0     :
-                    resList.length() + 1;
-    this.resList = resList;
+                    length() + 2;
   }
 }

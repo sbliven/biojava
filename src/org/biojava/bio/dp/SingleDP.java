@@ -47,7 +47,7 @@ class SingleDP extends DP {
   }
 
   public SingleDP(FlatModel flat)
-  throws IllegalResidueException {
+  throws IllegalResidueException, IllegalTransitionException {
     super(flat);
   }
   
@@ -76,6 +76,7 @@ class SingleDP extends DP {
       seq[0],
       new ReverseIterator(seq[0])
     );
+    return backward(dpCursor);
   }
 
   public DPMatrix forwardMatrix(ResidueList [] seq)
@@ -83,13 +84,12 @@ class SingleDP extends DP {
     if(seq.length != 1) {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
-    DPCursor dpCursor = new SmallCursor(
-      getStates(),
-      seq[0].length(),
-      seq[0],
-      seq[0].iterator()
-    );
-    return forward(dpCursor);
+    
+    SingleDPMatrix matrix = new SingleDPMatrix(getModel(), getStates(), seq[0]);
+    DPCursor dpCursor = new MatrixCursor(matrix, seq[0].iterator(), +1);
+    matrix.score = forward(dpCursor);
+    
+    return matrix;
   }
   
   public DPMatrix backwardMatrix(ResidueList [] seq)
@@ -97,42 +97,40 @@ class SingleDP extends DP {
     if(seq.length != 1) {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
-    DPCursor dpCursor = new SmallCursor(
-      getStates(),
-      seq[0].length(),
-      seq[0],
-      new ReverseIterator(seq[0])
-    );
+    
+    SingleDPMatrix matrix = new SingleDPMatrix(getModel(), getStates(), seq[0]);
+    DPCursor dpCursor = new MatrixCursor(matrix, new ReverseIterator(seq[0]), -1);
+    matrix.score = backward(dpCursor);
+    
+    return matrix;
   }
   
-  public DPMatrix forwardmatrix(ResidueList [] seq, DPMatrix matrix)
+  public DPMatrix forwardMatrix(ResidueList [] seq, DPMatrix matrix)
   throws IllegalArgumentException, IllegalResidueException,
   IllegalAlphabetException, IllegalResidueException {
     if(seq.length != 1) {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
-    DPCursor dpCursor = new SmallCursor(
-      getStates(),
-      seq[0].length(),
-      seq[0],
-      seq[0].iterator()
-    );
-    return forward(dpCursor);
+    
+    SingleDPMatrix sm = (SingleDPMatrix) matrix;
+    DPCursor dpCursor = new MatrixCursor(sm, seq[0].iterator(), +1);
+    sm.score = forward(dpCursor);
+    
+    return sm;
   }
 
-  public DPMatrix backwardmatrix(ResidueList [] seq, DPMatrix matrix)
+  public DPMatrix backwardMatrix(ResidueList [] seq, DPMatrix matrix)
   throws IllegalArgumentException, IllegalResidueException,
   IllegalAlphabetException, IllegalResidueException {
     if(seq.length != 1) {
       throw new IllegalArgumentException("seq must be 1 long, not " + seq.length);
     }
-    DPCursor dpCursor = new SmallCursor(
-      getStates(),
-      seq[0].length(),
-      seq[0],
-      new ReverseIterator(seq[0])
-    );
-    return forward(dpCursor);
+    
+    SingleDPMatrix sm = (SingleDPMatrix) matrix;
+    DPCursor dpCursor = new MatrixCursor(sm, new ReverseIterator(seq[0]), -1);
+    sm.score = backward(dpCursor);
+    
+    return sm;
   }
 
   private double forward(DPCursor dpCursor)
@@ -186,8 +184,9 @@ class SingleDP extends DP {
       Residue res = dpCursor.currentRes();
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
-      for (int l = 0; l < stateCount; l++) { // state l for residue i  sum(p(k->l))
-        double weight = states[l].getWeight(res);
+      for (int l = 0; l < getDotStatesIndex(); l++) { // all emission states
+        // state l for residue i  sum(p(k->l))
+        double weight = ((EmissionState) states[l]).getWeight(res);
         if (weight == Double.NEGATIVE_INFINITY) {
           // System.out.println("*");
           currentCol[l] = Double.NEGATIVE_INFINITY;
@@ -219,6 +218,65 @@ class SingleDP extends DP {
           // System.out.println("currentCol[" + states[l].getName() + "]=" + currentCol[l]);
         }
       }
+      for(int l = getDotStatesIndex(); l < states.length; l++) { // all dot states from emissions
+        double score = 0.0;
+        int [] tr = transitions[l];
+        double [] trs = transitionScore[l];
+        
+        int ci = 0;
+        while(
+          ci < tr.length  &&
+          tr[ci] < getDotStatesIndex() &&
+          currentCol[tr[ci]] == Double.NEGATIVE_INFINITY
+        ) {
+          ci++;
+        }
+        double constant = (ci < tr.length) ? lastCol[tr[ci]] : 0.0;
+        
+        for(int kc = 0; kc < tr.length; kc++) {
+          int k = tr[kc];
+          if(k >= getDotStatesIndex()) {
+            break;
+          }
+
+          if(currentCol[k] != Double.NEGATIVE_INFINITY) {
+            double t = trs[kc];
+            score += Math.exp(t + currentCol[k] - constant);
+          } else {
+          }
+        }
+        currentCol[l] = Math.log(score) + constant;
+      }
+      for(int l = getDotStatesIndex(); l < states.length; l++) { // all dot states to each other
+        double score = 0.0;
+        int [] tr = transitions[l];
+        double [] trs = transitionScore[l];
+        
+        int ci = tr.length-1;
+        while(
+          ci >= getDotStatesIndex()  &&
+          lastCol[tr[ci]] == Double.NEGATIVE_INFINITY
+        ) {
+          ci--;
+        }
+        double constant = (ci < tr.length) ? currentCol[tr[ci]] : 0.0;
+        
+        for(int kc = 0; kc < tr.length; kc++) {
+          int k = tr[kc];
+          if(k < getDotStatesIndex()) {
+            continue;
+          }
+          if(k >= l) {
+            break;
+          }
+          if(currentCol[k] != Double.NEGATIVE_INFINITY) {
+            double t = trs[kc];
+            score += Math.exp(t + currentCol[k] - constant);
+          } else {
+          }
+        }
+        currentCol[l] += Math.log(score) + constant;
+      }
     }
   }
 
@@ -240,19 +298,33 @@ class SingleDP extends DP {
         double [] trs = transitionScore[k];
         double score = 0.0;
         int ci = 0;
-        while (ci < tr.length &&
-            lastCol[tr[ci]] == Double.NEGATIVE_INFINITY) {
+        while (
+          ci < tr.length &&
+          lastCol[tr[ci]] == Double.NEGATIVE_INFINITY
+        ) {
           ci++;
         }
         double constant = (ci < tr.length) ? lastCol[tr[ci]] : 0.0;
 
         for (int lc = 0; lc < tr.length; lc++) {
           int l = tr[lc];
-          double weight = states[l].getWeight(res);
-          if (lastCol[l] != Double.NEGATIVE_INFINITY &&
+          if(l >= getDotStatesIndex()) {
+            break;
+          }
+          double weight = ((EmissionState) states[l]).getWeight(res);
+          if (currentCol[l] != Double.NEGATIVE_INFINITY &&
               weight != Double.NEGATIVE_INFINITY) {
             double t = trs[lc];
-            score += Math.exp(t + lastCol[l] + weight - constant);
+            score += Math.exp(t + currentCol[l] + weight - constant);
+          }
+        }
+        for(int lc = tr.length-1; lc >= 0; lc--) {
+          int l = tr[lc];
+          if(l < getDotStatesIndex()) {
+            break;
+          }
+          if(currentCol[l] != Double.NEGATIVE_INFINITY) {
+            score += Math.exp(trs[lc] + currentCol[l] - constant);
           }
         }
         // new_k = sum_l( transition(k, l) * old_l * emission_l(res) )
@@ -316,8 +388,8 @@ class SingleDP extends DP {
       Residue res = dpCursor.currentRes();
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
-      for (int l = 0; l < stateCount; l++) {
-        double emission = states[l].getWeight(res);
+      for (int l = 0; l < getDotStatesIndex(); l++) { // emission states
+        double emission = ((EmissionState) states[l]).getWeight(res);
         int [] tr = transitions[l];
         double [] trs = transitionScore[l];
         if (emission == Double.NEGATIVE_INFINITY) {
@@ -344,6 +416,66 @@ class SingleDP extends DP {
           }
         }
       }
+      for(int l = getDotStatesIndex(); l < states.length; l++) { // emission -> dot
+        int [] tr = transitions[l];
+        double [] trs = transitionScore[l];
+        double transProb = Double.NEGATIVE_INFINITY;
+        double trans = Double.NEGATIVE_INFINITY;
+        int prev = -1;
+        for (int kc = 0; kc < tr.length; kc++) {
+          int k = tr[kc];
+          if(k >= getDotStatesIndex()) {
+            break;
+          }
+          double t = trs[kc];
+          double p = t + currentCol[k];
+          if (p > transProb) {
+            transProb = p;
+            prev = k;
+            trans = t;
+          }
+          currentCol[l] = transProb;
+          if(prev != -1) {
+            newPointers[l] = new BackPointer(
+              states[l],
+              newPointers[prev],
+              trans
+            );
+          }
+        }
+      }
+      for(int l = getDotStatesIndex(); l < states.length; l++) { // dot -> dot
+        int [] tr = transitions[l];
+        double [] trs = transitionScore[l];
+        double transProb = Double.NEGATIVE_INFINITY;
+        double trans = Double.NEGATIVE_INFINITY;
+        int prev = -1;
+        for (int kc = 0; kc < tr.length; kc++) {
+          int k = tr[kc];
+          if(k < getDotStatesIndex()) {
+            continue;
+          }
+          if(k >= l) {
+            break;
+          }
+          double t = trs[kc];
+          double p = t + currentCol[k];
+          if (p > transProb) {
+            transProb = p;
+            prev = k;
+            trans = t;
+          }
+          currentCol[l] = transProb;
+          if(prev != -1) {
+            newPointers[l] = new BackPointer(
+              states[l],
+              newPointers[prev],
+              trans
+            );
+          }
+        }
+      }
+      
       BackPointer [] bp = newPointers;
       newPointers = oldPointers;
       oldPointers = bp;

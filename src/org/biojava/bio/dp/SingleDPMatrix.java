@@ -28,7 +28,7 @@ class SingleDPMatrix implements DPMatrix {
   private final State [] states;
   private final MarkovModel model;
   private final ResidueList [] resList;
-  final double [][] scores;
+  final double [][] scores; // [residue][state]
   double score;
  
   public State [] States() {
@@ -52,7 +52,7 @@ class SingleDPMatrix implements DPMatrix {
     if(index.length != 2) {
       throw new IndexOutOfBoundsException("index must be two-dimensional");
     }
-    return scores[index[0]][index[1]];
+    return scores[index[1]][index[0]];
   }
   
   public SingleDPMatrix(MarkovModel model, State [] states, ResidueList resList) {
@@ -60,6 +60,6 @@ class SingleDPMatrix implements DPMatrix {
     this.states = states;
     this.resList = new ResidueList [] { resList };
     this.score = Double.NEGATIVE_INFINITY;
-    this.scores = new double[states.length][resList.length()];
+    this.scores = new double[resList.length()][states.length];
   }
 }
