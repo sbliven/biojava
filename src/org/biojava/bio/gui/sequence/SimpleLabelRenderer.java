@@ -34,6 +34,9 @@ import org.biojava.bio.gui.*;
 
 import java.util.List;
 
+/**
+ * @author Matthew Pocock
+ */
 public class SimpleLabelRenderer
 extends AbstractChangeable
 implements LabelRenderer{

@@ -27,6 +27,9 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.utils.xml.*;
 
+/**
+ * @author Thomas Down
+ */
 public class PropertyWriter extends BasicXFFHelper {
     public void writeDetails(XMLWriter xw, Feature f)
     throws IOException {

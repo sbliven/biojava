@@ -40,6 +40,9 @@ import org.biojava.utils.*;
 
 /**
  * Builds a SimpleAssembly from sequence files
+ *
+ * @author David Huen
+ * @author Thomas Down
  */
 class RagbagVirtualSequenceBuilder
 {

@@ -27,6 +27,9 @@ import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.*;
 
+/**
+ * @author Thomas Down
+ */
 class BioSQLStrandedFeature extends BioSQLFeature implements StrandedFeature {
     private StrandedFeature.Strand strand;
     

@@ -33,6 +33,9 @@ import org.biojava.bio.symbol.*;
  * Dot states emit no sequence. They are there purely to make the wireing
  * of the model look neater, and to cut down the number of combinatorial
  * transitions that can so easily swamp models.
+ *
+ * @author Matthew Pocock
+ * @author Thomas Down
  */
 public class SimpleDotState
 extends FundamentalAtomicSymbol implements DotState, Serializable {

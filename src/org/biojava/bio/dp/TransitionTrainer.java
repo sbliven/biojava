@@ -26,6 +26,8 @@ import org.biojava.bio.symbol.*;
 
 /**
  * An object that can be used to train the transitions within a MarkovModel.
+ *
+ * @author Matthew Pocock
  */
 public interface TransitionTrainer {
   /**

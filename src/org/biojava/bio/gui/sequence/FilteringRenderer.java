@@ -34,6 +34,10 @@ import org.biojava.bio.gui.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
+/**
+ * @author Matthew Pocock
+ * @author Thomas Down
+ */
 public class FilteringRenderer
 extends SequenceRendererWrapper {
   public static ChangeType FILTER = new ChangeType(

@@ -32,6 +32,10 @@ import org.biojava.bio.symbol.*;
 
 /**
  * Class for pairing up two independant distributions.
+ *
+ * @author Matthew Pocock
+ * @author Thomas Down
+ * @author Samiul Hasan
  */
 
 

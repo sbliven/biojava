@@ -30,6 +30,9 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.program.gff.*;
 
+/**
+ * @author Thomas Down
+ */
 public class GFFDataSource implements DistDataSource {
     private GFFEntrySet gffe;
     private Set ids;

@@ -20,6 +20,9 @@
 
 package org.biojava.utils;
 
+/**
+ * @author Matthew Pocock
+ */
 public abstract class AbstractChangeable implements Changeable {
   private transient ChangeSupport changeSupport = null;
 

@@ -27,6 +27,10 @@ import java.util.*;
 import org.biojava.utils.*;
 import org.biojava.utils.io.*;
 
+/**
+ * @author Matthew Pocock
+ * @author Keith James
+ */
 class PrimaryIDList
 extends SearchableFileAsList {
   private Comparator INDEX_COMPARATOR = new Comparator() {

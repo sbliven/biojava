@@ -29,8 +29,8 @@ import org.xml.sax.*;
 import java.util.* ;
 
 /**
- *
- *  @author Hanning Ni    Doubletwist Inc
+ * @author Brian King
+ * @author Hanning Ni    Doubletwist Inc
  */
 public class AGAVEIdAliasPropHandler extends StAXPropertyHandler{
 

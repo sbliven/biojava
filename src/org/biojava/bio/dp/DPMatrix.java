@@ -24,6 +24,9 @@ package org.biojava.bio.dp;
 
 import org.biojava.bio.symbol.*;
 
+/**
+ * @author Matthew Pocock
+ */
 public interface DPMatrix {
   State [] states();
   MarkovModel model();

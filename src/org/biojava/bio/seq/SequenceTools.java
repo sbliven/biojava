@@ -28,6 +28,11 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.impl.*;
 
+/**
+ * Methods for manipulating sequences.
+ *
+ * @author Matthew Pocock
+ */
 public final class SequenceTools {
   public static Sequence createSequence(
     SymbolList syms, String uri, String name, Annotation ann

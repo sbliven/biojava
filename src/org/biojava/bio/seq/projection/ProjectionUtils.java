@@ -25,6 +25,9 @@ import java.util.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 
+/**
+ * @author Thomas Down
+ */
 public class ProjectionUtils {
     public static Location transformLocation(Location oldLoc, int translate, boolean oppositeStrand) {
         if (oppositeStrand) {

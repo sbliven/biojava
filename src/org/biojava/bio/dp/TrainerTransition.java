@@ -28,6 +28,8 @@ import java.io.Serializable;
  * This is a small and ugly class for storing a trainer and a transition.
  * <p>
  * It is hash-code-able, and has a sensible equality operator.
+ *
+ * @author Matthew Pocock
  */
 public class TrainerTransition implements Serializable {
   public TransitionTrainer trainer;

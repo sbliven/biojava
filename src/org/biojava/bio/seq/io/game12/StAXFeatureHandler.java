@@ -31,10 +31,10 @@ import org.biojava.bio.seq.io.game.ElementRecognizer;
  *  It was modified for greater generality. <strong>NOTE</strong> This class is
  *  not thread-safe -- it must only be used for one parse at any time.
  *
- *@author     Thomas Down
- *@author     David Huen
- *@created    19 January 2002
- *@since      1.8
+ * @author     Thomas Down
+ * @author     David Huen
+ * @created    19 January 2002
+ * @since      1.8
  */
 
 public class StAXFeatureHandler extends StAXContentHandlerBase {

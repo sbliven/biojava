@@ -32,6 +32,10 @@ import org.biojava.bio.symbol.*;
 
 import java.util.List;
 
+/**
+ * @author Matthew Pocock
+ * @author Thomas Down
+ */
 public class AlignmentRenderer
 extends SequenceRendererWrapper {
   public static ChangeType LABEL = new ChangeType(

@@ -27,6 +27,8 @@ import java.lang.String;
 /**
  * class that is passed to a RagbagAssembly to use
  * a SoftReferenceCache-backed RagbagCachedSequences.
+ *
+ * @author David Huen
  */
 public class RagbagSoftRefSeqFactory implements RagbagSequenceFactory
 {

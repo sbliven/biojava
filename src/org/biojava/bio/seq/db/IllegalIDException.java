@@ -23,6 +23,10 @@ package org.biojava.bio.seq.db;
 
 import org.biojava.bio.*;
 
+/**
+ * @author Matthew Pocock
+ * @author Keith James
+ */
 public class IllegalIDException extends BioException {
   public IllegalIDException() {
     super();

@@ -31,6 +31,9 @@ import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.*;
 
+/**
+ * @author Thomas Down
+ */
 class BioSQLFeature implements Feature, RealizingFeatureHolder {
     private Annotation _annotation;
     private int id;

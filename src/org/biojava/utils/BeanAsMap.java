@@ -24,10 +24,15 @@ import java.util.*;
 import java.lang.reflect.*;
 import java.beans.*;
 
+/**
+ * @author Matthew Pocock
+ */
 public class BeanAsMap
   extends
     AbstractMap
 {
+  // fixme: does this class work at all?
+  
   private static Map beanInfoCache;
   private static Object[] NO_PARAMS;
   

@@ -27,6 +27,11 @@ package org.biojava.bio.seq.db;
 
 import java.net.*;
 
+/**
+ * @author Lei Lai
+ * @author Thomas Down
+ * @author Matthew Pocock
+ */
 public class FetchURL
 {
 	String baseURL;

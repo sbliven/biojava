@@ -1,4 +1,4 @@
-/**
+/*
  *  BioJava development code This code may be freely distributed and modified
  *  under the terms of the GNU Lesser General Public Licence. This should be
  *  distributed with the code. If you do not have a copy, see:
@@ -18,6 +18,9 @@ import org.biojava.utils.stax.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
+/**
+ * @author David Huen
+ */
 class HitHspsHandler
     extends StAXFeatureHandler
 {

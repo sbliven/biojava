@@ -30,6 +30,8 @@ import org.biojava.bio.dist.*;
 
 /**
  * Encapsulates the training of an entire model.
+ *
+ * @author Matthew Pocock
  */
 public interface ModelTrainer extends DistributionTrainerContext {
   /**

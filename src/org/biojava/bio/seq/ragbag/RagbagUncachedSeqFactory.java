@@ -27,6 +27,8 @@ import java.lang.String;
 /**
  * class that is passed to a RagbagAssembly to use
  * the vanilla uncached RagbagSequence object.
+ *
+ * @author David Huen
  */
 public class RagbagUncachedSeqFactory implements RagbagSequenceFactory
 {

@@ -26,6 +26,9 @@ import java.util.*;
 
 import org.biojava.utils.*;
 
+/**
+ * @author Matthew Pocock
+ */
 class SecondaryFileAsList
 extends SearchableFileAsList {
   private Comparator KEY_VALUE_COMPARATOR = new Comparator() {

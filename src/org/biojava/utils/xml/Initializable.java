@@ -21,6 +21,9 @@
 
 package org.biojava.utils.xml;
 
+/**
+ * @author Thomas Down
+ */
 public interface Initializable {
     public void init();
 }

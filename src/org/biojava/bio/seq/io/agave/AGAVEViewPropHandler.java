@@ -31,7 +31,9 @@ import java.util.Vector;
  * <p>
  * end --> view_end
  *
- *  @author Hanning Ni    Doubletwist Inc
+ * @author Hanning Ni    Doubletwist Inc
+ * @author Keith James
+ * @author Matthew Pocock
  */
 public class AGAVEViewPropHandler
                extends StAXPropertyHandler

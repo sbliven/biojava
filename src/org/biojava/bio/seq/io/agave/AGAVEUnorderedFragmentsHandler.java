@@ -34,7 +34,7 @@ import org.xml.sax.*;
  * unordered_fragments
  *
  *
- *  @author Hanning Ni    Doubletwist Inc
+ * @author Hanning Ni    Doubletwist Inc
  * 
  */
 public class AGAVEUnorderedFragmentsHandler

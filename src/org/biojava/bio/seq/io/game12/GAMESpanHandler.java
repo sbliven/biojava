@@ -30,8 +30,8 @@ import org.biojava.bio.seq.io.game.ElementRecognizer;
  *  Handles the GAME &lt;<span>&gt; element.
  *  Subclass this to parse &lt;<span>&gt; and get your result somewhere useful.
  *
- *@author     David Huen
- *@since      1.2
+ * @author     David Huen
+ * @since      1.2
  */
 public class GAMESpanHandler
          extends StAXFeatureHandler {

@@ -27,6 +27,8 @@ import org.biojava.bio.symbol.*;
 
 /**
  * A state that contains an entire sub-model.
+ *
+ * @author Matthew Pocock
  */
 public interface ModelInState extends State {
   /**

@@ -30,6 +30,12 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 
+/**
+ * @author Matthew Pocock
+ * @author Thomas Down
+ * @author Samiul Hasan
+ * @author Keith James
+ */
 public class SimpleMarkovModel
   extends
     AbstractChangeable

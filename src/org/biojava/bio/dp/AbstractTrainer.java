@@ -28,6 +28,13 @@ import org.biojava.bio.dist.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.db.*;
 
+/**
+ * An abstract implementation of TrainingAlgorithm that provides a framework
+ * for plugging in per-cycle code for parameter optimization.
+ *
+ * @author Matthew Pocock
+ * @author Thomas Down
+ */
 public abstract class AbstractTrainer implements TrainingAlgorithm {
   private DP dp;
   

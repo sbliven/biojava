@@ -30,7 +30,11 @@ import org.biojava.bio.BioException;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.io.*;
-											 
+
+/**
+ * @author Lei Lai
+ * @author Matthew Pocock
+ */											 
 public class GenpeptSequenceDB
 {
   private static SequenceFormat format;

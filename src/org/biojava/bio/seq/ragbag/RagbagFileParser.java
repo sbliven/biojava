@@ -27,6 +27,8 @@ import org.biojava.bio.BioException;
 /**
  * Interface for classes that implement format-specific behaviour
  * for parsing input sequence/feature files.
+ *
+ * @author David Huen
  */
 interface RagbagFileParser
 {

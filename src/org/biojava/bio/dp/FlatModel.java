@@ -38,6 +38,9 @@ import org.biojava.bio.dist.*;
  * and other exotica are expressed purely in terms of these two state types.
  * <p>
  * You can train the resulting flat model, and the underlying models will be altered.
+ *
+ * @author Matthew Pocock
+ * @author Thomas Down
  */
 class FlatModel
   extends

@@ -30,6 +30,8 @@ import org.biojava.bio.BioException;
 
 /**
  * Returns an instance of the RagbagFileParser specific for an input file.
+ *
+ * @author David Huen
  */
 class RagbagParserFactory
 {

@@ -27,7 +27,7 @@ import java.util.Vector;
 /**
  * Deals with match_region
  *
- *  @author Hanning Ni    Doubletwist Inc
+ * @author Hanning Ni    Doubletwist Inc
  */
 public class AGAVEMatchRegionPropHandler
                extends StAXPropertyHandler implements AGAVEDbIdCallbackItf, AGAVEEvidenceCallbackItf

@@ -27,6 +27,11 @@ import java.io.*;
 import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
 
+/**
+ * @author Thomas Down
+ * @author Matthew Pocock
+ * @author Mark Schreiber
+ */
 class GeneralNthOrderDistribution extends AbstractOrderNDistribution implements Serializable{
     private Map dists;
     private static final long serialVersionUID = 42388921; //Change this value if internal implementation changes significantly

@@ -23,7 +23,7 @@ import java.util.* ;
 
 /**
  * xref
- *  @author Hanning Ni    Doubletwist Inc
+ * @author Hanning Ni    Doubletwist Inc
  * @author Greg Cox
 */
 public class AGAVEXref {

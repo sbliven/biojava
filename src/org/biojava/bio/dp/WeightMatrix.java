@@ -31,6 +31,8 @@ import org.biojava.bio.dist.*;
  * The weight matrix uses computer-coordinates. Thus, a 10 column weight matrix
  * has columns (0 - 9). I guess that if you try to access columns outside the
  * logical range, the implementation may throw an IndexOutOfBoundsException.
+ *
+ * @author Matthew Pocock
  */
 public interface WeightMatrix {
   /**

@@ -27,6 +27,9 @@ import org.biojava.directory.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.db.*;
 
+/**
+ * @author Thomas Down
+ */
 public class BioSQLSequenceDBProvider implements SequenceDBProvider {
     public String getName() {
 	return "biosql";

@@ -36,6 +36,11 @@ import org.biojava.bio.gui.*;
 
 import java.util.List;
 
+/**
+ * @author Thomas Down
+ * @author Matthew Pocock
+ * @author David Huen
+ */
 public class TickFeatureRenderer
 extends AbstractChangeable
 implements FeatureRenderer {

@@ -31,8 +31,8 @@ import org.biojava.bio.seq.io.game.ElementRecognizer;
  *
  * this element is used to represent transcripts.
  *
- *@author     David Huen
- *@since      1.2
+ * @author     David Huen
+ * @since      1.2
  */
 public class GAMEFeatureSetHandler
          extends StAXFeatureHandler {

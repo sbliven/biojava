@@ -31,7 +31,7 @@ import org.xml.sax.*;
 /**
  * transcript
  *
- *  @author Hanning Ni    Doubletwist Inc
+ * @author Hanning Ni    Doubletwist Inc
  */
 public class AGAVETranscriptHandler
                extends StAXFeatureHandler implements AGAVEEvidenceCallbackItf

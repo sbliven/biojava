@@ -28,6 +28,9 @@ import java.lang.reflect.*;
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 
+/**
+ * @author Matthew Pocock
+ */
 public abstract class AbstractLocationDecorator implements Location {
   private final Location wrapped;
   

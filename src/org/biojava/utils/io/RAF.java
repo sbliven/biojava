@@ -22,6 +22,9 @@ package org.biojava.utils.io;
 
 import java.io.*;
 
+/**
+ * @author Matthew Pocock
+ */
 public class RAF extends RandomAccessFile {
   private File file;
   

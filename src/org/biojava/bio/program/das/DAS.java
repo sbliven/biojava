@@ -34,6 +34,10 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.io.*;
 
+/**
+ * @author Matthew Pocock
+ * @author Thomas Down
+ */
 public class DAS extends AbstractChangeable {
     private static List activityListeners;
     private Map dataSources;

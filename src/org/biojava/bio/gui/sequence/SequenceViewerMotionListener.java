@@ -22,6 +22,9 @@ package org.biojava.bio.gui.sequence;
 
 import java.util.*;
 
+/**
+ * @author Matthew Pocock
+ */
 public interface SequenceViewerMotionListener
 extends EventListener {
   void mouseDragged(SequenceViewerEvent sve);

@@ -28,6 +28,8 @@ import org.biojava.bio.symbol.*;
  * A state in a markov process.
  * <p>
  * This signals that this object can sit inside a model.
+ *
+ * @author Matthew Pocock
  */
 public interface State extends AtomicSymbol {
 }

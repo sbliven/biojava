@@ -28,6 +28,10 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.db.*;
 import org.biojava.bio.seq.distributed.*;
 
+/**
+ * @author Matthew Pocock
+ * @author Thomas Down
+ */
 public class ReferenceServer
   extends
     DataSource

@@ -34,6 +34,8 @@ import org.biojava.bio.symbol.*;
  * of the model look neater, and to cut down the number of combinatorial
  * transitions that can so easily swamp models.
  * </p>
+ *
+ * @author Matthew Pocock
  */
 public interface DotState extends State {
 }

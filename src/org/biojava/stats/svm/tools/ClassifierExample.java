@@ -33,6 +33,11 @@ import org.biojava.stats.svm.*;
 /**
  * A simple toy example that allows you to put points on a canvas, and find a
  * polynomial hyperplane to seperate them.
+ *
+ * @author Ewan Birney
+ * @author Matthew Pocock
+ * @author Thomas Down
+ * @author Michael L Heurer
  */
 public class ClassifierExample {
   /**

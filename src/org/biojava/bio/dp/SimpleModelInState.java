@@ -26,6 +26,10 @@ import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
+/**
+ * @author Matthew Pocock
+ * @author Thomas Down
+ */
 public class SimpleModelInState
 extends FundamentalAtomicSymbol
 implements ModelInState {

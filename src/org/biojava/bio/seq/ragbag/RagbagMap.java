@@ -46,6 +46,9 @@ import org.biojava.bio.seq.StrandedFeature;
 /**
  * This class is an object that encapsulates all information 
  * present in a Map file in a Ragbag directory.
+ *
+ * @author David Huen
+ * @author Thomas Down
  */
 public class RagbagMap extends StAXContentHandlerBase
 {

@@ -33,6 +33,11 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.dist.*;
 
+/**
+ * @author Matthew Pocock
+ * @author Thomas Down
+ * @author Samiul Hasan
+ */
 public class XmlMarkovModel {
   public static WeightMatrix readMatrix(Element root)
   throws IllegalSymbolException, IllegalAlphabetException, BioException {

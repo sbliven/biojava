@@ -36,6 +36,10 @@ import java.io.*;
 
 import com.kizna.html.*;
 
+/**
+ * @author Lei Lai
+ * @author Matthew Pocock
+ */
 public class LocusLinkParser
 {
 	private String nucleotideIDs = "";//take all nucleotide ids into one string

@@ -27,6 +27,9 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 
+/**
+ * @author Matthew Pocock
+ */
 public interface ScoreType {
   /**
    * Calculate the score associated with a distribution and a symbol.
@@ -36,6 +39,9 @@ public interface ScoreType {
   
   public final static ScoreType PROBABILITY = new Probability();
   
+  /**
+   * @author Matthew Pocock
+   */
   public static class Probability implements ScoreType {
     public double calculateScore(Distribution dist, Symbol sym)
     throws IllegalSymbolException {
@@ -45,6 +51,9 @@ public interface ScoreType {
   
   public final static ScoreType ODDS = new Odds();
   
+  /**
+   * @author Matthew Pocock
+   */
   public static class Odds implements ScoreType {
     public double calculateScore(Distribution dist, Symbol sym)
     throws IllegalSymbolException {
@@ -57,6 +66,9 @@ public interface ScoreType {
   
   public final static ScoreType NULL_MODEL = new NullModel();
   
+  /**
+   * @author Matthew Pocock
+   */
   public static class NullModel implements ScoreType {
     public double calculateScore(Distribution dist, Symbol sym)
     throws IllegalSymbolException {

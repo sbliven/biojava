@@ -26,7 +26,14 @@ import java.io.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.io.*;
 
-// not thread-safe
+/**
+ * The original object for indexing sequence files.
+ *
+ * <p>This class may not be thread-safe.</p>
+ *
+ * @author Matthew Pocock
+ * @author Thomas Down
+ */
 public class BioIndex implements IndexStore {
   private static Comparator STRING_CASE_SENSITIVE_ORDER = new Comparator() {
     public int compare(Object a, Object b) {

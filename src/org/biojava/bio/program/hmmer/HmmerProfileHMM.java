@@ -39,7 +39,8 @@ import java.io.*;
  *   - there are no insert <-> delete transitions allowed
  *   - there is no iO initial insert state (between begin and initial match states)
  *   - there is not iN final insert state (between final match state and end state)
- *   @author Lachlan Coin
+ *
+ *  @author Lachlan Coin
  */
 public class HmmerProfileHMM extends ProfileHMM {
   HmmerProfileHMM(

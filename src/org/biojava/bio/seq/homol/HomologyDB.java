@@ -27,6 +27,10 @@ import org.biojava.bio.symbol.*;
 import org.biojava.utils.*;
 import org.biojava.bio.seq.db.*;
 
+/**
+ * @author Matthew Pocock
+ * @author Keith James
+ */
 public interface HomologyDB {
   /**
    * Retrieve the SeqDBs that have been searched against each other.

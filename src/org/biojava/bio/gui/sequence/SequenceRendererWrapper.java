@@ -34,6 +34,9 @@ import org.biojava.bio.symbol.*;
 
 import java.util.List;
 
+/**
+ * @author Matthew Pocock
+ */
 public class SequenceRendererWrapper
 extends AbstractChangeable
 implements SequenceRenderer, Serializable {

@@ -28,6 +28,7 @@ import java.io.Serializable;
  * Classic linear kernel. It actualy just delegates to SparseVector.kernel.
  *
  * @deprecated Just use SparseVector.kernel instead...
+ * @author Matthew Pocock
  */
 public class LinearKernel implements SVMKernel, Serializable {
     /**

@@ -29,6 +29,12 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.dist.*;
 
+/**
+ * A BlockPainter that renders letters in proportion to the size of the signal.
+ *
+ * @author Matthew Pocock
+ * @author Thomas Down
+ */
 public class TextBlock implements BlockPainter {
   private Font logoFont = new Font("Tahoma", Font.PLAIN, 12);
   

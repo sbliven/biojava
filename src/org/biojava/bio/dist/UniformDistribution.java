@@ -30,9 +30,12 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
-* An implementation of an uniform distribution
-* @serial WARNING serialized versions of this class may be incompatible with future versions of BioJava
-*/
+ * An implementation of an uniform distribution
+ * @serial WARNING serialized versions of this class may be incompatible with future versions of BioJava
+ * @author Matthew Pocock
+ * @author Mark Schreiber
+ * @author Thomas Down
+ */
 
 public class UniformDistribution
   extends

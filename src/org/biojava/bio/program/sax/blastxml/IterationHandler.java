@@ -1,4 +1,4 @@
-/**
+/*
  *  BioJava development code This code may be freely distributed and modified
  *  under the terms of the GNU Lesser General Public Licence. This should be
  *  distributed with the code. If you do not have a copy, see:
@@ -15,6 +15,9 @@ import org.biojava.bio.seq.io.game.ElementRecognizer;
 import org.biojava.utils.stax.*;
 import org.xml.sax.*;
 
+/**
+ * @author David Huen
+ */
 class IterationHandler
     extends StAXFeatureHandler
 {

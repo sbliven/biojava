@@ -24,6 +24,12 @@ package org.biojava.bio.seq.io;
 import java.io.*;
 import org.biojava.bio.symbol.*;
 
+/**
+ * @author Matthew Pocock
+ * @author Samiul Hasan
+ * @author Thomas Down
+ * @author Keith James
+ */
 public interface AlignmentFormat {
 
     public static final int UNKNOWN = 0;

@@ -28,6 +28,7 @@ import java.lang.ref.*;
  * A cache which retains weak references to objects
  *
  * @since 1.3
+ * @author Thomas Down
  */
 
 public class WeakCacheMap implements CacheMap {

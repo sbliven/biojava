@@ -36,6 +36,10 @@
 
 package org.biojava.utils.xml;
 
+/**
+ * @author Thomas Down
+ * @author Matthew Pocock
+ */
 public class AppException extends Exception {
     public AppException(String reason) {
 	super(reason);

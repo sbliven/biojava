@@ -24,7 +24,13 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.io.SymbolTokenization;
 
-public final class StructureTools {
+public final 
+/**
+ * Simple access to protein seccondary structure assignments.
+ *
+ * @author Matthew Pocock
+ */
+class StructureTools {
   private static final FiniteAlphabet struct;
   
   private static final AtomicSymbol _;

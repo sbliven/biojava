@@ -50,7 +50,7 @@ import java.util.* ;
 
  *
 
- *  @author Hanning Ni    Doubletwist Inc
+ * @author Hanning Ni    Doubletwist Inc
   * @author Greg Cox
 
 */

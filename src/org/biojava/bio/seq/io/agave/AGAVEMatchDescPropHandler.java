@@ -28,7 +28,7 @@ import java.util.Vector;
 /**
  * Deals with match_desc
  *
- *  @author Hanning Ni    Doubletwist Inc
+ * @author Hanning Ni    Doubletwist Inc
  */
 public class AGAVEMatchDescPropHandler
                extends StAXPropertyHandler

@@ -31,6 +31,10 @@ import org.biojava.bio.dist.*;
 import org.biojava.utils.*;
 import org.biojava.bio.dp.*;
 
+/**
+ * @author Matthew Pocock
+ * @author Thomas Down
+ */
 public class DPInterpreter implements CellCalculatorFactory {
   private final DP dp;
   

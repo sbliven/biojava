@@ -25,6 +25,9 @@ import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 
+/**
+ * @author Matthew Pocock
+ */
 public class SubSequenceDB extends SequenceDBWrapper {
   private final Set ids;
   

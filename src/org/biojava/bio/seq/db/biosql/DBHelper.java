@@ -24,6 +24,10 @@ package org.biojava.bio.seq.db.biosql;
 import java.sql.*;
 import java.util.*;
 
+/**
+ * @author Thomas Down
+ * @author Matthew Pocock
+ */
 public abstract class DBHelper {
     public static DBHelper getDBHelperForURL(String ourURL) {
 	if (ourURL.startsWith("jdbc:")) {

@@ -29,6 +29,9 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
+/**
+ * @author Thomas Down
+ */
 public class DoubleTokenization extends WordTokenization {
     public DoubleTokenization() {
 	super(DoubleAlphabet.getInstance());

@@ -29,6 +29,9 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
+/**
+ * @author Thomas Down
+ */
 public class IntegerTokenization extends WordTokenization {
     public IntegerTokenization() {
 	super(IntegerAlphabet.getInstance());

@@ -31,6 +31,9 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Collections;
 
+/**
+ * @author David Huen
+ */
 public interface RagbagFilterFactory
 {
 /**

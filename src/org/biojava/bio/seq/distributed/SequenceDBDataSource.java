@@ -27,6 +27,9 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.db.*;
 
+/**
+ * @author Thomas Down
+ */
 public class SequenceDBDataSource implements DistDataSource {
     private SequenceDB db;
 

@@ -27,6 +27,8 @@ import java.lang.String;
 /**
  * class that is passed to a RagbagAssembly to use
  * a specified RagbagSequence object type.
+ *
+ * @author David Huen
  */
 public interface RagbagSequenceFactory
 {

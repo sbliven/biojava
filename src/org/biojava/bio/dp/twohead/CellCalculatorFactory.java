@@ -25,6 +25,9 @@ package org.biojava.bio.dp.twohead;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dp.*;
 
+/**
+ * @author Matthew Pocock
+ */
 public interface CellCalculatorFactory {
   CellCalculator forwards(ScoreType scoreType)
   throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;

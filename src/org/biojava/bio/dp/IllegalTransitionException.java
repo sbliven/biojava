@@ -26,6 +26,8 @@ import org.biojava.bio.*;
 
 /**
  * This exception indicates that there is no transition between two states.
+ *
+ * @author Matthew Pocock
  */
 public class IllegalTransitionException extends BioException {
   private State from;

@@ -25,6 +25,9 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 
+/**
+ * @author Matthew Pocock
+ */
 public class SequenceViewerSupport {
   private List listeners = new ArrayList();
   

@@ -32,6 +32,9 @@ import org.biojava.bio.seq.SequenceIterator;
 
 /**
  * This class contains functions accessing DNA sequences in Genbank format.
+ *
+ * @author Lei Lai
+ * @author Matthew Pocock
  */
 public class GenbankSequenceDB
 {

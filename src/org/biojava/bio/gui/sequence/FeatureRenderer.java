@@ -34,6 +34,10 @@ import org.biojava.bio.gui.*;
 
 import java.util.List;
 
+/**
+ * @author Thomas Down
+ * @author Matthew Pocock
+ */
 public interface FeatureRenderer {
   void renderFeature(
     Graphics2D g,

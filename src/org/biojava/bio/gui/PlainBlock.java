@@ -26,6 +26,11 @@ import java.awt.geom.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 
+/**
+ * A painter that just draws a block (or bar).
+ *
+ * @author Matthew Pocock
+ */
 public class PlainBlock implements BlockPainter {
   public void paintBlock(LogoContext ctxt, Rectangle2D block, AtomicSymbol sym) {
     Graphics2D g2 = ctxt.getGraphics();

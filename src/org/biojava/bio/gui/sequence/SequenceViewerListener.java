@@ -22,6 +22,9 @@ package org.biojava.bio.gui.sequence;
 
 import java.util.*;
 
+/**
+ * @author Matthew Pocock
+ */
 public interface SequenceViewerListener extends EventListener {
   void mouseClicked(SequenceViewerEvent sve);
   void mousePressed(SequenceViewerEvent sve);

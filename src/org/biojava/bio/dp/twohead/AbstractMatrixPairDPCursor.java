@@ -30,6 +30,9 @@ import org.biojava.bio.dist.*;
 import org.biojava.utils.*;
 import org.biojava.bio.dp.*;
 
+/**
+ * @author Matthew Pocock
+ */
 public abstract class AbstractMatrixPairDPCursor
   implements PairDPCursor {
     protected int[] pos;

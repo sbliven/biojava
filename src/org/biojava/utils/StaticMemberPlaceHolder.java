@@ -23,6 +23,9 @@ package org.biojava.utils;
 import java.io.*;
 import java.lang.reflect.*;
 
+/**
+ * @author Matthew Pocock
+ */
 public class StaticMemberPlaceHolder implements Serializable {
   private String className;
   private String fieldName;

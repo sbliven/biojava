@@ -28,6 +28,9 @@ import org.biojava.bio.seq.*;
 
 /**
  * An alignment that relabels another alignment.
+ *
+ * @author Matthew Pocock
+ * @author Nimesh Singh
  */
 public class RelabeledAlignment
   extends

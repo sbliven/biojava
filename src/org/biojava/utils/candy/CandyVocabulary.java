@@ -43,6 +43,8 @@ import java.beans.*;
  * </p>
  *
  * @version $Id$
+ * @author Martin Senger
+ * @author Matthew Pocock
  */
 
 public interface CandyVocabulary

@@ -28,10 +28,9 @@ import org.biojava.bio.seq.io.game.ElementRecognizer;
 /**
  *  Handles the GAME &lt;seq&gt; element
  *
- *@author     david
- *@created    19 January 2002
- *@since      David Huen
- *@since      1.2
+ * @created    19 January 2002
+ * @author     David Huen
+ * @since      1.2
  */
 public class GAMESeqHandler
          extends StAXFeatureHandler {

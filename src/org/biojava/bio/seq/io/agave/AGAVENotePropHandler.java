@@ -28,7 +28,7 @@ import java.util.Vector;
 /**
  * Deals with note
  * 
- *  @author Hanning Ni    Doubletwist Inc
+ * @author Hanning Ni    Doubletwist Inc
  */
 public class AGAVENotePropHandler
                extends StAXPropertyHandler

@@ -34,6 +34,8 @@ package org.biojava.bio.symbol;
  * alphabet. Note, one interesting sub-set of reversible transforms are of the
  * form translate(x) = untranslate(x), and represent 'mirror image'
  * transformations.
+ *
+ * @author Matthew Pocock
  */
 public interface ReversibleTranslationTable extends TranslationTable {
   /**

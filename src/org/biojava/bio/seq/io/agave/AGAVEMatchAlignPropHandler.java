@@ -26,7 +26,7 @@ import java.util.Vector;
 
 /**
  * Deals with match_align
- *  @author Hanning Ni    Doubletwist Inc
+ * @author Hanning Ni    Doubletwist Inc
  */
 public class AGAVEMatchAlignPropHandler
                extends StAXPropertyHandler

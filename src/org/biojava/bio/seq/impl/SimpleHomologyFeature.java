@@ -27,6 +27,10 @@ import org.biojava.utils.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.homol.*;
 
+/**
+ * @author Matthew Pocock
+ * @author Keith James
+ */
 public class SimpleHomologyFeature
     extends SimpleStrandedFeature
     implements HomologyFeature {

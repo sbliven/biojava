@@ -23,6 +23,9 @@ package org.biojava.bio.program.das;
 
 import java.net.*;
 
+/**
+ * @author Thomas Down
+ */
 public class DASLink {
     private final String linkURL;
     private final String role;

@@ -20,7 +20,10 @@
  */
 package org.biojava.bio.seq.io.agave;
 
-
+/**
+ * @author Brian King
+ * @author Hanning Ni    Doubletwist Inc
+ */
 public interface   AGAVEIdAliasCallbackItf {
 
   public void addIdAlias(AGAVEIdAlias id) ;

@@ -23,6 +23,11 @@ package org.biojava.utils;
 import java.util.*;
 import java.io.*;
 
+/**
+ * @author Matthew Pocock
+ * @author Thomas Down
+ * @author Mark Schreiber
+ */
 public class ListTools implements Serializable{
   public static List createList(List l) {
     switch (l.size()) {

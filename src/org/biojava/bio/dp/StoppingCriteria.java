@@ -22,6 +22,21 @@
 
 package org.biojava.bio.dp;
 
+/**
+ * A callback that is invoked during the training of an HMM.
+ *
+ * @author Matthew Pocock
+ */
 public interface StoppingCriteria {
+  /**
+   * Decide if the training has completed.
+   *
+   * This can be on the basis of the scores published by ta. Or, it could be
+   * set to expire at a given cycle, or due to user intervention. It is
+   * perfectly acceptable for this method to have side effects such as logging.
+   *
+   * @param ta  the TrainingAlgorithm instance to check
+   * @return true if the training is complete, false if it should be continued
+   */
   boolean isTrainingComplete(TrainingAlgorithm ta);
 }

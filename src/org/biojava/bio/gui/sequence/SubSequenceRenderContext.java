@@ -33,6 +33,9 @@ import org.biojava.bio.gui.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
+/**
+ * @author Matthew Pocock
+ */
 public class SubSequenceRenderContext
 implements SequenceRenderContext {
   private final SequenceRenderContext src;

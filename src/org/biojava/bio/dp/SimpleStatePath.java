@@ -32,6 +32,9 @@ import org.biojava.bio.seq.*;
 
 /**
  * A no-frills implementation of StatePath.
+ *
+ * @author Matthew Pocock
+ * @author Nimesh Singh
  */
 public class SimpleStatePath
   extends

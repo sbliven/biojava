@@ -30,7 +30,9 @@ import org.biojava.bio.dist.*;
 import org.biojava.utils.*;
 import org.biojava.bio.dp.*;
 
-
+/**
+ * @author Matthew Pocock
+ */
 public class BackMatrixPairDPCursor
   extends AbstractMatrixPairDPCursor {
     public BackMatrixPairDPCursor(

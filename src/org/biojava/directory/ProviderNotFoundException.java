@@ -24,6 +24,9 @@ package org.biojava.directory;
 /**
  * <code>ProviderNotFoundException</code> is thrown when a sequence
  * database provider can not be located.
+ *
+ * @author Keith James
+ * @author Brian Gilman
  */
 public class ProviderNotFoundException extends RegistryException {
 

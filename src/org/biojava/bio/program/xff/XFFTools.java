@@ -33,6 +33,11 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.seq.impl.*;
 
+/**
+ * Common functionality for manipulating XFF.
+ *
+ * @author Matthew Pocock
+ */
 public class XFFTools {
     public static void annotateXFF(File xffFile, final Sequence sequence)
     throws IOException, SAXException, BioException {

@@ -45,6 +45,9 @@ import org.biojava.utils.cache.*;
  * assemblies.
  * <p>
  * It functionally proxies for RagbagSequence.
+ *
+ * @author David Huen
+ * @author Thomas Down
  */
 class RagbagParsedCachedSequence extends RagbagCachedSequence
 {

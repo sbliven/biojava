@@ -31,6 +31,13 @@ import org.biojava.bio.dist.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.dp.*;
 
+/**
+ * An implementation of DP that aligns a single sequence against a single model.
+ *
+ * @author Matthew Pocock
+ * @author Thomas Down
+ * @author Samiul Hasan
+ */
 public class SingleDP extends DP implements Serializable {
   private final HashMap emissionsProb;
   private final HashMap emissionsOdds;

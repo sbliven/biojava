@@ -27,6 +27,10 @@ import java.lang.reflect.*;
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 
+/**
+ * @author Matthew Pocock
+ * @author Keith James
+ */
 public abstract class AbstractRangeLocation extends AbstractLocation {
   public Iterator blockIterator() {
     return Collections.singleton(this).iterator();

@@ -26,6 +26,10 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 
+/** 
+ * @author Matthew Pocock
+ * @author Mark Schreiber
+ */
 public class NCBISequenceDB
 extends WebSequenceDB {
   private String server;

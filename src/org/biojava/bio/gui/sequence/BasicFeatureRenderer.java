@@ -34,6 +34,11 @@ import org.biojava.bio.gui.*;
 
 import java.util.List;
 
+/**
+ * @author Matthew Pocock
+ * @author Keith James
+ * @author Thomas Down
+ */
 public class BasicFeatureRenderer
 extends AbstractChangeable
 implements FeatureRenderer {

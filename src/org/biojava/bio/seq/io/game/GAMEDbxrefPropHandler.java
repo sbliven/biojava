@@ -31,6 +31,7 @@ import java.util.Vector;
 /**
  * Deals with database crossreferences
  *
+ * @author David Huen
  */
 public class GAMEDbxrefPropHandler 
                extends StAXPropertyHandler

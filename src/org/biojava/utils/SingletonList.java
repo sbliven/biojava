@@ -22,7 +22,10 @@ package org.biojava.utils;
 
 import java.util.*;
 import java.io.Serializable;
-  
+
+/**
+ * @author Matthew Pocock
+ */
 public class SingletonList extends AbstractList implements Serializable {
   private final Object obj;
   

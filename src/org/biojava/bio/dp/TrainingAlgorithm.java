@@ -28,6 +28,10 @@ import org.biojava.bio.dist.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.db.*;
 
+/**
+ * @author Matthew Pocock
+ * @author Thomas Down
+ */
 public interface TrainingAlgorithm {
   DP getDP();
   double getLastScore();

@@ -86,6 +86,8 @@ import org.biojava.utils.*;
  * <p>
  * Alternatively, you can input Symbols to the factory with addSymbols
  * make the sequence eventually with makeSymbolList.
+ *
+ * @author David Huen
  */
 public class ChunkedSymbolListFactory
 {

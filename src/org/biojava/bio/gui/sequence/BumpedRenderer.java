@@ -34,6 +34,9 @@ import org.biojava.bio.gui.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
+/**
+ * @author Matthew Pocock
+ */
 public class BumpedRenderer
 extends SequenceRendererWrapper {
   private int leadingPixles;

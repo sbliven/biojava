@@ -24,6 +24,10 @@ package org.biojava.bio.seq.db.biosql;
 import java.sql.*;
 import java.util.*;
 
+/**
+ * @author Thomas Down
+ * @author Matthew Pocock
+ */
 public class UnknownDBHelper extends DBHelper {
     public int getInsertID(Connection conn,
 			   String table,

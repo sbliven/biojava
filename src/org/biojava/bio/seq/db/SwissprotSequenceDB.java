@@ -33,6 +33,9 @@ import org.biojava.bio.seq.ProteinTools;
 
 /**
  * This class contains functions accessing sequences in swiss-prot.
+ *
+ * @author Lei Lai
+ * @author Matthew Pocock
  */
 public class SwissprotSequenceDB
 {

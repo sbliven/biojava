@@ -27,6 +27,11 @@ import java.io.Serializable;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dp.*;
 
+/**
+ * The dynamic programming matrix for a single sequence.
+ *
+ * @author Matthew Pocock
+ */
 public class SingleDPMatrix implements DPMatrix, Serializable {
   private final State [] states;
   private final MarkovModel model;

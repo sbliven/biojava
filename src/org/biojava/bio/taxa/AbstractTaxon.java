@@ -23,6 +23,10 @@ package org.biojava.bio.taxa;
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 
+/**
+ * @author Matthew Pocock
+ * @author Keith James`
+ */
 public abstract class AbstractTaxon
   extends
     AbstractChangeable

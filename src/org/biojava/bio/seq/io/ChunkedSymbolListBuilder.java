@@ -26,6 +26,9 @@ import java.io.*;
 
 import org.biojava.bio.symbol.*;
 
+/**
+ * @author Thomas Down
+ */
 public class ChunkedSymbolListBuilder {
     private final static int CHUNK_SIZE = 1<<12;
 

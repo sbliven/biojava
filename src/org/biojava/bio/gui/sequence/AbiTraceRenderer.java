@@ -33,6 +33,12 @@ import org.biojava.bio.seq.*;
 
 import java.util.List;
 
+/**
+ * Renders an ABI trace file as a chromatogram graph.
+ *
+ * @author Matthew Pocock
+ * @author Mark Schreiber
+ */
 public class AbiTraceRenderer
 extends AbstractChangeable
 implements SequenceRenderer {

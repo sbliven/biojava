@@ -34,7 +34,14 @@ import  java.lang.Integer;
 import  java.io.*;
 import  java.util.*;
 
-
+/**
+ * @author raemig
+ * @author Thomas Down
+ * @author Keith James
+ * @author Nimesh Singh
+ * @author Mark Schreiber
+ * @author Matthew Pocock
+ */
 
 public class MSFAlignmentFormat
        implements AlignmentFormat {

@@ -25,6 +25,9 @@ import java.io.*;
 import org.biojava.bio.seq.*;
 import org.biojava.utils.xml.*;
 
+/**
+ * @author Thomas Down
+ */
 public class BasicXFFHelper implements XFFHelper {
     public String getFeatureID(Feature f) {
 	return null;

@@ -39,6 +39,11 @@ import org.biojava.bio.symbol.*;
  * <pre>
  * fileNumber \t offset \t id \n
  * </pre>
+ *
+ * @author Matthew Pocock
+ * @author Thomas Down
+ * @author Keith James
+ * @author David Huen
  */
 public class TabIndexStore implements IndexStore, Serializable {
   public static TabIndexStore open(File storeFile)

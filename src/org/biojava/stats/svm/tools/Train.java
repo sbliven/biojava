@@ -33,6 +33,10 @@ import java.util.*;
 
 import org.biojava.stats.svm.*;
 
+/**
+ * @author Ewan Birney
+ * @author Matthew Pocock
+ */
 public class Train {
   public static void main(String[] args) throws Throwable {
     if (args.length != 2) {

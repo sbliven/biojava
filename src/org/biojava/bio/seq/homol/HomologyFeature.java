@@ -28,6 +28,10 @@ import org.biojava.bio.symbol.*;
 import org.biojava.utils.*;
 import org.biojava.bio.seq.*;
 
+/**
+ * @author Matthew Pocock
+ * @author Keith James
+ */
 public interface HomologyFeature extends StrandedFeature {
   Homology getHomology();
   

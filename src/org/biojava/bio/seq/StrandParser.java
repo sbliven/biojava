@@ -20,6 +20,11 @@
  */
 package org.biojava.bio.seq;
 
+/**
+ * Process strings and return strand objects.
+ *
+ * @author Matthew Pocock
+ */
 public final class StrandParser {
   public static final StrandedFeature.Strand parseStrand(String strand) {
     if(

@@ -34,7 +34,8 @@ import java.io.*;
 
 /** This is a class for representing the full HMMER generated Profile HMM (i.e. including loop
  *  states N and C terminal looping states.
- *   @author Lachlan Coin
+ *
+ *  @author Lachlan Coin
  */
 public class FullHmmerProfileHMM extends SimpleMarkovModel{
 
