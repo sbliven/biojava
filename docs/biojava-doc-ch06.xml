@@ -1,6 +1,6 @@
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook V4.1//EN"
-                         "/usr/share/sgml/docbook/sgml-dtd-4.1/docbook.dtd" [
-]>
+<!--DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+                      "file:///usr/share/sgml/docbook/xml-dtd/docbookx.dtd" [
+]-->
 
 <chapter id="bd-ch06">
   <title>Representing Search Results</title>
@@ -15,7 +15,7 @@
     <classname>org.biojava.bio.program.ssbind</classname> and
     <classname>org.biojava.bio.program.blast2html</classname>. For a
     complete overview of the APIs provided by these packages, please
-    consult the <ulink url="javadoc/index.html">JavaDoc
+    consult the <ulink url="api/index.html">JavaDoc
     documentation</ulink>.</para>
   </abstract>
 
@@ -44,18 +44,18 @@
 
 <programlisting>
 public interface SeqSimilaritySearchResult {
-    SymbolList getQuerySequence();
-    SequenceDB getSequenceDB();
+    String getQueryID();
+    String getDatabaseID();
     Map getSearchParameters();
     List getHits();
 }
 </programlisting>
 
     <para>As you can see, the result interface also specifies that
-    instances are capable of returning the query sequence as a
-    <classname>SymbolList</classname> and the target database as a
-    <classname>SequenceDB</classname>. The search parameters may not
-    be available, so the <methodname>getSearchParameters</methodname>
+    instances are capable of returning the query sequence ID as a
+    <classname>String</classname> and the target database ID as a
+    <classname>String</classname>. The search parameters may not be
+    available, so the <methodname>getSearchParameters</methodname>
     method is permitted to return null. The individual database hits
     are returned as a <classname>List</classname> whose order should
     be specified by the implementation. The
@@ -75,7 +75,7 @@ public interface SeqSimilaritySearchHit {
     public int getSubjectStart();
     public int getSubjectEnd();
     public Strand getSubjectStrand();
-    public String getSequenceID();
+    public String getSubjectID();
     public List getSubHits();
 }
 </programlisting>
@@ -180,26 +180,6 @@ BlastLikeSearchBuilder builder = new BlastLikeSearchBuilder(searchResults);
 adapter.setSearchContentHandler(builder);
 </programlisting>
 
-      <para>A <classname>BlastLikeSearchBuilder</classname> must be
-      primed with two sources of data. The first is a
-      <classname>SequenceDB</classname> containing all of the query
-      sequences used to create the Blast results in the stream (bear
-      in mind that there may be many in the same stream) and the
-      second is a <classname>SequenceDBInstallation</classname> which
-      contains <classname>SequenceDB</classname>s representing all of
-      the databases searched against. These may seem like excessive
-      requirements, yet once in place any combination of query and
-      database in the stream can be handled. If the sequences and
-      databases are unavailable then anonymous inner classes which
-      implement limited but sufficient functionality could be
-      used. For example a simple <classname>SequenceDB</classname>
-      which always returns the same empty
-      <classname>Sequence</classname> and a
-      <classname>SequenceDBInstallation</classname> which always
-      returns that <classname>SequenceDB</classname> could be
-      used. Take care that any such implementations are not exposed in
-      places where they could surprise others!</para>
-
       <para>Once the builder is set up, calling the
       <methodname>parse</methodname> method on the
       <classname>BlastLikeSAXParser</classname> will populate the
@@ -207,9 +187,6 @@ adapter.setSearchContentHandler(builder);
       <classname>SequenceDBSearchResult</classname>s.</para>
 
 <programlisting>
-builder.setQuerySeqHolder(queryDB);
-builder.setSubjectDBInstallation(dbs);
-
 reader.parse(new InputSource(searchStream));
 </programlisting>
 
@@ -249,6 +226,52 @@ SeqSimilarityAdapter adapter = new SeqSimilarityAdapter();
 reader.setContentHandler(adapter);
 </programlisting>
     </sect2>
+
+      <sect2>
+        <title>More complex builders</title>
+
+        <para>The <classname>BlastLikeSearchBuilder</classname> refers
+        to sequences and databases by simple identifier strings. It is
+        left to the programmer to decide whether they want to resolve
+        these to actual <classname>Sequence</classname> or
+        <classname>SequenceDB</classname> instances. However, some
+        builder implementations actually require the ability to do
+        this themselves, on demand. For example,
+        <classname>SimilarityPairBuilder</classname> annotates paired
+        <classname>Sequence</classname>s with
+        <classname>Feature</classname>s which represent regions of
+        similarity and therefore requires
+        <classname>Sequence</classname> objects, not just their
+        identifiers.</para>
+
+        <para>The strategy used by
+        <classname>SimilarityPairBuilder</classname> is typical of
+        this type of class. It must be primed with two sources of
+        data. The first is a <classname>SequenceDB</classname>
+        containing all of the query sequences used to create the Blast
+        results in the stream (bear in mind that there may be many
+        reports in the same stream) and the second is a
+        <classname>SequenceDBInstallation</classname> which contains
+        <classname>SequenceDB</classname>s representing all of the
+        databases searched against. These may seem like excessive
+        requirements, yet once in place any combination of query and
+        database in the stream can be handled. If the sequences and
+        databases are unavailable then anonymous inner classes which
+        implement limited but sufficient functionality could be
+        used. For example a simple <classname>SequenceDB</classname>
+        which always returns the same empty
+        <classname>Sequence</classname> and a
+        <classname>SequenceDBInstallation</classname> which always
+        returns that <classname>SequenceDB</classname> could be
+        used. Take care that any such implementations are not exposed
+        in places where they could surprise others!</para>
+
+<programlisting>
+builder.setQuerySeqHolder(queryDB);
+builder.setSubjectDBInstallation(dbs);
+</programlisting>
+
+      </sect2>
   </sect1>
 
   <sect1 id="bd-ch06-blastnative">
@@ -262,4 +285,4 @@ reader.setContentHandler(adapter);
     introduces an extra library dependency for the XSL
     transformer (probably Apache Xalan-Java).</para>
   </sect1>
-</chapter>
+  </chapter>

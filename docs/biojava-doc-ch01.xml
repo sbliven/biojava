@@ -1,5 +1,5 @@
-<!--DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook V4.1//EN"
-                         "/usr/share/sgml/docbook/sgml-dtd-4.1/docbook.dtd" [
+<!--DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+                      "file:///usr/share/sgml/docbook/xml-dtd/docbookx.dtd" [
 ]-->
 
 <!-- This demonstrates the id convention for chapters -->
@@ -105,6 +105,26 @@
           <para>The <ulink url="http://xml.apache.org">Xerces-J XML
           parser</ulink>.</para>
         </listitem>
+      </itemizedlist>
+
+      <para>The following packages are optional:</para>
+      <itemizedlist>
+        <listitem>
+          <para>The <ulink
+          url="http://www.oasis-open.org/docbook/xml">DocBook XML
+          DTD</ulink> is required to build the user documentation from
+          its XML source.</para>
+        </listitem>
+        <listitem>
+          <para>The <ulink url="http://nwalsh.com/docbook/xsl">DocBook
+          XSL stylesheets</ulink> are required to build the user
+          documentation from its XML source.</para>
+        </listitem>
+          <listitem>
+            <para>A implementation of transformation API for XML
+            (TrAX) is required to build the user documentation from
+            its XML source.</para>
+          </listitem>
       </itemizedlist>
     </sect2>
   </sect1>
@@ -214,10 +234,4 @@ set CLASSPATH=C:\biojava.jar;C:\xerces.jar;C:\bytecode.jar;.
       if Java 1.4 is detected.</para>
     </sect2>
   </sect1>
-
-  <sect1 id="bd-ch01-demos">
-    <title>Running the demo programs</title>
-
-    <para></para>
-  </sect1>
-</chapter>
+  </chapter>

@@ -2,7 +2,6 @@
 
 <!--
 
-
   Ant build file for the entire biojava tree
 
   see:
@@ -17,16 +16,19 @@
     compile-demos compiles the demo files
     package       builds the biojava.jar file (default)
     package-demos builds the demos.jar file
-    runtests      runs JUnit tests
-    javadocs
+    runtests      runs all JUnit tests
+    seqtests      runs sequence subset of JUnit tests
+    symboltests   runs symbol subset of JUnit tests
+    javadocs      builds API documentation
+    docbook       builds DocBook documentation
     dist
     dist-zip     'binary' release (jar & documentation) in zip format
     dist-tgz     'binary' release (jar & documentation) in tar.gz format
     dist-both    both dist-zip & dist-tgz
     clean        cleans up the build & dist directories
 
-  author:  Michael Heuer, modified by Keith James (JUnit support), modified
-           Greg Cox (fixed documentation)
+  author:  Michael Heuer, modified by Keith James (JUnit support,
+           DocBook support), modified Greg Cox (fixed documentation)
   version: $Id$
 
   portions Copyright (c) 1999-2000 The Apache Software Foundation.
@@ -44,23 +46,62 @@
 
     <property name="classpath" value="xerces.jar:jakarta-regexp.jar:bytecode.jar:htmlparser.jar" />
 
-    <!-- Save the current system classpath to pass to forked VMs -->
-    <property name="env.classpath" value="${java.class.path}" />
-
     <!-- Check the current system classpath for JUnit -->
-    <available classpath="${env.classpath}"
+    <available classpath="${java.class.path}"
                classname="junit.framework.TestCase"
                property="junit.present" />
 
     <!-- Check the current system classpath for JUnit support in Ant (only in >= 1.3) -->
-    <available classpath="${env.classpath}"
+    <available classpath="${java.class.path}"
                classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTest"
                property="junit.support" />
 
-    <available classpath="${env.classpath}"
+    <!-- Check for Java 1.4 -->
+    <available classpath="${java.class.path}"
                classname="java.nio.Buffer"
                property="java14">
     </available>
+
+    <!-- Check the current system classpath for Trax -->
+    <available classpath="${java.class.path}"
+               classname="javax.xml.transform.Transformer"
+               property="trax.present">
+    </available>
+
+    <!-- DocBook XML DTD path -->
+    <property name="docbook.dir" value="/usr/share/sgml/docbook/xml-dtd" />
+    <property name="docbook.dtd" value="${docbook.dir}/docbookx.dtd" />
+    <!-- DocBook XML stylesheet path -->
+    <property name="stylesheet.dir" value="/usr/share/sgml/docbook/xsl-stylesheets-1.44" />
+    <property name="docbook.xsl" value="${stylesheet.dir}/html/chunk.xsl" />
+
+    <!-- Check for DocBook DTD -->
+    <available file="${docbook.dtd}" type="file" property="docbook.dtd.present" />
+    <!-- Check for DocBook XML stylesheet -->
+    <available file="${docbook.xsl}" type="file" property="docbook.xsl.present" />
+
+    <!-- DocBook catalog -->
+    <xmlcatalog id="docbook.cat">
+      <dtd publicId="-//OASIS//DTD DocBook XML V4.2//EN"
+           location="${docbook.dtd}" />
+    </xmlcatalog>
+ 
+    <!-- Check for complete DocBook kit -->
+    <condition property="docbook.support">
+      <and>
+        <isset property="docbook.dtd.present" />
+        <isset property="docbook.xsl.present" />
+        <isset property="trax.present" />
+      </and>
+    </condition>
+
+    <!-- Echo information -->
+    <echo message="JUnit present:                   ${junit.present}" />
+    <echo message="JUnit supported by Ant:          ${junit.support}" />
+    <echo message="Trax API present:                ${trax.present}" />
+    <echo message="DocBook DTD present:             ${docbook.dtd.present}" />
+    <echo message="DocBook XSL stylesheets present: ${docbook.xsl.present}" />
+    <echo message="Full DocBook kit present:        ${docbook.support}" />
 
     <property name="readme" value="./README" />
     <property name="license" value="./LICENSE" />
@@ -70,6 +111,8 @@
     <property name="tests14.dir" value="./tests-1.4" />
     <property name="demos.dir" value="./demos" />
     <property name="demos14.dir" value="./demos-1.4" />
+    <property name="docs.dir" value="./docs" />
+    <property name="doc.css.file" value="biojava-doc.css" />
     <property name="reports.dir" value="./reports" />
     <property name="manifest.dir" value="./manifest" />
     <property name="manifest.file" value="defaultmanifest.txt" />
@@ -85,10 +128,13 @@
     <!-- Subdirectories for tests source and classes -->
     <property name="build.src.tests" value="./ant-build/src/tests" />
     <property name="build.dest.tests" value="./ant-build/classes/tests" />
+    <!-- Subdirectories for demos source and classes -->
     <property name="build.src.demos" value="./ant-build/src/demos" />
     <property name="build.dest.demos" value="./ant-build/classes/demos" />
-    <!-- Subdirectory for Javadocs -->
-    <property name="build.javadocs" value="./ant-build/docs" />
+    <!-- Subdirectories for docs source -->
+    <property name="build.src.docs" value="./ant-build/src/docs" />
+    <property name="build.dest.docs" value="./ant-build/docs" />
+    <property name="build.dest.javadocs" value="${build.dest.docs}/api" />
     <!-- Subdirectory for test reports -->
     <property name="reports.tests" value="./reports/tests" />
 
@@ -112,9 +158,11 @@
     <mkdir dir="${reports.tests}" />
     <mkdir dir="${build.src.demos}" />
     <mkdir dir="${build.dest.demos}" />
+    <mkdir dir="${build.src.docs}" />
+    <mkdir dir="${build.dest.docs}" />
+    <mkdir dir="${build.dest.javadocs}" />
 
     <!-- Copies src files -->
-    <!-- copydir src="${src.dir}" dest="${build.src}" excludes="CVS,cvs"/ -->
     <copy todir="${build.src.main}">
       <fileset dir="${src.dir}">
         <exclude name="**/CVS/**" />
@@ -135,8 +183,14 @@
       </fileset>
     </copy>
 
+    <!-- Copies docs files -->
+    <copy todir="${build.src.docs}">
+      <fileset dir="${docs.dir}">
+        <exclude name="**/CVS/**" />
+      </fileset>
+    </copy>
+
     <!-- Copies manifest -->
-    <!-- copydir src="${manifest.dir}" dest="${build.src}" includes="${manifest.file}"/ -->
     <copy todir="${build.src.main}">
       <fileset dir="${manifest.dir}">
         <include name="${manifest.file}" />
@@ -149,15 +203,14 @@
         <include name="${demosmanifest.file}" />
       </fileset>
     </copy>
-    
+
     <!-- Copies resources -->
-    <!-- copydir src="${resources.dir}" dest="${build.src}" excludes="CVS,cvs"/ -->
     <copy todir="${build.dest.main}">
       <fileset dir="${resources.dir}">
         <exclude name="**/CVS/**" />
       </fileset>
     </copy>
-    
+
     <!-- Copies jars -->
     <copy todir="${build.dir}">
       <fileset dir=".">
@@ -256,7 +309,6 @@
 
   <!-- Runs tests if the Ant optional JUnit support is available -->
   <target name="runtests" depends="init,compile-tests" >
-    <echo message="JUnit present: ${junit.present}"/>
     <junit printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
       <formatter type="plain" usefile="true" />
       <classpath>
@@ -269,7 +321,7 @@
         <!-- classes specified in this file -->
         <pathelement path="${classpath}" />
         <!-- classes specified in system classpath -->
-        <pathelement path="${env.classpath}" />
+        <pathelement path="${java.class.path}" />
       </classpath>
       <!-- The junit task doesn't support 'if' so we test for JUnit here -->
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
@@ -293,7 +345,7 @@
         <!-- classes specified in this file -->
         <pathelement path="${classpath}" />
         <!-- classes specified in system classpath -->
-        <pathelement path="${env.classpath}" />
+        <pathelement path="${java.class.path}" />
       </classpath>
       <!-- The junit task doesn't support 'if' so we test for JUnit here -->
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
@@ -317,7 +369,7 @@
         <!-- classes specified in this file -->
         <pathelement path="${classpath}" />
         <!-- classes specified in system classpath -->
-        <pathelement path="${env.classpath}" />
+        <pathelement path="${java.class.path}" />
       </classpath>
       <!-- The junit task doesn't support 'if' so we test for JUnit here -->
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
@@ -330,12 +382,12 @@
 
   <!-- Creates the API documentation -->
   <target name="javadocs" depends="init,prepare-src">
-    <mkdir dir="${build.javadocs}" />
+    <mkdir dir="${build.dest.javadocs}" />
     <javadoc
       packagenames="${packages}"
       sourcepath="${build.src.main}"
       classpath="${classpath}"
-      destdir="${build.javadocs}"
+      destdir="${build.dest.javadocs}"
       author="true"
       version="true"
       use="true"
@@ -364,18 +416,50 @@
     </javadoc>
   </target>
 
+  <!-- Creates the DocBook documentation -->
+  <target name="docbook" depends="init" if="docbook.support">
+    <xslt
+      in="${build.src.docs}/biojava-doc-main.xml"
+      out="${build.dest.docs}/index.html"
+      style="${docbook.xsl}"
+      force="true">
+        <!-- Pass XSL parameters to transformer -->
+        <param name="html.stylesheet" expression="${doc.css.file}" />
+        <param name="html.ext" expression=".html" />
+        <param name="using.chunker" expression="1" />
+        <param name="chunk.sections" expression="0" />
+        <param name="use.id.as.filename" expression="1" />
+        <outputproperty name="method" value="xml" />
+        <outputproperty name="standalone" value="yes" />
+        <outputproperty name="encoding" value="iso8859_1" />
+        <outputproperty name="indent" value="yes" />
+    </xslt>
+    <!-- CSS file used by HTML output -->
+    <copy file="${build.src.docs}/${doc.css.file}" todir="${build.dest.docs}" />
+    <!-- Images used by HTML output -->
+    <copy todir="${build.dest.docs}">
+      <fileset dir="${build.src.docs}">
+        <include name="*/*.png" />
+        <include name="*/*.jpg" />
+        <include name="*/*.gif" />
+      </fileset>
+    </copy>
+  </target>
+
   <!-- Creates the distribution -->
-  <target name="dist" depends="init,package,runtests,javadocs">
+  <target name="dist" depends="init,package,runtests,javadocs,docbook">
     <mkdir dir="${dist.root}" />
     <mkdir dir="${dist.dir}" />
     <mkdir dir="${dist.dir}/lib" />
     <mkdir dir="${dist.dir}/docs" />
 
-    <copyfile src="${readme}" dest="${dist.dir}" />
-    <copyfile src="${license}" dest="${dist.dir}" />
+    <copy file="${readme}" todir="${dist.dir}" />
+    <copy file="${license}" todir="${dist.dir}" />
 
-    <copyfile src="${build.dir}/${name}.jar" dest="${dist.dir}/lib/${name}.jar" />
-    <copydir src="${build.javadocs}" dest="${dist.dir}/docs" />
+    <copy file="${build.dir}/${name}.jar" tofile="${dist.dir}/lib/${name}.jar" />
+    <copy todir="${dist.dir}/docs">
+      <fileset dir="${build.dest.docs}" />
+    </copy>
   </target>
 
   <!-- zips the dist -->
@@ -406,5 +490,4 @@
     <AntCall target="package"/>
     <cvs command="commit" />
   </target>
-
 </project>

@@ -1,0 +1,54 @@
+body {
+    background-color: #FFFFFF;
+    margin-left:      25px;
+    margin-right:     25px;
+}
+
+.author {
+    margin-left:  50px;
+    margin-right: 50px;
+}
+
+.affiliation {
+    margin-left:  75px;
+    margin-right: 75px;
+}
+
+.revhistory {
+    color: #999999;
+    margin-top:    25px;
+    margin-bottom: 25px;
+}
+
+.toc {
+    margin-left:  25px;
+    margin-right: 25px;
+}
+
+.title {
+    background-color: #003399;
+    color:            #FFFFFF;
+    font-weight:      bold;
+}
+
+.abstract {
+    background-color: #CCCCFF;
+    margin-left:      25px;
+    margin-right:     25px;
+}
+
+.programlisting {
+    background-color: #CCCCFF;
+    font-family:      monospace;
+    margin-left:      25px;
+    margin-right:     25px;
+    padding:          12px 0px 12px 12px;
+}
+
+.navheader {
+    font-weight: bold;
+}
+
+.navfooter {
+    font-weight: bold;
+}

@@ -99,10 +99,20 @@ implements SearchContentHandler {
   }
 
   public void setQuerySeq(String seqID) {
-    System.out.println(getPrefix() + "query sequence: " + seqID);
+      setQueryID(seqID);
   }
 
   public void setSubjectDB(String dbID) {
-    System.out.println(getPrefix() + "subject db: " + dbID);
+      setDatabaseID(dbID);
   }
+
+    public void setQueryID(String queryID)
+    {
+        System.out.println(getPrefix() + "query sequence: " + queryID);
+    }
+
+    public void setDatabaseID(String databaseID)
+    {
+        System.out.println(getPrefix() + "subject db: " + databaseID);
+    }
 }

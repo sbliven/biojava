@@ -1,35 +1,37 @@
-<!--DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook V4.1//EN"
-                         "/usr/share/sgml/docbook/sgml-dtd-4.1/docbook.dtd" [
+<!--DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+                      "file:///usr/share/sgml/docbook/xml-dtd/docbookx.dtd" [
 ]-->
 
 <chapter id="bd-ch03">
-  <title>Sequences and Features</title>
+    <title><classname>Sequence</classname>s and
+    <classname>Feature</classname>s</title>
 
   <abstract id="bd-ch03-abstract">
-    <para><xref linkend="bd-ch02"> covered the
+    <para><xref linkend="bd-ch02"/> covered the
     <classname>SymbolList</classname> interface, BioJava's basic
     representation of biological sequence data. This chapter examines
-    the Sequence interface. This adds extra functionality to
-    <classname>SymbolList</classname>, providing a convenient way to
-    handle annotated sequences from biological database. This chapter
-    concentrates on classes and interfaces defined in the package
+    the <classname>Sequence</classname> interface. This adds extra
+    functionality to <classname>SymbolList</classname>, providing a
+    convenient way to handle annotated sequences from biological
+    database. This chapter concentrates on classes and interfaces
+    defined in the package
     <classname>org.biojava.bio.seq</classname>. For full descriptions
     of all the API used here, please consult the <ulink
     url="javadoc/index.html">JavaDoc documentation</ulink>.</para>
   </abstract>
 
   <sect1 id="bd-ch03-tour">
-    <title>A tour of a Sequence</title>
+    <title>A tour of a <classname>Sequence</classname></title>
 
-    <para>Sequence is a sub-interface of
+    <para><classname>Sequence</classname> is a sub-interface of
     <classname>SymbolList</classname>. Thus, all the standard methods
     for accessing sequence data in a <classname>SymbolList</classname>
     can equally be applied to a <classname>Sequence</classname>, and
     <classname>Sequence</classname>s can be passed to any analysis
     methods which normally expect to receive a
-    <classname>SymbolList</classname>. The Sequence interface adds two
-    types of additional data to a
-    <classname>SymbolList</classname>.</para>
+    <classname>SymbolList</classname>. The
+    <classname>Sequence</classname> interface adds two types of
+    additional data to a <classname>SymbolList</classname>.</para>
 
     <itemizedlist>
       <listitem>
@@ -39,7 +41,7 @@
       <listitem>
         <para>Location-specific annotations (features).</para>
       </listitem>
-    </itemizedlist>
+      </itemizedlist>
 
     <para>Two pieces of global annotation information are considered
     to be sufficiently important that they have dedicated accessor
@@ -115,7 +117,8 @@ for (Iterator i = seqAn.keys().iterator(); i.hasNext(); ) {
   </sect1>
 
   <sect1 id="bd-ch03-features">
-    <title>Features and FeatureHolders</title>
+    <title><classname>Feature</classname>s and
+    <classname>FeatureHolder</classname>s</title>
 
     <para>A <classname>Feature</classname> represents a region of a
     sequence with some defined properties attached. Typically,
@@ -162,8 +165,8 @@ for (Iterator i = seqAn.keys().iterator(); i.hasNext(); ) {
     <classname>Feature</classname>s.</para>
 
     <para>Sets of <classname>Feature</classname>s are stored in
-    objects implementing the FeatureHolder interface. Sequence is a
-    sub-interface of
+    objects implementing the <classname>FeatureHolder</classname>
+    interface. Sequence is a sub-interface of
     <classname>FeatureHolder</classname>. <classname>Feature</classname>
     itself also extends FeatureHolder, giving the possibility of
     representing 'nested' features. For instance, a
@@ -192,10 +195,11 @@ public void printFeatures(FeatureHolder fh,
 
     <para>all <classname>Feature</classname> implementations include
     two methods which indicate how it fits into a feature
-    tree. getParent returns the <classname>FeatureHolder</classname>
+    tree. <methodname>getParent</methodname> returns the
+    <classname>FeatureHolder</classname>
     (<classname>Sequence</classname> or
     <classname>Feature</classname>) which is the feature's immediate
-    parent, while getSequence returns the
+    parent, while <methodname>getSequence</methodname> returns the
     <classname>Sequence</classname> object which is the root of the
     tree. <classname>Feature</classname> objects are always associated
     with a specific sequence, and always have exactly one parent
@@ -227,7 +231,8 @@ public Feature createFeature(Feature.Template template);
     <para>There is no requirement that a particular
     <classname>FeatureHolder</classname> should include a working
     implementation of this method. If it is not possible to create a
-    new child feature, UnsupportedOperationException will be
+    new child feature,
+    <classname>UnsupportedOperationException</classname> will be
     thrown. In particular, this method is only implemented by
     <classname>Sequence</classname> and <classname>Feature</classname>
     objects. When <classname>FeatureHolder</classname> instances are
@@ -256,3 +261,4 @@ mySequence.createFeature(template);
     feature.</para>
   </sect1>
 </chapter>
+  

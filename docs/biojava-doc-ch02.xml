@@ -1,5 +1,5 @@
-<!--DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook V4.1//EN"
-                         "/usr/share/sgml/docbook/sgml-dtd-4.1/docbook.dtd" [
+<!--DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+                      "file:///usr/share/sgml/docbook/xml-dtd/docbookx.dtd" [
 ]-->
 
 <chapter id="bd-ch02">
@@ -108,7 +108,8 @@ while (dnaSymbols.hasNext()) {
   </sect1>
 
   <sect1 id="bd-ch02-simple">
-    <title>SymbolList: the simple sequence</title>
+    <title><classname>SymbolList<classname>: the simple
+    sequence</title>
 
     <para>The basic interface for sequence data in biojava is
     <classname>SymbolList</classname>. Every
@@ -167,16 +168,16 @@ System.out.println("First symbol = " + seq.symbolAt(1).getName());
     class. Whenever a thymidine residue is stored in a sequence, all
     that is really stored is a reference to the single thymidine
     object (Flyweight design pattern <xref
-    linkend="bd-main-biblio-GoF98">). Typically, this takes up four
+    linkend="bd-biblio-GoF98" />). Typically, this takes up four
     bytes of memory: more than the two bytes used by a Java char, but
     still manageable.</para>
 
     <mediaobject>
       <imageobject>
-        <imagedata fileref="images/flyweight.eps" format="eps" align="center" scale="100">
+        <imagedata fileref="images/flyweight.eps" format="eps" align="center" />
       </imageobject>
       <imageobject>
-        <imagedata fileref="images/flyweight.png" format="png" align="center" scale="100">
+        <imagedata fileref="images/flyweight.png" format="png" align="center" />
       </imageobject>
     </mediaobject>
 
@@ -190,7 +191,9 @@ System.out.println("First symbol = " + seq.symbolAt(1).getName());
     accessed -- not how data is stored. If space is important, it is
     possible to implement a 'packed' implementation of
     <classname>SymbolList</classname>. Client code need never worry
-    about the underlying data model.</para>
+    about the underlying data model. See the class
+    <classname>PackedSymbolList</classname> for an implementation
+    which uses this approach.</para>
 
     <para>BioJava's object oriented view of sequences brings other
     advantages. Many programs which analyse DNA sequences need to have
@@ -252,7 +255,8 @@ System.out.println("Strings match: " + seqString2.equalsIgnoreCase(seqString));
   </sect1>
 
     <sect1 id="bd-ch02-interface">
-      <title>What about the Sequence interface?</title>
+      <title>What about the <classname>Sequence</classname>
+      interface?</title>
 
     <para>Until this point, we have concentrated on the
     <classname>SymbolList</classname> interface which, as its name
@@ -309,7 +313,7 @@ public class GCContent {
         while (stream.hasNext()) {
             Sequence seq = stream.nextSequence();
             int gc = 0;
-            for (int pos = 1; pos <= seq.length(); ++pos) {
+            for (int pos = 1; pos &lt;= seq.length(); ++pos) {
                 Symbol sym = seq.symbolAt(pos);
                 if (sym == DNATools.g() || sym == DNATools.c())
                     ++gc;
@@ -326,7 +330,7 @@ public class GCContent {
   <sect1 id="bd-ch02-ambiguous">
     <title>Ambiguous symbols</title>
 
-    <para>Sometimes, it is useful to represent sequences which are not
+    <para>Sometimes it is useful to represent sequences which are not
     perfectly defined. In such cases, it is common to use ambiguous
     symbols. A common example is the 'N' character in DNA sequences,
     which is used to indicate parts of a sequence where the sequencing
@@ -347,4 +351,4 @@ public class GCContent {
     <para>You might want to modify the GCContent program, above, so as
     to ignore any ambiguity symbols in the input sequence.</para>
   </sect1>
-</chapter>
+  </chapter>

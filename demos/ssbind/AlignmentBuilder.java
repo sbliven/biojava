@@ -1,4 +1,4 @@
-package ssearch;
+package ssbind;
 
 import java.util.*;
 

@@ -9,9 +9,9 @@ import org.biojava.bio.BioError;
  *
  * <p>
  * Bit-packed symbol lists are space efficient compared to the usual pointer
- * stoorage model employed by implementatinos like SimpleSymbolList. This
+ * storage model employed by implementations like SimpleSymbolList. This
  * comes at the cost of encoding/decoding symbols from the storage. In
- * practice, the decrease in memory when stooring large sequences makes
+ * practice, the decrease in memory when storing large sequences makes
  * applications go quicker because of issues like page swapping.
  * </p>
  *
@@ -96,8 +96,8 @@ public class PackedSymbolList
    * </p>
    *
    * <p>
-   * This will create a new and independand symbol list that is a copy of
-   * the symbols in symList. Both lists can be modified independantly.
+   * This will create a new and independent symbol list that is a copy of
+   * the symbols in symList. Both lists can be modified independently.
    * </p>
    *
    * @param packing the way to bit-pack symbols
@@ -290,8 +290,8 @@ public class PackedSymbolList
    * representing symbols. You should not modify this in any way. If you do,
    * you will modify the symbols returned by symbolAt(). This methd is
    * provided primarily as an easy way for developers to extract the
-   * bit pattern for stoorage in such a way as it could be fetched later and
-   * fed into the apropreate constructor.
+   * bit pattern for storage in such a way as it could be fetched later and
+   * fed into the appropriate constructor.
    * </p>
    *
    * @return the actual long array used to store bit-packed symbols

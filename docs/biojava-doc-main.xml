@@ -1,5 +1,5 @@
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.1//EN"
-                      "/usr/share/sgml/docbook/sgml-dtd-4.1/docbook.dtd"
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+                      "file:///usr/share/sgml/docbook/xml-dtd/docbookx.dtd"
 [
     <!ENTITY chapter01 SYSTEM "biojava-doc-ch01.xml">
     <!ENTITY chapter02 SYSTEM "biojava-doc-ch02.xml">
@@ -14,38 +14,34 @@
         processed with any of Jade, Xalan etc.
 -->
 
-<!--
-        First priorities:
-
-        Docbook stuff. How to get and use.
-        Collate existing documentation and add.
-        Add recent bootcamp material.
-        Trawl mailing list and start FAQ.
-        Add Ant task to build docs and link to Javadoc.
--->
-
-<book id="biojava-main">
+<book id="index">
   <title>The BioJava Documentation</title>
   
   <bookinfo>
     <!-- Add your name as a collaborative author if you contribute.
     Authors are in alphabetical order. -->
     <authorgroup>
-      <collab>
-        <collabname>Thomas Down</collabname>
+      <author>
+        <firstname>Thomas</firstname>
+        <surname>Down</surname>
         <affiliation>
           <orgname>The Wellcome Trust Sanger Institute</orgname>
         </affiliation>
-      </collab>
-      <collab>
-        <collabname>Keith James</collabname>
+      </author>
+      <author>
+        <firstname>Keith</firstname>
+        <surname>James</surname>
         <affiliation>
           <orgname>The Wellcome Trust Sanger Institute</orgname>
         </affiliation>
-      </collab>
-      <collab>
-        <collabname>Matthew Pocock</collabname>
-      </collab>
+      </author>
+      <author>
+        <firstname>Matthew</firstname>
+        <surname>Pocock</surname>
+        <affiliation>
+          <orgname>BioJava Consulting Ltd.</orgname>
+        </affiliation>
+      </author>
     </authorgroup>
 
     <!-- Change this to reflect the current editor -->
@@ -65,9 +61,13 @@
         <!-- Please use this ISO standard for representing dates -->
         <date>2002/03/26</date>
         <authorinitials>KJ</authorinitials>
-        <revdescription>
-          <para>Initial draft</para>
-        </revdescription>        
+        <revdescription>Initial draft</revdescription>
+      </revision>
+      <revision>
+        <revnumber>2</revnumber>
+        <date>2002/10/26</date>
+        <authorinitials>KJ</authorinitials>
+        <revdescription>Revised to DocBook XML DTD 4.2</revdescription>
       </revision>
     </revhistory>
   </bookinfo>
@@ -98,7 +98,7 @@
     which allows different types of output, including HTML and
     printable formats, to be generated from a single source without
     compromising quality or portability across computing platforms. To
-    find out more about DocBook see <xref linkend="bd-apdx03">.</para>
+    find out more about DocBook see <xref linkend="bd-apdx03"/>.</para>
 
     <para>The following authors/groups have contributed to this
     document:</para>
@@ -196,15 +196,15 @@
 
     <itemizedlist>
       <listitem>
-        <para><ulink url="javadoc/index.html">API overview with
+        <para><ulink url="api/index.html">API overview with
         frames</ulink></para>
       </listitem>
       <listitem>
-        <para><ulink url="javadoc/overview-summary.html">API overview
+        <para><ulink url="api/overview-summary.html">API overview
         without frames</ulink></para>
       </listitem>
       <listitem>
-        <para><ulink url="javadoc/index-all.html">Full API
+        <para><ulink url="api/index-all.html">Full API
         index</ulink></para>
       </listitem>
     </itemizedlist>
@@ -307,10 +307,10 @@
       PostScript formats.</para>
 
       <para>The BioJava documentation aims to conform to both the
-      DocBook SGML 4.1 and the DocBook XML 4.1.2 DTD. Currently the
-      document is being validated against the SGML DTD, so the XML may
-      not be fully compliant. This will be rectified when XML
-      validation is added to the Ant build tasks.</para>
+      DocBook SGML 4.1 and the DocBook XML 4.2 DTD. Currently the
+      document is being validated against the XML DTD and should build
+      out of the box if you have the DocBook XML DTD, stylesheets and
+      an XSLT processor installed.</para>
     </sect1>
 
     <sect1 id="bd-apdx03-resources">
@@ -331,8 +331,8 @@
           </listitem>
           <listitem>
             <para>The <ulink
-            url="http://www.oasis-open.org/xml/4.1.2">DocBook XML
-            4.1.2</ulink> DTD.</para>
+            url="http://www.oasis-open.org/xml/4.2">DocBook XML
+            4.2</ulink> DTD.</para>
           </listitem>
           <listitem>
             <para>The <ulink
@@ -365,13 +365,13 @@
     </sect1>
   </appendix>
 
-  <bibliography id="bd-main-biblio">
+  <bibliography id="bd-biblio">
     <title>Bibliography</title>
 
-    <bibliodiv id="bd-main-biblio-book">
+    <bibliodiv id="bd-biblio-book">
       <title>Books</title>
 
-      <biblioentry id="bd-main-biblio-GoF98">
+      <biblioentry id="bd-biblio-GoF98">
         <abbrev>GoF98</abbrev>
         <authorgroup>
           <author>

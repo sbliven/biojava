@@ -1,5 +1,5 @@
-<!--DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook V4.1//EN"
-                         "/usr/share/sgml/docbook/sgml-dtd-4.1/docbook.dtd" [
+<!--DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+                      "file:///usr/share/sgml/docbook/xml-dtd/docbookx.dtd" [
 ]-->
 
 <chapter id="bd-ch05">
@@ -15,7 +15,7 @@
     <classname>ChangeEvent</classname>,
     <classname>ChangeListener</classname>,
     <classname>ChangeType</classname> and
-    <classname>ChangeVetoException</classname> . For full descriptions
+    <classname>ChangeVetoException</classname>. For full descriptions
     of all the API used here, please consult the <ulink
     url="javadoc/index.html">JavaDoc documentation</ulink>.</para>
   </abstract>
@@ -210,4 +210,4 @@
     class. It will lazily instantiate the delegate only when listeners
     need to be registered.</para>
   </sect1>
-</chapter>
+  </chapter>
