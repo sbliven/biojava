@@ -97,6 +97,8 @@ public abstract class AbstractSequenceDBTest extends TestCase {
         String sourceType = "asource";
         String annoTag = "anno";
         String annoVal = "123456";
+        String anno2Tag = "blah";
+        String anno2Val = "blahblah";
 
         // Create some features
         Feature.Template template = new Feature.Template();
@@ -157,6 +159,10 @@ public abstract class AbstractSequenceDBTest extends TestCase {
         assertTrue(i.hasNext());
         feature = (Feature) i.next();
         assertTrue(feature.getAnnotation().containsProperty(annoTag));
+
+        // Remove the annoTag annotation.
+        // First add another annotation. This triggered a bug in biosql binding.
+        feature.getAnnotation().setProperty(anno2Tag, anno2Val);
         feature.getAnnotation().removeProperty(annoTag);
         assertTrue(!feature.getAnnotation().containsProperty(annoTag));
 
