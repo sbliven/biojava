@@ -63,6 +63,9 @@ public class AceURL {
 	this.ref = old.getRef();
 	this.userInfo = userInfo;
 	this.authority = authority;
+  while(file.startsWith("/")) {
+    file = file.substring(1);
+  }
     }
 
     public AceURL(String spec) 
@@ -149,7 +152,9 @@ public class AceURL {
 			  protocol,
 			  host,
 			  port,
-			  (file == null) ? fragment : file + "/" + fragment,
+			  (file == null || fragment.startsWith("/"))
+          ? fragment
+          : file + "/" + fragment,
 			  _query,
 			  _ref,
 			  userInfo,

@@ -179,13 +179,9 @@ class SocketDatabase implements Database {
 		    }
 		}
 		allClassesSet = set;
-  } catch (AceException ae) {
-    if(!ae.isRecoverable())
-      sock = null;
-    throw ae;
 	    } finally {
-		if (sock != null)
-		    putSocket(sock);
+//		if (sock != null)
+//		    putSocket(sock);
 	    }
 	}
 
@@ -255,13 +251,9 @@ class SocketDatabase implements Database {
         nameList,
 				dbURL.relativeURL(clazz + '?' + namePattern)
       );
-  } catch (AceException ae) {
-    if(!ae.isRecoverable())
-      sock = null;
-    throw ae;
 	} finally {
-	    if (sock != null)
-		putSocket(sock);
+//	    if (sock != null)
+//		putSocket(sock);
 	}
     }
 
@@ -323,13 +315,9 @@ class SocketDatabase implements Database {
 
 	    String obj = sock.transact("show -p");
 	    o = parser.parseObject(obj);
-  } catch (AceException ae) {
-    if(!ae.isRecoverable())
-      sock = null;
-    throw ae;
 	} finally {
-      if(sock != null)
-  	    putSocket(sock);
+//      if(sock != null)
+//  	    putSocket(sock);
 	}
 
 	cacheObject(cacheName, o);

@@ -63,8 +63,11 @@ public class AcePerlParser {
   ) throws AceException {
     StaticAceNode obj = null;
 
+//    System.out.println("parent " + parent + "\tty:" + ty + "\tva:" + va + "\tcl:" + cl);
     if (ty.equals("in")) {
 	    obj = new StaticIntValue(Integer.parseInt(va), parent);
+    } else if (ty.equals("fl")) {
+      obj = new StaticFloatValue(Float.parseFloat(va), parent);
     } else if (ty.equals("dt")) {
       obj = new StaticDateValue(new Date(va), parent);
     } else if (ty.equals("tx")) {
@@ -117,16 +120,26 @@ public class AcePerlParser {
        throw new AceError("Resetting old ty value " + ty + " with " + s);
      }
      ty = s.substring(4).trim();
-	 } else if (s.equals("va=>")) {
+	 } else if (s.startsWith("va=>")) {
      if(va != null) {
 		   throw new AceError("Resetting old va value " + va + " with " + s);
      }
-     va = Ace.encode(t.nextToken());
+     if(s.length() > 4) {
+       va = s.substring(4);
+     } else {
+       va = t.nextToken();
+     }
+     va = Ace.encode(va);
    } else if (s.equals("cl=>")) {
      if(cl != null) {
        throw new AceError("Resetting old cl value " + cl + " with " + s);
      }
-     cl = Ace.encode(t.nextToken());
+     if(s.length() > 4) {
+       cl = s.substring(4);
+     } else {
+       cl = t.nextToken();
+     }
+     cl = Ace.encode(cl);
    } else if (s.equals("Pn=>")) {
 		if (! t.nextToken().equals("[")) {
 		    throw new AceError("Unrecoverable parsing error: expecting [");
@@ -145,7 +158,15 @@ public class AcePerlParser {
 		} else{ 
 		    return constructNode(parent, ty, va, cl);
 		}
-	    } else {
+      } else if (s.indexOf("=>") == 2) {
+        System.out.println("Unknown tag in perl-style dump: " + s);
+      } else {
+        if(ty != null || va != null) {
+          throw new AceException(
+            "Attempted to create model element with '" + s +
+            "' when ty was " + ty + " and va was " + va
+          );
+        }
         String str = s.trim();
         if(str.startsWith("?")) {
           ty = "model-reference";
