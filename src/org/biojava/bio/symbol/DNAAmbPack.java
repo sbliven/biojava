@@ -7,7 +7,8 @@ import org.biojava.bio.seq.*;
   
 public class DNAAmbPack
   implements
-    Packing
+    Packing,
+    java.io.Serializable
 {
   private final Symbol[] syms;
   

@@ -37,6 +37,8 @@ import org.biojava.bio.BioError;
 public class PackedSymbolList
   extends
     AbstractSymbolList
+  implements
+    java.io.Serializable
 {
   private final byte bitsPerElement = 64;
 

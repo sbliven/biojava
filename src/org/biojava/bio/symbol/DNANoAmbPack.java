@@ -10,7 +10,8 @@ import org.biojava.bio.seq.*;
  */  
 public class DNANoAmbPack
   implements
-    Packing
+    Packing,
+    java.io.Serializable
 {
   final byte placeHolder;
     
