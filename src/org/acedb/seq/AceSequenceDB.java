@@ -33,12 +33,11 @@ import org.biojava.bio.seq.*;
  */
 
 public class AceSequenceDB implements SequenceDB {
-  protected Database aceDB;
   protected AceSet seqSet;
   
   public Sequence getSequence(String id) throws BioException {
     try {
-      return new AceSequence(aceDB, id);
+      return new AceSequence((AceObject) seqSet.retrieve(id));
     } catch (AceException ae) {
       throw new BioException(ae, "unable to retrieve sequence " + id);
     }
@@ -47,18 +46,30 @@ public class AceSequenceDB implements SequenceDB {
   public Set ids() {
     return new AbstractSet() {
       public int size() {
-        return seqSet.size();
+        try {
+          return seqSet.size();
+        } catch (AceException ae) {
+          throw new AceError(ae, "Couldn't retrieve set size");
+        }
       }
 
       public Iterator iterator() {
-        return seqSet.nameIterator();
+        try {
+          return seqSet.nameIterator();
+        } catch (AceException ae) {
+          throw new AceError(ae, "Couldn't retrieve set size");
+        }
       }
 
       public boolean contains(Object o) {
         if (! (o instanceof String)) {
           return false;
         } else {
-          return seqSet.contains((String) o);
+          try {
+            return seqSet.contains((String) o);
+          } catch (AceException ae) {
+            throw new AceError(ae, "Couldn't retrieve set size");
+          }
         }
       }
     };
@@ -78,12 +89,21 @@ public class AceSequenceDB implements SequenceDB {
     };
   }
   
-  public AceSequenceDB(Database aceDB, String pattern) throws AceException {
-    this.aceDB = aceDB;
-    this.seqSet = aceDB.select(AceType.getClassType(aceDB, "Sequence"), pattern);
+  public AceSequenceDB(AceURL dbURL, String pattern) throws AceException {
+    AceURL url = new AceURL(
+      dbURL.getProtocol(),
+      dbURL.getHost(),
+      dbURL.getPort(),
+      "Sequence",
+      pattern,
+      dbURL.getRef(),
+      dbURL.getUserInfo(),
+      dbURL.getAuthority()
+    );
+    this.seqSet = Ace.fetch(url);
   }
 
-  public AceSequenceDB(Database aceDB) throws AceException {
-    this(aceDB, "*");
+  public AceSequenceDB(AceURL dbURL) throws AceException {
+    this(dbURL, "*");
   }
 } 

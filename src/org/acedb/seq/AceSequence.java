@@ -107,18 +107,17 @@ public class AceSequence implements Sequence {
     throw new UnsupportedOperationException("ACeDB sequences can't be modified");
   }
     
-  public AceSequence(Database aceDB, String id) throws AceException, BioException {
-    this.name = id;
+  public AceSequence(AceObject seqObj) throws AceException, BioException {
+    this.name = seqObj.getName();
     this.fHolder = new SimpleMutableFeatureHolder();
     
     try {
       // load in relevent ACeDB object & construct annotation wrapper
-      seqObj = aceDB.getObject(AceType.getClassType(aceDB, "Sequence"), id);
       annotation = new AceAnnotation(seqObj);
       
       // load in the corresponding dna
-      Connection con = aceDB.getConnection();
-      String selectString = con.transact("Find Sequence " + id);
+      Connection con = Ace.getConnection(seqObj.toURL());
+      String selectString = con.transact("Find Sequence " + name);
       String dnaString = con.transact("dna");
       SymbolParser rParser = alphabet().getParser("token");
       List rl = new ArrayList();
@@ -194,7 +193,7 @@ public class AceSequence implements Sequence {
         }
       }
     } catch (Exception ex) {
-      throw new AceException(ex, "Fatal error constructing sequence for " + id);
+      throw new AceException(ex, "Fatal error constructing sequence for " + name);
     }
   }
 }

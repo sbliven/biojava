@@ -53,16 +53,29 @@ public class AceAnnotation implements Annotation {
   public Set keys() {
     return new AbstractSet() {
       public Iterator iterator() {
-        return node.iterator();
+        try {
+          return node.iterator();
+        } catch (AceException ae) {
+          throw new AceError(ae, "Couldn't construct iterator");
+        }
       }
       
       public int size() {
-        return node.size();
+        try {
+          return node.size();
+        } catch (AceException ae) {
+          throw new AceError(ae, "Couldn't retrieve ace set size");
+        }
       }
       
       public boolean contains(Object obj) {
-        if(obj instanceof String)
-          return node.contains((String) obj);
+        try {
+          if(obj instanceof String) {
+            return node.contains((String) obj);
+          }
+        } catch (AceException ae) {
+          throw new AceError(ae, "Couldn't check to see if ace set " + node.getName() + " contained " + obj);
+        }
         return super.contains(obj);
       }
     };
