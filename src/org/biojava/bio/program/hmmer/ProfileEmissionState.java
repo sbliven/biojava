@@ -7,6 +7,10 @@ import org.biojava.utils.*;
 import java.util.*; 
 import org.biojava.bio.*;
 
+/**
+ * A state in a HMMer model.
+ */
+
 public class ProfileEmissionState extends SimpleEmissionState{
 	
 	public ProfileEmissionState(String str, Annotation ann, int[] adv, Distribution dis){
