@@ -30,7 +30,7 @@ import org.biojava.bio.seq.*;
  * @author Matthew Pocock
  * @since 1.1
  */
-public interface TranslatedRegion {
+public interface TranslatedRegion extends Feature {
   public Sequence getTranslation();
   
   /**
