@@ -37,7 +37,9 @@ import junit.framework.TestCase;
 public class FeatureFilterTest extends TestCase
 {
     protected Sequence seq;
+    protected Location complexLocation;
     protected Feature fooFeature;
+    protected Feature complexFeature;
     
     public FeatureFilterTest(String name) {
         super(name);
@@ -59,6 +61,14 @@ public class FeatureFilterTest extends TestCase
         template.annotation = new SmallAnnotation();
         template.annotation.setProperty("baz", Boolean.TRUE);
         fooFeature = seq.createFeature(template);
+        
+        complexLocation = LocationTools.union(
+            new RangeLocation(1,2),
+            new RangeLocation(5,6)
+        );
+        template.type = "complex";
+        template.location = complexLocation;
+        complexFeature = seq.createFeature(template);
     }
     
     public void testHasAnnotation() {
@@ -86,11 +96,30 @@ public class FeatureFilterTest extends TestCase
         assertTrue(new FeatureFilter.OverlapsLocation(new RangeLocation(1, 6)).accept(fooFeature));
         assertTrue(new FeatureFilter.OverlapsLocation(new RangeLocation(3, 6)).accept(fooFeature));
         assertTrue(!new FeatureFilter.OverlapsLocation(new RangeLocation(1, 1)).accept(fooFeature));
+        
+        assertTrue(new FeatureFilter.OverlapsLocation(new PointLocation(1)).accept(complexFeature));
+        assertTrue(!new FeatureFilter.OverlapsLocation(new PointLocation(3)).accept(complexFeature));
     }
     
     public void testContainedByLocation() {
         assertTrue(new FeatureFilter.ContainedByLocation(new RangeLocation(1, 6)).accept(fooFeature));
         assertTrue(!new FeatureFilter.ContainedByLocation(new RangeLocation(3, 6)).accept(fooFeature));
         assertTrue(!new FeatureFilter.ContainedByLocation(new RangeLocation(1, 1)).accept(fooFeature));
+        
+        assertTrue(new FeatureFilter.ContainedByLocation(new RangeLocation(1, 6)).accept(complexFeature));
+        assertTrue(!new FeatureFilter.ContainedByLocation(new RangeLocation(1, 2)).accept(complexFeature));
+        assertTrue(new FeatureFilter.ContainedByLocation(complexLocation).accept(complexFeature));
+    }
+    
+    public void testShadowOverlapsLocation() {
+        assertTrue(new FeatureFilter.ShadowOverlapsLocation(new PointLocation(1)).accept(complexFeature));
+        assertTrue(new FeatureFilter.ShadowOverlapsLocation(new PointLocation(3)).accept(complexFeature));
+        assertTrue(!new FeatureFilter.ShadowOverlapsLocation(new PointLocation(7)).accept(complexFeature));
+    }
+    
+    public void testShadowContainedByLocation() {
+        assertTrue(new FeatureFilter.ShadowContainedByLocation(new RangeLocation(1, 6)).accept(complexFeature));
+        assertTrue(!new FeatureFilter.ShadowContainedByLocation(new RangeLocation(1, 2)).accept(complexFeature));
+        assertTrue(!new FeatureFilter.ShadowContainedByLocation(complexLocation).accept(complexFeature));
     }
 }
