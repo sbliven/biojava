@@ -68,6 +68,10 @@ public class ChangeSupport {
   private Reference[] listeners;
   private ChangeType[] types;
 
+  public boolean hasListeners() {
+      return (listenerCount > 0);
+  }
+  
   /**
    * Generate a new ChangeSupport instance.
    */
