@@ -172,7 +172,9 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    // Pick up the default annotation set (this should maybe be optional)
 	    //
 
-	    features.addFeatureHolder(new DASFeatureSet(this, dataSourceURL, seqID));
+	    FeatureHolder refServerFeatureSet = new DASFeatureSet(this, dataSourceURL, seqID);
+	    featureSets.put(dataSourceURL, refServerFeatureSet);
+	    features.addFeatureHolder(refServerFeatureSet);
 	} catch (IOException ex) {
 	    throw new BioException(ex, "Error connecting to DAS server");
 	} catch (NumberFormatException ex) {
