@@ -91,12 +91,12 @@ public class SimpleAssemblyBuilder extends SequenceBuilderBase {
       System.err.println("SimpleAssemblyBuilder: illegal attempt to add symbols");
     }
 
-    public void addComponentSequence(ComponentFeature.Template cft)
+    public ComponentFeature addComponentSequence(ComponentFeature.Template cft)
       throws BioException, ChangeVetoException
     {
         checkSeq();
 
-        seq.createFeature(cft);
+        return (ComponentFeature) seq.createFeature(cft);
     }
 
     public Sequence makeSequence() 
