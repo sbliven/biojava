@@ -30,8 +30,11 @@ import java.io.*;
  * available. This file should contain the properties used to configure
  * building. 
  *
- * @author     Thomas Down 
-<td2@sanger.ac.uk>
+ * Other authors  -<ul>
+ * <li>Mathieu Wiepert    (Mayo Foundation)
+ *</ul>
+ *
+ * @author     Thomas Down <td2@sanger.ac.uk>
  * @author     Matthew Pocock <mrp@sanger.ac.uk>
  *        
  * @created    September 20, 2000 
@@ -119,7 +122,6 @@ public class Builder {
    *
    * @return an array of Strings containing each element of the classpath
    */
-
   public static String [] getClassPath() {
     String cp = props.getProperty("javac.classpath");
     List cpl = new ArrayList();
@@ -158,7 +160,7 @@ public class Builder {
     while (args[thisArg].startsWith("-")) {
       if (args[thisArg].startsWith("-C")) {
         javacOptions.add(args[thisArg].substring(2));
-      }
+     }
       else {
         System.err.println("Unknown switch: " + args[thisArg]);
       }
@@ -176,7 +178,8 @@ public class Builder {
     }
     else if (command.equals("package")) {
       List packList = new ArrayList();
-      for (int i = 1; i < args.length; ++i) {
+      
+      for (int i=++thisArg; i < args.length; ++i) {
         packList.add(args[i]);
       }
       buildPackages(packList);
@@ -234,7 +237,6 @@ public class Builder {
     }
     System.out.println("New " + jarTarget + " built.  Share and enjoy!");
   }
-
 
   /**
    *  Description of the Method 
