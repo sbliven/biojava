@@ -54,6 +54,7 @@ implements Serializable {
   /**
    * A set of well-known ambiguity symbols.
    */
+  private final Map ambigMap;
   private final Set ambig;
   
   /**
@@ -125,8 +126,27 @@ implements Serializable {
   public void addAmbiguity(Symbol aSym)
   throws IllegalSymbolException {
     validate(aSym);
+    if (ambig.contains(aSym))
+	throw new IllegalSymbolException("Can't add " + aSym.getName() + " twice");
+
+    Set key = new HashSet();
+    for (Iterator i = ((FiniteAlphabet) aSym.getMatches()).iterator(); i.hasNext(); ) {
+	key.add(i.next());
+    }
     ambig.add(aSym);
+    ambigMap.put(key, aSym);
   }
+
+    public Symbol getAmbiguity(Set syms) 
+        throws IllegalSymbolException
+    {
+	Symbol a = (Symbol) ambigMap.get(syms);
+	if (a == null) {
+	    a = super.getAmbiguity(syms);
+	    addAmbiguity(a);
+	}
+	return a;
+    }
 
   public void removeSymbol(Symbol s)
   throws IllegalSymbolException {
@@ -171,6 +191,7 @@ implements Serializable {
   public SimpleAlphabet(Set symbols, String name) {
     this.symbols = new HashSet();
     this.ambig = new HashSet();
+    this.ambigMap = new HashMap();
     this.name = name;
     this.alphabets = null;
     

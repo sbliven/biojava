@@ -91,6 +91,10 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
   public Symbol getAmbiguity(Set syms)
       throws IllegalSymbolException 
   {
+      for (Iterator i = syms.iterator(); i.hasNext(); ) {
+	  validate((Symbol) i.next());
+      }
+
     return AlphabetManager.createSymbol(
       '*', Annotation.EMPTY_ANNOTATION,
       syms, this
