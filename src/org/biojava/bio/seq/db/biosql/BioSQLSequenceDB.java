@@ -364,7 +364,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 create_bioentry.setInt(6, taxon_id);
             }
 	    create_bioentry.executeUpdate();
-	    //create_bioentry.close();
+	    create_bioentry.close();
 
 	    // System.err.println("Created bioentry");
 
