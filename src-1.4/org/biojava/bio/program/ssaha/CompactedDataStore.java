@@ -16,7 +16,7 @@ import org.biojava.bio.symbol.*;
  * @author Thomas Down
  */
 
-class CompactedDataStore implements DataStore {
+public class CompactedDataStore implements DataStore {
   private final Packing packing;
   private final int wordLength;
   private final IntBuffer hashTable;
@@ -139,7 +139,6 @@ class CompactedDataStore implements DataStore {
       int word = PackingFactory.primeWord(symList, wordLength, packing);
       listener.startSearch(seqID);
       fireHits(word, 1, listener);
-      System.err.println("Foo");
       for(int j = wordLength + 1; j <= symList.length(); j++) {
         word = PackingFactory.nextWord(symList, word, j, wordLength, packing);
         fireHits(word, j - wordLength + 1, listener);
@@ -196,7 +195,7 @@ class CompactedDataStore implements DataStore {
 	}
     }
 
-  private void fireHits(
+  public void fireHits(
     int word,
     int offset,
     SearchListener listener
