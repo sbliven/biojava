@@ -114,9 +114,16 @@ public class FeatureTableParser {
             case WITHIN:
                 if (line.charAt(0) == '/') {
                     // System.out.println("got '/', quotes = " + countChar(line, '"'));
-                    if (countChar(line, '"') % 2 == 0)
+                    // attribute either is unquoted and on one line or
+                    // is quoted, and must start & end with a quote
+                    //
+                    // we assume that no attributes have embedded quotes
+                    int eq = line.indexOf("=");
+                    if (line.charAt(eq + 1) != '"' ||
+                        line.charAt(line.length() - 1) == '"'
+                    ) {
                         processAttribute(line);
-                    else {
+                    } else {
                         featureBuf.setLength(0);
                         featureBuf.append(line);
                         featureStatus = ATTRIBUTE;
@@ -131,12 +138,15 @@ public class FeatureTableParser {
                 // consists of whitespace-delimited words. Therefore a
                 // space should be inserted at EOL otherwise words will
                 // get fused (unless there is a space already there)
-                if ((countChar(featureBuf, ' ') > 0) &&
+                if ((featureBuf.indexOf(" ") >= 0) &&
                     featureBuf.charAt(featureBuf.length()-1) != ' ')
                     featureBuf.append(" ");
                 featureBuf.append(line);
 
-                if (countChar(featureBuf, '"') % 2 == 0) {
+                int eq = featureBuf.indexOf("=");
+                if (featureBuf.charAt(eq + 1) != '"' ||
+                    featureBuf.charAt(featureBuf.length() - 1) == '"'
+                ) {
                     processAttribute(featureBuf.substring(0));
                     featureStatus = WITHIN;
                 }
