@@ -36,11 +36,16 @@ public class PolynomialKernel extends NestedKernel {
     private double c;
 
     public PolynomialKernel() {
-      order = 3;
-      a = 1.0;
-      c = 1.0;
+      this(null, 3.0, 1.0, 1.0);
     }
 
+    public PolynomialKernel(SVMKernel nested, double order, double a, double c) {
+      super(nested);
+      this.order = order;
+      this.a = a;
+      this.c = c;
+    }
+    
     public double evaluate(Object a, Object b) {
       return Math.pow(getMultiplier()*getNestedKernel().evaluate(a, b)
                       + getConstant(),

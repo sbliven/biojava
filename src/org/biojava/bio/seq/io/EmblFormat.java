@@ -33,6 +33,10 @@ import org.biojava.bio.seq.*;
  * Format reader for EMBL files.
  *
  * @author Thomas Down
+ * @author Thad Welch
+ * Added header info to sequence annotation. The annotation key is the EMBEL tag,
+ * (i.e. 'ID') and the value is a concatenation of all lines.substring(5) with the same
+ * tag.
  */
 
 public class EmblFormat implements SequenceFormat, Serializable {
@@ -147,7 +151,7 @@ class EmblContext {
 	
 	if (features.inFeature() && !(tag.equals("FT")))
 	    features.endFeature();
-	
+
 	if (tag.equals("AC")) {
 	    String acc= line.substring(5, line.length()-1);
 	    StringTokenizer toke = new StringTokenizer(acc, "; ");
@@ -158,14 +162,29 @@ class EmblContext {
 		// Has a featureType field -- should be a new feature
 		if (features.inFeature())
 		    features.endFeature();
-		
+
 		features.startFeature(line.substring(5, 20).trim());
 		// featureData(line.substring(21));
-	    } 
-	    features.featureData(line.substring(21));  
-	}
+	    }
+	    features.featureData(line.substring(21));
+	} else if ( !tag.equals( "  " ) && !tag.equals( "XX" ) ) {
+    processHeaderLine( tag, line );
+  }
     }
-    
+
+  private void processHeaderLine( String tag, String line )
+  {
+    String tagText = "";
+    try {
+      tagText = (String)annotation.getProperty( tag );
+    } catch( NoSuchElementException  ignored ) {}
+
+    if ( line.length() > 4 ) {
+      tagText += line.substring(5);
+      annotation.setProperty( tag, tagText );
+    }
+  }
+
     void processSeqLine(String line) throws IllegalSymbolException {
 	StringTokenizer st = new StringTokenizer(line);
 	while(st.hasMoreTokens()) {
@@ -180,11 +199,11 @@ class EmblContext {
 	    }
 	}
     }
-    
+
     Sequence makeSequence() throws BioException {
 	Sequence ss;
 	String primaryAcc = "unknown";
-	
+
 	if (accession.size() > 0) {
 	    primaryAcc = (String) accession.get(0);
 	    annotation.setProperty("embl_accessions", accession);

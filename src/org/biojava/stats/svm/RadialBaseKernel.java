@@ -39,9 +39,14 @@ public class RadialBaseKernel extends NestedKernel {
     private double width;
 
     public RadialBaseKernel() {
-      width = 1.0;
+      this(null, 1.0);
     }
 
+    public RadialBaseKernel(SVMKernel nested, double width) {
+      super(nested);
+      this.width = width;
+    }
+    
     public double evaluate(Object a, Object b) {
       SVMKernel k = getNestedKernel();
       double w = getWidth();
