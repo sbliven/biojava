@@ -119,7 +119,7 @@ public interface ChangeListener extends EventListener {
         new ChangeVetoException(
           cev, "This object has been locked"
         ),
-        "Assertion failure: A locked object has been modified"
+        "Assertion Failure: A locked object has been modified"
       );
     }
   }
