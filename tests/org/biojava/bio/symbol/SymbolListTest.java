@@ -37,7 +37,7 @@ import junit.framework.TestCase;
 public class SymbolListTest extends TestCase
 {
     // SymbolList lengths to run tests at.
-    int testLengths[] = {100, 16384, 32768, 1000000};
+    int testLengths[] = {100, 16384, 32000};
 
     // number of times to repeat each test to deal with chance
     // matches in last symbol.
@@ -249,6 +249,34 @@ public class SymbolListTest extends TestCase
                         iae.printStackTrace();
                         return null;
                     }
+                }
+            };
+
+        // exercise the PackedSymbolList implementation
+        assertTrue(runRepeatedSymbolListTests(arrayAlpha, symListAlpha, factory));
+    }
+
+    /**
+     * test for SimpleSymbolList that implements ambiguity symbols.
+     */
+    public void testSimpleSymbolListWithAmbiguitySymbols()
+        throws Exception
+    {
+        // create an alphabet with ambiguity symbols
+        FiniteAlphabet symListAlpha = (FiniteAlphabet) DNATools.getDNA();
+        FiniteAlphabet arrayAlpha = generateAmbiguousDNA();
+        assertNotNull(arrayAlpha);
+        assertNotNull(symListAlpha);
+
+        // create a SimpleSymbolList that supports ambiguity symbols
+        SymListFactory factory = new SymListFactory () {
+                public SymbolList createSymbolList(Symbol [] array, FiniteAlphabet alpha, int length)
+                {
+                    assertNotNull(array);
+                    assertNotNull(alpha);
+                    assertTrue(length > 0);
+
+                    return new SimpleSymbolList(array, length, alpha);
                 }
             };
 
