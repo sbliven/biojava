@@ -34,13 +34,13 @@ import java.util.*;
  * custom ResidueList implementations to be wrapped.
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
 public class SimpleSequence extends SimpleResidueList 
                             implements Sequence, MutableFeatureHolder 
 {
   protected static List templateClassToFeatureClass;
   public static void addFeatureImplementation(TemplateFeature tf) {
-      System.err.println("Adding " + tf.templateClass.getName());
     templateClassToFeatureClass.add(0, tf);
   }
   
