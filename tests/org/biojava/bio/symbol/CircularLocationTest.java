@@ -22,6 +22,7 @@
 package org.biojava.bio.symbol;
 
 import junit.framework.TestCase;
+import java.util.*;
 
 /**
  * <code>CircularLocationTest</code> tests the behaviour of
@@ -163,6 +164,40 @@ public class CircularLocationTest extends TestCase
         assertEquals(r1, LocationTools.union(r1, r1));
         assertEquals(LocationTools.union(r1, r2),
                      LocationTools.union(r2, r1));
+
+        CircularLocation[] locs = new CircularLocation[3];
+        locs[0] = LocationTools.makeCircularLocation(13,14,20);
+        locs[1] = LocationTools.makeCircularLocation(18,4,20);
+        locs[2] = (CircularLocation)LocationTools.union(locs[0], locs[1]);
+
+        assertTrue(locs[2].get5PrimeEnd() == 13);
+
+
+        //test a more complex union
+        ArrayList al = new ArrayList();
+        al.add(LocationTools.makeCircularLocation(5,8,20));
+        al.add(LocationTools.makeCircularLocation(7,16,20));
+        al.add(LocationTools.makeCircularLocation(19,2, 20));
+
+        CircularLocation loc = (CircularLocation)LocationTools.union(al);
+        assertTrue(loc.get5PrimeEnd() == 5);
+        assertTrue(loc.overlapsOrigin());
+
+
+        //check the components
+        Iterator blocki = loc.blockIterator();
+        Location locA = (Location)blocki.next();
+        assertTrue(locA.getMin() == 1);
+        assertTrue(locA.getMax() == 2);
+        Location locB = (Location)blocki.next();
+        assertTrue(locB.getMin() == 5);
+        assertTrue(locB.getMax() == 16);
+        Location locC = (Location)blocki.next();
+        assertTrue(locC.getMin() == 19);
+        assertTrue(locC.getMax() == 20);
+        //shouldn't be more
+        assertTrue(blocki.hasNext() == false);
+
     }
 
     /**

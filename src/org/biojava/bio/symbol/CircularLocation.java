@@ -24,6 +24,7 @@ import java.util.*;
 
 
 import org.biojava.bio.*;
+import org.biojava.utils.*;
 
 
 
@@ -40,8 +41,8 @@ import org.biojava.bio.*;
  * there is no logical value for a min or max on a circular sequence).
  * </p>
  *  <p>
- * The symbols() method has been overridden to handle the weirdness of a location crossing the
- * origin.
+ * The symbols() method has been overridden to handle the weirdness of a
+ * location crossing the origin.
  * </p>
  *
  * @author Matthew Pocock
@@ -55,6 +56,7 @@ extends AbstractLocationDecorator {
 
   private final int length;
   private int fivePrimeEnd;
+  private LinkedList fivePrimeSortedBlocks;
 
   private final boolean overlaps;
 
@@ -95,10 +97,22 @@ extends AbstractLocationDecorator {
     this.overlaps = CircularLocationTools.overlapsOrigin(this);
 
     //the 5' end must be the min of one of the blocks of the wrapped location
+    fivePrimeSortedBlocks = new LinkedList();
     for(Iterator i = wrapped.blockIterator(); i.hasNext();){
-      if( ((Location)i.next()).getMin() == fivePrimeEnd){
+      Location loc = (Location)i.next();
+      fivePrimeSortedBlocks.add(loc);
+      if(loc.getMin() == fivePrimeEnd){
         this.fivePrimeEnd = fivePrimeEnd;
       }
+    }
+
+    //reorder blocks so that block with 5' end is the first block
+    Collections.sort(fivePrimeSortedBlocks, Location.naturalOrder);
+    //check the first item to see if it is the five prime end
+    while(((Location)fivePrimeSortedBlocks.getFirst()).getMin() != get5PrimeEnd()){
+      //pop it off and send it to the back of the list
+      Object o = fivePrimeSortedBlocks.removeFirst();
+      fivePrimeSortedBlocks.addLast(o);
     }
 
     if(get5PrimeEnd() == 0){
@@ -165,6 +179,7 @@ extends AbstractLocationDecorator {
 
 
   public String toString(){
+    //fixme to use 5' iterator
 
     StringBuffer sb = new StringBuffer(getWrapped().toString());
 
@@ -180,11 +195,25 @@ extends AbstractLocationDecorator {
    * the origin are wrapped CompoundLocations they are not considered contiguous.
    * This is desirable from the point of view of logical operations as it greatly
    * simplifies the calculations of things such as contains, overlaps etc.
+   * @return true if the location is contiguous and doesn't overlap the origin
    */
   public boolean isContiguous() {
     return getWrapped().isContiguous();
   }
 
+  /**
+   * The point at which indicates the 5' end of the Location. This is needed as
+   * compound circular locations have polarity. For example (18..30, 1..12) is
+   * not the same as (1..12, 18..30). The 5' coordinate is derived during
+   * construction of the Location. In particular during a union operation
+   * the 5' coordinate is generally the 5' coordinate of the first location in
+   * the union. In the case where this cannot be logically maintained the 5'
+   * coordinate will revert to <code>getMin()</code>
+   *
+   * @return the most 5' coordinate
+   * @see fivePrimeBlockIterator()
+   * @see getMin()
+   */
   public int get5PrimeEnd(){
     return fivePrimeEnd;
   }
@@ -192,54 +221,34 @@ extends AbstractLocationDecorator {
 
   public SymbolList symbols(SymbolList seq) {
     SymbolList syms;
+    Edit ed;
 
-    //currently overlaps are stored as pseudo compound locations
-    if(getWrapped() instanceof CompoundLocation && overlapsOrigin()){
-      CompoundLocation loc = (CompoundLocation)getWrapped();
+    //iterate over the Locations from the 5' end
+    ListIterator i = this.fivePrimeBlockIterator();
+    syms = ((Location)i.next()).symbols(seq);
 
-      /*
-       * for purposes of constructing the SymbolList the first location
-       * on the list is really merged to the last vis a vis the use of
-       * a psuedo CompoundLocation.
-       */
-      LinkedList ll = new LinkedList(loc.getBlockList());
-      Object o = ll.removeFirst();
-      ll.addLast(o);
-
-      List residues = new ArrayList();
-      for (Iterator i = ll.listIterator(); i.hasNext(); ) {
-        Location subloc = (Location)i.next();
-        residues.addAll(seq.subList(subloc.getMin(), subloc.getMax()).toList());
-      }
-
+    while(i.hasNext()){
+      Location loc = (Location)i.next();
+      SymbolList add = loc.symbols(seq);
+      ed = new Edit(syms.length()+1,0,add);
       try {
-        syms = new SimpleSymbolList(seq.getAlphabet(), residues);
+        syms.edit(ed);
       }
-      catch (IllegalSymbolException ex) {
-        throw new BioError(ex, "Failure to build a SymbolList from its own Symbols!?");
+      catch (Exception ex) {
+        throw new BioError(ex,"Illegal edit operation");
       }
-      return syms;
     }
+    return syms;
+  }
 
-    else if(overlapsOrigin()){
-      if(getMin() == 1 && getMax() == length){
-        //no special treatment needed
-        return seq;
-      }
-      List l = new ArrayList(seq.subList(this.getMin(), seq.length()).toList());
-      l.addAll(seq.subList(1, this.getMax()).toList());
-
-      try {
-        syms = new SimpleSymbolList(seq.getAlphabet(), l);
-      }
-      catch (IllegalSymbolException ex) {
-        throw new BioError(ex, "Failure to build a SymbolList from its own Symbols!?");
-      }
-      return syms;
-    }
-
-    //otherwise
-    return super.symbols(seq);
+  /**
+   * Iterates over the location blocks in order starting with the most 5'
+   * @see blockIterator()
+   * @see get5PrimeEnd()
+   * @return a ListIterator
+   */
+  public ListIterator fivePrimeBlockIterator() {
+    return fivePrimeSortedBlocks.listIterator();
   }
 
 }

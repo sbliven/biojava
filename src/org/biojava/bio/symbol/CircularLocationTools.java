@@ -97,7 +97,7 @@ final class CircularLocationTools {
           locA = new RangeLocation(1,rmax - seqLength);
         }
         compound = LocationTools.union(locA,locB);
-        return new CircularLocation(compound,seqLength);
+        return new CircularLocation(compound,seqLength, rmin);
       }
   }
 

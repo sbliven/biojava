@@ -519,15 +519,30 @@ final public class LocationTools {
      */
 
     public static Location union(Collection locs) {
+        boolean circular = false;
         List locList = new ArrayList();
         for (Iterator li = locs.iterator(); li.hasNext(); ) {
             Location loc = (Location) li.next();
-            for (Iterator bi = loc.blockIterator(); bi.hasNext(); ) {
+            if((loc instanceof CircularLocation)){
+              circular = true;
+              locList.add(loc);
+            }else{
+              for (Iterator bi = loc.blockIterator(); bi.hasNext(); ) {
                 locList.add(bi.next());
+              }
             }
         }
-
-        return _union(locList);
+        if(circular){
+          //need to add these one at a time
+          ListIterator li = locList.listIterator();
+          CircularLocation loc = (CircularLocation)li.next();
+          while(li.hasNext()){
+            loc = (CircularLocation)union(loc, (Location)li.next());
+          }
+          return loc;
+        }else{
+          return _union(locList);
+        }
     }
 
 

@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.impl.*;
+import java.util.*;
 
 /**
  * <code>CircularSequenceTest</code> tests are to ensure that the <code>CircularView</code>
@@ -62,7 +63,20 @@ public class CircularSequenceTest extends TestCase
       assertEquals("atcgctcaga", cloc.symbols(dna).seqString());
 
       cloc = LocationTools.makeCircularLocation(9,1,dna.length());
+      assertTrue(cloc.get5PrimeEnd() == 9);
       assertEquals("gaa", cloc.symbols(dna).seqString());
+
+      // a more tricky case
+      ArrayList l = new ArrayList();
+      //this is the most 5'
+      l.add(LocationTools.makeCircularLocation(5,6, dna.length()));
+      //this is not the most 5'
+      l.add(LocationTools.makeCircularLocation(9,1,dna.length()));
+      l.add(LocationTools.makeCircularLocation(3,3, dna.length()));
+
+      cloc = (CircularLocation)LocationTools.union(l);
+      assertTrue(cloc.get5PrimeEnd() == 5);
+      assertEquals("ctgaac", cloc.symbols(dna).seqString());
     }
 
 
