@@ -93,7 +93,7 @@ public class XMLBeans {
 		    String name = echild.getAttribute("name");
 		    String ref = echild.getAttribute("ref");
 		    Object targ = null;
-		    if (ref != null) {
+		    if (! ref.equals("")) {
 			targ = refs.get(ref);
 		    } else {
 			targ = instantiateBean(echild);
