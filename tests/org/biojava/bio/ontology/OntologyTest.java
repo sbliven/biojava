@@ -55,10 +55,10 @@ public class OntologyTest extends TestCase {
         sprocket = onto.createTerm("sprocket", "");
         widget = onto.createTerm("widget", "");
         blueWidget = onto.createTerm("blueWidget", "");
-        isa = onto.importTerm(relations, master_isa);
-        partof = onto.importTerm(relations, master_partof);
+        isa = onto.importTerm(master_isa);
+        partof = onto.importTerm(master_partof);
         
-        dummy = new Term.Impl("dummy", "Silly dummy term");
+        dummy = new Ontology.Impl("", "").createTerm("dummy", "Silly dummy term");
         
         onto.createTriple(sprocket, machine, partof);
         onto.createTriple(widget, machine, partof);
