@@ -108,7 +108,7 @@ public class GAMEAnnotationHandler
             super.endElementHandler(nsURI, localName, qName, contentHandler);
 
             try {
-                listener.addFeatureProperty(db_xref_db, db_xref_id);
+                listener.addFeatureProperty("dbxref", "dbxref:" + db_xref_db + "//" + db_xref_id);
             }
             catch (ParseException pe) {
                 pe.printStackTrace();
@@ -168,8 +168,6 @@ public class GAMEAnnotationHandler
         super.addHandler(new ElementRecognizer.ByLocalName("gene"),
                 GAMEGeneHandler.GAME_GENE_HANDLER_FACTORY);
         // <feature_set>
-//        super.addHandler(new ElementRecognizer.ByLocalName("feature_set"),
-//                GAMEFeatureSetHandler.GAME_FEATURE_SET_HANDLER_FACTORY);
         super.addHandler(new ElementRecognizer.ByLocalName("feature_set"),
             new StAXHandlerFactory() {
                 public StAXContentHandler getHandler(StAXFeatureHandler staxenv) {
@@ -186,8 +184,11 @@ public class GAMEAnnotationHandler
             }
         );
         // <Aspect>
-//        super.addHandler(new ElementRecognizer.ByLocalName("aspect"),
-//                GAMEAspectHandler.GAME_ASPECT_HANDLER_FACTORY);
+        super.addHandler(new ElementRecognizer.ByLocalName("aspect"),
+                GAMEAspectHandler.GAME_ASPECT_HANDLER_FACTORY);
+        // <property>
+        super.addHandler(new ElementRecognizer.ByLocalName("property"),
+                GAMEPropertyHandler.GAME_PROPERTY_HANDLER_FACTORY);
     }
 
 
