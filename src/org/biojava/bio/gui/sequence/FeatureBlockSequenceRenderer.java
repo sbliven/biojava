@@ -46,6 +46,7 @@ import java.util.List;
  *
  * @author Matthew Pocock
  * @author Keith James
+ * @author Thomas Down
  */
 public class FeatureBlockSequenceRenderer extends AbstractChangeable
     implements SequenceRenderer {
@@ -54,8 +55,14 @@ public class FeatureBlockSequenceRenderer extends AbstractChangeable
                        "org.biojava.bio.gui.sequence.FeatureBlockSequenceRenderer",
                        "FEATURE_RENDERER",
                        SequenceRenderContext.LAYOUT);
+    public static ChangeType FEATURE_COLLAPSING =
+        new ChangeType("Changed whether the render collapses when no features are visible",
+                       "org.biojava.bio.gui.sequence.FeatureBlockSequenceRenderer",
+                       "FEATURE_COLLAPSING",
+                       SequenceRenderContext.LAYOUT);
   
     private FeatureRenderer renderer;
+    private boolean isCollapsing = true;;
     private transient ChangeForwarder rendForwarder;
 
     protected ChangeSupport getChangeSupport(ChangeType ct) {
@@ -142,13 +149,50 @@ public class FeatureBlockSequenceRenderer extends AbstractChangeable
             this.renderer = renderer;
         }
     }
+    
+    /**
+     * Specifies if the renderer should collapse to zero depth when no
+     * features are visible (default <code>true</code>).
+     *
+     * @since 1.3
+     */
+    
+    public void setCollapsing(boolean b) 
+        throws ChangeVetoException
+    {
+        if (hasListeners()) {
+            ChangeSupport cs = getChangeSupport(FEATURE_COLLAPSING);
+            synchronized (cs) {
+                ChangeEvent ce = new ChangeEvent(this,
+                                                 FEATURE_COLLAPSING,
+                                                 new Boolean(this.isCollapsing),
+                                                 new Boolean(b));
+                cs.firePreChangeEvent(ce);
+                this.isCollapsing = b;
+                cs.firePostChangeEvent(ce);
+            }
+        } else {
+            this.isCollapsing = b;
+        }                                        
+    }
+    
+    /**
+     * Returns <code>true</code> if this class collapses to zero depth when there are
+     * no visible features.
+     *
+     * @since 1.3
+     */
+    
+    public boolean getCollapsing() {
+        return isCollapsing;
+    }
 
     public double getDepth(SequenceRenderContext src) {
         FeatureHolder features = src.getFeatures();
         FeatureFilter filter =
             new FeatureFilter.OverlapsLocation(src.getRange());
         FeatureHolder fh = features.filter(filter, false);
-        if (fh.countFeatures() > 0) {
+        if (!isCollapsing || fh.countFeatures() > 0) {
             return renderer.getDepth(src);
         } else {
             return 0.0;
