@@ -57,7 +57,7 @@ import org.biojava.utils.*;
  */
 
 public class SubSequence
-        implements Sequence
+        implements Sequence, java.io.Serializable
 {
   private final Sequence parent;
   private final SymbolList symbols;
