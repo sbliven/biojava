@@ -88,7 +88,7 @@ public interface FeatureFilter extends Serializable {
    * @since 1.0
    */
   public final static class Not implements FeatureFilter {
-    static { WalkerFactory.getInstance().addFilterWithParent(Not.class); }
+    static { WalkerFactory.getInstance().addTypeWithParent(Not.class); }
 
     FeatureFilter child;
 
@@ -127,7 +127,7 @@ public interface FeatureFilter extends Serializable {
    * @since 1.0
    */
   public final static class And implements FeatureFilter {
-    static { WalkerFactory.getInstance().addFilterWithParent(And.class); }
+    static { WalkerFactory.getInstance().addTypeWithParent(And.class); }
 
     FeatureFilter c1, c2;
 
@@ -173,7 +173,7 @@ public interface FeatureFilter extends Serializable {
    * @since 1.0
    */
   public final static class Or implements FeatureFilter {
-    static { WalkerFactory.getInstance().addFilterWithParent(Or.class); }
+    static { WalkerFactory.getInstance().addTypeWithParent(Or.class); }
 
     FeatureFilter c1, c2;
 
@@ -442,7 +442,7 @@ public interface FeatureFilter extends Serializable {
         (o instanceof StrandFilter) &&
         (((StrandFilter) o).getStrand() == this.getStrand());
     }
-    
+
     public int hashCode() {
       return getStrand().hashCode();
     }
@@ -462,7 +462,7 @@ public interface FeatureFilter extends Serializable {
       );
     }
   }
-  
+
   /**
    * Accept features that reside on a sequence with a particular name.
    *
@@ -472,23 +472,23 @@ public interface FeatureFilter extends Serializable {
   public final static class BySequenceName
   implements OptimizableFilter {
     private String seqName;
-    
+
     public BySequenceName(String seqName) {
       this.seqName = seqName;
     }
-    
+
     public String getSequenceName() {
       return seqName;
     }
-    
+
     public boolean accept(Feature f) {
       return f.getSequence().getName().equals(seqName);
     }
-    
+
     public boolean isProperSubset(FeatureFilter sup) {
       return equals(sup);
     }
-    
+
     public boolean isDisjoint(FeatureFilter filt) {
         if (filt instanceof BySequenceName) {
             return !equals(this);
@@ -502,12 +502,12 @@ public interface FeatureFilter extends Serializable {
        (o instanceof BySequenceName) &&
        ((BySequenceName) o).getSequenceName().equals(seqName);
     }
-    
+
     public int hashCode() {
       return seqName.hashCode();
     }
   }
-  
+
   /**
    *  A filter that returns all features contained within a location.
    *
@@ -653,12 +653,12 @@ public interface FeatureFilter extends Serializable {
       }
       return (filt instanceof AcceptNoneFilter);
     }
-    
+
     public String toString() {
       return "Overlaps(" + loc + ")";
     }
   }
-  
+
   /**
    *  A filter that accepts all features whose shadow overlaps a specified
    * <code>Location</code>.  The shadow is defined as the interval between the
@@ -676,7 +676,7 @@ public interface FeatureFilter extends Serializable {
    * @author Thomas Down
    * @since 1.3
    */
-   
+
   public final static class ShadowOverlapsLocation implements OptimizableFilter {
     private Location loc;
 
@@ -735,12 +735,12 @@ public interface FeatureFilter extends Serializable {
       }
       return (filt instanceof AcceptNoneFilter);
     }
-    
+
     public String toString() {
       return "ShadowOverlaps(" + loc + ")";
     }
   }
-  
+
   /**
    *  A filter that accepts all features whose shadow is contained by a specified
    * <code>Location</code>.  The shadow is defined as the interval between the
@@ -825,7 +825,7 @@ public interface FeatureFilter extends Serializable {
       return "ShadowContainedBy(" + loc + ")";
     }
   }
-  
+
   /**
    * A filter that returns all features that have an annotation bundle that is of a given
    * annotation type.
@@ -837,40 +837,40 @@ public interface FeatureFilter extends Serializable {
   public static class ByAnnotationType
   implements OptimizableFilter {
     private AnnotationType type;
-    
+
     protected ByAnnotationType() {
       this(AnnotationType.ANY);
     }
-    
+
     public ByAnnotationType(AnnotationType type) {
       this.type = type;
     }
-    
+
     public AnnotationType getType() {
       return type;
     }
-    
+
     protected void setType(AnnotationType type) {
       this.type = type;
     }
-    
+
     public boolean accept(Feature f) {
       return type.instanceOf(f.getAnnotation());
     }
-    
+
     public boolean equals(Object o) {
       if(o instanceof ByAnnotationType) {
         ByAnnotationType that = (ByAnnotationType) o;
         return this.getType() == that.getType();
       }
-      
+
       return false;
     }
-    
+
     public int hashCode() {
       return getType().hashCode();
     }
-    
+
     public boolean isDisjoint(FeatureFilter filter) {
       if(filter instanceof AcceptNoneFilter) {
         return true;
@@ -883,7 +883,7 @@ public interface FeatureFilter extends Serializable {
         allProps.addAll(ourProps);
         for(Iterator i = allProps.iterator(); i.hasNext(); ) {
           Object prop = i.next();
-          
+
           CollectionConstraint thisC = this.getType().getConstraint(prop);
           CollectionConstraint thatC = that.getType().getConstraint(prop);
           if (AnnotationTools.intersection(thisC, thatC) == CollectionConstraint.NONE) {
@@ -891,10 +891,10 @@ public interface FeatureFilter extends Serializable {
           }
         }
       }
-      
+
       return false;
     }
-    
+
     public boolean isProperSubset(FeatureFilter filter) {
       if(filter instanceof ByAnnotationType) {
         ByAnnotationType that = (ByAnnotationType) filter;
@@ -903,27 +903,27 @@ public interface FeatureFilter extends Serializable {
         Set thatProps = that.getType().getProperties();
         for(Iterator i = thatProps.iterator(); i.hasNext(); ) {
           Object prop = i.next();
-          
+
           if(!thisProps.contains(prop)) {
             return false;
           }
-         
+
           CollectionConstraint thisP = this.getType().getConstraint(prop);
           CollectionConstraint thatP = that.getType().getConstraint(prop);
-          
+
           if(
             !thatP.subConstraintOf(thisP)
           ) {
             return false;
           }
         }
-        
+
         return true;
       }
-      
+
       return false;
     }
-    
+
     public String toString() {
       return "ByAnnotationType {" + type + "}";
     }
@@ -951,7 +951,7 @@ public interface FeatureFilter extends Serializable {
     public ByAnnotation(Object key, Object value) {
       this.key = key;
       this.value = value;
-      
+
       AnnotationType.Impl type = new AnnotationType.Impl();
       type.setConstraints(
         key,
@@ -969,7 +969,7 @@ public interface FeatureFilter extends Serializable {
       return value;
     }
   }
-  
+
   /**
    * Retrieve features that contain a given annotation, and that the set of values
    * contains the value given.
@@ -993,7 +993,7 @@ public interface FeatureFilter extends Serializable {
     public AnnotationContains(Object key, Object value) {
       this.key = key;
       this.value = value;
-      
+
       AnnotationType.Impl type = new AnnotationType.Impl();
       type.setConstraint(
         key,
@@ -1033,7 +1033,7 @@ public interface FeatureFilter extends Serializable {
      */
     public HasAnnotation(Object key) {
       this.key = key;
-      
+
       AnnotationType.Impl type = new AnnotationType.Impl();
       type.setConstraints(
         key,
@@ -1059,7 +1059,7 @@ public interface FeatureFilter extends Serializable {
      */
 
     public static class ByParent implements OptimizableFilter, Up {
-      static { WalkerFactory.getInstance().addFilterWithParent(ByParent.class); }
+      static { WalkerFactory.getInstance().addTypeWithParent(ByParent.class); }
 
         private FeatureFilter filter;
 
@@ -1106,7 +1106,7 @@ public interface FeatureFilter extends Serializable {
             } else {
                 return false;
             }
-        } 
+        }
 
         public boolean isDisjoint(FeatureFilter ff) {
             // System.err.println("Disjunction test for " + toString());
@@ -1132,7 +1132,7 @@ public interface FeatureFilter extends Serializable {
                     );
                 }
             }
-            
+
             return false;
         }
     }
@@ -1149,7 +1149,7 @@ public interface FeatureFilter extends Serializable {
      */
 
     public static class ByAncestor implements OptimizableFilter, Up {
-      static { WalkerFactory.getInstance().addFilterWithParent(ByAncestor.class); }
+      static { WalkerFactory.getInstance().addTypeWithParent(ByAncestor.class); }
 
         private FeatureFilter filter;
 
@@ -1207,7 +1207,7 @@ public interface FeatureFilter extends Serializable {
             if (ff instanceof IsTopLevel) {
                 return true;
             }
-            
+
             if (ff instanceof FeatureFilter.ByParent) {
                 return FilterUtils.areDisjoint(
                         ((FeatureFilter.ByParent) ff).getFilter(),
@@ -1226,7 +1226,7 @@ public interface FeatureFilter extends Serializable {
                             ff
                     );
                 }
-                
+
                 FeatureFilter childFilter = FilterUtils.getOnlyChildrenFilter(getFilter());
                 if (childFilter != null) {
                     // System.err.println("Child filter is: " + childFilter.toString());
@@ -1248,10 +1248,10 @@ public interface FeatureFilter extends Serializable {
                     }
                 }
             }
-            
+
             return false;
         }
-        
+
         public String toString() {
             return "ByAncestor(" + getFilter().toString() + ")";
         }
@@ -1259,26 +1259,26 @@ public interface FeatureFilter extends Serializable {
 
     /**
      * Accepts features where all immediate children meet the supplied filter.  This
-     * will be <code>true</code> in the case where no child features exist.  Mainly useful 
+     * will be <code>true</code> in the case where no child features exist.  Mainly useful
      * for defining schemas of feature-trees.
      *
      * @author Thomas Down
      * @since 1.3
      */
-     
+
     public static class OnlyChildren implements OptimizableFilter, ByHierarchy {
-      static { WalkerFactory.getInstance().addFilterWithParent(OnlyChildren.class); }
+      static { WalkerFactory.getInstance().addTypeWithParent(OnlyChildren.class); }
 
         private FeatureFilter filter;
-        
+
         public OnlyChildren(FeatureFilter ff) {
             this.filter = ff;
         }
-        
+
         public FeatureFilter getFilter() {
             return filter;
         }
-        
+
         public boolean accept(Feature f) {
             for (Iterator i = f.features(); i.hasNext(); ) {
                 if (!filter.accept((Feature) i.next())) {
@@ -1287,11 +1287,11 @@ public interface FeatureFilter extends Serializable {
             }
             return true;
         }
-        
+
         public int hashCode() {
             return filter.hashCode() + 762;
         }
-        
+
         public boolean equals(Object o) {
             if (! (o instanceof FeatureFilter.OnlyChildren)) {
                 return false;
@@ -1300,7 +1300,7 @@ public interface FeatureFilter extends Serializable {
             FeatureFilter.OnlyChildren ffoc = (FeatureFilter.OnlyChildren) o;
             return ffoc.getFilter().equals(filter);
         }
-        
+
         public boolean isProperSubset(FeatureFilter ff) {
             if (ff == FeatureFilter.all) {
                 return true;
@@ -1318,7 +1318,7 @@ public interface FeatureFilter extends Serializable {
                 return false;
             }
         }
-        
+
         public boolean isDisjoint(FeatureFilter ff) {
             if (ff instanceof ByChild) {
                 return FilterUtils.areDisjoint(
@@ -1329,42 +1329,42 @@ public interface FeatureFilter extends Serializable {
                 return false;
             }
         }
-        
+
         public String toString() {
             return "OnlyChildren(" + filter.toString() + ")";
         }
     }
-    
+
     /**
      * Accepts features where all descendants meet the supplied filter.  This
-     * will be <code>true</code> in the case where no child features exist.  Mainly useful 
+     * will be <code>true</code> in the case where no child features exist.  Mainly useful
      * for defining schemas of feature-trees.
      *
      * @author Thomas Down
      * @since 1.3
      */
-     
+
     public static class OnlyDescendants implements OptimizableFilter, ByHierarchy {
-      static { WalkerFactory.getInstance().addFilterWithParent(OnlyDescendants.class); }
+      static { WalkerFactory.getInstance().addTypeWithParent(OnlyDescendants.class); }
 
         private FeatureFilter filter;
-        
+
         public OnlyDescendants(FeatureFilter ff) {
             this.filter = ff;
         }
-        
+
         public FeatureFilter getFilter() {
             return filter;
         }
-        
+
         public boolean accept(Feature f) {
             return f.filter(FeatureFilter.all).countFeatures() == f.filter(filter).countFeatures();
         }
-        
+
         public int hashCode() {
             return filter.hashCode() + 763;
         }
-        
+
         public boolean equals(Object o) {
             if (! (o instanceof FeatureFilter.OnlyDescendants)) {
                 return false;
@@ -1373,8 +1373,8 @@ public interface FeatureFilter extends Serializable {
             FeatureFilter.OnlyDescendants ffoc = (FeatureFilter.OnlyDescendants) o;
             return ffoc.getFilter().equals(filter);
         }
-        
-        
+
+
         public boolean isProperSubset(FeatureFilter ff) {
             if (ff == FeatureFilter.all) {
                 return true;
@@ -1387,7 +1387,7 @@ public interface FeatureFilter extends Serializable {
                 return false;
             }
         }
-        
+
         public boolean isDisjoint(FeatureFilter ff) {
             if (ff instanceof ByChild) {
                 return FilterUtils.areDisjoint(
@@ -1404,7 +1404,7 @@ public interface FeatureFilter extends Serializable {
             }
         }
     }
-    
+
     /**
      * Filter by applying a nested <code>FeatureFilter</code> to the
      * child features.  Always <code>false</code> if there are no children.
@@ -1415,7 +1415,7 @@ public interface FeatureFilter extends Serializable {
      */
 
     public static class ByChild implements OptimizableFilter, Down {
-      static { WalkerFactory.getInstance().addFilterWithParent(ByChild.class); }
+      static { WalkerFactory.getInstance().addTypeWithParent(ByChild.class); }
 
         private FeatureFilter filter;
 
@@ -1463,7 +1463,7 @@ public interface FeatureFilter extends Serializable {
             } else {
                 return false;
             }
-        } 
+        }
 
         public boolean isDisjoint(FeatureFilter ff) {
             if (ff instanceof IsLeaf) {
@@ -1498,7 +1498,7 @@ public interface FeatureFilter extends Serializable {
      */
 
     public static class ByDescendant implements OptimizableFilter, Down {
-      static { WalkerFactory.getInstance().addFilterWithParent(ByDescendant.class); }
+      static { WalkerFactory.getInstance().addTypeWithParent(ByDescendant.class); }
 
         private FeatureFilter filter;
 
@@ -1608,7 +1608,7 @@ public interface FeatureFilter extends Serializable {
     public int hashCode() {
         return frame.getFrame() + 99;
     }
-    
+
     public boolean equals(Object o) {
       return (o instanceof FrameFilter && ((FrameFilter) o).getFrame() == getFrame());
     }
@@ -1778,7 +1778,7 @@ public interface FeatureFilter extends Serializable {
                 return equals(sup);
             } else if (sup instanceof ByClass) {
                 return ((ByClass) sup).getTestClass().isAssignableFrom(ComponentFeature.class);
-            } else {    
+            } else {
                 return (sup instanceof AcceptAllFilter);
             }
         }
@@ -1798,14 +1798,14 @@ public interface FeatureFilter extends Serializable {
             return "ByComponentName(" + cname + ")";
         }
     }
-    
+
     /**
      * A filter which accepts only top-level Features.  This is true
      * is <code>getParent()</code> returns a <code>Sequence</code> instance.
      *
      * @since 1.3
      */
-    
+
     public static final FeatureFilter top_level = new IsTopLevel();
 
     /**
@@ -1813,48 +1813,48 @@ public interface FeatureFilter extends Serializable {
      *
      * @since 1.3
      */
-    
+
     public static final FeatureFilter leaf = new IsLeaf();
-    
+
     // Note: this implements OptimizableFilter, but cheats :-).  Consequently,
     // other optimizablefilters don't know anything about it.  The convenience
     // methods on FilterUtils give ByFeature a higher precedence to make
     // sure this works out.
-    
+
     /**
      * Accept only features which are equal to the specified feature
      *
      * @author Thomas Down
      * @since 1.3
      */
-    
+
     public static final class ByFeature implements OptimizableFilter {
         private final Feature feature;
-        
+
         public ByFeature(Feature f) {
             this.feature = f;
         }
-        
+
         public Feature getFeature() {
             return feature;
         }
-        
+
         public boolean accept(Feature f) {
             return f.equals(feature);
         }
-        
+
         public boolean isProperSubset(FeatureFilter ff) {
             return ff.accept(feature);
         }
-        
+
         public boolean isDisjoint(FeatureFilter ff) {
             return !ff.accept(feature);
         }
-        
+
         public int hashCode() {
             return feature.hashCode() + 65;
         }
-        
+
         public boolean equals(Object o) {
             if (o instanceof FeatureFilter.ByFeature) {
                 return ((FeatureFilter.ByFeature) o).getFeature().equals(feature);
