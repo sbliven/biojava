@@ -15,7 +15,7 @@ import java.util.*;
  * Loeffler</a> for the <a href="http://www.imp.univie.ac.at">IMP</a>
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  */
-public interface SeqSimilaritySearchResult extends Cloneable
+public interface SeqSimilaritySearchResult
 {
 
     /**
@@ -50,6 +50,4 @@ public interface SeqSimilaritySearchResult extends Cloneable
      * but may return an empty list.
      */
     List getHits();
-
-    Object clone();
 }

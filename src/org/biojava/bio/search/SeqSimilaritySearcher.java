@@ -16,7 +16,7 @@ import java.util.*;
  * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A> for the 
  *         <A href="http://www.imp.univie.ac.at">IMP</A>
  */
-public interface SeqSimilaritySearcher extends Cloneable {
+public interface SeqSimilaritySearcher {
   /**
    * return a set of all databases that can be searched with this sequence similarity searcher. This method reflects
    * the fact that objects of this type represent a particular installation of a searcher which has access to only a
@@ -55,6 +55,4 @@ public interface SeqSimilaritySearcher extends Cloneable {
    * 
    */
   SeqSimilaritySearchResult search(SymbolList querySeq, SequenceDB db, Map searchParameters) throws BioException;
-
-  Object clone();
 }

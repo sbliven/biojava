@@ -79,6 +79,7 @@ implements SymbolList {
 
   public String subStr(int start, int end) {
     StringBuffer sb = new StringBuffer();
+
     for (int i = start; i <= end; i++) {
       sb.append(symbolAt(i).getToken());
     }

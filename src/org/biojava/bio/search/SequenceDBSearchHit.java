@@ -173,10 +173,4 @@ public class SequenceDBSearchHit extends AbstractChangeable
 	return "SequenceDBSearchHit to " + getSequenceID()
 	    + " with score " + getScore();
     }
-
-    // As the object is immutable we can alias ourselves
-    public Object clone()
-    {
-	return this;
-    }
 }

@@ -383,9 +383,9 @@ public class FastaSearchBuilder implements SearchBuilder
     {
 	// System.out.println("dataMap: " + dataMap);
 
-	Integer alDispStart = (Integer) dataMap.get(name + "AlDispStart");
-	Integer alStart     = (Integer) dataMap.get(name + "AlStart");
-	Integer alStop      = (Integer) dataMap.get(name + "AlStop");    
+	Integer alDispStart = (Integer) dataMap.get(name + "al_display_start");
+	Integer alStart     = (Integer) dataMap.get(name + "al_start");
+	Integer alStop      = (Integer) dataMap.get(name + "al_stop");    
 
 	StringBuffer seqTokens =
 	    new StringBuffer((String) dataMap.get(name + "SeqTokens"));

@@ -15,7 +15,7 @@ import java.util.List;
  * Loeffler</a> for the <a href="http://www.imp.univie.ac.at">IMP</a>
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  */
-public interface SeqSimilaritySearchHit extends Cloneable
+public interface SeqSimilaritySearchHit
 {
 
   /**
@@ -66,6 +66,4 @@ public interface SeqSimilaritySearchHit extends Cloneable
      * guaranteed to contain at least 1 entry.
      */
     List getSubHits();
-
-    Object clone();
 }

@@ -14,7 +14,7 @@ import org.biojava.bio.symbol.Alignment;
  * Loeffler</a> for the <a href="http://www.imp.univie.ac.at">IMP</a>
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  */
-public interface SeqSimilaritySearchSubHit extends Cloneable
+public interface SeqSimilaritySearchSubHit
 {
 
     /**
@@ -58,6 +58,4 @@ public interface SeqSimilaritySearchSubHit extends Cloneable
      * sequence. May return null.
      */
     Alignment getAlignment();
-
-    Object clone();
 }

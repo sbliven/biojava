@@ -126,10 +126,4 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
 
 	return hCode;
     }
-
-    // As the object is immutable we can alias ourselves
-    public Object clone()
-    {
-	return this;
-    }
 }

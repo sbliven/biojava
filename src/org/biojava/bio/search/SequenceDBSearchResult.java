@@ -164,10 +164,4 @@ public class SequenceDBSearchResult extends AbstractChangeable
 	return "SequenceDBSearchResult of " + getQuerySequence()
 	    + " against " + getSequenceDB();
     }
-
-    // As the object is immutable we can alias ourselves
-    public Object clone()
-    {
-	return this;
-    }
 }
