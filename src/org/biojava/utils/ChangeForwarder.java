@@ -28,7 +28,7 @@ package org.biojava.utils;
  *
  * @author Matthew Pocock
  */
-public abstract class ChangeForwarder implements ChangeListener {
+public class ChangeForwarder implements ChangeListener {
   private final Object source;
   private final transient ChangeSupport changeSupport;
   
@@ -46,13 +46,22 @@ public abstract class ChangeForwarder implements ChangeListener {
    * The returned ChangeEvent is the event that will be fired, and should be
    * built from information in the original event. If it is null, then no event
    * will be fired.
+   * <P>
+   * The default implementation just constructs a ChangeEvent of the same type
+   * that chains back to ce.
    *
    * @param ce  the originating ChangeEvent
    * @return a new ChangeEvent to pass on, or null if no event should be sent
    * @throws ChangeVetoException if for any reason this event can't be handled
    */
-  protected abstract ChangeEvent generateEvent(ChangeEvent ce)
-  throws ChangeVetoException;
+  protected ChangeEvent generateEvent(ChangeEvent ce)
+  throws ChangeVetoException {
+    return new ChangeEvent(
+      getSource(), ce.getType(),
+      null, null,
+      ce
+    );
+  }
     
   public void preChange(ChangeEvent ce)
   throws ChangeVetoException {

@@ -39,6 +39,9 @@ import org.biojava.bio.seq.*;
 public class SimpleFeature
 extends AbstractChangeable
 implements Feature, RealizingFeatureHolder, java.io.Serializable {
+  private transient ChangeListener annotationForwarder;
+  private transient ChangeListener featureForwarder;
+  
   /**
    * The FeatureHolder that we will delegate the FeatureHolder interface too.
    * This is lazily instantiated.
@@ -76,8 +79,9 @@ implements Feature, RealizingFeatureHolder, java.io.Serializable {
    * @return  the FeatureHolder delegate
    */
   protected SimpleFeatureHolder getFeatureHolder() {
-    if(featureHolder == null)
+    if(featureHolder == null) {
       featureHolder = new SimpleFeatureHolder();
+    }
     return featureHolder;
   }
 
@@ -93,6 +97,40 @@ implements Feature, RealizingFeatureHolder, java.io.Serializable {
     return featureHolder != null;
   }
 
+  protected ChangeSupport getChangeSupport(ChangeType ct) {
+    ChangeSupport cs = super.getChangeSupport(ct);
+    
+    if(
+      (annotationForwarder == null) &&
+      (ct == null || ct == Annotatable.ANNOTATION)
+    ) {
+      annotationForwarder = new Annotatable.AnnotationForwarder(
+        this,
+        cs
+      );
+      getAnnotation().addChangeListener(
+        annotationForwarder,
+        Annotatable.ANNOTATION
+      );
+    }
+    
+    if(
+      (featureForwarder == null) &&
+      (ct == null || ct == FeatureHolder.FEATURES)
+    ) {
+      featureForwarder = new ChangeForwarder(
+        this,
+        cs
+      );
+      getFeatureHolder().addChangeListener(
+        featureForwarder,
+        FeatureHolder.FEATURES
+      );
+    }
+    
+    return cs;
+  }
+  
     public Location getLocation() {
 	return loc;
     }
