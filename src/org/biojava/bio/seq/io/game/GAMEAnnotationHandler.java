@@ -26,7 +26,6 @@ import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.genomic.Gene;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.program.das.*;
 
@@ -84,7 +83,7 @@ public class GAMEAnnotationHandler
 
   protected Feature.Template createTemplate() {
     // create Gene Template for this
-    Gene.Template gt = new Gene.Template();
+    StrandedFeature.Template gt = new StrandedFeature.Template();
 
     // set up annotation bundle
     gt.type = "gene";

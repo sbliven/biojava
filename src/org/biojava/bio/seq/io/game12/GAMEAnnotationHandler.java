@@ -18,7 +18,6 @@ import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.genomic.Gene;
 import org.biojava.bio.symbol.*;
 //import org.biojava.bio.program.das.*;
 
@@ -53,7 +52,7 @@ public class GAMEAnnotationHandler
     int annotationLocMin = Integer.MAX_VALUE;
     int annotationLocMax = Integer.MIN_VALUE;
 
-    Gene.Template annotationTemplate;
+    StrandedFeature.Template annotationTemplate;
 
     // subclass GAMEFeatureSetHandler to retrieve transcript info
     private class FeatureSetHandler extends GAMEFeatureSetHandler
@@ -250,7 +249,7 @@ public class GAMEAnnotationHandler
         // indicate start of sequence
         try {
 //            System.out.println("local name is " + localName);
-            annotationTemplate = new Gene.Template();
+            annotationTemplate = new StrandedFeature.Template();
             annotationTemplate.annotation = new SimpleAnnotation();
 
             // there should be an id in the attributes, get it

@@ -24,7 +24,6 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.genomic.Gene;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.program.das.*;
 import org.biojava.utils.*;
