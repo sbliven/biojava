@@ -31,9 +31,15 @@ import org.biojava.bio.CardinalityConstraint;
 import org.biojava.bio.CollectionConstraint;
 import org.biojava.bio.PropertyConstraint;
 
+// for structure alignments
+import org.biojava.bio.structure.Atom ;
+
 /**
  * Alignment object to contain/manage a DAS alignment.  
- * see also DAS specification at <a href="http://wwwdev.sanger.ac.uk/xml/das/documentation/new_spec.html">http://wwwdev.sanger.ac.uk/xml/das/documentation/new_spec.html</a>
+ * see also DAS specification at <a href="http://dev.sanger.ac.uk/xml/das/documentation/new_spec.html">http://www.sanger.ac.uk/xml/das/documentation/new_spec.html</a>
+ *
+ * supports also structure alignments
+ * (optional shift vector and rotation matrix for objects)
  *
  * @author Andreas Prlic
  * @since 1.4
@@ -43,17 +49,23 @@ public class Alignment {
     private List objects;
     private List scores;
     private List blocks;
-
+    private List vectors;
+    private List matrices ;
+    
     private static final AnnotationType objectType;
     private static final AnnotationType scoreType;
     private static final AnnotationType blockType;
     private static final AnnotationType segmentType;
+    private static final AnnotationType vectorType;
+    private static final AnnotationType matrixType;
     
     static {
 		objectType  = getObjectAnnotationType() ;	
 		scoreType   = getScoreAnnotationType()  ;
 		segmentType = getSegmentAnnotationType();
 		blockType   = getBlockAnnotationType()  ;
+		vectorType  = getVectorAnnotationType() ;
+		matrixType  = getMatrixAnnotationType() ;
     }
     
     /**
@@ -61,10 +73,54 @@ public class Alignment {
      */
     
     public Alignment() {
-		objects  = new ArrayList();
-		scores   = new ArrayList() ;
-		blocks   = new ArrayList() ;
+		objects   = new ArrayList() ;
+		scores    = new ArrayList() ;
+		blocks    = new ArrayList() ;
+		vectors   = new ArrayList() ;
+		matrices  = new ArrayList() ;
     }
+
+    /** define the shift vector annotation type
+     * @return an AnnotationType object representing the shift vector for an object
+     */
+    public static AnnotationType getVectorAnnotationType() {
+        AnnotationType annType ;
+	
+	annType  = new AnnotationType.Impl();
+	annType.setConstraints("intObjectId",
+			       new PropertyConstraint.ByClass(String.class),
+			       CardinalityConstraint.ONE ) ;
+
+	annType.setConstraints("vector",
+			       new PropertyConstraint.ByClass(Atom.class),
+			       CardinalityConstraint.ONE ) ;
+	return annType;
+    }
+
+    /** define the rotation matrix annotation type
+     * @return an AnnotationType object representing the rotation matrix for an object in a structure alignment.
+     */
+    public static AnnotationType getMatrixAnnotationType() {
+        AnnotationType annType ;
+	
+	annType  = new AnnotationType.Impl();
+	annType.setConstraints("intObjectId",
+			       new PropertyConstraint.ByClass(String.class),
+			       CardinalityConstraint.ONE ) ;
+
+	for ( int x=1; x<=3; x++){
+	    for ( int y=1; y<=3; y++){
+		String mat = "mat"+x+y;
+		//System.out.println(mat);
+		annType.setConstraints(mat,
+				       new PropertyConstraint.ByClass(String.class),
+				       CardinalityConstraint.ONE ) ;
+	    }
+	}
+
+	return annType;
+    }
+    
 
     /** define the alignment Score Annotation Type.
      *
@@ -189,7 +245,52 @@ public class Alignment {
 			       CardinalityConstraint.ANY );
 	return annType ;
     }
+
+    /** add Annotation of DAS alignment "vector" type.
+     *
+     @see #getVectorAnnotationType
+     *
+     * @param vector a vector
+     * @throws DASException ...
+    */
+
+    public void addVector(Annotation vector)
+		throws DASException
+    {
+	if(vectorType.instanceOf(vector)) {
+	    vectors.add(vector);
+	} else {
+	    throw new 
+		IllegalArgumentException(
+					 "Expecting an annotation conforming to: " +
+					 vectorType + " but got: " + vector
+					 );
+	}
+    }
     
+    /** add Annotation of DAS alignment "matrix" type.
+     *
+     @see #getMatrixAnnotationType
+     *
+     * @param matrix a matrix
+     * @throws DASException ...
+    */
+
+    public void addMatrix(Annotation matrix)
+		throws DASException
+    {
+	if(matrixType.instanceOf(matrix)) {
+	    matrices.add(matrix);
+	} else {
+	    throw new 
+		IllegalArgumentException(
+					 "Expecting an annotation conforming to: " +
+					 matrixType + " but got: " + matrix
+					 );
+	}
+    }
+
+
     /** add Annotation of DAS alignment "object" type.
      *
      @see #getObjectAnnotationType
@@ -221,6 +322,25 @@ public class Alignment {
      */
     public Annotation[] getObjects(){
         return (Annotation[]) objects.toArray(new Annotation[objects.size()]) ;
+    }
+
+    /**
+     * Returns the shift vectors.
+     *
+     * @return an array of shift vectors
+     */
+    public Annotation[] getVectors(){
+
+        return (Annotation[]) vectors.toArray(new Annotation[vectors.size()]) ;
+    }
+
+    /**
+     * Returns the matrices.
+     *
+     * @return an array of the matrices
+     */
+    public Annotation[] getMatrices(){
+        return (Annotation[]) matrices.toArray(new Annotation[matrices.size()]) ;
     }
 
     /** adds a "Score" Annotation. 
