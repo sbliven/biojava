@@ -35,7 +35,7 @@ import org.biojava.bio.*;
  * @since 1.1
  */
 
-public class EmblProcessor implements SequenceBuilder {
+public class EmblProcessor extends SequenceBuilderFilter {
     public static final String PROPERTY_EMBL_ACCESSIONS = "embl_accessions";
 
     /**
@@ -56,40 +56,21 @@ public class EmblProcessor implements SequenceBuilder {
 	}
     }
 
-    private SequenceBuilder delegate;
     private FeatureTableParser features;
 
     public EmblProcessor(SequenceBuilder delegate) {
-	this.delegate = delegate;
+	super(delegate);
 	features = new FeatureTableParser(this);
     }
 
-    public void startSequence() {
-	delegate.startSequence();
-    }
-
-    public void endSequence() {
+    public void endSequence() throws ParseException {
 	if (accessions.size() > 0) {
 	    String id = (String) accessions.get(0);
-	    delegate.setName(id);
-	    delegate.setURI("urn:sequence/embl:" + id);
-	    delegate.addSequenceProperty(PROPERTY_EMBL_ACCESSIONS, accessions);
+	    getDelegate().setName(id);
+	    getDelegate().setURI("urn:sequence/embl:" + id);
+	    getDelegate().addSequenceProperty(PROPERTY_EMBL_ACCESSIONS, accessions);
 	}
-	delegate.endSequence();
-    }
-
-    public void setName(String name) {
-	delegate.setName(name);
-    }
-
-    public void setURI(String uri) {
-	delegate.setURI(uri);
-    }
-
-    public void addSymbols(Alphabet a, Symbol[] syms, int pos, int len)
-        throws IllegalAlphabetException
-    {
-	delegate.addSymbols(a, syms, pos, len);
+	getDelegate().endSequence();
     }
 
     private List accessions;
@@ -98,7 +79,7 @@ public class EmblProcessor implements SequenceBuilder {
 	accessions = new ArrayList();
     }
 
-    public void addSequenceProperty(String key, Object value) {
+    public void addSequenceProperty(Object key, Object value) throws ParseException {
 	try {
 	    // Tidy up any end-of-block jobbies
 	    
@@ -117,7 +98,7 @@ public class EmblProcessor implements SequenceBuilder {
 		}
 		features.featureData(featureLine.substring(16));
 	    } else {
-		delegate.addSequenceProperty(key, value);
+		getDelegate().addSequenceProperty(key, value);
 		
 		if (key.equals("AC")) {
 		    String acc= value.toString();
@@ -129,21 +110,5 @@ public class EmblProcessor implements SequenceBuilder {
 	} catch (BioException ex) {
 	    throw new BioError(ex, "FIXME");
 	}
-    }
-
-    public void startFeature(Feature.Template templ) {
-	delegate.startFeature(templ);
-    }
-
-    public void addFeatureProperty(String key, Object value) {
-	delegate.addFeatureProperty(key, value);
-    }
-
-    public void endFeature() {
-	delegate.endFeature();
-    }
-
-    public Sequence makeSequence() throws BioException {
-	return delegate.makeSequence();
     }
 }

@@ -37,7 +37,7 @@ import org.biojava.bio.*;
  * @since 1.1
  */
 
-public class FastaDescriptionLineParser implements SequenceBuilder {
+public class FastaDescriptionLineParser extends SequenceBuilderFilter {
     /**
      * Factory which wraps SequenceBuilders in a FastaDescriptionLineParser
      *
@@ -56,37 +56,12 @@ public class FastaDescriptionLineParser implements SequenceBuilder {
 	}
     }
 
-    private SequenceBuilder delegate;
-
     public FastaDescriptionLineParser(SequenceBuilder delegate) {
-	this.delegate = delegate;
-    }
-	
-
-    public void startSequence() {
-	delegate.startSequence();
+	super(delegate);
     }
 
-    public void endSequence() {
-	delegate.endSequence();
-    }
-
-    public void setName(String name) {
-	delegate.setName(name);
-    }
-
-    public void setURI(String uri) {
-	delegate.setURI(uri);
-    }
-
-    public void addSymbols(Alphabet a, Symbol[] syms, int pos, int len)
-        throws IllegalAlphabetException
-    {
-	delegate.addSymbols(a, syms, pos, len);
-    }
-
-    public void addSequenceProperty(String key, Object value) {
-	delegate.addSequenceProperty(key, value);
+    public void addSequenceProperty(Object key, Object value) throws ParseException {
+	getDelegate().addSequenceProperty(key, value);
 
 	if (FastaFormat.PROPERTY_DESCRIPTIONLINE.equals(key)) {
 	    String dline = value.toString();
@@ -95,24 +70,8 @@ public class FastaDescriptionLineParser implements SequenceBuilder {
 	    setName(name);
 	    setURI("urn:sequence/fasta:" + name);
 	    if (toke.hasMoreTokens()) {
-		delegate.addSequenceProperty("description", toke.nextToken("******"));
+		getDelegate().addSequenceProperty("description", toke.nextToken("******"));
 	    }
 	} 
-    }
-
-    public void startFeature(Feature.Template templ) {
-	delegate.startFeature(templ);
-    }
-
-    public void addFeatureProperty(String key, Object value) {
-	delegate.addFeatureProperty(key, value);
-    }
-
-    public void endFeature() {
-	delegate.endFeature();
-    }
-
-    public Sequence makeSequence() throws BioException {
-	return delegate.makeSequence();
     }
 }
