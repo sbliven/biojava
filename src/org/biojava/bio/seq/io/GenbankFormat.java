@@ -41,7 +41,11 @@ import org.biojava.bio.seq.*;
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  */
 
-public class GenbankFormat implements SequenceFormat, Serializable
+public class GenbankFormat
+        implements SequenceFormat,
+                   Serializable,
+                   org.biojava.utils.ParseErrorListener,
+                   org.biojava.utils.ParseErrorSource
 {
     static
     {
@@ -68,6 +72,8 @@ public class GenbankFormat implements SequenceFormat, Serializable
     protected static final String VERSION_TAG = "VERSION";
     protected static final String GI_TAG = "GI";
 
+    private Vector mListeners = new Vector();
+
     /**
      * Reads a sequence from the specified reader using the Symbol
      * parser and Sequence Factory provided. The sequence read in must
@@ -82,6 +88,7 @@ public class GenbankFormat implements SequenceFormat, Serializable
 	throws IllegalSymbolException, IOException, ParseException
     {
 	GenbankContext ctx = new GenbankContext(symParser, listener);
+    ctx.addParseErrorListener(this);
 	String line;
 	boolean hasAnotherSequence    = true;
 	boolean hasInternalWhitespace = false;
@@ -99,7 +106,7 @@ public class GenbankFormat implements SequenceFormat, Serializable
 		// Allows us to tolerate trailing whitespace without
 		// thinking that there is another Sequence to follow
 		char [] cbuf = new char [1];
-		
+
 		while (true)
 		{
 		    reader.mark(1);
@@ -161,7 +168,7 @@ public class GenbankFormat implements SequenceFormat, Serializable
 
 	String [] formats = (String []) getFormats().toArray(new String[0]);
 
-	// Allow client programmers to use whichever case they like	    
+	// Allow client programmers to use whichever case they like
 	for (int i = 0; i < formats.length; i++)
 	{
 	    if (formats[i].equalsIgnoreCase(format))
@@ -179,7 +186,7 @@ public class GenbankFormat implements SequenceFormat, Serializable
 	}
 
 	try
-	{   
+	{
 	    SeqFileFormer former = SeqFileFormerFactory.makeFormer(requestedFormat);
 	    former.setPrintStream(os);
 
@@ -200,6 +207,70 @@ public class GenbankFormat implements SequenceFormat, Serializable
     {
 	return "Genbank";
     }
+
+    /**
+     * Adds a parse error listener to the list of listeners if it isn't already
+     * included.
+     *
+     * @param theListener Listener to be added.
+     */
+    public synchronized void addParseErrorListener(ParseErrorListener theListener)
+    {
+        if(mListeners.contains(theListener) == false)
+        {
+            mListeners.addElement(theListener);
+        }
+    }
+
+    /**
+     * Removes a parse error listener from the list of listeners if it is
+     * included.
+     *
+     * @param theListener Listener to be removed.
+     */
+    public synchronized void removeParseErrorListener(
+            ParseErrorListener theListener)
+    {
+        if(mListeners.contains(theListener) == true)
+        {
+            mListeners.removeElement(theListener);
+        }
+    }
+
+    /**
+     * This method determines the behaviour when a bad line is processed.
+     * Some options are to log the error, throw an exception, ignore it
+     * completely, or pass the event through.
+     * <P>
+     * This method should be overwritten when different behavior is desired.
+     *
+     * @param theEvent The event that contains the bad line and token.
+     */
+    public void BadLineParsed(org.biojava.utils.ParseErrorEvent theEvent)
+    {
+        notifyParseErrorEvent(theEvent);
+    }
+
+    // Protected methods
+    /**
+     * Passes the event on to all the listeners registered for ParseErrorEvents.
+     *
+     * @param theEvent The event to be handed to the listeners.
+     */
+    protected void notifyParseErrorEvent(ParseErrorEvent theEvent)
+    {
+        Vector listeners;
+        synchronized(this)
+        {
+            listeners = (Vector)mListeners.clone();
+        }
+
+        for (int index = 0; index < listeners.size(); index++)
+        {
+            ParseErrorListener client = (ParseErrorListener)listeners.elementAt(index);
+            client.BadLineParsed(theEvent);
+        }
+    }
 }
 
 /**
@@ -209,7 +280,7 @@ public class GenbankFormat implements SequenceFormat, Serializable
  * @author Thomas Down
  * @author Greg Cox
  */
-class GenbankContext
+class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojava.utils.ParseErrorSource
 {
     private final static int HEADER = 1;
     private final static int FEATURES = 2;
@@ -225,6 +296,7 @@ class GenbankContext
     private String headerTag = "";
     private StringBuffer headerTagText = new StringBuffer();
     private SeqIOListener listener;
+    private Vector mListeners = new Vector();
 
     /**
      * Constructor that takes the listener and the Symbol parser from the
@@ -242,6 +314,21 @@ class GenbankContext
 
 	this.symParser = theSymbolParser;
 	this.streamParser = symParser.parseStream(listener);
+    ((ParseErrorSource)(this.listener)).addParseErrorListener(this);
+    }
+
+    /**
+     * This method determines the behaviour when a bad line is processed.
+     * Some options are to log the error, throw an exception, ignore it
+     * completely, or pass the event through.
+     * <P>
+     * This method should be overwritten when different behavior is desired.
+     *
+     * @param theEvent The event that contains the bad line and token.
+     */
+    public void BadLineParsed(org.biojava.utils.ParseErrorEvent theEvent)
+    {
+        notifyParseErrorEvent(theEvent);
     }
 
     /**
@@ -266,6 +353,9 @@ class GenbankContext
 	{
 	    status = SEQUENCE;
 	    this.saveSeqAnno();
+		// Additional commit to push the final feature off the stack
+        headerTag = line;
+        this.saveSeqAnno();
 	}
 	else if (line.startsWith(GenbankFormat.END_SEQUENCE_TAG))
 	{
@@ -284,6 +374,58 @@ class GenbankContext
 	    processHeaderLine(line);
 	}
     }
+
+    /**
+     * Adds a parse error listener to the list of listeners if it isn't already
+     * included.
+     *
+     * @param theListener Listener to be added.
+     */
+    public synchronized void addParseErrorListener(
+            ParseErrorListener theListener)
+    {
+        if(mListeners.contains(theListener) == false)
+        {
+            mListeners.addElement(theListener);
+        }
+    }
+
+    /**
+     * Removes a parse error listener from the list of listeners if it is
+     * included.
+     *
+     * @param theListener Listener to be removed.
+     */
+    public synchronized void removeParseErrorListener(
+            ParseErrorListener theListener)
+    {
+        if(mListeners.contains(theListener) == true)
+        {
+            mListeners.removeElement(theListener);
+        }
+    }
+
+    /**
+     * Passes the event on to all the listeners registered for ParseErrorEvents.
+     *
+     * @param theEvent The event to be handed to the listeners.
+     */
+    protected void notifyParseErrorEvent(ParseErrorEvent theEvent)
+    {
+        Vector listeners;
+        synchronized(this)
+        {
+            listeners = (Vector)mListeners.clone();
+        }
+
+        for (int index = 0; index < listeners.size(); index++)
+        {
+            ParseErrorListener client =
+                    (ParseErrorListener)listeners.elementAt(index);
+            client.BadLineParsed(theEvent);
+        }
+    }
+
 
     /**
      * Private method that processes a line, assuming that it is a sequence

@@ -239,6 +239,18 @@ public class SwissprotFileFormer implements SeqFileFormer
 		return(this.formatLocation(theBuffer, theLocation));
 	}
 
+	/**
+	 * Creates a string representation of the location of a feature
+	 *
+	 * @param theFeature The feature with the location to format
+	 * @return String The formatted location
+	 */
+	public String formatLocation(Feature theFeature)
+	{
+		StringBuffer toReturn = this.formatLocation(new StringBuffer(), theFeature.getLocation());
+		return toReturn.toString();
+	}
+
 // Public methods
 	/**
 	 * <code>formatLocation</code> creates a String representation of

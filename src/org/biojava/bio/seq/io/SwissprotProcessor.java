@@ -28,6 +28,10 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.*;
 
+import org.biojava.utils.ParseErrorEvent;
+import org.biojava.utils.ParseErrorSource;
+import org.biojava.utils.ParseErrorListener;
+
 /**
  * Simple filter which handles attribute lines from an Swissprot entry.
  * Skeleton implementation, please add more functionality.
@@ -44,13 +48,18 @@ import org.biojava.bio.*;
  * @since 1.1
  */
 
-public class SwissprotProcessor extends SequenceBuilderFilter
+public class SwissprotProcessor
+	extends
+		SequenceBuilderFilter
+	implements
+		ParseErrorSource
 {
 	public static final String PROPERTY_SWISSPROT_ACCESSIONS = "swissprot.accessions";
 	public static final String PROPERTY_SWISSPROT_COMMENT = "swissprot.comment";
-         public static final String PROPERTY_SWISSPROT_FEATUREATTRIBUTE = "swissprot.featureattribute";
+    public static final String PROPERTY_SWISSPROT_FEATUREATTRIBUTE = "swissprot.featureattribute";
 
 	private boolean mBadFeature = false;
+	private Vector mListeners = new Vector();
 
 	/**
 	 * Factory which wraps SequenceBuilders in a SwissprotProcessor
@@ -159,7 +168,66 @@ public class SwissprotProcessor extends SequenceBuilderFilter
 		{
 			// If an exception is thrown, read past the offending feature
 			mBadFeature = true;
-			System.err.println(ex);
+			ParseErrorEvent offendingLineEvent = new ParseErrorEvent(this, "This line could not be parsed: " + value.toString());
+			this.notifyParseErrorEvent(offendingLineEvent);
 	    }
+	    catch (IndexOutOfBoundsException ex)
+	    {
+	    	// This occurs when for some line min > max
+	    	mBadFeature = true;
+	    	ParseErrorEvent offendingLineEvent = new ParseErrorEvent(this, "From must be less than To: " + value.toString());
+			this.notifyParseErrorEvent(offendingLineEvent);
+	    }
+	}
+
+	/**
+	 * Adds a parse error listener to the list of listeners if it isn't already
+	 * included.
+	 *
+	 * @param theListener Listener to be added.
+	 */
+	public synchronized void addParseErrorListener(
+			ParseErrorListener theListener)
+	{
+		if(mListeners.contains(theListener) == false)
+		{
+			mListeners.addElement(theListener);
+		}
+	}
+
+	/**
+	 * Removes a parse error listener from the list of listeners if it is
+	 * included.
+	 *
+	 * @param theListener Listener to be removed.
+	 */
+	public synchronized void removeParseErrorListener(
+			ParseErrorListener theListener)
+	{
+		if(mListeners.contains(theListener) == true)
+		{
+			mListeners.removeElement(theListener);
+		}
+	}
+
+	// Protected methods
+	/**
+	 * Passes the event on to all the listeners registered for ParseErrorEvents.
+	 *
+	 * @param theEvent The event to be handed to the listeners.
+	 */
+	protected void notifyParseErrorEvent(ParseErrorEvent theEvent)
+	{
+		Vector listeners;
+		synchronized(this)
+		{
+			listeners = (Vector)mListeners.clone();
+		}
+
+		for (int index = 0; index < listeners.size(); index++)
+		{
+			ParseErrorListener client = (ParseErrorListener)listeners.elementAt(index);
+			client.BadLineParsed(theEvent);
+		}
 	}
 }

@@ -25,7 +25,7 @@ import java.io.*;
 import java.util.*;
 import java.net.*;
 
-import org.biojava.utils.StaticMemberPlaceHolder;
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
@@ -42,9 +42,14 @@ import org.biojava.bio.seq.io.*;
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author Greg Cox
  */
 
-public class FastaFormat implements SequenceFormat, Serializable {
+public class FastaFormat implements SequenceFormat,
+                                    Serializable,
+                                    org.biojava.utils.ParseErrorListener,
+                                    org.biojava.utils.ParseErrorSource
+{
 
     static
     {
@@ -61,6 +66,8 @@ public class FastaFormat implements SequenceFormat, Serializable {
      */
 
     public final static String PROPERTY_DESCRIPTIONLINE = "description_line";
+
+    private Vector mListeners = new Vector();
 
     /**
      * The line width for output.
@@ -107,6 +114,9 @@ public class FastaFormat implements SequenceFormat, Serializable {
 
 	String description = line.substring(1).trim();
 	siol.addSequenceProperty(PROPERTY_DESCRIPTIONLINE, description);
+
+	String name = new java.util.StringTokenizer(description).nextToken();
+	siol.setName(name);
 
 	boolean seenEOF = readSequenceData(reader, symParser, siol);
 	siol.endSequence();
@@ -224,5 +234,69 @@ public class FastaFormat implements SequenceFormat, Serializable {
     public String getDefaultFormat()
     {
 	return "Fasta";
+    }
+
+    /**
+     * Adds a parse error listener to the list of listeners if it isn't already
+     * included.
+     *
+     * @param theListener Listener to be added.
+     */
+    public synchronized void addParseErrorListener(ParseErrorListener theListener)
+    {
+        if(mListeners.contains(theListener) == false)
+        {
+            mListeners.addElement(theListener);
+        }
+    }
+
+    /**
+     * Removes a parse error listener from the list of listeners if it is
+     * included.
+     *
+     * @param theListener Listener to be removed.
+     */
+    public synchronized void removeParseErrorListener(
+            ParseErrorListener theListener)
+    {
+        if(mListeners.contains(theListener) == true)
+        {
+            mListeners.removeElement(theListener);
+        }
+    }
+
+    /**
+     * This method determines the behaviour when a bad line is processed.
+     * Some options are to log the error, throw an exception, ignore it
+     * completely, or pass the event through.
+     * <P>
+     * This method should be overwritten when different behavior is desired.
+     *
+     * @param theEvent The event that contains the bad line and token.
+     */
+    public void BadLineParsed(org.biojava.utils.ParseErrorEvent theEvent)
+    {
+        notifyParseErrorEvent(theEvent);
+    }
+
+    // Protected methods
+    /**
+     * Passes the event on to all the listeners registered for ParseErrorEvents.
+     *
+     * @param theEvent The event to be handed to the listeners.
+     */
+    protected void notifyParseErrorEvent(ParseErrorEvent theEvent)
+    {
+        Vector listeners;
+        synchronized(this)
+        {
+            listeners = (Vector)mListeners.clone();
+        }
+
+        for (int index = 0; index < listeners.size(); index++)
+        {
+            ParseErrorListener client = (ParseErrorListener)listeners.elementAt(index);
+            client.BadLineParsed(theEvent);
+        }
     }
 }

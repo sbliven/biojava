@@ -50,7 +50,12 @@ import org.biojava.bio.seq.*;
  * @since 1.1
  */
 
-public class EmblLikeFormat implements SequenceFormat, Serializable
+public class EmblLikeFormat
+	implements
+		SequenceFormat,
+		Serializable,
+		ParseErrorSource,
+		ParseErrorListener
 {
     static
     {
@@ -63,6 +68,7 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
     }
 
     private boolean elideSymbols = false;
+    private Vector mListeners = new Vector();
 
     /**
      * Should we ignore the symbols (SQ) part of the entry? If this
@@ -86,12 +92,13 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
     {
 	return elideSymbols;
     }
-    
+
     public boolean readSequence(BufferedReader reader,
 				SymbolParser   symParser,
 				SeqIOListener  listener)
 	throws IllegalSymbolException, IOException, ParseException
     {
+	((ParseErrorSource)(listener)).addParseErrorListener(this);
 	String            line;
 	StreamParser    sparser       = null;
 	boolean hasMoreSequence       = true;
@@ -113,7 +120,7 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
 		// Allows us to tolerate trailing whitespace without
 		// thinking that there is another Sequence to follow
 		char [] cbuf = new char [1];
-		
+
 		while (true)
 		{
 		    reader.mark(1);
@@ -237,7 +244,7 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
 
 	String [] formats = (String []) getFormats().toArray(new String[0]);
 
-	// Allow client programmers to use whichever case they like	    
+	// Allow client programmers to use whichever case they like
 	for (int i = 0; i < formats.length; i++)
 	{
 	    if (formats[i].equalsIgnoreCase(format))
@@ -274,4 +281,69 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
     {
 	return "Embl";
     }
+
+	/**
+	 * This method determines the behaviour when a bad line is processed.
+	 * Some options are to log the error, throw an exception, ignore it
+	 * completely, or pass the event through.
+	 * <P>
+	 * This method should be overwritten when different behavior is desired.
+	 *
+	 * @param theEvent The event that contains the bad line and token.
+	 */
+	public void BadLineParsed(ParseErrorEvent theEvent)
+	{
+		notifyParseErrorEvent(theEvent);
+	}
+
+	/**
+	 * Adds a parse error listener to the list of listeners if it isn't already
+	 * included.
+	 *
+	 * @param theListener Listener to be added.
+	 */
+	public synchronized void addParseErrorListener(
+			ParseErrorListener theListener)
+	{
+		if(mListeners.contains(theListener) == false)
+		{
+			mListeners.addElement(theListener);
+		}
+	}
+
+	/**
+	 * Removes a parse error listener from the list of listeners if it is
+	 * included.
+	 *
+	 * @param theListener Listener to be removed.
+	 */
+	public synchronized void removeParseErrorListener(
+			ParseErrorListener theListener)
+	{
+		if(mListeners.contains(theListener) == true)
+		{
+			mListeners.removeElement(theListener);
+		}
+	}
+
+	// Protected methods
+	/**
+	 * Passes the event on to all the listeners registered for ParseErrorEvents.
+	 *
+	 * @param theEvent The event to be handed to the listeners.
+	 */
+	protected void notifyParseErrorEvent(ParseErrorEvent theEvent)
+	{
+		Vector listeners;
+		synchronized(this)
+		{
+			listeners = (Vector)mListeners.clone();
+		}
+
+		for (int index = 0; index < listeners.size(); index++)
+		{
+			ParseErrorListener client = (ParseErrorListener)listeners.elementAt(index);
+			client.BadLineParsed(theEvent);
+		}
+	}
 }
