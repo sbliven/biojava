@@ -75,6 +75,7 @@ public class GenbankFormat
     protected static final String GI_TAG = "GI";
 
     private Vector mListeners = new Vector();
+    private boolean elideSymbols = false;
 
     /**
      * Reads a sequence from the specified reader using the Symbol
@@ -91,6 +92,7 @@ public class GenbankFormat
     {
         GenbankContext ctx = new GenbankContext(symParser, listener);
         ctx.addParseErrorListener(this);
+        ctx.setElideSymbols(this.getElideSymbols());
         String line;
         boolean hasAnotherSequence    = true;
         boolean hasInternalWhitespace = false;
@@ -269,6 +271,21 @@ public class GenbankFormat
             client.BadLineParsed(theEvent);
         }
     }
+
+
+
+  public boolean getElideSymbols() {
+    return elideSymbols;
+  }
+
+  /**
+   * Use this method to toggle reading of sequence data. If you're only
+   * interested in header data set to true.
+   * @param elideSymbols set to true if you don't want the sequence data.
+   */
+  public void setElideSymbols(boolean elideSymbols) {
+    this.elideSymbols = elideSymbols;
+  }
 }
 
 /**
@@ -295,6 +312,7 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
     private StringBuffer headerTagText = new StringBuffer();
     private SeqIOListener listener;
     private Vector mListeners = new Vector();
+    private boolean elideSymbols;
 
     /**
      * Constructor that takes the listener and the Symbol parser from the
@@ -363,7 +381,7 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
 	{
 	    processFeatureLine(line);
 	}
-	else if (status == SEQUENCE)
+	else if (status == SEQUENCE && elideSymbols == false)
 	{
 	    processSeqLine(line, streamParser);
 	}
@@ -733,5 +751,12 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
 		}
 	}
 	return isHeaderTag;
+    }
+
+    public boolean getElideSymbols() {
+      return elideSymbols;
+    }
+    public void setElideSymbols(boolean elideSymbols) {
+      this.elideSymbols = elideSymbols;
     }
 }
