@@ -142,7 +142,13 @@ class InfiniteCrossProductAlphabet implements CrossProductAlphabet {
     return new SimpleCrossProductResidue(rList, symbolSeed++);
   }
 
-  public ResidueParser getParser(String name) throws NoSuchElementException {
-    throw new NoSuchElementException("Currently no parsers are defined for SimpleCrossProductAlphabets");
+  public ResidueParser getParser(String name)
+  throws NoSuchElementException, SeqException {
+    if(name == "name") {
+      return new CrossProductResidueNameParser(this);
+    }
+    throw new NoSuchElementException(
+      "No parser for " + name + " is defined for " + getName()
+    );
   }
 }

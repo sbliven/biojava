@@ -111,9 +111,8 @@ public class DNATools {
                                 (Residue) matchesToResidue.get(complement(hl)));
         }
       }
-    } catch (IllegalResidueException e) {
-      e.printStackTrace();
-      System.exit(1);
+    } catch (Throwable t) {
+      throw new BioError(t, "Unable to initialize DNATools");
     }
   }
   
@@ -152,8 +151,12 @@ public class DNATools {
    */
   public static ResidueList createDNA(String dna)
   throws IllegalResidueException {
-    ResidueParser p = getAlphabet().getParser("symbol");
-    return p.parse(dna);
+    try {
+      ResidueParser p = getAlphabet().getParser("symbol");
+      return p.parse(dna);
+    } catch (SeqException se) {
+      throw new BioError(se, "Something has gone badly wrong with DNA");
+    }
   }
   
   /**
@@ -168,8 +171,15 @@ public class DNATools {
    */
   public static ResidueList createDNAAmbiguity(String amb)
   throws IllegalResidueException {
-    ResidueParser p = getAmbiguity().getParser("symbol");
-    return p.parse(amb);
+    try {
+      ResidueParser p = getAmbiguity().getParser("symbol");
+      return p.parse(amb);
+    } catch (SeqException se) {
+      throw new BioError(
+        se,
+        "Something has gone badly wrong in the DNA ambibuity alphabet"
+      );
+    }
   }
   
   /**

@@ -57,7 +57,7 @@ public class SimpleCrossProductResidue implements CrossProductResidue {
       Residue r = (Residue) l.get(i);
       name.append(r.getName());
       if (i < l.size() - 1) {
-        name.append(" ");
+        name.append(", ");
       }
     }
     name.append(")");

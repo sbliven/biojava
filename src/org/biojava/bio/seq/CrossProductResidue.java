@@ -26,6 +26,9 @@ import java.util.*;
 
 /**
  * Residue in a CrossProductAlphabet.
+ * <P>
+ * The getName method should return a string that is bracketed, and seperates
+ * each contained residue with a comma.
  *
  * @author Thomas Down
  */

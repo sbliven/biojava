@@ -82,9 +82,11 @@ public interface Alphabet extends Annotatable {
    *
    * @param name  the name of the parser
    * @return  a parser for that name
-   * @exception NoSuchElementException if the name is unknown
+   * @throws NoSuchElementException if the name is unknown
+   * @throws SeqException if for any reason the parser could not be built
    */
-  ResidueParser getParser(String name) throws NoSuchElementException;
+  ResidueParser getParser(String name)
+  throws NoSuchElementException, SeqException;
   
   /**
    * A realy useful static alphabet that is always empty.

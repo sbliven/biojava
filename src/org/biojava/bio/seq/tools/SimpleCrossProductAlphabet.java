@@ -102,8 +102,14 @@ class SimpleCrossProductAlphabet implements FiniteAlphabet, CrossProductAlphabet
     return name.toString();
   }
 
-  public ResidueParser getParser(String name) throws NoSuchElementException {
-    throw new NoSuchElementException("Currently no parsers are defined for SimpleAlphabetManagers");
+  public ResidueParser getParser(String name)
+  throws NoSuchElementException, SeqException {
+    if(name == "name") {
+      return new CrossProductResidueNameParser(this);
+    }
+    throw new NoSuchElementException(
+      "No parser for " + name + " is defined for " + getName()
+    );
   }
 
   public ResidueList residues() {

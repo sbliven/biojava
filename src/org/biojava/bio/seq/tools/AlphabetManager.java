@@ -218,9 +218,6 @@ public final class AlphabetManager {
           } else if(c == ')') {
             depth--;
           }
-          if(depth == 0) {
-            break;
-          }
           j++;
         }
         if(depth == 0) {
@@ -234,8 +231,13 @@ public final class AlphabetManager {
         }
       } else {
         int j = name.indexOf(" x ", i);
-        aList.add(alphabetForName(name.substring(i, j)));
-        i = j + " x ".length();
+        if(j < 0) {
+          aList.add(alphabetForName(name.substring(i).trim()));
+          i = name.length();
+        } else {
+          aList.add(alphabetForName(name.substring(i, j).trim()));
+          i = j + " x ".length();
+        }
       }
     }
     
