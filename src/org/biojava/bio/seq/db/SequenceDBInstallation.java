@@ -69,45 +69,56 @@ import java.util.Set;
  * Loeffler</a> for the <a href="http://www.imp.univie.ac.at">IMP</a>
  */
 public interface SequenceDBInstallation {
-  /**
-   * Return all sequence dbs available in this sequence db
-   * installation. This is not just the set of sequence dbs already
-   * returned by getSequenceDB() but the entire set of sequence dbs
-   * supported by this object.
-   *
-   * @return a set of SequenceDB objects which may be empty. An
-   * implementation may also return null if it is not at all possible
-   * to determine which sequence dbs are part of this installation.
-   */
-  Set getSequenceDBs();
+    /**
+     * Return all sequence dbs available in this sequence db
+     * installation. This is not just the set of sequence dbs already
+     * returned by getSequenceDB() but the entire set of sequence dbs
+     * supported by this object.
+     *
+     * @return a set of SequenceDB objects which may be empty. An
+     * implementation may also return null if it is not at all possible
+     * to determine which sequence dbs are part of this installation.
+     */
+    public Set getSequenceDBs();
 
-  /**
-   * <p>
-   * Return the SequenceDB for the given identifier. The identifier
-   * can (but need not) be the name of the sequence db.  An
-   * implementation may support any number of identifiers to
-   * (uniquely) identify a particular sequence db - but the name of
-   * the sequence db (returned by SequenceDB.getName()) must always be
-   * among them.
-   * </p>
-   *
-   * <p>
-   * If the sequence db identified by the given identifier has not
-   * been requested through this object, it will be created and
-   * returned (hence this method is a factory method). If the sequence
-   * db identified by the given identifier has already been requested,
-   * the same object is returned.
-   * </p>
-   *
-   * @param identifier the string that identifies the sequence db. May
-   * not be null.
-   *
-   * @return the SequenceDB object that matches the given identifier
-   * or null if no such SequenceDB object could be found. (It is the
-   * responsibility of the implementation to take care that all
-   * identifiers are unique so if it turns out that the given
-   * identifier identifies more than one sequence db, this method
-   * should throw a RuntimeException.)
-   */
-  SequenceDB getSequenceDB(String identifier);
+    /**
+     * <p>
+     * Return the SequenceDB for the given identifier. The identifier
+     * can (but need not) be the name of the sequence db.  An
+     * implementation may support any number of identifiers to
+     * (uniquely) identify a particular sequence db - but the name of
+     * the sequence db (returned by SequenceDB.getName()) must always be
+     * among them.
+     * </p>
+     *
+     * <p>
+     * If the sequence db identified by the given identifier has not
+     * been requested through this object, it will be created and
+     * returned (hence this method is a factory method). If the sequence
+     * db identified by the given identifier has already been requested,
+     * the same object is returned.
+     * </p>
+     *
+     * @param identifier the string that identifies the sequence db. May
+     * not be null.
+     *
+     * @return the SequenceDB object that matches the given identifier
+     * or null if no such SequenceDB object could be found. (It is the
+     * responsibility of the implementation to take care that all
+     * identifiers are unique so if it turns out that the given
+     * identifier identifies more than one sequence db, this method
+     * should throw a RuntimeException.)
+     */
+    public SequenceDB getSequenceDB(String identifier);
+
+    /**
+     * <code>addSequenceDB</code> adds a new <code>SequenceDB</code>
+     * under its own identifier which will additionally be recognised
+     * by the set of other identifiers. It is up to the implementation
+     * as to how conflicting identifiers are handled.
+     *
+     * @param sequenceDB a <code>SequenceDB</code>.
+     * @param otherIdentifiers a <code>Set</code>.
+     */
+    public void addSequenceDB(SequenceDB sequenceDB, Set otherIdentifiers);
 }
