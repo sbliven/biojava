@@ -157,7 +157,7 @@ extends SequenceRendererWrapper {
     );
     return new SubSequenceRenderContext(
       src,
-      ((Sequence) src.getSequence()).filter(filter, recurse)
+      ((Sequence) src.getSequence()).filter(actual, recurse)
     );
   }
 }
