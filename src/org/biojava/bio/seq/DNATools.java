@@ -45,6 +45,7 @@ import org.biojava.bio.symbol.AtomicSymbol;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Pattern;
 import org.biojava.bio.symbol.PatternMaker;
 import org.biojava.bio.symbol.PatternSearch;
 import org.biojava.bio.symbol.ReversibleTranslationTable;
@@ -445,7 +446,7 @@ public final class DNATools {
    * @param range Range to be searched.  If null, whole sequence will be searched.  Features that merely overlap
    *            the range are rejected.
    */
-  public static boolean match(PatternSearch.Pattern pattern, Sequence seq, 
+  public static boolean match(Pattern pattern, Sequence seq, 
     StrandedFeature.Template ft, RangeLocation range, boolean bothStrands)
     throws IllegalAlphabetException, ChangeVetoException, BioException
   {
@@ -503,7 +504,7 @@ public final class DNATools {
     throws IllegalAlphabetException, ChangeVetoException, ParseException, BioException
   {
     // create a Pattern
-    PatternSearch.Pattern pattern = PatternMaker.parsePattern(patternAsString, getDNA());
+    Pattern pattern = PatternMaker.parsePattern(patternAsString, getDNA());
     pattern.setLabel(patternAsString);
 
     return match(pattern, seq, null, null, bothStrands);
