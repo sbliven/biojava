@@ -494,13 +494,13 @@ public class SCF extends AbstractChromatogram {
         protected void readSamplesInto(int[] samps) throws IOException {
             if (header.sample_size == 1) {
                 for (int i = 0 ; i < samps.length ; i++) {
-                    samps[i] = din.readByte();
+                    samps[i] = din.readUnsignedByte();
                     offset += 1;
                 }
             }
             else if (header.sample_size == 2) {
                 for (int i = 0 ; i < samps.length ; i++) {
-                    samps[i] = din.readShort();
+                    samps[i] = din.readUnsignedShort();
                     offset += 2;
                 }
             }
