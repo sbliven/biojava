@@ -204,7 +204,7 @@ public class FastaFormat implements SequenceFormat,
 //    	if( (length % lineWidth) != 0)
 //    	    os.println();
 
-	for(int pos = 1; pos <= seq.length() + 1; pos += lineWidth) {
+	for(int pos = 1; pos <= seq.length(); pos += lineWidth) {
 	    int end = Math.min(pos + lineWidth - 1, seq.length());
 	    os.println(seq.subStr(pos, end));
 	}
