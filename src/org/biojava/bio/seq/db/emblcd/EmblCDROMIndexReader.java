@@ -86,7 +86,7 @@ public abstract class EmblCDROMIndexReader
      *
      * @exception IOException if an error occurs.
      */
-    public EmblCDROMIndexReader(InputStream input)
+    public EmblCDROMIndexReader(final InputStream input)
         throws IOException
     {
         this.input = input;

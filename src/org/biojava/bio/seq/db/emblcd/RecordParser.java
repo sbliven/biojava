@@ -57,7 +57,7 @@ class RecordParser
      *
      * @return a <code>long</code>.
      */
-    long parseInt4(byte [] int4)
+    long parseInt4(final byte [] int4)
     {
         int result = 0;
 
@@ -78,7 +78,7 @@ class RecordParser
      *
      * @return an <code>int</code>.
      */
-    int parseInt2(byte [] int2)
+    int parseInt2(final byte [] int2)
     {
         int result = 0;
 
@@ -103,7 +103,7 @@ class RecordParser
      *
      * @return a <code>String</code>.
      */
-    String parseDate(StringBuffer sb, byte [] dbDate)
+    String parseDate(final StringBuffer sb, final byte [] dbDate)
     {
         // The first byte is unused
         for (int i = dbDate.length; --i > 0;)
@@ -125,7 +125,7 @@ class RecordParser
      *
      * @return a <code>String</code>.
      */
-    String parseString(StringBuffer sb, byte [] characters)
+    String parseString(final StringBuffer sb, final byte [] characters)
     {
         for (int i = 0; i < characters.length; i++)
         {
@@ -146,7 +146,7 @@ class RecordParser
      *
      * @return an <code>Object []</code> array.
      */
-    Object [] parseDivRecord(byte [] divRecord)
+    Object [] parseDivRecord(final byte [] divRecord)
     {
         // The variable part of record is the name. Other parts are
 	// int which sum to 2

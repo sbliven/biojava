@@ -71,7 +71,7 @@ public class EntryNamRandomAccess extends EmblCDROMRandomAccess
      *
      * @return a <code>String</code>.
      */
-    protected String getRecordKey(Object [] record)
+    protected String getRecordKey(final Object [] record)
     {
         return (String) record[0];
     }

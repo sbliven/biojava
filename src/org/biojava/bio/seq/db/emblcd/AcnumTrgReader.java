@@ -40,7 +40,7 @@ public class AcnumTrgReader extends EmblCDROMIndexReader
      *
      * @exception IOException if an error occurs.
      */
-    public AcnumTrgReader(InputStream input)
+    public AcnumTrgReader(final InputStream input)
         throws IOException
     {
         super(input);

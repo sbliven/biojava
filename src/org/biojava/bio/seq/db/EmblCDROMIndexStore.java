@@ -99,7 +99,7 @@ public class EmblCDROMIndexStore implements IndexStore
     // The random access file containing ID/offset records
     private EmblCDROMRandomAccess entryRandomAccess;
 
-    /**
+ /**
      * Creates a new <code>EmblCDROMIndexStore</code> backed by a
      * random access binary index.
      *
@@ -113,11 +113,41 @@ public class EmblCDROMIndexStore implements IndexStore
      *
      * @exception IOException if an error occurs.
      */
-    public EmblCDROMIndexStore(File                   divisionLkp,
-                               File                   entryNamIdx,
-                               SequenceFormat         format,
-                               SequenceBuilderFactory factory,
-                               SymbolParser           parser)
+    public EmblCDROMIndexStore(final File                   divisionLkp,
+                               final File                   entryNamIdx,
+                               final SequenceFormat         format,
+                               final SequenceBuilderFactory factory,
+                               final SymbolParser           parser)
+        throws IOException
+    {
+        // Set to the empty abstract path
+        this(new File(""), divisionLkp, entryNamIdx,
+             format, factory, parser);
+    }
+
+    /**
+     * Creates a new <code>EmblCDROMIndexStore</code> backed by a
+     * random access binary index.
+     *
+     * @param pathPrefix a <code>File</code> containing the abstract
+     * path to be appended to sequence database filenames retrieved
+     * from the binary index.
+     * @param divisionLkp a <code>File</code> containing the master
+     * index.
+     * @param entryNamIdx a <code>File</code> containing the sequence
+     * IDs and offsets.
+     * @param format a <code>SequenceFormat</code>.
+     * @param factory a <code>SequenceBuilderFactory</code>.
+     * @param parser a <code>SymbolParser</code>.
+     *
+     * @exception IOException if an error occurs.
+     */
+    public EmblCDROMIndexStore(final File                   pathPrefix,
+                               final File                   divisionLkp,
+                               final File                   entryNamIdx,
+                               final SequenceFormat         format,
+                               final SequenceBuilderFactory factory,
+                               final SymbolParser           parser)
         throws IOException
     {
         this.divisionLkp = divisionLkp;
@@ -125,9 +155,7 @@ public class EmblCDROMIndexStore implements IndexStore
         this.format      = format;
         this.factory     = factory;
         this.parser      = parser;
-
-	// Set to the empty abstract path
-	pathPrefix = new File("");
+        this.pathPrefix  = pathPrefix;
 
         initialise();
     }
@@ -160,7 +188,7 @@ public class EmblCDROMIndexStore implements IndexStore
      * @param prefix a <code>File</code> prefix specifying the
      * abstract path to append.
      */
-    public void setPathPrefix(File pathPrefix)
+    public void setPathPrefix(final File pathPrefix)
     {
 	this.pathPrefix = pathPrefix;
     }
@@ -186,7 +214,8 @@ public class EmblCDROMIndexStore implements IndexStore
      * @exception IllegalIDException if an error occurs.
      * @exception BioException if an error occurs.
      */
-    public void store(Index index) throws IllegalIDException, BioException
+    public void store(final Index index)
+        throws IllegalIDException, BioException
     {
         throw new BioException("Failed to add Index: store is read-only. To add sequences, use the dbi programs supplied in EMBOSS");
     }
@@ -210,7 +239,7 @@ public class EmblCDROMIndexStore implements IndexStore
      */
     public void rollback() { }
 
-    public Index fetch(String id) throws IllegalIDException, BioException
+    public Index fetch(final String id) throws IllegalIDException, BioException
     {
         Index index = null;
 

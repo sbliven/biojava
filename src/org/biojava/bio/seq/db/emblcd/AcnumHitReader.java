@@ -40,7 +40,7 @@ public class AcnumHitReader extends EmblCDROMIndexReader
      *
      * @exception IOException if an error occurs.
      */
-    public AcnumHitReader(InputStream input)
+    public AcnumHitReader(final InputStream input)
         throws IOException
     {
         super(input);

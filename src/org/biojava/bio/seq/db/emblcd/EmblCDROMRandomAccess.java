@@ -113,7 +113,7 @@ public abstract class EmblCDROMRandomAccess
      *
      * @exception IOException if an error occurs.
      */
-    public Object [] findRecord(String identifier)
+    public Object [] findRecord(final String identifier)
         throws IOException
     {
         long startRecord = 0;
@@ -169,5 +169,5 @@ public abstract class EmblCDROMRandomAccess
      *
      * @return a <code>String</code>.
      */
-    protected abstract String getRecordKey(Object [] record);
+    protected abstract String getRecordKey(final Object [] record);
 }

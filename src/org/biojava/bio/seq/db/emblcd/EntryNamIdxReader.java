@@ -38,7 +38,7 @@ public class EntryNamIdxReader extends EmblCDROMIndexReader
      *
      * @param input an <code>InputStream</code>.
      */
-    public EntryNamIdxReader(InputStream input)
+    public EntryNamIdxReader(final InputStream input)
         throws IOException
     {
         super(input);
