@@ -180,13 +180,13 @@ public class GFFEntrySet {
                 framed.strand = rec.getStrand();
                 switch (rec.getFrame()) {
                   case 0:
-                    Template.readingFrame = FramedFeature.FRAME_0;
+                    framed.readingFrame = FramedFeature.FRAME_0;
                     break;
                   case 1:
-                    Template.readingFrame = FramedFeature.FRAME_1;
+                    framed.readingFrame = FramedFeature.FRAME_1;
                     break;
                   case 2:
-                    Template.readingFrame = FramedFeature.FRAME_2;
+                    framed.readingFrame = FramedFeature.FRAME_2;
                     break;
                 }
                 thisTemplate = framed;

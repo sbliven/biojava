@@ -45,7 +45,7 @@ public class SimpleFramedFeature extends SimpleStrandedFeature implements Framed
   public SimpleFramedFeature(Sequence sourceSeq, FeatureHolder parent, FramedFeature.Template template)
     throws IllegalAlphabetException {
     super(sourceSeq,parent,template);
-    this.readingFrame = FramedFeature.Template.readingFrame;
+    this.readingFrame = template.readingFrame;
     if (sourceSeq.getAlphabet() == RNATools.getRNA() && template.strand == NEGATIVE) {
       throw new IllegalAlphabetException("Cannot create a FramedFeature on the negative strand of an RNA");
     }
@@ -70,7 +70,7 @@ public class SimpleFramedFeature extends SimpleStrandedFeature implements Framed
 
   protected void fillTemplate(FramedFeature.Template ft){
     super.fillTemplate(ft);
-	FramedFeature.Template.readingFrame = getReadingFrame();
+	ft.readingFrame = getReadingFrame();
   }
   public String toString(){
    return super.toString() + " "+getStrand().getToken()+""
