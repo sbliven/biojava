@@ -493,10 +493,9 @@ public abstract class DP {
     */
   public StatePath generate(int length)
   throws IllegalSymbolException, BioException {
+    List tokenList = new ArrayList();
+    List stateList = new ArrayList();
     List scoreList = new ArrayList();
-    SimpleSymbolList tokens = new SimpleSymbolList(model.emissionAlphabet());
-    SimpleSymbolList states = new SimpleSymbolList(model.stateAlphabet());
-
     double totScore = 0.0;
     double resScore = 0.0;
     int i = length;
@@ -515,8 +514,8 @@ public abstract class DP {
       EmissionState eState = (EmissionState) oldState;
       token = eState.getDistribution().sampleSymbol();
       resScore += eState.getDistribution().getWeight(token);
-      states.addSymbol(oldState);
-      tokens.addSymbol(token);
+      stateList.add(oldState);
+      tokenList.add(token);
       scoreList.add(dAlpha.getSymbol(resScore));
       totScore += resScore;
       resScore = 0.0;
@@ -543,8 +542,8 @@ public abstract class DP {
         EmissionState eState = (EmissionState) newState;
         token = eState.getDistribution().sampleSymbol();
         resScore += eState.getDistribution().getWeight(token);
-        states.addSymbol(newState);
-        tokens.addSymbol(token);
+        stateList.add(newState);
+        tokenList.add(token);
         scoreList.add(dAlpha.getSymbol(resScore));
         totScore += resScore;
         resScore = 0.0;
@@ -554,9 +553,10 @@ public abstract class DP {
     }
 
     List resListList = new ArrayList(3);
-    resListList.add(tokens);
-    resListList.add(states);
-    resListList.add(new SimpleSymbolList(dAlpha, scoreList));
+
+    SymbolList tokens = new SimpleSymbolList(model.emissionAlphabet(), tokenList);
+    SymbolList states = new SimpleSymbolList(model.stateAlphabet(), stateList);
+    SymbolList scores = new SimpleSymbolList(dAlpha, scoreList);
     
     Map labelToResList = new HashMap();
     labelToResList.put(StatePath.SEQUENCE, tokens);

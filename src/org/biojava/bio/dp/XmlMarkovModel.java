@@ -35,7 +35,7 @@ public class XmlMarkovModel {
   public static WeightMatrix readMatrix(Element root)
   throws IllegalSymbolException, IllegalAlphabetException, BioException {
     Element alphaE = (Element) root.getElementsByTagName("alphabet").item(0);
-    Alphabet sa = AlphabetManager.instance().alphabetForName(
+    Alphabet sa = AlphabetManager.alphabetForName(
       alphaE.getAttribute("name"));
     if(! (sa instanceof FiniteAlphabet)) {
       throw new IllegalAlphabetException(
@@ -84,7 +84,7 @@ public class XmlMarkovModel {
     
     int heads = Integer.parseInt(root.getAttribute("heads"));
     Element alphaE = (Element) root.getElementsByTagName("alphabet").item(0);
-    Alphabet seqAlpha = AlphabetManager.instance().alphabetForName(
+    Alphabet seqAlpha = AlphabetManager.alphabetForName(
       alphaE.getAttribute("name")
     );
     SimpleMarkovModel model = new SimpleMarkovModel(heads, seqAlpha);

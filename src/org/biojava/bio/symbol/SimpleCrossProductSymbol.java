@@ -45,10 +45,19 @@ public class SimpleCrossProductSymbol
 implements CrossProductSymbol, Serializable {
   private final List l;
   private final char token;
+  private final CrossProductAlphabet parent;
+  private Alphabet matches;
 
-  public SimpleCrossProductSymbol(List l, char token) {
+  public SimpleCrossProductSymbol(
+    char token, List l, CrossProductAlphabet parent
+  ) {
     this.l = Collections.unmodifiableList(new ArrayList(l));
     this.token = token;
+    this.parent = parent;
+  }
+  
+  public SimpleCrossProductSymbol(char token, List l) {
+    this(token, l, null);
   }
 
   public List getSymbols() {
@@ -74,6 +83,18 @@ implements CrossProductSymbol, Serializable {
 
   public Annotation getAnnotation() {
     return Annotation.EMPTY_ANNOTATION;
+  }
+
+  public Alphabet getMatches() {
+    if(matches == null) {
+      List alphas = new ArrayList();
+      for(Iterator i = getSymbols().iterator(); i.hasNext(); ) {
+        Symbol s = (Symbol) i.next();
+        alphas.add(s.getMatches());
+      }
+      this.matches = AlphabetManager.getCrossProductAlphabet(alphas, parent);
+    }
+    return this.matches;
   }
 }
 

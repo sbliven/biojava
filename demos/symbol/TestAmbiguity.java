@@ -39,17 +39,12 @@ public class TestAmbiguity {
       for(int i = 1; i <= sList.length(); i++) {
         Symbol s = sList.symbolAt(i);
         System.out.print(s.getName() + " -> {");
-        if(s instanceof AmbiguitySymbol) {
-          AmbiguitySymbol as = (AmbiguitySymbol) s;
-          Iterator j = ((FiniteAlphabet) as.getMatchingAlphabet()).iterator();
-          if(j.hasNext()) {
-            System.out.print(((Symbol) j.next()).getName());
-          }
-          while(j.hasNext()) {
-            System.out.print(", " + ((Symbol) j.next()).getName());
-          }
-        } else {
-          System.out.print(s.getName());
+        Iterator j = ((FiniteAlphabet) s.getMatches()).iterator();
+        if(j.hasNext()) {
+          System.out.print(((Symbol) j.next()).getName());
+        }
+        while(j.hasNext()) {
+          System.out.print(", " + ((Symbol) j.next()).getName());
         }
         System.out.println("}");
       }

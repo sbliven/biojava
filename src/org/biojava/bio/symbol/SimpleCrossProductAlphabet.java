@@ -73,29 +73,29 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
     return ourSymbols.values().iterator();
   }
   
-  private void populateSymbols(List r) {
-    if(r.size() == 0) {
-      return;
-    }
-    if (r.size() == alphas.size()) {
-	    putSymbol(r);
+  private void populateSymbols(List symList) {
+    if (symList.size() == alphas.size()) {
+	    putSymbol(symList);
     } else {
-	    int indx = r.size();
+	    int indx = symList.size();
 	    FiniteAlphabet a = (FiniteAlphabet) alphas.get(indx);
 	    Iterator i = a.iterator();
       if(i.hasNext()) {
-        r.add(i.next());
-        populateSymbols(r);
+        symList.add(i.next());
+        populateSymbols(symList);
+        while (i.hasNext()) {
+          symList.set(indx, i.next());
+          populateSymbols(symList);
+        }
+        symList.remove(indx);
       }
-	    while (i.hasNext()) {
-        r.set(indx, i.next());
-        populateSymbols(r);
-	    }
-	    r.remove(indx);
     }
   }
 
   private void putSymbol(List r) {
+    if(r.size() == 0) {
+      return;
+    }
     CrossProductSymbol rr;
     if(parent != null) {
       try {
@@ -104,36 +104,30 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
         throw new BioError(ise, "Balls up - couldn't fetch symbol from parent");
       }
     } else {
-      rr = new SimpleCrossProductSymbol(r, tokenSeed++);
+      rr = new AtomicCrossProductSymbol(tokenSeed++, r);
     }
     ourSymbols.put(new AlphabetManager.ListWrapper(rr.getSymbols()), rr);
   }
 
   public boolean contains(Symbol s) {
-    if(ourSymbols.values().contains(s)) {// haven't seen it before
+    if(ourSymbols.values().contains(s)) {// have seen it before
       return true;
-    } else if(s instanceof AmbiguitySymbol) { // ambiguity
-      AmbiguitySymbol as = (AmbiguitySymbol) s;
-      Iterator i = ((FiniteAlphabet) as.getMatchingAlphabet()).iterator();
-      while(i.hasNext()) {
-        Symbol sym = (Symbol) i.next();
-        if(!this.contains(sym)) {
-          return false;
+    } else if(!(s instanceof AtomicSymbol)) { // ambiguity
+      Alphabet sa = s.getMatches();
+      if(sa instanceof FiniteAlphabet) {
+        Iterator i = ((FiniteAlphabet) sa).iterator();
+        while(i.hasNext()) {
+          CrossProductSymbol sym = (CrossProductSymbol) i.next();
+          if(!this.contains(sym)) {
+            return false;
+          }
         }
+        return true;
+      } else {
+        return false;
       }
-      return true;
     } else {
-      // check that it isn't composed of syms legal to contained alphabets
-      Iterator ai = getAlphabets().iterator();
-      Iterator si = ((CrossProductSymbol) s).getSymbols().iterator();
-      while(ai.hasNext() && si.hasNext()) {
-        Alphabet alpha = (Alphabet) ai.next();
-        Symbol sym = (Symbol) si.next();
-        if(!alpha.contains(sym)) {
-          return false;
-        }
-      }
-      return true;
+      return false;
     }
   }
 
@@ -191,21 +185,19 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
 
   public CrossProductSymbol getSymbol(List l)
   throws IllegalSymbolException {
-    //System.out.println("Size = " + size());
     CrossProductSymbol cps;
     synchronized(gopher) {
       gopher.l = l;
       cps = (CrossProductSymbol) ourSymbols.get(gopher);
     }
     if (cps == null) {
-      cps = new AmbiguityCrossProductSymbol(l, '?', this);
-      CrossProductSymbol s = (CrossProductSymbol) AlphabetManager.instance().getGapSymbol().normalize(cps);
-      if(this.contains(s)) {
-        return s;
+      cps = AlphabetManager.getCrossProductSymbol('?', l, this);
+      if(this.contains(cps)) {
+        return cps;
       } else {
         throw new IllegalSymbolException(
-          "Unable to find CrossProduct symbol for " +
-          s.getName() + " in alphabet " + getName()
+          "Unable to find CrossProduct symbol for " + cps.getClass() +
+          cps.getName() + " in alphabet " + getName()
         );
       }
     } else {

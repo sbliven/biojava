@@ -34,6 +34,7 @@ implements EmissionState, Serializable {
   private String name;
   private Annotation ann;
   private int [] advance;
+  private Alphabet matches;
   
   public final Annotation getAnnotation() {
     return this.ann;
@@ -71,6 +72,10 @@ implements EmissionState, Serializable {
     this.name = name;
   }
   
+  public Alphabet getMatches() {
+    return matches;
+  }
+  
   public SimpleEmissionState(
     String name,
     Annotation ann,
@@ -81,6 +86,7 @@ implements EmissionState, Serializable {
     setAnnotation(ann);
     this.advance = advance;
     setDistribution(dis);
+    this.matches = new SingletonAlphabet(this);
   }
   
   public void registerWithTrainer(ModelTrainer trainer) {}

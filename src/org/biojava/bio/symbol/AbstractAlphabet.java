@@ -25,7 +25,7 @@ package org.biojava.bio.symbol;
 import java.util.*;
 
 /**
- * An abstract implementation of FiniteAlphabet.
+ * An abstract implementation of Alphabet.
  * <P>
  * This provides the frame-work for maintaining the SymbolParser <-> name
  * mappings.

@@ -51,7 +51,7 @@ public class BaumWelchSampler extends AbstractTrainer implements Serializable {
     SingleDPMatrix bm = (SingleDPMatrix) dp.backwardMatrix(rll);
     double bs = bm.getScore();
 
-    Symbol gap = AlphabetManager.instance().getGapSymbol();
+    Symbol gap = AlphabetManager.getGapSymbol();
     
     // state trainer
     for (int i = 1; i <= resList.length(); i++) {

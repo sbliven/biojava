@@ -79,21 +79,22 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
   }
   
   public boolean contains(Symbol s) {
-    if(s instanceof AmbiguitySymbol) {
-      AmbiguitySymbol as = (AmbiguitySymbol) s;
-      Iterator i = ((FiniteAlphabet) as.getMatchingAlphabet()).iterator();
-      while(i.hasNext()) {
-        Symbol sym = (Symbol) i.next();
-        if(!this.contains(sym)) {
-          return false;
+    if(!(s instanceof AtomicSymbol)) {
+      Alphabet sa = s.getMatches();
+      if(sa instanceof FiniteAlphabet) {
+        Iterator i = ((FiniteAlphabet) sa).iterator();
+        while(i.hasNext()) {
+          AtomicSymbol sym = (AtomicSymbol) i.next();
+          if(!this.contains(sym)) {
+            return false;
+          }
         }
+        return true;
+      } else {
+        return false;
       }
     }
 
-    if(! (s instanceof CrossProductSymbol)) {
-      return false;
-    }
-    
     return knownSymbols.values().contains(s);
   }
 
@@ -106,22 +107,6 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
         " or an AmbiguitySymbol over a subset of this alphabet"
       );
     }
-    /*
-    if(! (r instanceof CrossProductSymbol)) {
-	    throw new IllegalSymbolException(
-        "CrossProductAlphabet " + getName() + " does not accept " + r.getName() +
-        " as it is not an instance of CrossProductSymbol"
-      );
-    }
-    
-    if(!contains(r)) {
-      throw new IllegalSymbolException(
-        r,
-        "Symbol " + r.getName() + " is not a member of the alphabet " +
-        getName()
-      );
-    }
-    */
   }
   
   
@@ -175,14 +160,14 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
           throw new IllegalSymbolException(
             ire,
             "Can't retrieve symbol for " +
-            new SimpleCrossProductSymbol(rList, '?') + " in alphabet " +
+            AlphabetManager.getCrossProductSymbol('?', rList) + " in alphabet " +
             getName()
           );
         }
       }
       List l = new ArrayList(rList);
-      r = new SimpleCrossProductSymbol(l, tokenSeed++);
-      knownSymbols.put(new AlphabetManager.ListWrapper(l), r);
+      r = AlphabetManager.getCrossProductSymbol(tokenSeed++, l);
+      knownSymbols.put(new AlphabetManager.ListWrapper(r.getSymbols()), r);
     }
     
     return r;

@@ -67,7 +67,7 @@ public class PairwiseAlignment {
       while(sourceI.hasNext()) {
         Sequence sourceSeq = sourceI.nextSequence();
         
-        InputStream targetIS = new FileInputStream(sourceSeqFile);
+        InputStream targetIS = new FileInputStream(targetSeqFile);
         SequenceIterator targetI = new StreamReader(
           targetIS,
           sFormat,
@@ -102,7 +102,7 @@ public class PairwiseAlignment {
     
     FiniteAlphabet dna = alpha;
     CrossProductAlphabet dna2 =
-      AlphabetManager.instance().getCrossProductAlphabet(
+      AlphabetManager.getCrossProductAlphabet(
         Collections.nCopies(2, dna)
       );
       

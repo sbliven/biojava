@@ -32,37 +32,31 @@ import org.biojava.bio.*;
  * @author Matthew Pocock
  */
 public class SimpleSymbol implements Symbol, Serializable {
-  /**
-   * The annotation for this object.
-   */
   private Annotation annotation;
-  
-  /**
-   * The character token for this symbol.
-   */
   private char token;
-  
-  /**
-   * The name for this symbol.
-   */
   private String name;
-
+  private Alphabet matches;
+  
   public Annotation getAnnotation() {
     if(annotation == null)
       annotation = new SimpleAnnotation();
-    return annotation;
+    return this.annotation;
   }
 
   public char getToken() {
-    return token;
+    return this.token;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public void setName(String name) {
     this.name = name;
+  }
+  
+  public Alphabet getMatches() {
+    return this.matches;
   }
   
   /**
@@ -71,12 +65,19 @@ public class SimpleSymbol implements Symbol, Serializable {
    * @param token  the char to represent this symbol when sequences are
    *                stringified
    * @param name  the long name
+   * @param matches the Alphabet of symbols that this symbol can match
    * @param annotation the annotation
    */
-  public SimpleSymbol(char token, String name, Annotation annotation) {
+  public SimpleSymbol(
+    char token,
+    String name,
+    Alphabet matches,
+    Annotation annotation
+  ) {
     this.token = token;
     this.name = name;
     this.annotation = annotation;
+    this.matches = matches;
   }
 
   public String toString() {

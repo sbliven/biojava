@@ -29,5 +29,5 @@ import org.biojava.bio.symbol.*;
  * <P>
  * This signals that this object can sit inside a model.
  */
-public interface State extends Symbol {
+public interface State extends AtomicSymbol {
 }

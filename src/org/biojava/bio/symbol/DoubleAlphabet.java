@@ -63,7 +63,7 @@ public class DoubleAlphabet implements Alphabet, Serializable {
    * The returned object is a view onto the underlying array, and does not copy
    * it. Changes made to the original array will alter the resulting SymbolList.
    *
-   * @param dArray  the arrou of doubles to view
+   * @param dArray  the array of doubles to view
    * @return a SymbolList over the DoubleAlphabet that represent the values in
    *         dArray
    */
@@ -97,16 +97,6 @@ public class DoubleAlphabet implements Alphabet, Serializable {
   public boolean contains(Symbol s) {
     if(s instanceof DoubleSymbol) {
       return true;
-    } else if(s instanceof AmbiguitySymbol) {
-      AmbiguitySymbol as = (AmbiguitySymbol) s;
-      Iterator i = ((FiniteAlphabet) as.getMatchingAlphabet()).iterator();
-      while(i.hasNext()) {
-        Symbol sym = (Symbol) i.next();
-        if(!this.contains(sym)) {
-          return false;
-        }
-      }
-      return true;
     }
     return false;
   }
@@ -133,8 +123,9 @@ public class DoubleAlphabet implements Alphabet, Serializable {
    * <P>
    * @author Matthew Pocock
    */
-  public static class DoubleSymbol implements Symbol, Serializable {
+  public static class DoubleSymbol implements AtomicSymbol, Serializable {
     private final double val;
+    private final Alphabet matches;
     
     public Annotation getAnnotation() {
       return Annotation.EMPTY_ANNOTATION;
@@ -152,8 +143,13 @@ public class DoubleAlphabet implements Alphabet, Serializable {
       return val;
     }
     
+    public Alphabet getMatches() {
+      return matches;
+    }
+    
     protected DoubleSymbol(double val) {
       this.val = val;
+      this.matches = new SingletonAlphabet(this);
     }
   }
   

@@ -49,18 +49,6 @@ class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable
   }
 
   public boolean contains(Symbol s) {
-    if(s instanceof AmbiguitySymbol) {
-      AmbiguitySymbol as = (AmbiguitySymbol) s;
-      Iterator i = ((FiniteAlphabet) as.getMatchingAlphabet()).iterator();
-      while(i.hasNext()) {
-        Symbol sym = (Symbol) i.next();
-        if(!this.contains(sym)) {
-          return false;
-        }
-      }
-      return true;
-    }
-    
     if(! (s instanceof CrossProductSymbol)) {
       return false;
     }
@@ -94,31 +82,6 @@ class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable
         " an AmbiguitySymbol over a subset of symbols in this alphabet."
       );
     }
-    
-/*    CrossProductSymbol cr = (CrossProductSymbol) r;
-    List rl = cr.getSymbols();
-    if(rl.size() != alphas.size()) {
-      throw new IllegalSymbolException(
-        "CrossProductAlphabet " + getName() + " does not accept " + r.getName() +
-        " as it is of a different order to this (" + alphas.size() + ":" + rl.size() +
-        ")"
-      );
-    }
-    
-    Iterator ai = alphas.iterator();
-    Iterator ri = rl.iterator();
-    
-    while(ai.hasNext() && ri.hasNext()) {
-      Alphabet aa = (Alphabet) ai.next();
-      Symbol rr = (Symbol) ri.next();
-      if(!aa.contains(rr)) {
-        throw new IllegalSymbolException(
-          "CrossProductAlphabet " + getName() + " does not accept " + r.getName() +
-          " as symbol " + rr.getName() + " is not a member of the alphabet " +
-          aa.getName()
-        );
-      }
-    }*/
   }
 
   public Annotation getAnnotation() {
@@ -153,7 +116,7 @@ class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable
       }
     }
     
-    return new SimpleCrossProductSymbol(rList, tokenSeed++);
+    return AlphabetManager.getCrossProductSymbol(tokenSeed++, rList);
   }
 
   public SymbolParser getParser(String name)

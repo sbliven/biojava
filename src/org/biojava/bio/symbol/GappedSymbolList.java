@@ -529,7 +529,7 @@ extends AbstractSymbolList implements Serializable {
     }
     int i = findViewBlock(indx);
     if(i == -1) {
-      return AlphabetManager.instance().getGapSymbol();
+      return AlphabetManager.getGapSymbol();
     } else {
       Block b = (Block) blocks.get(i);
       return source.symbolAt(b.sourceStart - b.viewStart + indx);

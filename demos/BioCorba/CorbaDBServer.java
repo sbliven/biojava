@@ -22,7 +22,7 @@ public class CorbaDBServer {
     
     // work out what to load
     File seqDBFile = new File(args[0]);
-    Alphabet alpha = AlphabetManager.instance().alphabetForName(args[1]);
+    Alphabet alpha = AlphabetManager.alphabetForName(args[1]);
     if(alpha == null) {
       throw new NullPointerException("Alphabet " + args[1] + " not known");
     }    

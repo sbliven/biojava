@@ -52,20 +52,33 @@ public abstract class AbstractDistribution implements Distribution {
    * @throws IllegalSymbolException if for any reason the symbols within amb
    *         are not recognized by this state
    */
-  protected double getAmbiguityWeight(AmbiguitySymbol amb)
+  protected double getAmbiguityWeight(Symbol amb)
   throws IllegalSymbolException {
-    FiniteAlphabet fa = (FiniteAlphabet) amb.getMatchingAlphabet();
-    double sum = 0.0;
-    double div = 0.0;
-    for(Iterator i = fa.iterator(); i.hasNext(); ) {
-      Symbol sym = (Symbol) i.next();
-      double nm = getNullModel().getWeight(sym);
-      sum += getWeight(sym) * nm;
-      div += nm;
+    if(amb instanceof AtomicSymbol) {
+      throw new IllegalSymbolException(
+        "Can't calculate ambiguity weight for atomic symbol " + amb.getName()
+      );
     }
-    return (sum == 0.0)
-      ? 0.0
-      : sum / div;
+    Alphabet ambA = amb.getMatches();
+    if(ambA instanceof FiniteAlphabet) {
+      FiniteAlphabet fa = (FiniteAlphabet) ambA;
+      double sum = 0.0;
+      double div = 0.0;
+      for(Iterator i = fa.iterator(); i.hasNext(); ) {
+        Symbol sym = (Symbol) i.next();
+        double nm = getNullModel().getWeight(sym);
+        sum += getWeight(sym) * nm;
+        div += nm;
+      }
+      return (sum == 0.0)
+        ? 0.0
+        : sum / div;
+    } else {
+      throw new IllegalSymbolException(
+        "Can't find weight for infinite set of symbols matched by " +
+        amb.getName()
+      );
+    }
   }
   
   /**
@@ -80,7 +93,7 @@ public abstract class AbstractDistribution implements Distribution {
     double p = Math.random();
     try {
       for(Iterator i = ((FiniteAlphabet) getAlphabet()).iterator(); i.hasNext(); ) {
-        Symbol s = (Symbol) i.next();
+        AtomicSymbol s = (AtomicSymbol) i.next();
         p -= getWeight(s);
         if( p <= 0) {
           return s;
@@ -89,7 +102,7 @@ public abstract class AbstractDistribution implements Distribution {
     
       StringBuffer sb = new StringBuffer();
       for(Iterator i = ((FiniteAlphabet) this.getAlphabet()).iterator(); i.hasNext(); ) {
-        Symbol s = (Symbol) i.next();
+        AtomicSymbol s = (AtomicSymbol) i.next();
         double w = getWeight(s);
         sb.append("\t" + s.getName() + " -> " + w + "\n");
       }

@@ -30,11 +30,6 @@ import org.biojava.bio.*;
  * This is the atomic unit of a SymbolList, or a sequence. It allows
  * for fine-train fly-weighting, so that there can be one instance
  * of each symbol that is referenced multiple times.
- * <P>
- * Symbols are considered unique if they are seperate objects, regardless
- * of any state information. A particular implementation may override this
- * concept so that different Symbol objects are considered to be examples
- * of the same type of symbol.
  *
  * @author Matthew Pocock
  */
@@ -52,4 +47,17 @@ public interface Symbol extends Annotatable {
    * @return  the long name
    */
   String getName();
+  
+  /**
+   * The alphabet containing the symbols matched by this ambiguity symbol.
+   * <P>
+   * This alphabet contains all of, and only, the symbols matched by this
+   * symobl. For example, the symbol representing the DNA
+   * ambiguity code for W would contain the symbol for A and T from the DNA
+   * alphabet.
+   *
+   * @return  the Alphabet of symbols matched by this
+   *          symbol
+   */
+  Alphabet getMatches();
 }

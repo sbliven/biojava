@@ -55,6 +55,7 @@ public final class AlphabetManager {
    * Retrieve the singleton instance.
    *
    * @return the AlphabetManager instance
+   * @deprecated all AlphabetManager methods have become static
    */
   static public AlphabetManager instance() {
     if(am == null)
@@ -62,25 +63,11 @@ public final class AlphabetManager {
     return am;
   }
 
-  /**
-   * Maintains the map from name to alphabet.
-   */
-  private Map nameToAlphabet;
-  private Map nameToSymbol;
-  private Map gappedAlphabets;
-  private Map crossProductAlphabets;
-  private Map ambiguitySymbols;
-  private GapSymbol gapSymbol;
-
-  /**
-   * Initialize nameToAlphabet.
-   */
-  {
-    nameToAlphabet = new HashMap();
-    nameToSymbol = new HashMap();
-    gappedAlphabets = new HashMap();
-    ambiguitySymbols = new HashMap();
-  }
+  static private Map nameToAlphabet;
+  static private Map nameToSymbol;
+  static private Map crossProductAlphabets;
+  static private Map ambiguitySymbols;
+  static private GapSymbol gapSymbol;
 
   /**
    * Retrieve the alphabet for a specific name.
@@ -89,7 +76,7 @@ public final class AlphabetManager {
    * @return the alphabet object
    * @throws NoSuchElementException if there is no alphabet by that name
    */
-  public Alphabet alphabetForName(String name)
+  static public Alphabet alphabetForName(String name)
   throws NoSuchElementException{
     Alphabet alpha = (Alphabet) nameToAlphabet.get(name);
     if(alpha == null) {
@@ -104,7 +91,7 @@ public final class AlphabetManager {
     return alpha;
   }
 
-  public Symbol symbolForName(String name) 
+  static public Symbol symbolForName(String name) 
   throws NoSuchElementException {
     Symbol s = (Symbol) nameToSymbol.get(name);
     if(s == null) {
@@ -119,7 +106,7 @@ public final class AlphabetManager {
    * @param name  the name by which it can be retrieved
    * @param alphabet the Alphabet to store
    */
-  public void registerAlphabet(String name, Alphabet alphabet) {
+  static public void registerAlphabet(String name, Alphabet alphabet) {
     nameToAlphabet.put(name, alphabet);
   }
   
@@ -128,7 +115,7 @@ public final class AlphabetManager {
    *
    * @return an Iterator over Alphabet objects
    */
-  public Iterator alphabets() {
+  static public Iterator alphabets() {
     return nameToAlphabet.values().iterator();
   }
 
@@ -137,17 +124,83 @@ public final class AlphabetManager {
    * <P>
    * @return the system-wide symbol that represents a gap
    */
-  public GapSymbol getGapSymbol() {
+  static public CrossProductSymbol getGapSymbol() {
     return gapSymbol;
   }
 
+
+  /**
+   * Generates a new CrossProductSymbol instance.
+   * <P>
+   * This factory method hides some complexity about exactly what to make. If
+   * symList contains only gaps, then the gap symbol is returned. If it contains
+   * only AtomicSymbol instances, then a CrossProductSymbol implementing
+   * AtomicSymbol will be returned. Otherwise, a plain-old CrossProductSymbol
+   * will be returned.
+   * <P>
+   * This method makes no attempt to force singleton-ness upon the returned
+   * symbol. This method will normaly be invoked by methods within alphabet
+   * implementations, not by client code.
+   *
+   * @param symList a list of Symbol objects
+   * @return a CrossProductSymbol that encapsulates that list
+   */
+  static public CrossProductSymbol getCrossProductSymbol(
+    char token, List symList
+  ) {
+    return getCrossProductSymbol(token, symList, null);
+  }
+  
+  /**
+   * Generates a new CrossProductSymbol instance.
+   * <P>
+   * This factory method hides some complexity about exactly what to make. If
+   * symList contains only gaps, then the gap symbol is returned. If it contains
+   * only AtomicSymbol instances, then a CrossProductSymbol implementing
+   * AtomicSymbol will be returned. Otherwise, a plain-old CrossProductSymbol
+   * will be returned.
+   * <P>
+   * This method makes no attempt to force singleton-ness upon the returned
+   * symbol. This method will normaly be invoked by methods within alphabet
+   * implementations, not by client code.
+   *
+   * @param symList a list of Symbol objects
+   * @param parent  a parental CrossProductAlphabet instance
+   * @return a CrossProductSymbol that encapsulates that list
+   */
+  static public CrossProductSymbol getCrossProductSymbol(
+    char token, List symList, CrossProductAlphabet parent
+  ) {
+    Iterator i = symList.iterator();
+    int gapC = 0;
+    int atomC = 0;
+    while(i.hasNext()) {
+      Symbol s = (Symbol) i.next();
+      if(s == gapSymbol) {
+        gapC++;
+      } else if(s instanceof AtomicSymbol) {
+        atomC++;
+      }
+    }
+    
+    if(gapC == symList.size()) {
+      return gapSymbol;
+    } else if(atomC == symList.size()) {
+      return new AtomicCrossProductSymbol(token, symList);
+    } else {
+      return new SimpleCrossProductSymbol(token, symList, parent);
+    }
+  }
+  
   /**
    * Generates a new CrossProductAlphabet from the give name.
    *
    * @param name  the name to parse
    * @return the associated Alphabet
    */
-  public CrossProductAlphabet generateCrossProductAlphaFromName(String name) {
+  static public CrossProductAlphabet generateCrossProductAlphaFromName(
+    String name
+  ) {
     if(!name.startsWith("(") || !name.endsWith(")")) {
       throw new BioError(
         "Can't parse " + name +
@@ -209,18 +262,42 @@ public final class AlphabetManager {
    * symbols.
    * <P>
    * The resulting alphabet cpa will be retrievable via
-   * AlphabetManager.instance().alphabetForName(cpa.getName())
+   * AlphabetManager.alphabetForName(cpa.getName())
    *
    * @param aList a list of Alphabet objects
    * @return a CrossProductAlphabet that is over the alphabets in aList
    */
-  public CrossProductAlphabet getCrossProductAlphabet(List aList) {
+  static public CrossProductAlphabet getCrossProductAlphabet(List aList) {
+    return getCrossProductAlphabet(aList, null);
+  }
+  
+  /**
+   * Retrieve a CrossProductAlphabet instance over the alphabets in aList.
+   * <P>
+   * If all of the alphabets in aList implements FiniteAlphabet then the
+   * method will return a FiniteAlphabet. Otherwise, it returns a non-finite
+   * alphabet.
+   * <P>
+   * If you call this method twice with a list containing the same alphabets,
+   * it will return the same alphabet. This promotes the re-use of alphabets
+   * and helps to maintain the 'flyweight' principal for finite alphabet
+   * symbols.
+   * <P>
+   * The resulting alphabet cpa will be retrievable via
+   * AlphabetManager.alphabetForName(cpa.getName())
+   *
+   * @param aList a list of Alphabet objects
+   * @param parent a parent alphabet
+   * @return a CrossProductAlphabet that is over the alphabets in aList
+   */
+  static public CrossProductAlphabet getCrossProductAlphabet(
+    List aList, CrossProductAlphabet parent
+  ) {
     if(crossProductAlphabets == null) {
       crossProductAlphabets = new HashMap();
     }
 
     ListWrapper aw = new ListWrapper(aList);
-        
     CrossProductAlphabet cpa =
       (CrossProductAlphabet) crossProductAlphabets.get(aw);
     
@@ -236,8 +313,8 @@ public final class AlphabetManager {
       }
       if(cpa == null) {
         try {
-          if(size > 0 && size < 1000) {
-            cpa = new SimpleCrossProductAlphabet(aList);
+          if(size >= 0 && size < 1000) {
+            cpa = new SimpleCrossProductAlphabet(aList, parent);
           } else {
             cpa = new SparseCrossProductAlphabet(aList);
           }
@@ -255,12 +332,12 @@ public final class AlphabetManager {
     return cpa;
   }
 
-  public AmbiguitySymbol getAmbiguitySymbol(Collection syms)
+  static public Symbol getAmbiguitySymbol(Collection syms)
   throws IllegalSymbolException {
     return getAmbiguitySymbol('\0', "", null, syms);
   }
   
-  public AmbiguitySymbol getAmbiguitySymbol(
+  static public Symbol getAmbiguitySymbol(
     char token,
     String name,
     Annotation ann,
@@ -269,24 +346,30 @@ public final class AlphabetManager {
     Set symSet = new HashSet();
     for(Iterator i = syms.iterator(); i.hasNext(); ) {
       Symbol s = (Symbol) i.next();
-      if(s instanceof AmbiguitySymbol) {
-        AmbiguitySymbol as = (AmbiguitySymbol) s;
-        FiniteAlphabet fa = (FiniteAlphabet) as.getMatchingAlphabet();
-        Iterator j = fa.iterator();
-        while(j.hasNext()) {
-          symSet.add(j.next());
-        }
-      } else {
+      if(s instanceof AtomicSymbol) {
         symSet.add(s);
+      } else {
+        Alphabet sa = s.getMatches();
+        if(sa instanceof FiniteAlphabet) {
+          Iterator j = ((FiniteAlphabet) sa).iterator();
+          while(j.hasNext()) {
+            symSet.add(j.next());
+          }
+        } else {
+          throw new IllegalSymbolException(
+            "Unable to process symbol " + s.getName() +
+            " as it matches an infinite number of AtomicSymbol objects."
+          );
+        }
       }
     }
-    AmbiguitySymbol as = (AmbiguitySymbol) ambiguitySymbols.get(symSet);
+    Symbol as = (Symbol) ambiguitySymbols.get(symSet);
     if(as == null) {
-      as = new SimpleAmbiguitySymbol(
+      as = new SimpleSymbol(
         token,
         name,
-        ann,
-        new SimpleAlphabet(symSet)
+        new SimpleAlphabet(symSet),
+        ann
       );
       ambiguitySymbols.put(symSet, as);
     }
@@ -300,12 +383,17 @@ public final class AlphabetManager {
    * <code>org/biojava/bio/seq/tools/AlphabetManager.xml</code>
    * and builds a basic set of alphabets.
    */
-  private AlphabetManager() {
+  static {
+    nameToAlphabet = new HashMap();
+    nameToSymbol = new HashMap();
+    ambiguitySymbols = new HashMap();
+
     gapSymbol = new GapSymbol();
     ambiguitySymbols.put(new HashSet(), gapSymbol);
     try {
-      URL alphabetURL =
-        getClass().getClassLoader().getResource("org/biojava/bio/symbol/AlphabetManager.xml");
+      URL alphabetURL = AlphabetManager.class.getClassLoader().getResource(
+        "org/biojava/bio/symbol/AlphabetManager.xml"
+      );
       InputSource is = Resolver.createInputSource(alphabetURL, true);
       Document doc = XmlDocument.createXmlDocument(is, true);
 
@@ -350,9 +438,9 @@ public final class AlphabetManager {
    * Build an individual symbol.
    *
    * @param resE an XML Element specifying the element
-   * @return the new Symbol object
+   * @return the new AtomicSymbol object
    */
-  private Symbol symbolFromXML(Element resE) {
+  static private AtomicSymbol symbolFromXML(Element resE) {
     char token = '\0';
     String name = null;
     String description = null;
@@ -371,7 +459,7 @@ public final class AlphabetManager {
       }
     }
 
-    Symbol res = new WellKnownSymbol(token, name, (Annotation) null);
+    AtomicSymbol res = new WellKnownSymbol(token, name, (Annotation) null);
     res.getAnnotation().setProperty("description", description);
     return res;
   }
@@ -382,7 +470,7 @@ public final class AlphabetManager {
    * @param resE an XML Element specifying the element
    * @return the new AmbiguitySymbol object
    */
-  private AmbiguitySymbol ambiguityFromXML(Element resE, Map nameToSym)
+  static private Symbol ambiguityFromXML(Element resE, Map nameToSym)
   throws IllegalSymbolException {
     char token = '\0';
     String name = null;
@@ -419,7 +507,7 @@ public final class AlphabetManager {
       }
     }
 
-    AmbiguitySymbol res = getAmbiguitySymbol(token, name, (Annotation) null, syms);
+    Symbol res = getAmbiguitySymbol(token, name, (Annotation) null, syms);
     return res;
   }
 
@@ -432,7 +520,7 @@ public final class AlphabetManager {
    * @return a new Alphabet
    * @throws BioException if anything goes wrong
    */
-  private SimpleAlphabet alphabetFromXML(Element alph, Map nameToSym)
+  static private SimpleAlphabet alphabetFromXML(Element alph, Map nameToSym)
   throws BioException {
     nameToSym = new HashMap(nameToSym);
     SimpleAlphabet alphabet = new WellKnownAlphabet();
@@ -494,7 +582,7 @@ public final class AlphabetManager {
 
         private Object readResolve() throws ObjectStreamException {
           try {
-            Alphabet a = AlphabetManager.instance().alphabetForName(name);
+            Alphabet a = AlphabetManager.alphabetForName(name);
             return a;
           } catch (NoSuchElementException ex) {
             throw new InvalidObjectException("Couldn't resolve alphabet " + name);
@@ -508,7 +596,7 @@ public final class AlphabetManager {
      * serialized data.
      */
 
-    private static class WellKnownSymbol extends SimpleSymbol
+    private static class WellKnownSymbol extends SimpleAtomicSymbol
                                           implements Serializable
     {
 	public WellKnownSymbol(char token, String name, Annotation a) {
@@ -531,7 +619,7 @@ public final class AlphabetManager {
 
 	    private Object readResolve() throws ObjectStreamException {
 		try {
-		    Symbol a = AlphabetManager.instance().
+		    Symbol a = AlphabetManager.
                                     symbolForName(name);
 		    return a;
 		} catch (NoSuchElementException ex) {
@@ -548,15 +636,19 @@ public final class AlphabetManager {
    */
 
   public static class ListWrapper {
-    List l;
+    List l; // should be moved private
 
-    ListWrapper(List l) {
+    public ListWrapper(List l) {
       this.l = l;
     }
 
-    ListWrapper() {
+    public ListWrapper() {
     }
 
+    public void setList(List l) {
+      this.l = l;
+    }
+    
     public boolean equals(Object o) {
       if (! (o instanceof ListWrapper)) {
         return false;
@@ -598,53 +690,29 @@ public final class AlphabetManager {
    *
    * @author Matthew Pocock
    */
-  public static class GapSymbol
-  extends SimpleAmbiguitySymbol
+  private static class GapSymbol
+  extends SimpleSymbol
   implements CrossProductSymbol {
     public GapSymbol() {
-      super('-', "gap", null, Alphabet.EMPTY_ALPHABET);
+      super('-', "gap", Alphabet.EMPTY_ALPHABET, Annotation.EMPTY_ANNOTATION);
     }
     
     /**
      * Returns an infinitely long list of itself.
      *
-     * @return a List of length Integer.MAX_VALUE with every slot filled with
-     *         this gap symbol
+     * @return a List of length zero, but where get(n) always returns the gap
+     *         symbol
      */
     public List getSymbols() {
       return new AbstractList() {
         public int size() {
-          return Integer.MAX_VALUE;
+          return 0;
         }
         
         public Object get(int index) {
           return GapSymbol.this;
         }
       };
-    }
-    
-    /**
-     * Takes a symbol, and returns a symbol that will be this Gap symbol iff
-     * s fulfills the gap criteria (a gap, or a cross-product symbol of gaps
-     * only).
-     *
-     * @param s the Symbol to normalize
-     * @return  the normalized view of s - either s, or gap
-     */
-    public Symbol normalize(Symbol s) {
-      if(s instanceof GapSymbol) {
-        return this;
-      } else if(s instanceof CrossProductSymbol) {
-        Iterator i = ((CrossProductSymbol) s).getSymbols().iterator();
-        while(i.hasNext()) {
-          if(!(i.next() instanceof GapSymbol)) {
-            return s;
-          }
-        }
-        return this;
-      } else {
-        return s;
-      }
     }
   }
 }

@@ -46,12 +46,12 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
   /**
    * A set of the non-ambiguity symbols within the alphabet.
    */
-  private Set symbols;
+  private final Set symbols;
   
   /**
    * A set of well-known ambiguity symbols.
    */
-  private Set ambig;
+  private final Set ambig;
   
   public Iterator iterator() {
     return symbols.iterator();
@@ -83,7 +83,10 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
       try {
 	  return new SimpleSymbolList(this, new ArrayList(symbols));
       } catch (IllegalSymbolException ex) {
-	  throw new BioError(ex);
+	  throw new BioError(
+      ex,
+      "There should be no circumstances under which this failed"
+    );
       }
   }
 
@@ -92,26 +95,28 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
       return false;
     } else if(symbols.contains(s)) {
       return true;
-    } else if(s instanceof AmbiguitySymbol) {
-      AmbiguitySymbol as = (AmbiguitySymbol) s;
-      Iterator i = ((FiniteAlphabet) as.getMatchingAlphabet()).iterator();
-      while(i.hasNext()) {
-        Symbol sym = (Symbol) i.next();
-        if(!symbols.contains(sym)) {
-          return false;
+    } else  {
+      Alphabet sa = s.getMatches();
+      if(!(sa instanceof FiniteAlphabet)) {
+        return false;
+      } else {
+        Iterator i = ((FiniteAlphabet) s.getMatches()).iterator();
+        while(i.hasNext()) {
+          Symbol sym = (Symbol) i.next();
+          if(!symbols.contains(sym)) {
+            return false;
+          }
         }
+        return true;
       }
-      return true;
-    } else {
-      return false;
     }
   }
 
   /**
    * Adds a symbol to this alphabet.
    * <P>
-   * If the symbol is an ambiguity symbol, then each symbol matching it will be
-   * added.
+   * If the symbol matches more than one AtomicSymbol, then each symbol matching
+   * it will be added.
    *
    * @param s the Symbol to add
    * @throws IllegalSymbolException if the symbol is null, or if for any reason
@@ -124,36 +129,44 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
         "You can not add null as a symbol to alphabet " + getName()
       );
     }
-    if(s instanceof AmbiguitySymbol) {
-      AmbiguitySymbol as = (AmbiguitySymbol) s;
-      Iterator i = ((FiniteAlphabet) as.getMatchingAlphabet()).iterator();
-      while(i.hasNext()) {
-        Symbol sym = (Symbol) i.next();
-        symbols.add(sym);
-      }
-    } else {
+    if(s instanceof AtomicSymbol) {
       symbols.add(s);
+    } else {
+      Alphabet sa = s.getMatches();
+      if(!(sa instanceof FiniteAlphabet)) {
+        throw new IllegalSymbolException(
+          "Can't add symbol " + s.getName() +
+          " as it matches an infinite number of symbols."
+        );
+      } else {
+        for(Iterator i = ((FiniteAlphabet) sa).iterator(); i.hasNext(); ) {
+          symbols.add((AtomicSymbol) i.next());
+        }
+      }
     }
   }
   
   /**
    * Add a commonly recognized ambiguiy symbol to this alphabet.
+   * <P>
+   * This effectively forges an alias between aSym and the symbols in its
+   * 'matches' alphabet for all derived parsers.
    *
-   * @param as the AmbiguitySymbol to add
-   * @throws IllegalSymbolException if as contains Symbols not contained within
-   *         this alpahbet
+   * @param as the ambiguity symbol to add
+   * @throws IllegalSymbolException if aSym contains an AtomicSymbol not found
+   *         within this alpahbet
    */
-  public void addAmbiguity(AmbiguitySymbol as)
+  public void addAmbiguity(Symbol aSym)
   throws IllegalSymbolException {
-    validate(as);
-    ambig.add(as);
+    validate(aSym);
+    ambig.add(aSym);
   }
   
   /**
    * Remove a symbol from this alphabet.
    * <P>
-   * If the symbol is an ambiguity symbol, then each symbol matching it will be
-   * removed.
+   * If the symbol matches multiple AtomicSymbols, then each matching symbol it
+   * will be removed.
    *
    * @param s the Symbol to remove
    * @throws IllegalSymbolException if the symbol is null, or if for any reason
@@ -162,15 +175,15 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
   public void removeSymbol(Symbol s)
   throws IllegalSymbolException {
     validate(s);
-    if(s instanceof AmbiguitySymbol) {
-      AmbiguitySymbol as = (AmbiguitySymbol) s;
-      Iterator i = ((FiniteAlphabet) as.getMatchingAlphabet()).iterator();
+    if(s instanceof AtomicSymbol) {
+      symbols.remove(s);
+    } else {
+      FiniteAlphabet sa = (FiniteAlphabet) s.getMatches();
+      Iterator i = ((FiniteAlphabet) sa).iterator();
       while(i.hasNext()) {
         Symbol sym = (Symbol) i.next();
         symbols.remove(sym);
       }
-    } else {
-      symbols.remove(s);
     }
   }
 
@@ -178,38 +191,46 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
     if(!contains(s)) {
       if(s == null) {
         throw new IllegalSymbolException("NULL is an illegal symbol");
-      } else if (s instanceof AmbiguitySymbol) {
-        try {
-          FiniteAlphabet fa = (FiniteAlphabet) ((AmbiguitySymbol) s).getMatchingAlphabet();
-          for(Iterator i = fa.iterator(); i.hasNext(); ) {
-            validate((Symbol) i.next());
-          }
-        } catch (IllegalSymbolException ise) {
-          throw new IllegalSymbolException(
-            ise,
-            "Ambiguity symbol " + s.getName() +
-            " could not be accepted as it matches an invalid symbol."
-          );
-        }
-        throw new BioError(
-          "Symbol " + s.getName() + " isn't contained within the alphabet " +
-          getName() +
-          " but I can't find which of the matching symbols is invalid"
-        );
-      } else {
+      } else if (s instanceof AtomicSymbol) { 
         throw new IllegalSymbolException("Symbol " + s.getName() +
                                           " not found in alphabet " +
                                           getName());
+      } else {
+        Alphabet alpha = s.getMatches();
+        if(alpha instanceof FiniteAlphabet) {
+          try {
+            for(Iterator i = ((FiniteAlphabet) alpha).iterator(); i.hasNext(); ) {
+              validate((AtomicSymbol) i.next());
+            }
+          } catch (IllegalSymbolException ise) {
+            throw new IllegalSymbolException(
+              ise,
+              "Ambiguity symbol " + s.getName() +
+              " could not be accepted as it matches an invalid symbol."
+            );
+          }
+          throw new BioError(
+            "Symbol " + s.getName() + " isn't contained within the alphabet " +
+            getName() +
+            " but I can't find which of the matching symbols is invalid"
+          );
+        } else {
+          throw new IllegalSymbolException(
+            "This alphabet is finite. The symbol " + s.getName() +
+            " matches an infinite number of symbols."
+          );
+        }
       }
     }
   }
   
   public SimpleAlphabet() {
-    symbols	= new HashSet();
-    ambig = new HashSet();
+    this.symbols	= new HashSet();
+    this.ambig = new HashSet();
   }
   
   public SimpleAlphabet(Set symbols) {
     this.symbols = symbols;
+    this.ambig = new HashSet();
   }
 }

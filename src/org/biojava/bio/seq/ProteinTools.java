@@ -37,9 +37,8 @@ public class ProteinTools {
   
   static {
     try {
-      AlphabetManager am = AlphabetManager.instance();
-      proteinAlpha = (FiniteAlphabet) am.alphabetForName("PROTEIN");
-      proteinTAlpha = (FiniteAlphabet) am.alphabetForName("PROTEIN-TERM");
+      proteinAlpha = (FiniteAlphabet) AlphabetManager.alphabetForName("PROTEIN");
+      proteinTAlpha = (FiniteAlphabet) AlphabetManager.alphabetForName("PROTEIN-TERM");
     } catch (Exception e) {
       throw new BioError(e, " Could not initialize ProteinTools");
     }

@@ -66,9 +66,8 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
       return d.doubleValue();
     } else {
       alphabet.validate(s);
-      if(s instanceof AmbiguitySymbol) {
-        AmbiguitySymbol as = (AmbiguitySymbol) s;
-        return getAmbiguityWeight(as);
+      if(!(s instanceof AtomicSymbol)) {
+        return getAmbiguityWeight(s);
       } else {
         throw new BioError(
           "Requested weight for " + s.getName() +
@@ -81,24 +80,13 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
   public void setWeight(Symbol s, double w)
   throws IllegalSymbolException {
     alphabet.validate(s);
-    if(s instanceof AmbiguitySymbol) {
+    if(!(s instanceof AtomicSymbol)) {
       throw new IllegalSymbolException(
         "Can't set the weight for an ambiguity symbol " + s.getName()
       );
     }
     Double d = new Double(w);
     weight.put(s, d);
-  }
-  
-  public void registerWithTrainer(org.biojava.bio.dp.ModelTrainer trainer) {
-/*    try {
-      trainer.registerTrainerForDistribution(new SimpleDistributionTrainer(this));
-    } catch (IllegalAlphabetException iae) {
-      throw new BioError(
-        iae,
-        "Couldn't register with trainer although I should be able to!"
-      );
-    }*/
   }
   
   public SimpleDistribution(FiniteAlphabet alphabet) {

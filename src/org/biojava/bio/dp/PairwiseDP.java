@@ -40,7 +40,7 @@ import org.biojava.bio.dist.*;
 
 public class PairwiseDP extends DP implements Serializable {
     private EmissionState magicalState;
-    //private HashMap emissions;
+    private HashMap emissions;
 
     public PairwiseDP(MarkovModel mm) throws IllegalSymbolException,
                                            IllegalTransitionException,
@@ -48,7 +48,7 @@ public class PairwiseDP extends DP implements Serializable {
     {
 	super(mm);
 	magicalState = mm.magicalState();
-  //emissions = new HashMap();
+  emissions = new HashMap();
     }
 
     private final static int[] ia00 = {0, 0};
@@ -57,30 +57,47 @@ public class PairwiseDP extends DP implements Serializable {
     // BACKWARD
     //
 
-  /*public void updateTransitions() {
+  public void updateTransitions() {
     super.updateTransitions();
     // workaround for bug in vm
     if(emissions != null) {
       emissions.clear();
     }
-  }*/
+  }
   
-  /*protected double [] getEmission(Symbol sym)
+  private AlphabetManager.ListWrapper gopher =
+    new AlphabetManager.ListWrapper();
+
+
+  protected double [] getEmission(List symList, CrossProductAlphabet alpha)
   throws IllegalSymbolException {
-    double [] em = (double []) emissions.get(sym);
+    gopher.setList(symList);
+    double [] em = (double []) emissions.get(gopher);
     if(em == null) {
+      Symbol sym[][] = new Symbol[2][2];
+      List ll = new ArrayList(symList);
+      Symbol gap = sym[0][0] = AlphabetManager.getGapSymbol();
+      sym[1][0] = alpha.getSymbol(Arrays.asList(new Symbol [] {
+        (Symbol) symList.get(0),
+        gap
+      }));
+      sym[0][1] = alpha.getSymbol(Arrays.asList(new Symbol [] {
+        gap,
+        (Symbol) symList.get(1)
+      }));
       int dsi = getDotStatesIndex();
       em = new double[dsi];
       State [] states = getStates();
       for(int i = 0; i < dsi; i++) {
         EmissionState es = (EmissionState) states[i];
+        int [] advance = es.getAdvance();
         Distribution dis = es.getDistribution();
-        em[i] = Math.log(dis.getWeight(sym));
+        em[i] = Math.log(dis.getWeight(sym[advance[0]][advance[1]]));
       }
-      emissions.put(sym, em);
+      emissions.put(ll, em);
     }
     return em;
-  }*/
+  }
 
     public double backward(SymbolList[] seqs) 
         throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
@@ -177,7 +194,7 @@ public class PairwiseDP extends DP implements Serializable {
     throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
       // System.out.println("*** (" + i + "," + j + ")");
-      Symbol gap = AlphabetManager.instance().getGapSymbol();
+      Symbol gap = AlphabetManager.getGapSymbol();
       symL.clear();
 
       symL.add(cursor.symbol(0, i+1));
@@ -401,7 +418,7 @@ public class PairwiseDP extends DP implements Serializable {
 	throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
 	// System.out.println("*** (" + i + "," + j + ")");
-  Symbol gap = AlphabetManager.instance().getGapSymbol();
+  Symbol gap = AlphabetManager.getGapSymbol();
 	symL.clear();
   
 	symL.add(cursor.symbol(0, i));
@@ -524,7 +541,7 @@ private class Viterbi {
 	states = getStates();
 	cursor = new LightPairDPCursor(seq0, seq1, states.length, true);
 	alpha = (CrossProductAlphabet) getModel().emissionAlphabet();
-  symMatrix[0][0] = AlphabetManager.instance().getGapSymbol();
+  symMatrix[0][0] = AlphabetManager.getGapSymbol();
   
 	// Forward initialization
 
@@ -606,7 +623,7 @@ private class Viterbi {
     {
 	// System.out.println("*** (" + i + "," + j + ")");
 
-  Symbol gap = AlphabetManager.instance().getGapSymbol();
+  Symbol gap = AlphabetManager.getGapSymbol();
 	symL.clear();
 	symL.add(cursor.symbol(0, i));
 	symL.add(cursor.symbol(1, j));
@@ -887,7 +904,7 @@ private class Viterbi {
 
     public Symbol symbol(int dim, int poz) {
       if (poz == 0 || poz > seqs[dim].length()) {
-        return AlphabetManager.instance().getGapSymbol();
+        return AlphabetManager.getGapSymbol();
       } else {
         return seqs[dim].symbolAt(poz);
       }
@@ -1008,7 +1025,7 @@ private class Viterbi {
 
     public Symbol symbol(int dim, int poz) {
       if (poz == 0 || poz > seqs[dim].length()) {
-        return AlphabetManager.instance().getGapSymbol();
+        return AlphabetManager.getGapSymbol();
       } else {
         return seqs[dim].symbolAt(poz);
       }
@@ -1094,7 +1111,7 @@ private class Viterbi {
         return null;
       }
       if (poz == 0 || poz > seqs[dim].length()) {
-        return AlphabetManager.instance().getGapSymbol();
+        return AlphabetManager.getGapSymbol();
       }
       return seqs[dim].symbolAt(poz);
     }

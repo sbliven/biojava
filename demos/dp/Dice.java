@@ -55,7 +55,7 @@ public class Dice
     
     	for(int i=1;i<7;i++)
     	{
-	    rolls[i-1]= new SimpleSymbol((char)('0'+i),""+i,Annotation.EMPTY_ANNOTATION);
+	    rolls[i-1]= new SimpleAtomicSymbol((char)('0'+i),""+i,Annotation.EMPTY_ANNOTATION);
 	    diceAlphabet.addSymbol(rolls[i-1]);
 	}  
   

@@ -26,7 +26,9 @@ import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
-public class SimpleModelInState extends SimpleSymbol implements ModelInState {
+public class SimpleModelInState
+extends SimpleAtomicSymbol
+implements ModelInState {
   private MarkovModel model;
   
   public MarkovModel getModel() {

@@ -297,6 +297,7 @@ class FlatModel extends ModelView implements Serializable {
   private static class Wrapper implements State, Serializable {
     private final State wrapped;
     private final String extra;
+    private final Alphabet matches;
 
     public char getToken() {
       return wrapped.getToken();
@@ -314,12 +315,17 @@ class FlatModel extends ModelView implements Serializable {
       return wrapped;
     }
 
+    public Alphabet getMatches() {
+      return matches;
+    }
+    
     public Wrapper(State wrapped, String extra) {
       if(wrapped == null) {
         throw new NullPointerException("Can't wrap null");
       }
       this.wrapped = wrapped;
       this.extra = extra;
+      this.matches = new SingletonAlphabet(this);
     }
   }
   

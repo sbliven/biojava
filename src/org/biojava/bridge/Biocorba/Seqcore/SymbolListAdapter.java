@@ -18,13 +18,12 @@ public class SymbolListAdapter implements SymbolList {
   
   public SymbolListAdapter(AnonymousSeq anonymousSeq)
   throws IllegalAlphabetException, IllegalSymbolException, BioException {
-    AlphabetManager am = AlphabetManager.instance();
     Alphabet alpha = null;
     SeqType type = anonymousSeq.type();
     if(type == SeqType.DNA) {
       alpha = DNATools.getDNA();
     } else if(type == SeqType.RNA) {
-      alpha = am.alphabetForName("RNA");
+      alpha = AlphabetManager.alphabetForName("RNA");
     } else if(type == SeqType.PROTEIN) {
       alpha = ProteinTools.getAlphabet();
     } else {

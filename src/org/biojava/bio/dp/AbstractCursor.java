@@ -32,7 +32,7 @@ import org.biojava.bio.symbol.*;
  * @author Matthew Pocock
  */
 abstract class AbstractCursor implements DPCursor {
-  private static final Symbol gap = AlphabetManager.instance().getGapSymbol();
+  private static final Symbol gap = AlphabetManager.getGapSymbol();
   private Iterator resIterator;
   
   private Symbol currentRes;

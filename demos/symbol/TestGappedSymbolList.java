@@ -57,7 +57,7 @@ public class TestGappedSymbolList {
       int pos;
       do {
         pos = (int) (Math.random() * (double) gl.length()) + 1;
-      } while(gl.symbolAt(pos) != AlphabetManager.instance().getGapSymbol());
+      } while(gl.symbolAt(pos) != AlphabetManager.getGapSymbol());
 //      System.out.println("Removing gap at " + pos);
       gl.removeGap(pos);
 //      gl.dumpBlocks();

@@ -74,7 +74,7 @@ extends AbstractSymbolList implements Serializable {
     }
     this.source = source;
     Alphabet a = source.getAlphabet();
-    this.alpha = AlphabetManager.instance().getCrossProductAlphabet(
+    this.alpha = AlphabetManager.getCrossProductAlphabet(
       Collections.nCopies(width, a)
     );
     this.width = width;

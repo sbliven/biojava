@@ -68,7 +68,7 @@ extends AbstractSymbolList implements Serializable {
   throws IllegalAlphabetException {
     this.source = source;
     Alphabet a = source.getAlphabet();
-    this.alpha = AlphabetManager.instance().getCrossProductAlphabet(
+    this.alpha = AlphabetManager.getCrossProductAlphabet(
       Collections.nCopies(order, a)
     );
     this.order = order;

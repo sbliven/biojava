@@ -42,8 +42,7 @@ public final class DNATools {
 
   static {
     try {
-      AlphabetManager aMan = AlphabetManager.instance();
-      dna = (FiniteAlphabet) aMan.alphabetForName("DNA");
+      dna = (FiniteAlphabet) AlphabetManager.alphabetForName("DNA");
       SymbolList syms = dna.getParser("token").parse("agct");
       a = syms.symbolAt(1);
       g = syms.symbolAt(2);
@@ -53,18 +52,18 @@ public final class DNATools {
       symbolToComplement = new HashMap();
 
       // add the gap symbol
-      Symbol gap = aMan.getGapSymbol();
+      Symbol gap = AlphabetManager.getGapSymbol();
       symbolToComplement.put(gap, gap);
       
       // add all other ambiguity symbols
       for(Iterator i = ((SimpleAlphabet) dna).ambiguities(); i.hasNext();) {
-        AmbiguitySymbol as = (AmbiguitySymbol) i.next();
+        Symbol as = (Symbol) i.next();
         List l = new ArrayList();
-        FiniteAlphabet fa = (FiniteAlphabet) as.getMatchingAlphabet();
+        FiniteAlphabet fa = (FiniteAlphabet) as.getMatches();
         for(Iterator j = fa.iterator(); j.hasNext(); ) {
           l.add(complement((Symbol) j.next()));
         }
-        symbolToComplement.put(as, aMan.getAmbiguitySymbol(l));
+        symbolToComplement.put(as, AlphabetManager.getAmbiguitySymbol(l));
       }
     } catch (Throwable t) {
       throw new BioError(t, "Unable to initialize DNATools");

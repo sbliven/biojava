@@ -79,12 +79,12 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
     if(name.equals("name")) {
       return new NameParser(nameToSymbol) {
         public Symbol parseToken(String token) throws IllegalSymbolException {
-          Symbol res = (Symbol) nameToSymbol.get(token);
-          if(res == null) {
-            res = new SimpleSymbol(token.charAt(0), token, null);
-            addSymbol(res);
+          Symbol sym = (Symbol) nameToSymbol.get(token);
+          if(sym == null) {
+            sym = new SimpleAtomicSymbol(token.charAt(0), token, null);
+            addSymbol(sym);
           }
-          return res;
+          return sym;
         }
       };
     } else if(name.equals("token")) {
@@ -105,12 +105,12 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
         public Symbol parseToken(String token) {
           char c = token.charAt(0);
           Character ch = new Character(c);
-          Symbol r = (Symbol) tokenToSymbol.get(ch);
-          if(r == null) {
-            r = new SimpleSymbol(c, token, null);
-            addSymbol(r);
+          Symbol s = (Symbol) tokenToSymbol.get(ch);
+          if(s == null) {
+            s = new SimpleAtomicSymbol(c, token, null);
+            addSymbol(s);
           }
-          return r;
+          return s;
         }
       };
     } else {

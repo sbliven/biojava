@@ -64,12 +64,7 @@ extends AbstractDistribution implements Serializable {
 
   public double getWeight(Symbol sym) throws IllegalSymbolException {
     getAlphabet().validate(sym);
-    /*if(sym instanceof AmbiguitySymbol) {
-      throw new IllegalSymbolException(
-        "Can't get weight ambiguity symbols. Got: " +
-        sym.getName()
-      );
-    }*/
+
     CrossProductSymbol cps = (CrossProductSymbol) sym;
     List symL = cps.getSymbols();
     Symbol f = (Symbol) symL.get(0);
@@ -81,7 +76,7 @@ extends AbstractDistribution implements Serializable {
   public PairDistribution(Distribution first, Distribution second) {
     this.first = first;
     this.second = second;
-    this.alphabet = AlphabetManager.instance().getCrossProductAlphabet(
+    this.alphabet = AlphabetManager.getCrossProductAlphabet(
       Arrays.asList(new Alphabet[] {
         first.getAlphabet(), second.getAlphabet()
       })
@@ -95,7 +90,7 @@ extends AbstractDistribution implements Serializable {
       DistributionTrainerContext dtc, Symbol sym, double times
     ) throws IllegalSymbolException {
       getAlphabet().validate(sym);
-      if(sym instanceof AmbiguitySymbol) {
+      if(!(sym instanceof AtomicSymbol)) {
         throw new IllegalSymbolException(
           "Can't add counts for ambiguity symbols. Got: " +
           sym.getName()

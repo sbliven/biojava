@@ -75,8 +75,7 @@ extends AbstractDistribution implements Serializable {
       return scores[3];
     } else {
       getAlphabet().validate(s);
-      AmbiguitySymbol as = (AmbiguitySymbol) s;
-      return getAmbiguityWeight(as);
+      return getAmbiguityWeight(s);
     }
   }
 
@@ -94,7 +93,7 @@ extends AbstractDistribution implements Serializable {
       getAlphabet().validate(s);
       throw new IllegalSymbolException(
         "Unable to set weight associated with symbol " + s.getName() +
-        ". Either this is a cock-up, or it is an isntance of AmbiguitySymbol."
+        ". Either this is a cock-up, or it is an ambiguous symbol."
       );
     }
   }

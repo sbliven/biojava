@@ -245,16 +245,17 @@ public class Builder {
     }
     
     public static int compile(List filenames) throws IOException {
-	String[] command = new String[7 + filenames.size()];
+	String[] command = new String[8 + filenames.size()];
 	command[0] = "javac";
-	command[1] = "-classpath";
-	command[2] = makePath(new String[] {"class", "xml.jar"});
-	command[3] = "-sourcepath";
-	command[4] = "src";
-	command[5] = "-d";
-	command[6] = "class";
+  command[1] = "-deprecation";
+	command[2] = "-classpath";
+	command[3] = makePath(new String[] {"class", "xml.jar"});
+	command[4] = "-sourcepath";
+	command[5] = "src";
+	command[6] = "-d";
+	command[7] = "class";
   	for (int i = 0; i < filenames.size(); ++i) {
-  	    command[i + 7] = ((File) filenames.get(i)).getCanonicalPath();
+  	    command[i + 8] = ((File) filenames.get(i)).getCanonicalPath();
         }
 	
 	Process p = Runtime.getRuntime().exec(command);

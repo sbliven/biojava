@@ -30,10 +30,11 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
- * The set of Symbols which can be concatinated together to make a SymbolList.
+ * The set of AtomicSymbols which can be concatinated together to make a
+ * SymbolList.
  * <P>
- * The symbols may be concrete symbols (such as DNA bases), or they may be
- * ambiguity symbols (such as the IUPAC ambiguity codes).
+ * A non-atomic symbol is considered to be contained within this alpahbet if
+ * all of the atomic symbols that it could match are members of this alphabet.
  * <P>
  * The alphabet concept may need to be widened to include alphabets that extend
  * others, or checks to see if two alphabets are equivalent, or other set-wise
@@ -115,8 +116,8 @@ public interface Alphabet extends Annotatable {
       return Annotation.EMPTY_ANNOTATION;
     }
     
-    public boolean contains(Symbol r) {
-      return false;
+    public boolean contains(Symbol s) {
+      return s == AlphabetManager.getGapSymbol();
     }
     
     public void validate(Symbol res) throws IllegalSymbolException {

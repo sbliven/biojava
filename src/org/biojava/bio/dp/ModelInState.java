@@ -33,9 +33,4 @@ public interface ModelInState extends State, Trainable {
    * The model that is inside this state.
    */
   MarkovModel getModel();
-  
-  /**
-   * Set the name of this state.
-   */
-  void setName(String name);
 }

@@ -143,7 +143,7 @@ extends AbstractSymbolList implements Alignment, Serializable {
       }
     }
     
-    this.alphabet = AlphabetManager.instance().getCrossProductAlphabet(alphaList);
+    this.alphabet = AlphabetManager.getCrossProductAlphabet(alphaList);
     this.length = length;
   }
   

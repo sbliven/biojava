@@ -33,9 +33,9 @@ import org.biojava.utils.*;
  * An alphabet over a finite set of Symbols.
  * <P>
  * This interface makes the distinction between an alphabet over a finite (and
- * possibly small) number of Symbols and an Alphabet over an infinite
- * (or extreemely large) set of Symbols. Within a FiniteAlphabet, the == operator
- * should be sufficient to decide upon equality.
+ * possibly small) number of symbols and an Alphabet over an infinite
+ * (or extreemely large) set of symbols. Within a FiniteAlphabet, the == operator
+ * should be sufficient to decide upon equality for all AtomicSymbol instances.
  * <P>
  * The alphabet functions as the repository of objects in the fly-weight design
  * pattern. Only symbols within an alphabet should appear in object that claim
@@ -55,10 +55,10 @@ public interface FiniteAlphabet extends Alphabet {
   /**
    * Retrieve an Iterator over the Symbols in this FiniteAlphabet.
    * <P>
-   * Each Symbol r for which this.contains(r) is true will be returned exactly
-   * once by this iterator in no specified order.
+   * Each AtomicSymbol as for which this.contains(as) is true will be returned
+   * exactly once by this iterator in no specified order.
    *
-   * @return an Iterator over the contained Symbol objects
+   * @return an Iterator over the contained AtomicSymbol objects
    */
   Iterator iterator();
   
@@ -68,10 +68,8 @@ public interface FiniteAlphabet extends Alphabet {
    * Subsequent calls to this method are not required to return either the same
    * symbol list, or even a symbol list with the symbols in the same order.
    *
-   * @return  a SymbolList containing one Symbol for each Symbol in this alphabet
+   * @return  a SymbolList containing one AtomicSymbol for each AtomicSymbol in
+   *          this alphabet
    */
   SymbolList symbols();
-  /**
-   * A realy useful static alphabet that is always empty.
-   */
 }
