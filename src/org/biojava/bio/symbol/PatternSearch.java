@@ -38,7 +38,7 @@ import java.util.ArrayList;
 public class PatternSearch
 {
 
-    private class MatchState
+    private static class MatchState
         implements Cloneable
     {
 
@@ -62,12 +62,6 @@ public class PatternSearch
             patternPos = 0;
         }
     }
-
-//    private class MatchStatus {}
-
-//    private static MatchStatus IMPOSSIBLE = new MatchStatus();
-//    private static MatchStatus FAILED = new MatchStatus();
-//    private static MatchStatus MATCHED = new MatchStatus();
 
     /**
      * Class to describe a regex-like pattern.  The pattern
@@ -153,7 +147,7 @@ public class PatternSearch
         }
     }
 
-    public boolean match(Pattern p, SymbolList sl, int pos)
+    public static boolean match(Pattern p, SymbolList sl, int pos)
     {
         MatchState state = new MatchState();
         state.symListPos = pos;
@@ -161,7 +155,7 @@ public class PatternSearch
         return match(p, sl, state);
     }
 
-    private boolean match(Pattern p, SymbolList sl, MatchState state)
+    private static boolean match(Pattern p, SymbolList sl, MatchState state)
     {
         //System.out.println("match called with " + p.getLabel() + " " + state.patternPos + " " + state.symListPos);
         // record own state
@@ -202,7 +196,7 @@ public class PatternSearch
      * positions specified within the MatchState object for SymbolList
      * and Pattern.
      */
-    private boolean matchOnce(Pattern p, SymbolList sl, MatchState state)
+    private static boolean matchOnce(Pattern p, SymbolList sl, MatchState state)
     {
         //System.out.println("matchOnce called with " + p.getLabel() + " " + state.patternPos + " " + state.symListPos);
         // record own state
@@ -254,7 +248,7 @@ public class PatternSearch
     /**
      * extends a match that begins with a Pattern.
      */
-    private boolean matchExtend(Pattern p, SymbolList sl, MatchState state)
+    private static boolean matchExtend(Pattern p, SymbolList sl, MatchState state)
     {
         //System.out.println("matchExtend called with " + p.getLabel() + " " + state.patternPos + " " + state.symListPos);
         // save the state
@@ -303,7 +297,7 @@ public class PatternSearch
         return false;
     }
 
-    private boolean matchSymbols(Symbol source, Symbol target)
+    private static boolean matchSymbols(Symbol source, Symbol target)
     {
         // an ambiguous target symbol leads to an immediate mismatch
         if (!(target instanceof AtomicSymbol))
