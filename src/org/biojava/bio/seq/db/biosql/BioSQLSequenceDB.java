@@ -495,15 +495,23 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         } else {
             // Taxon entry does not exist - create it
             Taxon parent = taxon.getParent();
-            int parent_taxon_id = (parent != null) ? getTaxonID(conn, parent) : -1;
-            PreparedStatement createTaxon = conn.prepareStatement(
-                                                                  "insert into taxon " 
-                                                                  + "(ncbi_taxon_id, parent_taxon_id) " 
-                                                                  + "values (?, ?)"
-                                                                  );
-            createTaxon.setInt(1, ncbi_taxon_id);
-            if (parent_taxon_id != -1) {
+            PreparedStatement createTaxon = null;
+            if (parent != null) {
+                int parent_taxon_id = getTaxonID(conn, parent);
+                createTaxon = conn.prepareStatement(
+                                                    "insert into taxon " 
+                                                    + "(ncbi_taxon_id, parent_taxon_id) " 
+                                                    + "values (?, ?)"
+                                                    );
+                createTaxon.setInt(1, ncbi_taxon_id);
                 createTaxon.setInt(2, parent_taxon_id);
+            } else {
+                createTaxon = conn.prepareStatement(
+                                                    "insert into taxon " 
+                                                    + "(ncbi_taxon_id) " 
+                                                    + "values (?)"
+                                                    );
+                createTaxon.setInt(1, ncbi_taxon_id);
             }
             createTaxon.executeUpdate();
             createTaxon.close();
