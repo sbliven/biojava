@@ -30,6 +30,7 @@ import junit.framework.TestCase;
  * Tests for AnnotationType.
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  * @since 1.3
  */
 public class AnnotationTypeTest
@@ -50,7 +51,8 @@ extends TestCase {
   
   protected PropertyConstraint pc_enum_animals;
   protected PropertyConstraint pc_enum_birds;
-  protected PropertyConstraint pc_enum_colors;
+  protected PropertyConstraint pc_enum_primary_colors;
+  protected PropertyConstraint pc_enum_warm_colors;
   
   protected AnnotationType at_any;
   protected AnnotationType at_color;
@@ -80,25 +82,26 @@ extends TestCase {
     
     pc_enum_animals = new PropertyConstraint.Enumeration(new Object[] { "dog", "cat", "antelope", "crow", "hawk", "tit" });
     pc_enum_birds = new PropertyConstraint.Enumeration(new Object[] { "crow", "hawk", "tit" });
-    pc_enum_colors = new PropertyConstraint.Enumeration(new Object[] { "red", "green", "blue" });
+    pc_enum_primary_colors = new PropertyConstraint.Enumeration(new Object[] { "red", "green", "blue" });
+    pc_enum_warm_colors = new PropertyConstraint.Enumeration(new Object[] {"red", "orange", "russet"});
     
     at_any = AnnotationType.ANY;
     
     at_color = new AnnotationType.Impl();
-    at_color.setConstraints("color", pc_enum_colors, cc_one);
+    at_color.setConstraints("color", pc_enum_primary_colors, cc_one);
 
     at_colors = new AnnotationType.Impl();
-    at_colors.setConstraints("color", pc_enum_colors, cc_one_or_more);
+    at_colors.setConstraints("color", pc_enum_primary_colors, cc_one_or_more);
     
     at_colorsish = new AnnotationType.Impl();
-    at_colorsish.setConstraints("color", pc_enum_colors, cc_any);
+    at_colorsish.setConstraints("color", pc_enum_primary_colors, cc_any);
     
     at_color_name = new AnnotationType.Impl();
-    at_color_name.setConstraints("color", pc_enum_colors, cc_one);
+    at_color_name.setConstraints("color", pc_enum_primary_colors, cc_one);
     at_color_name.setConstraints("name", pc_class_string, cc_one);
     
     at_color_dog = new AnnotationType.Impl();
-    at_color_dog.setConstraints("color", pc_enum_colors, cc_one);
+    at_color_dog.setConstraints("color", pc_enum_primary_colors, cc_one);
     at_color_dog.setConstraints("name", pc_exact_dog, cc_one);
   }
   
@@ -158,7 +161,7 @@ extends TestCase {
     // compare them
     assertTrue("are subconstraints: " + pc_enum_animals + ", " + pc_enum_animals, pc_enum_animals.subConstraintOf(pc_enum_animals));
     assertTrue("are subconstraints: " + pc_enum_animals + ", " + pc_enum_birds, pc_enum_animals.subConstraintOf(pc_enum_birds));
-    assertTrue("not subconstraints: " + pc_enum_animals + ", " + pc_enum_colors, !pc_enum_animals.subConstraintOf(pc_enum_colors));
+    assertTrue("not subconstraints: " + pc_enum_animals + ", " + pc_enum_primary_colors, !pc_enum_animals.subConstraintOf(pc_enum_primary_colors));
     assertTrue("not subconstraints: " + pc_enum_birds + ", " + pc_enum_animals, !pc_enum_birds.subConstraintOf(pc_enum_animals));
     
     // to pc_class_string
@@ -168,7 +171,7 @@ extends TestCase {
     // to pc_exact_dog
     assertTrue("are subconstraints: " + pc_enum_animals + ", " + pc_exact_dog, pc_enum_animals.subConstraintOf(pc_exact_dog));
     assertTrue("not subconstraints: " + pc_exact_dog + ", " + pc_enum_animals, !pc_exact_dog.subConstraintOf(pc_enum_animals));
-    assertTrue("not subconstraints: " + pc_enum_colors + ", " + pc_exact_dog, !pc_enum_colors.subConstraintOf(pc_exact_dog));
+    assertTrue("not subconstraints: " + pc_enum_primary_colors + ", " + pc_exact_dog, !pc_enum_primary_colors.subConstraintOf(pc_exact_dog));
   }
   
   public void testAllTypes() {
@@ -204,4 +207,9 @@ extends TestCase {
     assertTrue("not subtypes: " + at_color_dog + ", " + at_color_name, !at_color_dog.subTypeOf(at_color_name));
     assertTrue("are subtypes: " + at_color_dog + ", " + at_color_dog, at_color_dog.subTypeOf(at_color_dog));
   }
+  
+  public void testEnumerationOverlaps() {
+      assertTrue(AnnotationTools.intersection(pc_enum_primary_colors, pc_enum_birds) == PropertyConstraint.NONE);
+      assertTrue(AnnotationTools.intersection(pc_enum_primary_colors, pc_enum_warm_colors) != PropertyConstraint.NONE);
+  }  
 }
