@@ -85,7 +85,7 @@
     <echo message="Building biojava-${version}" />
     <echo message="JUnit present:                   ${junit.present}" />
     <echo message="JUnit supported by Ant:          ${junit.support}" />
-    <echo message="HSQLDB driver presend:           ${sqlDriver.hsqldb}" />
+    <echo message="HSQLDB driver present:           ${sqlDriver.hsqldb}" />
 
     <property name="readme" value="./README" />
     <property name="license" value="./LICENSE" />
