@@ -23,6 +23,7 @@ package org.biojava.bridge.Biocorba.Seqcore;
 
 import java.util.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
@@ -88,4 +89,19 @@ public class SequenceDBAdapter implements SequenceDB {
     PrimarySeqIterator psi = getPrimarySeqDB().make_PrimarySeqIterator();
     return new SequenceIteratorAdapter(psi);
   }
+
+  public void addSequence(Sequence seq)
+  throws ChangeVetoException {
+    throw new ChangeVetoException("SequenceDBAdapter is immutable");
+  }
+
+  public void removeSequence(String id)
+  throws ChangeVetoException {
+    throw new ChangeVetoException("SequenceDBAdapter is immutable");
+  }
+  
+  public void addChangeListener(ChangeListener cl) {}
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+  public void removeChangeListener(ChangeListener cl) {}
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 }

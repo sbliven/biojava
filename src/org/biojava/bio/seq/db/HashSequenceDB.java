@@ -24,7 +24,7 @@ package org.biojava.bio.seq.db;
 import java.util.*;
 import java.io.*;
 
-import org.biojava.utils.StaticMemberPlaceHolder;
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 
@@ -51,6 +51,8 @@ public class HashSequenceDB implements SequenceDB, Serializable {
    */
   private String name;
 
+  protected ChangeSupport changeSupport = null;
+  
   /**
    * Initialize sequenceByID.
    */
@@ -58,6 +60,12 @@ public class HashSequenceDB implements SequenceDB, Serializable {
     sequenceByID = new HashMap();
   }
 
+  protected void generateChangeSupport(ChangeType changeType) {
+    if(changeSupport == null) {
+      changeSupport = new ChangeSupport();
+    }
+  }
+  
   public String getName() {
     return name;
   }
@@ -83,9 +91,25 @@ public class HashSequenceDB implements SequenceDB, Serializable {
    *
    * @param id  the id to use
    * @param seq the Sequence to add
+   * @throws ChangeVetoException if this addition was vetoed
    */
-  public void addSequence(String id, Sequence seq) {
-    sequenceByID.put(id, seq);
+  public void addSequence(String id, Sequence seq)
+  throws ChangeVetoException {
+    if(changeSupport == null) {
+      sequenceByID.put(id, seq);
+    } else {
+      synchronized(changeSupport) {
+        ChangeEvent ce = new ChangeEvent(
+          this,
+          SequenceDB.SEQUENCES,
+          new Object[] { id, seq },
+          null
+        );
+        changeSupport.firePreChangeEvent(ce);
+        sequenceByID.put(id, seq);
+        changeSupport.firePostChangeEvent(ce);
+      }
+    }
   }
 
   /**
@@ -97,13 +121,47 @@ public class HashSequenceDB implements SequenceDB, Serializable {
     return idMaker;
   }
   
-  /**
-   * Add a sequence under its default id.
-   *
-   * @param seq  the Sequence to add
-   */
-  public void addSequence(Sequence seq) {
-    sequenceByID.put(idMaker.calcID(seq), seq);
+  public void addSequence(Sequence seq)
+  throws ChangeVetoException {
+    String id = idMaker.calcID(seq);
+    addSequence(id, seq);
+  }
+  
+  public void removeSequence(String id)
+  throws BioException, ChangeVetoException {
+    if(changeSupport == null) {
+      sequenceByID.remove(id);
+    } else {
+      synchronized(changeSupport) {
+        ChangeEvent ce = new ChangeEvent(
+          this,
+          SequenceDB.SEQUENCES,
+          null,
+          id
+        );
+        changeSupport.firePreChangeEvent(ce);
+        sequenceByID.remove(id);
+        changeSupport.firePostChangeEvent(ce);
+      }
+    }
+  }
+  
+  public void addChangeListener(ChangeListener cl) {
+    generateChangeSupport(null);
+    changeSupport.addChangeListener(cl);
+  }
+  
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+    generateChangeSupport(ct);
+    changeSupport.addChangeListener(cl, ct);
+  }
+  
+  public void removeChangeListener(ChangeListener cl) {
+    changeSupport.removeChangeListener(cl);
+  }
+  
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+    changeSupport.removeChangeListener(cl, ct);
   }
 
   /**

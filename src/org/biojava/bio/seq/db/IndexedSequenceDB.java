@@ -24,6 +24,7 @@ package org.biojava.bio.seq.db;
 import java.io.*;
 import java.util.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
@@ -34,7 +35,9 @@ import org.biojava.bio.seq.io.*;
 */
 
 
-public final class IndexedSequenceDB implements SequenceDB, Serializable {
+public final class IndexedSequenceDB
+extends AbstractSequenceDB
+implements SequenceDB, Serializable {
   private final String name;
   private final IDMaker idMaker;
   private final File indexFile;
@@ -191,12 +194,23 @@ public final class IndexedSequenceDB implements SequenceDB, Serializable {
   }
   
   /**
-  *Add sequences from a file to the sequence database.  This method works on an "all or nothing" principle.  If it can successfully interpret the entire file, all the sequences will be read in.  However, if it encounters any problems, it will abandon the whole file; an IOException will be thrown.  A bioexception will be thrown if it has problems understanding the sequences.
-  *@param seqFile the file containing the sequence or set of sequences
+  * Add sequences from a file to the sequence database.  This method works
+  * on an "all or nothing" principle.  If it can successfully interpret the
+  * entire file, all the sequences will be read in.  However, if it
+  * encounters any problems, it will abandon the whole file; an IOException
+  * will be thrown.  A bioexception will be thrown if it has problems
+  * understanding the sequences.
+  *
+  * @param seqFile the file containing the sequence or set of sequences
+  * @throws IOException if the IO fails
+  * @throws BioException if for any reason the sequences can't be read
+  *         correctly
+  * @throws ChangeVetoException if there is a listener that vetoes adding
+  *         the files
   */
   
   public void addFile(File seqFile)
-  throws IOException, BioException {
+  throws IOException, BioException, ChangeVetoException {
     seqFile = seqFile.getAbsoluteFile();
     HackedBufferedReader bReader = new HackedBufferedReader(seqFile); 
     StreamReader.Context context = new StreamReader.Context(bReader);
@@ -223,7 +237,19 @@ public final class IndexedSequenceDB implements SequenceDB, Serializable {
       pos = bReader.getFilePointer();
     }
     
-    idToSource.putAll(index);
+    if(changeSupport == null) {
+      idToSource.putAll(index);
+    } else {
+      ChangeEvent ce = new ChangeEvent(
+        this,
+        SequenceDB.SEQUENCES,
+        index,
+        null
+      );
+      changeSupport.firePreChangeEvent(ce);
+      idToSource.putAll(index);
+      changeSupport.firePostChangeEvent(ce);
+    }
     commit();
   }
 

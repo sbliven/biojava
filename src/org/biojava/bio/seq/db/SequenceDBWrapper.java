@@ -21,11 +21,13 @@
 
 package org.biojava.bio.seq.db;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.*;
 import java.util.*;
 import java.lang.ref.*;
+
+import org.biojava.utils.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.*;
 
 /**
  * An abstract implementation of SequenceDB that wraps up another database.
@@ -35,6 +37,16 @@ import java.lang.ref.*;
 public abstract class SequenceDBWrapper extends AbstractSequenceDB
 implements java.io.Serializable{
   private final SequenceDB parent;
+  private SequencesForwarder seqFor;
+  
+  protected void generateChangeSupport(ChangeType ct) {
+    super.generateChangeSupport(ct);
+    
+    if(ct == SequenceDB.SEQUENCES) {
+      seqFor = new SequencesForwarder(this, changeSupport);
+      super.addChangeListener(seqFor, SequenceDB.SEQUENCES);
+    }
+  }
   
   /**
    * Return the parent SequenceDB.
@@ -43,6 +55,28 @@ implements java.io.Serializable{
    */
   public SequenceDB getParent() {
     return this.parent;
+  }
+  
+  protected class SequencesForwarder extends ChangeAdapter {
+    public SequencesForwarder(Object source, ChangeSupport cs) {
+      super(source, cs);
+    }
+    
+    public ChangeEvent generateEvent(ChangeEvent ce) {
+      if(ce.getType() == SequenceDB.SEQUENCES) {
+        Object previous = ce.getPrevious();
+        if(previous != null) {
+          return new ChangeEvent(
+            getSource(),
+            SequenceDB.SEQUENCES,
+            null,
+            previous,
+            ce
+          );
+        }
+      }
+      return null;
+    }
   }
 
   public SequenceDBWrapper(SequenceDB parent) {

@@ -21,11 +21,13 @@
 
 package org.biojava.bio.seq.db;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.*;
 import java.util.*;
 import java.lang.ref.*;
+
+import org.biojava.utils.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.*;
 
 /**
  * An abstract implementation of SequenceDB that provides the sequenceIterator
@@ -34,6 +36,32 @@ import java.lang.ref.*;
  * @author Matthew Pocock
  */
 public abstract class AbstractSequenceDB implements SequenceDB {
+  protected ChangeSupport changeSupport = null;
+
+  protected void generateChangeSupport(ChangeType changeType) {
+    if(changeSupport == null) {
+      changeSupport = new ChangeSupport();
+    }
+  }
+
+  public void addChangeListener(ChangeListener cl) {
+    generateChangeSupport(null);
+    changeSupport.addChangeListener(cl);
+  }
+  
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+    generateChangeSupport(ct);
+    changeSupport.addChangeListener(cl, ct);
+  }
+  
+  public void removeChangeListener(ChangeListener cl) {
+    changeSupport.removeChangeListener(cl);
+  }
+  
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+    changeSupport.removeChangeListener(cl, ct);
+  }
+
   public SequenceIterator sequenceIterator() {
     return new SequenceIterator() {
       private Iterator pID = ids().iterator();
@@ -46,5 +74,15 @@ public abstract class AbstractSequenceDB implements SequenceDB {
         return getSequence((String) pID.next());
       }
     };
+  }
+  
+  public void addSequence(Sequence seq)
+  throws BioException, ChangeVetoException {
+    throw new ChangeVetoException("AbstractSequenceDB is immutable");
+  }
+  
+  public void removeSequence(String id)
+  throws BioException, ChangeVetoException {
+    throw new ChangeVetoException("AbstractSequenceDB is immutable");
   }
 }

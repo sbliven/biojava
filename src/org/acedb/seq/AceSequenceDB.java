@@ -25,6 +25,7 @@ package org.acedb.seq;
 import java.util.*;
 
 import org.acedb.*;
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.db.*;
@@ -98,7 +99,22 @@ public class AceSequenceDB implements SequenceDB {
       }
     };
   }
+
+  public void addSequence(Sequence seq)
+  throws ChangeVetoException {
+    throw new ChangeVetoException("SequenceDBAdapter is immutable");
+  }
+
+  public void removeSequence(String id)
+  throws ChangeVetoException {
+    throw new ChangeVetoException("SequenceDBAdapter is immutable");
+  }
   
+  public void addChangeListener(ChangeListener cl) {}
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+  public void removeChangeListener(ChangeListener cl) {}
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
+
   public AceSequenceDB(AceURL dbURL, String pattern) throws AceException {
     AceURL url = new AceURL(
       dbURL.getProtocol(),

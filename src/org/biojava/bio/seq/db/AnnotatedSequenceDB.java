@@ -36,7 +36,9 @@ import java.util.*;
  * @author Thomas Down
  */
 
-public class AnnotatedSequenceDB implements SequenceDB, Serializable {
+public class AnnotatedSequenceDB
+extends AbstractSequenceDB 
+implements SequenceDB, Serializable {
   private final SequenceDB parent;
   private final SequenceAnnotator annotator;
 
@@ -44,7 +46,7 @@ public class AnnotatedSequenceDB implements SequenceDB, Serializable {
     this.parent = parent;
     this.annotator = a;
   }
-
+  
     /**
     *Get the original sequenceDB from this annotated sequenceDB.
     */
@@ -79,7 +81,7 @@ public class AnnotatedSequenceDB implements SequenceDB, Serializable {
 	    }
     };
   }
-
+  
     /**
     *Apply the annotation to a sequence.
     *@param seq the sequence to annotate.
