@@ -1,0 +1,56 @@
+<body>
+<p>
+The Ragbag package is a set of classes for setting up a virtual sequence contig
+without the need of writing Biojava code.  It's a sort of Ensembl for
+Dummies.  It uses ComponentFeatures to effect this.
+</p>
+<p><b>What would I use it for?</b></p>
+Any situation where you need to provide a sequence assembled from other sequences and associated annotations, e.g. a DAS 
+server.  Other more sophisticated products exist like Ensembl with more features and superior performance but need a brain 
+the size of a planet to set up.  Ragbag is not intended to compete with those packages but to just provide an easier way of 
+setting up a minimalistic annotated sequence.
+<p><b>How do I use it?</b></p>
+<p>
+To use Ragbag, you only need to understand two structures.  Every directory represents a sequence.
+</p>
+<p>
+A directory that doesn't have a file named "Map" is assumed to have a single sequence file and (optionally) a directory 
+named "Annotation" containing files holding features to be annotated onto that sequence.  The sequence file will be 
+instantiated into a SimpleSequence object and all the features present in files in the Annotation directory will be applied 
+as features on this SimpleSequence object.
+</p>
+<p>
+If a directory has a "Map" file, then that file contains in an XML 
+format all the mappings of sequences in that directory onto the 
+SimpleAssembly object that the directory is associated with.  These 
+sequences can be in sequence files or be directories that themselves 
+represent other virtual sequences either of the SimpleSequence or 
+SimpleAssembly types.  Any files in the Annotation directory will 
+be applied as features onto the SimpleAssembly directly.
+</p>
+<p>
+A hierarchy of sequences can be constructed by merely constructing 
+a directory tree and editing the Map files.
+</p>
+<p>
+From a software perspective, instantiating a RagbagAssembly on the 
+root directory will instantiate the whole contig in memory.
+</p>
+<p><b>Current Limitations and Future Plans</b></p>
+<p>
+The EMBL, GAME, Genbank and XFF formats currently supported. GFF
+will eventually be supported but the current Biojava GFF parser
+is appears rather different from the other parsers.
+Planned features include a caching scheme to reduce RAM 
+requirements.  It should now be possible to annotate your virtual 
+contig by editing the EMBL/Genbank files within the directory 
+structure with Artemis!
+</p>
+
+<p>
+Under active development. Not warranted to work for any particular 
+or even general purpose.  Suited to coders with a death wish. 
+<b>VERY EXPERIMENTAL CODE!!!!</b>
+</p>
+</body>
+

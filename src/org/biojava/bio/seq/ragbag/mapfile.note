@@ -1,0 +1,7 @@
+The format of the Map file will be:-
+<mapping source=[filename] source_start=[] source_end=[] 
+dest_start=[] dest_end=[] direction=[SAME|REVERSED]> 
+any text goes here! </mapping>
+
+
+The source and dest sequence lengths must match.
