@@ -42,16 +42,17 @@ import java.util.*;
 
 final class CircularLocationTools {
   /**
-   * Translates coordinates from circular into linear
+   * Translates coordinates from circular into linear where base 1 is the first
+   * base and base 0 is the base before 1 or the last base of the sequence base
+   * -1 is the penultimate base of the sequence etc.
    *
    * @param val The circular coordinate
-   * @param length The lenght of the circular molecule
+   * @param length The length of the circular molecule
    * @return the transformed coordinate
    */
   private static int realValue(int val, int length){
-    val = ((val-1)%length)+1;
-    if(val<0)val = length+1 + val;
-    if(val == 0) val = 1;
+    val = (val % length);
+    if(val < 1) val = length + val;
     return val;
   }
 
@@ -63,11 +64,11 @@ final class CircularLocationTools {
    * @param seqLength  used to work out if the feature wraps arround the origin
    */
   protected static CircularLocation makeCircLoc(int min, int max, int seqLength){
-    if(min == 0|| max == 0 || seqLength == 0){
-        throw new IllegalArgumentException(
-             "Must use a non zero integer a a parameter"
-        );
-      }
+//    if(min == 0|| max == 0 || seqLength == 0){
+//        throw new IllegalArgumentException(
+//             "Must use a non zero integer a a parameter"
+//        );
+//      }
 
       boolean overlap = false;
       int rmin = realValue(min, seqLength);
