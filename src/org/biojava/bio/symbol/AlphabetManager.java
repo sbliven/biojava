@@ -48,41 +48,23 @@ import org.biojava.utils.bytecode.*;
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public final class AlphabetManager {
 
+public final class AlphabetManager {
     /**
-     * Parse a stringified representation of a sequence into a <code>SymbolList</code>
-     * using the specified <code>SymbolTokenization</code>
+     * Return the ambiguity symbol which matches all symbols in
+     * a given alphabet.
      *
      * @since 1.2
      */
 
-    /*
-
-    public static SymbolList parse(SymbolTokenization toke, String str)
-        throws IllegalSymbolException
-    {
-	final ChunkedSymbolListBuilder slb = new ChunkedSymbolListBuilder();
-	SeqIOListener siol = new SeqIOAdapter() {
-		public void addSymbols(Alphabet alpha,
-			   Symbol[] syms,
-			   int pos,
-			   int len)
-		    throws IllegalAlphabetException
-		{
-		    slb.addSymbols(alpha, syms, pos, len);
-		}
-	    } ;
-	StreamParser sp = toke.parseStream(siol);
-
-	char[] chs = str.toCharArray();
-	sp.characters(chs, 0, chs.length);
-	sp.close();
-	
-	return slb.makeSymbolList();
+    public static Symbol getAllAmbiguitySymbol(FiniteAlphabet alpha) {
+	Set allSymbols = getAllSymbols(alpha);
+	try {
+	    return alpha.getAmbiguity(allSymbols);
+	} catch (IllegalSymbolException ex) {
+	    throw new BioError(ex, "Assertion failure: coudn't recover all-ambiguity symbol");
+	}
     }
-
-    */
 
     /**
      * Return a set containing all possible symbols which can be
