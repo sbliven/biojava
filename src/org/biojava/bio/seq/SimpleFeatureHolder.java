@@ -28,6 +28,7 @@ import java.util.List;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.ListTools;
 
 /**
  * A no-frills implementation of FeatureHolder.
@@ -77,7 +78,7 @@ public class SimpleFeatureHolder extends AbstractFeatureHolder {
   }
 
   public Iterator features() {
-    return features.iterator();
+    return ListTools.nonRemoveIterator(features.iterator());
   }
 
     /**
