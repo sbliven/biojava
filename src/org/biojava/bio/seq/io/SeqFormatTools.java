@@ -262,8 +262,8 @@ public class SeqFormatTools
 
 	// Default is to quote unknown qualifiers
 	String form = "quoted";
-	if (qualifierData.containsKey(key))
-            form = (String) ((Map) qualifierData.get(key)).get("form");
+	if (QUALIFIER_DATA.containsKey(key))
+            form = (String) ((Map) QUALIFIER_DATA.get(key)).get("form");
 
 	// This is a slight simplification. There are some types of
         // qualifier which are unquoted unless they contain
