@@ -25,16 +25,24 @@ public class StAXContentHandlerBase implements StAXContentHandler {
     {
     }
 
+    /**
+     * Signal a span of character data in the XML input.
+     *
+     * @param ch an array of characters
+     * @param start index of the first significant character for this event.
+     * @param length number of characters significant to this event.
+     */
+
     public void characters(char[] ch,
 			   int start,
-			   int end)
+			   int length)
 	throws SAXException
     {
     }
 
     public void ignorableWhitespace(char[] ch,
 				    int start,
-				    int end)
+				    int length)
 	throws SAXException
     {
     }

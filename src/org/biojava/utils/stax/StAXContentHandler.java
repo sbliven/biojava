@@ -27,12 +27,12 @@ public interface StAXContentHandler {
 
     public void characters(char[] ch,
 			   int start,
-			   int end)
+			   int length)
 	throws SAXException;
 
     public void ignorableWhitespace(char[] ch,
 				    int start,
-				    int end)
+				    int length)
 	throws SAXException;
 
     public void startPrefixMapping(String prefix, String uri)

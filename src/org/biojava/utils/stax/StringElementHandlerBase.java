@@ -67,10 +67,10 @@ public abstract class StringElementHandlerBase extends StAXContentHandlerBase {
 	}
     }
 
-    public void characters(char[] ch, int start, int end) 
+    public void characters(char[] ch, int start, int length) 
         throws SAXException
     {
-	data.append(ch, start, end);
+	data.append(ch, start, length);
     }
 
     /**
