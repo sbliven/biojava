@@ -20,10 +20,12 @@
  */
 
 
-package org.biojava.bio.seq;
+package org.biojava.bio.seq.tools;
 
 import java.util.*;
 import java.lang.reflect.*;
+
+import org.biojava.bio.seq.*;
 
 /**
  * Cross product of a list of arbitrary alphabets.  This is the
@@ -49,7 +51,7 @@ class SimpleCrossProductAlphabet implements FiniteAlphabet, CrossProductAlphabet
       Alphabet aa = (Alphabet) i.next();
       if(! (aa instanceof FiniteAlphabet) ) {
         throw new IllegalAlphabetException(
-          "Can't create a SimpleCrossProductAlphabet over non-fininte alphabet " +
+          "Can't create a SimpleAlphabetManager over non-fininte alphabet " +
           aa.getName() + " of type " + aa.getClass()
         );
       }
@@ -80,7 +82,7 @@ class SimpleCrossProductAlphabet implements FiniteAlphabet, CrossProductAlphabet
     List l = Collections.unmodifiableList(new ArrayList(r));
     Residue rr = new SimpleCrossProductResidue(l, symbolSeed++);
     // System.out.println(rr.getName());
-    ourResidues.put(new CrossProductAlphabetFactory.ListWrapper(l), rr);
+    ourResidues.put(new AlphabetManager.ListWrapper(l), rr);
   }
 
   public boolean contains(Residue r) {
@@ -101,7 +103,7 @@ class SimpleCrossProductAlphabet implements FiniteAlphabet, CrossProductAlphabet
   }
 
   public ResidueParser getParser(String name) throws NoSuchElementException {
-    throw new NoSuchElementException("Currently no parsers are defined for SimpleCrossProductAlphabets");
+    throw new NoSuchElementException("Currently no parsers are defined for SimpleAlphabetManagers");
   }
 
   public ResidueList residues() {
@@ -126,8 +128,8 @@ class SimpleCrossProductAlphabet implements FiniteAlphabet, CrossProductAlphabet
     return alphas;
   }
 
-  private CrossProductAlphabetFactory.ListWrapper gopher =
-    new CrossProductAlphabetFactory.ListWrapper();
+  private AlphabetManager.ListWrapper gopher =
+    new AlphabetManager.ListWrapper();
 
   public CrossProductResidue getResidue(List l) throws IllegalAlphabetException {
     gopher.l = l;

@@ -26,16 +26,23 @@ import java.util.*;
 /**
  * Concrete implementation of CrossProductResidue, as returned
  * by a SimpleCrossProductAlphabet and InfiniteCrossProductAlphabet.
+ * <P>
+ * You should not normaly have to instantiate one of these directly - rather
+ * you would retrieve a CrossProductAlphabet from the AlphabetManager and use
+ * the CrossProductResidue objects that it creates.
+ * <P>
+ * You will need to use this class if you write your own implementation of
+ * CrossProductAlphabet.
  *
  * @author Thomas Down
  * @author Matthew Pocock
  */
 
-class SimpleCrossProductResidue implements CrossProductResidue {
+public class SimpleCrossProductResidue implements CrossProductResidue {
   private final List l;
   private final char symbol;
 
-  SimpleCrossProductResidue(List l, char symbol) {
+  public SimpleCrossProductResidue(List l, char symbol) {
     this.l = l;
     this.symbol = symbol;
   }

@@ -32,9 +32,16 @@ import com.sun.xml.tree.*;
 import org.xml.sax.*;
 
 import org.biojava.bio.seq.*;
+import org.biojava.bio.*;
 
 /**
  * The first port of call for retrieving standard alphabets.
+ * <P>
+ * The alphabet interfaces themselves don't give you a lot of help in actualy
+ * getting an alphabet instance. This is where the AlphabetManager comes in
+ * handy. It helps out in serialization, generating derived alphabets and
+ * building CrossProductAlphabet instances. It also contains limited support for
+ * parsing complex alphabet names back into the alphabets.
  *
  * @author Matthew Pocock
  * @author Thomas Down
@@ -62,6 +69,7 @@ public final class AlphabetManager {
   private Map nameToAlphabet;
   private Map nameToResidue;
   private Map gappedAlphabets;
+  private Map crossProductAlphabets;
   private Residue gapResidue;
 
   /**
@@ -82,7 +90,19 @@ public final class AlphabetManager {
    */
   public Alphabet alphabetForName(String name)
   throws NoSuchElementException{
-    return (Alphabet) nameToAlphabet.get(name);
+    Alphabet alpha = (Alphabet) nameToAlphabet.get(name);
+    if(alpha == null) {
+      if(name.startsWith("(") && name.endsWith(")")) {
+        alpha = generateCrossProductAlphaFromName(name);
+      } else if(name.endsWith("-GAP")) {
+        alpha = generateGappedAlphaFromName(name);
+      } else {
+        throw new NoSuchElementException(
+          "No alphabet for name " + name + " could be found"
+        );
+      }
+    }
+    return alpha;
   }
 
   Residue residueForName(String name) 
@@ -123,6 +143,24 @@ public final class AlphabetManager {
   }
 
   /**
+   * Returns a gapped alphabet for the alphabet name.
+   * <P>
+   * The name should be of the form Alphabet-GAP.
+   *
+   * @param name  the name to parse
+   * @return the associated Alphabet
+   */
+  public Alphabet generateGappedAlphaFromName(String name) {
+    if(!name.endsWith("-GAP")) {
+      throw new Error(
+        "Tried to give me a name that isn't a gap alphabet: " + name
+      );
+    }
+    String prefix = name.substring(0, name.length() - 4);
+    return getGappedAlphabet(alphabetForName(prefix));
+  }
+  
+  /**
    * Return a new alphabet which includes the gap residue
    * plus all other residues from the speicified alphabet.
    *
@@ -146,8 +184,115 @@ public final class AlphabetManager {
         b = new GappedAlphabet(a);
       }
       gappedAlphabets.put(a, b);
+      registerAlphabet(b.getName(), b);
     }
     return b;
+  }
+
+  /**
+   * Generates a new CrossProductAlphabet from the give name.
+   *
+   * @param name  the name to parse
+   * @return the associated Alphabet
+   */
+  public CrossProductAlphabet generateCrossProductAlphaFromName(String name) {
+    if(!name.startsWith("(") || !name.endsWith(")")) {
+      throw new BioError(
+        "Can't parse " + name +
+        " into a cross-product alphabet as it is not bracketed"
+      );
+    }
+    
+    name = name.substring(1, name.length()-1).trim();
+    List aList = new ArrayList(); // the alphabets
+    int i = 0;
+    while(i < name.length()) {
+      String alpha = null;
+      if(name.charAt(i) == '(') {
+        int depth = 1;
+        int j = i+1;
+        while(j < name.length() && depth > 0) {
+          char c = name.charAt(j);
+          if(c == '(') {
+            depth++;
+          } else if(c == ')') {
+            depth--;
+          }
+          if(depth == 0) {
+            break;
+          }
+          j++;
+        }
+        if(depth == 0) {
+          aList.add(alphabetForName(name.substring(i, j)));
+          i = j;
+        } else {
+          throw new BioError(
+            "Error parsing alphabet name: could not find matching bracket\n" +
+            name.substring(i)
+          );
+        }
+      } else {
+        int j = name.indexOf(" x ", i);
+        aList.add(alphabetForName(name.substring(i, j)));
+        i = j + " x ".length();
+      }
+    }
+    
+    return getCrossProductAlphabet(aList);
+  }
+  
+  /**
+   * Retrieve a CrossProductAlphabet instance over the alphabets in aList.
+   * <P>
+   * If all of the alphabets in aList implements FiniteAlphabet then the
+   * method will return a FiniteAlphabet. Otherwise, it returns a non-finite
+   * alphabet.
+   * <P>
+   * If you call this method twice with a list containing the same alphabets,
+   * it will return the same alphabet. This promotes the re-use of alphabets
+   * and helps to maintain the 'flyweight' principal for finite alphabet
+   * residues.
+   * <P>
+   * The resulting alphabet cpa will be retrievable via
+   * AlphabetManager.instance().alphabetForName(cpa.getName())
+   *
+   * @param aList a list of Alphabet objects
+   * @return a CrossProductAlphabet that is over the alphabets in aList
+   */
+  public CrossProductAlphabet getCrossProductAlphabet(List aList) {
+    if(crossProductAlphabets == null) {
+      crossProductAlphabets = new HashMap();
+    }
+
+    ListWrapper aw = new ListWrapper(aList);
+        
+    CrossProductAlphabet cpa =
+      (CrossProductAlphabet) crossProductAlphabets.get(aw);
+    
+    if(cpa == null) {
+      for(Iterator i = aList.iterator(); i.hasNext(); ) {
+        Alphabet aa = (Alphabet) i.next();
+        if(! (aa instanceof FiniteAlphabet) ) {
+          cpa =  new InfiniteCrossProductAlphabet(aList);
+          break;
+        }
+      }
+      if(cpa == null) {
+        try {
+          cpa = new SimpleCrossProductAlphabet(aList);
+        } catch (IllegalAlphabetException iae) {
+          throw new BioError(
+            "Could not create SimpleCrossProductAlphabet for " + aList +
+            " even though we should be able to. No idea what is wrong."
+          );
+        }
+      }
+      crossProductAlphabets.put(aw, cpa);
+      registerAlphabet(cpa.getName(), cpa);
+    }
+    
+    return cpa;
   }
 
   /**
@@ -466,4 +611,47 @@ public final class AlphabetManager {
 	    }
 	}
     }
+   
+  /**
+   * Simple wrapper to assist in list-comparisons.
+   *
+   * @author Thomas Down
+   */
+
+  public static class ListWrapper {
+    List l;
+
+    ListWrapper(List l) {
+      this.l = l;
+    }
+
+    ListWrapper() {
+    }
+
+    public boolean equals(Object o) {
+      if (! (o instanceof ListWrapper)) {
+        return false;
+      }
+      List ol = ((ListWrapper) o).l;
+      if (ol.size() != l.size()) {
+        return false;
+      }
+      Iterator i1 = l.iterator();
+      Iterator i2 = ol.iterator();
+      while (i1.hasNext()) {
+        if (i1.next() != i2.next()) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    public int hashCode() {
+      int c = 0;
+      for (Iterator i = l.iterator(); i.hasNext(); ) {
+        c += i.next().hashCode();
+      }
+      return c;
+    }
+  }
 }

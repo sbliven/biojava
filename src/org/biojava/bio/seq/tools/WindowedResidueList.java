@@ -72,7 +72,7 @@ public class WindowedResidueList extends AbstractResidueList {
     }
     this.source = source;
     Alphabet a = source.alphabet();
-    this.alpha = CrossProductAlphabetFactory.createAlphabet(
+    this.alpha = AlphabetManager.instance().getCrossProductAlphabet(
       Collections.nCopies(width, a)
     );
     this.width = width;

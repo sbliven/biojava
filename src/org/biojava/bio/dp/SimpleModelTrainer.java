@@ -81,10 +81,12 @@ public class SimpleModelTrainer implements ModelTrainer {
   public void addStateCount(EmissionState s, Residue r, double count)
   throws IllegalResidueException {
     Set trainerSet = (Set) stateToTrainer.get(s);
-    if(trainerSet == null)
-      throw new IllegalResidueException("No trainers associated with state " +
-                                        s.getName());
-                                        
+    if(trainerSet == null) {
+      throw new IllegalResidueException(
+        "No trainers associated with state " +
+        s.getName() + " while training " + model.stateAlphabet().getName()
+      );
+    }                                  
     for(Iterator i = trainerSet.iterator(); i.hasNext();) {
       ((StateTrainer) i.next()).addCount(r, count);
     }

@@ -33,7 +33,7 @@ public class SimpleStateTrainer implements StateTrainer {
     Double d = (Double) c.get(res);
     if (d == null) {
       throw new IllegalResidueException(
-        "Residue " + res +
+        "Residue " + res.getName() +
         " not found in " + state.alphabet().getName() +
         " within state " + state.getName()
       );

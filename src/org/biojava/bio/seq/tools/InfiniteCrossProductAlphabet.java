@@ -20,9 +20,11 @@
  */
 
 
-package org.biojava.bio.seq;
+package org.biojava.bio.seq.tools;
 
 import java.util.*;
+
+import org.biojava.bio.seq.*;
 
 class InfiniteCrossProductAlphabet implements CrossProductAlphabet {
   private final List alphas;

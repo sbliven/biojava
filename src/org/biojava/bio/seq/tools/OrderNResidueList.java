@@ -64,7 +64,7 @@ public class OrderNResidueList extends AbstractResidueList {
   throws IllegalAlphabetException {
     this.source = source;
     Alphabet a = source.alphabet();
-    this.alpha = CrossProductAlphabetFactory.createAlphabet(
+    this.alpha = AlphabetManager.instance().getCrossProductAlphabet(
       Collections.nCopies(order, a)
     );
     this.order = order;

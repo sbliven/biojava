@@ -25,6 +25,7 @@ package org.biojava.bio.seq;
 import java.util.*;
 
 import org.biojava.bio.*;
+import org.biojava.bio.seq.tools.*;
 
 /**
  * A simple implementation of an Alignment.
@@ -141,7 +142,7 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
       }
     }
     
-    this.alphabet = CrossProductAlphabetFactory.createAlphabet(alphaList);
+    this.alphabet = AlphabetManager.instance().getCrossProductAlphabet(alphaList);
     this.length = length;
   }
  
