@@ -67,14 +67,41 @@ public class CodonPrefTools
      * constants for model organisms
      */
     static String JUNIT = "jUnit use only!!!!";
+    /**
+     * Drosophila melanogaster codon preferences
+     */
     public static String DROSOPHILA_MELANOGASTER_NUCLEAR = "Drosophila melanogaster";
+    /**
+     * Homo sapiens codon preferences
+     */
     public static String MAN_NUCLEAR = "Homo sapiens";
+    /**
+     * Mus musculus codon preferences
+     */
     public static String MOUSE_NUCLEAR = "Mus musculus";
+    /**
+     * Rattus norvegicus codon preferences
+     */
     public static String RAT_NUCLEAR = "Rattus norvegicus";
+    /**
+     * Takifugu rubripes codon preferences
+     */
     public static String FUGU_NUCLEAR = "Takifugu rubripes";
+    /**
+     * Caenorhabditis elegans codon preferences
+     */
     public static String WORM_NUCLEAR = "Caenorhabditis elegans";
+    /**
+     * Saccharomyces cerevisiae codon preferences
+     */
     public static String CEREVISIAE_NUCLEAR = "Saccharomyces cerevisiae";
+    /**
+     * Schizosaccharomyces pombe codon preferences
+     */
     public static String POMBE_NUCLEAR = "Schizosaccharomyces pombe";
+    /**
+     * Escherichia coli codon preferences
+     */
     public static String ECOLI = "Escherichia coli";
 
     private static Map prefMap;
@@ -125,7 +152,7 @@ public class CodonPrefTools
 
     /**
      * returns an RNA dinucleotide alphabet.
-     * used to represent the non-wobble bases in WobbleDistribution
+     * Used to represent the non-wobble bases in WobbleDistribution
      */
     public static FiniteAlphabet getDinucleotideAlphabet()
     {
@@ -145,6 +172,10 @@ public class CodonPrefTools
         writer.flush();
     }
 
+    /**
+     * reads a specified CodonPref from an file.
+     * @param name name of organism
+     */
     public static CodonPref readFromXML(InputStream prefStream, String name)
         throws BioException
     {
@@ -155,6 +186,9 @@ public class CodonPrefTools
         return filter.getCodonPref();
     }
 
+    /**
+     * read an CodonPref XML stream and handle it with a CodonPrefFilter object.
+     */
     public static void readFromXML(InputStream prefStream, CodonPrefFilter filter)
         throws BioException
     {
