@@ -316,20 +316,17 @@ class GenbankContext
 			// VERSION line is a special case because it contains both
 			// the VERSION field and the GI number
 			this.saveSeqAnno();
-			headerTag = GenbankFormat.VERSION_TAG;
-			headerTagText = new StringBuffer(line.substring(
-					TAG_LENGTH, TAG_LENGTH + VERSION_LENGTH).trim());
-			int lengthProcessed =
-					TAG_LENGTH + VERSION_LENGTH + headerTagText.length();
+			StringTokenizer lineTokens = new StringTokenizer(line);
+			headerTag = lineTokens.nextToken();
+			headerTagText = new StringBuffer(lineTokens.nextToken());
 
-			String remainingString = line.substring(lengthProcessed);
-			remainingString.trim();
-			if(remainingString.startsWith(GenbankFormat.GI_TAG))
+			String nextToken = lineTokens.nextToken();
+			if(nextToken.startsWith(GenbankFormat.GI_TAG))
 			{
 				this.saveSeqAnno();
 				headerTag = GenbankFormat.GI_TAG; // Possibly should be UID?
 				headerTagText =
-						new StringBuffer(remainingString.substring(3));
+						new StringBuffer(nextToken.substring(3));
 			}
 		}
 		else if (hasHeaderTag(line))
