@@ -200,7 +200,11 @@ public interface AnnotationType {
                 }
                 return true;
               } else {
-                return false;
+                  if (card.contains(1)) {
+                      return con.accept(val);
+                  } else {
+                      return false;
+                  }
               }
             }
           }
