@@ -108,10 +108,12 @@ public class FileConvert {
 		    String record = "" ;
 		    if ( type.equals("hetatm") ) {
 			record = "HETATM";
+		
 		    } else {
 			record = "ATOM  ";
 		    }
-	   
+		   
+		    
 		    // format output ...
 		    int groupsize  = g.size();
 		    String resName = g.getPDBName();
@@ -131,8 +133,13 @@ public class FileConvert {
 			int    seri       = a.getPDBserial()        ;
 			String serial     = alignRight(""+seri,5)   ;
 			String fullname   = a.getFullName()         ;
+
 			Character  altLoc = a.getAltLoc()           ;
-			String resseq     = alignRight(""+pdbcode,4);
+			String resseq = "" ;
+			if ( hasInsertionCode(pdbcode) )
+			    resseq     = alignRight(""+pdbcode,5);
+			else 
+			    resseq     = alignRight(""+pdbcode,4)+" ";
 			String x          = alignRight(""+d3.format(a.getX()),8);
 			String y          = alignRight(""+d3.format(a.getY()),8);
 			String z          = alignRight(""+d3.format(a.getZ()),8);
@@ -143,7 +150,7 @@ public class FileConvert {
 
 			line = record + serial + " " + fullname +altLoc 
 			    + resName + " " + chainID + resseq 
-			    + "    " + x+y+z 
+			    + "   " + x+y+z 
 			    + occupancy + tempfactor;
 			str.append(line + "\n");
 			//System.out.println(line);
@@ -154,14 +161,23 @@ public class FileConvert {
 	    if ( structure.isNmr()) {
 		str.append("ENDMDL\n");
 	    }
-
-
 	}
-    
-
 
 	return str.toString() ;
     }
+
+
+
+    /** test if pdbserial has an insertion code */
+    private boolean hasInsertionCode(String pdbserial) {
+	try {
+	    int pos = Integer.parseInt(pdbserial) ;
+	} catch (NumberFormatException e) {
+	    return true ;
+	}
+	return false ;
+    }
+
 
     /** convert a protein Structure to a DAS Structure XML response .
      * @param xw  a XMLWriter object
