@@ -43,14 +43,16 @@ import org.biojava.bio.taxa.*;
  */
 
 class BioSQLSequenceAnnotation
-  extends
-    AbstractChangeable
   implements
     Annotation
 {
     private BioSQLSequenceDB seqDB;
     private int bioentry_id;
     private Annotation underlyingAnnotation;
+
+    int getBioentryID() {
+	return bioentry_id;
+    }
 
     BioSQLSequenceAnnotation(BioSQLSequenceDB seqDB,
 			     int bioentry_id)
@@ -142,17 +144,13 @@ class BioSQLSequenceAnnotation
     public void setProperty(Object key, Object value)
         throws ChangeVetoException
     {
-      if (!hasListeners()) {
-        _setProperty(key, value);
-      } else {
-        ChangeSupport changeSupport = getChangeSupport(Annotation.PROPERTY);
-        synchronized (changeSupport) {
-          ChangeEvent cev = new ChangeEvent(this, Annotation.PROPERTY, key);
-          changeSupport.firePreChangeEvent(cev);
-          _setProperty(key, value);
-          changeSupport.firePostChangeEvent(cev);
+	BioSQLChangeHub hub = seqDB.getChangeHub();
+	synchronized (hub) {
+	    ChangeEvent cev = new ChangeEvent(this, Annotation.PROPERTY, key);
+	    hub.fireEntryAnnotationPreChange(cev);
+	    _setProperty(key, value);
+	    hub.fireEntryAnnotationPostChange(cev);
         }
-      }
     }
 
     private void _setProperty(Object key, Object value) 
@@ -210,5 +208,26 @@ class BioSQLSequenceAnnotation
 	}
 
 	return Collections.unmodifiableMap(underlyingAnnotation.asMap());
+    }
+
+    
+    public void addChangeListener(ChangeListener cl) {
+	addChangeListener(cl, ChangeType.UNKNOWN);
+    }
+    
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {
+	seqDB.getChangeHub().addEntryAnnotationListener(bioentry_id, cl, ct);
+    }
+
+    public void removeChangeListener(ChangeListener cl) {
+	removeChangeListener(cl, ChangeType.UNKNOWN);
+    }
+
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+	seqDB.getChangeHub().removeEntryAnnotationListener(bioentry_id, cl, ct);
+    }
+
+    public boolean isUnchanging(ChangeType ct) {
+	return false;
     }
 }

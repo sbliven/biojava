@@ -1196,8 +1196,8 @@ public class BioSQLSequenceDB implements SequenceDB {
     private class SingleFeatureReceiver extends BioSQLFeatureReceiver {
 	private Feature feature;
 
-	private SingleFeatureReceiver(Sequence seq) {
-	    super(seq);
+	private SingleFeatureReceiver() {
+	    super(BioSQLSequenceDB.this);
 	}
 
 	protected void deliverTopLevelFeature(Feature f)
@@ -1215,16 +1215,28 @@ public class BioSQLSequenceDB implements SequenceDB {
 	}
     }
 
-    BioSQLFeature getFeatureByID(int feature_id) {
+    BioSQLFeature getFeatureByID(int feature_id) 
+    {
 	Integer key = new Integer(feature_id);
 	BioSQLFeature f = (BioSQLFeature) featuresByID.get(key);
 	if (f != null) {
 	    return f;
 	}
 
-	// try {
-	//    SingleFeatureReceiver receiver = new SingleFeatureReceiver
-	return null;
+	try {
+	    SingleFeatureReceiver receiver = new SingleFeatureReceiver();
+	    getFeaturesSQL().retrieveFeatures(-1, receiver, null, -1, feature_id);
+	    if (receiver.getFeature() == null) {
+		throw new BioRuntimeException("Dangling internal_feature_id");
+	    } else {
+		featuresByID.put(key, (BioSQLFeature) receiver.getFeature());
+		return (BioSQLFeature) receiver.getFeature();
+	    }
+	} catch (SQLException ex) {
+	    throw new BioRuntimeException(ex, "Database error");
+	} catch (BioException ex) {
+	    throw new BioRuntimeException(ex);
+	}
     }
 
     Cache getTileCache() {

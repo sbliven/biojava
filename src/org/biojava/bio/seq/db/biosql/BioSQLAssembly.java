@@ -42,8 +42,6 @@ import org.biojava.bio.symbol.*;
  */
 
 class BioSQLAssembly
-  extends
-    AbstractChangeable
   implements
     Sequence,
     RealizingFeatureHolder,
@@ -277,5 +275,26 @@ class BioSQLAssembly
         throws BioException
     {
 	seqDB.getFeaturesSQL().persistFeature(f, parent_id, bioentry_id);
+    }
+
+    
+    public void addChangeListener(ChangeListener cl) {
+	addChangeListener(cl, ChangeType.UNKNOWN);
+    }
+    
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {
+	getSequenceDB().getChangeHub().addEntryListener(bioentry_id, cl, ct);
+    }
+
+    public void removeChangeListener(ChangeListener cl) {
+	removeChangeListener(cl, ChangeType.UNKNOWN);
+    }
+
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+	getSequenceDB().getChangeHub().removeEntryListener(bioentry_id, cl, ct);
+    }
+
+    public boolean isUnchanging(ChangeType ct) {
+	return false;
     }
 }

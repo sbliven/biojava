@@ -131,15 +131,14 @@ class FeaturesSQL {
 	    get_features = conn.prepareStatement(
 			"select seqfeature.seqfeature_id, " +
 			"       ontology_term.term_name, " +
-			"       seqfeature_source.source_name " +
+			"       seqfeature_source.source_name, " +
+			"       seqfeature.bioentry_id " + 
 			"  from seqfeature, ontology_term, seqfeature_source " +
 			" where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
 			"       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
-			"       seqfeature.bioentry_id = ? and " +
 			"       seqfeature.seqfeature_id = ?"
 	    );
-	    get_features.setInt(1, bioentry_id);
-	    get_features.setInt(2, featureID);
+	    get_features.setInt(1, featureID);
 	} else {
 	    throw new BioException("I'm afraid you can't do that!");
 	}
@@ -152,6 +151,11 @@ class FeaturesSQL {
 	    templ.source = rs.getString(3).trim();
 	    templ.annotation = new BioSQLFeatureAnnotation(seqDB, feature_id);
 	    fmap.put(new Integer(feature_id), templ);
+
+	    if (featureID >= 0 && bioentry_id < 0) {
+		bioentry_id = rs.getInt(4);
+		listener.addSequenceProperty("_biosql_internal.bioentry_id", new Integer(bioentry_id));
+	    }
 	}
 	get_features.close();
 

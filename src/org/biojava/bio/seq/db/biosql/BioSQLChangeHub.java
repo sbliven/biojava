@@ -34,7 +34,19 @@ import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.*;
 
+/**
+ * Hub for changevents originating in BioSQL objects.  Bit nasty
+ * and monolithic.  There should be a generic `hub' class with one
+ * instance for each event type, and handle the event forwarding
+ * and locking separately.  This implementation works well for now,
+ * though.
+ *
+ * @author Thomas Down
+ * @since 1.3
+ */
+
 class BioSQLChangeHub {
+    private final Map entryAnnotationListeners;
     private final Map featureAnnotationListeners;
     private final Map featureListeners;
     private final Map entryListeners;
@@ -44,6 +56,7 @@ class BioSQLChangeHub {
     
     BioSQLChangeHub(BioSQLSequenceDB seqDB) {
 	super();
+	entryAnnotationListeners = new HashMap();
 	featureAnnotationListeners = new HashMap();
 	featureListeners = new HashMap();
 	entryListeners = new HashMap();
@@ -78,7 +91,18 @@ class BioSQLChangeHub {
 		    }
 		}
 	    } else if (ref instanceof FeatureAnnotationListenerReference) {
-		List listenerList = (List) featureListeners.get(((FeatureAnnotationListenerReference) ref).getKey());
+		List listenerList = (List) featureAnnotationListeners.get(((FeatureAnnotationListenerReference) ref).getKey());
+		if (listenerList != null) {
+		    for (Iterator i = listenerList.iterator(); i.hasNext(); ) {
+			ListenerMemento lm = (ListenerMemento) i.next();
+			if (lm.listener == ref) {
+			    i.remove();
+			    break;
+			}
+		    }
+		}
+	    } else if (ref instanceof EntryAnnotationListenerReference) {
+		List listenerList = (List) entryAnnotationListeners.get(((EntryAnnotationListenerReference) ref).getKey());
 		if (listenerList != null) {
 		    for (Iterator i = listenerList.iterator(); i.hasNext(); ) {
 			ListenerMemento lm = (ListenerMemento) i.next();
@@ -97,6 +121,96 @@ class BioSQLChangeHub {
 		    }
 		}
 	    }
+	}
+    }
+
+    public synchronized void addEntryAnnotationListener(int bioentry_id,
+							ChangeListener listener,
+							ChangeType ct)
+    {
+	diddleQueue();
+	Integer id = new Integer(bioentry_id);
+	List listenerList = (List) entryAnnotationListeners.get(id);
+	if (listenerList == null) {
+	    listenerList = new ArrayList();
+	    featureListeners.put(id, listenerList);
+	}
+	listenerList.add(new ListenerMemento(ct, new EntryAnnotationListenerReference(id, listener, queue)));
+    }
+
+    public synchronized void removeEntryAnnotationListener(int bioentry_id,
+							   ChangeListener listener,
+							   ChangeType ct)
+    {
+	Integer id = new Integer(bioentry_id);
+	List listenerList = (List) entryAnnotationListeners.get(id);
+	if (listenerList != null) {
+	    for (Iterator i = listenerList.iterator(); i.hasNext(); ) {
+		ListenerMemento lm = (ListenerMemento) i.next();
+		if (ct == lm.type && listener.equals(lm.listener.get())) {
+		    lm.listener.clear();
+		    i.remove();
+		    return;
+		}
+	    }
+	}
+
+	// Is this an error?
+    }
+
+    
+    public void fireEntryAnnotationPreChange(ChangeEvent cev) 
+        throws ChangeVetoException
+    {
+	BioSQLSequenceAnnotation source = (BioSQLSequenceAnnotation) cev.getSource();
+	Integer id = new Integer(source.getBioentryID());
+	ChangeType ct = cev.getType();
+	List listenerList = (List) entryAnnotationListeners.get(id);
+	if (listenerList != null) {
+	    for (Iterator i = listenerList.iterator(); i.hasNext(); ) {
+		ListenerMemento lm = (ListenerMemento) i.next();
+		if (ct.isMatchingType(lm.type)) {
+		    ChangeListener cl = (ChangeListener) lm.listener.get();
+		    if (cl != null) {
+			cl.preChange(cev);
+		    }
+		}
+	    }
+	}	
+
+	try {
+	    Sequence seq = seqDB.getSequence(null, id.intValue());
+	    ChangeEvent pcev = new ChangeEvent(seq, Annotatable.ANNOTATION, null, null, cev);
+	    fireEntryPreChange(pcev);
+	} catch (BioException ex) {
+	    throw new BioRuntimeException("Sequence has gone missing");
+	}
+    }
+
+    public void fireEntryAnnotationPostChange(ChangeEvent cev) 
+    {
+	BioSQLSequenceAnnotation source = (BioSQLSequenceAnnotation) cev.getSource();
+	Integer id = new Integer(source.getBioentryID());
+	ChangeType ct = cev.getType();
+	List listenerList = (List) entryAnnotationListeners.get(id);
+	if (listenerList != null) {
+	    for (Iterator i = listenerList.iterator(); i.hasNext(); ) {
+		ListenerMemento lm = (ListenerMemento) i.next();
+		if (ct.isMatchingType(lm.type)) {
+		    ChangeListener cl = (ChangeListener) lm.listener.get();
+		    if (cl != null) {
+			cl.postChange(cev);
+		    }
+		}
+	    }
+	}	
+
+	try {
+	    Sequence seq = seqDB.getSequence(null, id.intValue());
+	    ChangeEvent pcev = new ChangeEvent(seq, Annotatable.ANNOTATION, null, null, cev);
+	    fireEntryPostChange(pcev);
+	} catch (BioException ex) {
+	    throw new BioRuntimeException("Sequence has gone missing");
 	}
     }
 
@@ -153,7 +267,9 @@ class BioSQLChangeHub {
 	    }
 	}	
 
-	// Can't do the forwarding yet :-(
+	Feature parent = seqDB.getFeatureByID(id.intValue());
+	ChangeEvent pcev = new ChangeEvent(parent, Annotatable.ANNOTATION, null, null, cev);
+	fireFeaturePreChange(pcev);
     }
 
     public void fireFeatureAnnotationPostChange(ChangeEvent cev) 
@@ -174,7 +290,9 @@ class BioSQLChangeHub {
 	    }
 	}	
 
-	// Can't do the forwarding yet :-(
+	Feature parent = seqDB.getFeatureByID(id.intValue());
+	ChangeEvent pcev = new ChangeEvent(parent, Annotatable.ANNOTATION, null, null, cev);
+	fireFeaturePostChange(pcev);
     }
 
 
@@ -410,6 +528,24 @@ class BioSQLChangeHub {
 	}
 
 	public FeatureAnnotationListenerReference(Object key, Object ref, ReferenceQueue queue) {
+	    super(ref, queue);
+	    this.key = key;
+	}
+
+	public Object getKey() {
+	    return key;
+	}
+    }
+
+    private class EntryAnnotationListenerReference extends WeakReference {
+	private Object key;
+
+	public EntryAnnotationListenerReference(Object key, Object ref) {
+	    super(ref);
+	    this.key = key;
+	}
+
+	public EntryAnnotationListenerReference(Object key, Object ref, ReferenceQueue queue) {
 	    super(ref, queue);
 	    this.key = key;
 	}

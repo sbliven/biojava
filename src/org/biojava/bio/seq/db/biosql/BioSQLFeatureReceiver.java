@@ -50,6 +50,11 @@ abstract class BioSQLFeatureReceiver extends SeqIOAdapter {
 	this.seqDB = ((BioSQLSequenceI) seq).getSequenceDB();
     }
 
+    BioSQLFeatureReceiver(BioSQLSequenceDB seqDB) {
+	this.seq = null;
+	this.seqDB = seqDB;
+    }
+
     public void startFeature(Feature.Template templ)
 	throws ParseException
     {
@@ -81,6 +86,22 @@ abstract class BioSQLFeatureReceiver extends SeqIOAdapter {
 	    }
 	} else {
 	    throw new ParseException("start/end feature messages don't match");
+	}
+    }
+
+    public void addSequenceProperty(Object key, Object value)
+        throws ParseException
+    {
+	if ("_biosql_internal.bioentry_id".equals(key)) {
+	    if (seq != null) {
+		throw new ParseException("Attempting to set the sequence when it's already known!");
+	    }
+	    Integer bid = (Integer) value;
+	    try {
+		seq = seqDB.getSequence(null, bid.intValue());
+	    } catch (Exception ex) {
+		throw new ParseException("Non-existant sequence!");
+	    }
 	}
     }
 
