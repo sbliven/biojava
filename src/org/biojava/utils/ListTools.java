@@ -21,12 +21,7 @@
 package org.biojava.utils;
 
 import java.io.Serializable;
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Matthew Pocock
@@ -82,7 +77,7 @@ public class ListTools implements Serializable{
         return Arrays.asList(a);
     }
   }
-  
+
   /**
    * Create a new SeriesList with the given leader, trailer and size.
    *
@@ -285,7 +280,7 @@ public class ListTools implements Serializable{
       return other.get(0).equals(a) && other.get(1).equals(b) && other.get(2).equals(c);
     }
   }
-  
+
   /**
    * A list that represents a series of values.
    *
@@ -304,42 +299,146 @@ public class ListTools implements Serializable{
     private final String leader;
     private final String trailer;
     private final int size;
-    
+
     private SeriesList(String leader, String trailer, int size) {
       if(leader == null) {
         throw new NullPointerException(
         "Leader was null. Use the empty string instead");
       }
-      
+
       if(trailer == null) {
         throw new NullPointerException(
         "Trailer was null. Use the empty string instead");
       }
-      
+
       if(size < 0) {
         throw new IllegalArgumentException(
           "Size must be zero or positive: " + size );
       }
-      
+
       this.leader = leader;
       this.trailer = trailer;
       this.size = size;
     }
-    
+
     public String getLeader() {
       return leader;
     }
-    
+
     public String getTrailer() {
       return trailer;
     }
-    
+
     public int size() {
       return size;
     }
-    
+
     public Object get(int indx) {
       return leader + indx + trailer;
     }
   }
+
+  public static List mapList(final List list,
+                             final Mapper mapper)
+  {
+    return new AbstractList() {
+      public Object get(int index)
+      {
+        return mapper.map(list.get(index));
+      }
+
+      public int size()
+      {
+        return list.size();
+      }
+    };
+  }
+
+  public static Set mapSet(final Set set,
+                           final Mapper mapper)
+  {
+    return new AbstractSet() {
+      public Iterator iterator()
+      {
+        return new Iterator() {
+          Iterator i = set.iterator();
+          public boolean hasNext()
+          {
+            return i.hasNext();
+          }
+
+          public Object next()
+          {
+            return mapper.map(i.next());
+          }
+
+          public void remove()
+          {
+            i.remove();
+          }
+        };
+      }
+
+      public int size()
+      {
+        return set.size();
+      }
+    };
+  }
+
+  public static Map mapMap(final Map map,
+                           final Mapper keyMapper,
+                           final Mapper valMapper)
+  {
+    return new AbstractMap() {
+      public Set entrySet()
+      {
+        return mapSet(map.entrySet(), new Mapper() {
+          public Object map(Object val)
+          {
+            final Map.Entry ent = (Map.Entry) val;
+            return new Map.Entry() {
+              public Object getKey()
+              {
+                return keyMapper.map(ent.getKey());
+              }
+
+              public Object getValue()
+              {
+                return valMapper.map(ent.getValue());
+              }
+
+              public Object setValue(Object value)
+              {
+                throw new UnsupportedOperationException();
+              }
+            };
+          }
+        });
+      }
+    };
+  }
+
+  /**
+   * Maps one object to another.
+   *
+   * @author Matthew Pocock
+   * @since 1.4
+   */
+  public interface Mapper {
+    /**
+     * Map the object.
+     *
+     * @param val   the object to map
+     * @return      the new value
+     */
+    public Object map(Object val);
+  }
+
+  public static final Mapper NULL_MAPPER = new Mapper() {
+    public Object map(Object val)
+    {
+      return val;
+    }
+  };
 }
