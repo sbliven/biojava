@@ -21,19 +21,14 @@
 
 package org.biojava.bio.seq.db;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Iterator;
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.biojava.bio.SimpleAnnotation;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.symbol.LocationTools;
 
 /**
@@ -87,7 +82,7 @@ public abstract class AbstractSequenceDBTest extends TestCase {
         Feature noTS = seq.createFeature(template);
         assertTrue(seq.countFeatures() == 1);
     }
-    
+ 
 
     // A test that does a bit of feature editing
     public void testEditFeatures() throws Exception {
@@ -111,19 +106,15 @@ public abstract class AbstractSequenceDBTest extends TestCase {
         template.source = sourceType;
         Feature noANNO = seq.createFeature(template);
         assertTrue(!noANNO.getAnnotation().containsProperty(annoTag));
-        //new org.biojava.bio.seq.io.GenbankFormat().writeSequence(seq, System.err);
         assertTrue(seq.countFeatures() == 1);
 
-        template = new Feature.Template();
-        template.annotation = new SimpleAnnotation();
-        template.location = LocationTools.makeLocation(10, 15);
+        // Re-use the template object
         template.type = "yesANNO";
-        template.source = sourceType;
         template.annotation.setProperty(annoTag, annoVal);
         Feature yesANNO = seq.createFeature(template);
-        assertTrue(!noANNO.getAnnotation().containsProperty(annoTag));
         assertTrue(yesANNO.getAnnotation().containsProperty(annoTag));
-        //new org.biojava.bio.seq.io.GenbankFormat().writeSequence(seq, System.err);
+        assertTrue("createFeature should copy rather than referencing annotation.", 
+                   !noANNO.getAnnotation().containsProperty(annoTag));
         assertTrue(seq.countFeatures() == 2);
 
         // Check the features are both there
@@ -148,6 +139,7 @@ public abstract class AbstractSequenceDBTest extends TestCase {
         }
         assertTrue(!i.hasNext());
 
+        //new org.biojava.bio.seq.io.GenbankFormat().writeSequence(seq, System.err);
 
         // Delete the noANNO feature
         FeatureHolder fh = seq.filter(new FeatureFilter.And(new FeatureFilter.BySource(sourceType),
