@@ -9,6 +9,7 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.db.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.seq.db.*;
+import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.dist.*;
 import org.biojava.bio.dp.*;
 
@@ -115,7 +116,7 @@ public class SearchProfile {
       SequenceIterator seqI = new StreamReader(
         new FileInputStream(seqFile),
         fFormat,
-        alpha.getParser("symbol"),
+        alpha.getParser("token"),
         sFact
       );
       seqI.hasNext();
