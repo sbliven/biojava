@@ -1,0 +1,94 @@
+package ssbind;
+
+import org.biojava.bio.search.*;
+
+public class Echoer
+implements SearchContentHandler {
+  private int indentDepth = 0;
+  private String indentPrefix = "";
+  private boolean moreSearches = false;
+ 
+  public void indent() {
+    indentDepth++;
+    createPrefix();
+  }
+  
+  public void outdent() {
+    indentDepth--;
+    createPrefix();
+  }
+  
+  public String getPrefix() {
+    return indentPrefix;
+  }
+  
+  private void createPrefix() {
+    indentPrefix = "";
+    for(int i = 0; i < indentDepth; i++) {
+      indentPrefix += "  ";
+    }
+  }
+  
+  public void addHitProperty(Object key, Object value) {
+    System.out.println(getPrefix() + "hit property: " + key.getClass() + " " + key + " -> " + value.getClass() + " " + value);
+  }
+  public void addSearchProperty(Object key, Object value) {
+    System.out.println(getPrefix() + "search property: " + key.getClass() + " " + key + " -> " + value.getClass() + " " + value);
+  }
+
+  public void addSubHitProperty(Object key, Object value) {
+    System.out.println(getPrefix() + "subhit property: " + key.getClass() + " " + key + " -> " + value.getClass() + " " + value);
+  }
+
+  public void startHeader() {
+    System.out.println(getPrefix() + "header:");
+    indent();
+  }
+
+  public void endHeader() {
+    outdent();
+  }
+
+  public void startHit() {
+    System.out.println(getPrefix() + "hit:");
+    indent();
+  }
+
+  public void endHit() {
+    outdent();
+  }
+
+  public void startSearch() {
+    System.out.println(getPrefix() + "search");
+    indent();
+  }
+
+  public void endSearch() {
+    outdent();
+  }
+
+  public void startSubHit() {
+    System.out.println(getPrefix() + "sub hit:");
+    indent();
+  }
+
+  public void endSubHit() {
+    outdent();
+  }
+
+  public boolean getMoreSearches() {
+    return moreSearches;
+  }
+
+  public void setMoreSearches(boolean val) {
+    this.moreSearches = val;
+  }
+
+  public void setQuerySeq(String seqID) {
+    System.out.println(getPrefix() + "query sequence: " + seqID);
+  }
+
+  public void setSubjectDB(String dbID) {
+    System.out.println(getPrefix() + "subject db: " + dbID);
+  }
+}
