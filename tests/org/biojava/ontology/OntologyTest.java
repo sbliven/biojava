@@ -106,7 +106,7 @@ public class OntologyTest extends TestCase {
       doIsaTest(OntoTools.EQUIVALENCE, OntoTools.REFLEXIVE, true);
       doIsaTest(OntoTools.EQUIVALENCE, OntoTools.RELATION, true);
       doIsaTest(OntoTools.EQUIVALENCE, OntoTools.ANY, true);
-      doIsaTest(OntoTools.EQUIVALENCE, OntoTools.PARTIAL_ORDER, true);
+      doIsaTest(OntoTools.EQUIVALENCE, OntoTools.PARTIAL_ORDER, false);
     }
     
     private void doIsaTest(Term t1, Term t2, boolean yesno)
