@@ -33,33 +33,78 @@ import org.xml.sax.*;
 
 import org.biojava.bio.seq.*;
 
+/**
+ * The first port of call for retrieving standard alphabets.
+ *
+ * @author Matthew Pocock
+ */
 public class AlphabetManager {
+  /**
+   * Singleton instance.
+   */
   static private AlphabetManager am;
 
+  /**
+   * Retrieve the singleton instance.
+   *
+   * @return the AlphabetManager instance
+   */
   static public AlphabetManager instance() {
     if(am == null)
       am = new AlphabetManager();
     return am;
   }
 
+  /**
+   * Maintains the map from name to alphabet.
+   */
   private Map nameToAlphabet;
 
+  /**
+   * Initialize nameToAlphabet.
+   */
   {
     nameToAlphabet = new HashMap();
   }
 
-  public Alphabet alphabetForName(String name) {
+  /**
+   * Retrieve the alphabet for a specific name.
+   *
+   * @param name the name of the alphabet
+   * @return the alphabet object
+   * @throws NoSuchElementException if there is no alphabet by that name
+   */
+  public Alphabet alphabetForName(String name)
+  throws NoSuchElementException{
     return (Alphabet) nameToAlphabet.get(name);
   }
 
+  /**
+   * Register an alphabet by name.
+   *
+   * @param name  the name by which it can be retrieved
+   * @param alphabet the Alphabet to store
+   */
   public void registerAlphabet(String name, Alphabet alphabet) {
     nameToAlphabet.put(name, alphabet);
   }
   
+  /**
+   * Get an iterator over all alphabets known.
+   *
+   * @return an Iterator over Alphabet objects
+   */
   public Iterator alphabets() {
     return nameToAlphabet.values().iterator();
   }
 
+  /**
+   * Constructs a new Alphabetmanager instance.
+   * <P>
+   * This parses the resource
+   * <code>org/biojava/bio/seq/tools/AlphabetManager.xml</code>
+   * and builds a basic set of alphabets.
+   */
   protected AlphabetManager() {
     try {
       URL alphabetURL =
@@ -92,6 +137,12 @@ public class AlphabetManager {
     }
   }
 
+  /**
+   * Build an individual residue.
+   *
+   * @param resE an XML Element specifying the element
+   * @return the new Residue object
+   */
   protected Residue residueFromXML(Element resE) {
     char symbol = '\0';
     String name = null;
@@ -116,6 +167,14 @@ public class AlphabetManager {
     return res;
   }
 
+  /**
+   * Generate an alphabet from an XML element and a map of residue names to
+   * residue objects.
+   *
+   * @param alph  the alphabet XML Element
+   * @param nameToRes Map from residue name to Residue object
+   * @return a new Alphabet
+   */
   protected Alphabet alphabetFromXML(Element alph, Map nameToRes) {
     SimpleAlphabet alphabet = new SimpleAlphabet();
 
@@ -144,6 +203,14 @@ public class AlphabetManager {
     return alphabet;
   }
 
+  /**
+   * Build a custom parser for an alphabet.
+   * 
+   * @param tok the XML token Element
+   * @param alpha the Alphabet for the parser
+   * @param nameToRes  a map of residue name to Residue Object
+   * @return a newly built custom parser
+   */
   protected ResidueParser parserFromXML(Element tok, Alphabet alpha, Map nameToRes) 
          throws IllegalResidueException {
     FixedWidthParser tokenizer =

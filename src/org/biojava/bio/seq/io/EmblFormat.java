@@ -28,7 +28,14 @@ import java.util.*;
 import org.biojava.bio.seq.*;
 
 /**
- * IO module for embl files
+ * IO module for embl files.
+ * <P>
+ * This is a realy bad skeletal implementation. It can read the AC line and the
+ * sequence only. It does not yet write.
+ * <P>
+ * Would anybody like to write this?
+ *
+ * @author Matthew Pocock
  */
 public class EmblFormat implements SequenceFormat {
   public Sequence readSequence(StreamReader.Context context, ResidueParser resParser, SequenceFactory sf)
@@ -92,7 +99,10 @@ public class EmblFormat implements SequenceFormat {
                                                    resList), 
                              "urn://sequence:embl/" + accession, accession, ann);
   }
-  
+
+  /**
+   * This is not implemented. It does not write anything to the stream.
+   */
   public void writeSequence(Sequence seq, PrintStream os)
   throws IOException {
     

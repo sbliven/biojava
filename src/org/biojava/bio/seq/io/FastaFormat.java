@@ -28,14 +28,69 @@ import java.net.*;
 
 import org.biojava.bio.seq.*;
 
+/**
+ * Format for Fasta files.
+ * <P>
+ * The description lines often include complicated annotation for sequences.
+ * The parsing of these is handled by a FastaDescriptionReader object.
+ *
+ * @author Matthew Pocock
+ */
 public class FastaFormat implements SequenceFormat {
-  private FastaDescriptionReader fdr;
+  /**
+   * The default description reader.
+   */
+  private static final DEFAULT_DESCRIPTION_READER;
+  
+  static {
+    DEFAULT_DESCRIPTION_READER = new DefaultDescriptionReader();
+  }
+  
+  /**
+   * The description reader.
+   */
+  private FastaDescriptionReader fdr = DEFAULT_DESCRIPTION_READER;
+  
+  /**
+   * The line width for output.
+   */
   private int lineWidth = 60;
 
+  /**
+   * Set the descripiton reader.
+   *
+   * @param dfr the new description reader
+   */
+  public void setDescriptionReader(FastaDescriptionReader fdr) {
+    this.fdr = fdr;
+  }
+  
+  /**
+   * Retrieve the current description reader.
+   *
+   * @return the current description reader
+   */
+  public FastaDescriptionReader getDescriptionReader() {
+    return fdr;
+  }
+  
+  /**
+   * Retrive the current line width.
+   *
+   * @return the line width
+   */
   public int getLineWidth() {
     return lineWidth;
   }
 
+  /**
+   * Set the line width.
+   * <P>
+   * When writing, the lines of sequence will never be longer than the line
+   * width.
+   *
+   * @param width the new line width
+   */
   public void setLineWidth(int width) {
     this.lineWidth = lineWidth;
   }
@@ -97,13 +152,5 @@ public class FastaFormat implements SequenceFormat {
     }
     if( (length % lineWidth) != 0)
       os.print("\n");
-  }
-
-  public FastaFormat(FastaDescriptionReader fdr) {
-    this.fdr = fdr;
-  }
-  
-  public FastaFormat() {
-    this.fdr = new DefaultDescriptionReader();
   }
 }

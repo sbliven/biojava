@@ -28,10 +28,32 @@ import java.net.*;
 
 import org.biojava.bio.seq.*;
 
+/**
+ * Writes all of the sequences from a SequenceIterator to a stream with a
+ * particular format.
+ * <P>
+ * This can be wired from a StreamReader to make a simple file-format conversion
+ * utility, or can be used to write out the sequences in a database to disk.
+ *
+ * @author Matthew Pocock
+ */
 public class StreamWriter {
+  /**
+   * The format to write in.
+   */
   private SequenceFormat format;
+  
+  /**
+   * The stream to write to.
+   */
   private PrintStream os;
 
+  /**
+   * Write each of the sequences in ss to the stream in the given format.
+   *
+   * @param ss  the SequenceIterator to loop over
+   * @throws IOException if the stream has any problems
+   */
   public void writeStream(SequenceIterator ss)
               throws IOException {
     while(ss.hasNext()) {
@@ -43,6 +65,12 @@ public class StreamWriter {
     }
   }
 
+  /**
+   * Generate a new StreamWriter to the stream os and using format.
+   *
+   * @param os  the OutputStream to write to
+   * @param format the SequenceFormat to write with
+   */
   public StreamWriter(OutputStream os, SequenceFormat format) {
     this.os = new PrintStream(os);
     this.format = format;

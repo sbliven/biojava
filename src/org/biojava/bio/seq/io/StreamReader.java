@@ -28,12 +28,55 @@ import java.net.*;
 
 import org.biojava.bio.seq.*;
 
+/**
+ * Parses a stream into sequences.
+ * <P>
+ * This object implements SequenceIterator, so you can loop over each sequence
+ * produced. It consumes a stream, and uses a SequenceFormat to extract each
+ * sequence from the stream.
+ * <P>
+ * It is assumed that the stream contains sequences that can be handled by the
+ * one format, and that they are not seperated other than by delimiters that the
+ * format can handle.
+ * <P>
+ * Sequences are instantiated when they are requested by nextSequence, not
+ * before, so it is safe to use this object to parse a giggabite fasta file, and
+ * do sequence-by-sequence processing, while being guaranteed that StreamReader
+ * will not require you to keep any of the sequences in memory.
+ *
+ * @author Matthew Pocock
+ */
 public class StreamReader implements SequenceIterator {
+  /**
+   * The context object for parsing from.
+   */
   private Context context;
+  
+  /**
+   * The residue parser.
+   */
   private ResidueParser resParser;
+  
+  /**
+   * The sequenc format.
+   */
   private SequenceFormat format;
+  
+  /**
+   * The sequence factory.
+   */
   private SequenceFactory sf;
 
+  /**
+   * Pull the next sequence out of the stream.
+   * <P>
+   * This method will delegate parsing from the stream to a SequenceFormat
+   * object, and then return the resulting sequence.
+   *
+   * @return the next Sequence
+   * @throws NoSuchElementException if the end of the stream has been hit
+   * @throws SeqException if for any reason the next sequence could not be read
+   */
   public Sequence nextSequence()
          throws NoSuchElementException, SeqException  {
     if(context.isStreamEmpty())

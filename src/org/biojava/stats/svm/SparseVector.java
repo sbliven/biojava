@@ -75,20 +75,20 @@ public class SparseVector {
       } else { // need to create entry for dim
         indx = -(indx + 1);
 
-        System.out.println("indx  = " + indx);
-        System.out.println("dim   = " + dim);
-        System.out.println("value = " + value);
-        if(indx < size) {
+/*        if(indx < size) {
+          System.out.println("indx  = " + indx);
+          System.out.println("dim   = " + dim);
+          System.out.println("value = " + value);
           System.out.println("current key = " + keys[indx]);
           System.out.println("current val = " + values[indx]);
           System.out.println("last key = " + keys[size-1]);
           System.out.println("last val = " + values[size-1]);
-        }
+        } */
         if ((size + 1) >= keys.length) { // growing arrays
           int[] nKeys = new int[keys.length * 2];
+          Arrays.fill(nKeys, 0, nKeys.length, Integer.MAX_VALUE);
           System.arraycopy(keys, 0, nKeys, 0, indx);
           System.arraycopy(keys, indx, nKeys, indx+1, size-indx);
-          Arrays.fill(nKeys, size+1, nKeys.length, Integer.MAX_VALUE);
           keys = nKeys;
           
           double[] nValues = new double[values.length * 2];
@@ -104,12 +104,12 @@ public class SparseVector {
         values[indx] = value;
         ++size;
         
-        if(indx < size) {
+/*        if(indx < size-1) {
           System.out.println("new key = " + keys[indx+1]);
           System.out.println("new val = " + values[indx+1]);
           System.out.println("last key = " + keys[size-1]);
           System.out.println("last val = " + values[size-1]);
-        }
+        } */
       }
     }
 
@@ -134,16 +134,19 @@ public class SparseVector {
     }
 
     public static SparseVector normalLengthVector(SparseVector v, double length) {
-	SparseVector n = new SparseVector(v.size);
+      SparseVector n = new SparseVector(v.size);
 
-	double oldLength = 0;
-	for (int i = 0; i < v.size; ++i)
-	    oldLength += v.values[i] * v.values[i];
-	oldLength = Math.sqrt(oldLength);
+      double oldLength = 0;
+      for (int i = 0; i < v.size; ++i) {
+        oldLength += v.values[i] * v.values[i];
+      }
+      oldLength = Math.sqrt(oldLength);
 	
-	for (int i = 0; i < v.size; ++i)
-	    n.put(v.keys[i], v.values[i] * length / oldLength);
-	return n;
+    	for (int i = 0; i < v.size; ++i) {
+        n.put(v.keys[i], v.values[i] * length / oldLength);
+      }
+
+      return n;
     }
 
     public static final SVMKernel kernel = new SVMKernel() {
@@ -216,6 +219,8 @@ public class SparseVector {
         SparseVector a = (SparseVector) o1;
         SparseVector b = (SparseVector) o2;
         
+        System.out.println("o1 = " + o1);
+        System.out.println("o2 = " + o2);
         int ai=0, bi=0, si=0;
         double total = 0.0;
 	    
@@ -227,6 +232,10 @@ public class SparseVector {
           } else if (s.keys[si] < a.keys[ai] && s.keys[si] < b.keys[bi]) {
             ++si;
           } else {
+            /*System.out.println("indx=" + s.keys[si]);
+            System.out.println("a = " + a.values[ai]);
+            System.out.println("b = " + b.values[bi]);
+            System.out.println("s = " + s.values[si]); */
             total += a.values[ai++] * b.values[bi++] * s.values[si++];
           }
         }
@@ -250,17 +259,27 @@ public class SparseVector {
        */
       public NormalizingKernel(List vectors) {
         this.s = new SparseVector();
+        double [] sd = new double[100000];
         
         for(Iterator i = vectors.iterator(); i.hasNext(); ) {
           SparseVector v = (SparseVector) i.next();
           for(int j = 0; j < v.size(); j++) {
-            s.put(v.keys[j], s.get(v.keys[j]) + v.values[j]);
+            //s.put(v.keys[j], s.get(v.keys[j]) + v.values[j]);
+            sd[v.keys[j]] += v.values[j];
           }
         }
         
-        for(int j = 0; j < s.size(); j++) {
+        /*for(int j = 0; j < s.size(); j++) {
           s.values[j] = (double) vectors.size() / s.values[j];
           s.values[j] *= s.values[j];
+        }*/
+        
+        for(int j = 0; j < sd.length; j++) {
+          if(sd[j] == 0.0) {
+            continue;
+          }
+          sd[j] = (double) vectors.size() / (sd[j] * sd[j]);
+          s.put(j, sd[j]);
         }
       }
 

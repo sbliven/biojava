@@ -26,6 +26,8 @@ import org.biojava.bio.seq.*;
 
 /**
  * Assumes that the description is of the form 'id\s*desc'.
+ *
+ * @author Matthew Pocock
  */
 public class DefaultDescriptionReader implements FastaDescriptionReader {
   /**
