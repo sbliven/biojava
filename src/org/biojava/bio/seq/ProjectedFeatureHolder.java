@@ -186,6 +186,10 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
         throw new ChangeVetoException("Can't create features in this projection");
 	}
     
+    public FeatureFilter getSchema() {
+        return getTopLevelFeatures().getSchema();
+    }
+    
     //
     // Dumb set of features to which we delegate everything except the
     // ChangeEvent stuff.
@@ -233,7 +237,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
         }
     
         public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-            ff = transformFilter(ff);
+            ff = untransformFilter(ff);
             FeatureHolder toProject = baseSet.filter(ff, recurse);
             return makeProjectionSet(toProject);
         }
@@ -250,6 +254,10 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
 	        throw new ChangeVetoException("Can't create features in this projection");
 	    }
         
+        public FeatureFilter getSchema() {
+            return transformFilter(baseSet.getSchema());
+        }
+        
         public void addChangeListener(ChangeListener cl) {}
         public void removeChangeListener(ChangeListener cl) {}
         public void addChangeListener(ChangeListener cl, ChangeType ct) {}
@@ -258,8 +266,34 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
     }
     
     /**
-     * Called to transform a FeatureFilter applying to our projects into a corresponding
+     * Called to transform a FeatureFilter applying to our projections into a corresponding
      * filter on the parent FeatureHolder.
+     *
+     * @since 1.3
+     */
+    
+    protected FeatureFilter untransformFilter(FeatureFilter ff) {
+        return FilterUtils.transformFilter(
+            ff,
+            new FilterUtils.FilterTransformer() {
+                public FeatureFilter transform(FeatureFilter ff) {
+                    if (ff instanceof FeatureFilter.OverlapsLocation) {
+                        return new FeatureFilter.OverlapsLocation(untransformLocation(((FeatureFilter.OverlapsLocation) ff).getLocation()));
+                    } else if (ff instanceof FeatureFilter.ContainedByLocation) {
+                        return new FeatureFilter.ContainedByLocation(untransformLocation(((FeatureFilter.ContainedByLocation) ff).getLocation()));
+                    } else if (ff instanceof FeatureFilter.StrandFilter) {
+                        return new FeatureFilter.StrandFilter(transformStrand(((FeatureFilter.StrandFilter) ff).getStrand()));
+                    } else {
+                        return ff;
+                    }
+                }   
+            }
+        ) ;
+    }
+    
+    /**
+     * Called to transform a FeatureFilter applying to our parent FeatureHolder into the
+     * coordinate system of our parent.
      *
      * @since 1.3
      */
@@ -270,9 +304,9 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
             new FilterUtils.FilterTransformer() {
                 public FeatureFilter transform(FeatureFilter ff) {
                     if (ff instanceof FeatureFilter.OverlapsLocation) {
-                        return new FeatureFilter.OverlapsLocation(untransformLocation(((FeatureFilter.OverlapsLocation) ff).getLocation()));
+                        return new FeatureFilter.OverlapsLocation(transformLocation(((FeatureFilter.OverlapsLocation) ff).getLocation()));
                     } else if (ff instanceof FeatureFilter.ContainedByLocation) {
-                        return new FeatureFilter.ContainedByLocation(untransformLocation(((FeatureFilter.ContainedByLocation) ff).getLocation()));
+                        return new FeatureFilter.ContainedByLocation(transformLocation(((FeatureFilter.ContainedByLocation) ff).getLocation()));
                     } else if (ff instanceof FeatureFilter.StrandFilter) {
                         return new FeatureFilter.StrandFilter(transformStrand(((FeatureFilter.StrandFilter) ff).getStrand()));
                     } else {
@@ -426,6 +460,10 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
 	    {
 	        throw new ChangeVetoException("Can't create features in this projection");
 	    }
+        
+        public FeatureFilter getSchema(Feature f) {
+            return transformFilter(f.getSchema());
+        }
         
     //
     // Event wiring stuff

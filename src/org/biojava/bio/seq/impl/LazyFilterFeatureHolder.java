@@ -193,4 +193,10 @@ public class LazyFilterFeatureHolder implements FeatureHolder {
     public boolean isUnchanging(ChangeType ct) {
         return featureHolder.isUnchanging(ct);
     }
+    
+    public FeatureFilter getSchema() {
+        return new FeatureFilter.And(featureFilter,
+                                 new FeatureFilter.Or(featureHolder.getSchema(), 
+                                                      new FeatureFilter.ByAncestor(featureHolder.getSchema())));
+    }
 }

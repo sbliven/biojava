@@ -56,6 +56,10 @@ class BioSQLAllFeatures implements FeatureHolder, RealizingFeatureHolder
 	this.bioentry_id = bioentry_id;
     }
 
+    public FeatureFilter getSchema() {
+        return FeatureFilter.top_level;
+    }
+    
     public Iterator features() {
 	return getFeatures().features();
     }

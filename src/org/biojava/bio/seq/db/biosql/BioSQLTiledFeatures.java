@@ -71,7 +71,7 @@ class BioSQLTiledFeatures implements FeatureHolder, RealizingFeatureHolder
 		tileLocations[t] = new RangeLocation(1 + (t * tileSize),
 						     Math.min((t + 1) * tileSize, seq.length()));
 		tileFeatures[t] = new FeatureTile(t);
-		allFeatures.addFeatureHolder(tileFeatures[t], new FeatureFilter.ContainedByLocation(tileLocations[t]));
+		allFeatures.addFeatureHolder(tileFeatures[t]);
 	    }
 	    
 	    overlappingFeatures = new SimpleFeatureHolder();
@@ -81,6 +81,11 @@ class BioSQLTiledFeatures implements FeatureHolder, RealizingFeatureHolder
 	}
     }
 
+    
+    public FeatureFilter getSchema() {
+        return FeatureFilter.top_level;
+    }
+    
     public Iterator features() {
 	return getFeatures().features();
     }
@@ -267,6 +272,14 @@ class BioSQLTiledFeatures implements FeatureHolder, RealizingFeatureHolder
 		throw new BioRuntimeException(ex);
 	    } 
 	}
+    
+    public FeatureFilter getSchema() {
+        FeatureFilter tileFilter = new FeatureFilter.ContainedByLocation(tileLocations[tileNumber]);
+        return new FeatureFilter.And(
+                tileFilter,
+                new FeatureFilter.OnlyDescendants(tileFilter)
+        );
+    }
 
 	public void addFeature(Feature f) 
 	    throws ChangeVetoException

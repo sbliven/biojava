@@ -52,6 +52,10 @@ public class ProjectedFeature
     this.context = ctx;
   }
   
+  public FeatureFilter getSchema() {
+      return context.getSchema(feature);
+  }
+  
   public Feature getViewedFeature() {
     return feature;
   }
@@ -93,7 +97,8 @@ public class ProjectedFeature
   }
   
   public void setType(String type)
-  throws ChangeVetoException {
+    throws ChangeVetoException 
+  {
     feature.setType(type);
   }
   
@@ -102,7 +107,8 @@ public class ProjectedFeature
   }
   
   public void setSource(String source)
-  throws ChangeVetoException {
+    throws ChangeVetoException 
+  {
     feature.setSource(source);
   }
   

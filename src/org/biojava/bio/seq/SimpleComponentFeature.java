@@ -253,4 +253,8 @@ class SimpleComponentFeature
     {
 	throw new UnsupportedOperationException("Can't remove features from a ComponentFeature.");
     }
+    
+    public FeatureFilter getSchema() {
+        return new FeatureFilter.ByParent(new FeatureFilter.ByFeature(this));
+    }
 }

@@ -121,11 +121,10 @@ public class SimpleSequence
     }
 
     protected SimpleFeatureHolder getFeatureHolder() {
-	if(featureHolder == null) {
-	    featureHolder = new SimpleSequenceFeatureHolder();
-// FIXME:	    registerFeatureForwarder();
-	}
-	return featureHolder;
+        if(featureHolder == null) {
+            featureHolder = new SimpleSequenceFeatureHolder(FeatureFilter.top_level);
+        }
+        return featureHolder;
     }
     
     protected boolean featureHolderAllocated() {
@@ -206,6 +205,10 @@ public class SimpleSequence
 	SimpleFeatureHolder fh = this.getFeatureHolder();
 	fh.addFeature(f);
 	return f;
+    }
+    
+    public FeatureFilter getSchema() {
+        return getFeatureHolder().getSchema();
     }
 
     /**
@@ -308,7 +311,10 @@ public class SimpleSequence
      * this class is implemented for serialization purposes all methods delegate to super
      */
     private class SimpleSequenceFeatureHolder extends SimpleFeatureHolder implements Serializable{
-
-	private static final long serialVersionUID = 12687044;
+        private static final long serialVersionUID = 12687044;
+        
+        public SimpleSequenceFeatureHolder(FeatureFilter schema) {
+            super(schema);
+        }
     }
 }

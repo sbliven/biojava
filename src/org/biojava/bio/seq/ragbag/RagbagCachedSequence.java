@@ -307,6 +307,10 @@ class RagbagCachedSequence implements RagbagSequenceItf
     Sequence tempSeq = instantiateSequence();
     return tempSeq.features();
   }
+  public FeatureFilter getSchema()
+  {
+      return instantiateSequence().getSchema();
+  }
   public FeatureHolder filter(FeatureFilter ff, boolean recurse) 
   {
     Sequence tempSeq = instantiateSequence();

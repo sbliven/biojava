@@ -53,31 +53,55 @@ public abstract class LazyFeatureHolder
 {
     private FeatureHolder featureHolder;
     private Forwarder changeForwarder;
+    private FeatureFilter schema;
+    
+    /**
+     * Construct a LazyFeatureHolder with the schema of its contained featureholder
+     */
+    
+    protected LazyFeatureHolder() {
+    }
+    
+    /**
+     * Construct a LazyFeatureHolder with the specified schema
+     */
+     
+    protected LazyFeatureHolder(FeatureFilter schema) {
+        this.schema = schema;
+    }
+    
+    public FeatureFilter getSchema() {
+        if (schema == null) {
+            return getFeatureHolder().getSchema();
+        } else {
+            return schema;
+        }
+    }
 
     protected abstract FeatureHolder createFeatureHolder();
 
     protected void flushFeatures() {
-	featureHolder = null;
+        featureHolder = null;
     }
 
     private FeatureHolder getFeatureHolder() {
-	if (featureHolder == null) {
-	    featureHolder = createFeatureHolder();
+        if (featureHolder == null) {
+            featureHolder = createFeatureHolder();
 
-	    if (!hasListeners()) {
-		changeForwarder = new Forwarder();
-		featureHolder.addChangeListener(changeForwarder, ChangeType.UNKNOWN);
-	    }
-	}
-	return featureHolder;
+            if (!hasListeners()) {
+                changeForwarder = new Forwarder();
+                featureHolder.addChangeListener(changeForwarder, ChangeType.UNKNOWN);
+            }
+        }
+        return featureHolder;
     }
 
     public Iterator features() {
-	return getFeatureHolder().features();
+        return getFeatureHolder().features();
     }
 
     public int countFeatures() {
-	return getFeatureHolder().countFeatures();
+        return getFeatureHolder().countFeatures();
     }
 
     public FeatureHolder filter(FeatureFilter ff) {
@@ -91,17 +115,17 @@ public abstract class LazyFeatureHolder
     public Feature createFeature(Feature.Template template) 
         throws BioException, ChangeVetoException
     {
-	return getFeatureHolder().createFeature(template);
+        return getFeatureHolder().createFeature(template);
     }
 
     public void removeFeature(Feature f) 
         throws ChangeVetoException
     {
-	getFeatureHolder().removeFeature(f);
+        getFeatureHolder().removeFeature(f);
     }
 
     public boolean containsFeature(Feature f) {
-	return getFeatureHolder().containsFeature(f);
+        return getFeatureHolder().containsFeature(f);
     }
 
     protected ChangeSupport getChangeSupport(ChangeType ct) {

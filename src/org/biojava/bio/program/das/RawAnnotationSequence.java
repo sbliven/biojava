@@ -234,6 +234,10 @@ class RawAnnotationSequence
 	}
     }
     
+    public FeatureFilter getSchema() {
+        return features.getSchema();
+    }
+    
     public int countFeatures() {
 	return features.countFeatures();
     }

@@ -30,13 +30,31 @@ import org.biojava.bio.*;
  * A no-frills implementation of FeatureHolder.
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
 public class SimpleFeatureHolder extends AbstractFeatureHolder {
   /**
    * The child features.
    */
   private List features;
+  private FeatureFilter schema;
 
+  /**
+   * Construct a new SimpleFeatureHolder with a non-informative schema.
+   */
+  
+  public SimpleFeatureHolder() {
+      this.schema = FeatureFilter.all;
+  }
+  
+  /**
+   * Construct a new SimpleFeatureHolder with the specified schema.
+   */
+   
+  public SimpleFeatureHolder(FeatureFilter schema) {
+      this.schema = schema;
+  }
+  
   /**
    * Initialize features.
    */
@@ -101,5 +119,9 @@ public class SimpleFeatureHolder extends AbstractFeatureHolder {
   
   public boolean containsFeature(Feature f) {
     return features.contains(f);
+  }
+  
+  public FeatureFilter getSchema() {
+      return schema;
   }
 }

@@ -256,4 +256,7 @@ public class SimpleAssembly
       return cs;
     }
 
+    public FeatureFilter getSchema() {
+        return FeatureFilter.top_level;
+    }
 }

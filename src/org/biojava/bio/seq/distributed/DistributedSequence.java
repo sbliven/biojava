@@ -226,4 +226,8 @@ class DistributedSequence
 
 	return mfh;
     }
+    
+    public FeatureFilter getSchema() {
+        return FeatureFilter.all; // FIXME!
+    }
 }

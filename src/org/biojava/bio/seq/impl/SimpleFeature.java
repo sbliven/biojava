@@ -289,15 +289,15 @@ implements
      * @param template the template for the feature
      */
     public SimpleFeature(Sequence sourceSeq, 
-			 FeatureHolder parent,
-			 Feature.Template template)
+			             FeatureHolder parent,
+                         Feature.Template template)
 	throws IllegalArgumentException
     {
-	if(template.location == null) {
-	    throw new IllegalArgumentException(
-		     "Location can not be null. Did you mean Location.EMPTY_LOCATION?"
-					      );
-	}
+        if(template.location == null) {
+            throw new IllegalArgumentException(
+		         "Location can not be null. Did you mean Location.EMPTY_LOCATION?"
+            );
+        }
         if(!(parent instanceof Feature) && !(parent instanceof Sequence)) {
             throw new IllegalArgumentException("Parent must be sequence or feature, not: " + parent.getClass() + " " + parent);
         }
@@ -332,7 +332,8 @@ implements
     }
 
     public Feature createFeature(Feature.Template temp) 
-    throws BioException, ChangeVetoException {
+        throws BioException, ChangeVetoException 
+    {
 	Feature f = realizeFeature(this, temp);
 	getFeatureHolder().addFeature(f);
 	return f;
@@ -352,5 +353,9 @@ implements
 	    return false;
     
 	return makeTemplate().equals(fo.makeTemplate());
+    }
+    
+    public FeatureFilter getSchema() {
+        return new FeatureFilter.ByParent(new FeatureFilter.ByFeature(this));
     }
 }

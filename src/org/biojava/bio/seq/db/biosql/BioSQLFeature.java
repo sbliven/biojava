@@ -251,6 +251,10 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
 	return getFeatures().containsFeature(f);
     }
 
+    public FeatureFilter getSchema() {
+        return new FeatureFilter.ByParent(new FeatureFilter.ByFeature(this));
+    }
+    
     public FeatureHolder filter(FeatureFilter ff) {
         FeatureFilter childFilter = new FeatureFilter.And(new FeatureFilter.ContainedByLocation(getLocation()),
                                                           new FeatureFilter.Not(FeatureFilter.top_level));

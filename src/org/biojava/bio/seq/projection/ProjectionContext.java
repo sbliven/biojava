@@ -112,5 +112,13 @@ public interface ProjectionContext {
      */
      
     public void removeChangeListener(Feature f, ChangeListener cl, ChangeType ct);
+    
+    /**
+     * Delegate for getSchema
+     *
+     * @since 1.3
+     */
+     
+    public FeatureFilter getSchema(Feature f);
 }
 

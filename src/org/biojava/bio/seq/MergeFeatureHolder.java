@@ -37,22 +37,22 @@ import org.biojava.bio.symbol.*;
  */
 
 public class MergeFeatureHolder extends AbstractFeatureHolder {
-    private Map featureHolders;
+    private List featureHolders;
 
     /**
      * Create a new, empty, MergeFeatureHolder.
      */
 
     public MergeFeatureHolder() {
-	featureHolders = new SmallMap();
+        featureHolders = new ArrayList();
     }
 
     /**
      * Create a populated MFH
      */
 
-    private MergeFeatureHolder(Map m) {
-	featureHolders = m;
+    private MergeFeatureHolder(List m) {
+        featureHolders = m;
     }
 
     /**
@@ -73,33 +73,16 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
     public void addFeatureHolder(FeatureHolder fh) 
         throws ChangeVetoException
     {
-	featureHolders.put(fh, FeatureFilter.all);
-    }
-
-    /**
-     * Add an extra FeatureHolder to the set of FeatureHolders which
-     * are merged, with a filter defining the membership of the new
-     * child.
-     *
-     * @param fh A featureholder
-     * @param membershipFilter A featureFilter defining the membership of fh
-     * @since 1.2
-     */
-
-    public void addFeatureHolder(FeatureHolder fh,
-				 FeatureFilter membershipFilter) 
-	throws ChangeVetoException
-    {
-       if(!hasListeners()) {
-         featureHolders.put(fh, membershipFilter);
-       } else {
-         ChangeSupport changeSupport = getChangeSupport(FeatureHolder.FEATURES);
-         synchronized(changeSupport) {
-           ChangeEvent ce = new ChangeEvent(this, FeatureHolder.FEATURES);
-           changeSupport.firePreChangeEvent(ce);
-           featureHolders.put(fh, membershipFilter);
-           changeSupport.firePostChangeEvent(ce);
-         }
+        if(!hasListeners()) {
+            featureHolders.add(fh);
+        } else {
+            ChangeSupport changeSupport = getChangeSupport(FeatureHolder.FEATURES);
+            synchronized(changeSupport) {
+                ChangeEvent ce = new ChangeEvent(this, FeatureHolder.FEATURES);
+                changeSupport.firePreChangeEvent(ce);
+                featureHolders.add(fh);
+                changeSupport.firePostChangeEvent(ce);
+            }
        }
     }
 
@@ -125,27 +108,26 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
      }
 
     public int countFeatures() {
-	int fc = 0;
-	for (Iterator i = featureHolders.keySet().iterator(); i.hasNext(); ) {
-	    fc += ((FeatureHolder) i.next()).countFeatures();
-	}
-	return fc;
+        int fc = 0;
+        for (Iterator i = featureHolders.iterator(); i.hasNext(); ) {
+            fc += ((FeatureHolder) i.next()).countFeatures();
+        }
+        return fc;
     }
     
     public boolean containsFeature(Feature f) {
-	for (Iterator i = featureHolders.entrySet().iterator(); i.hasNext(); ) {
-	    Map.Entry me = (Map.Entry) i.next();
-	    FeatureHolder subFH = (FeatureHolder) me.getKey();
-	    FeatureFilter membership = (FeatureFilter) me.getValue();
+        for (Iterator i = featureHolders.iterator(); i.hasNext(); ) {
+            FeatureHolder subFH = (FeatureHolder) i.next();
+            FeatureFilter membership = subFH.getSchema();
 
-	    if (membership.accept(f)) {
-		if(subFH.containsFeature(f)) {
-		    return true;
-		}
-	    }
-	}
+            if (membership.accept(f)) {
+                if(subFH.containsFeature(f)) {
+                    return true;
+                }
+            }
+        }
       
-	return false;
+        return false;
     }
 
     /**
@@ -156,37 +138,7 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
      */
 
     public Iterator features() {
-	return new MFHIterator();
-    }
-
-    private Location extractInterestingLocation(FeatureFilter ff) {
-	if (ff instanceof FeatureFilter.OverlapsLocation) {
-	    return ((FeatureFilter.OverlapsLocation) ff).getLocation();
-	} else if (ff instanceof FeatureFilter.ContainedByLocation) {
-	    return ((FeatureFilter.ContainedByLocation) ff).getLocation();
-	} else if (ff instanceof FeatureFilter.And) {
-	    FeatureFilter.And ffa = (FeatureFilter.And) ff;
-	    Location l1 = extractInterestingLocation(ffa.getChild1());
-	    Location l2 = extractInterestingLocation(ffa.getChild2());
-
-	    if (l1 != null) {
-		if (l2 != null) {
-		    return l1.intersection(l2);
-		} else {
-		    return l1;
-		}
-	    } else {
-		if (l2 != null) {
-		    return l2;
-		} else {
-		    return null;
-		}
-	    }
-	}
-
-	// Don't know how this filter relates to location.
-
-	return null;
+        return new MFHIterator();
     }
 
     /**
@@ -195,66 +147,49 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
      */
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-      Map results = new SmallMap();
-      for (Iterator fhi = featureHolders.entrySet().iterator(); fhi.hasNext(); ) {
-        Map.Entry me = (Map.Entry) fhi.next();
-        FeatureHolder fh = (FeatureHolder) me.getKey();
-        FeatureFilter mf = (FeatureFilter) me.getValue();
-        if (recurse) {
-          Location ffl = extractInterestingLocation(ff);
-          if (ffl != null && FilterUtils.areDisjoint(mf, new FeatureFilter.OverlapsLocation(ffl))) {
-            continue;
-          }
-        } else {
-          if (FilterUtils.areDisjoint(mf, ff)) {
-            // Nothing interesting here...
-            continue;
-          }
+        List results = new ArrayList();
+        for (Iterator fhi = featureHolders.iterator(); fhi.hasNext(); ) {
+            FeatureHolder fh = (FeatureHolder) fhi.next();
+            FeatureFilter mf = fh.getSchema();
+            if (recurse) {
+                if (FilterUtils.areDisjoint(new FeatureFilter.Or(ff, new FeatureFilter.ByAncestor(ff)),
+                                            mf)) 
+                {
+                    continue;
+                }            
+            } else {
+                if (FilterUtils.areDisjoint(mf, ff)) {
+                    continue;
+                }
+            }
+            
+            FeatureHolder filterResult = fh.filter(ff, recurse);
+            results.add(filterResult);
         }
         
-        if (recurse) {
-          FeatureHolder filterResult = fh.filter(ff, true);
-          if (filterResult.countFeatures() > 0) {
-            results.put(filterResult, FeatureFilter.all);
-          }
+        if (results.size() == 0) {
+            return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        } else if (results.size() == 1) {
+            return (FeatureHolder) results.get(0);
         } else {
-          if (FilterUtils.areProperSubset(mf, ff)) {
-            results.put(fh, mf);
-          } else {
-            FeatureHolder filterResult = fh.filter(ff, false);
-            if (filterResult.countFeatures() != 0) {
-              results.put(filterResult, FilterUtils.optimize(FilterUtils.and(mf, ff)));
-            }
-          }
+            return new MergeFeatureHolder(results);
         }
-      }
-      
-      if (results.size() == 0) {
-        return FeatureHolder.EMPTY_FEATURE_HOLDER;
-      } else if (results.size() == 1) {
-        return (FeatureHolder) results.keySet().iterator().next();
-      } else {
-        return new MergeFeatureHolder(results);
-      }
+    }
+
+    public FeatureFilter getSchema() {
+        FeatureFilter[] filters = new FeatureFilter[featureHolders.size()];
+        for (int i = 0; i < filters.length; ++i) {
+            filters[i] = ((FeatureHolder) featureHolders.get(i)).getSchema();
+        }
+        return FilterUtils.or(filters);
     }
     
-    /**
-     * Get a map of featureHolders to filters.  This might well go away
-     * once we have more sophisticated optimizable filters.
-     *
-     * @since 1.2 (temporary)
-     */
-
-    public Map getMergeMap() {
-	return Collections.unmodifiableMap(featureHolders);
-    }
-
     private class MFHIterator implements Iterator {
 	private Iterator fhIterator;
 	private Iterator fIterator;
 
 	public MFHIterator() {
-	    fhIterator = featureHolders.keySet().iterator();
+	    fhIterator = featureHolders.iterator();
 	    if (fhIterator.hasNext())
 		fIterator = ((FeatureHolder) fhIterator.next()).features();
 	    else

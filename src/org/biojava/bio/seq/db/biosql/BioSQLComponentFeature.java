@@ -209,6 +209,11 @@ class BioSQLComponentFeature
         }
     }
 
+    
+    public FeatureFilter getSchema() {
+        return new FeatureFilter.ByParent(new FeatureFilter.ByFeature(this));
+    }
+    
     public Iterator features() {
 	return getProjectedFeatures().features();
     }

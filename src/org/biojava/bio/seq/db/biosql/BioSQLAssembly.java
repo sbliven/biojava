@@ -257,6 +257,11 @@ class BioSQLAssembly
         return getAllFeatures().filter(ff);
     }
     
+    
+    public FeatureFilter getSchema() {
+        return getFeatures().getSchema();
+    }
+    
     public Feature createFeature(Feature.Template ft)
         throws ChangeVetoException, BioException
     {

@@ -206,6 +206,10 @@ public class ViewSequence
         return exposedFeatures.filter(fc);
     }
     
+    public FeatureFilter getSchema() {
+        return exposedFeatures.getSchema();
+    }
+    
     //
     // MutableFeatureHolder methods -- delegate to addedFeatures
     //
@@ -219,7 +223,8 @@ public class ViewSequence
      */
 
     public void removeFeature(Feature f)
-    throws ChangeVetoException {
+        throws ChangeVetoException 
+    {
       addedFeatures.removeFeature(f);
     }
 

@@ -254,6 +254,10 @@ public class SubSequence implements Sequence {
     {
         removeProjectedFeature(parent, f);
     }
+    
+    public FeatureFilter getSchema() {
+        return getFeatures().getSchema();
+    }
 
     protected SubProjectedFeatureHolder getFeatures() {
         if (features == null) {
@@ -313,7 +317,7 @@ public class SubSequence implements Sequence {
         private SubSequence ssthis;
         private static final FeatureFilter remoteFilter = new FeatureFilter.ByClass(RemoteFeature.class);
         
-        protected FeatureFilter transformFilter(FeatureFilter ff) {
+        protected FeatureFilter untransformFilter(FeatureFilter ff) {
             return FilterUtils.transformFilter(super.transformFilter(ff),
                 new FilterUtils.FilterTransformer() {
                     public FeatureFilter transform(FeatureFilter ff) {

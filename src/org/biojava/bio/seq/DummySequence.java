@@ -169,4 +169,8 @@ public class DummySequence extends AbstractChangeable
     {
         return features.containsFeature(feature);
     }
+    
+    public FeatureFilter getSchema() {
+        return features.getSchema();
+    }
 }

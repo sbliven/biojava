@@ -217,12 +217,16 @@ class BioSQLSequence
 	    if (length() < 5000000) {
 		features = new BioSQLAllFeatures(this, seqDB, bioentry_id);
 	    } else {
-		features = new BioSQLTiledFeatures(this, seqDB, bioentry_id, 5000000);
+		features = new BioSQLTiledFeatures(this, seqDB, bioentry_id, 1000000);
 	    }
 	}
 	return features;
     }
 
+    public FeatureFilter getSchema() {
+        return getFeatures().getSchema();
+    }
+    
     public Iterator features() {
 	return getFeatures().features();
     }
@@ -284,6 +288,6 @@ class BioSQLSequence
     }
 
     public boolean isUnchanging(ChangeType ct) {
-	return false;
+        return false;
     }
 }

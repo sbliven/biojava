@@ -48,6 +48,17 @@ public interface FeatureHolder extends Changeable {
     "FEATURES"
   );
   
+  /**
+   * Signals that the schema of this FeatureHolder has changed.
+   *
+   * @since 1.3
+   */
+  public static final ChangeType SCHEMA = new ChangeType(
+    "The schema has changed",
+    "org.biojava.bio.seq.FeatureHolder",
+    "SCHEMA"
+  );
+  
     /**
      * Count how many features are contained.
      *
@@ -96,7 +107,7 @@ public interface FeatureHolder extends Changeable {
      *         creation of new features, or if the change was vetoed  
      */
     public Feature createFeature(Feature.Template ft)
-    throws BioException, ChangeVetoException;
+        throws BioException, ChangeVetoException;
 
     /**
      * Remove a feature from this FeatureHolder.
@@ -105,7 +116,7 @@ public interface FeatureHolder extends Changeable {
      *         feature removal or if the change was vetoed
      */
     public void removeFeature(Feature f)
-    throws ChangeVetoException;
+        throws ChangeVetoException;
     
     /**
      * Check if the feature is present in this holder.
@@ -115,13 +126,35 @@ public interface FeatureHolder extends Changeable {
      * @return true if f is in this set
      */
     public boolean containsFeature(Feature f);
+    
+    /**
+     * Return a schema-filter for this <code>FeatureHolder</code>.  This is a filter
+     * which all <code>Feature</code>s <em>immediately</em> contained by this <code>FeatureHolder</code>
+     * will match.  It need not directly match their child features, but it can (and should!) provide
+     * information about them using <code>FeatureFilter.OnlyChildren</code> filters.  In cases where there
+     * is no feature hierarchy, this can be indicated by including <code>FeatureFilter.leaf</code> in
+     * the schema filter.
+     *
+     * <p>
+     * For the truly non-informative case, it is possible to return <code>FeatureFilter.all</code>.  However,
+     * it is almost always possible to provide slightly more information that this.  For example, <code>Sequence</code>
+     * objects should, at a minimum, return <code>FeatureFilter.top_level</code>.  <code>Feature</code> objects
+     * should, as a minimum, return <code>FeatureFilter.ByParent(new FeatureFilter.ByFeature(this))</code>.
+     * </p>
+     *
+     * @since 1.3
+     * @return the schema filter
+     */
+     
+    public FeatureFilter getSchema();
 
     public static final FeatureHolder EMPTY_FEATURE_HOLDER =
       new EmptyFeatureHolder();
     
     final class EmptyFeatureHolder
-    extends Unchangeable
-    implements FeatureHolder {
+        extends Unchangeable
+        implements FeatureHolder 
+    {
       public int countFeatures() {
         return 0;
       }
@@ -148,6 +181,10 @@ public interface FeatureHolder extends Changeable {
       
       public boolean containsFeature(Feature f) {
         return false;
+      }
+      
+      public FeatureFilter getSchema() {
+          return FeatureFilter.none;
       }
     }
 }

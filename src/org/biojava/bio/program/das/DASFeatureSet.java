@@ -46,8 +46,7 @@ class DASFeatureSet
   extends
     Unchangeable
   implements
-    FeatureHolder,
-    DASOptimizableFeatureHolder
+    FeatureHolder
 {
     private FeatureRequestManager.Ticket[] featureTickets;
     private Location[]                     tiles;
@@ -235,12 +234,11 @@ class DASFeatureSet
 		allFeatures = new TileFeaturesWrapper(0);
 	    } else {
 		try {
-		    DASMergeFeatureHolder mfhAllFeatures = new DASMergeFeatureHolder();
+		    MergeFeatureHolder mfhAllFeatures = new MergeFeatureHolder();
 		    for (int t = 0; t < tiles.length; ++t) {
-			mfhAllFeatures.addFeatureHolder(new TileFeaturesWrapper(t),
-							new FeatureFilter.ContainedByLocation(tiles[t]));
+                mfhAllFeatures.addFeatureHolder(new TileFeaturesWrapper(t));
 		    }
-		    mfhAllFeatures.addFeatureHolder(unrulyFeatures, FeatureFilter.all);
+		    mfhAllFeatures.addFeatureHolder(unrulyFeatures);
 		    allFeatures = mfhAllFeatures;
 		} catch (ChangeVetoException cve) {
 		    throw new BioError(cve);
@@ -264,57 +262,42 @@ class DASFeatureSet
     }
     
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-        if (FilterUtils.areDisjoint(ff,
-				    new FeatureFilter.ByAnnotation(DASSequence.PROPERTY_ANNOTATIONSERVER,
-								   dataSource)
-           )) 
-        {    
+        if (FilterUtils.areDisjoint(ff, getSchema())) {
             return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        } else {
+            return getFeatures().filter(ff, recurse);
         }
-
-        if (FilterUtils.areDisjoint(ff, getAllTypesFilter())) {
-            return FeatureHolder.EMPTY_FEATURE_HOLDER;
-        }
-
-        return getFeatures().filter(ff, recurse);
+    }
+    
+    public FeatureFilter getSchema() {
+        FeatureFilter baseFilter = new FeatureFilter.And(
+            new FeatureFilter.ByAnnotation(DASSequence.PROPERTY_ANNOTATIONSERVER,
+								           dataSource),
+            getAllTypesFilter()
+        );
+        return new FeatureFilter.And(
+                baseFilter,
+                new FeatureFilter.Or(
+                        new FeatureFilter.ByDescendant(baseFilter),
+                        FeatureFilter.top_level
+                ) 
+        ) ;
     }
     
     public int countFeatures() {
-	return getFeatures().countFeatures();
+        return getFeatures().countFeatures();
     }
     
     public Feature createFeature(Feature.Template temp) 
         throws ChangeVetoException
     {
-	throw new ChangeVetoException("Can't create features on DAS sequences.");
+        throw new ChangeVetoException("Can't create features on DAS sequences.");
     }
 
     public void removeFeature(Feature f) 
         throws ChangeVetoException
     {
-	throw new ChangeVetoException("Can't remove features from DAS sequences.");
-    }
-
-    //
-    // Optimizable
-    //
-
-    public Set getOptimizableFilters() throws BioException {
-	FeatureHolder fh = getFeatures();
-	if (fh instanceof DASOptimizableFeatureHolder) {
-	    return ((DASOptimizableFeatureHolder) fh).getOptimizableFilters();
-	} else {
-	    return Collections.singleton(FeatureFilter.all);
-	}
-    }
-
-    public FeatureHolder getOptimizedSubset(FeatureFilter ff) throws BioException {
-	FeatureHolder fh = getFeatures();
-	if (fh instanceof DASOptimizableFeatureHolder) {
-	    return ((DASOptimizableFeatureHolder) fh).getOptimizedSubset(ff);
-	} else {
-	    return fh;
-	}
+        throw new ChangeVetoException("Can't remove features from DAS sequences.");
     }
 
     //
@@ -322,23 +305,23 @@ class DASFeatureSet
     //
 
     private class DASTypesPopulator implements TypesListener {
-	private Map types;
-
-	public void startSegment() {
-	    types = new HashMap();
-	}
-
-	public void registerType(String type) {
-	    types.put(type, null);
-	}
-
-	public void registerType(String type, int count) {
-	    types.put(type, new Integer(count));
-	}
-
-	public void endSegment() {
-	    typesMap = types;
-	}
+        private Map types;
+        
+        public void startSegment() {
+            types = new HashMap();
+        }
+        
+        public void registerType(String type) {
+            types.put(type, null);
+        }
+        
+        public void registerType(String type, int count) {
+            types.put(type, new Integer(count));
+        }
+        
+        public void endSegment() {
+            typesMap = types;
+        }
     }
 
     //
@@ -535,5 +518,13 @@ class DASFeatureSet
 	public boolean containsFeature(Feature f) {
 	    return getFeatures().containsFeature(f);
 	}
+    
+    public FeatureFilter getSchema() {
+        FeatureFilter tileFilter = new FeatureFilter.ContainedByLocation(tiles[tileNum]);
+        return new FeatureFilter.And(
+                tileFilter,
+                new FeatureFilter.OnlyDescendants(tileFilter)
+        ) ;
+    }
     }
 }

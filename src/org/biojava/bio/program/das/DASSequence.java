@@ -63,8 +63,7 @@ public class DASSequence
   extends
     AbstractChangeable
   implements
-    DASSequenceI,
-    DASOptimizableFeatureHolder
+    DASSequenceI
 {
     /**
      * Change type which indicates that the set of annotation servers used
@@ -104,14 +103,21 @@ public class DASSequence
 
     private Map featureSets;
     private FeatureHolder structure;
-    private DASMergeFeatureHolder features;
+    private MergeFeatureHolder features;
 
     {
-	featureSets = new HashMap();
-	features = new DASMergeFeatureHolder();
+        featureSets = new HashMap();
+        features = new MergeFeatureHolder();
     }
 
     private class StructureWrapper extends LazyFeatureHolder {
+        public StructureWrapper() {
+            super(new FeatureFilter.And(
+                    FeatureFilter.top_level,
+                    new FeatureFilter.ByClass(ComponentFeature.class)
+            ));
+        }
+        
         protected FeatureHolder createFeatureHolder() {
             try {
                 return getStructure();
@@ -137,7 +143,7 @@ public class DASSequence
 	FeatureRequestManager frm = getParentDB().getFeatureRequestManager();
 	this.structureTicket = frm.requestFeatures(getDataSourceURL(), seqID, listener, null, "component");
     try {
-        features.addFeatureHolder(new StructureWrapper(), new FeatureFilter.ByClass(ComponentFeature.class));
+        features.addFeatureHolder(new StructureWrapper());
     } catch (ChangeVetoException cve) {
 		throw new BioError(cve);
 	}
@@ -146,18 +152,17 @@ public class DASSequence
 	// Pick up some annotations
 	//
 
-	for (Iterator dsi = dataSources.iterator(); dsi.hasNext(); ) {
-	    URL annoURL = (URL) dsi.next();
-
-	    FeatureHolder newFeatureSet = new DASFeatureSet(this, annoURL, seqID);
-	    featureSets.put(annoURL, newFeatureSet);
-	    try {
-		features.addFeatureHolder(newFeatureSet, new FeatureFilter.ByAnnotation(DASSequence.PROPERTY_ANNOTATIONSERVER,
-											dataSourceURL));
-	    } catch (ChangeVetoException cve) {
-		throw new BioError(cve);
-	    }
-	}
+    for (Iterator dsi = dataSources.iterator(); dsi.hasNext(); ) {
+        URL annoURL = (URL) dsi.next();
+        
+        FeatureHolder newFeatureSet = new DASFeatureSet(this, annoURL, seqID);
+        featureSets.put(annoURL, newFeatureSet);
+        try {
+            features.addFeatureHolder(newFeatureSet);
+        } catch (ChangeVetoException cve) {
+            throw new BioError(cve);
+        }
+    }
     }
 
     private class SkeletonListener extends SeqIOAdapter {
@@ -648,7 +653,7 @@ public class DASSequence
 	    // Otherwise they want /real/ features, I'm afraid...
 	    //
 
-	    Location ffl = extractInterestingLocation(ff);
+	    Location ffl = FilterUtils.extractOverlappingLocation(ff);
 	    if (recurse) {
 		int numComponents = 1;
 		if (ffl != null) {
@@ -672,37 +677,10 @@ public class DASSequence
 	}
     }
 
-
-    static Location extractInterestingLocation(FeatureFilter ff) {
-	if (ff instanceof FeatureFilter.OverlapsLocation) {
-	    return ((FeatureFilter.OverlapsLocation) ff).getLocation();
-	} else if (ff instanceof FeatureFilter.ContainedByLocation) {
-	    return ((FeatureFilter.ContainedByLocation) ff).getLocation();
-	} else if (ff instanceof FeatureFilter.And) {
-	    FeatureFilter.And ffa = (FeatureFilter.And) ff;
-	    Location l1 = extractInterestingLocation(ffa.getChild1());
-	    Location l2 = extractInterestingLocation(ffa.getChild2());
-
-	    if (l1 != null) {
-		if (l2 != null) {
-		    return l1.intersection(l2);
-		} else {
-		    return l1;
-		}
-	    } else {
-		if (l2 != null) {
-		    return l2;
-		} else {
-		    return null;
-		}
-	    }
-	}
-
-	// Don't know how this filter relates to location.
-
-	return null;
+    public FeatureFilter getSchema() {
+        return features.getSchema();
     }
-
+    
     public int countFeatures() {
 	return features.countFeatures();
     }
@@ -717,18 +695,6 @@ public class DASSequence
         throws ChangeVetoException
     {
 	throw new ChangeVetoException("Can't remove features from DAS sequences.");
-    }
-
-    //
-    // Optimizable feature-holder
-    //
-
-    public Set getOptimizableFilters() throws BioException {
-	return features.getOptimizableFilters();
-    }
-
-    public FeatureHolder getOptimizedSubset(FeatureFilter ff) throws BioException {
-	return features.getOptimizedSubset(ff);
     }
 
     //

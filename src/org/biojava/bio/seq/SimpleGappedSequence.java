@@ -105,6 +105,10 @@ implements GappedSequence {
 		    throw new ChangeVetoException("NO");
 		}
         
+        public FeatureFilter getSchema(Feature f) {
+            return f.getSchema();
+        }
+        
         // THOMASD -- should hook into a forwarding system.
         
         public void addChangeListener(Feature f, ChangeListener cl, ChangeType ct) {}
@@ -142,6 +146,10 @@ implements GappedSequence {
 
     public boolean containsFeature(Feature f) {
 	return getFeatures().containsFeature(f);
+    }
+    
+    public FeatureFilter getSchema() {
+        return getFeatures().getSchema();
     }
     
     public void removeFeature(Feature f)

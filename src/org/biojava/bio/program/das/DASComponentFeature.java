@@ -39,8 +39,7 @@ class DASComponentFeature
   extends
     Unchangeable
   implements
-    ComponentFeature,
-    DASOptimizableFeatureHolder
+    ComponentFeature
 {
     private final DASSequence parent;
 
@@ -223,9 +222,6 @@ class DASComponentFeature
 
     
     protected FeatureHolder getProjectedFeatures() {
-	// This is currently a bit of a hack -- it's doing stuff which the projection
-	// engine will do for us once OptimizableFeatureHolder is in.  Soon, soon...
-
 	if (projectedFeatures == null) {
 	    int translation;
 	    boolean flip;
@@ -301,24 +297,8 @@ class DASComponentFeature
 
 	return temp;
     }
-
-
-    public Set getOptimizableFilters() throws BioException {
-	FeatureHolder fh = getProjectedFeatures();
-	if (fh instanceof DASOptimizableFeatureHolder) {
-	    return ((DASOptimizableFeatureHolder) fh).getOptimizableFilters();
-	} else {
-	    return Collections.singleton(FeatureFilter.all);
-	}
-    }
-
-    public FeatureHolder getOptimizedSubset(FeatureFilter ff) throws BioException {
-        // System.err.println("getOptimizedSubset on DASComponentFeature " + getComponentSequenceName() + ": " + ff.toString());
-	FeatureHolder fh = getProjectedFeatures();
-	if (fh instanceof DASOptimizableFeatureHolder) {
-	    return ((DASOptimizableFeatureHolder) fh).getOptimizedSubset(ff);
-	} else {
-	    return fh;
-	}
+    
+    public FeatureFilter getSchema() {
+        return new FeatureFilter.ByParent(new FeatureFilter.ByFeature(this));
     }
 }
