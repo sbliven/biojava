@@ -15,16 +15,17 @@
      The root element is a BlastLikeDataSetCollection.  This is
      described towards the end of the DTD.
      ================================================================ 
-     This DTD is Copyright 1999, 2000 Cambridge Antibody Technology   
+     This DTD is Copyright 1999, 2000, 2001 Cambridge Antibody Technology   
      Group plc (CAT). All Rights Reserved.                            
                                                                       
-     Version 1.01
+     Version 1.02
 
      Author List:                                                     
        Primary Author: Simon Brocklehurst (CAT)                       
        Other Authors:  Colin H. Hardman   (CAT)                       
                        Stuart Johnson     (CAT)                       
                        Tim Dilks          (CAT)                       
+                       Keith James        (Sanger Center)
      ================================================================ -->
 
 <!-- PARAMETER ENTITY DECLARATIONS 
@@ -34,7 +35,12 @@
 
 <!ENTITY % frameNumber   "(minus3|minus2|minus1|plus1|plus2|plus3)">
 
-<!ENTITY % alignmentType "(local|global)">
+<!ENTITY % alignmentType "(internal|end)">
+
+<!ENTITY % sequenceType  "(dna|rna|protein|profile)">
+
+<!ENTITY % querySequenceType   "querySequenceType %sequenceType; ">
+<!ENTITY % hitSequenceType     "hitSequenceType   %sequenceType; ">
 
 <!ENTITY % queryStrand   "queryStrand %strandType;">
 <!ENTITY % hitStrand     "hitStrand   %strandType;">
@@ -73,12 +79,24 @@
 <!-- ================================================================ -->
 <!-- Header section related information                               -->
 
-<!ELEMENT biojava:Header (biojava:RawOutput)>
+
+<!ELEMENT biojava:QueryId EMPTY>
+<!ATTLIST biojava:QueryId
+                    id             CDATA #REQUIRED 
+                    metaData       CDATA #REQUIRED >
+
+<!ELEMENT biojava:DatabaseId EMPTY>
+<!ATTLIST biojava:DatabaseId
+                    id             CDATA #REQUIRED 
+                    metaData       CDATA #REQUIRED >
+
+<!ELEMENT biojava:Header (biojava:RawOutput, QueryId?, DatabaseId? )>
 
 <!-- ================================================================ -->
 <!-- Summary section related information                              -->
 
-<!ELEMENT biojava:HitSummary (biojava:HitId,biojava:HitDescription?)>
+<!ELEMENT biojava:HitSummary (biojava:HitId, biojava:QueryId?,
+                              biojava:HitDescription?)>
 <!ATTLIST biojava:HitSummary
                 score                    CDATA #REQUIRED
                 expectValue              CDATA #IMPLIED
@@ -86,7 +104,7 @@
                 numberOfContributingHSPs CDATA #IMPLIED
                 smallestSumProbability   CDATA #IMPLIED
                 readingFrame             CDATA #IMPLIED 
-                numberOfDomains          CDATA #IMPLIED  >
+                numberOfMatches          CDATA #IMPLIED >
 
 <!-- DomainSummary and DomainHit elements are HMMER Specific -->
 
@@ -106,8 +124,6 @@
                 expectValue              CDATA #REQUIRED >
 
 <!ELEMENT biojava:DomainSummary (biojava:DomainHit*) >
-<!ATTLIST biojava:DomainSummary
-                domainCount              CDATA #REQUIRED >
 
 <!-- End of DomainSummarySecion                                       -->
 
@@ -119,6 +135,7 @@
 <!ELEMENT biojava:HSPSummary (biojava:RawOutput?)>
 <!ATTLIST biojava:HSPSummary
                 score               CDATA #REQUIRED
+                bitScore            CDATA #IMPLIED
                 expectValue         CDATA #REQUIRED
                 numberOfIdentities  CDATA #REQUIRED
                 alignmentSize       CDATA #REQUIRED
@@ -131,7 +148,9 @@
                 %queryStrand;             #IMPLIED
                 %hitStrand;               #IMPLIED
                 %queryFrame;              #IMPLIED
-                %hitFrame;                #IMPLIED >
+                %hitFrame;                #IMPLIED 
+                %querySequenceType;       #IMPLIED 
+                %hitSequenceType;         #IMPLIED >
 
 <!ELEMENT biojava:QuerySequence (#PCDATA)>
 <!ATTLIST biojava:QuerySequence 
@@ -171,10 +190,11 @@
 
 <!ELEMENT biojava:HSPCollection (biojava:HSP+)>
 
-<!ELEMENT biojava:Hit (biojava:HitId, biojava:HitDescription?,
+<!ELEMENT biojava:Hit (biojava:HitId, biojava:QueryId?, 
+                       biojava:HitDescription?,
                        biojava:HSPCollection+)>
 <!ATTLIST biojava:Hit
-                sequenceLength      CDATA #REQUIRED >
+                sequenceLength      CDATA #IMPLIED >
 
 <!ELEMENT biojava:Detail (biojava:Hit*)>
 
