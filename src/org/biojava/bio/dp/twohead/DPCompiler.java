@@ -42,7 +42,7 @@ import org.biojava.bio.dp.*;
  * @since 1.1
  */ 
 public class DPCompiler implements CellCalculatorFactoryMaker {
-  private final boolean debug = false; //true;
+  private final boolean debug = true; //true;
   
   private final boolean dumpToDisk;
   
@@ -60,11 +60,13 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
     
     try {
       Constructor forward = forwardC.getConstructor(new Class[] {
-        DP.class, ScoreType.class
+        DP.class,
+        ScoreType.class
       });
-      Constructor backward = null; /*backwardC.getConstructor(new Class[] {
-        DP.class, ScoreType.class
-      });*/
+      Constructor backward = backwardC.getConstructor(new Class[] {
+        DP.class,
+        ScoreType.class
+      });
       Constructor viterbi = viterbiC.getConstructor(new Class[] {
         DP.class,
         ScoreType.class,
@@ -97,10 +99,11 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
     // forward recursion is:
     // score[state_i] =
     //   emission * sum_j(prev_score[state_j] * transition[state_j, state_i])
+    // where prev_score is found as score[advance_i[0][advance_i[1]]
     // however, in log space (as we use), this becomes:
     // score[state_i] =
     //   emission + log( sum_j (
-    //     exp(prev_score[state_j] + transition[state_j, state_i)
+    //     exp(prev_score[state_j] + transition[state_i, state_j)
     //   ))
     //
     // In practice, for sequences of any length, the sum terms are too
@@ -240,7 +243,150 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
   }
   
   public Class generateBackwardClass(DP dp) {
-    return null;
+    // backward recursion is:
+    // score[state_i] =
+    //   sum_j(prev_score[state_j] * transition[state_i, state_j] * emission[j])
+    // where prev_score is found as score[advance_j[0][advance_j[1]]
+    // however, in log space (as we use), this becomes:
+    // score[state_i] =
+    //   emission + log( sum_j (
+    //     exp(prev_score[state_j] + transition[state_j, state_i)
+    //   ))
+    //
+    // In practice, for sequences of any length, the sum terms are too
+    // near to zero for numerical instablilty not to play a huge part. So, we
+    // take out a factor of max_j( prev_score[state_j] ) from the sum and add
+    // it to the total.
+
+    try {
+      MarkovModel model = dp.getModel();
+
+      String name = makeName("org.biojava.bio.dp.twohead.Backward", model);
+      if(!classLoader.hasGeneratedClass(name)) {    
+        CodeClass _Object = IntrospectedCodeClass.forClass(Object.class);
+        CodeClass _DP = IntrospectedCodeClass.forClass(DP.class);
+        CodeClass _ScoreType = IntrospectedCodeClass.forClass(ScoreType.class);
+        CodeClass _State_A = IntrospectedCodeClass.forClass(State [].class);
+        CodeClass _Cell_A_A = IntrospectedCodeClass.forClass(Cell [][].class);
+        CodeClass _CellCalculator = IntrospectedCodeClass.forClass(CellCalculator.class);
+        
+        GeneratedCodeClass clazz = new GeneratedCodeClass(
+          name,
+          _Object,
+          new CodeClass[] {_CellCalculator},
+          CodeUtils.ACC_PUBLIC
+        );
+      
+        State[] states = dp.getStates();
+        AlphabetIndex stateIndexer = AlphabetManager.getAlphabetIndex(states);
+        
+        CodeField stateF = clazz.createField(
+          "states",
+          _State_A,
+          CodeUtils.ACC_PROTECTED
+        );
+      
+        // The fields that contain transition scores as double [].
+        // This is built so that if two states shair the same transition
+        // distribution, they refer to the same transition field. This gives
+        // good optimizers a fighting chance to do some hard-core optimizations.
+        CodeField[] transitionFields = new CodeField[states.length];
+        AlphabetIndex[] transitionIndexers = new AlphabetIndex[states.length];
+
+        // The constructor must load in the transition probabilities.
+        // It uses the indexToFieldIndex to ensure that parameters are loaded
+        // just once.
+        GeneratedCodeMethod __init = clazz.createMethod(
+          "<init>",
+          CodeUtils.TYPE_VOID,
+          new CodeClass[] {_DP, _ScoreType },
+          new String[] { "dp", "scoreType" },
+          CodeUtils.ACC_PUBLIC
+        );
+        
+        clazz.setCodeGenerator(__init, createInit(
+          model, states,
+          clazz, __init,
+          transitionIndexers, transitionFields,
+          stateF, null
+        ));
+        
+        GeneratedCodeMethod initialize = clazz.createMethod(
+          "initialize",
+          CodeUtils.TYPE_VOID,
+          new CodeClass[] {_Cell_A_A},
+          new String[] { "cells" },
+          CodeUtils.ACC_PUBLIC
+        );
+        clazz.setCodeGenerator(
+          initialize,
+          createBRecursion(
+            true,
+            model, states, stateIndexer,
+            stateF, transitionFields, transitionIndexers,
+            initialize
+          )
+        );
+        
+        GeneratedCodeMethod calcCell = clazz.createMethod(
+          "calcCell",
+          CodeUtils.TYPE_VOID,
+          new CodeClass[] {_Cell_A_A },
+          new String[] { "cells" },
+          CodeUtils.ACC_PUBLIC
+        );
+        clazz.setCodeGenerator(
+        calcCell,
+        createBRecursion(
+          false,
+          model, states, stateIndexer,
+          stateF, transitionFields, transitionIndexers,
+          calcCell
+        )
+      );
+      
+      if(dumpToDisk == true) {
+        try {
+          StringBuffer fName = new StringBuffer(name);
+          for(int i = 0; i < fName.length(); i++) {
+            if(fName.charAt(i) == '.') {
+              fName.setCharAt(i, '/');
+            }
+          }
+          fName.append(".class");
+          
+          File dumpFile = new File(fName.toString());
+          System.out.println("Dumping file: " + fName);
+          dumpFile.getParentFile().mkdirs();
+          
+          OutputStream out = new FileOutputStream(dumpFile);
+          clazz.createCode(out);
+          out.close();
+        } catch (FileNotFoundException fnfe) {
+          throw new BioError(fnfe, "Couldn't dump dp class");
+        } catch (IOException ioe) {
+          throw new BioError(ioe, "Couldn't dump dp class");
+        }
+      }
+      
+      classLoader.defineClass(clazz);
+    }    
+     try {
+          return classLoader.loadClass(name);
+        } catch (Exception e) {
+          throw new BioError(e, "Can't find previously generated class for " + name);
+        }
+    } catch (CodeException ce) {
+      throw new BioError(ce, "Couldn't generate class");
+    } catch (NoSuchMethodException nsme) {
+      throw new BioError(nsme, "Couldn't find method");
+    } catch (NoSuchFieldException nsfe) {
+      throw new BioError(nsfe, "Couldn't find field");
+    } catch (IllegalSymbolException ise) {
+      throw new BioError(ise, "Couldn't find symbol");
+    } catch (BioException be) {
+      throw new BioError(be, "Couldn't create indexer");
+    }
   }
   
   public Class generateViterbiClass(DP dp) {
@@ -531,13 +677,8 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
         }
         stateV.add( ByteCode.make_dastore ());
       } else {
-        int[] advance;
+        int[] advance = getAdvance(state);
         FiniteAlphabet trans = model.transitionsFrom(state);
-        if(state instanceof EmissionState) {
-          advance = ((EmissionState) state).getAdvance();
-        } else {
-          advance = new int[] { 0, 0 };
-        }
         
         // find max/argmax of t_j[i] + v[j]
         // make a max pipeline
@@ -560,7 +701,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
             transitionIndexers[state_jIndx].indexForSymbol(state),
             state_jIndx,
             transitionFields,
-            score[advance[0]][advance[1]]
+            getAdvanced(score, advance)
           ));
           stateV.add( ByteCode.make_dup2  ());
           stateV.add( ByteCode.make_dload (max));
@@ -642,7 +783,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
         ifGotIn.add( ByteCode.make_aaload   ());
         
         // backpointer[adv_0][adv_1] [max_j]
-        ifGotIn.add( ByteCode.make_aload  (backpointer[advance[0]][advance[1]]));
+        ifGotIn.add( ByteCode.make_aload  (getAdvanced(backpointer, advance)));
         ifGotIn.add( ByteCode.make_iload  (max_j));
         ifGotIn.add( ByteCode.make_aaload ());
         
@@ -687,6 +828,242 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
   }
 
   private CodeGenerator createFRecursion(
+    boolean isInit,
+    MarkovModel model,
+    State[] states,
+    AlphabetIndex stateIndex,
+    CodeField stateF,
+    CodeField [] transitionFields,
+    AlphabetIndex[] transitionIndexers,
+    GeneratedCodeMethod method
+  ) throws
+    NoSuchMethodException,
+    NoSuchFieldException,
+    IllegalSymbolException,
+    CodeException
+  {
+    CodeClass _Cell = IntrospectedCodeClass.forClass(Cell.class);
+    CodeField _Cell_score = _Cell.getFieldByName("scores");
+    CodeField _Cell_backpointer = _Cell.getFieldByName("backPointers");
+    CodeField _Cell_emissions = _Cell.getFieldByName("emissions");
+    CodeClass _State = IntrospectedCodeClass.forClass(State.class);
+    CodeClass _double_A = IntrospectedCodeClass.forClass(double [].class);
+    CodeClass _Math = IntrospectedCodeClass.forClass(Math.class);
+    CodeMethod _Math_exp = _Math.getMethod("exp", new CodeClass[] { CodeUtils.TYPE_DOUBLE });
+    CodeMethod _Math_log = _Math.getMethod("log", new CodeClass[] { CodeUtils.TYPE_DOUBLE });
+
+    InstructionVector ccV = new InstructionVector();
+    
+    // if(isInit && state instanceof emission) {
+    //   cell[0][0] = (state == Magical) ? 0.0 : NaN;
+    // } else {
+    //   cell[0][0].score[i] = cell[0][0].emissions[i] + 
+    //                         sum_j(cell[adv_i_0][adv_i_1] + t_j[i])
+    // }
+    
+    // cell_00 = cell[0][0];
+    // cell_01 = cell[0][1];
+    // cell_10 = cell[1][0];
+    // cell_11 = cell[1][1];
+    LocalVariable[][] cell = new LocalVariable[2][2];
+    cell[0][0] = new LocalVariable(_Cell, "cell_00");
+    cell[0][1] = new LocalVariable(_Cell, "cell_01");
+    cell[1][0] = new LocalVariable(_Cell, "cell_10");
+    cell[1][1] = new LocalVariable(_Cell, "cell_11");
+    
+    ccV.add( ByteCode.make_aload  (method.getVariable("cells")));
+    ccV.add( ByteCode.make_dup    ());
+    ccV.add( ByteCode.make_iconst (0));
+    ccV.add( ByteCode.make_aaload ());
+    ccV.add( ByteCode.make_dup    ());
+    ccV.add( ByteCode.make_iconst (0));
+    ccV.add( ByteCode.make_aaload ());
+    ccV.add( ByteCode.make_astore (cell[0][0]));
+    ccV.add( ByteCode.make_iconst (1));
+    ccV.add( ByteCode.make_aaload ());
+    ccV.add( ByteCode.make_astore (cell[0][1]));
+    ccV.add( ByteCode.make_iconst (1));
+    ccV.add( ByteCode.make_aaload ());
+    ccV.add( ByteCode.make_dup    ());
+    ccV.add( ByteCode.make_iconst (0));
+    ccV.add( ByteCode.make_aaload ());
+    ccV.add( ByteCode.make_astore (cell[1][0]));
+    ccV.add( ByteCode.make_iconst (1));
+    ccV.add( ByteCode.make_aaload ());
+    ccV.add( ByteCode.make_astore (cell[1][1]));
+    
+    // score_00 = cell[0][0].score;
+    // score_01 = cell[0][1].score;
+    // score_10 = cell[1][0].score;
+    // score_11 = cell[1][1].score;
+
+    LocalVariable[][] score = new LocalVariable[2][2];
+    score[0][0] = new LocalVariable(_double_A, "score_00");
+    score[0][1] = new LocalVariable(_double_A, "score_01");
+    score[1][0] = new LocalVariable(_double_A, "score_10");
+    score[1][1] = new LocalVariable(_double_A, "score_11");
+    ccV.add( ByteCode.make_aload    (cell[0][0]));
+    ccV.add( ByteCode.make_getfield ( _Cell_score));
+    ccV.add( ByteCode.make_astore   (score[0][0]));
+    ccV.add( ByteCode.make_aload    (cell[0][1]));
+    ccV.add( ByteCode.make_getfield ( _Cell_score));
+    ccV.add( ByteCode.make_astore   (score[0][1]));
+    ccV.add( ByteCode.make_aload    (cell[1][0]));
+    ccV.add( ByteCode.make_getfield ( _Cell_score));
+    ccV.add( ByteCode.make_astore   (score[1][0]));
+    ccV.add( ByteCode.make_aload    (cell[1][1]));
+    ccV.add( ByteCode.make_getfield ( _Cell_score));
+    ccV.add( ByteCode.make_astore   (score[1][1]));
+        
+    LocalVariable emissions = new LocalVariable(_double_A, "emissions");
+    ccV.add( ByteCode.make_aload    (cell[0][0] ));
+    ccV.add( ByteCode.make_getfield (_Cell_emissions));
+    ccV.add( ByteCode.make_astore   (emissions));
+    
+    LocalVariable max = new LocalVariable(CodeUtils.TYPE_DOUBLE, "max");
+    for(int i = 0; i < states.length; i++) {
+      State state = states[i];
+      InstructionVector stateV = new InstructionVector();
+      // we need to push score & i onto the stack so that after finding the sum
+      // we can just push it back into the array
+      stateV.add( ByteCode.make_aload   (score[0][0]));
+      stateV.add( ByteCode.make_iconst  (i));
+      if(isInit && state instanceof EmissionState) {
+        if(state instanceof MagicalState) {
+          stateV.add( ByteCode.make_dconst   (0.0));
+        } else {
+          stateV.add( ByteCode.make_dconst   (Double.NaN));
+        }
+      } else {
+        int[] advance = getAdvance(state);
+        FiniteAlphabet trans = model.transitionsFrom(state);
+
+        LocalVariable j_scores = getAdvanced(score, advance);
+        
+        if(trans.size() == 1) {
+          State state_j = (State) trans.iterator().next();
+          int state_jIndx = stateIndex.indexForSymbol(state_j);
+          
+          // only one source. F[i] = trans_j[i] + F[j] + e[i]
+          stateV.add( ByteCode.make_aload    (method.getThis()));
+          stateV.add( ByteCode.make_getfield (transitionFields[state_jIndx]));
+          stateV.add( ByteCode.make_iconst   (transitionIndexers[state_jIndx].indexForSymbol(state)));
+          stateV.add( ByteCode.make_daload   ());
+          stateV.add( ByteCode.make_aload    (j_scores));
+          stateV.add( ByteCode.make_iconst   (state_jIndx));
+          stateV.add( ByteCode.make_daload   ());
+          stateV.add( ByteCode.make_dadd     ());
+          if(state instanceof EmissionState) {
+            stateV.add( ByteCode.make_aload  (emissions));
+            stateV.add( ByteCode.make_iconst (i));
+            stateV.add( ByteCode.make_daload ());
+            stateV.add( ByteCode.make_dadd   ());
+          }
+        } else {
+          // f[i] = emission[i] + log( sum_j [
+          //   exp( (j_scores[j] - max_j_score) + t_j[i] + e)
+          // ]) + max_j_score
+          
+          // find max j_scores
+          stateV.add( ByteCode.make_dconst (Double.NEGATIVE_INFINITY));
+          stateV.add( ByteCode.make_dstore (max));
+          
+          Iterator each_j = trans.iterator();
+          while(each_j.hasNext()) {
+            State state_j = (State) each_j.next();
+            int state_jIndx = stateIndex.indexForSymbol(state_j);
+            stateV.add( ByteCode.make_aload    (j_scores));
+            stateV.add( ByteCode.make_iconst   (state_jIndx));
+            stateV.add( ByteCode.make_daload   ());
+            stateV.add( ByteCode.make_dup2     ());
+            stateV.add( ByteCode.make_dload    (max));
+            stateV.add( ByteCode.make_dcmpl    ()); // puts -1 if max > this one
+                        
+            InstructionVector ifLargerThanMax = new InstructionVector();
+            ifLargerThanMax.add( ByteCode.make_dstore (max));
+
+            InstructionVector ifSmallerThanMax = new InstructionVector();
+            ifSmallerThanMax.add( ByteCode.make_pop2 ());
+            
+            stateV.add( new IfExpression(
+              ByteCode.op_ifge, // branch if int on stack >= 0
+              ifLargerThanMax,
+              ifSmallerThanMax
+            ));
+          }
+          
+          // sum logs of exponents - prime sum with zero
+          stateV.add( ByteCode.make_dconst (0.0));
+          
+          each_j = trans.iterator();
+          while(each_j.hasNext()) {
+            State state_j = (State) each_j.next();
+            int state_jIndx = stateIndex.indexForSymbol(state_j);
+            // score
+            stateV.add( ByteCode.make_aload  (j_scores));
+            stateV.add( ByteCode.make_iconst (state_jIndx));
+            stateV.add( ByteCode.make_daload ());
+            
+            // is score NaN?
+            stateV.add( ByteCode.make_dup2());
+            stateV.add( ByteCode.make_dup2());
+            stateV.add( ByteCode.make_dcmpl());
+            
+            InstructionVector scoreNotNaN = new InstructionVector();
+            // load max & subtract it from score, then exponentiate
+            scoreNotNaN.add( ByteCode.make_dload  (max));
+            scoreNotNaN.add( ByteCode.make_dsub   ());
+            
+            // exp( (j_score - max) + transition)
+            scoreNotNaN.add( ByteCode.make_aload        (method.getThis()));
+            scoreNotNaN.add( ByteCode.make_getfield     (transitionFields[state_jIndx]));
+            scoreNotNaN.add( ByteCode.make_iconst       (transitionIndexers[state_jIndx].indexForSymbol(state)));
+            scoreNotNaN.add( ByteCode.make_daload       ());
+            scoreNotNaN.add( ByteCode.make_dadd());
+            scoreNotNaN.add( ByteCode.make_invokestatic (_Math_exp));
+            
+            // sum this and current sum
+            scoreNotNaN.add( ByteCode.make_dadd());
+            
+            InstructionVector scoreIsNaN = new InstructionVector();
+            scoreIsNaN.add( ByteCode.make_pop2());
+            
+            stateV.add( new IfExpression(
+              ByteCode.op_ifge,
+              scoreNotNaN,
+              scoreIsNaN
+            ));
+          }
+          
+          // log sum
+          stateV.add( ByteCode.make_invokestatic (_Math_log));
+          
+          if(state instanceof EmissionState) {
+            // emissions[i]
+            stateV.add( ByteCode.make_aload    (emissions));
+            stateV.add( ByteCode.make_iconst   (i));
+            stateV.add( ByteCode.make_daload   ());
+            
+            // sum emission with j sum
+            stateV.add( ByteCode.make_dadd     ());
+          }
+
+          // lastly add on a factor of max - added here for maximum numerical stability
+          stateV.add( ByteCode.make_dload (max));
+          stateV.add( ByteCode.make_dadd  ());          
+        }
+      }
+      // store score on stack into scores array
+      stateV.add( ByteCode.make_dastore ());
+      ccV.add( stateV );
+    }
+    
+    ccV.add( ByteCode.make_return ());
+    
+    return ccV;
+  }
+  
+  private CodeGenerator createBRecursion(
     boolean isInit,
     MarkovModel model,
     State[] states,
@@ -776,13 +1153,22 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
     ccV.add( ByteCode.make_getfield ( _Cell_score));
     ccV.add( ByteCode.make_astore   (score[1][1]));
         
-    LocalVariable emissions = new LocalVariable(_double_A, "emissions");
-    ccV.add( ByteCode.make_aload    (cell[0][0] ));
+    LocalVariable[][] emission = new LocalVariable[2][2];
+    emission[0][1] = new LocalVariable(_double_A, "emission_01");
+    emission[1][0] = new LocalVariable(_double_A, "emission_10");
+    emission[1][1] = new LocalVariable(_double_A, "emission_11");
+    ccV.add( ByteCode.make_aload    (cell[0][1] ));
     ccV.add( ByteCode.make_getfield (_Cell_emissions));
-    ccV.add( ByteCode.make_astore   (emissions));
+    ccV.add( ByteCode.make_astore   (emission[0][1]));
+    ccV.add( ByteCode.make_aload    (cell[1][0] ));
+    ccV.add( ByteCode.make_getfield (_Cell_emissions));
+    ccV.add( ByteCode.make_astore   (emission[1][0]));
+    ccV.add( ByteCode.make_aload    (cell[1][1] ));
+    ccV.add( ByteCode.make_getfield (_Cell_emissions));
+    ccV.add( ByteCode.make_astore   (emission[1][1]));
     
     LocalVariable max = new LocalVariable(CodeUtils.TYPE_DOUBLE, "max");
-    for(int i = 0; i < states.length; i++) {
+    for(int i = states.length-1; i >= 0 ; i--) {
       State state = states[i];
       ccV.add( debug(message("Calculating for state " + i + " " + state.getName())));
       InstructionVector stateV = new InstructionVector();
@@ -800,15 +1186,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
           stateV.add( ByteCode.make_dconst   (Double.NaN));
         }
       } else {
-        int[] advance;
         FiniteAlphabet trans = model.transitionsFrom(state);
-        if(state instanceof EmissionState) {
-          advance = ((EmissionState) state).getAdvance();
-        } else {
-          advance = new int[] { 0, 0 };
-        }
-
-        LocalVariable j_scores = score[advance[0]][advance[1]];
         
         if(trans.size() == 1) {
           stateV.add( debug(message("single-source optimization")));
@@ -816,19 +1194,24 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
           State state_j = (State) trans.iterator().next();
           int state_jIndx = stateIndex.indexForSymbol(state_j);
           
-          // only one source. F[i] = e[i] + trans_j[i] + F[j]
-          stateV.add( ByteCode.make_aload    (emissions));
-          stateV.add( ByteCode.make_iconst   (i));
-          stateV.add( ByteCode.make_daload   ());
+          // work out advance
+          // only one source. B[i] = trans_j[i] + B[j] + e[j] // only add e[j] if emitting state
+          int [] advance = getAdvance(state_j);
+          
           stateV.add( ByteCode.make_aload    (method.getThis()));
           stateV.add( ByteCode.make_getfield (transitionFields[state_jIndx]));
           stateV.add( ByteCode.make_iconst   (transitionIndexers[state_jIndx].indexForSymbol(state)));
           stateV.add( ByteCode.make_daload   ());
-          stateV.add( ByteCode.make_dadd     ());
-          stateV.add( ByteCode.make_aload    (j_scores));
+          stateV.add( ByteCode.make_aload    (getAdvanced(score, advance)));
           stateV.add( ByteCode.make_iconst   (state_jIndx));
           stateV.add( ByteCode.make_daload   ());
           stateV.add( ByteCode.make_dadd     ());
+          if(state_j instanceof EmissionState) {
+            stateV.add( ByteCode.make_aload  (getAdvanced(emission, advance)));
+            stateV.add( ByteCode.make_iconst (i));
+            stateV.add( ByteCode.make_daload ());
+            stateV.add( ByteCode.make_dadd   ());
+          }
           
           LocalVariable tmp = new LocalVariable(CodeUtils.TYPE_DOUBLE, "tmp");
           InstructionVector dbi = new InstructionVector();
@@ -838,8 +1221,8 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
           stateV.add( debug(dbi));
           
         } else {
-          // f[i] = emission[i] + log( sum_j [
-          //   exp(j_scores[j] - max_j_score) + exp(t_j[i])
+          // B[i] = log( sum_j [
+          //   exp( (j_scores[j] - max_j_score) + t_j[i] + e[j])
           // ]) + max_j_score
           
           stateV.add( debug(message("full recursion")));
@@ -852,9 +1235,10 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
           while(each_j.hasNext()) {
             State state_j = (State) each_j.next();
             int state_jIndx = stateIndex.indexForSymbol(state_j);
-            stateV.add( ByteCode.make_aload    (method.getThis()));
-            stateV.add( ByteCode.make_getfield (transitionFields[state_jIndx]));
-            stateV.add( ByteCode.make_iconst   (transitionIndexers[state_jIndx].indexForSymbol(state)));
+            int[] advance = getAdvance(state_j);
+            
+            stateV.add( ByteCode.make_aload    (getAdvanced(score, advance)));
+            stateV.add( ByteCode.make_iconst   (state_jIndx));
             stateV.add( ByteCode.make_daload   ());
             stateV.add( ByteCode.make_dup2     ());
             stateV.add( ByteCode.make_dload    (max));
@@ -886,8 +1270,9 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
           while(each_j.hasNext()) {
             State state_j = (State) each_j.next();
             int state_jIndx = stateIndex.indexForSymbol(state_j);
+            int[] advance = getAdvance(state_j);
             // score
-            stateV.add( ByteCode.make_aload  (j_scores));
+            stateV.add( ByteCode.make_aload  (getAdvanced(score, advance)));
             stateV.add( ByteCode.make_iconst (state_jIndx));
             stateV.add( ByteCode.make_daload ());
             
@@ -895,18 +1280,28 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
             stateV.add( ByteCode.make_dup2());
             stateV.add( ByteCode.make_dup2());
             stateV.add( ByteCode.make_dcmpl());
+            // stack now looks like sum, score_j, score_j isNaN
+            // - boolean popped off during conditional branch leaving
+            //   sum, score_j
             
             InstructionVector scoreNotNaN = new InstructionVector();
-            // load max & subtract it from score, then exponentiate
+            // load max & subtract it from score
             scoreNotNaN.add( ByteCode.make_dload  (max));
             scoreNotNaN.add( ByteCode.make_dsub   ());
+            // sum, score_j - max
             
-            // exp( (j_score - max) + transition)
+            // (j_score - max) + transition + emission[j]) // only add emission if emiting state
             scoreNotNaN.add( ByteCode.make_aload        (method.getThis()));
             scoreNotNaN.add( ByteCode.make_getfield     (transitionFields[state_jIndx]));
             scoreNotNaN.add( ByteCode.make_iconst       (transitionIndexers[state_jIndx].indexForSymbol(state)));
             scoreNotNaN.add( ByteCode.make_daload       ());
-            scoreNotNaN.add( ByteCode.make_dadd());
+            scoreNotNaN.add( ByteCode.make_dadd         ());
+            if(state_j instanceof EmissionState) {
+              scoreNotNaN.add( ByteCode.make_aload      (getAdvanced(score, advance)));
+              scoreNotNaN.add( ByteCode.make_iconst     (state_jIndx));
+              scoreNotNaN.add( ByteCode.make_daload     ());
+              scoreNotNaN.add( ByteCode.make_dadd       ());
+            }
             scoreNotNaN.add( ByteCode.make_invokestatic (_Math_exp));
             
             // sum this and current sum
@@ -925,16 +1320,6 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
           // log sum
           stateV.add( ByteCode.make_invokestatic (_Math_log));
           
-          if(state instanceof EmissionState) {
-            // emissions[i]
-            stateV.add( ByteCode.make_aload    (emissions));
-            stateV.add( ByteCode.make_iconst   (i));
-            stateV.add( ByteCode.make_daload   ());
-            
-            // sum emission with j sum
-            stateV.add( ByteCode.make_dadd     ());
-          }
-
           // lastly add on a factor of max - added here for maximum numerical stability
           stateV.add( ByteCode.make_dload (max));
           stateV.add( ByteCode.make_dadd  ());          
@@ -961,7 +1346,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
     
     return ccV;
   }
-  
+
   private CodeGenerator createInit(
     MarkovModel model, State[] states,
     GeneratedCodeClass clazz,
@@ -1207,6 +1592,18 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
     } else {
       return CodeUtils.DO_NOTHING;
     }
+  }
+  
+  private int[] getAdvance(State s) {
+    if(s instanceof EmissionState) {
+      return ((EmissionState) s).getAdvance();
+    } else {
+      return new int[] {0, 0};
+    }
+  }
+  
+  private LocalVariable getAdvanced(LocalVariable[][] what, int[] advance) {
+    return what[advance[0]][advance[1]];
   }
   
   private static class Factory implements CellCalculatorFactory {

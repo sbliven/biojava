@@ -111,7 +111,6 @@ public class PairwiseAlignment {
           //double forwardMax = aligner.forwardMatrix(seqs).getScore();
           //System.out.println("Forwards+: " + forwardMax);
 
-          /*
           // tests explicit memory backwards
           double backward;
           System.out.println("Backwards:");
@@ -121,7 +120,7 @@ public class PairwiseAlignment {
           System.out.println("\t" + backward);
           backward = aligner.backward(seqs, ScoreType.NULL_MODEL);
           System.out.println("\t" + backward);
-          */
+          
           // tests minimal memory viterbi
           StatePath result;
           System.out.println("Viterbi:");

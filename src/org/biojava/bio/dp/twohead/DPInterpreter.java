@@ -277,12 +277,12 @@ public class DPInterpreter implements CellCalculatorFactory {
           }
           sourceScores[ci] = targetCell.scores[destI] + weight;
         }
-        for(int ci = 0; ci < tr.length; ci++) {
-          /*System.out.println(
+        /*for(int ci = 0; ci < tr.length; ci++) {
+          System.out.println(
             "Source = " + states[tr[ci]].getName() +
             "\t= " + sourceScores[ci]
-          );*/
-        }
+          );
+        }*/
 
         // Find base for addition
         double constant = Double.NaN;
