@@ -143,15 +143,15 @@ public final class AlignmentHandler extends DefaultHandler
     {
         if (seqType.equals("QuerySequence"))
         {
-            context.scHandler.addSubHitProperty("QuerySequence", s);
-            context.scHandler.addSubHitProperty("QuerySequenceStart", startPos);
-            context.scHandler.addSubHitProperty("QuerySequenceEnd", endPos);
+            context.scHandler.addSubHitProperty("querySequence", s);
+            context.scHandler.addSubHitProperty("querySequenceStart", startPos);
+            context.scHandler.addSubHitProperty("querySequenceEnd", endPos);
         }
         else if (seqType.equals("HitSequence"))
         {
-            context.scHandler.addSubHitProperty("HitSequence", s);
-            context.scHandler.addSubHitProperty("HitSequenceStart", startPos);
-            context.scHandler.addSubHitProperty("HitSequenceEnd", endPos);   
+            context.scHandler.addSubHitProperty("subjectSequence", s);
+            context.scHandler.addSubHitProperty("subjectSequenceStart", startPos);
+            context.scHandler.addSubHitProperty("subjectSequenceEnd", endPos);   
         }
     }
 }

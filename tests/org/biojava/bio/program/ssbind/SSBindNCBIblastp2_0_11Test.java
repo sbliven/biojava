@@ -48,14 +48,9 @@ public class SSBindNCBIblastp2_0_11Test extends SSBindCase
     {
         super.setUp();
 
-        super.topHitScore   = 326d;
-        super.topHitSeqID   = "P07155;P27109;P27428";
-        super.topHitQStart  = 1;
-        super.topHitQEnd    = 168;
-        super.topHitQStrand = StrandedFeature.POSITIVE;
-        super.topHitSStart  = 1;
-        super.topHitSEnd    = 168;
-        super.topHitSStrand = StrandedFeature.POSITIVE;
+        setTopHitValues(326d, "P07155;P27109;P27428",
+                        1, 168, StrandedFeature.POSITIVE,
+                        1, 168, StrandedFeature.POSITIVE);
 
         String blastOutputFileName = "ncbi_blastp_2.0.11.out.gz";
 

@@ -306,39 +306,38 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         Strand   bestQueryStrand = subs[subs.length - 1].getQueryStrand();
         Strand bestSubjectStrand = subs[subs.length - 1].getSubjectStrand();
 
-        // Sort to put sub-hits in order with respect to subject
-        Arrays.sort(subs, SeqSimilaritySearchSubHit.bySubjectStart);
+        int qStart = 0;
+        int qEnd   = 0;
+        int sStart = 0;
+        int sEnd   = 0;
 
-        int s = 0;
-        int e = subs.length - 1;
-        // Get first sub-hit on that strand
-        for (int i = 0; i < subs.length; i++)
+        // Get extent of sub-hits on this strand by subject position
+        for (int i = subs.length; --i >= 0;)
         {
             if (subs[i].getSubjectStrand().equals(bestSubjectStrand))
             {
-                s = i;
-                break;
-            }
-        }
+                if (sStart == 0 || sStart > subs[i].getSubjectStart())
+                {
+                    sStart = subs[i].getSubjectStart();
+                    qStart = subs[i].getQueryStart();
+                }
 
-        // Get last sub-hit on that strand
-        for (int i = subs.length; --i > 0;)
-        {
-            if (subs[i].getSubjectStrand().equals(bestSubjectStrand))
-            {
-                e = i;
-                break;
+                if (sEnd < subs[i].getSubjectEnd())
+                {
+                    sEnd = subs[i].getSubjectEnd();
+                    qEnd = subs[i].getQueryEnd();
+                }
             }
         }
 
         String hitId = (String) hitData.get("HitId");
 
         return new SequenceDBSearchHit(sc, ev, pv,
-                                       subs[s].getQueryStart(),
-                                       subs[e].getQueryEnd(),
+                                       qStart,
+                                       qEnd,
                                        bestQueryStrand,
-                                       subs[s].getSubjectStart(),
-                                       subs[e].getSubjectEnd(),
+                                       sStart,
+                                       sEnd,
                                        bestSubjectStrand,
                                        hitId,
                                        makeAnnotation(hitData),
@@ -380,10 +379,10 @@ public class BlastLikeSearchBuilder implements SearchBuilder
             sStrand = StrandedFeature.NEGATIVE;
 
         // Get start/end
-        int qStart = Integer.parseInt((String) subHitData.get("QuerySequenceStart"));
-        int   qEnd = Integer.parseInt((String) subHitData.get("QuerySequenceEnd"));
-        int sStart = Integer.parseInt((String) subHitData.get("HitSequenceStart"));
-        int   sEnd = Integer.parseInt((String) subHitData.get("HitSequenceEnd"));
+        int qStart = Integer.parseInt((String) subHitData.get("querySequenceStart"));
+        int   qEnd = Integer.parseInt((String) subHitData.get("querySequenceEnd"));
+        int sStart = Integer.parseInt((String) subHitData.get("subjectSequenceStart"));
+        int   sEnd = Integer.parseInt((String) subHitData.get("subjectSequenceEnd"));
 
         // The start/end coordinates from BioJava XML don't follow the
         // BioJava paradigm of start < end, with orientation given by
@@ -437,12 +436,12 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         Map labelMap = new HashMap();
 
         tokenBuffer.setLength(0);
-        tokenBuffer.append((String) subHitData.get("QuerySequence"));
+        tokenBuffer.append((String) subHitData.get("querySequence"));
         labelMap.put(SeqSimilaritySearchSubHit.QUERY_LABEL, 
                      tokenParser.parse(tokenBuffer.toString()));
 
         tokenBuffer.setLength(0);
-        tokenBuffer.append((String) subHitData.get("HitSequence"));
+        tokenBuffer.append((String) subHitData.get("subjectSequence"));
         labelMap.put(hitData.get("HitId"), 
                      tokenParser.parse(tokenBuffer.toString()));
 

@@ -135,4 +135,18 @@ public class SSBindCase extends TestCase
         assertEquals(topHitSEnd,   hit.getSubjectEnd());
         assertSame(topHitSStrand,  hit.getSubjectStrand());
     }
+
+    protected void setTopHitValues(double score, String id,
+                                   int qStart, int qEnd, Strand qStrand,
+                                   int sStart, int sEnd, Strand sStrand)
+    {
+        topHitScore   = score;
+        topHitSeqID   = id;
+        topHitQStart  = qStart;
+        topHitQEnd    = qEnd;
+        topHitQStrand = qStrand;
+        topHitSStart  = sStart;
+        topHitSEnd    = sEnd;
+        topHitSStrand = sStrand;
+    }
 }

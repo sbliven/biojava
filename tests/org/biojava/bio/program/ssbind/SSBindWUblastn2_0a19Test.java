@@ -48,14 +48,9 @@ public class SSBindWUblastn2_0a19Test extends SSBindCase
     {
         super.setUp();
 
-        super.topHitScore   = 12875d;
-        super.topHitSeqID   = "U51677";
-        super.topHitQStart  = 1;
-        super.topHitQEnd    = 2575;
-        super.topHitQStrand = StrandedFeature.POSITIVE;
-        super.topHitSStart  = 1;
-        super.topHitSEnd    = 2575;
-        super.topHitSStrand = StrandedFeature.POSITIVE;
+        setTopHitValues(12875d, "U51677",
+                        1, 2575, StrandedFeature.POSITIVE,
+                        1, 2575, StrandedFeature.POSITIVE);
 
         String blastOutputFileName = "wu_blastn_2.0a19.out.gz";
 

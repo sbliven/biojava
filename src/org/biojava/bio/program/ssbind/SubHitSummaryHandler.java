@@ -103,8 +103,16 @@ public class SubHitSummaryHandler extends DefaultHandler
             context.scHandler.addSubHitProperty("queryStrand",
                                                 attr.getValue("queryStrand"));
 
-        if (attr.getValue("subjectStrand") != null)
-            context.scHandler.addSubHitProperty("hitStrand",
+        if (attr.getValue("hitStrand") != null)
+            context.scHandler.addSubHitProperty("subjectStrand",
                                                 attr.getValue("hitStrand"));
+
+        if (attr.getValue("queryFrame") != null)
+            context.scHandler.addSubHitProperty("queryFrame",
+                                                attr.getValue("queryFrame"));
+
+        if (attr.getValue("hitFrame") != null)
+            context.scHandler.addSubHitProperty("subjectFrame",
+                                                attr.getValue("hitFrame"));
     }
 }

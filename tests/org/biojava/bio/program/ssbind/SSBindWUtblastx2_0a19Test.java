@@ -31,14 +31,22 @@ import java.util.zip.GZIPInputStream;
 import org.xml.sax.XMLReader;
 import org.xml.sax.InputSource;
 
-import org.biojava.bio.program.sax.FastaSearchSAXParser;
-import org.biojava.bio.search.SeqSimilaritySearchHit;
+import junit.framework.TestCase;
+
+import org.biojava.bio.program.sax.BlastLikeSAXParser;
 import org.biojava.bio.search.SeqSimilaritySearchResult;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import org.biojava.bio.search.SeqSimilaritySearchHit;
+import org.biojava.bio.search.SeqSimilaritySearchSubHit;
+import org.biojava.bio.symbol.Alignment;
+
 import org.biojava.bio.seq.StrandedFeature;
 
-public class SSBindFasta3_3t08Test extends SSBindCase
+public class SSBindWUtblastx2_0a19Test extends SSBindCase
 {
-    public SSBindFasta3_3t08Test(String name)
+    public SSBindWUtblastx2_0a19Test(String name)
     {
         super(name);
     }
@@ -47,31 +55,31 @@ public class SSBindFasta3_3t08Test extends SSBindCase
     {
         super.setUp();
 
-        setTopHitValues(3266.4d, "CISY_ECOLI",
-                        1, 427, StrandedFeature.POSITIVE,
-                        1, 427, StrandedFeature.POSITIVE);
+        setTopHitValues(4354d, "U51677",
+                        1, 2575, StrandedFeature.POSITIVE,
+                        1, 2575, StrandedFeature.POSITIVE);
 
-        String fastaOutputFileName = "fasta_3.3t08.out.gz";
+        String blastOutputFileName = "wu_tblastx_2.0a19.out.gz";
 
-        URL fastaOutputURL = SSBindFasta3_3t08Test.class
-            .getResource(fastaOutputFileName);
-        File fastaOutputFile = new File(fastaOutputURL.getFile());
+        URL blastOutputURL = SSBindWUtblastx2_0a19Test.class
+            .getResource(blastOutputFileName);
+        File blastOutputFile = new File(blastOutputURL.getFile());
 
         searchStream = new GZIPInputStream(new
-            FileInputStream(fastaOutputFile));
+            FileInputStream(blastOutputFile));
 
         // XMLReader -> (SAX events) -> adapter -> builder -> objects
-        XMLReader reader = (XMLReader) new FastaSearchSAXParser();
+        XMLReader reader = (XMLReader) new BlastLikeSAXParser();
 
         reader.setContentHandler(adapter);
         reader.parse(new InputSource(searchStream));
     }
 
-    public void testResultHitCount()
+    public void testBlastResultHitCount()
     {
         SeqSimilaritySearchResult result =
             (SeqSimilaritySearchResult) searchResults.get(0);
 
-        assertEquals(20, result.getHits().size());
+        assertEquals(4, result.getHits().size());
     }
 }

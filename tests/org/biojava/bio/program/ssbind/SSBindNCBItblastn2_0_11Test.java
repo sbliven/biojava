@@ -31,14 +31,15 @@ import java.util.zip.GZIPInputStream;
 import org.xml.sax.XMLReader;
 import org.xml.sax.InputSource;
 
-import org.biojava.bio.program.sax.FastaSearchSAXParser;
-import org.biojava.bio.search.SeqSimilaritySearchHit;
+import junit.framework.TestCase;
+
+import org.biojava.bio.program.sax.BlastLikeSAXParser;
 import org.biojava.bio.search.SeqSimilaritySearchResult;
 import org.biojava.bio.seq.StrandedFeature;
 
-public class SSBindFasta3_3t08Test extends SSBindCase
+public class SSBindNCBItblastn2_0_11Test extends SSBindCase
 {
-    public SSBindFasta3_3t08Test(String name)
+    public SSBindNCBItblastn2_0_11Test(String name)
     {
         super(name);
     }
@@ -47,31 +48,31 @@ public class SSBindFasta3_3t08Test extends SSBindCase
     {
         super.setUp();
 
-        setTopHitValues(3266.4d, "CISY_ECOLI",
-                        1, 427, StrandedFeature.POSITIVE,
-                        1, 427, StrandedFeature.POSITIVE);
+        setTopHitValues(326d, "Y00463",
+                        1, 168, StrandedFeature.POSITIVE,
+                        31, 534, StrandedFeature.POSITIVE);
 
-        String fastaOutputFileName = "fasta_3.3t08.out.gz";
+        String blastOutputFileName = "ncbi_tblastn_2.0.11.out.gz";
 
-        URL fastaOutputURL = SSBindFasta3_3t08Test.class
-            .getResource(fastaOutputFileName);
-        File fastaOutputFile = new File(fastaOutputURL.getFile());
+        URL blastOutputURL = SSBindNCBItblastn2_0_11Test.class
+            .getResource(blastOutputFileName);
+        File blastOutputFile = new File(blastOutputURL.getFile());
 
         searchStream = new GZIPInputStream(new
-            FileInputStream(fastaOutputFile));
+            FileInputStream(blastOutputFile));
 
         // XMLReader -> (SAX events) -> adapter -> builder -> objects
-        XMLReader reader = (XMLReader) new FastaSearchSAXParser();
+        XMLReader reader = (XMLReader) new BlastLikeSAXParser();
 
         reader.setContentHandler(adapter);
         reader.parse(new InputSource(searchStream));
     }
 
-    public void testResultHitCount()
+    public void testBlastResultHitCount()
     {
         SeqSimilaritySearchResult result =
             (SeqSimilaritySearchResult) searchResults.get(0);
 
-        assertEquals(20, result.getHits().size());
+        assertEquals(175, result.getHits().size());
     }
 }
