@@ -65,6 +65,9 @@ public interface AnnotationType {
    */
   public Set getProperties();
   
+  public void setProperty(Annotation ann, Object property, Object value)
+  throws ChangeVetoException;
+  
   public static final AnnotationType ANY = new AnnotationType() {
     public boolean instanceOf(Annotation ann) {
       return true;
@@ -73,10 +76,14 @@ public interface AnnotationType {
       return true;
     }
     public PropertyConstraint getPropertyConstraint(Object key) {
-      return null;
+      return PropertyConstraint.ANY;
     }
     public Set getProperties() {
       return Collections.EMPTY_SET;
+    }
+    public void setProperty(Annotation ann, Object property, Object value)
+    throws ChangeVetoException {
+      getPropertyConstraint(property).setProperty(ann, property, value);
     }
   };
   
@@ -104,7 +111,11 @@ public interface AnnotationType {
     }
     
     public PropertyConstraint getPropertyConstraint(Object key) {
-      return (PropertyConstraint) cons.get(key);
+      PropertyConstraint pc = (PropertyConstraint) cons.get(key);
+      if(pc == null) {
+        pc = PropertyConstraint.ANY;
+      }
+      return pc;
     }
     
     /**
@@ -145,6 +156,11 @@ public interface AnnotationType {
       }
       
       return true;
+    }
+
+    public void setProperty(Annotation ann, Object property, Object value)
+    throws ChangeVetoException {
+      getPropertyConstraint(property).setProperty(ann, property, value);
     }
   }
 }

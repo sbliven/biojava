@@ -12,8 +12,7 @@ public interface PropertyConstraint {
   public void setProperty(Annotation ann, Object property, Object value)
   throws ChangeVetoException;
   
-  public class Anything implements PropertyConstraint {
-    public Anything() {}
+  public static final PropertyConstraint ANY = new PropertyConstraint() {
     public boolean accept(Object value) {
       return true;
     }
@@ -26,7 +25,7 @@ public interface PropertyConstraint {
     throws ChangeVetoException {
       ann.setProperty(property, value);
     }
-  }
+  };
   
   public class ByClass implements PropertyConstraint {
     private Class cl;
