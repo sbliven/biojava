@@ -64,22 +64,22 @@ public class GenbankSequenceDB
   private boolean ExceptionFound=false;//check if any exception is found
   private static final String urlBatchSequences =
     "http://www.ncbi.nlm.nih.gov:80/entrez/eutils/efetch.fcgi";
-  
-  static 
+
+  static
   {
     SequenceFormat format = new GenbankFormat();
   }
-  
-  protected SequenceFormat getSequenceFormat() 
+
+  protected SequenceFormat getSequenceFormat()
   {
     return format;
   }
-  
-  protected Alphabet getAlphabet() 
+
+  protected Alphabet getAlphabet()
   {
     return DNATools.getDNA();
   }
-  
+
   /**
    * Get the URL object for locating sequence object using eutils.
    * The default value of the return format of the sequence object is text.
@@ -91,18 +91,18 @@ public class GenbankSequenceDB
 	String baseurl = seqURL.getbaseURL();
 	String db = seqURL.getDB();
 	//String returnFormat = seqURL.getReturnFormat();
-	
+
 	String url = baseurl+db+"&id="+id;
-	
+
     return new URL (url);
   }
-  
+
   /**
    * Get the URL object for locating sequence object using eutils.
    * User could specify the return format of the sequence object.
    */
   protected URL getAddress(String id, String format) throws MalformedURLException
-  {   
+  {
 	FetchURL seqURL = new FetchURL(DBName, format);
 	String baseurl = seqURL.getbaseURL();
 	if (!(baseurl.equalsIgnoreCase("")))
@@ -113,19 +113,19 @@ public class GenbankSequenceDB
 	String url = baseurl+db+"&id="+id;
     return new URL (url);
   }
-  
-  public String getName() 
+
+  public String getName()
   {
     return DBName;
   }
-  
-  public Sequence getSequence(String id) throws Exception 
+
+  public Sequence getSequence(String id) throws Exception
   {
-    try 
+    try
 	{
 	  IOExceptionFound=false;
 	  ExceptionFound=false;
-      URL queryURL = getAddress(id);//get URL based on ID      
+      URL queryURL = getAddress(id);//get URL based on ID
     //  System.err.println("query is "+ queryURL.toString());
       SequenceFormat sFormat = getSequenceFormat();//get incoming sequence format
       SequenceBuilder sbuilder = new SimpleSequenceBuilder();//create a sequence builder
@@ -137,7 +137,7 @@ public class GenbankSequenceDB
 	  BufferedReader reader = new BufferedReader (new InputStreamReader (in));
 	  SequenceIterator seqI= SeqIOTools.readGenbank(reader);
       return seqI.nextSequence();
-    } 
+    }
 	catch ( Exception e )
 	{
 	  System.out.println ("Exception found in GenbankSequenceDB -- getSequence");
@@ -145,21 +145,21 @@ public class GenbankSequenceDB
 	  ExceptionFound=true;
 	  IOExceptionFound=true;
 	  return null;
-    } 
+    }
   }
-  
+
   public boolean checkIOException()
   {
-	return IOExceptionFound;  
+	return IOExceptionFound;
   }
-  
+
   public boolean checkException()
   {
-	return ExceptionFound;  
+	return ExceptionFound;
   }
-  
+
   /**
-   * Create the Http Post Request to fetch (in batch mode) a list of sequence 
+   * Create the Http Post Request to fetch (in batch mode) a list of sequence
    * with Genbank.
    * @param url URL of the request
    * @param list List of sequence identifier
@@ -203,8 +203,8 @@ public class GenbankSequenceDB
 
   /**
    * Retrieve sequences from a Genbank
-   * 
-   * @param list List of NCBI sequence number (GI), accession, accession.version, 
+   *
+   * @param list List of NCBI sequence number (GI), accession, accession.version,
    * fasta or seqid.
    * @return The database object (HashSequenceDB) with downloaded sequences.
    */
@@ -215,10 +215,10 @@ public class GenbankSequenceDB
 
   /**
    * Retrieve sequences from a Genbank
-   * 
-   * @param list List of NCBI sequence number (GI), accession, accession.version, 
+   *
+   * @param list List of NCBI sequence number (GI), accession, accession.version,
    * fasta or seqid.
-   * @param database Where to store sequences. if database is null, use an 
+   * @param database Where to store sequences. if database is null, use an
    * HashSequenceDB Objet.
    * @return The database object with downloaded sequences.
    */
@@ -261,13 +261,13 @@ public class GenbankSequenceDB
         database.addSequence(seqI.nextSequence());
 
     } catch (MalformedURLException e) {
-      throw new BioException("Exception found in GenbankSequenceDB -- getSequences");
+      throw new BioException("Exception found in GenbankSequenceDB -- getSequences", e);
     } catch (IOException e) {
-      throw new BioException("Exception found in GenbankSequenceDB -- getSequences");
+      throw new BioException("Exception found in GenbankSequenceDB -- getSequences", e);
     } catch (BioException e) {
-      throw new BioException("Exception found in GenbankSequenceDB -- getSequences");
+      throw new BioException("Exception found in GenbankSequenceDB -- getSequences", e);
     } catch (ChangeVetoException e) {
-      throw new BioException("Exception found in GenbankSequenceDB -- getSequences");
+      throw new BioException("Exception found in GenbankSequenceDB -- getSequences", e);
     }
 
     return database;
