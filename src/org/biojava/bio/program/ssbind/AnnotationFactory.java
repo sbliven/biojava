@@ -34,13 +34,14 @@ import org.biojava.utils.ChangeVetoException;
 /**
  * <code>AnnotationFactory</code> is a utility class for making
  * <code>Annotation</code>s from <code>Map</code>s. Shared by the
- * search and homology builders.
+ * search and homology builders. Now public to allow use by anyone
+ * making custom handlers.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @author Thomas Down
  * @since 1.2
  */
-class AnnotationFactory
+public class AnnotationFactory
 {
     /**
      * <code>makeAnnotation</code> creates the annotation.
@@ -48,7 +49,7 @@ class AnnotationFactory
      * @param m a <code>Map</code> of raw data.
      * @return an <code>Annotation</code>.
      */
-    static Annotation makeAnnotation(final Map m)
+    public static Annotation makeAnnotation(final Map m)
     {
         int elements = m.size();
 

@@ -28,14 +28,14 @@ import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.symbol.FiniteAlphabet;
 
 /**
- * <code>AlphabetResolver</code> objects are helpers which determine
- * which type of sequence <code>Alphabet</code> to expect from a
- * search result.
+ * <code>AlphabetResolver</code>s are helpers which determine which
+ * type of sequence <code>Alphabet</code> to expect from a search
+ * result. Now public to allow use by anyone making custom handlers.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
  */
-class AlphabetResolver
+public class AlphabetResolver
 {
     static final int     DNA = 0;
     static final int PROTEIN = 1;
@@ -44,15 +44,16 @@ class AlphabetResolver
      * <code>resolveAlphabet</code> returns an appropriate
      * <code>Alphabet</code> for an arbitrary identifier. The protein
      * alphabet returned will include the termination character as
-     * e.g.  BLASTX 6-frame translations are likely to include stops.
+     * e.g. BLASTX 6-frame translations are likely to include stops.
      *
-     * @param identifier a <code>String</code> identifier.
+     * @param identifier a <code>String</code> identifier (recognised
+     * are BLASTN, BLASTP, BLASTX, TBLASTN, TBLASTX, DNA and PROTEIN).
      *
-     * @return a <code>FiniteAlphabet</code> value.
+     * @return a <code>FiniteAlphabet</code>.
      *
      * @exception BioException if the identifier is not known.
      */
-    FiniteAlphabet resolveAlphabet(String identifier)
+    public static FiniteAlphabet resolveAlphabet(String identifier)
         throws BioException
     {
         int type = 0;

@@ -29,7 +29,6 @@ import java.util.Map;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.SmallAnnotation;
-import org.biojava.bio.SmallAnnotation;
 import org.biojava.bio.program.search.SearchContentHandler;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Sequence;
@@ -99,7 +98,6 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
     private Map                    hitData;
     private Map                    subHitData;
 
-    private AlphabetResolver       alphaResolver;
     private TokenParser            tokenParser;
     private StringBuffer           tokenBuffer;
 
@@ -127,7 +125,6 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
         hitData          = new HashMap();
         subHitData       = new HashMap();
         subjectViewCache = new HashMap();
-        alphaResolver    = new AlphabetResolver();
         tokenBuffer      = new StringBuffer(1024);
     }
 
@@ -187,15 +184,16 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
         if (querySeqHolder == null)
             throw new BioException("Running BlastLikeHomologyBuilder with null query SequenceDB");
 
-        try
-	{
-	    queryView = new ViewSequence(querySeqHolder.getSequence(querySeqId));
-	}
-	catch (BioException be)
-	{
-	    throw new BioException(be, "Failed to retrieve query sequence from holder using ID: "
-				   + querySeqId);
-	}
+        Sequence temp = querySeqHolder.getSequence(querySeqId);
+
+        // It shouldn't happen, but it can with some implementations
+        // of SequenceDB
+        if (temp == null)
+	    throw new BioException("Failed to retrieve query sequence from holder using ID '"
+				   + querySeqId
+                                   + "' (sequence was null)");
+
+        queryView = new ViewSequence(temp);
     }
 
     public void setSubjectDB(final String subjectDBName)
@@ -206,9 +204,12 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
 
         subjectDB = subjectDBs.getSequenceDB(subjectDBName);
 
+        // It shouldn't happen, but it can with some implementations
+        // of SequenceDBInstallation
 	if (subjectDB == null)
-	    throw new BioException("Failed to retrieve database from installation using ID: "
-				   + subjectDBName);
+	    throw new BioException("Failed to retrieve database from installation using ID '"
+				   + subjectDBName
+                                   + "' (sequence was null)");
     }
 
     public boolean getMoreSearches()
@@ -308,7 +309,7 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
             else
                 throw new BioException("Failed to determine sequence type");
 
-            FiniteAlphabet alpha = alphaResolver.resolveAlphabet(identifier);
+            FiniteAlphabet alpha = AlphabetResolver.resolveAlphabet(identifier);
             tokenParser = new TokenParser(alpha);
         }
 
@@ -377,8 +378,9 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
             }
             catch (IllegalIDException iie)
             {
-                throw new BioException(iie, "Failed to retrieve subject sequence from subjectDB using ID: "
-                                       + subjectSeqId);
+                throw new BioException(iie, "Failed to retrieve subject sequence from subjectDB using ID '"
+                                       + subjectSeqId
+                                       + "'");
             }
             subjectViewCache.put(subjectSeqId, subjectView);
         }

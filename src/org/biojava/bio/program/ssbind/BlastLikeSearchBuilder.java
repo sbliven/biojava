@@ -108,7 +108,6 @@ public class BlastLikeSearchBuilder implements SearchBuilder
     private Map                    hitData;
     private Map                    subHitData;
 
-    private AlphabetResolver       alphaResolver;
     private TokenParser            tokenParser;
     private StringBuffer           tokenBuffer;
 
@@ -137,7 +136,6 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         searchParameters    = new HashMap();
         hitData             = new HashMap();
         subHitData          = new HashMap();
-        alphaResolver       = new AlphabetResolver();
         tokenBuffer         = new StringBuffer(1024);
     }
 
@@ -207,15 +205,16 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         if (querySeqHolder == null)
             throw new BioException("Running BlastLikeSearchBuilder with null query SequenceDB");
 
-        try
-	{
-	    querySeq = (SymbolList) querySeqHolder.getSequence(querySeqId);
-	}
-	catch (BioException be)
-	{
-	    throw new BioException(be, "Failed to retrieve query sequence from holder using ID: "
-				   + querySeqId);
-	}
+        SymbolList temp = (SymbolList) querySeqHolder.getSequence(querySeqId);
+
+        // It shouldn't happen, but it can with some implementations
+        // of SequenceDB
+        if (temp == null)
+	    throw new BioException("Failed to retrieve query sequence from holder using ID '"
+				   + querySeqId
+                                   + "' (sequence was null)");
+
+        querySeq = temp;
     }
 
     public void setSubjectDB(final String subjectDBName)
@@ -226,9 +225,12 @@ public class BlastLikeSearchBuilder implements SearchBuilder
 
         subjectDB = subjectDBs.getSequenceDB(subjectDBName);
 
+        // It shouldn't happen, but it can with some implementations
+        // of SequenceDBInstallation
 	if (subjectDB == null)
-	    throw new BioException("Failed to retrieve database from installation using ID: "
-				   + subjectDBName);
+	    throw new BioException("Failed to retrieve database from installation using ID '"
+				   + subjectDBName
+                                   + "' (sequence was null)");
     }
 
     public boolean getMoreSearches()
@@ -429,7 +431,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
             else
                 throw new BioException("Failed to determine sequence type");
 
-            FiniteAlphabet alpha = alphaResolver.resolveAlphabet(identifier);
+            FiniteAlphabet alpha = AlphabetResolver.resolveAlphabet(identifier);
             tokenParser = new TokenParser(alpha);
         }
 
