@@ -316,12 +316,14 @@ private class Backward {
 	    return null;
 
         if (l.contains(MagicalState.MAGICAL_RESIDUE)) {
+	    Residue gr = AlphabetManager.instance().getGapResidue();
+
 	    gappedResList.clear();
 	    boolean gotOther = false;
             for (Iterator i = l.iterator(); i.hasNext(); ) {
 		Object o = i.next();
-		if (o == MagicalState.MAGICAL_RESIDUE) {
-		    gappedResList.add(AlphabetManager.instance().getGapResidue());
+		if (o == MagicalState.MAGICAL_RESIDUE || o == gr) {
+		    gappedResList.add(gr);
 		} else {
 		    gappedResList.add(o);
 		    gotOther = true;
