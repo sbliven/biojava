@@ -27,7 +27,7 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 
 /**
- * Base-class for listeners that pass filtered events onto another listener.
+ * A set of convenience methods for handling common file formats.
  *
  * @author Thomas Down
  * @since 1.1
@@ -105,6 +105,31 @@ public class SeqIOTools  {
 				new GenbankFormat(),
 				getDNAParser(),
 				getGenbankBuilderFactory());
+    }
+
+    private static SequenceBuilderFactory _swissprotBuilderFactory;
+
+    /** 
+     * Get a default SequenceBuilderFactory for handling Swissprot
+     * files.
+     */
+
+    public static SequenceBuilderFactory getSwissprotBuilderFactory() {
+	if (_swissprotBuilderFactory == null) {
+	    _swissprotBuilderFactory = new SwissprotProcessor.Factory(SimpleSequenceBuilder.FACTORY);
+	}
+	return _swissprotBuilderFactory;
+    }
+
+    /**
+     * Iterate over the sequences in an Swissprot-format stream.
+     */
+
+    public static SequenceIterator readSwissprot(BufferedReader br) {
+	return new StreamReader(br,
+				new EmblLikeFormat(),
+				getProteinParser(),
+				getSwissprotBuilderFactory());
     }
 
     private static SequenceBuilderFactory _fastaBuilderFactory;
