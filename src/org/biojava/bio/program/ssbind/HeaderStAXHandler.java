@@ -25,6 +25,7 @@ import org.biojava.bio.program.xff.ElementRecognizer;
 import org.biojava.utils.stax.DelegationManager;
 import org.biojava.utils.stax.StAXContentHandler;
 import org.biojava.utils.stax.StAXContentHandlerBase;
+import org.biojava.utils.stax.StringElementHandlerBase;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -68,6 +69,16 @@ public class HeaderStAXHandler extends SeqSimilarityStAXHandler
                    });
 
         addHandler(new ElementRecognizer.ByNSName(SeqSimilarityStAXAdapter.NAMESPACE,
+                                                  "QueryDescription"),
+                   new StAXHandlerFactory()
+                   {
+                       public StAXContentHandler getHandler(SeqSimilarityStAXAdapter ssContext)
+                       {
+                           return new QueryDescriptionStAXHandler();
+                       }
+                   });
+
+        addHandler(new ElementRecognizer.ByNSName(SeqSimilarityStAXAdapter.NAMESPACE,
                                                   "DatabaseId"),
                    new StAXHandlerFactory()
                    {
@@ -91,6 +102,18 @@ public class HeaderStAXHandler extends SeqSimilarityStAXHandler
         throws SAXException
         {
             ssContext.getSearchContentHandler().setQueryID(attr.getValue("id"));
+        }
+    }
+
+    /**
+     * <code>QueryDescriptionStAXHandler</code> handles the hit
+     * description.
+     */
+    private class QueryDescriptionStAXHandler extends StringElementHandlerBase
+    {
+        protected void setStringValue(String s)
+        {
+            ssContext.getSearchContentHandler().addHitProperty("queryDescription", s);
         }
     }
 
