@@ -43,19 +43,19 @@ public class AtomImpl implements Atom {
 
     }
 
-    /* trimmed version of atom name, e.g. "CA" */
+    /** trimmed version of atom name, e.g. "CA" */
     public void   setName(String s) { name = s ;}
     public String getName()         { return name ;}
     
-    /* full name of atom e.g. " CA " */
+    /** full name of atom e.g. " CA " */
     public void   setFullName( String s ) { fullName =s ; }
     public String getFullName()           { return fullName; }
 
-    /* PDB atom number */
+    /** PDB atom number */
     public void setPDBserial(int i) { pdbserial = i    ; }
     public int  getPDBserial()      { return pdbserial ; }
 
-    /* the coordinates */    
+    /** the coordinates */    
     public void     setCoords( double[] c ) {
 	coords = c; 
 
@@ -66,7 +66,7 @@ public class AtomImpl implements Atom {
     public double getY() { return coords[1]; }
     public double getZ() { return coords[2]; }
     
-    /* store the whole line */
+    /** store the whole line */
     public void   setPDBline(String s) { pdbline = s;}
     public String getPDBline() { return pdbline ;}
 

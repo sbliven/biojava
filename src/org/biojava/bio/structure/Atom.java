@@ -31,19 +31,19 @@ package org.biojava.bio.structure;
  */
 public interface Atom {
     
-    /* trimmed version of atom name, e.g. "CA" */
+    /** trimmed version of atom name, e.g. "CA" */
     public void   setName(String s);
     public String getName();
     
-    /* full name of atom e.g. " CA " */
+    /** full name of atom e.g. " CA " */
     public void   setFullName(String s) ;
     public String getFullName();
 
-    /* PDB atom number */
+    /** PDB atom number */
     public void setPDBserial(int i) ;
     public int  getPDBserial() ;
 
-    /* the coordinates */    
+    /** the coordinates */    
     public void    setCoords(double[] c);
     public double[] getCoords() ;
     
@@ -51,7 +51,7 @@ public interface Atom {
     public double getY() ;
     public double getZ() ;
 
-    /* store the whole line */
+    /** store the whole line */
     public void   setPDBline(String s) ;
     public String getPDBline() ;
 }
