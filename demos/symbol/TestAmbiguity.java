@@ -36,46 +36,72 @@ public class TestAmbiguity {
   public static void main(String [] args) {
 
     try {
-      String things = "agctrymkswhbvdn-AGCTRYMKSWHBVDN";
-      FiniteAlphabet dna = DNATools.getDNA(); 	
-
- SymbolParser sParser = dna.getParser("token");
-      SymbolList sList = sParser.parse(things);
       
-for(int i = 1; i <= sList.length(); i++) {
-        Symbol s = sList.symbolAt(i);
-        System.out.print(s.getName() + " -> {");
-        Iterator j = ((FiniteAlphabet) s.getMatches()).iterator();
-        if(j.hasNext()) {
-          System.out.print(((Symbol) j.next()).getName());
+      {
+        final String dnaText = "agctrymkswhbvdn-AGCTRYMKSWHBVDN";
+        final FiniteAlphabet dna = DNATools.getDNA(); 	
+        
+        final SymbolParser sParser = dna.getParser("token");
+        final SymbolList dnaList = sParser.parse(dnaText);
+        
+        for(int i = 1; i <= dnaList.length(); i++) {
+          final Symbol s = dnaList.symbolAt(i);
+          System.out.print(s.getName() + " -> {");
+            Iterator j = ((FiniteAlphabet) s.getMatches()).iterator();
+            if(j.hasNext()) {
+              System.out.print(((Symbol) j.next()).getName());
+            }
+            while(j.hasNext()) {
+              System.out.print(", " + ((Symbol) j.next()).getName());
+            }
+          System.out.println("}");
         }
-        while(j.hasNext()) {
-          System.out.print(", " + ((Symbol) j.next()).getName());
-        }
-        System.out.println("}");
       }
   	
 
-      System.out.println("Now Testing Prot"); 
-   things = "agctrymkswhvdn-AGCTRYMKSWHVDN*";
-   dna = ProteinTools.getTAlphabet(); 
-   dna.addSymbol(AlphabetManager.getGapSymbol());//problem here, even when explicitly adding the gap symbol it doesn't parse
-  sParser = dna.getParser("token");
-   sList = sParser.parse(things);
-      
-for(int i = 1; i <= sList.length(); i++) {
-        Symbol s = sList.symbolAt(i);
-        System.out.print(s.getName() + " -> {");
-        Iterator j = ((FiniteAlphabet) s.getMatches()).iterator();
-        if(j.hasNext()) {
-          System.out.print(((Symbol) j.next()).getName());
+      {
+        System.out.println("Now Testing Prot"); 
+        final String protText = "agctrymkswhvdn-AGCTRYMKSWHVDN";
+        final FiniteAlphabet protein = ProteinTools.getAlphabet(); 
+        //dna.addSymbol(AlphabetManager.getGapSymbol());//problem here, even when explicitly adding the gap symbol it doesn't parse
+        final SymbolParser protParser = protein.getParser("token");
+        final SymbolList protList = protParser.parse(protText);
+        
+        for(int i = 1; i <= protList.length(); i++) {
+          final Symbol s = protList.symbolAt(i);
+          System.out.print(s.getName() + " -> {");
+            Iterator j = ((FiniteAlphabet) s.getMatches()).iterator();
+            if(j.hasNext()) {
+              System.out.print(((Symbol) j.next()).getName());
+            }
+            while(j.hasNext()) {
+              System.out.print(", " + ((Symbol) j.next()).getName());
+            }
+          System.out.println("}");
         }
-        while(j.hasNext()) {
-          System.out.print(", " + ((Symbol) j.next()).getName());
-        }
-        System.out.println("}");
       }
 
+      {
+        System.out.println("Now Testing Prot-Term"); 
+        final String protTText = "agctrymkswhvdn-AGCTRYMKSWHVDN*";
+        final FiniteAlphabet proteinT = ProteinTools.getTAlphabet(); 
+        //dna.addSymbol(AlphabetManager.getGapSymbol());//problem here, even when explicitly adding the gap symbol it doesn't parse
+        final SymbolParser protTParser = proteinT.getParser("token");
+        final SymbolList protTList = protTParser.parse(protTText);
+        
+        for(int i = 1; i <= protTList.length(); i++) {
+          final Symbol s = protTList.symbolAt(i);
+          System.out.print(s.getName() + " -> {");
+            Iterator j = ((FiniteAlphabet) s.getMatches()).iterator();
+            if(j.hasNext()) {
+              System.out.print(((Symbol) j.next()).getName());
+            }
+            while(j.hasNext()) {
+              System.out.print(", " + ((Symbol) j.next()).getName());
+            }
+          System.out.println("}");
+        }
+      }
     } catch (Throwable t) {
       t.printStackTrace();
       System.exit(1);
