@@ -319,6 +319,18 @@ public class DNATools {
   throws IllegalAlphabetException {
     return new ComplementSymbolList(list);
   }
+
+  /**
+   * Retrieve a reverse-complement view of list.
+   *
+   * @param list  the ResidueList to complement
+   * @return a SymbolList that is the complement
+   * @throws IllegalAlphabetException if list is not a complementable alphabet
+   */
+  public static SymbolList reverseComplement(SymbolList list)
+  throws IllegalAlphabetException {
+    return new ComplementSymbolList(new ReverseSymbolList(list));
+  }
   
   /**
    * Helps build the complement infomation.
