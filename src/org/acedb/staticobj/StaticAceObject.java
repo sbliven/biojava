@@ -29,7 +29,14 @@ import org.acedb.*;
  */
 
 public class StaticAceObject extends StaticAceNode implements AceObject {
-    public StaticAceObject(String name, AceSet parent) {
-      super(name, parent);
-    }
+  private String clazz;
+  
+  public StaticAceObject(String name, AceSet parent, String clazz) {
+    super(name, parent);
+    this.clazz = clazz;
+  }
+    
+  public String getClassName() {
+    return clazz;
+  }
 }

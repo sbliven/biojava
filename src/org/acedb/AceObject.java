@@ -29,5 +29,6 @@ package org.acedb;
  * @author Thomas Down
  */
 public interface AceObject extends AceNode {
+  String getClassName();
 }
 
