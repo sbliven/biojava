@@ -1,10 +1,30 @@
 package org.biojava.bio.symbol;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.seq.io.CharacterTokenization;
+import org.biojava.bio.seq.io.SymbolListCharSequence;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.Edit;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.utils.Changeable;
+import org.biojava.utils.AssertionFailure;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Unchangeable;
+
 
 /**
  * <p>
@@ -44,7 +64,7 @@ public class UkkonenSuffixTree{
   public static final int TO_A_LEAF = -1;
   private int e;
 
-  private String sequences;
+  private CharSequence sequences;
 
   private FiniteAlphabet alpha;
 
@@ -80,45 +100,15 @@ public class UkkonenSuffixTree{
     this.alpha=alpha;
   }
 
-
-  /** Makes a string out of a SymbolList, this string should only be used for
-   * internal or testing purposes, as it will necessarily consist of visible
-   * characters. It basically works by assigning a given character to every symbol.
-   * @param list a <code>SymbolList</code> to be converted to a string.
-   * @return a <code>String</code> representation of the SymbolList
-   * @exception IllegalSymbolException if an error occurs
-   */
-  public String symbolListToString(SymbolList list) throws IllegalSymbolException{
-    try {
-      FiniteAlphabet alpha = (FiniteAlphabet)list.getAlphabet();
-      SymbolTokenization tok = alpha.getTokenization("token");
-      return tok.tokenizeSymbolList(list);
-    } catch (BioException be) {
-      throw new IllegalSymbolException(be.toString());
-    }
-  }
-
-  /** Converts a string that came from symbolListToString back to a SymbolList.
-   * This should only be called for internal or testing purposes. The behavior
-   * is not defined if the string contains an unknown character.
-   * @param string a <code>String</code> to be converted to SymbolList
-   * @return a <code>SymbolList</code> representation of the string above.
-   */
-  public SymbolList stringToSymbolList(String string){
-    try {
-      SymbolTokenization tok = alpha.getTokenization("token");
-      return new SimpleSymbolList(tok, string);
-    } catch (BioException be) {
-      System.err.println("No alphabet known to the SuffixTree.");
-      return null;
-    }
-  }
-
   public void addSymbolList(SymbolList list, String name, boolean doNotTerminate) throws IllegalSymbolException{
-    String seq = symbolListToString(list);
+    if (!doNotTerminate)
+      list = new TerminatedSymbolList(list);
     
-    if(!doNotTerminate)
-      seq = seq+terminationChar;
+    CharSequence seq =new SymbolListCharSequence(list);
+    //if (!doNotTerminate)
+      
+    //if(!doNotTerminate)
+    //  seq = seq+terminationChar;
     addPreppedSequence(seq);
   }
 
@@ -163,7 +153,7 @@ public class UkkonenSuffixTree{
    *
    * @param seq a <code>String</code> value
    */
-  private void addPreppedSequence(String seq){
+  private void addPreppedSequence(CharSequence seq){
     int i, gammaStart;
     int j=0;
     SuffixNode oldNode=null, newNode;
@@ -261,7 +251,7 @@ public class UkkonenSuffixTree{
   public SuffixNode walkTo(SuffixNode starting, String source, int from, int to){
     SuffixNode currentNode;
     SuffixNode arrivedAt;
-    String edgeLabel;
+    CharSequence edgeLabel;
     
     
     currentNode=starting;
@@ -285,12 +275,12 @@ public class UkkonenSuffixTree{
           else
             rule=5;
         }
-        if (edgeLabel.substring(0, to-from).equals(source.substring(from,to)))
+        if (edgeLabel.subSequence(0, to-from).equals(source.substring(from,to)))
           rule=4;
         else
           rule=3;
         from=to;
-      } else if (source.substring(from,from+edgeLabel.length())
+      } else if (source.subSequence(from,from+edgeLabel.length())
                  .equals(edgeLabel)) {
         from+=edgeLabel.length();
         currentNode=arrivedAt;
@@ -325,7 +315,7 @@ public class UkkonenSuffixTree{
    * stopped inside an edge. (check the rule variable to see where it
    * stopped).
    */
-  public SuffixNode jumpTo(SuffixNode starting, String source, int from, int to){
+  public SuffixNode jumpTo(SuffixNode starting, CharSequence source, int from, int to){
     SuffixNode currentNode;
     SuffixNode arrivedAt;
     boolean canGoDown = true;
@@ -351,7 +341,7 @@ public class UkkonenSuffixTree{
       //  System.out.println(to+" here to "+source.substring(from, to)+" "+(i++));
       
       if (currentNode.isTerminal()){
-      	System.out.println("ARRGH! at "+source.substring(original, to)+
+      	System.out.println("ARRGH! at "+source.subSequence(original, to)+
                            "("+from+","+original+","+to+
                            ") from "+getLabel(originalNode));
         //Something truly awful happened if this line is ever reached.
@@ -418,8 +408,8 @@ public class UkkonenSuffixTree{
     return childLength-parentLength;
   }
 
-  protected String getEdgeLabel(SuffixNode child){
-    return sequences.substring(
+  protected CharSequence getEdgeLabel(SuffixNode child){
+    return sequences.subSequence(
                                child.labelStart+
                                (getPathLength(child)-getEdgeLength(child)),
                                (child.labelEnd==TO_A_LEAF)?
@@ -435,11 +425,11 @@ public class UkkonenSuffixTree{
     return node.labelEnd==TO_A_LEAF?e:node.labelEnd;
   }
 
-  protected String getLabel(SuffixNode node){
+  protected CharSequence getLabel(SuffixNode node){
     if (node==root)
       return "root";
     else
-      return sequences.substring(
+      return sequences.subSequence(
                                  node.labelStart,
                                  (node.labelEnd==TO_A_LEAF)?e:node.labelEnd).toString();
   }
@@ -603,13 +593,13 @@ public class UkkonenSuffixTree{
    */
   private void checkParent(SuffixNode child){
     SuffixNode parent=child.parent;
-    String parentLabel=getLabel(parent);
-    String label =getLabel(child);
+    CharSequence parentLabel=getLabel(parent);
+    CharSequence label =getLabel(child);
 
     if (parentLabel.equals("root"))
         parentLabel="";
     
-    if (parentLabel.length()>=label.length()||!parentLabel.equals(label.substring(0,parentLabel.length())))
+    if (parentLabel.length()>=label.length()||!parentLabel.equals(label.subSequence(0,parentLabel.length())))
     {
       System.err.println("bad addition on rule "+rule);
       System.err.println(parentLabel+" against "+ label);
@@ -624,5 +614,153 @@ public class UkkonenSuffixTree{
     walkTo(root, str, 0, str.length());
     return (rule==1||rule==4||rule==5);
   }
-  
+
+  /**
+   * Stupid little wrapper to put a termination symbol at the end. A sublist
+   * that doesn't include the termination symbol will have the same alphabet as
+   * the original, one that does will have an alphabet that includes the
+   * termination symbol.
+   *
+   */
+  private class TerminatedSymbolList implements SymbolList
+  {
+    private SymbolList unterminated;
+    final Symbol TERMINATION_SYMBOL;
+    private AbstractAlphabet alpha;
+        
+    public TerminatedSymbolList(SymbolList unterminated)
+    {
+      this.unterminated=unterminated;
+      TERMINATION_SYMBOL = AlphabetManager.createSymbol("Termination");
+      FiniteAlphabet oldAlphabet = (FiniteAlphabet)unterminated.getAlphabet();
+      Set set=AlphabetManager.getAllSymbols(oldAlphabet);
+      set.add(TERMINATION_SYMBOL);
+      alpha = new SimpleAlphabet(set);
+      CharacterTokenization tokenizer =new CharacterTokenization(alpha, true);
+      tokenizer.bindSymbol(TERMINATION_SYMBOL, DEFAULT_TERM_CHAR);
+      SymbolTokenization sToke;
+      try{
+        sToke = oldAlphabet.getTokenization("token");
+      }
+      catch (BioException be){
+          throw new BioError("Internal error: failed to get SymbolTokenization for SymbolList alphabet", be);
+      }
+      if (sToke.getTokenType() != SymbolTokenization.CHARACTER)
+        throw new IllegalArgumentException("Only FiniteAlphabets using a char token are supported by UkkonenSuffixTree");
+      try{
+        for (Iterator i= AlphabetManager.getAllSymbols(oldAlphabet).iterator();i.hasNext();){
+          Symbol s = (Symbol) i.next();
+          //takes first char of String, should work because we checked
+          //getTokenType above
+          tokenizer.bindSymbol(s,sToke.tokenizeSymbol(s).charAt(0));
+        }
+        //This is really hacky, ambiguous symbols containing
+        //TERMINATION_SYMBOL are impossible at this point, so I just define
+        //the Tokenization to treat them as TERMINATION_SYMBOL so that the
+        //code that likes to loop through doesn't go titty up.
+        for (Iterator i= AlphabetManager.getAllSymbols(alpha).iterator();i.hasNext();){
+          Symbol s = (Symbol) i.next();
+          Alphabet mathes = s.getMatches();
+          if (mathes.contains(TERMINATION_SYMBOL))
+              tokenizer.bindSymbol(s,DEFAULT_TERM_CHAR);
+        }
+          
+      }catch(IllegalSymbolException ise){
+        throw new AssertionFailure("Assertion Failure: This alphabet has been custom made so this doesn't happen",ise);
+      }
+      
+      alpha.putTokenization("token", tokenizer);
+    }
+    
+      
+      // Implementation of org.biojava.utils.Changeable
+
+    public void addChangeListener(ChangeListener changeListener, ChangeType changeType) {
+      unterminated.addChangeListener(changeListener,changeType);
+    }
+
+    public void addChangeListener(ChangeListener changeListener) {
+      unterminated.addChangeListener(changeListener);
+    }
+
+    public void removeChangeListener(ChangeListener changeListener, ChangeType changeType) {
+      unterminated.removeChangeListener(changeListener,changeType);
+    }
+
+    public void removeChangeListener(ChangeListener changeListener) {
+      unterminated.removeChangeListener(changeListener);
+    }
+
+    public boolean isUnchanging(ChangeType changeType) {
+      return unterminated.isUnchanging(changeType);
+    }
+    
+    // Implementation of org.biojava.bio.symbol.SymbolList
+
+    public int length() {
+      return unterminated.length()+1;
+    }
+
+    public Iterator iterator() {
+      return unterminated.iterator();
+    }
+
+    public SymbolList subList(int n, int n1) throws IndexOutOfBoundsException {
+      List list;
+      if (n1!=unterminated.length()+1)
+        return unterminated.subList(n,n1);
+      else{
+        list = unterminated.subList(n,n1-1).toList();
+        list.add(TERMINATION_SYMBOL);
+        try{
+          return new SimpleSymbolList(getAlphabet(),list);
+        }
+        catch(IllegalSymbolException e){
+          throw new AssertionFailure("Assertion Failure: This alphabet was created just so it doesn't do this",e);
+        }
+      }
+    }
+
+    public Alphabet getAlphabet() {
+      return alpha;
+    }
+
+    public Symbol symbolAt(int n) throws IndexOutOfBoundsException {
+      if (n!=length())
+        return unterminated.symbolAt(n);
+      else
+        return TERMINATION_SYMBOL;
+    }
+
+    public List toList() {
+      List answer = unterminated.toList();
+      answer.add(TERMINATION_SYMBOL);
+      return answer;
+    }
+
+    public String seqString() {
+      try{
+        SymbolTokenization toke = getAlphabet().getTokenization("token");
+        return unterminated.seqString()+toke.tokenizeSymbol(TERMINATION_SYMBOL);
+      } catch (BioException ex) {
+        throw new BioRuntimeException("Couldn't tokenize sequence", ex);
+      }
+    }
+    
+      public String subStr(int n, int n1) throws IndexOutOfBoundsException {
+      return subList(n, n1).seqString();
+    }
+
+    /**
+     * Describe <code>edit</code> method here.
+     *
+     * @param edit an <code>Edit</code> value
+     * @exception IndexOutOfBoundsException if an error occurs
+     * @exception IllegalAlphabetException if an error occurs
+     * @exception ChangeVetoException if an error occurs
+     */
+    public void edit(Edit edit) throws IndexOutOfBoundsException, IllegalAlphabetException, ChangeVetoException {
+      throw new ChangeVetoException("TerminatedSymbolList is immutable");
+    }
+  }
 }
