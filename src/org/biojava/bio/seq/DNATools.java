@@ -30,11 +30,13 @@ import java.util.Set;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.SimpleAnnotation;
+import org.biojava.bio.SmallAnnotation;
 import org.biojava.bio.dist.Distribution;
 import org.biojava.bio.dist.PairDistribution;
 import org.biojava.bio.dist.SimpleDistribution;
 import org.biojava.bio.seq.impl.SimpleSequenceFactory;
 import org.biojava.bio.seq.impl.SimpleGappedSequence;
+import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetManager;
@@ -42,6 +44,8 @@ import org.biojava.bio.symbol.AtomicSymbol;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.PatternMaker;
+import org.biojava.bio.symbol.PatternSearch;
 import org.biojava.bio.symbol.ReversibleTranslationTable;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
@@ -427,10 +431,59 @@ public final class DNATools {
     return new PairDistribution(getDNADistribution(fractionGC0), getDNADistribution(fractionGC1));
   }
 
+  /**
+   * Search a Sequence with a Pattern and annotate all matches with Feature objects.
+   * <p>
+   * Features will be marked by having the Pattern.toString written to the "pattern" property and
+   * and Pattern.getLabel() written to the "patternName" property in the annotation bundle.
+   *
+   * @param pattern The DNA search pattern.
+   * @param seq Sequence to be searched and subsequently annotated.
+   * @param ft Feature template to use when creating features.  When null, a Small Annotation will be created.
+   * @param bothStrands Are both strands to be matched?
+   */
+  public static void match(PatternSearch.Pattern pattern, Sequence seq, StrandedFeature.Template ft, boolean bothStrands)
+    throws IllegalAlphabetException, ChangeVetoException, BioException
+  {
+    if (ft == null) {
+      ft = new StrandedFeature.Template();
+      ft.source = "";
+      ft.sourceTerm = null;
+      ft.type = "";
+      ft.typeTerm = null;
+    }
 
+    // fill in details into Annotation bundle
+    if (ft.annotation == null) {
+      ft.annotation = new SmallAnnotation();
+    }
 
+    ft.annotation.setProperty("pattern", pattern.toString());
+    ft.annotation.setProperty("patternName", pattern.getLabel());
+    ft.strand = StrandedFeature.POSITIVE;
 
+    PatternSearch.match(pattern, seq, ft);
 
+    if (bothStrands) {
+        PatternSearch.match(pattern, SequenceTools.reverseComplement(seq), ft);
+    }
+  }
+
+  /**
+   * Search a Sequence with the specified pattern and annotate all matches with Feature objects.
+   * @param patternAsString A String specifying the DNA search pattern.
+   * @param seq Sequence to be searched and subsequently annotated.
+   * @param bothStrands Are both strands to be matched?
+   */
+  public static void match(String patternAsString, Sequence seq, boolean bothStrands)
+    throws IllegalAlphabetException, ChangeVetoException, ParseException, BioException
+  {
+    // create a Pattern
+    PatternSearch.Pattern pattern = PatternMaker.parsePattern(patternAsString, getDNA());
+    pattern.setLabel(patternAsString);
+
+    match(pattern, seq, null, bothStrands);
+  }
 }
 
 
