@@ -103,6 +103,9 @@ public abstract class SequenceBuilderBase implements SequenceBuilder {
     public void startFeature(Feature.Template templ) {
 	TemplateWithChildren t2 = new TemplateWithChildren();
 	t2.template = templ;
+    if(templ.annotation == Annotation.EMPTY_ANNOTATION) {
+        templ.annotation = new SmallAnnotation();
+    }
 	int stackSize = featureStack.size();
 	if (stackSize == 0) {
 	    rootFeatures.add(t2);
