@@ -86,7 +86,7 @@ public class GFFToFeatures {
   
   private static SequenceDB loadSequences(File seqFile)
   throws Exception {
-    HashSequenceDB seqDB = new HashSequenceDB(HashSequenceDB.byName);
+    HashSequenceDB seqDB = new HashSequenceDB(IDMaker.byName);
 
     Alphabet alpha = AlphabetManager.alphabetForName("DNA");
     SymbolParser rParser = alpha.getParser("token");

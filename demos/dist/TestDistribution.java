@@ -48,15 +48,14 @@ public class TestDistribution {
   
   private static void randomize(Distribution dist) {
     try {
-      DistributionTrainer dTrainer = new SimpleDistributionTrainer(dist);
+      DistributionTrainerContext dtc = new SimpleDistributionTrainerContext();
+      dtc.registerDistribution(dist);
       for(Iterator i = ((FiniteAlphabet) dist.getAlphabet()).iterator(); i.hasNext(); ) {
-        dTrainer.addCount(null, (Symbol) i.next(), Math.random());
+        dtc.addCount(dist, (Symbol) i.next(), Math.random());
       }
-      dTrainer.train(nullModel, 0);
+      dtc.train();
     } catch (IllegalSymbolException ise) {
       throw new BioError(ise, "This should be impossible");
-    } catch (IllegalAlphabetException iae) {
-      throw new BioError(iae, "This should be impossible");
     }
   }
 }

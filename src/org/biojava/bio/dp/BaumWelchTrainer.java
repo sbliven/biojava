@@ -82,16 +82,16 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
           int t = ts[tc];
           double weight = (states[t] instanceof EmissionState)
             ? ((EmissionState) states[t]).getDistribution().getWeight(res)
-            : 0.0;
-          if (weight != Double.NEGATIVE_INFINITY) {
+            : 1.0;
+          if (weight != 0.0) {
             try {
               trainer.addCount(
                 dist, states[t],
                 Math.exp(
-                  fsc[s] + tss[tc] + weight + bsc[t]
+                  fsc[s] + tss[tc] + bsc[t]
                   -
                   fs
-                )
+                ) * weight
               );
             } catch (IllegalSymbolException ise) {
               throw new BioError(

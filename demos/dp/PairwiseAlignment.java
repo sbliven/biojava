@@ -157,32 +157,43 @@ public class PairwiseAlignment {
     model.addState(insert1);
     model.addState(insert2);
     
+    Distribution dist;
+    
     model.createTransition(model.magicalState(), hub);
-    model.setTransitionScore(model.magicalState(), hub, 0.0);
     
     model.createTransition(hub, match);
-    model.setTransitionScore(hub, match, pMatch);
     model.createTransition(hub, insert1);
-    model.setTransitionScore(hub, insert1, pGap);
     model.createTransition(hub, insert2);
-    model.setTransitionScore(hub, insert2, pGap);
     model.createTransition(hub, model.magicalState());
-    model.setTransitionScore(hub, model.magicalState(), pEnd);
-    
+
     model.createTransition(match, match);
-    model.setTransitionScore(match, match, pExtendMatch);
     model.createTransition(match, hub);
-    model.setTransitionScore(match, hub, pEndMatch);
-    
+
     model.createTransition(insert1, insert1);
-    model.setTransitionScore(insert1, insert1, pExtendGap);
     model.createTransition(insert1, hub);
-    model.setTransitionScore(insert1, hub, pEndGap);
-    
+
     model.createTransition(insert2, insert2);
-    model.setTransitionScore(insert2, insert2, pExtendGap);
     model.createTransition(insert2, hub);
-    model.setTransitionScore(insert2, hub, pEndGap);
+
+    model.getWeights(model.magicalState()).setWeight(hub, 1.0);
+
+    dist = model.getWeights(hub);
+    dist.setWeight(match, pMatch);
+    dist.setWeight(insert1, pGap);
+    dist.setWeight(insert2, pGap);
+    dist.setWeight(model.magicalState(), pEnd);
+
+    dist = model.getWeights(match);
+    dist.setWeight(match, pExtendMatch);
+    dist.setWeight(hub, pEndMatch);
+
+    dist = model.getWeights(insert1);    
+    dist.setWeight(insert1, pExtendGap);
+    dist.setWeight(hub, pEndGap);
+
+    dist = model.getWeights(insert2);    
+    dist.setWeight(insert2, pExtendGap);
+    dist.setWeight(hub, pEndGap);
     
     return DPFactory.createDP(model);
   }

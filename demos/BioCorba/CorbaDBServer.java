@@ -33,7 +33,7 @@ public class CorbaDBServer {
     // load it
     System.out.println("Loading fasta database: " + seqDBFile);
     HashSequenceDB seqDB = new HashSequenceDB(
-      HashSequenceDB.byURN, seqDBFile.toString()
+      IDMaker.byURN, seqDBFile.toString()
     );
     SequenceFormat sFormat = new FastaFormat();
     InputStream seqDBI = new FileInputStream(seqDBFile);

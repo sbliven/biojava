@@ -85,9 +85,9 @@ public class BaumWelchSampler extends AbstractTrainer implements Serializable {
           int t = ts[tc];
           double weight = (states[t] instanceof EmissionState)
             ? ((EmissionState) states[t]).getDistribution().getWeight(res)
-            : 0.0;
-          if (weight != Double.NEGATIVE_INFINITY) {
-            p -= Math.exp(fm.scores[i][s] + tss[tc] + weight + bm.scores[i+1][t] - fs);
+            : 1.0;
+          if (weight != 0.0) {
+            p -= Math.exp(fm.scores[i][s] + tss[tc] + bm.scores[i+1][t] - fs) * weight;
             if (p <= 0.0) {
               try {
                 trainer.addCount(dist, (State) states[t], 1.0);

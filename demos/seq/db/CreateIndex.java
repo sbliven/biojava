@@ -56,7 +56,7 @@ public class CreateIndex {
         sFormat,
         sFact,
         sParser,
-        HashSequenceDB.byName
+        IDMaker.byName
       );
     } catch (Throwable t) {
       t.printStackTrace();

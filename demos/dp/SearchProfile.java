@@ -40,7 +40,7 @@ public class SearchProfile {
       
       System.out.println("Training whole profile");
       TrainingAlgorithm ta = new BaumWelchTrainer(dp);
-      ta.train(seqDB, nullModel, 5, new StoppingCriteria() {
+      ta.train(seqDB, 5, new StoppingCriteria() {
         public boolean isTrainingComplete(TrainingAlgorithm ta) {
           System.out.println("Cycle " + ta.getCycle() + " completed");
           System.out.println("Score: " + ta.getCurrentScore());
@@ -105,7 +105,7 @@ public class SearchProfile {
 
   public static SequenceDB readSequenceDB(File seqFile, Alphabet alpha)
   throws Exception {
-    HashSequenceDB seqDB = new HashSequenceDB(HashSequenceDB.byName);
+    HashSequenceDB seqDB = new HashSequenceDB(IDMaker.byName);
     
     SequenceFactory sFact = new SimpleSequenceFactory();
     FastaFormat fFormat = new FastaFormat();
@@ -128,7 +128,9 @@ public class SearchProfile {
   }
   
   private static void randomize(MarkovModel model) throws Exception {
-    ModelTrainer mt = new SimpleModelTrainer(model, nullModel, 0.001, 0.00001, 1.0);
+    ModelTrainer mt = new SimpleModelTrainer();
+    mt.registerModel(model);
+    mt.setNullModelWeight(5.0);
     
     for(Iterator i = model.stateAlphabet().symbols().iterator(); i.hasNext(); ) {
       State s = (State) i.next();
@@ -144,9 +146,10 @@ public class SearchProfile {
           mt.addCount(es.getDistribution(), r, Math.random());
         }
       }
+      Distribution dist = model.getWeights(s);
       for(Iterator j = model.transitionsFrom(s).iterator(); j.hasNext(); ) {
         State t = (State) j.next();
-        mt.addTransitionCount(s, t, Math.random());
+        mt.addCount(dist, t, Math.random());
       }
     }
     
