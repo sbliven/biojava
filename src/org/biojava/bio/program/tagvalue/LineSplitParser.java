@@ -40,7 +40,7 @@ import org.biojava.utils.ParserException;
  * <li>endOfRecord - string starting lines that mark record boundaries
  * e.g. "//"</li>
  * <li>splitOffset - column index of the first character of the value, and the
- * length of the raw tag e.g. 5 for embl files</li>
+ * length of the raw tag e.g. 5 for EMBL files</li>
  * <li>trimTag - trim white-space from tags</li>
  * <li>trimValue - trim white-space from values</li>
  * <li>continueOnEmptyTag - if the tag is empty, use the previous tag e.g. this
