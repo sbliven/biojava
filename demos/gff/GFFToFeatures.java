@@ -90,7 +90,7 @@ public class GFFToFeatures {
 
     Alphabet alpha = AlphabetManager.alphabetForName("DNA");
     SymbolParser rParser = alpha.getParser("token");
-    SequenceFactory sFact = new SimpleSequenceFactory();
+    SequenceBuilderFactory sFact = new EmblProcessor.Factory(SimpleSequenceBuilder.FACTORY);
     SequenceFormat sFormat = new FastaFormat();
     InputStream seqDBI = new FileInputStream(seqFile);
     SequenceIterator seqI = new StreamReader(seqDBI, sFormat, rParser, sFact);
