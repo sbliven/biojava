@@ -1,3 +1,4 @@
+/* -*- c-basic-offset: 2; indent-tabs-mode: nil -*- */
 /*
  *                    BioJava development code
  *
@@ -34,6 +35,7 @@ import org.biojava.utils.SmallMap;
  * @author Matthew Pocock
  * @author Greg Cox
  * @author Aroul Ramadass
+ * @author Len Trigg
  */
 public class SimpleGFFRecord implements GFFRecord {
   /**
@@ -78,66 +80,65 @@ public class SimpleGFFRecord implements GFFRecord {
    */
   private String comment;
 
-	/**
-	* Create a new SimpleGFFRecord from GFFRecord object
-	* 
-	* @param rec - A GFFRecord object
-	*/
+  /**
+  * Create a new SimpleGFFRecord from GFFRecord object
+  * 
+  * @param rec - A GFFRecord object
+  */
 
-	public SimpleGFFRecord(GFFRecord rec) {
-		this.seqName = rec.getSeqName();
-		this.source = rec.getSource();
-		this.feature = rec.getFeature();
-		this.start = rec.getStart();
-		this.end = rec.getEnd();
-		this.score = rec.getScore();
-		this.strand = rec.getStrand();
-		this.frame = rec.getFrame();
-		this.comment = rec.getComment();
-		this.groupAttributes = new SmallMap(rec.getGroupAttributes());
-	}
+  public SimpleGFFRecord(GFFRecord rec) {
+    this.seqName = rec.getSeqName();
+    this.source = rec.getSource();
+    this.feature = rec.getFeature();
+    this.start = rec.getStart();
+    this.end = rec.getEnd();
+    this.score = rec.getScore();
+    this.strand = rec.getStrand();
+    this.frame = rec.getFrame();
+    this.comment = rec.getComment();
+    this.groupAttributes = new SmallMap(rec.getGroupAttributes());
+  }
 
-        public SimpleGFFRecord(
-          String seqName,
-          String source,
-          String feature,
-          int start,
-          int end,
-          double score,
-          StrandedFeature.Strand strand,
-          int frame,
-          String comment,
-          Map groupAttributes
-        ) {
-          this.seqName = seqName;
-          this.source = source;
-          this.feature = feature;
-          this.start = start;
-          this.end = end;
-          this.score = score;
-          this.strand = strand;
-          this.frame = frame;
-          this.comment = comment;
-          this.groupAttributes = new SmallMap(groupAttributes);
-        }
+  public SimpleGFFRecord(
+                         String seqName,
+                         String source,
+                         String feature,
+                         int start,
+                         int end,
+                         double score,
+                         StrandedFeature.Strand strand,
+                         int frame,
+                         String comment,
+                         Map groupAttributes
+                         ) {
+    this.seqName = seqName;
+    this.source = source;
+    this.feature = feature;
+    this.start = start;
+    this.end = end;
+    this.score = score;
+    this.strand = strand;
+    this.frame = frame;
+    this.comment = comment;
+    this.groupAttributes = new SmallMap(groupAttributes);
+  }
+
 
    /**
-	 * Create a new SimpleGFFRecord with values set to null or zero
-	 */
-
-	public SimpleGFFRecord() {
-		this.seqName = null;
-		this.source = null;
-		this.feature = null;
-		this.start = 0;
-		this.end = 0;
-		this.score = 0;
-		this.strand = null;
-		this.frame = 0;
-		this.comment = null;
-		this.groupAttributes = null;
-		
-	}
+   * Create a new SimpleGFFRecord with values set to null or zero
+   */
+  public SimpleGFFRecord() {
+    this.seqName = null;
+    this.source = null;
+    this.feature = null;
+    this.start = 0;
+    this.end = 0;
+    this.score = 0;
+    this.strand = null;
+    this.frame = 0;
+    this.comment = null;
+    this.groupAttributes = null;
+  }
 
   /**
    * Set the sequence name to <span class="arg">seqName</span>.
@@ -243,8 +244,8 @@ public class SimpleGFFRecord implements GFFRecord {
    * @param score  the new score
    * @throws IllegalArgumentException if score is not valid.
    */
-  public void setFrame(int frame) throws IllegalArgumentException {
-    if(frame != GFFRecord.NO_FRAME &&
+  public void setFrame(int frame) {
+    if (frame != GFFTools.NO_FRAME &&
        (frame < 0 || frame > 2))
     {
       throw new IllegalArgumentException("Illegal frame: " + frame);
@@ -270,7 +271,7 @@ public class SimpleGFFRecord implements GFFRecord {
   }
 
   public Map getGroupAttributes() {
-    if(groupAttributes == null) {
+    if (groupAttributes == null) {
       groupAttributes = new SmallMap();
     }
     return groupAttributes;
@@ -305,26 +306,26 @@ public class SimpleGFFRecord implements GFFRecord {
   public static String stringifyAttributes(Map attMap) {
     StringBuffer sBuff = new StringBuffer();
     Iterator ki = attMap.keySet().iterator();
-    if(ki.hasNext()) {
+    if (ki.hasNext()) {
       String key = (String) ki.next();
       sBuff.append(key);
       List values = (List) attMap.get(key);
-      for(Iterator vi = values.iterator(); vi.hasNext();) {
+      for (Iterator vi = values.iterator(); vi.hasNext();) {
         String value = (String) vi.next();
-        if(value.indexOf(" ") != -1) {
+        if (value.indexOf(" ") != -1) {
           sBuff.append(" \"" + value + "\"");
         } else {
           sBuff.append(" " + value);
         }
       }
     }
-    while( ki.hasNext() ) {
+    while (ki.hasNext()) {
       String key = (String) ki.next();
       sBuff.append("; " + key);
       List values = (List) attMap.get(key);
-      for(Iterator vi = values.iterator(); vi.hasNext();) {
+      for (Iterator vi = values.iterator(); vi.hasNext();) {
         String value = (String) vi.next();
-        if(value.indexOf(" ") != -1) {
+        if (value.indexOf(" ") != -1) {
           sBuff.append(" \"" + value + "\"");
         } else {
           sBuff.append(" " + value);
