@@ -92,6 +92,14 @@ public class Search
         patterns.add(info);
     }
 
+    /**
+     * remove all patterns from the pattern cache.
+     */
+    public void clearPatterns()
+    {
+        patterns.clear();
+    }
+
     public char charValue(Symbol sym)
         throws IllegalSymbolException
     {
