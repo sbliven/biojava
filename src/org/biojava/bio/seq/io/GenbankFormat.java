@@ -49,11 +49,11 @@ public class GenbankFormat
 {
     static
     {
-	Set validFormats = new HashSet();
-	validFormats.add("Genbank");
+        Set validFormats = new HashSet();
+        validFormats.add("Genbank");
 
-	SequenceFormat.FORMATS.put(GenbankFormat.class.getName(),
-				   validFormats);
+        SequenceFormat.FORMATS.put(GenbankFormat.class.getName(),
+                                   validFormats);
     }
 
     protected static final String END_SEQUENCE_TAG = "//";
@@ -504,85 +504,87 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
      * @param line The line to be processed
      */
     private void processHeaderLine(String line)
-	throws ParseException
+        throws ParseException
     {
-	if(line.startsWith(GenbankFormat.LOCUS_TAG))
-	{
-	    // the LOCUS line is a special case because it contains the
-	    // locus, size, molecule type, GenBank division, and the date
-	    // of last modification.
-	    this.saveSeqAnno();
-	    StringTokenizer lineTokens = new StringTokenizer(line);
-	    headerTag = lineTokens.nextToken();
-	    headerTagText = new StringBuffer(lineTokens.nextToken());
+        if(line.startsWith(GenbankFormat.LOCUS_TAG))
+        {
+            // the LOCUS line is a special case because it contains the
+            // locus, size, molecule type, GenBank division, and the date
+            // of last modification.
+            this.saveSeqAnno();
+            StringTokenizer lineTokens = new StringTokenizer(line);
+            headerTag = lineTokens.nextToken();
+            headerTagText = new StringBuffer(lineTokens.nextToken());
 
-	    this.saveSeqAnno();
-	    headerTag = GenbankFormat.SIZE_TAG;
-	    headerTagText = new StringBuffer(lineTokens.nextToken());
-	    // read past 'bp'
-	    lineTokens.nextToken();
+            this.saveSeqAnno();
+            headerTag = GenbankFormat.SIZE_TAG;
+            headerTagText = new StringBuffer(lineTokens.nextToken());
+            // read past 'bp'
+            lineTokens.nextToken();
 
-	    // At this point there are three optional fields, strand number,
-	    // type, and circularity.
-	    if(line.charAt(34) != ' ')
-	    {
-		this.saveSeqAnno();
-		headerTag = GenbankFormat.STRAND_NUMBER_TAG;
-		headerTagText = new StringBuffer(lineTokens.nextToken());
-	    }
+            // At this point there are three optional fields, strand number,
+            // type, and circularity.
+            if(line.charAt(34) != ' ')
+            {
+                this.saveSeqAnno();
+                headerTag = GenbankFormat.STRAND_NUMBER_TAG;
+                headerTagText = new StringBuffer(lineTokens.nextToken());
+            }
 
-	    if(line.charAt(37) != ' ')
-	    {
-		this.saveSeqAnno();
-		headerTag = GenbankFormat.TYPE_TAG;// Check this; may be under PROP
-		headerTagText = new StringBuffer(lineTokens.nextToken());
-	    }
+            if(line.charAt(37) != ' ')
+            {
+                this.saveSeqAnno();
+                headerTag = GenbankFormat.TYPE_TAG;// Check this; may be under PROP
+                headerTagText = new StringBuffer(lineTokens.nextToken());
+            }
 
-	    if(line.charAt(43) != ' ')
-	    {
-		this.saveSeqAnno();
-		headerTag = GenbankFormat.CIRCULAR_TAG;
-		headerTagText = new StringBuffer(lineTokens.nextToken());
-	    }
+            if(line.charAt(43) != ' ')
+            {
+                this.saveSeqAnno();
+                headerTag = GenbankFormat.CIRCULAR_TAG;
+                headerTagText = new StringBuffer(lineTokens.nextToken());
+            }
 
-	    this.saveSeqAnno();
-	    headerTag = GenbankFormat.DIVISION_TAG; // May be under PROP
-	    headerTagText = new StringBuffer(lineTokens.nextToken());
+            this.saveSeqAnno();
+            headerTag = GenbankFormat.DIVISION_TAG; // May be under PROP
+            headerTagText = new StringBuffer(lineTokens.nextToken());
 
-	    this.saveSeqAnno();
-	    headerTag = GenbankFormat.DATE_TAG;
-	    headerTagText = new StringBuffer(lineTokens.nextToken());
-	}
-	else if (line.startsWith(GenbankFormat.VERSION_TAG))
-	{
-	    // VERSION line is a special case because it contains both
-	    // the VERSION field and the GI number
-	    this.saveSeqAnno();
-	    StringTokenizer lineTokens = new StringTokenizer(line);
-	    headerTag = lineTokens.nextToken();
-	    headerTagText = new StringBuffer(lineTokens.nextToken());
+            this.saveSeqAnno();
+            headerTag = GenbankFormat.DATE_TAG;
+            headerTagText = new StringBuffer(lineTokens.nextToken());
+        }
+        else if (line.startsWith(GenbankFormat.VERSION_TAG))
+        {
+            // VERSION line is a special case because it contains both
+            // the VERSION field and the GI number
+            this.saveSeqAnno();
+            StringTokenizer lineTokens = new StringTokenizer(line);
+            headerTag = lineTokens.nextToken();
+            headerTagText = new StringBuffer(lineTokens.nextToken());
 
-	    if (lineTokens.hasMoreTokens()) {
-		String nextToken = lineTokens.nextToken();
-		if(nextToken.startsWith(GenbankFormat.GI_TAG))
-		{
-		    this.saveSeqAnno();
-		    headerTag = GenbankFormat.GI_TAG; // Possibly should be UID?
-		    headerTagText =
-			new StringBuffer(nextToken.substring(3));
-		}
-	    }
-	}
-	else if (hasHeaderTag(line))
-	{	// line	has a header tag
-	    this.saveSeqAnno();
-	    headerTag =	line.substring(0, TAG_LENGTH).trim();
-	    headerTagText = new StringBuffer(line.substring(TAG_LENGTH));
-	}
-	else
-	{	// keep	appending tag text value
-	    headerTagText.append(" " + line.substring(TAG_LENGTH));
-	}
+            if (lineTokens.hasMoreTokens()) {
+                String nextToken = lineTokens.nextToken();
+                if(nextToken.startsWith(GenbankFormat.GI_TAG))
+                {
+                    this.saveSeqAnno();
+                    headerTag = GenbankFormat.GI_TAG; // Possibly should be UID?
+                    headerTagText =
+                        new StringBuffer(nextToken.substring(3));
+                }
+            }
+        }
+        else if (hasHeaderTag(line))
+        {	// line	has a header tag
+            this.saveSeqAnno();
+            headerTag =	line.substring(0, TAG_LENGTH).trim();
+            headerTagText = new StringBuffer(line.substring(TAG_LENGTH));
+        }
+        // gbpri1.seq (Release 125.0) has a line which is not
+        // TAG_LENGTH long. Patch offered by Ron Kuhn (rkuhn@cellomics.com)
+        else if (line.length() >= TAG_LENGTH)
+        {	// keep	appending tag text value
+            headerTagText.append(" " + line.substring(TAG_LENGTH));
+        }
     }
 
     /**
