@@ -53,10 +53,10 @@ public class LargeBuffer {
   private MappedByteBuffer getBuffer(int index)
   throws IOException {
     if(index != lastBufferIndex) {
-      System.out.println("Allocating page: " + index);
+      // System.out.println("Allocating page: " + index);
       long offset = PAGE_SIZE * index;
-      System.out.println("From: " + (pos + offset));
-      System.out.println("Size: " + Math.min(size - offset, PAGE_SIZE + PAGE_OVERLAP));
+      // System.out.println("From: " + (pos + offset));
+      // System.out.println("Size: " + Math.min(size - offset, PAGE_SIZE + PAGE_OVERLAP));
       lastBuffer = channel.map(
         mode,
         pos + offset,
