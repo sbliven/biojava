@@ -239,15 +239,40 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
         } else if (ff instanceof FeatureFilter.Not) {
             return new FeatureFilter.Not(transformFilter(((FeatureFilter.Not) ff).getChild()));
         } else if (ff instanceof FeatureFilter.OverlapsLocation) {
-            return new FeatureFilter.OverlapsLocation(transformLocation(((FeatureFilter.OverlapsLocation) ff).getLocation()));
+            return new FeatureFilter.OverlapsLocation(untransformLocation(((FeatureFilter.OverlapsLocation) ff).getLocation()));
         } else if (ff instanceof FeatureFilter.ContainedByLocation) {
-            return new FeatureFilter.ContainedByLocation(transformLocation(((FeatureFilter.ContainedByLocation) ff).getLocation()));
+            return new FeatureFilter.ContainedByLocation(untransformLocation(((FeatureFilter.ContainedByLocation) ff).getLocation()));
         } else if (ff instanceof FeatureFilter.StrandFilter) {
             return new FeatureFilter.StrandFilter(transformStrand(((FeatureFilter.StrandFilter) ff).getStrand()));
         } else {
             // should check for unknown cases.
             
             return ff;
+        }
+    }
+    
+    private Location untransformLocation(Location oldLoc) {
+        if (oppositeStrand) {
+            if (oldLoc.isContiguous()) {
+                if (oldLoc instanceof PointLocation){
+                    return new PointLocation(translate - oldLoc.getMin());
+                } else {
+                    return new RangeLocation(translate - oldLoc.getMax(),
+    	                                     translate - oldLoc.getMin());
+                }
+            } else {
+                Location compound = Location.empty;
+                List locList = new ArrayList();
+                for (Iterator i = oldLoc.blockIterator(); i.hasNext(); ) {
+                    Location oldBlock = (Location) i.next();
+                    locList.add(new RangeLocation(translate - oldBlock.getMax(),
+                    		      			translate - oldBlock.getMin()));
+                }
+                compound = LocationTools.union(locList);
+                return compound;
+            }
+        } else {
+            return oldLoc.translate(-translate);
         }
     }
     
