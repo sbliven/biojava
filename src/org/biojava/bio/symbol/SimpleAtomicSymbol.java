@@ -48,12 +48,13 @@ implements AtomicSymbol {
   protected SimpleAtomicSymbol(
     char token, String name, Annotation annotation,
     List syms
-  ) {
+  ) throws IllegalSymbolException {
     super(token, name, annotation, syms);
   }
   
   protected List createSymbols() {
-    return new SingletonList(this);
+    List syms = new SingletonList(this);
+    return syms;
   }
   
   protected Set createBases() {

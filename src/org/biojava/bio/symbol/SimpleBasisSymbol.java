@@ -40,9 +40,17 @@ implements BasisSymbol {
   public SimpleBasisSymbol(
     char token, String name, Annotation annotation,
     List symbols
-  ) {
+  ) throws IllegalSymbolException {
     this(token, name, annotation);
-    this.symbols = symbols;
+    if(symbols == null) {
+      throw new NullPointerException("symbols can't be null");
+    }
+    if(symbols.size() == 0) {
+      throw new IllegalSymbolException(
+        "Can't create BasisSymbol for an empty list. Use the Gap symbol."
+      );
+    }
+    this.symbols = Collections.unmodifiableList(new ArrayList(symbols));
   }
   
   protected SimpleBasisSymbol(
@@ -61,9 +69,19 @@ implements BasisSymbol {
     this.matches = new SimpleAlphabet(syms);
   }
   
-  public List getSymbols() {
+  public final List getSymbols() {
     if(symbols == null) {
       symbols = createSymbols();
+    }
+    if(symbols.size() == 0) {
+      throw new BioError(
+        "Assertion Failure: symbols array is of length 0 in " + this +
+        "\n\ttoken: " + getToken() +
+        "\n\tname: " + getName() +
+        "\n\tsymbols: " + this.symbols +
+        "\n\tmatches: " + this.matches +
+        "\n\tbases: " + this.bases
+      );
     }
     return symbols;
   }

@@ -141,7 +141,7 @@ public final class AlphabetManager {
   static public AtomicSymbol createSymbol(
     char token, String name, Annotation annotation
   ) {
-    AtomicSymbol as = new SimpleAtomicSymbol(token, name, annotation, null);
+    AtomicSymbol as = new SimpleAtomicSymbol(token, name, annotation);
     return as;
   }
 
