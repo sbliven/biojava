@@ -74,14 +74,16 @@ class DistProjectedFeatureHolder extends ProjectedFeatureHolder {
             ComponentFeature pcf = (ComponentFeature) componentFeatureCache.get(f);
             if (pcf == null) {
                 ComponentFeature.Template cft = (ComponentFeature.Template) ((ComponentFeature) f).makeTemplate();
+
                 if (cft.componentSequenceName == null) {
                     cft.componentSequenceName = cft.componentSequence.getName();
                 }
-                cft.componentSequence = null;    // We need to go back though the DistDB for the
-		                                         // proper component sequence to use here.
                 if (cft.componentSequenceName == null) {
                     throw new NullPointerException("Can't get component sequence name");
                 }
+
+                cft.componentSequence = null;    // We need to go back though the DistDB for the
+		                                         // proper component sequence to use here.
 
                 try {
                     pcf = new DistComponentFeature((DistributedSequence) getParent(),

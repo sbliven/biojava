@@ -248,13 +248,14 @@ public interface Feature extends FeatureHolder, Annotatable {
      * implementation from the template.
      *
      * <p>
-     * Equals and Hashcode methods are defined such that two templates
-     * are equal if all their fields are equal.  These are implemented
-     * by reflection, and automatically pick up any extra fields
+     * The equals(), hashcode(), toString() and populate() methods are defined
+     * such that two templates are equal if all their fields are equal.  These
+     * are implemented by reflection, and automatically pick up any extra fields
      * added in subclasses.
      * </p>
      *
      * @author Thomas Down
+     * @author Matthew Pocock
      */
 
     public static class Template implements Serializable {
@@ -309,6 +310,46 @@ public interface Feature extends FeatureHolder, Annotatable {
 	    
 	    return true;
 	}
+        
+        /**
+         * This attempts to populate the fields of this template using
+         * the publically accessible information in a feature. It is simple
+         * to call populate() within Feature.makeTemplate() to ensure all the
+         * slots get filled.
+         *
+         * @param feat  the Feature to read info from
+         */
+        public void populate(Feature feat)
+        throws BioException {
+          Field[] fields = this.getClass().getFields();
+          Method[] methods = feat.getClass().getMethods();
+          
+          for(int i = 0; i < fields.length; i++) {
+            Field field = fields[i];
+            String fName = field.getName();
+            String methName =
+              "get" +
+              fName.substring(0, 1).toUpperCase() +
+              fName.substring(1);
+
+            Method method = null;
+            for(int j = 0; j < methods.length; j++) {
+              Method meth = methods[j];
+              if(methods[j].getName().equals(methName)) {
+                method = meth;
+              }
+            }
+            if(method == null) {
+              throw new BioException("Expecting to find a method named: " + methName);
+            }
+              
+            try {
+              field.set(this, method.invoke(feat, new Object[] {}));
+            } catch (Exception e) {
+              throw new BioError(e, "Couldn't access template fields");
+            }
+          }
+        }
         
         public String toString() {
           StringBuffer sbuf = new StringBuffer();
