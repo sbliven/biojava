@@ -66,11 +66,8 @@ final class CircularLocationTools {
    * @param seqLength  used to work out if the feature wraps arround the origin
    */
   protected static CircularLocation makeCircLoc(int min, int max, int seqLength){
-//    if(min == 0|| max == 0 || seqLength == 0){
-//        throw new IllegalArgumentException(
-//             "Must use a non zero integer a a parameter"
-//        );
-//      }
+      if(min == max)
+        return new CircularLocation(new PointLocation(min), seqLength);
 
       boolean overlap = false;
       int rmin = realValue(min, seqLength);
@@ -105,35 +102,35 @@ final class CircularLocationTools {
   }
 
     static Location intersection(Location locA, Location locB) {
-	int circularityA, circularityB;
-	Location rawA, rawB;
-	if (locA instanceof CircularLocation) {
-	    circularityA = ((CircularLocation) locA).getLength();
-	    rawA = ((CircularLocation) locA).getWrapped();
-	} else if (locA == Location.empty) {
-	    return Location.empty;
-	} else {
-	    throw new BioError("Assertion failure: not circular");
-	}
+        int circularityA, circularityB;
+        Location rawA, rawB;
+        if (locA instanceof CircularLocation) {
+            circularityA = ((CircularLocation) locA).getLength();
+            rawA = ((CircularLocation) locA).getWrapped();
+        } else if (locA == Location.empty) {
+            return Location.empty;
+        } else {
+            throw new BioError("Assertion failure: not circular");
+        }
 
-	if (locA instanceof CircularLocation) {
-	    circularityB = ((CircularLocation) locB).getLength();
-	    rawB = ((CircularLocation) locB).getWrapped();
-	} else if (locB == Location.empty) {
-	    return Location.empty;
-	} else {
-	    throw new BioError("Assertion failure: not circular");
-	}
+        if (locA instanceof CircularLocation) {
+            circularityB = ((CircularLocation) locB).getLength();
+            rawB = ((CircularLocation) locB).getWrapped();
+        } else if (locB == Location.empty) {
+            return Location.empty;
+        } else {
+            throw new BioError("Assertion failure: not circular");
+        }
 
-	if (circularityA != circularityB) {
-	    throw new BioRuntimeException("Can't find intersection of locations on circular sequences of non-equal length");
-	}
+        if (circularityA != circularityB) {
+            throw new BioRuntimeException("Can't find intersection of locations on circular sequences of non-equal length");
+        }
 
-	Location intersect = LocationTools.intersection(rawA, rawB);
-	if (intersect != Location.empty) {
-	    intersect = new CircularLocation(intersect, circularityA);
-	}
-	return intersect;
+        Location intersect = LocationTools.intersection(rawA, rawB);
+        if (intersect != Location.empty) {
+            intersect = new CircularLocation(intersect, circularityA);
+        }
+        return intersect;
     }
 
 

@@ -44,10 +44,10 @@ final public class LocationTools {
     /**
      * Nobody needs one of these.
      */
-    
+
     private LocationTools() {
     }
-    
+
   /**
    * Return the union of two locations.
    *
@@ -126,73 +126,73 @@ final public class LocationTools {
 
     if(isDecorated(locA) || isDecorated(locB))
     {
-	handleDecorations(locA, locB);
-	if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
-	    {
-		return BetweenLocationTools.intersection(locA, locB);
-	    }
-	if (CircularLocationTools.isCircular(locA) || CircularLocationTools.isCircular(locB)) {
-	    return CircularLocationTools.intersection(locA, locB);
-	}
+        handleDecorations(locA, locB);
+        if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
+            {
+                return BetweenLocationTools.intersection(locA, locB);
+            }
+        if (CircularLocationTools.isCircular(locA) || CircularLocationTools.isCircular(locB)) {
+            return CircularLocationTools.intersection(locA, locB);
+        }
     }
 
     if(locA.isContiguous() && locB.isContiguous()) {
-	// handle easy case of solid locations
-	// Ought to make this bit more efficient --THOMASD
-	if (LocationTools.contains(locA, locB)) {
-	    return locB;
-	} else if (LocationTools.contains(locB, locA)) {
-	    return locA;
-	} if(LocationTools.overlaps(locA, locB)) {
-	    int min = Math.max(locA.getMin(), locB.getMin());
-	    int max = Math.min(locA.getMax(), locB.getMax());
-	    return makeLocation(min, max);
-	} else {
-	    return Location.empty;
-	}
+        // handle easy case of solid locations
+        // Ought to make this bit more efficient --THOMASD
+        if (LocationTools.contains(locA, locB)) {
+            return locB;
+        } else if (LocationTools.contains(locB, locA)) {
+            return locA;
+        } if(LocationTools.overlaps(locA, locB)) {
+            int min = Math.max(locA.getMin(), locB.getMin());
+            int max = Math.min(locA.getMax(), locB.getMax());
+            return makeLocation(min, max);
+        } else {
+            return Location.empty;
+        }
     } else {
-	// One or other of the locations is compound. Build a list of all
-	// locations created by finding intersection of all pairwise combinations
-	// of blocks in locA and locB. Ignore all Location.empty. Create the
-	// appropriate Location instance.
-	List locList = new ArrayList();
+        // One or other of the locations is compound. Build a list of all
+        // locations created by finding intersection of all pairwise combinations
+        // of blocks in locA and locB. Ignore all Location.empty. Create the
+        // appropriate Location instance.
+        List locList = new ArrayList();
 
-	List blA = getBlockList(locA);
-	{
-	    int minBlock = blockContainingOrFollowingPoint(blA, locB.getMin());
-	    int maxBlock = blockContainingOrPreceedingPoint(blA, locB.getMax());
-	    if (minBlock == -1 || maxBlock == -1) {
-		return Location.empty;
-	    }
-	    blA = blA.subList(minBlock, maxBlock + 1);
-	}
-	List blB = getBlockList(locB);
-	{
-	    int minBlock = blockContainingOrFollowingPoint(blB, locA.getMin());
-	    int maxBlock = blockContainingOrPreceedingPoint(blB, locA.getMax());
-	    if (minBlock == -1 || maxBlock == -1) {
-		return Location.empty;
-	    }
-	    blB = blB.subList(minBlock, maxBlock + 1);
-	}
+        List blA = getBlockList(locA);
+        {
+            int minBlock = blockContainingOrFollowingPoint(blA, locB.getMin());
+            int maxBlock = blockContainingOrPreceedingPoint(blA, locB.getMax());
+            if (minBlock == -1 || maxBlock == -1) {
+                return Location.empty;
+            }
+            blA = blA.subList(minBlock, maxBlock + 1);
+        }
+        List blB = getBlockList(locB);
+        {
+            int minBlock = blockContainingOrFollowingPoint(blB, locA.getMin());
+            int maxBlock = blockContainingOrPreceedingPoint(blB, locA.getMax());
+            if (minBlock == -1 || maxBlock == -1) {
+                return Location.empty;
+            }
+            blB = blB.subList(minBlock, maxBlock + 1);
+        }
 
-	if (blA.size() > blB.size()) {
-	    List temp = blA;
-	    blA = blB;
-	    blB = temp;
-	}
+        if (blA.size() > blB.size()) {
+            List temp = blA;
+            blA = blB;
+            blB = temp;
+        }
 
-	for (Iterator i = blA.iterator(); i.hasNext(); ) {
-	    Location blocA = (Location) i.next();
-	    int minHitIndex = blockContainingOrFollowingPoint(blB, blocA.getMin());
-	    int maxHitIndex = blockContainingOrPreceedingPoint(blB, blocA.getMax());
-	    for (int hitIndex = minHitIndex; hitIndex <= maxHitIndex; ++hitIndex) {
-		Location blocB = (Location) blB.get(hitIndex);
-		locList.add(LocationTools.intersection(blocA, blocB));
-	    }
-	}
+        for (Iterator i = blA.iterator(); i.hasNext(); ) {
+            Location blocA = (Location) i.next();
+            int minHitIndex = blockContainingOrFollowingPoint(blB, blocA.getMin());
+            int maxHitIndex = blockContainingOrPreceedingPoint(blB, blocA.getMax());
+            for (int hitIndex = minHitIndex; hitIndex <= maxHitIndex; ++hitIndex) {
+                Location blocB = (Location) blB.get(hitIndex);
+                locList.add(LocationTools.intersection(blocA, blocB));
+            }
+        }
 
-	return buildLoc(locList);
+        return buildLoc(locList);
     }
   }
 
@@ -205,20 +205,20 @@ final public class LocationTools {
      */
 
     private static List getBlockList(Location l) {
-	if (l == Location.empty) {
-	    return Collections.EMPTY_LIST;
-	} else if (l instanceof CompoundLocation) {
-	    return ((CompoundLocation )l).getBlockList();
-	} else if (l.isContiguous() && !CircularLocationTools.isCircular(l)) {
-	    return Collections.nCopies(1, l);
-	} else {
-	    List bl = new ArrayList();
-	    for (Iterator bi = l.blockIterator(); bi.hasNext(); ) {
-		bl.add(bi.next());
-	    }
-	    Collections.sort(bl, Location.naturalOrder);
-	    return bl;
-	}
+        if (l == Location.empty) {
+            return Collections.EMPTY_LIST;
+        } else if (l instanceof CompoundLocation) {
+            return ((CompoundLocation )l).getBlockList();
+        } else if (l.isContiguous() && !CircularLocationTools.isCircular(l)) {
+            return Collections.nCopies(1, l);
+        } else {
+            List bl = new ArrayList();
+            for (Iterator bi = l.blockIterator(); bi.hasNext(); ) {
+                bl.add(bi.next());
+            }
+            Collections.sort(bl, Location.naturalOrder);
+            return bl;
+        }
     }
 
     /**
@@ -227,23 +227,23 @@ final public class LocationTools {
      */
 
     private static int blockContainingPoint(List bl, int point) {
-	int start = 0;
-	int end = bl.size() - 1;
+        int start = 0;
+        int end = bl.size() - 1;
 
-	while (start <= end) {
-	    int mid = (start + end) / 2;
-	    Location block = (Location) bl.get(mid);
-	    if (block.contains(point)) {
-		return mid;
-	    } else if (point < block.getMin()) {
-		end = mid - 1;
-	    } else if (point > block.getMax()) {
-		start = mid + 1;
-	    } else {
-		throw new BioError("Assertion failed: overrun in binary search");
-	    }
-	}
-	return -1;
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            Location block = (Location) bl.get(mid);
+            if (block.contains(point)) {
+                return mid;
+            } else if (point < block.getMin()) {
+                end = mid - 1;
+            } else if (point > block.getMax()) {
+                start = mid + 1;
+            } else {
+                throw new BioError("Assertion failed: overrun in binary search");
+            }
+        }
+        return -1;
     }
 
     /**
@@ -252,31 +252,31 @@ final public class LocationTools {
      */
 
     private static int blockContainingOrPreceedingPoint(List bl, int point) {
-	// System.err.println("COPP");
-	int start = 0;
-	int length = bl.size();
-	int end = length - 1;
+        // System.err.println("COPP");
+        int start = 0;
+        int length = bl.size();
+        int end = length - 1;
 
-	while (start <= end) {
-	    int mid = (start + end) / 2;
-	    // System.err.println("Start=" + start + " mid=" + mid + " end=" + end);
-	    Location block = (Location) bl.get(mid);
-	    if (block.contains(point)) {
-		return mid;
-	    } else if (point < block.getMin()) {
-		end = mid - 1;
-	    } else if (point > block.getMax()) {
-		start = mid + 1;
-	    } else {
-		throw new BioError("Assertion failed: overrun in binary search");
-	    }
-	}
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            // System.err.println("Start=" + start + " mid=" + mid + " end=" + end);
+            Location block = (Location) bl.get(mid);
+            if (block.contains(point)) {
+                return mid;
+            } else if (point < block.getMin()) {
+                end = mid - 1;
+            } else if (point > block.getMax()) {
+                start = mid + 1;
+            } else {
+                throw new BioError("Assertion failed: overrun in binary search");
+            }
+        }
 
-	if (end < length) {
-	    return end;
-	} else {
-	    return -1;
-	}
+        if (end < length) {
+            return end;
+        } else {
+            return -1;
+        }
     }
 
     /**
@@ -285,30 +285,30 @@ final public class LocationTools {
      */
 
     private static int blockContainingOrFollowingPoint(List bl, int point) {
-	// System.err.println("COFP");
-	int start = 0;
-	int length = bl.size();
-	int end = length - 1;
+        // System.err.println("COFP");
+        int start = 0;
+        int length = bl.size();
+        int end = length - 1;
 
-	while (start <= end) {
-	    int mid = (start + end) / 2;
-	    // System.err.println("Start=" + start + " mid=" + mid + " end=" + end);
-	    Location block = (Location) bl.get(mid);
-	    if (block.contains(point)) {
-		return mid;
-	    } else if (point < block.getMin()) {
-		end = mid - 1;
-	    } else if (point > block.getMax()) {
-		start = mid + 1;
-	    } else {
-		throw new BioError("Assertion failed: overrun in binary search");
-	    }
-	}
-	if (start >= 0) {
-	    return start;
-	} else {
-	    return -1;
-	}
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            // System.err.println("Start=" + start + " mid=" + mid + " end=" + end);
+            Location block = (Location) bl.get(mid);
+            if (block.contains(point)) {
+                return mid;
+            } else if (point < block.getMin()) {
+                end = mid - 1;
+            } else if (point > block.getMax()) {
+                start = mid + 1;
+            } else {
+                throw new BioError("Assertion failed: overrun in binary search");
+            }
+        }
+        if (start >= 0) {
+            return start;
+        } else {
+            return -1;
+        }
     }
 
     /**
@@ -325,59 +325,59 @@ final public class LocationTools {
     public static boolean overlaps(Location locA, Location locB) {
         if(isDecorated(locA) || isDecorated(locB))
         {
-	    handleDecorations(locA, locB);
-	    if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
+            handleDecorations(locA, locB);
+            if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
                 {
-		    return BetweenLocationTools.overlaps(locA, locB);
+                    return BetweenLocationTools.overlaps(locA, locB);
                 }
         }
 
-	if(locA.isContiguous() && locB.isContiguous()) {
-	    // if they are both solid, return whether the extents overlap
-	    return !(
-		     (locA.getMax() < locB.getMin()) ||
-		     (locA.getMin() > locB.getMax())
-		     );
-	} else {
-	    // System.err.println("Doing complex overlap stuff");
+        if(locA.isContiguous() && locB.isContiguous()) {
+            // if they are both solid, return whether the extents overlap
+            return !(
+                     (locA.getMax() < locB.getMin()) ||
+                     (locA.getMin() > locB.getMax())
+                     );
+        } else {
+            // System.err.println("Doing complex overlap stuff");
 
-	    List blA = getBlockList(locA);
-	    {
-		// System.err.println("In A restriction");
-		int minBlock = blockContainingOrFollowingPoint(blA, locB.getMin());
-		int maxBlock = blockContainingOrPreceedingPoint(blA, locB.getMax());
-		if (minBlock == -1 || maxBlock == -1) {
-		    // System.err.println("blA empty: minBlock=" + minBlock +", maxBlock=" + maxBlock);
-		    return false;
-		}
-		blA = blA.subList(minBlock, maxBlock + 1);
-	    }
-	    List blB = getBlockList(locB);
-	    {
-		// System.err.println("In B restriction");
-		int minBlock = blockContainingOrFollowingPoint(blB, locA.getMin());
-		int maxBlock = blockContainingOrPreceedingPoint(blB, locA.getMax());
-		if (minBlock == -1 || maxBlock == -1) {
-		    // System.err.println("blB empty: minBlock=" + minBlock +", maxBlock=" + maxBlock);
-		    return false;
-		}
-		blB = blB.subList(minBlock, maxBlock + 1);
-	    }
+            List blA = getBlockList(locA);
+            {
+                // System.err.println("In A restriction");
+                int minBlock = blockContainingOrFollowingPoint(blA, locB.getMin());
+                int maxBlock = blockContainingOrPreceedingPoint(blA, locB.getMax());
+                if (minBlock == -1 || maxBlock == -1) {
+                    // System.err.println("blA empty: minBlock=" + minBlock +", maxBlock=" + maxBlock);
+                    return false;
+                }
+                blA = blA.subList(minBlock, maxBlock + 1);
+            }
+            List blB = getBlockList(locB);
+            {
+                // System.err.println("In B restriction");
+                int minBlock = blockContainingOrFollowingPoint(blB, locA.getMin());
+                int maxBlock = blockContainingOrPreceedingPoint(blB, locA.getMax());
+                if (minBlock == -1 || maxBlock == -1) {
+                    // System.err.println("blB empty: minBlock=" + minBlock +", maxBlock=" + maxBlock);
+                    return false;
+                }
+                blB = blB.subList(minBlock, maxBlock + 1);
+            }
 
-	    // System.err.println("Restricted lists");
+            // System.err.println("Restricted lists");
 
-	    for(Iterator aI = blA.iterator(); aI.hasNext(); ) {
-		Location a = (Location) aI.next();
-		for(Iterator bI = blB.iterator(); bI.hasNext(); ) {
-		    Location b = (Location) bI.next();
-		    if(LocationTools.overlaps(a, b)) {
-			return true;
-		    }
-		}
-	    }
+            for(Iterator aI = blA.iterator(); aI.hasNext(); ) {
+                Location a = (Location) aI.next();
+                for(Iterator bI = blB.iterator(); bI.hasNext(); ) {
+                    Location b = (Location) bI.next();
+                    if(LocationTools.overlaps(a, b)) {
+                        return true;
+                    }
+                }
+            }
 
-	    return false;
-	}
+            return false;
+        }
     }
 
     /**
@@ -392,35 +392,35 @@ final public class LocationTools {
     public static boolean contains(Location locA, Location locB) {
         if(isDecorated(locA) || isDecorated(locB))
         {
-	    handleDecorations(locA, locB);
-	    if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
+            handleDecorations(locA, locB);
+            if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
                 {
-		    return BetweenLocationTools.contains(locA, locB);
+                    return BetweenLocationTools.contains(locA, locB);
                 }
         }
 
-	if (locA.getMin() <= locB.getMin() && locA.getMax() >= locB.getMax()) {
-	    if (locA.isContiguous()) {
-		return true;
-	    } else {
-		List blA = getBlockList(locA);
-		for (Iterator biB = locB.blockIterator(); biB.hasNext(); ) {
-		    Location bloc = (Location) biB.next();
-		    int hitIndex = blockContainingPoint(blA, bloc.getMin());
-		    if (hitIndex < 0) {
-			return false;
-		    } else {
-			Location hitBloc = (Location) blA.get(hitIndex);
-			if (bloc.getMax() > hitBloc.getMax()) {
-			    return false;
-			}
-		    }
-		}
-		return true;
-	    }
-	} else {
-	    return false;
-	}
+        if (locA.getMin() <= locB.getMin() && locA.getMax() >= locB.getMax()) {
+            if (locA.isContiguous()) {
+                return true;
+            } else {
+                List blA = getBlockList(locA);
+                for (Iterator biB = locB.blockIterator(); biB.hasNext(); ) {
+                    Location bloc = (Location) biB.next();
+                    int hitIndex = blockContainingPoint(blA, bloc.getMin());
+                    if (hitIndex < 0) {
+                        return false;
+                    } else {
+                        Location hitBloc = (Location) blA.get(hitIndex);
+                        if (bloc.getMax() > hitBloc.getMax()) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        } else {
+            return false;
+        }
     }
 
   /**
@@ -599,7 +599,8 @@ final public class LocationTools {
      * A simple method to generate a RangeLocation wrapped
      * in a CircularLocation. The method will cope with situtations
      * where the min is greater than the max. Either of min or max can
-     * be negative, or greater than the underlying sequence length.
+     * be negative, or greater than the underlying sequence length. If min and
+     * max are equal a wrapped point location will be made.
      *
      * @param min the "left" end of the location
      * @param max the "right" end of the location
@@ -680,7 +681,7 @@ final public class LocationTools {
           return res;
       }
   }
-  
+
     /**
      * Subtract one location from another.  This methods calculates the set of
      * points which are contains in location <code>x</code> but not in <code>y</code>.
@@ -690,12 +691,12 @@ final public class LocationTools {
      * @return a location containing all points which are in x but not y
      * @since 1.3
      */
-  
+
     public static Location subtract(Location x, Location y) {
         if (isDecorated(x) || isDecorated(y)) {
             handleDecorations(x, y);
         }
-        
+
         List spans = new ArrayList();
         for (Iterator i = x.blockIterator(); i.hasNext(); ) {
             Location xb = (Location) i.next();

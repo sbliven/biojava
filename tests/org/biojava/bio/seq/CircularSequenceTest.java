@@ -49,43 +49,54 @@ public class CircularSequenceTest extends TestCase
 
     protected void setUp() throws Exception
     {
-	
+
         dna = DNATools.createDNASequence("atcgctcaga","");
-	circ = new CircularView(dna);
+        circ = new CircularView(dna);
     }
-    
+
+    public void testLocations(){
+      CircularLocation cloc = LocationTools.makeCircularLocation(1,5,dna.length());
+      assertEquals("atcgc", cloc.symbols(dna).seqString());
+
+      cloc = LocationTools.makeCircularLocation(1,10,dna.length());
+      assertEquals("atcgctcaga", cloc.symbols(dna).seqString());
+
+      cloc = LocationTools.makeCircularLocation(9,1,dna.length());
+      assertEquals("gaa", cloc.symbols(dna).seqString());
+    }
+
 
     public void testSubStr()
     {
         assertEquals("atc", circ.subStr(1,3));
-	assertEquals("aat", circ.subStr(0,2));
-	assertEquals("agaatc", circ.subStr(-2,3));
-	assertEquals("gaatc", circ.subStr(9,3));
-	assertEquals("gaatc", circ.subStr(9,13));
+        assertEquals("aat", circ.subStr(0,2));
+        assertEquals("agaatc", circ.subStr(-2,3));
+        assertEquals("gaatc", circ.subStr(9,3));
+        assertEquals("gaatc", circ.subStr(9,13));
     }
-    
+
     public void testSymbolAt()
     {
-	assertEquals(a, circ.symbolAt(0));
-	assertEquals(c, circ.symbolAt(13));
-	assertEquals(g, circ.symbolAt(-1));
-	assertEquals(t, circ.symbolAt(-4));
+        assertEquals(a, circ.symbolAt(0));
+        assertEquals(c, circ.symbolAt(13));
+        assertEquals(g, circ.symbolAt(-1));
+        assertEquals(t, circ.symbolAt(-4));
     }
-    
+
     public void testSubList() throws Exception
     {
         SymbolList s = DNATools.createDNA("agaatc");
         //System.out.println(circ.subList(-2,3).seqString());
         assertTrue(s.equals(circ.subList(-2,3)));
-	assertTrue(symsEq(circ.subList(-2,2), circ.subList(8,12)));
+        assertTrue(symsEq(circ.subList(-2,2), circ.subList(8,12)));
     }
-    
+
     private boolean symsEq(SymbolList a, SymbolList b){
-	if(a.length() != b.length()) return false;
-	for(int i = 1; i <= a.length(); i++){
-	  if(a.symbolAt(i) != b.symbolAt(i)) return false;
-	}
-	return true;
+        if(a.length() != b.length()) return false;
+        for(int i = 1; i <= a.length(); i++){
+          if(a.symbolAt(i) != b.symbolAt(i)) return false;
+        }
+        return true;
     }
 
 }
