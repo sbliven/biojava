@@ -21,6 +21,7 @@ public class RegexTest
     }
 
     public void testRegex()
+        throws Exception
     {
         // create a factory suitable for DNA
         PatternFactory fact = PatternFactory.makeFactory(DNATools.getDNA());

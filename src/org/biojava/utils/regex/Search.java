@@ -9,6 +9,7 @@ import java.util.HashSet;
 
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
 
@@ -81,8 +82,11 @@ public class Search
      * @param patternString String representation of the pattern.
      * @param overlap if true, the search continues at the base following the start to the previous hit.
      * If false, it continues at the base after the existing hit.
+     * @throws RegexException if the requested pattern is not valid
+     * @throws IllegalAlphabetException if the requested pattern is not valid
      */
     public void addPattern(String patternString, boolean overlap)
+        throws RegexException, IllegalAlphabetException
     {
         Pattern pattern = factory.compile(patternString);
         PatternInfo info = new PatternInfo();
