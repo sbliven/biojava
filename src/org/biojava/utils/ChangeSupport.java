@@ -100,20 +100,24 @@ public class ChangeSupport {
    * @param cl  the ChangeListener to add
    */
   public void addChangeListener(ChangeListener cl) {
-    addChangeListener(cl, null);
+    addChangeListener(cl, ChangeType.UNKNOWN);
   }
   
   /**
-   * Add a listener that will be informed of changes of a given type.
+   * Add a listener that will be informed of changes of a given type (and it's subtypes)
    *
    * @param cl  the ChangeListener
    * @param ct  the ChangeType it is to be informed of
    */
   public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    growIfNecisary();
-    types[listenerCount] = ct;
-    listeners[listenerCount] = new WeakReference(cl);
-    listenerCount++;
+      if (ct == null) {
+	  throw new NestedError("Since 1.2, listeners registered for the null changetype are not meaningful.  Please register a listener for ChangeType.UNKNOWN instead");
+      }
+
+      growIfNecisary();
+      types[listenerCount] = ct;
+      listeners[listenerCount] = new WeakReference(cl);
+      listenerCount++;
   }
   
   /**
@@ -140,7 +144,7 @@ public class ChangeSupport {
    * @param cl  a ChangeListener to remove
    */
   public void removeChangeListener(ChangeListener cl) {
-    removeChangeListener(cl, null);
+    removeChangeListener(cl, ChangeType.UNKNOWN);
   }
   
   /**
@@ -196,7 +200,7 @@ public class ChangeSupport {
     ChangeType ct = ce.getType();
     for(int i = 0; i < listenerCount; i++) {
       ChangeType lt = types[i];
-      if( (lt == null) || (lt == ct) ) {
+      if( ct.isMatchingType(lt)) {
         ChangeListener cl = (ChangeListener) listeners[i].get();
 	if (cl != null) {
 	    cl.preChange(ce);
@@ -226,7 +230,7 @@ public class ChangeSupport {
     ChangeType ct = ce.getType();
     for(int i = 0; i < listenerCount; i++) {
       ChangeType lt = types[i];
-      if( (lt == null) || (lt == ct) ) {
+      if( ct.isMatchingType(lt) ) {
         ChangeListener cl = (ChangeListener) listeners[i].get();
 	if (cl != null) {
 	    cl.postChange(ce);

@@ -32,14 +32,30 @@ import java.lang.reflect.*;
  * be specified at construction time, so that the ChangeType can
  * be properly serialized.  Typically, they should be constructed
  * using code like:
+ *
  * <pre>
- * class MyClassWhichCanThrowChangeEvents {
- * public final static ChangeEvent CHANGE_COLOR = new ChangeEvent(
- * "Color change",
- * MyClassWhichCanThrowChangeEvents.class,
- * "CHANGE_COLOR");
- * Rest of the class here...
+ * class MyClassWhichCanFireChangeEvents {
+ *   public final static ChangeEvent CHANGE_COLOR = new ChangeEvent(
+ *              "Color change",
+ *              MyClassWhichCanFireChangeEvents.class,
+ *              "CHANGE_COLOR");
+ *   // Rest of the class here...
  * }
+ * </pre>
+ *
+ * <p>
+ * As of BioJava 1.2, the known ChangeTypes of a system follow a simple
+ * hierarchy with single inheritance.  All ChangeTypes
+ * (except ChangeType.UNKNOWN) have a parent ChangeType (defaulting
+ * to ChangeType.UNKNOWN).  Generally, when a listener is registered
+ * for changetype <code>foo</code>, changes of type <code>bar</code>
+ * should be accepted if <code>bar</code> is a sub-type of <code>foo</code>.
+ * This can be checked using an expression like:
+ * </p>
+ *
+ * <pre>
+ *     bar.isMatchingType(foo);
+ * </pre>
  *
  * @author     Thomas Down
  * @author     Matthew Pocock
@@ -48,8 +64,9 @@ import java.lang.reflect.*;
  */
 
 public final class ChangeType implements Serializable {
-  private final String name;
-  private final Field ourField;
+    private final String name;
+    private final Field ourField;
+    private final ChangeType superType;
   
   /**
    * Constant ChangeType field which indicates that a change has
@@ -60,20 +77,36 @@ public final class ChangeType implements Serializable {
    */
   public static final ChangeType UNKNOWN;
 
+    /**
+     *  Construct a new ChangeType. 
+     *
+     * @param  name      The name of this change. 
+     * @param  ourField  The public static field which contains this 
+     *                   ChangeType. 
+     * @param  superType The supertype of this type.
+     *
+     * @since 1.2
+     */
+
+  public ChangeType(String name, Field ourField, ChangeType superType) {
+    this.name = name;
+    this.ourField = ourField;
+    this.superType = superType;
+  }
+
   /**
-   *  Construct a new ChangeType. 
+   *  Construct a new ChangeType with superType UNKNOWN. 
    *
    * @param  name      The name of this change. 
    * @param  ourField  The public static field which contains this 
    *      ChangeType. 
    */
   public ChangeType(String name, Field ourField) {
-    this.name = name;
-    this.ourField = ourField;
+      this(name, ourField, ChangeType.UNKNOWN);
   }
 
   /**
-   *  Construct a new ChangeType. 
+   *  Construct a new ChangeType with supertype UNKNOWN.
    *
    * @param  name   The name of this change. 
    * @param  clazz  The class which is going to contain this change. 
@@ -83,7 +116,25 @@ public final class ChangeType implements Serializable {
    * @throws        BioError If the field cannot be found. 
    */
   public ChangeType(String name, Class clazz, String fname) {
+      this(name, clazz, fname, ChangeType.UNKNOWN);
+  }
+
+  /**
+   *  Construct a new ChangeType with supertype UNKNOWN
+   *
+   * @param  name   The name of this change. 
+   * @param  clazz  The class which is going to contain this change. 
+   * @param  fname  
+   * The name of the field in <code>clazz</code> which 
+   * is to contain a reference to this change.
+   * @param superType the supertype of this type.
+   * @throws        BioError If the field cannot be found.
+   *
+   * @since 1.2 
+   */
+  public ChangeType(String name, Class clazz, String fname, ChangeType superType) {
     this.name = name;
+    this.superType = superType;
     try {
       this.ourField = clazz.getField(fname);
     }
@@ -92,18 +143,23 @@ public final class ChangeType implements Serializable {
     }
   }
 
-  public ChangeType(String name, String className, String fieldName) {
-    this.name = name;
-    try {
-      Class clazz = Class.forName(className);
-      this.ourField = clazz.getField(fieldName);
-    } catch (Exception ex) {
-      throw new NestedError(ex,
-        "Couldn't find class or field " + className +
-        "->" + fieldName
-      );
+    public ChangeType(String name, String className, String fieldName, ChangeType superType) {
+	this.name = name;
+	this.superType = superType;
+	try {
+	    Class clazz = Class.forName(className);
+	    this.ourField = clazz.getField(fieldName);
+	} catch (Exception ex) {
+	    throw new NestedError(ex,
+				  "Couldn't find class or field " + className +
+				  "->" + fieldName
+				  );
+	}
     }
-  }
+
+    public ChangeType(String name, String className, String fieldName) {
+	this(name, className, fieldName, ChangeType.UNKNOWN);
+    }
 
   /**
    *  Return the name of this change. 
@@ -144,7 +200,8 @@ public final class ChangeType implements Serializable {
     UNKNOWN = new ChangeType(
       "Unknown change", 
       ChangeType.class, 
-      "UNKNOWN"
+      "UNKNOWN",
+      null
     );
   }
 
@@ -172,4 +229,62 @@ public final class ChangeType implements Serializable {
 
 	return types;
     }
+
+    /**
+     * Return the immediate supertype (internal use only)
+     */
+
+    private ChangeType getSuperType() {
+	return superType;
+    }
+
+    /**
+     * Return an iterator which contains this type, and all supertypes.
+     *
+     * @since 1.2
+     */
+
+    public Iterator matchingTypes() {
+	return new Iterator() {
+		ChangeType cti = ChangeType.this;
+
+		public boolean hasNext() {
+		    return superType != null;
+		}
+
+		public Object next() {
+		    if (cti == null) {
+			throw new NoSuchElementException("No more elements");
+		    }
+
+		    ChangeType rt = cti;
+		    cti = cti.getSuperType();
+
+		    return rt;
+		}
+
+		public void remove() {
+		    throw new UnsupportedOperationException("Can't remove");
+		}
+	    } ;
+    }
+
+    /**
+     * Return <code>true</code> iff <code>ct</code> is equal to this type
+     * or any of it's supertypes (including ChangeType.UNKNOWN).
+     *
+     * @since 1.2
+     */
+
+    public boolean isMatchingType(ChangeType ct) {
+	for (Iterator i = matchingTypes(); i.hasNext(); ) {
+	    ChangeType mt = (ChangeType) i.next();
+	    if (mt == ct) {
+		return true;
+	    }
+	}
+
+	return false;
+    }
 }
+
