@@ -37,6 +37,7 @@ import org.biojava.utils.ParserException;
  * </p>
  *
  * @author Matthew Pocock
+ * @author David Huen (change of TagValueWrapper to interface)
  * @since 1.2
  */
 public abstract class SimpleTagValueWrapper
