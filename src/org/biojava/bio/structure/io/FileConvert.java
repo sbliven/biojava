@@ -21,15 +21,19 @@
  */
 package org.biojava.bio.structure.io;
 
-import org.biojava.bio.structure.* ;
+import org.biojava.bio.structure.*  ;
 
-import java.util.ArrayList ;
-import java.util.HashMap ;
-import java.text.DecimalFormat;
+import java.util.ArrayList          ;
+import java.util.HashMap            ;
+import java.text.DecimalFormat      ;
 
 // xml writer ...
-import org.biojava.utils.xml.*;
-import java.io.IOException ;
+import org.biojava.utils.xml.*      ;
+import java.io.IOException          ;
+
+// for formatting on numbers
+import java.util.Locale             ;
+import java.text.NumberFormat       ;
 
 /** Methods to convert a structure object into different file formats.
  * @author Andreas Prlic
@@ -78,8 +82,17 @@ public class FileConvert {
 	StringBuffer str = new StringBuffer();
 	int i = 0 ;
 	
-	DecimalFormat d3 = new DecimalFormat("0.000");
-	DecimalFormat d2 = new DecimalFormat("0.00");
+	// Locale should be english, e.g. in DE separator is "," -> PDB files have "." !
+	DecimalFormat d3 = (DecimalFormat)NumberFormat.getInstance(java.util.Locale.UK);
+	d3.setMaximumIntegerDigits(3);	
+	d3.setMinimumFractionDigits(3);
+	d3.setMaximumFractionDigits(3);
+
+	DecimalFormat d2 = (DecimalFormat)NumberFormat.getInstance(java.util.Locale.UK);
+	d2.setMaximumIntegerDigits(3);	
+	d3.setMinimumFractionDigits(3);
+	d3.setMaximumFractionDigits(3);
+
 
 	// do for all models
 	int nrModels = structure.nrModels() ;
@@ -101,14 +114,13 @@ public class FileConvert {
 		// do for all groups
 		int nrGroups = chain.getLength();
 		for ( int h=0; h<nrGroups;h++){
-
+		    
 		    Group g= chain.getGroup(h);
 		    String type = g.getType() ;
 
 		    String record = "" ;
 		    if ( type.equals("hetatm") ) {
 			record = "HETATM";
-		
 		    } else {
 			record = "ATOM  ";
 		    }
