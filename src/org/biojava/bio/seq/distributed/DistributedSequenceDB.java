@@ -32,6 +32,7 @@ import org.biojava.bio.seq.db.*;
  * Sequence database from the meta-DAS system.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.2
  *
  * @for.user
@@ -184,5 +185,25 @@ public class DistributedSequenceDB extends AbstractSequenceDB implements Sequenc
 	    }
 	}
 	return ids;
+    }
+    
+    public FeatureHolder filter(FeatureFilter ff) {
+      try {
+        MergeFeatureHolder mfh =  new MergeFeatureHolder();
+        
+        for(Iterator i = datasources.iterator(); i.hasNext(); ) {
+          DistDataSource dds = (DistDataSource) i.next();
+          FeatureHolder fh = dds.getFeatures(ff);
+          if(fh.countFeatures() > 0) {
+            mfh.addFeatureHolder(fh);
+          }
+        }
+        
+        return mfh;
+      } catch (ChangeVetoException cve) {
+        throw new BioError(cve, "This should not happen");
+      } catch (BioException be) {
+        throw new BioRuntimeException(be);
+      }
     }
 }
