@@ -75,18 +75,21 @@ public class ChunkedSymbolList
 
   public Symbol symbolAt(int pos) {
     int offset;
-
     --pos;
-    if ((pos < currentMin) || (pos > currentMax)) {
-      int chnk = pos / chunkSize;
-      offset =  pos % chunkSize;
 
-      currentMin = pos - offset;
-      currentMax = currentMin + chunkSize - 1;
-      currentChunk = chunks[chnk];
-    }
-    else {
-      offset = pos - currentMin;
+    synchronized(this) {
+      if ((pos < currentMin) || (pos > currentMax)) {
+        // bad - we are outside the current chunk
+        int chnk = pos / chunkSize;
+        offset =  pos % chunkSize;
+
+        currentMin = pos - offset;
+        currentMax = currentMin + chunkSize - 1;
+        currentChunk = chunks[chnk];
+      }
+      else {
+        offset = pos - currentMin;
+      }
     }
 
     return currentChunk.symbolAt(offset + 1);

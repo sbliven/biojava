@@ -61,14 +61,14 @@ public class PackedSymbolList
   implements
     java.io.Serializable
 {
-  private final byte bitsPerElement = 64;
+  private static final byte BITS_PER_ELEMENT = 64;
 
   private final Packing packing;
   private final long[] syms;
   private final int length;
   private final byte symsPerElement;
   private final byte mask;
-  
+
   // scratch area for optimisations
   // WARNING: these variables constitute an opportunity
   // for things to go wrong when doing multithreaded access
@@ -82,11 +82,11 @@ public class PackedSymbolList
   public Alphabet getAlphabet() {
     return packing.getAlphabet();
   }
-  
+
   public int length() {
     return length;
   }
-  
+
   /**
    * <p>
    * Create a new PackedSymbolList directly from a bit pattern.
@@ -104,14 +104,14 @@ public class PackedSymbolList
    * @param length the length of the sequence packed in symbols
    */
   public PackedSymbolList(Packing packing, long[] syms, int length) {
-    this.symsPerElement = (byte) (bitsPerElement / packing.wordSize());
+    this.symsPerElement = (byte) (BITS_PER_ELEMENT / packing.wordSize());
     this.packing = packing;
     this.syms = syms;
     this.length = length;
     this.mask = calcMask(packing);
     wordsize = packing.wordSize();
   }
-  
+
   /**
    * <p>
    * Create a new PackedSymbolList as a packed copy of another symbol list.
@@ -133,9 +133,9 @@ public class PackedSymbolList
         " and symbol list " + symList.getAlphabet()
       );
     }
-    
+
     try {
-      this.symsPerElement = (byte) (bitsPerElement / packing.wordSize());
+      this.symsPerElement = (byte) (BITS_PER_ELEMENT / packing.wordSize());
       this.packing = packing;
       this.length = symList.length();
       this.syms = new long[
@@ -144,7 +144,7 @@ public class PackedSymbolList
       ];
       this.mask = calcMask(packing);
       wordsize = packing.wordSize();
-      
+
       // pack the body of the sequence
       int ii = 0;
       for(int i = 0; i < (syms.length - 1); i++) {
@@ -180,7 +180,7 @@ public class PackedSymbolList
       throw new AssertionFailure("Assertion Failure: Symbol got lost somewhere", ise);
     }
   }
-  
+
   /**
    * <p>
    * Create a new PackedSymbolList from an array of Symbols.
@@ -210,13 +210,13 @@ public class PackedSymbolList
     // check that array length makes sense
     if (symbols.length < length) {
       throw new IllegalArgumentException(
-        "Symbol array size is too small to get " + length + 
+        "Symbol array size is too small to get " + length +
         "symbols from."
       );
     }
-    
+
     try {
-      this.symsPerElement = (byte) (bitsPerElement / packing.wordSize());
+      this.symsPerElement = (byte) (BITS_PER_ELEMENT / packing.wordSize());
       this.packing = packing;
       this.length = length;
       this.syms = new long[
@@ -225,7 +225,7 @@ public class PackedSymbolList
       ];
       this.mask = calcMask(packing);
       wordsize = packing.wordSize();
-      
+
       // pack the body of the sequence
       int ii = 0;
       for(int i = 0; i < (syms.length - 1); i++) {
@@ -259,36 +259,38 @@ public class PackedSymbolList
       throw new AssertionFailure("Assertion Failure: Symbol got lost somewhere",ise);
     }
   }
-  
-  public synchronized Symbol symbolAt(int indx) {
+
+  public Symbol symbolAt(int indx) {
     indx--;
 
     int word;
     int offset;
+    long l;
 
-    if ((indx < currentMin) || (indx > currentMax)) {
-      word = indx / symsPerElement;
-      offset = indx % symsPerElement;
+    synchronized(this) {
+      if ((indx < currentMin) || (indx > currentMax)) {
+        word = indx / symsPerElement;
+        offset = indx % symsPerElement;
 
-      currentMin = indx - offset;
-      currentMax = currentMin + symsPerElement - 1; 
-      currentWord = syms[word];
+        currentMin = indx - offset;
+        currentMax = currentMin + symsPerElement - 1;
+        currentWord = syms[word];
+      }
+      else {
+        offset = indx - currentMin;
+      }
+
+      l = currentWord;
     }
-    else {
-      offset = indx - currentMin;
-    }
 
-    long l = currentWord;
     int jj = offset * wordsize;
-//    int jj = offset * packing.wordSize();
-    
     try {
       return packing.unpack((byte) ((l >> (long) jj) & mask));
     } catch (IllegalSymbolException ise) {
       throw new AssertionFailure("Could not unpack " + indx + " at " + "word" + "," + offset, ise);
     }
   }
-  
+
   /**
    * Dump out the long as a binary string.
    *
@@ -300,7 +302,7 @@ public class PackedSymbolList
     }
     System.out.println();
   }
-  
+
   private static byte calcMask(Packing packing) {
     byte mask = 0;
     for(int i = 0; i < packing.wordSize(); i++) {
@@ -308,7 +310,7 @@ public class PackedSymbolList
     }
     return mask;
   }
-  
+
   /**
    * <p>
    * Return the long array within which the symbols are bit-packed.
