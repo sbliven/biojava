@@ -35,6 +35,7 @@ import org.biojava.utils.ChangeVetoException;
  * once? It also has support for the ChangeEvents.
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
 public abstract class AbstractFeatureHolder
   extends
@@ -43,7 +44,7 @@ public abstract class AbstractFeatureHolder
     FeatureHolder
 {
     public FeatureHolder filter(FeatureFilter filter) {
-        boolean recurse = FilterUtils.areProperSubset(filter, FeatureFilter.top_level);
+        boolean recurse = !FilterUtils.areProperSubset(filter, FeatureFilter.top_level);
         return filter(filter, recurse);
     }
 
