@@ -12,22 +12,26 @@
   targets:
 
     compile
-    compile-tests   compiles JUnit tests
-    compile-demos   compiles the demo files
-    compile-apps    compiles the application files
-    package-biojava builds the biojava.jar file (default)
-    package-demos   builds the demos.jar file
-    package-apps    builds the jar.apps file
-    runtests        runs all JUnit tests
-    seqtests        runs sequence subset of JUnit tests
-    symboltests     runs symbol subset of JUnit tests
-    javadoc         builds API documentation
-    docbook         builds DocBook documentation
+    compile-tests     compiles JUnit tests
+    compile-demos     compiles the demo files
+    compile-apps      compiles the application files
+    package-biojava   builds the biojava.jar file (default)
+    package-demos     builds the demos.jar file
+    package-apps      builds the jar.apps file
+    runtests          runs all JUnit tests
+    seqtests          runs sequence subset of JUnit tests
+    symboltests       runs symbol subset of JUnit tests
+    javadocs-biojava  builds biojava API documentation
+    javadocs-taglets  builds taglets API documentation
+    javadocs-grammars builds grammars API documentation
+    javadocs-demos    builds demos API documentation
+    javadocs-all      builds API documentation for all the above
+    docbook           builds DocBook documentation
     dist
-    dist-zip        'binary' release (jar & documentation) in zip format
-    dist-tgz        'binary' release (jar & documentation) in tar.gz format
-    dist-both       both dist-zip & dist-tgz
-    clean           cleans up the build & dist directories
+    dist-zip          'binary' release (jar & documentation) in zip format
+    dist-tgz          'binary' release (jar & documentation) in tar.gz format
+    dist-both         both dist-zip & dist-tgz
+    clean             cleans up the build & dist directories
 
   author:  Michael Heuer, modified by Keith James (JUnit support,
            DocBook support), modified Greg Cox (fixed documentation)
