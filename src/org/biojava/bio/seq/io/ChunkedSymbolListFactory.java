@@ -49,25 +49,25 @@ import org.biojava.utils.*;
  *       // deal with symbols
  *       public void addSymbols(Alphabet alpha, Symbol[] syms, int pos, int len)
  *         throws IllegalAlphabetException
- *           {
- *             chunker.addSymbols(alpha, syms, pos, len);
- *           }
+ *       {
+ *         chunker.addSymbols(alpha, syms, pos, len);
+ *       }
  *
- *           // make the sequence
- *           public Sequence makeSequence()
- *           {
- *             try {
- *               // make the SymbolList
- *               SymbolList symbols = chunker.makeSymbolList();
- *               seq = new SimpleSequence(symbols, uri, name, annotation);
+ *       // make the sequence
+ *       public Sequence makeSequence()
+ *       {
+ *         try {
+ *           // make the SymbolList
+ *           SymbolList symbols = chunker.makeSymbolList();
+ *           seq = new SimpleSequence(symbols, uri, name, annotation);
  *
- *               // call superclass method
- *               return super.makeSequence();
- *             }
- *             catch (IllegalAlphabetException iae) {
- *               throw new BioError("couldn't create symbol list");
- *             }
- *           }
+ *           // call superclass method
+ *           return super.makeSequence();
+ *         }
+ *         catch (IllegalAlphabetException iae) {
+ *           throw new BioError("couldn't create symbol list");
+ *         }
+ *       }
  *     };
  *   }
  * }
