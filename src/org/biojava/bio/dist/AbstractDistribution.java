@@ -119,7 +119,7 @@ public abstract class AbstractDistribution
    * Implement this to actually set the weight.
    *
    * <p>
-   * Do not inform any listneres. This has already been done for you. Just
+   * Do not inform any listeners. This has already been done for you. Just
    * update state.
    * </p>
    *
