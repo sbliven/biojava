@@ -24,8 +24,10 @@ package org.biojava.bio.symbol;
 import java.util.List;
 import java.util.ArrayList;
 import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.Feature;
 import org.biojava.bio.BioException;
-
+import org.biojava.utils.ChangeVetoException;
 /**
  * Class to perform arbitrary regex-like searches on
  * any FiniteAlphabet.
@@ -214,6 +216,53 @@ public class PatternSearch
         state.symListPos = pos;
 
         return match(p, sl, state);
+    }
+
+    /**
+     * Annotates the sequence with Features marking where matches to
+     * the specified sequence were encountered.
+     * @param p Pattern to match.
+     * @param seq Sequence to find match in.
+     * @param ft Feature.Template to be used in creating the Feature.
+     */
+    public static void match(Pattern p, Sequence seq, Feature.Template ft)
+        throws BioException, IllegalAlphabetException, ChangeVetoException
+    {
+        // check that the alphabets are compatible
+        if (p.getAlphabet() != seq.getAlphabet())
+            throw new IllegalAlphabetException("alphabets are not compatible.");
+
+        // mark out all hits with a Location object
+        MatchState state = new MatchState();
+        for (int i=1; i <= seq.length(); i++) {
+            state.symListPos = i;
+            state.resetPattern();
+            if (match(p, seq, state)) {
+                // add an annotation to mark the site
+                Location loc = new RangeLocation(i, state.symListPos - 1);
+                ft.location = loc;
+                seq.createFeature(ft);
+            }
+        }
+    }
+
+    /**
+     * Compute the extent from matching the Pattern to the specified position.
+     * @param p Pattern to match.
+     * @param sl SymbolList to find match in.
+     * @param pos position to look for match at.
+     * @return RangeLocation if a match was achieved, null if not.
+     */
+    public static RangeLocation getMatchRange(Pattern p, SymbolList sl, int pos)
+    {
+        MatchState state = new MatchState();
+        state.symListPos = pos;
+
+        if (match(p, sl, state)) {
+            return new RangeLocation(pos, state.symListPos - 1);
+        }
+        else
+            return null;
     }
 
     private static boolean match(Pattern p, SymbolList sl, MatchState state)
