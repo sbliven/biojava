@@ -26,8 +26,8 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
- * SymbolList which gives a view of the reverse complement of
- * another SymbolList.
+ * SymbolList which gives a view of the complement of
+ * another SymbolList (not the reverse-complement).
  * <P>
  * The parent SymbolList must use
  * either the DNA or DNA-AMBIGUITY alphabet, as provided
@@ -36,7 +36,7 @@ import org.biojava.bio.symbol.*;
  * @author Thomas Down
  */
 
-public class ComplementSymbolList extends AbstractSymbolList {
+class ComplementSymbolList extends AbstractSymbolList {
     private SymbolList parent;
 
     public ComplementSymbolList(SymbolList p) throws IllegalAlphabetException {
@@ -56,7 +56,7 @@ public class ComplementSymbolList extends AbstractSymbolList {
 
     public Symbol symbolAt(int pos) {
 	try {
-	    return DNATools.complement(parent.symbolAt(parent.length() - pos + 1));
+	    return DNATools.complement(parent.symbolAt(pos));
 	} catch (IllegalSymbolException ex) {
 	    throw new BioError(ex);
 	}

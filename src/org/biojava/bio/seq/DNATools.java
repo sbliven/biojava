@@ -307,7 +307,19 @@ public class DNATools {
     throw new BioError("Symbol not mapped to symbol list: " +
                        res.getName());
   }
- 
+  
+  /**
+   * Retrieve a complement view of list.
+   *
+   * @param list  the ResidueList to complement
+   * @return a SymbolList that is the complement
+   * @throws IllegalAlphabetException if list is not a complementable alphabet
+   */
+  static SymbolList complement(SymbolList list)
+  throws IllegalAlphabetException {
+    return new ComplementSymbolList(list);
+  }
+  
   /**
    * Helps build the complement infomation.
    */

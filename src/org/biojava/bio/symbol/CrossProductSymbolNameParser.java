@@ -25,6 +25,12 @@ package org.biojava.bio.symbol;
 import java.util.*;
 import org.biojava.bio.*;
 
+/**
+ * Allows Symbol objects to be created from Strings assuming that they follow
+ * the guide-lines layed down in CrossProductAlphabet for naming.
+ *
+ * @author Matthew Pocock
+ */
 public class CrossProductSymbolNameParser implements SymbolParser {
   private final CrossProductAlphabet alpha;
   private final SymbolParser [] parser;

@@ -25,6 +25,12 @@ import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
+/**
+ * The central port-of-call for all information and functionality specific to
+ * SymbolLists over the protein alphabet.
+ *
+ * @author Matthew Pocock
+ */
 public class ProteinTools {
   private static final FiniteAlphabet proteinAlpha;
   private static final FiniteAlphabet proteinXAlpha;

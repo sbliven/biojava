@@ -48,7 +48,7 @@ public class PairDPMatrix implements DPMatrix {
 	scores = new double[seq0.length() + 2][seq1.length() + 2][states.length];
     }
 
-    public State[] States() {
+    public State[] states() {
 	return states;
     }
 

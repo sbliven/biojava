@@ -25,7 +25,12 @@ package org.biojava.bio.dp;
 import java.util.*;
 import org.biojava.bio.symbol.*;
 
-public class MatrixCursor extends AbstractCursor {
+/**
+ * Single-head DP cursor over an underlying matrix.
+ *
+ * @author Matthew Pocock
+ */
+class MatrixCursor extends AbstractCursor {
   private final SingleDPMatrix matrix;
   private final int dir;
 

@@ -26,18 +26,56 @@ import java.util.NoSuchElementException;
 
 import org.biojava.bio.*;
 
-
+/**
+ * An efficient implementation of an Alphabet over the infinite set of double
+ * values.
+ * <P>
+ * This class can be used to represent lists of floating-point numbers as a
+ * SymbolList with the alphabet DoubleAlphabet. These lists can then be
+ * annotated with features, or fed into dynamic-programming algorithms, or
+ * processed as per any other SymbolList object.
+ * <P>
+ * Object identity can not be used to decide if two DoubleResidue objects are
+ * the same. You must use the equals method, or compare doubleValue manualy.
+ *
+ * @author Matthew Pocock
+ */
 public class DoubleAlphabet implements Alphabet {
-  public static final DoubleAlphabet INSTANCE = new DoubleAlphabet();
+  /**
+   * The singleton instance of the DoubleAlphabet class.
+   */
+  private static final DoubleAlphabet INSTANCE = new DoubleAlphabet();
+  
+  /**
+   * Retrieve a SymbolList view of an array of doubles.
+   * <P>
+   * The returned object is a view onto the underlying array, and does not copy
+   * it. Changes made to the original array will alter the resulting SymbolList.
+   *
+   * @param dArray  the arrou of doubles to view
+   * @return a SymbolList over the DoubleAlphabet that represent the values in
+   *         dArray
+   */
   public static SymbolList fromArray(double [] dArray) {
     return new DoubleArray(dArray);
   }
 
+  /**
+   * Retrieve the single DoubleAlphabet instance.
+   *
+   * @return the singleton DoubleAlphabet instance
+   */
   public static DoubleAlphabet getInstance() {
     return INSTANCE;
   }
 
-  public static DoubleSymbol getSymbol(double val) {
+  /**
+   * Retrieve the Symbol for a double.
+   *
+   * @param val  the double to view
+   * @return a DoubleSymbol embodying val
+   */
+  public DoubleSymbol getSymbol(double val) {
     return new DoubleSymbol(val);
   }
  
@@ -69,8 +107,13 @@ public class DoubleAlphabet implements Alphabet {
   private DoubleAlphabet() {
   }
   
+  /**
+   * A single double value.
+   * <P>
+   * @author Matthew Pocock
+   */
   public static class DoubleSymbol implements Symbol {
-    private double val;
+    private final double val;
     
     public Annotation getAnnotation() {
       return Annotation.EMPTY_ANNOTATION;
@@ -93,6 +136,12 @@ public class DoubleAlphabet implements Alphabet {
     }
   }
   
+  /**
+   * A light-weight implementation of SymbolList that allows an array to
+   * appear to be a SymbolList.
+   *
+   * @author Matthew Pocock
+   */
   private static class DoubleArray extends AbstractSymbolList {
     private final double [] dArray;
     

@@ -107,10 +107,12 @@ public class HashSequenceDB implements SequenceDB {
   protected HashSequenceDB() {}
   
   /**
-   * You should make one of these to define how to make an ID for a sequence.
+   * Interface for objects that define how to make an ID for a sequence.
    * <P>
-   * This gives you the freedom to re-map names from the fasta names to some
-   * other representation if you need to.
+   * Nine times out of ten, you will use one of HashSequenceDB.byURN or
+   * HashSequenceDB.byName, but once in a blue-moon, you will want some other
+   * systematic way of retrieveing Sequences. This interface is here to allow
+   * you to plug in this funcitonality if you need it.
    */
   public static interface IDMaker {
     /**

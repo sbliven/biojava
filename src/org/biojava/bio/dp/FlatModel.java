@@ -279,11 +279,11 @@ class FlatModel extends ModelView {
     throw new UnsupportedOperationException("removeState not supported by FlatModel");
   }
 
-  public static interface Wrapper extends State {
+  private static interface Wrapper extends State {
     public State getWrapped();
   }
   
-  public static class DotStateWrapper implements Wrapper, DotState {
+  private static class DotStateWrapper implements Wrapper, DotState {
     private final State wrapped;
     private final String extra;
     
@@ -318,7 +318,7 @@ class FlatModel extends ModelView {
     }
   }
 
-  public static class EmissionWrapper
+  private static class EmissionWrapper
   extends StateView
   implements Wrapper {
     public Symbol sourceToView(Symbol r) {

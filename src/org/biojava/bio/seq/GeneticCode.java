@@ -25,7 +25,19 @@ import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
+/**
+ * Constant TranslationTable instances that embody the genetic code.
+ * <P>
+ * The genetic code defines how non-overlapping DNA triplets map into
+ * amino-acids and the translation-termination signal.
+ * 
+ * @author Matthew Pocock
+ */
 public class GeneticCode {
+  /**
+   * The UNIVERSAL genetic code - used by most organisms for their primary
+   * genome.
+   */
   public static final TranslationTable UNIVERSAL;
   
   static {

@@ -369,8 +369,8 @@ public abstract class DP {
           return fMatrix.resList();
         }
       
-        public State [] States() {
-          return fMatrix.States();
+        public State [] states() {
+          return fMatrix.states();
         }
       };
     } catch (Exception e) {
@@ -408,13 +408,14 @@ public abstract class DP {
       throw new BioError(ite,
         "Transition returned from sampleTransition is invalid");
     }
+    DoubleAlphabet dAlpha = DoubleAlphabet.getInstance();
     if (oldState instanceof EmissionState) {
       EmissionState eState = (EmissionState) oldState;
       token = eState.sampleSymbol();
       resScore += eState.getWeight(token);
       states.addSymbol(oldState);
       tokens.addSymbol(token);
-      scoreList.add(DoubleAlphabet.getSymbol(resScore));
+      scoreList.add(dAlpha.getSymbol(resScore));
       totScore += resScore;
       resScore = 0.0;
       i--;
@@ -442,7 +443,7 @@ public abstract class DP {
         resScore += eState.getWeight(token);
         states.addSymbol(newState);
         tokens.addSymbol(token);
-        scoreList.add(DoubleAlphabet.getSymbol(resScore));
+        scoreList.add(dAlpha.getSymbol(resScore));
         totScore += resScore;
         resScore = 0.0;
         i--;
@@ -453,13 +454,13 @@ public abstract class DP {
     List resListList = new ArrayList(3);
     resListList.add(tokens);
     resListList.add(states);
-    resListList.add(new SimpleSymbolList(DoubleAlphabet.INSTANCE, scoreList));
+    resListList.add(new SimpleSymbolList(dAlpha, scoreList));
     
     Map labelToResList = new HashMap();
     labelToResList.put(StatePath.SEQUENCE, tokens);
     labelToResList.put(StatePath.STATES, states);
     labelToResList.put(StatePath.SCORES,
-                       new SimpleSymbolList(DoubleAlphabet.INSTANCE, scoreList));
+                       new SimpleSymbolList(dAlpha, scoreList));
     return new SimpleStatePath(totScore, labelToResList);
   }
 

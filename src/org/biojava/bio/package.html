@@ -1,7 +1,15 @@
 <body>
-The exceptions that will be used throughout the bio packages.
+The core classes that will be used throughout the bio packages.
 <P>
-These exceptions are the scafolding of all error passing throughout this
-project. They are used to wrap disparate exceptions and errors so that
-they can be trapped in a sensible manner without getting exception-bloat.
+The classes BioException and BioError form the basis of error-handeling within
+the core classes. They both can optionaly wrap a source Throwable, and carry a
+message. The stack-trace printed should contain a single merged stack-trace,
+together with all messages inserted in the propper places. These exceptions
+can be nested to any depth, providing an organic and natural way to trace errors
+and bugs.
+<P>
+The Annotation classes are used throughout the org.biojava.bio interface
+hierachy to indicate that there is un-typed information that may optionaly be
+associated with an object. The Annotation object takes the form of a paranoid
+Map, and Annotatable flags an object as having an associated Annotation object.
 </body>

@@ -128,6 +128,11 @@ public interface Location {
    */
   static final Location empty = new EmptyLocation();
   
+  /**
+   * The implementation of Location that contains no positions at all.
+   *
+   * @author Matthew Pocock
+   */
   static final class EmptyLocation implements Location {
     public int getMin() { return Integer.MAX_VALUE; }
     public int getMax() { return Integer.MIN_VALUE; }

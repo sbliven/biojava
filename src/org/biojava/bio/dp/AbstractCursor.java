@@ -25,7 +25,12 @@ package org.biojava.bio.dp;
 import java.util.*;
 import org.biojava.bio.symbol.*;
 
-abstract public class AbstractCursor implements DPCursor {
+/**
+ * An abstract instance of a single-head DP cursor.
+ *
+ * @author Matthew Pocock
+ */
+abstract class AbstractCursor implements DPCursor {
   private Iterator resIterator;
   
   private Symbol currentRes;

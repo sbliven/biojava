@@ -25,7 +25,12 @@ package org.biojava.bio.dp;
 import java.util.*;
 import org.biojava.bio.symbol.*;
 
-public class SmallCursor extends AbstractCursor {
+/**
+ * Constant-memory implementation of single-head DP cursor.
+ *
+ * @author Matthew Pocock
+ */
+class SmallCursor extends AbstractCursor {
   private final SymbolList resList;
   private double [] currentC;
   private double [] lastC;

@@ -30,15 +30,29 @@ package org.biojava.bio;
 
 import java.io.*;
 
+/**
+ * A general perpous Error that can wrap another Throwable object.
+ * <P>
+ * BioError is an Error that should be thrown whenever some exceptional and
+ * unforseable event takes place. For example, sometimes exceptions can be
+ * thrown by a given method, but not when the calling method is a memeber of
+ * the same class. In this case, the try-catch block would collect the
+ * 'impossible' exception and throw a BioError that wraps it.
+ *
+ * @author Matthew Pocock
+ */
 public class BioError extends Error {
-  private Throwable subException = null;
+  /**
+   * The wrapped Throwable object
+   */
+  private final Throwable subException;
 
   public BioError(String message) {
-	  super(message);
+	  this(null, message);
   }
 
   public BioError(Throwable ex) {
-    this.subException = ex;
+    this(ex, null);
   }
 
   public BioError(Throwable ex, String message) {
@@ -47,7 +61,7 @@ public class BioError extends Error {
   }
   
   public BioError() {
-	  super();
+	  this(null, null);
   }
 
   public Throwable getWrappedException() {

@@ -597,10 +597,11 @@ private class Viterbi {
 	List resl = new ArrayList();
 	List scorel = new ArrayList();
 	bp = bp.back; // skip final MagicalState match
+  DoubleAlphabet dAlpha = DoubleAlphabet.getInstance();
 	while (bp != null) {
 	    statel.add(bp.state);
 	    resl.add(bp.symbol);
-	    scorel.add(DoubleAlphabet.getSymbol(bp.score));
+	    scorel.add(dAlpha.getSymbol(bp.score));
 	    bp = bp.back;
 	}
 	Collections.reverse(statel);
@@ -612,7 +613,7 @@ private class Viterbi {
 	labelToList.put(StatePath.STATES, 
 			new SimpleSymbolList(getModel().stateAlphabet(), statel));
 	labelToList.put(StatePath.SCORES,
-			new SimpleSymbolList(DoubleAlphabet.getInstance(),
+			new SimpleSymbolList(dAlpha,
 					      scorel));
 	return new SimpleStatePath(col[l], labelToList);
     }
@@ -990,7 +991,7 @@ private class Viterbi {
 			SymbolList seq2,
 			PairDPMatrix matrix
     ) {
-      numStates = matrix.States().length;
+      numStates = matrix.states().length;
 
       zeroCol = new double[numStates]; // don't touch this, please...
       for (int i = 0; i < zeroCol.length; ++i) {
@@ -1065,7 +1066,7 @@ private class Viterbi {
       SymbolList seq2,
       PairDPMatrix matrix
     ) {
-      State[] states = matrix.States();
+      State[] states = matrix.states();
       numStates = states.length;
 
       zeroCol = new double[numStates]; // don't touch this, please...

@@ -25,7 +25,7 @@ package org.biojava.bio.dp;
 import org.biojava.bio.symbol.*;
 
 public interface DPMatrix {
-  State [] States();
+  State [] states();
   MarkovModel model();
   SymbolList [] resList();
   double getScore();

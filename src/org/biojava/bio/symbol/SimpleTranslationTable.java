@@ -23,8 +23,13 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
-import org.biojava.bio.seq.*;
 
+/**
+ * A no-frills implementation of TranslationTable that uses a Map to map from
+ * symbols in a finite source alphabet into a target alphabet.
+ *
+ * @author Matthew Pocock
+ */
 public class SimpleTranslationTable implements TranslationTable {
   private final Map transMap;
   private final FiniteAlphabet source;

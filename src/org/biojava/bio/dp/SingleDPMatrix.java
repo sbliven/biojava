@@ -31,7 +31,7 @@ class SingleDPMatrix implements DPMatrix {
   final double [][] scores; // [symbol][state]
   double score;
  
-  public State [] States() {
+  public State [] states() {
     return states;
   }
   

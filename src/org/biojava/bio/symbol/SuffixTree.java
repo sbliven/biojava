@@ -120,7 +120,14 @@ public class SuffixTree {
     return resList.indexOf(r);
   }
   
-  // A node in the suffix tree
+  /**
+   * A node in the suffix tree.
+   * <P>
+   * This class is realy stupid & delegates most work off to a SuffixTree so
+   * that it is as small as possible.
+   *
+   * @author Matthe Pocock
+   */
   public static abstract class SuffixNode {
     abstract public boolean isTerminal();
     abstract public boolean hasChild(int i);

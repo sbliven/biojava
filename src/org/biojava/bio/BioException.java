@@ -30,6 +30,18 @@ package org.biojava.bio;
 
 import java.io.*;
 
+/**
+ * A general perpose Exception that can wrap another exception.
+ * <P>
+ * It is common practice in BioJava to throw a BioException or a subclass of it
+ * when something goes wrong. The exception can be used to catch another
+ * throwable, thus keeping a complete record of where the original error
+ * originated while adding annotation to the stack-trace. It also affords a neat
+ * way to avoid exception-bloat on method calls, particularly when objects are
+ * composed from several objects from different packages.
+ *
+ * @author Matthew Pocock
+ */
 public class BioException extends Exception {
   private Throwable subThrowable = null;
 
