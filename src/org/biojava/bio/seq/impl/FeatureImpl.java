@@ -72,6 +72,8 @@ public class FeatureImpl {
 				SimpleSimilarityPairFeature.class);
             d.addImplementation(RemoteFeature.Template.class,
 				SimpleRemoteFeature.class);
+            d.addImplementation(FramedFeature.Template.class,
+                                SimpleFramedFeature.class);
 	} catch (BioException ex) {
 	    throw new BioError(ex, "Couldn't initialize default FeatureRealizer");
 	}
