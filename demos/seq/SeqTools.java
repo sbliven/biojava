@@ -20,8 +20,9 @@
  */
 import java.util.*;
  
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.tools.*;
+
 
 /**
  * Common stuff that the demos rely on.
@@ -35,12 +36,12 @@ public class SeqTools {
    * @param length  the number of residues in the sequence
    * @return the generated sequence
    */
-  public static ResidueList createResidueList(int length)
-  throws IllegalResidueException {
+  public static SymbolList createSymbolList(int length)
+  throws IllegalSymbolException {
     List l = new ArrayList(length);
     for(int i = 0; i < length; i++) {
       l.add(DNATools.forIndex((int) (4.0*Math.random())));
     }
-    return new SimpleResidueList(DNATools.getAlphabet(), l);
+    return new SimpleSymbolList(DNATools.getAlphabet(), l);
   }
 }
