@@ -23,6 +23,15 @@ import org.biojava.bio.BioError;
  * bits 0 through packing.wordLength()-1 of the long at index 0.
  * <p>
  *
+ * <h2>Example Usage</h2>
+ * <pre>
+ * SymbolList symL = ...;
+ * SymbolList packed = new PackedSymbolList(
+ *   PackingFactory.getPacking(symL.getAlphabet(), true),
+ *   symL
+ * );
+ * </pre>
+ *
  * @author Matthew Pocock
  */
 public class PackedSymbolList
