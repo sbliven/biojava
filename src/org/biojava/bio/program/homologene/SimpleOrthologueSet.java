@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 
-public class SimpleOrthologueSet implements OrthologueSet
+public class SimpleOrthologueSet extends AbstractOrthologueSet
 {
 
     public class Iterator implements OrthologueSet.Iterator
@@ -65,12 +65,28 @@ public class SimpleOrthologueSet implements OrthologueSet
         return newOrthologue;
     }
 
+    public Orthologue createOrthologue(Taxon taxon, String locusID, String homologeneID, String accession)
+    {
+        // create the Orthologue
+        Orthologue newOrthologue = new SimpleOrthologue(taxon, locusID, homologeneID, accession);
+
+        // stash it
+        orthologueSet.add(newOrthologue);
+        orthologueByHomologeneID.put(homologeneID, newOrthologue);
+        return newOrthologue;
+    }
+
+    public void addOrthologue(Orthologue ortho)
+    {
+        orthologueSet.add(ortho);
+    }
+
     public Orthologue getOrthologue(String homologeneID)
     {
         return (Orthologue) orthologueByHomologeneID.get(homologeneID);
     }
 
-    public Iterator iterator()
+    public OrthologueSet.Iterator iterator()
     {
         return new Iterator(orthologueSet.iterator());
     }

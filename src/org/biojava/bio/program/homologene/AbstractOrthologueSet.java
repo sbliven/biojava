@@ -21,12 +21,33 @@
 
 package org.biojava.bio.program.homologene;
 
+import org.biojava.utils.ChangeVetoException;
 
 public abstract class AbstractOrthologueSet implements OrthologueSet
 {
     public abstract Orthologue createOrthologue(int taxonID, String locusID, String homologeneID, String accession);
+    public abstract Orthologue createOrthologue(Taxon taxon, String locusID, String homologeneID, String accession);
     public abstract Orthologue getOrthologue(String homologeneID);
 
-//    public OrthologueSet filter(OrthologueFilter filter);
+    public OrthologueSet filter(OrthologueFilter filter)
+    {
+        OrthologueSet results = new SimpleOrthologueSet();
+
+        for (Iterator orthoI = iterator();
+               orthoI.hasNext(); )
+        {
+            Orthologue ortho = orthoI.nextOrthologue();
+
+            if (filter.accept(ortho)) {
+                try {
+                    results.addOrthologue(ortho);
+                }
+                catch (ChangeVetoException cve) {
+                    // should be impossible as this group was created by me
+                }
+            }
+        }
+        return results;
+    }
 }
 

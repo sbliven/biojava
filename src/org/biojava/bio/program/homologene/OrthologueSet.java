@@ -21,6 +21,7 @@
 
 package org.biojava.bio.program.homologene;
 
+import org.biojava.utils.ChangeVetoException;
 
 public interface OrthologueSet
 {
@@ -31,6 +32,10 @@ public interface OrthologueSet
     }
 
     public Orthologue createOrthologue(int taxonID, String locusID, String homologeneID, String accession);
+    public Orthologue createOrthologue(Taxon taxon, String locusID, String homologeneID, String accession);
     public Orthologue getOrthologue(String homologeneID);
+    public void addOrthologue(Orthologue ortho) throws ChangeVetoException;
+    public Iterator iterator();
+    public OrthologueSet filter(OrthologueFilter filter);
 }
 
