@@ -19,7 +19,7 @@
  *
  */
 
-package org.biojava.bio.programs.abi;
+package org.biojava.bio.program.abi;
 
 import org.biojava.utils.io.CachingInputStream;
 import org.biojava.utils.io.Seekable;
