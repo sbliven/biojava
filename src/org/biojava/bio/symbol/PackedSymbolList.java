@@ -10,7 +10,7 @@ import org.biojava.bio.BioError;
  * <p>
  * Bit-packed symbol lists are space efficient compared to the usual pointer
  * stoorage model employed by implementatinos like SimpleSymbolList. This
- * comes at the cost of encoding/decoding symbols from the stoorage. In
+ * comes at the cost of encoding/decoding symbols from the storage. In
  * practice, the decrease in memory when stooring large sequences makes
  * applications go quicker because of issues like page swapping.
  * </p>
@@ -33,6 +33,7 @@ import org.biojava.bio.BioError;
  * </pre>
  *
  * @author Matthew Pocock
+ * @author David Huen (new constructor for Symbol arrays and some speedups)
  */
 public class PackedSymbolList
   extends
@@ -48,6 +49,15 @@ public class PackedSymbolList
   private final byte symsPerElement;
   private final byte mask;
   
+  // scratch area for optimisations
+  // WARNING: these variables constitute an opportunity
+  // for things to go wrong when doing multithreaded access
+  // via symbolAt().  Keep SymbolAt() synchronized so they
+  // don't get changed during a lookup! Naaasssty.
+  private int currentMin = Integer.MAX_VALUE;
+  private int currentMax = Integer.MIN_VALUE;
+  private long currentWord;
+
   public Alphabet getAlphabet() {
     return packing.getAlphabet();
   }
@@ -143,18 +153,109 @@ public class PackedSymbolList
     }
   }
   
-  public Symbol symbolAt(int indx) {
-    indx--;
-    int word = indx / symsPerElement;
-    int offset = indx % symsPerElement;
+  /**
+   * <p>
+   * Create a new PackedSymbolList from an array of Symbols.
+   * </p>
+   *
+   * <p>
+   * This will create a new and independent SymbolList formed from the
+   * the symbol array.
+   * </p>
+   *
+   * @param packing the way to bit-pack symbols
+   * @param symbols an array of Symbols
+   * @param length the number of Symbols to process from symbols
+   * @param alfa the alphabet from which the Symbols are drawn
+   */
+  public PackedSymbolList(Packing packing, Symbol [] symbols, int length, Alphabet alfa)
+  throws IllegalAlphabetException,IllegalArgumentException {
+
+    // verify that the alphabet is one I can deal with.
+    if(packing.getAlphabet() != alfa) {
+      throw new IllegalAlphabetException(
+        "Can't pack with alphabet " + packing.getAlphabet() +
+        " and symbol list " + alfa
+      );
+    }
+
+    // check that array length makes sense
+    if (symbols.length < length) {
+      throw new IllegalArgumentException(
+        "Symbol array size is too small to get " + length + 
+        "symbols from."
+      );
+    }
     
-    long l = syms[word];
+    try {
+      this.symsPerElement = (byte) (bitsPerElement / packing.wordSize());
+      this.packing = packing;
+      this.length = length;
+      this.syms = new long[
+        length / symsPerElement +
+        ((length % symsPerElement == 0) ? 0 : 1)
+      ];
+      this.mask = calcMask(packing);
+      
+      // pack the body of the sequence
+      for(int i = 0; i < (syms.length - 1); i++) {
+        int ii = i * symsPerElement;
+        long l = 0;
+        for(int j = 0; j < symsPerElement; j++) {
+          int jj = j * packing.wordSize();
+          long p = packing.pack(symbols[ii + j]);
+          l |= (long) ((long) p << (long) jj);
+        }
+        syms[i] = l;
+      }
+      // pack the final word
+      if(syms.length > 0) {
+        long l = 0;
+        int ii = (syms.length - 1) * symsPerElement;
+        int jMax = length % symsPerElement;
+        if(jMax == 0) {
+          jMax = symsPerElement;
+        }
+        for(int j = 0; j < jMax; j++) {
+          int jj = j * packing.wordSize();
+          long p = packing.pack(symbols[ii + j]);
+          l |= (long) ((long) p << (long) jj);
+        }
+        syms[syms.length - 1] = l;
+      }
+    } catch (IllegalSymbolException ise) {
+      throw new BioError(ise, "Assertion Failure: Symbol got lost somewhere");
+    }
+  }
+  
+  public synchronized Symbol symbolAt(int indx) {
+    indx--;
+
+    int word;
+    int offset;
+
+    if ((indx < currentMin) || (indx > currentMax)) {
+//      int word = indx / symsPerElement;
+//      int offset = indx % symsPerElement;
+      word = indx / symsPerElement;
+      offset = indx % symsPerElement;
+
+      currentMin = indx - offset;
+      currentMax = currentMin + symsPerElement - 1; 
+      currentWord = syms[word];
+    }
+    else {
+      offset = indx - currentMin;
+    }
+
+//    long l = syms[word];
+    long l = currentWord;
     int jj = offset * packing.wordSize();
     
     try {
       return packing.unpack((byte) ((l >> (long) jj) & mask));
     } catch (IllegalSymbolException ise) {
-      throw new org.biojava.utils.NestedError(ise, "Could not unpack " + indx + " at " + word + "," + offset);
+      throw new org.biojava.utils.NestedError(ise, "Could not unpack " + indx + " at " + "word" + "," + offset);
     }
   }
   
