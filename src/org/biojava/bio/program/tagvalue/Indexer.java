@@ -141,7 +141,7 @@ implements TagValueListener {
    * </p>
    *
    * <p>
-   * Secondary keys are potentialy non-unique properties of the entries being
+   * Secondary keys are potentially non-unique properties of the entries being
    * indexed. Multiple records can use the same secondary key values, and a
    * single record can have multiple values for a secondary key.
    * </p>

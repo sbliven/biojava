@@ -31,7 +31,7 @@ import org.biojava.utils.*;
  * <code>ConfigFile</code> implements reading, updating and writing
  * of OBDA tab-delimited index files.
  *
- * @author Unknown
+ * @author Matthew Pocock
  * @author Keith James
  */
 class ConfigFile

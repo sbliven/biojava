@@ -35,11 +35,10 @@ import org.biojava.utils.ParserException;
  * </p>
  *
  * @author Matthew Pocock
- * @author Keith james
+ * @author Keith James
  * @since 1.2
  */
 public interface TagValueParser {
-
     /**
      * <p><code>EMPTY_LINE_EOR</code> is a special EOR value which
      * allows an empty line to be used as a record separator. Normally
