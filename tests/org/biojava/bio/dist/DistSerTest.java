@@ -81,6 +81,7 @@ public class DistSerTest extends TestCase {
       ois.close();
 
 	assertTrue(DistributionTools.areEmissionSpectraEqual(dist, dist2));
+        assertEquals(dist.getAlphabet(), dist2.getAlphabet());
     }
 
     public void testGapSerialization()throws Exception{
@@ -96,7 +97,7 @@ public class DistSerTest extends TestCase {
 
 	assertTrue(DistributionTools.areEmissionSpectraEqual(gap, dist2));
     }
-		  
+
     public void testPairSerialization()throws Exception{
       File f = File.createTempFile("DistSerTest",".tmp");
       ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
@@ -121,7 +122,7 @@ public class DistSerTest extends TestCase {
       ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
       dist2 = (Distribution)ois.readObject();
       ois.close();
-  
+
       assertTrue(orderN.getAlphabet()== dist2.getAlphabet());
       assertTrue(orderN.getConditionedAlphabet() == ((OrderNDistribution)dist2).getConditionedAlphabet());
       assertTrue(orderN.getConditioningAlphabet() == ((OrderNDistribution)dist2).getConditioningAlphabet());

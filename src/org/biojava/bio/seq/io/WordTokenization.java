@@ -44,7 +44,7 @@ public abstract class WordTokenization
   extends
     Unchangeable
   implements
-    SymbolTokenization
+    SymbolTokenization, Serializable
 {
     private Alphabet alphabet;
 

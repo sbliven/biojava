@@ -53,7 +53,7 @@ public class CharacterTokenization
   extends
     Unchangeable
   implements
-    SymbolTokenization
+    SymbolTokenization, Serializable
 {
     private Alphabet alphabet;
     private Map symbolsToCharacters = new HashMap();
@@ -182,7 +182,7 @@ public class CharacterTokenization
 		throw new IllegalSymbolException("No mapping for symbol " + s.getName());
 	    }
 	}
-	
+
 	return c;
     }
 
