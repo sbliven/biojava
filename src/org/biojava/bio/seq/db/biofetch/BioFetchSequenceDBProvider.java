@@ -43,19 +43,19 @@ public class BioFetchSequenceDBProvider implements SequenceDBProvider {
     public SequenceDBLite getSequenceDB(Map config)
         throws RegistryException, BioException
     {
-	String prefix = (String) config.get("prefix");
+	String prefix = (String) config.get("location");
 	if (prefix == null) {
 	    throw new RegistryException("BioFetch requires prefix");
 	}
 
-	String type = (String) config.get("type");
+	String type = (String) config.get("format");
 	if (type == null) {
 	    throw new RegistryException("BioFetch requires type");
 	}
 
-	String db = (String) config.get("db");
+	String db = (String) config.get("biodatabase");
 	if (db == null) {
-	    throw new RegistryException("BioFetch requires db");
+	    throw new RegistryException("BioFetch requires biodatabase paramter");
 	}
 
 	return new BioFetchSequenceDB(prefix, type, db);
