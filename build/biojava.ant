@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+
+<!--
+
+  Ant build file for the entire biojava tree
+        
+  see:
+  <a href="http://jakarta.apache.org/ant">Ant Project Homepage</a>
+  <a href="http://home.wxs.nl/~ajkuiper/ant.html">Ant User Manual</a>
+  <a href="http://jakarta.apache.org/builds/tomcat/nightly/ant.zip">Download</a>
+        
+  targets:
+
+    compile
+    package      builds the biojava.jar file (default)
+    javadocs
+    dist
+    dist-zip    'binary' release (jar & documentation) in zip format
+    dist-tgz    'binary' release (jar & documentation) in tar.gz format
+    dist-both    both dist-zip & dist-tgz
+    clean        cleans up the build & dist directories
+
+  author:  Michael Heuer
+  version: $Id: biojava.ant,v 1.1 2000-04-17 08:02:41 mrp Exp $
+        
+  portions Copyright (c) 1999-2000 The Apache Software Foundation.
+        
+-->
+        
+<project default="package" basedir=".">
+
+  <target name="init">
+    <tstamp />
+    <property name="name" value="biojava"/>
+    <property name="version" value="0.1"/>
+                
+    <property name="build.compiler" value="classic"/>
+        
+    <property name="readme" value="./README"/>
+    <property name="license" value="./LICENSE"/>
+    <property name="src.dir" value="./src"/>
+    <property name="manifest.dir" value="./manifest"/>
+    <property name="resources.dir" value="./resources"/>
+
+    <property name="packages" value="org.*"/>
+        
+    <property name="build.dir" value="./ant-build"/>
+    <property name="build.src" value="./ant-build/src"/>
+    <property name="build.dest" value="./ant-build/classes"/>
+    <property name="build.javadocs" value="./ant-build/docs"/>
+
+    <property name="dist.root" value="./dist"/>
+    <property name="dist.dir" value="${dist.root}/${name}-${version}"/>
+  </target>
+        
+  <!-- Prepares the build directory -->
+  <target name="prepare">
+    <mkdir dir="${build.dir}"/>
+  </target>
+
+  <!-- Prepares the source code -->
+  <target name="prepare-src" depends="prepare">
+
+    <!-- create directories -->
+    <mkdir dir="${build.src}"/>
+    <mkdir dir="${build.dest}"/>
+
+    <!-- copy src files -->
+    <copydir src="${src.dir}" dest="${build.src}" excludes="CVS,cvs"/>
+
+    <!-- copy manifest -->
+    <copydir src="${manifest.dir}" dest="${build.src}" includes="Manifest.mf"/>
+
+    <!-- copy resources -->
+    <copydir src="${resources.dir}" dest="${build.src}" excludes="CVS,cvs"/>
+  </target>
+        
+  <!-- Compiles the source directory -->
+  <target name="compile" depends="prepare-src">
+    <javac srcdir="${build.src}" destdir="${build.dest}" classpath="${classpath}"/>
+  </target>
+        
+  <!-- Creates the class package -->
+  <target name="package" depends="compile">
+    <jar jarfile="${build.dir}/${name}.jar" basedir="${build.dest}"
+         manifest="${build.src}/Manifest.mf" includes="org/**"/>
+  </target>
+        
+  <!-- Creates the API documentation -->
+  <target name="javadocs" depends="prepare-src">
+    <mkdir dir="${build.javadocs}"/>
+    <javadoc packagenames="${packages}"
+        sourcepath="${build.src}"
+        destdir="${build.javadocs}"
+        author="true"
+        version="true"
+        use="true"
+        windowtitle="${name} API"
+        doctitle="${name}"
+    />
+  </target>
+        
+  <!-- Creates the distribution -->
+  <target name="dist" depends="package,javadocs">
+    <mkdir dir="${dist.root}"/>
+    <mkdir dir="${dist.dir}"/>
+    <mkdir dir="${dist.dir}/lib"/>
+    <mkdir dir="${dist.dir}/docs"/>
+
+    <copyfile src="${readme}" dest="${dist.dir}"/>
+    <copyfile src="${license}" dest="${dist.dir}"/>
+ 
+    <copyfile src="${build.dir}/${name}.jar" dest="${dist.dir}/lib/${name}.jar"/>
+    <copydir src="${build.javadocs}" dest="${dist.dir}/docs"/>
+  </target>
+
+  <!-- zips the dist -->
+  <target name="dist-zip" depends="dist">
+    <zip zipfile="${name}-${version}.zip" basedir="${dist.dir}" includes="**"/>
+  </target>
+
+  <!-- tgzs the dist -->
+  <target name="dist-tgz" depends="dist">
+    <tar tarfile="${name}-${version}.tar" basedir="${dist.root}" includes="**"/>
+    <gzip zipfile="${name}-${version}.tar.gz" src="${name}-${version}.tar"/>
+  </target>
+
+  <!-- zip & tgz -->
+  <target name="dist-both" depends="dist-zip,dist-tgz"/>
+
+  <!-- Cleans everything -->
+  <target name="clean">
+    <deltree dir="${build.dir}"/>
+    <deltree dir="${dist.root}"/>
+    <delete file="${name}-${version}.tar.gz"/>
+    <delete file="${name}-${version}.tar"/>
+    <delete file="${name}-${version}.zip"/>
+  </target>
+
+</project>
