@@ -7,12 +7,12 @@ import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.seq.DNATools;
 
 /**
- * Test the MaxMissmatchPattern and MaxMissmatchMatcher classes.
+ * Test the MaxMismatchPattern and MaxMismatchMatcher classes.
  *
  * @author Matthew Pocock
  * @since 1.4
  */
-public class MaxMissmatchPatternTest
+public class MaxMismatchPatternTest
 extends TestCase {
   public void testTooShort()
   throws IllegalSymbolException, IllegalAlphabetException{
@@ -25,7 +25,7 @@ extends TestCase {
     SymbolList gcta = DNATools.createDNA("gcta");
     SymbolList gctt = DNATools.createDNA("gctt");
 
-    MaxMissmatchPattern mmp = new MaxMissmatchPattern(agct, 0);
+    MaxMismatchPattern mmp = new MaxMismatchPattern(agct, 0);
     assertFalse("Zero length string has no matches", mmp.matcher(zero).find());
     assertFalse("One length string has no matches", mmp.matcher(one).find());
     assertTrue("Four length identical string has a match", mmp.matcher(agct).find());
