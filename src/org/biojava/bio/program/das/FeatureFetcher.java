@@ -126,6 +126,7 @@ class FeatureFetcher {
 		    ps.println("  <segment id=\"" + id + "\" />");
 		}
 		ps.println("</featureRequest>");
+		ps.close();
 	    } else {
 		String segments;
 		Set segmentIDs = ticketsByID.keySet();

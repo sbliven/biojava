@@ -95,14 +95,14 @@ class FeatureRequestManager {
 	throws BioException
     {
 	FeatureFetcher ffetcher = new FeatureFetcher(dataSourceURL, triggerType, triggerCategory);
-//  try {
-//  	    boolean doXMLRequest = DASCapabilities.checkCapable(new URL(dataSourceURL, "../"),
-//  								DASCapabilities.CAPABILITY_EXTENDED,
-//  								DASCapabilities.CAPABILITY_EXTENDED_FEATURES);
-//  	    ffetcher.setUseXMLFetch(/* doXMLRequest */ false);
-//  	} catch (MalformedURLException ex) {
-//  	    throw new BioException(ex);
-//	}
+	try {
+  	    boolean doXMLRequest = DASCapabilities.checkCapable(new URL(dataSourceURL, "../"),
+  								DASCapabilities.CAPABILITY_EXTENDED,
+  								DASCapabilities.CAPABILITY_EXTENDED_FEATURES);
+  	    ffetcher.setUseXMLFetch(doXMLRequest);
+  	} catch (MalformedURLException ex) {
+  	    throw new BioException(ex);
+	}
 
 	return ffetcher;
     }
