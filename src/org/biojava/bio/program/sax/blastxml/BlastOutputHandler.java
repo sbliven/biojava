@@ -307,7 +307,7 @@ public class BlastOutputHandler
     }
 
 
-    public void startElementHandler(
+    void startElementHandler(
             String nsURI,
             String localName,
             String qName,
@@ -322,7 +322,7 @@ public class BlastOutputHandler
         }
     }
 
-    public void endElementHandler(
+    void endElementHandler(
             String nsURI,
             String localName,
             String qName,
