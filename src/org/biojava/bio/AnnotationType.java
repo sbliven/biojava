@@ -37,6 +37,11 @@ import org.biojava.utils.*;
  * @author Keith James (docs).
  */
 public interface AnnotationType {
+    /**
+     * The type that accepts all annotations and is the supertype of all
+     * other annotations. Only an empty annotation is an exact instance of
+     * this type.
+     */
     public static final AnnotationType ANY = new AnyAnnotationType();
 
     /**
@@ -46,6 +51,16 @@ public interface AnnotationType {
      * @return true if ann conforms to this type and false if it doesn't.
      */
     public boolean instanceOf(Annotation ann);
+    
+    /**
+     * Validate an Annotation to an exact type. Exact matches will also
+     * return true for instanceOf but will have no properties not found
+     * in the type.
+     *
+     * @param ann the Annotation to validate.
+     * @return true if ann is an instance of exactly this type
+     */
+     public boolean exactInstanceOf(Annotation ann);
 
     /**
      * <p>See if an AnnotationType is a specialisation of this type.</p>
@@ -147,6 +162,17 @@ public interface AnnotationType {
 
             return true;
         }
+        
+        public boolean exactInstanceOf(Annotation ann) {
+          Set keys = new HashSet(ann.keys());
+          keys.removeAll(cons.keySet());
+          
+          if(keys.isEmpty()) {
+            return instanceOf(ann);
+          } else {
+            return false;
+          }
+        }
     
         public boolean subTypeOf(AnnotationType subType) {
             for (Iterator i = cons.keySet().iterator(); i.hasNext();) {
@@ -171,6 +197,10 @@ public interface AnnotationType {
 class AnyAnnotationType implements AnnotationType {
     public boolean instanceOf(Annotation ann) {
         return true;
+    }
+    
+    public boolean exactInstanceOf(Annotation ann) {
+      return ann.keys().isEmpty();
     }
 
     public boolean subTypeOf(AnnotationType subType) {

@@ -5,6 +5,20 @@ import java.util.*;
 import org.biojava.bio.seq.*;
 
 /**
+ * <p>
+ * A factory that is used to maintain associations between alphabets and
+ * preferred bit-packings for them.
+ * </p>
+ *
+ * <p>
+ * There are many ways to pack the symbols for an alphabet as binary.
+ * Different applications will wish to have different representations for
+ * reasons such as integration with external formats, wether to store
+ * ambiguity or not and what algorithms may be used on the bit-packed
+ * representation. Also, it has utility methods to arrange the bit-strings
+ * for symbols within a Java int primative.
+ * </p>
+ *
  * @author Matthew Pocock
  */
 public class PackingFactory {
@@ -15,6 +29,13 @@ public class PackingFactory {
     
   }
   
+  /**
+   * Get the default packing for an alphabet.
+   *
+   * @param alpha  the FiniteAlphabet that will be bit-packed
+   * @param ambiguity  true if the packing should store ambiguity and false
+   *                   if it can discard ambiguity information
+   **/
   public static Packing getPacking(FiniteAlphabet alpha, boolean ambiguity)
   throws IllegalAlphabetException {
     Packing pack = (Packing) packForAlpha.get(alpha);
@@ -32,7 +53,11 @@ public class PackingFactory {
     return pack;
   }
   
-  public static int primeWord(SymbolList symList, int wordLength, Packing packing) {
+  public static int primeWord(
+    SymbolList symList,
+    int wordLength,
+    Packing packing
+  ) throws IllegalSymbolException {
     int word = 0;
     for(int i = 0; i < wordLength; i++) {
       int p = packing.pack(symList.symbolAt(i+1));
@@ -41,7 +66,13 @@ public class PackingFactory {
     return word;
   }
   
-  public static int nextWord(SymbolList symList, int word, int offset, int wordLength, Packing packing) {
+  public static int nextWord(
+    SymbolList symList,
+    int word,
+    int offset,
+    int wordLength,
+    Packing packing
+  ) throws IllegalSymbolException {
     word = word >> (int) packing.wordSize();
     int p = packing.pack(symList.symbolAt(offset));
     word |= (int) p << ((int) wordLength * packing.wordSize() - 1);

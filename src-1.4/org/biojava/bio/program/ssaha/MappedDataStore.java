@@ -4,14 +4,13 @@ import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 
+import org.biojava.bio.BioError;
 import org.biojava.bio.symbol.*;
 
 /**
  * An implementation of DataStore that will map onto a file using the NIO
- * constructs.
- * <p>
- * This is just one implementation. We will probably want others to break
- * the 2GB barrier.
+ * constructs. You should obtain one of these by using the methods in
+ * MappedDataStoreFactory.
  *
  * @author Matthew Pocock
  */
@@ -23,7 +22,7 @@ class MappedDataStore implements DataStore {
   private final IntBuffer nameArray;
   private final MappedByteBuffer nameTable;
   
-  public MappedDataStore(File dataStoreFile)
+  MappedDataStore(File dataStoreFile)
   throws IOException {
     FileChannel channel = new FileInputStream(dataStoreFile).getChannel();
     
@@ -125,15 +124,23 @@ class MappedDataStore implements DataStore {
     return packing.getAlphabet();
   }
   
-  public void search(String seqID, SymbolList symList, SearchListener listener) {
-    int word = PackingFactory.primeWord(symList, wordLength, packing);
-    listener.startSearch(seqID);
-    fireHits(word, 1, listener);
-    for(int j = wordLength + 2; j <= symList.length(); j++) {
-      word = PackingFactory.nextWord(symList, word, j, wordLength, packing);
-      fireHits(word, j - wordLength, listener);
+  public void search(
+    String seqID,
+    SymbolList symList,
+    SearchListener listener
+  ) {
+    try {
+      int word = PackingFactory.primeWord(symList, wordLength, packing);
+      listener.startSearch(seqID);
+      fireHits(word, 1, listener);
+      for(int j = wordLength + 2; j <= symList.length(); j++) {
+        word = PackingFactory.nextWord(symList, word, j, wordLength, packing);
+        fireHits(word, j - wordLength, listener);
+      }
+      listener.endSearch(seqID);
+    } catch (IllegalSymbolException ise) {
+      throw new BioError("Assertion Failure: Symbol dissapeared");
     }
-    listener.endSearch(seqID);
   }
   
   public String seqNameForID(int id) {
