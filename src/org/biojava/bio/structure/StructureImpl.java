@@ -24,12 +24,17 @@
 package org.biojava.bio.structure;
 
 import java.util.ArrayList ;
-import java.util.HashMap ;
+import java.util.HashMap   ;
+import java.util.Map       ;
+import java.util.List      ;
 
 import org.biojava.bio.structure.io.FileConvert ;
 /**
  * Implementation of a PDBStructure. This class
  * provides the data contained in a PDB file.
+ *
+ * @author Andreas Prlic
+ * @since 1.4
  */
 public class StructureImpl implements Structure {
    
@@ -89,18 +94,17 @@ public class StructureImpl implements Structure {
     public String getName()           { return name;  }
     
     /** set the Header data */
-    public void    setHeader(HashMap h){ header = h;    }
+    public void    setHeader(Map h){ header = (HashMap) h;    }
     /** get Header data */
-    public HashMap getHeader()         { return header ;}
+    public Map getHeader()         { return header ;}
 
     /** @see Structure interface */
-    public void      setConnections(ArrayList conns) { connections = conns ; }
+    public void      setConnections(List conns) { connections = (ArrayList)conns ; }
     /** @see Structure interface */
-    public ArrayList getConnections()                { return connections ;}
+    public List getConnections()                { return connections ;}
 
     /** add a new chain */
     public void addChain(Chain chain) {
-	// TODO Auto-generated method stub
 	int modelnr = 0 ;
 	addChain(chain,modelnr);
     }
@@ -140,8 +144,8 @@ public class StructureImpl implements Structure {
 
   
     /** add a new model */
-    public void addModel(ArrayList model){
-	models.add(model);
+    public void addModel(List model){
+	models.add((ArrayList)model);
     }
 
     /** string representation */
@@ -174,7 +178,7 @@ public class StructureImpl implements Structure {
 	return str ;
     }
     
-    /** return number of chains in this container 
+    /** return number of chains , if NMR return number of chains of first model 
      * 
      */
     public int size() {
@@ -190,7 +194,7 @@ public class StructureImpl implements Structure {
 	return model.size() ; 
     } 
     
-    /** return number of chains of of model */
+    /** return number of chains  of model */
     public int size(int modelnr) { return getChains(modelnr).size();   }
 
     // some NMR stuff : 
@@ -209,15 +213,15 @@ public class StructureImpl implements Structure {
     
 
     /** retrieve all chains of a model*/
-    public ArrayList getChains(int modelnr){
+    public List getChains(int modelnr){
 	return getModel(modelnr);
     }
 
     /** retrieve all Chains belonging to a model */
-    public ArrayList getModel(int modelnr) {
+    public List getModel(int modelnr) {
 
 	ArrayList model = (ArrayList)models.get(modelnr);		
-	return model ;
+	return model;
     }    
 
 

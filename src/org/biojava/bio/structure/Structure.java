@@ -23,14 +23,16 @@
  */
 package org.biojava.bio.structure;
 
-import java.util.ArrayList ;
-import java.util.HashMap ;
+import java.util.List ;
+import java.util.Map  ;
 
 /* *
  * 
- * Interface to a protein structure 
- * Any kind of PDB parser / DB interface, etc. will return an object that implements this interface
+ * Interface for a structure object. Provides access to the data of a PDB file.
  *
+ *
+ * @author Andreas Prlic
+ * @since 1.4
  */
 public interface Structure {
 	
@@ -62,13 +64,13 @@ public interface Structure {
     public String getName();
 
     /** set the Header data */
-    public void setHeader(HashMap h) ;
+    public void setHeader(Map h) ;
 
     /** get Header data */
-    public HashMap getHeader() ;
+    public Map getHeader() ;
 
     /** CONECT data 
-       sets/gets an ArrayList of  HashMaps which corresponds to the CONECT lines in the PDB file:
+       sets/gets an List of  Maps which corresponds to the CONECT lines in the PDB file:
 
        <pre>
        COLUMNS         DATA TYPE        FIELD           DEFINITION
@@ -102,8 +104,8 @@ public interface Structure {
        </ul>
        
     */
-    public void setConnections(ArrayList connections);
-    public ArrayList getConnections();
+    public void setConnections(List connections);
+    public List getConnections();
 
     /** return number of Chains in file */
     public int size() ;
@@ -127,17 +129,17 @@ public interface Structure {
     
 
     /** add a new model */
-    public void addModel(ArrayList model);
+    public void addModel(List model);
 
     /** retrieve all Chains belonging to a model 
      * @see getChains
      */
-    public ArrayList getModel(int modelnr);
+    public List getModel(int modelnr);
 
     /** retrieve all chains of a model
      * @see getModel
      */
-    public ArrayList getChains(int modelnr);
+    public List getChains(int modelnr);
 
 
     /** add a new chain */

@@ -85,7 +85,7 @@ public class GroupIterator implements Iterator {
 	    return false;
 	}
 	
-	ArrayList model = structure.getModel(tmp_model);
+	ArrayList model = (ArrayList) structure.getModel(tmp_model);
 	
 	if ( tmp_chain >= model.size() ){
 	    return hasSubGroup(tmp_model+1,0,0);
@@ -122,7 +122,7 @@ public class GroupIterator implements Iterator {
 	    throw new NoSuchElementException("arrived at end of structure!");
 	}
 	
-	ArrayList model = structure.getModel(tmp_model);
+	ArrayList model = (ArrayList) structure.getModel(tmp_model);
 	
 	if ( tmp_chain >= model.size() ){
 	    return getNextGroup(tmp_model+1,0,0);
