@@ -106,7 +106,7 @@ public class SmallAnnotation implements Annotation {
 
 	    for (int i = 0; i < numMappings * 2; i += 2) {
 		if (keyHash == mappings[i].hashCode() && key.equals(mappings[i])) {
-		    mappings[i] = value;
+		    mappings[i+1] = value;
 		    return;
 		}
 	    }
