@@ -35,23 +35,20 @@ import org.biojava.bio.symbol.*;
  * feature has been read from an EMBL or Genbank source the type will
  * be the same as the feature key in the feature table e.g. 'gene',
  * 'CDS', 'repeat_unit', 'misc_feature'. The source of the feature is
- * something like 'genscan', 'repeatmasker' or 'made-up'.</p>
+ * something like 'genscan', 'repeatmasker' or 'made-up'. </p>
  *
- * <p>
- * Features are <em>always</em> contained by a parent <code>FeatureHolder</code>,
- * which may either be a <code>Sequence</code> or another <code>Feature</code>. 
- * Feature instances should never be constructed directly by client
- * code, and the BioJava core does not contain any publicly accessible
- * implementations of the <code>Feature</code> interface.  Instead, you
- * should create a suitable <code>Feature.Template</code>, then pass this
- * to the <code>createFeature</code> method of a <code>Sequence</code>
- * or <code>Feature</code>.
- * </p>
+ * <p> Features are <em>always</em> contained by a parent
+ * <code>FeatureHolder</code>, which may either be a
+ * <code>Sequence</code> or another <code>Feature</code>. Feature
+ * instances should never be constructed directly by client code, and
+ * the BioJava core does not contain any publicly accessible
+ * implementations of the <code>Feature</code> interface. Instead, you
+ * should create a suitable <code>Feature.Template</code>, then pass
+ * this to the <code>createFeature</code> method of a
+ * <code>Sequence</code> or <code>Feature</code>. </p>
  *
- * <p>
- * We may need some standardisation for what the fields mean. In particular, we
- * should be compliant where sensible with GFF.
- * </p>
+ * <p> We may need some standardisation for what the fields mean. In
+ * particular, we should be compliant where sensible with GFF. </p>
  *
  * @author Matthew Pocock
  * @author Thomas Down
@@ -65,7 +62,7 @@ public interface Feature extends FeatureHolder, Annotatable {
      * identifies internal data. This is not printed when the
      * <code>Feature</code> is written to a flatfile. E.g. the
      * original feature's EMBL location string (if it has one) is
-     * stored here
+     * stored here.
      */
     public static final String PROPERTY_DATA_KEY = "internal_data";
 
@@ -155,7 +152,16 @@ public interface Feature extends FeatureHolder, Annotatable {
      * <code>Location</code>.
      */
     public static final ByLocationComparator byLocationOrder =
-	new ByLocationComparator();
+        new ByLocationComparator();
+
+    /**
+     * <code>byEmblOrder</code> contains a <code>Feature</code>
+     * comparator which compares by the minimum base position of their
+     * <code>Location</code>, but places <code>Feature</code>s with
+     * type "source" first.
+     */
+    public static final ByEmblOrderComparator byEmblOrder =
+        new ByEmblOrderComparator();
 
     /**
      * <code>ByLocationComparator</code> compares
@@ -163,24 +169,65 @@ public interface Feature extends FeatureHolder, Annotatable {
      * <code>Location</code>.
      *
      * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+     * @since 1.2
      */
     public static final class ByLocationComparator implements Comparator
     {
-	public int compare(Object o1, Object o2)
-	{
-	    Feature f1 = (Feature) o1;
-	    Feature f2 = (Feature) o2;
+        public int compare(Object o1, Object o2)
+        {
+            Feature f1 = (Feature) o1;
+            Feature f2 = (Feature) o2;
 
-	    // We don't subtract one coordinate from another as one or
-	    // both may be set to Integer.MAX_VALUE/Integer.MIN_VALUE
-	    // and the result could wrap around. Convert to Long if
-	    // necessary.
-	    if (f1.getLocation().getMin() > f2.getLocation().getMin())
-		return 1;
-	    else if ( f1.getLocation().getMin() < f2.getLocation().getMin())
-		return -1;
-	    else
-		return 0;
-	}
+            // We don't subtract one coordinate from another as one or
+            // both may be set to Integer.MAX_VALUE/Integer.MIN_VALUE
+            // and the result could wrap around. Convert to Long if
+            // necessary.
+            if (f1.getLocation().getMin() > f2.getLocation().getMin())
+                return 1;
+            else if ( f1.getLocation().getMin() < f2.getLocation().getMin())
+                return -1;
+            else
+                return 0;
+        }
+    }
+
+    /**
+     * <code>ByEmblOrderComparator</code> compares
+     * <code>Feature</code>s by the minimum base position of their
+     * <code>Location</code>, but places <code>Feature</code>s with
+     * type "source" first.
+     *
+     * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+     * @since 1.2
+     */
+    public static final class ByEmblOrderComparator implements Comparator
+    {
+        public int compare(Object o1, Object o2)
+        {
+            Feature f1 = (Feature) o1;
+            Feature f2 = (Feature) o2;
+
+            boolean source1 = f1.getType().equals("source") ? true : false;
+            boolean source2 = f2.getType().equals("source") ? true : false;
+
+            // We don't subtract one coordinate from another as one or
+            // both may be set to Integer.MAX_VALUE/Integer.MIN_VALUE
+            // and the result could wrap around. Convert to Long if
+            // necessary.
+            if (! source1 && source2)
+            {
+                return 1;
+            }
+            else if (source1 && ! source2)
+            {
+                return -1;
+            }
+            else if (f1.getLocation().getMin() > f2.getLocation().getMin())
+                return 1;
+            else if (f1.getLocation().getMin() < f2.getLocation().getMin())
+                return -1;
+            else
+                return 0;
+        }
     }
 }

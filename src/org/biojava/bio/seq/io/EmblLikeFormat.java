@@ -95,6 +95,7 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
 	String            line;
 	StreamParser    sparser = null;
 	boolean hasMoreSequence = true;
+	boolean hasWhitespace   = false;
 
 	listener.startSequence();
 
@@ -109,11 +110,35 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
 		    sparser = null;
 		}
 
-		reader.mark(2);
-		if (reader.read() == -1)
-		    hasMoreSequence = false;
-		else
-		    reader.reset();
+		// Allows us to tolerate trailing whitespace without
+		// thinking that there is another Sequence to follow
+		char [] cbuf = new char [1];
+		
+		while (true)
+		{
+		    reader.mark(1);
+
+		    if (reader.read() == -1)
+		    {
+			hasMoreSequence = false;
+			break;
+		    }
+
+		    reader.read(cbuf, 0, 1);
+
+		    if (Character.isWhitespace(cbuf[0]))
+		    {
+			hasWhitespace = true;
+			continue;
+		    }
+		    else
+		    {
+			if (hasWhitespace)
+			    System.err.println("Warning: whitespace found between sequence entries");
+			reader.reset();
+			break;
+		    }
+		}
 
 		listener.endSequence();
 		return hasMoreSequence;

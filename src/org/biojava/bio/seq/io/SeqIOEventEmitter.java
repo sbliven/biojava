@@ -33,11 +33,12 @@ import org.biojava.bio.symbol.*;
  * <code>Sequence</code> object and sends events describing its
  * constituent data to a <code>SeqIOListener</code>. The listener
  * should be able to reconstruct the <code>Sequence</code> from these
- * events.
+ * events. This class could benefit from parameterized feature
+ * <code>Comparator</code>s to determine the order of events.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
- */
+*/
 public class SeqIOEventEmitter
 {
     /**
@@ -80,19 +81,25 @@ public class SeqIOEventEmitter
 	    // Recurse through sub feature tree, flattening it for
 	    // EMBL
 	    List subs = getSubFeatures(seq);
-	    Collections.sort(subs, Feature.byLocationOrder);
+	    Collections.sort(subs, Feature.byEmblOrder);
+
+	    // Put the source features first for EMBL
 
 	    for (Iterator fi = subs.iterator(); fi.hasNext();)
 	    {		
 		// The template is required to call startFeature
 		Feature.Template t = ((Feature) fi.next()).makeTemplate();
-	    
+
 		// Inform listener of feature start
 		listener.startFeature(t);
 
 		// Pass feature properties (i.e. qualifiers to
 		// listener)
-		for (Iterator ki = t.annotation.keys().iterator(); ki.hasNext();)
+		List keys = new ArrayList();
+		keys.addAll(t.annotation.keys());
+		Collections.sort(keys);
+
+		for (Iterator ki = keys.iterator(); ki.hasNext();)
 		{
 		    Object key = ki.next();
 

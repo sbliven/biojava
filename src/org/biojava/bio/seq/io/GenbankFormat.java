@@ -39,7 +39,6 @@ import org.biojava.bio.seq.*;
  * tag is not included.	Stored in sequence.getName().
  * @author Greg	Cox
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
- * (writeSequence)
  */
 
 public class GenbankFormat implements SequenceFormat, Serializable
@@ -84,32 +83,47 @@ public class GenbankFormat implements SequenceFormat, Serializable
     {
 	GenbankContext ctx = new GenbankContext(symParser, listener);
 	String line;
-	StreamParser sParser = null; // FIXME? - Is sParser ever not null? KJ
-	boolean hasAnotherSequence = true;
+	boolean hasAnotherSequence    = true;
+	boolean hasInternalWhitespace = false;
+
 	listener.startSequence();
+
 	while ((line = reader.readLine()) != null)
 	{
-	    if(line.length() == 0)
-	    {
-		continue;
-	    }
+  	    if (line.startsWith(END_SEQUENCE_TAG))
+  	    {
+		// To close the StreamParser encapsulated in the
+		// GenbankContext object
+		ctx.processLine(line);
 
-	    if (line.startsWith(END_SEQUENCE_TAG))
-	    {
-		if(sParser != null)
-		{   // End of symbol data
-		    sParser.close();
-		    sParser = null;
-		}
+		// Allows us to tolerate trailing whitespace without
+		// thinking that there is another Sequence to follow
+		char [] cbuf = new char [1];
+		
+		while (true)
+		{
+		    reader.mark(1);
 
-		reader.mark(2);
-		if (reader.read() == -1)
-		{
-		    hasAnotherSequence = false;
-		}
-		else
-		{
-		    reader.reset();
+		    if (reader.read() == -1)
+		    {
+			hasAnotherSequence = false;
+			break;
+		    }
+
+		    reader.read(cbuf, 0, 1);
+
+		    if (Character.isWhitespace(cbuf[0]))
+		    {
+			hasInternalWhitespace = true;
+			continue;
+		    }
+		    else
+		    {
+			if (hasInternalWhitespace)
+			    System.err.println("Warning: whitespace found between sequence entries");
+			reader.reset();
+			break;
+		    }
 		}
 
 		listener.endSequence();
@@ -118,8 +132,6 @@ public class GenbankFormat implements SequenceFormat, Serializable
 	    ctx.processLine(line);
 	}
 
-	// FIXME - This is throwing spurious IOExceptions when reading
-	// the test file AL121903.genbank
 	throw new IOException("Premature end of stream for GENBANK");
     }
 
@@ -254,6 +266,10 @@ class GenbankContext
 	{
 	    status = SEQUENCE;
 	    this.saveSeqAnno();
+	}
+	else if (line.startsWith(GenbankFormat.END_SEQUENCE_TAG))
+	{
+	    streamParser.close();
 	}
 	else if (status == FEATURES)
 	{

@@ -45,25 +45,26 @@ public class EmblFileFormer implements SeqFileFormer
     private static Map   featureData = new HashMap();
     private static Map qualifierData = new HashMap();
 
+    private ArrayList   fStack = new ArrayList();
     private PrintStream stream;
 
     static
     {
-	SeqFileFormerFactory.addFactory("Embl", new EmblFileFormer.Factory());
+        SeqFileFormerFactory.addFactory("Embl", new EmblFileFormer.Factory());
 
-	// This loads an XML file containing information on which
-	// qualifiers are valid (or even mandatory) for a particular
-	// feature key. It also indicates whether the value should be
-	// contained within quotes.
-	SeqFormatTools.loadFeatureData(featureDataFile, featureData, qualifierData);
+        // This loads an XML file containing information on which
+        // qualifiers are valid (or even mandatory) for a particular
+        // feature key. It also indicates whether the value should be
+        // contained within quotes.
+        SeqFormatTools.loadFeatureData(featureDataFile, featureData, qualifierData);
     }
 
     private static class Factory extends SeqFileFormerFactory
     {
-	protected SeqFileFormer make()
-	{
-	    return new EmblFileFormer(System.out);
-	}
+        protected SeqFileFormer make()
+        {
+            return new EmblFileFormer(System.out);
+        }
     }
 
     /**
@@ -80,17 +81,17 @@ public class EmblFileFormer implements SeqFileFormer
      */
     private EmblFileFormer(final PrintStream stream)
     {
-	this.stream = stream;
+        this.stream = stream;
     }
 
     public PrintStream getPrintStream()
     {
-	return stream;
+        return stream;
     }
 
     public void setPrintStream(final PrintStream stream)
     {
-	this.stream = stream;
+        this.stream = stream;
     }
 
     public void setName(final String id) throws ParseException { }
@@ -102,184 +103,184 @@ public class EmblFileFormer implements SeqFileFormer
     public void setURI(final String uri) throws ParseException { }
 
     public void addSymbols(final Alphabet alpha,
-			   final Symbol[] syms,
-			   final int      start,
-			   final int      length)
-	throws IllegalAlphabetException
+                           final Symbol[] syms,
+                           final int      start,
+                           final int      length)
+        throws IllegalAlphabetException
     {
-	int aCount = 0;
-	int cCount = 0;
-	int gCount = 0;
-	int tCount = 0;
-	int oCount = 0;
+        int aCount = 0;
+        int cCount = 0;
+        int gCount = 0;
+        int tCount = 0;
+        int oCount = 0;
 
-	for (int i = 0; i < syms.length; i++)
-	{
-	    char c = syms[i].getToken();
+        for (int i = 0; i < syms.length; i++)
+        {
+            char c = syms[i].getToken();
 
-	    switch (c)
-	    {
-		case 'a': case 'A':
-		    aCount++;
-		    break;
-		case 'c': case 'C':
-		     cCount++;
-		     break;
-		case 'g': case 'G':
-		     gCount++;
-		     break;
-		case 't': case 'T':
-		     tCount++;
-		     break;
+            switch (c)
+            {
+                case 'a': case 'A':
+                    aCount++;
+                    break;
+                case 'c': case 'C':
+                    cCount++;
+                    break;
+                case 'g': case 'G':
+                    gCount++;
+                    break;
+                case 't': case 'T':
+                    tCount++;
+                    break;
+                    
+                default:
+                    oCount++;
+            }
+        }
 
-		default:
-		    oCount++;
-	    }
-	}
+        StringBuffer sq = new StringBuffer("XX\nSQ   Sequence ");
+        sq.append(length + " BP; ");
+        sq.append(aCount + " A; ");
+        sq.append(cCount + " C; ");
+        sq.append(gCount + " G; ");
+        sq.append(tCount + " T; ");
+        sq.append(oCount + " other;");
 
-	StringBuffer sq = new StringBuffer("XX\nSQ   Sequence ");
-	sq.append(length + " BP; ");
-	sq.append(aCount + " A; ");
-	sq.append(cCount + " C; ");
-	sq.append(gCount + " G; ");
-	sq.append(tCount + " T; ");
-	sq.append(oCount + " other;");
+        // Print sequence summary header
+        stream.println(sq.toString());
 
-	// Print sequence summary header
-	stream.println(sq.toString());
+        int fullLine = syms.length / 60;
+        int partLine = syms.length % 60;
 
-	int fullLine = syms.length / 60;
-	int partLine = syms.length % 60;
+        int lineCount = fullLine;
+        if (partLine > 0)
+            lineCount++;
 
-	int lineCount = fullLine;
-	if (partLine > 0)
-	    lineCount++;
+        int lineLens [] = new int [lineCount];
 
-	int lineLens [] = new int [lineCount];
+        // All lines are 60, except last (if present)
+        Arrays.fill(lineLens, 60);
+        lineLens[lineCount - 1] = partLine;
 
-	// All lines are 60, except last (if present)
-	Arrays.fill(lineLens, 60);
-	lineLens[lineCount - 1] = partLine;
+        for (int i = 0; i < lineLens.length; i++)
+        {
+            // How long is this chunk?
+            int len = lineLens[i];
 
-	for (int i = 0; i < lineLens.length; i++)
-	{
-	    // How long is this chunk?
-	    int len = lineLens[i];
+            // Prepare line 80 characters wide
+            StringBuffer sb   = new StringBuffer(80);
+            char [] emptyLine = new char [80];
+            Arrays.fill(emptyLine, ' ');
+            sb.append(emptyLine);
 
-	    // Prepare line 80 characters wide
-	    StringBuffer sb   = new StringBuffer(80);
-	    char [] emptyLine = new char [80];
-	    Arrays.fill(emptyLine, ' ');
-	    sb.append(emptyLine);
+            // Prepare a Symbol array same length as chunk
+            Symbol [] sa = new Symbol [len];
 
-	    // Prepare a Symbol array same length as chunk
-	    Symbol [] sa = new Symbol [len];
+            // Get symbols and format into blocks of tokens
+            System.arraycopy(syms, (i * 60), sa, 0, len);
 
-	    // Get symbols and format into blocks of tokens
-	    System.arraycopy(syms, (i * 60), sa, 0, len);
+            String blocks = (SeqFormatTools.formatTokenBlock(sa, 10)).toString();
+            sb.replace(5, blocks.length() + 5, blocks);
 
-	    String blocks = (SeqFormatTools.formatTokenBlock(sa, 10)).toString();
-	    sb.replace(5, blocks.length() + 5, blocks);
+            // Calculate the running residue count and add to the line
+            String count = Integer.toString((i * 60) + len);
+            sb.replace((80 - count.length()), 80, count);
 
-	    // Calculate the running residue count and add to the line
-	    String count = Integer.toString((i * 60) + len);
-	    sb.replace((80 - count.length()), 80, count);
+            // Print formatted sequence line
+            stream.println(sb);
+        }
 
-	    // Print formatted sequence line
-	    stream.println(sb);
-	}
-
-	// Print end of entry
-	stream.println("//");
+        // Print end of entry
+        stream.println("//");
     }
 
     public void addSequenceProperty(final Object key, final Object value)
-	throws ParseException
+        throws ParseException
     {
-	if (key.equals(EmblProcessor.PROPERTY_EMBL_ACCESSIONS))
-	{
-	    StringBuffer sb = new StringBuffer("AC   ");
-	    for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
-	    {
-		sb.append((String) ai.next());
-		sb.append(";");
-	    }
-	    stream.println(sb);
-	}
+        if (key.equals(EmblProcessor.PROPERTY_EMBL_ACCESSIONS))
+        {
+            StringBuffer sb = new StringBuffer("AC   ");
+            for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
+            {
+                sb.append((String) ai.next());
+                sb.append(";");
+            }
+            stream.println(sb);
+        }
     }
 
     public void startFeature(final Feature.Template templ)
-	throws ParseException
+        throws ParseException
     {
-	// There are 19 spaces in the leader
-	String leader = "FT                   ";
-	int    strand = 0;
+        // There are 19 spaces in the leader
+        String leader = "FT                   ";
+        int    strand = 0;
 
-	if (templ instanceof StrandedFeature.Template)
-	    strand = ((StrandedFeature.Template) templ).strand.getValue();
+        if (templ instanceof StrandedFeature.Template)
+            strand = ((StrandedFeature.Template) templ).strand.getValue();
 
-	StringBuffer lb = SeqFormatTools.formatLocationBlock(templ.location,
-							     strand,
-							     leader,
-							     80);
-	lb.replace(5, 5 + templ.type.length(), templ.type);
+        StringBuffer lb = SeqFormatTools.formatLocationBlock(templ.location,
+                                                             strand,
+                                                             leader,
+                                                             80);
+        lb.replace(5, 5 + templ.type.length(), templ.type);
 
-	stream.println(lb);
+        stream.println(lb);
     }
 
     public void endFeature() throws ParseException { }
 
     public void addFeatureProperty(final Object key, final Object value)
-	throws ParseException
+        throws ParseException
     {
-	// There are 19 spaces in the leader
-	String   leader = "FT                   ";
-	// Default is to quote unknown qualifiers
-	String     form = "quoted";
+        // There are 19 spaces in the leader
+        String   leader = "FT                   ";
+        // Default is to quote unknown qualifiers
+        String     form = "quoted";
 
-	if (qualifierData.containsKey(key))
-	    form = (String) ((Map) qualifierData.get(key)).get("form");
+        if (qualifierData.containsKey(key))
+            form = (String) ((Map) qualifierData.get(key)).get("form");
 
-	// The value may be a collection if several qualifiers of the
-	// same type are present in a feature
-	if (Collection.class.isInstance(value))
-	{
-	    for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
-	    {
-		String qualifer = makeStringsByForm(key, vi.next(), form);
-		stream.println(SeqFormatTools.formatQualifierBlock(qualifer,
-								   leader,
-								   80));
-	    }
-	}
-	else
-	{
-	    String qualifer = makeStringsByForm(key, value, form);
-	    stream.println(SeqFormatTools.formatQualifierBlock(qualifer,
-							       leader,
-							       80));
-	}
+        // The value may be a collection if several qualifiers of the
+        // same type are present in a feature
+        if (Collection.class.isInstance(value))
+        {
+            for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
+            {
+                String qualifer = makeStringsByForm(key, vi.next(), form);
+                stream.println(SeqFormatTools.formatQualifierBlock(qualifer,
+                                                                   leader,
+                                                                   80));
+            }
+        }
+        else
+        {
+            String qualifer = makeStringsByForm(key, value, form);
+            stream.println(SeqFormatTools.formatQualifierBlock(qualifer,
+                                                               leader,
+                                                               80));
+        }
     }
 
     private String makeStringsByForm(final Object key,
-				     final Object value,
-				     final String form)
-	throws ParseException
+                                     final Object value,
+                                     final String form)
+        throws ParseException
     {
-	StringBuffer tb = new StringBuffer("/" + key);
+        StringBuffer tb = new StringBuffer("/" + key);
 
-	// This is a slight simplification. There are some types of
-	// qualifier which are unquoted unless they contain
-	// spaces. We all love special cases, don't we?
-	if (form.equals("quoted"))
-	    tb.append("=\"" + value + "\"");
-	else if (form.equals("bare"))
-	    tb.append("=" + value);
-	else if (form.equals("paren"))
-	    tb.append("(" + value + ")");
-	else if (! form.equals("empty"))
-	    throw new ParseException("Unrecognised qualifier format: " + form);
+        // This is a slight simplification. There are some types of
+        // qualifier which are unquoted unless they contain
+        // spaces. We all love special cases, don't we?
+        if (form.equals("quoted"))
+            tb.append("=\"" + value + "\"");
+        else if (form.equals("bare"))
+            tb.append("=" + value);
+        else if (form.equals("paren"))
+            tb.append("(" + value + ")");
+        else if (! form.equals("empty"))
+            throw new ParseException("Unrecognised qualifier format: " + form);
 
-	return tb.toString();
+        return tb.toString();
     }
 }
