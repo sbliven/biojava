@@ -36,10 +36,35 @@ import org.biojava.bio.seq.*;
 
 public class BumpedRenderer
 extends SequenceRendererWrapper {
+  private int leadingPixles;
+  private int trailingPixles;
+
   public BumpedRenderer() {}
   
   public BumpedRenderer(SequenceRenderer renderer) {
     super(renderer);
+  }
+
+  public BumpedRenderer(SequenceRenderer renderer, int leading, int trailing) {
+    super(renderer);
+    this.leadingPixles = leading;
+    this.trailingPixles = trailing;
+  }
+
+  public int getLeadingPixles() {
+    return leadingPixles;
+  }
+
+  public void setLeadingPixles(int leading) {
+    this.leadingPixles = leading;
+  }
+
+  public int getTrailingPixles() {
+    return trailingPixles;
+  }
+
+  public void setTrailingPixles(int trailing) {
+    this.trailingPixles = trailing;
   }
 
   protected boolean hasListeners() {
@@ -135,7 +160,9 @@ extends SequenceRendererWrapper {
     FeatureHolder features = src.getFeatures();
     List layers = new ArrayList();
     List layerLocs = new ArrayList();
-    
+    int lead = (int) (leadingPixles / src.getScale());
+    int trail = (int) (trailingPixles / src.getScale());
+
     for(
       Iterator fi = features.filter(
         filt, false
@@ -145,9 +172,8 @@ extends SequenceRendererWrapper {
       Feature f = (Feature) fi.next();
       try {
         Location fLoc = f.getLocation();
-        if(!fLoc.isContiguous()) {
-          fLoc = new RangeLocation(fLoc.getMin(), fLoc.getMax());
-        }
+        fLoc = new RangeLocation(fLoc.getMin() - lead, fLoc.getMax() + trail);
+        
         Iterator li = layerLocs.iterator();
         Iterator fhI = layers.iterator();
         SimpleFeatureHolder fhLayer = null;
