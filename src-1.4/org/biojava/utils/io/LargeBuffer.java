@@ -279,11 +279,11 @@ public class LargeBuffer {
   }
   
   private int getOffset(long pos) {
-    return (int) (pos / (long) PAGE_SIZE);
+    return (int) (pos % PAGE_SIZE);
   }
   
   private int getIndex(long pos) {
-    return (int) (pos % PAGE_SIZE);
+    return (int) (pos / (long) PAGE_SIZE);
   }
   
   public void force() {

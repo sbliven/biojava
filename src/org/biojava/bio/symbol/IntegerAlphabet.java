@@ -351,7 +351,7 @@ public final class IntegerAlphabet
       }
     }
     
-    public Symbol getSymbol(int val)
+    public IntegerSymbol getSymbol(int val)
     throws IllegalSymbolException {
       if(val < min || val > max) {
         throw new IllegalSymbolException(

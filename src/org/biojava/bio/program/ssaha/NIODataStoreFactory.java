@@ -97,19 +97,19 @@ implements DataStoreFactory {
     final FileChannel channel = store.getChannel();
     
     // allocate array for k-tuple -> hit list
-    //System.out.println("Word length:\t" + wordLength);
+    System.out.println("Word length:\t" + wordLength);
     int words = 2 << (
       (int) packing.wordSize() *
       (int) wordLength
     );
-    //System.out.println("Words:\t" + words);
+    System.out.println("Words:\t" + words);
     
     hashTablePos = structDataSize;
     long hashTableSize =
-      Constants.BYTES_IN_INT +         // hash table length
+      Constants.BYTES_IN_LONG +        // hash table length
       words * Constants.BYTES_IN_LONG; // hash table entries
     
-    //System.out.println("Allocated:\t" + hashTableSize);
+    System.out.println("Allocated:\t" + hashTableSize);
     final MappedByteBuffer hashTable_MB = channel.map(
       FileChannel.MapMode.READ_WRITE,
       hashTablePos,
@@ -123,15 +123,18 @@ implements DataStoreFactory {
       hashTable.put(i+1, 0);
     }
     hashTable.position(0);
+    System.out.println("Initialized hash table");
     
     // 1st pass
     // writes counts as longs for each k-tuple
     // count up the space required for sequence names
     //
+    System.out.println("First parse");
     int seqCount = 0;
     int nameChars = 0;
     for(SequenceIterator i = seqDB.sequenceIterator(); i.hasNext(); ) {
       Sequence seq = i.nextSequence();
+      System.out.println(seq.getName());
       if(seq.length() > wordLength) {
         seqCount++;
         nameChars += seq.getName().length();
@@ -146,6 +149,8 @@ implements DataStoreFactory {
         }
       }
     }
+    System.out.println();
+    System.out.println("Done");
      
     // map the space for sequence names as short length, char* name
     //
@@ -154,7 +159,7 @@ implements DataStoreFactory {
       Constants.BYTES_IN_INT +              // bytes in table
       seqCount * Constants.BYTES_IN_SHORT + // string lengths
       nameChars * Constants.BYTES_IN_CHAR;  // characters
-    //System.out.println("nameTableSize:\t" + nameTableSize);
+    System.out.println("nameTableSize:\t" + nameTableSize);
     final MappedByteBuffer nameTable = channel.map(
       FileChannel.MapMode.READ_WRITE,
       nameTablePos,
@@ -174,15 +179,16 @@ implements DataStoreFactory {
         kmersUsed++;
       }
     }
+    System.out.println("hitCount: " + hitCount);
+    System.out.println("kmersUsed: " + kmersUsed);
     
     hitTablePos = nameTablePos + nameTableSize;
     long hitTableSize =
-      (long) Constants.BYTES_IN_INT +                            // size
-      (long) kmersUsed * (Constants.BYTES_IN_INT + Constants.BYTES_IN_INT) +  // list elements
-      (long) hitCount * Constants.BYTES_IN_INT;                  // size of lists
-    //System.out.println("hitTableSize:\t" + hitTableSize);
-    //System.out.println("hitTableSize:\t" + (int) hitTableSize);
-    //System.out.println("hitTablePos:\t" + hitTablePos);
+      (long) Constants.BYTES_IN_LONG +                            // size
+      (long) hitCount * (Constants.BYTES_IN_INT + Constants.BYTES_IN_INT) +  // list elements
+      (long) kmersUsed * Constants.BYTES_IN_INT;                  // size of lists
+    System.out.println("hitTableSize:\t" + hitTableSize);
+    System.out.println("hitTablePos:\t" + hitTablePos);
     
     final LargeBuffer hitTable = new LargeBuffer(
       channel,
@@ -194,6 +200,7 @@ implements DataStoreFactory {
     hitTable.putLong(hitTableSize);
     
     // write locations of hit arrays
+    System.out.println("Writing pointers from hash to hits");
     long hitOffset = 0;
     for(int i = 0; i < words; i++) {
       long counts = hashTable.get(i+1);
@@ -205,7 +212,7 @@ implements DataStoreFactory {
             throw new IndexOutOfBoundsException("Hit offset negative");
           }
           hashTable.put(i + 1, hitOffset); // wire hash table to hit table
-          hitTable.putInt(hitOffset + Constants.BYTES_IN_INT, 0); // initialy we have no hits
+          hitTable.putInt(hitOffset + Constants.BYTES_IN_LONG, 0); // initialy we have no hits
           hitOffset +=
             Constants.BYTES_IN_INT +
             counts * (Constants.BYTES_IN_INT + Constants.BYTES_IN_INT);
@@ -224,17 +231,19 @@ implements DataStoreFactory {
     // 2nd parse
     // write sequence array and names
     // write hitTable
+    System.out.println("2nd parse");
     int seqNumber = 0;
     nameTable.position(Constants.BYTES_IN_INT);
     for(SequenceIterator i = seqDB.sequenceIterator(); i.hasNext(); ) {
       Sequence seq = i.nextSequence();
-      
+      System.out.println(seq.getName());
+      seqNumber++;
       if(seq.length() > wordLength) {
         try {
           // write sequence name length and chars into nameTable
-          int namePos = nameTable.position();
+          int namePos = nameTable.position() - Constants.BYTES_IN_INT;
           String name = seq.getName();
-          nameTable.putInt(name.length());
+          nameTable.putShort((short) name.length());
           for(int j = 0; j < name.length(); j++) {
             nameTable.putChar((char) name.charAt(j));
           }
@@ -254,6 +263,8 @@ implements DataStoreFactory {
         }
       }
     }
+    System.out.println();
+    System.out.println("Done");
 
     final MappedByteBuffer rootBuffer = channel.map(
       FileChannel.MapMode.READ_WRITE,
@@ -274,6 +285,8 @@ implements DataStoreFactory {
     hitTable.force();
     nameTable.force();
     
+    System.out.println("Committed");
+    
     return getDataStore(storeFile);
   }
   
@@ -292,7 +305,7 @@ implements DataStoreFactory {
   ) {
     long kmerPointer = hashTable.get(word+1);
     if(kmerPointer != -1) {
-      kmerPointer += Constants.BYTES_IN_INT;
+      kmerPointer += Constants.BYTES_IN_LONG;
 
       int hitCount = hitTable.getInt(kmerPointer);
       long pos = kmerPointer + hitCount * (Constants.BYTES_IN_INT + Constants.BYTES_IN_INT) + Constants.BYTES_IN_INT;

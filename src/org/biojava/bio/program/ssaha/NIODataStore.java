@@ -43,11 +43,10 @@ class NIODataStore implements DataStore {
     
     // extend root map to include the serialized packing
     int packingStreamLength = rootBuffer.getInt();
-    //System.out.println("hashTablePos:\t" + hashTablePos);
-    //System.out.println("hitTablePos:\t" + hitTablePos);
-    //System.out.println("nameArrayPos:\t" + nameArrayPos);
-    //System.out.println("nameTablePos:\t" + nameTablePos);
-    //System.out.println("packingStreamLength:\t" + packingStreamLength);
+    System.out.println("hashTablePos:\t" + hashTablePos);
+    System.out.println("hitTablePos:\t" + hitTablePos);
+    System.out.println("nameTablePos:\t" + nameTablePos);
+    System.out.println("packingStreamLength:\t" + packingStreamLength);
     rootBuffer = channel.map(
       FileChannel.MapMode.READ_ONLY,
       0,
@@ -71,10 +70,11 @@ class NIODataStore implements DataStore {
     MappedByteBuffer hashTable_MB = channel.map(
       FileChannel.MapMode.READ_ONLY,
       hashTablePos,
-      4
+      Constants.BYTES_IN_LONG
     );
     hashTable_MB.position(0);
-    int hashTableSize = hashTable_MB.getInt();
+    long hashTableSize = hashTable_MB.getLong();
+    System.out.println("hashTableSize: " + hashTableSize);
     hashTable = channel.map(
       FileChannel.MapMode.READ_ONLY,
       hashTablePos + Constants.BYTES_IN_LONG,
@@ -136,7 +136,7 @@ class NIODataStore implements DataStore {
   
   public String seqNameForID(int id) {;
     nameTable.position(id);
-    int length = nameTable.getInt();
+    int length = nameTable.getShort();
     StringBuffer sbuff = new StringBuffer(length);
     for(int i = 0; i < length; i++) {
       sbuff.append(nameTable.getChar());
@@ -150,6 +150,7 @@ class NIODataStore implements DataStore {
     SearchListener listener
   ) {
     long hitOffset = hashTable.get(word);
+    //System.out.println("hitOffset: " + hitOffset);
     if(hitOffset != -1) {
       try {
         hitTable.position(hitOffset);

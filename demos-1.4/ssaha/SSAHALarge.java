@@ -27,7 +27,8 @@ public class SSAHALarge {
     //System.out.println("Searching:");
     
     for(
-      SequenceIterator si = SeqIOTools.readFastaDNA(
+      //SequenceIterator si = SeqIOTools.readFastaDNA(
+      SequenceIterator si = SeqIOTools.readEmbl(
         new BufferedReader(
           new FileReader(
             seqFile

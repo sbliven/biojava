@@ -120,7 +120,7 @@ implements Serializable {
     return this.alphabets;
   }
   
-  public AtomicSymbol getSymbolImpl(List symL)
+  protected AtomicSymbol getSymbolImpl(List symL)
   throws IllegalSymbolException {
     AtomicSymbol s = (AtomicSymbol) symL.get(0);
     return s;
