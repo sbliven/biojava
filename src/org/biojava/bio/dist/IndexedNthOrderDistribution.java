@@ -6,7 +6,7 @@ import java.io.*;
 import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
 
-class IndexedNthOrderDistribution extends NthOrderDistribution implements ObjectInputValidation {
+class IndexedNthOrderDistribution extends AbstractOrderNDistribution implements ObjectInputValidation {
     private Distribution[] dists;
     private transient AlphabetIndex index;
 
@@ -59,7 +59,7 @@ class IndexedNthOrderDistribution extends NthOrderDistribution implements Object
 	dists[indx] = dist;
     }
 
-    public Collection distributions() {
+    public Collection conditionedDistributions() {
 	return Arrays.asList(dists);
     }
 }

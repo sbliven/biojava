@@ -7,29 +7,13 @@ import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
 
 /**
- * Provides an N'th order distribution.  This is a distribution over one
- * alphabet which is conditioned on having previously observed one or
- * more other symbols (potentially from different alphabets).
- *
- * <p>
- * Order-N distributions are always over a CrossProductAlphabet.
- * </p>
- *
- * <p>
- * <strong>Note:</strong> Unlike normal distributions, the total weights for
- * all symbols in the overall alphabet do <em>not</em> sum to 1.0.  Instead,
- * the weights of each sub-distribution should sum to 1.0.
- * </p>
- *
- * <p>
- * This would typically be used in conjunction with an OrderNSymbolList.
- * </p>
+ * Simple base class for OrderNDistributions
  *
  * @author Samiul Hasan
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public abstract class NthOrderDistribution extends AbstractDistribution implements Serializable {
+public abstract class AbstractOrderNDistribution extends AbstractDistribution implements OrderNDistribution, Serializable {
   private CrossProductAlphabet alphabet;
   private Alphabet firstA;
   private Alphabet lastA;
@@ -44,7 +28,7 @@ public abstract class NthOrderDistribution extends AbstractDistribution implemen
       weightForwarder == null
     ) {
       weightForwarder = new WeigthForwarder(this, changeSupport);
-      for(Iterator i = distributions().iterator(); i.hasNext(); ) {
+      for(Iterator i = conditionedDistributions().iterator(); i.hasNext(); ) {
         Distribution dist = (Distribution) i.next();
         dist.addChangeListener(weightForwarder, Distribution.WEIGHTS);
       }
@@ -55,7 +39,7 @@ public abstract class NthOrderDistribution extends AbstractDistribution implemen
      * Construct a new NthOrderDistribution.
      */
 
-  protected NthOrderDistribution(CrossProductAlphabet alpha)
+  protected AbstractOrderNDistribution(CrossProductAlphabet alpha)
   throws IllegalAlphabetException  {
     this.alphabet = alpha;
     List aList = alpha.getAlphabets();
@@ -90,15 +74,7 @@ public abstract class NthOrderDistribution extends AbstractDistribution implemen
     public Alphabet getConditionedAlphabet() {
 	return lastA;
     }
-    
-    abstract Collection distributions();
-
-  public abstract void setDistribution(Symbol sym, Distribution dist)
-      throws IllegalSymbolException, IllegalAlphabetException;
-  
-  public abstract Distribution getDistribution(Symbol sym)
-      throws IllegalSymbolException;
-  
+   
   public Alphabet getAlphabet() {
     return alphabet;
   }
@@ -175,7 +151,7 @@ public abstract class NthOrderDistribution extends AbstractDistribution implemen
   }
   
   public void registerWithTrainer(DistributionTrainerContext dtc) {
-    for(Iterator i = distributions().iterator(); i.hasNext(); ) {
+    for(Iterator i = conditionedDistributions().iterator(); i.hasNext(); ) {
       dtc.registerDistribution((Distribution) i.next());
     }
     dtc.registerTrainer(this, new IgnoreCountsTrainer() {
@@ -203,7 +179,7 @@ public abstract class NthOrderDistribution extends AbstractDistribution implemen
     private Distribution nullModel = new UniformDistribution((FiniteAlphabet) lastA);
     
     public Alphabet getAlphabet() {
-      return NthOrderDistribution.this.getAlphabet();
+      return AbstractOrderNDistribution.this.getAlphabet();
     }
     
     public double getWeight(Symbol sym)
@@ -242,15 +218,4 @@ public abstract class NthOrderDistribution extends AbstractDistribution implemen
       return null;
     }
   }
-
-    public static NthOrderDistribution make(CrossProductAlphabet alpha,
-					    DistributionFactory df)
-	throws IllegalAlphabetException
-    {
-	List aList = alpha.getAlphabets();
-	if (aList.size() == 2 && aList.get(0) == org.biojava.bio.seq.DNATools.getDNA())
-	    return new IndexedNthOrderDistribution(alpha, df);
-	else
-	    return new GeneralNthOrderDistribution(alpha, df);
-    }
 }

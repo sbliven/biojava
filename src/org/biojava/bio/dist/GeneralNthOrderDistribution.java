@@ -6,7 +6,7 @@ import java.io.*;
 import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
 
-class GeneralNthOrderDistribution extends NthOrderDistribution {
+class GeneralNthOrderDistribution extends AbstractOrderNDistribution {
     private Map dists;
 
     GeneralNthOrderDistribution(CrossProductAlphabet alpha, DistributionFactory df) 
@@ -53,7 +53,7 @@ class GeneralNthOrderDistribution extends NthOrderDistribution {
 	dists.put(sym, dist);
     }
 
-    public Collection distributions() {
+    public Collection conditionedDistributions() {
 	return dists.values();
     }
 }
