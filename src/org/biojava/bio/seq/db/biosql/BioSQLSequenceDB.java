@@ -44,14 +44,18 @@ import org.biojava.bio.taxa.*;
  * @since 1.3
  */
 
-public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
+public class BioSQLSequenceDB implements SequenceDB {
     private JDBCConnectionPool pool;
     private int dbid = -1;
     private String name;
     private IDMaker idmaker = new IDMaker.ByName();
-    private WeakCacheMap outstandingSequences = new WeakCacheMap();
+    private WeakValueHashMap sequencesByName = new WeakValueHashMap();
+    private WeakValueHashMap sequencesByID = new WeakValueHashMap();
     private DBHelper helper;
     private FeaturesSQL featuresSQL;
+    private BioSQLChangeHub changeHub;
+    private WeakValueHashMap featuresByID = new WeakValueHashMap();
+    private Cache tileCache = new FixedSizeCache(10);
 
     JDBCConnectionPool getPool() {
 	return pool;
@@ -63,6 +67,10 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 
     FeaturesSQL getFeaturesSQL() {
 	return featuresSQL;
+    }
+
+    BioSQLChangeHub getChangeHub() {
+	return changeHub;
     }
 
     /**
@@ -94,6 +102,9 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 
 	// Create adapters
 	featuresSQL = new FeaturesSQL(this);
+
+	// Create helpers
+	changeHub = new BioSQLChangeHub(this);
 
 	try {
 	    Connection conn = pool.takeConnection();
@@ -132,17 +143,12 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 				    int length)
 	throws IllegalIDException, ChangeVetoException, BioException
     {
-      if (!hasListeners()) {
-        _createDummySequence(id, alphabet, length);
-      } else {
-        ChangeSupport changeSupport = getChangeSupport(SequenceDB.SEQUENCES);
-        synchronized (changeSupport) {
+        synchronized (changeHub) {
           ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, null);
-          changeSupport.firePreChangeEvent(cev);
+          changeHub.fireDatabasePreChange(cev);
           _createDummySequence(id, alphabet, length);
-          changeSupport.firePostChangeEvent(cev);
+          changeHub.fireDatabasePostChange(cev);
         }
-      }
     }
 
     private void _createDummySequence(String id,
@@ -202,17 +208,12 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
     public void addSequence(Sequence seq)
 	throws IllegalIDException, ChangeVetoException, BioException
     {
-      if (!hasListeners()) {
-        _addSequence(seq);
-      } else {
-        ChangeSupport changeSupport = getChangeSupport(SequenceDB.SEQUENCES);
-        synchronized (changeSupport) {
+	synchronized (changeHub) {
           ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, seq);
-          changeSupport.firePreChangeEvent(cev);
+          changeHub.fireDatabasePreChange(cev);
           _addSequence(seq);
-          changeSupport.firePostChangeEvent(cev);
+          changeHub.fireDatabasePostChange(cev);
         }
-      }
     }
 
     private void _addSequence(Sequence seq)
@@ -412,7 +413,21 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
     public Sequence getSequence(String id)
         throws BioException, IllegalIDException
     {
-	Sequence seq = (Sequence) outstandingSequences.get(id);
+	return getSequence(id, -1);
+    }
+
+    Sequence getSequence(String id, int bioentry_id)
+        throws BioException, IllegalIDException
+    {
+	Sequence seq = null;
+	if (id != null) {
+	    seq = (Sequence) sequencesByName.get(id);
+	} else if (bioentry_id >= 0) {
+	    seq = (Sequence) sequencesByID.get(new Integer(bioentry_id));
+	} else {
+	    throw new BioError("Neither a name nor an internal ID was supplied");
+	}
+
 	if (seq != null) {
 	    return seq;
 	}
@@ -420,22 +435,37 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	try {
 	    Connection conn = pool.takeConnection();
 
-	    PreparedStatement get_bioentry = conn.prepareStatement("select bioentry.bioentry_id " +
-								   "from bioentry " +
-								   "where bioentry.accession = ? and " +
-								   "      bioentry.biodatabase_id = ?");
-	    get_bioentry.setString(1, id);
-	    get_bioentry.setInt(2, dbid);
-	    ResultSet rs = get_bioentry.executeQuery();
-	    int bioentry_id = -1;
-	    if (rs.next()) {
-		bioentry_id = rs.getInt(1);
-	    }
-	    get_bioentry.close();
-
 	    if (bioentry_id < 0) {
-		pool.putConnection(conn);
-		throw new IllegalIDException("No bioentry with accession " + id);
+		PreparedStatement get_bioentry = conn.prepareStatement("select bioentry.bioentry_id " +
+								       "from bioentry " +
+								       "where bioentry.accession = ? and " +
+								       "      bioentry.biodatabase_id = ?");
+		get_bioentry.setString(1, id);
+		get_bioentry.setInt(2, dbid);
+		ResultSet rs = get_bioentry.executeQuery();
+		if (rs.next()) {
+		    bioentry_id = rs.getInt(1);
+		}
+		get_bioentry.close();
+
+		if (bioentry_id < 0) {
+		    pool.putConnection(conn);
+		    throw new IllegalIDException("No bioentry with accession " + id);
+		}
+	    } else {
+		PreparedStatement get_accession = conn.prepareStatement("select bioentry.accession from bioentry where bioentry.bioentry_id = ? and bioentry.biodatabase_id = ?");
+		get_accession.setInt(1, bioentry_id);
+		get_accession.setInt(2, dbid);
+		ResultSet rs = get_accession.executeQuery();
+		if (rs.next()) {
+		    id = rs.getString(1);
+		}
+		get_accession.close();
+
+		if (id == null) {
+		    pool.putConnection(conn);
+		    throw new IllegalIDException("No bioentry with internal ID " + bioentry_id);
+		}
 	    }
 
 	    if (seq == null) {
@@ -443,7 +473,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 									  "from   biosequence " +
 									  "where  bioentry_id = ?");
 		get_biosequence.setInt(1, bioentry_id);
-		rs = get_biosequence.executeQuery();
+		ResultSet rs = get_biosequence.executeQuery();
 		if (rs.next()) {
 		    int biosequence_id = rs.getInt(1);
 		    String molecule = rs.getString(2);
@@ -461,7 +491,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 								       "from   assembly " +
 								       "where  bioentry_id = ?");
 		get_assembly.setInt(1, bioentry_id);
-		rs = get_assembly.executeQuery();
+		ResultSet rs = get_assembly.executeQuery();
 		if (rs.next()) {
 		    int assembly_id = rs.getInt(1);
 		    int length = rs.getInt(2);
@@ -474,7 +504,8 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    pool.putConnection(conn);
 
 	    if (seq != null) {
-		outstandingSequences.put(id, seq);
+		sequencesByName.put(id, seq);
+		sequencesByID.put(new Integer(bioentry_id), seq);
 		return seq;
 	    }
 	} catch (SQLException ex) {
@@ -487,23 +518,19 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
     public void removeSequence(String id)
 	throws IllegalIDException, ChangeVetoException, BioException
     {
-      if (!hasListeners()) {
-        _removeSequence(id);
-      } else {
-        ChangeSupport changeSupport = getChangeSupport(SequenceDB.SEQUENCES);
-        synchronized (changeSupport) {
+     
+        synchronized (changeHub) {
           ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, null);
-          changeSupport.firePreChangeEvent(cev);
+          changeHub.fireDatabasePreChange(cev);
           _removeSequence(id);
-          changeSupport.firePostChangeEvent(cev);
+          changeHub.fireDatabasePostChange(cev);
         }
-      }
     }
 
     private void _removeSequence(String id)
         throws BioException, IllegalIDException, ChangeVetoException
     {
-	Sequence seq = (Sequence) outstandingSequences.get(id);
+	Sequence seq = (Sequence) sequencesByName.get(id);
 	if (seq != null) {
 	    seq = null;  // Don't want to be holding the reference ourselves!
 	    try {
@@ -512,7 +539,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    } catch (Exception ex) {
 		ex.printStackTrace();
 	    }
-	    seq = (Sequence) outstandingSequences.get(id);
+	    seq = (Sequence) sequencesByName.get(id);
 	    if (seq != null) {
 		throw new BioException("There are still references to sequence with ID " + id + " from this database.");
 	    }
@@ -1059,11 +1086,11 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	}
 
 	public boolean accept(Feature f) {
-	    if (! (f instanceof BioSQLFeatureI)) {
+	    if (! (f instanceof BioSQLFeature)) {
 		return false;
 	    }
 
-	    int intID = ((BioSQLFeatureI) f)._getInternalID();
+	    int intID = ((BioSQLFeature) f)._getInternalID();
 	    return (intID == id);
 	}
     }
@@ -1111,5 +1138,96 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	} catch (BioException ex) {
 	    throw new BioRuntimeException(ex, "Error fetching sequence");
 	}
+    }
+
+    // SequenceIterator here, 'cos AbstractSequenceDB grandfathers in AbstractChangable :-(
+
+  public SequenceIterator sequenceIterator() {
+    return new SequenceIterator() {
+      private Iterator pID = ids().iterator();
+      
+      public boolean hasNext() {
+        return pID.hasNext();
+      }
+      
+      public Sequence nextSequence() throws BioException {
+        return getSequence((String) pID.next());
+      }
+    };
+  }
+
+    public void addChangeListener(ChangeListener cl) {
+	addChangeListener(cl, ChangeType.UNKNOWN);
+    }
+    
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {
+	getChangeHub().addDatabaseListener(cl, ct);
+    }
+
+    public void removeChangeListener(ChangeListener cl) {
+	removeChangeListener(cl, ChangeType.UNKNOWN);
+    }
+
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+	getChangeHub().removeDatabaseListener(cl, ct);
+    }
+
+    public boolean isUnchanging(ChangeType ct) {
+	return false;
+    }
+
+    //
+    // Feature canonicalization
+    //
+
+    BioSQLFeature canonicalizeFeature(BioSQLFeature f, int feature_id) {
+	// System.err.println("Canonicalizing feature at " + f.getLocation());
+
+	Integer key = new Integer(feature_id);
+	BioSQLFeature oldFeature = (BioSQLFeature) featuresByID.get(key);
+	if (oldFeature != null) {
+	    return oldFeature;
+	} else {
+	    featuresByID.put(key, f);
+	    return f;
+	}
+    }
+
+    private class SingleFeatureReceiver extends BioSQLFeatureReceiver {
+	private Feature feature;
+
+	private SingleFeatureReceiver(Sequence seq) {
+	    super(seq);
+	}
+
+	protected void deliverTopLevelFeature(Feature f)
+	    throws ParseException
+	{
+	    if (feature == null) {
+		feature = f;
+	    } else {
+		throw new ParseException("Expecting only a single feature");
+	    }
+	}
+
+	public Feature getFeature() {
+	    return feature;
+	}
+    }
+
+    BioSQLFeature getFeatureByID(int feature_id) {
+	Integer key = new Integer(feature_id);
+	BioSQLFeature f = (BioSQLFeature) featuresByID.get(key);
+	if (f != null) {
+	    return f;
+	}
+
+	// try {
+	//    SingleFeatureReceiver receiver = new SingleFeatureReceiver
+	return null;
+    }
+
+    Cache getTileCache() {
+	return tileCache;
     }
 }

@@ -36,7 +36,7 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.taxa.*;
 
 /**
- * Behind-the-scenes adaptor for for features sub-schema of BioSQL.
+ * Behind-the-scenes adaptor to the features sub-schema of BioSQL.
  *
  * @author Thomas Down
  * @since 1.3
@@ -53,24 +53,97 @@ class FeaturesSQL {
     // Feature retrieval
     //
 
-    public void retrieveFeatures(int bioentry_id, SeqIOListener listener) 
-        throws SQLException, BioException, ChangeVetoException
+    /**
+     * Get some features out of BioSQL and fire SeqIO events to the specified listener.
+     * Currently 4 modes:
+     *
+     * <ul>
+     * <li>Get all features on a bioentry (including children)</li>
+     * <li>Get all top-level features in a region</li>
+     * <li>Get all children of a specified parent</li>
+     * <li>Get a particular feature by ID</li>
+     * </ul>
+     *
+     * This is rather ugly, but it's well hidden.  Not sure what the options would be for
+     * a cleaner API.
+     */
+
+    public void retrieveFeatures(int bioentry_id, 
+				 SeqIOListener listener,
+				 Location topLevelOverlappingRegion,
+				 int immediateChildrenOfParent,
+				 int featureID) 
+        throws SQLException, BioException
     {
 	Connection conn = seqDB.getPool().takeConnection();
 	Map fmap = new HashMap();
 	Map qmap = new HashMap();
 	Map lmap = new HashMap();
 
-	PreparedStatement get_features = conn.prepareStatement(
+	
+	PreparedStatement get_features = null;
+	if (topLevelOverlappingRegion == null && immediateChildrenOfParent < 0 && featureID < 0) {
+	    get_features = conn.prepareStatement(
 			"select seqfeature.seqfeature_id, " +
-			"ontology_term.term_name, " +
-			"seqfeature_source.source_name " +
-			"from seqfeature, ontology_term, seqfeature_source " +
-			"where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
-			"      seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
-			"      seqfeature.bioentry_id = ?"
+			"       ontology_term.term_name, " +
+			"       seqfeature_source.source_name " +
+			"  from seqfeature, ontology_term, seqfeature_source " +
+			" where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
+			"       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
+			"       seqfeature.bioentry_id = ?"
 			);
-	get_features.setInt(1, bioentry_id);
+	    get_features.setInt(1, bioentry_id);
+	} else if (topLevelOverlappingRegion != null) {
+	    get_features = conn.prepareStatement(
+			"select distinct " +
+			"       seqfeature.seqfeature_id, " +
+			"       ontology_term.term_name, " +
+			"       seqfeature_source.source_name " +
+			"  from ontology_term, seqfeature_source, seqfeature_location, " +
+			"       (seqfeature left outer join seqfeature_relationship " +
+                        "                   on seqfeature.seqfeature_id = seqfeature_relationship.parent_seqfeature_id) " +
+			" where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
+			"       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
+			"       seqfeature.bioentry_id = ? and " +
+			"       seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
+			"       seqfeature_location.seq_end >= ? and " +
+			"       seqfeature_location.seq_start <= ? and " +
+			"       seqfeature_relationship.parent_seqfeature_id is null"
+	    );
+	    get_features.setInt(1, bioentry_id);
+	    get_features.setInt(2, topLevelOverlappingRegion.getMin());
+	    get_features.setInt(3, topLevelOverlappingRegion.getMax());
+	} else if (immediateChildrenOfParent >= 0) {
+	    get_features = conn.prepareStatement(
+			"select seqfeature.seqfeature_id, " +
+			"       ontology_term.term_name, " +
+			"       seqfeature_source.source_name " +
+			"  from seqfeature, ontology_term, seqfeature_source, seqfeature_relationship " +
+			" where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
+			"       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
+			"       seqfeature.bioentry_id = ? and " +
+			"       seqfeature.seqfeature_id = seqfeature_relationship.child_seqfeature_id and " +
+			"       seqfeature_relationship.parent_seqfeature_id = ?"
+	    );
+	    get_features.setInt(1, bioentry_id);
+	    get_features.setInt(2, immediateChildrenOfParent);
+	} else if (featureID >= 0) {
+	    get_features = conn.prepareStatement(
+			"select seqfeature.seqfeature_id, " +
+			"       ontology_term.term_name, " +
+			"       seqfeature_source.source_name " +
+			"  from seqfeature, ontology_term, seqfeature_source " +
+			" where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
+			"       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
+			"       seqfeature.bioentry_id = ? and " +
+			"       seqfeature.seqfeature_id = ?"
+	    );
+	    get_features.setInt(1, bioentry_id);
+	    get_features.setInt(2, featureID);
+	} else {
+	    throw new BioException("I'm afraid you can't do that!");
+	}
+
 	ResultSet rs = get_features.executeQuery();
 	while (rs.next()) {
 	    int feature_id = rs.getInt(1);
@@ -83,6 +156,8 @@ class FeaturesSQL {
 	get_features.close();
 
 	// Fetch those crappy location qualifiers first...
+
+	/*
 
 	if (seqDB.isLocationQualifierSupported()) {
 	    PreparedStatement get_location_crap = conn.prepareStatement(
@@ -113,20 +188,77 @@ class FeaturesSQL {
 		l.add(lqm);
 	    }
 	}
+
+	*/
+
 	
 	// Fetch locations
-	
-	PreparedStatement get_locations = conn.prepareStatement(
+       
+	PreparedStatement get_locations = null;
+	if (topLevelOverlappingRegion == null && immediateChildrenOfParent < 0 && featureID < 0) {
+	    get_locations = conn.prepareStatement(
 		        "select seqfeature_location.seqfeature_location_id, " +
-			"seqfeature_location.seqfeature_id, " +
-			"seqfeature_location.seq_start, " +
-			"seqfeature_location.seq_end, " +
-			"seqfeature_location.seq_strand " +
-			"from seqfeature, seqfeature_location " +
-			"where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
-			"seqfeature.bioentry_id = ?"
-			);
-	get_locations.setInt(1, bioentry_id);
+			"       seqfeature_location.seqfeature_id, " +
+			"       seqfeature_location.seq_start, " +
+			"       seqfeature_location.seq_end, " +
+			"       seqfeature_location.seq_strand " +
+			"  from seqfeature, seqfeature_location " +
+			" where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
+			"       seqfeature.bioentry_id = ?"
+	    );
+	    get_locations.setInt(1, bioentry_id);
+	} else if (topLevelOverlappingRegion != null) {
+	    get_locations = conn.prepareStatement(
+		        "select distinct " +
+			"       seqfeature_location.seqfeature_location_id, " +
+			"       seqfeature_location.seqfeature_id, " +
+			"       seqfeature_location.seq_start, " +
+			"       seqfeature_location.seq_end, " +
+			"       seqfeature_location.seq_strand " +
+			"  from seqfeature_location, seqfeature_location as sfl2, " +
+			"       (seqfeature left outer join seqfeature_relationship " +
+                        "                   on seqfeature.seqfeature_id = seqfeature_relationship.parent_seqfeature_id) " +
+			" where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
+			"       seqfeature.bioentry_id = ? and " +
+			"       sfl2.seqfeature_id = seqfeature.seqfeature_id and " +
+			"       sfl2.seq_end >= ? and " +
+			"       sfl2.seq_start <= ? and " +
+			"       seqfeature_relationship.parent_seqfeature_id is null"
+	    );
+	    get_locations.setInt(1, bioentry_id);
+	    get_locations.setInt(2, topLevelOverlappingRegion.getMin());
+	    get_locations.setInt(3, topLevelOverlappingRegion.getMax());
+	} else if (immediateChildrenOfParent >= 0) {
+	    get_locations = conn.prepareStatement(
+		        "select seqfeature_location.seqfeature_location_id, " +
+			"       seqfeature_location.seqfeature_id, " +
+			"       seqfeature_location.seq_start, " +
+			"       seqfeature_location.seq_end, " +
+			"       seqfeature_location.seq_strand " +
+			"  from seqfeature, seqfeature_location, seqfeature_relationship " +
+			" where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
+			"       seqfeature.bioentry_id = ? and " +
+			"       seqfeature.seqfeature_id = seqfeature_relationship.child_seqfeature_id and " +
+			"       seqfeature_relationship.parent_seqfeature_id = ?"
+	    );
+	    get_locations.setInt(1, bioentry_id);
+	    get_locations.setInt(2, immediateChildrenOfParent);
+	} else if (featureID >= 0) {
+	    get_locations = conn.prepareStatement(
+		        "select seqfeature_location.seqfeature_location_id, " +
+			"       seqfeature_location.seqfeature_id, " +
+			"       seqfeature_location.seq_start, " +
+			"       seqfeature_location.seq_end, " +
+			"       seqfeature_location.seq_strand " +
+			"  from seqfeature, seqfeature_location " +
+			" where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
+			"       seqfeature.bioentry_id = ? and " +
+			"       seqfeature.seqfeature_id = ?");
+	    get_locations.setInt(1, bioentry_id);
+	    get_locations.setInt(2, featureID);
+	}
+
+
 	rs = get_locations.executeQuery();
 	while (rs.next()) {
 	    Integer lid = new Integer(rs.getInt(1));
@@ -269,7 +401,8 @@ class FeaturesSQL {
 	
 	Set toplevelFeatures = new HashSet(fmap.keySet());
 	Map featureHierarchy = new HashMap();
-	if (seqDB.isHierarchySupported()) {
+	int specifiedParent = -1;
+	if (topLevelOverlappingRegion == null && immediateChildrenOfParent < 0 && featureID < 0) {
 	    PreparedStatement get_hierarchy = conn.prepareStatement(
 		   "select parent_seqfeature_id, child_seqfeature_id " +
 		   "  from seqfeature_relationship, seqfeature " +
@@ -290,29 +423,57 @@ class FeaturesSQL {
 		cl.add(child);
 	    }
 	    get_hierarchy.close();
+	} else if (immediateChildrenOfParent >= 0) {
+	    specifiedParent = immediateChildrenOfParent;
+	} else if (featureID >= 0) {
+	    PreparedStatement discover_parent = conn.prepareStatement(
+		   "select parent_seqfeature_id " +
+		   "  from seqfeature_relationship " +
+		   " where parent_seqfeature_id = ?");
+	    discover_parent.setInt(1, featureID);
+	    rs = discover_parent.executeQuery();
+	    if (rs.next()) {
+		specifiedParent = rs.getInt(1);
+	    }
 	}
 
 	seqDB.getPool().putConnection(conn);
 	conn = null;
-	
+
 	for (Iterator tlfi = toplevelFeatures.iterator(); tlfi.hasNext(); ) {
 	    Integer fid = (Integer) tlfi.next();
 	    Feature.Template templ = (Feature.Template) fmap.get(fid);
-	    fireFeatureTree(listener, fid, fmap, featureHierarchy);
+	    fireFeatureTree(listener, 
+			    fid,
+			    fmap,
+			    featureHierarchy,
+			    (topLevelOverlappingRegion == null) && (immediateChildrenOfParent < 0),
+			    new Integer(specifiedParent)
+			    );
 	}
     }
 
-    private void fireFeatureTree(SeqIOListener listener, Integer fid, Map fmap, Map featureHierarchy)
-        throws BioException, ChangeVetoException
+    private void fireFeatureTree(SeqIOListener listener,
+				 Integer fid,
+				 Map fmap,
+				 Map featureHierarchy,
+				 boolean childrenFetched,
+				 Integer pid)
+        throws BioException
     {
 	Feature.Template templ = (Feature.Template) fmap.get(fid);
 	listener.startFeature(templ);
 	listener.addFeatureProperty("_biosql_internal.feature_id", fid);
+	listener.addFeatureProperty("_biosql_internal.parent_id", pid);
 	List children = (List) featureHierarchy.get(fid);
-	if (children != null) {
+	if (children == null) {
+	    if (childrenFetched) {
+		listener.addFeatureProperty("_biosql_internal.hint_childfree", Boolean.TRUE);
+	    }
+	} else {
 	    for (Iterator ci = children.iterator(); ci.hasNext(); ) {
 		Integer childID = (Integer) ci.next();
-		fireFeatureTree(listener, childID, fmap, featureHierarchy);
+		fireFeatureTree(listener, childID, fmap, featureHierarchy, childrenFetched, fid);
 	    }
 	}
 	listener.endFeature();
@@ -479,7 +640,7 @@ class FeaturesSQL {
 	return id;
     }
 
-    void removeFeature(BioSQLFeatureI f)
+    void removeFeature(BioSQLFeature f)
         throws ChangeVetoException
     {
         Connection conn = null;
@@ -503,14 +664,14 @@ class FeaturesSQL {
 	}
     }
 
-    private void removeFeature(Connection conn, BioSQLFeatureI f)
+    private void removeFeature(Connection conn, BioSQLFeature f)
         throws SQLException, ChangeVetoException
     {
         Iterator children = ((FeatureHolder) f).features();
         while (children.hasNext()) {
             Feature f2 = (Feature) children.next();
-            if (f2 instanceof BioSQLFeatureI) {
-                removeFeature(conn, (BioSQLFeatureI) f2);
+            if (f2 instanceof BioSQLFeature) {
+                removeFeature(conn, (BioSQLFeature) f2);
             }
         }
 
@@ -608,5 +769,31 @@ class FeaturesSQL {
 	}
 
 
+    }
+
+    void persistFeature(Feature f, int parent_id, int bioentry_id)
+        throws BioException
+    {
+	Connection conn = null;
+	try {
+	    conn = seqDB.getPool().takeConnection();
+	    conn.setAutoCommit(false);
+	    int f_id = seqDB.getFeaturesSQL().persistFeature(conn, bioentry_id, f, parent_id);
+	    if (f instanceof BioSQLFeature) {
+		((BioSQLFeature) f)._setInternalID(f_id);
+		((BioSQLFeature) f)._setAnnotation(new BioSQLFeatureAnnotation(seqDB, f_id));
+	    }
+	    conn.commit();
+	    seqDB.getPool().putConnection(conn);
+	} catch (SQLException ex) {
+	    boolean rolledback = false;
+	    if (conn != null) {
+		try {
+		    conn.rollback();
+		    rolledback = true;
+		} catch (SQLException ex2) {}
+	    }
+	    throw new BioException(ex, "Error adding BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""));
+	}
     }
 }

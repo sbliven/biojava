@@ -45,4 +45,6 @@ interface BioSQLSequenceI extends Sequence, RealizingFeatureHolder {
         throws BioException;
     
     BioSQLSequenceDB getSequenceDB();
+
+    int getBioEntryID();
 }

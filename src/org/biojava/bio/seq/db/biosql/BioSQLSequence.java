@@ -42,8 +42,6 @@ import org.biojava.bio.symbol.*;
  */
 
 class BioSQLSequence
-  extends
-    AbstractChangeable
   implements
     Sequence,
     RealizingFeatureHolder,
@@ -55,7 +53,7 @@ class BioSQLSequence
     private int biosequence_id;
     private Annotation annotation;
     private Alphabet alphabet;
-    private BioEntryFeatureSet features;
+    private RealizingFeatureHolder features;
     private SymbolList symbols;
     private int length;
 
@@ -65,6 +63,10 @@ class BioSQLSequence
 
     public BioSQLSequenceDB getSequenceDB() {
 	return seqDB;
+    }
+
+    public int getBioEntryID() {
+	return bioentry_id;
     }
 
     BioSQLSequence(BioSQLSequenceDB seqDB,
@@ -87,7 +89,7 @@ class BioSQLSequence
 	    throw new BioException(ex, "Can't load sequence with unknown alphabet " + alphaName);
 	}
 
-	features = new BioEntryFeatureSet(this, seqDB, bioentry_id);
+	// features = new BioEntryFeatureSet(this, seqDB, bioentry_id);
     }
 
     public String getName() {
@@ -210,7 +212,10 @@ class BioSQLSequence
     // implements FeatureHolder
     //
 
-    private BioEntryFeatureSet getFeatures() {
+    private RealizingFeatureHolder getFeatures() {
+	if (features == null) {
+	    features = new BioSQLTiledFeatures(this, seqDB, bioentry_id, 10000);
+	}
 	return features;
     }
 
@@ -251,6 +256,26 @@ class BioSQLSequence
     public void persistFeature(Feature f, int parent_id)
         throws BioException
     {
-	getFeatures().persistFeature(f, parent_id);
+	seqDB.getFeaturesSQL().persistFeature(f, parent_id, bioentry_id);
+    }
+
+    public void addChangeListener(ChangeListener cl) {
+	addChangeListener(cl, ChangeType.UNKNOWN);
+    }
+    
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {
+	getSequenceDB().getChangeHub().addEntryListener(bioentry_id, cl, ct);
+    }
+
+    public void removeChangeListener(ChangeListener cl) {
+	removeChangeListener(cl, ChangeType.UNKNOWN);
+    }
+
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+	getSequenceDB().getChangeHub().removeEntryListener(bioentry_id, cl, ct);
+    }
+
+    public boolean isUnchanging(ChangeType ct) {
+	return false;
     }
 }

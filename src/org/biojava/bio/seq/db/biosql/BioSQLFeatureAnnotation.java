@@ -41,10 +41,7 @@ import org.biojava.bio.symbol.*;
  */
 
 class BioSQLFeatureAnnotation
-  extends
-    AbstractChangeable
-  implements
-    Annotation
+  implements Annotation
 {
     private BioSQLSequenceDB seqDB;
     private int feature_id;
@@ -55,6 +52,10 @@ class BioSQLFeatureAnnotation
     {
 	this.seqDB = seqDB;
 	this.feature_id = feature_id;
+    }
+
+    int getFeatureID() {
+	return feature_id;
     }
 
     private void initAnnotations() {
@@ -99,17 +100,13 @@ class BioSQLFeatureAnnotation
     public void setProperty(Object key, Object value)
         throws ChangeVetoException
     {
-      if (!hasListeners()) {
-        _setProperty(key, value);
-      } else {
-        ChangeSupport changeSupport = getChangeSupport(Annotation.PROPERTY);
-        synchronized (changeSupport) {
-          ChangeEvent cev = new ChangeEvent(this, Annotation.PROPERTY, key);
-          changeSupport.firePreChangeEvent(cev);
-          _setProperty(key, value);
-          changeSupport.firePostChangeEvent(cev);
+        BioSQLChangeHub hub = seqDB.getChangeHub();
+        synchronized (hub) {
+	    ChangeEvent cev = new ChangeEvent(this, Annotation.PROPERTY, key);
+	    hub.fireFeatureAnnotationPreChange(cev);
+	    _setProperty(key, value);
+	    hub.fireFeatureAnnotationPostChange(cev);
         }
-      }
     }
 
     private void _setProperty(Object key, Object value) 
@@ -167,5 +164,25 @@ class BioSQLFeatureAnnotation
 	}
 
 	return Collections.unmodifiableMap(underlyingAnnotation.asMap());
+    }
+    
+    public void addChangeListener(ChangeListener cl) {
+	addChangeListener(cl, ChangeType.UNKNOWN);
+    }
+    
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {
+	seqDB.getChangeHub().addFeatureAnnotationListener(feature_id, cl, ct);
+    }
+
+    public void removeChangeListener(ChangeListener cl) {
+	removeChangeListener(cl, ChangeType.UNKNOWN);
+    }
+
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+	seqDB.getChangeHub().removeFeatureAnnotationListener(feature_id, cl, ct);
+    }
+
+    public boolean isUnchanging(ChangeType ct) {
+	return false;
     }
 }

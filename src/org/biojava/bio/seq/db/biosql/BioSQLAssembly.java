@@ -57,9 +57,9 @@ class BioSQLAssembly
     private Alphabet              alphabet;
     private int                   length;
 
-    private BioEntryFeatureSet    features;
-    private SimpleFeatureHolder   componentFeatures;
-    private MergeFeatureHolder    allFeatures;
+    private RealizingFeatureHolder features;
+    private SimpleFeatureHolder    componentFeatures;
+    private MergeFeatureHolder     allFeatures;
 
     private DBHelper getDBHelper() {
 	return seqDB.getDBHelper();
@@ -67,6 +67,10 @@ class BioSQLAssembly
 
     public BioSQLSequenceDB getSequenceDB() {
 	return seqDB;
+    }
+
+    public int getBioEntryID() {
+	return bioentry_id;
     }
 
     BioSQLAssembly(BioSQLSequenceDB seqDB,
@@ -89,7 +93,7 @@ class BioSQLAssembly
 	    throw new BioException(ex, "Can't load sequence with unknown alphabet " + alphaName);
 	}
 
-	features = new BioEntryFeatureSet(this, seqDB, bioentry_id);
+	features = new BioSQLAllFeatures(this, seqDB, bioentry_id);
     }
 
     public String getName() {
@@ -217,7 +221,7 @@ class BioSQLAssembly
     // implements FeatureHolder
     //
 
-    private BioEntryFeatureSet getFeatures() {
+    private RealizingFeatureHolder getFeatures() {
 	return features;
     }
 
@@ -272,6 +276,6 @@ class BioSQLAssembly
     public void persistFeature(Feature f, int parent_id)
         throws BioException
     {
-	getFeatures().persistFeature(f, parent_id);
+	seqDB.getFeaturesSQL().persistFeature(f, parent_id, bioentry_id);
     }
 }

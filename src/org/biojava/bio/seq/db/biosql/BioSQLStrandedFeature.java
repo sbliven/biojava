@@ -27,66 +27,64 @@ import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.*;
 
-class BioSQLStrandedFeature extends SimpleStrandedFeature implements BioSQLFeatureI {
-    private Annotation _annotation;
-    private int id;
-
-    BioSQLStrandedFeature(Sequence seq,
-			  FeatureHolder parent,
-			  StrandedFeature.Template templ)
-	throws IllegalArgumentException, IllegalAlphabetException
-    {
-	super(seq, parent, mungeTemplate(templ));
-	_annotation = templ.annotation;
-    }
-
-    public Feature createFeature(Feature.Template templ)
-        throws BioException, ChangeVetoException
-    {
-	Feature f = realizeFeature(this, templ);
-	getFeatureHolder().addFeature(f);
-	((BioSQLSequenceI) getSequence()).persistFeature(f, id);
-	return f;
-    }
-
-    public void removeFeature(Feature f)
-        throws ChangeVetoException
-    {
-	super.removeFeature(f);
-	((BioSQLSequenceI) getSequence()).getSequenceDB().getFeaturesSQL().removeFeature((BioSQLFeatureI) f);
-    }
-
-    private static StrandedFeature.Template mungeTemplate(StrandedFeature.Template templ) {
-	StrandedFeature.Template sft = new StrandedFeature.Template();
-	sft.location = templ.location;
-	sft.type = templ.type;
-	sft.source = templ.source;
-	sft.strand = templ.strand;
-	sft.annotation = Annotation.EMPTY_ANNOTATION;
-	return sft;
-    }
-
+class BioSQLStrandedFeature extends BioSQLFeature implements StrandedFeature {
+    private StrandedFeature.Strand strand;
     
-    public void _setAnnotation(Annotation a) {
-	_annotation = a;
+    public StrandedFeature.Strand getStrand() {
+	return strand;
     }
-
-    public Annotation getAnnotation() {
-	return _annotation;
+  
+    public SymbolList getSymbols() {
+	SymbolList symList = super.getSymbols();
+	if(getStrand() == NEGATIVE) {
+	    try {
+		symList = DNATools.reverseComplement(symList);
+	    } catch (IllegalAlphabetException iae) {
+		throw new BioError(
+				   iae,
+				   "Could not retrieve symbols for feature as " +
+				   "the alphabet can not be complemented."
+				   );
+	    }
+	}
+	return symList;
     }
-
-
-    public void _setInternalID(int i) {
-	this.id = i;
+  
+    public Feature.Template makeTemplate() {
+	StrandedFeature.Template ft = new StrandedFeature.Template();
+	fillTemplate(ft);
+	return ft;
     }
-
-    public int _getInternalID() {
-	return id;
+    
+    protected void fillTemplate(StrandedFeature.Template ft) {
+	super.fillTemplate(ft);
+	ft.strand = getStrand();
     }
-
-    public void _addFeature(Feature f) 
-        throws ChangeVetoException
+  
+    public BioSQLStrandedFeature(Sequence sourceSeq,
+				 FeatureHolder parent,
+				 StrandedFeature.Template template)
+	throws IllegalArgumentException, IllegalAlphabetException 
     {
-	getFeatureHolder().addFeature(f);
+	super(sourceSeq, parent, template);
+	this.strand = template.strand;
+    }
+
+    public BioSQLStrandedFeature(Sequence sourceSeq,
+				 StrandedFeature.Template template)
+	throws IllegalArgumentException, IllegalAlphabetException 
+    {
+	super(sourceSeq, template);
+	this.strand = template.strand;
+    }
+  
+    public String toString() {
+	String pm;
+	if(getStrand() == POSITIVE) {
+	    pm = "+";
+	} else {
+	    pm = "-";
+	}
+	return super.toString() + " " + pm;
     }
 } 

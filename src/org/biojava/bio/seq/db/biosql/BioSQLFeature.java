@@ -21,52 +21,155 @@
 
 package org.biojava.bio.seq.db.biosql;
 
+import java.util.*;
+import java.sql.*;
+
 import org.biojava.utils.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.io.*;
 import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.*;
 
-class BioSQLFeature extends SimpleFeature implements BioSQLFeatureI {
+class BioSQLFeature implements Feature, RealizingFeatureHolder {
     private Annotation _annotation;
     private int id;
+
+    // Feature stuff
+
+    private final String type;
+    private final String source;
+    private final Location location;
+
+    // Relationship to sequences
+
+    private int parentID = -1;
+    private final BioSQLSequenceI sequence;
+
+    // Children
+
+    private SimpleFeatureHolder childFeatures;
+
+    BioSQLFeature(Sequence seq,
+		  Feature.Template templ)
+	throws IllegalArgumentException, IllegalAlphabetException
+    {
+	this.type = templ.type;
+	this.source = templ.source;
+	this.location = templ.location;
+
+	this.sequence = (BioSQLSequenceI) seq;
+
+	_annotation = templ.annotation;
+    }
 
     BioSQLFeature(Sequence seq,
 		  FeatureHolder parent,
 		  Feature.Template templ)
 	throws IllegalArgumentException, IllegalAlphabetException
     {
-	super(seq, parent, mungeTemplate(templ));
-	_annotation = templ.annotation;
+	this(seq, templ);
+	if (parent instanceof BioSQLFeature) {
+	    parentID = ((BioSQLFeature) parent)._getInternalID();
+	} else {
+	    parentID = -1;
+	}
+    }
+
+    public void hintChildFree() {
+	if (childFeatures == null) {
+	    childFeatures = new SimpleFeatureHolder();
+	}
+    }
+
+    public void setParentID(int i) {
+	this.parentID = i;
+    }
+
+    public void setType(String s)
+        throws ChangeVetoException
+    {
+	throw new ChangeVetoException();
+    }
+
+    public String getType() {
+	return type;
+    }
+
+    public void setSource(String s)
+        throws ChangeVetoException
+    {
+	throw new ChangeVetoException();
+    }
+
+    public String getSource() {
+	return source;
+    }
+
+    public void setLocation(Location l)
+        throws ChangeVetoException
+    {
+	throw new ChangeVetoException();
+    }
+
+    public Location getLocation() {
+	return location;
+    }
+
+    public FeatureHolder getParent() {
+	if (parentID == -1) {
+	    return sequence;
+	} else {
+	    return sequence.getSequenceDB().getFeatureByID(parentID);
+	}
+    }
+
+    public Sequence getSequence() {
+	return sequence;
     }
 
     public void _setAnnotation(Annotation a) {
 	_annotation = a;
     }
 
+    public Feature realizeFeature(FeatureHolder fh, Feature.Template templ)
+        throws BioException
+    {
+	try {
+	    RealizingFeatureHolder rfh = (RealizingFeatureHolder) getParent();
+	    return rfh.realizeFeature(fh, templ);
+	} catch (ClassCastException ex) {
+	    throw new BioException("Couldn't propagate feature creation request.");
+	}
+    }
+
     public Feature createFeature(Feature.Template templ)
         throws BioException, ChangeVetoException
     {
 	Feature f = realizeFeature(this, templ);
-	getFeatureHolder().addFeature(f);
-	((BioSQLSequenceI) getSequence()).persistFeature(f, id);
+	
+	BioSQLChangeHub hub = sequence.getSequenceDB().getChangeHub();
+	ChangeEvent cev = new ChangeEvent(this, FeatureHolder.FEATURES, f, null);
+	synchronized (hub) {
+	    hub.fireFeaturePreChange(cev);
+	    getFeatures().addFeature(f);
+	    ((BioSQLSequenceI) getSequence()).persistFeature(f, id);
+	    hub.fireFeaturePostChange(cev);
+	}
 	return f;
     }
 
     public void removeFeature(Feature f)
         throws ChangeVetoException
     {
-	super.removeFeature(f);
-	((BioSQLSequenceI) getSequence()).getSequenceDB().getFeaturesSQL().removeFeature((BioSQLFeatureI) f);
-    }
-
-    private static Template mungeTemplate(Template templ) {
-	Feature.Template sft = new Feature.Template();
-	sft.location = templ.location;
-	sft.type = templ.type;
-	sft.source = templ.source;
-	sft.annotation = Annotation.EMPTY_ANNOTATION;
-	return sft;
+	BioSQLChangeHub hub = sequence.getSequenceDB().getChangeHub();
+	ChangeEvent cev = new ChangeEvent(this, FeatureHolder.FEATURES, null, f);
+	synchronized (hub) {
+	    hub.fireFeaturePreChange(cev);
+	    getFeatures().removeFeature(f);
+	    ((BioSQLSequenceI) getSequence()).getSequenceDB().getFeaturesSQL().removeFeature((BioSQLFeature) f);
+	    hub.fireFeaturePostChange(cev);
+	}
     }
 
     public Annotation getAnnotation() {
@@ -81,9 +184,114 @@ class BioSQLFeature extends SimpleFeature implements BioSQLFeatureI {
 	return id;
     }
 
-    public void _addFeature(Feature f) 
+    public synchronized void _addFeature(Feature f) 
         throws ChangeVetoException
     {
-	getFeatureHolder().addFeature(f);
+	if (childFeatures == null) {
+	    childFeatures = new SimpleFeatureHolder();
+	}
+	childFeatures.addFeature(f);
+    }
+
+    protected void fillTemplate(Feature.Template template) {
+	template.source = source;
+	template.type = type;
+	template.location = location;
+	template.annotation = _annotation;
+    }
+
+    public Feature.Template makeTemplate() {
+	Feature.Template template = new Feature.Template();
+	fillTemplate(template);
+	return template;
+    }
+
+    public Iterator features() {
+	return getFeatures().features();
+    }
+
+    public int countFeatures() {
+	return getFeatures().countFeatures();
+    }
+
+    public boolean containsFeature(Feature f) {
+	return getFeatures().containsFeature(f);
+    }
+
+    public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+	return getFeatures().filter(ff, recurse);
+    }
+
+    private class FeatureReceiver extends BioSQLFeatureReceiver {
+	FeatureReceiver() {
+	    super(sequence);
+	}
+
+	protected void deliverTopLevelFeature(Feature f)
+	    throws ParseException, ChangeVetoException
+	{
+	    childFeatures.addFeature(f);
+	}
+    }
+
+    private synchronized SimpleFeatureHolder getFeatures() {
+	if (childFeatures == null) {
+	    try {
+		BioSQLSequenceI seqi = (BioSQLSequenceI) sequence;
+		childFeatures = new SimpleFeatureHolder();
+		FeaturesSQL adaptor = seqi.getSequenceDB().getFeaturesSQL();
+		adaptor.retrieveFeatures(seqi.getBioEntryID(),
+					 new FeatureReceiver(),
+					 null,
+					 id,
+					 -1);
+	    } catch (SQLException ex) {
+		throw new BioRuntimeException(ex, "SQL error while reading features");
+	    } catch (BioException ex) {
+		throw new BioRuntimeException(ex);
+	    } 
+	}
+
+	return childFeatures;
+    }
+
+    public SymbolList getSymbols() {
+	return getLocation().symbols(getSequence());
+    }
+
+    public int hashCode() {
+	return makeTemplate().hashCode();
+    }
+
+//      public boolean equals(Object o) {
+//  	if (! (o instanceof Feature)) {
+//  	    return false;
+//  	}
+
+//  	Feature fo = (Feature) o;
+//  	if (! fo.getSequence().equals(getSequence())) 
+//  	    return false;
+    
+//  	return makeTemplate().equals(fo.makeTemplate());
+//      }
+    
+    public void addChangeListener(ChangeListener cl) {
+	addChangeListener(cl, ChangeType.UNKNOWN);
+    }
+    
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {
+	sequence.getSequenceDB().getChangeHub().addFeatureListener(id, cl, ct);
+    }
+
+    public void removeChangeListener(ChangeListener cl) {
+	removeChangeListener(cl, ChangeType.UNKNOWN);
+    }
+
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+	sequence.getSequenceDB().getChangeHub().removeFeatureListener(id, cl, ct);
+    }
+
+    public boolean isUnchanging(ChangeType ct) {
+	return false;
     }
 } 
