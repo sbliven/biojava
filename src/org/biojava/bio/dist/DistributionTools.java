@@ -106,7 +106,7 @@ public class DistributionTools {
     double totalEntropy = 0.0;
 
     for(Iterator i = ent.values().iterator(); i.hasNext();){
-      totalEntropy =+ ((Double)i.next()).doubleValue();
+      totalEntropy -= ((Double)i.next()).doubleValue();
     }
     return 2.0 - totalEntropy;
   }
