@@ -21,6 +21,7 @@
 package org.biojava.bio.dist;
 
 import org.biojava.utils.*;
+import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
@@ -30,10 +31,36 @@ import java.util.*;
  * Title:        DistributionTools.java
  * Description:  A static class to hold static methods for calculations and
  * maniputlations using Distributions.
- *
+ * @author Mark Schreiber
  */
 
 public class DistributionTools {
+
+  /**
+   * Compares the emission spectra of two distributions
+   * @return true if alphabets and symbol weights are equal for the two distributions.
+   * @throws BioException if one or both of the Distributions are over infinite alphabets.
+   * @author Mark Schreiber
+   * @since 1.2
+   */
+  public static boolean areEmissionSpectraEqual(Distribution a, Distribution b)
+    throws BioException{
+      //are either of the Dists infinite
+      if(a.getAlphabet() instanceof FiniteAlphabet == false
+          || b.getAlphabet() instanceof FiniteAlphabet == false){
+        throw new BioException("Cannot compare emission spectra over infinite alphabet");
+      }
+      //are alphabets equal?
+      if(!(a.getAlphabet().equals(b.getAlphabet()))){
+        return false;
+      }
+      //are emissions equal?
+      for(Iterator i = ((FiniteAlphabet)a.getAlphabet()).iterator();i.hasNext();){
+        Symbol s = (Symbol)i.next();
+        if(a.getWeight(s) != b.getWeight(s)) return false;
+      }
+      return true;
+  }
 
   /**
    * A method to calculate the Kullback-Liebler Distance (relative entropy)
@@ -113,19 +140,33 @@ public class DistributionTools {
 
   /**
    * Creates an array of distributions, one for each column of the alignment
+   * @throws BioRuntimeException if all sequences don't use the same alphabet
    * @param countGaps if true gaps will be included in the distributions
+   * @nullWeight the number of pseudo counts to add to each distribution
    * @author Mark Schreiber
    * @since 1.2
    */
-  public static Distribution[] distOverAlignment(Alignment a, boolean countGaps){
+  public static Distribution[] distOverAlignment(Alignment a,
+                                                 boolean countGaps,
+                                                 double nullWeight){
+
     List seqs = a.getLabels();
+    FiniteAlphabet alpha = (FiniteAlphabet)((SymbolList)a.symbolListForLabel(seqs.get(0))).getAlphabet();
+    for(int i = 1; i < seqs.size();i++){
+        FiniteAlphabet test = (FiniteAlphabet)((SymbolList)a.symbolListForLabel(seqs.get(i))).getAlphabet();
+        if(test != alpha){
+          throw new BioRuntimeException("Cannot Calculate distOverAlignment() for alignments with"+
+          "mixed alphabets");
+        }
+    }
+
     Distribution[] pos = new Distribution[a.length()];
-    FiniteAlphabet dna = DNATools.getDNA();
 
     try{
       for(int i = 0; i < a.length(); i++){// For each position
-        pos[i] = DistributionFactory.DEFAULT.createDistribution(dna);
+        pos[i] = DistributionFactory.DEFAULT.createDistribution(alpha);
         DistributionTrainerContext dtc = new SimpleDistributionTrainerContext();
+        dtc.setNullModelWeight(nullWeight);
         dtc.registerDistribution(pos[i]);
 
         for(Iterator j = seqs.iterator(); j.hasNext();){// of each sequence
@@ -144,6 +185,20 @@ public class DistributionTools {
       e.printStackTrace(System.err);
     }
     return pos;
+  }
+
+
+  /**
+   * Creates an array of distributions, one for each column of the alignment.
+   * No pseudo counts are used.
+   * @param countGaps if true gaps will be included in the distributions
+   *
+   * @author Mark Schreiber
+   * @since 1.2
+   */
+  public static Distribution[] distOverAlignment(Alignment a,
+                                                 boolean countGaps){
+    return distOverAlignment(a,countGaps,0.0);
   }
 
   /**
