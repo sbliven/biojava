@@ -39,7 +39,7 @@ public class ComplementResidueList extends AbstractResidueList {
 
     public ComplementResidueList(ResidueList p) throws IllegalAlphabetException {
 	Alphabet a = p.alphabet();
-	if (a != DNATools.getAlphabet() && a != DNATools.getAmbiguity())
+	if (!isComplementable(a))
 	    throw new IllegalAlphabetException("Only DNA can be complemented.");
 	parent = p;
     }
@@ -58,5 +58,10 @@ public class ComplementResidueList extends AbstractResidueList {
 	} catch (IllegalResidueException ex) {
 	    throw new BioError(ex);
 	}
+    }
+    
+    public static boolean isComplementable(Alphabet alpha) {
+      return alpha == DNATools.getAlphabet() ||
+             alpha == DNATools.getAmbiguity();
     }
 }
