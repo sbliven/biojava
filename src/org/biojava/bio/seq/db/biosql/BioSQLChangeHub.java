@@ -133,7 +133,7 @@ class BioSQLChangeHub {
 	List listenerList = (List) entryAnnotationListeners.get(id);
 	if (listenerList == null) {
 	    listenerList = new ArrayList();
-	    featureListeners.put(id, listenerList);
+	    entryAnnotationListeners.put(id, listenerList);
 	}
 	listenerList.add(new ListenerMemento(ct, new EntryAnnotationListenerReference(id, listener, queue)));
     }
@@ -223,7 +223,7 @@ class BioSQLChangeHub {
 	List listenerList = (List) featureAnnotationListeners.get(id);
 	if (listenerList == null) {
 	    listenerList = new ArrayList();
-	    featureListeners.put(id, listenerList);
+	    featureAnnotationListeners.put(id, listenerList);
 	}
 	listenerList.add(new ListenerMemento(ct, new FeatureAnnotationListenerReference(id, listener, queue)));
     }

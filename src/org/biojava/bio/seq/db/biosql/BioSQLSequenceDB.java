@@ -33,6 +33,7 @@ import org.biojava.bio.seq.db.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.taxa.*;
+import org.biojava.bio.ontology.*;
 
 /**
  * SequenceDB keyed off a BioSQL database.  This is an almost-complete
@@ -53,6 +54,7 @@ public class BioSQLSequenceDB implements SequenceDB {
     private WeakValueHashMap sequencesByID = new WeakValueHashMap();
     private DBHelper helper;
     private FeaturesSQL featuresSQL;
+    private OntologySQL ontologySQL;
     private BioSQLChangeHub changeHub;
     private WeakValueHashMap featuresByID = new WeakValueHashMap();
     private Cache tileCache = new FixedSizeCache(10);
@@ -102,6 +104,11 @@ public class BioSQLSequenceDB implements SequenceDB {
 
 	// Create adapters
 	featuresSQL = new FeaturesSQL(this);
+    try {
+        ontologySQL = new OntologySQL(this);
+    } catch (SQLException ex) {
+        throw new BioException(ex, "Error accessing ontologies");
+    }
 
 	// Create helpers
 	changeHub = new BioSQLChangeHub(this);
@@ -134,6 +141,18 @@ public class BioSQLSequenceDB implements SequenceDB {
 	}
     }
 
+    public Ontology createOntology(String name, String description)
+        throws Exception
+    {
+        return ontologySQL.createOntology(name, description);
+    }
+    
+    public Ontology getOntology(String name)
+        throws Exception
+    {
+        return ontologySQL.getOntology(name);
+    }
+    
     public String getName() {
 	return name;
     }
