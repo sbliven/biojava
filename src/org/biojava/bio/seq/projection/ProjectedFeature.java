@@ -180,4 +180,18 @@ class ProjectedFeature implements Feature, Projection {
 	if (cs != null)
 	    cs.removeChangeListener(cl, ct);
     }
+
+    public int hashCode() {
+	return makeTemplate().hashCode();
+    }
+
+    public boolean equals(Object o) {
+	if (o instanceof Feature) {
+	    Feature fo = (Feature) o;
+	    if (fo.getSequence().equals(getSequence())) {
+		return makeTemplate().equals(fo.makeTemplate());
+	    }
+	}
+	return false;
+    }
 }
