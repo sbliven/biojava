@@ -58,10 +58,15 @@ implements Serializable {
   }
   
   public SymbolList symbols() {
-    throw new UnsupportedOperationException(
-      "Can't return a list of the symbols in SparseCrossProductAlphabet " +
-      getName()
-    );
+    try {
+      SimpleSymbolList symL = new SimpleSymbolList(this);
+      for(Iterator i = iterator(); i.hasNext(); ) {
+        symL.addSymbol((Symbol) i.next());
+      }
+      return symL;
+    } catch (IllegalSymbolException ise) {
+      throw new BioError(ise, "Assertion Failure");
+    }
   }
   
   public String getName() {

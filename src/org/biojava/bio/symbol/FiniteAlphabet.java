@@ -101,6 +101,8 @@ public interface FiniteAlphabet extends Alphabet {
    *
    * @return  a SymbolList containing one AtomicSymbol for each AtomicSymbol in
    *          this alphabet
+   * @deprecated use AlphabetManager.getAlphabetIndex to enforce an ordering
+   *          over an alphabet, or FiniteAlphabet.iterator() to loop over them
    */
   SymbolList symbols();
 }
