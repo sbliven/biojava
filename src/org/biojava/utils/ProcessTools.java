@@ -81,7 +81,7 @@ public class ProcessTools {
      
     public static int exec(
         String[] args,
-        String input,
+        Reader input,
         Writer stdout,
         Writer stderr
     )
@@ -110,7 +110,7 @@ public class ProcessTools {
      
   public static int exec(
         String[] args,
-        String input,
+        Reader input,
         Writer stdout,
         Writer stderr,
         long timeout
@@ -123,9 +123,9 @@ public class ProcessTools {
         CharPump inPump, errPump;
         
         if (input == null) {
-            input = "";
+            input = new StringReader("");
         }
-        outPump = new PumpReaderToWriter(new StringReader(input), new OutputStreamWriter(proc.getOutputStream()));
+        outPump = new PumpReaderToWriter(input, new OutputStreamWriter(proc.getOutputStream()));
         if (stdout == null) {
             inPump = new PumpReaderToNull(new InputStreamReader(proc.getInputStream()));
         } else {
@@ -193,7 +193,7 @@ public class ProcessTools {
    */
   public static int exec(
                          String command,
-                         String input,
+                         Reader input,
                          Writer stdout,
                          Writer stderr)
         throws IOException
@@ -226,7 +226,7 @@ public class ProcessTools {
    */
   public static int exec(
                          String command,
-                         String input,
+                         Reader input,
                          Writer stdout,
                          Writer stderr,
                          long timeout)
