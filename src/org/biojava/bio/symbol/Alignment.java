@@ -31,7 +31,7 @@ import org.biojava.utils.*;
  * The alignment can be thought of as a rectangular array of
  * <span class="type">Symbol</span>s. Each
  * row is indexed by a label and each column is indexed by offset (counting from
- * 0).
+ * 1).
  * <P>
  * Alternatively, it can be thought of as a <span class="type">SymbolList</span>
  * where each <span class="type">Symbol</span> is
