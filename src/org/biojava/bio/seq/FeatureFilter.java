@@ -278,10 +278,12 @@ public interface FeatureFilter extends Serializable {
 
     public boolean isDisjoint(FeatureFilter feat) {
       if(feat instanceof ByClass) {
-        Class featC = ((ByClass) feat).getClass();
+        Class featC = ((ByClass) feat).getTestClass();
         return
           ! (featC.isAssignableFrom(getTestClass())) &&
           ! (getTestClass().isAssignableFrom(featC));
+      } else if (feat instanceof ByComponentName) {
+	  return !getTestClass().isAssignableFrom(ComponentFeature.class);
       }
 
       return (feat instanceof AcceptNoneFilter);
@@ -1156,5 +1158,68 @@ public interface FeatureFilter extends Serializable {
         public String toString() {
             return minScore + " >= score <= " + maxScore;
         }
+    }
+
+    /**
+     * Accepts features which are ComponentFeatures and have a <code>componentSequenceName</code>
+     * property of the specified value.
+     *
+     * @author Thomas Down
+     * @since 1.3
+     */
+
+    public final static class ByComponentName implements OptimizableFilter {
+        private String cname;
+
+        public ByComponentName(String cname) {
+            this.cname = cname;
+        }
+
+        public boolean accept(Feature f) {
+            if (f instanceof ComponentFeature) {
+                return cname.equals(((ComponentFeature) f).getComponentSequenceName());
+            } else {
+                return false;
+            }
+        }
+
+        public String getComponentName() {
+            return cname;
+        }
+
+        public boolean equals(Object o) {
+            return (o instanceof ByComponentName) && ((ByComponentName) o).getComponentName().equals(cname);
+	}
+
+        public int hashCode() {
+            return getComponentName().hashCode();
+        }
+
+        public boolean isProperSubset(FeatureFilter sup) {
+            if (sup instanceof ByComponentName) {
+                return equals(sup);
+	    } else if (sup instanceof ByClass) {
+		return ((ByClass) sup).getTestClass().isAssignableFrom(ComponentFeature.class);
+	    } else {
+		return (sup instanceof AcceptAllFilter);
+	    }
+	}
+
+
+	public boolean isDisjoint(FeatureFilter feat) {
+	    if (feat instanceof ByComponentName) {
+		return !equals(feat);
+	    } else if (feat instanceof ByClass) {
+		Class featC = ((ByClass) feat).getTestClass();
+		return
+		    ! (featC.isAssignableFrom(ComponentFeature.class));
+	    } else {
+		return (feat instanceof AcceptNoneFilter);
+	    }
+	}
+
+	public String toString() {
+	    return "ByComponentName(" + cname + ")";
+	}
     }
 }

@@ -47,6 +47,8 @@ public class SubSequence implements Sequence {
     private int start;
     private int end;
     private transient FeatureHolder cachedFeatures;
+    private final FeatureFilter projectff;
+    private final boolean recurse;
 
     private transient ChangeSupport changeSupport;
     private transient ChangeListener seqListener;
@@ -94,7 +96,30 @@ public class SubSequence implements Sequence {
      * @throws IndexOutOfBoundsException is the start or end position is illegal.
      */
 
-    public SubSequence(Sequence seq, final int start, final int end) {
+    public SubSequence(Sequence seq,
+		       final int start,
+		       final int end) 
+    {
+        this(seq, start, end, null, false);
+    }
+
+    /**
+     * Construct a new SubSequence of the specified sequence.
+     *
+     * @param seq A sequence to view
+     * @param start The start of the range to view
+     * @param end The end of the range to view
+     * @param ff A FeatureFilter to apply when cropping the sequence
+     * @param recurse Recursion flag when filtering.
+     * @throws IndexOutOfBoundsException is the start or end position is illegal.
+     */
+
+    public SubSequence(Sequence seq,
+		       final int start,
+		       final int end,
+		       final FeatureFilter ff,
+		       final boolean recurse) 
+    {
         this.parent = seq;
 	this.start = start;
 	this.end = end;
@@ -103,6 +128,14 @@ public class SubSequence implements Sequence {
 	name = seq.getName() + " (" + start + " - " + end + ")";
 	uri = seq.getURN() + "?start=" + start + ";end=" + end;
 	annotation = seq.getAnnotation();
+
+	FeatureFilter locFilter = new FeatureFilter.OverlapsLocation(new RangeLocation(start, end));
+	if (ff == null) {
+	    this.projectff = locFilter;
+	} else {
+	    this.projectff = new FeatureFilter.And(ff, locFilter);
+	}
+	this.recurse = recurse;
     }
 
     //
@@ -309,7 +342,7 @@ public class SubSequence implements Sequence {
 
 	    try {
 		SimpleFeatureHolder results = new SimpleFeatureHolder();
-		FeatureHolder rawFeatures = features.filter(new FeatureFilter.OverlapsLocation(new RangeLocation(start, end)), false);
+		FeatureHolder rawFeatures = features.filter(projectff, recurse);
 		for (Iterator i = rawFeatures.features(); i.hasNext(); ) {
 		    final Feature f = (Feature) i.next();
 
