@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 
 import org.biojava.bio.BioError;
+import org.biojava.bio.ontology.io.TabDelimParser;
 
 /**
  * Tools for manipulating ontologies.
