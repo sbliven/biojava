@@ -71,19 +71,27 @@ class FeatureRequestManager {
     }
 
     public Ticket requestFeatures(String id, SeqIOListener l) {
-	Ticket t = new Ticket(id, l);
+	return requestFeatures(id, l, null, null);
+    }
+
+    public Ticket requestFeatures(String id, SeqIOListener l, String type, String category)
+    {
+	Ticket t = new Ticket(id, l, type, category);
 	openTickets.add(t);
 	return t;
     }
 
-    private boolean fetchAll() 
+    private static boolean stringCompare(String a, String b) {
+	if (a == null || b == null) {
+	    return (a == b);
+	}
+	return a.equals(b);
+    }
+
+    private boolean fetchAll(Ticket trigger) 
         throws ParseException, BioException
     {
 	try {
-	    if (openTickets.size() <= 1) {
-		return false;
-	    }
-
 	    boolean canFetchMulti = DASCapabilities.checkCapable(new URL(dataSourceURL, ".."),
 								 DASCapabilities.CAPABILITY_EXTENDED,
 								 DASCapabilities.CAPABILITY_EXTENDED_FEATURES);
@@ -91,11 +99,25 @@ class FeatureRequestManager {
 		return false;
 	    }
 
+	    if (openTickets.size() <= 1) {
+		return false;
+	    }
+
 	    //
 	    // Server seems to do extended feature-fetches.  Try to honour all the tickets.
 	    //
 
-	    System.err.println("Wheee, extended fetch of " + openTickets.size() + " requests");
+	    Set matchingTickets = new HashSet();
+	    String triggerType = trigger.getType();
+	    String triggerCategory = trigger.getCategory();
+	    for (Iterator i = openTickets.iterator(); i.hasNext(); ) {
+		Ticket t = (Ticket) i.next();
+		if (stringCompare(triggerType, t.getType()) && stringCompare(triggerCategory, t.getCategory())) {
+		    matchingTickets.add(t);
+		}
+	    }
+
+	    System.err.println("Wheee, extended fetch of " + matchingTickets.size() + " requests (" + triggerType + "," + triggerCategory + ")");
 
 	    URL fURL = new URL(dataSourceURL, "features");
 	    HttpURLConnection huc = (HttpURLConnection) fURL.openConnection();
@@ -106,8 +128,16 @@ class FeatureRequestManager {
 	    PrintStream ps = new PrintStream(os);
 	    Map ticketsById = new HashMap();
 
-	    ps.println("<featureRequest encoding=\"xff\">");
-	    for (Iterator i = openTickets.iterator(); i.hasNext(); ) {
+	    ps.print("<featureRequest encoding=\"xff\"");
+	    if (triggerType != null) {
+		ps.print(" type=\"" + triggerType + "\"");
+	    }
+	    if (triggerCategory != null) {
+		ps.print(" category=\"" + triggerCategory + "\"");
+	    }
+	    ps.println(">");
+
+	    for (Iterator i = matchingTickets.iterator(); i.hasNext(); ) {
 		Ticket t = (Ticket) i.next();
 		ps.println("  <segment id=\"" + t.getID() + "\" />");
 		ticketsById.put(t.getID(), t);
@@ -143,6 +173,19 @@ class FeatureRequestManager {
 			DASXFFParser.INSTANCE.parseSegment(echld, t.getOutputListener());
 			t.setAsFetched();
 			openTickets.remove(t);
+		    } else if ("segmentNotAnnotated".equals(tagName)) {
+			String segID = echld.getAttribute("id");
+			Ticket t = (Ticket) ticketsById.get(segID);
+			if (t == null) {
+			    throw new ParseException("Response segment " + segID + " wasn't requested");
+			}
+
+			SeqIOListener siol = t.getOutputListener();
+			siol.startSequence();
+			siol.endSequence();
+
+			t.setAsFetched();
+			openTickets.remove(t);
 		    } else if ("segmentError".equals(tagName)) {
 			String segID = echld.getAttribute("id");
 			String segError = echld.getAttribute("error");
@@ -166,18 +209,26 @@ class FeatureRequestManager {
     private void fetchTicket(Ticket t) 
         throws ParseException, BioException
     {
-	System.err.println("Sigh, just fetching one featureSet");
+	System.err.println("Sigh, just fetching one featureSet (" + t.getType() + "," + t.getCategory() + ")");
 
 	try {
 	    boolean useXFF = DASCapabilities.checkCapable(new URL(dataSourceURL, ".."),
 							  DASCapabilities.CAPABILITY_FEATURETABLE,
 							  DASCapabilities.CAPABILITY_FEATURETABLE_XFF);
 	    
+	    String filter = "";
+	    if (t.getType() != null) {
+		filter += ";type=" + t.getType();
+	    }
+	    if (t.getCategory() != null) {
+		filter += ";category=" + t.getCategory();
+	    }
+
 	    if (useXFF) {
-		URL fURL = new URL(dataSourceURL, "features?encoding=xff;ref=" + t.getID());
+		URL fURL = new URL(dataSourceURL, "features?encoding=xff;ref=" + t.getID() + filter);
 		DASXFFParser.INSTANCE.parseURL(fURL, t.getOutputListener());
 	    } else {
-		URL fURL = new URL(dataSourceURL, "features?ref=" + t.getID());
+		URL fURL = new URL(dataSourceURL, "features?ref=" + t.getID() + filter);
 		DASGFFParser.INSTANCE.parseURL(fURL, t.getOutputListener());
 	    }
 
@@ -191,13 +242,19 @@ class FeatureRequestManager {
     public class Ticket {
 	private boolean _isFired = false;
 	private String id;
+	private String type;
+	private String category;
 	private SeqIOListener outputListener;
 
 	public Ticket(String id,
-		      SeqIOListener listener)
+		      SeqIOListener listener,
+		      String type,
+		      String category)
 	{
 	    this.id = id;
 	    this.outputListener = listener;
+	    this.type = type;
+	    this.category = category;
 	}
 
 	private String getID() {
@@ -206,6 +263,14 @@ class FeatureRequestManager {
 
 	private SeqIOListener getOutputListener() {
 	    return outputListener;
+	}
+
+	private String getType() {
+	    return type;
+	}
+
+	private String getCategory() {
+	    return category;
 	}
 
 	private void setAsFetched() {
@@ -218,7 +283,7 @@ class FeatureRequestManager {
 	    throws ParseException, BioException
 	{
 	    if (!_isFired) {
-		if (!fetchAll()) {
+		if (!fetchAll(this)) {
 		    fetchTicket(this);
 		}
 	    }

@@ -94,97 +94,77 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     DASSequence(DASSequenceDB db, URL dataSourceURL, String seqID) 
         throws BioException
     {
-	this(db, dataSourceURL, seqID, null);
-    }
-
-    DASSequence(DASSequenceDB db, URL dataSourceURL, String seqID, String parentID) 
-        throws BioException
-    {
 	this.parentdb = db;
 	this.dataSourceURL = dataSourceURL;
 	this.seqID = seqID;
 	
-	try {
-	    //
-	    // Check for deep structure.  This also checks that the sequence
-	    // really exists, and hopefully picks up the length along the way.
-	    //
+	//
+	// Check for deep structure.  This also checks that the sequence
+	// really exists, and hopefully picks up the length along the way.
+	//
 
-	    structure = new SimpleFeatureHolder();
+	structure = new SimpleFeatureHolder();
+	
+	SeqIOListener listener = new SkeletonListener();
+	FeatureRequestManager frm = FeatureRequestManager.getManager(dataSourceURL);
+	FeatureRequestManager.Ticket t = frm.requestFeatures(seqID, listener, null, "component");
+	t.doFetch();
+	
+	if (structure.countFeatures() > 0) {
+	    features.addFeatureHolder(structure);
+	}
 
-	    System.err.println("Doing a skeleton fetch...");
+	//
+	// Pick up the default annotation set (this should maybe be optional)
+	//
 
-	    SeqIOListener listener = new SeqIOAdapter() {
-		    public void addSequenceProperty(Object key, Object value)
-		        throws ParseException
-		    {
-			try {
-			    if (key.equals("sequence.start")) {
-				int start = Integer.parseInt(value.toString());
-				if (start != 1) {
-				    throw new ParseException("Server doesn't think sequence starts at 1.  Wierd.");
-				}
-			    } else if (key.equals("sequence.stop")) {
-				length = Integer.parseInt(value.toString());
-			    }
-			} catch (NumberFormatException ex) {
-			    throw new ParseException(ex, "Expect numbers for segment start and stop");
-			}
+	FeatureHolder refServerFeatureSet = new DASFeatureSet(this, dataSourceURL, seqID);
+	featureSets.put(dataSourceURL, refServerFeatureSet);
+	features.addFeatureHolder(refServerFeatureSet);
+    }
+
+    private class SkeletonListener extends SeqIOAdapter {
+	public void addSequenceProperty(Object key, Object value)
+	    throws ParseException
+	{
+	    try {
+		if (key.equals("sequence.start")) {
+		    int start = Integer.parseInt(value.toString());
+		    if (start != 1) {
+			throw new ParseException("Server doesn't think sequence starts at 1.  Wierd.");
 		    }
+		} else if (key.equals("sequence.stop")) {
+		    length = Integer.parseInt(value.toString());
+		}
+	    } catch (NumberFormatException ex) {
+		throw new ParseException(ex, "Expect numbers for segment start and stop");
+	    }
+	}
 
-		    public void startFeature(Feature.Template temp)
-		        throws ParseException
-		    {
-			if (temp instanceof ComponentFeature.Template) {
-			    String id = (String) temp.annotation.getProperty("sequence.id");
-
-			    try {
-				ComponentFeature.Template ctemp = (ComponentFeature.Template) temp;
-				ComponentFeature cf = new DASComponentFeature(DASSequence.this,
-									      ctemp);
-				((SimpleFeatureHolder) structure).addFeature(cf);
-
-				length = Math.max(length, ctemp.location.getMax());
-			    } catch (BioException ex) {
-				throw new ParseException(ex, "Error instantiating DASComponent");
-			    } catch (ChangeVetoException ex) {
-				throw new BioError(ex, "Immutable FeatureHolder when trying to build structure");
-			    }					  
-			} else {
-			    // Server seems not to honour category=
-			    // This hurts performance, but we can just elide the unwanted
-			    // features on the client side.
-			}
-		    }
-		} ;
-
-	    boolean useXFF = DASCapabilities.checkCapable(new URL(dataSourceURL, ".."),
-							  DASCapabilities.CAPABILITY_FEATURETABLE,
-							  DASCapabilities.CAPABILITY_FEATURETABLE_XFF);
-	    if (useXFF) {
-		URL fUrl = new URL(dataSourceURL, "features?encoding=xff;ref=" + seqID + ";category=component");
-		DASXFFParser.INSTANCE.parseURL(fUrl, listener);
+	public void startFeature(Feature.Template temp)
+	    throws ParseException
+	{
+	    if (temp instanceof ComponentFeature.Template) {
+		String id = (String) temp.annotation.getProperty("sequence.id");
+		
+		try {
+		    ComponentFeature.Template ctemp = (ComponentFeature.Template) temp;
+		    ComponentFeature cf = new DASComponentFeature(DASSequence.this,
+								  ctemp);
+		    ((SimpleFeatureHolder) structure).addFeature(cf);
+		    
+		    length = Math.max(length, ctemp.location.getMax());
+		} catch (BioException ex) {
+		    throw new ParseException(ex, "Error instantiating DASComponent");
+		} catch (ChangeVetoException ex) {
+		    throw new BioError(ex, "Immutable FeatureHolder when trying to build structure");
+		}					  
 	    } else {
-		URL fUrl = new URL(dataSourceURL, "features?ref=" + seqID + ";category=component");
-		DASGFFParser.INSTANCE.parseURL(fUrl, listener);
+		// Server seems not to honour category=
+		// This hurts performance, but we can just elide the unwanted
+		// features on the client side.
 	    }
-
-	    if (structure.countFeatures() > 0) {
-		features.addFeatureHolder(structure);
-	    }
-
-	    //
-	    // Pick up the default annotation set (this should maybe be optional)
-	    //
-
-	    FeatureHolder refServerFeatureSet = new DASFeatureSet(this, dataSourceURL, seqID);
-	    featureSets.put(dataSourceURL, refServerFeatureSet);
-	    features.addFeatureHolder(refServerFeatureSet);
-	} catch (IOException ex) {
-	    throw new BioException(ex, "Error connecting to DAS server");
-	} catch (NumberFormatException ex) {
-	    throw new BioException(ex);
-	} 
+	}
     }
 
     URL getDataSourceURL() {
@@ -267,17 +247,19 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     void registerFeatureFetchers() {
 	registerLocalFeatureFetchers();
 
-	for (Iterator fi = structure.features(); fi.hasNext(); ) {
-	    ComponentFeature cf = (ComponentFeature) fi.next();
-	    DASSequence cseq = (DASSequence) cf.getComponentSequence();
-	    cseq.registerFeatureFetchers();
+	if (length() < 10000000) {
+	    for (Iterator fi = structure.features(); fi.hasNext(); ) {
+		ComponentFeature cf = (ComponentFeature) fi.next();
+		DASSequence cseq = (DASSequence) cf.getComponentSequence();
+		cseq.registerFeatureFetchers();
+	    }
 	}
     }
 
     void registerFeatureFetchers(Location l) {
 	registerLocalFeatureFetchers();
 	
-	if (structure.countFeatures() > 0) {
+	if (structure.countFeatures() > 0 && (l.getMax() - l.getMin()) < 10000000) {
 	    FeatureHolder componentsBelow = structure.filter(new FeatureFilter.OverlapsLocation(l), false);
 	    for (Iterator fi = componentsBelow.features(); fi.hasNext(); ) {
 		ComponentFeature cf = (ComponentFeature) fi.next();
@@ -444,11 +426,12 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     //
 
     public Iterator features() {
+	registerFeatureFetchers();
 	return features.features();
     }
 
     public boolean containsFeature(Feature f) {
-      return features.containsFeature(f);
+	return features.containsFeature(f);
     }
     
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {

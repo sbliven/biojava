@@ -74,8 +74,17 @@ class DASXFFParser {
 	    parser.parse(is);
 	    Element el = parser.getDocument().getDocumentElement();
 	    NodeList segl = el.getElementsByTagName("SEGMENT");
-	    if (segl.getLength() != 1)
-		throw new BioException("Non-extended DASFEATURES documents must contain one SEGMENT");
+	    if (segl.getLength() != 1) {
+		segl = el.getElementsByTagName("segmentNotAnnotated");
+		if (segl.getLength() != 1) {
+		    throw new BioException("Non-extended DASFEATURES documents must contain one SEGMENT");
+		} else {
+		    siol.startSequence();
+		    siol.endSequence();
+		    return;
+		}
+	    }
+
 	    el = (Element) segl.item(0); 
 	    
 	    parseSegment(el, siol);

@@ -203,6 +203,8 @@ public class DASSequenceDB implements SequenceDB {
 		    if (! sequences.containsKey(id)) 
 			sequences.put(id, null);
 		}
+
+		gotAllIDs = true;
 	    } catch (SAXException ex) {
 		throw new BioError(ex, "Exception parsing DAS XML");
 	    } catch (IOException ex) {

@@ -141,7 +141,7 @@ class DASComponentFeature implements ComponentFeature {
     public Sequence getComponentSequence() {
 	if (componentSequence == null) {
 	    try {
-		componentSequence = new DASSequence(parent.getParentDB(), parent.getDataSourceURL(), componentID, parent.getName());
+		componentSequence = new DASSequence(parent.getParentDB(), parent.getDataSourceURL(), componentID);
 	    } catch (Exception ex) {
 		throw new BioError(ex, "Couldn't create child DAS sequence");
 	    }

@@ -78,9 +78,18 @@ class DASGFFParser {
 	    String version = el.getAttribute("version");
 	    if (version == null || !version.equals("0.95"))
 		throw new BioException("Unrecognized DASGFF version " + version);
+
 	    NodeList segl = el.getElementsByTagName("SEGMENT");
-	    if (segl.getLength() != 1)
-		throw new BioException("DASGFF documents must contain one SEGMENT");
+	    if (segl.getLength() != 1) {
+		segl = el.getElementsByTagName("segmentNotAnnotated");
+		if (segl.getLength() != 1) {
+		    throw new BioException("Non-extended DASGFF documents must contain one SEGMENT");
+		} else {
+		    siol.startSequence();
+		    siol.endSequence();
+		    return;
+		}
+	    }
 	    el = (Element) segl.item(0); 
 	    
 	    siol.startSequence();
