@@ -36,6 +36,7 @@ import org.biojava.bio.*;
 public class DAS extends AbstractChangeable {
     private static List activityListeners;
     private Map dataSources;
+    private static boolean threadFetches = false;
   
     {
 	dataSources = new HashMap();
@@ -43,6 +44,15 @@ public class DAS extends AbstractChangeable {
   
     static {
 	activityListeners = new ArrayList();
+	threadFetches = Boolean.getBoolean("org.biojava.bio.program.das.thread_fetches");
+    }
+
+    public static void setThreadFetches(boolean b) {
+	threadFetches = b;
+    }
+
+    public static boolean getThreadFetches() {
+	return threadFetches;
     }
 
     public static final ChangeType SERVERS = new ChangeType(

@@ -113,7 +113,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	
 	SeqIOListener listener = new SkeletonListener();
 	FeatureRequestManager frm = FeatureRequestManager.getManager(dataSourceURL);
-	this.structureTicket = frm.requestFeatures(seqID, listener, null, "component");
+	this.structureTicket = frm.requestFeatures(dataSourceURL, seqID, listener, null, "component");
 
 	//
 	// Pick up some annotations

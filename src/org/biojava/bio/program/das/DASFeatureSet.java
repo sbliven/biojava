@@ -50,12 +50,12 @@ class DASFeatureSet implements FeatureHolder {
     private FeatureRequestManager.Ticket featureTicket;
     private SimpleFeatureHolder realFeatures;
 
-    private Sequence refSequence;
+    private DASSequence refSequence;
     private URL dataSource;
     private String sourceID;
     private String dataSourceString;
 
-    DASFeatureSet(Sequence seq, URL ds, String id)
+    DASFeatureSet(DASSequence seq, URL ds, String id)
         throws BioException
     {
 	refSequence = seq;
@@ -67,8 +67,8 @@ class DASFeatureSet implements FeatureHolder {
     void registerFeatureFetcher() {
 	if (featureTicket == null) {
 	    SeqIOListener listener = new DASFeatureSetPopulator();
-	    FeatureRequestManager frm = FeatureRequestManager.getManager(dataSource);
-	    featureTicket = frm.requestFeatures(sourceID, listener);
+	    FeatureRequestManager frm = FeatureRequestManager.getManager(refSequence.getDataSourceURL());
+	    featureTicket = frm.requestFeatures(dataSource, sourceID, listener);
 	}
     }
 

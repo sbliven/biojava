@@ -40,34 +40,31 @@ import org.xml.sax.helpers.*;
 import org.w3c.dom.*;
 
 /**
- * Parse a DASGFF document and build suitable Feature.Templates
+ * Parse a DASGFF document and build suitable Feature.Templates.
+ * Now works with multi-segment DASGFF.  This isn't as efficient
+ * as it could be (builds a whole DOM tree...) -- if you want fast,
+ * use XFF instead.
  *
  * @author Thomas Down
  */
 
 class DASGFFParser {
-    final static DASGFFParser INSTANCE;
-
-    static {
-	INSTANCE = new DASGFFParser();
+    private Map ticketsByID;
+    private List doneTickets = new ArrayList();
+    
+    DASGFFParser(Map ticketsByID) {
+	this.ticketsByID = ticketsByID;
     }
 
-    private DASGFFParser() {
+    List getDoneTickets() {
+	return doneTickets;
     }
 
-    public void parseURL(URL fUrl, SeqIOListener siol)
+    void parseStream(InputStream data)
         throws BioException, ParseException, IOException
     {
 	try {
-	    HttpURLConnection huc = (HttpURLConnection) fUrl.openConnection();
-	    huc.connect();
-	    int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
-	    if (status == 0)
-		throw new BioError("Not a DAS server: " + fUrl.toString());
-	    else if (status != 200)
-		throw new BioError("DAS error (status code = " + status + ")");
-	    
-	    InputSource is = new InputSource(huc.getInputStream());
+	    InputSource is = new InputSource(data);
 	    DOMParser parser = new DOMParser();
 	    parser.parse(is);
 	    Element el = parser.getDocument().getDocumentElement();
@@ -76,50 +73,86 @@ class DASGFFParser {
 		throw new BioException("Couldn't find GFF element");
 	    el = (Element) gffl.item(0);
 	    String version = el.getAttribute("version");
-	    if (version == null || !version.equals("0.95"))
-		throw new BioException("Unrecognized DASGFF version " + version);
-
-	    NodeList segl = el.getElementsByTagName("SEGMENT");
-	    if (segl.getLength() != 1) {
-		segl = el.getElementsByTagName("segmentNotAnnotated");
-		if (segl.getLength() != 1) {
-		    throw new BioException("Non-extended DASGFF documents must contain one SEGMENT");
-		} else {
-		    siol.startSequence();
-		    siol.endSequence();
-		    return;
+	    if (version != null) {
+		try {
+		    double v = Double.parseDouble(version);
+		    if (v < 0.95 || v > 1.0) {
+			throw new ParseException("Unrecognized DASGFF version " + version);
+		    }
+		} catch (NumberFormatException ex) {
+		    throw new ParseException(ex);
 		}
 	    }
-	    el = (Element) segl.item(0); 
-	    
-	    siol.startSequence();
-	    
-	    String segStart = el.getAttribute("start");
-	    if (segStart != null) {
-		siol.addSequenceProperty("sequence.start", segStart);
-	    }
-	    String segStop = el.getAttribute("stop");
-	    if (segStop != null) {
-		siol.addSequenceProperty("sequence.stop", segStop);
-	    }
 
-	    Node segChld = el.getFirstChild();
-	    while (segChld != null) {
-		if (segChld instanceof Element) {
-		    Element featureEl = (Element) segChld;
-		    if (featureEl.getTagName().equals("FEATURE")) {
-			Feature.Template temp = parseDASFeature(featureEl);
-			siol.startFeature(temp);
-			siol.endFeature();
+	    Node n = el.getFirstChild();
+	    while (n != null) {
+		if (n instanceof Element) {
+		    Element echld = (Element) n;
+		    String tagName = echld.getTagName();
+		    if (tagName.equals("SEGMENT")) {
+			String segID = echld.getAttribute("id");
+			FeatureRequestManager.Ticket t = (FeatureRequestManager.Ticket) ticketsByID.get(segID);
+			if (t == null) {
+			    throw new SAXException("Response segment " + segID + " wasn't requested");
+			}
+			parseSegment(echld, t.getOutputListener());
+			t.setAsFetched();
+			doneTickets.add(t);
+		    } else if (tagName.equals("segmentNotAnnotated")) {
+			String segID = echld.getAttribute("id");
+			FeatureRequestManager.Ticket t = (FeatureRequestManager.Ticket) ticketsByID.get(segID);
+			if (t == null) {
+			    throw new SAXException("Response segment " + segID + " wasn't requested");
+			}
+			SeqIOListener siol = t.getOutputListener();
+			siol.startSequence();
+			siol.endSequence();
+			t.setAsFetched();
+			doneTickets.add(t);
+		    } else if (tagName.equals("segmentError")) {
+			String segID = echld.getAttribute("id");
+			String segError = echld.getAttribute("error");
+			
+			throw new ParseException("Error " + segError + " fetching " + segID);
 		    }
 		}
-		segChld = segChld.getNextSibling();
-	    }
 
-	    siol.endSequence();
-	} catch (SAXException ex) {
-	    throw new ParseException(ex);
+		n = n.getNextSibling();
+	    }
+	} catch (SAXException sex) {
+	    throw new ParseException(sex, "Error parsing DAS XML");
 	}
+    }
+
+
+    private void parseSegment(Element el, SeqIOListener siol)
+        throws BioException, ParseException
+    {
+	siol.startSequence();
+	
+	String segStart = el.getAttribute("start");
+	if (segStart != null) {
+	    siol.addSequenceProperty("sequence.start", segStart);
+	}
+	String segStop = el.getAttribute("stop");
+	if (segStop != null) {
+	    siol.addSequenceProperty("sequence.stop", segStop);
+	}
+
+	Node segChld = el.getFirstChild();
+	while (segChld != null) {
+	    if (segChld instanceof Element) {
+		Element featureEl = (Element) segChld;
+		if (featureEl.getTagName().equals("FEATURE")) {
+		    Feature.Template temp = parseDASFeature(featureEl);
+		    siol.startFeature(temp);
+		    siol.endFeature();
+		}
+	    }
+	    segChld = segChld.getNextSibling();
+	}
+	
+	siol.endSequence();
     }
 
     private Feature.Template parseDASFeature(Element fe) 

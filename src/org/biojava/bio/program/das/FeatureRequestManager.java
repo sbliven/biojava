@@ -40,7 +40,7 @@ import org.xml.sax.helpers.*;
 import org.w3c.dom.*;
 
 /**
- * Class which controls the fetching of features from DAS servers.
+ * Queue and schedule requests for DAS features.
  *
  * @since 1.1
  * @author Thomas Down
@@ -56,30 +56,28 @@ class FeatureRequestManager {
     public static FeatureRequestManager getManager(URL dataSource) {
 	FeatureRequestManager frm = (FeatureRequestManager) requestManagers.get(dataSource);
 	if (frm == null) {
-	    frm = new FeatureRequestManager(dataSource);
+	    frm = new FeatureRequestManager();
 	    requestManagers.put(dataSource, frm);
 	}
 	return frm;
     }
 
     private Set openTickets;
-    private URL dataSourceURL;
 
     {
 	openTickets = new HashSet();
     }
 
-    public FeatureRequestManager(URL dataSource) {
-	dataSourceURL = dataSource;
+    private FeatureRequestManager() {
     }
 
-    public Ticket requestFeatures(String id, SeqIOListener l) {
-	return requestFeatures(id, l, null, null);
+    public Ticket requestFeatures(URL ds, String id, SeqIOListener l) {
+	return requestFeatures(ds, id, l, null, null);
     }
 
-    public Ticket requestFeatures(String id, SeqIOListener l, String type, String category)
+    public Ticket requestFeatures(URL ds, String id, SeqIOListener l, String type, String category)
     {
-	Ticket t = new Ticket(id, l, type, category);
+	Ticket t = new Ticket(ds, id, l, type, category);
 	openTickets.add(t);
 	return t;
     }
@@ -91,295 +89,157 @@ class FeatureRequestManager {
 	return a.equals(b);
     }
 
-    private synchronized boolean fetchAll(Ticket trigger) 
+    private FeatureFetcher makeFeatureFetcher(URL dataSourceURL,
+					      String triggerType,
+					      String triggerCategory)
+	throws BioException
+    {
+	FeatureFetcher ffetcher = new FeatureFetcher(dataSourceURL, triggerType, triggerCategory);
+	try {
+	    boolean doXMLRequest = DASCapabilities.checkCapable(new URL(dataSourceURL, ".."),
+								DASCapabilities.CAPABILITY_EXTENDED,
+								DASCapabilities.CAPABILITY_EXTENDED_FEATURES);
+	    ffetcher.setUseXMLFetch(doXMLRequest);
+	} catch (MalformedURLException ex) {
+	    throw new BioException(ex);
+	}
+
+	return ffetcher;
+    }
+
+    private synchronized void fetch(Ticket trigger) 
         throws ParseException, BioException
     {
-	boolean startedActivity = false;
-
-	try {
-	    boolean canFetchMulti = DASCapabilities.checkCapable(new URL(dataSourceURL, ".."),
-								 DASCapabilities.CAPABILITY_EXTENDED,
-								 DASCapabilities.CAPABILITY_EXTENDED_FEATURES);
-	    if (!canFetchMulti) {
-		return false;
-	    }
-
-	    if (openTickets.size() <= 1) {
-		return false;
-	    }
-
-	    //
-	    // Server seems to do extended feature-fetches.  Try to honour all the tickets.
-	    //
-
-	    Set matchingTickets = new HashSet();
-	    String triggerType = trigger.getType();
-	    String triggerCategory = trigger.getCategory();
-	    for (Iterator i = openTickets.iterator(); i.hasNext(); ) {
-		Ticket t = (Ticket) i.next();
-		if (stringCompare(triggerType, t.getType()) && stringCompare(triggerCategory, t.getCategory())) {
-		    matchingTickets.add(t);
+	String triggerType = trigger.getType();
+	String triggerCategory = trigger.getCategory();
+	Map fetchers = new HashMap();
+	   
+	for (Iterator i = openTickets.iterator(); i.hasNext(); ) {
+	    Ticket t = (Ticket) i.next();
+	    if (stringCompare(triggerType, t.getType()) && 
+		stringCompare(triggerCategory, t.getCategory())) 
+	    {
+		URL dataSourceURL = t.getDataSource();
+		FeatureFetcher ffetcher = (FeatureFetcher) fetchers.get(dataSourceURL);
+		if (ffetcher == null) {
+		    ffetcher = makeFeatureFetcher(dataSourceURL, triggerType, triggerCategory);
+		    fetchers.put(dataSourceURL, ffetcher);
 		}
-	    }
-
-            if(matchingTickets.size() <= 1) {
-              return false;
-            }
-            
-	    // System.err.println("Wheee, extended fetch of " + matchingTickets.size() + " requests (" + triggerType + "," + triggerCategory + ")");
-
-	    DAS.startedActivity(trigger);
-	    startedActivity = true;
-
-	    URL fURL = new URL(dataSourceURL, "features");
-	    HttpURLConnection huc = (HttpURLConnection) fURL.openConnection();
-	    huc.setRequestMethod("POST");
-	    huc.setRequestProperty("Content-Type", "text/xml");
-	    huc.setDoOutput(true);
-
-	    OutputStream os = huc.getOutputStream();
-	    PrintStream ps = new PrintStream(os);
-	    Map ticketsById = new HashMap();
-
-	    ps.print("<featureRequest encoding=\"xff\"");
-	    if (triggerType != null) {
-		ps.print(" type=\"" + triggerType + "\"");
-	    }
-	    if (triggerCategory != null) {
-		ps.print(" category=\"" + triggerCategory + "\"");
-	    }
-	    ps.println(">");
-
-	    for (Iterator i = matchingTickets.iterator(); i.hasNext(); ) {
-		Ticket t = (Ticket) i.next();
-		ps.println("  <segment id=\"" + t.getID() + "\" />");
-		ticketsById.put(t.getID(), t);
-	    }
-	    ps.println("</featureRequest>");
-
-	    // Transact, and hopefully get the segments back to honour our tickets.
-
-	    huc.connect();
-	    int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
-	    if (status == 0) {
-		throw new BioError("Not a DAS server: " + fURL.toString());
-	    } else if (status != 200) {
-		throw new BioError("DAS error (status code = " + status + ")");
-	    }
-
-	    InputSource is = new InputSource(huc.getInputStream());
-	    DASFeaturesHandler dfh = new DASFeaturesHandler(ticketsById, trigger);
-	    SAXParser parser = new SAXParser();
-	    parser.setContentHandler(new SAX2StAXAdaptor(dfh));
-	    parser.parse(is);
-	    openTickets.removeAll(dfh.getDoneTickets());
-	} catch (IOException ex) {
-	    throw new ParseException(ex);
-	} catch (SAXException ex) {
-	    throw new ParseException(ex);
-	} finally {
-	    if (startedActivity) {
-		DAS.completedActivity(trigger);
+		ffetcher.addTicket(t);
 	    }
 	}
 
-	// Looks like this worked...
-
-	return true;
-    }
-
-    private class DASFeaturesHandler extends StAXContentHandlerBase {
-	private boolean inDocument = false;
-	private Map ticketsById;
-	private Ticket thisTicket;
-	private List doneTickets = new ArrayList();
-        private Ticket trigger;
-
-	public List getDoneTickets() {
-	    return doneTickets;
+	if(fetchers.size() < 1) {
+	    System.err.println("*** Hmmm, don't actually seem to be fetching anything...");
+	    return;
 	}
 
-	public DASFeaturesHandler(Map ticketsById, Ticket trigger) {
-	    this.ticketsById = ticketsById;
-            this.trigger = trigger;
-	}
+	System.err.println("*** Built " + fetchers.size() + " feature-fetch jobs");
 
-	public void startElement(String nsURI,
-				 String localName,
-				 String qName,
-				 Attributes attrs,
-				 DelegationManager dm)
-	    throws SAXException
-	{
-	    if (!inDocument) {
-		inDocument = true;
-	    } else {
-		if (localName.equals("SEGMENT")) {
-		    String segID = attrs.getValue("id");
-		    if (segID == null) {
-			throw new SAXException("Missing segment ID");
-		    }
-		    thisTicket = (Ticket) ticketsById.get(segID);
-		    if (thisTicket == null) {
-			throw new SAXException("Response segment " + segID + " wasn't requested");
-		    }
-
-		    dm.delegate(new DASSegmentHandler(thisTicket.getOutputListener()));
-		} else if (localName.equals("segmentNotAnnotated")) {
-		    String segID = attrs.getValue("id");
-		    if (segID == null) {
-			throw new SAXException("Missing segment ID");
-		    }
-		    Ticket t = (Ticket) ticketsById.get(segID);
-		    if (t == null) {
-			throw new SAXException("Response segment " + segID + " wasn't requested");
-		    }
-
-		    SeqIOListener siol = t.getOutputListener();
-		    try {
-			siol.startSequence();
-			siol.endSequence();
-		    } catch (ParseException ex) {
-			throw new SAXException(ex);
-		    }
-		    
-		    t.setAsFetched();
-		    doneTickets.add(t);
-		} else if (localName.equals("segmentError")) {
-		    String segID = attrs.getValue("id");
-		    String segError = attrs.getValue("error");
-
-		    throw new SAXException("Error " + segError + " fetching " + segID);
-		}
+	if (DAS.getThreadFetches() && (fetchers.size() > 1)) {
+	    FetchMonitor monitor = new FetchMonitor();
+	    for (Iterator i = fetchers.values().iterator(); i.hasNext(); ) {
+		monitor.addJob((FeatureFetcher) i.next());
 	    }
-	}
-
-	public void endElement(String nsURI,
-			       String localName,
-			       String qName)
-	    throws SAXException
-	{
-	    if (localName.equals("SEGMENT")) {
-		thisTicket.setAsFetched();
-		doneTickets.add(thisTicket);
-                DAS.activityProgress(trigger, doneTickets.size()
-                , ticketsById.size());
+	    List okay = monitor.doFetches();
+	    for (Iterator i = okay.iterator(); i.hasNext(); ) {
+		FeatureFetcher ffetcher = (FeatureFetcher) i.next();
+		openTickets.removeAll(ffetcher.getDoneTickets());
+	    }
+	} else {
+	    for (Iterator i = fetchers.values().iterator(); i.hasNext(); ) {
+		FeatureFetcher ffetcher = (FeatureFetcher) i.next();
+		ffetcher.runFetch();
+		openTickets.removeAll(ffetcher.getDoneTickets());
 	    }
 	}
     }
 
-    private class DASSegmentHandler extends StAXContentHandlerBase {
-	private SeqIOListener siol;
-	private int level = 0;
+    private class FetchMonitor {
+	private Set pending = new HashSet();
+	private List successes = new ArrayList();
 
-	public DASSegmentHandler(SeqIOListener siol) {
-	    this.siol = siol;
+	private FetchJob failedJob;
+	private Exception failure;
+
+	public void addJob(FeatureFetcher ff) {
+	    pending.add(new FetchJob(ff, this));
 	}
 
-	public void startElement(String nsURI,
-				 String localName,
-				 String qName,
-				 Attributes attrs,
-				 DelegationManager dm)
-	    throws SAXException
-	{
-	    ++level;
-	    if (level == 1) {
+	public void jobSucceeded(FetchJob j) {
+	    synchronized (successes) {
+		successes.add(j.getFetcher());
+	    }
+	    synchronized (pending) {
+		pending.remove(j);
+		if (pending.size() == 0) {
+		    pending.notifyAll();
+		}
+	    }
+	    System.err.println("*** Job checked in (success)");
+	}
+
+	public void jobFailed(FetchJob j, Exception ex) {
+	    if (failedJob == null) {
+		failedJob = j;
+		failure = ex;
+	    }
+
+	    synchronized (pending) {
+		pending.remove(j);
+		if (pending.size() == 0) {
+		    pending.notifyAll();
+		}
+	    }
+	    System.err.println("*** Job checked in (failure)");
+	}
+
+	public List doFetches() throws BioException {
+	    synchronized (pending) {
+		for (Iterator i = pending.iterator(); i.hasNext(); ) {
+		    FetchJob job = (FetchJob) i.next();
+		    job.start();
+		    System.err.println("*** Job checked out");
+		}
 		try {
-		    siol.startSequence();
-		
-		    String segStart = attrs.getValue("start");
-		    if (segStart != null) {
-			siol.addSequenceProperty("sequence.start", segStart);
-		    }
-		    String segStop = attrs.getValue("stop");
-		    if (segStop != null) {
-			siol.addSequenceProperty("sequence.stop", segStop);
-		    }
-		} catch (ParseException ex) {
-		    throw new SAXException(ex);
-		}
-	    } else {
-		if (localName.equals("featureSet")) {
-		    XFFFeatureSetHandler xffh = new XFFFeatureSetHandler();
-		    xffh.setFeatureListener(siol);
-		    xffh.addFeatureHandler(new ElementRecognizer.ByLocalName("componentFeature"),
-					   ComponentFeatureHandler.COMPONENTFEATURE_HANDLER_FACTORY);
-		    xffh.addDetailHandler(new ElementRecognizer.ByNSName("http://www.biojava.org/dazzle",
-									 "links"),
-					  DASLinkHandler.LINKDETAIL_HANDLER_FACTORY);
-		    dm.delegate(xffh);
-		} else {
-		    throw new SAXException("Expecting an XFF featureSet and got " + localName);
-		}
+		    pending.wait();
+		} catch (InterruptedException ex ) {}
 	    }
-	}
 
-	public void endElement(String nsURI,
-			       String localName,
-			       String qName)
-	    throws SAXException
-	{
-	    if (level == 1) {
-		try {
-		    siol.endSequence();
-		} catch (ParseException ex) {
-		    throw new SAXException(ex);
-		}
+	    if (pending.size() != 0) {
+		throw new BioError("Assertion failed: threads going screwy");
 	    }
-	    --level;
+
+	    if (failedJob != null) {
+		throw new BioException(failure, "Failure while fetching features from " + failedJob.getFetcher().getDataSourceURL());
+	    }
+
+	    return successes;
 	}
     }
 
-    private synchronized void fetchTicket(Ticket t) 
-        throws ParseException, BioException
-    {
-	// System.err.println("Sigh, just fetching one featureSet (" + t.getType() + "," + t.getCategory() + ")");
+    private class FetchJob extends Thread {
+	private FeatureFetcher fetcher;
+	private FetchMonitor monitor;
+	
+	FetchJob(FeatureFetcher fetcher,
+		 FetchMonitor monitor) 
+	{
+	    this.fetcher = fetcher;
+	    this.monitor = monitor;
+	}
 
-	try {
-	    DAS.startedActivity(t);
-	    boolean useXFF = DASCapabilities.checkCapable(new URL(dataSourceURL, ".."),
-							  DASCapabilities.CAPABILITY_FEATURETABLE,
-							  DASCapabilities.CAPABILITY_FEATURETABLE_XFF);
-	    
-	    String filter = "";
-	    if (t.getType() != null) {
-		filter += ";type=" + t.getType();
-	    }
-	    if (t.getCategory() != null) {
-		filter += ";category=" + t.getCategory();
-	    }
+	public FeatureFetcher getFetcher() {
+	    return fetcher;
+	}
 
-	    if (useXFF) {
-		URL fURL = new URL(dataSourceURL, "features?encoding=xff;ref=" + t.getID() + filter);
-		HttpURLConnection huc = (HttpURLConnection) fURL.openConnection();
-		huc.connect();
-		int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
-		if (status == 0)
-		    throw new BioError("Not a DAS server: " + fURL.toString());
-		else if (status != 200)
-		    throw new BioError("DAS error (status code = " + status + ")");
-
-		Map ticketsById = new HashMap();
-		ticketsById.put(t.getID(), t);
-		InputSource is = new InputSource(huc.getInputStream());
-		DASFeaturesHandler dfh = new DASFeaturesHandler(ticketsById, t);
-		SAXParser parser = new SAXParser();
-		parser.setContentHandler(new SAX2StAXAdaptor(dfh));
-		parser.parse(is);
-		openTickets.removeAll(dfh.getDoneTickets());		
-	    } else {
-		URL fURL = new URL(dataSourceURL, "features?ref=" + t.getID() + filter);
-		DASGFFParser.INSTANCE.parseURL(fURL, t.getOutputListener());
-		openTickets.remove(t);
-		t.setAsFetched();
+	public void run() {
+	    try {
+		fetcher.runFetch();
+		monitor.jobSucceeded(this);
+	    } catch (Exception ex) {
+		monitor.jobFailed(this, ex);
 	    }
-	} catch (IOException ex) {
-	    throw new ParseException(ex);
-	} catch (SAXException ex) {
-	    throw new ParseException(ex);
-	} finally {
-	    DAS.completedActivity(t);
 	}
     }
 
@@ -389,23 +249,30 @@ class FeatureRequestManager {
 	private String type;
 	private String category;
 	private SeqIOListener outputListener;
+	private URL dataSource;
 
-	public Ticket(String id,
+	public Ticket(URL dataSource,
+		      String id,
 		      SeqIOListener listener,
 		      String type,
 		      String category)
 	{
+	    this.dataSource = dataSource;
 	    this.id = id;
 	    this.outputListener = listener;
 	    this.type = type;
 	    this.category = category;
 	}
 
-	private String getID() {
+	private URL getDataSource() {
+	    return dataSource;
+	}
+
+	String getID() {
 	    return id;
 	}
 
-	private SeqIOListener getOutputListener() {
+	SeqIOListener getOutputListener() {
 	    return outputListener;
 	}
 
@@ -417,7 +284,7 @@ class FeatureRequestManager {
 	    return category;
 	}
 
-	private void setAsFetched() {
+	void setAsFetched() {
 	    _isFired = true;
 	    id = null;
 	    outputListener = null;
@@ -427,9 +294,7 @@ class FeatureRequestManager {
 	    throws ParseException, BioException
 	{
 	    if (!_isFired) {
-		if (!fetchAll(this)) {
-		    fetchTicket(this);
-		}
+		fetch(this);
 	    }
 	}
 
