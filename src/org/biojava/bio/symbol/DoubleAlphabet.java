@@ -45,9 +45,6 @@ import org.biojava.bio.seq.io.*;
  * @author Matthew Pocock
  */
 public class DoubleAlphabet implements Alphabet, Serializable {
-  /**
-   * The singleton instance of the DoubleAlphabet class.
-   */
   private static final DoubleAlphabet INSTANCE = new DoubleAlphabet();
   private static final SymbolParser PARSER = new SymbolParser() {
     public Alphabet getAlphabet() {
@@ -98,6 +95,8 @@ public class DoubleAlphabet implements Alphabet, Serializable {
     return INSTANCE;
   }
 
+  private List alphabets = null;
+  
   /**
    * Retrieve the Symbol for a double.
    *
@@ -127,6 +126,33 @@ public class DoubleAlphabet implements Alphabet, Serializable {
         "(" + s.getClass() + ") " + s.getName()
       );
     }
+  }
+  
+  public List getAlphabets() {
+    if(alphabets == null) {
+      alphabets = new SingletonList(this);
+    }
+    return alphabets;
+  }
+  
+  public Symbol getAmbiguity(Set syms) throws IllegalSymbolException {
+    for(Iterator i = syms.iterator(); i.hasNext(); ) {
+      Symbol sym = (Symbol) i.next();
+      validate(sym);
+    }
+    throw new BioError("Operation not implemented");
+  }
+  
+  public Symbol getSymbol(List symList) throws IllegalSymbolException {
+    if(symList.size() != 1) {
+      throw new IllegalSymbolException(
+        "Can't build symbol from list " + symList.size() + " long"
+      );
+    }
+    
+    Symbol s = (Symbol) symList.get(0);
+    validate(s);
+    return s;
   }
   
   public String getName() {
@@ -169,15 +195,22 @@ public class DoubleAlphabet implements Alphabet, Serializable {
     }
     
     /**
-    *@return the double value associated with this double symbol
-    */
-    
+     * @return the double value associated with this double symbol
+     */
     public double doubleValue() {
       return val;
     }
     
     public Alphabet getMatches() {
       return matches;
+    }
+    
+    public List getSymbols() {
+      return new SingletonList(this);
+    }
+    
+    public Set getBasies() {
+      return Collections.singleton(this);
     }
     
     protected DoubleSymbol(double val) {

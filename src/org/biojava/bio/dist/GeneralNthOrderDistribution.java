@@ -9,7 +9,7 @@ import org.biojava.bio.symbol.*;
 class GeneralNthOrderDistribution extends AbstractOrderNDistribution {
     private Map dists;
 
-    GeneralNthOrderDistribution(CrossProductAlphabet alpha, DistributionFactory df) 
+    GeneralNthOrderDistribution(Alphabet alpha, DistributionFactory df) 
         throws IllegalAlphabetException
     {
 	super(alpha);

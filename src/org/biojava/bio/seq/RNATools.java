@@ -68,12 +68,12 @@ public final class RNATools {
       // add all other ambiguity symbols
       for(Iterator i = ((SimpleAlphabet) rna).ambiguities(); i.hasNext();) {
         Symbol as = (Symbol) i.next();
-        List l = new ArrayList();
+        Set l = new HashSet();
         FiniteAlphabet fa = (FiniteAlphabet) as.getMatches();
         for(Iterator j = fa.iterator(); j.hasNext(); ) {
           l.add(complement((Symbol) j.next()));
         }
-        symbolToComplement.put(as, AlphabetManager.getAmbiguitySymbol(l));
+        symbolToComplement.put(as, rna.getAmbiguity(l));
       }
       complementTable = new RNAComplementTranslationTable();
       transcriptionTable = new TranscriptionTable();

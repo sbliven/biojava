@@ -45,7 +45,7 @@ extends AbstractSymbolList implements Serializable {
   /**
    * The alphabet for each overlapping tuple.
    */
-  private final CrossProductAlphabet alpha;
+  private final Alphabet alpha;
   
   /**
    * The view order.

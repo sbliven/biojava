@@ -36,7 +36,8 @@ import org.biojava.bio.symbol.*;
 
 
 public class PairDistribution
-extends AbstractDistribution implements Serializable {
+extends AbstractDistribution
+implements Serializable {
   private static Map cache;
   private static ListWrapper gopher;
   
@@ -69,7 +70,7 @@ extends AbstractDistribution implements Serializable {
   
   private Distribution first;
   private Distribution second;
-  private CrossProductAlphabet alphabet;
+  private Alphabet alphabet;
   
   private Distribution nullModel;
   
@@ -99,18 +100,16 @@ extends AbstractDistribution implements Serializable {
     trainer.registerTrainer(this, new PairTrainer());
   }
 
-  public double getWeight(Symbol sym) throws IllegalSymbolException {
-    getAlphabet().validate(sym);
-
-    CrossProductSymbol cps = (CrossProductSymbol) sym;
-    List symL = cps.getSymbols();
+  public double getWeightImpl(AtomicSymbol sym)
+  throws IllegalSymbolException {
+    List symL = sym.getSymbols();
     Symbol f = (Symbol) symL.get(0);
     Symbol s = (Symbol) symL.get(1);
 
     return first.getWeight(f) * second.getWeight(s);      
   }
   
-  public void setWeightImpl(Symbol sym, double weight)
+  public void setWeightImpl(AtomicSymbol sym, double weight)
   throws ChangeVetoException {
     throw new ChangeVetoException(
       "Can't set the weight directly in a PairDistribution. " +
@@ -141,8 +140,9 @@ extends AbstractDistribution implements Serializable {
           sym.getName()
         );
       }
-      CrossProductSymbol cps = (CrossProductSymbol) sym;
-      List symL = cps.getSymbols();
+      // FIXME: should get matches for symbol &
+      // divide count by null model ratioes.
+      List symL = ((BasisSymbol) sym).getSymbols();
       Symbol f = (Symbol) symL.get(0);
       Symbol s = (Symbol) symL.get(1);
       

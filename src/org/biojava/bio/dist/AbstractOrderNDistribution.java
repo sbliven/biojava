@@ -16,7 +16,7 @@ import org.biojava.bio.symbol.*;
 public abstract class AbstractOrderNDistribution
 extends AbstractDistribution
 implements OrderNDistribution, Serializable {
-  private CrossProductAlphabet alphabet;
+  private Alphabet alphabet;
   private Alphabet firstA;
   private Alphabet lastA;
   private Distribution nullModel;
@@ -41,7 +41,7 @@ implements OrderNDistribution, Serializable {
      * Construct a new NthOrderDistribution.
      */
 
-  protected AbstractOrderNDistribution(CrossProductAlphabet alpha)
+  protected AbstractOrderNDistribution(Alphabet alpha)
   throws IllegalAlphabetException  {
     this.alphabet = alpha;
     List aList = alpha.getAlphabets();
@@ -86,22 +86,17 @@ implements OrderNDistribution, Serializable {
      * on the first part of the symbol.
      */
 
-  public double getWeight(Symbol sym) throws IllegalSymbolException {
-    if(sym instanceof AtomicSymbol) {
-      CrossProductSymbol cps = (CrossProductSymbol) sym;
-      List symL = cps.getSymbols();
-      int lb1 = symL.size() - 1;
-      Symbol firstS;
-      if(symL.size() == 2) {
-        firstS = (Symbol) symL.get(0);
-      } else {
-        firstS = ((CrossProductAlphabet) firstA).getSymbol(symL.subList(0, lb1));
-      }
-      Distribution dist = getDistribution(firstS);
-      return dist.getWeight((Symbol) symL.get(lb1));
+  protected double getWeightImpl(AtomicSymbol sym) throws IllegalSymbolException {
+    List symL = sym.getSymbols();
+    int lb1 = symL.size() - 1;
+    BasisSymbol firstS;
+    if(symL.size() == 2) {
+      firstS = (AtomicSymbol) symL.get(0);
     } else {
-      return getAmbiguityWeight(sym);
+      firstS = (AtomicSymbol) firstA.getSymbol(symL.subList(0, lb1));
     }
+    Distribution dist = getDistribution(firstS);
+    return dist.getWeight((AtomicSymbol) symL.get(lb1));
   }
 
     /**
@@ -110,24 +105,18 @@ implements OrderNDistribution, Serializable {
      * weights which sum to 1.0.
      */
 
-    public void setWeightImpl(Symbol sym, double w) 
-        throws IllegalSymbolException, ChangeVetoException
-    {
-	if (sym instanceof AtomicSymbol) {
-	    CrossProductSymbol cps = (CrossProductSymbol) sym;
-	    List symL = cps.getSymbols();
-	    int lb1 = symL.size() - 1;
-	    Symbol firstS;
-	    if(symL.size() == 2) {
-		firstS = (Symbol) symL.get(0);
-	    } else {
-		firstS = ((CrossProductAlphabet) firstA).getSymbol(symL.subList(0, lb1));
-	    }
-	    Distribution dist = getDistribution(firstS);
-	    dist.setWeight((Symbol) symL.get(lb1), w);
-	} else {
-	    throw new IllegalSymbolException("Can't set a weight for an ambiguity symbol");
-	}
+    public void setWeightImpl(AtomicSymbol sym, double w) 
+    throws IllegalSymbolException, ChangeVetoException {
+      List symL = sym.getSymbols();
+      int lb1 = symL.size() - 1;
+      Symbol firstS;
+      if(symL.size() == 2) {
+        firstS = (Symbol) symL.get(0);
+      } else {
+        firstS = firstA.getSymbol(symL.subList(0, lb1));
+      }
+      Distribution dist = getDistribution(firstS);
+      dist.setWeight((Symbol) symL.get(lb1), w);
     }
   
   public void setNullModelImpl(Distribution nullModel) {
@@ -148,14 +137,13 @@ implements OrderNDistribution, Serializable {
         Symbol sym,
         double count
       ) throws IllegalSymbolException {
-        CrossProductSymbol cps = (CrossProductSymbol) sym;
-        List symL = cps.getSymbols();
+        List symL = ((BasisSymbol) sym).getSymbols();
         int lb1 = symL.size() - 1;
         Symbol firstS;
         if(lb1 == 1) {
           firstS = (Symbol) symL.get(0);
         } else {
-          firstS = ((CrossProductAlphabet) firstA).getSymbol(symL.subList(0, lb1));
+          firstS = firstA.getSymbol(symL.subList(0, lb1));
         }
         Distribution dist = getDistribution(firstS);
         dtc.addCount(dist, (Symbol) symL.get(lb1), count);
@@ -173,15 +161,14 @@ implements OrderNDistribution, Serializable {
       return AbstractOrderNDistribution.this.getAlphabet();
     }
     
-    public double getWeight(Symbol sym)
+    protected double getWeightImpl(AtomicSymbol sym)
     throws IllegalSymbolException {
-      CrossProductSymbol cps = (CrossProductSymbol) sym;
-      List symL = cps.getSymbols();
+      List symL = sym.getSymbols();
       int lb1 = symL.size() - 1;
-      return nullModel.getWeight((Symbol) symL.get(lb1));
+      return nullModel.getWeight((AtomicSymbol) symL.get(lb1));
     }
     
-    protected void setWeightImpl(Symbol sym, double weight)
+    protected void setWeightImpl(AtomicSymbol sym, double weight)
     throws ChangeVetoException {
       throw new ChangeVetoException(
         "Can't change the weight of this null model"

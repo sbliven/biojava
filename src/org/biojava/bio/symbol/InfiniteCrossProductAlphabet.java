@@ -29,12 +29,16 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.io.*;
 
-class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable {
+class InfiniteCrossProductAlphabet implements Alphabet, Serializable {
   private final List alphas;
   private char tokenSeed = 'A';
 
   InfiniteCrossProductAlphabet(List alphas) {
     this.alphas = alphas;
+  }
+  
+  public Symbol getAmbiguity(Set symSet) {
+    throw new BioError("Not implemented yet");
   }
   
   public String getName() {
@@ -51,29 +55,41 @@ class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable
   }
 
   public boolean contains(Symbol s) {
-    if(! (s instanceof CrossProductSymbol)) {
-      return false;
-    }
-    
-    CrossProductSymbol cs = (CrossProductSymbol) s;
-    
-    List sl = cs.getSymbols();
-    if(sl.size() != alphas.size()) {
-      return false;
-    }
-    
-    Iterator ai = alphas.iterator();
-    Iterator si = sl.iterator();
-    
-    while(ai.hasNext() && si.hasNext()) {
-      Alphabet aa = (Alphabet) ai.next();
-      Symbol ss = (Symbol) si.next();
-      if(!aa.contains(ss)) {
+    if(! (s instanceof AtomicSymbol)) {
+      Alphabet ma = s.getMatches();
+      if(ma instanceof FiniteAlphabet) {
+        for(Iterator i = ((FiniteAlphabet) ma).iterator(); i.hasNext(); ) {
+          if(!contains((Symbol) i.next())) {
+            return false;
+          }
+        }
+        return true;
+      } else {
+        throw new BioError(
+          "Problem: Can't work out if I contain ambiguity symbol " + s.getName()
+        );
+      }
+    } else {
+      AtomicSymbol cs = (AtomicSymbol) s;
+      
+      List sl = cs.getSymbols();
+      if(sl.size() != alphas.size()) {
         return false;
       }
+      
+      Iterator ai = alphas.iterator();
+      Iterator si = sl.iterator();
+      
+      while(ai.hasNext() && si.hasNext()) {
+        Alphabet aa = (Alphabet) ai.next();
+        Symbol ss = (Symbol) si.next();
+        if(!aa.contains(ss)) {
+          return false;
+        }
+      }
+      
+      return true;
     }
-    
-    return true;
   }
   
   public void validate(Symbol s) throws IllegalSymbolException {
@@ -94,7 +110,7 @@ class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable
     return alphas;
   }
   
-  public CrossProductSymbol getSymbol(List sList)
+  public Symbol getSymbol(List sList)
   throws IllegalSymbolException {
     if(sList.size() != alphas.size()) {
       throw new IllegalSymbolException(
@@ -108,7 +124,7 @@ class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable
     
     while(ai.hasNext() && si.hasNext()) {
       Alphabet aa = (Alphabet) ai.next();
-      Symbol ss = (Symbol) si.next();
+      AtomicSymbol ss = (AtomicSymbol) si.next();
       if(!aa.contains(ss)) {
         throw new IllegalSymbolException(
           "CrossProductAlphabet " + getName() + " does not accept " + sList +
@@ -118,7 +134,10 @@ class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable
       }
     }
     
-    return AlphabetManager.getCrossProductSymbol(tokenSeed++, sList);
+    return AlphabetManager.createSymbol(
+      tokenSeed++, "?", Annotation.EMPTY_ANNOTATION,
+      sList, this
+    );
   }
 
   public SymbolParser getParser(String name)

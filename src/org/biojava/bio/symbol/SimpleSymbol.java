@@ -22,123 +22,83 @@
 
 package org.biojava.bio.symbol;
 
+import java.util.*;
 import java.io.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
- * A no-frills implementation of a symbol.
+ * A no-frills implementation of Symbol.
  *
  * @author Matthew Pocock
  */
-public class SimpleSymbol implements Symbol, Serializable {
-  private Annotation annotation;
-  private char token;
-  private String name;
-  private Alphabet matches;
+class SimpleSymbol extends AbstractSymbol
+implements Symbol, Serializable {
+  private final char token;
+  private final String name;
+  private final Annotation annotation;
+  protected Alphabet matches;
+  protected Set basies;
   
-  protected transient ChangeSupport changeSupport = null;
-  protected transient Annotatable.AnnotationForwarder annotationForwarder = null;
-  
-  protected void generateChangeSupport(ChangeType ct) {
-    changeSupport = new ChangeSupport();
-    
-    if(
-      ((ct == null) || (ct == Annotatable.ANNOTATION) ) &&
-      annotationForwarder == null
-    ) {
-      annotationForwarder = new Annotatable.AnnotationForwarder(this, changeSupport);
-      if(annotation != null) {
-        annotation.addChangeListener(annotationForwarder);
-      }
-    }
-  }
-  
-  public Annotation getAnnotation() {
-    if(annotation == null) {
-      annotation = new SimpleAnnotation();
-      if(annotationForwarder != null) {
-        annotation.addChangeListener(annotationForwarder);
-      }
-    }
-    return this.annotation;
-  }
-
-  public char getToken() {
-    return this.token;
-  }
-
-  public String getName() {
-    return this.name;
-  }
-    /**
-*Assign a name to the symbol
-*@param name the name you wish to give this symbol
-*/
-
-  public void setName(String name) {
-    this.name = name;
-  }
-  
-  public Alphabet getMatches() {
-    return this.matches;
-  }
-
-  public void addChangeListener(ChangeListener cl) {
-    generateChangeSupport(null);
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl);
-    }
-  }
-  
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    generateChangeSupport(ct);
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl, ct);
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl);
-      }
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl, ct);
-      }
-    }
-  }  
-  
-  /**
-   * Create a new SimpleSymbol.
-   *
-   * @param token  the char to represent this symbol when sequences are
-   *                stringified
-   * @param name  the long name
-   * @param matches the Alphabet of symbols that this symbol can match
-   * @param annotation the annotation
-   */
   public SimpleSymbol(
-    char token,
-    String name,
-    Alphabet matches,
-    Annotation annotation
+    char token, String name, Annotation annotation,
+    Set basies
   ) {
     this.token = token;
     this.name = name;
-    this.annotation = annotation;
-    this.matches = matches;
+    this.annotation = new SimpleAnnotation(annotation);
+    if(basies == null) {
+      this.basies = null;
+    } else {
+      this.basies = Collections.unmodifiableSet(basies);
+    }
   }
-
-  public String toString() {
-    return super.toString() + " " + token;
+  
+  public char getToken() {
+    return token;
+  }
+  
+  public String getName() {
+    return name;
+  }
+  
+  public Annotation getAnnotation() {
+    return annotation;
+  }
+  
+  public Alphabet getMatches() {
+    if(matches == null) {
+      matches = createMatches();
+    }
+    return matches;
+  }
+  
+  protected Alphabet createMatches() {
+    Set basies = getBasies();
+    Set mat = new HashSet();
+    for(Iterator i = basies.iterator(); i.hasNext(); ) {
+      BasisSymbol bs = (BasisSymbol) i.next();
+      if(bs instanceof AtomicSymbol) {
+        mat.add(bs);
+      } else {
+        FiniteAlphabet ma = (FiniteAlphabet) bs.getMatches();
+        for(Iterator j = ma.iterator(); j.hasNext(); ) {
+          mat.add((AtomicSymbol) j.next());
+        }
+      }
+    }
+    return new SimpleAlphabet(mat);
+  }
+  
+  public Set getBasies() {
+    if(basies == null) {
+      basies = createBasies();
+    }
+    return basies;
+  }
+  
+  protected Set createBasies() {
+    throw new BioError("Assertion Failure: Basies set is null");
   }
 }

@@ -39,7 +39,7 @@ public class SimpleAlignment
 extends AbstractSymbolList implements Alignment, Serializable {
   private Map labelToSymbolList;
   private List labels;
-  private CrossProductAlphabet alphabet;
+  private Alphabet alphabet;
   private int length;
   
   public int length() {

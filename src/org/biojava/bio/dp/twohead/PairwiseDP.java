@@ -51,7 +51,7 @@ public class PairwiseDP extends DP implements Serializable {
     BioException
   {
     super(mm);
-    CrossProductAlphabet alpha = (CrossProductAlphabet) mm.emissionAlphabet();
+    Alphabet alpha = mm.emissionAlphabet();
     emissionCache = new HashMap();
     emissionCache.put(ScoreType.PROBABILITY, new EmissionCache(
       alpha, getStates(), getDotStatesIndex(), ScoreType.PROBABILITY)

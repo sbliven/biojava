@@ -328,6 +328,14 @@ class FlatModel implements MarkovModel, Serializable {
       return matches;
     }
     
+    public Set getBasies() {
+      return Collections.singleton(this);
+    }
+    
+    public List getSymbols() {
+      return new SingletonList(this);
+    }
+    
     protected void generateChangeSupport(ChangeType ct) {
       if(changeSupport == null) {
         changeSupport = new ChangeSupport();

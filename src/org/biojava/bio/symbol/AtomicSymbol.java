@@ -22,14 +22,24 @@
 
 package org.biojava.bio.symbol;
 
+import java.util.List;
+
 /**
- * A symbol that is indivisible.
+ * A symbol that is not ambiguous.
  * <P>
  * Atomic symbols are the real underlying elements that a SymbolList is meant
  * to be composed of. DNA nucleotides are atomic, as are amino-acids. The
- * getMatches() method should return an alphabet containing just itself.
- *
+ * getMatches() method should return an alphabet containing just the one Symbol.
+ * <P>
+ * The Symbol instances for single codons would be instances of AtomicSymbol as
+ * they can only be represented as a Set of symbols from their alphabet that
+ * contains just that one symbol.
+ * <P>
+ * AtomicSymbol instances guarantee that getMatches returns an Alphabet
+ * containing just that Symbol, getBasies returns a Set containing just that
+ * Symbol and each element of the List returned by getSymbols is also atomic.
+ * 
  * @author Matthew Pocock
  */
-public interface AtomicSymbol extends Symbol {
+public interface AtomicSymbol extends BasisSymbol {
 }

@@ -34,7 +34,8 @@ import org.biojava.bio.symbol.*;
 */
 
 public class UniformDistribution
-extends AbstractDistribution implements Serializable {
+extends AbstractDistribution
+implements Serializable {
   private final FiniteAlphabet alphabet;
   private Distribution nullModel;
   
@@ -54,17 +55,12 @@ extends AbstractDistribution implements Serializable {
     this.nullModel = nullModel;
   }
   
-  public double getWeight(Symbol s)
+  protected double getWeightImpl(AtomicSymbol s)
   throws IllegalSymbolException {
-    alphabet.validate(s);
-    if(s instanceof AtomicSymbol) {
-      return 1.0 / (double) alphabet.size();
-    } else {
-      return getAmbiguityWeight(s);
-    }
+    return 1.0;
   }
   
-  protected void setWeightImpl(Symbol sym, double weight)
+  protected void setWeightImpl(AtomicSymbol sym, double weight)
   throws ChangeVetoException {
     throw new ChangeVetoException(
       "Can't change the weights in a UniformDistribution"

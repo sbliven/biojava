@@ -36,7 +36,9 @@ import org.biojava.bio.symbol.*;
  * @author Thomas Down
  */
 
-public final class SimpleDistribution extends AbstractDistribution implements Serializable {
+public final class SimpleDistribution
+extends AbstractDistribution
+implements Serializable {
   private transient AlphabetIndex indexer;
   private double[] weights = null;
   private Distribution nullModel;
@@ -69,27 +71,18 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
 	return weights;
   }
   
-  public double getWeight(Symbol s)
+  public double getWeightImpl(AtomicSymbol s)
   throws IllegalSymbolException {
     if(!hasWeights()) {
       return Double.NaN;
     } else {
-      if(s instanceof AtomicSymbol) {
-        return weights[indexer.indexForSymbol(s)];
-      } else {
-        return getAmbiguityWeight(s);
-      }
+      return weights[indexer.indexForSymbol(s)];
     }
   }
 
-  protected void setWeightImpl(Symbol s, double w)
+  protected void setWeightImpl(AtomicSymbol s, double w)
   throws IllegalSymbolException, ChangeVetoException {
     double[] weights = getWeights();
-    if(!(s instanceof AtomicSymbol)) {
-      throw new IllegalSymbolException(
-        "Can't set the weight for an ambiguity symbol " + s.getName()
-      );
-    }
     if(w < 0.0) {
       throw new IllegalArgumentException(
         "Can't set weight to negative score: " +

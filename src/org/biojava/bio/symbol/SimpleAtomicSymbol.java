@@ -22,92 +22,45 @@
 
 package org.biojava.bio.symbol;
 
+import java.util.*;
+import java.io.*;
+
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
  * A no-frills implementation of AtomicSymbol.
+ * <P>
+ * In general, you should use the methods in AlphabetManager to instantiate
+ * Symbol objects. However, this class is public with a protected constructor
+ * to help out when you need to implement and extend AtomicSymbol.
  *
  * @author Matthew Pocock
  */
-public class SimpleAtomicSymbol implements AtomicSymbol {
-  private final char token;
-  private final String name;
-  private final Annotation annotation;
-  private final SingletonAlphabet alphabet;
-
-  protected transient ChangeSupport changeSupport = null;
-  protected transient Annotatable.AnnotationForwarder annotationForwarder = null;
-  
-  public SimpleAtomicSymbol(char token, String name, Annotation annotation) {
-    if(annotation == null) {
-      throw new IllegalArgumentException("Can't use null Annotation");
-    }
-    this.token = token;
-    this.name = name;
-    this.annotation = new SimpleAnnotation(annotation);
-    this.alphabet = new SingletonAlphabet(this);
+public class SimpleAtomicSymbol extends SimpleBasisSymbol
+implements AtomicSymbol {  
+  protected SimpleAtomicSymbol(
+    char token, String name, Annotation annotation
+  ) {
+    super(token, name, annotation);
   }
   
-  public char getToken() {
-    return token;
+  protected SimpleAtomicSymbol(
+    char token, String name, Annotation annotation,
+    List syms
+  ) {
+    super(token, name, annotation, syms);
   }
   
-  public String getName() {
-    return name;
+  protected List createSymbols() {
+    return new SingletonList(this);
   }
   
-  public Annotation getAnnotation() {
-    return annotation;
+  protected Set createBasies() {
+    return Collections.singleton(this);
   }
   
-  public Alphabet getMatches() {
-    return alphabet;
-  }
-  
-  protected void generateChangeSupport(ChangeType changeType) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-    
-    if(
-      ((changeType == null) || (changeType == Annotation.PROPERTY)) &&
-      (annotationForwarder == null)
-    ) {
-      annotationForwarder = new Annotatable.AnnotationForwarder(this, changeSupport);
-      annotation.addChangeListener(annotationForwarder, Annotation.PROPERTY);
-    }
-  }
-  
-  public void addChangeListener(ChangeListener cl) {
-    generateChangeSupport(null);
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl);
-    }
-  }
-  
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    generateChangeSupport(ct);
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl, ct);
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl);
-      }
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl, ct);
-      }
-    }
+  protected Alphabet createMatches() {
+    return new SingletonAlphabet(this);
   }
 }

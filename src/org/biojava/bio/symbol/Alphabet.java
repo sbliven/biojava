@@ -79,6 +79,39 @@ public interface Alphabet extends Annotatable {
   String getName();
 
   /**
+   * Return an ordered List of the alphabets which make up this
+   * compound alphabet.  The returned list should be immutable.
+   *
+   */
+  public List getAlphabets();
+
+  /**
+   * Get a symbol from the Alphabet which corresponds
+   * to the specified ordered list of atomic symbols.
+   * <P>
+   * The symbol at i in the list must be a member of the i'th alphabet in
+   * getAlphabets. If all of the symbols in rl are attomic, then the resulting
+   * symbol will also be atomic. If any one of them is an ambiguity symbol then
+   * the resulting symbol will be the apropreate ambiguity symbol. 
+   *
+   * @param rl A list of Symbol instances
+   * @throws IllegalSymbolException if the members of rl are
+   *            not Symbols over the alphabets returned from
+   *            <code>getAlphabets</code>
+   */
+  public Symbol getSymbol(List rl) 
+  throws IllegalSymbolException;
+
+  /**
+   * Get a symbol that represents the set of symbols in syms.
+   * <P>
+   * Syms must be a set of Symbol instances each of which is contained within
+   * this alphabet.
+   */
+  public Symbol getAmbiguity(Set syms)
+  throws IllegalSymbolException;
+  
+  /**
    * Returns whether or not this Alphabet contains the symbol.
    * <P>
    * An alphabet contains an ambiguity symbol iff the ambiguity symbol's
@@ -157,6 +190,24 @@ public interface Alphabet extends Annotatable {
 
     public int size() {
       return 0;
+    }
+    
+    public List getAlphabets() {
+      return Collections.EMPTY_LIST;
+    }
+    
+    public Symbol getSymbol(List syms) throws IllegalSymbolException {
+      if(syms.size() != 0) {
+        throw new IllegalSymbolException("The empty alphabet contains nothing");
+      }
+      return AlphabetManager.getGapSymbol();
+    }
+    
+    public Symbol getAmbiguity(Set syms) throws IllegalSymbolException {
+      for(Iterator i = syms.iterator(); i.hasNext(); ) {
+        this.validate((Symbol) i.next());
+      }
+      return AlphabetManager.getGapSymbol();
     }
     
     public Iterator iterator() {

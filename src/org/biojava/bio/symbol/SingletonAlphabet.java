@@ -34,26 +34,25 @@ import org.biojava.bio.seq.io.*;
  *
  * @author Matthew Pocock
  */
-public class SingletonAlphabet implements FiniteAlphabet, Serializable {
+public class SingletonAlphabet
+extends AbstractAlphabet
+implements FiniteAlphabet, Serializable {
   private final AtomicSymbol sym;
+  private List alphabets;
   
   public SingletonAlphabet(AtomicSymbol sym) {
     this.sym = sym;
   }
-  
-  public boolean contains(Symbol s) {
-    return
-      s == sym ||
-      s == AlphabetManager.getGapSymbol();
+
+  public List getAlphabets() {
+    if(this.alphabets == null) {
+      this.alphabets = new SingletonList(this);
+    }
+    return this.alphabets;
   }
   
-  public void validate(Symbol s)
-  throws IllegalSymbolException {
-    if(!contains(s)) {
-      throw new IllegalSymbolException(
-        "The alphabet " + getName() + " does not contain the symbol " + s.getName()
-      );
-    }
+  protected boolean containsImpl(AtomicSymbol s) {
+    return s == sym;
   }
   
   public String getName() {
@@ -61,7 +60,7 @@ public class SingletonAlphabet implements FiniteAlphabet, Serializable {
   }
   
   public SymbolParser getParser(String name)
-  throws NoSuchElementException, BioException {
+  throws NoSuchElementException {
     throw new NoSuchElementException(
       "No parsers associated with " + getName() +
       ": " + name
@@ -80,7 +79,7 @@ public class SingletonAlphabet implements FiniteAlphabet, Serializable {
     return Annotation.EMPTY_ANNOTATION;
   }
   
-  public void addSymbol(Symbol sym) throws IllegalSymbolException {
+  public void addSymbolImpl(AtomicSymbol sym) throws IllegalSymbolException {
     throw new IllegalSymbolException(
       "Can't add symbols to alphabet: " + sym.getName() +
       " in " + getName()
@@ -93,7 +92,12 @@ public class SingletonAlphabet implements FiniteAlphabet, Serializable {
       " in " + getName()
     );
   }
-    
+  
+  protected AtomicSymbol getSymbolImpl(List symList)
+  throws IllegalSymbolException {
+    return (AtomicSymbol) symList.get(0);
+  }
+  
   public SymbolList symbols() {
     try {
       return new SimpleSymbolList(this, Collections.nCopies(1, sym));
@@ -101,9 +105,4 @@ public class SingletonAlphabet implements FiniteAlphabet, Serializable {
       throw new BioError(ise, "This is impossible. I must contain me.");
     }
   }
-
-  public void addChangeListener(ChangeListener cl) {}
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-  public void removeChangeListener(ChangeListener cl) {}
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 }

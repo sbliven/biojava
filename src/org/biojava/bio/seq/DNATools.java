@@ -61,12 +61,12 @@ public final class DNATools {
       // add all other ambiguity symbols
       for(Iterator i = ((SimpleAlphabet) dna).ambiguities(); i.hasNext();) {
         Symbol as = (Symbol) i.next();
-        List l = new ArrayList();
+        Set l = new HashSet();
         FiniteAlphabet fa = (FiniteAlphabet) as.getMatches();
         for(Iterator j = fa.iterator(); j.hasNext(); ) {
           l.add(complement((Symbol) j.next()));
         }
-        symbolToComplement.put(as, AlphabetManager.getAmbiguitySymbol(l));
+        symbolToComplement.put(as, dna.getAmbiguity(l));
       }
       complementTable = new DNAComplementTranslationTable();
     } catch (Throwable t) {

@@ -61,7 +61,7 @@ implements ReversibleTranslationTable, Serializable {
           Symbol is = (Symbol) i.next();
           syms.add(this.untranslate(is));
         }
-        s = AlphabetManager.getAmbiguitySymbol(syms);
+        s = getSourceAlphabet().getAmbiguity(syms);
       }
     }
     return s;

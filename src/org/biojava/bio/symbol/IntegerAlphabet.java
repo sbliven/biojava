@@ -90,9 +90,23 @@ public class IntegerAlphabet implements Alphabet, Serializable {
   public IntegerSymbol getSymbol(int val) {
     return new IntegerSymbol(val);
   }
- 
+  
   public Annotation getAnnotation() {
     return Annotation.EMPTY_ANNOTATION;
+  }
+  
+  public List getAlphabets() {
+    return new SingletonList(this);
+  }
+  
+  public Symbol getSymbol(List symList)
+  throws IllegalSymbolException {
+    throw new BioError("Unimplemneted method");
+  }
+  
+  public Symbol getAmbiguity(Set symSet)
+  throws IllegalSymbolException {
+    throw new BioError("Unimplemneted method");
   }
   
   public boolean contains(Symbol s) {
@@ -152,6 +166,14 @@ public class IntegerAlphabet implements Alphabet, Serializable {
     
     public Alphabet getMatches() {
       return matches;
+    }
+    
+    public List getSymbols() {
+      return new SingletonList(this);
+    }
+    
+    public Set getBasies() {
+      return Collections.singleton(this);
     }
     
     protected IntegerSymbol(int val) {

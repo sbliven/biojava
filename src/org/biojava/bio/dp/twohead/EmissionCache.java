@@ -39,13 +39,13 @@ import org.biojava.bio.dp.*;
 public class EmissionCache {
   private final Map eMap;
   private final ListWrapper gopher;
-  private final CrossProductAlphabet alpha;
+  private final Alphabet alpha;
   private final State[] states;
   private final int dsi;
   private final ScoreType scoreType;
   
   public EmissionCache(
-    CrossProductAlphabet alpha,
+    Alphabet alpha,
     State[] states,
     int dsi,
     ScoreType scoreType

@@ -95,7 +95,7 @@ public abstract class AbstractDistribution implements Distribution {
     }
   }
 
-  abstract protected void setWeightImpl(Symbol sym, double weight)
+  abstract protected void setWeightImpl(AtomicSymbol sym, double weight)
   throws IllegalSymbolException, ChangeVetoException;
   
   /**
@@ -108,7 +108,7 @@ public abstract class AbstractDistribution implements Distribution {
   final public void setWeight(Symbol sym, double weight)
   throws IllegalSymbolException, ChangeVetoException {
     if(changeSupport == null) {
-      setWeightImpl(sym, weight);
+      doSetWeight(sym, weight);
     } else {
       ChangeEvent ce = new ChangeEvent(
         this,
@@ -118,8 +118,21 @@ public abstract class AbstractDistribution implements Distribution {
       );
       synchronized(changeSupport) {
         changeSupport.firePreChangeEvent(ce);
-        setWeightImpl(sym, weight);
+        doSetWeight(sym, weight);
         changeSupport.firePostChangeEvent(ce);
+      }
+    }
+  }
+  
+  private void doSetWeight(Symbol sym, double weight)
+  throws IllegalSymbolException, ChangeVetoException {
+    if(sym instanceof AtomicSymbol) {
+      setWeightImpl((AtomicSymbol) sym, weight);
+    } else {
+      FiniteAlphabet fa = (FiniteAlphabet) sym.getMatches();
+      for(Iterator si = fa.iterator(); si.hasNext(); ) {
+        AtomicSymbol as = (AtomicSymbol) si.next();
+        setWeightImpl(as, weight);
       }
     }
   }
@@ -164,41 +177,47 @@ public abstract class AbstractDistribution implements Distribution {
   }
   
   /**
-   * Performs the standard munge to handle ambiguity symbols.
+   * Retrieve the weight for this distribution.
+   * <P>
+   * Performs the standard munge to handle ambiguity symbols. The actual weights
+   * for each attomic symbol should be calculated by the getWeightImpl
+   * functions.
    *
-   * @param amb the AmbiguitySymbol to find the probability of
+   * @param amb the Symbol to find the probability of
    * @return the probability that one of the symbols matching amb was emitted
    * @throws IllegalSymbolException if for any reason the symbols within amb
    *         are not recognized by this state
    */
-  protected double getAmbiguityWeight(Symbol amb)
+  public final double getWeight(Symbol sym)
   throws IllegalSymbolException {
-    if(amb instanceof AtomicSymbol) {
-      throw new IllegalSymbolException(
-        "Can't calculate ambiguity weight for atomic symbol " + amb.getName()
-      );
-    }
-    Alphabet ambA = amb.getMatches();
-    if(ambA instanceof FiniteAlphabet) {
-      FiniteAlphabet fa = (FiniteAlphabet) ambA;
-      double sum = 0.0;
-      double div = 0.0;
-      for(Iterator i = fa.iterator(); i.hasNext(); ) {
-        Symbol sym = (Symbol) i.next();
-        double nm = getNullModel().getWeight(sym);
-        sum += getWeight(sym) * nm;
-        div += nm;
+    if(sym instanceof AtomicSymbol) {
+      return getWeightImpl((AtomicSymbol) sym);
+    } else {  
+      Alphabet ambA = sym.getMatches();
+      if(ambA instanceof FiniteAlphabet) {
+        FiniteAlphabet fa = (FiniteAlphabet) ambA;
+        double sum = 0.0;
+        double div = 0.0;
+        for(Iterator i = fa.iterator(); i.hasNext(); ) {
+          AtomicSymbol as = (AtomicSymbol) i.next();
+          double nm = getNullModel().getWeight(sym);
+          sum += getWeightImpl(as) * nm;
+          div += nm;
+        }
+        return (sum == 0.0)
+           ? 0.0
+           : sum / div;
+      } else {
+        throw new IllegalSymbolException(
+           "Can't find weight for infinite set of symbols matched by " +
+           sym.getName()
+        );
       }
-      return (sum == 0.0)
-        ? 0.0
-        : sum / div;
-    } else {
-      throw new IllegalSymbolException(
-        "Can't find weight for infinite set of symbols matched by " +
-        amb.getName()
-      );
     }
   }
+  
+  protected abstract double getWeightImpl(AtomicSymbol sym)
+  throws IllegalSymbolException;
   
   public Symbol sampleSymbol()
   throws BioError {

@@ -40,8 +40,9 @@ import org.biojava.bio.seq.io.*;
  */
 
 class SimpleCrossProductAlphabet
-implements FiniteAlphabet, CrossProductAlphabet, Serializable {
-  private final CrossProductAlphabet parent;
+extends AbstractAlphabet
+implements Serializable {
+  private final Alphabet parent;
   private final List alphas;
   private final HashMap ourSymbols;
   private char tokenSeed = 'A';
@@ -54,7 +55,7 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
     this(a, null);
   }
   
-  public SimpleCrossProductAlphabet(List a, CrossProductAlphabet parent)
+  public SimpleCrossProductAlphabet(List a, Alphabet parent)
   throws IllegalAlphabetException {
     this.parent = parent;
     for(Iterator i = a.iterator(); i.hasNext(); ) {
@@ -94,45 +95,32 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
     }
   }
 
-  private void putSymbol(List s) {
-    if(s.size() == 0) {
-      return;
-    }
-    CrossProductSymbol ss;
+  private AtomicSymbol putSymbol(List s) {
+    AtomicSymbol ss;
     if(parent != null) {
       try {
-        ss = parent.getSymbol(s);
+        ss = (AtomicSymbol) parent.getSymbol(s);
       } catch (IllegalSymbolException ise) {
         throw new BioError(ise, "Balls up - couldn't fetch symbol from parent");
       }
     } else {
-      ss = new AtomicCrossProductSymbol(tokenSeed++, s);
+      try {
+        ss = (AtomicSymbol) AlphabetManager.createSymbol(
+          tokenSeed++, ""+tokenSeed, Annotation.EMPTY_ANNOTATION, s, this
+        );
+      } catch (IllegalSymbolException ise) { 
+        throw new BioError(
+          ise,
+          "Assertion Failure: Should have a legal symbol."
+        );
+      }
     }
     ourSymbols.put(new ListWrapper(ss.getSymbols()), ss);
+    return ss;
   }
 
-  public boolean contains(Symbol s) {
-    if(ourSymbols.values().contains(s)) {// have seen it before
-      return true;
-    } else if(s == null) {
-      throw new NullPointerException("Can't use null as a symbol");
-    } else if(!(s instanceof AtomicSymbol)) { // ambiguity
-      Alphabet sa = s.getMatches();
-      if(sa instanceof FiniteAlphabet) {
-        Iterator i = ((FiniteAlphabet) sa).iterator();
-        while(i.hasNext()) {
-          CrossProductSymbol sym = (CrossProductSymbol) i.next();
-          if(!this.contains(sym)) {
-            return false;
-          }
-        }
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
+  protected boolean containsImpl(AtomicSymbol s) {
+    return ourSymbols.values().contains(s);
   }
 
   public String getName() {
@@ -149,9 +137,16 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
   }
 
   public SymbolParser getParser(String name)
-  throws NoSuchElementException, BioException {
+  throws NoSuchElementException {
     if(name == "name") {
-      return new CrossProductSymbolNameParser(this);
+      try {
+        return new CrossProductSymbolNameParser(this);
+      } catch (BioException be) {
+        throw new NoSuchElementException(
+          "Couldn't build parser for " + name + ": " + be.getMessage()
+        );
+      }
+
     }
     throw new NoSuchElementException(
       "No parser for " + name + " is defined for " + getName()
@@ -170,12 +165,6 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
     return ourSymbols.size();
   }
 
-  public void validate(Symbol s) throws IllegalSymbolException {
-    if (!contains(s)) {
-	    throw new IllegalSymbolException("Alphabet " + getName() + " does not accept " + s.getName());
-    }
-  }
-
   public Annotation getAnnotation() {
     return Annotation.EMPTY_ANNOTATION;
   }
@@ -187,29 +176,23 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
   private ListWrapper gopher =
     new ListWrapper();
 
-  public CrossProductSymbol getSymbol(List l)
+  public AtomicSymbol getSymbolImpl(List l)
   throws IllegalSymbolException {
-    CrossProductSymbol cps;
+    AtomicSymbol cps;
     synchronized(gopher) {
       gopher.setList(l);
-      cps = (CrossProductSymbol) ourSymbols.get(gopher);
+      cps = (AtomicSymbol) ourSymbols.get(gopher);
     }
     if (cps == null) {
-      cps = AlphabetManager.getCrossProductSymbol('?', l, this);
-      if(this.contains(cps)) {
-        return cps;
-      } else {
-        throw new IllegalSymbolException(
-          "Unable to find CrossProduct symbol for " + cps.getClass() +
-          cps.getName() + " in alphabet " + getName()
-        );
-      }
+      cps = putSymbol(l);
+      return cps;
     } else {
       return cps;
     }
   }
   
-  public void addSymbol(Symbol sym) throws IllegalSymbolException {
+  protected void addSymbolImpl(AtomicSymbol sym)
+  throws IllegalSymbolException {
     throw new IllegalSymbolException(
       "Can't add symbols to alphabet: " + sym.getName() +
       " in " + getName()

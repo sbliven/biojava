@@ -60,15 +60,14 @@ public class OrderNDistributionFactory implements DistributionFactory {
     public Distribution createDistribution(Alphabet alpha)
         throws IllegalAlphabetException
     {
-	if (! (alpha instanceof CrossProductAlphabet))
-	    throw new IllegalAlphabetException("Can only construct order-N distributions for cross-product alphabets");
-
-	CrossProductAlphabet cpa = (CrossProductAlphabet) alpha;
-
-	List aList = cpa.getAlphabets();
-	if (aList.size() == 2 && aList.get(0) == org.biojava.bio.seq.DNATools.getDNA())
-	    return new IndexedNthOrderDistribution(cpa, df);
-	else
-	    return new GeneralNthOrderDistribution(cpa, df);
+	List aList = alpha.getAlphabets();
+	if (
+          aList.size() == 2 &&
+          aList.get(0) == org.biojava.bio.seq.DNATools.getDNA()
+        ) {
+	    return new IndexedNthOrderDistribution(alpha, df);
+	} else {
+	    return new GeneralNthOrderDistribution(alpha, df);
+        }
     }
 }

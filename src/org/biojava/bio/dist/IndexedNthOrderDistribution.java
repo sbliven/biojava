@@ -13,10 +13,11 @@ import org.biojava.bio.symbol.*;
  * @author     Matthew Pocock 
  * @since      1.1 
  */
-class IndexedNthOrderDistribution extends AbstractOrderNDistribution {
+class IndexedNthOrderDistribution
+extends AbstractOrderNDistribution {
   private transient Distribution[] dists;
   private transient AlphabetIndex index;
-  IndexedNthOrderDistribution(CrossProductAlphabet alpha, DistributionFactory df)
+  IndexedNthOrderDistribution(Alphabet alpha, DistributionFactory df)
        throws IllegalAlphabetException {
     super(alpha);
 

@@ -45,7 +45,7 @@ extends AbstractSymbolList implements Serializable {
   /**
    * The alphabet of window Symbols.
    */
-  private final CrossProductAlphabet alpha;
+  private final Alphabet alpha;
   
   /**
    * The width of the window.

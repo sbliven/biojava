@@ -131,71 +131,163 @@ public final class AlphabetManager {
    * <P>
    * @return the system-wide symbol that represents a gap
    */
-  static public CrossProductSymbol getGapSymbol() {
+  static public Symbol getGapSymbol() {
     return gapSymbol;
   }
 
+  /**
+   * Generate a new AtomicSymbol instance with a token, name and Annotation.
+   */
+  static public AtomicSymbol createSymbol(
+    char token, String name, Annotation annotation
+  ) {
+    AtomicSymbol as = new SimpleAtomicSymbol(token, name, annotation, null);
+    return as;
+  }
 
   /**
-   * Generates a new CrossProductSymbol instance.
-   * <P>
-   * This factory method hides some complexity about exactly what to make. If
-   * symList contains only gaps, then the gap symbol is returned. If it contains
-   * only AtomicSymbol instances, then a CrossProductSymbol implementing
-   * AtomicSymbol will be returned. Otherwise, a plain-old CrossProductSymbol
-   * will be returned.
-   * <P>
-   * This method makes no attempt to force singleton-ness upon the returned
-   * symbol. This method will normaly be invoked by methods within alphabet
-   * implementations, not by client code.
+   * Generates a new Symbol instance that represents the tuple of Symbols in
+   * symList.
    *
+   * @param token   the Symbol's token
+   * @param name    the Symbol's name
    * @param symList a list of Symbol objects
-   * @return a CrossProductSymbol that encapsulates that list
+   * @param alpha   the Alphabet that this Symbol will reside in
+   * @return a Symbol that encapsulates that List
    */
-  static public CrossProductSymbol getCrossProductSymbol(
-    char token, List symList
-  ) {
-    return getCrossProductSymbol(token, symList, null);
-  }
-  
-  /**
-   * Generates a new CrossProductSymbol instance.
-   * <P>
-   * This factory method hides some complexity about exactly what to make. If
-   * symList contains only gaps, then the gap symbol is returned. If it contains
-   * only AtomicSymbol instances, then a CrossProductSymbol implementing
-   * AtomicSymbol will be returned. Otherwise, a plain-old CrossProductSymbol
-   * will be returned.
-   * <P>
-   * This method makes no attempt to force singleton-ness upon the returned
-   * symbol. This method will normaly be invoked by methods within alphabet
-   * implementations, not by client code.
-   *
-   * @param symList a list of Symbol objects
-   * @param parent  a parental CrossProductAlphabet instance
-   * @return a CrossProductSymbol that encapsulates that list
-   */
-  static public CrossProductSymbol getCrossProductSymbol(
-    char token, List symList, CrossProductAlphabet parent
-  ) {
+  static public Symbol createSymbol(
+    char token, String name, Annotation annotation,
+    List symList, Alphabet alpha
+  ) throws IllegalSymbolException {
     Iterator i = symList.iterator();
-    int gapC = 0;
+    int basis = 0;
     int atomC = 0;
     while(i.hasNext()) {
       Symbol s = (Symbol) i.next();
-      if(s == gapSymbol) {
-        gapC++;
-      } else if(s instanceof AtomicSymbol) {
-        atomC++;
+      if(s instanceof BasisSymbol) {
+        basis++;
+        if(s instanceof AtomicSymbol) {
+          atomC++;
+        }
       }
     }
-    
-    if(gapC == symList.size()) {
-      return gapSymbol;
-    } else if(atomC == symList.size()) {
-      return new AtomicCrossProductSymbol(token, symList);
+
+    if(atomC == symList.size()) {
+      return new SimpleAtomicSymbol(
+        token, name, Annotation.EMPTY_ANNOTATION,
+        symList
+      );
+    } else if(basis == symList.size()) {
+      return new SimpleBasisSymbol(
+        token, name, Annotation.EMPTY_ANNOTATION,
+        symList
+      );
     } else {
-      return new SimpleCrossProductSymbol(token, symList, parent);
+      return new SimpleSymbol(
+        token, name, Annotation.EMPTY_ANNOTATION,
+        expandBasies(alpha, symList, new ArrayList())
+      );
+    }
+  }
+  
+  private static Set expandBasies(Alphabet alpha, List symList, List built) {
+    int indx = built.size();
+    if(indx < symList.size()) {
+      Symbol s = (Symbol) symList.get(indx);
+      if(s instanceof BasisSymbol) {
+        built.add(s);
+        return expandBasies(alpha, symList, built);
+      } else {
+        Set res = new HashSet();
+        Iterator i = ((FiniteAlphabet) s.getBasies()).iterator();
+        while(i.hasNext()) {
+          BasisSymbol bs = (BasisSymbol) i.next();
+          List built2 = new ArrayList(built);
+          built2.add(bs);
+          res.add(expandBasies(alpha, symList, built2));
+        }
+        return res;
+      }
+    } else {
+      try {
+        return Collections.singleton(alpha.getSymbol(built));
+      } catch (IllegalSymbolException ise) {
+        throw new BioError(
+          ise,
+          "Assertion Failure: Should just have legal AtomicSymbol instances."
+        );
+      }
+    }
+  }
+
+  /**
+   * Generates a new Symbol instance that represents the tuple of Symbols in
+   * symList.
+   *
+   * @param token   the Symbol's token
+   * @param name    the Symbol's name
+   * @param symSet  a Set of Symbol objects
+   * @param alpha   the Alphabet that this Symbol will reside in
+   * @return a Symbol that encapsulates that List
+   */
+  static public Symbol createSymbol(
+    char token, String name, Annotation annotation,
+    Set symSet, Alphabet alpha
+  ) throws IllegalSymbolException {
+    if(symSet.size() == 0) {
+      return getGapSymbol();
+    }
+    Set basisSet = new HashSet();
+    int len = -1;
+    for(
+      Iterator i = symSet.iterator();
+      i.hasNext();
+    ) {
+      Symbol s = (Symbol) i.next();
+      if(s instanceof AtomicSymbol) {
+        AtomicSymbol as = (AtomicSymbol) s;
+        int l = as.getSymbols().size();
+        if(len == -1) {
+          len = l;
+        } else if(len != l) {
+          throw new IllegalSymbolException(
+            "Can't build ambiguity symbol as the symbols have inconsistent " +
+            "length"
+          );
+        }
+        basisSet.add(s);
+      } else {
+        for(Iterator j = ((FiniteAlphabet) s.getMatches()).iterator();
+          j.hasNext();
+        ) {
+          AtomicSymbol as = ( AtomicSymbol) j.next();
+          int l = as.getSymbols().size();
+          if(len == -1) {
+            len = l;
+          } else if(len != l) {
+            throw new IllegalSymbolException(
+              "Can't build ambiguity symbol as the symbols have inconsistent " +
+              "length"
+            );
+          }
+          basisSet.add(as);
+        }
+      }
+    }
+    if(basisSet.size() == 0) {
+      return getGapSymbol();
+    } else if(basisSet.size() == 1) {
+      return (Symbol) basisSet.iterator().next();
+    } else {
+      if(len == 1) {
+        return new SimpleBasisSymbol(
+          token, name, annotation,
+          basisSet
+        );
+      } else {
+        // fixme: need to factorize these atomic symbols into BasisSymbols
+        throw new BioError("Not implemented yet");
+      }
     }
   }
   
@@ -205,7 +297,7 @@ public final class AlphabetManager {
    * @param name  the name to parse
    * @return the associated Alphabet
    */
-  static public CrossProductAlphabet generateCrossProductAlphaFromName(
+  static public Alphabet generateCrossProductAlphaFromName(
     String name
   ) {
     if(!name.startsWith("(") || !name.endsWith(")")) {
@@ -274,7 +366,7 @@ public final class AlphabetManager {
    * @param aList a list of Alphabet objects
    * @return a CrossProductAlphabet that is over the alphabets in aList
    */
-  static public CrossProductAlphabet getCrossProductAlphabet(List aList) {
+  static public Alphabet getCrossProductAlphabet(List aList) {
     return getCrossProductAlphabet(aList, null);
   }
   
@@ -297,16 +389,15 @@ public final class AlphabetManager {
    * @param parent a parent alphabet
    * @return a CrossProductAlphabet that is over the alphabets in aList
    */
-  static public CrossProductAlphabet getCrossProductAlphabet(
-    List aList, CrossProductAlphabet parent
+  static public Alphabet getCrossProductAlphabet(
+    List aList, Alphabet parent
   ) {
     if(crossProductAlphabets == null) {
       crossProductAlphabets = new HashMap();
     }
 
     ListWrapper aw = new ListWrapper(aList);
-    CrossProductAlphabet cpa =
-      (CrossProductAlphabet) crossProductAlphabets.get(aw);
+    Alphabet cpa = (Alphabet) crossProductAlphabets.get(aw);
     
     int size = 1;
     if(cpa == null) {
@@ -338,65 +429,60 @@ public final class AlphabetManager {
     
     return cpa;
   }
+  
+  /**
+   * Return an alphabet that contains all of the AtomicSymbol instances spanned
+   * by a BasisSymbol.
+   *
+   * @param sym   the BasisSymbol to expand
+   * @return all  AtomicSymbol instances that match sym
+   */
+  public static Alphabet expand(BasisSymbol sym) {
+    return new SimpleAlphabet(
+      expandImpl(sym.getSymbols(), new ArrayList()),
+      sym.getName()
+    );
+  }
 
-    /**
-    *Obtain the default ambiguity symbol to represent the symbols passed in as parameters e.g. using the IUPAC ambiguity code, the symbol W will be returned for the collection [AT]. 
-    *@param syms the collection of symbols
-    *@throws IllegalSymbolException if the symbols are not recognized.
-    */
-  static public Symbol getAmbiguitySymbol(Collection syms)
-  throws IllegalSymbolException {
-    return getAmbiguitySymbol('\0', "", null, syms);
-  }
-    /**
-    *Create a specific ambiguity symbol for a collection of symbols.
-    *@param token the ambiguity character's designated token
-    *@param name a name for this ambiguity symbol.
-    *@param ann Annotation to associate with the ambiguity symbol
-    *@param syms the collection of symbols which will be represented by this ambiguity symbol
-    *@throws IllegalSymbolException if the symbols are not recognized.
-    */
-    static public Symbol getAmbiguitySymbol(
-    char token,
-    String name,
-    Annotation ann,
-    Collection syms
-  ) throws IllegalSymbolException {
-    Set symSet = new HashSet();
-    for(Iterator i = syms.iterator(); i.hasNext(); ) {
-      Symbol s = (Symbol) i.next();
-      if(s instanceof AtomicSymbol) {
-        symSet.add(s);
+  private static Set expandImpl(List symList, List built) {
+    int indx = built.size();
+    if(indx < symList.size()) {
+      BasisSymbol bs = (BasisSymbol) symList.get(indx);
+      if(bs instanceof AtomicSymbol) {
+        built.add(bs);
+        return expandImpl(symList, built);
       } else {
-        Alphabet sa = s.getMatches();
-        if(sa instanceof FiniteAlphabet) {
-          Iterator j = ((FiniteAlphabet) sa).iterator();
-          while(j.hasNext()) {
-            symSet.add(j.next());
-          }
-        } else {
-          throw new IllegalSymbolException(
-            "Unable to process symbol " + s.getName() +
-            " as it matches an infinite number of AtomicSymbol objects."
-          );
+        Set syms = new HashSet();
+        Iterator i = ((FiniteAlphabet) bs.getMatches()).iterator();
+        while(i.hasNext()) {
+          List built2 = new ArrayList(built);
+          built2.add((BasisSymbol) i.next());
+          syms.add(expandImpl(symList, built2));
         }
+        return syms;
       }
+    } else {
+      //try {
+        //return Collections.singleton(alpha.getSymbol(built));
+        throw new BioError("Pants");
+      //} catch (IllegalSymbolException ise) {
+      //  throw new BioError(ise, "Assertion Failure: Couldn't create symbol.");
+      //}
     }
-    if(symSet.isEmpty()) {
-      return getGapSymbol();
-    }
-    Symbol as = (Symbol) ambiguitySymbols.get(symSet);
-    if(as == null) {
-      as = new SimpleSymbol(
-        token,
-        name + "-pigs",
-        new SimpleAlphabet(symSet),
-        ann
-      );
-      ambiguitySymbols.put(symSet, as);
-    }
-    return as;
   }
+  
+  /**
+   * Return a Set of BasisSymbol instances that span all of the AtomicSymbl
+   * instances in symSet.
+   *
+   * @param symSet  the Set of AtomicSymbol instances
+   * @param alpha   the Alphabet instance that the Symbols are from
+   * @return a Set containing BasisSymbol instances
+   */
+  public static Set factorize(Set symSet, Alphabet alpha) {
+    return null;
+  }
+  
   
   /**
    * Initialize the static AlphabetManager resources.
@@ -516,12 +602,13 @@ public final class AlphabetManager {
    * @param symE an XML Element specifying the element
    * @return the new AmbiguitySymbol object
    */
-  static private Symbol ambiguityFromXML(Element symE, Map nameToSym)
-  throws IllegalSymbolException {
+  static private Symbol ambiguityFromXML(
+    Alphabet alpha, Element symE, Map nameToSym
+  ) throws IllegalSymbolException {
     char token = '\0';
     String name = null;
     String description = null;
-    List syms = new ArrayList();
+    Set syms = new HashSet();
     
     NodeList children = symE.getChildNodes();
     for(int i = 0; i < children.getLength(); i++) {
@@ -561,7 +648,10 @@ public final class AlphabetManager {
       }
     }
 
-    Symbol sym = getAmbiguitySymbol(token, name, (Annotation) null, syms);
+    Symbol sym = createSymbol(
+      token, name, Annotation.EMPTY_ANNOTATION,
+      syms, alpha
+    );
     return sym;
   }
 
@@ -600,7 +690,7 @@ public final class AlphabetManager {
         } else if(name.equals("symbolref")) {
           alphabet.addSymbol((Symbol) nameToSym.get(el.getAttribute("name")));
         } else if(name.equals("ambiguity")) {
-            alphabet.addAmbiguity(ambiguityFromXML(el, nameToSym));
+          alphabet.addAmbiguity(ambiguityFromXML(alphabet, el, nameToSym));
         }
       } catch (Exception e) {
         throw new BioException(e, "Couldn't parse element " + el);
@@ -711,28 +801,9 @@ public final class AlphabetManager {
    * @author Matthew Pocock
    */
   private static class GapSymbol
-  extends SimpleSymbol
-  implements CrossProductSymbol {
+  extends SimpleSymbol {
     public GapSymbol() {
-      super('-', "gap", Alphabet.EMPTY_ALPHABET, Annotation.EMPTY_ANNOTATION);
-    }
-    
-    /**
-     * Returns an infinitely long list of itself.
-     *
-     * @return a List of length zero, but where get(n) always returns the gap
-     *         symbol
-     */
-    public List getSymbols() {
-      return new AbstractList() {
-        public int size() {
-          return 0;
-        }
-        
-        public Object get(int index) {
-          return GapSymbol.this;
-        }
-      };
+      super('-', "gap", Annotation.EMPTY_ANNOTATION, Collections.EMPTY_SET);
     }
   }
   

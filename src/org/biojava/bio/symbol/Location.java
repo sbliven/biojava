@@ -181,7 +181,11 @@ public interface Location {
     public boolean contains(int p) { return false; }
     public boolean equals(Object o) {
       if(o instanceof Location) {
-        return Location.naturalOrder.areEqual(this, (Location) o);
+        if(o instanceof EmptyLocation) {
+          return true;
+        } else {
+          return Location.naturalOrder.areEqual(this, (Location) o);
+        }
       } else {
         return false;
       }

@@ -41,22 +41,16 @@ import org.biojava.bio.seq.io.*;
  *
  * @author Matthew Pocock
  */
-public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
+public class AllTokensAlphabet
+extends AbstractAlphabet
+implements Serializable {
   private Map tokenToSymbol; // token->Symbol
   private Map nameToSymbol; // name->Symbol
   private Set symbols;
   private String name;
   private Annotation annotation;
-  
-  protected transient ChangeSupport changeSupport = null;
-  protected transient Annotatable.AnnotationForwarder annotationForwarder = null;
 
-  /**
-   * Adds a symbol to the alphabet
-   *
-   * @param r the symbol to add
-   */
-  public void addSymbol(Symbol s) {
+  protected void addSymbolImpl(AtomicSymbol s) {
     symbols.add(s);
     Character token = new Character(s.getToken());
     if(!tokenToSymbol.keySet().contains(token)) {
@@ -75,12 +69,16 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
     return annotation;
   }
   
-  public boolean contains(Symbol s) {
+  protected boolean containsImpl(AtomicSymbol s) {
     return symbols.contains(s);
   }
   
   public String getName() {
     return name;
+  }
+  
+  public List getAlphabets() {
+    return new SingletonList(this);
   }
   
   public SymbolParser getParser(String name)
@@ -91,7 +89,14 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
           Symbol sym = (Symbol) nameToSymbol.get(token);
           if(sym == null) {
             sym = new SimpleAtomicSymbol(token.charAt(0), token, null);
-            addSymbol(sym);
+            try {
+              addSymbol(sym);
+            } catch (ChangeVetoException cve) {
+              throw new IllegalSymbolException(
+                cve,
+                "Couldn't parse '" + token + "'"
+              );
+            }
           }
           return sym;
         }
@@ -101,23 +106,33 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
         public Alphabet getAlphabet() {
           return AllTokensAlphabet.this;
         }
-        public SymbolList parse(String seq) {
+        public SymbolList parse(String seq)
+        throws IllegalSymbolException {
           List symList = new ArrayList(seq.length());
-          for(int i = 0; i < seq.length(); i++)
+          for(int i = 0; i < seq.length(); i++) {
             symList.add(parseToken(seq.substring(i, i+1)));
-	  try {
-	      return new SimpleSymbolList(getAlphabet(), symList);
-	  } catch (IllegalSymbolException ex) {
-	      throw new BioError(ex);
-	  }
+          }
+          try {
+	    return new SimpleSymbolList(getAlphabet(), symList);
+          } catch (IllegalSymbolException ex) {
+	    throw new BioError(ex);
+          }
         }
-        public Symbol parseToken(String token) {
+        public Symbol parseToken(String token)
+        throws IllegalSymbolException {
           char c = token.charAt(0);
           Character ch = new Character(c);
           Symbol s = (Symbol) tokenToSymbol.get(ch);
           if(s == null) {
             s = new SimpleAtomicSymbol(c, token, null);
-            addSymbol(s);
+            try {
+              addSymbol(s);
+            } catch (ChangeVetoException cve) {
+              throw new IllegalSymbolException(
+                cve,
+                "Can't add symbol '" + token + "'"
+              );
+            }
           }
           return s;
         }
@@ -162,15 +177,7 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
   public int size() {
     return symbols.size();
   }
-  
-  public void validate(Symbol s)
-  throws IllegalSymbolException {
-    if(contains(s))
-      return;
-    throw new IllegalSymbolException("No symbol " + s.getName() +
-                                      " in alphabet " + getName());
-  }
-  
+    
   public void removeSymbol(Symbol sym) throws IllegalSymbolException {
     throw new IllegalSymbolException(
       "Can't remove symbols from alphabet: " + sym.getName() +
@@ -178,52 +185,11 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
     );
   }
   
-  protected void generateChangeSupport(ChangeType changeType) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-    
-    if(
-      ((changeType == null) || (changeType == Annotation.PROPERTY)) &&
-      (annotationForwarder == null)
-    ) {
-      annotationForwarder = new Annotatable.AnnotationForwarder(this, changeSupport);
-      annotation.addChangeListener(annotationForwarder, Annotation.PROPERTY);
-    }
+  protected AtomicSymbol getSymbolImpl(List symList)
+  throws IllegalSymbolException {
+    return (AtomicSymbol) symList.get(0);
   }
   
-  public void addChangeListener(ChangeListener cl) {
-    generateChangeSupport(null);
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl);
-    }
-  }
-  
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    generateChangeSupport(ct);
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl, ct);
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl);
-      }
-    }
-  }
-  
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl, ct);
-      }
-    }
-  }  
-
   public AllTokensAlphabet(String name) {
     this.name = name;
     this.symbols = new HashSet();

@@ -62,7 +62,7 @@ public class SimpleTranslationTable implements TranslationTable, Serializable {
           Symbol is = (Symbol) i.next();
           syms.add(this.translate(is));
         }
-        s = AlphabetManager.getAmbiguitySymbol(syms);
+        s = getTargetAlphabet().getAmbiguity(syms);
       }
     }
     return s;

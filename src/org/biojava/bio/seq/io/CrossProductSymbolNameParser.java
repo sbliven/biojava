@@ -35,7 +35,7 @@ import org.biojava.bio.symbol.*;
  * @author Matthew Pocock
  */
 public class CrossProductSymbolNameParser implements SymbolParser, Serializable {
-  private final CrossProductAlphabet alpha;
+  private final Alphabet alpha;
   private final SymbolParser [] parser;
   
   public Alphabet getAlphabet() {
@@ -142,7 +142,7 @@ public class CrossProductSymbolNameParser implements SymbolParser, Serializable 
     return alpha.getSymbol(rList);
   }
   
-  public CrossProductSymbolNameParser(CrossProductAlphabet alpha)
+  public CrossProductSymbolNameParser(Alphabet alpha)
   throws NoSuchElementException, BioException {
     this.alpha = alpha;
     List alphas = alpha.getAlphabets();

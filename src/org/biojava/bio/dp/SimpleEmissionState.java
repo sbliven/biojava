@@ -23,6 +23,7 @@
 package org.biojava.bio.dp;
 
 import java.io.Serializable;
+import java.util.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
@@ -103,7 +104,15 @@ implements EmissionState, Serializable {
   public Alphabet getMatches() {
     return matches;
   }
+  
+  public Set getBasies() {
+    return Collections.singleton(this);
+  }
 
+  public List getSymbols() {
+    return new SingletonList(this);
+  }
+  
   public void addChangeListener(ChangeListener cl) {
     if(changeSupport == null) {
       changeSupport = new ChangeSupport();

@@ -33,7 +33,9 @@ import org.biojava.bio.*;
  *
  * @author Matthew Pocock
  */
-public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
+public class SimpleAlphabet
+extends AbstractAlphabet
+implements Serializable {
   /**
    * The name of this alphabet.
    */
@@ -54,6 +56,12 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
    */
   private final Set ambig;
   
+  /**
+   * A list of alphabets that make up this one - a singleton list containing
+   * this.
+   */
+  private List alphabets;
+  
   public Iterator iterator() {
     return symbols.iterator();
   }
@@ -65,7 +73,7 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
   public String getName() {
     return name;
   }
-
+  
   /**
    * Assign a name to the alphabet
    * @param name the name you wish to give this alphabet
@@ -95,29 +103,11 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
       }
   }
 
-  public boolean contains(Symbol s) {
-    if(s == null) {
-      return false;
-    } else if(symbols.contains(s)) {
-      return true;
-    } else  {
-      Alphabet sa = s.getMatches();
-      if(!(sa instanceof FiniteAlphabet)) {
-        return false;
-      } else {
-        Iterator i = ((FiniteAlphabet) s.getMatches()).iterator();
-        while(i.hasNext()) {
-          Symbol sym = (Symbol) i.next();
-          if(!symbols.contains(sym)) {
-            return false;
-          }
-        }
-        return true;
-      }
-    }
+  protected boolean containsImpl(AtomicSymbol s) {
+    return symbols.contains(s);
   }
 
-  protected void addSymbolImpl(Symbol s)
+  protected void addSymbolImpl(AtomicSymbol s)
   throws IllegalSymbolException, ChangeVetoException {
     symbols.add(s);
   }
@@ -130,7 +120,7 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
    *
    * @param as the ambiguity symbol to add
    * @throws IllegalSymbolException if aSym contains an AtomicSymbol not found
-   *         within this alpahbet
+   *         within this alphabet
    */
   public void addAmbiguity(Symbol aSym)
   throws IllegalSymbolException {
@@ -153,41 +143,17 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
     }
   }
 
-  public void validate(Symbol s) throws IllegalSymbolException {
-    if(!contains(s)) {
-      if(s == null) {
-        throw new IllegalSymbolException("NULL is an illegal symbol");
-      } else if (s instanceof AtomicSymbol) { 
-        throw new IllegalSymbolException("Symbol " + s.getName() +
-                                          " not found in alphabet " +
-                                          getName());
-      } else {
-        Alphabet alpha = s.getMatches();
-        if(alpha instanceof FiniteAlphabet) {
-          try {
-            for(Iterator i = ((FiniteAlphabet) alpha).iterator(); i.hasNext(); ) {
-              validate((AtomicSymbol) i.next());
-            }
-          } catch (IllegalSymbolException ise) {
-            throw new IllegalSymbolException(
-              ise,
-              "Ambiguity symbol " + s.getName() +
-              " could not be accepted as it matches an invalid symbol."
-            );
-          }
-          throw new BioError(
-            "Symbol " + s.getName() + " isn't contained within the alphabet " +
-            getName() +
-            " but I can't find which of the matching symbols is invalid"
-          );
-        } else {
-          throw new IllegalSymbolException(
-            "This alphabet is finite. The symbol " + s.getName() +
-            " matches an infinite number of symbols."
-          );
-        }
-      }
+  public List getAlphabets() {
+    if(this.alphabets == null) {
+      this.alphabets = new SingletonList(this);
     }
+    return this.alphabets;
+  }
+  
+  public AtomicSymbol getSymbolImpl(List rl)
+  throws IllegalSymbolException {
+    AtomicSymbol s = (AtomicSymbol) rl.get(0);
+    return s;
   }
   
   public SimpleAlphabet() {
@@ -206,5 +172,6 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
     this.symbols = symbols;
     this.ambig = new HashSet();
     this.name = name;
+    this.alphabets = null;
   }
 }
