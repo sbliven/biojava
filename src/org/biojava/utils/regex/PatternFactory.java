@@ -77,7 +77,8 @@ public class PatternFactory
     /**
      * Returns a Pattern object that applies the specified regex
      * against SymbolLists in the Alphabet that this PatternFactory 
-     * was defined against.
+     * was defined against.  The String returned by getName() is
+     * set to pattern.
      */
     public org.biojava.utils.regex.Pattern compile(String pattern)
         throws RegexException, IllegalAlphabetException

@@ -97,6 +97,26 @@ public class Search
     }
 
     /**
+     * add a search pattern to the searches to be conducted
+     * by this object.
+     * @param patternString String representation of the pattern.
+     * @param overlap if true, the search continues at the base following the start to the previous hit.
+     * If false, it continues at the base after the existing hit.
+     * @throws RegexException if the requested pattern is not valid
+     * @throws IllegalAlphabetException if the requested pattern is not valid
+     */
+    public void addPattern(String label, String patternString, boolean overlap)
+        throws RegexException, IllegalAlphabetException
+    {
+        Pattern pattern = factory.compile(patternString, label);
+        PatternInfo info = new PatternInfo();
+        info.patternString = patternString;
+        info.pattern = pattern;
+        info.overlap = overlap;
+        patterns.add(info);
+    }
+
+    /**
      * remove all patterns from the pattern cache.
      */
     public void clearPatterns()
