@@ -405,7 +405,7 @@ Changeable {
     
     // do a transform to offset drawing to the neighbourhood of zero.
     // the 50 here is pretty arbitrary.  The precise value doesn't matter
-    // setGraphicsOrigin(50.0-sequenceToGraphics(range.getMin()));
+    setGraphicsOrigin(50.0-sequenceToGraphics(range.getMin()));
 
     double minAcross = sequenceToGraphics(range.getMin()) -
                        renderer.getMinimumLeader(this);
