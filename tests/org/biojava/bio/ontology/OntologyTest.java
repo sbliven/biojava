@@ -35,6 +35,10 @@ import junit.framework.TestCase;
  */
 public class OntologyTest
 extends TestCase {
+  public OntologyTest(String name) {
+    super(name);
+  }
+  
   // fixme: this needs splitting into multiple tests
   // we need a basic ontology to do tests over
   public void testProperties()
