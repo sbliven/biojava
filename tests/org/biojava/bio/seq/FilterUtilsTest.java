@@ -75,7 +75,7 @@ public class FilterUtilsTest extends TestCase
     protected FeatureFilter pf1_AND_tf1_or_tf2;
     protected FeatureFilter pf1_and_pf2_OR_tf1;
 
-    public FeatureFilterTest(String name) {
+    public FilterUtilsTest(String name) {
 	super(name);
     }
 

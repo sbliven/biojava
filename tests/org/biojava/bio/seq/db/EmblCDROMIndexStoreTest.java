@@ -147,7 +147,7 @@ public class EmblCDROMIndexStoreTest extends TestCase
 
         for (Iterator i = files.iterator(); i.hasNext();)
         {
-            String name = ((File) i.next()).getName();
+            String name = (String) i.next();
 
             assertTrue(names.contains(name));
         }
