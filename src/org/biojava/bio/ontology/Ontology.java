@@ -72,7 +72,7 @@ public interface Ontology extends Changeable {
      * @throws NoSuchElementException if no term exists with that name
      */
     
-    public Term getTermByName(String s) throws NoSuchElementException;
+    public Term getTerm(String s) throws NoSuchElementException;
     
     /**
      * Return all triples from this ontology which match the supplied
@@ -192,7 +192,7 @@ public interface Ontology extends Changeable {
             return new HashSet(terms.values());
         }
         
-        public Term getTermByName(String name) 
+        public Term getTerm(String name) 
             throws NoSuchElementException
         {
             Term t = (Term) terms.get(name);

@@ -123,7 +123,7 @@ public class TabDelimParser {
     boolean isTrippleTerm = termName.startsWith("(") && termName.endsWith(")");
     
     if(onto.containsTerm(termName)) {
-      return onto.getTermByName(termName);
+      return onto.getTerm(termName);
     } else {
       try {
         if(isTrippleTerm) {

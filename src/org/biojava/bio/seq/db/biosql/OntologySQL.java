@@ -243,7 +243,7 @@ class OntologySQL {
     public void blessExternal(Ontology internalOntology, Ontology externalOntology) {
         for (Iterator i = externalOntology.getTerms().iterator(); i.hasNext(); ) {
             Term extTerm = (Term) i.next();
-            Term intTerm = internalOntology.getTermByName(extTerm.getName());
+            Term intTerm = internalOntology.getTerm(extTerm.getName());
             blessedExternalAliases.put(extTerm, intTerm);
             blessedExternalTerms.put(intTerm, extTerm);
         }
@@ -554,4 +554,11 @@ class OntologySQL {
         }
     }
     
+    Term termForID(int id) {
+        Term t = (Term) termsByID.get(new Integer(id));
+        if (t == null) {
+            throw new BioError("Invalid term id " + id);
+        }
+        return t;
+    }
 }

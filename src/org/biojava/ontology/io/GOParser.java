@@ -116,7 +116,7 @@ public class GOParser {
         StringTokenizer toke = new StringTokenizer(termName, ", ");
         termName = toke.nextToken();
         if (onto.containsTerm(termName)) {
-            return onto.getTermByName(termName);
+            return onto.getTerm(termName);
         } else {
             Term t = onto.createTerm(termName, termDesc);
             if (toke.hasMoreTokens()) {

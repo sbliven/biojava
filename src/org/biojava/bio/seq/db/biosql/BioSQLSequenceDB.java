@@ -804,56 +804,20 @@ public class BioSQLSequenceDB implements SequenceDB {
     int intern_ontology_term(Connection conn, String s)
         throws SQLException
     {
-        int guano_id = ontologySQL.ontologyID(ontologySQL.getLegacyOntology());
-        
-        PreparedStatement get = conn.prepareStatement("select ontology_term_id from ontology_term where ontology_id = ? and name = ?");
-        get.setInt(1, guano_id);
-        get.setString(2, s);
-        ResultSet rs = get.executeQuery();
-        if (rs.next()) {
-            int id = rs.getInt(1);
-            get.close();
-            return id;
+        Ontology legacy = ontologySQL.getLegacyOntology();
+        if (legacy.containsTerm(s)) {
+            return ontologySQL.termID(legacy.getTerm(s));
+        } else {
+            try {
+                return ontologySQL.termID(legacy.createTerm(s, ""));
+            } catch (Exception ex) {
+                throw new SQLException("Couldn't create term in legacy ontology namespace");
+            }
         }
-        get.close();
-        
-        PreparedStatement insert = conn.prepareStatement("insert into ontology_term (name, ontology_id) values ( ?, ? )");
-        insert.setString(1, s);
-        insert.setInt(2, guano_id);
-        insert.executeUpdate();
-        insert.close();
-        
-        int id = getDBHelper().getInsertID(conn, "ontology_term", "ontology_term_id");
-        return id;
     }
-
-    Map ontologyTermCache = new HashMap();
     
     String getOntologyTerm(int termId) {
-        synchronized(ontologyTermCache) {
-            Integer termKey = new Integer(termId);
-            if (!ontologyTermCache.containsKey(termKey)) {
-                ontologyTermCache.clear();
-                Connection conn = null;
-                try {
-                    conn = pool.takeConnection();
-                    PreparedStatement get_terms = conn.prepareStatement(
-                            "select ontology_term_id, name " +
-                            "  from ontology_term"
-                    );
-                    ResultSet rs = get_terms.executeQuery();
-                    while (rs.next()) {
-                        ontologyTermCache.put(new Integer(rs.getInt(1)),
-                                              rs.getString(2).trim());
-                    }
-                    get_terms.close();
-                    pool.putConnection(conn);
-                } catch (SQLException ex) {
-                    throw new BioRuntimeException(ex, "Error fetching annotations");
-                }                                                         
-            }
-            return (String) ontologyTermCache.get(termKey);
-        }
+        return ontologySQL.termForID(termId).getName();
     }
         
     

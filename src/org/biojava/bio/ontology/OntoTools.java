@@ -46,17 +46,17 @@ public final class OntoTools {
       
       CORE_ONTOLOGY = new TabDelimParser().parse(reader, DEFAULT_FACTORY);
       
-      IS_A = CORE_ONTOLOGY.getTermByName("is-a");
-      HAS_A = CORE_ONTOLOGY.getTermByName("has-a");
-      ANY = CORE_ONTOLOGY.getTermByName("any");
-      REMOTE_TERM = CORE_ONTOLOGY.getTermByName("remote-term");
-      TRIPLE_TERM = CORE_ONTOLOGY.getTermByName("triple-term");
-      RELATION = CORE_ONTOLOGY.getTermByName("relation");
-      REFLEXIVE = CORE_ONTOLOGY.getTermByName("reflexive");
-      EQUIVALENCE = CORE_ONTOLOGY.getTermByName("equivalence");
-      PARTIAL_ORDER = CORE_ONTOLOGY.getTermByName("partial-order");
-      PART_OF = CORE_ONTOLOGY.getTermByName("part-of");
-      INVERSE = CORE_ONTOLOGY.getTermByName("inverse");
+      IS_A = CORE_ONTOLOGY.getTerm("is-a");
+      HAS_A = CORE_ONTOLOGY.getTerm("has-a");
+      ANY = CORE_ONTOLOGY.getTerm("any");
+      REMOTE_TERM = CORE_ONTOLOGY.getTerm("remote-term");
+      TRIPLE_TERM = CORE_ONTOLOGY.getTerm("triple-term");
+      RELATION = CORE_ONTOLOGY.getTerm("relation");
+      REFLEXIVE = CORE_ONTOLOGY.getTerm("reflexive");
+      EQUIVALENCE = CORE_ONTOLOGY.getTerm("equivalence");
+      PARTIAL_ORDER = CORE_ONTOLOGY.getTerm("partial-order");
+      PART_OF = CORE_ONTOLOGY.getTerm("part-of");
+      INVERSE = CORE_ONTOLOGY.getTerm("inverse");
     } catch (Exception e) {
       throw new BioError(e, "Could not initialize OntoTools");
     }
