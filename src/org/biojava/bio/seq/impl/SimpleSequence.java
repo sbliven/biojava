@@ -50,7 +50,7 @@ import org.biojava.bio.seq.*;
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public class SimpleSequence implements Sequence, RealizingFeatureHolder
+public class SimpleSequence implements Sequence, RealizingFeatureHolder, java.io.Serializable
 {
     //
     // This section is for the SymbolList implementation-by-delegation

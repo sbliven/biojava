@@ -22,6 +22,7 @@
 package org.biojava.bio.seq.impl;
 
 import java.util.*;
+import java.io.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
@@ -35,7 +36,7 @@ import org.biojava.bio.seq.*;
  * @author Thomas Down
  */
 
-public class SimpleFeature implements Feature, RealizingFeatureHolder {
+public class SimpleFeature implements Feature, RealizingFeatureHolder, java.io.Serializable {
   /**
    * The FeatureHolder that we will delegate the FeatureHolder interface too.
    * This is lazily instantiated.

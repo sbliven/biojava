@@ -37,6 +37,8 @@ import org.biojava.bio.seq.*;
  */
 
 public class ProjectedFeatureWrapper implements Feature {
+    private transient ChangeSupport changeSupport;
+
     private final Feature feature;
     private final ProjectedFeatureHolder holder;
     private final Location newLocation;
@@ -48,6 +50,15 @@ public class ProjectedFeatureWrapper implements Feature {
 	this.feature = f;
 	this.holder = holder;
 	this.newLocation = holder.getProjectedLocation(f.getLocation());
+    }
+
+    protected ChangeSupport getChangeSupport() {
+	return changeSupport;
+    }
+
+    protected void instantiateChangeSupport() {
+	if (changeSupport == null)
+	    changeSupport = new ChangeSupport();
     }
 
     public Feature getViewedFeature() {
@@ -122,8 +133,25 @@ public class ProjectedFeatureWrapper implements Feature {
 	throw new UnsupportedOperationException("Projected features don't have children (yet).");
     }
         
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
+    public void addChangeListener(ChangeListener cl) {
+	instantiateChangeSupport();
+	getChangeSupport().addChangeListener(cl);
+    }
+
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {
+	instantiateChangeSupport();
+	getChangeSupport().addChangeListener(cl, ct);
+    }
+
+    public void removeChangeListener(ChangeListener cl) {
+	ChangeSupport cs = getChangeSupport();
+	if (cs != null)
+	    cs.removeChangeListener(cl);
+    }
+
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+	ChangeSupport cs = getChangeSupport();
+	if (cs != null)
+	    cs.removeChangeListener(cl, ct);
+    }
 }
