@@ -183,10 +183,12 @@ implements
   }
 
   public String getType() {
-    if (typeTerm != OntoTools.ANY) {
+    if(type != null) {
+      return type;
+    } else if (typeTerm != null) {
         return typeTerm.getName();
     } else {
-        return type;
+        return "";
     }
   }
 
@@ -225,10 +227,12 @@ implements
     }
 
   public String getSource() {
-    if (sourceTerm != OntoTools.ANY) {
+    if(source != null) {
+      return source;
+    } else if (sourceTerm != null) {
         return sourceTerm.getName();
     } else {
-        return source;
+        return "";
     }
   }
 
