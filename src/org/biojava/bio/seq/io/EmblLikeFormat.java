@@ -93,9 +93,9 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
 	throws IllegalSymbolException, IOException, ParseException
     {
 	String            line;
-	StreamParser    sparser = null;
-	boolean hasMoreSequence = true;
-	boolean hasWhitespace   = false;
+	StreamParser    sparser       = null;
+	boolean hasMoreSequence       = true;
+	boolean hasInternalWhitespace = false;
 
 	listener.startSequence();
 
@@ -128,12 +128,12 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
 
 		    if (Character.isWhitespace(cbuf[0]))
 		    {
-			hasWhitespace = true;
+			hasInternalWhitespace = true;
 			continue;
 		    }
 		    else
 		    {
-			if (hasWhitespace)
+			if (hasInternalWhitespace)
 			    System.err.println("Warning: whitespace found between sequence entries");
 			reader.reset();
 			break;
