@@ -282,6 +282,12 @@ class AbstractGenEmblFileFormer
 		String formattedLocation = null;
 		StrandedFeature.Strand featureStrand = StrandedFeature.POSITIVE;
 
+		String joinType = "join";
+		if(theFeature.getAnnotation().containsProperty("JoinType"))
+		{
+			joinType = (String)theFeature.getAnnotation().getProperty("JoinType");
+		}
+
 		if(theFeature instanceof RemoteFeature)
 		{
 			StringBuffer tempBuffer = new StringBuffer();
@@ -289,7 +295,8 @@ class AbstractGenEmblFileFormer
 
 			if(regionList.size() > 1)
 			{
-				tempBuffer.append("join(");
+				tempBuffer.append(joinType);
+				tempBuffer.append("(");
 			}
 			java.util.ListIterator tempIterator = regionList.listIterator();
 
@@ -334,8 +341,11 @@ class AbstractGenEmblFileFormer
 			{
 				featureStrand = ((StrandedFeature)theFeature).getStrand();
 			}
-			formattedLocation = this.formatLocation(
-					theFeature.getLocation(), featureStrand);
+
+			StringBuffer tempBuffer = new StringBuffer();
+			formattedLocation = this.formatLocationBlock(tempBuffer,
+					theFeature.getLocation(), featureStrand.getValue(), "",
+					Integer.MAX_VALUE, joinType).toString();
 		}
 
 		return formattedLocation;
@@ -346,7 +356,9 @@ class AbstractGenEmblFileFormer
      * representation of a <code>Location</code>. This is a
      * convenience method only. The version which has a
      * <code>StringBuffer</code> parameter (and returns the
-     * <code>StringBuffer</code>) is preferred.
+     * <code>StringBuffer</code>) is preferred.  If a compound location is
+     * formatted using this method, it is returned as a join-type location
+     * rather than an order-type.
      *
      * @param loc a <code>Location</code> to format.
      * @param strand a <code>StrandedFeature.Strand</code>
@@ -358,12 +370,13 @@ class AbstractGenEmblFileFormer
 				 final StrandedFeature.Strand strand)
     {
 	// Using arbitrary leader and wrapwidth wide enough to always
-	// make one line
+	// make one line.
 	StringBuffer sb = formatLocationBlock(new StringBuffer(),
 					      loc,
 					      strand.getValue(),
 					      "",
-					      Integer.MAX_VALUE);
+					      Integer.MAX_VALUE,
+					      "join");
 
 	return sb.toString();
     }
@@ -390,8 +403,11 @@ class AbstractGenEmblFileFormer
      *   AL123465:(123..567)
      * </pre>
      *
-     * Use of 'order' rather than 'join' is not retained over a
-     * read/write cycle. i.e. 'order' is converted to 'join'.
+     * If a compound location is formatted using this method, it is returned as
+     * a join-type location rather than an order-type.
+     *
+     * To preserve the join/order distinction; and to format locations like
+     * AL123465:(123..567), use the formatLocation(Feature) method.
      *
      * @param sb a <code>StringBuffer</code to which the location will
      * be appended.
@@ -407,7 +423,7 @@ class AbstractGenEmblFileFormer
     {
 	// Using arbitrary leader and wrapwidth wide enough to always
 	// make one line
-	return formatLocationBlock(sb, loc, strand.getValue(), "", Integer.MAX_VALUE);
+	return formatLocationBlock(sb, loc, strand.getValue(), "", Integer.MAX_VALUE, "join");
     }
 
     /**
@@ -422,6 +438,8 @@ class AbstractGenEmblFileFormer
      * each line.
      * @param wrapWidth an <code>int</code> indicating the number of
      * columns per line.
+     * @param joinType Only used if the location is a compound location.  It is
+     * prepended to the list of locations.
      *
      * @return a <code>StringBuffer</code>.
      */
@@ -429,7 +447,8 @@ class AbstractGenEmblFileFormer
 				     final Location     loc,
 				     final int          strand,
 				     final String       leader,
-				     final int          wrapWidth)
+				     final int          wrapWidth,
+				     final String		joinType)
     {
 	// Get separator for system
 	String nl = System.getProperty("line.separator");
@@ -458,7 +477,8 @@ class AbstractGenEmblFileFormer
 	if (loc instanceof CompoundLocation)
 	{
 	    join = true;
-	    sb.append("join(");
+	    sb.append(joinType);
+	    sb.append("(");
 	    position += 5;
 	}
 

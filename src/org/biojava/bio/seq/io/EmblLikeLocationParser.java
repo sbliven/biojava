@@ -67,6 +67,12 @@ class EmblLikeLocationParser
 
     // Stores join/order/complement instructions
     private List instructStack = new ArrayList();
+	// joinType is a hack to store if a compound location is a join(...) or an
+	// order(...) location.  If this isn't sufficient for your needs, feel free
+	// to fix it.  If you do, please make sure the AbstractGenEmblFileFormer
+	// class is still able to format join and order correctly
+	private String joinType = null;
+
     // List of sublocations.  Used for compound locations on the current
     // sequence
     private List  subLocations = new ArrayList();
@@ -119,6 +125,7 @@ class EmblLikeLocationParser
         instructStack.clear();
         subLocations.clear();
         subRegions.clear();
+        joinType = null;
 
         thisToken = lexer.getNextToken();
         while (thisToken != null)
@@ -232,6 +239,17 @@ class EmblLikeLocationParser
 			theTemplate = newTemplate;
 		}
 
+		if(joinType != null)
+		{
+			try
+			{
+				theTemplate.annotation.setProperty("JoinType", joinType);
+			}
+			catch(org.biojava.utils.ChangeVetoException cve)
+			{
+				throw new org.biojava.bio.BioError(cve);
+			}
+		}
 		return theTemplate;
     }
 
@@ -407,10 +425,7 @@ class EmblLikeLocationParser
 	String instruct = (String) instructStack.remove(instructStack.size() - 1);
 	if (instruct.equals("join") || instruct.equals("order"))
 	{
-	    // This is handled implicitly by the parseLocation()
-	    // return statement. However, the choice of join/order
-	    // should be reported back to the parent Feature and
-	    // stored in the annotation bundle.
+		joinType = instruct;
 	}
 	else if (instruct.equals("complement"))
 	{
