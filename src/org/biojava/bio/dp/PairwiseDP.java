@@ -57,12 +57,14 @@ public class PairwiseDP extends DP {
     public double backward(ResidueList[] seqs) 
         throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
     {
-	if (seqs.length != 2)
-	    throw new IllegalArgumentException("This DP object only runs on pairs.");
+//  	if (seqs.length != 2)
+//  	    throw new IllegalArgumentException("This DP object only runs on pairs.");
 
-	Backward f = new Backward();
-	PairDPCursor cursor = new LightPairDPCursor(seqs[0], seqs[1], getStates().length, false);
-	return f.runBackward(seqs[0], seqs[1], cursor);
+//  	Backward f = new Backward();
+//  	PairDPCursor cursor = new LightPairDPCursor(seqs[0], seqs[1], getStates().length, false);
+//  	return f.runBackward(seqs[0], seqs[1], cursor);
+
+	return backwardMatrix(seqs).getScore();
     }
 
     public DPMatrix backwardMatrix(ResidueList[] seqs) 
@@ -100,7 +102,7 @@ private class Backward {
 	cursor = curs;
 	alpha = (CrossProductAlphabet) getModel().emissionAlphabet();
 
-	// Forward initialization
+	// initialization
 
 	double[] col = cursor.getCurrentColumn();
 	for (int l = 0; l < states.length; ++l)
@@ -115,14 +117,14 @@ private class Backward {
 	while (cursor.canAdvance(0) || cursor.canAdvance(1)) {
 	    if (cursor.canAdvance(0)) {
 		cursor.advance(0);
-		for (int i = 0; i <= cursor.getPos(1); ++i) {
+		for (int i = seq1.length() + 1; i >= cursor.getPos(1); --i) {
 		    backwardPrepareCol(cursor.getPos(0), i);
 		}
 	    }
 
 	    if (cursor.canAdvance(1)) {
 		cursor.advance(1);
-		for (int i = 0; i <= cursor.getPos(0); ++i) {
+		for (int i = seq0.length() + 1; i >= cursor.getPos(0); --i) {
 		    backwardPrepareCol(i, cursor.getPos(1));
 		}
 	    }
@@ -183,7 +185,7 @@ private class Backward {
     {
 	double[] curCol = (double[]) matrix[0][0];
 	int[] advance;
-	for (int l = states.length; l > 0; --l) {
+	for (int l = states.length - 1; l >= 0; --l) {
 	    // System.out.println("State = " + states[l].getName());
 
 	    if (states[l] instanceof EmissionState)
@@ -581,6 +583,7 @@ private class Viterbi {
 	List statel = new ArrayList();
 	List resl = new ArrayList();
 	List scorel = new ArrayList();
+	bp = bp.back; // skip final MagicalState match
 	while (bp != null) {
 	    statel.add(bp.state);
 	    resl.add(bp.residue);
@@ -1054,7 +1057,7 @@ private static class BackMatrixPairDPCursor implements PairDPCursor {
     public double[] getColumn(int[] coords) {
 //	System.out.println("!!! getting " + coords[0] + "," + coords[1]);
 
-	if (coords[0] == -1 || coords[1] == -1)
+	if (coords[0] == -1 || coords[1] == -1 || coords[0] == seqs[0].length() + 2 || coords[1] == seqs[1].length() + 2)
 	    return zeroCol;
 
     	return (double[]) sMatrix[coords[0]][coords[1]];

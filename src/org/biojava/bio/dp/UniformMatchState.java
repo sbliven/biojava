@@ -47,7 +47,7 @@ public class UniformMatchState implements EmissionState {
 	this.alpha = (CrossProductAlphabet) a;
 	Iterator i = alpha.getAlphabets().iterator();
 	Alphabet sa = (Alphabet) i.next();
-  if(! (subAlpha instanceof FiniteAlphabet) ) {
+  if(! (sa instanceof FiniteAlphabet) ) {
     throw new IllegalAlphabetException(
       "Can't generate a UniformMatchState over infinite alphabet " +
       subAlpha.getName() + " of type " + subAlpha.getClass()
