@@ -92,6 +92,11 @@ public class Digest {
     public void addDigestFeatures() throws BioException, ChangeVetoException 
     {
         peptideQue = new LinkedList();
+        
+        if(protease == null){
+           throw new BioException("Protease is null"); 
+        }
+        
         String cleaveSites = protease.getCleaveageResidues();
         boolean endoProtease = protease.isEndoProtease();
         String notCleave = protease.getNotCleaveResidues();

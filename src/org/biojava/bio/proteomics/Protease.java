@@ -59,7 +59,7 @@ public class Protease {
                 "org/biojava/bio/proteomics/ProteaseManager.xml"
               );
               if(tablesStream == null ) {
-                throw new BioError("Couldn't locate ResidueProperties.xml.");
+                throw new BioError("Couldn't locate ProteaseManager.xml.");
               }
 
               InputSource is = new InputSource(tablesStream);
@@ -151,6 +151,7 @@ public class Protease {
      */
     public static Protease getProteaseByName(String proteaseName){
         Protease protease = null;
+        
             NodeList children = doc.getDocumentElement().getChildNodes();
             for(int i = 0; i < children.getLength(); i++) {
                 Node cnode = (Node) children.item(i); 
@@ -168,7 +169,7 @@ public class Protease {
                         NodeList proteaseNodes = child.getChildNodes();
                         for(int j = 0; j < proteaseNodes.getLength(); j++)
                         {
-                            Node cnode2 = (Node) children.item(j); 
+                            Node cnode2 = (Node) proteaseNodes.item(j); 
                             if(! (cnode2 instanceof Element)) {
                                 continue;
                             }
@@ -183,11 +184,13 @@ public class Protease {
                                 endo = new Boolean(content).booleanValue();
                             }
                         }
+                        
                         if(cleavRes != null && exceptRes != null){
                             protease = new Protease(cleavRes ,endo, exceptRes);
                         }else if(cleavRes != null && exceptRes == null){
-                            protease = new Protease(cleavRes ,endo);
+                            protease = new Protease(cleavRes ,endo);                            
                         }
+                        
                     }
                 }
             }

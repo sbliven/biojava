@@ -65,11 +65,18 @@ public class MassCalc {
     
     //Save values here so that modifications are not global
     private HashMap mSymbolPropertyHash;
+    
+    /**
+     * If instance methods are being used this will store the 
+     * isotopic type to be used for calculation. Write now just worry about 
+     * hydroxMass
+     */
+     private double hydroxMass;
 
     
-    /** Creates new MassCalc */
+    /** Creates new MassCalc 
     public MassCalc() {
-    }
+    }*/
     
      /** Creates new MassCalc
      * @param isotopicType The type of isotopes to calculate. Either mono isotopic
@@ -77,20 +84,40 @@ public class MassCalc {
      * table. Ex. SymbolPropertyTable.AVG_MASS or SymbolPropertyTable.MONO_MASS
      */
     public MassCalc(String isotopicType) {
+        //Calculate hydroxyl mass
+        hydroxMass = 0.0;
+        if(isotopicType.equals(SymbolPropertyTable.AVG_MASS)){
+           hydroxMass = Havg + Oavg;
+        }
+        else if(isotopicType.equals(SymbolPropertyTable.MONO_MASS)){
+           hydroxMass = Hmono + Omono; 
+        }
+        
+        
         mSymbolPropertyHash = new HashMap();
         
         SymbolPropertyTable symbolPropertyTable = 
                 ProteinTools.getSymbolPropertyTable(isotopicType);
         
-        Iterator symbolList = ProteinTools.getAlphabet().symbols().iterator();
+        //Iterator symbolList = ProteinTools.getAlphabet().symbols().iterator();
+        
+        Iterator symbolList = ProteinTools.getAlphabet().iterator();
         
         for(; symbolList.hasNext(); )
         {
             
             Symbol sym = (Symbol)symbolList.next();
             try{
+                System.out.println(sym.getName() + ":" + sym.getToken());
+                try{
                 Double value = new Double(symbolPropertyTable.getDoubleValue(sym));
+                
                 mSymbolPropertyHash.put(sym, value);
+                }catch (NullPointerException npe){
+                   //This seems to be happening when a amino acid is 
+                   //in the property table that doesn't have a residue value
+                   
+                }
             }
             catch(IllegalSymbolException ise)
             {
@@ -109,7 +136,9 @@ public class MassCalc {
     public void setSymbolModification(char symbolToken, double mass) 
                                         throws IllegalSymbolException
     {
-        Iterator list = ProteinTools.getAlphabet().symbols().iterator();
+        //Iterator list = ProteinTools.getAlphabet().symbols().iterator();
+        
+        Iterator list = ProteinTools.getAlphabet().iterator();
         for(; list.hasNext(); )
         {
             Symbol sym = (Symbol)list.next();
@@ -165,15 +194,23 @@ public class MassCalc {
             ise.printStackTrace();
         }
         
+        //Calculate hydroxyl mass
+        double hydroxMass = 0.0;
+        if(isotopicType.equals(SymbolPropertyTable.AVG_MASS)){
+           hydroxMass = Havg + Oavg;
+        }
+        else if(isotopicType.equals(SymbolPropertyTable.MONO_MASS)){
+           hydroxMass = Hmono + Omono; 
+        }
         if (pepMass != 0.0)
         {
                 if (MH_PLUS)
                 {
-                   pepMass = pepMass + 3 * Havg + Oavg;
+                   pepMass = pepMass + 3 * hydroxMass;
                 }
                 else
                 {
-                   pepMass = pepMass + 2 * Havg + Oavg;
+                   pepMass = pepMass + 2 * hydroxMass;
                 }
         }
 
@@ -206,11 +243,11 @@ public class MassCalc {
         {
                 if (MH_PLUS)
                 {
-                   pepMass = pepMass + 3 * Havg + Oavg;
+                   pepMass = pepMass + 3 * hydroxMass;
                 }
                 else
                 {
-                   pepMass = pepMass + 2 * Havg + Oavg;
+                   pepMass = pepMass + 2 * hydroxMass;
                 }
         }
 
