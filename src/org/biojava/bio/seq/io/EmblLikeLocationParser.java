@@ -111,7 +111,7 @@ class EmblLikeLocationParser
      *
      * @exception BioException if an error occurs.
      */
-    Feature.Template parseLocation(String location, Feature.Template theTemplate)
+    public Feature.Template parseLocation(String location, Feature.Template theTemplate)
 		throws BioException
     {
         this.location = location;
