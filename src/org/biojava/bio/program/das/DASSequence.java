@@ -22,6 +22,7 @@
 package org.biojava.bio.program.das;
 
 import java.util.*;
+import java.util.zip.*;
 import java.net.*;
 import java.io.*;
 
@@ -55,6 +56,7 @@ import org.biojava.utils.stax.*;
  * @since 1.1
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author David Huen
  */
 
 public class DASSequence implements Sequence, RealizingFeatureHolder {
@@ -305,8 +307,6 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 
         FeatureHolder structure = getStructure();
 	if (length() < SIZE_THRESHOLD && structure.countFeatures() > 0) {
-	    System.err.println("Hmmmm, doing whole assembly");
-
 	    List sequences = new ArrayList();
 	    for (Iterator fi = structure.features(); fi.hasNext(); ) {
 		ComponentFeature cf = (ComponentFeature) fi.next();
@@ -490,14 +490,19 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     }
 
     protected SymbolList getTrueSymbols() {
+            long startGet = (new Date()).getTime();
+
 	try {
 	    DAS.startedActivity(this);
 
 	    URL epURL = new URL(dataSourceURL, "dna?ref=" + seqID);
 	    HttpURLConnection huc = (HttpURLConnection) epURL.openConnection();
+            huc.setRequestProperty("Accept-Encoding", "gzip");
+
 	    huc.connect();
 	    // int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
 	    int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
+
 	    if (status == 0)
 		throw new BioError("Not a DAS server");
 	    else if (status != 200)
@@ -510,7 +515,20 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    StreamParser ssparser = sparser.parseStream(sb);
 
 	    StAXContentHandler dnaHandler = new DNAHandler(ssparser);
-	    InputSource is = new InputSource(huc.getInputStream());
+
+            // determine if I'm getting a gzipped reply
+            String contentEncoding = huc.getContentEncoding();
+            InputStream inStream = huc.getInputStream();
+ 
+            if (contentEncoding != null) {
+                if (contentEncoding.indexOf("gzip") != -1) {
+		    // we have gzip encoding
+		    inStream = new GZIPInputStream(inStream);
+		    // System.out.println("gzip encoded dna!");
+                }
+            }
+
+	    InputSource is = new InputSource(inStream);
 	    SAXParser parser = nonvalidatingSAXParser();
 	    parser.setContentHandler(new SAX2StAXAdaptor(dnaHandler));
 	    parser.parse(is);

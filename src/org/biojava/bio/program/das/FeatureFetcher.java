@@ -22,6 +22,7 @@
 package org.biojava.bio.program.das;
 
 import java.util.*;
+import java.util.zip.*;
 import java.net.*;
 import java.io.*;
 
@@ -44,6 +45,7 @@ import org.w3c.dom.*;
  *
  * @since 1.2
  * @author Thomas Down
+ * @author David Huen
  */
 
 class FeatureFetcher {
@@ -88,6 +90,8 @@ class FeatureFetcher {
     void runFetch() 
 	throws BioException, ParseException
     {
+        // get time
+        long startFetch = (new Date()).getTime();
 	DAS.startedActivity(this);
 	URL fURL = null;
 	    
@@ -108,6 +112,7 @@ class FeatureFetcher {
 		huc = (HttpURLConnection) fURL.openConnection();
 		huc.setRequestMethod("POST");
 		huc.setRequestProperty("Content-Type", "text/xml");
+		huc.setRequestProperty("Accept-Encoding", "gzip");
 		huc.setDoOutput(true);
 		 
 		OutputStream os = huc.getOutputStream();
@@ -170,6 +175,7 @@ class FeatureFetcher {
 		huc = (HttpURLConnection) fURL.openConnection();
 		huc.setRequestMethod("POST");
 		huc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+		huc.setRequestProperty("Accept-Encoding", "gzip");
 		huc.setDoOutput(true);
 		OutputStream os = huc.getOutputStream();
 		PrintStream ps = new PrintStream(os);
@@ -178,6 +184,7 @@ class FeatureFetcher {
 	    }
 
 	    huc.connect();
+
 	    // int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
 	    int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
 	    if (status == 0) {
@@ -186,13 +193,26 @@ class FeatureFetcher {
 		throw new BioError("DAS error (status code = " + status + ")");
 	    }
 
+            // determine if I'm getting a gzipped reply
+            String contentEncoding = huc.getContentEncoding();
+            
+            InputStream inStream = huc.getInputStream();
+
+	    if (contentEncoding != null) {
+                if (contentEncoding.indexOf("gzip") != -1) {
+		    // we have gzip encoding
+		    inStream = new GZIPInputStream(inStream);
+		    // System.out.println("gzip encoding!");
+                }
+            }
+
 	    if (fetchEncoding.equals("dasgff")) {
 		DASGFFParser gffParser = new DASGFFParser(ticketsByID);
-		gffParser.parseStream(huc.getInputStream());
+		gffParser.parseStream(inStream);
 
 		doneTickets = gffParser.getDoneTickets();
 	    } else if (fetchEncoding.equals("xff")) {
-		InputSource is = new InputSource(huc.getInputStream());
+		InputSource is = new InputSource(inStream);
 		DASFeaturesHandler dfh = new DASFeaturesHandler(ticketsByID, this);
 		SAXParser parser = DASSequence.nonvalidatingSAXParser();
 		parser.setContentHandler(new SAX2StAXAdaptor(dfh));
