@@ -35,7 +35,7 @@ import java.util.*;
  */
 
 public class DistributionTools {
- 
+
   /**
    * Overide the constructer to prevent subclassing
    */
@@ -65,6 +65,26 @@ public class DistributionTools {
       }
       return true;
   }
+
+  /**
+   * Compares the emission spectra of two distribution arrays
+   * @return true if alphabets and symbol weights are equal for each pair
+   * of distributions. Will return false if the arrays are of unequal length.
+   * @throws BioException if one of the Distributions is over an infinite
+   * alphabet.
+   * @since 1.3
+   */
+  public static final boolean areEmissionSpectraEqual(Distribution[] a,
+                                                      Distribution[] b)
+    throws BioException{
+      if(a.length != b.length) return false;
+      for (int i = 0; i < a.length; i++) {
+        if(areEmissionSpectraEqual(a[i], b[i]) == false){
+          return false;
+        }
+      }
+      return true;
+    }
 
   /**
    * A method to calculate the Kullback-Liebler Distance (relative entropy)
