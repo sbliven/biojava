@@ -78,6 +78,11 @@ public class GenbankFormat implements SequenceFormat, Serializable
 		listener.startSequence();
 		while ((line = reader.readLine()) != null)
 		{
+			if(line.length() == 0)
+			{
+				continue;
+			}
+
 			if (line.startsWith(END_SEQUENCE_TAG))
 			{
 				if(sParser != null)

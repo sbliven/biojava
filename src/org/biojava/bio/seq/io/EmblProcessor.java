@@ -60,7 +60,7 @@ public class EmblProcessor extends SequenceBuilderFilter {
 
     public EmblProcessor(SequenceBuilder delegate) {
 	super(delegate);
-	features = new FeatureTableParser(this);
+	features = new FeatureTableParser(this, "EMBL");
     }
 
     public void endSequence() throws ParseException {
@@ -82,24 +82,24 @@ public class EmblProcessor extends SequenceBuilderFilter {
     public void addSequenceProperty(Object key, Object value) throws ParseException {
 	try {
 	    // Tidy up any end-of-block jobbies
-	    
+
 	    if (features.inFeature() && !key.equals("FT")) {
 		features.endFeature();
 	    }
-       
+
 	    if (key.equals("FT")) {
 		String featureLine = value.toString();
 		if (featureLine.charAt(0) != ' ') {
 		    // This is a featuretype field
 		    if (features.inFeature())
 			features.endFeature();
-		    
+
 		    features.startFeature(featureLine.substring(0, 15).trim());
 		}
 		features.featureData(featureLine.substring(16));
 	    } else {
 		getDelegate().addSequenceProperty(key, value);
-		
+
 		if (key.equals("AC")) {
 		    String acc= value.toString();
 		    StringTokenizer toke = new StringTokenizer(acc, "; ");

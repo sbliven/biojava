@@ -68,7 +68,7 @@ public class GenbankProcessor extends SequenceBuilderFilter
 	public GenbankProcessor(SequenceBuilder theDelegate)
 	{
 		super(theDelegate);
-		features = new FeatureTableParser(this);
+		features = new FeatureTableParser(this, "GENBANK");
 	}
 
 	public void endSequence() throws ParseException

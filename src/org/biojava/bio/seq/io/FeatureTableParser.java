@@ -42,26 +42,34 @@ import org.biojava.bio.seq.*;
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author Greg Cox
+ */
+
+/*
+ * Greg Cox: Changed private fields and methods to protected so that
+ * SwissProtFeatureTableParser could subclass and snag the implementation
  */
 
 class FeatureTableParser {
     private final static int WITHOUT=0;
-    private final static int WITHIN=1;
-    private final static int LOCATION=2;
-    private final static int ATTRIBUTE=3;
+    protected final static int WITHIN=1;
+    protected final static int LOCATION=2;
+    protected final static int ATTRIBUTE=3;
 
-    private int featureStatus = WITHOUT;
-    private StringBuffer featureBuf;
-    
+    protected int featureStatus = WITHOUT;
+    protected StringBuffer featureBuf;
+
     private String featureType;
-    private Location featureLocation;
+    protected Location featureLocation;
     private Map featureAttributes;
     private StrandedFeature.Strand featureStrand;
+    private String featureSource;
 
     private SeqIOListener listener;
 
-    FeatureTableParser(SeqIOListener listener) {
+    FeatureTableParser(SeqIOListener listener, String source) {
 	this.listener = listener;
+	this.featureSource = source;
 	featureBuf = new StringBuffer();
 	featureAttributes = new HashMap();
     }
@@ -70,7 +78,7 @@ class FeatureTableParser {
 	featureType = type;
 	featureStatus = LOCATION;
 	featureBuf.setLength(0);
-	featureAttributes.clear();    
+	featureAttributes.clear();
     }
 
     public void featureData(String line) throws BioException {
@@ -108,12 +116,13 @@ class FeatureTableParser {
 	}
     }
 
-    public void endFeature() 
-	throws BioException 
+    public void endFeature()
+	throws BioException
     {
 	listener.startFeature(buildFeatureTemplate(featureType,
 						   featureLocation,
 						   featureStrand,
+						   featureSource,
 						   featureAttributes));
 	listener.endFeature();
 	featureStatus = WITHOUT;
@@ -122,7 +131,8 @@ class FeatureTableParser {
     protected Feature.Template buildFeatureTemplate(String type,
 						    Location loc,
 						    StrandedFeature.Strand strandHint,
-						    Map attrs) 
+						    String source,
+						    Map attrs)
     {
 	StrandedFeature.Template t = new StrandedFeature.Template();
 	t.annotation = new SimpleAnnotation();
@@ -140,25 +150,25 @@ class FeatureTableParser {
 
 	t.location = loc;
 	t.type = type;
-	t.source = "EMBL";
+	t.source = source;
 	t.strand = strandHint;
 
 	return t;
     }
 
     private Location parseLocation(String loc) throws BioException {
-	    boolean joining = false;    
+	    boolean joining = false;
 	    boolean complementing = false;
 	    boolean isComplement = false;
 	    boolean ranging = false;
 	    boolean fuzzyMin = false;
         boolean fuzzyMax = false;
-    
+
 	    int start = -1;
 
 	    Location result = null;
 	    List locationList = null;
-	
+
 	    StringTokenizer toke = new StringTokenizer(loc, "(),. ><", true);
 	    int level = 0;
 	    while (toke.hasMoreTokens()) {
@@ -193,7 +203,7 @@ class FeatureTableParser {
 		// System.err.println("Range! " + ranging);
 		// This ought to be an actual coordinate.
 		int pos = -1;
-		try {  
+		try {
 		    pos = Integer.parseInt(t);
 		} catch (NumberFormatException ex) {
 		    throw new BioException("bad locator: " + t + " " + loc);
@@ -207,7 +217,7 @@ class FeatureTableParser {
             if (fuzzyMin || fuzzyMax) {
                 rl = new FuzzyLocation(rl, fuzzyMin, fuzzyMax);
             }
-            
+
 		    if (joining) {
 			locationList.add(rl);
 		    } else {
@@ -228,7 +238,7 @@ class FeatureTableParser {
 	if (level != 0) {
 	    throw new BioException("Mismatched parentheses: " + loc);
 	}
-    
+
 	if (ranging) {
 	    Location rl = new PointLocation(start);
 	    if (joining) {
@@ -240,13 +250,13 @@ class FeatureTableParser {
 		result = rl;
 	    }
 	}
-	
+
 	if (isComplement) {
 	    featureStrand = StrandedFeature.NEGATIVE;
-	} else { 
+	} else {
 	    featureStrand = StrandedFeature.POSITIVE;
 	}
-    
+
 	if (result == null) {
 	    if(locationList == null) {
 		throw new BioException("Location null: " + loc);
@@ -257,7 +267,7 @@ class FeatureTableParser {
 	return result;
     }
 
-    private void processAttribute(String attr) throws BioException {
+    protected void processAttribute(String attr) throws BioException {
 	// System.err.println(attr);
 	int eqPos = attr.indexOf('=');
 	if (eqPos == -1) {
@@ -295,7 +305,7 @@ class FeatureTableParser {
 	return (featureStatus != WITHOUT);
     }
 
-    private int countChar(StringBuffer s, char c) {
+    protected int countChar(StringBuffer s, char c) {
 	int cnt = 0;
 	for (int i = 0; i < s.length(); ++i)
 	    if (s.charAt(i) == c)
@@ -303,7 +313,7 @@ class FeatureTableParser {
 	return cnt;
     }
 
-    private int countChar(String s, char c) {
+    protected int countChar(String s, char c) {
 	int cnt = 0;
 	for (int i = 0; i < s.length(); ++i)
 	    if (s.charAt(i) == c)
