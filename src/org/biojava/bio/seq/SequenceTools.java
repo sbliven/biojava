@@ -65,7 +65,7 @@ public final class SequenceTools {
   throws IndexOutOfBoundsException {
     return new SubSequence(seq, start, end);
   }
-  
+
   /**
    * Extract a sub-sequence from a sequence.
    *
@@ -163,6 +163,18 @@ public final class SequenceTools {
   }
 
   /**
+   * Creates a new Sequence with the data of the old but with a different
+   * FeatureRealizer that will be applied to new Features.
+   *
+   * @param seq the Sequence to wrap
+   * @param fr the new FeatureRealizer
+   * @return the new ViewSequence
+   */
+  public static ViewSequence view(Sequence seq, FeatureRealizer fr){
+    return new ViewSequence(seq, fr);
+  }
+
+  /**
    * Create a new gapped sequence for a sequence.
    *
    * <p>
@@ -233,7 +245,7 @@ public final class SequenceTools {
    * @param fh  the features to add
    * @throws ChangeVetoException if the sequence could not be modified
    * @throws BioException if there was an error creating the features
-   */  
+   */
   public static void addAllFeatures(Sequence seq, FeatureHolder fh)
   throws
     ChangeVetoException,

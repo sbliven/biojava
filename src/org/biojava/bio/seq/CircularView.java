@@ -40,9 +40,6 @@ import org.biojava.utils.ChangeVetoException;
  * Future versions may support changing the origin.
  * </p>
  *
- * <p>
- * This code is currently experimental
- * </p>
  *
  * @author Mark Schreiber
  * @version 1.2

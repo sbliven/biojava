@@ -59,9 +59,9 @@ implements Serializable {
     public final static RangeResolver RESOLVE_AVERAGE;
 
     static {
-	RESOLVE_INNER = new InnerRangeResolver();
-	RESOLVE_OUTER = new OuterRangeResolver();
-	RESOLVE_AVERAGE = new AverageRangeResolver();
+        RESOLVE_INNER = new InnerRangeResolver();
+        RESOLVE_OUTER = new OuterRangeResolver();
+        RESOLVE_AVERAGE = new AverageRangeResolver();
     }
 
     private int outerMin;
@@ -90,17 +90,17 @@ implements Serializable {
     int innerMin, int innerMax,
     RangeResolver resolver
   ) {
-  	boolean isMinFuzzy = false;
-  	boolean isMaxFuzzy = false;
-  	if (outerMin != innerMin)
-	{
+        boolean isMinFuzzy = false;
+        boolean isMaxFuzzy = false;
+        if (outerMin != innerMin)
+        {
             isMinFuzzy = true;
-	}
-	if (outerMax != innerMax)
-	{
+        }
+        if (outerMax != innerMax)
+        {
             isMaxFuzzy = true;
-	}
-	this.initializeVariables(outerMin, outerMax, innerMin, innerMax, isMinFuzzy, isMaxFuzzy, resolver);
+        }
+        this.initializeVariables(outerMin, outerMax, innerMin, innerMax, isMinFuzzy, isMaxFuzzy, resolver);
   }
 
     /**
@@ -109,6 +109,11 @@ implements Serializable {
      * endpoint as fuzzy, even if there is no other information about it.  For
      * example, a valid swissprot location "?5 10" would be a fuzzy location 5
      * to 10 where the min is fuzzy and the max is not.
+     * <p>
+     * Note that it is not logical to specify inner and outer values that
+     * clearly denote fuzzy boundaries and the set the <code>isMinFuzzy</code> or
+     * <code>isMaxFuzzy</code> value to false. This object makes
+     * no specific check of your logic so be careful.
      *
      * @param outerMin the lower bound on the location's min value.
      *				 Integer.MIN_VALUE indicates unbounded.
@@ -187,13 +192,13 @@ implements Serializable {
 
     public String toString()
     {
-	return "["
-	    + (hasBoundedMin() ? Integer.toString(getMin()) : "<" + Integer.toString(getMin()))
-	    + ", "
-	    + (hasBoundedMax() ? Integer.toString(getMax()) : ">" + Integer.toString(getMax()))
-	    + "]";
+        return "["
+            + (hasBoundedMin() ? Integer.toString(getMin()) : "<" + Integer.toString(getMin()))
+            + ", "
+            + (hasBoundedMax() ? Integer.toString(getMax()) : ">" + Integer.toString(getMax()))
+            + "]";
     }
-    
+
     /**
      * Determines how a <code>FuzzyLocation</code> should be treated when used
      * as a normal <code>Location</code>.
@@ -211,61 +216,65 @@ implements Serializable {
     public static interface RangeResolver extends Serializable {
         /**
          * Delegate for the getMin() method.
+         * @param loc The Location to resolve
+         * @return the resolved Min
          */
-        
+
         public int resolveMin(FuzzyLocation loc);
-        
+
         /**
          * Delegate for the getMax() method.
+         * @param loc The Location to resolve
+         * @return the resolved Max
          */
-        
+
         public int resolveMax(FuzzyLocation loc);
     }
 
     private static class InnerRangeResolver implements RangeResolver {
-	public int resolveMin(FuzzyLocation loc) {
-	    return loc.getInnerMin();
-	}
+        public int resolveMin(FuzzyLocation loc) {
+            return loc.getInnerMin();
+        }
 
-	public int resolveMax(FuzzyLocation loc) {
-	    return loc.getInnerMax();
-	}
+        public int resolveMax(FuzzyLocation loc) {
+            return loc.getInnerMax();
+        }
     }
 
     private static class OuterRangeResolver implements RangeResolver {
-	public int resolveMin(FuzzyLocation loc) {
-	    if (loc.hasBoundedMin()) {
-		return loc.getOuterMin();
-	    } else {
-		return loc.getInnerMin();
-	    }
-	}
+        public int resolveMin(FuzzyLocation loc) {
+            if (loc.hasBoundedMin()) {
+                return loc.getOuterMin();
+            } else {
+                return loc.getInnerMin();
+            }
+        }
 
-	public int resolveMax(FuzzyLocation loc) {
-	    if (loc.hasBoundedMax()) {
-		return loc.getOuterMax();
-	    } else {
-		return loc.getInnerMax();
-	    }
-	}
+        public int resolveMax(FuzzyLocation loc) {
+            if (loc.hasBoundedMax()) {
+                return loc.getOuterMax();
+            } else {
+                return loc.getInnerMax();
+            }
+        }
     }
 
     private static class AverageRangeResolver implements RangeResolver {
-	public int resolveMin(FuzzyLocation loc) {
-	    if (loc.hasBoundedMin()) {
-		return (loc.getOuterMin() + loc.getInnerMin()) / 2;
-	    } else {
-		return loc.getInnerMin();
-	    }
-	}
+        public int resolveMin(FuzzyLocation loc) {
+            if (loc.hasBoundedMin()) {
+                return (loc.getOuterMin() + loc.getInnerMin()) / 2;
+            } else {
+                return loc.getInnerMin();
+            }
+        }
 
-	public int resolveMax(FuzzyLocation loc) {
-	    if (loc.hasBoundedMax()) {
-		return (loc.getOuterMax() + loc.getInnerMax()) / 2;
-	    } else {
-		return loc.getInnerMax();
-	    }
-	}
+        public int resolveMax(FuzzyLocation loc) {
+            if (loc.hasBoundedMax()) {
+                return (loc.getOuterMax() + loc.getInnerMax()) / 2;
+            } else {
+                return loc.getInnerMax();
+            }
+        }
     }
 
     public boolean isMinFuzzy()

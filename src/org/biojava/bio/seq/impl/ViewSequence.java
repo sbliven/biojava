@@ -88,7 +88,7 @@ public class ViewSequence
      * For serialization support, all methods delegated to super
      */
     private class ViewSeqSimpleFeatureHolder extends SimpleFeatureHolder implements Serializable {
-	private static final long serialVersionUID = 38475932;
+        private static final long serialVersionUID = 38475932;
     }
 
     /**
@@ -108,13 +108,14 @@ public class ViewSequence
     private transient FeatureRealizer featureRealizer;
 
     private void readObject(ObjectInputStream s)throws IOException, ClassNotFoundException{
-	s.defaultReadObject();
-	this.featureRealizer = FeatureImpl.DEFAULT;
+        s.defaultReadObject();
+        this.featureRealizer = FeatureImpl.DEFAULT;
     }
 
   /**
    * Construct a view onto an existing sequence and give it a new
    * name.
+   * <p>The prefered method is SequenceTools.view(Sequence seq, String name)
    */
   public ViewSequence(Sequence seq, String name) {
     this.name = name;
@@ -144,6 +145,7 @@ public class ViewSequence
     /**
      * Construct a view onto an existing sequence which takes on that
      * sequence's name.
+     * <p>The prefered method is SequenceTools.view(Sequence seq)
      */
     public ViewSequence(Sequence seq) {
         this(seq, seq.getName());
@@ -151,10 +153,11 @@ public class ViewSequence
 
     /**
      * Construct a view onto a sequence, using a specific FeatureRealizer
+     * <p>The prefered method is SequenceTools.view(Sequence seq, FeatureRealizer fr)
      */
     public ViewSequence(Sequence seq, FeatureRealizer fr) {
-	this(seq);
-	this.featureRealizer = fr;
+        this(seq);
+        this.featureRealizer = fr;
     }
 
     //
@@ -162,35 +165,35 @@ public class ViewSequence
     //
 
     public Alphabet getAlphabet() {
-	return seqDelegate.getAlphabet();
+        return seqDelegate.getAlphabet();
     }
 
     public Iterator iterator() {
-	return seqDelegate.iterator();
+        return seqDelegate.iterator();
     }
 
     public int length() {
-	return seqDelegate.length();
+        return seqDelegate.length();
     }
 
     public String seqString() {
-	return seqDelegate.seqString();
+        return seqDelegate.seqString();
     }
 
     public String subStr(int start, int end) {
-	return seqDelegate.subStr(start, end);
+        return seqDelegate.subStr(start, end);
     }
 
     public SymbolList subList(int start, int end) {
-	return seqDelegate.subList(start, end);
+        return seqDelegate.subList(start, end);
     }
 
     public Symbol symbolAt(int indx) {
-	return seqDelegate.symbolAt(indx);
+        return seqDelegate.symbolAt(indx);
     }
 
     public List toList() {
-	return seqDelegate.toList();
+        return seqDelegate.toList();
     }
 
     //
@@ -198,11 +201,11 @@ public class ViewSequence
     //
 
     public String getURN() {
-	return urn;
+        return urn;
     }
 
     public String getName() {
-	return name;
+        return name;
     }
 
     //
@@ -210,11 +213,11 @@ public class ViewSequence
     //
 
     public int countFeatures() {
-	return exposedFeatures.countFeatures();
+        return exposedFeatures.countFeatures();
     }
 
     public Iterator features() {
-	return exposedFeatures.features();
+        return exposedFeatures.features();
     }
 
     public FeatureHolder filter(FeatureFilter fc, boolean recurse) {
@@ -224,11 +227,11 @@ public class ViewSequence
     public FeatureHolder filter(FeatureFilter fc) {
         return exposedFeatures.filter(fc);
     }
-    
+
     public FeatureFilter getSchema() {
         return exposedFeatures.getSchema();
     }
-    
+
     //
     // MutableFeatureHolder methods -- delegate to addedFeatures
     //
@@ -250,13 +253,13 @@ public class ViewSequence
     public boolean containsFeature(Feature f) {
       return exposedFeatures.containsFeature(f);
     }
-    
+
     //
     // Get our annotation
     //
 
     public Annotation getAnnotation() {
-	return anno;
+        return anno;
     }
 
     //
@@ -266,7 +269,7 @@ public class ViewSequence
     public Feature realizeFeature(FeatureHolder parent, Feature.Template template)
         throws BioException
     {
-	return featureRealizer.realizeFeature(this, parent, template);
+        return featureRealizer.realizeFeature(this, parent, template);
     }
 
     public Feature createFeature(Feature.Template template)
@@ -289,9 +292,9 @@ public class ViewSequence
     }
 
     public FeatureHolder getAddedFeatures() {
-	return addedFeatures;
+        return addedFeatures;
     }
- 
+
   public void edit(Edit edit) throws ChangeVetoException {
     throw new ChangeVetoException("ViewSequence is immutable");
   }
