@@ -926,9 +926,9 @@ public class FilterUtils {
             return null;
         }
     }
-
+/*
   public void visitFilter(FeatureFilter filter, Visitor visitor) {
     WalkerFactory.getInstance().getWalker(visitor).walk(filter, visitor);
   }
-
+*/
 }
