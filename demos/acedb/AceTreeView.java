@@ -54,7 +54,7 @@ public class AceTreeView {
 	myTree.setModel(tm);
 	myTree.setCellRenderer(new AceNodeNameRenderer());
 	myTree.setEditable(false);
-	myFrame.getContentPane().add(myTree);
+	myFrame.getContentPane().add(new JScrollPane(myTree));
 	myFrame.pack();
 	myFrame.setVisible(true);
 	System.out.println("Going...");

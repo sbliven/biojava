@@ -105,11 +105,11 @@ public class AcePerlParser {
 	    String s = t.nextToken();
  
 	    if (s.startsWith("ty=>")) {
-        ty = s.substring(4);
+        ty = s.substring(4).trim();
 	    } else if (s.startsWith("va=>")) {
         va = s.substring(4).trim();
 	    } else if (s.startsWith("cl=>")) {
-        cl = s.substring(4);
+        cl = s.substring(4).trim();
 	    } else if (s.equals("Pn=>")) {
         if (! t.nextToken().equals("[")) {
           throw new AceError("Unrecoverable parsing error: expecting [");

@@ -153,7 +153,7 @@ class SocketDatabase implements Database {
 		    String line = toke.nextToken();
 		    if (line.charAt(0) <= 32) {
 			StringTokenizer lineToke = new StringTokenizer(line);
-			String name = lineToke.nextToken();
+			String name = lineToke.nextToken().trim();
 			set.add(
         name,
         new SocketClazzSet(dbURL.relativeURL(name + '/'), set)
