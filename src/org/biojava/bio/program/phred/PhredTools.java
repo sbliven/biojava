@@ -119,7 +119,7 @@ public final class PhredTools {
     //get the DNA component of the Phred Symbol
     List l = ((BasisSymbol)phredSym).getSymbols();
     //the first symbol should be DNA
-    return (AtomicSymbol)(l.get(0));
+    return (Symbol) l.get(0);
   }
 
   /**
