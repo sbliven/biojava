@@ -349,7 +349,7 @@ public class PairwiseDP extends DP {
         return a.getResidue(l);
     }
 
-private class Forward {
+  private class Forward {
     private int[][] transitions;
     private double[][] transitionScores;
     private State[] states;
@@ -448,77 +448,77 @@ private class Forward {
     }
 
     private void forwardCalcStepMatrix()
-	throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
     {
-	double[] curCol = matrix[0][0];
-	int[] advance;
+      double[] curCol = matrix[0][0];
+      int[] advance;
 
-	for (int l = 0; l < states.length; ++l) {
-	    if (initializationHack && states[l] == magicalState) {
-        continue;
-	    }
+      for (int l = 0; l < states.length; ++l) {
+        if (initializationHack && states[l] == magicalState) {
+          continue;
+        }
 
-	    // System.out.println("State = " + states[l].getName());
+        // System.out.println("State = " + states[l].getName());
 
-	    double weight = Double.NEGATIVE_INFINITY;
+        double weight = Double.NEGATIVE_INFINITY;
 
-	    if (states[l] instanceof EmissionState) {
-		advance = ((EmissionState) states[l]).getAdvance();
-		Residue res = resMatrix[advance[0]][advance[1]];
+        if (states[l] instanceof EmissionState) {
+          advance = ((EmissionState) states[l]).getAdvance();
+          Residue res = resMatrix[advance[0]][advance[1]];
 		
-		if (res == null) {
-		    weight = Double.NEGATIVE_INFINITY;
-		} else if (res == MagicalState.MAGICAL_RESIDUE) {
-		    try {
-			weight = ((EmissionState) states[l]).getWeight(res);
-		    } catch (Exception ex) {}
-		} else {
-		    weight = ((EmissionState) states[l]).getWeight(res);
-		}
-	    } else {
-		advance = ia00;
-		weight = 0.0;
-	    }
+      		if (res == null) {
+            weight = Double.NEGATIVE_INFINITY;
+          } else if (res == MagicalState.MAGICAL_RESIDUE) {
+            try {
+              weight = ((EmissionState) states[l]).getWeight(res);
+            } catch (Exception ex) {}
+          } else {
+            weight = ((EmissionState) states[l]).getWeight(res);
+          }
+        } else {
+          advance = ia00;
+          weight = 0.0;
+        }
 
-	    if (weight == Double.NEGATIVE_INFINITY) {
-		curCol[l] = Double.NEGATIVE_INFINITY;
-	    } else {
-		// System.out.println("weight = " + weight);
-		double score = 0.0;
-		int [] tr = transitions[l];
-		double[] trs = transitionScores[l];
+        if (weight == Double.NEGATIVE_INFINITY) {
+          curCol[l] = Double.NEGATIVE_INFINITY;
+        } else {
+          // System.out.println("weight = " + weight);
+          double score = 0.0;
+          int [] tr = transitions[l];
+          double[] trs = transitionScores[l];
 
-		// Calculate probabilities for states with transitions
-		// here.
+          // Calculate probabilities for states with transitions
+          // here.
 		
-		double[] sourceScores = new double[tr.length];
-		double[] sCol = matrix[advance[0]][advance[1]];
-		for (int ci = 0; ci < tr.length; ++ci) {
-		    sourceScores[ci] = sCol[tr[ci]];
-		}
+      		double[] sourceScores = new double[tr.length];
+          double[] sCol = matrix[advance[0]][advance[1]];
+          for (int ci = 0; ci < tr.length; ++ci) {
+            sourceScores[ci] = sCol[tr[ci]];
+          }
 
-		// Find base for addition
-		int ci = 0;
-		while (ci < tr.length && sourceScores[ci] == Double.NEGATIVE_INFINITY)
-		    ++ci;
-		double constant = (ci < tr.length) ? sourceScores[ci] : 0.0;
+          // Find base for addition
+          int ci = 0;
+          while (ci < tr.length && sourceScores[ci] == Double.NEGATIVE_INFINITY)
+          ++ci;
+          double constant = (ci < tr.length) ? sourceScores[ci] : 0.0;
 
-		for (int kc = 0; kc < tr.length; ++kc) {
-		    // System.out.println("In from " + states[kc].getName());
-		    // System.out.println("prevScore = " + sourceScores[kc]);
+          for (int kc = 0; kc < tr.length; ++kc) {
+            // System.out.println("In from " + states[kc].getName());
+            // System.out.println("prevScore = " + sourceScores[kc]);
 
-		    int k = tr[kc];
-		    if (sourceScores[kc] != Double.NEGATIVE_INFINITY) {
-			double t = trs[kc];
-			score += Math.exp(t + sourceScores[kc] - constant);
-		    }
-		}
-		curCol[l] = weight + Math.log(score) + constant;
-		// System.out.println(curCol[l]);
-	    }
-	}
+            int k = tr[kc];
+            if (sourceScores[kc] != Double.NEGATIVE_INFINITY) {
+              double t = trs[kc];
+              score += Math.exp(t + sourceScores[kc] - constant);
+            }
+          }
+          curCol[l] = weight + Math.log(score) + constant;
+          // System.out.println(curCol[l]);
+        }
+      }
     }
-}
+  }
 
     //
     // VITERBI!
@@ -541,6 +541,7 @@ private class Viterbi {
     private State[] states;
     private PairDPCursor cursor;
     private CrossProductAlphabet alpha;
+    private boolean initializationHack = true;
 
     public StatePath runViterbi(ResidueList seq0, ResidueList seq1) 
         throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
@@ -555,7 +556,9 @@ private class Viterbi {
 	for (int l = 0; l < states.length; ++l)
 	    col[l] = (states[l] == magicalState) ? 0.0 :
 	                Double.NEGATIVE_INFINITY;
-
+  viterbiPrepareCol(0, 0);
+  initializationHack = false;
+  
 	// Recurse
 
 	transitions = getForwardTransitions();
@@ -660,18 +663,24 @@ private class Viterbi {
     }
 
     private void viterbiCalcStepMatrix()
-	throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
     {
-	double[] curCol = (double[]) matrix[0][0];
-	int[] advance;
-	BackPointer[] curBPs = bpMatrix[0][0];
-	for (int l = 0; l < states.length; ++l) {
-	    // System.out.println("State = " + states[l].getName());
+      double[] curCol = (double[]) matrix[0][0];
+      int[] advance;
+      BackPointer[] curBPs = bpMatrix[0][0];
+      for (int l = 0; l < states.length; ++l) {
+        if (initializationHack && states[l] == magicalState) {
+          continue;
+        }
+    
+  	    // System.out.println("State = " + states[l].getName());
 
-	    if (states[l] instanceof EmissionState)
-		advance = ((EmissionState) states[l]).getAdvance();
-	    else
-		advance = ia00;
+        if (states[l] instanceof EmissionState) {
+          advance = ((EmissionState) states[l]).getAdvance();
+        } else {
+          advance = ia00;
+        }
+        
 	    Residue res = resMatrix[advance[0]][advance[1]];
 	    double weight = Double.NEGATIVE_INFINITY;
 	    if (res == null) {
