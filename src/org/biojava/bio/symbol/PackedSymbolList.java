@@ -57,6 +57,7 @@ public class PackedSymbolList
   private int currentMin = Integer.MAX_VALUE;
   private int currentMax = Integer.MIN_VALUE;
   private long currentWord;
+  private int wordsize;
 
   public Alphabet getAlphabet() {
     return packing.getAlphabet();
@@ -88,6 +89,7 @@ public class PackedSymbolList
     this.syms = syms;
     this.length = length;
     this.mask = calcMask(packing);
+    wordsize = packing.wordSize();
   }
   
   /**
@@ -121,6 +123,7 @@ public class PackedSymbolList
         ((length % symsPerElement == 0) ? 0 : 1)
       ];
       this.mask = calcMask(packing);
+      wordsize = packing.wordSize();
       
       // pack the body of the sequence
       for(int i = 0; i < (syms.length - 1); i++) {
@@ -196,6 +199,7 @@ public class PackedSymbolList
         ((length % symsPerElement == 0) ? 0 : 1)
       ];
       this.mask = calcMask(packing);
+      wordsize = packing.wordSize();
       
       // pack the body of the sequence
       for(int i = 0; i < (syms.length - 1); i++) {
@@ -247,7 +251,8 @@ public class PackedSymbolList
     }
 
     long l = currentWord;
-    int jj = offset * packing.wordSize();
+    int jj = offset * wordsize;
+//    int jj = offset * packing.wordSize();
     
     try {
       return packing.unpack((byte) ((l >> (long) jj) & mask));
