@@ -79,13 +79,15 @@ public class AGAVESeqLocationPropHandler
             ListIterator li = staxenv.getHandlerStackIterator(currLevel);
             while (li.hasPrevious())
             {
+		// THOMASD fixed strand == null crash
+
                 Object ob = li.previous();
                 if (ob instanceof AGAVEFeatureCallbackItf)
                 {
                     ((AGAVEFeatureCallbackItf) ob).reportFeature(  new RangeLocation(start, end) );
-                    if( strand.equalsIgnoreCase("true") )
+                    if( "true".equalsIgnoreCase(strand) )
                         ((AGAVEFeatureCallbackItf) ob).reportStrand( StrandedFeature.NEGATIVE );
-                   else if( strand.equalsIgnoreCase("false") )
+                   else if( "false".equalsIgnoreCase(strand) )
                          ((AGAVEFeatureCallbackItf) ob).reportStrand( StrandedFeature.POSITIVE );
                    else
                        ((AGAVEFeatureCallbackItf) ob).reportStrand( StrandedFeature.UNKNOWN );

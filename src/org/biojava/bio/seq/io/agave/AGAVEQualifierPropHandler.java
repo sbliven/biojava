@@ -64,7 +64,7 @@ public class AGAVEQualifierPropHandler extends StAXPropertyHandler {
    public void characters(char[] ch, int start, int length)
         throws SAXException
   {
-      value = new String(ch) ;
+      value = new String(ch, start, length) ;  // THOMASD was taking whole array!
   }
   public void endElementHandler(
                 String nsURI,

@@ -65,10 +65,12 @@ public class AGAVEProperty
     {
         StringBuffer sb = new StringBuffer() ;
         sb.append(indent + "<" + property_class ) ;
-        if( property_class.equals(QUALIFIER))
+        if( property_class.equals(QUALIFIER)) {
            sb.append( " qualifier_type=\"" ) ;
-        else
-           sb.append( " data_type=\"" ) ;
+        } else {
+	    sb.append( " prop_type=\"" ) ;   // Fixed.  Must be a bug, since it was giving duplicated attributes THOMASD
+	}
+	sb.append(prop);
         sb.append("\" data_type=\"" + data_type + "\">" + value + "</" + property_class + ">" + "\n" ) ;
 
         return sb.toString();
@@ -77,10 +79,12 @@ public class AGAVEProperty
     {
         StringBuffer sb = new StringBuffer() ;
         sb.append("<" + property_class ) ;
-        if( property_class.equals(QUALIFIER))
+        if( property_class.equals(QUALIFIER)) {
            sb.append( " qualifier_type=\"" ) ;
-        else
-           sb.append( " data_type=\"" ) ;
+        } else {
+	    sb.append( " prop_type=\"" ) ;   // Fixed.  Must be a bug, since it was giving duplicated attributes THOMASD
+	}
+	sb.append(prop);
         sb.append("\" data_type=\"" + data_type + "\">" + value + "</" + property_class + ">" + "\n" ) ;
 
         return sb.toString();

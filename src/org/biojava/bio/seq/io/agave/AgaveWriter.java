@@ -308,6 +308,9 @@ public class AgaveWriter
         }
 
         s = mAnnotFilter.getMolType( seq.getAnnotation() );
+	if (s == null && (seq instanceof Sequence)) {
+	    s = ((Sequence) seq).getAlphabet().getName();
+	}
         if (s != null)
         {
             mOut.print(" molecule_type=\"");
@@ -316,6 +319,9 @@ public class AgaveWriter
         }
 
         s = mAnnotFilter.getElementId(seq.getAnnotation());
+	if (s == null && (seq instanceof Sequence)) {
+	    s = ((Sequence) seq).getName();
+	}
         if (s != null)
         {
             mOut.print(" element_id=\"");
@@ -395,7 +401,7 @@ public class AgaveWriter
         writeDNA( seq ) ;
         writeAltIds( seq ) ;
         writeXrefs( seq ) ;
-        writeSequenceMap(seq);
+        writeSequenceMap2(seq);   // THOMASD hacked this....
         writeMapLocation(seq) ;
         writeClassification(seq);
 
@@ -544,7 +550,7 @@ public class AgaveWriter
 
         //ignore write computation
 
-        writeAnnotations((Feature)f);
+        writeAnnotations((FeatureHolder) f);
 
         mOut.print(mIndent);
         mOut.println("</sequence_map>");
@@ -556,8 +562,7 @@ public class AgaveWriter
      *
      *
      */
-    protected void
-    writeAnnotations(Feature f) throws IOException
+    protected void writeAnnotations(FeatureHolder f) throws IOException   // changed to FeatureHolder THOMASD
     {
      //write annotation
         //    <!ELEMENT annotations       (seq_feature | gene | comp_result )+ >
@@ -582,8 +587,10 @@ public class AgaveWriter
                    writeSeqFeature(feature);
                 else if( type.equalsIgnoreCase( "gene") )
                    writeGene( feature);
-                else  //default mapping to comp_result
-                   writeCompResult( feature);
+                else { //default mapping to comp_result
+		    // writeCompResult( feature);
+		   writeSeqFeature(feature);  // THOMASD
+		}
         }
         mOut.print(mIndent);
         mOut.println("</annotations>");
@@ -780,6 +787,9 @@ public class AgaveWriter
         // write attributes
         //
         String s = mAnnotFilter.getFeatureType( f.getAnnotation() );
+	if (s == null) {  // THOMASD
+	    s = ((Feature) f).getType();
+	}
         mOut.print(" feature_type=\"");
         mFilter.write( s == null? "default" : s );
         mOut.print('"');

@@ -117,21 +117,25 @@ public class AGAVESeqFeatureHandler
   }**/
 
 
-  public void addProperty(AGAVEProperty prop)
-  {
+   public void addProperty(AGAVEProperty prop) {
       try{
-         Object ob = null;
-	 if (staxenv.featureTemplate.annotation.containsProperty("qualifier")) {
-	     ob = staxenv.featureTemplate.annotation.getProperty("qualifier");
-	 }
+	  String propType = prop.getPropType();
+	  String value = prop.getValue();
 
-         if( ob != null )
-             ((List)ob).add( prop ) ;
+	  // System.out.println(propType + " : " + value);
+
+	  Object ob = null;
+	  if (staxenv.featureTemplate.annotation.containsProperty(propType)) {
+	      ob = staxenv.featureTemplate.annotation.getProperty(propType);
+	  }
+
+         if( ob != null && ob instanceof Collection) 
+             ((Collection)ob).add( value ) ;
          else
          {
              List props = new ArrayList(1) ;
-             props.add( prop ) ;
-             staxenv.featureTemplate.annotation.setProperty("qualifier", props)  ;
+             props.add( value ) ;
+             staxenv.featureTemplate.annotation.setProperty(propType, props)  ;
          }
       }catch (ChangeVetoException cve) {
           cve.printStackTrace() ;

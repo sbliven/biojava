@@ -264,17 +264,19 @@ public class SimpleAnnotFilter implements AGAVEAnnotFilter{
           return (AGAVEDbId) null ;
      }
         /**
-         *
+         *   ThomasD made this a bit safer...
          */
      public AGAVEProperty[] getProperty(Annotation annot, String type)
      {
-            AGAVEProperty[] set = new AGAVEProperty[ annot.keys().size() ] ;
-            int index = 0 ;
-            for (Iterator i = annot.keys().iterator(); i.hasNext();)
-            {
-                String key = (String) i.next();
-                set[ index++ ] =  new AGAVEProperty(type, key, null, (String)annot.getProperty(key) ) ;
-            }
-            return set ;
+	 List set = new ArrayList();
+	 for (Iterator i = annot.keys().iterator(); i.hasNext();)
+	     {
+		 Object key = i.next();
+		 Object value = annot.getProperty(key);
+		 if (key instanceof String && value instanceof String) {
+		     set.add(new AGAVEProperty(type, (String) key, null, (String) value ));
+		 }
+	     }
+	 return (AGAVEProperty[]) set.toArray(new AGAVEProperty[set.size()]);
      }
 }
