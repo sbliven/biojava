@@ -28,7 +28,7 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.seq.*;
 
 /**
- * Usefull functionality, specific to DNA.
+ * Usefull functionality for processing DNA sequences.
  *
  * @author Matthew Pocock
  */
@@ -141,6 +141,38 @@ public class DNATools {
   }
 
   /**
+   * Return a new DNA <span class="type">ResidueList</span> for
+   * <span class="arg">dna</span>.
+   *
+   * @param dna a <span class="type">String</span> to parse into DNA
+   * @return a <span class="type">ResidueList</span> created form
+   *         <span class="arg">dna</span>
+   * @throws IllegalResidueException if  <span class="arg">dna</span> contains
+   *         any non-DNA characters
+   */
+  public static ResidueList createDNA(String dna)
+  throws IllegalResidueException {
+    ResidueParser p = getAlphabet().getParser("symbol");
+    return p.parse(dna);
+  }
+  
+  /**
+   * Return a new DNA-AMBIGUITY <span class="type">ResidueList</span> for
+   * <span class="arg">amb</span>.
+   *
+   * @param amb a <span class="type">String</span> to parse into DNA-AMBIGUITY
+   * @return a <span class="type">ResidueList</span> created form
+   *         <span class="arg">amb</span>
+   * @throws IllegalResidueException if  <span class="arg">amb</span> contains
+   *         any non-DNA-AMBIGUITY characters
+   */
+  public static ResidueList createDNAAmbiguity(String amb)
+  throws IllegalResidueException {
+    ResidueParser p = getAmbiguity().getParser("symbol");
+    return p.parse(amb);
+  }
+  
+  /**
    * Return an integer index for a residue - compatible with forIndex.
    * <P>
    * The index for a residue is stable accross virtual machines & invokations.
@@ -171,9 +203,10 @@ public class DNATools {
    *
    * @param index  the index to look up
    * @return       the residue at that index
-   * @throws IllegalResidueException if res is not a member of the DNA alphabet
+   * @throws IndexOutOfBoundsException if index is not between 0 and 3
    */
-  final static public Residue forIndex(int index) throws IllegalResidueException {
+  final static public Residue forIndex(int index)
+  throws IndexOutOfBoundsException {
     if(index == 0)
       return a;
     else if(index == 1)
@@ -182,7 +215,7 @@ public class DNATools {
       return c;
     else if(index == 3)
       return t;
-    else throw new IllegalResidueException("No residue for index " + index);
+    else throw new IndexOutOfBoundsException("No residue for index " + index);
   }
   
   /**

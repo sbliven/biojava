@@ -24,6 +24,12 @@ package org.biojava.stats.svm;
  * @author Matthew Pocock
  */
 public class NormalizingKernel extends NestedKernel {
+  public NormalizingKernel() {}
+  
+  public NormalizingKernel(SVMKernel k) {
+    setNestedKernel(k);
+  }
+  
     public double evaluate(Object a, Object b) {
       SVMKernel k = getNestedKernel();
       double kAA = k.evaluate(a, a);

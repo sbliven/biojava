@@ -27,16 +27,21 @@ import java.util.*;
 import org.biojava.bio.seq.*;
 
 /**
- * An alignment containing multiple residue lists.
+ * An alignment containing multiple <span class="type">ResidueList</span>s.
  * <P>
- * The alignment can be thought of a rectangular array of residues. Each
- * row is indexed by a label and each column is indexed by residue offset.
+ * The alignment can be thought of a rectangular array of
+ * <span class="type">Residue</span>s. Each
+ * row is indexed by a label and each column is indexed by offset (counting from
+ * 0).
  * <P>
- * Alternatively, it can be thought of as a residue list where each residue is
- * a list of residues in that column - modeled as a Column object.
+ * Alternatively, it can be thought of as a <span class="type">ResidueList</span>
+ * where each <span class="type">Residue</span> is
+ * a list of <span class="type">Residue</span>s in that column - probably modeled
+ *  as a <span class="type">Column</span> object.
  * <P>
- * To create gapped alignments, use ResidueLists with gaps. The most flexible
- * way to do this will be to leverage GappedResidueList objects.
+ * To create gapped alignments, use <span class="type">ResidueList</span>s with
+ * gaps. The most flexible way to do this will be to leverage
+ * <span class="type">GappedResidueList</span> objects.
  */
 public interface Alignment extends ResidueList {
   /**
@@ -83,8 +88,8 @@ public interface Alignment extends ResidueList {
   throws NoSuchElementException;
   
   /**
-   * Defines the particular type of CrossProductResidues that can be a column
-   * in an alignment.
+   * Defines the particular type of CrossProductResidues that is recomended as
+   * a column in an alignment.
    *
    * @author Matthew Pocock
    */

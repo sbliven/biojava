@@ -23,13 +23,23 @@ public class DiagonalCachingKernel extends NestedKernel {
    */
   private Map cache;
 
+  {
+    cache = new HashMap();
+  }
+  
   /**
    * Create a new CachingKernel.
    */
   public DiagonalCachingKernel() {
-    cache = new HashMap();
   }
 
+  /**
+   * Creates a new DiagonalCachingKernel that nests k.
+   */
+  public DiagonalCachingKernel(SVMKernel k) {
+    setNestedKernel(k);
+  }
+  
   /**
    * Set the kernel to nest.
    * <P>

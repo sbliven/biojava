@@ -23,8 +23,15 @@ import java.util.*;
 public class CachingKernel extends NestedKernel {
     private Map cache;
 
-    public CachingKernel() {
+    {
       cache = new HashMap();
+    }
+    
+    public CachingKernel() {
+    }
+    
+    public CachingKernel(SVMKernel k) {
+      super(k);
     }
 
     public void setNestedKernel(SVMKernel k) {
