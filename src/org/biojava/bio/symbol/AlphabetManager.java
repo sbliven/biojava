@@ -1221,6 +1221,102 @@ public final class AlphabetManager {
         }
     }
      
+    private static class WellKnownSubAlphabet extends Unchangeable implements FiniteAlphabet {
+        private FiniteAlphabet alpha;
+        private FiniteAlphabet superAlpha;
+        
+        public WellKnownSubAlphabet(FiniteAlphabet alpha, FiniteAlphabet superAlpha) {
+            this.alpha = alpha;
+            this.superAlpha = superAlpha;
+        }
+        
+        public boolean contains(Symbol s) {
+            if (s instanceof AtomicSymbol) {
+                return alpha.contains(s);
+            } else {
+                for (Iterator i = ((FiniteAlphabet) s.getMatches()).iterator(); i.hasNext(); ) {
+                    if (!alpha.contains((Symbol) i.next())) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        
+        public List getAlphabets() {
+            return alpha.getAlphabets();
+        }
+        
+        public Symbol getAmbiguity(Set s) 
+            throws IllegalSymbolException
+        {
+            for (Iterator i = s.iterator(); i.hasNext(); ) {
+                validate((Symbol) i.next());
+            }
+            return superAlpha.getAmbiguity(s);
+        }
+        
+        public Symbol getGapSymbol() {
+            return superAlpha.getGapSymbol();
+        }
+        
+        public String getName() {
+            return alpha.getName();
+        }
+        
+        public Symbol getSymbol(List l) 
+            throws IllegalSymbolException
+        {
+            return alpha.getSymbol(l);
+        }
+        
+        public SymbolTokenization getTokenization(String name)
+            throws BioException
+        {
+            return superAlpha.getTokenization(name);
+        }
+        
+        public void validate(Symbol s)
+            throws IllegalSymbolException
+        {
+            if (s instanceof AtomicSymbol) {
+                alpha.validate(s);
+            } else {
+                for (Iterator i = ((FiniteAlphabet) s.getMatches()).iterator(); i.hasNext(); ) {
+                    alpha.validate((Symbol) i.next());
+                }
+            }
+        }
+        
+        public void addSymbol(Symbol s)
+            throws ChangeVetoException
+        {
+            throw new ChangeVetoException("Can't add symbols to WellKnownSubAlphabets");
+        }
+        
+        public void removeSymbol(Symbol s)
+            throws ChangeVetoException
+        {
+            throw new ChangeVetoException("Can't remove symbols from WellKnownSubAlphabets");
+        }
+        
+        public Iterator iterator() {
+            return  alpha.iterator();
+        }
+        
+        public int size() {
+            return alpha.size();
+        }
+        
+        public SymbolList symbols() {
+            return alpha.symbols();
+        }
+        
+        public Annotation getAnnotation() {
+            return alpha.getAnnotation();
+        }
+    }
+     
     private static class WellKnownBasisSymbol extends Unchangeable implements BasisSymbol, Serializable {
         protected WellKnownAlphabet alpha;
         protected BasisSymbol symbol;
@@ -1253,7 +1349,7 @@ public final class AlphabetManager {
         }
         
         public Alphabet getMatches() {
-            return symbol.getMatches();
+            return new WellKnownSubAlphabet((FiniteAlphabet) symbol.getMatches(), alpha);
         }
         
         public List getSymbols() {
