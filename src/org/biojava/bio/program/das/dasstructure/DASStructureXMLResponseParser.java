@@ -155,7 +155,8 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
 	AtomImpl atom = new AtomImpl() ;
 	int pdbnumber = Integer.parseInt(atomID);
 	atom.setPDBserial(pdbnumber);
-	atom.setName(atomName);
+	atom.setFullName(atomName);
+	atom.setName(atomName.trim());
 	double x = Double.parseDouble(X);
 	double y = Double.parseDouble(Y);
 	double z = Double.parseDouble(Z);
