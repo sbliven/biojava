@@ -26,10 +26,9 @@ import java.awt.Paint;
 import java.awt.Color;
 import java.util.*;
 
-import org.biojava.bio.BioError;
-import org.biojava.bio.seq.Symbol;
-import org.biojava.bio.seq.IllegalSymbolException;
-import org.biojava.bio.seq.tools.DNATools;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.DNATools;
 
 /**
  * A simple implementation of SymbolStyle optimized for DNA.

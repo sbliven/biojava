@@ -2,7 +2,10 @@ package org.biojava.bridge.Biocorba.Seqcore;
 
 import java.util.*;
 
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
+
 import org.Biocorba.Seqcore.*;
 
 public class SeqImpl

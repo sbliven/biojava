@@ -27,8 +27,8 @@ import java.beans.*;
 import java.util.Iterator;
 import javax.swing.*;
 
-import org.biojava.bio.BioError;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.dp.*;
 
 /**

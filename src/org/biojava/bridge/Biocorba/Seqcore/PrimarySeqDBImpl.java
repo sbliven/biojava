@@ -1,5 +1,7 @@
 package org.biojava.bridge.Biocorba.Seqcore;
 
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 import org.Biocorba.Seqcore.*;
@@ -48,10 +50,10 @@ implements _PrimarySeqDB_Operations {
       _PrimarySeq_Tie pst = new _PrimarySeq_Tie(psi);
       primarySeqDB._orb().connect(pst);
       return pst;
-    } catch (BioException se) {
-      throw new UnableToProcess(se.getMessage());
     } catch (IllegalAlphabetException iae) {
       throw new UnableToProcess(iae.getMessage());
+    } catch (BioException se) {
+      throw new UnableToProcess(se.getMessage());
     }
   }
 }

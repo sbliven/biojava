@@ -25,6 +25,7 @@ package org.biojava.bio.seq.io;
 import java.io.*;
 import java.util.*;
 
+import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 
 /**

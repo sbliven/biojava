@@ -22,18 +22,19 @@
 package org.biojava.bio.gui;
 
 import java.util.*;
+import java.util.List; // usefull trick to 'hide' javax.swing.List
 import java.beans.*;
 import java.lang.reflect.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.gui.sequence.*;
 
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-import java.util.List;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.*;
+import org.biojava.bio.gui.sequence.*;
 
 public class SequencePanel extends JComponent {
     public final static int HORIZONTAL = 1;

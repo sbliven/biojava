@@ -24,8 +24,7 @@ package org.biojava.bio.gui;
 
 import java.awt.Paint;
 import java.awt.Color;
-import org.biojava.bio.seq.Symbol;
-import org.biojava.bio.seq.IllegalSymbolException;
+import org.biojava.bio.symbol.*;
 
 /**
  * A simple implementation of SymbolStyle that just uses a single paint for

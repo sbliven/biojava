@@ -2,7 +2,10 @@ package org.biojava.bridge.Biocorba.Seqcore;
 
 import java.util.*;
 
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
+
 import org.Biocorba.Seqcore.*;
 import org.biojava.bridge.GNOME.*;
 
@@ -25,10 +28,10 @@ implements _PrimarySeqIterator_Operations {
       return pst;
     } catch (NoSuchElementException e) {
       throw new EndOfStream();
-    } catch (BioException se) {
-      throw new UnableToProcess(se.getMessage());
     } catch (IllegalAlphabetException iae) {
       throw new UnableToProcess(iae.getMessage());
+    } catch (BioException se) {
+      throw new UnableToProcess(se.getMessage());
     }
   }
 

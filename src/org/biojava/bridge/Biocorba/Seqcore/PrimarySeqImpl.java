@@ -1,5 +1,7 @@
 package org.biojava.bridge.Biocorba.Seqcore;
 
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 import org.Biocorba.Seqcore.*;

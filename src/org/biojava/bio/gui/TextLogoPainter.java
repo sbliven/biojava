@@ -28,8 +28,8 @@ import java.awt.geom.*;
 import java.beans.*;
 import java.util.*;
 
-import org.biojava.bio.BioError;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.dp.*;
 
 /**

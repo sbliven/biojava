@@ -23,6 +23,7 @@
 package org.biojava.bio.seq.io;
 
 import java.util.NoSuchElementException;
+import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 
 /**
