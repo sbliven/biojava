@@ -496,29 +496,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 				    "CDATA",
 				    nFormat.format(percentId * 100));
 
-	    // queryStrand attribute (always plus for Fasta)
-	    qName.setQName("queryStrand");
-	    attributes.addAttribute(qName.getURI(),
-				    qName.getLocalName(),
-				    qName.getQName(),
-				    "CDATA",
-				    "plus");
-
-	    String strand;
-	    if (hitProperties.get("fa_frame").equals("f"))
-		strand = "plus";
-	    else
-		strand = "minus";
-
-	    // hitStrand attribute (may be minus for Fasta vs. nt sequence)
-	    qName.setQName("hitStrand");
-	    attributes.addAttribute(qName.getURI(),
-				    qName.getLocalName(),
-				    qName.getQName(),
-				    "CDATA",
-				    strand);
-
-            // Maybe proper RNA check?
+            // Maybe proper RNA check? Should be same for query and subject
             String seqType;
             if (hitProperties.get("query_sq_type").equals("dna"))
                 seqType = "dna";
@@ -533,7 +511,8 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 				    "CDATA",
 				    seqType);
 
-            // Maybe proper RNA check?
+            // Maybe proper RNA check? Maybe raise exception if not
+            // same as query type?
             if (hitProperties.get("subject_sq_type").equals("dna"))
                 seqType = "dna";
             else
@@ -546,6 +525,32 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 				    qName.getQName(),
 				    "CDATA",
 				    seqType);
+
+            // Strand information only valid for DNA
+            if (seqType.equals("dna"))
+            {
+                // queryStrand attribute (always plus for Fasta)
+                qName.setQName("queryStrand");
+                attributes.addAttribute(qName.getURI(),
+                                        qName.getLocalName(),
+                                        qName.getQName(),
+                                        "CDATA",
+                                        "plus");
+
+                String strand;
+                if (hitProperties.get("fa_frame").equals("f"))
+                    strand = "plus";
+                else
+                    strand = "minus";
+
+                // hitStrand attribute (may be minus for Fasta vs. nt sequence)
+                qName.setQName("hitStrand");
+                attributes.addAttribute(qName.getURI(),
+                                        qName.getLocalName(),
+                                        qName.getQName(),
+                                        "CDATA",
+                                        strand);
+            }
 
 	    // Start the HSPSummary
 	    startElement(new QName(this, this.prefix("HSPSummary")),

@@ -78,7 +78,7 @@ public class DataSetHandler extends DefaultHandler
                              Attributes attr)
         throws SAXException
     {
-        // The context need to know too
+        // The context needs to know too
         context.setProgram(attr.getValue("program"));
 
         context.scHandler.addSearchProperty("program", attr.getValue("program"));

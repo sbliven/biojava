@@ -85,7 +85,7 @@ public interface SeqSimilaritySearchSubHit
 
     /**
      * Return the strand of the sub-hit with respect to the query
-     * sequence.
+     * sequence. This may be null for protein sequences.
      *
      * @return a <code>Strand</code> value.
      */
@@ -109,7 +109,7 @@ public interface SeqSimilaritySearchSubHit
 
     /**
      * Return the strand of the sub-hit with respect to the subject
-     * sequence.
+     * sequence. This may be null for protein sequences.
      *
      * @return a <code>Strand</code> value.
      */

@@ -142,7 +142,6 @@ public class FastaSearchParser implements SearchParser
 		    handler.endSearch();
 
   		    searchParsed = true;
-
 		    searchStatus = NODATA;
 		    continue LINE;
 		}
@@ -156,8 +155,6 @@ public class FastaSearchParser implements SearchParser
 		handler.endSearch();
 
   		searchParsed = true;
-	        // handler.setMoreSearches(true);
-
 		searchStatus = NODATA;
 
 		// Continue getting lines to look for start of another
@@ -180,7 +177,6 @@ public class FastaSearchParser implements SearchParser
 		    // don't set the flag saying we have parsed this
 		    // value so that later we overwrite this from the
 		    // "proper" source in the hit data, if it exists.
-
 		    if (line.startsWith(" >"))
 		    {
 			String trimmed = line.trim();

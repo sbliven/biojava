@@ -150,7 +150,7 @@ public class LayeredRenderer {
 
         // Don't know what this is
         double allocatedOffset = 0.0;
-    
+
         Iterator srcI = srcL.iterator();
         Iterator i = renderers.iterator();
 
@@ -170,7 +170,7 @@ public class LayeredRenderer {
                 sRend.getMinimumLeader(src);
             double maxP = src.sequenceToGraphics(src.getRange().getMax() + 1) +
                 sRend.getMinimumTrailer(src);
-      
+
             if (dir == src.HORIZONTAL) {
                 clip.setFrame(minP, 0.0, maxP - minP, depth);
                 g.translate(0.0, offset);
@@ -178,18 +178,18 @@ public class LayeredRenderer {
                 clip.setFrame(0.0, minP, depth, maxP - minP);
                 g.translate(offset, 0.0);
             }
-      
+
             Shape oldClip = g.getClip();
             g.clip(clip);
             sRend.paint(g, src);
             g.setClip(oldClip);
-      
+
             if (dir == src.HORIZONTAL) {
                 g.translate(0.0, -offset);
             } else {
                 g.translate(-offset, 0.0);
             }
-      
+
             if (sRend instanceof OverlayMarker)  {
                 // overlay, just record maximum allocation
                 allocatedOffset = Math.max(allocatedOffset, sRend.getDepth(src));
@@ -200,7 +200,7 @@ public class LayeredRenderer {
             }
         }
     }
-  
+
     public SequenceViewerEvent processMouseEvent(List srcL, MouseEvent me,
                                                  List path, List renderers) {
         if (srcL.size() != renderers.size()) {
@@ -210,7 +210,7 @@ public class LayeredRenderer {
 
         // Offset perpendicular to sequence rendering direction
         double offset = 0.0;
-    
+
         Iterator srcI = srcL.iterator();
         Iterator i = renderers.iterator();
 

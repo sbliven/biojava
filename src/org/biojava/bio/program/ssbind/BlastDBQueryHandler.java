@@ -115,7 +115,6 @@ public class BlastDBQueryHandler extends DefaultHandler
 
 	if (level == 0)
 	    setStringValue(data.toString());
-
     }
 
     /**

@@ -112,8 +112,8 @@ public interface SearchContentHandler
      * The <code>addSearchProperty</code> method adds a key/value pair
      * containing some property of the overall search result.
      *
-     * @param key an <code>Object</code> instance.
-     * @param value an <code>Object</code> instance.
+     * @param key an <code>Object</code>.
+     * @param value an <code>Object</code>.
      */
     public void addSearchProperty(Object key, Object value);
 
@@ -121,8 +121,8 @@ public interface SearchContentHandler
      * The <code>addHitProperty</code> method adds a key/value pair
      * containing some property of a particular hit.
      *
-     * @param key an <code>Object</code> instance.
-     * @param value an <code>Object</code> instance.
+     * @param key an <code>Object</code>.
+     * @param value an <code>Object</code>.
      */
     public void addHitProperty(Object key, Object value);
 
@@ -130,8 +130,8 @@ public interface SearchContentHandler
      * The <code>addSubHitProperty</code> method adds a key/value pair
      * containing some property of a particular subhit.
      *
-     * @param key an <code>Object</code> instance.
-     * @param value an <code>Object</code> instance.
+     * @param key an <code>Object</code>.
+     * @param value an <code>Object</code>.
      */
     public void addSubHitProperty(Object key, Object value);
 

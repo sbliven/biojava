@@ -18,6 +18,7 @@
  *      http://www.biojava.org/
  *
  */
+
 package org.biojava.bio.seq.homol;
  
 import java.io.*;

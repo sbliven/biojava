@@ -40,14 +40,10 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.List;
 import javax.swing.JComponent;
-import javax.swing.SwingConstants;
 
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.seq.ProjectedFeatureHolder;
-import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SymbolList;
@@ -78,6 +74,10 @@ import org.biojava.utils.Changeable;
  * width of the panel and the scale. Resizing the panel will cause the
  * number of <code>Symbol</code>s rendered to change accordingly.</p>
  *
+ * <p>The panel will fill its background to the <code>Color</code>
+ * defined by the <code>setBackground()</code> method provided that
+ * it has been defined as opaque using <code>setOpaque()</code>.</p>
+ *
  * <p>The change event handling code is based on the original panel
  * and other BioJava components by Matthew and Thomas</p>.
  *
@@ -87,7 +87,7 @@ import org.biojava.utils.Changeable;
  * @since 1.2
  */
 public class TranslatedSequencePanel extends JComponent
-    implements SwingConstants, SequenceRenderContext, Changeable
+    implements SequenceRenderContext, Changeable
 {
     /**
      * Constant <code>RENDERER</code> is a <code>ChangeType</code>
@@ -295,8 +295,8 @@ public class TranslatedSequencePanel extends JComponent
         if (sequence != null)
             sequence.addChangeListener(layoutListener);
 
-        resizeAndValidate();
         firePropertyChange("sequence", prevSequence, sequence);
+        resizeAndValidate();
     }
 
     /**
@@ -353,7 +353,7 @@ public class TranslatedSequencePanel extends JComponent
      * context expects sequences to be rendered - HORIZONTAL or
      * VERTICAL.
      *
-     * @return an <code>int</code> value.
+     * @return an <code>int</code>.
      */
     public int getDirection()
     {
@@ -376,8 +376,8 @@ public class TranslatedSequencePanel extends JComponent
         int prevDirection = this.direction;
         this.direction = direction;
 
-        resizeAndValidate();
         firePropertyChange("direction", prevDirection, direction);
+        resizeAndValidate();
     }
 
     /**
@@ -402,16 +402,16 @@ public class TranslatedSequencePanel extends JComponent
         double prevScale = this.scale;
         this.scale = scale;
 
-        resizeAndValidate();
         firePropertyChange("scale", prevScale, scale);
+        resizeAndValidate();
     }
 
     /**
      * <code>getSymbolTranslation</code> returns the current
      * translation in <code>Symbol</code>s which will be applied when
      * rendering. The sequence will be rendered, immediately after any
-     * borders, starting at translation. Values may be from 0 to the
-     * length of the rendered sequence.
+     * borders, starting at this translation. Values may be from 0 to
+     * the length of the rendered sequence.
      *
      * @return an <code>int</code>.
      */
@@ -424,8 +424,8 @@ public class TranslatedSequencePanel extends JComponent
      * <code>setSymbolTranslation</code> sets the translation in
      * <code>Symbol</code>s which will be applied when rendering. The
      * sequence will be rendered, immediately after any borders,
-     * starting at translation. Values may be from 0 to the length of
-     * the rendered sequence.
+     * starting at that translation. Values may be from 0 to the
+     * length of the rendered sequence.
      *
      * @param translation an <code>int</code>.
      *
@@ -455,8 +455,8 @@ public class TranslatedSequencePanel extends JComponent
             this.translation = translation;
         }
 
-        resizeAndValidate();
         firePropertyChange("translation", prevTranslation, translation);
+        resizeAndValidate();
     }
 
     /**
@@ -651,6 +651,14 @@ public class TranslatedSequencePanel extends JComponent
         // Set hints
         Graphics2D g2 = (Graphics2D) g;
         g2.addRenderingHints(hints);
+
+        // As we subclass JComponent we have to paint our own
+        // background, but only if we are opaque
+        if (isOpaque())
+        {
+            g2.setPaint(getBackground());
+            g2.fillRect(0, 0, getWidth(), getHeight());
+        }
 
         // Save current transform and clip
         AffineTransform prevTransform = g2.getTransform();

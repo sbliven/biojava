@@ -254,7 +254,7 @@ public class FastaSearchBuilder implements SearchBuilder
      * The <code>makeHit</code> method makes a new Hit object from
      * the hit data and an annotation.
      *
-     * @param dataMap a <code>Map</code> object.
+     * @param dataMap a <code>Map</code>.
      * @param hitAnnotation an <code>Annotation</code>.
      *
      * @return a <code>SeqSimilaritySearchHit</code>.
@@ -273,23 +273,28 @@ public class FastaSearchBuilder implements SearchBuilder
 	int          queryEnd = Integer.parseInt((String) hitData.get("query_al_stop"));
 	int    queryDispStart = Integer.parseInt((String) hitData.get("query_al_display_start"));
 	String querySeqTokens = (String) hitData.get("querySeqTokens");
-	Strand querySeqStrand = StrandedFeature.POSITIVE;
 
 	int        subjectStart = Integer.parseInt((String) hitData.get("subject_al_start"));
 	int          subjectEnd = Integer.parseInt((String) hitData.get("subject_al_stop"));
 	int    subjectDispStart = Integer.parseInt((String) hitData.get("subject_al_display_start"));
 	String subjectSeqTokens = (String) hitData.get("subjectSeqTokens");
 
-	Strand subjectSeqStrand;
-	if (((String) hitData.get("fa_frame")).equals("f"))
-	    subjectSeqStrand = StrandedFeature.POSITIVE;
-	else
-	    subjectSeqStrand = StrandedFeature.NEGATIVE;
+        // These are left null for protein sequences
+        Strand   querySeqStrand = null;
+        Strand subjectSeqStrand = null;
+
+        if (seqType.equals("dna"))
+        {
+            if (((String) hitData.get("fa_frame")).equals("f"))
+                subjectSeqStrand = StrandedFeature.POSITIVE;
+            else
+                subjectSeqStrand = StrandedFeature.NEGATIVE;
+        }
 
 	// What happens if Fasta is given an RNA sequence?
 	FiniteAlphabet alpha;
 
-	if (seqType.equals("DNA"))
+	if (seqType.equals("dna"))
 	    alpha = DNATools.getDNA();
 	else
             // We use the T(ermination)Alphabet here for compatability

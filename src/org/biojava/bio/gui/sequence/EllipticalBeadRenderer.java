@@ -53,6 +53,10 @@ import org.biojava.utils.ChangeVetoException;
 public class EllipticalBeadRenderer extends AbstractBeadRenderer
     implements FeatureRenderer
 {
+    /**
+     * Constant <code>RATIO</code> indicating a change to the minimum
+     * allowed ratio of long axis to short axis of the features.
+     */
     public static final ChangeType RATIO =
 	new ChangeType("The shape of the features has changed",
 		       "org.biojava.bio.gui.sequence.EllipticalBeadRenderer",

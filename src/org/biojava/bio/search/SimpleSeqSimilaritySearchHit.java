@@ -70,15 +70,17 @@ public class SimpleSeqSimilaritySearchHit
      * @param qEnd the end of the last sub-hit on the query
      * sequence.
      * @param qStrand the strand of the sub-hits on the query
-     * sequence, which may not be null. If they are no all positive or
-     * all negative, then this should be the unknown strand.
+     * sequence, which may be null for protein similarities. If they
+     * are no all positive or all negative, then this should be the
+     * unknown strand.
      * @param sStart the start of the first sub-hit on the subject
      * sequence.
      * @param sEnd the end of the last sub-hit on the subject
      * sequence.
      * @param sStrand the strand of the sub-hits on the subject
-     * sequence, which may not be null. If they are no all positive or
-     * all negative, then this should be the unknown strand.
+     * sequence, which may be null for protein similarities. If they
+     * are no all positive or all negative, then this should be the
+     * unknown strand.
      * @param sequenceID the (unique) sequence identifier for this
      * hit, valid within the sequence database against which this
      * search was performed, which may not be null.
@@ -100,8 +102,6 @@ public class SimpleSeqSimilaritySearchHit
 	Contract.pre(! Double.isNaN(score), "score was NaN");
 	// pValue may be NaN
 	// eValue may be NaN
-        Contract.pre(qStrand    != null, "query strand was null");
-        Contract.pre(sStrand    != null, "subject strand was null");
 	Contract.pre(sequenceID != null, "sequenceID was null");
 	Contract.pre(subHits    != null, "subHits was null");
 

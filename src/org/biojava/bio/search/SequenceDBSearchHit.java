@@ -52,6 +52,8 @@ import org.biojava.utils.contract.Contract;
  * <li>Hit strand == NEGATIVE if all sub-hits have strand NEGATIVE</li>
  * <li>Hit strand == UNKNOWN if sub-hits have either mixed or any UNKNOWN
  *     strands</li>
+ * <li>Hit strand == null if the concept of strandedness is inappropriate
+ *     for the sequence type i.e. for protein</li>
  * </ul>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
@@ -93,20 +95,22 @@ public class SequenceDBSearchHit extends AbstractChangeable
      * @param qEnd the end of the last sub-hit on the query
      * sequence.
      * @param qStrand the strand of the sub-hits on the query
-     * sequence, which may not be null. If they are no all positive or
-     * all negative, then this should be the unknown strand.
+     * sequence, which may be null for protein similarities. If they
+     * are not all positive or all negative, then this should be the
+     * unknown strand.
      * @param sStart the start of the first sub-hit on the subject
      * sequence.
      * @param sEnd the end of the last sub-hit on the subject
      * sequence.
      * @param sStrand the strand of the sub-hits on the subject
-     * sequence, which may not be null. If they are no all positive or
-     * all negative, then this should be the unknown strand.
+     * sequence, which may be null for protein similarities. If they
+     * are no all positive or all negative, then this should be the
+     * unknown strand.
      * @param subHits a <code>List</code> object containing the
      * subhits, which may not be null. They should be sorted in the
      * order specified by the search program.
      * @param annotation an <code>Annotation</code> object, which may
-     * not be null
+     * not be null.
      */
     public SequenceDBSearchHit(final double     score,
 			       final double     eValue,
@@ -125,8 +129,6 @@ public class SequenceDBSearchHit extends AbstractChangeable
 	// pValue may be NaN
 	// eValue may be NaN
 	Contract.pre(sequenceID    != null, "sequenceID was null");
-        Contract.pre(queryStrand   != null, "query strand was null");
-        Contract.pre(subjectStrand != null, "subject strand was null");
 	Contract.pre(annotation    != null, "annotation was null");
 	Contract.pre(subHits       != null, "subHits was null");
 

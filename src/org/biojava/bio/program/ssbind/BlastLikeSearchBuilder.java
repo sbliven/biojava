@@ -57,31 +57,52 @@ import org.biojava.utils.ChangeVetoException;
  * <code>SeqSimilaritySearchResult</code>s from SAX events via a
  * <code>SeqSimilarityAdapter</code>. The SAX events should describe
  * elements conforming to the BioJava BlastLikeDataSetCollection
- * DTD. The result objects are placed in the <code>List</code>
- * supplied to the constructor.</p>
+ * DTD. Suitable sources are <code>BlastLikeSAXParser</code> or
+ * <code>FastaSAXParser</code>. The result objects are placed in the
+ * <code>List</code> supplied to the constructor.</p>
  *
  * <p>The start/end/strand of <code>SeqSimilaritySearchHit</code>s are
- * calculated by taking the strand of the top scoring
- * <code>SeqSimilaritySearchSubHit</code> and setting the start equal
- * to the start of the very first sub-hit and the end equal to the end
- * of the very last sub-hit on that strand. The calculation is
- * performed on the subject sequence sub-hits and the corresponding
- * query positions recorded. If you believe that this should be
- * calculated differently or have an improved method, please e-mail
- * me.</p>
+ * calculated from their constituent
+ * <code>SeqSimilaritySearchSubHit</code>s as follows:</p>
+ *
+ * <ul>
+ * <li>The query start is the lowest query start coordinate of its
+ *     sub-hits, regardless of strand</li>
+ * <li>The query end is the highest query end coordinate of its sub-hits,
+ *     regardless of strand</li>
+ * <li>The hit start is the lowest hit start coordinate of its sub-hits,
+ *     regardless of strand</li>
+ * <li>The hit end is the highest hit end coordinate of its sub-hits,
+ *     regardless of strand</li>
+ * <li>The query strand is null for protein sequences. Otherwise it is
+ *     equal to the query strand of its sub-hits if they are all on the
+ *     same strand, or <code>StrandedFeature.UNKNOWN</code> if the sub-hits
+ *     have mixed query strands</li>
+ * <li>The hit strand is null for protein sequences. Otherwise it is
+ *     equal to the hit strand of its sub-hits if they are all on the same
+ *     strand, or <code>StrandedFeature.UNKNOWN</code> if the sub-hits have
+ *     mixed hit strands</li>
+ * </ul>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
  */
 public class BlastLikeSearchBuilder implements SearchBuilder
 {
+    // Supplier of instances of searched databases
     private SequenceDBInstallation subjectDBs;
+    // The specific database searched
     private SequenceDB             subjectDB;
+    // Holder for all query sequences
     private SequenceDB             querySeqHolder;
+    // The specific query sequence instance
     private SymbolList             querySeq;
 
+    // Hit and Result annotation
     private Annotation             hitAnnotation;
     private Annotation             resultAnnotation;
+
+    // Data holders for search result properties
     private Map                    resultPreAnnotation;
     private Map                    searchParameters;
     private Map                    hitData;
@@ -96,8 +117,11 @@ public class BlastLikeSearchBuilder implements SearchBuilder
 
     private SeqSimilaritySearchSubHit [] subs;
 
-    private List    target;
+    // Flag indicating whether there are more results in the stream
     private boolean moreSearchesAvailable = false;
+
+    // List to accept all results in the stream
+    private List target;
 
     /**
      * Creates a new <code>BlastLikeSearchBuilder</code> which will
@@ -226,7 +250,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
     {
         try
         {
-            resultAnnotation = makeAnnotation(resultPreAnnotation);
+            resultAnnotation = AnnotationFactory.makeAnnotation(resultPreAnnotation);
             target.add(makeSearchResult());
         }
         catch (BioException be)
@@ -311,46 +335,73 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         ev = subs[subs.length - 1].getEValue();
         pv = subs[subs.length - 1].getPValue();
 
-        // Retain the strand of the best sub-hit for calculation of
-        // hit strand
-        Strand   bestQueryStrand = subs[subs.length - 1].getQueryStrand();
-        Strand bestSubjectStrand = subs[subs.length - 1].getSubjectStrand();
+        // Check for any mixed or null strands
+        boolean    mixQueryStrand = false;
+        boolean  mixSubjectStrand = false;
+        boolean   nullQueryStrand = false;
+        boolean nullSubjectStrand = false;
 
-        int qStart = 0;
-        int qEnd   = 0;
-        int sStart = 0;
-        int sEnd   = 0;
+        // Start with index 0 value (arbitrarily)
+        Strand qStrand = subs[0].getQueryStrand();
+        Strand sStrand = subs[0].getSubjectStrand();
 
-        // Get extent of sub-hits on this strand by subject position
-        for (int i = subs.length; --i >= 0;)
+        int qStart = subs[0].getQueryStart();
+        int qEnd   = subs[0].getQueryEnd();
+        int sStart = subs[0].getSubjectStart();
+        int sEnd   = subs[0].getSubjectEnd();
+
+        if (qStrand == null)
+            nullQueryStrand = true;
+        if (sStrand == null)
+            nullSubjectStrand = true;
+
+        // Compare all other values. Note --i > 0 as we are comparing
+        // all the the index 0 value
+        for (int i = subs.length; --i > 0;)
         {
-            if (subs[i].getSubjectStrand().equals(bestSubjectStrand))
-            {
-                if (sStart == 0 || sStart > subs[i].getSubjectStart())
-                {
-                    sStart = subs[i].getSubjectStart();
-                    qStart = subs[i].getQueryStart();
-                }
+            Strand qS = subs[i].getQueryStrand();
+            Strand sS = subs[i].getSubjectStrand();
 
-                if (sEnd < subs[i].getSubjectEnd())
-                {
-                    sEnd = subs[i].getSubjectEnd();
-                    qEnd = subs[i].getQueryEnd();
-                }
-            }
+            if (qS == null)
+                nullQueryStrand = true;
+            if (sS == null)
+                nullSubjectStrand = true;
+
+            if (qS != qStrand)
+                mixQueryStrand = true;
+            if (sS != sStrand)
+                mixSubjectStrand = true;
+
+            qStart = Math.min(qStart, subs[i].getQueryStart());
+            qEnd   = Math.max(qEnd,   subs[i].getQueryEnd());
+            
+            sStart = Math.min(sStart, subs[i].getSubjectStart());
+            sEnd   = Math.max(sEnd,   subs[i].getSubjectEnd());
         }
+
+        // Note any mixed strand hits as unknown strand
+        if (mixQueryStrand)
+            qStrand = StrandedFeature.UNKNOWN;
+        if (mixSubjectStrand)
+            sStrand = StrandedFeature.UNKNOWN;
+
+        // Any null strands from protein sequences
+        if (nullQueryStrand)
+            qStrand = null;
+        if (nullSubjectStrand)
+            sStrand = null;
 
         String hitId = (String) hitData.get("HitId");
 
         return new SequenceDBSearchHit(sc, ev, pv,
                                        qStart,
                                        qEnd,
-                                       bestQueryStrand,
+                                       qStrand,
                                        sStart,
                                        sEnd,
-                                       bestSubjectStrand,
+                                       sStrand,
                                        hitId,
-                                       makeAnnotation(hitData),
+                                       AnnotationFactory.makeAnnotation(hitData),
                                        subHits);
     }
 
@@ -382,30 +433,38 @@ public class BlastLikeSearchBuilder implements SearchBuilder
             tokenParser = new TokenParser(alpha);
         }
 
-        // BLASTP output has the strands implied to be POSITIVE
-        Strand qStrand = StrandedFeature.POSITIVE;
-        Strand sStrand = StrandedFeature.POSITIVE;
+        // BLASTP output has the strands set null (protein sequences)
+        Strand qStrand = null;
+        Strand sStrand = null;
 
         // Override where an explicit strand is given (FASTA DNA,
-        // FASTA protein, BLASTN)
-        if (subHitData.containsKey("queryStrand") &&
-            subHitData.get("queryStrand").equals("minus"))
-            qStrand = StrandedFeature.NEGATIVE;
+        // BLASTN)
+        if (subHitData.containsKey("queryStrand"))
+            if (subHitData.get("queryStrand").equals("plus"))
+                qStrand = StrandedFeature.POSITIVE;
+            else
+                qStrand = StrandedFeature.NEGATIVE;
 
-        if (subHitData.containsKey("subjectStrand") &&
-            subHitData.get("subjectStrand").equals("minus"))
-            sStrand = StrandedFeature.NEGATIVE;
+        if (subHitData.containsKey("subjectStrand"))
+            if (subHitData.get("subjectStrand").equals("plus"))
+                sStrand = StrandedFeature.POSITIVE;
+            else
+                sStrand = StrandedFeature.NEGATIVE;
 
         // Override where a frame is given as this contains strand
         // information (BLASTX for query, TBLASTN for hit, TBLASTX for
         // both)
-        if (subHitData.containsKey("queryFrame") &&
-            ((String) subHitData.get("queryFrame")).startsWith("minus"))
-            qStrand = StrandedFeature.NEGATIVE;
+        if (subHitData.containsKey("queryFrame"))
+            if (((String) subHitData.get("queryFrame")).startsWith("plus"))
+                qStrand = StrandedFeature.POSITIVE;
+            else
+                qStrand = StrandedFeature.NEGATIVE;
 
-        if (subHitData.containsKey("subjectFrame") &&
-            ((String) subHitData.get("subjectFrame")).startsWith("minus"))
-            sStrand = StrandedFeature.NEGATIVE;
+        if (subHitData.containsKey("subjectFrame"))
+            if (((String) subHitData.get("subjectFrame")).startsWith("plus"))
+                sStrand = StrandedFeature.POSITIVE;
+            else
+                sStrand = StrandedFeature.NEGATIVE;
 
         // Get start/end
         int qStart = Integer.parseInt((String) subHitData.get("querySequenceStart"));
@@ -470,34 +529,5 @@ public class BlastLikeSearchBuilder implements SearchBuilder
                                           qStart, qEnd, qStrand,
                                           sStart, sEnd, sStrand,
                                           new SimpleAlignment(labelMap));
-    }
-
-    /**
-     * <code>makeAnnotation</code> creates the annotation.
-     *
-     * @param preAnnotation a <code>Map</code> of raw data.
-     * @return an <code>Annotation</code>.
-     */
-    private Annotation makeAnnotation(final Map preAnnotation)
-    {
-	Annotation annotation = new SmallAnnotation();
-	Set  annotationKeySet = preAnnotation.keySet();
-
-	for (Iterator ksi = annotationKeySet.iterator(); ksi.hasNext();)
-	{
-	    Object   annotationKey = ksi.next();
-	    Object annotationValue = preAnnotation.get(annotationKey);
-
-	    try
-	    {
-		annotation.setProperty(annotationKey, annotationValue);
-	    }
-	    catch (ChangeVetoException cve)
-	    {
-		System.err.println("Failed to add mapping to Annotation:");
-                cve.printStackTrace();
-	    }
-	}
-	return annotation;
     }
 }

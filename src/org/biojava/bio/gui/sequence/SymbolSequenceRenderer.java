@@ -88,11 +88,11 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
 	// intended to center text in band
         double fudgeDown = 0.0;
         if (direction == src.HORIZONTAL) {
-          fudgeAcross = - maxBounds.getCenterX();
-          fudgeDown = depth * 0.5 - maxBounds.getCenterY();
+            fudgeAcross = - maxBounds.getCenterX();
+            fudgeDown = depth * 0.5 - maxBounds.getCenterY();
         } else {
-          fudgeAcross = depth * 0.5 - maxBounds.getCenterX();
-          fudgeDown = scale * 0.5 - maxBounds.getCenterY();
+            fudgeAcross = depth * 0.5 - maxBounds.getCenterX();
+            fudgeDown = scale * 0.5 - maxBounds.getCenterY();
         }
         
         int leading;       // these correspond to the symbol index value

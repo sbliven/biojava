@@ -81,7 +81,8 @@ public interface SeqSimilaritySearchHit
     /**
      * Return the strand of the hit with respect to the query
      * sequence. If the sub-hits are not all on the same strand this
-     * should return the unknown strand.
+     * should return the unknown strand. This may be null for protein
+     * sequences.
      *
      * @return a <code>Strand</code> value.
      */
@@ -106,7 +107,8 @@ public interface SeqSimilaritySearchHit
     /**
      * Return the strand of the sub-hit with respect to the subject
      * sequence. If the sub-hits are not all on the same strand this
-     * should return the unknown strand.
+     * should return the unknown strand. This may be null for protein
+     * sequences.
      *
      * @return a <code>Strand</code> value.
      */

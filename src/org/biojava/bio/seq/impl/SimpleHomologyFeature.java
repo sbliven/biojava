@@ -28,27 +28,27 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.homol.*;
 
 public class SimpleHomologyFeature
-extends SimpleStrandedFeature
-implements HomologyFeature {
-  private Homology homology;
+    extends SimpleStrandedFeature
+    implements HomologyFeature {
+    private Homology homology;
   
-  public Homology getHomology() {
-    return this.homology;
-  }
+    public Homology getHomology() {
+        return this.homology;
+    }
   
-  public Feature.Template makeTemplate() {
-    HomologyFeature.Template ft = new HomologyFeature.Template();
-    fillTemplate(ft);
-    return ft;
-  }
+    public Feature.Template makeTemplate() {
+        HomologyFeature.Template ft = new HomologyFeature.Template();
+        fillTemplate(ft);
+        return ft;
+    }
   
-  protected void fillTemplate(HomologyFeature.Template ft) {
-    super.fillTemplate(ft);
-    ft.homology = getHomology();
-  }
+    protected void fillTemplate(HomologyFeature.Template ft) {
+        super.fillTemplate(ft);
+        ft.homology = getHomology();
+    }
   
-  public SimpleHomologyFeature(Sequence sourceSeq,
-				 FeatureHolder parent,
+    public SimpleHomologyFeature(Sequence sourceSeq,
+                                 FeatureHolder parent,
 				 HomologyFeature.Template template)
 	throws IllegalArgumentException, IllegalAlphabetException 
     {
@@ -56,7 +56,7 @@ implements HomologyFeature {
         this.homology = template.homology;
     }
     
-  public String toString() {
-    return super.toString() + " " + getHomology();
-  }
+    public String toString() {
+        return super.toString() + " " + getHomology();
+    }
 }

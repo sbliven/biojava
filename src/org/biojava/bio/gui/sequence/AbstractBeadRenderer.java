@@ -81,8 +81,8 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
     implements FeatureRenderer
 {
     /**
-     * constant <code>DISPLACEMENT</code> indicating a change to the
-     * Y-axis displacement of the feature.
+     * Constant <code>DISPLACEMENT</code> indicating a change to the
+     * Y-axis displacement of the features.
      */
     public static final ChangeType DISPLACEMENT =
 	new ChangeType("The displacement of the features has changed",
@@ -90,7 +90,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 		       "DISPLACEMENT", SequenceRenderContext.LAYOUT);
     
     /**
-     * constant <code>DEPTH</code> indicating a change to the depth of
+     * Constant <code>DEPTH</code> indicating a change to the depth of
      * the renderer.
      */
     public static final ChangeType DEPTH =
@@ -99,8 +99,8 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 		       "DEPTH", SequenceRenderContext.LAYOUT);
 
     /**
-     * constant <code>OUTLINE</code> indicating a change to the
-     * outline paint of the feature.
+     * Constant <code>OUTLINE</code> indicating a change to the
+     * outline paint of the features.
      */
     public static final ChangeType OUTLINE =
 	new ChangeType("The outline of the features has changed",
@@ -108,8 +108,8 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 		       "OUTLINE", SequenceRenderContext.REPAINT);
 
     /**
-     * constant <code>STROKE</code> indicating a change to the outline
-     * stroke of the feature.
+     * Constant <code>STROKE</code> indicating a change to the outline
+     * stroke of the features.
      */
     public static final ChangeType STROKE =
 	new ChangeType("The stroke of the features has changed",
@@ -117,8 +117,8 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 		       "STROKE", SequenceRenderContext.REPAINT);
     
     /**
-     * constant <code>FILL</code> indicating a change to the fill of
-     * the feature.
+     * Constant <code>FILL</code> indicating a change to the fill of
+     * the features.
      */
     public static final ChangeType FILL =
 	new ChangeType("The fill of the features has changed",

@@ -56,14 +56,14 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
      * coordinate of the hit on the query sequence.
      * @param queryStrand a <code>Strand</code> object indicating the
      * strand of the hit with respect to the query sequence, which may
-     * not be null.
+     * be null for protein similarities.
      * @param subjectStart an <code>int</code> value indicating the
      * start coordinate of the hit on the subject sequence.
      * @param subjectEnd an <code>int</code> value indicating the end
      * coordinate of the hit on the query sequence.
      * @param subjectStrand a <code>Strand</code> object indicating
      * the strand of the hit with respect to the query sequence, which
-     * may not be null.
+     * may be null for protein similarities.
      * @param score a <code>double</code> value; the score of the
      * subhit, which may not be NaN.
      * @param eValue a <code>double</code> the E-value of the
@@ -88,8 +88,6 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
         Contract.pre(! Double.isNaN(score), "score was NaN");
         // pValue may be NaN
 	// eValue may be NaN
-	Contract.pre(queryStrand   != null, "queryStrand was null");
-	Contract.pre(subjectStrand != null, "subjectStrand was null");
 	Contract.pre(alignment     != null, "alignment was null");
 
 	this.score         = score;

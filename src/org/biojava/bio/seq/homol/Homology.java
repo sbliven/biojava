@@ -28,16 +28,28 @@ import org.biojava.utils.*;
 import org.biojava.bio.seq.*;
 
 /**
- * Signifies that two or more features are homologous.
- * <P>
- * Blast hits or local multiple-sequence alignments can be represented as a set
- * of features on sequences that have an alignment. The features will probably
- * implement HomologyFeature.
+ * <p>Signifies that two or more features are homologous.</p> 
+ *
+ * <p> Blast hits or local multiple-sequence alignments can be
+ * represented as a set of features on sequences that have an
+ * alignment. The features will probably implement
+ * HomologyFeature.</p>
  *
  * @author Matthew Pocock
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
  */
 public interface Homology {
+  /**
+   * Signals that the alignment describing the homologous sequences
+   * has changed. For implementations which implement
+   * <code>Changeable</code>.
+   */
+  public static final ChangeType ALIGNMENT =
+      new ChangeType("The alignment has been changed",
+                     "org.biojava.bio.seq.homol.Homology",
+                     "ALIGNMENT");
+
   /**
    * Retrieve the set of features that mark homologous regions.
    *
