@@ -30,8 +30,25 @@ package org.biojava.utils;
 public abstract class AbstractChangeable implements Changeable {
   private transient ChangeSupport changeSupport = null;
 
+  /**
+   * Discover if we have any listeners registered.
+   * 
+   * @return true if there is at least one listener
+   * @deprecated	use hasListeners(ChangeType) if at all possible
+   */
   protected boolean hasListeners() {
     return changeSupport != null && changeSupport.hasListeners();
+  }
+  
+  /**
+   * Discover if we have listeners registered for a particular change type.
+   * 
+   * @param ct	the ChangeType we are interested in
+   * @return	true if there is at least one listener
+   */
+  protected boolean hasListeners(ChangeType ct)
+  {
+  	return changeSupport != null && changeSupport.hasListeners(ct);
   }
 
   /**
