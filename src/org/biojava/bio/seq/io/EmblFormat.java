@@ -76,7 +76,14 @@ public class EmblFormat implements SequenceFormat {
       StringTokenizer st = new StringTokenizer(line, " ", false);
       while(st.hasMoreTokens()) {
         String token = st.nextToken();
-        resList.addAll(resParser.parse(token).toList());
+        if(st.hasMoreTokens()) {
+          resList.addAll(resParser.parse(token).toList());
+        } else {
+          char c = token.charAt(token.length()-1);
+          if(!Character.isDigit(c)) {
+            resList.addAll(resParser.parse(token).toList());
+          }
+        }
       }
       line = in.readLine();
     }
