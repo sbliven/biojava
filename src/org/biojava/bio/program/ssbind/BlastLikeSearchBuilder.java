@@ -72,6 +72,76 @@ import org.biojava.utils.ChangeVetoException;
  *     mixed hit strands</li>
  * </ul>
  *
+ * <p>
+ * This class has special meanings for particular keys: if you want to
+ * adapt this class for another parser, you will need to be aware of
+ * this.
+ * </p>
+ * <table>
+ * <tr>
+ *   <th>Key</th>
+ *   <th>Meaning</th>
+ * </tr>
+ * <tr>
+ *   <td>program</td>
+ *   <td>either this value or the hitSequenceType value must be set. This can take values 
+ *       acceptable to AlphabetResolver.  These are BLASTN, BLASTP, BLASTX, TBLASTN,
+ *       TBLASTX, DNA and PROTEIN. </td>
+ * </tr>
+ * <tr>
+ *   <td>hitSequenceType</td>
+ *   <td>type of sequence that hit is.  Can be DNA or PROTEIN.</td>
+ * </tr>
+ * <tr>
+ *   <td>HitId</td>
+ *   <td>id of sequence that is hit</td>
+ * </tr>
+ * <tr>
+ *   <td>queryStrand</td>
+ *   <td>Strandedness of query in alignment.  Takes values of "plus" and "minus"</td>
+ * </tr>
+ * <tr>
+ *   <td>subjectStrand</td>
+ *   <td>Strandedness of query in alignment.  Takes values of "plus" and "minus"</td>
+ * </tr>
+ * <tr>
+ *   <td>queryFrame</td>
+ *   <td>self-evident</td>
+ * </tr>
+ * <tr>
+ *   <td>subjectFrame</td>
+ *   <td>self-evident</td>
+ * </tr>
+ * <tr>
+ *   <td>querySequenceStart</td>
+ *   <td>self-evident</td>
+ * </tr>
+ * <tr>
+ *   <td>querySequenceEnd</td>
+ *   <td>self-evident</td>
+ * </tr>
+ * <tr>
+ *   <td>subjectSequenceStart</td>
+ *   <td>self-evident</td>
+ * </tr>
+ * <tr>
+ *   <td>subjectSequenceEnd</td>
+ *   <td>self-evident</td>
+ * </tr>
+ * <tr>
+ *   <td>score</td>
+ *   <td>self-evident</td>
+ * </tr>
+ * <tr>
+ *   <td>expectValue</td>
+ *   <td>self-evident</td>
+ * </tr>
+ * <tr>
+ *   <td>pValue</td>
+ *   <td>self-evident</td>
+ * </tr>
+ * </table>
+ *
  * @author Keith James
  * @author Greg Cox
  * @since 1.2
