@@ -165,7 +165,7 @@ extends AbstractDistribution implements Serializable{
     weights[indexer.indexForSymbol(s)] = w;
   }
 
-  public SimpleDistribution(FiniteAlphabet alphabet) {
+  private void initialise(FiniteAlphabet alphabet) {
     this.alpha = alphabet;
     this.indexer = AlphabetManager.getAlphabetIndex(alphabet);
     indexer.addChangeListener(
@@ -186,6 +186,38 @@ extends AbstractDistribution implements Serializable{
       setNullModel(new UniformDistribution(alphabet));
     } catch (Exception e) {
       throw new BioError("This should never fail. Something is screwed!", e);
+    }
+  }
+
+  /**
+   * make an instance of SimpleDistribution for the specified Alphabet.
+   */
+  public SimpleDistribution(FiniteAlphabet alphabet)
+  {
+    initialise(alphabet);
+  }
+
+  /**
+   * make an instance of SimpleDistribution with weights identical
+   * to the specified Distribution.
+   *
+   * @param dist Distribution to copy the weights from.
+   */
+  public SimpleDistribution(Distribution dist)
+  {
+    try {
+    initialise((FiniteAlphabet) dist.getAlphabet());
+
+    // now copy over weights
+    int alfaSize = ((FiniteAlphabet)getAlphabet()).size();
+
+    for (int i = 0; i < alfaSize; i++) {
+      weights = new double[alfaSize];
+      weights[i] = dist.getWeight(indexer.symbolForIndex(i));
+    }
+    }
+    catch (IllegalSymbolException ise) {
+      System.err.println("an impossible error surely! "); ise.printStackTrace();
     }
   }
 
