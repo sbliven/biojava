@@ -173,6 +173,7 @@ public class MassCalc {
     public static final double getMass(SymbolList proteinSeq, 
                                         String isotopicType, 
                                         boolean MH_PLUS)
+	                       throws IllegalSymbolException
     {
         if(!proteinSeq.getAlphabet().getName().equals("PROTEIN")){
             //throw exception
@@ -191,7 +192,7 @@ public class MassCalc {
         catch(IllegalSymbolException ise)
         {
             //Throw
-            ise.printStackTrace();
+            throw ise;
         }
         
         //Calculate hydroxyl mass
