@@ -136,6 +136,14 @@ public final class SeqIOTools  {
                                 getDNAParser(),
                                 getGenbankBuilderFactory());
     }
+    
+    public static SequenceIterator readGenbankXml( BufferedReader br )
+    {
+    	return new StreamReader( br,
+                                 new GenbankXmlFormat(),
+                                 getDNAParser(),
+                                 getGenbankBuilderFactory() );
+    }
 
     /**
     * Get a default SequenceBuilderFactory for handling Genpept
