@@ -683,7 +683,7 @@ class AbstractGenEmblFileFormer
 	    InputStream featureDataStream  =
 		EmblFileFormer.class.getClassLoader().getResourceAsStream(featureDataFile);
 	    if (featureDataStream == null)
-		throw new BioError("Unable to find resource: "
+		throw new BioError("Failed to find resource: "
 				   + featureDataFile);
 
 	    InputSource   is = new InputSource(featureDataStream);

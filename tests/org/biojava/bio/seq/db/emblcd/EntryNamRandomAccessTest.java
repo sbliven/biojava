@@ -31,8 +31,8 @@ import java.net.URL;
 import junit.framework.TestCase;
 
 /**
- * <code>EntryNamRandomAccessTest</code> tests random access reading
- * of the binary entrynam.idx file type.
+ * <code>EntryNamRandomAccessTest</code> is a unit test of random
+ * access reading the binary entrynam.idx file type.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2

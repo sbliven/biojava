@@ -263,7 +263,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 
 		if (! thisFilter.isDisjoint(filter))
 		{
-		    throw new IllegalArgumentException("Unable to apply filter as it clashes with existing filter "
+		    throw new IllegalArgumentException("Failed to apply filter as it clashes with existing filter "
 						       + thisFilter
 						       + " (filters must be disjoint)");
 		}

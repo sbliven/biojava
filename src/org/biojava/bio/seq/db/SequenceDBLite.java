@@ -28,11 +28,10 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 
 /**
- * A database of sequences.
- * <P>
- * This may have several implementations with rich behaviour, but basically most
- * of the time you will just use the interface methods to do stuff. A sequence
- * database contains a finite number of sequences stored under unique keys.
+ * A database of sequences. This may have several implementations with
+ * rich behaviour, but basically most of the time you will just use
+ * the interface methods to do stuff. A sequence database contains a
+ * finite number of sequences stored under unique keys.
  *
  * @author Matthew Pocock
  * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A>

@@ -292,7 +292,14 @@ public class FastaSearchBuilder implements SearchBuilder
 	if (seqType.equals("DNA"))
 	    alpha = DNATools.getDNA();
 	else
-	    alpha = ProteinTools.getAlphabet();
+            // We use the T(ermination)Alphabet here for compatability
+            // with the ssbind package which has to use TAlphabet for
+            // BLASTX support (may contain * in 6-frame
+            // translation). As ssbind also supports Fasta, unless we
+            // use TAlphabet here, we would have two means of
+            // processing results which could give different results
+            // for the same data.
+	    alpha = ProteinTools.getTAlphabet();
 
         if (tokenParser == null)
             tokenParser = new TokenParser(alpha);

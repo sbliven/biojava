@@ -442,7 +442,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	    if (hitProperties.containsKey("fa_z-score"))
 		score = (String) hitProperties.get("fa_z-score");
 	    else
-		throw new SAXException("Unable to retrieve hit z-score from search data");
+		throw new SAXException("Failed to retrieve hit z-score from search data");
 
 	    // Score attribute
 	    qName.setQName("score");

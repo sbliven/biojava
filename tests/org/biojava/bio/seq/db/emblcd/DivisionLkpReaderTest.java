@@ -31,8 +31,8 @@ import java.net.URL;
 import junit.framework.TestCase;
 
 /**
- * <code>DivisionLkpReaderTest</code> tests reading of the binary
- * division.lkp file type.
+ * <code>DivisionLkpReaderTest</code> is a unit test of reading the
+ * binary division.lkp file type.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2

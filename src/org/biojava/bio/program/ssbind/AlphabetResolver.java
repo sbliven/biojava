@@ -38,7 +38,9 @@ class AlphabetResolver
 {
     /**
      * <code>resolveAlphabet</code> returns an appropriate
-     * <code>Alphabet</code> for an arbitrary identifier.
+     * <code>Alphabet</code> for an arbitrary identifier. The protein
+     * alphabet returned will include the termination character as
+     * BLASTX 6-frame translations are likely to include stops.
      *
      * @param identifier a <code>String</code> identifier.
      *
@@ -49,17 +51,20 @@ class AlphabetResolver
     FiniteAlphabet resolveAlphabet(String identifier)
         throws BioException
     {
-        // For (t)blastn/p/x
+        // For (T)BLASTN/P/X
         if (identifier.endsWith("blastn"))
             return DNATools.getDNA();
         else if (identifier.endsWith("blastp") ||
                  identifier.endsWith("blastx"))
-            return ProteinTools.getAlphabet();
+            // Use T(ermination)Alphabet as BLASTX may give * in
+            // 6-frame translation
+            return ProteinTools.getTAlphabet();
         // For Fasta
         else if (identifier.equalsIgnoreCase("dna"))
             return DNATools.getDNA();
         else if (identifier.equalsIgnoreCase("protein"))
-            return ProteinTools.getAlphabet();
+            // Use TAlphabet for compatability with above
+            return ProteinTools.getTAlphabet();
         else
             throw new BioException("Failed to resolve sequence type from identifier '"
                                    + identifier

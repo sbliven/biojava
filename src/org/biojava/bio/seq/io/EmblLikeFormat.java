@@ -248,7 +248,7 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
 	}
 
 	if (! found)
-	    throw new IOException("Unable to write: an invalid file format '"
+	    throw new IOException("Failed to write: an invalid file format '"
 				  + format
 				  + "' was requested");
 

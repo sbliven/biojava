@@ -31,7 +31,7 @@ import java.net.URL;
 import junit.framework.TestCase;
 
 /**
- * <code>EntryNamIdxReaderTest</code> tests reading of the binary
+ * <code>EntryNamIdxReaderTest</code> is a unit test of reading the binary
  * entrynam.idx file type.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
@@ -42,9 +42,9 @@ public class EntryNamIdxReaderTest extends TestCase
     protected EntryNamIdxReader ent;
 
     protected String [] seqID;
-    protected long []   rPos;
-    protected long []   sPos;
-    protected int  []   fileNum;
+    protected   long [] rPos;
+    protected   long [] sPos;
+    protected    int [] fileNum;
 
     public EntryNamIdxReaderTest(String name)
     {

@@ -42,6 +42,13 @@ import org.biojava.bio.seq.io.SimpleSequenceBuilder;
 import org.biojava.bio.seq.io.SymbolParser;
 import org.biojava.bio.symbol.Alphabet;
 
+/**
+ * <code>EmblCDROMIndexStoreTest</code> contains unit tests for EMBL
+ * CD-ROM format binary index <code>IndexStore</code>.
+ *
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @since 1.2
+ */
 public class EmblCDROMIndexStoreTest extends TestCase
 {
     protected SequenceFormat         format;
