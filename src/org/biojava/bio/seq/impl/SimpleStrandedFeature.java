@@ -42,7 +42,7 @@ public class SimpleStrandedFeature extends SimpleFeature implements StrandedFeat
 	SymbolList symList = super.getSymbols();
 	if(getStrand() == NEGATIVE) {
 	    try {
-		symList = DNATools.complement(symList);
+		symList = DNATools.reverseComplement(symList);
 	    } catch (IllegalAlphabetException iae) {
 		throw new BioError(
 				   iae,

@@ -55,7 +55,7 @@ public interface StrandedFeature extends Feature {
    * according to the concept of ordering within the location object.
    * <P>
    * If the feature is on the negative strand then the SymbolList will be
-   * reversecomplemented as appropriate.
+   * reverse-complemented as appropriate.
    *
    * @return  a SymbolList containing each symbol of the parent sequence contained
    *          within this feature in the order they appear in the parent
