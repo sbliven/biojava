@@ -17,7 +17,13 @@ import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.seq.io.CharacterTokenization;
 
-class PatternFactory
+/**
+ * A class that creates Patterns for regex matching on 
+ * SymbolLists of a specific Alphabet.
+ * @author David Huen
+ * @since 1.4
+ */
+public class PatternFactory
 {
     private FiniteAlphabet alfa;
     private SymbolTokenization toke = null;
@@ -66,6 +72,11 @@ class PatternFactory
         }
     }
 
+    /**
+     * Returns a Pattern object that applies the specified regex
+     * against SymbolLists in the Alphabet that this PatternFactory 
+     * was defined against.
+     */
     public org.biojava.utils.regex.Pattern compile(String pattern)
     {
         // validate the pattern is from this alphabet
@@ -74,6 +85,15 @@ class PatternFactory
         return new org.biojava.utils.regex.Pattern(java.util.regex.Pattern.compile(pattern), alfa);
     }
 
+    /**
+     * Returns the character that represents the specified Symbol in
+     * the Alphabet that this PatternFactory was defined for.
+     * <p>
+     * The character will be ASCII in Alphabets that define a Character tokenization.
+     * In Alphabets that don't a Unicode character in the private range is returned
+     * instead and this can be used to assemble the String that is the argument
+     * for the compile method.
+     */
     public char charValue(Symbol sym)
         throws IllegalSymbolException
     {
@@ -81,6 +101,9 @@ class PatternFactory
         return toke.tokenizeSymbol(sym).charAt(0);
     }
 
+    /**
+     * Returns a factory for Patterns in the specified Alphabet.
+     */
     public static PatternFactory makeFactory(FiniteAlphabet alfa)
     {
         return new PatternFactory(alfa);
