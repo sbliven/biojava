@@ -180,7 +180,7 @@ public final class AlphabetManager {
     } else if(basis == symList.size()) {
       return new SimpleBasisSymbol(
         token, name, Annotation.EMPTY_ANNOTATION,
-        symList
+        symList, expandMatches(alpha, symList, new ArrayList())
       );
     } else {
       return new SimpleSymbol(
@@ -204,7 +204,7 @@ public final class AlphabetManager {
           BasisSymbol bs = (BasisSymbol) i.next();
           List built2 = new ArrayList(built);
           built2.add(bs);
-          res.add(expandBases(alpha, symList, built2));
+          res.addAll(expandBases(alpha, symList, built2));
         }
         return res;
       }
@@ -255,7 +255,7 @@ public final class AlphabetManager {
             "length"
           );
         }
-        basisSet.add(s);
+        basisSet.add(as);
       } else {
         for(Iterator j = ((FiniteAlphabet) s.getMatches()).iterator();
           j.hasNext();
@@ -430,44 +430,29 @@ public final class AlphabetManager {
     return cpa;
   }
   
-  /**
-   * Return an alphabet that contains all of the AtomicSymbol instances spanned
-   * by a BasisSymbol.
-   *
-   * @param sym   the BasisSymbol to expand
-   * @return all  AtomicSymbol instances that match sym
-   */
-  public static Alphabet expand(BasisSymbol sym) {
-    return new SimpleAlphabet(
-      expandImpl(sym.getSymbols(), new ArrayList()),
-      sym.getName()
-    );
-  }
-
-  private static Set expandImpl(List symList, List built) {
+  private static Set expandMatches(Alphabet parent, List symList, List built) {
     int indx = built.size();
     if(indx < symList.size()) {
       BasisSymbol bs = (BasisSymbol) symList.get(indx);
       if(bs instanceof AtomicSymbol) {
         built.add(bs);
-        return expandImpl(symList, built);
+        return expandMatches(parent, symList, built);
       } else {
         Set syms = new HashSet();
         Iterator i = ((FiniteAlphabet) bs.getMatches()).iterator();
         while(i.hasNext()) {
           List built2 = new ArrayList(built);
           built2.add((BasisSymbol) i.next());
-          syms.add(expandImpl(symList, built2));
+          syms.addAll(expandMatches(parent, symList, built2));
         }
         return syms;
       }
     } else {
-      //try {
-        //return Collections.singleton(alpha.getSymbol(built));
-        throw new BioError("Pants");
-      //} catch (IllegalSymbolException ise) {
-      //  throw new BioError(ise, "Assertion Failure: Couldn't create symbol.");
-      //}
+      try {
+        return Collections.singleton(parent.getSymbol(built));
+      } catch (IllegalSymbolException ise) {
+        throw new BioError(ise, "Assertion Failure: Couldn't create symbol.");
+      }
     }
   }
   

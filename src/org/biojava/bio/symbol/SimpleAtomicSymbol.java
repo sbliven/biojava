@@ -49,7 +49,7 @@ implements AtomicSymbol {
     char token, String name, Annotation annotation,
     List syms
   ) throws IllegalSymbolException {
-    super(token, name, annotation, syms);
+    super(token, name, annotation, syms, null);
   }
   
   protected List createSymbols() {

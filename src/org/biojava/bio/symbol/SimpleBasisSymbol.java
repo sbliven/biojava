@@ -39,7 +39,7 @@ implements BasisSymbol {
   
   public SimpleBasisSymbol(
     char token, String name, Annotation annotation,
-    List symbols
+    List symbols, Set matches
   ) throws IllegalSymbolException {
     this(token, name, annotation);
     if(symbols == null) {
@@ -51,6 +51,18 @@ implements BasisSymbol {
       );
     }
     this.symbols = Collections.unmodifiableList(new ArrayList(symbols));
+    if(matches != null) {
+      for(Iterator i = matches.iterator(); i.hasNext(); ) {
+        Object obj = i.next();
+        if(obj instanceof AtomicSymbol) {
+        } else {
+          throw new ClassCastException(
+            "Can't cast " + obj + " to AtomicSymbol"
+          );
+        }
+      }
+      this.matches = new SimpleAlphabet(matches);
+    }
   }
   
   protected SimpleBasisSymbol(
@@ -93,9 +105,4 @@ implements BasisSymbol {
   protected Set createBases() {
     return Collections.singleton(this);
   }
-  
-  protected Alphabet createMatches() {
-    return AlphabetManager.expand(this);
-  }
 }
-
