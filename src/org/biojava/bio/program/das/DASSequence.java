@@ -151,7 +151,10 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 		    }
 		} ;
 
-	    if (DASSequenceDB.USE_XFF) {
+	    boolean useXFF = DASCapabilities.checkCapable(new URL(dataSourceURL, ".."),
+							  DASCapabilities.CAPABILITY_FEATURETABLE,
+							  DASCapabilities.CAPABILITY_FEATURETABLE_XFF);
+	    if (useXFF) {
 		URL fUrl = new URL(dataSourceURL, "features?encoding=xff;ref=" + seqID + ";category=component");
 		DASXFFParser.INSTANCE.parseURL(fUrl, listener);
 	    } else {

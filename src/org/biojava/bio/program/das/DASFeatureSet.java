@@ -113,7 +113,11 @@ class DASFeatureSet implements FeatureHolder {
 		    }
 		} ;
 
-	    if (DASSequenceDB.USE_XFF) {
+	    boolean useXFF = DASCapabilities.checkCapable(new URL(dataSource, ".."),
+							  DASCapabilities.CAPABILITY_FEATURETABLE,
+							  DASCapabilities.CAPABILITY_FEATURETABLE_XFF);
+
+	    if (useXFF) {
 		URL fURL = new URL(dataSource, "features?encoding=xff;ref=" + sourceID);
 		DASXFFParser.INSTANCE.parseURL(fURL, listener);
 	    } else {
