@@ -1,0 +1,54 @@
+<body>
+Classes and Interfaces for defining sequences.
+<P>
+This package contains the core classes and interfaces for defining
+sequences and features. All definitions are interfaces. Where ever
+possible, at least one pure java implementation of the interface is
+supplied.
+<P>
+Computationaly, the most natural way to represent a string is as a
+list of tokens from some alphabet. This representation gives us
+great freedom in defining the tokens within an alphabet, without
+restricting us to a single set of tokens. It also decouples the
+representation of the string from the alphabet it is over.
+<P>
+The model we use is as follows:
+<br>
+Residue - A token
+<br>
+Alphabet - A set of tokens
+<br>
+ResidueList - A string over a set of tokens
+<p>
+Throughout the seq package, Annotation and Annotatable are used
+to stoor and retrieve annotations. These apply to the entire
+Annotatable object, and are a loose key-value map. They are for
+stooring data that does not easily fit the object model.
+<p>
+Once we have got these abstract definitions in place, we can move
+onto representing biologicaly useful sequences. These are defined
+by the Sequence interface. It inherits the ResidueList interface
+for stooring the sequence. It also implements Annotatable which
+allows annotation to be attached to the entire sequence. Lastly,
+it implements FeatureHolder so that it can contain features.
+<P>
+Features are regions of a sequence which have location-specific
+annotation or meaning. The Location interface is a very fluid
+way of defining the region to annotate. Features can contain
+sub-features, as they are FeatureHolder implementors. They are
+also annotatable. Lastly, they contain a couple of fields aimed
+at enhancing GFF interoperability.
+<P>
+Also within this package are the classes that implement these
+interfaces. They are usualy preceeded with 'Simple' to indicate
+that they are vanilla, pure-java implementations. You should
+be able to use these object out-of-the-box.
+<P>
+The other classes are supporting code, that should realy be
+hidden from the casual observer. They are abstract implementations
+or objects that are instantiated within 'Simple' objects but
+only ever returned to the user by interface. It is worth
+looking at them if you are interested in deriving your own
+classes from the interfaces, or wish to extend the 'Simple'
+implementations.
+</body>
