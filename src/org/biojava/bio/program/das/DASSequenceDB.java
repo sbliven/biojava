@@ -24,9 +24,10 @@ package org.biojava.bio.program.das;
 import java.util.*;
 import java.net.*;
 import java.io.*;
+import org.biojava.utils.*;
+import org.biojava.utils.cache.*;
 
 import org.biojava.bio.*;
-import org.biojava.utils.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.db.*;
 import org.biojava.bio.symbol.*;
@@ -49,11 +50,17 @@ import org.w3c.dom.*;
 public class DASSequenceDB implements SequenceDB {
     private final URL dataSourceURL;
     private Map sequences;
+    private Cache symbolsCache;
 
     private SequenceDB allEntryPoints;
 
     {
 	sequences = new HashMap();
+	symbolsCache = new FixedSizeCache(20);
+    }
+
+    Cache getSymbolsCache() {
+	return symbolsCache;
     }
 
     public DASSequenceDB(URL dataSourceURL) 
@@ -145,7 +152,7 @@ public class DASSequenceDB implements SequenceDB {
 	Sequence seq = (Sequence) sequences.get(id);
 	if (seq == null) {
 	    try {
-		seq = new DASSequence(dataSourceURL, id);
+		seq = new DASSequence(this, dataSourceURL, id);
 	    } catch (Exception ex) {
 		throw new BioError(ex);
 	    }

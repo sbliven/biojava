@@ -26,6 +26,8 @@ import java.net.*;
 import java.io.*;
 
 import org.biojava.utils.*;
+import org.biojava.utils.cache.*;
+
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
@@ -64,12 +66,13 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    "ANNOTATIONS"
     );
 
+    private final DASSequenceDB parentdb;
     private final Alphabet alphabet = DNATools.getDNA();
     private final URL dataSourceURL;
     private final String seqID;
     private final FeatureRealizer featureRealizer = FeatureImpl.DEFAULT;
 
-    private SymbolList refSymbols;
+    private CacheReference refSymbols;
     private int length;
 
     private Map featureSets;
@@ -83,15 +86,16 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	features = new MergeFeatureHolder();
     }
 
-    DASSequence(URL dataSourceURL, String seqID) 
+    DASSequence(DASSequenceDB db, URL dataSourceURL, String seqID) 
         throws BioException
     {
-	this(dataSourceURL, seqID, null);
+	this(db, dataSourceURL, seqID, null);
     }
 
-    private DASSequence(URL dataSourceURL, String seqID, String parentID) 
+    DASSequence(DASSequenceDB db, URL dataSourceURL, String seqID, String parentID) 
         throws BioException
     {
+	this.parentdb = db;
 	this.dataSourceURL = dataSourceURL;
 	this.seqID = seqID;
 	
@@ -163,16 +167,13 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 		    String segId = seg.getAttribute("id");
 		    int segStart = Integer.parseInt(seg.getAttribute("start"));
 		    int segStop = Integer.parseInt(seg.getAttribute("stop"));
-		    DASSequence segSeq = new DASSequence(dataSourceURL, segId, seqID);
-		    ComponentFeature.Template cft = new ComponentFeature.Template();
-		    cft.location = new RangeLocation(segStart, segStop);
-		    cft.type = "SubSequence";
-		    cft.source = "Dazzle_Client_Internals";
-		    cft.annotation = Annotation.EMPTY_ANNOTATION;
-		    cft.strand = StrandedFeature.POSITIVE;
-		    cft.componentSequence = segSeq;
-		    cft.componentLocation = new RangeLocation(1, segSeq.length());
-		    ((SimpleFeatureHolder) structure).addFeature(new DASComponentFeature(this, cft));
+
+		    DASComponentFeature dcf = new DASComponentFeature(this,
+								      new RangeLocation(segStart, segStop),
+								      StrandedFeature.POSITIVE,
+								      segId);
+		    
+		    ((SimpleFeatureHolder) structure).addFeature(dcf);
 		}
 		features.addFeatureHolder(structure);
 	    } else {
@@ -187,6 +188,14 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	} catch (ChangeVetoException ex) {
 	    throw new BioError("Assertion failed: we should be able to add to hidden FeatureHolders");
 	}
+    }
+
+    URL getDataSourceURL() {
+	return dataSourceURL;
+    }
+
+    DASSequenceDB getParentDB() {
+	return parentdb;
     }
 
     private void _addAnnotationSource(URL dataSourceURL) 
@@ -298,9 +307,32 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     //
 
     protected SymbolList getSymbols() {
-	if (refSymbols != null)
-	    return refSymbols;
+	SymbolList sl = null;
+	if (refSymbols != null) {
+	    sl = (SymbolList) refSymbols.get();
+	}
 
+	if (sl == null) {
+	    if (structure.countFeatures() == 0) {
+		sl = getTrueSymbols();
+	    } else {
+		AssembledSymbolList asl = new AssembledSymbolList();
+		asl.setLength(length);
+		for (Iterator i = structure.features(); i.hasNext(); ) {
+		    ComponentFeature cf = (ComponentFeature) i.next();
+		    asl.putComponent(cf.getLocation(), cf);
+		}
+
+		sl = asl;
+	    }
+
+	    refSymbols = parentdb.getSymbolsCache().makeReference(sl);
+	}
+
+	return sl;
+    }
+
+    protected SymbolList getTrueSymbols() {
 	try {
 	    URL epURL = new URL(dataSourceURL, "dna?ref=" + seqID);
 	    HttpURLConnection huc = (HttpURLConnection) epURL.openConnection();
@@ -323,7 +355,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    el = (Element) dnal.item(0);
 	    int len = Integer.parseInt(el.getAttribute("length"));
 	    if (len != length())
-		throw new BioError("Returned DNA length incorrect");
+		throw new BioError("Returned DNA length incorrect: expecting " + length() + " but got " + len);
 	    // el.normalize();
 	    CharacterData t = (CharacterData) el.getFirstChild();
 	    String seqstr = t.getData();
@@ -332,7 +364,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    SymbolParser sp = alphabet.getParser("token");
 	    while (toke.hasMoreTokens())
 		symList.addAll(sp.parse(toke.nextToken()).toList());
-	    refSymbols = new SimpleSymbolList(alphabet, symList);
+	    return new SimpleSymbolList(alphabet, symList);
 	} catch (SAXException ex) {
 	    throw new BioError(ex, "Exception parsing DAS XML");
 	} catch (IOException ex) {
@@ -342,8 +374,6 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	} catch (BioException ex) {
 	    throw new BioError(ex);
 	}
-
-	return refSymbols;
     }
 
     //

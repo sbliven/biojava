@@ -35,54 +35,39 @@ import org.biojava.utils.*;
  */
 
 class DASComponentFeature implements ComponentFeature {
-    private FeatureHolder parent;
+    private final DASSequence parent;
 
     private FeatureHolder projectedFeatures;
 
-    private Location location;
-    private String type;
-    private String source;
-    private Annotation annotation;
-
-    private StrandedFeature.Strand strand;
+    private final Location location;
+    private final StrandedFeature.Strand strand;
+    private final String componentID;
 
     private Sequence componentSequence;
-    private Location componentLocation;
-    private int translation;
 
-    public DASComponentFeature(FeatureHolder parent,
-			       ComponentFeature.Template temp)
+    public DASComponentFeature(DASSequence parent,
+			       Location loc,
+			       StrandedFeature.Strand strand,
+			       String id)
         throws BioException
     {
-	if (locationContent(temp.location) != 
-	    locationContent(temp.componentLocation))
-	{
-	    throw new BioException("Component and container locations must contain an equal number of symbols.");
-	}
+//      if (locationContent(temp.location) != 
+//  	    locationContent(temp.componentLocation))
+//  	{
+//  	    throw new BioException("Component and container locations must contain an equal number of symbols.");
+//  	}
 
-	if (!temp.location.isContiguous() || temp.componentLocation.isContiguous()) {
-	    throw new BioException("Can only include contiguous segments in an assembly [may change in future]");
-	}
+//  	if (!temp.location.isContiguous() || temp.componentLocation.isContiguous()) {
+//  	    throw new BioException("Can only include contiguous segments in an assembly [may change in future]");
+//  	}
 
 	this.parent = parent;
 	
-	this.location = temp.location;
-	this.type = temp.type;
-	this.source = temp.source;
-	this.annotation = temp.annotation;
+	this.location = loc;
+	this.strand = strand;
+	this.componentID = id;
 
-	this.strand = temp.strand;
-	
-	this.componentSequence = temp.componentSequence;
-	this.componentLocation = temp.componentLocation;
-
-	if (temp.strand == StrandedFeature.NEGATIVE) {
-	    this.translation = temp.location.getMax() - temp.componentLocation.getMin() + 1;
-	    this.projectedFeatures = new ProjectedFeatureHolder(componentSequence, this, translation, true);
-	} else  if (temp.strand == StrandedFeature.POSITIVE) {
-	    this.translation = temp.location.getMin() - temp.componentLocation.getMin();
-	    this.projectedFeatures = new ProjectedFeatureHolder(componentSequence, this, translation, false);
-	} else {
+	if (strand != StrandedFeature.NEGATIVE && strand != StrandedFeature.POSITIVE) {
 	    throw new BioException("Strand must be specified when creating a ComponentFeature");
 	}
     }
@@ -111,26 +96,23 @@ class DASComponentFeature implements ComponentFeature {
     }
 
     public Sequence getSequence() {
-	FeatureHolder fh = parent;
-	while (fh instanceof Feature)
-	    fh = ((Feature) fh).getParent();
-	return (Sequence) fh;
+	return parent;
     }
 
     public String getSource() {
-	return source;
+	return "Dazzle_Client";
     }
 
     public String getType() {
-	return type;
+	return "SubSequence";
     }
 
     public Annotation getAnnotation() {
-	return annotation;
+	return Annotation.EMPTY_ANNOTATION;
     }
 
     public SymbolList getSymbols() {
-	SymbolList syms = componentLocation.symbols(componentSequence);
+	SymbolList syms = getComponentSequence();  /* componentLocation.symbols(getComponentSequence()); */
 	if (strand == StrandedFeature.NEGATIVE) {
 	    try {
 		syms = DNATools.reverseComplement(syms);
@@ -142,23 +124,35 @@ class DASComponentFeature implements ComponentFeature {
     }
 
     public Sequence getComponentSequence() {
+	if (componentSequence == null) {
+	    try {
+		componentSequence = new DASSequence(parent.getParentDB(), parent.getDataSourceURL(), componentID, parent.getName());
+	    } catch (Exception ex) {
+		throw new BioError(ex, "Couldn't create child DAS sequence");
+	    }
+	}
 	return componentSequence;
     }
 
     public Location getComponentLocation() {
-	return componentLocation;
+	return new RangeLocation(1, location.getMax() - location.getMin() + 1);
     }
 
     protected FeatureHolder getProjectedFeatures() {
-//  	if (projectedFeatures == null) {
-//  	    projectedFeatures = new ProjectedFeatureHolder(componentSequence,
-//  							   this, translation);
-//  	}
+	if (projectedFeatures == null) {
+	    if (strand == StrandedFeature.NEGATIVE) {
+		int translation = location.getMax() + 1;
+		this.projectedFeatures = new ProjectedFeatureHolder(getComponentSequence(), this, translation, true);
+	    } else  if (strand == StrandedFeature.POSITIVE) {
+		int translation = location.getMin() - 1;
+		this.projectedFeatures = new ProjectedFeatureHolder(getComponentSequence(), this, translation, false);
+	    } 
+	}
 	return projectedFeatures;
     }
 
     public int countFeatures() {
-	return componentSequence.countFeatures();
+	return getComponentSequence().countFeatures();
     }
 
     public Iterator features() {
