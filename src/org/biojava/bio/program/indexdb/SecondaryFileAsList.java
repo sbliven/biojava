@@ -42,9 +42,9 @@ extends SearchableFileAsList {
     super(file, recordLen);
   }
   
-  public SecondaryFileAsList(File file)
+  public SecondaryFileAsList(File file, boolean mutable)
   throws IOException {
-    super(file);
+    super(file, mutable);
   }
   
   protected Object parseRecord(byte[] buffer) {

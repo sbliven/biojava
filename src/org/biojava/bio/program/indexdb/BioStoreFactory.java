@@ -32,7 +32,7 @@ import org.biojava.utils.*;
  * instances. These are directory and file structures which index flat
  * files according to the OBDA specification.
  *
- * @author Unknown
+ * @author Matthew Pocock
  * @author Keith James
  * @author Greg Cox
  */

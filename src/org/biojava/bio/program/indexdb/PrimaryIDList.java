@@ -58,9 +58,9 @@ extends SearchableFileAsList {
     this.store = store;
   }
   
-  public PrimaryIDList(File file, BioStore store)
+  public PrimaryIDList(File file, BioStore store, boolean mutable)
   throws IOException {
-    super(file);
+    super(file, mutable);
     this.store = store;
   }
   

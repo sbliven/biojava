@@ -60,12 +60,13 @@ abstract class SearchableFileAsList
      *
      * @param file a <code>File</code>  used to back the
      * list. This file must already exist.
+     * @param mutable  true if the list can be edited, false otherwise
      *
      * @exception IOException if an error occurs
      */
-    public SearchableFileAsList(File file)
+    public SearchableFileAsList(File file, boolean mutable)
         throws IOException {
-        super(file);
+        super(file, mutable);
     }
 
     public Object search(String id) {

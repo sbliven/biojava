@@ -34,7 +34,7 @@ import org.biojava.utils.io.*;
  * preferred method of constructing new instances is to use
  * <code>BioStoreFactory</code>.
  *
- * @author Unknown
+ * @author Matthew Pocock
  * @author Keith James
  */
 public class BioStore implements IndexStore {
@@ -75,9 +75,9 @@ public class BioStore implements IndexStore {
 
         File plFile = BioStoreFactory.makePrimaryKeyFile(location, primaryKey);
         if (cache) {
-            primaryList = new CacheList(new PrimaryIDList(plFile, this));
+            primaryList = new CacheList(new PrimaryIDList(plFile, this, false));
         } else {
-            primaryList = new PrimaryIDList(plFile, this);
+            primaryList = new PrimaryIDList(plFile, this, false);
         }
 
         StringTokenizer sTok = new StringTokenizer(keyList, "\t");
@@ -86,9 +86,9 @@ public class BioStore implements IndexStore {
       
             File file = BioStoreFactory.makeSecondaryFile(location, k);
             if (cache) {
-                idToList.put(k, new CacheList(new SecondaryFileAsList(file)));
+                idToList.put(k, new CacheList(new SecondaryFileAsList(file, false)));
             } else {
-                idToList.put(k, new SecondaryFileAsList(file));
+                idToList.put(k, new SecondaryFileAsList(file, false));
             }
         }
 
