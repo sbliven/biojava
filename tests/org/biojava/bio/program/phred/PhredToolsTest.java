@@ -21,10 +21,10 @@
 
 package org.biojava.bio.program.phred;
 
-import org.biojava.utils.NestedError;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
+import org.biojava.utils.*;
 import junit.framework.TestCase;
 
 /**
@@ -43,7 +43,7 @@ extends TestCase {
       PhredTools.getPhredSymbol(DNATools.c(), IntegerAlphabet.getInstance().getSymbol(3));
       PhredTools.getPhredSymbol(DNATools.t(), IntegerAlphabet.getInstance().getSymbol(4));
     } catch (IllegalSymbolException ise) {
-      throw new NestedError(ise);
+      throw new AssertionFailure(ise);
     }
   }
   
@@ -51,7 +51,7 @@ extends TestCase {
     try {
       PhredTools.getPhredSymbol(DNATools.n(), IntegerAlphabet.getInstance().getSymbol(5));
     } catch (IllegalSymbolException ise) {
-      throw new NestedError(ise);
+      throw new AssertionFailure(ise);
     }
   }
 }

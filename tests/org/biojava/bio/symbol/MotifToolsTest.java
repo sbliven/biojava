@@ -31,7 +31,7 @@ import junit.framework.TestCase;
 
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.utils.NestedError;
+import org.biojava.utils.AssertionFailure;
 
 public class MotifToolsTest
     extends TestCase {
@@ -72,7 +72,7 @@ public class MotifToolsTest
           sb.append("]");
           n = sb.toString();
       } catch (Exception e) {
-          throw new NestedError(e, "Couldn't initialize motif tools test");
+          throw new AssertionFailure("Couldn't initialize motif tools test", e);
       }
     }
       
@@ -136,7 +136,7 @@ public class MotifToolsTest
         try {
             assertEquals(target, MotifTools.createRegex(DNATools.createDNA(pattern)));
         } catch (IllegalSymbolException ise) {
-            throw new NestedError(ise);
+            throw new AssertionFailure(ise);
         }
     }
 }
