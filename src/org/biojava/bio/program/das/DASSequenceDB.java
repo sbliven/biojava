@@ -48,12 +48,6 @@ import org.w3c.dom.*;
  */
 
 public class DASSequenceDB implements SequenceDB {
-    static boolean USE_XFF;
-
-    static {
-	USE_XFF = Boolean.getBoolean("org.biojava.use_xff");
-    }
-
     private URL dataSourceURL;
     private Map sequences;
     private Cache symbolsCache;
@@ -71,41 +65,6 @@ public class DASSequenceDB implements SequenceDB {
 	throws BioException 
     {
 	this.dataSourceURL = dataSourceURL;
-
-	try {
-	    URL epURL = new URL(dataSourceURL, "entry_points");
-	    HttpURLConnection huc = (HttpURLConnection) epURL.openConnection();
-            try {
-              huc.connect();
-            } catch (Exception e) {
-              throw new BioException(e, "Can't connect to " + epURL);
-            }
-	    int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
-	    if (status == 0)
-		throw new BioException("Not a DAS server");
-	    else if (status != 200)
-		throw new BioException("DAS error (status code = " + status +
-                ") connecting to " + dataSourceURL + " with query " + epURL);
-
-
-	    InputSource is = new InputSource(huc.getInputStream());
-	    DOMParser parser = DASSequence.nonvalidatingParser();
-	    parser.parse(is);
-	    Element el = parser.getDocument().getDocumentElement();
-
-	    NodeList segl = el.getElementsByTagName("SEGMENT");
-	    Element segment = null;
-	    for (int i = 0; i < segl.getLength(); ++i) {
-		el = (Element) segl.item(i);
-	        sequences.put(el.getAttribute("id"), null);
-	    }
-	} catch (SAXException ex) {
-	    throw new BioException(ex, "Exception parsing DAS XML");
-	} catch (IOException ex) {
-	    throw new BioException(ex, "Error connecting to DAS server");
-	} catch (NumberFormatException ex) {
-	    throw new BioException(ex);
-	}
     }
 
     /**
@@ -198,8 +157,8 @@ public class DASSequenceDB implements SequenceDB {
     }
 
     public Sequence getSequence(String id) {
-	if (! sequences.containsKey(id))
-	    throw new NoSuchElementException("Couldn't find sequence " + id);
+	// if (! sequences.containsKey(id))
+	//    throw new NoSuchElementException("Couldn't find sequence " + id);
 	Sequence seq = (Sequence) sequences.get(id);
 	if (seq == null) {
 	    try {
@@ -213,6 +172,45 @@ public class DASSequenceDB implements SequenceDB {
     }
 
     public Set ids() {
+	if (sequences == null) {
+	    try {
+		URL epURL = new URL(dataSourceURL, "entry_points");
+		HttpURLConnection huc = (HttpURLConnection) epURL.openConnection();
+		try {
+		    huc.connect();
+		} catch (Exception e) {
+		    throw new BioException(e, "Can't connect to " + epURL);
+		}
+		int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
+		if (status == 0)
+		    throw new BioException("Not a DAS server");
+		else if (status != 200)
+		    throw new BioException("DAS error (status code = " + status +
+					   ") connecting to " + dataSourceURL + " with query " + epURL);
+
+
+		InputSource is = new InputSource(huc.getInputStream());
+		DOMParser parser = DASSequence.nonvalidatingParser();
+		parser.parse(is);
+		Element el = parser.getDocument().getDocumentElement();
+		
+		NodeList segl = el.getElementsByTagName("SEGMENT");
+		Element segment = null;
+		for (int i = 0; i < segl.getLength(); ++i) {
+		    el = (Element) segl.item(i);
+		    sequences.put(el.getAttribute("id"), null);
+		}
+	    } catch (SAXException ex) {
+		throw new BioError(ex, "Exception parsing DAS XML");
+	    } catch (IOException ex) {
+		throw new BioError(ex, "Error connecting to DAS server");
+	    } catch (NumberFormatException ex) {
+		throw new BioError(ex);
+	    } catch (BioException ex) {
+		throw new BioError(ex);
+	    }
+	}
+
 	return sequences.keySet();
     }
 

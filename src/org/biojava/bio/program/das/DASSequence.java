@@ -256,10 +256,44 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	}
     }
 
-    void registerFeatureFetchers() {
+    private void registerLocalFeatureFetchers() {
 	for (Iterator i = featureSets.values().iterator(); i.hasNext(); ) {
 	    DASFeatureSet dfs = (DASFeatureSet) i.next();
 	    dfs.registerFeatureFetcher();
+	}
+    }
+
+    void registerFeatureFetchers() {
+	registerLocalFeatureFetchers();
+
+	for (Iterator fi = structure.features(); fi.hasNext(); ) {
+	    ComponentFeature cf = (ComponentFeature) fi.next();
+	    DASSequence cseq = (DASSequence) cf.getComponentSequence();
+	    cseq.registerFeatureFetchers();
+	}
+    }
+
+    void registerFeatureFetchers(Location l) {
+	registerLocalFeatureFetchers();
+	
+	if (structure.countFeatures() > 0) {
+	    FeatureHolder componentsBelow = structure.filter(new FeatureFilter.OverlapsLocation(l), false);
+	    for (Iterator fi = componentsBelow.features(); fi.hasNext(); ) {
+		ComponentFeature cf = (ComponentFeature) fi.next();
+		DASSequence cseq = (DASSequence) cf.getComponentSequence();
+		if (l.contains(cf.getLocation())) {
+		    cseq.registerFeatureFetchers();
+		} else {
+		    Location partNeeded = l.intersection(cf.getLocation());
+		    if (cf.getStrand() == StrandedFeature.POSITIVE) {
+			partNeeded = partNeeded.translate(cf.getComponentLocation().getMin() - cf.getLocation().getMin());
+			cseq.registerFeatureFetchers(partNeeded);
+		    } else {
+			// FIXME: Couldn't work out the appropriate xform.
+			cseq.registerFeatureFetchers();
+		    }
+		}
+	    }
 	}
     }
 
@@ -446,9 +480,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	// Otherwise they want /real/ features, I'm afraid...
 	//
 
-	registerFeatureFetchers();
-	if (structure.countFeatures() > 0 && 
-	    (ff instanceof FeatureFilter.OverlapsLocation || ff instanceof FeatureFilter.ContainedByLocation))
+	if (ff instanceof FeatureFilter.OverlapsLocation || ff instanceof FeatureFilter.ContainedByLocation)
 	{
 	    Location l = null;
 	    if (ff instanceof FeatureFilter.OverlapsLocation) {
@@ -456,12 +488,9 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    } else {
 		l = ((FeatureFilter.ContainedByLocation) ff).getLocation();
 	    }
-	    FeatureHolder componentsBelow = structure.filter(new FeatureFilter.OverlapsLocation(l), false);
-	    for (Iterator fi = componentsBelow.features(); fi.hasNext(); ) {
-		ComponentFeature cf = (ComponentFeature) fi.next();
-		DASSequence cseq = (DASSequence) cf.getComponentSequence();
-		cseq.registerFeatureFetchers();
-	    }
+	    registerFeatureFetchers(l);
+	} else {
+	    registerFeatureFetchers();
 	}
 
 	return features.filter(ff, recurse);
