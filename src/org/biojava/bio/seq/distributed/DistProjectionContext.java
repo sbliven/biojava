@@ -54,10 +54,10 @@ class DistProjectionContext
     private Map componentFeatureCache = new HashMap();
 
     public DistProjectionContext(FeatureHolder fh,
-                                                      FeatureHolder parent,
-                                      Annotation annotation)
+                                 FeatureHolder parent,
+                                 Annotation annotation)
     {
-        super(fh, parent);
+        super(parent, fh);
         this.annotation = annotation;
     }
 

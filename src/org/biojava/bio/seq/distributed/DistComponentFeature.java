@@ -255,8 +255,8 @@ class DistComponentFeature
       if (projectedFeatures == null) {
         projectedFeatures = new ProjectedFeatureHolder(
                 new TranslateFlipContext(
-                        getComponentSequence(),
                         this,
+                        getComponentSequence(),
                         translation,
                         getStrand() == StrandedFeature.NEGATIVE));
       }

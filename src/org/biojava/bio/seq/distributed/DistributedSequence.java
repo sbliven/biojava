@@ -175,14 +175,36 @@ class DistributedSequence
   public Iterator features() {
     return getFeatures().features();
   }
+  
+  
+    private FeatureHolder components = null;
 
-  public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-    return getFeatures().filter(ff, recurse);
-  }
+    public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+        if (recurse) {
+            MergeFeatureHolder results = new MergeFeatureHolder();
+            try {
+                results.addFeatureHolder(getFeatures().filter(new FeatureFilter.And(new FeatureFilter.Not(new FeatureFilter.ByAncestor(new FeatureFilter.ByClass(ComponentFeature.class))), ff), recurse));
+                if (components == null) {
+                    components = getFeatures().filter(new FeatureFilter.And(FeatureFilter.top_level, new FeatureFilter.ByClass(ComponentFeature.class)));
+                }
+                for (Iterator i = components.features(); i.hasNext(); ) {
+                    FeatureHolder fh = ((Feature) i.next()).filter(ff);
+                    if (fh.countFeatures() > 0) {
+                        results.addFeatureHolder(fh);
+                    }
+                }
+            } catch (Exception ex) {
+                throw new BioRuntimeException(ex);
+            }
+            return results;
+        } else {
+            return getFeatures().filter(ff, recurse);
+        }
+    }
 
-  public FeatureHolder filter(FeatureFilter ff) {
-    return getFeatures().filter(ff);
-  }
+    public FeatureHolder filter(FeatureFilter ff) {
+        return filter(ff, true);
+    }
 
   public void removeFeature(Feature f)
           throws ChangeVetoException {
@@ -223,10 +245,14 @@ class DistributedSequence
           Annotation ann = new SmallAnnotation();
           ann.setProperty("source", dds);
           mfh.addFeatureHolder(
-                  new ProjectedFeatureHolder(
-                          new DistProjectionContext(dds.getFeatures(id, FeatureFilter.all, false),
-                                                    this,
-                                                    ann)));
+              new ProjectedFeatureHolder(
+                  new DistProjectionContext(
+                      dds.getFeatures(id, FeatureFilter.all, false),
+                      this,
+                      ann
+                  )
+              )
+          );
         } catch (Exception ex) {
           ex.printStackTrace();
         }
