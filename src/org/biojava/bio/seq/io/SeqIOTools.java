@@ -54,42 +54,6 @@ public final class SeqIOTools  {
     private SeqIOTools() {
     }
 
-    private static SymbolTokenization getDNAParser() {
-        try {
-            return DNATools.getDNA().getTokenization("token");
-        } catch (BioException ex) {
-            throw new BioError(ex, "Assertion failing:"
-                               + " Couldn't get DNA token parser");
-        }
-    }
-
-    private static SymbolTokenization getRNAParser() {
-        try {
-            return RNATools.getRNA().getTokenization("token");
-        } catch (BioException ex) {
-            throw new BioError(ex, "Assertion failing:"
-                               + " Couldn't get RNA token parser");
-        }
-    }
-
-    private static SymbolTokenization getNucleotideParser() {
-        try {
-            return NucleotideTools.getNucleotide().getTokenization("token");
-        } catch (BioException ex) {
-            throw new BioError(ex, "Assertion failing:"
-                               + " Couldn't get nucleotide token parser");
-        }
-    }
-
-    private static SymbolTokenization getProteinParser() {
-        try {
-            return ProteinTools.getTAlphabet().getTokenization("token");
-        } catch (BioException ex) {
-            throw new BioError(ex, "Assertion failing:"
-                               + " Couldn't get PROTEIN token parser");
-        }
-    }
-
     /**
      * Get a default SequenceBuilderFactory for handling EMBL
      * files.
@@ -277,7 +241,7 @@ public final class SeqIOTools  {
     /**
      * Write a sequenceDB to an output stream in fasta format.
      *
-     * @throws IOException if problems occur during writing.
+     * @throws IOException if there was an error while writing.
      * @since 1.2
      */
     public static void writeFasta(OutputStream os, SequenceDB db)
@@ -287,11 +251,11 @@ public final class SeqIOTools  {
     }
 
     /**
-     * Writes sequences from a SequenceIterator to an OutputStream in Fasta Format.
-     * This makes for a useful format filter where a StreamReader can be sent to the
-     * StreamWriter after formatting.
+     * Writes sequences from a SequenceIterator to an OutputStream in
+     * Fasta Format.  This makes for a useful format filter where a
+     * StreamReader can be sent to the StreamWriter after formatting.
      *
-     * @throws IOException if problems occur during writing.
+     * @throws IOException if there was an error while writing.
      * @since 1.2
      */
     public static void writeFasta(OutputStream os, SequenceIterator in)
@@ -301,11 +265,11 @@ public final class SeqIOTools  {
     }
 
     /**
-     * Writes a single Sequence to an OutputSream in fasta format.
+     * Writes a single Sequence to an OutputStream in Fasta format.
      *
-     * @param os  the OutputStream
-     * @param seq  the Sequence
-     * @throws IOException if there was an error writing it
+     * @param os  the OutputStream.
+     * @param seq  the Sequence.
+     * @throws IOException if there was an error while writing.
      */
     public static void writeFasta(OutputStream os, Sequence seq)
         throws IOException {
@@ -313,8 +277,11 @@ public final class SeqIOTools  {
     }
 
     /**
-     * The following methods write sequences from a SequenceIterator
-     * to an OutputStream.
+     * Writes a stream of Sequences to an OutputStream in EMBL format.
+     *
+     * @param os the OutputStream.
+     * @param in a SequenceIterator.
+     * @exception IOException if there was an error while writing.
      */
     public static void writeEmbl(OutputStream os, SequenceIterator in)
         throws IOException {
@@ -322,10 +289,25 @@ public final class SeqIOTools  {
         sw.writeStream(in);
     }
 
+    /**
+     * Writes a single Sequence to an OutputStream in EMBL format.
+     *
+     * @param os  the OutputStream.
+     * @param seq  the Sequence.
+     * @throws IOException if there was an error while writing.
+     */
     public static void writeEmbl(OutputStream os, Sequence seq) throws IOException {
         writeEmbl(os, new SingleSeqIterator(seq));
     }
 
+    /**
+     * Writes a stream of Sequences to an OutputStream in SwissProt
+     * format.
+     *
+     * @param os the OutputStream.
+     * @param in a SequenceIterator.
+     * @exception IOException if there was an error while writing.
+     */
     public static void writeSwissprot(OutputStream os, SequenceIterator in)
         throws IOException, BioException {
         SequenceFormat former = new EmblLikeFormat();
@@ -335,11 +317,26 @@ public final class SeqIOTools  {
         }
     }
 
+    /**
+     * Writes a single Sequence to an OutputStream in SwissProt format.
+     *
+     * @param os  the OutputStream.
+     * @param seq  the Sequence.
+     * @throws IOException if there was an error while writing.
+     */
     public static void writeSwissprot(OutputStream os, Sequence seq)
         throws IOException, BioException {
         writeSwissprot(os, new SingleSeqIterator(seq));
     }
 
+    /**
+     * Writes a stream of Sequences to an OutputStream in Genpept
+     * format.
+     *
+     * @param os the OutputStream.
+     * @param in a SequenceIterator.
+     * @exception IOException if there was an error while writing.
+     */
     public static void writeGenpept(OutputStream os, SequenceIterator in)
         throws IOException, BioException {
         SequenceFormat former = new GenbankFormat();
@@ -349,17 +346,39 @@ public final class SeqIOTools  {
         }
     }
 
+    /**
+     * Writes a single Sequence to an OutputStream in Genpept format.
+     *
+     * @param os  the OutputStream.
+     * @param seq  the Sequence.
+     * @throws IOException if there was an error while writing.
+     */
     public static void writeGenpept(OutputStream os, Sequence seq)
     throws IOException, BioException {
       writeGenpept(os, new SingleSeqIterator(seq));
     }
 
+    /**
+     * Writes a stream of Sequences to an OutputStream in Genbank
+     * format.
+     *
+     * @param os the OutputStream.
+     * @param in a SequenceIterator.
+     * @exception IOException if there was an error while writing.
+     */
     public static void writeGenbank(OutputStream os, SequenceIterator in)
         throws IOException {
         StreamWriter sw = new StreamWriter(os, new GenbankFormat());
         sw.writeStream(in);
     }
 
+    /**
+     * Writes a single Sequence to an OutputStream in Genbank format.
+     *
+     * @param os  the OutputStream.
+     * @param seq  the Sequence.
+     * @throws IOException if there was an error while writing.
+     */
     public static void writeGenbank(OutputStream os, Sequence seq)
         throws IOException {
         writeGenbank(os, new SingleSeqIterator(seq));
@@ -381,12 +400,6 @@ public final class SeqIOTools  {
      */
     public static int identifyFormat(String formatName, String alphabetName) {
         int format, alpha;
-
-        System.err.println("Identifying format: "
-                           + formatName
-                           + " alpha: "
-                           + alphabetName);
-
         if (formatName.equalsIgnoreCase("raw"))
             format = SeqIOConstants.RAW;
         else if (formatName.equalsIgnoreCase("fasta"))
@@ -430,9 +443,59 @@ public final class SeqIOTools  {
         return (format | alpha);
     }
 
-    public static SequenceBuilderFactory fileToFactory(int fileType)
+    /**
+     * <code>getSequenceFormat</code> accepts a value which represents
+     * a sequence format and returns the relevant
+     * <code>SequenceFormat</code> object.
+     *
+     * @param identifier an <code>int</code> which represents a binary
+     * value with bits set according to the scheme described in
+     * <code>SeqIOConstants</code>.
+     *
+     * @return a <code>SequenceFormat</code>.
+     *
+     * @exception BioException if an error occurs.
+     */
+    public static SequenceFormat getSequenceFormat(int identifier)
         throws BioException {
-        switch (fileType) {
+        switch (identifier) {
+            case SeqIOConstants.FASTA_DNA:
+            case SeqIOConstants.FASTA_RNA:
+            case SeqIOConstants.FASTA_AA:
+                return new FastaFormat();
+            case SeqIOConstants.EMBL:
+            case SeqIOConstants.EMBL_DNA:
+            case SeqIOConstants.EMBL_RNA:
+                return new EmblLikeFormat();
+            case SeqIOConstants.GENBANK:
+            case SeqIOConstants.GENBANK_DNA:
+            case SeqIOConstants.GENBANK_RNA:
+                return new GenbankFormat();
+            case SeqIOConstants.SWISSPROT:
+                return new EmblLikeFormat();
+            default:
+                throw new BioException("Unknown file type '"
+                                       + identifier
+                                       + "'");
+        }
+    }
+
+    /**
+     * <code>getBuilderFactory</code> accepts a value which represents
+     * a sequence format and returns the relevant
+     * <code>SequenceBuilderFactory</code> object.
+     *
+     * @param identifier an <code>int</code> which represents a binary
+     * value with bits set according to the scheme described in
+     * <code>SeqIOConstants</code>.
+     *
+     * @return a <code>SequenceBuilderFactory</code>.
+     *
+     * @exception BioException if an error occurs.
+     */
+    public static SequenceBuilderFactory getBuilderFactory(int identifier)
+        throws BioException {
+        switch (identifier) {
             case SeqIOConstants.FASTA_DNA:
             case SeqIOConstants.FASTA_RNA:
             case SeqIOConstants.FASTA_AA:
@@ -449,16 +512,28 @@ public final class SeqIOTools  {
                 return getGenpeptBuilderFactory();
             default:
                 throw new BioException("Unknown file type '"
-                                       + fileType
+                                       + identifier
                                        + "'");
         }
     }
 
-    public static FiniteAlphabet fileToAlphabet(int fileType)
+    /**
+     * <code>getAlphabet</code> accepts a value which represents a
+     * sequence format and returns the relevant
+     * <code>FiniteAlphabet</code> object.
+     *
+     * @param identifier an <code>int</code> which represents a binary
+     * value with bits set according to the scheme described in
+     * <code>SeqIOConstants</code>.
+     *
+     * @return a <code>FiniteAlphabet</code>.
+     *
+     * @exception BioException if an error occurs.
+     */
+    public static FiniteAlphabet getAlphabet(int identifier)
         throws BioException {
-
         // Mask the sequence format bytes
-        int alphaType = fileType & (~ 0xffff);
+        int alphaType = identifier & (~ 0xffff);
 
         switch (alphaType) {
             case SeqIOConstants.DNA:
@@ -469,7 +544,7 @@ public final class SeqIOTools  {
                 return ProteinTools.getAlphabet();
             default:
                 throw new BioException("Unknown file type '"
-                                       + fileType
+                                       + identifier
                                        + "' which indicates alphabet type '"
                                        + alphaType
                                        + "'");
@@ -485,7 +560,10 @@ public final class SeqIOTools  {
     /**
      * Attempts to guess the filetype of a file given the name.  For
      * use with the functions below that take an int fileType as a
-     * parameter.  The constants used are above.
+     * parameter.
+     *
+     * @deprecated because there is no standard file naming convention
+     * and guessing by file name is inherantly error prone and bad.
      */
     public static int guessFileType(File seqFile)
         throws IOException, FileNotFoundException {
@@ -564,20 +642,26 @@ public final class SeqIOTools  {
     }
 
     /**
-     * Attempts to retreive the most appropriate SequenceBuilder
-     * object for some combination of <code>Alphabet</code> and
-     * <code>SequenceFormat</code>
+     * Attempts to retrieve the most appropriate
+     * <code>SequenceBuilder</code> object for some combination of
+     * <code>Alphabet</code> and <code>SequenceFormat</code>
+     *
      * @param format currently supports <code>FastaFormat</code>,
      * <code>GenbankFormat</code>, <code>EmblLikeFormat</code>
      * @param alpha currently only supports the DNA and Protein
      * alphabets
+     *
      * @return the <code>SequenceBuilderFactory</code>
+     *
      * @throws BioException if the combination of alpha and format is
      * unrecognized.
+     *
+     * @deprecated as this essentially duplicates the operation
+     * available in the method <code>identifyBuilderFactory</code>.
      */
-    public static SequenceBuilderFactory formatToFactory(
-        SequenceFormat format, Alphabet alpha)
-        throws BioException{
+    public static SequenceBuilderFactory formatToFactory(SequenceFormat format,
+                                                         Alphabet alpha)
+        throws BioException {
 
         if ((format instanceof FastaFormat) &&
            (alpha == DNATools.getDNA() ||
@@ -592,7 +676,6 @@ public final class SeqIOTools  {
         }
         else if (format instanceof GenbankFormat &&
                  alpha == ProteinTools.getAlphabet()) {
-
             return getGenpeptBuilderFactory();
         }
         else if (format instanceof EmblLikeFormat &&
@@ -609,33 +692,10 @@ public final class SeqIOTools  {
       }
     }
 
-    public static SequenceFormat fileToFormat(int fileType)
-        throws BioException {
-        switch(fileType) {
-            case SeqIOConstants.FASTA_DNA:
-            case SeqIOConstants.FASTA_RNA:
-            case SeqIOConstants.FASTA_AA:
-                return new FastaFormat();
-            case SeqIOConstants.EMBL:
-            case SeqIOConstants.EMBL_DNA:
-            case SeqIOConstants.EMBL_RNA:
-                return new EmblLikeFormat();
-            case SeqIOConstants.GENBANK:
-            case SeqIOConstants.GENBANK_DNA:
-            case SeqIOConstants.GENBANK_RNA:
-                return new GenbankFormat();
-            case SeqIOConstants.SWISSPROT:
-                return new EmblLikeFormat();
-            default:
-                throw new BioException("Unknown file type '"
-                                       + fileType
-                                       + "'");
-        }
-    }
-
     /**
-     * Reads a file and returns the corresponding Biojava object.  You need to cast it as
-     * an Alignment or a SequenceIterator as appropriate.
+     * Reads a file and returns the corresponding Biojava object. You
+     * need to cast it as an Alignment or a SequenceIterator as
+     * appropriate.
      */
     public static Object fileToBiojava(int fileType, BufferedReader br)
         throws BioException {
@@ -710,6 +770,42 @@ public final class SeqIOTools  {
         }
 
         return SeqIOConstants.FASTA_DNA;
+    }
+
+    private static SymbolTokenization getDNAParser() {
+        try {
+            return DNATools.getDNA().getTokenization("token");
+        } catch (BioException ex) {
+            throw new BioError(ex, "Assertion failing:"
+                               + " Couldn't get DNA token parser");
+        }
+    }
+
+    private static SymbolTokenization getRNAParser() {
+        try {
+            return RNATools.getRNA().getTokenization("token");
+        } catch (BioException ex) {
+            throw new BioError(ex, "Assertion failing:"
+                               + " Couldn't get RNA token parser");
+        }
+    }
+
+    private static SymbolTokenization getNucleotideParser() {
+        try {
+            return NucleotideTools.getNucleotide().getTokenization("token");
+        } catch (BioException ex) {
+            throw new BioError(ex, "Assertion failing:"
+                               + " Couldn't get nucleotide token parser");
+        }
+    }
+
+    private static SymbolTokenization getProteinParser() {
+        try {
+            return ProteinTools.getTAlphabet().getTokenization("token");
+        } catch (BioException ex) {
+            throw new BioError(ex, "Assertion failing:"
+                               + " Couldn't get PROTEIN token parser");
+        }
     }
 
     /**
