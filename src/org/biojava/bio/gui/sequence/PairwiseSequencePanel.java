@@ -981,7 +981,7 @@ public class PairwiseSequencePanel extends JComponent
     {
         addChangeListener(cl, ChangeType.UNKNOWN);
     }
-  
+
     /**
      * <code>addChangeListener</code> adds a listener for specific
      * types of change.
@@ -994,7 +994,7 @@ public class PairwiseSequencePanel extends JComponent
       ChangeSupport cs = getChangeSupport(ct);
       cs.addChangeListener(cl, ct);
     }
-  
+
     /**
      * <code>removeChangeListener</code> removes a listener.
      *
@@ -1004,7 +1004,7 @@ public class PairwiseSequencePanel extends JComponent
     {
         removeChangeListener(cl, ChangeType.UNKNOWN);
     }
-  
+
     /**
      * <code>removeChangeListener</code> removes a listener.
      *
@@ -1018,7 +1018,7 @@ public class PairwiseSequencePanel extends JComponent
         cs.removeChangeListener(cl);
       }
     }
-    
+
     public boolean isUnchanging(ChangeType ct) {
       ChangeSupport cs = getChangeSupport(ct);
       return cs.isUnchanging(ct);
@@ -1081,12 +1081,12 @@ public class PairwiseSequencePanel extends JComponent
       if(changeSupport != null) {
         return changeSupport;
       }
-      
+
       synchronized(this) {
         if (changeSupport == null) {
           changeSupport = new ChangeSupport();
         }
-    
+
         return changeSupport;
       }
     }

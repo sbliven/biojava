@@ -336,6 +336,10 @@ public class SequencePoster
     return new RangeLocation(1, sequence.length());
   }
 
+  public RangeLocation getVisibleRange() {
+    return getRange();
+  }
+
   /**
    * Set the direction that this SequencePoster renders in. The direction can be
    * one of HORIZONTAL or VERTICAL. Once the direction is set, the display will

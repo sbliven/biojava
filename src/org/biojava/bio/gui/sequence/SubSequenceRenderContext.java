@@ -21,7 +21,7 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.awt.Font;
+import java.awt.*;
 import java.awt.geom.Point2D;
 
 import org.biojava.bio.seq.FeatureHolder;

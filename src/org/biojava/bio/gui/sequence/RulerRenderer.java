@@ -21,6 +21,8 @@
 
 package org.biojava.bio.gui.sequence;
 
+import org.biojava.bio.symbol.RangeLocation;
+
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -115,15 +117,16 @@ public class RulerRenderer implements SequenceRenderer
     {
         return depth + 1.0;
     }
-  
+
     public void paint(Graphics2D g2, SequenceRenderContext context)
     {
         AffineTransform prevTransform = g2.getTransform();
 
         g2.setPaint(Color.black);
 
-        int min = context.getRange().getMin();
-        int max = context.getRange().getMax();
+        RangeLocation visible = GUITools.getVisibleRange(context, g2);
+        int min = visible.getMin();
+        int max = visible.getMax();
         double minX = context.sequenceToGraphics(min);
         double maxX = context.sequenceToGraphics(max);
         double scale = context.getScale();
@@ -187,7 +190,7 @@ public class RulerRenderer implements SequenceRenderer
         }
         else
         {
-            snapSymsPerGap = (int) (2.0 * Math.pow(10.0, exponent)); 
+            snapSymsPerGap = (int) (2.0 * Math.pow(10.0, exponent));
         }
 
         int minP = min + (snapSymsPerGap - min) % snapSymsPerGap;
@@ -243,7 +246,7 @@ public class RulerRenderer implements SequenceRenderer
             g2.draw(line);
         }
     }
-  
+
     public SequenceViewerEvent processMouseEvent(SequenceRenderContext context,
                                                  MouseEvent            me,
                                                  List                  path)

@@ -31,6 +31,7 @@ import java.util.List;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.FilterUtils;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.utils.AbstractChangeable;
@@ -65,14 +66,14 @@ public class FeatureBlockSequenceRenderer extends AbstractChangeable
                        "org.biojava.bio.gui.sequence.FeatureBlockSequenceRenderer",
                        "FEATURE_COLLAPSING",
                        SequenceRenderContext.LAYOUT);
-  
+
     private FeatureRenderer renderer;
     private boolean isCollapsing = true;;
     private transient ChangeForwarder rendForwarder;
 
     protected ChangeSupport getChangeSupport(ChangeType ct) {
         ChangeSupport cs = super.getChangeSupport(ct);
-    
+
         if (rendForwarder == null) {
             rendForwarder = new SequenceRenderer.RendererForwarder(this, cs);
             if ((renderer != null) && (renderer instanceof Changeable)) {
@@ -110,7 +111,7 @@ public class FeatureBlockSequenceRenderer extends AbstractChangeable
             throw new AssertionFailure("Assertion Failure: Should have no listeners", cve);
         }
     }
-    
+
     /**
      * <code>getFeatureRenderer</code> returns the currently active
      * renderer.
@@ -141,12 +142,12 @@ public class FeatureBlockSequenceRenderer extends AbstractChangeable
                 if ((this.renderer != null) &&
                     (this.renderer instanceof Changeable)) {
                     Changeable c = (Changeable) this.renderer;
-                    c.removeChangeListener(rendForwarder);
+                    c.removeChangeListener(rendForwarder, SequenceRenderContext.REPAINT);
                 }
                 this.renderer = renderer;
                 if (renderer instanceof Changeable) {
                     Changeable c = (Changeable) renderer;
-                    c.removeChangeListener(rendForwarder);
+                    c.removeChangeListener(rendForwarder, SequenceRenderContext.REPAINT);
                 }
                 cs.firePostChangeEvent(ce);
             }
@@ -154,15 +155,15 @@ public class FeatureBlockSequenceRenderer extends AbstractChangeable
             this.renderer = renderer;
         }
     }
-    
+
     /**
      * Specifies if the renderer should collapse to zero depth when no
      * features are visible (default <code>true</code>).
      *
      * @since 1.3
      */
-    
-    public void setCollapsing(boolean b) 
+
+    public void setCollapsing(boolean b)
         throws ChangeVetoException
     {
         if (hasListeners()) {
@@ -178,16 +179,16 @@ public class FeatureBlockSequenceRenderer extends AbstractChangeable
             }
         } else {
             this.isCollapsing = b;
-        }                                        
+        }
     }
-    
+
     /**
      * Returns <code>true</code> if this class collapses to zero depth when there are
      * no visible features.
      *
      * @since 1.3
      */
-    
+
     public boolean getCollapsing() {
         return isCollapsing;
     }
@@ -212,21 +213,21 @@ public class FeatureBlockSequenceRenderer extends AbstractChangeable
         return 0.0;
     }
 
-    public void paint(Graphics2D g, SequenceRenderContext src) {
-        for (Iterator i =
-                 src.getFeatures().filter(new FeatureFilter.OverlapsLocation(src.getRange()),
-                                          false).features(); i.hasNext();) {
-            Shape clip = g.getClip();
-            AffineTransform at = g.getTransform();
+  public void paint(Graphics2D g, SequenceRenderContext src) {
+    FeatureFilter filt = FilterUtils.overlapsLocation(GUITools.getVisibleRange(src, g));
+    FeatureHolder feats = src.getFeatures().filter(filt, false);
+    for (Iterator i =feats.features(); i.hasNext();) {
+      Shape clip = g.getClip();
+      AffineTransform at = g.getTransform();
 
-            Feature f = (Feature) i.next();
-            Location l = f.getLocation();
-            renderer.renderFeature(g, f, src);
+      Feature f = (Feature) i.next();
+      Location l = f.getLocation();
+      renderer.renderFeature(g, f, src);
 
-            g.setTransform(at);
-            g.setClip(clip);
-        }
+      g.setTransform(at);
+      g.setClip(clip);
     }
+  }
 
     public SequenceViewerEvent processMouseEvent(SequenceRenderContext src,
                                                  MouseEvent me,

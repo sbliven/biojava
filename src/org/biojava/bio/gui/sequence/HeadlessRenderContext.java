@@ -20,7 +20,7 @@
  */
 package org.biojava.bio.gui.sequence;
 
-import java.awt.Font;
+import java.awt.*;
 import java.awt.geom.Point2D;
 
 import org.biojava.bio.seq.FeatureHolder;
@@ -74,7 +74,7 @@ import org.biojava.bio.symbol.SymbolList;
  * @since 1.3
  * @author Matthew Pocock
  */
- 
+
 public class HeadlessRenderContext
 implements SequenceRenderContext {
   private static final Font FONT = new Font(null, Font.PLAIN, 10);
@@ -83,7 +83,7 @@ implements SequenceRenderContext {
   private final double scale;
   private final Sequence seq;
   private final double offset;
-  
+
   public HeadlessRenderContext(Sequence seq, RangeLocation range, int width) {
     this.seq = seq;
     this.range = range;
@@ -91,47 +91,47 @@ implements SequenceRenderContext {
     (double) (range.getMax() - range.getMin() + 1);
     offset = -( (double) range.getMin() * scale);
   }
-  
+
   public int getDirection() {
     return HORIZONTAL;
   }
-  
+
   public FeatureHolder getFeatures() {
     return seq;
   }
-  
+
   public Font getFont() {
     return FONT;
   }
-  
+
   public SequenceRenderContext.Border getLeadingBorder() {
     return new SequenceRenderContext.Border();
   }
-  
+
   public RangeLocation getRange() {
     return range;
   }
-  
+
   public double getScale() {
     return scale;
   }
-  
+
   public SymbolList getSymbols() {
     return seq;
   }
-  
+
   public SequenceRenderContext.Border getTrailingBorder() {
     return new SequenceRenderContext.Border();
   }
-  
+
   public double sequenceToGraphics(int i) {
     return ((double) (i - 1)) * scale + offset;
   }
-  
+
   public int graphicsToSequence(Point2D point) {
     return graphicsToSequence(point.getX());
   }
-  
+
   public int graphicsToSequence(double d) {
     return ((int) ((d - offset) / scale)) + 1;
   }
