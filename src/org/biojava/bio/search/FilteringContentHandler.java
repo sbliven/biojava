@@ -269,7 +269,6 @@ public class FilteringContentHandler
         if (!skipSubHits) {
             for (Iterator subHitFilterI = subHitFilters.iterator(); subHitFilterI.hasNext();) {
                 BlastLikeSearchFilter sf = (BlastLikeSearchFilter) subHitFilterI.next();
-                System.out.println("evaluating " +sf);
                 sf.evaluate(this);
             }
 
