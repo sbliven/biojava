@@ -27,7 +27,6 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
-import org.biojava.bio.program.xff.*;
 
 import org.biojava.utils.*;
 import org.biojava.utils.stax.*;
@@ -39,7 +38,7 @@ import org.xml.sax.*;
  *
  * @author David Huen
  * @author Thomas Down
- * @since 1.2
+ * @since 1.8
  */
 public class GAMETypePropHandler extends StringElementHandlerBase {
   // The <type> handler is context sensitive as the meaning of type depends on

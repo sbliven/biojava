@@ -35,6 +35,8 @@ import org.xml.sax.*;
 /**
  * Handles the GAME &lt;aspect&gt; element
  *
+ * @author David Huen
+ * @since 1.8
  */
 public class GAMEAspectPropHandler extends StAXPropertyHandler {
   // the <seq> element supplies clone name and length.

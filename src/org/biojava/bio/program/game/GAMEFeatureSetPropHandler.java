@@ -35,6 +35,8 @@ import org.xml.sax.*;
 /**
  * Handles the GAME <feature_set> element
  *
+ * @author David Huen
+ * @since 1.8
  */
 public class GAMEFeatureSetPropHandler extends StAXPropertyHandler {
   // while <feature_set> doesn't invoke creation of features, elements nested

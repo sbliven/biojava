@@ -35,6 +35,9 @@ import org.xml.sax.*;
 /**
  * Handles the GAME &lt;map_position&gt; element
  * Currently, it just ignores it!
+ *
+ * @author David Huen
+ * @since 1.8
  */
 public class GAMEMapPosPropHandler extends StAXPropertyHandler {
   // the <map_position> element supplies details of the map

@@ -27,31 +27,35 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
-import org.biojava.bio.program.xff.*;
 
 import org.biojava.utils.*;
 import org.biojava.utils.stax.*;
 import org.xml.sax.*;
 
 /**
- * StAX handler for GAME &lt;description&gt; elements.
+ * StAX handler for GAME &lt;residues&gt; elements.
  * derived from Thomas Down's PropDetailHandler
+ *
+ * <p>
+ * This takes the sequence supplied by &lt;residues&gt; elements
+ * and feeds it to a StreamParser associated with a SeqIOLIstener
+ * instance.
  *
  * @author David Huen
  * @author Thomas Down
  * @since 1.8
  */
-public class GAMEDescriptionPropHandler extends StringElementHandlerBase {
-  // this just sets up a proprty named "description" in the annotation bundle.
-  public static final StAXHandlerFactory GAME_DESCRIPTION_PROP_HANDLER_FACTORY = new StAXHandlerFactory() {
+public class GAMEResiduesPropHandler extends SequenceContentHandlerBase {
+  public static final StAXHandlerFactory GAME_RESIDUES_PROP_HANDLER_FACTORY = new StAXHandlerFactory() {
 	  public StAXContentHandler getHandler(StAXFeatureHandler staxenv) {
-                 return new GAMEDescriptionPropHandler(staxenv);
+                 return new GAMEResiduesPropHandler(staxenv);
 	  }
             } ;
 
   private StAXFeatureHandler staxenv;
+  private TokenParser tokenParser;
 
-  public GAMEDescriptionPropHandler(StAXFeatureHandler staxenv) {
+  public GAMEResiduesPropHandler(StAXFeatureHandler staxenv) {
     super();
     this.staxenv = staxenv;
   }
@@ -63,22 +67,11 @@ public class GAMEDescriptionPropHandler extends StringElementHandlerBase {
                                     DelegationManager dm)
                      throws SAXException
   {
-
     super.startElement(nsURI, localName, qName, attrs, dm);
+
+    // set up StreamParser
+    tokenParser = new TokenParser(DNATools.getDNA());    
+    super.setStreamParser(tokenParser.parseStream(staxenv.featureListener));
   }
 
-  protected void setStringValue(String s)
-        throws SAXException
-  {
-//      System.out.println("GAMEDescriptionPropHandler: string is " + s); 
-      String trimmed = s.trim();
-
-      try {
-        staxenv.featureTemplate.annotation.setProperty("description", trimmed);
-      }
-      catch (ChangeVetoException cve) {
-        System.err.println("GAMEDescriptionPropHandler: veto exception caught.");
-      }
-  }
-  
 }

@@ -37,6 +37,7 @@ import org.xml.sax.*;
  * Handles the &lt;feature_set&gt; element
  *
  * @author David Huen
+ * @since 1.8
  */
 public class GAMEFeatureSetHandler
                extends StAXFeatureHandler
@@ -81,7 +82,7 @@ public class GAMEFeatureSetHandler
       }
       catch (ChangeVetoException cve) {
         // baulk and discard exception
-        System.err.println("GAMEFeatureSetHandler: change vetoed");
+        System.out.println("GAMEFeatureSetHandler: change vetoed");
       }
     }
   }

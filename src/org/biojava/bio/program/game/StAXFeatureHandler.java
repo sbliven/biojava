@@ -43,7 +43,7 @@ import org.xml.sax.*;
  * @author Thomas Down
  * @author David Huen
  *
- * @since 1.2
+ * @since 1.8
  */
 
 public class StAXFeatureHandler extends StAXContentHandlerBase

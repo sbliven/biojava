@@ -39,7 +39,7 @@ import org.xml.sax.*;
  *
  * @author David Huen
  * @author Thomas Down
- * @since 1.2
+ * @since 1.8
  */
 
 public class GAMENamePropHandler extends StringElementHandlerBase {

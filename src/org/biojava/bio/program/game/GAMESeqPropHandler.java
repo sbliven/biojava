@@ -35,6 +35,8 @@ import org.xml.sax.*;
 /**
  * Handles the GAME &lt;seq&gt; element
  *
+ * @since David Huen
+ * @since 1.8
  */
 public class GAMESeqPropHandler 
                extends StAXPropertyHandler 
@@ -50,7 +52,7 @@ public class GAMESeqPropHandler
 //      System.out.println("GAMESeqPropHandler factory called.");
       StAXContentHandler temp = new GAMESeqPropHandler(staxenv);
 //      System.out.println("GAMESeqPropHandler factory created " + temp);  
-      System.out.println("");
+//      System.out.println("");
 //      if (temp == null) System.out.println("GAMESeqPropHandler instantiation failed");
 //      return new GAMESeqPropHandler(staxenv);
       return temp;
@@ -70,6 +72,9 @@ public class GAMESeqPropHandler
     // <description>
     super.addHandler(new ElementRecognizer.ByLocalName("description"),
       GAMEDescriptionPropHandler.GAME_DESCRIPTION_PROP_HANDLER_FACTORY);
+    // <residues>
+    super.addHandler(new ElementRecognizer.ByLocalName("residues"),
+      GAMEResiduesPropHandler.GAME_RESIDUES_PROP_HANDLER_FACTORY);
 //    System.out.println("GAMESeqPropHandler constructor: leaving now.");
   }
 

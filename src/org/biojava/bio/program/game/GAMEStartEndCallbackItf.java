@@ -27,6 +27,11 @@ import java.lang.String;
 /**
  * An interface that can be tested for by nested handlers
  * when trying to do a callback.
+ * This one handles &lt;start&gt; and  &lt;end&gt; element
+ * callbacks.
+ *
+ * @author David Huen
+ * @since 1.8
  */
 public interface GAMEStartEndCallbackItf {
 

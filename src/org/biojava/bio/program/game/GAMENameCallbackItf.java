@@ -27,6 +27,10 @@ import java.lang.String;
 /**
  * An interface that can be tested for by nested handlers
  * when trying to do a callback.
+ * This one handles callbacks from &lt;name&gt; elements.
+ *
+ * @author David Huen
+ * @since 1.8
  */
 public interface GAMENameCallbackItf {
 

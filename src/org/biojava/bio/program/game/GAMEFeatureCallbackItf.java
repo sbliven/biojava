@@ -28,6 +28,11 @@ import org.biojava.bio.seq.StrandedFeature;
 /**
  * An interface that can be tested for by nested handlers
  * when trying to do a callback.
+ * This one handles callbacks from nested elements that
+ * determine strandedness of a nesting element.
+ *
+ * @author David Huen
+ * @since 1.8
  */
 public interface GAMEFeatureCallbackItf {
 

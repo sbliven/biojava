@@ -28,6 +28,12 @@ import org.biojava.bio.seq.StrandedFeature;
 /**
  * An interface that can be tested for by nested handlers
  * when trying to do a callback.
+ * This one allows an element that represents a transcript
+ * to gain information about locations of nested elements
+ * that represent exons/introns.
+ *
+ * @author David Huen
+ * @since 1.8
  */
 public interface GAMETranscriptCallbackItf {
 

@@ -36,6 +36,7 @@ import org.xml.sax.*;
  * Handles the root GAME element
  *
  * @author David Huen
+ * @since 1.8
  */
 public class GAMEHandler extends StAXFeatureHandler {
   // there is only one GAME element encompassing the entire file

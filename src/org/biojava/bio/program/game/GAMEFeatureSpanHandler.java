@@ -37,6 +37,7 @@ import org.xml.sax.*;
  * Handles the &lt;feature_span&gt; element
  *
  * @author David Huen
+ * @since 1.8
  */
 public class GAMEFeatureSpanHandler extends StAXFeatureHandler {
   // <feature_span> is one of the worst elements in GAME.  The type of element
@@ -88,7 +89,7 @@ public class GAMEFeatureSpanHandler extends StAXFeatureHandler {
                 String qName,
                 Attributes attrs)
   {
-//    System.out.println("GAMEFeatureSpanHandler.startElementHandler entered.");
+    System.out.println("GAMEFeatureSpanHandler.startElementHandler entered.");
   }
 */
   public void endElementHandler(

@@ -37,6 +37,7 @@ import org.xml.sax.*;
  * Handles the GAME &lt;annotation&gt; element
  *
  * @author David Huen
+ * @since 1.8
  */
 public class GAMEAnnotationHandler 
                extends StAXFeatureHandler 
