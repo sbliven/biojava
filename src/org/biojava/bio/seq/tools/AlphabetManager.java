@@ -60,6 +60,7 @@ public final class AlphabetManager {
    * Maintains the map from name to alphabet.
    */
   private Map nameToAlphabet;
+  private Map nameToResidue;
   private Map gappedAlphabets;
   private Residue gapResidue;
 
@@ -68,6 +69,7 @@ public final class AlphabetManager {
    */
   {
     nameToAlphabet = new HashMap();
+    nameToResidue = new HashMap();
     gappedAlphabets = new HashMap();
   }
 
@@ -82,6 +84,12 @@ public final class AlphabetManager {
   throws NoSuchElementException{
     return (Alphabet) nameToAlphabet.get(name);
   }
+
+    private Residue residueForName(String name) 
+        throws NoSuchElementException
+    {
+	return (Residue) nameToResidue.get(name);
+    }
 
   /**
    * Register an alphabet by name.
@@ -141,8 +149,6 @@ public final class AlphabetManager {
       InputSource is = Resolver.createInputSource(alphabetURL, true);
       Document doc = XmlDocument.createXmlDocument(is, true);
 
-      Map nameToResidue = new HashMap();
-
       NodeList children = doc.getDocumentElement().getChildNodes();
       for(int i = 0; i < children.getLength(); i++) {
         Element child = (Element) children.item(i);
@@ -193,7 +199,7 @@ public final class AlphabetManager {
       }
     }
 
-    Residue res = new SimpleResidue(symbol, name, (Annotation) null);
+    Residue res = new WellKnownResidue(symbol, name, (Annotation) null);
     res.getAnnotation().setProperty("description", description);
     return res;
   }
@@ -207,7 +213,7 @@ public final class AlphabetManager {
    * @return a new Alphabet
    */
   protected Alphabet alphabetFromXML(Element alph, Map nameToRes) {
-    SimpleAlphabet alphabet = new SimpleAlphabet();
+    SimpleAlphabet alphabet = new WellKnownAlphabet();
 
     NodeList children = alph.getChildNodes();
     for(int i = 0; i < children.getLength(); i++) {
@@ -267,7 +273,7 @@ public final class AlphabetManager {
      * AlphabetManager internal use only.
      */
 
-    private class GappedAlphabet implements Alphabet {
+    private class GappedAlphabet implements Alphabet, Serializable {
 	private Alphabet child;
 
 	GappedAlphabet(Alphabet child) {
@@ -304,6 +310,114 @@ public final class AlphabetManager {
 
 	public Annotation getAnnotation() {
 	    return child.getAnnotation();
+	}
+
+	private Object writeReplace() {
+	    return new GappedAlphabetOPH(child);
+	}
+    }
+
+    /**
+     * Placeholder for a GappedAlphabet in a serialized object
+     * stream.
+     */
+
+
+    private static class GappedAlphabetOPH implements Serializable {
+	private Alphabet child;
+
+	public GappedAlphabetOPH(Alphabet child) {
+	    this.child = child;
+	}
+
+	public GappedAlphabetOPH() {
+	}
+
+	private Object readResolve() throws ObjectStreamException {
+	    try {
+		Alphabet a = AlphabetManager.instance().getGappedAlphabet(child);
+		return a;
+	    } catch (Exception ex) {
+		throw new InvalidObjectException("Couldn't reconstruct gapped Alphabet from " + child.getName());
+	    }
+	} 
+    }
+
+    /**
+     * A well-known alphabet.  In principle this is just like
+     * SimpleAlphabet, but it is replaces by a placeholder in
+     * serialized data.
+     */
+
+    private static class WellKnownAlphabet extends SimpleAlphabet 
+                                           implements Serializable 
+    {
+	private Object writeReplace() {
+	    return new OPH(getName());
+	}
+
+	/**
+	 * Placeholder for a WellKnownAlphabet in a serialized
+	 * object stream.
+	 */
+
+	private static class OPH implements Serializable {
+	    private String name;
+
+	    public OPH(String name) {
+		this.name = name;
+	    }
+	
+	    public OPH() {
+	    }
+
+	    private Object readResolve() throws ObjectStreamException {
+		try {
+		    Alphabet a = AlphabetManager.instance().
+                                    alphabetForName(name);
+		    return a;
+		} catch (NoSuchElementException ex) {
+		    throw new InvalidObjectException("Couldn't resolve alphabet " + name);
+		}
+	    }
+	}
+    }
+
+    /**
+     * A well-known residue.  Replaced by a placeholder in
+     * serialized data.
+     */
+
+    private static class WellKnownResidue extends SimpleResidue
+                                          implements Serializable
+    {
+	public WellKnownResidue(char symbol, String name, Annotation a) {
+	    super(symbol, name, a);
+	}
+
+	private Object writeReplace() {
+	    return new OPH(getName());
+	}
+
+	private static class OPH implements Serializable {
+	    private String name;
+
+	    public OPH(String name) {
+		this.name = name;
+	    }
+	
+	    public OPH() {
+	    }
+
+	    private Object readResolve() throws ObjectStreamException {
+		try {
+		    Residue a = AlphabetManager.instance().
+                                    residueForName(name);
+		    return a;
+		} catch (NoSuchElementException ex) {
+		    throw new InvalidObjectException("Couldn't resolve residue " + name);
+		}
+	    }
 	}
     }
 }
