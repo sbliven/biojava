@@ -42,7 +42,7 @@ import org.biojava.bio.dp.*;
  * @since 1.1
  */ 
 public class DPCompiler implements CellCalculatorFactoryMaker {
-  private final boolean debug = true; //true;
+  private final boolean debug = false; //true;
   
   private final boolean dumpToDisk;
   
@@ -1199,8 +1199,8 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
           int [] advance = getAdvance(state_j);
           
           stateV.add( ByteCode.make_aload    (method.getThis()));
-          stateV.add( ByteCode.make_getfield (transitionFields[state_jIndx]));
-          stateV.add( ByteCode.make_iconst   (transitionIndexers[state_jIndx].indexForSymbol(state)));
+          stateV.add( ByteCode.make_getfield (transitionFields[i]));
+          stateV.add( ByteCode.make_iconst   (transitionIndexers[i].indexForSymbol(state_j)));
           stateV.add( ByteCode.make_daload   ());
           stateV.add( ByteCode.make_aload    (getAdvanced(score, advance)));
           stateV.add( ByteCode.make_iconst   (state_jIndx));
@@ -1292,8 +1292,8 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
             
             // (j_score - max) + transition + emission[j]) // only add emission if emiting state
             scoreNotNaN.add( ByteCode.make_aload        (method.getThis()));
-            scoreNotNaN.add( ByteCode.make_getfield     (transitionFields[state_jIndx]));
-            scoreNotNaN.add( ByteCode.make_iconst       (transitionIndexers[state_jIndx].indexForSymbol(state)));
+            scoreNotNaN.add( ByteCode.make_getfield     (transitionFields[i]));
+            scoreNotNaN.add( ByteCode.make_iconst       (transitionIndexers[i].indexForSymbol(state_j)));
             scoreNotNaN.add( ByteCode.make_daload       ());
             scoreNotNaN.add( ByteCode.make_dadd         ());
             if(state_j instanceof EmissionState) {
