@@ -46,6 +46,34 @@ import org.biojava.utils.*;
 
 public class PhredTools {
 
+   static{
+     List l = new ArrayList(2);
+     l.add(DNATools.getDNA());
+     l.add(IntegerAlphabet.getSubAlphabet(0,60));
+     SimpleAlphabet a = new SimpleAlphabet(
+       new HashSet(
+         ((FiniteAlphabet)AlphabetManager.getCrossProductAlphabet(l)).symbols().toList()
+        ),"PHRED"
+     );
+     AlphabetManager.registerAlphabet("PHRED",a);
+   }
+
+  /**
+   * Retrieves the PHRED alphabet from the AlphabetManager. The Phred alphabet
+   * is a cross product of a subset of the IntegerAlphabet from 0...60 and the
+   * DNA alphabet. The Phred alphabet is finite. It is assumed that no Phred
+   * score would ever exceed 60 which equates to 1 error in a million base pairs.
+   * This seems reasonable as no single sequence run could be expected to exceed
+   * this level of accuracy.
+   *
+   * The Phred Alphabet contains 244 BasisSymbols named, for example, (guanine 47).
+   * The BasisSymbols can be fragmented into their component AtomicSymbols using
+   * the <code>getSymbols()</code> method of BasisSymbol.
+   */
+  public static final FiniteAlphabet getPhredAlphabet(){
+    return (FiniteAlphabet)AlphabetManager.alphabetForName("PHRED");
+  }
+
   /**
    * Writes Phred quality data in a Fasta type format.
    * @param db a bunch of PhredSequence objects

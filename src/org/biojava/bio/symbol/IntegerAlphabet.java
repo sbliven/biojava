@@ -100,6 +100,13 @@ public class IntegerAlphabet
   }
 
   /**
+   * Generates an IntegerSymbol for the provided int argument
+   */
+  public static IntegerSymbol fromInt(int i){
+    return new IntegerSymbol(i);
+  }
+
+  /**
    * Retrieve the single IntegerAlphabet instance.
    *
    * @return the singleton IntegerAlphabet instance
