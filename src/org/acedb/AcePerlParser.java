@@ -69,10 +69,15 @@ public class AcePerlParser {
     } else if (ty.equals("fl")) {
       obj = new StaticFloatValue(Float.parseFloat(va), parent);
     } else if (ty.equals("dt")) {
-      obj = new StaticDateValue(new Date(va), parent);
+      int year = Integer.parseInt(va.substring(0, 4));
+      int month = Integer.parseInt(va.substring(5, 7));
+      int day = Integer.parseInt(va.substring(8, 10));
+      obj = new StaticDateValue(new Date(year, month, day), parent);
     } else if (ty.equals("tx")) {
   	  obj = new StaticStringValue(va, parent);
     } else if (ty.equals("ob")) {
+      va = Ace.encode(va);
+      cl = Ace.encode(cl);
 	    if (parent != null) {
         obj = new StaticReference(
           va,
@@ -87,15 +92,15 @@ public class AcePerlParser {
         );
 	    }
     } else if (ty.equals("tg")) {
-	    obj = new StaticAceNode(va, parent);
+	    obj = new StaticAceNode(Ace.encode(va), parent);
     } else if (ty.equals("model-node")) {
-      obj = new StaticModelNode(va, parent);
+      obj = new StaticModelNode(Ace.encode(va), parent);
     } else if (ty.equals("model-reference")) {
-      obj = new StaticModelReference(va, parent);
+      obj = new StaticModelReference(Ace.encode(va), parent);
     } else if (ty.equals("model-include")) {
-      obj = new StaticModelInclude(va, parent);
+      obj = new StaticModelInclude(Ace.encode(va), parent);
     } else if (ty.equals("model-type")) {
-      obj = new StaticModelType(va, parent);
+      obj = new StaticModelType(Ace.encode(va), parent);
     } else {
       throw new AceError("Don't know how to handle type " + ty);
     }
@@ -129,7 +134,6 @@ public class AcePerlParser {
      } else {
        va = t.nextToken();
      }
-     va = Ace.encode(va);
    } else if (s.equals("cl=>")) {
      if(cl != null) {
        throw new AceError("Resetting old cl value " + cl + " with " + s);
@@ -139,7 +143,6 @@ public class AcePerlParser {
      } else {
        cl = t.nextToken();
      }
-     cl = Ace.encode(cl);
    } else if (s.equals("Pn=>")) {
 		if (! t.nextToken().equals("[")) {
 		    throw new AceError("Unrecoverable parsing error: expecting [");
@@ -188,7 +191,6 @@ public class AcePerlParser {
         } else {
           ty = "model-node";
         }
-        va = Ace.encode(str);
 	    }
 	}
     }

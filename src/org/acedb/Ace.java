@@ -120,14 +120,13 @@ public class Ace {
     
     public static String encode(String s) {
       s = URLEncoder.encode(s);
-      if(s.indexOf("%") != -1) {
+      if(s.indexOf("%") != -1 || s.indexOf("-") != -1) {
         StringBuffer sb = new StringBuffer(s);
         for(int i = sb.length()-1; i >= 0; i--) {
           if(sb.charAt(i) == '%') {
             sb.setCharAt(i, '-');
           } else if(sb.charAt(i) == '-') {
             sb.insert(i, '-');
-            i++;
           }
         }
         s = sb.toString();
@@ -136,9 +135,10 @@ public class Ace {
     }
     
     public static String decode(String s) throws AceException {
+//      System.out.println("decoding '" + s + "'");
       if(s.indexOf("-") != -1) {
         StringBuffer sb = new StringBuffer(s);
-        for(int i = sb.length()-1; i >= 0; i--) {
+        for(int i = 0; i < sb.length(); i++) {
           if(sb.charAt(i) == '-') {
             if(sb.charAt(i+1) == '-') {
               sb.delete(i, i+1);
@@ -154,6 +154,7 @@ public class Ace {
       } catch (Exception e) {
         throw new AceException(e, "Couldn't decode " + s);
       }
+//      System.out.println("decoded as '" + s + "'");
       return s;
     }
 }
