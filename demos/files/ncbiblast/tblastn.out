@@ -1,0 +1,4853 @@
+TBLASTN 2.0.11 [Jan-20-2000]
+
+
+Reference: Altschul, Stephen F., Thomas L. Madden, Alejandro A. Schaffer, 
+Jinghui Zhang, Zheng Zhang, Webb Miller, and David J. Lipman (1997), 
+"Gapped BLAST and PSI-BLAST: a new generation of protein database search
+programs",  Nucleic Acids Res. 25:3389-3402.
+
+Query= sp|P09429|HMG1_HUMAN HIGH MOBILITY GROUP PROTEIN HMG1 (HMG-1) -
+Homo sapiens (Human).
+         (214 letters)
+
+Database: embl.fas
+           442,729 sequences; 675,252,082 total letters
+
+Searching...................................................done
+
+                                                                   Score     E
+Sequences producing significant alignments:                        (bits)  Value
+
+Y00463 Rat mRNA for high mobility group protein HMG1                 326  2e-88
+Z11997 M.musculus mRNA for non-histone chromosomal high-mobilit...   326  2e-88
+M63852 Rat high mobility group 1 protein synthetic gene, comple...   326  2e-88
+M64986 Rat amphoterin mRNA, complete cds.                            326  2e-88
+L38477 Mus musculus (clone Clebp-1) high mobility group 1 prote...   326  2e-88
+U00431 Mus musculus HMG-1 mRNA, complete cds.                        326  2e-88
+X12796 Bovine mRNA for high mobility group 1 (HMG1) protein          326  2e-88
+X12597 Human mRNA for high mobility group-1 protein (HMG-1).         326  2e-88
+M21683;M21684 Pig nonhistone protein HMG1 mRNA, complete cds.        324  9e-88
+D63874 Human mRNA for HMG-1, complete cds.                           322  3e-87
+L08048 Human non-histone chromosomal protein (HMG-1) retropseud...   319  2e-86
+Z95115 Human DNA sequence from BAC 445C9 on chromosome 22q12.1.      303  2e-81
+U21933 Xenopus laevis high mobility group protein-1 (HMG-1) mRN...   297  1e-79
+X62534 H.sapiens HMG-2 mRNA                                          284  1e-75
+J02895 Pig non-histone chromosomal protein (HMG2) mRNA, complet...   283  1e-75
+D84418 Rat mRNA for chromosomal protein HMG2, complete cds.          282  2e-75
+Z46757 M.musculus mRNA for high mobility group 2 protein.            279  2e-74
+M83235 Gallus gallus non-histone chromosomal protein (HMG2) mRN...   279  3e-74
+M80574 Gallus domesticus high-mobility group-2 protein (HMG-2) ...   275  4e-73
+D30765 Xenopus laevis mRNA for HMG-X protein, complete cds.          273  2e-72
+X02666 Trout mRNA for high mobility group protein HMG-T              266  2e-70
+U31513 Ambystoma mexicanum high mobility group protein-2 (HMG-2...   261  9e-69
+X98857 L.fluviatilis mRNA for HMG protein                            257  1e-67
+Y00365 Chinese hamster HMG-1 gene for high mobility group prote...   252  3e-66
+X63463 G.gallus HMG2a mRNA                                           251  8e-66
+AF022465 Mus musculus high mobility group protein homolog HMG4 ...   250  1e-65
+X67668 M.musculus mRNA for high mobility group 2 protein             250  2e-65
+Y10043 Homo sapiens mRNA for high mobility group protein HMG2a       245  6e-64
+D14314 Chicken mRNA for HMG-1, complete cds.                         243  2e-63
+Z17240 Homo sapiens for mRNA encoding HMG2B.                         235  4e-61
+X80457 M.musculus HMG1 gene                                          189  3e-47
+U13881 Drosophila melanogaster DNA-binding protein (DSP1) mRNA,...   183  1e-45
+X81456 D.melanogaster mRNA for an open reading frame                 183  1e-45
+L06453 Strongylocentrotus purpuratus (clone C) high mobility gr...   165  6e-40
+D14718 Human chromosomal protein HMG1 related gene.                  162  3e-39
+AF009343 Mus musculus HMG-like protein (Trf) mRNA, complete cds.     155  7e-38
+M83665 Human high mobility group 2 protein (HMG-2) gene, comple...   107  2e-35
+X89811 D.melanogaster DNA for SSRP2 gene                              82  4e-33
+X80466 M.musculus HMG1-R-227 gene                                    133  3e-30
+X80462 M.musculus HMG1-R-154 gene                                    123  2e-27
+U51677 Human non-histone chromatin protein HMG1 (HMG1) gene, co...   111  7e-24
+Z93931 Human DNA sequence from PAC 438G17 on chromosome 6q22. C...   109  5e-23
+L32859 Rainbow trout HMG-1 gene exons 2-5, complete cds.             100  2e-20
+AC002526 Human PAC clone DJ0558L21 from Xq23, complete sequence.      99  7e-20
+AF003626 Homo sapiens cosmids IM0525, LC1233, Qc3C1, LB1439, Qc...    97  2e-19
+L32954 Rainbow trout HMG-T2 gene exons 1-4, complete cds.             92  7e-18
+X80465 M.musculus HMG1-R-168 gene                                     90  3e-17
+X80467 M.musculus HMG1-R-87 gene                                      59  7e-17
+X80461 M.musculus HMG1-R-145 gene                                     54  1e-16
+X80460 M.musculus HMG1-R-135 gene                                     58  6e-16
+U22831 Caenorhabditis elegans cosmid F47D12.                          83  4e-15
+U00049 Caenorhabditis elegans cosmid C18F10.                          83  4e-15
+X80459 M.musculus HMG1-R-177 gene                                     51  9e-14
+S50213 HMG1-related DNA-binding protein [mice, mRNA, 2569 nt].        75  8e-13
+M26110 Bovine high-mobility-group protein (HMG-1) mRNA, 3' end.       75  1e-12
+L08814 Rat CIIDBP (homologous to human SSRP-1 and mouse T160 ge...    75  1e-12
+U84139 Bos taurus structure-specific recognition protein 1 (SSR...    74  2e-12
+I66608 Sequence 6 from patent US 5670621.                             73  4e-12
+M86737 Human high mobility group box (SSRP1) mRNA, complete cds.      73  4e-12
+I66610 Sequence 9 from patent US 5670621.                             73  4e-12
+I66609 Sequence 8 from patent US 5670621.                             73  4e-12
+D14315 delta-crystallin enhancer binding protein, partial seque...    70  3e-11
+M74017 T.brucei rhodesiense HMG1-like protein mRNA, complete cds.     69  7e-11
+X97906 V.faba mRNA for transcription factor containing HMG-box        68  1e-10
+M95912 Saccharomyces cerevisiae N-acetyltransferase (MAK) compl...    68  1e-10
+Z71255 S.cerevisiae chromosome XVI 165536 bp sequence, cen righ...    68  1e-10
+Z49219;U00094 S.cerevisiae chromosome XVI cosmid 9499.                68  1e-10
+X15317 Yeast NHP6A gene for nonhistone protein                        68  1e-10
+X58282 Maize mRNA for a high mobility group protein                   68  1e-10
+X66077 Z.mays MNB1b mRNA for DNA-binding protein                      68  1e-10
+L08815 Chicken CIIDBP (homologous to human SSRP-1 and mouse T16...    67  2e-10
+X80464 M.musculus HMG1-R-161 gene                                     67  3e-10
+U01348 Rattus norvegicus clone B-0/7 arylamine N-acetyltransfer...    66  4e-10
+U01343 Rattus norvegicus clone A-1 arylamine N-acetyltransferas...    66  4e-10
+AB000637 Canavalia gladiata mRNA for HMG-1, complete cds.             66  5e-10
+X15318 Yeast NHPB gene for nonhistone protein                         65  1e-09
+U01345 Rattus norvegicus clone A-3 arylamine N-acetyltransferas...    65  1e-09
+Z35959;Y13134 S.cerevisiae chromosome II reading frame ORF YBR090c    65  1e-09
+Z21703 V.faba mRNA for HMG box.                                       64  2e-09
+L12169 Japanese morning glory high mobility group protein mRNA ...    63  3e-09
+Z29356 Gallus domesticus of h71t7 gene encoding G.domesticus ex...    62  1e-08
+Z11540 T.aestivum mRNA for high mobility group protein (HMGW)         62  1e-08
+U39747 Ipomoea nil high mobility group protein 2 HMG2 mRNA, com...    62  1e-08
+U80736 Homo sapiens CAGF9 mRNA, partial cds.                          61  2e-08
+AJ002391 Solanum tuberosum mRNA for high mobility group protein       61  2e-08
+AF002226 Nicotiana tabacum DNA-binding protein (T231) mRNA, com...    61  2e-08
+Z50799 H.vulgare mRNA for HMG1/2-like protein.                        61  2e-08
+L31630 Plasmodium falciparum (clone: D10) high mobility group p...    60  3e-08
+M73753 Saccharomyces cerevisiae mitochondrial protein gene, com...    59  5e-08
+Z48952;Z71257 S.cerevisiae chromosome XIII cosmid 9916.               59  5e-08
+Y08298 Z.mays mRNA for HMGc2 protein                                  59  5e-08
+AJ223169 Saccharomyces cerevisiae mRNA for cisplatin-damaged DN...    59  5e-08
+Y14072 Arabidopsis thaliana mRNA for HMG beta1 protein                59  6e-08
+Y14073 Arabidopsis thaliana mRNA for HMG beta2 protein                59  6e-08
+Y09482 A.thaliana mRNA for HMG 1 protein                              59  6e-08
+Y14071 Arabidopsis thaliana mRNA for HMG alpha protein                58  1e-07
+Y08807 Z.mays mRNA for HMG protein                                    58  1e-07
+X80463 M.musculus HMG1-R-159 gene                                     58  1e-07
+I66612 Sequence 12 from patent US 5670621.                            58  1e-07
+I66611 Sequence 10 from patent US 5670621.                            58  1e-07
+X68408 D.melanogaster SSRP1 mRNA                                      58  1e-07
+Z28032;Y13137 S.cerevisiae chromosome XI reading frame ORF YKL032c    58  1e-07
+L16900 Yeast intrastrand crosslink recognition protein (Ixr1) g...    58  1e-07
+X71622 S.cerevisiae DNA sequence for Kazal serine protease inhi...    58  1e-07
+Y14074 Arabidopsis thaliana mRNA for HMG gamma protein                57  2e-07
+X78993 S.cerevisiae genomic DNA 70kb region of the right arm of...    57  3e-07
+Y08297 Z.mays mRNA for HMGc1 protein                                  56  4e-07
+D13491 A.thaliana mRNA for high mobility group protein, complet...    56  4e-07
+X58245 Soybean mRNA for HMG-1 like protein                            56  4e-07
+L08825 Drosophila melanogaster single-stranded recognition prot...    56  6e-07
+L22300 Chilo iridescent virus type 6 zinc finger protein and no...    55  7e-07
+M81360 Babesia bovis non-histone protein mRNA, complete cds.          55  1e-06
+AF000195 Caenorhabditis elegans cosmid C32F10.                        54  2e-06
+X53461;X53260 Human mRNA for upstream binding factor (hUBF)           54  2e-06
+X53390 Human mRNA for upstream binding factor (hUBF)                  54  2e-06
+M61725 Rat transcription factor UBF2 mRNA.                            54  2e-06
+M61726 Rat transcription factor UBF1 mRNA.                            54  2e-06
+X56687 H.sapiens mRNA for autoantigen NOR-90                          54  2e-06
+X60831 Mouse ubf gene for transcription factor UBF                    53  3e-06
+X76774 P.sativum mRNA for HMG1 protein                                53  4e-06
+L42570 Cricetulus griseus ribosomal transcription factor (UBF1)...    53  5e-06
+Y14075 Arabidopsis thaliana mRNA for HMG delta protein                53  5e-06
+L42571 Cricetulus griseus ribosomal transcription factor (UBF2)...    53  5e-06
+U10401 Caenorhabditis elegans cosmid T20B12                           52  6e-06
+X53025 P.falciparum DNA for erythrocyte membrane-associated ant...    52  1e-05
+U57939 Mus musculus mitochondrial transcription factor A gene, ...    50  2e-05
+U63859 Mus musculus mitochondrial transcription factor A pseudo...    50  2e-05
+U63858 Mus musculus mitochondrial transcription factor A mRNA, ...    50  2e-05
+U13695 Human homolog of yeast mutL (hPMS1) gene, complete cds.        50  2e-05
+L07107 Mus musculus HMG box protein mRNA, complete cds.               50  2e-05
+U35728 Xenopus laevis transcription factor A (xl-mtTFA) mRNA, n...    50  4e-05
+M62810 Human mitochondrial transcription factor 1 mRNA, complet...    49  7e-05
+Z48008;Z71256 S.cerevisiae chromosome IV cosmid 8119.                 47  2e-04
+L28094 Barley mRNA sequence.                                          47  3e-04
+M63424 Tetrahymena thermophila high-mobility-group protein C (H...    46  5e-04
+U63860 Mus musculus mitochondrial transcription factor A pseudo...    45  0.001
+Z69727 S.pombe chromosome I cosmid c4G9.                              44  0.002
+Y07542 X.laevis mRNA for SOX3 protein                                 39  0.047
+X86381 P.paniscus SRY gene                                            39  0.047
+Z30265 O.aries sry gene for sex determining region of Y chromosome    39  0.061
+Z30327 B.taurus sry gene for sex-determining region Y                 39  0.080
+Z30321 B.bonasus sry gene encoding sex-determining region Y           39  0.080
+I34580 Sequence 1 from patent US 5596089.                             39  0.080
+E11537 DNA from Y chromosome which contain bovine Sry gene.           39  0.080
+U15569;L36821 Bos taurus sex determining region Y protein (SRY)...    39  0.080
+D83256 Rainbow trout mRNA for SoxP1, complete cds.                    38  0.10
+U66141 Mus musculus transcription factor Sox-M (sox-M) mRNA, pa...    38  0.10
+AF017182 Mus musculus putative transcription factor (Sox10) mRN...    38  0.10
+AJ001029 Rattus norvegicus mRNA for Sox10 protein                     38  0.10
+AJ001183 Homo sapiens mRNA for Sox10 protein                          38  0.10
+Z30646 C.hircus SRY gene for sex determining region Y                 38  0.14
+L29543 Mus pahari sex-determining protein gene, 5' end.               36  0.69
+X89730 R.norvegicus DNA for Sry gene (partial)                        36  0.69
+U70658 Mus hortulanus sex determining protein (Sry) gene, compl...    35  1.2
+AF009521 Mus spretus sex determining protein (Sry) gene, comple...    35  1.2
+U70651 Mus musculus musculus sex determining protein (Sry) gene...    35  1.2
+U70642 Mus musculus domesticus sex determining protein (Sry) gene,    35  1.2
+U70659 Mus spretus sex determining protein (Sry) gene, complete...    35  1.2
+U70657 Mus musculus castaneus sex determining protein (Sry) gen...    35  1.2
+U70654 Mus musculus musculus sex determining protein (Sry) gene...    35  1.2
+U70653 Mus musculus musculus sex determining protein (Sry) gene...    35  1.2
+U70652 Mus musculus musculus sex determining protein (Sry) gene...    35  1.2
+U70650 Mus musculus domesticus sex determining protein (Sry) gene,    35  1.2
+U70649 Mus musculus domesticus sex determining protein (Sry) gene,    35  1.2
+U70648 Mus musculus domesticus sex determining protein (Sry) gene,    35  1.2
+U70647 Mus musculus domesticus sex determining protein (Sry) gene,    35  1.2
+U70646 Mus musculus domesticus sex determining protein (Sry) gene,    35  1.2
+U70645 Mus musculus domesticus sex determining protein (Sry) gene,    35  1.2
+U70644 Mus musculus domesticus sex determining protein (Sry) gene,    35  1.2
+U70641 Mus musculus domesticus sex determining protein (Sry) gene,    35  1.2
+L29550 Mus spicilegus Y-linked sex determining (Sry) gene, part...    35  1.2
+L29544 Mus spretus sex-determing protein gene, 5' end.                35  1.2
+L29551 Mus musculus domesticus Y-linked sex determining (Sry) g...    35  1.2
+AF009519 Mus musculus domesticus sex determining protein (Sry) ...    35  1.2
+U03645 Mus musculus domesticus Torino (Sry) gene, complete cds.       35  1.2
+
+>Y00463 Rat mRNA for high mobility group protein HMG1
+           Length = 825
+           
+ Score =  326 bits (826), Expect = 2e-88
+ Identities = 154/168 (91%), Positives = 154/168 (91%)
+ Frame = +1
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE
+Sbjct: 31  GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 210
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS
+Sbjct: 211 DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 390
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGDVAKKLGEMWNNTAADDKQP              DIAAYRAKGKPD
+Sbjct: 391 IGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEKDIAAYRAKGKPD 534
+
+
+>Z11997 M.musculus mRNA for non-histone chromosomal high-mobility
+           group 1
+           Length = 2231
+           
+ Score =  326 bits (826), Expect = 2e-88
+ Identities = 154/168 (91%), Positives = 154/168 (91%)
+ Frame = +1
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE
+Sbjct: 76  GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 255
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS
+Sbjct: 256 DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 435
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGDVAKKLGEMWNNTAADDKQP              DIAAYRAKGKPD
+Sbjct: 436 IGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEKDIAAYRAKGKPD 579
+
+
+>M63852 Rat high mobility group 1 protein synthetic gene, complete
+           cds.
+           Length = 924
+           
+ Score =  326 bits (826), Expect = 2e-88
+ Identities = 154/168 (91%), Positives = 154/168 (91%)
+ Frame = +2
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE
+Sbjct: 92  GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 271
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS
+Sbjct: 272 DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 451
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGDVAKKLGEMWNNTAADDKQP              DIAAYRAKGKPD
+Sbjct: 452 IGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEKDIAAYRAKGKPD 595
+
+
+>M64986 Rat amphoterin mRNA, complete cds.
+           Length = 1225
+           
+ Score =  326 bits (826), Expect = 2e-88
+ Identities = 154/168 (91%), Positives = 154/168 (91%)
+ Frame = +3
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE
+Sbjct: 126 GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 305
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS
+Sbjct: 306 DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 485
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGDVAKKLGEMWNNTAADDKQP              DIAAYRAKGKPD
+Sbjct: 486 IGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEKDIAAYRAKGKPD 629
+
+
+>L38477 Mus musculus (clone Clebp-1) high mobility group 1 protein
+           (HMG-1)
+           Length = 1225
+           
+ Score =  326 bits (826), Expect = 2e-88
+ Identities = 154/168 (91%), Positives = 154/168 (91%)
+ Frame = +2
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE
+Sbjct: 77  GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 256
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS
+Sbjct: 257 DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 436
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGDVAKKLGEMWNNTAADDKQP              DIAAYRAKGKPD
+Sbjct: 437 IGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEKDIAAYRAKGKPD 580
+
+
+>U00431 Mus musculus HMG-1 mRNA, complete cds.
+           Length = 1308
+           
+ Score =  326 bits (826), Expect = 2e-88
+ Identities = 154/168 (91%), Positives = 154/168 (91%)
+ Frame = +2
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE
+Sbjct: 149 GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 328
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS
+Sbjct: 329 DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 508
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGDVAKKLGEMWNNTAADDKQP              DIAAYRAKGKPD
+Sbjct: 509 IGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEKDIAAYRAKGKPD 652
+
+
+>X12796 Bovine mRNA for high mobility group 1 (HMG1) protein
+           Length = 1236
+           
+ Score =  326 bits (826), Expect = 2e-88
+ Identities = 154/168 (91%), Positives = 154/168 (91%)
+ Frame = +2
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE
+Sbjct: 122 GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 301
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS
+Sbjct: 302 DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 481
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGDVAKKLGEMWNNTAADDKQP              DIAAYRAKGKPD
+Sbjct: 482 IGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEKDIAAYRAKGKPD 625
+
+
+>X12597 Human mRNA for high mobility group-1 protein (HMG-1).
+           Length = 1009
+           
+ Score =  326 bits (826), Expect = 2e-88
+ Identities = 154/168 (91%), Positives = 154/168 (91%)
+ Frame = +2
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE
+Sbjct: 56  GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 235
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS
+Sbjct: 236 DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 415
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGDVAKKLGEMWNNTAADDKQP              DIAAYRAKGKPD
+Sbjct: 416 IGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEKDIAAYRAKGKPD 559
+
+
+>M21683;M21684 Pig nonhistone protein HMG1 mRNA, complete cds.
+           Length = 2192
+           
+ Score =  324 bits (821), Expect = 9e-88
+ Identities = 153/168 (91%), Positives = 153/168 (91%)
+ Frame = +3
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE
+Sbjct: 12  GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 191
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS
+Sbjct: 192 DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 371
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGDVAKKLGEMWNNTAADDK P              DIAAYRAKGKPD
+Sbjct: 372 IGDVAKKLGEMWNNTAADDKHPYEKKAAKLKEKYEKDIAAYRAKGKPD 515
+
+
+>D63874 Human mRNA for HMG-1, complete cds.
+           Length = 1194
+           
+ Score =  322 bits (817), Expect = 3e-87
+ Identities = 153/168 (91%), Positives = 153/168 (91%)
+ Frame = +2
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDPKKPR KMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE
+Sbjct: 80  GKGDPKKPRRKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 259
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS
+Sbjct: 260 DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 439
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGDVAKKLGEMWNNTAADDKQP              DIAAYRAKGKPD
+Sbjct: 440 IGDVAKKLGEMWNNTAADDKQPYEKKAEKLKEKYEKDIAAYRAKGKPD 583
+
+
+>L08048 Human non-histone chromosomal protein (HMG-1)
+           retropseudogene.
+           Length = 1814
+           
+ Score =  319 bits (810), Expect = 2e-86
+ Identities = 152/168 (90%), Positives = 152/168 (90%)
+ Frame = +1
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDPKKP GKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE
+Sbjct: 661 GKGDPKKPTGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 840
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKR PSAFFLFCSEYRPKIKGEHPGLS
+Sbjct: 841 DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRLPSAFFLFCSEYRPKIKGEHPGLS 1020
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGDVAKKLGEMWNNTAADDKQP              DIAAYRAKGKPD
+Sbjct: 1021IGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEKDIAAYRAKGKPD 1164
+
+
+>Z95115 Human DNA sequence from BAC 445C9 on chromosome 22q12.1.
+             Length = 131398
+             
+ Score =  303 bits (767), Expect = 2e-81
+ Identities = 145/167 (86%), Positives = 146/167 (86%)
+ Frame = +1
+
+Query: 2     KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+             KGDPKK RGKMSS+AFF QTCRE HKKKHPDASVN SEFSKKCSERWKTMSAKEKGKFED
+Sbjct: 58000 KGDPKKLRGKMSSHAFFGQTCREAHKKKHPDASVNLSEFSKKCSERWKTMSAKEKGKFED 58179
+
+Query: 62    MAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSI 121
+             MAKADKA YEREMKTYIPPKGETKKKFKDPNAPKR PSAFFLFCS YRPKIKGEHPGLSI
+Sbjct: 58180 MAKADKAHYEREMKTYIPPKGETKKKFKDPNAPKRTPSAFFLFCSAYRPKIKGEHPGLSI 58359
+
+Query: 122   GDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+             GDVAKKLGEMWNNTAADDKQP              DIAAYRAKGKPD
+Sbjct: 58360 GDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEKDIAAYRAKGKPD 58500
+
+
+>U21933 Xenopus laevis high mobility group protein-1 (HMG-1) mRNA,
+           complete
+           Length = 1552
+           
+ Score =  297 bits (752), Expect = 1e-79
+ Identities = 138/168 (82%), Positives = 148/168 (87%)
+ Frame = +3
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDPKKPRGKMSSYA+FVQTCREEHKKKHPDASVNF+EFSKKCSERWKTMS KEK KFE
+Sbjct: 60  GKGDPKKPRGKMSSYAYFVQTCREEHKKKHPDASVNFAEFSKKCSERWKTMS-KEKTKFE 236
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           DMAKADK RYEREMK+YIPPKGETKK+FKDPNAPKRPPSAFFLFCS++RPKIKGEHPG +
+Sbjct: 237 DMAKADKVRYEREMKSYIPPKGETKKRFKDPNAPKRPPSAFFLFCSDFRPKIKGEHPGST 416
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGD+AKKLGEMWNNTA DDK P              D+AAYRAKGKP+
+Sbjct: 417 IGDIAKKLGEMWNNTATDDKLPYERRAAKLKEKYEKDVAAYRAKGKPE 560
+
+
+>X62534 H.sapiens HMG-2 mRNA
+           Length = 1301
+           
+ Score =  284 bits (718), Expect = 1e-75
+ Identities = 132/168 (78%), Positives = 142/168 (83%)
+ Frame = +2
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDP KPRGKMSSYAFFVQTCREEHKKKHPD+SVNF+EFSKKCSERWKTMSAKEK KFE
+Sbjct: 218 GKGDPNKPRGKMSSYAFFVQTCREEHKKKHPDSSVNFAEFSKKCSERWKTMSAKEKSKFE 397
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           DMAK+DKARY+REMK Y+PPKG+ K K KDPNAPKRPPSAFFLFCSE+RPKIK EHPGLS
+Sbjct: 398 DMAKSDKARYDREMKNYVPPKGDKKGKKKDPNAPKRPPSAFFLFCSEHRPKIKSEHPGLS 577
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGD AKKLGEMW+  +A DKQP              DIAAYRAKGK +
+Sbjct: 578 IGDTAKKLGEMWSEQSAKDKQPYEQKAAKLKEKYEKDIAAYRAKGKSE 721
+
+
+>J02895 Pig non-histone chromosomal protein (HMG2) mRNA, complete
+           cds.
+           Length = 1153
+           
+ Score =  283 bits (717), Expect = 1e-75
+ Identities = 132/166 (79%), Positives = 141/166 (84%)
+ Frame = +3
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDP KPRGKMSSYAFFVQTCREEHKKKHPD+SVNF+EFSKKCSERWKTMSAKEK KFE
+Sbjct: 147 GKGDPNKPRGKMSSYAFFVQTCREEHKKKHPDSSVNFAEFSKKCSERWKTMSAKEKSKFE 326
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           DMAK+DKARY+REMK Y+PPKG+ K K KDPNAPKRPPSAFFLFCSE+RPKIK EHPGLS
+Sbjct: 327 DMAKSDKARYDREMKNYVPPKGDKKGKKKDPNAPKRPPSAFFLFCSEHRPKIKSEHPGLS 506
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGK 166
+           IGD AKKLGEMW+  +A DKQP              DIAAYRAKGK
+Sbjct: 507 IGDTAKKLGEMWSEQSAKDKQPYEQKAAKLKEKYEKDIAAYRAKGK 644
+
+
+>D84418 Rat mRNA for chromosomal protein HMG2, complete cds.
+           Length = 1072
+           
+ Score =  282 bits (715), Expect = 2e-75
+ Identities = 131/168 (77%), Positives = 142/168 (83%)
+ Frame = +3
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDP KPRGKMSSYAFFVQTCREEHKKKHPD+SVNF+EFSKKCSERWKTMSAKEK KFE
+Sbjct: 78  GKGDPNKPRGKMSSYAFFVQTCREEHKKKHPDSSVNFAEFSKKCSERWKTMSAKEKSKFE 257
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           D+AK+DKARY+REMK Y+PPKG+ K K KDPNAPKRPPSAFFLFCSE+RPKIK EHPGLS
+Sbjct: 258 DLAKSDKARYDREMKNYVPPKGDKKGKKKDPNAPKRPPSAFFLFCSEHRPKIKSEHPGLS 437
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGD AKKLGEMW+  +A DKQP              DIAAYRAKGK +
+Sbjct: 438 IGDTAKKLGEMWSEQSAKDKQPYEQKAAKLKEKYEKDIAAYRAKGKSE 581
+
+
+>Z46757 M.musculus mRNA for high mobility group 2 protein.
+           Length = 870
+           
+ Score =  279 bits (707), Expect = 2e-74
+ Identities = 131/168 (77%), Positives = 141/168 (82%)
+ Frame = +1
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDP KPRGKMSSYAFFVQTCREEHKKKHPD+SVNF+EFSKKCSERWKTMSAKEK KFE
+Sbjct: 100 GKGDPNKPRGKMSSYAFFVQTCREEHKKKHPDSSVNFAEFSKKCSERWKTMSAKEKSKFE 279
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           D+AK+DKARY+REMK Y+PPKG+ K K KDPNAPKRPPSAFFLFCSE RPKIK EHPGLS
+Sbjct: 280 DLAKSDKARYDREMKNYVPPKGDKKGKKKDPNAPKRPPSAFFLFCSENRPKIKIEHPGLS 459
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGD AKKLGEMW+  +A DKQP              DIAAYRAKGK +
+Sbjct: 460 IGDTAKKLGEMWSEQSAKDKQPYEQKAAKLKEKYEKDIAAYRAKGKSE 603
+
+
+>M83235 Gallus gallus non-histone chromosomal protein (HMG2) mRNA,
+           complete
+           Length = 1083
+           
+ Score =  279 bits (706), Expect = 3e-74
+ Identities = 129/168 (76%), Positives = 140/168 (82%)
+ Frame = +2
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDP KPRGKMSSYA+FVQTCREEHKKKHPD+SVNF+EFS+KCSERWKTMS+KEKGKFE
+Sbjct: 86  GKGDPNKPRGKMSSYAYFVQTCREEHKKKHPDSSVNFAEFSRKCSERWKTMSSKEKGKFE 265
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           +MAK DKARY+REMK Y+PPKGE K K KDPNAPKRPPSAFFLFCSE+RPKIK +HPGLS
+Sbjct: 266 EMAKGDKARYDREMKNYVPPKGEKKGKKKDPNAPKRPPSAFFLFCSEHRPKIKNDHPGLS 445
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGD AKKLGEMW+   A DKQP              DIAAYRAK K D
+Sbjct: 446 IGDTAKKLGEMWSEQLAKDKQPYEQKAAKLKEKYEKDIAAYRAKSKSD 589
+
+
+ Score = 33.2 bits (74), Expect = 3.5
+ Identities = 20/78 (25%), Positives = 34/78 (42%), Gaps = 2/78 (2%)
+ Frame = +2
+
+Query: 63  AKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSI- 121
+           A+  +AR          P  E      DPN P+   S++  F    R + K +HP  S+ 
+Sbjct: 14  AQGARARVANAKPPQPGPAAELAMGKGDPNKPRGKMSSYAYFVQTCREEHKKKHPDSSVN 193
+
+Query: 122 -GDVAKKLGEMWNNTAADDK 140
+             + ++K  E W   ++ +K
+Sbjct: 194 FAEFSRKCSERWKTMSSKEK 253
+
+
+>M80574 Gallus domesticus high-mobility group-2 protein (HMG-2)
+           mRNA,
+           Length = 995
+           
+ Score =  275 bits (696), Expect = 4e-73
+ Identities = 127/168 (75%), Positives = 139/168 (82%)
+ Frame = +1
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDP KPRGKMSSYA+FVQTC  EHKKKHPD+SVNF+EFS+KCSERWKTMS+KEKGKFE
+Sbjct: 103 GKGDPNKPRGKMSSYAYFVQTCPREHKKKHPDSSVNFAEFSRKCSERWKTMSSKEKGKFE 282
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           +MAK DKARY+REMK Y+PPKGE K K KDPNAPKRPPSAFFLFCSE+RPKIK +HPGLS
+Sbjct: 283 EMAKGDKARYDREMKNYVPPKGEKKGKKKDPNAPKRPPSAFFLFCSEHRPKIKNDHPGLS 462
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGD AKKLGEMW+  +A DKQP              DIAAYRAK K D
+Sbjct: 463 IGDTAKKLGEMWSEQSAKDKQPYEQKAAKLKEKYEKDIAAYRAKSKSD 606
+
+
+>D30765 Xenopus laevis mRNA for HMG-X protein, complete cds.
+           Length = 1081
+           
+ Score =  273 bits (690), Expect = 2e-72
+ Identities = 129/168 (76%), Positives = 139/168 (81%), Gaps = 1/168 (0%)
+ Frame = +3
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDP KPRGKMSSYA+FVQTCREEHKKKHPD SVNFS+FSKKCSERWK+MSAKEKGKFE
+Sbjct: 108 GKGDPNKPRGKMSSYAYFVQTCREEHKKKHPDTSVNFSDFSKKCSERWKSMSAKEKGKFE 287
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETK-KKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGL 119
+           D+AK DKARYEREMKTYIPPKGETK K+ KDPNAPKRPPSAFF+FCSE+RP+IK E PGL
+Sbjct: 288 DLAKGDKARYEREMKTYIPPKGETKGKRKKDPNAPKRPPSAFFIFCSEHRPQIKSETPGL 467
+
+Query: 120 SIGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           SIGD AKKLGE+W      DK P              D+AAYRAKGK D
+Sbjct: 468 SIGDTAKKLGELWAEQTPKDKLPHEQKAAKLKEKYEKDVAAYRAKGKSD 614
+
+
+>X02666 Trout mRNA for high mobility group protein HMG-T
+           Length = 716
+           
+ Score =  266 bits (674), Expect = 2e-70
+ Identities = 123/163 (75%), Positives = 137/163 (83%)
+ Frame = +1
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP+KPRGKMSSYA+FVQT REEHKKKHP+ASVNFSEFSKKCSERWKTMSAKEKGKFED+A
+Sbjct: 10  DPRKPRGKMSSYAYFVQTRREEHKKKHPEASVNFSEFSKKCSERWKTMSAKEKGKFEDLA 189
+
+Query: 64  KADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGD 123
+           K DK RYEREM++YIPPKGE KK+FKDPNAPKRP SAFF+FC+++RP++KGE PGLSIGD
+Sbjct: 190 KLDKVRYEREMRSYIPPKGEKKKRFKDPNAPKRPSSAFFIFCADFRPQVKGETPGLSIGD 369
+
+Query: 124 VAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGK 166
+           VAKKLGE WNN  A+DK P              DI AYR KGK
+Sbjct: 370 VAKKLGEKWNNLTAEDKVPYEKKASRLKEKYEKDITAYRNKGK 498
+
+
+ Score = 34.0 bits (76), Expect = 2.0
+ Identities = 17/52 (32%), Positives = 27/52 (51%), Gaps = 2/52 (3%)
+ Frame = +1
+
+Query: 89  KDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSI--GDVAKKLGEMWNNTAADDK 140
+           KDP  P+   S++  F    R + K +HP  S+   + +KK  E W   +A +K
+Sbjct: 7   KDPRKPRGKMSSYAYFVQTRREEHKKKHPEASVNFSEFSKKCSERWKTMSAKEK 168
+
+
+>U31513 Ambystoma mexicanum high mobility group protein-2 (HMG-2)
+           mRNA,
+           Length = 1048
+           
+ Score =  261 bits (659), Expect = 9e-69
+ Identities = 128/168 (76%), Positives = 137/168 (81%), Gaps = 2/168 (1%)
+ Frame = +1
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDP KPRGKMSSYA+FVQTCREEHKKKHPDASVNF+EFSKKCSERWKTM+AKEKGKFE
+Sbjct: 22  GKGDPNKPRGKMSSYAYFVQTCREEHKKKHPDASVNFAEFSKKCSERWKTMNAKEKGKFE 201
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETK-KKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGL 119
+           DMAK DK RY+REMK+Y+PPKGETK KK KDPNAPKR PSAFFLFCSE+R KIK + PGL
+Sbjct: 202 DMAKGDKVRYDREMKSYVPPKGETKGKKKKDPNAPKRLPSAFFLFCSEHRLKIKADCPGL 381
+
+Query: 120 SIGDVAKKLGEMWNNTAADDKQPX-XXXXXXXXXXXXXDIAAYRAKGKPD 168
+           SIGD AKKLGE W+     DK P               DIAAYRAKGK D
+Sbjct: 382 SIGDTAKKLGEKWSEQTPKDKIPSFEQKAAKLKEKYEKDIAAYRAKGKVD 531
+
+
+>X98857 L.fluviatilis mRNA for HMG protein
+           Length = 1650
+           
+ Score =  257 bits (649), Expect = 1e-67
+ Identities = 117/166 (70%), Positives = 138/166 (82%), Gaps = 1/166 (0%)
+ Frame = +1
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDPKKP+GKMSSYA+FVQTCREEHKKK+P+ASVNF+EFSKKCSERWKTMS KEK +FE
+Sbjct: 76  GKGDPKKPKGKMSSYAYFVQTCREEHKKKNPEASVNFAEFSKKCSERWKTMSEKEKTRFE 255
+
+Query: 61  DMAKADKARYEREMKTYIPPKGET-KKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGL 119
+           DMAK DK RY+REMKTY+PPKGE   +K KDPNAPKRPPSAFF++C+EYR K++ E+PGL
+Sbjct: 256 DMAKVDKVRYDREMKTYVPPKGERGSRKKKDPNAPKRPPSAFFIYCAEYRSKVRAENPGL 435
+
+Query: 120 SIGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGK 166
+           +IG +AKKLGEMWNN  AD+K                D+A+YR+KGK
+Sbjct: 436 TIGSIAKKLGEMWNNAPADEKSIYERKTAKLKEKYDKDMASYRSKGK 576
+
+
+>Y00365 Chinese hamster HMG-1 gene for high mobility group protein 1
+           Length = 2058
+           
+ Score =  252 bits (637), Expect = 3e-66
+ Identities = 120/134 (89%), Positives = 120/134 (89%)
+ Frame = +1
+
+Query: 35  VNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAP 94
+           VNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAP
+Sbjct: 1   VNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAP 180
+
+Query: 95  KRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXX 154
+           KRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP            
+Sbjct: 181 KRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKY 360
+
+Query: 155 XXDIAAYRAKGKPD 168
+             DIAAYRAKGKPD
+Sbjct: 361 EKDIAAYRAKGKPD 402
+
+
+ Score = 44.5 bits (103), Expect = 0.001
+ Identities = 22/74 (29%), Positives = 37/74 (49%)
+ Frame = +1
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP  P+   S++  F    R + K +HP  S+   + +KK  E W   +A +K  +E  A
+Sbjct: 166 DPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIG--DVAKKLGEMWNNTAADDKQPYEKKA 339
+
+Query: 64  KADKARYEREMKTY 77
+              K +YE+++  Y
+Sbjct: 340 AKLKEKYEKDIAAY 381
+
+
+>X63463 G.gallus HMG2a mRNA
+           Length = 1073
+           
+ Score =  251 bits (634), Expect = 8e-66
+ Identities = 118/167 (70%), Positives = 135/167 (80%)
+ Frame = +1
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           KGDPKKP+GKMS+YAFFVQTCREEHKKK+P+  VNF+EFSKKCSERWKTMS+KEK KF++
+Sbjct: 67  KGDPKKPKGKMSAYAFFVQTCREEHKKKNPEVPVNFAEFSKKCSERWKTMSSKEKAKFDE 246
+
+Query: 62  MAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSI 121
+           MAKADK RY+REMK Y P KG  KK  KDPNAPKRPPSAFFLFCSE+RPKIK  +PG+SI
+Sbjct: 247 MAKADKVRYDREMKDYGPAKGGKKK--KDPNAPKRPPSAFFLFCSEFRPKIKSTNPGISI 420
+
+Query: 122 GDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           GDVAKKLGEMWNN +  +KQP              D+A Y++KGK D
+Sbjct: 421 GDVAKKLGEMWNNLSDGEKQPYNNKAAKLKEKYEKDVADYKSKGKFD 561
+
+
+>AF022465 Mus musculus high mobility group protein homolog HMG4
+           (Hmg4) mRNA,
+           Length = 1502
+           
+ Score =  250 bits (633), Expect = 1e-65
+ Identities = 117/167 (70%), Positives = 135/167 (80%)
+ Frame = +1
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           KGDPKKP+GKMS+YAFFVQTCREEHKKK+P+  VNF+EFSKKCSERWKTMS+KEK KF++
+Sbjct: 34  KGDPKKPKGKMSAYAFFVQTCREEHKKKNPEVPVNFAEFSKKCSERWKTMSSKEKSKFDE 213
+
+Query: 62  MAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSI 121
+           MAKADK RY+REMK Y P KG  KK  KDPNAPKRPPS FFLFCSE+RPKIK  +PG+SI
+Sbjct: 214 MAKADKVRYDREMKDYGPAKGGKKK--KDPNAPKRPPSGFFLFCSEFRPKIKSTNPGISI 387
+
+Query: 122 GDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           GDVAKKLGEMWNN + ++KQP              D+A Y++KGK D
+Sbjct: 388 GDVAKKLGEMWNNLSDNEKQPYVTKAAKLKEKYEKDVADYKSKGKFD 528
+
+
+>X67668 M.musculus mRNA for high mobility group 2 protein
+           Length = 847
+           
+ Score =  250 bits (631), Expect = 2e-65
+ Identities = 119/168 (70%), Positives = 132/168 (77%)
+ Frame = +1
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           GKGDP KP GKMSSYAFFVQTCREEHKKKHP++SVNF+E SKKCS+RWKTMSAKE  KFE
+Sbjct: 139 GKGDPIKPLGKMSSYAFFVQTCREEHKKKHPNSSVNFAEISKKCSKRWKTMSAKENSKFE 318
+
+Query: 61  DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           D+AK+DKA Y REMK Y+ PKG+ K K KDPNAPKRPPSAF LFCSE RPKIK E+PGLS
+Sbjct: 319 DLAKSDKACYYREMKNYVSPKGDKKGKKKDPNAPKRPPSAFCLFCSENRPKIKIEYPGLS 498
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           IGD AKKLGEMW+  +A +KQP              D AAYR KGK +
+Sbjct: 499 IGDTAKKLGEMWSEQSAKEKQPYEQKAAKLKEKYEKDFAAYRVKGKSE 642
+
+
+>Y10043 Homo sapiens mRNA for high mobility group protein HMG2a
+           Length = 1633
+           
+ Score =  245 bits (618), Expect = 6e-64
+ Identities = 115/167 (68%), Positives = 131/167 (77%)
+ Frame = +3
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           KGDPKKP+GK S+YAFFVQTCREEHKKK+P+  VNF+EFSKKCSERWKT+S KEK KF++
+Sbjct: 93  KGDPKKPKGKTSAYAFFVQTCREEHKKKNPEVPVNFAEFSKKCSERWKTVSGKEKSKFDE 272
+
+Query: 62  MAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSI 121
+           MAKADK RY+REMK Y P KG  KK  KDPNAPKRPPS FFLFCSE+RPKIK  +PG+SI
+Sbjct: 273 MAKADKVRYDREMKDYGPAKGGKKK--KDPNAPKRPPSGFFLFCSEFRPKIKSTNPGISI 446
+
+Query: 122 GDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           GDVAKKLGEMWNN    +KQP              D+A Y++KGK D
+Sbjct: 447 GDVAKKLGEMWNNLNDSEKQPYITKAAKLKEKYEKDVADYKSKGKFD 587
+
+
+>D14314 Chicken mRNA for HMG-1, complete cds.
+           Length = 740
+           
+ Score =  243 bits (613), Expect = 2e-63
+ Identities = 116/167 (69%), Positives = 133/167 (79%)
+ Frame = +3
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           KGDPKKP+GKMS+YAFFVQTCREEHKK +P+  VNF+EFSKKCSERWKTMS+KEK KF++
+Sbjct: 27  KGDPKKPKGKMSAYAFFVQTCREEHKK-NPEVPVNFAEFSKKCSERWKTMSSKEKAKFDE 203
+
+Query: 62  MAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSI 121
+           MAKADK RY+REMK Y P KG  KKK  DPNAPKRPPS FFLFCSE+RPKIK  +PG+SI
+Sbjct: 204 MAKADKVRYDREMKDYGPAKGGKKKK--DPNAPKRPPSGFFLFCSEFRPKIKSTNPGISI 377
+
+Query: 122 GDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           GDVAKKLGEMWNN +  +KQP              D+A Y++KGK D
+Sbjct: 378 GDVAKKLGEMWNNLSDGEKQPYNNKAAKLKEKYEKDVADYKSKGKFD 518
+
+
+>Z17240 Homo sapiens for mRNA encoding HMG2B.
+           Length = 1066
+           
+ Score =  235 bits (594), Expect = 4e-61
+ Identities = 110/146 (75%), Positives = 120/146 (81%)
+ Frame = +1
+
+Query: 23  REEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKG 82
+           REEHKKKHPD+SVNF+EFSKKCSERWKTMSAKEK KFEDMAK+DKARY+REMK Y+PPKG
+Sbjct: 1   REEHKKKHPDSSVNFAEFSKKCSERWKTMSAKEKSKFEDMAKSDKARYDREMKNYVPPKG 180
+
+Query: 83  ETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 142
+           + K K KDPNAPKRPPSAFFLFCSE+RPKIK EHPGLSIGD AKKLGEMW+  +A DKQP
+Sbjct: 181 DKKGKKKDPNAPKRPPSAFFLFCSEHRPKIKSEHPGLSIGDTAKKLGEMWSEQSAKDKQP 360
+
+Query: 143 XXXXXXXXXXXXXXDIAAYRAKGKPD 168
+                         DIAAY AKGK +
+Sbjct: 361 YEQKAAKLKEKYEKDIAAYGAKGKSE 438
+
+
+ Score = 53.5 bits (126), Expect = 3e-06
+ Identities = 30/93 (32%), Positives = 47/93 (50%)
+ Frame = +1
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           K DP  P+   S++  F    R + K +HP  S+   + +KK  E W   SAK+K  +E 
+Sbjct: 196 KKDPNAPKRPPSAFFLFCSEHRPKIKSEHPGLSIG--DTAKKLGEMWSEQSAKDKQPYEQ 369
+
+Query: 62  MAKADKARYEREMKTYIPPKGETKKKFKDPNAP 94
+            A   K +YE+++  Y   KG+++   K P  P
+Sbjct: 370 KAAKLKEKYEKDIAAY-GAKGKSEAGKKGPGRP 465
+
+
+>X80457 M.musculus HMG1 gene
+           Length = 2547
+           
+ Score =  189 bits (475), Expect = 3e-47
+ Identities = 98/98 (100%), Positives = 98/98 (100%), Gaps = 49/98 (50%)
+ Frame = +2
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWK----------- 49
+           GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWK           
+Sbjct: 176 GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKVRGL*RC*VPL 355
+
+Query: 50  --------------------------------------TMSAKEKGKFEDMAKADKARYE 71
+                                                 TMSAKEKGKFEDMAKADKARYE
+Sbjct: 356 SCKLG*TGWVFSLLYDY*SALGWHIEHLYVKFTNNSF*TMSAKEKGKFEDMAKADKARYE 535
+
+Query: 72  REMKTYIPPKGETKKKFKDPNAPKRPP 98
+           REMKTYIPPKGETKKKFKDPNAPKRPP
+Sbjct: 536 REMKTYIPPKGETKKKFKDPNAPKRPP 616
+
+
+ Score = 97.9 bits (240), Expect = 1e-19
+ Identities = 44/44 (100%), Positives = 44/44 (100%)
+ Frame = +2
+
+Query: 99   SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 142
+            SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP
+Sbjct: 1010 SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 1141
+
+
+ Score = 35.6 bits (80), Expect = 0.69
+ Identities = 19/63 (30%), Positives = 31/63 (49%)
+ Frame = +2
+
+Query: 10   GKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKAR 69
+            G  S++  F    R + K +HP  S+   + +KK  E W   +A +K  +E  A   K +
+Sbjct: 1001 GFSSAFFLFCSEYRPKIKGEHPGLSIG--DVAKKLGEMWNNTAADDKQPYEKKAAKLKEK 1174
+
+Query: 70   YER 72
+            YE+
+Sbjct: 1175 YEK 1183
+
+
+>U13881 Drosophila melanogaster DNA-binding protein (DSP1) mRNA,
+           complete
+           Length = 1900
+           
+ Score =  183 bits (461), Expect = 1e-45
+ Identities = 84/160 (52%), Positives = 113/160 (70%), Gaps = 6/160 (3%)
+ Frame = +1
+
+Query: 7   KPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKAD 66
+           KPRG+M++YA+FVQTCREEHKKKHPD +V F+EFS+KC+ERWKTM  KEK +F +MA+ D
+Sbjct: 712 KPRGRMTAYAYFVQTCREEHKKKHPDETVIFAEFSRKCAERWKTMVDKEKKRFHEMAEKD 891
+
+Query: 67  KARYEREMKTYIPPK------GETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+           K RYE EM+ Y+PPK      G+ +K+ KDPNAPKR  SAFF FC++ R K+K  +P   
+Sbjct: 892 KQRYEAEMQNYVPPKGALWDRGKKRKQIKDPNAPKRSLSAFFWFCNDERNKVKALNPEFG 1071
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGK 166
+           +GD+AK+LG  W++   + KQ               ++  Y+  GK
+Sbjct: 1072VGDIAKELGRKWSDVDPEVKQKYESMAERDKARYEREMTEYKTSGK 1209
+
+
+>X81456 D.melanogaster mRNA for an open reading frame
+            Length = 2852
+            
+ Score =  183 bits (461), Expect = 1e-45
+ Identities = 84/160 (52%), Positives = 113/160 (70%), Gaps = 6/160 (3%)
+ Frame = +2
+
+Query: 7    KPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKAD 66
+            KPRG+M++YA+FVQTCREEHKKKHPD +V F+EFS+KC+ERWKTM  KEK +F +MA+ D
+Sbjct: 1250 KPRGRMTAYAYFVQTCREEHKKKHPDETVIFAEFSRKCAERWKTMVDKEKKRFHEMAEKD 1429
+
+Query: 67   KARYEREMKTYIPPK------GETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+            K RYE EM+ Y+PPK      G+ +K+ KDPNAPKR  SAFF FC++ R K+K  +P   
+Sbjct: 1430 KQRYEAEMQNYVPPKGAVVGRGKKRKQIKDPNAPKRSLSAFFWFCNDERNKVKALNPEFG 1609
+
+Query: 121  IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGK 166
+            +GD+AK+LG  W++   + KQ               ++  Y+  GK
+Sbjct: 1610 VGDIAKELGRKWSDVDPEVKQKYESMAERDKARYEREMTEYKTSGK 1747
+
+
+>L06453 Strongylocentrotus purpuratus (clone C) high mobility group
+           1
+           Length = 1755
+           
+ Score =  165 bits (413), Expect = 6e-40
+ Identities = 81/164 (49%), Positives = 102/164 (61%), Gaps = 3/164 (1%)
+ Frame = +2
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           D  KPRG+MS+YA+FVQ  R EH K HP++ V F+EFSK CS RWK +  K KG F + +
+Sbjct: 119 DSSKPRGRMSAYAYFVQDSRAEHGKNHPNSPVRFAEFSKDCSARWKALEEKGKGVFHEKS 298
+
+Query: 64  KADKARYEREMKTYIPPKGETKK---KFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+             DK RY+REM++Y PPKGE  K   + KDP+APKR  SAFF+F  E R  IK  HP  S
+Sbjct: 299 MRDKVRYDREMQSYKPPKGEKNKRRRRRKDPDAPKRNLSAFFIFSGENRAAIKSVHPNWS 478
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKP 167
+           +GD+AK+L   W    A +K P               +A Y+AK KP
+Sbjct: 479 VGDIAKELAVRWRAMTAGEKIPFDKGAAKDKERYIKAMAEYKAKAKP 619
+
+
+ Score = 49.2 bits (115), Expect = 5e-05
+ Identities = 29/97 (29%), Positives = 48/97 (48%)
+ Frame = +2
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP  P+  +S++  F    R   K  HP+ SV   + +K+ + RW+ M+A EK  F+  A
+Sbjct: 386 DPDAPKRNLSAFFIFSGENRAAIKSVHPNWSVG--DIAKELAVRWRAMTAGEKIPFDKGA 559
+
+Query: 64  KADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSA 100
+             DK RY + M  Y       K++ K+ ++     S+
+Sbjct: 560 AKDKERYIKAMAEYKAKAKPMKRQVKESSSSSSSDSS 670
+
+
+>D14718 Human chromosomal protein HMG1 related gene.
+            Length = 2140
+            
+ Score =  162 bits (407), Expect = 3e-39
+ Identities = 79/105 (75%), Positives = 81/105 (76%)
+ Frame = +3
+
+Query: 64   KADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGD 123
+            K DKA YERE+KT IPPKGETKKKFKDPNAPKRPPSAFFLFCSEY PKIKGE  GL I D
+Sbjct: 1110 KGDKAHYEREVKT*IPPKGETKKKFKDPNAPKRPPSAFFLFCSEYHPKIKGEQLGLPISD 1289
+
+Query: 124  VAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+            V KKLGEMWNNTAA+DKQP              DIAAY AKGKPD
+Sbjct: 1290 VVKKLGEMWNNTAAEDKQPCEKKAAKLKEKYKKDIAAY*AKGKPD 1424
+
+
+ Score =  138 bits (344), Expect = 8e-32
+ Identities = 67/95 (70%), Positives = 75/95 (78%)
+ Frame = +1
+
+Query: 1    GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+            GKGD KKPRGKMSSYAFFVQTCREEHKK+HPDASVNFSEFSKK SERWKTMSAKEKG+FE
+Sbjct: 922  GKGDSKKPRGKMSSYAFFVQTCREEHKKQHPDASVNFSEFSKKGSERWKTMSAKEKGQFE 1101
+
+Query: 61   DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPK 95
+            DMAK  +   + + K    PKG  K+  + P  P+
+Sbjct: 1102 DMAKVTRPIMKEK*KPKSLPKGRQKRSSRIPMHPR 1206
+
+
+ Score = 37.5 bits (85), Expect = 0.18
+ Identities = 22/74 (29%), Positives = 35/74 (46%), Gaps = 1/74 (1%)
+ Frame = +3
+
+Query: 4    DPKKPRGKMSSYAFFVQTCREEHKK-KHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDM 62
+            DP  P+   S++  F   C E H K K     +  S+  KK  E W   +A++K   E  
+Sbjct: 1188 DPNAPKRPPSAFFLF---CSEYHPKIKGEQLGLPISDVVKKLGEMWNNTAAEDKQPCEKK 1358
+
+Query: 63   AKADKARYEREMKTY 77
+            A   K +Y++++  Y
+Sbjct: 1359 AAKLKEKYKKDIAAY 1403
+
+
+>AF009343 Mus musculus HMG-like protein (Trf) mRNA, complete cds.
+           Length = 1328
+           
+ Score =  155 bits (387), Expect(2) = 7e-38
+ Identities = 72/80 (90%), Positives = 75/80 (93%)
+ Frame = +3
+
+Query: 7   KPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKAD 66
+           + R KMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKAD
+Sbjct: 156 RSRDKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKAD 335
+
+Query: 67  KARYEREMKTYIPPKGETKK 86
+           KARY REMKTY PPKG+ K+
+Sbjct: 336 KARYGREMKTYTPPKGDQKE 395
+
+
+ Score =  154 bits (385), Expect = 1e-36
+ Identities = 77/115 (66%), Positives = 84/115 (72%)
+ Frame = +1
+
+Query: 54  KEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIK 113
+           K++G  +   +  +   E + K   PPK ETKKKFKDPNAPKRPPSAFFLFCSEYRPKIK
+Sbjct: 298 KKRGNLKIWQRLTRLVMEEK*KPTPPPK-ETKKKFKDPNAPKRPPSAFFLFCSEYRPKIK 474
+
+Query: 114 GEHPGLSIGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           GEHP LSIGD+AKKLGEMWNNTAADDKQP              DIAAYRAKGKPD
+Sbjct: 475 GEHPRLSIGDLAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEKDIAAYRAKGKPD 639
+
+
+ Score = 44.5 bits (103), Expect = 0.001
+ Identities = 22/74 (29%), Positives = 37/74 (49%)
+ Frame = +1
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP  P+   S++  F    R + K +HP  S+   + +KK  E W   +A +K  +E  A
+Sbjct: 403 DPNAPKRPPSAFFLFCSEYRPKIKGEHPRLSIG--DLAKKLGEMWNNTAADDKQPYEKKA 576
+
+Query: 64  KADKARYEREMKTY 77
+              K +YE+++  Y
+Sbjct: 577 AKLKEKYEKDIAAY 618
+
+
+ Score = 24.7 bits (52), Expect(2) = 7e-38
+ Identities = 9/9 (100%), Positives = 9/9 (100%)
+ Frame = +2
+
+Query: 1   GKGDPKKPR 9
+           GKGDPKKPR
+Sbjct: 140 GKGDPKKPR 166
+
+
+>M83665 Human high mobility group 2 protein (HMG-2) gene, complete
+            cds.
+            Length = 4341
+            
+ Score =  107 bits (264), Expect = 2e-22
+ Identities = 46/55 (83%), Positives = 50/55 (90%)
+ Frame = +1
+
+Query: 1    GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKE 55
+            GKGDP KPRGKMSSYAFFVQTCREEHKKKHPD+SVNF+EFSKKCSERWK    ++
+Sbjct: 1672 GKGDPNKPRGKMSSYAFFVQTCREEHKKKHPDSSVNFAEFSKKCSERWKVRQERD 1836
+
+
+ Score = 90.1 bits (220), Expect(2) = 2e-35
+ Identities = 40/50 (80%), Positives = 45/50 (90%)
+ Frame = +1
+
+Query: 49   KTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPP 98
+            +TMSAKEK KFEDMAK+DKARY+REMK Y+PPKG+ K K KDPNAPKRPP
+Sbjct: 2101 QTMSAKEKSKFEDMAKSDKARYDREMKNYVPPKGDKKGKKKDPNAPKRPP 2250
+
+
+ Score = 81.5 bits (198), Expect(2) = 2e-35
+ Identities = 36/44 (81%), Positives = 39/44 (87%)
+ Frame = +2
+
+Query: 99   SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 142
+            SAFFLFCSE+RPKIK EHPGLSIGD AKKLGEMW+  +A DKQP
+Sbjct: 2324 SAFFLFCSEHRPKIKSEHPGLSIGDTAKKLGEMWSEQSAKDKQP 2455
+
+
+ Score = 38.7 bits (88), Expect = 0.080
+ Identities = 20/60 (33%), Positives = 31/60 (51%)
+ Frame = +2
+
+Query: 13   SSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYER 72
+            S++  F    R + K +HP  S+   + +KK  E W   SAK+K  +E  A   K +YE+
+Sbjct: 2324 SAFFLFCSEHRPKIKSEHPGLSIG--DTAKKLGEMWSEQSAKDKQPYEQKAAKLKEKYEK 2497
+
+
+>X89811 D.melanogaster DNA for SSRP2 gene
+            Length = 5713
+            
+ Score = 82.3 bits (200), Expect(2) = 4e-33
+ Identities = 33/43 (76%), Positives = 41/43 (94%)
+ Frame = +1
+
+Query: 7    KPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWK 49
+            KPRG+M++YA+FVQTCREEHKKKHPD +V F+EFS+KC+ERWK
+Sbjct: 3661 KPRGRMTAYAYFVQTCREEHKKKHPDETVIFAEFSRKCAERWK 3789
+
+
+ Score = 81.5 bits (198), Expect(2) = 4e-33
+ Identities = 48/92 (52%), Positives = 66/92 (71%), Gaps = 49/92 (53%)
+ Frame = +2
+
+Query: 50   TMSAKEKGKFEDMAKADKARYEREMKTYIPPK------GETKKKFKDPNAPKRP------ 97
+            TM  KEK +F +MA+ DK RYE EM+ Y+PPK      G+ +K+ KDPNAPKR       
+Sbjct: 3866 TMVDKEKKRFHEMAEKDKQRYEAEMQNYVPPKGAVVGRGKKRKQIKDPNAPKRSL*VRSK 4045
+
+Query: 98   -------------------------------------PSAFFLFCSEYRPKIKGEHPGLS 120
+                                                  SAFF FC++ R K+K  +P   
+Sbjct: 4046 VNYHIIRYSAYKSM*LQEI*SESDQ**CLLCSILPLFRSAFFWFCNDERNKVKALNPEFG 4225
+
+Query: 121  IGDVAKKLGEMWNNTAADDKQ 141
+            +GD+AK+LG  W++   + KQ
+Sbjct: 4226 VGDIAKELGRKWSDVDPEVKQ 4288
+
+
+ Score = 40.2 bits (92), Expect = 0.027
+ Identities = 20/57 (35%), Positives = 30/57 (52%)
+ Frame = +2
+
+Query: 16   AFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYER 72
+            AFF     E +K K  +      + +K+   +W  +  + K K+E MA+ DKARYER
+Sbjct: 4163 AFFWFCNDERNKVKALNPEFGVGDIAKELGRKWSDVDPEVKQKYESMAERDKARYER 4333
+
+
+>X80466 M.musculus HMG1-R-227 gene
+          Length = 184
+          
+ Score =  133 bits (331), Expect = 3e-30
+ Identities = 61/61 (100%), Positives = 61/61 (100%)
+ Frame = +1
+
+Query: 4  DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+          DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA
+Sbjct: 1  DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 180
+
+Query: 64 K 64
+          K
+Sbjct: 181K 183
+
+
+ Score = 32.8 bits (73), Expect = 4.6
+ Identities = 16/51 (31%), Positives = 26/51 (50%), Gaps = 2/51 (3%)
+ Frame = +1
+
+Query: 90  DPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSI--GDVAKKLGEMWNNTAADDK 140
+           DP  P+   S++  F    R + K +HP  S+   + +KK  E W   +A +K
+Sbjct: 1   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEK 159
+
+
+>X80462 M.musculus HMG1-R-154 gene
+          Length = 190
+          
+ Score =  123 bits (307), Expect = 2e-27
+ Identities = 57/62 (91%), Positives = 58/62 (92%)
+ Frame = +1
+
+Query: 1  GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+          GKGDPKKPRGKMSSYA FV+TC EEHKKKHPDASVNFS FSKKCSERWKTMSAKEKGKFE
+Sbjct: 4  GKGDPKKPRGKMSSYALFVKTCWEEHKKKHPDASVNFSGFSKKCSERWKTMSAKEKGKFE 183
+
+Query: 61 DM 62
+           M
+Sbjct: 184GM 189
+
+
+>U51677 Human non-histone chromatin protein HMG1 (HMG1) gene,
+          complete cds.
+          Length = 2575
+          
+ Score =  111 bits (276), Expect = 7e-24
+ Identities = 50/54 (92%), Positives = 50/54 (92%)
+ Frame = +1
+
+Query: 1  GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAK 54
+          GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWK    K
+Sbjct: 4  GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKVRGLK 165
+
+
+ Score =  107 bits (264), Expect = 2e-22
+ Identities = 51/55 (92%), Positives = 51/55 (92%)
+ Frame = +3
+
+Query: 50  TMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLF 104
+           TMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPP    LF
+Sbjct: 330 TMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPP*VSCLF 494
+
+
+ Score = 97.9 bits (240), Expect = 1e-19
+ Identities = 44/44 (100%), Positives = 44/44 (100%)
+ Frame = +2
+
+Query: 99   SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 142
+            SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP
+Sbjct: 971  SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 1102
+
+
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 18/60 (30%), Positives = 30/60 (50%)
+ Frame = +2
+
+Query: 13   SSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYER 72
+            S++  F    R + K +HP  S+   + +KK  E W   +A +K  +E  A   K +YE+
+Sbjct: 971  SAFFLFCSEYRPKIKGEHPGLSIG--DVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEK 1144
+
+
+>Z93931 Human DNA sequence from PAC 438G17 on chromosome 6q22. Contains
+             Length = 148198
+             
+ Score =  109 bits (269), Expect = 5e-23
+ Identities = 54/81 (66%), Positives = 64/81 (78%), Gaps = 11/81 (13%)
+ Frame = -3
+
+Query: 2     KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+             K DPK+P+GKMS+YAFFVQ  REEHKKK+ +  +NF+EFSK CSERWKTMS KEK KF++
+Sbjct: 95804 KVDPKEPKGKMSAYAFFVQMGREEHKKKNLEFPINFTEFSKNCSERWKTMSGKEKSKFDE 95625
+
+Query: 62    MAKADKARY-----------EREMKTYIPPKG 82
+             MAKADK              E   +T  PPKG
+Sbjct: 95624 MAKADKYTMIGR*RIKNQLREARRRTLTPPKG 95529
+
+
+ Score = 62.5 bits (149), Expect(2) = 7e-13
+ Identities = 32/57 (56%), Positives = 40/57 (70%)
+ Frame = -2
+
+Query: 70    YEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAK 126
+             Y+ E+K   P KG  KK   +PNAPKRPPS FFLF SE+  KIK  +P +SIGD++K
+Sbjct: 95601 YDWEIKN*EPAKGGKKK---NPNAPKRPPSGFFLFYSEFCHKIKSTNPDISIGDMSK 95440
+
+
+ Score = 33.2 bits (74), Expect(2) = 7e-13
+ Identities = 18/43 (41%), Positives = 22/43 (50%)
+ Frame = -1
+
+Query: 126   KKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+             KKLGEMWNN    +KQP              D+A  ++KGK D
+Sbjct: 95443 KKLGEMWNNLNDSEKQP-YITKVAQLKKYEKDVADCKSKGKFD 95318
+
+
+>L32859 Rainbow trout HMG-1 gene exons 2-5, complete cds.
+            Length = 3882
+            
+ Score =  100 bits (246), Expect = 2e-20
+ Identities = 43/46 (93%), Positives = 46/46 (99%)
+ Frame = +2
+
+Query: 4    DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWK 49
+            DP+KPRGKMSSYA+FVQTCREEHKKKHP+ASVNFSEFSKKCSERWK
+Sbjct: 1286 DPRKPRGKMSSYAYFVQTCREEHKKKHPEASVNFSEFSKKCSERWK 1423
+
+
+ Score = 97.1 bits (238), Expect = 2e-19
+ Identities = 44/57 (77%), Positives = 48/57 (84%)
+ Frame = +2
+
+Query: 41   SKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRP 97
+            S  C    KTMSAKEKGKFED+AK DK RYEREM++YIPPKGE KK+FKDPNAPKRP
+Sbjct: 1820 SSCCCSSLKTMSAKEKGKFEDLAKLDKVRYEREMRSYIPPKGEKKKRFKDPNAPKRP 1990
+
+
+ Score = 78.0 bits (189), Expect = 1e-13
+ Identities = 34/55 (61%), Positives = 42/55 (75%)
+ Frame = +3
+
+Query: 88   FKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 142
+            F  P +     SAFF+FC+++RP++KGE PGLSIGDVAKKLGE WNN  A+DK P
+Sbjct: 2268 FLPPTSLPSSRSAFFIFCADFRPQVKGETPGLSIGDVAKKLGEKWNNLTAEDKVP 2432
+
+
+ Score = 34.4 bits (77), Expect = 1.6
+ Identities = 18/63 (28%), Positives = 33/63 (51%)
+ Frame = +3
+
+Query: 13   SSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYER 72
+            S++  F    R + K + P  S+   + +KK  E+W  ++A++K  +E  A   K +YE+
+Sbjct: 2301 SAFFIFCADFRPQVKGETPGLSIG--DVAKKLGEKWNNLTAEDKVPYEKKASKLKEKYEK 2474
+
+Query: 73   EMK 75
+              K
+Sbjct: 2475 VNK 2483
+
+
+>AC002526 Human PAC clone DJ0558L21 from Xq23, complete sequence.
+              Length = 134580
+              
+ Score = 98.7 bits (242), Expect = 7e-20
+ Identities = 59/125 (47%), Positives = 71/125 (56%)
+ Frame = +3
+
+Query: 2      KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+              KGD + P+GKMS+  FFV+TCREEHKK  PD  V+F    K    R +    KEK     
+Sbjct: 123669 KGDLRNPKGKMSANVFFVKTCREEHKKLKPDGPVSFLRIFKSYL-RGERQFGKEKINLIK 123845
+
+Query: 62     MAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSI 121
+                +  K   + EMK Y P KG  KKK +   A   P S FFLFCSE+ PKIK   PG+S+
+Sbjct: 123846 SQRWVKDA-DWEMKDYDPAKGHKKKKVR--KAC*SPASEFFLFCSEFYPKIKSPKPGVSV 124016
+
+Query: 122    GDVAK 126
+               DV K
+Sbjct: 124017 ADVTK 124031
+
+
+>AF003626 Homo sapiens cosmids IM0525, LC1233, Qc3C1, LB1439, Qc12C11
+             and
+             Length = 86769
+             
+ Score = 97.1 bits (238), Expect = 2e-19
+ Identities = 41/48 (85%), Positives = 46/48 (95%)
+ Frame = +2
+
+Query: 2     KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWK 49
+             KGDPKKP+GKMS+YAFFVQTCREEHKKK+P+  VNF+EFSKKCSERWK
+Sbjct: 66767 KGDPKKPKGKMSAYAFFVQTCREEHKKKNPEVPVNFAEFSKKCSERWK 66910
+
+
+ Score = 77.6 bits (188), Expect = 2e-13
+ Identities = 34/46 (73%), Positives = 38/46 (81%)
+ Frame = +1
+
+Query: 97    PPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 142
+             P S FFLFCSE+RPKIK  +PG+SIGDVAKKLGEMWNN    +KQP
+Sbjct: 68284 PRSGFFLFCSEFRPKIKSTNPGISIGDVAKKLGEMWNNLNDSEKQP 68421
+
+
+ Score = 76.9 bits (186), Expect = 3e-13
+ Identities = 39/59 (66%), Positives = 45/59 (76%)
+ Frame = +3
+
+Query: 40    FSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPP 98
+             F++ CS   +TMS KEK KF++MAKADK RY+REMK Y P KG  KK  KDPNAPKRPP
+Sbjct: 67188 FNESCS--LQTMSGKEKSKFDEMAKADKVRYDREMKDYGPAKGGKKK--KDPNAPKRPP 67352
+
+
+>L32954 Rainbow trout HMG-T2 gene exons 1-4, complete cds.
+          Length = 1368
+          
+ Score = 92.1 bits (225), Expect = 7e-18
+ Identities = 40/49 (81%), Positives = 42/49 (85%)
+ Frame = +3
+
+Query: 4  DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMS 52
+          DP KP+GK SSYAFFV TCREEHKKKHP  SVNFSEFSKKCSERW+  S
+Sbjct: 42 DPNKPKGKTSSYAFFVATCREEHKKKHPGTSVNFSEFSKKCSERWRVSS 188
+
+
+ Score = 78.4 bits (190), Expect = 9e-14
+ Identities = 37/57 (64%), Positives = 45/57 (78%), Gaps = 2/57 (3%)
+ Frame = +2
+
+Query: 48  WKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGE--TKKKFKDPNAPKRPPSAFFLF 104
+           ++TMSAKEK KFEDMAK DK RY+++MK Y+PPKG     K+ KDPNAPKRPP    L+
+Sbjct: 347 FQTMSAKEKVKFEDMAKGDKVRYDKDMKGYVPPKGSKAAGKRKKDPNAPKRPP*VLHLY 523
+
+
+ Score = 66.3 bits (159), Expect = 4e-10
+ Identities = 36/77 (46%), Positives = 51/77 (65%), Gaps = 21/77 (27%)
+ Frame = +3
+
+Query: 66  DKARYEREMKTYIPPKGETK---------------------KKFKDPNAPKRPPSAFFLF 104
+           D  + ERE +T +PPKG  K                      +   PN+     SAFF+F
+Sbjct: 450 DLRQQERERRTPMPPKGHRKYSTYTTIDFCSVLFRFWN*MCSQHSIPNS-----SAFFVF 614
+
+Query: 105 CSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 142
+           C+E+R +IK ++PG+ IGD+AK+LG +W      DKQP
+Sbjct: 615 CAEHRGRIKADNPGMGIGDIAKQLGLLWGKQTPKDKQP 728
+
+
+ Score = 37.9 bits (86), Expect = 0.14
+ Identities = 18/44 (40%), Positives = 26/44 (58%), Gaps = 2/44 (4%)
+ Frame = +3
+
+Query: 89  KDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSI--GDVAKKLGEMW 132
+           KDPN PK   S++  F +  R + K +HPG S+   + +KK  E W
+Sbjct: 39  KDPNKPKGKTSSYAFFVATCREEHKKKHPGTSVNFSEFSKKCSERW 176
+
+
+>X80465 M.musculus HMG1-R-168 gene
+          Length = 181
+          
+ Score = 89.7 bits (219), Expect = 3e-17
+ Identities = 41/49 (83%), Positives = 44/49 (89%)
+ Frame = +2
+
+Query: 11 KMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKF 59
+          K   YAFF+QTC+EEHK K+ DASVNFSEFSKKCSERWKTMSAKEKGKF
+Sbjct: 35 KCPVYAFFMQTCQEEHKTKYLDASVNFSEFSKKCSERWKTMSAKEKGKF 181
+
+
+>X80467 M.musculus HMG1-R-87 gene
+           Length = 190
+           
+ Score = 58.6 bits (139), Expect(2) = 7e-17
+ Identities = 25/27 (92%), Positives = 27/27 (99%)
+ Frame = +2
+
+Query: 36  NFSEFSKKCSERWKTMSAKEKGKFEDM 62
+           NFSEFSKKCSERW+TM+AKEKGKFEDM
+Sbjct: 107 NFSEFSKKCSERWETMTAKEKGKFEDM 187
+
+
+ Score = 50.8 bits (119), Expect(2) = 7e-17
+ Identities = 25/33 (75%), Positives = 26/33 (78%)
+ Frame = +1
+
+Query: 1  GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDA 33
+          GK DPKK RGKMSSYAFF+QT    HKKKH DA
+Sbjct: 4  GKKDPKKLRGKMSSYAFFLQTFWV*HKKKHLDA 102
+
+
+>X80461 M.musculus HMG1-R-145 gene
+          Length = 196
+          
+ Score = 54.3 bits (128), Expect(2) = 1e-16
+ Identities = 22/27 (81%), Positives = 25/27 (92%)
+ Frame = +1
+
+Query: 2  KGDPKKPRGKMSSYAFFVQTCREEHKK 28
+          +GDPKKPRG MS YAFFVQTCREEH++
+Sbjct: 7  RGDPKKPRGTMSLYAFFVQTCREEHRR 87
+
+
+ Score = 53.9 bits (127), Expect(2) = 1e-16
+ Identities = 22/34 (64%), Positives = 28/34 (81%)
+ Frame = +3
+
+Query: 27  KKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           +++HPDASVNFSE SKKCSERWKT   K++G  +
+Sbjct: 81  QERHPDASVNFSELSKKCSERWKTCLLKKRGNLK 182
+
+
+>X80460 M.musculus HMG1-R-135 gene
+          Length = 190
+          
+ Score = 57.8 bits (137), Expect(2) = 6e-16
+ Identities = 28/37 (75%), Positives = 29/37 (77%)
+ Frame = +1
+
+Query: 1  GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNF 37
+          GK DPKK RGKMSSYAFF+QT    HKKKHPDAS  F
+Sbjct: 4  GKKDPKKLRGKMSSYAFFLQTFWV*HKKKHPDASSTF 114
+
+
+ Score = 48.4 bits (113), Expect(2) = 6e-16
+ Identities = 22/28 (78%), Positives = 25/28 (88%)
+ Frame = +2
+
+Query: 35  VNFSEFSKKCSERWKTMSAKEKGKFEDM 62
+           +  SEFSKKCSER +TM+AKEKGKFEDM
+Sbjct: 104 LQLSEFSKKCSER*ETMTAKEKGKFEDM 187
+
+
+>U22831 Caenorhabditis elegans cosmid F47D12.
+           Length = 41275
+           
+ Score = 82.7 bits (201), Expect = 4e-15
+ Identities = 39/71 (54%), Positives = 51/71 (70%), Gaps = 2/71 (2%)
+ Frame = +3
+
+Query: 4   DPKKP--RGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           D  KP  RGK S Y FFV+ C EEHKKK+P+ +V  +E SKKCSE+WKTM   EK +F +
+Sbjct: 36  DMGKPPVRGKTSPYGFFVKMCYEEHKKKYPNENVQVTEISKKCSEKWKTMVDDEKRRFYE 215
+
+Query: 62  MAKADKARYEREM 74
+           +A+ D  RY+ E+
+Sbjct: 216 LAQKDAERYQAEV 254
+
+
+ Score = 42.2 bits (97), Expect = 0.007
+ Identities = 17/42 (40%), Positives = 26/42 (61%)
+ Frame = +2
+
+Query: 99  SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDK 140
+           SAFF +  + RP+I+  HP   +G VA++LG+MW     + K
+Sbjct: 608 SAFFFYSQDKRPEIQAGHPDWKVGQVAQELGKMWKLVPQETK 733
+
+
+ Score = 37.1 bits (84), Expect = 0.24
+ Identities = 19/58 (32%), Positives = 32/58 (54%)
+ Frame = +2
+
+Query: 13  SSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARY 70
+           S++ F+ Q  R E +  HPD  V   + +++  + WK +  + K  +E  A+ADK RY
+Sbjct: 608 SAFFFYSQDKRPEIQAGHPDWKVG--QVAQELGKMWKLVPQETKDMYEQKAQADKDRY 775
+
+
+>U00049 Caenorhabditis elegans cosmid C18F10.
+             Length = 24936
+             
+ Score = 82.7 bits (201), Expect = 4e-15
+ Identities = 39/71 (54%), Positives = 51/71 (70%), Gaps = 2/71 (2%)
+ Frame = +3
+
+Query: 4     DPKKP--RGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+             D  KP  RGK S Y FFV+ C EEHKKK+P+ +V  +E SKKCSE+WKTM   EK +F +
+Sbjct: 24573 DMGKPPVRGKTSPYGFFVKMCYEEHKKKYPNENVQVTEISKKCSEKWKTMVDDEKRRFYE 24752
+
+Query: 62    MAKADKARYEREM 74
+             +A+ D  RY+ E+
+Sbjct: 24753 LAQKDAERYQAEV 24791
+
+
+>X80459 M.musculus HMG1-R-177 gene
+          Length = 173
+          
+ Score = 50.8 bits (119), Expect(2) = 9e-14
+ Identities = 25/33 (75%), Positives = 26/33 (78%)
+ Frame = +1
+
+Query: 1  GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDA 33
+          GK DPKK RGKMSSYAFF+QT    HKKKH DA
+Sbjct: 4  GKKDPKKLRGKMSSYAFFLQTFWV*HKKKHLDA 102
+
+
+ Score = 48.0 bits (112), Expect(2) = 9e-14
+ Identities = 20/22 (90%), Positives = 22/22 (99%)
+ Frame = +2
+
+Query: 36  NFSEFSKKCSERWKTMSAKEKG 57
+           NFSEFSKKCSERW+TM+AKEKG
+Sbjct: 107 NFSEFSKKCSERWETMTAKEKG 172
+
+
+>S50213 HMG1-related DNA-binding protein [mice, mRNA, 2569 nt].
+            Length = 2569
+            
+ Score = 75.3 bits (182), Expect = 8e-13
+ Identities = 40/114 (35%), Positives = 63/114 (55%)
+ Frame = +2
+
+Query: 28   KKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKK 87
+            ++  D +  F   +   S   +  S +E+ K E + +A  A+  +  +     K    KK
+Sbjct: 1532 EEEEDVAEEFDSNASASSSSNEGDSDREEKKREQLKRAKMAKDRKSRR-----KSSEAKK 1696
+
+Query: 88   FKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+             KDPNAPKRP SA+ L+ +  R KIK +HPG+SI D++KK GE+W   + + K+
+Sbjct: 1697 GKDPNAPKRPMSAYMLWLNASREKIKSDHPGISITDLSKKAGEIWKGMSKEKKE 1858
+
+
+ Score = 61.7 bits (147), Expect = 1e-08
+ Identities = 31/92 (33%), Positives = 51/92 (54%)
+ Frame = +2
+
+Query: 4    DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+            DP  P+  MS+Y  ++   RE+ K  HP  S+  ++ SKK  E WK MS ++K +++  A
+Sbjct: 1703 DPNAPKRPMSAYMLWLNASREKIKSDHPGISI--TDLSKKAGEIWKGMSKEKKEEWDRKA 1876
+
+Query: 64   KADKARYEREMKTYIPPKGETKKKFKDPNAPK 95
+            +  +  YE+ MK Y   +G++ K+ K     K
+Sbjct: 1877 EDARREYEKAMKEYEGGRGDSSKRDKSKKKKK 1972
+
+
+>M26110 Bovine high-mobility-group protein (HMG-1) mRNA, 3' end.
+           Length = 791
+           
+ Score = 74.9 bits (181), Expect = 1e-12
+ Identities = 36/51 (70%), Positives = 37/51 (71%)
+ Frame = +1
+
+Query: 118 GLSIGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           G+SIGDVAKKLGEMWNNTAADDKQP              DIAAYRAKGKPD
+Sbjct: 10  GVSIGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEKDIAAYRAKGKPD 162
+
+
+ Score = 34.4 bits (77), Expect = 1.6
+ Identities = 14/47 (29%), Positives = 24/47 (50%)
+ Frame = +1
+
+Query: 31 PDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTY 77
+          P   V+  + +KK  E W   +A +K  +E  A   K +YE+++  Y
+Sbjct: 1  PGGGVSIGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEKDIAAY 141
+
+
+>L08814 Rat CIIDBP (homologous to human SSRP-1 and mouse T160 genes)
+            mRNA,
+            Length = 2082
+            
+ Score = 74.5 bits (180), Expect = 1e-12
+ Identities = 40/114 (35%), Positives = 63/114 (55%)
+ Frame = +1
+
+Query: 28   KKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKK 87
+            ++  D +  F   +   S   +  S +E+ K + + +A  A+  +  K     K    KK
+Sbjct: 1012 EEEEDVAEEFDSNASASSSSNEGDSDREEKKRKQLKRAKMAKDRKSRK-----KSSEGKK 1176
+
+Query: 88   FKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+             KDPNAPKRP SA+ L+ +  R KIK +HPG+SI D++KK GE+W   + + K+
+Sbjct: 1177 GKDPNAPKRPMSAYMLWLNASREKIKSDHPGISITDLSKKAGEIWKGMSKEKKE 1338
+
+
+ Score = 59.3 bits (141), Expect = 5e-08
+ Identities = 30/92 (32%), Positives = 49/92 (52%)
+ Frame = +1
+
+Query: 4    DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+            DP  P+  MS+Y  ++   RE+ K  HP  S+  ++ SKK  E WK MS ++K +++   
+Sbjct: 1183 DPNAPKRPMSAYMLWLNASREKIKSDHPGISI--TDLSKKAGEIWKGMSKEKKEEWDRKG 1356
+
+Query: 64   KADKARYEREMKTYIPPKGETKKKFKDPNAPK 95
+            +  +  YE  MK Y   +G++ K+ K     K
+Sbjct: 1357 EDARREYEEAMKEYEGGRGDSSKRDKSKKKKK 1452
+
+
+>U84139 Bos taurus structure-specific recognition protein 1 (SSRP1)
+           mRNA,
+           Length = 1834
+           
+ Score = 73.7 bits (178), Expect = 2e-12
+ Identities = 40/114 (35%), Positives = 63/114 (55%)
+ Frame = +1
+
+Query: 28  KKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKK 87
+           ++  D +  F   +   S   +  S +E+ K + + KA  A+  +  K     K    KK
+Sbjct: 709 EEEEDVAEEFDSNASASSSSKEGDSDREEKKRKQLKKAKMAKDRKSRK-----KPLEVKK 873
+
+Query: 88  FKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+            KDPNAPKRP SA+ L+ +  R KIK +HPG+S+ D++KK GE+W   + + K+
+Sbjct: 874 GKDPNAPKRPMSAYMLWLNASREKIKSDHPGISVTDLSKKAGEIWKGMSKEKKE 1035
+
+
+ Score = 63.2 bits (151), Expect = 3e-09
+ Identities = 33/92 (35%), Positives = 51/92 (54%)
+ Frame = +1
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP  P+  MS+Y  ++   RE+ K  HP  SV  ++ SKK  E WK MS ++K +++  A
+Sbjct: 880 DPNAPKRPMSAYMLWLNASREKIKSDHPGISV--TDLSKKAGEIWKGMSKEKKEEWDRKA 1053
+
+Query: 64  KADKARYEREMKTYIPPKGETKKKFKDPNAPK 95
+           +  +  YE+ MK Y   +GE+ K+ K     K
+Sbjct: 1054EDARREYEKAMKEYEGGRGESSKRDKSKKKKK 1149
+
+
+>I66608 Sequence 6 from patent US 5670621.
+            Length = 2839
+            
+ Score = 73.0 bits (176), Expect = 4e-12
+ Identities = 40/114 (35%), Positives = 63/114 (55%)
+ Frame = +2
+
+Query: 28   KKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKK 87
+            ++  D +  F   +   S   +  S +++ K + + KA  A+  +  K     K    KK
+Sbjct: 1730 EEEEDVAEEFDSNASASSSSNEGDSDRDEKKRKQLKKAKMAKDRKSRK-----KPVEVKK 1894
+
+Query: 88   FKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+             KDPNAPKRP SA+ L+ +  R KIK +HPG+SI D++KK GE+W   + + K+
+Sbjct: 1895 GKDPNAPKRPMSAYMLWLNASREKIKSDHPGISITDLSKKAGEIWKGMSKEKKE 2056
+
+
+ Score = 62.1 bits (148), Expect = 7e-09
+ Identities = 32/92 (34%), Positives = 51/92 (54%)
+ Frame = +2
+
+Query: 4    DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+            DP  P+  MS+Y  ++   RE+ K  HP  S+  ++ SKK  E WK MS ++K +++  A
+Sbjct: 1901 DPNAPKRPMSAYMLWLNASREKIKSDHPGISI--TDLSKKAGEIWKGMSKEKKEEWDRKA 2074
+
+Query: 64   KADKARYEREMKTYIPPKGETKKKFKDPNAPK 95
+            +  +  YE+ MK Y   +GE+ K+ K     K
+Sbjct: 2075 EDARRDYEKAMKEYEGGRGESSKRDKSKKKKK 2170
+
+
+>M86737 Human high mobility group box (SSRP1) mRNA, complete cds.
+            Length = 2839
+            
+ Score = 73.0 bits (176), Expect = 4e-12
+ Identities = 40/114 (35%), Positives = 63/114 (55%)
+ Frame = +2
+
+Query: 28   KKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKK 87
+            ++  D +  F   +   S   +  S +++ K + + KA  A+  +  K     K    KK
+Sbjct: 1730 EEEEDVAEEFDSNASASSSSNEGDSDRDEKKRKQLKKAKMAKDRKSRK-----KPVEVKK 1894
+
+Query: 88   FKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+             KDPNAPKRP SA+ L+ +  R KIK +HPG+SI D++KK GE+W   + + K+
+Sbjct: 1895 GKDPNAPKRPMSAYMLWLNASREKIKSDHPGISITDLSKKAGEIWKGMSKEKKE 2056
+
+
+ Score = 62.1 bits (148), Expect = 7e-09
+ Identities = 32/92 (34%), Positives = 51/92 (54%)
+ Frame = +2
+
+Query: 4    DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+            DP  P+  MS+Y  ++   RE+ K  HP  S+  ++ SKK  E WK MS ++K +++  A
+Sbjct: 1901 DPNAPKRPMSAYMLWLNASREKIKSDHPGISI--TDLSKKAGEIWKGMSKEKKEEWDRKA 2074
+
+Query: 64   KADKARYEREMKTYIPPKGETKKKFKDPNAPK 95
+            +  +  YE+ MK Y   +GE+ K+ K     K
+Sbjct: 2075 EDARRDYEKAMKEYEGGRGESSKRDKSKKKKK 2170
+
+
+>I66610 Sequence 9 from patent US 5670621.
+            Length = 1444
+            
+ Score = 73.0 bits (176), Expect = 4e-12
+ Identities = 40/114 (35%), Positives = 63/114 (55%)
+ Frame = +1
+
+Query: 28   KKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKK 87
+            ++  D +  F   +   S   +  S +++ K + + KA  A+  +  K     K    KK
+Sbjct: 1012 EEEEDVAEEFDSNASASSSSNEGDSDRDEKKRKQLKKAKMAKDRKSRK-----KPVEVKK 1176
+
+Query: 88   FKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+             KDPNAPKRP SA+ L+ +  R KIK +HPG+SI D++KK GE+W   + + K+
+Sbjct: 1177 GKDPNAPKRPMSAYMLWLNASREKIKSDHPGISITDLSKKAGEIWKGMSKEKKE 1338
+
+
+ Score = 61.3 bits (146), Expect = 1e-08
+ Identities = 31/86 (36%), Positives = 50/86 (58%)
+ Frame = +1
+
+Query: 4    DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+            DP  P+  MS+Y  ++   RE+ K  HP  S+  ++ SKK  E WK MS ++K +++  A
+Sbjct: 1183 DPNAPKRPMSAYMLWLNASREKIKSDHPGISI--TDLSKKAGEIWKGMSKEKKEEWDRKA 1356
+
+Query: 64   KADKARYEREMKTYIPPKGETKKKFK 89
+            +  +  YE+ MK Y   +GE+ K+ K
+Sbjct: 1357 EDARRDYEKAMKEYEGGRGESSKRDK 1434
+
+
+>I66609 Sequence 8 from patent US 5670621.
+            Length = 1898
+            
+ Score = 73.0 bits (176), Expect = 4e-12
+ Identities = 40/114 (35%), Positives = 63/114 (55%)
+ Frame = +1
+
+Query: 28   KKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKK 87
+            ++  D +  F   +   S   +  S +++ K + + KA  A+  +  K     K    KK
+Sbjct: 1012 EEEEDVAEEFDSNASASSSSNEGDSDRDEKKRKQLKKAKMAKDRKSRK-----KPVEVKK 1176
+
+Query: 88   FKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+             KDPNAPKRP SA+ L+ +  R KIK +HPG+SI D++KK GE+W   + + K+
+Sbjct: 1177 GKDPNAPKRPMSAYMLWLNASREKIKSDHPGISITDLSKKAGEIWKGMSKEKKE 1338
+
+
+ Score = 62.1 bits (148), Expect = 7e-09
+ Identities = 32/92 (34%), Positives = 51/92 (54%)
+ Frame = +1
+
+Query: 4    DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+            DP  P+  MS+Y  ++   RE+ K  HP  S+  ++ SKK  E WK MS ++K +++  A
+Sbjct: 1183 DPNAPKRPMSAYMLWLNASREKIKSDHPGISI--TDLSKKAGEIWKGMSKEKKEEWDRKA 1356
+
+Query: 64   KADKARYEREMKTYIPPKGETKKKFKDPNAPK 95
+            +  +  YE+ MK Y   +GE+ K+ K     K
+Sbjct: 1357 EDARRDYEKAMKEYEGGRGESSKRDKSKKKKK 1452
+
+
+>D14315 delta-crystallin enhancer binding protein, partial sequence.
+           Length = 1320
+           
+ Score = 70.2 bits (169), Expect = 3e-11
+ Identities = 36/77 (46%), Positives = 52/77 (66%), Gaps = 1/77 (1%)
+ Frame = +3
+
+Query: 65  ADKARYEREMKTYIPPKGETK-KKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGD 123
+           A KA+  ++ K   P K + + KK KDPNAPKRP SA+ L+ +  R KIK +HPG+SI D
+Sbjct: 321 AKKAKIVKDRK---PRKKQVESKKGKDPNAPKRPMSAYMLWLNANREKIKSDHPGISITD 491
+
+Query: 124 VAKKLGEMWNNTAADDKQ 141
+           ++KK GE+W   + + K+
+Sbjct: 492 LSKKAGELWKAMSKEKKE 545
+
+
+ Score = 59.7 bits (142), Expect = 4e-08
+ Identities = 38/115 (33%), Positives = 58/115 (50%), Gaps = 1/115 (0%)
+ Frame = +3
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP  P+  MS+Y  ++   RE+ K  HP  S+  ++ SKK  E WK MS ++K +++  A
+Sbjct: 390 DPNAPKRPMSAYMLWLNANREKIKSDHPGISI--TDLSKKAGELWKAMSKEKKEEWDRKA 563
+
+Query: 64  KADKARYEREMKTY-IPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPG 118
+           +  K  YE+ MK Y +  K E+ K  +     K+          E + K KGE  G
+Sbjct: 564 EDAKRDYEKAMKEYSVGNKSESSKMERSKKKKKK---------QEKQMKGKGEKKG 704
+
+
+>M74017 T.brucei rhodesiense HMG1-like protein mRNA, complete cds.
+           Length = 2070
+           
+ Score = 68.7 bits (165), Expect = 7e-11
+ Identities = 47/137 (34%), Positives = 70/137 (50%), Gaps = 8/137 (5%)
+ Frame = +1
+
+Query: 5   PKKP----RGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+           PKKP    +  +SSY  FV   REE K K+P   +  +   +   + W   S   K  + 
+Sbjct: 472 PKKPADYPKPAVSSYLLFVADQREELKAKNP--GMQNTAILQTLGKMWSDASDDVKEHYR 645
+
+Query: 61  DMAKADKARYEREMKTYIPPKGET----KKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEH 116
+             A+ DKAR+ RE+  Y    G+      K  KD NAPKR  ++F  F S++R K    H
+Sbjct: 646 KKAEEDKARFRREVDEYKRQGGKEYGRGGKIKKDSNAPKRAMTSFMFFSSDFRSK----H 813
+
+Query: 117 PGLSIGDVAKKLGEMWNNTAADDKQ 141
+             LSI +++K  G  W     ++++
+Sbjct: 814 SDLSIVEMSKAAGAAWKELGPEERK 888
+
+
+ Score = 51.5 bits (121), Expect = 1e-05
+ Identities = 27/73 (36%), Positives = 40/73 (53%)
+ Frame = +1
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           K D   P+  M+S+ FF      + + KH D S+   E SK     WK +  +E+  +E+
+Sbjct: 739 KKDSNAPKRAMTSFMFF----SSDFRSKHSDLSI--VEMSKAAGAAWKELGPEERKVYEE 900
+
+Query: 62  MAKADKARYEREM 74
+           MA+ DK RY+REM
+Sbjct: 901 MAEKDKERYKREM 939
+
+
+ Score = 48.4 bits (113), Expect = 9e-05
+ Identities = 31/127 (24%), Positives = 57/127 (44%)
+ Frame = +1
+
+Query: 39  EFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPP 98
+           EF K+     K   A +    +   +A  A  E   KT    K  T+K  K  + PK   
+Sbjct: 337 EFKKQLELALKEKDASKSSGGKGSKRARSAGAEAPSKT---KKEMTEKPKKPADYPKPAV 507
+
+Query: 99  SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDI 158
+           S++ LF ++ R ++K ++PG+    + + LG+MW++ + D K+               ++
+Sbjct: 508 SSYLLFVADQREELKAKNPGMQNTAILQTLGKMWSDASDDVKEHYRKKAEEDKARFRREV 687
+
+Query: 159 AAYRAKG 165
+             Y+ +G
+Sbjct: 688 DEYKRQG 708
+
+
+>X97906 V.faba mRNA for transcription factor containing HMG-box
+            Length = 2270
+            
+ Score = 68.3 bits (164), Expect = 1e-10
+ Identities = 42/131 (32%), Positives = 66/131 (50%)
+ Frame = +2
+
+Query: 32   DASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDP 91
+            D+  + S+ S+   E  K   AK++ K +  +KA  ++ + +       K + KKK KDP
+Sbjct: 1550 DSGADVSDASQSGGETEKP--AKKEPKKDLSSKASSSKKKSKDADVDGVKKKQKKK-KDP 1720
+
+Query: 92   NAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQPXXXXXXXXX 151
+            NAPKR  S F  F    R  +K  +PG+S  DV + LGE W N +A++K+P         
+Sbjct: 1721 NAPKRALSGFMFFSQMERENLKKTNPGISFTDVGRVLGEKWKNLSAEEKEPYEAKAQADK 1900
+
+Query: 152  XXXXXDIAAYR 162
+                 +I+ Y+
+Sbjct: 1901 KRYKDEISGYK 1933
+
+
+ Score = 63.2 bits (151), Expect = 3e-09
+ Identities = 31/80 (38%), Positives = 48/80 (59%)
+ Frame = +2
+
+Query: 2    KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+            K DP  P+  +S + FF Q  RE  KK +P   ++F++  +   E+WK +SA+EK  +E 
+Sbjct: 1709 KKDPNAPKRALSGFMFFSQMERENLKKTNP--GISFTDVGRVLGEKWKNLSAEEKEPYEA 1882
+
+Query: 62   MAKADKARYEREMKTYIPPK 81
+             A+ADK RY+ E+  Y  P+
+Sbjct: 1883 KAQADKKRYKDEISGYKNPQ 1942
+
+
+>M95912 Saccharomyces cerevisiae N-acetyltransferase (MAK) complete
+            cds;
+            Length = 1780
+            
+ Score = 68.3 bits (164), Expect = 1e-10
+ Identities = 32/69 (46%), Positives = 42/69 (60%)
+ Frame = -1
+
+Query: 74   MKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWN 133
+            M T   PK  T +K KDPNAPKR  SA+  F +E R  ++ E+P ++ G V KKLGE W 
+Sbjct: 1420 MVTPREPKKRTTRKKKDPNAPKRALSAYMFFANENRDIVRSENPDITFGQVGKKLGEKWK 1241
+
+Query: 134  NTAADDKQP 142
+                ++KQP
+Sbjct: 1240 ALTPEEKQP 1214
+
+
+ Score = 62.8 bits (150), Expect = 4e-09
+ Identities = 29/76 (38%), Positives = 45/76 (59%)
+ Frame = -1
+
+Query: 2    KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+            K DP  P+  +S+Y FF    R+  + ++PD  + F +  KK  E+WK ++ +EK  +E 
+Sbjct: 1378 KKDPNAPKRALSAYMFFANENRDIVRSENPD--ITFGQVGKKLGEKWKALTPEEKQPYEA 1205
+
+Query: 62   MAKADKARYEREMKTY 77
+             A+ADK RYE E + Y
+Sbjct: 1204 KAQADKKRYESEKELY 1157
+
+
+>Z71255 S.cerevisiae chromosome XVI 165536 bp sequence, cen rightwards.
+              Length = 165536
+              
+ Score = 68.3 bits (164), Expect = 1e-10
+ Identities = 32/69 (46%), Positives = 42/69 (60%)
+ Frame = -3
+
+Query: 74     MKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWN 133
+              M T   PK  T +K KDPNAPKR  SA+  F +E R  ++ E+P ++ G V KKLGE W 
+Sbjct: 135597 MVTPREPKKRTTRKKKDPNAPKRALSAYMFFANENRDIVRSENPDITFGQVGKKLGEKWK 135418
+
+Query: 134    NTAADDKQP 142
+                  ++KQP
+Sbjct: 135417 ALTPEEKQP 135391
+
+
+ Score = 62.8 bits (150), Expect = 4e-09
+ Identities = 29/76 (38%), Positives = 45/76 (59%)
+ Frame = -3
+
+Query: 2      KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+              K DP  P+  +S+Y FF    R+  + ++PD  + F +  KK  E+WK ++ +EK  +E 
+Sbjct: 135555 KKDPNAPKRALSAYMFFANENRDIVRSENPD--ITFGQVGKKLGEKWKALTPEEKQPYEA 135382
+
+Query: 62     MAKADKARYEREMKTY 77
+               A+ADK RYE E + Y
+Sbjct: 135381 KAQADKKRYESEKELY 135334
+
+
+>Z49219;U00094 S.cerevisiae chromosome XVI cosmid 9499.
+             Length = 43776
+             
+ Score = 68.3 bits (164), Expect = 1e-10
+ Identities = 32/69 (46%), Positives = 42/69 (60%)
+ Frame = -3
+
+Query: 74    MKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWN 133
+             M T   PK  T +K KDPNAPKR  SA+  F +E R  ++ E+P ++ G V KKLGE W 
+Sbjct: 13837 MVTPREPKKRTTRKKKDPNAPKRALSAYMFFANENRDIVRSENPDITFGQVGKKLGEKWK 13658
+
+Query: 134   NTAADDKQP 142
+                 ++KQP
+Sbjct: 13657 ALTPEEKQP 13631
+
+
+ Score = 62.8 bits (150), Expect = 4e-09
+ Identities = 29/76 (38%), Positives = 45/76 (59%)
+ Frame = -3
+
+Query: 2     KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+             K DP  P+  +S+Y FF    R+  + ++PD  + F +  KK  E+WK ++ +EK  +E 
+Sbjct: 13795 KKDPNAPKRALSAYMFFANENRDIVRSENPD--ITFGQVGKKLGEKWKALTPEEKQPYEA 13622
+
+Query: 62    MAKADKARYEREMKTY 77
+              A+ADK RYE E + Y
+Sbjct: 13621 KAQADKKRYESEKELY 13574
+
+
+>X15317 Yeast NHP6A gene for nonhistone protein
+           Length = 591
+           
+ Score = 68.3 bits (164), Expect = 1e-10
+ Identities = 32/69 (46%), Positives = 42/69 (60%)
+ Frame = +1
+
+Query: 74  MKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWN 133
+           M T   PK  T +K KDPNAPKR  SA+  F +E R  ++ E+P ++ G V KKLGE W 
+Sbjct: 94  MVTPREPKKRTTRKKKDPNAPKRALSAYMFFANENRDIVRSENPDITFGQVGKKLGEKWK 273
+
+Query: 134 NTAADDKQP 142
+               ++KQP
+Sbjct: 274 ALTPEEKQP 300
+
+
+ Score = 62.8 bits (150), Expect = 4e-09
+ Identities = 29/76 (38%), Positives = 45/76 (59%)
+ Frame = +1
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           K DP  P+  +S+Y FF    R+  + ++PD  + F +  KK  E+WK ++ +EK  +E 
+Sbjct: 136 KKDPNAPKRALSAYMFFANENRDIVRSENPD--ITFGQVGKKLGEKWKALTPEEKQPYEA 309
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+ADK RYE E + Y
+Sbjct: 310 KAQADKKRYESEKELY 357
+
+
+>X58282 Maize mRNA for a high mobility group protein
+           Length = 885
+           
+ Score = 67.9 bits (163), Expect = 1e-10
+ Identities = 40/110 (36%), Positives = 52/110 (46%), Gaps = 1/110 (0%)
+ Frame = +1
+
+Query: 52  SAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPK 111
+           SA +  K +  AKAD     +      P KG   K  KDPN PKR PSAFF+F  E+R +
+Sbjct: 34  SAMKGAKSKGAAKADAKLAVKSKGAEKPAKGRKGKAGKDPNKPKRAPSAFFVFMEEFRKE 213
+
+Query: 112 IKGEHP-GLSIGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAY 161
+            K ++P   S+  V K  G+ W + +  DK P               IAAY
+Sbjct: 214 FKEKNPKNKSVAAVGKAAGDRWKSLSESDKAPYVAKANKLKLEYNKAIAAY 366
+
+
+ Score = 46.9 bits (109), Expect = 3e-04
+ Identities = 27/88 (30%), Positives = 47/88 (52%)
+ Frame = +1
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP KP+   S++  F++  R+E K+K+P  + + +   K   +RWK++S  +K  +  +A
+Sbjct: 148 DPNKPKRAPSAFFVFMEEFRKEFKEKNP-KNKSVAAVGKAAGDRWKSLSESDKAPY--VA 318
+
+Query: 64  KADKARYEREMKTYIPPKGETKKKFKDP 91
+           KA+K + E         KGE+    K P
+Sbjct: 319 KANKLKLEYNKAIAAYNKGESTAAKKAP 402
+
+
+>X66077 Z.mays MNB1b mRNA for DNA-binding protein
+           Length = 918
+           
+ Score = 67.9 bits (163), Expect = 1e-10
+ Identities = 40/110 (36%), Positives = 52/110 (46%), Gaps = 1/110 (0%)
+ Frame = +3
+
+Query: 52  SAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPK 111
+           SA +  K +  AKAD     +      P KG   K  KDPN PKR PSAFF+F  E+R +
+Sbjct: 30  SAMKGAKSKGAAKADAKLAVKSKGAEKPAKGRKGKAGKDPNKPKRAPSAFFVFMEEFRKE 209
+
+Query: 112 IKGEHP-GLSIGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAY 161
+            K ++P   S+  V K  G+ W + +  DK P               IAAY
+Sbjct: 210 FKEKNPKNKSVAAVGKAAGDRWKSLSESDKAPYVAKANKLKLEYNKAIAAY 362
+
+
+ Score = 46.9 bits (109), Expect = 3e-04
+ Identities = 27/88 (30%), Positives = 47/88 (52%)
+ Frame = +3
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP KP+   S++  F++  R+E K+K+P  + + +   K   +RWK++S  +K  +  +A
+Sbjct: 144 DPNKPKRAPSAFFVFMEEFRKEFKEKNP-KNKSVAAVGKAAGDRWKSLSESDKAPY--VA 314
+
+Query: 64  KADKARYEREMKTYIPPKGETKKKFKDP 91
+           KA+K + E         KGE+    K P
+Sbjct: 315 KANKLKLEYNKAIAAYNKGESTAAKKAP 398
+
+
+>L08815 Chicken CIIDBP (homologous to human SSRP-1 and mouse T160
+            genes)
+            Length = 2092
+            
+ Score = 67.1 bits (161), Expect = 2e-10
+ Identities = 29/56 (51%), Positives = 40/56 (70%)
+ Frame = +3
+
+Query: 86   KKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+            KK KDPN PKRP SA+ L+ +  R KIK +HPG+SI D++KK GE+W   + + K+
+Sbjct: 1500 KKGKDPNVPKRPMSAYMLWLNANREKIKSDHPGISITDLSKKAGELWKAMSKEKKE 1667
+
+
+ Score = 59.3 bits (141), Expect = 5e-08
+ Identities = 38/115 (33%), Positives = 58/115 (50%), Gaps = 1/115 (0%)
+ Frame = +3
+
+Query: 4    DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+            DP  P+  MS+Y  ++   RE+ K  HP  S+  ++ SKK  E WK MS ++K +++  A
+Sbjct: 1512 DPNVPKRPMSAYMLWLNANREKIKSDHPGISI--TDLSKKAGELWKAMSKEKKEEWDRKA 1685
+
+Query: 64   KADKARYEREMKTY-IPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPG 118
+            +  K  YE+ MK Y +  K E+ K  +     K+          E + K KGE  G
+Sbjct: 1686 EDAKRDYEKAMKEYSVGNKSESSKMERSKKKKKK---------QEKQMKGKGEKKG 1826
+
+
+>X80464 M.musculus HMG1-R-161 gene
+          Length = 195
+          
+ Score = 66.7 bits (160), Expect = 3e-10
+ Identities = 33/64 (51%), Positives = 39/64 (60%)
+ Frame = +1
+
+Query: 1  GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+          GK DPKK   +               +++ P    NFSEFSKKCSERW+TM+AKEKGKFE
+Sbjct: 4  GKKDPKKAERQNVLICILFANLLGVAQEEAPGCFFNFSEFSKKCSERWETMTAKEKGKFE 183
+
+Query: 61 DMAK 64
+          DM K
+Sbjct: 184DMGK 195
+
+
+>U01348 Rattus norvegicus clone B-0/7 arylamine N-acetyltransferase
+           mRNA,
+           Length = 1385
+           
+ Score = 66.3 bits (159), Expect = 4e-10
+ Identities = 27/32 (84%), Positives = 31/32 (96%)
+ Frame = -1
+
+Query: 21  TCREEHKKKHPDASVNFSEFSKKCSERWKTMS 52
+           +C+EEHKKKHPD+SVNF+EF KKCSERWKTMS
+Sbjct: 134 SCQEEHKKKHPDSSVNFAEFLKKCSERWKTMS 39
+
+
+ Score = 43.0 bits (99), Expect = 0.004
+ Identities = 19/29 (65%), Positives = 21/29 (71%)
+ Frame = -3
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKK 29
+           GKGDP KPRGKMSSYAFFV    +E   +
+Sbjct: 186 GKGDPNKPRGKMSSYAFFVPGGAQEEASR 100
+
+
+>U01343 Rattus norvegicus clone A-1 arylamine N-acetyltransferase
+           mRNA,
+           Length = 1418
+           
+ Score = 66.3 bits (159), Expect = 4e-10
+ Identities = 27/32 (84%), Positives = 31/32 (96%)
+ Frame = -1
+
+Query: 21  TCREEHKKKHPDASVNFSEFSKKCSERWKTMS 52
+           +C+EEHKKKHPD+SVNF+EF KKCSERWKTMS
+Sbjct: 137 SCQEEHKKKHPDSSVNFAEFLKKCSERWKTMS 42
+
+
+ Score = 43.0 bits (99), Expect = 0.004
+ Identities = 19/29 (65%), Positives = 21/29 (71%)
+ Frame = -3
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKK 29
+           GKGDP KPRGKMSSYAFFV    +E   +
+Sbjct: 189 GKGDPNKPRGKMSSYAFFVPGGAQEEASR 103
+
+
+>AB000637 Canavalia gladiata mRNA for HMG-1, complete cds.
+           Length = 736
+           
+ Score = 66.0 bits (158), Expect = 5e-10
+ Identities = 39/101 (38%), Positives = 51/101 (49%), Gaps = 3/101 (2%)
+ Frame = +2
+
+Query: 64  KADKARYEREMKTYIPPKG--ETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHP-GLS 120
+           KAD    +  +K      G  ++KK  KDPN PKRPPSAFF+F SE+R + K EHP   S
+Sbjct: 32  KADAKAADNRLKRKGAGAGRKQSKKAAKDPNKPKRPPSAFFVFMSEFREQYKKEHPTNKS 211
+
+Query: 121 IGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAK 164
+           +  V K  G+ W + +  +K P               I AY  K
+Sbjct: 212 VAVVGKAGGDKWKSLSDAEKAPFVARAEKKKEEYDKSILAYNRK 343
+
+
+ Score = 49.2 bits (115), Expect = 5e-05
+ Identities = 23/74 (31%), Positives = 41/74 (55%)
+ Frame = +2
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP KP+   S++  F+   RE++KK+HP  + + +   K   ++WK++S  EK  F   A
+Sbjct: 116 DPNKPKRPPSAFFVFMSEFREQYKKEHP-TNKSVAVVGKAGGDKWKSLSDAEKAPFVARA 292
+
+Query: 64  KADKARYEREMKTY 77
+           +  K  Y++ +  Y
+Sbjct: 293 EKKKEEYDKSILAY 334
+
+
+>X15318 Yeast NHPB gene for nonhistone protein
+           Length = 900
+           
+ Score = 64.8 bits (155), Expect = 1e-09
+ Identities = 30/71 (42%), Positives = 43/71 (60%)
+ Frame = +1
+
+Query: 72  REMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEM 131
+           +E K    PK  T ++ KDPNAPKR  SA+  F +E R  ++ E+P ++ G V + LGE 
+Sbjct: 343 KEAKQPKEPKKRTTRRKKDPNAPKRGLSAYMFFANENRDIVRSENPDVTFGQVGRILGER 522
+
+Query: 132 WNNTAADDKQP 142
+           W    A++KQP
+Sbjct: 523 WKALTAEEKQP 555
+
+
+ Score = 62.5 bits (149), Expect = 6e-09
+ Identities = 30/76 (39%), Positives = 45/76 (58%)
+ Frame = +1
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           K DP  P+  +S+Y FF    R+  + ++PD  V F +  +   ERWK ++A+EK  +E 
+Sbjct: 391 KKDPNAPKRGLSAYMFFANENRDIVRSENPD--VTFGQVGRILGERWKALTAEEKQPYES 564
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+ADK RYE E + Y
+Sbjct: 565 KAQADKKRYESEKELY 612
+
+
+>U01345 Rattus norvegicus clone A-3 arylamine N-acetyltransferase
+           mRNA,
+           Length = 478
+           
+ Score = 64.8 bits (155), Expect = 1e-09
+ Identities = 26/31 (83%), Positives = 30/31 (95%)
+ Frame = -2
+
+Query: 21  TCREEHKKKHPDASVNFSEFSKKCSERWKTM 51
+           +C+EEHKKKHPD+SVNF+EF KKCSERWKTM
+Sbjct: 192 SCQEEHKKKHPDSSVNFAEFLKKCSERWKTM 100
+
+
+ Score = 43.0 bits (99), Expect = 0.004
+ Identities = 19/29 (65%), Positives = 21/29 (71%)
+ Frame = -1
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHKKK 29
+           GKGDP KPRGKMSSYAFFV    +E   +
+Sbjct: 244 GKGDPNKPRGKMSSYAFFVPGGAQEEASR 158
+
+
+>Z35959;Y13134 S.cerevisiae chromosome II reading frame ORF YBR090c
+           Length = 1378
+           
+ Score = 64.8 bits (155), Expect = 1e-09
+ Identities = 30/71 (42%), Positives = 43/71 (60%)
+ Frame = -3
+
+Query: 72  REMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEM 131
+           +E K    PK  T ++ KDPNAPKR  SA+  F +E R  ++ E+P ++ G V + LGE 
+Sbjct: 698 KEAKQPKEPKKRTTRRKKDPNAPKRRLSAYMFFANENRDIVRSENPDVTFGQVGRILGER 519
+
+Query: 132 WNNTAADDKQP 142
+           W    A++KQP
+Sbjct: 518 WKALTAEEKQP 486
+
+
+ Score = 64.0 bits (153), Expect = 2e-09
+ Identities = 30/76 (39%), Positives = 46/76 (60%)
+ Frame = -3
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           K DP  P+ ++S+Y FF    R+  + ++PD  V F +  +   ERWK ++A+EK  +E 
+Sbjct: 650 KKDPNAPKRRLSAYMFFANENRDIVRSENPD--VTFGQVGRILGERWKALTAEEKQPYES 477
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+ADK RYE E + Y
+Sbjct: 476 KAQADKKRYESEKELY 429
+
+
+>Z21703 V.faba mRNA for HMG box.
+           Length = 823
+           
+ Score = 64.0 bits (153), Expect = 2e-09
+ Identities = 36/90 (40%), Positives = 49/90 (54%), Gaps = 3/90 (3%)
+ Frame = +1
+
+Query: 79  PPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHP-GLSIGDVAKKLGEMWNNTAA 137
+           P KG   K+ KDPN PKRPPSAFF+F +++R + K +HP   S+  V K  GE W + + 
+Sbjct: 205 PAKG---KEPKDPNKPKRPPSAFFVFMADFREQYKKDHPNNKSVAAVGKACGEEWKSLSE 375
+
+Query: 138 DDKQPXXXXXXXXXXXXXXDIAAYRAK--GKPD 168
+           ++K P               + AY  K  GK D
+Sbjct: 376 EEKAPYVDRALKKKEEYEITLQAYNKKLEGKDD 474
+
+
+ Score = 56.2 bits (133), Expect = 4e-07
+ Identities = 26/74 (35%), Positives = 42/74 (56%)
+ Frame = +1
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP KP+   S++  F+   RE++KK HP+ + + +   K C E WK++S +EK  + D A
+Sbjct: 229 DPNKPKRPPSAFFVFMADFREQYKKDHPN-NKSVAAVGKACGEEWKSLSEEEKAPYVDRA 405
+
+Query: 64  KADKARYEREMKTY 77
+              K  YE  ++ Y
+Sbjct: 406 LKKKEEYEITLQAY 447
+
+
+>L12169 Japanese morning glory high mobility group protein mRNA
+           sequence.
+           Length = 726
+           
+ Score = 63.2 bits (151), Expect = 3e-09
+ Identities = 32/82 (39%), Positives = 42/82 (51%), Gaps = 1/82 (1%)
+ Frame = +3
+
+Query: 83  ETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHP-GLSIGDVAKKLGEMWNNTAADDKQ 141
+           +TKK  KDPN PKRPPSAFF+F  ++R   K +HP   S+  V K  G+ W    A +K 
+Sbjct: 153 KTKKAVKDPNKPKRPPSAFFVFMEDFRKTYKEKHPNNKSVAVVGKAGGDKWKQLTAAEKA 332
+
+Query: 142 PXXXXXXXXXXXXXXDIAAYRAK 164
+           P              ++ AY  K
+Sbjct: 333 PFISKAEKRKQEYEKNLQAYNKK 401
+
+
+ Score = 50.8 bits (119), Expect = 2e-05
+ Identities = 23/74 (31%), Positives = 43/74 (58%)
+ Frame = +3
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP KP+   S++  F++  R+ +K+KHP+ + + +   K   ++WK ++A EK  F   A
+Sbjct: 174 DPNKPKRPPSAFFVFMEDFRKTYKEKHPN-NKSVAVVGKAGGDKWKQLTAAEKAPFISKA 350
+
+Query: 64  KADKARYEREMKTY 77
+           +  K  YE+ ++ Y
+Sbjct: 351 EKRKQEYEKNLQAY 392
+
+
+>Z29356 Gallus domesticus of h71t7 gene encoding G.domesticus
+           expressed sequence
+           Length = 237
+           
+ Score = 61.7 bits (147), Expect = 1e-08
+ Identities = 26/27 (96%), Positives = 27/27 (99%)
+ Frame = +3
+
+Query: 1   GKGDPKKPRGKMSSYAFFVQTCREEHK 27
+           GKGDPKKPRGKMSSYAFFVQTCR+EHK
+Sbjct: 156 GKGDPKKPRGKMSSYAFFVQTCRQEHK 236
+
+
+>Z11540 T.aestivum mRNA for high mobility group protein (HMGW)
+           Length = 923
+           
+ Score = 61.7 bits (147), Expect = 1e-08
+ Identities = 41/109 (37%), Positives = 52/109 (47%), Gaps = 2/109 (1%)
+ Frame = +2
+
+Query: 53  AKEKGKFEDMAKADKARYEREMKTYIPP-KGETKKKFKDPNAPKRPPSAFFLFCSEYRPK 111
+           AK KG     AKAD     +      P  KG+  K  KDPN PKR PSAFF+F  E+R +
+Sbjct: 86  AKSKGA----AKADAKLAVKSKGAEKPAAKGKKGKAGKDPNKPKRAPSAFFVFMGEFREE 253
+
+Query: 112 IKGEHP-GLSIGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAY 161
+            K ++P   S+  V K  GE W + +  +K P               IAAY
+Sbjct: 254 FKQKNPKNKSVAAVGKAAGERWKSLSESEKAPYVAKANKLKGEYNKAIAAY 406
+
+
+ Score = 47.6 bits (111), Expect = 2e-04
+ Identities = 27/81 (33%), Positives = 42/81 (51%)
+ Frame = +2
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP KP+   S++  F+   REE K+K+P  + + +   K   ERWK++S  EK  +   A
+Sbjct: 188 DPNKPKRAPSAFFVFMGEFREEFKQKNP-KNKSVAAVGKAAGERWKSLSESEKAPYVAKA 364
+
+Query: 64  KADKARYEREMKTYIPPKGET 84
+              K  Y + +  Y   KGE+
+Sbjct: 365 NKLKGEYNKAIAAY--NKGES 421
+
+
+>U39747 Ipomoea nil high mobility group protein 2 HMG2 mRNA,
+           complete cds.
+           Length = 835
+           
+ Score = 61.7 bits (147), Expect = 1e-08
+ Identities = 34/101 (33%), Positives = 50/101 (48%), Gaps = 5/101 (4%)
+ Frame = +3
+
+Query: 64  KADKARYEREMKTYIPPKG----ETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHP-G 118
+           K  K++ + + K  +  +G    ++KK  KDPN PKRPPSAFF+F  ++R   K +HP  
+Sbjct: 144 KGGKSKAKSDNKLAVKKRGCETKKSKKSVKDPNKPKRPPSAFFVFMEDFRKTYKEKHPNN 323
+
+Query: 119 LSIGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAK 164
+            S+  V K  G+ W      +K P               + AY  K
+Sbjct: 324 KSVAAVGKAGGDKWKQLTDAEKAPFIAKAEKRKQEYEKSMQAYNRK 461
+
+
+ Score = 49.2 bits (115), Expect = 5e-05
+ Identities = 23/74 (31%), Positives = 42/74 (56%)
+ Frame = +3
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP KP+   S++  F++  R+ +K+KHP+ + + +   K   ++WK ++  EK  F   A
+Sbjct: 234 DPNKPKRPPSAFFVFMEDFRKTYKEKHPN-NKSVAAVGKAGGDKWKQLTDAEKAPFIAKA 410
+
+Query: 64  KADKARYEREMKTY 77
+           +  K  YE+ M+ Y
+Sbjct: 411 EKRKQEYEKSMQAY 452
+
+
+>U80736 Homo sapiens CAGF9 mRNA, partial cds.
+           Length = 2224
+           
+ Score = 60.9 bits (145), Expect = 2e-08
+ Identities = 29/79 (36%), Positives = 44/79 (54%)
+ Frame = +1
+
+Query: 85  KKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQPXX 144
+           KKK KDPN P++P SA+ LF  + +  IKG++P  + G+V+K +  MW++   + KQ   
+Sbjct: 1   KKKKKDPNEPQKPVSAYALFFRDTQAAIKGQNPNATFGEVSKIVASMWDSLGEEQKQVYK 180
+
+Query: 145 XXXXXXXXXXXXDIAAYRA 163
+                        +AAYRA
+Sbjct: 181 RKTEAAKKEYLKALAAYRA 237
+
+
+>AJ002391 Solanum tuberosum mRNA for high mobility group protein
+           Length = 734
+           
+ Score = 60.9 bits (145), Expect = 2e-08
+ Identities = 35/101 (34%), Positives = 50/101 (48%), Gaps = 5/101 (4%)
+ Frame = +3
+
+Query: 64  KADKARYEREMKTYIPPKGETKKKFK----DPNAPKRPPSAFFLFCSEYRPKIKGEHP-G 118
+           K  K++ + + K  +  K    KK K    DPN PKRPPSAFF+F  E+R   K +HP  
+Sbjct: 96  KGAKSKAKADTKLGVRKKATESKKAKNAAKDPNKPKRPPSAFFVFMEEFRKTYKEKHPNN 275
+
+Query: 119 LSIGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAK 164
+            S+  V K  G+ W   + ++K P              ++ AY  K
+Sbjct: 276 KSVAVVGKAGGDKWKQLSDEEKAPYQAKAEKRKAEYQKNMDAYNKK 413
+
+
+ Score = 51.5 bits (121), Expect = 1e-05
+ Identities = 23/74 (31%), Positives = 44/74 (59%)
+ Frame = +3
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP KP+   S++  F++  R+ +K+KHP+ + + +   K   ++WK +S +EK  ++  A
+Sbjct: 186 DPNKPKRPPSAFFVFMEEFRKTYKEKHPN-NKSVAVVGKAGGDKWKQLSDEEKAPYQAKA 362
+
+Query: 64  KADKARYEREMKTY 77
+           +  KA Y++ M  Y
+Sbjct: 363 EKRKAEYQKNMDAY 404
+
+
+>AF002226 Nicotiana tabacum DNA-binding protein (T231) mRNA,
+           complete cds.
+           Length = 759
+           
+ Score = 60.9 bits (145), Expect = 2e-08
+ Identities = 32/86 (37%), Positives = 42/86 (48%), Gaps = 1/86 (1%)
+ Frame = +2
+
+Query: 83  ETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHP-GLSIGDVAKKLGEMWNNTAADDKQ 141
+           + KK  KDPN PKRPPSAFF+F  E+R   K +HP   S+  V K  G+ W   +  +K 
+Sbjct: 98  KAKKAAKDPNKPKRPPSAFFVFMEEFRKTYKEKHPNNKSVAAVGKAGGDAWKKLSEAEKA 277
+
+Query: 142 PXXXXXXXXXXXXXXDIAAYRAKGKPD 168
+           P              ++ AY  K   D
+Sbjct: 278 PYQAKAEKRKAEYQKNMDAYNRKQAGD 358
+
+
+ Score = 50.4 bits (118), Expect = 2e-05
+ Identities = 23/74 (31%), Positives = 42/74 (56%)
+ Frame = +2
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP KP+   S++  F++  R+ +K+KHP+ + + +   K   + WK +S  EK  ++  A
+Sbjct: 119 DPNKPKRPPSAFFVFMEEFRKTYKEKHPN-NKSVAAVGKAGGDAWKKLSEAEKAPYQAKA 295
+
+Query: 64  KADKARYEREMKTY 77
+           +  KA Y++ M  Y
+Sbjct: 296 EKRKAEYQKNMDAY 337
+
+
+>Z50799 H.vulgare mRNA for HMG1/2-like protein.
+           Length = 974
+           
+ Score = 60.5 bits (144), Expect = 2e-08
+ Identities = 40/109 (36%), Positives = 52/109 (47%), Gaps = 2/109 (1%)
+ Frame = +2
+
+Query: 53  AKEKGKFEDMAKADKARYEREMKTYIPP-KGETKKKFKDPNAPKRPPSAFFLFCSEYRPK 111
+           AK KG     AKAD     +      P  KG+  K  KDPN PKR PSAFF+F  E+R +
+Sbjct: 98  AKSKGA----AKADTKLAVKSKGAEKPAAKGKKGKAGKDPNKPKRAPSAFFVFMGEFREE 265
+
+Query: 112 IKGEHP-GLSIGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAY 161
+            K ++P   S+  V K  GE W + +  +K P               IA+Y
+Sbjct: 266 FKQKNPKNKSVAAVGKAAGERWKSLSESEKAPFVAKANKLKGEYNKAIASY 418
+
+
+ Score = 49.6 bits (116), Expect = 4e-05
+ Identities = 32/96 (33%), Positives = 48/96 (49%)
+ Frame = +2
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP KP+   S++  F+   REE K+K+P  + + +   K   ERWK++S  EK  F   A
+Sbjct: 200 DPNKPKRAPSAFFVFMGEFREEFKQKNP-KNKSVAAVGKAAGERWKSLSESEKAPFVAKA 376
+
+Query: 64  KADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPS 99
+              K  Y + + +Y   KGE+        APK+  S
+Sbjct: 377 NKLKGEYNKAIASY--NKGESTTA-----APKKASS 463
+
+
+>L31630 Plasmodium falciparum (clone: D10) high mobility group
+           protein,
+           Length = 392
+           
+ Score = 60.1 bits (143), Expect = 3e-08
+ Identities = 29/76 (38%), Positives = 39/76 (51%)
+ Frame = +1
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           K DP  P+  +S+Y FF +  R E   K P+ S + +   K   E W  +  KEK  FE 
+Sbjct: 121 KKDPHAPKRSLSAYMFFAKEKRAEIISKQPELSKDVATVGKMIGEAWNKLGEKEKAPFEK 300
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+ DK RYE+E   Y
+Sbjct: 301 KAQEDKLRYEKEKAEY 348
+
+
+ Score = 51.5 bits (121), Expect = 1e-05
+ Identities = 26/58 (44%), Positives = 34/58 (57%), Gaps = 2/58 (3%)
+ Frame = +1
+
+Query: 85  KKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS--IGDVAKKLGEMWNNTAADDKQP 142
+           +KK KDP+APKR  SA+  F  E R +I  + P LS  +  V K +GE WN     +K P
+Sbjct: 112 RKKKKDPHAPKRSLSAYMFFAKEKRAEIISKQPELSKDVATVGKMIGEAWNKLGEKEKAP 291
+
+
+>M73753 Saccharomyces cerevisiae mitochondrial protein gene,
+           complete CDS.
+           Length = 1194
+           
+ Score = 59.3 bits (141), Expect = 5e-08
+ Identities = 36/133 (27%), Positives = 65/133 (48%)
+ Frame = +2
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           K  PK+P    S+Y  ++Q  R +  K++P  ++  +E SK   E+W+ + A  K K+  
+Sbjct: 344 KQGPKRPT---SAYFLYLQDHRSQFVKENP--TLRPAEISKIAGEKWQNLEADIKEKYIS 508
+
+Query: 62  MAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSI 121
+             K   + Y++            KK+F +   PK+P   F  + +E R ++  +HP  S 
+Sbjct: 509 ERKKLYSEYQK-----------AKKEFDEKLPPKKPAGPFIKYANEVRSQVFAQHPDKSQ 655
+
+Query: 122 GDVAKKLGEMWNN 134
+            D+ K +G+ W +
+Sbjct: 656 LDLMKIIGDKWQS 694
+
+
+ Score = 46.5 bits (108), Expect = 4e-04
+ Identities = 20/48 (41%), Positives = 30/48 (61%)
+ Frame = +2
+
+Query: 94  PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+           PKRP SA+FL+  ++R +   E+P L   +++K  GE W N  AD K+
+Sbjct: 353 PKRPTSAYFLYLQDHRSQFVKENPTLRPAEISKIAGEKWQNLEADIKE 496
+
+
+>Z48952;Z71257 S.cerevisiae chromosome XIII cosmid 9916.
+             Length = 22131
+             
+ Score = 59.3 bits (141), Expect = 5e-08
+ Identities = 36/133 (27%), Positives = 65/133 (48%)
+ Frame = +3
+
+Query: 2     KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+             K  PK+P    S+Y  ++Q  R +  K++P  ++  +E SK   E+W+ + A  K K+  
+Sbjct: 15762 KQGPKRPT---SAYFLYLQDHRSQFVKENP--TLRPAEISKIAGEKWQNLEADIKEKYIS 15926
+
+Query: 62    MAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSI 121
+               K   + Y++            KK+F +   PK+P   F  + +E R ++  +HP  S 
+Sbjct: 15927 ERKKLYSEYQK-----------AKKEFDEKLPPKKPAGPFIKYANEVRSQVFAQHPDKSQ 16073
+
+Query: 122   GDVAKKLGEMWNN 134
+              D+ K +G+ W +
+Sbjct: 16074 LDLMKIIGDKWQS 16112
+
+
+ Score = 46.5 bits (108), Expect = 4e-04
+ Identities = 20/48 (41%), Positives = 30/48 (61%)
+ Frame = +3
+
+Query: 94    PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+             PKRP SA+FL+  ++R +   E+P L   +++K  GE W N  AD K+
+Sbjct: 15771 PKRPTSAYFLYLQDHRSQFVKENPTLRPAEISKIAGEKWQNLEADIKE 15914
+
+
+>Y08298 Z.mays mRNA for HMGc2 protein
+           Length = 828
+           
+ Score = 59.3 bits (141), Expect = 5e-08
+ Identities = 27/58 (46%), Positives = 38/58 (64%), Gaps = 1/58 (1%)
+ Frame = +1
+
+Query: 85  KKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPG-LSIGDVAKKLGEMWNNTAADDKQP 142
+           +KK      PKRPPSAFF+F SE+R + + +HPG  S+  V+K  GE W + +  +KQP
+Sbjct: 73  RKKAAASGKPKRPPSAFFVFMSEFRQEYQAQHPGNKSVAAVSKAAGEKWRSMSEQEKQP 249
+
+
+ Score = 46.5 bits (108), Expect = 4e-04
+ Identities = 27/93 (29%), Positives = 45/93 (48%)
+ Frame = +1
+
+Query: 3   GDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDM 62
+           G PK+P    S++  F+   R+E++ +HP  + + +  SK   E+W++MS +EK  + D 
+Sbjct: 94  GKPKRPP---SAFFVFMSEFRQEYQAQHP-GNKSVAAVSKAAGEKWRSMSEQEKQPYVDQ 261
+
+Query: 63  AKADKARYEREMKTYIPPKGETKKKFKDPNAPK 95
+           A   K  YE+            K K  D +  K
+Sbjct: 262 AGQKKQDYEKTKANIEKSTSSKKAKTDDDDGSK 360
+
+
+>AJ223169 Saccharomyces cerevisiae mRNA for cisplatin-damaged DNA
+           recognition
+           Length = 1087
+           
+ Score = 59.3 bits (141), Expect = 5e-08
+ Identities = 36/133 (27%), Positives = 65/133 (48%)
+ Frame = +1
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           K  PK+P    S+Y  ++Q  R +  K++P  ++  +E SK   E+W+ + A  K K+  
+Sbjct: 646 KQGPKRPT---SAYFLYLQDHRSQFVKENP--TLRPAEISKIAGEKWQNLEADIKEKYIS 810
+
+Query: 62  MAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSI 121
+             K   + Y++            KK+F +   PK+P   F  + +E R ++  +HP  S 
+Sbjct: 811 ERKKLYSEYQK-----------AKKEFDEKLPPKKPAGPFIKYANEVRSQVFAQHPDKSQ 957
+
+Query: 122 GDVAKKLGEMWNN 134
+            D+ K +G+ W +
+Sbjct: 958 LDLMKIIGDKWQS 996
+
+
+ Score = 46.5 bits (108), Expect = 4e-04
+ Identities = 20/48 (41%), Positives = 30/48 (61%)
+ Frame = +1
+
+Query: 94  PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+           PKRP SA+FL+  ++R +   E+P L   +++K  GE W N  AD K+
+Sbjct: 655 PKRPTSAYFLYLQDHRSQFVKENPTLRPAEISKIAGEKWQNLEADIKE 798
+
+
+>Y14072 Arabidopsis thaliana mRNA for HMG beta1 protein
+           Length = 686
+           
+ Score = 58.9 bits (140), Expect = 6e-08
+ Identities = 37/105 (35%), Positives = 51/105 (48%), Gaps = 7/105 (6%)
+ Frame = +1
+
+Query: 60  EDMAKADKARYE-REMKTYIPPK-----GETKKKFKDPNAPKRPPSAFFLFCSEYRPKIK 113
+           E + K  K++ E R  K  +  K     G  K   KDPN PKRP SAFF+F  ++R   K
+Sbjct: 25  ESIMKGAKSKTETRSSKLSVTKKPAKGAGRGKAAAKDPNKPKRPASAFFVFMEDFRETFK 204
+
+Query: 114 GEHP-GLSIGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAK 164
+            E+P   S+  V K  G+ W + +  +K P              +I AY  K
+Sbjct: 205 KENPKNKSVATVGKAAGDKWKSLSDSEKAPYVAKAEKRKVEYEKNIKAYNKK 360
+
+
+ Score = 49.6 bits (116), Expect = 4e-05
+ Identities = 23/74 (31%), Positives = 41/74 (55%)
+ Frame = +1
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP KP+   S++  F++  RE  KK++P  + + +   K   ++WK++S  EK  +   A
+Sbjct: 133 DPNKPKRPASAFFVFMEDFRETFKKENPK-NKSVATVGKAAGDKWKSLSDSEKAPYVAKA 309
+
+Query: 64  KADKARYEREMKTY 77
+           +  K  YE+ +K Y
+Sbjct: 310 EKRKVEYEKNIKAY 351
+
+
+>Y14073 Arabidopsis thaliana mRNA for HMG beta2 protein
+           Length = 731
+           
+ Score = 58.9 bits (140), Expect = 6e-08
+ Identities = 39/105 (37%), Positives = 52/105 (49%), Gaps = 5/105 (4%)
+ Frame = +3
+
+Query: 60  EDMAKADKARYE-REMKTYI---PPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGE 115
+           E + K  K++ E R  K  +   P KG  K   KDPN PKRP SAFF+F  ++R   K E
+Sbjct: 42  ESIMKGAKSKAETRSTKLSVTKKPAKG-AKGAAKDPNKPKRPSSAFFVFMEDFRVTYKEE 218
+
+Query: 116 HP-GLSIGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAK 164
+           HP   S+  V K  GE W + +  +K P              ++ AY  K
+Sbjct: 219 HPKNKSVAAVGKAGGEKWKSLSDSEKAPYVAKADKRKVEYEKNMKAYNKK 368
+
+
+ Score = 50.0 bits (117), Expect = 3e-05
+ Identities = 24/74 (32%), Positives = 40/74 (53%)
+ Frame = +3
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP KP+   S++  F++  R  +K++HP  + + +   K   E+WK++S  EK  +   A
+Sbjct: 141 DPNKPKRPSSAFFVFMEDFRVTYKEEHPK-NKSVAAVGKAGGEKWKSLSDSEKAPYVAKA 317
+
+Query: 64  KADKARYEREMKTY 77
+              K  YE+ MK Y
+Sbjct: 318 DKRKVEYEKNMKAY 359
+
+
+>Y09482 A.thaliana mRNA for HMG 1 protein
+           Length = 738
+           
+ Score = 58.9 bits (140), Expect = 6e-08
+ Identities = 39/105 (37%), Positives = 52/105 (49%), Gaps = 5/105 (4%)
+ Frame = +1
+
+Query: 60  EDMAKADKARYE-REMKTYI---PPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGE 115
+           E + K  K++ E R  K  +   P KG  K   KDPN PKRP SAFF+F  ++R   K E
+Sbjct: 40  ESIMKGAKSKAETRSTKLSVTKKPAKG-AKGAAKDPNKPKRPSSAFFVFMEDFRVTYKEE 216
+
+Query: 116 HP-GLSIGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAK 164
+           HP   S+  V K  GE W + +  +K P              ++ AY  K
+Sbjct: 217 HPKNKSVAAVGKAGGEKWKSLSDSEKAPYVAKADKRKVEYEKNMKAYNKK 366
+
+
+ Score = 50.0 bits (117), Expect = 3e-05
+ Identities = 24/74 (32%), Positives = 40/74 (53%)
+ Frame = +1
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP KP+   S++  F++  R  +K++HP  + + +   K   E+WK++S  EK  +   A
+Sbjct: 139 DPNKPKRPSSAFFVFMEDFRVTYKEEHPK-NKSVAAVGKAGGEKWKSLSDSEKAPYVAKA 315
+
+Query: 64  KADKARYEREMKTY 77
+              K  YE+ MK Y
+Sbjct: 316 DKRKVEYEKNMKAY 357
+
+
+>Y14071 Arabidopsis thaliana mRNA for HMG alpha protein
+           Length = 846
+           
+ Score = 58.2 bits (138), Expect = 1e-07
+ Identities = 35/94 (37%), Positives = 49/94 (51%), Gaps = 1/94 (1%)
+ Frame = +1
+
+Query: 49  KTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEY 108
+           K  + KE  K  D  K  K +   E  T    + E K K KDPN PKR PSAFF+F  ++
+Sbjct: 79  KVKTTKEALKPVDDRKVGKRKAPAEKPTKRETRKEKKAK-KDPNKPKRAPSAFFVFLEDF 255
+
+Query: 109 RPKIKGEHPGL-SIGDVAKKLGEMWNNTAADDKQP 142
+           R   K E+P + ++  V K  G+ W + +  +K P
+Sbjct: 256 RVTFKKENPNVKAVSAVGKAGGQKWKSMSQAEKAP 360
+
+
+ Score = 54.7 bits (129), Expect = 1e-06
+ Identities = 27/76 (35%), Positives = 42/76 (54%)
+ Frame = +1
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           K DP KP+   S++  F++  R   KK++P+     S   K   ++WK+MS  EK  +E+
+Sbjct: 193 KKDPNKPKRAPSAFFVFLEDFRVTFKKENPNVKA-VSAVGKAGGQKWKSMSQAEKAPYEE 369
+
+Query: 62  MAKADKARYEREMKTY 77
+            A   KA YE++M  Y
+Sbjct: 370 KAAKRKAEYEKQMDAY 417
+
+
+>Y08807 Z.mays mRNA for HMG protein
+           Length = 731
+           
+ Score = 57.8 bits (137), Expect = 1e-07
+ Identities = 30/83 (36%), Positives = 40/83 (48%), Gaps = 1/83 (1%)
+ Frame = +1
+
+Query: 86  KKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGL-SIGDVAKKLGEMWNNTAADDKQPXX 144
+           K  KDPN PKRPPSAFF+F  E+R   K +HP +  +  + K  G+ W + +  +K P  
+Sbjct: 97  KAEKDPNKPKRPPSAFFVFMEEFRKDYKEKHPNVKQVSVIGKAGGDKWKSLSDAEKAPYV 276
+
+Query: 145 XXXXXXXXXXXXDIAAYRAKGKPD 168
+                        I AY  K   D
+Sbjct: 277 SKAEKLKAEYTKKIDAYNNKQSGD 348
+
+
+ Score = 51.2 bits (120), Expect = 1e-05
+ Identities = 27/90 (30%), Positives = 47/90 (52%)
+ Frame = +1
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP KP+   S++  F++  R+++K+KHP+     S   K   ++WK++S  EK  +   A
+Sbjct: 109 DPNKPKRPPSAFFVFMEEFRKDYKEKHPNVK-QVSVIGKAGGDKWKSLSDAEKAPYVSKA 285
+
+Query: 64  KADKARYEREMKTYIPPKGETKKKFKDPNA 93
+           +  KA Y +++  Y        K+  DP A
+Sbjct: 286 EKLKAEYTKKIDAY------NNKQSGDPTA 357
+
+
+>X80463 M.musculus HMG1-R-159 gene
+           Length = 192
+           
+ Score = 57.8 bits (137), Expect = 1e-07
+ Identities = 25/36 (69%), Positives = 30/36 (82%)
+ Frame = +3
+
+Query: 27  KKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDM 62
+           +++ P    NFSEFS KCSERW+TM+AKEKGKFEDM
+Sbjct: 81  QEEAPGCFFNFSEFSMKCSERWETMTAKEKGKFEDM 188
+
+
+ Score = 53.9 bits (127), Expect = 2e-06
+ Identities = 27/37 (72%), Positives = 28/37 (74%)
+ Frame = +1
+
+Query: 1  GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNF 37
+          GK DPKK RGKMSSYAFF+QT    HKKKH DAS  F
+Sbjct: 4  GKKDPKKLRGKMSSYAFFLQTFWV*HKKKHLDASSTF 114
+
+
+>I66612 Sequence 12 from patent US 5670621.
+            Length = 3292
+            
+ Score = 57.8 bits (137), Expect = 1e-07
+ Identities = 37/131 (28%), Positives = 59/131 (44%)
+ Frame = +1
+
+Query: 2    KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+            K  PK+P    S+Y  F  + R E  ++ P+A V   E SK  S RWK ++  +K  F +
+Sbjct: 907  KQGPKRPS---SAYFLFSMSIRNELLQQFPEAKV--PELSKLASARWKELTDDQKKPFYE 1071
+
+Query: 62   MAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSI 121
+              + +  +Y              +  ++    PKRP   F  F  E RP +  E+P   +
+Sbjct: 1072 EFRTNWEKYR-----------VVRDAYEKTLPPKRPSGPFIQFTQEIRPTVVKENPDKGL 1218
+
+Query: 122  GDVAKKLGEMW 132
+             ++ K +GE W
+Sbjct: 1219 IEITKIIGERW 1251
+
+
+ Score = 39.5 bits (90), Expect = 0.047
+ Identities = 19/60 (31%), Positives = 30/60 (49%)
+ Frame = +1
+
+Query: 83  ETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 142
+           E +K+ K    PKRP SA+FLF    R ++  + P   + +++K     W     D K+P
+Sbjct: 886 ERRKQLKK-QGPKRPSSAYFLFSMSIRNELLQQFPEAKVPELSKLASARWKELTDDQKKP 1062
+
+
+>I66611 Sequence 10 from patent US 5670621.
+            Length = 2384
+            
+ Score = 57.8 bits (137), Expect = 1e-07
+ Identities = 37/88 (42%), Positives = 52/88 (59%), Gaps = 9/88 (10%)
+ Frame = +3
+
+Query: 54   KEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIK 113
+            K++ K E   K +K   E+E       K  +KKK KD   PKR  +AF L+ ++ R  IK
+Sbjct: 1683 KKEKKSEKKEKKEKKHKEKERT-----KKPSKKK-KDSGKPKRATTAFMLWLNDTRESIK 1844
+
+Query: 114  GEHPGLSIGDVAKKLGEM---------WNNTAADDKQ 141
+             E+PG+ + ++AKK GEM         W + AA DKQ
+Sbjct: 1845 RENPGIKVTEIAKKGGEMWKELKDKSKWEDAAAKDKQ 1955
+
+
+>X68408 D.melanogaster SSRP1 mRNA
+            Length = 2384
+            
+ Score = 57.8 bits (137), Expect = 1e-07
+ Identities = 37/88 (42%), Positives = 52/88 (59%), Gaps = 9/88 (10%)
+ Frame = +3
+
+Query: 54   KEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIK 113
+            K++ K E   K +K   E+E       K  +KKK KD   PKR  +AF L+ ++ R  IK
+Sbjct: 1683 KKEKKSEKKEKKEKKHKEKERT-----KKPSKKK-KDSGKPKRATTAFMLWLNDTRESIK 1844
+
+Query: 114  GEHPGLSIGDVAKKLGEM---------WNNTAADDKQ 141
+             E+PG+ + ++AKK GEM         W + AA DKQ
+Sbjct: 1845 RENPGIKVTEIAKKGGEMWKELKDKSKWEDAAAKDKQ 1955
+
+
+>Z28032;Y13137 S.cerevisiae chromosome XI reading frame ORF YKL032c
+            Length = 3499
+            
+ Score = 57.8 bits (137), Expect = 1e-07
+ Identities = 37/131 (28%), Positives = 59/131 (44%)
+ Frame = -1
+
+Query: 2    KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+            K  PK+P    S+Y  F  + R E  ++ P+A V   E SK  S RWK ++  +K  F +
+Sbjct: 2215 KQGPKRPS---SAYFLFSMSIRNELLQQFPEAKV--PELSKLASARWKELTDDQKKPFYE 2051
+
+Query: 62   MAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSI 121
+              + +  +Y              +  ++    PKRP   F  F  E RP +  E+P   +
+Sbjct: 2050 EFRTNWEKYR-----------VVRDAYEKTLPPKRPSGPFIQFTQEIRPTVVKENPDKGL 1904
+
+Query: 122  GDVAKKLGEMW 132
+             ++ K +GE W
+Sbjct: 1903 IEITKIIGERW 1871
+
+
+ Score = 39.5 bits (90), Expect = 0.047
+ Identities = 19/60 (31%), Positives = 30/60 (49%)
+ Frame = -1
+
+Query: 83   ETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 142
+            E +K+ K    PKRP SA+FLF    R ++  + P   + +++K     W     D K+P
+Sbjct: 2236 ERRKQLKK-QGPKRPSSAYFLFSMSIRNELLQQFPEAKVPELSKLASARWKELTDDQKKP 2060
+
+
+>L16900 Yeast intrastrand crosslink recognition protein (Ixr1) gene,
+            Length = 3036
+            
+ Score = 57.8 bits (137), Expect = 1e-07
+ Identities = 37/131 (28%), Positives = 59/131 (44%)
+ Frame = +3
+
+Query: 2    KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+            K  PK+P    S+Y  F  + R E  ++ P+A V   E SK  S RWK ++  +K  F +
+Sbjct: 2037 KQGPKRPS---SAYFLFSMSIRNELLQQFPEAKV--PELSKLASARWKELTDDQKKPFYE 2201
+
+Query: 62   MAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSI 121
+              + +  +Y              +  ++    PKRP   F  F  E RP +  E+P   +
+Sbjct: 2202 EFRTNWEKYR-----------VVRDAYEKTLPPKRPSGPFIQFTQEIRPTVVKENPDKGL 2348
+
+Query: 122  GDVAKKLGEMW 132
+             ++ K +GE W
+Sbjct: 2349 IEITKIIGERW 2381
+
+
+ Score = 39.5 bits (90), Expect = 0.047
+ Identities = 19/60 (31%), Positives = 30/60 (49%)
+ Frame = +3
+
+Query: 83   ETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 142
+            E +K+ K    PKRP SA+FLF    R ++  + P   + +++K     W     D K+P
+Sbjct: 2016 ERRKQLKK-QGPKRPSSAYFLFSMSIRNELLQQFPEAKVPELSKLASARWKELTDDQKKP 2192
+
+
+>X71622 S.cerevisiae DNA sequence for Kazal serine protease inhibitor
+            signature
+            Length = 11719
+            
+ Score = 57.8 bits (137), Expect = 1e-07
+ Identities = 37/131 (28%), Positives = 59/131 (44%)
+ Frame = -1
+
+Query: 2    KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+            K  PK+P    S+Y  F  + R E  ++ P+A V   E SK  S RWK ++  +K  F +
+Sbjct: 9469 KQGPKRPS---SAYFLFSMSIRNELLQQFPEAKV--PELSKLASARWKELTDDQKKPFYE 9305
+
+Query: 62   MAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSI 121
+              + +  +Y              +  ++    PKRP   F  F  E RP +  E+P   +
+Sbjct: 9304 EFRTNWEKYR-----------VVRDAYEKTLPPKRPSGPFIQFTQEIRPTVVKENPDKGL 9158
+
+Query: 122  GDVAKKLGEMW 132
+             ++ K +GE W
+Sbjct: 9157 IEITKIIGERW 9125
+
+
+ Score = 39.5 bits (90), Expect = 0.047
+ Identities = 19/60 (31%), Positives = 30/60 (49%)
+ Frame = -1
+
+Query: 83   ETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 142
+            E +K+ K    PKRP SA+FLF    R ++  + P   + +++K     W     D K+P
+Sbjct: 9490 ERRKQLKK-QGPKRPSSAYFLFSMSIRNELLQQFPEAKVPELSKLASARWKELTDDQKKP 9314
+
+
+>Y14074 Arabidopsis thaliana mRNA for HMG gamma protein
+           Length = 701
+           
+ Score = 57.4 bits (136), Expect = 2e-07
+ Identities = 33/102 (32%), Positives = 47/102 (45%), Gaps = 1/102 (0%)
+ Frame = +1
+
+Query: 63  AKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHP-GLSI 121
+           +KA     ++ +KT     G  KK  KDPN PKRPPSAFF+F  ++R +    +P   S+
+Sbjct: 19  SKAGATSTDQRLKTRGRKAG--KKTKKDPNQPKRPPSAFFVFLEDFRKEFNLANPNNKSV 192
+
+Query: 122 GDVAKKLGEMWNNTAADDKQPXXXXXXXXXXXXXXDIAAYRAK 164
+             V K  G  W +   +DK P              ++  Y  K
+Sbjct: 193 ATVGKAAGARWKSMTDEDKAPYVAKAESRKTEYIKNVQQYNLK 321
+
+
+>X78993 S.cerevisiae genomic DNA 70kb region of the right arm of
+            chromosome II.
+            Length = 69748
+            
+ Score = 56.6 bits (134), Expect = 3e-07
+ Identities = 27/71 (38%), Positives = 43/71 (60%)
+ Frame = -3
+
+Query: 7    KPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKAD 66
+            +P  ++S+Y FF    R+  + ++PD  V F +  +   ERWK ++A+EK  +E  A+AD
+Sbjct: 6641 RP*ERLSAYMFFANENRDIVRSENPD--VTFGQVGRILGERWKALTAEEKQPYESKAQAD 6468
+
+Query: 67   KARYEREMKTY 77
+            K RYE E + Y
+Sbjct: 6467 KKRYESEKELY 6435
+
+
+ Score = 42.6 bits (98), Expect = 0.005
+ Identities = 21/62 (33%), Positives = 35/62 (55%), Gaps = 3/62 (4%)
+ Frame = -3
+
+Query: 81   KGETKKKFKDPNAPKRP---PSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAA 137
+            KG  ++  ++     RP    SA+  F +E R  ++ E+P ++ G V + LGE W    A
+Sbjct: 6686 KGTKEEDHQEKEGS*RP*ERLSAYMFFANENRDIVRSENPDVTFGQVGRILGERWKALTA 6507
+
+Query: 138  DDKQP 142
+            ++KQP
+Sbjct: 6506 EEKQP 6492
+
+
+>Y08297 Z.mays mRNA for HMGc1 protein
+           Length = 784
+           
+ Score = 56.2 bits (133), Expect = 4e-07
+ Identities = 27/58 (46%), Positives = 36/58 (61%), Gaps = 1/58 (1%)
+ Frame = +2
+
+Query: 85  KKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPG-LSIGDVAKKLGEMWNNTAADDKQP 142
+           +KK      PKRPPSAFF+F SE+R + +  HPG  S+  V+K  GE W   +  +KQP
+Sbjct: 158 RKKAAASGKPKRPPSAFFVFMSEFRQEYQALHPGNKSVATVSKAAGEKWRAMSDQEKQP 334
+
+
+ Score = 46.1 bits (107), Expect = 5e-04
+ Identities = 26/87 (29%), Positives = 44/87 (49%)
+ Frame = +2
+
+Query: 3   GDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDM 62
+           G PK+P    S++  F+   R+E++  HP  + + +  SK   E+W+ MS +EK  + D 
+Sbjct: 179 GKPKRPP---SAFFVFMSEFRQEYQALHP-GNKSVATVSKAAGEKWRAMSDQEKQPYVDQ 346
+
+Query: 63  AKADKARYEREMKTYIPPKGETKKKFK 89
+           A   K  YE+    +   +  + KK K
+Sbjct: 347 AGQKKQDYEKTKANFDKKESTSSKKAK 427
+
+
+>D13491 A.thaliana mRNA for high mobility group protein, complete cds.
+            Length = 2114
+            
+ Score = 56.2 bits (133), Expect = 4e-07
+ Identities = 36/78 (46%), Positives = 46/78 (58%), Gaps = 14/78 (17%)
+ Frame = +2
+
+Query: 53   AKEKGKFEDMAKADKARYEREMKTY--IPPKGET------------KKKFKDPNAPKRPP 98
+            A E G  E   K+ K   ++E  +   +PPK +T             KK KDPNAPKR  
+Sbjct: 1568 ASEGGVGEIKEKSIKKEPKKEASSSKGLPPKRKTVAADEGSSKRKKPKKKKDPNAPKRAM 1747
+
+Query: 99   SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGE 130
+            S F  F    R  IK EHPG++ G+V K LG+
+Sbjct: 1748 SGFMFFSQMERDNIKKEHPGIAFGEVGKVLGD 1843
+
+
+ Score = 44.1 bits (102), Expect = 0.002
+ Identities = 25/80 (31%), Positives = 37/80 (46%)
+ Frame = +2
+
+Query: 2    KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+            K DP  P+  MS + FF Q  R+  KK+HP   + F E  K   ++        K   + 
+Sbjct: 1715 KKDPNAPKRAMSGFMFFSQMERDNIKKEHP--GIAFGEVGKVLGDKCVKCLLMIKSHMKP 1888
+
+Query: 62   MAKADKARYEREMKTYIPPK 81
+              + DK RY+ E+  Y  P+
+Sbjct: 1889 RLQVDKQRYKDEISDYKNPQ 1948
+
+
+>X58245 Soybean mRNA for HMG-1 like protein
+           Length = 761
+           
+ Score = 56.2 bits (133), Expect = 4e-07
+ Identities = 29/79 (36%), Positives = 37/79 (46%), Gaps = 1/79 (1%)
+ Frame = +1
+
+Query: 86  KKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHP-GLSIGDVAKKLGEMWNNTAADDKQPXX 144
+           K  KDPN PKRPPSAFF+F  E+R     EHP   ++  V K  G  W   +  +K P  
+Sbjct: 142 KAAKDPNKPKRPPSAFFVFMEEFRKVFNKEHPENKAVSAVGKAAGAKWKTMSDAEKAPYV 321
+
+Query: 145 XXXXXXXXXXXXDIAAYRAK 164
+                       ++ AY  K
+Sbjct: 322 AKSEKRKVEYEKNMRAYNKK 381
+
+
+ Score = 51.2 bits (120), Expect = 1e-05
+ Identities = 28/83 (33%), Positives = 43/83 (51%), Gaps = 4/83 (4%)
+ Frame = +1
+
+Query: 1   GKG----DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEK 56
+           GKG    DP KP+   S++  F++  R+   K+HP+     S   K    +WKTMS  EK
+Sbjct: 133 GKGKAAKDPNKPKRPPSAFFVFMEEFRKVFNKEHPENKA-VSAVGKAAGAKWKTMSDAEK 309
+
+Query: 57  GKFEDMAKADKARYEREMKTYIPPKGE 83
+             +   ++  K  YE+ M+ Y   + E
+Sbjct: 310 APYVAKSEKRKVEYEKNMRAYNKKQAE 390
+
+
+>L08825 Drosophila melanogaster single-stranded recognition protein
+            (SSRP)
+            Length = 2443
+            
+ Score = 55.8 bits (132), Expect = 6e-07
+ Identities = 36/88 (40%), Positives = 51/88 (57%), Gaps = 9/88 (10%)
+ Frame = +1
+
+Query: 54   KEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIK 113
+            K++ K E   K +K   E+E       K  +KKK KD   PKR  +AF L+ ++ R   K
+Sbjct: 1666 KKEKKSEKKEKKEKKHKEKERT-----KKPSKKK-KDSGKPKRATTAFMLWLNDTRESYK 1827
+
+Query: 114  GEHPGLSIGDVAKKLGEM---------WNNTAADDKQ 141
+             E+PG+ + ++AKK GEM         W + AA DKQ
+Sbjct: 1828 RENPGIKVTEIAKKGGEMWKELKDKSKWEDAAAKDKQ 1938
+
+
+>L22300 Chilo iridescent virus type 6 zinc finger protein and
+            non-histone
+            Length = 5702
+            
+ Score = 55.4 bits (131), Expect = 7e-07
+ Identities = 39/134 (29%), Positives = 60/134 (44%)
+ Frame = +3
+
+Query: 8    PRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADK 67
+            P+   SSY FF Q  R     + PD   N  +      ++W  +  +++ K++ MA  D+
+Sbjct: 927  PKRNKSSYLFFCQEIRPSIVAEMPDIKPN--QVMVHLGKKWSELPLEDRKKYDVMAVEDR 1100
+
+Query: 68   ARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKK 127
+             RY            E  KK   P       S +  FC++ R KIK + P L+  D+  K
+Sbjct: 1101 KRYLASK--------EANKKLNKPVKI----SGYLQFCADER-KIKLKFPDLTTKDITAK 1241
+
+Query: 128  LGEMWNNTAADDKQ 141
+            LG MWN+   ++ Q
+Sbjct: 1242 LGGMWNDYKKNNPQ 1283
+
+
+ Score = 43.0 bits (99), Expect = 0.004
+ Identities = 18/50 (36%), Positives = 26/50 (52%)
+ Frame = +3
+
+Query: 92  NAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+           N PKR  S++  FC E RP I  E P +    V   LG+ W+    +D++
+Sbjct: 921 NVPKRNKSSYLFFCQEIRPSIVAEMPDIKPNQVMVHLGKKWSELPLEDRK 1070
+
+
+>M81360 Babesia bovis non-histone protein mRNA, complete cds.
+           Length = 401
+           
+ Score = 55.0 bits (130), Expect = 1e-06
+ Identities = 27/80 (33%), Positives = 41/80 (50%)
+ Frame = +3
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           K DP  P+  +SSY FF +  R E   ++P+ + + +   K     W  +S +EK  +E 
+Sbjct: 117 KKDPNAPKRALSSYMFFAKEKRVEIIAENPEIAKDVAAIGKMIGAAWNALSDEEKKPYER 296
+
+Query: 62  MAKADKARYEREMKTYIPPK 81
+           M+  D+ RYERE   Y   K
+Sbjct: 297 MSDEDRVRYEREKAEYAQRK 356
+
+
+ Score = 47.6 bits (111), Expect = 2e-04
+ Identities = 22/58 (37%), Positives = 36/58 (61%), Gaps = 2/58 (3%)
+ Frame = +3
+
+Query: 85  KKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS--IGDVAKKLGEMWNNTAADDKQP 142
+           +K  KDPNAPKR  S++  F  E R +I  E+P ++  +  + K +G  WN  + ++K+P
+Sbjct: 108 RKAKKDPNAPKRALSSYMFFAKEKRVEIIAENPEIAKDVAAIGKMIGAAWNALSDEEKKP 287
+
+
+>AF000195 Caenorhabditis elegans cosmid C32F10.
+             Length = 30102
+             
+ Score = 54.3 bits (128), Expect = 2e-06
+ Identities = 34/93 (36%), Positives = 52/93 (55%)
+ Frame = -1
+
+Query: 49    KTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEY 108
+             + +  K+K   E   K +K   E+ +K     KG   KK KDPN PKR  +A+ ++ +  
+Sbjct: 12192 ENIEPKKKESKEKKNKREKK--EKPVKEKAVKKG---KKTKDPNEPKRATTAYIIWFNAN 12028
+
+Query: 109   RPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+             R  +K +  G ++GDVAKK G  W + +ADDK+
+Sbjct: 12027 RNSMKED--GDTLGDVAKKAGAKWKSMSADDKK 11935
+
+
+>X53461;X53260 Human mRNA for upstream binding factor (hUBF)
+            Length = 3097
+            
+ Score = 53.9 bits (127), Expect = 2e-06
+ Identities = 35/97 (36%), Positives = 53/97 (54%), Gaps = 29/97 (29%)
+ Frame = +1
+
+Query: 44   CSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGE---------------TKKKF 88
+            CS++WK +S KEK  +       K  YE E+  ++    E                KK+ 
+Sbjct: 1129 CSQQWKLLSQKEKDAYHKKCDQKKKDYEVELLRFLESLPEEEQQRVLGEEKMLNINKKQA 1308
+
+Query: 89   KDPNA--------------PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNN 134
+              P +              PKRP SA F+F  E R +++ E P LS  ++ + L  MWN+
+Sbjct: 1309 TSPASKKPAQEGGKGGSEKPKRPVSAMFIFSEEKRRQLQEERPELSESELTRLLARMWND 1488
+
+Query: 135  TAADDK 140
+             +   K
+Sbjct: 1489 LSEKKK 1506
+
+
+ Score = 53.1 bits (125), Expect = 4e-06
+ Identities = 39/140 (27%), Positives = 68/140 (47%), Gaps = 3/140 (2%)
+ Frame = +1
+
+Query: 1    GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+            GKG  +KP+  +S+   F +  R + +++ P+ S   SE ++  +  W  +S K+K K++
+Sbjct: 1345 GKGGSEKPKRPVSAMFIFSEEKRRQLQEERPELSE--SELTRLLARMWNDLSEKKKAKYK 1518
+
+Query: 61   DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+                A KA+ ER+      P GE +++ K P +PKR           ++  + G++    
+Sbjct: 1519 AREAALKAQSERK------PGGEREERGKLPESPKRAEEI-------WQQSVIGDYLARF 1659
+
+Query: 121  IGDVAKKLGEM---WNNTAADDK 140
+              D  K L  M   WNN    +K
+Sbjct: 1660 KNDRVKALKAMEMTWNNMEKKEK 1728
+
+
+ Score = 41.4 bits (95), Expect = 0.012
+ Identities = 29/94 (30%), Positives = 41/94 (42%), Gaps = 3/94 (3%)
+ Frame = +1
+
+Query: 48   WKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGET--KKKFKDPNAPKRPP-SAFFLF 104
+            W  M  KEK  +   A  D+ RYERE+     P   T   KK K    PK+PP + +  F
+Sbjct: 1702 WNNMEKKEKLMWIKKAAEDQKRYERELSEMRAPPAATNSSKKMKFQGEPKKPPMNGYQKF 1881
+
+Query: 105  CSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+              E      GE   L + +   ++G  W   +   K+
+Sbjct: 1882 SQELLS--NGELNHLPLKERMVEIGSRWQRISQSQKE 1986
+
+
+ Score = 37.9 bits (86), Expect = 0.14
+ Identities = 32/98 (32%), Positives = 45/98 (45%), Gaps = 1/98 (1%)
+ Frame = +1
+
+Query: 35  VNFSEFS-KKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNA 93
+           V F +FS   C  +W  +S  E  KF  + +      E     Y   KG  KK  K P+ 
+Sbjct: 319 VAFKDFSGDMCKLKWVEIS-NEVRKFRTLTELILDAQEHVKNPY---KG--KKLKKHPDF 480
+
+Query: 94  PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMW 132
+           PK+P + +F F  E R K    HP +S  D+ K L + +
+Sbjct: 481 PKKPLTPYFRFFMEKRAKYAKLHPEMSNLDLTKILSKKY 597
+
+
+ Score = 35.6 bits (80), Expect = 0.69
+ Identities = 27/91 (29%), Positives = 46/91 (49%), Gaps = 18/91 (19%)
+ Frame = +1
+
+Query: 23  REEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPP-- 80
+           ++ + K  PDA+    E      ++W  +S K++ K+   A   +  YE  M+ YI    
+Sbjct: 778 KKVYLKVRPDATTK--EVKDSLGKQWSQLSDKKRLKWIHKALEQRKEYEEIMRDYIQKHP 951
+
+Query: 81  ---------------KGETKKKFKDPNAP-KRPPSAFFLFCSEYRPKIK 113
+                          K E + K K    P K PP+++ L+C+E    +K
+Sbjct: 952 ELNISEEGITKSTLTKAERQLKDKFDGRPTKPPPNSYSLYCAELMANMK 1098
+
+
+>X53390 Human mRNA for upstream binding factor (hUBF)
+            Length = 3097
+            
+ Score = 53.9 bits (127), Expect = 2e-06
+ Identities = 35/97 (36%), Positives = 53/97 (54%), Gaps = 29/97 (29%)
+ Frame = +1
+
+Query: 44   CSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGE---------------TKKKF 88
+            CS++WK +S KEK  +       K  YE E+  ++    E                KK+ 
+Sbjct: 1129 CSQQWKLLSQKEKDAYHKKCDQKKKDYEVELLRFLESLPEEEQQRVLGEEKMLNINKKQA 1308
+
+Query: 89   KDPNA--------------PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNN 134
+              P +              PKRP SA F+F  E R +++ E P LS  ++ + L  MWN+
+Sbjct: 1309 TSPASKKPAQEGGKGGSEKPKRPVSAMFIFSEEKRRQLQEERPELSESELTRLLARMWND 1488
+
+Query: 135  TAADDK 140
+             +   K
+Sbjct: 1489 LSEKKK 1506
+
+
+ Score = 53.1 bits (125), Expect = 4e-06
+ Identities = 39/140 (27%), Positives = 68/140 (47%), Gaps = 3/140 (2%)
+ Frame = +1
+
+Query: 1    GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+            GKG  +KP+  +S+   F +  R + +++ P+ S   SE ++  +  W  +S K+K K++
+Sbjct: 1345 GKGGSEKPKRPVSAMFIFSEEKRRQLQEERPELSE--SELTRLLARMWNDLSEKKKAKYK 1518
+
+Query: 61   DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+                A KA+ ER+      P GE +++ K P +PKR           ++  + G++    
+Sbjct: 1519 AREAALKAQSERK------PGGEREERGKLPESPKRAEEI-------WQQSVIGDYLARF 1659
+
+Query: 121  IGDVAKKLGEM---WNNTAADDK 140
+              D  K L  M   WNN    +K
+Sbjct: 1660 KNDRVKALKAMEMTWNNMEKKEK 1728
+
+
+ Score = 41.4 bits (95), Expect = 0.012
+ Identities = 29/94 (30%), Positives = 41/94 (42%), Gaps = 3/94 (3%)
+ Frame = +1
+
+Query: 48   WKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGET--KKKFKDPNAPKRPP-SAFFLF 104
+            W  M  KEK  +   A  D+ RYERE+     P   T   KK K    PK+PP + +  F
+Sbjct: 1702 WNNMEKKEKLMWIKKAAEDQKRYERELSEMRAPPAATNSSKKMKFQGEPKKPPMNGYQKF 1881
+
+Query: 105  CSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+              E      GE   L + +   ++G  W   +   K+
+Sbjct: 1882 SQELLS--NGELNHLPLKERMVEIGSRWQRISQSQKE 1986
+
+
+ Score = 37.9 bits (86), Expect = 0.14
+ Identities = 32/98 (32%), Positives = 45/98 (45%), Gaps = 1/98 (1%)
+ Frame = +1
+
+Query: 35  VNFSEFS-KKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNA 93
+           V F +FS   C  +W  +S  E  KF  + +      E     Y   KG  KK  K P+ 
+Sbjct: 319 VAFKDFSGDMCKLKWVEIS-NEVRKFRTLTELILDAQEHVKNPY---KG--KKLKKHPDF 480
+
+Query: 94  PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMW 132
+           PK+P + +F F  E R K    HP +S  D+ K L + +
+Sbjct: 481 PKKPLTPYFRFFMEKRAKYAKLHPEMSNLDLTKILSKKY 597
+
+
+ Score = 35.6 bits (80), Expect = 0.69
+ Identities = 27/91 (29%), Positives = 46/91 (49%), Gaps = 18/91 (19%)
+ Frame = +1
+
+Query: 23  REEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPP-- 80
+           ++ + K  PDA+    E      ++W  +S K++ K+   A   +  YE  M+ YI    
+Sbjct: 778 KKVYLKVRPDATTK--EVKDSLGKQWSQLSDKKRLKWIHKALEQRKEYEEIMRDYIQKHP 951
+
+Query: 81  ---------------KGETKKKFKDPNAP-KRPPSAFFLFCSEYRPKIK 113
+                          K E + K K    P K PP+++ L+C+E    +K
+Sbjct: 952 ELNISEEGITKSTLTKAERQLKDKFDGRPTKPPPNSYSLYCAELMANMK 1098
+
+
+>M61725 Rat transcription factor UBF2 mRNA.
+            Length = 2452
+            
+ Score = 53.9 bits (127), Expect = 2e-06
+ Identities = 35/97 (36%), Positives = 53/97 (54%), Gaps = 29/97 (29%)
+ Frame = +3
+
+Query: 44   CSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGE---------------TKKKF 88
+            CS++WK +S KEK  +       K  YE E+  ++    E                KK+ 
+Sbjct: 1137 CSQQWKLLSQKEKDAYHKKCDQKKKDYEVELLRFLESLPEEEQQRVLGEEKMLNINKKQT 1316
+
+Query: 89   KDPNA--------------PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNN 134
+              P +              PKRP SA F+F  E R +++ E P LS  ++ + L  MWN+
+Sbjct: 1317 TSPASKKPSQEGGKGGSEKPKRPVSAMFIFSEEKRRQLQEERPELSESELTRLLARMWND 1496
+
+Query: 135  TAADDK 140
+             +   K
+Sbjct: 1497 LSEKKK 1514
+
+
+ Score = 52.3 bits (123), Expect = 6e-06
+ Identities = 39/140 (27%), Positives = 67/140 (47%), Gaps = 3/140 (2%)
+ Frame = +3
+
+Query: 1    GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+            GKG  +KP+  +S+   F +  R + +++ P+ S   SE ++  +  W  +S K+K K++
+Sbjct: 1353 GKGGSEKPKRPVSAMFIFSEEKRRQLQEERPELSE--SELTRLLARMWNDLSEKKKAKYK 1526
+
+Query: 61   DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+                A KA+ ER+      P GE + + K P +PKR           ++  + G++    
+Sbjct: 1527 AREAALKAQSERK------PGGEREDRGKLPESPKRAEEI-------WQQSVIGDYLARF 1667
+
+Query: 121  IGDVAKKLGEM---WNNTAADDK 140
+              D  K L  M   WNN    +K
+Sbjct: 1668 KNDRVKALKAMEMTWNNMEKKEK 1736
+
+
+ Score = 41.4 bits (95), Expect = 0.012
+ Identities = 29/94 (30%), Positives = 41/94 (42%), Gaps = 3/94 (3%)
+ Frame = +3
+
+Query: 48   WKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGET--KKKFKDPNAPKRPP-SAFFLF 104
+            W  M  KEK  +   A  D+ RYERE+     P   T   KK K    PK+PP + +  F
+Sbjct: 1710 WNNMEKKEKLMWIKKAAEDQKRYERELSEMRAPPAATNSSKKMKFQGEPKKPPMNGYQKF 1889
+
+Query: 105  CSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+              E      GE   L + +   ++G  W   +   K+
+Sbjct: 1890 SQELLS--NGELNHLPLKERMVEIGSRWQRISQSQKE 1994
+
+
+ Score = 37.9 bits (86), Expect = 0.14
+ Identities = 32/98 (32%), Positives = 45/98 (45%), Gaps = 1/98 (1%)
+ Frame = +3
+
+Query: 35  VNFSEFS-KKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNA 93
+           V F +FS   C  +W  +S  E  KF  + +      E     Y   KG  KK  K P+ 
+Sbjct: 438 VAFKDFSGDMCKLKWVEIS-NEVRKFRTLTELILDAQEHVKNPY---KG--KKLKKHPDF 599
+
+Query: 94  PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMW 132
+           PK+P + +F F  E R K    HP +S  D+ K L + +
+Sbjct: 600 PKKPLTPYFRFFMEKRAKYAKLHPEMSNLDLTKILSKKY 716
+
+
+>M61726 Rat transcription factor UBF1 mRNA.
+            Length = 2563
+            
+ Score = 53.9 bits (127), Expect = 2e-06
+ Identities = 35/97 (36%), Positives = 53/97 (54%), Gaps = 29/97 (29%)
+ Frame = +3
+
+Query: 44   CSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGE---------------TKKKF 88
+            CS++WK +S KEK  +       K  YE E+  ++    E                KK+ 
+Sbjct: 1248 CSQQWKLLSQKEKDAYHKKCDQKKKDYEVELLRFLESLPEEEQQRVLGEEKMLNINKKQT 1427
+
+Query: 89   KDPNA--------------PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNN 134
+              P +              PKRP SA F+F  E R +++ E P LS  ++ + L  MWN+
+Sbjct: 1428 TSPASKKPSQEGGKGGSEKPKRPVSAMFIFSEEKRRQLQEERPELSESELTRLLARMWND 1607
+
+Query: 135  TAADDK 140
+             +   K
+Sbjct: 1608 LSEKKK 1625
+
+
+ Score = 52.3 bits (123), Expect = 6e-06
+ Identities = 39/140 (27%), Positives = 67/140 (47%), Gaps = 3/140 (2%)
+ Frame = +3
+
+Query: 1    GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+            GKG  +KP+  +S+   F +  R + +++ P+ S   SE ++  +  W  +S K+K K++
+Sbjct: 1464 GKGGSEKPKRPVSAMFIFSEEKRRQLQEERPELSE--SELTRLLARMWNDLSEKKKAKYK 1637
+
+Query: 61   DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+                A KA+ ER+      P GE + + K P +PKR           ++  + G++    
+Sbjct: 1638 AREAALKAQSERK------PGGEREDRGKLPESPKRAEEI-------WQQSVIGDYLARF 1778
+
+Query: 121  IGDVAKKLGEM---WNNTAADDK 140
+              D  K L  M   WNN    +K
+Sbjct: 1779 KNDRVKALKAMEMTWNNMEKKEK 1847
+
+
+ Score = 41.4 bits (95), Expect = 0.012
+ Identities = 29/94 (30%), Positives = 41/94 (42%), Gaps = 3/94 (3%)
+ Frame = +3
+
+Query: 48   WKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGET--KKKFKDPNAPKRPP-SAFFLF 104
+            W  M  KEK  +   A  D+ RYERE+     P   T   KK K    PK+PP + +  F
+Sbjct: 1821 WNNMEKKEKLMWIKKAAEDQKRYERELSEMRAPPAATNSSKKMKFQGEPKKPPMNGYQKF 2000
+
+Query: 105  CSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+              E      GE   L + +   ++G  W   +   K+
+Sbjct: 2001 SQELLS--NGELNHLPLKERMVEIGSRWQRISQSQKE 2105
+
+
+ Score = 37.9 bits (86), Expect = 0.14
+ Identities = 32/98 (32%), Positives = 45/98 (45%), Gaps = 1/98 (1%)
+ Frame = +3
+
+Query: 35  VNFSEFS-KKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNA 93
+           V F +FS   C  +W  +S  E  KF  + +      E     Y   KG  KK  K P+ 
+Sbjct: 438 VAFKDFSGDMCKLKWVEIS-NEVRKFRTLTELILDAQEHVKNPY---KG--KKLKKHPDF 599
+
+Query: 94  PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMW 132
+           PK+P + +F F  E R K    HP +S  D+ K L + +
+Sbjct: 600 PKKPLTPYFRFFMEKRAKYAKLHPEMSNLDLTKILSKKY 716
+
+
+ Score = 35.6 bits (80), Expect = 0.69
+ Identities = 27/91 (29%), Positives = 46/91 (49%), Gaps = 18/91 (19%)
+ Frame = +3
+
+Query: 23   REEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPP-- 80
+            ++ + K  PDA+    E      ++W  +S K++ K+   A   +  YE  M+ YI    
+Sbjct: 897  KKVYLKVRPDATTK--EVKDSLGKQWSQLSDKKRLKWIHKALEQRKEYEEIMRDYIQKHP 1070
+
+Query: 81   ---------------KGETKKKFKDPNAP-KRPPSAFFLFCSEYRPKIK 113
+                           K E + K K    P K PP+++ L+C+E    +K
+Sbjct: 1071 ELNISEEGITKSTLTKAERQLKDKFDGRPTKPPPNSYSLYCAELMANMK 1217
+
+
+>X56687 H.sapiens mRNA for autoantigen NOR-90
+            Length = 2489
+            
+ Score = 53.9 bits (127), Expect = 2e-06
+ Identities = 35/97 (36%), Positives = 53/97 (54%), Gaps = 29/97 (29%)
+ Frame = +3
+
+Query: 44   CSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGE---------------TKKKF 88
+            CS++WK +S KEK  +       K  YE E+  ++    E                KK+ 
+Sbjct: 1050 CSQQWKLLSQKEKDAYHKKCDQKKKDYEVELLRFLESLPEEEQQRVLGEEKMLNINKKQA 1229
+
+Query: 89   KDPNA--------------PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNN 134
+              P +              PKRP SA F+F  E R +++ E P LS  ++ + L  MWN+
+Sbjct: 1230 TSPASKKPAQEGGKGGSEKPKRPVSAMFIFSEEKRRQLQEERPELSESELTRLLARMWND 1409
+
+Query: 135  TAADDK 140
+             +   K
+Sbjct: 1410 LSEKKK 1427
+
+
+ Score = 53.1 bits (125), Expect = 4e-06
+ Identities = 39/140 (27%), Positives = 68/140 (47%), Gaps = 3/140 (2%)
+ Frame = +3
+
+Query: 1    GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+            GKG  +KP+  +S+   F +  R + +++ P+ S   SE ++  +  W  +S K+K K++
+Sbjct: 1266 GKGGSEKPKRPVSAMFIFSEEKRRQLQEERPELSE--SELTRLLARMWNDLSEKKKAKYK 1439
+
+Query: 61   DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+                A KA+ ER+      P GE +++ K P +PKR           ++  + G++    
+Sbjct: 1440 AREAALKAQSERK------PGGEREERGKLPESPKRAEEI-------WQQSVIGDYLARF 1580
+
+Query: 121  IGDVAKKLGEM---WNNTAADDK 140
+              D  K L  M   WNN    +K
+Sbjct: 1581 KNDRVKALKAMEMTWNNMEKKEK 1649
+
+
+ Score = 41.4 bits (95), Expect = 0.012
+ Identities = 29/94 (30%), Positives = 41/94 (42%), Gaps = 3/94 (3%)
+ Frame = +3
+
+Query: 48   WKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGET--KKKFKDPNAPKRPP-SAFFLF 104
+            W  M  KEK  +   A  D+ RYERE+     P   T   KK K    PK+PP + +  F
+Sbjct: 1623 WNNMEKKEKLMWIKKAAEDQKRYERELSEMRAPPAATNSSKKMKFQGEPKKPPMNGYQKF 1802
+
+Query: 105  CSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+              E      GE   L + +   ++G  W   +   K+
+Sbjct: 1803 SQELLS--NGELNHLPLKERMVEIGSRWQRISQSQKE 1907
+
+
+ Score = 37.9 bits (86), Expect = 0.14
+ Identities = 32/98 (32%), Positives = 45/98 (45%), Gaps = 1/98 (1%)
+ Frame = +3
+
+Query: 35  VNFSEFS-KKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNA 93
+           V F +FS   C  +W  +S  E  KF  + +      E     Y   KG  KK  K P+ 
+Sbjct: 351 VAFKDFSGDMCKLKWVEIS-NEVRKFRTLTELILDAQEHVKNPY---KG--KKLKKHPDF 512
+
+Query: 94  PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMW 132
+           PK+P + +F F  E R K    HP +S  D+ K L + +
+Sbjct: 513 PKKPLTPYFRFFMEKRAKYAKLHPEMSNLDLTKILSKKY 629
+
+
+>X60831 Mouse ubf gene for transcription factor UBF
+            Length = 3031
+            
+ Score = 53.5 bits (126), Expect = 3e-06
+ Identities = 35/97 (36%), Positives = 52/97 (53%), Gaps = 29/97 (29%)
+ Frame = +3
+
+Query: 44   CSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGE---------------TKKKF 88
+            CS++WK +S KEK  +       K  YE E+  ++    E                KK+ 
+Sbjct: 1032 CSQQWKLLSQKEKDAYHKKCDQKKKDYEVELLRFLESLPEEEQQRVLGEEKMLNINKKQT 1211
+
+Query: 89   KDPNA--------------PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNN 134
+              P +              PKRP SA F+F  E R +++ E P LS  ++ + L  MWN+
+Sbjct: 1212 TSPASKKPSQEGGKGGSEKPKRPVSAMFIFSEEKRRQLQEERPELSESELTRLLARMWND 1391
+
+Query: 135  TAADDK 140
+                 K
+Sbjct: 1392 LTEKKK 1409
+
+
+ Score = 51.2 bits (120), Expect = 1e-05
+ Identities = 38/140 (27%), Positives = 67/140 (47%), Gaps = 3/140 (2%)
+ Frame = +3
+
+Query: 1    GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+            GKG  +KP+  +S+   F +  R + +++ P+ S   SE ++  +  W  ++ K+K K++
+Sbjct: 1248 GKGGSEKPKRPVSAMFIFSEEKRRQLQEERPELSE--SELTRLLARMWNDLTEKKKAKYK 1421
+
+Query: 61   DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+                A KA+ ER+      P GE + + K P +PKR           ++  + G++    
+Sbjct: 1422 AREAALKAQSERK------PGGEREDRGKLPESPKRAEEI-------WQQSVIGDYLARF 1562
+
+Query: 121  IGDVAKKLGEM---WNNTAADDK 140
+              D  K L  M   WNN    +K
+Sbjct: 1563 KNDRVKALKAMEMTWNNMEKKEK 1631
+
+
+ Score = 41.4 bits (95), Expect = 0.012
+ Identities = 29/94 (30%), Positives = 41/94 (42%), Gaps = 3/94 (3%)
+ Frame = +3
+
+Query: 48   WKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGET--KKKFKDPNAPKRPP-SAFFLF 104
+            W  M  KEK  +   A  D+ RYERE+     P   T   KK K    PK+PP + +  F
+Sbjct: 1605 WNNMEKKEKLMWIKKAAEDQKRYERELSEMRAPPAATNSSKKMKFQGEPKKPPMNGYQKF 1784
+
+Query: 105  CSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+              E      GE   L + +   ++G  W   +   K+
+Sbjct: 1785 SQELLS--NGELNHLPLKERMVEIGSRWQRISQSQKE 1889
+
+
+ Score = 37.9 bits (86), Expect = 0.14
+ Identities = 32/98 (32%), Positives = 45/98 (45%), Gaps = 1/98 (1%)
+ Frame = +3
+
+Query: 35  VNFSEFS-KKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNA 93
+           V F +FS   C  +W  +S  E  KF  + +      E     Y   KG  KK  K P+ 
+Sbjct: 222 VAFKDFSGDMCKLKWVEIS-NEVRKFRTLTELILDAQEHVKNPY---KG--KKLKKHPDF 383
+
+Query: 94  PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMW 132
+           PK+P + +F F  E R K    HP +S  D+ K L + +
+Sbjct: 384 PKKPLTPYFRFFMEKRAKYAKLHPEMSNLDLTKILSKKY 500
+
+
+ Score = 34.4 bits (77), Expect = 1.6
+ Identities = 27/91 (29%), Positives = 45/91 (48%), Gaps = 18/91 (19%)
+ Frame = +3
+
+Query: 23  REEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPP-- 80
+           ++ + K  PDA+    E      ++W  +S K+  K+   A   +  YE  M+ YI    
+Sbjct: 681 KKVYLKVRPDATTK--EVKDSLGKQWSQLSDKKTLKWIHKALEQRKEYEEIMRDYIQKHP 854
+
+Query: 81  ---------------KGETKKKFKDPNAP-KRPPSAFFLFCSEYRPKIK 113
+                          K E + K K    P K PP+++ L+C+E    +K
+Sbjct: 855 ELNISEEGITKSTLTKAERQLKDKFDGRPTKPPPNSYSLYCAELMANMK 1001
+
+
+>X76774 P.sativum mRNA for HMG1 protein
+           Length = 807
+           
+ Score = 53.1 bits (125), Expect = 4e-06
+ Identities = 29/86 (33%), Positives = 40/86 (45%), Gaps = 1/86 (1%)
+ Frame = +3
+
+Query: 79  PPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKI-KGEHPGLSIGDVAKKLGEMWNNTAA 137
+           P KG   K+ KDPN PKRPPSAFF+F  ++R +  KG     ++  V K  G  W +   
+Sbjct: 117 PAKG---KEPKDPNKPKRPPSAFFVFMEDFRKQFKKGNADNKAVSAVGKAAGAKWKSMTE 287
+
+Query: 138 DDKQPXXXXXXXXXXXXXXDIAAYRAK 164
+            +K P               + +Y  K
+Sbjct: 288 AEKAPYAAKAEKRKAEYEKSMKSYNKK 368
+
+
+ Score = 50.8 bits (119), Expect = 2e-05
+ Identities = 26/80 (32%), Positives = 42/80 (52%)
+ Frame = +3
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP KP+   S++  F++  R++ KK + D     S   K    +WK+M+  EK  +   A
+Sbjct: 141 DPNKPKRPPSAFFVFMEDFRKQFKKGNADNKA-VSAVGKAAGAKWKSMTEAEKAPYAAKA 317
+
+Query: 64  KADKARYEREMKTYIPPKGE 83
+           +  KA YE+ MK+Y   + E
+Sbjct: 318 EKRKAEYEKSMKSYNKKQAE 377
+
+
+>L42570 Cricetulus griseus ribosomal transcription factor (UBF1) mRNA,
+            Length = 2416
+            
+ Score = 52.7 bits (124), Expect = 5e-06
+ Identities = 34/97 (35%), Positives = 53/97 (54%), Gaps = 29/97 (29%)
+ Frame = +1
+
+Query: 44   CSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGE---------------TKKKF 88
+            CS++WK +S KEK  +       K  YE E+  ++    E                KK+ 
+Sbjct: 988  CSQQWKLLSQKEKDAYHKKCDQKKKDYEVELLRFLESLPEEEQQRVLGEEKMLNINKKQT 1167
+
+Query: 89   KDPNA--------------PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNN 134
+              P +              PKRP SA F+F  E R +++ + P LS  ++ + L  MWN+
+Sbjct: 1168 TSPASKKPSQEGGKGGSEKPKRPVSAMFIFSEEKRRQLQEQRPELSESELTRLLARMWND 1347
+
+Query: 135  TAADDK 140
+             +   K
+Sbjct: 1348 LSEKKK 1365
+
+
+ Score = 51.9 bits (122), Expect = 8e-06
+ Identities = 39/140 (27%), Positives = 67/140 (47%), Gaps = 3/140 (2%)
+ Frame = +1
+
+Query: 1    GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+            GKG  +KP+  +S+   F +  R + +++ P+ S   SE ++  +  W  +S K+K K++
+Sbjct: 1204 GKGGSEKPKRPVSAMFIFSEEKRRQLQEQRPELSE--SELTRLLARMWNDLSEKKKAKYK 1377
+
+Query: 61   DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+                A KA+ ER       P GE +++ K P +PKR           ++  + G++    
+Sbjct: 1378 AREAALKAQSER------MPGGEREERGKLPESPKRAEEI-------WQQSVIGDYLARF 1518
+
+Query: 121  IGDVAKKLGEM---WNNTAADDK 140
+              D  K L  M   WNN    +K
+Sbjct: 1519 KNDRVKALKAMEMTWNNMEKKEK 1587
+
+
+ Score = 41.4 bits (95), Expect = 0.012
+ Identities = 29/94 (30%), Positives = 41/94 (42%), Gaps = 3/94 (3%)
+ Frame = +1
+
+Query: 48   WKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGET--KKKFKDPNAPKRPP-SAFFLF 104
+            W  M  KEK  +   A  D+ RYERE+     P   T   KK K    PK+PP + +  F
+Sbjct: 1561 WNNMEKKEKLMWIKKAAEDQKRYERELSEMRAPPAATNSSKKMKFQGMPKKPPMNGYQKF 1740
+
+Query: 105  CSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+              E      GE   L + +   ++G  W   +   K+
+Sbjct: 1741 SQELLS--NGELNHLPLKERMVEIGSRWQRISQSQKE 1845
+
+
+ Score = 35.6 bits (80), Expect = 0.69
+ Identities = 27/91 (29%), Positives = 46/91 (49%), Gaps = 18/91 (19%)
+ Frame = +1
+
+Query: 23  REEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPP-- 80
+           ++ + K  PDA+    E      ++W  +S K++ K+   A   +  YE  M+ YI    
+Sbjct: 637 KKVYLKVRPDATTK--EVKDSLGKQWSQLSDKKRLKWIHKALEQRKEYEEIMRDYIQKHP 810
+
+Query: 81  ---------------KGETKKKFKDPNAP-KRPPSAFFLFCSEYRPKIK 113
+                          K E + K K    P K PP+++ L+C+E    +K
+Sbjct: 811 ELNISEEGITKSTLTKAERQLKDKFDGRPTKPPPNSYSLYCAELMANMK 957
+
+
+ Score = 34.0 bits (76), Expect = 2.0
+ Identities = 30/98 (30%), Positives = 43/98 (43%), Gaps = 1/98 (1%)
+ Frame = +1
+
+Query: 35  VNFSEF-SKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNA 93
+           V F +F    C  +W  +S  E  KF  + +      E     Y   KG  KK  K P+ 
+Sbjct: 178 VAFKDFLGDMCKLKWVEIS-NEVRKFRTLTELILDAQEHVKNPY---KG--KKLKKHPDF 339
+
+Query: 94  PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMW 132
+           PK+P + +  F  E R K    HP +S  D+ K L + +
+Sbjct: 340 PKKPLTPYLRFFMEKRAKYAKLHPEMSNLDLTKILSKKY 456
+
+
+>Y14075 Arabidopsis thaliana mRNA for HMG delta protein
+           Length = 539
+           
+ Score = 52.7 bits (124), Expect = 5e-06
+ Identities = 22/57 (38%), Positives = 35/57 (60%), Gaps = 1/57 (1%)
+ Frame = +1
+
+Query: 86  KKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHP-GLSIGDVAKKLGEMWNNTAADDKQP 142
+           KK KDPN PK+PPS FF+F  ++R +    +P   S+G+V +  G+ W     +++ P
+Sbjct: 76  KKTKDPNRPKKPPSPFFVFLDDFRKEFNLANPDNKSVGNVGRAAGKKWKTMTEEERAP 249
+
+
+ Score = 40.2 bits (92), Expect = 0.027
+ Identities = 19/74 (25%), Positives = 37/74 (49%)
+ Frame = +1
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           DP +P+   S +  F+   R+E    +PD + +     +   ++WKTM+ +E+  F   +
+Sbjct: 88  DPNRPKKPPSPFFVFLDDFRKEFNLANPD-NKSVGNVGRAAGKKWKTMTEEERAPFVAKS 264
+
+Query: 64  KADKARYEREMKTY 77
+           ++ K  Y   M+ Y
+Sbjct: 265 QSKKTEYAVTMQQY 306
+
+
+>L42571 Cricetulus griseus ribosomal transcription factor (UBF2) mRNA,
+            Length = 2305
+            
+ Score = 52.7 bits (124), Expect = 5e-06
+ Identities = 34/97 (35%), Positives = 53/97 (54%), Gaps = 29/97 (29%)
+ Frame = +1
+
+Query: 44   CSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGE---------------TKKKF 88
+            CS++WK +S KEK  +       K  YE E+  ++    E                KK+ 
+Sbjct: 877  CSQQWKLLSQKEKDAYHKKCDQKKKDYEVELLRFLESLPEEEQQRVLGEEKMLNINKKQT 1056
+
+Query: 89   KDPNA--------------PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNN 134
+              P +              PKRP SA F+F  E R +++ + P LS  ++ + L  MWN+
+Sbjct: 1057 TSPASKKPSQEGGKGGSEKPKRPVSAMFIFSEEKRRQLQEQRPELSESELTRLLARMWND 1236
+
+Query: 135  TAADDK 140
+             +   K
+Sbjct: 1237 LSEKKK 1254
+
+
+ Score = 51.9 bits (122), Expect = 8e-06
+ Identities = 39/140 (27%), Positives = 67/140 (47%), Gaps = 3/140 (2%)
+ Frame = +1
+
+Query: 1    GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+            GKG  +KP+  +S+   F +  R + +++ P+ S   SE ++  +  W  +S K+K K++
+Sbjct: 1093 GKGGSEKPKRPVSAMFIFSEEKRRQLQEQRPELSE--SELTRLLARMWNDLSEKKKAKYK 1266
+
+Query: 61   DMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS 120
+                A KA+ ER       P GE +++ K P +PKR           ++  + G++    
+Sbjct: 1267 AREAALKAQSER------MPGGEREERGKLPESPKRAEEI-------WQQSVIGDYLARF 1407
+
+Query: 121  IGDVAKKLGEM---WNNTAADDK 140
+              D  K L  M   WNN    +K
+Sbjct: 1408 KNDRVKALKAMEMTWNNMEKKEK 1476
+
+
+ Score = 41.4 bits (95), Expect = 0.012
+ Identities = 29/94 (30%), Positives = 41/94 (42%), Gaps = 3/94 (3%)
+ Frame = +1
+
+Query: 48   WKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGET--KKKFKDPNAPKRPP-SAFFLF 104
+            W  M  KEK  +   A  D+ RYERE+     P   T   KK K    PK+PP + +  F
+Sbjct: 1450 WNNMEKKEKLMWIKKAAEDQKRYERELSEMRAPPAATNSSKKMKFQGMPKKPPMNGYQKF 1629
+
+Query: 105  CSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+              E      GE   L + +   ++G  W   +   K+
+Sbjct: 1630 SQELLS--NGELNHLPLKERMVEIGSRWQRISQSQKE 1734
+
+
+ Score = 34.0 bits (76), Expect = 2.0
+ Identities = 30/98 (30%), Positives = 43/98 (43%), Gaps = 1/98 (1%)
+ Frame = +1
+
+Query: 35  VNFSEF-SKKCSERWKTMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNA 93
+           V F +F    C  +W  +S  E  KF  + +      E     Y   KG  KK  K P+ 
+Sbjct: 178 VAFKDFLGDMCKLKWVEIS-NEVRKFRTLTELILDAQEHVKNPY---KG--KKLKKHPDF 339
+
+Query: 94  PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMW 132
+           PK+P + +  F  E R K    HP +S  D+ K L + +
+Sbjct: 340 PKKPLTPYLRFFMEKRAKYAKLHPEMSNLDLTKILSKKY 456
+
+
+>U10401 Caenorhabditis elegans cosmid T20B12
+             Length = 36811
+             
+ Score = 52.3 bits (123), Expect = 6e-06
+ Identities = 32/90 (35%), Positives = 50/90 (55%)
+ Frame = -1
+
+Query: 52    SAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPK 111
+             S + KG+ ++  +  + R ++E        G+  KK KDPNAPKR  SA+  +    R +
+Sbjct: 14866 SKRRKGEPKEKREKKEKREKKE--------GKKGKKDKDPNAPKRATSAYMQWFLASRNE 14711
+
+Query: 112   IKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+             +K +  G S+ DVAKK G  W   ++DDK+
+Sbjct: 14710 LKED--GDSVADVAKKGGAKWKTMSSDDKK 14627
+
+
+ Score = 35.2 bits (79), Expect(2) = 0.001
+ Identities = 19/51 (37%), Positives = 27/51 (52%), Gaps = 3/51 (5%)
+ Frame = -2
+
+Query: 58    KFEDMAKADKARYEREMKTYI---PPKGETKKKFKDPNAPKRPPSAFFLFCSEY 108
+             K+E+ A+ DK+RYE+EMK Y    PP   +K      +     PS+      EY
+Sbjct: 14574 KWEEKAEEDKSRYEKEMKEYRKNGPPSSSSKPSSSKTSKKSSGPSSSKAISKEY 14413
+
+
+ Score = 29.3 bits (64), Expect(2) = 0.001
+ Identities = 16/53 (30%), Positives = 26/53 (48%)
+ Frame = -1
+
+Query: 4     DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEK 56
+             DP  P+   S+Y  +    R E K+     +    + +KK   +WKTMS+ +K
+Sbjct: 14776 DPNAPKRATSAYMQWFLASRNELKEDGDSVA----DVAKKGGAKWKTMSSDDK 14630
+
+
+>X53025 P.falciparum DNA for erythrocyte membrane-associated antigen
+           (clone
+           Length = 253
+           
+ Score = 51.5 bits (121), Expect = 1e-05
+ Identities = 26/58 (44%), Positives = 34/58 (57%), Gaps = 2/58 (3%)
+ Frame = +2
+
+Query: 85  KKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLS--IGDVAKKLGEMWNNTAADDKQP 142
+           +KK KDP+APKR  SA+  F  E R +I  + P LS  +  V K +GE WN     +K P
+Sbjct: 41  RKKKKDPHAPKRSLSAYMFFAKEKRAEIISKQPELSKDVATVGKMIGEAWNKLGEKEKAP 220
+
+
+ Score = 47.6 bits (111), Expect = 2e-04
+ Identities = 23/65 (35%), Positives = 32/65 (48%)
+ Frame = +2
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           K DP  P+  +S+Y FF +  R E   K P+ S + +   K   E W  +  KEK  FE 
+Sbjct: 50  KKDPHAPKRSLSAYMFFAKEKRAEIISKQPELSKDVATVGKMIGEAWNKLGEKEKAPFEK 229
+
+Query: 62  MAKAD 66
+            A+ D
+Sbjct: 230 KAQED 244
+
+
+>U57939 Mus musculus mitochondrial transcription factor A gene,
+           nuclear
+           Length = 1449
+           
+ Score = 50.4 bits (118), Expect = 2e-05
+ Identities = 45/137 (32%), Positives = 68/137 (48%), Gaps = 21/137 (15%)
+ Frame = +1
+
+Query: 5   PKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAK 64
+           PKKP   MSSY  F      + K KHPDA +  SE  +K +  W+ +   EK  +E   K
+Sbjct: 241 PKKP---MSSYLRFSTEQLPKFKAKHPDAKL--SELVRKIAALWRELPEAEKKVYEADFK 405
+
+Query: 65  ADKARYEREMKTY---IPP-------KGETKKKFKDP-----------NAPKRPPSAFFL 103
+           A+   Y+  +  Y   + P       K   +++ K               PKRP SA+ +
+Sbjct: 406 AEWKAYKEAVSKYKEQLTPSQLMGMEKEARQRRLKKKALVKRRELILLGKPKRPRSAYNI 585
+
+Query: 104 FCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+           + SE   + K +    S     K + E W N + ++KQ
+Sbjct: 586 YVSESFQEAKDD----SAQGKLKLVNEAWKNLSPEEKQ 687
+
+
+ Score = 44.5 bits (103), Expect = 0.001
+ Identities = 25/75 (33%), Positives = 39/75 (51%)
+ Frame = +1
+
+Query: 3   GDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDM 62
+           G PK+PR   S+Y  +V    +E K       +      K  +E WK +S +EK  +  +
+Sbjct: 550 GKPKRPR---SAYNIYVSESFQEAKDDSAQGKL------KLVNEAWKNLSPEEKQAYIQL 702
+
+Query: 63  AKADKARYEREMKTY 77
+           AK D+ RY+ EMK++
+Sbjct: 703 AKDDRIRYDNEMKSW 747
+
+
+>U63859 Mus musculus mitochondrial transcription factor A pseudogene
+           mRNA,
+           Length = 1318
+           
+ Score = 50.4 bits (118), Expect = 2e-05
+ Identities = 45/137 (32%), Positives = 68/137 (48%), Gaps = 21/137 (15%)
+ Frame = +2
+
+Query: 5   PKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAK 64
+           PKKP   MSSY  F      + K KHPDA +  SE  +K +  W+ +   EK  +E   K
+Sbjct: 449 PKKP---MSSYLRFSTEQLPKFKAKHPDAKL--SELVRKIAALWRELPEAEKKVYEADFK 613
+
+Query: 65  ADKARYEREMKTY---IPP-------KGETKKKFKDP-----------NAPKRPPSAFFL 103
+           A+   Y+  +  Y   + P       K   +++ K               PKRP SA+ +
+Sbjct: 614 AEWKAYKEAVSKYKEQLTPSQLMGMEKEARQRRLKKKALVKRRELILLGKPKRPRSAYNI 793
+
+Query: 104 FCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+           + SE   + K +    S     K + E W N + ++KQ
+Sbjct: 794 YVSESFQEAKDD----SAQGKLKLVNEAWKNLSPEEKQ 895
+
+
+ Score = 44.5 bits (103), Expect = 0.001
+ Identities = 25/75 (33%), Positives = 39/75 (51%)
+ Frame = +2
+
+Query: 3   GDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDM 62
+           G PK+PR   S+Y  +V    +E K       +      K  +E WK +S +EK  +  +
+Sbjct: 758 GKPKRPR---SAYNIYVSESFQEAKDDSAQGKL------KLVNEAWKNLSPEEKQAYIQL 910
+
+Query: 63  AKADKARYEREMKTY 77
+           AK D+ RY+ EMK++
+Sbjct: 911 AKDDRIRYDNEMKSW 955
+
+
+>U63858 Mus musculus mitochondrial transcription factor A mRNA,
+           complete
+           Length = 772
+           
+ Score = 50.4 bits (118), Expect = 2e-05
+ Identities = 45/137 (32%), Positives = 68/137 (48%), Gaps = 21/137 (15%)
+ Frame = +2
+
+Query: 5   PKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAK 64
+           PKKP   MSSY  F      + K KHPDA +  SE  +K +  W+ +   EK  +E   K
+Sbjct: 83  PKKP---MSSYLRFSTEQLPKFKAKHPDAKL--SELVRKIAALWRELPEAEKKVYEADFK 247
+
+Query: 65  ADKARYEREMKTY---IPP-------KGETKKKFKDP-----------NAPKRPPSAFFL 103
+           A+   Y+  +  Y   + P       K   +++ K               PKRP SA+ +
+Sbjct: 248 AEWKAYKEAVSKYKEQLTPSQLMGMEKEARQRRLKKKALVKRRELILLGKPKRPRSAYNI 427
+
+Query: 104 FCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+           + SE   + K +    S     K + E W N + ++KQ
+Sbjct: 428 YVSESFQEAKDD----SAQGKLKLVNEAWKNLSPEEKQ 529
+
+
+ Score = 44.5 bits (103), Expect = 0.001
+ Identities = 25/75 (33%), Positives = 39/75 (51%)
+ Frame = +2
+
+Query: 3   GDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDM 62
+           G PK+PR   S+Y  +V    +E K       +      K  +E WK +S +EK  +  +
+Sbjct: 392 GKPKRPR---SAYNIYVSESFQEAKDDSAQGKL------KLVNEAWKNLSPEEKQAYIQL 544
+
+Query: 63  AKADKARYEREMKTY 77
+           AK D+ RY+ EMK++
+Sbjct: 545 AKDDRIRYDNEMKSW 589
+
+
+>U13695 Human homolog of yeast mutL (hPMS1) gene, complete cds.
+            Length = 3063
+            
+ Score = 50.4 bits (118), Expect = 2e-05
+ Identities = 35/98 (35%), Positives = 53/98 (53%)
+ Frame = +3
+
+Query: 6    KKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKA 65
+            KKP   MS+ A FVQ  R +   ++P  S+   + + +  E WKT+S +EK K+E+ A  
+Sbjct: 1794 KKP---MSASALFVQDHRPQFLIENPKTSLE--DATLQIEELWKTLSEEEKLKYEEKATK 1958
+
+Query: 66   DKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFL 103
+            D  RY  +MK  I  + E++   KD     +P SA+ L
+Sbjct: 1959 DLERYNSQMKRAI--EQESQMSLKDGRKKIKPTSAWNL 2066
+
+
+ Score = 36.0 bits (81), Expect = 0.53
+ Identities = 15/46 (32%), Positives = 27/46 (58%)
+ Frame = +3
+
+Query: 95   KRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDK 140
+            K+P SA  LF  ++RP+   E+P  S+ D   ++ E+W   + ++K
+Sbjct: 1794 KKPMSASALFVQDHRPQFLIENPKTSLEDATLQIEELWKTLSEEEK 1931
+
+
+>L07107 Mus musculus HMG box protein mRNA, complete cds.
+           Length = 745
+           
+ Score = 50.4 bits (118), Expect = 2e-05
+ Identities = 45/137 (32%), Positives = 68/137 (48%), Gaps = 21/137 (15%)
+ Frame = +1
+
+Query: 5   PKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAK 64
+           PKKP   MSSY  F      + K KHPDA +  SE  +K +  W+ +   EK  +E   K
+Sbjct: 46  PKKP---MSSYLRFSTEQLPKFKAKHPDAKL--SELVRKIAALWRELPEAEKKVYEADFK 210
+
+Query: 65  ADKARYEREMKTY---IPP-------KGETKKKFKDP-----------NAPKRPPSAFFL 103
+           A+   Y+  +  Y   + P       K   +++ K               PKRP SA+ +
+Sbjct: 211 AEWKAYKEAVSKYKEQLTPSQLMGMEKEARQRRLKKKALVKRRELILLGKPKRPRSAYNI 390
+
+Query: 104 FCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+           + SE   + K +    S     K + E W N + ++KQ
+Sbjct: 391 YVSESFQEAKDD----SAQGKLKLVNEAWKNLSPEEKQ 492
+
+
+ Score = 44.5 bits (103), Expect = 0.001
+ Identities = 25/75 (33%), Positives = 39/75 (51%)
+ Frame = +1
+
+Query: 3   GDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDM 62
+           G PK+PR   S+Y  +V    +E K       +      K  +E WK +S +EK  +  +
+Sbjct: 355 GKPKRPR---SAYNIYVSESFQEAKDDSAQGKL------KLVNEAWKNLSPEEKQAYIQL 507
+
+Query: 63  AKADKARYEREMKTY 77
+           AK D+ RY+ EMK++
+Sbjct: 508 AKDDRIRYDNEMKSW 552
+
+
+>U35728 Xenopus laevis transcription factor A (xl-mtTFA) mRNA,
+           nuclear gene
+           Length = 2003
+           
+ Score = 49.6 bits (116), Expect = 4e-05
+ Identities = 46/136 (33%), Positives = 79/136 (57%), Gaps = 28/136 (20%)
+ Frame = +3
+
+Query: 5   PKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAK 64
+           PK+P   +S Y  +    R +  K++P+A +   + +K  +  WK +++ EK  +E +AK
+Sbjct: 384 PKRP---LSGYLRYSVEQRPKLHKQYPEAKM--MDLTKIIALEWKGLASTEKEPYEAVAK 548
+
+Query: 65  ADKARYEREMKTY---IPP---------------KGETKKKFKDPNA---PKRPPSAFFL 103
+           AD  +Y  E+K Y   + P               K ++ +K ++  A   PKRP S F +
+Sbjct: 549 ADLKKYREEVKQYREALSPVQLELHREQRRQRLAKRKSVRKKRELTALGRPKRPRSPFNI 728
+
+Query: 104 FCSEYRPKIKG---EHPGLSIGDVAKKL----GEMWNNTAADDK 140
+           F SE+    KG   +    S+ D  ++L     + +N+ A DDK
+Sbjct: 729 FMSEHFQDAKGTSSQTKMKSLRDEWERLHNTQKQTYNHLAQDDK 860
+
+
+ Score = 40.6 bits (93), Expect = 0.021
+ Identities = 19/74 (25%), Positives = 32/74 (42%)
+ Frame = +3
+
+Query: 94  PKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQPXXXXXXXXXXX 153
+           PKRP S +  +  E RPK+  ++P   + D+ K +   W   A+ +K+P           
+Sbjct: 384 PKRPLSGYLRYSVEQRPKLHKQYPEAKMMDLTKIIALEWKGLASTEKEPYEAVAKADLKK 563
+
+Query: 154 XXXDIAAYRAKGKP 167
+              ++  YR    P
+Sbjct: 564 YREEVKQYREALSP 605
+
+
+ Score = 35.6 bits (80), Expect = 0.69
+ Identities = 28/93 (30%), Positives = 45/93 (48%), Gaps = 11/93 (11%)
+ Frame = +3
+
+Query: 3   GDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFS-KKCSERWKTMSAKEKGKFED 61
+           G PK+PR   + +         EH +   DA    S+   K   + W+ +   +K  +  
+Sbjct: 693 GRPKRPRSPFNIFM-------SEHFQ---DAKGTSSQTKMKSLRDEWERLHNTQKQTYNH 842
+
+Query: 62  MAKADKARYEREMKTYIPPKGE----------TKKKFKDPNAPK 95
+           +A+ DK RYE EMK++     E           +K+FK P A +
+Sbjct: 843 LAQDDKIRYENEMKSWEEQMIEIGRGDLIRLNQRKRFKKPRATR 974
+
+
+>M62810 Human mitochondrial transcription factor 1 mRNA, complete
+           cds.
+           Length = 1936
+           
+ Score = 48.8 bits (114), Expect = 7e-05
+ Identities = 41/137 (29%), Positives = 71/137 (50%), Gaps = 21/137 (15%)
+ Frame = +1
+
+Query: 5   PKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAK 64
+           PKKP   +SSY  F +      K ++PDA    +E  ++ ++RW+ +   +K  ++D  +
+Sbjct: 280 PKKP---VSSYLRFSKEQLPIFKAQNPDAKT--TELIRRIAQRWRELPDSKKKIYQDAYR 444
+
+Query: 65  ADKARYERE--------------------MKTYIPPKGETKKK-FKDPNAPKRPPSAFFL 103
+           A+   Y+ E                    M  ++  K  TKKK       PKRP SA+ +
+Sbjct: 445 AEWQVYKEEISRFKEQLTPSQIMSLEKEIMDKHLKRKAMTKKKELTLLGKPKRPRSAYNV 624
+
+Query: 104 FCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQ 141
+           + +E   + KG+ P     +  K + E W N +  +K+
+Sbjct: 625 YVAERFQEAKGDSP----QEKLKTVKENWKNLSDSEKE 726
+
+
+ Score = 42.6 bits (98), Expect = 0.005
+ Identities = 26/75 (34%), Positives = 36/75 (47%)
+ Frame = +1
+
+Query: 3   GDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDM 62
+           G PK+PR   S+Y  +V    +E K   P   +      K   E WK +S  EK  +   
+Sbjct: 589 GKPKRPR---SAYNVYVAERFQEAKGDSPQEKL------KTVKENWKNLSDSEKELYIQH 741
+
+Query: 63  AKADKARYEREMKTY 77
+           AK D+ RY  EMK++
+Sbjct: 742 AKEDETRYHNEMKSW 786
+
+
+>Z48008;Z71256 S.cerevisiae chromosome IV cosmid 8119.
+            Length = 37404
+            
+ Score = 47.3 bits (110), Expect = 2e-04
+ Identities = 27/75 (36%), Positives = 45/75 (60%), Gaps = 3/75 (4%)
+ Frame = -2
+
+Query: 68   ARYEREMKTYIPPKGETKK---KFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDV 124
+            A +++E+ T    K +TK+   K +DPN PKRP +A+ L+C   + +I+ ++  L   DV
+Sbjct: 6980 ASFKQELLTKPFRKSKTKRHKVKERDPNMPKRPTNAYLLYCEMNKERIR-QNGSL---DV 6813
+
+Query: 125  AKKLGEMWNNTAADDKQP 142
+             + L E W N    D++P
+Sbjct: 6812 TRDLAEGWKNLNEQDRKP 6759
+
+
+ Score = 32.8 bits (73), Expect = 4.6
+ Identities = 14/74 (18%), Positives = 36/74 (47%)
+ Frame = -2
+
+Query: 4    DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+            DP  P+   ++Y  + +  +E  ++          + ++  +E WK ++ +++  +  + 
+Sbjct: 6905 DPNMPKRPTNAYLLYCEMNKERIRQN------GSLDVTRDLAEGWKNLNEQDRKPYYKLY 6744
+
+Query: 64   KADKARYEREMKTY 77
+              D+ RY+ EM+ Y
+Sbjct: 6743 SEDRERYQMEMEIY 6702
+
+
+>L28094 Barley mRNA sequence.
+           Length = 942
+           
+ Score = 46.9 bits (109), Expect = 3e-04
+ Identities = 25/83 (30%), Positives = 41/83 (49%), Gaps = 1/83 (1%)
+ Frame = +3
+
+Query: 79  PPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHP-GLSIGDVAKKLGEMWNNTAA 137
+           PP+G  +++ + P +P+  P AFF+   E+R + K ++P   S+  V K  GE W + + 
+Sbjct: 177 PPRGRRERQARTPTSPRGTP-AFFVSMGEFREEFKQKNPKNKSVAPVGKAAGERWKSLSE 353
+
+Query: 138 DDKQPXXXXXXXXXXXXXXDIAAY 161
+            +K P               IAAY
+Sbjct: 354 PEKAPFVAKANKLKGEYNKAIAAY 425
+
+
+>M63424 Tetrahymena thermophila high-mobility-group protein C (HMG
+           C), 3'
+           Length = 686
+           
+ Score = 46.1 bits (107), Expect = 5e-04
+ Identities = 25/82 (30%), Positives = 45/82 (54%)
+ Frame = +1
+
+Query: 5   PKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAK 64
+           P  P+  +S++  F     E  KK++P+A +  +E +   +E+WK +  KEK K+E +  
+Sbjct: 214 PAPPKRPLSAFFLFK*HNYE*VKKENPNAKI--TELTSMIAEKWKAVGEKEKKKYETL*S 387
+
+Query: 65  ADKARYEREMKTYIPPKGETKK 86
+             KA+YE+ +  Y    G+ +K
+Sbjct: 388 EAKAKYEKAL*AYEKKYGKPEK 453
+
+
+ Score = 38.7 bits (88), Expect = 0.080
+ Identities = 25/80 (31%), Positives = 34/80 (42%), Gaps = 1/80 (1%)
+ Frame = +1
+
+Query: 89  KDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQPXXXXXX 148
+           K P  PKRP SAFFLF       +K E+P   I ++   + E W      +K+       
+Sbjct: 208 K*PAPPKRPLSAFFLFK*HNYE*VKKENPNAKITELTSMIAEKWKAVGEKEKKKYETL*S 387
+
+Query: 149 XXXXXXXXDIAAYRAK-GKPD 168
+                    + AY  K GKP+
+Sbjct: 388 EAKAKYEKAL*AYEKKYGKPE 450
+
+
+>U63860 Mus musculus mitochondrial transcription factor A pseudogene
+           mRNA,
+           Length = 1085
+           
+ Score = 44.5 bits (103), Expect = 0.001
+ Identities = 25/75 (33%), Positives = 39/75 (51%)
+ Frame = +3
+
+Query: 3   GDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDM 62
+           G PK+PR   S+Y  +V    +E K       +      K  +E WK +S +EK  +  +
+Sbjct: 186 GKPKRPR---SAYNIYVSESFQEAKDDSAQGKL------KLVNEAWKNLSPEEKQAYIQL 338
+
+Query: 63  AKADKARYEREMKTY 77
+           AK D+ RY+ EMK++
+Sbjct: 339 AKDDRIRYDNEMKSW 383
+
+
+>Z69727 S.pombe chromosome I cosmid c4G9.
+             Length = 40915
+             
+ Score = 43.8 bits (101), Expect = 0.002
+ Identities = 34/97 (35%), Positives = 58/97 (59%), Gaps = 28/97 (28%)
+ Frame = -3
+
+Query: 46    ERWKTMSAKE----KGKFEDMAKADKARYEREMKTYIPPK--GETKKKFKD--------- 90
+             +++K ++A E    K K ++   A+K R+   ++++ P +   E +++ K+         
+Sbjct: 22727 QKYKALTADEIQKYKNKLQEQFDAEKKRFMETLRSFTPTEIDSENRRRSKEAHSTGSRYY 22548
+
+Query: 91    ----PNAPKRPPSAFFLFCSEYR--PKIKGEHPGLSIGDVAKKLGE-------MWNNTAA 137
+                 P+ PK+P SAF LF  E R  PK++ E   L I +    L E        W   A 
+Sbjct: 22547 RLRHPDVPKKPSSAFILFYKELRNNPKLRQE---LGIPEAISTLVEETQNASKAWKELAE 22377
+
+Query: 138   DDKQP 142
+             D K+P
+Sbjct: 22376 DKKKP 22362
+
+
+ Score = 37.1 bits (84), Expect = 0.24
+ Identities = 23/71 (32%), Positives = 38/71 (53%), Gaps = 4/71 (5%)
+ Frame = -3
+
+Query: 5     PKKPRGKMSSYAFFVQTCREEHKKKH----PDASVNFSEFSKKCSERWKTMSAKEKGKFE 60
+             PKKP    S++  F +  R   K +     P+A     E ++  S+ WK ++  +K  F 
+Sbjct: 22526 PKKPS---SAFILFYKELRNNPKLRQELGIPEAISTLVEETQNASKAWKELAEDKKKPFI 22356
+
+Query: 61    DMAKADKARYEREMK 75
+             D +KA K +Y++ MK
+Sbjct: 22355 DKSKALKEQYDKFMK 22311
+
+
+>Y07542 X.laevis mRNA for SOX3 protein
+           Length = 1691
+           
+ Score = 39.5 bits (90), Expect = 0.047
+ Identities = 19/63 (30%), Positives = 33/63 (52%)
+ Frame = +1
+
+Query: 80  PKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADD 139
+           P G+      D +  KRP +AF ++    R K+  E+P +   +++K+LG  W   +  D
+Sbjct: 160 PGGKGNASTLDQDRVKRPMNAFMVWSRGQRRKMAQENPKMHNSEISKRLGADWKLLSDSD 339
+
+Query: 140 KQP 142
+           K+P
+Sbjct: 340 KRP 348
+
+
+>X86381 P.paniscus SRY gene
+           Length = 615
+           
+ Score = 39.5 bits (90), Expect = 0.047
+ Identities = 21/60 (35%), Positives = 35/60 (58%), Gaps = 2/60 (3%)
+ Frame = +1
+
+Query: 83  ETKKKFKDP--NAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDK 140
+           ET +  KD   +  KRP +AFF++  + R K+  E+P +   +++K+LG  W    A +K
+Sbjct: 139 ETGENSKDSVQDRVKRPMNAFFVWSRDQRRKMALENPRMRNSEISKQLGYQWKMLTAAEK 318
+
+Query: 141 QP 142
+            P
+Sbjct: 319 WP 324
+
+
+ Score = 35.2 bits (79), Expect = 0.91
+ Identities = 27/104 (25%), Positives = 42/104 (39%)
+ Frame = +1
+
+Query: 4   DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMA 63
+           D  + R K    AFFV +  +  K    +  +  SE SK+   +WK ++A EK  F   A
+Sbjct: 160 DSVQDRVKRPMNAFFVWSRDQRRKMALENPRMRNSEISKQLGYQWKMLTAAEKWPFFQEA 339
+
+Query: 64  KADKARYEREMKTYIPPKGETKKKFKDPNAPKRPPSAFFLFCSE 107
+           +  +A +  +   Y   +   K      N    P     + CSE
+Sbjct: 340 QKLQAMHREKYPNY-KYRPRRKANMLPKNCSLLPADPASVLCSE 468
+
+
+>Z30265 O.aries sry gene for sex determining region of Y chromosome
+           Length = 723
+           
+ Score = 39.1 bits (89), Expect = 0.061
+ Identities = 20/62 (32%), Positives = 34/62 (54%)
+ Frame = +1
+
+Query: 81  KGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDK 140
+           +GE  ++    N  KRP +AF ++  E R K+  E+P L   +++K+LG  W      +K
+Sbjct: 157 RGENVRE-SSQNHVKRPMNAFIVWSRERRRKVALENPKLQNSEISKQLGYEWKRLTDAEK 333
+
+Query: 141 QP 142
+           +P
+Sbjct: 334 RP 339
+
+
+>Z30327 B.taurus sry gene for sex-determining region Y
+           Length = 690
+           
+ Score = 38.7 bits (88), Expect = 0.080
+ Identities = 17/48 (35%), Positives = 28/48 (57%)
+ Frame = +1
+
+Query: 95  KRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 142
+           KRP +AF ++  E R K+  E+P +   D++K+LG  W      +K+P
+Sbjct: 163 KRPMNAFIVWSRERRRKVALENPKMKNSDISKQLGYEWKRLTDAEKRP 306
+
+
+>Z30321 B.bonasus sry gene encoding sex-determining region Y
+           Length = 690
+           
+ Score = 38.7 bits (88), Expect = 0.080
+ Identities = 17/48 (35%), Positives = 28/48 (57%)
+ Frame = +1
+
+Query: 95  KRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 142
+           KRP +AF ++  E R K+  E+P +   D++K+LG  W      +K+P
+Sbjct: 163 KRPMNAFIVWSRERRRKVALENPKMKNSDISKQLGYEWKRLTDAEKRP 306
+
+
+>I34580 Sequence 1 from patent US 5596089.
+            Length = 1661
+            
+ Score = 38.7 bits (88), Expect = 0.080
+ Identities = 17/48 (35%), Positives = 28/48 (57%)
+ Frame = +3
+
+Query: 95   KRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 142
+            KRP +AF ++  E R K+  E+P +   D++K+LG  W      +K+P
+Sbjct: 1074 KRPMNAFIVWSRERRRKVALENPKMKNSDISKQLGYEWKRLTDAEKRP 1217
+
+
+>E11537 DNA from Y chromosome which contain bovine Sry gene.
+            Length = 2840
+            
+ Score = 38.7 bits (88), Expect = 0.080
+ Identities = 17/48 (35%), Positives = 28/48 (57%)
+ Frame = +2
+
+Query: 95   KRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 142
+            KRP +AF ++  E R K+  E+P +   D++K+LG  W      +K+P
+Sbjct: 1229 KRPMNAFIVWSRERRRKVALENPKMKNSDISKQLGYEWKRLTDAEKRP 1372
+
+
+>U15569;L36821 Bos taurus sex determining region Y protein (SRY) gene,
+            complete
+            Length = 1800
+            
+ Score = 38.7 bits (88), Expect = 0.080
+ Identities = 17/48 (35%), Positives = 28/48 (57%)
+ Frame = +3
+
+Query: 95   KRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 142
+            KRP +AF ++  E R K+  E+P +   D++K+LG  W      +K+P
+Sbjct: 1074 KRPMNAFIVWSRERRRKVALENPKMKNSDISKQLGYEWKRLTDAEKRP 1217
+
+
+>D83256 Rainbow trout mRNA for SoxP1, complete cds.
+           Length = 3626
+           
+ Score = 38.3 bits (87), Expect = 0.10
+ Identities = 20/65 (30%), Positives = 38/65 (57%)
+ Frame = +1
+
+Query: 78  IPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAA 137
+           +P +G    K K P+  KRP +AF ++    R K+  ++P L   +++K LG++W   + 
+Sbjct: 502 MPVRGNGSLKNK-PHV-KRPMNAFMVWAQAARRKLADQYPHLHNAELSKTLGKLWRLLSE 675
+
+Query: 138 DDKQP 142
+           ++K+P
+Sbjct: 676 NEKRP 690
+
+
+>U66141 Mus musculus transcription factor Sox-M (sox-M) mRNA,
+           partial cds.
+           Length = 2761
+           
+ Score = 38.3 bits (87), Expect = 0.10
+ Identities = 19/67 (28%), Positives = 32/67 (47%)
+ Frame = +3
+
+Query: 76  TYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNT 135
+           T +P         K     KRP +AF ++    R K+  ++P L   +++K LG++W   
+Sbjct: 540 TLVPMPVRVNGASKSKPHVKRPMNAFMVWAQAARRKLADQYPHLHNAELSKTLGKLWRLL 719
+
+Query: 136 AADDKQP 142
+              DK+P
+Sbjct: 720 NESDKRP 740
+
+
+>AF017182 Mus musculus putative transcription factor (Sox10) mRNA,
+           partial
+           Length = 2761
+           
+ Score = 38.3 bits (87), Expect = 0.10
+ Identities = 19/67 (28%), Positives = 32/67 (47%)
+ Frame = +2
+
+Query: 76  TYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNT 135
+           T +P         K     KRP +AF ++    R K+  ++P L   +++K LG++W   
+Sbjct: 605 TLVPMPVRVNGASKSKPHVKRPMNAFMVWAQAARRKLADQYPHLHNAELSKTLGKLWRLL 784
+
+Query: 136 AADDKQP 142
+              DK+P
+Sbjct: 785 NESDKRP 805
+
+
+>AJ001029 Rattus norvegicus mRNA for Sox10 protein
+           Length = 3030
+           
+ Score = 38.3 bits (87), Expect = 0.10
+ Identities = 19/67 (28%), Positives = 32/67 (47%)
+ Frame = +1
+
+Query: 76  TYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNT 135
+           T +P         K     KRP +AF ++    R K+  ++P L   +++K LG++W   
+Sbjct: 838 TLVPMPVRVNGASKSKPHVKRPMNAFMVWAQAARRKLADQYPHLHNAELSKTLGKLWRLL 1017
+
+Query: 136 AADDKQP 142
+              DK+P
+Sbjct: 1018NESDKRP 1038
+
+
+>AJ001183 Homo sapiens mRNA for Sox10 protein
+           Length = 2565
+           
+ Score = 38.3 bits (87), Expect = 0.10
+ Identities = 19/67 (28%), Positives = 32/67 (47%)
+ Frame = +1
+
+Query: 76  TYIPPKGETKKKFKDPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNT 135
+           T +P         K     KRP +AF ++    R K+  ++P L   +++K LG++W   
+Sbjct: 376 TLVPMPVRVNGASKSKPHVKRPMNAFMVWAQAARRKLADQYPHLHNAELSKTLGKLWRLL 555
+
+Query: 136 AADDKQP 142
+              DK+P
+Sbjct: 556 NESDKRP 576
+
+
+>Z30646 C.hircus SRY gene for sex determining region Y
+           Length = 723
+           
+ Score = 37.9 bits (86), Expect = 0.14
+ Identities = 17/48 (35%), Positives = 28/48 (57%)
+ Frame = +1
+
+Query: 95  KRPPSAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQP 142
+           KRP +AF ++  E R K+  E+P L   +++K+LG  W      +K+P
+Sbjct: 196 KRPMNAFIVWSRERRRKVALENPKLQNSEISKQLGYEWKRLTDAEKRP 339
+
+
+>L29543 Mus pahari sex-determining protein gene, 5' end.
+           Length = 515
+           
+ Score = 35.6 bits (80), Expect = 0.69
+ Identities = 26/90 (28%), Positives = 41/90 (44%)
+ Frame = +3
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 90  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 254
+
+Query: 62  MAKADKARYEREMKTYIPPKGETKKKFKDP 91
+            A+  K  +  +   Y   K +  +K K P
+Sbjct: 255 EAQRLKTLHREKYPNY---KYQPHRKAKVP 335
+
+
+>X89730 R.norvegicus DNA for Sry gene (partial)
+           Length = 459
+           
+ Score = 35.6 bits (80), Expect = 0.69
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +1
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  SE SK+   +WK+++  EK  F  
+Sbjct: 100 EGQVKRPMN-----AFMVWSRGERHKLAQQNPSMQNSEISKQLGYQWKSLTEAEKRPFFQ 264
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 265 EAQRLKTLHREKYPNY 312
+
+
+>U70658 Mus hortulanus sex determining protein (Sry) gene, complete
+           cds.
+           Length = 1263
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +1
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 40  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 204
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 205 EAQRLKTLHREKYPNY 252
+
+
+>AF009521 Mus spretus sex determining protein (Sry) gene, complete
+           cds.
+           Length = 1408
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +1
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 70  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 234
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 235 EAQRLKTLHREKYPNY 282
+
+
+>U70651 Mus musculus musculus sex determining protein (Sry) gene,
+           complete
+           Length = 1611
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +1
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 61  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 225
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 226 EAQRLKTLHREKYPNY 273
+
+
+>U70642 Mus musculus domesticus sex determining protein (Sry) gene,
+           Length = 1546
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +1
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 67  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 231
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 232 EAQRLKTLHREKYPNY 279
+
+
+>U70659 Mus spretus sex determining protein (Sry) gene, complete
+           cds.
+           Length = 1405
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +2
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 65  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 229
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 230 EAQRLKTLHREKYPNY 277
+
+
+>U70657 Mus musculus castaneus sex determining protein (Sry) gene,
+           complete
+           Length = 1549
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +2
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 65  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 229
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 230 EAQRLKTLHREKYPNY 277
+
+
+>U70654 Mus musculus musculus sex determining protein (Sry) gene,
+           complete
+           Length = 1598
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +3
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 60  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 224
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 225 EAQRLKTLHREKYPNY 272
+
+
+>U70653 Mus musculus musculus sex determining protein (Sry) gene,
+           complete
+           Length = 1586
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +3
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 60  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 224
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 225 EAQRLKTLHREKYPNY 272
+
+
+>U70652 Mus musculus musculus sex determining protein (Sry) gene,
+           complete
+           Length = 1612
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +2
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 68  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 232
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 233 EAQRLKTLHREKYPNY 280
+
+
+>U70650 Mus musculus domesticus sex determining protein (Sry) gene,
+           Length = 1552
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +2
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 65  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 229
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 230 EAQRLKTLHREKYPNY 277
+
+
+>U70649 Mus musculus domesticus sex determining protein (Sry) gene,
+           Length = 1547
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +2
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 65  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 229
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 230 EAQRLKTLHREKYPNY 277
+
+
+>U70648 Mus musculus domesticus sex determining protein (Sry) gene,
+           Length = 1546
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +2
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 65  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 229
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 230 EAQRLKTLHREKYPNY 277
+
+
+>U70647 Mus musculus domesticus sex determining protein (Sry) gene,
+           Length = 1546
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +2
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 65  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 229
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 230 EAQRLKTLHREKYPNY 277
+
+
+>U70646 Mus musculus domesticus sex determining protein (Sry) gene,
+           Length = 1558
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +2
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 65  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 229
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 230 EAQRLKTLHREKYPNY 277
+
+
+>U70645 Mus musculus domesticus sex determining protein (Sry) gene,
+           Length = 1546
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +2
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 65  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 229
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 230 EAQRLKTLHREKYPNY 277
+
+
+>U70644 Mus musculus domesticus sex determining protein (Sry) gene,
+           Length = 1549
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +2
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 65  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 229
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 230 EAQRLKTLHREKYPNY 277
+
+
+>U70641 Mus musculus domesticus sex determining protein (Sry) gene,
+           Length = 1550
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +3
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 60  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 224
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 225 EAQRLKTLHREKYPNY 272
+
+
+>L29550 Mus spicilegus Y-linked sex determining (Sry) gene, partial
+           cds.
+           Length = 515
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +3
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 90  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 254
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 255 EAQRLKTLHREKYPNY 302
+
+
+>L29544 Mus spretus sex-determing protein gene, 5' end.
+           Length = 515
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +3
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 90  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 254
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 255 EAQRLKTLHREKYPNY 302
+
+
+>L29551 Mus musculus domesticus Y-linked sex determining (Sry) gene,
+           Length = 515
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +3
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 90  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 254
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 255 EAQRLKTLHREKYPNY 302
+
+
+>AF009519 Mus musculus domesticus sex determining protein (Sry)
+           gene,
+           Length = 1560
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +2
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 68  EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 232
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 233 EAQRLKTLHREKYPNY 280
+
+
+>U03645 Mus musculus domesticus Torino (Sry) gene, complete cds.
+           Length = 2215
+           
+ Score = 34.8 bits (78), Expect = 1.2
+ Identities = 22/76 (28%), Positives = 35/76 (45%)
+ Frame = +2
+
+Query: 2   KGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFED 61
+           +G  K+P       AF V +  E HK    + S+  +E SK+   RWK+++  EK  F  
+Sbjct: 707 EGHVKRPMN-----AFMVWSRGERHKLAQQNPSMQNTEISKQLGCRWKSLTEAEKRPFFQ 871
+
+Query: 62  MAKADKARYEREMKTY 77
+            A+  K  +  +   Y
+Sbjct: 872 EAQRLKTLHREKYPNY 919
+
+
+  Database: embl.fas
+    Posted date:  May 15, 1998  5:37 PM
+  Number of letters in database: 675,252,082
+  Number of sequences in database:  442,729
+  
+Lambda     K      H
+   0.313    0.131    0.397 
+
+Gapped
+Lambda     K      H
+   0.270   0.0470    0.230 
+
+
+Matrix: BLOSUM62
+Gap Penalties: Existence: 11, Extension: 1
+Number of Hits to DB: 140890138
+Number of Sequences: 442729
+Number of extensions: 2085205
+Number of successful extensions: 9457
+Number of sequences better than 10.0: 460
+Number of HSP's better than 10.0 without gapping: 294
+Number of HSP's successfully gapped in prelim test: 14
+Number of HSP's that attempted gapping in prelim test: 8813
+Number of HSP's gapped (non-prelim): 503
+length of query: 214
+length of database: 225,084,027
+effective HSP length: 55
+effective length of query: 159
+effective length of database: 200,733,932
+effective search space: 31916695188
+effective search space used: 31916695188
+frameshift window, decay const: 50,  0.1
+T: 13
+A: 40
+X1: 16 ( 7.2 bits)
+X2: 38 (14.8 bits)
+X3: 64 (24.9 bits)
+S1: 42 (21.9 bits)
+S2: 70 (31.7 bits)

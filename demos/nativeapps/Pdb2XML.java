@@ -63,6 +63,9 @@ import org.biojava.bio.program.PdbToXMLConverter;
  * <li>Stuart Johnston    (CAT)
  *</ul>
  *
+ * @deprecated Prior to the biojava1.1 release - use equivalent class in
+ *  the demo package eventbasedparsing. Classes in this package were
+ *  deprecated because nativeapps is an unhelpful name.
  *
  * @author Cambridge Antibody Technology Group plc (CAT)
  * @version 1.0
@@ -93,14 +96,16 @@ public class Pdb2XML {
 
 	    System.out.println();
 	    System.out.println(
-           "Utility program to convert the output from  blast-like");
+           "Utility program to convert descriptions of macromolecular ");
 	    System.out.println(
-           "software into an XML format that should validate correctly");
+           "structures in formats resembline PDB format ");
 	    System.out.println(
-           "against the biojava BlastLikeDataSectCollection DTD.");
+           "into an XML format that should validate correctly");
+	    System.out.println(
+           "against the biojava MacromolecularStructureCollection DTD.");
 	    System.out.println();
             System.out.println  ("Usage:  java Pdb2XML " +
-            "[-mode <strict|lazy>] <blast output file pathname>");
+            "[-mode <strict|lazy>] <pdb file pathname>");
 
 	    System.out.println();
 

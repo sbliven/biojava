@@ -1,0 +1,318 @@
+BLASTX 2.0a19MP-WashU [05-Feb-1998] [Build sol2.5-ultra 01:47:30 05-Feb-1998]
+
+Reference:  Gish, Warren (1994-1997).  unpublished.
+Gish, Warren and David J. States (1993).  Identification of protein coding
+regions by database similarity search.  Nat. Genet. 3:266-72.
+
+Notice:  statistical significance is estimated under the assumption that the
+equivalent of one entire reading frame in the query sequence codes for protein
+and that significant alignments will involve only coding reading frames.
+
+Query=  U51677
+        (2575 letters)
+
+  Translating both strands of query sequence in all 6 reading frames
+
+Database:  swissprot
+           72,615 sequences; 26,335,942 total letters.
+Searching....10....20....30....40....50....60....70....80....90....100% done
+
+                                                                     Smallest
+                                                                       Sum
+                                                     Reading  High  Probability
+Sequences producing High-scoring Segment Pairs:        Frame Score  P(N)      N
+
+sp|P09429|HMG1_HUMAN HIGH MOBILITY GROUP PROTEIN HMG1 ... +2   311  5.0e-108  4
+sp|P10103|HMG1_BOVIN HIGH MOBILITY GROUP PROTEIN HMG1 ... +2   311  1.3e-107  4
+sp|P07155|HMG1_MOUSE HIGH MOBILITY GROUP PROTEIN HMG1 ... +2   311  2.7e-107  4
+sp|P12682|HMG1_PIG   HIGH MOBILITY GROUP PROTEIN HMG1 ... +2   306  4.6e-107  4
+
+
+
+>sp|P09429|HMG1_HUMAN HIGH MOBILITY GROUP PROTEIN HMG1 (HMG-1).
+            Length = 214
+
+  Plus Strand HSPs:
+
+ Score = 311 (109.5 bits), Expect = 5.0e-108, Sum P(4) = 5.0e-108
+ Identities = 58/58 (100%), Positives = 58/58 (100%), Frame = +2
+
+Query:   971 SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEK 1144
+             SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEK
+Sbjct:    99 SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEK 156
+
+ Score = 303 (106.7 bits), Expect = 5.0e-108, Sum P(4) = 5.0e-108
+ Identities = 59/59 (100%), Positives = 59/59 (100%), Frame = +1
+
+Query:  2146 KDIAAYRAKGKPDAAKKGVVKAEKSKKKKEEEEDEEDEEDEEEEEDEEDEDEEEDDDDE 2322
+             KDIAAYRAKGKPDAAKKGVVKAEKSKKKKEEEEDEEDEEDEEEEEDEEDEDEEEDDDDE
+Sbjct:   156 KDIAAYRAKGKPDAAKKGVVKAEKSKKKKEEEEDEEDEEDEEEEEDEEDEDEEEDDDDE 214
+
+ Score = 276 (97.2 bits), Expect = 5.0e-108, Sum P(4) = 5.0e-108
+ Identities = 50/54 (92%), Positives = 50/54 (92%), Frame = +1
+
+Query:     4 GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKVRGLK 165
+             GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWK    K
+Sbjct:     1 GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAK 54
+
+ Score = 265 (93.3 bits), Expect = 5.0e-108, Sum P(4) = 5.0e-108
+ Identities = 52/56 (92%), Positives = 52/56 (92%), Frame = +3
+
+Query:   330 TMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPP*VSCLFL 497
+             TMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPP  S  FL
+Sbjct:    50 TMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPP--SAFFL 103
+
+ Score = 80 (28.2 bits), Expect = 1.8e-31, Sum P(2) = 1.8e-31
+ Identities = 18/60 (30%), Positives = 30/60 (50%), Frame = +2
+
+Query:   971 SAFFLFCSEYRPKIKGEHPGLSIG--DVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEK 1144
+             S++  F    R + K +HP  S+   + +KK  E W   +A +K  +E  A   K +YE+
+Sbjct:    13 SSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYER 72
+
+ Score = 65 (22.9 bits), Expect = 6.7e-30, Sum P(2) = 6.7e-30
+ Identities = 14/45 (31%), Positives = 22/45 (48%), Frame = +1
+
+Query:    13 DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERW 147
+             DP  P+   S++  F    R + K +HP  S+   + +KK  E W
+Sbjct:    90 DPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIG--DVAKKLGEMW 132
+
+ Score = 42 (14.8 bits), Expect = 1.3e-24, Sum P(2) = 1.3e-24
+ Identities = 11/37 (29%), Positives = 19/37 (51%), Frame = +3
+
+Query:   336 SAKEKGKFEDMAKADKARYEREMKTY-IPPKGETKKK 443
+             +A +K  +E  A   K +YE+++  Y    K +  KK
+Sbjct:   136 AADDKQPYEKKAAKLKEKYEKDIAAYRAKGKPDAAKK 172
+
+
+>sp|P10103|HMG1_BOVIN HIGH MOBILITY GROUP PROTEIN HMG1 (HMG-1).
+            Length = 214
+
+  Plus Strand HSPs:
+
+ Score = 311 (109.5 bits), Expect = 1.3e-107, Sum P(4) = 1.3e-107
+ Identities = 58/58 (100%), Positives = 58/58 (100%), Frame = +2
+
+Query:   971 SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEK 1144
+             SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEK
+Sbjct:    99 SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEK 156
+
+ Score = 299 (105.3 bits), Expect = 1.3e-107, Sum P(4) = 1.3e-107
+ Identities = 58/59 (98%), Positives = 59/59 (100%), Frame = +1
+
+Query:  2146 KDIAAYRAKGKPDAAKKGVVKAEKSKKKKEEEEDEEDEEDEEEEEDEEDEDEEEDDDDE 2322
+             KDIAAYRAKGKPDAAKKGVVKAEKSKKKKEEEEDEEDEEDEEEEEDEEDE+EEEDDDDE
+Sbjct:   156 KDIAAYRAKGKPDAAKKGVVKAEKSKKKKEEEEDEEDEEDEEEEEDEEDEEEEEDDDDE 214
+
+ Score = 276 (97.2 bits), Expect = 1.3e-107, Sum P(4) = 1.3e-107
+ Identities = 50/54 (92%), Positives = 50/54 (92%), Frame = +1
+
+Query:     4 GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKVRGLK 165
+             GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWK    K
+Sbjct:     1 GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAK 54
+
+ Score = 265 (93.3 bits), Expect = 1.3e-107, Sum P(4) = 1.3e-107
+ Identities = 52/56 (92%), Positives = 52/56 (92%), Frame = +3
+
+Query:   330 TMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPP*VSCLFL 497
+             TMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPP  S  FL
+Sbjct:    50 TMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPP--SAFFL 103
+
+ Score = 80 (28.2 bits), Expect = 4.9e-31, Sum P(2) = 4.9e-31
+ Identities = 18/60 (30%), Positives = 30/60 (50%), Frame = +2
+
+Query:   971 SAFFLFCSEYRPKIKGEHPGLSIG--DVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEK 1144
+             S++  F    R + K +HP  S+   + +KK  E W   +A +K  +E  A   K +YE+
+Sbjct:    13 SSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYER 72
+
+ Score = 65 (22.9 bits), Expect = 1.8e-29, Sum P(2) = 1.8e-29
+ Identities = 14/45 (31%), Positives = 22/45 (48%), Frame = +1
+
+Query:    13 DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERW 147
+             DP  P+   S++  F    R + K +HP  S+   + +KK  E W
+Sbjct:    90 DPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIG--DVAKKLGEMW 132
+
+ Score = 42 (14.8 bits), Expect = 1.3e-24, Sum P(2) = 1.3e-24
+ Identities = 11/37 (29%), Positives = 19/37 (51%), Frame = +3
+
+Query:   336 SAKEKGKFEDMAKADKARYEREMKTY-IPPKGETKKK 443
+             +A +K  +E  A   K +YE+++  Y    K +  KK
+Sbjct:   136 AADDKQPYEKKAAKLKEKYEKDIAAYRAKGKPDAAKK 172
+
+
+>sp|P07155|HMG1_MOUSE HIGH MOBILITY GROUP PROTEIN HMG1 (HMG-1) (AMPHOTERIN)
+            (HEPARIN-BINDING PROTEIN P30).
+            Length = 214
+
+  Plus Strand HSPs:
+
+ Score = 311 (109.5 bits), Expect = 2.7e-107, Sum P(4) = 2.7e-107
+ Identities = 58/58 (100%), Positives = 58/58 (100%), Frame = +2
+
+Query:   971 SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEK 1144
+             SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEK
+Sbjct:    99 SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEK 156
+
+ Score = 296 (104.2 bits), Expect = 2.7e-107, Sum P(4) = 2.7e-107
+ Identities = 57/59 (96%), Positives = 59/59 (100%), Frame = +1
+
+Query:  2146 KDIAAYRAKGKPDAAKKGVVKAEKSKKKKEEEEDEEDEEDEEEEEDEEDEDEEEDDDDE 2322
+             KDIAAYRAKGKPDAAKKGVVKAEKSKKKKEEE+DEEDEEDEEEEE+EEDEDEEEDDDDE
+Sbjct:   156 KDIAAYRAKGKPDAAKKGVVKAEKSKKKKEEEDDEEDEEDEEEEEEEEDEDEEEDDDDE 214
+
+ Score = 276 (97.2 bits), Expect = 2.7e-107, Sum P(4) = 2.7e-107
+ Identities = 50/54 (92%), Positives = 50/54 (92%), Frame = +1
+
+Query:     4 GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKVRGLK 165
+             GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWK    K
+Sbjct:     1 GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAK 54
+
+ Score = 265 (93.3 bits), Expect = 2.7e-107, Sum P(4) = 2.7e-107
+ Identities = 52/56 (92%), Positives = 52/56 (92%), Frame = +3
+
+Query:   330 TMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPP*VSCLFL 497
+             TMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPP  S  FL
+Sbjct:    50 TMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPP--SAFFL 103
+
+ Score = 114 (40.1 bits), Expect = 1.4e-57, Sum P(3) = 1.4e-57
+ Identities = 25/63 (39%), Positives = 43/63 (68%), Frame = +1
+
+Query:  2146 KDIAAYRAKGKPD-AAKKGVVKAEKSKK---KKEEEEDEEDEEDEEEEEDEEDEDEEEDD 2313
+             K  A  + K + D AA +   K + +KK   K E+ + +++EED+EE+E++E+E+EEE+D
+Sbjct:   145 KKAAKLKEKYEKDIAAYRAKGKPDAAKKGVVKAEKSKKKKEEEDDEEDEEDEEEEEEEED 204
+
+Query:  2314 DDE 2322
+             +DE
+Sbjct:   205 EDE 207
+
+ Score = 80 (28.2 bits), Expect = 1.0e-30, Sum P(2) = 1.0e-30
+ Identities = 18/60 (30%), Positives = 30/60 (50%), Frame = +2
+
+Query:   971 SAFFLFCSEYRPKIKGEHPGLSIG--DVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEK 1144
+             S++  F    R + K +HP  S+   + +KK  E W   +A +K  +E  A   K +YE+
+Sbjct:    13 SSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYER 72
+
+ Score = 65 (22.9 bits), Expect = 3.8e-29, Sum P(2) = 3.8e-29
+ Identities = 14/45 (31%), Positives = 22/45 (48%), Frame = +1
+
+Query:    13 DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERW 147
+             DP  P+   S++  F    R + K +HP  S+   + +KK  E W
+Sbjct:    90 DPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIG--DVAKKLGEMW 132
+
+ Score = 42 (14.8 bits), Expect = 1.3e-24, Sum P(2) = 1.3e-24
+ Identities = 11/37 (29%), Positives = 19/37 (51%), Frame = +3
+
+Query:   336 SAKEKGKFEDMAKADKARYEREMKTY-IPPKGETKKK 443
+             +A +K  +E  A   K +YE+++  Y    K +  KK
+Sbjct:   136 AADDKQPYEKKAAKLKEKYEKDIAAYRAKGKPDAAKK 172
+
+
+>sp|P12682|HMG1_PIG HIGH MOBILITY GROUP PROTEIN HMG1 (HMG-1).
+            Length = 214
+
+  Plus Strand HSPs:
+
+ Score = 306 (107.7 bits), Expect = 4.6e-107, Sum P(4) = 4.6e-107
+ Identities = 57/58 (98%), Positives = 57/58 (98%), Frame = +2
+
+Query:   971 SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEK 1144
+             SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDK PYEKKAAKLKEKYEK
+Sbjct:    99 SAFFLFCSEYRPKIKGEHPGLSIGDVAKKLGEMWNNTAADDKHPYEKKAAKLKEKYEK 156
+
+ Score = 299 (105.3 bits), Expect = 4.6e-107, Sum P(4) = 4.6e-107
+ Identities = 58/59 (98%), Positives = 59/59 (100%), Frame = +1
+
+Query:  2146 KDIAAYRAKGKPDAAKKGVVKAEKSKKKKEEEEDEEDEEDEEEEEDEEDEDEEEDDDDE 2322
+             KDIAAYRAKGKPDAAKKGVVKAEKSKKKKEEEEDEEDEEDEEEEEDEEDE+EEEDDDDE
+Sbjct:   156 KDIAAYRAKGKPDAAKKGVVKAEKSKKKKEEEEDEEDEEDEEEEEDEEDEEEEEDDDDE 214
+
+ Score = 276 (97.2 bits), Expect = 4.6e-107, Sum P(4) = 4.6e-107
+ Identities = 50/54 (92%), Positives = 50/54 (92%), Frame = +1
+
+Query:     4 GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKVRGLK 165
+             GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWK    K
+Sbjct:     1 GKGDPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAK 54
+
+ Score = 265 (93.3 bits), Expect = 4.6e-107, Sum P(4) = 4.6e-107
+ Identities = 52/56 (92%), Positives = 52/56 (92%), Frame = +3
+
+Query:   330 TMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPP*VSCLFL 497
+             TMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPP  S  FL
+Sbjct:    50 TMSAKEKGKFEDMAKADKARYEREMKTYIPPKGETKKKFKDPNAPKRPP--SAFFL 103
+
+ Score = 80 (28.2 bits), Expect = 4.9e-31, Sum P(2) = 4.9e-31
+ Identities = 18/60 (30%), Positives = 30/60 (50%), Frame = +2
+
+Query:   971 SAFFLFCSEYRPKIKGEHPGLSIG--DVAKKLGEMWNNTAADDKQPYEKKAAKLKEKYEK 1144
+             S++  F    R + K +HP  S+   + +KK  E W   +A +K  +E  A   K +YE+
+Sbjct:    13 SSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERWKTMSAKEKGKFEDMAKADKARYER 72
+
+ Score = 65 (22.9 bits), Expect = 1.8e-29, Sum P(2) = 1.8e-29
+ Identities = 14/45 (31%), Positives = 22/45 (48%), Frame = +1
+
+Query:    13 DPKKPRGKMSSYAFFVQTCREEHKKKHPDASVNFSEFSKKCSERW 147
+             DP  P+   S++  F    R + K +HP  S+   + +KK  E W
+Sbjct:    90 DPNAPKRPPSAFFLFCSEYRPKIKGEHPGLSIG--DVAKKLGEMW 132
+
+ Score = 42 (14.8 bits), Expect = 1.3e-24, Sum P(2) = 1.3e-24
+ Identities = 11/37 (29%), Positives = 19/37 (51%), Frame = +3
+
+Query:   336 SAKEKGKFEDMAKADKARYEREMKTY-IPPKGETKKK 443
+             +A +K  +E  A   K +YE+++  Y    K +  KK
+Sbjct:   136 AADDKHPYEKKAAKLKEKYEKDIAAYRAKGKPDAAKK 172
+
+Parameters:
+
+  ctxfactor=6.00
+  E=10
+
+  Query                        -----  As Used  -----    -----  Computed  ----
+  Frame  MatID Matrix name     Lambda    K       H      Lambda    K       H
+   Std.    0   BLOSUM62                                 0.318   0.135   0.401  
+   +3      0   BLOSUM62        0.318   0.135   0.401    0.374   0.168   0.632  
+               Q=9,R=2         0.244   0.0300  0.180     n/a     n/a     n/a
+   +2      0   BLOSUM62        0.318   0.135   0.401    0.357   0.161   0.556  
+               Q=9,R=2         0.244   0.0300  0.180     n/a     n/a     n/a
+   +1      0   BLOSUM62        0.318   0.135   0.401    0.358   0.161   0.586  
+               Q=9,R=2         0.244   0.0300  0.180     n/a     n/a     n/a
+   -1      0   BLOSUM62        0.318   0.135   0.401    0.357   0.159   0.555  
+               Q=9,R=2         0.244   0.0300  0.180     n/a     n/a     n/a
+   -2      0   BLOSUM62        0.318   0.135   0.401    0.361   0.163   0.576  
+               Q=9,R=2         0.244   0.0300  0.180     n/a     n/a     n/a
+   -3      0   BLOSUM62        0.318   0.135   0.401    0.352   0.155   0.521  
+               Q=9,R=2         0.244   0.0300  0.180     n/a     n/a     n/a
+
+  Query
+  Frame  MatID  Length  Eff.Length     E    S W   T  X   E2     S2
+   +3      0      857       857       10.  77 3  12 22  0.11    36
+                                                    37  0.10    40
+   +2      0      858       858       10.  77 3  12 22  0.11    36
+                                                    37  0.10    40
+   +1      0      858       858       10.  77 3  12 22  0.11    36
+                                                    37  0.10    40
+   -1      0      858       858       10.  77 3  12 22  0.11    36
+                                                    37  0.10    40
+   -2      0      858       858       10.  77 3  12 22  0.11    36
+                                                    37  0.10    40
+   -3      0      857       857       10.  77 3  12 22  0.11    36
+                                                    37  0.10    40
+
+
+Statistics:
+
+  Database:  /dbEST1/wublast/database/swissprot/sprot.fa
+    Title:  swissprot
+    Release date:  unknown
+    Posted date:  11:37 AM GMT Feb 21, 2000
+    Format:  BLAST
+  # of letters in database:  26,335,942
+  # of sequences in database:  72,615
+  # of database sequences satisfying E:  476
+  No. of states in DFA:  599 (59 KB)
+  Total size of DFA:  635 KB (640 KB)
+  Time to generate neighborhood:  0.08u 0.00s 0.08t  Elapsed: 00:00:00
+  No. of threads or processors used:  2
+  Search cpu time:  216.45u 0.39s 216.84t  Elapsed: 00:01:53
+  Total cpu time:  217.02u 0.56s 217.58t  Elapsed: 00:01:55
+  Start:  Mon Feb 21 12:12:16 2000   End:  Mon Feb 21 12:14:11 2000
+
+WARNINGS ISSUED:  1

@@ -68,6 +68,10 @@ import org.biojava.bio.program.BlastLikeToXMLConverter;
  * <li>Stuart Johnston    (CAT)
  *</ul>
  *
+ * @deprecated Prior to the biojava1.1 release - use equivalent class in
+ *  the demo package eventbasedparsing. Classes in this package were
+ *  deprecated because nativeapps is an unhelpful name.
+ *
  * @author Cambridge Antibody Technology (CAT)
  * @version 1.0
  * 
