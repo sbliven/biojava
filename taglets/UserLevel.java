@@ -72,7 +72,7 @@ public class UserLevel implements Taglet {
     } else {
       StringBuffer sb = new StringBuffer();
       
-      sb.append("<dt></dt><dd><table BORDER=\"1\" CELLPADDING=\"3\" CELLSPACING=\"0\" WIDTH=\"100%\">\n");
+      sb.append("<dt><table BORDER=\"1\" CELLPADDING=\"3\" CELLSPACING=\"0\" WIDTH=\"100%\">\n");
       sb.append("<tr BGCOLOR=\"#EEEEFF\" CLASS=\"TableSubHeadingColor\">\n");
       sb.append("<td><b>Intended for:</b> " + message + "</td>\n");
       sb.append("</tr>\n");
@@ -82,7 +82,7 @@ public class UserLevel implements Taglet {
           sb.append("<tr BGCOLOR=\"white\" CLASS=\"TableRowColor\"><td>" + text + "</td></tr>\n");
         }
       }
-      sb.append("</table></dd>\n");
+      sb.append("</table></dt>\n");
       
       return sb.toString();
     }

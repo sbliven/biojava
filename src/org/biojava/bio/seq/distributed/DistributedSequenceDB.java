@@ -39,7 +39,7 @@ import org.biojava.bio.seq.db.*;
  * you should be able to prety much forget about it and use it directly as a normal
  * SequenceDB implementation.
  *
- * @for.powerUsers
+ * @for.powerUser
  * DataSources can be added and removed while the object is live. 
  */
 

@@ -274,6 +274,13 @@ public final class SeqIOTools  {
       sw.writeStream(in);
    }
 
+   /**
+    * Writes a single Sequence to an OutputSream in fasta format.
+    *
+    * @param os  the OutputStream
+    * @param seq  the Sequence
+    * @throws IOException if there was an error writing it
+    */
    public static void writeFasta(OutputStream os, Sequence seq)
    throws IOException {
      writeFasta(os, new SingleSeqIterator(seq));
