@@ -562,11 +562,11 @@ public class LocationFormatterTest extends TestCase
 	 * @param theString1 The first string to compare
 	 * @param theString2 The second string to compare
 	 */
-	private void assertEquals(String theString1, String theString2)
-	{
-		if(theString1.equals(theString2) == false)
-		{
-			fail("\n\t" + theString1 + "\n\t\t != \n\t" + theString2);
-		}
-	}
+//	private void assertEquals(String theString1, String theString2)
+//	{
+//		if(theString1.equals(theString2) == false)
+//		{
+//			fail("\n\t" + theString1 + "\n\t\t != \n\t" + theString2);
+//		}
+//	}
 }
