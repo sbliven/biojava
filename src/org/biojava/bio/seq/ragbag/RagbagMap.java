@@ -146,12 +146,14 @@ class RagbagMap extends StAXContentHandlerBase
  */
   public class MapElement
   {
+    private String ref;
     private String filename;
     private RangeLocation srcLoc;
     private RangeLocation dstLoc;
     private StrandedFeature.Strand strand;
 
-    private MapElement(String filename, 
+    private MapElement(String ref,
+                       String filename, 
                        RangeLocation srcLoc, 
                        RangeLocation dstLoc, 
                        StrandedFeature.Strand strand)
@@ -163,6 +165,7 @@ class RagbagMap extends StAXContentHandlerBase
       this.strand = strand;
     }
     // to enforce immutability
+    public String getRef() {return ref;}
     public String getFilename() {return filename;}
     public RangeLocation getSrcLocation() {return srcLoc;}
     public RangeLocation getDstLocation() {return dstLoc;}
@@ -221,7 +224,7 @@ class RagbagMap extends StAXContentHandlerBase
 
     // the element has one or more <mapping> elements
     if (!(localName.equals("mapping")))
-      throw new SAXException("Only mapping elements permitted within a <ragbag_map> element");
+      throw new SAXException("Only mapping elements are permitted within a <ragbag_map> element");
 
     // all seems kosher, process attributes. 
     // get source: do I need full pathnames?
@@ -229,12 +232,17 @@ class RagbagMap extends StAXContentHandlerBase
     if (srcFilename == null)
       throw new SAXException("source missing in <mapping> in Map.");       
 
+    // pick up reference
+    String refStg = attrs.getValue("ref");
+    if (refStg == null)
+      throw new SAXException("ref missing in <mapping> in Map.");       
+
     // get source start and end coordinates
-    String srcStartStg = attrs.getValue("source_start");
-    String srcEndStg = attrs.getValue("source_end");
-    String dstStartStg = attrs.getValue("dest_start");
-    String dstEndStg = attrs.getValue("dest_end");
-    String direction = attrs.getValue("direction");
+    String srcStartStg = attrs.getValue("src_start");
+    String srcEndStg = attrs.getValue("src_end");
+    String dstStartStg = attrs.getValue("dst_start");
+    String dstEndStg = attrs.getValue("dst_end");
+    String direction = attrs.getValue("sense");
 
     // validation
     if (srcStartStg == null || srcEndStg == null
@@ -265,7 +273,7 @@ class RagbagMap extends StAXContentHandlerBase
 
     // create the mapping object and add to list
 //    System.out.println("adding " + srcFilename + srcLoc + dstLoc + strand);
-    map.add(new MapElement(srcFilename, srcLoc, dstLoc, strand));     
+    map.add(new MapElement(refStg.trim(), srcFilename, srcLoc, dstLoc, strand));     
   }  
 
   public void endElement(String nsURI, 

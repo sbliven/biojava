@@ -48,17 +48,24 @@ class RagbagVirtualSequenceBuilder
   private RagbagMap map = null;
   private String seqName;
   private RagbagSequenceFactory factory;
+  private RagbagComponentDirectory compDir;
 /**
  * create a virtual sequence with mappings specified
  * @param seqName name for virtual sequence
  * @param uri     URI for virtual sequence
  * @param mapFile file containing mappings to be used
  */
-  protected RagbagVirtualSequenceBuilder(String seqName, String uri, File mapFile, RagbagSequenceFactory factory)
+  protected RagbagVirtualSequenceBuilder(
+              String seqName, 
+              String uri, 
+              File mapFile, 
+              RagbagSequenceFactory factory, 
+              RagbagComponentDirectory compDir)
     throws BioException, SAXException
   {
     this.seqName = seqName;
     this.factory = factory;
+    this.compDir = compDir;
 
     // create mapping object
     map = new RagbagMap(mapFile);
@@ -106,7 +113,7 @@ class RagbagVirtualSequenceBuilder
     else if (seqfile.isDirectory()) {
       // it's a virtual sequence in a represented by a directory
       try {
-        currSequence = new RagbagAssembly(seqfile, factory);
+        currSequence = new RagbagAssembly(seqfile, factory, compDir);
       }
       catch (FileNotFoundException fne) {
         throw new BioException("Directory " + seqfile.getName() + "could not be found.");
@@ -138,7 +145,12 @@ class RagbagVirtualSequenceBuilder
       // and add it to SimpleAssembly
       System.out.println("Adding features on " + seqfile.getName() + cft.componentLocation);
       try {
-        sab.addComponentSequence(cft);
+        ComponentFeature cf = sab.addComponentSequence(cft);
+
+        // should the feature be logged?
+        if (compDir != RagbagComponentDirectory.UNLOGGED) {
+          compDir.addComponentFeature(mapping.getRef(), cf);
+        }
       }
       catch (ChangeVetoException cve) {
         System.err.println("Can't add feature: change vetoed.");

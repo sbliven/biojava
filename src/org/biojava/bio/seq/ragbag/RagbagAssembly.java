@@ -67,15 +67,23 @@ public class RagbagAssembly extends RagbagAbstractSequence
   }
 */
 
+/**
+ * creates instances of sequence proxy objects with right cache behaviour
+ */
   RagbagSequenceFactory seqFactory;
 
-  public RagbagAssembly(File thisDir, RagbagSequenceFactory seqFactory)
+/**
+ * @param thisDir    directory containing Ragbag structure.
+ * @param seqFactory used to create sequence objects by this class.
+ * @param compDir    directory used to log ComponentFeatures. Set to RagbagComponentDirectory.UNLOGGED if logging not desired.
+ */
+  public RagbagAssembly(File thisDir, RagbagSequenceFactory seqFactory, RagbagComponentDirectory compDir)
     throws BioException, FileNotFoundException, ChangeVetoException, IOException, SAXException
   {
-    // stash factory object
+    // stash factory object for later use
     this.seqFactory = seqFactory;
 
-    // check it is a directory
+    // ***ERRORCHECK: check it is a directory
     if (!thisDir.exists() ||
         !thisDir.isDirectory()) {
       throw new BioException("RagbagAssembly: the reference is not to a directory.");
@@ -87,7 +95,7 @@ public class RagbagAssembly extends RagbagAbstractSequence
       // ************ Construct virtual sequence ****************
       // virtual contig required
       RagbagVirtualSequenceBuilder seqBuilder = 
-        new RagbagVirtualSequenceBuilder(thisDir.getName(), "", mapFile, seqFactory);
+        new RagbagVirtualSequenceBuilder(thisDir.getName(), "", mapFile, seqFactory, compDir);
 
 
       // search thru' files and instantiate them
@@ -97,7 +105,7 @@ public class RagbagAssembly extends RagbagAbstractSequence
 
       for (int i=0; i < dirList.length; i++) {
         File currFile = dirList[i];
-        //is it a file?
+        // add all files/directories that contain sequence to virtual sequence
         if (!(currFile.getName().equals("Map"))
              && !(currFile.getName().equals("Annotation")) ) {
           // this is not the Map file or the Annotation directory.
@@ -120,7 +128,7 @@ public class RagbagAssembly extends RagbagAbstractSequence
           // add all files.
           if (annotDirList[i].isFile()) {
             seqBuilder.addFeatures(annotDirList[i]);
-            System.out.println("adding annotations onto a virtual sequence has not been implemented yet.");
+//            System.out.println("adding annotations onto a virtual sequence has not been implemented yet.");
           }
         }
       }
@@ -138,7 +146,7 @@ public class RagbagAssembly extends RagbagAbstractSequence
       // get directory contents
       File dirList[] = thisDir.listFiles();
 
-      // check directory is not empty
+      // ***ERRORCHECK: check directory is not empty
       if ((dirList == null) || (dirList.length == 0))
         throw new BioException("RagbagAssembly: directory is empty");
 
@@ -163,6 +171,7 @@ public class RagbagAssembly extends RagbagAbstractSequence
         }
       }
 
+      // ***ERRORCHECK: one sequence file required.
       if (seqFileCount == 0 || seqFileCount > 1)
         throw new BioException(
         "RagbagAssembly: an unmapped directory MUST have ONE sequence file.");
