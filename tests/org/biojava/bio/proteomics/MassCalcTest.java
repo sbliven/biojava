@@ -115,27 +115,19 @@ public class MassCalcTest extends TestCase
 
         mCalc = new MassCalc(SymbolPropertyTable.MONO_MASS, false);
         assertEquals(monoAla + (monoO + monoH) + monoH,
-                     mCalc.getMass(syms1, false), delta);
-        assertEquals(monoAla + (monoO + monoH) + monoH + monoH,
-                     mCalc.getMass(syms1, true), delta);
+                     mCalc.getMass(syms1), delta);
 
         mCalc = new MassCalc(SymbolPropertyTable.MONO_MASS, true);
-        assertEquals(monoAla + (monoO + monoH) + monoH,
-                     mCalc.getMass(syms1, false), delta);
         assertEquals(monoAla + (monoO + monoH) + monoH + monoH,
-                     mCalc.getMass(syms1, true), delta);
+                     mCalc.getMass(syms1), delta);
 
         mCalc = new MassCalc(SymbolPropertyTable.AVG_MASS, false);
         assertEquals(avgAla + (avgO + avgH) + avgH,
-                     mCalc.getMass(syms1, false), delta);
-        assertEquals(avgAla + (avgO + avgH) + avgH + avgH,
-                     mCalc.getMass(syms1, true), delta);
+                     mCalc.getMass(syms1), delta);
 
         mCalc = new MassCalc(SymbolPropertyTable.AVG_MASS, true);
-        assertEquals(avgAla + (avgO + avgH) + avgH,
-                     mCalc.getMass(syms1, false), delta);
         assertEquals(avgAla + (avgO + avgH) + avgH + avgH,
-                     mCalc.getMass(syms1, true), delta);
+                     mCalc.getMass(syms1), delta);
     }
 
     /**
@@ -179,29 +171,21 @@ public class MassCalcTest extends TestCase
         mCalc = new MassCalc(SymbolPropertyTable.MONO_MASS, false);
         mCalc.setSymbolModification('A', newAla);
         assertEquals(newAla + (monoO + monoH) + monoH,
-                     mCalc.getMass(syms1, false), delta);
-        assertEquals(newAla + (monoO + monoH) + monoH + monoH,
-                     mCalc.getMass(syms1, true), delta);
+                     mCalc.getMass(syms1), delta);
 
         mCalc = new MassCalc(SymbolPropertyTable.MONO_MASS, true);
         mCalc.setSymbolModification('A', newAla);
-        assertEquals(newAla + (monoO + monoH) + monoH,
-                     mCalc.getMass(syms1, false), delta);
         assertEquals(newAla + (monoO + monoH) + monoH + monoH,
-                     mCalc.getMass(syms1, true), delta);
+                     mCalc.getMass(syms1), delta);
 
         mCalc = new MassCalc(SymbolPropertyTable.AVG_MASS, false);
         mCalc.setSymbolModification('A', newAla);
         assertEquals(newAla + (avgO + avgH) + avgH,
-                     mCalc.getMass(syms1, false), delta);
-        assertEquals(newAla + (avgO + avgH) + avgH + avgH,
-                     mCalc.getMass(syms1, true), delta);
+                     mCalc.getMass(syms1), delta);
 
         mCalc = new MassCalc(SymbolPropertyTable.AVG_MASS, true);
         mCalc.setSymbolModification('A', newAla);
-        assertEquals(newAla + (avgO + avgH) + avgH,
-                     mCalc.getMass(syms1, false), delta);
         assertEquals(newAla + (avgO + avgH) + avgH + avgH,
-                     mCalc.getMass(syms1, true), delta);
+                     mCalc.getMass(syms1), delta);
     }
 }
