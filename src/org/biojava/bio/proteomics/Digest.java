@@ -56,12 +56,12 @@ public class Digest {
     
     /** Creates new Digest */
     public Digest() {
-        try{
+        /*try{
             protease = new Protease();
-        }catch (Exception e){
+	}catch (Exception e){
             //Should never happen
             e.printStackTrace();
-        }
+	    }*/
     }
     
     public void setProtese(Protease protease) {
@@ -103,7 +103,12 @@ public class Digest {
         
         List cleaveSites = protease.getCleaveageResidues().toList();
         boolean endoProtease = protease.isEndoProtease();
-        List notCleave = protease.getNotCleaveResidues().toList();
+        
+	List notCleave = protease.getNotCleaveResidues().toList();
+	//Returns null if the list is empty
+	if(notCleave == null){
+	    notCleave = new LinkedList();
+	}
         int nTerm = 1;
         
         if(cleaveSites == null || notCleave == null){

@@ -84,9 +84,9 @@ public class Protease {
     public static String CHYMOTRYP = "Chymostrypsin";
     public static String CNBr = "CNBr"; 
     
-    private static SymbolList cleavageResidues;
-    private static SymbolList notCleaveResidues;
-    private static boolean endoProtease = true;
+    private SymbolList cleavageResidues;
+    private SymbolList notCleaveResidues;
+    private boolean endoProtease = true;
     
     /** Creates new Protease */
     public Protease(SymbolList cleaveRes, 
@@ -114,13 +114,6 @@ public class Protease {
         this.cleavageResidues = createSymbolList(cleavageRes);
         this.endoProtease = endoProtease;
         this.notCleaveResidues = createSymbolList("");
-    }
-    
-    public Protease() 
-            throws IllegalSymbolException, BioException {
-        String seqString = ""; 
-        cleavageResidues = createSymbolList(seqString);
-        notCleaveResidues = createSymbolList(seqString);
     }
     
     public SymbolList getCleaveageResidues()
@@ -196,9 +189,9 @@ public class Protease {
                             String name = el.getNodeName();
                             String content = el.getFirstChild().getNodeValue();
                             if(name.equals("cleaveRes")) {
-                                cleavRes = content;
+                                cleavRes = content.trim();
                             }else if(name.equals("exceptRes")) {
-                                exceptRes = content;
+                                exceptRes = content.trim();
                             }else if(name.equals("endo")) {
                                 endo = new Boolean(content).booleanValue();
                             }
@@ -218,10 +211,12 @@ public class Protease {
     
     private SymbolList createSymbolList(String seq) 
                                   throws IllegalSymbolException, BioException {
-        FiniteAlphabet prot 
+	SymbolList sList;
+	FiniteAlphabet prot 
                  = (FiniteAlphabet)AlphabetManager.alphabetForName("PROTEIN");
-        //SymbolParser parser = prot.getParser("token"); 
+
         SymbolTokenization tokenization = prot.getTokenization("token");
-        return new SimpleSymbolList (tokenization, seq); 
+      	sList = new SimpleSymbolList (tokenization, seq); 
+        return sList; 
     }
 }
