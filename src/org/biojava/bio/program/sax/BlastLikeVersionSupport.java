@@ -80,6 +80,7 @@ final class BlastLikeVersionSupport {
     public static final int    V2_0A19MP_WASHU   = 200;
 
     public static final int    V2_0              = 300;
+    public static final int    V2_1_1            = 301;
 
 
     public static final int STRICT = 0;
@@ -152,7 +153,7 @@ final class BlastLikeVersionSupport {
      //Check version support for HMMER
 
      if (iProgram == HMMER) {
-         if (iVersion == V2_0) {
+         if (iVersion == V2_0 || iVersion == V2_1_1 ) {
          return true;
          }
      }
@@ -332,6 +333,10 @@ final class BlastLikeVersionSupport {
     }
 
     if (oVersionString.equals("2.0")) {
+        iVersion = V2_0;
+        tFormatFound = true;
+    }
+    if (oVersionString.equals("2.1.1")) {
         iVersion = V2_0;
         tFormatFound = true;
     }

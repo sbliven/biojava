@@ -54,11 +54,11 @@ import org.xml.sax.helpers.AttributesImpl;
  * <ul>
  * <li>NCBI Blast version 2.0.11
  * <li>WU-Blast version 2.0a19mp-washu
+ * <li>HMMER 2.1.1 hmmsearch 
  * </ul>
  * Planned addition support
  * <ul>
- * <li>HMMER (Wash U.) (Current support for HMMER is only partial and
- * likely to change without notice as more functionality is added).
+ * <li> Support for HMMER hmmpfam almost there but not fully tested
  * </ul>
  * <p>
  * <p>

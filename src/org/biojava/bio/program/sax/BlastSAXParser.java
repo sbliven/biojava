@@ -165,8 +165,9 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
         } // end while
         } catch (java.io.IOException x) {
         System.out.println(x.getMessage());
-        System.out.println("File read interupted");
+        System.out.println("File read interrupted");
         } // end try/catch
+
 
         //Now close open elements...
         if (iState == IN_TRAILER) {
@@ -199,7 +200,7 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
          (poLine.startsWith(
                   "Sequences producing High-scoring Segment Pairs")) ||
          (poLine.startsWith(
-                  "--------   ")) ) {
+                  "-------- ")) ) {
 
         this.emitRawOutput(oBuffer);
 
@@ -219,8 +220,8 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
             poLine = oContents.readLine();
 
         } catch (java.io.IOException x) {
-            System.out.println(x.getMessage());
-            System.out.println("File read interupted");
+            System.err.println(x.getMessage());
+            System.err.println("File read interrupted");
         } // end try/catch
 
         if (poLine.trim().equals("")) {
@@ -247,32 +248,44 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 
         //(signal is a blank line for NCBIBlast and Wu-Blast, 
         //(signal is either a blank line or 
-        //[no more scores below E threshold] for HMMER.
         //Signal is \\End of List for GCG
 
-        if ( (poLine.trim().equals("")) ||
-         (poLine.trim().startsWith("[no more scores")) ||
-         (poLine.trim().startsWith("\\")) ) {
-        //Can't change state, because we still want to
-        //check for start of detail... 
+	// HMMR has a longer summary section to include the
+	// domain summary and the check for a blank line
+	// will prematurely end the summary section so
+	// skip this check for HMMR 
+
+
+	int iProgram = oVersion.getProgram();
+    
+	if ( iProgram == BlastLikeVersionSupport.HMMER ) {
+
+	    if ( poLine.trim().equals("") ) {
+		return; // skip
+	    }
+
+	    //HMMER-specific
+	    if (poLine.startsWith("Parsed for domains:")) {
+		//signifies domain summary info
+		String oAfterHmmr =  this.hmmerDomainSummaryReached(poLine);
+		//		System.err.println( "Last-->" + oAfterHmmr + "<--" );
+		return;
+	    } 
+	} else if ( (poLine.trim().equals("")) ||
+		    (poLine.trim().startsWith("[no more scores")) ||
+		    (poLine.trim().startsWith("\\")) ) {
+	    //Can't change state, because we still want to
+	    //check for start of detail... 
 
         //Forgive non-standard white-space
-        //between end of summary and start of detail
-        if (!tDoneSummary) {
-            tDoneSummary = true;
-            this.endElement(new QName(this,this.prefix("Summary")));
-        } 
-        return; //return before attempting to parse Summary Line
+	    //between end of summary and start of detail
+	    if (!tDoneSummary) {
+		tDoneSummary = true;
+		this.endElement(new QName(this,this.prefix("Summary")));
+	    } 
+	    return; //return before attempting to parse Summary Line
 
         }
-
-        //HMMER-specific
-        if (poLine.startsWith("Parsed for domains:")) {
-        //signifies domain summary info
-        this.hmmerDomainSummaryReached(poLine);
-        }
-
-
 
         if (poLine.startsWith(">")) {
         //signifies start of detail section
@@ -285,7 +298,7 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
         //summary and start of detail e.g. multi-line WARNINGs
         //at end of Summary section in Wu-Blast.
         if (!tDoneSummary) {
-        this.parseSummaryLine(poLine);
+	    this.parseSummaryLine(poLine);
         }
         return;
     }
@@ -429,6 +442,14 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
         } // end try/catch
     }
 
+    /* Note have to do this check a hmmer can have empty summary
+     * sections and oMap.keySet().toArray will return an array
+     * of size 1 with a null first element if the map is empty.
+     */
+    if ( oMap.size() == 0 ) {
+	return;
+    }
+
     aoKeys = (String[])(oMap.keySet().toArray(aoArrayType));
 
     oAtts.clear();
@@ -487,6 +508,8 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
         //System.out.println(oMap.get(aoKeys[i]));
     }
     this.endElement(new QName(this,this.prefix("HitSummary")));
+
+    oMap.clear();
     }
     /**
      * From the specified line, hand over
@@ -545,20 +568,157 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
      * @param poLine a <code>String</code> value
      * @exception SAXException if an error occurs
      */
-    private void hmmerDomainSummaryReached(String poLine)
-    throws SAXException {
+    private String hmmerDomainSummaryReached(String poLine)
+	throws SAXException {
 
-    //To be implemented - parse Contents stream up to end of 
-    //domain summary via delegation (analagous to hits parsing
+	//To be implemented - parse Contents stream up to end of 
+	//domain summary via delegation (analagous to hits parsing
     
 
-    oAtts.clear();
-    this.startElement(new QName(this,this.prefix("DomainSummary")),
-              (Attributes)oAtts);
+	oAtts.clear();
+	this.startElement(new QName(this,this.prefix("DomainSummary")),
+			  (Attributes)oAtts);
 
-    //... insert functionality.
+	int iProgram = oVersion.getProgram();
+    
+	if ( iProgram == BlastLikeVersionSupport.HMMER ) {
 
-    this.endElement(new QName(this,this.prefix("Detail")));
+	    DomainSectionSAXParser oDomains = new DomainSectionSAXParser
+		( oVersion, this.getNamespacePrefix() );
+
+	    oDomains.setContentHandler( oHandler );
+	    
+	    oDomains.parse( oContents, poLine );
+
+	    this.endElement(new QName(this,this.prefix("DomainSummary")));
+	    this.endElement(new QName(this,this.prefix("Summary")));
+
+
+	    String oLine = null;
+	    try {
+
+		oLine = oContents.readLine();
+		while( oLine != null && 
+		       ( !oLine.startsWith
+			 ( "Alignments of top-scoring domains:" ) ) &&
+		       ( !oLine.startsWith( "//" ) ) &&
+		       ( !oLine.startsWith( "Histogram of all scores:" ) )	       
+		       ) {
+		    oLine = oContents.readLine();	    
+		}
+	    } catch ( IOException e ) {
+		System.err.println( e.getMessage());
+		System.err.println("File read interrupted");
+		throw new SAXException( "File read interrupted" );
+	    }
+		
+	    if ( oLine != null && 
+		 oLine.startsWith( "Alignments of top-scoring domains:" ) ) {
+ 
+		oAtts.clear();
+		this.startElement(new QName(this,this.prefix("Detail")),
+				  (Attributes)oAtts);		
+
+		HmmerAlignmentSAXParser oAlignments = new HmmerAlignmentSAXParser
+		    ( oVersion, this.getNamespacePrefix() );
+
+		oAlignments.setContentHandler( oHandler );
+	    
+		String oLastLine = oAlignments.parse( oContents, poLine );
+
+		if ( oLastLine.trim().equals("//") ) { // hmmpfam
+
+		    // then close details, BlastLikeDataSet
+		    // if more stuff
+
+		    this.endElement(new QName(this,this.prefix("Detail")));
+
+		    try {
+			oLine = oContents.readLine();
+			while ( (oLine != null) &&
+				(!oLine.startsWith( "Query:" ) ) ) {
+
+			    oLine = oContents.readLine();
+			}
+		    } catch ( IOException e ) {
+			System.err.println( "Read interrupted" );
+			System.err.println( e );
+
+			e.printStackTrace();
+			throw new SAXException( "File read interupted" );
+		    }
+		    if ( oLine == null ) {
+			this.changeState(AT_END);
+			return oLine;
+		    } else {
+			this.endElement(new QName(this,this.prefix
+						  ("BlastLikeDataSet")));
+			// need to start a new one ( if there is )
+			oAtts.clear();
+			oAttQName.setQName("program");
+			oAtts.addAttribute(oAttQName.getURI(),
+					   oAttQName.getLocalName(),
+					   oAttQName.getQName(),
+					   "CDATA",oVersion.getProgramString());
+		
+			oAttQName.setQName("version");
+			oAtts.addAttribute(oAttQName.getURI(),
+					   oAttQName.getLocalName(),
+					   oAttQName.getQName(),
+					   "CDATA",oVersion.getVersionString());
+
+			this.startElement(new QName(this,this.prefix
+						    ("BlastLikeDataSet")),
+					  (Attributes)oAtts);
+
+			
+			oAtts.clear();
+			this.startElement(new QName(this,this.prefix("Header")),
+					  (Attributes)oAtts);
+			oBuffer.clear();
+			oBuffer.add( oLine );
+			this.emitRawOutput(oBuffer);
+			this.endElement(new QName(this,this.prefix("Header")));
+
+			this.changeState( IN_SUMMARY );
+
+			oAtts.clear();
+			this.startElement(new QName(this,this.prefix
+						    ("Summary")),
+					  (Attributes)oAtts);
+
+			try{
+			// fast forward to first summary
+			    while (! oLine.startsWith( "-------- " ) ) {
+				oLine = oContents.readLine();
+			    }  
+			} catch (java.io.IOException x) {
+			    System.err.println(x.getMessage());
+			    System.err.println("File read interrupted");
+			    throw new SAXException( "File read interrupted" );
+			} // end try/catch
+		    }
+
+		} else {
+		    //		    System.err.println( "FINISHED HITS>>>>>>" );
+		    oLine = oLastLine;
+		    this.changeState( FINISHED_HITS );
+		}
+		
+		
+	    } else { // passed Alignment section
+		//
+		// Either trailer with histogram or a new entry with '//'
+		// look for the start of a new file with 'hmmsearch'?
+		
+		this.changeState(FINISHED_HITS);
+
+	    }
+	    return oLine;
+	}
+	return poLine;;
+
+    //    this.endElement(new QName(this,this.prefix("Detail")));
 
     }
 
@@ -574,14 +734,14 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
      */
     private boolean checkNewBlastLikeDataSet(String poLine) {
 
-
-    if ( (poLine.startsWith("BLAST")) ||
-         (poLine.startsWith("TBLAST")) )
-        {
-        return true;
-        } else {
-        return false;
-        }
+	if ( (poLine.startsWith("BLAST")) ||
+	     (poLine.startsWith("TBLAST"))
+	     )
+	    {
+		return true;
+	    } else {
+		return false;
+	    }
 
     }
     /**

@@ -81,6 +81,12 @@ final class HmmerSummaryLineHelper implements SummaryLineHelperIF{
     public void parse(String poLine, HashMap poMap,
 		      BlastLikeVersionSupport poVersion) throws SAXException {
 
+
+	if ( poLine.trim().equals( "[no hits above thresholds]" ) ) {
+	    // ignore
+	    return;
+	}
+
 	int iCount;
 	int iGrab;
 
