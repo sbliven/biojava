@@ -75,7 +75,19 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
           fudgeAcross = depth * 0.5 - maxBounds.getCenterX();
           fudgeDown = scale * 0.5 - maxBounds.getCenterY();
         }
-
+        
+        int leading;
+        int trailing;
+        if(sp.getDirection() == sp.HORIZONTAL) {
+          leading = sp.graphicsToSequence(clip.getMinX());
+          trailing = sp.graphicsToSequence(clip.getMaxX());
+        } else {
+          leading = sp.graphicsToSequence(clip.getMinY());
+          trailing = sp.graphicsToSequence(clip.getMaxY());
+        }
+        min = Math.max(min, leading);
+        max = Math.min(max, trailing+1);
+        
         for (int pos = min; pos <= max; ++pos) {
           double gPos = sp.sequenceToGraphics(pos);
           char c = seq.symbolAt(pos).getToken();

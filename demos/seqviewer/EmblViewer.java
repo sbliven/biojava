@@ -99,6 +99,7 @@ public class EmblViewer {
     sp.addRenderer(new FilteringRenderer(misc, miscFilter, false));
     sp.addRenderer(new FilteringRenderer(lsr, featuresFilter, false));
     sp.addRenderer(new SymbolSequenceRenderer());
+    sp.addRenderer(new RulerRenderer());
     f.getContentPane().setLayout(new BorderLayout());
     f.getContentPane().add(new JScrollPane(sp), BorderLayout.CENTER);
     JPanel panel = new JPanel();
