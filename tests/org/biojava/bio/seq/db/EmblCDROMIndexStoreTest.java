@@ -47,7 +47,7 @@ import org.biojava.bio.symbol.AlphabetManager;
  * <code>EmblCDROMIndexStoreTest</code> contains unit tests for EMBL
  * CD-ROM format binary index <code>IndexStore</code>.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class EmblCDROMIndexStoreTest extends TestCase
