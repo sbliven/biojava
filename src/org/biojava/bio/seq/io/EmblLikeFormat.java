@@ -55,6 +55,17 @@ import org.biojava.bio.seq.*;
  */
 
 public class EmblLikeFormat implements SequenceFormat, Serializable {
+    private boolean elideSymbols = false;
+
+    /**
+     * Should we ignore the symbols (SQ) part of the
+     * entry?
+     */
+
+    public void setElideSymbols(boolean b) {
+	elideSymbols = b;
+    }
+
     public boolean readSequence(BufferedReader reader,
 			     SymbolParser symParser,
 			     SeqIOListener listener)
@@ -95,7 +106,8 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
 		    listener.addSequenceProperty(tag, rest);
 		} else {
 		    // Sequence line
-		    processSequenceLine(line, sparser);
+		    if (!elideSymbols)
+			processSequenceLine(line, sparser);
 		}
 	    }
 	}
