@@ -1,0 +1,195 @@
+<MarkovModel heads="1">
+  <alphabet name="DNA"/>
+  <state name="H0">
+    <weight res="a" prob="0.25"/>
+    <weight res="c" prob="0.25"/>
+    <weight res="g" prob="0.25"/>
+    <weight res="t" prob="0.25"/>
+  </state>
+  <transition from="_START_" to="H0" prob="1.0"/>
+  <transition from="H0" to="H0" prob="0.98"/>
+  <transition from="H0" to="T-tata1" prob="0.01"/>
+  <transition from="H0" to="_END_" prob="0.01"/>
+  <state name="T-tata1">
+    <weight res="a" prob="0.1"/>
+    <weight res="c" prob="0.1"/>
+    <weight res="g" prob="0.1"/>
+    <weight res="t" prob="0.7"/>
+  </state>
+  <state name="A-tata2">
+    <weight res="a" prob="0.7"/>
+    <weight res="c" prob="0.1"/>
+    <weight res="g" prob="0.1"/>
+    <weight res="t" prob="0.1"/>
+  </state>
+  <state name="T-tata3">
+    <weight res="a" prob="0.1"/>
+    <weight res="c" prob="0.1"/>
+    <weight res="g" prob="0.1"/>
+    <weight res="t" prob="0.7"/>
+  </state>
+  <state name="A-tata4">
+    <weight res="a" prob="0.7"/>
+    <weight res="c" prob="0.1"/>
+    <weight res="g" prob="0.1"/>
+    <weight res="t" prob="0.1"/>
+  </state>
+  <state name="A-tata5">
+    <weight res="a" prob="0.7"/>
+    <weight res="c" prob="0.1"/>
+    <weight res="g" prob="0.1"/>
+    <weight res="t" prob="0.1"/>
+  </state>
+  <state name="T-tata6">
+    <weight res="a" prob="0.1"/>
+    <weight res="c" prob="0.1"/>
+    <weight res="g" prob="0.1"/>
+    <weight res="t" prob="0.7"/>
+  </state>
+  <transition from="T-tata1" to="A-tata2" prob="1.0"/>
+  <transition from="A-tata2" to="T-tata3" prob="1.0"/>
+  <transition from="T-tata3" to="A-tata4" prob="1.0"/>
+  <transition from="A-tata4" to="A-tata5" prob="1.0"/>
+  <transition from="A-tata5" to="T-tata6" prob="1.0"/>
+  <transition from="T-tata6" to="gap1" prob="1.0"/>
+  <state name="gap1">
+    <weight res="a" prob="0.25"/>
+    <weight res="c" prob="0.25"/>
+    <weight res="g" prob="0.25"/>
+    <weight res="t" prob="0.25"/>
+  </state>
+  <state name="gap2">
+    <weight res="a" prob="0.25"/>
+    <weight res="c" prob="0.25"/>
+    <weight res="g" prob="0.25"/>
+    <weight res="t" prob="0.25"/>
+  </state>
+  <state name="gap3">
+    <weight res="a" prob="0.25"/>
+    <weight res="c" prob="0.25"/>
+    <weight res="g" prob="0.25"/>
+    <weight res="t" prob="0.25"/>
+  </state>
+  <state name="gap4">
+    <weight res="a" prob="0.25"/>
+    <weight res="c" prob="0.25"/>
+    <weight res="g" prob="0.25"/>
+    <weight res="t" prob="0.25"/>
+  </state>
+  <state name="gap5">
+    <weight res="a" prob="0.25"/>
+    <weight res="c" prob="0.25"/>
+    <weight res="g" prob="0.25"/>
+    <weight res="t" prob="0.25"/>
+  </state>
+  <state name="gap6">
+    <weight res="a" prob="0.25"/>
+    <weight res="c" prob="0.25"/>
+    <weight res="g" prob="0.25"/>
+    <weight res="t" prob="0.25"/>
+  </state>
+  <state name="gap7">
+    <weight res="a" prob="0.25"/>
+    <weight res="c" prob="0.25"/>
+    <weight res="g" prob="0.25"/>
+    <weight res="t" prob="0.25"/>
+  </state>
+  <state name="gap8">
+    <weight res="a" prob="0.25"/>
+    <weight res="c" prob="0.25"/>
+    <weight res="g" prob="0.25"/>
+    <weight res="t" prob="0.25"/>
+  </state>
+  <state name="gap9">
+    <weight res="a" prob="0.25"/>
+    <weight res="c" prob="0.25"/>
+    <weight res="g" prob="0.25"/>
+    <weight res="t" prob="0.25"/>
+  </state>
+  <state name="gap10">
+    <weight res="a" prob="0.25"/>
+    <weight res="c" prob="0.25"/>
+    <weight res="g" prob="0.25"/>
+    <weight res="t" prob="0.25"/>
+  </state>
+  <state name="gap11">
+    <weight res="a" prob="0.25"/>
+    <weight res="c" prob="0.25"/>
+    <weight res="g" prob="0.25"/>
+    <weight res="t" prob="0.25"/>
+  </state>
+  <state name="gap12">
+    <weight res="a" prob="0.25"/>
+    <weight res="c" prob="0.25"/>
+    <weight res="g" prob="0.25"/>
+    <weight res="t" prob="0.25"/>
+  </state>
+  <state name="gap13">
+    <weight res="a" prob="0.25"/>
+    <weight res="c" prob="0.25"/>
+    <weight res="g" prob="0.25"/>
+    <weight res="t" prob="0.25"/>
+  </state>
+  <state name="gap14">
+    <weight res="a" prob="0.25"/>
+    <weight res="c" prob="0.25"/>
+    <weight res="g" prob="0.25"/>
+    <weight res="t" prob="0.25"/>
+  </state>
+  <state name="gap15">
+    <weight res="a" prob="0.25"/>
+    <weight res="c" prob="0.25"/>
+    <weight res="g" prob="0.25"/>
+    <weight res="t" prob="0.25"/>
+  </state>
+  <transition from="gap1" to="gap2" prob="1.0"/>
+  <transition from="gap2" to="gap3" prob="1.0"/>
+  <transition from="gap3" to="gap4" prob="1.0"/>
+  <transition from="gap4" to="gap5" prob="1.0"/>
+  <transition from="gap5" to="gap6" prob="1.0"/>
+  <transition from="gap6" to="gap7" prob="1.0"/>
+  <transition from="gap7" to="gap8" prob="1.0"/>
+  <transition from="gap8" to="gap9" prob="1.0"/>
+  <transition from="gap9" to="gap10" prob="1.0"/>
+  <transition from="gap10" to="gap11" prob="1.0"/>
+  <transition from="gap11" to="gap12" prob="1.0"/>
+  <transition from="gap12" to="gap13" prob="1.0"/>
+  <transition from="gap13" to="gap14" prob="1.0"/>
+  <transition from="gap14" to="gap15" prob="1.0"/>
+  <transition from="gap15" to="G-caat1" prob="1.0"/>
+  <state name="G-caat1">
+    <weight res="a" prob="0.1"/>
+    <weight res="c" prob="0.1"/>
+    <weight res="g" prob="0.7"/>
+    <weight res="t" prob="0.1"/>
+  </state>
+  <state name="C-caat2">
+    <weight res="a" prob="0.1"/>
+    <weight res="c" prob="0.7"/>
+    <weight res="g" prob="0.1"/>
+    <weight res="t" prob="0.1"/>
+  </state>
+  <state name="A-caat3">
+    <weight res="a" prob="0.7"/>
+    <weight res="c" prob="0.1"/>
+    <weight res="g" prob="0.1"/>
+    <weight res="t" prob="0.1"/>
+  </state>
+  <state name="A-caat4">
+    <weight res="a" prob="0.7"/>
+    <weight res="c" prob="0.1"/>
+    <weight res="g" prob="0.1"/>
+    <weight res="t" prob="0.1"/>
+  </state>
+  <state name="T-caat5">
+    <weight res="a" prob="0.1"/>
+    <weight res="c" prob="0.1"/>
+    <weight res="g" prob="0.1"/>
+    <weight res="t" prob="0.7"/>
+  </state>
+  <transition from="G-caat1" to="C-caat2" prob="1.0"/>
+  <transition from="C-caat2" to="A-caat3" prob="1.0"/>
+  <transition from="A-caat3" to="A-caat4" prob="1.0"/>
+  <transition from="A-caat4" to="T-caat5" prob="1.0"/>
+  <transition from="T-caat5" to="H0" prob="1.0"/>
+</MarkovModel>
