@@ -55,4 +55,10 @@ public class ProjectedStrandedFeatureWrapper extends ProjectedFeatureWrapper
 	    return ((StrandedFeature) getFeature()).getStrand();
 	}
     }
+
+    public String toString() {
+        return "Feature " + getType() + " " +
+            getSource() + " " + getLocation();
+    }
+
 }
