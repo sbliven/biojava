@@ -24,6 +24,8 @@ package org.biojava.utils.lsid;
 /**
  * Exception thrown in the event of an error in
  * parsing a LSID-formatted string.
+ *
+ * @author Michael Heuer
  */
 public class LifeScienceIdentifierParseException
     extends Exception {

@@ -23,6 +23,8 @@ package org.biojava.utils.lsid;
 
 /**
  * Marks an implementor as having a LifeScienceIdentifier.
+ *
+ * @author Michael Heuer
  */
 public interface Identifiable {
 

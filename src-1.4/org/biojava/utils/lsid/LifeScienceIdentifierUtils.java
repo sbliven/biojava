@@ -30,6 +30,8 @@ import java.util.regex.PatternSyntaxException;
 /**
  * Provides reference implementations and utilities
  * for the LifeScienceIdentifier interface.
+ *
+ * @author Michael Heuer
  */
 public class LifeScienceIdentifierUtils {
 

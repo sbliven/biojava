@@ -24,6 +24,8 @@ package org.biojava.utils.lsid;
 /**
  * Runtime exception thrown in the event of an
  * error in creating instances of LifeScienceIdentifier.
+ *
+ * @author Michael Heuer
  */
 public class LifeScienceIdentifierFactoryException
     extends RuntimeException {

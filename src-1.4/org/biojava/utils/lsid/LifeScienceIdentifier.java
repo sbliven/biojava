@@ -38,6 +38,8 @@ import java.io.Serializable;
  * <li>version = &lt;version&gt; optional version information
  * <li>security = &lt;security&gt; optional security information
  * </ul>
+ *
+ * @author Michael Heuer
  */
 public  interface LifeScienceIdentifier
     extends Immutable, Serializable {

@@ -23,6 +23,8 @@ package org.biojava.utils.lsid;
 
 /**
  * Factory interface for creating LifeScienceIdentifiers.
+ *
+ * @author Michael Heuer
  */
 public interface LifeScienceIdentifierFactory
 {
