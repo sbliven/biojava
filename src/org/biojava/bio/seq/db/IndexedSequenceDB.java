@@ -30,9 +30,11 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 
-/**This class reads in a file or a set of files containing sequence data.  It
-* contains methods for automatically indexing these sequences.
-*/
+/**
+ * [FIXME] Broken since newio changes [td2].
+ * This class reads in a file or a set of files containing sequence data.  It
+ * contains methods for automatically indexing these sequences.
+ */
 
 
 public final class IndexedSequenceDB
@@ -136,15 +138,18 @@ implements SequenceDB, Serializable {
     SequenceFactory sFact,
     SymbolParser symParser,
     IDMaker idMaker
-  ) {
-    this.name = name;
-    this.indexFile = indexFile;
-    this.format = format;
-    this.sFact = sFact;
-    this.symParser = symParser;
-    this.idMaker = idMaker;
-    this.files = new HashSet();
-  }
+  ) 
+    {
+	this.name = name;
+	this.indexFile = indexFile;
+	this.format = format;
+	this.sFact = sFact;
+	this.symParser = symParser;
+	this.idMaker = idMaker;
+	this.files = new HashSet();
+
+	throw new BioError("[FIXME] broken after newio");
+    }
 
   private RandomAccessFile getReader(File f) throws IOException {
     if(fileToReaders == null) {
@@ -217,7 +222,7 @@ implements SequenceDB, Serializable {
     HashMap index = new HashMap();
     long pos = bReader.getFilePointer();
     while(!context.isStreamEmpty()) {
-      Sequence seq = format.readSequence(context, symParser, sFact);
+      Sequence seq = null; /* [FIXME] format.readSequence(context, symParser, sFact); */
       Source s = new Source(seqFile, pos);
       String id = idMaker.calcID(seq);
       if(index.containsKey(id)) {
@@ -287,7 +292,7 @@ implements SequenceDB, Serializable {
       raf.seek(s.start);
       HackedBufferedReader hbr = new HackedBufferedReader(raf);
       StreamReader.Context context = new StreamReader.Context(hbr);
-      Sequence seq = format.readSequence(context, symParser, sFact);
+      Sequence seq = null; /* [FIXME] format.readSequence(context, symParser, sFact); */
       putReader(s.file, raf);
       return seq;
     } catch (IOException ioe) {
