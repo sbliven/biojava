@@ -464,13 +464,8 @@ public abstract class DP {
     Symbol token;
 
     oldState = (State) model.getWeights(model.magicalState()).sampleSymbol();
-    Distribution oldDist = model.getWeights(oldState);
-    try {
-      symScore += oldDist.getWeight(oldState);
-    } catch (IllegalSymbolException ite) {
-      throw new BioError(ite,
-        "Transition returned from sampleTransition is invalid");
-    }
+    symScore += model.getWeights(model.magicalState()).getWeight(oldState);
+
     DoubleAlphabet dAlpha = DoubleAlphabet.getInstance();
     if (oldState instanceof EmissionState) {
       EmissionState eState = (EmissionState) oldState;
