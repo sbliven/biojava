@@ -65,6 +65,11 @@ public class BioStore implements IndexStore {
      * @exception BioException if an error occurs.
      */
     public BioStore(File location, boolean cache)
+    throws IOException, BioException {
+      this(location, cache, false);
+    }
+    
+    BioStore(File location, boolean cache, boolean mutable)
         throws IOException, BioException {
         this.location = location;
         metaData = new ConfigFile(BioStoreFactory.makeConfigFile(location));
@@ -75,9 +80,9 @@ public class BioStore implements IndexStore {
 
         File plFile = BioStoreFactory.makePrimaryKeyFile(location, primaryKey);
         if (cache) {
-            primaryList = new CacheList(new PrimaryIDList(plFile, this, false));
+            primaryList = new CacheList(new PrimaryIDList(plFile, this, mutable));
         } else {
-            primaryList = new PrimaryIDList(plFile, this, false);
+            primaryList = new PrimaryIDList(plFile, this, mutable);
         }
 
         StringTokenizer sTok = new StringTokenizer(keyList, "\t");
@@ -86,9 +91,9 @@ public class BioStore implements IndexStore {
       
             File file = BioStoreFactory.makeSecondaryFile(location, k);
             if (cache) {
-                idToList.put(k, new CacheList(new SecondaryFileAsList(file, false)));
+                idToList.put(k, new CacheList(new SecondaryFileAsList(file, mutable)));
             } else {
-                idToList.put(k, new SecondaryFileAsList(file, false));
+                idToList.put(k, new SecondaryFileAsList(file, mutable));
             }
         }
 
@@ -118,20 +123,18 @@ public class BioStore implements IndexStore {
                 if (file.length() != length) {
                     throw new BioException("File changed length: " + file);
                 }
-        
+                
                 if (indx >= fileCount) {
                     // beyond end
-          
                     if (indx >= fileIDToRAF.length) {
                         // beyond array end
-                        RAF[] tmpr = new RAF[indx];
+                        RAF[] tmpr = new RAF[indx+1];
                         System.arraycopy(fileIDToRAF, 0, tmpr, 0, fileIDToRAF.length);
                         fileIDToRAF = tmpr;
                     }
 
                     fileCount = indx;
                 }
-                //System.out.println(indx + " "  + file);
                 fileIDToRAF[indx] = raf;
             }
         }

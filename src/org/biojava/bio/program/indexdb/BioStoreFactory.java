@@ -174,7 +174,7 @@ public class BioStoreFactory {
             ann.setProperty(KEYS, keyList.substring(0));
             ann.commit();
 
-            BioStore bStore = new BioStore(storeLoc, true);
+            BioStore bStore = new BioStore(storeLoc, true, true);
 
             return bStore;
         } catch (ChangeVetoException cve) {
