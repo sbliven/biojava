@@ -159,7 +159,7 @@ public class DoubleAlphabet implements Alphabet, Serializable {
     }
     
     public Symbol symbolAt(int i) {
-      return new DoubleSymbol(dArray[i]);
+      return new DoubleSymbol(dArray[i-1]);
     }
     
     public int length() {

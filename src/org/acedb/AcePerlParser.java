@@ -160,6 +160,10 @@ public class AcePerlParser {
 		}
       } else if (s.indexOf("=>") == 2) {
         System.out.println("Unknown tag in perl-style dump: " + s);
+        if (s.length() == 4) {
+          s = t.nextToken();
+          System.out.println("Throwing away next token: " + s);
+        }
       } else {
         if(ty != null || va != null) {
           throw new AceException(

@@ -40,8 +40,8 @@ import org.acedb.socket.*;
  */
 public class AceClient {
   public static void main(String [] args) throws Exception {
-    if(args.length != 4) {
-      throw new Exception("Use: AceClient host port user password");
+    if(args.length > 5) {
+      throw new Exception("Use: AceClient host port user password [log]");
     }
     
     try {
@@ -49,6 +49,10 @@ public class AceClient {
       String port = args[1];
       String user = args[2];
       String passwd = args[3];
+      Writer log = null;
+      if(args.length == 5) {
+        log = new FileWriter(new File(args[4]));
+      }
       Ace.registerDriver(new SocketDriver());
       URL _dbURL = new URL("acedb://" + host + ":" + port + "/");
       AceURL dbURL = new AceURL(_dbURL, user, passwd, null);
@@ -64,11 +68,17 @@ public class AceClient {
         command != null;
         command = in.readLine()
       ) {
+        if(log != null) {
+          log.write(command);
+        }
         if(command.trim().equals("bye")) {
           aceCon.dispose();
           break;
         } else {
           String response = aceCon.transact(command);
+          if(log != null) {
+            log.write(response);
+          }
           System.out.println(response);
         }
       }
