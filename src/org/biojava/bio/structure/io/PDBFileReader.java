@@ -70,7 +70,6 @@ import java.util.Calendar;
  */
 public class PDBFileReader implements StructureIOFile {
 
-    String pdb_code                 ;
     String path                     ;
     ArrayList extensions            ;
 
@@ -114,23 +113,6 @@ public class PDBFileReader implements StructureIOFile {
 	nucleotides = new String[]{"C","G","A","T","U","I","+C","+G","+A","+T","+U","+I"};
 
 	
-    }
-
-
-    
-
-    public void setId(String id) {
-	pdb_code = id ;
-    }
-
-    /**
-     * Returns the id value (PDB code).
-     * @see #setId
-     * @return a String representing the PDB code
-     */
-    
-    public String getId() {
-	return pdb_code ;
     }
 
 
@@ -199,7 +181,7 @@ public class PDBFileReader implements StructureIOFile {
      * - secnd check: if not found check in PDBpath/xy/ where xy is second and third char of PDBcode.
      */
     
-    private FileInputStream getInputStream() 
+    private FileInputStream getInputStream(String pdbId) 
 	throws IOException
     {
 	//System.out.println("checking file");
@@ -212,7 +194,7 @@ public class PDBFileReader implements StructureIOFile {
 	
 	String pdbFile = null ;
 	File f = null ;
-	String fpath = path+"/"+pdb_code;
+	String fpath = path+"/"+pdbId;
 	for (int i=0 ; i<extensions.size();i++){
 	    String ex = (String)extensions.get(i) ;
 	    //System.out.println("testing: "+fpath+ex);
@@ -262,7 +244,7 @@ public class PDBFileReader implements StructureIOFile {
 	}
 	
 	if ( pdbFile == null ) {
-	    String message = "no structure with PDB code " + pdb_code + " found!" ;
+	    String message = "no structure with PDB code " + pdbId + " found!" ;
 	    throw new IOException (message);
 	}
 	
@@ -353,7 +335,7 @@ public class PDBFileReader implements StructureIOFile {
        
 
        structure.setPDBCode(idCode);
-       setId(idCode);
+       //setId(idCode);
        
     }
 
@@ -819,7 +801,7 @@ COLUMNS       DATA TYPE      FIELD         DEFINITION
      * @throws PDBParseException ...
      */
     public Structure parsePDBFile(InputStream inStream) 
-	throws IOException, PDBParseException
+	throws IOException
     {
 
 	//System.out.println("preparing buffer");
@@ -847,7 +829,7 @@ COLUMNS       DATA TYPE      FIELD         DEFINITION
      */
     
     public Structure parsePDBFile(BufferedReader buf) 
-	throws IOException, PDBParseException 
+	throws IOException 
     {
 
 
@@ -879,15 +861,15 @@ COLUMNS       DATA TYPE      FIELD         DEFINITION
 		
 		recordName = line.substring (0, 6).trim ();
 		//System.out.println(recordName);
-		if      ( recordName.equals("ATOM")  ) pdb_ATOM_Handler(line)  ;
-		else if ( recordName.equals("HETATM")) pdb_ATOM_Handler(line)  ;
-		else if ( recordName.equals("MODEL") ) pdb_MODEL_Handler(line) ;
-		else if ( recordName.equals("HEADER")) pdb_HEADER_Handler(line);
-		else if ( recordName.equals("TITLE") ) pdb_TITLE_Handler(line) ;
-		else if ( recordName.equals("EXPDTA")) pdb_EXPDTA_Handler(line);
-		else if ( recordName.equals("REMARK")) pdb_REMARK_Handler(line);
-		else if ( recordName.equals("CONECT")) pdb_CONECT_Handler(line);
-		else if ( recordName.equals("REVDAT")) pdb_REVDAT_Handler(line);
+		if      ( recordName.equals("ATOM")  ) pdb_ATOM_Handler  ( line ) ;
+		else if ( recordName.equals("HETATM")) pdb_ATOM_Handler  ( line ) ;
+		else if ( recordName.equals("MODEL") ) pdb_MODEL_Handler ( line ) ;
+		else if ( recordName.equals("HEADER")) pdb_HEADER_Handler( line ) ;
+		else if ( recordName.equals("TITLE") ) pdb_TITLE_Handler ( line ) ;
+		else if ( recordName.equals("EXPDTA")) pdb_EXPDTA_Handler( line ) ;
+		else if ( recordName.equals("REMARK")) pdb_REMARK_Handler( line ) ;
+		else if ( recordName.equals("CONECT")) pdb_CONECT_Handler( line ) ;
+		else if ( recordName.equals("REVDAT")) pdb_REVDAT_Handler( line ) ;
 		else {
 		    // this line type is not supported, yet.
 		}
@@ -931,29 +913,21 @@ COLUMNS       DATA TYPE      FIELD         DEFINITION
 
 
     /** load a structure from local file system and return a PDBStructure object 
-     * requires pdb_code to be set earlier...
-     *
+
+     * @param pdbId  a String specifying the id value (PDB code)
      * @return the Structure object
      * @throws IOException ...
      */
-    public Structure getStructure() 
+    public Structure getStructureById(String pdbId) 
 	throws IOException
     {
 	
 
-	FileInputStream inStream = getInputStream();
-	try{
-	    //System.out.println("Starting to parse PDB file " + getTimeStamp());
-	    parsePDBFile(inStream) ;
-	    //System.out.println("Done parsing PDB file " + getTimeStamp());
-	} catch(Exception ex){
-	    ex.printStackTrace();
-	}
+	FileInputStream inStream = getInputStream(pdbId);
 
-
-	return structure ;
-
-
+	//System.out.println("Starting to parse PDB file " + getTimeStamp());
+	Structure struc = parsePDBFile(inStream) ;
+	return struc ;
     }
 
     /** open filename  and returns
@@ -966,18 +940,9 @@ COLUMNS       DATA TYPE      FIELD         DEFINITION
 	throws IOException
     {
 	
-
 	FileInputStream inStream = new FileInputStream(filename);
-	
-	try{
-	    parsePDBFile(inStream) ;
-	} catch(Exception ex){
-	    ex.printStackTrace();
-	}
-
-
-	return structure ;
-
+	Structure struc = parsePDBFile(inStream) ;
+	return struc ;
 
     }
 
