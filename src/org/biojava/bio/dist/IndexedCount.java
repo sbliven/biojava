@@ -50,6 +50,7 @@ import org.biojava.utils.ChangeVetoException;
  *
  * @author Matthew Pocock
  * @author Mark Schreiber (serialization)
+ * @author Thomas Down (more serialization...)
  * @since 1.1
  */
 public final class IndexedCount
@@ -58,6 +59,8 @@ public final class IndexedCount
   implements
     Count, Serializable
 {
+  static final long serialVersionUID = -1764931829553447679L;  
+    
   //must be transient as indices may vary between VM's
   private transient AlphabetIndex indexer;
   private transient double[] counts;
@@ -169,35 +172,47 @@ public final class IndexedCount
     }
   }
 
-  private void writeObject(ObjectOutputStream stream)throws IOException{
-    symbolIndices = new HashMap(counts.length);
-    for (int i = 0; i < counts.length; i++) {
-      symbolIndices.put(indexer.symbolForIndex(i), new Double(counts[i]));
-    }
-
-    stream.defaultWriteObject();
+  
+  
+  private static class SymbolWeightMemento implements Serializable {
+      static final long serialVersionUID = 5223128163879670657L;
+      
+      public final Symbol symbol;
+      public final double weight;
+      
+      public SymbolWeightMemento(Symbol s, double weight) {
+          this.symbol = s;
+          this.weight = weight;
+      }
+  }
+  
+  private void writeObject(ObjectOutputStream oos)
+      throws IOException
+  {
+      oos.defaultWriteObject();
+      
+      SymbolWeightMemento[] swm = new SymbolWeightMemento[counts.length];
+      for (int w = 0; w < swm.length; ++w) {
+          swm[w] = new SymbolWeightMemento(indexer.symbolForIndex(w), counts[w]);
+      }
+      oos.writeObject(swm);
   }
 
   private void readObject(ObjectInputStream stream)
-         throws IOException, ClassNotFoundException{
-
+    throws IOException, ClassNotFoundException
+  {
     stream.defaultReadObject();
     indexer = AlphabetManager.getAlphabetIndex(alpha);
     counts = new double[alpha.size()];
-
-    for(int i = 0; i < alpha.size(); i++){
-      Symbol key = indexer.symbolForIndex(0);
-      Double d  = (Double)symbolIndices.get(key);
-      if (d == null) {//no value, set to 0.0
-        counts[i] = 0.0;
-      }
-      else {
-        counts[i] = d.doubleValue();
-      }
+    
+    SymbolWeightMemento[] swm = (SymbolWeightMemento[]) stream.readObject();
+    for (int m = 0; m < swm.length; ++m) {
+        try {
+            counts[indexer.indexForSymbol(swm[m].symbol)] = swm[m].weight;
+        } catch (IllegalSymbolException ex) {
+            throw new IOException("Symbol in serialized stream can't be found in the alphabet");
+        }
     }
-
-    //mark for garbage collection
-    symbolIndices = null;
   }
 
   /**
