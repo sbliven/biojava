@@ -33,7 +33,7 @@ package org.biojava.utils;
  * </pre>
  */
 
-public class ParserException extends Exception {
+public class ParserException extends NestedException {
     private String locator = null;
     private int lineNumber = -1;
     private int character = -1;
@@ -72,6 +72,53 @@ public class ParserException extends Exception {
 			  int character)
     {
 	super(detail);
+	this.locator = locator;
+	this.lineNumber = lineNumber;
+	this.character = character;
+	this.line = line;
+    }
+
+    public ParserException(Throwable t) {
+      super(t);
+    }
+    
+    public ParserException(Throwable t, String detail) {
+      super(t, detail);
+    }
+    
+    public ParserException(Throwable t, String detail, String locator) {
+	super(t, detail);
+	this.locator = locator;
+    }
+
+    public ParserException(Throwable t, String detail, String locator, int line) {
+	super(t, detail);
+	this.locator = locator;
+	this.lineNumber = line;
+    }
+
+    public ParserException(
+        Throwable t,
+        String detail,
+			  String locator,
+			  int lineNumber,
+			  String line)
+    {
+	super(t, detail);
+	this.locator = locator;
+	this.lineNumber = lineNumber;
+	this.line = line;
+    }
+
+    public ParserException(
+        Throwable t,
+        String detail,
+			  String locator,
+			  int lineNumber,
+			  String line,
+			  int character)
+    {
+	super(t, detail);
 	this.locator = locator;
 	this.lineNumber = lineNumber;
 	this.character = character;

@@ -30,15 +30,12 @@ import org.biojava.utils.*;
  * @author Matthew Pocock
  */
 public abstract class AbstractAnnotation
+  extends
+    AbstractChangeable
   implements
     Annotation,
     Serializable
 {
-  /**
-   * The object to do the hard work of informing others of changes.
-   */
-  protected transient ChangeSupport changeSupport = null;
-
   /**
    * Implement this to return the Map delegate.
    *
@@ -72,7 +69,7 @@ public abstract class AbstractAnnotation
 
   public void setProperty(Object key, Object value)
   throws ChangeVetoException {
-    if(changeSupport == null) {
+    if(!hasListeners()) {
       getProperties().put(key, value);
     } else {
       Map properties = getProperties();
@@ -82,10 +79,11 @@ public abstract class AbstractAnnotation
         new Object[] { key, value },
         new Object[] { key, properties.get(key)}
       );
-      synchronized(changeSupport) {
-        changeSupport.firePreChangeEvent(ce);
+      ChangeSupport cs = getChangeSupport(Annotation.PROPERTY);
+      synchronized(cs) {
+        cs.firePreChangeEvent(ce);
         properties.put(key, value);
-        changeSupport.firePostChangeEvent(ce);
+        cs.firePostChangeEvent(ce);
       }
     }
   }
@@ -124,42 +122,6 @@ public abstract class AbstractAnnotation
 
   public Map asMap() {
     return Collections.unmodifiableMap(getProperties());
-  }
-
-  public void addChangeListener(ChangeListener cl) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl);
-    }
-  }
-
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-
-    synchronized(changeSupport) {
-      changeSupport.addChangeListener(cl, ct);
-    }
-  }
-
-  public void removeChangeListener(ChangeListener cl) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl);
-      }
-    }
-  }
-
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    if(changeSupport != null) {
-      synchronized(changeSupport) {
-        changeSupport.removeChangeListener(cl, ct);
-      }
-    }
   }
 
   protected AbstractAnnotation() {
