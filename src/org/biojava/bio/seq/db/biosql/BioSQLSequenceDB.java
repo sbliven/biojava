@@ -720,53 +720,52 @@ public class BioSQLSequenceDB implements SequenceDB {
 	    remove_old_value.close();
 	}
 
-	PreparedStatement insert_new;
-	if (isSPASupported()) {
-	    insert_new= conn.prepareStatement("insert into bioentry_qualifier_value " +
+    if (value != null) {
+        PreparedStatement insert_new;
+        if (isSPASupported()) {
+            insert_new= conn.prepareStatement("insert into bioentry_qualifier_value " +
                                               "       (bioentry_id, ontology_term_id, qualifier_value) " +
-					      "values (?, intern_ontology_term( ? ), ?)");
-	    if (value instanceof Collection) {
-		int cnt = 0;
-		for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
-		    insert_new.setInt(1, bioentry_id);
-		    insert_new.setString(2, keyString);
-		    // insert_new.setInt(3, ++cnt);
-		    insert_new.setString(3, i.next().toString());
-		    insert_new.executeUpdate();
-		}
-	    } else {
-		insert_new.setInt(1, bioentry_id);
-		insert_new.setString(2, keyString);
-		// insert_new.setInt(3, 1);
-		insert_new.setString(3, value.toString());
-		insert_new.executeUpdate();
-	    }
-	} else {
-	    insert_new= conn.prepareStatement("insert into bioentry_qualifier_value " +
+                    					      "values (?, intern_ontology_term( ? ), ?)");
+            if (value instanceof Collection) {
+                int cnt = 0;
+                for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+                    insert_new.setInt(1, bioentry_id);
+                    insert_new.setString(2, keyString);
+                    // insert_new.setInt(3, ++cnt);
+                    insert_new.setString(3, i.next().toString());
+                    insert_new.executeUpdate();
+                }
+            } else {
+                insert_new.setInt(1, bioentry_id);
+                insert_new.setString(2, keyString);
+                // insert_new.setInt(3, 1);
+                insert_new.setString(3, value.toString());
+                insert_new.executeUpdate();
+            }
+        } else {
+            insert_new= conn.prepareStatement("insert into bioentry_qualifier_value " +
                                               "       (bioentry_id, ontology_term_id, qualifier_value) " +
-					      "values (?, ?, ?)");
-	    int termID = intern_ontology_term(conn, keyString);
-	    if (value instanceof Collection) {
-		int cnt = 0;
-		for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
-		    insert_new.setInt(1, bioentry_id);
-		    insert_new.setInt(2, termID);
-		    // insert_new.setInt(3, ++cnt);
-		    insert_new.setString(3, i.next().toString());
-		    insert_new.executeUpdate();
-		}
-	    } else {
-		insert_new.setInt(1, bioentry_id);
-		insert_new.setInt(2, termID);
-		// insert_new.setInt(3, 1);
-		insert_new.setString(3, value.toString());
-		insert_new.executeUpdate();
-	    }
-	}
-
-
-
+					                          "values (?, ?, ?)");
+	        int termID = intern_ontology_term(conn, keyString);
+            if (value instanceof Collection) {
+                int cnt = 0;
+                for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+                    insert_new.setInt(1, bioentry_id);
+                    insert_new.setInt(2, termID);
+                    // insert_new.setInt(3, ++cnt);
+                    insert_new.setString(3, i.next().toString());
+                    insert_new.executeUpdate();
+                }
+            } else {
+                insert_new.setInt(1, bioentry_id);
+                insert_new.setInt(2, termID);
+                // insert_new.setInt(3, 1);
+                insert_new.setString(3, value.toString());
+                insert_new.executeUpdate();
+            }
+        }
 	insert_new.close();
+    }
     }
 
     int intern_seqfeature_source(Connection conn, String s)

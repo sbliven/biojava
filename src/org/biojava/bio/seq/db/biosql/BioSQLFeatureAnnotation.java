@@ -102,20 +102,40 @@ class BioSQLFeatureAnnotation
     {
         BioSQLChangeHub hub = seqDB.getChangeHub();
         synchronized (hub) {
-	    ChangeEvent cev = new ChangeEvent(this, Annotation.PROPERTY, key);
-	    hub.fireFeatureAnnotationPreChange(cev);
-	    _setProperty(key, value);
-	    hub.fireFeatureAnnotationPostChange(cev);
+            ChangeEvent cev = new ChangeEvent(this, Annotation.PROPERTY, key);
+            hub.fireFeatureAnnotationPreChange(cev);
+            _setProperty(key, value);
+            hub.fireFeatureAnnotationPostChange(cev);
         }
     }
 
     private void _setProperty(Object key, Object value) 
         throws ChangeVetoException
     {
-	if (underlyingAnnotation != null) {
-	    underlyingAnnotation.setProperty(key, value);
-	}
-	persistProperty(key, value);
+        if (underlyingAnnotation != null) {
+            underlyingAnnotation.setProperty(key, value);
+        }
+        persistProperty(key, value);
+    }
+    
+    public void removeProperty(Object key)
+        throws ChangeVetoException
+    {
+        if (underlyingAnnotation == null) {
+            initAnnotations();
+        }
+        if (!underlyingAnnotation.containsProperty(key)) {
+            throw new NoSuchElementException("Annotation doesn't contain property " + key.toString());
+        }
+        
+        BioSQLChangeHub hub = seqDB.getChangeHub();
+        synchronized (hub) {
+            ChangeEvent cev = new ChangeEvent(this, Annotation.PROPERTY, key);
+            hub.fireFeatureAnnotationPreChange(cev);
+            underlyingAnnotation.removeProperty(key);
+            persistProperty(key, null);
+            hub.fireFeatureAnnotationPostChange(cev);
+        }
     }
 
     private void persistProperty(Object key, Object value)

@@ -827,6 +827,9 @@ class FeaturesSQL {
         delete_feature.close();
     }
 
+    /**
+     * Persist a property.  Nothing is written if value is void
+     */
     
     void persistProperty(Connection conn,
 			 int feature_id,
@@ -847,52 +850,53 @@ class FeaturesSQL {
 	    remove_old_value.close();
 	}
 
-	PreparedStatement insert_new;
-	if (seqDB.isSPASupported()) {
-	    insert_new= conn.prepareStatement("insert into seqfeature_qualifier_value " +
+    if (value != null) {
+        PreparedStatement insert_new;
+        if (seqDB.isSPASupported()) {
+            insert_new= conn.prepareStatement("insert into seqfeature_qualifier_value " +
                                               "       (seqfeature_id, ontology_term_id, qualifier_rank, qualifier_value) " +
-					      "values (?, intern_ontology_term( ? ), ?, ?)");
-	    if (value instanceof Collection) {
-		int cnt = 0;
-		for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
-		    insert_new.setInt(1, feature_id);
-		    insert_new.setString(2, keyString);
-		    insert_new.setInt(3, ++cnt);
-		    insert_new.setString(4, i.next().toString());
-		    insert_new.executeUpdate();
-		}
-	    } else {
-		insert_new.setInt(1, feature_id);
-		insert_new.setString(2, keyString);
-		insert_new.setInt(3, 1);
-		insert_new.setString(4, value.toString());
-		insert_new.executeUpdate();
-	    }
-	    insert_new.close();
-	} else {
-	    insert_new = conn.prepareStatement("insert into seqfeature_qualifier_value " +
+                    					      "values (?, intern_ontology_term( ? ), ?, ?)");
+            if (value instanceof Collection) {
+                int cnt = 0;
+                for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+                    insert_new.setInt(1, feature_id);
+                    insert_new.setString(2, keyString);
+                    insert_new.setInt(3, ++cnt);
+                    insert_new.setString(4, i.next().toString());
+                    insert_new.executeUpdate();
+                }
+            } else {
+                insert_new.setInt(1, feature_id);
+                insert_new.setString(2, keyString);
+                insert_new.setInt(3, 1);
+                insert_new.setString(4, value.toString());
+                insert_new.executeUpdate();
+            }
+            insert_new.close();
+        } else {
+            insert_new = conn.prepareStatement("insert into seqfeature_qualifier_value " +
                                                "       (seqfeature_id, ontology_term_id, qualifier_rank, qualifier_value) " +
-			  	 	      "values (?, ?, ?, ?)");
-	    int sfq = seqDB.intern_ontology_term(conn, keyString);
-	    if (value instanceof Collection) {
-		int cnt = 0;
-		for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
-		    insert_new.setInt(1, feature_id);
-		    insert_new.setInt(2, sfq);
-		    insert_new.setInt(3, ++cnt);
-		    insert_new.setString(4, i.next().toString());
-		    insert_new.executeUpdate();
-		}
-	    } else {
-		insert_new.setInt(1, feature_id);
-		insert_new.setInt(2, sfq);
-		insert_new.setInt(3, 1);
-		insert_new.setString(4, value.toString());
-		insert_new.executeUpdate();
-	    }
-	    insert_new.close();
-	}
-
+			  	 	                           "values (?, ?, ?, ?)");
+	        int sfq = seqDB.intern_ontology_term(conn, keyString);
+            if (value instanceof Collection) {
+                int cnt = 0;
+                for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+                    insert_new.setInt(1, feature_id);
+                    insert_new.setInt(2, sfq);
+                    insert_new.setInt(3, ++cnt);
+                    insert_new.setString(4, i.next().toString());
+                    insert_new.executeUpdate();
+                }
+            } else {
+                insert_new.setInt(1, feature_id);
+                insert_new.setInt(2, sfq);
+                insert_new.setInt(3, 1);
+                insert_new.setString(4, value.toString());
+                insert_new.executeUpdate();
+            }
+            insert_new.close();
+        }
+    }
 
     }
 
