@@ -240,7 +240,7 @@ extends AbstractDistribution implements Serializable{
 
 
     protected void trainImpl(DistributionTrainerContext dtc, double weight) {
-      System.out.println("Training");
+      //System.out.println("Training");
       try {
         Distribution nullModel = getNullModel();
         double[] weights = getWeights();
@@ -256,7 +256,7 @@ extends AbstractDistribution implements Serializable{
         }
         double sum_inv = 1.0 / sum;
         for(int i = 0; i < total.length; i++) {
-          System.out.println("\t" + weights[i] + "\t" + total[i] * sum_inv);
+          //System.out.println("\t" + weights[i] + "\t" + total[i] * sum_inv);
           weights[i] = total[i] * sum_inv;
         }
       } catch (IllegalSymbolException ise) {
