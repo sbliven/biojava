@@ -91,4 +91,23 @@ public class AlphabetManagerTest extends TestCase {
           assertTrue(found);
       }
   }
+  
+  public void testSharedSymbols()
+    throws Exception
+  {
+      Alphabet protein = ProteinTools.getAlphabet();
+      Alphabet proteinT = ProteinTools.getTAlphabet();
+      String protString = "RVQZ";
+      SymbolList sl_protein = new SimpleSymbolList(
+        protein.getTokenization("token"),
+        protString
+      );
+      SymbolList sl_proteinT = new SimpleSymbolList(
+        protein.getTokenization("token"),
+        protString
+      );
+      for (int i = 1; i <= sl_protein.length(); ++i) {
+          assertEquals(sl_protein.symbolAt(i), sl_proteinT.symbolAt(i));
+      }
+  }
 }

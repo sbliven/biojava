@@ -61,9 +61,9 @@ public class AlphabetSerializationTest extends TestCase {
 
         //make a custom alphabet
 
-        AtomicSymbol s0 = AlphabetManager.createSymbol('f',"foo",Annotation.EMPTY_ANNOTATION);
-        AtomicSymbol s1 = AlphabetManager.createSymbol('g',"goo",Annotation.EMPTY_ANNOTATION);
-        AtomicSymbol s2 = AlphabetManager.createSymbol('h',"hoo",Annotation.EMPTY_ANNOTATION);
+        AtomicSymbol s0 = AlphabetManager.createSymbol("foo",Annotation.EMPTY_ANNOTATION);
+        AtomicSymbol s1 = AlphabetManager.createSymbol("goo",Annotation.EMPTY_ANNOTATION);
+        AtomicSymbol s2 = AlphabetManager.createSymbol("hoo",Annotation.EMPTY_ANNOTATION);
         Set set = new HashSet(3);
         set.add(s0); set.add(s1); set.add(s2);
         custom = new SimpleAlphabet(set,"custom_test");
