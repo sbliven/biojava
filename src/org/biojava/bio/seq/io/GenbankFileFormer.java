@@ -326,9 +326,13 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
         {
             ub.setLength(0);
             ub.append("ACCESSION   ");
-            for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
-            {
-                ub.append((String) ai.next());
+            if(value instanceof List) {
+                for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
+                {
+                    ub.append((String) ai.next());
+                }
+            } else {
+                ub.append(value);
             }
             acb = new StringBuffer(ub.substring(0));
         }
