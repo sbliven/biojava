@@ -65,3 +65,5 @@ implements BioPattern {
     return new MaxMismatchMatcher(symList, pattern, mismatches);
   }
 }
+
+
