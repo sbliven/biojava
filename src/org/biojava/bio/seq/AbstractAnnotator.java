@@ -37,13 +37,10 @@ public abstract class AbstractAnnotator implements Annotator {
     HashSequenceDB hitDB = new HashSequenceDB(null);
 
     for(Iterator i = sdb.ids().iterator(); i.hasNext(); ) {
-      try {
-        String id = (String) i.next();
-        Sequence seq = sdb.getSequence(id);
-        if(annotate(seq)) {
-          hitDB.addSequence(id, seq);
-        }
-      } catch (SeqException se){
+      String id = (String) i.next();
+      Sequence seq = sdb.getSequence(id);
+      if(annotate(seq)) {
+        hitDB.addSequence(id, seq);
       }
     }
 

@@ -39,12 +39,14 @@ public class GFFEntrySet {
       public boolean annotate(Sequence seq) throws SeqException {
         Feature.Template plain = new Feature.Template();
         StrandedFeature.Template stranded = new StrandedFeature.Template();
+        plain.annotation = Annotation.EMPTY_ANNOTATION;
+        stranded.annotation = Annotation.EMPTY_ANNOTATION;
         boolean addedAny = false;
         for(Iterator i = lineIterator(); i.hasNext(); ) {
           Object o = i.next();
           if(o instanceof GFFRecord) {
             GFFRecord rec = (GFFRecord) o;
-            if(rec.getSeqName() == seq.getName()) {
+            if(rec.getSeqName().equals(seq.getName())) {
               if(rec.getStrand() == GFFRecord.NO_STRAND) {
                 plain.location = new RangeLocation(rec.getStart(), rec.getEnd());
                 plain.type = rec.getFeature();

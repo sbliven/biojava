@@ -102,7 +102,15 @@ public class SimpleAnnotation implements Annotation {
   public SimpleAnnotation() {
   }
   
-  public SimpleAnnotation(Annotation ann) {
+  public SimpleAnnotation(Annotation ann) throws IllegalArgumentException {
+    if(ann == null) {
+      throw new IllegalArgumentException(
+        "Null annotation not allowed. Use Annotation.EMPTY_ANNOTATION instead."
+      );
+    }
+    if(ann == Annotation.EMPTY_ANNOTATION) {
+      return;
+    }
     for(Iterator i = ann.keys().iterator(); i.hasNext(); ) {
       Object key = i.next();
       try {

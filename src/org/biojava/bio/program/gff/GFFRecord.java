@@ -22,5 +22,6 @@ public interface GFFRecord {
   public static int POSITIVE_STRAND = +1;
   public static int NEGATIVE_STRAND = -1;
   public static int NO_STRAND = 0;
+  public static int NO_FRAME = -1;
 }
 

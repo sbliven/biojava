@@ -11,6 +11,7 @@ public class GFFParser {
     handler.startDocument();
     ArrayList aList = new ArrayList();
     for(String line = bReader.readLine(); line != null; line = bReader.readLine()) {
+      aList.clear();
       if(line.startsWith("#")) {
         handler.commentLine(line);
       } else {
@@ -79,14 +80,20 @@ public class GFFParser {
         record.setStrand(GFFRecord.POSITIVE_STRAND);
       } else if(strand.equals("-")) {
         record.setStrand(GFFRecord.NEGATIVE_STRAND);
+      } else {
+        handler.invalidStrand(strand);
       }
-      handler.invalidStrand(strand);
     }
     
-    try {
-      record.setFrame(Integer.parseInt( (String) aList.get(7)));
-    } catch (NumberFormatException nfe) {
-      handler.invalidFrame((String) aList.get(7), nfe);
+    String frame = (String) aList.get(7);
+    if(frame.equals(".")) {
+      record.setFrame(GFFRecord.NO_FRAME);
+    } else {
+      try {
+        record.setFrame(Integer.parseInt(frame));
+      } catch (NumberFormatException nfe) {
+        handler.invalidFrame((String) aList.get(7), nfe);
+      }
     }
     
     record.setGroupAttributes(rest);
