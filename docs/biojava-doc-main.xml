@@ -1,5 +1,5 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
-                      "../../lib/xml-dtd-4.2/docbookx.dtd"
+                      "../ant-build/lib/xml-dtd-4.2/docbookx.dtd"
 [
     <!ENTITY chapter01 SYSTEM "biojava-doc-ch01.xml">
     <!ENTITY chapter02 SYSTEM "biojava-doc-ch02.xml">
