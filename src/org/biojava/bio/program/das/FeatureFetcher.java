@@ -238,11 +238,12 @@ class FeatureFetcher implements Fetcher {
 		    if (segID == null) {
 			throw new SAXException("Missing segment ID");
 		    }
-		    thisTicket = (FeatureRequestManager.Ticket) ticketsBySegment.get(new Segment(segID));
+		    Segment seg = new Segment(segID);
+		    thisTicket = (FeatureRequestManager.Ticket) ticketsBySegment.get(seg);
 		    if (thisTicket == null) {
 			int start = Integer.parseInt(attrs.getValue("start"));
 			int stop = Integer.parseInt(attrs.getValue("stop"));
-			Segment seg = new Segment(segID, start, stop);
+			seg = new Segment(segID, start, stop);
 			thisTicket = (FeatureRequestManager.Ticket) ticketsBySegment.get(seg);
 			if (thisTicket == null) {
 			    throw new SAXException("Response segment " + segID + ":" + start + 
@@ -251,25 +252,30 @@ class FeatureFetcher implements Fetcher {
 			segID = segID + ":" + start + "," + stop;
 		    }
 
+		    ticketsBySegment.remove(seg);
+		    
 		    // System.err.println("Got segment: " + segID);
 
 		    dm.delegate(new DASSegmentHandler(((FeatureRequestManager.FeatureTicket) thisTicket).getOutputListener(), fetchEncoding));
-		} else if (localName.equals("segmentNotAnnotated")) {
+		} else if (localName.equals("segmentNotAnnotated") || localName.equals("SEGMENTUNKNOWN")) {
 		    String segID = attrs.getValue("id");
 		    if (segID == null) {
 			throw new SAXException("Missing segment ID");
 		    }
+		    Segment seg = new Segment(segID);
 		    thisTicket = (FeatureRequestManager.Ticket) ticketsBySegment.get(new Segment(segID));
 		    if (thisTicket == null) {
 			int start = Integer.parseInt(attrs.getValue("start"));
 			int stop = Integer.parseInt(attrs.getValue("stop"));
-			Segment seg = new Segment(segID, start, stop);
+			seg = new Segment(segID, start, stop);
 			thisTicket = (FeatureRequestManager.Ticket) ticketsBySegment.get(seg);
 			if (thisTicket == null) {
 			    throw new SAXException("Response segment " + segID + ":" + start + 
 						   "," + stop + " wasn't requested");
 			}
 		    }
+
+		    ticketsBySegment.remove(seg);
 
 		    SeqIOListener siol = ((FeatureRequestManager.FeatureTicket) thisTicket).getOutputListener();
 		    try {
@@ -281,11 +287,28 @@ class FeatureFetcher implements Fetcher {
 		    
 		    thisTicket.setAsFetched();
 		    doneTickets.add(thisTicket);
-		} else if (localName.equals("segmentError")) {
+		} else if (localName.equals("segmentError") || localNAme.equals("SEGMENTERROR")) {
 		    String segID = attrs.getValue("id");
 		    String segError = attrs.getValue("error");
 
 		    throw new SAXException("Error " + segError + " fetching " + segID);
+		}
+	    }
+	}
+	
+	public void endTree()
+	    throws SAXException
+	{
+	    for (Iterator i = ticketsBySegment.entrySet().iterator(); i.hasNext(); ) {
+		Map.Entry me = (Map.Entry) i.next();
+		Segment seg = (Segment) me.getKey();
+		System.err.println("*** Not got anything back for segment " + seg.toString());
+		SeqIOListener siol = ((FeatureRequestManager.FeatureTicket) me.getValue).getOutputListener();
+		try {
+		    siol.startSequence();
+		    siol.endSequence();
+		} catch (ParseException ex) {
+		    throw new SAXException(ex);
 		}
 	    }
 	}

@@ -98,4 +98,12 @@ class Segment {
 	    }
 	}
     }
+
+    public String toString() {
+	if (!isBounded()) {
+	    return id;
+	} else {
+	    return id + ":" + start + "," + stop;
+	}
+    }
 }
