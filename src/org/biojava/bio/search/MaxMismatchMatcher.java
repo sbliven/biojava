@@ -22,134 +22,45 @@
 package org.biojava.bio.search;
 
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.symbol.BasisSymbol;
+import org.biojava.bio.symbol.IllegalAlphabetException;
 
 /**
- * A BioMatcher class returned by MaxMismatchPattern.matcher() that implements
- * searching of a SymbolList.
- * <p>
- * This class is public only to allow access to the mismatchCount() method.
+ * This class permits searching a SymbolList with another SymbolList while
+ * permitting a specified number of mismatches.
  *
- * @author Matthew Pocock (wrote original MaxMissmatchMatcher class)
- * @author David Huen (debugging and extension of functionality)
+ * @author Matthew Pocock (wrote original MaxMissmatchPattern class)
+ @ @author David Huen (debugging and reimplementation to use MaxMismatchMatcher class)
  */
-public class MaxMismatchMatcher
-implements BioMatcher {
-    // primary data
-    private final Symbol [] patternSymbol; // an array containing the pattern symbols in reversed order
-    private final SymbolList seq;
-    private final int mismatches;
+public class MaxMismatchPattern
+implements BioPattern {
+  private int mismatches;
+  private SymbolList pattern;
 
-    // precomputed constants
-    private final int patLength;
-    private final int maxPatternSymbolIdx;
-    private final int seqLength;
-    private final int minMatches;
-    private final boolean [] ambiguousPosition; // indicates if the corresponding position in patternSymbol represents
-                                                // an ambiguity
-    private boolean hasAmbiguity =false;
+  public MaxMismatchPattern() {}
 
-    // working numbers
-    private final int[] matches; // this is a modulo'd rotating register that keeps track of the match count
-    private int pos; // this is the symbol in sequence that will be added for consideration
+  public MaxMismatchPattern(SymbolList pattern, int mismatches) {
+    this.pattern = pattern;
+    this.mismatches = mismatches;
+  }
 
-    MaxMismatchMatcher(SymbolList seq,
-                      SymbolList pattern,
-                      int mismatches)
-    {
-        this.seq = seq;
-        this.mismatches = mismatches;
+  public int getMismatches() {
+    return mismatches;
+  }
 
-        patLength = pattern.length();
-        maxPatternSymbolIdx = patLength - 1;
-        seqLength = seq.length();
-        minMatches = patLength - mismatches;
+  public void setMismatches(int mismatches) {
+    this.mismatches = mismatches;
+  }
 
-        // construct reversed pattern array
-        patternSymbol = new Symbol[patLength];
-        ambiguousPosition = new boolean[patLength];
-        for (int i=0; i < patLength; i++) {
-            patternSymbol[i] = pattern.symbolAt(patLength - i);
-            if (patternSymbol[i] instanceof BasisSymbol) {
-                ambiguousPosition[i] = true;
-                hasAmbiguity = true;
-            }
-        }
+  public SymbolList getPattern() {
+    return pattern;
+  }
 
-        // initialize matches
-        matches = new int[patLength];
-        for(int i = 0; i < matches.length; i++) matches[i] = 0;
+  public void setPattern(SymbolList pattern) {
+    this.pattern = pattern;
+  }
 
-        pos = 1;
-    }
-
-    public boolean find() 
-    {
-        int patLength = matches.length;
-
-        if (pos >= seq.length()) {
-            return false;
-        }
-
-        for (; pos <= seqLength; pos++) {
-            if (addSymbol()) {
-                pos++;
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    // computes consequences of symbol pointed to by pos
-    private boolean addSymbol()
-    {
-        Symbol sym = seq.symbolAt(pos);
-        // compute matches for continuation of match
-        if (hasAmbiguity) {
-            for (int i=0; i < maxPatternSymbolIdx; i++) {
-                int idx = (pos + i) % patLength;
-                if (ambiguousPosition[i]) {
-                    if (patternSymbol[i].getMatches().contains(sym))
-                        matches[idx]++;
-                }
-                else {
-                    if (sym == patternSymbol[i])
-                        matches[idx]++;
-                }
-            }
-        }
-        else {
-            for (int i=0; i < maxPatternSymbolIdx; i++) {
-                int idx = (pos + i) % patLength;
-                if (sym == patternSymbol[i])
-                    matches[idx]++;
-            }
-        }
-
-        // initialise and compute initial match
-        matches[(pos + maxPatternSymbolIdx) % patLength] = (sym == patternSymbol[maxPatternSymbolIdx])?1:0;
-
-        return matches[pos % patLength] >= minMatches;
-    }
-
-    public int start() {
-        // remember that pos is already incremented beyond the match
-        return pos - matches.length;
-    }
-
-    public int end() {
-        // remember that pos is already incremented beyond the match
-        return pos - 1;
-    }
-
-    public SymbolList group() {
-        return seq.subList(start(), end());
-    }
-
-    /**
-     * Returns number of mismatches
-     */
-    public int mismatchCount() { return patLength - matches[(pos - 1) % patLength]; }
+  public BioMatcher matcher(SymbolList symList)
+          throws IllegalAlphabetException {
+    return new MaxMismatchMatcher(symList, pattern, mismatches);
+  }
 }
