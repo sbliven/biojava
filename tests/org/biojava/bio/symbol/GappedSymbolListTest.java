@@ -23,6 +23,8 @@ package org.biojava.bio.symbol;
 
 import java.util.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.impl.SimpleSequence;
+import org.biojava.bio.seq.impl.SimpleGappedSequence;
 import org.biojava.bio.seq.io.*;
 import junit.framework.TestCase;
 
@@ -39,11 +41,11 @@ public class GappedSymbolListTest extends TestCase {
   private SymbolList symList2;
   private SymbolList symList3;
   private SymbolList symList4;
-  
+
   public GappedSymbolListTest(String name) {
     super(name);
   }
-  
+
   protected void setUp()
   throws Exception {
     FiniteAlphabet dna = (FiniteAlphabet) AlphabetManager.alphabetForName("DNA");
@@ -54,7 +56,7 @@ public class GappedSymbolListTest extends TestCase {
     symList3 = new SimpleSymbolList(tok,"gtg---tggga");
     symList4 = new SimpleSymbolList(tok,"gtg----tggga");
   }
-  
+
   public void testIndividualInsertBlockRemove()
   throws Exception {
     GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
@@ -71,11 +73,11 @@ public class GappedSymbolListTest extends TestCase {
 
     gsl.addGapInSource(4);
     assertTrue(SymbolUtils.compareSymbolLists(gsl, symList4));
-    
+
     gsl.removeGaps(4,4);
     assertTrue(SymbolUtils.compareSymbolLists(gsl, symList));
   }
-  
+
   public void testBlockedInsertIndividualRemove()
   throws Exception {
     GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
@@ -83,20 +85,20 @@ public class GappedSymbolListTest extends TestCase {
 
     gsl.addGapsInSource(4,4);
     assertTrue("Four gaps:\n" + gsl.seqString() + "\n" + symList4.seqString(), SymbolUtils.compareSymbolLists(gsl, symList4));
-    
+
     gsl.removeGap(4);
     assertTrue("Three gaps:\n" + gsl.seqString() + "\n" + symList3.seqString(), SymbolUtils.compareSymbolLists(gsl, symList3));
-    
+
     gsl.removeGap(4);
     assertTrue("Two gaps:\n" + gsl.seqString() + "\n" + symList2.seqString(), SymbolUtils.compareSymbolLists(gsl, symList2));
-    
+
     gsl.removeGap(4);
     assertTrue("One gap:\n" + gsl.seqString() + "\n" + symList1.seqString(), SymbolUtils.compareSymbolLists(gsl, symList1));
-    
+
     gsl.removeGap(4);
     assertTrue("All gaps removed:\n" + gsl.seqString() + "\n" + symList.seqString(), SymbolUtils.compareSymbolLists(gsl, symList));
   }
-  
+
   public void testBlockedInsertBlockRemove()
   throws Exception {
     GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
@@ -104,11 +106,11 @@ public class GappedSymbolListTest extends TestCase {
 
     gsl.addGapsInSource(4,4);
     assertTrue(SymbolUtils.compareSymbolLists(gsl, symList4));
-    
+
     gsl.removeGaps(4,4);
     assertTrue(SymbolUtils.compareSymbolLists(gsl, symList));
   }
-  
+
   public void testBeginningGap()
   throws Exception {
     GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
@@ -120,7 +122,7 @@ public class GappedSymbolListTest extends TestCase {
       Alphabet.EMPTY_ALPHABET.getGapSymbol() == gsl.symbolAt(1)
     );
   }
-  
+
   public void testBeginningGaps()
   throws Exception {
     GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
@@ -134,7 +136,7 @@ public class GappedSymbolListTest extends TestCase {
       );
     }
   }
-  
+
   public void testTrailingGap()
   throws Exception {
     GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
@@ -146,7 +148,7 @@ public class GappedSymbolListTest extends TestCase {
       Alphabet.EMPTY_ALPHABET.getGapSymbol() == gsl.symbolAt(gsl.length())
     );
   }
-  
+
   public void testTrailingGaps()
   throws Exception {
     GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
@@ -160,7 +162,7 @@ public class GappedSymbolListTest extends TestCase {
       );
     }
   }
-  
+
   public void testInternalGap()
   throws Exception {
     GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
@@ -172,7 +174,7 @@ public class GappedSymbolListTest extends TestCase {
       gsl.getAlphabet().getGapSymbol() == gsl.symbolAt(4)
     );
   }
-  
+
   public void testInternalGaps()
   throws Exception {
     GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
@@ -185,5 +187,26 @@ public class GappedSymbolListTest extends TestCase {
         gsl.getAlphabet().getGapSymbol() == gsl.symbolAt(i)
       );
     }
+  }
+
+  public void testDavidBug()
+  throws Exception {
+    SymbolTokenization dnaToke1 = DNATools.getDNA().getTokenization("token");
+    SymbolList symbolList = new SimpleSymbolList(dnaToke1, "ACTGGACCTAAGG");
+    Sequence sequence = new SimpleSequence(symbolList, "test", "test", null);
+    SimpleGappedSequence gappedSequence = new SimpleGappedSequence(sequence);
+
+    gappedSequence.addGapsInView(4, 4);
+    gappedSequence.removeGap(7);
+    gappedSequence.removeGaps(4, 3);
+    gappedSequence.addGapsInView(7, 2);
+    gappedSequence.addGapsInView(9, 3);
+    gappedSequence.addGapsInView(12, 2);
+    gappedSequence.addGapsInView(14, 3);
+    gappedSequence.addGapsInView(17, 2);
+    gappedSequence.removeGap(18);
+    gappedSequence.removeGaps(11, 6);
+
+    String seqStr = gappedSequence.seqString();
   }
 }

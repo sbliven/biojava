@@ -190,7 +190,7 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
     /**
      * Construct a copy of an existing SymbolList.
      *
-     * @param The list to copy.
+     * @param sl the list to copy.
      */
 
     public SimpleSymbolList(SymbolList sl) {
@@ -268,7 +268,15 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
 //            " as it is not within 1.." + length
 //          );
 //        }
-      return symbols[viewOffset + pos - 1];
+      // fixme: I have added this check back in a different way as the index
+      // system flips from arrays to symbols - we need this detailed debug
+      // messaging - anybody want to performance check with/without the try?
+      try {
+        return symbols[viewOffset + pos - 1];
+      } catch (IndexOutOfBoundsException e) {
+        throw new IndexOutOfBoundsException(
+                "Index must be within [1.." + length() + "] : " + pos);
+      }
     }
 
 

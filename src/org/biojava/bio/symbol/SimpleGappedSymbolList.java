@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.biojava.bio.BioError;
+import org.biojava.utils.AssertionFailure;
 
 /**
  * This implementation of GappedSymbolList wraps a SymbolList, allowing you to
@@ -40,26 +41,28 @@ import org.biojava.bio.BioError;
 public class SimpleGappedSymbolList
 extends AbstractSymbolList
 implements GappedSymbolList, Serializable {
+  private static final boolean assertion = true;
+
   /**
    * The Alphabet - the same as source but guaranteed to include the gap character.
    */
   private final Alphabet alpha;
-  
+
   /**
    * The SymbolList to view.
    */
   private final SymbolList source;
-  
+
   /**
    * The list of ungapped blocks that align between source and this view.
    */
   private final ArrayList blocks;
-  
+
   /**
    * The total length of the alignment - necessary to allow leading & trailing gaps.
    */
   private int length;
-  
+
   /**
    * Finds the index of the block containing the source coordinate indx.
    *
@@ -70,7 +73,7 @@ implements GappedSymbolList, Serializable {
     int i = blocks.size() / 2;
     int imin = 0;
     int imax = blocks.size() - 1;
-    
+
     do {
       Block b = (Block) blocks.get(i);
       if(b.sourceStart <= indx && b.sourceEnd >= indx) {
@@ -85,7 +88,7 @@ implements GappedSymbolList, Serializable {
         }
       }
     } while(imin <= imax);
-    
+
     throw new BioError(
       "Something is screwed. Could not find source block containing index " +
       indx + " in sequence of length " + source.length()
@@ -107,7 +110,7 @@ implements GappedSymbolList, Serializable {
     int imin = 0;
     int imax = blocks.size() - 1;
     //System.out.println("Searching for " + indx);
-    
+
     Block b;
     do {
       //System.out.println(imin + " < " + i + " < " + imax);
@@ -128,11 +131,11 @@ implements GappedSymbolList, Serializable {
         }
       }
     } while(imin <= imax);
-    
+
     if(i >= blocks.size()) {
       return -blocks.size() - 1;
     }
-    
+
     if(blocks.get(i) != b) {
       if(blocks.get(i-1) == b) {
         --i;
@@ -140,7 +143,7 @@ implements GappedSymbolList, Serializable {
         ++i;
       }
     }
-    
+
     //System.out.println("Finding block for: " + indx + " in " + blocks);
     //System.out.println("\ti=" + i);
     //System.out.println("\t" + blocks.get(i));
@@ -151,7 +154,7 @@ implements GappedSymbolList, Serializable {
         //System.out.println("\t" + blocks.get(i));
       }
     }
-    return -i - 1; 
+    return -i - 1;
   }
 
   /**
@@ -164,7 +167,7 @@ implements GappedSymbolList, Serializable {
     int i = blocks.size() / 2;
     int imin = 0;
     int imax = blocks.size() - 1;
-    
+
     do {
       Block b = (Block) blocks.get(i);
       if(b.sourceStart <= indx && b.sourceEnd >= indx) {
@@ -179,7 +182,7 @@ implements GappedSymbolList, Serializable {
         }
       }
     } while(imin <= imax);
-    
+
     Block b = (Block) blocks.get(i);
     if(b.viewEnd < indx) {
       return i;
@@ -187,7 +190,7 @@ implements GappedSymbolList, Serializable {
       return i-1;
     }
   }
-  
+
   /**
    * Finds the index of the Block before the gap at indx within the view range.
    * <p>
@@ -202,7 +205,7 @@ implements GappedSymbolList, Serializable {
     int i = blocks.size() / 2;
     int imin = 0;
     int imax = blocks.size() - 1;
-    
+
     do {
       Block b = (Block) blocks.get(i);
       if(b.viewStart <= indx && b.viewEnd >= indx) {
@@ -218,7 +221,7 @@ implements GappedSymbolList, Serializable {
       }
     } while(imin <= imax);
 
-    if(i < blocks.size()) {    
+    if(i < blocks.size()) {
       Block b = (Block) blocks.get(i);
       if(b.viewEnd < indx) {
         return i;
@@ -240,7 +243,7 @@ implements GappedSymbolList, Serializable {
   protected final int viewToSource(Block b, int indx) {
     return indx - b.viewStart + b.sourceStart;
   }
-  
+
   public final int viewToSource(int indx)
   throws IndexOutOfBoundsException {
     if(indx < 1 || indx > length()) {
@@ -267,7 +270,7 @@ implements GappedSymbolList, Serializable {
       );
     }
   }
-  
+
   /**
    * Coordinate conversion from source to view.
    *
@@ -278,7 +281,7 @@ implements GappedSymbolList, Serializable {
   protected final int sourceToView(Block b, int indx) {
     return indx - b.sourceStart + b.viewStart;
   }
-  
+
   public final int sourceToView(int indx)
   throws IndexOutOfBoundsException {
     if(indx < 1 || indx > source.length()) {
@@ -292,14 +295,14 @@ implements GappedSymbolList, Serializable {
       indx
     );
   }
-  
+
   /**
    * Renumber the view indexes from block, adding delta to each offset.
    * <p>
-   * This adjusts viewStart and viewEnd to be += delta for each block i->blocks.size(), 
+   * This adjusts viewStart and viewEnd to be += delta for each block i->blocks.size(),
    * and sets the total length to += delta.
    *
-   * @param i the first 
+   * @param i the first
    */
   protected final void renumber(int i, int delta) {
     for(int j = i; j < blocks.size(); j++) {
@@ -309,7 +312,7 @@ implements GappedSymbolList, Serializable {
     }
     length += delta;
   }
-  
+
   public void addGapInView(int pos)
   throws IndexOutOfBoundsException {
     addGapsInView(pos, 1);
@@ -322,11 +325,11 @@ implements GappedSymbolList, Serializable {
         "Attempted to add a gap outside of this sequence (1.." + length() + ") at " + pos
       );
     }
-    
+
     int i = blocks.size() / 2;
     int imin = 0;
     int imax = blocks.size() - 1;
-    
+
     do {
       Block b = (Block) blocks.get(i);
       if(b.viewStart < pos && b.viewEnd >= pos) { // found block that need splitting with gaps
@@ -346,7 +349,7 @@ implements GappedSymbolList, Serializable {
         }
       }
     } while(imin <= imax);
-    
+
     // extending an already existing run of gaps;
     if(i < blocks.size()) {
       Block b = (Block) blocks.get(i);
@@ -358,23 +361,23 @@ implements GappedSymbolList, Serializable {
     }
     renumber(i+1, length);
   }
-  
+
   public void addGapInSource(int pos)
   throws IndexOutOfBoundsException {
     addGapsInSource(pos, 1);
   }
-  
+
   public void addGapsInSource(int pos, int length) {
     if(pos < 1 || pos > (length() + 1)) {
       throw new IndexOutOfBoundsException(
         "Attempted to add a gap outside of this sequence (1.." + length() + ") at " + pos
       );
     }
-    
+
     int i = blocks.size() / 2;
     int imin = 0;
     int imax = blocks.size() - 1;
-    
+
     do {
       Block b = (Block) blocks.get(i);
       if(b.sourceStart < pos && b.sourceEnd >= pos) { // found block that need splitting with gaps
@@ -394,7 +397,7 @@ implements GappedSymbolList, Serializable {
         }
       }
     } while(imin <= imax);
-    
+
     // extending an already existing run of gaps;
     if(i < blocks.size()) {
       Block b = (Block) blocks.get(i);
@@ -403,10 +406,16 @@ implements GappedSymbolList, Serializable {
       }
     }
     renumber(i+1, length);
+
+    if(assertion) {
+      if(!isSane()) {
+        throw new AssertionError("Data corrupted: " + blocks);
+      }
+    }
   }
-  
+
   public void removeGap(int pos)
-  throws IndexOutOfBoundsException, IllegalSymbolException { 
+  throws IndexOutOfBoundsException, IllegalSymbolException {
     if(pos < 1 || pos > length()) {
       throw new IndexOutOfBoundsException(
         "Attempted to remove gap outside of this sequence (1.." + length() + ") at " + pos
@@ -418,7 +427,7 @@ implements GappedSymbolList, Serializable {
         "Attempted to remove a gap at a non-gap index: " + pos + " -> " + symbolAt(pos).getName()
       );
     }
-    
+
     if(i == -1 || i == (blocks.size()-1)) { // at the beginning or the end
       renumber(i+1, -1);
     } else { // internal
@@ -432,8 +441,14 @@ implements GappedSymbolList, Serializable {
         blocks.remove(i+1);
       }
     }
+
+    if(assertion) {
+      if(!isSane()) {
+        throw new AssertionError("Data corrupted: " + blocks);
+      }
+    }
   }
-  
+
   public void removeGaps(int pos, int length)
   throws IndexOutOfBoundsException, IllegalSymbolException {
     int end = pos + length - 1;
@@ -453,7 +468,7 @@ implements GappedSymbolList, Serializable {
         "Attempted to remove a gap at a non-gap index: " + pos + " -> " + symbolAt(pos).getName()
       );
     }
-    
+
     if(i == -1) { // removing track at the beginning
       Block b = (Block) blocks.get(0);
       if(b.viewStart <= end) {
@@ -467,25 +482,37 @@ implements GappedSymbolList, Serializable {
     } else { // removing internal gaps
       Block l = (Block) blocks.get(i);
       Block r = (Block) blocks.get(i+1);
-      
-      renumber(i+1, -length);
       int gap = r.viewStart - l.viewEnd;
+      if(gap < length) {
+        throw new IllegalSymbolException(
+                "Removing " + length + " gaps from + " + i +
+                " but there are only " + gap + " gaps there: " + blocks);
+      }
+
+      renumber(i+1, -length);
       if( gap == length) { // deleted an entire gapped region
         l.sourceEnd = r.sourceEnd;
         l.viewEnd = r.viewEnd;
         blocks.remove(i+1);
       }
     }
+
+    if(assertion) {
+      if(!isSane()) {
+        throw new AssertionError("Data corrupted: removeGaps(" + pos +
+                                 "," + length + ") " + blocks);
+      }
+    }
   }
-  
+
   public Alphabet getAlphabet() {
     return alpha;
   }
-  
+
   public int length() {
     return length;
   }
-  
+
   public Symbol symbolAt(int indx)
   throws IndexOutOfBoundsException {
     if(indx > length() || indx < 1) {
@@ -504,21 +531,29 @@ implements GappedSymbolList, Serializable {
         return getAlphabet().getGapSymbol();
       }
     } else {
-      Block b = (Block) blocks.get(i);
-      return source.symbolAt(b.sourceStart - b.viewStart + indx);
+      try {
+        Block b = (Block) blocks.get(i);
+        return source.symbolAt(b.sourceStart - b.viewStart + indx);
+      } catch (IndexOutOfBoundsException e) {
+        throw new AssertionFailure(
+                "Internal book-keeping error fetching index: " + indx +
+                " of " + length() +
+                " blocks: " + blocks,
+                e);
+      }
     }
   }
-  
+
   public int firstNonGap() {
     int first = ((Block) blocks.get(0)).viewStart;
     return first;
   }
-  
+
   public int lastNonGap() {
     int last = ((Block) blocks.get(blocks.size() - 1)).viewEnd;
     return last;
   }
-  
+
   /**
    * Get list of the un-gapped region of the SymbolList.
    * <p>
@@ -532,7 +567,7 @@ implements GappedSymbolList, Serializable {
   public List BlockIterator() {
     return Collections.unmodifiableList(blocks);
   }
-  
+
   /**
    * Create a new SimpleGappedSymbolList that will view source.
    *
@@ -546,10 +581,10 @@ implements GappedSymbolList, Serializable {
     Block b = new Block(1, length, 1, length);
     blocks.add(b);
   }
-    
+
   /**
    * Debugging method
-   */ 
+   */
   public void dumpBlocks() {
     for(Iterator i = blocks.iterator(); i.hasNext(); ) {
       Block b = (Block) i.next();
@@ -581,7 +616,7 @@ implements GappedSymbolList, Serializable {
      *
      * @since 1.3
      */
-    
+
     public Location gappedToLocation(Location l) {
       if(l.isContiguous()) {
         return gappedToBlock(l);
@@ -593,7 +628,7 @@ implements GappedSymbolList, Serializable {
         return LocationTools.union(lblocks);
       }
     }
-    
+
     private Location blockToGapped(Location l) {
 	int start = l.getMin();
 	int end = l.getMax();
@@ -615,38 +650,38 @@ implements GappedSymbolList, Serializable {
     private Location gappedToBlock(Location l) {
       int start = l.getMin();
       int end = l.getMax();
-      
+
       int startBlockI = findViewBlock(start);
       int endBlockI = findViewBlock(end);
-      
+
       if(startBlockI < 0) { // in a gap
         int sb = -startBlockI - 1;
         if(sb == blocks.size()) {
           start = Integer.MAX_VALUE;
         } else {
           Block startBlock = (Block) blocks.get(sb);
-        
+
           start = startBlock.sourceStart;
         }
       } else {
         Block startBlock = (Block) blocks.get(startBlockI);
         start = start - startBlock.viewStart + startBlock.sourceStart;
       }
-      
+
       if(endBlockI < 0) { // in a gap
         int eb = -endBlockI - 1;
         if(eb == 0) {
           end = Integer.MIN_VALUE;
         } else {
           Block endBlock = (Block) blocks.get(eb - 1);
-        
+
           end = endBlock.sourceEnd;
         }
       } else {
         Block endBlock = (Block) blocks.get(endBlockI);
         end = end - endBlock.viewEnd + endBlock.sourceEnd;
       }
-      
+
       if(start > end) {
         return Location.empty;
       } else {
@@ -666,6 +701,17 @@ implements GappedSymbolList, Serializable {
     }
 
     return LocationTools.union(locList);
+  }
+
+  protected boolean isSane() {
+    for(Iterator i = blocks.iterator(); i.hasNext(); ) {
+      Block b = (Block) i.next();
+      if(!b.isSane()) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -695,12 +741,24 @@ implements GappedSymbolList, Serializable {
       this.sourceEnd = block.sourceEnd;
       this.viewStart = block.viewStart;
       this.viewEnd = block.viewEnd;
+
+      // fixme: should be using 1.4 assertion syntax
+      //assert isSane() : "Block is a sane shape: " + this.toString();
+      if(assertion) {
+        if(!isSane()) {
+          throw new AssertionError("Block is a sane shape: " + this.toString());
+        }
+      }
     }
 
     public String toString() {
       return
         "Block: source=" + sourceStart + "," + sourceEnd +
         " view=" + viewStart + "," + viewEnd;
+    }
+
+    public boolean isSane() {
+      return (viewEnd - viewStart) == (sourceEnd - sourceStart);
     }
   }
 }
