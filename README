@@ -25,5 +25,21 @@ downloaded from Sun at:
 
 http://developer.java.sun.com/developer/products/xml
 
+To build the project, change to biojava-live and type:
+
+> javac build/Builder.java
+> java build.Builder all
+> java build.Builder docs
+
+to build a list of packages type:
+
+> java build.Builder package package1 package2 ... packageN
+
+to check for edits type:
+
+> cvs update
+and then for each directory under src with at least one modified file, build
+the package.
+
 Contact Matthew Pocock (mrp@sanger.ac.uk) for more details, or mail the
 biojava mailing list (biojava-l@biojava.org).
