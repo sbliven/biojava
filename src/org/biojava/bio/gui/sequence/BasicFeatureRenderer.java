@@ -255,9 +255,9 @@ implements FeatureRenderer {
     }
     if(s == null) {
       if(src.getDirection() == src.HORIZONTAL) {
-        s = new Rectangle2D.Double(min, 0, max-min, 2.0*arrowScoop + arrowSize);
+        s = new Rectangle2D.Double(min, 0, Math.min(1.0, max-min), 2.0*arrowScoop + arrowSize);
       } else {
-        s = new Rectangle2D.Double(0, min, 2.0*arrowScoop + arrowSize, max-min);
+        s = new Rectangle2D.Double(0, min, 2.0*arrowScoop + arrowSize, Math.min(1.0, max-min));
       }
     }
     if(fill != null) {

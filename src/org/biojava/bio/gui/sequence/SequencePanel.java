@@ -91,6 +91,9 @@ Changeable {
       if(!isActive()) {
         return;
       }
+
+      setGraphicsOrigin(50.0-sequenceToGraphics(range.getMin()));
+
       int [] dist = calcDist();
       me.translatePoint(+dist[0], +dist[1]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
@@ -106,6 +109,9 @@ Changeable {
       if(!isActive()) {
         return;
       }
+
+      setGraphicsOrigin(50.0-sequenceToGraphics(range.getMin()));
+
       int [] dist = calcDist();
       me.translatePoint(+dist[0], +dist[1]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
@@ -121,6 +127,9 @@ Changeable {
       if(!isActive()) {
         return;
       }
+
+      setGraphicsOrigin(50.0-sequenceToGraphics(range.getMin()));
+
       int [] dist = calcDist();
       me.translatePoint(+dist[0], +dist[1]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
@@ -145,6 +154,9 @@ Changeable {
       if(!isActive()) {
         return;
       }
+
+      setGraphicsOrigin(50.0-sequenceToGraphics(range.getMin()));
+
       int [] dist = calcDist();
       me.translatePoint(+dist[0], +dist[1]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
@@ -160,6 +172,9 @@ Changeable {
       if(!isActive()) {
         return;
       }
+
+      setGraphicsOrigin(50.0-sequenceToGraphics(range.getMin()));
+
       int [] dist = calcDist();
       me.translatePoint(+dist[0], +dist[1]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
