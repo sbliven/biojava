@@ -34,13 +34,30 @@ public class Builder {
     private static FilenameFilter javaFiles = 
              new EndsWithFilenameFilter(".java");
 
+    private static List javacOptions = new ArrayList();
+
     public static void main(String[] args) throws Exception {
 	if (args.length == 0) {
 	    printUsage();
 	    return;
 	}
 
-	String command = args[0].toLowerCase();
+	int thisArg = 0;
+	while (args[thisArg].startsWith("-")) {
+	    if(args[thisArg].startsWith("-C")) {
+		javacOptions.add(args[thisArg].substring(2));
+	    } else {
+		System.err.println("Unknown switch: " + args[thisArg]);
+	    }
+
+	    ++thisArg;
+	    if (thisArg >= args.length) {
+		printUsage();
+		return;
+	    }
+	}
+
+	String command = args[thisArg].toLowerCase();
 	if (command.equals("all"))
 	    buildAll();
 	else if (command.equals("package")) {
@@ -58,6 +75,8 @@ public class Builder {
     public static void printUsage() {
 	System.out.println("BioJava integrated build tool 0.01");
 	System.out.println("java build.Builder [all | package <name> | docs]");
+	System.out.println("Compiler switched may be specified with -C before the action command");
+	System.out.println("Example: java build.Builder -C-deprecation all");
     }
 
     public static void buildAll() throws IOException {
@@ -245,17 +264,20 @@ public class Builder {
     }
     
     public static int compile(List filenames) throws IOException {
-	String[] command = new String[8 + filenames.size()];
-	command[0] = "javac";
-  command[1] = "-deprecation";
-	command[2] = "-classpath";
-	command[3] = makePath(new String[] {"class", "xml.jar"});
-	command[4] = "-sourcepath";
-	command[5] = "src";
-	command[6] = "-d";
-	command[7] = "class";
-  	for (int i = 0; i < filenames.size(); ++i) {
-  	    command[i + 8] = ((File) filenames.get(i)).getCanonicalPath();
+	String[] command = new String[7 + filenames.size() + javacOptions.size()];
+	int pos = 0;
+	command[pos++] = "javac";
+	for (Iterator i = javacOptions.iterator(); i.hasNext(); ) {
+	    command[pos++] = (String) i.next();
+	}
+	command[pos++] = "-classpath";
+	command[pos++] = makePath(new String[] {"class", "xml.jar"});
+	command[pos++] = "-sourcepath";
+	command[pos++] = "src";
+	command[pos++] = "-d";
+	command[pos++] = "class";
+  	for (Iterator i = filenames.iterator(); i.hasNext(); ) {
+  	    command[pos++] = ((File) i.next()).getCanonicalPath();
         }
 	
 	Process p = Runtime.getRuntime().exec(command);
