@@ -59,7 +59,7 @@ import org.biojava.utils.stax.*;
  * @author David Huen
  */
 
-public class DASSequence implements Sequence, RealizingFeatureHolder {
+public class DASSequence implements Sequence, RealizingFeatureHolder, DASOptimizableFeatureHolder {
     /**
      * Change type which indicates that the set of annotation servers used
      * by this DASSequence has been changed. This extends Feature.FEATURES as
@@ -97,13 +97,13 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 
     private Map featureSets;
     private FeatureHolder structure;
-    private MergeFeatureHolder features;
+    private DASMergeFeatureHolder features;
 
     protected transient ChangeSupport changeSupport = null;
 
     {
 	featureSets = new HashMap();
-	features = new MergeFeatureHolder();
+	features = new DASMergeFeatureHolder();
     }
 
     DASSequence(DASSequenceDB db, URL dataSourceURL, String seqID, Set dataSources) 
@@ -131,7 +131,12 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 
 	    FeatureHolder newFeatureSet = new DASFeatureSet(this, annoURL, seqID);
 	    featureSets.put(annoURL, newFeatureSet);
-	    features.addFeatureHolder(newFeatureSet);
+	    try {
+		features.addFeatureHolder(newFeatureSet, new FeatureFilter.ByAnnotation(DASSequence.PROPERTY_ANNOTATIONSERVER,
+											dataSourceURL));
+	    } catch (ChangeVetoException cve) {
+		throw new BioError(cve);
+	    }
 	}
     }
 
@@ -145,7 +150,11 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	public void endSequence() {
 	    structure = structureF;
 	    if (structure.countFeatures() > 0) {
-		features.addFeatureHolder(structure);
+		try {
+		    features.addFeatureHolder(structure, new FeatureFilter.ByClass(ComponentFeature.class));
+		} catch (ChangeVetoException cve) {
+		    throw new BioError(cve);
+		}
 	    } 
 	}
 
@@ -615,7 +624,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     }
 
 
-    private Location extractInterestingLocation(FeatureFilter ff) {
+    static Location extractInterestingLocation(FeatureFilter ff) {
 	if (ff instanceof FeatureFilter.OverlapsLocation) {
 	    return ((FeatureFilter.OverlapsLocation) ff).getLocation();
 	} else if (ff instanceof FeatureFilter.ContainedByLocation) {
@@ -659,6 +668,18 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
         throws ChangeVetoException
     {
 	throw new ChangeVetoException("Can't remove features from DAS sequences.");
+    }
+
+    //
+    // Optimizable feature-holder
+    //
+
+    public Set getOptimizableFilters() throws BioException {
+	return features.getOptimizableFilters();
+    }
+
+    public FeatureHolder getOptimizedSubset(FeatureFilter ff) throws BioException {
+	return features.getOptimizedSubset(ff);
     }
 
     //

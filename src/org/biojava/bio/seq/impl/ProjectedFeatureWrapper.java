@@ -119,10 +119,10 @@ public class ProjectedFeatureWrapper implements Feature {
 
     protected FeatureHolder getProjectedFeatures() {
 	if (projectedFeatures == null) {
-	    projectedFeatures = new ProjectedFeatureHolder(feature,
-							   this,
-							   holder.getTranslation(),
-							   holder.isOppositeStrand());
+	    projectedFeatures = ProjectedFeatureHolder.projectFeatureHolder(feature,
+									    this,
+									    holder.getTranslation(),
+									    holder.isOppositeStrand());
 	}
 	return projectedFeatures;
     }

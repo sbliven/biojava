@@ -75,7 +75,7 @@ public class DASSequenceDB implements SequenceDB {
                                 " exceeded by " + min);
       }
 	if (featuresCache.getLimit() < min) {
-	    System.err.println("Setting cache limit up to " + min);
+	    // System.err.println("Setting cache limit up to " + min);
 	    featuresCache.setLimit(min);
 	}
     }

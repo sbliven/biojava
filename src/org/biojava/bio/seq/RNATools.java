@@ -292,14 +292,20 @@ public final class RNATools {
   }
 
   /**
-   * Translate RNA into protein (with termination symbols).
+   * Translate RNA into protein (with termination symbols).  For
+   * compatibility with BioJava 1.1, this will also handle sequences
+   * which are already expressed in the (RNA x RNA x RNA) (codon)
+   * alphabet.
    *
    * @since 1.1
    */
   public static SymbolList translate(SymbolList syms)
-  throws IllegalAlphabetException {
-  	SymbolList codons = SymbolListViews.windowedSymbolList(syms, 3);
-    return SymbolListViews.translate(codons, getGeneticCode("UNIVERSAL"));
+    throws IllegalAlphabetException 
+  {
+      if (syms.getAlphabet() == getRNA()) {
+	  syms = SymbolListViews.windowedSymbolList(syms, 3);
+      }
+      return SymbolListViews.translate(syms, getGeneticCode("UNIVERSAL"));
   }
 
   private static void loadGeneticCodes() {

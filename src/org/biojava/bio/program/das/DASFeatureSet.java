@@ -42,7 +42,7 @@ import org.biojava.bio.program.xff.*;
  * @author Matthew Pocock
  */
 
-class DASFeatureSet implements FeatureHolder {
+class DASFeatureSet implements FeatureHolder, DASOptimizableFeatureHolder {
     private FeatureRequestManager.Ticket[] featureTickets;
     private Location[]                     tiles;
     private CacheReference[]               tileFeatures;
@@ -84,7 +84,20 @@ class DASFeatureSet implements FeatureHolder {
 	    try {
 		typesTicket.doFetch();
 	    } catch (Exception ex) {
-		throw new BioRuntimeException(ex, "Error fetching types");
+		// Really evil hack-around for wormbase.
+
+		ex.printStackTrace();
+		// throw new BioRuntimeException(ex, "Error fetching types");
+		try {
+		    Set allTypes = DAS.getTypes(dataSource);
+		    typesMap = new HashMap();
+		    for (Iterator i = allTypes.iterator(); i.hasNext(); ) {
+			String type = (String) i.next();
+			typesMap.put(type, null);
+		    }
+		} catch (BioException ex2) {
+		    throw new BioRuntimeException(ex2, "Types command isn't working AT ALL!");
+		}
 	    }
 	}
 	if (typesMap == null) {
@@ -124,6 +137,7 @@ class DASFeatureSet implements FeatureHolder {
 	    if (seqLength > TILE_THRESHOLD_LENGTH) {
 		// System.err.print("*** Considering tiling...");
 		Map types = getTypesMap();
+		
 		int totalCount = 0;
 		for (Iterator ti = types.values().iterator(); ti.hasNext(); ) {
 		    Integer count = (Integer) ti.next();
@@ -214,14 +228,17 @@ class DASFeatureSet implements FeatureHolder {
 	    if (tiles.length == 1) {
 		allFeatures = new TileFeaturesWrapper(0);
 	    } else {
-		MergeFeatureHolder mfhAllFeatures = new MergeFeatureHolder();
-		for (int t = 0; t < tiles.length; ++t) {
-		    mfhAllFeatures.addFeatureHolder(new TileFeaturesWrapper(t),
-						    new FeatureFilter.ContainedByLocation(tiles[t]));
+		try {
+		    DASMergeFeatureHolder mfhAllFeatures = new DASMergeFeatureHolder();
+		    for (int t = 0; t < tiles.length; ++t) {
+			mfhAllFeatures.addFeatureHolder(new TileFeaturesWrapper(t),
+							new FeatureFilter.ContainedByLocation(tiles[t]));
+		    }
+		    mfhAllFeatures.addFeatureHolder(unrulyFeatures, FeatureFilter.all);
+		    allFeatures = mfhAllFeatures;
+		} catch (ChangeVetoException cve) {
+		    throw new BioError(cve);
 		}
-		mfhAllFeatures.addFeatureHolder(unrulyFeatures, FeatureFilter.all);
-
-		allFeatures = mfhAllFeatures;
 	    }
 	}
 
@@ -266,6 +283,28 @@ class DASFeatureSet implements FeatureHolder {
         throws ChangeVetoException
     {
 	throw new ChangeVetoException("Can't remove features from DAS sequences.");
+    }
+
+    //
+    // Optimizable
+    //
+
+    public Set getOptimizableFilters() throws BioException {
+	FeatureHolder fh = getFeatures();
+	if (fh instanceof DASOptimizableFeatureHolder) {
+	    return ((DASOptimizableFeatureHolder) fh).getOptimizableFilters();
+	} else {
+	    return Collections.singleton(FeatureFilter.all);
+	}
+    }
+
+    public FeatureHolder getOptimizedSubset(FeatureFilter ff) throws BioException {
+	FeatureHolder fh = getFeatures();
+	if (fh instanceof DASOptimizableFeatureHolder) {
+	    return ((DASOptimizableFeatureHolder) fh).getOptimizedSubset(ff);
+	} else {
+	    return fh;
+	}
     }
 
     // 

@@ -35,7 +35,7 @@ import org.biojava.utils.*;
  * @author Matthew Pocock
  */
 
-class DASComponentFeature implements ComponentFeature {
+class DASComponentFeature implements ComponentFeature, DASOptimizableFeatureHolder {
     private final DASSequence parent;
 
     private FeatureHolder projectedFeatures;
@@ -149,6 +149,10 @@ class DASComponentFeature implements ComponentFeature {
     }
 
     public Sequence getComponentSequence() {
+	return _getComponentSequence();
+    }
+
+    private DASSequence _getComponentSequence() {
 	if (componentSequence == null) {
 	    try {
 		componentSequence = parent.getParentDB()._getSequence(componentID, parent.dataSourceURLs());
@@ -163,15 +167,39 @@ class DASComponentFeature implements ComponentFeature {
 	return componentLocation;
     }
 
+    //  protected FeatureHolder getProjectedFeatures() {
+//  	if (projectedFeatures == null) {
+//  	    if (strand == StrandedFeature.NEGATIVE) {
+//  		int translation = location.getMax() + componentLocation.getMin();
+//  		this.projectedFeatures = new ProjectedFeatureHolder(getComponentSequence(), this, translation, true);
+//  	    } else  if (strand == StrandedFeature.POSITIVE) {
+//  		int translation = location.getMin() - componentLocation.getMin();
+//  		this.projectedFeatures = new ProjectedFeatureHolder(getComponentSequence(), this, translation, false);
+//  	    } 
+//  	}
+//  	return projectedFeatures;
+//      }
+
+    
     protected FeatureHolder getProjectedFeatures() {
+	// This is currently a bit of a hack -- it's doing stuff which the projection
+	// engine will do for us once OptimizableFeatureHolder is in.  Soon, soon...
+
 	if (projectedFeatures == null) {
+	    int translation;
+	    boolean flip;
 	    if (strand == StrandedFeature.NEGATIVE) {
-		int translation = location.getMax() + componentLocation.getMin();
-		this.projectedFeatures = new ProjectedFeatureHolder(getComponentSequence(), this, translation, true);
+		translation = location.getMax() + componentLocation.getMin();
+		flip = true;
 	    } else  if (strand == StrandedFeature.POSITIVE) {
-		int translation = location.getMin() - componentLocation.getMin();
-		this.projectedFeatures = new ProjectedFeatureHolder(getComponentSequence(), this, translation, false);
-	    } 
+		translation = location.getMin() - componentLocation.getMin();
+		flip = false;
+	    } else {
+		throw new BioError("No strand -- erk!");
+	    }
+
+
+	    projectedFeatures = ProjectedFeatureHolder.projectFeatureHolder(getComponentSequence(), this, translation, flip);
 	}
 	return projectedFeatures;
     }
@@ -213,6 +241,25 @@ class DASComponentFeature implements ComponentFeature {
 
     public Feature.Template makeTemplate() {
 	throw new BioRuntimeException("FIXME");
+    }
+
+
+    public Set getOptimizableFilters() throws BioException {
+	FeatureHolder fh = getProjectedFeatures();
+	if (fh instanceof DASOptimizableFeatureHolder) {
+	    return ((DASOptimizableFeatureHolder) fh).getOptimizableFilters();
+	} else {
+	    return Collections.singleton(FeatureFilter.all);
+	}
+    }
+
+    public FeatureHolder getOptimizedSubset(FeatureFilter ff) throws BioException {
+	FeatureHolder fh = getProjectedFeatures();
+	if (fh instanceof DASOptimizableFeatureHolder) {
+	    return ((DASOptimizableFeatureHolder) fh).getOptimizedSubset(ff);
+	} else {
+	    return fh;
+	}
     }
 
     // 

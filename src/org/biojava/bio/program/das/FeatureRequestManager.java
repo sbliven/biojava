@@ -128,6 +128,9 @@ class FeatureRequestManager {
 	Object triggerGroup = trigger.getFetchGroup();
 	Map fetchers = new HashMap();
 
+	// System.err.println("\n\nFetch triggered by: " + triggerGroup);
+	// new Exception("Fetch trigger path").printStackTrace();
+
 	for (Iterator i = openTickets.iterator(); i.hasNext(); ) {
 	    Ticket t = (Ticket) i.next();
 	    if (triggerClass.isInstance(t) &&

@@ -73,8 +73,12 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
 	seqDelegate = seq;
 	addedFeatures = new SimpleFeatureHolder();
 	exposedFeatures = new MergeFeatureHolder();
-	exposedFeatures.addFeatureHolder(new ProjectedFeatureHolder(seqDelegate, this, 0, false));
-	exposedFeatures.addFeatureHolder(addedFeatures);
+	try {
+	    exposedFeatures.addFeatureHolder(new ProjectedFeatureHolder(seqDelegate, this, 0, false));
+	    exposedFeatures.addFeatureHolder(addedFeatures);
+	} catch (ChangeVetoException cve) {
+	    throw new BioError(cve, "Modification of hidden featureholder vetoed!");
+	}
 
 	name = seqDelegate.getName();  // Is this sensible?
 	urn = seqDelegate.getURN();

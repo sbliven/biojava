@@ -29,6 +29,7 @@ import org.biojava.utils.bytecode.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.program.das.*;
 
 /**
  * Helper class for projecting Feature objects into an alternative
@@ -64,6 +65,53 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 
     private ChangeListener underlyingFeaturesChange;
 
+
+    private static Location extractInterestingLocation(FeatureFilter ff) {
+	if (ff instanceof FeatureFilter.OverlapsLocation) {
+	    return ((FeatureFilter.OverlapsLocation) ff).getLocation();
+	} else if (ff instanceof FeatureFilter.ContainedByLocation) {
+	    return ((FeatureFilter.ContainedByLocation) ff).getLocation();
+	} else if (ff instanceof FeatureFilter.And) {
+	    FeatureFilter.And ffa = (FeatureFilter.And) ff;
+	    Location l1 = extractInterestingLocation(ffa.getChild1());
+	    Location l2 = extractInterestingLocation(ffa.getChild2());
+
+	    if (l1 != null) {
+		if (l2 != null) {
+		    return l1.intersection(l2);
+		} else {
+		    return l1;
+		}
+	    } else {
+		if (l2 != null) {
+		    return l2;
+		} else {
+		    return null;
+		}
+	    }
+	}
+
+	// Don't know how this filter relates to location.
+
+	return null;
+    }
+    
+
+    public static FeatureHolder projectFeatureHolder(FeatureHolder fh,
+						     FeatureHolder parent, 
+						     int translation,
+						     boolean flip)
+    {
+	if (fh instanceof DASOptimizableFeatureHolder) {
+	    return new ProjectedOptimizedFeatureHolder((DASOptimizableFeatureHolder) fh,
+						       parent,
+						       translation,
+						       flip);
+	} else {
+	    return new ProjectedFeatureHolder(fh, parent, translation, flip);
+	}    
+    }
+
     /**
      * Construct a new FeatureHolder which projects a set of features
      * into a new coordinate system.  If <code>translation</code> is 0
@@ -89,6 +137,11 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 				  int translation,
 				  boolean oppositeStrand) 
     {
+	// System.err.println("+++ Constructing a ProjectedFeatureHolder");
+	// System.err.println("+++ Parent: " + fh.getClass().getName());
+	// new Exception("How we got here...").printStackTrace();
+	
+
 	this.wrapped = fh;
 	this.parent = parent;
 	this.translate = translation;
@@ -386,5 +439,158 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 
     public FeatureHolder getParent() {
 	return parent;
+    }
+
+
+    private static class ProjectedOptimizedFeatureHolder extends AbstractFeatureHolder implements DASOptimizableFeatureHolder {
+	private final DASOptimizableFeatureHolder wrapped;
+	private final FeatureHolder parent;
+	private final int translate;
+	private boolean oppositeStrand;
+
+	private MergeFeatureHolder mfh = null;
+	private ChangeListener underlyingFeaturesChange;
+
+	public ProjectedOptimizedFeatureHolder(DASOptimizableFeatureHolder fh,
+					       FeatureHolder parent, 
+					       int translation,
+					       boolean oppositeStrand) 
+	{
+	    this.wrapped = fh;
+	    this.parent = parent;
+	    this.translate = translation;
+	    this.oppositeStrand = oppositeStrand;
+
+	    underlyingFeaturesChange = new ChangeListener() {
+		    public void preChange(ChangeEvent e)
+			throws ChangeVetoException 
+		    {
+			if (changeSupport != null) {
+			    changeSupport.firePreChangeEvent(new ChangeEvent(this,
+									     FeatureHolder.FEATURES,
+									     e.getChange(),
+									     e.getPrevious(),
+									     e));
+			}
+		    }
+		    
+		    public void postChange(ChangeEvent e) {
+			mfh = null; // Flush all the cached projections --
+			// who knows what might have changed.
+			
+			// System.err.println("*** Flushing cache on optimized projection...");
+
+			if (changeSupport != null) {
+			    changeSupport.firePostChangeEvent(new ChangeEvent(this,
+									      FeatureHolder.FEATURES,
+									      e.getChange(),
+									      e.getPrevious(),
+									      e));
+			}
+		    }
+		} ;
+
+	    wrapped.addChangeListener(underlyingFeaturesChange, ChangeType.UNKNOWN);
+	    
+	}
+
+	protected MergeFeatureHolder getProjectedFeatures() {
+	    if (mfh == null) {
+		try {
+		    Set optimizableFilters = wrapped.getOptimizableFilters();
+		    mfh = new MergeFeatureHolder();
+		    for (Iterator i = optimizableFilters.iterator(); i.hasNext(); ) {
+			FeatureFilter potFilter = (FeatureFilter) i.next();
+			FeatureHolder potHolder = wrapped.getOptimizedSubset(potFilter);
+			
+			FeatureFilter projectedPotFilter = potFilter;
+			// System.err.println("projecting for: " + potFilter);
+			if (extractInterestingLocation(projectedPotFilter) != null) {
+			    if (projectedPotFilter instanceof FeatureFilter.ContainedByLocation) {
+				if (oppositeStrand) {
+				    System.err.println("*** Warning: flipped projection, can't fixup!");
+				    projectedPotFilter = FeatureFilter.all;
+				} else {
+				    Location loc = ((FeatureFilter.ContainedByLocation) projectedPotFilter).getLocation();
+				    projectedPotFilter = new FeatureFilter.ContainedByLocation(loc.translate(translate));
+				}
+			    } else {
+				System.err.println("*** Warning: complex location-filter, can't fixup!");
+				projectedPotFilter = FeatureFilter.all;
+			    }   
+			}
+			
+			FeatureHolder projectedPotHolder = projectFeatureHolder(potHolder,
+										parent,
+										translate,
+										oppositeStrand);
+			mfh.addFeatureHolder(projectedPotHolder, projectedPotFilter);
+		    }
+		} catch (BioException bex) {
+		    throw new BioRuntimeException(bex);
+		} catch (ChangeVetoException cve) {
+		    throw new BioError(cve, "Change to internal featureset vetoed!");
+		}
+	    }
+
+	    return mfh;
+	}
+
+	public int countFeatures() {
+	    return wrapped.countFeatures();
+	}
+	
+	public Iterator features() {
+	    return getProjectedFeatures().features();
+	}
+	
+	public boolean containsFeature(Feature f) {
+	    return getProjectedFeatures().containsFeature(f);
+	}
+
+	public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+	    return getProjectedFeatures().filter(ff, recurse);
+	}
+
+	public Set getOptimizableFilters() {
+	    Map mm = getProjectedFeatures().getMergeMap();
+	    Set osf = new HashSet();
+	    for (Iterator i = mm.values().iterator(); i.hasNext(); ) {
+		osf.add(i.next());
+	    }
+	    
+	    return osf;
+	}
+
+	public FeatureHolder getOptimizedSubset(FeatureFilter ff) 
+	    throws BioException
+	{
+	    List ss = new ArrayList();
+	    Map mm = getProjectedFeatures().getMergeMap();
+	    for (Iterator i = mm.entrySet().iterator(); i.hasNext(); ) {
+		Map.Entry me = (Map.Entry) i.next();
+		FeatureHolder fh = (FeatureHolder) me.getKey();
+		FeatureFilter tff = (FeatureFilter) me.getValue();
+		if (tff.equals(ff)) {
+		    ss.add(fh);
+		}
+	    }
+	    
+	    if (ss.size() == 0) {
+		throw new BioException("No optimized subset matching: " + ff);
+	    } else if (ss.size() == 1) {
+		return (FeatureHolder) ss.get(0);
+	    } else {
+		MergeFeatureHolder mfh = new MergeFeatureHolder();
+		for (Iterator i = ss.iterator(); i.hasNext(); ) {
+		    try {
+			mfh.addFeatureHolder((FeatureHolder) i.next());
+		    } catch (ChangeVetoException cve) {
+			throw new BioError(cve, "Change to internal featureset vetoed!");
+		    }
+		}
+		return mfh;
+	    }
+	}
     }
 }

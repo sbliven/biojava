@@ -70,7 +70,9 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
      * </p>
      */
 
-    public void addFeatureHolder(FeatureHolder fh) {
+    public void addFeatureHolder(FeatureHolder fh) 
+        throws ChangeVetoException
+    {
 	featureHolders.put(fh, FeatureFilter.all);
     }
 
@@ -84,8 +86,19 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
      * @since 1.2
      */
 
-    public void addFeatureHolder(FeatureHolder fh, FeatureFilter membershipFilter) {
+    public void addFeatureHolder(FeatureHolder fh,
+				 FeatureFilter membershipFilter) 
+	throws ChangeVetoException
+    {
+	if (changeSupport != null) {
+	    changeSupport.firePreChangeEvent(new ChangeEvent(this,
+							     FeatureHolder.FEATURES));
+	}
 	featureHolders.put(fh, membershipFilter);
+	if (changeSupport != null) {
+	    changeSupport.firePostChangeEvent(new ChangeEvent(this,
+							      FeatureHolder.FEATURES));
+	}
     }
 
     /**
@@ -93,8 +106,18 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
      * are merged.
      */
 
-    public void removeFeatureHolder(FeatureHolder fh) {
+    public void removeFeatureHolder(FeatureHolder fh) 
+        throws ChangeVetoException
+    {
+	if (changeSupport != null) {
+	    changeSupport.firePreChangeEvent(new ChangeEvent(this,
+							     FeatureHolder.FEATURES));
+	}
 	featureHolders.remove(fh);
+	if (changeSupport != null) {
+	    changeSupport.firePostChangeEvent(new ChangeEvent(this,
+							      FeatureHolder.FEATURES));
+	}
     }
 
     public int countFeatures() {
