@@ -410,7 +410,8 @@ public class SequencePanel
 
 	  Graphics2D g2 = (Graphics2D) g;
 	  AffineTransform oldTransform = g2.getTransform();
-	  Rectangle2D currentClip = g2.getClip().getBounds2D();
+	  //Rectangle2D currentClip = g2.getClip().getBounds2D();
+
 	  Insets insets = getInsets();
 
 	  if (isOpaque())
