@@ -39,7 +39,27 @@ import org.apache.regexp.*;
  * @author Nimesh Singh
  * @since 1.1
  */
-public class SeqIOTools  {
+public final class SeqIOTools  {
+    //constants representing different filetypes
+    public static final int UNKNOWN = 0;
+    public static final int FASTADNA = 1;
+    public static final int FASTAPROTEIN = 2;
+    public static final int EMBL = 3;
+    public static final int GENBANK = 4;
+    public static final int SWISSPROT = 5;
+    public static final int GENPEPT = 6;
+    public static final int MSFDNA = 7;
+    public static final int FASTA = 8;              //only appropriate for writing
+    public static final int FASTAALIGNDNA = 9;
+    public static final int MSFPROTEIN = 10;
+    public static final int FASTAALIGNPROTEIN = 11;
+    public static final int MSF = 12;               //only appropriate for reading
+
+    private static SequenceBuilderFactory _emblBuilderFactory;
+    private static SequenceBuilderFactory _genbankBuilderFactory;
+    private static SequenceBuilderFactory _genpeptBuilderFactory;
+    private static SequenceBuilderFactory _swissprotBuilderFactory;
+    private static SequenceBuilderFactory _fastaBuilderFactory;
 
     /**
      * This can't be instantiated.
@@ -70,8 +90,6 @@ public class SeqIOTools  {
             throw new BioError(ex, "Assertion failing: Couldn't get PROTEIN token parser");
         }
     }
-
-    private static SequenceBuilderFactory _emblBuilderFactory;
 
     /**
      * Get a default SequenceBuilderFactory for handling EMBL
@@ -104,8 +122,6 @@ public class SeqIOTools  {
                                 getEmblBuilderFactory());
     }
 
-    private static SequenceBuilderFactory _genbankBuilderFactory;
-
     /**
      * Get a default SequenceBuilderFactory for handling GenBank
      * files.
@@ -126,8 +142,6 @@ public class SeqIOTools  {
                                 getDNAParser(),
                                 getGenbankBuilderFactory());
     }
-
-      private static SequenceBuilderFactory _genpeptBuilderFactory;
 
     /**
     * Get a default SequenceBuilderFactory for handling Genpept
@@ -150,9 +164,6 @@ public class SeqIOTools  {
                                 getGenpeptBuilderFactory());
     }
 
-
-    private static SequenceBuilderFactory _swissprotBuilderFactory;
-
     /**
      * Get a default SequenceBuilderFactory for handling Swissprot
      * files.
@@ -173,8 +184,6 @@ public class SeqIOTools  {
                                 getProteinParser(),
                                 getSwissprotBuilderFactory());
     }
-
-    private static SequenceBuilderFactory _fastaBuilderFactory;
 
     /**
      * Get a default SequenceBuilderFactory for handling FASTA
@@ -290,30 +299,20 @@ public class SeqIOTools  {
      *
      */
 
-    //constants representing different filetypes
-    public static final int UNKNOWN = 0;
-    public static final int FASTADNA = 1;
-    public static final int FASTAPROTEIN = 2;
-    public static final int EMBL = 3;
-    public static final int GENBANK = 4;
-    public static final int SWISSPROT = 5;
-    public static final int GENPEPT = 6;
-    public static final int MSFDNA = 7;
-    public static final int FASTA = 8;              //only appropriate for writing
-    public static final int FASTAALIGNDNA = 9;
-    public static final int MSFPROTEIN = 10;
-    public static final int FASTAALIGNPROTEIN = 11;
-    public static final int MSF = 12;               //only appropriate for reading
-
     /**
      * Attempts to guess the filetype of a file given the name.  For use with
      * the functions below that take an int fileType as a parameter.  The
      * constants used are above.
      */
-    public static int guessFileType(String fileName) throws IOException, FileNotFoundException {
+    public static int guessFileType(File seqFile)
+    throws IOException, FileNotFoundException {
         //First tries by matching an extension
+        String fileName = seqFile.getName();
         try {
             if ((new RE(".*\\u002eem.*")).match(fileName)) {
+                return EMBL;
+            }
+            else if ((new RE(".*\\u002edat.*")).match(fileName)) {
                 return EMBL;
             }
             else if ((new RE(".*\\u002egb.*")).match(fileName)) {
@@ -336,7 +335,7 @@ public class SeqIOTools  {
         }
 
         //Reads the file to guess based on content
-        BufferedReader br = new BufferedReader(new FileReader(fileName));
+        BufferedReader br = new BufferedReader(new FileReader(seqFile));
         String line1 = br.readLine();
         String line2 = br.readLine();
         br.close();
@@ -377,7 +376,8 @@ public class SeqIOTools  {
             return guessGenType(fileName);
         }
         else {
-            System.out.println("guessFileType -- Could not guess file type.");
+            // fixme: mrp: We shouldn't have print statements inlibrary code
+            //System.out.println("guessFileType -- Could not guess file type.");
             return UNKNOWN;
         }
     }
@@ -452,6 +452,44 @@ public class SeqIOTools  {
         }
         return GENBANK;
     }
+    
+    public static SequenceBuilderFactory fileToFactory(int fileType)
+    throws BioException {
+      switch(fileType) {
+            case FASTADNA:
+              return getFastaBuilderFactory();
+            case FASTAPROTEIN:
+              return getFastaBuilderFactory();
+            case EMBL:
+              return getEmblBuilderFactory();
+            case GENBANK:
+              return getGenbankBuilderFactory();
+            case SWISSPROT:
+              return getSwissprotBuilderFactory();
+            case GENPEPT:
+              return getGenpeptBuilderFactory();
+            default:
+              throw new BioException("Unknown format: " + fileType);
+      }
+    }
+
+    public static SequenceFormat fileToFormat(int fileType)
+    throws BioException {
+      switch(fileType) {
+            case FASTADNA:
+              return new FastaFormat();
+            case FASTAPROTEIN:
+              return new FastaFormat();
+            case EMBL:
+              return new EmblLikeFormat();
+            case GENBANK:
+              return new GenbankFormat();
+            case SWISSPROT:
+              return new EmblLikeFormat();
+            default:
+              throw new BioException("Unknown format: " + fileType);
+      }
+    }
 
     /**
      * Reads a file and returns the corresponding Biojava object.  You need to cast it as
@@ -473,6 +511,8 @@ public class SeqIOTools  {
             case GENPEPT:
                 return fileToSeq(fileType, br);
             default:
+                // fixme: mrp: don't print a message & return null,
+                // throw an exception!
                 System.out.println("fileToBiojava -- File type not recognized.");
                 return null;
         }
@@ -593,15 +633,4 @@ public class SeqIOTools  {
                 System.out.println("seqToFile -- File type not recognized.");
         }
     }
-
-//    public static void main(String[] args) throws Exception {
-//        BufferedReader br = new BufferedReader(new FileReader("U:/prot.msf.txt"));
-//        SimpleAlignment align = (SimpleAlignment) fileToBiojava(MSF, br);
-//        SequenceIterator seqIt = align.sequenceIterator();
-//        while (seqIt.hasNext()) {
-//            Sequence seq = seqIt.nextSequence();
-//            System.out.println(seq.getName() + ": " + seq.seqString());
-//        }
-//    }
-
 }

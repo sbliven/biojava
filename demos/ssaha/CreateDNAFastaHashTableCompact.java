@@ -62,7 +62,9 @@ public class CreateDNAFastaHashTableCompact {
 	}
 
 	SequenceStreamer streamer = new SequenceStreamer.FileStreamer(
-		new FastaFormat(),
+		SeqIOTools.fileToFormat(
+                  SeqIOTools.guessFileType((File) seqFiles.get(0))
+                ),
 		DNATools.getDNA().getTokenization("token"),
 		seqFiles
         );
