@@ -202,7 +202,7 @@ implements Serializable {
     private static class AverageRangeResolver implements RangeResolver {
 	public int resolveMin(FuzzyLocation loc) {
 	    if (loc.hasBoundedMin()) {
-		return loc.getOuterMin() + loc.getInnerMin() / 2;
+		return (loc.getOuterMin() + loc.getInnerMin()) / 2;
 	    } else {
 		return loc.getInnerMin();
 	    }
@@ -210,7 +210,7 @@ implements Serializable {
 
 	public int resolveMax(FuzzyLocation loc) {
 	    if (loc.hasBoundedMax()) {
-		return loc.getOuterMax() + loc.getInnerMax() / 2;
+		return (loc.getOuterMax() + loc.getInnerMax()) / 2;
 	    } else {
 		return loc.getInnerMax();
 	    }

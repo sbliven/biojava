@@ -211,8 +211,7 @@ class AbstractGenEmblFileFormer
      *
      * @return a <code>String</code> bounded by the correct tokens.
      */
-    String formatQualifier(final Object       key,
-			   final Object       value)
+    String formatQualifier(final Object key, final Object value)
     {
 	StringBuffer sb = new StringBuffer("/" + key);
 
@@ -429,7 +428,7 @@ class AbstractGenEmblFileFormer
 		case BETWEEN_LOCATION:
 		    BetweenLocation tempLocation = (BetweenLocation) thisLoc;
 		    String formattedLocation = formatBetween(tempLocation);
-		    if(complement)
+		    if (complement)
 		    {
 			formattedLocation = toComplement(formattedLocation);
 		    }
