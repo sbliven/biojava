@@ -1,3 +1,4 @@
+/* -*- c-basic-offset: 4; indent-tabs-mode: nil -*- */
 /*
  *                    BioJava development code
  *
@@ -55,9 +56,9 @@ import org.biojava.utils.ChangeVetoException;
  *
  * @author Thomas Down
  * @author Simon Foote (modifications for schema version 1.0)
+ * @author Len Trigg
  * @since 1.3
  */
-
 class FeaturesSQL {
     private BioSQLSequenceDB seqDB;
 
@@ -97,7 +98,7 @@ class FeaturesSQL {
         Map lmap = new HashMap();
 
 	
-	    PreparedStatement get_features = null;
+        PreparedStatement get_features = null;
         if (overlappingRegion == null && immediateChildrenOfParent < 0 && featureID < 0) {
             get_features = conn.prepareStatement(
 			        "select seqfeature.seqfeature_id, " +
@@ -161,6 +162,7 @@ class FeaturesSQL {
                 listener.addSequenceProperty("_biosql_internal.bioentry_id", new Integer(bioentry_id));
             }
         }
+        rs.close();
         get_features.close();
 
         // Fetch annotations (worth a try!)
@@ -226,7 +228,9 @@ class FeaturesSQL {
                throw new BioError("Couldn't modify hidden FeatureHolder");
            }
        }
-        
+       rs.close();
+       get_annotations.close();
+
 	// Fetch those crappy location qualifiers first...
 
 	/*
@@ -441,6 +445,7 @@ class FeaturesSQL {
             }
             ll.add(bloc);
        }
+       rs.close();
        get_locations.close();
 	
 	   // Bind location information to features
@@ -507,6 +512,7 @@ class FeaturesSQL {
                 }
                 cl.add(child);
             }
+            rs.close();
             get_hierarchy.close();
         } else if (immediateChildrenOfParent >= 0) {
             specifiedParent = immediateChildrenOfParent;
@@ -521,6 +527,8 @@ class FeaturesSQL {
             if (rs.next()) {
                 specifiedParent = rs.getInt(1);
             }
+            rs.close();
+            discover_parent.close();
         }
 
         seqDB.getPool().putConnection(conn);
@@ -597,7 +605,7 @@ class FeaturesSQL {
 	    update_key.setInt(1, seqfeature_key);
 	    update_key.setInt(2, feature_id);
 	    update_key.executeUpdate();
-
+            
 	    conn.commit();
 	    seqDB.getPool().putConnection(conn);
 	} catch (SQLException ex) {
@@ -740,7 +748,7 @@ class FeaturesSQL {
 		       int bioentry_id,
 		       Feature f,
 		       int parent_id,
-					 int typeRank)
+                       int typeRank)
 	throws BioException, SQLException
     {
 	int id = -1;
