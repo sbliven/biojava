@@ -236,20 +236,44 @@ public class PatternSearch
     public static void match(Pattern p, Sequence seq, Feature.Template ft)
         throws BioException, IllegalAlphabetException, ChangeVetoException
     {
+        match(p, seq, ft, new RangeLocation(1, seq.length()));
+    }
+
+    /**
+     * Annotates the sequence with Features marking where matches to
+     * the specified sequence were encountered.
+     * @param p Pattern to match.
+     * @param seq Sequence to find match in.
+     * @param ft Feature.Template to be used in creating the Feature.
+     * @param range The part of the sequence in which the search is to be conducted.
+     *              Note that patterns that start within the range but extend
+     *              beyond it will be discarded.
+     */
+    public static void match(Pattern p, Sequence seq, Feature.Template ft, RangeLocation range)
+        throws BioException, IllegalAlphabetException, ChangeVetoException, IndexOutOfBoundsException
+    {
         // check that the alphabets are compatible
         if (p.getAlphabet() != seq.getAlphabet())
             throw new IllegalAlphabetException("alphabets are not compatible.");
 
+        // check range
+        if (!LocationTools.contains(new RangeLocation(1, seq.length()), range))
+            throw new IndexOutOfBoundsException(range + " is not valid for this sequence.");
+
         // mark out all hits with a Location object
         MatchState state = new MatchState();
-        for (int i=1; i <= seq.length(); i++) {
+        for (int i = range.getMin(); i <= range.getMax(); i++) {
             state.symListPos = i;
             state.resetPattern();
             if (match(p, seq, state)) {
                 // add an annotation to mark the site
                 Location loc = new RangeLocation(i, state.symListPos - 1);
-                ft.location = loc;
-                seq.createFeature(ft);
+
+                // confirm that it is in the interval before adding this location.
+                if (LocationTools.contains(range, loc)) {
+                    ft.location = loc;
+                    seq.createFeature(ft);
+                }
             }
         }
     }
