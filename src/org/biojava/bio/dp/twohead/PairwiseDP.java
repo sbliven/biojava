@@ -53,6 +53,8 @@ import org.biojava.bio.symbol.SimpleGappedSymbolList;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.SymbolList;
 
+import org.biojava.utils.SmallMap;
+
 /**
  * Algorithms for dynamic programming (alignments) between pairs
  * of SymbolLists.
@@ -306,7 +308,7 @@ public class PairwiseDP extends DP implements Serializable {
     //System.out.println(gap0.seqString());
     //System.out.println(gap1.seqString());
     double [] scoreA = new double[statel.size()];
-    Map aMap = new HashMap();
+    Map aMap = new SmallMap();
     aMap.put(seq0, gap0);
     aMap.put(seq1, gap1);
     Alignment ali = new SimpleAlignment(aMap);
