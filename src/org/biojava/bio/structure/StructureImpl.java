@@ -56,6 +56,16 @@ public class StructureImpl implements Structure {
 
     }
 
+    /* returns an identical copy of this structure 
+       public Object clone() {
+       
+       StructureImpl n = new StructureImpl();
+       // pfuuuh go through whole substructure and clone! 
+       
+       }
+    */
+
+
     /**
      *
      * set PDB code of structure 
@@ -97,8 +107,16 @@ public class StructureImpl implements Structure {
 
     /** add a new chain, if several models are available*/
     public void addChain(Chain chain, int modelnr) {
-	ArrayList model = (ArrayList)models.get(modelnr);
-	model.add(chain);
+	// if model has not been initialized, init it!
+	if ( models.size() == 0  ) {
+	    ArrayList model = new ArrayList() ;
+	    model.add(chain);
+	    models.add(model);
+	    
+	} else {
+	    ArrayList model = (ArrayList)models.get(modelnr);	    
+	    model.add(chain);
+	}
     }
     
     /** retrieve a chain by it's position within the Structure */
@@ -210,6 +228,7 @@ public class StructureImpl implements Structure {
 	FileConvert f = new FileConvert(this) ;
 	
 	String str = f.toPDB();
+
 
 	return str ;
 	

@@ -42,6 +42,9 @@ public interface Chain {
      */
     public ArrayList getGroups (String type);
 
+    /** return all groups of this chain */
+    public ArrayList getGroups ();
+
     /** get total length of chain, including HETATMs.*/
     public int getLength();
     
@@ -73,5 +76,5 @@ public interface Chain {
     /** get the Swissprot id of this chains */
     public String getSwissprotId() ;
 
-
+    
 }

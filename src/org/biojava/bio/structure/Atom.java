@@ -51,6 +51,10 @@ public interface Atom {
     public double getY() ;
     public double getZ() ;
 
+    /** get set alternate Location */
+    public void setAltLoc(Character c);
+    public Character getAltLoc();
+
     /** store the whole line */
     public void   setPDBline(String s) ;
     public String getPDBline() ;

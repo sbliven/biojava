@@ -32,8 +32,8 @@ import java.util.ArrayList ;
 
 public class GroupIterator implements Iterator {
     
-    Structure structure ;
-
+    Structure structure   ;
+    Chain     chain       ;
     int current_model_pos ;
     int current_chain_pos ;
     int current_group_pos ;
@@ -41,22 +41,23 @@ public class GroupIterator implements Iterator {
   
     
     public GroupIterator (Structure struct) { 
-	structure = struct ;
-	current_model_pos = 0 ;
-	current_chain_pos = 0 ;
+	structure = struct     ;
+	chain     = null       ;
+	current_model_pos = 0  ;
+	current_chain_pos = 0  ;
 	current_group_pos = -1 ;
 
     } 
 
 
-    // needed to do a copy of iterator ...
-    private Structure getStructure(){ return structure; };    
-    private int  getModelPos(){ return current_model_pos;}
-    private void setModelPos(int pos){ current_model_pos = pos;}
-    private int  getChainPos(){ return current_chain_pos;}
-    private void setChainPos(int pos){ current_chain_pos = pos;}
-    private int  getGroupPos(){ return current_group_pos;}
-    private void setGroupPos(int pos){ current_group_pos = pos;}
+    /** needed to do a copy of iterator ... */
+    private Structure getStructure() { return structure         ;}    
+    private int  getModelPos()       { return current_model_pos ;}
+    private void setModelPos(int pos){ current_model_pos = pos  ;}
+    private int  getChainPos()       { return current_chain_pos ;}
+    private void setChainPos(int pos){ current_chain_pos = pos  ;}
+    private int  getGroupPos()       { return current_group_pos ;}
+    private void setGroupPos(int pos){ current_group_pos = pos  ;}
     
     /**  Creates and returns a copy of this object. */
     public Object clone () {

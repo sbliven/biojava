@@ -86,6 +86,10 @@ public class ChainImpl implements Chain {
 	//Group[] g = (Group[])tmp.toArray(new Group[tmp.size()]);
 	return tmp ;
     }
+    /** return all groups of this chain */
+    public ArrayList getGroups(){
+	return groups ;
+    }
 
     
 

@@ -34,6 +34,10 @@ import java.util.HashMap ;
  */
 public interface Structure {
 	
+    /* returns an identical copy of this structure 
+       public Structure clone();
+    */
+    
     /**
      * String representation of object
      */

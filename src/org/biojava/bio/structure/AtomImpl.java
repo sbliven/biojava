@@ -38,6 +38,8 @@ public class AtomImpl implements Atom {
     double occupancy ;
     double tempfactor;
 
+    Character altLoc ;
+
     public AtomImpl () {
 	name     = null        ;
 	fullName = null        ;
@@ -45,6 +47,7 @@ public class AtomImpl implements Atom {
 	pdbline  = ""          ;  
 	occupancy  = 0.0       ;
 	tempfactor = 0.0       ;
+	altLoc = new Character(' ');
     }
 
     /** trimmed version of atom name, e.g. "CA" */
@@ -74,6 +77,16 @@ public class AtomImpl implements Atom {
 
     /** get the Z coordinate */
     public double getZ() { return coords[2]; }
+
+    /** set alternate Location */
+    public void setAltLoc(Character c) {
+	altLoc = c ;
+    }
+    /** get alternate Location */
+    public Character getAltLoc() {
+	return altLoc ;
+    }
+
     
     /** store the whole line */
     public void   setPDBline(String s) { pdbline = s;}
