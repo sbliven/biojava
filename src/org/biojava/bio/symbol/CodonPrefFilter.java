@@ -21,7 +21,12 @@
 
 package org.biojava.bio.symbol;
 
+import java.io.PrintWriter;
+import java.io.IOException;
+
 import org.biojava.bio.symbol.CodonPref;
+import org.biojava.utils.xml.PrettyXMLWriter;
+import org.biojava.bio.BioException;
 
 public interface CodonPrefFilter
 {
@@ -33,14 +38,14 @@ public interface CodonPrefFilter
     /**
      * handles storage of a CodonPref object
      */
-    public void put(CodonPref codonPref);
+    public void put(CodonPref codonPref) throws BioException;
 
-    public class FilterByName implements CodonPrefFilter
+    public class ByName implements CodonPrefFilter
     {
         String name;
         CodonPref filteredCodonPref;
 
-        public FilterByName(String name)
+        public ByName(String name)
         {
             this.name = name;
         }
@@ -51,6 +56,7 @@ public interface CodonPrefFilter
         }
 
         public void put(CodonPref codonPref)
+            throws BioException
         {
             filteredCodonPref = codonPref;
         }
@@ -58,6 +64,47 @@ public interface CodonPrefFilter
         public CodonPref getCodonPref()
         {
             return filteredCodonPref;
+        }
+    }
+
+    public class EverythingToXML implements CodonPrefFilter
+    {
+        PrintWriter pw;
+        PrettyXMLWriter xw;
+        boolean writtenWrapper = false;
+
+        public EverythingToXML(PrintWriter pw)
+        {
+            this.pw = pw;
+            xw = new PrettyXMLWriter(pw);
+        }
+
+        public boolean isRequired(String name)
+        {
+            return true;
+        }
+
+        public void put(CodonPref codonPref)
+            throws BioException
+        {
+            try {
+            if (!writtenWrapper) {
+                xw.openTag("CodonPrefs");
+                writtenWrapper = true;
+            }
+
+            CodonPrefTools.dumpToXML(codonPref, xw, false);
+            }
+            catch (IOException ioe) {
+                throw new BioException(ioe);
+            }
+        }
+
+        public void close()
+            throws IOException
+        {
+            xw.closeTag("CodonPrefs");
+            pw.flush();
         }
     }
 }

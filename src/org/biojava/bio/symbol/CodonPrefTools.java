@@ -22,12 +22,16 @@
 package org.biojava.bio.symbol;
 
 import java.io.InputStream;
+import java.io.BufferedReader;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.List;
 import java.util.HashMap;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -47,6 +51,7 @@ import org.biojava.bio.dist.SimpleDistribution;
 import org.biojava.bio.dist.Count;
 import org.biojava.bio.dist.IndexedCount;
 import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.xml.XMLWriter;
 import org.biojava.utils.xml.PrettyXMLWriter;
 
@@ -63,7 +68,7 @@ public class CodonPrefTools
 
     private static Map prefMap;
 
-    final private static Symbol [] cutg = new Symbol[64];
+    final private static AtomicSymbol [] cutg = new AtomicSymbol[64];
 
     static {
         prefMap = new HashMap();
@@ -117,47 +122,22 @@ public class CodonPrefTools
     }
 
     /**
-     * writes out a CodonPref object in XML form
+     * write out a specified CodonPref object in XML format.
      */
-    public static void dumpToXML(CodonPref codonPref, PrintWriter writer)
+    public static void writeToXML(CodonPref codonPref, PrintWriter writer)
         throws NullPointerException, IOException, IllegalSymbolException, BioException
     {
-        // validate both objects first
-        if ((codonPref == null) || (writer == null))
-            throw new NullPointerException();
-
         XMLWriter xw = new PrettyXMLWriter(writer);
 
-        // get the CodonPref Distribution
-        Distribution codonDist = codonPref.getFrequency();
+        dumpToXML(codonPref, xw, true);
 
-        // start <CodonPrefs>
-        xw.openTag("CodonPrefs");
-        xw.openTag("CodonPref");
-        xw.attribute("id", codonPref.getName());
-        xw.attribute("geneticCodeId", codonPref.getGeneticCodeName());
-
-        // loop over all codons, writing out the stats
-        for (Iterator codonI = RNATools.getCodonAlphabet().iterator(); codonI.hasNext(); ) {
-            BasisSymbol codon = (BasisSymbol) codonI.next();
-
-            xw.openTag("frequency");
-
-            // convert codon to a three letter string
-            xw.attribute("codon", stringifyCodon(codon));
-            xw.attribute("value", Double.toString(codonDist.getWeight(codon)));
-
-            xw.closeTag("frequency");
-        }
-
-        xw.closeTag("CodonPref");
-        xw.closeTag("CodonPrefs");
+        writer.flush();
     }
 
     public static CodonPref readFromXML(InputStream prefStream, String name)
         throws BioException
     {
-        CodonPrefFilter.FilterByName filter = new CodonPrefFilter.FilterByName(name);
+        CodonPrefFilter.ByName filter = new CodonPrefFilter.ByName(name);
 
         readFromXML(prefStream, filter);
 
@@ -242,11 +222,22 @@ public class CodonPrefTools
      * reads in a file in Codon Usage Database format and
      * translate it into our XML format
      * These can be obtained from the 
-     * <a href="http://www.kazusa.or.jp/codon/">Codon Usage Database</a>
+     * <a href="http://www.kazusa.or.jp/codon/">Codon Usage Database</a>.
      */
-    public void translateCUD()
+    public static void translateCUD(InputStream input, OutputStream output)
+        throws IOException
     {
+        // create a BufferedReader for the job
+        BufferedReader rdr = new BufferedReader(new InputStreamReader(input));
 
+        // create a PrintWriter for the job
+        PrintWriter pw = new PrintWriter(output);
+        CodonPrefFilter.EverythingToXML filter = new CodonPrefFilter.EverythingToXML(pw);
+
+        // now invoke the CUD reader and stream its output to the XML writer
+        readFromCUD(rdr, filter);
+
+        filter.close();
     }
 
 
@@ -365,6 +356,94 @@ public class CodonPrefTools
             + toke.tokenizeSymbol((Symbol) codonList.get(2));
 
         return tokenizedCodon;
+    }
+
+    /**
+     * writes out a CodonPref object in XML form
+     */
+    static void dumpToXML(CodonPref codonPref, XMLWriter xw, boolean writeWrapper)
+        throws NullPointerException, IOException, IllegalSymbolException, BioException
+    {
+        // validate both objects first
+        if ((codonPref == null) || (xw == null))
+            throw new NullPointerException();
+
+        // get the CodonPref Distribution
+        Distribution codonDist = codonPref.getFrequency();
+
+        // start <CodonPrefs>
+        if (writeWrapper) xw.openTag("CodonPrefs");
+
+        xw.openTag("CodonPref");
+        xw.attribute("id", codonPref.getName());
+        xw.attribute("geneticCodeId", codonPref.getGeneticCodeName());
+
+        // loop over all codons, writing out the stats
+        for (Iterator codonI = RNATools.getCodonAlphabet().iterator(); codonI.hasNext(); ) {
+            BasisSymbol codon = (BasisSymbol) codonI.next();
+
+            xw.openTag("frequency");
+
+            // convert codon to a three letter string
+            xw.attribute("codon", stringifyCodon(codon));
+            xw.attribute("value", Double.toString(codonDist.getWeight(codon)));
+
+            xw.closeTag("frequency");
+        }
+
+        xw.closeTag("CodonPref");
+
+        if (writeWrapper) xw.closeTag("CodonPrefs");
+    }
+
+    /**
+     * reads in records in CUD format
+     */
+    private static void readFromCUD(BufferedReader rdr, CodonPrefFilter filter)
+    {
+        try {
+            String currLine;
+            while ((currLine = rdr.readLine()) != null) {
+
+                // process comment line
+                StringTokenizer toke = new StringTokenizer(currLine, ":");
+                if (toke.hasMoreTokens()) {
+                    // get id string
+                    String id = (toke.nextToken()).trim();
+
+                    // read the codon count
+                    currLine = rdr.readLine();
+                    if (currLine == null) break;
+
+                    // do we even want to process this record?
+                    if (filter.isRequired(id)) {
+                        toke = new StringTokenizer(currLine);
+
+                        int idx = 0;
+                        IndexedCount count = new IndexedCount(RNATools.getCodonAlphabet());
+                        while (toke.hasMoreTokens()) {
+                            // check that I haven't read too many values!
+                            if (idx > 63) continue;
+                            count.increaseCount(cutg[idx], Double.parseDouble(toke.nextToken()));
+                            idx++;
+                        }
+
+                        if (idx != 64) continue;
+
+                        // ok, I now have the counts and the name, let's stash it
+                        Distribution codonDist = DistributionTools.countToDistribution(count);
+
+                        CodonPref codonPref = new SimpleCodonPref("UNIVERSAL", codonDist, id);
+                        filter.put(codonPref);
+                    }
+                }
+            }
+        }
+        catch (IOException ioe) {}
+        catch (IllegalSymbolException ise) {}
+        catch (IllegalAlphabetException iae) {}
+        catch (ChangeVetoException cve) {}
+        catch (BioException be) {}
     }
 }
 
