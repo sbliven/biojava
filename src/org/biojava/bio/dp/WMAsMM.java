@@ -29,10 +29,12 @@ import org.biojava.bio.seq.*;
  * Wraps a weight matrix up so that it appears to be a very simple hmm.
  */
 public class WMAsMM implements MarkovModel {
+  private static final int [] advance = {1};
+  private static MagicalState magicalState = MagicalState.getMagicalState(1);
+  
   private WeightMatrix wm;
   private Alphabet stateAlpha;
   private WMState [] stateList;
-  private MagicalState magicalState;
   
   public Alphabet emissionAlphabet() {
     return wm.alphabet();
@@ -172,21 +174,20 @@ public class WMAsMM implements MarkovModel {
   
   public WMAsMM(WeightMatrix wm) throws IllegalResidueException {
     this.wm = wm;
-    stateList = new WMState[wm.columns()];
+    this.stateList = new WMState[wm.columns()];
     SimpleAlphabet sa = new SimpleAlphabet();
     sa.addResidue(magicalState);
+    this.stateAlpha = sa;
     for(int i = 0; i < wm.columns(); i++) {
       stateList[i] = new WMState(i);
       sa.addResidue(stateList[i]);
       stateList[i].setName( "" + (i+1) );
     }
     sa.setName("Weight Matrix columns");
-    this.stateAlpha = sa;
   }
   
   private class WMState extends AbstractState {
-    private int [] advance = {1};
-    private int index;
+    private final int index;
     
     public int index() {
       return index;
@@ -216,7 +217,6 @@ public class WMAsMM implements MarkovModel {
     public WMState(int index) {
       super(emissionAlphabet());
       this.index = index;
-      this.advance = advance;
     }
   }
 }
