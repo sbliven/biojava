@@ -27,7 +27,31 @@ import java.io.IOException;
 
 import org.biojava.bio.seq.*;
 
+/**
+ * An iterator over a bag of sequences.
+ * <P>
+ * java.util.iterator was not apropreate here, as we need specific exceptions
+ * to be thrown, and as much type-saftey as possible. However, we have made it
+ * as complient with iterator as we could so that there is a minimal learning
+ * curve.
+ *
+ * @author Matthew Pocock
+ */
 public interface SequenceIterator {
+  /**
+   * Returns whether there are more sequences to iterate over.
+   *
+   * @return  true if there are more sequences to get and false otherwise
+   */
   boolean hasNext();
+  
+  /**
+   * Returns the next sequence in the iterator.
+   *
+   * @return the next Sequence
+   * @throws NoSuchElementException if you call nextSequence when hasNext
+   *                                returns false
+   * @throws SeqException if for any reason the sequence could not be retrieved
+   */
   Sequence nextSequence() throws NoSuchElementException, SeqException;
 }

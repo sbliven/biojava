@@ -31,6 +31,8 @@ import java.util.ArrayList;
  * It is not required to contain all locations within this range. It is meant
  * to contain getMin or getMax. In the event that an operation would produce an
  * invalid or nonsensical range, empty should be returned.
+ *
+ * @author Matthew Pocock
  */
 public interface Location {
   /**

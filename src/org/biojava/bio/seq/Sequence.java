@@ -22,6 +22,19 @@
 
 package org.biojava.bio.seq;
 
+/**
+ * A sequence.
+ * <P>
+ * This interface is a residue list, so it contains residues. It is annotatable
+ * so that you can add annotation to it, and it is a FeatureHolder so that you
+ * can add information to regions of it.
+ * <P>
+ * It is expected that there may be several implementations of this interface,
+ * each of which may be failry heavy-weight. It takes the ResidueList interface]
+ * that is nice mathematicaly, and turns it into a biologicaly useful object.
+ *
+ * @author Matthew Pocock
+ */
 public interface Sequence extends ResidueList, FeatureHolder, Annotatable {
   /**
    * The URN for this sequence. This will be something like

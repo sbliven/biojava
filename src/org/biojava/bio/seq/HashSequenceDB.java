@@ -26,10 +26,26 @@ import java.util.*;
 
 import org.biojava.bio.seq.*;
 
+/**
+ * An implementation of SequenceDB that uses an underlying HashMap to stoor the
+ * sequence objects.
+ *
+ * @author Matthew Pocock
+ */
 public class HashSequenceDB implements SequenceDB {
+  /**
+   * The sequence-by-id map.
+   */
   private Map sequenceByID;
+  
+  /**
+   * An object to extract an ID for a sequence.
+   */
   private IDMaker idMaker;
   
+  /**
+   * Initialize sequenceByID.
+   */
   {
     sequenceByID = new HashMap();
   }
@@ -63,7 +79,10 @@ public class HashSequenceDB implements SequenceDB {
   }
   
   /**
-   * Make a little one of these to define how to make an ID for a sequence.
+   * You should make one of these to define how to make an ID for a sequence.
+   * <P>
+   * This gives you the freedom to re-map names from the fasta names to some
+   * other representation if you need to.
    */
   public static interface IDMaker {
     /**

@@ -30,9 +30,12 @@ import java.io.Serializable;
  * This may implement arbitrary rules, or be based upon the feature's
  * annotation, type, location or source.
  * <P>
- * If the filter is to be used in a remote process, it is expected that it would
- * be serialized and sent over to run remotely, rather than each feature being retrieved
- * localy.
+ * If the filter is to be used in a remote process, it is recognized that it may
+ * be serialized and sent over to run remotely, rather than each feature being
+ * retrieved localy.
+ *
+ * @author Matthew Pocock
+ * @author Thomas Down
  */
 public interface FeatureFilter extends Serializable {
   /**
@@ -62,6 +65,12 @@ public interface FeatureFilter extends Serializable {
    */
   static class ByType implements FeatureFilter {
     private String type;
+    /**
+     * Create a ByType filter that filters in all features with type fields
+     * equal to type.
+     *
+     * @param type  the String to match type fields against
+     */
     public ByType(String type) {
       this.type = type;
     }
@@ -73,6 +82,12 @@ public interface FeatureFilter extends Serializable {
    */
   static class BySource implements FeatureFilter {
     private String source;
+    /**
+     * Create a BySource filter that filters in all features which have sources
+     * equal to source.
+     *
+     * @param type  the String to match source fields against
+     */
     public BySource(String source) {
       this.source = source;
     }

@@ -33,6 +33,8 @@ package org.biojava.bio.seq;
  * of any state information. A particular implementation may override this
  * concept so that different Residue objects are considered to be examples
  * of the same type of residue.
+ *
+ * @author Matthew Pocock
  */
 public interface Residue extends Annotatable {
   /**

@@ -27,7 +27,16 @@ import java.util.NoSuchElementException;
 /**
  * The set of Residues which can be concatinated together to make a ResidueList.
  * <P>
- * 
+ * The alphabet functions as the repository of objects in the fly-weight design
+ * pattern. Only residues within an alphabet should appear in object that claim
+ * to use the alphabet - otherwise something is in error.
+ * <P>
+ * The alphabet concept may need to be widened to include alphabets that extend
+ * others, or checks to see if two alphabets are equivalent, or other set-wise
+ * operations. As yet, I have baulked at this as it may make Alphabet too heavy
+ * to easily implement.
+ *
+ * @author Matthew Pocock
  */
 public interface Alphabet extends Annotatable {
   /**
@@ -46,6 +55,9 @@ public interface Alphabet extends Annotatable {
   
   /**
    * A list of residues that make up this alphabet.
+   * <P>
+   * Subsequent calls to this method are not required to return either the same
+   * residue list, or even a residue list with the residues in the same order.
    *
    * @return  a ResidueList containing one Residue for each Residue in this alphabet
    */
@@ -62,6 +74,11 @@ public interface Alphabet extends Annotatable {
   /**
    * Throws a precanned IllegalResidueException if the residue is not contained
    * within this Alphabet.
+   * <P>
+   * This function is used all over the code to validate residues as they enter
+   * a method. Also, the code is littered with catches for
+   * IllegalResidueException. There is a preferred style of handeling this,
+   * which should be covererd in the package documentation.
    *
    * @param r the Residue to validate
    * @throws  IllegalResidueException if r is not contained in this alphabet
@@ -73,10 +90,12 @@ public interface Alphabet extends Annotatable {
    * <P>
    * The parser returned is guaranteed to return Residues and ResidueLists that
    * conform to this alphabet.
+   * <P>
    * Every alphabet should have a ResidueParser under the name 'symbol' that
-   * uses the residue symbol characters to translate a string into a ResidueList. Likewise,
-   * there should be a ResidueParser under the name 'name' that uses residue names to
-   * identify residues.
+   * uses the residue symbol characters to translate a string into a
+   * ResidueList. Likewise, there should be a ResidueParser under the name
+   * 'name' that uses residue names to identify residues. Any other names may
+   * also be defined, but the behaviour of that parser is not defined here.
    *
    * @param name  the name of the parser
    * @return  a parser for that name
@@ -84,8 +103,14 @@ public interface Alphabet extends Annotatable {
    */
   ResidueParser getParser(String name) throws NoSuchElementException;
   
+  /**
+   * A realy useful static alphabet that is always empty.
+   */
   static final Alphabet EMPTY_ALPHABET = new EmptyAlphabet();
   
+  /**
+   * The class that implements Alphabet and is empty.
+   */
   public class EmptyAlphabet implements Alphabet {
     public String getName() {
       return "Empty Alphabet";

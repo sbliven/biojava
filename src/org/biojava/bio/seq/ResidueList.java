@@ -28,6 +28,8 @@ import java.util.*;
  * A sequence of residues that belong to an alphabet.
  * <P>
  * This uses biological coordinates (1 to length).
+ *
+ * @author Matthew Pocock
  */
 public interface ResidueList {
   /**
@@ -88,8 +90,15 @@ public interface ResidueList {
    */
   ResidueList subList(int start, int end) throws IndexOutOfBoundsException;
   
+  /**
+   * A usefull object that represents an empty residue list, to avoid returning
+   * null.
+   */
   static final ResidueList EMPTY_LIST = new EmptyResidueList();
   
+  /**
+   * The empty immutable implementation.
+   */
   class EmptyResidueList implements ResidueList {
     public Alphabet alphabet() {
       return Alphabet.EMPTY_ALPHABET;

@@ -24,12 +24,18 @@ package org.biojava.bio.seq;
 
 /**
  * Flags an object as having associated annotation.
+ * <P>
+ * This interface was introduced in retrospect so that UI code could interogate
+ * an object to see if it was Annotatable, and if so pop up a suitable GUI for
+ * browsing the annotation.
+ *
+ * @author  Matthew Pocock
  */
 public interface Annotatable {
   /**
    * Should return the associated annotation object.
    *
-   * @return	an Annotation object, not null
+   * @return	an Annotation object, never null
    */
   Annotation getAnnotation();
 }

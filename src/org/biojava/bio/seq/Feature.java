@@ -28,6 +28,11 @@ package org.biojava.bio.seq;
  * Features contain annotation and a location. The type of the feature
  * is something like 'Repeat' or 'BetaStrand'. The source of the feature is
  * something like 'genscan', 'repeatmasker' or 'made-up'.
+ * <P>
+ * We may need some standardisation for what the fields mean. In particular, we
+ * should be compliant where sensible with GFF.
+ *
+ * @author Matthew Pocock
  */
 public interface Feature extends FeatureHolder, Annotatable {
   /**
@@ -47,7 +52,7 @@ public interface Feature extends FeatureHolder, Annotatable {
   String getType();
   
   /**
-   * The source of the feature.
+   * The source of the feature. This may be a program or process.
    *
    * @return the source, or generator
    */
@@ -58,6 +63,9 @@ public interface Feature extends FeatureHolder, Annotatable {
    * <P>
    * The residues may not be contiguous in the original sequence, but they
    * will be concatinated together in the resulting ResidueList.
+   * <P>
+   * The order of the Residues within the resulting residue list will be 
+   * according to the concept of ordering within the location object.
    *
    * @return  a ResidueList containing each residue of the parent sequence contained
    *          within this feature in the order they appear in the parent

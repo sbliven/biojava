@@ -24,6 +24,18 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 
+/**
+ * An implementation of Alphabet that grows the alphabet to accomodate all
+ * the characters seen while parsing a file.
+ * <P>
+ * The contains and validate methods will still work as for other alphabets, but
+ * the parsers will generate new residue objects for each symbol or name seen.
+ * <P>
+ * This is particularly useful when reading in arbitrary alphabet files where
+ * you don't want to invest the time and effort writing a formal alphabet.
+ *
+ * @author Matthew Pocock
+ */
 public class AllSymbolsAlphabet implements Alphabet {
   private Map symbolToResidue; // symbol->residue
   private Map nameToResidue; // name->residue

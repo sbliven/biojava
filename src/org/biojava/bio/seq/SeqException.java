@@ -24,6 +24,11 @@ package org.biojava.bio.seq;
 
 import org.biojava.bio.BioException;
 
+/**
+ * The generic exception to throw for sequence-related problems.
+ *
+ * @author Matthew Pocock
+ */
 public class SeqException extends BioException {
   public SeqException(String message) {
   	super(message);

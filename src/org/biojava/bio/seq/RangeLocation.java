@@ -25,6 +25,10 @@ package org.biojava.bio.seq;
 /**
  * A simple implementation of Location that contains all points between
  * getMin and getMax inclusive.
+ * <P>
+ * This will in practice bee the most commonly used pure-java implementation.
+ *
+ * @author Matthew Pocock
  */
 public class RangeLocation implements Location {
   /**

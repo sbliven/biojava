@@ -24,11 +24,34 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 
+/**
+ * A parser that uses a fixed with window of characters to look up the
+ * associated residue.
+ * <P>
+ * The string will be chunked up into substrings the size of the window, and
+ * each substring will be converted into a Residue object.
+ *
+ * @author Matthew Pocock
+ */
 public class FixedWidthParser implements ResidueParser {
+  /**
+   * The alphabet for this parser.
+   */
   private Alphabet alpha;
+  
+  /**
+   * The length of each token.
+   */
   private int tokenLength;
+  
+  /**
+   * Map from token to residue.
+   */
   private Map tokenToResidue;
 
+  /**
+   * Initialize tokenToResidue.
+   */
   {
     tokenToResidue = new HashMap();
   }

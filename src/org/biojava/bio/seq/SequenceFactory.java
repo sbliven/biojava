@@ -22,7 +22,27 @@
 
 package org.biojava.bio.seq;
 
+/**
+ * The interface for objects that will manufacture sequences.
+ * <P>
+ * The factory layer is in here as sequences are potentialy heavy-weight, so we
+ * want to decouple their possibly complicated creation from the code that wants
+ * to make them.
+ *
+ * @author Matthew Pocock
+ */
 public interface SequenceFactory {
+  /**
+   * Creates a sequence using these parameters.
+   * <P>
+   * The annotation is under the same contract as in FeatureFactory.
+   *
+   * @param resList the ResidueList defining the 'sequence'
+   * @param uri the uri
+   * @param name   the name
+   * @param annotation  a hint for the annotation of the resulting sequence
+   * @return  a new Sequence object
+   */
   Sequence createSequence(ResidueList resList,
                           String uri, String name, Annotation annotation);
 }

@@ -26,6 +26,10 @@ import java.util.*;
 
 /**
  * A single residue.
+ * <P>
+ * min and max equal the location of the single residue.
+ *
+ * @author Matthew Pocock
  */
 public class PointLocation implements Location {
   /**

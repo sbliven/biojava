@@ -24,12 +24,34 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 
+/**
+ * A comlex location. It is made up from multiple sub-locations and is essential
+ * the point-wise union of the child locations.
+ * <P>
+ * Currently this is implemented very badly. I need a maths person to look over
+ * it, and sort stuff out.
+ *
+ * @author Matthew Pocock
+ */
 public class CompoundLocation implements Location {
+  /**
+   * The list of child locations in no particular order.
+   */
   private List locations;
 
-  int min = Integer.MAX_VALUE;
-  int max = Integer.MIN_VALUE;
+  /**
+   * Minimum index contained.
+   */
+  private int min = Integer.MAX_VALUE;
 
+  /**
+   * Maximum index contained.
+   */
+  private int max = Integer.MIN_VALUE;
+
+  /**
+   * Set up the member variables.
+   */
   {
     locations = new ArrayList();
   }

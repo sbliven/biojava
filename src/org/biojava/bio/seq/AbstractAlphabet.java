@@ -24,6 +24,15 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 
+/**
+ * An abstract implementation of Alphabet.
+ * <P>
+ * This provides the frame-work for maintaining the ResidueParser <-> name
+ * mappings.
+ * <P>
+ * This class is for developers to derive from, not for use directly.
+ *
+ * @author Matthew Pocock
 public abstract class AbstractAlphabet implements Alphabet {
   private Map parserByName;
   {

@@ -22,7 +22,26 @@
 
 package org.biojava.bio.seq;
 
+/**
+ * The exception to indicate that a residue is not valid within a context.
+ * <P>
+ * The usual reason for throwing an IllegalResidueException is that you are
+ * trying to add a residue to a sequence with an alpabet that does not contain
+ * the residue. This is the sequence/alphabet equivalent of a ClassCastException
+ * for objects.
+ * <P>
+ * Frequently, these excepions are actualy generated from Alphabet.validate.
+ *
+ * @author Matthew Pocock
+ */
 public class IllegalResidueException extends Exception {
+  /**
+   * Just make the exception.
+   */
   public IllegalResidueException() { super(); }
+  
+  /**
+   * Make the exception with a message.
+   */
   public IllegalResidueException(String message) { super(message); }
 }

@@ -24,11 +24,30 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 
+/**
+ * A simple no-frills implementation of the Alphabet interface.
+ *
+ * @author Matthew Pocock
+ */
 public class SimpleAlphabet extends AbstractAlphabet {
+  /**
+   * The name of this alphabet.
+   */
   private String name;
+  
+  /**
+   * The annotation associated with this alphabet.
+   */
   private Annotation annotation;
+  
+  /**
+   * A set of all residues within the alphabet.
+   */
   private Set residues;
 
+  /**
+   * Initialize the residues set.
+   */
   {
     residues	= new HashSet();
   }

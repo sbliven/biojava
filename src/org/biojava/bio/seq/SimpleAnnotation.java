@@ -24,15 +24,35 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 
+/**
+ * A no-frills implementation of Annotation that is just a wrapper around a Map.
+ *
+ * @author Matthew Pocock
+ */
 public class SimpleAnnotation implements Annotation {
+  /**
+   * The properties map.
+   * <P>
+   * This may be null if no property values have yet been set.
+   */
   private Map properties;
   
+  /**
+   * Retrieves properties, potentialy creating it if it was null.
+   *
+   * @return the properties Map
+   */
   protected final Map getProperties() {
     if(!propertiesAllocated())
       properties = new HashMap();
     return properties;
   }
 
+  /**
+   * A convenience method to see if we have allocated the properties map yet.
+   *
+   * @returns true if properties is set and false otherwise
+   */
   protected final boolean propertiesAllocated() {
     return properties != null;
   }

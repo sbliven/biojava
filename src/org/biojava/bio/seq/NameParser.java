@@ -26,11 +26,23 @@ import java.util.*;
 
 /**
  * This uses residue symbols to parse characters into residues.
+ *
+ * @author Matthew Pocock
  */
 public class NameParser implements ResidueParser {
+  /**
+   * The alphabet to parse symbols to.
+   */
   private Alphabet alphabet;
+  
+  /**
+   * The map of symbols to residues.
+   */
   private Map nameToResidue;
   
+  /**
+   * Initialize the nameToResidue map.
+   */
   {
     nameToResidue = new HashMap();
   }

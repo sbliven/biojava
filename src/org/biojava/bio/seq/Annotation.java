@@ -25,11 +25,27 @@ package org.biojava.bio.seq;
 import java.util.*;
 
 /**
- * Annotation for many, many biological objects.
+ * Arbitrary annotation associated with one or more objects.
+ * <P>
+ * Biological information often does not fit design patterns very well, and can
+ * be a jumble of facts and relationships. Annotation object provide a standard
+ * way for you to stoor this mess as a property of an object.
+ * <P>
+ * Annotations may contain keys that have Annotations as values. In this way,
+ * annotations can be shaired among multiple Annotatable objects, and you can
+ * represent semi-structured data.
+ * <P>
+ * It is perfectly possible to wrap up almost any tree-like or flat data
+ * structure as Annotation.
+ *
+ * @author Matthew Pocock
  */
 public interface Annotation {
   /**
    * Retrieve the value of a property by key.
+   * <P>
+   * Unlike the Map collections, it will complain if the key does not exist. It
+   * will only return null if the key is defined and has value null.
    *
    * @param key  the key of the property to retrieve
    * @return  the object associated with that key
@@ -41,7 +57,8 @@ public interface Annotation {
    * Set the value of a property.
    * <P>
    * This method throws an exception if either properties can not be
-   * added to this object, or that this particular property is immutable.
+   * added to this object, or that this particular property is immutable or
+   * illegal within the implementation.
    *
    * @param key the key object
    * @param value the new value for this key
@@ -59,8 +76,18 @@ public interface Annotation {
    */
   Set keys();
   
+  /**
+   * A realy usefull empty and immutable annotation object.
+   * <P>
+   * Use this instead of null when you realy don't want an object or an
+   * implementation to have annotation even though it should implement
+   * Annotatable.
+   */
   static final Annotation EMPTY_ANNOTATION = new EmptyAnnotation();
   
+  /**
+   * The empty and immutable implementation.
+   */
   class EmptyAnnotation implements Annotation {
     public Object getProperty(Object key) throws NoSuchElementException {
       throw new NoSuchElementException("There are no keys in the Empty Annotaion object: " + key);
