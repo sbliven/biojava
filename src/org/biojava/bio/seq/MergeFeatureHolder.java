@@ -40,6 +40,11 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
 	featureHolders = new HashSet();
     }
 
+    /**
+     * Add an extra FeatureHolder to the set of FeatureHolders which
+     * are merged.
+     */
+
     public void addFeatureHolder(FeatureHolder fh) {
 	featureHolders.add(fh);
     }
@@ -61,6 +66,19 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
 
     public Iterator features() {
 	return new MFHIterator();
+    }
+
+    /**
+     * When applied to a MergeFeatureHolder, this filters each child
+     * FeatureHolder independantly.
+     */
+
+    public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+	MergeFeatureHolder mfh = new MergeFeatureHolder();
+	for (Iterator fhi = featureHolders.iterator(); fhi.hasNext(); ) {
+	    FeatureHolder fh = (FeatureHolder) fhi.next();
+	    mfh.addFeatureHolder(fh.filter(ff, recurse));
+	}
     }
 
     private class MFHIterator implements Iterator {
