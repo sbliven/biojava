@@ -15,6 +15,8 @@ import org.biojava.bio.*;
 class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
   private /*final*/ FiniteAlphabet alpha;
   private Symbol[] symbols;
+  private ChangeListener indexBuilder;
+  private ChangeListener adapter;
 
   // hack for bug in compaq 1.2?
   protected ChangeSupport getChangeSupport(ChangeType ct) {
@@ -30,12 +32,12 @@ class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
     this.symbols = buildIndex(alpha);
     
     alpha.addChangeListener(
-      new IndexRebuilder(),
+      indexBuilder = new IndexRebuilder(),
       Alphabet.SYMBOLS
     );
     
     this.addChangeListener(
-      new ChangeAdapter() {
+      adapter = new ChangeAdapter() {
         public void postChange(ChangeEvent ce) {
           symbols = (Symbol[] ) ce.getChange();
         }
