@@ -140,6 +140,7 @@ public interface CollectionConstraint {
      * members must be acceptable by the given cardinality constraint.
      *
      * @author Thomas Down
+     * @author Matthew Pocock
      */
     
     public class AllValuesIn implements CollectionConstraint {
@@ -242,6 +243,10 @@ public interface CollectionConstraint {
                 return subConstraintOf(cco.getChild1()) && subConstraintOf(cco.getChild2());
             }
             return false;
+        }
+        
+        public String toString() {
+          return "AllValuesIn: (" + pc.toString() + ", " + card.toString() + ")";
         }
     }
     
@@ -349,6 +354,10 @@ public interface CollectionConstraint {
                 return subConstraintOf(cco.getChild1()) && subConstraintOf(cco.getChild2());
             }
             return false;
+        }
+        
+        public String toString() {
+          return "Contains: (" + pc.toString() + ", " + card.toString() + ")";
         }
     }
     

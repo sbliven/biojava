@@ -94,6 +94,29 @@ public class SimpleGFFRecord implements GFFRecord {
 		this.groupAttributes = new SmallMap(rec.getGroupAttributes());
 	}
 
+        public SimpleGFFRecord(
+          String seqName,
+          String source,
+          String feature,
+          int start,
+          int end,
+          double score,
+          StrandedFeature.Strand strand,
+          int frame,
+          String comment,
+          Map groupAttributes
+        ) {
+          this.seqName = seqName;
+          this.source = source;
+          this.feature = feature;
+          this.start = start;
+          this.end = end;
+          this.score = score;
+          this.strand = strand;
+          this.frame = frame;
+          this.comment = comment;
+          this.groupAttributes = new SmallMap(groupAttributes);
+        }
 
    /**
 	 * Create a new SimpleGFFRecord with values set to null or zero
