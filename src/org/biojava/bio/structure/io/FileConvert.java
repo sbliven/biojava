@@ -227,6 +227,7 @@ public class FileConvert {
 		Chain chain = (Chain)structure.getChain(modelnr,chainnr); 
 		xw.openTag("chain");
 		xw.attribute("id",chain.getName());
+		xw.attribute("SwissprotId",chain.getSwissprotId() );
 		if (structure.isNmr()){
 		    xw.attribute("model",Integer.toString(modelnr+1));
 		}
