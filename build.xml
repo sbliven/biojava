@@ -157,6 +157,13 @@
         <exclude name="**/CVS/**" />
       </fileset>
     </copy>
+    
+    <!-- Copies jars -->
+    <copy todir="${build.dir}">
+      <fileset dir=".">
+        <include name="*.jar"/>
+      </fileset>
+    </copy>
   </target>
 
   <target name="prepare-14" if="java14">
