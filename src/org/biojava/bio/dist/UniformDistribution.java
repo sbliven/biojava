@@ -57,7 +57,7 @@ implements Serializable {
   
   protected double getWeightImpl(AtomicSymbol s)
   throws IllegalSymbolException {
-    return 1.0;
+    return (1.0 / alphabet.size());
   }
   
   protected void setWeightImpl(AtomicSymbol sym, double weight)
