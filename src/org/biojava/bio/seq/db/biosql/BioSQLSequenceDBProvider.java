@@ -32,7 +32,7 @@ public class BioSQLSequenceDBProvider implements SequenceDBProvider {
 	return "biosql";
     }
 
-    public SequenceDB getSequenceDB(Map config)
+    public SequenceDBLite getSequenceDB(Map config)
         throws RegistryException, BioException
     {
 	String location = (String) config.get("location");
