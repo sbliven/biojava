@@ -41,25 +41,25 @@ import org.biojava.utils.ChangeVetoException;
 public class SimpleLabelRenderer
 extends AbstractChangeable
 implements LabelRenderer{
-  private static final ChangeType LABEL = new ChangeType(
+  public static final ChangeType LABEL = new ChangeType(
     "The label has changed",
     "org.biojava.bio.gui.sequence.SimpleLabelRenderer",
     "LABEL",
     SequenceRenderContext.LAYOUT
   );
-  
+
   private static final AffineTransform FLIP =
-    new AffineTransform(0.0, 1.0, -1.0, 0.0, 0.0, 0.0); 
+    new AffineTransform(0.0, 1.0, -1.0, 0.0, 0.0, 0.0);
   private String label;
   private Shape labelGlyphH;
   private Shape labelGlyphV;
-  
+
   protected Shape getLabelGlyph(
         SequenceRenderContext src,
         FontRenderContext frc
   ) {
     Shape s;
-    
+
     if (src.getDirection() == SequenceRenderContext.HORIZONTAL) {
       if(labelGlyphH == null) {
         Font font = src.getFont();
@@ -73,10 +73,10 @@ implements LabelRenderer{
       }
       s = labelGlyphV;
     }
-    
+
     return s;
   }
-  
+
   public void setLabel(String label)
   throws ChangeVetoException {
     if(hasListeners()) {
@@ -99,7 +99,7 @@ implements LabelRenderer{
       this.labelGlyphV = null;
     }
   }
-    
+
   public String getLabel() {
     return label;
   }
@@ -113,7 +113,7 @@ implements LabelRenderer{
     GlyphVector gv = f.createGlyphVector(frc, label);
     return gv.getVisualBounds().getWidth();
   }
-  
+
   public void paint(
     Graphics2D g, SequenceRenderContext sp,
     int min, int max, SequenceRenderContext.Border side
@@ -135,7 +135,7 @@ implements LabelRenderer{
       renderLabel(g, labelGlyph, labelBox, sp, side);
     }*/
   }
-  
+
   private void renderLabel(
       Graphics2D g,
       Shape gv, Rectangle2D labelBox,
@@ -147,8 +147,8 @@ implements LabelRenderer{
       if (sp.getDirection() == SequenceRenderContext.HORIZONTAL) {
         across = labelBox.getCenterY() - bounds.getCenterY();
 	int balign = border.getAlignment();
-        
-        if (balign == SequenceRenderContext.Border.LEADING) 
+
+        if (balign == SequenceRenderContext.Border.LEADING)
             along = labelBox.getMinX() - bounds.getMinX();
         else if (balign == SequenceRenderContext.Border.TRAILING)
             along = labelBox.getMaxX() - bounds.getMaxX();
