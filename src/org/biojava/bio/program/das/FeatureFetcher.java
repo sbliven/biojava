@@ -322,6 +322,10 @@ class FeatureFetcher {
 		    if (segStop != null) {
 			siol.addSequenceProperty("sequence.stop", segStop);
 		    }
+		    String segVersion = attrs.getValue("version");
+		    if (segVersion != null) {
+			siol.addSequenceProperty("sequence.version", segVersion);
+		    }
 		} catch (ParseException ex) {
 		    throw new SAXException(ex);
 		}

@@ -73,6 +73,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     public static final String PROPERTY_FEATUREID = "org.biojava.bio.program.das.feature_id";
     public static final String PROPERTY_FEATURELABEL = "org.biojava.bio.program.das.feature_label";
     public static final String PROPERTY_LINKS = "org.biojava.bio.program.das.links";
+    public static final String PROPERTY_SEQUENCEVERSION = "org.biojava.bio.program.das.sequence_version";
 
     public static final int SIZE_THRESHOLD = 500000;
     
@@ -80,6 +81,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     private Alphabet alphabet = DNATools.getDNA();
     private URL dataSourceURL;
     private String seqID;
+    private String version = null;
     private FeatureRealizer featureRealizer = FeatureImpl.DEFAULT;
     private FeatureRequestManager.Ticket structureTicket;
 
@@ -159,6 +161,8 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 		    }
 		} else if (key.equals("sequence.stop")) {
 		    length = Integer.parseInt(value.toString());
+		} else if (key.equals("sequence.version")) {
+		    version = value.toString();
 		}
 	    } catch (NumberFormatException ex) {
 		throw new ParseException(ex, "Expect numbers for segment start and stop");
@@ -666,7 +670,13 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     //
 
     public Annotation getAnnotation() {
-	return Annotation.EMPTY_ANNOTATION;
+	try {
+	    Annotation anno = new SmallAnnotation();
+	    anno.setProperty(PROPERTY_SEQUENCEVERSION, version);
+	    return anno;
+	} catch (ChangeVetoException ex) {
+	    throw new BioError("Expected to be able to modify annotation");
+	}
     }
 
     //

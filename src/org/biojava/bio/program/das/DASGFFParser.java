@@ -141,6 +141,10 @@ class DASGFFParser {
 	    } catch (NumberFormatException ex) {}
 	    siol.addSequenceProperty("sequence.stop", segStop);
 	}
+	String segVersion = el.getAttribute("version");
+	if (segVersion != null) {
+	    siol.addSequenceProperty("sequence.version", segVersion);
+	}
 
 	Node segChld = el.getFirstChild();
 	while (segChld != null) {
