@@ -51,9 +51,6 @@ public class RevCompSequence extends SimpleSequence{
     
     public RevCompSequence(Sequence seq)throws IllegalAlphabetException{
         this(seq,seq.getURN(),seq.getName(),seq.getAnnotation());
-//        pfh = new ProjectedFeatureHolder(seq,this,seq.length()+1,true);
-//        pfh.setIsCachingProjections(false);
-//        origSeq = seq;
     }
     
     
@@ -115,6 +112,10 @@ public class RevCompSequence extends SimpleSequence{
 //        return pfh.projectFeature(f);
 //    }
 
+    public Location getRCLocation(Location l){
+        return pfh.getProjectedLocation(l);
+    }
+
     /**
     * createFeature() will call createFeature() on the underlying Sequence.
     * returns the feature as it will be projected onto the reverse complement sequence 
@@ -151,7 +152,7 @@ public class RevCompSequence extends SimpleSequence{
     
     /**
     * clone() should make a complete copy of the Sequence with  all features (and children) and return
-    * a SimpleSequence that is unconnected from the orignial sequence.
+    * a SimpleSequence that is unconnected from the original sequence.
     */
     
     public Object clone(){
