@@ -1,3 +1,5 @@
+package seq;
+
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
@@ -5,7 +7,7 @@ import org.biojava.bio.seq.*;
 public class TestTranslation {
   public static void main(String [] args) {
     try {
-      SymbolList randomSeq = SeqTools.createSymbolList(30);
+      SymbolList randomSeq = symbol.Tools.createSymbolList(30);
       SymbolList rev = new ReverseSymbolList(randomSeq);
       SymbolList revComp = DNATools.complement(rev);
       SymbolList codons = new WindowedSymbolList(revComp, 3);

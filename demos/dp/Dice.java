@@ -18,6 +18,7 @@
  *      http://www.biojava.org/
  *
  */
+package dp;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
@@ -58,42 +59,44 @@ public class Dice
 	}  
   
     	int [] advance = { 1 };
-	EmissionState fair   = StateFactory.DEFAULT.createState(diceAlphabet, advance, "fair");
-	EmissionState loaded = StateFactory.DEFAULT.createState(diceAlphabet, advance, "loaded");
+	Distribution fairD = DistributionFactory.DEFAULT.createDistribution(diceAlphabet);
+  EmissionState fairS = new SimpleEmissionState("fair", Annotation.EMPTY_ANNOTATION, advance, fairD);
+	Distribution loadedD = DistributionFactory.DEFAULT.createDistribution(diceAlphabet);
+  EmissionState loadedS = new SimpleEmissionState("loaded", Annotation.EMPTY_ANNOTATION, advance, loadedD);
 	
-	SimpleMarkovModel casino=new SimpleMarkovModel(1, diceAlphabet);
-	casino.addState(fair);
-	casino.addState(loaded);
+	SimpleMarkovModel casino = new SimpleMarkovModel(1, diceAlphabet);
+	casino.addState(fairS);
+	casino.addState(loadedS);
 	
 	//set up transitions between states.
-	casino.createTransition(casino.magicalState(),fair);
-	casino.createTransition(casino.magicalState(),loaded);
-	casino.createTransition(fair,casino.magicalState());
-	casino.createTransition(loaded,casino.magicalState());
-	casino.createTransition(fair,loaded);
-	casino.createTransition(loaded,fair);
-	casino.createTransition(fair,fair);
-	casino.createTransition(loaded,loaded);
+	casino.createTransition(casino.magicalState(),fairS);
+	casino.createTransition(casino.magicalState(),loadedS);
+	casino.createTransition(fairS,casino.magicalState());
+	casino.createTransition(loadedS,casino.magicalState());
+	casino.createTransition(fairS,loadedS);
+	casino.createTransition(loadedS,fairS);
+	casino.createTransition(fairS,fairS);
+	casino.createTransition(loadedS,loadedS);
 	
 	//set up emission probabilities.
 	for(int i=0;i<rolls.length;i++)
 	{
-	    fair.setWeight(rolls[i],-Math.log(6));
-	    loaded.setWeight(rolls[i],-Math.log(10));
+	    fairD.setWeight(rolls[i],-Math.log(6));
+	    loadedD.setWeight(rolls[i],-Math.log(10));
 	}
-	loaded.setWeight(rolls[5],-Math.log(2));
+	loadedD.setWeight(rolls[5],-Math.log(2));
 	
 	//set up transition scores.
-	casino.setTransitionScore(casino.magicalState(),fair,  Math.log(0.8));
-	casino.setTransitionScore(casino.magicalState(),loaded,Math.log(0.2));
+	casino.setTransitionScore(casino.magicalState(),fairS,  Math.log(0.8));
+	casino.setTransitionScore(casino.magicalState(),loadedS,Math.log(0.2));
 
-	casino.setTransitionScore(fair,loaded,               Math.log(0.04));
-	casino.setTransitionScore(fair,fair,                 Math.log(0.95));
-	casino.setTransitionScore(fair,casino.magicalState(),Math.log(0.01));
+	casino.setTransitionScore(fairS,loadedS,               Math.log(0.04));
+	casino.setTransitionScore(fairS,fairS,                 Math.log(0.95));
+	casino.setTransitionScore(fairS,casino.magicalState(), Math.log(0.01));
 	
-	casino.setTransitionScore(loaded,fair,                 Math.log(0.09));
-	casino.setTransitionScore(loaded,loaded,               Math.log(0.90));
-	casino.setTransitionScore(loaded,casino.magicalState(),Math.log(0.01));
+	casino.setTransitionScore(loadedS,fairS,                 Math.log(0.09));
+	casino.setTransitionScore(loadedS,loadedS,               Math.log(0.90));
+	casino.setTransitionScore(loadedS,casino.magicalState(), Math.log(0.01));
 	
 	DP dp=DPFactory.createDP(casino);
 	StatePath obs_rolls = dp.generate(300);

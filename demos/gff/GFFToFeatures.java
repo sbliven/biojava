@@ -18,7 +18,8 @@
  *      http://www.biojava.org/
  *
  */
- 
+package gff;
+
 import java.io.*;
 import java.util.*;
 

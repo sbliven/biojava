@@ -1,3 +1,5 @@
+package BioCorba;
+
 import java.io.*;
 import org.omg.CORBA.*;
 

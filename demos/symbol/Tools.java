@@ -18,6 +18,8 @@
  *      http://www.biojava.org/
  *
  */
+package symbol;
+ 
 import java.util.*;
 
 import org.biojava.bio.*;
@@ -42,6 +44,6 @@ public class Tools {
     for(int i = 0; i < length; i++) {
       l.add(DNATools.forIndex((int) (4.0*Math.random())));
     }
-    return new SimpleSymbolList(DNATools.getAlphabet(), l);
+    return new SimpleSymbolList(DNATools.getDNA(), l);
   }
 }

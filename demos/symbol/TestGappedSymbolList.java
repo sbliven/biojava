@@ -18,7 +18,8 @@
  *      http://www.biojava.org/
  *
  */
-
+package symbol;
+ 
 import java.util.*;
 import java.io.*;
 

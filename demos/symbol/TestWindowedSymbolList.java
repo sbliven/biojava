@@ -1,3 +1,5 @@
+package symbol;
+
 import java.util.*;
 
 import org.biojava.bio.symbol.*;

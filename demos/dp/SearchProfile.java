@@ -1,3 +1,5 @@
+package dp;
+
 import java.io.*;
 import java.util.*;
 
@@ -8,14 +10,14 @@ import org.biojava.bio.seq.io.*;
 import org.biojava.bio.dp.*;
 
 public class SearchProfile {
-  public static EmissionState nullModel;
+  public static Distribution nullModel;
   
   public static void main(String [] args) {
     try {
       File seqFile = new File(args[0]);
 
-      FiniteAlphabet PROTEIN = ProteinTools.getXAlphabet();
-      nullModel = createNullModel(PROTEIN);
+      FiniteAlphabet PROTEIN = ProteinTools.getAlphabet();
+      nullModel = UniformDistribution.createInstance(PROTEIN);
       
       System.out.println("Loading sequences");
       SequenceDB seqDB = readSequenceDB(seqFile, PROTEIN);
@@ -90,7 +92,7 @@ public class SearchProfile {
     System.out.println("Estimating alignment as having length " + length);
     ProfileHMM profile = new ProfileHMM(
       alpha, length,
-      StateFactory.DEFAULT, StateFactory.DEFAULT
+      DistributionFactory.DEFAULT, DistributionFactory.DEFAULT
     );
     
     randomize(profile);
@@ -129,8 +131,10 @@ public class SearchProfile {
       State s = (State) i.next();
       if(s instanceof EmissionState && !(s instanceof MagicalState) ) {
         EmissionState es = (EmissionState) s;
+        Distribution dis = es.getDistribution();
+        FiniteAlphabet fa = (FiniteAlphabet) dis.getAlphabet();
         for(
-          Iterator j = ((FiniteAlphabet) es.alphabet()).symbols().iterator();
+          Iterator j = fa.iterator();
           j.hasNext();
         ) {
           Symbol r = (Symbol) j.next();
@@ -145,18 +149,6 @@ public class SearchProfile {
     
     mt.train();
     mt.clearCounts();
-  }
-  
-  private static EmissionState createNullModel(FiniteAlphabet alpha)
-  throws IllegalSymbolException, IllegalAlphabetException {
-    EmissionState nm = StateFactory.DEFAULT.createState(
-      alpha, new int[] { 1 }, "null-model"
-    );
-    double weight = -Math.log(alpha.size());
-    for(Iterator i = alpha.symbols().iterator(); i.hasNext(); ) {
-      nm.setWeight((Symbol) i.next(), weight);
-    }
-    return nm;
   }
   
   private static void dumpDP(DP dp) {

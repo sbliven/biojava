@@ -1,3 +1,5 @@
+package seq;
+
 import java.io.*;
 
 import org.biojava.bio.*;
@@ -17,7 +19,7 @@ public class TestGenbank {
       BufferedReader gReader = new BufferedReader(
         new InputStreamReader(new FileInputStream(genbankFile)));
       SequenceFactory sFact = new SimpleSequenceFactory();
-      Alphabet alpha = DNATools.getAmbiguity();
+      Alphabet alpha = DNATools.getDNA();
       SymbolParser rParser = alpha.getParser("token");
       SequenceIterator seqI =
         new StreamReader(gReader, gFormat, rParser, sFact);

@@ -1,3 +1,5 @@
+package seq;
+
 import java.io.*;
 
 import org.biojava.bio.*;
@@ -17,7 +19,7 @@ public class TestEmbl {
       BufferedReader eReader = new BufferedReader(
         new InputStreamReader(new FileInputStream(emblFile)));
       SequenceFactory sFact = new SimpleSequenceFactory();
-      Alphabet alpha = DNATools.getAmbiguity();
+      Alphabet alpha = DNATools.getDNA();
       SymbolParser rParser = alpha.getParser("token");
       SequenceIterator seqI =
         new StreamReader(eReader, eFormat, rParser, sFact);

@@ -18,6 +18,7 @@
  *      http://www.biojava.org/
  *
  */
+package gff;
 
 import java.util.*;
 import java.io.*;
@@ -57,7 +58,7 @@ public class EmblToGffFasta {
       BufferedReader eReader = new BufferedReader(
         new InputStreamReader(new FileInputStream(emblFile)));
       SequenceFactory sFact = new SimpleSequenceFactory();
-      Alphabet alpha = DNATools.getAmbiguity();
+      Alphabet alpha = DNATools.getDNA();
       SymbolParser rParser = alpha.getParser("token");
 
       // fasta stuff

@@ -18,6 +18,7 @@
  *      http://www.biojava.org/
  *
  */
+package acedb;
 
 import java.awt.*;
 import java.net.*;

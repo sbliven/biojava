@@ -2,6 +2,7 @@
  * A simple corba server that serves up a simple database with randomly
  * positioned features.
  */
+package BioCorba;
 
 import java.io.*;
 import org.omg.CORBA.*;
