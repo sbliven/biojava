@@ -128,6 +128,7 @@ public interface StrandedFeature extends Feature {
     public char getToken() {
       return token;
     }
+
     private Object writeReplace() throws ObjectStreamException {
       try {
         return new StaticMemberPlaceHolder(StrandedFeature.class.getField(text));
