@@ -51,6 +51,7 @@ public class AminoAcid extends Hetatom {
 	
     }
 
+    
     public String getType(){ return type;}
     
     /** browse through atoms and find the right one*/
@@ -66,25 +67,31 @@ public class AminoAcid extends Hetatom {
 	
     }
 
+    /** get N atom*/
     public Atom getN()  {return findAtom("N");  }
+    /** get CA atom*/
     public Atom getCA() {return findAtom("CA"); }
+    /** get C atom*/
     public Atom getC()  {return findAtom("C");  }
+    /** get O atom*/
     public Atom getO()  {return findAtom("O");  }
+    /** get CB atom*/
     public Atom getCB() {return findAtom("CB"); }
 
     
 
 
-    /* returns the name of the AA, in single letter code */
+    /** returns the name of the AA, in single letter code */
     public  Character getAminoType() {
 	return amino_char;
     }
 
-    /* set the name of the AA, in single letter code */
+    /** set the name of the AA, in single letter code */
     public void setAminoType(Character aa){
 	amino_char  = aa ;
     }
-	
+
+    /** string representation */
     public String toString(){
 		
 	String str = "PDB: "+ pdb_name + " " + amino_char + " " + pdb_code +  " "+ pdb_flag;
@@ -94,5 +101,8 @@ public class AminoAcid extends Hetatom {
 	return str ;
 		
     }
+
+   
+
 
 }
