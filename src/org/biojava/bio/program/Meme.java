@@ -106,10 +106,10 @@ public class Meme {
 
      FINDMOTIF:
       while( true ) {
-	int nt = st.nextToken();
-	if (nt == StreamTokenizer.TT_EOF) {
+        int nt = st.nextToken();
+        if (nt == StreamTokenizer.TT_EOF) {
             break OUTER;
-	} else if (nt == StreamTokenizer.TT_WORD) {
+        } else if (nt == StreamTokenizer.TT_WORD) {
             if(st.sval.startsWith("MOTIF")) {
               st.nextToken();			// MOTIF x
               motifNo = (int) st.nval;	// x
@@ -122,10 +122,10 @@ public class Meme {
 
      FINDWEIGHTS:
       while( true ) {
-	int nt = st.nextToken();
-	if (nt == StreamTokenizer.TT_EOF) {
+        int nt = st.nextToken();
+        if (nt == StreamTokenizer.TT_EOF) {
             break OUTER;
-	} else if (nt == StreamTokenizer.TT_WORD) {
+        } else if (nt == StreamTokenizer.TT_WORD) {
             if(st.sval.startsWith("log")) {
               while(st.nextToken() != StreamTokenizer.TT_EOL) {}
               break FINDWEIGHTS;
@@ -143,8 +143,8 @@ public class Meme {
       int c = 0;
      READMOTIF:
       while( true ) {
-	int nt = st.nextToken();
-	if (nt == StreamTokenizer.TT_EOF) {
+        int nt = st.nextToken();
+        if (nt == StreamTokenizer.TT_EOF) {
             break OUTER;
         } else if (nt == StreamTokenizer.TT_EOL) {
             r = 0;
@@ -156,7 +156,7 @@ public class Meme {
             matrix.getColumn(c).setWeight(sym.symbolAt(r+1), st.nval);
             r++;
           } catch (ChangeVetoException cve) {
-            throw new BioError(cve, "Couldn't set up the distribution ");
+            throw new BioError("Couldn't set up the distribution ",cve);
           }
         }
       }

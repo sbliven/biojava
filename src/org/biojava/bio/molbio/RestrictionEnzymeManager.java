@@ -412,7 +412,7 @@ public final class RestrictionEnzymeManager
         }
         catch (Exception e)
         {
-            throw new BioError(e, "Failed to read REBASE data file");
+            throw new BioError("Failed to read REBASE data file",e);
         }
     }
 
@@ -516,7 +516,7 @@ public final class RestrictionEnzymeManager
             }
             catch (IllegalAlphabetException iae)
             {
-                throw new BioError(iae, "New DNA SymbolList no longer consists on DNA Alphabet");
+                throw new BioError("New DNA SymbolList no longer consists on DNA Alphabet",iae);
             }
 
             return enzyme;
@@ -547,7 +547,7 @@ public final class RestrictionEnzymeManager
                 }
                 catch (NumberFormatException nfe)
                 {
-                    throw new ParserException(nfe, "Failed to parse cut site index");
+                    throw new ParserException("Failed to parse cut site index",nfe);
                 }
 
                 // Indices before the site indicate a double cutter
@@ -588,7 +588,7 @@ public final class RestrictionEnzymeManager
                 }
                 catch (IllegalSymbolException iae)
                 {
-                    throw new ParserException(iae, "Illegal DNA symbol in recognition site");
+                    throw new ParserException("Illegal DNA symbol in recognition site",iae);
                 }
             }
         }

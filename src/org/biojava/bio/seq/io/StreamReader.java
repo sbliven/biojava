@@ -57,7 +57,7 @@ public class StreamReader implements SequenceIterator, org.biojava.utils.ParseEr
      * The symbol parser.
      */
     private SymbolTokenization symParser;
-  
+
     /**
      * The sequence format.
      */
@@ -92,55 +92,55 @@ public class StreamReader implements SequenceIterator, org.biojava.utils.ParseEr
      */
 
     public Sequence nextSequence()
-	throws NoSuchElementException, BioException
+        throws NoSuchElementException, BioException
     {
-	if(!moreSequenceAvailable)
-	    throw new NoSuchElementException("Stream is empty");
-	try {
-	    SequenceBuilder builder = sf.makeSequenceBuilder();
-	    moreSequenceAvailable = format.readSequence(reader, symParser, builder);
-	    return builder.makeSequence();
-	} catch (Exception e) {
-	    throw new BioException(e, "Could not read sequence");
-	}
+        if(!moreSequenceAvailable)
+            throw new NoSuchElementException("Stream is empty");
+        try {
+            SequenceBuilder builder = sf.makeSequenceBuilder();
+            moreSequenceAvailable = format.readSequence(reader, symParser, builder);
+            return builder.makeSequence();
+        } catch (Exception e) {
+            throw new BioException("Could not read sequence",e);
+        }
     }
 
     public boolean hasNext() {
-	return moreSequenceAvailable;
+        return moreSequenceAvailable;
     }
 
     public StreamReader(InputStream is,
-			SequenceFormat format,
-			SymbolTokenization symParser,
-			SequenceBuilderFactory sf)  {
-	this.reader = new BufferedReader(new InputStreamReader(is));
-	this.format = format;
-	this.symParser = symParser;
-	this.sf = sf;
+                        SequenceFormat format,
+                        SymbolTokenization symParser,
+                        SequenceBuilderFactory sf)  {
+        this.reader = new BufferedReader(new InputStreamReader(is));
+        this.format = format;
+        this.symParser = symParser;
+        this.sf = sf;
     }
 
     public StreamReader(BufferedReader reader,
-			SequenceFormat format,
-			SymbolTokenization symParser,
-			SequenceBuilderFactory sf)  {
-	this.reader = reader;
-	this.format = format;
-	this.symParser = symParser;
-	this.sf = sf;
-	((org.biojava.utils.ParseErrorSource)(this.format)).addParseErrorListener(this);
+                        SequenceFormat format,
+                        SymbolTokenization symParser,
+                        SequenceBuilderFactory sf)  {
+        this.reader = reader;
+        this.format = format;
+        this.symParser = symParser;
+        this.sf = sf;
+        ((org.biojava.utils.ParseErrorSource)(this.format)).addParseErrorListener(this);
     }
 
-	/**
-	 * This method determines the behaviour when a bad line is processed.
-	 * Some options are to log the error, throw an exception, ignore it
-	 * completely, or pass the event through.
-	 * <p>
-	 * This method should be overwritten when different behavior is desired.
-	 *
-	 * @param theEvent The event that contains the bad line and token.
-	 */
-	public void BadLineParsed(org.biojava.utils.ParseErrorEvent theEvent)
-	{
-		System.err.println(theEvent.getMessage());
-	}
+        /**
+         * This method determines the behaviour when a bad line is processed.
+         * Some options are to log the error, throw an exception, ignore it
+         * completely, or pass the event through.
+         * <p>
+         * This method should be overwritten when different behavior is desired.
+         *
+         * @param theEvent The event that contains the bad line and token.
+         */
+        public void BadLineParsed(org.biojava.utils.ParseErrorEvent theEvent)
+        {
+                System.err.println(theEvent.getMessage());
+        }
 }

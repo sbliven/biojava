@@ -46,7 +46,7 @@ import org.biojava.utils.ParserException;
  */
 
 public class GFFTools {
-  
+
   /**
    * Flag to indicate that there is no score info.
    */
@@ -56,7 +56,7 @@ public class GFFTools {
    * Flag to indicate that there is no frame info.
    */
   public static int NO_FRAME = -1;
-  
+
  /**
   * Reads a <code>GFFEntrySet</code> from a file with no filtering
   * @param fileName the file containing the GFF
@@ -149,9 +149,9 @@ public class GFFTools {
       annotated = ents.getAnnotator().annotate(seq);
     }
     catch (ChangeVetoException ex) {
-      throw new BioError(ex,"Assertion Error: Unable to annotate sequence");
+      throw new BioError("Assertion Error: Unable to annotate sequence",ex);
     }catch (BioException ex) {
-      throw new BioError(ex,"Assertion Error: Unable to annotate sequence");
+      throw new BioError("Assertion Error: Unable to annotate sequence",ex);
     }
     return annotated;
   }
@@ -176,9 +176,9 @@ public class GFFTools {
       annotated = ents.getAnnotator(checkSeqName).annotate(seq);
     }
     catch (ChangeVetoException ex) {
-      throw new BioError(ex,"Assertion Error: Unable to annotate sequence");
+      throw new BioError("Assertion Error: Unable to annotate sequence",ex);
     }catch (BioException ex) {
-      throw new BioError(ex,"Assertion Error: Unable to annotate sequence");
+      throw new BioError("Assertion Error: Unable to annotate sequence",ex);
     }
     return annotated;
   }

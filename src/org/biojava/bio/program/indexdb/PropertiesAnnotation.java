@@ -58,7 +58,7 @@ class PropertiesAnnotation
             try {
                 props.load(new FileInputStream(propsFile));
             } catch (IOException ioe) {
-                throw new BioError(ioe, "Assertion Failure: could not load properties");
+                throw new BioError( "Assertion Failure: could not load properties",ioe);
             }
         }
     }
@@ -70,7 +70,7 @@ class PropertiesAnnotation
             try {
                 rollback();
             } catch (BioError be) {
-                throw new BioError(be, "Catastrophic failure: could not roll back after failed commit");
+                throw new BioError("Catastrophic failure: could not roll back after failed commit",be);
             }
             throw new BioError("Could not commit");
         }

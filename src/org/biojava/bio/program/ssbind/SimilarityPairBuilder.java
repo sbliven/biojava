@@ -338,7 +338,7 @@ public class SimilarityPairBuilder extends ViewSequenceFactory
         }
         catch (ChangeVetoException cve)
         {
-            throw new BioError(cve, "Assertion failure creating SimilarityPairFeature. Template modification vetoed");
+            throw new BioError("Assertion failure creating SimilarityPairFeature. Template modification vetoed",cve);
         }
     }
 }

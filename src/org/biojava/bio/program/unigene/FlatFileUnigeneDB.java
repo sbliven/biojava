@@ -42,14 +42,14 @@ implements UnigeneDB {
   private final BioStore liStore;
   private final BioStore uniqueStore;
   private final BioStore allStore;
-  
+
   private final Map clusterCache;
   private final Map allCache;
   private final SequenceDB uniqueDB;
   private final ParserListener dataPL;
   private final Parser dataParser;
   private final AnnotationBuilder dataBuilder;
-  
+
   public FlatFileUnigeneDB(
     BioStore dataStore,
     BioStore liStore,
@@ -60,11 +60,11 @@ implements UnigeneDB {
     this.liStore = liStore;
     this.uniqueStore = uniqueStore;
     this.allStore = allStore;
-    
+
     try {
       clusterCache = new WeakValueHashMap();
       allCache = new WeakValueHashMap();
-      
+
       FastaFormat fasta = new FastaFormat();
       uniqueDB = new CachingSequenceDB(
         new BioIndexSequenceDB(
@@ -79,10 +79,10 @@ implements UnigeneDB {
       dataPL = UnigeneTools.buildDataParser(dataBuilder);
       dataParser = new Parser();
     } catch (ParserException pe) {
-      throw new BioException(pe, "Could not initialize unigene DB");
+      throw new BioException("Could not initialize unigene DB", pe);
     }
   }
-  
+
   public UnigeneCluster getCluster(String clusterID)
   throws BioException {
     UnigeneCluster cluster = (UnigeneCluster) clusterCache.get(clusterID);
@@ -97,9 +97,9 @@ implements UnigeneDB {
             BufferedReader reader = new BufferedReader(rar);
             dataParser.read(reader, dataPL.getParser(), dataPL.getListener());
           } catch (IOException ioe) {
-            throw new BioException(ioe, "Failed to load cluster: " + clusterID);
+            throw new BioException("Failed to load cluster: " + clusterID, ioe);
           } catch (ParserException pe) {
-            throw new BioException(pe, "Failed to parse cluster: " + clusterID);
+            throw new BioException("Failed to parse cluster: " + clusterID, pe);
           }
         }
         cluster = new AnnotationCluster(dataBuilder.getLast());
@@ -108,11 +108,11 @@ implements UnigeneDB {
     }
     return cluster;
   }
-  
+
   public SequenceDB getAll(String clusterID)
   throws BioException {
     SequenceDB db = (SequenceDB) allCache.get(clusterID);
-    
+
     if(db == null) {
       synchronized(db) {
         db = (SequenceDB) allCache.get(clusterID);
@@ -121,7 +121,7 @@ implements UnigeneDB {
         }
       }
     }
-    
+
     return db;
   }
 
@@ -129,29 +129,29 @@ implements UnigeneDB {
   throws BioException, ChangeVetoException {
     throw new ChangeVetoException("Can't alter a file-based unigene installation");
   }
-  
+
   public Sequence getUnique(String clusterID)
   throws IllegalIDException, BioException {
     return uniqueDB.getSequence(clusterID);
   }
-  
+
   private class AnnotationCluster
   extends Unchangeable
   implements UnigeneCluster {
     private Annotation ann;
-    
+
     public AnnotationCluster(Annotation ann) {
       this.ann = ann;
     }
-    
+
     public String getID() {
       return (String) ann.getProperty("ID");
     }
-    
+
     public String getTitle() {
       return (String) ann.getProperty("TITLE");
     }
-    
+
     public SequenceDB getAll() {
       try {
         return FlatFileUnigeneDB.this.getAll(getID());
@@ -159,7 +159,7 @@ implements UnigeneDB {
         throw new BioError(be);
       }
     }
-    
+
     public Sequence getUnique() {
       try {
         return FlatFileUnigeneDB.this.getUnique(getID());
@@ -167,47 +167,47 @@ implements UnigeneDB {
         throw new BioError(be);
       }
     }
-    
+
     public Annotation getAnnotation() {
       return ann;
     }
   }
-  
+
   private static class BioIndexSequenceDB
   extends AbstractSequenceDB {
     private final BioStore store;
     private final SequenceFormat format;
     private Set ids = null;
-    
+
     public BioIndexSequenceDB(BioStore store, SequenceFormat format) {
       this.store = store;
       this.format = format;
     }
-    
+
     public Set ids() {
       if(ids == null) {
         ids = new AbstractSet() {
           public int size() {
             return store.getRecordList().size();
           }
-          
+
           public boolean contains(Object o) {
             return store.get((String) o) != null;
           }
-          
+
           public Iterator iterator() {
             return store.getRecordList().iterator();
           }
         };
       }
-      
+
       return ids;
     }
-    
+
     public String getName() {
       return "UniqueStore";
     }
-    
+
     public Sequence getSequence(String id)
     throws BioException {
       try {
@@ -221,18 +221,18 @@ implements UnigeneDB {
       }
     }
   }
-  
+
   private static class AllDB
   extends AbstractSequenceDB {
     private final Set ids;
     private final BioStore store;
     private final String name;
-    
+
     public AllDB(UnigeneCluster cluster, BioStore store) {
       this.name = "All:" + cluster.getID();
       ids = new HashSet();
       this.store = store;
-      
+
       Annotation ann = cluster.getAnnotation();
       Set seqs = (Set) ann.getProperty("SEQUENCES");
       for(Iterator i = seqs.iterator(); i.hasNext(); ) {
@@ -240,15 +240,15 @@ implements UnigeneDB {
         ids.add(sa.getProperty("ACC"));
       }
     }
-    
+
     public Set ids() {
       return ids;
     }
-    
+
     public String getName() {
       return name;
     }
-    
+
     public Sequence getSequence(String id)
     throws BioException {
       try {

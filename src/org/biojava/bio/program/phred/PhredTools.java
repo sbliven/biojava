@@ -89,7 +89,7 @@ public final class PhredTools {
        l.add(IntegerAlphabet.getSubAlphabet(0,99));
        AlphabetManager.getCrossProductAlphabet(l, "PHRED");
      } catch (IllegalAlphabetException iae) {
-       throw new BioError(iae, "Could not create phred alphabet");
+       throw new BioError( "Could not create the Phred alphabet", iae);
      }
    }
 

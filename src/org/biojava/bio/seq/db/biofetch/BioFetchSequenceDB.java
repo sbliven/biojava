@@ -63,7 +63,7 @@ public class BioFetchSequenceDB
      * @param dbName The database name to use.
      */
     public BioFetchSequenceDB(String location,
-			                  String dbName) {
+                                          String dbName) {
         this.location = location;
         this.dbName = dbName;
     }
@@ -153,7 +153,7 @@ public class BioFetchSequenceDB
             return si.nextSequence();
 
         } catch (IOException ex) {
-            throw new BioException(ex, "Error reading data from BioFetch");
+            throw new BioException("Error reading data from BioFetch",ex);
         }
     }
 }

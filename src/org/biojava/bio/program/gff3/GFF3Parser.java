@@ -56,23 +56,23 @@ import org.biojava.utils.ParserException;
  */
 public class GFF3Parser {
   private GFFErrorHandler errors = GFFErrorHandler.ABORT_PARSING;
-  
+
   /**
   * Set the error handler used by this parser.
   */
-  
+
   public void setErrorHandler(GFFErrorHandler errors) {
     this.errors = errors;
   }
-  
+
   /**
   * Find the error handler used by this parser.
   */
-  
+
   public GFFErrorHandler getErrorHandler() {
     return errors;
   }
-  
+
   /**
   * Informs <span class="arg">handler</span> of each line of
   * gff read from <span class="arg">bReader</span>.  This form
@@ -89,7 +89,7 @@ public class GFF3Parser {
   * @throws <span class="type">BioException</span> if
   *         <span class="arg">handler</span> can not correct a parse error
   */
-  
+
   public void parse(
     BufferedReader bReader,
     GFF3DocumentHandler handler,
@@ -99,7 +99,7 @@ public class GFF3Parser {
   {
     parse(bReader, handler, ontology, "unknown:");
   }
-  
+
   /**
   * Informs <span class="arg">handler</span> of each line of
   * GFF read from <span class="arg">bReader</span>
@@ -114,7 +114,7 @@ public class GFF3Parser {
   * @throws <span class="type">BioException</span> if
   *         <span class="arg">handler</span> can not correct a parse error
   */
-  
+
   public void parse(
     BufferedReader bReader,
     GFF3DocumentHandler handler,
@@ -133,13 +133,13 @@ public class GFF3Parser {
     } catch (OntologyException ex) {
         throw new ParserException("Couldn't create fallback ontology", ex);
     }
-    
+
     handler.startDocument(locator);
     ArrayList aList = new ArrayList();
     int lineNum = 0;
     for(String line = bReader.readLine(); line != null; line = bReader.readLine()) {
       ++lineNum;
-      
+
       try {
         aList.clear();
         if(line.startsWith("#")) {
@@ -180,7 +180,7 @@ public class GFF3Parser {
     }
     handler.endDocument();
   }
-  
+
   /**
   * Actually turns a list of tokens, some value string and a comment into a
   * <span class="type">GFF3Record</span> and informs
@@ -210,7 +210,7 @@ public class GFF3Parser {
     GFF3Record.Impl record = new GFF3Record.Impl();
 
     record.setSequenceID((String) aList.get(0));
-    
+
     {
       Term st;
       String stn = (String) aList.get(1);
@@ -222,14 +222,14 @@ public class GFF3Parser {
         try {
           st = fallBack.createTerm(stn, "");
         } catch (AlreadyExistsException te) {
-          throw new BioError(te, "Assertion Failure: Term should not yet exist");
+          throw new BioError("Assertion Failure: Term should not yet exist", te);
         } catch (ChangeVetoException cve) {
-          throw new BioError(cve, "Assertion Failure: Unable to create term");
+          throw new BioError("Assertion Failure: Unable to create term", cve);
         }
       }
       record.setSource(st);
     }
-    
+
     {
       Term tt;
       String ttn = (String) aList.get(2);
@@ -241,14 +241,14 @@ public class GFF3Parser {
         try {
           tt = fallBack.createTerm(ttn, "");
         } catch (AlreadyExistsException te) {
-          throw new BioError(te, "Assertion Failure: Term should not yet exist");
+          throw new BioError("Assertion Failure: Term should not yet exist", te);
         } catch (ChangeVetoException cve) {
-          throw new BioError(cve, "Assertion Failure: Unable to create term");
+          throw new BioError("Assertion Failure: Unable to create term", cve);
         }
       }
       record.setSource(tt);
     }
-    
+
     int start = -1;
     try {
       start = Integer.parseInt( (String) aList.get(3));
@@ -256,7 +256,7 @@ public class GFF3Parser {
       start = errors.invalidStart((String) aList.get(3));
     }
     record.setStart(start);
-    
+
     int end = -1;
     try {
       end = Integer.parseInt( (String) aList.get(4));
@@ -264,14 +264,14 @@ public class GFF3Parser {
       end = errors.invalidEnd((String) aList.get(3));
     }
     record.setEnd(end);
-    
+
     String score = (String) aList.get(5);
     if(
       score == null     ||
       score.equals("")  ||
     score.equals(".") ||
     score.equals("0")
-    ) 
+    )
     {
       record.setScore(GFFTools.NO_SCORE);
     } else {
@@ -283,7 +283,7 @@ public class GFF3Parser {
       }
       record.setScore(sc);
     }
-    
+
     String strand = (String) aList.get(6);
     if(strand == null || strand.equals("") || strand.equals(".")) {
       record.setStrand(StrandedFeature.UNKNOWN);
@@ -296,7 +296,7 @@ public class GFF3Parser {
         record.setStrand(errors.invalidStrand(strand));
       }
     }
-    
+
     String frame = (String) aList.get(7);
     if(frame.equals(".")) {
       record.setPhase(GFFTools.NO_FRAME);
@@ -309,18 +309,18 @@ public class GFF3Parser {
       }
       record.setPhase(fr);
     }
-    
+
     if (rest != null) {
       try {
         parseAttribute(rest, record.getAnnotation(), ontology, fallBack);
       } catch (ChangeVetoException cve) {
-        throw new BioException(cve, "Unable to populate annotations");
+        throw new BioException("Unable to populate annotations", cve);
       }
     }
-    
+
     return record;
   }
-  
+
   /**
   * Parse <span class="arg">attValList</span> into a
   * <span class="type">Map</span> of attributes and value lists.
@@ -331,7 +331,7 @@ public class GFF3Parser {
   *
   * @param attValList  the <span class="type">String</span> to parse
   */
-  
+
   protected void parseAttribute(String attValList, Annotation anno, Ontology onto, Ontology fallBack)
   throws ChangeVetoException {
     StringTokenizer sTok = new StringTokenizer(attValList, ";", false);
@@ -372,7 +372,7 @@ public class GFF3Parser {
           }
         }
       }
-      
+
       Term key;
       if(onto.containsTerm(attName)) {
         key = onto.getTerm(attName);
@@ -382,9 +382,9 @@ public class GFF3Parser {
         try {
           key = fallBack.createTerm(attName, "");
         } catch (AlreadyExistsException te) {
-          throw new BioError(te, "Assertion Failure: Term should not be there yet");
+          throw new BioError("Assertion Failure: Term should not be there yet",te);
         } catch (ChangeVetoException cve) {
-          throw new BioError(cve, "Assertion Failure: Unable to create term");
+          throw new BioError("Assertion Failure: Unable to create term", cve);
         }
       }
       anno.setProperty(key, valList);

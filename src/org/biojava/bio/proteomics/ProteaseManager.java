@@ -275,7 +275,7 @@ public static Protease getTrypsin(){
     return getProteaseByName(TRYPSIN);
   }
   catch (BioException ex) {
-    throw new BioError(ex, "Cannot retreive Trypsin, AlphabetManager.xml may be corrupted");
+    throw new BioError("Cannot retreive Trypsin, AlphabetManager.xml may be corrupted", ex);
   }
 }
 
@@ -287,7 +287,7 @@ public static Protease getLys_C(){
     return getProteaseByName(LYS_C);
   }
   catch (BioException ex) {
-    throw new BioError(ex, "Cannot retreive Lys-C, AlphabetManager.xml may be corrupted");
+    throw new BioError("Cannot retreive Lys-C, AlphabetManager.xml may be corrupted", ex);
   }
 }
 
@@ -299,7 +299,7 @@ public static Protease getArg_C(){
     return getProteaseByName(ARG_C);
   }
   catch (BioException ex) {
-    throw new BioError(ex, "Cannot retreive Arg-C, AlphabetManager.xml may be corrupted");
+    throw new BioError("Cannot retreive Arg-C, AlphabetManager.xml may be corrupted",ex);
   }
 }
 
@@ -311,7 +311,7 @@ public static Protease getAsp_N(){
     return getProteaseByName(ASP_N);
   }
   catch (BioException ex) {
-    throw new BioError(ex, "Cannot retreive Asp-N, AlphabetManager.xml may be corrupted");
+    throw new BioError("Cannot retreive Asp-N, AlphabetManager.xml may be corrupted",ex);
   }
 }
 
@@ -323,7 +323,7 @@ public static Protease getGlu_C_bicarbonate(){
     return getProteaseByName(GLU_C_BICARB);
   }
   catch (BioException ex) {
-    throw new BioError(ex, "Cannot retreive Glu_C_bicarbonate, AlphabetManager.xml may be corrupted");
+    throw new BioError("Cannot retreive Glu_C_bicarbonate, AlphabetManager.xml may be corrupted", ex);
   }
 }
 
@@ -335,7 +335,7 @@ public static Protease getGlu_C_phosphate(){
     return getProteaseByName(GLU_C_PHOS);
   }
   catch (BioException ex) {
-    throw new BioError(ex, "Cannot retreive Glu_C_phosphate, AlphabetManager.xml may be corrupted");
+    throw new BioError("Cannot retreive Glu_C_phosphate, AlphabetManager.xml may be corrupted", ex);
   }
 }
 
@@ -347,7 +347,7 @@ public static Protease getChymotrypsin(){
     return getProteaseByName(CHYMOTRYP);
   }
   catch (BioException ex) {
-    throw new BioError(ex, "Cannot retreive Chymotrypsin, AlphabetManager.xml may be corrupted");
+    throw new BioError("Cannot retreive Chymotrypsin, AlphabetManager.xml may be corrupted", ex);
   }
 }
 
@@ -359,7 +359,7 @@ public static Protease getCNBr(){
     return getProteaseByName(CNBr);
   }
   catch (BioException ex) {
-    throw new BioError(ex, "Cannot retreive CNBr, AlphabetManager.xml may be corrupted");
+    throw new BioError("Cannot retreive CNBr, AlphabetManager.xml may be corrupted", ex);
   }
 }
 

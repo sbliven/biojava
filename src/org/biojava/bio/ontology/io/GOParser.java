@@ -19,8 +19,8 @@
  *
  */
 
-package org.biojava.bio.ontology.io; 
- 
+package org.biojava.bio.ontology.io;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Thomas Down
  * @since 1.4
  */
- 
+
 public class GOParser {
     public Ontology parseGO(BufferedReader goFile,
                             String ontoName,
@@ -65,8 +65,8 @@ public class GOParser {
                 line = line.trim();
                 if (line.startsWith("!")) {
                     continue;
-                } 
-                
+                }
+
                 StringTokenizer toke = new StringTokenizer(line, "%<$", true);
                 String parentRel = toke.nextToken();
                 Term term = parseTerm(onto, toke.nextToken());
@@ -74,7 +74,7 @@ public class GOParser {
                     safeAddTriple(onto, term, (Term) termStack.get(leadSpaces - 1), isa);
                 } else if (parentRel.equals("<")) {
                     safeAddTriple(onto, term, (Term) termStack.get(leadSpaces - 1), partof);
-                } 
+                }
                 while (toke.hasMoreTokens()) {
                     String altRel = toke.nextToken();
                     Term altTerm = parseTerm(onto, toke.nextToken());
@@ -84,7 +84,7 @@ public class GOParser {
                         safeAddTriple(onto, term, altTerm, partof);
                     }
                 }
-                
+
                 if (termStack.size() == leadSpaces) {
                     termStack.add(term);
                 } else {
@@ -97,19 +97,19 @@ public class GOParser {
         } catch (OntologyException ex) {
             throw new ParseException(ex);
         } catch (ChangeVetoException ex) {
-            throw new BioError(ex, "Error accessing newly created ontology");
+            throw new BioError("Error accessing newly created ontology",ex);
         }
     }
-    
-    private void safeAddTriple(Ontology onto, Term s, Term o, Term p) 
+
+    private void safeAddTriple(Ontology onto, Term s, Term o, Term p)
         throws AlreadyExistsException, ChangeVetoException
     {
         if (!onto.containsTriple(s, o, p)) {
             onto.createTriple(s, o, p);
         }
     }
-    
-    private Term parseTerm(Ontology onto, String s) 
+
+    private Term parseTerm(Ontology onto, String s)
         throws ParseException, AlreadyExistsException, ChangeVetoException
     {
         int semi = s.indexOf(';');
@@ -141,5 +141,5 @@ public class GOParser {
         }
     }
 }
- 
- 
+
+

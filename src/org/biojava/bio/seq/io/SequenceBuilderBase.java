@@ -50,7 +50,7 @@ import org.biojava.utils.ChangeVetoException;
  */
 
 public abstract class SequenceBuilderBase implements SequenceBuilder {
-    public static Object ERROR_FEATURES_PROPERTY 
+    public static Object ERROR_FEATURES_PROPERTY
       = SequenceBuilderBase.class + "ERROR_FEATURES_PROPERTY";
 
     //
@@ -67,13 +67,13 @@ public abstract class SequenceBuilderBase implements SequenceBuilder {
     private Set rootFeatures;
 
     private List featureStack;
-    
+
     protected Sequence seq;
 
     {
-	annotation = new SimpleAnnotation();
-	rootFeatures = new HashSet();
-	featureStack = new ArrayList();
+        annotation = new SimpleAnnotation();
+        rootFeatures = new HashSet();
+        featureStack = new ArrayList();
 //	slBuilder = new ChunkedSymbolListBuilder();
     }
 
@@ -88,11 +88,11 @@ public abstract class SequenceBuilderBase implements SequenceBuilder {
     }
 
     public void setName(String name) {
-	this.name = name;
+        this.name = name;
     }
 
     public void setURI(String uri) {
-	this.uri = uri;
+        this.uri = uri;
     }
 
     public abstract void addSymbols(Alphabet alpha, Symbol[] syms, int pos, int len)
@@ -114,21 +114,21 @@ public abstract class SequenceBuilderBase implements SequenceBuilder {
     }
 
     public void startFeature(Feature.Template templ) {
-	TemplateWithChildren t2 = new TemplateWithChildren();
-	t2.template = templ;
+        TemplateWithChildren t2 = new TemplateWithChildren();
+        t2.template = templ;
     if(templ.annotation == Annotation.EMPTY_ANNOTATION) {
         templ.annotation = new SmallAnnotation();
     }
-	int stackSize = featureStack.size();
-	if (stackSize == 0) {
-	    rootFeatures.add(t2);
-	} else {
-	    TemplateWithChildren parent = (TemplateWithChildren) featureStack.get(stackSize - 1);
-	    if (parent.children == null)
-		parent.children = new HashSet();
-	    parent.children.add(t2);
-	}
-	featureStack.add(t2);
+        int stackSize = featureStack.size();
+        if (stackSize == 0) {
+            rootFeatures.add(t2);
+        } else {
+            TemplateWithChildren parent = (TemplateWithChildren) featureStack.get(stackSize - 1);
+            if (parent.children == null)
+                parent.children = new HashSet();
+            parent.children.add(t2);
+        }
+        featureStack.add(t2);
     }
 
     /**
@@ -161,12 +161,12 @@ public abstract class SequenceBuilderBase implements SequenceBuilder {
     }
 
     public void endFeature() {
-	if (featureStack.size() == 0)
-	    throw new BioError("Assertion failed: Not within a feature");
-	featureStack.remove(featureStack.size() - 1);
+        if (featureStack.size() == 0)
+            throw new BioError("Assertion failed: Not within a feature");
+        featureStack.remove(featureStack.size() - 1);
     }
 
-    public Sequence makeSequence() 
+    public Sequence makeSequence()
     {
       //	SymbolList symbols = slBuilder.makeSymbolList();
       //	Sequence seq = new SimpleSequence(symbols, uri, name, annotation);
@@ -195,7 +195,7 @@ public abstract class SequenceBuilderBase implements SequenceBuilder {
           }
         }
       } catch (Exception ex) {
-        throw new BioError(ex, "Couldn't create feature");
+        throw new BioError("Couldn't create feature",ex);
       }
       return seq;
     }
@@ -203,47 +203,47 @@ public abstract class SequenceBuilderBase implements SequenceBuilder {
     private void makeChildFeatures(Feature parent, Set children)
         throws Exception
     {
-	for (Iterator i = children.iterator(); i.hasNext(); ) {
-	    TemplateWithChildren twc = (TemplateWithChildren) i.next();
-	    Feature f = parent.createFeature(twc.template);
-	    if (twc.children != null) {
-		makeChildFeatures(f, twc.children);
-	    }
-	}
+        for (Iterator i = children.iterator(); i.hasNext(); ) {
+            TemplateWithChildren twc = (TemplateWithChildren) i.next();
+            Feature f = parent.createFeature(twc.template);
+            if (twc.children != null) {
+                makeChildFeatures(f, twc.children);
+            }
+        }
     }
 
     protected void addProperty(Annotation ann, Object key, Object value) {
-	if (value == null)
-	    return;
+        if (value == null)
+            return;
 
-	Object oldValue = null;
-	Object newValue = value;
+        Object oldValue = null;
+        Object newValue = value;
 
-	if(ann.containsProperty(key)) {
-	    oldValue = ann.getProperty(key);
-	}
-        
-	if (oldValue != null) {
-	    if (oldValue instanceof Collection) {
-		((Collection) oldValue).add(newValue);
-		newValue = oldValue;
-	    } else {
-		List nvList = new ArrayList();
-		nvList.add(oldValue);
-		nvList.add(newValue);
-		newValue = nvList;
-	    }
-	}
+        if(ann.containsProperty(key)) {
+            oldValue = ann.getProperty(key);
+        }
 
-	try {
-	    ann.setProperty(key, newValue);
-	} catch (ChangeVetoException ex) {
-	    throw new BioError(ex, "Annotation should be modifiable");
-	}
+        if (oldValue != null) {
+            if (oldValue instanceof Collection) {
+                ((Collection) oldValue).add(newValue);
+                newValue = oldValue;
+            } else {
+                List nvList = new ArrayList();
+                nvList.add(oldValue);
+                nvList.add(newValue);
+                newValue = nvList;
+            }
+        }
+
+        try {
+            ann.setProperty(key, newValue);
+        } catch (ChangeVetoException ex) {
+            throw new BioError("Annotation should be modifiable",ex);
+        }
     }
 
     private static class TemplateWithChildren {
-	Feature.Template template;
-	Set children;
+        Feature.Template template;
+        Set children;
     }
 }

@@ -73,8 +73,8 @@ class DASRawSymbolList
     private SymbolList rawSymbols;
 
     DASRawSymbolList(DASSequence seq, Segment seg) {
-	this.sequence = seq;
-	this.segment = seg;
+        this.sequence = seq;
+        this.segment = seg;
     }
 
     public Alphabet getAlphabet() {
@@ -120,74 +120,74 @@ class DASRawSymbolList
     }
 
     protected SymbolList getRawSymbols() {
-	if (rawSymbols == null) {
-	    try {
-		DAS.startedActivity(this);
+        if (rawSymbols == null) {
+            try {
+                DAS.startedActivity(this);
 
         String seqRequest = "dna";
         if (DASCapabilities.checkCapable(new URL(sequence.getDataSourceURL(), ".."),
-                                         DASCapabilities.CAPABILITY_SEQUENCE)) 
+                                         DASCapabilities.CAPABILITY_SEQUENCE))
         {
             seqRequest = "sequence";
         }
         StringBuffer qb = new StringBuffer();
         qb.append(seqRequest);
         qb.append("?segment=");
-		qb.append(segment.getID());
-		if (segment.isBounded()) {
-		    qb.append(':');
-		    qb.append(segment.getStart());
-		    qb.append(',');
-		    qb.append(segment.getStop());
-		}
-		URL dnaURL = new URL(sequence.getDataSourceURL(), qb.substring(0));
-		HttpURLConnection huc = (HttpURLConnection) dnaURL.openConnection();
-		huc.setRequestProperty("Accept-Encoding", "gzip");
+                qb.append(segment.getID());
+                if (segment.isBounded()) {
+                    qb.append(':');
+                    qb.append(segment.getStart());
+                    qb.append(',');
+                    qb.append(segment.getStop());
+                }
+                URL dnaURL = new URL(sequence.getDataSourceURL(), qb.substring(0));
+                HttpURLConnection huc = (HttpURLConnection) dnaURL.openConnection();
+                huc.setRequestProperty("Accept-Encoding", "gzip");
 
-		huc.connect();
-		// int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
-		int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
+                huc.connect();
+                // int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
+                int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
 
-		if (status == 0)
-		    throw new BioRuntimeException("Not a DAS server");
-		else if (status != 200)
-		    throw new BioRuntimeException("DAS error (status code = " + status + ")");
+                if (status == 0)
+                    throw new BioRuntimeException("Not a DAS server");
+                else if (status != 200)
+                    throw new BioRuntimeException("DAS error (status code = " + status + ")");
 
-		SequenceBuilder sb = new SimpleSequenceBuilder();
-		sb.setURI(dnaURL.toString());
-		sb.setName(sequence.getName());
-		StAXContentHandler seqHandler = new SequenceHandler(sb, seqRequest);
+                SequenceBuilder sb = new SimpleSequenceBuilder();
+                sb.setURI(dnaURL.toString());
+                sb.setName(sequence.getName());
+                StAXContentHandler seqHandler = new SequenceHandler(sb, seqRequest);
 
-		// determine if I'm getting a gzipped reply
-		String contentEncoding = huc.getContentEncoding();
-		InputStream inStream = huc.getInputStream();
+                // determine if I'm getting a gzipped reply
+                String contentEncoding = huc.getContentEncoding();
+                InputStream inStream = huc.getInputStream();
 
-		if (contentEncoding != null) {
-		    if (contentEncoding.indexOf("gzip") != -1) {
-			// we have gzip encoding
-			inStream = new GZIPInputStream(inStream);
-			// System.out.println("gzip encoded dna!");
-		    }
-		}
+                if (contentEncoding != null) {
+                    if (contentEncoding.indexOf("gzip") != -1) {
+                        // we have gzip encoding
+                        inStream = new GZIPInputStream(inStream);
+                        // System.out.println("gzip encoded dna!");
+                    }
+                }
 
-		InputSource is = new InputSource(inStream);
-		is.setSystemId(dnaURL.toString());
-		XMLReader parser = DASSequence.nonvalidatingSAXParser();
-		parser.setContentHandler(new SAX2StAXAdaptor(seqHandler));
-		parser.parse(is);
-		rawSymbols = sb.makeSequence();
-	    } catch (SAXException ex) {
-		throw new BioRuntimeException(ex, "Exception parsing DAS XML");
-	    } catch (IOException ex) {
-		throw new BioRuntimeException(ex, "Error connecting to DAS server");
-	    } catch (BioException ex) {
-		throw new BioRuntimeException(ex);
-	    } finally {
-		DAS.completedActivity(this);
-	    }
-	}
+                InputSource is = new InputSource(inStream);
+                is.setSystemId(dnaURL.toString());
+                XMLReader parser = DASSequence.nonvalidatingSAXParser();
+                parser.setContentHandler(new SAX2StAXAdaptor(seqHandler));
+                parser.parse(is);
+                rawSymbols = sb.makeSequence();
+            } catch (SAXException ex) {
+                throw new BioRuntimeException("Exception parsing DAS XML", ex);
+            } catch (IOException ex) {
+                throw new BioRuntimeException("Error connecting to DAS server", ex);
+            } catch (BioException ex) {
+                throw new BioRuntimeException(ex);
+            } finally {
+                DAS.completedActivity(this);
+            }
+        }
 
-	return rawSymbols;
+        return rawSymbols;
     }
 
     private class SequenceHandler extends StAXContentHandlerBase {
@@ -200,12 +200,12 @@ class DASRawSymbolList
         }
 
         public void startElement(String nsURI,
-		                		 String localName,
+                                                 String localName,
                                  String qName,
                                  Attributes attrs,
                                  DelegationManager dm)
-	        throws SAXException
-	    {
+                throws SAXException
+            {
             if (localName.equals("DNA")) {
                 SymbolTokenization toke;
                 try {
@@ -240,53 +240,53 @@ class DASRawSymbolList
     }
 
     private class SymbolsHandler extends StAXContentHandlerBase {
-	private StreamParser ssparser;
+        private StreamParser ssparser;
 
-	SymbolsHandler(StreamParser ssparser) {
-	    this.ssparser = ssparser;
-	}
+        SymbolsHandler(StreamParser ssparser) {
+            this.ssparser = ssparser;
+        }
 
-	public void endElement(String nsURI,
-			   String localName,
-			   String qName,
-			   StAXContentHandler handler)
-	    throws SAXException
-	{
-	    try {
-		ssparser.close();
-	    } catch (IllegalSymbolException ex) {
-		throw new SAXException(ex);
-	    }
-	}
+        public void endElement(String nsURI,
+                           String localName,
+                           String qName,
+                           StAXContentHandler handler)
+            throws SAXException
+        {
+            try {
+                ssparser.close();
+            } catch (IllegalSymbolException ex) {
+                throw new SAXException(ex);
+            }
+        }
 
-	public void characters(char[] ch, int start, int length)
-	    throws SAXException
-	{
-	    try {
-		int parseStart = start;
-		int parseEnd   = start;
-		int blockEnd = start + length;
+        public void characters(char[] ch, int start, int length)
+            throws SAXException
+        {
+            try {
+                int parseStart = start;
+                int parseEnd   = start;
+                int blockEnd = start + length;
 
-		while (parseStart < blockEnd) {
-		    while (parseStart < blockEnd && Character.isWhitespace(ch[parseStart])) {
-			++parseStart;
-		    }
-		    if (parseStart >= blockEnd) {
-			return;
-		    }
+                while (parseStart < blockEnd) {
+                    while (parseStart < blockEnd && Character.isWhitespace(ch[parseStart])) {
+                        ++parseStart;
+                    }
+                    if (parseStart >= blockEnd) {
+                        return;
+                    }
 
-		    parseEnd = parseStart + 1;
-		    while (parseEnd < blockEnd && !Character.isWhitespace(ch[parseEnd])) {
-			++parseEnd;
-		    }
+                    parseEnd = parseStart + 1;
+                    while (parseEnd < blockEnd && !Character.isWhitespace(ch[parseEnd])) {
+                        ++parseEnd;
+                    }
 
-		    ssparser.characters(ch, parseStart, parseEnd - parseStart);
+                    ssparser.characters(ch, parseStart, parseEnd - parseStart);
 
-		    parseStart = parseEnd;
-		}
-	    } catch (IllegalSymbolException ex) {
-		throw new SAXException(ex);
-	    }
-	}
+                    parseStart = parseEnd;
+                }
+            } catch (IllegalSymbolException ex) {
+                throw new SAXException(ex);
+            }
+        }
     }
 }

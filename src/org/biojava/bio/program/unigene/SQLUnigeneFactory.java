@@ -76,7 +76,7 @@ implements UnigeneFactory {
       stmt.execute("use " + dbName);
       stmt.execute(getCreateDBStatement());
     } catch (SQLException se) {
-      throw new BioException(se, "Could not create database");
+      throw new BioException("Could not create database", se);
     } finally {
       try {
         connPool.putStatement(stmt);

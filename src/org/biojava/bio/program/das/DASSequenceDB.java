@@ -84,13 +84,13 @@ public class DASSequenceDB
     private FeatureRequestManager frm;
 
     {
-	sequences = new HashMap();
-	symbolsCache = new FixedSizeCache(20);
-	featuresCache = new FixedSizeCache(50);
+        sequences = new HashMap();
+        symbolsCache = new FixedSizeCache(20);
+        featuresCache = new FixedSizeCache(50);
     }
 
     Cache getSymbolsCache() {
-	return symbolsCache;
+        return symbolsCache;
     }
 
     /**
@@ -101,29 +101,29 @@ public class DASSequenceDB
 //          throw new BioException( "Capacity of (" + MAX_CAPACITY +
 //                                  " exceeded by " + min);
 //        }
-	if (featuresCache.getLimit() < min) {
-	    // System.err.println("Setting cache limit up to " + min);
-	    featuresCache.setLimit(min);
-	}
+        if (featuresCache.getLimit() < min) {
+            // System.err.println("Setting cache limit up to " + min);
+            featuresCache.setLimit(min);
+        }
     }
 
     Cache getFeaturesCache() {
-	return featuresCache;
+        return featuresCache;
     }
 
     FeatureRequestManager getFeatureRequestManager() {
-	if (frm == null) {
-	    frm = new FeatureRequestManager(this);
-	}
+        if (frm == null) {
+            frm = new FeatureRequestManager(this);
+        }
 
-	return frm;
+        return frm;
     }
 
     DASSequenceDB() {
-	// Constructor for dummy objects.  Ugh.
+        // Constructor for dummy objects.  Ugh.
     }
 
-    
+
   public FeatureHolder filter(FeatureFilter ff) {
       MergeFeatureHolder results = new MergeFeatureHolder();
       try {
@@ -137,40 +137,40 @@ public class DASSequenceDB
       } catch (BioException ex) {
           throw new BioRuntimeException(ex);
       } catch (ChangeVetoException cve) {
-          throw new BioError(cve, "Assertion failed: couldn't modify newly created MergeFeatureHolder");
+          throw new BioError("Assertion failed: couldn't modify newly created MergeFeatureHolder", cve);
       }
       return results;
   }
-    
-    public DASSequenceDB(URL dataSourceURL) 
-	throws BioException 
+
+    public DASSequenceDB(URL dataSourceURL)
+        throws BioException
     {
-	String s = dataSourceURL.toString();
-	if (! (s.endsWith("/"))) {
-	    try {
-		dataSourceURL = new URL(s + "/");
-	    } catch (MalformedURLException ex) {
-		throw new BioException(ex, "Assertion failure: trivial URI manipulation failed");
-	    }
-	}
-	this.dataSourceURL = dataSourceURL;
+        String s = dataSourceURL.toString();
+        if (! (s.endsWith("/"))) {
+            try {
+                dataSourceURL = new URL(s + "/");
+            } catch (MalformedURLException ex) {
+                throw new BioException("Assertion failure: trivial URI manipulation failed",ex);
+            }
+        }
+        this.dataSourceURL = dataSourceURL;
     }
 
-    DASSequence _getSequence(String id) 
+    DASSequence _getSequence(String id)
         throws BioException, IllegalIDException
     {
-	return _getSequence(id, Collections.singleton(dataSourceURL));
+        return _getSequence(id, Collections.singleton(dataSourceURL));
     }
 
-    DASSequence _getSequence(String id, Set annoURLs) 
+    DASSequence _getSequence(String id, Set annoURLs)
         throws BioException, IllegalIDException
     {
-	DASSequence seq = (DASSequence) sequences.get(id);
-	if (seq == null) {
-	    seq = new DASSequence(this, dataSourceURL, id, annoURLs);
-	    sequences.put(id, seq);
-	}
-	return seq;
+        DASSequence seq = (DASSequence) sequences.get(id);
+        if (seq == null) {
+            seq = new DASSequence(this, dataSourceURL, id, annoURLs);
+            sequences.put(id, seq);
+        }
+        return seq;
     }
 
     /**
@@ -182,11 +182,11 @@ public class DASSequenceDB
     private SequenceDBLite allEntryPoints;
 
     public SequenceDBLite allEntryPointsDB() {
-	if (allEntryPoints == null) {
-	    allEntryPoints = new AllEntryPoints();
-	}
+        if (allEntryPoints == null) {
+            allEntryPoints = new AllEntryPoints();
+        }
 
-	return allEntryPoints;
+        return allEntryPoints;
     }
 
     private class AllEntryPoints
@@ -195,27 +195,27 @@ public class DASSequenceDB
       implements
         SequenceDBLite
     {
-	public Sequence getSequence(String id)
-	    throws BioException, IllegalIDException
-	{
-	    return _getSequence(id);
-	}
+        public Sequence getSequence(String id)
+            throws BioException, IllegalIDException
+        {
+            return _getSequence(id);
+        }
 
-	public void addSequence(Sequence seq)
-	    throws ChangeVetoException
-	{
-	    throw new ChangeVetoException("No way we're adding sequences to DAS");
-	}
+        public void addSequence(Sequence seq)
+            throws ChangeVetoException
+        {
+            throw new ChangeVetoException("No way we're adding sequences to DAS");
+        }
 
-	public void removeSequence(String id)
-	    throws ChangeVetoException
-	{
-	    throw new ChangeVetoException("No way we're removing sequences from DAS");
-	}
+        public void removeSequence(String id)
+            throws ChangeVetoException
+        {
+            throw new ChangeVetoException("No way we're removing sequences from DAS");
+        }
 
-	public String getName() {
-	    return "All sequences in " + dataSourceURL.toString();
-	}
+        public String getName() {
+            return "All sequences in " + dataSourceURL.toString();
+        }
   }
 
 
@@ -224,115 +224,115 @@ public class DASSequenceDB
      */
 
     public URL getURL() {
-	return dataSourceURL;
+        return dataSourceURL;
     }
 
     public String getName() {
-	return dataSourceURL.toString();
+        return dataSourceURL.toString();
     }
 
-    public Sequence getSequence(String id) 
+    public Sequence getSequence(String id)
         throws BioException, IllegalIDException
     {
-	if (! (ids().contains(id))) {
-	    throw new IllegalIDException("Database does not contain " + id + " as a top-level sequence");
-	}
-	return _getSequence(id);
+        if (! (ids().contains(id))) {
+            throw new IllegalIDException("Database does not contain " + id + " as a top-level sequence");
+        }
+        return _getSequence(id);
     }
 
     public Set ids() {
-	if (rootIDs == null) {
-	    try {
-		DAS.startedActivity(this);
+        if (rootIDs == null) {
+            try {
+                DAS.startedActivity(this);
 
-		Set ids = new HashSet();
+                Set ids = new HashSet();
 
-		URL epURL = new URL(dataSourceURL, "entry_points");
-		HttpURLConnection huc = (HttpURLConnection) epURL.openConnection();
-		try {
-		    huc.connect();
-		} catch (Exception e) {
-		    throw new BioException(e, "Can't connect to " + epURL);
-		}
-		int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
-		if (status == 0)
-		    throw new BioException("Not a DAS server: " + dataSourceURL + " Query: " + epURL);
-		else if (status != 200)
-		    throw new BioException("DAS error (status code = " + status +
-					   ") connecting to " + dataSourceURL + " with query " + epURL);
+                URL epURL = new URL(dataSourceURL, "entry_points");
+                HttpURLConnection huc = (HttpURLConnection) epURL.openConnection();
+                try {
+                    huc.connect();
+                } catch (Exception e) {
+                    throw new BioException("Can't connect to " + epURL, e);
+                }
+                int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
+                if (status == 0)
+                    throw new BioException("Not a DAS server: " + dataSourceURL + " Query: " + epURL);
+                else if (status != 200)
+                    throw new BioException("DAS error (status code = " + status +
+                                           ") connecting to " + dataSourceURL + " with query " + epURL);
 
 
-		InputSource is = new InputSource(huc.getInputStream());
-		is.setSystemId(epURL.toString());
-		DocumentBuilder parser = DASSequence.nonvalidatingParser();
-		Element el = parser.parse(is).getDocumentElement();
-		
-		NodeList segl = el.getElementsByTagName("SEGMENT");
-		Element segment = null;
-		for (int i = 0; i < segl.getLength(); ++i) {
-		    el = (Element) segl.item(i);
-		    String id = el.getAttribute("id");
-		    ids.add(id);
-		}
+                InputSource is = new InputSource(huc.getInputStream());
+                is.setSystemId(epURL.toString());
+                DocumentBuilder parser = DASSequence.nonvalidatingParser();
+                Element el = parser.parse(is).getDocumentElement();
 
-		rootIDs = Collections.unmodifiableSet(ids);
-	    } catch (SAXException ex) {
-		throw new BioRuntimeException(ex, "Exception parsing DAS XML");
-	    } catch (IOException ex) {
-		throw new BioRuntimeException(ex, "Error connecting to DAS server");
-	    } catch (NumberFormatException ex) {
-		throw new BioRuntimeException(ex, "Error parsing number");
-	    } catch (BioException ex) {
-		throw new BioRuntimeException(ex);
-	    } finally {
-		DAS.completedActivity(this);
-	    }
-	}
+                NodeList segl = el.getElementsByTagName("SEGMENT");
+                Element segment = null;
+                for (int i = 0; i < segl.getLength(); ++i) {
+                    el = (Element) segl.item(i);
+                    String id = el.getAttribute("id");
+                    ids.add(id);
+                }
 
-	return rootIDs;
+                rootIDs = Collections.unmodifiableSet(ids);
+            } catch (SAXException ex) {
+                throw new BioRuntimeException("Exception parsing DAS XML",ex);
+            } catch (IOException ex) {
+                throw new BioRuntimeException("Error connecting to DAS server",ex);
+            } catch (NumberFormatException ex) {
+                throw new BioRuntimeException("Error parsing number",ex);
+            } catch (BioException ex) {
+                throw new BioRuntimeException(ex);
+            } finally {
+                DAS.completedActivity(this);
+            }
+        }
+
+        return rootIDs;
     }
 
     public void addSequence(Sequence seq)
         throws ChangeVetoException
     {
-	throw new ChangeVetoException("No way we're adding sequences to DAS");
+        throw new ChangeVetoException("No way we're adding sequences to DAS");
     }
 
     public void removeSequence(String id)
         throws ChangeVetoException
     {
-	throw new ChangeVetoException("No way we're removing sequences from DAS");
+        throw new ChangeVetoException("No way we're removing sequences from DAS");
     }
 
-    public SequenceIterator sequenceIterator() 
+    public SequenceIterator sequenceIterator()
     {
-	return new SequenceIterator() {
-	    private Iterator i = ids().iterator();
+        return new SequenceIterator() {
+            private Iterator i = ids().iterator();
 
-	    public boolean hasNext() {
-		return i.hasNext();
-	    }
+            public boolean hasNext() {
+                return i.hasNext();
+            }
 
-	    public Sequence nextSequence() 
-	        throws BioException
-	    {
-		return getSequence((String) i.next());
-	    }
-	} ;
+            public Sequence nextSequence()
+                throws BioException
+            {
+                return getSequence((String) i.next());
+            }
+        } ;
     }
 
     static int tolerantIntHeader(HttpURLConnection huc, String name)
     {
-	try {
-	    String header = huc.getHeaderField(name);
-	    if (header == null) {
-		return 0;
-	    }
+        try {
+            String header = huc.getHeaderField(name);
+            if (header == null) {
+                return 0;
+            }
 
-	    String firstToken = new StringTokenizer(header).nextToken();
-	    return Integer.parseInt(firstToken);
-	} catch (NumberFormatException ex) {
-	    return 0;
-	}
+            String firstToken = new StringTokenizer(header).nextToken();
+            return Integer.parseInt(firstToken);
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
     }
 }

@@ -58,232 +58,232 @@ class SwissprotFeatureTableParser
     private StringBuffer descBuf;
 
     {
-	descBuf = new StringBuffer();
+        descBuf = new StringBuffer();
     }
 
     SwissprotFeatureTableParser(SeqIOListener listener, String source)
     {
-	this.listener = listener;
-	this.featureSource = source;
+        this.listener = listener;
+        this.featureSource = source;
     }
 
     public void startFeature(String type)
-	throws BioException
+        throws BioException
     {
-	featureTemplate = new Feature.Template();
-	featureTemplate.source = featureSource;
-	featureTemplate.type = type;
-	descBuf.setLength(0);
-	inFeature = true;
+        featureTemplate = new Feature.Template();
+        featureTemplate.source = featureSource;
+        featureTemplate.type = type;
+        descBuf.setLength(0);
+        inFeature = true;
     }
 
-	public void featureData(String line)
-	    throws BioException
-	{
-		boolean newFeature = false;
-		// Check if there is a location section.
-		if(line.charAt(5) != ' ')
-		{
-			StringTokenizer tokens = new StringTokenizer(line);
-			featureTemplate.location = getLocation(tokens);
+        public void featureData(String line)
+            throws BioException
+        {
+                boolean newFeature = false;
+                // Check if there is a location section.
+                if(line.charAt(5) != ' ')
+                {
+                        StringTokenizer tokens = new StringTokenizer(line);
+                        featureTemplate.location = getLocation(tokens);
 
-			if(line.length() >= 20)
-			{
-				line = line.substring(20);
-			}
-			else
-			{
-				line = "";
-			}
-			newFeature = true;
-		}
+                        if(line.length() >= 20)
+                        {
+                                line = line.substring(20);
+                        }
+                        else
+                        {
+                                line = "";
+                        }
+                        newFeature = true;
+                }
 
-		if(newFeature == true)
-		{
-			descBuf.setLength(0);
-		}
-		descBuf.append(" " + line.trim());
-		newFeature = false;
-	}
+                if(newFeature == true)
+                {
+                        descBuf.setLength(0);
+                }
+                descBuf.append(" " + line.trim());
+                newFeature = false;
+        }
 
-	public void endFeature()
-	    throws BioException
-	{
-	    if (descBuf.length() > 0) {
-		featureTemplate.annotation = new SimpleAnnotation();
-		try {
-		    featureTemplate.annotation.setProperty(SwissprotProcessor.PROPERTY_SWISSPROT_FEATUREATTRIBUTE, descBuf.substring(0));
-		} catch (ChangeVetoException ex) {
-		    throw new BioException(ex, "Couldn't alter annotation");
-		}
-	    } else {
-		featureTemplate.annotation = Annotation.EMPTY_ANNOTATION;
-	    }
+        public void endFeature()
+            throws BioException
+        {
+            if (descBuf.length() > 0) {
+                featureTemplate.annotation = new SimpleAnnotation();
+                try {
+                    featureTemplate.annotation.setProperty(SwissprotProcessor.PROPERTY_SWISSPROT_FEATUREATTRIBUTE, descBuf.substring(0));
+                } catch (ChangeVetoException ex) {
+                    throw new BioException("Couldn't alter annotation",ex);
+                }
+            } else {
+                featureTemplate.annotation = Annotation.EMPTY_ANNOTATION;
+            }
 
-	    listener.startFeature(featureTemplate);
-	    listener.endFeature();
+            listener.startFeature(featureTemplate);
+            listener.endFeature();
 
-	    inFeature = false;
-	}
+            inFeature = false;
+        }
 
         public boolean inFeature()
-	{
-	    return inFeature;
-	}
+        {
+            return inFeature;
+        }
 
-	/**
-	 * Returns the next location contained in theTokens
-	 *
-	 * @exception bioException Thrown if a non-location is first in theTokens
-	 * @param theTokens The tokens to process
-	 * @return The location at the front of theTokens
-	 */
-	private Location getLocation(StringTokenizer theTokens)
-		throws BioException
-	{
-		Index startIndex = this.getIndex(theTokens);
-		Index endIndex = this.getIndex(theTokens);
+        /**
+         * Returns the next location contained in theTokens
+         *
+         * @exception bioException Thrown if a non-location is first in theTokens
+         * @param theTokens The tokens to process
+         * @return The location at the front of theTokens
+         */
+        private Location getLocation(StringTokenizer theTokens)
+                throws BioException
+        {
+                Index startIndex = this.getIndex(theTokens);
+                Index endIndex = this.getIndex(theTokens);
 
-		Location theLocation;
-		if(startIndex.isFuzzy() || endIndex.isFuzzy())
-		{
-			// This handles all locations with one of the following points:
-			// 		<nn
-			//		>nn
-			//		?nn
-			//		?
-			// All these get resolved into a fuzzy location, though with
-			// different combinations of start and end points.  The getIndex
-			// method does some preliminary work to find mins and maxes
-			if(startIndex.equals(endIndex))
-			{
-				theLocation = new FuzzyPointLocation(startIndex.getMinValue(),
-						startIndex.getMaxValue(),
-						FuzzyPointLocation.RESOLVE_AVERAGE);
-			}
-			else
-			{
-				theLocation = new FuzzyLocation(startIndex.getMinValue(),
-					endIndex.getMaxValue(), startIndex.getMaxValue(),
-					endIndex.getMinValue(), startIndex.isFuzzy(),
-					endIndex.isFuzzy(), FuzzyLocation.RESOLVE_INNER);
-			}
-		}
-		else if(startIndex.equals(endIndex))
-		{
-			// Fuzzy point locations were peeled off as fuzzy locations.  The
-			// point locations handled here are concrete point locations
-		    theLocation = new PointLocation(startIndex.getMinValue());
-		}
-	    else
-		{
-		    theLocation = new RangeLocation(startIndex.getMinValue(), endIndex.getMinValue());
-		}
+                Location theLocation;
+                if(startIndex.isFuzzy() || endIndex.isFuzzy())
+                {
+                        // This handles all locations with one of the following points:
+                        // 		<nn
+                        //		>nn
+                        //		?nn
+                        //		?
+                        // All these get resolved into a fuzzy location, though with
+                        // different combinations of start and end points.  The getIndex
+                        // method does some preliminary work to find mins and maxes
+                        if(startIndex.equals(endIndex))
+                        {
+                                theLocation = new FuzzyPointLocation(startIndex.getMinValue(),
+                                                startIndex.getMaxValue(),
+                                                FuzzyPointLocation.RESOLVE_AVERAGE);
+                        }
+                        else
+                        {
+                                theLocation = new FuzzyLocation(startIndex.getMinValue(),
+                                        endIndex.getMaxValue(), startIndex.getMaxValue(),
+                                        endIndex.getMinValue(), startIndex.isFuzzy(),
+                                        endIndex.isFuzzy(), FuzzyLocation.RESOLVE_INNER);
+                        }
+                }
+                else if(startIndex.equals(endIndex))
+                {
+                        // Fuzzy point locations were peeled off as fuzzy locations.  The
+                        // point locations handled here are concrete point locations
+                    theLocation = new PointLocation(startIndex.getMinValue());
+                }
+            else
+                {
+                    theLocation = new RangeLocation(startIndex.getMinValue(), endIndex.getMinValue());
+                }
 
-		return theLocation;
-	}
+                return theLocation;
+        }
 
-	/**
-	 * Returns the Integer value of the next token and its fuzzyness
-	 *
-	 * @exception BioException Thrown if a non-number token is passed in
-	 * (fuzzy locations are handled)
-	 * @param theTokens The tokens to be processed
-	 * @return Index
-	 */
-	private Index getIndex(StringTokenizer theTokens)
-		throws BioException
-	{
-		String returnIndex = theTokens.nextToken();
-		int minValue;
-		int maxValue;
-		boolean isFuzzy;
-		if(returnIndex.indexOf('<') != -1)
-		{
-			// Peel off cases "<nn"  Returned as MIN_VALUE to nn
-			returnIndex = returnIndex.substring(1);
-			minValue = Integer.MIN_VALUE;
-			maxValue = Integer.parseInt(returnIndex);
-			isFuzzy = true;
-		}
-		else if(returnIndex.indexOf('>') != -1)
-		{
-			// Peel off cases ">nn"  Returned as nn to MAX_VALUE
-			returnIndex = returnIndex.substring(1);
-			maxValue = Integer.MAX_VALUE;
-			minValue = Integer.parseInt(returnIndex);
-			isFuzzy = true;
-		}
-		else if(returnIndex.indexOf('?') != -1)
-		{
-			// Two cases are handled here; '?' and "?nn"
-			if(returnIndex.length() == 1)
-			{
-				minValue = Integer.MIN_VALUE;
-				maxValue = Integer.MAX_VALUE;
-				isFuzzy = true;
-			}
-			else
-			{
-				returnIndex = returnIndex.substring(1);
-				minValue = Integer.parseInt(returnIndex);
-				maxValue = minValue;
-				isFuzzy = true;
-			}
-		}
-		else
-		{
-			// Plain vanilla location
-			minValue = Integer.parseInt(returnIndex);
-			maxValue = minValue;
-			isFuzzy = false;
-		}
+        /**
+         * Returns the Integer value of the next token and its fuzzyness
+         *
+         * @exception BioException Thrown if a non-number token is passed in
+         * (fuzzy locations are handled)
+         * @param theTokens The tokens to be processed
+         * @return Index
+         */
+        private Index getIndex(StringTokenizer theTokens)
+                throws BioException
+        {
+                String returnIndex = theTokens.nextToken();
+                int minValue;
+                int maxValue;
+                boolean isFuzzy;
+                if(returnIndex.indexOf('<') != -1)
+                {
+                        // Peel off cases "<nn"  Returned as MIN_VALUE to nn
+                        returnIndex = returnIndex.substring(1);
+                        minValue = Integer.MIN_VALUE;
+                        maxValue = Integer.parseInt(returnIndex);
+                        isFuzzy = true;
+                }
+                else if(returnIndex.indexOf('>') != -1)
+                {
+                        // Peel off cases ">nn"  Returned as nn to MAX_VALUE
+                        returnIndex = returnIndex.substring(1);
+                        maxValue = Integer.MAX_VALUE;
+                        minValue = Integer.parseInt(returnIndex);
+                        isFuzzy = true;
+                }
+                else if(returnIndex.indexOf('?') != -1)
+                {
+                        // Two cases are handled here; '?' and "?nn"
+                        if(returnIndex.length() == 1)
+                        {
+                                minValue = Integer.MIN_VALUE;
+                                maxValue = Integer.MAX_VALUE;
+                                isFuzzy = true;
+                        }
+                        else
+                        {
+                                returnIndex = returnIndex.substring(1);
+                                minValue = Integer.parseInt(returnIndex);
+                                maxValue = minValue;
+                                isFuzzy = true;
+                        }
+                }
+                else
+                {
+                        // Plain vanilla location
+                        minValue = Integer.parseInt(returnIndex);
+                        maxValue = minValue;
+                        isFuzzy = false;
+                }
 
-		return(new Index(minValue, maxValue, isFuzzy));
-	}
+                return(new Index(minValue, maxValue, isFuzzy));
+        }
 
-	/**
-	 * This inner class is a struct to pass back the information contained in
-	 * a Swissprot point
-	 */
-	private class Index
-	{
-		protected int mMinValue;
-		protected int mMaxValue;
-		protected boolean isFuzzy;
+        /**
+         * This inner class is a struct to pass back the information contained in
+         * a Swissprot point
+         */
+        private class Index
+        {
+                protected int mMinValue;
+                protected int mMaxValue;
+                protected boolean isFuzzy;
 
-		public Index(int theMinValue, int theMaxValue, boolean theFuzzyness)
-		{
-			this.mMinValue = theMinValue;
-			this.mMaxValue = theMaxValue;
-			this.isFuzzy = theFuzzyness;
-		}
+                public Index(int theMinValue, int theMaxValue, boolean theFuzzyness)
+                {
+                        this.mMinValue = theMinValue;
+                        this.mMaxValue = theMaxValue;
+                        this.isFuzzy = theFuzzyness;
+                }
 
-		public int getMaxValue()
-		{
-			return this.mMaxValue;
-		}
+                public int getMaxValue()
+                {
+                        return this.mMaxValue;
+                }
 
-		public int getMinValue()
-		{
-			return this.mMinValue;
-		}
+                public int getMinValue()
+                {
+                        return this.mMinValue;
+                }
 
-		public boolean isFuzzy()
-		{
-			return this.isFuzzy;
-		}
+                public boolean isFuzzy()
+                {
+                        return this.isFuzzy;
+                }
 
-		public boolean equals(Index theIndex)
-		{
-			boolean returnValue = false;
-			if((this.mMinValue == theIndex.getMinValue()) &&
-				(this.mMaxValue == theIndex.getMaxValue()) &&
-				(this.isFuzzy == theIndex.isFuzzy()))
-			{
-				returnValue = true;
-			}
-			return returnValue;
-		}
-	}
+                public boolean equals(Index theIndex)
+                {
+                        boolean returnValue = false;
+                        if((this.mMinValue == theIndex.getMinValue()) &&
+                                (this.mMaxValue == theIndex.getMaxValue()) &&
+                                (this.isFuzzy == theIndex.isFuzzy()))
+                        {
+                                returnValue = true;
+                        }
+                        return returnValue;
+                }
+        }
 }

@@ -183,7 +183,7 @@ implements Format {
 
             tag = null;
           } catch (IllegalStateException ise) {
-            throw new ParserException(ise, "Couldn't match: " + pat.pattern() + " " + tag);
+            throw new ParserException("Couldn't match: " + pat.pattern() + " " + tag, ise);
           }
         } else {
           super.value(ctxt, val);

@@ -36,7 +36,7 @@ import org.biojava.utils.ChangeVetoException;
 /**
  * <p>PhredSequence is an extension of SimpleSequence that implements
  * Qualitative to hold Phred quality scores.</p>
- *     
+ *
  * <p>Copyright:    Copyright (c) 2001</p>
  * <p>Company:      AgResearch</p>
  * @author Mark Schreiber
@@ -73,10 +73,10 @@ public class PhredSequence extends SimpleSequence implements Qualitative{
       try{
         qual.addSymbol(PhredTools.integerSymbolFromPhred(this.symbolAt(i)));
       }catch(IllegalSymbolException ise){
-        throw new BioError(ise,
-        "PhredTools.integerSymbolFromPhred() has returned a symbol not in this SymbolLists alphabet");
+        throw new BioError(
+        "PhredTools.integerSymbolFromPhred() has returned a symbol not in this SymbolLists alphabet", ise);
       }catch(ChangeVetoException cve){
-        throw new BioError(cve, "Cannot construct symbol list as it has becomed locked?");
+        throw new BioError( "Cannot construct symbol list as it has becomed locked?", cve);
       }
     }
     return qual;
@@ -91,10 +91,10 @@ public class PhredSequence extends SimpleSequence implements Qualitative{
       try{
         dna.addSymbol(PhredTools.dnaSymbolFromPhred(this.symbolAt(i)));
       }catch(ChangeVetoException cve){
-        throw new BioError(cve, "Cannot construct symbol list as it has becomed locked?");
+        throw new BioError("Cannot construct symbol list as it has becomed locked?", cve);
       }catch(IllegalSymbolException ise){
-        throw new BioError(ise,
-        "PhredTools.dnaSymbolFromPhred() has returned a symbol not in the DNA alphabet");
+        throw new BioError(
+        "PhredTools.dnaSymbolFromPhred() has returned a symbol not in the DNA alphabet", ise);
       }
     }
     return dna;
@@ -104,7 +104,7 @@ public class PhredSequence extends SimpleSequence implements Qualitative{
     try{
       return PhredTools.integerSymbolFromPhred(this.symbolAt(index));
     }catch(IllegalSymbolException ise){
-      throw new BioError(ise, "Something has gone badly wrong with the Phred Alphabet!");
+      throw new BioError("Something has gone badly wrong with the Phred Alphabet!", ise);
     }
   }
 
@@ -112,7 +112,7 @@ public class PhredSequence extends SimpleSequence implements Qualitative{
     try{
       return PhredTools.dnaSymbolFromPhred(this.symbolAt(index));
     }catch(IllegalSymbolException ise){
-      throw new BioError(ise, "Something has gone badly wrong with the Phred Alphabet!");
+      throw new BioError("Something has gone badly wrong with the Phred Alphabet!", ise);
     }
   }
 }

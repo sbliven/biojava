@@ -41,11 +41,11 @@ import org.biojava.utils.ChangeVetoException;
  */
 public class SimpleStrandedFeature extends SimpleFeature implements StrandedFeature {
     private StrandedFeature.Strand strand;
-    
+
     public StrandedFeature.Strand getStrand() {
         return strand;
     }
-  
+
     public SymbolList getSymbols() {
         SymbolList symList = super.getSymbols();
         if (getStrand() == NEGATIVE) {
@@ -53,15 +53,14 @@ public class SimpleStrandedFeature extends SimpleFeature implements StrandedFeat
                 symList = DNATools.reverseComplement(symList);
             } catch (IllegalAlphabetException iae) {
                 throw new BioError(
-				       iae,
-				       "Could not retrieve symbols for feature as " +
-				       "the alphabet can not be complemented."
-				       );
+                                       "Could not retrieve symbols for feature as " +
+                                       "the alphabet can not be complemented.", iae
+                                       );
             }
         }
         return symList;
     }
-  
+
     public void setStrand(Strand strand)
         throws ChangeVetoException {
         if (hasListeners()) {
@@ -83,17 +82,17 @@ public class SimpleStrandedFeature extends SimpleFeature implements StrandedFeat
     fillTemplate(ft);
     return ft;
   }
-  
+
   protected void fillTemplate(StrandedFeature.Template ft) {
     super.fillTemplate(ft);
     ft.strand = getStrand();
   }
-  
+
     public SimpleStrandedFeature(Sequence sourceSeq,
                                  FeatureHolder parent,
                                  StrandedFeature.Template template)
         throws IllegalArgumentException
-               //, IllegalAlphabetException 
+               //, IllegalAlphabetException
     {
         super(sourceSeq, parent, template);
         this.strand = template.strand;
@@ -104,7 +103,7 @@ public class SimpleStrandedFeature extends SimpleFeature implements StrandedFeat
             //					);
         }
     }
-  
+
     public String toString() {
         String pm;
         if(getStrand() == POSITIVE) {

@@ -281,8 +281,8 @@ public class Protease implements Serializable {
         }
       }
       catch (BioException ex) {
-        throw new BioError(ex,
-          "Assertion Error: Cannot register Protease instance following de serialization"
+        throw new BioError(
+          "Assertion Error: Cannot register Protease instance following de serialization", ex
         );
       }
     }

@@ -54,7 +54,7 @@ implements UnigeneFactory {
   private static final String LIB_INFO_INDEX = "libInfo.index";
   private static final String UNIQUE_INDEX = "unique.index";
   private static final String ALL_INDEX = "all.index";
-  
+
   /**
    * Accepts all URLs that are of the file protocol.
    */
@@ -70,7 +70,7 @@ implements UnigeneFactory {
         unigeneLoc
       );
     }
-    
+
     File unigeneDir = new File(unigeneLoc.getPath());
     if(!unigeneDir.exists()) {
       throw new BioException("Could not locate directory: " + unigeneDir);
@@ -78,8 +78,8 @@ implements UnigeneFactory {
     if(!unigeneDir.isDirectory()) {
       throw new BioException("Expecting a directory at: " + unigeneDir);
     }
-    
-    
+
+
     // load a pre-made unigene file set
     try {
       return new FlatFileUnigeneDB(
@@ -89,10 +89,10 @@ implements UnigeneFactory {
         new BioStore(new File(unigeneDir, ALL_INDEX), true)
       );
     } catch (IOException ioe) {
-      throw new BioException(ioe, "Could not instantiate flat file unigene db");
+      throw new BioException("Could not instantiate flat file unigene db",ioe);
     }
   }
-  
+
   public UnigeneDB createUnigene(URL unigeneLoc)
   throws BioException {
     if(!unigeneLoc.getProtocol().equals("file")) {
@@ -101,7 +101,7 @@ implements UnigeneFactory {
         unigeneLoc
       );
     }
-    
+
     File unigeneDir = new File(unigeneLoc.getPath());
     if(!unigeneDir.exists()) {
       throw new BioException("Could not locate directory: " + unigeneDir);
@@ -116,9 +116,9 @@ implements UnigeneFactory {
       indexData(unigeneDir);
       indexLibInfo(unigeneDir);
     } catch (IOException ioe) {
-      throw new BioException(ioe, "Failed to index data");
+      throw new BioException("Failed to index data",ioe);
     }
-    
+
     return loadUnigene(unigeneLoc);
   }
 
@@ -149,7 +149,7 @@ implements UnigeneFactory {
           pl.getListener()
         )) { ; }
       } catch (ParserException pe) {
-        throw new BioException(pe, "Failed to parse " + f);
+        throw new BioException("Failed to parse " + f, pe);
       }
     }
     try {
@@ -186,7 +186,7 @@ implements UnigeneFactory {
             pl.getListener()
         )) { ; }
       } catch (ParserException pe) {
-        throw new BioException(pe, "Failed to parse " + f);
+        throw new BioException("Failed to parse " + f, pe);
       }
     }
     try {
@@ -195,7 +195,7 @@ implements UnigeneFactory {
       throw new BioException(ne);
     }
   }
-  
+
   private void indexUnique(File unigeneDir)
   throws BioException, IOException {
     File uniqueIndex = new File(unigeneDir, UNIQUE_INDEX);
@@ -236,7 +236,7 @@ implements UnigeneFactory {
       throw new BioException(ne);
     }
   }
-  
+
   private void indexAll(File unigeneDir)
   throws BioException, IOException {
     File allIndex = new File(unigeneDir, ALL_INDEX);
@@ -255,7 +255,7 @@ implements UnigeneFactory {
       File f = allFiles[i];
       RAF raf = new RAF(f, "r");
       CountedBufferedReader reader = new CountedBufferedReader(new FileReader(f));
-      
+
       long offset = -1;
       String id = null;
       for(String line = reader.readLine(); line != null; line = reader.readLine()) {

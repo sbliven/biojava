@@ -101,12 +101,10 @@ public class FormatTools {
           format = (Format) formatClass.newInstance();
         } catch (InstantiationException e) {
           throw new BioException(
-            e,
-            "Could not instantiate class for name " + formatName );
+            "Could not instantiate class for name " + formatName,e );
         } catch (IllegalAccessException e) {
           throw new BioException(
-            e,
-            "Could not instantiate class for name " + formatName );
+            "Could not instantiate class for name " + formatName , e);
         }
       }
     }
@@ -135,7 +133,7 @@ public class FormatTools {
           LSID_2_FORMAT.put(format.getLSID(), format);
         }
       } catch (Exception e) {
-        throw new BioException(e, "Could not load service provider info for formats");
+        throw new BioException("Could not load service provider info for formats",e);
       }
     }
 

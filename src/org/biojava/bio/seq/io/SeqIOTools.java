@@ -646,7 +646,7 @@ public final class SeqIOTools  {
     // reading and writing sequences and alignments. (Nimesh Singh).
     //
     //
-     
+
     /**
      * Attempts to guess the filetype of a file given the name.  For
      * use with the functions below that take an int fileType as a
@@ -683,7 +683,7 @@ public final class SeqIOTools  {
                 return guessMsfType(seqFile);
             }
         } catch (PatternSyntaxException e) {
-            throw new BioError(e, "Internal error in SeqIOTools");
+            throw new BioError("Internal error in SeqIOTools", e);
         }
 
         //Reads the file to guess based on content
@@ -927,8 +927,8 @@ public final class SeqIOTools  {
         try {
             return DNATools.getDNA().getTokenization("token");
         } catch (BioException ex) {
-            throw new BioError(ex, "Assertion failing:"
-                               + " Couldn't get DNA token parser");
+            throw new BioError("Assertion failing:"
+                               + " Couldn't get DNA token parser",ex);
         }
     }
 
@@ -936,8 +936,8 @@ public final class SeqIOTools  {
         try {
             return RNATools.getRNA().getTokenization("token");
         } catch (BioException ex) {
-            throw new BioError(ex, "Assertion failing:"
-                               + " Couldn't get RNA token parser");
+            throw new BioError("Assertion failing:"
+                               + " Couldn't get RNA token parser",ex);
         }
     }
 
@@ -945,8 +945,8 @@ public final class SeqIOTools  {
         try {
             return NucleotideTools.getNucleotide().getTokenization("token");
         } catch (BioException ex) {
-            throw new BioError(ex, "Assertion failing:"
-                               + " Couldn't get nucleotide token parser");
+            throw new BioError("Assertion failing:"
+                               + " Couldn't get nucleotide token parser",ex);
         }
     }
 
@@ -954,8 +954,8 @@ public final class SeqIOTools  {
         try {
             return ProteinTools.getTAlphabet().getTokenization("token");
         } catch (BioException ex) {
-            throw new BioError(ex, "Assertion failing:"
-                               + " Couldn't get PROTEIN token parser");
+            throw new BioError("Assertion failing:"
+                               + " Couldn't get PROTEIN token parser",ex);
         }
     }
 

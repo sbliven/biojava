@@ -18,7 +18,7 @@
  *      http://www.biojava.org/
  *
  */
- 
+
 package org.biojava.bio.program.das;
 
 import java.io.IOException;
@@ -61,73 +61,73 @@ public class DAS extends AbstractChangeable {
     private static List activityListeners;
     private Map dataSources;
     private static boolean threadFetches = false;
-  
+
     {
-	dataSources = new HashMap();
-    }
-  
-    static {
-	activityListeners = new ArrayList();
-	threadFetches = Boolean.getBoolean("org.biojava.bio.program.das.thread_fetches");
+        dataSources = new HashMap();
     }
 
-    
+    static {
+        activityListeners = new ArrayList();
+        threadFetches = Boolean.getBoolean("org.biojava.bio.program.das.thread_fetches");
+    }
+
+
     public static Set getTypes(URL dasURL) throws BioException {
-	final Set types = new HashSet();
-	try {
-	    TypesFetcher tf = new TypesFetcher(dasURL, null, null);
-	    tf.setNullSegmentHandler(new TypesListener() {
-		    public void startSegment() {}
-		    public void endSegment() {}
-		    public void registerType(String type) { types.add(type); }
-		    public void registerType(String type, int count) { types.add(type); }
-		} );
-	    tf.runFetch();
-	} catch (ParseException ex) {
-	    throw new BioException(ex);
-	}
-	return Collections.unmodifiableSet(types);
+        final Set types = new HashSet();
+        try {
+            TypesFetcher tf = new TypesFetcher(dasURL, null, null);
+            tf.setNullSegmentHandler(new TypesListener() {
+                    public void startSegment() {}
+                    public void endSegment() {}
+                    public void registerType(String type) { types.add(type); }
+                    public void registerType(String type, int count) { types.add(type); }
+                } );
+            tf.runFetch();
+        } catch (ParseException ex) {
+            throw new BioException(ex);
+        }
+        return Collections.unmodifiableSet(types);
     }
 
     public static void setThreadFetches(boolean b) {
-	threadFetches = b;
+        threadFetches = b;
     }
 
     public static boolean getThreadFetches() {
-	return threadFetches;
+        return threadFetches;
     }
 
     public static final ChangeType SERVERS = new ChangeType(
-		 "Das Servers changed", DAS.class, "SERVERS"
-							   );
-  
+                 "Das Servers changed", DAS.class, "SERVERS"
+                                                           );
+
     public static synchronized void addActivityListener(ActivityListener al) {
-	activityListeners.add(al);
+        activityListeners.add(al);
     }
 
     public static synchronized void removeActivityListener(ActivityListener al) {
-	activityListeners.remove(al);
+        activityListeners.remove(al);
     }
 
     public static synchronized void startedActivity(Object source) {
-	for (Iterator i = activityListeners.iterator(); i.hasNext(); ) {
-	    ActivityListener al = (ActivityListener) i.next();
-	    al.startedActivity(source);
-	}
+        for (Iterator i = activityListeners.iterator(); i.hasNext(); ) {
+            ActivityListener al = (ActivityListener) i.next();
+            al.startedActivity(source);
+        }
     }
 
     public static synchronized void completedActivity(Object source) {
-	for (Iterator i = activityListeners.iterator(); i.hasNext(); ) {
-	    ActivityListener al = (ActivityListener) i.next();
-	    al.completedActivity(source);
-	}
+        for (Iterator i = activityListeners.iterator(); i.hasNext(); ) {
+            ActivityListener al = (ActivityListener) i.next();
+            al.completedActivity(source);
+        }
     }
 
     public static synchronized void activityProgress(Object source, int current, int target) {
-	for (Iterator i = activityListeners.iterator(); i.hasNext(); ) {
-	    ActivityListener al = (ActivityListener) i.next();
-	    al.activityProgress(source, current, target);
-	}
+        for (Iterator i = activityListeners.iterator(); i.hasNext(); ) {
+            ActivityListener al = (ActivityListener) i.next();
+            al.activityProgress(source, current, target);
+        }
     }
 
   public void addDasURL(URL dasURL)
@@ -138,13 +138,13 @@ public class DAS extends AbstractChangeable {
         ChangeEvent ce = new ChangeEvent(this, SERVERS);
         cs.firePreChangeEvent(ce);
         addDasURLImpl(dasURL);
-	cs.firePostChangeEvent(ce);
+        cs.firePostChangeEvent(ce);
       }
     } else {
       addDasURLImpl(dasURL);
     }
   }
-  
+
   // fixme: can leave the object in an inconsistent state. Should be made into
   // an atomic operation
   private void addDasURLImpl(URL dasURL)
@@ -158,17 +158,17 @@ public class DAS extends AbstractChangeable {
       if(status == 0) {
         throw new BioException("Not a DAS server: " + dsnURL);
       } else if(status != 200) {
-        throw new BioException("DAS error (status code = " + status + ")"); 
+        throw new BioException("DAS error (status code = " + status + ")");
       }
-      
+
       InputSource is = new InputSource(huc.getInputStream());
       is.setSystemId(dsnURL.toString());
       DocumentBuilder parser = DASSequence.nonvalidatingParser();
       NodeList nl = parser
-	.parse(is)
+        .parse(is)
         .getDocumentElement()
         .getElementsByTagName("DSN");
-      
+
       for(int i = 0; i < nl.getLength(); i++) {
         Node n = nl.item(i);
         if(n instanceof Element) {
@@ -176,27 +176,27 @@ public class DAS extends AbstractChangeable {
           Element source = (Element) dnsE.getElementsByTagName("SOURCE").item(0);
           Element mapmaster = (Element) dnsE.getElementsByTagName("MAPMASTER").item(0);
           Element description = (Element) dnsE.getElementsByTagName("DESCRIPTION").item(0);
-          
+
           String sourceID = source.getAttribute("id");
           String sourceText = ((Text) source.getFirstChild()).getData().trim();
-	  String mapURLString = ((Text) mapmaster.getFirstChild()).getData().trim();
-	  if (! (mapURLString.charAt(mapURLString.length() - 1) == '/')) {
-	      mapURLString = mapURLString + '/';
-	  }
+          String mapURLString = ((Text) mapmaster.getFirstChild()).getData().trim();
+          if (! (mapURLString.charAt(mapURLString.length() - 1) == '/')) {
+              mapURLString = mapURLString + '/';
+          }
           URL mapURL = new URL(mapURLString);
           String descrText = ((Text) description.getFirstChild()).getData().trim();
-          
+
           URL dsURL = new URL(dasURL, sourceID + "/");
           ReferenceServer master = (ReferenceServer) dataSources.get(mapURL);
-          
+
           if(dsURL.equals(mapURL)) { // reference server URL
             if(master != null) { // merge this entry with old stub entry
-		master.setName(sourceText);
-		master.setDescription(descrText);
+                master.setName(sourceText);
+                master.setDescription(descrText);
             } else {
-		ReferenceServer ds = new ReferenceServer(dsURL, sourceText, descrText);
-		dataSources.put(dsURL, ds);
-	    }
+                ReferenceServer ds = new ReferenceServer(dsURL, sourceText, descrText);
+                dataSources.put(dsURL, ds);
+            }
           } else { // annotation server
             if(master == null) {
               master = new ReferenceServer(mapURL, null, null);
@@ -208,16 +208,16 @@ public class DAS extends AbstractChangeable {
         }
       }
     } catch (MalformedURLException me) {
-      throw new BioException(me, "Can't build DAS url");
+      throw new BioException("Can't build DAS url",me);
     } catch (IOException ioe) {
-      throw new BioException(ioe, "Can't process URL connection");
+      throw new BioException("Can't process URL connection",ioe);
     } catch (SAXException se) {
-      throw new BioException(se, "Can't parse XML document");
+      throw new BioException("Can't parse XML document",se);
     } finally {
-	DAS.completedActivity(this);
+        DAS.completedActivity(this);
     }
   }
-  
+
   // Set of all ReferenceServer objects known by this das
   public Set getReferenceServers() {
     return Collections.unmodifiableSet(new HashSet(dataSources.values()));

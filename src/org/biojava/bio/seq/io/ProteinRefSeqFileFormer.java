@@ -59,7 +59,7 @@ public class ProteinRefSeqFileFormer extends GenbankFileFormer
                            Symbol [] theSymbols,
                            int       theStart,
                            int       theLength)
-	throws IllegalAlphabetException
+        throws IllegalAlphabetException
     {
         // Get newline character
         String newLine = System.getProperty("line.separator");
@@ -123,7 +123,7 @@ public class ProteinRefSeqFileFormer extends GenbankFileFormer
         try {
             tokenization = theAlphabet.getTokenization("token");
         } catch (BioException ex) {
-            throw new BioError(ex, "Expected tokenization");
+            throw new BioError("Expected tokenization",ex);
         }
         for(int i = theStart; i < theStart + theLength; i++)
         {

@@ -99,7 +99,7 @@ class SeqIOEventEmitter
 
             // Put the source features first for EMBL
             for (Iterator fi = subs.iterator(); fi.hasNext();)
-            {		
+            {
                 // The template is required to call startFeature
                 Feature.Template t = ((Feature) fi.next()).makeTemplate();
 
@@ -127,7 +127,7 @@ class SeqIOEventEmitter
                                 (Symbol []) seq.toList().toArray(symProto),
                                 0,
                                 seq.length());
-	    
+
             // Inform listener of sequence end
             listener.endSequence();
         }
@@ -135,11 +135,11 @@ class SeqIOEventEmitter
         {
             // This should never happen as the alphabet is being used
             // by this Sequence instance
-            throw new BioError(iae, "An internal error occurred processing symbols");
+            throw new BioError("An internal error occurred processing symbols",iae);
         }
         catch (ParseException pe)
         {
-            throw new BioError(pe, "An internal error occurred creating SeqIO events");
+            throw new BioError("An internal error occurred creating SeqIO events",pe);
         }
     }
 

@@ -283,7 +283,7 @@ public class IndexTools
         }
         catch (CommitFailure ne)
         {
-            throw new BioException(ne, "Failed to commit new index to file");
+            throw new BioException("Failed to commit new index to file",ne);
         }
     }
 
@@ -344,7 +344,7 @@ public class IndexTools
         }
         catch (CommitFailure ne)
         {
-            throw new BioException(ne, "Failed to commit new index to file");
+            throw new BioException("Failed to commit new index to file",ne);
         }
     }
 
@@ -395,7 +395,7 @@ public class IndexTools
         }
         catch (CommitFailure ne)
         {
-            throw new BioException(ne, "Failed to commit new index to file");
+            throw new BioException("Failed to commit new index to file",ne);
         }
     }
 }

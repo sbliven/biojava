@@ -50,17 +50,17 @@ public abstract class AbstractSequenceDB
   public SequenceIterator sequenceIterator() {
     return new SequenceIterator() {
       private Iterator pID = ids().iterator();
-      
+
       public boolean hasNext() {
         return pID.hasNext();
       }
-      
+
       public Sequence nextSequence() throws BioException {
         return getSequence((String) pID.next());
       }
     };
   }
-  
+
   public FeatureHolder filter(FeatureFilter ff) {
       MergeFeatureHolder results = new MergeFeatureHolder();
       try {
@@ -74,16 +74,16 @@ public abstract class AbstractSequenceDB
       } catch (BioException ex) {
           throw new BioRuntimeException(ex);
       } catch (ChangeVetoException cve) {
-          throw new BioError(cve, "Assertion failed: couldn't modify newly created MergeFeatureHolder");
+          throw new BioError("Assertion failed: couldn't modify newly created MergeFeatureHolder",cve);
       }
       return results;
   }
-  
+
   public void addSequence(Sequence seq)
   throws BioException, ChangeVetoException {
     throw new ChangeVetoException("AbstractSequenceDB is immutable");
   }
-  
+
   public void removeSequence(String id)
   throws BioException, ChangeVetoException {
     throw new ChangeVetoException("AbstractSequenceDB is immutable");

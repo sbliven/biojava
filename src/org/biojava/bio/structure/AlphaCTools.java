@@ -73,7 +73,7 @@ public final class AlphaCTools {
         return a;
       }
       catch (IllegalAlphabetException ex) {
-        throw new BioError(ex, "Cannot construct "+ALPHA+" alphabet");
+        throw new BioError( "Cannot construct "+ALPHA+" alphabet",ex);
       }
     }
   }

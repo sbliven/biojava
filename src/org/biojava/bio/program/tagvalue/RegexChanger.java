@@ -31,7 +31,7 @@ public class RegexChanger
     this.pattern = pattern;
     this.matchGroup = matchGroup;
   }
-  
+
   public Object change(Object value)
   throws ParserException {
     try {
@@ -40,8 +40,7 @@ public class RegexChanger
       return matcher.group(matchGroup);
     } catch (IllegalStateException e) {
       throw new ParserException(
-        e,
-        "Could not match " + pattern.pattern() + " to " + value
+        "Could not match " + pattern.pattern() + " to " + value,  e
       );
     }
   }

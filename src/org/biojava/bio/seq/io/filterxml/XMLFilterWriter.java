@@ -47,10 +47,10 @@ public class XMLFilterWriter {
     public static final String XML_FILTER_NS = "http://www.biojava.org/FeatureFilter";
     private static final Class[] NO_ARGS = new Class[0];
     private static final Object[] NO_ARGS_VAL = new Object[0];
-    
+
     private Map filterWritersByClass = new HashMap();
     private boolean strict = false;
-    
+
     /**
      * Interface for an object which can write a FeatureFilter as XML.  Implement
      * this to add support for new types of <code>FeatureFilter</code>
@@ -58,7 +58,7 @@ public class XMLFilterWriter {
      * @author Thomas Down
      * @since 1.3
      */
-    
+
     public interface FilterWriter {
         public void writeFilter(FeatureFilter ff,
                                 XMLWriter xw,
@@ -66,12 +66,12 @@ public class XMLFilterWriter {
             throws ClassCastException, IllegalArgumentException, IOException;
     }
 
-    
+
     /**
      * Construct a new <code>XMLFilterWriter</code> which can serialize the buildin types of
      * <code>FeatureFilter</code>.
      */
-    
+
     public XMLFilterWriter() {
         try {
             filterWritersByClass.put(
@@ -192,54 +192,54 @@ public class XMLFilterWriter {
                 new ByPairwiseScoreFilterWriter()
             );
         } catch (Exception ex) {
-            throw new BioError(ex, "Assertion failed: couldn't initialize XMLFilterWriters");
+            throw new BioError("Assertion failed: couldn't initialize XMLFilterWriters",ex);
         }
     }
-    
+
     /**
      * Add a writer for the specified class of filters
      */
-    
+
     public void addXMLFilterWriter(Class clazz, FilterWriter xfw) {
         filterWritersByClass.put(clazz, xfw);
     }
-    
+
     /**
      * Add a writer for a singleton filter.
      */
-     
+
     public void addXMLFilterWriter(FeatureFilter ff, FilterWriter xfw) {
         filterWritersByClass.put(ff, xfw);
     }
-    
+
     /**
      * Determine if this writer is in strict mode.
      */
-    
+
     public boolean isStrict() {
         return strict;
     }
-    
+
     /**
      * Selects strict mode.  In strict mode, the writer will throw an <code>IllegalArgumentException</code>
      * if it encounters a type of <code>FeatureFilter</code> it doesn't recognize.  When not
      * in strict model, unrecognized filters are silently replaced by <code>FeatureFilter.all</code>.
      * Default is <code>false</code>.
      */
-    
+
     public void setIsStrict(boolean b) {
         this.strict = b;
     }
-    
+
     /**
      * Write a FeatureFilter to the supplied XMLWriter
      *
-     * @throws IllegalArgumentException if the FeatureFilter is unrecognized, and the writer is 
+     * @throws IllegalArgumentException if the FeatureFilter is unrecognized, and the writer is
      *                                  in strict mode.
      * @throws IOException if an error occurs while outputting XML.
      */
-    
-    public void writeFilter(FeatureFilter ff, XMLWriter xw) 
+
+    public void writeFilter(FeatureFilter ff, XMLWriter xw)
         throws IllegalArgumentException, IOException
     {
         FilterWriter xfw = (FilterWriter) filterWritersByClass.get(ff);
@@ -250,7 +250,7 @@ public class XMLFilterWriter {
             try {
                 xfw.writeFilter(ff, xw, this);
             } catch (ClassCastException ex) {
-                throw new BioError(ex, "Filter type mismatch");
+                throw new BioError("Filter type mismatch",ex);
             }
         } else {
             if (strict) {
@@ -260,16 +260,16 @@ public class XMLFilterWriter {
             }
         }
     }
-    
+
     private static class BlankFilterWriter implements FilterWriter {
         private String nsURI;
         private String localName;
-        
+
         BlankFilterWriter(String nsURI, String localName) {
             this.nsURI = nsURI;
             this.localName =  localName;
         }
-        
+
         public void writeFilter(FeatureFilter ff,
                                 XMLWriter xw,
                                 XMLFilterWriter config)
@@ -279,21 +279,21 @@ public class XMLFilterWriter {
             xw.closeTag(nsURI, localName);
         }
     }
-    
+
     private static abstract class PropertyFilterWriter implements FilterWriter {
         private final String nsURI;
         private final String localName;
         private final Method propMethod;
-        
+
         PropertyFilterWriter(String nsURI,
                              String localName,
-                             Method propMethod) 
+                             Method propMethod)
         {
             this.nsURI = nsURI;
             this.localName =  localName;
             this.propMethod = propMethod;
         }
-        
+
         public void writeFilter(FeatureFilter ff,
                                 XMLWriter xw,
                                 XMLFilterWriter config)
@@ -305,26 +305,26 @@ public class XMLFilterWriter {
                 writeContent(obj, xw, config);
                 xw.closeTag(nsURI, localName);
             } catch (IllegalAccessException ex) {
-                throw new BioError(ex, "Can't access property method");
+                throw new BioError("Can't access property method",ex);
             } catch (InvocationTargetException ex) {
-                throw new BioError(ex, "Coudln't access property");
+                throw new BioError("Couldn't access property",ex);
             }
         }
-        
+
         protected abstract void writeContent(Object obj,
                                              XMLWriter xw,
                                              XMLFilterWriter config)
             throws ClassCastException, IllegalArgumentException, IOException;
     }
-    
+
     private static class StringFilterWriter extends PropertyFilterWriter {
         StringFilterWriter(String nsURI,
                            String localName,
-                           Method propMethod) 
+                           Method propMethod)
         {
             super(nsURI, localName, propMethod);
         }
-        
+
         protected void writeContent(Object obj,
                                              XMLWriter xw,
                                              XMLFilterWriter config)
@@ -333,15 +333,15 @@ public class XMLFilterWriter {
             xw.print(obj.toString());
         }
     }
-    
+
     private static class LocationFilterWriter extends PropertyFilterWriter {
         LocationFilterWriter(String nsURI,
                            String localName,
-                           Method propMethod) 
+                           Method propMethod)
         {
             super(nsURI, localName, propMethod);
         }
-        
+
         protected void writeContent(Object obj,
                                              XMLWriter xw,
                                              XMLFilterWriter config)
@@ -354,18 +354,18 @@ public class XMLFilterWriter {
                 xw.attribute("start", "" + block.getMin());
                 xw.attribute("stop", "" + block.getMax());
                 xw.closeTag("span");
-            }   
+            }
         }
     }
-    
+
     private static class FilterFilterWriter extends PropertyFilterWriter {
         FilterFilterWriter(String nsURI,
                            String localName,
-                           Method propMethod) 
+                           Method propMethod)
         {
             super(nsURI, localName, propMethod);
         }
-        
+
         protected void writeContent(Object obj,
                                     XMLWriter xw,
                                     XMLFilterWriter config)
@@ -375,7 +375,7 @@ public class XMLFilterWriter {
             config.writeFilter(ff, xw);
         }
     }
-    
+
     private static class AndFilterWriter implements FilterWriter {
         public void writeFilter(FeatureFilter ff,
                                 XMLWriter xw,
@@ -387,7 +387,7 @@ public class XMLFilterWriter {
             writeSubFilter(ff, xw, config);
             xw.closeTag(XML_FILTER_NS, "and");
         }
-        
+
         private void writeSubFilter(FeatureFilter ff,
                                     XMLWriter xw,
                                     XMLFilterWriter config)
@@ -402,7 +402,7 @@ public class XMLFilterWriter {
             }
         }
     }
-    
+
     private static class OrFilterWriter implements FilterWriter {
         public void writeFilter(FeatureFilter ff,
                                 XMLWriter xw,
@@ -414,7 +414,7 @@ public class XMLFilterWriter {
             writeSubFilter(ff, xw, config);
             xw.closeTag(XML_FILTER_NS, "or");
         }
-        
+
         private void writeSubFilter(FeatureFilter ff,
                                     XMLWriter xw,
                                     XMLFilterWriter config)
@@ -429,7 +429,7 @@ public class XMLFilterWriter {
             }
         }
     }
-    
+
     private static class ByPairwiseScoreFilterWriter implements FilterWriter {
         public void writeFilter(FeatureFilter ff,
                                 XMLWriter xw,
@@ -447,14 +447,14 @@ public class XMLFilterWriter {
             xw.closeTag(XML_FILTER_NS, "byPairwiseScore");
         }
     }
-    
+
     private static class ByClassFilterWriter extends PropertyFilterWriter {
         ByClassFilterWriter()
             throws NoSuchMethodException
         {
                 super(XML_FILTER_NS, "byClass", FeatureFilter.ByClass.class.getMethod("getTestClass", NO_ARGS));
         }
-        
+
         protected void writeContent(Object obj,
                                              XMLWriter xw,
                                              XMLFilterWriter config)
@@ -463,14 +463,14 @@ public class XMLFilterWriter {
             xw.print(((Class) obj).getName());
         }
     }
-    
+
     private static class StrandFilterWriter extends PropertyFilterWriter {
         StrandFilterWriter()
             throws NoSuchMethodException
         {
                 super(XML_FILTER_NS, "byStrand", FeatureFilter.StrandFilter.class.getMethod("getStrand", NO_ARGS));
         }
-        
+
         protected void writeContent(Object obj,
                                              XMLWriter xw,
                                              XMLFilterWriter config)
@@ -479,14 +479,14 @@ public class XMLFilterWriter {
             xw.print(((StrandedFeature.Strand) obj).toString());
         }
     }
-    
+
     private static class FrameFilterWriter extends PropertyFilterWriter {
         FrameFilterWriter()
             throws NoSuchMethodException
         {
                 super(XML_FILTER_NS, "byFrame", FeatureFilter.FrameFilter.class.getMethod("getFrame", NO_ARGS));
         }
-        
+
         protected void writeContent(Object obj,
                                              XMLWriter xw,
                                              XMLFilterWriter config)
@@ -495,17 +495,17 @@ public class XMLFilterWriter {
             xw.print("" + ((FramedFeature.ReadingFrame) obj).getFrame());
         }
     }
-    
+
     private static class AnnotationTypeFilterWriter extends PropertyFilterWriter {
         private XMLAnnotationTypeWriter xatw;
-        
+
         AnnotationTypeFilterWriter(XMLAnnotationTypeWriter xatw)
             throws NoSuchMethodException
         {
                 super(XML_FILTER_NS, "byAnnotationType", FeatureFilter.ByAnnotationType.class.getMethod("getType", NO_ARGS));
                 this.xatw = xatw;
         }
-        
+
         protected void writeContent(Object obj,
                                     XMLWriter xw,
                                     XMLFilterWriter config)

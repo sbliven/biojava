@@ -44,6 +44,6 @@ public class DuplicateTaxonException
 
     public DuplicateTaxonException(Throwable t, String message)
     {
-        super(t, message);
+        super(message, t);
     }
 }

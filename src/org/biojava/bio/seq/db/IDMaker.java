@@ -49,13 +49,13 @@ public interface IDMaker {
    */
   String calcID(Sequence seq);
 
-  
+
   /**
    * A simple implementation of IDMaker that hashes by URN.
    *
    */
   public final static IDMaker byURN = new ByURN();
-  
+
   static class ByURN implements Serializable, IDMaker {
     public String calcID(Sequence seq) {
       return seq.getURN();
@@ -67,19 +67,19 @@ public interface IDMaker {
         );
       } catch (NoSuchFieldException nsfe) {
         throw new BioError(
-          nsfe,
-          "Could not find field while serializing"
+          "Could not find field while serializing",
+          nsfe
         );
       }
     }
   }
-  
+
   /**
    * A simple implementation of IDMaker that hashes by sequence name.
    *
    */
   public final static IDMaker byName = new ByName();
-  
+
   static class ByName implements Serializable, IDMaker {
     public String calcID(Sequence seq) {
       return seq.getName();
@@ -91,11 +91,11 @@ public interface IDMaker {
         );
       } catch (NoSuchFieldException nsfe) {
         throw new BioError(
-          nsfe,
-          "Could not find field while serializing"
+          "Could not find field while serializing",
+          nsfe
         );
       }
     }
   }
 }
- 
+

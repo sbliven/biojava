@@ -75,13 +75,13 @@ public class AnnotationFactory
                     Object key = ksi.next();
                     annotation.setProperty(key, m.get(key));
                 }
-	    }
-	    catch (ChangeVetoException cve)
-	    {
-                throw new BioError(cve, "Assert failed: couldn't modify newly created Annotation");
-	    }
+            }
+            catch (ChangeVetoException cve)
+            {
+                throw new BioError("Assert failed: couldn't modify newly created Annotation",cve);
+            }
 
             return annotation;
-	}
+        }
     }
 }

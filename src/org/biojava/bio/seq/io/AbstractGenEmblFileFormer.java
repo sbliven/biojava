@@ -70,7 +70,7 @@ import org.xml.sax.SAXException;
 class AbstractGenEmblFileFormer
 {
     private static final String FEATURE_DATA_FILE =
-	"org/biojava/bio/seq/io/FeatureQualifier.xml";
+        "org/biojava/bio/seq/io/FeatureQualifier.xml";
 
     private static final Map   FEATURE_DATA = new HashMap();
     private static final Map QUALIFIER_DATA = new HashMap();
@@ -127,7 +127,7 @@ class AbstractGenEmblFileFormer
         }
         catch (Exception e)
         {
-            throw new BioError(e, "Couldn't initialize tokenizer for the DNA alphabet");
+            throw new BioError("Couldn't initialize tokenizer for the DNA alphabet",e);
         }
     }
 
@@ -437,7 +437,7 @@ class AbstractGenEmblFileFormer
             {
                 featureStrand = ((StrandedFeature)theFeature).getStrand();
             }
-            
+
             StringBuffer tempBuffer = new StringBuffer();
             formattedLocation = this.formatLocationBlock(tempBuffer,
                                                          theFeature.getLocation(), featureStrand.getValue(), "",

@@ -73,11 +73,11 @@ public class SwissprotFileFormer extends AbstractGenEmblFileFormer
     private SymbolTokenization proteinTokenization;
 
     {
-	try {
-	    proteinTokenization = ProteinTools.getTAlphabet().getTokenization("token");
-	} catch (Exception ex) {
-	    throw new BioError(ex, "Couldn't initialize tokenizer for the DNA alphabet");
-	}
+        try {
+            proteinTokenization = ProteinTools.getTAlphabet().getTokenization("token");
+        } catch (Exception ex) {
+            throw new BioError("Couldn't initialize tokenizer for the DNA alphabet",ex);
+        }
     }
 
     // Static variables
@@ -453,7 +453,7 @@ public class SwissprotFileFormer extends AbstractGenEmblFileFormer
      */
     public StringBuffer formatLocation(StringBuffer theBuffer,
                                        Location theLocation)
-	{
+        {
             // Five Location cases, each treated seperately:
             //   Point Location: "     5      5"
             //   Range Location: "     5     10"
@@ -488,7 +488,7 @@ public class SwissprotFileFormer extends AbstractGenEmblFileFormer
             }
 
             return new StringBuffer(startPoint.toString() + " " + endPoint.toString());
-	}
+        }
 
     // Protected methods
     /**

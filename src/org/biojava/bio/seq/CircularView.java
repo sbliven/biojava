@@ -163,7 +163,7 @@ public class CircularView extends ViewSequence{
       try{
         toEnd.edit(edit);
       }catch(Exception e){
-        throw new BioError(e, "Couldn't construct subList, this shouldn't happen");
+        throw new BioError("Couldn't construct subList, this shouldn't happen",e);
       }
       return toEnd;
     }

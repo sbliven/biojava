@@ -77,46 +77,46 @@ class RawAnnotationSequence
     private DASFeatureSet features;
 
     {
-	nullSymbols = new DummySymbolList(DNATools.getDNA(), 2000000000);
+        nullSymbols = new DummySymbolList(DNATools.getDNA(), 2000000000);
     }
 
 
-    RawAnnotationSequence(DASSequenceDB dummyDB, URL dataSourceURL, String seqID) 
+    RawAnnotationSequence(DASSequenceDB dummyDB, URL dataSourceURL, String seqID)
         throws BioException, IllegalIDException
     {
-	this.dummyDB = dummyDB;
-	this.dataSourceURL = dataSourceURL;
-	this.seqID = seqID;
-	this.features = new DASFeatureSet(this, dataSourceURL, seqID);
+        this.dummyDB = dummyDB;
+        this.dataSourceURL = dataSourceURL;
+        this.seqID = seqID;
+        this.features = new DASFeatureSet(this, dataSourceURL, seqID);
     }
 
     URL getDataSourceURL() {
-	return dataSourceURL;
+        return dataSourceURL;
     }
 
     public DASSequenceDB getParentDB() {
-	return dummyDB;
+        return dummyDB;
     }
-            
+
 
     private int registerLocalFeatureFetchers(Object regKey) {
-	features.registerFeatureFetcher(regKey);
+        features.registerFeatureFetcher(regKey);
 
-	return 1;
+        return 1;
     }
 
     private int registerLocalFeatureFetchers(Location l, Object regKey) {
-	features.registerFeatureFetcher(l, regKey);
+        features.registerFeatureFetcher(l, regKey);
 
-	return 1;
+        return 1;
     }
 
     int registerFeatureFetchers(Object regKey) throws BioException {
-	return registerLocalFeatureFetchers(regKey);
+        return registerLocalFeatureFetchers(regKey);
     }
 
     int registerFeatureFetchers(Location l, Object regKey) throws BioException {
-	return registerLocalFeatureFetchers(l, regKey);
+        return registerLocalFeatureFetchers(l, regKey);
     }
 
     //
@@ -124,57 +124,57 @@ class RawAnnotationSequence
     //
 
     public Alphabet getAlphabet() {
-	return nullSymbols.getAlphabet();
+        return nullSymbols.getAlphabet();
     }
 
     public Iterator iterator() {
-	return nullSymbols.iterator();
+        return nullSymbols.iterator();
     }
 
     public int length() {
-	return nullSymbols.length();
+        return nullSymbols.length();
     }
 
     public String seqString() {
-	return nullSymbols.seqString();
+        return nullSymbols.seqString();
     }
 
     public String subStr(int start, int end) {
-	return nullSymbols.subStr(start, end);
+        return nullSymbols.subStr(start, end);
     }
 
     public SymbolList subList(int start, int end) {
-	return nullSymbols.subList(start, end);
+        return nullSymbols.subList(start, end);
     }
 
     public Symbol symbolAt(int pos) {
-	return nullSymbols.symbolAt(pos);
+        return nullSymbols.symbolAt(pos);
     }
 
     public List toList() {
-	return nullSymbols.toList();
+        return nullSymbols.toList();
     }
 
-    public void edit(Edit e) 
+    public void edit(Edit e)
         throws ChangeVetoException
     {
-	throw new ChangeVetoException("/You/ try implementing read-write DAS");
+        throw new ChangeVetoException("/You/ try implementing read-write DAS");
     }
-    
+
     //
     // Identification stuff
     //
 
     public String getName() {
-	return seqID;
+        return seqID;
     }
 
     public String getURN() {
-	try {
-	    return new URL(getDataSourceURL(), "?ref=" + seqID).toString();
-	} catch (MalformedURLException ex) {
-	    throw new BioRuntimeException(ex);
-	}
+        try {
+            return new URL(getDataSourceURL(), "?ref=" + seqID).toString();
+        } catch (MalformedURLException ex) {
+            throw new BioRuntimeException(ex);
+        }
     }
 
     //
@@ -183,80 +183,80 @@ class RawAnnotationSequence
 
     public Iterator features() {
       try {
-	  registerFeatureFetchers(null);
-	  return features.features();
+          registerFeatureFetchers(null);
+          return features.features();
       } catch (BioException be) {
-	  throw new BioRuntimeException(be, "Couldn't create features iterator");
+          throw new BioRuntimeException("Couldn't create features iterator",be);
       }
     }
 
     public boolean containsFeature(Feature f) {
-	return features.containsFeature(f);
+        return features.containsFeature(f);
     }
-    
+
     public FeatureHolder filter(FeatureFilter ff) {
         return filter(ff, !FilterUtils.areProperSubset(ff, FeatureFilter.top_level));
     }
-    
+
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	try {
-	    //
-	    // We optimise for the case of just wanting `structural' features,
-	    // which improves the scalability of the Dazzle server (and probably
-	    // other applications, too)
-	    //
-	    
-	    FeatureFilter structureMembershipFilter = new FeatureFilter.ByClass(ComponentFeature.class);
+        try {
+            //
+            // We optimise for the case of just wanting `structural' features,
+            // which improves the scalability of the Dazzle server (and probably
+            // other applications, too)
+            //
 
-	    if (FilterUtils.areProperSubset(ff, structureMembershipFilter)) {
-		return FeatureHolder.EMPTY_FEATURE_HOLDER;
-	    }
+            FeatureFilter structureMembershipFilter = new FeatureFilter.ByClass(ComponentFeature.class);
 
-	    //
-	    // Otherwise they want /real/ features, I'm afraid...
-	    //
-	    
-	    Location ffl = FilterUtils.extractOverlappingLocation(ff);
-	    if (recurse) {
-		int numComponents = 1;
-		if (ffl != null) {
-		    numComponents = registerFeatureFetchers(ffl, ff);
-		} else {
-		    numComponents = registerFeatureFetchers(ff);
-		}
-		getParentDB().ensureFeaturesCacheCapacity(numComponents * 3);
-	    } else {
-		if (ffl != null) {
-		    registerLocalFeatureFetchers(ffl, ff);
-		} else {
-		    registerLocalFeatureFetchers(ff);
-		}
-	    }
-	    
-	    return features.filter(ff, recurse);
-	} catch (BioException be) {
-	    throw new BioRuntimeException(be, "Can't filter");
-	}
+            if (FilterUtils.areProperSubset(ff, structureMembershipFilter)) {
+                return FeatureHolder.EMPTY_FEATURE_HOLDER;
+            }
+
+            //
+            // Otherwise they want /real/ features, I'm afraid...
+            //
+
+            Location ffl = FilterUtils.extractOverlappingLocation(ff);
+            if (recurse) {
+                int numComponents = 1;
+                if (ffl != null) {
+                    numComponents = registerFeatureFetchers(ffl, ff);
+                } else {
+                    numComponents = registerFeatureFetchers(ff);
+                }
+                getParentDB().ensureFeaturesCacheCapacity(numComponents * 3);
+            } else {
+                if (ffl != null) {
+                    registerLocalFeatureFetchers(ffl, ff);
+                } else {
+                    registerLocalFeatureFetchers(ff);
+                }
+            }
+
+            return features.filter(ff, recurse);
+        } catch (BioException be) {
+            throw new BioRuntimeException("Can't filter",be);
+        }
     }
-    
+
     public FeatureFilter getSchema() {
         return features.getSchema();
     }
-    
+
     public int countFeatures() {
-	return features.countFeatures();
+        return features.countFeatures();
     }
-    
-    public Feature createFeature(Feature.Template temp) 
+
+    public Feature createFeature(Feature.Template temp)
         throws ChangeVetoException
     {
-	throw new ChangeVetoException("Can't create features on DAS sequences.");
+        throw new ChangeVetoException("Can't create features on DAS sequences.");
     }
 
     public void removeFeature(Feature f)
         throws ChangeVetoException
     {
-	throw new ChangeVetoException("Can't remove features from DAS sequences.");
+        throw new ChangeVetoException("Can't remove features from DAS sequences.");
     }
 
     //
@@ -264,10 +264,10 @@ class RawAnnotationSequence
     //
 
     public Feature realizeFeature(FeatureHolder dest,
-				  Feature.Template temp)
-	throws BioException
+                                  Feature.Template temp)
+        throws BioException
     {
-	return featureRealizer.realizeFeature(this, dest, temp);
+        return featureRealizer.realizeFeature(this, dest, temp);
     }
 
     //
@@ -275,6 +275,6 @@ class RawAnnotationSequence
     //
 
     public Annotation getAnnotation() {
-	return Annotation.EMPTY_ANNOTATION;
+        return Annotation.EMPTY_ANNOTATION;
     }
 }

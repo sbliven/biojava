@@ -36,7 +36,7 @@ import org.biojava.bio.symbol.SymbolList;
 
 /**
  * An object to find exact subsequences within a sequence.
- * 
+ *
  * <p>
  * Reference: KNUTH D.E., MORRIS (Jr) J.H., PRATT V.R., 1977,
  * Fast pattern matching in strings, SIAM Journal on Computing 6(1):323-350.
@@ -61,7 +61,7 @@ import org.biojava.bio.symbol.SymbolList;
  *
  * <p>Copyright:    Copyright (c) 2002</p>
  * <p>Company:      AgResearch</p>
- * 
+ *
  * @author Mark Schreiber
  * @version 1.0
  */
@@ -93,7 +93,7 @@ public final class KnuthMorrisPrattSearch {
       this.pattern = new SimpleSymbolList(alpha, rList);
     }catch(Exception e){
       //really shouldn't happen
-      throw new BioError(e, "Couldn't make KMP pattern");
+      throw new BioError("Couldn't make KMP pattern", e);
     }
 
 

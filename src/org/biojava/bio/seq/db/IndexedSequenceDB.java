@@ -173,7 +173,7 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
         }
         completed = true; // we completed succesfuly
       } catch (IOException ioe) {
-        throw new BioException(ioe, "Failed to read sequence file");
+        throw new BioException("Failed to read sequence file",ioe);
       } finally {
         if(!completed) { // if there was a failure, discard changes
           indexStore.rollback();
@@ -254,7 +254,7 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
         }
         catch (IOException ioe)
         {
-            throw new BioException(ioe, "Couldn't grab region of file");
+            throw new BioException("Couldn't grab region of file",ioe);
         }
     }
 

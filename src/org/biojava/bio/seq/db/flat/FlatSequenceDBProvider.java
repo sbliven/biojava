@@ -69,7 +69,7 @@ public class FlatSequenceDBProvider implements SequenceDBProvider
         }
         catch (IOException ioe)
         {
-            throw new BioException(ioe, "Flat provider failed to open index");
+            throw new BioException("Flat provider failed to open index",ioe);
         }
     }
 }

@@ -328,7 +328,7 @@ public class BlastLikeHomologyBuilder extends ViewSequenceFactory
         }
         catch (ChangeVetoException cve)
         {
-            throw new BioException(cve, "Failed to create HomologyFeature");
+            throw new BioException( "Failed to create HomologyFeature",cve);
         }
     }
 }

@@ -52,17 +52,17 @@ class DistProjectionContext
         extends ReparentContext {
     private Annotation annotation;
     private Map componentFeatureCache = new HashMap();
-    
+
     public DistProjectionContext(FeatureHolder fh,
-				                      FeatureHolder parent,
+                                                      FeatureHolder parent,
                                       Annotation annotation)
     {
         super(fh, parent);
         this.annotation = annotation;
     }
-    
+
     public Feature projectFeature(Feature f) {
-	    if (f instanceof ComponentFeature && getParent() instanceof DistributedSequence) {
+            if (f instanceof ComponentFeature && getParent() instanceof DistributedSequence) {
             ComponentFeature pcf = (ComponentFeature) componentFeatureCache.get(f);
             if (pcf == null) {
                 ComponentFeature.Template cft = (ComponentFeature.Template) ((ComponentFeature) f).makeTemplate();
@@ -75,25 +75,25 @@ class DistProjectionContext
                 }
 
                 cft.componentSequence = null;    // We need to go back though the DistDB for the
-		                                         // proper component sequence to use here.
+                                                         // proper component sequence to use here.
 
                 try {
                     pcf = new DistComponentFeature((DistributedSequence) getParent(),
-						                           cft);
+                                                                           cft);
                 } catch (Exception ex) {
-                    throw new BioRuntimeException(ex, "Error instantiating DistComponentFeature for: " + f);
+                    throw new BioRuntimeException("Error instantiating DistComponentFeature for: " + f, ex);
                 }
                 componentFeatureCache.put(f, pcf);
-            } 
+            }
             return pcf;
-	    } else {
+            } else {
             // Default: generate a throwaway ProjectedFeature
-            
-            return super.projectFeature(f);
-	    }
-	}
 
-	public Annotation getAnnotation(Feature f) {
+            return super.projectFeature(f);
+            }
+        }
+
+        public Annotation getAnnotation(Feature f) {
         if (annotation != null) {
             try {
                 MergeAnnotation ma = new MergeAnnotation();
@@ -106,5 +106,5 @@ class DistProjectionContext
         } else {
             return f.getAnnotation();
         }
-	}
+        }
 }

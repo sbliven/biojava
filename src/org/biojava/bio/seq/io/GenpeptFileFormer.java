@@ -80,11 +80,11 @@ class GenpeptFileFormer extends AbstractGenEmblFileFormer
     private SymbolTokenization proteinTokenization;
 
     {
-	try {
-	    proteinTokenization = ProteinTools.getTAlphabet().getTokenization("token");
-	} catch (BioException ex) {
-	    throw new BioError(ex, "Couldn't initialize tokenizer for the PROTEIN alphabet");
-	}
+        try {
+            proteinTokenization = ProteinTools.getTAlphabet().getTokenization("token");
+        } catch (BioException ex) {
+            throw new BioError("Couldn't initialize tokenizer for the PROTEIN alphabet",ex);
+        }
     }
 
     /**
@@ -110,12 +110,12 @@ class GenpeptFileFormer extends AbstractGenEmblFileFormer
 
     public PrintStream getPrintStream()
     {
-	return stream;
+        return stream;
     }
 
     public void setPrintStream(PrintStream stream)
     {
-	this.stream = stream;
+        this.stream = stream;
     }
 
     public void setName(String id) throws ParseException {
@@ -129,15 +129,15 @@ class GenpeptFileFormer extends AbstractGenEmblFileFormer
     public void setURI(String uri) throws ParseException { }
 
     public void addSymbols(Alphabet  alpha,
-			   Symbol [] syms,
-			   int       start,
-			   int       length)
-	throws IllegalAlphabetException
+                           Symbol [] syms,
+                           int       start,
+                           int       length)
+        throws IllegalAlphabetException
     {
-	try {
-	    int end = start + length - 1;
+        try {
+            int end = start + length - 1;
 
-	    // My Changes are here
+            // My Changes are here
             locusLineCreator(length);
             if (idb != null) {stream.println(idb); }
             if (acb != null) {stream.println(acb); }
@@ -153,29 +153,29 @@ class GenpeptFileFormer extends AbstractGenEmblFileFormer
                 stream.print(ftb);
             }
 
-	    sq.setLength(0);
-	    sq.append("ORIGIN");
+            sq.setLength(0);
+            sq.append("ORIGIN");
 
-	    // Print sequence summary header
-	    stream.println(sq);
+            // Print sequence summary header
+            stream.println(sq);
 
-	    int fullLine = length / 60;
-	    int partLine = length % 60;
+            int fullLine = length / 60;
+            int partLine = length % 60;
 
-	    int lineCount = fullLine;
-	    if (partLine > 0)
-		lineCount++;
+            int lineCount = fullLine;
+            if (partLine > 0)
+                lineCount++;
 
-	    int lineLens [] = new int [lineCount];
+            int lineLens [] = new int [lineCount];
 
-	    // All lines are 60, except last (if present)
-	    Arrays.fill(lineLens, 60);
-	    lineLens[lineCount - 1] = partLine;
+            // All lines are 60, except last (if present)
+            Arrays.fill(lineLens, 60);
+            lineLens[lineCount - 1] = partLine;
 
-	    // Prepare line 80 characters wide, sequence is subset of this
-	    char [] emptyLine = new char [80];
+            // Prepare line 80 characters wide, sequence is subset of this
+            char [] emptyLine = new char [80];
 
-	    for (int i = 0; i < lineLens.length; i++)
+            for (int i = 0; i < lineLens.length; i++)
             {
                 sq.setLength(0);
                 ub.setLength(0);
@@ -205,11 +205,11 @@ class GenpeptFileFormer extends AbstractGenEmblFileFormer
                 stream.println(sq);
             }
 
-	    // Print end of entry
-	    stream.println("//");
-	} catch (IllegalSymbolException ex) {
-	    throw new IllegalAlphabetException(ex, "Protein not tokenizing");
-	}
+            // Print end of entry
+            stream.println("//");
+        } catch (IllegalSymbolException ex) {
+            throw new IllegalAlphabetException(ex, "Protein not tokenizing");
+        }
     }
 
     private String sequenceBufferCreator(Object key, Object value) {
@@ -300,7 +300,7 @@ class GenpeptFileFormer extends AbstractGenEmblFileFormer
     }
 
     public void addSequenceProperty(Object key, Object value)
-	throws ParseException
+        throws ParseException
     {
         if (key.equals("LOCUS")) {
             idb.setLength(0);
@@ -355,20 +355,20 @@ class GenpeptFileFormer extends AbstractGenEmblFileFormer
             ccb = new StringBuffer(sequenceBufferCreator("COMMENT    ", value));
         }
         else if (key.equals(GenbankProcessor.PROPERTY_GENBANK_ACCESSIONS))
-	{
-	    ub.setLength(0);
-	    ub.append("ACCESSION   ");
-	    for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
-	    {
-		ub.append((String) ai.next());
-	    }
+        {
+            ub.setLength(0);
+            ub.append("ACCESSION   ");
+            for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
+            {
+                ub.append((String) ai.next());
+            }
             acb = new StringBuffer(ub.toString());
-	}
+        }
     }
 
     //null implementation
     public void startFeature(Feature.Template templ)
-	throws ParseException
+        throws ParseException
     {
     }
 
@@ -376,7 +376,7 @@ class GenpeptFileFormer extends AbstractGenEmblFileFormer
 
     //null implementation
     public void addFeatureProperty(Object key, Object value)
-	throws ParseException
+        throws ParseException
     {
     }
 }

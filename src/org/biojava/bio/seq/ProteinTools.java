@@ -68,7 +68,7 @@ public class ProteinTools {
             proteinAlpha = (FiniteAlphabet) AlphabetManager.alphabetForName("PROTEIN");
             proteinTAlpha = (FiniteAlphabet) AlphabetManager.alphabetForName("PROTEIN-TERM");
         } catch (Exception e) {
-            throw new BioError(e, " Could not initialize ProteinTools");
+            throw new BioError(" Could not initialize ProteinTools", e);
         }
     }
 
@@ -94,7 +94,7 @@ public class ProteinTools {
 
           InputSource is = new InputSource(tablesStream);
           DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-	  doc = parser.parse(is);
+          doc = parser.parse(is);
         }catch (MissingResourceException mre) {
             System.err.println(mre.getMessage());
         }catch(Exception e){//err
@@ -107,7 +107,7 @@ public class ProteinTools {
             SymbolPropertyTable.MONO_MASS
             );
 
-	    SimpleSymbolPropertyTable avgMassPropertyTable = new SimpleSymbolPropertyTable(
+            SimpleSymbolPropertyTable avgMassPropertyTable = new SimpleSymbolPropertyTable(
             getAlphabet(),
             SymbolPropertyTable.AVG_MASS
             );
@@ -117,47 +117,47 @@ public class ProteinTools {
             SymbolPropertyTable.PK
             );
 
-	    SymbolTokenization tokens = getAlphabet().getTokenization("token");
+            SymbolTokenization tokens = getAlphabet().getTokenization("token");
 
             NodeList children = doc.getDocumentElement().getChildNodes();
-	    for(int i = 0; i < children.getLength(); i++) {
-		Node cnode = (Node) children.item(i);
-		if(! (cnode instanceof Element)) {
-		    continue;
-		}
-		Element child = (Element) cnode;
-		if(child.getNodeName().equals("residue")) {
-		    String token = child.getAttribute("token");
-		    Symbol s = tokens.parseToken(token);
+            for(int i = 0; i < children.getLength(); i++) {
+                Node cnode = (Node) children.item(i);
+                if(! (cnode instanceof Element)) {
+                    continue;
+                }
+                Element child = (Element) cnode;
+                if(child.getNodeName().equals("residue")) {
+                    String token = child.getAttribute("token");
+                    Symbol s = tokens.parseToken(token);
 
-		    NodeList properyNodes = child.getChildNodes();
-		    for(int j = 0; j < properyNodes.getLength(); j++) {
-			cnode = (Node) properyNodes.item(j);
-			if(! (cnode instanceof Element)) {
-			    continue;
-			}
-			Element el = (Element) cnode;
-			String name = el.getAttribute("name");
-			if(name.equals(SymbolPropertyTable.MONO_MASS)) {
-			    String value = el.getAttribute("value");
-			    monoMassPropertyTable.setDoubleProperty(s, value);
-			} else if (name.equals(SymbolPropertyTable.AVG_MASS)) {
-			    String value = el.getAttribute("value");
-			    avgMassPropertyTable.setDoubleProperty(s, value);
-			} else if (name.equals(SymbolPropertyTable.PK)) {
+                    NodeList properyNodes = child.getChildNodes();
+                    for(int j = 0; j < properyNodes.getLength(); j++) {
+                        cnode = (Node) properyNodes.item(j);
+                        if(! (cnode instanceof Element)) {
+                            continue;
+                        }
+                        Element el = (Element) cnode;
+                        String name = el.getAttribute("name");
+                        if(name.equals(SymbolPropertyTable.MONO_MASS)) {
+                            String value = el.getAttribute("value");
+                            monoMassPropertyTable.setDoubleProperty(s, value);
+                        } else if (name.equals(SymbolPropertyTable.AVG_MASS)) {
+                            String value = el.getAttribute("value");
+                            avgMassPropertyTable.setDoubleProperty(s, value);
+                        } else if (name.equals(SymbolPropertyTable.PK)) {
                             String value = el.getAttribute("value");
                             pKPropertyTable.setDoubleProperty(s, value);
                             break;
                         }
-		    }
-		}
-	    }
+                    }
+                }
+            }
 
             propertyTableMap.put(SymbolPropertyTable.MONO_MASS, (SymbolPropertyTable) monoMassPropertyTable);
             propertyTableMap.put(SymbolPropertyTable.AVG_MASS, (SymbolPropertyTable) avgMassPropertyTable);
             propertyTableMap.put(SymbolPropertyTable.PK, (SymbolPropertyTable) pKPropertyTable);
         } catch (Exception e) {
-            throw new BioError(e, " Could not initialize ProteinTools");
+            throw new BioError(" Could not initialize ProteinTools", e);
         }
     }
     /**
@@ -179,40 +179,40 @@ public class ProteinTools {
         return (SymbolPropertyTable)propertyTableMap.get(name);
     }
 
-	/**
-	 * Return a new Protein <span class="type">SymbolList</span> for
-	 * <span class="arg">protein</span>.
-	 *
-	 * @param theProtein a <span class="type">String</span> to parse into Protein
-	 * @return a <span class="type">SymbolList</span> created form
-	 *         <span class="arg">Protein</span>
-	 * @throws IllegalSymbolException if  <span class="arg">dna</span> contains
-	 *         any non-Amino Acid characters.
-	 */
-	public static SymbolList createProtein(String theProtein)
-		throws IllegalSymbolException
-	{
-		try
-		{
-			org.biojava.bio.seq.io.SymbolTokenization p = getTAlphabet().getTokenization("token");
-			return new SimpleSymbolList(p, theProtein);
-		}
-		catch (BioException se)
-		{
-			throw new BioError(se, "Something has gone badly wrong with Protein");
-		}
-	}
+        /**
+         * Return a new Protein <span class="type">SymbolList</span> for
+         * <span class="arg">protein</span>.
+         *
+         * @param theProtein a <span class="type">String</span> to parse into Protein
+         * @return a <span class="type">SymbolList</span> created form
+         *         <span class="arg">Protein</span>
+         * @throws IllegalSymbolException if  <span class="arg">dna</span> contains
+         *         any non-Amino Acid characters.
+         */
+        public static SymbolList createProtein(String theProtein)
+                throws IllegalSymbolException
+        {
+                try
+                {
+                        org.biojava.bio.seq.io.SymbolTokenization p = getTAlphabet().getTokenization("token");
+                        return new SimpleSymbolList(p, theProtein);
+                }
+                catch (BioException se)
+                {
+                        throw new BioError("Something has gone badly wrong with Protein", se);
+                }
+        }
     /** Get a new protein as a GappedSequence */
     public static GappedSequence createGappedProteinSequence(String theProtein, String name) throws IllegalSymbolException{
-	String theProtein1 = theProtein.replaceAll("-", "");
-	Sequence protein = createProteinSequence(theProtein1, name);
-	GappedSequence protein1 = new SimpleGappedSequence(protein);
-	int pos = theProtein.indexOf('-', 0);
-	while(pos!=-1){
-	    protein1.addGapInView(pos+1);
-	    pos = theProtein.indexOf('-', pos+1);
-	}
-	return protein1;
+        String theProtein1 = theProtein.replaceAll("-", "");
+        Sequence protein = createProteinSequence(theProtein1, name);
+        GappedSequence protein1 = new SimpleGappedSequence(protein);
+        int pos = theProtein.indexOf('-', 0);
+        while(pos!=-1){
+            protein1.addGapInView(pos+1);
+            pos = theProtein.indexOf('-', pos+1);
+        }
+        return protein1;
     }
 
   /**
@@ -234,7 +234,7 @@ public class ProteinTools {
         "", name, new SimpleAnnotation()
       );
     } catch (BioException se) {
-      throw new BioError(se, "Something has gone badly wrong with ProteinTAlpha");
+      throw new BioError("Something has gone badly wrong with ProteinTAlpha", se);
     }
   }
 }

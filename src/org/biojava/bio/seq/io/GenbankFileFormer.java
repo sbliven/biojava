@@ -91,7 +91,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
         }
         catch (BioException ex)
         {
-            throw new BioError(ex, "Couldn't initialize tokenizer for the DNA alphabet");
+            throw new BioError("Couldn't initialize tokenizer for the DNA alphabet",ex);
         }
     }
 

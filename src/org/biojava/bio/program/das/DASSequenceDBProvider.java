@@ -52,7 +52,7 @@ public class DASSequenceDBProvider implements SequenceDBProvider {
         try {
             return new DASSequenceDB(new URL(location));
         } catch (MalformedURLException ex) {
-            throw new RegistryException(ex, "Bad DAS URL");
+            throw new RegistryException("Bad DAS URL",ex);
         }
     }
 }

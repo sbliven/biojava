@@ -74,15 +74,15 @@ public class FlatSequenceDB extends Unchangeable implements SequenceDBLite
         }
         catch (NoSuchElementException nsee)
         {
-            throw new BioException(nsee, "Malformed OBDA index '"
+            throw new BioException("Malformed OBDA index '"
                                    + location
-                                   + "' does not indicate sequence format");
+                                   + "' does not indicate sequence format",nsee);
         }
         catch (LifeScienceIdentifierParseException lse)
         {
-            throw new BioException(lse, "Malformed OBDA index '"
+            throw new BioException("Malformed OBDA index '"
                                    + location
-                                   + "' has a format identifier which is not a valid LSID");
+                                   + "' has a format identifier which is not a valid LSID",lse);
         }
     }
 
@@ -125,8 +125,8 @@ public class FlatSequenceDB extends Unchangeable implements SequenceDBLite
         }
         catch (IOException ioe)
         {
-            throw new BioException(ioe, "Failed to retrieve sequence with ID "
-                                   + id);
+            throw new BioException("Failed to retrieve sequence with ID "
+                                   + id, ioe);
         }
     }
 

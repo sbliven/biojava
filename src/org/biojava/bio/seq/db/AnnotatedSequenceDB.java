@@ -34,13 +34,13 @@ import org.biojava.utils.ChangeVetoException;
 /**
  * SequenceDB implementation which lazily applies a SequenceAnnotator
  * to sequences retrieved from a SequenceDB.
- * 
+ *
  * @author Thomas Down
  * @author Matthew Pocock
  */
 
 public class AnnotatedSequenceDB
-extends AbstractSequenceDB 
+extends AbstractSequenceDB
 implements SequenceDB, Serializable {
   private final SequenceDB parent;
   private final SequenceAnnotator annotator;
@@ -49,7 +49,7 @@ implements SequenceDB, Serializable {
     this.parent = parent;
     this.annotator = a;
   }
-  
+
    /**
     * Get the original sequenceDB from this annotated sequenceDB.
     */
@@ -57,7 +57,7 @@ implements SequenceDB, Serializable {
   public SequenceDB getParent() {
     return this.parent;
   }
-  
+
   public String getName() {
     return parent.getName() + " (" + annotator.toString() + ")";
   }
@@ -75,16 +75,16 @@ implements SequenceDB, Serializable {
     return new SequenceIterator() {
       SequenceIterator pi = parent.sequenceIterator();
 
-	    public boolean hasNext() {
+            public boolean hasNext() {
         return pi.hasNext();
-	    }
+            }
 
-	    public Sequence nextSequence() throws BioException {
+            public Sequence nextSequence() throws BioException {
         return doAnnotation(pi.nextSequence());
-	    }
+            }
     };
   }
-  
+
    /**
     * Apply the annotation to a sequence.
     * @param seq the sequence to annotate.
@@ -94,9 +94,9 @@ implements SequenceDB, Serializable {
     try {
       return annotator.annotate(seq);
     } catch (IllegalAlphabetException ex) {
-      throw new BioException(ex, "Couldn't apply annotator " + annotator.toString() + " to " + seq.getURN());
+      throw new BioException("Couldn't apply annotator " + annotator.toString() + " to " + seq.getURN(), ex);
     } catch (ChangeVetoException cve) {
-      throw new BioException(cve, "Couldn't apply annotator " + annotator.toString() + " to " + seq.getURN());
+      throw new BioException("Couldn't apply annotator " + annotator.toString() + " to " + seq.getURN(), cve);
     }
   }
 }

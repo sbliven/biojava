@@ -128,9 +128,8 @@ public class Registry {
                 }
               } catch (ClassNotFoundException ce) {
                 throw new RegistryException(
-                  ce,
                   "Could not find class: " + className +
-                  " for service provider " + providerName
+                  " for service provider " + providerName, ce
                 );
               }
             }
@@ -138,8 +137,8 @@ public class Registry {
             throw new ProviderNotFoundException("No such provider exists: "
                                                 + providerName);
         } catch (Exception e) {
-            throw new RegistryException(e, "Error accessing"
-                                        + " SequenceDBProvider services");
+            throw new RegistryException("Error accessing"
+                                        + " SequenceDBProvider services",e);
         }
     }
 

@@ -52,19 +52,19 @@ public class Formats {
     );
     ValueChanger semiColonChanger = new ValueChanger(listener);
     semiColonChanger.setDefaultSplitter(semiColonSplitter);
-    
+
 
     LineSplitParser lsp = LineSplitParser.EMBL;
-    
+
     TagDelegator td = new TagDelegator(listener);
-    
+
     LineSplitParser ftParser = new LineSplitParser();
     ftParser.setSplitOffset(15);
     ftParser.setTrimTag(true);
     ftParser.setTrimValue(true);
     ftParser.setContinueOnEmptyTag(true);
     ftParser.setMergeSameTag(false);
-    
+
     TagValueListener ftListener = new FeatureTableListener(listener);
 
     td.setParserListener("FT", ftParser, ftListener);
@@ -74,7 +74,7 @@ public class Formats {
       new String[] { "ID", "TYPE", "MOLECULE", "DIVISION", "SIZE" },
       true
     ));
-    td.setListener("AC", semiColonChanger); 
+    td.setListener("AC", semiColonChanger);
     td.setListener("KW", semiColonChanger);
     td.setListener("OC", semiColonChanger);
 
@@ -246,7 +246,7 @@ public class Formats {
     public SPFeatureTableListener(TagValueListener delegate) {
       super(delegate);
     }
-    
+
     public void startRecord()
     throws ParserException {
       depth++;
@@ -303,7 +303,7 @@ public class Formats {
 
             tag = null;
           } catch (IllegalStateException ise) {
-            throw new ParserException(ise, "Couldn't match: " + pat.pattern() + " " + tag);
+            throw new ParserException("Couldn't match: " + pat.pattern() + " " + tag, ise);
           }
         } else {
           super.value(ctxt, val);
