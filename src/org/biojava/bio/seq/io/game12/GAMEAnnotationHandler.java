@@ -228,7 +228,8 @@ public class GAMEAnnotationHandler
     private void knownTypesInitialiser()
     {
         // initialise a String array
-        String [] types = {"gene", "tRNA", "snRNA", "pseudogene", "transposon", "snoRNA", "misc. non-coding RNA"};
+        String [] types = {"gene", "tRNA", "snRNA", "pseudogene", "transposon", "snoRNA", "misc. non-coding RNA", 
+            "transposable_element", "miscellaneous curator's observation"};
 
         // now initialise the knownTypes Set
         knownTypes = new HashSet();
