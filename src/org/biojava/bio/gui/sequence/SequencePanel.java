@@ -510,20 +510,20 @@ Changeable {
       double maxAcross = sequenceToGraphics(range.getMax());
       double maxDropAcross = sequenceToGraphics(range.getMax() - 1);
       double lb = renderer.getMinimumLeader(this);
-      double tb = renderer.getMinimumTrailer(this);
+      double tb = renderer.getMinimumTrailer(this) + trailingBorder.getSize();
       double alongDim =
         (maxAcross - minAcross) +
         lb + tb;
       double alongDropDim = 
-	(maxDropAcross - minAcross) + 
-	lb + tb;
+    (maxDropAcross - minAcross) + 
+    lb + tb;
       double depth = renderer.getDepth(this);
       if(direction == HORIZONTAL) {
-	  mind = new Dimension((int) Math.ceil(alongDropDim), (int) Math.ceil(depth));
-	  maxd = new Dimension((int) Math.ceil(alongDim), (int) Math.ceil(depth));
+      mind = new Dimension((int) Math.ceil(alongDropDim), (int) Math.ceil(depth));
+      maxd = new Dimension((int) Math.ceil(alongDim), (int) Math.ceil(depth));
       } else {
-	  mind = new Dimension((int) Math.ceil(depth), (int) Math.ceil(alongDropDim));
-	  maxd = new Dimension((int) Math.ceil(depth), (int) Math.ceil(alongDim));
+      mind = new Dimension((int) Math.ceil(depth), (int) Math.ceil(alongDropDim));
+      maxd = new Dimension((int) Math.ceil(depth), (int) Math.ceil(alongDim));
       }
     }
     
@@ -583,15 +583,15 @@ Changeable {
     public void setAlignment(int alignment)
         throws IllegalArgumentException 
     {
-	if (alignment == LEADING || alignment == TRAILING || alignment == CENTER) {
-	    int old = this.alignment;
-	    this.alignment = alignment;
-	    pcs.firePropertyChange("alignment", old, alignment);
-	} else {
-	    throw new IllegalArgumentException(
-		  "Alignment must be one of the constants LEADING, TRAILING or CENTER"
+    if (alignment == LEADING || alignment == TRAILING || alignment == CENTER) {
+        int old = this.alignment;
+        this.alignment = alignment;
+        pcs.firePropertyChange("alignment", old, alignment);
+    } else {
+        throw new IllegalArgumentException(
+          "Alignment must be one of the constants LEADING, TRAILING or CENTER"
             );
-	}
+    }
     }
     
     private Border() {
@@ -609,36 +609,36 @@ Changeable {
   }
 
     private boolean eq(Object a, Object b) {
-	if (a == null || b == null) {
-	    return a == b;
-	} else {
-	    return a.equals(b);
-	}
+    if (a == null || b == null) {
+        return a == b;
+    } else {
+        return a.equals(b);
     }
-	
+    }
+    
 
     public boolean equals(Object o) {
-	if (! (o instanceof SequencePanel)) {
-	    return false;
-	}
+    if (! (o instanceof SequencePanel)) {
+        return false;
+    }
 
-	SequencePanel osp = (SequencePanel) o;
-	return (eq(getSymbols(), osp.getSymbols()) && eq(getRange(), osp.getRange()));
+    SequencePanel osp = (SequencePanel) o;
+    return (eq(getSymbols(), osp.getSymbols()) && eq(getRange(), osp.getRange()));
     }
 
     public int hashCode() {
-	int hc = 653;
-	SymbolList sl = getSymbols();
-	if (sl != null) {
-	    hc = hc ^ sl.hashCode();
-	}
+    int hc = 653;
+    SymbolList sl = getSymbols();
+    if (sl != null) {
+        hc = hc ^ sl.hashCode();
+    }
 
-	Location l = getRange();
-	if (l != null) {
-	    hc = hc ^ l.hashCode();
-	}
+    Location l = getRange();
+    if (l != null) {
+        hc = hc ^ l.hashCode();
+    }
 
-	return hc;
+    return hc;
     }
 }
 
