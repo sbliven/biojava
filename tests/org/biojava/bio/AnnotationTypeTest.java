@@ -22,6 +22,7 @@
 package org.biojava.bio;
 
 import java.util.*;
+import org.biojava.bio.symbol.Location;
 
 import junit.framework.TestCase;
 
@@ -33,11 +34,11 @@ import junit.framework.TestCase;
  */
 public class AnnotationTypeTest
 extends TestCase {
-  protected CardinalityConstraint cc_zero;
-  protected CardinalityConstraint cc_zero_or_one;
-  protected CardinalityConstraint cc_one;
-  protected CardinalityConstraint cc_one_or_more;
-  protected CardinalityConstraint cc_any;
+  protected Location cc_zero;
+  protected Location cc_zero_or_one;
+  protected Location cc_one;
+  protected Location cc_one_or_more;
+  protected Location cc_any;
 
   protected PropertyConstraint pc_any;
   protected PropertyConstraint pc_class_string;
@@ -99,43 +100,6 @@ extends TestCase {
     at_color_dog = new AnnotationType.Impl();
     at_color_dog.setConstraints("color", pc_enum_colors, cc_one);
     at_color_dog.setConstraints("name", pc_exact_dog, cc_one);
-  }
-  
-  public void testCardinalitySubConstraint() {
-    // zero
-    assertTrue("are subconstraint: " + cc_zero + ", " + cc_zero, cc_zero.subConstraintOf(cc_zero));
-    assertTrue("not subconstraint: " + cc_zero_or_one + ", " + cc_zero, !cc_zero.subConstraintOf(cc_zero_or_one));
-    assertTrue("not subconstraint: " + cc_one + ", " + cc_zero, !cc_zero.subConstraintOf(cc_one));
-    assertTrue("not subconstraint: " + cc_one_or_more + ", " + cc_zero, !cc_zero.subConstraintOf(cc_one_or_more));
-    assertTrue("not subconstraint: " + cc_any + ", " + cc_zero, !cc_zero.subConstraintOf(cc_any));
-
-    // zero_or_one
-    assertTrue("are subconstraint: " + cc_zero + ", " + cc_zero_or_one, cc_zero_or_one.subConstraintOf(cc_zero));
-    assertTrue("are subconstraint: " + cc_zero_or_one + ", " + cc_zero_or_one, cc_zero_or_one.subConstraintOf(cc_zero_or_one));
-    assertTrue("are subconstraint: " + cc_one + ", " + cc_zero_or_one, cc_zero_or_one.subConstraintOf(cc_one));
-    assertTrue("not subconstraint: " + cc_one_or_more + ", " + cc_zero_or_one, !cc_zero_or_one.subConstraintOf(cc_one_or_more));
-    assertTrue("not subconstraint: " + cc_any + ", " + cc_zero_or_one, !cc_zero_or_one.subConstraintOf(cc_any));
-    
-    // one
-    assertTrue("not subconstraint: " + cc_zero + ", " + cc_one, !cc_one.subConstraintOf(cc_zero));
-    assertTrue("not subconstraint: " + cc_zero_or_one + ", " + cc_one, !cc_one.subConstraintOf(cc_zero_or_one));
-    assertTrue("are subconstraint: " + cc_one + ", " + cc_one, cc_one.subConstraintOf(cc_one));
-    assertTrue("not subconstraint: " + cc_one_or_more + ", " + cc_one, !cc_one.subConstraintOf(cc_one_or_more));
-    assertTrue("not subconstraint: " + cc_any + ", " + cc_one, !cc_one.subConstraintOf(cc_any));
-    
-    // one_or_more
-    assertTrue("not subconstraint: " + cc_zero + ", " + cc_one_or_more, !cc_one_or_more.subConstraintOf(cc_zero));
-    assertTrue("not subconstraint: " + cc_zero_or_one + ", " + cc_one_or_more, !cc_one_or_more.subConstraintOf(cc_zero_or_one));
-    assertTrue("are subconstraint: " + cc_one + ", " + cc_one_or_more, cc_one_or_more.subConstraintOf(cc_one));
-    assertTrue("are subconstraint: " + cc_one_or_more + ", " + cc_one_or_more, cc_one_or_more.subConstraintOf(cc_one_or_more));
-    assertTrue("not subconstraint: " + cc_any + ", " + cc_one_or_more, !cc_one_or_more.subConstraintOf(cc_any));
-    
-    // any
-    assertTrue("are subconstraint: " + cc_zero + ", " + cc_any, cc_any.subConstraintOf(cc_zero));
-    assertTrue("are subconstraint: " + cc_zero_or_one + ", " + cc_any, cc_any.subConstraintOf(cc_zero_or_one));
-    assertTrue("are subconstraint: " + cc_one + ", " + cc_any, cc_any.subConstraintOf(cc_one));
-    assertTrue("are subconstraint: " + cc_one_or_more + ", " + cc_any, cc_any.subConstraintOf(cc_one_or_more));
-    assertTrue("are subconstraint: " + cc_any + ", " + cc_any, cc_any.subConstraintOf(cc_any));
   }
   
   public void testClassProperties() {

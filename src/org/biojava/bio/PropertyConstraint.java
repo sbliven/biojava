@@ -105,6 +105,8 @@ public interface PropertyConstraint {
      * addition under all conditions.
      */
     public static final PropertyConstraint ANY = new AnyPropertyConstraint();
+    
+    public static final PropertyConstraint NONE = new NonePropertyConstraint();
   
     /**
      * <code>ByClass</code> accepts a property value if it is an
@@ -382,6 +384,98 @@ public interface PropertyConstraint {
           return "Enumeration:" + values;
         }
     }
+    
+    public class And implements PropertyConstraint {
+      private PropertyConstraint c1;
+      private PropertyConstraint c2;
+      
+      public And(PropertyConstraint c1, PropertyConstraint c2) {
+        this.c1 = c1;
+        this.c2 = c2;
+      }
+      
+      public PropertyConstraint getChild1() {
+        return c1;
+      }
+      
+      public PropertyConstraint getChild2() {
+        return c2;
+      }
+      
+      public boolean accept(Object object) {
+        return c1.accept(object) && c2.accept(object);
+      }
+      
+      public boolean subConstraintOf(PropertyConstraint pc) {
+        return c1.subConstraintOf(pc) && c2.subConstraintOf(pc);
+      }
+      
+      public void setProperty(Annotation ann, Object key, Object val)
+      throws ChangeVetoException {
+        if(!accept(val)) {
+          throw new ChangeVetoException("Can't accept value: " + this + ": " + val);
+        }
+        c1.setProperty(ann, key, val);
+      }
+      
+      public void addValue(Collection coll, Object val)
+      throws ChangeVetoException {
+        if(!accept(val)) {
+          throw new ChangeVetoException("Can't accept value: " + this + ": " + val);
+        }
+        c1.addValue(coll, val);
+      }
+      
+      public String toString() {
+        return "And(" + c1 + ", " + c2 + ")";
+      }
+    }
+    
+    public class Or implements PropertyConstraint {
+      private PropertyConstraint c1;
+      private PropertyConstraint c2;
+      
+      public Or(PropertyConstraint c1, PropertyConstraint c2) {
+        this.c1 = c1;
+        this.c2 = c2;
+      }
+      
+      public PropertyConstraint getChild1() {
+        return c1;
+      }
+      
+      public PropertyConstraint getChild2() {
+        return c2;
+      }
+      
+      public boolean accept(Object object) {
+        return c1.accept(object) || c2.accept(object);
+      }
+      
+      public boolean subConstraintOf(PropertyConstraint pc) {
+        return c1.subConstraintOf(pc) || c2.subConstraintOf(pc);
+      }
+      
+      public void setProperty(Annotation ann, Object key, Object val)
+      throws ChangeVetoException {
+        if(!accept(val)) {
+          throw new ChangeVetoException("Can't accept value: " + this + ": " + val);
+        }
+        c1.setProperty(ann, key, val);
+      }
+      
+      public void addValue(Collection coll, Object val)
+      throws ChangeVetoException {
+        if(!accept(val)) {
+          throw new ChangeVetoException("Can't accept value: " + this + ": " + val);
+        }
+        c1.addValue(coll, val);
+      }
+      
+      public String toString() {
+        return "Or(" + c1 + ", " + c2 + ")";
+      }
+    }
 }
 
 class AnyPropertyConstraint implements PropertyConstraint  {
@@ -406,4 +500,34 @@ class AnyPropertyConstraint implements PropertyConstraint  {
     public String toString() {
       return "ANY";
     }
+}
+
+class NonePropertyConstraint implements PropertyConstraint {
+  public boolean accept(Object value) {
+    return false;
+  }
+  
+  public boolean subConstraintOf(PropertyConstraint subConstraint) {
+    return subConstraint instanceof NonePropertyConstraint;
+  }
+  
+  public void setProperty(Annotation ann, Object property, Object value)
+        throws ChangeVetoException {
+    throw new ChangeVetoException(
+      "There are no values that could match this property constraint: " +
+      ann + ", " + property + " -> " + value
+    );
+  }
+  
+  public void addValue(Collection coll, Object value)
+        throws ChangeVetoException {
+    throw new ChangeVetoException(
+      "There are no values that could match this property constraint: " +
+      value
+    );
+  }
+  
+  public String toString() {
+    return "NONE";
+  }
 }

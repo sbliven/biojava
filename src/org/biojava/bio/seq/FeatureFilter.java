@@ -256,6 +256,12 @@ public interface FeatureFilter extends Serializable {
         if (clazz == null) {
             throw new NullPointerException("Clazz may not be null");
         }
+        if(!Feature.class.isAssignableFrom(clazz)) {
+            throw new ClassCastException(
+              "Filters by class must be over Feature classes: " +
+              clazz
+            );
+        }
         this.clazz = clazz;
     }
 
@@ -661,13 +667,10 @@ public interface FeatureFilter extends Serializable {
         }
         for(Iterator i = ourProps.iterator(); i.hasNext(); ) {
           Object prop = i.next();
-          CardinalityConstraint thisC = this.getType().getCardinalityConstraint(prop);
-          CardinalityConstraint thatC = that.getType().getCardinalityConstraint(prop);
+          Location thisC = this.getType().getCardinalityConstraint(prop);
+          Location thatC = that.getType().getCardinalityConstraint(prop);
           
-          if(
-            thisC.getMax() < thatC.getMin() ||
-            thisC.getMin() > thatC.getMax()
-          ) {
+          if(LocationTools.intersection(thisC, thatC) == Location.empty) {
             return true;
           }
           
@@ -686,23 +689,23 @@ public interface FeatureFilter extends Serializable {
       if(filter instanceof ByAnnotationType) {
         ByAnnotationType that = (ByAnnotationType) filter;
 
+        Set thisProps = this.getType().getProperties();
         Set thatProps = that.getType().getProperties();
-        for(Iterator i = this.getType().getProperties().iterator(); i.hasNext(); ) {
+        for(Iterator i = that.getType().getProperties().iterator(); i.hasNext(); ) {
           Object prop = i.next();
           
-          if(!thatProps.contains(prop)) {
+          if(!thisProps.contains(prop)) {
             return false;
           }
           
-          CardinalityConstraint thisC = this.getType().getCardinalityConstraint(prop);
-          CardinalityConstraint thatC = that.getType().getCardinalityConstraint(prop);
+          Location thisC = this.getType().getCardinalityConstraint(prop);
+          Location thatC = that.getType().getCardinalityConstraint(prop);
           PropertyConstraint thisP = this.getType().getPropertyConstraint(prop);
           PropertyConstraint thatP = that.getType().getPropertyConstraint(prop);
           
           if(
             !thatP.subConstraintOf(thisP) ||
-            thatC.getMin() > thisC.getMin() ||
-            thatC.getMax() < thisC.getMax()
+            !LocationTools.contains(thatC, thisC)
           ) {
             return false;
           }
@@ -869,7 +872,7 @@ public interface FeatureFilter extends Serializable {
      * @since 1.2
      */
 
-    public static class ByParent implements OptimizableFilter {
+    public static class ByParent implements OptimizableFilter, ByHierachy {
         private FeatureFilter filter;
 
         public ByParent(FeatureFilter ff) {
@@ -946,7 +949,7 @@ public interface FeatureFilter extends Serializable {
      * @since 1.2
      */
 
-    public static class ByAncestor implements OptimizableFilter {
+    public static class ByAncestor implements OptimizableFilter, ByHierachy {
         private FeatureFilter filter;
 
         public ByAncestor(FeatureFilter ff) {
@@ -1248,6 +1251,8 @@ public interface FeatureFilter extends Serializable {
         }
     }
     
+    public static final FeatureFilter top_level = new IsTopLevel();
+    
     /**
      * Accept features which are top-level sequence features.  This is implemented
      * by the logic that the <code>parent</code> property of top-level features
@@ -1283,4 +1288,8 @@ public interface FeatureFilter extends Serializable {
             return (ff instanceof ByParent) || (ff instanceof ByAncestor);
         }
     }
+}
+
+interface ByHierachy extends FeatureFilter {
+  FeatureFilter getFilter();
 }

@@ -24,6 +24,8 @@ package org.biojava.bio;
 import java.util.*;
 
 import org.biojava.utils.*;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.LocationTools;
 
 /**
  * <p>A type to constrain annotation bundles.</p>
@@ -45,6 +47,11 @@ public interface AnnotationType {
     public static final AnnotationType ANY = new AnyOfType(
       PropertyConstraint.ANY,
       CardinalityConstraint.ANY
+    );
+    
+    public static final AnnotationType NONE = new AnyOfType(
+      PropertyConstraint.NONE,
+      CardinalityConstraint.NONE
     );
 
     /**
@@ -99,13 +106,13 @@ public interface AnnotationType {
      *
      * <p>For an annotation to be acceptable, the property must have a number
      * of values that matches the cardinality constraint. Common values are
-     * represented by static fields of CardinalityConstraint.</p>
+     * represented by static fields of Location.</p>
      *
      * @param key the property to be validated
-     * @return a CardinalityConstraint giving the number of values assocated
+     * @return a Location giving the number of values assocated
      *         with the property
      */
-    public CardinalityConstraint getCardinalityConstraint(Object key);
+    public Location getCardinalityConstraint(Object key);
 
     /**
      * Set the constraints associated with a property.
@@ -117,7 +124,7 @@ public interface AnnotationType {
     public void setConstraints(
       Object key,
       PropertyConstraint con,
-      CardinalityConstraint card
+      Location card
     );
 
     /**
@@ -144,7 +151,7 @@ public interface AnnotationType {
           for (Iterator i = getProperties().iterator(); i.hasNext();) {
             Object key = i.next();
             PropertyConstraint con = getPropertyConstraint(key);
-            CardinalityConstraint card = getCardinalityConstraint(key);
+            Location card = getCardinalityConstraint(key);
 
             if(!validate(ann, key, con, card)) {
               return false;
@@ -158,7 +165,7 @@ public interface AnnotationType {
           Annotation ann,
           Object key,
           PropertyConstraint con,
-          CardinalityConstraint card
+          Location card
         ) {
           if(
             CardinalityConstraint.ZERO.equals(card) &&
@@ -180,12 +187,12 @@ public interface AnnotationType {
             return true;
           } else {
             if(!ann.containsProperty(key)) {
-              return card.accept(0);
+              return card.contains(0);
             } else {
               Object val = ann.getProperty(key);
               if(val instanceof Collection) {
                 Collection vals = (Collection) val;
-                if(!card.accept(vals.size())) {
+                if(!card.contains(vals.size())) {
                   return false;
                 }
                 for(Iterator i = vals.iterator(); i.hasNext(); ) {
@@ -205,7 +212,7 @@ public interface AnnotationType {
         throws ChangeVetoException {
           try {
             PropertyConstraint prop = getPropertyConstraint(property);
-            CardinalityConstraint card = getCardinalityConstraint(property);
+            Location card = getCardinalityConstraint(property);
             if(card.getMax() > 1) {
               Collection vals = null;
               if(ann.containsProperty(property)) {
@@ -229,7 +236,7 @@ public interface AnnotationType {
           for(Iterator i = getProperties().iterator(); i.hasNext(); ) {
             Object key = i.next();
             PropertyConstraint pc = getPropertyConstraint(key);
-            CardinalityConstraint cc = getCardinalityConstraint(key);
+            Location cc = getCardinalityConstraint(key);
             
             sb.append(" [" + key + ", " + pc + ", " + cc + "]");
           }
@@ -271,8 +278,8 @@ public interface AnnotationType {
             return pc;
         }
 
-        public CardinalityConstraint getCardinalityConstraint(Object key) {
-            CardinalityConstraint card = (CardinalityConstraint) cards.get(key);
+        public Location getCardinalityConstraint(Object key) {
+            Location card = (Location) cards.get(key);
             if (card == null) {
                 card = CardinalityConstraint.ANY;
             }
@@ -282,7 +289,7 @@ public interface AnnotationType {
         public void setConstraints(
           Object key,
           PropertyConstraint con,
-          CardinalityConstraint card
+          Location card
         ) {
             cons.put(key, con);
             cards.put(key, card);
@@ -314,9 +321,9 @@ public interface AnnotationType {
                     return false;
                 }
                 
-                CardinalityConstraint thisCC = getCardinalityConstraint(key);
-                CardinalityConstraint subCC = subType.getCardinalityConstraint(key);
-                if (!thisCC.subConstraintOf(subCC)) {
+                Location thisCC = getCardinalityConstraint(key);
+                Location subCC = subType.getCardinalityConstraint(key);
+                if (!LocationTools.contains(thisCC, subCC)) {
                   return false;
                 }
             }
@@ -334,12 +341,12 @@ public interface AnnotationType {
     public class AnyOfType
     extends AnnotationType.Abstract {
         private PropertyConstraint constraint;
-        private CardinalityConstraint cardinality;
+        private Location cardinality;
 
         /**
          * Create a new Impl with no constraints.
          */
-        public AnyOfType(PropertyConstraint constraint, CardinalityConstraint cardinality) {
+        public AnyOfType(PropertyConstraint constraint, Location cardinality) {
             this.constraint = constraint;
             this.cardinality = cardinality;
         }
@@ -348,7 +355,7 @@ public interface AnnotationType {
             return constraint;
         }
 
-        public CardinalityConstraint getCardinalityConstraint(Object key) {
+        public Location getCardinalityConstraint(Object key) {
           return cardinality;
         }
 
@@ -356,7 +363,7 @@ public interface AnnotationType {
         public void setConstraints(
           Object key,
           PropertyConstraint con,
-          CardinalityConstraint card
+          Location card
         ) {
           constraint = con;
           cardinality = card;
