@@ -32,7 +32,7 @@ import org.biojava.bio.seq.DNATools;
 public class TestAmbiguity {
   public static void main(String [] args) {
     try {
-      String things = "agctrymkswhbvdn-";
+      String things = "agctrymkswhbvdn-AGCTRYMKSWHBVDN";
       FiniteAlphabet dna = DNATools.getDNA();
       SymbolParser sParser = dna.getParser("token");
       SymbolList sList = sParser.parse(things);
