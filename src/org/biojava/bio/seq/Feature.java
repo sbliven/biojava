@@ -28,6 +28,7 @@ import java.lang.reflect.*;
 import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.utils.*;
 
 /**
  * A feature within a sequence, or nested within another feature.
@@ -72,13 +73,56 @@ public interface Feature extends FeatureHolder, Annotatable {
     public static final String PROPERTY_DATA_KEY = "internal_data";
 
     /**
+     * The location of this feature is being altered.
+     */
+    public static final ChangeType LOCATION = new ChangeType(
+      "Location has altered",
+      Feature.class,
+      "LOCATION"
+    );
+    
+    /**
+     * The type of this feature has altered.
+     */
+    public static final ChangeType TYPE = new ChangeType(
+      "Type has altered",
+      Feature.class,
+      "TYPE"
+    );
+    
+    /**
+     * The source of this feature has altered
+     */
+    public static final ChangeType SOURCE = new ChangeType(
+      "Source has altered",
+      Feature.class,
+      "SOURCE"
+    );
+    
+    /**
      * The location of this feature.
      * <p>
      * The location may be complicated, or simply a range.
      * The annotation is assumed to apply to all the region contained
      * within the location.
+     *
+     * @return a Location anchoring this feature
      */
     Location getLocation();
+    
+    /**
+     * The new locatoin for this feature.
+     * <p>
+     * The location may be complicated or simply a range. The annotation is
+     * assumed to apply to the entire region contained within the location.
+     * Any values returned from methods that rely on the old location must
+     * not be affected.
+     *
+     * @param loc the new Location for this feature
+     * @throws ChangeVetoException if the location can't be altered
+     */
+    void setLocation(Location loc)
+    throws ChangeVetoException;
   
     /**
      * The type of the feature.
@@ -86,6 +130,15 @@ public interface Feature extends FeatureHolder, Annotatable {
      * @return the type of this sequence
      */
     String getType();
+    
+    /**
+     * Change the type of this feature.
+     *
+     * @param the new type String
+     * @throws ChangeVetoException if the type can't be altered
+     */
+    void setType(String type)
+    throws ChangeVetoException;
   
     /**
      * The source of the feature. This may be a program or process.
@@ -93,7 +146,16 @@ public interface Feature extends FeatureHolder, Annotatable {
      * @return the source, or generator
      */
     String getSource();
-  
+    
+    /**
+     * Change the source of the Feature.
+     *
+     * @param source the new source String
+     * @throws ChangeVetoException if the source can't be altered
+     */
+    void setSource(String source)
+    throws ChangeVetoException;
+    
     /**
      * Return a list of symbols that are contained in this feature.
      * <p>
@@ -102,6 +164,9 @@ public interface Feature extends FeatureHolder, Annotatable {
      * <p>
      * The order of the Symbols within the resulting symbol list will be 
      * according to the concept of ordering within the location object.
+     * <p>
+     * If the feature location is modified then this does not modify any
+     * SymbolList produced by earlier invocations of this method.
      *
      * @return  a SymbolList containing each symbol of the parent sequence contained
      *          within this feature in the order they appear in the parent

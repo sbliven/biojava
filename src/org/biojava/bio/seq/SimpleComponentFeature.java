@@ -135,6 +135,14 @@ class SimpleComponentFeature implements ComponentFeature {
     public Location getLocation() {
 	return location;
     }
+    
+    public void setLocation(Location loc)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        new ChangeEvent(this, LOCATION, loc, this.location),
+        "Can't change location as it is immutable"
+      );
+    }
 
     public FeatureHolder getParent() {
 	return parent;
@@ -151,10 +159,26 @@ class SimpleComponentFeature implements ComponentFeature {
 	return source;
     }
 
+    public void setSource(String source)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        new ChangeEvent(this, TYPE, source, this.source),
+        "Can't change source as it is immutable"
+      );
+    }
+
     public String getType() {
 	return type;
     }
 
+    public void setType(String type)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        new ChangeEvent(this, TYPE, type, this.type),
+        "Can't change type as it is immutable"
+      );
+    }
+    
     public Annotation getAnnotation() {
 	return annotation;
     }
