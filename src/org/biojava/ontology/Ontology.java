@@ -53,13 +53,13 @@ import org.biojava.utils.Changeable;
 public interface Ontology extends Changeable {
     public static final ChangeType TERM = new ChangeType(
       "A term has been added or removed",
-      "org.biojava.bio.ontology.Ontology",
+      "org.biojava.ontology.Ontology",
       "TERM"
     );
     
     public static final ChangeType TRIPLE = new ChangeType(
       "A triple has been added or removed",
-      "org.biojava.bio.ontology.Ontology",
+      "org.biojava.ontology.Ontology",
       "TRIPLE"
     );
     

@@ -56,7 +56,7 @@ public interface Term extends Annotatable {
     
     public static final ChangeType ONTOLOGY = new ChangeType(
       "This term's ontology has been changed",
-      "org.biojava.bio.ontology.Term",
+      "org.biojava.ontology.Term",
       "ONTOLOGY"
     );
     

@@ -25,23 +25,23 @@ public interface ReasoningDomain
 extends Changeable {
   public static final ChangeType ONTOLOGIES = new ChangeType(
     "Set of ontologies in this domain are changing",
-    "org.biojava.bio.ontology.ReasoningDomain",
+    "org.biojava.ontology.ReasoningDomain",
     "ONTOLOGIES" );
   
   public static final ChangeType TERMS = new ChangeType(
     "Terms in ontologies in this domain are changing",
-    "org.biojava.bio.ontology.ReasoningDomain",
+    "org.biojava.ontology.ReasoningDomain",
     "TERMS" );
   
   public static final ChangeType ADD_ONTOLOGY = new ChangeType(
     "Adding an ontology to this domain",
-    "org.biojava.bio.ontology.ReasoningDomain",
+    "org.biojava.ontology.ReasoningDomain",
     "ADD_ONTOLOGY",
     ONTOLOGIES );
 
   public static final ChangeType REMOVE_ONTOLOGY = new ChangeType(
     "Removing an ontology to this domain",
-    "org.biojava.bio.ontology.ReasoningDomain",
+    "org.biojava.ontology.ReasoningDomain",
     "REMOVE_ONTOLOGY",
     ONTOLOGIES );
 
