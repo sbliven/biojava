@@ -156,7 +156,7 @@ class SocketDatabase implements Database {
 			String name = lineToke.nextToken().trim();
 			set.add(
         name,
-        new SocketClazzSet(dbURL.relativeURL(name + '/'), set)
+        new SocketClazzSet(name, dbURL.relativeURL(name + '/'), set, this)
       );
 		    }
 		}
@@ -170,7 +170,7 @@ class SocketDatabase implements Database {
 	return allClassesSet;
     }
 
-    private AceSet select(String clazz, String namePattern)
+    AceSet select(String clazz, String namePattern)
 	                  throws AceException
     {
 	AceSocket sock = null;

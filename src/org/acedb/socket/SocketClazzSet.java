@@ -33,10 +33,13 @@ class SocketClazzSet implements AceSet {
     private AceURL url;
     private AceSet parent;
     private AceSet _allMembers = null;
+    private SocketDatabase ourDB;
+    private String name;
 
-    public SocketClazzSet(AceURL url, AceSet parent) {
+    public SocketClazzSet(String name, AceURL url, AceSet parent, SocketDatabase ourDB) {
 	this.url = url;
 	this.parent = parent;
+	this.ourDB = ourDB;
     }
 
     private AceSet allMembers() throws AceException {
@@ -66,7 +69,8 @@ class SocketClazzSet implements AceSet {
     }
 
     public AceSet filter(String rule) throws AceException {
-	return Ace.fetch(url.relativeURL("?" + rule));
+	// return Ace.fetch(url.relativeURL("?" + rule));
+	return ourDB.select(name, rule);
     }
 
     public AceSet getParent() {
