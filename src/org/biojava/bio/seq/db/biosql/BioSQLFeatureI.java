@@ -33,7 +33,7 @@ import org.biojava.bio.seq.*;
  * @since 1.3
  */
 
-interface BioSQLFeatureI {
+interface BioSQLFeatureI extends Feature {
     public void _setInternalID(int id);
     public int _getInternalID();
 

@@ -129,7 +129,7 @@ class BioSQLFeatureAnnotation
 	    conn = seqDB.getPool().takeConnection();
 	    conn.setAutoCommit(false);
 
-	    seqDB.persistProperty(conn, feature_id, key, value, true);
+	    seqDB.getFeaturesSQL().persistProperty(conn, feature_id, key, value, true);
 
 	    conn.commit();
 	    seqDB.getPool().putConnection(conn);

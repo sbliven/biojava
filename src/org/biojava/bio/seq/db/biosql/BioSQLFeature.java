@@ -57,7 +57,7 @@ class BioSQLFeature extends SimpleFeature implements BioSQLFeatureI {
         throws ChangeVetoException
     {
 	super.removeFeature(f);
-	((BioSQLSequenceI) getSequence()).getSequenceDB().removeFeature((BioSQLFeatureI) f);
+	((BioSQLSequenceI) getSequence()).getSequenceDB().getFeaturesSQL().removeFeature((BioSQLFeatureI) f);
     }
 
     private static Template mungeTemplate(Template templ) {

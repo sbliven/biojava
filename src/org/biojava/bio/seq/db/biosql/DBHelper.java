@@ -24,7 +24,25 @@ package org.biojava.bio.seq.db.biosql;
 import java.sql.*;
 import java.util.*;
 
-public interface DBHelper {
+public abstract class DBHelper {
+    public static DBHelper getDBHelperForURL(String ourURL) {
+	if (ourURL.startsWith("jdbc:")) {
+	    ourURL = ourURL.substring(5);
+	}
+	int colon = ourURL.indexOf(':');
+	if (colon > 0) {
+	    String protocol = ourURL.substring(0, colon);
+	    if (protocol.indexOf("mysql") >= 0) {
+		// Accept any string containing `mysql', to cope with Caucho driver
+	        return new MySQLDBHelper();
+	    } else if (protocol.equals("postgresql")) {
+		return new PostgreSQLDBHelper();
+	    }
+	}
+
+	return new UnknownDBHelper();
+    }
+
     public static final class DeleteStyle {
 	private final String name;
 
@@ -41,10 +59,10 @@ public interface DBHelper {
     public final static DeleteStyle DELETE_MYSQL4 = new DeleteStyle("Mysql 4.02 or later");
     public final static DeleteStyle DELETE_GENERIC = new DeleteStyle("Portable SQL");
 
-    public int getInsertID(Connection conn,
+    public abstract int getInsertID(Connection conn,
 			   String table,
 			   String columnName)
 	throws SQLException;
 
-    public DeleteStyle getDeleteStyle();
+    public abstract DeleteStyle getDeleteStyle();
 }

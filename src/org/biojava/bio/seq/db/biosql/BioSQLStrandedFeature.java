@@ -53,7 +53,7 @@ class BioSQLStrandedFeature extends SimpleStrandedFeature implements BioSQLFeatu
         throws ChangeVetoException
     {
 	super.removeFeature(f);
-	((BioSQLSequenceI) getSequence()).getSequenceDB().removeFeature((BioSQLFeatureI) f);
+	((BioSQLSequenceI) getSequence()).getSequenceDB().getFeaturesSQL().removeFeature((BioSQLFeatureI) f);
     }
 
     private static StrandedFeature.Template mungeTemplate(StrandedFeature.Template templ) {

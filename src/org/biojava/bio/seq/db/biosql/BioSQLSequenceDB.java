@@ -51,6 +51,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
     private IDMaker idmaker = new IDMaker.ByName();
     private WeakCacheMap outstandingSequences = new WeakCacheMap();
     private DBHelper helper;
+    private FeaturesSQL featuresSQL;
 
     JDBCConnectionPool getPool() {
 	return pool;
@@ -58,6 +59,10 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 
     DBHelper getDBHelper() {
 	return helper;
+    }
+
+    FeaturesSQL getFeaturesSQL() {
+	return featuresSQL;
     }
 
     /**
@@ -80,30 +85,15 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 			    boolean create)
 	throws BioException
     {
-	String ourURL = dbURL;
-	if (ourURL.startsWith("jdbc:")) {
-	    ourURL = ourURL.substring(5);
-	}
-	int colon = ourURL.indexOf(':');
-	if (colon > 0) {
-	    String protocol = ourURL.substring(0, colon);
-	    if (protocol.indexOf("mysql") >= 0) {
-		// Accept any string containing `mysql', to cope with Caucho driver
-		helper = new MySQLDBHelper();
-	    } else if (protocol.equals("postgresql")) {
-		helper = new PostgreSQLDBHelper();
-	    }
-	}
-
-	if (helper == null) {
-	    helper = new UnknownDBHelper();
-	}
-
+	helper = DBHelper.getDBHelperForURL(dbURL);
 	pool = new JDBCConnectionPool(dbURL, dbUser, dbPass);
 
 	if (! isBioentryPropertySupported()) {
 	    throw new BioException("This database appears to be an old (pre-Cape-Town) BioSQL.  If you need to access it, try an older BioJava snapshot");
 	}
+
+	// Create adapters
+	featuresSQL = new FeaturesSQL(this);
 
 	try {
 	    Connection conn = pool.takeConnection();
@@ -322,7 +312,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 		    System.err.println("*** Warning: feature hierarchy was lost when adding sequence to BioSQL");
 		}
 	    }
-	    persistFeatures(conn, bioentry_id, features, -1);
+	    getFeaturesSQL().persistFeatures(conn, bioentry_id, features, -1);
 
 	    // System.err.println("Stored features");
 
@@ -416,21 +406,6 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 		} catch (SQLException ex2) {}
 	    }
 	    throw new BioRuntimeException(ex, "Error adding BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""));
-	}
-    }
-
-    void persistFeatures(Connection conn, int bioentry_id, FeatureHolder features, int parent)
-        throws BioException, SQLException
-    {
-	for (Iterator fi = features.features(); fi.hasNext(); ) {
-	    Feature f = (Feature) fi.next();
-
-	    if (! (f instanceof ComponentFeature) /* && !(f.getType().equals("similarity")) */ ) {
-		int id = persistFeature(conn, bioentry_id, f, parent);
-		if (isHierarchySupported()) {
-		    persistFeatures(conn, bioentry_id, f, id);
-		}
-	    }
 	}
     }
 
@@ -686,270 +661,6 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
     // Sequence support
     //
 
-    int persistFeature(Connection conn,
-		       int bioentry_id,
-		       Feature f,
-		       int parent_id)
-	throws BioException, SQLException
-    {
-	int id = -1;
-	boolean locationWritten = false;
-
-	if (isSPASupported()) {
-	    if (f.getLocation().isContiguous()) {
-		Location loc = f.getLocation();
-
-		PreparedStatement add_feature = conn.prepareStatement(
-		        "select create_seqfeature_onespan(?, ?, ?, ?, ?, ?)"
-		);
-		add_feature.setInt(1, bioentry_id);
-		add_feature.setString(2, f.getType());
-		add_feature.setString(3, f.getSource());
-		add_feature.setInt(4, loc.getMin());
-		add_feature.setInt(5, loc.getMax());
-		if (f instanceof StrandedFeature) {
-		    StrandedFeature.Strand s = ((StrandedFeature) f).getStrand();
-		    if (s == StrandedFeature.POSITIVE) {
-			add_feature.setInt(6, 1);
-		    } else if (s== StrandedFeature.NEGATIVE) {
-			add_feature.setInt(6, -1);
-		    } else {
-			add_feature.setInt(6, 0);
-		    }
-		} else {
-		    add_feature.setInt(6, 0);
-		}
-		ResultSet rs = add_feature.executeQuery();
-		if (rs.next()) {
-		    id = rs.getInt(1);
-		}
-		add_feature.close();
-
-		locationWritten = true;
-	    } else {
-		PreparedStatement add_feature = conn.prepareStatement(
-		        "select create_seqfeature(?, ?, ?)"
-		);
-		add_feature.setInt(1, bioentry_id);
-		add_feature.setString(2, f.getType());
-		add_feature.setString(3, f.getSource());
-		ResultSet rs = add_feature.executeQuery();
-		if (rs.next()) {
-		    id = rs.getInt(1);
-		}
-		add_feature.close();
-	    }
-	} else {
-	    int seqfeature_key = intern_ontology_term(conn, f.getType());
-	    int seqfeature_source = intern_seqfeature_source(conn, f.getSource());
-
-	    PreparedStatement add_feature = conn.prepareStatement(
-		"insert into seqfeature "+
-		"       (bioentry_id, seqfeature_key_id, seqfeature_source_id) " +
-		"values (?, ?,  ?)"
-	    );
-	    add_feature.setInt(1, bioentry_id);
-	    add_feature.setInt(2, seqfeature_key);
-	    add_feature.setInt(3, seqfeature_source);
-	    add_feature.executeUpdate();
-	    add_feature.close();
-
-	    id = getDBHelper().getInsertID(conn, "seqfeature", "seqfeature_id");
-	}
-
-	if (!locationWritten) {
-	    PreparedStatement add_locationspan = conn.prepareStatement(
-                    "insert into seqfeature_location " +
-	            "       (seqfeature_id, seq_start, seq_end, seq_strand, location_rank) " +
-    		    "values (?, ?, ?, ?, ?)"
-	    );
-
-	    int strandNum;
-
-	    if (f instanceof StrandedFeature) {
-		StrandedFeature.Strand s = ((StrandedFeature) f).getStrand();
-		if (s == StrandedFeature.POSITIVE) {
-		    strandNum = 1;
-		} else if (s== StrandedFeature.NEGATIVE) {
-		    strandNum = -1;
-		} else {
-		    strandNum = 0;
-		}
-	    } else {
-		strandNum = 0;
-	    }
-
-	    int rank = 0;
-	    for (Iterator i = f.getLocation().blockIterator(); i.hasNext(); ) {
-		Location bloc = (Location) i.next();
-		add_locationspan.setInt(1, id);
-		add_locationspan.setInt(2, bloc.getMin());
-		add_locationspan.setInt(3, bloc.getMax());
-		add_locationspan.setInt(4, strandNum);
-		add_locationspan.setInt(5, ++rank);
-		add_locationspan.executeUpdate();
-	    }
-	    add_locationspan.close();
-	}
-
-	//
-	// Persist anything in the annotation bundle, as well.
-	//
-
-	for (Iterator ai = f.getAnnotation().asMap().entrySet().iterator(); ai.hasNext(); ) {
-	    Map.Entry akv = (Map.Entry) ai.next();
-	    persistProperty(conn, id, akv.getKey(), akv.getValue(), false);
-	}
-
-	//
-	// Persist link to parent
-	//
-
-	if (parent_id >= 0) {
-	    PreparedStatement add_hierarchy = conn.prepareStatement(
-		"insert into seqfeature_relationship "+
-		"       (parent_seqfeature_id, child_seqfeature_id, relationship_type_id) " +
-		"values (?, ?, ?)"
-		);
-	    add_hierarchy.setInt(1, parent_id);
-	    add_hierarchy.setInt(2, id);
-	    add_hierarchy.setInt(3, intern_ontology_term(conn, "contains"));
-	    add_hierarchy.executeUpdate();
-	    add_hierarchy.close();
-	}
-
-	return id;
-    }
-
-    void removeFeature(BioSQLFeatureI f)
-        throws ChangeVetoException
-    {
-        Connection conn = null;
-        try {
-            conn = pool.takeConnection();
-            conn.setAutoCommit(false);
-
-            removeFeature(conn, f);
-
-            conn.commit();
-            pool.putConnection(conn);
-        } catch (SQLException ex) {
-	    boolean rolledback = false;
-	    if (conn != null) {
-		try {
-		    conn.rollback();
-		    rolledback = true;
-		} catch (SQLException ex2) {}
-	    }
-	    throw new BioRuntimeException(ex, "Error removing from BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""));
-	}
-    }
-
-    private void removeFeature(Connection conn, BioSQLFeatureI f)
-        throws SQLException, ChangeVetoException
-    {
-        Iterator children = ((FeatureHolder) f).features();
-        while (children.hasNext()) {
-            Feature f2 = (Feature) children.next();
-            if (f2 instanceof BioSQLFeatureI) {
-                removeFeature(conn, (BioSQLFeatureI) f2);
-            }
-        }
-
-        int feature_id = f._getInternalID();
-
-        PreparedStatement delete_locs = conn.prepareStatement("delete from seqfeature_location " +
-                                                              " where seqfeature_location.seqfeature_id = ?");
-        delete_locs.setInt(1, feature_id);
-        delete_locs.executeUpdate();
-        delete_locs.close();
-
-        PreparedStatement delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value " +
-                                                             " where seqfeature_qualifier_value.seqfeature_id = ?");
-        delete_fqv.setInt(1, feature_id);
-        delete_fqv.executeUpdate();
-        delete_fqv.close();
-
-        PreparedStatement delete_rel = conn.prepareStatement("delete from seqfeature_relationship " +
-                                                             " where child_seqfeature_id = ?");
-        delete_rel.setInt(1, feature_id);
-        delete_rel.executeUpdate();
-        delete_rel.close();
-
-        PreparedStatement delete_feature = conn.prepareStatement("delete from seqfeature " +
-                                                                 " where seqfeature_id = ?");
-        delete_feature.setInt(1, feature_id);
-        delete_feature.executeUpdate();
-        delete_feature.close();
-    }
-
-    void persistProperty(Connection conn,
-			 int feature_id,
-			 Object key,
-			 Object value,
-			 boolean removeFirst)
-        throws SQLException
-    {
-	String keyString = key.toString();
-
-	if (removeFirst) {
-	    int id = intern_ontology_term(conn, keyString);
-	    PreparedStatement remove_old_value = conn.prepareStatement("delete from seqfeature_qualifier_value " +
-								       " where seqfeature_id = ? and ontology_term_id = ?");
-	    remove_old_value.setInt(1, feature_id);
-	    remove_old_value.setInt(2, id);
-	    remove_old_value.executeUpdate();
-	    remove_old_value.close();
-	}
-
-	PreparedStatement insert_new;
-	if (isSPASupported()) {
-	    insert_new= conn.prepareStatement("insert into seqfeature_qualifier_value " +
-                                              "       (seqfeature_id, ontology_term_id, qualifier_rank, qualifier_value) " +
-					      "values (?, intern_ontology_term( ? ), ?, ?)");
-	    if (value instanceof Collection) {
-		int cnt = 0;
-		for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
-		    insert_new.setInt(1, feature_id);
-		    insert_new.setString(2, keyString);
-		    insert_new.setInt(3, ++cnt);
-		    insert_new.setString(4, i.next().toString());
-		    insert_new.executeUpdate();
-		}
-	    } else {
-		insert_new.setInt(1, feature_id);
-		insert_new.setString(2, keyString);
-		insert_new.setInt(3, 1);
-		insert_new.setString(4, value.toString());
-		insert_new.executeUpdate();
-	    }
-	    insert_new.close();
-	} else {
-	    insert_new = conn.prepareStatement("insert into seqfeature_qualifier_value " +
-                                               "       (seqfeature_id, ontology_term_id, qualifier_rank, qualifier_value) " +
-			  	 	      "values (?, ?, ?, ?)");
-	    int sfq = intern_ontology_term(conn, keyString);
-	    if (value instanceof Collection) {
-		int cnt = 0;
-		for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
-		    insert_new.setInt(1, feature_id);
-		    insert_new.setInt(2, sfq);
-		    insert_new.setInt(3, ++cnt);
-		    insert_new.setString(4, i.next().toString());
-		    insert_new.executeUpdate();
-		}
-	    } else {
-		insert_new.setInt(1, feature_id);
-		insert_new.setInt(2, sfq);
-		insert_new.setInt(3, 1);
-		insert_new.setString(4, value.toString());
-		insert_new.executeUpdate();
-	    }
-	    insert_new.close();
-	}
-
-
-    }
 
     void persistBioentryProperty(Connection conn,
 				 int bioentry_id,
