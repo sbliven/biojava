@@ -98,7 +98,7 @@ public class NestedException extends Exception {
           }
         }
         for(Iterator i = lines1.iterator(); i.hasNext(); ) {
-          System.out.println(i.next());
+          pw.println(i.next());
         }
         pw.print("rethrown as ");
         pw.print(mes2);

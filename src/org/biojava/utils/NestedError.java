@@ -81,9 +81,9 @@ public class NestedError extends Error {
   }
   
   public void printStackTrace(PrintWriter pw) {
-  	if (subException != null) {
+    if (subException != null) {
       StringWriter sw1 = new StringWriter();
-	    subException.printStackTrace(new PrintWriter(sw1));
+      subException.printStackTrace(new PrintWriter(sw1));
       String mes1 = sw1.toString();
       StringWriter sw2 = new StringWriter();
       super.printStackTrace(new PrintWriter(sw2));
@@ -107,7 +107,7 @@ public class NestedError extends Error {
           }
         }
         for(Iterator i = lines1.iterator(); i.hasNext(); ) {
-          System.out.println(i.next());
+          pw.println(i.next());
         }
         pw.print("rethrown as ");
         pw.print(mes2);
