@@ -80,6 +80,7 @@ DROP TABLE term_dbxref;
 DROP TABLE term_path;
 DROP TABLE term_relationship;
 DROP TABLE term_synonym;
+DROP TABLE term_relationship_term;
 
 
 -- Hsqldb complains about indexes not existing -- maybe it automatically

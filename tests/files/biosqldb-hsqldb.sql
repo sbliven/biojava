@@ -22,6 +22,7 @@
 -- constraints have been commented out for compatibility.
 -- HSQLDB 1.7.2 alpha N. has problem with PreparedStatements that affect the BioJava binding (these 
 -- will apparently be addressed by the 1.7.2 release)
+-- HSQLDB 1.7.2 alpha T. Seems to work fine.
 
 CREATE TABLE biodatabase (
   	biodatabase_id 	INT NOT NULL IDENTITY,
@@ -133,6 +134,9 @@ CREATE INDEX trmpath_objectid ON term_path(object_term_id);
 CREATE INDEX trmpath_ontid ON term_path(ontology_id);
 
 
+
+
+
 CREATE TABLE bioentry (
 	bioentry_id	INT NOT NULL IDENTITY,
   	biodatabase_id  INT NOT NULL,
@@ -151,6 +155,15 @@ CREATE TABLE bioentry (
 CREATE INDEX bioentry_name ON bioentry(name);
 CREATE INDEX bioentry_db   ON bioentry(biodatabase_id);
 CREATE INDEX bioentry_tax  ON bioentry(taxon_id);
+
+-- BioJava addition. Not currently in main BioSQL
+CREATE TABLE term_relationship_term (
+        term_relationship_id    int DEFAULT 0 NOT NULL,
+        term_id                 int DEFAULT 0 NOT NULL,
+        PRIMARY KEY (term_relationship_id,term_id),
+        UNIQUE (term_relationship_id),
+        UNIQUE (term_id)
+);
 
 
 CREATE TABLE bioentry_relationship (
