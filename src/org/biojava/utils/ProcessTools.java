@@ -31,7 +31,21 @@ import java.util.*;
  * offers wrappers around the <code>java.lang.Process</code> API,
  * but hides away the details of managing threads and process I/O.
  *
+ * <h3>Example</h3>
+ *
+ * <pre>
+ * StringBuffer out = new StringBuffer();
+ * ProcessTools.exec(
+ *          new String[] {"/usr/bin/wc", "-w"},
+ *          "The quick brown fox jumps over the lazy dog",
+ *          out,
+ *          null
+ * );
+ * int numWords = Integer.parseInt(out.toString().trim());
+ * </pre>
+ *
  * @author Thomas Down
+ * @author Francois Pepin
  * @since 1.4
  */
 
@@ -53,21 +67,23 @@ public class ProcessTools {
       private static final String MAX_RUN_TIME_EXCEEDED_STRING =
 	  "MAX_RUN_TIME_EXCEEDED";
 
-      /** Default max run time (in seconds) **/
-      private static int maxRunTimeSecs = 0;
-
-
-  /**
-     * Execute the specified command and wait for it to return
+    // Dummy constructor since this is just a tools class  
+      
+    private ProcessTools() {
+    }
+      
+   /**
+     * Execute the specified command and wait for it to return.
      *
      * @param args the command line to execute.
      * @param input data to present to the process' standard input, or <code>null</code> if the process does not require input.
      * @param stdout a <code>StringBuffer</code> which will be filled with data from the process' output stream, or <code>null</code> to ignore output.
      * @param stderr a <code>StringBuffer</code> which will be filled with data from the process' error stream, or <code>null</code> to ignore output.
+     * @param timeout maximum run-time for child process.  A value of 0 indicates no limit.
      * @return the process' return code.
-     * @throws IOException if an error occurs while starting or communicating with the process
      */
-  public static int exec(
+     
+    public static int exec(
         String[] args,
         String input,
         StringBuffer stdout,
@@ -75,17 +91,37 @@ public class ProcessTools {
     )
         throws IOException
     {
-      /** Flag to indicate if we've exceeded max run time **/
-      boolean maxRunTimeExceeded = false;
+        try {
+            return exec(args, input, stdout, stderr, 0L);
+        } catch (ProcessTimeoutException ex) {
+            throw new Error("Assertion failed: unexpected process timeout");
+        }
+    }
 
-      
-      // First get the start time & calculate comparison numbers
-      Date startTime = new Date();
-      long startTimeMs = startTime.getTime();
-      long maxTimeMs = startTimeMs + (maxRunTimeSecs * 1000);
-      
+   /**
+     * Execute the specified command and wait for it to return, or kill
+     * it if the specified timeout expires first.
+     *
+     * @param args the command line to execute.
+     * @param input data to present to the process' standard input, or <code>null</code> if the process does not require input.
+     * @param stdout a <code>StringBuffer</code> which will be filled with data from the process' output stream, or <code>null</code> to ignore output.
+     * @param stderr a <code>StringBuffer</code> which will be filled with data from the process' error stream, or <code>null</code> to ignore output.
+     * @param timeout maximum run-time (in milliseconds) for the child process.  A value of 0 indicates no limit.
+     * @return the process' return code.
+     * @throws IOException if an error occurs while starting or communicating with the process
+     * @throws ProcessTimeoutException if the child process was killed because its timeout had expired.
+     */
+     
+  public static int exec(
+        String[] args,
+        String input,
+        StringBuffer stdout,
+        StringBuffer stderr,
+        long timeout
+    )
+        throws IOException, ProcessTimeoutException
+    {
         Process proc = Runtime.getRuntime().exec(args);
-        
         Pump outPump, inPump, errPump;
         
         if (input == null) {
@@ -103,6 +139,12 @@ public class ProcessTools {
             errPump = new PumpStreamToStringBuffer(proc.getErrorStream(), stderr);
         }
         
+        TimeBomb tb = null;
+        if (timeout > 0) {
+            tb = new TimeBomb(proc, timeout);
+            tb.start();
+        }
+        
         outPump.start();
         inPump.start();
         errPump.start();
@@ -110,6 +152,11 @@ public class ProcessTools {
         int rc;
         try {
             rc = proc.waitFor();
+            
+            if (tb != null) {
+                tb.defuse();
+            }
+            
             outPump.join();
             inPump.join();
             errPump.join();
@@ -120,7 +167,12 @@ public class ProcessTools {
         checkException(outPump, "Output to child");
         checkException(inPump, "Input from child");
         checkException(errPump, "Errors from child");
-        return rc;
+        
+        if (tb != null && tb.fired()) {
+            throw new ProcessTimeoutException(rc);
+        } else {
+            return rc;
+        }
     }
 
   
@@ -147,6 +199,40 @@ public class ProcessTools {
                          StringBuffer stdout,
                          StringBuffer stderr)
         throws IOException
+  {
+      try {
+            return exec(command, input, stdout, stderr, 0L);
+      } catch (ProcessTimeoutException ex) {
+            throw new Error("Assertion failed: unexpected process timeout");
+      }
+  }
+  
+  /**
+   * Execute the specified command and wait for it to return. This is the
+   * simplified version that tries to be nice and make your life easier. If
+   * you know exactly what you want, you might want to use exec(String[],...)
+   * instead.  
+   *
+   * @param command the command line to execute.
+   * @param input data to present to the process' standard input, or
+   * <code>null</code> if the process does not require input. 
+   * @param stdout a <code>StringBuffer</code> which will be filled with data
+   * from the process' output stream, or <code>null</code> to ignore output. 
+   * @param stderr a <code>StringBuffer</code> which will be filled with data
+   * from the process' error stream, or <code>null</code> to ignore output. 
+   * @param timeout maximum run-time (in milliseconds) for the child process.  A value of 0 indicates no limit.
+   * @return the process' return code.
+   * @throws IOException if an error occurs while starting or communicating
+   * with the process 
+   * @throws ProcessTimeoutException if the child process was killed because its timeout had expired.
+   */
+  public static int exec(
+                         String command,
+                         String input,
+                         StringBuffer stdout,
+                         StringBuffer stderr,
+                         long timeout)
+        throws IOException, ProcessTimeoutException
   {
     String[] cmd = null;
     // First determine the OS to build the right command string
@@ -183,8 +269,10 @@ public class ProcessTools {
          return exec(cmd,input,stdout,stderr);
   }
   
-  
-
+    /**
+     * Check the status of a Pump and re-throw any exception which may
+     * have occured during its lifecycle
+     */
   
     private static void checkException(Pump p, String msg)
         throws IOException
@@ -195,11 +283,74 @@ public class ProcessTools {
         }
     }
     
+    /**
+     * Thread which will kill the specified process if it is not defused before
+     * the timeout expires.
+     */
+    
+    private static class TimeBomb extends Thread {
+        private volatile boolean ticking = false;
+        private volatile boolean fired = false;
+        private final long time; 
+        private final Process victim;
+        
+        public TimeBomb(Process victim, long time) {
+            this.time = time;
+            this.victim = victim;
+        }
+        
+        public void run() {
+            synchronized(this) {
+                try {
+                    ticking = true;
+                    wait(time);
+                } catch (InterruptedException ex) {
+                    System.err.println("Timebomb thread was interrupted -- this shouldn't happen");
+                }
+            }
+            if (ticking) {
+                // System.err.println("TimeBomb activated -- killing child process");
+                fired = true;
+                victim.destroy();
+            }
+        }
+        
+        public synchronized void defuse() {
+            ticking = false;
+            notifyAll();
+        }
+        
+        public boolean fired() {
+            return fired;
+        }
+    }
+    
+    /**
+     * Base class for threads which pump bytes from a source to a sink.  Subclasses
+     * must implement sourceData and sinkData.  They may also wish to override
+     * shutdownHook, a dummy method which is called when the pump finishes (usually
+     * because the end of the data source has been reached).
+     */
+    
     private static abstract class Pump extends Thread {
         private IOException err = null;
         
+        /**
+         * Read bytes of data from some data source.
+         */
+        
         protected abstract int sourceData(byte[] buf) throws IOException;
+        
+        /**
+         * Write bytes of data to some data sink.
+         */
+        
         protected abstract void sinkData(byte[] buf, int len) throws IOException;
+        
+        /**
+         * Perform any required tidying operations when the Pump's job has finished.
+         */
+        
         protected void shutdownHook() throws IOException {};
         
         public void run() {
