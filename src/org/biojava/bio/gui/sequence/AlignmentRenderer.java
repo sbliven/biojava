@@ -104,6 +104,9 @@ public class AlignmentRenderer implements SequenceRenderer, PropertyChangeListen
 	for (Iterator i = renderList.iterator(); i.hasNext(); ) {
 	    LabelAndRenderer lar = (LabelAndRenderer) i.next();
 	    SequenceRenderContext subctx = new SequenceRenderContextForLabel(ctx, lar.getLabel());
+
+	    System.out.println(lar.getLabel().toString() + " " + offset);
+
 	    double depth = lar.getRenderer().getDepth(subctx);
 	    int dir = ctx.getDirection();
 	    if (dir == ctx.HORIZONTAL) {

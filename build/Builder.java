@@ -218,7 +218,7 @@ public class Builder {
 	command[1] = "-sourcepath";
 	command[2] = "src";
 	command[3] = "-classpath";
-	command[4] = makePath(new String[] {"class", "xml.jar"});
+	command[4] = makePath(new String[] {"class", "xerces.jar"});
 	command[5] = "-d";
 	command[6] = apiDocDir.getPath();
 	command[7] = "-version";
@@ -280,7 +280,7 @@ public class Builder {
 	    command[pos++] = (String) i.next();
 	}
 	command[pos++] = "-classpath";
-	command[pos++] = makePath(new String[] {"class", "xml.jar"});
+	command[pos++] = makePath(new String[] {"class", "xerces.jar"});
 	command[pos++] = "-sourcepath";
 	command[pos++] = "src";
 	command[pos++] = "-d";

@@ -23,11 +23,6 @@ package symbol;
 import java.util.*;
 import java.io.*;
 
-import org.w3c.dom.*;
-import org.xml.sax.*;
-import com.sun.xml.tree.*;
-import com.sun.xml.parser.*;
-
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 

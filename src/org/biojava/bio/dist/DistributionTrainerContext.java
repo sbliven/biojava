@@ -30,8 +30,18 @@ import org.biojava.bio.symbol.*;
  * @author Matthew Pocock
  */
 public interface DistributionTrainerContext {
+    /**
+     * Return the number of pseudocounts added to the distribution when training.
+     */
+
   public double getNullModelWeight();
   
+    /**
+     * Set the number of pseudocounts to add when training the distribution.
+     * These counts are added in proportion to the null model of the distribution
+     * being trained.
+     */
+
   public void setNullModelWeight(double weight);
   
   /**

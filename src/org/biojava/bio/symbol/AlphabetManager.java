@@ -27,8 +27,7 @@ import java.util.*;
 import java.net.*;
 
 import org.w3c.dom.*;
-import com.sun.xml.parser.*;
-import com.sun.xml.tree.*;
+import org.apache.xerces.parsers.*;
 import org.xml.sax.*;
 
 import org.biojava.bio.*;
@@ -394,7 +393,7 @@ public final class AlphabetManager {
   }
   
   /**
-   * Constructs a new Alphabetmanager instance.
+   * Initialize the static AlphabetManager resources.
    * <P>
    * This parses the resource
    * <code>org/biojava/bio/seq/tools/AlphabetManager.xml</code>
@@ -408,15 +407,24 @@ public final class AlphabetManager {
     gapSymbol = new GapSymbol();
     ambiguitySymbols.put(new HashSet(), gapSymbol);
     try {
-      URL alphabetURL = AlphabetManager.class.getClassLoader().getResource(
+      InputStream alphabetStream = AlphabetManager.class.getClassLoader().getResourceAsStream(
         "org/biojava/bio/symbol/AlphabetManager.xml"
       );
-      InputSource is = Resolver.createInputSource(alphabetURL, true);
-      Document doc = XmlDocument.createXmlDocument(is, true);
+      if (alphabetStream == null)
+	  throw new BioError("Couldn't locate AlphabetManager.xml.  Badly built biojava archive?");
+
+      InputSource is = new InputSource(alphabetStream);
+      DOMParser parser = new DOMParser();
+      parser.parse(is);
+      Document doc = parser.getDocument();
 
       NodeList children = doc.getDocumentElement().getChildNodes();
       for(int i = 0; i < children.getLength(); i++) {
-        Element child = (Element) children.item(i);
+	Node cnode = children.item(i);
+	if (! (cnode instanceof Element))
+	    continue;
+
+        Element child = (Element) cnode;
         String name = child.getNodeName();
         if(name.equals("symbol")) {
           nameToSymbol.put(child.getAttribute("name"),
@@ -446,8 +454,8 @@ public final class AlphabetManager {
                          spe.getLineNumber() + ":" +
                          spe.getColumnNumber()
       );
-    } catch (Throwable t) {
-      throw new BioError(t, "Unable to intialize AlphabetManager");
+    } catch (Exception t) {
+      throw new BioError(t, "Unable to initialize AlphabetManager");
     }
   }
 
@@ -466,7 +474,11 @@ public final class AlphabetManager {
 
     NodeList children = resE.getChildNodes();
     for(int i = 0; i < children.getLength(); i++) {
-      Element el = (Element) children.item(i);
+      Node n = children.item(i);
+      if (! (n instanceof Element))
+	  continue;
+
+      Element el = (Element) n;
       String nodeName = el.getNodeName();
       String content = el.getFirstChild().getNodeValue();
       if(nodeName.equals("short")) {
@@ -498,12 +510,20 @@ public final class AlphabetManager {
     
     NodeList children = resE.getChildNodes();
     for(int i = 0; i < children.getLength(); i++) {
-      Element el = (Element) children.item(i);
+      Node n = children.item(i);
+      if (! (n instanceof Element))
+	  continue;
+
+      Element el = (Element) n;
       String nodeName = el.getNodeName();
       if(nodeName.equals("symbol")) {
         NodeList symC = el.getChildNodes();
         for(int j = 0; j < symC.getLength(); j++) {
-          Element eel = (Element) symC.item(j);
+	  Node en = symC.item(j);
+	  if (! (en instanceof Element))
+	      continue;
+
+          Element eel = (Element) en;
           String eName = eel.getNodeName();
           String content = eel.getFirstChild().getNodeValue();
           if(eName.equals("short")) {
@@ -546,7 +566,11 @@ public final class AlphabetManager {
 
     NodeList children = alph.getChildNodes();
     for(int i = 0; i < children.getLength(); i++) {
-      Element el = (Element) children.item(i);
+      Node n = children.item(i);
+      if (! (n instanceof Element))
+	  continue;
+
+      Element el = (Element) n;
       try {
         String name = el.getNodeName();
         if(name.equals("description")) {

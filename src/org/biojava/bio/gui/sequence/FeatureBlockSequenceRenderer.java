@@ -244,7 +244,7 @@ implements SequenceRenderer, PropertyChangeListener {
         renderer.renderFeature(g, f, box, sp);
       }
 
-      g2.setClip(oldClip);
+      g.setClip(oldClip);
     }
 
     private void renderLabel(

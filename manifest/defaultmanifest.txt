@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Class-Path: xml.jar
+Class-Path: xerces.jar
 
 Name: resources/org/biojava/bio/seq/tools/AlphabetManager.xml
