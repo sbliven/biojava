@@ -44,32 +44,36 @@ public abstract class DBHelper {
      * Returns a DBHelper implementation suitable for a particular
      * database.
      *
-     * @param ourURL the JDBC url
+     * @param conn a connection to the database.
      * @return a <code>DBHelper</code>.
      */
-    public static DBHelper getDBHelperForURL(String ourURL) {
-	if (ourURL.startsWith("jdbc:")) {
-	    ourURL = ourURL.substring(5);
-	}
-        if (!Character.isLetter(ourURL.charAt(0))) {
-            throw new IllegalArgumentException("URL must start with a letter: " + ourURL);
+    public static DBHelper getDBHelper(Connection conn) {
+        try {
+            String dbType = conn.getMetaData().getURL();
+            if (dbType.startsWith("jdbc:")) {
+                dbType = dbType.substring(5);
+            }
+            if (!Character.isLetter(dbType.charAt(0))) {
+                throw new IllegalArgumentException("URL must start with a letter: " + dbType);
+            }
+            
+            int colon = dbType.indexOf(':');
+            if (colon > 0) {
+                String protocol = dbType.substring(0, colon);
+                if (protocol.indexOf("mysql") >= 0) {
+                    // Accept any string containing `mysql', to cope with Caucho driver
+                    return new MySQLDBHelper(conn);
+                } else if (protocol.equals("postgresql")) {
+                    return new PostgreSQLDBHelper();
+                } else if (protocol.equals("oracle")) {
+                    return new OracleDBHelper();
+                } else if (protocol.equals("hsqldb")) {
+                    return new HypersonicDBHelper();
+                }
+            }
+        } catch (SQLException se) {
+            se.printStackTrace();
         }
-  
-	int colon = ourURL.indexOf(':');
-	if (colon > 0) {
-	    String protocol = ourURL.substring(0, colon);
-	    if (protocol.indexOf("mysql") >= 0) {
-		// Accept any string containing `mysql', to cope with Caucho driver
-	        return new MySQLDBHelper();
-	    } else if (protocol.equals("postgresql")) {
-		return new PostgreSQLDBHelper();
- 	    } else if (protocol.equals("oracle")) {
- 		return new OracleDBHelper();
- 	    } else if (protocol.equals("hsqldb")) {
- 		return new HypersonicDBHelper();
-	    }
-	}
-
 	return new UnknownDBHelper();
     }
 
