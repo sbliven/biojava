@@ -102,9 +102,10 @@ public class SimpleMarkovModel implements MarkovModel {
     _tran.to = to;
     if(transitionScores.containsKey(_tran)) {
       transitionScores.put(_tran, new Double(value));
-    }
-    throw new IllegalTransitionException(from, to, "No transition from " + from.getName() +
+    } else {
+	throw new IllegalTransitionException(from, to, "No transition from " + from.getName() +
                                          " to " + to.getName() + " defined");
+    }
   }
 
   public void createTransition(State from, State to)
@@ -166,7 +167,9 @@ public class SimpleMarkovModel implements MarkovModel {
     this.queryAlpha = queryAlpha;
     this.stateAlpha = stateAlpha;
 
-    if(!stateAlpha.contains(DP.MAGICAL_STATE))
+    // FIXME?  Thomas Down added quick hack for PairwiseDP.
+
+    if(!stateAlpha.contains(DP.MAGICAL_STATE) && !stateAlpha.contains(PairwiseDP.MAGICAL_STATE))
       throw new SeqException("Use new SimpleMarkovModel(queryAlpha, stateAlpha). " +
                              "stateAlpha did not contain DP.MAGICAL_STATE.");
     for(Iterator i = stateAlpha.residues().iterator(); i.hasNext(); ) {
