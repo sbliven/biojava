@@ -325,13 +325,13 @@ public final class SeqIOTools  {
                 return GENPEPT;
             }
             else if ((new RE(".*\\u002efa.*")).match(fileName)) {
-                return guessFastaType(fileName);
+                return guessFastaType(seqFile);
             }
             else if ((new RE(".*\\u002emsf.*")).match(fileName)) {
-                return guessMsfType(fileName);
+                return guessMsfType(seqFile);
             }
         } catch (RESyntaxException e) {
-            System.out.println("guessFileType -- Problem with regular expression matching.");
+            System.out.println("guessFileType -- Problem with regular expression matching for:" + seqFile);
         }
 
         //Reads the file to guess based on content
@@ -341,10 +341,10 @@ public final class SeqIOTools  {
         br.close();
 
         if (line1.startsWith(">")) {
-            return guessFastaType(fileName);
+            return guessFastaType(seqFile);
         }
         else if (line1.startsWith("PileUp")) {
-            return guessMsfType(fileName);
+            return guessMsfType(seqFile);
         }
         else if (line1.startsWith("!!AA_MULTIPLE_ALIGNMENT")) {
             return MSFPROTEIN;
@@ -385,8 +385,8 @@ public final class SeqIOTools  {
     /**
      * Helper function for guessFileName.
      */
-    private static int guessFastaType(String fileName) throws IOException, FileNotFoundException {
-        BufferedReader br = new BufferedReader(new FileReader(fileName));
+    private static int guessFastaType(File seqFile) throws IOException, FileNotFoundException {
+        BufferedReader br = new BufferedReader(new FileReader(seqFile));
         String line = br.readLine();
         line = br.readLine();
         br.close();
@@ -406,8 +406,8 @@ public final class SeqIOTools  {
     /**
      * Helper function for guessFileName.
      */
-    private static int guessMsfType(String fileName) throws IOException, FileNotFoundException {
-        BufferedReader br = new BufferedReader(new FileReader(fileName));
+    private static int guessMsfType(File seqFile) throws IOException, FileNotFoundException {
+        BufferedReader br = new BufferedReader(new FileReader(seqFile));
         String line = br.readLine();
         if (line.startsWith("!!NA_MULTIPLE_ALIGNMENT")) {
             return MSFDNA;
