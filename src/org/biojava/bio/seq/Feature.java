@@ -191,7 +191,7 @@ public interface Feature extends FeatureHolder, Annotatable {
     /**
      * Change the type of this feature.
      *
-     * @param the new type String
+     * @param type  new type String
      * @throws ChangeVetoException if the type can't be altered
      */
     void setType(String type)
@@ -348,7 +348,7 @@ public interface Feature extends FeatureHolder, Annotatable {
 			hc += o.hashCode();
 		    }
 		} catch (Exception ex) {
-		    throw new BioError(ex, "Can't access template fields");
+		    throw new BioError("Can't access template fields", ex);
 		}
 	    }
 	    
@@ -377,7 +377,7 @@ public interface Feature extends FeatureHolder, Annotatable {
 			}
 		    }
 		} catch (Exception ex) {
-		    throw new BioError(ex, "Can't access template fields");
+		    throw new BioError("Can't access template fields", ex);
 		}
 	    }
 	    
@@ -419,7 +419,7 @@ public interface Feature extends FeatureHolder, Annotatable {
             try {
               field.set(this, method.invoke(feat, new Object[] {}));
             } catch (Exception e) {
-              throw new BioError(e, "Couldn't access template fields");
+              throw new BioError("Couldn't access template fields", e);
             }
           }
         }
@@ -439,7 +439,7 @@ public interface Feature extends FeatureHolder, Annotatable {
               sbuf.append("=");
               sbuf.append(fields[i].get(this));
             } catch (Exception e) {
-              throw new BioError(e, "Couldn't access template fields");
+              throw new BioError("Couldn't access template fields", e);
             }
           }
           
