@@ -50,14 +50,12 @@ import org.biojava.utils.Changeable;
  *   public Foo() {
  *     // make the ann delegate
  *     ann = new SimpleAnnotation();
- *
- *     annFor = new ChangeForwarder.Retyper(this, cs, Annotation.PROPERTY);(
- *       this, // this is the source of the new events
- *       getChangeSupport(Annotatable.ANNOTATION) // the type of the events
- *     );
- *
- *     // add the forwarder to our ann delegate
- *     ann.addChangeListener(annFor, Annotatable.ANNOTATION);
+ *     // construct the forwarder so that it emits Annotatable.ANNOTATION ChangeEvents
+ *     // for the Annotation.PROPERTY events it will listen for
+ *     annFor = new ChangeForwarder.Retyper(this, getChangesupport( Annotatable.ANNOTATION ), 
+ *                                          Annotatable.ANNOTATION );
+ *     // connect the forwarder so it listens for Annotation.PROPERTY events
+ *     ann.addChangeListener( annFor, Annotation.PROPERTY ); 
  *   }
  *
  *   public Annotation getAnnotation() {
