@@ -65,10 +65,10 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
     return name;
   }
 
-    /**
-*Assign a name to the alphabet
-*@param name the name you wish to give this alphabet
-*/
+  /**
+   * Assign a name to the alphabet
+   * @param name the name you wish to give this alphabet
+   */
   public void setName(String name) {
     this.name = name;
   }
@@ -116,16 +116,6 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
     }
   }
 
-  /**
-   * Adds a symbol to this alphabet.
-   * <P>
-   * If the symbol matches more than one AtomicSymbol, then each symbol matching
-   * it will be added.
-   *
-   * @param s the Symbol to add
-   * @throws IllegalSymbolException if the symbol is null, or if for any reason
-   *         it can't be added
-   */
   public void addSymbol(Symbol s)
   throws IllegalSymbolException {
     if(s == null) {
@@ -165,17 +155,7 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
     validate(aSym);
     ambig.add(aSym);
   }
-  
-  /**
-   * Remove a symbol from this alphabet.
-   * <P>
-   * If the symbol matches multiple AtomicSymbols, then each matching symbol it
-   * will be removed.
-   *
-   * @param s the Symbol to remove
-   * @throws IllegalSymbolException if the symbol is null, or if for any reason
-   *         it can't be removed
-   */
+
   public void removeSymbol(Symbol s)
   throws IllegalSymbolException {
     validate(s);
@@ -229,12 +209,20 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
   }
   
   public SimpleAlphabet() {
-    this.symbols	= new HashSet();
-    this.ambig = new HashSet();
+    this(new HashSet(), null);
   }
   
   public SimpleAlphabet(Set symbols) {
+    this(symbols, null);
+  }
+  
+  public SimpleAlphabet(String name) {
+    this(new HashSet(), name);
+  }
+
+  public SimpleAlphabet(Set symbols, String name) {
     this.symbols = symbols;
     this.ambig = new HashSet();
+    this.name = name;
   }
 }

@@ -71,7 +71,7 @@ extends AbstractDistribution implements Serializable {
   }
   
   public void registerWithTrainer(DistributionTrainerContext dtc) {
-    dtc.registerDistributionTrainer(this, IgnoreCountsTrainer.getInstance());
+    dtc.registerTrainer(this, IgnoreCountsTrainer.getInstance());
   }
   
   public UniformDistribution(FiniteAlphabet alphabet) {

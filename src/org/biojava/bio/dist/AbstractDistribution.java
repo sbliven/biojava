@@ -81,13 +81,6 @@ public abstract class AbstractDistribution implements Distribution {
     }
   }
   
-  /**
-   * Retrieve the null model Distribution that this Distribution recognizes.
-   *
-   * @return  the apropriate null model
-   */
-  public abstract Distribution getNullModel();
-  
   public Symbol sampleSymbol()
   throws BioError {
     double p = Math.random();
@@ -120,6 +113,6 @@ public abstract class AbstractDistribution implements Distribution {
   }
   
   public void registerWithTrainer(DistributionTrainerContext dtc) {
-    dtc.registerDistributionTrainer(this, IgnoreCountsTrainer.getInstance());
+    dtc.registerTrainer(this, IgnoreCountsTrainer.getInstance());
   }
 }

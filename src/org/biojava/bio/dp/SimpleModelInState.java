@@ -35,12 +35,6 @@ implements ModelInState {
     return model;
   }
   
-  public void registerWithTrainer(ModelTrainer modelTrainer)
-  throws BioException {
-    System.out.println("Registering " + getName() + " and the model contained");
-    getModel().registerWithTrainer(modelTrainer);
-  }
-  
   public SimpleModelInState(MarkovModel model, String name) {
     super(name.charAt(0), name, null);
     this.model = model;

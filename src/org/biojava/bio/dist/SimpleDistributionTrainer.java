@@ -61,10 +61,9 @@ implements DistributionTrainer, Serializable {
     c.put(sym, new Double(d.doubleValue() + count));
   }
 
-  public void train(
-    Distribution nullModel,
-    double weight
-  ) throws IllegalSymbolException {
+  public void train(double weight)
+  throws IllegalSymbolException {
+    Distribution nullModel = dis.getNullModel();
     double sum = 0.0;
     for(
       Iterator i = ((FiniteAlphabet) dis.getAlphabet()).iterator();

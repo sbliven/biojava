@@ -7,6 +7,10 @@ public class ModelVetoException extends Exception {
     return mce;
   }
   
+  public ModelVetoException(String message) {
+    this(message, null);
+  }
+  
   public ModelVetoException(String message, ModelChangeEvent mce) {
     super(message);
     this.mce = mce;

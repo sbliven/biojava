@@ -58,12 +58,14 @@ public abstract class AbstractTrainer implements TrainingAlgorithm {
   /**
    * Trains the sequences in db until stopper says to finnish.
    */
-  public void train(SequenceDB db, Distribution nullModel,
+  public void train(SequenceDB db,
                     double nullWeight, StoppingCriteria stopper)
   throws IllegalSymbolException, BioException {
     try {
-      ModelTrainer trainer =
-        new SimpleModelTrainer(dp.getModel(), nullModel, nullWeight, 5.0, 1.0);
+      ModelTrainer trainer = new SimpleModelTrainer();
+      trainer.setNullModelWeight(5.0);
+      trainer.registerModel(dp.getModel());
+        
       do {
         cycle++;
         lastScore = currentScore;

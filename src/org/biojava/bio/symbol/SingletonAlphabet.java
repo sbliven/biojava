@@ -78,6 +78,20 @@ public class SingletonAlphabet implements FiniteAlphabet, Serializable {
     return Annotation.EMPTY_ANNOTATION;
   }
   
+  public void addSymbol(Symbol sym) throws IllegalSymbolException {
+    throw new IllegalSymbolException(
+      "Can't add symbols to alphabet: " + sym.getName() +
+      " in " + getName()
+    );
+  }
+  
+  public void removeSymbol(Symbol sym) throws IllegalSymbolException {
+    throw new IllegalSymbolException(
+      "Can't remove symbols from alphabet: " + sym.getName() +
+      " in " + getName()
+    );
+  }
+    
   public SymbolList symbols() {
     try {
       return new SimpleSymbolList(this, Collections.nCopies(1, sym));

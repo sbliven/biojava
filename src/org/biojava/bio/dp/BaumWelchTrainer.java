@@ -40,6 +40,7 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
     double [][] forwardTransitionScores = dp.getForwardTransitionScores();    
     int [][] backwardTransitions = dp.getBackwardTransitions();
     double [][] backwardTransitionScores = dp.getBackwardTransitionScores();    
+    MarkovModel model = dp.getModel();
     
     SymbolList [] rll = { resList };
     
@@ -76,6 +77,7 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
       for (int s = 0; s < states.length; s++) {  // any -> emission transitions
         int [] ts = backwardTransitions[s];
         double [] tss = backwardTransitionScores[s];
+        Distribution dist = model.getWeights(states[s]);
         for (int tc = 0; tc < ts.length; tc++) {
           int t = ts[tc];
           double weight = (states[t] instanceof EmissionState)
@@ -83,17 +85,17 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
             : 0.0;
           if (weight != Double.NEGATIVE_INFINITY) {
             try {
-              trainer.addTransitionCount(
-                states[s], states[t],
+              trainer.addCount(
+                dist, states[t],
                 Math.exp(
                   fsc[s] + tss[tc] + weight + bsc[t]
                   -
                   fs
                 )
               );
-            } catch (IllegalTransitionException ite) {
+            } catch (IllegalSymbolException ise) {
               throw new BioError(
-                ite,
+                ise,
                 "Transition in backwardTransitions[][] dissapeared"
               );
             }

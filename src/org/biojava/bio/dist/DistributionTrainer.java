@@ -52,10 +52,9 @@ public interface DistributionTrainer {
    * <P>
    * This method should not modify the underlying counts.
    *
-   * @param nullModel the null model Distribution
    * @param weight  how many lots of the null model to add
    */
-  void train(Distribution nullModel, double weight) throws IllegalSymbolException;
+  void train(double weight) throws IllegalSymbolException;
   
   /**
    * Clears all of the counts to zero.

@@ -30,22 +30,37 @@ import org.biojava.bio.symbol.*;
  * @author Matthew Pocock
  */
 public interface DistributionTrainerContext {
-/**
-*Register a distribution object
-*/
-  void registerDistribution(Distribution dist);
-/**
-*Register a distribution and an associated distributiontrainer object
-*@param dist the distribution to be registered.
-*@param trainer the distribution's trainer object to be registered.
-*/  
-  void registerDistributionTrainer(Distribution dist, DistributionTrainer trainer);
+  public double getNullModelWeight();
+  
+  public void setNullModelWeight(double weight);
   
   /**
-  *Return the Distribution trainer object from the current context.
-  *@param dist the Distribution whose trainer is required.
+  * Register a distribution object with this context.
+  * <P>
+  * This method is a request to the context to register dist. If dist is already
+  * registered then this method should do nothing. If it is not registered, then
+  * it should invoke dist.registerWithTrainer
+  *
+  * @param dist the Distribution to register
   */
-   DistributionTrainer getDistributionTrainer(Distribution dist);
+  void registerDistribution(Distribution dist);
+  
+  /**
+   * Register a Distribution and an associated DistributionTrainer object.
+   * <P>
+   * In the registerWithTrainer method of a Distribution, it should associate
+   * itself with a trainer using this method.
+   *
+   * @param dist the distribution to be registered.
+   * @param trainer the distribution's trainer object to be registered.
+   */
+  void registerTrainer(Distribution dist, DistributionTrainer trainer);
+  
+  /**
+  * Return the Distribution trainer object from the current context.
+  * @param dist the Distribution whose trainer is required.
+  */
+   DistributionTrainer getTrainer(Distribution dist);
   
   /**
    * Registers that sym was counted in this state.
@@ -69,10 +84,10 @@ public interface DistributionTrainerContext {
    * @param nullModel the null model Distribution
    * @param weight  how many lots of the null model to add
    */
-  void trainDistributions() throws IllegalSymbolException;
+  void train() throws IllegalSymbolException;
   
   /**
    * Clears all of the counts to zero.
    */
-  void clearDistributionCounts();
+  void clearCounts();
 }

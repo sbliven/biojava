@@ -61,9 +61,13 @@ public class GapDistribution implements Distribution {
   public Symbol sampleSymbol() {
     return AlphabetManager.getGapSymbol();
   }
+  
+  public Distribution getNullModel() {
+    return this;
+  }
 
   public void registerWithTrainer(DistributionTrainerContext dtc) {
-    dtc.registerDistributionTrainer(this, IgnoreCountsTrainer.getInstance());
+    dtc.registerTrainer(this, IgnoreCountsTrainer.getInstance());
   }
     
   public GapDistribution(Alphabet alpha) {

@@ -28,6 +28,7 @@ import java.io.Serializable;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
+import org.biojava.utils.*;
 
 /**
  * Algorithms for dynamic programming (alignments) between pairs
@@ -65,8 +66,8 @@ public class PairwiseDP extends DP implements Serializable {
     }
   }
   
-  private AlphabetManager.ListWrapper gopher =
-    new AlphabetManager.ListWrapper();
+  private ListWrapper gopher =
+    new ListWrapper();
 
 
   protected double [] getEmission(List symList, CrossProductAlphabet alpha)
@@ -106,7 +107,7 @@ public class PairwiseDP extends DP implements Serializable {
           emission[i]
         );*/
       }
-      emissions.put(new AlphabetManager.ListWrapper(ll), emission);
+      emissions.put(new ListWrapper(ll), emission);
     } else {
       //System.out.print("-");
     }

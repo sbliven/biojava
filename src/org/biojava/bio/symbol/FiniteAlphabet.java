@@ -62,6 +62,34 @@ public interface FiniteAlphabet extends Alphabet {
    */
   Iterator iterator();
   
+
+  /**
+   * Adds a symbol to this alphabet.
+   * <P>
+   * If the symbol matches more than one AtomicSymbol, then each symbol matching
+   * it will be added.
+   *
+   * @param s the Symbol to add
+   * @throws IllegalSymbolException if the symbol is null, or if for any reason
+   *         it can't be added
+   */
+  public void addSymbol(Symbol s)
+  throws IllegalSymbolException;
+  
+  
+  /**
+   * Remove a symbol from this alphabet.
+   * <P>
+   * If the symbol matches multiple AtomicSymbols, then each matching symbol it
+   * will be removed.
+   *
+   * @param s the Symbol to remove
+   * @throws IllegalSymbolException if the symbol is null, or if for any reason
+   *         it can't be removed
+   */
+  public void removeSymbol(Symbol s)
+  throws IllegalSymbolException;
+  
   /**
    * A list of symbols that make up this alphabet.
    * <P>

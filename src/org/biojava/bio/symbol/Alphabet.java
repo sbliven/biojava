@@ -140,6 +140,20 @@ public interface Alphabet extends Annotatable {
     public SymbolList symbols() {
       return SymbolList.EMPTY_LIST;
     }
+  
+    public void addSymbol(Symbol sym) throws IllegalSymbolException {
+      throw new IllegalSymbolException(
+        "Can't add symbols to alphabet: " + sym.getName() +
+        " in " + getName()
+      );
+    }
+  
+    public void removeSymbol(Symbol sym) throws IllegalSymbolException {
+      throw new IllegalSymbolException(
+        "Can't remove symbols from alphabet: " + sym.getName() +
+        " in " + getName()
+      );
+    }
 
     private Object writeReplace() throws ObjectStreamException {
       try {

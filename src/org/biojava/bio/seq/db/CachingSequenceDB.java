@@ -21,13 +21,13 @@
 
 package org.biojava.bio.seq.db;
 
-import java.io.Serializable;
+import java.io.*;
+import java.util.*;
+import java.lang.ref.*;
 
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.*;
-import java.util.*;
-import java.lang.ref.*;
 
 /**
  * SequenceDB implementation that caches the results of another SequenceDB.
@@ -35,13 +35,8 @@ import java.lang.ref.*;
  * @author Matthew Pocock
  */
 
-public class CachingSequenceDB implements SequenceDB, Serializable {
-  private final SequenceDB parent;
-  private final transient Map cache;
-  
-  {
-    cache = new HashMap();
-  }
+public class CachingSequenceDB extends SequenceDBWrapper {
+  private transient Map cache;
   
   /**
    * Create a new CachingSequenceDB that caches the sequences in parent.
@@ -49,49 +44,37 @@ public class CachingSequenceDB implements SequenceDB, Serializable {
    * @param parent the SequenceDB to cache
    */
   public CachingSequenceDB(SequenceDB parent) {
-    this.parent = parent;
-  }
-  
-  /**
-   * Return the parent SequenceDB.
-   *
-   * @return the parent SequenceDB
-   */
-  public SequenceDB getParent() {
-    return this.parent;
+    super(parent);
+    cache = new HashMap();
   }
   
   public String getName() {
-    return parent.getName();
+    return getParent().getName();
   }
   
   public Sequence getSequence(String id) throws BioException {
     SoftReference ref = (SoftReference) cache.get(id);
     Sequence seq;
     if(ref == null) {
-      seq = parent.getSequence(id);
+      seq = getParent().getSequence(id);
       cache.put(id, new SoftReference(seq));
     } else {
       seq = (Sequence) ref.get();
+      if(seq == null) {
+        seq = getParent().getSequence(id);
+        cache.put(id, new SoftReference(seq));
+      }
     }
     return seq;
   }
   
   public Set ids() {
-    return parent.ids();
+    return getParent().ids();
   }
   
-  public SequenceIterator sequenceIterator() {
-    return new SequenceIterator() {
-      private Iterator pID = parent.ids().iterator();
-      
-      public boolean hasNext() {
-        return pID.hasNext();
-      }
-      
-      public Sequence nextSequence() throws BioException {
-        return getSequence((String) pID.next());
-      }
-    };
+  private void readObject(ObjectInputStream in)
+  throws IOException, ClassNotFoundException {
+    in.defaultReadObject();
+    this.cache = new HashMap();
   }
 }

@@ -49,7 +49,7 @@ public interface Distribution {
    *
    * @return  the Alphabet associated with this spectrum
    */
-  public Alphabet getAlphabet();
+  Alphabet getAlphabet();
     
   /**
    * Return the probability that Symbol s is emited by this spectrum.
@@ -61,7 +61,7 @@ public interface Distribution {
    * @return  the log probability of emitting that symbol
    * @throws IllegalSymbolException if s is not from this state's alphabet
    */
-  public double getWeight(Symbol s) throws IllegalSymbolException;
+  double getWeight(Symbol s) throws IllegalSymbolException;
   
   /**
    * Set the probability or odds that Symbol s is emited by this state.
@@ -74,7 +74,7 @@ public interface Distribution {
    * @throws UnsupportedOperationException if this state does not allow weights
    *         to be tampered with
    */
-  public void setWeight(Symbol s, double w)
+  void setWeight(Symbol s, double w)
   throws IllegalSymbolException, UnsupportedOperationException;
 
   /**
@@ -82,7 +82,14 @@ public interface Distribution {
    *
    * @return the symbol sampled
    */
-  public Symbol sampleSymbol();
+  Symbol sampleSymbol();
+  
+  /**
+   * Retrieve the null model Distribution that this Distribution recognizes.
+   *
+   * @return  the apropriate null model
+   */
+  Distribution getNullModel();
   
   /**
    * Register this distribution with a training context.

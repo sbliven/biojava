@@ -191,7 +191,7 @@ public abstract class DP {
     private boolean transitionsTo(State from, State to)
 	  throws IllegalTransitionException, IllegalSymbolException {
 	    Set checkedSet = new HashSet();
-	    Set workingSet = mm.transitionsFrom(from);
+	    Set workingSet = new HashSet(mm.transitionsFrom(from).symbols().toList());
 	    while (workingSet.size() > 0) {
         Set newWorkingSet = new HashSet();
         for (Iterator i = workingSet.iterator(); i.hasNext(); ) {
@@ -232,7 +232,7 @@ public abstract class DP {
     for (int i = 0; i < stateCount; i++) {
       int [] tmp = new int[stateCount];
       int len = 0;
-      Set trans = model.transitionsTo(states[i]);
+      FiniteAlphabet trans = model.transitionsTo(states[i]);
       for (int j = 0; j < stateCount; j++) {
         if (trans.contains(states[j])) {
           tmp[len++] = j;
@@ -260,8 +260,9 @@ public abstract class DP {
       scores[i] = new double[transitions[i].length];
       for (int j = 0; j < scores[i].length; j++) {
         try {
-          scores[i][j] = model.getTransitionScore(states[transitions[i][j]], is);
-        } catch (IllegalTransitionException ite) {
+          scores[i][j] =
+            model.getWeights(states[transitions[i][j]]).getWeight(is);
+        } catch (IllegalSymbolException ite) {
           throw new BioError(ite,
             "Transition listed in transitions array has dissapeared.");
         }
@@ -279,7 +280,7 @@ public abstract class DP {
     for (int i = 0; i < stateCount; i++) {
       int [] tmp = new int[stateCount];
       int len = 0;
-      Set trans = model.transitionsFrom(states[i]);
+      FiniteAlphabet trans = model.transitionsFrom(states[i]);
       for (int j = 0; j < stateCount; j++) {
         if (trans.contains(states[j]))
           tmp[len++] = j;
@@ -304,8 +305,9 @@ public abstract class DP {
       scores[i] = new double[transitions[i].length];
       for (int j = 0; j < scores[i].length; j++) {
         try {
-          scores[i][j] = model.getTransitionScore(is, states[transitions[i][j]]);
-        } catch (IllegalTransitionException ite) {
+          scores[i][j] =
+            model.getWeights(is).getWeight(states[transitions[i][j]]);
+        } catch (IllegalSymbolException ite) {
           throw new BioError(ite,
             "Transition listed in transitions array has dissapeared");
         }
@@ -502,10 +504,11 @@ public abstract class DP {
     State oldState;
     Symbol token;
 
-    oldState = model.sampleTransition(model.magicalState());
+    oldState = (State) model.getWeights(model.magicalState()).sampleSymbol();
+    Distribution oldDist = model.getWeights(oldState);
     try {
-      resScore += model.getTransitionScore(model.magicalState(), oldState);
-    } catch (IllegalTransitionException ite) {
+      resScore += oldDist.getWeight(oldState);
+    } catch (IllegalSymbolException ite) {
       throw new BioError(ite,
         "Transition returned from sampleTransition is invalid");
     }
@@ -523,14 +526,15 @@ public abstract class DP {
     }
 
     while (i != 0) {
-      State newState;
+      State newState = null;
+      Distribution dist = model.getWeights(oldState); 
       do {
-        newState = model.sampleTransition(oldState);
+        newState = (State) dist.sampleSymbol();
       } while (newState == model.magicalState() && i > 0);
       try {
-        resScore += model.getTransitionScore(oldState, newState);
-      } catch (IllegalTransitionException ite) {
-        throw new BioError(ite,
+        resScore += dist.getWeight(newState);
+      } catch (IllegalSymbolException ise) {
+        throw new BioError(ise,
           "Transition returned from sampleTransition is invalid");
       }
 

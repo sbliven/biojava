@@ -22,8 +22,6 @@
 
 package org.biojava.bio.symbol;
 
-import org.biojava.bio.seq.*;
-
 /**
  * Encapsulates the mapping from a source to a destination alphabet.
  * <P>

@@ -26,6 +26,7 @@ import java.util.*;
 import java.io.Serializable; 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.dist.*;
 
 public class SimpleMarkovModel implements MarkovModel, Serializable {
   private final Alphabet emissionAlpha;
@@ -34,7 +35,7 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
 
   private final Map transFrom;
   private final Map transTo;
-  private final Map transitionScores;
+  private final Map transWeights;
   
   private transient List transitionListeners;
 
@@ -43,7 +44,7 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
   {
     transFrom = new HashMap();
     transTo = new HashMap();
-    transitionScores = new HashMap();
+    transWeights = new HashMap();
   }
 
   protected List getTransitionListeners() {
@@ -58,95 +59,65 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
   public int heads() { return magicalState().getAdvance().length; }
   public MagicalState magicalState() { return magicalState; }
 
-  public double getTransitionScore(State from, State to)
-  throws IllegalSymbolException, IllegalTransitionException {
-    stateAlphabet().validate(from);
-    stateAlphabet().validate(to);
+  public Distribution getWeights(State source)
+  throws IllegalSymbolException {
+    stateAlphabet().validate(source);
 
-    _tran.from = from;
-    _tran.to = to;
-    Double ts = (Double) transitionScores.get(_tran);
-    if(ts != null)
-      return ts.doubleValue();
-    throw new IllegalTransitionException(from, to);
-  }
-
-  public State sampleTransition(State from) throws IllegalSymbolException {
-    stateAlphabet().validate(from);
-    
-    double p = Math.random();
-    try {
-      for(Iterator i = transitionsFrom(from).iterator(); i.hasNext(); ) {
-        State s = (State) i.next();
-        if( (p -= Math.exp(getTransitionScore(from, s))) <= 0 )
-        return s;
-      }
-    } catch (IllegalSymbolException ire) {
-    } catch (IllegalTransitionException ite) {
-      throw new BioError(ite, "Transition listend in transitionsFrom(" +
-                         from.getName() + "has dissapeared.");
-    }
-    
-    StringBuffer sb = new StringBuffer();
-
-    for(Iterator i = transitionsFrom(from).iterator(); i.hasNext(); ) {
-      try {
-      State s = (State) i.next();
-      double t = getTransitionScore(from, s);
-      if(t > 0.0)
-        sb.append("\t" + s.getName() + " -> " + t + "\n");
-      } catch (IllegalTransitionException ite) {
-        throw new BioError(ite, "Transition listend in transitionsFrom(" +
-                           from.getName() + "has dissapeared.");
-      }
-    }
-    throw new IllegalSymbolException("Could not find transition from state " +
-                                      from.getName() +
-                                      ". Do the probabilities sum to 1?" +
-                                      "\np=" + p + "\n" + sb.toString());
-  }
-  
-  public void setTransitionScore(State from, State to, double value)
-  throws IllegalSymbolException, IllegalTransitionException, ModelVetoException {
-    stateAlphabet().validate(from);
-    stateAlphabet().validate(to);
-
-    TransitionEvent te = new TransitionEvent(
-      this, from, to, getTransitionScore(from, to), value
-    );
-    List transitionListeners = getTransitionListeners();
-    List tl;
-    synchronized(transitionListeners) {
-      tl = new ArrayList(transitionListeners);
-    }
-    
-    for(Iterator i = tl.iterator(); i.hasNext(); ) {
-      ((TransitionListener) i.next()).preChangeTransitionScore(te);
-    }
-
-    _tran.from = from;
-    _tran.to = to;
-    if(transitionScores.containsKey(_tran)) {
-      transitionScores.put(_tran, new Double(value));
-    } else {
-      throw new IllegalTransitionException(
-        from, to,
-        "No transition from " + from.getName() +
-        " to " + to.getName() + " defined"
+    Distribution dist = (Distribution) transWeights.get(source);
+    if(dist == null) {
+      throw new BioError(
+        "Model does contain " + source.getName() +
+        " but the associated transition distribution is missing."
       );
     }
-
-    for(Iterator i = tl.iterator(); i.hasNext(); ) {
-      ((TransitionListener) i.next()).postChangeTransitionScore(te);
-    }
+    return dist;
   }
 
+  /**
+   * Use this methods to customize the transition probabilities.
+   * <P>
+   * By default, the distribution P(destination | source) is a totaly free
+   * distribution. This allows the different probabilities to vary. If you
+   * wish to change this behaviour (for example, to make one set of transition
+   * probabilities equal to another), then use this method to replace the
+   * Distribution with one of your own.
+   *
+   * @param the source State
+   * @param dist  the new Distribution over the transition probabilites from source
+   * @throws IllegalSymbolException if source is not a member of this model
+   * @throws IllegalAlphabetException if dist is not a distribution over the
+   *         states returned by model.transitionsFrom(source)
+   */
+  public void setWeights(State source, Distribution dist)
+  throws IllegalSymbolException, IllegalAlphabetException {
+    FiniteAlphabet ta = transitionsFrom(source);
+    if(dist.getAlphabet() != ta) {
+      throw new IllegalAlphabetException(
+        "Can't set distribution from state " + source.getName() +
+        " as the distribution alphabet is not the alphabet of transitions: " +
+        ta.getName() + " and " + dist.getAlphabet().getName()
+      );
+    }
+    
+    transWeights.put(source, dist);
+  }
+  
   public void createTransition(State from, State to)
   throws IllegalSymbolException, ModelVetoException {
     stateAlphabet().validate(from);
     stateAlphabet().validate(to);
-
     TransitionEvent te = new TransitionEvent(this, from, to);
+    
+    FiniteAlphabet f = transitionsFrom(from);
+    FiniteAlphabet t = transitionsTo(to);
+
+    if(f.contains(to)) {
+      throw new ModelVetoException(
+        "Transition already exists: " + from.getName() + " -> " + to.getName(),
+        te
+      );
+    }
+
     List transitionListeners = getTransitionListeners();
     List tl;
     synchronized(transitionListeners) {
@@ -156,13 +127,9 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     for(Iterator i = tl.iterator(); i.hasNext(); ) {
       ((TransitionListener) i.next()).preCreateTransition(te);
     }
-    
-    transitionScores.put(new Transition(from, to),
-                         new Double(Double.NEGATIVE_INFINITY));
-    Set t = transitionsTo(to);
-    Set f = transitionsFrom(from);
-    f.add(to);
-    t.add(from);
+
+    f.addSymbol(to);
+    t.addSymbol(from);
 
     for(Iterator i = tl.iterator(); i.hasNext(); ) {
       ((TransitionListener) i.next()).postCreateTransition(te);
@@ -175,6 +142,27 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     stateAlphabet().validate(to);
 
     TransitionEvent te = new TransitionEvent(this, from, to);
+
+    FiniteAlphabet f = transitionsFrom(from);
+    FiniteAlphabet t = transitionsTo(to);
+    
+    if(!f.contains(to)) {
+      throw new ModelVetoException(
+        "Transition does not exists: " + from.getName() + " -> " + to.getName(),
+        te
+      );
+    }
+
+    Distribution dist = getWeights(from);
+    double w = dist.getWeight(to); 
+    if(w != 0.0) {
+      throw new ModelVetoException(
+        "Can't remove transition as its weight is not zero: " +
+        from.getName() + " -> " + to.getName() + " = " + w,
+        te
+      );
+    }
+
     List transitionListeners = getTransitionListeners();
     List tl;
     synchronized(transitionListeners) {
@@ -184,13 +172,10 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     for(Iterator i = tl.iterator(); i.hasNext(); ) {
       ((TransitionListener) i.next()).preDestroyTransition(te);
     }
-    
-    _tran.from = from;
-    _tran.to = to;
-    transitionScores.remove(_tran);
-    transitionsFrom(from).remove(to);
-    transitionsTo(to).remove(from);
 
+    transitionsFrom(from).removeSymbol(to);
+    transitionsTo(to).removeSymbol(from);
+    
     for(Iterator i = tl.iterator(); i.hasNext(); ) {
       ((TransitionListener) i.next()).postDestroyTransition(te);
     }
@@ -198,35 +183,44 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
   
   public boolean containsTransition(State from, State to)
   throws IllegalSymbolException {
-    stateAlphabet().validate(from);
     stateAlphabet().validate(to);
     return transitionsFrom(from).contains(to);
   }
   
-  public Set transitionsFrom(State from) throws IllegalSymbolException {
+  public FiniteAlphabet transitionsFrom(State from)
+  throws IllegalSymbolException {
     stateAlphabet().validate(from);
     
-    Set s = (Set) transFrom.get(from);
-    if(s == null)
-      throw new IllegalSymbolException("State " + from.getName() +
-                                        " not known in states " +
-                                        stateAlphabet().getName());
+    FiniteAlphabet s = (FiniteAlphabet) transFrom.get(from);
+    if(s == null) {
+      throw new BioError(
+        "State " + from.getName() +
+        " is known in states " +
+        stateAlphabet().getName() +
+        " but is not listed in the transFrom table"
+      );
+    }
     return s;
   }
     
-  public Set transitionsTo(State to) throws IllegalSymbolException {
+  public FiniteAlphabet transitionsTo(State to)
+  throws IllegalSymbolException {
     stateAlphabet().validate(to);
 
-    Set s = (Set) transTo.get(to);
-    if(s == null)
-      throw new IllegalSymbolException("State " + to +
-                                        " not known in states " +
-                                        stateAlphabet().getName());
+    FiniteAlphabet s = (FiniteAlphabet) transTo.get(to);
+    if(s == null) {
+      throw new BioError(
+        "State " + to +
+        " is known in states " +
+        stateAlphabet().getName() +
+        " but is not listed in the transTo table"
+      );
+    }
     return s;
   }
 
   public void addState(State toAdd) throws IllegalSymbolException {
-    if(toAdd instanceof MagicalState) {
+    if(toAdd instanceof MagicalState && toAdd != magicalState) {
       throw new IllegalSymbolException("Can not add a MagicalState");
     }
     
@@ -256,9 +250,9 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
       }
     }
       
-    ((SimpleAlphabet) stateAlphabet()).addSymbol(toAdd);
-    transFrom.put(toAdd, new HashSet());
-    transTo.put(toAdd, new HashSet());
+    stateAlphabet().addSymbol(toAdd);
+    transFrom.put(toAdd, new SimpleAlphabet("Transitions from " + toAdd.getName()));
+    transTo.put(toAdd, new SimpleAlphabet("Transitions to " + toAdd.getName()));
   }
   
   public void removeState(State toGo)
@@ -267,8 +261,8 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     if(toGo instanceof MagicalState) {
       throw new IllegalSymbolException("You can not remove the MagicalState");
     }
-    Set t;
-    if(!(t = transitionsFrom(toGo)).isEmpty()) {
+    FiniteAlphabet t;
+    if((t = transitionsFrom(toGo)).size() != 0) {
       throw new IllegalTransitionException(
         toGo, (State) t.iterator().next(),
         "You can not remove a state untill all transitions to and from it " +
@@ -276,7 +270,7 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
       );
     }
 
-    if(!(t = transitionsTo(toGo)).isEmpty()) {
+    if((t = transitionsTo(toGo)).size() != 0) {
       throw new IllegalTransitionException(
         (State) t.iterator().next(), toGo,
         "You can not remove a state untill all transitions to and from it " +
@@ -295,7 +289,7 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
   }
   
   /**
-   * @depricated
+   * @deprecated
    */
   public SimpleMarkovModel(int heads, Alphabet emissionAlpha) {
     this.emissionAlpha = emissionAlpha;
@@ -311,34 +305,10 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
       );
     }
 
-    transFrom.put(magicalState, new HashSet());
-    transTo.put(magicalState, new HashSet());
-  }
-  
-  public void registerWithTrainer(ModelTrainer modelTrainer)
-  throws BioException {
-    if(modelTrainer.getTrainerForModel(this) == null) {
-      TransitionTrainer tTrainer = new SimpleTransitionTrainer(this);
-      modelTrainer.registerTrainerForModel(this, tTrainer);
-      for(Iterator i = stateAlphabet().iterator(); i.hasNext(); ) {
-        State s = (State) i.next();
-        if(s instanceof Trainable) {
-          ((Trainable) s).registerWithTrainer(modelTrainer);
-        }
-        try {
-          for(Iterator j = transitionsFrom(s).iterator(); j.hasNext(); ) {
-            State t = (State) j.next();
-            modelTrainer.registerTrainerForTransition(s, t, tTrainer, s, t);
-          }
-        } catch (IllegalSymbolException ire) {
-          throw new BioException(
-            ire,
-            "State " + s.getName() +
-            " listed in alphabet " +
-            stateAlphabet().getName() + " dissapeared."
-          );
-        }
-      }
+    try {
+      addState(magicalState);
+    } catch (IllegalSymbolException ise) {
+      throw new BioError(ise, "Couldn't add magical state");
     }
   }
   

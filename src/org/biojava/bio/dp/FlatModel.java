@@ -38,59 +38,68 @@ import org.biojava.bio.dist.*;
  * <P>
  * You can train the resulting flat model, and the underlying models will be altered.
  */
-class FlatModel extends ModelView implements Serializable {
-  private MarkovModel source;
-  private SimpleAlphabet stateAlpha;
+class FlatModel implements MarkovModel, Serializable {
+  private final MarkovModel source;
+  private final MarkovModel delegate;
   
-  private List transitionListeners;
-  
-  public MarkovModel getSource() {
-    return source;
+  protected void addAState(State ourState)
+  throws IllegalSymbolException {
+    try {
+      delegate.addState(ourState);
+    } catch (ModelVetoException mve) {
+      throw new BioError(mve, "This model should be ours with no listeners");
+    }
   }
 
-  public FiniteAlphabet stateAlphabet() {
-    return stateAlpha;
-  }
-  
   public Alphabet emissionAlphabet() {
-    return source.emissionAlphabet();
+    return delegate.emissionAlphabet();
   }
   
-  public MagicalState magicalState() {
-    return source.magicalState();
+  public FiniteAlphabet stateAlphabet() {
+    return delegate.stateAlphabet();
   }
   
   public int heads() {
-    return source.heads();
+    return delegate.heads();
   }
   
-  private void addAState(State s) {
-    //System.out.println("Adding state: " + s.getName());
-    try {
-      stateAlpha.addSymbol(s);
-      super.addState(s);
-    } catch (Exception e) {
-      throw new BioError(e, "Something got stuffed up while adding state " + s.getName());
-    }
+  public MagicalState magicalState() {
+    return delegate.magicalState();
   }
   
-  public void addTransitionListener(TransitionListener tl) {
-    transitionListeners.add(tl);
+  public Distribution getWeights(State source)
+  throws IllegalSymbolException {
+    return delegate.getWeights(source);
   }
   
-  public void removeTransitionListener(TransitionListener tl) {
-    transitionListeners.remove(tl);
+  public boolean containsTransition(State from, State to)
+  throws IllegalSymbolException {
+    return delegate.containsTransition(from, to);
+  }
+  
+  public FiniteAlphabet transitionsFrom(State from)
+  throws IllegalSymbolException {
+    return delegate.transitionsFrom(from);
+  }
+  
+  public FiniteAlphabet transitionsTo(State to)
+  throws IllegalSymbolException {
+    return delegate.transitionsTo(to);
+  }
+  
+  public void setWeights(State source, Distribution dist)
+  throws ModelVetoException {
+    throw new ModelVetoException("Can't set weights in immutable view");
   }
   
   public FlatModel(MarkovModel model)
   throws IllegalSymbolException, IllegalAlphabetException {
     this.source = model;
-    this.stateAlpha = new SimpleAlphabet();
-    this.transitionListeners = new ArrayList();
-    
-    stateAlpha.setName("flat " + model.stateAlphabet().getName());
-    
-    addAState(model.magicalState());
+    this.delegate = new SimpleMarkovModel(
+      source.heads(),
+      source.emissionAlphabet(),
+      "flat"
+    );
     
     // add all the states
     //System.out.println("Adding states");
@@ -167,99 +176,72 @@ class FlatModel extends ModelView implements Serializable {
     }
 
     // wire
-    for(Iterator i = stateAlpha.iterator(); i.hasNext(); ) {
+    for(Iterator i = delegate.stateAlphabet().iterator(); i.hasNext(); ) {
       State s = (State) i.next();
-
+      
+      State sOrig;
+      MarkovModel sModel;
+      
       //System.out.println("Processing transitions from " + s.getName());
-
+      
+      // find underlying state and model for s
       if(s instanceof MagicalState) { // from magic
-        for(Iterator j = model.transitionsFrom(s).iterator(); j.hasNext(); ) {
-          State twrapped = (State) j.next();
-          if(twrapped instanceof ModelInState) { // Magic -> ModelInState
-            State to = (State) misStart.get(twrapped);
-            createTransition(
-              s, to, 
-              model, s, twrapped
-            );
-          } else { // Magic -> normal
-            State to = (State) toM.get(twrapped);
-            createTransition(
-              s, to,
-              model, model.magicalState(), twrapped
-            );
-          }
-        }
+        sOrig = s;
+        sModel = model;
       } else { // from not Magic
         Wrapper swrapper = (Wrapper) s;
         State swrapped = swrapper.getWrapped();
-        MarkovModel sModel = (MarkovModel) inModel.get(swrapped);
-        if(sModel == model) { // state from model, not sub-model
-          if(swrapped instanceof ModelInState) { // from ModelInState
-            State from = (State) misEnd.get(swrapped);
-            if(from == swrapper) { // only consider the from half
-              for(
-                Iterator j = model.transitionsFrom(swrapped).iterator();
-                j.hasNext();
-              ) { // deal with transitions with top-level model
-                State t = (State) j.next();
-                if(t instanceof ModelInState) { // MIS -> MIS
-                  State to = (State) misStart.get(t);
-                  createTransition(from, to, model, swrapped, t);
-                } else if(t instanceof MagicalState) { // MIS -> magic
-                  createTransition(from, t, model, swrapped, t);
-                } else { // MIS -> normal
-                  State to = (State) toM.get(t);
-                  createTransition(from, to, model, swrapped, t);
-                }
-              }
-              MarkovModel fromM = ((ModelInState) swrapped).getModel();
-              from = (State) misStart.get(swrapped);
-              for(
-                Iterator j = fromM.transitionsFrom(fromM.magicalState()).iterator();
-                j.hasNext();
-              ) { // deal with transitions down into wrapped model
-                State t = (State) j.next();
-                State to = (State) toM.get(t);
-                createTransition(from, to, fromM, fromM.magicalState(), t);
-              }
-            }
-          } else { // from normal
-            for(
-              Iterator j = model.transitionsFrom(swrapped).iterator();
-              j.hasNext();
-            ) {
-              State t = (State) j.next();
-              if(t instanceof ModelInState) { // normal -> MIS
-                State to = (State) misStart.get(t);
-                createTransition(swrapper, to, model, swrapped, t);
-              } else if(t instanceof MagicalState) { // normal -> magic
-                createTransition(swrapper, t, model, swrapped, t);
-              } else { // normal -> normal
-                State to = (State) toM.get(t);
-                createTransition(swrapper, to, model, swrapped, t);
-              }
-            }
+        MarkovModel subModel = (MarkovModel) inModel.get(swrapped);
+
+        if(subModel != model) { // subModel -> *
+          sOrig = swrapped;
+          sModel = subModel;
+        } else if(swrapper instanceof ModelInState) { // mis -> ?
+          if(swrapper == modelStart.get(subModel)) { // mis -> subModel
+            sModel = ((ModelInState) swrapped).getModel();
+            sOrig = sModel.magicalState();
+          } else { // mis -> model
+            sModel = model;
+            sOrig = swrapped;
           }
-        } else { // state from sub-model
-          for(
-            Iterator j = sModel.transitionsFrom(swrapped).iterator();
-            j.hasNext();
-          ) {
-            State t = (State) j.next();
-            if(t instanceof MagicalState) { // sub state -> magical
-              State to = (State) modelEnd.get(sModel);
-              createTransition(swrapper, to, sModel, swrapped, t);
-            } else {
-              State to = (State) toM.get(t);
-              createTransition(swrapper, to, sModel, swrapped, t);
-            }
-          }
+        } else { // normal
+          sModel = model;
+          sOrig = s;
         }
       }
+      
+      TranslatedDistribution dist = TranslatedDistribution.getDistribution(
+        delegate.transitionsFrom(s),
+        sModel.getWeights(sOrig)
+      );
+      SimpleReversibleTranslationTable table =
+        (SimpleReversibleTranslationTable) dist.getTable();
+      try {
+          delegate.setWeights(s, dist);
+      } catch (ModelVetoException mve) {
+        throw new BioError(mve, "Couldn't edit delegate model");
+      }
+      table.setTranslation(s, sOrig);
+      
+      // find all reachable states from s
+      for(
+        Iterator j = sModel.transitionsFrom(sOrig).iterator();
+        j.hasNext();
+      ) {
+        State tOrig = (State) j.next();
+        State t;
+        if(tOrig instanceof MagicalState) { // * -> magic
+          if(sModel == model) { // outer -> magic
+            t = tOrig;
+          } else { // subModel -> magic
+            t = (State) modelEnd.get(sModel);
+          }
+        } else { // * -> normal
+          t = (State) toM.get(sOrig);
+        }
+        table.setTranslation(t, tOrig);
+      }
     }
-    
-    source.addTransitionListener(new TransitionForwarder());
-    //System.out.println("Done");
   }
   
   public void createTransition(State from, State to)
@@ -278,12 +260,6 @@ class FlatModel extends ModelView implements Serializable {
     throw new UnsupportedOperationException("destroyTransition not supported by FlatModel");
   }
 
-  public void setTransitionScore(State from, State to, double score)
-  throws IllegalSymbolException, IllegalTransitionException,
-  UnsupportedOperationException {
-    throw new UnsupportedOperationException("setTransitionScore not supported by FlatModel");
-  }
-
   public void addState(State toAdd)
   throws UnsupportedOperationException {
     throw new UnsupportedOperationException("addState not supported by FlatModel");
@@ -293,7 +269,17 @@ class FlatModel extends ModelView implements Serializable {
   throws UnsupportedOperationException {
     throw new UnsupportedOperationException("removeState not supported by FlatModel");
   }
-
+  
+  public void registerWithTrainer(ModelTrainer modelTrainer) {
+    modelTrainer.registerModel(delegate);
+  }
+  
+  public void addTransitionListener(TransitionListener tl) {
+  }
+  
+  public void removeTransitionListener(TransitionListener tl) {
+  }
+  
   private static class Wrapper implements State, Serializable {
     private final State wrapped;
     private final String extra;
@@ -367,77 +353,6 @@ class FlatModel extends ModelView implements Serializable {
     
     public EmissionWrapper(EmissionState wrapped, String extra) {
       super(wrapped, extra);
-    }
-  }
-  
-  private class TransitionForwarder implements TransitionListener, Serializable {
-    public void preCreateTransition(TransitionEvent te)
-    throws ModelVetoException {
-      synchronized(transitionListeners) {
-        /*TransitionEvent te = new TransitionEvent(
-          this, from, to, getTransitionScore(from, to), value
-        );*/
-        for(Iterator i = transitionListeners.iterator(); i.hasNext(); ) {
-          ((TransitionListener) i.next()).preCreateTransition(te);
-        }
-      }
-    }
-  
-    public void postCreateTransition(TransitionEvent te) {
-      synchronized(transitionListeners) {
-        /*TransitionEvent te = new TransitionEvent(
-          this, from, to, getTransitionScore(from, to), value
-        );*/
-        for(Iterator i = transitionListeners.iterator(); i.hasNext(); ) {
-          ((TransitionListener) i.next()).postCreateTransition(te);
-        }
-      }
-    }
-  
-    public void preDestroyTransition(TransitionEvent te)
-    throws ModelVetoException {
-      synchronized(transitionListeners) {
-        /*TransitionEvent te = new TransitionEvent(
-          this, from, to, getTransitionScore(from, to), value
-        );*/
-        for(Iterator i = transitionListeners.iterator(); i.hasNext(); ) {
-          ((TransitionListener) i.next()).preDestroyTransition(te);
-        }
-      }
-    }
-  
-    public void postDestroyTransition(TransitionEvent te) {
-      synchronized(transitionListeners) {
-        /*TransitionEvent te = new TransitionEvent(
-          this, from, to, getTransitionScore(from, to), value
-        );*/
-        for(Iterator i = transitionListeners.iterator(); i.hasNext(); ) {
-          ((TransitionListener) i.next()).postDestroyTransition(te);
-        }
-      }
-    }
-  
-    public void preChangeTransitionScore(TransitionEvent te)
-    throws ModelVetoException {
-      synchronized(transitionListeners) {
-        /*TransitionEvent te = new TransitionEvent(
-          this, from, to, getTransitionScore(from, to), value
-        );*/
-        for(Iterator i = transitionListeners.iterator(); i.hasNext(); ) {
-          ((TransitionListener) i.next()).preChangeTransitionScore(te);
-        }
-      }
-    }
-  
-    public void postChangeTransitionScore(TransitionEvent te) {
-      synchronized(transitionListeners) {
-        /*TransitionEvent te = new TransitionEvent(
-          this, from, to, getTransitionScore(from, to), value
-        );*/
-        for(Iterator i = transitionListeners.iterator(); i.hasNext(); ) {
-          ((TransitionListener) i.next()).postChangeTransitionScore(te);
-        }
-      }
     }
   }
 }

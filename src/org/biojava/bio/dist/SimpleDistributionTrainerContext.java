@@ -37,38 +37,22 @@ implements DistributionTrainerContext, Serializable {
   private final Map distToTrainer;
   private final Set trainers;
   
-  private Distribution nullModel;
   private double nullModelWeight;
     
   /**
-  *Retrieve the background distribution
-  */  
-  public Distribution getNullModel() {
-    return this.nullModel;
-  }
-  
-  /**
-  *Assign a background distribution
-  *@param nullModel the background distribution to assign
-  */     
-  public void setNullModel(Distribution nullModel) {
-    this.nullModel = nullModel;
-  }
-  /**
-  *Retrieve the weight of the background distribution
+  * Retrieve the weight of the background distribution
   */   
   public double getNullModelWeight() {
     return this.nullModelWeight;
   }
 
   /**
-  *Assign a weight to the background distribution
-  *@param nullModelWeight the weight of the null model to assign.
+  * Assign a weight to the background distribution
+  * @param nullModelWeight the weight of the null model to assign.
   */ 
   public void setNullModelWeight(double nullModelWeight) {
     this.nullModelWeight = nullModelWeight;
   }
-  
   
   public void registerDistribution(Distribution dist) {
     if(!distToTrainer.keySet().contains(dist)) {
@@ -76,20 +60,20 @@ implements DistributionTrainerContext, Serializable {
     }
   }
   
-  public void registerDistributionTrainer(
+  public void registerTrainer(
     Distribution dist, DistributionTrainer trainer
   ) {
     distToTrainer.put(dist, trainer);
     trainers.add(trainer);
   }
   
-  public DistributionTrainer getDistributionTrainer(Distribution dist) {
+  public DistributionTrainer getTrainer(Distribution dist) {
     return (DistributionTrainer) distToTrainer.get(dist);
   }
 
   public void addCount(Distribution dist, Symbol sym, double times)
   throws IllegalSymbolException {
-    DistributionTrainer dt = getDistributionTrainer(dist);
+    DistributionTrainer dt = getTrainer(dist);
     if(dt == null) {
       throw new NullPointerException(
         "No trainer associated with distribution " + dist
@@ -98,14 +82,14 @@ implements DistributionTrainerContext, Serializable {
     dt.addCount(this, sym, times);
   }
   
-  public void trainDistributions()
+  public void train()
   throws IllegalSymbolException {
     for(Iterator i = trainers.iterator(); i.hasNext(); ) {
-      ((DistributionTrainer) i.next()).train(getNullModel(), getNullModelWeight());
+      ((DistributionTrainer) i.next()).train(getNullModelWeight());
     }
   }
   
-  public void clearDistributionCounts() {
+  public void clearCounts() {
     for(Iterator i = trainers.iterator(); i.hasNext(); ) {
       ((DistributionTrainer) i.next()).clearCounts();
     }

@@ -159,8 +159,8 @@ public class XmlMarkovModel {
       double prob = Math.log(Double.parseDouble(transitionE.getAttribute("prob")));
       try {
         model.createTransition(from, to);
-        model.setTransitionScore(from, to, prob);
-      } catch (IllegalTransitionException ite) {
+        model.getWeights(from).setWeight(to, prob);
+      } catch (IllegalSymbolException ite) {
         throw new BioError(
           ite, 
           "We should have unlimited write-access to this model. " +
@@ -241,8 +241,8 @@ public class XmlMarkovModel {
       try {
       out.println("  <transition from=\"" + ((from instanceof MagicalState) ? "_start_" : from.getName()) +
                              "\" to=\"" + ((to instanceof MagicalState) ? "_end_" : to.getName()) +
-                             "\" prob=\"" + Math.exp(model.getTransitionScore(from, to)) + "\"/>");
-      } catch (IllegalTransitionException ite) {
+                             "\" prob=\"" + model.getWeights(from).getWeight(to) + "\"/>");
+      } catch (IllegalSymbolException ite) {
         throw new BioError(ite, "Transition listed in transitionsFrom(" +
                            from.getName() + ") has dissapeared");
       }

@@ -32,6 +32,7 @@ import com.sun.xml.tree.*;
 import org.xml.sax.*;
 
 import org.biojava.bio.*;
+import org.biojava.utils.*;
 
 /**
  * The first port of call for retrieving standard alphabets.
@@ -655,62 +656,7 @@ public final class AlphabetManager {
         }
       }
     }
-   
-  /**
-   * Simple wrapper to assist in list-comparisons.
-   *
-   * @author Thomas Down
-   */
-
-  public static class ListWrapper {
-    List l; // should be moved private
-
-    public ListWrapper(List l) {
-      this.l = l;
-    }
-
-    public ListWrapper() {
-    }
     
-    /**
-    *Assigns a list of objects to a different list of objects.
-    *This aids in comparison purposes, especially while doing hash lookups etc.
-    *Please note that once a list has been assigned with setList, this 
-    *function should not be re-called.
-    *
-    *@param l the list to assign to the current list.
-    */
-    public void setList(List l) {
-      this.l = l;
-    }
-    
-    public boolean equals(Object o) {
-      if (! (o instanceof ListWrapper)) {
-        return false;
-      }
-      List ol = ((ListWrapper) o).l;
-      if (ol.size() != l.size()) {
-        return false;
-      }
-      Iterator i1 = l.iterator();
-      Iterator i2 = ol.iterator();
-      while (i1.hasNext()) {
-        if (i1.next() != i2.next()) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    public int hashCode() {
-      int c = 0;
-      for (Iterator i = l.iterator(); i.hasNext(); ) {
-        c += i.next().hashCode();
-      }
-      return c;
-    }
-  }
-  
   /** 
    * The class representing the Gap symbol.
    * <P>

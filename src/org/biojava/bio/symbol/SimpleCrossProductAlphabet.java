@@ -26,6 +26,7 @@ import java.util.*;
 import java.io.*;
 
 import org.biojava.bio.*;
+import org.biojava.utils.*;
 
 /**
  * Cross product of a list of arbitrary alphabets.  This is the
@@ -106,7 +107,7 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
     } else {
       rr = new AtomicCrossProductSymbol(tokenSeed++, r);
     }
-    ourSymbols.put(new AlphabetManager.ListWrapper(rr.getSymbols()), rr);
+    ourSymbols.put(new ListWrapper(rr.getSymbols()), rr);
   }
 
   public boolean contains(Symbol s) {
@@ -182,14 +183,14 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
     return alphas;
   }
 
-  private AlphabetManager.ListWrapper gopher =
-    new AlphabetManager.ListWrapper();
+  private ListWrapper gopher =
+    new ListWrapper();
 
   public CrossProductSymbol getSymbol(List l)
   throws IllegalSymbolException {
     CrossProductSymbol cps;
     synchronized(gopher) {
-      gopher.l = l;
+      gopher.setList(l);
       cps = (CrossProductSymbol) ourSymbols.get(gopher);
     }
     if (cps == null) {
@@ -205,5 +206,19 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
     } else {
       return cps;
     }
+  }
+  
+  public void addSymbol(Symbol sym) throws IllegalSymbolException {
+    throw new IllegalSymbolException(
+      "Can't add symbols to alphabet: " + sym.getName() +
+      " in " + getName()
+    );
+  }
+  
+  public void removeSymbol(Symbol sym) throws IllegalSymbolException {
+    throw new IllegalSymbolException(
+      "Can't remove symbols from alphabet: " + sym.getName() +
+      " in " + getName()
+    );
   }
 }

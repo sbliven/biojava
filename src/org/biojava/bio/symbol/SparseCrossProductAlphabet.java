@@ -26,6 +26,7 @@ import java.util.*;
 import java.io.*;
 
 import org.biojava.bio.*;
+import org.biojava.utils.*;
 
 /**
  * Cross product of a list of arbitrary alphabets.  This is a memory efficicent
@@ -132,8 +133,8 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
     );
   }
 
-  private AlphabetManager.ListWrapper gopher =
-    new AlphabetManager.ListWrapper();
+  private ListWrapper gopher =
+    new ListWrapper();
 
   public CrossProductSymbol getSymbol(List rList)
   throws IllegalSymbolException {
@@ -146,7 +147,7 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
     
     CrossProductSymbol r;
     synchronized(gopher) {
-      gopher.l = rList;
+      gopher.setList(rList);
       r = (CrossProductSymbol) knownSymbols.get(gopher);
     }
 
@@ -167,9 +168,24 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
       }
       List l = new ArrayList(rList);
       r = AlphabetManager.getCrossProductSymbol(tokenSeed++, l);
-      knownSymbols.put(new AlphabetManager.ListWrapper(r.getSymbols()), r);
+      knownSymbols.put(new ListWrapper(r.getSymbols()), r);
     }
     
     return r;
   }
+    
+  public void addSymbol(Symbol sym) throws IllegalSymbolException {
+    throw new IllegalSymbolException(
+      "Can't add symbols to alphabet: " + sym.getName() +
+      " in " + getName()
+    );
+  }
+  
+  public void removeSymbol(Symbol sym) throws IllegalSymbolException {
+    throw new IllegalSymbolException(
+      "Can't remove symbols from alphabet: " + sym.getName() +
+      " in " + getName()
+    );
+  }
+
 }

@@ -23,18 +23,51 @@
 package org.biojava.bio.dist;
 
 import java.util.*;
+import java.lang.ref.*;
 import java.io.Serializable;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
-*Class for pairing up two unique distributions.
-*/
+ * Class for pairing up two independant distributions.
+ */
 
 
 public class PairDistribution
 extends AbstractDistribution implements Serializable {
+  private static Map cache;
+  
+  static {
+    cache = new HashMap();
+  }
+  
+  protected static Distribution getNullModel(Distribution source) {
+    synchronized(cache) {
+      SoftReference ref = (SoftReference) cache.get(source);
+      Distribution dist;
+      try {
+        if(ref == null) {
+          dist = new ComplementaryDistribution(source);
+          cache.put(source, new SoftReference(dist));
+        } else {
+          dist = (Distribution) ref.get();
+          if(dist == null) {
+            dist = new ComplementaryDistribution(source);
+            cache.put(source, new SoftReference(dist));
+          }
+        }
+      } catch (IllegalAlphabetException iae) {
+        throw new BioError(
+          iae,
+          "The parent's null distribution is not complementable, " +
+          "but the parent is. Something is wrong with the parent"
+        );
+      }
+      return dist;
+    }
+  }  
+  
   private Distribution first;
   private Distribution second;
   private CrossProductAlphabet alphabet;
@@ -46,35 +79,18 @@ extends AbstractDistribution implements Serializable {
   }
   
   public Distribution getNullModel() {
-    return nullModel;
+    return getNullModel(this);
   }
   
   /**
-  *Set a null background distribution.
-  *@param nullModel the distribution to act as the background distribution.
-  */
-  
-  public void setNullModel(Distribution nullModel)
-  throws IllegalAlphabetException {
-    if(nullModel.getAlphabet() != this.getAlphabet()) {
-      throw new IllegalAlphabetException(
-        "The null model has alphabet " + nullModel.getAlphabet() +
-        " but it should be " + this.getAlphabet()
-      );
-    }
-    this.nullModel = nullModel;
-  }
-  
-  /**
-  *Register this paired distribution with a model trainer.
-  *@param trainer the trainer to register this distribution with.
-  */
-  
+   * Register this paired distribution with a model trainer.
+   * @param trainer the trainer to register this distribution with.
+   */
   public void registerWithTrainer(org.biojava.bio.dp.ModelTrainer trainer) {
     trainer.registerDistribution(first);
     trainer.registerDistribution(second);
     
-    trainer.registerDistributionTrainer(this, new PairTrainer());
+    trainer.registerTrainer(this, new PairTrainer());
   }
 
   public double getWeight(Symbol sym) throws IllegalSymbolException {

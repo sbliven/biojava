@@ -22,9 +22,9 @@
 
 package org.biojava.bio.dp;
 
-import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.dist.*;
 
 /**
  * A markov model.
@@ -37,7 +37,7 @@ import org.biojava.bio.symbol.*;
  * container->start and end->container. For the sample methods to work, the log
  * scores must be probabilities (sum to 1).
  */
-public interface MarkovModel extends Trainable {
+public interface MarkovModel {
   /**
    * Alphabet that is emitted by the emission states.
    */
@@ -72,27 +72,60 @@ public interface MarkovModel extends Trainable {
   int heads();
   
   /**
-   * Probability of the transition between from and to.
+   * Get a probability Distribution over the transition from 'source'. 
    *
-   * @param from  the State currently occupied
-   * @param to  the State to move to
-   * @return the transition score from->to
-   * @throws IllegalSymbolException if either from or to are not legal states
-   * @throws IllegalTransitionException if there is no transition between the states
+   * @param source  the State currently occupied
+   * @return the probability Distribution over the reachable states
+   * @throws IllegalSymbolException if from is not a legal state
    */
-  double getTransitionScore(State from, State to)
-  throws IllegalSymbolException, IllegalTransitionException;
+  Distribution getWeights(State source)
+  throws IllegalSymbolException;
 
   /**
-   * Returns whether a transition is possible in the model.
+   * Set the probability distribution over the transitions from 'source'.
+   * <P>
+   * This should throw an IllegalAlphabetException if the source alphabet in
+   * 'dist' is not the same alphabet as returned by transitionsFrom(source).
    *
-   * @param from  the State currently occupied
-   * @param to  the State to move to
-   * @throws IllegalSymbolException if either from or to are not legal states
+   * @param source  the source State
+   * @param dist    the new distribution over transitions from 'source'
+   * @throws IllegalSymbolException if source is not a state in this model
+   * @throws IllegalAlphabetException if the distribution has the wrong source
+   *         alphabet
+   * @throws ModelVetoException if for any reason the distribution can't be
+   *         replaced at this time
+   */
+  void setWeights(State source, Distribution dist)
+  throws IllegalSymbolException, IllegalAlphabetException, ModelVetoException;
+  
+  /**
+   * Returns the FiniteAlphabet of all states that have a transition from 'source'.
+   *
+   * @param source  the source State
+   * @return  a FiniteAlphabet of State objects that can reach from 'source'
+   */
+  FiniteAlphabet transitionsFrom(State source) throws IllegalSymbolException;
+  
+  /**
+   * Returns the FiniteAlphabet of all states that have a transition to 'dest'.
+   *
+   * @param dest  the destination state
+   * @return  a FiniteAlphabet of State objects that can reach 'dest'
+   */
+  FiniteAlphabet transitionsTo(State dest) throws IllegalSymbolException;
+
+  /**
+   * Returns wether a transition exists or not.
+   *
+   * @param from the transitin source
+   * @param to the transition destination
+   * @return true/false depending on wether this model has the transition
+   * @throws IllegalSymbolException if either from or to are not states in this
+   *         model
    */
   boolean containsTransition(State from, State to)
   throws IllegalSymbolException;
-
+  
   /**
    * Makes a transition between two states legal.
    * <P>
@@ -108,9 +141,9 @@ public interface MarkovModel extends Trainable {
    *         transitions to be created
    * @throws ModelVetoException if creating the transition is vetoed
    */
-   void createTransition(State from, State to)
-   throws IllegalSymbolException, UnsupportedOperationException,
-   ModelVetoException;
+  void createTransition(State from, State to)
+  throws IllegalSymbolException, UnsupportedOperationException,
+  ModelVetoException;
    
   /**
    * Breaks a transition between two states legal.
@@ -127,60 +160,10 @@ public interface MarkovModel extends Trainable {
    *         transitions to be destroyed
    * @throws ModelVetoException if breaking the transition is vetoed
    */
-   void destroyTransition(State from, State to)
-   throws IllegalSymbolException, UnsupportedOperationException,
-   ModelVetoException;
+  void destroyTransition(State from, State to)
+  throws IllegalSymbolException, UnsupportedOperationException,
+  ModelVetoException;
 
-   /**
-   * Set the transition score associated with a transition.
-   * <P>
-   * This method should inform each TransitionListener that the score is to be
-   * changed by calling preChangeTransitionScore, and if the change is not
-   * vetoed, it should update the score and then call postChangeTransitionScore
-   * on each listener.
-   *
-   * @param from  the source State
-   * @param to  the destination State
-   * @param score the new score for the transition
-   * @throws IllegalSymbolException if either from or to are not states in the
-   *         model
-   * @throws IllegalTransitionException if the transition does not exist in the
-   *         model
-   * @throws UnsupportedOperationException if an implementation does not allow
-   *         transition scores to be altered
-   * @throws ModelVetoException if the new score is vetoed
-   */
-  void setTransitionScore(State from, State to, double score)
-  throws IllegalSymbolException, IllegalTransitionException,
-  UnsupportedOperationException, ModelVetoException;
-  
-  /**
-   * Sample a transition from the distribution of transitions.
-   * <P>
-   * This will give eroneous results if the scores are not log-probabilities.
-   *
-   * @param from  the starting state
-   * @return  a State sampled from all states reachable from 'from'
-   * @throws  IllegalSymbolException if 'from' is not a state within this model
-   */
-  State sampleTransition(State from) throws IllegalSymbolException;
-  
-  /**
-   * Returns a Set of all legal transitions from a state.
-   *
-   * @param from  the starting state
-   * @return  a List of State objects
-   */
-  Set transitionsFrom(State from) throws IllegalSymbolException;
-  
-  /**
-   * Returns a Set of all legal transitions to a state.
-   *
-   * @param from  the destination state
-   * @return  a List of State objects
-   */
-  Set transitionsTo(State to) throws IllegalSymbolException;
-  
   /**
    * Adds a state to the model.
    *

@@ -47,13 +47,12 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
   
   private Annotation annotation;
 
-    /*
-    *Adds a symbol to the alphabet
-    *
-    *@param r the symbol to add
-    */
-
-  protected void addSymbol(Symbol r) {
+  /**
+   * Adds a symbol to the alphabet
+   *
+   * @param r the symbol to add
+   */
+  public void addSymbol(Symbol r) {
     symbols.add(r);
     Character token = new Character(r.getToken());
     if(!tokenToSymbol.keySet().contains(token)) {
@@ -143,6 +142,13 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
       return;
     throw new IllegalSymbolException("No symbol " + r.getName() +
                                       " in alphabet " + getName());
+  }
+  
+  public void removeSymbol(Symbol sym) throws IllegalSymbolException {
+    throw new IllegalSymbolException(
+      "Can't remove symbols from alphabet: " + sym.getName() +
+      " in " + getName()
+    );
   }
   
   public AllTokensAlphabet(String name) {

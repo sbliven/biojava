@@ -23,6 +23,7 @@
 package org.biojava.bio.dist;
 
 import java.util.*;
+import java.lang.ref.*;
 import java.io.Serializable;
 
 import org.biojava.bio.*;
@@ -30,12 +31,45 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.DNATools;
 
 /**
-*Creates a complementary distribution from a given distribution.
-*/
-
+ * Creates a complementary distribution from an underlying DNA distribution.
+ *
+ * @author Matthew Pocock
+ */
 public class ComplementaryDistribution
 implements Distribution, Serializable {
-  private Distribution other;
+  private static Map cache;
+  
+  static {
+    cache = new HashMap();
+  }
+  
+  protected static Distribution getNullModel(Distribution source) {
+    synchronized(cache) {
+      SoftReference ref = (SoftReference) cache.get(source);
+      Distribution dist;
+      try {
+        if(ref == null) {
+          dist = new ComplementaryDistribution(source);
+          cache.put(source, new SoftReference(dist));
+        } else {
+          dist = (Distribution) ref.get();
+          if(dist == null) {
+            dist = new ComplementaryDistribution(source);
+            cache.put(source, new SoftReference(dist));
+          }
+        }
+      } catch (IllegalAlphabetException iae) {
+        throw new BioError(
+          iae,
+          "The parent's null distribution is not complementable, " +
+          "but the parent is. Something is wrong with the parent"
+        );
+      }
+      return dist;
+    }
+  }
+
+  private final Distribution other;
   
   public double getWeight(Symbol s) throws IllegalSymbolException {
     return other.getWeight(DNATools.complement(s));
@@ -61,9 +95,13 @@ implements Distribution, Serializable {
     }
   }
   
+  public Distribution getNullModel() {
+    return getNullModel(other.getNullModel()); 
+  }
+  
   public void registerWithTrainer(DistributionTrainerContext dtc) {
     dtc.registerDistribution(other);
-    dtc.registerDistributionTrainer(this, new IgnoreCountsTrainer() {
+    dtc.registerTrainer(this, new IgnoreCountsTrainer() {
       public void addCount(
         DistributionTrainerContext dtc,
         Symbol s,
@@ -90,5 +128,5 @@ implements Distribution, Serializable {
       );
     }
     this.other = other;
-  }  
+  }
 }

@@ -30,7 +30,7 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.DNATools;
 
 /**
- * A state in a markov process.
+ * A distribution optimized for DNA.
  * <P>
  * This implementation is optimized for DNA.
  */
@@ -114,10 +114,11 @@ extends AbstractDistribution implements Serializable {
   }
   
   public void registerWithTrainer(DistributionTrainerContext dtc) {
-    dtc.registerDistributionTrainer(this, new DNADistributionTrainer());
+    dtc.registerTrainer(this, new DNADistributionTrainer());
   }
 
-  private class DNADistributionTrainer implements DistributionTrainer, Serializable {
+  private class DNADistributionTrainer
+  implements DistributionTrainer, Serializable {
     double c [] = new double[4];
       
     public void addCount(
@@ -126,8 +127,9 @@ extends AbstractDistribution implements Serializable {
       c[DNATools.index(sym)] += counts;
     }
       
-    public void train(Distribution nullModel, double weight)
+    public void train(double weight)
     throws IllegalSymbolException {
+      Distribution nullModel = getNullModel();
       double sum = 0.0;
       for(int i = 0; i < c.length; i++) {
         Symbol s = DNATools.forIndex(i);
