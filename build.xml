@@ -39,7 +39,8 @@
 
 <project default="package-biojava" basedir=".">
 
-  <target name="init">
+  <!-- Checks environment and setup variables -->
+  <target name="init" description="Checks environment and setup variables">
     <tstamp />
     <property name="version" value="live" />
 
@@ -170,7 +171,7 @@
   -->
 
   <!-- Prepares the basic stuff -->
-  <target name="prepare" depends="init">
+  <target name="prepare" depends="init" description="creates basic directories">
     <!-- Creates directories -->
     <mkdir dir="${build.dir}" />
     <mkdir dir="${build.lib}" />
@@ -186,7 +187,8 @@
   </target>
 
   <!-- Prepares the grammars -->
-  <target name="prepare-grammars" depends="prepare" if="sableCC.support">
+  <target name="prepare-grammars" depends="prepare" if="sableCC.support" 
+   description="Prepares the grammars">
 
     <!-- Creates directories -->
     <mkdir dir="${build.src.grammars}" />
@@ -210,7 +212,7 @@
   </target>
 
   <!-- Copies taglet files -->
-  <target name="prepare-taglets" depends="prepare">
+  <target name="prepare-taglets" depends="prepare" description="Copies taglet files">
     <mkdir dir="${build.src.taglets}" />
     <mkdir dir="${build.dest.taglets}" />
     <mkdir dir="${build.docs.taglets}" />
@@ -223,7 +225,8 @@
   </target>
 
   <!-- Prepares the biojava source code -->
-  <target name="prepare-biojava" depends="prepare">
+  <target name="prepare-biojava" depends="prepare" 
+  description="Prepares biojava source files">
 
     <!-- Creates directories -->
     <mkdir dir="${build.src.biojava}" />
@@ -253,7 +256,8 @@
   </target>
 
   <!-- Prepares the test source code -->
-  <target name="prepare-tests" depends="prepare">
+  <target name="prepare-tests" depends="prepare" 
+  description="Prepares the test source code">
 
     <!-- Creates directories -->
     <mkdir dir="${build.src.tests}" />
@@ -271,7 +275,8 @@
   </target>
 
   <!-- Prepares the demos code -->
-  <target name="prepare-demos" depends="prepare">
+  <target name="prepare-demos" depends="prepare" 
+  description="Prepares the demos code">
 
     <!-- Creates directories -->
     <mkdir dir="${build.src.demos}" />
@@ -294,7 +299,8 @@
   </target>
 
   <!-- Prepares the apps code -->
-  <target name="prepare-apps" depends="prepare">
+  <target name="prepare-apps" depends="prepare"
+  description="Prepares the apps code">
 
     <!-- Creates directories -->
     <mkdir dir="${build.src.apps}" />
@@ -317,7 +323,7 @@
   </target>
 
   <!-- Prepares the javadocs -->
-  <target name="prepare-javadocs" depends="prepare">
+  <target name="prepare-javadocs" depends="prepare" description="Prepares the javadocs">
 
     <!-- Creates directories -->
     <mkdir dir="${build.src.docs}" />
@@ -332,7 +338,8 @@
   </target>
 
   <!-- Prepares DocBook environment and encloses it from older Ant versions -->
-  <target name="prepare-docs" depends="prepare" if="outputproperty.support">
+  <target name="prepare-docs" depends="prepare" if="outputproperty.support"
+  description="Prepares DocBook environment">
     <!-- Check the current system classpath for Trax -->
     <available classpath="${java.class.path}"
                classname="javax.xml.transform.Transformer"
@@ -373,7 +380,8 @@
   -->
 
   <!-- Compiles the grammars directory -->
-  <target name="compile-grammars" depends="prepare-grammars" if="sableCC.support">
+  <target name="compile-grammars" depends="prepare-grammars" if="sableCC.support"
+  description="Compiles the grammars directory">
     <!-- Turn the grammars into java code -->
     <taskdef name="sablecc" classname="org.sablecc.ant.taskdef.Sablecc" />
     <sablecc src="${build.src.grammars}"
@@ -398,7 +406,8 @@
   </target>
 
   <!-- Compiles the taglets directory -->
-  <target name="compile-taglets" depends="init,prepare-taglets">
+  <target name="compile-taglets" depends="init,prepare-taglets"
+  description="Compiles the taglets directory">
     <javac
       srcdir="${build.src.taglets}"
       destdir="${build.dest.taglets}"
@@ -412,7 +421,8 @@
   </target>
 
   <!-- Compiles the source directory -->
-  <target name="compile-biojava" depends="prepare-biojava,package-grammars">
+  <target name="compile-biojava" depends="prepare-biojava,package-grammars"
+  description="Compiles the source directory">
     <javac
       srcdir="${build.src.biojava}"
       destdir="${build.dest.biojava}"
@@ -427,7 +437,8 @@
   </target>
 
   <!-- Compiles the tests directory -->
-  <target name="compile-tests" depends="prepare-tests,package-biojava">
+  <target name="compile-tests" depends="prepare-tests,package-biojava"
+  description="Compiles the tests directory">
     <javac
       srcdir="${build.src.tests}"
       destdir="${build.dest.tests}"
@@ -443,7 +454,8 @@
   </target>
 
   <!-- Compiles the demos directory -->
-  <target name="compile-demos" depends="prepare-demos,package-biojava">
+  <target name="compile-demos" depends="prepare-demos,package-biojava"
+  description="Compiles the demos directory">
     <javac
       srcdir="${build.src.demos}"
       destdir="${build.dest.demos}"
@@ -458,7 +470,8 @@
   </target>
 
   <!-- Compiles the apps directory -->
-  <target name="compile-apps" depends="prepare-apps,package-biojava">
+  <target name="compile-apps" depends="prepare-apps,package-biojava"
+  description="Compiles the apps directory">
     <javac
       srcdir="${build.src.apps}"
       destdir="${build.dest.apps}"
@@ -481,7 +494,8 @@
   -->
 
   <!-- Creates the grammars package -->
-  <target name="package-grammars" depends="compile-grammars" if="sableCC.support">
+  <target name="package-grammars" depends="compile-grammars" if="sableCC.support"
+  description="Creates the grammars jar file">
     <jar
       jarfile="${jar.grammars}"
       basedir="${build.dest.grammars}"
@@ -491,7 +505,8 @@
   </target>
 
   <!-- Creates the class package (tests are left in the parallel tree) -->
-  <target name="package-biojava" depends="compile-biojava">
+  <target name="package-biojava" depends="compile-biojava" 
+  description="create biojava class jar file">
     <jar
       jarfile="${jar.biojava}"
       basedir="${build.dest.biojava}"
@@ -501,7 +516,8 @@
   </target>
 
   <!-- Create the demo package -->
-  <target name="package-demos" depends="init,package-biojava,compile-demos">
+  <target name="package-demos" depends="init,package-biojava,compile-demos"
+  description="create the demo jar file">
     <jar
       jarfile="${jar.demos}"
       basedir="${build.dest.demos}"
@@ -511,7 +527,8 @@
   </target>
 
   <!-- Create the apps package -->
-  <target name="package-apps" depends="init,package-biojava,compile-apps">
+  <target name="package-apps" depends="init,package-biojava,compile-apps"
+  description="create the apps jar file">
     <jar
       jarfile="${jar.apps}"
       basedir="${build.dest.apps}"
@@ -523,7 +540,8 @@
 
   <target
     name="package-all"
-    depends="package-grammars,package-biojava,package-demos,package-apps"/>
+    depends="package-grammars,package-biojava,package-demos,package-apps"
+    description="create all the jar files" />
 
 
   <!--
@@ -533,7 +551,8 @@
   -->
 
   <!-- Create taglet API documentation -->
-  <target name="javadocs-taglets" depends="prepare-taglets">
+  <target name="javadocs-taglets" depends="prepare-taglets"
+  description="Create taglet API documentation">
     <javadoc
       sourcepath="${build.src.taglets}"
       classpath="${classpath}:${java.home}/../lib/tools.jar"
@@ -551,7 +570,8 @@
   </target>
 
   <!-- Create grammar API documentation -->
-  <target name="javadocs-grammars" depends="compile-grammars" if="sableCC.support">
+  <target name="javadocs-grammars" depends="compile-grammars" if="sableCC.support"
+  description="Create grammar API documentation">
     <javadoc
       packagenames="${packages}"
       sourcepath="${build.src.grammars_java}"
@@ -568,7 +588,8 @@
   </target>
 
   <!-- Creates the API documentation -->
-  <target name="javadocs-biojava" depends="prepare-biojava,compile-taglets">
+  <target name="javadocs-biojava" depends="prepare-biojava,compile-taglets"
+  description="Creates the API documentation">
     <javadoc
       packagenames="${packages}"
       sourcepath="${build.src.biojava}"
@@ -612,7 +633,8 @@
   </target>
 
   <!-- Create demos API documentation -->
-  <target name="javadocs-demos" depends="prepare-demos,compile-taglets">
+  <target name="javadocs-demos" depends="prepare-demos,compile-taglets"
+  description="Create the demos API documentation">
     <javadoc
       packagenames="${packages}"
       sourcepath="${build.src.demos}"
@@ -632,7 +654,8 @@
   </target>
 
   <!-- Create apps API documentation -->
-  <target name="javadocs-apps" depends="prepare-apps,compile-taglets">
+  <target name="javadocs-apps" depends="prepare-apps,compile-taglets"
+  description="Create the apps API documentation">
     <javadoc
       packagenames="${packages}"
       sourcepath="${build.src.apps}"
@@ -652,7 +675,9 @@
   </target>
 
   <!-- Creates the DocBook documentation -->
-  <target name="docbook" depends="prepare-docs" if="trax.present">
+  <target name="docbook" depends="prepare-docs" if="trax.present"
+  description="Creates the DocBook documentation">
+
     <xslt
       in="${build.src.docs}/biojava-doc-main.xml"
       out="${build.dest.docs}/index.html"
@@ -684,10 +709,12 @@
   <target
     name="javadocs-all"
     depends="javadocs-taglets,javadocs-grammars,javadocs-biojava,javadocs-demos,javadocs-apps,docbook"
+    description="Creates the javadocs for all components"
   />
 
   <!-- Runs tests if the Ant optional JUnit support is available -->
-  <target name="runtests" depends="compile-tests" >
+  <target name="runtests" depends="compile-tests" 
+  description="Run all tests, can be quite slow">
     <junit maxmemory="128m" printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
       <formatter type="plain" usefile="true" />
       <classpath>
@@ -716,7 +743,8 @@
   </target>
 
   <!-- Runs tests if the Ant optional JUnit support is available -->
-  <target name="runmosttests" depends="compile-tests" >
+  <target name="runmosttests" depends="compile-tests" 
+  description="Run all tests except blast unit tests, lot faster than runtests">
     <junit printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
       <formatter type="plain" usefile="true" />
       <classpath>
@@ -746,7 +774,8 @@
     </junit>
   </target>
 
-  <target name="seqtests" depends="compile-tests" if="junit.support">
+  <target name="seqtests" depends="compile-tests" if="junit.support"
+  description="Run the tests under the seq package">
     <junit printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
       <formatter type="plain" usefile="true" />
       <classpath>
@@ -774,7 +803,8 @@
     </junit>
   </target>
 
-  <target name="symboltests" depends="compile-tests" if="junit.support">
+  <target name="symboltests" depends="compile-tests" if="junit.support"
+  description="Run the tests under the symbol package">
     <junit printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
       <formatter type="plain" usefile="true" />
       <classpath>
@@ -802,7 +832,8 @@
     </junit>
   </target>
 
-  <target name="biotests" depends="compile-tests" if="junit.support">
+  <target name="biotests" depends="compile-tests" if="junit.support"
+  description="Run all tests under the bio package">
     <junit printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
       <formatter type="plain" usefile="true" />
       <classpath>
@@ -830,7 +861,8 @@
     </junit>
   </target>
 
-  <target name="ontotests" depends="compile-tests" if="junit.support">
+  <target name="ontotests" depends="compile-tests" if="junit.support"
+  description="Runs all the ontology tests">
     <junit printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
       <formatter type="plain" usefile="true" />
       <classpath>
@@ -858,7 +890,8 @@
     </junit>
   </target>
 
-  <target name="filtertests" depends="compile-tests" if="junit.support">
+  <target name="filtertests" depends="compile-tests" if="junit.support"
+  description="run all filter tests">
     <junit printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
       <formatter type="plain" usefile="true" />
       <classpath>
@@ -886,7 +919,8 @@
     </junit>
   </target>
 
-  <target name="dptests" depends="compile-tests" if="junit.support">
+  <target name="dptests" depends="compile-tests" if="junit.support"
+  description="Runs all the dp tests">
     <junit printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
       <formatter type="plain" usefile="true" />
       <classpath>
@@ -914,7 +948,8 @@
     </junit>
   </target>
 
-  <target name="searchtests" depends="compile-tests" if="junit.support">
+  <target name="searchtests" depends="compile-tests" if="junit.support"
+  description="Runs all the search tests">
     <junit printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
       <formatter type="plain" usefile="true" />
       <classpath>
@@ -943,7 +978,8 @@
   </target>
 
   <!-- Creates the distribution -->
-  <target name="dist" depends="runtests,javadocs-all,docbook">
+  <target name="dist" depends="runtests,javadocs-all,docbook"
+  description="Creates the distribution">
     <mkdir dir="${dist.root}" />
     <mkdir dir="${dist.dir}" />
     <mkdir dir="${dist.dir}/lib" />
@@ -959,21 +995,25 @@
   </target>
 
   <!-- zips the dist -->
-  <target name="dist-zip" depends="init,dist">
+  <target name="dist-zip" depends="init,dist"
+  description="zips the distribution">
     <zip zipfile="${name.biojava}-${version}.zip" basedir="${dist.dir}" includes="**" />
   </target>
 
   <!-- tgzs the dist -->
-  <target name="dist-tgz" depends="init,dist">
+  <target name="dist-tgz" depends="init,dist"
+  description="tgzs the distribution">
     <tar tarfile="${name.biojava}-${version}.tar" basedir="${dist.root}" includes="**" />
     <gzip zipfile="${name.biojava}-${version}.tar.gz" src="${name.biojava}-${version}.tar" />
   </target>
 
   <!-- zip & tgz -->
-  <target name="dist-both" depends="init,dist-zip,dist-tgz" />
+  <target name="dist-both" depends="init,dist-zip,dist-tgz" 
+  description="Zips and tgzs the distribution"/>
 
   <!-- Cleans everything -->
-  <target name="clean" depends="init">
+  <target name="clean" depends="init"
+  description="Cleans everything">
     <delete dir="${build.dir}" />
     <delete dir="${dist.root}" />
     <delete file="${name.biojava}-${version}.tar.gz" />
@@ -981,7 +1021,7 @@
     <delete file="${name.biojava}-${version}.zip" />
   </target>
 
-  <target name="sync">
+  <target name="sync" description="synchronize with the cvs">
     <cvs command="update" />
     <AntCall target="package"/>
     <cvs command="commit" />
