@@ -46,6 +46,7 @@ import org.biojava.utils.ChangeVetoException;
  * Annotation keyed off a BioSQL seqfeature_qualifier_value table
  *
  * @author Thomas Down
+ * @author Len Trigg
  * @since 1.3
  */
 
