@@ -66,7 +66,7 @@ public class DNAAmbPack
     }
     
     byte p = 0;
-    for(Iterator i = DNATools.getDNA().iterator(); i.hasNext(); ) {
+    for(Iterator i = ((FiniteAlphabet) sym.getMatches()).iterator(); i.hasNext(); ) {
       p |= pack((AtomicSymbol) i.next());
     }
     return p;

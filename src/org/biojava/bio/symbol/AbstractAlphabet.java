@@ -115,32 +115,46 @@ public abstract class AbstractAlphabet
 	return toke;
     }
 
-  public final Symbol getAmbiguity(Set syms)
-      throws IllegalSymbolException
-  {
-      if (syms.size() == 0) {
-	  return getGapSymbol();
-      } else if (syms.size() == 1) {
-	  Symbol sym = (Symbol) syms.iterator().next();
-	  validate(sym);
-	  return sym;
-      } else {
-        Symbol s = (Symbol) ambCache.get(syms);
-        if(s == null) {
-          for (Iterator i = syms.iterator(); i.hasNext(); ) {
-            validate((Symbol) i.next());
-          }
-
-          s = AlphabetManager.createSymbol(
-					      '*', Annotation.EMPTY_ANNOTATION,
-					      syms, this
-					      );
-          ambCache.put(new HashSet(syms), s);
+    public final Symbol getAmbiguity(Set syms)
+        throws IllegalSymbolException
+    {
+        if (syms.size() == 0) {
+            return getGapSymbol();
+        } else if (syms.size() == 1) {
+            Symbol sym = (Symbol) syms.iterator().next();
+            validate(sym);
+            return sym;
+        } else {
+            Symbol s = (Symbol) ambCache.get(syms);
+            if(s == null) {
+                for (Iterator i = syms.iterator(); i.hasNext(); ) {
+                    validate((Symbol) i.next());
+                }
+                
+                
+                s = getAmbiguityImpl(syms);
+                ambCache.put(new HashSet(syms), s);
+            } 
+            return s;
         }
-        return s;
-      }
-  }
-
+    }
+    
+    /**
+     * Backend for getAmbiguity, called when it is actually necessarly to create a new symbol.
+     * By default, calls AlphabetManager.createSymbol.
+     *
+     * @since 1.3
+     */
+    
+    protected Symbol getAmbiguityImpl(Set syms)
+        throws IllegalSymbolException
+    {
+        return AlphabetManager.createSymbol(
+                    '*', Annotation.EMPTY_ANNOTATION,
+                    syms, this
+                );  
+    }
+    
   public final Symbol getSymbol(List syms)
   throws IllegalSymbolException {
     if (syms.size() == 1) {
