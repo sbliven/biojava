@@ -151,6 +151,15 @@ public abstract class EmblCDROMIndexReader
         return name;
     }
 
+    /**
+     * <code>readDBRelease</code> returns the database release from
+     * the index header. This may be called more than once as the
+     * value is cached.
+     *
+     * @return a <code>String</code>.
+     *
+     * @exception IOException if an error occurs.
+     */
     public String readDBRelease() throws IOException
     {
         if (! headerParsed)
@@ -159,6 +168,15 @@ public abstract class EmblCDROMIndexReader
         return release;
     }
 
+    /**
+     * <code>readDBDate</code> reads the date from the index
+     * header. This is known to be broken. It will be fixed to return
+     * a Java Date, if possible.
+     *
+     * @return a <code>String</code>.
+     *
+     * @exception IOException if an error occurs.
+     */
     public String readDBDate() throws IOException
     
     {
@@ -168,8 +186,26 @@ public abstract class EmblCDROMIndexReader
         return date;
     }
 
+    /**
+     * <code>readRecord</code> returns an array of objects parsed from
+     * a single record. Its content will depend on the type of index
+     * file. Concrete subclasses must provide an implementation of
+     * this method.
+     *
+     * @return an <code>Object []</code> array.
+     *
+     * @exception IOException if an error occurs
+     */
     public abstract Object [] readRecord() throws IOException;
 
+    /**
+     * <code>readRawRecord</code> returns the raw bytes of a single
+     * record from the index.
+     *
+     * @return a <code>byte []</code> array.
+     *
+     * @exception IOException if an error occurs.
+     */
     public byte [] readRawRecord() throws IOException
     {
         input.read(record);
@@ -177,6 +213,14 @@ public abstract class EmblCDROMIndexReader
         return record;
     }
 
+    /**
+     * <code>parseInt4</code> creates a long from Little-endian. Named
+     * after the EMBOSS Ajax function which wrote the data.
+     *
+     * @param int4 a <code>byte []</code> array.
+     *
+     * @return a <code>long</code>.
+     */
     long parseInt4(byte [] int4)
     {
         int result = 0;
@@ -190,6 +234,14 @@ public abstract class EmblCDROMIndexReader
         return result;
     }
 
+    /**
+     * <code>parseInt2</code> creates an int from Little-endian. Named
+     * after the EMBOSS Ajax function which wrote the data.
+     *
+     * @param int2 a <code>byte []</code> array.
+     *
+     * @return an <code>int</code>.
+     */
     int parseInt2(byte [] int2)
     {
         int result = 0;
@@ -203,6 +255,14 @@ public abstract class EmblCDROMIndexReader
         return result;
     }
 
+    /**
+     * <code>parseDate</code> is broken.
+     *
+     * @param sb a <code>StringBuffer</code> object.
+     * @param dbDate a <code>byte[]</code>.
+     *
+     * @return a <code>String</code>.
+     */
     String parseDate(StringBuffer sb, byte [] dbDate)
     {
         for (int i = 0; i < dbDate.length; i++)
@@ -213,6 +273,15 @@ public abstract class EmblCDROMIndexReader
         return sb.toString();
     }
 
+    /**
+     * <code>parseString</code> parses a String from an array of
+     * bytes, skipping the empties.
+     *
+     * @param sb a <code>StringBuffer</code> object.
+     * @param characters a <code>byte []</code> array.
+     *
+     * @return a <code>String</code>.
+     */
     String parseString(StringBuffer sb, byte [] characters)
     {
         for (int i = 0; i < characters.length; i++)
@@ -226,6 +295,13 @@ public abstract class EmblCDROMIndexReader
         return sb.toString();
     }
 
+    /**
+     * <code>parseHeader</code> carries out a full parse of the 300
+     * byte header (common to all the index types) when first
+     * encountered.
+     *
+     * @exception IOException if an error occurs
+     */
     private void parseHeader() throws IOException
     {
         input.read(int4);
