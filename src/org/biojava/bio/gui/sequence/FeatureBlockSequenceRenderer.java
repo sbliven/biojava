@@ -164,6 +164,8 @@ implements SequenceRenderer, PropertyChangeListener {
   }
     
     public void paint(Graphics2D g, SequenceRenderContext sp, Rectangle2D seqBox) {
+	Shape oldClip = g.getClip();
+
       if(label != null) {
         Rectangle2D.Double labelBox = null;
         Shape labelGlyph = null;
@@ -241,6 +243,8 @@ implements SequenceRenderer, PropertyChangeListener {
         }
         renderer.renderFeature(g, f, box, sp);
       }
+
+      g2.setClip(oldClip);
     }
 
     private void renderLabel(
