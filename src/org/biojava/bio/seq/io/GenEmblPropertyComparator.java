@@ -39,9 +39,9 @@ import java.util.List;
  *
  * @author Keith James
  */
-final class GenEmblPropertyComparator implements Comparator
+public final class GenEmblPropertyComparator implements Comparator
 {
-    static final Comparator INSTANCE = new GenEmblPropertyComparator();
+    public static final Comparator INSTANCE = new GenEmblPropertyComparator();
 
     private List tagOrder;
 

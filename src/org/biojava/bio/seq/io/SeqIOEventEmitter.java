@@ -40,8 +40,8 @@ import org.biojava.bio.symbol.Symbol;
  *
  * @author Keith James
  * @since 1.2
-*/
-class SeqIOEventEmitter
+ */
+public class SeqIOEventEmitter
 {
     private static Symbol [] symProto = new Symbol [0];
 
@@ -49,12 +49,12 @@ class SeqIOEventEmitter
     private Comparator refPropComparator;
     private Comparator featureComparator;
 
-    SeqIOEventEmitter(Comparator seqPropComparator,
+    public SeqIOEventEmitter(Comparator seqPropComparator,
                       Comparator featureComparator)
     {
         this.seqPropComparator = seqPropComparator;
         this.featureComparator = featureComparator;
-    };
+    }
 
 
             /**
@@ -65,7 +65,7 @@ class SeqIOEventEmitter
      * @param seq a <code>Sequence</code>.
      * @param listener a <code>SeqIOListener</code>.
      */
-    void getSeqIOEvents(Sequence seq, SeqIOListener listener)
+    public void getSeqIOEvents(Sequence seq, SeqIOListener listener)
     {
         try
         {

@@ -34,9 +34,9 @@ import org.biojava.bio.seq.Feature;
  * @author Keith James
  * @since 1.2
  */
-final class GenEmblFeatureComparator implements Comparator
+public final class GenEmblFeatureComparator implements Comparator
 {
-    static final Comparator INSTANCE = new GenEmblFeatureComparator();
+    public static final Comparator INSTANCE = new GenEmblFeatureComparator();
 
     private GenEmblFeatureComparator() { }
 
