@@ -261,20 +261,8 @@ public abstract class AbstractAlphabet
   public final void validate(Symbol sym)
   throws IllegalSymbolException {
     if(!contains(sym)) {
-      StringBuffer sb = new StringBuffer("{");
-      /*Iterator i = iterator();
-      if(i.hasNext()) {
-        sb.append(((Symbol) i.next()).getName());
-      }
-      while(i.hasNext()) {
-        sb.append(',');
-        sb.append(((Symbol) i.next()).getName());
-      }
-      sb.append("}");*/
-
       throw new IllegalSymbolException(
-        "Symbol " + sym.getName() + " not found in alphabet " + this.getName() +
-        " " + sb.substring(0)
+        "Symbol " + sym.getName() + " not found in alphabet " + this.getName()
       );
     }
   }

@@ -39,7 +39,7 @@ import org.biojava.utils.*;
  * annotated with features, or fed into dynamic-programming algorithms, or
  * processed as per any other SymbolList object.
  * <p>
- * Object identity can not be used to decide if two IntegerResidue objects are
+ * Object identity can not be used to decide if two IntegerSymbol objects are
  * the same. You must use the equals method, or compare intValue manually.
  *
  * @author Matthew Pocock
@@ -260,9 +260,11 @@ public class IntegerAlphabet
    * A class to represent a finite contiguous subset of the infinite IntegerAlphabet
    *
    * @author Mark Schreiber
+   * @author Matthew Pocock
    * @since 1.3
    */
-  private static class SubIntegerAlphabet extends SimpleAlphabet{
+  private static class SubIntegerAlphabet
+  extends SimpleAlphabet {
     private int min;
     private int max;
 
@@ -283,6 +285,15 @@ public class IntegerAlphabet
       }
 
       this.setName("SubIntegerAlphabet["+min+".."+max+"]");
+    }
+    
+    protected boolean containsImpl(AtomicSymbol sym) {
+      if(!IntegerAlphabet.getInstance().contains(sym)) {
+        return false;
+      }
+      
+      IntegerSymbol is = (IntegerSymbol) sym;
+      return is.intValue() >= min && is.intValue() <= max;
     }
 
     /**
