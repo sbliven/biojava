@@ -1,3 +1,5 @@
+-- $Id$
+--
 -- biosqldb-hsqldb.sql
 
 -- Authors: Ewan Birney, Elia Stupka
@@ -22,13 +24,13 @@
 -- constraints have been commented out for compatibility.
 -- HSQLDB 1.7.2 alpha N. has problem with PreparedStatements that affect the BioJava binding (these 
 -- will apparently be addressed by the 1.7.2 release)
--- HSQLDB 1.7.2 alpha T. Seems to work fine.
 
 CREATE TABLE biodatabase (
   	biodatabase_id 	INT NOT NULL IDENTITY,
   	name           	VARCHAR(128) NOT NULL,
 	authority	VARCHAR(128),
 	description	LONGVARCHAR,
+        PRIMARY KEY (biodatabase_id),
   	UNIQUE (name)
 );
 
@@ -44,6 +46,7 @@ CREATE TABLE taxon (
        mito_genetic_code TINYINT,
        left_value	INT,
        right_value	INT,
+       PRIMARY KEY (taxon_id),
        UNIQUE (ncbi_taxon_id)
 );
 -- HSQLDB 1.7.1 UNIQUE BUG
@@ -68,6 +71,7 @@ CREATE TABLE ontology (
        	ontology_id        INT NOT NULL IDENTITY,
        	name	   	   VARCHAR(32) NOT NULL,
        	definition	   LONGVARCHAR,
+        PRIMARY KEY (ontology_id),
 	UNIQUE (name)
 );
 
@@ -79,6 +83,7 @@ CREATE TABLE term (
 	identifier	   VARCHAR(40),
 	is_obsolete	   CHAR(1),
 	ontology_id	   INT NOT NULL,
+        PRIMARY KEY (term_id),
 	UNIQUE (name,ontology_id)
 );
 -- HSQLDB 1.7.1 UNIQUE BUG
@@ -87,7 +92,8 @@ CREATE TABLE term (
 CREATE INDEX term_ont ON term(ontology_id);
 
 
--- We use the field name "name" instead of "synonym" (which is a reserved word in some RDBMS)
+-- We should use the field name "name" instead of "synonym" 
+-- (because it is a reserved word in some RDBMS)
 CREATE TABLE term_synonym (
        name		  VARCHAR(255) NOT NULL,
        term_id		  INT NOT NULL,
@@ -111,6 +117,7 @@ CREATE TABLE term_relationship (
        	predicate_term_id    INT NOT NULL,
        	object_term_id       INT NOT NULL,
 	ontology_id	INT NOT NULL,
+        PRIMARY KEY (term_relationship_id),
 	UNIQUE (subject_term_id,predicate_term_id,object_term_id,ontology_id)
 );
 
@@ -119,6 +126,16 @@ CREATE INDEX trmrel_objectid ON term_relationship(object_term_id);
 CREATE INDEX trmrel_ontid ON term_relationship(ontology_id);
 
 
+-- This lets one associate a single term with a term_relationship 
+-- effecively allowing us to treat triples as 1st class terms.
+-- http://www.open-bio.org/pipermail/biosql-l/2003-October/000455.html
+CREATE TABLE term_relationship_term (
+        term_relationship_id INT NOT NULL,
+        term_id              INT NOT NULL,
+        UNIQUE ( term_relationship_id ),
+        UNIQUE ( term_id ) 
+);
+
 CREATE TABLE term_path (
         term_path_id         INT NOT NULL IDENTITY,
        	subject_term_id	     INT NOT NULL,
@@ -126,15 +143,13 @@ CREATE TABLE term_path (
        	object_term_id       INT NOT NULL,
 	ontology_id          INT NOT NULL,
 	distance	     INT,
+        PRIMARY KEY (term_path_id),
 	UNIQUE (subject_term_id,predicate_term_id,object_term_id,ontology_id,distance)
 );
 
 CREATE INDEX trmpath_predicateid ON term_path(predicate_term_id);
 CREATE INDEX trmpath_objectid ON term_path(object_term_id);
 CREATE INDEX trmpath_ontid ON term_path(ontology_id);
-
-
-
 
 
 CREATE TABLE bioentry (
@@ -147,7 +162,9 @@ CREATE TABLE bioentry (
 	division	VARCHAR(6),
   	description  	LONGVARCHAR,
   	version 	SMALLINT NOT NULL, 
-  	UNIQUE (accession,biodatabase_id,version)
+        PRIMARY KEY (bioentry_id),
+  	UNIQUE (accession,biodatabase_id,version),
+        UNIQUE (identifier,biodatabase_id)
 );
 -- HSQLDB 1.7.1 UNIQUE BUG
 --  	UNIQUE (identifier)
@@ -156,15 +173,6 @@ CREATE INDEX bioentry_name ON bioentry(name);
 CREATE INDEX bioentry_db   ON bioentry(biodatabase_id);
 CREATE INDEX bioentry_tax  ON bioentry(taxon_id);
 
--- BioJava addition. Not currently in main BioSQL
-CREATE TABLE term_relationship_term (
-        term_relationship_id    int DEFAULT 0 NOT NULL,
-        term_id                 int DEFAULT 0 NOT NULL,
-        PRIMARY KEY (term_relationship_id,term_id),
-        UNIQUE (term_relationship_id),
-        UNIQUE (term_id)
-);
-
 
 CREATE TABLE bioentry_relationship (
         bioentry_relationship_id INT NOT NULL IDENTITY,
@@ -172,6 +180,7 @@ CREATE TABLE bioentry_relationship (
    	subject_bioentry_id 	INT NOT NULL,
    	term_id 		INT NOT NULL,
    	rank 			INT,
+        PRIMARY KEY (bioentry_relationship_id),
 	UNIQUE (object_bioentry_id,subject_bioentry_id,term_id)
 );
 
@@ -211,6 +220,7 @@ CREATE TABLE dbxref (
         dbname          VARCHAR(40) NOT NULL,
         accession       VARCHAR(40) NOT NULL,
 	version		SMALLINT NOT NULL,
+        PRIMARY KEY (dbxref_id),
         UNIQUE(accession, dbname, version)
 );
 
@@ -246,6 +256,7 @@ CREATE TABLE reference (
   	title    	   LONGVARCHAR,
   	authors  	   LONGVARCHAR NOT NULL,
   	crc	   	   VARCHAR(32),
+        PRIMARY KEY (reference_id),
 	UNIQUE (dbxref_id),
 	UNIQUE (crc)
 );
@@ -269,6 +280,7 @@ CREATE TABLE anncomment (
   	bioentry_id    	INT NOT NULL,
   	comment_text   	LONGVARCHAR NOT NULL,
   	rank   		SMALLINT DEFAULT 0 NOT NULL,
+        PRIMARY KEY (comment_id),
   	UNIQUE(bioentry_id, rank)
 );
 
@@ -291,6 +303,7 @@ CREATE TABLE seqfeature (
    	source_term_id  	INT NOT NULL,
 	display_name		VARCHAR(64),
    	rank 			SMALLINT DEFAULT 0 NOT NULL,
+        PRIMARY KEY (seqfeature_id),
 	UNIQUE (bioentry_id,type_term_id,source_term_id,rank)
 );
 
@@ -304,6 +317,7 @@ CREATE TABLE seqfeature_relationship (
    	subject_seqfeature_id 	INT NOT NULL,
    	term_id 	INT NOT NULL,
    	rank 			INT,
+        PRIMARY KEY (seqfeature_relationship_id),
 	UNIQUE (object_seqfeature_id,subject_seqfeature_id,term_id)
 );
 
@@ -351,8 +365,9 @@ CREATE TABLE location (
 	term_id			INT,
    	start_pos              	INT,
    	end_pos                	INT,
-   	strand             	TINYINT NOT NULL,
+   	strand             	TINYINT DEFAULT 0 NOT NULL,
    	rank          		SMALLINT DEFAULT 0 NOT NULL,
+        PRIMARY KEY (location_id),
    	UNIQUE (seqfeature_id, rank)
 );
 
@@ -410,6 +425,15 @@ ALTER TABLE term_relationship ADD CONSTRAINT FKtrmobject_trmrel
 ALTER TABLE term_relationship ADD CONSTRAINT FKterm_trmrel
        	FOREIGN KEY (ontology_id) REFERENCES ontology(ontology_id)
 	ON DELETE CASCADE;
+
+-- term_relationship_term
+
+ALTER TABLE term_relationship_term ADD CONSTRAINT FKtrmrel_trmreltrm
+      FOREIGN KEY (term_relationship_id) REFERENCES term_relationship(term_relationship_id)
+      ON DELETE CASCADE ;
+ALTER TABLE term_relationship_term ADD CONSTRAINT FKtrm_trmreltrm
+      FOREIGN KEY (term_id) REFERENCES term(term_id)
+      ON DELETE CASCADE ;
 
 -- term_path
 
