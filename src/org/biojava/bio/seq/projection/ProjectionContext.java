@@ -46,7 +46,7 @@ import org.biojava.utils.*;
  *
  * <p>
  * All of these methods are implemented by @link ReparentContext, and it would
- * be unwise to try to implement them again independantly, but it's a free
+ * be unwise to try to implement them again independently, but it's a free
  * world and this is, after all, an interface. Some of the methods have
  * contracts that are a little tricky to implement without some thought.
  * </p>
@@ -129,8 +129,8 @@ import org.biojava.utils.*;
  *
  * @for.developer
  * Every ProjectionContext implementation must be a public class. This is
- * because ProjectionEngine wires method calls from the prjected features back
- * into the context. These methods are not necisarily defined by the context
+ * because ProjectionEngine wires method calls from the projected features back
+ * into the context. These methods are not necessarily defined by the context
  * interface (if they are project/revert pairs), so the class itself must be
  * directly accessible.
  *

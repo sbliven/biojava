@@ -11,9 +11,9 @@ import java.util.*;
  *
  * <p>
  * ReparentContext takes care of much of the ugliness of implementing
- * ProjectionContext, such as handling listners and grafting features onto
+ * ProjectionContext, such as handling listeners and grafting features onto
  * a new parent. It also sets up a framework for mutating feature filters.
- * Think carefully before over-riding methods in this class.
+ * Think carefully before overriding methods in this class.
  * </p>
  *
  * @author Matthew Pocock

@@ -39,11 +39,11 @@ import org.biojava.utils.AssertionFailure;
  * automatically as they are required.
  *
  * @for.user
- * Don't use this class directly. This class contains deep voodo code. Run
+ * Don't use this class directly. This class contains deep voodoo code. Run
  * away while you still can.
  *
  * @for.powerUser
- * You may find that for some bizar reason you need to manualy project a feature
+ * You may find that for some bizaare reason you need to manually project a feature
  * through a ProjectionContext. You should be using @link
  * ProjectionContext.projectFeature(). If this is not practical for some reason,
  * use this class. However, this probably indicates that you are doing something
@@ -63,7 +63,7 @@ import org.biojava.utils.AssertionFailure;
  * implements. Then, it will instantiate that class with your context and the
  * underlying feature. The returned feature will currently be an implementation
  * of the package-private class org.biojava.bio.seq.projection.ProjectedFeature,
- * but this is implementation detail and should not be relied uppon.
+ * but this is implementation detail and should not be relied upon.
  *
  * @author Thomas Down
  * @since 1.2
