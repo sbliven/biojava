@@ -62,22 +62,11 @@ class BioSQLSequenceAnnotation implements Annotation {
     private void initAnnotations() {
 	try {
 	    Connection conn = seqDB.getPool().takeConnection();
-	    
+	    underlyingAnnotation = new SmallAnnotation();
+
 	    //
 	    // Handle all the hacky special cases first
 	    //
-
-	    PreparedStatement get_annotations = conn.prepareStatement("select comment_text from comment where bioentry_id = ?");
-	    get_annotations.setInt(1, bioentry_id);
-	    ResultSet rs = get_annotations.executeQuery();
-	    
-	    underlyingAnnotation = new SmallAnnotation();
-	    while (rs.next()) {
-		String value = rs.getString(1);
-		String key = "comment";
-		underlyingAnnotation.setProperty(key, value);
-	    }
-	    get_annotations.close();
       
 	    PreparedStatement get_taxa = conn.prepareStatement(
 			"select taxa.full_lineage, taxa.common_name, taxa.ncbi_taxa_id " +
@@ -86,7 +75,7 @@ class BioSQLSequenceAnnotation implements Annotation {
 			"      bioentry_taxa.taxa_id = taxa.taxa_id "
 			                                      );
 	    get_taxa.setInt(1, bioentry_id);
-	    rs = get_taxa.executeQuery();
+	    ResultSet rs = get_taxa.executeQuery();
 	    if (rs.next()) {
 		Taxa taxa = EbiFormat.getInstance().parse(WeakTaxaFactory.GLOBAL, rs.getString(1));
 		taxa.setCommonName(rs.getString(2));
@@ -103,11 +92,11 @@ class BioSQLSequenceAnnotation implements Annotation {
 
 	    if (seqDB.isBioentryPropertySupported()) {
 		PreparedStatement get_properties = conn.prepareStatement(
-			"select seqfeature_qualifier.qualifier_name as qn, bioentry_property.property_value, bioentry_property.property_rank as rank " +
-			"  from bioentry_property, seqfeature_qualifier " +
-			" where bioentry_property.bioentry_id = ? " +
-			"   and seqfeature_qualifier.seqfeature_qualifier_id = bioentry_property.seqfeature_qualifier_id " +
-			" order by qn, rank");
+			"select ontology_term.term_name as qn, bioentry_qualifier_value.qualifier_value " + /*, bioentry_property.property_rank as rank " + */
+			"  from bioentry_qualifier_value, ontology_term " +
+			" where bioentry_qualifier_value.bioentry_id = ? " +
+			"   and ontology_term.ontology_term_id = bioentry_qualifier_value.ontology_term_id " /* + */
+			/* " order by qn, rank" */);
 		get_properties.setInt(1, bioentry_id);
 		rs = get_properties.executeQuery();
 		while (rs.next()) {

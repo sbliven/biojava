@@ -121,10 +121,10 @@ class BioEntryFeatureSet implements FeatureHolder, RealizingFeatureHolder {
 
 		PreparedStatement get_features = conn.prepareStatement(
                         "select seqfeature.seqfeature_id, " +
-			"seqfeature_key.key_name, " +
+			"ontology_term.term_name, " +
 			"seqfeature_source.source_name " +
-			"from seqfeature, seqfeature_key, seqfeature_source " +
-			"where seqfeature_key.seqfeature_key_id = seqfeature.seqfeature_key_id and " +
+			"from seqfeature, ontology_term, seqfeature_source " +
+			"where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
 			"      seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
 			"      seqfeature.bioentry_id = ?"
 			);
@@ -328,7 +328,7 @@ class BioEntryFeatureSet implements FeatureHolder, RealizingFeatureHolder {
 		Set toplevelFeatures = new HashSet(fmap.keySet());
 		Map featureHierarchy = new HashMap();
 		if (seqDB.isHierarchySupported()) {
-		    PreparedStatement get_hierarchy = conn.prepareStatement("select parent, child from seqfeature_hierarchy, seqfeature where parent = seqfeature.seqfeature_id and seqfeature.bioentry_id = ?");
+		    PreparedStatement get_hierarchy = conn.prepareStatement("select parent_seqfeature_id, child_seqfeature_id from seqfeature_relationship, seqfeature where parent = seqfeature.seqfeature_id and seqfeature.bioentry_id = ?");
 		    get_hierarchy.setInt(1, bioentry_id);
 		    rs = get_hierarchy.executeQuery();
 		    while (rs.next()) {

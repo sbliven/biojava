@@ -182,6 +182,7 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder, BioSQLSequence
 		PreparedStatement get_symbols = conn.prepareStatement("select biosequence_str " +
 								      "from biosequence " +
 								      "where biosequence_id = ?");
+		// FIXME should handle NULL biosequence_str (thomasd, Cape Town)
 		get_symbols.setInt(1, biosequence_id);
 		ResultSet rs = get_symbols.executeQuery();
 		String seqString = null;
