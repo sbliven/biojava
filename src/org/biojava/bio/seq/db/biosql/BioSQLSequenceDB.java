@@ -73,10 +73,8 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	if (colon > 0) {
 	    String protocol = ourURL.substring(0, colon);
 	    if (protocol.equals("mysql")) {
-		System.err.println("MySQL");
 		helper = new MySQLDBHelper();
 	    } else {
-		System.err.println("PostgreSQL");
 		helper = new PostgreSQLDBHelper();
 	    }
 	}
@@ -338,8 +336,10 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 
 	    PreparedStatement get_bioentry = conn.prepareStatement("select bioentry.bioentry_id " +
 								   "from bioentry " +
-								   "where bioentry.accession = ?");
+								   "where bioentry.accession = ? and " +
+								   "      bioentry.biodatabase_id = ?");
 	    get_bioentry.setString(1, id);
+	    get_bioentry.setInt(2, dbid);
 	    ResultSet rs = get_bioentry.executeQuery();
 	    int bioentry_id = -1;
 	    if (rs.next()) {
