@@ -1,0 +1,18 @@
+<body>
+Data structures and algorithms for processing sequences.
+<P>
+This package deals with suffix trees, weight matricies and dynamic programming.
+It uses the same notions of sequences and alphabets as org.biojava.bio.seq, and
+extends them to encorporate states, state sequences, alignments and hidden
+markov models.
+<P>
+HMMs are defined by a finite set of states and a finite set of transitions. The
+states are encapsulated as subinterfaces of Residues, so that we can re-use
+alphabets and ResidueList to stoor legal states and sequences of states. States
+that emit residues must implement EmissionState. They can be thought of as a
+probability distribution over an alphabet. Other states may contain entire
+HMMs, or be non-emitting states which make the model easier to wire. An HMM
+contains an alphabet of states and a set of transitions with scores. They realy
+resemble directed weighted graphs with the nodes being the states and the arcs
+being the transitions.
+</body>
