@@ -204,6 +204,25 @@ public interface GFFRecordFilter {
     }
   }
 
+  public static class FrameFilter implements GFFRecordFilter {
+    private int frame;
+
+    public FrameFilter() {}
+    public FrameFilter(int frame) { setFrame(frame); }
+
+    public int getFrame() {
+      return this.frame;
+    }
+
+    public void setFrame(int frame) {
+      this.frame = frame;
+    }
+
+    public boolean accept(GFFRecord record) {
+      return record.getFrame() == frame;
+    }
+  }
+
   public static class NotFilter implements GFFRecordFilter {
     private GFFRecordFilter filter;
 

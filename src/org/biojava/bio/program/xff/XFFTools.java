@@ -34,7 +34,7 @@ public class XFFTools {
         sb.makeSequence();
     }
     
-    public static FeatureHolder readXFF(File xffFile, String seqID, FiniteAlphabet alpha)
+    public static Sequence readXFF(File xffFile, String seqID, FiniteAlphabet alpha)
     throws IOException, SAXException, BioException {
         SymbolList dummy = new DummySymbolList(alpha, Integer.MAX_VALUE);
         Sequence ourSeq = new SimpleSequence(dummy, seqID, seqID, new SmallAnnotation());
