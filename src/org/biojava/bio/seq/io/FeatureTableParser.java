@@ -123,56 +123,56 @@ class FeatureTableParser {
     Location result = null;
     List locationList = null;
 	
-	  StringTokenizer toke = new StringTokenizer(loc, "(),. ><", true);
+    StringTokenizer toke = new StringTokenizer(loc, "(),. ><", true);
     int level = 0;
     while (toke.hasMoreTokens()) {
-	    String t = toke.nextToken();
-	    // System.err.println(t);
-	    if (t.equals("join")) {
-        joining = true;
-        locationList = new ArrayList();
-	    } else if (t.equals("complement")) {
-        complementing = true;
-        isComplement = true;
-	    } else if (t.equals("(")) {
-        ++level;
-	    } else if (t.equals(")")) {
-        --level;
-	    } else if (t.equals(".")) {
-	    } else if (t.equals(",")) {
-	    } else if (t.equals(">")) {
-	    } else if (t.equals("<")) {
-	    } else if (t.equals(" ")) {
-	    } else {
-        // System.err.println("Range! " + ranging);
-        // This ought to be an actual coordinate.
-        int pos = -1;
-        try {  
-          pos = Integer.parseInt(t);
-        } catch (NumberFormatException ex) {
-          throw new BioException("bad locator: " + t + " " + loc);
-        }
-
-        if (ranging == false) {
-          start = pos;
-          ranging = true;
-        } else {
-          Location rl = new RangeLocation(start, pos);
-          if (joining) {
-            locationList.add(rl);
-          } else {
-            if (result != null) {
-              throw new BioException(
-                "Tried to set result to " + rl +
-                " when it was alredy set to " + result
-              );
-            }
-            result = rl;
-          }
-          ranging = false;
-          complementing = false;
-        }
+	String t = toke.nextToken();
+	// System.err.println(t);
+	if (t.equals("join") || t.equals("order")) {
+	    joining = true;
+	    locationList = new ArrayList();
+	} else if (t.equals("complement")) {
+	    complementing = true;
+	    isComplement = true;
+	} else if (t.equals("(")) {
+	    ++level;
+	} else if (t.equals(")")) {
+	    --level;
+	} else if (t.equals(".")) {
+	} else if (t.equals(",")) {
+	} else if (t.equals(">")) {
+	} else if (t.equals("<")) {
+	} else if (t.equals(" ")) {
+	} else {
+	    // System.err.println("Range! " + ranging);
+	    // This ought to be an actual coordinate.
+	    int pos = -1;
+	    try {  
+		pos = Integer.parseInt(t);
+	    } catch (NumberFormatException ex) {
+		throw new BioException("bad locator: " + t + " " + loc);
 	    }
+
+	    if (ranging == false) {
+		start = pos;
+		ranging = true;
+	    } else {
+		Location rl = new RangeLocation(start, pos);
+		if (joining) {
+		    locationList.add(rl);
+		} else {
+		    if (result != null) {
+			throw new BioException(
+					       "Tried to set result to " + rl +
+					       " when it was alredy set to " + result
+					       );
+		    }
+		    result = rl;
+		}
+		ranging = false;
+		complementing = false;
+	    }
+	}
     }
     if (level != 0) {
 	    throw new BioException("Mismatched parentheses: " + loc);
