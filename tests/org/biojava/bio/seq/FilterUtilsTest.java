@@ -23,7 +23,7 @@ package org.biojava.bio.seq;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.genomic.*;
+import org.biojava.bio.seq.homol.*;
 import junit.framework.TestCase;
 
 /**
@@ -59,7 +59,7 @@ public class FilterUtilsTest extends TestCase
    
     protected FeatureFilter cf_StrandedFeature;
     protected FeatureFilter cf_ComponentFeature;
-    protected FeatureFilter cf_SpliceVariant;
+    protected FeatureFilter cf_HomologyFeature;
 
     protected FeatureFilter parent_cf_ComponentFeature;
     protected FeatureFilter ancestor_cf_ComponentFeature;
@@ -146,7 +146,7 @@ public class FilterUtilsTest extends TestCase
 	
 	cf_StrandedFeature = new FeatureFilter.ByClass(StrandedFeature.class);
 	cf_ComponentFeature = new FeatureFilter.ByClass(ComponentFeature.class);
-	cf_SpliceVariant = new FeatureFilter.ByClass(SpliceVariant.class);
+	cf_HomologyFeature = new FeatureFilter.ByClass(HomologyFeature.class);
 
 	//
 	// NOTed filters.
@@ -213,9 +213,9 @@ public class FilterUtilsTest extends TestCase
     }
 
     public void testByClass() throws Exception {
-	assertTrue(FilterUtils.areProperSubset(cf_SpliceVariant, cf_StrandedFeature));
+	assertTrue(FilterUtils.areProperSubset(cf_HomologyFeature, cf_StrandedFeature));
 	assertTrue(FilterUtils.areProperSubset(cf_ComponentFeature, cf_StrandedFeature));
-	assertTrue(FilterUtils.areDisjoint(cf_ComponentFeature, cf_SpliceVariant));
+	assertTrue(FilterUtils.areDisjoint(cf_ComponentFeature, cf_HomologyFeature));
     }
 
     public void testLocation() throws Exception {
