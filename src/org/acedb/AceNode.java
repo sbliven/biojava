@@ -31,9 +31,5 @@ import java.net.URL;
  * @author Thomas Down
  */
 public interface AceNode extends AceSet {
-  /**
-   * The name of this node.
-   */
-  String getName();
 }
 

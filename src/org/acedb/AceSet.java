@@ -53,6 +53,11 @@ public interface AceSet {
    * Returns whether an object is contained under a given name.
    */
   boolean contains(String name) throws AceException;
+
+  /**
+   * The name of this node - possibly null.
+   */
+  String getName();
   
   /**
    * The logical parent of this object or null if there is no logical parent.

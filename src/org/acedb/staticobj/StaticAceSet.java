@@ -27,11 +27,13 @@ import java.util.*;
 public class StaticAceSet implements AceSet {
     private Map subSets;
     private AceSet parent;
+    private String name;
     private AceURL url;
 
-    public StaticAceSet(AceSet parent, AceURL url) {
+    public StaticAceSet(AceSet parent, AceURL url, String name) {
 	this.parent = parent;
 	this.url = url;
+  this.name = name;
     }
 
     public int size() {
@@ -44,6 +46,10 @@ public class StaticAceSet implements AceSet {
 	return url;
     }
 
+    public String getName() {
+      return name;
+    }
+    
     public AceSet getParent() {
 	return parent;
     }
