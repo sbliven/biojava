@@ -27,12 +27,12 @@ extends Changeable {
     "Set of ontologies in this domain are changing",
     "org.biojava.ontology.ReasoningDomain",
     "ONTOLOGIES" );
-  
+
   public static final ChangeType TERMS = new ChangeType(
     "Terms in ontologies in this domain are changing",
     "org.biojava.ontology.ReasoningDomain",
     "TERMS" );
-  
+
   public static final ChangeType ADD_ONTOLOGY = new ChangeType(
     "Adding an ontology to this domain",
     "org.biojava.ontology.ReasoningDomain",
@@ -60,7 +60,7 @@ extends Changeable {
    * <code>Set</code> instance each time, or return an unmodifiable view.
    */
   public Set getOntologies();
-  
+
   /**
    * Add an ontology to this domain.
    *
@@ -85,7 +85,7 @@ extends Changeable {
    */
   public void addOntology(Ontology onto)
   throws ChangeVetoException;
-  
+
   /**
    * Remove an ontology from this domain.
    *
@@ -109,7 +109,7 @@ extends Changeable {
    */
   public void removeOntology(Ontology onto)
   throws ChangeVetoException;
-  
+
   /**
    * Decide if two terms are linked by a given relation.
    *
@@ -206,7 +206,7 @@ extends Changeable {
     private Set explicitOntologies;
     private Map allOntologies;
     private boolean debug = false;
-    
+
     /**
      * Working values for relations.
      *
@@ -215,17 +215,17 @@ extends Changeable {
      * Relation->null means that we are in the process of proving things
      */
     private Map knownTrue;
-    
+
     private int level = 0;
-    
+
     private void upLevel() {
         ++level;
     }
-    
+
     private void downLevel() {
         --level;
     }
-    
+
     private void println(String s) {
         if (debug) {
             for (int i = 0; i < level; ++i) {
@@ -234,26 +234,26 @@ extends Changeable {
             System.err.println(s);
         }
     }
-    
+
     public Impl() {
       explicitOntologies = new HashSet();
       allOntologies = new HashMap();
       knownTrue = new HashMap();
     }
-    
+
     public Set getOntologies() {
       return Collections.unmodifiableSet(allOntologies.keySet());
     }
-    
+
     public void addOntology(Ontology onto)
     throws ChangeVetoException {
       Set all = recSearch(onto, false);
-      
+
       if(all.size() == 0) {
         doAdd(onto, Collections.singleton(onto));
         return;
       }
-      
+
       if(hasListeners()) {
         ChangeSupport cs = getChangeSupport(ReasoningDomain.ADD_ONTOLOGY);
         synchronized(cs) {
@@ -277,7 +277,7 @@ extends Changeable {
         doAdd(onto, all);
       }
     }
-    
+
     private void doAdd(Ontology onto, Set all) {
       explicitOntologies.add(onto);
       for(Iterator i = all.iterator(); i.hasNext(); ) {
@@ -289,20 +289,20 @@ extends Changeable {
         os.add(onto);
       }
     }
-    
+
     public void removeOntology(Ontology onto)
     throws ChangeVetoException {
       if(!allOntologies.containsKey(onto)) {
         return;
       }
-      
+
       Set all = recSearch(onto, true);
-      
+
       if(all.size() == 0) {
         doRemove(onto, Collections.singleton(onto));
         return;
       }
-      
+
       if(hasListeners()) {
         ChangeSupport cs = getChangeSupport(ReasoningDomain.REMOVE_ONTOLOGY);
         synchronized(cs) {
@@ -326,7 +326,7 @@ extends Changeable {
         doRemove(onto, all);
       }
     }
-    
+
     private void doRemove(Ontology onto, Set all) {
       explicitOntologies.remove(onto);
       for(Iterator i = all.iterator(); i.hasNext(); ) {
@@ -338,21 +338,21 @@ extends Changeable {
         }
       }
     }
-    
+
     // fixme: we just assume that relation is a relation term for now
     public boolean isTrue(Term subject, Term object, Term relation)
-      throws InvalidTermException 
+      throws InvalidTermException
     {
       Relation rel = new Relation(subject, object, relation);
-      
+
       println("isTrue(" + rel + ")");
       upLevel();
       boolean result = _isTrue(subject, object, relation, rel);
       downLevel();
       return result;
     }
-    
-    
+
+
     private boolean _isTrue(Term subject, Term object, Term relation, Relation rel)
       throws InvalidTermException
     {
@@ -368,10 +368,10 @@ extends Changeable {
           return false;
         }
       }
-      
+
       // we're working on it...
       knownTrue.put(rel, null);
-      
+
       // for every Term x, x IS_A x
       println("Check for self-isa: " + rel);
       if(subject == object && relation == OntoTools.IS_A) {
@@ -379,10 +379,10 @@ extends Changeable {
         println("For every term x, x IS_A x holds");
         return true;
       }
-      
+
       // true(a, b, R)  = (a, b, R) member_of triples
       //               or (x, y, S) implies (a, b, R) and true(x, y, S)
-      
+
       // do (a, b, R) member_of triples
       println("Check for direct support: " + rel);
       if(subject.getOntology() == object.getOntology() &&
@@ -393,12 +393,12 @@ extends Changeable {
         println("Directly supported by the ontology: " + rel);
         return true;
       }
-      
+
       // do (x, y, S) implies (a, b, R) and true(x, y, S)
       //
-      
+
       // 1st case - implicit identity due to imports
-      
+
       // subject import
       println("Check for subject imports");
       for(Iterator ti = findIdentities(subject).iterator(); ti.hasNext(); ) {
@@ -435,7 +435,7 @@ extends Changeable {
           return true;
         }
       }
-      
+
       // checking for reflexive relation: i R i
       println("Checking for reflexive relation: " + rel);
       if(object.equals(subject) && isReflexive(relation)) {
@@ -443,7 +443,7 @@ extends Changeable {
         println("Reflexive proposition true: " + rel);
         return true;
       }
-      
+
       // checking for symmetric relation: a R b => b R a
       println("Checking for symmetric relation: " + rel);
       if(isSymmetric(relation)) {
@@ -453,7 +453,7 @@ extends Changeable {
           return true;
         }
       }
-      
+
       // checking for transitive relation: x R y && y R z => x R z
       // we have a potential x & z - search for a suitable y.
       println("Checking for transitive relation: " + rel);
@@ -472,12 +472,12 @@ extends Changeable {
           }
         }
       }
-      
+
       // Special case handling for HAS_A.  This should actually cover
       // some other types of relation, but I can't remember the generic
       // term for things that follow this pattern.  Just playing
       // around for now --thomasd.
-      
+
       if (isTrue(relation, OntoTools.HAS_A, OntoTools.IS_A)) {
           println("Special case for HAS_A.  Checking through transitive closure (slowly)");
           for (Iterator ti = getAllTerms().iterator(); ti.hasNext(); ) {
@@ -493,7 +493,7 @@ extends Changeable {
               }
           }
       }
-      
+
       // not able to prove this proposition.
       println("Unable to prove: " + rel);
       knownTrue.put(rel, Boolean.FALSE);
@@ -505,7 +505,7 @@ extends Changeable {
       recSearchImpl(res, onto, toRemove);
       return res;
     }
-    
+
     private void recSearchImpl(Set res, Ontology onto, boolean toRemove) {
       Set dependants = (Set) allOntologies.get(onto);
       if(toRemove && dependants != null && dependants.size() == 1) {
@@ -513,7 +513,7 @@ extends Changeable {
       } else if(!toRemove && dependants == null) {
         res.add(onto);
       }
-      
+
       for(Iterator i = onto.getTerms().iterator(); i.hasNext(); ) {
         Term t = (Term) i.next();
         if(t instanceof RemoteTerm) {
@@ -523,15 +523,15 @@ extends Changeable {
         }
       }
     }
-    
+
     private Set findIdentities(Term term) {
       Set identities = null;
-      
+
       if(term instanceof RemoteTerm) {
         identities = new HashSet();
         identities.add(((RemoteTerm) term).getRemoteTerm());
       }
-      
+
       for(Iterator oi = allOntologies.keySet().iterator(); oi.hasNext(); ) {
         Ontology o = (Ontology) oi.next();
         // we need an optimization for fetching all remote terms in an ontology
@@ -548,19 +548,18 @@ extends Changeable {
           }
         }
       }
-      
+
       if(identities == null) {
         return Collections.EMPTY_SET;
       } else {
         return identities;
       }
     }
-    
+
     // fixme: shouldn't be throwing this - should be an assertion failure
-    private Set findParents(Term term)
-    throws InvalidTermException {
+    private Set findParents(Term term) {
       Set parents = null;
-      
+
       for(Iterator tripI = term.getOntology().getTriples(term, null, OntoTools.IS_A).iterator();
           tripI.hasNext(); )
       {
@@ -570,19 +569,18 @@ extends Changeable {
         }
         parents.add(trip.getObject());
       }
-      
+
       if(parents == null) {
         return Collections.EMPTY_SET;
       } else {
         return parents;
       }
     }
-    
+
     // fixme: shouldn't be throwing this - should be an assertion failure
-    private Set findChildren(Term term)
-    throws InvalidTermException {
+    private Set findChildren(Term term) {
       Set children = null;
-      
+
       for(Iterator tripI = term.getOntology().getTriples(null, term, OntoTools.IS_A).iterator();
           tripI.hasNext(); )
       {
@@ -592,14 +590,14 @@ extends Changeable {
         }
         children.add(trip.getObject());
       }
-      
+
       if(children == null) {
         return Collections.EMPTY_SET;
       } else {
         return children;
       }
     }
-    
+
     private boolean isReflexive(Term relation)
     throws InvalidTermException {
       if(relation == OntoTools.IS_A) {
@@ -608,12 +606,12 @@ extends Changeable {
         return isa(relation, OntoTools.REFLEXIVE);
       }
     }
-    
+
     private boolean isSymmetric(Term relation)
     throws InvalidTermException {
       return isa(relation, OntoTools.SYMMETRIC);
     }
-    
+
     private boolean isTransitive(Term relation)
     throws InvalidTermException {
       if(relation == OntoTools.IS_A) {
@@ -622,7 +620,7 @@ extends Changeable {
         return isa(relation, OntoTools.TRANSITIVE);
       }
     }
-    
+
     private Set getAllTerms() {
       Set all = new HashSet();
       for(Iterator i = allOntologies.keySet().iterator(); i.hasNext(); ) {
@@ -631,7 +629,7 @@ extends Changeable {
       }
       return all;
     }
-    
+
     private boolean isa(Term subject, Term object)
     throws InvalidTermException {
       return isTrue(subject, object, OntoTools.IS_A);
@@ -650,7 +648,7 @@ extends Changeable {
       return hits;
     }
   }
-  
+
   /**
    * A relation together with a proven or not flag.
    * Hashcode & equals only take the terms into account. They ignore proven.
@@ -662,17 +660,17 @@ extends Changeable {
     private final Term subject;
     private final Term object;
     private final Term relation;
-    
+
     public Relation(Term subject, Term object, Term relation) {
       this.subject = subject;
       this.object = object;
       this.relation = relation;
     }
-    
+
     public Term getSubject()  { return subject; }
     public Term getObject()   { return object; }
     public Term getRelation() { return relation; }
-    
+
     public boolean equals(Object o) {
       if(o instanceof Relation) {
         Relation that = (Relation) o;
@@ -684,13 +682,13 @@ extends Changeable {
         return false;
       }
     }
-    
+
     public int hashCode() {
       return getSubject().hashCode() +
         31 * getObject().hashCode() +
         31 * 31 * getRelation().hashCode();
     }
-    
+
     public String toString() {
       return
         "Relation [subject: " + getSubject()

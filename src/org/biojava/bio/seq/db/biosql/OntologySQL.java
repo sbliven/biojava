@@ -407,7 +407,7 @@ class OntologySQL {
                 if (cev.getChange() != null && cev.getPrevious() == null) {
                     // Adding
                     if (! (cev.getChange() instanceof Term)) {
-                        throw new BioError("Assertion failed: added object isn't a term");
+                        throw new BioError("Assertion failed: added object isn't a term: " + cev.getChange());
                     }
                     Term addedTerm = (Term) cev.getChange();
                     if (addedTerm instanceof RemoteTerm) {
@@ -420,7 +420,7 @@ class OntologySQL {
                 if (cev.getChange() != null && cev.getPrevious() == null) {
                     // Adding
                     if (! (cev.getChange() instanceof Triple)) {
-                        throw new BioError("Assertion failed: added object isn't a triple");
+                        throw new BioError("Assertion failed: added object isn't a triple: " + cev.getChange());
                     }
                     persistTriple(ontology, (Triple) cev.getChange());
                 }
@@ -453,6 +453,7 @@ class OntologySQL {
     private void persistTerm(Connection conn, Term term)
         throws SQLException
     {
+      try {
         PreparedStatement import_term = conn.prepareStatement(
             "insert into term " +
             "       (name, definition, ontology_id) " +
@@ -467,6 +468,13 @@ class OntologySQL {
         Integer tid = new Integer(id);
         termsByID.put(tid, term);
         IDsByTerm.put(term, tid);
+      } catch (SQLException se) {
+        throw (SQLException) new SQLException(
+                "Failed to persist term: " + term +
+                " from ontology: " + term.getOntology() +
+                " with error: " + se.getErrorCode() + " : " + se.getSQLState()
+        ).initCause(se);
+      }
     }
 
     private void persistTriple(Ontology ont, Triple triple) {
