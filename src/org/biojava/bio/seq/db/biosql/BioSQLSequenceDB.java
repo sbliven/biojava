@@ -45,7 +45,7 @@ import org.biojava.bio.ontology.*;
  * @since 1.3
  */
 
-public class BioSQLSequenceDB implements SequenceDB {
+public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     private JDBCConnectionPool pool;
     private int dbid = -1;
     private String name;
@@ -55,7 +55,11 @@ public class BioSQLSequenceDB implements SequenceDB {
     private DBHelper helper;
     private FeaturesSQL featuresSQL;
     private OntologySQL ontologySQL;
-    private BioSQLChangeHub changeHub;
+//    private BioSQLChangeHub changeHub;
+    private BioSQLEntryChangeHub entryChangeHub;
+    private BioSQLEntryAnnotationChangeHub entryAnnotationChangeHub;
+    private BioSQLFeatureChangeHub featureChangeHub;
+    private BioSQLFeatureAnnotationChangeHub featureAnnotationChangeHub;
     private WeakValueHashMap featuresByID = new WeakValueHashMap();
     private Cache tileCache = new FixedSizeCache(10);
 
@@ -70,9 +74,25 @@ public class BioSQLSequenceDB implements SequenceDB {
     FeaturesSQL getFeaturesSQL() {
 	return featuresSQL;
     }
-
+/*
     BioSQLChangeHub getChangeHub() {
 	return changeHub;
+    }
+*/
+    BioSQLEntryChangeHub getEntryChangeHub() {
+	return entryChangeHub;
+    }
+
+    BioSQLEntryAnnotationChangeHub getEntryAnnotationChangeHub() {
+	return entryAnnotationChangeHub;
+    }
+
+    BioSQLFeatureChangeHub getFeatureChangeHub() {
+	return featureChangeHub;
+    }
+
+    BioSQLFeatureAnnotationChangeHub getFeatureAnnotationChangeHub() {
+	return featureAnnotationChangeHub;
     }
 
     /**
@@ -111,7 +131,11 @@ public class BioSQLSequenceDB implements SequenceDB {
     }
 
 	// Create helpers
-	changeHub = new BioSQLChangeHub(this);
+//	changeHub = new BioSQLChangeHub(this);
+        entryChangeHub = new BioSQLEntryChangeHub(this);
+        entryAnnotationChangeHub = new BioSQLEntryAnnotationChangeHub(this, entryChangeHub);
+        featureChangeHub = new BioSQLFeatureChangeHub(this, entryChangeHub);
+        featureAnnotationChangeHub = new BioSQLFeatureAnnotationChangeHub(this, featureChangeHub);
 
 	try {
 	    Connection conn = pool.takeConnection();
@@ -130,7 +154,7 @@ public class BioSQLSequenceDB implements SequenceDB {
 		PreparedStatement createdb = conn.prepareStatement("insert into biodatabase (name) values ( ? )");
 		createdb.setString(1, biodatabase);
 		createdb.executeUpdate();
-        conn.commit();
+                conn.commit();
 		createdb.close();
 
 		dbid = getDBHelper().getInsertID(conn, "biodatabase", "biodatabase_id");
@@ -169,11 +193,11 @@ public class BioSQLSequenceDB implements SequenceDB {
 				    int length)
 	throws IllegalIDException, ChangeVetoException, BioException
     {
-        synchronized (changeHub) {
+        synchronized (this) {
           ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, null);
-          changeHub.fireDatabasePreChange(cev);
+          firePreChangeEvent(cev);
           _createDummySequence(id, alphabet, length);
-          changeHub.fireDatabasePostChange(cev);
+          firePostChangeEvent(cev);
         }
     }
 
@@ -234,11 +258,11 @@ public class BioSQLSequenceDB implements SequenceDB {
     public void addSequence(Sequence seq)
 	throws IllegalIDException, ChangeVetoException, BioException
     {
-	synchronized (changeHub) {
+	synchronized (this) {
           ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, seq);
-          changeHub.fireDatabasePreChange(cev);
+          firePreChangeEvent(cev);
           _addSequence(seq);
-          changeHub.fireDatabasePostChange(cev);
+          firePostChangeEvent(cev);
         }
     }
 
@@ -504,12 +528,12 @@ public class BioSQLSequenceDB implements SequenceDB {
 		get_biosequence.setInt(1, bioentry_id);
 		ResultSet rs = get_biosequence.executeQuery();
 		if (rs.next()) {
-            String molecule = rs.getString(1);
-            int length = rs.getInt(2);
-            if (rs.wasNull()) {
-                length = -1;
-            }
-            seq = new BioSQLSequence(this, id, bioentry_id, molecule, length);
+                    String molecule = rs.getString(1);
+                    int length = rs.getInt(2);
+                    if (rs.wasNull()) {
+                        length = -1;
+                    }
+                    seq = new BioSQLSequence(this, id, bioentry_id, molecule, length);
 		}
 		get_biosequence.close();
 	    }
@@ -547,11 +571,11 @@ public class BioSQLSequenceDB implements SequenceDB {
 	throws IllegalIDException, ChangeVetoException, BioException
     {
      
-        synchronized (changeHub) {
+        synchronized (this) {
           ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, null);
-          changeHub.fireDatabasePreChange(cev);
+          firePreChangeEvent(cev);
           _removeSequence(id);
-          changeHub.fireDatabasePostChange(cev);
+          firePostChangeEvent(cev);
         }
     }
 
@@ -948,6 +972,56 @@ public class BioSQLSequenceDB implements SequenceDB {
 	return bioentryPropertySupported;
     }
 
+    private boolean bioentryDblinkChecked = false;
+    private boolean bioentryDblinkSupported = false;
+
+    boolean isBioentryDblinkSupported() {
+	if (!bioentryDblinkChecked) {
+	    try {
+		Connection conn = pool.takeConnection();
+		PreparedStatement ps = conn.prepareStatement("select * from bioentry_dblink limit 1");
+		try {
+		    ps.executeQuery();
+		    bioentryDblinkSupported = true;
+		} catch (SQLException ex) {
+		    bioentryDblinkSupported = false;
+		}
+		ps.close();
+		pool.putConnection(conn);
+	    } catch (SQLException ex) {
+		throw new BioRuntimeException(ex);
+	    }
+	    bioentryDblinkChecked = true;
+	}
+
+	return bioentryPropertySupported;
+    }
+
+    private boolean dbxrefQualifierValueChecked = false;
+    private boolean dbxrefQualifierValueSupported = false;
+
+    boolean isDbxrefQualifierValueSupported() {
+	if (!dbxrefQualifierValueChecked) {
+	    try {
+		Connection conn = pool.takeConnection();
+		PreparedStatement ps = conn.prepareStatement("select * from dbxref_qualifier_value limit 1");
+		try {
+		    ps.executeQuery();
+		    dbxrefQualifierValueSupported = true;
+		} catch (SQLException ex) {
+		    dbxrefQualifierValueSupported = false;
+		}
+		ps.close();
+		pool.putConnection(conn);
+	    } catch (SQLException ex) {
+		throw new BioRuntimeException(ex);
+	    }
+	    dbxrefQualifierValueChecked = true;
+	}
+
+	return dbxrefQualifierValueSupported;
+    }
+
     private boolean spaChecked = false;
     private boolean spaSupported = false;
 
@@ -1175,25 +1249,16 @@ public class BioSQLSequenceDB implements SequenceDB {
       }
     };
   }
-
-    public void addChangeListener(ChangeListener cl) {
-	addChangeListener(cl, ChangeType.UNKNOWN);
-    }
-    
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	getChangeHub().addDatabaseListener(cl, ct);
+    // change support stuff
+    void firePreChangeEvent(ChangeEvent cev)
+        throws ChangeVetoException
+    {
+        getChangeSupport(cev.getType()).firePreChangeEvent(cev);
     }
 
-    public void removeChangeListener(ChangeListener cl) {
-	removeChangeListener(cl, ChangeType.UNKNOWN);
-    }
-
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-	getChangeHub().removeDatabaseListener(cl, ct);
-    }
-
-    public boolean isUnchanging(ChangeType ct) {
-	return false;
+    void firePostChangeEvent(ChangeEvent cev)
+    {
+        getChangeSupport(cev.getType()).firePostChangeEvent(cev);
     }
 
     //
@@ -1258,6 +1323,46 @@ public class BioSQLSequenceDB implements SequenceDB {
 	    throw new BioRuntimeException(ex);
 	}
     }
+/*
+    //
+    // Dbxref canonicalization
+    //
+    BioSQLXRef canonicalizeXRef(BioSQLXRef r, int dbxref_id) {
+
+        Integer key = new Integer(dbxref_id);
+        BioSQLXRef oldXRef = (BioSQLXRef) XRefsByID.get(key);
+        if (oldXRef != null) {
+            return oldXRef;
+        } else {
+            featuresByID.put(key, r);
+            return r;
+        }
+    }
+    
+    BioSQLXRef getXRefsByID(int dbxref_id) 
+    {
+	Integer key = new Integer(dbxref_id);
+	BioSQLFeature f = (BioSQLFeature) featuresByID.get(key);
+	if (f != null) {
+	    return f;
+	}
+
+	try {
+	    SingleFeatureReceiver receiver = new SingleFeatureReceiver();
+	    getFeaturesSQL().retrieveFeatures(-1, receiver, null, -1, feature_id);
+	    if (receiver.getFeature() == null) {
+		throw new BioRuntimeException("Dangling internal_feature_id");
+	    } else {
+		featuresByID.put(key, (BioSQLFeature) receiver.getFeature());
+		return (BioSQLFeature) receiver.getFeature();
+	    }
+	} catch (SQLException ex) {
+	    throw new BioRuntimeException(ex, "Database error");
+	} catch (BioException ex) {
+	    throw new BioRuntimeException(ex);
+	}
+    }
+*/
 
     Cache getTileCache() {
 	return tileCache;

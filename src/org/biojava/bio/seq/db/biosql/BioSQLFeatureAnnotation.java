@@ -120,12 +120,12 @@ class BioSQLFeatureAnnotation
     public void setProperty(Object key, Object value)
         throws ChangeVetoException
     {
-        BioSQLChangeHub hub = seqDB.getChangeHub();
-        synchronized (hub) {
+        BioSQLFeatureAnnotationChangeHub featureAnnotationHub = seqDB.getFeatureAnnotationChangeHub();
+        synchronized (featureAnnotationHub) {
             ChangeEvent cev = new ChangeEvent(this, Annotation.PROPERTY, key);
-            hub.fireFeatureAnnotationPreChange(cev);
+            featureAnnotationHub.firePreChange(cev);
             _setProperty(key, value);
-            hub.fireFeatureAnnotationPostChange(cev);
+            featureAnnotationHub.firePostChange(cev);
         }
     }
 
@@ -148,13 +148,13 @@ class BioSQLFeatureAnnotation
             throw new NoSuchElementException("Annotation doesn't contain property " + key.toString());
         }
         
-        BioSQLChangeHub hub = seqDB.getChangeHub();
-        synchronized (hub) {
+        BioSQLFeatureAnnotationChangeHub featureAnnotationHub = seqDB.getFeatureAnnotationChangeHub();
+        synchronized (featureAnnotationHub) {
             ChangeEvent cev = new ChangeEvent(this, Annotation.PROPERTY, key);
-            hub.fireFeatureAnnotationPreChange(cev);
+            featureAnnotationHub.firePreChange(cev);
             underlyingAnnotation.removeProperty(key);
             persistProperty(key, null);
-            hub.fireFeatureAnnotationPostChange(cev);
+            featureAnnotationHub.firePostChange(cev);
         }
     }
 
@@ -211,7 +211,7 @@ class BioSQLFeatureAnnotation
     }
     
     public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	seqDB.getChangeHub().addFeatureAnnotationListener(feature_id, cl, ct);
+	seqDB.getFeatureAnnotationChangeHub().addListener(new Integer(feature_id), cl, ct);
     }
 
     public void removeChangeListener(ChangeListener cl) {
@@ -219,7 +219,7 @@ class BioSQLFeatureAnnotation
     }
 
     public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-	seqDB.getChangeHub().removeFeatureAnnotationListener(feature_id, cl, ct);
+	seqDB.getFeatureAnnotationChangeHub().removeListener(new Integer(feature_id), cl, ct);
     }
 
     public boolean isUnchanging(ChangeType ct) {

@@ -93,17 +93,17 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
     public void setType(String s)
         throws ChangeVetoException
     {
-	BioSQLChangeHub hub = sequence.getSequenceDB().getChangeHub();
+	BioSQLFeatureChangeHub featureHub = sequence.getSequenceDB().getFeatureChangeHub();
 	ChangeEvent cev = new ChangeEvent(this, Feature.TYPE, getType(), s);
-	synchronized (hub) {
-	    hub.fireFeaturePreChange(cev);
+	synchronized (featureHub) {
+	    featureHub.firePreChange(cev);
 	    try {
 		((BioSQLSequenceI) getSequence()).getSequenceDB().getFeaturesSQL().setFeatureType(id, s);
 	    } catch (SQLException ex) {
 		throw new BioRuntimeException(ex, "Error updating feature in database");
 	    }
 	    this.type = s;
-	    hub.fireFeaturePostChange(cev);
+	    featureHub.firePostChange(cev);
 	}
     }
 
@@ -124,17 +124,17 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
     public void setSource(String s)
         throws ChangeVetoException
     {
-	BioSQLChangeHub hub = sequence.getSequenceDB().getChangeHub();
+        BioSQLFeatureChangeHub featureHub = sequence.getSequenceDB().getFeatureChangeHub();
 	ChangeEvent cev = new ChangeEvent(this, Feature.SOURCE, getSource(), s);
-	synchronized (hub) {
-	    hub.fireFeaturePreChange(cev);
+	synchronized (featureHub) {
+            featureHub.firePreChange(cev);
 	    try {
 		((BioSQLSequenceI) getSequence()).getSequenceDB().getFeaturesSQL().setFeatureSource(id, s);
 	    } catch (SQLException ex) {
 		throw new BioRuntimeException(ex, "Error updating feature in database");
 	    }
 	    this.source = s;
-	    hub.fireFeaturePostChange(cev);
+            featureHub.firePostChange(cev);
 	}
     }
 
@@ -155,17 +155,17 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
     public void setLocation(Location l)
         throws ChangeVetoException
     {
-	BioSQLChangeHub hub = sequence.getSequenceDB().getChangeHub();
+        BioSQLFeatureChangeHub featureHub = sequence.getSequenceDB().getFeatureChangeHub();
 	ChangeEvent cev = new ChangeEvent(this, Feature.LOCATION, getLocation(), l);
-	synchronized (hub) {
-	    hub.fireFeaturePreChange(cev);
+	synchronized (featureHub) {
+	    featureHub.firePreChange(cev);
 	    try {
 		((BioSQLSequenceI) getSequence()).getSequenceDB().getFeaturesSQL().setFeatureLocation(id, l, StrandedFeature.UNKNOWN);
 	    } catch (SQLException ex) {
 		throw new BioRuntimeException(ex, "Error updating feature in database");
 	    }
 	    this.location = l;
-	    hub.fireFeaturePostChange(cev);
+            featureHub.firePostChange(cev);
 	}
     }
 
@@ -205,13 +205,13 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
     {
 	Feature f = realizeFeature(this, templ);
 	
-	BioSQLChangeHub hub = sequence.getSequenceDB().getChangeHub();
+        BioSQLFeatureChangeHub featureHub = sequence.getSequenceDB().getFeatureChangeHub();
 	ChangeEvent cev = new ChangeEvent(this, FeatureHolder.FEATURES, f, null);
-	synchronized (hub) {
-	    hub.fireFeaturePreChange(cev);
+	synchronized (featureHub) {
+            featureHub.firePreChange(cev);
 	    getFeatures().addFeature(f);
 	    ((BioSQLSequenceI) getSequence()).persistFeature(f, id);
-	    hub.fireFeaturePostChange(cev);
+            featureHub.firePostChange(cev);
 	}
 	return f;
     }
@@ -219,13 +219,13 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
     public void removeFeature(Feature f)
         throws ChangeVetoException
     {
-	BioSQLChangeHub hub = sequence.getSequenceDB().getChangeHub();
+        BioSQLFeatureChangeHub featureHub = sequence.getSequenceDB().getFeatureChangeHub();
 	ChangeEvent cev = new ChangeEvent(this, FeatureHolder.FEATURES, null, f);
-	synchronized (hub) {
-	    hub.fireFeaturePreChange(cev);
+	synchronized (featureHub) {
+            featureHub.firePreChange(cev);
 	    getFeatures().removeFeature(f);
 	    ((BioSQLSequenceI) getSequence()).getSequenceDB().getFeaturesSQL().removeFeature((BioSQLFeature) f);
-	    hub.fireFeaturePostChange(cev);
+	    featureHub.firePostChange(cev);
 	}
     }
 
@@ -357,7 +357,7 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
     }
     
     public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	sequence.getSequenceDB().getChangeHub().addFeatureListener(id, cl, ct);
+	sequence.getSequenceDB().getFeatureChangeHub().addListener(new Integer(id), cl, ct);
     }
 
     public void removeChangeListener(ChangeListener cl) {
@@ -365,7 +365,7 @@ class BioSQLFeature implements Feature, RealizingFeatureHolder {
     }
 
     public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-	sequence.getSequenceDB().getChangeHub().removeFeatureListener(id, cl, ct);
+	sequence.getSequenceDB().getFeatureChangeHub().removeListener(new Integer(id), cl, ct);
     }
 
     public boolean isUnchanging(ChangeType ct) {

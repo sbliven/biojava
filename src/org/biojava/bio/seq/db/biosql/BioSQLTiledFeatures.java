@@ -124,13 +124,13 @@ class BioSQLTiledFeatures implements FeatureHolder, RealizingFeatureHolder
     {
 	Feature f = realizeFeature(seq, ft);
 	
-	BioSQLChangeHub hub = ((BioSQLSequenceI) seq).getSequenceDB().getChangeHub();
+	BioSQLEntryChangeHub entryHub = ((BioSQLSequenceI) seq).getSequenceDB().getEntryChangeHub();
 	ChangeEvent cev = new ChangeEvent(seq, FeatureHolder.FEATURES, f);
-	synchronized (hub) {
-	    hub.fireEntryPreChange(cev);
+	synchronized (entryHub) {
+	    entryHub.firePreChange(cev);
 	    seqDB.getFeaturesSQL().persistFeature(f, -1, bioentry_id); // No parent
 	    _addFeature(f);
-	    hub.fireEntryPostChange(cev);
+	    entryHub.firePostChange(cev);
 	}
 
 	return f;
@@ -153,13 +153,13 @@ class BioSQLTiledFeatures implements FeatureHolder, RealizingFeatureHolder
             throw new ChangeVetoException("This isn't a normal BioSQL feature");
         }
         
-        BioSQLChangeHub hub = ((BioSQLSequenceI) seq).getSequenceDB().getChangeHub();
+        BioSQLEntryChangeHub entryHub = ((BioSQLSequenceI) seq).getSequenceDB().getEntryChangeHub();
 	ChangeEvent cev = new ChangeEvent(seq, FeatureHolder.FEATURES, f);
-	synchronized (hub) {
-	    hub.fireEntryPreChange(cev);
+	synchronized (entryHub) {
+	    entryHub.firePreChange(cev);
 	    seqDB.getFeaturesSQL().removeFeature((BioSQLFeature) f);
 	    fh.removeFeature(f);
-	    hub.fireEntryPostChange(cev);
+	    entryHub.firePostChange(cev);
         }
     }
 

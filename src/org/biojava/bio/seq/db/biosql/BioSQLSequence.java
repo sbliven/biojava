@@ -269,7 +269,7 @@ class BioSQLSequence
     }
     
     public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	getSequenceDB().getChangeHub().addEntryListener(bioentry_id, cl, ct);
+	getSequenceDB().getEntryChangeHub().addListener(bioentry_id, cl, ct);
     }
 
     public void removeChangeListener(ChangeListener cl) {
@@ -277,7 +277,7 @@ class BioSQLSequence
     }
 
     public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-	getSequenceDB().getChangeHub().removeEntryListener(bioentry_id, cl, ct);
+	getSequenceDB().getEntryChangeHub().removeListener(bioentry_id, cl, ct);
     }
 
     public boolean isUnchanging(ChangeType ct) {

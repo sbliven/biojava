@@ -149,12 +149,12 @@ class BioSQLSequenceAnnotation
     public void setProperty(Object key, Object value)
         throws ChangeVetoException
     {
-        BioSQLChangeHub hub = seqDB.getChangeHub();
-        synchronized (hub) {
+        BioSQLEntryAnnotationChangeHub entryAnnotationHub = seqDB.getEntryAnnotationChangeHub();
+        synchronized (entryAnnotationHub) {
             ChangeEvent cev = new ChangeEvent(this, Annotation.PROPERTY, key);
-            hub.fireEntryAnnotationPreChange(cev);
+            entryAnnotationHub.firePreChange(cev);
             _setProperty(key, value);
-            hub.fireEntryAnnotationPostChange(cev);
+            entryAnnotationHub.firePostChange(cev);
         }
     }
 
@@ -177,13 +177,13 @@ class BioSQLSequenceAnnotation
             throw new NoSuchElementException("Annotation doesn't contain property " + key.toString());
         }
         
-        BioSQLChangeHub hub = seqDB.getChangeHub();
-        synchronized (hub) {
+        BioSQLEntryAnnotationChangeHub entryAnnotationHub = seqDB.getEntryAnnotationChangeHub();
+        synchronized (entryAnnotationHub) {
             ChangeEvent cev = new ChangeEvent(this, Annotation.PROPERTY, key);
-            hub.fireFeatureAnnotationPreChange(cev);
+            entryAnnotationHub.firePreChange(cev);
             underlyingAnnotation.removeProperty(key);
             persistProperty(key, null);
-            hub.fireFeatureAnnotationPostChange(cev);
+            entryAnnotationHub.firePostChange(cev);
         }
     }
 
@@ -241,7 +241,7 @@ class BioSQLSequenceAnnotation
     }
     
     public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	seqDB.getChangeHub().addEntryAnnotationListener(bioentry_id, cl, ct);
+	seqDB.getEntryAnnotationChangeHub().addListener(new Integer(bioentry_id), cl, ct);
     }
 
     public void removeChangeListener(ChangeListener cl) {
@@ -249,7 +249,7 @@ class BioSQLSequenceAnnotation
     }
 
     public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-	seqDB.getChangeHub().removeEntryAnnotationListener(bioentry_id, cl, ct);
+	seqDB.getEntryAnnotationChangeHub().removeListener(new Integer(bioentry_id), cl, ct);
     }
 
     public boolean isUnchanging(ChangeType ct) {
