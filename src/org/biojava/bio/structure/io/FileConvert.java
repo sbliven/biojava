@@ -38,22 +38,24 @@ public class FileConvert {
 	structure = struc ;
     }
 
+    /** align a string to the right
+     * length is the total length the new string should take, inlcuding spaces on the left
+     * incredible that this tool is missing in java !!!
+     */
     private String alignRight(String input, int length){
 
-	String str = "" ;
-	int diff = length - input.length() ;
-	
-	for (int i = length; i>0; i--) {
+	String spaces = "                           " ;
+	int n = input.length();
+	int diff = length - n ;
+	String s = "";
 
-	    if  ( i <= diff) {
-		str = " " + str;
-	    } else {
-		int pos = input.length() - length +  i -1;
-		//System.out.println(input + " " +pos + " " + input.charAt(pos) );
-		str = input.charAt(pos) + str ;
-	    }                    
-        }
-	return str ;
+	if (n < length) {
+	    s = spaces.substring(0,diff) + input;
+	} else {
+	    // does not work
+	    return input ;
+	}
+	return s;
     }
 
 
@@ -84,9 +86,10 @@ public class FileConvert {
 		// do for all groups
 		int nrGroups = chain.getLength();
 		for ( int h=0; h<nrGroups;h++){
+
 		    Group g= chain.getGroup(h);
-		    //System.out.println(g);
 		    String type = g.getType() ;
+
 		    String record = "" ;
 		    if ( type.equals("hetatm") ) {
 			record = "HETATM";
@@ -121,6 +124,8 @@ public class FileConvert {
 			String occupancy  = alignRight(""+d2.format(a.getOccupancy()),6) ;
 			String tempfactor = alignRight(""+d2.format(a.getTempFactor()),6);
 		
+			//System.out.println("fullname,zise:" + fullname + " " + fullname.length());
+
 			line = record + serial + " " + fullname +altLoc 
 			    + resName + " " + chainID + resseq 
 			    + "    " + x+y+z 
@@ -142,14 +147,33 @@ public class FileConvert {
     public void toDASStructure(XMLWriter xw)
 	throws IOException 
     {
+
+	/*xmlns="http://www.sanger.ac.uk/xml/das/2004/06/17/dasalignment.xsd" xmlns:align="http://www.sanger.ac.uk/xml/das/2004/06/17/alignment.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xsd:schemaLocation="http://www.sanger.ac.uk/xml/das/2004/06/17/dasalignment.xsd http://www.sanger.ac.uk/xml/das//2004/06/17/dasalignment.xsd"*/
+
+	HashMap header = structure.getHeader();
 	
+	xw.openTag("object");
+	xw.attribute("dbAccessionId",structure.getPDBCode());	    
+	xw.attribute("intObjectId"  ,structure.getPDBCode());	    
+	// missing modification date
+	String modificationDate = (String)header.get("modDate") ;
+	xw.attribute("objectVersion",modificationDate);	    
+	xw.attribute("type","protein structure");	    
+	xw.attribute("dbSource","PDB");	    
+	xw.attribute("dbVersion","20040621");
+	xw.attribute("dbCoordSys","PDBresnum");
+
+	// do we need object details ???
+	xw.closeTag("object");
+
+
 	// do for all models
 	for (int modelnr = 0;modelnr<structure.nrModels();modelnr++){
 	    
 	    // do for all chains:
 	    for (int chainnr = 0;chainnr<structure.size(modelnr);chainnr++){
 		Chain chain = (Chain)structure.getChain(modelnr,chainnr); 
-		xw.openTag("CHAIN");
+		xw.openTag("chain");
 		xw.attribute("id",chain.getName());
 		if (structure.isNmr()){
 		    xw.attribute("model",Integer.toString(modelnr+1));
@@ -158,10 +182,10 @@ public class FileConvert {
 		//do for all groups:
 		for (int groupnr =0;groupnr<chain.getLength();groupnr++){
 		    Group gr = chain.getGroup(groupnr);
-		    xw.openTag("GROUP");
+		    xw.openTag("group");
 		    xw.attribute("name",gr.getPDBName());
 		    xw.attribute("type",gr.getType());
-		    xw.attribute("groupid",gr.getPDBCode());
+		    xw.attribute("groupID",gr.getPDBCode());
 		    
 		    
 		    // do for all atoms:
@@ -169,84 +193,85 @@ public class FileConvert {
 		    ArrayList atoms = gr.getAtoms();
 		    for (int atomnr=0;atomnr<atoms.size();atomnr++){
 			Atom atom = (Atom)atoms.get(atomnr);
-			xw.openTag("ATOM");
+			xw.openTag("atom");
 			xw.attribute("atomID",Integer.toString(atom.getPDBserial()));
 			xw.attribute("atomName",atom.getFullName());
 			xw.attribute("x",Double.toString(atom.getX()));
 			xw.attribute("y",Double.toString(atom.getY()));
 			xw.attribute("z",Double.toString(atom.getZ()));
-			xw.closeTag("ATOM");
+			xw.closeTag("atom");
 		    }
-		    xw.closeTag("GROUP") ;
+		    xw.closeTag("group") ;
 		}
 		
-		xw.closeTag("CHAIN");
-
-
-		ArrayList cons = structure.getConnections();
-		for (int cnr = 0; cnr<cons.size();cnr++){
+		xw.closeTag("chain");
+	    }
+	}
+	
+	// do connectivity for all chains:
+	
+	ArrayList cons = structure.getConnections();
+	for (int cnr = 0; cnr<cons.size();cnr++){
 		
 
-		    /*
-		      the HashMap for a single CONECT line contains the following fields:
-		      <ul>
-		      <li>atomserial (mandatory) : Atom serial number
-		      <li>bond1 .. bond4 (optional): Serial number of bonded atom
-		      <li>hydrogen1 .. hydrogen4 (optional):Serial number of hydrogen bonded atom
-		      <li>salt1 .. salt2 (optional): Serial number of salt bridged atom
-		      </ul>
-		    */
+	    /*
+	      the HashMap for a single CONECT line contains the following fields:
+	      <ul>
+	      <li>atomserial (mandatory) : Atom serial number
+	      <li>bond1 .. bond4 (optional): Serial number of bonded atom
+	      <li>hydrogen1 .. hydrogen4 (optional):Serial number of hydrogen bonded atom
+	      <li>salt1 .. salt2 (optional): Serial number of salt bridged atom
+	      </ul>
+	    */
 		    
-		    HashMap con = (HashMap)cons.get(cnr);
-		    Integer as = (Integer)con.get("atomserial");
-		    int atomserial = as.intValue();
+	    HashMap con = (HashMap)cons.get(cnr);
+	    Integer as = (Integer)con.get("atomserial");
+	    int atomserial = as.intValue();
 		    
 		    
-		    ArrayList atomids = new ArrayList() ;
+	    ArrayList atomids = new ArrayList() ;
 		    
-		    // test salt and hydrogen first //
-		    if (con.containsKey("salt1")) atomids.add(con.get("salt1"));
-		    if (con.containsKey("salt2")) atomids.add(con.get("salt2"));
+	    // test salt and hydrogen first //
+	    if (con.containsKey("salt1")) atomids.add(con.get("salt1"));
+	    if (con.containsKey("salt2")) atomids.add(con.get("salt2"));
 		    
-		    if (atomids.size()!=0){
-			addConnection(xw,"salt",atomserial,atomids);
-			atomids = new ArrayList() ;		    
-		    }
-		    if (con.containsKey("hydrogen1")) atomids.add(con.get("hydrogen1"));
-		    if (con.containsKey("hydrogen2")) atomids.add(con.get("hydrogen2"));		
-		    if (con.containsKey("hydrogen3")) atomids.add(con.get("hydrogen3"));		
-		    if (con.containsKey("hydrogen4")) atomids.add(con.get("hydrogen4"));
-		    if (atomids.size()!=0){
-			addConnection(xw,"hydrogen",atomserial,atomids);
-			atomids = new ArrayList() ;		    
-		    }
+	    if (atomids.size()!=0){
+		addConnection(xw,"salt",atomserial,atomids);
+		atomids = new ArrayList() ;		    
+	    }
+	    if (con.containsKey("hydrogen1")) atomids.add(con.get("hydrogen1"));
+	    if (con.containsKey("hydrogen2")) atomids.add(con.get("hydrogen2"));		
+	    if (con.containsKey("hydrogen3")) atomids.add(con.get("hydrogen3"));		
+	    if (con.containsKey("hydrogen4")) atomids.add(con.get("hydrogen4"));
+	    if (atomids.size()!=0){
+		addConnection(xw,"hydrogen",atomserial,atomids);
+		atomids = new ArrayList() ;		    
+	    }
 		    
-		    if (con.containsKey("bond1")) atomids.add(con.get("bond1"));
-		    if (con.containsKey("bond2")) atomids.add(con.get("bond2"));
-		    if (con.containsKey("bond3")) atomids.add(con.get("bond3"));
-		    if (con.containsKey("bond4")) atomids.add(con.get("bond4"));
+	    if (con.containsKey("bond1")) atomids.add(con.get("bond1"));
+	    if (con.containsKey("bond2")) atomids.add(con.get("bond2"));
+	    if (con.containsKey("bond3")) atomids.add(con.get("bond3"));
+	    if (con.containsKey("bond4")) atomids.add(con.get("bond4"));
 		    
-		    if (atomids.size()!=0){
-			addConnection(xw,"bond",atomserial,atomids);
-		    }
-		}
+	    if (atomids.size()!=0){
+		addConnection(xw,"bond",atomserial,atomids);
 	    }
 	}
     }
 
-        private void addConnection(XMLWriter xw,String connType, int atomserial, ArrayList atomids){
+    private void addConnection(XMLWriter xw,String connType, int atomserial, ArrayList atomids){
 	try{
-	    xw.openTag("CONNECT");
-	    xw.attribute("atomserial",Integer.toString(atomserial));
-	    xw.attribute("connectionType",connType);
+	    xw.openTag("connect");
+	    xw.attribute("atomSerial",Integer.toString(atomserial));
+	    xw.attribute("type",connType);
 	    for (int i=0;i<atomids.size();i++){
 		Integer atomid = (Integer)atomids.get(i);
 		int aid = atomid.intValue();
-		xw.openTag("ATOMID");
-		xw.attribute("atomid",Integer.toString(aid));
-		xw.closeTag("ATOMID");
+		xw.openTag("atomID");
+		xw.attribute("atomID",Integer.toString(aid));
+		xw.closeTag("atomID");
 	    }
-	    xw.closeTag("CONNECT"); 
+	    xw.closeTag("connect"); 
 	} catch( Exception e) {
 	    e.printStackTrace();
 	}
