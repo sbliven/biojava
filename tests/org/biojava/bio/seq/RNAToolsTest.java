@@ -224,6 +224,39 @@ public class RNAToolsTest extends TestCase {
         }
     }
 
+    public void testGeneticCode() {
+        try {
+            // get the universal genetic code and give it a trashing
+            ManyToOneTranslationTable geneticCode = RNATools.getGeneticCode(TranslationTable.UNIVERSAL);
+            assertNotNull(geneticCode);
+
+            // for the entire amino-acid alphabet, do the reverse lookup
+            // and then confirm that the Set of Symbols return is correct
+            FiniteAlphabet aaAlfa = ProteinTools.getTAlphabet();
+            assertNotNull(aaAlfa);
+
+            for (Iterator aaI = aaAlfa.iterator(); aaI.hasNext();) {
+                Symbol residue = (Symbol) aaI.next();
+
+                // get the List of codons that yield this amino-acid
+                Set codons = geneticCode.untranslate(residue);
+
+                // iterate thru the list confirming that they correspond
+                // to the expected amino-acid
+                for (Iterator codonI = codons.iterator(); codonI.hasNext(); ) {
+                    Symbol codon = (Symbol) codonI.next();
+
+                    // translate codon
+                    Symbol xlatedResidue = geneticCode.translate(codon);
+
+                    assertEquals(residue, xlatedResidue);
+                }
+            }
+        }
+        catch (IllegalSymbolException ise) {
+        }
+    }
+
     public void assertEquals(Symbol expected, Symbol actual) throws IllegalSymbolException {
         assertEquals(getRNATokenization().tokenizeSymbol(expected), getRNATokenization().tokenizeSymbol(actual));
     }
