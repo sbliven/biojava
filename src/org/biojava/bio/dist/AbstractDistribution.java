@@ -199,7 +199,15 @@ public abstract class AbstractDistribution implements Distribution {
         double sum = 0.0;
         double div = 0.0;
         for(Iterator i = fa.iterator(); i.hasNext(); ) {
-          AtomicSymbol as = (AtomicSymbol) i.next();
+          Object obj = i.next();
+          if(!(obj instanceof AtomicSymbol)) {
+            throw new BioError(
+              "Assertion Failure: Not an instance of AtomicSymbol: " +
+              obj
+            );
+          }
+          //AtomicSymbol as = (AtomicSymbol) i.next();
+          AtomicSymbol as = (AtomicSymbol) obj;
           double nm = getNullModel().getWeight(as);
           sum += getWeightImpl(as) * nm;
           div += nm;

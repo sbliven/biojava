@@ -169,9 +169,16 @@ implements Serializable {
   }
 
   public SimpleAlphabet(Set symbols, String name) {
-    this.symbols = symbols;
+    this.symbols = new HashSet();
     this.ambig = new HashSet();
     this.name = name;
     this.alphabets = null;
+    
+    // this costs, but I am tracking down a ClassCast exception.
+    // roll on parameterised types.
+    for(Iterator i = symbols.iterator(); i.hasNext(); ) {
+      AtomicSymbol a = (AtomicSymbol) i.next();
+      this.symbols.add(a);
+    }
   }
 }

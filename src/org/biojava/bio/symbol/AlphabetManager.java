@@ -202,7 +202,7 @@ public final class AlphabetManager {
     int indx = built.size();
     if(indx < symList.size()) {
       Symbol s = (Symbol) symList.get(indx);
-      if(s instanceof BasisSymbol) {
+      if(s instanceof AtomicSymbol) {
         built.add(s);
         return expandBasis(alpha, symList, built);
       } else {
@@ -462,14 +462,23 @@ public final class AlphabetManager {
         Iterator i = ((FiniteAlphabet) bs.getMatches()).iterator();
         while(i.hasNext()) {
           List built2 = new ArrayList(built);
-          built2.add((BasisSymbol) i.next());
+          built2.add((AtomicSymbol) i.next());
           syms.addAll(expandMatches(parent, symList, built2));
         }
         return syms;
       }
     } else {
       try {
-        return Collections.singleton(parent.getSymbol(built));
+        Symbol s = parent.getSymbol(built);
+        if(s instanceof AtomicSymbol) {
+          return Collections.singleton((AtomicSymbol) s);
+        } else {
+          Set syms = new HashSet();
+          for(Iterator i = ((FiniteAlphabet) s.getMatches()).iterator(); i.hasNext(); ) {
+            syms.add((AtomicSymbol) i.next());
+          }
+          return syms;
+        }
       } catch (IllegalSymbolException ise) {
         throw new BioError(ise, "Assertion Failure: Couldn't create symbol.");
       }
