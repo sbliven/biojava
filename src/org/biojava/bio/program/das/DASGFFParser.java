@@ -260,7 +260,7 @@ class DASGFFParser {
 	    // Right now we're not going to do the sequence instantiation here -- trust it to
 	    // the listener instead.
 
-	    ctemp.annotation = new SimpleAnnotation();
+	    ctemp.annotation = new SmallAnnotation();
 	    try {
 		ctemp.annotation.setProperty("sequence.id", refName);
 	    } catch (ChangeVetoException ex) {
@@ -286,7 +286,7 @@ class DASGFFParser {
 	}
 
 	if (temp.annotation == null) {
-	    temp.annotation = new SimpleAnnotation();
+	    temp.annotation = new SmallAnnotation();
 	}
 
 	try {

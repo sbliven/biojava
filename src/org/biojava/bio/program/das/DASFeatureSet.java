@@ -160,7 +160,7 @@ class DASFeatureSet implements FeatureHolder {
 		try {
 		    Feature f = null;
 		    if (temp.annotation == Annotation.EMPTY_ANNOTATION) {
-			temp.annotation = new SimpleAnnotation();
+			temp.annotation = new SmallAnnotation();
 		    } else {
 			if (temp.annotation.containsProperty(XFFFeatureSetHandler.PROPERTY_XFF_ID)) {
 			    temp.annotation.setProperty(DASSequence.PROPERTY_FEATUREID,

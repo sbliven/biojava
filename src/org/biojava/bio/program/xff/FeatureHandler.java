@@ -172,7 +172,7 @@ public class FeatureHandler extends StAXContentHandlerBase {
 	} else {
 	    Feature.Template ft = getFeatureTemplate();
 	    if (ft.annotation == null) {
-		ft.annotation = new SimpleAnnotation();
+		ft.annotation = new SmallAnnotation();
 	    }
 	    ft.annotation.setProperty(key, value);
 	}
