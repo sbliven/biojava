@@ -265,6 +265,18 @@ public abstract class DP {
     return sl;
   }
 
+  /**
+   * Returns a matrix for the specified States describing all
+   * valid Transitions between those States.
+   * <p>
+   * The matrix is 2-dimensional.  The primary array has an element
+   * corresponding to every State in the states argument.  That
+   * element is itself an array the elements of which identify 
+   * the States that can be reached from that State.  The destination States 
+   * are identified by their index within the states [] array.
+   * @param model MarkovModel to be analysed.
+   * @param states The States for which the transition matrix is to be determined.
+   */
   public static int[][] forwardTransitions(
           MarkovModel model,
           State[] states
