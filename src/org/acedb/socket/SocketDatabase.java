@@ -79,8 +79,9 @@ class SocketDatabase implements Database {
 
     synchronized void putSocket(AceSocket s) {
       if(s == null)
-        throw new AceError("Attemted to add a null socket");
-	socks.add(s);
+	  throw new AceError("Attemted to add a null socket");
+      if (! (s.isDefunct()))
+	  socks.add(s);
     }
 
     public Connection getConnection() throws AceException {
@@ -180,8 +181,8 @@ class SocketDatabase implements Database {
 		}
 		allClassesSet = set;
 	    } finally {
-//		if (sock != null)
-//		    putSocket(sock);
+		if (sock != null)
+		    putSocket(sock);
 	    }
 	}
 
@@ -198,6 +199,7 @@ class SocketDatabase implements Database {
 	    } catch (AceException ex) {
         ex.printStackTrace();
 		if (! ex.isRecoverable())
+
 		    throw ex;
 	    }
 	}
@@ -207,53 +209,50 @@ class SocketDatabase implements Database {
     private AceSet _select(String clazz, String namePattern)
 	                  throws AceException
     {
-	System.out.println("Selecting, clazz=" + clazz + ", pattern=" + namePattern);
-
 	AceSocket sock = null;
 	try {
 	    sock = takeSocket();
-      String _clazz = clazz;
-      _clazz = Ace.decode(clazz);
+	    String _clazz = clazz;
+	    _clazz = Ace.decode(clazz);
 	    String result = sock.transact(
-        "find " +
-        _clazz +
-        " " +
-			  namePattern
-      );
+					  "find " +
+					  _clazz +
+					  " " +
+					  namePattern
+					  );
 	    int mpos = result.indexOf("// Found ");
 	    if (mpos < 0)
 		return null; // FIXME?
-	    int numFound = Integer.parseInt(new StringTokenizer(
-                               result.substring(mpos + 9)).nextToken());
+	    int numFound = Integer.parseInt(new StringTokenizer(result.substring(mpos + 9)).nextToken());
 	    System.out.println("found "+numFound);
 
 	    result = sock.transact("list -j");
 	    StringTokenizer listToke = new StringTokenizer(result, "\r\n");
 	    List nameList = new ArrayList();
 	    while (listToke.hasMoreTokens()) {
-        String l = listToke.nextToken();
-        Ace.encode(l);
-        if (l.startsWith("?") && l.endsWith("?")) {
-          int indx = l.indexOf("?", 1);
-          String itemClazz = l.substring(1, indx);
-          String itemName = l.substring(indx+1, l.length()-1);
-          if(itemName.startsWith("\\?")) {
-            itemName = itemName.substring(1);
-          }
-          itemName = Ace.encode(itemName);
-          nameList.add(itemName);
-        }
+		String l = listToke.nextToken();
+		Ace.encode(l);
+		if (l.startsWith("?") && l.endsWith("?")) {
+		    int indx = l.indexOf("?", 1);
+		    String itemClazz = l.substring(1, indx);
+		    String itemName = l.substring(indx+1, l.length()-1);
+		    if(itemName.startsWith("\\?")) {
+			itemName = itemName.substring(1);
+		    }
+		    itemName = Ace.encode(itemName);
+		    nameList.add(itemName);
+		}
 	    }
 	    
 	    return new SocketResultSet(
-        this,
-        allClasses().retrieve(clazz),
-        nameList,
-				dbURL.relativeURL(clazz + '?' + namePattern)
-      );
+				       this,
+				       allClasses().retrieve(clazz),
+				       nameList,
+				       dbURL.relativeURL(clazz + '?' + namePattern)
+				       );
 	} finally {
-//	    if (sock != null)
-//		putSocket(sock);
+	    if (sock != null)
+		putSocket(sock);
 	}
     }
 
@@ -292,32 +291,32 @@ class SocketDatabase implements Database {
 	AceSocket sock = null;
 	try {
 	    sock = takeSocket();
-      String query =
-        "find " +
-        Ace.decode(clazz) +
-        " " +
-			  Ace.decode(name);
+	    String query =
+		"find " +
+		Ace.decode(clazz) +
+		" " +
+		Ace.decode(name);
 	    String result = sock.transact(query);
-      String tag = "// Found ";
-      int indx = result.indexOf(tag) + tag.length();
-      int spc = result.indexOf(" ", indx);
-      String bit = result.substring(indx, spc);
-      try {
-        int count = Integer.parseInt(result.substring(indx, spc));
-        if (count == 0) {
-          throw new AceException("Couldn't find object " + cacheName + " using query " + query + " - does it exist?");
-        } else if (count > 1) {
-          throw new AceException("Found multiple objects (" + count + ") with " + cacheName + " using query " + query);
-        }
-      } catch (NumberFormatException nfe) {
-        throw new AceError("Couldn't parse string '" + bit + "' at index " + indx + " to " + spc);
-      }
+	    String tag = "// Found ";
+	    int indx = result.indexOf(tag) + tag.length();
+	    int spc = result.indexOf(" ", indx);
+	    String bit = result.substring(indx, spc);
+	    try {
+		int count = Integer.parseInt(result.substring(indx, spc));
+		if (count == 0) {
+		    throw new AceException("Couldn't find object " + cacheName + " using query " + query + " - does it exist?");
+		} else if (count > 1) {
+		    throw new AceException("Found multiple objects (" + count + ") with " + cacheName + " using query " + query);
+		}
+	    } catch (NumberFormatException nfe) {
+		throw new AceError("Couldn't parse string '" + bit + "' at index " + indx + " to " + spc);
+	    }
 
 	    String obj = sock.transact("show -p");
 	    o = parser.parseObject(obj);
 	} finally {
-//      if(sock != null)
-//  	    putSocket(sock);
+	    if(sock != null)
+		putSocket(sock);
 	}
 
 	cacheObject(cacheName, o);

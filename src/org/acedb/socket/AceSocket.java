@@ -43,7 +43,6 @@ class AceSocket implements Connection {
     private final static String MSGENCORE = "ACESERV_MSGENCORE";
     private final static String MSGFAIL = "ACESERV_MSGFAIL";
     private final static String MSGKILL = "ACESERV_MSGKILL";
-
     private Socket sock;
     private DataInputStream dis;
     private DataOutputStream dos;
@@ -53,6 +52,7 @@ class AceSocket implements Connection {
     private int clientId = 0;
     private int encore = 0;
     private int maxBytes = 0;
+    private boolean defunct = false;
 
     public AceSocket(String host, int port, String user, String passwd) 
 	throws AceException 
@@ -89,6 +89,7 @@ class AceSocket implements Connection {
     }
 
     private void handleUnsolicited() throws AceException {
+	defunct = true;
 	throw new AceException("Unsolicited data from server!", true);
     }
 
@@ -171,7 +172,7 @@ class AceSocket implements Connection {
 	    return (char) ('a' + i-10);
     }
 
-    public static void main(String[] args) {
-	System.out.println(args[0] + " " + md5Sum(args[0], args[1]));
+    public boolean isDefunct() {
+	return defunct;
     }
 }
