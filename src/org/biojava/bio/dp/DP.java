@@ -303,6 +303,18 @@ public abstract class DP {
     return transitions;
   }
 
+  /**
+   * Compute the log(score) of all transitions
+   * between the specified States.
+   * <p>
+   * Note that all parameters <b>MUST</b> be
+   * consistent with each other!!!!
+   * <p>
+   * @param model The model for which the data is to be computed.
+   * @param states The States within that model for which scores are required.
+   * @param transitions The transition matrix obtained by calling forwardTransitions() with the above argument values.
+   * @param scoreType The type of score to be evaluated.
+   */
   public static double[][] forwardTransitionScores(
           MarkovModel model,
           State[] states,
