@@ -132,6 +132,51 @@ public final class AnnotationTools {
     }
     
     /**
+     * <p>
+     * Scans an Annotation with an AnnotationType and returns all Annotation
+     * instances matching a Type.
+     * </p>
+     *
+     * <p>This differs from AnnotationType.instanceOf()
+     * as it will descend into properties of an Annotation if that property is
+     * itself an Annotation. This allows you to scan a tree of Annotations for
+     * nodes in the tree of a particular shape.
+     * </p>
+     *
+     * @param ann  the Annotation to scan
+     * @param query  the AnnotationType to match against all nodes in the tree
+     * @for.users when trying to find interesting bits of data presented as
+     * Annotations.
+     * @for.developers as a fall-through implementation of AnnotationDB.search()
+     */
+    public static Set searchAnnotation(Annotation ann, AnnotationType query) {
+      Set hits = new HashSet();
+      searchAnnotation(ann, query, hits);
+      return hits;
+    }
+    
+    private static void searchAnnotation(Annotation ann, AnnotationType query, Set hits) {
+      if(query.instanceOf(ann)) {
+        hits.add(ann);
+      }
+      
+      for(Iterator i = ann.keys().iterator(); i.hasNext(); ) {
+        Object prop = i.next();
+        Object val = ann.getProperty(prop);
+        if(val instanceof Annotation) {
+          searchAnnotation((Annotation) val, query, hits);
+        } else if(prop instanceof Collection) {
+          for(Iterator vi = ((Collection) val).iterator(); vi.hasNext(); ) {
+            Object v = vi.next();
+            if(v instanceof Annotation) {
+              searchAnnotation((Annotation) v, query, hits);
+            }
+          }
+        }
+      }
+    }
+    
+    /**
      * Calculate an AnnotationType that matches all Annotation instances matched
      * by both types.
      *

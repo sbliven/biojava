@@ -37,7 +37,8 @@ import org.biojava.utils.*;
  * @author Greg Cox
  */
 public class BioStoreFactory {
-
+    public static final String STORE_NAME = "name";
+    
     /**
      * <code>PRIMARY_KEY_NAME</code> is the key used to identify the
      * primary namespace in the OBDA config.dat files.
@@ -50,15 +51,62 @@ public class BioStoreFactory {
      */
     public static final String KEYS = "secondary_namespaces";
 
+    /**
+     * AnnotationType that all meta-data files should fit.
+     */
+    public static final AnnotationType META_DATA_TYPE;
+    
+    static {
+      try {
+        META_DATA_TYPE = new AnnotationType.Impl();
+        META_DATA_TYPE.setDefaultConstraints(PropertyConstraint.ANY, CardinalityConstraint.ANY);
+        
+        META_DATA_TYPE.setConstraints(
+          BioStoreFactory.PRIMARY_KEY_NAME,
+          new PropertyConstraint.ByClass(String.class),
+          CardinalityConstraint.ONE
+        );
+        
+        META_DATA_TYPE.setConstraints(
+          "index",
+          new PropertyConstraint.ByClass(String.class),
+          CardinalityConstraint.ONE
+        );
+        
+        META_DATA_TYPE.setConstraints(
+          BioStoreFactory.KEYS,
+          new PropertyConstraint.ByClass(String.class),
+          CardinalityConstraint.ONE
+        );
+
+        META_DATA_TYPE.setConstraints(
+          "name",
+          new PropertyConstraint.ByClass(String.class),
+          CardinalityConstraint.ZERO_OR_ONE
+        );
+      } catch (Exception e) {
+        throw new NestedError(e);
+      }
+    }
+
     private File storeLoc;
     private String primaryKey;
     private Map keys;
+    private String name;
 
     /**
      * Creates a new <code>BioStoreFactory</code>.
      */
     public BioStoreFactory() {
         keys = new SmallMap();
+    }
+    
+    public void setStoreName(String name) {
+      this.name = name;
+    }
+    
+    public String getStoreName() {
+      return name;
     }
 
     /**
@@ -146,6 +194,10 @@ public class BioStoreFactory {
             ConfigFile ann = new ConfigFile(makeConfigFile(storeLoc));
             ann.setProperty("index", "flat/1");
 
+            if(name != null) {
+              ann.setProperty(STORE_NAME, name);
+            }
+            
             // primary key data
             ann.setProperty(PRIMARY_KEY_NAME, primaryKey);
 

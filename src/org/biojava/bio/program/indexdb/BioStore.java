@@ -39,11 +39,11 @@ import org.biojava.utils.io.*;
  */
 public class BioStore implements IndexStore {
     static Comparator STRING_CASE_SENSITIVE_ORDER = new Comparator() {
-            public int compare(Object a, Object b) {
-                return ((String) a).compareTo(b);
-            }
-        };
-
+      public int compare(Object a, Object b) {
+        return ((String) a).compareTo(b);
+      }
+    };
+    
     private ConfigFile metaData;
     private File location;
     private String primaryKey;
@@ -105,6 +105,21 @@ public class BioStore implements IndexStore {
         //System.out.println("Primary key: " + plFile);
 
         readFileIDs();
+    }
+    
+    /**
+     * The name of this store or null if the name has not been set.
+     */
+    public String getName() {
+      if(metaData.containsProperty(BioStoreFactory.STORE_NAME)) {
+        return (String) metaData.getProperty(BioStoreFactory.STORE_NAME);
+      } else {
+        return null;
+      }
+    }
+    
+    public File getLocation() {
+      return location;
     }
 
     private void readFileIDs()
