@@ -118,6 +118,8 @@ public class TabIndexStore implements IndexStore, Serializable {
       
       commitStore();
       
+      out.close();
+
       commited.putAll(uncommited);
       uncommited.clear();
     } catch (IOException ioe) {

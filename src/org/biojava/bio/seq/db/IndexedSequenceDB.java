@@ -123,10 +123,11 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
           hasNextSequence = format.readSequence(bReader, symParser, sb);
           Sequence seq = sb.makeSequence();
           String id = idMaker.calcID(seq);
-          pos = bReader.getFilePointer();
-          
+
           indexStore.store(new SimpleIndex(seqFile, pos, id));
-        }
+
+	  pos = bReader.getFilePointer();
+	}
         
         if(changeSupport == null) {
           indexStore.commit();
@@ -326,7 +327,7 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
 		skipInBuffer = buffFill - buffPos;
 	    }
 	    position += skipInBuffer;
-	    buffPos = buffFill;
+	    buffPos += skipInBuffer;
 
 	    if (n > skipInBuffer) {
 		long skippedInStream;
