@@ -74,7 +74,7 @@ public class SVM_Light {
       return sb.toString();
     }
 
-    public static SVMClassiferModel readModelFile(String fileName)
+    public static SVMClassifierModel readModelFile(String fileName)
         throws IOException
     {
 	BufferedReader r = new BufferedReader(new FileReader(fileName));
@@ -90,7 +90,7 @@ public class SVM_Light {
 
 	try {
 	    int size = Integer.parseInt(numSV);
-	    SVMClassifierModel model = new SVMClassifierModel();
+	    SimpleSVMClassifierModel model = new SimpleSVMClassifierModel();
 	    switch (Integer.parseInt(kType)) {
 	    case 0:
 		model.setKernel(SparseVector.kernel);

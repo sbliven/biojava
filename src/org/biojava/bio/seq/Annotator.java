@@ -45,7 +45,7 @@ public interface Annotator {
    * @return a database of all modified sequences
    */
   public SequenceDB annotate(SequenceDB sdb)
-  throws IllegalResidueException, java.io.IOException;
+  throws IllegalResidueException, SeqException;
   
   /**
    * Annotate this single sequence.
@@ -54,5 +54,5 @@ public interface Annotator {
    * annotated.
    */
   public boolean annotate(Sequence seq)
-  throws IllegalResidueException;
+  throws IllegalResidueException, SeqException;
 }

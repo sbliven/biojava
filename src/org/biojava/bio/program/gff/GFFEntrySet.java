@@ -36,7 +36,7 @@ public class GFFEntrySet {
   
   public Annotator getAnnotator() {
     return new AbstractAnnotator() {
-      public boolean annotate(Sequence seq) {
+      public boolean annotate(Sequence seq) throws SeqException {
         Feature.Template plain = new Feature.Template();
         StrandedFeature.Template stranded = new StrandedFeature.Template();
         boolean addedAny = false;

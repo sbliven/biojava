@@ -33,7 +33,7 @@ import java.util.*;
 public abstract class AbstractAnnotator implements Annotator {
 
   public SequenceDB annotate(SequenceDB sdb)
-        throws IllegalResidueException, java.io.IOException {
+        throws IllegalResidueException, SeqException {
     HashSequenceDB hitDB = new HashSequenceDB(null);
 
     for(Iterator i = sdb.ids().iterator(); i.hasNext(); ) {

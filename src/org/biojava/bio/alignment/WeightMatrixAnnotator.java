@@ -37,7 +37,7 @@ public class WeightMatrixAnnotator extends AbstractAnnotator {
   private double threshold;
 
   public boolean annotate(Sequence seq)
-         throws IllegalResidueException {
+         throws IllegalResidueException, SeqException {
     if(!(seq instanceof MutableFeatureHolder)) {
       return false;
     }

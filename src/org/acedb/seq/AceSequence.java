@@ -101,7 +101,7 @@ public class AceSequence implements Sequence {
    * Ace sequences are currently immutable. This may be changed in the future.
    * This method will always throw an UnsupportedOperationException.
    */
-  public Feature createFeature(MutableFeatureHolder fh, Feature.Template)
+  public Feature createFeature(MutableFeatureHolder fh, Feature.Template template)
   throws UnsupportedOperationException {
     throw new UnsupportedOperationException("ACeDB sequences can't be modified");
   }

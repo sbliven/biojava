@@ -67,5 +67,5 @@ public interface Sequence extends ResidueList, FeatureHolder, Annotatable {
    *         are of no use
    */
   Feature createFeature(MutableFeatureHolder fh, Feature.Template featureTemplate)
-  throws UnsupportedOperationException, IllegalArgumentException;
+  throws UnsupportedOperationException, IllegalArgumentException, SeqException;
 }

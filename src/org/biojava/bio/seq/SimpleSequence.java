@@ -132,8 +132,9 @@ public class SimpleSequence extends SimpleResidueList implements Sequence {
     return new SimpleFeatureHolder();
   }
 
-  public Feature createFeature(MutableFeatureHolder fh, Feature.Template template) {
-    Feature f = fFact.createFeature(this, template);
+  public Feature createFeature(MutableFeatureHolder fh, Feature.Template template)
+  throws SeqException {
+    Feature f = createFeatureFromTemplate(this, template);
     if(fh == this) {
       fh = this.getFeatureHolder();
     }
