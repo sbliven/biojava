@@ -44,6 +44,7 @@ class DASComponentFeature implements ComponentFeature {
     private final StrandedFeature.Strand strand;
     private final String type;
     private final String source;
+    private final Annotation annotation;
 
     private final String componentID;
 
@@ -70,6 +71,7 @@ class DASComponentFeature implements ComponentFeature {
 	this.strand = temp.strand;
 	this.type = temp.type;
 	this.source = temp.source;
+	this.annotation = temp.annotation;
 
 	if (temp.componentSequence != null) {
 	    componentSequence = (DASSequence) temp.componentSequence;
@@ -123,7 +125,7 @@ class DASComponentFeature implements ComponentFeature {
     }
 
     public Annotation getAnnotation() {
-	return Annotation.EMPTY_ANNOTATION;
+	return annotation;
     }
 
     public SymbolList getSymbols() {
