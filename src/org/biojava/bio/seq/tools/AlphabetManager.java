@@ -63,7 +63,7 @@ public class AlphabetManager {
   protected AlphabetManager() {
     try {
       URL alphabetURL =
-        getClass().getClassLoader().getResource("bio/seq/tools/AlphabetManager.xml");
+        getClass().getClassLoader().getResource("org/biojava/bio/seq/tools/AlphabetManager.xml");
       InputSource is = Resolver.createInputSource(alphabetURL, true);
       Document doc = XmlDocument.createXmlDocument(is, true);
 
