@@ -20,16 +20,23 @@ public class LargeBuffer {
    * try to write a double to the last byte in a buffer. So, 
    */
 
-  private static long PAGE_SIZE = Integer.MAX_VALUE - Constants.BYTES_IN_LONG;
-  private static long PAGE_OVERLAP = Constants.BYTES_IN_LONG;
+  private static final long PAGE_SIZE;
+  private static final long PAGE_OVERLAP;
   
   static {
     PAGE_OVERLAP = Constants.BYTES_IN_LONG;
-    PAGE_SIZE = Integer.MAX_VALUE - PAGE_OVERLAP;
+    PAGE_SIZE = Integer.MAX_VALUE / 2 - PAGE_OVERLAP;
   }
   
-  private List buffers;
+  private final long pos;
+  private final long size;
+  private final FileChannel channel;
+  private final FileChannel.MapMode mode;
+
   private long position = 0;
+  private int lastBufferIndex = -1;
+  private MappedByteBuffer lastBuffer = null;
+  
   
   public LargeBuffer(
     FileChannel channel,
@@ -37,235 +44,243 @@ public class LargeBuffer {
     long pos,
     long size
   ) throws IOException {
-    buffers = new ArrayList();
-    
-    while(true) {
-      if(size > PAGE_SIZE) {
-        buffers.add(channel.map(mode, pos, PAGE_SIZE + PAGE_OVERLAP));
-        
-        pos  += PAGE_SIZE;
-        size -= PAGE_SIZE;
-      } else {
-        buffers.add(channel.map(mode, pos, size));
-        
-        break;
-      }
+    this.channel = channel;
+    this.mode = mode;
+    this.pos = pos;
+    this.size = size;
+  }
+  
+  private MappedByteBuffer getBuffer(int index)
+  throws IOException {
+    if(index != lastBufferIndex) {
+      System.out.println("Allocating page: " + index);
+      long offset = PAGE_SIZE * index;
+      System.out.println("From: " + (pos + offset));
+      System.out.println("Size: " + Math.min(size - offset, PAGE_SIZE + PAGE_OVERLAP));
+      lastBuffer = channel.map(
+        mode,
+        pos + offset,
+        Math.min(size - offset, PAGE_SIZE + PAGE_OVERLAP)
+      );
+      lastBufferIndex = index;
     }
+    
+    return lastBuffer;
   }
   
   public byte get(long pos)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     int offset = getOffset(pos);
     int index = getIndex(pos);
     
-    MappedByteBuffer buffer = (MappedByteBuffer) buffers.get(index);
+    MappedByteBuffer buffer = getBuffer(index);
     return buffer.get(offset);
   }
   
   public byte get()
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     byte val = get(position);
     position += Constants.BYTES_IN_BYTE;
     return val;
   }
   
   public void put(long pos, byte b)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     int offset = getOffset(pos);
     int index = getIndex(pos);
     
-    MappedByteBuffer buffer = (MappedByteBuffer) buffers.get(index);
+    MappedByteBuffer buffer = getBuffer(index);
     buffer.put(offset, b);
   }
   
   public void put(byte val)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     put(position, val);
     position += Constants.BYTES_IN_BYTE;
   }
   
   public char getChar(long pos)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     int offset = getOffset(pos);
     int index = getIndex(pos);
     
-    MappedByteBuffer buffer = (MappedByteBuffer) buffers.get(index);
+    MappedByteBuffer buffer = getBuffer(index);
     return buffer.getChar(offset);
   }
   
   public char getChar()
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     char val = getChar(position);
     position += Constants.BYTES_IN_CHAR;
     return val;
   }
   
   public void putChar(long pos, char c)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     int offset = getOffset(pos);
     int index = getIndex(pos);
     
-    MappedByteBuffer buffer = (MappedByteBuffer) buffers.get(index);
+    MappedByteBuffer buffer = getBuffer(index);
     buffer.putChar(offset, c);
   }
   
   public void putChar(char val)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     putChar(position, val);
     position += Constants.BYTES_IN_CHAR;
   }
   
   public double getDouble(long pos)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     int offset = getOffset(pos);
     int index = getIndex(pos);
     
-    MappedByteBuffer buffer = (MappedByteBuffer) buffers.get(index);
+    MappedByteBuffer buffer = getBuffer(index);
     return buffer.getDouble(offset);
   }
   
   public double getDouble()
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     double val = getDouble(position);
     position += Constants.BYTES_IN_DOUBLE;
     return val;
   }
   
   public void putDouble(long pos, double d)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     int offset = getOffset(pos);
     int index = getIndex(pos);
     
-    MappedByteBuffer buffer = (MappedByteBuffer) buffers.get(index);
+    MappedByteBuffer buffer = getBuffer(index);
     buffer.putDouble(offset, d);
   }
   
   public void putDouble(double val)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     putDouble(position, val);
     position += Constants.BYTES_IN_DOUBLE;
   }
   
   public float getFloat(long pos)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     int offset = getOffset(pos);
     int index = getIndex(pos);
     
-    MappedByteBuffer buffer = (MappedByteBuffer) buffers.get(index);
+    MappedByteBuffer buffer = getBuffer(index);
     return buffer.getFloat(offset);
   }
   
   public float getFloat()
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     float val = getFloat(position);
     position += Constants.BYTES_IN_FLOAT;
     return val;
   }
   
   public void putFloat(long pos, float f)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     int offset = getOffset(pos);
     int index = getIndex(pos);
     
-    MappedByteBuffer buffer = (MappedByteBuffer) buffers.get(index);
+    MappedByteBuffer buffer = getBuffer(index);
     buffer.putFloat(offset, f);
   }
   
   public void putFloat(float val)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     putFloat(position, val);
     position += Constants.BYTES_IN_FLOAT;
   }
   
   public int getInt(long pos)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     int offset = getOffset(pos);
     int index = getIndex(pos);
     
-    MappedByteBuffer buffer = (MappedByteBuffer) buffers.get(index);
+    MappedByteBuffer buffer = getBuffer(index);
     return buffer.getInt(offset);
   }
   
   public int getInt()
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     int val = getInt(position);
     position += Constants.BYTES_IN_INT;
     return val;
   }
   
   public void putInt(long pos, int i)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     int offset = getOffset(pos);
     int index = getIndex(pos);
     
-    MappedByteBuffer buffer = (MappedByteBuffer) buffers.get(index);
+    MappedByteBuffer buffer = getBuffer(index);
     buffer.putInt(offset, i);
   }
   
   public void putInt(int val)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     putInt(position, val);
     position += Constants.BYTES_IN_INT;
   }
   
   public long getLong(long pos)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     int offset = getOffset(pos);
     int index = getIndex(pos);
     
-    MappedByteBuffer buffer = (MappedByteBuffer) buffers.get(index);
+    MappedByteBuffer buffer = getBuffer(index);
     return buffer.getLong(offset);
   }
   
   public long getLong()
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     long val = getLong(position);
     position += Constants.BYTES_IN_LONG;
     return val;
   }
   
   public void putLong(long pos, long l)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     int offset = getOffset(pos);
     int index = getIndex(pos);
     
-    MappedByteBuffer buffer = (MappedByteBuffer) buffers.get(index);
+    MappedByteBuffer buffer = getBuffer(index);
     buffer.putLong(offset, l);
   }
   
   public void putLong(long val)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     putLong(position, val);
     position += Constants.BYTES_IN_LONG;
   }
   
   public short getShort(long pos)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     int offset = getOffset(pos);
     int index = getIndex(pos);
     
-    MappedByteBuffer buffer = (MappedByteBuffer) buffers.get(index);
+    MappedByteBuffer buffer = getBuffer(index);
     return buffer.getShort(offset);
   }
   
   public short getShort()
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     short val = getShort(position);
     position += Constants.BYTES_IN_SHORT;
     return val;
   }
   
   public void putShort(long pos, short s)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     int offset = getOffset(pos);
     int index = getIndex(pos);
     
-    MappedByteBuffer buffer = (MappedByteBuffer) buffers.get(index);
+    MappedByteBuffer buffer = getBuffer(index);
     buffer.putShort(offset, s);
   }
   
   public void putShort(short val)
-  throws IndexOutOfBoundsException {
+  throws IndexOutOfBoundsException, IOException {
     putShort(position, val);
     position += Constants.BYTES_IN_SHORT;
   }
@@ -278,7 +293,11 @@ public class LargeBuffer {
     this.position = pos;
   }
   
-  private int getOffset(long pos) {
+  private int getOffset(long pos)
+  throws IndexOutOfBoundsException {
+    if(pos > size) {
+      throw new IndexOutOfBoundsException();
+    }
     return (int) (pos % PAGE_SIZE);
   }
   
@@ -287,9 +306,9 @@ public class LargeBuffer {
   }
   
   public void force() {
-    for(Iterator i = buffers.iterator(); i.hasNext(); ) {
-      MappedByteBuffer buff = (MappedByteBuffer) i.next();
-      buff.force();
-    }
+//    for(Iterator i = buffers.iterator(); i.hasNext(); ) {
+//      MappedByteBuffer buff = (MappedByteBuffer) i.next();
+//      buff.force();
+//    }
   }
 }
