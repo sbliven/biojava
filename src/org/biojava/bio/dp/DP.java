@@ -102,8 +102,10 @@ public abstract class DP {
     HMMOrderByTransition comp = new HMMOrderByTransition(mm);
     List dotStates = new LinkedList();
     for (Iterator addStates = alpha.iterator(); addStates.hasNext(); ) {
-	    Object state = addStates.next();
-	    if (state instanceof EmissionState) {
+      Object state = addStates.next();
+      if(state instanceof MagicalState) {
+        emissionStates.add(0, state);
+      } else if (state instanceof EmissionState) {
         emissionStates.add(state);
       } else {
         ListIterator checkOld = dotStates.listIterator();
@@ -568,7 +570,7 @@ public abstract class DP {
       }
 	    State s1 = (State) o1;
 	    State s2 = (State) o2;
-
+        
 	    if (transitionsTo(s1, s2)) {
         return LESS_THAN;
       }

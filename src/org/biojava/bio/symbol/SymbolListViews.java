@@ -29,6 +29,8 @@ package org.biojava.bio.symbol;
  */
 
 public class SymbolListViews {
+  private SymbolListViews() {}
+  
     /**
      * An n-th order view of another SymbolList.
      * <p>

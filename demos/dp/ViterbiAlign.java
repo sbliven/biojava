@@ -89,7 +89,9 @@ public class ViterbiAlign {
       MarkovModel model = XmlMarkovModel.readModel(doc.getDocumentElement());
 
       // make alphabets
-      Alphabet alpha = model.emissionAlphabet();
+      Alphabet modelAlpha = model.emissionAlphabet();
+      Alphabet alpha = (Alphabet) (modelAlpha.getAlphabets().get(0));
+      
       SymbolParser rParser = alpha.getParser("token");
 
       // make dp object
@@ -106,7 +108,7 @@ public class ViterbiAlign {
           seqI.hasNext(); )
       {
         Sequence seq = seqI.nextSequence();
-        SymbolList [] rl = { seq };
+        SymbolList [] rl = { SymbolListViews.orderNSymbolList(seq, modelAlpha.getAlphabets().size() ) };
         StatePath statePath = dp.viterbi(rl, ScoreType.PROBABILITY);
 		
         double fScore = dp.forward(rl, ScoreType.PROBABILITY);

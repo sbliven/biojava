@@ -14,19 +14,7 @@ import org.biojava.utils.*;
  * @author Matthew Pocock
  * @since 1.2
  */
-public class QueryBuilder {
-  private final Set nodes;
-  private final Map operationsToLabel;
-  private final Map arcsFrom;
-  private final Map arcsTo;
-  
-  {
-    nodes = new HashSet();
-    operationsToLabel = new HashMap();
-    arcsFrom = new HashMap();
-    arcsTo = new HashMap();
-  }
-  
+public class QueryBuilder extends QueryData {
   public void addQuery(Query query) {
     for(
       Iterator i = query.getArcsToOperators().entrySet().iterator();
@@ -44,38 +32,6 @@ public class QueryBuilder {
         throw new NestedError(oe, "This should never happen");
       }
     }
-  }
-  
-  public Set getNodes() {
-    return nodes;
-  }
-  
-  public Set getOperations(Arc arc) {
-    Set ops = (Set) operationsToLabel.get(arc);
-    if(ops == null) {
-      ops = Collections.EMPTY_SET;
-    }
-    return ops;
-  }
-  
-  public Map getArcsToOperators() {
-    return operationsToLabel;
-  }
-  
-  public Set getArcsFrom(Node from) {
-    Set fromSet = (Set) arcsFrom.get(from);
-    if(fromSet == null) {
-      fromSet = Collections.EMPTY_SET;
-    }
-    return fromSet;
-  }
-  
-  public Set getArcsTo(Node to) {
-    Set toSet = (Set) arcsTo.get(to);
-    if(toSet == null) {
-      toSet = Collections.EMPTY_SET;
-    }
-    return toSet;
   }
   
   public void addNode(Node node) {

@@ -126,6 +126,19 @@ public class XmlMarkovModel {
     nameToState.put("_START_", model.magicalState());
     nameToState.put("_END_", model.magicalState());
     NodeList states = root.getElementsByTagName("state");
+    DistributionFactory dFact;
+    if( (seqAlpha.getAlphabets().size() > 1) &&
+        seqAlpha.getAlphabets().equals(
+          Collections.nCopies(
+            seqAlpha.getAlphabets().size(),
+            seqAlpha.getAlphabets().get(0)
+          )
+        )
+    ) {
+      dFact = OrderNDistributionFactory.DEFAULT;
+    } else {
+      dFact = DistributionFactory.DEFAULT;
+    }
     for(int i = 0; i < states.getLength(); i++) {
       Element stateE = (Element) states.item(i);
       String name = stateE.getAttribute("name");
@@ -139,6 +152,9 @@ public class XmlMarkovModel {
       for(int j = 0; j < weights.getLength(); j++) {
         Element weightE = (Element) weights.item(j);
         String symName = weightE.getAttribute("res");
+        if(symName == null || "".equals(symName)) {
+          symName = weightE.getAttribute("sym");
+        }
         Symbol sym;
         if(symName.length() == 1) {
           if(symbolParser != null) {
@@ -147,10 +163,14 @@ public class XmlMarkovModel {
             sym = nameParser.parseToken(symName);
           }
         } else {
-          if(nameParser != null) {
-            sym = nameParser.parseToken(symName);
-          } else {
-            sym = symbolParser.parseToken(symName);
+          try {
+            if(nameParser != null) {
+              sym = nameParser.parseToken(symName);
+            } else {
+              sym = symbolParser.parseToken(symName);
+            }
+          } catch (IllegalSymbolException ise) {
+            throw new BioException(ise, "Can't extract symbol from " + weightE + " in " + stateE);
           }
         }
         try {

@@ -82,12 +82,21 @@ public class SingleDP extends DP implements Serializable {
       int dsi = getDotStatesIndex();
       em = new double[dsi];
       State [] states = getStates();
-      for(int i = 0; i < dsi; i++) {
+      if(sym == AlphabetManager.getGapSymbol()) {
+        em[0] = 0;
+      } else {
+        em[0] = Double.NEGATIVE_INFINITY;
+      }
+      for(int i = 1; i < dsi; i++) {
         EmissionState es = (EmissionState) states[i];
         Distribution dis = es.getDistribution();
         em[i] = Math.log(scoreType.calculateScore(dis, sym));
       }
       emissions.put(sym, em);
+      /*System.out.println("Emissions for " + sym);
+      for(int i = 0; i < em.length; i++) {
+        System.out.println("\t" + states[i] + "\t-> " + em[i]);
+      }*/
     }
     return em;
   }
@@ -512,7 +521,7 @@ public class SingleDP extends DP implements Serializable {
       //System.out.println(sym.getName());
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
-      for (int l = 0; l < states.length; l++) {
+      for (int l = 0; l < states.length; l++) { // don't move from magical state
         double emission;
         if(l < getDotStatesIndex()) {
           emission = emissions[l];
@@ -635,6 +644,7 @@ public class SingleDP extends DP implements Serializable {
 
     /*System.out.println("Counted " + emC + " emissions and " + dotC + " dots");
     System.out.println("Counted backpointers. Alignment of length " + len);
+    System.out.println("Counted states " + stateList.size());
     System.out.println("Input list had length " + dpCursor.symList().length());
     System.out.println("Added gaps: " + gaps);
     System.out.println("Gapped view has length " + symView.length());*/

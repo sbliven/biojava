@@ -92,7 +92,7 @@ public class CrossProductSymbolNameParser implements SymbolParser, Serializable 
   throws IllegalSymbolException {
     if(!token.startsWith("(") || !token.endsWith(")")) {
       throw new IllegalSymbolException(
-        "Can't parse " + token + " as it is not bracketed"
+        "Can't parse '" + token + "' as it is not bracketed"
       );
     }
     
@@ -124,17 +124,26 @@ public class CrossProductSymbolNameParser implements SymbolParser, Serializable 
           );
         }
       } else {
-        int j = token.indexOf(", ", i);
+        int comma = token.indexOf(",", i);
+        int space = token.indexOf(" ", i);
+        int j;
+        if(comma == -1) {
+          j = space;
+        } else if(space == -1) {
+          j = comma;
+        } else {
+          j = Math.min(comma, space);
+        }
         if(j < 0) {
           rList.add(parser[rList.size()].parseToken(
-            token.substring(i)
+            token.substring(i).trim()
           ));
           i = token.length();
         } else {
           rList.add(parser[rList.size()].parseToken(
-            token.substring(i, j)
+            token.substring(i, j).trim()
           ));
-          i = j + ", ".length();
+          i = j + 1;
         }
       }
     }
