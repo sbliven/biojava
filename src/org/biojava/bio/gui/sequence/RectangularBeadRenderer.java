@@ -48,6 +48,16 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
     protected Rectangle2D rect;
 
     /**
+     * Creates a new <code>RectangularBeadRenderer</code> with the
+     * default settings.
+     */
+    public RectangularBeadRenderer()
+    {
+        super();
+        rect = new Rectangle2D.Double();
+    }
+
+    /**
      * Creates a new <code>RectangularBeadRenderer</code>.
      *
      * @param beadDepth a <code>double</code>.
@@ -62,7 +72,7 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
                                    Paint  beadFill,
                                    Stroke beadStroke)
     {
-	super(beadDepth, beadDisplacement, beadOutline, beadFill, beadStroke);
+        super(beadDepth, beadDisplacement, beadOutline, beadFill, beadStroke);
         rect = new Rectangle2D.Double();
     }
 
@@ -83,43 +93,43 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
         int max = loc.getMax();
         int dif = max - min;
 
-	if (context.getDirection() == context.HORIZONTAL)
-	{
-	    double  posXW = context.sequenceToGraphics(min);
-	    double  posYN = beadDisplacement;
-	    double  width = Math.max(((double) (dif + 1)) * context.getScale(), 1.0);
-	    double height = Math.min(beadDepth, width / 2.0);
+        if (context.getDirection() == context.HORIZONTAL)
+        {
+            double  posXW = context.sequenceToGraphics(min);
+            double  posYN = beadDisplacement;
+            double  width = Math.max(((double) (dif + 1)) * context.getScale(), 1.0);
+            double height = Math.min(beadDepth, width / 2.0);
 
-	    // If the bead height occupies less than the full height
-	    // of the renderer, move it down so that it is central
-	    if (height < beadDepth)
-		posYN += ((beadDepth - height) / 2.0);
+            // If the bead height occupies less than the full height
+            // of the renderer, move it down so that it is central
+            if (height < beadDepth)
+                posYN += ((beadDepth - height) / 2.0);
 
-	    rect.setRect(posXW, posYN,
+            rect.setRect(posXW, posYN,
                          Math.floor(width),
                          Math.floor(height));
-	}
-	else
-	{
-	    double  posXW = beadDisplacement;
-	    double  posYN = context.sequenceToGraphics(min);
-	    double height = Math.max(((double) dif + 1) * context.getScale(), 1.0);
-	    double  width = Math.min(beadDepth, height / 2.0);
+        }
+        else
+        {
+            double  posXW = beadDisplacement;
+            double  posYN = context.sequenceToGraphics(min);
+            double height = Math.max(((double) dif + 1) * context.getScale(), 1.0);
+            double  width = Math.min(beadDepth, height / 2.0);
 
-	    if (width < beadDepth)
-		posXW += ((beadDepth - width) /  2.0);
+            if (width < beadDepth)
+                posXW += ((beadDepth - width) /  2.0);
 
-	    rect.setRect(posXW, posYN,
+            rect.setRect(posXW, posYN,
                          Math.floor(width),
                          Math.floor(height));
-	}
+        }
 
-	g2.setPaint(beadFill);
-	g2.fill(rect);
+        g2.setPaint(beadFill);
+        g2.fill(rect);
 
-	g2.setStroke(beadStroke);
-	g2.setPaint(beadOutline);
-	g2.draw(rect);
+        g2.setStroke(beadStroke);
+        g2.setPaint(beadOutline);
+        g2.draw(rect);
     }
 
     /**
@@ -132,8 +142,8 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
      */
     public double getDepth(final SequenceRenderContext context)
     {
-	// Get max depth of delegates using base class method
-  	double maxDepth = super.getDepth(context);
-  	return Math.max(maxDepth, (beadDepth + beadDisplacement));
+        // Get max depth of delegates using base class method
+        double maxDepth = super.getDepth(context);
+        return Math.max(maxDepth, (beadDepth + beadDisplacement));
     }
 }

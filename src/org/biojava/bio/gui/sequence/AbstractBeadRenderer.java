@@ -84,45 +84,45 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * Y-axis displacement of the features.
      */
     public static final ChangeType DISPLACEMENT =
-	new ChangeType("The displacement of the features has changed",
-		       "org.biojava.bio.gui.sequence.AbstractBeadRenderer",
-		       "DISPLACEMENT", SequenceRenderContext.LAYOUT);
+        new ChangeType("The displacement of the features has changed",
+                       "org.biojava.bio.gui.sequence.AbstractBeadRenderer",
+                       "DISPLACEMENT", SequenceRenderContext.LAYOUT);
     
     /**
      * Constant <code>DEPTH</code> indicating a change to the depth of
      * the renderer.
      */
     public static final ChangeType DEPTH =
-	new ChangeType("The depth of the renderer has changed",
-		       "org.biojava.bio.gui.sequence.AbstractBeadRenderer",
-		       "DEPTH", SequenceRenderContext.LAYOUT);
+        new ChangeType("The depth of the renderer has changed",
+                       "org.biojava.bio.gui.sequence.AbstractBeadRenderer",
+                       "DEPTH", SequenceRenderContext.LAYOUT);
 
     /**
      * Constant <code>OUTLINE</code> indicating a change to the
      * outline paint of the features.
      */
     public static final ChangeType OUTLINE =
-	new ChangeType("The outline of the features has changed",
-		       "org.biojava.bio.gui.sequence.AbstractBeadRenderer",
-		       "OUTLINE", SequenceRenderContext.REPAINT);
+        new ChangeType("The outline of the features has changed",
+                       "org.biojava.bio.gui.sequence.AbstractBeadRenderer",
+                       "OUTLINE", SequenceRenderContext.REPAINT);
 
     /**
      * Constant <code>STROKE</code> indicating a change to the outline
      * stroke of the features.
      */
     public static final ChangeType STROKE =
-	new ChangeType("The stroke of the features has changed",
-		       "org.biojava.bio.gui.sequence.AbstractBeadRenderer",
-		       "STROKE", SequenceRenderContext.REPAINT);
-    
+        new ChangeType("The stroke of the features has changed",
+                       "org.biojava.bio.gui.sequence.AbstractBeadRenderer",
+                       "STROKE", SequenceRenderContext.REPAINT);
+
     /**
      * Constant <code>FILL</code> indicating a change to the fill of
      * the features.
      */
     public static final ChangeType FILL =
-	new ChangeType("The fill of the features has changed",
-		       "org.biojava.bio.gui.sequence.AbstractBeadRenderer",
-		       "FILL", SequenceRenderContext.REPAINT);
+        new ChangeType("The fill of the features has changed",
+                       "org.biojava.bio.gui.sequence.AbstractBeadRenderer",
+                       "FILL", SequenceRenderContext.REPAINT);
 
     protected double        beadDepth;
     protected double beadDisplacement;
@@ -140,7 +140,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      */
     public AbstractBeadRenderer()
     {
-	this(10.0f, 0.0f, Color.black, Color.black, new BasicStroke());
+        this(10.0f, 0.0f, Color.black, Color.black, new BasicStroke());
     }
 
     /**
@@ -158,14 +158,14 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
                                 Paint  beadFill,
                                 Stroke beadStroke)
     {
-	this.beadDepth        = beadDepth;
-	this.beadDisplacement = beadDisplacement;
-	this.beadOutline      = beadOutline;
-	this.beadFill         = beadFill;
-	this.beadStroke       = beadStroke;
+        this.beadDepth        = beadDepth;
+        this.beadDisplacement = beadDisplacement;
+        this.beadOutline      = beadOutline;
+        this.beadFill         = beadFill;
+        this.beadStroke       = beadStroke;
 
-	delegates = new HashMap();
-	cache     = new Cache();
+        delegates = new HashMap();
+        cache     = new Cache();
     }
 
     /**
@@ -179,10 +179,10 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * @return a <code>FeatureHolder</code>.
      */
     public FeatureHolder processMouseEvent(final FeatureHolder         holder,
-					   final SequenceRenderContext context,
-					   final MouseEvent            mEvent)
+                                           final SequenceRenderContext context,
+                                           final MouseEvent            mEvent)
     {
-	return holder;
+        return holder;
     }
 
     /**
@@ -198,37 +198,37 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
                               final Feature               f,
                               final SequenceRenderContext context)
     {
-	// Check the cache first
-	if (cache.containsKey(f))
-	{
-	    // System.err.println("Used cache for: " + f);
+        // Check the cache first
+        if (cache.containsKey(f))
+        {
+            // System.err.println("Used cache for: " + f);
 
-	    BeadFeatureRenderer cachedRenderer =
-		(BeadFeatureRenderer) cache.get(f);
+            BeadFeatureRenderer cachedRenderer =
+                (BeadFeatureRenderer) cache.get(f);
 
-	    cachedRenderer.renderBead(g2, f, context);
-	    return;
-	}
+            cachedRenderer.renderBead(g2, f, context);
+            return;
+        }
 
-	for (Iterator di = delegates.keySet().iterator(); di.hasNext();)
-	{
-	    FeatureFilter filter = (FeatureFilter) di.next();
+        for (Iterator di = delegates.keySet().iterator(); di.hasNext();)
+        {
+            FeatureFilter filter = (FeatureFilter) di.next();
 
-	    if (filter.accept(f))
-	    {
-		// System.err.println(filter + " accepted " + f);
+            if (filter.accept(f))
+            {
+                // System.err.println(filter + " accepted " + f);
 
-		FeatureRenderer delegate =
-		    (FeatureRenderer) delegates.get(filter);
+                FeatureRenderer delegate =
+                    (FeatureRenderer) delegates.get(filter);
 
-		delegate.renderFeature(g2, f, context);
-		return;
-	    }
-	}
+                delegate.renderFeature(g2, f, context);
+                return;
+            }
+        }
 
-	cache.put(f, this);
-	// System.err.println("Rendering: " + f);
-	renderBead(g2, f, context);
+        cache.put(f, this);
+        // System.err.println("Rendering: " + f);
+        renderBead(g2, f, context);
     }
 
     /**
@@ -247,34 +247,34 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * disjoint with existing delegate filters.
      */
     public void setDelegateRenderer(final OptimizableFilter   filter,
-				    final BeadFeatureRenderer renderer)
-	throws IllegalArgumentException
+                                    final BeadFeatureRenderer renderer)
+        throws IllegalArgumentException
     {
-	Set delegateFilters = delegates.keySet();
+        Set delegateFilters = delegates.keySet();
 
-	if (delegateFilters.size() == 0)
-	{
-	    delegates.put(filter, renderer);
-	}
-	else
-	{
-	    for (Iterator fi = delegateFilters.iterator(); fi.hasNext();)
-	    {
-		OptimizableFilter thisFilter = (OptimizableFilter) fi.next();
+        if (delegateFilters.size() == 0)
+        {
+            delegates.put(filter, renderer);
+        }
+        else
+        {
+            for (Iterator fi = delegateFilters.iterator(); fi.hasNext();)
+            {
+                OptimizableFilter thisFilter = (OptimizableFilter) fi.next();
 
-		if (! thisFilter.isDisjoint(filter))
-		{
-		    throw new IllegalArgumentException("Failed to apply filter as it clashes with existing filter "
-						       + thisFilter
-						       + " (filters must be disjoint)");
-		}
-		else
-		{
-		    delegates.put(filter, renderer);
-		    break;
-		}
-	    }
-	}
+                if (! thisFilter.isDisjoint(filter))
+                {
+                    throw new IllegalArgumentException("Failed to apply filter as it clashes with existing filter "
+                                                       + thisFilter
+                                                       + " (filters must be disjoint)");
+                }
+                else
+                {
+                    delegates.put(filter, renderer);
+                    break;
+                }
+            }
+        }
     }
 
     /**
@@ -292,22 +292,22 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      */
     public double getDepth(final SequenceRenderContext context)
     {
-	Collection delegateRenderers = delegates.values();
-	double maxDepth = 0.0;
+        Collection delegateRenderers = delegates.values();
+        double maxDepth = 0.0;
 
-	if (delegateRenderers.size() == 0)
-	{
-	    return maxDepth + 1.0;
-	}
-	else
-	{
-	    for (Iterator ri = delegateRenderers.iterator(); ri.hasNext();)
-	    {
-		maxDepth = Math.max(maxDepth, ((FeatureRenderer) ri.next()).getDepth(context));
-	    }
+        if (delegateRenderers.size() == 0)
+        {
+            return maxDepth + 1.0;
+        }
+        else
+        {
+            for (Iterator ri = delegateRenderers.iterator(); ri.hasNext();)
+            {
+                maxDepth = Math.max(maxDepth, ((FeatureRenderer) ri.next()).getDepth(context));
+            }
 
-	    return maxDepth + 1.0;
-	}
+            return maxDepth + 1.0;
+        }
     }
 
     /**
@@ -318,7 +318,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      */
     public double getBeadDepth()
     {
-	return beadDepth;
+        return beadDepth;
     }
 
     /**
@@ -331,25 +331,25 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      */
     public void setBeadDepth(final double depth) throws ChangeVetoException
     {
-	if (hasListeners())
-	{
-	    ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
-	    synchronized(cs)
-	    {
-		ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.LAYOUT,
-						 null, null,
-						 new ChangeEvent(this, DEPTH,
-								 new Double(beadDepth),
-								 new Double(depth)));
-		cs.firePreChangeEvent(ce);
-		beadDepth = depth;
-		cs.firePostChangeEvent(ce);
-	    }
-	}
-	else
-	{
-	    beadDepth = depth;
-	}
+        if (hasListeners())
+        {
+            ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
+            synchronized(cs)
+            {
+                ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.LAYOUT,
+                                                 null, null,
+                                                 new ChangeEvent(this, DEPTH,
+                                                                 new Double(beadDepth),
+                                                                 new Double(depth)));
+                cs.firePreChangeEvent(ce);
+                beadDepth = depth;
+                cs.firePostChangeEvent(ce);
+            }
+        }
+        else
+        {
+            beadDepth = depth;
+        }
     }
 
     /**
@@ -362,7 +362,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      */
     public double getBeadDisplacement()
     {
-	return beadDisplacement;
+        return beadDisplacement;
     }
 
     /**
@@ -378,25 +378,25 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
     public void setBeadDisplacement(final double displacement)
         throws ChangeVetoException
     {
-	if (hasListeners())
-	{
-	    ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
-	    synchronized(cs)
-	    {
-		ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.LAYOUT,
-						 null, null,
-						 new ChangeEvent(this, DISPLACEMENT,
-								 new Double(beadDisplacement),
-								 new Double(displacement)));
-		cs.firePreChangeEvent(ce);
-		beadDisplacement = displacement;
-		cs.firePostChangeEvent(ce);
-	    }
-	}
-	else
-	{
-	    beadDisplacement = displacement;
-	}
+        if (hasListeners())
+        {
+            ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
+            synchronized(cs)
+            {
+                ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.LAYOUT,
+                                                 null, null,
+                                                 new ChangeEvent(this, DISPLACEMENT,
+                                                                 new Double(beadDisplacement),
+                                                                 new Double(displacement)));
+                cs.firePreChangeEvent(ce);
+                beadDisplacement = displacement;
+                cs.firePostChangeEvent(ce);
+            }
+        }
+        else
+        {
+            beadDisplacement = displacement;
+        }
     }
 
     /**
@@ -406,7 +406,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      */
     public Paint getBeadOutline()
     {
-	return beadOutline;
+        return beadOutline;
     }
 
     /**
@@ -418,25 +418,25 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      */
     public void setBeadOutline(final Paint outline) throws ChangeVetoException
     {
-	if (hasListeners())
-	{
-	    ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
-	    synchronized(cs)
-	    {
-		ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.LAYOUT,
-						 null, null,
-						 new ChangeEvent(this, OUTLINE,
-								 outline,
-								 beadOutline));
-		cs.firePreChangeEvent(ce);
-		beadOutline = outline;
-		cs.firePostChangeEvent(ce);
-	    }
-	}
-	else
-	{
-	    beadOutline = outline;
-	}
+        if (hasListeners())
+        {
+            ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
+            synchronized(cs)
+            {
+                ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.LAYOUT,
+                                                 null, null,
+                                                 new ChangeEvent(this, OUTLINE,
+                                                                 outline,
+                                                                 beadOutline));
+                cs.firePreChangeEvent(ce);
+                beadOutline = outline;
+                cs.firePostChangeEvent(ce);
+            }
+        }
+        else
+        {
+            beadOutline = outline;
+        }
     }
 
     /**
@@ -446,7 +446,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      */
     public Stroke getBeadStroke()
     {
-	return beadStroke;
+        return beadStroke;
     }
 
     /**
@@ -458,25 +458,25 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      */
     public void setBeadStroke(final Stroke stroke) throws ChangeVetoException
     {
-	if (hasListeners())
-	{
-	    ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
-	    synchronized(cs)
-	    {
-		ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.LAYOUT,
-						 null, null,
-						 new ChangeEvent(this, STROKE,
+        if (hasListeners())
+        {
+            ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
+            synchronized(cs)
+            {
+                ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.LAYOUT,
+                                                 null, null,
+                                                 new ChangeEvent(this, STROKE,
 								 stroke,
-								 beadStroke));
-		cs.firePreChangeEvent(ce);
-		beadStroke = stroke;
-		cs.firePostChangeEvent(ce);
-	    }
-	}
-	else
-	{
-	    beadStroke = stroke;
-	}
+                                                                 beadStroke));
+                cs.firePreChangeEvent(ce);
+                beadStroke = stroke;
+                cs.firePostChangeEvent(ce);
+            }
+        }
+        else
+        {
+            beadStroke = stroke;
+        }
     } 
 
     /**
@@ -486,7 +486,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      */
     public Paint getBeadFill()
     {
-	return beadFill;
+        return beadFill;
     }
 
     /**
@@ -498,25 +498,25 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      */
     public void setBeadFill(final Paint fill) throws ChangeVetoException
     {
-	if (hasListeners())
-	{
-	    ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
-	    synchronized(cs)
-	    {
-		ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.LAYOUT,
-						 null, null,
-						 new ChangeEvent(this, FILL,
-								 fill,
-								 beadFill));
-		cs.firePreChangeEvent(ce);
-		beadFill = fill;
-		cs.firePostChangeEvent(ce);
-	    }
-	}
-	else
-	{
-	    beadFill = fill;
-	}
+        if (hasListeners())
+        {
+            ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
+            synchronized(cs)
+            {
+                ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.LAYOUT,
+                                                 null, null,
+                                                 new ChangeEvent(this, FILL,
+                                                                 fill,
+                                                                 beadFill));
+                cs.firePreChangeEvent(ce);
+                beadFill = fill;
+                cs.firePostChangeEvent(ce);
+            }
+        }
+        else
+        {
+            beadFill = fill;
+        }
     }
 
     /**
@@ -532,7 +532,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
                                     final SequenceRenderContext context);
 
     /**
-     * <p> <code>Cache</code> to hold the direct mapping of
+     * <p><code>Cache</code> to hold the direct mapping of
      * <code>Feature</code>s to their renderers. This is used to
      * bypass recursion through the delegate renderers once the
      * relationship has been established by an initial recursive
@@ -551,35 +551,36 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      */
     private class Cache
     {
-	private WeakHashMap map = new WeakHashMap();
+        private WeakHashMap map = new WeakHashMap();
 
-	private ChangeListener listener = new ChangeAdapter()
-	{
-	    public void postChange(ChangeEvent cev)
-	    {
-		Changeable changedFeature = (Changeable) cev.getSource();
-		map.remove(changedFeature);
-		changedFeature.removeChangeListener(listener);
-	    }
-	};
+        private ChangeListener listener = new ChangeAdapter()
+        {
+            public void postChange(ChangeEvent cev)
+            {
+                Changeable changedFeature = (Changeable) cev.getSource();
+                map.remove(changedFeature);
+                changedFeature.removeChangeListener(listener);
+            }
+        };
 
-	public void put(Object key, Object value)
-	{
-	    map.put(key, value);
-	    if (Changeable.class.isInstance(key))
-	    {
-		((Changeable) key).addChangeListener(listener, Annotation.PROPERTY);
-	    }
-	}
+        public void put(Object key, Object value)
+        {
+            map.put(key, value);
+            if (Changeable.class.isInstance(key))
+            {
+                ((Changeable) key).addChangeListener(listener,
+                                                     Annotation.PROPERTY);
+            }
+        }
 
-	public Object get(Object key)
-	{
-	    return map.get(key);
-	}
+        public Object get(Object key)
+        {
+            return map.get(key);
+        }
 
-	public boolean containsKey(Object key)
-	{
-	    return map.containsKey(key);
-	}
+        public boolean containsKey(Object key)
+        {
+            return map.containsKey(key);
+        }
     }
 }

@@ -141,28 +141,28 @@ public class RectangularImapRenderer
         max = loc.getMax();
         dif = max - min;
 
-	if (context.getDirection() == context.HORIZONTAL)
-	{
-	    posXW  = context.sequenceToGraphics(min);
-        posYN  = beadDisplacement;
-        width  = Math.max(((double) (dif + 1)) * context.getScale(), 1.0);
-        height = Math.min(beadDepth, width / 2.0);
+        if (context.getDirection() == context.HORIZONTAL)
+        {
+            posXW  = context.sequenceToGraphics(min);
+            posYN  = beadDisplacement;
+            width  = Math.max(((double) (dif + 1)) * context.getScale(), 1.0);
+            height = Math.min(beadDepth, width / 2.0);
 
-	    // If the bead height occupies less than the full height
-	    // of the renderer, move it down so that it is central
-	    if (height < beadDepth)
-		posYN += ((beadDepth - height) / 2.0);
-	}
-	else
-	{
-	    posXW  = beadDisplacement;
-	    posYN  = context.sequenceToGraphics(min);
-	    height = Math.max(((double) dif + 1) * context.getScale(), 1.0);
-	    width  = Math.min(beadDepth, height / 2.0);
+            // If the bead height occupies less than the full height
+            // of the renderer, move it down so that it is central
+            if (height < beadDepth)
+                posYN += ((beadDepth - height) / 2.0);
+        }
+        else
+        {
+            posXW  = beadDisplacement;
+            posYN  = context.sequenceToGraphics(min);
+            height = Math.max(((double) dif + 1) * context.getScale(), 1.0);
+            width  = Math.min(beadDepth, height / 2.0);
 
-	    if (width < beadDepth)
-		posXW += ((beadDepth - width) /  2.0);
-	}
+            if (width < beadDepth)
+                posXW += ((beadDepth - width) /  2.0);
+        }
 
         // Apply translation and round
         x1 = (int) Math.floor(posXW + transX);
@@ -212,12 +212,12 @@ public class RectangularImapRenderer
 
     public double getBeadDepth()
     {
-	return renderer.getBeadDepth();
+        return renderer.getBeadDepth();
     }
 
     public double getBeadDisplacement()
     {
-	return renderer.getBeadDisplacement();
+        return renderer.getBeadDisplacement();
     }
 
     public FeatureHolder processMouseEvent(final FeatureHolder         holder,
