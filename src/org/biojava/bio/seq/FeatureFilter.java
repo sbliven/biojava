@@ -22,7 +22,9 @@
 package org.biojava.bio.seq;
 
 import java.io.Serializable;
+import java.util.NoSuchElementException;
 
+import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
@@ -138,7 +140,6 @@ public interface FeatureFilter extends Serializable {
 	    return clazz;
         }
     }
-
 
   /**
    *  A filter that returns all features contained within a location.
@@ -271,6 +272,89 @@ public interface FeatureFilter extends Serializable {
 
     public boolean accept(Feature f) {
         return (c1.accept(f) || c2.accept(f));
+    }
+  }
+  
+  /**
+   * Retrieve features that contain a given annotation with a given value.
+   *
+   * @author Matthew Pocock
+   */
+  public class ByAnnotation implements FeatureFilter {
+    private Object key;
+    private Object value;
+    
+    /**
+     * Make a new ByAnnotation that will accept features with an annotation
+     * bundle containing 'value' associated with 'key'.
+     *
+     * @param key  the Object used as a key in the annotation
+     * @param value the Object associated with key in the annotation
+     */
+    public ByAnnotation(Object key, Object value) {
+      this.key = key;
+      this.value = value;
+    }
+    
+    public Object getKey() {
+      return key;
+    }
+    
+    public Object getValue() {
+      return value;
+    }
+    
+    public boolean accept(Feature f) {
+      Annotation ann = f.getAnnotation();
+      // fixme - Annotation should have a hasProperty method
+      try {
+        Object v = ann.getProperty(key);
+        if(v == null ) {
+          if(value == null) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return v.equals(value);
+        }
+      } catch (NoSuchElementException nsee) {
+        return false;
+      }
+    }
+  }
+  
+  /**
+   * Retrieve features that contain a given annotation with any value.
+   *
+   * @author Matthew Pocock
+   */
+  public class HasAnnotation implements FeatureFilter {
+    private Object key;
+    
+    /**
+     * Make a new ByAnnotation that will accept features with an annotation
+     * bundle containing any value associated with 'key'.
+     *
+     * @param key  the Object used as a key in the annotation
+     */
+    public HasAnnotation(Object key) {
+      this.key = key;
+    }
+    
+    public Object getKey() {
+      return key;
+    }
+    
+    public boolean accept(Feature f) {
+      Annotation ann = f.getAnnotation();
+      // fixme - Annotation should have a hasProperty method
+      try {
+        Object v = ann.getProperty(key);
+        return true;
+      } catch (NoSuchElementException nsee) {
+        return false;
+      }
     }
   }
 }
