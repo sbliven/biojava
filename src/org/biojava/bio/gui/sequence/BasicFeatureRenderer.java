@@ -32,18 +32,15 @@ import java.awt.geom.*;
 
 import java.util.List;
 
-public class BasicFeatureRenderer implements FeatureRenderer {
+public class BasicFeatureRenderer extends AbstractFeatureRenderer {
   private Paint fill;
   private Paint outline;
   private float arrowSize = 15.0f;
   private float arrowScoop = 4.0f;
 
-  protected PropertyChangeSupport pcs;
-
   public BasicFeatureRenderer() {
     fill = Color.red;
     outline = Color.black;
-    pcs = new PropertyChangeSupport(this);
   }
 
   public void setFill(Paint p) {
@@ -181,22 +178,5 @@ public class BasicFeatureRenderer implements FeatureRenderer {
         g.setPaint(outline);
         g.draw(s);
       }
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener l) {
-	pcs.addPropertyChangeListener(l);
-    }
-
-    public void addPropertyChangeListener(String p, PropertyChangeListener l) {
-	pcs.addPropertyChangeListener(l);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener l) {
-	pcs.removePropertyChangeListener(l);
-    }
-
-    public void removePropertyChangeListener(String p,
-					     PropertyChangeListener l) {
-	pcs.removePropertyChangeListener(p, l);
     }
 }

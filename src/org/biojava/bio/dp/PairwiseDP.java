@@ -226,7 +226,7 @@ public class PairwiseDP extends DP implements Serializable {
 
      STATELOOP:      
       for (int l = states.length - 1; l >= 0; --l) {
-        System.out.println("State = " + states[l].getName());
+        //System.out.println("State = " + states[l].getName());
         State curState = states[l];
         if(initializationHack && (curState instanceof EmissionState)) {
           if(curState == magicalState) {
@@ -266,10 +266,10 @@ public class PairwiseDP extends DP implements Serializable {
           sourceScores[ci] = targetCell.scores[destI] + weight;
         }
         for(int ci = 0; ci < tr.length; ci++) {
-          System.out.println(
+          /*System.out.println(
             "Source = " + states[tr[ci]].getName() +
             "\t= " + sourceScores[ci]
-          );
+          );*/
         }
 
         // Find base for addition
@@ -299,13 +299,13 @@ public class PairwiseDP extends DP implements Serializable {
           //System.out.println(curCol[l]);
         }
       }
-      for (int l = 0; l < states.length; ++l) {
+      /*for (int l = 0; l < states.length; ++l) {
         State curState = states[l];
         System.out.println(
           "State = " + states[l].getName() +
           "\t = " + curCol[l]
         );
-      }
+      }*/
     }
   }
 

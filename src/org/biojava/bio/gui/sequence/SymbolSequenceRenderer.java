@@ -78,11 +78,9 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
       Rectangle2D maxBounds =
         g.getFont().getMaxCharBounds(g.getFontRenderContext());
       if(
-        sp.getScale() < maxBounds.getWidth()*0.4 ||
-        sp.getScale() < maxBounds.getHeight()*0.4
+        sp.getScale() >= maxBounds.getWidth()*0.3 &&
+        sp.getScale() >= maxBounds.getHeight()*0.3
       ) {
-        g.fill(seqBox);
-      } else {
         double fudgeAcross = 0.0;
         double fudgeDown = 0.0;
         if (direction == sp.HORIZONTAL) {

@@ -669,7 +669,7 @@ public abstract class DP {
     throws IllegalSymbolException {
       double d = dist.getWeight(sym);
       double n = dist.getNullModel().getWeight(sym);
-      System.out.println("Odds for " + sym.getName() + "\t= " + d + " / " + n);
+      //System.out.println("Odds for " + sym.getName() + "\t= " + d + " / " + n);
       return d / n;
     }
   };

@@ -204,7 +204,7 @@ public class SuffixTree implements Serializable {
    * This class is realy stupid & delegates most work off to a SuffixTree so
    * that it is as small (in memory-per-object terms) as possible.
    *
-   * @author Matthe Pocock
+   * @author Matthew Pocock
    */
   public static abstract class SuffixNode implements Serializable {
       /**
