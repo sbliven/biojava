@@ -22,11 +22,26 @@ package org.biojava.bio.seq;
 
 public final class StrandParser {
   public static final StrandedFeature.Strand parseStrand(String strand) {
-    if("+".equals(strand) || "1".equals(strand)) {
+    if(
+      "+".equals(strand) ||
+      "1".equals(strand) ||
+      "plus".equals(strand) ||
+      "POSITIVE".equals(strand)
+    ) {
       return StrandedFeature.POSITIVE;
-    } else if("-".equals(strand) || "-1".equals(strand) || "minus".equals(strand)) {
+    } else if(
+      "-".equals(strand) ||
+      "-1".equals(strand) ||
+      "minus".equals(strand) ||
+      "NEGATIVE".equals(strand)
+    ) {
       return StrandedFeature.NEGATIVE;
-    } else if(".".equals(strand) || "0".equals(strand) || "plus".equals(strand)) {
+    } else if(
+      ".".equals(strand) ||
+      "0".equals(strand) ||
+      "none".equals(strand) ||
+      "UNKNOWN".equals(strand)
+    ) {
       return StrandedFeature.UNKNOWN;
     }
 

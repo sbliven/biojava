@@ -97,7 +97,7 @@ public interface StrandedFeature extends Feature {
    *
    * @author Matthew Pocock
    */
-  public static class Strand implements Serializable {
+  public static final class Strand implements Serializable {
     private final String text;
     private final int value;
     private final char token;
@@ -127,6 +127,19 @@ public interface StrandedFeature extends Feature {
     */
     public char getToken() {
       return token;
+    }
+
+    /**
+     * Return a strand that represents flipping this onto the opposite strand.
+     */
+    public Strand flip() {
+      if(this == POSITIVE) {
+        return NEGATIVE;
+      } else if(this == NEGATIVE) {
+        return POSITIVE;
+      } else {
+        return this;
+      }
     }
 
     private Object writeReplace() throws ObjectStreamException {
