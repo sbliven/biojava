@@ -76,8 +76,8 @@ import org.biojava.utils.*;
  * Then reading in FASTA files can be done with something like:-
  * <p>
  * <pre>
- * SequenceIterator seqI = new StreamReader(br, new FastaFormat(), 
- *     DNATools.getDNA().getTokenization("token"), 
+ * SequenceIterator seqI = new StreamReader(br, new FastaFormat(),
+ *     DNATools.getDNA().getTokenization("token"),
  *     new PackedChunkedListFactory() );
  * </pre>
  * <p>
@@ -94,7 +94,7 @@ import org.biojava.utils.*;
  *
  * @author David Huen
  */
-public class ChunkedSymbolListFactory
+public class ChunkedSymbolListFactory implements Serializable
 {
     /**
      * operating mode
@@ -126,7 +126,7 @@ public class ChunkedSymbolListFactory
     // you can only use symbolAt() or make(), not both.
     private boolean canDoMake = true;
 
-    private class ChunkedSymbolList extends AbstractSymbolList
+    private class ChunkedSymbolList extends AbstractSymbolList implements Serializable
     {
         private SymbolList [] chunks;
         private final int chunkSize;
@@ -219,7 +219,7 @@ public class ChunkedSymbolListFactory
     }
 
     /**
-     * @param userSymListFactory User-supplied class which produces the SymbolLists 
+     * @param userSymListFactory User-supplied class which produces the SymbolLists
      * that are used to store the chunked symbols (only used when the chunked list
      * to be created is larger than threshold.
      * @param threshold the size of the SymbolList beyond which the userSymListFactory
@@ -266,8 +266,8 @@ public class ChunkedSymbolListFactory
 
         // if count reaches threshold, initiate conversion but do it
         // once only and only if we are in AUTO_SELECT mode
-        if ((opMode == AUTO_SELECT) 
-            && (currSymListFactory != userSymListFactory) 
+        if ((opMode == AUTO_SELECT)
+            && (currSymListFactory != userSymListFactory)
             && (symCount > threshold)) useSuppliedSymListFactory();
 
         // see if I need to create the first chunk
@@ -311,7 +311,7 @@ public class ChunkedSymbolListFactory
         symCount = 0;
 
         chunkL = new ArrayList();
-        alfa = null;        
+        alfa = null;
 
         // if auto-select return to default symbol list factory
         if (opMode == AUTO_SELECT) {
@@ -368,7 +368,7 @@ public class ChunkedSymbolListFactory
     /**
      * Converts accumulated Symbols to a SymbolList
      */
-    public SymbolList makeSymbolList() 
+    public SymbolList makeSymbolList()
         throws IllegalAlphabetException
     {
         try {

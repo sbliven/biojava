@@ -35,7 +35,7 @@ import org.biojava.bio.symbol.*;
  * @since 1.1 [newio proposal]
  */
 
-class ChunkedSymbolList extends AbstractSymbolList {
+class ChunkedSymbolList extends AbstractSymbolList implements Serializable {
     private Symbol[][] chunks;
     private final int chunkSize;
 
@@ -43,36 +43,36 @@ class ChunkedSymbolList extends AbstractSymbolList {
     private int length;
 
     protected void finalize() throws Throwable {
-	super.finalize();
-	alpha.removeChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
+        super.finalize();
+        alpha.removeChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
     }
 
     public ChunkedSymbolList(Symbol[][] chunks,
-			     int chunkSize,
-			     int length,
-			     Alphabet alpha) 
+                             int chunkSize,
+                             int length,
+                             Alphabet alpha)
     {
-	this.chunks = chunks;
-	this.chunkSize = chunkSize;
-	this.length = length;
-	this.alpha = alpha;
-	alpha.addChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
+        this.chunks = chunks;
+        this.chunkSize = chunkSize;
+        this.length = length;
+        this.alpha = alpha;
+        alpha.addChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
     }
-    
+
     public Alphabet getAlphabet() {
-	return alpha;
+        return alpha;
     }
 
     public int length() {
-	return length;
+        return length;
     }
 
     public Symbol symbolAt(int pos) {
       try {
-	--pos; // the inevitable...
-	int chnk = pos / chunkSize;
-	int spos = pos % chunkSize;
-	return chunks[chnk][spos];
+        --pos; // the inevitable...
+        int chnk = pos / chunkSize;
+        int spos = pos % chunkSize;
+        return chunks[chnk][spos];
       } catch (IndexOutOfBoundsException ioobe) {
         ++pos;
         throw new IndexOutOfBoundsException("Attempted to access symbol at "
@@ -92,18 +92,18 @@ class ChunkedSymbolList extends AbstractSymbolList {
             "end must not be lower than start: start=" + start + ", end=" + end
         );
       }
-        
+
       //
       // Mildly optimized for case where from and to are within
       // the same chunk.
-      //	
+      //
 
       int afrom = start - 1;
       int ato = end - 1;
       int cfrom = afrom / chunkSize;
       if (ato / chunkSize == cfrom) {
           return new SubArraySymbolList(chunks[cfrom],
-			                    	    end - start + 1,
+                                                    end - start + 1,
                                         afrom % chunkSize,
                                         getAlphabet());
       } else {
@@ -122,46 +122,46 @@ class ChunkedSymbolList extends AbstractSymbolList {
     public static SymbolList make(SymbolReader sr)
         throws IOException, IllegalSymbolException
     {
-	List chunkL = new ArrayList();
-	Symbol[] headChunk = new Symbol[CHUNK_SIZE];
-	int headChunkPos = 0;
-	while (sr.hasMoreSymbols()) {
-	    if (headChunkPos == CHUNK_SIZE) {
-		chunkL.add(headChunk);
-		headChunk = new Symbol[CHUNK_SIZE];
-		headChunkPos = 0;
-	    }
-	    int read = sr.readSymbols(headChunk, headChunkPos, CHUNK_SIZE - headChunkPos);
-	    headChunkPos += read;
-	}
-	if (headChunkPos > 0) {
-	    if (headChunkPos < CHUNK_SIZE) {
-		Symbol[] oldChunk = headChunk;
-		headChunk = new Symbol[headChunkPos];
-		System.arraycopy(oldChunk, 0, headChunk, 0, headChunkPos);
-	    }
-	    chunkL.add(headChunk);
-	}
+        List chunkL = new ArrayList();
+        Symbol[] headChunk = new Symbol[CHUNK_SIZE];
+        int headChunkPos = 0;
+        while (sr.hasMoreSymbols()) {
+            if (headChunkPos == CHUNK_SIZE) {
+                chunkL.add(headChunk);
+                headChunk = new Symbol[CHUNK_SIZE];
+                headChunkPos = 0;
+            }
+            int read = sr.readSymbols(headChunk, headChunkPos, CHUNK_SIZE - headChunkPos);
+            headChunkPos += read;
+        }
+        if (headChunkPos > 0) {
+            if (headChunkPos < CHUNK_SIZE) {
+                Symbol[] oldChunk = headChunk;
+                headChunk = new Symbol[headChunkPos];
+                System.arraycopy(oldChunk, 0, headChunk, 0, headChunkPos);
+            }
+            chunkL.add(headChunk);
+        }
 
-	if (chunkL.size() == 1) {
-	    // Small-sequence optimization
-	    
-	    return new SubArraySymbolList((Symbol[]) chunkL.get(0),
-					  headChunkPos,
-					  0,
-					  sr.getAlphabet());
-	} else {
-	    Symbol[][] chunks = new Symbol[chunkL.size()][];
-	    for (int cnum = 0; cnum < chunkL.size(); ++cnum) {
-		chunks[cnum] = (Symbol[]) chunkL.get(cnum);
-	    }
-	    int length = (chunkL.size() - 1) * CHUNK_SIZE + headChunkPos;
-	    
-	    return new ChunkedSymbolList(chunks,
-					 CHUNK_SIZE,
-					 length,
-					 sr.getAlphabet());
-	}
+        if (chunkL.size() == 1) {
+            // Small-sequence optimization
+
+            return new SubArraySymbolList((Symbol[]) chunkL.get(0),
+                                          headChunkPos,
+                                          0,
+                                          sr.getAlphabet());
+        } else {
+            Symbol[][] chunks = new Symbol[chunkL.size()][];
+            for (int cnum = 0; cnum < chunkL.size(); ++cnum) {
+                chunks[cnum] = (Symbol[]) chunkL.get(cnum);
+            }
+            int length = (chunkL.size() - 1) * CHUNK_SIZE + headChunkPos;
+
+            return new ChunkedSymbolList(chunks,
+                                         CHUNK_SIZE,
+                                         length,
+                                         sr.getAlphabet());
+        }
     }
 }
 

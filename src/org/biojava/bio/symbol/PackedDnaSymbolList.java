@@ -25,6 +25,7 @@ import org.biojava.bio.BioException;
 
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
+import java.io.*;
 
 /**
  * a class that implements storage of symbols
@@ -34,7 +35,7 @@ import org.biojava.bio.seq.*;
  * @since 1.2
  */
 public class PackedDnaSymbolList
-    extends AbstractSymbolList
+    extends AbstractSymbolList implements Serializable
 {
     /*
      * The data is organised at two levels:-
@@ -48,7 +49,7 @@ public class PackedDnaSymbolList
      *  in the terminal cache line, the number of bytes
      *  to be processed and the number of nibbles in the
      *  final byte may vary from that in the other cache
-     *  lines. 
+     *  lines.
      */
 
     // class variables
@@ -106,7 +107,7 @@ public class PackedDnaSymbolList
         symbolCache = new Symbol[0x0001<<log2SymsPerCacheLine];
 
         // compute derived shifts
-        log2StorageUnitsPerCacheLine 
+        log2StorageUnitsPerCacheLine
             = log2SymsPerCacheLine - log2PackedSymsPerStorageUnit;
         storageUnitsPerCacheLine = 0x0001 << log2StorageUnitsPerCacheLine;
         packedSymsPerStorageUnit = 0x0001 << log2PackedSymsPerStorageUnit;
@@ -131,7 +132,7 @@ public class PackedDnaSymbolList
         symsInFinalCacheLine = length & cacheLineOffsetMask;
 
         // note that this is for FILLED storage units.
-        fullStorageUnitsInFinalCacheLine 
+        fullStorageUnitsInFinalCacheLine
             = symsInFinalCacheLine >> log2PackedSymsPerStorageUnit;
 
         // get access to an AlphabetIndex
@@ -187,15 +188,15 @@ public class PackedDnaSymbolList
 
         // check that the array is correct in size
         int expectedArraySize;
-        if (symsInFinalStorageUnit == 0) 
+        if (symsInFinalStorageUnit == 0)
             expectedArraySize = storageUnitSize;
-        else 
+        else
             expectedArraySize = storageUnitSize + 1;
 
-        if (byteArray.length < expectedArraySize) 
+        if (byteArray.length < expectedArraySize)
             throw new BioException("array is too small to represent given sequence length.");
 
-        packedSymbolArray = byteArray;        
+        packedSymbolArray = byteArray;
     }
 
     /*************************/
@@ -221,7 +222,7 @@ public class PackedDnaSymbolList
         if (currCacheIndex != cacheIndex) {
             // fill symbol cache
 
-            // do we have a full cache line 
+            // do we have a full cache line
             // or is this a partially-filled final cache line?
             int storageUnitIndex = cacheIndex << log2StorageUnitsPerCacheLine;
 //            System.out.println("storageUnitIndex,cacheLineCount,symsInFinalCacheLine " + storageUnitIndex + " " + cacheLineCount + " " + symsInFinalCacheLine);
@@ -260,7 +261,7 @@ public class PackedDnaSymbolList
             else {
                 // complete cache line
 
-                // logically-driven version  
+                // logically-driven version
                 int symIndex = 0;
                 for (int i=0; i < storageUnitsPerCacheLine; i++) {
                     byte currStorageUnit = packedSymbolArray[storageUnitIndex];
