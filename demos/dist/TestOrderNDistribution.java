@@ -40,8 +40,14 @@ import org.biojava.bio.seq.io.*;
 public class TestOrderNDistribution {
   public static void main(String [] args) {
     try {
-        SymbolList res = Tools.createSymbolList(100);
-        int order = Integer.parseInt(args[0]);
+        // verify arguments
+        if (args.length != 2) {
+            System.out.println("Usage: java dist/TestOrderNDistribution <test seq length> <order>");
+            System.exit(1);
+        }
+
+        SymbolList res = Tools.createSymbolList(Integer.parseInt(args[0]));
+        int order = Integer.parseInt(args[1]);
     
         // generate the Nth order view of this sequence
         SymbolList view = SymbolListViews.orderNSymbolList(res, order);
