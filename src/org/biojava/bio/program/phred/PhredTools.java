@@ -79,7 +79,7 @@ public final class PhredTools {
    * @throws IllegalSymbolException if the provided symbol is not from the
    * PHRED alphabet.
    */
-  public static final AtomicSymbol dnaSymbolFromPhred(Symbol phredSym)
+  public static final Symbol dnaSymbolFromPhred(Symbol phredSym)
     throws IllegalSymbolException{
     //validate the symbol
     getPhredAlphabet().validate(phredSym);
