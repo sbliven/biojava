@@ -69,6 +69,17 @@ public class AceAnnotation implements Annotation {
     };
   }
   
+  public Map asMap() {
+    Map map = new HashMap();
+    
+    for(Iterator i = keys().iterator(); i.hasNext(); ) {
+      Object key = i.next();
+      map.put(key, getProperty(key));
+    }
+    
+    return map;
+  }
+  
   public AceAnnotation(AceNode node) {
     this.node = node;
   }

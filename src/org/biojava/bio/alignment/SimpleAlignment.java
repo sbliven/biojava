@@ -30,11 +30,11 @@ import org.biojava.bio.seq.*;
  * A simple implementation of an Alignment.
  */
 public class SimpleAlignment extends AbstractResidueList implements Alignment {
-  private List resList;
+  private Map labelToResidueList;
+  private List labels;
   private Alphabet alphabet;
   private int length;
   
-
   public int length() {
     return length;
   }
@@ -47,21 +47,32 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
     return new ColAsResidue(col);
   }
   
-  public List getResidueLists() {
-    return resList;
+  public List getLabels() {
+    return labels;
   }
   
-  public Residue getResidue(ResidueList seq, int column) {
-    return seq.residueAt(column);
+  public Residue residueAt(Object label, int column) {
+    return residueListForLabel(label).residueAt(column);
   }
   
-  public Alignment subAlignment(List residueLists, Location loc) {
-    List ress = new ArrayList();
-    for(Iterator i = residueLists.iterator(); i.hasNext(); ) {
-      ResidueList res = (ResidueList) i.next();
-      ress.add(loc.residues(res));
+  public Alignment subAlignment(List residueLists, Location loc)
+  throws NoSuchElementException {
+    Map labelsToResList = new HashMap();
+    for(Iterator i = getLabels().iterator(); i.hasNext(); ) {
+      Object label = i.next();
+      ResidueList res = residueListForLabel(label);
+      labelsToResList.put(label, res);
     }
-    return new SimpleAlignment(ress);
+    return new SimpleAlignment(labelsToResList);
+  }
+  
+  public ResidueList residueListForLabel(Object label)
+  throws NoSuchElementException {
+    ResidueList rl = (ResidueList) labelToResidueList.get(label);
+    if(rl == null) {
+      throw new NoSuchElementException("No residue list associated with label " + label);
+    }
+    return rl;
   }
   
   /**
@@ -69,17 +80,19 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
    * <P>
    * The ResidueLists must all be of the same length.
    *
-   * @param resLists  the things to put into the alignment
+   * @param labelToResList  the label-to-residue list mapping
    * @throws IllegalArgumentException if the ResidueLists are not the same
    *         length
    */
-  public SimpleAlignment(List resLists) throws IllegalArgumentException {
-    this.resList = Collections.unmodifiableList(resLists);
+  public SimpleAlignment(Map labelToResList) throws IllegalArgumentException {
+    this.labels = Collections.unmodifiableList(new ArrayList(labelToResList.keySet()));
+    this.labelToResidueList = labelToResList;
     
-    length = 0;
+    length = -1;
     List alphaList = new ArrayList();
-    for(Iterator ri = resLists.iterator(); ri.hasNext(); ) {
-      ResidueList rl = (ResidueList) ri.next();
+    for(Iterator li = labels.iterator(); li.hasNext(); ) {
+      Object label = li.next();
+      ResidueList rl = residueListForLabel(label);
       alphaList.add(rl.alphabet());
       if(length == -1) {
         length = rl.length();
@@ -96,7 +109,7 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
     this.alphabet = new ValidatingAlphabet(alphaList);
   }
   
-  private class ColAsResidue implements CrossProductResidue {
+  private class ColAsResidue implements Alignment.Column {
     private int col;
     
     public ColAsResidue(int col) {
@@ -106,20 +119,21 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
     public List getResidues() {
       return new AbstractList() {
         public Object get(int indx) {
-          return getResidue((ResidueList) resList.get(indx), col);
+          return residueAt(getLabels().get(indx), col);
         }
         public int size() {
-          return resList.size();
+          return getLabels().size();
         }
       };
     }
       
     public String getName() {
+      List labels = getLabels();
       StringBuffer sb = new StringBuffer("(");
-      if(resList.size() != 0) {
-        sb.append(getResidue((ResidueList) resList.get(0), col).getName());
-        for(int i = 1; i < resList.size(); i++) {
-          sb.append(" " + getResidue((ResidueList) resList.get(i), col).getName());
+      if(labels.size() != 0) {
+        sb.append(residueAt(labels.get(0), col).getName());
+        for(int i = 1; i < labels.size(); i++) {
+          sb.append(" " + residueAt(labels.get(i), col).getName());
         }
       }
       sb.append(")");
@@ -128,6 +142,10 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
       
     public char getSymbol() {
       return '?';
+    }
+    
+    public List getLabels() {
+      return SimpleAlignment.this.getLabels();
     }
     
     public Annotation getAnnotation() {

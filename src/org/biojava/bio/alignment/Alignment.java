@@ -27,18 +27,16 @@ import java.util.*;
 import org.biojava.bio.seq.*;
 
 /**
- * An alignment containing multiple sequences.
+ * An alignment containing multiple residue lists.
  * <P>
  * The alignment can be thought of a rectangular array of residues. Each
- * row is indexed by sequence and each column is indexed by residue offset.
+ * row is indexed by a label and each column is indexed by residue offset.
  * <P>
  * Alternatively, it can be thought of as a residue list where each residue is
- * a list of residues in that column - modeled as a CrossProductResidue.
+ * a list of residues in that column - modeled as a Column object.
  * <P>
  * To create gapped alignments, use ResidueLists with gaps. The most flexible
  * way to do this will be to leverage GappedResidueList objects.
- * <P>
- * This object uses bio-numbers, that is 1-length (a-b is a and b inclusive).
  */
 public interface Alignment extends ResidueList {
   /**
@@ -51,15 +49,18 @@ public interface Alignment extends ResidueList {
    *
    * @return  the List of all ResidueLists in the alignment
    */
-  List getResidueLists();
+  List getLabels();
   
   /**
-   * Retrieve a residue by ResidueList and column.
+   * Retrieve a residue by label and column.
    *
    * @param res the ResidueList to retrieve from
    * @param column  the index of the column to retrieve
+   * @return  the residue in the residue list associated with the label at the given column
+   * @throws NoSuchElementException if there is no row for 'label'
    */
-  Residue getResidue(ResidueList res, int column);
+  Residue residueAt(Object label, int column)
+  throws NoSuchElementException;
   
   /**
    * Make a view onto this alignment.
@@ -67,6 +68,26 @@ public interface Alignment extends ResidueList {
    * @param residueLists the set of sequences to include
    * @param loc the Location to include
    * @return  a sub Alignment
+   * @throws  NoSuchElementException if labels contains any item that is not a label
    */
-  Alignment subAlignment(List residueLists, Location loc);
+  Alignment subAlignment(List labels, Location loc)
+  throws NoSuchElementException;
+  
+  /**
+   * Defines the particular type of CrossProductResidues that can be a column
+   * in an alignment.
+   *
+   * @author Matthew Pocock
+   */
+  interface Column extends CrossProductResidue {
+    /**
+     * Return the same list as the alignment uses to label each ResidueList.
+     * <P>
+     * In this case, it labels each residue.
+     *
+     * @return  a List of labels for the residues
+     */
+    List getLabels();
+  }
 }
+

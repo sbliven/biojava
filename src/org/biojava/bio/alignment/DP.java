@@ -343,14 +343,14 @@ public class DP {
     return scores[l];
   }
 
-  public StateLabeledSequence viterbi(ResidueList seq)
+  public StatePath viterbi(ResidueList seq)
   throws IllegalResidueException {
     DPCursor dpCursor = new SmallCursor(states, seq.length(), seq.iterator());
     return viterbi(dpCursor, seq);
   }
 
-  public StateLabeledSequence viterbi(DPCursor dpCursor, ResidueList seq)
-    throws IllegalResidueException {
+  public StatePath viterbi(DPCursor dpCursor, ResidueList seq)
+  throws IllegalResidueException {
     int seqLength = dpCursor.length();
 
     int [][] transitions = forwardTransitions;
@@ -431,12 +431,13 @@ public class DP {
       best = best.back;
     };
 
-    return new SimpleStateLabeledSequence(
-      seq,
-      new SimpleResidueList(model.stateAlphabet(), stateList),
-      new SimpleResidueList(DoubleAlphabet.INSTANCE, scoreList),
-      this, bestScore, null
-    );
+    Map labelToResList = new HashMap();
+    labelToResList.put(StatePath.SEQUENCE, seq);
+    labelToResList.put(StatePath.STATES,
+                       new SimpleResidueList(model.stateAlphabet(), stateList));
+    labelToResList.put(StatePath.SCORES,
+                       new SimpleResidueList(DoubleAlphabet.INSTANCE, scoreList));
+    return new SimpleStatePath(bestScore, labelToResList);
   }
 
   /**
@@ -444,12 +445,13 @@ public class DP {
     * <P>
     * If the length is set to -1 then the model length will be sampled
     * using the model's transition to the end state. If the length is
-    * fixed using lenght, then the transitions to the end state are implicitly
+    * fixed using length, then the transitions to the end state are implicitly
     * invoked.
     *
     * @param length  the length of the sequence to generate
+    * @return  a StatePath generated at random
     */
-  public StateLabeledSequence generate(int length)
+  public StatePath generate(int length)
   throws IllegalResidueException, SeqException {
     List scoreList = new ArrayList();
     SimpleResidueList tokens = new SimpleResidueList(model.queryAlphabet());
@@ -509,10 +511,17 @@ public class DP {
       oldState = newState;
     }
 
-    return new SimpleStateLabeledSequence(
-      tokens, states, new SimpleResidueList(DoubleAlphabet.INSTANCE, scoreList),
-      this, totScore, null
-    );
+    List resListList = new ArrayList(3);
+    resListList.add(tokens);
+    resListList.add(states);
+    resListList.add(new SimpleResidueList(DoubleAlphabet.INSTANCE, scoreList));
+    
+    Map labelToResList = new HashMap();
+    labelToResList.put(StatePath.SEQUENCE, tokens);
+    labelToResList.put(StatePath.STATES, states);
+    labelToResList.put(StatePath.SCORES,
+                       new SimpleResidueList(DoubleAlphabet.INSTANCE, scoreList));
+    return new SimpleStatePath(totScore, labelToResList);
   }
 
   /**
