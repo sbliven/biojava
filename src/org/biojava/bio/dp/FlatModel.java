@@ -38,27 +38,251 @@ import org.biojava.bio.seq.*;
  */
 public class FlatModel implements MarkovModel {
   private final MarkovModel source;
-  private final MarkovModel flat;
+  private final SimpleAlphabet stateAlpha;
+  private final Map transFrom;
+  private final Map transTo;
+  private final Map transModelTrans;
+  private Transition _trans = new Transition(null, null);
   
   public Alphabet stateAlphabet() {
-    return flat.stateAlphabet();
+    return stateAlpha;
   }
   
   public Alphabet emissionAlphabet() {
-    return flat.emissionAlphabet();
+    return source.emissionAlphabet();
   }
   
   public MagicalState magicalState() {
-    return flat.magicalState();
+    return source.magicalState();
   }
   
   public int heads() {
-    return flat.heads();
+    return source.heads();
+  }
+  
+  public State sampleTransition(State from) throws IllegalResidueException {
+    stateAlphabet().validate(from);
+    
+    double p = Math.random();
+    try {
+      for(Iterator i = transitionsFrom(from).iterator(); i.hasNext(); ) {
+        State s = (State) i.next();
+        if( (p -= Math.exp(getTransitionScore(from, s))) <= 0 )
+        return s;
+      }
+    } catch (IllegalResidueException ire) {
+    } catch (IllegalTransitionException ite) {
+      throw new BioError(ite, "Transition listend in transitionsFrom(" +
+                         from.getName() + "has dissapeared.");
+    }
+    
+    StringBuffer sb = new StringBuffer();
+
+    for(Iterator i = transitionsFrom(from).iterator(); i.hasNext(); ) {
+      try {
+      State s = (State) i.next();
+      double t = getTransitionScore(from, s);
+      if(t > 0.0)
+        sb.append("\t" + s.getName() + " -> " + t + "\n");
+      } catch (IllegalTransitionException ite) {
+        throw new BioError(ite, "Transition listend in transitionsFrom(" +
+                           from.getName() + "has dissapeared.");
+      }
+    }
+    throw new IllegalResidueException("Could not find transition from state " +
+                                      from.getName() +
+                                      ". Do the probabilities sum to 1?" +
+                                      "\np=" + p + "\n" + sb.toString());
+  }
+
+  protected ModelTransition getMT(State from, State to)
+  throws IllegalResidueException {
+    stateAlphabet().validate(from);
+    stateAlphabet().validate(to);
+    
+    _trans.from = from;
+    _trans.to = to;
+    
+    return (ModelTransition) transModelTrans.get(_trans);
   }
   
   public boolean containsTransition(State from, State to)
   throws IllegalResidueException {
-    return flat.containsTransition(from, to);
+    return getMT(from, to) != null;
+  }
+  
+  public Set transitionsFrom(State from) throws IllegalResidueException {
+    return (Set) transFrom.get(from);
+  }
+  
+  public Set transitionsTo(State to) throws IllegalResidueException {
+    return (Set) transTo.get(to);
+  }
+  
+  public double getTransitionScore(State from, State to)
+  throws IllegalResidueException, IllegalTransitionException {
+    ModelTransition mt = getMT(from, to);
+    if(mt != null) {
+      return mt.model.getTransitionScore(mt.from, mt.to);
+    }
+    throw new IllegalTransitionException(from, to);
+  }
+
+  public void registerWithTrainer(ModelTrainer modelTrainer) {
+  }
+  
+  private void createTransition(
+    State from, State to,
+    MarkovModel within, State source, State dest
+  ) {
+    try {
+      ModelTransition mt = getMT(from, to);
+      if(mt == null) {
+        transModelTrans.put(
+          new Transition(from, to),
+          new ModelTransition(within, source, dest)
+        );
+      }
+      Set f = (Set) transFrom.get(from);
+      Set t = (Set) transTo.get(to);
+      f.add(to);
+      t.add(from);
+    } catch (IllegalResidueException ire) {
+      throw new BioError(ire, "Something is fucked up in FlatModel - a residue dissapeared");
+    }
+  }
+  
+  private void addAState(State s) {
+    try {
+      stateAlpha.addResidue(s);
+      transFrom.put(s, new HashSet());
+      transTo.put(s, new HashSet());
+    } catch (Exception e) {
+      throw new BioError(e, "Something got stuffed up while adding state " + s.getName());
+    }
+  }
+  
+  public FlatModel(MarkovModel model)
+  throws IllegalResidueException, IllegalAlphabetException {
+    this.source = model;
+    this.stateAlpha = new SimpleAlphabet();
+    this.transFrom = new HashMap();
+    this.transTo = new HashMap();
+    this.transModelTrans = new HashMap();
+    
+    stateAlpha.addResidue(model.magicalState());
+    
+    // add all the states
+    System.out.println("Adding states");
+    Map fromM = new HashMap();
+    Map toM = new HashMap();
+    Map inModel = new HashMap();
+    Map modelStart = new HashMap();
+    Map modelEnd = new HashMap();
+    
+    modelStart.put(model, model.magicalState());
+    modelEnd.put(model, model.magicalState());
+    
+    for(Iterator i = model.stateAlphabet().residues().iterator(); i.hasNext(); ) {
+      State s = (State) i.next();
+      if(s instanceof DotState) { // simple dot state in model
+        DotStateWrapper dsw = new DotStateWrapper(s);
+        addAState(dsw);
+        inModel.put(s, model);
+        fromM.put(s, dsw);
+        toM.put(s, dsw);
+        System.out.println("Added dot state " + dsw.getName());
+      } else if(s instanceof EmissionState) {  // simple emission state in model
+        if(s instanceof MagicalState) {
+          continue;
+        }
+        EmissionWrapper esw =
+          new EmissionWrapper((EmissionState) s);
+        addAState(esw);
+        inModel.put(s, model);
+        fromM.put(s, esw);
+        toM.put(s, esw);
+        System.out.println("Added emission state " + esw.getName());
+      } else if(s instanceof ModelInState) { // complex model inside state
+        System.out.println("Adding a model-in-state");
+        ModelInState mis = (ModelInState) s;
+        MarkovModel mism = mis.getModel();
+        FlatModel flatM = new FlatModel(mism);
+
+        DotStateWrapper start = new DotStateWrapper(mis);
+        DotStateWrapper end = new DotStateWrapper(mis);
+        addAState(start);
+        addAState(end);
+        inModel.put(s, model);
+        fromM.put(s, end);
+        toM.put(s, start);
+        modelStart.put(mism, start);
+        modelEnd.put(mism, end);
+        System.out.println("Added " + start.getName() + " and " + end.getName());
+
+        for(Iterator j = flatM.stateAlphabet().residues().iterator(); j.hasNext(); ) {
+          State t = (State) j.next();
+          if(t instanceof DotState) {
+            DotStateWrapper dsw = new DotStateWrapper(t);
+            addAState(dsw);
+            inModel.put(t, mism);
+            fromM.put(t, dsw);
+            toM.put(t, dsw);
+            System.out.println("Added wrapped dot state " + dsw.getName());
+          } else if(t instanceof EmissionState) {
+            if(t instanceof MagicalState) {
+              continue;
+            }
+            EmissionWrapper esw =
+              new EmissionWrapper((EmissionState) t);
+            addAState(esw);
+            inModel.put(t, mism);
+            fromM.put(t, esw);
+            toM.put(t, esw);
+            System.out.println("Added wrapped emission state " + esw.getName());
+          } else { // unknown eventuality
+            throw new IllegalResidueException(s, "Don't know how to handle state: " + s.getName());
+          }
+        }
+      } else { // unknown eventuality
+        throw new IllegalResidueException(s, "Don't know how to handle state: " + s.getName());
+      }
+    }
+
+    // wire them
+    for(Iterator i = stateAlpha.residues().iterator(); i.hasNext(); ) {
+      State s = (State) i.next();
+      System.out.println("Processing transitions involving " + s.getName());
+      if(s instanceof MagicalState) {
+        continue;
+      }
+      Wrapper sw = (Wrapper) s;
+      State swrapped = sw.getWrapped();
+      MarkovModel sModel = (MarkovModel) inModel.get(swrapped);
+      if(sModel.containsTransition(sModel.magicalState(), swrapped)) {
+        createTransition(
+          magicalState(), s,
+          model, (State) modelStart.get(model), swrapped
+        );
+      }
+      for(Iterator j = sModel.transitionsFrom(swrapped).iterator(); j.hasNext();) {
+        State tw = (State) j.next();
+        if(tw instanceof MagicalState) {
+          continue;
+        }
+        State t = (State) toM.get(tw);
+        createTransition(s, t, sModel, sw, tw);
+      }
+      for(Iterator j = sModel.transitionsTo(swrapped).iterator(); j.hasNext();) {
+        State tw = (State) j.next();
+        if(tw instanceof MagicalState) {
+          continue;
+        }
+        State t = (State) fromM.get(tw);
+        createTransition(t, s, sModel, tw, sw);
+      }
+    }
+    System.out.println("Done");
   }
   
   public void createTransition(State from, State to)
@@ -83,18 +307,6 @@ public class FlatModel implements MarkovModel {
     throw new UnsupportedOperationException("setTransitionScore not supported by FlatModel");
   }
 
-  public State sampleTransition(State from) throws IllegalResidueException {
-    return flat.sampleTransition(from);
-  }
-  
-  public Set transitionsFrom(State from) throws IllegalResidueException {
-    return flat.transitionsFrom(from);
-  }
-  
-  public Set transitionsTo(State to) throws IllegalResidueException {
-    return flat.transitionsTo(to);
-  }
-
   public void addState(State toAdd)
   throws UnsupportedOperationException {
     throw new UnsupportedOperationException("addState not supported by FlatModel");
@@ -104,348 +316,73 @@ public class FlatModel implements MarkovModel {
   throws UnsupportedOperationException {
     throw new UnsupportedOperationException("removeState not supported by FlatModel");
   }
+
+  public static interface Wrapper extends State {
+    public State getWrapped();
+  }
   
-  public double getTransitionScore(State from, State to)
-  throws IllegalResidueException, IllegalTransitionException {
-    stateAlphabet().validate(from);
-    stateAlphabet().validate(to);
-    if(!flat.containsTransition(from, to)) {
-      throw new IllegalTransitionException(from, to, "Transition does not exist");
+  public static class DotStateWrapper extends DotState implements Wrapper {
+    private final State wrapped;
+    
+    public State getWrapped() {
+      return wrapped;
     }
     
-    State from2, to2;
-    MarkovModel mod;
-    if(from instanceof StateProxy) {
-      from2 = ((StateProxy) from).getWrappedState();
-      mod = ((StateProxy) from).getSourceModel();
-      if(to instanceof MagicalState) {
-        to2 = to;
-      } else if(to instanceof StateProxy) {
-        to2 = ((StateProxy) to).getWrappedState();
-      } else {
-        to2 = ((StateWrapper) to).getModelState();
-      }
-    } else if(to instanceof StateProxy) {
-      to2 = ((StateProxy) to).getWrappedState();
-      mod = ((StateProxy) to).getSourceModel();
-      if(from instanceof MagicalState) {
-        from2 = from;
-      } else if(from instanceof StateProxy) {
-        from2 = ((StateProxy) from).getWrappedState();
-      } else {
-        from2 = ((StateWrapper) from).getModelState();
-      }
-    } else {
-      from2 = ((StateWrapper) from).getModelState();
-      to2 = ((StateWrapper) to).getModelState();
-      mod = ((ModelInState) from2).getModel();
+    public DotStateWrapper(State wrapped) {
+      super(wrapped.getName());
+      this.wrapped = wrapped;
     }
-    
-    return mod.getTransitionScore(from2, to2);
   }
 
-  public void registerWithTrainer(ModelTrainer modelTrainer) {
-    if(modelTrainer.getTrainerForModel(flat) == null) {
-      TransitionTrainer tTrainer = new SimpleTransitionTrainer(flat);
-      try {
-        modelTrainer.registerTrainerForModel(flat, tTrainer);
-      } catch (SeqException se) {
-        throw new BioError(se, "Can't register trainer for model, even though " + 
-          " there is no trainer associated with the model");
-      }
-      for(Iterator i = stateAlphabet().residues().iterator(); i.hasNext(); ) {
-        State s = (State) i.next();
-        if(s instanceof EmissionState) {
-          ((EmissionState) s).registerWithTrainer(modelTrainer);
-        }
-        if(s instanceof StateWrapper) {
-          ((StateWrapper) s).getModelState().getModel().registerWithTrainer(modelTrainer);
-        }
-        try {
-          for(Iterator j = transitionsFrom(s).iterator(); j.hasNext(); ) {
-            State t = (State) j.next();
-            modelTrainer.registerTrainerForTransition(s, t, tTrainer, s, t);
-          }
-        } catch (IllegalResidueException ire) {
-          throw new BioError(ire, "State " + s.getName() +
-                             " listed in alphabet " +
-                             stateAlphabet().getName() + " dissapeared.");
-        } catch (SeqException se) {
-          throw new BioError(se, "Somehow, my trainer is not registered.");
-        }
-      }
-    }
-  }
-  
-  public FlatModel(MarkovModel model)
-  throws IllegalResidueException, IllegalAlphabetException {
-    this.source = model;
+  public static class EmissionWrapper
+  extends SimpleResidue implements Wrapper, EmissionState {
+    private final EmissionState wrapped;
     
-    flat = new SimpleMarkovModel(model.heads(), model.emissionAlphabet());
-
-    // add all the states
-    System.out.println("Adding states");
-    Map old2from = new HashMap();
-    Map old2to = new HashMap();
-    for(Iterator i = model.stateAlphabet().residues().iterator(); i.hasNext(); ) {
-      State s = (State) i.next();
-      if(s instanceof DotState) { // simple dot state in model
-        DotStateProxy dsw = new DotStateProxy(s, model, "." + s.getName());
-        old2from.put(s, dsw);
-        old2to.put(s, dsw);
-        flat.addState(dsw);
-        System.out.println("Added " + dsw.getName());
-      } else if(s == model.magicalState()) { // magical state
-        old2from.put(model.magicalState(), model.magicalState());
-        old2to.put(model.magicalState(), model.magicalState());
-      } else if(s instanceof EmissionState) {  // simple emission state in model
-        EmissionStateProxy esw = new EmissionStateProxy(
-          (EmissionState) s, model, s.getName()
-        );
-        old2from.put(s, esw);
-        old2to.put(s, esw);
-        flat.addState(esw);
-        System.out.println("Added " + esw.getName());
-      } else if(s instanceof ModelInState) { // complex model inside state
-        ModelInState mis = (ModelInState) s;
-        MarkovModel mism = mis.getModel();
-        FlatModel flatM = new FlatModel(mism);
-        for(Iterator j = flatM.stateAlphabet().residues().iterator(); j.hasNext(); ) {
-          State t = (State) j.next();
-          if(t instanceof EmissionState) {
-            EmissionStateWrapper esw = new SimpleEmissionStateWrapper(
-              (EmissionStateWrapper) t, mis
-            );
-            old2from.put(t, esw);
-            old2to.put(t, esw);
-            flat.addState(esw);
-            System.out.println("Added " + esw.getName());
-          } else if(t instanceof DotState) {
-            DotStateWrapper dsw = new DotStateWrapper(t, mis, "." + t.getName());
-            old2from.put(t, dsw);
-            old2to.put(t, dsw);
-            flat.addState(dsw);
-            System.out.println("Added " + dsw.getName());
-          } else if(t == mism.magicalState()) {
-            DotStateWrapper start = new DotStateWrapper(mism.magicalState(), mis, "start");
-            DotStateWrapper end = new DotStateWrapper(mism.magicalState(), mis, "end");
-            old2from.put(model.magicalState(), start);
-            old2to.put(model.magicalState(), end);
-            old2from.put(s, end);
-            old2to.put(s, start);
-            flat.addState(start);
-            flat.addState(end);
-            System.out.println("Added " + start.getName() + " and " + end.getName());
-          }
-        }
-      } else { // unknown eventuality
-        throw new IllegalResidueException(s, "Don't know how to handle state: " + s.getName());
-      }
+    public State getWrapped() {
+      return wrapped;
     }
 
-    // wire them
-    for(Iterator i = flat.stateAlphabet().residues().iterator(); i.hasNext(); ) {
-      State s = (State) i.next();
-      System.out.println("Processing transitions involving " + s.getName());
-      if(s instanceof MagicalState) {
-      } else if(s instanceof StateProxy) {
-        StateProxy sp = (StateProxy) s;
-        State swrapped = sp.getWrappedState();
-        MarkovModel smod = sp.getSourceModel();
-        for(Iterator j = smod.transitionsFrom(swrapped).iterator(); j.hasNext(); ) {
-          State twrapped = (State) j.next();
-          State t = (State) old2to.get(twrapped);
-          if(!flat.containsTransition(s, t)) {
-            flat.createTransition(s, t);
-            System.out.println("Created transition " + s.getName() + " -> " + t.getName());
-          }
-        }
-        for(Iterator j = smod.transitionsTo(swrapped).iterator(); j.hasNext(); ) {
-          State twrapped = (State) j.next();
-          State t = (State) old2to.get(twrapped);
-          if(!flat.containsTransition(t, s)) {
-            flat.createTransition(t, s);
-            System.out.println("Created transition " + t.getName() + " -> " + s.getName());
-          }
-        }
-      } else if(s instanceof StateWrapper) {
-        StateWrapper sw = (StateWrapper) s;
-        State swrapped = sw.getWrappedState();
-        MarkovModel wmod = sw.getModelState().getModel();
-        for(Iterator j = wmod.transitionsFrom(swrapped).iterator(); j.hasNext(); ) {
-          State twrapped = (State) j.next();
-          flat.createTransition(s, (State) old2to.get(twrapped));
-          System.out.println(
-            "Transition " + s.getName() + " -> " +
-            ((State) old2to.get(twrapped)).getName()
-          );
-        }
-        for(Iterator j = wmod.transitionsTo(swrapped).iterator(); j.hasNext(); ) {
-          State twrapped = (State) j.next();
-          flat.createTransition((State) old2from.get(twrapped), s);
-          System.out.println(
-            "Transition " + ((State) old2from.get(twrapped)).getName() + " -> " +
-            s
-          );
-        }
-      }
-    }
-    System.out.println("Done");
-  }
-  
-  public static interface StateProxy extends State {
-    public State getWrappedState();
-    public MarkovModel getSourceModel();
-  }
-  
-  private static class DotStateProxy extends DotState implements StateProxy {
-    private final State wrappedState;
-    private final MarkovModel sourceModel;
-    
-    public State getWrappedState() {
-      return wrappedState;
-    }
-    
-    public MarkovModel getSourceModel() {
-      return sourceModel;
-    }
-    
-    public DotStateProxy(State wrappedState, MarkovModel sourceModel, String name) {
-      super(name);
-      this.wrappedState = wrappedState;
-      this.sourceModel = sourceModel;
-    }
-  }
-  
-  private static class EmissionStateProxy extends SimpleResidue implements StateProxy, EmissionState {
-    private final EmissionState wrappedState;
-    private final MarkovModel sourceModel;
-    
-    public State getWrappedState() {
-      return wrappedState;
-    }
-    
-    public MarkovModel getSourceModel() {
-      return sourceModel;
-    }
-    
-    public double getWeight(Residue r) throws IllegalResidueException {
-      return wrappedState.getWeight(r);
-    }
-    
-    public void setWeight(Residue r, double score)
-    throws IllegalResidueException {
-      wrappedState.setWeight(r, score);
+    public int [] getAdvance() {
+      return wrapped.getAdvance();
     }
     
     public void registerWithTrainer(ModelTrainer trainer) {
-      wrappedState.registerWithTrainer(trainer);
-    }
-    
-    public int [] getAdvance() {
-      return wrappedState.getAdvance();
+      wrapped.registerWithTrainer(trainer);
     }
     
     public Residue sampleResidue() {
-      return wrappedState.sampleResidue();
+      return wrapped.sampleResidue();
+    }
+    
+    public double getWeight(Residue r)
+    throws IllegalResidueException {
+      return wrapped.getWeight(r);
+    }
+    
+    public void setWeight(Residue r, double weight)
+    throws IllegalResidueException {
+      wrapped.setWeight(r, weight);
     }
     
     public Alphabet alphabet() {
-      return wrappedState.alphabet();
+      return wrapped.alphabet();
     }
     
-    public EmissionStateProxy(EmissionState wrappedState, MarkovModel sourceModel, String name) {
-      super(name.charAt(0), name, Annotation.EMPTY_ANNOTATION);
-      this.wrappedState = wrappedState;
-      this.sourceModel = sourceModel;
+    public EmissionWrapper(EmissionState wrapped) {
+      super(wrapped.getSymbol(), wrapped.getName(), wrapped.getAnnotation());
+      this.wrapped = wrapped;
     }
   }
   
-  private static class DotStateWrapper extends DotState implements StateWrapper {
-    private final State wrappedState;
-    private final ModelInState modelState;
+  private class ModelTransition {
+    public final MarkovModel model;
+    public final State from;
+    public final State to;
     
-    public State getWrappedState() {
-      return wrappedState;
-    }
-    
-    public ModelInState getModelState() {
-      return modelState;
-    }
-
-    public DotStateWrapper(State wrappedState, ModelInState modelState, String name)
-    throws IllegalArgumentException {
-      super(name);
-      if(
-        wrappedState instanceof EmissionState ||
-        wrappedState instanceof ModelInState
-      ) {
-        throw new IllegalArgumentException(
-          "DotStateWrapper must wrap a silent state, not " + wrappedState
-        );
-      }
-      this.wrappedState = wrappedState;
-      this.modelState = modelState;
-    }
-  }
-
-  private static class SimpleStateWrapper extends SimpleResidue implements StateWrapper {
-    private final State wrappedState;
-    private final ModelInState modelState;
-    
-    public State getWrappedState() {
-      return wrappedState;
-    }
-    
-    public ModelInState getModelState() {
-      return modelState;
-    }
-
-    public SimpleStateWrapper(State wrappedState, ModelInState modelState) {
-      super(modelState.getSymbol(), modelState.getName() + "-" + wrappedState.getName(), null);
-      this.wrappedState = wrappedState;
-      this.modelState = modelState;
-    }
-  }
-  
-  private static class SimpleEmissionStateWrapper extends SimpleStateWrapper implements EmissionStateWrapper {
-    public Residue sampleResidue() {
-      return ((EmissionState) getWrappedState()).sampleResidue();
-    }
-    
-    public double getWeight(Residue res)
-    throws IllegalResidueException {
-      return ((EmissionState) getWrappedState()).getWeight(res);
-    }
-    
-    public void setWeight(Residue res, double weight)
-    throws IllegalResidueException {
-      ((EmissionState) getWrappedState()).setWeight(res, weight);
-    }
-    
-    public Alphabet alphabet() {
-      return ((EmissionState) getWrappedState()).alphabet();
-    }
-    
-    public void registerWithTrainer(ModelTrainer modelTrainer) {
-      ((EmissionState) getWrappedState()).registerWithTrainer(modelTrainer);
-      for(
-        Iterator i = modelTrainer.trainersForState(
-          ((EmissionState) getWrappedState())
-        ).iterator();
-        i.hasNext();
-      ) {
-        StateTrainer st = (StateTrainer) i.next();
-        modelTrainer.registerTrainerForState(this, st);
-      }
-    }
-    
-    public int[] getAdvance() {
-      return ((EmissionState) getWrappedState()).getAdvance();
-    }
-
-    public SimpleEmissionStateWrapper(EmissionState wrappedState, ModelInState modelState) {
-      super(wrappedState, modelState);
+    public ModelTransition(MarkovModel model, State from, State to) {
+      this.model = model;
+      this.from = from;
+      this.to = to;
     }
   }
 }
