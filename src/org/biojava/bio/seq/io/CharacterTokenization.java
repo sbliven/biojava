@@ -30,10 +30,23 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
+ * <p>
  * Implementation of SymbolTokenization which binds symbols
- * to single unicode characters
+ * to single unicode characters,
+ * </p>
+ *
+ * <p>
+ * Many alphabets (and all simple built-in alphabets like DNA, RNA and Protein)
+ * will have an instance of CharacterTokenization registered under the name
+ * 'token', so that you could say <code>CharacterTokenization ct
+ * = (CharacterTokenization) alpha.getTokenization('token');</code> and expect
+ * it to work. When you construct a new instance of this class for an alphabet,
+ * there will be no intial associations of Symbols with characters. It is your
+ * responsibility to populate the new tokenization appropreately.
+ * </p>
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.2
  */
 
@@ -66,6 +79,27 @@ public class CharacterTokenization
 	return Annotation.EMPTY_ANNOTATION;
     }
 
+    /**
+     * <p>
+     * Bind a Symbol to a character.
+     * </p>
+     *
+     * <p>
+     * This method will ensure that when this char is observed, it resolves to
+     * this symbol. If it was previously associated with another symbol, the old
+     * binding is removed.
+     * If this is the first time the symbol has been bound to any character,
+     * then this character is taken to be the default tokenization of the
+     * Symbol. This means that when converting symbols into characters, this
+     * char will be used. If the symbol has previously been bound to another
+     * character, then this char will not be produced for the symbol when
+     * stringifying the symbol, but this symbol will be produced when tokenizing
+     * this character.
+     * </p>
+     *
+     * @param s  the Symbol to bind
+     * @param c  the char to bind it to
+     */
     public void bindSymbol(Symbol s, char c) {
 	Character chr = new Character(c);
 

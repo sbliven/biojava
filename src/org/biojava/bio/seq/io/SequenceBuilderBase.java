@@ -41,6 +41,8 @@ import org.biojava.bio.seq.impl.*;
  */
 
 public abstract class SequenceBuilderBase implements SequenceBuilder {
+    public static Object ERROR_FEATURES_PROPERTY 
+      = SequenceBuilderBase.class + "ERROR_FEATURES_PROPERTY";
 
     //
     // State
@@ -122,7 +124,7 @@ public abstract class SequenceBuilderBase implements SequenceBuilder {
      *      the new value is added to that collection. </li>
      * <li> Otherwise, the current value is replaced by a List object
      *      containing the old value then the new value in that order. </li>
-     * </ul
+     * </ul>
      */
     public void addFeatureProperty(Object key, Object value)
     throws ParseException {
@@ -149,20 +151,36 @@ public abstract class SequenceBuilderBase implements SequenceBuilder {
     }
 
     public Sequence makeSequence() {
-//	SymbolList symbols = slBuilder.makeSymbolList();
-//	Sequence seq = new SimpleSequence(symbols, uri, name, annotation);
-	try {
-	    for (Iterator i = rootFeatures.iterator(); i.hasNext(); ) {
-		TemplateWithChildren twc = (TemplateWithChildren) i.next();
-		Feature f = seq.createFeature(twc.template);
-		if (twc.children != null) {
-		    makeChildFeatures(f, twc.children);
-		}
-	    }
-	} catch (Exception ex) {
-	    throw new BioError(ex, "Couldn't create feature");
-	}
-	return seq;
+      //	SymbolList symbols = slBuilder.makeSymbolList();
+      //	Sequence seq = new SimpleSequence(symbols, uri, name, annotation);
+      try {
+        for (Iterator i = rootFeatures.iterator(); i.hasNext(); ) {
+          TemplateWithChildren twc = (TemplateWithChildren) i.next();
+          try {
+            Feature f = seq.createFeature(twc.template);
+            if (twc.children != null) {
+              makeChildFeatures(f, twc.children);
+            }
+          } catch (Exception e) {
+            // fixme: we should do something more sensible with this error
+            e.printStackTrace();
+            Set errFeatures;
+            Annotation ann = seq.getAnnotation();
+            if(ann.containsProperty(ERROR_FEATURES_PROPERTY)) {
+              errFeatures = (Set) ann.getProperty(ERROR_FEATURES_PROPERTY);
+            } else {
+              ann.setProperty(
+                ERROR_FEATURES_PROPERTY,
+                errFeatures = new HashSet()
+              );
+            }
+            errFeatures.add(twc);
+          }
+        }
+      } catch (Exception ex) {
+        throw new BioError(ex, "Couldn't create feature");
+      }
+      return seq;
     }
 
     private void makeChildFeatures(Feature parent, Set children)
