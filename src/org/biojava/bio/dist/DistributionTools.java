@@ -42,6 +42,30 @@ public class DistributionTools {
   private DistributionTools(){}
 
   /**
+   * Make a distribution from a count
+   */
+  public static Distribution countToDistribution(Count c){
+    FiniteAlphabet a  = (FiniteAlphabet)c.getAlphabet();
+    Distribution d = null;
+    try{
+      d = DistributionFactory.DEFAULT.createDistribution(a);
+      AlphabetIndex index =
+          AlphabetManager.getAlphabetIndex(a);
+      DistributionTrainerContext dtc = new SimpleDistributionTrainerContext();
+      dtc.registerDistribution(d);
+
+      for(int i = 0; i < a.size(); i++){
+        dtc.addCount(d, index.symbolForIndex(i),
+         c.getCount((AtomicSymbol)index.symbolForIndex(i)));
+      }
+      dtc.train();
+    }catch(NestedException ne){
+      throw new BioError(ne, "Assertion Error: Cannot convert Count to Distribution");
+    }
+    return d;
+  }
+
+  /**
    * Compares the emission spectra of two distributions
    * @return true if alphabets and symbol weights are equal for the two distributions.
    * @throws IllegalAlphabetException if one or both of the Distributions are over infinite alphabets.
