@@ -33,7 +33,6 @@ import java.util.ArrayList ;
 public class GroupIterator implements Iterator {
     
     Structure structure   ;
-    Chain     chain       ;
     int current_model_pos ;
     int current_chain_pos ;
     int current_group_pos ;
@@ -42,7 +41,6 @@ public class GroupIterator implements Iterator {
     
     public GroupIterator (Structure struct) { 
 	structure = struct     ;
-	chain     = null       ;
 	current_model_pos = 0  ;
 	current_chain_pos = 0  ;
 	current_group_pos = -1 ;
