@@ -39,6 +39,7 @@ import java.util.Set;
  * </p>
  *
  * @author Thomas Down
+ * @author Len Trigg
  */
 
 public class SmallMap extends AbstractMap implements Serializable {
@@ -125,11 +126,18 @@ public class SmallMap extends AbstractMap implements Serializable {
 	return false;
     }
 
+
+    // num ranges from 1 to numMappings
     private void removeMapping(int num) {
-	if (num < (numMappings - 1)) {
-	    System.arraycopy(mappings, num + 1, mappings, num, (numMappings - num - 1) * 2);
-	}
+        //System.err.println("removeMapping(" + num + "/" + numMappings + ")");
+        //System.err.println("Before: " + toString());
+	if (num < numMappings) {
+	    System.arraycopy(mappings, num * 2, mappings, (num - 1) * 2, (numMappings - num) * 2);
+        }
+        mappings[numMappings * 2 - 1] = null;
+        mappings[numMappings * 2 - 2] = null;
 	numMappings--;
+        //System.err.println("After: " + toString());
     }
 
     private class KeySet extends AbstractSet {
