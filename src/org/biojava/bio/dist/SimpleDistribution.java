@@ -49,7 +49,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Thomas Down
  * @author Mark Schreiber
  * @since 1.0
- * @serial WARNING serilized versions of this class may not be compatible with later versions of BioJava
+ * @serial WARNING serialized versions of this class may not be compatible with later versions of BioJava
  */
 public class SimpleDistribution
 extends AbstractDistribution implements Serializable{
@@ -110,7 +110,7 @@ extends AbstractDistribution implements Serializable{
 
 
   /**
-   * Indicate wether the weights array has been allocated yet.
+   * Indicate whether the weights array has been allocated yet.
    *
    * @return  true if the weights are allocated
    */

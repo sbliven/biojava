@@ -44,8 +44,8 @@ import org.biojava.utils.*;
 /**
  * An abstract implementation of Distribution.
  * <p>
- * You will need to over-ride <code>getWeight()</code> for a simple
- * implementation. You may also wish to over-ride the other methods if the
+ * You will need to override <code>getWeight()</code> for a simple
+ * implementation. You may also wish to override the other methods if the
  * default implementation is not suitable.
  * </p>
  *
@@ -116,7 +116,7 @@ public abstract class AbstractDistribution
   }
 
   /**
-   * Implement this to actualy set the weight.
+   * Implement this to actually set the weight.
    *
    * <p>
    * Do not inform any listneres. This has already been done for you. Just
@@ -213,7 +213,7 @@ public abstract class AbstractDistribution
       nullModel.addChangeListener(nullModelForwarder);
     }
     if(!hasListeners()) {
-      // if there are no listners yet, don't g through the overhead of
+      // if there are no listeners yet, don't go through the overhead of
       // synchronized regions or of trying to inform them.
       setNullModelImpl(nullModel);
     } else {
@@ -237,7 +237,7 @@ public abstract class AbstractDistribution
    * Retrieve the weight for this distribution.
    * <P>
    * Performs the standard munge to handle ambiguity symbols. The actual weights
-   * for each attomic symbol should be calculated by the getWeightImpl
+   * for each atomic symbol should be calculated by the getWeightImpl
    * functions.
    *
    * @param sym the Symbol to find the probability of
@@ -280,8 +280,8 @@ public abstract class AbstractDistribution
   }
 
   /**
-   * Over-ride this method to implement getting the weigth for an attomic
-   * symbol. You should just do what is necisary to fetch state. All the work
+   * Override this method to implement getting the weight for an atomic
+   * symbol. You should just do what is necessary to fetch state. All the work
    * with exceptions and listeners will have been handled for you.
    *
    * @param sym   the AtomicSymbol to get the weight for
