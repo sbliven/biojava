@@ -55,13 +55,6 @@ public class SequenceDBSearchHit extends AbstractChangeable
     private Annotation annotation;
 
     /**
-     * <code>annFor</code> is the annotation forwarder for the
-     * Annotation object. It listens for changes to the annotation
-     * object and passes them on to us.
-     */
-    private ChangeListener annFor;
-
-    /**
      * Creates a new <code>SequenceDBSearchHit</code> object.
      *
      * @param sequenceID a <code>String</code> representing the ID in
@@ -96,19 +89,10 @@ public class SequenceDBSearchHit extends AbstractChangeable
 	this.eValue     = eValue;
 	this.pValue     = pValue;
 	this.subHits    = subHits;
-	this.annotation = (annotation == null ? new SimpleAnnotation() : annotation);
-    }
+	this.annotation = annotation;
 
-    {
-	// Forward annotation changes to ourself, although the
-	// annotation should not change
-	annFor = new Annotatable.AnnotationForwarder(this, getChangeSupport(Annotatable.ANNOTATION));    
-	annotation.addChangeListener(annFor,
-				     Annotatable.ANNOTATION);
-
-	// Lock the annotation by vetoing all changes to properties
-	annotation.addChangeListener(ChangeListener.ALWAYS_VETO,
-				     Annotation.PROPERTY);
+	// Lock the annotation by vetoing all changes
+	this.annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
     }
 
     public double getScore()

@@ -261,6 +261,7 @@ public class FastaSearchBuilder implements SearchBuilder
 					   eValue.doubleValue(),
 					   pValue.doubleValue(),
 					   alignment);
+
 	    subHits.add(subHit);
 	}
 	catch (IllegalSymbolException ise)

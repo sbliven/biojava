@@ -102,18 +102,19 @@ public class SearchReader implements Iterator
 	}
 	catch (ParserException pex)
 	{
-	    throw new NoSuchElementException("No valid search result could be parsed from this stream. "
-					     + "Failed at line: "
+	    throw new NoSuchElementException("No valid search result could be parsed from this stream: "
+					     + "parse failed at line "
 					     + pex.getLineNumber()
 					     + " of input");
 	}
 	catch (IOException iox)
 	{
-	    throw new NoSuchElementException("No valid search foo result could be parsed from this stream");
+	    throw new NoSuchElementException("No valid search result could be parsed from this stream");
 	}
 	catch (BioException bex)
 	{
-	    throw new NoSuchElementException("No valid search bar result could be parsed from this stream");
+	    throw new NoSuchElementException("No valid search result could be parsed from this stream: "
+					     + bex.getMessage());
 	}
     }
 

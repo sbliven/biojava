@@ -63,11 +63,9 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
 	this.pValue    = eValue;
 	this.eValue    = pValue;
 	this.alignment = alignment;
-    }
 
-    {
 	// Lock alignment by vetoing all changes
-	alignment.addChangeListener(ChangeListener.ALWAYS_VETO);
+	this.alignment.addChangeListener(ChangeListener.ALWAYS_VETO);
     }
 
     public double getScore()
@@ -87,7 +85,7 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
 
     public Alignment getAlignment()
     {
-	return null;
+	return alignment;
     }
 
     public String toString()

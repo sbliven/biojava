@@ -55,13 +55,6 @@ public class SequenceDBSearchResult extends AbstractChangeable
     private Annotation annotation;
 
     /**
-     * <code>annFor</code> is the annotation forwarder for the
-     * Annotation object. It listens for changes to the annotation
-     * object and passes them on to us.
-     */
-    protected ChangeListener annFor;
-
-    /**
      * Creates a new <code>SequenceDBSearchResult</code> object.
      *
      * @param sequenceDB a <code>SequenceDB</code> object.
@@ -86,19 +79,16 @@ public class SequenceDBSearchResult extends AbstractChangeable
 	this.searchParameters = searchParameters;
 	this.querySeq         = querySeq;
 	this.hits             = hits;
-	this.annotation       = (annotation == null ? new SimpleAnnotation() : annotation);
-    }
+	this.annotation       = annotation;
 
-    {
-	// Forward annotation changes to ourself, although the
-	// annotation should not change
-	annFor = new Annotatable.AnnotationForwarder(this, getChangeSupport(Annotatable.ANNOTATION));    
-	annotation.addChangeListener(annFor,
-				     Annotatable.ANNOTATION);
+	// Lock the sequenceDB by vetoing all changes
+	this.sequenceDB.addChangeListener(ChangeListener.ALWAYS_VETO);
+
+	// Lock the querySeq by vetoing all changes
+	this.querySeq.addChangeListener(ChangeListener.ALWAYS_VETO);
 
 	// Lock the annotation by vetoing all changes to properties
-	annotation.addChangeListener(ChangeListener.ALWAYS_VETO,
-				     Annotation.PROPERTY);
+	this.annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
     }
 
     public SymbolList getQuerySequence()

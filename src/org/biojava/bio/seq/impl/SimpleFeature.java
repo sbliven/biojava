@@ -195,7 +195,7 @@ public class SimpleFeature implements Feature, RealizingFeatureHolder, java.io.S
 	    RealizingFeatureHolder rfh = (RealizingFeatureHolder) getParent();
 	    return rfh.realizeFeature(fh, templ);
 	} catch (ClassCastException ex) {
-	    throw new BioException("Couldn't propogate feature creation request.");
+	    throw new BioException("Couldn't propagate feature creation request.");
 	}
     }
 

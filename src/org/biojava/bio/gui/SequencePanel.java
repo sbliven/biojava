@@ -38,7 +38,7 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.gui.sequence.*;
 
-import java.util.List; // usefull trick to 'hide' javax.swing.List
+import java.util.List; // useful trick to 'hide' javax.swing.List
 
 /**
  * A panel that visualy displays a Sequence.
