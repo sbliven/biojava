@@ -24,6 +24,7 @@ package org.biojava.bio.seq.io;
 import java.io.PrintStream;
 
 import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.Feature;
 import org.biojava.bio.symbol.Location;
 
 /**
@@ -79,4 +80,16 @@ public interface SeqFileFormer extends SeqIOListener
     public StringBuffer formatLocation(final StringBuffer           sb,
 				       final Location               loc,
 				       final StrandedFeature.Strand strand);
+
+	/**
+	 * Formats the location of a feature.  This version is required when
+	 * formatting remote locations, since the location field of a remote
+	 * feature is the projection of that feature on the sequence.  When a
+	 * distinction is made between 'order' and 'join' this method will likely
+	 * be extended for that also.
+	 *
+	 * @param theFeature The feature with the location to format
+	 * @return String The formatted location
+	 */
+	public String formatLocation(Feature theFeature);
 }

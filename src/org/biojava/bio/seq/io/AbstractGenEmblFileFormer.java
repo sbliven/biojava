@@ -47,6 +47,7 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.RemoteFeature;
 import org.biojava.bio.symbol.CompoundLocation;
 import org.biojava.bio.symbol.FuzzyLocation;
 import org.biojava.bio.symbol.FuzzyPointLocation;
@@ -266,6 +267,80 @@ class AbstractGenEmblFileFormer
 	return sb;
     }
 
+	/**
+	 * Formats the location of a feature.  This version is required when
+	 * formatting remote locations, since the location field of a remote
+	 * feature is the projection of that feature on the sequence.  When a
+	 * distinction is made between 'order' and 'join' this method will likely
+	 * be extended for that also.
+	 *
+	 * @param theFeature The feature with the location to format
+	 * @return String The formatted location
+	 */
+	public String formatLocation(Feature theFeature)
+	{
+		String formattedLocation = null;
+		StrandedFeature.Strand featureStrand = StrandedFeature.POSITIVE;
+
+		if(theFeature instanceof RemoteFeature)
+		{
+			StringBuffer tempBuffer = new StringBuffer();
+			List regionList = ((RemoteFeature)theFeature).getRegions();
+
+			if(regionList.size() > 1)
+			{
+				tempBuffer.append("join(");
+			}
+			java.util.ListIterator tempIterator = regionList.listIterator();
+
+			while(tempIterator.hasNext())
+			{
+				// Set up remote location
+				RemoteFeature.Region tempRegion = (RemoteFeature.Region)(tempIterator.next());
+
+				if(tempRegion.getSeqID() != null)
+				{
+					tempBuffer.append(tempRegion.getSeqID());
+					tempBuffer.append(':');
+				}
+
+				// Add the actual location
+				String tempLocation = null;
+				if(theFeature instanceof StrandedFeature)
+				{
+					featureStrand = ((StrandedFeature)theFeature).getStrand();
+				}
+				tempLocation = this.formatLocation(
+						tempRegion.getLocation(), featureStrand);
+				tempBuffer.append(tempLocation);
+
+				// Only have commas between two subregions
+				if(tempIterator.hasNext())
+				{
+					tempBuffer.append(',');
+				}
+			}
+
+			// Close out the join block if needed
+			if(regionList.size() > 1)
+			{
+				tempBuffer.append(')');
+			}
+			formattedLocation = tempBuffer.toString();
+		}
+		else
+		{
+			if(theFeature instanceof StrandedFeature)
+			{
+				featureStrand = ((StrandedFeature)theFeature).getStrand();
+			}
+			formattedLocation = this.formatLocation(
+					theFeature.getLocation(), featureStrand);
+		}
+
+		return formattedLocation;
+	}
+
     /**
      * <code>formatLocation</code> creates an EMBL/Genbank style
      * representation of a <code>Location</code>. This is a
@@ -297,7 +372,7 @@ class AbstractGenEmblFileFormer
      * <code>formatLocation</code> creates an EMBL/Genbank style
      * representation of a <code>Location</code>. Supported location
      * forms:
-     *     
+     *
      * <pre>
      *   123
      *  <123 or >123
@@ -374,7 +449,7 @@ class AbstractGenEmblFileFormer
 	/* There are issues here about choosing various forms:
 	 * join(complement(...),complement(...))
 	 * complement(join(...,...))
-	 * 
+	 *
 	 * The former has the locations sorted in reverse order.
 	 */
 
