@@ -67,7 +67,7 @@ public class EmblLikeFormat
     {
         Set validFormats = new HashSet();
         validFormats.add("Embl");
-        validFormats.add("SwissProt");
+        validFormats.add("Swissprot");
 
         SequenceFormat.FORMATS.put(EmblLikeFormat.class.getName(),
                                    validFormats);
@@ -214,8 +214,12 @@ public class EmblLikeFormat
                 return;
 
             parseEnd = parseStart + 1;
-            while (parseEnd < cline.length && cline[parseEnd] != ' ')
+            while (parseEnd < cline.length && cline[parseEnd] != ' ') {
+                if (cline[parseEnd] == '.' || cline[parseEnd] == '~') {
+                   cline[parseEnd] = '-';
+                }
                 ++parseEnd;
+            }
 
             // Got a segment of read sequence data
             parser.characters(cline, parseStart, parseEnd - parseStart);
