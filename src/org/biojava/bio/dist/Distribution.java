@@ -88,7 +88,7 @@ public interface Distribution extends Changeable {
    * exactly one of the symbols matching it was emitted.
    *
    * @param s the Symbol emitted
-   * @return  the log probability of emitting that symbol
+   * @return  the probability of emitting that symbol
    * @throws IllegalSymbolException if s is not from this state's alphabet
    */
   double getWeight(Symbol s) throws IllegalSymbolException;

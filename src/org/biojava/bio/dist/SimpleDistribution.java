@@ -25,6 +25,7 @@ package org.biojava.bio.dist;
 import java.util.*;
 import java.io.Serializable;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
@@ -36,63 +37,34 @@ import org.biojava.bio.symbol.*;
  */
 
 public final class SimpleDistribution extends AbstractDistribution implements Serializable {
-  private final FiniteAlphabet alphabet;
-  private final Map weight;
+  private transient AlphabetIndex indexer;
+  private double []weights;
   private Distribution nullModel;
   
   public Alphabet getAlphabet() {
-    return alphabet;
+    return indexer.getAlphabet();
   }
   
   public Distribution getNullModel() {
     return this.nullModel;
   }
   
-  /**
-  *Assign a distribution to be the background null model.
-  *@param nullModel the distribution to act as the null model.
-  */
-  
-  public void setNullModel(Distribution nullModel)
-  throws IllegalAlphabetException {
-    if(nullModel == null) {
-      throw new NullPointerException(
-        "The null model must not be null." +
-        " The apropreate null-model is a UniformDistribution instance."
-      );
-    }
-    if(nullModel.getAlphabet() != getAlphabet()) {
-      throw new IllegalAlphabetException(
-        "Could not use distribution " + nullModel +
-        " as its alphabet is " + nullModel.getAlphabet().getName() +
-        " and this distribution's alphabet is " + getAlphabet().getName()
-      );
-    }
-    this.nullModel = nullModel;   
+  protected void setNullModelImpl(Distribution nullModel)
+  throws IllegalAlphabetException, ChangeVetoException {
+    this.nullModel = nullModel;
   }
   
   public double getWeight(Symbol s)
   throws IllegalSymbolException {
-    Double d = (Double) weight.get(s);
-    if(d != null) {
-      return d.doubleValue();
+    if(s instanceof AtomicSymbol) {
+      return weights[indexer.indexForSymbol(s)];
     } else {
-      alphabet.validate(s);
-      if(!(s instanceof AtomicSymbol)) {
-        return getAmbiguityWeight(s);
-      } else {
-        return Double.NaN;
-      }
+      return getAmbiguityWeight(s);
     }
   }
 
-    /**
-     * Set the weight associated with the specified symbol in this distribution.
-     */
-  
-  public void setWeight(Symbol s, double w)
-  throws IllegalSymbolException {
-    alphabet.validate(s);
+  protected void setWeightImpl(Symbol s, double w)
+  throws IllegalSymbolException, ChangeVetoException {
     if(!(s instanceof AtomicSymbol)) {
       throw new IllegalSymbolException(
         "Can't set the weight for an ambiguity symbol " + s.getName()
@@ -104,13 +76,15 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
         s.getName() + " -> " + w
       );
     }
-    Double d = new Double(w);
-    weight.put(s, d);
+    weights[indexer.indexForSymbol(s)] = w;
   }
   
   public SimpleDistribution(FiniteAlphabet alphabet) {
-    this.alphabet = alphabet;
-    this.weight = new HashMap();
+    this.indexer = AlphabetManager.getAlphabetIndex(alphabet);
+    this.weights =  new double[alphabet.size()];
+    for(int i = 0; i < alphabet.size(); i++) {
+      weights[i] = Double.NaN;
+    }
     try {
       setNullModel(new UniformDistribution(alphabet));
     } catch (Exception e) {
@@ -123,10 +97,77 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
    */
 
   public void registerWithTrainer(DistributionTrainerContext dtc) {
-    try {
-	    dtc.registerTrainer(this, new SimpleDistributionTrainer(this));
-    } catch (IllegalAlphabetException ex) {
-	    throw new BioError("Couldn't register trainer for simple distribution");
+   dtc.registerTrainer(this, new Trainer());
+  }
+  
+  private class Trainer implements DistributionTrainer {
+    private final Count counts;
+    
+    public Trainer() {
+      counts = new IndexedCount(indexer);
+    }
+    
+    public void addCount(DistributionTrainerContext dtc, Symbol sym, double times)
+    throws IllegalSymbolException {
+      try {
+        counts.increaseCount(sym, times);
+      } catch (ChangeVetoException cve) {
+        throw new BioError(
+          cve, "Assertion Failure: Change to Count object vetoed"
+        );
+      }
+    }
+    
+    public void clearCounts() {
+      try {
+        int size = ((FiniteAlphabet) counts.getAlphabet()).size();
+        for(int i = 0; i < size; i++) {
+          counts.zeroCounts();
+        }
+      } catch (ChangeVetoException cve) {
+        throw new BioError(
+          cve, "Assertion Failure: Change to Count object vetoed"
+        );
+      }
+    }
+    
+    public void train(double weight)
+    throws ChangeVetoException {
+      if(changeSupport == null)  {
+        trainImpl(weight);
+      } else {
+        synchronized(changeSupport) {
+          ChangeEvent ce = new ChangeEvent(
+            SimpleDistribution.this,
+            Distribution.WEIGHTS
+          );
+          changeSupport.firePreChangeEvent(ce);
+          trainImpl(weight);
+          changeSupport.firePostChangeEvent(ce);
+        }
+      }
+    }
+    
+    protected void trainImpl(double weight) {
+      try {
+        Distribution nullModel = getNullModel();
+        double []total = new double[weights.length];
+        double sum = 0.0;
+        for(int i = 0; i < total.length; i++) {
+          Symbol s = indexer.symbolForIndex(i);
+          sum += total[i] = 
+            counts.getCount(s) +
+            nullModel.getWeight(s) * weight;
+        }
+        double sum_inv = 1.0 / sum;
+        for(int i = 0; i < total.length; i++) {
+          weights[i] = total[i] * sum_inv;
+        }
+      } catch (IllegalSymbolException ise) {
+        throw new BioError(ise,
+          "Assertion Failure: Should be impossible to mess up the symbols."
+        );
+      }
     }
   }
 }

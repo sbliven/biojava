@@ -95,17 +95,72 @@ public abstract class AbstractDistribution implements Distribution {
     }
   }
 
+  abstract protected void setWeightImpl(Symbol sym, double weight)
+  throws IllegalSymbolException, ChangeVetoException;
+  
   /**
-   * Set the weight of a given symbol in this distribution.  This implementation
-   * simply throws an exception.
+   * Set the weight of a given symbol in this distribution.
+   * <P>
+   * This implementation informs all listeners of the change, and then calls
+   * setWeightImpl to make the actual change. Sub-classes should over-ride
+   * setWeightImpl to implement the actual storage of the weights.
    */
-  public void setWeight(Symbol sym, double weight)
+  final public void setWeight(Symbol sym, double weight)
   throws IllegalSymbolException, ChangeVetoException {
-    throw new ChangeVetoException(
-      "There is no way to set the emission weights " +
-      "in this distribution: symbol " +
-      sym.getName()
-    );
+    if(changeSupport == null) {
+      setWeightImpl(sym, weight);
+    } else {
+      ChangeEvent ce = new ChangeEvent(
+        this,
+        Distribution.WEIGHTS,
+        new Object[] {sym, new Double(weight)},
+        new Object[] {sym, new Double(getWeight(sym))}
+      );
+      synchronized(changeSupport) {
+        changeSupport.firePreChangeEvent(ce);
+        setWeightImpl(sym, weight);
+        changeSupport.firePostChangeEvent(ce);
+      }
+    }
+  }
+  
+  abstract protected void setNullModelImpl(Distribution nullModel)
+  throws IllegalAlphabetException, ChangeVetoException;
+  
+  final public void setNullModel(Distribution nullModel)
+  throws IllegalAlphabetException, ChangeVetoException {
+    if(nullModel.getAlphabet() != getAlphabet()) {
+      throw new IllegalAlphabetException(
+        "Could not use distribution " + nullModel +
+        " as its alphabet is " + nullModel.getAlphabet().getName() +
+        " and this distribution's alphabet is " + getAlphabet().getName()
+      );
+    }
+    Distribution oldModel = getNullModel();
+    if(nullModelForwarder != null) {
+      if(oldModel != null) {
+        oldModel.removeChangeListener(nullModelForwarder);
+      }
+      nullModel.addChangeListener(nullModelForwarder);
+    }
+    if(changeSupport == null) {
+      // if there are no listners yet, don't g through the overhead of
+      // synchronized regions or of trying to inform them.
+      setNullModelImpl(nullModel);
+    } else {
+      // OK - so somebody is intereted in me. Do it properly this time.
+      ChangeEvent ce = new ChangeEvent(
+        this,
+        Distribution.NULL_MODEL,
+        nullModel,
+        oldModel
+      );
+      synchronized(changeSupport) {
+        changeSupport.firePreChangeEvent(ce);
+        setNullModelImpl(nullModel);
+        changeSupport.firePostChangeEvent(ce);
+      }
+    }    
   }
   
   /**
@@ -144,13 +199,6 @@ public abstract class AbstractDistribution implements Distribution {
       );
     }
   }
-  
-  /**
-   * Retrieve the null model Distribution that this Distribution recognizes.
-   *
-   * @return  the apropriate null model
-   */
-  public abstract Distribution getNullModel();
   
   public Symbol sampleSymbol()
   throws BioError {

@@ -81,7 +81,7 @@ extends AbstractDistribution implements Serializable {
     return getNullModel(first, second);
   }
   
-  public void setNullModel(Distribution nullModel)
+  protected void setNullModelImpl(Distribution nullModel)
   throws IllegalAlphabetException, ChangeVetoException {
     throw new ChangeVetoException(
       "PairDistribution objects can't have their null models changed."
@@ -108,6 +108,14 @@ extends AbstractDistribution implements Serializable {
     Symbol s = (Symbol) symL.get(1);
 
     return first.getWeight(f) * second.getWeight(s);      
+  }
+  
+  public void setWeightImpl(Symbol sym, double weight)
+  throws ChangeVetoException {
+    throw new ChangeVetoException(
+      "Can't set the weight directly in a PairDistribution. " +
+      "You must set the weights in the underlying distributions."
+    );
   }
   
   public PairDistribution(Distribution first, Distribution second) {

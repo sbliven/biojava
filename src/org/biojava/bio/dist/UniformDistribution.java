@@ -25,11 +25,12 @@ package org.biojava.bio.dist;
 import java.util.*;
 import java.io.Serializable;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
-*An implementation of an uniform distribution
+* An implementation of an uniform distribution
 */
 
 public class UniformDistribution
@@ -48,14 +49,8 @@ extends AbstractDistribution implements Serializable {
   *Assign a background distribution
   *@param nullModel the background distribution to assign
   */  
-  public void setNullModel(Distribution nullModel)
+  protected void setNullModelImpl(Distribution nullModel)
   throws IllegalAlphabetException {
-    if(nullModel.getAlphabet() != this.getAlphabet()) {
-      throw new IllegalAlphabetException(
-        "The null model has alphabet " + nullModel.getAlphabet() +
-        " but it should be " + this.getAlphabet()
-      );
-    }
     this.nullModel = nullModel;
   }
   
@@ -67,6 +62,13 @@ extends AbstractDistribution implements Serializable {
     } else {
       return getAmbiguityWeight(s);
     }
+  }
+  
+  protected void setWeightImpl(Symbol sym, double weight)
+  throws ChangeVetoException {
+    throw new ChangeVetoException(
+      "Can't change the weights in a UniformDistribution"
+    );
   }
   
   public void registerWithTrainer(DistributionTrainerContext dtc) {

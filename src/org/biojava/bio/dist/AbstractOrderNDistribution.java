@@ -13,7 +13,9 @@ import org.biojava.bio.symbol.*;
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public abstract class AbstractOrderNDistribution extends AbstractDistribution implements OrderNDistribution, Serializable {
+public abstract class AbstractOrderNDistribution
+extends AbstractDistribution
+implements OrderNDistribution, Serializable {
   private CrossProductAlphabet alphabet;
   private Alphabet firstA;
   private Alphabet lastA;
@@ -108,7 +110,7 @@ public abstract class AbstractOrderNDistribution extends AbstractDistribution im
      * weights which sum to 1.0.
      */
 
-    public void setWeight(Symbol sym, double w) 
+    public void setWeightImpl(Symbol sym, double w) 
         throws IllegalSymbolException, ChangeVetoException
     {
 	if (sym instanceof AtomicSymbol) {
@@ -128,21 +130,7 @@ public abstract class AbstractOrderNDistribution extends AbstractDistribution im
 	}
     }
   
-  public void setNullModel(Distribution nullModel)
-  throws IllegalAlphabetException, ChangeVetoException {
-  	if(nullModel == null) {
-    	    throw new NullPointerException(
-          	"The null model must not be null." +
-          	" The apropreate null-model is a UniformDistribution instance."
-    	    );
-  	}
-  	if(nullModel.getAlphabet() != getAlphabet()) {
-    	    throw new IllegalAlphabetException(
-          	"Could not use distribution " + nullModel +
-          	" as its alphabet is " + nullModel.getAlphabet().getName() +
-          	" and this distribution's alphabet is " + getAlphabet().getName()
-    	    );
-  	}
+  public void setNullModelImpl(Distribution nullModel) {
   	this.nullModel = nullModel;   
   }
   
@@ -175,8 +163,11 @@ public abstract class AbstractOrderNDistribution extends AbstractDistribution im
     });
   }
   
-  private class UniformNullModel extends AbstractDistribution implements Serializable {
-    private Distribution nullModel = new UniformDistribution((FiniteAlphabet) lastA);
+  private class UniformNullModel
+  extends AbstractDistribution implements Serializable {
+    private Distribution nullModel = new UniformDistribution(
+      (FiniteAlphabet) lastA
+    );
     
     public Alphabet getAlphabet() {
       return AbstractOrderNDistribution.this.getAlphabet();
@@ -189,12 +180,19 @@ public abstract class AbstractOrderNDistribution extends AbstractDistribution im
       int lb1 = symL.size() - 1;
       return nullModel.getWeight((Symbol) symL.get(lb1));
     }
-      
+    
+    protected void setWeightImpl(Symbol sym, double weight)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        "Can't change the weight of this null model"
+      );
+    }
+    
     public Distribution getNullModel() {
       return this;
     }
     
-    public void setNullModel(Distribution nullModel)
+    protected void setNullModelImpl(Distribution nullModel)
     throws IllegalAlphabetException, ChangeVetoException {
       throw new ChangeVetoException(
         "Can't set the null model for NthOrderDistribution.UniformNullModel"

@@ -39,11 +39,9 @@ public final class DNADistribution
 extends AbstractDistribution implements Serializable {
   private double [] scores;
   private Distribution nullModel;
-  private transient ChangeListener nullModelListener; 
   
   {
     scores = new double[4];
-    nullModelListener = new Distribution.NullModelForwarder(this, changeSupport);
   }
   
   public Alphabet getAlphabet() {
@@ -54,38 +52,9 @@ extends AbstractDistribution implements Serializable {
     return this.nullModel;
   }
   
-  public void setNullModel(Distribution nullModel)
+  public void setNullModelImpl(Distribution nullModel)
   throws IllegalAlphabetException, ChangeVetoException {
-    if(nullModel.getAlphabet() != getAlphabet()) {
-      throw new IllegalAlphabetException(
-        "Could not use distribution " + nullModel +
-        " as its alphabet is " + nullModel.getAlphabet().getName() +
-        " and this distribution's alphabet is " + getAlphabet().getName()
-      );
-    }
-    if(this.nullModel != null) {
-      this.nullModel.removeChangeListener(nullModelListener);
-    }
-    if(changeSupport == null) {
-      // if there are no listners yet, don't g through the overhead of
-      // synchronized regions or of trying to inform them.
-      this.nullModel = nullModel;
-      nullModel.addChangeListener(nullModelListener);
-    } else {
-      // OK - so somebody is intereted in me. Do it properly this time.
-      ChangeEvent ce = new ChangeEvent(
-        this,
-        Distribution.NULL_MODEL,
-        nullModel,
-        this.nullModel
-      );
-      synchronized(changeSupport) {
-        changeSupport.firePreChangeEvent(ce);
-        this.nullModel = nullModel;
-        nullModel.addChangeListener(nullModelListener);
-        changeSupport.firePostChangeEvent(ce);
-      }
-    }
+    this.nullModel = nullModel;
   }
   
   public double getWeight(Symbol s)
@@ -104,7 +73,7 @@ extends AbstractDistribution implements Serializable {
     }
   }
 
-  public void setWeight(Symbol s, double score)
+  public void setWeightImpl(Symbol s, double score)
   throws IllegalSymbolException, ChangeVetoException {
     int si;
     if(s == DNATools.a()) {
@@ -123,29 +92,12 @@ extends AbstractDistribution implements Serializable {
       );
     }
     
-    if(changeSupport == null) {
-      // if there are no listners yet, don't g through the overhead of
-      // synchronized regions or of trying to inform them.
-      scores[si] = score;
-    } else {
-      // OK - so somebody is intereted in me. Do it properly this time.
-      ChangeEvent ce = new ChangeEvent(
-        this,
-        Distribution.WEIGHTS,
-        new Object[] {s, new Double(score)},
-        new Object[] {s, new Double(scores[si])}
-      );
-      synchronized(changeSupport) {
-        changeSupport.firePreChangeEvent(ce);
-        scores[si] = score;
-        changeSupport.firePostChangeEvent(ce);
-      }
-    }
+    scores[si] = score;
   }
     
   public DNADistribution() {
     try {
-      setNullModel(new UniformDistribution(DNATools.getDNA()));
+      setNullModelImpl(new UniformDistribution(DNATools.getDNA()));
     } catch (IllegalAlphabetException iae) {
       throw new BioError(iae, "This should never fail. Something is screwed with alpahbets!");
     } catch (ChangeVetoException cve) {
