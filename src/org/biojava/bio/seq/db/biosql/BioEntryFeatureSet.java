@@ -328,7 +328,7 @@ class BioEntryFeatureSet implements FeatureHolder, RealizingFeatureHolder {
 		Set toplevelFeatures = new HashSet(fmap.keySet());
 		Map featureHierarchy = new HashMap();
 		if (seqDB.isHierarchySupported()) {
-		    PreparedStatement get_hierarchy = conn.prepareStatement("select parent_seqfeature_id, child_seqfeature_id from seqfeature_relationship, seqfeature where parent = seqfeature.seqfeature_id and seqfeature.bioentry_id = ?");
+		    PreparedStatement get_hierarchy = conn.prepareStatement("select parent_seqfeature_id, child_seqfeature_id from seqfeature_relationship, seqfeature where parent_seqfeature_id = seqfeature.seqfeature_id and seqfeature.bioentry_id = ?");
 		    get_hierarchy.setInt(1, bioentry_id);
 		    rs = get_hierarchy.executeQuery();
 		    while (rs.next()) {
