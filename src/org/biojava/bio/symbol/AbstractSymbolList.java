@@ -69,15 +69,15 @@ implements SymbolList {
 
   public SymbolList subList(int start, int end)
   {
-      if (start < 0 || end > length()) {
+      if (start < 1 || end > length()) {
           throw new IndexOutOfBoundsException(
                   "Sublist index out of bounds " + length() + ":" + start + "," + end
           );
       }
 
       if (end < start) {
-        throw new IndexOutOfBoundsException(
-            "send must not be lower than sstart: start=" + start + ", end=" + end
+        throw new IllegalArgumentException(
+            "end must not be lower than start: start=" + start + ", end=" + end
         );
       }
       return new SubList(start, end);

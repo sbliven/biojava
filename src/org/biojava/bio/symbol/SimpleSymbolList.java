@@ -245,6 +245,18 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
     */
 
     public SymbolList subList(int start, int end){
+        if (start < 1 || end > length()) {
+            throw new IndexOutOfBoundsException(
+                      "Sublist index out of bounds " + length() + ":" + start + "," + end
+                      );
+        }
+
+        if (end < start) {
+            throw new IllegalArgumentException(
+                "end must not be lower than start: start=" + start + ", end=" + end
+                );
+        }
+        
         SimpleSymbolList sl = new SimpleSymbolList(this,viewOffset+start,viewOffset+end);
         if (isView){
             referenceSymbolList.addChangeListener(sl);

@@ -80,23 +80,35 @@ class ChunkedSymbolList extends AbstractSymbolList {
       }
     }
 
-    public SymbolList subList(int from, int to) {
-	//
-	// Mildly optimized for case where from and to are within
-	// the same chunk.
-	//	
+    public SymbolList subList(int start, int end) {
+        if (start < 1 || end > length()) {
+          throw new IndexOutOfBoundsException(
+                  "Sublist index out of bounds " + length() + ":" + start + "," + end
+          );
+      }
 
-	int afrom = from - 1;
-	int ato = to - 1;
-	int cfrom = afrom / chunkSize;
-	if (ato / chunkSize == cfrom) {
-	    return new SubArraySymbolList(chunks[cfrom],
-					  to - from + 1,
-					  afrom % chunkSize,
-					  getAlphabet());
-	} else {
-	    return super.subList(from, to);
-	}
+      if (end < start) {
+        throw new IllegalArgumentException(
+            "end must not be lower than start: start=" + start + ", end=" + end
+        );
+      }
+        
+      //
+      // Mildly optimized for case where from and to are within
+      // the same chunk.
+      //	
+
+      int afrom = start - 1;
+      int ato = end - 1;
+      int cfrom = afrom / chunkSize;
+      if (ato / chunkSize == cfrom) {
+          return new SubArraySymbolList(chunks[cfrom],
+			                    	    end - start + 1,
+                                        afrom % chunkSize,
+                                        getAlphabet());
+      } else {
+          return super.subList(start, end);
+      }
     }
 
 
