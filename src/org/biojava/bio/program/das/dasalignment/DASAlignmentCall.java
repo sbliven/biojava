@@ -68,7 +68,7 @@ public class DASAlignmentCall {
 	serverurl = url;
     }
     
-    /** set url of structure service.
+    /** set url of aligmnent service.
      *
      * @param s  a String specifying the serverurl value
      *
@@ -76,7 +76,7 @@ public class DASAlignmentCall {
      */
     public void   setServerurl(String s) { serverurl = s;     }
 
-    /** get url of structure service.
+    /** get url of alignment service.
      *
      * @return a String representing the serverurl value
      *
@@ -84,9 +84,38 @@ public class DASAlignmentCall {
      */
     public String getServerurl(        ) { return serverurl;}
     
+    /** connect to a DAS alignment service and retreive alignments.
+     * return Alignment objects.
+     * uses the serverurl specified in the constructore to create http request
+    
+     * @return an array of Alignment objects
+     * @throws IOException ...
+     */
+    
+    public Alignment[] getAlignments()
+	throws IOException
+    {
+	URL dasUrl = null ;
+	try {
+	    dasUrl = new URL(serverurl);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    return null;
+	}
+	System.out.println("connecting to "+serverurl);
+	InputStream inStream = connectDASServer(dasUrl);
+	
 
-    /** connect to a DAS structure service and retreive 3D data.
-     * return a biojava Structure object.
+	Alignment[] ali = null;
+	try{
+	    ali =  parseDASResponse(inStream) ;
+	} catch (Exception e) {
+	    e.printStackTrace() ;
+	}
+	return ali;	
+    }
+    /** connect to a DAS alignment  service and retreive data.
+     * return a biojava Alignment object.
      *
      * @param query  a String
      * @return an array of Alignment objects
@@ -188,7 +217,6 @@ public class DASAlignmentCall {
 	    e.printStackTrace();
 	}
 	
-	//System.out.println("DASStructureCall setting DASStructureXMLResponseParser");
 
 	DASAlignmentXMLResponseParser cont_handle = new DASAlignmentXMLResponseParser() ;
 	xmlreader.setContentHandler(cont_handle);
