@@ -28,35 +28,75 @@ import java.io.*;
 import org.biojava.bio.seq.*;
 
 /**
- * Suffix tree implementation.
- * <P>
- * The interface is a bit strange, as it needed to be as space-efficient as
- * possible. More work could be done on the space issue.
+ * Suffix tree implementation.  The interface is a bit strange, as it
+ * needed to be as space-efficient as possible. More work could be
+ * done on the space issue.
+ *
+ * <p>
+ * A suffix tree is an efficient method for encoding the frequencies
+ * of motifs in a sequence.  They are sometimes used to quickly screen
+ * for similar sequences.  For instance, all motifs of length up to
+ * 2 in the sequence <code>AAGT</code> could be encoded as:
+ * </p>
+ *
+ * <pre>
+ * root(4)
+ * |
+ * A(2)--------G(1)-----T(1)
+ * |           |
+ * A(1)--G(1)  T(1)
+ * </pre>
+ *
+ * <p>
+ * A possible method of comparing SuffixTrees is provided as a kernel
+ * function as <code>org.biojava.stats.svm.tools.SuffixTreeKernel</code>.
+ * </p>
  *
  * @author Matthew Pocock
+ * @author Thomas Down (documentation and other updates) 
  */
+
 public class SuffixTree implements Serializable {
   private FiniteAlphabet alphabet;
   private SuffixNode root;
   private List resList;
   private List counts;
   
+    /**
+     * Return the Alphabet containing all Symbols which might be found in
+     * this SuffixTree.
+     */
+
   public FiniteAlphabet getAlphabet() {
     return alphabet;
   }
+
+    /**
+     * Return the node object which is the root of this suffix tree.
+     * This represents the set of all motifs found in this tree.
+     */
 
   public SuffixNode getRoot() {
     return root;
   }
   
+    /**
+     * Get a child of a SuffixTree.SuffixNode, constructing a new
+     * one if need be.  This method is here due to memory optimisations.
+     */
+
   public SuffixNode getChild(SuffixNode node, Symbol r) {
     if(!getAlphabet().contains(r)) {
       return null;
     }
-    int index = indexForRes(r);
+    int index = indexForSymbol(r);
     return getChild(node, index);
   }
   
+    /**
+     * Get the n'th child of a node.
+     */
+
   public SuffixNode getChild(SuffixNode node, int i) {
     if(!node.hasChild(i)) {
       node.addChild(this, i, new SimpleNode(alphabet.size()));
@@ -64,6 +104,15 @@ public class SuffixTree implements Serializable {
     return node.getChild(i);
   }
   
+    /**
+     * Add a count for all motifs with length of up to <code>window</code>
+     * to this tree.
+     *
+     * @param rList a SymbolList whose motifs should be added to the
+     *              tree.
+     * @param window The maximum motif length to count.
+     */
+
   public void addSymbols(SymbolList rList, int window) {
     SuffixNode [] buf = new SuffixNode[window];
     int [] counts = new int[window];
@@ -98,14 +147,32 @@ public class SuffixTree implements Serializable {
     }
   }
   
+    /**
+     * Return the length of the longest motif represented in this
+     * SuffixTree
+     */
+
   public int maxLength() {
     return counts.size();
   }
   
+    /**
+     * Return the number of motifs of a given length encoded
+     * in this SuffixTree.
+     */
+
   public int frequency(int length) {
     return ((Integer) counts.get(length - 1)).intValue();
   }
   
+    /**
+     * Construct a new SuffixTree to contain motifs over the
+     * specified alphabet.
+     *
+     * @param alphabet The alphabet of this SuffixTree (must be
+     *                 finite).
+     */
+
   public SuffixTree(FiniteAlphabet alphabet) {
     this.alphabet = alphabet;
     this.resList = alphabet.symbols().toList();
@@ -113,11 +180,21 @@ public class SuffixTree implements Serializable {
     this.root = new SimpleNode(alphabet.size());
   }
   
-  public Symbol resForIndex(int i) {
+    /**
+     * Return the Symbol corresponding to a specified index number.
+     */
+
+  public Symbol symbolForIndex(int i) {
     return (Symbol) resList.get(i);
   }
 
-  public int indexForRes(Symbol r) {
+    /**
+     * Return an internal index number corresponding to the given
+     * Symbol.  These numbers are used by the SuffixTree implementation
+     * to build the tree efficiently.
+     */
+
+  public int indexForSymbol(Symbol r) {
     return resList.indexOf(r);
   }
   
@@ -125,15 +202,39 @@ public class SuffixTree implements Serializable {
    * A node in the suffix tree.
    * <P>
    * This class is realy stupid & delegates most work off to a SuffixTree so
-   * that it is as small as possible.
+   * that it is as small (in memory-per-object terms) as possible.
    *
    * @author Matthe Pocock
    */
   public static abstract class SuffixNode implements Serializable {
+      /**
+       * Determine is this node is terminal (has no children).
+       *
+       * @return <code>true</code> if and only if this node has no children.
+       */
+
     abstract public boolean isTerminal();
+      
+      /**
+       * Determine if this node has a child corresponding to a given
+       * index number.
+       */
+
     abstract public boolean hasChild(int i);
+
+      /**
+       * Return a number (usually, but not always, a motif count)
+       * associated with this node of the tree.
+       */
+
     abstract public float getNumber();
+      
+      /**
+       * Set the number associated with this node.
+       */
+
     abstract public void setNumber(float n);
+
     abstract SuffixNode getChild(int i);
     abstract void addChild(SuffixTree tree, int i, SuffixNode n);
   }
