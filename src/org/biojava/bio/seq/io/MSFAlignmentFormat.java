@@ -41,6 +41,7 @@ import  java.util.regex.*;
  * @author Nimesh Singh
  * @author Mark Schreiber
  * @author Matthew Pocock
+ * @author Bradford Powell
  */
 
 public class MSFAlignmentFormat
