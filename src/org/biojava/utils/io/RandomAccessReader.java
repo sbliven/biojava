@@ -199,8 +199,20 @@ public class RandomAccessReader extends Reader
         return raPtrPos - bufferEnd + bufferPos;
     }
 
+    /**
+     * <code>seek</code> moves the pointer to the specified position.
+     *
+     * @param pos a <code>long</code> offset.
+     *
+     * @exception IOException if an error occurs
+     */
     public void seek(long pos) throws IOException
     {
+	// If we seek backwards after reaching EOF, we are no longer
+	// at EOF.
+	if (pos < raf.length())
+	    atEOF = false;
+
         int p = (int) (raPtrPos - pos);
 
         // Check if we can seek within the buffer
