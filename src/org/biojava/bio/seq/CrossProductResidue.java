@@ -24,6 +24,12 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 
+/**
+ * Residue in a CrossProductAlphabet.
+ *
+ * @author Thomas Down
+ */
+
 public interface CrossProductResidue extends Residue {
     /**
      * Return an immutable ordered list of residues which are

@@ -25,6 +25,15 @@ package org.biojava.bio.seq;
 import java.util.*;
 import java.lang.reflect.*;
 
+/**
+ * Cross product of a list of arbitrary alphabets.  This is the
+ * most flexible implementation of CrossProductAlphabet, but it
+ * is likely to be possible to produce more efficient implementations
+ * for specific tasks.
+ * 
+ * @author Thomas Down
+ */
+
 public class SimpleCrossProductAlphabet implements CrossProductAlphabet {
     private List alphas;
     private HashMap ourResidues;
@@ -107,6 +116,10 @@ public class SimpleCrossProductAlphabet implements CrossProductAlphabet {
 	return r;
     }
 
+    /**
+     * Simple wrapper to assist in list-comparisons.
+     */
+
     private static class ListWrapper {
         List l;
 
@@ -138,6 +151,11 @@ public class SimpleCrossProductAlphabet implements CrossProductAlphabet {
 	    return c;
 	}
     }
+
+    /**
+     * Concrete implementation of CrossProductResidue, as returned
+     * by a SimpleCrossProductAlphabet.
+     */
 
     private class SCPAResidue implements CrossProductResidue {
 	private List l;
