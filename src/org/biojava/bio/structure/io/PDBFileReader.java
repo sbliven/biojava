@@ -145,7 +145,7 @@ public class PDBFileReader implements StructureIOFile {
 	return header ;
     }
 
-    private String getTimeStamp(){
+    protected String getTimeStamp(){
 
 	Calendar cal = Calendar.getInstance() ;
 	// Get the components of the time
@@ -303,13 +303,14 @@ public class PDBFileReader implements StructureIOFile {
     
     */
    private void pdb_HEADER_Handler(String line) {
-       //System.out.println(line);
+       System.out.println(line);
 
        String classification  = line.substring (10, 50).trim() ;
        String deposition_date = line.substring (50, 59).trim() ;
        String idCode          = line.substring (62, 66).trim() ;       
 
        header.put("idCode",idCode);
+       structure.setPDBCode(idCode);
        header.put("classification",classification);
        header.put("depDate",deposition_date);
        
@@ -353,12 +354,19 @@ public class PDBFileReader implements StructureIOFile {
     */
 
     private void pdb_REMARK_2_Handler(String line) {
+	
 	int i = line.indexOf("ANGSTROM");
 	if ( i != -1) {
 	    // line contains ANGSTROM info...
 	    String resolution = line.substring(22,27).trim();
 	    // convert string to float
-	    float res = Float.parseFloat(resolution);
+	    float res = 99 ;
+	    try {
+		 res = Float.parseFloat(resolution);
+	    } catch (NumberFormatException e) {
+		e.printStackTrace() ;
+		return ;
+	    }
 	    header.put("resolution",new Float(res));
 	}
 
@@ -680,6 +688,7 @@ public class PDBFileReader implements StructureIOFile {
     
     /** test if the chain is already known (is in current_model
      * ArrayList) and if yes, returns the chain 
+     * if no -> returns null
      */
     private Chain isKnownChain(String chainID){
 	Chain testchain =null;
@@ -702,13 +711,49 @@ public class PDBFileReader implements StructureIOFile {
     }
 
 
+    private BufferedReader getBufferedReader(InputStream inStream) 
+	throws IOException {
+	
+	BufferedReader buf ;
+	if (inStream == null) {
+	    throw new IOException ("input stream is null!");
+	}
+	
+	buf = new BufferedReader (new InputStreamReader (inStream));
+	return buf ;
+
+    }
+
+
+
     /** parse a PDB file and return a datastructure implementing
      * PDBStructure interface.
      */
-    public Structure parsePDBFile(FileInputStream inStream) 
+    public Structure parsePDBFile(InputStream inStream) 
 	throws IOException, PDBParseException
     {
-       
+
+	System.out.println("preparing buffer");
+	BufferedReader buf ;
+	try {
+	    buf = getBufferedReader(inStream);
+	    
+	} catch (IOException e) {
+	    e.printStackTrace();
+	    throw new IOException ("error initializing BufferedReader");
+	}
+	System.out.println("done");
+
+	return parsePDBFile(buf);
+	
+    }
+
+
+    public Structure parsePDBFile(BufferedReader buf) 
+	throws IOException, PDBParseException 
+    {
+	System.out.println("parsePDBFile");
+
 	// (re)set structure 
 
 	structure     = new StructureImpl() ;
@@ -717,13 +762,14 @@ public class PDBFileReader implements StructureIOFile {
 	current_group = null           ;
 	header        = init_header();
 	connects      = new ArrayList();
-	try {
 
-	    BufferedReader buf = new BufferedReader (new InputStreamReader (inStream));
+
+	try {
 	    
 	    String line = buf.readLine ();
 	    String recordName = "";
-	    
+
+	    //System.out.println (line);
 
 	    while (line != null) {
 		//System.out.println (line);
@@ -748,7 +794,7 @@ public class PDBFileReader implements StructureIOFile {
 	    }
 
 	    // finish and add ...
-	    //System.out.println("final checks...");
+	    System.out.println("final checks...");
 	    current_chain.addGroup(current_group);
 	    if (isKnownChain(current_chain.getName()) == null) {
 		current_model.add(current_chain);
@@ -757,6 +803,7 @@ public class PDBFileReader implements StructureIOFile {
 	    structure.setHeader(header);
 	    structure.setConnections(connects);
 	} catch (Exception e) {
+	 
 	    e.printStackTrace();
 	    throw new IOException ("Error parsing PDB file");
 	}
@@ -778,9 +825,9 @@ public class PDBFileReader implements StructureIOFile {
 
 	FileInputStream inStream = getInputStream();
 	try{
-	    //System.out.println("Starting to parse PDB file " + getTimeStamp());
+	    System.out.println("Starting to parse PDB file " + getTimeStamp());
 	    parsePDBFile(inStream) ;
-	    //System.out.println("Done parsing PDB file " + getTimeStamp());
+	    System.out.println("Done parsing PDB file " + getTimeStamp());
 	} catch(Exception ex){
 	    ex.printStackTrace();
 	}

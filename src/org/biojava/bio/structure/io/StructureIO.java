@@ -42,7 +42,7 @@ public interface StructureIO {
      */
     public Structure getStructure() throws IOException;
 
-    /** open filename (does not support compressed files!) and returns
+    /** open filename (does not support compressed files, yet...) and returns
      * a PDBStructure object 
      */
     public Structure getStructure(String filename) throws IOException ;
