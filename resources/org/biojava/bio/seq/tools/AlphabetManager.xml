@@ -49,7 +49,7 @@
     <long>thymine</long>
     <description>pairs with A</description>
   </residue>
-  <residue name="uracile">
+  <residue name="uracil">
     <short>u</short>
     <long>uracyl</long>
     <description>pairs with A, replacing T in RNA</description>
@@ -117,7 +117,7 @@
   
   <alphabet>
     <name>DNA</name>
-    <description>Deoxy-Rhybose Nucleic Acid. The stuff of life.</description>
+    <description>Deoxy-Ribose Nucleic Acid. The stuff of life.</description>
     <residueref name="adenine"/>
     <residueref name="guanine"/>
     <residueref name="cytosine"/>
@@ -125,7 +125,7 @@
   </alphabet>
   <alphabet>
     <name>DNA-N</name>
-    <description>Deoxy-Rhybose Nucleic Acid with N character.</description>
+    <description>Deoxy-Ribose Nucleic Acid with N character.</description>
     <residueref name="adenine"/>
     <residueref name="guanine"/>
     <residueref name="cytosine"/>
@@ -134,7 +134,7 @@
   </alphabet>
   <alphabet>
     <name>DNA-AMBIGUITY</name>
-    <description>Deoxy-Rhybose Nucleic Acid with ambiguitiy codes.</description>
+    <description>Deoxy-Ribose Nucleic Acid with ambiguitiy codes.</description>
     <residueref name="adenine"/>
     <residueref name="guanine"/>
     <residueref name="cytosine"/>
@@ -154,10 +154,10 @@
   </alphabet>
   <alphabet>
     <name>RNA</name>
-    <description>Rhybose Nucleic Acid. Intermediate between genomic DNA and protein.</description>
+    <description>Ribose Nucleic Acid. Intermediate between genomic DNA and protein.</description>
     <residueref name="adenine"/>
     <residueref name="guanine"/>
     <residueref name="cytosine"/>
-    <residueref name="uracile"/>
+    <residueref name="uracil"/>
   </alphabet>
 </alphabetManager>
