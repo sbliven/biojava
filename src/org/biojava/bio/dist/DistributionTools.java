@@ -55,6 +55,12 @@ import org.biojava.bio.symbol.SymbolListViews;
 import org.biojava.utils.AssertionFailure;
 import org.biojava.utils.ChangeVetoException;
 import org.xml.sax.SAXException;
+import org.biojava.bio.symbol.SymbolListFactory;
+import org.biojava.bio.symbol.SimpleSymbolListFactory;
+import org.biojava.bio.symbol.PackedSymbolListFactory;
+import org.biojava.bio.seq.impl.SimpleSequenceFactory;
+import org.biojava.bio.seq.SequenceFactory;
+
 
 /**
  * A class to hold static methods for calculations and manipulations using
@@ -517,13 +523,26 @@ public final class DistributionTools {
     }
 
     try {
-      sl = new SimpleSymbolList(d.getAlphabet(),l);
+      SymbolListFactory fact;
+      if(length < 10000){
+        fact = new SimpleSymbolListFactory();
+      }else{
+        fact = new PackedSymbolListFactory();
+      }
+
+      Symbol[] syms = new Symbol[length];
+      l.toArray(syms);
+
+      sl = fact.makeSymbolList(syms, length, d.getAlphabet());
+      //sl = new SimpleSymbolList(d.getAlphabet(),l);
     }
-    catch (IllegalSymbolException ex) {
+    catch (IllegalAlphabetException ex) {
       //shouldn't happen but...
       throw new BioError("Distribution emitting Symbols not from its Alphabet?");
     }
-    return new SimpleSequence(sl,name,name,Annotation.EMPTY_ANNOTATION);
+    SequenceFactory fact = new SimpleSequenceFactory();
+    return fact.createSequence(sl, name, name, Annotation.EMPTY_ANNOTATION);
+    //return new SimpleSequence(sl,name,name,Annotation.EMPTY_ANNOTATION);
   }
 
   /**
@@ -568,14 +587,29 @@ public final class DistributionTools {
          seed = (BasisSymbol)cond.getSymbol(ll);
        }
 
-       sl = new SimpleSymbolList(d.getConditionedAlphabet(),l);
+       SymbolListFactory fact;
+       if(length < 10000){
+         fact = new SimpleSymbolListFactory();
+       }else{
+         fact = new PackedSymbolListFactory();
+       }
+
+       Symbol[] syms = new Symbol[ll.size()];
+       ll.toArray(syms);
+       sl = fact.makeSymbolList(syms, length, d.getConditionedAlphabet());
+       //sl = new SimpleSymbolList(d.getConditionedAlphabet(),l);
     }
     catch (IllegalSymbolException ex) {
       //shouldn't happen but...
-      throw new BioError("Distribution emitting Symbols not from its Alphabet?");
+      throw new BioError("Distribution emitting Symbols not from its Alphabet?",ex);
+    }catch(IllegalAlphabetException ex){
+      //shouldn't happen but...
+      throw new BioError("Distribution emitting Symbols not from its Alphabet?",ex);
     }
 
-    return new SimpleSequence(sl, name, name, Annotation.EMPTY_ANNOTATION);
+    SequenceFactory fact = new SimpleSequenceFactory();
+    return fact.createSequence(sl, name, name, Annotation.EMPTY_ANNOTATION);
+    //return new SimpleSequence(sl, name, name, Annotation.EMPTY_ANNOTATION);
   }
 
 }//End of class

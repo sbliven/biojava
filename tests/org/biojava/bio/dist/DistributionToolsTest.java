@@ -18,6 +18,7 @@ import org.biojava.bio.seq.*;
 public class DistributionToolsTest extends TestCase {
 
   private Alignment a;
+  private Distribution random;
 
   public DistributionToolsTest(String name) {
     super(name);
@@ -34,6 +35,10 @@ public class DistributionToolsTest extends TestCase {
       }
 
       a = new SimpleAlignment(map);
+
+      random = new SimpleDistribution(DNATools.getDNA());
+      DistributionTools.randomizeDistribution(random);
+
     }catch(Exception e){
       e.printStackTrace();
     }
@@ -79,6 +84,14 @@ public class DistributionToolsTest extends TestCase {
       double ent = ((Double)map.get(s)).doubleValue();
       assertTrue(ent == 2.0);
     }
+  }
+
+  public void testGenerateSequence(){
+    Sequence seq = DistributionTools.generateSequence("seq",random,1000);
+    assertTrue(seq.length() == 1000);
+    //this will kick in the PackedSymbolListFactory
+    Sequence seq2 = DistributionTools.generateSequence("seq", random, 30000);
+    assertTrue(seq2.length() == 30000);
   }
 
 }
