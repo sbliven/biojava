@@ -312,14 +312,14 @@ public class SMOTrainer {
       if(listener != null) {
         listener.trainingCycleComplete(ourEvent);
       }
+    }
+
+    public void trainingCompleted() {
       for(int i = 0; i < size(); i++) {
         if(getAlpha(i) == 0) {
           model.removeItem(getItem(i));
         }
       }
-    }
-
-    public void trainingCompleted() {
       if (listener != null) {
         listener.trainingComplete(ourEvent);
       }
@@ -335,7 +335,6 @@ public class SMOTrainer {
     
     public void setAlpha(int i, double a) {
       alphas[i] = a;
-      System.out.println("Setting " + i + ": " + getItem(i) + " -> " + getAlpha(i) * getTarget(i));
       model.setAlpha(getItem(i), getAlpha(i) * getTarget(i));
     }
     
@@ -405,7 +404,6 @@ public class SMOTrainer {
       Iterator itemI = itemSet.iterator();
       for (int i = 0; itemI.hasNext(); ++i) {
         Object item = itemI.next();
-        System.out.println("Caching " + i + ": " + item + " -> " + item.hashCode());
         items[i] = item;
         targets[i] = target.getTarget(item);
         alphas[i] = model.getAlpha(item) / targets[i];

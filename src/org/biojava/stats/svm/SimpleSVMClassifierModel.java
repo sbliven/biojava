@@ -47,10 +47,6 @@ public class SimpleSVMClassifierModel extends AbstractSVMClassifierModel {
     for(Iterator i = items.iterator(); i.hasNext(); ) {
       addItem(i.next());
     }
-    Iterator i = items().iterator();
-    for(int c = 0; i.hasNext(); c++) {
-      System.out.println("Item " + c + ": " + i.next());
-    }
   }    
 
   public SimpleSVMClassifierModel(SVMKernel kernel, SVMTarget target) {
@@ -82,7 +78,6 @@ public class SimpleSVMClassifierModel extends AbstractSVMClassifierModel {
   }
   
   public void setAlpha(Object item, double alpha) {
-    System.out.println(item + " -> " + item.hashCode());
     ItemValue iv = (ItemValue) itemToItemAlpha.get(item);
     iv.setValue(alpha);
   }
@@ -97,7 +92,6 @@ public class SimpleSVMClassifierModel extends AbstractSVMClassifierModel {
     ItemValue iv = new SimpleItemValue(item, alpha);
     itemToItemAlpha.put(item, iv);
     itemAlphaSet.add(iv);
-    System.out.println(item + " -> " + item.hashCode());
   }
   
   public void removeItem(Object item) {
