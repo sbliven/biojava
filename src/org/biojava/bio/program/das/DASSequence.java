@@ -192,9 +192,15 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     private void _addAnnotationSource(URL dataSourceURL) 
         throws BioException
     {
+      if(!featureSets.containsKey(dataSourceURL)) {
 	FeatureHolder fs = new DASFeatureSet(this, dataSourceURL, this.seqID);
 	featureSets.put(dataSourceURL, fs);
 	features.addFeatureHolder(fs);
+      }
+    }
+    
+    public Set dataSourceURLs() {
+      return Collections.unmodifiableSet(featureSets.keySet());
     }
 
     public void addAnnotationSource(URL dataSourceURL) 

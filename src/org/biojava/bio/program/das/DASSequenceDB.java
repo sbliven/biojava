@@ -69,7 +69,9 @@ public class DASSequenceDB implements SequenceDB {
 	    if (status == 0)
 		throw new BioException("Not a DAS server");
 	    else if (status != 200)
-		throw new BioException("DAS error (status code = " + status + ")");
+		throw new BioException("DAS error (status code = " + status +
+                ") connecting to " + dataSourceURL + " with query " + epURL);
+
 
 	    InputSource is = new InputSource(huc.getInputStream());
 	    DOMParser parser = DASSequence.nonvalidatingParser();
