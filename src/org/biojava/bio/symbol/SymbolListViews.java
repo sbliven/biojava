@@ -151,6 +151,35 @@ public final class SymbolListViews {
       return new SymListAsAlignment(labels, symList);
     }
     
+    /**
+     * View a portion of a SymbolList.  Unlike SymbolList.subList, this
+     * method is guarenteed to return a view, which will change when
+     * the underlying SymbolList is modified.
+     *
+     * @param parent the SymbolList to view
+     * @param start the first index to include in the view
+     * @param end the last index to include in the view
+     * @throws IllegalArgumentException if the start or end points fall outside the parent SymbolList.
+     * @since 1.4
+     */
+     
+    public static SymbolList subList(SymbolList parent, int start, int end)
+        throws IllegalArgumentException
+    {
+        if (start < 1 || end > parent.length()) {
+            throw new IndexOutOfBoundsException(
+                "Sublist index out of bounds " + parent.length() + ":" + start + "," + end
+            );
+        }
+        
+        if (end < start) {
+            throw new IllegalArgumentException(
+                "end must not be lower than start: start=" + start + ", end=" + end
+            );
+        }
+        return new SubList(parent, start, end);
+    }
+    
     private static class SymListAsAlignment
     extends Unchangeable
     implements Alignment {
