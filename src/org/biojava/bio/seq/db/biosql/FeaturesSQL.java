@@ -147,6 +147,7 @@ class FeaturesSQL {
             templ.type = rs.getString(2).trim();     // HACK due to stupid schema change    
             templ.source = rs.getString(3).trim();
             templ.annotation = new BioSQLFeatureAnnotation(seqDB, feature_id);
+            // templ.annotation = new SmallAnnotation();
             fmap.put(new Integer(feature_id), templ);
 
             if (featureID >= 0 && bioentry_id < 0) {
@@ -156,6 +157,78 @@ class FeaturesSQL {
         }
         get_features.close();
 
+        // Fetch annotations (worth a try!)
+        
+        PreparedStatement get_annotations = null;
+        if (overlappingRegion == null && immediateChildrenOfParent < 0 && featureID < 0) {
+            get_annotations = conn.prepareStatement(
+		            "select seqfeature_qualifier_value.seqfeature_id, " +
+                    "       ontology_term.term_name, " +
+                    "       seqfeature_qualifier_value.qualifier_value " +
+                    "  from seqfeature, seqfeature_qualifier_value, ontology_term " +
+                    " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id and " +
+                    "       seqfeature.bioentry_id = ? and " +
+                    "       ontology_term.ontology_term_id = seqfeature_qualifier_value.ontology_term_id"
+            );
+            get_annotations.setInt(1, bioentry_id);
+        } else if (overlappingRegion != null) {
+           get_annotations = conn.prepareStatement(
+		            "select distinct " +
+                    "       seqfeature_qualifier_value.seqfeature_id, " +
+                    "       ontology_term.term_name, " +
+                    "       seqfeature_qualifier_value.qualifier_value " +
+                    "  from seqfeature, seqfeature_qualifier_value, ontology_term, seqfeature_location " +
+                    " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id and " +
+                    "       seqfeature.bioentry_id = ? and" +
+                    "       seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
+                    "       seqfeature_location.seq_end >= ? and " +
+                    "       seqfeature_location.seq_start <= ? and" +
+                    "       ontology_term.ontology_term_id = seqfeature_qualifier_value.ontology_term_id"
+           );
+           get_annotations.setInt(1, bioentry_id);
+           get_annotations.setInt(2, overlappingRegion.getMin());
+           get_annotations.setInt(3, overlappingRegion.getMax());
+        } else if (immediateChildrenOfParent >= 0) {
+            get_annotations = conn.prepareStatement(
+           		   "select seqfeature_qualifier_value.seqfeature_id, " +
+                   "       ontology_term.term_name, " +
+                   "       seqfeature_qualifier_value.qualifier_value " +
+                   "  from seqfeature, seqfeature_qualifier_value, seqfeature_relationship, ontology_term " +
+                   " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id and " +
+                   "       seqfeature.bioentry_id = ? and " +
+                   "       seqfeature.seqfeature_id = seqfeature_relationship.child_seqfeature_id and " +
+                   "       seqfeature_relationship.parent_seqfeature_id = ? and " +
+                   "       ontology_term.ontology_term_id = seqfeature_qualifier_value.ontology_term_id"
+           );
+           get_annotations.setInt(1, bioentry_id);
+           get_annotations.setInt(2, immediateChildrenOfParent);
+        } else if (featureID >= 0) {
+           get_annotations = conn.prepareStatement(
+		            "select seqfeature_qualifier_value.seqfeature_id, " +
+                    "       ontology_term.term_name, " +
+                    "       seqfeature_qualifier_value.qualifier_value " +
+                    "  from seqfeature, seqfeature_qualifier_value, ontology_term " +
+                    " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id and " +
+                    "       seqfeature.id = ? and " +
+                    "       seqfeature.bioentry_id = ? and " +
+                    "       ontology_term.ontology_term_id = seqfeature_qualifier_value.ontology_term_id"
+            );
+	       get_annotations.setInt(1, bioentry_id);
+           get_annotations.setInt(2, featureID);
+       }
+       rs = get_annotations.executeQuery();
+       while (rs.next()) {
+           Integer fid = new Integer(rs.getInt(1));
+           String key = rs.getString(2).trim();
+           String value = rs.getString(3).trim();
+           Feature.Template templ = (Feature.Template) fmap.get(fid);
+           try {
+               ((BioSQLFeatureAnnotation) templ.annotation).initProperty(key, value);
+           } catch (ChangeVetoException ex) {
+               throw new BioError("Couldn't modify hidden FeatureHolder");
+           }
+       }
+        
 	// Fetch those crappy location qualifiers first...
 
 	/*

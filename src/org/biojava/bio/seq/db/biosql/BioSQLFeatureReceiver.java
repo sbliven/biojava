@@ -111,7 +111,7 @@ abstract class BioSQLFeatureReceiver extends SeqIOAdapter {
 	if ("_biosql_internal.feature_id".equals(key)) {
 	    Integer fid = (Integer) value;
 	    getCurrent()._setInternalID(fid.intValue());
-	    getCurrent()._setAnnotation(new BioSQLFeatureAnnotation(seqDB, fid.intValue()));
+	    // getCurrent()._setAnnotation(new BioSQLFeatureAnnotation(seqDB, fid.intValue()));
 	} else if ("_biosql_internal.feature_id".equals(key)) {
 	    Integer pid = (Integer) value;
 	    getCurrent().setParentID(pid.intValue());

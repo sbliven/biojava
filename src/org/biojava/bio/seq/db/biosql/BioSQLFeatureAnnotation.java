@@ -69,12 +69,11 @@ class BioSQLFeatureAnnotation
 	    get_annotations.setInt(1, feature_id);
 	    ResultSet rs = get_annotations.executeQuery();
 	    
-	    underlyingAnnotation = new SmallAnnotation();
 	    while (rs.next()) {
 		String key = rs.getString(1).trim();   // HACK due to stupid schema change
 		String value = rs.getString(2);
 		try {
-		    underlyingAnnotation.setProperty(key, value);
+		    initProperty(key, value);
 		} catch (ChangeVetoException ex) {
 		    throw new BioError(ex);
 		}
@@ -97,6 +96,27 @@ class BioSQLFeatureAnnotation
 	return underlyingAnnotation.getProperty(key);
     }
 
+    void initProperty(Object key, Object value)
+        throws ChangeVetoException
+    {
+        if (underlyingAnnotation == null) {
+            underlyingAnnotation = new SmallAnnotation();
+        }
+        if (underlyingAnnotation.containsProperty(key)) {
+            Object oldVal = underlyingAnnotation.getProperty(key);
+            if (oldVal instanceof Collection) {
+                ((Collection) oldVal).add(value);
+            } else {
+                List newList = new ArrayList();
+                newList.add(oldVal);
+                newList.add(value);
+                underlyingAnnotation.setProperty(key, newList);
+            }
+        } else {
+            underlyingAnnotation.setProperty(key, value);
+        }
+    }
+    
     public void setProperty(Object key, Object value)
         throws ChangeVetoException
     {
