@@ -121,7 +121,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 	    }
 	} ;
 
-	wrapped.addChangeListener(underlyingFeaturesChange, FeatureHolder.FEATURES);
+	wrapped.addChangeListener(underlyingFeaturesChange);
     }
 
         /**
