@@ -58,12 +58,15 @@ public class SimpleCrossProductAlphabet implements CrossProductAlphabet {
 		r.set(indx, i.next());
 		populateResidues(r);
 	    }
+	    r.remove(indx);
 	}
     }
 
     private void putResidue(List r) {
 	List l = Collections.unmodifiableList(new ArrayList(r));
-	ourResidues.put(new ListWrapper(l), new SCPAResidue(l, symbolSeed++));
+	Residue rr = new SCPAResidue(l, symbolSeed++);
+	// System.out.println(rr.getName());
+	ourResidues.put(new ListWrapper(l), rr);
     }
 
     public boolean contains(Residue r) {
@@ -78,6 +81,7 @@ public class SimpleCrossProductAlphabet implements CrossProductAlphabet {
 	    if (i < alphas.size() - 1)
 		name.append(" x ");
 	}
+	name.append(")");
 	return name.toString();
     }
 
@@ -95,7 +99,7 @@ public class SimpleCrossProductAlphabet implements CrossProductAlphabet {
 
     public void validate(Residue r) throws IllegalResidueException {
 	if (!contains(r))
-	    throw new IllegalResidueException();
+	    throw new IllegalResidueException("Alphabet " + getName() + " does not accept " + r.getName());
     }
 
     public Annotation getAnnotation() {
@@ -178,6 +182,7 @@ public class SimpleCrossProductAlphabet implements CrossProductAlphabet {
 		if (i < l.size() - 1)
 		    name.append(" ");
 	    }
+	    name.append(")");
 	    return name.toString();
 	}
 
