@@ -69,95 +69,92 @@ class FeaturesSQL {
      */
 
     public void retrieveFeatures(int bioentry_id, 
-				 SeqIOListener listener,
-				 Location topLevelOverlappingRegion,
-				 int immediateChildrenOfParent,
-				 int featureID) 
+				                 SeqIOListener listener,
+                                 Location overlappingRegion,
+                                 int immediateChildrenOfParent,
+                                 int featureID) 
         throws SQLException, BioException
     {
-	Connection conn = seqDB.getPool().takeConnection();
-	Map fmap = new HashMap();
-	Map qmap = new HashMap();
-	Map lmap = new HashMap();
+        Connection conn = seqDB.getPool().takeConnection();
+        Map fmap = new HashMap();
+        Map qmap = new HashMap();
+        Map lmap = new HashMap();
 
 	
-	PreparedStatement get_features = null;
-	if (topLevelOverlappingRegion == null && immediateChildrenOfParent < 0 && featureID < 0) {
-	    get_features = conn.prepareStatement(
-			"select seqfeature.seqfeature_id, " +
-			"       ontology_term.term_name, " +
-			"       seqfeature_source.source_name " +
-			"  from seqfeature, ontology_term, seqfeature_source " +
-			" where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
-			"       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
-			"       seqfeature.bioentry_id = ?"
+	    PreparedStatement get_features = null;
+        if (overlappingRegion == null && immediateChildrenOfParent < 0 && featureID < 0) {
+            get_features = conn.prepareStatement(
+			        "select seqfeature.seqfeature_id, " +
+                    "       ontology_term.term_name, " +
+                    "       seqfeature_source.source_name " +
+                    "  from seqfeature, ontology_term, seqfeature_source " +
+                    " where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
+                    "       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
+                    "       seqfeature.bioentry_id = ?"
 			);
-	    get_features.setInt(1, bioentry_id);
-	} else if (topLevelOverlappingRegion != null) {
-	    get_features = conn.prepareStatement(
-			"select distinct " +
-			"       seqfeature.seqfeature_id, " +
-			"       ontology_term.term_name, " +
-			"       seqfeature_source.source_name " +
-			"  from ontology_term, seqfeature_source, seqfeature_location, " +
-			"       seqfeature left outer join seqfeature_relationship " +
-                        "                   on seqfeature.seqfeature_id = seqfeature_relationship.parent_seqfeature_id " +
-			" where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
-			"       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
-			"       seqfeature.bioentry_id = ? and " +
-			"       seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
-			"       seqfeature_location.seq_end >= ? and " +
-			"       seqfeature_location.seq_start <= ? and " +
-			"       seqfeature_relationship.parent_seqfeature_id is null"
-	    );
-	    get_features.setInt(1, bioentry_id);
-	    get_features.setInt(2, topLevelOverlappingRegion.getMin());
-	    get_features.setInt(3, topLevelOverlappingRegion.getMax());
-	} else if (immediateChildrenOfParent >= 0) {
-	    get_features = conn.prepareStatement(
-			"select seqfeature.seqfeature_id, " +
-			"       ontology_term.term_name, " +
-			"       seqfeature_source.source_name " +
-			"  from seqfeature, ontology_term, seqfeature_source, seqfeature_relationship " +
-			" where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
-			"       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
-			"       seqfeature.bioentry_id = ? and " +
-			"       seqfeature.seqfeature_id = seqfeature_relationship.child_seqfeature_id and " +
-			"       seqfeature_relationship.parent_seqfeature_id = ?"
-	    );
-	    get_features.setInt(1, bioentry_id);
-	    get_features.setInt(2, immediateChildrenOfParent);
-	} else if (featureID >= 0) {
-	    get_features = conn.prepareStatement(
-			"select seqfeature.seqfeature_id, " +
-			"       ontology_term.term_name, " +
-			"       seqfeature_source.source_name, " +
-			"       seqfeature.bioentry_id " + 
-			"  from seqfeature, ontology_term, seqfeature_source " +
-			" where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
-			"       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
-			"       seqfeature.seqfeature_id = ?"
-	    );
-	    get_features.setInt(1, featureID);
-	} else {
-	    throw new BioException("I'm afraid you can't do that!");
-	}
+            get_features.setInt(1, bioentry_id);
+        } else if (overlappingRegion != null) {
+            get_features = conn.prepareStatement(
+			        "select distinct " +
+                    "       seqfeature.seqfeature_id, " +
+                    "       ontology_term.term_name, " +
+                    "       seqfeature_source.source_name " +
+                    "  from ontology_term, seqfeature_source, seqfeature_location, seqfeature " +
+                    " where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
+                    "       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
+                    "       seqfeature.bioentry_id = ? and " +
+                    "       seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
+                    "       seqfeature_location.seq_end >= ? and " +
+                    "       seqfeature_location.seq_start <= ?"
+             );
+             get_features.setInt(1, bioentry_id);
+             get_features.setInt(2, overlappingRegion.getMin());
+             get_features.setInt(3, overlappingRegion.getMax());
+        } else if (immediateChildrenOfParent >= 0) {
+            get_features = conn.prepareStatement(
+			        "select seqfeature.seqfeature_id, " +
+                    "       ontology_term.term_name, " +
+                    "       seqfeature_source.source_name " +
+                    "  from seqfeature, ontology_term, seqfeature_source, seqfeature_relationship " +
+                    " where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
+                    "       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
+                    "       seqfeature.bioentry_id = ? and " +
+                    "       seqfeature.seqfeature_id = seqfeature_relationship.child_seqfeature_id and " +
+                    "       seqfeature_relationship.parent_seqfeature_id = ?"
+	         );
+             get_features.setInt(1, bioentry_id);
+             get_features.setInt(2, immediateChildrenOfParent);
+        } else if (featureID >= 0) {
+	        get_features = conn.prepareStatement(
+			        "select seqfeature.seqfeature_id, " +
+                    "       ontology_term.term_name, " +
+                    "       seqfeature_source.source_name, " +
+                    "       seqfeature.bioentry_id " + 
+                    "  from seqfeature, ontology_term, seqfeature_source " +
+                    " where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
+                    "       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
+                    "       seqfeature.seqfeature_id = ?"
+	        );
+            get_features.setInt(1, featureID);
+        } else {
+            throw new BioException("I'm afraid you can't do that!");
+        }
 
-	ResultSet rs = get_features.executeQuery();
-	while (rs.next()) {
-	    int feature_id = rs.getInt(1);
-	    StrandedFeature.Template templ = new StrandedFeature.Template();
-	    templ.type = rs.getString(2).trim();     // HACK due to stupid schema change    
-	    templ.source = rs.getString(3).trim();
-	    templ.annotation = new BioSQLFeatureAnnotation(seqDB, feature_id);
-	    fmap.put(new Integer(feature_id), templ);
+        ResultSet rs = get_features.executeQuery();
+        while (rs.next()) {
+            int feature_id = rs.getInt(1);
+            StrandedFeature.Template templ = new StrandedFeature.Template();
+            templ.type = rs.getString(2).trim();     // HACK due to stupid schema change    
+            templ.source = rs.getString(3).trim();
+            templ.annotation = new BioSQLFeatureAnnotation(seqDB, feature_id);
+            fmap.put(new Integer(feature_id), templ);
 
-	    if (featureID >= 0 && bioentry_id < 0) {
-		bioentry_id = rs.getInt(4);
-		listener.addSequenceProperty("_biosql_internal.bioentry_id", new Integer(bioentry_id));
-	    }
-	}
-	get_features.close();
+            if (featureID >= 0 && bioentry_id < 0) {
+                bioentry_id = rs.getInt(4);
+                listener.addSequenceProperty("_biosql_internal.bioentry_id", new Integer(bioentry_id));
+            }
+        }
+        get_features.close();
 
 	// Fetch those crappy location qualifiers first...
 
@@ -196,265 +193,286 @@ class FeaturesSQL {
 	*/
 
 	
-	// Fetch locations
+	    // Fetch locations
        
-	PreparedStatement get_locations = null;
-	if (topLevelOverlappingRegion == null && immediateChildrenOfParent < 0 && featureID < 0) {
-	    get_locations = conn.prepareStatement(
-		        "select seqfeature_location.seqfeature_location_id, " +
-			"       seqfeature_location.seqfeature_id, " +
-			"       seqfeature_location.seq_start, " +
-			"       seqfeature_location.seq_end, " +
-			"       seqfeature_location.seq_strand " +
-			"  from seqfeature, seqfeature_location " +
-			" where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
-			"       seqfeature.bioentry_id = ?"
-	    );
-	    get_locations.setInt(1, bioentry_id);
-	} else if (topLevelOverlappingRegion != null) {
-	    get_locations = conn.prepareStatement(
-		        "select distinct " +
-			"       seqfeature_location.seqfeature_location_id, " +
-			"       seqfeature_location.seqfeature_id, " +
-			"       seqfeature_location.seq_start, " +
-			"       seqfeature_location.seq_end, " +
-			"       seqfeature_location.seq_strand " +
-			"  from seqfeature_location, seqfeature_location as sfl2, " +
-			"       seqfeature left outer join seqfeature_relationship " +
-                        "                   on seqfeature.seqfeature_id = seqfeature_relationship.parent_seqfeature_id " +
-			" where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
-			"       seqfeature.bioentry_id = ? and " +
-			"       sfl2.seqfeature_id = seqfeature.seqfeature_id and " +
-			"       sfl2.seq_end >= ? and " +
-			"       sfl2.seq_start <= ? and " +
-			"       seqfeature_relationship.parent_seqfeature_id is null"
-	    );
-	    get_locations.setInt(1, bioentry_id);
-	    get_locations.setInt(2, topLevelOverlappingRegion.getMin());
-	    get_locations.setInt(3, topLevelOverlappingRegion.getMax());
-	} else if (immediateChildrenOfParent >= 0) {
-	    get_locations = conn.prepareStatement(
-		        "select seqfeature_location.seqfeature_location_id, " +
-			"       seqfeature_location.seqfeature_id, " +
-			"       seqfeature_location.seq_start, " +
-			"       seqfeature_location.seq_end, " +
-			"       seqfeature_location.seq_strand " +
-			"  from seqfeature, seqfeature_location, seqfeature_relationship " +
-			" where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
-			"       seqfeature.bioentry_id = ? and " +
-			"       seqfeature.seqfeature_id = seqfeature_relationship.child_seqfeature_id and " +
-			"       seqfeature_relationship.parent_seqfeature_id = ?"
-	    );
-	    get_locations.setInt(1, bioentry_id);
-	    get_locations.setInt(2, immediateChildrenOfParent);
-	} else if (featureID >= 0) {
-	    get_locations = conn.prepareStatement(
-		        "select seqfeature_location.seqfeature_location_id, " +
-			"       seqfeature_location.seqfeature_id, " +
-			"       seqfeature_location.seq_start, " +
-			"       seqfeature_location.seq_end, " +
-			"       seqfeature_location.seq_strand " +
-			"  from seqfeature, seqfeature_location " +
-			" where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
-			"       seqfeature.bioentry_id = ? and " +
-			"       seqfeature.seqfeature_id = ?");
-	    get_locations.setInt(1, bioentry_id);
-	    get_locations.setInt(2, featureID);
-	}
+       PreparedStatement get_locations = null;
+       if (overlappingRegion == null && immediateChildrenOfParent < 0 && featureID < 0) {
+            get_locations = conn.prepareStatement(
+		            "select seqfeature_location.seqfeature_location_id, " +
+                    "       seqfeature_location.seqfeature_id, " +
+                    "       seqfeature_location.seq_start, " +
+                    "       seqfeature_location.seq_end, " +
+                    "       seqfeature_location.seq_strand " +
+                    "  from seqfeature, seqfeature_location " +
+                    " where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
+                    "       seqfeature.bioentry_id = ?"
+            );
+            get_locations.setInt(1, bioentry_id);
+       } else if (overlappingRegion != null) {
+           get_locations = conn.prepareStatement(
+		           "select distinct " +
+                   "       seqfeature_location.seqfeature_location_id, " +
+                   "       seqfeature_location.seqfeature_id, " +
+                   "       seqfeature_location.seq_start, " +
+                   "       seqfeature_location.seq_end, " +
+                   "       seqfeature_location.seq_strand " +
+                   "  from seqfeature_location, seqfeature_location as sfl2, seqfeature " +
+                   " where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
+                   "       seqfeature.bioentry_id = ? and " +
+                   "       sfl2.seqfeature_id = seqfeature.seqfeature_id and " +
+                   "       sfl2.seq_end >= ? and " +
+                   "       sfl2.seq_start <= ?"
+           );
+           get_locations.setInt(1, bioentry_id);
+           get_locations.setInt(2, overlappingRegion.getMin());
+           get_locations.setInt(3, overlappingRegion.getMax());
+       } else if (immediateChildrenOfParent >= 0) {
+           get_locations = conn.prepareStatement(
+		           "select seqfeature_location.seqfeature_location_id, " +
+                   "       seqfeature_location.seqfeature_id, " +
+                   "       seqfeature_location.seq_start, " +
+                   "       seqfeature_location.seq_end, " +
+                   "       seqfeature_location.seq_strand " +
+                   "  from seqfeature, seqfeature_location, seqfeature_relationship " +
+                   " where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
+                   "       seqfeature.bioentry_id = ? and " +
+                   "       seqfeature.seqfeature_id = seqfeature_relationship.child_seqfeature_id and " +
+                   "       seqfeature_relationship.parent_seqfeature_id = ?"
+           );
+           get_locations.setInt(1, bioentry_id);
+           get_locations.setInt(2, immediateChildrenOfParent);
+       } else if (featureID >= 0) {
+           get_locations = conn.prepareStatement(
+		            "select seqfeature_location.seqfeature_location_id, " +
+                    "       seqfeature_location.seqfeature_id, " +
+                    "       seqfeature_location.seq_start, " +
+                    "       seqfeature_location.seq_end, " +
+                    "       seqfeature_location.seq_strand " +
+                    "  from seqfeature, seqfeature_location " +
+                    " where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
+                    "       seqfeature.bioentry_id = ? and " +
+                    "       seqfeature.seqfeature_id = ?");
+	       get_locations.setInt(1, bioentry_id);
+           get_locations.setInt(2, featureID);
+       }
 
 
-	rs = get_locations.executeQuery();
-	while (rs.next()) {
-	    Integer lid = new Integer(rs.getInt(1));
-	    Integer fid = new Integer(rs.getInt(2));
-	    int start = rs.getInt(3);
-	    int end = rs.getInt(4);
-	    int istrand = rs.getInt(5);
+       rs = get_locations.executeQuery();
+       while (rs.next()) {
+           Integer lid = new Integer(rs.getInt(1));
+           Integer fid = new Integer(rs.getInt(2));
+           int start = rs.getInt(3);
+           int end = rs.getInt(4);
+           int istrand = rs.getInt(5);
 	    
-	    StrandedFeature.Strand strand = StrandedFeature.UNKNOWN;
-	    if (istrand > 0) {
-		strand = StrandedFeature.POSITIVE;
-	    } else if (istrand < 0) {
-		strand = StrandedFeature.NEGATIVE;
-	    }
-	    StrandedFeature.Template templ = (StrandedFeature.Template) fmap.get(fid);
-	    if (templ.strand != null && templ.strand != strand) {
-		// throw new BioRuntimeException("Feature strands don't match");
-		// Really don't want to support these at all, but...
-		templ.strand = StrandedFeature.UNKNOWN;
-	    } else {
-		templ.strand = strand;
-	    }
+	        StrandedFeature.Strand strand = StrandedFeature.UNKNOWN;
+            if (istrand > 0) {
+                strand = StrandedFeature.POSITIVE;
+            } else if (istrand < 0) {
+                strand = StrandedFeature.NEGATIVE;
+            }
+            StrandedFeature.Template templ = (StrandedFeature.Template) fmap.get(fid);
+            if (templ.strand != null && templ.strand != strand) {
+                // throw new BioRuntimeException("Feature strands don't match");
+                // Really don't want to support these at all, but...
+                templ.strand = StrandedFeature.UNKNOWN;
+            } else {
+                templ.strand = strand;
+            }
 	    
-	    Location bloc;
-	    if (start == end) {
-		bloc = new PointLocation(start);
-	    } else {
-		bloc = new RangeLocation(start, end);
-	    }
+	        Location bloc;
+            if (start == end) {
+                bloc = new PointLocation(start);
+            } else {
+                bloc = new RangeLocation(start, end);
+            }
 	    
-	    List locationCrap = (List) qmap.get(lid);
-	    if (locationCrap != null) {
-		int min_start = -1;
-		int min_end = -1;
-		int max_start = -1;
-		int max_end = -1;
-		boolean unknown_start = false;
-		boolean unknown_end = false;
-		boolean unbounded_start = false;
-		boolean unbounded_end = false;
-		boolean isFuzzy = false;
+	        List locationCrap = (List) qmap.get(lid);
+            if (locationCrap != null) {
+                int min_start = -1;
+                int min_end = -1;
+                int max_start = -1;
+                int max_end = -1;
+                boolean unknown_start = false;
+                boolean unknown_end = false;
+                boolean unbounded_start = false;
+                boolean unbounded_end = false;
+                boolean isFuzzy = false;
 		
-		for (Iterator i = locationCrap.iterator(); i.hasNext(); ) {
-		    LocationQualifierMemento lqm = (LocationQualifierMemento) i.next();
-		    String qname = lqm.qualifier_name;
+	    	    for (Iterator i = locationCrap.iterator(); i.hasNext(); ) {
+                    LocationQualifierMemento lqm = (LocationQualifierMemento) i.next();
+                    String qname = lqm.qualifier_name;
 		    
-		    if ("min_start".equals(qname)) {
-			min_start = lqm.qualifier_int;
-			isFuzzy = true;
-		    } else if ("max_start".equals(qname)) {
-			max_start = lqm.qualifier_int;
-			isFuzzy = true;
-		    } else if ("min_end".equals(qname)) {
-			min_end = lqm.qualifier_int;
-			isFuzzy = true;
-		    } else if ("max_end".equals(qname)) {
-			max_end = lqm.qualifier_int;
-			isFuzzy = true;
-		    } else if ("start_pos_type".equals(qname)) {
-			if ("BEFORE".equalsIgnoreCase(lqm.qualifier_value)) {
-			    unbounded_start = true;
-			    isFuzzy = true;
-			}
-		    } if ("end_pos_type".equals(qname)) {
-			if ("AFTER".equalsIgnoreCase(lqm.qualifier_value)) {
-			    unbounded_end = true;
-			    isFuzzy = true;
-			}
-		    } 
-		}
+	    	        if ("min_start".equals(qname)) {
+                        min_start = lqm.qualifier_int;
+                        isFuzzy = true;
+                    } else if ("max_start".equals(qname)) {
+                        max_start = lqm.qualifier_int;
+                        isFuzzy = true;
+                    } else if ("min_end".equals(qname)) {
+                        min_end = lqm.qualifier_int;
+                        isFuzzy = true;
+                    } else if ("max_end".equals(qname)) {
+                        max_end = lqm.qualifier_int;
+                        isFuzzy = true;
+                    } else if ("start_pos_type".equals(qname)) {
+                        if ("BEFORE".equalsIgnoreCase(lqm.qualifier_value)) {
+                            unbounded_start = true;
+                            isFuzzy = true;
+                        }
+                    } if ("end_pos_type".equals(qname)) {
+                        if ("AFTER".equalsIgnoreCase(lqm.qualifier_value)) {
+                            unbounded_end = true;
+                            isFuzzy = true;
+                        }
+                    } 
+                }
 
-		if (isFuzzy) {
-		    if (unknown_start) {
-			min_start = Integer.MIN_VALUE;
-			max_start = Integer.MAX_VALUE;
-		    }
-		    if (unbounded_start) {
-			min_start = Integer.MIN_VALUE;
-		    }
-		    if (unknown_end) {
-			min_end = Integer.MIN_VALUE;
-			max_end = Integer.MAX_VALUE;
-		    }
-		    if (unbounded_end) {
-			max_end = Integer.MAX_VALUE;
-		    }
+                if (isFuzzy) {
+                    if (unknown_start) {
+                        min_start = Integer.MIN_VALUE;
+                        max_start = Integer.MAX_VALUE;
+                    }
+                    if (unbounded_start) {
+                        min_start = Integer.MIN_VALUE;
+                    }
+                    if (unknown_end) {
+                        min_end = Integer.MIN_VALUE;
+                        max_end = Integer.MAX_VALUE;
+                    }
+                    if (unbounded_end) {
+                        max_end = Integer.MAX_VALUE;
+                    }
 		    
-		    if (min_start == -1) {
-			min_start = bloc.getMin();
-		    }
-		    if (max_start == -1) {
-			max_start = bloc.getMin();
-		    }
-		    if (min_end == -1) {
-			min_end = bloc.getMax();
-		    } 
-		    if (max_end == -1) {
-			max_end = bloc.getMax();
-		    }
+    	    	    if (min_start == -1) {
+                        min_start = bloc.getMin();
+                    }
+                    if (max_start == -1) {
+                        max_start = bloc.getMin();
+                    }
+                    if (min_end == -1) {
+                        min_end = bloc.getMax();
+                    } 
+                    if (max_end == -1) {
+                        max_end = bloc.getMax();
+                    }
 		    
-		    bloc = new FuzzyLocation(min_start,
-					     max_end,
-					     max_start,
-					     min_end,
-					     FuzzyLocation.RESOLVE_INNER);
-		}
-	    }
+	        	    bloc = new FuzzyLocation(min_start,
+		                			     max_end,
+                                         max_start,
+                                         min_end,
+                                         FuzzyLocation.RESOLVE_INNER);
+                }
+            }
 
-	    List ll = (List) lmap.get(fid);
-	    if (ll == null) {
-		ll = new ArrayList();
-		lmap.put(fid, ll);
-	    }
-	    ll.add(bloc);
-	}
-	get_locations.close();
+            List ll = (List) lmap.get(fid);
+            if (ll == null) {
+                ll = new ArrayList();
+               lmap.put(fid, ll);
+            }
+            ll.add(bloc);
+       }
+       get_locations.close();
 	
-	// Bind location information to features
+	   // Bind location information to features
 	
-	for (Iterator i = fmap.entrySet().iterator(); i.hasNext(); ) {
-	    Map.Entry me = (Map.Entry) i.next();
-	    Integer fid = (Integer) me.getKey();
-	    StrandedFeature.Template templ = (StrandedFeature.Template) me.getValue();
+    	for (Iterator i = fmap.entrySet().iterator(); i.hasNext(); ) {
+            Map.Entry me = (Map.Entry) i.next();
+            Integer fid = (Integer) me.getKey();
+            StrandedFeature.Template templ = (StrandedFeature.Template) me.getValue();
 	    
-	    List ll = (List) lmap.get(fid);
-	    if (ll == null) {
-		throw new BioRuntimeException("BioSQL SeqFeature doesn't have any associated location spans");
-	    }
+    	    List ll = (List) lmap.get(fid);
+            if (ll == null) {
+                throw new BioRuntimeException("BioSQL SeqFeature doesn't have any associated location spans");
+            }
 	    
-	    Location loc = null;
-	    if (ll.size() == 1) {
-		loc = (Location) ll.get(0);
-	    } else {
-		loc = LocationTools.union(ll);
-	    }
-	    templ.location = loc;
-	}
+    	    Location loc = null;
+            if (ll.size() == 1) {
+                loc = (Location) ll.get(0);
+            } else {
+                loc = LocationTools.union(ll);
+            }
+            templ.location = loc;
+        }
 
-	// Check hierarchy
+        // Check hierarchy
 	
-	Set toplevelFeatures = new HashSet(fmap.keySet());
-	Map featureHierarchy = new HashMap();
-	int specifiedParent = -1;
-	if (topLevelOverlappingRegion == null && immediateChildrenOfParent < 0 && featureID < 0) {
-	    PreparedStatement get_hierarchy = conn.prepareStatement(
-		   "select parent_seqfeature_id, child_seqfeature_id " +
-		   "  from seqfeature_relationship, seqfeature " +
-		   " where parent_seqfeature_id = seqfeature.seqfeature_id and " +
-		   "       seqfeature.bioentry_id = ?");
-	    get_hierarchy.setInt(1, bioentry_id);
-	    rs = get_hierarchy.executeQuery();
-	    while (rs.next()) {
-		Integer parent = new Integer(rs.getInt(1));
-		Integer child = new Integer(rs.getInt(2));
+    	Set toplevelFeatures = new HashSet(fmap.keySet());
+        Map featureHierarchy = new HashMap();
+        int specifiedParent = -1;
+        if (immediateChildrenOfParent < 0 && featureID < 0) {
+            PreparedStatement get_hierarchy;
+            if (overlappingRegion == null) {
+                get_hierarchy = conn.prepareStatement(
+                        "select parent_seqfeature_id, child_seqfeature_id " +
+                        "  from seqfeature_relationship, seqfeature " +
+                        " where parent_seqfeature_id = seqfeature.seqfeature_id and " +
+                        "       seqfeature.bioentry_id = ?"
+                );
+                get_hierarchy.setInt(1, bioentry_id);
+            } else {
+                get_hierarchy = conn.prepareStatement(
+                        "select distinct parent_seqfeature_id, child_seqfeature_id " +
+                        "  from seqfeature_relationship, seqfeature, seqfeature_location " +
+                        " where parent_seqfeature_id = seqfeature.seqfeature_id and " +
+                        "       seqfeature.bioentry_id = ? and " +
+                        "       seqfeature_location.seqfeature_id = parent_seqfeature_id and " +
+                        "       seqfeature_location.seq_end >= ? and " +
+                        "       seqfeature_location.seq_start <= ?"
+                 );
+                 get_hierarchy.setInt(1, bioentry_id);
+                 get_hierarchy.setInt(2, overlappingRegion.getMin());
+                 get_hierarchy.setInt(3, overlappingRegion.getMax());
+            }
+            rs = get_hierarchy.executeQuery();
+            while (rs.next()) {
+                Integer parent = new Integer(rs.getInt(1));
+                Integer child = new Integer(rs.getInt(2));
 		
-		toplevelFeatures.remove(child);
-		List cl = (List) featureHierarchy.get(parent);
-		if (cl == null) {
-		    cl = new ArrayList();
-		    featureHierarchy.put(parent, cl);
-		}
-		cl.add(child);
-	    }
-	    get_hierarchy.close();
-	} else if (immediateChildrenOfParent >= 0) {
-	    specifiedParent = immediateChildrenOfParent;
-	} else if (featureID >= 0) {
-	    PreparedStatement discover_parent = conn.prepareStatement(
-		   "select parent_seqfeature_id " +
-		   "  from seqfeature_relationship " +
-		   " where parent_seqfeature_id = ?");
-	    discover_parent.setInt(1, featureID);
-	    rs = discover_parent.executeQuery();
-	    if (rs.next()) {
-		specifiedParent = rs.getInt(1);
-	    }
-	}
+    		    toplevelFeatures.remove(child);
+                List cl = (List) featureHierarchy.get(parent);
+                if (cl == null) {
+                    cl = new ArrayList();
+                    featureHierarchy.put(parent, cl);
+                }
+                cl.add(child);
+            }
+            get_hierarchy.close();
+        } else if (immediateChildrenOfParent >= 0) {
+            specifiedParent = immediateChildrenOfParent;
+        } else if (featureID >= 0) {
+            PreparedStatement discover_parent = conn.prepareStatement(
+		            "select parent_seqfeature_id " +
+                    "  from seqfeature_relationship " +
+                    " where parent_seqfeature_id = ?"
+            );
+            discover_parent.setInt(1, featureID);
+            rs = discover_parent.executeQuery();
+            if (rs.next()) {
+                specifiedParent = rs.getInt(1);
+            }
+        }
 
-	seqDB.getPool().putConnection(conn);
-	conn = null;
+        seqDB.getPool().putConnection(conn);
+        conn = null;
 
-	for (Iterator tlfi = toplevelFeatures.iterator(); tlfi.hasNext(); ) {
-	    Integer fid = (Integer) tlfi.next();
-	    Feature.Template templ = (Feature.Template) fmap.get(fid);
-	    fireFeatureTree(listener, 
-			    fid,
-			    fmap,
-			    featureHierarchy,
-			    (topLevelOverlappingRegion == null) && (immediateChildrenOfParent < 0),
-			    new Integer(specifiedParent)
-			    );
-	}
+        for (Iterator tlfi = toplevelFeatures.iterator(); tlfi.hasNext(); ) {
+            Integer fid = (Integer) tlfi.next();
+            Feature.Template templ = (Feature.Template) fmap.get(fid);
+            boolean childrenFetched = (immediateChildrenOfParent < 0);
+            if (overlappingRegion != null) {
+                if (!overlappingRegion.contains(templ.location)) {
+                    childrenFetched = false;
+                }
+            }
+            fireFeatureTree(listener, 
+			                fid,
+                            fmap,
+                            featureHierarchy,
+                            childrenFetched,
+                            new Integer(specifiedParent)
+                           );
+        }
     }
 
     private void fireFeatureTree(SeqIOListener listener,
@@ -465,22 +483,22 @@ class FeaturesSQL {
 				 Integer pid)
         throws BioException
     {
-	Feature.Template templ = (Feature.Template) fmap.get(fid);
-	listener.startFeature(templ);
-	listener.addFeatureProperty("_biosql_internal.feature_id", fid);
-	listener.addFeatureProperty("_biosql_internal.parent_id", pid);
-	List children = (List) featureHierarchy.get(fid);
-	if (children == null) {
-	    if (childrenFetched) {
-		listener.addFeatureProperty("_biosql_internal.hint_childfree", Boolean.TRUE);
-	    }
-	} else {
-	    for (Iterator ci = children.iterator(); ci.hasNext(); ) {
-		Integer childID = (Integer) ci.next();
-		fireFeatureTree(listener, childID, fmap, featureHierarchy, childrenFetched, fid);
-	    }
-	}
-	listener.endFeature();
+        Feature.Template templ = (Feature.Template) fmap.get(fid);
+        listener.startFeature(templ);
+        listener.addFeatureProperty("_biosql_internal.feature_id", fid);
+        listener.addFeatureProperty("_biosql_internal.parent_id", pid);
+        if (childrenFetched) {
+            List children = (List) featureHierarchy.get(fid);
+            if (children == null) {
+                listener.addFeatureProperty("_biosql_internal.hint_childfree", Boolean.TRUE);
+            } else {
+                for (Iterator ci = children.iterator(); ci.hasNext(); ) {
+                    Integer childID = (Integer) ci.next();
+                    fireFeatureTree(listener, childID, fmap, featureHierarchy, childrenFetched, fid);
+                }
+            }
+        }
+        listener.endFeature();
     }
 
     
