@@ -19,7 +19,7 @@
  *
  */
 
-package org.biojava.bio.seq.impl;
+package org.biojava.bio.seq.projection;
 
 import java.util.*;
 
@@ -29,27 +29,27 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 /**
- * Class used by ProjectedFeatureHolder to wrap Feature objects.
+ * Class used by ProjectionEngine to wrap Feature objects.
  *
  * @author Thomas Down
  * @author Matthew Pocock
  * @since 1.1
  */
 
-public class ProjectedFeatureWrapper implements Feature {
+class ProjectedFeature implements Feature, Projection {
     private transient ChangeSupport changeSupport;
 
     private final Feature feature;
-    private final ProjectedFeatureHolder holder;
-    private final Location newLocation;
+    private final ProjectionContext context;
+    private Location newLocation;
     private FeatureHolder projectedFeatures;
 
-    public ProjectedFeatureWrapper(Feature f,
-				   ProjectedFeatureHolder holder)
+    public ProjectedFeature(Feature f,
+			    ProjectionContext ctx)
     {
 	this.feature = f;
-	this.holder = holder;
-	this.newLocation = holder.getProjectedLocation(f.getLocation());
+	this.context = ctx;
+	// this.newLocation = holder.getProjectedLocation(f.getLocation());
     }
 
     protected ChangeSupport getChangeSupport() {
@@ -57,36 +57,44 @@ public class ProjectedFeatureWrapper implements Feature {
     }
 
     protected void instantiateChangeSupport() {
-	if (changeSupport == null)
+	if (changeSupport == null) {
 	    changeSupport = new ChangeSupport();
+	}
     }
 
     public Feature getViewedFeature() {
 	return feature;
     }
 
-    public Feature.Template makeTemplate() {
-      return getFeature().makeTemplate();
+    public ProjectionContext getProjectionContext() {
+	return context;
     }
-    
-    public Feature getFeature() {
-	return feature;
+
+    public Feature.Template makeTemplate() {
+	Feature.Template ft = getViewedFeature().makeTemplate();
+	ft.location = getLocation();
+	ft.annotation = getAnnotation();
+	return ft;
     }
 
     public Location getLocation() {
+	if (newLocation == null) {
+	    newLocation = context.getLocation(feature);
+	}
 	return newLocation;
     }
 
     public FeatureHolder getParent() {
-	return holder.getParent();
+	return context.getParent(feature);
     }
 
     public Sequence getSequence() {
-	FeatureHolder fh = getParent();
-	while (fh instanceof Feature) {
-	    fh = ((Feature) fh).getParent();
-	}
-	return (Sequence) fh;
+//  	FeatureHolder fh = getParent();
+//  	while (fh instanceof Feature) {
+//  	    fh = ((Feature) fh).getParent();
+//  	}
+	//  	return (Sequence) fh;
+	return context.getSequence(feature);
     }
 
     public String getType() {
@@ -98,7 +106,7 @@ public class ProjectedFeatureWrapper implements Feature {
     }
 
     public Annotation getAnnotation() {
-	return feature.getAnnotation();
+	return context.getAnnotation(feature);
     }
 
     public SymbolList getSymbols() {
@@ -110,25 +118,18 @@ public class ProjectedFeatureWrapper implements Feature {
     }
     
     public boolean containsFeature(Feature f) {
-      if(countFeatures() > 0) {
-        return getProjectedFeatures().containsFeature(f);
-      } else {
-        return false;
-      }
+	if(countFeatures() > 0) {
+	    return getProjectedFeatures().containsFeature(f);
+	} else {
+	    return false;
+	}
     }
 
     protected FeatureHolder getProjectedFeatures() {
 	if (projectedFeatures == null) {
-	    projectedFeatures = ProjectedFeatureHolder.projectFeatureHolder(feature,
-									    this,
-									    holder.getTranslation(),
-									    holder.isOppositeStrand());
+	    projectedFeatures = context.projectChildFeatures(feature, this);
 	}
 	return projectedFeatures;
-    }
-
-    protected ProjectedFeatureHolder getProjectingFeatureHolder() {
-	return holder;
     }
 
     public Iterator features() {
@@ -136,7 +137,7 @@ public class ProjectedFeatureWrapper implements Feature {
     }
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	FeatureFilter membershipFilter = new FeatureFilter.ContainedByLocation(newLocation);
+	FeatureFilter membershipFilter = new FeatureFilter.ContainedByLocation(getLocation());
 	if (FilterUtils.areDisjoint(ff, membershipFilter)) { 
 	    // System.err.println("Wheeeee! Disjunction in ProjectedFeatureWrapper");
 
@@ -146,12 +147,16 @@ public class ProjectedFeatureWrapper implements Feature {
 	return getProjectedFeatures().filter(ff, recurse);
     }
 
-    public Feature createFeature(Feature.Template temp) throws BioException {
-	throw new BioException("Can't create subfeatures of projected features");
+    public Feature createFeature(Feature.Template temp)
+        throws ChangeVetoException
+    {
+	throw new ChangeVetoException("Can't create subfeatures of projected features (yet).");
     }
 
-    public void removeFeature(Feature f) {
-	throw new UnsupportedOperationException("Projected features don't have children (yet).");
+    public void removeFeature(Feature f) 
+        throws ChangeVetoException
+    {
+	throw new ChangeVetoException("Can't alter projected features (yet).");
     }
         
     public void addChangeListener(ChangeListener cl) {

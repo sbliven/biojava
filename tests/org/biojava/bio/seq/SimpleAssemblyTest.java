@@ -54,6 +54,14 @@ public class SimpleAssemblyTest extends TestCase
 				       "fragment2",
 				       "fragment2",
 				       Annotation.EMPTY_ANNOTATION);
+	
+	StrandedFeature.Template sft = new StrandedFeature.Template();
+	sft.type = "project_test";
+	sft.source = "test";
+	sft.annotation = Annotation.EMPTY_ANNOTATION;
+	sft.strand = StrandedFeature.NEGATIVE;
+	sft.location = new RangeLocation(1, 3);
+	fragment2.createFeature(sft);
 
 	assembly = new SimpleAssembly(12, "test", "test");
 	ComponentFeature.Template templ = new ComponentFeature.Template();
@@ -87,6 +95,17 @@ public class SimpleAssemblyTest extends TestCase
 				     DNATools.createDNA("n")));
 	assertTrue(compareSymbolList(assembly.subList(11, 12),
 				     DNATools.createDNA("aa")));
+    }
+
+    public void testProjectedFeatures()
+        throws Exception
+    {
+	FeatureHolder f = assembly.filter(new FeatureFilter.ByType("project_test"), true);
+	assertEquals(f.countFeatures(), 1);
+	Feature pf = (Feature) f.features().next();
+	Location pfl = pf.getLocation();
+	assertEquals(pfl.getMin(), 10);
+	assertEquals(pfl.getMax(), 12);
     }
 
     private boolean compareSymbolList(SymbolList sl1, SymbolList sl2) {

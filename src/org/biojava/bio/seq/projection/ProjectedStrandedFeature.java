@@ -19,7 +19,7 @@
  *
  */
 
-package org.biojava.bio.seq.impl;
+package org.biojava.bio.seq.projection;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
@@ -32,28 +32,23 @@ import org.biojava.bio.seq.*;
  * @since 1.1
  */
 
-public class ProjectedStrandedFeatureWrapper extends ProjectedFeatureWrapper 
+class ProjectedStrandedFeature extends ProjectedFeature 
                  implements StrandedFeature 
 {
-    public ProjectedStrandedFeatureWrapper(StrandedFeature f,
-					   ProjectedFeatureHolder holder)
+    public ProjectedStrandedFeature(StrandedFeature f,
+				    ProjectionContext ctx)
     {
-	super(f, holder);
+	super(f, ctx);
     }
 
     public StrandedFeature.Strand getStrand() {
-	if (getProjectingFeatureHolder().isOppositeStrand()) {
-	    StrandedFeature.Strand s = ((StrandedFeature) getFeature()).getStrand();
-	    if (s == StrandedFeature.POSITIVE) {
-		return StrandedFeature.NEGATIVE;
-	    } else if (s == StrandedFeature.NEGATIVE) {
-		return StrandedFeature.POSITIVE;
-	    } else {
-		return StrandedFeature.UNKNOWN;
-	    }
-	} else {
-	    return ((StrandedFeature) getFeature()).getStrand();
-	}
+	return getProjectionContext().getStrand((StrandedFeature) getViewedFeature());
+    }
+
+    public Feature.Template makeTemplate() {
+	StrandedFeature.Template sft = (StrandedFeature.Template) super.makeTemplate();
+	sft.strand = getStrand();
+	return sft;
     }
 
     public String toString() {

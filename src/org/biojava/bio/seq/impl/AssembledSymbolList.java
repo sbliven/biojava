@@ -180,7 +180,7 @@ public class AssembledSymbolList extends AbstractSymbolList {
     }
 
   public Symbol symbolAt(int pos) {
-    System.out.println(this + "  symbolAt(" + pos + ")");
+      // System.out.println(this + "  symbolAt(" + pos + ")");
     Location l = locationOfPoint(pos);
     if (l != null) {
       SymbolList syms = getComponentSymbols(l);
@@ -191,7 +191,7 @@ public class AssembledSymbolList extends AbstractSymbolList {
   }
 
   public SymbolList subList(int start, int end) {
-    System.out.println(this + "  subList(" + start + ", " + end + ")");
+      // System.out.println(this + "  subList(" + start + ", " + end + ")");
     Location l = locationOfPoint(start);
     if (l != null && l.contains(end)) {
       SymbolList symbols = getComponentSymbols(l);

@@ -28,6 +28,7 @@ import org.biojava.utils.*;
 import org.biojava.utils.bytecode.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.impl.*;
+import org.biojava.bio.seq.projection.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.program.das.*;
 
@@ -48,6 +49,14 @@ import org.biojava.bio.program.das.*;
  * feature.  All other methods are proxied directly.
  * </p>
  *
+ * <p>
+ * Originally, <code>ProjectedFeatureHolder</code> was a self-contained
+ * class containing the full projection infrastructure.  Since BioJava
+ * 1.2, most of the projection infrastructure has been moved to separate
+ * classes in the package <code>org.biojava.bio.seq.projection</code>.
+ * Custom applications may wish to use that code directly.
+ * </p>
+ *
  * @author Thomas Down
  * @author Matthew Pocock
  * @since 1.1
@@ -64,7 +73,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
     private FeatureFilter filter;
 
     private ChangeListener underlyingFeaturesChange;
-
+    private PFHContext projectionContext;
 
     private static Location extractInterestingLocation(FeatureFilter ff) {
 	if (ff instanceof FeatureFilter.OverlapsLocation) {
@@ -137,16 +146,13 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 				  int translation,
 				  boolean oppositeStrand) 
     {
-	// System.err.println("+++ Constructing a ProjectedFeatureHolder");
-	// System.err.println("+++ Parent: " + fh.getClass().getName());
-	// new Exception("How we got here...").printStackTrace();
-	
-
 	this.wrapped = fh;
 	this.parent = parent;
 	this.translate = translation;
 	this.oppositeStrand = oppositeStrand;
 	this.filter = filter;
+
+	this.projectionContext = new PFHContext();
 
 	underlyingFeaturesChange = new ChangeListener() {
 	    public void preChange(ChangeEvent e)
@@ -234,7 +240,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 	SimpleFeatureHolder sfh = new SimpleFeatureHolder();
 	for (Iterator i = toProject.features(); i.hasNext(); ) {
 	    Feature f = (Feature) i.next();
-	    Feature wf = projectFeature(f);
+	    Feature wf = ProjectionEngine.DEFAULT.projectFeature(f, projectionContext);
 	    try {
 		sfh.addFeature(wf);
 	    } catch (ChangeVetoException cve) {
@@ -252,32 +258,6 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 	return sfh;
     }
 
-    protected Feature projectFeature(Feature f) {
-	Class featureClass = f.getClass();
-	Class[] fcInterfaces = featureClass.getInterfaces();
-	Class featureInterface = Feature.class;
-	for (int i = fcInterfaces.length - 1; i >= 0; --i) {
-	    if (Feature.class.isAssignableFrom(fcInterfaces[i])) {
-		featureInterface = fcInterfaces[i];
-		break;
-	    }
-	}
-
-	Class projectionClass = getProjectionClass(featureInterface);
-	Class[] sig = new Class[2];
-	sig[0] = featureInterface;
-	sig[1] = ProjectedFeatureHolder.class;
-	try {
-	    Constructor ct = projectionClass.getConstructor(sig);
-	    Object[] args = new Object[2];
-	    args[0] = f;
-	    args[1] = this;
-	    return (Feature) ct.newInstance(args);
-	} catch (Exception ex) {
-	    throw new BioError(ex, "Assertion failed: Couldn't instantiate proxy " + projectionClass.getName());
-	}
-    }
-
     public int countFeatures() {
 	return wrapped.countFeatures();
     }
@@ -292,122 +272,6 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
 	return getProjectedFeatures().filter(ff, recurse);
-    }
-
-    private static Map _projectionClasses;
-    private static int seed = 1;
-    private static GeneratedClassLoader loader;
-
-    static {
-	_projectionClasses = new HashMap();
-	_projectionClasses.put(Feature.class, ProjectedFeatureWrapper.class);
-	_projectionClasses.put(StrandedFeature.class, ProjectedStrandedFeatureWrapper.class);
-	loader = new GeneratedClassLoader(ProjectedFeatureWrapper.class.getClassLoader());
-    }
-
-    private static Class getProjectionClass(Class face) {
-	Class projection = (Class) _projectionClasses.get(face);
-	if (projection == null) {
-	    try {
-		Class baseClass = ProjectedFeatureWrapper.class;
-		if (StrandedFeature.class.isAssignableFrom(face))
-		    baseClass = ProjectedStrandedFeatureWrapper.class;
-		
-		StringTokenizer st = new StringTokenizer(face.getName(), ".");
-		String faceName = st.nextToken();
-		while (st.hasMoreTokens())
-		    faceName = st.nextToken();
-		
-		CodeClass baseClassC = IntrospectedCodeClass.forClass(baseClass);
-		CodeClass faceClassC = IntrospectedCodeClass.forClass(face);
-
-		GeneratedCodeClass pclass = new GeneratedCodeClass(
-      "org.biojava.bio.seq.impl.Projection_" + faceName + "_" + (seed++),
-			baseClassC,
-		  new CodeClass[] { faceClassC },
-			CodeUtils.ACC_PUBLIC | CodeUtils.ACC_SUPER
-    );
-
-		List baseInitArgsList = new ArrayList();
-		baseInitArgsList.add(baseClass == ProjectedStrandedFeatureWrapper.class ?
-				     IntrospectedCodeClass.forClass(StrandedFeature.class) :
-				     IntrospectedCodeClass.forClass(Feature.class));
-		baseInitArgsList.add(IntrospectedCodeClass.forClass(ProjectedFeatureHolder.class));
-		CodeMethod m_ourBase_init = new SimpleCodeMethod("<init>",
-								 baseClassC,
-								 CodeUtils.TYPE_VOID,
-								 baseInitArgsList,
-								 CodeUtils.ACC_PUBLIC);
-		CodeMethod m_ourBase_getViewedFeature = new SimpleCodeMethod("getViewedFeature",
-									     baseClassC,
-									     IntrospectedCodeClass.forClass(Feature.class),
-									     new ArrayList(),
-									     CodeUtils.ACC_PUBLIC);
-
-		GeneratedCodeMethod init = pclass.createMethod("<init>",
-							       IntrospectedCodeClass.forClass(Void.TYPE),
-							       new CodeClass[] {
-								   faceClassC,
-								   IntrospectedCodeClass.forClass(
-									     ProjectedFeatureHolder.class
-									                         )},
-							       CodeUtils.ACC_PUBLIC);
-		InstructionVector iv = new InstructionVector();
-		iv.add(ByteCode.make_aload(init.getThis()));
-		iv.add(ByteCode.make_aload(init.getVariable(0)));
-		iv.add(ByteCode.make_aload(init.getVariable(1)));
-		iv.add(ByteCode.make_invokespecial(m_ourBase_init));
-		iv.add(ByteCode.make_return());
-		pclass.setCodeGenerator(init, iv);
-
-		for (Iterator methIt = faceClassC.getMethods().iterator(); methIt.hasNext(); ) {
-		    CodeMethod faceMethod = (CodeMethod) methIt.next();
-		    if (baseClassC.getMethodsByName(faceMethod.getName()).size() > 0) {
-			// System.err.println("Skipping defined method " + faceMethod.getName());
-			continue;
-		    }
-		    
-		    if (faceMethod.numParameters() > 0) {
-			// System.err.println("Method " + faceMethod.getName() + " has params :|");
-			continue;
-		    }
-		    
-		    GeneratedCodeMethod proxyMethod = pclass.createMethod(faceMethod.getName(),
-									  faceMethod.getReturnType(),
-									  CodeUtils.EMPTY_LIST,
-									  CodeUtils.ACC_PUBLIC);
-		    iv = new InstructionVector();
-		    iv.add(ByteCode.make_aload(proxyMethod.getThis()));
-		    iv.add(ByteCode.make_invokevirtual(m_ourBase_getViewedFeature));
-		    iv.add(ByteCode.make_invokeinterface(faceMethod));
-		    Instruction returni = ByteCode.make_areturn();
-		    CodeClass rtype = proxyMethod.getReturnType();
-		    if (rtype == CodeUtils.TYPE_VOID) {
-			returni = ByteCode.make_return();
-		    } else if (rtype == CodeUtils.TYPE_INT ||
-			       rtype == CodeUtils.TYPE_SHORT ||
-			       rtype == CodeUtils.TYPE_CHAR ||
-			       rtype == CodeUtils.TYPE_BYTE) {
-			returni = ByteCode.make_ireturn();
-		    } else if (rtype == CodeUtils.TYPE_LONG) {
-			returni = ByteCode.make_lreturn();
-		    } else if (rtype == CodeUtils.TYPE_FLOAT) {
-			returni = ByteCode.make_freturn();
-		    } else if (rtype == CodeUtils.TYPE_DOUBLE) {
-			returni = ByteCode.make_dreturn();
-		    }
-		    iv.add(returni);
-		    pclass.setCodeGenerator(proxyMethod, iv);
-		}			
-	
-		projection = loader.defineClass(pclass);
-		_projectionClasses.put(face, projection);
-	    } catch (CodeException ex) {
-		throw new BioError(ex);
-	    }
-							       
-	}
-	return projection;
     }
 
     public Location getProjectedLocation(Location oldLoc) {
@@ -439,6 +303,68 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 
     public FeatureHolder getParent() {
 	return parent;
+    }
+
+    /**
+     * ProjectionContext implementation tied to a given ProjectedFeatureHolder
+     */
+
+    private class PFHContext implements ProjectionContext {
+	public FeatureHolder getParent(Feature f) {
+	    return parent;
+	}
+
+	public Sequence getSequence(Feature f) {
+	    FeatureHolder fh = parent;
+	    while (fh instanceof Feature) {
+		fh = ((Feature) fh).getParent();
+	    }
+	    return (Sequence) fh;
+	}
+
+	public Location getLocation(Feature f) {
+	    Location oldLoc = f.getLocation();
+
+	    if (oppositeStrand) {
+		if (oldLoc.isContiguous()) {
+		    return new RangeLocation(translate - oldLoc.getMax(),
+					     translate - oldLoc.getMin());
+		} else {
+		    Location compound = Location.empty;
+		    for (Iterator i = oldLoc.blockIterator(); i.hasNext(); ) {
+			Location oldBlock = (Location) i.next();
+			compound = compound.union(new RangeLocation(translate - oldBlock.getMax(),
+								    translate - oldBlock.getMin()));
+		    }
+		    return compound;
+		}
+	    } else {
+		return oldLoc.translate(translate);
+	    }
+	}
+
+	public StrandedFeature.Strand getStrand(StrandedFeature sf) {
+	    if (isOppositeStrand()) {
+		StrandedFeature.Strand s = sf.getStrand();
+		if (s == StrandedFeature.POSITIVE) {
+		    return StrandedFeature.NEGATIVE;
+		} else if (s == StrandedFeature.NEGATIVE) {
+		    return StrandedFeature.POSITIVE;
+		} else {
+		    return StrandedFeature.UNKNOWN;
+		}
+	    } else {
+		return sf.getStrand();
+	    }
+	}
+
+	public Annotation getAnnotation(Feature f) {
+	    return f.getAnnotation();
+	}
+
+	public FeatureHolder projectChildFeatures(Feature f, FeatureHolder parent) {
+	    return projectFeatureHolder(f, parent, getTranslation(), isOppositeStrand());
+	}
     }
 
 
