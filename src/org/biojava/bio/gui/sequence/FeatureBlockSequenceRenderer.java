@@ -39,8 +39,6 @@ public class FeatureBlockSequenceRenderer
 implements SequenceRenderer, PropertyChangeListener {
   private static final AffineTransform FLIP =
     new AffineTransform(0.0, 1.0, -1.0, 0.0, 0.0, 0.0); 
-  private FeatureFilter filter;
-  private Map featureCache;
   private double depth = 25.0;
   private FeatureRenderer renderer;
   private String label;
@@ -50,21 +48,8 @@ implements SequenceRenderer, PropertyChangeListener {
   protected PropertyChangeSupport pcs;
 
   public FeatureBlockSequenceRenderer() {
-    featureCache = new HashMap();
     pcs = new PropertyChangeSupport(this);
-    filter = FeatureFilter.all;
-	  setFeatureRenderer(new BasicFeatureRenderer());
-  }
-
-  public FeatureFilter getFilter() {
-    return filter;
-  }
-
-  public void setFilter(FeatureFilter f) {
-    FeatureFilter oldFilter = filter;
-    filter = f;
-    featureCache.clear();
-    pcs.firePropertyChange("filter", oldFilter, filter);
+    setFeatureRenderer(new BasicFeatureRenderer());
   }
     
   public FeatureRenderer getFeatureRenderer() {
@@ -144,25 +129,6 @@ implements SequenceRenderer, PropertyChangeListener {
     return getMinimumLeader(sp);
   }
 
-  protected FeatureHolder getFeatures(SequenceRenderContext sp) {
-    SymbolList sl = sp.getSequence();
-    if (! (sl instanceof Sequence)) {
-      return FeatureHolder.EMPTY_FEATURE_HOLDER;
-    }
-    Sequence seq = (Sequence) sl;
-    FeatureHolder fh = (FeatureHolder) featureCache.get(seq);
-    if(fh == null) {
-      /* requires mutability events so that if the sequence changes features, the
-      feature cache is invalidated */
-      // featureCache.put(seq, fh = seq.filter(filter, false));
-      // workaround
-      fh = seq.filter(filter, false);
-    }
-    
-    
-    return fh;
-  }
-    
     public void paint(Graphics2D g, SequenceRenderContext sp, Rectangle2D seqBox) {
 	Shape oldClip = g.getClip();
 
@@ -223,7 +189,7 @@ implements SequenceRenderer, PropertyChangeListener {
       }
       
       for(
-        Iterator i = getFeatures(sp).features();
+        Iterator i = ((Sequence) sp.getSequence()).features();
 	      i.hasNext();
       )	{
         Feature f = (Feature) i.next();

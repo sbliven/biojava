@@ -35,15 +35,10 @@ import org.biojava.bio.seq.*;
 
 public class LayeredRenderer implements SequenceRenderer {
   protected PropertyChangeSupport pcs;
-  protected FeatureFilter filter;
-  protected boolean recurse;
-  
   private SequenceRenderer lineRenderer;
 
   public LayeredRenderer() {
     pcs = new PropertyChangeSupport(this);
-    //filter = FeatureFilter.AcceptAllFilter;
-    //recurse = false;
   }
   
   public void addPropertyChangeListener(PropertyChangeListener l) {
@@ -72,26 +67,6 @@ public class LayeredRenderer implements SequenceRenderer {
   
   public SequenceRenderer getLineRenderer() {
     return this.lineRenderer;
-  }
-  
-  public void setFilter(FeatureFilter filter) {
-    FeatureFilter old = this.filter;
-    this.filter = filter;
-    pcs.firePropertyChange("filter", old, filter);
-  }
-  
-  public FeatureFilter getFilter() {
-    return this.filter;
-  }
-  
-  public void setRecurse(boolean recurse) {
-    boolean old = this.recurse;
-    this.recurse = recurse;
-    pcs.firePropertyChange("recurse", old, recurse);
-  }
-  
-  public boolean getRecurse() {
-    return this.recurse;
   }
   
   public double getDepth(SequenceRenderContext src) {
@@ -154,11 +129,10 @@ public class LayeredRenderer implements SequenceRenderer {
   }
   
   protected List layer(Sequence seq) {
-    FeatureHolder filtered = seq.filter(filter, recurse);
     List layers = new ArrayList();
     List layerLocs = new ArrayList();
     
-    for(Iterator fi = filtered.features(); fi.hasNext(); ) {
+    for(Iterator fi = seq.features(); fi.hasNext(); ) {
       Feature f = (Feature) fi.next();
       Location fLoc = f.getLocation();
       if(!fLoc.isContiguous()) {
@@ -194,139 +168,5 @@ public class LayeredRenderer implements SequenceRenderer {
       }
     }
     return layers;
-  }
-  
-  private static class SubSequenceRenderContext
-  implements SequenceRenderContext {
-    private final Sequence seq;
-    private final SequenceRenderContext src;
-    
-    public SubSequenceRenderContext(
-      SequenceRenderContext src, FeatureHolder fh 
-    ) {
-      this.src = src;
-      this.seq = new PartialSequence((Sequence) src.getSequence(), fh);
-    }
-    
-    public int getDirection() {
-      return src.getDirection();
-    }
-    
-    public double getScale() {
-      return src.getScale();
-    }
-    
-    public double sequenceToGraphics(int i) {
-      return src.sequenceToGraphics(i);
-    }
-    
-    public int graphicsToSequence(double d) {
-      return src.graphicsToSequence(d);
-    }
-    
-    public SymbolList getSequence() {
-      return seq;
-    }
-    
-    public SequenceRenderContext.Border getLeadingBorder() {
-      return src.getLeadingBorder();
-    }
-    
-    public SequenceRenderContext.Border getTrailingBorder() {
-      return src.getTrailingBorder();
-    }
-    
-    public Font getFont() {
-      return src.getFont();
-    }
-  }
-  
-  private static class PartialSequence implements Sequence {
-    private final Sequence seq;
-    private final FeatureHolder fh;
-    
-    public PartialSequence(Sequence seq, FeatureHolder fh) {
-      this.seq = seq;
-      this.fh = fh;
-    }
-    
-    public String getURN() {
-      return seq.getURN();
-    }
-    
-    public String getName() {
-      return seq.getName();
-    }
-    
-    public Annotation getAnnotation() {
-      return seq.getAnnotation();
-    }
-    
-    public int countFeatures() {
-      return fh.countFeatures();
-    }
-    
-    public Iterator features() {
-      return fh.features();
-    }
-    
-    public FeatureHolder filter(FeatureFilter fc, boolean recurse) {
-      return fh.filter(fc, recurse);
-    }
-    
-    public Feature createFeature(Feature.Template ft)
-    throws BioException, ChangeVetoException {
-      return fh.createFeature(ft);
-    }
-    
-    public void removeFeature(Feature f)
-    throws ChangeVetoException {
-      fh.removeFeature(f);
-    }
-    
-    public Alphabet getAlphabet() {
-      return seq.getAlphabet();
-    }
-    
-    public int length() {
-      return seq.length();
-    }
-    
-    public Symbol symbolAt(int index) throws IndexOutOfBoundsException {
-      return seq.symbolAt(index);
-    }
-    
-    public List toList() {
-      return seq.toList();
-    }
-    
-    public Iterator iterator() {
-      return seq.iterator();
-    }
-    
-    public SymbolList subList(int start, int end)
-    throws IndexOutOfBoundsException {
-      return seq.subList(start, end);
-    }
-    
-    public String seqString() {
-      return seq.seqString();
-    }
-    
-    public String subStr(int start, int end)
-    throws IndexOutOfBoundsException {
-      return seq.subStr(start, end);
-    }
-    
-    public void edit(Edit edit)
-    throws IndexOutOfBoundsException, IllegalAlphabetException,
-    ChangeVetoException {
-      seq.edit(edit);
-    }
-    
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
   }
 }
