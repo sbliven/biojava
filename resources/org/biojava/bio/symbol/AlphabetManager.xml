@@ -3,7 +3,7 @@
 <!DOCTYPE alphabetManager [
   <!ELEMENT alphabetManager (symbol|alphabet)*>
 
-  <!ELEMENT symbol (short, long, description?)>
+  <!ELEMENT symbol (short, long?, description?)>
   <!ATTLIST symbol
     name	ID	#IMPLIED>
 
@@ -313,9 +313,42 @@
   </alphabet>
   <alphabet name="TERM" parent="PROTEIN">
     <symbol name="termination">
-    <short>*</short>
+      <short>*</short>
       <long>TER</long>
       <description>Termination signal during translation</description>
+    </symbol>
+  </alphabet>
+  <alphabet name="STRUCTURE">
+    <symbol>
+      <short> </short>
+      <long>nothing</long>
+      <description>The structure here is undetermined</description>
+    </symbol>
+    <symbol>
+      <short>g</short>
+    </symbol>
+    <symbol>
+      <short>e</short>
+      <long>sheet</long>
+      <description>part of an extended beta-sheet</description>
+    </symbol>
+    <symbol>
+      <short>h</short>
+      <long>helix</long>
+      <description>part of an alpha-helix</description>
+    </symbol>
+    <symbol>
+      <short>t</short>
+      <long>turn</long>
+    </symbol>
+    <symbol>
+      <short>b</short>
+    </symbol>
+    <symbol>
+      <short>s</short>
+    </symbol>
+    <symbol>
+      <short>i</short>
     </symbol>
   </alphabet>
 </alphabetManager>

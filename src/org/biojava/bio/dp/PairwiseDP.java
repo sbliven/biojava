@@ -1054,12 +1054,6 @@ public class PairwiseDP extends DP implements Serializable {
       return depth;
     }
 
-    public boolean hasNext() {
-      return
-        pos[0] <= (seqs[0].length()+1) ||
-        pos[1] <= (seqs[1].length()+1);
-    }
-    
     public Cell[][] press() {
       Cell [][] cells = new Cell[depth[0]][depth[1]];
       for(int i = 0; i < cells.length; i++) {
