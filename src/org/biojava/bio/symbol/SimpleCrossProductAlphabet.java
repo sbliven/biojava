@@ -183,12 +183,12 @@ implements Serializable {
       gopher.setList(l);
       cps = (AtomicSymbol) ourSymbols.get(gopher);
     }
-    if (cps == null) {
-      cps = putSymbol(l);
-      return cps;
-    } else {
-      return cps;
+    
+    if(cps == null) {
+      throw new IllegalSymbolException("Can't find symbol for " + l);
     }
+    
+    return cps;
   }
   
   protected void addSymbolImpl(AtomicSymbol sym)
