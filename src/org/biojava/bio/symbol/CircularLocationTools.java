@@ -22,6 +22,7 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import org.biojava.bio.*;
 
 /**
  * <p>
@@ -37,6 +38,7 @@ import java.util.*;
  *
  * @author Mark Schreiber
  * @author Greg Cox
+ * @author Thomas Down
  * @version 1.0
  */
 
@@ -101,6 +103,39 @@ final class CircularLocationTools {
         return new CircularLocation(compound,seqLength);
       }
   }
+
+    static Location intersection(Location locA, Location locB) {
+	int circularityA, circularityB;
+	Location rawA, rawB;
+	if (locA instanceof CircularLocation) {
+	    circularityA = ((CircularLocation) locA).getLength();
+	    rawA = ((CircularLocation) locA).getWrapped();
+	} else if (locA == Location.empty) {
+	    return Location.empty;
+	} else {
+	    throw new BioError("Assertion failure: not circular");
+	}
+
+	if (locA instanceof CircularLocation) {
+	    circularityB = ((CircularLocation) locB).getLength();
+	    rawB = ((CircularLocation) locB).getWrapped();
+	} else if (locB == Location.empty) {
+	    return Location.empty;
+	} else {
+	    throw new BioError("Assertion failure: not circular");
+	}
+
+	if (circularityA != circularityB) {
+	    throw new BioRuntimeException("Can't find intersection of locations on circular sequences of non-equal length");
+	}
+
+	Location intersect = LocationTools.intersection(rawA, rawB);
+	if (intersect != Location.empty) {
+	    intersect = new CircularLocation(intersect, circularityA);
+	}
+	return intersect;
+    }
+	
 
   protected static CircularLocation union(CircularLocation locA, CircularLocation locB){
     int length = locA.getLength();

@@ -108,7 +108,11 @@ final public class LocationTools {
 	    {
 		return BetweenLocationTools.intersection(locA, locB);
 	    }
+	if (CircularLocationTools.isCircular(locA) || CircularLocationTools.isCircular(locB)) {
+	    return CircularLocationTools.intersection(locA, locB);
+	}
     }
+
     if(locA.isContiguous() && locB.isContiguous()) {
 	// handle easy case of solid locations
 	// Ought to make this bit more efficient --THOMASD
@@ -172,6 +176,9 @@ final public class LocationTools {
     /**
      * Return an ordered list of non-overlapping blocks of a location
      * (singleton list for contiguous locations, empty list for empty locations)
+     *
+     * Note that from this point of view, contiguous circular locations
+     * aren't necessarily contiguous :-(.
      */
 
     private static List getBlockList(Location l) {
@@ -179,7 +186,7 @@ final public class LocationTools {
 	    return Collections.EMPTY_LIST;
 	} else if (l instanceof CompoundLocation) {
 	    return ((CompoundLocation )l).getBlockList();
-	} else if (l.isContiguous()) {
+	} else if (l.isContiguous() && !CircularLocationTools.isCircular(l)) {
 	    return Collections.nCopies(1, l);
 	} else {
 	    List bl = new ArrayList();
