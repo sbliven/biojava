@@ -160,11 +160,18 @@ implements SequenceRenderer {
     MouseEvent me,
     List path
   ) {
-    path.add(this);
-    int sPos = src.graphicsToSequence(me.getPoint());
+    double pos;
+    if(src.getDirection() == SequenceRenderContext.HORIZONTAL) {
+      pos = me.getPoint().getY();
+    } else {
+      pos = me.getPoint().getX();
+    }
+    
+    int sMin = src.graphicsToSequence(pos);
+    int sMax = src.graphicsToSequence(pos + 1);
     
     FeatureHolder hits = src.getFeatures().filter(
-      new FeatureFilter.OverlapsLocation(new PointLocation(sPos)), false
+      new FeatureFilter.OverlapsLocation(new RangeLocation(sMin, sMax)), false
     );
 
     hits = renderer.processMouseEvent(hits, src, me);
@@ -172,7 +179,7 @@ implements SequenceRenderer {
     return new SequenceViewerEvent(
       this,
       hits,
-      sPos,
+      sMin,
       me,
       path
     );
