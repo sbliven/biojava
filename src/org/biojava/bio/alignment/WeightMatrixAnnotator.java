@@ -43,6 +43,9 @@ public class WeightMatrixAnnotator extends AbstractAnnotator {
     }
     
     int cols = matrix.columns();
+    Feature.Template template = new Feature.Template();
+    template.source = "WeightMatrixAnnotator";
+    template.type = "hit";
     for(int offset = 1;
         offset <= seq.length() - cols + 1;
         offset++) {
@@ -50,14 +53,12 @@ public class WeightMatrixAnnotator extends AbstractAnnotator {
       double q = Math.exp(score) * prior;
       double pmd = q/(1.0+q);
       if(pmd >= threshold) {
-        Feature hit =
-         seq.createFeature((MutableFeatureHolder) seq,
-                           new RangeLocation(offset, offset+cols-1),
-                           "WeightMatrix", "WeightMatrix",
-                           null);
-        hit.getAnnotation().setProperty("score", new Double(score));
-        hit.getAnnotation().setProperty("weightMatrix", matrix);
-        hit.getAnnotation().setProperty("p-value", new Double(pmd));
+        template.location = new RangeLocation(offset, offset+cols-1);
+        SimpleAnnotation ann = new SimpleAnnotation();
+        ann.setProperty("score", new Double(score));
+        ann.setProperty("weightMatrix", matrix);
+        ann.setProperty("p-value", new Double(pmd));
+        seq.createFeature((MutableFeatureHolder) seq, template);
         return true;
       }
     }

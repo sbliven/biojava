@@ -76,14 +76,11 @@ public class AceSequence implements Sequence {
   }
   
   public String subStr(int start, int end) {
-    StringBuffer sb = new StringBuffer();
-    for(int i = start; i <= end; i++)
-      sb.append(residueAt(i).getSymbol());
-    return sb.toString();
+    return resList.subStr(start, end);
   }
   
   public String seqString() {
-    return subStr(1, length());
+    return resList.seqString();
   }
   
   public int countFeatures() {
@@ -104,8 +101,7 @@ public class AceSequence implements Sequence {
    * Ace sequences are currently immutable. This may be changed in the future.
    * This method will always throw an UnsupportedOperationException.
    */
-  public Feature createFeature(MutableFeatureHolder fh, Location loc,
-                        String type, String source, Annotation annotation)
+  public Feature createFeature(MutableFeatureHolder fh, Feature.Template)
   throws UnsupportedOperationException {
     throw new UnsupportedOperationException("ACeDB sequences can't be modified");
   }

@@ -34,11 +34,7 @@ implements Sequence {
     }
   }
   
-  public Feature createFeature(MutableFeatureHolder fh,
-                               Location loc,
-                               String type,
-                               String source,
-                               Annotation annotation)
+  public Feature createFeature(MutableFeatureHolder fh, Feature.Template template)
   throws UnsupportedOperationException {
     throw new UnsupportedOperationException("Can not add features to a CORBA sequence");
   }
