@@ -44,6 +44,13 @@ import org.biojava.bio.symbol.Alignment;
 
 import org.biojava.bio.seq.StrandedFeature;
 
+/**
+ * <code>SSBindWUtblastx2_0a19Test</code> tests object bindings for
+ * Blast-like SAX events.
+ *
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @since 1.2
+ */
 public class SSBindWUtblastx2_0a19Test extends SSBindCase
 {
     public SSBindWUtblastx2_0a19Test(String name)
@@ -58,6 +65,10 @@ public class SSBindWUtblastx2_0a19Test extends SSBindCase
         setTopHitValues(4354d, "U51677",
                         1, 2575, StrandedFeature.POSITIVE,
                         1, 2575, StrandedFeature.POSITIVE);
+
+        setBotHitValues(401d, "M64986",
+                        1, 2575, StrandedFeature.POSITIVE,
+                        123, 1019, StrandedFeature.POSITIVE);
 
         String blastOutputFileName = "wu_tblastx_2.0a19.out.gz";
 

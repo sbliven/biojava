@@ -37,6 +37,13 @@ import org.biojava.bio.program.sax.BlastLikeSAXParser;
 import org.biojava.bio.search.SeqSimilaritySearchResult;
 import org.biojava.bio.seq.StrandedFeature;
 
+/**
+ * <code>SSBindWUtblastn2_0a19Test</code> tests object bindings for
+ * Blast-like SAX events.
+ *
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @since 1.2
+ */
 public class SSBindWUtblastn2_0a19Test extends SSBindCase
 {
     public SSBindWUtblastn2_0a19Test(String name)
@@ -51,6 +58,10 @@ public class SSBindWUtblastn2_0a19Test extends SSBindCase
         setTopHitValues(1144d, "X12597",
                         1, 214, StrandedFeature.POSITIVE,
                         56, 697, StrandedFeature.POSITIVE);
+
+        setBotHitValues(126d, "AF025664",
+                        47, 214, StrandedFeature.POSITIVE,
+                        304, 866, StrandedFeature.POSITIVE);
 
         String blastOutputFileName = "wu_tblastn_2.0a19.out.gz";
 

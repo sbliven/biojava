@@ -38,6 +38,13 @@ import org.biojava.bio.seq.db.DummySequenceDBInstallation;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.db.SequenceDBInstallation;
 
+/**
+ * <code>SSBindCase</code> is a base class for tests of object
+ * bindings for Blast-like SAX events.
+ *
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @since 1.2
+ */
 public class SSBindCase extends TestCase
 {
     protected SequenceDB             queryDB;
@@ -55,6 +62,15 @@ public class SSBindCase extends TestCase
     protected int     topHitSStart;
     protected int       topHitSEnd;
     protected Strand topHitSStrand;
+
+    protected double   botHitScore;
+    protected String   botHitSeqID;
+    protected int     botHitQStart;
+    protected int       botHitQEnd;
+    protected Strand botHitQStrand;
+    protected int     botHitSStart;
+    protected int       botHitSEnd;
+    protected Strand botHitSStrand;
 
     public SSBindCase(String name)
     {
@@ -136,6 +152,28 @@ public class SSBindCase extends TestCase
         assertSame(topHitSStrand,  hit.getSubjectStrand());
     }
 
+    public void testBotHit()
+    {
+        SeqSimilaritySearchResult result =
+            (SeqSimilaritySearchResult) searchResults.get(0);
+
+        List hits = result.getHits();
+
+        SeqSimilaritySearchHit hit =
+            (SeqSimilaritySearchHit) hits.get(hits.size() - 1);
+
+        assertEquals(botHitScore, hit.getScore(), 0.0);
+        assertEquals(botHitSeqID, hit.getSequenceID());
+
+        assertEquals(botHitQStart, hit.getQueryStart());
+        assertEquals(botHitQEnd,   hit.getQueryEnd());
+        assertSame(botHitQStrand,  hit.getQueryStrand());
+
+        assertEquals(botHitSStart, hit.getSubjectStart());
+        assertEquals(botHitSEnd,   hit.getSubjectEnd());
+        assertSame(botHitSStrand,  hit.getSubjectStrand());
+    }
+
     protected void setTopHitValues(double score, String id,
                                    int qStart, int qEnd, Strand qStrand,
                                    int sStart, int sEnd, Strand sStrand)
@@ -148,5 +186,19 @@ public class SSBindCase extends TestCase
         topHitSStart  = sStart;
         topHitSEnd    = sEnd;
         topHitSStrand = sStrand;
+    }
+
+    protected void setBotHitValues(double score, String id,
+                                   int qStart, int qEnd, Strand qStrand,
+                                   int sStart, int sEnd, Strand sStrand)
+    {
+        botHitScore   = score;
+        botHitSeqID   = id;
+        botHitQStart  = qStart;
+        botHitQEnd    = qEnd;
+        botHitQStrand = qStrand;
+        botHitSStart  = sStart;
+        botHitSEnd    = sEnd;
+        botHitSStrand = sStrand;
     }
 }

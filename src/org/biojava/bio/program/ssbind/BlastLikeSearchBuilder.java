@@ -53,12 +53,22 @@ import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeVetoException;
 
 /**
- * <code>BlastLikeSearchBuilder</code> will create
+ * <p><code>BlastLikeSearchBuilder</code> will create
  * <code>SeqSimilaritySearchResult</code>s from SAX events via a
  * <code>SeqSimilarityAdapter</code>. The SAX events should describe
  * elements conforming to the BioJava BlastLikeDataSetCollection
  * DTD. The result objects are placed in the <code>List</code>
- * supplied to the constructor.
+ * supplied to the constructor.</p>
+ *
+ * <p>The start/end/strand of <code>SeqSimilaritySearchHit</code>s are
+ * calculated by taking the strand of the top scoring
+ * <code>SeqSimilaritySearchSubHit</code> and setting the start equal
+ * to the start of the very first sub-hit and the end equal to the end
+ * of the very last sub-hit on that strand. The calculation is
+ * performed on the subject sequence sub-hits and the corresponding
+ * query positions recorded. If you believe that this should be
+ * calculated differently or have an improved method, please e-mail
+ * me.</p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
