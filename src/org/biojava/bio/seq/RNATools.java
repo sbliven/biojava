@@ -43,12 +43,12 @@ public final class RNATools {
   private static final ReversibleTranslationTable transcriptionTable;
   static private final FiniteAlphabet rna;
   static private final Map geneticCodes;
-  
+
   static private final Symbol a;
   static private final Symbol g;
   static private final Symbol c;
   static private final Symbol u;
-  
+
   static private Map symbolToComplement;
 
   static {
@@ -59,13 +59,13 @@ public final class RNATools {
       g = syms.symbolAt(2);
       c = syms.symbolAt(3);
       u = syms.symbolAt(4);
-      
+
       symbolToComplement = new HashMap();
 
       // add the gap symbol
       Symbol gap = rna.getGapSymbol();
       symbolToComplement.put(gap, gap);
-      
+
       // add all other ambiguity symbols
       for(Iterator i = ((SimpleAlphabet) rna).ambiguities(); i.hasNext();) {
         Symbol as = (Symbol) i.next();
@@ -78,14 +78,14 @@ public final class RNATools {
       }
       complementTable = new RNAComplementTranslationTable();
       transcriptionTable = new TranscriptionTable();
- 
-      geneticCodes = new HashMap(); 
+
+      geneticCodes = new HashMap();
       loadGeneticCodes();
     } catch (Throwable t) {
       throw new BioError(t, "Unable to initialize RNATools");
     }
   }
-  
+
   public static Symbol a() { return a; }
   public static Symbol g() { return g; }
   public static Symbol c() { return c; }
@@ -119,7 +119,7 @@ public final class RNATools {
       throw new BioError(se, "Something has gone badly wrong with RNA");
     }
   }
-  
+
   /**
    * Return an integer index for a symbol - compatible with forIndex.
    * <P>
@@ -143,7 +143,7 @@ public final class RNATools {
     throw new IllegalSymbolException("Realy confused. Can't find index for " +
                                       sym.getName());
   }
-  
+
   /**
    * Return the symbol for an index - compatible with index.
    * <P>
@@ -165,7 +165,7 @@ public final class RNATools {
       return u;
     else throw new IndexOutOfBoundsException("No symbol for index " + index);
   }
-  
+
   /**
    * Complement the symbol.
    *
@@ -195,7 +195,7 @@ public final class RNATools {
       );
     }
   }
-  
+
   /**
    * Retrieve the symbol for a symbol.
    *
@@ -216,7 +216,7 @@ public final class RNATools {
     }
     throw new IllegalSymbolException("Unable to find symbol for token " + token);
   }
-  
+
   /**
    * Retrieve a complement view of list.
    *
@@ -240,7 +240,7 @@ public final class RNATools {
   throws IllegalAlphabetException {
     return SymbolListViews.translate(SymbolListViews.reverse(list), complementTable());
   }
-  
+
   /**
    * Transcribe DNA into RNA.
    *
@@ -252,7 +252,7 @@ public final class RNATools {
    throws IllegalAlphabetException {
      return SymbolListViews.translate(list, transcriptionTable());
    }
-  
+
   /**
    * Get a translation table for complementing DNA symbols.
    *
@@ -262,7 +262,7 @@ public final class RNATools {
   public static ReversibleTranslationTable complementTable() {
     return complementTable;
   }
-  
+
   /**
    * Get a translation table for converting DNA to RNA.
    *
@@ -271,17 +271,17 @@ public final class RNATools {
   public static ReversibleTranslationTable transcriptionTable() {
     return transcriptionTable;
   }
-  
+
   /**
    * Retrieve a TranslationTable by name. The universal genetic code is under
    * the name "UNIVERSAL".
-   * 
+   *
    * @since 1.1
    */
   public static TranslationTable getGeneticCode(String name) {
     return (TranslationTable) geneticCodes.get(name);
   }
-  
+
   /**
    * Retrieve a Set containing the name of each genetic code.
    *
@@ -290,7 +290,7 @@ public final class RNATools {
   public static Set getGeneticCodeNames() {
     return geneticCodes.keySet();
   }
-  
+
   /**
    * Translate RNA into protein (with termination symbols).
    *
@@ -298,9 +298,10 @@ public final class RNATools {
    */
   public static SymbolList translate(SymbolList syms)
   throws IllegalAlphabetException {
-    return SymbolListViews.translate(syms, getGeneticCode("UNIVERSAL"));
+  	SymbolList codons = SymbolListViews.windowedSymbolList(syms, 3);
+    return SymbolListViews.translate(codons, getGeneticCode("UNIVERSAL"));
   }
-  
+
   private static void loadGeneticCodes() {
     try {
       InputStream tablesStream = RNATools.class.getClassLoader().getResourceAsStream(
@@ -309,18 +310,18 @@ public final class RNATools {
       if(tablesStream == null ) {
         throw new BioError("Couldn't locate TranslationTables.xml.");
       }
-      
+
       InputSource is = new InputSource(tablesStream);
       DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
       Document doc = parser.parse(is);
-      
+
       NodeList children = doc.getDocumentElement().getChildNodes();
       for(int i = 0; i < children.getLength(); i++) {
         Node cnode = children.item(i);
         if(! (cnode instanceof Element)) {
           continue;
         }
-        
+
         Element child = (Element) cnode;
         String name = child.getNodeName();
         if(name.equals("table")) {
@@ -337,7 +338,7 @@ public final class RNATools {
             sourceA,
             targetA
           );
-          
+
           NodeList translates = child.getChildNodes();
           for(int j = 0; j < translates.getLength(); j++) {
             Node tn = translates.item(j);
@@ -356,14 +357,14 @@ public final class RNATools {
 	      if (fromSymbols.length() != 3) {
 		  throw new BioError("`" + from + "' is not a valid codon");
 	      }
-	      
+
               // AtomicSymbol fromS = (AtomicSymbol) sourceP.parseToken(from);
 	      AtomicSymbol fromS = (AtomicSymbol) sourceA.getSymbol(fromSymbols.toList());
               AtomicSymbol toS   = (AtomicSymbol) targetP.parseToken(to);
               table.setTranslation(fromS, toS);
             }
           }
-          
+
           geneticCodes.put(tableName, table);
         }
       }
@@ -379,12 +380,12 @@ public final class RNATools {
 
   /*private static*/ class RNAComplementTranslationTable
   implements ReversibleTranslationTable {
-    public Symbol translate(Symbol s) 
+    public Symbol translate(Symbol s)
 	  throws IllegalSymbolException {
 	    return RNATools.complement(s);
 	  }
 
-	  public Symbol untranslate(Symbol s) 
+	  public Symbol untranslate(Symbol s)
 	  throws IllegalSymbolException {
 	    return RNATools.complement(s);
     }
@@ -397,11 +398,11 @@ public final class RNATools {
 	    return RNATools.getRNA();
 	  }
   }
-  
+
   /**
    * Sneaky class for converting DNA->RNA.
    */
-   
+
   /*private static*/ class TranscriptionTable
   implements ReversibleTranslationTable {
     public Symbol translate(Symbol s)
@@ -412,7 +413,7 @@ public final class RNATools {
       DNATools.getDNA().validate(s);
       return s;
     }
-    
+
     public Symbol untranslate(Symbol s)
     throws IllegalSymbolException {
       if(s == RNATools.u()) {
@@ -421,11 +422,11 @@ public final class RNATools {
       RNATools.getRNA().validate(s);
       return s;
     }
-    
+
     public Alphabet getSourceAlphabet() {
       return DNATools.getDNA();
     }
-    
+
     public Alphabet getTargetAlphabet() {
       return RNATools.getRNA();
     }
