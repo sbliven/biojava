@@ -21,6 +21,9 @@
 
 package org.biojava.bio.program.ssaha;
 
+import java.io.*;
+import java.util.*;
+
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
@@ -29,7 +32,7 @@ import org.biojava.bio.symbol.*;
 
 public interface SequenceStreamer {
     public boolean hasNext();
-    public void streamNext(SeqIOListener listener) throws BioException;
+    public void streamNext(SeqIOListener listener) throws IOException, BioException;
     public void reset() throws BioException;
 
     public static class SequenceDBStreamer implements SequenceStreamer {
@@ -67,6 +70,47 @@ public interface SequenceStreamer {
 		}
 	    }
 	    listener.endSequence();
+	}
+    }
+
+    public static class FileStreamer implements SequenceStreamer {
+	private final List fileList;
+	private final SequenceFormat format;
+	private final SymbolTokenization toke;
+	private Iterator fileIterator;
+	private BufferedReader currentStream = null;
+
+	public FileStreamer(SequenceFormat format, SymbolTokenization toke, List files) {
+	    this.format = format;
+	    this.fileList = files;
+	    this.toke = toke;
+	    fileIterator = fileList.iterator();
+	}
+
+	public FileStreamer(SequenceFormat format, SymbolTokenization toke, File f) {
+	    this(format, toke, Collections.singletonList(f));
+	}
+
+	public void reset() {
+	    currentStream = null;
+	    fileIterator = fileList.iterator();
+	}
+
+	public boolean hasNext() {
+	    return (currentStream != null || fileIterator.hasNext());
+	}
+
+	public void streamNext(SeqIOListener listener)
+	    throws BioException, IOException
+	{
+	    if (currentStream == null) {
+		currentStream = new BufferedReader(new FileReader((File) fileIterator.next()));
+	    }
+	    boolean more = format.readSequence(currentStream, toke, listener);
+	    if (!more) {
+		currentStream.close();
+		currentStream = null;
+	    }
 	}
     }
 }
