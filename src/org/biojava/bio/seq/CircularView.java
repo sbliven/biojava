@@ -144,9 +144,10 @@ public class CircularView extends ViewSequence{
     else{
       SymbolList toEnd = super.subList(start,super.length());
       SymbolList fromStart = super.subList(1,end);
-      Edit edit = new Edit(toEnd.length() +1, 0, fromStart);
+      SimpleSymbolList sl = new SimpleSymbolList(toEnd);
+      Edit edit = new Edit(sl.length() +1, 0, fromStart);
       try{
-        toEnd.edit(edit);
+        sl.edit(edit);
       }catch(Exception e){
         throw new BioError(e, "Couldn't construct subList, this shouldn't happen");
       }
