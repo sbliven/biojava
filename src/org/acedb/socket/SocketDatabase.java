@@ -250,9 +250,20 @@ class SocketDatabase implements Database {
         " " +
 			  Ace.decode(name);
 	    String result = sock.transact(query);
-	    if (result.indexOf("// Found 1 object") < 0) {
-		throw new AceException("Couldn't find object " + cacheName + " using query " + query + " - does it exist?");
-	    }
+      String tag = "// Found ";
+      int indx = result.indexOf(tag) + tag.length();
+      int spc = result.indexOf(" ", indx);
+      String bit = result.substring(indx, spc);
+      try {
+        int count = Integer.parseInt(result.substring(indx, spc));
+        if (count == 0) {
+          throw new AceException("Couldn't find object " + cacheName + " using query " + query + " - does it exist?");
+        } else if (count > 1) {
+          throw new AceException("Found multiple objects (" + count + ") with " + cacheName + " using query " + query);
+        }
+      } catch (NumberFormatException nfe) {
+        throw new AceError("Couldn't parse string '" + bit + "' at index " + indx + " to " + spc);
+      }
 
 	    String obj = sock.transact("show -p");
 	    o = parser.parseObject(obj);

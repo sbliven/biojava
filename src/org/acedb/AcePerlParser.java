@@ -65,6 +65,8 @@ public class AcePerlParser {
 
     if (ty.equals("in")) {
 	    obj = new StaticIntValue(Integer.parseInt(va), parent);
+    } else if (ty.equals("dt")) {
+      obj = new StaticDateValue(new Date(va), parent);
     } else if (ty.equals("tx")) {
   	  obj = new StaticStringValue(va, parent);
     } else if (ty.equals("ob")) {
