@@ -22,6 +22,7 @@
 package org.biojava.utils.cache;
 
 import java.util.*;
+import java.lang.ref.*;
 
 /**
  * Cache which stores up to <code>limit</code> Objects.
@@ -44,10 +45,12 @@ public class FixedSizeCache implements Cache {
 
     public CacheReference makeReference(Object o) {
 	CacheReference cr = new FixedSizeCacheReference(o);
-	objects.add(cr);
+	objects.add(new WeakReference(cr));
 	while (objects.size() > sizeLimit) {
-	    CacheReference old = (CacheReference) objects.remove(0);
-	    old.clear();
+	    CacheReference old = (CacheReference) ((WeakReference) objects.remove(0)).get();
+	    if (old != null) {
+		old.clear();
+	    }
 	}
 	
 	return cr;
