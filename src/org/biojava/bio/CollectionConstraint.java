@@ -503,34 +503,3 @@ public interface CollectionConstraint {
     }
 }
 
-/**
- * Hidden implementation detail. Damn those interfaces not having private
- * inner classes & static fields.
- *
- * @author Matthew Pocock
- * @author Thomas Down
- */
- 
-class NoneCollectionConstraint implements CollectionConstraint {
-  public boolean accept(Object value) {
-    return false;
-  }
-  
-  public boolean subConstraintOf(CollectionConstraint subConstraint) {
-    return subConstraint instanceof NoneCollectionConstraint;
-  }
-  
-  public boolean validateAddValue(Collection oldcoll, Object newval)
-  {
-      return false;
-  }
-  
-  public boolean validateRemoveValue(Collection oldcoll, Object victime)
-  {
-      return false;
-  }
-  
-  public String toString() {
-    return "NONE";
-  }
-}

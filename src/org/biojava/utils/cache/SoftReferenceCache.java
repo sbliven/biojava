@@ -36,25 +36,24 @@ import java.lang.ref.*;
 
 public class SoftReferenceCache implements Cache {
     public CacheReference makeReference(Object o) {
-	return new ReferenceReference(new SoftReference(o));
-    }
-}
-
-
-class ReferenceReference implements CacheReference {
-    private Reference ref;
-
-    ReferenceReference(Reference r) {
-	ref = r;
+	    return new ReferenceReference(new SoftReference(o));
     }
 
-    public Object get() {
-	if (ref != null)
-	    return ref.get();
-	return null;
-    }
-
-    public void clear() {
-	ref = null;
+    private static class ReferenceReference implements CacheReference {
+      private Reference ref;
+      
+      ReferenceReference(Reference r) {
+        ref = r;
+      }
+      
+      public Object get() {
+        if (ref != null)
+          return ref.get();
+        return null;
+      }
+      
+      public void clear() {
+        ref = null;
+      }
     }
 }

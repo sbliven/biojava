@@ -473,44 +473,4 @@ public interface PropertyConstraint {
     }
 }
 
-/**
- * Hidden implementation detail. Damn those interfaces not having private
- * inner classes & static fields.
- *
- * @author Matthew Pocock
- * @author Thomas Down
- */
-class AnyPropertyConstraint implements PropertyConstraint  {
-    public boolean accept(Object value) {
-        return true;
-    }
-    
-    public boolean subConstraintOf(PropertyConstraint subConstraint) {
-        return true;
-    }
-    
-    public String toString() {
-      return "ANY";
-    }
-}
 
-/**
- * Hidden implementation detail. Damn those interfaces not having private
- * inner classes & static fields.
- *
- * @author Matthew Pocock
- * @author Thomas Down
- */
-class NonePropertyConstraint implements PropertyConstraint {
-  public boolean accept(Object value) {
-    return false;
-  }
-  
-  public boolean subConstraintOf(PropertyConstraint subConstraint) {
-    return subConstraint instanceof NonePropertyConstraint;
-  }
-  
-  public String toString() {
-    return "NONE";
-  }
-}

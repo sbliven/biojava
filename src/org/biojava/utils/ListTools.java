@@ -62,6 +62,24 @@ public class ListTools implements Serializable{
         return Arrays.asList(a);
     }
   }
+  
+  /**
+   * Create a new SeriesList with the given leader, trailer and size.
+   *
+   * @param leader  the String that will prefix the index
+   * @param trailer the String that will suffix the index
+   * @param size  the length of the list
+   * @throws NullPointerException if leader or trailer are null (use the empty
+   *   string instead)
+   * @throws IllegalArgumentException if the size is negative
+   */
+  public static SeriesList createSeriesList(
+    String leader,
+    String trailer,
+    int size
+  ) {
+    return new SeriesList(leader, trailer, size);
+  }
 
   public static class Doublet extends AbstractList implements Serializable {
     private Object a;
@@ -245,6 +263,63 @@ public class ListTools implements Serializable{
       }
 
       return other.get(0).equals(a) && other.get(1).equals(b) && other.get(2).equals(c);
+    }
+  }
+  
+  /**
+   * A list that represents a series of values.
+   *
+   * <p>This provides a simple list implementation that synthesises elements from
+   * a leading and trailing string and the index into the list.</p>
+   *
+   * <p>For example, a SeriesList with leader "" and trailer ":" will contain
+   * values like "0:", "1:", "2:" and so on. A SeriesList with leader "Chapter "
+   * and trailer "" will have values like "Chapter 5".</p>
+   *
+   * @author Matthew Pocock
+   * @since 1.4
+   */
+  public static class SeriesList
+  extends AbstractList {
+    private final String leader;
+    private final String trailer;
+    private final int size;
+    
+    private SeriesList(String leader, String trailer, int size) {
+      if(leader == null) {
+        throw new NullPointerException(
+        "Leader was null. Use the empty string instead");
+      }
+      
+      if(trailer == null) {
+        throw new NullPointerException(
+        "Trailer was null. Use the empty string instead");
+      }
+      
+      if(size < 0) {
+        throw new IllegalArgumentException(
+          "Size must be zero or positive: " + size );
+      }
+      
+      this.leader = leader;
+      this.trailer = trailer;
+      this.size = size;
+    }
+    
+    public String getLeader() {
+      return leader;
+    }
+    
+    public String getTrailer() {
+      return trailer;
+    }
+    
+    public int size() {
+      return size;
+    }
+    
+    public Object get(int indx) {
+      return leader + indx + trailer;
     }
   }
 }
