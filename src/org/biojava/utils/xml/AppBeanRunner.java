@@ -24,6 +24,7 @@ package org.biojava.utils.xml;
 import org.w3c.dom.*;
 import org.xml.sax.*;
 import java.io.*;
+import javax.xml.parsers.*;
 
 /**
  * Create a bean from an XML file, then attempt to enter it.
@@ -44,9 +45,10 @@ public class AppBeanRunner {
 		altArgs[i-1] = args[i];
 	    
 	    InputSource is = new InputSource(new FileInputStream(name));
-	    DOMParser parser = new DOMParser();
-	    parser.parse(is);
-	    Document doc = parser.getDocument();
+	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	    dbf.setValidating(false);
+	    DocumentBuilder parser = dbf.newDocumentBuilder();
+	    Document doc = parser.parse(is);
 	    Object bean = XMLBeans.INSTANCE.instantiateBean(doc.getDocumentElement());
 	    if (! (bean instanceof AppEntry)) {
 		System.out.println("Application can't be entered");

@@ -21,7 +21,7 @@
 package org.biojava.bio.program.xff;
 
 import java.io.*;
-
+import javax.xml.parsers.*;
 import org.xml.sax.*;
 
 import org.biojava.utils.xml.*;
@@ -50,7 +50,15 @@ public class XFFTools {
         xffHandler.setFeatureListener(sb);
         
         ContentHandler saxHandler = new SAX2StAXAdaptor(xffHandler);
-        SAXParser parser = new SAXParser();
+        XMLReader parser;
+        try {
+            SAXParserFactory spf = SAXParserFactory.newInstance();
+            spf.setValidating(false);
+            spf.setNamespaceAware(true);
+            parser = spf.newSAXParser().getXMLReader();
+        } catch (Exception ex) {
+            throw new BioException(ex, "Error creating SAX parser");
+        }
         parser.setContentHandler(saxHandler);
         InputSource is = new InputSource(new FileReader(xffFile));
         parser.parse(is);

@@ -24,6 +24,7 @@ package org.biojava.bio.seq.io;
 import java.io.*;
 import java.util.*;
 import java.net.*;
+import javax.xml.parsers.*;
 
 import org.xml.sax.*;
 import org.biojava.utils.stax.*;
@@ -56,7 +57,15 @@ public class GAMEFormat implements SequenceFormat
 
             GAMEHandler handler = new GAMEHandler(listener);
 
-            SAXParser parser = new SAXParser();
+            XMLReader parser;
+            try {
+                SAXParserFactory spf = SAXParserFactory.newInstance();
+                spf.setValidating(false);
+                spf.setNamespaceAware(true);
+                parser = spf.newSAXParser().getXMLReader();
+            } catch (Exception ex) {
+                throw new IOException("Error creating SAX parser");
+            }
             parser.setContentHandler(new SAX2StAXAdaptor(handler));
 
             parser.parse(is);
