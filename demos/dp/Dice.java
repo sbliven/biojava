@@ -19,8 +19,9 @@
  *
  */
 
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.tools.*;
 import org.biojava.bio.dp.*;
 
 /**
@@ -44,7 +45,7 @@ public class Dice
 {
     public static void main(String[] args) throws Exception
     {
-    	Residue[] rolls=new Residue[6];
+    	Symbol[] rolls=new Symbol[6];
 	
     	//set up the dice alphabet
     	SimpleAlphabet diceAlphabet=new SimpleAlphabet();
@@ -52,8 +53,8 @@ public class Dice
     
     	for(int i=1;i<7;i++)
     	{
-	    rolls[i-1]= new SimpleResidue((char)('0'+i),""+i,Annotation.EMPTY_ANNOTATION);
-	    diceAlphabet.addResidue(rolls[i-1]);
+	    rolls[i-1]= new SimpleSymbol((char)('0'+i),""+i,Annotation.EMPTY_ANNOTATION);
+	    diceAlphabet.addSymbol(rolls[i-1]);
 	}  
   
     	int [] advance = { 1 };
@@ -97,22 +98,22 @@ public class Dice
 	DP dp=DPFactory.createDP(casino);
 	StatePath obs_rolls = dp.generate(300);
 	
-	ResidueList roll_sequence = obs_rolls.residueListForLabel(StatePath.SEQUENCE);
-	ResidueList[] res_array = {roll_sequence};
+	SymbolList roll_sequence = obs_rolls.symbolListForLabel(StatePath.SEQUENCE);
+	SymbolList[] res_array = {roll_sequence};
 	StatePath v = dp.viterbi(res_array);
 	
 	//print out obs_sequence, output, state symbols.
 	for(int i = 1; i <= obs_rolls.length()/60; i++) {
 	  for(int j=i*60; j<Math.min((i+1)*60, obs_rolls.length()); j++)  {
-	    System.out.print(obs_rolls.residueAt(StatePath.SEQUENCE, j+1).getSymbol());
+	    System.out.print(obs_rolls.symbolAt(StatePath.SEQUENCE, j+1).getToken());
 	  }
 	  System.out.print("\n");
 	  for(int j=i*60; j<Math.min((i+1)*60, obs_rolls.length()); j++)  {
-	    System.out.print(obs_rolls.residueAt(StatePath.STATES, j+1).getSymbol());
+	    System.out.print(obs_rolls.symbolAt(StatePath.STATES, j+1).getToken());
 	  }
 	  System.out.print("\n");
 	  for(int j=i*60; j<Math.min((i+1)*60, obs_rolls.length()); j++)  {
-	    System.out.print(v.residueAt(StatePath.STATES, j+1).getSymbol());
+	    System.out.print(v.symbolAt(StatePath.STATES, j+1).getToken());
 	  }
 	  System.out.print("\n\n");	  
 	}	

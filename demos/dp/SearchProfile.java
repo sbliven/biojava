@@ -1,9 +1,10 @@
 import java.io.*;
 import java.util.*;
 
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.tools.*;
 import org.biojava.bio.dp.*;
 
 public class SearchProfile {
@@ -49,7 +50,7 @@ public class SearchProfile {
       System.out.println("Alignining sequences to the model");
       for(SequenceIterator si = seqDB.sequenceIterator(); si.hasNext(); ) {
         Sequence seq = si.nextSequence();
-        ResidueList [] rl = { seq };
+        SymbolList [] rl = { seq };
         StatePath statePath = dp.viterbi(rl);
         double fScore = dp.forward(rl);
         double bScore = dp.backward(rl);
@@ -62,11 +63,11 @@ public class SearchProfile {
         );
         for(int i = 0; i <= statePath.length() / 60; i++) {
           for(int j = i*60; j < Math.min((i+1)*60, statePath.length()); j++) {
-            System.out.print(statePath.residueAt(StatePath.SEQUENCE, j+1).getSymbol()); 
+            System.out.print(statePath.symbolAt(StatePath.SEQUENCE, j+1).getToken()); 
           }
           System.out.print("\n");
           for(int j = i*60; j < Math.min((i+1)*60, statePath.length()); j++) {
-            System.out.print(statePath.residueAt(StatePath.STATES, j+1).getSymbol()); 
+            System.out.print(statePath.symbolAt(StatePath.STATES, j+1).getToken()); 
           }
           System.out.print("\n");
           System.out.print("\n");
@@ -124,15 +125,15 @@ public class SearchProfile {
   private static void randomize(MarkovModel model) throws Exception {
     ModelTrainer mt = new SimpleModelTrainer(model, nullModel, 0.001, 0.00001, 1.0);
     
-    for(Iterator i = model.stateAlphabet().residues().iterator(); i.hasNext(); ) {
+    for(Iterator i = model.stateAlphabet().symbols().iterator(); i.hasNext(); ) {
       State s = (State) i.next();
       if(s instanceof EmissionState && !(s instanceof MagicalState) ) {
         EmissionState es = (EmissionState) s;
         for(
-          Iterator j = ((FiniteAlphabet) es.alphabet()).residues().iterator();
+          Iterator j = ((FiniteAlphabet) es.alphabet()).symbols().iterator();
           j.hasNext();
         ) {
-          Residue r = (Residue) j.next();
+          Symbol r = (Symbol) j.next();
           mt.addStateCount(es, r, Math.random());
         }
       }
@@ -147,13 +148,13 @@ public class SearchProfile {
   }
   
   private static EmissionState createNullModel(FiniteAlphabet alpha)
-  throws IllegalResidueException, IllegalAlphabetException {
+  throws IllegalSymbolException, IllegalAlphabetException {
     EmissionState nm = StateFactory.DEFAULT.createState(
       alpha, new int[] { 1 }, "null-model"
     );
     double weight = -Math.log(alpha.size());
-    for(Iterator i = alpha.residues().iterator(); i.hasNext(); ) {
-      nm.setWeight((Residue) i.next(), weight);
+    for(Iterator i = alpha.symbols().iterator(); i.hasNext(); ) {
+      nm.setWeight((Symbol) i.next(), weight);
     }
     return nm;
   }

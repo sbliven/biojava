@@ -28,9 +28,10 @@ import org.xml.sax.*;
 import com.sun.xml.tree.*;
 import com.sun.xml.parser.*;
 
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.tools.*;
 import org.biojava.bio.dp.*;
 
 
@@ -86,7 +87,7 @@ public class ViterbiAlign {
 
       // make alphabets
       Alphabet alpha = model.emissionAlphabet();
-      ResidueParser rParser = alpha.getParser("symbol");
+      SymbolParser rParser = alpha.getParser("token");
 
       // make dp object
       DP dp = DPFactory.createDP(model);
@@ -102,7 +103,7 @@ public class ViterbiAlign {
           seqI.hasNext(); )
       {
         Sequence seq = seqI.nextSequence();
-        ResidueList [] rl = { seq };
+        SymbolList [] rl = { seq };
         StatePath statePath = dp.viterbi(rl);
         double fScore = dp.forward(rl);
         double bScore = dp.backward(rl);
@@ -115,11 +116,11 @@ public class ViterbiAlign {
         );
         for(int i = 0; i <= statePath.length() / 60; i++) {
           for(int j = i*60; j < Math.min((i+1)*60, statePath.length()); j++) {
-            System.out.print(statePath.residueAt(StatePath.SEQUENCE, j+1).getSymbol()); 
+            System.out.print(statePath.symbolAt(StatePath.SEQUENCE, j+1).getToken()); 
           }
           System.out.print("\n");
           for(int j = i*60; j < Math.min((i+1)*60, statePath.length()); j++) {
-            System.out.print(statePath.residueAt(StatePath.STATES, j+1).getSymbol()); 
+            System.out.print(statePath.symbolAt(StatePath.STATES, j+1).getToken()); 
           }
           System.out.print("\n");
           System.out.print("\n");
