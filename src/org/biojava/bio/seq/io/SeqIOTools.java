@@ -629,7 +629,8 @@ public final class SeqIOTools  {
     /**
      * Attempts to guess the filetype of a file given the name.  For
      * use with the functions below that take an int fileType as a
-     * parameter.
+     * parameter. EMBL and Genbank files are assumed to contain DNA
+     * sequence.
      *
      * @deprecated because there is no standard file naming convention
      * and guessing by file name is inherantly error prone and bad.
@@ -640,13 +641,13 @@ public final class SeqIOTools  {
         String fileName = seqFile.getName();
         try {
             if ((new RE(".*\\u002eem.*")).match(fileName)) {
-                return SeqIOConstants.EMBL;
+                return SeqIOConstants.EMBL_DNA;
             }
             else if ((new RE(".*\\u002edat.*")).match(fileName)) {
-                return SeqIOConstants.EMBL;
+                return SeqIOConstants.EMBL_DNA;
             }
             else if ((new RE(".*\\u002egb.*")).match(fileName)) {
-                return SeqIOConstants.GENBANK;
+                return SeqIOConstants.GENBANK_DNA;
             }
             else if ((new RE(".*\\u002esp.*")).match(fileName)) {
                 return SeqIOConstants.SWISSPROT;
@@ -763,24 +764,27 @@ public final class SeqIOTools  {
 
     /**
      * Reads a file with the specified format and alphabet
-     * @param formatName the name of the format eg genbank or swissprot (case insensitive)
-     * @param alphabetName the name of the alphabet eg dna or rna or protein (case insensitive)
+     * @param formatName the name of the format eg genbank or
+     * swissprot (case insensitive)
+     * @param alphabetName the name of the alphabet eg dna or rna or
+     * protein (case insensitive)
      * @param br a BufferedReader for the input
-     * @return either an Alignment object or a SequenceIterator (depending on the format read)
-     * @throws BioException if an error occurs while reading or a unrecognized format, alphabet
-     *  combination is used (eg swissprot and DNA).
+     * @return either an Alignment object or a SequenceIterator
+     * (depending on the format read)
+     * @throws BioException if an error occurs while reading or a
+     * unrecognized format, alphabet combination is used (eg swissprot
+     * and DNA).
      *
      * @since 1.3
      */
     public static Object fileToBiojava(String formatName,
                                        String alphabetName,
                                        BufferedReader br)
-        throws BioException
-    {
+        throws BioException {
 
-      int fileType = identifyFormat(formatName, alphabetName);
+        int fileType = identifyFormat(formatName, alphabetName);
 
-      return fileToBiojava(fileType, br);
+        return fileToBiojava(fileType, br);
     }
 
     /**
@@ -956,7 +960,7 @@ public final class SeqIOTools  {
                     return SeqIOConstants.GENPEPT;
             }
         }
-        return SeqIOConstants.GENBANK;
+        return SeqIOConstants.GENBANK_DNA;
     }
 
     /**
