@@ -36,7 +36,7 @@ import org.biojava.utils.Changeable;
  * BioJava object itself will probably not want to extend the
  * Annotation interface directly, but rather delegate off that
  * functionality to an Annotation property. The Annotatable interface
- * indicates that there is an Annoation porperty. When implementing
+ * indicates that there is an Annoation property. When implementing
  * Annotatable, you should always create a protected or private field
  * containing an instance of ChangeForwarder, and register it as a
  * ChangeListener with the associated Annotation delegate
@@ -68,13 +68,13 @@ import org.biojava.utils.Changeable;
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a> (docs).
  *
  * @for.user Check if BioJava classes and interfaces extend Annotatable. This
- * will tell  you if you should look for associated annotation
+ * will tell  you if you should look for associated annotation.
  *
- * @for.powerUser If an object implements Annotatable, it may well propogate
+ * @for.powerUser If an object implements Annotatable, it may well propagate
  * ChangeEvent notifications from the associated Annotation. You may
  * need to track these to maintain the state of your applications.
  *
- * @for.developer Be careful to hook up the appropreate event forwarders.
+ * @for.developer Be careful to hook up the appropriate event forwarders.
  *
  * @for.developer The getAnnotation() method can be implemented lazily
  * (instantiate the Annotation instance and event forwarders when the first
