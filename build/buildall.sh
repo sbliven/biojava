@@ -1,4 +1,5 @@
 #! /bin/sh
+rm -rf class biojava.jar
 mkdir class
 find src -name "*.java" | xargs javac -classpath xml.jar:class -sourcepath src -d class
 jar -cf biojava.jar -C class .

@@ -26,6 +26,7 @@ import java.util.*;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.tools.DoubleAlphabet;
 
 public abstract class DP {
     public static State[] stateList(MarkovModel mm)
