@@ -196,13 +196,16 @@ public class XmlMarkovModel {
     
     // print out states & scores
     for(Iterator stateI = stateL.iterator(); stateI.hasNext(); ) {
-      EmissionState es = (EmissionState) stateI.next();
-      if(! (es instanceof MagicalState)) {
-        out.println("  <state name=\"" + es.getName() + "\">");
-        for(Iterator resI = resR.iterator(); resI.hasNext(); ) {
-          Residue r = (Residue) resI.next();
-          out.println("    <weight res=\"" + r.getName() +
-                               "\" prob=\"" + Math.exp(es.getWeight(r)) + "\"/>");
+      State s = (State) stateI.next();
+      if(! (s instanceof MagicalState)) {
+        out.println("  <state name=\"" + s.getName() + "\">");
+        if(s instanceof EmissionState) {
+          EmissionState es = (EmissionState) s;
+          for(Iterator resI = resR.iterator(); resI.hasNext(); ) {
+            Residue r = (Residue) resI.next();
+            out.println("    <weight res=\"" + r.getName() +
+                        "\" prob=\"" + Math.exp(es.getWeight(r)) + "\"/>");
+          }
         }
         out.println("  </state>");
       }

@@ -44,43 +44,57 @@ public abstract class DP {
     return model;
   }
   
-    public static State[] stateList(MarkovModel mm)
-	throws IllegalResidueException, IllegalTransitionException
-    {
-	FiniteAlphabet alpha = mm.stateAlphabet();
+  public static State[] stateList(MarkovModel mm)
+  throws IllegalResidueException, IllegalTransitionException
+  {
+    FiniteAlphabet alpha = mm.stateAlphabet();
 
-	List emissionStates = new ArrayList();
-	HMMOrderByTransition comp = new HMMOrderByTransition(mm);
-	List dotStates = new LinkedList();
-	for (Iterator addStates = alpha.iterator(); addStates.hasNext(); ) {
+    List emissionStates = new ArrayList();
+    HMMOrderByTransition comp = new HMMOrderByTransition(mm);
+    List dotStates = new LinkedList();
+    for (Iterator addStates = alpha.iterator(); addStates.hasNext(); ) {
 	    Object state = addStates.next();
-	    if (state instanceof EmissionState)
-		emissionStates.add(state);
-	    else {
-		ListIterator checkOld = dotStates.listIterator();
-		int insertPos = -1;
-		while (checkOld.hasNext() && insertPos == -1) {
-		    Object oldState = checkOld.next();
-		    if (comp.compare(state, oldState) == comp.LESS_THAN)
-			insertPos = checkOld.nextIndex() - 1;
-		}
-		if (insertPos >= 0)
-		    dotStates.add(insertPos, state);
-		else
-		    dotStates.add(state);
-	    }
-	}
-
-	State[] sl = new State[emissionStates.size() + dotStates.size()];
-	int i = 0;
-	for (Iterator si = emissionStates.iterator(); si.hasNext(); ) {
-	    sl[i++] = (State) si.next();
-	}
-	for (Iterator si = dotStates.iterator(); si.hasNext(); ) {
-	    sl[i++] = (State) si.next();
-	}
-	return sl;
+	    if (state instanceof EmissionState) {
+        emissionStates.add(state);
+      } else {
+        ListIterator checkOld = dotStates.listIterator();
+        int insertPos = -1;
+        while (checkOld.hasNext() && insertPos == -1) {
+          Object oldState = checkOld.next();
+          if (comp.compare(state, oldState) == comp.LESS_THAN) {
+            insertPos = checkOld.nextIndex() - 1;
+          }
+        }
+        if (insertPos >= 0) {
+          dotStates.add(insertPos, state);
+        } else {
+          dotStates.add(state);
+        }
+      }
     }
+    
+    State[] sl = new State[emissionStates.size() + dotStates.size()];
+    int i = 0;
+    for (Iterator si = emissionStates.iterator(); si.hasNext(); ) {
+      EmissionState ex = (EmissionState) si.next();
+      int [] ad = ex.getAdvance();
+      for(int adi = 0; ad != null && adi < ad.length; adi++) {
+        if(ad[adi] != 0) {
+          ad = null;
+        }
+      }
+      if(ad != null) {
+        throw new Error(
+          "State " + ex.getName() + " has advance " + ad
+        );
+      }
+      sl[i++] = ex;
+    }
+    for (Iterator si = dotStates.iterator(); si.hasNext(); ) {
+      sl[i++] = (State) si.next();
+    }
+    return sl;
+  }
 
   private static class HMMOrderByTransition {
     public final static Object GREATER_THAN = new Object();
