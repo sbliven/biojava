@@ -169,11 +169,6 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
         return alignment;
     }
 
-    public String toString()
-    {
-        return "SequenceDBSearchSubHit with score " + getScore();
-    }
-  
     public boolean equals(final Object other)
     {
         if (other == this) return true;
