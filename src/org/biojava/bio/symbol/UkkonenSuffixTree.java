@@ -238,7 +238,7 @@ public class UkkonenSuffixTree{
 	  currentNode=newNode;
 	}
 
-	if (rule==4||rule==5)
+	if (rule==1||rule==4||rule==5)
 	  currentNode = currentNode.parent;
 
 	if (oldNode!=null){
@@ -251,7 +251,7 @@ public class UkkonenSuffixTree{
 	oldNode=newNode;
 	newNode=null;
 
-        if (rule==4||rule==5){
+        if (rule==1||rule==4||rule==5){
 	  oldNode=null;
           canLinkJump=false;
           break;
