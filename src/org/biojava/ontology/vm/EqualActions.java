@@ -32,13 +32,14 @@ public final class EqualActions {
     {
       Frame frame = interpreter.popFrame();
 
-      if(frame.getAxiom() instanceof Triple) {
-        if(frame.getProp() instanceof Triple) {
-          interpreter.pushFrame(frame.changeAction(EQUIVALENT_TRIPLE));
-        } else {
-          frame = interpreter.popFrame();
-          interpreter.pushFrame(frame.changeResult(OntoTools.FALSE));
-        }
+      boolean pt = frame.getProp() instanceof Triple;
+      boolean at = frame.getAxiom() instanceof Triple;
+
+      if(pt != at) {
+        frame = interpreter.popFrame();
+        interpreter.pushFrame(frame.changeResult(OntoTools.FALSE));
+      } else if(pt) {
+        interpreter.pushFrame(frame.changeAction(EQUIVALENT_TRIPLE));
       } else {
         interpreter.pushFrame(frame.changeAction(EQUIVALENT_ATOM));
       }
@@ -60,12 +61,15 @@ public final class EqualActions {
       Term prop = ReasoningTools.resolveRemote(frame.getProp());
 
       // variables involved - resolve them
-      if(prop instanceof Variable) {
+      boolean propV = prop instanceof Variable;
+      boolean axiomV = axiom instanceof Variable;
+
+      if(propV) {
         interpreter.pushFrame(parent
                               .bind((Variable) prop, axiom)
                               .changeResult(OntoTools.TRUE));
 
-      } else if(axiom instanceof Variable) {
+      } else if(axiomV) {
         interpreter.pushFrame(parent
                               .bind((Variable) axiom, prop)
                               .changeResult(OntoTools.TRUE));

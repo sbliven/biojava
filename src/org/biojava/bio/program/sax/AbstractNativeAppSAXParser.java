@@ -69,7 +69,7 @@ import org.xml.sax.SAXNotSupportedException;
  * in the interface.
  * <p>
  * Non-interface methods are functional utility methods to help
- * application writers.  For example, see the source of 
+ * application writers.  For example, see the source of
  * <code>org.biojava.bio.program.sax.BlastLikeSAXParser</code>
  * for an example of how these utility methods can be used.
  * <p>
@@ -93,14 +93,14 @@ import org.xml.sax.SAXNotSupportedException;
  *
  * @see BlastLikeSAXParser
  */
-abstract class AbstractNativeAppSAXParser 
+abstract class AbstractNativeAppSAXParser
     implements org.xml.sax.XMLReader,
                NamespaceConfigurationIF {
 
     private   HashMap             oPrefixMap            = new HashMap();
     protected ContentHandler      oHandler              =  null;
-    protected boolean             tNamespaces           =  true;    
-    protected boolean             tNamespacePrefixes    =  false;    
+    protected boolean             tNamespaces           =  true;
+    protected boolean             tNamespacePrefixes    =  false;
     protected String              oNamespacePrefix      = "";
     protected String              oFullNamespacePrefix  = "";
 
@@ -108,7 +108,7 @@ abstract class AbstractNativeAppSAXParser
 
 
     /**
-     * Allow an application to register a content event handler. 
+     * Allow an application to register a content event handler.
      * If the application does not register a content handler, all content
      * events reported by the SAX parser will be silently ignored.
      * <p>
@@ -122,7 +122,7 @@ abstract class AbstractNativeAppSAXParser
      */
     public void setContentHandler(ContentHandler poHandler) {
     if (poHandler == null) {
-        throw new 
+        throw new
              java.lang.NullPointerException("ContentHandler is null");
     }
     oHandler = poHandler;
@@ -143,7 +143,7 @@ abstract class AbstractNativeAppSAXParser
     public void parse(InputSource input)
            throws java.io.IOException,
     SAXException {
-    
+
     }
     /**
      * Full implementation of interface method.
@@ -162,12 +162,12 @@ abstract class AbstractNativeAppSAXParser
     throws SAXNotRecognizedException,SAXNotSupportedException {
 
     //if get here, throw exception
-    throw (new SAXNotSupportedException("The feature \"" + poName + 
-            "\" is not supported "+ 
+    throw (new SAXNotSupportedException("The feature \"" + poName +
+            "\" is not supported "+
             "in the biojava native SAX2 parsing framework."));
    }
     /**
-     * Handles support for Namespaces and Namespace-prefixes
+     * Handles support for ReasoningDomain and Namespace-prefixes
      *
      */
     public void setFeature(java.lang.String poName,
@@ -176,7 +176,7 @@ abstract class AbstractNativeAppSAXParser
     SAXNotSupportedException {
 
     //handle namespaces
-    if (poName.equals("http://xml.org/sax/features/namespaces")) { 
+    if (poName.equals("http://xml.org/sax/features/namespaces")) {
         this.setNamespaces(value);
         //check if features combination is supported
         if ((!this.getNamespaces()) && (!this.getNamespacePrefixes())) {
@@ -187,7 +187,7 @@ abstract class AbstractNativeAppSAXParser
         return;
     }
 
-    
+
     if (poName.equals("http://xml.org/sax/features/namespace-prefixes")) {
         this.setNamespacePrefixes(value);
         if ((!this.getNamespaces()) && (!this.getNamespacePrefixes())) {
@@ -198,7 +198,7 @@ abstract class AbstractNativeAppSAXParser
     }
 
     //if get here, throw exception
-    throw (new SAXNotSupportedException("The feature \"" + poName + 
+    throw (new SAXNotSupportedException("The feature \"" + poName +
             "\" is not supported "+
             "in the biojava native SAX2 parsing framework."));
     }
@@ -348,7 +348,7 @@ abstract class AbstractNativeAppSAXParser
      * This mapping can be looked up later to get URIs on request
      * using the getURIFromPrefix method.
      *
-     * @param poPrefix a <code>String</code> representation of the 
+     * @param poPrefix a <code>String</code> representation of the
      * namespace prefix
      * @param poURI a <code>String</code> representation of the URI
      * for the namespace prefix.
@@ -423,7 +423,7 @@ abstract class AbstractNativeAppSAXParser
     //Highest - Character stream
 
     if (oSource.getCharacterStream() != null) {
-        
+
         oContents = new BufferedReader(oSource.getCharacterStream(),
                        iBuffSize);
         return oContents;
@@ -433,7 +433,7 @@ abstract class AbstractNativeAppSAXParser
 
 
     if ( (oSource.getByteStream() != null) ) {
-        
+
         oContents = new BufferedReader(
            new InputStreamReader(oSource.getByteStream()),
                      iBuffSize);
@@ -446,16 +446,16 @@ abstract class AbstractNativeAppSAXParser
     if ( (oSource.getSystemId() != null) ) {
 
         try {
-        //URL handles file URI's and URL's, which might be sent in 
+        //URL handles file URI's and URL's, which might be sent in
         //by an XSLT processor.  Handles things like file:\C:\file.txt
         URL IORUrl = new java.net.URL(oSource.getSystemId());
-        BufferedInputStream inStr = 
+        BufferedInputStream inStr =
                 new BufferedInputStream(IORUrl.openStream());
         // Create input stream
         oContents = new
             BufferedReader(new InputStreamReader(inStr),
                    iBuffSize);
-        
+
         return oContents;
         //catch Malfromed URL and IOException
         } catch (MalformedURLException x) {
@@ -466,7 +466,7 @@ abstract class AbstractNativeAppSAXParser
         System.out.println(x.getMessage());
         System.out.println("Couldn't open file");
         System.exit(0);
-        }   
+        }
     }
 
     //should throw an exception to say couldn't get stream

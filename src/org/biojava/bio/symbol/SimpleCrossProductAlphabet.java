@@ -170,7 +170,7 @@ implements Serializable {
     return alphas;
   }
 
-  public AtomicSymbol getSymbolImpl(List l)
+  protected AtomicSymbol getSymbolImpl(List l)
   throws IllegalSymbolException {
     AtomicSymbol cps;
     cps = (AtomicSymbol) ourSymbols.get(l);

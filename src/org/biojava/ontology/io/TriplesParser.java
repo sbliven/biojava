@@ -440,7 +440,7 @@ public class TriplesParser {
     }
   }
 
-  private static final class ListRewriter
+  public static final class ListRewriter
   extends DepthFirstAdapter {
     private int listCounter;
     private final Map listToExpression;

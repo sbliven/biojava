@@ -3,14 +3,8 @@ package org.biojava.ontology;
 import java.util.*;
 
 import org.biojava.utils.*;
-import org.biojava.bio.dp.State;
 import org.biojava.ontology.vm.*;
 import org.biojava.ontology.vm.Action;
-
-import javax.swing.*;
-import javax.crypto.Mac;
-
-import com.sun.jdi.Value;
 
 /**
  * A domain over which we are reasoning.
@@ -447,7 +441,7 @@ public interface ReasoningDomain
     void extractConstTerms(Set allTerms, Set constTerms) {
       for(Iterator i = allTerms.iterator(); i.hasNext(); ) {
         Triple trip = (Triple) i.next();
-        if(findFirstVariable(trip) == null) {
+        if(ReasoningTools.findFirstVariable(trip) == null) {
           constTerms.add(trip);
         }
       }
@@ -506,7 +500,7 @@ public interface ReasoningDomain
         for(Iterator i = constantAxioms.iterator(); i.hasNext(); ) {
           Term t = (Term) i.next();
 
-          if(findFirstVariable(t) != null) {
+          if(ReasoningTools.findFirstVariable(t) != null) {
             i.remove();
           }
         }
@@ -526,7 +520,7 @@ public interface ReasoningDomain
         for(Iterator i = variableAxioms.iterator(); i.hasNext();) {
           Term t = (Term) i.next();
 
-          if(findFirstVariable(t) == null) {
+          if(ReasoningTools.findFirstVariable(t) == null) {
             i.remove();
           }
         }
@@ -641,30 +635,6 @@ public interface ReasoningDomain
       //System.out.println("evaluateTriple: Unable to prove proposition");
       resultCache.put(expr, OntoTools.FALSE);
       return OntoTools.FALSE;
-    }
-
-    Variable findFirstVariable(Term term) {
-      term = ReasoningTools.resolveRemote(term);
-
-      if(term instanceof Variable)
-        return (Variable) term;
-
-      if(term instanceof Triple) {
-        Triple trip = (Triple) term;
-
-        Variable r;
-
-        r = findFirstVariable(trip.getPredicate());
-        if(r != null) return r;
-
-        r = findFirstVariable(trip.getSubject());
-        if(r != null) return r;
-
-        r = findFirstVariable(trip.getObject());
-        if(r != null) return r;
-      }
-
-      return null;
     }
 
     private Set _values;
@@ -1000,51 +970,99 @@ public interface ReasoningDomain
       private final Action EVALUATE_IF_TRUE;
       private final Action EVALUATE;
       private final Action CHECK_IMPLICATION;
-      private final Action SUBSTITUTE;
       private final Action EXPAND_VARIABLES;
       private final Action ON_SOLUTION;
+      private final Action ON_NON_SOLUTION;
+      private final Action RECURSIVE_EVAL;
+      private final Action EVALUATE_FULLY;
       private final Action CHECK_TRUE_FALSE;
 
       private Term result;
 
       {
+        List axes = new ArrayList();
+        axes.addAll(getConstantAxioms());
+        axes.addAll(getVariableAxioms());
 
-        EACH_AXIOM = new EachAxiom(getAxioms().iterator());
-        EVALUATE = new Evaluate();
-        EVALUATE_IF_TRUE = new LogicalActions.ConditionalAction(
-                EVALUATE,
-                LogicalActions.NULL_OP);
-        EVALUATE_AXIOM = new EvaluateAxiom();
-        CHECK_IMPLICATION = new CheckImplication();
-        SUBSTITUTE = new Substitute();
-        EXPAND_VARIABLES = new ExpandVariables();
         ON_SOLUTION = new Action() {
           public void evaluate(Interpreter interpreter)
           {
             Frame frame = interpreter.popFrame();
             result = frame.getAxiom();
           }
+
+          public String toString()
+          {
+            return "ON_SOLUTION";
+          }
         };
-        CHECK_TRUE_FALSE = new CheckTrueFalse(ON_SOLUTION, LogicalActions.NULL_OP);
+        ON_NON_SOLUTION = new LogicalActions.LazyRef() {
+          protected Action getDelegate()
+          {
+            return LogicalActions.NULL_OP;
+          }
+
+          public String toString()
+          {
+            return "ON_NON_SOLUTION:" + super.toString();
+          }
+        };
+
+        RECURSIVE_EVAL = new Evaluate.RecursiveEval(ReasoningDomain.Impl.this);
+
+        EVALUATE_FULLY = new Evaluate.EvaluateFully(
+                ReasoningDomain.Impl.this,
+                RECURSIVE_EVAL);
+        CHECK_TRUE_FALSE = new Evaluate.CheckTrueFalse(
+                ON_SOLUTION,
+                ON_NON_SOLUTION,
+                EVALUATE_FULLY);
+        EXPAND_VARIABLES = new Evaluate.ExpandVariables(CHECK_TRUE_FALSE, getTerms());
+        EVALUATE = new StackActions.Macro("EVALUATE", Arrays.asList(new Action[] {
+          EXPAND_VARIABLES
+        }));
+        EVALUATE_IF_TRUE = new LogicalActions.ConditionalAction(
+                EVALUATE,
+                LogicalActions.NULL_OP);
+
+        Action _evaluate_axiom = new LogicalActions.LazyRef() {
+          protected Action getDelegate()
+          {
+            return EVALUATE_AXIOM;
+          }
+        };
+        Action _check_implication = new LogicalActions.LazyRef() {
+          protected Action getDelegate()
+          {
+            return CHECK_IMPLICATION;
+          }
+        };
+        
+        CHECK_IMPLICATION = new Evaluate.CheckImplication(_evaluate_axiom, _check_implication);
+        EVALUATE_AXIOM = new Evaluate.EvaluateAxiom(EVALUATE_IF_TRUE, CHECK_IMPLICATION);
+        EACH_AXIOM = new Evaluate.EachAxiom(axes.iterator(), EVALUATE_AXIOM);
       }
 
       MatchIterator(Term proposition) {
         Set debugOn = new HashSet();
+        //debugOn.add(EqualActions.EQUIVALENT_ATOM);
         //debugOn.add(SUBSTITUTE);
         //debugOn.add(CHECK_TRUE_FALSE);
         //debugOn.add(ValueIterator.class);
         debugOn.add(ON_SOLUTION);
+        //debugOn.add(RECURSIVE_EVAL);
+        //debugOn.add(ON_NON_SOLUTION);
         //debugOn.add(LogicalActions.EqualsValue.class);
-        debugOn.add(StackActions.BindValue.class);
-        //debugOn.add(EvaluateFully.class);
+        //debugOn.add(StackActions.BindValue.class);
+        //debugOn.add(EVALUATE_FULLY);
         Interpreter.Debug interp = new Interpreter.Debug();
         interp.setDebugOn(debugOn);
-        interp.setMaxDepth(20);
+        interp.setMaxDepth(40);
         interp.setStacksToKeep(5);
         interp.setMaxTries(100000);
 
         interpreter = interp;
-        interpreter.pushFrame(new Frame(EACH_AXIOM, null, proposition));
+        interpreter.pushFrame(new Frame(ReasoningDomain.Impl.this, EACH_AXIOM, null, proposition));
         result = null;
         findNext();
       }
@@ -1077,440 +1095,7 @@ public interface ReasoningDomain
           interpreter.advance();
         }
       }
-
-      private class EachAxiom
-              implements Action
- {
-        Iterator axI;
-
-        EachAxiom(Iterator axI)
-        {
-          this.axI = axI;
-        }
-
-        public void evaluate(Interpreter interpreter)
-        {
-          if(axI.hasNext()) {
-            Triple axiom = (Triple) axI.next();
-
-            // got a new axiom to process - push it on to the stack
-            Frame frame = interpreter.getFrame();
-            interpreter.pushFrame(frame = frame
-                                          .changeAction(EVALUATE_AXIOM)
-                                          .changeAxiom(axiom));
-          } else {
-            // no more axioms - pop me
-            interpreter.popFrame();
-          }
-        }
-
-        public String toString()
-        {
-          return "EACH_AXIOM";
-        }
-      }
-
-      private class EvaluateAxiom
-              implements Action
-      {
-        public void evaluate(Interpreter interpreter)
-        {
-          Frame frame = interpreter.popFrame();
-          interpreter.pushFrame(frame.changeAction(EVALUATE_IF_TRUE));
-          interpreter.pushFrame(frame.changeAction(CHECK_IMPLICATION));
-        }
-
-        public String toString()
-        {
-          return "EVALUATE_AXIOM";
-        }
-      }
-
-      private class Evaluate implements Action {
-        public void evaluate(Interpreter interpreter)
-        {
-          Frame frame = interpreter.popFrame();
-
-          interpreter.pushFrame(frame.changeAction(EXPAND_VARIABLES));
-          interpreter.pushFrame(frame.changeAction(SUBSTITUTE));
-        }
-
-        public String toString()
-        {
-          return "EVALUATE";
-        }
-      }
-
-      private class CheckImplication implements Action {
-        final Action EA_Object;
-        final Action EA_Subject;
-        final Action EA_S_or_O;
-        final Action EA_S_and_O;
-        final Action IMPL;
-
-        {
-          EA_Object = new StackActions.Macro(Arrays.asList(new Action[]{
-            EVALUATE_AXIOM,
-            StackActions.AXIOM_OBJECT}));
-          EA_Subject = new StackActions.Macro(Arrays.asList(new Action[]{
-            EVALUATE_AXIOM,
-            StackActions.AXIOM_SUBJECT}));
-          EA_S_or_O = new StackActions.Macro(Arrays.asList(new Action[]{
-            new LogicalActions.Or(EA_Subject, EA_Object, false)}));
-          EA_S_and_O = new StackActions.Macro(Arrays.asList(new Action[]{
-            new LogicalActions.And(EA_Subject, EA_Object, false)}));
-          IMPL = new StackActions.Macro(Arrays.asList(new Action[]{
-            new LazyRef() { protected Action getDelegate() { return CHECK_IMPLICATION; } },
-            StackActions.AXIOM_OBJECT }));
-        }
-
-        public void evaluate(Interpreter interpreter)
-        {
-          //
-          // check for
-          // - axiom = prop
-          // - axiom -> prop
-          // - axiom = x & y, x -> prop or y -> prop
-          // - axiom = x || y, x -> prop and y -> prop
-          //
-          // push in reverse order so they get popped in the correct one
-
-          Frame frame = interpreter.popFrame();
-          Term axiom = ReasoningTools.resolveRemote(frame.getAxiom());
-
-          if(!(axiom instanceof Triple)) {
-            // if we've walked to a non-triple, things are bad
-            throw new IllegalStateException("Term must be a triple: " + axiom);
-          }
-
-          Triple trip = (Triple) axiom;
-          Term predicate = ReasoningTools.resolveRemote(trip.getPredicate());
-          Action toPush = null;
-
-          // (x & y) -> prop, x -> prop or y -> prop
-          if(predicate == OntoTools.AND) {
-            Term tripO = ReasoningTools.resolveRemote(trip.getObject());
-            Term tripS = ReasoningTools.resolveRemote(trip.getSubject());
-
-            boolean tto = tripO instanceof Triple;
-            boolean tts = tripS instanceof Triple;
-
-            if(tto && tts) {
-              toPush = EA_S_or_O;
-            }
-
-            if(tripO instanceof Triple) {
-              toPush = EA_Object;
-            }
-
-            if(tripS instanceof Triple) {
-              toPush = EA_Subject;
-            }
-          }
-
-          // (x || y) -> prop, x -> prop and y -> prop
-          if(predicate == OntoTools.OR) {
-            Term tripO = ReasoningTools.resolveRemote(trip.getObject());
-            Term tripS = ReasoningTools.resolveRemote(trip.getSubject());
-
-            boolean tto = tripO instanceof Triple;
-            boolean tts = tripS instanceof Triple;
-
-            if(tto && tts) {
-              toPush = EA_S_and_O;
-            }
-
-            if(tripO instanceof Triple) {
-              toPush = EA_Object;
-            }
-
-            if(tripS instanceof Triple) {
-              toPush = EA_Subject;
-            }
-          }
-
-          // axiom -> prop
-          if(predicate == OntoTools.IMPLIES) {
-            toPush = IMPL;
-          }
-
-          // axiom = prop
-          if(toPush == null) {
-            interpreter.pushFrame(frame.changeAction(EqualActions.EQUIVALENT));
-          } else {
-            interpreter.pushFrame(frame.changeAction(
-                    new LogicalActions.Or(EqualActions.EQUIVALENT,
-                                          toPush,
-                                          false)));
-          }
-        }
-
-        public String toString()
-        {
-          return "CHECK_IMPLICATION";
-        }
-      }
-
-      public class Substitute implements Action {
-        public void evaluate(Interpreter interpreter)
-        {
-          Frame frame = interpreter.popFrame();
-          SymbolTable symTab = frame.getSymbolTable();
-          Term axiom = frame.getAxiom();
-          Term prop = frame.getProp();
-
-          for(Iterator i = symTab.variables().iterator(); i.hasNext(); ) {
-            Variable var = (Variable) i.next();
-            Term val = symTab.getValue(var);
-
-            axiom = ReasoningTools.substitute(axiom,
-                                              var,
-                                              val,
-                                              ReasoningDomain.Impl.this);
-            prop = ReasoningTools.substitute(prop,
-                                             var,
-                                             val,
-                                             ReasoningDomain.Impl.this);
-          }
-
-          Frame parent = interpreter.popFrame();
-          interpreter.pushFrame(parent
-                                .changeAxiom(axiom)
-                                .changeProp(prop)
-                                .changeSymbolTable(SymbolTable.EMPTY));
-        }
-
-        public String toString()
-        {
-          return "SUBSTITUTE";
-        }
-      }
-
-      private class ExpandVariables
-              implements Action {
-        public void evaluate(Interpreter interpreter)
-        {
-          Frame frame = interpreter.popFrame();
-          Term axiom = frame.getAxiom();
-          Term prop = frame.getProp();
-
-          Variable var = findFirstVariable(axiom);
-          if(var == null) {
-            var = findFirstVariable(prop);
-          }
-
-          if(var == null) {
-            interpreter.pushFrame(frame.changeAction(CHECK_TRUE_FALSE));
-          } else {
-            //Set vals = findValues(axiom, var);
-            //vals.addAll(findValues(prop, var));
-
-            interpreter.pushFrame(frame.changeAction(
-                    new ValueIterator(var, getTerms().iterator())));
-          }
-        }
-
-        public String toString()
-        {
-          return "EXPAND_VARIABLES";
-        }
-      }
-
-      public class ValueIterator
-              implements Action {
-        private final Variable var;
-        private final Iterator vals;
-
-        ValueIterator(Variable var, Iterator vals) {
-          this.var = var;
-          this.vals = vals;
-        }
-
-        public void evaluate(Interpreter interpreter)
-        {
-          while(vals.hasNext()) {
-            Term val = (Term) vals.next();
-            if(val instanceof Variable || val instanceof Triple || val instanceof RemoteTerm) {
-              continue;
-            }
-
-            Frame frame = interpreter.getFrame();
-            interpreter.pushFrame(frame.changeAction(EXPAND_VARIABLES));
-            interpreter.pushFrame(frame.changeAction(SUBSTITUTE));
-            interpreter.pushFrame(frame.changeAction(
-                    new StackActions.BindValue(var, val)));
-            return;
-          }
-
-          interpreter.popFrame();
-        }
-
-        public String toString()
-        {
-          return "VALUE_ITERATOR(" + var + ")";
-        }
-      }
-
-      public class CheckTrueFalse
-              implements Action {
-        private final Action onSuccess;
-        private final Action onFailure;
-
-        private final Action SUBSTITUTE_PROP_TRUE;
-        private final Action SUBSTITUTE_PROP_FALSE;
-        private final Action TRUE_EVAL;
-        private final Action FALSE_EVAL;
-        private final Action AND_EVAL;
-        private final Action EVALUATE_FULLY;
-        private final Action CONDITIONAL;
-
-        CheckTrueFalse(Action onSuccess, Action onFailure) {
-          this.onSuccess = onSuccess;
-          this.onFailure = onFailure;
-
-          SUBSTITUTE_PROP_TRUE = new SubstituteProposition(OntoTools.TRUE);
-          SUBSTITUTE_PROP_FALSE = new SubstituteProposition(OntoTools.FALSE);
-
-          EVALUATE_FULLY = new EvaluateFully();
-
-          TRUE_EVAL = new StackActions.Macro(Arrays.asList(new Action[] {
-            LogicalActions.TRUE_VALUE,
-            EVALUATE_FULLY,
-            SUBSTITUTE_PROP_TRUE
-          }));
-
-          FALSE_EVAL = new StackActions.Macro(Arrays.asList(new Action[]{
-            LogicalActions.FALSE_VALUE,
-            EVALUATE_FULLY,
-            SUBSTITUTE_PROP_FALSE
-          }));
-
-          AND_EVAL = new LogicalActions.And(TRUE_EVAL, FALSE_EVAL, false);
-          CONDITIONAL = new LogicalActions.ConditionalAction(onSuccess, onFailure);
-        }
-
-        public void evaluate(Interpreter interpreter)
-        {
-          // we will do this:
-          //
-          // if( and( (prop -> true, evaluate, is True),
-          //          (prop -> false, evaluate, isFalse) ) )
-          //    onSuccess
-          // else
-          //    onFailure
-
-          Frame frame = interpreter.popFrame();
-          interpreter.pushFrame(frame.changeAction(CONDITIONAL));
-          interpreter.pushFrame(frame.changeAction(AND_EVAL));
-        }
-
-        public String toString()
-        {
-          return "CHECK_TRUE_FALSE(" + onSuccess + ", " + onFailure + ")";
-        }
-      }
-
-      class SubstituteProposition implements Action {
-        Term val;
-
-        SubstituteProposition(Term val) {
-          this.val = val;
-        }
-
-        public void evaluate(Interpreter interpreter)
-        {
-          Frame frame = interpreter.popFrame();
-          Frame parent = interpreter.popFrame();
-
-          Term axiom = frame.getAxiom();
-          Term prop = frame.getProp();
-
-          axiom = ReasoningTools.substitute(axiom,
-                                            prop,
-                                            val,
-                                            ReasoningDomain.Impl.this);
-          interpreter.pushFrame(parent
-                                .changeAxiom(axiom)
-                                .changeProp(val));
-        }
-
-        public String toString()
-        {
-          return "SUBSTITUTE_PROPOSITION";
-        }
-      }
-
-      class EvaluateFully implements Action {
-        private Action EF_SUB;
-        private Action EF_OBJ;
-        private Action EF_EVAL;
-
-        private Action RECURSIVE_EVAL = new LazyRef() {
-          protected Action getDelegate()
-          {
-            return LogicalActions.NULL_OP;
-          }
-        };
-
-        {
-          EF_SUB = new StackActions.Macro(Arrays.asList(new Action[] {
-            new StackActions.AxiomSubjectReplace(ReasoningDomain.Impl.this),
-            this,
-            StackActions.AXIOM_SUBJECT,
-          }));
-
-          EF_OBJ = new StackActions.Macro(Arrays.asList(new Action[]{
-            new StackActions.AxiomObjectReplace(ReasoningDomain.Impl.this),
-            this,
-            StackActions.AXIOM_OBJECT,
-          }));
-
-          EF_EVAL = new StackActions.Macro(Arrays.asList(new Action[]{
-            RECURSIVE_EVAL,
-            EF_OBJ,
-            EF_SUB
-          }));
-        }
-
-        public void evaluate(Interpreter interpreter)
-        {
-          // Atom -> Atom
-          //
-          // Triple ->
-          //  t'.subject = EF:Triple.subject
-          //  t'.object = EF:Triple.object
-          //  discover if (t') is supported by this ontology (recursive call)
-
-          Frame frame = interpreter.popFrame();
-          Term axiom = frame.getAxiom();
-
-          if(axiom instanceof Triple) {
-            interpreter.pushFrame(frame.changeAction(EF_EVAL));
-          } else {
-            Frame parent = interpreter.popFrame();
-            interpreter.pushFrame(parent.changeResult(axiom));
-          }
-        }
-      }
-
-      public String toString()
-      {
-        return "EVALUATE_FULLY";
-      }
-    }
-
-    private abstract class LazyRef implements Action {
-      protected abstract Action getDelegate();
-
-      public void evaluate(Interpreter interpreter)
-      {
-        getDelegate().evaluate(interpreter);
-      }
-
-      public String toString()
-      {
-        return getDelegate().toString();
-      }
     }
   }
+
 }

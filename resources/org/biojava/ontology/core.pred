@@ -119,6 +119,7 @@ xor(equal(_x, _y),
     not_equal(_x, _y))
 
 # members of any & none
+everything_in_any as
 instance_of { everything is an any }
           (_x, any)
 equal { nothing is a none }
@@ -167,7 +168,7 @@ reflexive     { reflexive }
 
 sub_type_of(transitive, relation)
 transitive_closure as
-implies { if _r is transitive and _r(_x, _y) and _r(_y, _z) then _r(_x, _z)
+implies { if _r is transitive and _r(_x, _y) and _r(_y, _z) then _r(_x, _z) }
        (and(instance_of(_r, transitive),
             and(_r(_x, _y), _r(_y, _z))),
         _r(_x, _z))

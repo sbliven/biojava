@@ -64,6 +64,20 @@ public final class LogicalActions {
     }
   }
 
+  public static abstract class LazyRef implements Action {
+    protected abstract Action getDelegate();
+
+    public void evaluate(Interpreter interpreter)
+    {
+      getDelegate().evaluate(interpreter);
+    }
+
+    public String toString()
+    {
+      return getDelegate().toString();
+    }
+  }
+
   public static final class ConditionalAction implements Action {
     private final Action onTrue;
     private final Action onFalse;
@@ -170,7 +184,8 @@ public final class LogicalActions {
     }
   }
 
-  public static final class Or implements Action {
+  public static final class Or
+          implements Action {
     private final Action first;
     private final Action second;
 
@@ -193,7 +208,8 @@ public final class LogicalActions {
     }
   }
 
-  private static final class OrFirst implements Action {
+  private static final class OrFirst
+          implements Action {
     private final Action act;
     private final boolean lazy;
 
@@ -227,7 +243,8 @@ public final class LogicalActions {
     }
   }
 
-  private static final class OrResult implements Action {
+  private static final class OrResult
+          implements Action {
     private final boolean state;
 
     OrResult(boolean state)

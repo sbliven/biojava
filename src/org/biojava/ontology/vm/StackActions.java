@@ -21,6 +21,12 @@ public final class StackActions {
   public static final Action PROP_OBJECT;
   public static final Action PROP_PREDICATE;
 
+  public static final Action RESULT_TO_AXIOM;
+  public static final Action RESULT_TO_PROP;
+
+  public static final Action AXIOM_SUBJECT_REPLACE;
+  public static final Action AXIOM_OBJECT_REPLACE;
+
   static {
     AXIOM_SUBJECT = new AxiomSubject();
     AXIOM_OBJECT = new AxiomObject();
@@ -29,19 +35,27 @@ public final class StackActions {
     PROP_SUBJECT = new PropSubject();
     PROP_OBJECT = new PropObject();
     PROP_PREDICATE = new PropPredicate();
+
+    RESULT_TO_AXIOM = new ResultToAxiom();
+    RESULT_TO_PROP = new ResultToProp();
+
+    AXIOM_SUBJECT_REPLACE = new AxiomSubjectReplace();
+    AXIOM_OBJECT_REPLACE = new AxiomObjectReplace();
   }
 
   public static class Macro
           implements Action {
     private final List actions;
+    private final String name;
 
-    public Macro(List actions) {
+    public Macro(String name, List actions) {
       for(Iterator i = actions.iterator(); i.hasNext(); ) {
         if(i.next() == null) {
           throw new NullPointerException("Null action in: " + actions);
         }
       }
 
+      this.name = name;
       this.actions = actions;
     }
 
@@ -57,7 +71,7 @@ public final class StackActions {
 
     public String toString()
     {
-      return "MACRO" + actions.toString();
+      return "MACRO:" + name + actions.toString();
     }
   }
 
@@ -200,25 +214,19 @@ public final class StackActions {
     }
   }
 
-  public static final class AxiomSubjectReplace implements Action {
-    private final ReasoningDomain rd;
-
-    public AxiomSubjectReplace(ReasoningDomain rd)
-    {
-      this.rd = rd;
-    }
-
+  private static final class AxiomSubjectReplace implements Action {
     public void evaluate(Interpreter interpreter)
     {
       Frame frame = interpreter.popFrame();
       Frame parent = interpreter.popFrame();
 
       Triple pTrip = (Triple) parent.getAxiom();
-      Triple result = rd.createVirtualTerm(frame.getResult(),
-                                           pTrip.getObject(),
-                                           pTrip.getPredicate(),
-                                           null,
-                                           null);
+      Triple result = frame.getRd().createVirtualTerm(
+              frame.getResult(),
+              pTrip.getObject(),
+              pTrip.getPredicate(),
+              null,
+              null);
 
       interpreter.pushFrame(parent.changeAxiom(result));
     }
@@ -229,12 +237,36 @@ public final class StackActions {
     }
   }
 
-  public static final class AxiomObjectReplace implements Action {
-    private final ReasoningDomain rd;
-
-    public AxiomObjectReplace(ReasoningDomain rd)
+  private static final class AxiomObjectReplace implements Action {
+    public void evaluate(Interpreter interpreter)
     {
-      this.rd = rd;
+      Frame frame = interpreter.popFrame();
+      Frame parent = interpreter.popFrame();
+
+      Triple pTrip = (Triple) parent.getAxiom();
+      Triple result = frame.getRd().createVirtualTerm(
+              pTrip.getSubject(),
+              frame.getResult(),
+              pTrip.getPredicate(),
+              null,
+              null);
+
+      interpreter.pushFrame(parent.changeAxiom(result));
+    }
+
+    public String toString()
+    {
+      return "AXIOM_OBJECT_REPLACE";
+    }
+  }
+
+  public static class SubstituteProposition
+          implements Action {
+    private final Term val;
+
+    public SubstituteProposition(Term val)
+    {
+      this.val = val;
     }
 
     public void evaluate(Interpreter interpreter)
@@ -242,19 +274,77 @@ public final class StackActions {
       Frame frame = interpreter.popFrame();
       Frame parent = interpreter.popFrame();
 
-      Triple pTrip = (Triple) parent.getAxiom();
-      Triple result = rd.createVirtualTerm(pTrip.getSubject(),
-                                           frame.getResult(),
-                                           pTrip.getPredicate(),
-                                           null,
-                                           null);
+      Term axiom = frame.getAxiom();
+      Term prop = frame.getProp();
 
-      interpreter.pushFrame(parent.changeAxiom(result));
+      axiom = ReasoningTools.substitute(axiom,
+                                        prop,
+                                        val,
+                                        frame.getRd());
+      interpreter.pushFrame(parent
+                            .changeAxiom(axiom)
+                            .changeProp(val));
     }
 
     public String toString()
     {
-      return "AXIOM_SUBJECT_REPLACE";
+      return "SUBSTITUTE_PROPOSITION";
+    }
+  }
+
+  private static class ResultToAxiom
+          implements Action
+  {
+    public void evaluate(Interpreter interpreter)
+    {
+      Frame frame = interpreter.popFrame();
+      interpreter.pushFrame(interpreter.popFrame()
+                            .changeAxiom(frame.getResult()));
+    }
+
+    public String toString()
+    {
+      return "RESULT_TO_AXIOM";
+    }
+  }
+
+  private static class ResultToProp
+          implements Action {
+    public void evaluate(Interpreter interpreter)
+    {
+      Frame frame = interpreter.popFrame();
+      interpreter.pushFrame(interpreter.popFrame()
+                            .changeAxiom(frame.getProp()));
+    }
+
+    public String toString()
+    {
+      return "RESULT_TO_PROP";
+    }
+  }
+
+  public static class Cutback
+          implements Action {
+    private final Action cutBackTo;
+
+    public Cutback(Action cutBackTo) {
+      this.cutBackTo = cutBackTo;
+    }
+
+    public Action getCutBackTo()
+    {
+      return cutBackTo;
+    }
+
+    public void evaluate(Interpreter interpreter)
+    {
+      Frame frame = interpreter.popFrame();
+      Frame topFrame = frame;
+      while(frame.getAction() != cutBackTo) {
+        frame = interpreter.popFrame();
+      }
+
+      interpreter.pushFrame(frame.changeResult(topFrame.getResult()));
     }
   }
 }

@@ -175,6 +175,31 @@ public final class ReasoningTools {
     return null;
   }
 
+  public static Variable findFirstVariable(Term term)
+  {
+    term = ReasoningTools.resolveRemote(term);
+
+    if(term instanceof Variable)
+      return (Variable) term;
+
+    if(term instanceof Triple) {
+      Triple trip = (Triple) term;
+
+      Variable r;
+
+      r = findFirstVariable(trip.getPredicate());
+      if(r != null) return r;
+
+      r = findFirstVariable(trip.getSubject());
+      if(r != null) return r;
+
+      r = findFirstVariable(trip.getObject());
+      if(r != null) return r;
+    }
+
+    return null;
+  }
+
   public static Term booleanToTerm(boolean bool) {
     return (bool) ? OntoTools.TRUE : OntoTools.FALSE;
   }

@@ -190,7 +190,7 @@
   </target>
 
   <!-- Prepares the grammars -->
-  <target name="prepare-grammars" depends="prepare" if="sableCC.support" 
+  <target name="prepare-grammars" depends="prepare" if="sableCC.support"
    description="Prepares the grammars">
 
     <!-- Creates directories -->
@@ -228,7 +228,7 @@
   </target>
 
   <!-- Prepares the biojava source code -->
-  <target name="prepare-biojava" depends="prepare" 
+  <target name="prepare-biojava" depends="prepare"
   description="Prepares biojava source files">
 
     <!-- Creates directories -->
@@ -259,7 +259,7 @@
   </target>
 
   <!-- Prepares the test source code -->
-  <target name="prepare-tests" depends="prepare" 
+  <target name="prepare-tests" depends="prepare"
   description="Prepares the test source code">
 
     <!-- Creates directories -->
@@ -278,7 +278,7 @@
   </target>
 
   <!-- Prepares the demos code -->
-  <target name="prepare-demos" depends="prepare" 
+  <target name="prepare-demos" depends="prepare"
   description="Prepares the demos code">
 
     <!-- Creates directories -->
@@ -510,7 +510,7 @@
   </target>
 
   <!-- Creates the class package (tests are left in the parallel tree) -->
-  <target name="package-biojava" depends="compile-biojava" 
+  <target name="package-biojava" depends="compile-biojava"
   description="create biojava class jar file">
     <jar
       jarfile="${jar.biojava}"
@@ -632,8 +632,10 @@
        <group title="Experimental and new packages"
               packages="org.biojava.bio.proteomics:org.biojava.bio.molbio:org.biojava.stats.svm:org.biojava.stats.svm.tools:org.biojava.bio.seq.homol:org.biojava.utils.lsid:org.biojava.bio.program.unigene:org.biojava.bio.program.ssaha:org.biojava.bio.seq.distributed:org.biojava.bio.annodb:org.biojava.bio.ontology:org.biojava.bio.ontology.io:org.biojava.bio.program.formats:org.biojava.bio.program.gff3:org.biojava.bio.structure" />
 
-       <taglet name="UserLevel" path="${build.dest.taglets}" />
-       <taglet name="MetaData" path="${build.dest.taglets}:${classpath}:${jar.biojava}" />
+      <taglet name="UserLevel" path="${build.dest.taglets}" />
+      <taglet name="MetaData" path="${build.dest.taglets}:${classpath}:${jar.biojava}" />
+      <taglet name="Useage" path="${build.dest.taglets}"/>
+      <taglet name="Option" path="${build.dest.taglets}"/>
     </javadoc>
   </target>
 
@@ -655,6 +657,8 @@
       <link href="../biojava" offline="true" packagelistLoc="${build.docs.biojava}/package-list}"/>
       <taglet name="UserLevel" path="${build.dest.taglets}" />
       <taglet name="MetaData" path="${build.dest.taglets}:${classpath}" />
+      <taglet name="Useage" path="${build.dest.taglets}"/>
+      <taglet name="Option" path="${build.dest.taglets}"/>
     </javadoc>
   </target>
 
@@ -664,7 +668,7 @@
     <javadoc
       packagenames="${packages}"
       sourcepath="${build.src.apps}"
-      classpath="${classpath}"
+      classpath="${classpath}:${build.dest.biojava}"
       destdir="${build.docs.apps}"
       author="true"
       version="true"
@@ -676,6 +680,9 @@
       <link href="../biojava" offline="true" packagelistLoc="${build.docs.biojava}/package-list}"/>
       <taglet name="UserLevel" path="${build.dest.taglets}" />
       <taglet name="MetaData" path="${build.dest.taglets}:${classpath}" />
+      <taglet name="Useage" path="${build.dest.taglets}"/>
+      <taglet name="Option" path="${build.dest.taglets}"/>
+      <taglet name="Values" path="${build.dest.taglets}"/>
     </javadoc>
   </target>
 
@@ -718,7 +725,7 @@
   />
 
   <!-- Runs tests if the Ant optional JUnit support is available -->
-  <target name="runtests" depends="compile-tests" 
+  <target name="runtests" depends="compile-tests"
   description="Run all tests, can be quite slow">
     <junit maxmemory="128m" printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
       <formatter type="plain" usefile="true" />
@@ -748,7 +755,7 @@
   </target>
 
   <!-- Runs tests if the Ant optional JUnit support is available -->
-  <target name="runmosttests" depends="compile-tests" 
+  <target name="runmosttests" depends="compile-tests"
   description="Run all tests except blast unit tests, lot faster than runtests">
     <junit printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
       <formatter type="plain" usefile="true" />
@@ -887,8 +894,8 @@
       <!-- The junit task doesn't support 'if' so we test for JUnit here -->
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
         <fileset dir="${build.dest.tests}">
-          <include name="org/biojava/ontology/*Test.class" />
-          <include name="org/biojava/ontology/*TestSuite.class" />
+          <include name="org/biojava/ontology/**/*Test.class" />
+          <include name="org/biojava/ontology/**/*TestSuite.class" />
           <exclude name="**/Abstract*Test.class" />
         </fileset>
       </batchtest>
@@ -1013,7 +1020,7 @@
   </target>
 
   <!-- zip & tgz -->
-  <target name="dist-both" depends="init,dist-zip,dist-tgz" 
+  <target name="dist-both" depends="init,dist-zip,dist-tgz"
   description="Zips and tgzs the distribution"/>
 
   <!-- Cleans everything -->

@@ -2,6 +2,7 @@ package org.biojava.ontology.vm;
 
 import org.biojava.ontology.Variable;
 import org.biojava.ontology.Term;
+import org.biojava.ontology.Triple;
 import org.biojava.utils.SmallSet;
 
 import java.util.Set;
@@ -41,6 +42,10 @@ public class SymbolTable {
   }
 
   public SymbolTable bind(Variable var, Term val) {
+    /* paranoia */
+    if(var == null || val == null) throw new NullPointerException("Can't use null values: " + var + " -> " + val + " in " + this);
+    if(val instanceof Triple) throw new IllegalArgumentException("Can't bind variable to triple: " + var + " -> " + val + " in " + this);
+    if(getValue(var) != null) throw new IllegalArgumentException("Can't re-bind variable: " + var + " -> " + val + " in " + this);
     return new SymbolTable(this, var, val);
   }
 
