@@ -269,6 +269,8 @@ public abstract class AbstractAlphabet
 
   protected abstract boolean containsImpl(AtomicSymbol s);
 
+  /*
+  
   public boolean equals(Object o) {
     if(o == this) {
       return true;
@@ -293,6 +295,8 @@ public abstract class AbstractAlphabet
     return true;
   }
 
+  */
+  
   public String toString() {
     return getName();
   }
