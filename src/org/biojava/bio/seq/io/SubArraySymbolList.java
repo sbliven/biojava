@@ -3,6 +3,7 @@ package org.biojava.bio.seq.io;
 import java.util.*;
 import java.io.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
 
 class SubArraySymbolList extends AbstractSymbolList {
@@ -10,6 +11,11 @@ class SubArraySymbolList extends AbstractSymbolList {
     private final int length;
     private final int offset;
     private final Symbol[] array;
+
+    protected void finalize() throws Throwable {
+	super.finalize();
+	alpha.removeChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
+    }
 
     SubArraySymbolList(Symbol[] array, int length, int offset, Alphabet alpha) {
 	this.alpha = alpha;
@@ -19,6 +25,8 @@ class SubArraySymbolList extends AbstractSymbolList {
 
 	if (length + offset > array.length)
 	    throw new IndexOutOfBoundsException();
+
+	alpha.addChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
     }
 
     public Alphabet getAlphabet() {

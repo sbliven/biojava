@@ -46,6 +46,15 @@ public class SimpleSymbolList extends AbstractSymbolList implements Serializable
     private Symbol[] symbols;
     private int length;
 
+    private void addListener() {
+	alphabet.addChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
+    }
+
+    protected void finalize() throws Throwable {
+	super.finalize();
+	alphabet.removeChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
+    }
+
     /**
      * Construct an empty SimpleSymbolList.
      *
@@ -56,6 +65,7 @@ public class SimpleSymbolList extends AbstractSymbolList implements Serializable
 	this.alphabet = alpha;
 	this.length = 0;
 	this.symbols = new Symbol[INCREMENT];
+	addListener();
     }
 
     /**
@@ -81,6 +91,7 @@ public class SimpleSymbolList extends AbstractSymbolList implements Serializable
         alphabet.validate(symbols[pos]);
         pos++;
       }
+      addListener();
     }
 
     /**
@@ -96,6 +107,7 @@ public class SimpleSymbolList extends AbstractSymbolList implements Serializable
       for (int i = 0; i < length; ++i) {
         symbols[i] = sl.symbolAt(i + 1);
       }
+      addListener();
     }
 
     /**

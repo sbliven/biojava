@@ -24,6 +24,7 @@ package org.biojava.bio.seq.io;
 import java.util.*;
 import java.io.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
 
 /**
@@ -41,6 +42,11 @@ class ChunkedSymbolList extends AbstractSymbolList {
     private Alphabet alpha;
     private int length;
 
+    protected void finalize() throws Throwable {
+	super.finalize();
+	alpha.removeChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
+    }
+
     public ChunkedSymbolList(Symbol[][] chunks,
 			     int chunkSize,
 			     int length,
@@ -50,6 +56,7 @@ class ChunkedSymbolList extends AbstractSymbolList {
 	this.chunkSize = chunkSize;
 	this.length = length;
 	this.alpha = alpha;
+	alpha.addChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
     }
     
     public Alphabet getAlphabet() {
