@@ -39,7 +39,7 @@ public final class DNATools {
   static private final Symbol g;
   static private final Symbol c;
   static private final Symbol t;
-  
+    
   static private Map symbolToComplement;
 
   static {

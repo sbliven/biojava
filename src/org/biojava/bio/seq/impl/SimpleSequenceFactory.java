@@ -19,12 +19,13 @@
  *
  */
 
-package org.biojava.bio.seq;
+package org.biojava.bio.seq.impl;
 
 import java.io.Serializable;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.*;
 
 /**
  * A no-frills implementation of SequenceFactory that produces SimpleSequence

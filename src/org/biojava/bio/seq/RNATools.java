@@ -21,7 +21,12 @@
 
 package org.biojava.bio.seq;
 
+import java.io.*;
 import java.util.*;
+
+import org.w3c.dom.*;
+import org.apache.xerces.parsers.*;
+import org.xml.sax.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
@@ -35,6 +40,7 @@ public final class RNATools {
   private static final ReversibleTranslationTable complementTable;
   private static final ReversibleTranslationTable transcriptionTable;
   static private final FiniteAlphabet rna;
+  static private final Map geneticCodes;
   
   static private final Symbol a;
   static private final Symbol g;
@@ -70,6 +76,9 @@ public final class RNATools {
       }
       complementTable = new RNAComplementTranslationTable();
       transcriptionTable = new TranscriptionTable();
+ 
+      geneticCodes = new HashMap(); 
+      loadGeneticCodes();
     } catch (Throwable t) {
       throw new BioError(t, "Unable to initialize RNATools");
     }
@@ -262,6 +271,35 @@ public final class RNATools {
   }
   
   /**
+   * Retrieve a TranslationTable by name. The universal genetic code is under
+   * the name "UNIVERSAL".
+   * 
+   * @since 1.1
+   */
+  public static TranslationTable getGeneticCode(String name) {
+    return (TranslationTable) geneticCodes.get(name);
+  }
+  
+  /**
+   * Retrieve a Set containing the name of each genetic code.
+   *
+   * @since 1.1
+   */
+  public static Set getGeneticCodeNames() {
+    return geneticCodes.keySet();
+  }
+  
+  /**
+   * Translate RNA into protein (with termination symbols).
+   *
+   * @since 1.1
+   */
+  public static SymbolList translate(SymbolList syms)
+  throws IllegalAlphabetException {
+    return new TranslatedSymbolList(syms, getGeneticCode("UNIVERSAL"));
+  }
+  
+  /**
    * Sneaky class for complementing RNA bases.
    */
 
@@ -316,6 +354,65 @@ public final class RNATools {
     
     public Alphabet getTargetAlphabet() {
       return RNATools.getRNA();
+    }
+  }
+
+  private static void loadGeneticCodes() {
+    try {
+      InputStream tablesStream = RNATools.class.getClassLoader().getResourceAsStream(
+        "org/biojava/bio/symbol/TranslationTables.xml"
+      );
+      if(tablesStream == null ) {
+        throw new BioError("Couldn't locate TranslationTables.xml.");
+      }
+      
+      InputSource is = new InputSource(tablesStream);
+      DOMParser parser = new DOMParser();
+      parser.parse(is);
+      Document doc = parser.getDocument();
+      
+      NodeList children = doc.getDocumentElement().getChildNodes();
+      for(int i = 0; i < children.getLength(); i++) {
+        Node cnode = children.item(i);
+        if(! (cnode instanceof Element)) {
+          continue;
+        }
+        
+        Element child = (Element) cnode;
+        String name = child.getNodeName();
+        if(name.equals("table")) {
+          String tableName = child.getAttribute("name");
+          String source = child.getAttribute("source");
+          String target = child.getAttribute("target");
+          FiniteAlphabet sourceA =
+            (FiniteAlphabet) AlphabetManager.alphabetForName(source);
+          FiniteAlphabet targetA =
+            (FiniteAlphabet) AlphabetManager.alphabetForName(target);
+          SymbolParser sourceP = sourceA.getParser("name");
+          SymbolParser targetP = targetA.getParser("name");
+          SimpleTranslationTable table = new SimpleTranslationTable(
+            sourceA,
+            targetA
+          );
+          
+          NodeList translates = child.getChildNodes();
+          for(int j = 0; j < translates.getLength(); j++) {
+            Node tn = translates.item(j);
+            if(tn instanceof Element) {
+              Element te = (Element) tn;
+              String from = te.getAttribute("from");
+              String to = te.getAttribute("to");
+              Symbol fromS = sourceP.parseToken(from);
+              Symbol toS = targetP.parseToken(to);
+              table.setTranslation(fromS, toS);
+            }
+          }
+          
+          geneticCodes.put(tableName, table);
+        }
+      }
+    } catch (Exception e) {
+      throw new BioError(e, "Couldn't parse TranslationTables.xml");
     }
   }
 }
