@@ -151,6 +151,12 @@
       <ambiguityMapping char="-">
         <!-- Gap is the empty set -->
       </ambiguityMapping>
+
+      <ambiguityMapping char="~">
+      </ambiguityMapping>
+
+      <ambiguityMapping char=".">
+      </ambiguityMapping>
     </characterTokenization>
   </alphabet>
 
@@ -182,6 +188,12 @@
 
       <ambiguityMapping char="-">
         <!-- Gap is the empty set -->
+      </ambiguityMapping>
+
+      <ambiguityMapping char="~">
+      </ambiguityMapping>
+
+      <ambiguityMapping char=".">
       </ambiguityMapping>
     </characterTokenization>
   </alphabet>
@@ -373,6 +385,12 @@
 
       <ambiguityMapping char="-">
       </ambiguityMapping>
+
+      <ambiguityMapping char="~">
+      </ambiguityMapping>
+
+      <ambiguityMapping char=".">
+      </ambiguityMapping>
     </characterTokenization>
   </alphabet>
 
@@ -507,6 +525,12 @@
       </ambiguityMapping>
 
       <ambiguityMapping char="-">
+      </ambiguityMapping>
+
+      <ambiguityMapping char="~">
+      </ambiguityMapping>
+
+      <ambiguityMapping char=".">
       </ambiguityMapping>
     </characterTokenization>
 
