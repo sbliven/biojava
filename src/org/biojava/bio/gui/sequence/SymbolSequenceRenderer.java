@@ -24,6 +24,7 @@ package org.biojava.bio.gui.sequence;
 import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.gui.*;
 
 import java.awt.*;
@@ -34,20 +35,20 @@ import java.util.List;
 public class SymbolSequenceRenderer implements SequenceRenderer {
     private double depth = 25.0;
     
-    public double getDepth(SequencePanel sp) {
+    public double getDepth(SequenceRenderContext sp) {
       return depth;
     }
 
-    public double getMinimumLeader(SequencePanel sp) {
+    public double getMinimumLeader(SequenceRenderContext sp) {
       return 0.0;
     }
 
-    public double getMinimumTrailer(SequencePanel sp) {
+    public double getMinimumTrailer(SequenceRenderContext sp) {
       return 0.0;
     }
 
-    public void paint(Graphics2D g, SequencePanel sp, Rectangle2D seqBox) {
-      Sequence seq = sp.getSequence();
+    public void paint(Graphics2D g, SequenceRenderContext sp, Rectangle2D seqBox) {
+      SymbolList seq = sp.getSequence();
       int direction = sp.getDirection();
       int minP;
       int maxP;

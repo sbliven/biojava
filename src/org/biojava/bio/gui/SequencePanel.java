@@ -56,8 +56,8 @@ import java.util.List; // usefull trick to 'hide' javax.swing.List
  * @author Thomas Down
  * @author Matthew Pocock
  */
-public class SequencePanel extends JComponent implements SwingConstants {
-  private Sequence sequence;
+public class SequencePanel extends JComponent implements SwingConstants, SequenceRenderContext {
+  private SymbolList sequence;
   private int direction;
   private double scale;
   private int lines;
@@ -68,8 +68,8 @@ public class SequencePanel extends JComponent implements SwingConstants {
   private double lineDepth = 0.0;
   private int realLines = 0;
   
-  private Border leadingBorder;
-  private Border trailingBorder;
+  private SequenceRenderContext.Border leadingBorder;
+  private SequenceRenderContext.Border trailingBorder;
 
   private List views;
   private Map depths;
@@ -89,8 +89,8 @@ public class SequencePanel extends JComponent implements SwingConstants {
     spacer = 0;
 
     theMonitor = new RendererMonitor();
-    leadingBorder = new Border();
-    trailingBorder = new Border();
+    leadingBorder = new SequenceRenderContext.Border();
+    trailingBorder = new SequenceRenderContext.Border();
     leadingBorder.addPropertyChangeListener(theMonitor);
     trailingBorder.addPropertyChangeListener(theMonitor);
   }
@@ -103,14 +103,14 @@ public class SequencePanel extends JComponent implements SwingConstants {
     this.addPropertyChangeListener(theMonitor);
   }
     
-  public void setSequence(Sequence s) {
-    Sequence oldSequence = sequence;
+  public void setSequence(SymbolList s) {
+    SymbolList oldSequence = sequence;
     this.sequence = s;
     resizeAndValidate();
     firePropertyChange("sequence", oldSequence, s);
   }
 
-  public Sequence getSequence() {
+  public SymbolList getSequence() {
     return sequence;
   }
 
@@ -164,11 +164,11 @@ public class SequencePanel extends JComponent implements SwingConstants {
     return lines;
   }
   
-  public Border getLeadingBorder() {
+  public SequenceRenderContext.Border getLeadingBorder() {
     return leadingBorder;
   }
   
-  public Border getTrailingBorder() {
+  public SequenceRenderContext.Border getTrailingBorder() {
     return trailingBorder;
   }
   
@@ -394,55 +394,6 @@ public class SequencePanel extends JComponent implements SwingConstants {
   private class RendererMonitor implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent ev) {
 	    repaint();
-    }
-  }
-  
-  public class Border
-  implements Serializable, SwingConstants {
-    protected final PropertyChangeSupport pcs;
-    private double size = 0.0;
-    private int alignment = CENTER;
-    
-    public double getSize() {
-      return size;
-    }
-    
-    private void setSize(double size) {
-      this.size = size;
-    }
-    
-    public int getAlignment() {
-      return alignment;
-    }
-    
-    public void setAlignment(int alignment)
-    throws IllegalArgumentException {
-      switch (alignment) {
-        case LEADING:
-        case TRAILING:
-        case CENTER:
-          int old = this.alignment;
-          this.alignment = alignment;
-          pcs.firePropertyChange("alignment", old, alignment);
-          break;
-        default:
-          throw new IllegalArgumentException(
-            "Alignment must be one of the constants LEADING, TRAILING or CENTER"
-          );
-      }
-    }
-    
-    private Border() {
-      alignment = CENTER;
-      pcs = new PropertyChangeSupport(this);
-    }
-    
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-      pcs.addPropertyChangeListener(listener);
-    }
-    
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-      pcs.removePropertyChangeListener(listener);
     }
   }
 }

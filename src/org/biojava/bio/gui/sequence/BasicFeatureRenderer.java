@@ -98,7 +98,7 @@ public class BasicFeatureRenderer implements FeatureRenderer {
       Graphics2D g,
       Feature f, 
       Rectangle2D box,
-      SequencePanel context
+      SequenceRenderContext context
     ) {
       Shape s = box;
       if (f instanceof StrandedFeature) {

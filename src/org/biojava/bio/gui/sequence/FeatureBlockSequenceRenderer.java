@@ -114,7 +114,7 @@ implements SequenceRenderer, PropertyChangeListener {
     pcs.firePropertyChange("depth", new Double(oldDepth), new Double(d));
   }
 
-  public double getDepth(SequencePanel sp) {
+  public double getDepth(SequenceRenderContext sp) {
     return depth;
   }
 
@@ -130,7 +130,7 @@ implements SequenceRenderer, PropertyChangeListener {
     return label;
   }
     
-  public double getMinimumLeader(SequencePanel sp) {
+  public double getMinimumLeader(SequenceRenderContext sp) {
     if(label == null) {
       return 0.0;
     }
@@ -140,12 +140,15 @@ implements SequenceRenderer, PropertyChangeListener {
     return gv.getVisualBounds().getWidth();
   }
 
-  public double getMinimumTrailer(SequencePanel sp) {
+  public double getMinimumTrailer(SequenceRenderContext sp) {
     return getMinimumLeader(sp);
   }
 
-  protected FeatureHolder getFeatures(SequencePanel sp) {
-    Sequence seq = sp.getSequence();
+  protected FeatureHolder getFeatures(SequenceRenderContext sp) {
+    SymbolList sl = sp.getSequence();
+    if (! (sl instanceof Sequence))
+	return FeatureHolder.EMPTY_FEATURE_HOLDER;
+    Sequence seq = (Sequence) sl;
     FeatureHolder fh = (FeatureHolder) featureCache.get(seq);
     if(fh == null) {
       featureCache.put(seq, fh = seq.filter(filter, false));
@@ -153,12 +156,12 @@ implements SequenceRenderer, PropertyChangeListener {
     return fh;
   }
     
-    public void paint(Graphics2D g, SequencePanel sp, Rectangle2D seqBox) {
+    public void paint(Graphics2D g, SequenceRenderContext sp, Rectangle2D seqBox) {
       if(label != null) {
         Rectangle2D.Double labelBox = null;
         Shape labelGlyph = null;
-        SequencePanel.Border leading = sp.getLeadingBorder();
-        SequencePanel.Border trailing = sp.getTrailingBorder();
+        SequenceRenderContext.Border leading = sp.getLeadingBorder();
+        SequenceRenderContext.Border trailing = sp.getTrailingBorder();
         if (sp.getDirection() == sp.HORIZONTAL) {
           if(labelGlyphH == null) {
             Font font = sp.getFont();
@@ -236,7 +239,7 @@ implements SequenceRenderer, PropertyChangeListener {
     private void renderLabel(
       Graphics2D g,
       Shape gv, Rectangle2D labelBox,
-      SequencePanel sp, SequencePanel.Border border
+      SequenceRenderContext sp, SequenceRenderContext.Border border
     ) {
       Rectangle2D bounds = gv.getBounds2D();
       double along = 0.0;

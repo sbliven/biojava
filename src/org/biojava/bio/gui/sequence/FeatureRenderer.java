@@ -34,5 +34,5 @@ import java.util.List;
 
 public interface FeatureRenderer {
     public void renderFeature(Graphics2D g, Feature f, Rectangle2D box,
-			      SequencePanel context);
+			      SequenceRenderContext context);
 }

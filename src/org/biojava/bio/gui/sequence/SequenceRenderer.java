@@ -48,7 +48,7 @@ public interface SequenceRenderer {
    * @param sp the SequencePanel that encapsulates the information to render
    * @param seqBox the rectangle within which to render sequence stuff
    */
-  void paint(Graphics2D g, SequencePanel sp, Rectangle2D seqBox);
+  void paint(Graphics2D g, SequenceRenderContext sp, Rectangle2D seqBox);
   
   /**
    * Retrieve the depth of this renderer when rendering sp.
@@ -59,7 +59,7 @@ public interface SequenceRenderer {
    * @param sp the SequencePanel to return info for
    * @return the depth of the renderer for that sequence panel
    */
-    double getDepth(SequencePanel sp);
+    double getDepth(SequenceRenderContext sp);
   /**
    * Retrieve the minimum leading distance for this renderer when rendering sp.
    * <P>
@@ -69,7 +69,7 @@ public interface SequenceRenderer {
    * @param sp the SequencePanel to return info for
    * @return the leading distance of the renderer for that sequence panel
    */
-    double getMinimumLeader(SequencePanel sp);
+    double getMinimumLeader(SequenceRenderContext sp);
   /**
    * Retrieve the minimum trailing distance for this renderer when rendering sp.
    * <P>
@@ -79,5 +79,5 @@ public interface SequenceRenderer {
    * @param sp the SequencePanel to return info for
    * @return the trailing distance of the renderer for that sequence panel
    */
-    double getMinimumTrailer(SequencePanel sp);
+    double getMinimumTrailer(SequenceRenderContext sp);
 }
