@@ -31,6 +31,7 @@ public class GCContent {
 
 	while (stream.hasNext()) {
 	    Sequence seq = stream.nextSequence();
+	    System.out.println("Length: " + seq.length());
 	    int gc = 0;
 	    for (int pos = 1; pos <= seq.length(); ++pos) {
 		Symbol sym = seq.symbolAt(pos);

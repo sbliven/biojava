@@ -53,6 +53,7 @@ public class SimpleAssemblyTest {
 	System.out.println(contig.subList(3, 9).seqString());
 	System.out.println(contig.subList(3, 11).seqString());
 	System.out.println(contig.subList(10, 12).seqString());
+	System.out.println(contig.subList(15, 18).seqString());
 	printFeatures(contig);
     }
 
