@@ -39,6 +39,7 @@ import org.apache.xerces.parsers.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 import org.w3c.dom.*;
+import org.biojava.utils.stax.*;
 
 /**
  * Sequence reflecting a DAS reference sequence, possibly
@@ -502,36 +503,23 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    else if (status != 200)
 		throw new BioError("DAS error (status code = " + status + ")");
 
+	    SequenceBuilder sb = new SimpleSequenceBuilder();
+	    sb.setURI(epURL.toString());
+	    sb.setName(getName());
+	    SymbolParser sparser = DNATools.getDNA().getParser("token");
+	    StreamParser ssparser = sparser.parseStream(sb);
 
+	    StAXContentHandler dnaHandler = new DNAHandler(ssparser);
 	    InputSource is = new InputSource(huc.getInputStream());
-	    DOMParser parser = nonvalidatingParser();
+	    SAXParser parser = nonvalidatingSAXParser();
+	    parser.setContentHandler(new SAX2StAXAdaptor(dnaHandler));
 	    parser.parse(is);
-	    Element el = parser.getDocument().getDocumentElement();
-
-	    NodeList dnal = el.getElementsByTagName("DNA");
-	    if (dnal.getLength() < 1)
-		throw new BioError("Didn't find DNA element");
-	    el = (Element) dnal.item(0);
-	    int len = Integer.parseInt(el.getAttribute("length"));
-	    if (length >= 0) {
-		if (len != length())
-		    throw new BioError("Returned DNA length incorrect: expecting " + length() + " but got " + len);
-	    }
-	    // el.normalize();
-	    CharacterData t = (CharacterData) el.getFirstChild();
-	    String seqstr = t.getData();
-	    StringTokenizer toke = new StringTokenizer(seqstr);
-	    List symList = new ArrayList(length());
-	    SymbolParser sp = alphabet.getParser("token");
-	    while (toke.hasMoreTokens())
-		symList.addAll(sp.parse(toke.nextToken()).toList());
-	    return new SimpleSymbolList(alphabet, symList);
+	    SymbolList sl = sb.makeSequence();
+	    return sl;
 	} catch (SAXException ex) {
 	    throw new BioError(ex, "Exception parsing DAS XML");
 	} catch (IOException ex) {
 	    throw new BioError(ex, "Error connecting to DAS server");
-	} catch (NumberFormatException ex) {
-	    throw new BioError(ex);
 	} catch (BioException ex) {
 	    throw new BioError(ex);
 	} finally {
@@ -539,6 +527,77 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	}
     }
 
+    private class DNAHandler extends StAXContentHandlerBase {
+	private StreamParser ssparser;
+
+	DNAHandler(StreamParser ssparser) {
+	    this.ssparser = ssparser;
+	}
+
+	public void startElement(String nsURI,
+				 String localName,
+				 String qName,
+				 Attributes attrs,
+				 DelegationManager dm)
+	    throws SAXException
+	{
+	    if (localName.equals("DNA")) {
+		dm.delegate(new SymbolsHandler(ssparser));
+	    }
+	}
+    }
+
+    private class SymbolsHandler extends StAXContentHandlerBase {
+	private StreamParser ssparser;
+
+	SymbolsHandler(StreamParser ssparser) {
+	    this.ssparser = ssparser;
+	}
+
+	public void endElement(String nsURI,
+			   String localName,
+			   String qName,
+			   StAXContentHandler handler)
+	    throws SAXException
+	{
+	    try {
+		ssparser.close();
+	    } catch (IllegalSymbolException ex) {
+		throw new SAXException(ex);
+	    }
+	}
+
+	public void characters(char[] ch, int start, int length) 
+	    throws SAXException
+	{
+	    try {
+		int parseStart = start;
+		int parseEnd   = start;
+		int blockEnd = start + length;
+
+		while (parseStart < blockEnd) {
+		    while (parseStart < blockEnd && Character.isSpace(ch[parseStart])) {
+			++parseStart;
+		    }
+		    if (parseStart >= blockEnd) {
+			return;
+		    }
+
+		    parseEnd = parseStart + 1;
+		    while (parseEnd < blockEnd && !Character.isSpace(ch[parseEnd])) {
+			++parseEnd;
+		    }
+
+		    ssparser.characters(ch, parseStart, parseEnd - parseStart);
+
+		    parseStart = parseEnd;
+		}
+	    } catch (IllegalSymbolException ex) {
+		throw new SAXException(ex);
+	    }
+	}
+    }
+    
     //
     // Identification stuff
     //
