@@ -386,6 +386,7 @@
         <fileset dir="${build.dest.tests}">
           <include name="**/*Test.class" />
           <include name="**/*TestSuite.class" />
+          <exclude name="**/Abstract*Test.class" />
         </fileset>
       </batchtest>
     </junit>
@@ -412,6 +413,7 @@
         <fileset dir="${build.dest.tests}">
           <include name="**/*Test.class" />
           <include name="**/*TestSuite.class" />
+          <exclude name="**/Abstract*Test.class" />
           <exclude name="**/ssbind/*Test.class" />
           <exclude name="**/ssbind/*TestSuite.class" />
         </fileset>
@@ -439,6 +441,7 @@
         <fileset dir="${build.dest.tests}">
           <include name="org/biojava/bio/seq/**/*Test.class" />
           <include name="org/biojava/bio/seq/**/*TestSuite.class" />
+          <exclude name="**/Abstract*Test.class" />
         </fileset>
       </batchtest>
     </junit>
@@ -464,6 +467,7 @@
         <fileset dir="${build.dest.tests}">
           <include name="org/biojava/bio/symbol/*Test.class" />
           <include name="org/biojava/bio/symbol/*TestSuite.class" />
+          <exclude name="**/Abstract*Test.class" />
         </fileset>
       </batchtest>
     </junit>
@@ -489,6 +493,7 @@
         <fileset dir="${build.dest.tests}">
           <include name="org/biojava/bio/*Test.class" />
           <include name="org/biojava/bio/*TestSuite.class" />
+          <exclude name="**/Abstract*Test.class" />
         </fileset>
       </batchtest>
     </junit>
@@ -514,6 +519,7 @@
         <fileset dir="${build.dest.tests}">
           <include name="org/biojava/bio/ontology/*Test.class" />
           <include name="org/biojava/bio/ontology/*TestSuite.class" />
+          <exclude name="**/Abstract*Test.class" />
         </fileset>
       </batchtest>
     </junit>
@@ -539,6 +545,7 @@
         <fileset dir="${build.dest.tests}">
           <include name="org/biojava/bio/seq/filter/*Test.class" />
           <include name="org/biojava/bio/seq/filter/*TestSuite.class" />
+          <exclude name="**/Abstract*Test.class" />
         </fileset>
       </batchtest>
     </junit>
@@ -564,6 +571,7 @@
         <fileset dir="${build.dest.tests}">
           <include name="org/biojava/bio/dp/*Test.class" />
           <include name="org/biojava/bio/dp/*TestSuite.class" />
+          <exclude name="**/Abstract*Test.class" />
         </fileset>
       </batchtest>
     </junit>
@@ -589,6 +597,7 @@
         <fileset dir="${build.dest.tests}">
           <include name="org/biojava/bio/search/*Test.class" />
           <include name="org/biojava/bio/search/*TestSuite.class" />
+          <exclude name="**/Abstract*Test.class" />
         </fileset>
       </batchtest>
     </junit>
