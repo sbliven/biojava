@@ -7,7 +7,7 @@ package org.biojava.bio.program.ssaha;
  * The callbacks will always be called in the order startSearch, hit,
  * endSearch, during which time there may be multiple hit calls. The seqID
  * of startSearch and endSearch will match. After this, a new startSearch
- * may begin. These events will usualy originate from the search method of
+ * may begin. These events will usually originate from the search method of
  * DataStore.
  *
  * @author Matthew Pocock

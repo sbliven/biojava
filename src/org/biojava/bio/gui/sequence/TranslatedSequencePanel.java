@@ -47,51 +47,36 @@ import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.utils.ChangeAdapter;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.Changeable;
+import org.biojava.utils.*;
 
 /**
- * <p>
- * <code>TranslatedSequencePanel</code> is a panel that displays a
+ * <p><code>TranslatedSequencePanel</code> is a panel that displays a
  * Sequence. Its features are that it will always draw at low pixel
  * coordinates when using Java2D to render very long sequences and it
- * is quite fast.
- * </p>
+ * is quite fast (approximately 8x faster than
+ * <code>SequencePanel</code></p>.
  *
- * <p>
- * A <code>TranslatedSequencePanel</code> can either display the
+ * <p>A <code>TranslatedSequencePanel</code> can either display the
  * sequence from left-to-right (HORIZONTAL) or from top-to-bottom
  * (VERTICAL). It has an associated scale which is the number of
  * pixels per symbol and a translation which is the number of
  * <code>Symbol</code>s to skip before rendering starts. In order to
  * produce a scrolling effect, the <code>setSymbolTranslation</code>
  * method may be hooked up to an <code>Adjustable</code> such as
- * <code>JScrollBar</code> or to an event listener.
- * </p>
+ * <code>JScrollBar</code> or to an event listener.</p>
  *
- * <p>
- * The exact number of <code>Symbol</code>s rendered depends on the
+ * <p>The exact number of <code>Symbol</code>s rendered depends on the
  * width of the panel and the scale. Resizing the panel will cause the
- * number of <code>Symbol</code>s rendered to change accordingly.
- * </p>
+ * number of <code>Symbol</code>s rendered to change accordingly.</p>
  *
- * <p>
- * The panel will fill its background to the <code>Color</code>
- * defined by the <code>setBackground()</code> method provided that
- * it has been defined as opaque using <code>setOpaque()</code>.
- * </p>
+ * <p>The panel will fill its background to the <code>Color</code>
+ * defined by the <code>setBackground()</code> method provided that it
+ * has been defined as opaque using <code>setOpaque()</code>.</p>
  *
- * <p>
- * The change event handling code is based on the original panel
- * and other BioJava components by Matthew and Thomas.
- * </p>
+ * <p>The change event handling code is based on the original panel
+ * and other BioJava components by Matthew and Thomas.</p>
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @author Matthew Pocock
  * @author Thomas Down
  * @since 1.2
@@ -184,9 +169,14 @@ public class TranslatedSequencePanel extends JComponent
             if (! isActive())
                 return;
 
+            Insets insets = getInsets();
+            me.translatePoint(-insets.left, -insets.top);
+
             SequenceViewerEvent sve =
                 renderer.processMouseEvent(TranslatedSequencePanel.this, me,
                                            new ArrayList());
+
+            me.translatePoint(insets.left, insets.top);
             svSupport.fireMouseClicked(sve);
         }
 
@@ -195,20 +185,29 @@ public class TranslatedSequencePanel extends JComponent
             if (! isActive())
                 return;
 
+            Insets insets = getInsets();
+            me.translatePoint(-insets.left, -insets.top);
+
             SequenceViewerEvent sve =
                 renderer.processMouseEvent(TranslatedSequencePanel.this, me,
                                            new ArrayList());
+            me.translatePoint(insets.left, insets.top);
             svSupport.fireMousePressed(sve);
         }
 
         public void mouseReleased(MouseEvent me)
         {
-            if ( !isActive())
+            if (! isActive())
                 return;
+
+            Insets insets = getInsets();
+            me.translatePoint(-insets.left, -insets.top);
 
             SequenceViewerEvent sve =
                 renderer.processMouseEvent(TranslatedSequencePanel.this, me,
                                            new ArrayList());
+
+            me.translatePoint(insets.left, insets.top);
             svSupport.fireMouseReleased(sve);
         }
     };
@@ -226,9 +225,14 @@ public class TranslatedSequencePanel extends JComponent
             if (! isActive())
                 return;
 
+            Insets insets = getInsets();
+            me.translatePoint(-insets.left, -insets.top);
+
             SequenceViewerEvent sve =
                 renderer.processMouseEvent(TranslatedSequencePanel.this, me,
                                            new ArrayList());
+
+            me.translatePoint(insets.left, insets.top);
             svmSupport.fireMouseDragged(sve);
         }
 
@@ -237,9 +241,14 @@ public class TranslatedSequencePanel extends JComponent
             if (! isActive())
                 return;
 
+            Insets insets = getInsets();
+            me.translatePoint(-insets.left, -insets.top);
+
             SequenceViewerEvent sve =
                 renderer.processMouseEvent(TranslatedSequencePanel.this, me,
                                            new ArrayList());
+
+            me.translatePoint(insets.left, insets.top);
             svmSupport.fireMouseMoved(sve);
         }
     };
@@ -673,6 +682,11 @@ public class TranslatedSequencePanel extends JComponent
         Graphics2D g2 = (Graphics2D) g;
         g2.addRenderingHints(hints);
 
+        // Save current transform and clip
+        AffineTransform prevTransform = g2.getTransform();
+        Shape                prevClip = g2.getClip();
+        Insets                 insets = getInsets();
+
         // As we subclass JComponent we have to paint our own
         // background, but only if we are opaque
         if (isOpaque())
@@ -681,48 +695,44 @@ public class TranslatedSequencePanel extends JComponent
             g2.fillRect(0, 0, getWidth(), getHeight());
         }
 
-        // Save current transform and clip
-        AffineTransform prevTransform = g2.getTransform();
-        Shape                prevClip = g2.getClip();
+         Rectangle2D.Double clip = new Rectangle2D.Double();
 
-        Rectangle2D.Double clip = new Rectangle2D.Double();
+         if (direction == HORIZONTAL)
+         {
+             // Clip x to edge of delegate renderer's leader
+             clip.x = renderer.getMinimumLeader(this);
+             clip.y = 0.0;
+             // Set the width to visible symbols + the delegate
+             // renderer's minimum trailer (which may have something in
+             // it to render).
+             clip.width = sequenceToGraphics(getVisibleSymbolCount() + 1)
+                 + renderer.getMinimumTrailer(this);
+             clip.height = renderer.getDepth(this);
 
-        if (direction == HORIZONTAL)
-        {
-            // Clip x to edge of delegate renderer's leader
-            clip.x = renderer.getMinimumLeader(this);
-            clip.y = 0.0;
-            // Set the width to visible symbols + the delegate
-            // renderer's minimum trailer (which may have something in
-            // it to render).
-            clip.width = sequenceToGraphics(getVisibleSymbolCount() + 1)
-                + renderer.getMinimumTrailer(this);
-            clip.height = renderer.getDepth(this);
+             g2.translate(leadingBorder.getSize() + insets.left, insets.top);
+         }
+         else
+         {
+             clip.x = 0.0;
+             // Clip y to edge of delegate renderer's leader
+             clip.y = renderer.getMinimumLeader(this);
+             clip.width = renderer.getDepth(this);
+             // Set the height to visible symbols + the delegate
+             // renderer's minimum trailer (which may have something in
+             // it to render).
+             clip.height = sequenceToGraphics(getVisibleSymbolCount() + 1)
+                 + renderer.getMinimumTrailer(this);
 
-            g2.translate(leadingBorder.getSize(), 0.0);
-        }
-        else
-        {
-            clip.x = 0.0;
-            // Clip y to edge of delegate renderer's leader
-            clip.y = renderer.getMinimumLeader(this);
-            clip.width = renderer.getDepth(this);
-            // Set the height to visible symbols + the delegate
-            // renderer's minimum trailer (which may have something in
-            // it to render).
-            clip.height = sequenceToGraphics(getVisibleSymbolCount() + 1)
-                + renderer.getMinimumTrailer(this);
+             g2.translate(insets.left, leadingBorder.getSize() + insets.top);
+         }
 
-            g2.translate(0.0, leadingBorder.getSize());
-        }
+         // Clip and paint
+         g2.clip(clip);
+         renderer.paint(g2, this);
 
-        // Clip and paint
-        g2.clip(clip);
-        renderer.paint(g2, this);
-
-        // Restore saved settings
-        g2.setClip(prevClip);
-        g2.setTransform(prevTransform);
+         // Restore
+         g2.setTransform(prevTransform);
+         g2.setClip(prevClip);
     }
 
     /**

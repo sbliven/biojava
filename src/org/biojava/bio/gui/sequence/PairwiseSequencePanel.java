@@ -21,7 +21,6 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
@@ -183,9 +182,14 @@ public class PairwiseSequencePanel extends JComponent
             if (! isActive())
                 return;
 
+            Insets insets = getInsets();
+            me.translatePoint(-insets.left, -insets.top);
+
             SequenceViewerEvent sve =
                 renderer.processMouseEvent(PairwiseSequencePanel.this, me,
                                            new ArrayList());
+
+            me.translatePoint(insets.left, insets.top);
             svSupport.fireMouseClicked(sve);
         }
 
@@ -194,9 +198,14 @@ public class PairwiseSequencePanel extends JComponent
             if (! isActive())
                 return;
 
+            Insets insets = getInsets();
+            me.translatePoint(-insets.left, -insets.top);
+
             SequenceViewerEvent sve =
                 renderer.processMouseEvent(PairwiseSequencePanel.this, me,
                                            new ArrayList());
+
+            me.translatePoint(insets.left, insets.top);
             svSupport.fireMousePressed(sve);
         }
 
@@ -205,9 +214,14 @@ public class PairwiseSequencePanel extends JComponent
             if (! isActive())
                 return;
 
+            Insets insets = getInsets();
+            me.translatePoint(-insets.left, -insets.top);
+
             SequenceViewerEvent sve =
                 renderer.processMouseEvent(PairwiseSequencePanel.this, me,
                                            new ArrayList());
+
+            me.translatePoint(insets.left, insets.top);
             svSupport.fireMouseReleased(sve);
         }
     };
@@ -225,9 +239,14 @@ public class PairwiseSequencePanel extends JComponent
             if (! isActive())
                 return;
 
+            Insets insets = getInsets();
+            me.translatePoint(-insets.left, -insets.top);
+
             SequenceViewerEvent sve =
                 renderer.processMouseEvent(PairwiseSequencePanel.this, me,
                                            new ArrayList());
+
+            me.translatePoint(insets.left, insets.top);
             svmSupport.fireMouseDragged(sve);
         }
 
@@ -236,9 +255,14 @@ public class PairwiseSequencePanel extends JComponent
             if (! isActive())
                 return;
 
+            Insets insets = getInsets();
+            me.translatePoint(-insets.left, -insets.top);
+
             SequenceViewerEvent sve =
                 renderer.processMouseEvent(PairwiseSequencePanel.this, me,
                                            new ArrayList());
+
+            me.translatePoint(insets.left, insets.top);
             svmSupport.fireMouseMoved(sve);
         }
     };
@@ -875,6 +899,7 @@ public class PairwiseSequencePanel extends JComponent
         // Save current transform and clip
         AffineTransform prevTransform = g2.getTransform();
         Shape                prevClip = g2.getClip();
+        Insets                 insets = getInsets();
 
         Rectangle2D.Double clip = new Rectangle2D.Double();
 
@@ -885,22 +910,22 @@ public class PairwiseSequencePanel extends JComponent
         {
             clip.width  = sequenceToGraphics(getVisibleSymbolCount() + 1);
             clip.height = secondarySequenceToGraphics(getVisibleSecondarySymbolCount() + 1);
-            g2.translate(leadingBorder.getSize(), 0.0);
+            g2.translate(leadingBorder.getSize() + insets.left, insets.top);
         }
         else
         {
             clip.width  = secondarySequenceToGraphics(getVisibleSecondarySymbolCount() + 1);
             clip.height = sequenceToGraphics(getVisibleSymbolCount() + 1);
-            g2.translate(0.0, leadingBorder.getSize());
+            g2.translate(insets.left, leadingBorder.getSize() + insets.top);
         }
 
         // Clip and paint
         g2.clip(clip);
         renderer.paint(g2, this);
 
-        // Restore saved settings
-        g2.setClip(prevClip);
+        // Restore
         g2.setTransform(prevTransform);
+        g2.setClip(prevClip);
     }
 
     /**

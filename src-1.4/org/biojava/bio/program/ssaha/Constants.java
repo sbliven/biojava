@@ -1,7 +1,7 @@
 package org.biojava.bio.program.ssaha;
 
 /**
- * Some usefull constants for working with binary files.
+ * Some useful constants for working with binary files.
  *
  * @author Matthew Pocock
  */

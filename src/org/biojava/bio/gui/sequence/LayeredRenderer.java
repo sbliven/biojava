@@ -38,7 +38,8 @@ import org.biojava.bio.seq.*;
  * <code>MultiLineRender</code>s. For each successive lane it
  * translates the <code>Graphics2D</code> perpendicular to the
  * sequence rendering direction by an amount equal to the value
- * returned by the getDepth() method of that lane's renderer.
+ * returned by the <code>getDepth()</code> method of that lane's
+ * renderer.
  *
  * @author Matthew Pocock
  * @author Keith James
@@ -147,7 +148,6 @@ public class LayeredRenderer {
 
         // Offset perpendicular to sequence rendering direction
         double offset = 0.0;
-
         // Don't know what this is
         double allocatedOffset = 0.0;
 

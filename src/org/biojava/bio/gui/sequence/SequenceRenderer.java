@@ -48,7 +48,7 @@ import java.util.List;
  *
  * @author Thomas Down
  * @author Matthew Pocock
- * @author Keith James (docs)
+ * @author Keith James
  */
 public interface SequenceRenderer {
   

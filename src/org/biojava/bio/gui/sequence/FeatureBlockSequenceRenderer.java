@@ -37,152 +37,162 @@ import org.biojava.bio.gui.*;
 
 import java.util.List;
 
-public class FeatureBlockSequenceRenderer
-extends AbstractChangeable
-implements SequenceRenderer {
-  public static ChangeType FEATURE_RENDERER = new ChangeType(
-    "The associated FeatureRenderer has changed",
-    "org.biojava.bio.gui.sequence.FeatureBlockSequenceRenderer",
-    "FEATURE_RENDERER",
-    SequenceRenderContext.LAYOUT
-  );
+/**
+ * <code>FeatureBlockSequenceRenderer</code> forms a bridge between
+ * <code>Sequence</code> rendering and <code>Feature</code>
+ * rendering. It is a <code>SequenceRenderer</code> which iterates
+ * through a <code>Sequence</code>'s <code>Feature</code>s and makes
+ * method calls on a <code>FeatureRenderer</code>.
+ *
+ * @author Matthew Pocock
+ * @author Keith James
+ */
+public class FeatureBlockSequenceRenderer extends AbstractChangeable
+    implements SequenceRenderer {
+    public static ChangeType FEATURE_RENDERER =
+        new ChangeType("The associated FeatureRenderer has changed",
+                       "org.biojava.bio.gui.sequence.FeatureBlockSequenceRenderer",
+                       "FEATURE_RENDERER",
+                       SequenceRenderContext.LAYOUT);
   
-  private FeatureRenderer renderer;
-  private transient ChangeForwarder rendForwarder;
-  
-  
-  protected ChangeSupport getChangeSupport(ChangeType ct) {
-    ChangeSupport cs = super.getChangeSupport(ct);
-    
-    if(rendForwarder == null) {
-      rendForwarder = new SequenceRenderer.RendererForwarder(this, cs);
-      if((renderer != null) && (renderer instanceof Changeable)) {
-        Changeable c = (Changeable) this.renderer;
-        c.addChangeListener(
-          rendForwarder,
-          SequenceRenderContext.REPAINT
-        );
-      }
-    }
-    
-    return cs;
-  }
-  
-  public FeatureBlockSequenceRenderer() {
-    try {
-      setFeatureRenderer(new BasicFeatureRenderer());
-    } catch (ChangeVetoException cve) {
-      throw new NestedError(cve, "Assertion Failure: Should have no listeners");
-    }
-  }
-  
-  public FeatureBlockSequenceRenderer(FeatureRenderer fRend) {
-    try {
-      setFeatureRenderer(fRend);
-    } catch (ChangeVetoException cve) {
-      throw new NestedError(cve, "Assertion Failure: Should have no listeners");
-    }
-  }
-    
-  public FeatureRenderer getFeatureRenderer() {
-    return renderer;
-  }
+    private FeatureRenderer renderer;
+    private transient ChangeForwarder rendForwarder;
 
-  public void setFeatureRenderer (FeatureRenderer renderer)
-  throws ChangeVetoException {
-    if(hasListeners()) {
-      ChangeSupport cs = getChangeSupport(FEATURE_RENDERER);
-      synchronized(cs) {
-        ChangeEvent ce = new ChangeEvent(
-          this, FEATURE_RENDERER, this.renderer, renderer
-        );
-        cs.firePreChangeEvent(ce);
-        if((this.renderer != null) && (this.renderer instanceof Changeable)) {
-          Changeable c = (Changeable) this.renderer;
-          c.removeChangeListener(rendForwarder);
+    protected ChangeSupport getChangeSupport(ChangeType ct) {
+        ChangeSupport cs = super.getChangeSupport(ct);
+    
+        if (rendForwarder == null) {
+            rendForwarder = new SequenceRenderer.RendererForwarder(this, cs);
+            if ((renderer != null) && (renderer instanceof Changeable)) {
+                Changeable c = (Changeable) this.renderer;
+                c.addChangeListener(rendForwarder,
+                                    SequenceRenderContext.REPAINT);
+            }
         }
-        this.renderer = renderer;
-        if(renderer instanceof Changeable) {
-          Changeable c = (Changeable) renderer;
-          c.removeChangeListener(rendForwarder);
+
+        return cs;
+    }
+
+    /**
+     * Creates a new <code>FeatureBlockSequenceRenderer</code> which
+     * uses a <code>BasicFeatureRenderer</code> as its renderer.
+     */
+    public FeatureBlockSequenceRenderer() {
+        try {
+            setFeatureRenderer(new BasicFeatureRenderer());
+        } catch (ChangeVetoException cve) {
+            throw new NestedError(cve, "Assertion Failure: Should have no listeners");
         }
-        cs.firePostChangeEvent(ce);
-      }
-    } else {
-      this.renderer = renderer;
     }
-  }
-  
-  public double getDepth(SequenceRenderContext src) {
-    FeatureHolder features = src.getFeatures();
-    FeatureFilter filter =
-      new FeatureFilter.OverlapsLocation(src.getRange());
-    FeatureHolder fh = features.filter(filter, false);
-    if(fh.countFeatures() > 0) {
-      return renderer.getDepth(src);
-    } else {
-      return 0.0;
-    }
-  }
-  
-  public double getMinimumLeader(SequenceRenderContext src) {
-    return 0.0;
-  }
-  
-  public double getMinimumTrailer(SequenceRenderContext src) {
-    return 0.0;
-  }
-  
-  public void paint(
-      Graphics2D g,
-      SequenceRenderContext src
-  ) {
-    Shape oldClip = g.getClip();
-    
-    Rectangle2D clip = g.getClipBounds();
-    Rectangle2D box = new Rectangle2D.Double();
-    
-    for(
-      Iterator i = src.getFeatures().filter(
-        new FeatureFilter.OverlapsLocation(src.getRange()), false
-      ).features();
-      i.hasNext();
-    ) {
-      Feature f = (Feature) i.next();
-      Location l = f.getLocation();
-      
-      renderer.renderFeature(g, f, src);
-    }
-  }
 
-  public SequenceViewerEvent processMouseEvent(
-    SequenceRenderContext src,
-    MouseEvent me,
-    List path
-  ) {
-    double pos;
-    if(src.getDirection() == SequenceRenderContext.HORIZONTAL) {
-      pos = me.getPoint().getX();
-    } else {
-      pos = me.getPoint().getY();
+    /**
+     * Creates a new <code>FeatureBlockSequenceRenderer</code> which
+     * uses the specified <code>FeatureRenderer</code>.
+     *
+     * @param fRend a <code>FeatureRenderer</code>.
+     */
+    public FeatureBlockSequenceRenderer(FeatureRenderer fRend) {
+        try {
+            setFeatureRenderer(fRend);
+        } catch (ChangeVetoException cve) {
+            throw new NestedError(cve, "Assertion Failure: Should have no listeners");
+        }
     }
     
-    int sMin = src.graphicsToSequence(pos);
-    int sMax = src.graphicsToSequence(pos + 1);
-    
-    FeatureHolder hits = src.getFeatures().filter(
-      new FeatureFilter.OverlapsLocation(new RangeLocation(sMin, sMax)), false
-    );
+    /**
+     * <code>getFeatureRenderer</code> returns the currently active
+     * renderer.
+     *
+     * @return a <code>FeatureRenderer</code>.
+     */
+    public FeatureRenderer getFeatureRenderer() {
+        return renderer;
+    }
 
-    hits = renderer.processMouseEvent(hits, src, me);
+    /**
+     * <code>setFeatureRenderer</code> sets the renderer to be used.
+     *
+     * @param renderer a <code>FeatureRenderer</code>.
+     * @exception ChangeVetoException if the renderer can not be
+     * changed.
+     */
+    public void setFeatureRenderer(FeatureRenderer renderer)
+        throws ChangeVetoException {
+        if (hasListeners()) {
+            ChangeSupport cs = getChangeSupport(FEATURE_RENDERER);
+            synchronized(cs) {
+                ChangeEvent ce = new ChangeEvent(this,
+                                                 FEATURE_RENDERER,
+                                                 this.renderer,
+                                                 renderer);
+                cs.firePreChangeEvent(ce);
+                if ((this.renderer != null) &&
+                    (this.renderer instanceof Changeable)) {
+                    Changeable c = (Changeable) this.renderer;
+                    c.removeChangeListener(rendForwarder);
+                }
+                this.renderer = renderer;
+                if (renderer instanceof Changeable) {
+                    Changeable c = (Changeable) renderer;
+                    c.removeChangeListener(rendForwarder);
+                }
+                cs.firePostChangeEvent(ce);
+            }
+        } else {
+            this.renderer = renderer;
+        }
+    }
 
-    return new SequenceViewerEvent(
-      this,
-      hits,
-      sMin,
-      me,
-      path
-    );
-  }
+    public double getDepth(SequenceRenderContext src) {
+        FeatureHolder features = src.getFeatures();
+        FeatureFilter filter =
+            new FeatureFilter.OverlapsLocation(src.getRange());
+        FeatureHolder fh = features.filter(filter, false);
+        if (fh.countFeatures() > 0) {
+            return renderer.getDepth(src);
+        } else {
+            return 0.0;
+        }
+    }
+
+    public double getMinimumLeader(SequenceRenderContext src) {
+        return 0.0;
+    }
+
+    public double getMinimumTrailer(SequenceRenderContext src) {
+        return 0.0;
+    }
+
+    public void paint(Graphics2D g, SequenceRenderContext src) {
+        for (Iterator i =
+                 src.getFeatures().filter(new FeatureFilter.OverlapsLocation(src.getRange()),
+                                          false).features(); i.hasNext();) {
+            Feature f = (Feature) i.next();
+            Location l = f.getLocation();
+            renderer.renderFeature(g, f, src);
+        }
+    }
+
+    public SequenceViewerEvent processMouseEvent(SequenceRenderContext src,
+                                                 MouseEvent me,
+                                                 List path) {
+        double pos;
+        if (src.getDirection() == SequenceRenderContext.HORIZONTAL) {
+            pos = me.getPoint().getX();
+        } else {
+            pos = me.getPoint().getY();
+        }
+
+        int sMin = src.graphicsToSequence(pos);
+        int sMax = src.graphicsToSequence(pos + 1);
+
+        FeatureHolder hits =
+            src.getFeatures().filter(new FeatureFilter.OverlapsLocation(new RangeLocation(sMin, sMax)),
+                                     false);
+
+        hits = renderer.processMouseEvent(hits, src, me);
+
+        return new SequenceViewerEvent(this, hits, sMin, me, path);
+    }
 }
 
