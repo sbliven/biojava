@@ -70,7 +70,6 @@ public class SimpleAtomicSymbol
     {
       syms = sym.getSymbols();
       ann = sym.getAnnotation();
-      System.out.println("made SBSH for " + sym.hashCode() + " " + sym);
     }
 
     public Object readResolve()
@@ -78,7 +77,6 @@ public class SimpleAtomicSymbol
     {
       try {
         Symbol sym = AlphabetManager.createSymbol(ann, syms, null);
-        System.out.println("read SBSH for " + sym.hashCode() + " " + sym);
         return sym;
       } catch (IllegalSymbolException ex) {
         throw new InvalidObjectException("Couldn't resolve symbol:" + syms);
