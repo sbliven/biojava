@@ -154,7 +154,7 @@ public interface Distribution extends Changeable {
    * @author Matthew Pocock
    * @since 1.1
    */
-  public class NullModelForwarder extends ChangeAdapter {
+  public class NullModelForwarder extends ChangeAdapter implements java.io.Serializable {
     public NullModelForwarder(Object source, ChangeSupport cs) {
       super(source, cs);
     }
