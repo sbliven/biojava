@@ -58,7 +58,7 @@ public abstract class AbstractMatrixPairDPCursor
 
       this.zeroCol = new double[this.numStates]; // don't touch this, please...
       for (int i = 0; i < zeroCol.length; ++i) {
-        this.zeroCol[i] = Double.NEGATIVE_INFINITY;
+        this.zeroCol[i] = Double.NaN;
       }
       this.emptyBP = new BackPointer[numStates];
       

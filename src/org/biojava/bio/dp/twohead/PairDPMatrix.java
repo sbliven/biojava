@@ -47,7 +47,7 @@ public class PairDPMatrix implements DPMatrix, Serializable {
 	seqs = new SymbolList[2];
 	seqs[0] = seq0;
 	seqs[1] = seq1;
-	finalScore = Double.NEGATIVE_INFINITY;
+	finalScore = Double.NaN;
 	scores = new double[seq0.length() + 2][seq1.length() + 2][states.length];
     }
 

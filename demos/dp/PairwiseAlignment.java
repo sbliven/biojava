@@ -27,8 +27,10 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
+import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.dist.*;
 import org.biojava.bio.dp.*;
+import org.biojava.bio.dp.twohead.*;
 
 /**
  * This demo file is a simple implementation of pairwise-alignment.
@@ -39,19 +41,31 @@ import org.biojava.bio.dp.*;
 public class PairwiseAlignment {
   public static void main(String [] args) {
     try {
-      if(args.length != 2) {
-        throw new Exception("Use: PairwiseAlignment sourceSeqFile targetSeqFile");
+      if(args.length != 3) {
+        throw new Exception("Use: PairwiseAlignment i|c sourceSeqFile targetSeqFile\n" +
+        "i for interpreter (classic), c for run-time compiled (experimental)");
       }
       
-      File sourceSeqFile = new File(args[0]);
-      File targetSeqFile = new File(args[1]);
+      String ic = args[0];
+      File sourceSeqFile = new File(args[1]);
+      File targetSeqFile = new File(args[2]);
       FiniteAlphabet alpha = ProteinTools.getAlphabet();
       
-      DP aligner = generateAligner(
+      CellCalculatorFactoryMaker cfFactM;
+      if(ic.equals("i")) {
+        cfFactM = new DPInterpreter.Maker();
+      } else {
+        cfFactM = new DPCompiler(true);
+      }
+      DPFactory fact = new DPFactory.DefaultFactory(cfFactM);
+      
+      MarkovModel model = generateAligner(
         alpha,
         0.5, 0.8,
         0.2, 0.8
       );
+      
+      DP aligner = fact.createDP(model);
       
       SymbolParser rParser = alpha.getParser("token");
       SequenceFactory sFact = new SimpleSequenceFactory();
@@ -97,6 +111,7 @@ public class PairwiseAlignment {
           //double forwardMax = aligner.forwardMatrix(seqs).getScore();
           //System.out.println("Forwards+: " + forwardMax);
 
+          /*
           // tests explicit memory backwards
           double backward;
           System.out.println("Backwards:");
@@ -106,7 +121,7 @@ public class PairwiseAlignment {
           System.out.println("\t" + backward);
           backward = aligner.backward(seqs, ScoreType.NULL_MODEL);
           System.out.println("\t" + backward);
-          
+          */
           // tests minimal memory viterbi
           StatePath result;
           System.out.println("Viterbi:");
@@ -124,7 +139,7 @@ public class PairwiseAlignment {
     }
   }
   
-  private static DP generateAligner(
+  private static MarkovModel generateAligner(
     FiniteAlphabet alpha,
     double pMatch, double pExtendMatch,
     double pGap, double pExtendGap
@@ -213,7 +228,7 @@ public class PairwiseAlignment {
     dist.setWeight(insert2, pExtendGap);
     dist.setWeight(hub, pEndGap);
     
-    return DPFactory.DEFAULT.createDP(model);
+    return model;
   }
   
   private static Distribution generateMatchDist(FiniteAlphabet dna2)

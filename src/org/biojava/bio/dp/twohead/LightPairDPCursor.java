@@ -98,7 +98,7 @@ public class LightPairDPCursor implements PairDPCursor {
     this.zeroCol = new double[this.numStates];
     // don't touch this, please...
     for (int i = 0; i < zeroCol.length; ++i) {
-      this.zeroCol[i] = Double.NEGATIVE_INFINITY;
+      this.zeroCol[i] = Double.NaN;
     }
     this.emptyBP = new BackPointer[numStates];
     this.pos = new int[2];
@@ -136,7 +136,7 @@ public class LightPairDPCursor implements PairDPCursor {
       for (int j = 0; j < ci.length; j++) {
         double[] cj = ci[j];
         for (int k = 0; k < cj.length; k++) {
-          cj[k] = Double.NEGATIVE_INFINITY;
+          cj[k] = Double.NaN;
         }
       }
     }
