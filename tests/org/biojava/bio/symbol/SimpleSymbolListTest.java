@@ -85,6 +85,12 @@ public class SimpleSymbolListTest extends TestCase {
 	tsl.edit(new Edit(4, 0, sl2));
 	assertTrue(compareSymbolList(tsl, DNATools.createDNA("gatatggaaca")));
     }
+    
+    public void testInsertAtEnd() throws Exception {
+      SimpleSymbolList ts1 = new SimpleSymbolList(sl1);
+      ts1.edit(new Edit(7,0,sl2));
+      assertTrue(compareSymbolList(ts1, DNATools.createDNA("gatacaatgga")));
+    }
 
     public void testDeletion()
         throws Exception

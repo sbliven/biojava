@@ -72,8 +72,11 @@ public class CircularSequenceTest extends TestCase
 	assertEquals(t, circ.symbolAt(-4));
     }
     
-    public void testSubList()
+    public void testSubList() throws Exception
     {
+        SymbolList s = DNATools.createDNA("agaatc");
+        //System.out.println(circ.subList(-2,3).seqString());
+        assertTrue(s.equals(circ.subList(-2,3)));
 	assertTrue(symsEq(circ.subList(-2,2), circ.subList(8,12)));
     }
     
