@@ -484,6 +484,8 @@ class OntologySQL {
           throws SQLException
   {
     try {
+      System.err.println("Persisting " + term + " using " + term.getName() + ", " + term.getDescription() + ", " + ontologyID(term.getOntology()));
+
       PreparedStatement import_term = conn.prepareStatement(
               "insert into term " +
               "       (name, definition, ontology_id) " +

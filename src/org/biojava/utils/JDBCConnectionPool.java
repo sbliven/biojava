@@ -74,14 +74,18 @@ public class JDBCConnectionPool {
 	// We don't perform the isClosed in the synchronized block in case the
 	// network is being slow.
 
-	if (conn != null) {
-	    if (!conn.isClosed()) {
-		return conn;
-	    } else {
-		// We simply drop conn on the floor.  It should be safely collected.
-		return takeConnection();
-	    }
-	}
+	//if (conn != null) {
+	//    if (!conn.isClosed()) {
+        //            // hack for turfing out bad connections
+        //            Statement stmt = conn.createStatement();
+        //            stmt.execute("SELECT 1");
+        //            return conn;
+        //        
+	//    } else {
+	//	// We simply drop conn on the floor.  It should be safely collected.
+	//	return takeConnection();
+	//    }
+	//}
 
 	// Statement-pool was empty -- let's create a new connection.
 
