@@ -20,7 +20,7 @@ public class CreateDNAFastaHashTable {
     }
     SequenceDB seqDB = new FilesWrapper(seqFiles);
     
-    DataStore ds = new CompactedDataStoreFactory().buildDataStore(
+    DataStore ds = new MappedDataStoreFactory().buildDataStore(
       dataStoreFile,
       seqDB,
       new DNANoAmbPack(DNATools.t()),
