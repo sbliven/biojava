@@ -198,7 +198,6 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
 		toSkip -= skipped;
 	    }
 	    BufferedReader br = new BufferedReader(fr);
-
 	    SequenceBuilder sb = indexStore.getSBFactory().makeSequenceBuilder();
 	    indexStore.getFormat().readSequence(
               br,

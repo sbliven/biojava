@@ -71,6 +71,11 @@ public class EmblCDROMIndexStore implements IndexStore
 {
     private final File                   divisionLkp;
     private final File                   entryNamIdx;
+
+    // Optional PATH prefix to append to the filename(s) extracted
+    // from the binary indices
+    private File                         pathPrefix;
+
     private final SequenceFormat         format;
     private final SequenceBuilderFactory factory;
     private final SymbolParser           parser;
@@ -121,7 +126,43 @@ public class EmblCDROMIndexStore implements IndexStore
         this.factory     = factory;
         this.parser      = parser;
 
+	// Set to the empty abstract path
+	pathPrefix = new File("");
+
         initialise();
+    }
+
+    /**
+     * <code>getPathPrefix</code> returns the abstract path currently
+     * being appended to the raw sequence database filenames extracted
+     * from the binary index. This value defaults to the empty
+     * abstract path.
+     *
+     * @return a <code>File</code>.
+     */
+    public File getPathPrefix()
+    {
+	return pathPrefix;
+    }
+
+    /**
+     * <code>setPathPrefix</code> sets the abstract path to be
+     * appended to sequence database filenames retrieved from the
+     * binary index. E.g. if the binary index refers to the database
+     * as 'SWALL' and the <code>pathPrefix</code> is set to
+     * "/usr/local/share/data/seq/", then the <code>IndexStore</code>
+     * will know the database path as
+     * "/usr/local/share/data/seq/swall" and any <code>Index</code>
+     * instances produced by the store will return the latter path
+     * when their getFile() method is called. This value defaults to
+     * the empty abstract path.
+     *
+     * @param prefix a <code>File</code> prefix specifying the
+     * abstract path to append.
+     */
+    public void setPathPrefix(File pathPrefix)
+    {
+	this.pathPrefix = pathPrefix;
     }
 
     /**
@@ -180,7 +221,8 @@ public class EmblCDROMIndexStore implements IndexStore
             if (enRecord.length == 0)
                 throw new IllegalIDException("Failed to find id: " + id);
 
-            index = new SimpleIndex((File) seqFiles.get((Integer) enRecord[3]),
+	    // Append current pathPrefix
+            index = new SimpleIndex(new File(pathPrefix, (String) seqFiles.get((Integer) enRecord[3])),
                                     ((Long) enRecord[1]).longValue(),
                                     id);
         }
@@ -310,7 +352,7 @@ public class EmblCDROMIndexStore implements IndexStore
                 Integer fileNumber = (Integer) divRecord[0];
                 String    fileName = (String)  divRecord[1];
 
-                seqFiles.put(fileNumber, new File(fileName));
+                seqFiles.put(fileNumber, fileName);
             }
 
             // Keep a Set view
