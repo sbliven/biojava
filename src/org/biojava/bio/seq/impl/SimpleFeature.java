@@ -34,6 +34,7 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ * @author Kalle Näslund
  */
 
 public class SimpleFeature
@@ -223,6 +224,9 @@ implements Feature, RealizingFeatureHolder, java.io.Serializable {
 		     "Location can not be null. Did you mean Location.EMPTY_LOCATION?"
 					      );
 	}
+        if(!(parent instanceof Feature) && !(parent instanceof Sequence)) {
+            throw new IllegalArgumentException("Parent must be sequence or feature, not: " + parent.getClass() + " " + parent);
+        }
 	this.parent = parent;
 	this.loc = template.location;
 	this.type = template.type;
