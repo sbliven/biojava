@@ -57,7 +57,7 @@ public interface AceSet {
   /**
    * The logical parent of this object or null if there is no logical parent.
    */
-  AceSet parent();
+  AceSet getParent();
   
   /**
    * A URL that can be used to retrieve this set (assuming that the server will
@@ -74,10 +74,6 @@ public interface AceSet {
 
   /**
    * Retrieve a sub-set of members by a filter string.
-   * <P>
-   * The parent of the returned filtered set should be the same as the parent
-   * of this object. If only one item matches the filter, then a set containing
-   * one member is returned.
    */
   AceSet filter(String pattern) throws AceException;
 }
