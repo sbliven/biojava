@@ -173,7 +173,7 @@ public class MassCalc {
         mSymbolPropertyHash.put(sym, new Double(mass));
     }
  
-    /** amino acid to a specific location on a peptide. If multiple masses are 
+    /** Add Variable modifications.  If multiple masses are 
      * set by this method more then one mass will be returned for a mass 
      * calculation. For example if a peptide contains two Mets and the user sets 
      * the native and oxidized mass for the Met then the masses returned will be
