@@ -159,6 +159,10 @@ public class SVM_Light {
     double r = 1;
     String u = "empty";
 
+    while(k instanceof CachingKernel) {
+      k = ((CachingKernel) k).getNestedKernel();
+    }
+    
     if (k == SparseVector.kernel) {
       kType = 0;
     } else if (k instanceof PolynomialKernel) {

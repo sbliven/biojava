@@ -808,7 +808,7 @@ public interface FeatureFilter extends Serializable {
      * @since 1.2
      */
 
-    public static class ByParent implements OptimizableFilter, ByHierarchy {
+    public static class ByParent implements OptimizableFilter, Up {
         private FeatureFilter filter;
 
         public ByParent(FeatureFilter ff) {
@@ -885,7 +885,7 @@ public interface FeatureFilter extends Serializable {
      * @since 1.2
      */
 
-    public static class ByAncestor implements OptimizableFilter, ByHierarchy {
+    public static class ByAncestor implements OptimizableFilter, Up {
         private FeatureFilter filter;
 
         public ByAncestor(FeatureFilter ff) {
@@ -965,7 +965,7 @@ public interface FeatureFilter extends Serializable {
      * @since 1.3
      */
 
-    public static class ByChild implements OptimizableFilter, ByHierarchy {
+    public static class ByChild implements OptimizableFilter, Down {
         private FeatureFilter filter;
 
         public ByChild(FeatureFilter ff) {
@@ -1044,7 +1044,7 @@ public interface FeatureFilter extends Serializable {
      * @since 1.2
      */
 
-    public static class ByDescendant implements OptimizableFilter, ByHierarchy {
+    public static class ByDescendant implements OptimizableFilter, Down {
         private FeatureFilter filter;
 
         public ByDescendant(FeatureFilter ff) {
@@ -1347,80 +1347,8 @@ public interface FeatureFilter extends Serializable {
     }
     
     public static final FeatureFilter top_level = new IsTopLevel();
-    
-    /**
-     * Accept features which are top-level sequence features.  This is implemented
-     * by the logic that the <code>parent</code> property of top-level features
-     * will implement the <code>Sequence</code> interface.
-     *
-     * @author Thomas Down
-     * @since 1.3
-     */
-    
-    public static final class IsTopLevel implements OptimizableFilter {
-        public boolean accept(Feature f) {
-            return f.getParent() instanceof Sequence;
-        }
-        
-        public int hashCode() {
-            return 42;
-        }
-        
-        /**
-         * All instances are equal (this should really be a singleton, but
-         * that doesn't quite fit current </code>FeatureFilter</code>
-         * patterns.
-         */
-        
-        public boolean equals(Object o) {
-            return (o instanceof FeatureFilter.IsTopLevel);
-        }
-       
-        public boolean isProperSubset(FeatureFilter ff) {
-            return (ff instanceof IsTopLevel) || (ff instanceof AcceptAllFilter);
-        }
-        
-        public boolean isDisjoint(FeatureFilter ff) {
-            return (ff instanceof ByParent) || (ff instanceof ByAncestor);
-        }
-    }
 
     public static final FeatureFilter leaf = new IsLeaf();
-    
-    /**
-     * Accept features which themselves have no children.
-     *
-     * @author Matthew Pocock
-     * @since 1.3
-     */
-    
-    public static final class IsLeaf implements OptimizableFilter {
-        public boolean accept(Feature f) {
-            return f.countFeatures() == 0;
-        }
-        
-        public int hashCode() {
-            return 41;
-        }
-        
-        /**
-         * All instances are equal (this should really be a singleton, but
-         * that doesn't quite fit current </code>FeatureFilter</code>
-         * patterns.
-         */
-        
-        public boolean equals(Object o) {
-            return (o instanceof FeatureFilter.IsLeaf);
-        }
-       
-        public boolean isProperSubset(FeatureFilter ff) {
-            return (ff instanceof IsLeaf) || (ff instanceof AcceptAllFilter);
-        }
-        
-        public boolean isDisjoint(FeatureFilter ff) {
-            return ff instanceof ByChild || ff instanceof ByDescendant || ff instanceof AcceptNoneFilter;
-        }
-    }
     
     // Note: this implements OptimizableFilter, but cheats :-).  Consequently,
     // other optimizablefilters don't know anything about it.  The convenience
@@ -1474,6 +1402,9 @@ public interface FeatureFilter extends Serializable {
 interface ByHierarchy extends FeatureFilter {
   FeatureFilter getFilter();
 }
+
+interface Up extends FeatureFilter {}
+interface Down extends FeatureFilter {}
 
 
 /**
@@ -1542,6 +1473,79 @@ class AcceptNoneFilter implements OptimizableFilter {
   
   public String toString() {
     return "None";
+  }
+}
+
+
+/**
+ * Accept features which are top-level sequence features.  This is implemented
+ * by the logic that the <code>parent</code> property of top-level features
+ * will implement the <code>Sequence</code> interface.
+ *
+ * @author Thomas Down
+ * @since 1.3
+ */
+
+final class IsTopLevel implements OptimizableFilter {
+  public boolean accept(Feature f) {
+    return f.getParent() instanceof Sequence;
+  }
+  
+  public int hashCode() {
+    return 42;
+  }
+  
+  /**
+  * All instances are equal (this should really be a singleton, but
+  * that doesn't quite fit current </code>FeatureFilter</code>
+  * patterns.
+  */
+  
+  public boolean equals(Object o) {
+    return (o instanceof IsTopLevel);
+  }
+  
+  public boolean isProperSubset(FeatureFilter ff) {
+    return (ff instanceof IsTopLevel) || (ff instanceof AcceptAllFilter);
+  }
+  
+  public boolean isDisjoint(FeatureFilter ff) {
+    return (ff instanceof ByParent) || (ff instanceof ByAncestor);
+  }
+}
+
+/**
+ * Accept features which themselves have no children.
+ *
+ * @author Matthew Pocock
+ * @since 1.3
+ */
+
+final class IsLeaf implements OptimizableFilter {
+  public boolean accept(Feature f) {
+    return f.countFeatures() == 0;
+  }
+  
+  public int hashCode() {
+    return 41;
+  }
+  
+  /**
+  * All instances are equal (this should really be a singleton, but
+  * that doesn't quite fit current </code>FeatureFilter</code>
+  * patterns.
+  */
+  
+  public boolean equals(Object o) {
+    return (o instanceof IsLeaf);
+  }
+  
+  public boolean isProperSubset(FeatureFilter ff) {
+    return (ff instanceof IsLeaf) || (ff instanceof AcceptAllFilter);
+  }
+  
+  public boolean isDisjoint(FeatureFilter ff) {
+    return ff instanceof ByChild || ff instanceof ByDescendant || ff instanceof AcceptNoneFilter;
   }
 }
 

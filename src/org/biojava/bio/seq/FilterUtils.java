@@ -67,11 +67,9 @@ public class FilterUtils {
       
       // Body
       
-      if(sub.equals(sup)) {
+      if(sub == sup) {
         return true;
-      }
-      
-      if (sup == all()) {
+      } else if (sup == all()) {
         return true;
       } else if (sub == none()) {
         return true;
@@ -92,12 +90,15 @@ public class FilterUtils {
         return areDisjoint(sub, not_sup);
       } else if (sub instanceof FeatureFilter.Not) {
         // How do we prove this one?
+        return false;  // return false for now
       } else if (sub instanceof OptimizableFilter) {
           // The works okay for ByFeature, too.
         return ((OptimizableFilter) sub).isProperSubset(sup);
+      } else if(sup.equals(sub)) {
+        return true;
+      } else {
+        return false;
       }
-      
-      return false;
     }
   
     /**
@@ -337,6 +338,14 @@ public class FilterUtils {
     return new FeatureFilter.ByAncestor(ancestorFilter);
   }
   
+  public final static FeatureFilter byChild(FeatureFilter childFilter) {
+    return new FeatureFilter.ByChild(childFilter);
+  }
+  
+  public final static FeatureFilter byDescendant(FeatureFilter descFilter) {
+    return new FeatureFilter.ByDescendant(descFilter);
+  }
+  
   public final static FeatureFilter byFrame(FramedFeature.ReadingFrame frame) {
     return new FeatureFilter.FrameFilter(frame);
   }
@@ -351,6 +360,10 @@ public class FilterUtils {
   
   public final static FeatureFilter topLevel() {
     return FeatureFilter.top_level;
+  }
+  
+  public final static FeatureFilter leaf() {
+    return FeatureFilter.leaf;
   }
   
   public final static FeatureFilter all() {
@@ -616,14 +629,36 @@ public class FilterUtils {
       ByHierarchy f1h = (ByHierarchy) f1;
       ByHierarchy f2h = (ByHierarchy) f2;
       
-      FeatureFilter filt = optimize(and(f1h.getFilter(), f2h.getFilter()));
-      if(
-        f1h instanceof FeatureFilter.ByParent ||
-        f2h instanceof FeatureFilter.ByParent
-      ) {
-        return byParent(filt);
+      if(f1 instanceof Up && f2 instanceof Up) {
+        FeatureFilter filt = optimize(or(f1h.getFilter(), f2h.getFilter()));
+        if(filt == none()) {
+          return none();
+        }
+        
+        if(
+          f1h instanceof FeatureFilter.ByParent ||
+          f2h instanceof FeatureFilter.ByParent
+        ) {
+          return byParent(filt);
+        } else {
+          return byAncestor(filt);
+        }
+      } else if(f1 instanceof Down && f2 instanceof Down) {
+        FeatureFilter filt = optimize(or(f1h.getFilter(), f2h.getFilter()));
+        if(filt == none()) {
+          return none();
+        }
+
+        if(
+          f1h instanceof FeatureFilter.ByChild ||
+          f2h instanceof FeatureFilter.ByChild
+        ) {
+          return byChild(filt);
+        } else {
+          return byDescendant(filt);
+        }
       } else {
-        return byAncestor(filt);
+        return none();
       }
     }
     
@@ -667,14 +702,36 @@ public class FilterUtils {
       ByHierarchy f1h = (ByHierarchy) f1;
       ByHierarchy f2h = (ByHierarchy) f2;
       
-      FeatureFilter filt = optimize(or(f1h.getFilter(), f2h.getFilter()));
-      if(
-        f1h instanceof FeatureFilter.ByAncestor ||
-        f2h instanceof FeatureFilter.ByAncestor
-      ) {
-        return byAncestor(filt);
+      if(f1 instanceof Up && f2 instanceof Up) {
+        FeatureFilter filt = optimize(or(f1h.getFilter(), f2h.getFilter()));
+        if(filt == none()) {
+          return none();
+        }
+        
+        if(
+          f1h instanceof FeatureFilter.ByAncestor ||
+          f2h instanceof FeatureFilter.ByAncestor
+        ) {
+          return byAncestor(filt);
+        } else {
+          return byParent(filt);
+        }
+      } else if(f1 instanceof Down && f2 instanceof Down) {
+        FeatureFilter filt = optimize(or(f1h.getFilter(), f2h.getFilter()));
+        if(filt == none()) {
+          return none();
+        }
+
+        if(
+          f1h instanceof FeatureFilter.ByDescendant ||
+          f2h instanceof FeatureFilter.ByDescendant
+        ) {
+          return byDescendant(filt);
+        } else {
+          return byChild(filt);
+        }
       } else {
-        return byParent(filt);
+        return none();
       }
     }
     

@@ -113,7 +113,7 @@ public interface Annotation extends Changeable {
       throws NoSuchElementException, ChangeVetoException;
   
   /**
-   * Returns whether there is any property under that key in this Annotation.
+   * Returns whether there the property is defined.
    *
    * @param key the key Object to search for
    * @return true if this Annotation knows about the key, false otherwise
@@ -128,7 +128,7 @@ public interface Annotation extends Changeable {
   Set keys();
   
   /**
-   * Retern a map that contains the same key/values as this Annotation.
+   * Return a map that contains the same key/values as this Annotation.
    * <p>
    * If the annotation changes, the map may not reflect this.  The Map
    * may be unmodifiable.
