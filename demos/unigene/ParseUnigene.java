@@ -13,12 +13,21 @@ public class ParseUnigene {
       new FileReader(dataFile)
     );
     
-    Parser parser = new Parser();
-    AnnotationBuilder ab = new AnnotationBuilder(UnigeneTools.UNIGENE_ANNOTATION);
-    ParserListener pl = UnigeneTools.buildParser(ab);
-    
-    while(parser.read(br, pl.getParser(), pl.getListener())) {
-      System.out.println(ab.getLast());
+    if(args.length > 1 && args[1].startsWith("val")) {
+      Parser parser = new Parser();
+      AnnotationBuilder ab = new AnnotationBuilder(UnigeneTools.UNIGENE_ANNOTATION);
+      ParserListener pl = UnigeneTools.buildDataParser(ab);
+      
+      while(parser.read(br, pl.getParser(), pl.getListener())) {
+        System.out.println(ab.getLast());
+      }
+    } else {
+      Parser parser = new Parser();
+      Echo echo = new Echo();
+      ParserListener pl = UnigeneTools.buildDataParser(echo);
+      
+      while(parser.read(br, pl.getParser(), pl.getListener())) {
+      }
     }
   }
 }
