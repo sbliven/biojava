@@ -1,3 +1,0 @@
-javac.classpath=class|xerces.jar|bytecode.jar|jakarta-regexp.jar
-jar.target=biojava.jar
-jar.manifest=manifest/defaultmanifest.txt
