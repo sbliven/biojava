@@ -230,7 +230,7 @@ public class GFFParser {
 	if (rest != null)
 	    record.setGroupAttributes(parseAttribute(rest));
 	else
-	    record.setGroupAttributes(new HashMap());
+	    record.setGroupAttributes(new SmallMap());
 	record.setComment(comment);
 
 	return record;
@@ -252,7 +252,7 @@ public class GFFParser {
      */
 
     protected Map parseAttribute(String attValList) {
-	Map attMap = new HashMap();
+	Map attMap = new SmallMap();
 
 	StringTokenizer sTok = new StringTokenizer(attValList, ";", false);
 	while(sTok.hasMoreTokens()) {

@@ -22,6 +22,7 @@
 package org.biojava.bio.program.gff;
 
 import java.util.*;
+import org.biojava.utils.*;
 import org.biojava.bio.seq.StrandedFeature;
 
 /**
@@ -90,7 +91,7 @@ public class SimpleGFFRecord implements GFFRecord {
 		this.strand = rec.getStrand();
 		this.frame = rec.getFrame();
 		this.comment = rec.getComment();
-		this.groupAttributes = new HashMap(rec.getGroupAttributes());
+		this.groupAttributes = new SmallMap(rec.getGroupAttributes());
 	}
 
 
@@ -244,7 +245,7 @@ public class SimpleGFFRecord implements GFFRecord {
 
   public Map getGroupAttributes() {
     if(groupAttributes == null) {
-      groupAttributes = new HashMap();
+      groupAttributes = new SmallMap();
     }
     return groupAttributes;
   }
