@@ -41,12 +41,23 @@ public class TestDigestIO extends Object {
         
         //Initiate Digest
         Digest bioJavaDigest = new Digest();
-        bioJavaDigest.setMaxMissedCleavages(1);
+        bioJavaDigest.setMaxMissedCleavages(0);
         
         massCalc = new MassCalc(SymbolPropertyTable.MONO_MASS, true);
         try{
-            massCalc.setSymbolModification('W', 100000.00);
-        }catch(Exception e){}
+           // massCalc.setSymbolModification('W', 100000.00);
+            massCalc.setSymbolModification('Z', 100000.00);
+	    
+	    //Variable mods
+	    double[] vMasses = new double[1];
+	    vMasses[0] = 131.04049 + 16;
+	    //vMasses[1] = 100000.00;
+	    massCalc.addVariableModification('M',vMasses);
+	    
+        }catch(Exception e){
+	    e.printStackTrace();
+	    System.exit(-1);
+	}
         
         // Protease protease = new Protease();
         // String[] list = Protease.getProteaseList();
@@ -81,7 +92,7 @@ public class TestDigestIO extends Object {
         bioJavaDigest.setProtese(Protease.getProteaseByName(Protease.CNBr));
         
         //Get the Sequence Iterator
-        sourceI = getSeqIterator(fileName);
+     //   sourceI = getSeqIterator(fileName);
         
         while(sourceI.hasNext()) {
             Sequence sourceSeq = sourceI.nextSequence();
@@ -94,65 +105,58 @@ public class TestDigestIO extends Object {
                 calcMasses(sourceSeq.features(), sourceSeq.getName() + " " );
             }
         }
-        
     }
     
-    
-    
     private  void calcMasses(Iterator i, String prefix) {
-        
         for (; i.hasNext(); ) {
             Feature f = (Feature) i.next();
-            //System.out.print(prefix);
-            //System.out.print(f.getType());
-            //System.out.print(f.getLocation().toString()+ " ");
-            
             try{
-                double mass = massCalc.getMass(f.getSymbols(),true);
-                
+                double mass = massCalc.getMass(f.getSymbols());
                 System.out.print(mass);
-                
                 System.out.println();
-                
             }
             catch(Exception ise){
                 System.out.println(ise.getMessage());
             }
         }
-        
     }
     
-    private  void printFeatures(Iterator i, String prefix) {
-        for (; i.hasNext(); ) {
-            Feature f = (Feature) i.next();
+    private  void printFeatures(Iterator it, String prefix) {
+        for (; it.hasNext(); ) {
+            Feature f = (Feature) it.next();
             System.out.print(prefix);
             System.out.print(f.getType());
             System.out.print(f.getLocation().toString()+ " ");
             
             //Use this for static
             try{
-                double mass = MassCalc.getMass(
-                f.getSymbols(),
-                SymbolPropertyTable.MONO_MASS,
-                true);
-                System.out.print(nf.format(mass) + " ");
+                double mass;
+          //      double mass = MassCalc.getMass(
+          //      f.getSymbols(),
+         //       SymbolPropertyTable.MONO_MASS,
+         //       true);
+         //       System.out.print(nf.format(mass) + " ");
                 
                 //Use this for instances of MassCalc
-                mass = massCalc.getMass(f.getSymbols(),true);
-                
+                mass = massCalc.getMass(f.getSymbols());
                 System.out.print(" PTM " + nf.format(mass) + " ");
-                
-                
                 System.out.print(" " + f.getSymbols().seqString() + "    " );
-                
-                
-                
                 System.out.println();
-                //  printFeatures(f, pw, prefix + "    ");
-                
+
+		System.out.println("Now get Variable Masses ");
+		double[] masses = massCalc.getVariableMasses(f.getSymbols());
+		System.out.println("Got Variable masses " + masses.length);
+		System.out.println(masses.length);
+		for(int i=0; i<masses.length; i++){
+		    System.out.println("PTM" + i + ": " + masses[i]);
+		}
+		//System.out.print(" PTM1 " + nf.format(masses[0]) + " ");
+		//System.out.print(" PTM2 " + nf.format(masses[1]) + " ");
             }
-            catch(IllegalSymbolException ise){
-                System.out.println(ise.getMessage());
+            catch(Exception ise){
+                System.out.println();
+                System.out.println(ise);
+                ise.printStackTrace();
             }
         }
     }
@@ -165,7 +169,6 @@ public class TestDigestIO extends Object {
             SymbolTokenization protParser = alpha.getTokenization("token");
             BufferedReader br = new BufferedReader(
             new FileReader(fileName));
-            
             
             SequenceBuilderFactory sFact = new FastaDescriptionLineParser.Factory(SimpleSequenceBuilder.FACTORY);
             SequenceFormat sFormat = new FastaFormat();
