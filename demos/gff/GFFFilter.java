@@ -58,10 +58,24 @@ import org.biojava.bio.program.gff.*;
  */
 public class GFFFilter {
   public static void main(String [] args) throws Exception {
-    if(args.length > 2) {
-      throw new Exception("Use: GFFToFeatures [in.gff [out.gff]]");
-    }
+    Map options = parseArgs(args);
 
+    if(args.length == 0 || args == null || args.containsKey("help")) {
+      throw new Exception(
+        "Use: GFFToFeatures [options]\n" +
+        "    --infile in    read gff from file named in (stdin if absent or -)\n" +
+        "    --outfile out  write gff to file named out (stdout if absent or -)\n" +
+        "    --source [!]s  source==s or source!=s\n" +
+        "    --type [!]t    type==t or type!=t\n" +
+        "    --seq [!]s     sequence==s or sequence!=s\n" +
+        "    --frame [!]f   frame==f or frame!=f where f is one of 0, 1, 2\n" +
+        "    --strand [!]s  strand==s or strand!=s where s is one of ., +, -\n" +
+        "    --start [<>]x  start==x or start<x or start>x\n" +
+        "    --end [<>]y    end==y or end<y or end>y\n" +
+        "    --help         this help message\n"
+      );
+    }
+    
     try {
       BufferedReader in = null;
       PrintWriter out = null;
@@ -87,5 +101,9 @@ public class GFFFilter {
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+  
+  private static Map parseArgs(String[] args) {
+      
   }
 }
