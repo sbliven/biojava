@@ -25,6 +25,9 @@ package org.biojava.bio.structure;
 
 
 import java.util.ArrayList ;
+import java.util.List;
+
+import org.biojava.bio.structure.AminoAcid;
 
 /**
  * A Chain in a PDB file. It contains several groups which can be of
@@ -164,6 +167,7 @@ public class ChainImpl implements Chain {
 	    i++ ;
 	} while ( i< groups.size()) ;
 	    
+	
 	return str ;
 			
     }
@@ -172,17 +176,17 @@ public class ChainImpl implements Chain {
      * @return a String representing the sequence.	    
      */
     public String getSequence(){
-	String str = "" ;
-	ArrayList gr = getGroups("amino");
-	for (int i=0 ; i<gr.size();i++){
-	    AminoAcid a = (AminoAcid)gr.get(i);
-	    
-	    str += a.getPDBName() ;
-	}
-
-	    
-
-	return str ;
+        
+        List aminos = getGroups("amino");
+        StringBuffer sequence = new StringBuffer() ;
+        for ( int i=0 ; i< aminos.size(); i++){
+            AminoAcid a = (AminoAcid)aminos.get(i);
+            sequence.append( a.getAminoType());
+        }
+        
+        String s = sequence.toString();
+                
+        return s ;
     }
 	
 }
