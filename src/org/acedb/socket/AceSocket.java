@@ -76,12 +76,20 @@ class AceSocket implements Connection {
 
     public String transact(String s) throws AceException {
 	try {
+	    if (dis.available() != 0) {
+		handleUnsolicited();
+	    }
+
 	    writeMessage(MSGREQ, s);
 	    String reply = readMessage();
 	    return reply;
 	} catch (IOException ex) {
 	    throw new AceException(ex);
 	}
+    }
+
+    private void handleUnsolicited() throws AceException {
+	throw new AceException("Unsolicited data from server!", true);
     }
 
     private void writeMessage(String type, String s) throws IOException {

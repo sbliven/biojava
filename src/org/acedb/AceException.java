@@ -28,19 +28,30 @@ import org.biojava.bio.BioException;
  */
 
 public class AceException extends BioException {
-  public AceException(String message) {
+    private boolean recoverable = false;
+
+    public AceException(String message) {
   	super(message);
-  }
+    }
 
-  public AceException(Throwable ex) {
-    super(ex);
-  }
+    public AceException(String message, boolean rec) {
+  	super(message);
+	this.recoverable = rec;
+    }
 
-  public AceException(Throwable ex, String message) {
-    super(ex, message);
-  }
+    public AceException(Throwable ex) {
+	super(ex);
+    }
 
-  public AceException() {
-    super();
-  }
+    public AceException(Throwable ex, String message) {
+	super(ex, message);
+    }
+    
+    public AceException() {
+	super();
+    }
+
+    public boolean isRecoverable() {
+	return recoverable;
+    }
 }

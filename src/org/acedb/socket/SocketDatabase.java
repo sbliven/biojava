@@ -142,7 +142,22 @@ class SocketDatabase implements Database {
 	return resultSet;
     }
 
-    private AceSet allClasses() 
+    private AceSet allClasses()
+        throws AceException
+    {
+	AceSet res = null;
+	while (res == null) {
+	    try {
+		res = _allClasses();
+	    } catch (AceException ex) {
+		if (! ex.isRecoverable())
+		    throw ex;
+	    }
+	}
+	return res;
+    }
+
+    private AceSet _allClasses() 
         throws AceException
     {
 	if (allClassesSet == null) {
@@ -173,6 +188,21 @@ class SocketDatabase implements Database {
     }
 
     AceSet select(String clazz, String namePattern)
+	                  throws AceException
+    {
+	AceSet res = null;
+	while (res == null) {
+	    try {
+		res = _select(clazz, namePattern);
+	    } catch (AceException ex) {
+		if (! ex.isRecoverable())
+		    throw ex;
+	    }
+	}
+	return res;
+    }
+
+    private AceSet _select(String clazz, String namePattern)
 	                  throws AceException
     {
 	System.out.println("Selecting, clazz=" + clazz + ", pattern=" + namePattern);
@@ -229,7 +259,22 @@ class SocketDatabase implements Database {
 	return dbURL;
     }
 
-    public AceNode getObject(String clazz, String name) 
+    public AceNode getObject(String clazz, String name)
+	                  throws AceException
+    {
+	AceNode res = null;
+	while (res == null) {
+	    try {
+		res = _getObject(clazz, name);
+	    } catch (AceException ex) {
+		if (! ex.isRecoverable())
+		    throw ex;
+	    }
+	}
+	return res;
+    }
+
+    private AceNode _getObject(String clazz, String name) 
             throws AceException
     {
       if(clazz == null) {
