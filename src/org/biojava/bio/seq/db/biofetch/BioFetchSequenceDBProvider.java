@@ -35,6 +35,7 @@ import org.biojava.bio.seq.db.*;
  *                interest to users.
  *
  * @author Thomas Down
+ * @author Keith James
  * @since 1.3
  */
 public class BioFetchSequenceDBProvider implements SequenceDBProvider {

@@ -39,6 +39,7 @@ import org.biojava.bio.seq.io.*;
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Greg Cox
+ * @author Keith James
  * @since 1.3
  */
 public class BioFetchSequenceDB
