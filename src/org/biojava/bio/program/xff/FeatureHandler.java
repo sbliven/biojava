@@ -103,7 +103,11 @@ public class FeatureHandler extends StAXContentHandlerBase {
 	    throw new ParseException("startFeature event has already been fired for this feature");
 	}
 
-	getXFFEnvironment().getFeatureListener().startFeature(getFeatureTemplate());
+	Feature.Template templ = getFeatureTemplate();
+	if (templ.annotation == null) {
+	    templ.annotation = Annotation.EMPTY_ANNOTATION;
+	}
+	getXFFEnvironment().getFeatureListener().startFeature(templ);
 	startFired = true;
     }
 
