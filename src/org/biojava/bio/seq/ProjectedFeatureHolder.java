@@ -184,7 +184,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 	_projectionClasses = new HashMap();
 	_projectionClasses.put(Feature.class, ProjectedFeatureWrapper.class);
 	_projectionClasses.put(StrandedFeature.class, ProjectedStrandedFeatureWrapper.class);
-	loader = new GeneratedClassLoader();
+	loader = new GeneratedClassLoader(ProjectedFeatureWrapper.class.getClassLoader());
     }
 
     private static Class getProjectionClass(Class face) {
