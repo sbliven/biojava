@@ -30,9 +30,9 @@ import org.biojava.bio.seq.db.SequenceDBLite;
 import org.biojava.utils.Services;
 
 /**
- * <p><code>SequenceDBFactory</code> is a factory which gets
- * implementations of the BioJava <code>SequenceDB</code>
- * interface.</p>
+ * <p><code>Registry</code> is a factory which gets implementations of
+ * the BioJava <code>SequenceDB</code> interface. This is the point of
+ * entry for OBDA access.</p>
  *
  * @author Brian Gilman
  * @author Thomas Down
