@@ -4,6 +4,9 @@ import org.biojava.bio.seq.*;
 
 import org.Biocorba.Seqcore.*;
 
+/**
+ * Implements a CORBA PrimarySeq object by adapting a biojava ResidueList.
+ */
 public class PrimarySeqImpl
 extends AnonymousSeqImpl
 implements _PrimarySeq_Operations {

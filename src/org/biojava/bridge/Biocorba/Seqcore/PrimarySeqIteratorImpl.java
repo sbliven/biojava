@@ -19,7 +19,7 @@ implements _PrimarySeqIterator_Operations {
   throws org.Biocorba.Seqcore.EndOfStream, org.Biocorba.Seqcore.UnableToProcess {
     try {
       Sequence seq = si.nextSequence();
-      PrimarySeqImpl psi = new PrimarySeqImpl(seq);
+      PrimarySeqImpl psi = new PrimarySeqImpl(seq, seq.getName(), seq.getURN(), seq.getURN());
       _PrimarySeq_Tie pst = new _PrimarySeq_Tie(psi);
       primarySeqIterator._orb().connect(pst);
       return pst;

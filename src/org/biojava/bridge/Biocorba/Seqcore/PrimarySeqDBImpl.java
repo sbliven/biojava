@@ -44,7 +44,7 @@ implements _PrimarySeqDB_Operations {
   throws UnableToProcess {
     try {
       Sequence seq = getSequenceDB().getSequence(primary_id);
-      PrimarySeqImpl psi = new PrimarySeqImpl(seq, name + ":" + primary_id);
+      PrimarySeqImpl psi = new PrimarySeqImpl(seq, seq.getName(), seq.toString(), name + ":" + primary_id);
       _PrimarySeq_Tie pst = new _PrimarySeq_Tie(psi);
       primarySeqDB._orb().connect(pst);
       return pst;
