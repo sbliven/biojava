@@ -38,9 +38,25 @@ public class FilterUtils {
    *
    * @param sub  the subset filter
    * @param sup  the superset filter
-   * @return boolean true if sub is a propper subset of sup
+   * @return boolean true if sub is a proper subset of sup
    */
-  public boolean isPropperSubset(FeatureFilter sub, FeatureFilter sup) {
+  public boolean isProperSubset(FeatureFilter sub, FeatureFilter sup) {
+    if(sub instanceof FeatureFilter.And) {
+      FeatureFilter.And and = (FeatureFilter.And) sub;
+      FeatureFilter a1 = and.getChild1();
+      FeatureFilter a2 = and.getChild2();
+      
+      return isProperSubset(a1, sup) || isProperSubset(a2.sup);
+    }
+    
+    if(sup instanceof FeatureFilter.And) {
+      FeatureFilter.And and = (FeatureFilter.And) sup;
+      FeatureFilter a1 = and.getChild1();
+      FeatureFilter a2 = and.getChild2();
+      
+      return isProperSubset(sub, a1) && isProperSubset(sub, a2);
+    }
+    
     if(sub.getClass() != sup.getClass()) { // different classes
       if(sup instanceof FeatureFilter.AcceptAllFilter) {
         return true;
@@ -73,10 +89,10 @@ public class FilterUtils {
         Location subL = ((FeatureFilter.OverlapsLocation) sub).getLocation();
         
         return supL.contains(subL);
-      } else {
-        return false;
       }
     }
+    
+    return false;
   }
   
 }
