@@ -96,8 +96,8 @@
       </ambiguityMapping>
 
       <ambiguityMapping char="k">
-        <symbolref name="cytosine" />
-	<symbolref name="adenine" />
+        <symbolref name="guanine" />
+	<symbolref name="thymine" />
       </ambiguityMapping>
 
       <ambiguityMapping char="s">
