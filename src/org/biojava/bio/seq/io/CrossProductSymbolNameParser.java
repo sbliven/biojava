@@ -20,12 +20,13 @@
  */
 
 
-package org.biojava.bio.symbol;
+package org.biojava.bio.seq.io;
 
 import java.util.*;
 import java.io.*;
 
 import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * Allows Symbol objects to be created from Strings assuming that they follow
@@ -41,6 +42,10 @@ public class CrossProductSymbolNameParser implements SymbolParser, Serializable 
     return alpha;
   }
   
+    public StreamParser parseStream(SeqIOListener l) {
+	throw new BioError("[FIXME] not implemented");
+    }
+
   public SymbolList parse(String seq)
   throws IllegalSymbolException {
     List symbols = new ArrayList();
