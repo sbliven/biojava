@@ -116,6 +116,15 @@ public class GFFParser {
 			String token = st.nextToken();
 			aList.add(token);
 		    }
+
+                    if(aList.size() < 7) {
+                      throw new ParserException(
+                        "Line doesn't look like GFF",
+                        locator,
+                        lineNum,
+                        line );
+                    }
+
 		    String rest = null;
 		    String comment = null;
 		    if(st.hasMoreTokens()) {
@@ -131,6 +140,7 @@ public class GFFParser {
 			    rest = rest.substring(0, ci);
 			}
 		    }
+
 		    GFFRecord record = createRecord(handler, aList, rest, comment);
 		    handler.recordLine(record);
 		}
