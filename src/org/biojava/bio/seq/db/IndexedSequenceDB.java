@@ -210,7 +210,7 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
 	throws IOException, BioException, ChangeVetoException 
     {
 	seqFile = seqFile.getAbsoluteFile();
-	HackedBufferedReader bReader = new HackedBufferedReader(seqFile); 
+	CountedBufferedReader bReader = new CountedBufferedReader(new FileReader(seqFile)); 
 	HashMap index = new HashMap();
 	long pos = bReader.getFilePointer();
 	boolean hasNextSequence = true;
@@ -330,13 +330,21 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
 	    if(s == null) {
 		throw new BioException("Couldn't find sequence for id " + id);
 	    }
-	    RandomAccessFile raf = getReader(s.file);
-	    raf.seek(s.start);
-	    HackedBufferedReader hbr = new HackedBufferedReader(raf);
+	    FileReader fr = new FileReader(s.file);
+	    long toSkip = s.start;
+	    while (toSkip > 0) {
+		long skipped = fr.skip(toSkip);
+		if (skipped < 0)
+		    throw new IOException("Reached end of file");
+		toSkip -= skipped;
+	    }
+	    BufferedReader br = new BufferedReader(fr);
+
 	    SequenceBuilder sb = sbFact.makeSequenceBuilder();
-	    format.readSequence(hbr, symParser, sb);
+	    format.readSequence(br, symParser, sb);
 	    Sequence seq = sb.makeSequence();
-	    putReader(s.file, raf);
+	    // putReader(s.file, raf);
+	    br.close();
 	    return seq;
 	} catch (IOException ioe) {
 	    throw new BioException(ioe, "Couldn't grab region of file"); 
@@ -374,6 +382,225 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
 	}
     }
     
+    private static class CountedBufferedReader extends BufferedReader {
+	private final static int DEFAULT_BUFFER_SIZE = 1 << 14;
+
+	private long position;
+
+	private Reader stream;
+	private char[] buffer;
+	private int buffPos;
+	private int buffFill;
+
+	private boolean reachedEOF = false;
+
+	private int mark = -1;
+	private int markLimit = -1;
+
+	public long getFilePointer() {
+	    return position;
+	}
+
+	public CountedBufferedReader(Reader stream) {
+	    super(new Reader() {
+		public void close() {}
+		public int read(char[] cbuf, int off, int len) { return 0; }
+	    });
+
+	    this.stream = stream;
+	    this.buffer = new char[DEFAULT_BUFFER_SIZE];
+	    position = 0;
+	    buffPos = 0;
+	    buffFill = 0;
+	}
+
+	public void close()
+	    throws IOException
+	{
+	    stream.close();
+	    stream = null;
+	}
+
+	public int read() 
+	    throws IOException
+	{
+	    if (buffPos >= buffFill)
+		fillBuffer();
+
+	    if (reachedEOF) {
+		return -1;
+	    } else {
+		position++;
+		return buffer[buffPos++];
+	    }
+	}
+
+	private int peek()
+	    throws IOException
+	{
+	    if (buffPos >= buffFill)
+		fillBuffer();
+
+	    if (reachedEOF) {
+		return -1;
+	    } else {
+		return buffer[buffPos];
+	    }
+	}
+
+	public int read(char[] cbuf)
+	    throws IOException
+	{
+	    return read(cbuf, 0, cbuf.length);
+	}
+
+	public int read(char[] cbuf, int off, int len) 
+	    throws IOException
+	{
+	    if (buffPos >= buffFill)
+		fillBuffer();
+
+	    if (reachedEOF) {
+		return -1;
+	    } else {
+		int toReturn = Math.min(len, buffFill - buffPos);
+		System.arraycopy(buffer, buffPos, cbuf, off, toReturn);
+		buffPos += toReturn;
+		position += toReturn;
+
+		return toReturn;
+	    }
+	}
+
+	public boolean ready() 
+	    throws IOException
+	{
+	    if (buffPos < buffFill)
+		return true;
+	    return stream.ready();
+	}
+
+	public long skip(long n)
+	    throws IOException
+	{
+	    int skipInBuffer;
+	    if (n < buffer.length) {
+		skipInBuffer = Math.min((int) n, buffFill - buffPos);
+	    } else {
+		skipInBuffer = buffFill - buffPos;
+	    }
+	    position += skipInBuffer;
+	    buffPos = buffFill;
+
+	    if (n > skipInBuffer) {
+		long skippedInStream;
+
+		if (mark >= 0) {
+		    // Yuck, fix this...
+		    char[] dummy = new char[(int) (n - skipInBuffer)];
+		    skippedInStream = read(dummy); 
+		} else {
+		    skippedInStream = stream.skip(n - skipInBuffer);
+		}
+
+		position += skippedInStream;
+		return skippedInStream + skipInBuffer;
+	    } else {
+		return skipInBuffer;
+	    }
+	}
+
+	public boolean markSupported() {
+	    return true;
+	}
+
+	public void mark(int limit)
+	    throws IOException
+	{
+	    if (limit + 1> buffer.length) {
+		char[] newBuffer = new char[limit + 1];
+		System.arraycopy(buffer, buffPos, newBuffer, 0, buffFill - buffPos);
+		buffer = newBuffer;
+		buffFill = buffFill - buffPos;
+		buffPos = 0;
+	    } else if (buffPos + limit > buffer.length) {
+		System.arraycopy(buffer, buffPos, buffer, 0, buffFill - buffPos);
+		buffFill = buffFill - buffPos;
+		buffPos = 0;
+	    }
+
+	    mark = buffPos;
+	    markLimit = limit;
+	}
+
+	public void reset()
+	    throws IOException
+	{
+	    if (mark < 0)
+		throw new IOException("The mark is not currently in scope");
+
+	    position = position - mark + buffPos;
+	    buffPos = mark;
+	}
+
+	public String readLine()
+	    throws IOException 
+	{
+	    StringBuffer sb = new StringBuffer(100);
+	    
+	    int c = read();
+	    while (c >= 0 && c != '\n' && c != '\r') {
+		sb.append((char) c);
+		c = read();
+	    }
+
+	    if (c == '\r') {
+		c = peek();
+		if (c == '\n')
+		    read();
+	    }
+
+	    // System.out.println("Readline: " + sb.toString());
+
+	    String retVal = sb.toString();
+	    return retVal;
+	}
+
+	private void fillBuffer()
+	    throws IOException
+	{
+	    if (mark < 0) {
+		buffFill = stream.read(buffer);
+		if (buffFill == -1) {
+		    buffFill = 0;
+		    reachedEOF = true;
+		} 
+		// System.out.println("Filled buffer: " + buffFill);
+		
+		buffPos = 0;
+	    } else {
+		if (buffPos >= (markLimit - mark)) {
+		    // Mark's gone out of scope -- wheee!
+		    mark = -1;
+		    markLimit = -1;
+		    fillBuffer();
+		    return;
+		}
+
+		System.arraycopy(buffer, mark, buffer, 0, buffFill - mark);
+		buffFill = buffFill - mark;
+		mark = 0;
+		buffPos = buffFill;
+		int newChars = stream.read(buffer, buffFill, buffer.length - buffFill);
+		if (newChars == -1) {
+		    reachedEOF = true;
+		} else {
+		    buffFill = buffFill + newChars;
+		}
+	    }
+	}
+    }
+
     private class HackedBufferedReader extends BufferedReader {
 	private final RandomAccessFile raf;
 	private long marker;
