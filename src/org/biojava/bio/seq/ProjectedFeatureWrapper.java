@@ -35,21 +35,22 @@ import org.biojava.bio.symbol.*;
  * @since 1.1
  */
 
-class ProjectedFeatureWrapper implements Feature {
+public class ProjectedFeatureWrapper implements Feature {
     private final Feature feature;
-    private final FeatureHolder inParent;
+    private final ProjectedFeatureHolder holder;
     private final Location newLocation;
-    private final int translation;
     private FeatureHolder projectedFeatures;
 
     public ProjectedFeatureWrapper(Feature f,
-				   FeatureHolder tParent,
-				   int offset)
+				   ProjectedFeatureHolder holder)
     {
 	this.feature = f;
-	this.inParent = tParent;
-	this.translation = offset;
-	this.newLocation = f.getLocation().translate(offset);
+	this.holder = holder;
+	this.newLocation = holder.getProjectedLocation(f.getLocation());
+    }
+
+    public Feature getViewedFeature() {
+	return feature;
     }
 
     public Feature.Template makeTemplate() {
@@ -65,11 +66,11 @@ class ProjectedFeatureWrapper implements Feature {
     }
 
     public FeatureHolder getParent() {
-	return inParent;
+	return holder.getParent();
     }
 
     public Sequence getSequence() {
-	FeatureHolder fh = inParent;
+	FeatureHolder fh = getParent();
 	while (fh instanceof Feature) {
 	    fh = ((Feature) fh).getParent();
 	}
@@ -99,7 +100,7 @@ class ProjectedFeatureWrapper implements Feature {
     protected FeatureHolder getProjectedFeatures() {
 	if (projectedFeatures == null) {
 	    projectedFeatures = new ProjectedFeatureHolder(feature,
-							   this, translation);
+							   this, holder.getTranslation());
 	}
 	return projectedFeatures;
     }

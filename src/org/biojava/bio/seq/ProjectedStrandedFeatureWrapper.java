@@ -31,14 +31,13 @@ import org.biojava.bio.symbol.*;
  * @since 1.1
  */
 
-class ProjectedStrandedFeatureWrapper extends ProjectedFeatureWrapper 
+public class ProjectedStrandedFeatureWrapper extends ProjectedFeatureWrapper 
                  implements StrandedFeature 
 {
     public ProjectedStrandedFeatureWrapper(StrandedFeature f,
-					   FeatureHolder tParent,
-					   int offset)
+					   ProjectedFeatureHolder holder)
     {
-	super(f, tParent, offset);
+	super(f, holder);
     }
 
     public StrandedFeature.Strand getStrand() {
