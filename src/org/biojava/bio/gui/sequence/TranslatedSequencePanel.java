@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import javax.swing.JComponent;
 
 import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeAdapter;
@@ -109,7 +108,7 @@ public class TranslatedSequencePanel extends JComponent
                        "TRANSLATION", SequenceRenderContext.REPAINT);
 
     // The sequence to be rendered
-    private Sequence sequence;
+    private SymbolList sequence;
     // The number of residues to skip before starting to render
     private int translation;
     // The rendering direction (HORIZONTAL or VERTICAL)
@@ -293,7 +292,7 @@ public class TranslatedSequencePanel extends JComponent
      *
      * @return a <code>Sequence</code>.
      */
-    public Sequence getSequence()
+    public SymbolList getSequence()
     {
         return sequence;
     }
@@ -304,9 +303,9 @@ public class TranslatedSequencePanel extends JComponent
      *
      * @param sequence a <code>Sequence</code>.
      */
-    public void setSequence(Sequence sequence)
+    public void setSequence(SymbolList sequence)
     {
-        Sequence prevSequence = this.sequence;
+        SymbolList prevSequence = this.sequence;
 
         // Remove out listener from the sequence, if necessary
         if (prevSequence != null)
@@ -350,7 +349,11 @@ public class TranslatedSequencePanel extends JComponent
      */
     public FeatureHolder getFeatures()
     {
-        return sequence;
+      if(sequence instanceof FeatureHolder) {
+        return (FeatureHolder) sequence;
+      } else {
+        return FeatureHolder.EMPTY_FEATURE_HOLDER;
+      }
     }
 
     /**
@@ -525,7 +528,7 @@ public class TranslatedSequencePanel extends JComponent
      * <code>setRenderer</code> sets the current
      * <code>SequenceRenderer</code>.
      *
-     * @return a <code>SequenceRenderer</code>.
+     * @param renderer  set the <code>SequenceRenderer</code> used
      */
     public void setRenderer(SequenceRenderer renderer)
         throws ChangeVetoException
@@ -615,7 +618,7 @@ public class TranslatedSequencePanel extends JComponent
      * <code>graphicsToSequence</code> converts a graphical position
      * to a sequence index.
      *
-     * @param graphicsPos a <code>double</code>.
+     * @param point the <code>Point</code> to transform
      *
      * @return an <code>int</code>.
      */

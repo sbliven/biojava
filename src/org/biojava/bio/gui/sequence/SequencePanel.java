@@ -45,7 +45,6 @@ import javax.swing.JComponent;
 import javax.swing.SwingConstants;
 
 import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SymbolList;
@@ -91,7 +90,7 @@ public class SequencePanel
     SequenceRenderContext.LAYOUT
   );
 
-  private Sequence sequence;
+  private SymbolList sequence;
   private RangeLocation range;
   private int direction;
   private double scale;
@@ -312,7 +311,7 @@ public class SequencePanel
    *
    * @param s  the SymboList to render
    */
-  public void setSequence(Sequence s) {
+  public void setSequence(SymbolList s) {
     SymbolList oldSequence = sequence;
     if(oldSequence != null) {
       oldSequence.removeChangeListener(layoutListener);
@@ -326,7 +325,7 @@ public class SequencePanel
     firePropertyChange("sequence", oldSequence, s);
   }
 
-  public Sequence getSequence() {
+  public SymbolList getSequence() {
     return sequence;
   }
 
@@ -340,7 +339,11 @@ public class SequencePanel
   }
 
   public FeatureHolder getFeatures() {
-    return sequence;
+    if(sequence instanceof FeatureHolder) {
+      return (FeatureHolder) sequence;
+    } else {
+      return FeatureHolder.EMPTY_FEATURE_HOLDER;
+    }
   }
 
   public void setRange(RangeLocation range) {
