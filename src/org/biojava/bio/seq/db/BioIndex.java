@@ -8,6 +8,12 @@ import org.biojava.bio.seq.io.*;
 
 // not thread-safe
 public class BioIndex implements IndexStore {
+  private static Comparator STRING_CASE_SENSITIVE_ORDER = new Comparator() {
+    public int compare(Object a, Object b) {
+      return ((String) a).compareTo(b);
+    }
+  };
+  
   private static Comparator COMPARATOR = new Comparator() {
     public int compare(Object a, Object b) {
       String as;
@@ -25,7 +31,7 @@ public class BioIndex implements IndexStore {
         bs = (String) b;
       }
       
-      return String.CASE_INSENSITIVE_ORDER.compare(a, b);
+      return STRING_CASE_SENSITIVE_ORDER.compare(a, b);
     }
     
     public boolean equals(Object o) {
@@ -33,8 +39,13 @@ public class BioIndex implements IndexStore {
     }
   };
   
+  private File indexDirectory;
+  
   private Map fileIDToFile;
+  private Map fileToFileID;
+  
   private RandomAccessFile indxFile;
+  
   private int recordLength;
   private List indxList;
   private Set idSet = new ListAsSet();
@@ -43,6 +54,20 @@ public class BioIndex implements IndexStore {
   private SequenceFormat format;
   private SequenceBuilderFactory sbFactory;
   private SymbolTokenization symbolTokenization;
+  
+  public BioIndex(
+    File indexDirectory
+  ) {
+    this.indexDirectory = indexDirectory;
+  }
+  
+  private File getFileForID(String id) {
+    return (File) fileIDToFile.get(id);
+  }
+  
+  private String getIDForFile(File file) {
+    return (String) fileToFileID.get(file);
+  }
   
   public String getName() {
     return this.name;
@@ -146,7 +171,7 @@ public class BioIndex implements IndexStore {
       while(buffer[newI] != '\t') {
         newI++;
       }
-      File file = (File) fileIDToFile.get(new String(buffer, lastI, newI).trim());
+      File file = getFileForID(new String(buffer, lastI, newI).trim());
 
       while(buffer[newI] != '\t') {
         newI++;
@@ -168,6 +193,59 @@ public class BioIndex implements IndexStore {
       } catch (IOException ioe) {
         throw new BioError(ioe, "Can't read file length");
       }
+    }
+    
+    public boolean add(Object o) {
+      Index indx = (Index) o;
+      
+      String id = indx.getID();
+      String fileID = getIDForFile(indx.getFile());
+      String start = String.valueOf(indx.getStart());
+      String length = String.valueOf(indx.getLength());
+      
+      int i = 0;
+      byte[] str;
+      
+      str = id.getBytes();
+      for(int j = 0; j < str.length; j++) {
+        buffer[i++] = str[j];
+      }
+      
+      buffer[i++] = '\t';
+      
+      str = fileID.getBytes();
+      for(int j = 0; j < str.length; j++) {
+        buffer[i++] = str[j];
+      }
+      
+      buffer[i++] = '\t';
+      
+      str = start.getBytes();
+      for(int j = 0; j < str.length; j++) {
+        buffer[i++] = str[j];
+      }
+      
+      buffer[i++] = '\t';
+      
+      str = length.getBytes();
+      for(int j = 0; j < str.length; j++) {
+        buffer[i++] = str[j];
+      }
+      
+      while(i < buffer.length - 1) {
+        buffer[i++] = ' ';
+      }
+      
+      buffer[i] = '\n';
+      
+      try {
+        indxFile.seek(indxFile.length());
+        indxFile.write(buffer);
+      } catch (IOException ioe) {
+        throw new BioError(ioe, "Failed to write index");
+      }
+      
+      return true;
     }
   }
   

@@ -253,6 +253,8 @@ public class EmblCDROMIndexStore implements IndexStore
 	    // Append current pathPrefix
             index = new SimpleIndex(new File(pathPrefix, (String) seqFiles.get((Integer) enRecord[3])),
                                     ((Long) enRecord[1]).longValue(),
+                                    -1, // fixme - does the embl format give you
+                                        // lengths?
                                     id);
         }
         catch (IOException ioe)

@@ -227,6 +227,7 @@ public class TabIndexStore implements IndexStore, Serializable {
         SimpleIndex index = new SimpleIndex(
           seqFileIndex[fileNum],
           start,
+          -1,
           id
         );
         
