@@ -125,13 +125,15 @@ class FeatureRequestManager {
 	String triggerType = trigger.getType();
 	String triggerCategory = trigger.getCategory();
 	Class triggerClass = trigger.getClass();
+	Object triggerGroup = trigger.getFetchGroup();
 	Map fetchers = new HashMap();
 	   
 	for (Iterator i = openTickets.iterator(); i.hasNext(); ) {
 	    Ticket t = (Ticket) i.next();
 	    if (triggerClass.isInstance(t) &&
 		stringCompare(triggerType, t.getType()) && 
-		stringCompare(triggerCategory, t.getCategory())) 
+		stringCompare(triggerCategory, t.getCategory()) &&
+		triggerGroup == t.getFetchGroup()) 
 	    {
 		URL dataSourceURL = t.getDataSource();
 		Fetcher ffetcher = (Fetcher) fetchers.get(dataSourceURL);
@@ -305,11 +307,12 @@ class FeatureRequestManager {
     }
 
     public abstract class Ticket {
-	private boolean _isFired = false;
-	private Segment segment;
-	private String type;
-	private String category;
-	private URL dataSource;
+	private boolean          _isFired = false;
+	private Segment          segment;
+	private String           type;
+	private String           category;
+	private URL              dataSource;
+	private Object           fetchGroup;
 
 	public Ticket(URL dataSource,
 		      Segment segment,
@@ -353,6 +356,14 @@ class FeatureRequestManager {
 
 	public boolean isFetched() {
 	    return _isFired;
+	}
+
+	public void setFetchGroup(Object fg) {
+	    this.fetchGroup = fg;
+	}
+
+	public Object getFetchGroup() {
+	    return fetchGroup;
 	}
     }
 }

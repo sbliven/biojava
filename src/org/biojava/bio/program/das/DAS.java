@@ -109,7 +109,7 @@ public class DAS extends AbstractChangeable {
   throws BioException, ChangeVetoException {
     try {
       URL dsnURL = new URL(dasURL, "dsn");
-      DAS.startedActivity(dsnURL);
+      DAS.startedActivity(this);
       HttpURLConnection huc = (HttpURLConnection) dsnURL.openConnection();
       huc.connect();
       int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
@@ -165,13 +165,14 @@ public class DAS extends AbstractChangeable {
           }
         }
       }
-      DAS.completedActivity(dsnURL);
     } catch (MalformedURLException me) {
       throw new BioException(me, "Can't build DAS url");
     } catch (IOException ioe) {
       throw new BioException(ioe, "Can't process URL connection");
     } catch (SAXException se) {
       throw new BioException(se, "Can't parse XML document");
+    } finally {
+	DAS.completedActivity(this);
     }
   }
   

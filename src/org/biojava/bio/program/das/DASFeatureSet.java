@@ -51,11 +51,12 @@ class DASFeatureSet implements FeatureHolder {
 
     private Map                            typesMap;
     private FeatureRequestManager.Ticket   typesTicket;
+    private FeatureFilter                  allTypesFilter;   
 
-    private DASSequence refSequence;
-    private URL dataSource;
-    private String sourceID;
-    private String dataSourceString;
+    private DASSequence                    refSequence;
+    private URL                            dataSource;
+    private String                         sourceID;
+    private String                         dataSourceString;
 
     DASFeatureSet(DASSequence seq, URL ds, String id)
         throws BioException
@@ -93,6 +94,27 @@ class DASFeatureSet implements FeatureHolder {
 	return typesMap;
     }
 	
+    private FeatureFilter getAllTypesFilter() {
+	if (allTypesFilter == null) {
+	    allTypesFilter = FeatureFilter.all;
+
+	    if (refSequence.length() > TILE_THRESHOLD_LENGTH) {
+		Map typesMap = getTypesMap();
+		for (Iterator ti = typesMap.keySet().iterator(); ti.hasNext(); ) {
+		    String type = (String) ti.next();
+		    FeatureFilter typeFilter = new FeatureFilter.ByType(type);
+		    if (allTypesFilter == FeatureFilter.all) {
+			allTypesFilter = typeFilter;
+		    } else {
+			allTypesFilter = new FeatureFilter.Or(allTypesFilter, typeFilter);
+		    }
+		}
+	    } 
+	}
+
+	return allTypesFilter;
+    }
+    
 
     private Location[] getTiles() {
 	if (tiles == null) {
@@ -100,7 +122,7 @@ class DASFeatureSet implements FeatureHolder {
 	    int seqLength = refSequence.length();
 	    
 	    if (seqLength > TILE_THRESHOLD_LENGTH) {
-		System.err.print("*** Considering tiling...");
+		// System.err.print("*** Considering tiling...");
 		Map types = getTypesMap();
 		int totalCount = 0;
 		for (Iterator ti = types.values().iterator(); ti.hasNext(); ) {
@@ -113,14 +135,14 @@ class DASFeatureSet implements FeatureHolder {
 		}
 
 		if (doTiling) {
-		    System.err.println("yes (unknown total)");
+		    // System.err.println("yes (unknown total)");
 		} else {
 		    doTiling = (totalCount > TILE_THRESHOLD_COUNT);
-		    if (doTiling) {
-			System.err.println("yes (" + totalCount + ")");
-		    } else {
-			System.err.println("no.");
-		    }
+		    //  if (doTiling) {
+//  			System.err.println("yes (" + totalCount + ")");
+//  		    } else {
+//  			System.err.println("no.");
+//  		    }
 		}
 	    }
 
@@ -145,7 +167,7 @@ class DASFeatureSet implements FeatureHolder {
 	return tiles;
     }
 
-    private void registerFeatureFetcher(int tileNum) {
+    private void registerFeatureFetcher(int tileNum, Object regKey) {
 	Location[] tiles = getTiles();
 
 	if (tileFeatures[tileNum] == null || tileFeatures[tileNum].get() == null) {
@@ -163,22 +185,24 @@ class DASFeatureSet implements FeatureHolder {
 								 listener);
 		}
 	    }
+
+	    featureTickets[tileNum].setFetchGroup(regKey);
 	}
     }
 
-    void registerFeatureFetcher(Location loc) {
+    void registerFeatureFetcher(Location loc, Object regKey) {
 	Location[] tiles = getTiles();
 	for (int t = 0; t < tiles.length; ++t) {
 	    if (LocationTools.overlaps(tiles[t], loc)) {
-		registerFeatureFetcher(t);
+		registerFeatureFetcher(t, regKey);
 	    }
 	}
     }
 
-    void registerFeatureFetcher() {
+    void registerFeatureFetcher(Object regKey) {
 	Location[] tiles = getTiles();
 	for (int t = 0; t < tiles.length; ++t) {
-	    registerFeatureFetcher(t);
+	    registerFeatureFetcher(t, regKey);
 	}
     }
 
@@ -216,6 +240,10 @@ class DASFeatureSet implements FeatureHolder {
 								   dataSource)
 				   )) 
 	{
+	    return FeatureHolder.EMPTY_FEATURE_HOLDER;
+	}
+
+	if (FilterUtils.areDisjoint(ff, getAllTypesFilter())) {
 	    return FeatureHolder.EMPTY_FEATURE_HOLDER;
 	}
 
@@ -412,7 +440,7 @@ class DASFeatureSet implements FeatureHolder {
 		}
 	    }
 
-	    registerFeatureFetcher(tileNum);
+	    registerFeatureFetcher(tileNum, new Object());
 	    try {
 		featureTickets[tileNum].doFetch();
 	    } catch (Exception ex) {

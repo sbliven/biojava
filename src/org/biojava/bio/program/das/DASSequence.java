@@ -291,34 +291,34 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	}
     }
 
-    private int registerLocalFeatureFetchers() {
+    private int registerLocalFeatureFetchers(Object regKey) {
 	// System.err.println(getName() + ": registerLocalFeatureFetchers()");
 
 	for (Iterator i = featureSets.values().iterator(); i.hasNext(); ) {
 	    DASFeatureSet dfs = (DASFeatureSet) i.next();
-	    dfs.registerFeatureFetcher();
+	    dfs.registerFeatureFetcher(regKey);
 	}
 
 	return featureSets.size();
     }
 
-    private int registerLocalFeatureFetchers(Location l) {
+    private int registerLocalFeatureFetchers(Location l, Object regKey) {
 	// System.err.println(getName() + ": registerLocalFeatureFetchers(" + l.toString() + ")");
 
 	for (Iterator i = featureSets.values().iterator(); i.hasNext(); ) {
 	    DASFeatureSet dfs = (DASFeatureSet) i.next();
-	    dfs.registerFeatureFetcher(l);
+	    dfs.registerFeatureFetcher(l, regKey);
 	}
 
 	return featureSets.size();
     }
 
-    int registerFeatureFetchers() throws BioException {
+    int registerFeatureFetchers(Object regKey) throws BioException {
 	// System.err.println(getName() + ": registerFeatureFetchers()");
 
 	for (Iterator i = featureSets.values().iterator(); i.hasNext(); ) {
 	    DASFeatureSet dfs = (DASFeatureSet) i.next();
-	    dfs.registerFeatureFetcher();
+	    dfs.registerFeatureFetcher(regKey);
 	}
 
 	int num = featureSets.size();
@@ -334,19 +334,19 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 
 	    for (Iterator si = sequences.iterator(); si.hasNext(); ) {
 		DASSequence cseq = (DASSequence) si.next();
-		num += cseq.registerFeatureFetchers();
+		num += cseq.registerFeatureFetchers(regKey);
 	    }
 	}
 
 	return num;
     }
 
-    int registerFeatureFetchers(Location l) throws BioException {
+    int registerFeatureFetchers(Location l, Object regKey) throws BioException {
 	// System.err.println(getName() + ": registerFeatureFetchers(" + l.toString() + ")");
 
 	for (Iterator i = featureSets.values().iterator(); i.hasNext(); ) {
 	    DASFeatureSet dfs = (DASFeatureSet) i.next();
-	    dfs.registerFeatureFetcher(l);
+	    dfs.registerFeatureFetcher(l, regKey);
 	}
 
 	int num = featureSets.size();
@@ -378,9 +378,9 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 		DASSequence cseq = (DASSequence) srme.getKey();
 		Location partNeeded = (Location) srme.getValue();
 		if (partNeeded != null) {
-		    num += cseq.registerFeatureFetchers(partNeeded);
+		    num += cseq.registerFeatureFetchers(partNeeded, regKey);
 		} else {
-		    num += cseq.registerFeatureFetchers();
+		    num += cseq.registerFeatureFetchers(regKey);
 		}
 	    }
 	}
@@ -664,7 +664,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 
     public Iterator features() {
       try {
-	registerFeatureFetchers();
+	registerFeatureFetchers(new Object());
 	return features.features();
       } catch (BioException be) {
         throw new BioRuntimeException(be, "Couldn't create features iterator");
@@ -705,17 +705,17 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    if (recurse) {
 		int numComponents = 1;
 		if (ffl != null) {
-		    numComponents = registerFeatureFetchers(ffl);
+		    numComponents = registerFeatureFetchers(ffl, new Object());
 		} else {
-		    numComponents = registerFeatureFetchers();
+		    numComponents = registerFeatureFetchers(new Object());
 		}
 		getParentDB().ensureFeaturesCacheCapacity(numComponents * 3);
 	    } else {
 		if (ffl != null) {
-		    registerLocalFeatureFetchers(ffl);
+		    registerLocalFeatureFetchers(ffl, new Object());
 		} else {
-		    new Exception("Hmmm, this is dangerous...").printStackTrace();
-		    registerLocalFeatureFetchers();
+		    // new Exception("Hmmm, this is dangerous...").printStackTrace();
+		    registerLocalFeatureFetchers(new Object());
 		}
 	    }
 	    
