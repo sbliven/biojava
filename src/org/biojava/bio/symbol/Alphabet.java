@@ -42,7 +42,9 @@ import org.biojava.bio.seq.io.*;
  * </p>
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
+ 
 public interface Alphabet extends Annotatable {
   /** 
    * <p>
@@ -82,8 +84,9 @@ public interface Alphabet extends Annotatable {
   String getName();
 
   /**
-   * Return an ordered List of the alphabets which make up this
-   * compound alphabet.  The returned list should be immutable.
+   * Return an ordered List of the alphabets which make up a
+   * compound alphabet.  For simple alphabets, this will return
+   * a singleton list of itself. The returned list should be immutable.
    *
    * @return a List of alphabets
    */
@@ -108,7 +111,7 @@ public interface Alphabet extends Annotatable {
    *            <code>getAlphabets</code>
    */
   Symbol getSymbol(List rl) 
-  throws IllegalSymbolException;
+    throws IllegalSymbolException;
 
   /**
    * <p>
@@ -148,8 +151,8 @@ public interface Alphabet extends Annotatable {
    *
    * <p>
    * An alphabet contains an ambiguity symbol iff the ambiguity symbol's
-   * getMemberAlphabet() returns an alphabet that is a proper sub-set of this
-   * alphabet. That means that every one of the symbols that could mach the
+   * getMatches() returns an alphabet that is a proper sub-set of this
+   * alphabet. That means that every one of the symbols that could match the
    * ambiguity symbol is also a member of this alphabet.
    * </p>
    *
@@ -178,7 +181,7 @@ public interface Alphabet extends Annotatable {
   
   /**
    * <p>
-   * Get a parser by name.
+   * Get a SymbolTokenization by name.
    * </p>
    *
    * <p>
@@ -187,17 +190,17 @@ public interface Alphabet extends Annotatable {
    * </p>
    *
    * <p>
-   * Every alphabet should have a SymbolParser under the name 'token' that
+   * Every alphabet should have a SymbolTokenzation under the name 'token' that
    * uses the symbol token characters to translate a string into a
-   * SymbolList. Likewise, there should be a SymbolParser under the name
+   * SymbolList. Likewise, there should be a SymbolTokenization under the name
    * 'name' that uses symbol names to identify symbols. Any other names may
-   * also be defined, but the behaviour of that parser is not defined here.
+   * also be defined, but the behaviour of the returned SymbolTokenization is not defined here.
    * </p>
    *
    * @param name  the name of the parser
    * @return  a parser for that name
    * @throws NoSuchElementException if the name is unknown
-   * @throws BioException if for any reason the parser could not be built
+   * @throws BioException if for any reason the tokenization could not be built
    * @since 1.2
    */
     
