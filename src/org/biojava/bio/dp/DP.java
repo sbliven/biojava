@@ -323,7 +323,7 @@ public abstract class DP {
           int[][] transitions,
           ScoreType scoreType
           ) {
-System.out.println("forwardTransitionScores");
+    // System.out.println("forwardTransitionScores");
     int stateCount = states.length;
     double[][] scores = new double[stateCount][];
 
