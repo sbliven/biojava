@@ -186,7 +186,7 @@
   </target>
 
   <!-- Prepares the grammars -->
-  <target name="prepare-grammars" depends="prepare" if="sableCC.supported">
+  <target name="prepare-grammars" depends="prepare" if="sableCC.support">
 
     <!-- Creates directories -->
     <mkdir dir="${build.src.grammars}" />
@@ -373,17 +373,17 @@
   -->
 
   <!-- Compiles the grammars directory -->
-  <target name="compile-grammars" depends="prepare-grammars" if="sableCC.supported">
+  <target name="compile-grammars" depends="prepare-grammars" if="sableCC.support">
     <!-- Turn the grammars into java code -->
     <taskdef name="sablecc" classname="org.sablecc.ant.taskdef.Sablecc" />
-    <sablecc src="${build.src.grammars"
+    <sablecc src="${build.src.grammars}"
              outputdirectory="${build.src.grammars_java}"
              includes="*.grammar" />
 
     <!-- Compile that java code -->
     <javac
       srcdir="${build.src.grammars_java}"
-      destdir="${dest.demos}"
+      destdir="${build.dest.grammars}"
       depend="${javac.depend}"
       deprecation="${javac.deprecation}"
       debug="${javac.debug}">
@@ -473,7 +473,7 @@
   -->
 
   <!-- Creates the grammars package -->
-  <target name="package-grammars" depends="compile-grammars" if="sableCC.supported">
+  <target name="package-grammars" depends="compile-grammars" if="sableCC.support">
     <jar
       jarfile="${jar.grammars}"
       basedir="${build.dest.grammars}"
@@ -541,7 +541,7 @@
   </target>
 
   <!-- Create grammar API documentation -->
-  <target name="javadocs-grammars" depends="compile-grammars" if="sableCC.supported">
+  <target name="javadocs-grammars" depends="compile-grammars" if="sableCC.support">
     <javadoc
       packagenames="${packages}"
       sourcepath="${build.src.grammars}"
