@@ -197,7 +197,6 @@ public abstract class AbstractDistribution implements Distribution {
       if(ambA instanceof FiniteAlphabet) {
         FiniteAlphabet fa = (FiniteAlphabet) ambA;
         double sum = 0.0;
-        double div = 0.0;
         for(Iterator i = fa.iterator(); i.hasNext(); ) {
           Object obj = i.next();
           if(!(obj instanceof AtomicSymbol)) {
@@ -206,15 +205,10 @@ public abstract class AbstractDistribution implements Distribution {
               obj
             );
           }
-          //AtomicSymbol as = (AtomicSymbol) i.next();
           AtomicSymbol as = (AtomicSymbol) obj;
-          double nm = getNullModel().getWeight(as);
-          sum += getWeightImpl(as) * nm;
-          div += nm;
+          sum += getWeightImpl(as);
         }
-        return (sum == 0.0)
-           ? 0.0
-           : sum / div;
+        return sum;
       } else {
         throw new IllegalSymbolException(
            "Can't find weight for infinite set of symbols matched by " +
