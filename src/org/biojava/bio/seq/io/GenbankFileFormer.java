@@ -171,18 +171,20 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	Arrays.fill(lineLens, 60);
 	lineLens[lineCount - 1] = partLine;
 
+	// Prepare line 80 characters wide, sequence is subset of this
+	char [] emptyLine = new char [80];
+
 	for (int i = 0; i < lineLens.length; i++)
 	{
-	    // Empty the primary buffer
+	    // Empty the sequence buffer
 	    sq.delete(0, sq.length());
-	    // Empty the secondary buffer
+	    // Empty the utility buffer
 	    ub.delete(0, ub.length());
 
 	    // How long is this chunk?
 	    int len = lineLens[i];
 
-	    // Prepare line 80 characters wide
-	    char [] emptyLine = new char [80];
+	    // Prep the whitespace
 	    Arrays.fill(emptyLine, ' ');
 	    sq.append(emptyLine);
 
