@@ -30,7 +30,7 @@ public class SymbolListAdapter implements SymbolList {
     } else {
       throw new IllegalAlphabetException("Could not find alphabet for " + type);
     }
-    SymbolParser parser = alpha.getParser("symbol");
+    SymbolParser parser = alpha.getParser("token");
 
     try {
       resList = parser.parse(anonymousSeq.get_seq());

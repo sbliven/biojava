@@ -47,7 +47,7 @@ public class GeneticCode {
         Collections.nCopies(3, DNA)
       );
       FiniteAlphabet PROT = ProteinTools.getTAlphabet();
-      SymbolParser dp = DNA.getParser("symbol");
+      SymbolParser dp = DNA.getParser("token");
       SymbolParser aap = PROT.getParser("name");
       SimpleTranslationTable univ = new SimpleTranslationTable(
         (FiniteAlphabet) codon,

@@ -46,7 +46,7 @@ public class DNATools {
     try {
       alpha = (FiniteAlphabet) AlphabetManager.instance().alphabetForName("DNA");
       ambiguity = (FiniteAlphabet) AlphabetManager.instance().alphabetForName("DNA-AMBIGUITY");
-      SymbolList res = alpha.getParser("symbol").parse("agct");
+      SymbolList res = alpha.getParser("token").parse("agct");
       a = res.symbolAt(1);
       g = res.symbolAt(2);
       c = res.symbolAt(3);
@@ -54,7 +54,7 @@ public class DNATools {
       
       symbolToMatches = new HashMap();
       symbolToComplement = new HashMap();
-      SymbolParser ambParser = ambiguity.getParser("symbol");
+      SymbolParser ambParser = ambiguity.getParser("token");
       // for 1.3
       /*
       symbolToMatches.put(a, new HashableList(alpha,
@@ -315,7 +315,7 @@ public class DNATools {
    * @return a SymbolList that is the complement
    * @throws IllegalAlphabetException if list is not a complementable alphabet
    */
-  static SymbolList complement(SymbolList list)
+  public static SymbolList complement(SymbolList list)
   throws IllegalAlphabetException {
     return new ComplementSymbolList(list);
   }

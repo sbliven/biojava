@@ -6,9 +6,10 @@
 import java.io.*;
 import org.omg.CORBA.*;
  
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.tools.*;
 import org.biojava.bridge.Biocorba.Seqcore.*;
 import org.Biocorba.Seqcore.*;
 
@@ -24,7 +25,7 @@ public class CorbaDBServer {
     if(alpha == null) {
       throw new NullPointerException("Alphabet " + args[1] + " not known");
     }    
-    ResidueParser rParser = alpha.getParser("symbol");
+    SymbolParser rParser = alpha.getParser("token");
     SequenceFactory sFact = new SimpleSequenceFactory();
     
     // load it
@@ -37,7 +38,7 @@ public class CorbaDBServer {
     while(seqI.hasNext()) {
       try {
         seqDB.addSequence(seqI.nextSequence());
-      } catch (SeqException se) {
+      } catch (BioException se) {
         se.printStackTrace();
       }
     }

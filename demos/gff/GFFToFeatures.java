@@ -22,9 +22,10 @@
 import java.io.*;
 import java.util.*;
 
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.tools.*;
 import org.biojava.bio.program.gff.*;
 
 /**
@@ -86,7 +87,7 @@ public class GFFToFeatures {
     HashSequenceDB seqDB = new HashSequenceDB(HashSequenceDB.byName);
 
     Alphabet alpha = AlphabetManager.instance().alphabetForName("DNA");
-    ResidueParser rParser = alpha.getParser("symbol");
+    SymbolParser rParser = alpha.getParser("token");
     SequenceFactory sFact = new SimpleSequenceFactory();
     SequenceFormat sFormat = new FastaFormat();
     InputStream seqDBI = new FileInputStream(seqFile);
@@ -95,7 +96,7 @@ public class GFFToFeatures {
     while(seqI.hasNext()) {
       try {
         seqDB.addSequence(seqI.nextSequence());
-      } catch (SeqException se) {
+      } catch (BioException se) {
         se.printStackTrace();
       }
     }

@@ -1,9 +1,10 @@
 import java.io.*;
 import org.omg.CORBA.*;
 
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.tools.*;
 import org.biojava.bridge.Biocorba.Seqcore.*;
 import org.Biocorba.Seqcore.*;
 

@@ -324,20 +324,20 @@ public final class AlphabetManager {
           nameToSymbol.put(child.getAttribute("name"),
                             symbolFromXML(child));
         } else if(name.equals("alphabet")) {
-          Alphabet alpha = alphabetFromXML(child, nameToSymbol);
+          FiniteAlphabet alpha = alphabetFromXML(child, nameToSymbol);
           registerAlphabet(alpha.getName(), alpha);
         }
       }
 
       gapSymbol = (Symbol) nameToSymbol.get("gap");
     } catch (SAXParseException spe) {
-      System.out.println(spe.toString() +
+      throw new BioError(spe,
+                         spe.toString() +
                          spe.getLineNumber() + ":" +
-                         spe.getColumnNumber());
-      System.exit(1);
-    } catch (Exception e) {
-      e.printStackTrace();
-      System.exit(1);
+                         spe.getColumnNumber()
+      );
+    } catch (Throwable t) {
+      throw new BioError(t, "Unable to intialize AlphabetManager");
     }
   }
 
@@ -378,8 +378,10 @@ public final class AlphabetManager {
    * @param alph  the alphabet XML Element
    * @param nameToRes Map from symbol name to Symbol object
    * @return a new Alphabet
+   * @throws BioException if anything goes wrong
    */
-  protected Alphabet alphabetFromXML(Element alph, Map nameToRes) {
+  protected FiniteAlphabet alphabetFromXML(Element alph, Map nameToRes)
+  throws BioException {
     SimpleAlphabet alphabet = new WellKnownAlphabet();
 
     NodeList children = alph.getChildNodes();
@@ -400,7 +402,7 @@ public final class AlphabetManager {
                                 parserFromXML(el, alphabet, nameToRes));
         }
       } catch (Exception e) {
-        System.err.println(e.toString() + el.toString());
+        throw new BioException("Couldn't parse " + alph);
       }
     }
 

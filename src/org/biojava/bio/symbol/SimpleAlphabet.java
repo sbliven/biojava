@@ -84,17 +84,16 @@ public class SimpleAlphabet extends AbstractAlphabet {
   }
 
   public void addSymbol(Symbol r)
-         throws IllegalSymbolException {
-    if(r == null)
+  throws IllegalSymbolException {
+    if(r == null) {
       throw new IllegalSymbolException("You can not add null as a symbol");
+    }
     symbols.add(r);
   }
   
   public void removeSymbol(Symbol r)
   throws IllegalSymbolException {
-    if(r == null) {
-      throw new IllegalSymbolException("You can not add null as a symbol");
-    }
+    validate(r);
     symbols.remove(r);
   }
 

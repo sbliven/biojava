@@ -1,20 +1,20 @@
 <?xml version="1.0"?>
 
 <!DOCTYPE alphabetManager [
-  <!ELEMENT alphabetManager (residue|alphabet)*>
+  <!ELEMENT alphabetManager (symbol|alphabet)*>
 
-  <!ELEMENT residue (short, long, description?)>
-  <!ATTLIST residue
+  <!ELEMENT symbol (short, long, description?)>
+  <!ATTLIST symbol
     name	ID	#IMPLIED>
 
   <!ELEMENT short (#PCDATA)>
   <!ELEMENT long (#PCDATA)>
   <!ELEMENT description (#PCDATA)>
 
-  <!ELEMENT alphabet (name, description, (residue|residueref)*, tokenizer*)>
+  <!ELEMENT alphabet (name, description, (symbol|symbolref)*, tokenizer*)>
   <!ELEMENT name (#PCDATA)>
-  <!ELEMENT residueref EMPTY>
-  <!ATTLIST residueref
+  <!ELEMENT symbolref EMPTY>
+  <!ATTLIST symbolref
     name	IDREF	#REQUIRED>
 
   <!ELEMENT tokenizer (map)*>
@@ -25,252 +25,252 @@
   <!ELEMENT map EMPTY>
   <!ATTLIST map
     token	CDATA #REQUIRED
-    residue	IDREF #REQUIRED>
+    symbol	IDREF #REQUIRED>
 ]>
 
 <alphabetManager>
-  <residue name="adenine">
+  <symbol name="adenine">
     <short>a</short>
     <long>adenine</long>
     <description>pairs with T in DNA, and U in RNA</description>
-  </residue>
-  <residue name="guanine">
+  </symbol>
+  <symbol name="guanine">
     <short>g</short>
     <long>guanine</long>
     <description>pairs with C</description>
-  </residue>
-  <residue name="cytosine">
+  </symbol>
+  <symbol name="cytosine">
     <short>c</short>
     <long>cytosine</long>
     <description>pairs with G</description>
-  </residue>
-  <residue name="thymine">
+  </symbol>
+  <symbol name="thymine">
     <short>t</short>
     <long>thymine</long>
     <description>pairs with A</description>
-  </residue>
-  <residue name="uracil">
+  </symbol>
+  <symbol name="uracil">
     <short>u</short>
     <long>uracyl</long>
     <description>pairs with A, replacing T in RNA</description>
-  </residue>
-  <residue name="r">
+  </symbol>
+  <symbol name="r">
     <short>r</short>
     <long>ag</long>
     <description>A or G</description>
-  </residue>
-  <residue name="y">
+  </symbol>
+  <symbol name="y">
     <short>y</short>
     <long>ct</long>
     <description>C or T</description>
-  </residue>
-  <residue name="m">
+  </symbol>
+  <symbol name="m">
     <short>m</short>
     <long>ac</long>
     <description>A or C</description>
-  </residue>
-  <residue name="k">
+  </symbol>
+  <symbol name="k">
     <short>k</short>
     <long>GT</long>
     <description>G or T</description>
-  </residue>
-  <residue name="s">
+  </symbol>
+  <symbol name="s">
     <short>s</short>
     <long>gc</long>
     <description>G or C</description>
-  </residue>
-  <residue name="w">
+  </symbol>
+  <symbol name="w">
     <short>w</short>
     <long>at</long>
     <description>A or T</description>
-  </residue>
-  <residue name="h">
+  </symbol>
+  <symbol name="h">
     <short>h</short>
     <long>act</long>
     <description>Not G</description>
-  </residue>
-  <residue name="b">
+  </symbol>
+  <symbol name="b">
     <short>b</short>
     <long>gtc</long>
     <description>Not A</description>
-  </residue>
-  <residue name="v">
+  </symbol>
+  <symbol name="v">
     <short>v</short>
     <long>gac</long>
     <description>Not T</description>
-  </residue>
-  <residue name="d">
+  </symbol>
+  <symbol name="d">
     <short>d</short>
     <long>gat</long>
     <description>Not C</description>
-  </residue>
-  <residue name="n">
+  </symbol>
+  <symbol name="n">
     <short>n</short>
     <long>agct</long>
     <description>A, G, C or T</description>
-  </residue>
-  <residue name="gap">
+  </symbol>
+  <symbol name="gap">
     <short>-</short>
     <long>gap</long>
     <description>There is a gap here</description>
-  </residue>
-  <residue name="X">
+  </symbol>
+  <symbol name="X">
     <short>X</short>
     <long>UNK</long>
     <description>Unknown amino-acid</description>
-  </residue>
-  <residue name="termination">
+  </symbol>
+  <symbol name="termination">
     <short>*</short>
     <long>TER</long>
     <description>Termination signal during translation</description>
-  </residue>
+  </symbol>
   
   <alphabet>
     <name>DNA</name>
     <description>Deoxy-Ribose Nucleic Acid. The stuff of life.</description>
-    <residueref name="adenine"/>
-    <residueref name="guanine"/>
-    <residueref name="cytosine"/>
-    <residueref name="thymine"/>
+    <symbolref name="adenine"/>
+    <symbolref name="guanine"/>
+    <symbolref name="cytosine"/>
+    <symbolref name="thymine"/>
   </alphabet>
   <alphabet>
     <name>DNA-N</name>
     <description>Deoxy-Ribose Nucleic Acid with N character.</description>
-    <residueref name="adenine"/>
-    <residueref name="guanine"/>
-    <residueref name="cytosine"/>
-    <residueref name="thymine"/>
-    <residueref name="n"/>
+    <symbolref name="adenine"/>
+    <symbolref name="guanine"/>
+    <symbolref name="cytosine"/>
+    <symbolref name="thymine"/>
+    <symbolref name="n"/>
   </alphabet>
   <alphabet>
     <name>DNA-AMBIGUITY</name>
     <description>Deoxy-Ribose Nucleic Acid with ambiguitiy codes.</description>
-    <residueref name="adenine"/>
-    <residueref name="guanine"/>
-    <residueref name="cytosine"/>
-    <residueref name="thymine"/>
-    <residueref name="r"/>
-    <residueref name="y"/>
-    <residueref name="m"/>
-    <residueref name="k"/>
-    <residueref name="s"/>
-    <residueref name="w"/>
-    <residueref name="h"/>
-    <residueref name="b"/>
-    <residueref name="v"/>
-    <residueref name="d"/>
-    <residueref name="n"/>
-    <residueref name="gap"/>
+    <symbolref name="adenine"/>
+    <symbolref name="guanine"/>
+    <symbolref name="cytosine"/>
+    <symbolref name="thymine"/>
+    <symbolref name="r"/>
+    <symbolref name="y"/>
+    <symbolref name="m"/>
+    <symbolref name="k"/>
+    <symbolref name="s"/>
+    <symbolref name="w"/>
+    <symbolref name="h"/>
+    <symbolref name="b"/>
+    <symbolref name="v"/>
+    <symbolref name="d"/>
+    <symbolref name="n"/>
+    <symbolref name="gap"/>
   </alphabet>
   <alphabet>
     <name>RNA</name>
     <description>Ribose Nucleic Acid. Intermediate between genomic DNA and protein.</description>
-    <residueref name="adenine"/>
-    <residueref name="guanine"/>
-    <residueref name="cytosine"/>
-    <residueref name="uracil"/>
+    <symbolref name="adenine"/>
+    <symbolref name="guanine"/>
+    <symbolref name="cytosine"/>
+    <symbolref name="uracil"/>
   </alphabet>
   <alphabet>
     <name>PROTEIN</name>
     <description>Unmodified Amino-acids commonly found in proteins</description>
-    <residue>
+    <symbol>
       <short>A</short>
       <long>ALA</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>R</short>
       <long>ARG</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>N</short>
       <long>ASN</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>D</short>
       <long>ASP</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>C</short>
       <long>CYS</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>Q</short>
       <long>GLN</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>E</short>
       <long>GLU</long>
-    </residue>
+    </symbol>
 
-    <residue>
+    <symbol>
       <short>G</short>
       <long>GLY</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>H</short>
       <long>HIS</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>I</short>
       <long>ILE</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>L</short>
       <long>LEU</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>K</short>
       <long>LYS</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>M</short>
       <long>MET</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>F</short>
       <long>PHE</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>P</short>
       <long>PRO</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>S</short>
       <long>SER</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>T</short>
       <long>THR</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>W</short>
       <long>TRP</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>Y</short>
       <long>TYR</long>
-    </residue>
+    </symbol>
   
-    <residue>
+    <symbol>
       <short>V</short>
       <long>VAL</long>
-    </residue>
+    </symbol>
   </alphabet>
 </alphabetManager>
