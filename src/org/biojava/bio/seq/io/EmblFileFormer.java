@@ -36,6 +36,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.taxa.EbiFormat;
 import org.biojava.bio.taxa.Taxon;
+import org.biojava.bio.BioException;
 
 /**
  * <p><code>EmblFileFormer</code> performs the detailed formatting of
@@ -80,7 +81,7 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
     // 3 spaces
     private static String SQ_LEADER = "   ";
 
-    // 80 spaces 
+    // 80 spaces
     private static String EMPTY_LINE =
         "                                        " +
         "                                        ";
@@ -210,7 +211,10 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
                 System.arraycopy(syms, start + (i * 60), sa, 0, len);
 
                 sb = new StringBuffer();
-                String blocks = (formatTokenBlock(sb, sa, 10, dnaTokenization)).toString();
+
+                String blocks = (formatTokenBlock(sb, sa, 10,
+                         alpha.getTokenization("token"))).toString();
+
                 sq.replace(5, blocks.length() + 5, blocks);
 
                 // Calculate the running residue count and add to the line
@@ -219,11 +223,11 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
 
                 // Print formatted sequence line
                 stream.println(sq);
-            }           
+            }
         }
-        catch (IllegalSymbolException ex)
+        catch (BioException ex)
         {
-            throw new IllegalAlphabetException(ex, "DNA not tokenizing");
+            throw new IllegalAlphabetException(ex, "Alphabet not tokenizing");
         }
     }
 
