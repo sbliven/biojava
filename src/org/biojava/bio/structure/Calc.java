@@ -27,6 +27,8 @@ package org.biojava.bio.structure ;
 
 import org.biojava.bio.structure.StructureException ;
 
+
+
 /** utility operations on Atoms, AminoAcids, etc. 
  * <p>
  * Currently the
@@ -34,10 +36,7 @@ import org.biojava.bio.structure.StructureException ;
  * (double[3]). It would be more powerful to use Point3D from
  * javax.vecmath.  but unfortunately this is not a part of standard
  * java installations, since it comes with java3d . So to keep things
- * simple at the moment biojava does not depend on java3d.  If the
- * structure part of biojava becomes more powerful it could be moved
- * out of the core - biojava and the dependency on java3d could be
- * introduced. 
+ * simple at the moment biojava does not depend on java3d.  
  * @author Andreas Prlic
  * @since 1.4
  * @version %I% %G%
@@ -330,7 +329,10 @@ public class Calc {
 	}
 	AtomIterator iter = new AtomIterator(structure) ;
 	while (iter.hasNext()) {
-	    Atom atom = (Atom) iter.next() ;
+	    Atom atom = null ;
+	    
+	    atom = (Atom) iter.next() ;
+	  
 	    double x = atom.getX();
 	    double y = atom.getY() ;
 	    double z = atom.getZ();
@@ -356,8 +358,18 @@ public class Calc {
 
 	AtomIterator iter = new AtomIterator(structure) ;
 	while (iter.hasNext() ) {
-	    Atom atom = (Atom) iter.next()  ;	    
-	    atom = add(atom,a);	   
+	    Atom atom = null ;
+	   
+	    atom = (Atom) iter.next()  ;	    
+	    //System.out.print("atom before: " + atom);
+	    Atom natom = add(atom,a);	   
+	    double x = natom.getX();
+	    double y = natom.getY() ;
+	    double z = natom.getZ();
+	    atom.setX(x);
+	    atom.setY(y);
+	    atom.setZ(z);
+	    //	    System.out.println(" after : " + atom);
 	}
     }
     
