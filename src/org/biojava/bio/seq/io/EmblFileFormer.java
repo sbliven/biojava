@@ -239,11 +239,15 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
         {
 	    ub.setLength(0);
             ub.append("AC   ");
-            for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
-            {
-                ub.append((String) ai.next());
-                ub.append(";");
-            }
+	    if (value instanceof List) {
+		for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
+		    {
+			ub.append((String) ai.next());
+			ub.append(";");
+		    }
+	    } else {
+		ub.append(value.toString());
+	    }
             stream.println(ub);
         }
     }
