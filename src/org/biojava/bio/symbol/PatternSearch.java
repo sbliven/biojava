@@ -233,10 +233,10 @@ public class PatternSearch
      * @param seq Sequence to find match in.
      * @param ft Feature.Template to be used in creating the Feature.
      */
-    public static void match(Pattern p, Sequence seq, Feature.Template ft)
+    public static boolean match(Pattern p, Sequence seq, Feature.Template ft)
         throws BioException, IllegalAlphabetException, ChangeVetoException
     {
-        match(p, seq, ft, new RangeLocation(1, seq.length()));
+        return match(p, seq, ft, new RangeLocation(1, seq.length()));
     }
 
     /**
@@ -249,9 +249,11 @@ public class PatternSearch
      *              Note that patterns that start within the range but extend
      *              beyond it will be discarded.
      */
-    public static void match(Pattern p, Sequence seq, Feature.Template ft, RangeLocation range)
+    public static boolean match(Pattern p, Sequence seq, Feature.Template ft, RangeLocation range)
         throws BioException, IllegalAlphabetException, ChangeVetoException, IndexOutOfBoundsException
     {
+        boolean hasHit = false;
+
         // check that the alphabets are compatible
         if (p.getAlphabet() != seq.getAlphabet())
             throw new IllegalAlphabetException("alphabets are not compatible.");
@@ -273,9 +275,12 @@ public class PatternSearch
                 if (LocationTools.contains(range, loc)) {
                     ft.location = loc;
                     seq.createFeature(ft);
+                    hasHit = true;
                 }
             }
         }
+
+        return hasHit;
     }
 
     /**

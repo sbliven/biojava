@@ -445,7 +445,7 @@ public final class DNATools {
    * @param range Range to be searched.  If null, whole sequence will be searched.  Features that merely overlap
    *            the range are rejected.
    */
-  public static void match(PatternSearch.Pattern pattern, Sequence seq, 
+  public static boolean match(PatternSearch.Pattern pattern, Sequence seq, 
     StrandedFeature.Template ft, RangeLocation range, boolean bothStrands)
     throws IllegalAlphabetException, ChangeVetoException, BioException
   {
@@ -466,22 +466,28 @@ public final class DNATools {
     ft.annotation.setProperty("patternName", pattern.getLabel());
     ft.strand = StrandedFeature.POSITIVE;
 
+    boolean hasHit = false;
+
     if (range == null) {
       // whole sequence search
-      PatternSearch.match(pattern, seq, ft);
+      hasHit = PatternSearch.match(pattern, seq, ft);
 
       if (bothStrands) {
-        PatternSearch.match(pattern, SequenceTools.reverseComplement(seq), ft);
+        hasHit = hasHit || PatternSearch.match(pattern, SequenceTools.reverseComplement(seq), ft);
       }
+
+      return hasHit;
     }
     else {
       // partial sequence search
-      PatternSearch.match(pattern, seq, ft, range);
+      hasHit = PatternSearch.match(pattern, seq, ft, range);
 
       if (bothStrands) {
-        PatternSearch.match(pattern, SequenceTools.reverseComplement(seq), ft, 
+        hasHit = hasHit || PatternSearch.match(pattern, SequenceTools.reverseComplement(seq), ft, 
           new RangeLocation(seq.length() + 1 - range.getMax(), seq.length() + 1 - range.getMin()));
       }
+
+      return hasHit;
     }
   }
 
@@ -493,14 +499,14 @@ public final class DNATools {
    * @param range Range to be searched.  If null, whole sequence will be searched.  Features that merely overlap
    *            the range are rejected.
    */
-  public static void match(String patternAsString, Sequence seq, boolean bothStrands, RangeLocation range)
+  public boolean match(String patternAsString, Sequence seq, boolean bothStrands, RangeLocation range)
     throws IllegalAlphabetException, ChangeVetoException, ParseException, BioException
   {
     // create a Pattern
     PatternSearch.Pattern pattern = PatternMaker.parsePattern(patternAsString, getDNA());
     pattern.setLabel(patternAsString);
 
-    match(pattern, seq, null, null, bothStrands);
+    return match(pattern, seq, null, null, bothStrands);
   }
 }
 
