@@ -22,6 +22,7 @@
 package org.biojava.bio.symbol;
 
 import java.io.Serializable;
+import org.biojava.utils.*;
 
 /**
  * <p>
@@ -49,5 +50,21 @@ public final class Edit implements Serializable {
     this.pos = pos;
     this.length = length;
     this.replacement = replacement;
+  }
+
+  /**
+   * Convenience construtor for making single residue changes
+   *
+   * @param pos the position of the change
+   * @param alpha the <code>Alphabet</code> of the replacement <code>Symbol</code>
+   * @param replacement the replacement <code>Symbol</code>
+   * @throws IllegalSymbolException if the replacement <code>Symbol</code> is not contained in <code>alpha</code>
+   */
+  public Edit(int pos, Alphabet alpha, Symbol replacement) throws IllegalSymbolException{
+    this.pos = pos;
+    this.length = 1;
+    SymbolList sl = new SimpleSymbolList(
+        alpha, new SingletonList(replacement));
+    this.replacement = sl;
   }
 }
