@@ -107,7 +107,7 @@ class TypesFetcher implements Fetcher {
 		}
 	    }
 	    String segments = sb.toString();
-	    System.err.println("*** Types-Fetching: " + segments);
+	    // System.err.println("*** Types-Fetching: " + segments);
 	    
 	    String encodingRequest = "";
 	    

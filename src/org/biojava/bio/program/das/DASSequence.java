@@ -664,7 +664,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 
     public Iterator features() {
       try {
-	registerFeatureFetchers(new Object());
+	registerFeatureFetchers(null);
 	return features.features();
       } catch (BioException be) {
         throw new BioRuntimeException(be, "Couldn't create features iterator");
@@ -705,17 +705,17 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    if (recurse) {
 		int numComponents = 1;
 		if (ffl != null) {
-		    numComponents = registerFeatureFetchers(ffl, new Object());
+		    numComponents = registerFeatureFetchers(ffl, ff);
 		} else {
-		    numComponents = registerFeatureFetchers(new Object());
+		    numComponents = registerFeatureFetchers(ff);
 		}
 		getParentDB().ensureFeaturesCacheCapacity(numComponents * 3);
 	    } else {
 		if (ffl != null) {
-		    registerLocalFeatureFetchers(ffl, new Object());
+		    registerLocalFeatureFetchers(ffl, ff);
 		} else {
 		    // new Exception("Hmmm, this is dangerous...").printStackTrace();
-		    registerLocalFeatureFetchers(new Object());
+		    registerLocalFeatureFetchers(ff);
 		}
 	    }
 	    

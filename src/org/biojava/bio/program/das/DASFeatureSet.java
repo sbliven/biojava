@@ -186,7 +186,9 @@ class DASFeatureSet implements FeatureHolder {
 		}
 	    }
 
-	    featureTickets[tileNum].setFetchGroup(regKey);
+	    if (regKey != null) {
+		featureTickets[tileNum].setFetchGroup(regKey);
+	    }
 	}
     }
 
@@ -440,7 +442,7 @@ class DASFeatureSet implements FeatureHolder {
 		}
 	    }
 
-	    registerFeatureFetcher(tileNum, new Object());
+	    registerFeatureFetcher(tileNum, null);
 	    try {
 		featureTickets[tileNum].doFetch();
 	    } catch (Exception ex) {

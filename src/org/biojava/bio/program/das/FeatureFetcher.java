@@ -141,6 +141,8 @@ class FeatureFetcher implements Fetcher {
 
 	    String queryString = encodingRequest + categoryRequest + typeRequest + segments;
 
+	    // System.err.println("Fetching: " + queryString);
+
 	    // fURL = new URL(dataSource, "features?" + encodingRequest + categoryRequest + typeRequest + segments);
 	    // huc = (HttpURLConnection) fURL.openConnection();
 	    // huc.setRequestProperty("Accept-Encoding", "gzip");
@@ -175,7 +177,7 @@ class FeatureFetcher implements Fetcher {
                 if (contentEncoding.indexOf("gzip") != -1) {
 		    // we have gzip encoding
 		    inStream = new GZIPInputStream(inStream);
-		    System.out.println("gzip encoding!");
+		    // System.out.println("gzip encoding!");
                 }
             }
 
