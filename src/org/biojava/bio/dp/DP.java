@@ -224,6 +224,11 @@ public abstract class DP {
   private double [][] forwardTransitionScores;
   private int [][] backwardTransitions;
   private double [][] backwardTransitionScores;
+  private int dotStatesIndex;
+
+    public int getDotStatesIndex() {
+	return dotStatesIndex;
+    }
 
   public FlatModel getModel() {
     return model;
@@ -260,6 +265,15 @@ public abstract class DP {
     this.backwardTransitions = backwardTransitions(model, states);
     this.backwardTransitionScores = backwardTransitionScores(model, states,
       backwardTransitions);
+
+    // Find first dot state
+
+    int i;
+    for (i = 0; i < states.length; ++i) {
+	if (! (states[i] instanceof EmissionState))
+	    break;
+    }
+    dotStatesIndex = i;
   }
 
   public abstract double forward(ResidueList [] resList)
