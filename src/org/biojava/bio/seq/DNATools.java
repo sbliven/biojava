@@ -30,6 +30,9 @@ import java.util.Set;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.SimpleAnnotation;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.dist.PairDistribution;
+import org.biojava.bio.dist.SimpleDistribution;
 import org.biojava.bio.seq.impl.SimpleSequenceFactory;
 import org.biojava.bio.seq.impl.SimpleGappedSequence;
 import org.biojava.bio.seq.io.SymbolTokenization;
@@ -44,6 +47,7 @@ import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.SymbolListViews;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Useful functionality for processing DNA sequences.
@@ -51,6 +55,7 @@ import org.biojava.bio.symbol.SymbolListViews;
  * @author Matthew Pocock
  * @author Keith James (docs)
  * @author Mark Schreiber
+ * @author David Huen
  */
 public final class DNATools {
   private static final ReversibleTranslationTable complementTable;
@@ -116,6 +121,14 @@ public final class DNATools {
    */
   public static FiniteAlphabet getDNA() {
     return dna;
+  }
+
+  /**
+   * Gets the (DNA x DNA) Alphabet
+   * @return a flyweight version of the (DNA x DNA) alphabet
+   */
+  public static FiniteAlphabet getDNAxDNA(){
+    return (FiniteAlphabet)AlphabetManager.generateCrossProductAlphaFromName("(DNA x DNA)");
   }
 
   /**
@@ -377,5 +390,51 @@ public final class DNATools {
             return DNATools.getDNA();
           }
   }
+
+  /**
+   * return a SimpleDistribution of specified GC content.
+   * @param fractionGC (G+C) content as a fraction.
+   */
+  public static Distribution getDNADistribution(double fractionGC)
+  {
+    try {
+        Distribution dist = new SimpleDistribution(DNATools.getDNA());
+        double gc = 0.5 * fractionGC;
+        double at = 0.5 * (1.0 - fractionGC);
+        dist.setWeight(DNATools.a(), at);
+        dist.setWeight(DNATools.t(), at);
+        dist.setWeight(DNATools.c(), gc);
+        dist.setWeight(DNATools.g(), gc);
+
+        return dist;
+    }
+	// these exceptions are just plain impossible!!!
+    catch (IllegalSymbolException ise) { return null; }
+    catch (ChangeVetoException cve) { return null; }
+  }
+
+  /**
+   * return a (DNA x DNA) cross-product Distribution with specified
+   * DNA contents in each component Alphabet.
+   * @param fractionGC0 (G+C) content of first sequence as a fraction.
+   * @param fractionGC1 (G+C) content of second sequence as a fraction.
+   */
+  public static Distribution getDNAxDNADistribution(
+    double fractionGC0, 
+    double fractionGC1
+    )
+  {
+    return new PairDistribution(getDNADistribution(fractionGC0), getDNADistribution(fractionGC1));
+  }
+
+
+
+
+
 }
+
+
+
+
+
 
