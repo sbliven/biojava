@@ -358,12 +358,13 @@ Changeable {
     if(!isActive()) {
       return;
     }
-    
     Graphics2D g2 = (Graphics2D) g;
     Rectangle2D currentClip = g2.getClip().getBounds2D();
     
-    double minAcross = sequenceToGraphics(range.getMin());
-    double maxAcross = sequenceToGraphics(range.getMax());
+    double minAcross = sequenceToGraphics(range.getMin()) -
+                       renderer.getMinimumLeader(this, range);
+    double maxAcross = sequenceToGraphics(range.getMax()) +
+                       renderer.getMinimumTrailer(this, range);
     double alongDim = maxAcross - minAcross;
     double depth = renderer.getDepth(this, range);
     Rectangle2D.Double clip = new Rectangle2D.Double();
@@ -372,13 +373,13 @@ Changeable {
       clip.y = 0.0;
       clip.width = alongDim;
       clip.height = depth;
-      g2.translate(leadingBorder.getSize(), 0.0);
+      g2.translate(leadingBorder.getSize() - minAcross, 0.0);
     } else {
       clip.x = 0.0;
       clip.y = minAcross;
       clip.width = depth;
       clip.height = alongDim;
-      g2.translate(0.0, leadingBorder.getSize());
+      g2.translate(0.0, leadingBorder.getSize() - minAcross);
     }
 
     Shape oldClip = g2.getClip();
@@ -453,13 +454,22 @@ Changeable {
     } else {
       double minAcross = sequenceToGraphics(range.getMin());
       double maxAcross = sequenceToGraphics(range.getMax());
-      double alongDim = maxAcross - minAcross;
+      double lb = renderer.getMinimumLeader(this, range);
+      double tb = renderer.getMinimumTrailer(this, range);
+      double alongDim =
+        (maxAcross - minAcross) +
+        lb + tb;
       double depth = renderer.getDepth(this, range);
-      d = new Dimension((int) Math.ceil(alongDim), (int) Math.ceil(depth));
+      if(direction == HORIZONTAL) {
+        d = new Dimension((int) Math.ceil(alongDim), (int) Math.ceil(depth));
+      } else {
+        d = new Dimension((int) Math.ceil(depth), (int) Math.ceil(alongDim));
+      }
     }
     
     setMinimumSize(d);
     setPreferredSize(d);
+    setMaximumSize(d);
     revalidate();
     //System.out.println("resizeAndValidate ending");
   }

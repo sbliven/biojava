@@ -111,19 +111,31 @@ public class LayeredRenderer {
     
     Iterator srcI = srcL.iterator();
     Iterator i = renderers.iterator();
+    
+    Rectangle2D clip = new Rectangle2D.Double();
     while(srcI.hasNext() && i.hasNext()) {
       SequenceRenderContext src = (SequenceRenderContext) srcI.next();
       SequenceRenderer sRend = (SequenceRenderer) i.next();
       int dir = src.getDirection();
+      double depth = sRend.getDepth(src, pos);
+      double minP = src.sequenceToGraphics(pos.getMin()) -
+                    sRend.getMinimumLeader(src, pos);
+      double maxP = src.sequenceToGraphics(pos.getMax()) +
+                    sRend.getMinimumTrailer(src, pos);
       
       if(dir == src.HORIZONTAL) {
+        clip.setFrame(minP, 0.0, maxP - minP, depth);
         g.translate(0.0, offset);
       } else {
+        clip.setFrame(0.0, minP, depth, maxP - minP);
         g.translate(offset, 0.0);
       }
       
+      Shape oldClip = g.getClip();
+      g.setClip(clip);
       sRend.paint(g, src, pos);
-
+      g.setClip(oldClip);
+      
       if(dir == src.HORIZONTAL) {
         g.translate(0.0, -offset);
       } else {
