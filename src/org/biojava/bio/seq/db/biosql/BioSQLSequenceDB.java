@@ -812,6 +812,64 @@ public class BioSQLSequenceDB implements SequenceDB {
 	return id;
     }
 
+    Map ontologyTermCache = new HashMap();
+    
+    String getOntologyTerm(int termId) {
+        synchronized(ontologyTermCache) {
+            Integer termKey = new Integer(termId);
+            if (!ontologyTermCache.containsKey(termKey)) {
+                ontologyTermCache.clear();
+                Connection conn = null;
+                try {
+                    conn = pool.takeConnection();
+                    PreparedStatement get_terms = conn.prepareStatement(
+                            "select ontology_term_id, term_name " +
+                            "  from ontology_term"
+                    );
+                    ResultSet rs = get_terms.executeQuery();
+                    while (rs.next()) {
+                        ontologyTermCache.put(new Integer(rs.getInt(1)),
+                                              rs.getString(2).trim());
+                    }
+                    get_terms.close();
+                    pool.putConnection(conn);
+                } catch (SQLException ex) {
+                    throw new BioRuntimeException(ex, "Error fetching annotations");
+                }                                                         
+            }
+            return (String) ontologyTermCache.get(termKey);
+        }
+    }
+        
+    Map seqfeatureSourceCache = new HashMap();
+    
+    String getSeqfeatureSource(int termId) {
+        synchronized(seqfeatureSourceCache) {
+            Integer termKey = new Integer(termId);
+            if (!seqfeatureSourceCache.containsKey(termKey)) {
+                seqfeatureSourceCache.clear();
+                Connection conn = null;
+                try {
+                    conn = pool.takeConnection();
+                    PreparedStatement get_terms = conn.prepareStatement(
+                            "select seqfeature_source_id, source_name " +
+                            "  from seqfeature_source"
+                    );
+                    ResultSet rs = get_terms.executeQuery();
+                    while (rs.next()) {
+                        seqfeatureSourceCache.put(new Integer(rs.getInt(1)),
+                                              rs.getString(2).trim());
+                    }
+                    get_terms.close();
+                    pool.putConnection(conn);
+                } catch (SQLException ex) {
+                    throw new BioRuntimeException(ex, "Error fetching annotations");
+                }                                                         
+            }
+            return (String) seqfeatureSourceCache.get(termKey);
+        }
+    }
+    
     private boolean hierarchyChecked = false;
     private boolean hierarchySupported = false;
 

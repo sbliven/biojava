@@ -48,7 +48,7 @@ class FeaturesSQL {
     FeaturesSQL(BioSQLSequenceDB seqDB) {
 	this.seqDB = seqDB;
     }
-
+    
     //
     // Feature retrieval
     //
@@ -85,27 +85,23 @@ class FeaturesSQL {
         if (overlappingRegion == null && immediateChildrenOfParent < 0 && featureID < 0) {
             get_features = conn.prepareStatement(
 			        "select seqfeature.seqfeature_id, " +
-                    "       ontology_term.term_name, " +
-                    "       seqfeature_source.source_name " +
-                    "  from seqfeature, ontology_term, seqfeature_source " +
-                    " where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
-                    "       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
-                    "       seqfeature.bioentry_id = ?"
+                    "       seqfeature.seqfeature_key_id, " +
+                    "       seqfeature.seqfeature_source_id " +
+                    "  from seqfeature " +
+                    " where seqfeature.bioentry_id = ?"
 			);
             get_features.setInt(1, bioentry_id);
         } else if (overlappingRegion != null) {
             get_features = conn.prepareStatement(
-			        "select distinct " +
-                    "       seqfeature.seqfeature_id, " +
-                    "       ontology_term.term_name, " +
-                    "       seqfeature_source.source_name " +
-                    "  from ontology_term, seqfeature_source, seqfeature_location, seqfeature " +
-                    " where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
-                    "       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
-                    "       seqfeature.bioentry_id = ? and " +
+			        "select seqfeature.seqfeature_id, " +
+                    "       seqfeature.seqfeature_key_id, " +
+                    "       seqfeature.seqfeature_source_id " +
+                    "  from seqfeature_location, seqfeature " +
+                    " where seqfeature.bioentry_id = ? and " +
                     "       seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
                     "       seqfeature_location.seq_end >= ? and " +
-                    "       seqfeature_location.seq_start <= ?"
+                    "       seqfeature_location.seq_start <= ? " +
+                    " group by seqfeature.seqfeature_id, seqfeature.seqfeature_key_id, seqfeature.seqfeature_source_id"
              );
              get_features.setInt(1, bioentry_id);
              get_features.setInt(2, overlappingRegion.getMin());
@@ -113,12 +109,10 @@ class FeaturesSQL {
         } else if (immediateChildrenOfParent >= 0) {
             get_features = conn.prepareStatement(
 			        "select seqfeature.seqfeature_id, " +
-                    "       ontology_term.term_name, " +
-                    "       seqfeature_source.source_name " +
-                    "  from seqfeature, ontology_term, seqfeature_source, seqfeature_relationship " +
-                    " where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
-                    "       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
-                    "       seqfeature.bioentry_id = ? and " +
+                    "       seqfeature.seqfeature_key_id, " +
+                    "       seqfeature.seqfeature_source_id " +
+                    "  from seqfeature, seqfeature_relationship " +
+                    " where seqfeature.bioentry_id = ? and " +
                     "       seqfeature.seqfeature_id = seqfeature_relationship.child_seqfeature_id and " +
                     "       seqfeature_relationship.parent_seqfeature_id = ?"
 	         );
@@ -127,13 +121,11 @@ class FeaturesSQL {
         } else if (featureID >= 0) {
 	        get_features = conn.prepareStatement(
 			        "select seqfeature.seqfeature_id, " +
-                    "       ontology_term.term_name, " +
-                    "       seqfeature_source.source_name, " +
+                    "       seqfeature.seqfeature_key_id, " +
+                    "       seqfeature.seqfeature_source_id, " +
                     "       seqfeature.bioentry_id " + 
-                    "  from seqfeature, ontology_term, seqfeature_source " +
-                    " where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
-                    "       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
-                    "       seqfeature.seqfeature_id = ?"
+                    "  from seqfeature " +
+                    " where seqfeature.seqfeature_id = ?"
 	        );
             get_features.setInt(1, featureID);
         } else {
@@ -144,8 +136,8 @@ class FeaturesSQL {
         while (rs.next()) {
             int feature_id = rs.getInt(1);
             StrandedFeature.Template templ = new StrandedFeature.Template();
-            templ.type = rs.getString(2).trim();     // HACK due to stupid schema change    
-            templ.source = rs.getString(3).trim();
+            templ.type = seqDB.getOntologyTerm(rs.getInt(2));
+            templ.source = seqDB.getSeqfeatureSource(rs.getInt(3));
             templ.annotation = new BioSQLFeatureAnnotation(seqDB, feature_id);
             // templ.annotation = new SmallAnnotation();
             fmap.put(new Integer(feature_id), templ);
@@ -163,27 +155,27 @@ class FeaturesSQL {
         if (overlappingRegion == null && immediateChildrenOfParent < 0 && featureID < 0) {
             get_annotations = conn.prepareStatement(
 		            "select seqfeature_qualifier_value.seqfeature_id, " +
-                    "       ontology_term.term_name, " +
+                    "       seqfeature_qualifier_value.ontology_term_id, " +
                     "       seqfeature_qualifier_value.qualifier_value " +
-                    "  from seqfeature, seqfeature_qualifier_value, ontology_term " +
+                    "  from seqfeature, seqfeature_qualifier_value " +
                     " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id and " +
-                    "       seqfeature.bioentry_id = ? and " +
-                    "       ontology_term.ontology_term_id = seqfeature_qualifier_value.ontology_term_id"
+                    "       seqfeature.bioentry_id = ?"
             );
             get_annotations.setInt(1, bioentry_id);
         } else if (overlappingRegion != null) {
            get_annotations = conn.prepareStatement(
-		            "select distinct " +
-                    "       seqfeature_qualifier_value.seqfeature_id, " +
-                    "       ontology_term.term_name, " +
+		            "select seqfeature_qualifier_value.seqfeature_id, " +
+                    "       seqfeature_qualifier_value.ontology_term_id, " +
                     "       seqfeature_qualifier_value.qualifier_value " +
-                    "  from seqfeature, seqfeature_qualifier_value, ontology_term, seqfeature_location " +
+                    "  from seqfeature, seqfeature_qualifier_value, seqfeature_location " +
                     " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id and " +
                     "       seqfeature.bioentry_id = ? and" +
                     "       seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
                     "       seqfeature_location.seq_end >= ? and " +
-                    "       seqfeature_location.seq_start <= ? and" +
-                    "       ontology_term.ontology_term_id = seqfeature_qualifier_value.ontology_term_id"
+                    "       seqfeature_location.seq_start <= ? " +
+                    "       group by seqfeature_qualifier_value.seqfeature_id, " +
+                    "                seqfeature_qualifier_value.ontology_term_id, " +
+                    "                seqfeature_qualifier_value.qualifier_value"
            );
            get_annotations.setInt(1, bioentry_id);
            get_annotations.setInt(2, overlappingRegion.getMin());
@@ -191,27 +183,25 @@ class FeaturesSQL {
         } else if (immediateChildrenOfParent >= 0) {
             get_annotations = conn.prepareStatement(
            		   "select seqfeature_qualifier_value.seqfeature_id, " +
-                   "       ontology_term.term_name, " +
+                   "       seqfeature_qualifier_value.ontology_term_id, " +
                    "       seqfeature_qualifier_value.qualifier_value " +
-                   "  from seqfeature, seqfeature_qualifier_value, seqfeature_relationship, ontology_term " +
+                   "  from seqfeature, seqfeature_qualifier_value, seqfeature_relationship " +
                    " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id and " +
                    "       seqfeature.bioentry_id = ? and " +
                    "       seqfeature.seqfeature_id = seqfeature_relationship.child_seqfeature_id and " +
-                   "       seqfeature_relationship.parent_seqfeature_id = ? and " +
-                   "       ontology_term.ontology_term_id = seqfeature_qualifier_value.ontology_term_id"
+                   "       seqfeature_relationship.parent_seqfeature_id = ?"
            );
            get_annotations.setInt(1, bioentry_id);
            get_annotations.setInt(2, immediateChildrenOfParent);
         } else if (featureID >= 0) {
            get_annotations = conn.prepareStatement(
 		            "select seqfeature_qualifier_value.seqfeature_id, " +
-                    "       ontology_term.term_name, " +
+                    "       seqfeature_qualifier_value.ontology_term_id, " +
                     "       seqfeature_qualifier_value.qualifier_value " +
-                    "  from seqfeature, seqfeature_qualifier_value, ontology_term " +
+                    "  from seqfeature, seqfeature_qualifier_value " +
                     " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id and " +
                     "       seqfeature.id = ? and " +
-                    "       seqfeature.bioentry_id = ? and " +
-                    "       ontology_term.ontology_term_id = seqfeature_qualifier_value.ontology_term_id"
+                    "       seqfeature.bioentry_id = ?"
             );
 	       get_annotations.setInt(1, bioentry_id);
            get_annotations.setInt(2, featureID);
@@ -219,7 +209,7 @@ class FeaturesSQL {
        rs = get_annotations.executeQuery();
        while (rs.next()) {
            Integer fid = new Integer(rs.getInt(1));
-           String key = rs.getString(2).trim();
+           String key = seqDB.getOntologyTerm(rs.getInt(2));
            String value = rs.getString(3).trim();
            Feature.Template templ = (Feature.Template) fmap.get(fid);
            try {
@@ -283,8 +273,7 @@ class FeaturesSQL {
             get_locations.setInt(1, bioentry_id);
        } else if (overlappingRegion != null) {
            get_locations = conn.prepareStatement(
-		           "select distinct " +
-                   "       seqfeature_location.seqfeature_location_id, " +
+		           "select seqfeature_location.seqfeature_location_id, " +
                    "       seqfeature_location.seqfeature_id, " +
                    "       seqfeature_location.seq_start, " +
                    "       seqfeature_location.seq_end, " +
@@ -294,7 +283,12 @@ class FeaturesSQL {
                    "       seqfeature.bioentry_id = ? and " +
                    "       sfl2.seqfeature_id = seqfeature.seqfeature_id and " +
                    "       sfl2.seq_end >= ? and " +
-                   "       sfl2.seq_start <= ?"
+                   "       sfl2.seq_start <= ? " +
+                   " group by seqfeature_location.seqfeature_location_id, " +
+                   "          seqfeature_location.seqfeature_id, " +
+                   "          seqfeature_location.seq_start, " +
+                   "          seqfeature_location.seq_end, " +
+                   "          seqfeature_location.seq_strand"
            );
            get_locations.setInt(1, bioentry_id);
            get_locations.setInt(2, overlappingRegion.getMin());
@@ -485,13 +479,14 @@ class FeaturesSQL {
                 get_hierarchy.setInt(1, bioentry_id);
             } else {
                 get_hierarchy = conn.prepareStatement(
-                        "select distinct parent_seqfeature_id, child_seqfeature_id " +
+                        "select parent_seqfeature_id, child_seqfeature_id " +
                         "  from seqfeature_relationship, seqfeature, seqfeature_location " +
                         " where parent_seqfeature_id = seqfeature.seqfeature_id and " +
                         "       seqfeature.bioentry_id = ? and " +
                         "       seqfeature_location.seqfeature_id = parent_seqfeature_id and " +
                         "       seqfeature_location.seq_end >= ? and " +
-                        "       seqfeature_location.seq_start <= ?"
+                        "       seqfeature_location.seq_start <= ? " +
+                        "       group by parent_seqfeature_id, child_seqfeature_id"
                  );
                  get_hierarchy.setInt(1, bioentry_id);
                  get_hierarchy.setInt(2, overlappingRegion.getMin());
