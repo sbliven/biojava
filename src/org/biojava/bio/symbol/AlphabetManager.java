@@ -736,16 +736,14 @@ public final class AlphabetManager {
   /**
    * Get an indexer for a specified alphabet.
    *
-   * @param alpha The alphabet to index.
-   * @param allowAmbiguity Should the index recognise ambiguous symbols?
-   * @returns an index.
-   * @throws IllegalAlphabetException if this alphabet cannot be indexed for some reason.
+   * @param alpha The alphabet to index
+   * @return an AlphabetIndex instance
    * @since 1.1
    */
   public static AlphabetIndex getAlphabetIndex(
-    FiniteAlphabet alpha, boolean allowAmbiguity
-  ) throws IllegalAlphabetException {
-    final int generateIndexSize = 16;
+    FiniteAlphabet alpha
+  ) {
+    final int generateIndexSize = 160;
     AlphabetIndex ai = (AlphabetIndex) alphabetToIndex.get(alpha); 
     if(ai == null) {
       int size = alpha.size();
