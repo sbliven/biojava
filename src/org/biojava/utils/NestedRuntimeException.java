@@ -19,41 +19,41 @@
  *
  */
 
-
 package org.biojava.utils;
 
 import java.io.*;
 import java.util.*;
 
 /**
- * A general perpose Exception that can wrap another exception.
- * <P>
- * It is common practice in BioJava to throw a NestedException or a subclass of it
- * when something goes wrong. The exception can be used to catch another
- * throwable, thus keeping a complete record of where the original error
- * originated while adding annotation to the stack-trace. It also affords a neat
- * way to avoid exception-bloat on method calls, particularly when objects are
- * composed from several objects from different packages.
+ * A general perpose RuntimeException that can wrap another exception.
+ * <p>
+ * In BioJava, checked exceptions are generally preferred to RuntimeExceptions,
+ * but RuntimeExceptions can be used as a fall-back if you are implementing
+ * an interface which doesn't support checked exceptions.  If you do this,
+ * please document this clearly in the implementing class.
+ * </p>
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
-public class NestedException extends Exception {
+
+public class NestedRuntimeException extends RuntimeException {
   private Throwable subThrowable = null;
 
-  public NestedException(String message) {
+  public NestedRuntimeException(String message) {
 	  super(message);
   }
 
-  public NestedException(Throwable ex) {
+  public NestedRuntimeException(Throwable ex) {
     this.subThrowable = ex;
   }
 
-  public NestedException(Throwable ex, String message) {
+  public NestedRuntimeException(Throwable ex, String message) {
     super(message);
     this.subThrowable = ex;
   }
   
-  public NestedException() {
+  public NestedRuntimeException() {
 	  super();
   }
 

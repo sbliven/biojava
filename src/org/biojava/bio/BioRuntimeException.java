@@ -18,30 +18,38 @@
  *      http://www.biojava.org/
  *
  */
-
 package org.biojava.bio;
 
-import org.biojava.utils.NestedException;
+import org.biojava.utils.NestedRuntimeException;
 
 /**
  * A nestable biological exception.
  *
+ * <p>
+ * In BioJava, checked exceptions are generally preferred to RuntimeExceptions,
+ * but RuntimeExceptions can be used as a fall-back if you are implementing
+ * an interface which doesn't support checked exceptions.  If you do this,
+ * please document this clearly in the implementing class.
+ * </p>
+ *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
-public class BioException extends NestedException {
-  public BioException(String message) {
+
+public class BioRuntimeException extends NestedRuntimeException {
+  public BioRuntimeException(String message) {
 	  super(message);
   }
 
-  public BioException(Throwable ex) {
+  public BioRuntimeException(Throwable ex) {
     super(ex);
   }
 
-  public BioException(Throwable ex, String message) {
+  public BioRuntimeException(Throwable ex, String message) {
     super(ex, message);
   }
   
-  public BioException() {
+  public BioRuntimeException() {
 	  super();
   }
 }
