@@ -264,7 +264,7 @@ public class TriplesParser {
           //System.err.println("Remote name: '" + termName + "' in '" + ontoName + "'");
 
           Term term = domain.getOntology(ontoName).getTerm(termName);
-          RemoteTerm remoteTerm = onto.importTerm(term, null);
+          Term remoteTerm = onto.importTerm(term, null);
           register(aNameValue, aNameValue.toString(), remoteTerm);
         } else {
           String name = nameToString(fullName);

@@ -157,13 +157,17 @@ public interface Ontology extends Changeable {
   /**
    * Create a view of a term from another ontology.  If the requested term
    * has already been imported under that name, this method returns the existing
-   * RemoteTerm object.
+   * RemoteTerm object. If the term that is being imported is itself a
+   * RemoteTerm instance then first unwrap the term back to the orriginal
+   * term it represents and then produce a RemoteTerm from that. If the term
+   * being imported orriginated from this ontology, then return that term
+   * unaltered.
    *
    * @param t  the Term to import
    * @param localName  the local name to import it under, optionally null
    */
 
-  public RemoteTerm importTerm(Term t, String localName)
+  public Term importTerm(Term t, String localName)
           throws
           ChangeVetoException,
           IllegalArgumentException;
@@ -362,9 +366,18 @@ public interface Ontology extends Changeable {
     }
 
 
-    public RemoteTerm importTerm(Term t, String name)
+    public Term importTerm(Term t, String name)
             throws IllegalArgumentException, ChangeVetoException
     {
+      // unpack any potential indirection - belt & braces
+      while(t instanceof RemoteTerm) {
+        t = ((RemoteTerm) t).getRemoteTerm();
+      }
+
+      if(t.getOntology() == this) {
+        return t;
+      }
+
       RemoteTerm rt = (RemoteTerm) remoteTerms.get(t);
       if (rt == null) {
         rt = new RemoteTerm.Impl(this, t, name);

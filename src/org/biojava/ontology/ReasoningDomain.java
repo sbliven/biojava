@@ -767,23 +767,94 @@ extends Changeable {
       return vals;
     }
 
+    Map _closures = new HashMap();
+
     Set transitiveClosure(Term subject, Term object, Term relation) {
-      // fill in transitive closure search - null subject means that's free,
-      // null object means that's free
-      // - we must take care of remote terms
-      return null;
+      if(relation == null) {
+        throw new IllegalArgumentException("Relation must not be null");
+      }
+
+      Ontology closure = (Ontology) _closures.get(resolveRemote(relation));
+
+      if(closure == null) {
+        closure = OntoTools.getDefaultFactory().createOntology(
+                "closure over: " + subject + ", " + object + ", " + relation,
+                null);
+      
+        Set triples = getTriples(null, null, relation);
+        Set terms = new HashSet();
+        for(Iterator i = triples.iterator(); i.hasNext(); ) {
+          Triple t = (Triple) i.next();
+          terms.add(resolveRemote(t.getSubject()));
+          terms.add(resolveRemote(t.getObject()));
+          terms.add(resolveRemote(t.getRelation()));
+        }
+        
+        for(Iterator i = terms.iterator(); i.hasNext(); ) {
+          Term t = (Term) i.next();
+          Term rt = closure.importTerm(t, null);
+
+          closure.createTriple(rt, rt, relation, null, null);
+        }
+
+        for(Iterator i = triples.iterator(); i.hasNext(); ) {
+          Triple t = (Triple) i.next();
+          closure.createTriple(closure.importTerm(t.getSubject(), null),
+                               closure.importTerm(t.getObject(), null),
+                               closure.importTerm(t.getRelation(), null),
+                               null,
+                               null);
+        }
+
+        for(Iterator i = closure.getTriples(null, null, relation).iterator();
+            i.hasNext();
+        ) {
+          Triple t = (Triple) i.next();
+          objectClosure(t.getSubject(), t.getObject(), relation, closure);
+        }
+      }
+
+      if(subject != null) subject = closure.importTerm(subject, null);
+      if(object != null) object = closure.importTerm(object, null);
+      if(relation != null) relation = closure.importTerm(relation, null);
+
+      return closure.getTriples(subject, object, relation);
+    }
+
+    private void objectClosure(Term subject,
+                               Term object,
+                               Term relation,
+                               Ontology closure)
+    {
+      Set targets = closure.getTriples(object, null, relation);
+      for(Iterator i = targets.iterator(); i.hasNext(); ) {
+        Term t = (Term) i.next();
+        if(t != subject && t != object) {
+          objectClosure(subject, t, relation, closure);
+          closure.createTriple(subject, t, relation, null, null);
+        }
+      }
     }
 
     boolean tripleExists(Term subject, Term object, Term relation) {
-      // true if in one of the ontologies we can find this triple
-      // - we must take care of remote terms
-      return false;
+      return !getTriples(subject, object, relation).isEmpty();
     }
 
     Set getTriples(Term subject, Term object, Term relation) {
-      // get the set of all triples matching this, taking care of remote terms
+      MergingSet mSet = new MergingSet();
 
-      return null;
+      for(Iterator i = getOntologies().iterator(); i.hasNext(); ) {
+        Ontology o = (Ontology) i.next();
+        try {
+          mSet.addSet(o.getTriples(o.importTerm(subject, null),
+                                   o.importTerm(object, null),
+                                   o.importTerm(relation, null)));
+        } catch (ChangeVetoException e) {
+          throw new AssertionFailure(e);
+        }
+      }
+
+      return mSet;
     }
 
     private void populateMembership(Term term, Variable var, Set membership)

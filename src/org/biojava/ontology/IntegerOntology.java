@@ -94,7 +94,7 @@ public class IntegerOntology
     throw new ChangeVetoException(getName() + " is immutable");
   }
 
-  public RemoteTerm importTerm(Term t, String name)
+  public Term importTerm(Term t, String name)
           throws
           ChangeVetoException
   {
