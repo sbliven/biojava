@@ -885,8 +885,9 @@ public final class AlphabetManager {
         } else if(name.equals("ambiguity")) {
 	    throw new BioException("AlphabetManager.xml should no longer contain ambiguity records");
         } else if (name.equals("characterTokenization")) {
-	    SymbolTokenization toke = characterTokenizationFromXML(alphabet, el, nameToSym);
-	    alphabet.putTokenization(el.getAttribute("name"), toke);
+	    String tokeName = el.getAttribute("name");
+	    SymbolTokenization toke = characterTokenizationFromXML(alphabet, tokeName, el, nameToSym);
+	    alphabet.putTokenization(tokeName, toke);
 	}
       } catch (Exception e) {
         throw new BioException(e, "Couldn't parse element " + el);
@@ -897,11 +898,11 @@ public final class AlphabetManager {
   }
 
 
-    private static SymbolTokenization characterTokenizationFromXML(Alphabet alpha, Element el, Map nameToSym)
+    private static SymbolTokenization characterTokenizationFromXML(Alphabet alpha, String name, Element el, Map nameToSym)
         throws BioException
     {
 	boolean caseSensitive = ("true".equals(el.getAttribute("caseSensitive")));
-	CharacterTokenization toke = new CharacterTokenization(alpha, caseSensitive);
+	CharacterTokenization toke = new WellKnownTokenization(alpha, name, caseSensitive);
 	
 	NodeList children = el.getChildNodes();
 	for (int i = 0; i < children.getLength(); i++) {
@@ -930,6 +931,37 @@ public final class AlphabetManager {
 	}
 
 	return toke;
+    }
+
+    private static class WellKnownTokenization extends CharacterTokenization implements Serializable {
+	private String name;
+
+	WellKnownTokenization(Alphabet alpha, String name, boolean caseSensitive) {
+	    super(alpha, caseSensitive);
+	    this.name = name;
+	}
+
+	public Object writeReplace() {
+	    return new OPH(getAlphabet(), name);
+	}
+
+	private static class OPH implements Serializable {
+	    private Alphabet alphabet;
+	    private String name;
+
+	    OPH(Alphabet alphabet, String name) {
+		this.alphabet = alphabet;
+		this.name = name;
+	    }
+
+	    private Object readResolve() throws ObjectStreamException {
+		try {
+		    return alphabet.getTokenization(name);
+		} catch (Exception ex) {
+		    throw new InvalidObjectException("Couldn't resolve tokenization " + name + " in alphabet " + alphabet.getName());
+		}
+	    }
+	}
     }
 
     /**
