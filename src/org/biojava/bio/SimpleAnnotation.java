@@ -80,7 +80,11 @@ public class SimpleAnnotation implements Annotation {
   }
 
   public Set keys() {
-    return properties.keySet();
+    if(propertiesAllocated()) {
+      return properties.keySet();
+    } else {
+      return Collections.EMPTY_SET;
+    }
   }
   
   public String toString() {
