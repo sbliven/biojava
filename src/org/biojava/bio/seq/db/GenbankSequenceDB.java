@@ -22,6 +22,8 @@ package org.biojava.bio.seq.db;
 
 import java.net.*;
 import java.io.*;
+import java.util.Set;
+import java.util.Iterator;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.seq.DNATools;
@@ -29,12 +31,14 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * This class contains functions accessing DNA sequences in Genbank format.
  *
  * @author Lei Lai
  * @author Matthew Pocock
+ * @author Laurent Jourdren
  */
 public class GenbankSequenceDB
 {
@@ -42,6 +46,8 @@ public class GenbankSequenceDB
   private static String DBName="Genbank";//predefined the database name -- Genbank
   private boolean IOExceptionFound=false;//check if IOException is found
   private boolean ExceptionFound=false;//check if any exception is found
+  private static final String urlBatchSequences =
+    "http://www.ncbi.nlm.nih.gov:80/entrez/eutils/efetch.fcgi";
   
   static 
   {
@@ -134,5 +140,120 @@ public class GenbankSequenceDB
   public boolean checkException()
   {
 	return ExceptionFound;  
+  }
+  
+  /**
+   * Create the Http Post Request to fetch (in batch mode) a list of sequence 
+   * with Genbank.
+   * @param url URL of the request
+   * @param list List of sequence identifier
+   * @return The Post request.
+   */
+  private String makeBatchRequest(URL url, Set list) {
+
+    StringBuffer params = new StringBuffer();
+    params.append("db=nucleotide&rettype=gb&id=");
+
+    for (Iterator i = list.iterator(); i.hasNext();) {
+      String idSequence = (String) i.next();
+      params.append(idSequence);
+      params.append(",");
+    }
+
+    StringBuffer header = new StringBuffer();
+    header.append("POST ");
+    header.append(url.getPath());
+    header.append(
+      " HTTP/1.0\r\n"
+        + "Connection: close\r\n"
+        + "Accept: text/html, text/plain\r\n"
+        + "Host: ");
+
+    header.append(url.getHost());
+    header.append(
+      "\r\n"
+        + "User-Agent: Biojava/GenbankSequenceDB\r\n"
+        + "Content-Type: application/x-www-form-urlencoded\r\n"
+        + "Content-Length: ");
+    header.append(params.length());
+    header.append("\r\n\r\n");
+
+    StringBuffer request = new StringBuffer();
+    request.append(header);
+    request.append(params);
+
+    return request.toString();
+  }
+
+  /**
+   * Retrieve sequences from a Genbank
+   * 
+   * @param list List of NCBI sequence number (GI), accession, accession.version, 
+   * fasta or seqid.
+   * @return The database object (HashSequenceDB) with downloaded sequences.
+   */
+  public SequenceDB getSequences(Set list) throws BioException {
+
+    return getSequences(list, null);
+  }
+
+  /**
+   * Retrieve sequences from a Genbank
+   * 
+   * @param list List of NCBI sequence number (GI), accession, accession.version, 
+   * fasta or seqid.
+   * @param database Where to store sequences. if database is null, use an 
+   * HashSequenceDB Objet.
+   * @return The database object with downloaded sequences.
+   */
+  public SequenceDB getSequences(Set list, SequenceDB database)
+    throws BioException {
+
+    if (database == null)
+      database = new HashSequenceDB();
+
+    try {
+
+      URL url = new URL(urlBatchSequences);
+      int port = url.getPort();
+      String hostname = url.getHost();
+
+      //Open the connection and the streams
+      Socket s = new Socket(hostname, port);
+
+      InputStream sin = s.getInputStream();
+      BufferedReader fromServer =
+        new BufferedReader(new InputStreamReader(sin));
+      OutputStream sout = s.getOutputStream();
+      PrintWriter toServer = new PrintWriter(new OutputStreamWriter(sout));
+
+      // Put the Post request to the server
+      toServer.print(makeBatchRequest(url, list));
+      toServer.flush();
+
+      // Delete response headers
+      boolean finEntete = false;
+      for (String l = null;
+        ((l = fromServer.readLine()) != null) && (!finEntete);
+        )
+        if (l.equals(""))
+          finEntete = true;
+
+      SequenceIterator seqI = SeqIOTools.readGenbank(fromServer);
+
+      while (seqI.hasNext())
+        database.addSequence(seqI.nextSequence());
+
+    } catch (MalformedURLException e) {
+      throw new BioException("Exception found in GenbankSequenceDB -- getSequences");
+    } catch (IOException e) {
+      throw new BioException("Exception found in GenbankSequenceDB -- getSequences");
+    } catch (BioException e) {
+      throw new BioException("Exception found in GenbankSequenceDB -- getSequences");
+    } catch (ChangeVetoException e) {
+      throw new BioException("Exception found in GenbankSequenceDB -- getSequences");
+    }
+
+    return database;
   }
 }
