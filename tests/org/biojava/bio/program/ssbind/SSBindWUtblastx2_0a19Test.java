@@ -63,6 +63,9 @@ public class SSBindWUtblastx2_0a19Test extends SSBindCase
     {
         super.setUp();
 
+        queryID = "U51677";
+        databaseID = "embl";
+
         setTopHitValues(4354d, "U51677",
                         1, 2575, StrandedFeature.UNKNOWN,
                         1, 2575, StrandedFeature.UNKNOWN);

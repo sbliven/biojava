@@ -56,6 +56,9 @@ public class SSBindWUtblastn2_0a19Test extends SSBindCase
     {
         super.setUp();
 
+        queryID = "sp|P09429|HMG1_HUMAN";
+        databaseID = "embl";
+
         setTopHitValues(1144d, "X12597",
                         1, 214, null,
                         56, 697, StrandedFeature.POSITIVE);

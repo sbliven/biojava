@@ -39,15 +39,15 @@ import org.biojava.bio.symbol.*;
  * <code>SequenceDBSearchSubHitTest</code> tests the behaviour of
  * <code>SequenceDBSearchSubHit</code>.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  */
 public class SequenceDBSearchSubHitTest extends TestCase
 {
     private SeqSimilaritySearchSubHit sh1;
     private SeqSimilaritySearchSubHit sh2;
 
-    private Alignment                 al1;
-    private Alignment                 al2;
+    private Alignment al1;
+    private Alignment al2;
 
     private double            score = 100.0d;
     private double           eValue = 1e-10d;
@@ -59,7 +59,7 @@ public class SequenceDBSearchSubHitTest extends TestCase
     private int          subjectEnd = 8;
     private Strand subjectSeqStrand = StrandedFeature.POSITIVE;
 
-    private String     subjectSeqID = "subjectID";
+    private String        subjectID = "subjectID";
     private String   querySeqTokens = "TRYPASNDEF";
     private String subjectSeqTokens = "-RYPASND--";
 
@@ -75,7 +75,7 @@ public class SequenceDBSearchSubHitTest extends TestCase
         Map labelMap1 = new HashMap();
         labelMap1.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
                       new SimpleSymbolList(tp, querySeqTokens));
-        labelMap1.put(subjectSeqID,
+        labelMap1.put(subjectID,
                       new SimpleSymbolList(tp, subjectSeqTokens));
 
         al1 = new SimpleAlignment(labelMap1);
@@ -83,7 +83,7 @@ public class SequenceDBSearchSubHitTest extends TestCase
         Map labelMap2 = new HashMap();
         labelMap2.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
                       new SimpleSymbolList(tp, querySeqTokens));
-        labelMap2.put(subjectSeqID,
+        labelMap2.put(subjectID,
                       new SimpleSymbolList(tp, subjectSeqTokens));
 
         al2 = new SimpleAlignment(labelMap2);

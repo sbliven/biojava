@@ -47,12 +47,12 @@ import org.biojava.bio.seq.db.SequenceDBInstallation;
  */
 public class SSBindCase extends TestCase
 {
-    protected SequenceDB             queryDB;
-    protected SequenceDBInstallation dbInstallation;
+    protected String queryID;
+    protected String databaseID;
 
     protected SeqSimilarityAdapter adapter;
-    protected InputStream          searchStream;
-    protected List                 searchResults;
+    protected InputStream searchStream;
+    protected List        searchResults;
 
     protected double   topHitScore;
     protected String   topHitSeqID;
@@ -79,17 +79,11 @@ public class SSBindCase extends TestCase
 
     protected void setUp() throws Exception
     {
-        queryDB        = new DummySequenceDB("query");
-        dbInstallation = new DummySequenceDBInstallation();
         searchResults  = new ArrayList();
 
         // Set builder to build into a List
         BlastLikeSearchBuilder builder =
             new BlastLikeSearchBuilder(searchResults);
-
-        // Set the holder for query sequences and databases
-        builder.setQuerySeqHolder(queryDB);
-        builder.setSubjectDBInstallation(dbInstallation);
 
         // Adapter from SAX -> search result construction interface
         adapter = new SeqSimilarityAdapter();
@@ -108,20 +102,20 @@ public class SSBindCase extends TestCase
         assertEquals(1, searchResults.size());
     }
 
-    public void testResultGetQuerySequence() throws Exception
+    public void testResultGetQueryID() throws Exception
     {
         SeqSimilaritySearchResult result =
             (SeqSimilaritySearchResult) searchResults.get(0);
 
-        assertEquals(queryDB.getSequence(""), result.getQuerySequence());
+        assertEquals(queryID, result.getQueryID());
     }
 
-    public void testResultGetSequenceDB()
+    public void testResultGetDatabaseID()
     {
         SeqSimilaritySearchResult result =
             (SeqSimilaritySearchResult) searchResults.get(0);
 
-        assertEquals(dbInstallation.getSequenceDB(""), result.getSequenceDB());
+        assertEquals(databaseID, result.getDatabaseID());
     }
 
     public void testResultGetAnnotation()
@@ -141,7 +135,7 @@ public class SSBindCase extends TestCase
             (SeqSimilaritySearchHit) result.getHits().get(0);
 
         assertEquals(topHitScore, hit.getScore(), 0.0);
-        assertEquals(topHitSeqID, hit.getSequenceID());
+        assertEquals(topHitSeqID, hit.getSubjectID());
 
         assertEquals(topHitQStart, hit.getQueryStart());
         assertEquals(topHitQEnd,   hit.getQueryEnd());
@@ -163,7 +157,7 @@ public class SSBindCase extends TestCase
             (SeqSimilaritySearchHit) hits.get(hits.size() - 1);
 
         assertEquals(botHitScore, hit.getScore(), 0.0);
-        assertEquals(botHitSeqID, hit.getSequenceID());
+        assertEquals(botHitSeqID, hit.getSubjectID());
 
         assertEquals(botHitQStart, hit.getQueryStart());
         assertEquals(botHitQEnd,   hit.getQueryEnd());

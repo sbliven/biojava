@@ -42,18 +42,16 @@ import org.biojava.bio.symbol.AlphabetManager;
  * <code>SequenceDBSearchResultTest</code> tests the behaviour of
  * <code>SequenceDBSearchResult</code>.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  */
 public class SequenceDBSearchResultTest extends TestCase
 {
     private SeqSimilaritySearchResult r1;
     private SeqSimilaritySearchResult r2;
 
-    private SequenceDB                database;
-    private Map                       parameters;
-    private SymbolList                query;
-
-    private String querySeqTokens = "TRYPASNDEF";
+    private String queryID;
+    private String databaseID;
+    private Map    parameters;
 
     public SequenceDBSearchResultTest(String name)
     {
@@ -62,24 +60,21 @@ public class SequenceDBSearchResultTest extends TestCase
 
     protected void setUp() throws Exception
     {
-        database   = new HashSequenceDB("test");
+        queryID    = "queryID";
+        databaseID = "databaseID";
         parameters = new HashMap();
 
-        SymbolTokenization tp = ProteinTools.getAlphabet().getTokenization("token");
-
-        query = new SimpleSymbolList(tp, querySeqTokens);
-
-        r1 = new SequenceDBSearchResult(database,
+        r1 = new SequenceDBSearchResult(queryID,
+                                        databaseID,
                                         parameters,
-                                        query,
-                                        Annotation.EMPTY_ANNOTATION,
-                                        new ArrayList());
+                                        new ArrayList(),
+                                        Annotation.EMPTY_ANNOTATION);
 
-        r2 = new SequenceDBSearchResult(database,
+        r2 = new SequenceDBSearchResult(queryID,
+                                        databaseID,
                                         parameters,
-                                        query,
-                                        Annotation.EMPTY_ANNOTATION,
-                                        new ArrayList());
+                                        new ArrayList(),
+                                        Annotation.EMPTY_ANNOTATION);
     }
 
     public void testEquals()
@@ -90,22 +85,22 @@ public class SequenceDBSearchResultTest extends TestCase
         assertEquals(r2, r1);
     }
 
-    public void testSequenceDB()
+    public void testGetQueryID()
     {
-        assertEquals(r1.getSequenceDB(), database);
+        assertEquals("queryID", r1.getQueryID());
+    }
+
+    public void testGetDatabaseID()
+    {
+        assertEquals("databaseID", r1.getDatabaseID());
     }
 
     public void testSearchParameters()
     {
-        assertEquals(r1.getSearchParameters(), parameters);
+        assertEquals(new HashMap(), r1.getSearchParameters());
     }
 
-    public void testQuerySequence()
-    {
-        assertEquals(r1.getQuerySequence(), query);
-    }
-
-    public void testAnnotation()
+    public void testGetAnnotation()
     {
         assertEquals(((SequenceDBSearchResult) r1).getAnnotation(),
                      Annotation.EMPTY_ANNOTATION);

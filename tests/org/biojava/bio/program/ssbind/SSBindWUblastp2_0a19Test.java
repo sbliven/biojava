@@ -56,6 +56,9 @@ public class SSBindWUblastp2_0a19Test extends SSBindCase
     {
         super.setUp();
 
+        queryID = "sp|P09429|HMG1_HUMAN";
+        databaseID = "swissprot";
+
         setTopHitValues(1144d, "sp|P09429|HMG1_HUMAN",
                         1, 214, null,
                         1, 214, null);

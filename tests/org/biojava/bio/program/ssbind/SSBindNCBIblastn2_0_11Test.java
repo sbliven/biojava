@@ -51,6 +51,9 @@ public class SSBindNCBIblastn2_0_11Test extends SSBindCase
     {
         super.setUp();
 
+        queryID = "ECGLTA01_3";
+        databaseID = "embl_other-1; embl_other-2; embl_other-3; embl_other-4;";
+
         setTopHitValues(2545D, "ECGLTA01",
                         1, 1284, StrandedFeature.POSITIVE,
                         1091, 2374, StrandedFeature.NEGATIVE);

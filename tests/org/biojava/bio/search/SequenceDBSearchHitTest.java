@@ -43,21 +43,21 @@ import org.biojava.bio.symbol.AlphabetManager;
  * <code>SequenceDBSearchHitTest</code> tests the behaviour of
  * <code>SequenceDBSearchHit</code>.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  */
 public class SequenceDBSearchHitTest extends TestCase
 {
     private SeqSimilaritySearchHit h1;
     private SeqSimilaritySearchHit h2;
 
-    private Annotation             an1;
-    private Annotation             an2;
+    private Annotation an1;
+    private Annotation an2;
 
-    private List                   subHits1;
-    private List                   subHits2;
+    private List subHits1;
+    private List subHits2;
 
-    private Alignment              al1;
-    private Alignment              al2;
+    private Alignment al1;
+    private Alignment al2;
 
     private double            score = 100.0d;
     private double           eValue = 1e-10d;
@@ -69,7 +69,7 @@ public class SequenceDBSearchHitTest extends TestCase
     private int          subjectEnd = 8;
     private Strand subjectSeqStrand = StrandedFeature.POSITIVE;
 
-    private String     subjectSeqID = "subjectID";
+    private String        subjectID = "subjectID";
     private String   querySeqTokens = "TRYPASNDEF";
     private String subjectSeqTokens = "-RYPASND--";
 
@@ -85,7 +85,7 @@ public class SequenceDBSearchHitTest extends TestCase
          Map labelMap1 = new HashMap();
          labelMap1.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
                        new SimpleSymbolList(tp, querySeqTokens));
-         labelMap1.put(subjectSeqID,
+         labelMap1.put(subjectID,
                        new SimpleSymbolList(tp, subjectSeqTokens));
 
          al1 = new SimpleAlignment(labelMap1);
@@ -93,7 +93,7 @@ public class SequenceDBSearchHitTest extends TestCase
          Map labelMap2 = new HashMap();
          labelMap2.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
                        new SimpleSymbolList(tp, querySeqTokens));
-         labelMap2.put(subjectSeqID,
+         labelMap2.put(subjectID,
                        new SimpleSymbolList(tp, subjectSeqTokens));
 
          al2 = new SimpleAlignment(labelMap2);
@@ -131,7 +131,7 @@ public class SequenceDBSearchHitTest extends TestCase
                                       subjectStart,
                                       subjectEnd,
                                       subjectSeqStrand,
-                                      subjectSeqID,
+                                      subjectID,
                                       Annotation.EMPTY_ANNOTATION,
                                       subHits1);
 
@@ -144,7 +144,7 @@ public class SequenceDBSearchHitTest extends TestCase
                                       subjectStart,
                                       subjectEnd,
                                       subjectSeqStrand,
-                                      subjectSeqID,
+                                      subjectID,
                                       Annotation.EMPTY_ANNOTATION,
                                       subHits2);
     }
@@ -180,7 +180,7 @@ public class SequenceDBSearchHitTest extends TestCase
 
     public void testID()
     {
-        assertEquals(h1.getSequenceID(), "subjectID");
+        assertEquals(h1.getSubjectID(), "subjectID");
     }
 
     public void testAnnotation()

@@ -55,6 +55,9 @@ public class SSBindFasta3_3t08Test extends SSBindCase
     {
         super.setUp();
 
+        queryID = "CISY_ECOLI";
+        databaseID = "%L";
+
         setTopHitValues(3266.4D, "CISY_ECOLI",
                         1, 427, null,
                         1, 427, null);
