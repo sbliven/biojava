@@ -301,5 +301,17 @@ public class SmallAnnotation implements Annotation {
 	    return (getKey() == null ? 0 : getKey().hashCode()) ^ (getValue() == null ? 0 : getValue().hashCode());
 	}
     }
+
+    public int hashCode() {
+	return asMap().hashCode();
+    }
+
+    public boolean equals(Object o) {
+	if (! (o instanceof Annotation)) {
+	    return false;
+	}
+
+	return ((Annotation) o).asMap().equals(asMap());
+    }
 }
 

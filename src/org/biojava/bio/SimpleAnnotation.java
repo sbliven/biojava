@@ -216,4 +216,17 @@ public class SimpleAnnotation implements Annotation, Serializable {
       properties.put(key, annMap.get(key));
     }
   }
+
+    
+    public int hashCode() {
+	return asMap().hashCode();
+    }
+
+    public boolean equals(Object o) {
+	if (! (o instanceof Annotation)) {
+	    return false;
+	}
+
+	return ((Annotation) o).asMap().equals(asMap());
+    }
 }

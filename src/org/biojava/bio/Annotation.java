@@ -161,5 +161,17 @@ public interface Annotation extends Changeable {
         throw new NotSerializableException(nsfe.getMessage());
       }
     }
+
+      public int hashCode() {
+	  return asMap().hashCode();
+      }
+      
+      public boolean equals(Object o) {
+	  if (! (o instanceof Annotation)) {
+	      return false;
+	  }
+	  
+	  return ((Annotation) o).asMap().equals(asMap());
+      }
   }
 }
