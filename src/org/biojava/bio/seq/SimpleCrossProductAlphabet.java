@@ -35,7 +35,7 @@ import java.lang.reflect.*;
  * @author Matthew Pocock
  */
 
-public class SimpleCrossProductAlphabet implements CrossProductAlphabet {
+class SimpleCrossProductAlphabet implements FiniteAlphabet, CrossProductAlphabet {
   private final List alphas;
   private final HashMap ourResidues;
   private char symbolSeed = 'A';
@@ -78,9 +78,9 @@ public class SimpleCrossProductAlphabet implements CrossProductAlphabet {
 
   private void putResidue(List r) {
     List l = Collections.unmodifiableList(new ArrayList(r));
-    Residue rr = new SCPAResidue(l, symbolSeed++);
+    Residue rr = new SimpleCrossProductResidue(l, symbolSeed++);
     // System.out.println(rr.getName());
-    ourResidues.put(new ListWrapper(l), rr);
+    ourResidues.put(new CrossProductAlphabetFactory.ListWrapper(l), rr);
   }
 
   public boolean contains(Residue r) {
@@ -126,7 +126,8 @@ public class SimpleCrossProductAlphabet implements CrossProductAlphabet {
     return alphas;
   }
 
-  private ListWrapper gopher = new ListWrapper();
+  private CrossProductAlphabetFactory.ListWrapper gopher =
+    new CrossProductAlphabetFactory.ListWrapper();
 
   public CrossProductResidue getResidue(List l) throws IllegalAlphabetException {
     gopher.l = l;
@@ -135,86 +136,5 @@ public class SimpleCrossProductAlphabet implements CrossProductAlphabet {
 	    throw new IllegalAlphabetException();
     }
     return r;
-  }
-
-  /**
-   * Simple wrapper to assist in list-comparisons.
-   */
-
-  private static class ListWrapper {
-    List l;
-
-    ListWrapper(List l) {
-      this.l = l;
-    }
-
-    ListWrapper() {
-    }
-
-    public boolean equals(Object o) {
-      if (! (o instanceof ListWrapper)) {
-        return false;
-      }
-      List ol = ((ListWrapper) o).l;
-      if (ol.size() != l.size()) {
-        return false;
-      }
-      Iterator i1 = l.iterator();
-      Iterator i2 = ol.iterator();
-      while (i1.hasNext()) {
-        if (i1.next() != i2.next()) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    public int hashCode() {
-      int c = 0;
-      for (Iterator i = l.iterator(); i.hasNext(); ) {
-        c += i.next().hashCode();
-      }
-      return c;
-    }
-  }
-
-  /**
-   * Concrete implementation of CrossProductResidue, as returned
-   * by a SimpleCrossProductAlphabet.
-   */
-
-  private class SCPAResidue implements CrossProductResidue {
-    private List l;
-    private char symbol;
-
-    private SCPAResidue(List l, char symbol) {
-      this.l = l;
-      this.symbol = symbol;
-    }
-
-    public List getResidues() {
-      return l;
-    }
-
-    public String getName() {
-      StringBuffer name = new StringBuffer("(");
-      for (int i = 0; i < l.size(); ++i) {
-        Residue r = (Residue) l.get(i);
-        name.append(r.getName());
-        if (i < l.size() - 1) {
-          name.append(" ");
-        }
-      }
-      name.append(")");
-      return name.toString();
-    }
-
-    public char getSymbol() {
-      return symbol;
-    }
-
-    public Annotation getAnnotation() {
-      return Annotation.EMPTY_ANNOTATION;
-    }
   }
 }

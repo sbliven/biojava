@@ -15,11 +15,11 @@ public class OrderNResidueList extends AbstractResidueList {
   /**
    * The source sequence that we will transliterate.
    */
-  private ResidueList source;
+  private final ResidueList source;
   
-  private CrossProductAlphabet alpha;
+  private final CrossProductAlphabet alpha;
   
-  private int order;
+  private final int order;
 
   /**
    * Create an order n OrderNResidueList from source.
@@ -28,17 +28,10 @@ public class OrderNResidueList extends AbstractResidueList {
   throws IllegalAlphabetException {
     this.source = source;
     Alphabet a = source.alphabet();
-    if(a instanceof FiniteAlphabet) {
-      this.alpha = new SimpleCrossProductAlphabet(
+    this.alpha = CrossProductAlphabetFactory.createAlphabet(
       Collections.nCopies(order, a)
-      );
-      this.order = order;
-    } else {
-      throw new IllegalAlphabetException(
-        "OrderNResidueList objects can only be constructed " +
-        "over finite alphabets, not " + a.getName() + " of type " + a.getClass()
-      );
-    }
+    );
+    this.order = order;
   }
   
   public Alphabet alphabet() {

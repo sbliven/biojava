@@ -25,10 +25,13 @@ package org.biojava.bio.seq;
 import java.util.*;
 
 /**
- * Cross product of two or more alphabets.  This is provided primarily
+ * Cross product of a list of alphabets.  This is provided primarily
  * to assist in the implemention of a `multi-headed' hidden markov
  * model.  For instance, in a pair HMM intended for aligning DNA
  * sequence, the emmision alphabet will be (DNA, gap) x (DNA, gap).
+ *
+ * To actualy make a CrossProductAlphabet, either roll your own, or us
+ * the CrossProductAlphabetFactory object.
  *
  * @author Thomas Down
  */

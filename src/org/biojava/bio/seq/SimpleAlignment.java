@@ -28,11 +28,17 @@ import org.biojava.bio.*;
 
 /**
  * A simple implementation of an Alignment.
+ * <P>
+ * This is a simple-stupid implementation that is made from a set of same-lengthed
+ * ResidueList objects each with an associated label. It does not handle differently
+ * lengthed sequences and doesn't contain any gap-editing concepts.
+ *
+ * @author Matthew Pocock
  */
 public class SimpleAlignment extends AbstractResidueList implements Alignment {
   private Map labelToResidueList;
   private List labels;
-  private Alphabet alphabet;
+  private CrossProductAlphabet alphabet;
   private int length;
   
   public int length() {
@@ -44,7 +50,13 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
   }
   
   public Residue residueAt(int col) {
-    return new ColAsResidue(col);
+    try {
+      return alphabet.getResidue(new ColAsList(col));
+    } catch (IllegalAlphabetException iae) {
+      throw new BioError(
+        "Somehow my crossproduct alphabet is incompatible with column " + col
+      );
+    }
   }
   
   public List getLabels() {
@@ -97,7 +109,7 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
     this.labels = Collections.unmodifiableList(new ArrayList(labelToResList.keySet()));
     this.labelToResidueList = labelToResList;
     
-    length = -1;
+    int length = -1;
     List alphaList = new ArrayList();
     for(Iterator li = labels.iterator(); li.hasNext(); ) {
       Object label = li.next();
@@ -129,154 +141,28 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
       }
     }
     
-    this.alphabet = new ValidatingAlphabet(alphaList);
+    this.alphabet = CrossProductAlphabetFactory.createAlphabet(alphaList);
+    this.length = length;
   }
-  
-  private class ColAsResidue implements Alignment.Column {
-    private int col;
+ 
+  /** 
+   * Makes a column of the alignment behave like a list.
+   *
+   * @author Matthew Pocock
+   */
+  private final class ColAsList extends AbstractList {
+    private final int col;
     
-    public ColAsResidue(int col) {
+    public ColAsList(int col) {
       this.col = col;
     }
     
-    public List getResidues() {
-      return new AbstractList() {
-        public Object get(int indx) {
-          return residueAt(getLabels().get(indx), col);
-        }
-        public int size() {
-          return getLabels().size();
-        }
-      };
-    }
-      
-    public String getName() {
-      List labels = getLabels();
-      StringBuffer sb = new StringBuffer("(");
-      if(labels.size() != 0) {
-        sb.append(residueAt(labels.get(0), col).getName());
-        for(int i = 1; i < labels.size(); i++) {
-          sb.append(" " + residueAt(labels.get(i), col).getName());
-        }
-      }
-      sb.append(")");
-      return sb.toString();
-    }
-      
-    public char getSymbol() {
-      return '?';
-    }
-    
-    public List getLabels() {
-      return SimpleAlignment.this.getLabels();
-    }
-    
-    public Annotation getAnnotation() {
-      return Annotation.EMPTY_ANNOTATION;
-    }
-  }
-  
-  private class ValidatingAlphabet implements CrossProductAlphabet {
-    private List alphabets;
-    
-    public ValidatingAlphabet(List alphabets) {
-      this.alphabets = Collections.unmodifiableList(alphabets);
-    }
-    
-    public boolean contains(Residue r) {
-      if(!(r instanceof CrossProductAlphabet)) {
-        return false;
-      }
-      CrossProductResidue cr = (CrossProductResidue) r;
-      
-      Iterator subResI = cr.getResidues().iterator();
-      Iterator alphaI = alphabets.iterator();
-      while(subResI.hasNext() && alphaI.hasNext() ) {
-        Residue res = (Residue) subResI.next();
-        Alphabet alpha = (Alphabet) alphaI.next();
-        if(!alpha.contains(res)) {
-          return false;
-        }
-      }
-      if(alphaI.hasNext() || subResI.hasNext()) {
-        return false;
-      }
-      return true;
-    }
-    
-    public String getName() {
-      return "?";
-    }
-    
-    public ResidueParser getParser(String name) {
-      throw new NoSuchElementException(
-        "No parsers associated with this alphabet"
-      );
-    }
-    
-    public ResidueList residues() {
-      return ResidueList.EMPTY_LIST;
+    public Object get(int indx) {
+      return residueAt(labels.get(indx), col);
     }
     
     public int size() {
-      return -1;
+      return labels.size();
     }
-    
-    public void validate(Residue r) throws IllegalResidueException {
-      if(!(r instanceof CrossProductAlphabet)) {
-        throw new IllegalResidueException(
-          "Residue " + r + " is not a CrossProduct residue"
-        );
-      }
-      CrossProductResidue cr = (CrossProductResidue) r;
-      Iterator subResI = cr.getResidues().iterator();
-      Iterator alphaI = alphabets.iterator();
-      while( subResI.hasNext() && alphaI.hasNext() ) {
-        Residue res = (Residue) subResI.next();
-        Alphabet alpha = (Alphabet) alphaI.next();
-        alpha.validate(res);
-      }
-      if( alphaI.hasNext() || subResI.hasNext() ) {
-        throw new IllegalResidueException(
-          "Residue has a different number of dimensions to this alphabet: " + cr
-        );
-      }
-    }
-    
-    public List getAlphabets() {
-      return alphabets;
-    }
-    
-    public CrossProductResidue getResidue(List rl)
-    throws IllegalAlphabetException {
-      final List rl2 = Collections.unmodifiableList(rl);
-      return new CrossProductResidue() {
-        public List getResidues() {
-          return rl2;
-        }
-        public String getName() {
-          StringBuffer sb = new StringBuffer("(");
-          if(rl2.size() != 0) {
-            sb.append(((Residue) rl2.get(0)).getName());
-            for(int i = 1; i < size(); i++) {
-              sb.append(((Residue) rl2.get(i)).getName());
-            }
-          }
-          sb.append(")");
-          return sb.toString();
-        }
-      
-        public char getSymbol() {
-          return '?';
-        }
-        
-        public Annotation getAnnotation() {
-          return Annotation.EMPTY_ANNOTATION;
-        }
-      }; 
-    }
-    public Annotation getAnnotation() {
-      return Annotation.EMPTY_ANNOTATION;
-    }
-  }
+  }    
 }
