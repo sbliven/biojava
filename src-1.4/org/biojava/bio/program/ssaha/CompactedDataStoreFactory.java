@@ -126,7 +126,7 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
     
     // allocate array for k-tuple -> hit list
     //System.out.println("Word length:\t" + wordLength);
-    int words = 2 << (
+    int words = 1 << (
       (int) packing.wordSize() *
       (int) wordLength
     );
