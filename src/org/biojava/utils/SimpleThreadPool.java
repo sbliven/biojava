@@ -47,6 +47,8 @@ import java.util.LinkedList;
 public class SimpleThreadPool implements ThreadPool
 {
     protected PooledThread [] threads;
+    protected int priority;
+
     private LinkedList queue;
     private boolean daemon;
     private boolean waiting;
@@ -54,11 +56,26 @@ public class SimpleThreadPool implements ThreadPool
 
     /**
      * Creates a new <code>SimpleThreadPool</code> containing 4
-     * non-daemon threads and starts them.
+     * non-daemon threads and starts them. The threads have priority
+     * Thread.NORM_PRIORITY.
      */
     public SimpleThreadPool()
     {
         this(4, false);
+    }
+
+    /**
+     * Creates a new <code>SimpleThreadPool</code> containing the
+     * specified number of threads and starts them. The threads have
+     * priority Thread.NORM_PRIORITY.
+     *
+     * @param threadCount an <code>int</code> thread count.
+     * @param daemon a <code>boolean</code> indicating whether the
+     * threads should be daemons.
+     */
+    public SimpleThreadPool(int threadCount, boolean daemon)
+    {
+        this(threadCount, daemon, Thread.NORM_PRIORITY);
     }
 
     /**
@@ -68,10 +85,12 @@ public class SimpleThreadPool implements ThreadPool
      * @param threadCount an <code>int</code> thread count.
      * @param daemon a <code>boolean</code> indicating whether the
      * threads should be daemons.
+     * @param priority an <code>int</code> priority for the threads.
      */
-    public SimpleThreadPool(int threadCount, boolean daemon)
+    public SimpleThreadPool(int threadCount, boolean daemon, int priority)
     {
         this.daemon = daemon;
+        this.priority = priority;
         queue = new LinkedList();
         threads = new PooledThread[threadCount];
         stopped = true;
@@ -106,6 +125,7 @@ public class SimpleThreadPool implements ThreadPool
                 threads[i] = new PooledThread();
                 if (daemon)
                     threads[i].setDaemon(true);
+                threads[i].setPriority(priority);
                 threads[i].start();
             }
         }
