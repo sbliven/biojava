@@ -31,7 +31,7 @@ package org.biojava.bio.seq;
  *
  * @author Matthew Pocock
  */
-public class IllegalAlphabetException extends Exception {
+public class IllegalAlphabetException extends SeqException {
   /**
    * Just make the exception.
    */
@@ -41,4 +41,8 @@ public class IllegalAlphabetException extends Exception {
    * Make the exception with a message.
    */
   public IllegalAlphabetException(String message) { super(message); }
+  
+  public IllegalAlphabetException(Throwable t) { super(t); }
+  
+  public IllegalAlphabetException(Throwable t, String message) { super(t, message); }
 }

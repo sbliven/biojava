@@ -43,7 +43,7 @@ public class SimpleState extends AbstractState {
     } catch (IllegalResidueException ire) {
       throw new IllegalResidueException(
         ire,
-        "Couldn't retrieve weight for " + r.getName() + " in state " + getName()
+        "Couldn't retrieve weight in state " + getName()
       );
     }
     Double d = (Double) residueToProb.get(r);

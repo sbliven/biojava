@@ -272,6 +272,7 @@ public final class AlphabetManager {
     CrossProductAlphabet cpa =
       (CrossProductAlphabet) crossProductAlphabets.get(aw);
     
+    int size = 1;
     if(cpa == null) {
       for(Iterator i = aList.iterator(); i.hasNext(); ) {
         Alphabet aa = (Alphabet) i.next();
@@ -279,10 +280,15 @@ public final class AlphabetManager {
           cpa =  new InfiniteCrossProductAlphabet(aList);
           break;
         }
+        size *= ((FiniteAlphabet) aa).size();
       }
       if(cpa == null) {
         try {
-          cpa = new SimpleCrossProductAlphabet(aList);
+          if(size > 0 && size < 1000) {
+            cpa = new SimpleCrossProductAlphabet(aList);
+          } else {
+            cpa = new SparseCrossProductAlphabet(aList);
+          }
         } catch (IllegalAlphabetException iae) {
           throw new BioError(
             "Could not create SimpleCrossProductAlphabet for " + aList +
@@ -446,11 +452,18 @@ public final class AlphabetManager {
     }
 
     public void validate(Residue r) throws IllegalResidueException {
-	    if (!(
-          (child.contains(r) ||
-           r == gapResidue)
-      )) {
-        throw new IllegalResidueException("Residue " + r.getName() + " is not found in Alphabet " + getName());
+      if(r == gapResidue) {
+        return;
+      }
+      
+      try {
+        child.validate(r);
+      } catch (IllegalResidueException ire) {
+        throw new IllegalResidueException(
+          ire,
+          "Residue not found in underlying alphabet and is not gap in " +
+          getName()
+        );
       }
     }
 

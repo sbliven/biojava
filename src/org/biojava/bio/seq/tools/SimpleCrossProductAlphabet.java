@@ -23,7 +23,6 @@
 package org.biojava.bio.seq.tools;
 
 import java.util.*;
-import java.lang.reflect.*;
 
 import org.biojava.bio.seq.*;
 
@@ -142,12 +141,15 @@ class SimpleCrossProductAlphabet implements FiniteAlphabet, CrossProductAlphabet
     new AlphabetManager.ListWrapper();
 
   public CrossProductResidue getResidue(List l) throws IllegalAlphabetException {
-    gopher.l = l;
-    CrossProductResidue r = (CrossProductResidue) ourResidues.get(gopher);
+    CrossProductResidue r;
+    synchronized(gopher) {
+      gopher.l = l;
+      r = (CrossProductResidue) ourResidues.get(gopher);
+    }
     if (r == null) {
       throw new IllegalAlphabetException(
         "Unable to find CrossProduct residue for " +
-        l + " in alphabet " + getName()
+        new SimpleCrossProductResidue(l, '?').getName() + " in alphabet " + getName()
       );
     }
     return r;

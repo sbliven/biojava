@@ -88,7 +88,7 @@ public class PairwiseDP extends DP {
     }
 
 
-private class Backward {
+  private class Backward {
     private int[][] transitions;
     private double[][] transitionScores;
     private State[] states;
@@ -98,173 +98,183 @@ private class Backward {
     public double runBackward(ResidueList seq0, ResidueList seq1, PairDPCursor curs) 
         throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
     {
-	states = getStates();
-	cursor = curs;
-	alpha = (CrossProductAlphabet) getModel().emissionAlphabet();
+      states = getStates();
+      cursor = curs;
+      alpha = (CrossProductAlphabet) getModel().emissionAlphabet();
 
-	// initialization
+      // initialization
 
-	double[] col = cursor.getCurrentColumn();
-	for (int l = 0; l < states.length; ++l)
-	    col[l] = (states[l] == magicalState) ? 0.0 :
-	                Double.NEGATIVE_INFINITY;
+      double[] col = cursor.getCurrentColumn();
+      for (int l = 0; l < states.length; ++l) {
+        col[l] = (states[l] == magicalState)
+          ? 0.0
+	        : Double.NEGATIVE_INFINITY;
+      }
 
-	// Recurse
+      // Recurse
 
-	transitions = getBackwardTransitions();
-	transitionScores = getBackwardTransitionScores();
+      transitions = getBackwardTransitions();
+      transitionScores = getBackwardTransitionScores();
 
-	while (cursor.canAdvance(0) || cursor.canAdvance(1)) {
-	    if (cursor.canAdvance(0)) {
-		cursor.advance(0);
-		for (int i = seq1.length() + 1; i >= cursor.getPos(1); --i) {
-		    backwardPrepareCol(cursor.getPos(0), i);
-		}
-	    }
+      while (cursor.canAdvance(0) || cursor.canAdvance(1)) {
+        if (cursor.canAdvance(0)) {
+          cursor.advance(0);
+          for (int i = seq1.length() + 1; i >= cursor.getPos(1); --i) {
+            backwardPrepareCol(cursor.getPos(0), i);
+          }
+        }
 
-	    if (cursor.canAdvance(1)) {
-		cursor.advance(1);
-		for (int i = seq0.length() + 1; i >= cursor.getPos(0); --i) {
-		    backwardPrepareCol(i, cursor.getPos(1));
-		}
-	    }
-	}  
+        if (cursor.canAdvance(1)) {
+          cursor.advance(1);
+          for (int i = seq0.length() + 1; i >= cursor.getPos(0); --i) {
+            backwardPrepareCol(i, cursor.getPos(1));
+          }
+        }
+      }
 
-	// Terminate!
+      // Terminate!
 
-	col = cursor.getColumn(ia00);
-	int l = 0;
-	while (states[l] != magicalState)
-	    ++l;
+      col = cursor.getColumn(ia00);
+      int l = 0;
+      while (states[l] != magicalState) {
+        ++l;
+      }
 
-	return col[l];
+      return col[l];
     }
 
     private List ress = new ArrayList();
-    private Object[][] matrix = new Object[2][2];
+    private double[][][] matrix = new double [2][2][];
+    private double[][][] emission = new double [2][2][];
     private Residue[][] resMatrix = new Residue[2][2];
+    private Residue[][] resMatrixF = new Residue[2][2];
     private int[] colId = new int[2];
 
     private void backwardPrepareCol(int i, int j)
-	throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
     {
-	// System.out.println("*** (" + i + "," + j + ")");
+      // System.out.println("*** (" + i + "," + j + ")");
 
-	ress.clear();
-	ress.add(cursor.residue(0, i+1));
-	ress.add(cursor.residue(1, j+1));
-	// resMatrix[1][1] = alpha.getResidue(ress);
-	resMatrix[1][1] = getResWrapper(alpha, ress);
-	ress.clear();
-	ress.add(cursor.residue(0, i + 1));
-	ress.add(AlphabetManager.instance().getGapResidue());
-	// resMatrix[1][0] = alpha.getResidue(ress);
-	resMatrix[1][0] = getResWrapper(alpha, ress);
-	ress.clear();
-	ress.add(AlphabetManager.instance().getGapResidue());
-	ress.add(cursor.residue(1, j + 1));
-	// resMatrix[0][1] = alpha.getResidue(ress);
-	resMatrix[0][1] = getResWrapper(alpha, ress);
+      ress.clear();
+      ress.add(cursor.residue(0, i+1));
+      ress.add(cursor.residue(1, j+1));
+      resMatrix[1][1] = getResWrapper(alpha, ress);
+      ress.clear();
+      ress.add(cursor.residue(0, i + 1));
+      ress.add(AlphabetManager.instance().getGapResidue());
+      resMatrix[1][0] = getResWrapper(alpha, ress);
+      ress.clear();
+      ress.add(AlphabetManager.instance().getGapResidue());
+      ress.add(cursor.residue(1, j + 1));
+      resMatrix[0][1] = getResWrapper(alpha, ress);
 
-	colId[0] = i;
-	colId[1] = j;
-	// System.out.println("***A ("+ colId[0] + "," + colId[1] +")");
-	matrix[0][0] = cursor.getColumn(colId);
-	colId[0]++;
-	matrix[1][0] = cursor.getColumn(colId);
-	colId[1]++;
-	matrix[1][1] = cursor.getColumn(colId);
-	colId[0]--;
-	matrix[0][1] = cursor.getColumn(colId);
+      ress.clear();
+      ress.add(cursor.residue(0, i));
+      ress.add(cursor.residue(1, j));
+      resMatrixF[1][1] = getResWrapper(alpha, ress);
+      ress.clear();
+      ress.add(cursor.residue(0, i));
+      ress.add(AlphabetManager.instance().getGapResidue());
+      resMatrixF[1][0] = getResWrapper(alpha, ress);
+      ress.clear();
+      ress.add(AlphabetManager.instance().getGapResidue());
+      ress.add(cursor.residue(1, j));
+      resMatrixF[0][1] = getResWrapper(alpha, ress);
 
-	backwardCalcStepMatrix();
+      colId[0] = i;
+      colId[1] = j;
+      // System.out.println("***A ("+ colId[0] + "," + colId[1] +")");
+      matrix[0][0] = cursor.getColumn(colId);
+      emission[0][0] = cursor.getEmission(colId);
+      colId[0]++;
+      matrix[1][0] = cursor.getColumn(colId);
+      emission[1][0] = cursor.getEmission(colId);
+      colId[1]++;
+      matrix[1][1] = cursor.getColumn(colId);
+      emission[1][1] = cursor.getEmission(colId);
+      colId[0]--;
+      matrix[0][1] = cursor.getColumn(colId);
+      emission[0][1] = cursor.getEmission(colId);
+
+      double[] curECol = emission[0][0];
+      for(int l = 0; l < getDotStatesIndex(); l++) {
+        EmissionState es = (EmissionState) states[l];
+        int [] advance = es.getAdvance();
+        curECol[l] = es.getWeight(resMatrixF[advance[0]][advance[1]]);
+      }
+
+      backwardCalcStepMatrix();
     }
 
     private void backwardCalcStepMatrix()
-	throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
+    throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
     {
-	double[] curCol = (double[]) matrix[0][0];
-	int[] advance;
-	for (int l = states.length - 1; l >= 0; --l) {
-	    // System.out.println("State = " + states[l].getName());
+      double[] curCol = matrix[0][0];
+      int[] advance;
+      
+      for (int l = states.length - 1; l >= 0; --l) {
+        // System.out.println("State = " + states[l].getName());
 
-	    if (states[l] instanceof EmissionState)
-		advance = ((EmissionState) states[l]).getAdvance();
-	    else
-		advance = ia00;
+        if (states[l] instanceof EmissionState) {
+          advance = ((EmissionState) states[l]).getAdvance();
+        } else {
+        advance = ia00;
+        }
 
+        // System.out.println("weight = " + weight);
+        double score = 0.0;
+        int [] tr = transitions[l];
+        double[] trs = transitionScores[l];
 
-//  	    Residue res = resMatrix[advance[0]][advance[1]];
-//  	    double weight = Double.NEGATIVE_INFINITY;
-//  	    if (res == null) {
-//  		weight = Double.NEGATIVE_INFINITY;
-//  	    } else if (! (states[l] instanceof EmissionState)) {
-//  		weight = 0.0;
-//  	    } else if (res == MagicalState.MAGICAL_RESIDUE) {
-//  		try {
-//  		    weight = ((EmissionState) states[l]).getWeight(res);
-//  		} catch (Exception ex) {}
-//  	    } else {
-//  		weight = ((EmissionState) states[l]).getWeight(res);
-//  	    }
+        // Calculate probabilities for states with transitions
+        // here.
 
+  	    double[] sourceScores = new double[tr.length];
+        for (int ci = 0; ci < tr.length; ++ci) {
+          double[] sCol;
+          double weight = 0.0;
 
-	    // System.out.println("weight = " + weight);
-	    double score = 0.0;
-	    int [] tr = transitions[l];
-	    double[] trs = transitionScores[l];
+          int destI = tr[ci];
+          State destS = states[destI];
+          if (destS instanceof EmissionState) {
+            advance = ((EmissionState)destS).getAdvance();
+            Residue res = resMatrix[advance[0]][advance[1]];
+            if (res == null) {
+              weight = Double.NEGATIVE_INFINITY;
+            } else if (! (destS instanceof EmissionState)) {
+              weight = 0.0;
+            } else {
+              weight = emission[advance[0]][advance[1]][destI];
+            }
+            sCol = matrix[advance[0]][advance[1]];
+          } else {
+            sCol = matrix[0][0];
+          }
+          sourceScores[ci] = sCol[destI] + weight;
+        }
 
-	    // Calculate probabilities for states with transitions
-	    // here.
-		
-
-	    double[] sourceScores = new double[tr.length];
-	    for (int ci = 0; ci < tr.length; ++ci) {
-		double[] sCol;
-		double weight = 0.0;
-
-		if (states[tr[ci]] instanceof EmissionState) {
-		    advance = ((EmissionState)states[tr[ci]]).getAdvance();
-		    Residue res = resMatrix[advance[0]][advance[1]];
-		    if (res == null) {
-			weight = Double.NEGATIVE_INFINITY;
-		    } else if (! (states[tr[ci]] instanceof EmissionState)) {
-			weight = 0.0;
-		    } else if (res == MagicalState.MAGICAL_RESIDUE) {
-			try {
-			    weight = ((EmissionState) states[tr[ci]]).getWeight(res);
-			} catch (Exception ex) {}
-		    } else {
-			weight = ((EmissionState) states[tr[ci]]).getWeight(res);
-		    }
-		    sCol = (double[]) matrix[advance[0]][advance[1]];
-		} else {
-		    sCol = (double[]) matrix[0][0];
-		}
-		sourceScores[ci] = sCol[tr[ci]] + weight;
-	    }
-
-	    // Find base for addition
-	    int ci = 0;
-	    while (ci < tr.length && sourceScores[ci] == Double.NEGATIVE_INFINITY)
-		++ci;
-	    double constant = (ci < tr.length) ? sourceScores[ci] : 0.0;
+        // Find base for addition
+        int ci = 0;
+        while (ci < tr.length && sourceScores[ci] == Double.NEGATIVE_INFINITY) {
+          ++ci;
+        }
+        double constant = (ci < tr.length) ? sourceScores[ci] : 0.0;
 	    
-	    for (int kc = 0; kc < tr.length; ++kc) {
-		// System.out.println("In from " + states[kc].getName());
-		// System.out.println("prevScore = " + sourceScores[kc]);
+  	    for (int kc = 0; kc < tr.length; ++kc) {
+          // System.out.println("In from " + states[kc].getName());
+          // System.out.println("prevScore = " + sourceScores[kc]);
 
-		int k = tr[kc];
-		if (sourceScores[kc] != Double.NEGATIVE_INFINITY) {
-		    double t = trs[kc];
-		    score += Math.exp(t + sourceScores[kc] - constant);
-		}
-	    }
-	    curCol[l] = Math.log(score) + constant;
-	    // System.out.println(curCol[l]);
-	}
+          int k = tr[kc];
+          if (sourceScores[kc] != Double.NEGATIVE_INFINITY) {
+            double t = trs[kc];
+            score += Math.exp(t + sourceScores[kc] - constant);
+          }
+        }
+        curCol[l] = Math.log(score) + constant;
+        // System.out.println(curCol[l]);
+      }
     }
-}
+  }
 
     //
     // FORWARD
@@ -396,7 +406,7 @@ private class Forward {
     }
 
     private List ress = new ArrayList();
-    private Object[][] matrix = new Object[2][2];
+    private double[][][] matrix = new double[2][2][];
     private Residue[][] resMatrix = new Residue[2][2];
     private int[] colId = new int[2];
 
@@ -438,13 +448,12 @@ private class Forward {
     private void forwardCalcStepMatrix()
 	throws IllegalResidueException, IllegalAlphabetException, IllegalTransitionException
     {
-	double[] curCol = (double[]) matrix[0][0];
+	double[] curCol = matrix[0][0];
 	int[] advance;
 
 	for (int l = 0; l < states.length; ++l) {
 	    if (initializationHack && states[l] == magicalState) {
-		System.out.println("Init fixup");
-		continue;
+        continue;
 	    }
 
 	    // System.out.println("State = " + states[l].getName());
@@ -481,7 +490,7 @@ private class Forward {
 		// here.
 		
 		double[] sourceScores = new double[tr.length];
-		double[] sCol = (double[]) matrix[advance[0]][advance[1]];
+		double[] sCol = matrix[advance[0]][advance[1]];
 		for (int ci = 0; ci < tr.length; ++ci) {
 		    sourceScores[ci] = sCol[tr[ci]];
 		}
@@ -605,8 +614,8 @@ private class Viterbi {
     }
 
     private List ress = new ArrayList();
-    private Object[][] matrix = new Object[2][2];
-    private Object[][] bpMatrix = new Object[2][2];
+    private double[][][] matrix = new double[2][2][];
+    private BackPointer[][][] bpMatrix = new BackPointer[2][2][];
     private Residue[][] resMatrix = new Residue[2][2];
     private int[] colId = new int[2];
 
@@ -653,7 +662,7 @@ private class Viterbi {
     {
 	double[] curCol = (double[]) matrix[0][0];
 	int[] advance;
-	BackPointer[] curBPs = (BackPointer[]) bpMatrix[0][0];
+	BackPointer[] curBPs = bpMatrix[0][0];
 	for (int l = 0; l < states.length; ++l) {
 	    // System.out.println("State = " + states[l].getName());
 
@@ -701,11 +710,11 @@ private class Viterbi {
 		    BackPointer[] bpCol;
 		    if (states[tr[ci]] instanceof EmissionState) {
 			advance = ((EmissionState)states[tr[ci]]).getAdvance();
-		        sCol = (double[]) matrix[advance[0]][advance[1]];
-			bpCol = (BackPointer[]) bpMatrix[advance[0]][advance[1]];
+		        sCol = matrix[advance[0]][advance[1]];
+			bpCol = bpMatrix[advance[0]][advance[1]];
 		    } else {
-			sCol = (double[]) matrix[0][0];
-			bpCol = (BackPointer[]) bpMatrix[0][0];
+			sCol = matrix[0][0];
+			bpCol = bpMatrix[0][0];
 		    }
 		    sourceScores[ci] = sCol[tr[ci]];
 		    oldBPs[ci] = bpCol[tr[ci]];
@@ -738,43 +747,43 @@ private class Viterbi {
     }
 }
 
-private static class BackPointer {
+  private static class BackPointer {
     State state;
     BackPointer back;
     double score;
     Residue residue;
     
     BackPointer(State state, BackPointer back, double score, Residue residue) {
-	this.state = state;
-	this.back = back;
-	this.score = score;
-	this.residue = residue;
+      this.state = state;
+      this.back = back;
+      this.score = score;
+      this.residue = residue;
     }
-}
+  }
 
 
-private static interface PairDPCursor {
-    public int getPos(int dim);
-    public boolean canAdvance(int dim);
-    public void advance(int dim);
-    public Residue residue(int dim, int poz);
-    public double[] getColumn(int[] coords);
-    public double[] getCurrentColumn();
-    public BackPointer[] getBackPointers(int[] coords);
-}
+  private static interface PairDPCursor {
+    int getPos(int dim);
+    boolean canAdvance(int dim);
+    void advance(int dim);
+    Residue residue(int dim, int poz);
+    double[] getColumn(int[] coords);
+    double[] getCurrentColumn();
+    BackPointer[] getBackPointers(int[] coords);
+    double[] getEmission(int[] coords);
+  }
 
+  private static class LightPairDPCursor implements PairDPCursor {
+    private double[][] s1cur;
+    private double[][] s1prev;
+    private double[][] s2cur;
+    private double[][] s2prev;
 
-private static class LightPairDPCursor implements PairDPCursor {
-    private Object[] s1cur;
-    private Object[] s1prev;
-    private Object[] s2cur;
-    private Object[] s2prev;
-
-    private Object[] s1curBP;
-    private Object[] s1prevBP;
-    private Object[] s2curBP;
-    private Object[] s2prevBP;
-
+    private BackPointer[][] s1curBP;
+    private BackPointer[][] s1prevBP;
+    private BackPointer[][] s2curBP;
+    private BackPointer[][] s2prevBP;
+    
     private int[] pos;
     private ResidueList[] seqs;
     private int numStates;
@@ -784,112 +793,122 @@ private static class LightPairDPCursor implements PairDPCursor {
     private boolean storeBPs;
     private BackPointer[] zeroColBP;
 
-    public LightPairDPCursor(ResidueList seq1,
+    public LightPairDPCursor(
+      ResidueList seq1,
 			ResidueList seq2,
-			int states, boolean bp) {
-	this.storeBPs = bp;
-	numStates = states;
+			int states, boolean bp
+    ) {
+      this.storeBPs = bp;
+      numStates = states;
 	
-	s1cur = new Object[seq2.length() + 2];
-	s1prev = new Object[seq2.length() + 2];
-	s2cur = new Object[seq1.length() + 2];
-	s2prev = new Object[seq1.length() + 2];
+    	s1cur = new double[seq2.length() + 2][];
+      s1prev = new double[seq2.length() + 2][];
+      s2cur = new double[seq1.length() + 2][];
+      s2prev = new double[seq1.length() + 2][];
 
-	if (storeBPs) {
-	    s1curBP = new Object[seq2.length() + 2];
-	    s1prevBP = new Object[seq2.length() + 2];
-	    s2curBP = new Object[seq1.length() + 2];
-	    s2prevBP = new Object[seq1.length() + 2];
-	    zeroColBP = new BackPointer[numStates];
-	    s1curBP[0] = s2curBP[0] = new BackPointer[numStates];
-	}
+      if (storeBPs) {
+        s1curBP = new BackPointer[seq2.length() + 2][];
+        s1prevBP = new BackPointer[seq2.length() + 2][];
+        s2curBP = new BackPointer[seq1.length() + 2][];
+        s2prevBP = new BackPointer[seq1.length() + 2][];
+        zeroColBP = new BackPointer[numStates];
+        s1curBP[0] = s2curBP[0] = new BackPointer[numStates];
+      }
 
-	zeroCol = new double[numStates]; // don't touch this, please...
-	for (int i = 0; i < zeroCol.length; ++i)
-	    zeroCol[i] = Double.NEGATIVE_INFINITY;
+      zeroCol = new double[numStates]; // don't touch this, please...
+      for (int i = 0; i < zeroCol.length; ++i) {
+        zeroCol[i] = Double.NEGATIVE_INFINITY;
+      }
 
-	s1cur[0] = s2cur[0] = new double[numStates];
+      s1cur[0] = s2cur[0] = new double[numStates];
 	
 
-	pos = new int[2];
-	pos[0] = pos[1] = 0;
-	seqs = new ResidueList[2];
-	seqs[0] = seq1;
-	seqs[1] = seq2;
+    	pos = new int[2];
+      pos[0] = pos[1] = 0;
+      seqs = new ResidueList[2];
+      seqs[0] = seq1;
+      seqs[1] = seq2;
     }
 
     public int getPos(int dim) {
-	return pos[dim];
+      return pos[dim];
     }
 
     public boolean canAdvance(int dim) {
-	return (pos[dim] <= seqs[dim].length());
+      return (pos[dim] <= seqs[dim].length());
     }
 
     public void advance(int dim) {
-	pos[dim]++;
+      pos[dim]++;
 
-	Object[] tmp;
+      double[][] tmpS;
+      BackPointer[][] tmpBP;
 
-	if (dim == 0) {
-	    tmp = s1cur;
-	    s1cur = s1prev;
-	    s1prev = tmp;
-	    for (int i = 0; i <= pos[1]; ++i) {
-		if (s1cur[i] == null)
-		    s1cur[i] = new double[numStates];
-	    }
+      if (dim == 0) {
+        tmpS = s1cur;
+        s1cur = s1prev;
+        s1prev = tmpS;
+        for (int i = 0; i <= pos[1]; ++i) {
+          if (s1cur[i] == null) {
+            s1cur[i] = new double[numStates];
+          }
+        }
 	    
-	    if (storeBPs) {
-		tmp = s1curBP;
-		s1curBP = s1prevBP;
-		s1prevBP = tmp;
-		for (int i = 0; i <= pos[1]; ++i) {
-		    if (s1curBP[i] == null)
-			s1curBP[i] = new BackPointer[numStates];
-		}
-	    }
-	} else if (dim == 1) {
-	    tmp = s2cur;
-	    s2cur = s2prev;
-	    s2prev = tmp;
-	    for (int i = 0; i <= pos[0]; ++i) {
-		if (s2cur[i] == null)
-		    s2cur[i] = new double[numStates];
-	    }
+  	    if (storeBPs) {
+          tmpBP = s1curBP;
+          s1curBP = s1prevBP;
+          s1prevBP = tmpBP;
+          for (int i = 0; i <= pos[1]; ++i) {
+            if (s1curBP[i] == null) {
+              s1curBP[i] = new BackPointer[numStates];
+            }
+          }
+        }
+      } else if (dim == 1) {
+        tmpS = s2cur;
+        s2cur = s2prev;
+        s2prev = tmpS;
+        for (int i = 0; i <= pos[0]; ++i) {
+          if (s2cur[i] == null) {
+            s2cur[i] = new double[numStates];
+          }
+        }
 
-	    if (storeBPs) {
-		tmp = s2curBP;
-		s2curBP = s2prevBP;
-		s2prevBP = tmp;
-		for (int i = 0; i <= pos[0]; ++i) {
-		    if (s2curBP[i] == null)
-			s2curBP[i] = new BackPointer[numStates];
-		}
-	    }
-	}
+        if (storeBPs) {
+          tmpBP = s2curBP;
+          s2curBP = s2prevBP;
+          s2prevBP = tmpBP;
+          for (int i = 0; i <= pos[0]; ++i) {
+            if (s2curBP[i] == null) {
+              s2curBP[i] = new BackPointer[numStates];
+            }
+          }
+        }
+      }
     }
 
     public Residue residue(int dim, int poz) {
-	if (poz == 0 || poz > seqs[dim].length())
-	    return MagicalState.MAGICAL_RESIDUE;
-	return seqs[dim].residueAt(poz);
+      if (poz == 0 || poz > seqs[dim].length()) {
+        return MagicalState.MAGICAL_RESIDUE;
+      } else {
+        return seqs[dim].residueAt(poz);
+      }
     }
 
-
     public double[] getColumn(int[] coords) {
-	double[] col = _getColumn(coords);
-	if (col == null) {
-	    System.out.println("getColumn Returning null: " + coords[0] + " " + coords[1]); 
-	}
-	return col;
+      double[] col = _getColumn(coords);
+      if (col == null) {
+        System.out.println("getColumn Returning null: " + coords[0] + " " + coords[1]); 
+      }
+      return col;
     }
 
     public double[] _getColumn(int[] coords) {
-//	System.out.println("!!! getting " + coords[0] + "," + coords[1]);
+      //	System.out.println("!!! getting " + coords[0] + "," + coords[1]);
 
-	if (coords[0] == -1 || coords[1] == -1)
-	    return zeroCol;
+      if (coords[0] == -1 || coords[1] == -1) {
+        return zeroCol;
+      }
 
 //    	if (heavyMatrix[coords[0]][coords[1]] == null)
 //    	    heavyMatrix[coords[0]][coords[1]] = new double[numStates];
@@ -897,52 +916,57 @@ private static class LightPairDPCursor implements PairDPCursor {
 
     	if (coords[0] == pos[0] && (s1cur[coords[1]] != null)) {
   	    // System.out.println("??? s1cur");
-    	    return (double[]) s1cur[coords[1]];
+    	  return s1cur[coords[1]];
     	} else if (coords[1] == pos[1] && (s2cur[coords[0]] != null)) {
   	    // System.out.println("??? s2cur");
-    	    return (double[]) s2cur[coords[0]];
+    	  return s2cur[coords[0]];
     	} else if (coords[0] == pos[0] - 1 && (s1prev[coords[1]] != null)) {
   	    // System.out.println("??? s1prev");
-    	    return (double[]) s1prev[coords[1]];
+    	  return s1prev[coords[1]];
     	} else if (coords[1] == pos[1] - 1) {
   	    // System.out.println("??? s2prev");
-    	    return (double[]) s2prev[coords[0]];
+    	  return s2prev[coords[0]];
     	}
 	
-   	throw new NoSuchElementException();
+     	throw new NoSuchElementException();
     }
 
     public BackPointer[] getBackPointers(int[] coords) {
-	if (!storeBPs)
-	    throw new NoSuchElementException("This cursor isn't storing BackPointers.");
+      if (!storeBPs) {
+        throw new NoSuchElementException(
+          "This cursor isn't storing BackPointers."
+        );
+      }
 
 //	System.out.println("!!! getting " + coords[0] + "," + coords[1]);
 
-	if (coords[0] == -1 || coords[1] == -1)
-	    return zeroColBP;
+    	if (coords[0] == -1 || coords[1] == -1) {
+        return zeroColBP;
+      }
 
     	if (coords[0] == pos[0] && (s1curBP[coords[1]] != null)) {
-    	    return (BackPointer[]) s1curBP[coords[1]];
+    	  return s1curBP[coords[1]];
     	} else if (coords[1] == pos[1] && (s2curBP[coords[0]] != null)) {
-    	    return (BackPointer[]) s2curBP[coords[0]];
+    	  return s2curBP[coords[0]];
     	} else if (coords[0] == pos[0] - 1 && (s1prevBP[coords[1]] != null)) {
-    	    return (BackPointer[]) s1prevBP[coords[1]];
+    	  return s1prevBP[coords[1]];
     	} else if (coords[1] == pos[1] - 1) {
-    	    return (BackPointer[]) s2prevBP[coords[0]];
+    	  return s2prevBP[coords[0]];
     	}
 	
-   	throw new NoSuchElementException();
+     	throw new NoSuchElementException();
     }
     
-
     public double[] getCurrentColumn() {
-	throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException();
     }
-}
+    
+    public double[] getEmission(int[] coords) {
+      throw new UnsupportedOperationException();
+    }
+  }
 
-
-
-private static class MatrixPairDPCursor implements PairDPCursor {
+  private static class MatrixPairDPCursor implements PairDPCursor {
     private int[] pos;
     private ResidueList[] seqs;
     private int numStates;
@@ -951,125 +975,166 @@ private static class MatrixPairDPCursor implements PairDPCursor {
 
     private double[][][] sMatrix;
 
-    public MatrixPairDPCursor(ResidueList seq1,
-			     ResidueList seq2,
-			     PairDPMatrix matrix) {
-	numStates = matrix.States().length;
+    public MatrixPairDPCursor(
+      ResidueList seq1,
+			ResidueList seq2,
+			PairDPMatrix matrix
+    ) {
+      numStates = matrix.States().length;
 
-	zeroCol = new double[numStates]; // don't touch this, please...
-	for (int i = 0; i < zeroCol.length; ++i)
-	    zeroCol[i] = Double.NEGATIVE_INFINITY;
+      zeroCol = new double[numStates]; // don't touch this, please...
+      for (int i = 0; i < zeroCol.length; ++i) {
+        zeroCol[i] = Double.NEGATIVE_INFINITY;
+      }
 	
-	sMatrix = matrix.getScoreArray();
+    	sMatrix = matrix.getScoreArray();
 
-	pos = new int[2];
-	pos[0] = pos[1] = 0;
-	seqs = new ResidueList[2];
-	seqs[0] = seq1;
-	seqs[1] = seq2;
+      pos = new int[2];
+      pos[0] = pos[1] = 0;
+      seqs = new ResidueList[2];
+      seqs[0] = seq1;
+      seqs[1] = seq2;
     }
 
     public int getPos(int dim) {
-	return pos[dim];
+      return pos[dim];
     }
 
     public boolean canAdvance(int dim) {
-	return (pos[dim] <= seqs[dim].length());
+      return (pos[dim] <= seqs[dim].length());
     }
 
     public void advance(int dim) {
-	pos[dim]++;
+      pos[dim]++;
     }
 
     public Residue residue(int dim, int poz) {
-	if (poz == 0 || poz > seqs[dim].length())
-	    return MagicalState.MAGICAL_RESIDUE;
-	return seqs[dim].residueAt(poz);
+      if (poz == 0 || poz > seqs[dim].length()) {
+        return MagicalState.MAGICAL_RESIDUE;
+      } else {
+        return seqs[dim].residueAt(poz);
+      }
     }
 
     public double[] getCurrentColumn() {
-	throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException();
     }
 
     public double[] getColumn(int[] coords) {
-//	System.out.println("!!! getting " + coords[0] + "," + coords[1]);
+      //	System.out.println("!!! getting " + coords[0] + "," + coords[1]);
 
-	if (coords[0] == -1 || coords[1] == -1)
-	    return zeroCol;
-
-    	return (double[]) sMatrix[coords[0]][coords[1]];
+      if (coords[0] == -1 || coords[1] == -1) {
+        return zeroCol;
+      } else {
+        return (double[]) sMatrix[coords[0]][coords[1]];
+      }
     }
 
     public BackPointer[] getBackPointers(int[] coords) {
-	throw new NoSuchElementException("This cursor isn't storing BackPointers.");
+      throw new NoSuchElementException("This cursor isn't storing BackPointers.");
     }
     
-}
+    public double[] getEmission(int[] coords) {
+      throw new UnsupportedOperationException();
+    }
+  }
 
-private static class BackMatrixPairDPCursor implements PairDPCursor {
+  private class BackMatrixPairDPCursor implements PairDPCursor {
     private int[] pos;
     private ResidueList[] seqs;
     private int numStates;
 
     private double[] zeroCol;
+    private double[] zeroECol;
 
     private double[][][] sMatrix;
+    private double[][][] eMatrix;
 
-    public BackMatrixPairDPCursor(ResidueList seq1,
-			     ResidueList seq2,
-			     PairDPMatrix matrix) {
-	numStates = matrix.States().length;
+    public BackMatrixPairDPCursor(
+      ResidueList seq1,
+      ResidueList seq2,
+      PairDPMatrix matrix
+    ) {
+      State[] states = matrix.States();
+      numStates = states.length;
 
-	zeroCol = new double[numStates]; // don't touch this, please...
-	for (int i = 0; i < zeroCol.length; ++i)
-	    zeroCol[i] = Double.NEGATIVE_INFINITY;
-	
-	sMatrix = matrix.getScoreArray();
+      zeroCol = new double[numStates]; // don't touch this, please...
+      zeroECol = new double[getDotStatesIndex()];
+      
+      for (int i = 0; i < zeroCol.length; ++i) {
+        zeroCol[i] = Double.NEGATIVE_INFINITY;
+      }
+      for (int i = 0; i < zeroECol.length; i++) {
+        zeroECol[i] = Double.NEGATIVE_INFINITY;
+      }
 
-	pos = new int[2];
-	pos[0] = seq1.length() + 1;
-	pos[1] = seq2.length() + 1;
-	seqs = new ResidueList[2];
-	seqs[0] = seq1;
-	seqs[1] = seq2;
+    	sMatrix = matrix.getScoreArray();
+      eMatrix = new double[sMatrix.length][sMatrix[0].length][getDotStatesIndex()];
+      
+      pos = new int[2];
+      pos[0] = seq1.length() + 1;
+      pos[1] = seq2.length() + 1;
+      seqs = new ResidueList[2];
+      seqs[0] = seq1;
+      seqs[1] = seq2;
     }
 
     public int getPos(int dim) {
-	return pos[dim];
+      return pos[dim];
     }
 
     public boolean canAdvance(int dim) {
-	return (pos[dim] > 0);
+      return (pos[dim] > 0);
     }
 
     public void advance(int dim) {
-	pos[dim]--;
+      pos[dim]--;
     }
 
     public Residue residue(int dim, int poz) {
-	if (poz > seqs[dim].length() + 1)
-	    return null;
-	if (poz == 0 || poz > seqs[dim].length())
-	    return MagicalState.MAGICAL_RESIDUE;
-	return seqs[dim].residueAt(poz);
+      if (poz > seqs[dim].length() + 1) {
+        return null;
+      }
+      if (poz == 0 || poz > seqs[dim].length()) {
+        return MagicalState.MAGICAL_RESIDUE;
+      }
+      return seqs[dim].residueAt(poz);
     }
 
     public double[] getColumn(int[] coords) {
-//	System.out.println("!!! getting " + coords[0] + "," + coords[1]);
+      //	System.out.println("!!! getting " + coords[0] + "," + coords[1]);
 
-	if (coords[0] == -1 || coords[1] == -1 || coords[0] == seqs[0].length() + 2 || coords[1] == seqs[1].length() + 2)
-	    return zeroCol;
-
-    	return (double[]) sMatrix[coords[0]][coords[1]];
+      if (
+        coords[0] == -1 ||
+        coords[1] == -1 ||
+        coords[0] == seqs[0].length() + 2 ||
+        coords[1] == seqs[1].length() + 2
+      ) {
+        return zeroCol;
+      } else {
+        return sMatrix[coords[0]][coords[1]];
+      }
+    }
+    
+    public double[] getEmission(int[] coords) {
+      if(
+        coords[0] == -1 ||
+        coords[1] == -1 ||
+        coords[0] == seqs[0].length() + 2 ||
+        coords[1] == seqs[1].length() + 2
+      ) {
+        return zeroECol;
+      } else {
+        return eMatrix[coords[0]][coords[1]];
+      }
     }
 
     public double[] getCurrentColumn() {
-	return (double[]) sMatrix[pos[0]][pos[1]];
+      return (double[]) sMatrix[pos[0]][pos[1]];
     }
 
     public BackPointer[] getBackPointers(int[] coords) {
-	throw new NoSuchElementException("This cursor isn't storing BackPointers.");
+      throw new NoSuchElementException("This cursor isn't storing BackPointers.");
     }
-    
-}
+  }
 }

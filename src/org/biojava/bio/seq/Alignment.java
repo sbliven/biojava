@@ -36,8 +36,7 @@ import org.biojava.bio.seq.*;
  * <P>
  * Alternatively, it can be thought of as a <span class="type">ResidueList</span>
  * where each <span class="type">Residue</span> is
- * a list of <span class="type">Residue</span>s in that column - probably modeled
- *  as a <span class="type">Column</span> object.
+ * a list of <span class="type">Residue</span>s in that column.
  * <P>
  * To create gapped alignments, use <span class="type">ResidueList</span>s with
  * gaps. The most flexible way to do this will be to leverage
@@ -91,22 +90,5 @@ public interface Alignment extends ResidueList {
    */
   Alignment subAlignment(Set labels, Location loc)
   throws NoSuchElementException;
-  
-  /**
-   * Defines the particular type of CrossProductResidues that is recomended as
-   * a column in an alignment.
-   *
-   * @author Matthew Pocock
-   */
-  interface Column extends CrossProductResidue {
-    /**
-     * Return the same list as the alignment uses to label each ResidueList.
-     * <P>
-     * In this case, it labels each residue.
-     *
-     * @return  a List of labels for the residues
-     */
-    List getLabels();
-  }
 }
 

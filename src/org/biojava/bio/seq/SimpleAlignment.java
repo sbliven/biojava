@@ -55,6 +55,7 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
       return alphabet.getResidue(new ColAsList(col));
     } catch (IllegalAlphabetException iae) {
       throw new BioError(
+        iae,
         "Somehow my crossproduct alphabet is incompatible with column " + col
       );
     }
