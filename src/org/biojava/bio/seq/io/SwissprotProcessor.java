@@ -80,6 +80,11 @@ public class SwissprotProcessor
 		{
 			return new SwissprotProcessor(delegateFactory.makeSequenceBuilder());
 		}
+
+		public SequenceBuilder makeSequenceBuilder(String theSource)
+		{
+			return new SwissprotProcessor(delegateFactory.makeSequenceBuilder(), theSource);
+		}
 	}
 
 	private SwissprotFeatureTableParser features;
@@ -87,6 +92,19 @@ public class SwissprotProcessor
 	private List accessions;
 	{
 		accessions = new ArrayList();
+	}
+
+	/**
+	 * Constructor that sets the source of the feature to theSource.
+	 *
+	 * @param delegate The sequecence builder to be used in constructing the
+	 * sequence
+	 * @param theSource The source of the features.  e.g. "SWISS-PROT", "TrEMBL"
+	 */
+	public SwissprotProcessor(SequenceBuilder delegate, String theSource)
+	{
+		super(delegate);
+		features = new SwissprotFeatureTableParser(this, theSource);
 	}
 
 	public SwissprotProcessor(SequenceBuilder delegate)
