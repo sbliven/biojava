@@ -24,12 +24,23 @@ package org.biojava.bio.dp;
 
 /**
  * A backpointer.
+ * <p>
+ * This is used to facilitate traceback after the Viterbi computation.
  *
  * @author Matthew Pocock
  */
 public class BackPointer {
+  /**
+   * The state with which this backpointer is associated.
+   */
   public final State state;
+  /**
+   * The previous backpointer (towards origin of DP matrix) in traceback.
+   */
   public final BackPointer back;
+  /**
+   * The score of this element of the DP matrix.
+   */
   public final double score;
     
   public BackPointer(State state, BackPointer back, double score) {

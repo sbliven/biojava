@@ -305,7 +305,9 @@ public abstract class DP {
 
   /**
    * Compute the log(score) of all transitions
-   * between the specified States.
+   * between the specified States.  The layout
+   * of the array is identical to that of the transitions
+   * array.
    * <p>
    * Note that all parameters <b>MUST</b> be
    * consistent with each other!!!!
