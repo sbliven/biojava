@@ -69,7 +69,7 @@ public final class KnuthMorrisPrattSearch {
    *
    * A new class should be constructed for each occurance of
    * <code>pattern</code>.<p>
-   *
+   * @param pattern the pattern to search for
    */
   public KnuthMorrisPrattSearch(SymbolList pattern) {
     Alphabet alpha = pattern.getAlphabet();
@@ -118,6 +118,11 @@ public final class KnuthMorrisPrattSearch {
   /**
    * This will return an int[] giving the offsets of the matches in <code>text</code>
    * (ie the location of the first symbol of each match in the <code>text</code>).
+   *
+   * @param text the text or sequence to search for the pattern
+   *
+   * @return an int[] giving the offsets to the matches or a zero length array if there are
+   * no matches.
    */
   public int[] findMatches(SymbolList text){
     List matches = new ArrayList();
@@ -156,17 +161,24 @@ public final class KnuthMorrisPrattSearch {
 
   /**
    * Returns the table of border lengths
+   * @return an int[] of border lenghts
    */
   protected int[] getKmpNextTable(){
     return kmpNext;
   }
-  
+
+  /**
+   *
+   * @return the pattern being searched for
+   */
   public SymbolList getPattern() {
       return pattern;
   }
 
   /**
    * Demo and Test method
+   * @param args no arguments required
+   * @throws Exception if the test fails
    */
   public static void main(String[] args) throws Exception{
     KnuthMorrisPrattSearch kmp1;
