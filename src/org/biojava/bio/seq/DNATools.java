@@ -33,6 +33,7 @@ import org.biojava.bio.symbol.*;
  *
  * @author Matthew Pocock
  * @author Keith James (docs)
+ * @author Mark Schreiber
  */
 public final class DNATools {
   private static final ReversibleTranslationTable complementTable;
@@ -242,21 +243,18 @@ public final class DNATools {
    *
    * @param token  the char to look up
    * @return  the symbol for that char
-   * @throws IllegalSymbolException if the char does not belong to {a, g, c, t}
+   * @throws IllegalSymbolException if the char is not a valid IUB dna code
    */
   static public Symbol forSymbol(char token)
   throws IllegalSymbolException {
-    token = Character.toLowerCase(token);
-    if(token == 'a') {
-      return a;
-    } else if(token == 'g') {
-      return g;
-    } else if(token == 'c') {
-      return c;
-    } else if(token == 't') {
-      return t;
+    String t = Character.toString(Character.toLowerCase(token));
+    SymbolTokenization toke;
+    try{
+      toke = getDNA().getTokenization("token");
+    }catch(BioException e){
+      throw new BioError(e, "Cannot find the 'token' Tokenization for DNA!?");
     }
-    throw new IllegalSymbolException("Unable to find symbol for token " + token);
+    return toke.parseToken(t);
   }
 
   /**

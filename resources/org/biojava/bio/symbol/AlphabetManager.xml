@@ -192,6 +192,60 @@
         <symbolref name="uracil"/>
       </atomicMapping>
 
+     <ambiguityMapping token="r">
+        <symbolref name="adenine" />
+	<symbolref name="guanine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="y">
+        <symbolref name="cytosine" />
+	<symbolref name="uracil" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="m">
+        <symbolref name="cytosine" />
+	<symbolref name="adenine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="k">
+        <symbolref name="guanine" />
+	<symbolref name="uracil" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="s">
+        <symbolref name="guanine" />
+	<symbolref name="cytosine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="w">
+        <symbolref name="adenine" />
+	<symbolref name="uracil" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="h">
+        <symbolref name="adenine" />
+	<symbolref name="cytosine" />
+	<symbolref name="uracil" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="b">
+        <symbolref name="guanine" />
+	<symbolref name="cytosine" />
+	<symbolref name="uracil" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="v">
+        <symbolref name="guanine" />
+	<symbolref name="adenine" />
+	<symbolref name="cytosine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="d">
+        <symbolref name="guanine" />
+	<symbolref name="adenine" />
+	<symbolref name="uracil" />
+      </ambiguityMapping>
+
       <ambiguityMapping token="n">
         <symbolref name="guanine" />
 	    <symbolref name="adenine" />

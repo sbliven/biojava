@@ -40,6 +40,7 @@ import org.biojava.bio.symbol.*;
  * @author Keith James (docs)
  * @author Thomas Down
  * @author Greg Cox
+ * @author Mark Schreiber
  */
 public final class RNATools {
   private static final ReversibleTranslationTable complementTable;
@@ -51,6 +52,7 @@ public final class RNATools {
   static private final AtomicSymbol g;
   static private final AtomicSymbol c;
   static private final AtomicSymbol u;
+  static private final Symbol n;
 
   static private Map symbolToComplement;
 
@@ -58,11 +60,12 @@ public final class RNATools {
     try {
       rna = (FiniteAlphabet) AlphabetManager.alphabetForName("RNA");
 
-      SymbolList syms = new SimpleSymbolList(rna.getTokenization("token"), "agcu");
+      SymbolList syms = new SimpleSymbolList(rna.getTokenization("token"), "agcun");
       a = (AtomicSymbol) syms.symbolAt(1);
       g = (AtomicSymbol) syms.symbolAt(2);
       c = (AtomicSymbol) syms.symbolAt(3);
       u = (AtomicSymbol) syms.symbolAt(4);
+      n = syms.symbolAt(5);
 
       symbolToComplement = new HashMap();
 
@@ -101,6 +104,7 @@ public final class RNATools {
   public static AtomicSymbol g() { return g; }
   public static AtomicSymbol c() { return c; }
   public static AtomicSymbol u() { return u; }
+  public static Symbol n() { return n; }
 
   /**
    * Return the RNA alphabet.
@@ -243,21 +247,19 @@ public final class RNATools {
    *
    * @param token  the char to look up
    * @return  the symbol for that char
-   * @throws IllegalSymbolException if the char does not belong to {a, g, c, t}
+   * @throws IllegalSymbolException if the char is not a valid IUB code.
    */
   static public Symbol forSymbol(char token)
   throws IllegalSymbolException {
-    token = Character.toLowerCase(token);
-    if(token == 'a') {
-      return a;
-    } else if(token == 'g') {
-      return g;
-    } else if(token == 'c') {
-      return c;
-    } else if(token == 'u') {
-      return u;
+    String t = Character.toString(Character.toLowerCase(token));
+    SymbolTokenization toke;
+
+    try{
+      toke = getRNA().getTokenization("token");
+    }catch(BioException e){
+      throw new BioError(e, "Cannot find the 'token' Tokenization for RNA!?");
     }
-    throw new IllegalSymbolException("Unable to find symbol for token " + token);
+    return toke.parseToken(t);
   }
 
   /**
