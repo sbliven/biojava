@@ -1,4 +1,4 @@
-<MarkovModel>
+<MarkovModel heads="1">
   <alphabet name="DNA"/>
   <state name="H0">
     <weight res="a" prob="0.25"/>

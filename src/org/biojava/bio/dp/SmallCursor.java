@@ -26,8 +26,7 @@ import java.util.*;
 import org.biojava.bio.seq.*;
 
 public class SmallCursor extends AbstractCursor {
-  private ResidueList resList;
-  private int length;
+  private final ResidueList resList;
   private double [] currentC;
   private double [] lastC;
   
@@ -36,7 +35,7 @@ public class SmallCursor extends AbstractCursor {
   }
   
   public int length() {
-    return length;
+    return resList.length();
   }
   
   public double [] currentCol() {
@@ -55,9 +54,9 @@ public class SmallCursor extends AbstractCursor {
     currentC = v;
   }
   
-  public SmallCursor(State [] states, int length, ResidueList resList, Iterator resIterator) {
+  public SmallCursor(State [] states, ResidueList resList, Iterator resIterator) {
     super(resIterator);
-    this.length = length;
+    this.resList = resList;
     
     this.currentC = new double[states.length];
     this.lastC = new double[states.length];

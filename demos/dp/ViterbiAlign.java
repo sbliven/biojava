@@ -85,11 +85,11 @@ public class ViterbiAlign {
       MarkovModel model = XmlMarkovModel.readModel(doc.getDocumentElement());
 
       // make alphabets
-      Alphabet alpha = model.queryAlphabet();
+      Alphabet alpha = model.emissionAlphabet();
       ResidueParser rParser = alpha.getParser("symbol");
 
       // make dp object
-      DP dp = new DP(new FlatModel(model));
+      DP dp = DPFactory.createDP(model);
     
       SequenceFactory sFact = new SimpleSequenceFactory();
       FastaFormat fFormat = new FastaFormat();
@@ -102,7 +102,7 @@ public class ViterbiAlign {
           seqI.hasNext(); )
       {
         Sequence seq = seqI.nextSequence();
-        StatePath statePath = dp.viterbi(seq);
+        StatePath statePath = dp.viterbi(new ResidueList [] { seq });
       
         System.out.println(seq.getName());
         for(int i = 0; i <= statePath.length() / 60; i++) {

@@ -58,7 +58,6 @@ class SingleDP extends DP {
     }
     DPCursor dpCursor = new SmallCursor(
       getStates(),
-      seq[0].length(),
       seq[0],
       seq[0].iterator()
     );
@@ -72,7 +71,6 @@ class SingleDP extends DP {
     }
     DPCursor dpCursor = new SmallCursor(
       getStates(),
-      seq[0].length(),
       seq[0],
       new ReverseIterator(seq[0])
     );
@@ -360,7 +358,7 @@ class SingleDP extends DP {
   public StatePath viterbi(ResidueList [] resList)
   throws IllegalResidueException {
     ResidueList r = resList[0];
-    DPCursor dpCursor = new SmallCursor(getStates(), r.length(), r, r.iterator());
+    DPCursor dpCursor = new SmallCursor(getStates(), r, r.iterator());
     return viterbi(dpCursor);
   }
 
@@ -379,6 +377,9 @@ class SingleDP extends DP {
     // initialize
     for (int l = 0; l < stateCount; l++) {
       double [] v = dpCursor.currentCol();
+      if(states[l] == getModel().magicalState()) {
+        System.out.println("Initializing start state to 0.0");
+      }
       v[l] = (states[l] == getModel().magicalState()) ? 0.0 : Double.NEGATIVE_INFINITY;
     }
 
@@ -386,13 +387,16 @@ class SingleDP extends DP {
     while (dpCursor.canAdvance()) { // residue i
       dpCursor.advance();
       Residue res = dpCursor.currentRes();
+      System.out.println(res.getName());
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
       for (int l = 0; l < getDotStatesIndex(); l++) { // emission states
         double emission = ((EmissionState) states[l]).getWeight(res);
         int [] tr = transitions[l];
+        System.out.println("Considering " + tr.length + " alternatives");
         double [] trs = transitionScore[l];
         if (emission == Double.NEGATIVE_INFINITY) {
+          System.out.println(states[l].getName() + ": impossible emission");
           currentCol[l] = Double.NEGATIVE_INFINITY;
           newPointers[l] = null;
         } else {
@@ -411,8 +415,11 @@ class SingleDP extends DP {
           }
           currentCol[l] = transProb + emission;
           if(prev != -1) {
+            System.out.println(states[prev].getName() + "->" + states[l].getName());
             newPointers[l] = new BackPointer(states[l], oldPointers[prev],
                                              trans + emission);
+          } else {
+            System.out.println(states[l].getName() + ": Nowhere to come from");
           }
         }
       }
@@ -436,6 +443,7 @@ class SingleDP extends DP {
           }
           currentCol[l] = transProb;
           if(prev != -1) {
+            System.out.println(states[prev].getName() + "->" + states[l]);
             newPointers[l] = new BackPointer(
               states[l],
               newPointers[prev],
@@ -467,6 +475,7 @@ class SingleDP extends DP {
           }
           currentCol[l] = transProb;
           if(prev != -1) {
+            System.out.println(states[prev].getName() + "->" + states[l]);
             newPointers[l] = new BackPointer(
               states[l],
               newPointers[prev],
@@ -483,7 +492,7 @@ class SingleDP extends DP {
 
     // find max in last row
     BackPointer best = null;
-    double bestScore = 0.0;
+    double bestScore = Double.NaN;
     for (int l = 0; l < stateCount; l++) {
       if (states[l] == getModel().magicalState()) {
         best = oldPointers[l].back;

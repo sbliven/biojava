@@ -24,7 +24,7 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.*;
 
 /**
  * A simple implementation of an Alignment.
@@ -92,16 +92,26 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
     List alphaList = new ArrayList();
     for(Iterator li = labels.iterator(); li.hasNext(); ) {
       Object label = li.next();
-      ResidueList rl = residueListForLabel(label);
-      alphaList.add(rl.alphabet());
-      if(length == -1) {
-        length = rl.length();
-      } else {
-        if(rl.length() != length) {
+      try {
+        ResidueList rl = residueListForLabel(label);
+        alphaList.add(rl.alphabet());
+        if(length == -1) {
+          length = rl.length();
+        } else {
+          if(rl.length() != length) {
+            throw new IllegalArgumentException(
+              "All ResidueLists must be the same length (" + length +
+              "), not " + rl.length()
+            );
+          }
+        }
+      } catch (NoSuchElementException nsee) {
+        if(labelToResidueList.containsKey(label)) {
           throw new IllegalArgumentException(
-            "All ResidueLists must be the same length (" + length +
-            "), not " + rl.length()
+            "The residue list associated with " + label + " is null"
           );
+        } else {
+          throw new BioError(nsee, "Something is screwey - map is lieing about key/values");
         }
       }
     }

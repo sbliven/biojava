@@ -118,7 +118,9 @@ public class FlatModel implements MarkovModel {
     if(from instanceof StateProxy) {
       from2 = ((StateProxy) from).getWrappedState();
       mod = ((StateProxy) from).getSourceModel();
-      if(to instanceof StateProxy) {
+      if(to instanceof MagicalState) {
+        to2 = to;
+      } else if(to instanceof StateProxy) {
         to2 = ((StateProxy) to).getWrappedState();
       } else {
         to2 = ((StateWrapper) to).getModelState();
@@ -126,7 +128,9 @@ public class FlatModel implements MarkovModel {
     } else if(to instanceof StateProxy) {
       to2 = ((StateProxy) to).getWrappedState();
       mod = ((StateProxy) to).getSourceModel();
-      if(from instanceof StateProxy) {
+      if(from instanceof MagicalState) {
+        from2 = from;
+      } else if(from instanceof StateProxy) {
         from2 = ((StateProxy) from).getWrappedState();
       } else {
         from2 = ((StateWrapper) from).getModelState();
@@ -179,23 +183,29 @@ public class FlatModel implements MarkovModel {
     
     flat = new SimpleMarkovModel(model.heads(), model.emissionAlphabet());
 
-    // add all the states    
+    // add all the states
+    System.out.println("Adding states");
     Map old2from = new HashMap();
     Map old2to = new HashMap();
     for(Iterator i = model.stateAlphabet().residues().iterator(); i.hasNext(); ) {
       State s = (State) i.next();
-      if(s instanceof EmissionState) {  // simple emission state in model
+      if(s instanceof DotState) { // simple dot state in model
+        DotStateProxy dsw = new DotStateProxy(s, model, "." + s.getName());
+        old2from.put(s, dsw);
+        old2to.put(s, dsw);
+        flat.addState(dsw);
+        System.out.println("Added " + dsw.getName());
+      } else if(s == model.magicalState()) { // magical state
+        old2from.put(model.magicalState(), model.magicalState());
+        old2to.put(model.magicalState(), model.magicalState());
+      } else if(s instanceof EmissionState) {  // simple emission state in model
         EmissionStateProxy esw = new EmissionStateProxy(
           (EmissionState) s, model, s.getName()
         );
         old2from.put(s, esw);
         old2to.put(s, esw);
         flat.addState(esw);
-      } else if(s instanceof DotState) { // simple dot state in model
-        DotStateProxy dsw = new DotStateProxy(s, model, "." + s.getName());
-        old2from.put(s, dsw);
-        old2to.put(s, dsw);
-        flat.addState(dsw);
+        System.out.println("Added " + esw.getName());
       } else if(s instanceof ModelInState) { // complex model inside state
         ModelInState mis = (ModelInState) s;
         MarkovModel mism = mis.getModel();
@@ -209,11 +219,13 @@ public class FlatModel implements MarkovModel {
             old2from.put(t, esw);
             old2to.put(t, esw);
             flat.addState(esw);
+            System.out.println("Added " + esw.getName());
           } else if(t instanceof DotState) {
             DotStateWrapper dsw = new DotStateWrapper(t, mis, "." + t.getName());
             old2from.put(t, dsw);
             old2to.put(t, dsw);
             flat.addState(dsw);
+            System.out.println("Added " + dsw.getName());
           } else if(t == mism.magicalState()) {
             DotStateWrapper start = new DotStateWrapper(mism.magicalState(), mis, "start");
             DotStateWrapper end = new DotStateWrapper(mism.magicalState(), mis, "end");
@@ -223,11 +235,9 @@ public class FlatModel implements MarkovModel {
             old2to.put(s, start);
             flat.addState(start);
             flat.addState(end);
+            System.out.println("Added " + start.getName() + " and " + end.getName());
           }
         }
-      } else if(s == model.magicalState()) { // magical state
-        old2from.put(model.magicalState(), model.magicalState());
-        old2to.put(model.magicalState(), model.magicalState());
       } else { // unknown eventuality
         throw new IllegalResidueException(s, "Don't know how to handle state: " + s.getName());
       }
@@ -236,20 +246,51 @@ public class FlatModel implements MarkovModel {
     // wire them
     for(Iterator i = flat.stateAlphabet().residues().iterator(); i.hasNext(); ) {
       State s = (State) i.next();
-      if(s instanceof StateWrapper) {
+      System.out.println("Processing transitions involving " + s.getName());
+      if(s instanceof MagicalState) {
+      } else if(s instanceof StateProxy) {
+        StateProxy sp = (StateProxy) s;
+        State swrapped = sp.getWrappedState();
+        MarkovModel smod = sp.getSourceModel();
+        for(Iterator j = smod.transitionsFrom(swrapped).iterator(); j.hasNext(); ) {
+          State twrapped = (State) j.next();
+          State t = (State) old2to.get(twrapped);
+          if(!flat.containsTransition(s, t)) {
+            flat.createTransition(s, t);
+            System.out.println("Created transition " + s.getName() + " -> " + t.getName());
+          }
+        }
+        for(Iterator j = smod.transitionsTo(swrapped).iterator(); j.hasNext(); ) {
+          State twrapped = (State) j.next();
+          State t = (State) old2to.get(twrapped);
+          if(!flat.containsTransition(t, s)) {
+            flat.createTransition(t, s);
+            System.out.println("Created transition " + t.getName() + " -> " + s.getName());
+          }
+        }
+      } else if(s instanceof StateWrapper) {
         StateWrapper sw = (StateWrapper) s;
         State swrapped = sw.getWrappedState();
         MarkovModel wmod = sw.getModelState().getModel();
         for(Iterator j = wmod.transitionsFrom(swrapped).iterator(); j.hasNext(); ) {
           State twrapped = (State) j.next();
-          createTransition(s, (State) old2to.get(twrapped));
+          flat.createTransition(s, (State) old2to.get(twrapped));
+          System.out.println(
+            "Transition " + s.getName() + " -> " +
+            ((State) old2to.get(twrapped)).getName()
+          );
         }
         for(Iterator j = wmod.transitionsTo(swrapped).iterator(); j.hasNext(); ) {
           State twrapped = (State) j.next();
-          createTransition((State) old2from.get(twrapped), s);
+          flat.createTransition((State) old2from.get(twrapped), s);
+          System.out.println(
+            "Transition " + ((State) old2from.get(twrapped)).getName() + " -> " +
+            s
+          );
         }
       }
     }
+    System.out.println("Done");
   }
   
   public static interface StateProxy extends State {

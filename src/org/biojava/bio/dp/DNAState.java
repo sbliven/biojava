@@ -42,7 +42,7 @@ public class DNAState extends AbstractState {
 
   public double getWeight(Residue r)
   throws IllegalResidueException {
-    if(r instanceof MagicalState)
+    if(r == MagicalState.MAGICAL_RESIDUE)
       return Double.NEGATIVE_INFINITY;
     alphabet().validate(r);
     return scores[DNATools.index(r)];
@@ -50,7 +50,7 @@ public class DNAState extends AbstractState {
 
   public void setWeight(Residue r, double score)
   throws IllegalResidueException {
-    if(r instanceof MagicalState)
+    if(r == MagicalState.MAGICAL_RESIDUE)
       return;
     alphabet().validate(r);
     scores[DNATools.index(r)] = score;
