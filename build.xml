@@ -87,25 +87,29 @@
     <property name="manifest.file" value="defaultmanifest.txt" />
     <property name="demosmanifest.file" value="demosmanifest.txt" />
     <property name="resources.dir" value="./resources" />
+    <property name="taglets.dir" value="./taglets" />
 
     <property name="packages" value="org.*" />
 
     <property name="build.dir" value="./ant-build" />
     <!-- Subdirectories for main source and classes -->
-    <property name="build.src.main" value="./ant-build/src/main" />
-    <property name="build.dest.main" value="./ant-build/classes/main" />
+    <property name="build.src.main" value="${build.dir}/src/main" />
+    <property name="build.dest.main" value="${build.dir}/classes/main" />
     <!-- Subdirectories for tests source and classes -->
-    <property name="build.src.tests" value="./ant-build/src/tests" />
-    <property name="build.dest.tests" value="./ant-build/classes/tests" />
+    <property name="build.src.tests" value="${build.dir}/src/tests" />
+    <property name="build.dest.tests" value="${build.dir}/classes/tests" />
     <!-- Subdirectories for demos source and classes -->
-    <property name="build.src.demos" value="./ant-build/src/demos" />
-    <property name="build.dest.demos" value="./ant-build/classes/demos" />
+    <property name="build.src.demos" value="${build.dir}/src/demos" />
+    <property name="build.dest.demos" value="${build.dir}/classes/demos" />
     <!-- Subdirectories for docs source -->
-    <property name="build.src.docs" value="./ant-build/src/docs" />
-    <property name="build.dest.docs" value="./ant-build/docs" />
+    <property name="build.src.docs" value="${build.dir}/src/docs" />
+    <property name="build.dest.docs" value="${build.dir}/docs" />
     <property name="build.dest.javadocs" value="${build.dest.docs}/api" />
     <!-- Subdirectory for libraries used during build -->
-    <property name="build.lib" value="./ant-build/lib" />
+    <property name="build.lib" value="${build.dir}/lib" />
+    <!-- Subdirectory for taglets -->
+    <property name="build.src.taglets" value="${build.dir}/src/taglets" />
+    <property name="build.dest.taglets" value="${build.dir}/dest/taglets" />
     <!-- Subdirectory for test reports -->
     <property name="reports.tests" value="./reports/tests" />
 
@@ -210,9 +214,20 @@
     </copy>
   </target>
 
-  <target name="prepare-14demos" if="java14">
+  <target name="prepare-14demos" depends="init" if="java14">
     <copy todir="${build.src.demos}">
       <fileset dir="${demo14.dir}">
+        <exclude name="**/CVS/**" />
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="prepare-14taglets" depends="init" if="java14">
+    <mkdir dir="${build.src.taglets}" />
+    <mkdir dir="${build.dest.taglets}" />
+
+    <copy todir="${build.src.taglets}">
+      <fileset dir="${taglets.dir}">
         <exclude name="**/CVS/**" />
       </fileset>
     </copy>
@@ -290,6 +305,17 @@
       <classpath>
         <pathelement path="${classpath}" />
         <pathelement path="${build.dest.main}" />
+      </classpath>
+    </javac>
+  </target>
+  
+  <target name="compile-14taglets" depends="init,prepare-14taglets" if="java14">
+    <javac
+      srcdir="${build.src.taglets}"
+      destdir="${build.dest.taglets}"
+    >
+      <classpath>
+        <pathelement path="${classpath}" />
       </classpath>
     </javac>
   </target>
@@ -443,7 +469,7 @@
   </target>
 
   <!-- Creates the API documentation -->
-  <target name="javadocs" depends="init,prepare-src">
+  <target name="javadocs" depends="init,prepare-src,compile-14taglets">
     <mkdir dir="${build.dest.javadocs}" />
     <javadoc
       packagenames="${packages}"
@@ -475,6 +501,8 @@
 
        <group title="Experimental/New Packages"
               packages="org.biojava.bio.proteomics:org.biojava.bio.molbio:org.biojava.stats.svm:org.biojava.stats.svm.tools:org.biojava.bio.seq.homol:org.biojava.directory:org.biojava.utils.lsid:org.biojava.bio.program.unigene:org.biojava.bio.program.ssaha" />
+	      
+       <taglet name="UserLevel" path="${build.dest.taglets}" />
     </javadoc>
   </target>
 

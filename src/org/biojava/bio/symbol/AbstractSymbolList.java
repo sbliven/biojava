@@ -111,7 +111,6 @@ implements SymbolList {
   /**
    * Provides logical equality for two SymbolLists that share the same list
    * of canonical symbols
-   * @author Mark Schreiber
    */
   public boolean equals(Object o){
     if(this == o) return true;//just for optimality
