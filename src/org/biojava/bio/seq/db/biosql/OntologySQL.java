@@ -254,9 +254,10 @@ class OntologySQL {
             "       term_relationship.object_term_id, " +
             "       term_relationship.predicate_term_id " +
             "FROM term LEFT OUTER JOIN term_relationship_term " +
-            "     ON term.term_id = term_relationship_term.term_id JOIN term_relationship " +
+            "     ON term.term_id = term_relationship_term.term_id LEFT OUTER JOIN term_relationship " +
             "     ON term_relationship_term.term_relationship_id = term_relationship.term_relationship_id " +
-            "WHERE term.ontology_id = ?" );
+            "WHERE term.ontology_id = ? " +
+            "ORDER BY term.term_id" );
 
     get_terms.setInt(1, id);
     ResultSet rs = get_terms.executeQuery();
@@ -280,11 +281,15 @@ class OntologySQL {
         int object_term_id = rs.getInt(6); 
         int predicate_term_id = rs.getInt(7);
 
+        System.err.println("Loading triple: " + term_relation_id + " -> " + subject_term_id + ", " + object_term_id + ", " + predicate_term_id);
+
         t = ont.createTriple((Term) termsByID.get(new Integer(subject_term_id)),
                              (Term) termsByID.get(new Integer(object_term_id)),
                              (Term) termsByID.get(new Integer(predicate_term_id)),
                              name, description);
       }
+
+      System.err.println("Loaded term: " + tid + " -> " + t);
 
       termsByID.put(tid, t);
       IDsByTerm.put(t, tid);
@@ -350,28 +355,6 @@ class OntologySQL {
       }
       rs.close();
       get_onts.close();
-
-      PreparedStatement get_rels = conn.prepareStatement(
-              "select ontology_id, subject_term_id, object_term_id, predicate_term_id " +
-              "  from term_relationship"
-      );
-
-      rs = get_rels.executeQuery();
-      while (rs.next()) {
-        int ontology_id = rs.getInt(1);
-        int subject_id = rs.getInt(2);
-        int object_id = rs.getInt(3);
-        int predicate_id = rs.getInt(4);
-        Ontology ont = (Ontology) ontologiesByID.get(new Integer(ontology_id));
-        ont.createTriple(
-                localize(ont, (Term) termsByID.get(new Integer(subject_id))),
-                localize(ont, (Term) termsByID.get(new Integer(object_id))),
-                localize(ont, (Term) termsByID.get(new Integer(predicate_id))),
-                null, null
-        );
-      }
-      rs.close();
-      get_rels.close();
 
       for (Iterator i = ontologiesByID.values().iterator(); i.hasNext(); ) {
         Ontology ont = (Ontology) i.next();
@@ -493,7 +476,7 @@ class OntologySQL {
           rolledback = true;
         } catch (SQLException ex2) {}
       }
-      throw new BioRuntimeException("Error removing from BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""),ex);
+      throw new BioRuntimeException("Error commiting to BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""),ex);
     }
   }
 
