@@ -1,6 +1,29 @@
+Welcome to BioJava.
 
+BioJava is an open-source initiative with the aim of providing the
+biological community with objects for representing and manipulating
+biological information. We hope that it becomes the one-stop solution for
+every-day biological programming.
 
-This is the biojava core classes.
+This distribution contains the biojava classes and resources, along with
+scripts for building the .class files and the documentation tree. The CVS
+directories are arranged as follows:
 
-Contact Matt Pocock (mrp@sanger.ac.uk) for
-more details
+biojava
+ |
+ |- src : java source files and package documentation
+ |
+ |- resources : resource files - images, xml documents
+ |
+ |- build : scripts for managing your copy of the repository
+
+In addition, the scripts will generate the non-cvs directories docs and
+class, which will contain the javadoc documentation and the class files.
+
+The XML portions of this source tree rely on XML.jar, which can be
+downloaded from Sun at:
+
+http://developer.java.sun.com/developer/products/xml
+
+Contact Matthew Pocock (mrp@sanger.ac.uk) for more details, or mail the
+biojava mailing list (biojava-l@biojava.org).
