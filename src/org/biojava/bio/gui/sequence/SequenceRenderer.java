@@ -22,12 +22,62 @@
 package org.biojava.bio.gui.sequence;
 
 import java.awt.*;
+import java.awt.geom.*;
 import org.biojava.bio.gui.*;
 import org.biojava.bio.seq.*;
 
+/**
+ * The interface for things that can render a line of information about a
+ * sequence.
+ * <P>
+ * Renderers are always activated within the context of a particular sequence
+ * panel. A single Renderer can be shaired among many sequence panels, or added
+ * multiple times to the same panel. The renderer is required to request how
+ * much leading and trailing space it requires, as well as the depth (space
+ * orthoganal to the direction that the sequence is rendered).
+ *
+ * @author Thomas Down
+ * @author Matthew Pocock
+ */
 public interface SequenceRenderer {
-    void paint(Graphics2D g, SequencePanel sp);
+  /**
+   * Render a portion (possibly all) of the information for sp to g, displaying
+   * all of the data that would fall within seqBox.
+   *
+   * @param g the Graphics2D to render to
+   * @param sp the SequencePanel that encapsulates the information to render
+   * @param seqBox the rectangle within which to render sequence stuff
+   */
+  void paint(Graphics2D g, SequencePanel sp, Rectangle2D seqBox);
+  
+  /**
+   * Retrieve the depth of this renderer when rendering sp.
+   * <P>
+   * The depth may vary between sequence panels - for example based upon
+   * sequence length.
+   *
+   * @param sp the SequencePanel to return info for
+   * @return the depth of the renderer for that sequence panel
+   */
     double getDepth(SequencePanel sp);
+  /**
+   * Retrieve the minimum leading distance for this renderer when rendering sp.
+   * <P>
+   * The leading distance may vary between sequence panels - for example based
+   * upon sequence length.
+   *
+   * @param sp the SequencePanel to return info for
+   * @return the leading distance of the renderer for that sequence panel
+   */
     double getMinimumLeader(SequencePanel sp);
+  /**
+   * Retrieve the minimum trailing distance for this renderer when rendering sp.
+   * <P>
+   * The trailing distance may vary between sequence panels - for example based
+   * upon sequence length.
+   *
+   * @param sp the SequencePanel to return info for
+   * @return the trailing distance of the renderer for that sequence panel
+   */
     double getMinimumTrailer(SequencePanel sp);
 }

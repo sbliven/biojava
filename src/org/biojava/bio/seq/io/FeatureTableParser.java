@@ -112,88 +112,99 @@ class FeatureTableParser {
 	
     }
 
-    private Location parseLocation(String loc) throws BioException {
-	boolean joining = false;
-	boolean complementing = false;
-	boolean isComplement = false;
-	boolean ranging = false;
+  private Location parseLocation(String loc) throws BioException {
+    boolean joining = false;
+    boolean complementing = false;
+    boolean isComplement = false;
+    boolean ranging = false;
 	
-	int start = -1;
+	  int start = -1;
 
-	Location result = null;
+    Location result = null;
+    List locationList = null;
 	
-	StringTokenizer toke = new StringTokenizer(loc, "(),. ><", true);
-	int level = 0;
-	while (toke.hasMoreTokens()) {
+	  StringTokenizer toke = new StringTokenizer(loc, "(),. ><", true);
+    int level = 0;
+    while (toke.hasMoreTokens()) {
 	    String t = toke.nextToken();
 	    // System.err.println(t);
 	    if (t.equals("join")) {
-		joining = true;
-		result = new CompoundLocation();
+        joining = true;
+        locationList = new ArrayList();
 	    } else if (t.equals("complement")) {
-		complementing = true;
-		isComplement = true;
+        complementing = true;
+        isComplement = true;
 	    } else if (t.equals("(")) {
-		++level;
+        ++level;
 	    } else if (t.equals(")")) {
-		--level;
+        --level;
 	    } else if (t.equals(".")) {
 	    } else if (t.equals(",")) {
 	    } else if (t.equals(">")) {
 	    } else if (t.equals("<")) {
 	    } else if (t.equals(" ")) {
 	    } else {
-		// System.err.println("Range! " + ranging);
-		// This ought to be an actual oordinate.
-		int pos = -1;
-		try {
-		    pos = Integer.parseInt(t);
-		} catch (NumberFormatException ex) {
-		    throw new BioException("bad locator: " + t + " " + loc);
-		}
+        // System.err.println("Range! " + ranging);
+        // This ought to be an actual coordinate.
+        int pos = -1;
+        try {  
+          pos = Integer.parseInt(t);
+        } catch (NumberFormatException ex) {
+          throw new BioException("bad locator: " + t + " " + loc);
+        }
 
-		if (ranging == false) {
-		    start = pos;
-		    ranging = true;
-		} else {
-		    Location rl = new RangeLocation(start, pos);
-		    if (joining) {
-			((CompoundLocation) result).addLocation(rl);
-		    } else {
-			if (result != null)
-			    throw new BioException();
-			result = rl;
-		    }
-		    ranging = false;
-		    complementing = false;
-		}
+        if (ranging == false) {
+          start = pos;
+          ranging = true;
+        } else {
+          Location rl = new RangeLocation(start, pos);
+          if (joining) {
+            locationList.add(rl);
+          } else {
+            if (result != null) {
+              throw new BioException(
+                "Tried to set result to " + rl +
+                " when it was alredy set to " + result
+              );
+            }
+            result = rl;
+          }
+          ranging = false;
+          complementing = false;
+        }
 	    }
-	}
-	if (level != 0)
-	    throw new BioException("Mismatched parentheses: " + loc);
-	
-	if (ranging) {
-	    Location rl = new PointLocation(start);
-	    if (joining) {
-		((CompoundLocation) result).addLocation(rl);
-	    } else {
-		if (result != null)
-		    throw new BioException();
-		result = rl;
-	    }
-	}
-
-	if (isComplement)
-	    featureStrand = StrandedFeature.NEGATIVE;
-	else
-	    featureStrand = StrandedFeature.POSITIVE;
-
-	if (result == null) {
-	    throw new BioException("Location null: " + loc);
-	}
-
-	return result;
     }
+    if (level != 0) {
+	    throw new BioException("Mismatched parentheses: " + loc);
+    }
+    
+	  if (ranging) {
+	    Location rl = new PointLocation(start);
+      if (joining) {
+        locationList.add(rl);
+      } else {
+        if (result != null) {
+          throw new BioException();
+        }
+        result = rl;
+      }
+    }
+
+    if (isComplement) {
+	    featureStrand = StrandedFeature.NEGATIVE;
+    } else { 
+	    featureStrand = StrandedFeature.POSITIVE;
+    }
+    
+    if (result == null) {
+      if(locationList == null) {
+   	    throw new BioException("Location null: " + loc);
+      }
+      result = new CompoundLocation(locationList);
+    }
+
+    return result;
+  }
 
     private void processAttribute(String attr) throws BioException {
 	// System.err.println(attr);

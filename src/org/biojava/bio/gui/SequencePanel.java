@@ -22,8 +22,8 @@
 package org.biojava.bio.gui;
 
 import java.util.*;
-import java.util.List; // usefull trick to 'hide' javax.swing.List
 import java.beans.*;
+import java.io.Serializable;
 import java.lang.reflect.*;
 
 import java.awt.*;
@@ -35,6 +35,8 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.gui.sequence.*;
+
+import java.util.List; // usefull trick to 'hide' javax.swing.List
 
 /**
  * A panel that visualy displays a Sequence.
@@ -60,12 +62,13 @@ public class SequencePanel extends JComponent implements SwingConstants {
   private double scale;
   private int lines;
 
-  private double insetBefore = 10;
-  private double insetAfter = 10;
   private double alongDim = 0.0;
   private double acrossDim = 0.0;
   private double lineDepth = 0.0;
   private int realLines = 0;
+  
+  private Border leadingBorder;
+  private Border trailingBorder;
 
   private List views;
   private Map depths;
@@ -84,10 +87,17 @@ public class SequencePanel extends JComponent implements SwingConstants {
     lines = 1;
 
     theMonitor = new RendererMonitor();
+    leadingBorder = new Border();
+    trailingBorder = new Border();
+    leadingBorder.addPropertyChangeListener(theMonitor);
+    trailingBorder.addPropertyChangeListener(theMonitor);
   }
 
   public SequencePanel() {
     super();
+    if(getFont() == null) {
+      setFont(new Font("Times New Roman", Font.PLAIN, 12));
+    }
     this.addPropertyChangeListener(theMonitor);
   }
     
@@ -141,18 +151,26 @@ public class SequencePanel extends JComponent implements SwingConstants {
     return lines;
   }
   
+  public Border getLeadingBorder() {
+    return leadingBorder;
+  }
+  
+  public Border getTrailingBorder() {
+    return trailingBorder;
+  }
+  
   public void paintComponent(Graphics g) {
     Graphics2D g2 = (Graphics2D) g;
 
     Rectangle2D.Double boxClip = new Rectangle2D.Double();
     switch (direction) {
       case HORIZONTAL:
-        boxClip.width = alongDim;
+        boxClip.width = alongDim + leadingBorder.getSize() + trailingBorder.getSize();
         boxClip.height = acrossDim;
         break;
       case VERTICAL:
         boxClip.width = acrossDim;
-        boxClip.height = alongDim;
+        boxClip.height = alongDim + leadingBorder.getSize() + trailingBorder.getSize();
         break;
     }
     
@@ -162,38 +180,65 @@ public class SequencePanel extends JComponent implements SwingConstants {
     int minLine = 0; 
     int maxLine = realLines;
     Rectangle2D.Double clip = new Rectangle2D.Double();
+    Rectangle2D.Double seqBox = new Rectangle2D.Double();
+    
+    double totalLength =  
+      leadingBorder.getSize() +
+      trailingBorder.getSize() +
+      scale * sequence.length();
     switch (direction) {
       case HORIZONTAL:
-        clip.width = insetBefore + insetAfter + scale * sequence.length();
+        clip.width = totalLength;
+        seqBox.width = alongDim; 
         minLine = (int) Math.max(minLine, Math.floor(newClip.getMinY()/lineDepth));
         maxLine = (int) Math.min(maxLine, Math.ceil(newClip.getMaxY()/lineDepth));
-        g2.translate(-minLine * alongDim, minLine * lineDepth);
+        g2.translate(
+          -minLine * alongDim + leadingBorder.getSize(),
+          minLine * lineDepth
+        );
         break;
       case VERTICAL:
-        clip.height = insetBefore + insetAfter + scale * sequence.length();
-        minLine = (int) Math.max(minLine, Math.ceil(newClip.getMinX()/lineDepth));
+        clip.height = totalLength;
+        seqBox.height = alongDim;
+        minLine = (int) Math.max(minLine, Math.floor(newClip.getMinX()/lineDepth));
         maxLine = (int) Math.min(maxLine, Math.ceil(newClip.getMaxX()/lineDepth));
-        g2.translate(minLine * lineDepth, -minLine * alongDim);
+        g2.translate(
+          minLine * lineDepth,
+          -minLine * alongDim + leadingBorder.getSize()
+        );
         break;
     }
 
     for(int l = minLine; l < maxLine; l++) {
+      switch(direction) {
+        case HORIZONTAL:
+          clip.x = l * alongDim - leadingBorder.getSize();
+          seqBox.x = l * alongDim;
+          clip.y = 0.0;
+          break;
+	      case VERTICAL:
+          clip.x = 0.0;
+          clip.y = l * alongDim - leadingBorder.getSize();
+          seqBox.y = l * alongDim;
+          break;
+      }
       for (Iterator i = views.iterator(); i.hasNext(); ) {
         SequenceRenderer r = (SequenceRenderer) i.next();
         double depth = ((Double) depths.get(r)).doubleValue();
-
         switch(direction) {
           case HORIZONTAL:
             clip.height = depth;
+            seqBox.height = depth;
             break;
 	        case VERTICAL:
             clip.width = depth;
+            seqBox.width = depth;
             break;
         }
         
         Shape oldClip = g2.getClip();
         g2.clip(clip);
-        r.paint(g2, this);
+        r.paint(g2, this, seqBox);
         g2.setClip(oldClip);
 
         switch (direction) {
@@ -236,20 +281,19 @@ public class SequencePanel extends JComponent implements SwingConstants {
   }
 
   public double sequenceToGraphics(int seqPos) {
-    return ((seqPos-1) * scale) + insetBefore;
+    return ((double) (seqPos-1) * scale);
   }
 
   public int graphicsToSequence(double gPos) {
-    return (int) ((gPos - insetBefore) / scale) + 1;
+    return (int) (gPos / scale) + 1;
   }
 
   public void resizeAndValidate() {
     alongDim = 
-      scale * sequence.length() + 
-      insetBefore + insetAfter;
+      scale * sequence.length();
     acrossDim = 0.0;
-    insetBefore = 0.0;
-    insetAfter = 0.0;
+    double insetBefore = 0.0;
+    double insetAfter = 0.0;
     for (Iterator i = views.iterator(); i.hasNext(); ) {
       SequenceRenderer r = (SequenceRenderer) i.next();
       double depth = r.getDepth(this);
@@ -259,7 +303,9 @@ public class SequencePanel extends JComponent implements SwingConstants {
       insetAfter = Math.max(insetAfter, r.getMinimumTrailer(this));
     }
     lineDepth = acrossDim;
-
+    leadingBorder.setSize(insetBefore);
+    trailingBorder.setSize(insetAfter);
+    
     Dimension d = null;    
     if(lines < 1) {
       // fit to component size for across, and wrap as many times as is needed
@@ -274,32 +320,42 @@ public class SequencePanel extends JComponent implements SwingConstants {
           width = parentSize.height;
           break;
       }
+      width = (int) Math.ceil((double) width - insetBefore - insetAfter);
       realLines = (int) Math.ceil((double) alongDim / (double) width);
       acrossDim = acrossDim * realLines;
-      alongDim = Math.ceil((double) width + insetBefore + insetAfter);
+      alongDim = Math.ceil((double) width);
       switch (direction) {
         case HORIZONTAL:
-          d = new Dimension((int) alongDim, (int) acrossDim);
+          d = new Dimension(
+            (int) Math.ceil(alongDim + insetBefore + insetAfter),
+            (int) acrossDim
+          );
           break;
         case VERTICAL:
-          d = new Dimension((int) acrossDim, (int) alongDim);
+          d = new Dimension(
+            (int) acrossDim,
+            (int) Math.ceil(alongDim + insetBefore + insetAfter)
+          );
           break;
       }
     } else {
-      // fit depth to lines*acrossDim and make as wide as necisary to accomodoate the
-      // whole sequence
+      // fit depth to lines*acrossDim and make as wide as necisary to 
+      // accomodoate the whole sequence
       realLines = lines;
-      alongDim = Math.ceil(
-                         alongDim / (double) lines +
-                         insetBefore + insetAfter
-                      );
+      alongDim = Math.ceil(alongDim / (double) lines);
       acrossDim = Math.ceil((double) lines * acrossDim);  
       switch (direction) {
         case HORIZONTAL:
-          d = new Dimension((int) alongDim, (int) acrossDim);
+          d = new Dimension(
+            (int) Math.ceil(alongDim + insetBefore + insetAfter),
+            (int) acrossDim
+          );
           break;
         case VERTICAL:
-          d = new Dimension((int) acrossDim, (int) alongDim);
+          d = new Dimension(
+            (int) acrossDim,
+            (int) Math.ceil(alongDim + insetBefore + insetAfter)
+          );
           break;
       }
     }
@@ -312,6 +368,55 @@ public class SequencePanel extends JComponent implements SwingConstants {
   private class RendererMonitor implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent ev) {
 	    repaint();
+    }
+  }
+  
+  public class Border
+  implements Serializable, SwingConstants {
+    protected final PropertyChangeSupport pcs;
+    private double size = 0.0;
+    private int alignment = CENTER;
+    
+    public double getSize() {
+      return size;
+    }
+    
+    private void setSize(double size) {
+      this.size = size;
+    }
+    
+    public int getAlignment() {
+      return alignment;
+    }
+    
+    public void setAlignment(int alignment)
+    throws IllegalArgumentException {
+      switch (alignment) {
+        case LEADING:
+        case TRAILING:
+        case CENTER:
+          int old = this.alignment;
+          this.alignment = alignment;
+          pcs.firePropertyChange("alignment", old, alignment);
+          break;
+        default:
+          throw new IllegalArgumentException(
+            "Alignment must be one of the constants LEADING, TRAILING or CENTER"
+          );
+      }
+    }
+    
+    private Border() {
+      alignment = CENTER;
+      pcs = new PropertyChangeSupport(this);
+    }
+    
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+      pcs.addPropertyChangeListener(listener);
+    }
+    
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+      pcs.removePropertyChangeListener(listener);
     }
   }
 }

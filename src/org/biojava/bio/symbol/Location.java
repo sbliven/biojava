@@ -21,7 +21,7 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.io.*;
 import java.lang.reflect.*;
 
@@ -85,16 +85,17 @@ public interface Location {
    * @return	true if this contains p, otherwise false
    */
   boolean contains(int p);
+  
   /**
    * Checks if this location is equivalent to the other.
    * <P>
    * Abstractly, a location is equal to another if for every point in one
    * it is also in the other. This is equivalent to a.contains(b) && b.contains(a).
    *
-   * @param l	the Location to check
+   * @param l	the Object to check
    * @return	true if this equals l, otherwise false
    */
-  boolean equals(Location l);
+  boolean equals(Object l);
 
   /**
    * Returns a Location that contains all points common to both ranges.
@@ -127,15 +128,31 @@ public interface Location {
    */
   Location translate(int dist);
    
-    /**
-     * Determine if a Location is contiguous.
-     *
-     * @return <code>true</code> if and only if this Location
-     *         contains every point from <code>min</code> to
-     *         <code>max</code> inclusive.
-     */
-
-    public boolean isContiguous();
+  /**
+   * Determine if a Location is contiguous.
+   *
+   * @return <code>true</code> if and only if this Location
+   *         contains every point from <code>min</code> to
+   *         <code>max</code> inclusive.
+   */
+  boolean isContiguous();
+  
+  /**
+   * Return an Iterator over the set of maximal contiguous sub-locations.
+   * <P>
+   * Given any location, it can be considered to contain zero or more
+   * maximal contiguous blocks of width 1 or greater. The empty location is
+   * composed from nothing. A contiguous location is composed from itself.
+   * A non-contiguous location is composed from contiguous blocks seperated by
+   * gaps.
+   * <P>
+   * This method should return an Iterator over these maximaly contiguous blocks
+   * starting with the left-most block, and finnishing at the right-most block.
+   *
+   * @return an Iterator over Location objects that are the maximaly contiguous
+   *         set of locations contained within this location
+   */
+  Iterator blockIterator();
 
   /**
    * The empty range.
@@ -149,6 +166,8 @@ public interface Location {
    */
   static final Location empty = new EmptyLocation();
   
+  static final LocationComparator naturalOrder = new LocationComparator();
+  
   /**
    * The implementation of Location that contains no positions at all.
    *
@@ -160,21 +179,90 @@ public interface Location {
     public boolean overlaps(Location l) { return false; }
     public boolean contains(Location l) { return false; }
     public boolean contains(int p) { return false; }
-    public boolean equals(Location l) { return false; }
+    public boolean equals(Object o) {
+      if(o instanceof Location) {
+        return Location.naturalOrder.areEqual(this, (Location) o);
+      } else {
+        return false;
+      }
+    }
     public Location intersection(Location l) { return empty; }
     public Location union(Location l) { return l; }
     public SymbolList symbols(SymbolList seq) {
-	try {
-	    return new SimpleSymbolList(seq.getAlphabet(), new ArrayList());
-	} catch (IllegalSymbolException ex) {
-	    throw new BioError(ex);
-	}
+      try {
+        return new SimpleSymbolList(seq.getAlphabet(), new ArrayList());
+      } catch (IllegalSymbolException ex) {
+        throw new BioError(ex);
+      }
     }
     public Location translate(int dist) { return this; }
     public boolean isContiguous() { return true; }
+    public Iterator blockIterator() { return Collections.EMPTY_SET.iterator(); }
     private Object writeReplace() throws ObjectStreamException {
       try {
         return new StaticMemberPlaceHolder(Location.class.getField("empty"));
+      } catch (NoSuchFieldException nsfe) {
+        throw new NotSerializableException(nsfe.getMessage());
+      }
+    }
+  }
+  
+  static final class LocationComparator implements Comparator, Serializable {
+    public int compare(Object o1, Object o2) {
+      int d = 0;
+        
+      Location l1 = (Location) o1;
+      Location l2 = (Location) o2;
+        
+      Iterator i1 = l1.blockIterator();
+      Iterator i2 = l2.blockIterator();
+
+      while(i1.hasNext() && i2.hasNext()) {
+        Location li1 = (Location) i1.next();
+        Location li2 = (Location) i2.next();
+          
+        d = li1.getMin() - li2.getMin();
+        if(d != 0) {
+          return d;
+        }
+        d = li1.getMax() - li2.getMax();
+        if(d != 0) {
+          return d;
+        }
+      }
+      if(i2.hasNext()) {
+        return 1;
+      } else if(i1.hasNext()) {
+        return -1;
+      }
+        
+      return 0;
+    }
+    
+    public boolean equals(Object obj) {
+      return obj == this;
+    }
+    
+    public boolean areEqual(Location l1, Location l2) {
+      Iterator i1 = l1.blockIterator();
+      Iterator i2 = l2.blockIterator();
+
+      while(i1.hasNext() && i2.hasNext()) {
+        if(! i1.next().equals(i2.next()) ) {
+          return false;
+        }
+      }
+      
+      if(!i1.hasNext() && !i2.hasNext()) {
+        return false;
+      }
+      
+      return true;
+    }
+    
+    private Object writeReplace() throws ObjectStreamException {
+      try {
+        return new StaticMemberPlaceHolder(Location.class.getField("naturalOrder"));
       } catch (NoSuchFieldException nsfe) {
         throw new NotSerializableException(nsfe.getMessage());
       }

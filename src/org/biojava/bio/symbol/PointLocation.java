@@ -51,32 +51,38 @@ public class PointLocation implements Location, Serializable {
       : Location.empty;
   }
   public Location union(Location l)	{
-    CompoundLocation cl = new CompoundLocation();
-    cl.addLocation(this);
-    cl.addLocation(l);
+    List locations = new ArrayList();
+    locations.add(this);
+    locations.add(l);
+    CompoundLocation cl = new CompoundLocation(locations);
     return cl;
   }
 
   public SymbolList symbols(SymbolList s)	{
     final Symbol res = s.symbolAt(this.point);
     try {
-	return new SimpleSymbolList(s.getAlphabet(), new AbstractList() {
-	    public Object get(int index) throws IndexOutOfBoundsException {
-		if(index == 0)
-		    return res;
-		throw new IndexOutOfBoundsException("Index " + index + " greater than 0");
-	    }
-	    public int size() { return 1; }
-	});
+      return new SimpleSymbolList(s.getAlphabet(), new AbstractList() {
+        public Object get(int index) throws IndexOutOfBoundsException {
+          if(index == 0) {
+            return res;
+          }
+          throw new IndexOutOfBoundsException("Index " + index + " greater than 0");
+        }
+        public int size() { return 1; }
+      });
     } catch (IllegalSymbolException ex) {
-	throw new BioError(ex);
+      throw new BioError(ex);
     }
   }
 
-    public boolean isContiguous() {
-	return true;
-    }
+  public boolean isContiguous() {
+    return true;
+  }
 
+  public Iterator blockIterator() {
+    return Collections.singleton(this).iterator();
+  }
+  
   public Location translate(int dist) {
     return new PointLocation(this.point + dist);
   }

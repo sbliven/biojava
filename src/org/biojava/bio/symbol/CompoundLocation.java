@@ -36,7 +36,8 @@ import org.biojava.bio.*;
  */
 public class CompoundLocation implements Location, Serializable {
   /**
-   * The list of child locations in no particular order.
+   * The list of child locations in order. Should contain only RangeLocation
+   * instances.
    */
   private List locations;
 
@@ -56,7 +57,43 @@ public class CompoundLocation implements Location, Serializable {
   {
     locations = new ArrayList();
   }
-
+  
+  /** 
+   * Generate a new CompoundLocation from a list of locations.
+   * <P>
+   * The generated location will contain exactly those points that are within
+   * at least one of the loctaions in the list.
+   *
+   * @param locations a list of Location instances to combine into a single
+   *        compound location
+   */
+  public CompoundLocation(List locations) {
+    List working = new ArrayList();
+    for(Iterator i = locations.iterator(); i.hasNext(); ) {
+      for(Iterator bi = ((Location) i.next()).blockIterator(); bi.hasNext(); ) {
+        Location bl = (Location) bi.next();
+        if(bl != Location.empty) {
+          working.add(bl);
+        }
+      }
+    }
+    Collections.sort(this.locations, Location.naturalOrder);
+    
+    Location last = Location.empty;
+    for(int i = 0; i < working.size(); i++) {
+      Location cur = (Location) working.get(i);
+      if(cur.overlaps(last)) {
+        last = last.union(cur);
+      } else {
+        this.locations.add(last);
+        last = cur;
+      }
+    }
+    if(last != Location.empty) {
+      this.locations.add(last);
+    }
+  }
+  
   public boolean contains(int p) {
     if(p < min || p > max)
       return false;
@@ -69,6 +106,7 @@ public class CompoundLocation implements Location, Serializable {
     return false;
   }
 
+  // may be broken in the case when l spans more than one of the sub-locations
   public boolean contains(Location l) {
     if(l.getMin() > max || l.getMax() < min)
       return false;
@@ -93,8 +131,12 @@ public class CompoundLocation implements Location, Serializable {
     return false;
   }
 
-  public boolean equals(Location l) {
-    return l == this;
+  public boolean equals(Object o) {
+    if(o instanceof Location) {
+      return Location.naturalOrder.areEqual(this, (Location) o);
+    } else {
+      return false;
+    }
   }
 
   public int getMin() {
@@ -106,26 +148,27 @@ public class CompoundLocation implements Location, Serializable {
   }
 
   public Location intersection(Location l) {
-    CompoundLocation res = new CompoundLocation();
+    List res = new ArrayList();
 
     for(Iterator i = locations.iterator(); i.hasNext(); ) {
       Location loc = ((Location) i.next()).intersection(l);
-      if(loc != Location.empty)
-        res.addLocation(loc);
+      if(loc != Location.empty) {
+        res.add(loc);
+      }
     }
 
-    if(res.locations.size() != 0)
-      return res;
+    if(res.size() != 0)
+      return new CompoundLocation(res);
     return Location.empty;
   }
 
   public Location union(Location l) {
-    CompoundLocation res = new CompoundLocation();
+    List res = new ArrayList();
 
     for(Iterator i = locations.iterator(); i.hasNext(); )
-      res.addLocation( ((Location) i.next()).union(l) );
+      res.add( ((Location) i.next()).union(l) );
 
-    return res;
+    return new CompoundLocation(res);
   }
 
   public SymbolList symbols(SymbolList s) {
@@ -136,34 +179,29 @@ public class CompoundLocation implements Location, Serializable {
         res.add(s.symbolAt(p));
 
     try {
-	return new SimpleSymbolList(s.getAlphabet(), res);
+      return new SimpleSymbolList(s.getAlphabet(), res);
     } catch (IllegalSymbolException ex) {
-	throw new BioError(ex);
+      throw new BioError(ex);
     }
-  }
-
-  public void addLocation(Location l) {
-    locations.add(l);
-    min = Math.min(min, l.getMin());
-    max = Math.max(max, l.getMax());
   }
 
   public Location translate(int dist) {
-    CompoundLocation res = new CompoundLocation();
+    List res = new ArrayList();
 
     for(Iterator i = locations.iterator(); i.hasNext(); )
-      res.addLocation( ((Location) i.next()).translate(dist) );
+      res.add( ((Location) i.next()).translate(dist) );
 
-    return res;
+    return new CompoundLocation(res);
   }
 
-    public boolean isContiguous() {
-	for (int pos = getMin(); pos <= getMax(); ++pos)
-	    if (! contains(pos))
-		return false;
-	return true;
-    }
+  public boolean isContiguous() {
+    return locations.size() <= 1;
+  }
   
+  public Iterator blockIterator() {
+    return locations.iterator();
+  }
+
   public String toString() {
     StringBuffer sb = new StringBuffer();
     sb.append(getMin() + ", " + getMax() + " {");

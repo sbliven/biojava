@@ -32,15 +32,10 @@ import java.awt.geom.*;
 import java.util.List;
 
 public class SymbolSequenceRenderer implements SequenceRenderer {
-    private final double minWidth = 3.0;
     private double depth = 25.0;
     
     public double getDepth(SequencePanel sp) {
-      /*if(sp.getScale() < minWidth) {
-        return 0.0;
-      } else {*/
-        return depth;
-      //}
+      return depth;
     }
 
     public double getMinimumLeader(SequencePanel sp) {
@@ -51,33 +46,51 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
       return 0.0;
     }
 
-    public void paint(Graphics2D g, SequencePanel sp) {
+    public void paint(Graphics2D g, SequencePanel sp, Rectangle2D seqBox) {
       Sequence seq = sp.getSequence();
-      Rectangle2D clip = g.getClipBounds();
       int direction = sp.getDirection();
       int minP;
       int maxP;
       
+      g.setFont(sp.getFont());
+      g.clip(seqBox);
+      Rectangle2D clip = g.getClipBounds();
+
       if(direction == sp.HORIZONTAL) {
-        minP = Math.max(1, sp.graphicsToSequence(clip.getMinX()));
+        minP = Math.max(1,            sp.graphicsToSequence(clip.getMinX()));
         maxP = Math.min(seq.length(), sp.graphicsToSequence(clip.getMaxX()));
       } else {
-        minP = Math.max(1, sp.graphicsToSequence(clip.getMinY()));
+        minP = Math.max(1,            sp.graphicsToSequence(clip.getMinY()));
         maxP = Math.min(seq.length(), sp.graphicsToSequence(clip.getMaxY()));
       }
       
       g.setColor(Color.black);
       
-      if(sp.getScale() < minWidth) {
-        g.fill(clip);
+      double scale = sp.getScale();
+      Rectangle2D maxBounds =
+        g.getFont().getMaxCharBounds(g.getFontRenderContext());
+      if(
+        sp.getScale() < maxBounds.getWidth()*0.5 ||
+        sp.getScale() < maxBounds.getHeight()*0.5
+      ) {
+        g.fill(seqBox);
       } else {
+        double fudgeAcross = 0.0;
+        double fudgeDown = 0.0;
+        if (direction == sp.HORIZONTAL) {
+          fudgeAcross = scale * 0.5 - maxBounds.getCenterX();
+          fudgeDown = seqBox.getCenterY() - maxBounds.getCenterY();
+        } else {
+          fudgeAcross = scale * 0.5 - maxBounds.getCenterY();
+          fudgeDown = seqBox.getCenterX() - maxBounds.getCenterX();
+        }
         for (int pos = minP; pos <= maxP; ++pos) {
           double gPos = sp.sequenceToGraphics(pos);
           char c = seq.symbolAt(pos).getToken();
           if (direction == SequencePanel.HORIZONTAL) {
-            g.drawString("" + c, (int) gPos, 20);
+            g.drawString("" + c, (int) (gPos + fudgeAcross), (int) fudgeDown);
           } else {
-            g.drawString("" + c, 10, (int) gPos + 10);  // FIXME!
+            g.drawString("" + c, (int) fudgeDown, (int) (gPos + fudgeAcross));
           }
         }
       }

@@ -49,6 +49,8 @@ public class EmblViewer {
     FeatureBlockSequenceRenderer repeats = new FeatureBlockSequenceRenderer();
     features.setFeatureRenderer(fr);
     repeats.setFeatureRenderer(fr);
+    features.setLabel("features");
+    repeats.setLabel("repeats");
     features.setFilter(
       new FeatureFilter.And(
         new FeatureFilter.Not(repeatFilter),
@@ -59,7 +61,7 @@ public class EmblViewer {
 
     sp.addRenderer(repeats);    
     sp.addRenderer(features);
-    sp.addRenderer(new SymbolSequenceRenderer());
+    //sp.addRenderer(new SymbolSequenceRenderer());
     f.getContentPane().setLayout(new BorderLayout());
     f.getContentPane().add(new JScrollPane(sp), BorderLayout.CENTER);
     JPanel panel = new JPanel();

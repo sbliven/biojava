@@ -22,6 +22,7 @@
 package org.biojava.bio.symbol;
 
 import java.io.*;
+import java.util.*;
 
 /**
  * A simple implementation of Location that contains all points between
@@ -67,7 +68,7 @@ public class RangeLocation implements Location, Serializable {
 
   public boolean equals(Location l) {
     return getMin() == l.getMin() &&
-           getMax() == l.getMax() && l.contains(this);
+           getMax() == l.getMax() && l.isContiguous();
   }
 
   public Location intersection(Location l) {
@@ -95,9 +96,13 @@ public class RangeLocation implements Location, Serializable {
     return new RangeLocation(getMin() + dist, getMax() + dist);
   }
   
-    public boolean isContiguous() {
-	return true;
-    }
+  public boolean isContiguous() {
+    return true;
+  }
+
+  public Iterator blockIterator() {
+    return Collections.singleton(this).iterator();
+  }
 
   public RangeLocation(int min, int max) {
     this.min = min;
