@@ -86,7 +86,11 @@ public class CreateFAIndex {
           
           /* 1st word */
           int a = line.indexOf(" ");
-          id = line.substring(0, a);
+          if(a != -1) {
+            id = line.substring(0, a);
+          } else {
+            id = line;
+          }
         }
       }
       

@@ -655,7 +655,7 @@ public interface FeatureFilter extends Serializable {
     }
     
     public String toString() {
-      return "Annotation Type: " + type;
+      return "ByAnnotationType {" + type + "}";
     }
   }
 
@@ -699,9 +699,9 @@ public interface FeatureFilter extends Serializable {
       return value;
     }
 
-    public String toString() {
-      return getKey() + " == " + getValue();
-    }
+//    public String toString() {
+//      return getKey() + " == " + getValue();
+//    }
   }
 
   /**
@@ -737,9 +737,9 @@ public interface FeatureFilter extends Serializable {
       return key;
     }
     
-    public String toString() {
-      return "Has annotation: " + getKey();
-    }
+//    public String toString() {
+//      return "Has annotation: " + getKey();
+//    }
   }
 
   /**

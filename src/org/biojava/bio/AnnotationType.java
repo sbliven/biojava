@@ -44,12 +44,12 @@ public interface AnnotationType {
      * other annotations. Only an empty annotation is an exact instance of
      * this type.
      */
-    public static final AnnotationType ANY = new AnyOfType(
+    public static final AnnotationType ANY = new Impl(
       PropertyConstraint.ANY,
       CardinalityConstraint.ANY
     );
     
-    public static final AnnotationType NONE = new AnyOfType(
+    public static final AnnotationType NONE = new Impl(
       PropertyConstraint.NONE,
       CardinalityConstraint.NONE
     );
@@ -61,16 +61,6 @@ public interface AnnotationType {
      * @return true if ann conforms to this type and false if it doesn't.
      */
     public boolean instanceOf(Annotation ann);
-
-    /**
-     * Validate an Annotation to an exact type. Exact matches will also
-     * return true for instanceOf but will have no properties not found
-     * in the type.
-     *
-     * @param ann the Annotation to validate.
-     * @return true if ann is an instance of exactly this type
-     */
-     public boolean exactInstanceOf(Annotation ann);
 
     /**
      * <p>See if an AnnotationType is a specialisation of this type.</p>
@@ -127,6 +117,10 @@ public interface AnnotationType {
       Location card
     );
 
+    public void setDefaultConstraints(PropertyConstraint pc, Location cc);
+    public PropertyConstraint getDefaultPropertyConstraint();
+    public Location getDefaultCardinalityConstraint();
+
     /**
      * <p>Retrieve the complete set of properties that must be present for
      * an <code>Annotation</code> to be accepted by this
@@ -148,6 +142,10 @@ public interface AnnotationType {
     public abstract class Abstract
     implements AnnotationType {
         public boolean instanceOf(Annotation ann) {
+          Set props = new HashSet();
+          props.addAll(getProperties());
+          props.addAll(ann.keys());
+
           for (Iterator i = getProperties().iterator(); i.hasNext();) {
             Object key = i.next();
             PropertyConstraint con = getPropertyConstraint(key);
@@ -240,10 +238,35 @@ public interface AnnotationType {
             
             sb.append(" [" + key + ", " + pc + ", " + cc + "]");
           }
+          sb.append(" [*, " + getDefaultPropertyConstraint() + ", " + getDefaultCardinalityConstraint() + "]");
           
           sb.append(" }");
           
           return sb.toString();
+        }
+
+        public boolean subTypeOf(AnnotationType subType) {
+            Set props = new HashSet();
+            props.addAll(getProperties());
+            props.addAll(subType.getProperties());
+
+            for (Iterator i = props.iterator(); i.hasNext();) {
+                Object key = i.next();
+         
+                PropertyConstraint thisPC = getPropertyConstraint(key);
+                PropertyConstraint subPC = subType.getPropertyConstraint(key);
+                if (! thisPC.subConstraintOf(subPC)) {
+                    return false;
+                }
+
+                Location thisCC = getCardinalityConstraint(key);
+                Location subCC = subType.getCardinalityConstraint(key);
+                if (!LocationTools.contains(thisCC, subCC)) {
+                  return false;
+                }
+            }
+
+            return true;
         }
     }
 
@@ -274,7 +297,12 @@ public interface AnnotationType {
             unknownPC = PropertyConstraint.ANY;
             unknownCC = CardinalityConstraint.ANY;
         }
-        
+
+        public Impl(PropertyConstraint defaultPC, Location defaultCC) {
+            this();
+            setDefaultConstraints(defaultPC, defaultCC);
+        }
+
         public void setDefaultConstraints(PropertyConstraint pc, Location cc) {
           unknownPC = pc;
           unknownCC = cc;
@@ -316,105 +344,5 @@ public interface AnnotationType {
         public Set getProperties() {
             return cons.keySet();
         }
-
-
-        public boolean exactInstanceOf(Annotation ann) {
-          Set keys = new HashSet(ann.keys());
-          keys.removeAll(cons.keySet());
-
-          if(keys.isEmpty()) {
-            return this.instanceOf(ann);
-          } else {
-            return false;
-          }
-        }
-
-        public boolean subTypeOf(AnnotationType subType) {
-            for (Iterator i = cons.keySet().iterator(); i.hasNext();) {
-                Object key = i.next();
-                
-                PropertyConstraint thisPC = getPropertyConstraint(key);
-                PropertyConstraint subPC = subType.getPropertyConstraint(key);
-                if (! thisPC.subConstraintOf(subPC)) {
-                    return false;
-                }
-                
-                Location thisCC = getCardinalityConstraint(key);
-                Location subCC = subType.getCardinalityConstraint(key);
-                if (!LocationTools.contains(thisCC, subCC)) {
-                  return false;
-                }
-            }
-
-            return true;
-        }
-    }
-
-    /**
-     * This, like any, will accept empty annotations. If keys do exist, it will
-     * expect all values to conform to a single type and cardinality.
-     *
-     * @author Matthew Pocock
-     */
-    public class AnyOfType
-    extends AnnotationType.Abstract {
-        private PropertyConstraint constraint;
-        private Location cardinality;
-
-        /**
-         * Create a new Impl with no constraints.
-         */
-        public AnyOfType(PropertyConstraint constraint, Location cardinality) {
-            this.constraint = constraint;
-            this.cardinality = cardinality;
-        }
-
-        public PropertyConstraint getPropertyConstraint(Object key) {
-            return constraint;
-        }
-
-        public Location getCardinalityConstraint(Object key) {
-          return cardinality;
-        }
-
-
-        public void setConstraints(
-          Object key,
-          PropertyConstraint con,
-          Location card
-        ) {
-          constraint = con;
-          cardinality = card;
-        }
-
-        public Set getProperties() {
-            return Collections.EMPTY_SET;
-        }
-
-        public boolean instanceOf(Annotation ann) {
-            for (Iterator i = ann.asMap().values().iterator(); i.hasNext();) {
-                Object val = i.next();
-                if(!constraint.accept(val)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        public boolean exactInstanceOf(Annotation ann) {
-          return ann.keys().isEmpty();
-        }
-
-        public boolean subTypeOf(AnnotationType subType) {
-          for(Iterator pi = subType.getProperties().iterator(); pi.hasNext(); ) {
-            if(!constraint.subConstraintOf(subType.getPropertyConstraint(pi.next()))) {
-              return false;
-            }
-          }
-
-          return true;
-        }
     }
 }
-

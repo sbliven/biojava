@@ -437,7 +437,7 @@ public class FilterUtilsTest extends TestCase
       AnnotationType.Impl rpType = new AnnotationType.Impl();
       rpType.setConstraints("id", PropertyConstraint.ANY, CardinalityConstraint.ONE);
       rpType.setDefaultConstraints(PropertyConstraint.NONE, CardinalityConstraint.NONE);
-      FeatureFilter repeatID = FilterUtils.hasAnnotation(rpType);
+      FeatureFilter repeatID = FilterUtils.byAnnotationType(rpType);
       
       FeatureFilter tsSchema = FilterUtils.and(transcript, tsID);
       FeatureFilter exSchema = FilterUtils.and(exon, exID);
@@ -450,11 +450,12 @@ public class FilterUtilsTest extends TestCase
       
       // pull out a feature by id
       FeatureFilter hasID = FilterUtils.hasAnnotation("id");
-
       
       // let the fun commence
       optimizeEquals(FilterUtils.and(tsSchema, aTranscript), FilterUtils.and(transcript, aTranscript));
-      optimizeExact(FilterUtils.and(exSchema, aTranscript), aTranscript);
+      optimizeExact(FilterUtils.and(exSchema, aTranscript), FilterUtils.none());
+      optimizeExact(FilterUtils.and(reSchema, aTranscript), FilterUtils.none());
+      optimizeEquals(dbFilter, dbFilter);
       optimizeEquals(FilterUtils.and(dbFilter, aTranscript), FilterUtils.and(transcript, aTranscript));
     }
     

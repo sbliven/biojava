@@ -127,6 +127,10 @@ public class FilterUtils {
       if(a.equals(b)) {
         return false;
       }
+
+      if(a == none() || b == none()) {
+        return true;
+      }
       
       if (a == all()) {
         return areProperSubset(b, FeatureFilter.none);
@@ -326,15 +330,18 @@ public class FilterUtils {
     return FeatureFilter.none;
   }
   
+  private static int depth = 0;
+
   public final static FeatureFilter optimize(FeatureFilter filter) {
-    System.err.println("Optimizing " + filter);
-    
+    System.err.println(depth + ":" + "Optimizing " + filter);
+    depth++;
+    try {
     if(filter instanceof FeatureFilter.And) {
-      System.err.println("is AND");
+      System.err.println(depth + ":" + "is AND");
       
       List filters = new ArrayList();
       expandAnd(filter, filters);
-      System.err.println("as list: " + filters);
+      System.err.println(depth + ":" + "as list: " + filters);
       
       // get all children of this AND, and of all AND children
       for(int i = 0; i < filters.size(); i++) {
@@ -354,56 +361,56 @@ public class FilterUtils {
 
       // optimize all simple filters
       for(int i = 1; i < filters.size(); i++) {
-        System.err.println("i: " + i);
+        System.err.println(depth + ":" + "i: " + i);
         FeatureFilter a = (FeatureFilter) filters.get(i);
         for(int j = 0; j < i; j++) {
-          System.err.println("j: " + j);
+          System.err.println(depth + ":" + "j: " + j);
           FeatureFilter b = (FeatureFilter) filters.get(j);
           
-          System.err.println("Comparing " + a + ", " + b + " of " + filters);
+          System.err.println(depth + ":" + "Comparing " + a + ", " + b + " of " + filters);
           
           if(areDisjoint(a, b)) {
             // a n b = E
-            System.err.println("Disjoint");
+            System.err.println(depth + ":" + "Disjoint. Returning none()");
             return none();
           } else if(areProperSubset(a, b)) {
-            System.err.println("a < b");
+            System.err.println(depth + ":" + "a < b. Removing b");
             // if a < b then a n b = a  
             filters.remove(j);
             j--; i--;
           } else if(areProperSubset(b, a)) {
-            System.err.println("a > b");
+            System.err.println(depth + ":" + "a > b. Removing a");
             // if a > b then a n b = b
             filters.remove(i);
             i--;
             break;
           } else {
-            System.err.println("Attempting to calculate intersection");
+            System.err.println(depth + ":" + "Attempting to calculate intersection");
             FeatureFilter intersect = intersection(a, b);
             if(intersect != null) {
-              System.err.println("got intersection: " + intersect);
+              System.err.println(depth + ":" + "got intersection: " + intersect);
               filters.set(i, intersect);
               filters.remove(j);
-              j--; i--;
+              j--; i-=2;
             } else {
-              System.err.println("no luck - moving on");
+              System.err.println(depth + ":" + "no luck - moving on");
             }
           }
         }
       }
-      System.err.println("Reduced to: " + filters);
+      System.err.println(depth + ":" + "Reduced to: " + filters);
       
       if(filters.isEmpty()) {
-        System.err.println("empty filter set");
+        System.err.println(depth + ":" + "empty filter set. Returning none()");
         return none();
       } else {
         FeatureFilter ands = and((FeatureFilter[]) filters.toArray(new FeatureFilter[] {}));
         if(ors.isEmpty()) {
-          System.err.println("No ors, just returning anded values: " + ands);
+          System.err.println(depth + ":" + "No ors, just returning anded values: " + ands);
           return ands;
         } else {
-          System.err.println("Mixing in ors: " + ors);
-          System.err.println("to: " + ands);
+          System.err.println(depth + ":" + "Mixing in ors: " + ors);
+          System.err.println(depth + ":" + "to: " + ands);
           List combs = new ArrayList();
           combs.add(ands);
           for(int i = 0; i < ors.size(); i++) {
@@ -416,16 +423,18 @@ public class FilterUtils {
             }
             combs = newCombs;
           }
-          return optimize(or((FeatureFilter[]) combs.toArray(new FeatureFilter[] {})));
+          FeatureFilter res = optimize(or((FeatureFilter[]) combs.toArray(new FeatureFilter[] {})));
+          System.err.println(depth + ":" + "Returning optimized or: " + res);
+          return res;
         }
       }
     } else if(filter instanceof FeatureFilter.Or) {
-      System.err.println("is OR");
+      System.err.println(depth + ":" + "is OR");
       
       List filters = new ArrayList();
       expandOr(filter, filters);
       
-      System.err.println("as list: " + filters);
+      System.err.println(depth + ":" + "as list: " + filters);
       
       for(int i = 0; i < filters.size(); i++) {
         filters.set(i, optimize((FeatureFilter) filters.get(i)));
@@ -441,67 +450,83 @@ public class FilterUtils {
           i--;
         }
       }
+      System.err.println(depth + ":" + "filters: " + filters);
+      System.err.println(depth + ":" + "ands: " + ands);
 
       for(int i = 1; i < filters.size(); i++) {
-        System.err.println("i: " + i);
+        System.err.println(depth + ":" + "i: " + i);
         FeatureFilter a = (FeatureFilter) filters.get(i);
         for(int j = 0; j < i; j++) {
-          System.err.println("j: " + j);
+          System.err.println(depth + ":" + "j: " + j);
           FeatureFilter b = (FeatureFilter) filters.get(j);
           
-          System.err.println("Comparing " + a + ", " + b + " of " + filters);
+          System.err.println(depth + ":" + "Comparing " + a + ", " + b + " of " + filters);
           
           if(a == all() || b == all()) {
-            System.err.println("Found an all");
+            System.err.println(depth + ":" + "Found an all. Returning all()");
             return all();
           } else if(areProperSubset(a, b)) {
-            System.err.println("a < b");
+            System.err.println(depth + ":" + "a < b. Removing a");
             filters.remove(i);
             i--;
           } else if(areProperSubset(b, a)) {
-            System.err.println("a > b");
+            System.err.println(depth + ":" + "a > b. Removing b");
             filters.remove(j);
-            j--; i--;
+            j--; i-=2;
           } else {
-            System.err.println("Trying to calculate union");
+            System.err.println(depth + ":" + "Trying to calculate union");
             FeatureFilter union = union(a, b);
             if(union != null) {
-              System.err.println("Got union: " + union);
+              System.err.println(depth + ":" + "Got union: " + union);
               filters.set(i, union);
               filters.remove(j);
               j--; i--;
             } else {
-              System.err.println("no luck - moving on");
+              System.err.println(depth + ":" + "no luck - moving on");
             }
           }
         }
       }
-      
-      FeatureFilter ors = or((FeatureFilter[]) filters.toArray(new FeatureFilter[] {}));
-      if(ands.isEmpty()) {
-        System.err.println("no ands, returning ors: " + ors);
-        return ors;
-      } else {
-        System.err.println("Mixing in ands: " + ands);
-        System.err.println("to: " + ors);
-        List combs = new ArrayList();
-        combs.add(ors);
-        for(int i = 0; i < ands.size(); i++) {
-          List newCombs = new ArrayList();
-          FeatureFilter.And and = (FeatureFilter.And) ands.get(i);
-          for(int j = 0; j < combs.size(); j++) {
-            FeatureFilter f = (FeatureFilter) combs.get(j);
-            newCombs.add(or(f, and.getChild1()));
-            newCombs.add(or(f, and.getChild2()));
-          }
+      System.err.println(depth + ":" + "Reduced to: " + filters);
+
+      if(filters.isEmpty()) {
+        if(ands.isEmpty()) {
+          return none();
+        } else {
+          return optimize(and((FeatureFilter[]) ands.toArray(new FeatureFilter[] {})));
         }
-        return optimize(and((FeatureFilter[]) combs.toArray(new FeatureFilter[] {})));
+      } else {
+        FeatureFilter ors = or((FeatureFilter[]) filters.toArray(new FeatureFilter[] {}));
+        if(ands.isEmpty()) {
+          System.err.println(depth + ":" + "no ands, returning ors: " + ors);
+          return ors;
+        } else {
+          System.err.println(depth + ":" + "Mixing in ands: " + ands);
+          System.err.println(depth + ":" + "to: " + ors);
+          List combs = new ArrayList();
+          combs.add(ors);
+          for(int i = 0; i < ands.size(); i++) {
+            List newCombs = new ArrayList();
+            FeatureFilter.And and = (FeatureFilter.And) ands.get(i);
+            for(int j = 0; j < combs.size(); j++) {
+              FeatureFilter f = (FeatureFilter) combs.get(j);
+              newCombs.add(or(f, and.getChild1()));
+              newCombs.add(or(f, and.getChild2()));
+            }
+          }
+          FeatureFilter val = optimize(and((FeatureFilter[]) combs.toArray(new FeatureFilter[] {})));
+          System.err.println(depth + ":" + "returning anded values: " + val);
+          return val;
+        }
       }
     } else if(filter instanceof FeatureFilter.Not) {
       FeatureFilter.Not not = (FeatureFilter.Not) filter;
       return not(optimize(not.getChild()));
     } else {
       return filter;
+    }
+    } finally {
+      depth--;
     }
   }
   

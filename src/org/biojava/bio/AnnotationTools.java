@@ -109,9 +109,12 @@ public final class AnnotationTools {
       AnnotationType ann1,
       AnnotationType ann2
     ) {
+System.err.println("intersection: " + ann1 + ", " + ann2);
       if(ann1.subTypeOf(ann2)) {
+System.err.println("ann2.subTypeOf(ann1)");
         return ann2;
       } else if(ann2.subTypeOf(ann1)) {
+System.err.println("ann1.subTypeOf(ann2)");
         return ann1;
       } else {
         Set props = new HashSet();
@@ -121,11 +124,13 @@ public final class AnnotationTools {
         AnnotationType.Impl intersect = new AnnotationType.Impl();
         for(Iterator i = props.iterator(); i.hasNext(); ) {
           Object key = i.next();
+System.err.println("key: " + key);
 
           Location cc1 = ann1.getCardinalityConstraint(key);
           Location cc2 = ann2.getCardinalityConstraint(key);
           Location cc = LocationTools.intersection(cc1, cc2);
           if(cc == Location.empty) {
+System.err.println("empty cardinality");
             return AnnotationType.NONE;
           }
           
@@ -133,11 +138,18 @@ public final class AnnotationTools {
           PropertyConstraint pc2 = ann2.getPropertyConstraint(key);
           PropertyConstraint pc = intersection(pc1, pc2);
           if (pc == PropertyConstraint.NONE && !cc.contains(0)) {
+System.err.println("incompattible types");
             return AnnotationType.NONE;
           }
           
+System.err.println("setting: " + key + " " + pc + " " + cc);
           intersect.setConstraints(key, pc, cc);
         }
+
+        intersect.setDefaultConstraints(
+          intersection(ann1.getDefaultPropertyConstraint(), ann2.getDefaultPropertyConstraint()),
+          LocationTools.intersection(ann1.getDefaultCardinalityConstraint(), ann2.getDefaultCardinalityConstraint())
+        );
         
         return intersect;
       }
@@ -147,27 +159,34 @@ public final class AnnotationTools {
       PropertyConstraint pc1,
       PropertyConstraint pc2
     ) {
+System.err.println("intersection of: " + pc1 + ", " + pc2);
       if(pc1.subConstraintOf(pc2)) {
+System.err.println("subConstraint");
         return pc2;
       } else if(pc2.subConstraintOf(pc1)) {
+System.err.println("subConstraint");
         return pc1;
       } else if(
         pc1 instanceof PropertyConstraint.ByClass &&
         pc2 instanceof PropertyConstraint.ByClass
       ) {
+System.err.println("byClass");
         PropertyConstraint.ByClass pc1c = (PropertyConstraint.ByClass) pc1;
         PropertyConstraint.ByClass pc2c = (PropertyConstraint.ByClass) pc2;
         Class c1 = pc1c.getPropertyClass();
         Class c2 = pc2c.getPropertyClass();
         
         if(!c1.isInterface() && !c2.isInterface()) {
+System.err.println("anding");
           return new PropertyConstraint.And(pc1c, pc2c);
         } else {
+System.err.println("disjoint");
           return PropertyConstraint.NONE;
         }
       } else if(pc2 instanceof PropertyConstraint.ByClass) {
         return intersection(pc2, pc1);
       } else if(pc1 instanceof PropertyConstraint.ByClass) {
+System.err.println("class VS something");
         PropertyConstraint.ByClass pc1c = (PropertyConstraint.ByClass) pc1;
         
         if(pc2 instanceof PropertyConstraint.Enumeration) {
@@ -233,6 +252,7 @@ public final class AnnotationTools {
       AnnotationType ann1,
       AnnotationType ann2
     ) {
+System.err.println("Finding union of: " + ann1 + ", " + ann2);
       if(ann1.subTypeOf(ann2)) {
         return ann1;
       } else if(ann2.subTypeOf(ann1)) {

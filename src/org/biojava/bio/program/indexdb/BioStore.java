@@ -72,6 +72,11 @@ public class BioStore implements IndexStore {
     BioStore(File location, boolean cache, boolean mutable)
         throws IOException, BioException {
         this.location = location;
+
+        File configFile = BioStoreFactory.makeConfigFile(location);
+        if(!configFile.exists()) {
+          throw new BioException("Config file does not exist: " + configFile);
+        }
         metaData = new ConfigFile(BioStoreFactory.makeConfigFile(location));
         idToList = new SmallMap();
 

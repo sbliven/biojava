@@ -35,6 +35,7 @@ import org.biojava.bio.seq.*;
  * @author Matthew Pocock
  * @author Thomas Down
  * @author Kalle N�slund
+ * @author Paul Seed
  */
 
 public class SimpleFeature
@@ -277,6 +278,16 @@ implements
       ft.annotation = getAnnotation();
     }
     
+    /**
+     * Create a <code>SimpleFeature</code> on the given sequence. 
+     * The feature is created underneath the parent <code>FeatureHolder</code>
+     * and populated directly from the template fields. However,
+     * if the template annotation is the <code>Annotation.EMPTY_ANNOTATION</code>, 
+     * an empty <code>SimpleAnnotation</code> is attached to the feature instead.
+     * @param sourceSeq the source sequence
+     * @param parent the parent sequence or feature
+     * @param template the template for the feature
+     */
     public SimpleFeature(Sequence sourceSeq, 
 			 FeatureHolder parent,
 			 Feature.Template template)
@@ -299,7 +310,9 @@ implements
 	this.loc = template.location;
 	this.type = template.type;
 	this.source = template.source;
-	this.annotation = new SimpleAnnotation(template.annotation);
+        this.annotation = (template.annotation == Annotation.EMPTY_ANNOTATION) ?
+                               new SimpleAnnotation() :
+                               template.annotation;
     }
 
     public String toString() {
