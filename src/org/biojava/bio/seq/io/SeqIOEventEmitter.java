@@ -108,11 +108,6 @@ public class SeqIOEventEmitter
                 for (Iterator ki = keys.iterator(); ki.hasNext();)
                 {
                     Object key = ki.next();
-
-                    // Skip internal data
-                    if (key.equals(Feature.PROPERTY_DATA_KEY))
-                        continue;
-
                     listener.addFeatureProperty(key, t.annotation.getProperty(key));
                 }
 
