@@ -40,25 +40,34 @@ import org.biojava.bio.*;
  *
  * @author Matthew Pocock
  */
-public class FuzzyLocation implements Location {
-  private final Location parent;
-  private final boolean fuzzyMin;
-  private final boolean fuzzyMax;
+public class FuzzyLocation
+extends AbstractRangeLocation
+implements Serializable {
+  private int outerMin;
+  private int innerMin;
+  private int innerMax;
+  private int outerMax;
+  private RangeResolver resolver;
   
   /**
    * Create a new FuzzyLocation that decorates 'parent' with a potentialy
    * fuzzy min or max value.
    *
-   * @param parent   the Location to decorate
    * @param fuzzyMin true if getMin represents a fuzzy location, false
    *                 otherwise
    * @param fuzzyMax true if getMax represents a fuzzy location, false
    *                 otherwise
    */
-  public FuzzyLocation(Location parent, boolean fuzzyMin, boolean fuzzyMax) {
-    this.parent = parent;
-    this.fuzzyMin = fuzzyMin;
-    this.fuzzyMax = fuzzyMax;
+  public FuzzyLocation(
+    int outerMin, int outerMax,
+    int innerMin, int innerMax,
+    RangeResolver resolver
+  ) {
+    this.outerMin = outerMin;
+    this.outerMax = outerMax;
+    this.innerMin = innerMin;
+    this.innerMax = innerMax;
+    this.resolver = resolver;
   }
   
   /**
@@ -67,73 +76,46 @@ public class FuzzyLocation implements Location {
    * @return the Location instance that stores all of the Loctaion interface
    *         data
    */
-  public Location getParent() {
-    return parent;
+  public RangeResolver getResolver() {
+    return resolver;
+  }
+
+  public int getOuterMin() {
+    return outerMin;
   }
   
-  /**
-   * Find out if the getMin vaule is fuzzy or not.
-   *
-   * @return true if getMin should be treated as fuzzy, false otherwise
-   */
-  public boolean getFuzzyMin() {
-    return fuzzyMin;
+
+  public int getOuterMax() {
+    return outerMax;
   }
-      
-  /**
-   * Find out if the getMax vaule is fuzzy or not.
-   *
-   * @return true if getMax should be treated as fuzzy, false otherwise
-   */
-  public boolean getFuzzyMax() {
-    return fuzzyMax;
+  
+  public int getInnerMin() {
+    return innerMin;
+  }
+  
+
+  public int getInnerMax() {
+    return innerMax;
   }
 
   public int getMin() {
-    return getParent().getMin();
+    return resolver.resolveMin(this);
   }
 
   public int getMax() {
-    return getParent().getMax();
-  }
-
-  public boolean overlaps(Location l) {
-    return getParent().overlaps(l);
-  }
-
-  public boolean contains(Location l) {
-    return getParent().contains(l);
-  }
-
-  public boolean contains(int p) {
-    return getParent().contains(p);
+    return resolver.resolveMax(this);
   }
   
-  public boolean equals(Object l) {
-    return getParent().equals(l);
-  }
-
-  public Location intersection(Location l) {
-    return getParent().intersection(l);
-  }
-
-  public Location union(Location l) {
-    return getParent().union(l);
-  }
-
-  public SymbolList symbols(SymbolList seq) {
-    return getParent().symbols(seq);
-  }
-
-  public Location translate(int dist) {
-    return getParent().translate(dist);
-  }
-   
-  public boolean isContiguous() {
-    return getParent().isContiguous();
+  public boolean hasBoundedMin() {
+    return outerMin != Integer.MIN_VALUE;
   }
   
-  public Iterator blockIterator() {
-    return getParent().blockIterator();
+  public boolean hasBoundedMax() {
+    return outerMax != Integer.MAX_VALUE;
+  }
+  
+  public static interface RangeResolver {
+    public int resolveMin(FuzzyLocation loc);
+    public int resolveMax(FuzzyLocation loc);
   }
 }

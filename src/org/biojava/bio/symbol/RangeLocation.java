@@ -32,7 +32,9 @@ import java.util.*;
  *
  * @author Matthew Pocock
  */
-public class RangeLocation implements Location, Serializable {
+public class RangeLocation
+extends AbstractRangeLocation
+implements Serializable {
   /**
    * The minimum point contained.
    */
@@ -51,68 +53,6 @@ public class RangeLocation implements Location, Serializable {
     return max;
   }
 
-  public boolean overlaps(Location l) {
-    return !(getMin() > l.getMax() ||
-             getMax() < l.getMin());
-  }
-
-  public boolean contains(Location l) {
-    return getMin() <= l.getMin() &&
-           getMax() >= l.getMax();
-  }
-
-  public boolean contains(int p) {
-    return getMin() <= p &&
-           getMax() >= p;
-  }
-    
-    
-  /**
-  *Tests for object equality against another location
-  *@param l the location to compare against
-  */  
-  public boolean equals(Location l) {
-    return getMin() == l.getMin() &&
-           getMax() == l.getMax() && l.isContiguous();
-  }
-
-  public Location intersection(Location l) {
-    int start = Math.max(getMin(), l.getMin());
-    int end = Math.min(getMax(), l.getMax());
-
-    if(start <= end)
-      return new RangeLocation(start, end);
-    else
-      return Location.empty;
-  }
-
-  public Location union(Location l) {
-    List al = new ArrayList(2);
-    al.add(this);
-    al.add(l);
-
-    return new CompoundLocation(al);
-  }
-
-  public SymbolList symbols(SymbolList seq) {
-    return seq.subList(getMin(), getMax());
-  }
-
-  public Location translate(int dist) {
-      if (dist == 0)
-	  return this;
-
-      return new RangeLocation(getMin() + dist, getMax() + dist);
-  }
-  
-  public boolean isContiguous() {
-    return true;
-  }
-
-  public Iterator blockIterator() {
-    return Collections.singleton(this).iterator();
-  }
-
   public RangeLocation(int min, int max) throws IndexOutOfBoundsException {
     if(max < min) {
       throw new IndexOutOfBoundsException(
@@ -121,9 +61,5 @@ public class RangeLocation implements Location, Serializable {
     }
     this.min = min;
     this.max = max;
-  }
-
-  public String toString() {
-    return "[" + getMin() + ", " + getMax() + "]";
   }
 }
