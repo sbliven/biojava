@@ -53,6 +53,21 @@ public class XMLAnnotationTypeWriter {
     private boolean strict = false;
     
     /**
+     * Writer for types of PropertyConstraint.  Implement this to add support
+     * for a new type of PropertyConstraint.
+     *
+     * @author Thomas Down
+     * @since 1.3
+     */
+    
+    public interface XMLPropertyConstraintWriter {
+        public void writePropertyConstraint(PropertyConstraint pc,
+                                            XMLWriter xw,
+                                            XMLAnnotationTypeWriter config)
+            throws ClassCastException, IOException, IllegalArgumentException;
+    }
+    
+    /**
      * Construct a new AnnotationTypeWriter which knows about the builtin types of PropertyConstraint
      */
     
@@ -148,7 +163,7 @@ public class XMLAnnotationTypeWriter {
                 Location bloc = (Location) bi.next();
                 xw.openTag("span");
                 xw.attribute("start", intToString(bloc.getMin()));
-                xw.attribute("end",  intToString(bloc.getMax()));
+                xw.attribute("stop",  intToString(bloc.getMax()));
                 xw.closeTag("span");
             }
             xw.closeTag(XML_ANNOTATIONTYPE_NS, "cardinality");
