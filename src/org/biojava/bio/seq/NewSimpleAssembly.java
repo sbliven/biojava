@@ -44,7 +44,10 @@ import org.biojava.utils.ChangeVetoException;
 /**
  * A Sequence which is assembled from other sequences contained
  * in a set of ComponentFeature objects.
- *
+ * <p>
+ * The class has been extended to handle overlapping
+ * component sequences.  It is assumed that the overlaps
+ * are consistent between components: this will not be checked.
  * <p>
  * There is still some potential for optimising SymbolList
  * operations on this class.
@@ -52,6 +55,7 @@ import org.biojava.utils.ChangeVetoException;
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author David Huen
  * @since 1.1
  */
 
