@@ -34,102 +34,105 @@ import org.acedb.staticobj.*;
  */
 
 public class AcePerlParser {
-    private Database parentDB;
+  private Database parentDB;
 
-    public AcePerlParser(Database db) {
-	parentDB = db;
+  public AcePerlParser(Database db) {
+    parentDB = db;
+  }
+
+  public AceObject parseObject(String obj) 
+  throws AceException {
+    obj = obj.trim();
+    if (obj.startsWith("/")) {
+	    throw new AceException("Empty object!");
     }
 
-    public AceObject parseObject(String obj) 
-        throws IOException
-    {
-	obj = obj.trim();
-	if (obj.startsWith("/"))
-	    throw new IOException("Empty object!");
-
-	StringTokenizer toke = new StringTokenizer(obj, "{},[] \t\n\r", true);
-	if (! toke.nextToken().equals("{"))
-	    System.out.println("Erkity...");
-	try {
+    StringTokenizer toke = new StringTokenizer(obj, "{},[] \t\n\r", true);
+    if (! toke.nextToken().equals("{")) {
+      throw new AceError("Unrecoverable parsing error: expecting {");
+    }
+    
+    try {
 	    return (AceObject) getNode(null, toke);
-	} catch (Exception ex) {
-	    ex.printStackTrace();
-	    System.err.println(obj);
-	}
-	return null;
+    } catch (Exception ex) {
+	    throw new AceError(ex);
     }
+  }
 
-    private StaticAceNode constructNode(StaticAceNode parent,
-					String ty, 
-					String va,
-					String cl) 
-	 throws IOException
-    {
-	StaticAceNode obj = null;
+  private StaticAceNode constructNode(
+    StaticAceNode parent,
+		String ty, 
+		String va,
+		String cl
+  ) throws AceException {
+    StaticAceNode obj = null;
 
-	if (ty.equals("in")) {
+    if (ty.equals("in")) {
 	    obj = new StaticIntValue(Integer.parseInt(va), parent);
-	} else if (ty.equals("tx")) {
-	    obj = new StaticStringValue(va, parent);
-	} else if (ty.equals("ob")) {
+    } else if (ty.equals("tx")) {
+  	  obj = new StaticStringValue(va, parent);
+    } else if (ty.equals("ob")) {
 	    if (parent != null) {
-		obj = new StaticReference(
-		     AceType.getClassType(parentDB, cl).getRefType(),
-			     va, parent, parentDB);
+        obj = new StaticReference(
+          va,
+          parent,
+          Ace.rootURL(parent.toURL()).relativeURL(cl)
+        );
 	    } else {
-		obj = new StaticAceObject(va, 
-		      AceType.getClassType(parentDB, cl), null,
-					  parentDB);
+        obj = new StaticAceObject(
+          va, 
+		      parent
+        );
 	    }
-	} else /* if (ty.equals("tg")) */ {
+    } else /* if (ty.equals("tg")) */ {
 	    obj = new StaticAceNode(va, parent);
-	}
-
-	return obj;
     }
+
+    return obj;
+  }
 	
 
-    private AceNode getNode(StaticAceNode parent, StringTokenizer t) 
-        throws IOException
-    {
-	String ty = null;
-	String va = null;
-	String cl = null;
-	StaticAceNode obj = null;
+  private AceNode getNode(StaticAceNode parent, StringTokenizer t) 
+  throws AceException {
+    String ty = null;
+    String va = null;
+    String cl = null;
+    StaticAceNode obj = null;
 
-	while (true) {
+    while (true) {
 	    String s = t.nextToken();
  
 	    if (s.startsWith("ty=>")) {
-		ty = s.substring(4);
+        ty = s.substring(4);
 	    } else if (s.startsWith("va=>")) {
-		va = s.substring(4).trim();
+        va = s.substring(4).trim();
 	    } else if (s.startsWith("cl=>")) {
-		cl = s.substring(4);
+        cl = s.substring(4);
 	    } else if (s.equals("Pn=>")) {
-		if (! t.nextToken().equals("["))
-		    System.out.println("PnErkity...");
-		obj = constructNode(parent, ty, va, cl);
-		getChildren(obj, t);
-	    } else if (s.equals("}")) {
-		if (obj != null)
-		    return obj;
-		else
-		    return constructNode(parent, ty, va, cl);
+        if (! t.nextToken().equals("[")) {
+          throw new AceError("Unrecoverable parsing error: expecting [");
+        }
+        obj = constructNode(parent, ty, va, cl);
+        getChildren(obj, t);
+      } else /* { */ if (s.equals("}")) {
+        if (obj != null) {
+          return obj;
+        } else{ 
+          return constructNode(parent, ty, va, cl);
+        }
 	    }
-	}
     }
+  }
 
-    private void getChildren(StaticAceNode parent, StringTokenizer t) 
-        throws IOException
-    {
-	while (true) {
-	    String s = t.nextToken();
-	    if (s.equals("{")) {
-		parent.addNode(getNode(parent, t));
-	    } else if (s.equals("]")) {
-		return;
-	    }
-	}
+  private void getChildren(StaticAceNode parent, StringTokenizer t) 
+  throws AceException {
+    while (true) {
+      String s = t.nextToken();
+      if (s.equals("{")) /* } */ {
+        parent.addNode(getNode(parent, t));
+      } else if (s.equals("]")) {
+        return;
+      }
     }
+  }
 }

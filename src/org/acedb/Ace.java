@@ -21,6 +21,8 @@
 
 package org.acedb;
 
+import java.util.*;
+
 public class Ace {
     /**
      * You can't make one of these for love nor money.
@@ -83,7 +85,7 @@ public class Ace {
 
     public static AceSet fetch(AceURL url) throws AceException {
 	Database db = (Database) databases.get(url);
-	return db.retrieve(url);
+	return db.fetch(url);
     }
 
     /**
@@ -93,7 +95,7 @@ public class Ace {
     public static AceURL rootURL(AceURL url) {
 	String protocol = url.getProtocol();
 	String userInfo = url.getUserInfo();
-	String authorization = url.getAuthorization();
+	String authority = url.getAuthority();
 	String host = url.getHost();
 	int port = url.getPort();
 	return new AceURL(protocol, host, port, null, null, null, userInfo, authority);
