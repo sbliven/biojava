@@ -35,24 +35,24 @@ public interface AceSet {
   /**
    * The number of items in this AceSet.
    */
-  int size();
+  int size() throws AceException;
   
   /**
    * An iterator over the names associated with each thing in the set.
    * Names are Strings.
    */
-  Iterator nameIterator();
+  Iterator nameIterator() throws AceException;
   
   /**
    * An iterator over every thing in this set.
    * Things are AceSet-derived objects.
    */
-  Iterator iterator();
+  Iterator iterator() throws AceException;
 
   /**
    * Returns whether an object is contained under a given name.
    */
-  boolean contains(String name);
+  boolean contains(String name) throws AceException;
   
   /**
    * The logical parent of this object or null if there is no logical parent.

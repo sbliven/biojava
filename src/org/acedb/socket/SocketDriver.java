@@ -31,15 +31,11 @@ import org.acedb.*;
  */
 
 public class SocketDriver implements Driver {
-  public boolean accept(URL url) {
+  public boolean accept(AceURL url) {
     return url.getProtocol().equals("acedb");
   }
-  
-  public Database connect(URL url) throws AceException {
-    return new SocketDatabase(url);
-  }
 
-  public Database connect(URL url, String user, String pass) throws AceException {
-    return new SocketDatabase(url, user, pass);
+  public Database connect(AceURL url) throws AceException {
+    return new SocketDatabase(url);
   }
 }

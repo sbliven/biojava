@@ -60,7 +60,7 @@ class SocketDatabase implements Database {
 	host = dbURL.getHost();
 	port = dbURL.getPort();
 	this.user = dbURL.getUserInfo();
-	this.passwd = dbURL.getAuthorization();
+	this.passwd = dbURL.getAuthority();
 	
 	// check we can connect...
 	AceSocket as = takeSocket();
@@ -103,8 +103,8 @@ class SocketDatabase implements Database {
 	return null;
     }
 
-    private AceSet fetch(AceURL url) throws AceException {
-	AceSet resultSet = null
+    public AceSet fetch(AceURL url) throws AceException {
+	AceSet resultSet = null;
 
 	String file = url.getFile();
 
@@ -137,12 +137,12 @@ class SocketDatabase implements Database {
         throws AceException
     {
 	if (allClassesSet == null) {
-	    AceSocket sock = null();
+	    AceSocket sock = null;
 	    try {
 		sock = takeSocket();
 		String result = sock.transact("classes");
 		StaticAceSet set = new StaticAceSet(null, dbURL);
-		for(StringTokenizer toke = new StringTokenizer(result, '\r\n'); toke.hasMoreTokens(); ) {
+		for(StringTokenizer toke = new StringTokenizer(result, "\r\n"); toke.hasMoreTokens(); ) {
 		    String line = toke.nextToken();
 		    if (line.charAt(0) <= 32) {
 			StringTokenizer lineToke = new StringTokenizer(line);
@@ -189,8 +189,12 @@ class SocketDatabase implements Database {
 		}
 	    }
 	    
-	    return new SocketResultSet(this, allClasses().retrieve(clazz), nameList,
-				       dbURL.relative(clazz + '?' + namePattern);
+	    return new SocketResultSet(
+        this,
+        allClasses().retrieve(clazz),
+        nameList,
+				dbURL.relative(clazz + '?' + namePattern)
+      );
 	} finally {
 	    if (sock != null)
 		putSocket(sock);
@@ -221,7 +225,7 @@ class SocketDatabase implements Database {
 
 	    String obj = sock.transact("show -p");
 	    o = parser.parseObject(obj);
-	} catch (IOException ex) {
+	} catch (AceException ex) {
 	    throw new AceException(ex);
 	} finally {
       if(sock != null)

@@ -21,6 +21,10 @@
 
 package org.acedb.socket;
 
+import java.util.*;
+
+import org.acedb.*;
+
 /**
  * AceSet representing all the objects in a class
  */
@@ -49,20 +53,16 @@ class SocketClazzSet implements AceSet {
 	return allMembers().nameIterator();
     }
 
-    public Iterator nameIterator() throws AceException {
-	return allMembers().nameIterator();
-    }
-
     public boolean contains(String name) throws AceException {
 	return allMembers().contains(name);
     }
 
     public AceSet retrieve(String name) throws AceException {
-	return Ace.fetch(url.relative(name));
+	return Ace.fetch(url.relativeURL(name));
     }
 
     public AceSet filter(String rule) throws AceException {
-	return Ace.fetch(url.relative("?" + name));
+	return Ace.fetch(url.relativeURL("?" + rule));
     }
 
     public AceSet getParent() {
