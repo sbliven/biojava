@@ -225,6 +225,8 @@ class DASXFFParser {
 		    } catch (ChangeVetoException ex) {
 			throw new BioError(ex);
 		    }
+		} else if (tagName.equals("details")) {
+		    parseDetails(e, templ);
 		}
 	    }
 	    chld = chld.getNextSibling();
@@ -233,7 +235,31 @@ class DASXFFParser {
 	if (templ.annotation == null) {
 	    templ.annotation = Annotation.EMPTY_ANNOTATION;
 	}
-	    
+    }
+
+    public void parseDetails(Element el, Feature.Template templ)
+        throws ParseException
+    {
+	Node chld = el.getFirstChild();
+	while (chld != null) {
+	    if (chld instanceof Element) {
+		Element e = (Element) chld;
+		String tagName = e.getTagName();
+		if (tagName.equals("prop")) {
+		    String key = e.getAttribute("key");
+		    String value = getChildText(e);
+		    if (templ.annotation == null) {
+			templ.annotation = new SimpleAnnotation();
+		    }
+		    try {
+			templ.annotation.setProperty(key, value);
+		    } catch (ChangeVetoException ex) {
+			throw new BioError(ex);
+		    }
+		}
+	    }
+	    chld = chld.getNextSibling();
+	}
     }
 
     public Location parseXFFLocation(Element el)
