@@ -26,6 +26,11 @@ import java.util.*;
 /**
  * Annotation implementation which allows new key-value
  * pairs to be layered on top of an underlying Annotation.
+ * When <code>getProperty</code> is called, we first check
+ * for a value stored in the overlay.  If this fails, the
+ * underlying <code>Annotation</code> is checked.  Values
+ * passed to <code>setProperty</code> are always stored
+ * within the overlay.
  *
  * @author Thomas Down
  */
@@ -33,6 +38,14 @@ import java.util.*;
 public class OverlayAnnotation implements Annotation {
     private Annotation parent;
     private Map overlay;
+
+    /**
+     * Construct an annotation which can overlay new key-value
+     * pairs onto an underlyin annotation.
+     *
+     * @param par The `parent' annotation, on which new
+     *            key-value pairs can be layered.
+     */
 
     public OverlayAnnotation(Annotation par) {
 	parent = par;
@@ -50,9 +63,22 @@ public class OverlayAnnotation implements Annotation {
 	return parent.getProperty(key);
     }
 
+    /**
+     * Return a <code>Set</code> containing all key objects
+     * visible in this annotation.  The <code>Set</code> is
+     * unmodifiable, but will dynamically reflect changes made
+     * to the annotation.
+     */
+
     public Set keys() {
 	return new OAKeySet();
     }
+
+    /**
+     * Return a <code>Map</code> view onto this annotation.
+     * The returned <code>Map</code> is unmodifiable, but will
+     * dynamically reflect any changes made to this annotation.
+     */
 
     public Map asMap() {
 	return new OAMap();

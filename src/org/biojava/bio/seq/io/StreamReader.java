@@ -113,17 +113,40 @@ public class StreamReader implements SequenceIterator {
     this.sf = sf;
   }
 
+    /**
+     * Encapsulate a stream for reading sequence data.  This
+     * is the object which gets passed to SequenceFormats.
+     */
+
   static public class Context {
     private BufferedReader reader;
+
+      /**
+       * Get a Reader object for accessing data from the
+       * stream.
+       *
+       * @return A <code>Reader</code> object, or <code>null</code>
+       *         if the stream contains no more sequences.
+       */
 
     public BufferedReader getReader() {
       return reader;
     }
 
+      /**
+       * Signal that the stream contains no more sequence data.
+       * This may or may not correspond to reaching the end of
+       * the stream.
+       */
+
     public void streamEmpty() {
       reader = null;
     }
     
+      /**
+       * Check if the stream is empty.
+       */
+
     public boolean isStreamEmpty() {
       return reader == null;
     }
