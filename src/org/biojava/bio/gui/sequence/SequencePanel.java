@@ -123,7 +123,6 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
    * @param s  the SymboList to render
    */
   public void setSequence(SymbolList s) {
-    System.out.println("Setting sequence");
     SymbolList oldSequence = sequence;
     if(oldSequence != null) {
       oldSequence.removeChangeListener(layoutListener);
@@ -295,26 +294,23 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
       minPos = currentClip.getMinX();
       maxPos = currentClip.getMaxX();
     }
-    System.out.println("Clipping in range: " + minPos + "-" + maxPos);
     
     int minOffset = Arrays.binarySearch(offsets, minPos);
     if(minOffset < 0) {
       minOffset = -minOffset - 1;
     }
-    System.out.println("minOffset for " + minPos + " is " + minOffset);
     double minCoord = (minOffset == 0) ? 0.0 : offsets[minOffset-1];
     int minP = 1 + (int) ((double) minOffset * symbolsPerLine);
-    System.out.println("minP: " + minP);
     
     Rectangle2D.Double clip = new Rectangle2D.Double();
     if (direction == HORIZONTAL) {
         clip.width = alongDim;
         clip.height = acrossDim;
-        g2.translate(leadingBorder.getSize(), minCoord);
+        g2.translate(leadingBorder.getSize() - alongDim * minOffset, minCoord);
     } else {
         clip.width = acrossDim;
         clip.height = alongDim;
-        g2.translate(minCoord, leadingBorder.getSize());
+        g2.translate(minCoord, leadingBorder.getSize() - alongDim * minOffset);
     }
     
     LineInfo currentLI;
@@ -323,13 +319,12 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
       int max = Math.min(min + symbolsPerLine - 1, sequence.length());
       currentLI = (LineInfo) lineInfos.get(l);
       
-      System.out.println("Painting " + min + ".." + max);
       if (direction == HORIZONTAL) {
-          clip.x = l * alongDim - leadingBorder.getSize();
+          clip.x = l * alongDim;
           clip.y = 0.0;
       } else {
           clip.x = 0.0;
-          clip.y = l * alongDim - leadingBorder.getSize();
+          clip.y = l * alongDim;
       }
       
       for (Iterator i = views.iterator(); i.hasNext(); ) {
@@ -345,8 +340,7 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
         g2.clip(clip);
         r.paint(g2, this, min, max);
         g2.setClip(oldClip);
-        g2.draw(clip);
-
+        
         if (direction == HORIZONTAL) {
             g2.translate(0.0, depth);
         } else {
@@ -362,8 +356,6 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
       min += symbolsPerLine;
 
       if(offsets[l] > maxPos) {
-        System.out.println("Stopping as " + offsets[l] + " is larger than "
-        + maxPos);
         break;
       }
     }
