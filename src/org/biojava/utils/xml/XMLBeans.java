@@ -31,6 +31,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import org.biojava.bio.Annotation;
+import org.biojava.bio.SmallAnnotation;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.SmallMap;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -149,6 +153,14 @@ public class XMLBeans {
 		    valueObject = new ArrayList();
 		    configureBean(valueObject, echild, refs);
 		    valueType = valueObject.getClass();
+		} else if (tag.equals("map")) {
+		    valueObject = new SmallMap();
+		    configureBean(valueObject, echild, refs);
+		    valueType = valueObject.getClass();
+		} else if (tag.equals("annotation")) {
+		    valueObject = new SmallAnnotation();
+		    configureBean(valueObject, echild, refs);
+		    valueType = valueObject.getClass();
 		} else {
 		    throw new AppException("Unknown element `" + tag + "' in XML-bean");
 		}
@@ -158,9 +170,9 @@ public class XMLBeans {
 		    setProp(clazz, bean, name, valueObject, valueType);
 		} else {
 		    if (bean instanceof Collection) {
-			((Collection) bean).add(valueObject);
+		        ((Collection) bean).add(valueObject);
 		    } else {
-			throw new AppException("Anonymous beans are only allowed as children of Collections");
+		        throw new AppException("Anonymous beans are only allowed as children of Collections");
 		    }
 		}
 		
@@ -172,31 +184,41 @@ public class XMLBeans {
     private void setProp(Class clazz, Object bean, String prop, Object value, Class ourType) 
         throws AppException
     {
-	BeanInfo bi = null;
-
-	try {
-	    bi = Introspector.getBeanInfo(clazz);
-	} catch (IntrospectionException ex) {
-	    throw new AppException("Couldn't introspect class " + bean.getClass().getName());
-	}
-	PropertyDescriptor[] descs = bi.getPropertyDescriptors();
-	for (int i = 0; i < descs.length; ++i) {
-	    if (descs[i].getName().equals(prop)) {
-		PropertyDescriptor desc = descs[i];
-		if (! desc.getPropertyType().isAssignableFrom(ourType)) {
-		    throw new AppException("Property " + prop + " is not assignable from " + ourType.getName());
-		}
-		Object[] obj = new Object[1];
-		obj[0] = value;
+		BeanInfo bi = null;
+	
 		try {
-		    desc.getWriteMethod().invoke(bean, obj);
-		} catch (Exception ex) {
-		    throw new AppException("Invocation failed");
+		    bi = Introspector.getBeanInfo(clazz);
+		} catch (IntrospectionException ex) {
+		    throw new AppException("Couldn't introspect class " + bean.getClass().getName());
 		}
-		return;
-	    }
-	}
-	throw new AppException("Couldn't find property " + prop + " in class " + clazz.getName());
+		PropertyDescriptor[] descs = bi.getPropertyDescriptors();
+		for (int i = 0; i < descs.length; ++i) {
+		    if (descs[i].getName().equals(prop)) {
+			PropertyDescriptor desc = descs[i];
+			if (! desc.getPropertyType().isAssignableFrom(ourType)) {
+			    throw new AppException("Property " + prop + " is not assignable from " + ourType.getName());
+			}
+			Object[] obj = new Object[1];
+			obj[0] = value;
+			try {
+			    desc.getWriteMethod().invoke(bean, obj);
+			} catch (Exception ex) {
+			    throw new AppException("Invocation failed");
+			}
+			return;
+		    }
+		}
+		if (bean instanceof Map) {
+		    ((Map) bean).put(prop, value);
+		} else if (bean instanceof Annotation) {
+		    try {
+		        ((Annotation) bean).setProperty(prop, value);
+		    } catch (ChangeVetoException cve) {
+		        throw new AppException("Unexpected veto updating Annotation");
+		    }
+		} else {
+		    throw new AppException("Couldn't find property " + prop + " in class " + clazz.getName());
+		}
     }
 }
  
