@@ -38,47 +38,18 @@ public class BlastAggregator
     extends StAXFeatureHandler
 {
     // constructor
-    public BlastAggregator()
+    public BlastAggregator(StAXFeatureHandler staxenv)
     {
+        // execute superclass
+        super(staxenv);
+
         // delegate handling of <BlastOutput>
         super.addHandler(new ElementRecognizer.ByLocalName("BlastOutput"),
             new StAXHandlerFactory() {
                 public StAXContentHandler getHandler(StAXFeatureHandler staxenv) {
-                    return new BlastOutputHandler(staxenv) {
-                        public void startElementHandler(
-                            String nsURI,
-                            String localName,
-                            String qName,
-                            Attributes attrs)
-                            throws SAXException
-                        {
-                            // suppress generation of <BlastLikeDataSetCollection> wrapper in this class.
-                            wrap = false;
-                        }
-                    };
+                    return new BlastOutputHandler(staxenv);
                 }
             }
         );
-    }
-
-    public void startElementHandler(
-            String nsURI,
-            String localName,
-            String qName,
-            Attributes attrs)
-             throws SAXException
-    {
-        // generate start of <biojava:HSPCollection>
-        listener.startElement(biojavaUri, "BlastLikeDataSetCollection", biojavaUri + ":BlastLikeDataSetCollection", new AttributesImpl());
-    }
-
-    public void endElementHandler(
-            String nsURI,
-            String localName,
-            String qName,
-            StAXContentHandler handler)
-             throws SAXException
-    {
-        listener.endElement(biojavaUri, "BlastLikeDataSetCollection", biojavaUri + ":BlastLikeDataSetCollection");
     }
 }

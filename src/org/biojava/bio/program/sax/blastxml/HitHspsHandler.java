@@ -38,7 +38,7 @@ class HitHspsHandler
     public HitHspsHandler(StAXFeatureHandler staxenv)
     {
         super(staxenv);
-
+//        System.out.println("HitHspsHandler staxenv " + staxenv);
         // delegate handling of <Hsp> to its own class
         super.addHandler(new ElementRecognizer.ByLocalName("Hsp"),
             HspHandler.HSP_HANDLER_FACTORY);
@@ -52,7 +52,7 @@ class HitHspsHandler
              throws SAXException
     {
         // generate start of <biojava:HSPCollection>
-        listener.startElement(biojavaUri, "HSPCollection", biojavaUri + ":HSPCollection", new AttributesImpl());        
+        staxenv.listener.startElement(biojavaUri, "HSPCollection", biojavaUri + ":HSPCollection", new AttributesImpl());        
     }
 
     public void endElementHandler(
@@ -63,6 +63,6 @@ class HitHspsHandler
              throws SAXException
     {
         // generate end of <biojava:HSPCollection>
-        listener.endElement(biojavaUri, "HSPCollection", biojavaUri + ":HSPCollection");
+        staxenv.listener.endElement(biojavaUri, "HSPCollection", biojavaUri + ":HSPCollection");
     }
 }

@@ -89,23 +89,11 @@ public class BlastOutputHandler
      */
     boolean wrap = true;
 
-    // constructor for when this class is the document class
-    public BlastOutputHandler(ContentHandler handler)
-    {
-        super();
-
-        staxenv = this;
-        listener = handler;
-
-        // initialise delegation
-        initDelegation();
-    }
-
     // constructor when this is a element class in a document
     public BlastOutputHandler(StAXFeatureHandler staxenv)
     {
         super(staxenv);
-
+//        System.out.println("BlastOutputHandler staxenv " + staxenv);
         // initialise delegation
         initDelegation();
     }
@@ -195,6 +183,10 @@ public class BlastOutputHandler
                             StAXContentHandler handler)
                             throws SAXException
                         {
+                            // necessary as staxenv cannot be final and therefore
+                            // staxenv.listener cannot be accessed from inner class
+                            ContentHandler listener = getListener();
+
                             super.endElement(nsURI, localName, qName, handler);
 
                             // generate the start of <BlastLikeDataSet> here.
@@ -202,7 +194,7 @@ public class BlastOutputHandler
                             // generate attributes
                             AttributesImpl bldsAttrs = new AttributesImpl();
 
-                            System.out.println("program, version " + program + " " + version);
+//                            System.out.println("program, version " + program + " " + version);
                             if ((program != null) && (version != null)) {
                                 bldsAttrs.addAttribute(biojavaUri, "program", "program", CDATA, program);
                                 bldsAttrs.addAttribute(biojavaUri, "version", "version", CDATA, version);
@@ -272,6 +264,11 @@ public class BlastOutputHandler
                             Attributes attrs)
                             throws SAXException
                         {
+                            // necessary as staxenv cannot be final and therefore
+                            // staxenv.listener cannot be accessed from inner class
+                            ContentHandler listener = getListener();
+//                            System.out.println("about to start outputting QueryId. listener is " + listener);
+
                             // the DatabaseId and QueryId elements are generated
                             // in reversed order so I cannot generate them on-the-fly.
 
@@ -306,22 +303,6 @@ public class BlastOutputHandler
         );
     }
 
-
-    void startElementHandler(
-            String nsURI,
-            String localName,
-            String qName,
-            Attributes attrs)
-             throws SAXException
-    {
-        if (wrap) {
-            AttributesImpl bldscAttrs = new AttributesImpl();
-            bldscAttrs.addAttribute("", "xmlns", "xmlns", CDATA, "");
-            bldscAttrs.addAttribute(biojavaUri, "biojava", "xmlns:biojava", CDATA, "http://www.biojava.org");
-            listener.startElement(biojavaUri, "BlastLikeDataSetCollection", biojavaUri + ":BlastLikeDataSetCollection", bldscAttrs);
-        }
-    }
-
     void endElementHandler(
             String nsURI,
             String localName,
@@ -330,8 +311,6 @@ public class BlastOutputHandler
              throws SAXException
     {
         // generate end of <biojava:BlastLikeDataSet>
-        listener.endElement(biojavaUri, "BlastLikeDataSet", biojavaUri + ":BlastLikeDataSet");
-
-        if (wrap) listener.endElement(biojavaUri, "BlastLikeDataSetCollection", biojavaUri + ":BlastLikeDataSetCollection");
+        staxenv.listener.endElement(biojavaUri, "BlastLikeDataSet", biojavaUri + ":BlastLikeDataSet");
     }
 }

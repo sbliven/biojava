@@ -35,7 +35,7 @@ class IterationHandler
     public IterationHandler(StAXFeatureHandler staxenv)
     {
         super(staxenv);
-
+//        System.out.println("IterationHandler staxenv " + staxenv);
         // delegate handling of <Iteration_hits>
         super.addHandler(new ElementRecognizer.ByLocalName("Iteration_hits"),
             IterationHitsHandler.ITERATION_HITS_HANDLER_FACTORY);

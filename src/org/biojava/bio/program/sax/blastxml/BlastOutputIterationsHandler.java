@@ -32,6 +32,7 @@ class BlastOutputIterationsHandler
     public BlastOutputIterationsHandler(StAXFeatureHandler staxenv)
     {
         super(staxenv);
+//        System.out.println("BlastOutputIterationsHandler staxenv " + staxenv);
 
         // delegate handling of <Iteration>
         super.addHandler(new ElementRecognizer.ByLocalName("Iteration"),

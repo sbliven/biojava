@@ -64,15 +64,12 @@ class StAXFeatureHandler extends StAXContentHandlerBase {
     /**
      *  handler list for delegation
      */
-    private List handlers;
+    List handlers;
 
-    /**
-     *  These switches control functionality *
-     */
     /**
      *  are we in delegation from current object or is this pass my own?
      */
-    private int level = 0;
+    int level = 0;
 
     /**
      *  This base class defines default behaviour for a StAX handler including
@@ -86,7 +83,6 @@ class StAXFeatureHandler extends StAXContentHandlerBase {
      */
 
     StAXFeatureHandler() {
-//        System.out.println("entering anonymous constructor");
         handlers = new ArrayList();
     }
 
@@ -99,7 +95,6 @@ class StAXFeatureHandler extends StAXContentHandlerBase {
     StAXFeatureHandler(StAXFeatureHandler staxenv) {
         handlers = new ArrayList();
         this.staxenv = staxenv;
-        this.listener = staxenv.listener;
     }
 
     // Class to implement bindings
@@ -145,10 +140,11 @@ class StAXFeatureHandler extends StAXContentHandlerBase {
     /**
      * get the SeqIOListener for this parser
      */
-//    public SeqIOListener getListener()
-//    {
-//        return staxenv.listener;
-//    }
+    public ContentHandler getListener()
+    {
+//        System.out.println("in StAXFeatureHandler. staxenv is " + staxenv);
+        return staxenv.listener;
+    }
 
     /**
      *  Element-specific handler. Subclass this to do something useful!
@@ -194,7 +190,7 @@ class StAXFeatureHandler extends StAXContentHandlerBase {
             for (int i = handlers.size() - 1; i >= 0; --i) {
                 Binding b = (Binding) handlers.get(i);
                 if (b.recognizer.filterStartElement(nsURI, localName, qName, attrs)) {
-                    dm.delegate(b.handlerFactory.getHandler(this));
+                    dm.delegate(b.handlerFactory.getHandler(staxenv));
                     return;
                 }
             }

@@ -75,7 +75,7 @@ class HspHandler
     public HspHandler(StAXFeatureHandler staxenv)
     {
         super(staxenv);
-
+//        System.out.println("HspHandler staxenv " + staxenv);
         // delegate handling of <Hsp_num>
 //        super.addHandler(new ElementRecognizer.ByLocalName("Hsp_num"),
 //            SubHitPropertyHandler.SUBHIT_PROPERTY_HANDLER_FACTORY);
@@ -370,54 +370,54 @@ class HspHandler
             );
 
         // generate start of <biojava:Hsp>
-        listener.startElement(biojavaUri, "HSP", biojavaUri + ":HSP", new AttributesImpl());
+        staxenv.listener.startElement(biojavaUri, "HSP", biojavaUri + ":HSP", new AttributesImpl());
 
             // generate <biojava:HSPSummary>
-            listener.startElement(biojavaUri, "HSPSummary", biojavaUri + ":" + "HSPSummary", hspAttrs);
-            listener.endElement(biojavaUri, "HSPSummary", biojavaUri + ":" + "HSPSummary");
+            staxenv.listener.startElement(biojavaUri, "HSPSummary", biojavaUri + ":" + "HSPSummary", hspAttrs);
+            staxenv.listener.endElement(biojavaUri, "HSPSummary", biojavaUri + ":" + "HSPSummary");
 
             // generate the <biojava:BlastLikeAlignment>
-            listener.startElement(biojavaUri, "BlastLikeAlignment", biojavaUri + ":BlastLikeAlignment", new AttributesImpl());
+            staxenv.listener.startElement(biojavaUri, "BlastLikeAlignment", biojavaUri + ":BlastLikeAlignment", new AttributesImpl());
 
                 // generate start of <biojava:QuerySequence>
                 AttributesImpl queryAttrs = new AttributesImpl();
                 queryAttrs.addAttribute(biojavaUri, "startPosition", "startPosition", CDATA, sHsp_query_from);
                 queryAttrs.addAttribute(biojavaUri, "stopPosition", "stopPosition", CDATA, sHsp_query_to);
-                listener.startElement(biojavaUri, "QuerySequence", biojavaUri + ":QuerySequence", queryAttrs);
+                staxenv.listener.startElement(biojavaUri, "QuerySequence", biojavaUri + ":QuerySequence", queryAttrs);
 
                 // pass the sequence symbol tokens over
-                listener.characters(sHsp_qseq.toCharArray(), 0, sHsp_qseq.length());
+                staxenv.listener.characters(sHsp_qseq.toCharArray(), 0, sHsp_qseq.length());
 
                 // generate end of <biojava:QuerySequence>
-                listener.endElement(biojavaUri, "QuerySequence", biojavaUri + ":QuerySequence");
+                staxenv.listener.endElement(biojavaUri, "QuerySequence", biojavaUri + ":QuerySequence");
 
                 // generate start of <biojava:MatchConsensus>
                 AttributesImpl matchAttrs = new AttributesImpl();
                 matchAttrs.addAttribute("xml", "space", "xml:space", CDATA, "preserve");
-                listener.startElement(biojavaUri, "MatchConsensus", biojavaUri + ":MatchConsensus", matchAttrs);
+                staxenv.listener.startElement(biojavaUri, "MatchConsensus", biojavaUri + ":MatchConsensus", matchAttrs);
 
                 // pass the sequence symbol tokens over
-                listener.characters(sHsp_midline.toCharArray(), 0, sHsp_midline.length());
+                staxenv.listener.characters(sHsp_midline.toCharArray(), 0, sHsp_midline.length());
 
                 // generate end of <biojava:MatchConsensus>
-                listener.endElement(biojavaUri, "MatchConsensus", biojavaUri + ":MatchConsensus");
+                staxenv.listener.endElement(biojavaUri, "MatchConsensus", biojavaUri + ":MatchConsensus");
 
                 // generate start of <biojava:HitSequence>
                 AttributesImpl hitAttrs = new AttributesImpl();
                 hitAttrs.addAttribute(biojavaUri, "startPosition", "startPosition", CDATA, sHsp_hit_from);
                 hitAttrs.addAttribute(biojavaUri, "stopPosition", "stopPosition", CDATA, sHsp_hit_to);
-                listener.startElement(biojavaUri, "HitSequence", "HitSequence", hitAttrs);
+                staxenv.listener.startElement(biojavaUri, "HitSequence", "HitSequence", hitAttrs);
 
                 // pass the sequence symbol tokens over
-                listener.characters(sHsp_hseq.toCharArray(), 0, sHsp_hseq.length());
+                staxenv.listener.characters(sHsp_hseq.toCharArray(), 0, sHsp_hseq.length());
 
                 // generate end of <biojava:HitSequence>
-                listener.endElement(biojavaUri, "HitSequence", biojavaUri + ":HitSequence");
+                staxenv.listener.endElement(biojavaUri, "HitSequence", biojavaUri + ":HitSequence");
 
             // generate end of <biojava::BlastLikeAlignment>    
-            listener.endElement(biojavaUri, "BlastLikeAlignment", biojavaUri + ":BlastLikeAlignment"); 
+            staxenv.listener.endElement(biojavaUri, "BlastLikeAlignment", biojavaUri + ":BlastLikeAlignment"); 
 
         // generate end of <biojava:Hsp>
-        listener.endElement(biojavaUri, "HSP", biojavaUri + ":HSP");
+        staxenv.listener.endElement(biojavaUri, "HSP", biojavaUri + ":HSP");
     }
 }

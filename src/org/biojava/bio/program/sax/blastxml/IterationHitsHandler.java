@@ -35,7 +35,7 @@ class IterationHitsHandler
     public IterationHitsHandler(StAXFeatureHandler staxenv)
     {
         super(staxenv);
-
+//        System.out.println("IterationHitsHandler staxenv " + staxenv);
         // delegate handling of <Hits>
         super.addHandler(new ElementRecognizer.ByLocalName("Hit"),
             HitHandler.HIT_HANDLER_FACTORY);
@@ -49,7 +49,7 @@ class IterationHitsHandler
              throws SAXException
     {
         // generate start of <biojava:Detail>
-        listener.startElement(biojavaUri, "Detail", biojavaUri + ":Detail", new AttributesImpl());
+        staxenv.listener.startElement(biojavaUri, "Detail", biojavaUri + ":Detail", new AttributesImpl());
     }
 
     public void endElementHandler(
@@ -60,6 +60,6 @@ class IterationHitsHandler
              throws SAXException
     {
         // generate end of <biojava:HSPCollection>
-        listener.endElement(biojavaUri, "Detail", biojavaUri + ":Detail");
+        staxenv.listener.endElement(biojavaUri, "Detail", biojavaUri + ":Detail");
     }
 }

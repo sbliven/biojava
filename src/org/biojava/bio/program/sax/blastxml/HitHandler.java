@@ -29,7 +29,7 @@ import org.xml.sax.helpers.*;
 import java.util.*;
 
 /**
- * @author Matthew Pocock
+ * @author David Huen
  */
 class HitHandler
     extends StAXFeatureHandler
@@ -53,7 +53,7 @@ class HitHandler
     public HitHandler(StAXFeatureHandler staxenv)
     {
         super(staxenv);
-
+//        System.out.println("HitHandler staxenv " + staxenv);
 //        // acquire value of <Hit_num> with inner class.
 //        super.addHandler(new ElementRecognizer.ByLocalName("Hit_num"),
 //            HitPropertyHandler.HIT_PROPERTY_HANDLER_FACTORY);
@@ -132,6 +132,10 @@ class HitHandler
                             StAXContentHandler handler)
                             throws SAXException
                         {
+                            // necessary as staxenv cannot be final and therefore
+                            // staxenv.listener cannot be accessed from inner class
+                            ContentHandler listener = getListener();
+
                             // get superclass to process the PCDATA for this element
                             super.endElement(nsURI, localName, qName, handler);
 
@@ -190,6 +194,6 @@ class HitHandler
             StAXContentHandler handler)
              throws SAXException
     {
-        listener.endElement(biojavaUri, "Hit", biojavaUri + ":Hit");
+        staxenv.listener.endElement(biojavaUri, "Hit", biojavaUri + ":Hit");
     }    
 }
