@@ -85,5 +85,25 @@ public interface ElementRecognizer {
 	}
     }
 
+    /**
+     * Filter elements by local name (not recommended).
+     */
+
+    public static class ByLocalName implements ElementRecognizer {
+	private String localName;
+
+	public ByLocalName(String localName) {
+	    this.localName = localName;
+	}
+
+	public boolean filterStartElement(String nsURI,
+					  String localName,
+					  String qName,
+					  Attributes attrs)
+	{
+	    return (localName.equals(this.localName));
+	}
+    }
+
     public boolean filterStartElement(String nsURI, String localName, String qName, Attributes attrs);
 }

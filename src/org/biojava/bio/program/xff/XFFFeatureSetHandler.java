@@ -69,6 +69,9 @@ public class XFFFeatureSetHandler extends StAXContentHandlerBase {
 	addFeatureHandler(ElementRecognizer.ALL, FeatureHandler.FEATURE_HANDLER_FACTORY);
 	addFeatureHandler(new ElementRecognizer.HasAttribute("strand"),
 			  StrandedFeatureHandler.STRANDEDFEATURE_HANDLER_FACTORY);
+
+	addDetailHandler(new ElementRecognizer.ByLocalName("prop"),
+			 PropDetailHandler.PROPDETAIL_HANDLER_FACTORY);
     }
 
     /**
@@ -121,7 +124,7 @@ public class XFFFeatureSetHandler extends StAXContentHandlerBase {
 	    return;
 	}
 
-	for (int i = featureHandlers.size() - 1; i >= 0; ++i) {
+	for (int i = featureHandlers.size() - 1; i >= 0; --i) {
 	    Binding b = (Binding) featureHandlers.get(i);
 	    if (b.recognizer.filterStartElement(nsURI, localName, qName, attrs)) {
 		dm.delegate(b.handlerFactory.getPartHandler(this));
@@ -138,6 +141,46 @@ public class XFFFeatureSetHandler extends StAXContentHandlerBase {
     {
 	if (localName.equals("featureSet")) {
 	    inFeatureSet = false;
+	}
+    }
+
+    public StAXContentHandlerBase getDetailsHandler() {
+	return new XFFDetailsHandler();
+    }
+
+    private class XFFDetailsHandler extends StAXContentHandlerBase {
+	private boolean inDetails;
+	
+	public void startElement(String nsURI,
+				 String localName,
+				 String qName,
+				 Attributes attrs,
+				 DelegationManager dm)
+	    throws SAXException
+	{
+	    if (localName.equals("details")) {
+		inDetails = true;
+		return;
+	    }
+
+	    for (int i = detailHandlers.size() - 1; i >= 0; --i) {
+		Binding b = (Binding) detailHandlers.get(i);
+		if (b.recognizer.filterStartElement(nsURI, localName, qName, attrs)) {
+		    dm.delegate(b.handlerFactory.getPartHandler(XFFFeatureSetHandler.this));
+		    return;
+		}
+	    }
+	    
+	    // Unknown detail types get silently ignored.
+	}
+
+	public void endElement(String nsURI,
+			       String localName,
+			       String qName)
+	{
+	    if (localName.equals("details")) {
+		inDetails = false;
+	    }
 	}
     }
 }

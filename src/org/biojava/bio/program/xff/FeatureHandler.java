@@ -181,7 +181,7 @@ public class FeatureHandler extends StAXContentHandlerBase {
 		    }
 		}
 
-		dm.delegate(new StAXContentHandlerBase());
+		dm.delegate(xffenv.getDetailsHandler());
 
 		// Need to handle details properly
 	    } else if (localName.equals("featureSet")) {
