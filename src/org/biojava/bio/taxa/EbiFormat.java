@@ -10,8 +10,8 @@ import org.biojava.utils.*;
  *
  * @author Matthew Pocock
  */
-public class EbiFormat implements TaxaParser {
-  public static final String PROPERTY_NCBI_TAXA = EbiFormat.class + ":NCBI_TAXA";
+public class EbiFormat implements TaxonParser {
+  public static final String PROPERTY_NCBI_TAXON = EbiFormat.class + ":NCBI_TAXON";
   private static EbiFormat INSTANCE = new EbiFormat();
   
   public static final EbiFormat getInstance() {
@@ -22,31 +22,31 @@ public class EbiFormat implements TaxaParser {
     return INSTANCE;
   }
   
-  public Taxa parse(TaxaFactory taxaFactory, String taxaString)
+  public Taxon parse(TaxonFactory taxonFactory, String taxonString)
     throws
       ChangeVetoException,
       CircularReferenceException
   {
-    String name = taxaString.trim();
+    String name = taxonString.trim();
     if(name.endsWith(".")) {
       name = name.substring(0, name.length() - 1);
     }
     
-    Taxa taxa = taxaFactory.getRoot();
+    Taxon taxon = taxonFactory.getRoot();
     StringTokenizer sTok = new StringTokenizer(name, ";");
     
     if(sTok.countTokens() == 1) {
-      return taxaFactory.addChild(taxa, taxaFactory.createTaxa(name, null));
+      return taxonFactory.addChild(taxon, taxonFactory.createTaxon(name, null));
     }
     
     String tok = null;
     CLIMB_TREE:
     while(sTok.hasMoreTokens()) {
       tok = sTok.nextToken().trim();
-      for(Iterator i = taxa.getChildren().iterator(); i.hasNext(); ) {
-        Taxa child = (Taxa) i.next();
+      for(Iterator i = taxon.getChildren().iterator(); i.hasNext(); ) {
+        Taxon child = (Taxon) i.next();
         if(child.getScientificName().equals(tok)) {
-          taxa = child;
+          taxon = child;
           continue CLIMB_TREE; // found child by name - go through loop again
         }
       }
@@ -55,27 +55,27 @@ public class EbiFormat implements TaxaParser {
     }
     
     for(; sTok.hasMoreTokens(); tok = sTok.nextToken().trim()) {
-      taxa = taxaFactory.addChild(
-        taxa,
-        taxaFactory.createTaxa(tok, null)
+      taxon = taxonFactory.addChild(
+        taxon,
+        taxonFactory.createTaxon(tok, null)
       );
     }
     
-    return taxa;
+    return taxon;
   }
   
-  public String serialize(Taxa taxa) {
+  public String serialize(Taxon taxon) {
     String name = null;
     
     do {
-      String sci = taxa.getScientificName();
+      String sci = taxon.getScientificName();
       if(name == null) {
         name = sci + ".";
       } else {
         name = sci + "; " + name;
       }
-      taxa = taxa.getParent();
-    } while(taxa != null && taxa.getParent() != null);
+      taxon = taxon.getParent();
+    } while(taxon != null && taxon.getParent() != null);
     
     return name;
   }

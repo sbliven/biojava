@@ -29,7 +29,7 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.SmallAnnotation;
-import org.biojava.bio.program.search.SearchContentHandler;
+import org.biojava.bio.search.SearchContentHandler;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.StrandedFeature.Strand;
@@ -77,28 +77,28 @@ public class SimilarityPairBuilder implements SearchContentHandler
     // Supplier of instances of searched databases
     private SequenceDBInstallation subjectDBs;
     // The specific database searched
-    private SequenceDB             subjectDB;
+    private SequenceDB subjectDB;
     // Holder for all query sequences
-    private SequenceDB             querySeqHolder;
+    private SequenceDB querySeqHolder;
     // View of query sequence instance
-    private Sequence               queryView;
+    private Sequence queryView;
 
     // Cache which holds view(s) of query sequence(s) which have
     // been instantiated for annotation
-    private Map                    queryViewCache;
+    private Map queryViewCache;
 
     // Cache which holds view(s) of subject sequence(s) which have
     // been instantiated for annotation
-    private Map                    subjectViewCache;
+    private Map subjectViewCache;
 
     // Data holders for search result properties
-    private Map                    resultData;
-    private Map                    hitData;
-    private Map                    subHitData;
+    private Map resultData;
+    private Map hitData;
+    private Map subHitData;
 
-    private AlphabetResolver       alphaResolver;
-    private SymbolTokenization     tokenParser;
-    private StringBuffer           tokenBuffer;
+    private AlphabetResolver   alphaResolver;
+    private SymbolTokenization tokenParser;
+    private StringBuffer       tokenBuffer;
 
     // Flag indicating whether there are more results in the stream
     private boolean moreSearchesAvailable = false;
@@ -114,7 +114,7 @@ public class SimilarityPairBuilder implements SearchContentHandler
         tokenBuffer      = new StringBuffer(1024);
     }
 
-    public Sequence getAnnotatedQuerySeq(String queryId)
+    public Sequence getAnnotatedQuerySeq(final String queryId)
         throws IllegalIDException
     {
         if (! queryViewCache.containsKey(queryId))
@@ -125,7 +125,7 @@ public class SimilarityPairBuilder implements SearchContentHandler
         return (Sequence) queryViewCache.get(queryId);
     }
 
-    public Sequence getAnnotatedSubjectSeq(String subjectId)
+    public Sequence getAnnotatedSubjectSeq(final String subjectId)
         throws IllegalIDException
     {
         if (! subjectViewCache.containsKey(subjectId))

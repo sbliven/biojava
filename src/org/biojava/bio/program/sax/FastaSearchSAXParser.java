@@ -38,28 +38,17 @@ import org.xml.sax.helpers.AttributesImpl;
 import org.biojava.bio.BioException;
 import org.biojava.utils.ParserException;
 
-import org.biojava.bio.program.search.FastaSearchParser;
-import org.biojava.bio.program.search.SearchContentHandler;
-import org.biojava.bio.program.search.SearchParser;
+import org.biojava.bio.search.SearchContentHandler;
 
 /**
  * <code>FastaSearchSAXParser</code> is a SAX2 compliant parser for
  * '-m 10' format output from the the Fasta search program (see the
  * Fasta documentation for details of this format).
  *
- * <p>
- * The SAX2 events produced are as if the input to the parser was
- * an XML file validating against the biojava
+ * <p>The SAX2 events produced are as if the input to the parser was
+ * an XML file validating against the BioJava
  * BlastLikeDataSetCollection DTD. There is no requirement for an
- * intermediate conversion of native output to XML format.
- * </p>
- *
- * <p>
- * This class is backed by the
- * <code>org.biojava.bio.program.search.FastaSearchParser</code>
- * parser, so changes to that class will be reflected in the output
- * from this one.
- * </p>
+ * intermediate conversion of native output to XML format.</p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
@@ -67,9 +56,9 @@ import org.biojava.bio.program.search.SearchParser;
 public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
     implements SearchContentHandler
 {
-    private SearchParser   fastaParser;
-    private Map       searchProperties;
-    private Map          hitProperties;
+    private FastaSearchParser fastaParser;
+    private Map               searchProperties;
+    private Map               hitProperties;
 
     private String  querySeqIdentifier;
     private String subjectDBIdentifier;

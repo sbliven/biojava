@@ -4,23 +4,22 @@ import java.util.*;
 import java.lang.ref.*;
 
 /**
- * An implementation of Taxa that keeps only weak references to children, but
- * full references to parents.
+ * <p>An implementation of Taxon that keeps only weak references to
+ * children, but full references to parents.</p>
  *
- * <p>
- * This may be suitable for deriving memory-savy implementations of TaxaFactory.
- * </p>
+ * <p>This may be suitable for deriving memory-savy implementations
+ * of TaxonFactory.</p>
  *
- * <p>
- * To manipulate the children set, use the getChildrenRaw and setChildrenRaw
- * methods. These 'box' the actual weak reference, but recognize null to mean
- * that there are no children currently known. A code-fragment may wish to do
- * something like this:
+ * <p>To manipulate the children set, use the getChildrenRaw and
+ * setChildrenRaw methods. These 'box' the actual weak reference, but
+ * recognize null to mean that there are no children currently
+ * known. A code-fragment may wish to do something like this:</p>
+ *
  * <pre><code>
- * Set children = weakTaxa.getChildrenRaw();
+ * Set children = weakTaxon.getChildrenRaw();
  * if(children == null) {
  *   children = new HashSet();
- *   weakTaxa.setChildrenRaw(children);
+ *   weakTaxon.setChildrenRaw(children);
  * }
  * // do stuff to update child set e.g. add children 
  * </code></pre>
@@ -28,23 +27,23 @@ import java.lang.ref.*;
  *
  * @author Matthew Pocock
  */
-public class WeakTaxa extends AbstractTaxa {
-  protected Taxa parent;
+public class WeakTaxon extends AbstractTaxon {
+  protected Taxon parent;
   private WeakReference /*Set*/ children;
   
-  public WeakTaxa() {
+  public WeakTaxon() {
     super();
   }
   
-  public WeakTaxa(String scientificName, String commonName) {
+  public WeakTaxon(String scientificName, String commonName) {
     super(scientificName, commonName);
   }
   
-  public Taxa getParent() {
+  public Taxon getParent() {
     return parent;
   }
   
-  void setParent(Taxa parent) {
+  void setParent(Taxon parent) {
     this.parent = parent;
   }
   

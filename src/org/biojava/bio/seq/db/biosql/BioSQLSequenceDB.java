@@ -338,15 +338,15 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    //
 
 	    if(ann.containsProperty(OrganismParser.PROPERTY_ORGANISM)) {
-                Taxa taxa = (Taxa) ann.getProperty(OrganismParser.PROPERTY_ORGANISM);
-                Annotation ta = taxa.getAnnotation();
-                int taxaID;
+                Taxon taxon = (Taxon) ann.getProperty(OrganismParser.PROPERTY_ORGANISM);
+                Annotation ta = taxon.getAnnotation();
+                int taxonID;
                 {
-		    Object t  = ta.getProperty(EbiFormat.PROPERTY_NCBI_TAXA);
+		    Object t  = ta.getProperty(EbiFormat.PROPERTY_NCBI_TAXON);
 		    if(t instanceof List) {
 			t = (String) ((List) t).get(0);
 		    }
-		    taxaID = Integer.parseInt((String) t);
+		    taxonID = Integer.parseInt((String) t);
                 }
                 
                 int taxa_id;
@@ -355,15 +355,15 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 								      "from taxa " +
 								      "where ncbi_taxa_id = ? "
 								      );
-                select_taxa.setInt(1, taxaID);
+                select_taxa.setInt(1, taxonID);
                 ResultSet trs = select_taxa.executeQuery();
                 if(trs.next()) {
 		    // entry exists - link to it
 		    taxa_id = trs.getInt(1);
                 } else {
 		    // entry does not exist - create it and link to it
-		    String name = EbiFormat.getInstance().serialize(taxa);
-		    String common = taxa.getCommonName();
+		    String name = EbiFormat.getInstance().serialize(taxon);
+		    String common = taxon.getCommonName();
 		    PreparedStatement create_taxa = conn.prepareStatement(
 									  "insert into taxa " +
 									  "(full_lineage, common_name, ncbi_taxa_id) " +
@@ -371,7 +371,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 									  );
 		    create_taxa.setString(1, name);
 		    create_taxa.setString(2, common);
-		    create_taxa.setInt(3, taxaID);
+		    create_taxa.setInt(3, taxonID);
 		    create_taxa.executeUpdate();
 		    create_taxa.close();
 		    taxa_id = getDBHelper().getInsertID(conn, "taxa", "taxa_id");

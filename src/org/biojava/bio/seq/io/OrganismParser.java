@@ -8,8 +8,8 @@ import org.biojava.bio.taxa.*;
 import org.biojava.utils.*;
 
 /**
- * A parser that is able to generate Taxa entries for sequence builder event
- * streams.
+ * A parser that is able to generate Taxon entries for sequence
+ * builder event streams.
  *
  * @author Matthew Pocock
  */
@@ -34,61 +34,61 @@ public class OrganismParser
     private SequenceBuilderFactory delegateFactory;
     private String sciNameKey;
     private String commonNameKey;
-    private String ncbiTaxaKey;
-    private TaxaFactory taxaFactory;
-    private TaxaParser taxaParser;
+    private String ncbiTaxonKey;
+    private TaxonFactory taxonFactory;
+    private TaxonParser taxonParser;
     
     public Factory(
       SequenceBuilderFactory delegateFactory,
-      TaxaFactory taxaFactory,
-      TaxaParser taxaParser,
+      TaxonFactory taxonFactory,
+      TaxonParser taxonParser,
       String sciNameKey,
       String commonNameKey,
-      String ncbiTaxaKey
+      String ncbiTaxonKey
     ) {
       this.delegateFactory = delegateFactory;
-      this.taxaFactory = taxaFactory;
-      this.taxaParser = taxaParser;
+      this.taxonFactory = taxonFactory;
+      this.taxonParser = taxonParser;
       this.sciNameKey = sciNameKey;
       this.commonNameKey = commonNameKey;
-      this.ncbiTaxaKey = ncbiTaxaKey;
+      this.ncbiTaxonKey = ncbiTaxonKey;
     }
     
     public SequenceBuilder makeSequenceBuilder() {
       return new OrganismParser(
         delegateFactory.makeSequenceBuilder(),
-        taxaFactory,
-        taxaParser,
+        taxonFactory,
+        taxonParser,
         sciNameKey,
         commonNameKey,
-        ncbiTaxaKey
+        ncbiTaxonKey
       );
     }
   }
   
-  private final TaxaFactory taxaFactory;
-  private final TaxaParser taxaParser;
+  private final TaxonFactory taxonFactory;
+  private final TaxonParser taxonParser;
   private final String sciNameKey;
   private final String commonNameKey;
-  private final String ncbiTaxaKey;
+  private final String ncbiTaxonKey;
   private String fullName;
   private String commonName;
-  private String ncbiTaxa;
+  private String ncbiTaxon;
   
   public OrganismParser(
     SequenceBuilder delegate,
-    TaxaFactory taxaFactory,
-    TaxaParser taxaParser,
+    TaxonFactory taxonFactory,
+    TaxonParser taxonParser,
     String sciNameKey,
     String commonNameKey,
-    String ncbiTaxaKey
+    String ncbiTaxonKey
   ) {
     super(delegate);
-    this.taxaFactory = taxaFactory;
-    this.taxaParser = taxaParser;
+    this.taxonFactory = taxonFactory;
+    this.taxonParser = taxonParser;
     this.sciNameKey = sciNameKey;
     this.commonNameKey = commonNameKey;
-    this.ncbiTaxaKey = ncbiTaxaKey;
+    this.ncbiTaxonKey = ncbiTaxonKey;
   }
   
   public void addSequenceProperty(Object sciNameKey, Object value)
@@ -103,7 +103,7 @@ public class OrganismParser
       }
     } else if(this.commonNameKey.equals(sciNameKey)) {
       commonName = value.toString();
-    } else if(this.ncbiTaxaKey.equals(sciNameKey)) {
+    } else if(this.ncbiTaxonKey.equals(sciNameKey)) {
       String tid = value.toString();
       int eq = tid.indexOf("=");
       if(eq >= 0) {
@@ -113,10 +113,10 @@ public class OrganismParser
       if(sc >= 0) {
         tid = tid.substring(0, sc);
       }
-      if(this.ncbiTaxa == null) {
-        this.ncbiTaxa = tid;
+      if(this.ncbiTaxon == null) {
+        this.ncbiTaxon = tid;
       } else {
-        this.ncbiTaxa = this.ncbiTaxa + tid;
+        this.ncbiTaxon = this.ncbiTaxon + tid;
       }
     } else {
       getDelegate().addSequenceProperty(sciNameKey, value);
@@ -128,25 +128,25 @@ public class OrganismParser
       ParseException
   {
     try {
-      Taxa taxa = taxaParser.parse(taxaFactory, fullName);
-      if(commonName != null && taxa.getCommonName() == null) {
+      Taxon taxon = taxonParser.parse(taxonFactory, fullName);
+      if(commonName != null && taxon.getCommonName() == null) {
         try {
-          taxa.setCommonName(commonName);
+          taxon.setCommonName(commonName);
         } catch (ChangeVetoException cve) {
-          throw new ParseException(cve, "Failed to build Taxa");
+          throw new ParseException(cve, "Failed to build Taxon");
         }
       }
-      StringTokenizer stok = new StringTokenizer(ncbiTaxa, ",");
+      StringTokenizer stok = new StringTokenizer(ncbiTaxon, ",");
       if(stok.countTokens() == 1) {
-        taxa.getAnnotation().setProperty(EbiFormat.PROPERTY_NCBI_TAXA, ncbiTaxa);
+        taxon.getAnnotation().setProperty(EbiFormat.PROPERTY_NCBI_TAXON, ncbiTaxon);
       } else {
         List tl = new ArrayList();
         while(stok.hasMoreTokens()) {
           tl.add(stok.nextToken());
         }
-        taxa.getAnnotation().setProperty(EbiFormat.PROPERTY_NCBI_TAXA, tl);
+        taxon.getAnnotation().setProperty(EbiFormat.PROPERTY_NCBI_TAXON, tl);
       }
-      getDelegate().addSequenceProperty(PROPERTY_ORGANISM, taxa);
+      getDelegate().addSequenceProperty(PROPERTY_ORGANISM, taxon);
     } catch (ChangeVetoException cve) {
       throw new ParseException(cve, "Could not parse organism: " + fullName);
     } catch (CircularReferenceException cre) {

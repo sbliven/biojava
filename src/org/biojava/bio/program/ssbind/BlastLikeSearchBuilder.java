@@ -32,8 +32,8 @@ import java.util.Set;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.SmallAnnotation;
-import org.biojava.bio.program.search.SearchBuilder;
-import org.biojava.bio.program.search.SearchContentHandler;
+import org.biojava.bio.search.SearchBuilder;
+import org.biojava.bio.search.SearchContentHandler;
 import org.biojava.bio.search.SeqSimilaritySearchHit;
 import org.biojava.bio.search.SeqSimilaritySearchResult;
 import org.biojava.bio.search.SeqSimilaritySearchResult;
@@ -47,29 +47,25 @@ import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.db.SequenceDBInstallation;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.utils.ChangeVetoException;
 
 /**
- * <p>
- * <code>BlastLikeSearchBuilder</code> will create
+ * <p><code>BlastLikeSearchBuilder</code> will create
  * <code>SeqSimilaritySearchResult</code>s from SAX events via a
  * <code>SeqSimilarityAdapter</code>. The SAX events should describe
  * elements conforming to the BioJava BlastLikeDataSetCollection
  * DTD. Suitable sources are <code>BlastLikeSAXParser</code> or
- * <code>FastaSAXParser</code>. The result objects are placed in the
- * <code>List</code> supplied to the constructor.
- * </p>
+ * <code>FastaSearchSAXParser</code>. The result objects are placed in
+ * the <code>List</code> supplied to the constructor.</p>
  *
- * <p>
- * The start/end/strand of <code>SeqSimilaritySearchHit</code>s are
+ * <p>The start/end/strand of <code>SeqSimilaritySearchHit</code>s are
  * calculated from their constituent
- * <code>SeqSimilaritySearchSubHit</code>s as follows:
- * </p>
+ * <code>SeqSimilaritySearchSubHit</code>s as follows:</p>
  *
  * <ul>
  * <li>The query start is the lowest query start coordinate of its
@@ -98,27 +94,27 @@ public class BlastLikeSearchBuilder implements SearchBuilder
     // Supplier of instances of searched databases
     private SequenceDBInstallation subjectDBs;
     // The specific database searched
-    private SequenceDB             subjectDB;
+    private SequenceDB subjectDB;
     // Holder for all query sequences
-    private SequenceDB             querySeqHolder;
+    private SequenceDB querySeqHolder;
     // The specific query sequence instance
-    private SymbolList             querySeq;
+    private SymbolList querySeq;
 
     // Hit and Result annotation
-    private Annotation             hitAnnotation;
-    private Annotation             resultAnnotation;
+    private Annotation hitAnnotation;
+    private Annotation resultAnnotation;
 
     // Data holders for search result properties
-    private Map                    resultPreAnnotation;
-    private Map                    searchParameters;
-    private Map                    hitData;
-    private Map                    subHitData;
+    private Map resultPreAnnotation;
+    private Map searchParameters;
+    private Map hitData;
+    private Map subHitData;
 
-    private SymbolTokenization     tokenParser;
-    private StringBuffer           tokenBuffer;
+    private SymbolTokenization tokenParser;
+    private StringBuffer       tokenBuffer;
 
-    private List                   hits;
-    private List                   subHits;
+    private List hits;
+    private List subHits;
 
     private SeqSimilaritySearchSubHit [] subs;
 
@@ -134,7 +130,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
      *
      * @param target a <code>List</code>.
      */
-    public BlastLikeSearchBuilder(List target)
+    public BlastLikeSearchBuilder(final List target)
     {
         this.target = target;
 

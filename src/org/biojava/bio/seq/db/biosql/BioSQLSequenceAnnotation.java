@@ -77,13 +77,13 @@ class BioSQLSequenceAnnotation implements Annotation {
 	    get_taxa.setInt(1, bioentry_id);
 	    ResultSet rs = get_taxa.executeQuery();
 	    if (rs.next()) {
-		Taxa taxa = EbiFormat.getInstance().parse(WeakTaxaFactory.GLOBAL, rs.getString(1));
-		taxa.setCommonName(rs.getString(2));
-		taxa.getAnnotation().setProperty(
-						 EbiFormat.PROPERTY_NCBI_TAXA,
+		Taxon taxon = EbiFormat.getInstance().parse(WeakTaxonFactory.GLOBAL, rs.getString(1));
+		taxon.setCommonName(rs.getString(2));
+		taxon.getAnnotation().setProperty(
+						 EbiFormat.PROPERTY_NCBI_TAXON,
 						 String.valueOf(rs.getInt(3))
 						 );
-		underlyingAnnotation.setProperty(OrganismParser.PROPERTY_ORGANISM, taxa);
+		underlyingAnnotation.setProperty(OrganismParser.PROPERTY_ORGANISM, taxon);
 	    }
 
 	    //

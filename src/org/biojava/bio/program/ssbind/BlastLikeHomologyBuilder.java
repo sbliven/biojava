@@ -29,7 +29,7 @@ import java.util.Map;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.SmallAnnotation;
-import org.biojava.bio.program.search.SearchContentHandler;
+import org.biojava.bio.search.SearchContentHandler;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.StrandedFeature.Strand;

@@ -31,7 +31,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import org.biojava.bio.program.search.SearchContentHandler;
+import org.biojava.bio.search.SearchContentHandler;
 import org.biojava.bio.search.SeqSimilaritySearchHit;
 import org.biojava.bio.search.SeqSimilaritySearchResult;
 import org.biojava.bio.search.SeqSimilaritySearchSubHit;
@@ -60,10 +60,10 @@ public class SeqSimilarityAdapter extends DefaultHandler
     // SAX ContentHandler factories
     private static Map hFactories = new HashMap();
     // Acceptable element contexts
-    private static Map   hContext = new HashMap();
+    private static Map hContext = new HashMap();
 
     // Stack of handler bindings
-    private List           bStack;
+    private List bStack;
     // The currently operating binding
     private HandlerBinding currentBinding;
 
@@ -125,7 +125,7 @@ public class SeqSimilarityAdapter extends DefaultHandler
      *
      * @param scHandler a <code>SearchContentHandler</code>.
      */
-    public void setSearchContentHandler(SearchContentHandler scHandler)
+    public void setSearchContentHandler(final SearchContentHandler scHandler)
     {
         this.scHandler = scHandler;
     }
@@ -242,7 +242,7 @@ public class SeqSimilarityAdapter extends DefaultHandler
      * @param program a <code>String</code> indicating the progam
      * name.
      */
-    void setProgram(String program)
+    void setProgram(final String program)
     {
         this.program = program;
     }
@@ -257,7 +257,7 @@ public class SeqSimilarityAdapter extends DefaultHandler
      *
      * @return a <code>boolean</code> value.
      */
-    private boolean inContext(String localName)
+    private boolean inContext(final String localName)
     {
         // If there is nothing specified for this context we assume it
         // is good

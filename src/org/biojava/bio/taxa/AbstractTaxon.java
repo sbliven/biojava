@@ -3,20 +3,20 @@ package org.biojava.bio.taxa;
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 
-public abstract class AbstractTaxa
+public abstract class AbstractTaxon
   extends
     AbstractChangeable
   implements
-    Taxa
+    Taxon
 {
   private transient ChangeListener annotationForwarder;
   private Annotation ann;
   private String commonName;
   private String scientificName;
   
-  protected AbstractTaxa() {}
+  protected AbstractTaxon() {}
 
-  protected AbstractTaxa(String scientificName, String commonName) {
+  protected AbstractTaxon(String scientificName, String commonName) {
     this.scientificName = scientificName;
     this.commonName = commonName;
   }
@@ -60,8 +60,8 @@ public abstract class AbstractTaxa
     }
     
     if(hasListeners()) {
-      ChangeSupport cs = getChangeSupport(Taxa.CHANGE_COMMON_NAME);
-      ChangeEvent cevt = new ChangeEvent(this, Taxa.CHANGE_COMMON_NAME, commonName);
+      ChangeSupport cs = getChangeSupport(Taxon.CHANGE_COMMON_NAME);
+      ChangeEvent cevt = new ChangeEvent(this, Taxon.CHANGE_COMMON_NAME, commonName);
       synchronized(cs) {
         cs.firePreChangeEvent(cevt);
         this.commonName = commonName;
@@ -90,8 +90,8 @@ public abstract class AbstractTaxa
     }
     
     if(hasListeners()) {
-      ChangeSupport cs = getChangeSupport(Taxa.CHANGE_SCIENTIFIC_NAME);
-      ChangeEvent cevt = new ChangeEvent(this, Taxa.CHANGE_SCIENTIFIC_NAME, scientificName);
+      ChangeSupport cs = getChangeSupport(Taxon.CHANGE_SCIENTIFIC_NAME);
+      ChangeEvent cevt = new ChangeEvent(this, Taxon.CHANGE_SCIENTIFIC_NAME, scientificName);
       synchronized(cs) {
         cs.firePreChangeEvent(cevt);
         this.scientificName = scientificName;
@@ -111,8 +111,8 @@ public abstract class AbstractTaxa
   }
   
   public boolean equals(Object o) {
-    if(o instanceof Taxa) {
-      Taxa t = (Taxa) o;
+    if(o instanceof Taxon) {
+      Taxon t = (Taxon) o;
       
       return
         this == t || (
@@ -126,7 +126,7 @@ public abstract class AbstractTaxa
   }
   
   public String toString() {
-    Taxa parent = getParent();
+    Taxon parent = getParent();
     String scientificName = getScientificName();
     
     if(parent != null) {
