@@ -71,7 +71,7 @@ final class QName  {
     /**
      * Sets the qName for the object. When the qName is set,
      * local names and namespace prefixes are automatically
-     * accessibly from calling relevant methods on th object.
+     * accessible from calling relevant methods on th object.
      *
      * @param poQName a <code>String</code> value of qName. For
      * example, it could be &quot;biojava:MyElement&quot;
@@ -110,7 +110,8 @@ final class QName  {
 
 	    oURI = oNamespace.getURIFromPrefix(oPrefixName);
 	} else {
-	    //if name or attribute does not have a namespace, local name is QName,
+	    //if name or attribute does not have a namespace,
+	    //local name is QName.
 	    oPrefixName = "";
 	    if ( (oQName.equals("xmlns")) &&
 		  (!oNamespace.getNamespacePrefixes()) )  {

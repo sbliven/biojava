@@ -28,8 +28,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import org.biojava.bio.program.sax.AbstractNativeAppSAXParser;
-
 /**
  * A reusable class for parsing Detail
  * sections of Blast-like programs:
@@ -71,7 +69,6 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
     private HashMap              oMap               = new HashMap();
     private String[]             aoKeys;
     private String[]             aoArrayType        = new String[1];
-    private int                  iState;
     private boolean              tClearOfWarning    = true;
 
     private static final int STARTUP                = 0;
@@ -83,8 +80,11 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
     private static final int IN_ALIGNMENT           = 6;
 
 
-    HitSectionSAXParser(BlastLikeVersionSupport poVersion) {
+    HitSectionSAXParser(BlastLikeVersionSupport poVersion,
+			String poNamespacePrefix) {
 	oVersion = poVersion;
+	this.setNamespacePrefix(poNamespacePrefix);
+
 	this.changeState(STARTUP);
 	aoLineSeparator = System.getProperty("line.separator").toCharArray();
     }
@@ -171,7 +171,7 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 				   oAttQName.getQName(),
 				   "CDATA",oLength);
 
-		this.startElement(new QName(this,"biojava:Hit"),
+		this.startElement(new QName(this,this.prefix("Hit")),
 				  (Attributes)oAtts);
 
 		//Here, oStringBuffer contains ID + Description
@@ -194,10 +194,10 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 				   oAttQName.getQName(),
 				   "CDATA","none");
 
-		this.startElement(new QName(this,"biojava:HitId"),
+		this.startElement(new QName(this,this.prefix("HitId")),
 				  (Attributes)oAtts);
 
-		this.endElement(new QName(this,"biojava:HitId"));
+		this.endElement(new QName(this,this.prefix("HitId")));
 
 		oDescription.setLength(0);
 
@@ -210,13 +210,13 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 			//System.out.println(oDescription);
 		    }
 		    oAtts.clear();
-		    this.startElement(new QName(this,"biojava:HitDescription"),
+		    this.startElement(new QName(this,this.prefix("HitDescription")),
 					  (Attributes)oAtts);
 
 		    aoChars = oDescription.toString().trim().toCharArray();
 		    this.characters(aoChars,0,aoChars.length);
 
-		    this.endElement(new QName(this,"biojava:HitDescription"));
+		    this.endElement(new QName(this,this.prefix("HitDescription")));
 
 		} //end if there is a hit description
 
@@ -238,14 +238,14 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 	    if (poLine.trim().startsWith("Score")) {
 		//here if on a new HSP
 		oAtts.clear();
-		this.startElement(new QName(this,"biojava:HSPCollection"),
+		this.startElement(new QName(this,this.prefix("HSPCollection")),
 				  (Attributes)oAtts);
 
 		//Note, this method will have changed
 		//the State when it returns
 		this.firstHSPEvent(poLine);
-		this.endElement(new QName(this,"biojava:HSPCollection"));
-		this.endElement(new QName(this,"biojava:Hit"));
+		this.endElement(new QName(this,this.prefix("HSPCollection")));
+		this.endElement(new QName(this,this.prefix("Hit")));
 		this.changeState(CAPTURING_HIT_SUMMARY);
 	    }
 	}
@@ -281,7 +281,7 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 	    if (!(iState == ON_FIRST_HSP)) {
 		//output previous HSP-related data
 		this.outputHSPInfo();
-		this.endElement(new QName(this,"biojava:HSP"));
+		this.endElement(new QName(this,this.prefix("HSP")));
 	    }
 	    
 	} catch (java.io.IOException x) {
@@ -309,7 +309,7 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 	if (oLine.trim().startsWith(oGlobalEndSignal)) {
 	    //here when we've hit the trailer...
 
-	    //this.endElement("biojava:HSP");
+	    //this.endElement(this.prefix("HSP"));
 	    this.changeState(DONE);
 	    return;
 	}
@@ -352,11 +352,11 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 	    if (!(iState == ON_FIRST_HSP)) {
 		//output previous HSP-related data
 		this.outputHSPInfo();
-		this.endElement(new QName(this,"biojava:HSP"));
+		this.endElement(new QName(this,this.prefix("HSP")));
 
 	    }
 	    oAtts.clear();
-	    this.startElement(new QName(this,"biojava:HSP"),
+	    this.startElement(new QName(this,this.prefix("HSP")),
 			      (Attributes)oAtts);
 
 	    //Start accumulating all HSP summary information
@@ -474,7 +474,7 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 	}
 
 	
-	this.startElement(new QName(this,"biojava:HSPSummary"),
+	this.startElement(new QName(this,this.prefix("HSPSummary")),
 			  (Attributes)oAtts);
 	//Raw HSPSummary Data
 	oAtts.clear();
@@ -483,7 +483,7 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 			   oAttQName.getLocalName(),
 			   oAttQName.getQName(),
 			   "NMTOKEN","preserve");
-	this.startElement(new QName(this,"biojava:RawOutput"),
+	this.startElement(new QName(this,this.prefix("RawOutput")),
 			  (Attributes)oAtts);
 
 	int iTmpBufferSize = oBuffer.size();
@@ -494,28 +494,19 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 	    this.characters(aoLineSeparator,0,1);
 
 	}
-	this.endElement(new QName(this,"biojava:RawOutput"));
+	this.endElement(new QName(this,this.prefix("RawOutput")));
 
-	this.endElement(new QName(this,"biojava:HSPSummary"));
+	this.endElement(new QName(this,this.prefix("HSPSummary")));
 
 	//Output Alignment info via delegation to
 	//a BlastLikeAlignmentSAXParser
 
-	oAlignmentParser = new BlastLikeAlignmentSAXParser();
+	oAlignmentParser = 
+	    new BlastLikeAlignmentSAXParser(this.getNamespacePrefix());
 
 	oAlignmentParser.setContentHandler(oHandler);
 
 	oAlignmentParser.parse(oAlignmentBuffer);
-    }
-    /**
-     * Centralise chaning of iState field to help
-     * with debugging e.g. printing out value etc.
-     * All changes to iState should be made through this method.
-     *
-     * @param piState an <code>int</code> value
-     */
-    private void changeState(int piState) {
-	iState = piState;
     }
 
 }

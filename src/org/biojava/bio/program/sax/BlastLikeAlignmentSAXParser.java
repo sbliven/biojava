@@ -29,7 +29,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 
-import org.biojava.bio.program.sax.AbstractNativeAppSAXParser;
 
 /**
  * A reusable class for SAX parsing Blast-alignments...
@@ -72,7 +71,6 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
     private String               oParsedSeq;
     private int                  iOffset;
     private int                  iEnd;
-    private int                  iState;
     private boolean              tJustDoneQuery;
     private boolean              tJustDoneConsensus;
     private boolean              tJustDoneHit;
@@ -83,8 +81,10 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 
 
 
-    BlastLikeAlignmentSAXParser() {
+    public BlastLikeAlignmentSAXParser(String poNamespacePrefix) {
 	this.changeState(STARTUP);
+	this.setNamespacePrefix(poNamespacePrefix);
+
     }
 
     /**
@@ -92,13 +92,13 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
      *
      * @param poAlignment	 -
      */
-    void parse(ArrayList poAlignment) 
+    public void parse(ArrayList poAlignment)
 	throws SAXException {
 
 	oAlignment = poAlignment;
 
 	oAtts.clear();
-	this.startElement(new QName(this,"biojava:BlastLikeAlignment"),
+	this.startElement(new QName(this,this.prefix("BlastLikeAlignment")),
 			  (Attributes)oAtts);
 
 	this.changeState(ON_FIRST_SEGMENT);
@@ -117,7 +117,7 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 	tJustDoneConsensus = false;
 	tJustDoneHit       = false;
 	//Loop over all alignment lines
-    int iAlSize = oAlignment.size();
+	int iAlSize = oAlignment.size();
 	for (int i = 0; i < iAlSize;i++) {
 	    //System.out.println(oAlignment.get(i));
 	    oLine = (String)oAlignment.get(i);
@@ -152,11 +152,11 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 			   oAttQName.getQName(),
 			   "CDATA",oQueryStopId.toString());
 
-	this.startElement(new QName(this,"biojava:QuerySequence"),
+	this.startElement(new QName(this,this.prefix("QuerySequence")),
 			  (Attributes)oAtts);
 	aoChars = oQuery.toString().toCharArray();
 	this.characters(aoChars,0,aoChars.length);
-	this.endElement(new QName(this,"biojava:QuerySequence"));
+	this.endElement(new QName(this,this.prefix("QuerySequence")));
 
 
 	//Match consensus
@@ -166,12 +166,12 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 			   oAttQName.getLocalName(),
 			   oAttQName.getQName(),
 			   "NMTOKEN","preserve");
-	this.startElement(new QName(this,"biojava:MatchConsensus"),
+	this.startElement(new QName(this,this.prefix("MatchConsensus")),
 			  (Attributes)oAtts);
 	aoChars = oMatchConsensus.toString().toCharArray();
 	this.characters(aoChars,0,aoChars.length);
 
-	this.endElement(new QName(this,"biojava:MatchConsensus"));
+	this.endElement(new QName(this,this.prefix("MatchConsensus")));
 
 	//HitSequence
 
@@ -188,15 +188,16 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 			   oAttQName.getQName(),
 			   "CDATA",oHitStopId.toString());
 
-	this.startElement(new QName(this,"biojava:HitSequence"),
+	this.startElement(new QName(this,this.prefix("HitSequence")),
 			  (Attributes)oAtts);
 	aoChars = oHit.toString().toCharArray();
 	this.characters(aoChars,0,aoChars.length);
-	this.endElement(new QName(this,"biojava:HitSequence"));
+	this.endElement(new QName(this,this.prefix("HitSequence")));
 
 
 	//end Alignment
-	this.endElement(new QName(this,"biojava:BlastLikeAlignment"));
+	this.endElement(new QName(this,
+				  this.prefix(this.prefix("BlastLikeAlignment"))));
     } 
     /**
      * Describe 'parseLine' method here.
@@ -371,17 +372,6 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 	    oMatchConsensus.append(oParsedSeq);
 	    return;
 	} //end if inAlignment
-    }
-
-    /**
-     * Centralise chaning of iState field to help
-     * with debugging e.g. printing out value etc.
-     * All changes to iState should be made through this method.
-     *
-     * @param piState an <code>int</code> value
-     */
-    private void changeState(int piState) {
-	iState = piState;
     }
 
 }

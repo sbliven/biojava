@@ -76,7 +76,7 @@ import org.xml.sax.Attributes;
  * This code was first released to the biojava.org project, July 2000.
  *
  * @author Cambridge Antibody Technology Group plc (CAT)
- * @version 1.0
+ * @version 1.1
  *
  * @see BlastLikeSAXParser
  */
@@ -88,6 +88,10 @@ abstract class AbstractNativeAppSAXParser
     protected ContentHandler      oHandler              =  null;
     protected boolean             tNamespaces           =  true;    
     protected boolean             tNamespacePrefixes    =  false;    
+    protected String              oNamespacePrefix      = "";
+    protected String              oFullNamespacePrefix  = "";
+
+    protected int                 iState;
 
 
     /**
@@ -110,7 +114,6 @@ abstract class AbstractNativeAppSAXParser
 	}
 	oHandler = poHandler;
     }
-
     /**
      * Return the content handler.
      *
@@ -130,12 +133,13 @@ abstract class AbstractNativeAppSAXParser
 
     }
     /**
-     * Do-nothing implementation of interface method
-     *
+     * Full implementation of interface method.
      */
-    public void parse(java.lang.String systemId)
+    public void parse(java.lang.String poSystemId)
 	throws java.io.IOException,
 	SAXException {
+
+	this.parse(new InputSource(poSystemId));
     }
     /**
      * Do-nothing implementation of interface method
@@ -218,8 +222,6 @@ abstract class AbstractNativeAppSAXParser
     public void setEntityResolver(EntityResolver resolver) {
 
     }
-
-
     /**
      * Do-nothing implementation of interface method
      *
@@ -227,8 +229,6 @@ abstract class AbstractNativeAppSAXParser
     public EntityResolver getEntityResolver() {
 	return null;
     }
-
-
     /**
      * Do-nothing implementation of interface method
      *
@@ -236,7 +236,6 @@ abstract class AbstractNativeAppSAXParser
     public void setDTDHandler(DTDHandler handler) {
 
     }
-
     /**
      * Do-nothing implementation of interface method
      *
@@ -259,15 +258,14 @@ abstract class AbstractNativeAppSAXParser
     public ErrorHandler getErrorHandler() {
 	return null;
     }
-
     //----------------------------------------
     /**
-     * Utility method to centralize the sending of a SAX startElement
-     * message a document handler.
+     * Utility method to centralize sending of a SAX
+     * startElement message to document handler
      *
-     * @param name	 -
-     * @param atts	 -
-     * @exception SAXException thrown if
+     * @param poQName a <code>QName</code> value
+     * @param atts an <code>Attributes</code> value
+     * @exception SAXException if an error occurs
      */
     protected void startElement(QName poQName, Attributes atts) 
     throws SAXException{
@@ -362,5 +360,108 @@ abstract class AbstractNativeAppSAXParser
 	    return null;
 	}
     }
+    /**
+     *
+     * @param poPrefix a <code>String</code> value
+     */
+    public void setNamespacePrefix(String poPrefix) {
+	oNamespacePrefix = poPrefix;
+	oFullNamespacePrefix = oNamespacePrefix.concat(":");
+    }
+    /**
+     * Describe <code>getNamespacePrefix</code> method here.
+     *
+     * @return a <code>String</code> value
+     */
+    public String getNamespacePrefix() {
+	return oNamespacePrefix;
+    }
+    /**
+     * Given an unprefixed element name, returns
+     * a new element name with a namespace prefix
+     *
+     * @return a <code>String</code> value
+     */
+    public String prefix(String poElementName) {
+	return oFullNamespacePrefix.concat(poElementName);
+    }
+
+    /**
+     * Create a stream from an an InputSource, picking the
+     * correct stream according to order of precedance.
+     *
+     * @param poInputSource an <code>InputSource</code> value
+     * @return a <code>BufferedReader</code> value
+     */
+    protected BufferedReader getContentStream(InputSource poSource) {
+
+
+	InputSource               oSource;
+	BufferedReader            oContents;
+	FileInputStream           oInputFileStream;
+	int                       iBuffSize          = 8192;
+
+
+	oSource = poSource;
+
+	//Check contents InputSource in order of precedence
+
+	//Highest - Character stream
+
+	if (oSource.getCharacterStream() != null) {
+	    
+	    oContents = new BufferedReader(oSource.getCharacterStream(),
+					   iBuffSize);
+	    return oContents;
+	}
+
+	//Next to lowest -  Byte stream
+
+
+	if ( (oSource.getByteStream() != null) ) {
+	    
+	    oContents = new BufferedReader(
+		   new InputStreamReader(oSource.getByteStream()),
+					 iBuffSize);
+
+	    return oContents;
+	}
+
+	//Lowest precedence - System URI
+
+	if ( (oSource.getSystemId() != null) ) {
+
+	    try {
+		oInputFileStream = new FileInputStream(oSource.getSystemId());
+		// Create input stream
+		oContents = new
+		    BufferedReader(new InputStreamReader(oInputFileStream),
+				   iBuffSize);
+	    
+		return oContents;
+		
+	    } catch (java.io.FileNotFoundException x) {
+		System.out.println(x.getMessage());
+		System.out.println("Couldn't open file");
+		System.exit(0);
+	    }
+	}
+
+	//should throw an exception to say couldn't get stream
+	return null;
+    }
+
+    /**
+     * Centralise chaning of iState field to help
+     * with debugging e.g. printing out value etc.
+     * All changes to iState should be made through this method.
+     *
+     * @param piState an <code>int</code> value
+     */
+    protected void changeState(int piState) {
+	iState = piState;
+    }
+
+
 
 }

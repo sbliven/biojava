@@ -20,9 +20,6 @@
  */
 package org.biojava.bio.program.sax;
 
-import org.biojava.bio.program.sax.AbstractNativeAppSAXParser;
-import org.biojava.bio.program.sax.BlastSAXParser;
-
 import java.util.*;
 import java.io.*;
 
@@ -112,178 +109,70 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
 
     private AttributesImpl          oAtts     = new AttributesImpl();
     private QName                   oAttQName = new QName(this);     
-    private int                     iState;
     private boolean                 tValidFormat  = false;
 
     private static final int        STARTUP       = 0;
     private static final int        INSIDE_FILE   = 1;
 
     /**
-     * Describe constructor here.
+     * Initialises SAXParser, and sets default namespace prefix
+     * to "biojava".
      *
-     * @param nil	 -
      */
     public BlastLikeSAXParser() {
 	this.changeState(STARTUP);
+
+	//centralised setting of namespace prefix
+	//the setting is cascaded everywhere else
+	this.setNamespacePrefix("biojava");
+
     }
+
     /**
-     * Parse input source and send SAX events to
-     * to previously registed ContentHandler.
+     * Describe <code>parse</code> method here.
      *
-     * @param poPathname	 -
-     * @exception SAXException thrown if
-     * @exception  thrown if
+     * @param poSource an <code>InputSource</code> value
+     * @exception IOException if an error occurs
+     * @exception SAXException if an error occurs
      */
-    public void parse( String poPathname )
-	throws java.io.IOException,
-	SAXException {
-
-	FileInputStream           oInputFileStream;
-	BufferedReader            oContents;
-	String                    oLine            = null;
-
-        // Open file and read all lines from file sequentially
-        try{
-            oInputFileStream = new FileInputStream(poPathname);
-            // create input stream
-            oContents = new
-                BufferedReader(new InputStreamReader(oInputFileStream));
-            try {
-                // loop over file
-		oLine = oContents.readLine();
-                while (oLine != null) {
-
-                    //System.out.println(oLine);
-
-		    //interpret line and send messages accordingly
-
-		    this.interpret(oContents,oLine);
-		    oLine = oContents.readLine();
-		    
-                } // end while
-	    } catch (java.io.IOException x) {
-                System.out.println(x.getMessage());
-                System.out.println("File read interupted");
-            } // end try/catch
-
-	    //at end of file...
-
-	    if (!tValidFormat) {
-		throw (new SAXException("Could not recognised the format " +
-		"of this file as one supported by the framework."));
-	    }
-
-	    this.endElement(new QName(this,
-				      "biojava:BlastLikeDataSetCollection"));
-	    
-        } catch (java.io.FileNotFoundException x) {
-            System.out.println(x.getMessage());
-            System.out.println("Couldn't open file");
-            System.exit(0);
-        }
-    }
-
     public void parse(InputSource poSource ) 
 	throws IOException, SAXException {
 
-	InputSource               oSource;
-	boolean                   tParsed          = false;
 	BufferedReader            oContents;
 	String                    oLine;
 
-	oSource = poSource;
+	//Use method form superclass
+	oContents = this.getContentStream(poSource);
 
-	//Check contents InputSource in order of precedence
+	try {
+	    // loop over file
+	    oLine = oContents.readLine();
+	    while (oLine != null) {
 
-	//Highest - Character stream
+		//System.out.println(oLine);
 
-	if (oSource.getCharacterStream() != null) {
-	    
-	    oContents = new BufferedReader(oSource.getCharacterStream());
-
-            try {
-                // loop over file
+		//interpret line and send messages accordingly
+		
+		this.interpret(oContents,oLine);
 		oLine = oContents.readLine();
-                while (oLine != null) {
+		
+	    } // end while
+	} catch (java.io.IOException x) {
+	    System.out.println(x.getMessage());
+	    System.out.println("File read interupted");
+	} // end try/catch
 
-                    //System.out.println(oLine);
+	//at end of file...
+	oContents.close();
 
-		    //interpret line and send messages accordingly
-
-		    this.interpret(oContents,oLine);
-		    oLine = oContents.readLine();
-		    
-                } // end while
-	    } catch (java.io.IOException x) {
-                System.out.println(x.getMessage());
-                System.out.println("File read interupted");
-            } // end try/catch
-
-	    //at end of file...
-
-	    if (!tValidFormat) {
-		throw (new SAXException("Could not recognised the format " +
-		"of this file as one supported by the framework."));
+	if (!tValidFormat) {
+	    throw (new SAXException("Could not recognised the format " +
+		    "of this file as one supported by the framework."));
 	    }
-
+	
 	    this.endElement(new QName(this,
-				      "biojava:BlastLikeDataSetCollection"));
-
+			      this.prefix("BlastLikeDataSetCollection")));
 	    
-	}
-
-	//Next to lowest -  Byte stream
-
-
-	if ( (oSource.getByteStream() != null) && (!tParsed) ) {
-	    
-	    tParsed = true;
-
-	    oContents = new BufferedReader(
-		   new InputStreamReader(oSource.getByteStream()));
-
-            try {
-                // loop over file
-		oLine = oContents.readLine();
-                while (oLine != null) {
-
-                    //System.out.println(oLine);
-
-		    //interpret line and send messages accordingly
-
-		    this.interpret(oContents,oLine);
-		    oLine = oContents.readLine();
-		    
-                } // end while
-	    } catch (java.io.IOException x) {
-                System.out.println(x.getMessage());
-                System.out.println("File read interupted");
-            } // end try/catch
-
-	    //at end of file...
-
-	    if (!tValidFormat) {
-		throw (new SAXException("Could not recognised the format " +
-		"of this file as one supported by the framework."));
-	    }
-
-	    this.endElement(new QName(this,
-				      "biojava:BlastLikeDataSetCollection"));
-
-	    
-	}
-
-
-	//Lowest precedence - System URI
-
-	if ( (oSource.getSystemId() != null) && (!tParsed)){
-	    tParsed = true;
-
-	    this.parse(oSource.getSystemId());
-
-	    return;
-	}
-
     }
     /**
      * This is the default, parsing will be attempted only if both
@@ -354,7 +243,8 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
 				   "CDATA","http://www.biojava.org");
 		}
 		this.startElement(
-			  new QName(this,"biojava:BlastLikeDataSetCollection"),
+			  new QName(this,
+				    this.prefix("BlastLikeDataSetCollection")),
 				  (Attributes)oAtts);
 
 		this.onNewDataSet(poContents,poLine);
@@ -391,7 +281,7 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
 
 	//choose according to version...
 
-	oBlast = new BlastSAXParser(oVersion);
+	oBlast = new BlastSAXParser(oVersion,this.getNamespacePrefix());
 	String oLine;
 
 	//Parse Contents stream up to end of a single BlastDataSet.
@@ -409,16 +299,6 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
 	    //here if at the EOF
 	    return;
 	}
-    }
-    /**
-     * Centralise chaning of iState field to help
-     * with debugging e.g. printing out value etc.
-     * All changes to iState should be made through this method.
-     *
-     * @param piState an <code>int</code> value
-     */
-    private void changeState(int piState) {
-	iState = piState;
     }
     
 }

@@ -25,6 +25,7 @@ import java.io.*;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -36,11 +37,14 @@ import org.xml.sax.helpers.AttributesImpl;
  * <p>
  * Currently memory usage whilst parsing is at the level of a single model.
  * <p>
- * <b>Note this code is experimental and subject to change without notice.
+ * <b>Note this code is experimental, in development and subject 
+ * to change without notice - please do not use unless you're in
+ * contact with the primary author preferably via the biojava-l
+ * mailing list.
  * </b>
  * <p>
  *
- * Copyright &copy; 2000 Cambridge Antibody Technology.
+ * Copyright &copy; 2000,2001 Cambridge Antibody Technology.
  * All Rights Reserved.
  * <p>
  * Primary author -<ul>
@@ -54,7 +58,7 @@ import org.xml.sax.helpers.AttributesImpl;
  *
  *
  * @author Cambridge Antibody Technology (CAT)
- * @version 0.1
+ * @version 0.2
  *
  */
 public class PdbSAXParser extends AbstractNativeAppSAXParser {
@@ -71,10 +75,10 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
     private QName                   oAttQName = new QName(this);     
 
     /**
-     * Default constructor does nothing.
+     * Sets namespace prefix to "biojava"
      */
     public PdbSAXParser() {
-
+	this.setNamespacePrefix("biojava");
     }
 
     /**
@@ -82,88 +86,85 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
      *
      * @param nil	 -
      */
-    public void parse(String poPathname ) throws SAXException {
+    public void parse(InputSource poSource ) 
+	throws IOException,SAXException {
 
-	FileInputStream           oInputFileStream;
 	BufferedReader            oContents;
 	String                    oLine = null;
 
+	//Use method form superclass
+	oContents = this.getContentStream(poSource);
 
-        // Open file and read all records into the oRecordList object
-        try{
-            oInputFileStream = new FileInputStream(poPathname);
-            // create input stream
-            oContents = new
-                BufferedReader(new InputStreamReader(oInputFileStream));
-            try {
-                // loop over file
-		oLine = oContents.readLine();
-                while (oLine != null) {
 
-                    // put line into ArrayList
-                    oRecordList.add(oLine);
-                    //System.out.println(oLine);
-		    oLine = oContents.readLine();
-                } // end while
-
-		//-----------------------
-
-		//At this point, have the entire raw file in core memory.
-		//Now parse it and fire of relevant events
-
-		//First preprocess file
-
-		//Rule
-		//If there are no model records, then insert records
-		//for a single model.  MODEL record before first ATOM,
-		//ENDMDL and before, CONECT, MASTER, END
+	try {
+	    // loop over file
+	    oLine = oContents.readLine();
+	    while (oLine != null) {
 		
-		boolean tIsModel = false;
+		// put line into ArrayList
+		oRecordList.add(oLine);
+		//System.out.println(oLine);
+		oLine = oContents.readLine();
+	    } // end while
+	    
+	    //-----------------------
 
+	    //At this point, have the entire raw file in core memory.
+	    //Now parse it and fire of relevant events
+	    
+	    //First preprocess file
+	    
+	    //Rule
+	    //If there are no model records, then insert records
+	    //for a single model.  MODEL record before first ATOM,
+	    //ENDMDL and before, CONECT, MASTER, END
+		
+	    boolean tIsModel = false;
+	    
+	    for (int i = 0; i < oRecordList.size(); i++) {
+		oRecord = (String)oRecordList.get(i);
+		if (oRecord.startsWith("MODEL")) {
+		    tIsModel = true;
+		    break;
+		}
+	    }
+
+	    boolean tFoundFirstAtom = false;
+	    if (!tIsModel) {
+		//System.out.println("No MODEL records");
 		for (int i = 0; i < oRecordList.size(); i++) {
 		    oRecord = (String)oRecordList.get(i);
-		    if (oRecord.startsWith("MODEL")) {
-			tIsModel = true;
+		    
+		    if ((oRecord.startsWith("ATOM  ")) &&
+			(!tFoundFirstAtom))             {
+			tFoundFirstAtom = true;
+
+			//System.out.println("Found first atom>"+i+"<");
+
+			oRecordList.add(i,"MODEL        1");
 			break;
 		    }
 		}
 
-		boolean tFoundFirstAtom = false;
-		if (!tIsModel) {
-		    //System.out.println("No MODEL records");
-		    for (int i = 0; i < oRecordList.size(); i++) {
-			oRecord = (String)oRecordList.get(i);
-
-			if ((oRecord.startsWith("ATOM  ")) &&
- 			    (!tFoundFirstAtom))             {
-			    tFoundFirstAtom = true;
-
-			    //System.out.println("Found first atom>"+i+"<");
-
-			    oRecordList.add(i,"MODEL        1");
-			    break;
-			}
-		    }
-
-		    boolean tFoundLastAtom = false;
-		    for (int i = oRecordList.size() - 1; i > 0; i--) {
-			oRecord = (String)oRecordList.get(i);
+		boolean tFoundLastAtom = false;
+		for (int i = oRecordList.size() - 1; i > 0; i--) {
+		    oRecord = (String)oRecordList.get(i);
 			
-			if ( ((oRecord.startsWith("ATOM  ")) ||
-			      (oRecord.startsWith("HETATM")) ||
-			      (oRecord.startsWith("TER")  )) &&
- 			      (!tFoundLastAtom))                 {
+		    if ( ((oRecord.startsWith("ATOM  ")) ||
+			  (oRecord.startsWith("HETATM")) ||
+			  (oRecord.startsWith("TER")  )) &&
+			 (!tFoundLastAtom))                 {
+			
+			tFoundLastAtom = true;
 
-			    tFoundLastAtom = true;
+			//System.out.println("Found last atom>"+i+"<");
 
-			    //System.out.println("Found last atom>"+i+"<");
-
-			    oRecordList.add(i+1,"ENDMDL");
-			    break;
-			}
+			oRecordList.add(i+1,"ENDMDL");
+			break;
 		    }
+		}
 
-		} //end if tIsModel == false
+	    } //end if tIsModel == false
 
 
 		//End preprocess file
@@ -174,7 +175,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 
 		oAtts.clear();
 		this.startElement(new QName(this,
-			    "biojava:MacromolecularStructure"),
+			    this.prefix("MacromolecularStructure")),
 			  (Attributes)oAtts);
 
 
@@ -206,7 +207,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 					   oAttQName.getQName(),
 					   "CDATA",oModelId);
 
-			this.startElement(new QName(this,"biojava:Model"),
+			this.startElement(new QName(this,this.prefix("Model")),
 					  (Attributes)oAtts);
 
 		    }
@@ -223,38 +224,38 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 			//parse protein for this model...
 
 			oAtts.clear();
-			this.startElement(new QName(this,"biojava:Protein"),
+			this.startElement(new QName(this,this.prefix("Protein")),
 					  (Attributes)oAtts);
 
 
 			oAtts.clear();
 			this.startElement(new QName(this,
-					    "biojava:ProteinChainList"),
+					    this.prefix("ProteinChainList")),
 					  (Attributes)oAtts);
 
 
 			this.parseProtein(iModelStart,iModelStop);
 			//close final Atom Residue and ProteinChain
 
-			this.endElement(new QName(this,"biojava:Atom"));
-			this.endElement(new QName(this,"biojava:Residue"));
+			this.endElement(new QName(this,this.prefix("Atom")));
+			this.endElement(new QName(this,this.prefix("Residue")));
 			this.endElement(new QName(this,
-						  "biojava:ProteinChain"));
+						  this.prefix("ProteinChain")));
 			this.endElement(new QName(this,
-						  "biojava:ProteinChainList"));
+						  this.prefix("ProteinChainList")));
 
 
 			//todo parse solvent, dna etc.
 			
 			//having parsed all content, end model
-			this.endElement(new QName(this,"biojava:Model"));
+			this.endElement(new QName(this,this.prefix("Model")));
 
 		    }
 		    iPos++;
 		}
 
 		this.endElement(new QName(this,
-					  "biojava:MacromolecularStructure"));
+					  this.prefix("MacromolecularStructure")));
 
 		//System.out.println("Finished parsing");
 
@@ -263,11 +264,6 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
                 System.out.println(x.getMessage());
                 System.out.println("File read interupted");
             } // end try/catch
-        } catch (java.io.FileNotFoundException x) {
-            System.out.println(x.getMessage());
-            System.out.println("Couldn't open file");
-            System.exit(0);
-        }
 
     }
     //==================================================================
@@ -305,7 +301,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 	boolean tFirstResidue = true;
 
 	oCurrentChainId="XXX";    //set as an impossible initial value
-	oCurrentResidueId="A£$£!$"; //set as an impossible initial value
+	oCurrentResidueId="A*ZZ**"; //set as an impossible initial value
 
 	for (int i = piStart; i < piStop; i++) {
 	    oRecord = (String)oRecordList.get(i);
@@ -337,14 +333,14 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 		if (!oResidueId.equals(oCurrentResidueId)) {
 		    if (!tFirstResidue) {
 			this.endElement(new QName(this,
-					  "biojava:Residue"));
+					  this.prefix("Residue")));
 
 		    }
 		    if (!oChainId.equals(oCurrentChainId)) {
 			if (!tFirstChain) {
 
 			this.endElement(new QName(this,
-					  "biojava:ProteinChain"));
+					  this.prefix("ProteinChain")));
 
 			}
 			//check new chain event
@@ -356,7 +352,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 					   "CDATA",oChainId);
 
 			this.startElement(new QName(this,
-      				          "biojava:ProteinChain"),
+      				          this.prefix("ProteinChain")),
 					  (Attributes)oAtts);
 
 
@@ -376,7 +372,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 				       oAttQName.getQName(),
 				       "CDATA",oResidueType);
 
-		    this.startElement(new QName(this,"biojava:Residue"),
+		    this.startElement(new QName(this,this.prefix("Residue")),
 					  (Attributes)oAtts);
 
 		    tFirstResidue = false; //a bit ugly to set all the time.
@@ -397,7 +393,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 				   oAttQName.getQName(),
 				   "CDATA",oAtomType);
 		
-		this.startElement(new QName(this,"biojava:Atom"),
+		this.startElement(new QName(this,this.prefix("Atom")),
 					  (Attributes)oAtts);
 
 
@@ -419,12 +415,12 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 				   oAttQName.getQName(),
 				   "CDATA",oZ);
 		
-		this.startElement(new QName(this,"biojava:Coordinates"),
+		this.startElement(new QName(this,this.prefix("Coordinates")),
 					  (Attributes)oAtts);
 
 
-		this.endElement(new QName(this,"biojava:Coordinates"));
-		this.endElement(new QName(this,"biojava:Atom"));
+		this.endElement(new QName(this,this.prefix("Coordinates")));
+		this.endElement(new QName(this,this.prefix("Atom")));
 
 	    }
 	}

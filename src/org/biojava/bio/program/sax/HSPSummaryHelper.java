@@ -70,7 +70,7 @@ final class HSPSummaryHelper {
      * @param oVersion a <code>BlastLikeVersionSupport</code> value
      * @exception SAXException if an error occurs
      */
-    static void parse(String poLine, HashMap poMap, 
+    public static void parse(String poLine, HashMap poMap,
 		      BlastLikeVersionSupport poVersion) 
     throws SAXException {
 

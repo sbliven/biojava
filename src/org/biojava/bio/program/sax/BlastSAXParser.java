@@ -20,8 +20,6 @@
  */
 package org.biojava.bio.program.sax;
 
-import org.biojava.bio.program.sax.*;
-
 import java.util.*;
 import java.io.*;
 
@@ -75,7 +73,6 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
     private String[]             aoKeys;
     private String[]             aoArrayType        = new String[1];
     private HashMap              oMap               = new HashMap();
-    private int                  iState;
     private int                  iVer;
 
     private BlastLikeVersionSupport      oVersion;
@@ -100,9 +97,13 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
      *
      * @exception SAXException if an error occurs
      */
-    BlastSAXParser(BlastLikeVersionSupport poVersion) throws SAXException {
+    BlastSAXParser(BlastLikeVersionSupport poVersion, 
+		   String poNamespacePrefix) throws SAXException {
+
 	oVersion = poVersion;
-        oHits = new HitSectionSAXParser(oVersion);
+	this.setNamespacePrefix(poNamespacePrefix);
+
+        oHits = new HitSectionSAXParser(oVersion,this.getNamespacePrefix());
 
 	this.changeState(STARTUP);
 	aoLineSeparator = System.getProperty("line.separator").toCharArray();
@@ -119,7 +120,7 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
      * Describe 'parse' method here.
      *
      */
-    String parse(BufferedReader poContents, String poLine)
+    public String parse(BufferedReader poContents, String poLine)
 	throws SAXException {
 
 	String         oLine = null;
@@ -166,11 +167,11 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 	    //Now close open elements...
 	    if (iState == IN_TRAILER) {
 		this.emitRawOutput(oBuffer);
-		this.endElement(new QName(this,"biojava:Trailer"));
+		this.endElement(new QName(this,this.prefix("Trailer")));
 		this.changeState(AT_END);
 	    }
 
-	    this.endElement(new QName(this,"biojava:BlastLikeDataSet"));
+	    this.endElement(new QName(this,this.prefix("BlastLikeDataSet")));
 
 	    return oLine;
     }
@@ -198,12 +199,12 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 
 		this.emitRawOutput(oBuffer);
 
-		this.endElement(new QName(this,"biojava:Header"));
+		this.endElement(new QName(this,this.prefix("Header")));
 		
 		//change state
 		this.changeState(IN_SUMMARY);
 		oAtts.clear();
-		this.startElement(new QName(this,"biojava:Summary"),
+		this.startElement(new QName(this,this.prefix("Summary")),
 				      (Attributes)oAtts);
 
 		//eat a blank line if there is one...
@@ -253,7 +254,7 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 		//between end of summary and start of detail
 		if (!tDoneSummary) {
 		    tDoneSummary = true;
-		    this.endElement(new QName(this,"biojava:Summary"));
+		    this.endElement(new QName(this,this.prefix("Summary")));
 		} 
 		return; //return before attempting to parse Summary Line
 
@@ -287,9 +288,9 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 
 	    //check end of detail section
 
-		this.endElement(new QName(this,"biojava:Detail"));
+		this.endElement(new QName(this,this.prefix("Detail")));
 		oAtts.clear();
-		this.startElement(new QName(this,"biojava:Trailer"),
+		this.startElement(new QName(this,this.prefix("Trailer")),
 				  (Attributes)oAtts);
 
 		//change state to Trailer and initialse Buffer
@@ -346,7 +347,7 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 			   oAttQName.getQName(),
 			   "CDATA",oVersion.getVersionString());
 
-	this.startElement(new QName(this,"biojava:BlastLikeDataSet"),
+	this.startElement(new QName(this,this.prefix("BlastLikeDataSet")),
 			  (Attributes)oAtts);
 
 	//change state to reflect the fact we're in the Header
@@ -354,7 +355,7 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 	oBuffer.clear();
 	
 	oAtts.clear();
-	this.startElement(new QName(this,"biojava:Header"),
+	this.startElement(new QName(this,this.prefix("Header")),
 			  (Attributes)oAtts);
     }
     /**
@@ -370,7 +371,7 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 			   oAttQName.getLocalName(),
 			   oAttQName.getQName(),
 			   "NMTOKEN","preserve");
-	this.startElement(new QName (this,"biojava:RawOutput"),
+	this.startElement(new QName (this,this.prefix("RawOutput")),
 			  (Attributes)oAtts);
 
 	//Cycle through ArrayList and send character array data to
@@ -384,7 +385,7 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 	    this.characters(aoChars,0,aoChars.length);
 	}
 
-	this.endElement(new QName(this,"biojava:RawOutput"));
+	this.endElement(new QName(this,this.prefix("RawOutput")));
     }
     /**
      * Parses a summary line.  Actualy parsing functionality
@@ -434,7 +435,7 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 	    }
 	}
 
-	this.startElement(new QName(this,"biojava:HitSummary"),
+	this.startElement(new QName(this,this.prefix("HitSummary")),
 			  (Attributes)oAtts);
 
 	for (int i = 0; i < aoKeys.length; i++) {
@@ -452,23 +453,23 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 				   oAttQName.getLocalName(),
 				   oAttQName.getQName(),
 				   "CDATA","none");
-		this.startElement(new QName(this,"biojava:HitId"),
+		this.startElement(new QName(this,this.prefix("HitId")),
 				  (Attributes)oAtts);
-		this.endElement(new QName(this,"biojava:HitId"));
+		this.endElement(new QName(this,this.prefix("HitId")));
 
 	    } else if (aoKeys[i].equals("hitDescription")) {
 		oAtts.clear();
-		this.startElement(new QName(this,"biojava:HitDescription"),
+		this.startElement(new QName(this,this.prefix("HitDescription")),
 				  (Attributes)oAtts);
 		aoChars = ((String)oMap.get(aoKeys[i])).toCharArray();
 		this.characters(aoChars,0,aoChars.length);
-		this.endElement(new QName(this,"biojava:HitDescription"));
+		this.endElement(new QName(this,this.prefix("HitDescription")));
 
 	    }
 	    //System.out.print(aoKeys[i] + ": ");
 	    //System.out.println(oMap.get(aoKeys[i]));
 	}
-	this.endElement(new QName(this,"biojava:HitSummary"));
+	this.endElement(new QName(this,this.prefix("HitSummary")));
     }
     /**
      * From the specified line, hand over
@@ -487,7 +488,7 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 	//this returns when end of hits section reached...
 
 	oAtts.clear();
-	this.startElement(new QName(this,"biojava:Detail"),
+	this.startElement(new QName(this,this.prefix("Detail")),
 			  (Attributes)oAtts);
 
 	int iProgram = oVersion.getProgram();
@@ -531,12 +532,12 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 	
 
 	oAtts.clear();
-	this.startElement(new QName(this,"biojava:DomainSummary"),
+	this.startElement(new QName(this,this.prefix("DomainSummary")),
 			  (Attributes)oAtts);
 
 	//... insert functionality.
 
-	this.endElement(new QName(this,"biojava:Detail"));
+	this.endElement(new QName(this,this.prefix("Detail")));
 
     }
 
@@ -611,15 +612,5 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
 	    concat(" version ").
 	    concat(oVersion.getVersionString())));
 
-    }
-    /**
-     * Centralise chaning of iState field to help
-     * with debugging e.g. printing out value etc.
-     * All changes to iState should be made through this method.
-     *
-     * @param piState an <code>int</code> value
-     */
-    private void changeState(int piState) {
-	iState = piState;
     }
 }
