@@ -32,22 +32,28 @@ import org.biojava.utils.*;
  * <P>
  * It will allow you to set any property, but will throw exceptions if you try
  * to retrieve a property that is not set.
+ * <P>
+ * So that multiple values may be assigned to the same key, for example,
+ * multiple "/note" fields on a GenBank feature, if a value would be
+ * overwritten, a list will instead be composed of the old value and the new
+ * one.  Therefore, use caution when adding a list as a value.
  *
  * @author Matthew Pocock
+ * @atuhor Greg Cox
  */
 public class SimpleAnnotation implements Annotation, Serializable {
   /**
    * The object to do the hard work of informing others of changes.
    */
   protected transient ChangeSupport changeSupport = null;
-  
+
   /**
    * The properties map.
    * <P>
    * This may be null if no property values have yet been set.
    */
   private Map properties;
-  
+
   /**
    * Retrieves properties, potentialy creating it if it was null.
    *
@@ -84,32 +90,62 @@ public class SimpleAnnotation implements Annotation, Serializable {
 
   public void setProperty(Object key, Object value)
   throws ChangeVetoException {
+	// This mess is to handle cases where there is already a value associated
+	// with the key.
+	Object newValue;
+	Object oldValue = null;
+	try
+	{
+		if(properties.containsKey(key))
+		{
+			oldValue = this.getProperty(key);
+			// If the old value is already a list, append the new value to it.
+			if (oldValue instanceof List)
+			{
+				newValue = oldValue;
+				((List)newValue).add(value);
+			}
+			// Otherwise, construct a new list with the old and new values.
+			else
+			{
+				newValue = new ArrayList();
+				((List)newValue).add(oldValue);
+				((List)newValue).add(value);
+			}
+		}
+		else
+		{
+			newValue = value;
+		}
+	}
+	// Catches ClassCast, Unsupported operation, and Illegal argument exceptions
+	// from newValue.add.  If this operation fails, create a new list with the
+	// new and old values.
+	catch (RuntimeException re)
+	{
+		newValue = new ArrayList();
+		((List)newValue).add(oldValue);
+		((List)newValue).add(value);
+	}
+
     if(changeSupport == null) {
-      getProperties().put(key, value);
+      getProperties().put(key, newValue);
     } else {
       Map properties = getProperties();
       ChangeEvent ce = new ChangeEvent(
         this,
         Annotation.PROPERTY,
-        new Object[] { key, value },
-        new Object[] { key, properties.get(value)} 
+        new Object[] { key, newValue },
+        new Object[] { key, properties.get(key)}
       );
       synchronized(changeSupport) {
         changeSupport.firePreChangeEvent(ce);
-        properties.put(key, value);
+        properties.put(key, newValue);
         changeSupport.firePostChangeEvent(ce);
       }
     }
   }
 
-  public boolean containsProperty(Object key) {
-    if(propertiesAllocated()) {
-      return properties.containsKey(key);
-    } else {
-      return false;
-    }
-  }
-  
   public Set keys() {
     if(propertiesAllocated()) {
       return properties.keySet();
@@ -117,7 +153,7 @@ public class SimpleAnnotation implements Annotation, Serializable {
       return Collections.EMPTY_SET;
     }
   }
-  
+
   public String toString() {
     StringBuffer sb = new StringBuffer("{");
     Map prop = getProperties();
@@ -133,11 +169,11 @@ public class SimpleAnnotation implements Annotation, Serializable {
     sb.append("}");
     return sb.toString();
   }
-  
+
   public Map asMap() {
     return new HashMap(getProperties());
   }
-  
+
   public void addChangeListener(ChangeListener cl) {
     if(changeSupport == null) {
       changeSupport = new ChangeSupport();
@@ -147,7 +183,7 @@ public class SimpleAnnotation implements Annotation, Serializable {
       changeSupport.addChangeListener(cl);
     }
   }
-  
+
   public void addChangeListener(ChangeListener cl, ChangeType ct) {
     if(changeSupport == null) {
       changeSupport = new ChangeSupport();
@@ -157,7 +193,7 @@ public class SimpleAnnotation implements Annotation, Serializable {
       changeSupport.addChangeListener(cl, ct);
     }
   }
-  
+
   public void removeChangeListener(ChangeListener cl) {
     if(changeSupport != null) {
       synchronized(changeSupport) {
@@ -165,18 +201,18 @@ public class SimpleAnnotation implements Annotation, Serializable {
       }
     }
   }
-  
+
   public void removeChangeListener(ChangeListener cl, ChangeType ct) {
     if(changeSupport != null) {
       synchronized(changeSupport) {
         changeSupport.removeChangeListener(cl, ct);
       }
     }
-  }  
-  
+  }
+
   public SimpleAnnotation() {
   }
-  
+
   public SimpleAnnotation(Annotation ann) throws IllegalArgumentException {
     if(ann == null) {
       throw new IllegalArgumentException(
@@ -199,7 +235,7 @@ public class SimpleAnnotation implements Annotation, Serializable {
       }
     }
   }
-  
+
   public SimpleAnnotation(Map annMap) {
     if(annMap == null) {
       throw new IllegalArgumentException(
@@ -209,7 +245,7 @@ public class SimpleAnnotation implements Annotation, Serializable {
     if(annMap.isEmpty()) {
       return;
     }
-    
+
     Map properties = getProperties();
     for(Iterator i = annMap.keySet().iterator(); i.hasNext(); ) {
       Object key = i.next();

@@ -34,9 +34,15 @@ import org.biojava.utils.*;
  * underlying <code>Annotation</code> is checked.  Values
  * passed to <code>setProperty</code> are always stored
  * within the overlay.
+ * <P>
+ * So that multiple values may be assigned to the same key, for example,
+ * multiple "/note" fields on a GenBank feature, if a value would be
+ * overwritten, a list will instead be composed of the old value and the new
+ * one.  Therefore, use caution when adding a list as a value.
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author Greg Cox
  */
 
 public class OverlayAnnotation implements Annotation, Serializable {
@@ -48,12 +54,12 @@ public class OverlayAnnotation implements Annotation, Serializable {
 
   private Annotation parent;
   private Map overlay = null;
-  
+
   protected void generateChangeSupport(ChangeType changeType) {
     if(changeSupport == null) {
       changeSupport = new ChangeSupport();
     }
-    
+
     if(
       ((changeType == null) || (changeType == Annotation.PROPERTY)) &&
       (propertyForwarder == null)
@@ -61,7 +67,7 @@ public class OverlayAnnotation implements Annotation, Serializable {
       propertyForwarder = new PropertyForwarder(
         OverlayAnnotation.this,
         changeSupport
-      );        
+      );
       parent.addChangeListener(
         propertyForwarder,
         Annotation.PROPERTY
@@ -89,18 +95,56 @@ public class OverlayAnnotation implements Annotation, Serializable {
 
   public void setProperty(Object key, Object value)
   throws ChangeVetoException {
+	// This mess is to handle cases where there is already a value associated
+	// with the key.
+	Object newValue;
+	Object oldValue = null;
+	try
+	{
+		if(overlay.containsKey(key))
+		{
+			oldValue = this.getProperty(key);
+			// If the old value is already a list, append the new value to it.
+			if (oldValue instanceof List)
+			{
+				newValue = oldValue;
+				((List)newValue).add(value);
+			}
+			// Otherwise, construct a new list with the old and new values.
+			else
+			{
+				newValue = new ArrayList();
+				((List)newValue).add(oldValue);
+				((List)newValue).add(value);
+			}
+		}
+		else
+		{
+			newValue = value;
+		}
+	}
+	// Catches ClassCast, Unsupported operation, and Illegal argument exceptions
+	// from newValue.add.  If this operation fails, create a new list with the
+	// new and old values.
+	catch (RuntimeException re)
+	{
+		newValue = new ArrayList();
+		((List)newValue).add(oldValue);
+		((List)newValue).add(value);
+	}
+
     if(changeSupport == null) {
-      getOverlay().put(key, value);
+      getOverlay().put(key, newValue);
     } else {
       ChangeEvent ce = new ChangeEvent(
         this,
         Annotation.PROPERTY,
-        new Object[] {key, value},
+        new Object[] {key, newValue},
         new Object[] {key, getProperty(key)}
       );
       synchronized(changeSupport) {
         changeSupport.firePreChangeEvent(ce);
-        getOverlay().put(key, value);
+        getOverlay().put(key, newValue);
         changeSupport.firePostChangeEvent(ce);
       }
     }
@@ -116,17 +160,6 @@ public class OverlayAnnotation implements Annotation, Serializable {
       return parent.getProperty(key);
   }
 
-  public boolean containsProperty(Object key) {
-    if(
-      (overlay != null) &&
-      (overlay.containsKey(key))
-    ) {
-      return true;
-    } else {
-      return parent.containsProperty(key);
-    }
-  }
-  
     private Object getPropertySilent(Object key) {
 	try {
 	    return getProperty(key);
@@ -162,7 +195,7 @@ public class OverlayAnnotation implements Annotation, Serializable {
       changeSupport.addChangeListener(cl);
     }
   }
-  
+
   public void addChangeListener(ChangeListener cl, ChangeType ct) {
     generateChangeSupport(ct);
 
@@ -170,7 +203,7 @@ public class OverlayAnnotation implements Annotation, Serializable {
       changeSupport.addChangeListener(cl, ct);
     }
   }
-  
+
   public void removeChangeListener(ChangeListener cl) {
     if(changeSupport != null) {
       synchronized(changeSupport) {
@@ -178,36 +211,36 @@ public class OverlayAnnotation implements Annotation, Serializable {
       }
     }
   }
-  
+
   public void removeChangeListener(ChangeListener cl, ChangeType ct) {
     if(changeSupport != null) {
       synchronized(changeSupport) {
         changeSupport.removeChangeListener(cl, ct);
       }
     }
-  }  
+  }
 
   private class OAKeySet extends AbstractSet {
     private Set parentKeys;
-     
+
      private OAKeySet() {
        super();
        parentKeys = parent.keys();
      }
-     
+
      public Iterator iterator() {
        return new Iterator() {
-         Iterator oi = (overlay != null) ? overlay.keySet().iterator() 
+         Iterator oi = (overlay != null) ? overlay.keySet().iterator()
 	                                 : Collections.EMPTY_SET.iterator();
          Iterator pi = parentKeys.iterator();
          Object peek = null;
-         
+
          public boolean hasNext() {
            if (peek == null)
              peek = nextObject();
              return (peek != null);
          }
-         
+
          public Object next() {
            if (peek == null) {
              peek = nextObject();
@@ -219,7 +252,7 @@ public class OverlayAnnotation implements Annotation, Serializable {
            peek = null;
            return o;
          }
-         
+
          private Object nextObject() {
            if (oi.hasNext()) {
              return oi.next();
@@ -233,13 +266,13 @@ public class OverlayAnnotation implements Annotation, Serializable {
            }
            return po;
          }
-         
+
          public void remove() {
            throw new UnsupportedOperationException();
          }
        };
      }
-     
+
      public int size() {
        int i = 0;
        Iterator keys = iterator();
@@ -249,7 +282,7 @@ public class OverlayAnnotation implements Annotation, Serializable {
        }
        return i;
      }
-     
+
      public boolean contains(Object o) {
        return (overlay != null && overlay.containsKey(o)) || parentKeys.contains(o);
      }
@@ -262,86 +295,86 @@ public class OverlayAnnotation implements Annotation, Serializable {
 	    super();
 	    ks = new OAKeySet();
     }
-    
+
     public Iterator iterator() {
 	    return new Iterator() {
         Iterator ksi = ks.iterator();
-        
+
         public boolean hasNext() {
           return ksi.hasNext();
         }
-        
+
         public Object next() {
           Object k = ksi.next();
           Object v = getProperty(k);
           return new OAMapEntry(k, v);
         }
-        
+
         public void remove() {
           throw new UnsupportedOperationException();
         }
 	    };
     }
-    
+
     public int size() {
 	    return ks.size();
     }
   }
-  
+
   private class OAMapEntry implements Map.Entry {
     private Object key;
     private Object value;
-    
+
     private OAMapEntry(Object key, Object value) {
 	    this.key = key;
 	    this.value = value;
     }
-    
+
     public Object getKey() {
 	    return key;
     }
-    
+
     public Object getValue() {
 	    return value;
     }
-    
+
     public Object setValue(Object v) {
 	    throw new UnsupportedOperationException();
     }
-    
+
     public boolean equals(Object o) {
 	    if (! (o instanceof Map.Entry)) {
         return false;
       }
-      
+
 	    Map.Entry mo = (Map.Entry) o;
 	    return ((key == null ? mo.getKey() == null : key.equals(mo.getKey())) &&
 		    (value == null ? mo.getValue() == null : value.equals(mo.getValue())));
     }
-    
+
     public int hashCode() {
 	    return (key == null ? 0 : key.hashCode()) ^ (value == null ? 0 : value.hashCode());
     }
   }
-  
+
   private class OAMap extends AbstractMap {
     OAEntrySet es;
     OAKeySet ks;
-    
+
     private OAMap() {
 	    super();
 	    ks = new OAKeySet();
 	    es = new OAEntrySet();
     }
-    
+
     public Set entrySet() {
 	    return es;
     }
-    
+
     public Set keySet() {
 	    return ks;
     }
-	
+
 	  public Object get(Object key) {
 	    try {
         return getProperty(key);
@@ -351,12 +384,12 @@ public class OverlayAnnotation implements Annotation, Serializable {
 	    return null;
     }
   }
-  
+
   protected class PropertyForwarder extends ChangeForwarder {
     public PropertyForwarder(Object source, ChangeSupport cs) {
       super(source, cs);
     }
-    
+
     public ChangeEvent generateEvent(ChangeEvent ce) {
       ChangeType ct = ce.getType();
       if(ct == Annotation.PROPERTY) {
