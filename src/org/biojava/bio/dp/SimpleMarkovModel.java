@@ -230,7 +230,7 @@ public class SimpleMarkovModel implements MarkovModel {
     if(modelTrainer.getTrainerForModel(this) == null) {
       TransitionTrainer tTrainer = new SimpleTransitionTrainer(this);
       modelTrainer.registerTrainerForModel(this, tTrainer);
-      for(Iterator i = stateAlphabet().residues().iterator(); i.hasNext(); ) {
+      for(Iterator i = stateAlphabet().iterator(); i.hasNext(); ) {
         State s = (State) i.next();
         if(s instanceof EmissionState) {
           ((EmissionState) s).registerWithTrainer(modelTrainer);

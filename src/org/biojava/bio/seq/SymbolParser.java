@@ -79,7 +79,7 @@ public class SymbolParser implements ResidueParser {
    */
   public SymbolParser(FiniteAlphabet alpha) {
     this.alphabet = alpha;
-    for(Iterator i = alpha.residues().iterator(); i.hasNext(); ) {
+    for(Iterator i = alpha.iterator(); i.hasNext(); ) {
       Residue res = (Residue) i.next();
       char c = res.getSymbol();
       symbolToResidue.put(Character.toLowerCase(c) + "", res);

@@ -127,7 +127,7 @@ public class TextLogoPainter implements LogoPainter {
     
     try {
       for(
-        Iterator i = ((FiniteAlphabet) state.alphabet()).residues().iterator();
+        Iterator i = ((FiniteAlphabet) state.alphabet()).iterator();
         i.hasNext();
       ) {
         Residue r = (Residue) i.next();

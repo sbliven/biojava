@@ -53,7 +53,7 @@ public class SimpleStateTrainer implements StateTrainer {
   ) throws IllegalResidueException {
     if(nullModel != null) {
       for (
-        Iterator i = ((FiniteAlphabet) state.alphabet()).residues().iterator();
+        Iterator i = ((FiniteAlphabet) state.alphabet()).iterator();
         i.hasNext();
       ) {
         Residue r = (Residue) i.next();
@@ -63,7 +63,7 @@ public class SimpleStateTrainer implements StateTrainer {
     
     double sum = 0.0;
     for(
-      Iterator i = ((FiniteAlphabet) state.alphabet()).residues().iterator();
+      Iterator i = ((FiniteAlphabet) state.alphabet()).iterator();
       i.hasNext();
     ) {
       Residue r = (Residue) i.next();
@@ -71,7 +71,7 @@ public class SimpleStateTrainer implements StateTrainer {
     }
     //System.out.println(state.getName() + ": sum=" + sum);
     for(
-      Iterator i = ((FiniteAlphabet) state.alphabet()).residues().iterator();
+      Iterator i = ((FiniteAlphabet) state.alphabet()).iterator();
       i.hasNext();
     ) {
       Residue res = (Residue) i.next();
@@ -90,7 +90,7 @@ public class SimpleStateTrainer implements StateTrainer {
 
   public void clearCounts() {
     for(
-      Iterator i = ((FiniteAlphabet) state.alphabet()).residues().iterator();
+      Iterator i = ((FiniteAlphabet) state.alphabet()).iterator();
       i.hasNext();
     ) {
       Residue res = (Residue) i.next();
@@ -109,7 +109,7 @@ public class SimpleStateTrainer implements StateTrainer {
     }
     this.c = new HashMap();
     this.state = s;
-    for (Iterator i = ((FiniteAlphabet) a).residues().iterator(); i.hasNext();) {
+    for (Iterator i = ((FiniteAlphabet) a).iterator(); i.hasNext();) {
       c.put(i.next(), new Double(0.0));
     }
   }

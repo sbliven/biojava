@@ -94,7 +94,7 @@ public class DNATools {
       
       // add all other ambiguity residues
       Map matchesToResidue = new HashMap();
-      for(Iterator i = ambiguity.residues().iterator(); i.hasNext();) {
+      for(Iterator i = ambiguity.iterator(); i.hasNext();) {
         Residue r = (Residue) i.next();
         if(!residueToMatches.keySet().contains(r)) {
           ResidueList rl = ambParser.parse(r.getName());
@@ -103,7 +103,7 @@ public class DNATools {
           matchesToResidue.put(hl, r);
         }
       }
-      for(Iterator i = ambiguity.residues().iterator(); i.hasNext();) {
+      for(Iterator i = ambiguity.iterator(); i.hasNext();) {
         Residue r = (Residue) i.next();
         if(!residueToComplement.keySet().contains(r)) {
           hl = (HashableList) residueToMatches.get(r);

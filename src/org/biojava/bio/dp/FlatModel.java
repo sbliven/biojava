@@ -88,7 +88,7 @@ public class FlatModel extends ModelView {
     Map modelStart = new HashMap();
     Map modelEnd = new HashMap();
     
-    for(Iterator i = model.stateAlphabet().residues().iterator(); i.hasNext(); ) {
+    for(Iterator i = model.stateAlphabet().iterator(); i.hasNext(); ) {
       State s = (State) i.next();
       if(s instanceof DotState) { // simple dot state in model
         DotStateWrapper dsw = new DotStateWrapper(s);
@@ -124,7 +124,7 @@ public class FlatModel extends ModelView {
         misEnd.put(mis, end);
         //System.out.println("Added " + start.getName() + " and " + end.getName());
 
-        for(Iterator j = flatM.stateAlphabet().residues().iterator(); j.hasNext(); ) {
+        for(Iterator j = flatM.stateAlphabet().iterator(); j.hasNext(); ) {
           State t = (State) j.next();
           if(t instanceof DotState) {
             DotStateWrapper dsw = new DotStateWrapper(t);
@@ -154,7 +154,7 @@ public class FlatModel extends ModelView {
     }
 
     // wire
-    for(Iterator i = stateAlpha.residues().iterator(); i.hasNext(); ) {
+    for(Iterator i = stateAlpha.iterator(); i.hasNext(); ) {
       State s = (State) i.next();
 
       //System.out.println("Processing transitions from " + s.getName());

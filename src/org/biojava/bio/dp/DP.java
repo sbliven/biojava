@@ -37,7 +37,7 @@ public abstract class DP {
 	List emissionStates = new ArrayList();
 	HMMOrderByTransition comp = new HMMOrderByTransition(mm);
 	List dotStates = new LinkedList();
-	for (Iterator addStates = alpha.residues().iterator(); addStates.hasNext(); ) {
+	for (Iterator addStates = alpha.iterator(); addStates.hasNext(); ) {
 	    Object state = addStates.next();
 	    if (state instanceof EmissionState)
 		emissionStates.add(state);

@@ -133,7 +133,7 @@ public abstract class ModelView implements MarkovModel {
       thisT = new ViewTransitionTrainer();
       modelTrainer.registerTrainerForModel(this, thisT);
       
-      for(Iterator i = stateAlphabet().residues().iterator(); i.hasNext(); ) {
+      for(Iterator i = stateAlphabet().iterator(); i.hasNext(); ) {
         State s = (State) i.next();
         if(s instanceof EmissionState && ! (s instanceof MagicalState) ) {
           EmissionState es = (EmissionState) s;

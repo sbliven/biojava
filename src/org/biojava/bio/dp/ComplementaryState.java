@@ -91,7 +91,7 @@ public class ComplementaryState implements EmissionState {
     FiniteAlphabet foa = (FiniteAlphabet) oa;
     this.other = other;
     this.cache = StateFactory.DEFAULT.createState(oa, other.getAdvance(), other.getName() + "-c");
-    for(Iterator i = foa.residues().iterator(); i.hasNext();) {
+    for(Iterator i = foa.iterator(); i.hasNext();) {
       Residue r = (Residue) i.next();
       try {
         cache.setWeight(DNATools.complement(r), other.getWeight(r));
@@ -115,7 +115,7 @@ public class ComplementaryState implements EmissionState {
     throws IllegalResidueException {
       st.train(nullModel, weight); // a hack - forces st to be trained first
       for(
-        Iterator i = ((FiniteAlphabet) other.alphabet()).residues().iterator();
+        Iterator i = ((FiniteAlphabet) other.alphabet()).iterator();
         i.hasNext();
       ) {
         Residue r = (Residue) i.next();

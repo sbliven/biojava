@@ -113,7 +113,7 @@ public class AmbiguityState extends AbstractState {
         Residue r = DNATools.forIndex(i);
         c[i] /= sum;
       }
-      for(Iterator i = DNATools.getAmbiguity().residues().iterator(); i.hasNext();) {
+      for(Iterator i = DNATools.getAmbiguity().iterator(); i.hasNext();) {
         sum = 0.0;
         Residue ir = (Residue) i.next();
         for(Iterator j = DNATools.forAmbiguity(ir).iterator(); j.hasNext();) {

@@ -78,7 +78,7 @@ public abstract class AbstractState implements EmissionState {
   throws BioError {
     double p = Math.random();
     try {
-      for(Iterator i = alpha.residues().iterator(); i.hasNext(); ) {
+      for(Iterator i = alpha.iterator(); i.hasNext(); ) {
         Residue r = (Residue) i.next();
         p -= Math.exp(getWeight(r));
         if( p <= 0) {
@@ -87,7 +87,7 @@ public abstract class AbstractState implements EmissionState {
       }
     
       StringBuffer sb = new StringBuffer();
-      for(Iterator i = alpha.residues().iterator(); i.hasNext(); ) {
+      for(Iterator i = alpha.iterator(); i.hasNext(); ) {
         Residue r = (Residue) i.next();
         double w = Math.exp(getWeight(r));
         if(w > 0.0)

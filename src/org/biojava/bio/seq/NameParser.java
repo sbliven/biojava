@@ -88,7 +88,7 @@ public class NameParser implements ResidueParser {
   
   public NameParser(FiniteAlphabet alpha) {
     this.alphabet = alpha;
-    for(Iterator i = alpha.residues().iterator(); i.hasNext(); ) {
+    for(Iterator i = alpha.iterator(); i.hasNext(); ) {
       Residue res = (Residue) i.next();
       nameToResidue.put(res.getName(), res);
     }

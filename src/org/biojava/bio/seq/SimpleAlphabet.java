@@ -52,6 +52,10 @@ public class SimpleAlphabet extends AbstractAlphabet {
     residues	= new HashSet();
   }
 
+  public Iterator iterator() {
+    return residues.iterator();
+  }
+  
   public String getName() {
     return name;
   }

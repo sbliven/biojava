@@ -187,7 +187,7 @@ public class StateLogo extends JComponent {
     EmissionState eState = getState();
     
     for(
-      Iterator i = ((FiniteAlphabet) eState.alphabet()).residues().iterator();
+      Iterator i = ((FiniteAlphabet) eState.alphabet()).iterator();
       i.hasNext();
     ) {
       Residue r = (Residue) i.next();

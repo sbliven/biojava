@@ -484,6 +484,10 @@ public final class AlphabetManager {
       super(child);
     }
 
+    public Iterator iterator() {
+      return residues().iterator();
+    }
+    
     public ResidueList residues() {
 	    List l = getSourceAlphabet().residues().toList();
 	    List nl = new ArrayList(l);
@@ -542,38 +546,36 @@ public final class AlphabetManager {
      * serialized data.
      */
 
-    private static class WellKnownAlphabet extends SimpleAlphabet 
-                                           implements Serializable 
-    {
-	private Object writeReplace() {
-	    return new OPH(getName());
-	}
+    private static class WellKnownAlphabet
+    extends SimpleAlphabet implements Serializable {
+      private Object writeReplace() {
+        return new OPH(getName());
+      }
 
-	/**
-	 * Placeholder for a WellKnownAlphabet in a serialized
-	 * object stream.
-	 */
+      /**
+       * Placeholder for a WellKnownAlphabet in a serialized
+       * object stream.
+       */
 
-	private static class OPH implements Serializable {
-	    private String name;
+      private static class OPH implements Serializable {
+        private String name;
 
-	    public OPH(String name) {
-		this.name = name;
-	    }
+        public OPH(String name) {
+          this.name = name;
+        }
 	
-	    public OPH() {
-	    }
+  	    public OPH() {
+        }
 
-	    private Object readResolve() throws ObjectStreamException {
-		try {
-		    Alphabet a = AlphabetManager.instance().
-                                    alphabetForName(name);
-		    return a;
-		} catch (NoSuchElementException ex) {
-		    throw new InvalidObjectException("Couldn't resolve alphabet " + name);
-		}
-	    }
-	}
+        private Object readResolve() throws ObjectStreamException {
+          try {
+            Alphabet a = AlphabetManager.instance().alphabetForName(name);
+            return a;
+          } catch (NoSuchElementException ex) {
+            throw new InvalidObjectException("Couldn't resolve alphabet " + name);
+          }
+        }
+      }
     }
 
     /**

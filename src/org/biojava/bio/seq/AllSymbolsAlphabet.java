@@ -52,6 +52,10 @@ public class AllSymbolsAlphabet implements FiniteAlphabet {
     }
     nameToResidue.put(r.getName(), r);
   }
+
+  public Iterator iterator() {
+    return residues.iterator();
+  }
   
   public Annotation getAnnotation() {
     if(annotation == null)

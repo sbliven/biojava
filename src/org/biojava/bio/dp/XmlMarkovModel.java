@@ -141,7 +141,7 @@ public class XmlMarkovModel {
     
     for(int i = 0; i < matrix.columns(); i++) {
       out.println("  <col indx=\"" + (i+1) + "\">");
-      for(Iterator ri = resA.residues().iterator(); ri.hasNext(); ) {
+      for(Iterator ri = resA.iterator(); ri.hasNext(); ) {
         Residue r = (Residue) ri.next();
         out.println("    <weight res=\"" + r.getName() +
                              "\" prob=\"" + matrix.getWeight(r, i) + "\"/>");

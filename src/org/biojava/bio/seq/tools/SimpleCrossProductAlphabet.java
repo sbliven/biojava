@@ -61,13 +61,17 @@ class SimpleCrossProductAlphabet implements FiniteAlphabet, CrossProductAlphabet
     populateResidues(new ArrayList());
   }
 
+  public Iterator iterator() {
+    return ourResidues.values().iterator();
+  }
+  
   private void populateResidues(List r) {
     if (r.size() == alphas.size()) {
 	    putResidue(r);
     } else {
 	    int indx = r.size();
 	    FiniteAlphabet a = (FiniteAlphabet) alphas.get(indx);
-	    Iterator i = a.residues().iterator();
+	    Iterator i = a.iterator();
 	    r.add(i.next());
 	    populateResidues(r);
 	    while (i.hasNext()) {

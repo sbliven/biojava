@@ -39,7 +39,7 @@ public class SimpleTransitionTrainer implements TransitionTrainer {
   public SimpleTransitionTrainer(MarkovModel model) {
     this.model = model;
     
-    for(Iterator i = model.stateAlphabet().residues().iterator(); i.hasNext(); ) {
+    for(Iterator i = model.stateAlphabet().iterator(); i.hasNext(); ) {
       State s = (State) i.next();
       try {
         for(Iterator j = model.transitionsFrom(s).iterator(); j.hasNext(); ) {

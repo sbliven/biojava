@@ -52,7 +52,7 @@ public class BarLogoPainter implements LogoPainter {
 
     double w = 0.0;    
     for(
-      Iterator i = ((FiniteAlphabet) state.alphabet()).residues().iterator();
+      Iterator i = ((FiniteAlphabet) state.alphabet()).iterator();
       i.hasNext();
     ) {
       Residue r = (Residue) i.next();

@@ -22,6 +22,7 @@
 
 package org.biojava.bio.seq;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
@@ -44,6 +45,16 @@ public interface FiniteAlphabet extends Alphabet {
   int size();
   
   /**
+   * Retrieve an Iterator over the Residues in this FiniteAlphabet.
+   * <P>
+   * Each Residue r for which this.contains(r) is true will be returned exactly
+   * once by this iterator in no specified order.
+   *
+   * @return an Iterator over the contained Residue objects
+   */
+  Iterator iterator();
+  
+  /**
    * A list of residues that make up this alphabet.
    * <P>
    * Subsequent calls to this method are not required to return either the same
@@ -64,6 +75,10 @@ public interface FiniteAlphabet extends Alphabet {
   extends Alphabet.EmptyAlphabet implements FiniteAlphabet {
     public int size() {
       return 0;
+    }
+    
+    public Iterator iterator() {
+      return ResidueList.EMPTY_LIST.iterator();
     }
     
     public ResidueList residues() {

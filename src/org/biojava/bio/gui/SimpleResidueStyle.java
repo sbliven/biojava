@@ -55,7 +55,7 @@ public class SimpleResidueStyle implements ResidueStyle {
     Map fill = getStandardFillPaints(alphabet);
     try {
       if(fill == null || outline == null) {
-        for(Iterator i = alphabet.residues().iterator(); i.hasNext(); ) {
+        for(Iterator i = alphabet.iterator(); i.hasNext(); ) {
           Residue r = (Residue) i.next();
           if(outline == null) {
             setOutlinePaint(r, Color.black);

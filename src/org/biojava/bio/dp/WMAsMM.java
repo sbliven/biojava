@@ -115,7 +115,7 @@ public class WMAsMM implements MarkovModel {
   
   public void registerWithTrainer(ModelTrainer modelTrainer)
   throws SeqException {
-    for(Iterator i = stateAlphabet().residues().iterator(); i.hasNext(); ) {
+    for(Iterator i = stateAlphabet().iterator(); i.hasNext(); ) {
       EmissionState s = (EmissionState) i.next();
       s.registerWithTrainer(modelTrainer);
     }
