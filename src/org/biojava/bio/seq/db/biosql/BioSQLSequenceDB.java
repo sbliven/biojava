@@ -25,6 +25,7 @@ import java.sql.*;
 import java.util.*;
 
 import org.biojava.utils.*;
+import org.biojava.utils.cache.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
