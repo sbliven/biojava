@@ -33,27 +33,21 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 public class FilteringRenderer
-extends AbstractForwarder
-implements SequenceRenderer {
-  public static ChangeType RENDERER = new ChangeType(
-    "The renderer used to render the filtered features has changed",
-    "org.biojava.bio.gui.sequence.FilteringRenderer",
-    "RENDERER"
-  );
-  
+extends SequenceRendererWrapper {
   public static ChangeType FILTER = new ChangeType(
     "The filter has changed",
     "org.biojava.bio.gui.sequence.FilteringRenderer",
-    "FILTER"
+    "FILTER",
+    SequenceRenderContext.LAYOUT
   );
   
   public static ChangeType RECURSE = new ChangeType(
-    "The recurse for the filter has changed",
+    "The recurse flag has changed",
     "org.biojava.bio.gui.sequence.FilteringRenderer",
-    "RECURSE"
+    "RECURSE",
+    SequenceRenderContext.LAYOUT
   );
-  
-  protected SequenceRenderer lineRenderer;
+
   protected FeatureFilter filter;
   protected boolean recurse;
 
@@ -63,49 +57,17 @@ implements SequenceRenderer {
   }
   
   public FilteringRenderer(
-    SequenceRenderer lineRenderer,
+    SequenceRenderer renderer,
     FeatureFilter filter,
     boolean recurse
   ) {
+    super(renderer);
     try {
-      setLineRenderer(lineRenderer);
       setFilter(filter);
       setRecurse(recurse);
     } catch (ChangeVetoException cve) {
       throw new NestedError(cve, "Assertion Failure: Should have no listeners");
     }
-  }
-  
-  public void setLineRenderer(SequenceRenderer lineRenderer)
-  throws ChangeVetoException {
-    if(hasListeners()) {
-      ChangeSupport cs = getChangeSupport(RENDERER);
-      synchronized(cs) {
-        ChangeEvent ce = new ChangeEvent(
-          this, SequenceRenderContext.LAYOUT,
-          null, null, new ChangeEvent(
-            this, RENDERER, lineRenderer, this.lineRenderer
-          )
-        );
-        cs.firePreChangeEvent(ce);
-        setLineRendererImpl(lineRenderer);
-        cs.firePostChangeEvent(ce);
-      }
-    } else {
-      setLineRendererImpl(lineRenderer);
-    }
-  }
-  
-  protected void setLineRendererImpl(SequenceRenderer lineRenderer) {
-    unregisterLayout(this.lineRenderer, SequenceRenderContext.LAYOUT);
-    unregisterRepaint(this.lineRenderer, SequenceRenderContext.REPAINT);
-    this.lineRenderer = lineRenderer;
-    registerLayout(this.lineRenderer, SequenceRenderContext.LAYOUT);
-    registerRepaint(this.lineRenderer, SequenceRenderContext.REPAINT);
-  }
-  
-  public SequenceRenderer getLineRenderer() {
-    return this.lineRenderer;
   }
   
   public void setFilter(FeatureFilter filter)
@@ -114,10 +76,7 @@ implements SequenceRenderer {
       ChangeSupport cs = getChangeSupport(FILTER);
       synchronized(cs) {
         ChangeEvent ce = new ChangeEvent(
-          this, SequenceRenderContext.LAYOUT,
-          null, null, new ChangeEvent(
-            this, FILTER, this.filter, filter
-          )
+          this, FILTER, this.filter, filter
         );
         cs.firePreChangeEvent(ce);
         this.filter = filter;
@@ -138,17 +97,14 @@ implements SequenceRenderer {
       ChangeSupport cs = getChangeSupport(RECURSE);
       synchronized(cs) {
         ChangeEvent ce = new ChangeEvent(
-          this, SequenceRenderContext.LAYOUT,
-          null, null, new ChangeEvent(
-            this, RECURSE, this.filter, filter
-          )
+          this, RECURSE, new Boolean(recurse), new Boolean(this.recurse)
         );
         cs.firePreChangeEvent(ce);
-        this.filter = filter;
+        this.recurse = recurse;
         cs.firePostChangeEvent(ce);
       }
     } else {
-      this.filter = filter;
+      this.recurse = recurse;
     }
   }
   
@@ -157,15 +113,15 @@ implements SequenceRenderer {
   }
 
   public double getDepth(SequenceRenderContext src, int min, int max) {
-    return getLineRenderer().getDepth(getContext(src), min, max);
+    return super.getDepth(getContext(src), min, max);
   }    
   
   public double getMinimumLeader(SequenceRenderContext src) {
-    return getLineRenderer().getMinimumLeader(getContext(src));
+    return super.getMinimumLeader(getContext(src));
   }
   
   public double getMinimumTrailer(SequenceRenderContext src) {
-    return getLineRenderer().getMinimumTrailer(getContext(src));
+    return super.getMinimumTrailer(getContext(src));
   }
   
   public void paint(
@@ -173,7 +129,7 @@ implements SequenceRenderer {
     SequenceRenderContext src,
     int min, int max
   ) {
-    getLineRenderer().paint(g, getContext(src), min, max);
+    super.paint(g, getContext(src), min, max);
   }
   
   protected SequenceRenderContext getContext(SequenceRenderContext src) {

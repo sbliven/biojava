@@ -23,6 +23,8 @@ package org.biojava.bio.gui.sequence;
 
 import java.awt.*;
 import java.awt.geom.*;
+
+import org.biojava.utils.*;
 import org.biojava.bio.gui.*;
 import org.biojava.bio.seq.*;
 
@@ -98,4 +100,23 @@ v   * all of the data that would fall within seqBox.
    * @return the trailing distance of the renderer for that sequence panel
    */
   double getMinimumTrailer(SequenceRenderContext sp);
+  
+  public static class RendererForwarder extends ChangeForwarder {
+    public RendererForwarder(SequenceRenderer source, ChangeSupport cs) {
+      super(source, cs);
+    }
+    
+    public ChangeEvent generateEvent(ChangeEvent ce) {
+      ChangeType cType = ce.getType();
+      ChangeType newType;
+      if(cType.isMatchingType(SequenceRenderContext.LAYOUT)) {
+        newType = SequenceRenderContext.LAYOUT;
+      } else if(cType.isMatchingType(SequenceRenderContext.REPAINT)) {
+        newType = SequenceRenderContext.REPAINT;
+      } else {
+        return null;
+      }
+      return new ChangeEvent(getSource(), newType, null, null, ce);
+    }
+  }
 }

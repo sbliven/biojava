@@ -21,34 +21,35 @@
 
 package org.biojava.bio.gui.sequence;
 
+import java.io.Serializable;
 import java.util.*;
-import java.lang.reflect.*;
-import java.beans.*;
+
 import java.awt.*;
 import java.awt.geom.*;
-import java.awt.font.*;
 
 import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
-import org.biojava.bio.gui.*;
+import org.biojava.bio.symbol.*;
 
 import java.util.List;
 
-public class FeatureBlockSequenceRenderer
+public class SequenceRendererWrapper
 extends AbstractChangeable
-implements SequenceRenderer {
-  public static ChangeType FEATURE_RENDERER = new ChangeType(
-    "The associated FeatureRenderer has changed",
-    "org.biojava.bio.gui.sequence.FeatureBlockSequenceRenderer",
-    "FEATURE_RENDERER",
+implements SequenceRenderer, Serializable {
+  public static ChangeType RENDERER = new ChangeType(
+    "The renderer used to render the filtered features has changed",
+    "org.biojava.bio.gui.sequence.FilteringRenderer",
+    "RENDERER",
     SequenceRenderContext.LAYOUT
   );
   
-  private FeatureRenderer renderer;
+  private SequenceRenderer renderer;
   private transient ChangeForwarder rendForwarder;
   
+  public SequenceRendererWrapper() {}
+  public SequenceRendererWrapper(SequenceRenderer renderer) {
+    this.renderer = renderer;
+  }
   
   protected ChangeSupport getChangeSupport(ChangeType ct) {
     ChangeSupport cs = super.getChangeSupport(ct);
@@ -67,28 +68,17 @@ implements SequenceRenderer {
     return cs;
   }
   
-  public FeatureBlockSequenceRenderer() {
-    try {
-      setFeatureRenderer(new BasicFeatureRenderer());
-    } catch (ChangeVetoException cve) {
-      throw new NestedError(cve, "Assertion Failure: Should have no listeners");
-    }
-  }
-    
-  public FeatureRenderer getFeatureRenderer() {
-    return renderer;
-  }
-
-  public void setFeatureRenderer (FeatureRenderer renderer)
+  public void setRenderer(SequenceRenderer renderer)
   throws ChangeVetoException {
     if(hasListeners()) {
-      ChangeSupport cs = getChangeSupport(FEATURE_RENDERER);
+      ChangeEvent ce = new ChangeEvent(
+        this, RENDERER,
+        renderer, this.renderer
+      );
+      ChangeSupport cs = getChangeSupport(RENDERER);
       synchronized(cs) {
-        ChangeEvent ce = new ChangeEvent(
-          this, FEATURE_RENDERER, this.renderer, renderer
-        );
         cs.firePreChangeEvent(ce);
-        if((this.renderer != null) && (this.renderer instanceof Changeable)) {
+        if((renderer != null) && (renderer instanceof Changeable)) {
           Changeable c = (Changeable) this.renderer;
           c.removeChangeListener(rendForwarder);
         }
@@ -104,47 +94,28 @@ implements SequenceRenderer {
     }
   }
   
+  public SequenceRenderer getRenderer() {
+    return this.renderer;
+  }
+  
   public double getDepth(SequenceRenderContext src, int min, int max) {
-    Sequence sp = (Sequence) src.getSequence();
-    FeatureFilter filter =
-      new FeatureFilter.OverlapsLocation(new RangeLocation(min, max));
-    FeatureHolder fh = sp.filter(filter, false);
-    if(fh.countFeatures() > 0) {
-      return renderer.getDepth(src);
-    } else {
-      return 0.0;
-    }
+    return getRenderer().getDepth(src, min, max);
   }
   
   public double getMinimumLeader(SequenceRenderContext src) {
-    return 0.0;
+    return getRenderer().getMinimumLeader(src);
   }
   
   public double getMinimumTrailer(SequenceRenderContext src) {
-    return 0.0;
+    return getRenderer().getMinimumTrailer(src);
   }
   
   public void paint(
-      Graphics2D g,
-      SequenceRenderContext sp, 
-      int min, int max
+    Graphics2D g,
+    SequenceRenderContext src,
+    int min, int max
   ) {
-    Shape oldClip = g.getClip();
-    
-    Rectangle2D clip = g.getClipBounds();
-    Rectangle2D box = new Rectangle2D.Double();
-    
-    for(
-      Iterator i = ((Sequence) sp.getSequence()).filter(
-        new FeatureFilter.OverlapsLocation(new RangeLocation(min, max)), false
-      ).features();
-      i.hasNext();
-    ) {
-      Feature f = (Feature) i.next();
-      Location l = f.getLocation();
-      
-      renderer.renderFeature(g, f, sp);
-    }
+    getRenderer().paint(g, src, min, max);
   }
 }
 

@@ -92,8 +92,8 @@ public class EmblViewer {
       new FeatureFilter.Not(miscFilter)
     );
 
-    LayeredRenderer lsr = new LayeredRenderer();
-    lsr.setLineRenderer(features);
+    BumpedRenderer lsr = new BumpedRenderer();
+    lsr.setRenderer(features);
     
     sp.addRenderer(new FilteringRenderer(repeats, repeatFilter, false));
     sp.addRenderer(new FilteringRenderer(misc, miscFilter, false));

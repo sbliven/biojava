@@ -249,7 +249,7 @@ public final class ChangeType implements Serializable {
 		ChangeType cti = ChangeType.this;
 
 		public boolean hasNext() {
-		    return superType != null;
+		    return cti != null;
 		}
 
 		public Object next() {

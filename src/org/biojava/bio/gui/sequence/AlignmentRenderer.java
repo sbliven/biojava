@@ -33,48 +33,57 @@ import org.biojava.bio.symbol.*;
 import java.util.List;
 
 public class AlignmentRenderer
-extends AbstractForwarder
-implements SequenceRenderer {
-  private List renderList;
-
-  {
-    renderList = new ArrayList();
-  }
-
-  public void addRenderer(SequenceRenderer sr, Object label) {
-    renderList.add(new LabelAndRenderer(sr, label));
-    registerRepaint(sr, SequenceRenderContext.REPAINT);
-    registerLayout(sr, SequenceRenderContext.LAYOUT);
-  }
-
-  public double getDepth(SequenceRenderContext ctx, int min, int max) {
-    double depth = 0.0;
-    for (Iterator i = renderList.iterator(); i.hasNext(); ) {
-      LabelAndRenderer lar = (LabelAndRenderer) i.next();
-      SequenceRenderContext subctx = new SequenceRenderContextForLabel(ctx, lar.getLabel());
-      depth += lar.getRenderer().getDepth(subctx, min, max);
+extends SequenceRendererWrapper {
+  public static ChangeType LABEL = new ChangeType(
+    "The label used to select the Alignment component to render has changed.",
+    "org.biojava.bio.gui.sequence.AlignmentRenderer",
+    "LABEL",
+    SequenceRenderContext.LAYOUT
+  );
+  
+  private Object label;
+  
+  public void setLabel(Object label)
+  throws ChangeVetoException {
+    if(hasListeners()) {
+      ChangeEvent ce = new ChangeEvent(
+        this, LABEL,
+        label, this.label
+      );
+      ChangeSupport cs = getChangeSupport(LABEL);
+      synchronized(cs) {
+        cs.firePreChangeEvent(ce);
+        this.label = label;
+        cs.firePostChangeEvent(ce);
+      }
+    } else {
+      this.label = label;
     }
-    return depth;
+  }
+  
+  public Object getLabel() {
+    return this.label;
+  }
+  
+  public double getDepth(SequenceRenderContext ctx, int min, int max) {
+    SequenceRenderContext subctx = new SequenceRenderContextForLabel(
+      ctx, getLabel()
+    );
+    return super.getDepth(subctx, min, max);
   }
   
   public double getMinimumLeader(SequenceRenderContext ctx) {
-    double leader = 0.0;
-    for (Iterator i = renderList.iterator(); i.hasNext(); ) {
-      LabelAndRenderer lar = (LabelAndRenderer) i.next();
-      SequenceRenderContext subctx = new SequenceRenderContextForLabel(ctx, lar.getLabel());
-      leader = Math.max(lar.getRenderer().getMinimumLeader(subctx), leader);
-    }
-    return leader;
+    SequenceRenderContext subctx = new SequenceRenderContextForLabel(
+      ctx, getLabel()
+    );
+    return super.getMinimumLeader(subctx);
   }
   
   public double getMinimumTrailer(SequenceRenderContext ctx) {
-    double trailer = 0.0;
-    for (Iterator i = renderList.iterator(); i.hasNext(); ) {
-      LabelAndRenderer lar = (LabelAndRenderer) i.next();
-      SequenceRenderContext subctx = new SequenceRenderContextForLabel(ctx, lar.getLabel());
-      trailer = Math.max(lar.getRenderer().getMinimumTrailer(subctx), trailer);
-    }
-    return trailer;
+    SequenceRenderContext subctx = new SequenceRenderContextForLabel(
+      ctx, getLabel()
+    );
+    return super.getMinimumTrailer(subctx);
   }
   
   public void paint(
@@ -83,106 +92,65 @@ implements SequenceRenderer {
         int min,
         int max
   ) {
-    double offset = 0.0;
-    
-    for (Iterator i = renderList.iterator(); i.hasNext(); ) {
-      LabelAndRenderer lar = (LabelAndRenderer) i.next();
-      SequenceRenderContext subctx = new SequenceRenderContextForLabel(
-      ctx, lar.getLabel()
+    SequenceRenderContext subctx = new SequenceRenderContextForLabel(
+      ctx, getLabel()
     );
+    super.paint(g, subctx, min, max);
+  }
+
+  private class SequenceRenderContextForLabel implements SequenceRenderContext {
+    private SequenceRenderContext parent;
+    private Object label;
     
-    double depth = lar.getRenderer().getDepth(subctx, min, max);
-      int dir = ctx.getDirection();
-      if (dir == ctx.HORIZONTAL) {
-        g.translate(0.0, offset);
-      } else {
-        g.translate(offset, 0.0);
-      }
-      
-      lar.getRenderer().paint(g, subctx, min, max);
-      
-      if (dir == ctx.HORIZONTAL) {
-        g.translate(0.0, -offset);
-      } else {
-        g.translate(-offset, 0.0);
-      }
-      
-      offset += depth;
-      }
-    }
-    
-    private class SequenceRenderContextForLabel implements SequenceRenderContext {
-      private SequenceRenderContext parent;
-      private Object label;
-      
-      private SequenceRenderContextForLabel(
+    private SequenceRenderContextForLabel(
             SequenceRenderContext parent,
             Object label
-      ) {
-        this.parent = parent;
-        this.label = label;
-      }
-      
-      public int getDirection() {
-        return parent.getDirection();
-      }
-      
-      public double getScale() {
-        return parent.getScale();
-      }
-      
-      public double sequenceToGraphics(int i) {
-        return parent.sequenceToGraphics(i);
-      }
-      
-      public int graphicsToSequence(double d) {
-        return parent.graphicsToSequence(d);
-      }
-      
-      public SymbolList getSequence() {
-        SymbolList sl = null;
-        SymbolList pseq = parent.getSequence();
-        if (pseq instanceof Alignment) {
-          Alignment aseq = (Alignment) parent.getSequence();
-          sl = aseq.symbolListForLabel(label);
-        }
-        
-        if(sl == null) {
-          sl = SymbolList.EMPTY_LIST;
-        }
-        
-        return sl;
-      }
-      
-      public SequenceRenderContext.Border getLeadingBorder() {
-        return parent.getLeadingBorder();
-      }
-      
-      public SequenceRenderContext.Border getTrailingBorder() {
-        return parent.getTrailingBorder();
-      }
-      
-      public Font getFont() {
-        return parent.getFont();
-      }
+    ) {
+      this.parent = parent;
+      this.label = label;
     }
     
-  
-  private static class LabelAndRenderer {
-    private Object label;
-    private SequenceRenderer renderer;
-    
-    private LabelAndRenderer(SequenceRenderer sr, Object l) {
-      this.label = l;
-      this.renderer = sr;
+    public int getDirection() {
+      return parent.getDirection();
     }
     
-    public Object getLabel() {
-      return label;
+    public double getScale() {
+      return parent.getScale();
     }
     
-    public SequenceRenderer getRenderer() {
-      return renderer;
+    public double sequenceToGraphics(int i) {
+      return parent.sequenceToGraphics(i);
+    }
+    
+    public int graphicsToSequence(double d) {
+      return parent.graphicsToSequence(d);
+    }
+    
+    public SymbolList getSequence() {
+      SymbolList sl = null;
+      SymbolList pseq = parent.getSequence();
+      if (pseq instanceof Alignment) {
+        Alignment aseq = (Alignment) parent.getSequence();
+        sl = aseq.symbolListForLabel(label);
+      }
+      
+      if(sl == null) {
+        sl = SymbolList.EMPTY_LIST;
+      }
+      
+      return sl;
+    }
+    
+    public SequenceRenderContext.Border getLeadingBorder() {
+      return parent.getLeadingBorder();
+    }
+    
+    public SequenceRenderContext.Border getTrailingBorder() {
+      return parent.getTrailingBorder();
+    }
+    
+    public Font getFont() {
+      return parent.getFont();
     }
   }
 }

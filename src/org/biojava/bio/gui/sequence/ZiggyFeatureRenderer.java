@@ -43,7 +43,8 @@ import java.util.List;
  *
  * @author Matthew Pocock
  */
-public class ZiggyFeatureRenderer extends AbstractForwarder
+public class ZiggyFeatureRenderer
+extends AbstractChangeable
 implements FeatureRenderer, java.io.Serializable {
   private Paint outline = Color.black;
   private Paint fill = Color.yellow;

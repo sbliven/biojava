@@ -43,34 +43,13 @@ public interface SequenceRenderContext extends SwingConstants {
     "org.biojava.bio.gui.sequence.SequenceRenderContext",
     "REPAINT"
   );
-
+  
   public static final ChangeType LAYOUT = new ChangeType(
     "Something that affects layout has changed",
     "org.biojava.bio.gui.sequence.SequenceRenderContext",
-    "LAYOUT"
+    "LAYOUT",
+    REPAINT
   );
-  
-  public static class RepaintForwarder extends ChangeForwarder {
-    public RepaintForwarder(Object source, ChangeSupport cs) {
-      super(source, cs);
-    }
-    
-    protected ChangeEvent generateEvent(ChangeEvent ce) {
-      ChangeEvent ce2 = new ChangeEvent(getSource(), REPAINT, null, null, ce);
-      return ce2;
-    }
-  }
-  
-  public static class LayoutForwarder extends ChangeForwarder {
-    public LayoutForwarder(Object source, ChangeSupport cs) {
-      super(source, cs);
-    }
-    
-    protected ChangeEvent generateEvent(ChangeEvent ce) {
-      ChangeEvent ce2 = new ChangeEvent(getSource(), LAYOUT, null, null, ce);
-      return ce2;
-    }
-  }
   
   /**
    *  Gets the direction in which this context expects sequences to be rendered

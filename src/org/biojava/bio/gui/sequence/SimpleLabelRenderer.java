@@ -35,12 +35,13 @@ import org.biojava.bio.gui.*;
 import java.util.List;
 
 public class SimpleLabelRenderer
-extends AbstractForwarder
+extends AbstractChangeable
 implements LabelRenderer{
   private static final ChangeType LABEL = new ChangeType(
     "The label has changed",
     "org.biojava.bio.gui.sequence.SimpleLabelRenderer",
-    "LABEL"
+    "LABEL",
+    SequenceRenderContext.LAYOUT
   );
   
   private static final AffineTransform FLIP =
@@ -75,7 +76,7 @@ implements LabelRenderer{
   public void setLabel(String label)
   throws ChangeVetoException {
     if(hasListeners()) {
-      ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
+      ChangeSupport cs = getChangeSupport(LABEL);
       synchronized(cs) {
         ChangeEvent ce = new ChangeEvent(
           this, SequenceRenderContext.LAYOUT, null, null, new ChangeEvent(

@@ -32,152 +32,105 @@ import org.biojava.bio.gui.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
-public class LayeredRenderer
-extends AbstractForwarder
-implements SequenceRenderer {
-  public static final ChangeType RENDERER = new ChangeType(
-    "The renderer has changed.",
-    "org.biojava.bio.gui.sequence.LayeredRenderer",
-    "RENDERER"
-  );
+public class LayeredRenderer {
+  public static final LayeredRenderer INSTANCE = new LayeredRenderer();
   
-  private SequenceRenderer lineRenderer;
-
-  public LayeredRenderer() {
-  }
-  
-  public LayeredRenderer(SequenceRenderer lineRenderer) {
-    try {
-      setLineRenderer(lineRenderer);
-    } catch (ChangeVetoException cve) {
-      throw new BioError(cve, "Assertion Failure: Should have no listeners");
-    }
-  }
-  
-  public void setLineRenderer(SequenceRenderer lineRenderer)
-  throws ChangeVetoException {
-    if(hasListeners()) {
-      ChangeSupport cs = getChangeSupport(RENDERER);
-      synchronized(cs) {
-        ChangeEvent ce = new ChangeEvent(
-          this, SequenceRenderContext.LAYOUT,
-          null, null, new ChangeEvent(
-            this, RENDERER, lineRenderer, this.lineRenderer
-          )
-        );
-        cs.firePreChangeEvent(ce);
-        this.lineRenderer = lineRenderer;
-        cs.firePostChangeEvent(ce);
-      }
-    } else {
-      this.lineRenderer = lineRenderer;
-    }
-  }
-  
-  public SequenceRenderer getLineRenderer() {
-    return this.lineRenderer;
-  }
-  
-  public double getDepth(SequenceRenderContext src, int min, int max) {
-    double depth = 0.0;
-    List layers = layer((Sequence) src.getSequence());
-
-    for(Iterator i = layers.iterator(); i.hasNext(); ) {
-      FeatureHolder layer = (FeatureHolder) i.next();
-      SequenceRenderContext subsrc = new SubSequenceRenderContext(
-        src,
-        layer
+  public double getDepth(
+    List srcL,
+    int min, int max,
+    List renderers
+  ) {
+    if(srcL.size() != renderers.size()) {
+      throw new IllegalArgumentException(
+        "srcL and renderers must be the same size: " +
+        srcL.size() + ":" + renderers.size()
       );
-      depth += getLineRenderer().getDepth(subsrc, min, max);
     }
-    
+    double depth = 0.0;
+    Iterator srcI = srcL.iterator();
+    Iterator i = renderers.iterator();
+    while(srcI.hasNext() && i.hasNext()) {
+      SequenceRenderContext src = (SequenceRenderContext) srcI.next();
+      SequenceRenderer sRend = (SequenceRenderer) i.next();
+      depth += sRend.getDepth(src, min, max);
+    }
     return depth;
   }
   
-  public double getMinimumLeader(SequenceRenderContext src) {
-    return getLineRenderer().getMinimumLeader(src);
+  public double getMinimumLeader(List srcL, List renderers) {
+    if(srcL.size() != renderers.size()) {
+      throw new IllegalArgumentException(
+        "srcL and renderers must be the same size: " +
+        srcL.size() + ":" + renderers.size()
+      );
+    }
+    double max = 0.0;
+    Iterator srcI = srcL.iterator();
+    Iterator i = renderers.iterator();
+    while(srcI.hasNext() && i.hasNext()) {
+      SequenceRenderContext src = (SequenceRenderContext) srcI.next();
+      SequenceRenderer sRend = (SequenceRenderer) i.next();
+      max = Math.max(max, sRend.getMinimumLeader(src));
+    }
+    return max;
   }
   
-  public double getMinimumTrailer(SequenceRenderContext src) {
-    return getLineRenderer().getMinimumTrailer(src);
+  public double getMinimumTrailer(List srcL, List renderers) {
+    if(srcL.size() != renderers.size()) {
+      throw new IllegalArgumentException(
+        "srcL and renderers must be the same size: " +
+        srcL.size() + ":" + renderers.size()
+      );
+    }
+    double max = 0.0;
+    Iterator srcI = srcL.iterator();
+    Iterator i = renderers.iterator();
+    while(srcI.hasNext() && i.hasNext()) {
+      SequenceRenderContext src = (SequenceRenderContext) srcI.next();
+      SequenceRenderer sRend = (SequenceRenderer) i.next();
+      max = Math.max(max, sRend.getMinimumTrailer(src));
+    }
+    return max;
   }
   
   public void paint(
     Graphics2D g,
-    SequenceRenderContext src,
-    int min, int max
+    List srcL,
+    int min, int max,
+    List renderers
   ) {
-    List layers = layer((Sequence) src.getSequence());
-    SequenceRenderer sr = getLineRenderer();
-    double offset = 0.0;
-    double depth = sr.getDepth(src, min, max);
-    
-    for(Iterator i = layers.iterator(); i.hasNext(); ) {
-      FeatureHolder layer = (FeatureHolder) i.next();
-      
-      SequenceRenderContext subsrc = new SubSequenceRenderContext(
-        src,
-        layer
+    if(srcL.size() != renderers.size()) {
+      throw new IllegalArgumentException(
+        "srcL and renderers must be the same size: " +
+        srcL.size() + ":" + renderers.size()
       );
-      
+    }
+
+    double offset = 0.0;
+    
+    Iterator srcI = srcL.iterator();
+    Iterator i = renderers.iterator();
+    while(srcI.hasNext() && i.hasNext()) {
+      SequenceRenderContext src = (SequenceRenderContext) srcI.next();
+      SequenceRenderer sRend = (SequenceRenderer) i.next();
       int dir = src.getDirection();
+      
       if(dir == src.HORIZONTAL) {
         g.translate(0.0, offset);
       } else {
         g.translate(offset, 0.0);
       }
       
-      sr.paint(g, subsrc, min, max);
-      
+      sRend.paint(g, src, min, max);
+
       if(dir == src.HORIZONTAL) {
         g.translate(0.0, -offset);
       } else {
         g.translate(-offset, 0.0);
       }
       
-      offset += depth;
+      offset += sRend.getDepth(src, min, max);
     }
-  }
-  
-  protected List layer(Sequence seq) {
-    List layers = new ArrayList();
-    List layerLocs = new ArrayList();
-    
-    for(Iterator fi = seq.features(); fi.hasNext(); ) {
-      Feature f = (Feature) fi.next();
-      Location fLoc = f.getLocation();
-      if(!fLoc.isContiguous()) {
-        fLoc = new RangeLocation(fLoc.getMin(), fLoc.getMax());
-      }
-      Iterator li = layerLocs.iterator();
-      Iterator fhI = layers.iterator();
-      SimpleFeatureHolder fhLayer = null;
-      List listLayer = null;
-    LAYER:
-      while(li.hasNext()) {
-        List l = (List) li.next();
-        SimpleFeatureHolder fh = (SimpleFeatureHolder) fhI.next();
-        for(Iterator locI = l.iterator(); locI.hasNext(); ) {
-          Location loc = (Location) locI.next();
-          if(loc.overlaps(fLoc)) {
-            continue LAYER;
-          }
-        }
-        listLayer = l;
-        fhLayer = fh;
-        break;
-      }
-      if(listLayer == null) {
-        layerLocs.add(listLayer = new ArrayList());
-        layers.add(fhLayer = new SimpleFeatureHolder());
-      }
-      listLayer.add(fLoc);
-      try {
-        fhLayer.addFeature(f);
-      } catch (ChangeVetoException cve) {
-        throw new BioError(cve, "Pants");
-      }
-    }
-    return layers;
   }
 }
+
