@@ -69,7 +69,7 @@ public class PhredSequence extends SimpleSequence implements Qualitative{
    */
   public SymbolList getQuality(){
     SimpleSymbolList qual = new SimpleSymbolList(IntegerAlphabet.getSubAlphabet(0,99));
-    for(int i = 1; i < this.length(); i++){
+    for(int i = 1; i < this.length() + 1; i++){
       try{
         qual.addSymbol(PhredTools.integerSymbolFromPhred(this.symbolAt(i)));
       }catch(IllegalSymbolException ise){
@@ -87,7 +87,7 @@ public class PhredSequence extends SimpleSequence implements Qualitative{
    */
   public SymbolList getDNA(){
     SimpleSymbolList dna = new SimpleSymbolList(DNATools.getDNA());
-    for(int i = 1; i < this.length(); i++){
+    for(int i = 1; i < this.length() + 1; i++){
       try{
         dna.addSymbol(PhredTools.dnaSymbolFromPhred(this.symbolAt(i)));
       }catch(ChangeVetoException cve){
