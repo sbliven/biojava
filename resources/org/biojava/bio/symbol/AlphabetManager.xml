@@ -1,28 +1,16 @@
 <?xml version="1.0"?>
 
-
+<!--
 
 <!DOCTYPE alphabetManager [
-
   <!ELEMENT alphabetManager (symbol|alphabet)*>
-
-
-
   <!ELEMENT symbol (short, long?, description?)>
-
   <!ATTLIST symbol
-
     name	ID	#IMPLIED>
 
-
-
   <!ELEMENT short (#PCDATA)>
-
   <!ELEMENT long (#PCDATA)>
-
   <!ELEMENT description (#PCDATA)>
-
-
 
   <!ELEMENT ambiguity (symbol, symbolref*)>
 
@@ -31,699 +19,566 @@
   <!ELEMENT alphabet (description?, (symbol|symbolref)*, ambiguity*)>
 
   <!ATTLIST alphabet
-
     name ID #IMPLIED
-
     parent IDREF #IMPLIED>
 
 
 
   <!ELEMENT name (#PCDATA)>
-
   <!ELEMENT symbolref EMPTY>
-
   <!ATTLIST symbolref
-
     name	IDREF	#REQUIRED>
 
 ]>
 
-
+-->
 
 <alphabetManager>
-
   <symbol name="adenine">
-
-    <short>a</short>
-
-    <long>adenine</long>
-
     <description>pairs with T in DNA, and U in RNA</description>
-
   </symbol>
 
   <symbol name="guanine">
-
-    <short>g</short>
-
-    <long>guanine</long>
-
     <description>pairs with C</description>
-
   </symbol>
 
   <symbol name="cytosine">
-
-    <short>c</short>
-
-    <long>cytosine</long>
-
     <description>pairs with G</description>
-
   </symbol>
 
   <symbol name="thymine">
-
-    <short>t</short>
-
-    <long>thymine</long>
-
     <description>pairs with A</description>
-
   </symbol>
 
   <symbol name="uracil">
-
-    <short>u</short>
-
-    <long>uracyl</long>
-
     <description>pairs with A, replacing T in RNA</description>
-
   </symbol>
 
 
 
   <alphabet name="DNA">
-
     <description>Deoxy-Ribose Nucleic Acid. The stuff of life.</description>
-
     <symbolref name="adenine"/>
-
     <symbolref name="guanine"/>
-
     <symbolref name="cytosine"/>
-
     <symbolref name="thymine"/>
-
-    <ambiguity>
-
-      <symbol>
-
-        <short>r</short>
-
-        <long>ag</long>
-
-      </symbol>
-
-      <symbolref name="adenine"/>
-
-      <symbolref name="guanine"/>
-
-    </ambiguity>
-
-    <ambiguity>
-
-      <symbol>
-
-        <short>y</short>
-
-        <long>ct</long>
-
-      </symbol>
-
-      <symbolref name="cytosine"/>
-
-      <symbolref name="thymine"/>
-
-    </ambiguity>
-
-    <ambiguity>
-
-      <symbol>
-
-        <short>m</short>
-
-        <long>ac</long>
-
-      </symbol>
-
-      <symbolref name="adenine"/>
-
-      <symbolref name="cytosine"/>
-
-    </ambiguity>
-
-    <ambiguity>
-
-      <symbol>
-
-        <short>k</short>
-
-        <long>GT</long>
-
-      </symbol>
-
-      <symbolref name="guanine"/>
-
-      <symbolref name="thymine"/>
-
-    </ambiguity>
-
-    <ambiguity>
-
-      <symbol>
-
-        <short>s</short>
-
-        <long>gc</long>
-
-      </symbol>
-
-      <symbolref name="guanine"/>
-
-      <symbolref name="cytosine"/>
-
-    </ambiguity>
-
-    <ambiguity>
-
-      <symbol>
-
-        <short>w</short>
-
-        <long>at</long>
-
-      </symbol>
-
-      <symbolref name="adenine"/>
-
-      <symbolref name="thymine"/>
-
-    </ambiguity>
-
-    <ambiguity>
-
-      <symbol>
-
-        <short>h</short>
-
-        <long>act</long>
-
-      </symbol>
-
-      <symbolref name="adenine"/>
-
-      <symbolref name="cytosine"/>
-
-      <symbolref name="thymine"/>
-
-    </ambiguity>
-
-    <ambiguity>
-
-      <symbol>
-
-        <short>b</short>
-
-        <long>gtc</long>
-
-      </symbol>
-
-      <symbolref name="guanine"/>
-
-      <symbolref name="cytosine"/>
-
-      <symbolref name="thymine"/>
-
-    </ambiguity>
-
-    <ambiguity>
-
-      <symbol>
-
-        <short>v</short>
-
-        <long>gac</long>
-
-      </symbol>
-
-      <symbolref name="guanine"/>
-
-      <symbolref name="adenine"/>
-
-      <symbolref name="cytosine"/>
-
-    </ambiguity>
-
-    <ambiguity>
-
-      <symbol>
-
-        <short>d</short>
-
-        <long>gat</long>
-
-      </symbol>
-
-      <symbolref name="guanine"/>
-
-      <symbolref name="adenine"/>
-
-      <symbolref name="thymine"/>
-
-    </ambiguity>
-
-    <ambiguity>
-
-      <symbol>
-
-        <short>n</short>
-
-        <long>agct</long>
-
-      </symbol>
-
-      <symbolref name="guanine"/>
-
-      <symbolref name="adenine"/>
-
-      <symbolref name="cytosine"/>
-
-      <symbolref name="thymine"/>
-
-    </ambiguity>
-
+    
+    <characterTokenization name="token" caseSensitive="false">
+      <atomicMapping char="a">
+        <symbolref name="adenine"/>
+      </atomicMapping>
+
+      <atomicMapping char="g">
+        <symbolref name="guanine"/>
+      </atomicMapping>
+
+      <atomicMapping char="c">
+        <symbolref name="cytosine"/>
+      </atomicMapping>
+
+      <atomicMapping char="t">
+        <symbolref name="thymine"/>
+      </atomicMapping>
+
+      <ambiguityMapping char="r">
+        <symbolref name="adenine" />
+	<symbolref name="guanine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping char="y">
+        <symbolref name="cytosine" />
+	<symbolref name="thymine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping char="m">
+        <symbolref name="cytosine" />
+	<symbolref name="adenine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping char="k">
+        <symbolref name="cytosine" />
+	<symbolref name="adenine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping char="s">
+        <symbolref name="guanine" />
+	<symbolref name="cytosine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping char="w">
+        <symbolref name="adenine" />
+	<symbolref name="thymine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping char="h">
+        <symbolref name="adenine" />
+	<symbolref name="cytosine" />
+	<symbolref name="thymine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping char="b">
+        <symbolref name="guanine" />
+	<symbolref name="cytosine" />
+	<symbolref name="thymine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping char="v">
+        <symbolref name="guanine" />
+	<symbolref name="adenine" />
+	<symbolref name="cytosine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping char="d">
+        <symbolref name="guanine" />
+	<symbolref name="adenine" />
+	<symbolref name="thymine" />
+      </ambiguityMapping>
+    
+      <ambiguityMapping char="n">
+        <symbolref name="guanine" />
+	<symbolref name="adenine" />
+	<symbolref name="cytosine" />
+	<symbolref name="thymine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping char="-">
+        <!-- Gap is the empty set -->
+      </ambiguityMapping>
+    </characterTokenization>
   </alphabet>
 
 
 
   <alphabet name="RNA">
-
     <description>Ribose Nucleic Acid. Intermediate between genomic DNA and protein.</description>
-
-    <symbolref name="adenine"/>
-
+    <symbolref name="adenine"/>	
     <symbolref name="guanine"/>
-
     <symbolref name="cytosine"/>
-
     <symbolref name="uracil"/>
 
+    <characterTokenization name="token" caseSensitive="false">
+      <atomicMapping char="a">
+        <symbolref name="adenine"/>
+      </atomicMapping>
+
+      <atomicMapping char="g">
+        <symbolref name="guanine"/>
+      </atomicMapping>
+
+      <atomicMapping char="c">
+        <symbolref name="cytosine"/>
+      </atomicMapping>
+
+      <atomicMapping char="u">
+        <symbolref name="uracil"/>
+      </atomicMapping>
+
+      <ambiguityMapping char="-">
+        <!-- Gap is the empty set -->
+      </ambiguityMapping>
+    </characterTokenization>
   </alphabet>
 
+
   <alphabet name="PROTEIN">
-
     <description>Unmodified Amino-acids commonly found in proteins</description>
-
-    <symbol name="A">
-
-      <short>A</short>
-
-      <long>ALA</long>
-
+    <symbol name="ALA">
     </symbol>
 
-
-
-    <symbol name="R">
-
-      <short>R</short>
-
-      <long>ARG</long>
-
+    <symbol name="ARG">
     </symbol>
 
-
-
-    <symbol name="N">
-
-      <short>N</short>
-
-      <long>ASN</long>
-
+    <symbol name="ASN">
     </symbol>
 
-
-
-    <symbol name="D">
-
-      <short>D</short>
-
-      <long>ASP</long>
-
+    <symbol name="ASP">
     </symbol>
 
-
-
-    <symbol name="C">
-
-      <short>C</short>
-
-      <long>CYS</long>
-
+    <symbol name="CYS">
     </symbol>
 
-
-
-    <symbol name="Q">
-
-      <short>Q</short>
-
-      <long>GLN</long>
-
+    <symbol name="GLN">
     </symbol>
 
-
-
-    <symbol name="E">
-
-      <short>E</short>
-
-      <long>GLU</long>
-
+    <symbol name="GLU">
     </symbol>
 
-
-
-    <symbol name="G">
-
-      <short>G</short>
-
-      <long>GLY</long>
-
+    <symbol name="GLY">
     </symbol>
 
-
-
-    <symbol name="H">
-
-      <short>H</short>
-
-      <long>HIS</long>
-
+    <symbol name="HIS">
     </symbol>
 
-
-
-    <symbol name="I">
-
-      <short>I</short>
-
-      <long>ILE</long>
-
+    <symbol name="ILE">
     </symbol>
 
-
-
-    <symbol name="L">
-
-      <short>L</short>
-
-      <long>LEU</long>
-
+    <symbol name="LEU">
     </symbol>
 
-
-
-    <symbol name="K">
-
-      <short>K</short>
-
-      <long>LYS</long>
-
+    <symbol name="LYS">
     </symbol>
 
-
-
-    <symbol name="M">
-
-      <short>M</short>
-
-      <long>MET</long>
-
+    <symbol name="MET">
     </symbol>
 
-
-
-    <symbol name="F">
-
-      <short>F</short>
-
-      <long>PHE</long>
-
+    <symbol name="PHE">
     </symbol>
 
-
-
-    <symbol name="P">
-
-      <short>P</short>
-
-      <long>PRO</long>
-
+    <symbol name="PRO">
     </symbol>
 
-
-
-    <symbol name="S">
-
-      <short>S</short>
-
-      <long>SER</long>
-
+    <symbol name="SER">
     </symbol>
 
-
-
-    <symbol name="T">
-
-      <short>T</short>
-
-      <long>THR</long>
-
+    <symbol name="THR">
     </symbol>
 
-
-
-    <symbol name="U">
-
-      <short>U</short>
-
-      <long>SEC</long>
-
+    <symbol name="SEC">
     </symbol>
 
-
-
-    <symbol name="W">
-
-      <short>W</short>
-
-      <long>TRP</long>
-
+    <symbol name="TRP">
     </symbol>
 
-
-
-    <symbol name="Y">
-
-      <short>Y</short>
-
-      <long>TYR</long>
-
+    <symbol name="TYR">
     </symbol>
 
-
-
-    <symbol name="V">
-
-      <short>V</short>
-
-      <long>VAL</long>
-
+    <symbol name="VAL">
     </symbol>
 
+    <characterTokenization name="token" caseSensitive="false">
+      <atomicMapping char="A">
+        <symbolref name="ALA" />
+      </atomicMapping>
 
+      <atomicMapping char="R">
+        <symbolref name="ARG" />
+      </atomicMapping>
 
-    <ambiguity>
+      <atomicMapping char="N">
+        <symbolref name="ASN" />
+      </atomicMapping>
 
-      <symbol>
+      <atomicMapping char="D">
+        <symbolref name="ASP" />
+      </atomicMapping>
 
-        <short>X</short>
+      <atomicMapping char="C">
+        <symbolref name="CYS" />
+      </atomicMapping>
 
-        <long>UNK</long>
+      <atomicMapping char="Q">
+        <symbolref name="GLN" />
+      </atomicMapping>
 
-      </symbol>
+      <atomicMapping char="E">
+        <symbolref name="GLU" />
+      </atomicMapping>
 
-      <symbolref name="A"/>
+      <atomicMapping char="G">
+        <symbolref name="GLY" />
+      </atomicMapping>
+      
+      <atomicMapping char="H">
+        <symbolref name="HIS" />
+      </atomicMapping>
 
-      <symbolref name="R"/>
+      <atomicMapping char="I">
+        <symbolref name="ILE" />
+      </atomicMapping>
 
-      <symbolref name="N"/>
+      <atomicMapping char="L">
+        <symbolref name="LEU" />
+      </atomicMapping>
 
-      <symbolref name="D"/>
+      <atomicMapping char="K">
+        <symbolref name="LYS" />
+      </atomicMapping>
 
-      <symbolref name="C"/>
+      <atomicMapping char="M">
+        <symbolref name="MET" />
+      </atomicMapping>
 
-      <symbolref name="Q"/>
+      <atomicMapping char="F">
+        <symbolref name="PHE" />
+      </atomicMapping>
 
-      <symbolref name="E"/>
+      <atomicMapping char="P">
+        <symbolref name="PRO" />
+      </atomicMapping>
 
-      <symbolref name="G"/>
+      <atomicMapping char="S">
+        <symbolref name="SER" />
+      </atomicMapping>
 
-      <symbolref name="H"/>
+      <atomicMapping char="T">
+        <symbolref name="THR" />
+      </atomicMapping>
 
-      <symbolref name="I"/>
+      <atomicMapping char="U">
+        <symbolref name="SEC" />
+      </atomicMapping>
 
-      <symbolref name="L"/>
+      <atomicMapping char="W">
+        <symbolref name="TRP" />
+      </atomicMapping>
 
-      <symbolref name="K"/>
+      <atomicMapping char="Y">
+        <symbolref name="TYR" />
+      </atomicMapping>
 
-      <symbolref name="M"/>
+      <atomicMapping char="V">
+        <symbolref name="VAL" />
+      </atomicMapping>
 
-      <symbolref name="F"/>
+      <ambiguityMapping char="X">
+        <symbolref name="ALA"/>
+        <symbolref name="ARG"/>
+        <symbolref name="ASN"/>
+        <symbolref name="ASP"/>
+        <symbolref name="CYS"/>
+        <symbolref name="GLN"/>
+        <symbolref name="GLU"/>
+        <symbolref name="GLY"/>
+        <symbolref name="HIS"/>
+        <symbolref name="ILE"/>
+        <symbolref name="LEU"/>
+        <symbolref name="LYS"/>
+        <symbolref name="MET"/>
+        <symbolref name="PHE"/>
+        <symbolref name="PRO"/>
+        <symbolref name="SER"/>
+        <symbolref name="THR"/>
+        <symbolref name="SEC"/>
+        <symbolref name="TRP"/>
+        <symbolref name="TYR"/>
+        <symbolref name="VAL"/>
+      </ambiguityMapping>
 
-      <symbolref name="P"/>
+      <ambiguityMapping char="B">
+        <symbolref name="ASP" />
+	<symbolref name="ASN" />
+      </ambiguityMapping>
 
-      <symbolref name="S"/>
+      <ambiguityMapping char="Z">
+        <symbolref name="GLU" />
+	<symbolref name="GLN" />
+      </ambiguityMapping>
 
-      <symbolref name="T"/>
-
-      <symbolref name="U"/>
-
-      <symbolref name="W"/>
-
-      <symbolref name="Y"/>
-
-      <symbolref name="V"/>
-
-    </ambiguity>
-
-    <ambiguity>
-
-      <symbol>
-
-        <short>B</short>
-
-        <long>ASX</long>
-
-      </symbol>
-
-      <symbolref name="D"/>
-
-      <symbolref name="N"/>
-
-    </ambiguity>
-
-    <ambiguity>
-
-      <symbol>
-
-        <short>Z</short>
-
-        <long>GLZ</long>
-
-      </symbol>
-
-      <symbolref name="E"/>
-
-      <symbolref name="Q"/>
-
-    </ambiguity>
-
+      <ambiguityMapping char="-">
+      </ambiguityMapping>
+    </characterTokenization>
   </alphabet>
 
   <alphabet name="TERM" parent="PROTEIN">
-
-    <symbol name="termination">
-
-      <short>*</short>
-
-      <long>TER</long>
-
+    <symbol name="TER">
       <description>Termination signal during translation</description>
-
     </symbol>
+
+    <!-- THOMASD we surely shouldn't need to replicated this -->
+
+    <characterTokenization name="token" caseSensitive="false">
+      <atomicMapping char="*">
+        <symbolref name="TER" />
+      </atomicMapping>
+
+      <atomicMapping char="A">
+        <symbolref name="ALA" />
+      </atomicMapping>
+
+      <atomicMapping char="R">
+        <symbolref name="ARG" />
+      </atomicMapping>
+
+      <atomicMapping char="N">
+        <symbolref name="ASN" />
+      </atomicMapping>
+
+      <atomicMapping char="D">
+        <symbolref name="ASP" />
+      </atomicMapping>
+
+      <atomicMapping char="C">
+        <symbolref name="CYS" />
+      </atomicMapping>
+
+      <atomicMapping char="Q">
+        <symbolref name="GLN" />
+      </atomicMapping>
+
+      <atomicMapping char="E">
+        <symbolref name="GLU" />
+      </atomicMapping>
+
+      <atomicMapping char="G">
+        <symbolref name="GLY" />
+      </atomicMapping>
+      
+      <atomicMapping char="H">
+        <symbolref name="HIS" />
+      </atomicMapping>
+
+      <atomicMapping char="I">
+        <symbolref name="ILE" />
+      </atomicMapping>
+
+      <atomicMapping char="L">
+        <symbolref name="LEU" />
+      </atomicMapping>
+
+      <atomicMapping char="K">
+        <symbolref name="LYS" />
+      </atomicMapping>
+
+      <atomicMapping char="M">
+        <symbolref name="MET" />
+      </atomicMapping>
+
+      <atomicMapping char="F">
+        <symbolref name="PHE" />
+      </atomicMapping>
+
+      <atomicMapping char="P">
+        <symbolref name="PRO" />
+      </atomicMapping>
+
+      <atomicMapping char="S">
+        <symbolref name="SER" />
+      </atomicMapping>
+
+      <atomicMapping char="T">
+        <symbolref name="THR" />
+      </atomicMapping>
+
+      <atomicMapping char="U">
+        <symbolref name="SEC" />
+      </atomicMapping>
+
+      <atomicMapping char="W">
+        <symbolref name="TRP" />
+      </atomicMapping>
+
+      <atomicMapping char="Y">
+        <symbolref name="TYR" />
+      </atomicMapping>
+
+      <atomicMapping char="V">
+        <symbolref name="VAL" />
+      </atomicMapping>
+
+      <ambiguityMapping char="X">
+        <symbolref name="ALA"/>
+        <symbolref name="ARG"/>
+        <symbolref name="ASN"/>
+        <symbolref name="ASP"/>
+        <symbolref name="CYS"/>
+        <symbolref name="GLN"/>
+        <symbolref name="GLU"/>
+        <symbolref name="GLY"/>
+        <symbolref name="HIS"/>
+        <symbolref name="ILE"/>
+        <symbolref name="LEU"/>
+        <symbolref name="LYS"/>
+        <symbolref name="MET"/>
+        <symbolref name="PHE"/>
+        <symbolref name="PRO"/>
+        <symbolref name="SER"/>
+        <symbolref name="THR"/>
+        <symbolref name="SEC"/>
+        <symbolref name="TRP"/>
+        <symbolref name="TYR"/>
+        <symbolref name="VAL"/>
+      </ambiguityMapping>
+
+      <ambiguityMapping char="B">
+        <symbolref name="ASP" />
+	<symbolref name="ASN" />
+      </ambiguityMapping>
+
+      <ambiguityMapping char="Z">
+        <symbolref name="GLU" />
+	<symbolref name="GLN" />
+      </ambiguityMapping>
+
+      <ambiguityMapping char="-">
+      </ambiguityMapping>
+    </characterTokenization>
 
   </alphabet>
 
   <alphabet name="STRUCTURE">
-
-    <symbol>
-
-      <short> </short>
-
-      <long>nothing</long>
-
+    <symbol name="nothing">
       <description>The structure here is undetermined</description>
-
     </symbol>
 
-    <symbol>
-
-      <short>c</short>
-
-      <long>coil</long>
-
+    <symbol name="coil">
       <description>Random coil</description>
-
     </symbol>
 
-    <symbol>
-
-      <short>h</short>
-
-      <long>alpha-helix</long>
-
+    <symbol name="alpha-helix">
       <description>part of an alpha-helix</description>
-
     </symbol>
 
-    <symbol>
-
-      <short>g</short>
-
-      <long>3(10) helix</long>
-
+    <symbol name="3(10)-helix">
     </symbol>
 
-    <symbol>
-
-      <short>i</short>
-
-      <long>Pi-helix</long>
-
+    <symbol name="Pi-helix">
     </symbol>
 
-    <symbol>
-
-      <short>e</short>
-
-      <long>sheet</long>
-
+    <symbol name="sheet">
       <description>part of an extended hydrogen bonded beta-strand (extended strand, logs of Bs)</description>
-
     </symbol>
 
-    <symbol>
-
-      <short>b</short>
-
-      <long>beta-bridge</long>
-
+    <symbol name="beta-bridge">
       <description>like a lone E</description>
-
     </symbol>
 
-    <symbol>
-
-      <short>t</short>
-
-      <long>turn</long>
-
+    <symbol name="turn">
     </symbol>
 
-    <symbol>
-
-      <short>s</short>
-
-      <long>bend</long>
-
+    <symbol name="bend">
       <description>five-residue bend centred at residue i</description>
-
     </symbol>
 
+    <characterTokenization name="token" caseSensitive="false">
+      <atomicMapping char=" ">
+        <symbolref name="nothing" />
+      </atomicMapping>
+
+      <atomicMapping char="c">
+        <symbolref name="coil" />
+      </atomicMapping>
+
+      <atomicMapping char="h">
+        <symbolref name="alpha-helix" />
+      </atomicMapping>
+
+      <atomicMapping char="g">
+        <symbolref name="3(10)-helix" />
+      </atomicMapping>
+
+      <atomicMapping char="i">
+        <symbolref name="Pi-helix" />
+      </atomicMapping>
+
+      <atomicMapping char="e">
+        <symbolref name="sheet" />
+      </atomicMapping>
+
+      <atomicMapping char="b">
+        <symbolref name="beta-bridge" />
+      </atomicMapping>
+
+      <atomicMapping char="t">
+        <symbolref name="turn" />
+      </atomicMapping>
+
+      <atomicMapping char="s">
+        <symbolref name="bend" />
+      </atomicMapping>
+
+      <ambiguityMapping char="-">
+      </ambiguityMapping>
+    </characterTokenization>
   </alphabet>
 
 </alphabetManager>
