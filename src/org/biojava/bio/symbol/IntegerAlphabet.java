@@ -78,10 +78,10 @@ public class IntegerAlphabet
    */
   public static FiniteAlphabet getSubAlphabet(int min, int max)throws IllegalArgumentException{
     String name = "SubIntegerAlphabet["+min+".."+max+"]";
-    if(AlphabetManager.alphabetForName(name) == null){
-      FiniteAlphabet a = new SubIntegerAlphabet(min, max);
-      AlphabetManager.registerAlphabet(a.getName(),a);
-    }
+
+    FiniteAlphabet a = new SubIntegerAlphabet(min, max);
+    AlphabetManager.registerAlphabet(a.getName(),a);
+
     return (FiniteAlphabet)(AlphabetManager.alphabetForName(name));
   }
 
@@ -260,7 +260,7 @@ public class IntegerAlphabet
      * Construct a contiguous sub alphabet with the integers from min to max inclusive.
      */
     SubIntegerAlphabet(int min, int max) throws IllegalArgumentException{
-      if(max > min) throw new IllegalArgumentException("min must be less than max: "+min+" : "+max);
+      if(max < min) throw new IllegalArgumentException("min must be less than max: "+min+" : "+max);
       this.min = min;
       this.max = max;
 
