@@ -178,7 +178,8 @@ public class SequencePanel extends JComponent implements SwingConstants {
     }
     
     Graphics2D g2 = (Graphics2D) g;
-
+    System.out.println("Transform: " + g2.getTransform());
+    
     Rectangle2D.Double boxClip = new Rectangle2D.Double();
     switch (direction) {
       case HORIZONTAL:
@@ -190,8 +191,7 @@ public class SequencePanel extends JComponent implements SwingConstants {
         boxClip.height = alongDim + leadingBorder.getSize() + trailingBorder.getSize();
         break;
     }
-    
-    g2.clip(boxClip);
+    //g2.clip(boxClip); // removed because it fucked things up.
     Rectangle2D newClip = g2.getClip().getBounds2D();
     
     int minLine = 0; 
@@ -342,7 +342,7 @@ public class SequencePanel extends JComponent implements SwingConstants {
           break;
       }
       width = (int) Math.ceil((double) width - insetBefore - insetAfter);
-      realLines = (int) Math.ceil((double) alongDim / (double) width / scale);
+      realLines = (int) Math.ceil((double) alongDim / (double) width);
       acrossDim = acrossDim * realLines + spacer * (realLines - 1);
       alongDim = Math.ceil((double) width);
       switch (direction) {
