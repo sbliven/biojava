@@ -47,7 +47,7 @@ import org.biojava.bio.symbol.Symbol;
  * some code dupication with <code>EmblFileFormer</code> which could
  * be factored out.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class GenbankFileFormer extends AbstractGenEmblFileFormer
@@ -81,28 +81,30 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
     private StringBuffer mdatb = new StringBuffer();
     private StringBuffer divb = new StringBuffer();
 
-
     private SymbolTokenization dnaTokenization;
 
     {
-	try {
-	    dnaTokenization = DNATools.getDNA().getTokenization("token");
-	} catch (BioException ex) {
-	    throw new BioError(ex, "Couldn't initialize tokenizer for the DNA alphabet");
-	}
+        try
+        {
+            dnaTokenization = DNATools.getDNA().getTokenization("token");
+        }
+        catch (BioException ex)
+        {
+            throw new BioError(ex, "Couldn't initialize tokenizer for the DNA alphabet");
+        }
     }
 
     static
     {
-	SeqFileFormerFactory.addFactory("Genbank", new GenbankFileFormer.Factory());
+        SeqFileFormerFactory.addFactory("Genbank", new GenbankFileFormer.Factory());
     }
 
     private static class Factory extends SeqFileFormerFactory
     {
-	protected SeqFileFormer make()
-	{
-	    return new GenbankFileFormer(System.out);
-	}
+        protected SeqFileFormer make()
+        {
+            return new GenbankFileFormer(System.out);
+        }
     }
 
     /**
@@ -119,20 +121,21 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
      */
     protected GenbankFileFormer(PrintStream stream)
     {
-	this.stream = stream;
+        this.stream = stream;
     }
 
     public PrintStream getPrintStream()
     {
-	return stream;
+        return stream;
     }
 
     public void setPrintStream(PrintStream stream)
     {
-	this.stream = stream;
+        this.stream = stream;
     }
 
-    public void setName(String id) throws ParseException {
+    public void setName(String id) throws ParseException
+    {
         idb = new StringBuffer("LOCUS       " + id);
     }
 
@@ -143,43 +146,44 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
     public void setURI(String uri) throws ParseException { }
 
     public void addSymbols(Alphabet  alpha,
-			   Symbol [] syms,
-			   int       start,
-			   int       length)
-	throws IllegalAlphabetException
+                           Symbol [] syms,
+                           int       start,
+                           int       length)
+        throws IllegalAlphabetException
     {
-	try {
-	    int aCount = 0;
-	    int cCount = 0;
-	    int gCount = 0;
-	    int tCount = 0;
-	    int oCount = 0;
+        try
+        {
+            int aCount = 0;
+            int cCount = 0;
+            int gCount = 0;
+            int tCount = 0;
+            int oCount = 0;
 
-	    int end = start + length - 1;
+            int end = start + length - 1;
 
-	    for (int i = start; i <= end; i++)
-		{
-		    char c = dnaTokenization.tokenizeSymbol(syms[i]).charAt(0);
+            for (int i = start; i <= end; i++)
+            {
+                char c = dnaTokenization.tokenizeSymbol(syms[i]).charAt(0);
 
-		    switch (c)
-			{
-			case 'a': case 'A':
-			    aCount++;
-			    break;
-			case 'c': case 'C':
-			    cCount++;
-			    break;
-			case 'g': case 'G':
-			    gCount++;
-			    break;
-			case 't': case 'T':
-			    tCount++;
-			    break;
+                switch (c)
+                {
+                    case 'a': case 'A':
+                        aCount++;
+                        break;
+                    case 'c': case 'C':
+                        cCount++;
+                        break;
+                    case 'g': case 'G':
+                        gCount++;
+                        break;
+                    case 't': case 'T':
+                        tCount++;
+                        break;
 
-			default:
-			    oCount++;
-			}
-		}
+                    default:
+                        oCount++;
+                }
+            }
 
             // Print out sequence properties in order
             locusLineCreator(length);
@@ -192,168 +196,86 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
             if (ocb != null) {stream.println(ocb); }
             if (ccb != null) {stream.println(ccb); }
 
-            if (ftb.length() != 0) {
+            if (ftb.length() != 0)
+            {
                 ftb.insert(0, "FEATURES             Location/Qualifiers" + nl);
                 stream.print(ftb);
             }
 
-	    sq.setLength(0);
-	    sq.append("BASE COUNT    ");
-	    sq.append(aCount + " a   ");
-	    sq.append(cCount + " c   ");
-	    sq.append(gCount + " g   ");
-	    sq.append(tCount + " t    ");
+            sq.setLength(0);
+            sq.append("BASE COUNT    ");
+            sq.append(aCount + " a   ");
+            sq.append(cCount + " c   ");
+            sq.append(gCount + " g   ");
+            sq.append(tCount + " t    ");
             sq.append(oCount + " others");
-	    sq.append(nl);
-	    sq.append("ORIGIN");
+            sq.append(nl);
+            sq.append("ORIGIN");
 
-	    // Print sequence summary header
-	    stream.println(sq);
+            // Print sequence summary header
+            stream.println(sq);
 
-	    int fullLine = length / 60;
-	    int partLine = length % 60;
+            int fullLine = length / 60;
+            int partLine = length % 60;
 
-	    int lineCount = fullLine;
-	    if (partLine > 0)
-		lineCount++;
+            int lineCount = fullLine;
+            if (partLine > 0)
+                lineCount++;
 
-	    int lineLens [] = new int [lineCount];
+            int lineLens [] = new int [lineCount];
 
-	    // All lines are 60, except last (if present)
-	    Arrays.fill(lineLens, 60);
-	    lineLens[lineCount - 1] = partLine;
+            // All lines are 60, except last (if present)
+            Arrays.fill(lineLens, 60);
 
-	    // Prepare line 80 characters wide, sequence is subset of this
-	    char [] emptyLine = new char [80];
+            if (partLine > 0)
+                lineLens[lineCount - 1] = partLine;
 
-	    for (int i = 0; i < lineLens.length; i++)
-		{
-		    // Empty the sequence buffer
-		    sq.setLength(0);
-		    // Empty the utility buffer
-		    ub.setLength(0);
+            // Prepare line 80 characters wide, sequence is subset of this
+            char [] emptyLine = new char [80];
 
-		    // How long is this chunk?
-		    int len = lineLens[i];
+            for (int i = 0; i < lineLens.length; i++)
+            {
+                // Empty the sequence buffer
+                sq.setLength(0);
+                // Empty the utility buffer
+                ub.setLength(0);
 
-		    // Prep the whitespace
-		    Arrays.fill(emptyLine, ' ');
-		    sq.append(emptyLine);
+                // How long is this chunk?
+                int len = lineLens[i];
 
-		    // Prepare a Symbol array same length as chunk
-		    Symbol [] sa = new Symbol [len];
+                // Prep the whitespace
+                Arrays.fill(emptyLine, ' ');
+                sq.append(emptyLine);
 
-		    // Get symbols and format into blocks of tokens
-		    System.arraycopy(syms, start + (i * 60), sa, 0, len);
+                // Prepare a Symbol array same length as chunk
+                Symbol [] sa = new Symbol [len];
 
-		    String blocks = (formatTokenBlock(ub, sa, 10, dnaTokenization)).toString();
+                // Get symbols and format into blocks of tokens
+                System.arraycopy(syms, start + (i * 60), sa, 0, len);
 
-		    sq.replace(10, blocks.length() + 10, blocks);
+                String blocks = (formatTokenBlock(ub, sa, 10, dnaTokenization)).toString();
 
-		    // Calculate the running residue count and add to the line
-		    String count = Integer.toString((i * 60) + 1);
-		    sq.replace((9 - count.length()), 9, count);
+                sq.replace(10, blocks.length() + 10, blocks);
 
-		    // Print formatted sequence line
-		    stream.println(sq);
-		}
+                // Calculate the running residue count and add to the line
+                String count = Integer.toString((i * 60) + 1);
+                sq.replace((9 - count.length()), 9, count);
 
-	    // Print end of entry
-	    stream.println("//");
-	} catch (IllegalSymbolException ex) {
-	    throw new IllegalAlphabetException(ex, "DNA not tokenizing");
-	}
-    }
-
-
-    private String sequenceBufferCreator(Object key, Object value) {
-        StringBuffer temp = new StringBuffer();
-
-        if (value == null) {
-            temp.append((String) key);
-        }
-        else if (value instanceof ArrayList) {
-            Iterator iter = ((ArrayList) value).iterator();
-            temp.append((String) key + " " + iter.next());
-            while (iter.hasNext()) {
-                temp.append(nl + "            " + iter.next());
+                // Print formatted sequence line
+                stream.println(sq);
             }
+
+            // Print end of entry
+            stream.println("//");
         }
-        else {
-            StringTokenizer valueToke = new StringTokenizer((String) value, " ");
-            int fullline = 80;
-            int length = 0;
-            temp.append((String) key);
-            if (valueToke.hasMoreTokens()) {
-                String token = valueToke.nextToken();
-
-                while (true) {
-                    length = (temp.length() % (fullline + 1)) + token.length() + 1;
-                    if (temp.length() % (fullline + 1) == 0) length = 81 + token.length();
-                    while (length <= fullline && valueToke.hasMoreTokens()) {
-                        temp.append(" " + token);
-                        token = valueToke.nextToken();
-                        length = (temp.length() % (fullline + 1)) + token.length() + 1;
-                        if (temp.length() % (fullline + 1) == 0) length = 81 + token.length();
-                    }
-                    if (valueToke.hasMoreTokens()) {
-                        for(int i = length-token.length(); i < fullline; i++) {
-                            temp.append(" ");
-                        }
-                        temp.append(nl + "           ");
-                    }
-                    else if (length <= fullline) {
-                        temp.append(" " + token);
-                        break;
-                    }
-                    else {
-                        temp.append(nl);
-                        temp.append("            " + token);
-                        break;
-                    }
-                }
-            }
-            else {
-                temp.append(" ");
-            }
+        catch (IllegalSymbolException ex)
+        {
+            throw new IllegalAlphabetException(ex, "DNA not tokenizing");
         }
-
-        return temp.toString();
-    }
-
-    private StringBuffer fixLength(StringBuffer temp, int length) {
-        while (temp.length() < length) {
-            temp.append(" ");
-        }
-        return temp;
-    }
-
-    private void locusLineCreator(int size) {
-        idb = fixLength(idb, 30);
-        typeb = fixLength(typeb, 8);
-
-        sizeb.insert(0, size);
-        while(sizeb.length() < 12) {sizeb.insert(0, " ");}
-        sizeb.append(" bp ");
-
-        if (strb.length() > 0) {
-            strb.append("-");
-        }
-        strb = fixLength(strb, 3);
-        circb = fixLength(circb, 9);
-        mdatb = fixLength(mdatb, 11);
-        divb = fixLength(divb, 4);
-        idb.insert(29, sizeb);
-        idb.insert(44, strb);
-        idb.insert(47, typeb);
-        idb.insert(55, circb);
-        idb.insert(64, divb);
-        idb.insert(68, mdatb);
-        idb.setLength(79);
     }
 
     public void addSequenceProperty(Object key, Object value)
-	throws ParseException
+        throws ParseException
     {
         if (key.equals("LOCUS")) {
             idb.setLength(0);
@@ -408,37 +330,37 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
             ccb = new StringBuffer(sequenceBufferCreator("COMMENT    ", value));
         }
         else if (key.equals(GenbankProcessor.PROPERTY_GENBANK_ACCESSIONS))
-	{
-	    ub.setLength(0);
-	    ub.append("ACCESSION   ");
-	    for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
-	    {
-		ub.append((String) ai.next());
-	    }
-            acb = new StringBuffer(ub.toString());
-	}
+        {
+            ub.setLength(0);
+            ub.append("ACCESSION   ");
+            for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
+            {
+                ub.append((String) ai.next());
+            }
+            acb = new StringBuffer(ub.substring(0));
+        }
     }
 
     public void startFeature(Feature.Template templ)
-	throws ParseException
+        throws ParseException
     {
-	// There are 21 spaces in the leader
-	String leader = "                     ";
-	int    strand = 0;
+        // There are 21 spaces in the leader
+        String leader = "                     ";
+        int    strand = 0;
 
-	if (templ instanceof StrandedFeature.Template)
-	    strand = ((StrandedFeature.Template) templ).strand.getValue();
+        if (templ instanceof StrandedFeature.Template)
+            strand = ((StrandedFeature.Template) templ).strand.getValue();
 
-	ub.setLength(0);
-	ub.append(leader);
+        ub.setLength(0);
+        ub.append(leader);
 
-	StringBuffer lb = formatLocationBlock(ub,
-					      templ.location,
-					      strand,
-					      leader,
-					      80);
+        StringBuffer lb = formatLocationBlock(ub,
+                                              templ.location,
+                                              strand,
+                                              leader,
+                                              80);
 
-	lb.replace(5, 5 + templ.type.length(), templ.type);
+        lb.replace(5, 5 + templ.type.length(), templ.type);
 
         ftb.append(lb + nl);
     }
@@ -446,39 +368,125 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
     public void endFeature() throws ParseException { }
 
     public void addFeatureProperty(Object key, Object value)
-	throws ParseException
+        throws ParseException
     {
-	// There are 21 spaces in the leader
-	String   leader = "                     ";
+        // There are 21 spaces in the leader
+        String   leader = "                     ";
 
-	// Don't print internal data structures
-	if (key.equals(Feature.PROPERTY_DATA_KEY))
-	    return;
+        // Don't print internal data structures
+        if (key.equals(Feature.PROPERTY_DATA_KEY))
+            return;
 
-	// The value may be a collection if several qualifiers of the
-	// same type are present in a feature
-	if (Collection.class.isInstance(value))
-	{
-	    for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
-	    {
-		qb.setLength(0);
-		ub.setLength(0);
-		StringBuffer fb = formatQualifierBlock(qb,
-						       formatQualifier(ub, key, vi.next()).toString(),
-						       leader,
-						       80);
+        // The value may be a collection if several qualifiers of the
+        // same type are present in a feature
+        if (Collection.class.isInstance(value))
+        {
+            for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
+            {
+                qb.setLength(0);
+                ub.setLength(0);
+                StringBuffer fb = formatQualifierBlock(qb,
+                                                       formatQualifier(ub, key, vi.next()).substring(0),
+                                                       leader,
+                                                       80);
                 ftb.append(fb + nl);
-	    }
-	}
-	else
-	{
+            }
+        }
+        else
+        {
             qb.setLength(0);
             ub.setLength(0);
-	    StringBuffer fb = formatQualifierBlock(qb,
-						   formatQualifier(ub, key, value).toString(),
-						   leader,
-						   80);
+            StringBuffer fb = formatQualifierBlock(qb,
+                                                   formatQualifier(ub, key, value).substring(0),
+                                                   leader,
+                                                   80);
             ftb.append(fb + nl);
-	}
+        }
+    }
+
+    private String sequenceBufferCreator(Object key, Object value) {
+        StringBuffer temp = new StringBuffer();
+
+        if (value == null) {
+            temp.append((String) key);
+        }
+        else if (value instanceof ArrayList) {
+            Iterator iter = ((ArrayList) value).iterator();
+            temp.append((String) key + " " + iter.next());
+            while (iter.hasNext()) {
+                temp.append(nl + "            " + iter.next());
+            }
+        }
+        else {
+            StringTokenizer valueToke = new StringTokenizer((String) value, " ");
+            int fullline = 80;
+            int length = 0;
+            temp.append((String) key);
+            if (valueToke.hasMoreTokens()) {
+                String token = valueToke.nextToken();
+
+                while (true) {
+                    length = (temp.length() % (fullline + 1)) + token.length() + 1;
+                    if (temp.length() % (fullline + 1) == 0) length = 81 + token.length();
+                    while (length <= fullline && valueToke.hasMoreTokens()) {
+                        temp.append(" " + token);
+                        token = valueToke.nextToken();
+                        length = (temp.length() % (fullline + 1)) + token.length() + 1;
+                        if (temp.length() % (fullline + 1) == 0) length = 81 + token.length();
+                    }
+                    if (valueToke.hasMoreTokens()) {
+                        for(int i = length-token.length(); i < fullline; i++) {
+                            temp.append(" ");
+                        }
+                        temp.append(nl + "           ");
+                    }
+                    else if (length <= fullline) {
+                        temp.append(" " + token);
+                        break;
+                    }
+                    else {
+                        temp.append(nl);
+                        temp.append("            " + token);
+                        break;
+                    }
+                }
+            }
+            else {
+                temp.append(" ");
+            }
+        }
+
+        return temp.substring(0);
+    }
+
+    private StringBuffer fixLength(StringBuffer temp, int length) {
+        while (temp.length() < length) {
+            temp.append(" ");
+        }
+        return temp;
+    }
+
+    private void locusLineCreator(int size) {
+        idb = fixLength(idb, 30);
+        typeb = fixLength(typeb, 8);
+
+        sizeb.insert(0, size);
+        while(sizeb.length() < 12) {sizeb.insert(0, " ");}
+        sizeb.append(" bp ");
+
+        if (strb.length() > 0) {
+            strb.append("-");
+        }
+        strb = fixLength(strb, 3);
+        circb = fixLength(circb, 9);
+        mdatb = fixLength(mdatb, 11);
+        divb = fixLength(divb, 4);
+        idb.insert(29, sizeb);
+        idb.insert(44, strb);
+        idb.insert(47, typeb);
+        idb.insert(55, circb);
+        idb.insert(64, divb);
+        idb.insert(68, mdatb);
+        idb.setLength(79);
     }
 }

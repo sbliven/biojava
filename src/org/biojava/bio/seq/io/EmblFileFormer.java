@@ -47,7 +47,7 @@ import org.biojava.bio.symbol.Symbol;
  * duplication with <code>GenbankFileFormer</code> which could be
  * factored out.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class EmblFileFormer extends AbstractGenEmblFileFormer
@@ -79,11 +79,14 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
     private SymbolTokenization dnaTokenization;
 
     {
-	try {
-	    dnaTokenization = DNATools.getDNA().getTokenization("token");
-	} catch (Exception ex) {
-	    throw new BioError(ex, "Couldn't initialize tokenizer for the DNA alphabet");
-	}
+        try
+        {
+            dnaTokenization = DNATools.getDNA().getTokenization("token");
+        }
+        catch (Exception ex)
+        {
+            throw new BioError(ex, "Couldn't initialize tokenizer for the DNA alphabet");
+        }
     }
 
     static
@@ -111,7 +114,7 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
      *
      * @param stream a <code>PrintStream</code>.
      */
-    private EmblFileFormer(final PrintStream stream)
+    private EmblFileFormer(PrintStream stream)
     {
         this.stream = stream;
     }
@@ -121,12 +124,13 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
         return stream;
     }
 
-    public void setPrintStream(final PrintStream stream)
+    public void setPrintStream(PrintStream stream)
     {
         this.stream = stream;
     }
 
-    public void setName(final String id) throws ParseException {
+    public void setName(String id) throws ParseException
+    {
         idb = new StringBuffer("ID   " + id);
     }
 
@@ -134,47 +138,47 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
 
     public void endSequence() throws ParseException { }
 
-    public void setURI(final String uri) throws ParseException { }
+    public void setURI(String uri) throws ParseException { }
 
-    public void addSymbols(final Alphabet  alpha,
-                           final Symbol [] syms,
-                           final int       start,
-                           final int       length)
+    public void addSymbols(Alphabet  alpha,
+                           Symbol [] syms,
+                           int       start,
+                           int       length)
         throws IllegalAlphabetException
     {
-	try {
-	    int aCount = 0;
-	    int cCount = 0;
-	    int gCount = 0;
-	    int tCount = 0;
-	    int oCount = 0;
+        try
+        {
+            int aCount = 0;
+            int cCount = 0;
+            int gCount = 0;
+            int tCount = 0;
+            int oCount = 0;
 
-	    int end = start + length - 1;
+            int end = start + length - 1;
 
+            for (int i = start; i <= end; i++)
+            {
+                char c = dnaTokenization.tokenizeSymbol(syms[i]).charAt(0);
 
-	    for (int i = start; i <= end; i++)
-		{
-		    char c = dnaTokenization.tokenizeSymbol(syms[i]).charAt(0);
+                switch (c)
+                {
+                    case 'a': case 'A':
+                        aCount++;
+                        break;
+                    case 'c': case 'C':
+                        cCount++;
+                        break;
+                    case 'g': case 'G':
+                        gCount++;
+                        break;
+                    case 't': case 'T':
+                        tCount++;
+                        break;
 
-		    switch (c)
-			{
-			case 'a': case 'A':
-			    aCount++;
-			    break;
-			case 'c': case 'C':
-			    cCount++;
-			    break;
-			case 'g': case 'G':
-			    gCount++;
-			    break;
-			case 't': case 'T':
-			    tCount++;
-			    break;
-
-			default:
-			    oCount++;
-			}
-		}
+                    default:
+                        oCount++;
+                }
+            }
 
             // My Changes are here
             if (idb != null) {stream.println(idb); stream.println("XX");}
@@ -191,73 +195,180 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
                 stream.print(ftb);
             }
 
-	    sq.setLength(0);
-	    sq.append("XX");
-	    sq.append(nl);
-	    sq.append("SQ   Sequence ");
-	    sq.append(length + " BP; ");
-	    sq.append(aCount + " A; ");
-	    sq.append(cCount + " C; ");
-	    sq.append(gCount + " G; ");
-	    sq.append(tCount + " T; ");
-	    sq.append(oCount + " other;");
+            sq.setLength(0);
+            sq.append("XX");
+            sq.append(nl);
+            sq.append("SQ   Sequence ");
+            sq.append(length + " BP; ");
+            sq.append(aCount + " A; ");
+            sq.append(cCount + " C; ");
+            sq.append(gCount + " G; ");
+            sq.append(tCount + " T; ");
+            sq.append(oCount + " other;");
 
-	    // Print sequence summary header
-	    stream.println(sq);
+            // Print sequence summary header
+            stream.println(sq);
 
-	    int fullLine = length / 60;
-	    int partLine = length % 60;
+            int fullLine = length / 60;
+            int partLine = length % 60;
 
-	    int lineCount = fullLine;
-	    if (partLine > 0)
-		lineCount++;
+            int lineCount = fullLine;
+            if (partLine > 0)
+                lineCount++;
 
-	    int lineLens [] = new int [lineCount];
+            int lineLens [] = new int [lineCount];
 
-	    // All lines are 60, except last (if present)
-	    Arrays.fill(lineLens, 60);
-	    lineLens[lineCount - 1] = partLine;
+            // All lines are 60, except last (if present)
+            Arrays.fill(lineLens, 60);
 
-	    // Prepare line 80 characters wide, sequence is subset of this
-	    char [] emptyLine = new char [80];
+            if (partLine > 0)
+                lineLens[lineCount - 1] = partLine;
 
-	    for (int i = 0; i < lineLens.length; i++)
-		{
-		    // Empty the sequence buffer
-		    sq.setLength(0);
-		    // Empty the utility buffer
-		    ub.setLength(0);
+            // Prepare line 80 characters wide, sequence is subset of this
+            char [] emptyLine = new char [80];
 
-		    // How long is this chunk?
-		    int len = lineLens[i];
+            for (int i = 0; i < lineLens.length; i++)
+            {
+                // Empty the sequence buffer
+                sq.setLength(0);
+                // Empty the utility buffer
+                ub.setLength(0);
 
-		    // Prep the whitespace
-		    Arrays.fill(emptyLine, ' ');
-		    sq.append(emptyLine);
+                // How long is this chunk?
+                int len = lineLens[i];
 
-		    // Prepare a Symbol array same length as chunk
-		    Symbol [] sa = new Symbol [len];
+                // Prep the whitespace
+                Arrays.fill(emptyLine, ' ');
+                sq.append(emptyLine);
 
-		    // Get symbols and format into blocks of tokens
-		    System.arraycopy(syms, start + (i * 60), sa, 0, len);
+                // Prepare a Symbol array same length as chunk
+                Symbol [] sa = new Symbol [len];
 
-		    String blocks = (formatTokenBlock(ub, sa, 10, dnaTokenization)).toString();
+                // Get symbols and format into blocks of tokens
+                System.arraycopy(syms, start + (i * 60), sa, 0, len);
 
-		    sq.replace(5, blocks.length() + 5, blocks);
+                String blocks = (formatTokenBlock(ub, sa, 10, dnaTokenization)).toString();
 
-		    // Calculate the running residue count and add to the line
-		    String count = Integer.toString((i * 60) + len);
-		    sq.replace((80 - count.length()), 80, count);
+                sq.replace(5, blocks.length() + 5, blocks);
 
-		    // Print formatted sequence line
-		    stream.println(sq);
-		}
+                // Calculate the running residue count and add to the line
+                String count = Integer.toString((i * 60) + len);
+                sq.replace((80 - count.length()), 80, count);
 
-	    // Print end of entry
-	    stream.println("//");
-	} catch (IllegalSymbolException ex) {
-	    throw new IllegalAlphabetException(ex, "DNA not tokenizing");
-	}
+                // Print formatted sequence line
+                stream.println(sq);
+            }
+
+            // Print end of entry
+            stream.println("//");
+        }
+        catch (IllegalSymbolException ex)
+        {
+            throw new IllegalAlphabetException(ex, "DNA not tokenizing");
+        }
+    }
+
+    public void addSequenceProperty(Object key, Object value)
+        throws ParseException
+    {
+        if (key.equals("ID")) {
+            idb.setLength(0);
+            idb.append("ID   " + (String) value);
+        }
+        else if (key.equals("DT") || key.equals("MDAT")) {
+            dtb = new StringBuffer(sequenceBufferCreator("DT", value));
+        }
+        else if (key.equals("DE") || key.equals("DEFINITION")) {
+            deb = new StringBuffer(sequenceBufferCreator("DE", value));
+        }
+        else if (key.equals("SV") || key.equals("VERSION")) {
+            svb = new StringBuffer(sequenceBufferCreator("SV", value));
+        }
+        else if (key.equals("KW") || key.equals("KEYWORDS")) {
+            kwb = new StringBuffer(sequenceBufferCreator("KW", value));
+        }
+        else if (key.equals("OS") || key.equals("SOURCE")) {
+            osb = new StringBuffer(sequenceBufferCreator("OS", value));
+        }
+        else if (key.equals("OC") || key.equals("ORGANISM")) {
+            ocb = new StringBuffer(sequenceBufferCreator("OC", value));
+        }
+        else if (key.equals("CC") || key.equals("COMMENT")) {
+            ccb = new StringBuffer(sequenceBufferCreator("CC", value));
+        }
+        else if (key.equals(EmblProcessor.PROPERTY_EMBL_ACCESSIONS))
+        {
+            acb = new StringBuffer();
+            acb.append("AC   ");
+            for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
+            {
+                acb.append((String) ai.next());
+                acb.append(";");
+            }
+        }
+    }
+
+    public void startFeature(Feature.Template templ)
+        throws ParseException
+    {
+        // There are 19 spaces in the leader
+        String leader = "FT                   ";
+        int    strand = 0;
+
+        if (templ instanceof StrandedFeature.Template)
+            strand = ((StrandedFeature.Template) templ).strand.getValue();
+
+        ub.setLength(0);
+        ub.append(leader);
+
+        StringBuffer lb = formatLocationBlock(ub,
+                                              templ.location,
+                                              strand,
+                                              leader,
+                                              80);
+
+        lb.replace(5, 5 + templ.type.length(), templ.type);
+
+        ftb.append(lb + nl);
+    }
+
+    public void endFeature() throws ParseException { }
+
+    public void addFeatureProperty(Object key, Object value)
+        throws ParseException
+    {
+        // There are 19 spaces in the leader
+        String leader = "FT                   ";
+
+        // Don't print internal data structures
+        if (key.equals(Feature.PROPERTY_DATA_KEY))
+            return;
+
+        // The value may be a collection if several qualifiers of the
+        // same type are present in a feature
+        if (Collection.class.isInstance(value))
+        {
+            for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
+            {
+                qb.setLength(0);
+                ub.setLength(0);
+                StringBuffer fb = formatQualifierBlock(qb,
+                                                       formatQualifier(ub, key, vi.next()).substring(0),
+                                                       leader,
+                                                       80);
+                ftb.append(fb + nl);
+            }
+        }
+        else
+        {
+            qb.setLength(0);
+            ub.setLength(0);
+            StringBuffer fb = formatQualifierBlock(qb,
+                                                   formatQualifier(ub, key, value).substring(0),
+                                                   leader,
+                                                   80);
+            ftb.append(fb + nl);
+        }
     }
 
     private String sequenceBufferCreator(Object key, Object value) {
@@ -310,109 +421,6 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
             }
         }
 
-        return temp.toString();
-    }
-
-    public void addSequenceProperty(final Object key, final Object value)
-        throws ParseException
-    {
-        if (key.equals("ID")) {
-            idb.setLength(0);
-            idb.append("ID   " + (String) value);
-        }
-        else if (key.equals("DT") || key.equals("MDAT")) {
-            dtb = new StringBuffer(sequenceBufferCreator("DT", value));
-        }
-        else if (key.equals("DE") || key.equals("DEFINITION")) {
-            deb = new StringBuffer(sequenceBufferCreator("DE", value));
-        }
-        else if (key.equals("SV") || key.equals("VERSION")) {
-            svb = new StringBuffer(sequenceBufferCreator("SV", value));
-        }
-        else if (key.equals("KW") || key.equals("KEYWORDS")) {
-            kwb = new StringBuffer(sequenceBufferCreator("KW", value));
-        }
-        else if (key.equals("OS") || key.equals("SOURCE")) {
-            osb = new StringBuffer(sequenceBufferCreator("OS", value));
-        }
-        else if (key.equals("OC") || key.equals("ORGANISM")) {
-            ocb = new StringBuffer(sequenceBufferCreator("OC", value));
-        }
-        else if (key.equals("CC") || key.equals("COMMENT")) {
-            ccb = new StringBuffer(sequenceBufferCreator("CC", value));
-        }
-        else if (key.equals(EmblProcessor.PROPERTY_EMBL_ACCESSIONS))
-        {
-	    acb = new StringBuffer();
-            acb.append("AC   ");
-            for (Iterator ai = ((List) value).iterator(); ai.hasNext();)
-            {
-                acb.append((String) ai.next());
-                acb.append(";");
-            }
-        }
-    }
-
-    public void startFeature(final Feature.Template templ)
-        throws ParseException
-    {
-        // There are 19 spaces in the leader
-        String leader = "FT                   ";
-        int    strand = 0;
-
-        if (templ instanceof StrandedFeature.Template)
-            strand = ((StrandedFeature.Template) templ).strand.getValue();
-
-	ub.setLength(0);
-	ub.append(leader);
-
-        StringBuffer lb = formatLocationBlock(ub,
-					      templ.location,
-					      strand,
-					      leader,
-					      80);
-
-        lb.replace(5, 5 + templ.type.length(), templ.type);
-
-        ftb.append(lb + nl);
-    }
-
-    public void endFeature() throws ParseException { }
-
-    public void addFeatureProperty(final Object key, final Object value)
-        throws ParseException
-    {
-        // There are 19 spaces in the leader
-        String leader = "FT                   ";
-
-	// Don't print internal data structures
-	if (key.equals(Feature.PROPERTY_DATA_KEY))
-	    return;
-
-        // The value may be a collection if several qualifiers of the
-        // same type are present in a feature
-        if (Collection.class.isInstance(value))
-        {
-            for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
-            {
-		qb.setLength(0);
-		ub.setLength(0);
-		StringBuffer fb = formatQualifierBlock(qb,
-						       formatQualifier(ub, key, vi.next()).toString(),
-						       leader,
-						       80);
-                ftb.append(fb + nl);
-            }
-        }
-        else
-        {
-            qb.setLength(0);
-            ub.setLength(0);
-	    StringBuffer fb = formatQualifierBlock(qb,
-						   formatQualifier(ub, key, value).toString(),
-						   leader,
-						   80);
-            ftb.append(fb + nl);
-        }
+        return temp.substring(0);
     }
 }
