@@ -181,6 +181,15 @@ public final class AlphabetManager {
   }
 
   /**
+   * Has an Alphabet been registered by that name
+   * @param name the name of the alphabet
+   * @return true if it has or false otherwise
+   */
+  static public boolean registered(String name){
+    return nameToAlphabet.containsKey(name);
+  }
+
+  /**
    * Get an iterator over all alphabets known.
    *
    * @return an Iterator over Alphabet objects
@@ -704,7 +713,7 @@ public final class AlphabetManager {
     if(aList.size() == 0) {
       return Alphabet.EMPTY_ALPHABET;
     }
-    
+
     // This trap means that the `product' operator can be
     // safely applied to a single alphabet.
 
