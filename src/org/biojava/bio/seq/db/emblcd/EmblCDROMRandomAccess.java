@@ -125,7 +125,7 @@ public abstract class EmblCDROMRandomAccess
             raIndexFile.seek(headerLength + (midPoint * recordLength));
 
             Object [] record = readRecord();
-            String recordKey = getRecordKey(record).trim();;
+            String recordKey = getRecordKey(record).trim();
 
             if (recordKey.equals(identifier))
                 return record;

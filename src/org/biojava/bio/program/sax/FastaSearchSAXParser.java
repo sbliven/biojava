@@ -95,16 +95,16 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
      */
     public FastaSearchSAXParser()
     {
-	this.setNamespacePrefix("biojava");
-	this.addPrefixMapping("biojava", "http://www.biojava.org");
+        this.setNamespacePrefix("biojava");
+        this.addPrefixMapping("biojava", "http://www.biojava.org");
 
-	fastaParser = new FastaSearchParser();
-	attributes  = new AttributesImpl();
-	qName       = new QName(this);
-	nFormat     = new DecimalFormat("###.0");
+        fastaParser = new FastaSearchParser();
+        attributes  = new AttributesImpl();
+        qName       = new QName(this);
+        nFormat     = new DecimalFormat("###.0");
         props       = new StringBuffer(1024);
         seqTokens   = new StringBuffer(2048);
-	nl          = System.getProperty("line.separator");
+        nl          = System.getProperty("line.separator");
     }
 
     public void parse(final InputSource source)

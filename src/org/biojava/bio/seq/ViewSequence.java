@@ -67,9 +67,12 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
     private FeatureRealizer featureRealizer;
 
     /**
-     * Construct a view onto an existing sequence.
+     * Construct a view onto an existing sequence and give it a new
+     * name.
      */
-    public ViewSequence(Sequence seq) {
+    public ViewSequence(Sequence seq, String name) {
+        this.name = name;
+
 	seqDelegate = seq;
 	addedFeatures = new SimpleFeatureHolder();
 	exposedFeatures = new MergeFeatureHolder();
@@ -80,7 +83,6 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
 	    throw new BioError(cve, "Modification of hidden featureholder vetoed!");
 	}
 
-	name = seqDelegate.getName();  // Is this sensible?
 	urn = seqDelegate.getURN();
 	if (urn.indexOf('?') >= 0)
 	    urn = urn + "&view=" + hashCode();
@@ -93,9 +95,16 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
     }
 
     /**
+     * Construct a view onto an existing sequence which takes on that
+     * sequence's name.
+     */
+    public ViewSequence(Sequence seq) {
+        this(seq, seq.getName());
+    }
+
+    /**
      * Construct a view onto a sequence, using a specific FeatureRealizer
      */
-
     public ViewSequence(Sequence seq, FeatureRealizer fr) {
 	this(seq);
 	this.featureRealizer = fr;
@@ -209,9 +218,14 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
     {
       Location loc = template.location;
       if(loc.getMin() < 1 || loc.getMax() > this.length()) {
-        throw new BioException(
-          "Can't create a feature that is outside this sequence: " + loc
-        );
+          throw new BioException("Failed to create a feature with a location "
+                                 + loc
+                                 + " outside the sequence: name '"
+                                 + getName()
+                                 + "', URN '"
+                                 + getURN()
+                                 + "' length "
+                                 + length());
       }
       Feature f = realizeFeature(this, template);
       addedFeatures.addFeature(f);

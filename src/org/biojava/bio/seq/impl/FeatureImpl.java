@@ -34,6 +34,7 @@ import org.biojava.bio.seq.homol.*;
  *
  * @author Thomas Down
  * @author Greg Cox
+ * @author Keith James
  * @since 1.1
  */
 
@@ -67,10 +68,10 @@ public class FeatureImpl {
 				SimpleStrandedFeature.class);
 	    d.addImplementation(HomologyFeature.Template.class,
 				SimpleHomologyFeature.class);
-		d.addImplementation(RemoteFeature.Template.class,
+            d.addImplementation(SimilarityPairFeature.Template.class,
+				SimpleSimilarityPairFeature.class);
+            d.addImplementation(RemoteFeature.Template.class,
 				SimpleRemoteFeature.class);
-            d.addImplementation(FramedFeature.Template.class,
-                                SimpleFramedFeature.class);//Mark Schreiber
 	} catch (BioException ex) {
 	    throw new BioError(ex, "Couldn't initialize default FeatureRealizer");
 	}

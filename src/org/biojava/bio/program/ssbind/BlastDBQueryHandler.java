@@ -94,7 +94,7 @@ public class BlastDBQueryHandler extends DefaultHandler
     {
         level++;
         if (level > 1)
-	    throw new SAXException("Found child element when expecting character data");
+            throw new SAXException("Found child element when expecting character data");
     }
 
     /**
@@ -111,10 +111,10 @@ public class BlastDBQueryHandler extends DefaultHandler
 			   String qName)
 	throws SAXException
     {
-	level--;
+        level--;
 
-	if (level == 0)
-	    setStringValue(data.toString());
+        if (level == 0)
+            setStringValue(data.toString());
     }
 
     /**
@@ -129,7 +129,7 @@ public class BlastDBQueryHandler extends DefaultHandler
     public void characters(char[] ch, int start, int length) 
         throws SAXException
     {
-	data.append(ch, start, length);
+        data.append(ch, start, length);
     }
 
     /**
