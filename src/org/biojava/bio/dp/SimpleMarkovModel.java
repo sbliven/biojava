@@ -31,6 +31,7 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 
 public class SimpleMarkovModel implements MarkovModel, Serializable {
+  public static final long serialVersionUID = -3043028839927615753l;
   private final Alphabet emissionAlpha;
   private final FiniteAlphabet stateAlpha;
   private final MagicalState magicalState;
@@ -38,8 +39,8 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
   private final Map transFrom;
   private final Map transTo;
   private final Map transWeights;
-  private final transient ChangeSupport changeSupport;
-  private final transient MarkovModel.DistributionForwarder distForwarder;
+  private transient ChangeSupport changeSupport;
+  private transient MarkovModel.DistributionForwarder distForwarder;
   
   private Transition _tran = new Transition(null, null);
   
@@ -47,8 +48,31 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     transFrom = new HashMap();
     transTo = new HashMap();
     transWeights = new HashMap();
-    changeSupport = new ChangeSupport();
-    distForwarder = new MarkovModel.DistributionForwarder(this, changeSupport);
+  }
+
+  protected void generateChangeSupport(ChangeType ct) {
+    if(changeSupport == null) {
+	  changeSupport = new ChangeSupport();
+	}
+	
+	if(
+	  ( (ct == null) || (ct == MarkovModel.PARAMETER) ) &&
+	  (distForwarder == null)
+	) {
+	  distForwarder = new MarkovModel.DistributionForwarder(
+	    this,
+		changeSupport
+	  );
+	  for(Iterator si = stateAlpha.iterator(); si.hasNext(); ) {
+	    State s = (State) si.next();
+		if(s instanceof EmissionState) {
+		  EmissionState es = (EmissionState) s;
+		  Distribution dist = es.getDistribution();
+		  dist.addChangeListener(distForwarder, Distribution.WEIGHTS);
+		  dist.addChangeListener(distForwarder, Distribution.NULL_MODEL);
+		}
+	  }
+	}
   }
 
   public Alphabet emissionAlphabet() { return emissionAlpha; }
@@ -112,21 +136,26 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     
     FiniteAlphabet f = transitionsFrom(from);
     FiniteAlphabet t = transitionsTo(to);
-
+		
     if(f.contains(to)) {
       throw new ChangeVetoException(
         ce,
         "Transition already exists: " + from.getName() + " -> " + to.getName()
       );
     }
-
-    synchronized(changeSupport) {
-      changeSupport.firePreChangeEvent(ce);
+	
+	if (changeSupport == null) {
+	  f.addSymbol(to);
+	  t.addSymbol(from);
+	} else {
+      synchronized(changeSupport) {
+      	changeSupport.firePreChangeEvent(ce);
       
-      f.addSymbol(to);
-      t.addSymbol(from);
+      	f.addSymbol(to);
+      	t.addSymbol(from);
       
-      changeSupport.firePostChangeEvent(ce);
+      	changeSupport.firePostChangeEvent(ce);
+	  }
     }
   }
   
@@ -161,14 +190,19 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
       );
     }
 
-    synchronized(changeSupport) {
-      changeSupport.firePreChangeEvent(ce);
-
+    if(changeSupport == null) {
       transitionsFrom(from).removeSymbol(to);
       transitionsTo(to).removeSymbol(from);
+	} else {
+      synchronized(changeSupport) {
+        changeSupport.firePreChangeEvent(ce);
+ 
+        transitionsFrom(from).removeSymbol(to);
+        transitionsTo(to).removeSymbol(from);
       
-      changeSupport.firePostChangeEvent(ce);
-    }
+        changeSupport.firePostChangeEvent(ce);
+      }
+	}
   }
   
   public boolean containsTransition(State from, State to)
@@ -267,8 +301,10 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     
     if(toAdd instanceof EmissionState) {
       Distribution dist = ((EmissionState) toAdd).getDistribution();
-      dist.addChangeListener(distForwarder, Distribution.WEIGHTS);
-      dist.addChangeListener(distForwarder, Distribution.NULL_MODEL);
+	  if(distForwarder != null) {
+	    dist.addChangeListener(distForwarder, Distribution.WEIGHTS);
+        dist.addChangeListener(distForwarder, Distribution.NULL_MODEL);
+	  }
     }
   }
   
@@ -317,16 +353,20 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     transTo.remove(toGo);
     if(toGo instanceof EmissionState) {
       Distribution dist = ((EmissionState) toGo).getDistribution();
-      toGo.removeChangeListener(distForwarder, Distribution.NULL_MODEL);
-      toGo.removeChangeListener(distForwarder, Distribution.WEIGHTS);
+      if(distForwarder != null) {
+        toGo.removeChangeListener(distForwarder, Distribution.NULL_MODEL);
+        toGo.removeChangeListener(distForwarder, Distribution.WEIGHTS);
+      }
     }
   }
 
   public void addChangeListener(ChangeListener cl) {
+    generateChangeSupport(null);
     changeSupport.addChangeListener(cl);
   }
   
   public void addChangeListener(ChangeListener cl, ChangeType ct) {
+    generateChangeSupport(ct);
     changeSupport.addChangeListener(cl, ct);
   }
 
