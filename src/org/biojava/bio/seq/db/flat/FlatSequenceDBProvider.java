@@ -30,6 +30,16 @@ import org.biojava.bio.seq.db.SequenceDBLite;
 import org.biojava.directory.RegistryException;
 import org.biojava.directory.SequenceDBProvider;
 
+/**
+ * <code>FlatSequenceDBProvider</code> directory-services plugin for
+ * flatfile databases.
+ *
+ * @for.developer This class is instantiated automatically by the
+ *                directory-services code, and is not of direct
+ *                interest to users.
+ *
+ * @author Keith James
+ */
 public class FlatSequenceDBProvider implements SequenceDBProvider
 {
     public String getName()
