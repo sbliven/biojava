@@ -22,13 +22,13 @@
 
 package org.acedb;
 
-import org.biojava.bio.BioError;
+import org.biojava.utils.NestedError;
 
 /**
  * @author Thomas Down
  */
 
-public class AceError extends BioError {
+public class AceError extends NestedError {
   public AceError() {
     super();
   }

@@ -28,94 +28,27 @@
 
 package org.biojava.bio;
 
-import java.io.*;
-import java.util.*;
+import org.biojava.utils.NestedException;
 
 /**
- * A general perpose Exception that can wrap another exception.
- * <P>
- * It is common practice in BioJava to throw a BioException or a subclass of it
- * when something goes wrong. The exception can be used to catch another
- * throwable, thus keeping a complete record of where the original error
- * originated while adding annotation to the stack-trace. It also affords a neat
- * way to avoid exception-bloat on method calls, particularly when objects are
- * composed from several objects from different packages.
+ * A nestable biological exception.
  *
  * @author Matthew Pocock
  */
-public class BioException extends Exception {
-  private Throwable subThrowable = null;
-
+public class BioException extends NestedException {
   public BioException(String message) {
 	  super(message);
   }
 
   public BioException(Throwable ex) {
-    this.subThrowable = ex;
+    super(ex);
   }
 
   public BioException(Throwable ex, String message) {
-    super(message);
-    this.subThrowable = ex;
+    super(ex, message);
   }
   
   public BioException() {
 	  super();
-  }
-
-  public void printStackTrace() {	
-    printStackTrace(System.err);
-  }
-  
-  public void printStackTrace(PrintStream ps) {
-    printStackTrace(new PrintWriter(ps));
-  }
-  
-  public void printStackTrace(PrintWriter pw) {
-  	if (subThrowable != null) {
-      StringWriter sw1 = new StringWriter();
-	    subThrowable.printStackTrace(new PrintWriter(sw1));
-      String mes1 = sw1.toString();
-      StringWriter sw2 = new StringWriter();
-      super.printStackTrace(new PrintWriter(sw2));
-      String mes2 = sw2.toString();
-
-      try {
-        List lines1 = lineSplit(new BufferedReader(new StringReader(mes1)));
-        List lines2 = lineSplit(new BufferedReader(new StringReader(mes2)));
-      
-        ListIterator li1 = lines1.listIterator(lines1.size());
-        ListIterator li2 = lines2.listIterator(lines2.size());
-      
-        while(li1.hasPrevious() && li2.hasPrevious()) {
-          Object s1 = li1.previous();
-          Object s2 = li2.previous();
-          
-          if(s1.equals(s2)) {
-            li1.remove();
-          } else {
-            break;
-          }
-        }
-        for(Iterator i = lines1.iterator(); i.hasNext(); ) {
-          System.out.println(i.next());
-        }
-        pw.print("rethrown as ");
-        pw.print(mes2);
-      } catch (IOException ioe) {
-        throw new Error("Coudn't merge stack-traces");
-      }
-    } else {
-      super.printStackTrace(pw);
-    }
-    pw.flush();
-  }
-  
-  private List lineSplit(BufferedReader in) throws IOException {
-    List lines = new ArrayList();
-    for(String line = in.readLine(); line != null; line = in.readLine()) {
-      lines.add(line);
-    }
-    return lines;
   }
 }

@@ -21,13 +21,13 @@
 
 package org.acedb;
 
-import org.biojava.bio.BioException;
+import org.biojava.utils.NestedException;
 
 /**
  * @author Thomas Down
  */
 
-public class AceException extends BioException {
+public class AceException extends NestedException {
     private boolean recoverable = false;
 
     public AceException(String message) {
