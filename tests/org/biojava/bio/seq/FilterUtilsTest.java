@@ -483,6 +483,157 @@ public class FilterUtilsTest extends TestCase
       );
     }
     
+    public void testAncestorDescendants() {
+        FeatureFilter type_foo = new FeatureFilter.ByType("foo");
+        FeatureFilter type_bar = new FeatureFilter.ByType("bar");
+        FeatureFilter test = new FeatureFilter.ByAncestor(new FeatureFilter.OnlyDescendants(type_foo));
+        
+        assertTrue(
+            FilterUtils.areDisjoint(
+                type_bar,
+                test
+            )
+        );
+        assertTrue(
+            !FilterUtils.areDisjoint(
+                type_foo,
+                test
+            )
+        );
+    }
+    
+    public void testOrAncestorDescendants() {
+        FeatureFilter type_foo = new FeatureFilter.ByType("foo");
+        FeatureFilter type_bar = new FeatureFilter.ByType("bar");
+        FeatureFilter test = new FeatureFilter.ByAncestor(new FeatureFilter.OnlyDescendants(type_foo));
+        
+        assertTrue(
+            FilterUtils.areDisjoint(
+                type_bar,
+                test
+            )
+        );
+        assertTrue(
+            !FilterUtils.areDisjoint(
+                type_foo,
+                test
+            )
+        );
+    }
+    
+    public void testAncestorLeafChildren() {
+        FeatureFilter type_foo = new FeatureFilter.ByType("foo");
+        FeatureFilter type_bar = new FeatureFilter.ByType("bar");
+        FeatureFilter test = new FeatureFilter.ByAncestor(
+                new FeatureFilter.OnlyChildren(
+                        new FeatureFilter.And(
+                                type_foo,
+                                FeatureFilter.leaf
+                        )
+                )
+        );
+        FeatureFilter test_nonleaf = new FeatureFilter.ByAncestor(
+                new FeatureFilter.OnlyChildren(
+                                type_foo
+                )
+        );
+        
+        assertTrue(
+            FilterUtils.areDisjoint(
+                type_bar,
+                test
+            )
+        );
+        assertTrue(
+            !FilterUtils.areDisjoint(
+                type_bar,
+                test_nonleaf
+            )
+        );
+        assertTrue(
+            !FilterUtils.areDisjoint(
+                type_foo,
+                test
+            )
+        );
+    }
+    
+    public void testAncestorComplexChildren() {
+        FeatureFilter type_foo = new FeatureFilter.ByType("foo");
+        FeatureFilter type_bar = new FeatureFilter.ByType("bar");
+        FeatureFilter type_baz = new FeatureFilter.ByType("baz");
+        FeatureFilter test = new FeatureFilter.ByAncestor(
+                new FeatureFilter.OnlyChildren(
+                        new FeatureFilter.And(
+                                type_foo,
+                                new FeatureFilter.OnlyChildren(
+                                        new FeatureFilter.And(
+                                                type_baz,
+                                                FeatureFilter.leaf
+                                        )
+                                )
+                        )
+                )
+        );
+        
+        assertTrue(
+            FilterUtils.areDisjoint(
+                type_bar,
+                test
+            )
+        );
+        assertTrue(
+            !FilterUtils.areDisjoint(
+                type_foo,
+                test
+            )
+        );
+        assertTrue(
+            !FilterUtils.areDisjoint(
+                type_baz,
+                test
+            )
+        );
+    }
+    
+    public void testParentChildren() {
+        FeatureFilter type_foo = new FeatureFilter.ByType("foo");
+        FeatureFilter type_bar = new FeatureFilter.ByType("bar");
+        FeatureFilter type_baz = new FeatureFilter.ByType("baz");
+        FeatureFilter test = new FeatureFilter.ByParent(
+                new FeatureFilter.OnlyChildren(
+                        new FeatureFilter.And(
+                                type_foo,
+                                new FeatureFilter.OnlyChildren(
+                                        new FeatureFilter.And(
+                                                type_baz,
+                                                FeatureFilter.leaf
+                                        )
+                                )
+                        )
+                )
+        );
+        
+        assertTrue(
+            FilterUtils.areDisjoint(
+                type_bar,
+                test
+            )
+        );
+        assertTrue(
+            !FilterUtils.areDisjoint(
+                type_foo,
+                test
+            )
+        );
+        assertTrue(
+            FilterUtils.areDisjoint(
+                type_baz,
+                test
+            )
+        );
+    }
+    
     private void optimizeExact(FeatureFilter raw, FeatureFilter target) {
       FeatureFilter result = FilterUtils.optimize(raw);
       assertTrue("optimize: " + raw + " should be " + target + " but is " + result, result == target);
