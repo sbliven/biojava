@@ -103,6 +103,7 @@ public class GFFParser {
 		aList.clear();
 		if(line.startsWith("#")) {
 		    handler.commentLine(line.substring(1));
+		} else if (line.length() == 0) {
 		} else {
 		    StringTokenizer st = new StringTokenizer(line, "\t", false);
 		    while(st.hasMoreTokens() && aList.size() < 8) {

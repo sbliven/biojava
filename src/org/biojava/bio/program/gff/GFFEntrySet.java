@@ -121,12 +121,14 @@ public class GFFEntrySet {
             GFFRecord rec = (GFFRecord) o;
             if(rec.getSeqName().equals(seq.getName())) {
               if(rec.getStrand() == StrandedFeature.UNKNOWN) {
-                plain.location = new RangeLocation(rec.getStart(), rec.getEnd());
+                plain.location = new RangeLocation(Math.max(1, rec.getStart()),
+						   Math.min(rec.getEnd(), seq.length()));
                 plain.type = rec.getFeature();
                 plain.source = rec.getSource();
                 seq.createFeature(plain);
               } else {
-                stranded.location = new RangeLocation(rec.getStart(), rec.getEnd());
+                stranded.location = new RangeLocation(Math.max(1, rec.getStart()),
+						      Math.min(rec.getEnd(), seq.length()));
                 stranded.type = rec.getFeature();
                 stranded.source = rec.getSource();
                 stranded.strand = rec.getStrand();
