@@ -36,7 +36,7 @@ import org.biojava.utils.Changeable;
  * BioJava object itself will probably not want to extend the
  * Annotation interface directly, but rather delegate off that
  * functionality to an Annotation property. The Annotatable interface
- * indicates that there is an Annoation property. When implementing
+ * indicates that there is an Annotation property. When implementing
  * Annotatable, you should always create a protected or private field
  * containing an instance of ChangeForwarder, and register it as a
  * ChangeListener with the associated Annotation delegate
@@ -79,7 +79,7 @@ import org.biojava.utils.Changeable;
  * @for.developer The getAnnotation() method can be implemented lazily
  * (instantiate the Annotation instance and event forwarders when the first
  * request comes in). It can also be implemented by returning throw-away
- * immutable Annotatoin instances that are built from scratch each time.
+ * immutable Annotation instances that are built from scratch each time.
  *
  * @since 1.0
  */
