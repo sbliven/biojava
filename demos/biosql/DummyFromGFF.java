@@ -14,7 +14,7 @@ public class DummyFromGFF {
     public static void main(String[] args) 
         throws Exception
     {
-  	String dbURL = "jdbc:postgresql://localhost/thomasd_biosql";
+  	String dbURL = "jdbc:postgresql://localhost/thomasd_biosql2";
   	String dbUser = "thomas";
   	String dbPass = "";
   	String bioName = "testing";
