@@ -44,11 +44,21 @@ public class CreateIndex {
       String indexName = args[0];
       File indexFile = new File(indexName+".index");
       String formatName = args[1];
-      SequenceFormat sFormat = resolveFormat(formatName);
       String alphaName = args[2];
       Alphabet alpha = resolveAlphabet(alphaName);
       SymbolParser sParser = alpha.getParser("token");
-      SequenceFactory sFact = new SimpleSequenceFactory();
+      
+      SequenceFormat sFormat = null;
+      SequenceBuilderFactory sFact = null;
+      if(formatName.equals("fasta")) {
+	  sFormat = new FastaFormat();
+	  sFact = new FastaDescriptionLineParser.Factory(SimpleSequenceBuilder.FACTORY);
+      } else if(formatName.equals("embl")) {
+	  sFormat = new EmblLikeFormat();
+	  sFact = new EmblProcessor.Factory(SimpleSequenceBuilder.FACTORY);
+      } else {
+	  throw new Exception("Format must be one of {embl, fasta}");
+      }
       
       IndexedSequenceDB seqDB = IndexedSequenceDB.createDB(
         indexName,
@@ -61,20 +71,6 @@ public class CreateIndex {
     } catch (Throwable t) {
       t.printStackTrace();
       System.exit(1);
-    }
-  }
-  
-  private static SequenceFormat resolveFormat(String formatName)
-  throws IllegalArgumentException {
-    formatName = formatName.toLowerCase();
-    if(formatName.equals("fasta")) {
-      return new FastaFormat();
-    } else if(formatName.equals("embl")) {
-      return new EmblFormat();
-    } else if(formatName.equals("genbank")) {
-      return new GenbankFormat();
-    } else {
-      throw new IllegalArgumentException("Could not find format for " + formatName);
     }
   }
   
