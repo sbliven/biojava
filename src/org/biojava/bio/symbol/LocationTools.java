@@ -322,6 +322,28 @@ final public class LocationTools {
     }
 
     /**
+     * Determines whether the locations are touching or not (if they could be
+     * merged in a single Location.
+     * <p>
+     * Two locations can merge if they contain at least one index of one
+     * beside one index of the other.
+     * </p>
+     *
+     * @param locA  the first Location
+     * @param locB  the second Location
+     * @return <code>true</code> if they can merge, <code>false</code> otherwise
+     */
+  public static boolean canMerge(Location locA, Location locB){
+    if (overlaps(locA, locB)||
+        overlaps(locA.translate(1), locB)||
+        overlaps(locA.translate(-1),locB))
+      return true;
+    return false;
+  }
+  
+
+  
+    /**
      * Determines whether the locations overlap or not.
      * <p>
      * Two locations overlap if they contain at least one index in common.
@@ -578,7 +600,7 @@ final public class LocationTools {
       // merge or add last with next location
       while(i.hasNext()) {
         Location cur = (Location) i.next();
-        if(last.overlaps(cur)) {
+        if(canMerge(last,cur)) {
           try {
             last = MergeLocation.mergeLocations(last,cur);
           }

@@ -136,7 +136,7 @@ public class MergeLocation extends RangeLocation {
 
       //make sure blocks are contiguous
       if(lastMin != -1 && lastMax != -1){
-        if(!(loc.getMin() <= lastMax)){
+        if(!(loc.getMin()+1 <= lastMax)){
           //blocks aren't contiguous
           throw new BioException(
             "All members of the component locations list must be contiguous");
