@@ -229,9 +229,11 @@ public final class SeqIOTools  {
             try {
                 db.addSequence(seq);
             } catch (ChangeVetoException cve) {
-                throw new NestedError(cve,"Could not successfully add sequence "
-                                      + seq.getName()
-                                      + " to sequence database");
+                throw new AssertionFailure(
+                  "Could not successfully add sequence "
+                  + seq.getName()
+                  + " to sequence database",
+                  cve);
             }
         }
         return db;

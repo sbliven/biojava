@@ -94,7 +94,7 @@ public class BioStoreFactory {
                                           new PropertyConstraint.ByClass(String.class),
                                           CardinalityConstraint.ZERO_OR_ONE);
         } catch (Exception e) {
-            throw new NestedError(e);
+            throw new Error(e);
         }
     }
 
@@ -289,9 +289,11 @@ public class BioStoreFactory {
 
             return bStore;
         } catch (ChangeVetoException cve) {
-            throw new BioError(cve, "Assertion Failure: Can't update annotation");
+            throw new AssertionFailure("Assertion Failure: Can't update annotation", cve);
         } catch (IOException ioe) {
-            throw new BioError(ioe, "Could not initialize store");
+            throw new AssertionFailure("Could not initialize store", ioe);
+        } catch (CommitFailure cf) {
+          throw new AssertionFailure("Could not commit store", cf);
         }
     }
 

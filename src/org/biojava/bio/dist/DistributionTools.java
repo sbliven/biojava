@@ -107,8 +107,12 @@ public final class DistributionTools {
          c.getCount((AtomicSymbol)index.symbolForIndex(i)));
       }
       dtc.train();
-    }catch(NestedException ne){
-      throw new BioError(ne, "Assertion Error: Cannot convert Count to Distribution");
+    } catch (IllegalAlphabetException iae) {
+      throw new AssertionFailure("Assertion failure: Alphabets don't match");
+    }catch(IllegalSymbolException ise){
+      throw new AssertionFailure("Assertion Error: Cannot convert Count to Distribution", ise);
+    } catch (ChangeVetoException cve) {
+      throw new AssertionFailure("Assertion failure: distributions or counts got locked.", cve);
     }
     return d;
   }
@@ -420,11 +424,11 @@ public final class DistributionTools {
       dtc.train();
       return average;
     } catch(IllegalAlphabetException iae){//The following throw unchecked exceptions as they shouldn't happen
-       throw new NestedError(iae,"Distribution contains an illegal alphabet");
+       throw new AssertionFailure("Distribution contains an illegal alphabet", iae);
     } catch(IllegalSymbolException ise){
-       throw new NestedError(ise, "Distribution contains an illegal symbol");
+       throw new AssertionFailure("Distribution contains an illegal symbol", ise);
     } catch(ChangeVetoException cve){
-       throw new NestedError(cve, "The Distribution has become locked");
+       throw new AssertionFailure("The Distribution has become locked", cve);
     }
   }
 

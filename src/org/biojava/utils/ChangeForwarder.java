@@ -97,9 +97,9 @@ public class ChangeForwarder implements ChangeListener {
         changeSupport.firePostChangeEvent(nce);
       }
     } catch (ChangeVetoException cve) {
-      throw new NestedError(
-        cve,
-        "Assertion Failure: Change was vetoed after it had been accepted by preChange"
+      throw new AssertionFailure(
+        "Assertion Failure: Change was vetoed after it had been accepted by preChange",
+        cve
       );
     }
   }

@@ -55,7 +55,7 @@ public class TabIndexStore implements IndexStore, Serializable {
       fis.close();
       return indxStore;
     } catch (ClassNotFoundException cnfe) {
-      throw new NestedError(cnfe, "Assertion Failure: How did we get here?");
+      throw new AssertionFailure("Assertion Failure: How did we get here?", cnfe);
     }
   }
   

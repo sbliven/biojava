@@ -1,6 +1,7 @@
 package	seq;
 
 import java.io.*;
+import java.util.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
@@ -32,6 +33,12 @@ public class TestGenbank {
 			{
 				Sequence seq = seqI.nextSequence();
 				System.out.println(seq.getName() + " has " + seq.countFeatures() + " features");
+        
+        for(Iterator i = seq.features(); i.hasNext(); ) {
+          Feature f = (Feature) i.next();
+          System.out.println("\t" + f.getType() + "\t" + f.getLocation() + "\t" + f.getAnnotation().asMap());
+        }
+        
 				// Feature (location) testing
 //				java.util.Iterator theIterator = seq.features();
 //				SeqFileFormer theFormatter = SeqFileFormerFactory.makeFormer("Genbank");

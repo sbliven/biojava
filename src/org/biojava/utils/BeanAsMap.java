@@ -134,9 +134,9 @@ public class BeanAsMap
       try {
         return pd.getReadMethod().invoke(bean, NO_PARAMS);
       } catch (IllegalAccessException iae) {
-        throw new NestedError(iae, "Could not set property");
+        throw new AssertionFailure("Could not set property", iae);
       } catch (InvocationTargetException ite) {
-        throw new NestedError(ite, "Could not invoke property");
+        throw new AssertionFailure("Could not invoke property", ite);
       }
     }
     
@@ -147,9 +147,9 @@ public class BeanAsMap
         
         return old;
       } catch (IllegalAccessException iae) {
-        throw new NestedError(iae, "Could not access property");
+        throw new AssertionFailure("Could not access property", iae);
       } catch (InvocationTargetException ite) {
-        throw new NestedError(ite, "Could not invoke property");
+        throw new AssertionFailure("Could not invoke property", ite);
       }
     }
   }

@@ -94,9 +94,33 @@ public interface MarkovModel extends Changeable {
    * Each head consumes a single SymbolList. A single-head model just consumes/
    * emits a single sequence. A two-head model performs alignment between two
    * sequences (e.g. smith-waterman). Models with more heads do more interesting
-   * things.
+   * things.</p>
+   *
+   * <p><code>heads()</code> should equal <code>advance().length</code>.
+   *
+   * @return the number of heads in this model.
+   * @deprecated  use <code>advance().length</code>
    */
   int heads();
+  
+  /**
+   * The maximum advance for this model.
+   * <p>
+   * Each head consumes a single SymbolList. However, the states that advance
+   * through that SymbolList may emit more than one symbol at a time. This array
+   * give the maximum advance in each direction.
+   * </p>
+   *
+   * @for.developer
+   * Be sure to return a new array each time this is called. This protects the
+   * internal state of the object from someone modifying the advance array.
+   * @for.developer
+   * Be sure to update this as/when states modify their advance arrays and
+   * as/when states are added or removed
+   *
+   * @return the maximum advance of all states for all heads
+   */
+  int[] advance();
   
   /**
    * Get a probability Distribution over the transition from 'source'. 

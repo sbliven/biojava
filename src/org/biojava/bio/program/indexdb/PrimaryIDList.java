@@ -97,7 +97,7 @@ extends SearchableFileAsList {
   }
   
   protected void generateRecord(byte[] buffer, Object item)
-  throws NestedException {
+  throws IOException {
     String id = null;
     int fileID = -1;
     String start = null;
@@ -108,7 +108,7 @@ extends SearchableFileAsList {
       
       id = indx.getID();
       if(id == null) {
-        throw new NestedException("Can't process null ID: " + indx);
+        throw new NullPointerException("Can't process null ID: " + indx);
       }
       fileID = store.getIDForFile(indx.getFile());
       start = String.valueOf(indx.getOffset());
@@ -152,22 +152,20 @@ extends SearchableFileAsList {
         fileID + "\t" +
         start + "\t" +
         length;
-      throw new NestedException(
-        ex,
+      throw (IOException) new IOException(
         "Could not build record. Record length: " + buffer.length +
         " Line length: " + attemptedLine.length() +
-        " " + attemptedLine );
+        " " + attemptedLine).initCause(ex);
     } catch (ArrayIndexOutOfBoundsException ex) {
       String attemptedLine =
         id + "\t" +
         fileID + "\t" +
         start + "\t" +
         length;
-      throw new NestedException(
-        ex,
+      throw (IOException) new IOException(
         "Could not build record. Record length: " + buffer.length +
         " Line length: " + attemptedLine.length() +
-        " " + attemptedLine );
+        " " + attemptedLine).initCause(ex);
     }
   }
   

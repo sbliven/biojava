@@ -20,7 +20,7 @@
  */
 package org.biojava.bio.symbol;
 
-import org.biojava.bio.BioError;
+import org.biojava.utils.AssertionFailure;
 
 /**
  * <p>
@@ -177,7 +177,7 @@ public class PackedSymbolList
         syms[syms.length - 1] = l;
       }
     } catch (IllegalSymbolException ise) {
-      throw new BioError(ise, "Assertion Failure: Symbol got lost somewhere");
+      throw new AssertionFailure("Assertion Failure: Symbol got lost somewhere", ise);
     }
   }
   
@@ -256,7 +256,7 @@ public class PackedSymbolList
         syms[syms.length - 1] = l;
       }
     } catch (IllegalSymbolException ise) {
-      throw new BioError(ise, "Assertion Failure: Symbol got lost somewhere");
+      throw new AssertionFailure("Assertion Failure: Symbol got lost somewhere",ise);
     }
   }
   
@@ -285,7 +285,7 @@ public class PackedSymbolList
     try {
       return packing.unpack((byte) ((l >> (long) jj) & mask));
     } catch (IllegalSymbolException ise) {
-      throw new org.biojava.utils.NestedError(ise, "Could not unpack " + indx + " at " + "word" + "," + offset);
+      throw new AssertionFailure("Could not unpack " + indx + " at " + "word" + "," + offset, ise);
     }
   }
   

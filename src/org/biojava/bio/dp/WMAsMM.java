@@ -56,6 +56,10 @@ public class WMAsMM
   
   private final transient MarkovModel.DistributionForwarder distForwarder;
   
+  public int[] advance() {
+    return new int[] { 1 }; // fixme: this should be cleverer:x
+  }
+  
   public Alphabet emissionAlphabet() {
     return wm.getAlphabet();
   }

@@ -98,7 +98,7 @@ public class DNAAmbPack
           return DNATools.getDNA().getGapSymbol();
 
     } catch (IllegalSymbolException ise) {
-      throw new NestedError(ise, "Assertion failure: couldn't get DNA ambiguity from DNA: " + syms);
+      throw new AssertionFailure("Assertion failure: couldn't get DNA ambiguity from DNA: " + syms, ise);
     }
   }
   

@@ -91,6 +91,26 @@ public class SimpleMarkovModel
   public int heads() { return magicalState().getAdvance().length; }
   public MagicalState magicalState() { return magicalState; }
 
+  public int[] advance() {
+    int[] advances = new int[heads()];
+    
+    for(int i = 0; i < advances.length; i++) {
+      advances[i] = 0;
+    }
+    
+    for(Iterator si = stateAlphabet().iterator(); si.hasNext(); ) {
+      State s = (State) si.next();
+      if(s instanceof EmissionState) {
+        int[] adv = ((EmissionState) s).getAdvance();
+        for(int i = 0; i < advances.length; i++) {
+          advances[i] = Math.max(advances[i], adv[i]);
+        }
+      }
+    }
+    
+    return advances;
+  }
+  
   public Distribution getWeights(State source)
   throws IllegalSymbolException {
     stateAlphabet().validate(source);

@@ -144,7 +144,7 @@ public final class ChangeType implements Serializable {
       this.ourField = clazz.getField(fname);
     }
     catch (Exception ex) {
-      throw new NestedError(ex, "Couldn't find field " + fname + " in class " + clazz.getName());
+      throw new AssertionFailure("Couldn't find field " + fname + " in class " + clazz.getName(), ex);
     }
   }
 
@@ -155,9 +155,10 @@ public final class ChangeType implements Serializable {
 	    Class clazz = Class.forName(className);
 	    this.ourField = clazz.getField(fieldName);
 	} catch (Exception ex) {
-	    throw new NestedError(ex,
+	    throw new AssertionFailure(
 				  "Couldn't find class or field " + className +
-				  "->" + fieldName
+				  "->" + fieldName,
+          ex
 				  );
 	}
     }

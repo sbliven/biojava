@@ -114,22 +114,13 @@ public final class OntoTools {
       }
     }
     
-    OntologyOps oo;
-    if(subject.getOntology() instanceof OntologyOps) {
-      oo = (OntologyOps) subject.getOntology();
-    } else {
-      final Ontology so = subject.getOntology();
-      oo = new DefaultOps() {
-        public Ontology getOntology() {
-          return so;
-        }
-      };
-    }
+    OntologyOps subOps = subject.getOntology().getOps();
+    OntologyOps objOps = object.getOntology().getOps();
     
-    if(subject.getOntology() == object.getOntology()) {
-      return oo.isa(subject, object);
+    if(subOps == objOps) {
+      return subOps.isa(subject, object);
     } else {
-      Ontology remoteTriples = oo.transitiveClosure(
+      Ontology remoteTriples = subOps.transitiveClosure(
         subject, ANY, IS_A
       );
       for(
@@ -152,6 +143,7 @@ public final class OntoTools {
       return false;
     }
   }
+  
   /**
    * Get a Set of Triples satisfying some constraints.
    *

@@ -32,10 +32,13 @@ import java.util.*;
  * fixed 4 byte leader is used to encode the record length in the
  * file.
  *
- * @author Unknown
+ * @author Matthew Pocock
  * @author Keith James
  * @author Greg Cox
  */
+
+// fixme: throughout this class, we are raising assertions for things that
+// are legitimiate exceptions. This needs re-factoring.
 public abstract class FileAsList
     extends
         AbstractList
@@ -135,7 +138,7 @@ public abstract class FileAsList
                 mappedFile.seek(offset);
                 mappedFile.readFully(buffer);
             } catch (IOException ioe) {
-                throw new NestedError(ioe, "Failed to seek for record");
+                throw new AssertionFailure("Failed to seek for record", ioe);
             }
         }
 
@@ -160,7 +163,7 @@ public abstract class FileAsList
             try {
                 sizeCache = (int) (unFixOffset(mappedFile.length()) / (long) buffer.length);
             } catch (IOException ioe) {
-                throw new NestedError(ioe, "Can't read file length");
+                throw new AssertionFailure("Can't read file length", ioe);
             }
         };
 
@@ -172,15 +175,15 @@ public abstract class FileAsList
 
         try {
             generateRecord(buffer, o);
-        } catch (NestedException ne) {
-            throw new NestedError(ne, "Failed to write index");
+        } catch (IOException e) {
+            throw new AssertionFailure("Failed to write index", e);
         }
 
         try {
             mappedFile.seek(mappedFile.length());
             mappedFile.write(buffer);
         } catch (IOException ioe) {
-            throw new NestedError(ioe, "Failed to write index");
+            throw new AssertionFailure("Failed to write index", ioe);
         }
 
         return true;
@@ -192,15 +195,15 @@ public abstract class FileAsList
     public Object set(int indx, Object o) {
         try {
             generateRecord(buffer, o);
-        } catch (NestedException ne) {
-            throw new NestedError(ne, "Failed to write index");
+        } catch (IOException e) {
+            throw new AssertionFailure("Failed to write index", e);
         }
 
         try {
             mappedFile.seek(fixOffset(indx * buffer.length));
             mappedFile.write(buffer);
         } catch (IOException ioe) {
-            throw new NestedError(ioe, "Failed to write index");
+            throw new AssertionFailure("Failed to write index", ioe);
         }
 
         return null;
@@ -210,7 +213,7 @@ public abstract class FileAsList
         try {
             mappedFile.setLength(fixOffset(0));
         } catch (IOException ioe) {
-            throw new NestedError(ioe, "Could not truncate list");
+            throw new AssertionFailure("Could not truncate list", ioe);
         }
         commitedRecords = 0;
     }
@@ -223,10 +226,12 @@ public abstract class FileAsList
         try {
             mappedFile.setLength(fixOffset((long) commitedRecords * (long) buffer.length));
         } catch (Throwable t) {
-            throw new NestedError(t, "Could not roll back. "
-                                  + "The index store will be in an inconsistent state "
-                                  + "and should be discarded. File: "
-                                  + mappedFile);
+            throw new AssertionFailure(
+              "Could not roll back. "
+              + "The index store will be in an inconsistent state "
+              + "and should be discarded. File: "
+              + mappedFile,
+              t );
         }
     }
 
@@ -241,7 +246,7 @@ public abstract class FileAsList
     protected abstract Object parseRecord(byte[] buffer);
 
     protected abstract void generateRecord(byte[] buffer, Object item)
-        throws NestedException;
+        throws IOException;
 
     public abstract Comparator getComparator();
 

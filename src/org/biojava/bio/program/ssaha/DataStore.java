@@ -1,6 +1,5 @@
 package org.biojava.bio.program.ssaha;
 
-import org.biojava.utils.NestedException;
 import org.biojava.bio.symbol.*;
 
 /**
@@ -28,7 +27,7 @@ public interface DataStore {
    *         is not compatible with this data store
    */
   public void search(String id, SymbolList symList, SearchListener listener)
-  throws IllegalAlphabetException, NestedException;
+  throws IllegalAlphabetException, SearchException;
   
   /**
    * Resolve an ID to a sequence name.
@@ -38,5 +37,5 @@ public interface DataStore {
    * @throws IndexOutOfBoundsException if id is negative or too large
    */
   public String seqNameForID(int id)
-  throws IndexOutOfBoundsException, NestedException;
+  throws IndexOutOfBoundsException, SearchException;
 }

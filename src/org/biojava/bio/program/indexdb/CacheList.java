@@ -29,7 +29,7 @@ import org.biojava.utils.*;
  * <code>SearchableList</code>s which maintains an in-memory cache of
  * list elements.
  *
- * @author Unknown
+ * @author Matthew Pocock
  * @author Keith James
  */
 class CacheList
@@ -85,7 +85,7 @@ class CacheList
     }
 
     public void commit()
-        throws NestedException {
+        throws CommitFailure {
         delegate.clear();
 
         for(Iterator i = shadow.iterator(); i.hasNext(); ) {

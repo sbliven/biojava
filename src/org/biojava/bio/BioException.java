@@ -21,8 +21,6 @@
 
 package org.biojava.bio;
 
-import org.biojava.utils.NestedException;
-
 /**
  * A nestable biological exception.
  *
@@ -39,7 +37,7 @@ import org.biojava.utils.NestedException;
  * Be sure to wrap up any causual throwable. It makes debugging your (and
  * other peoples') code much easier.
  */
-public class BioException extends NestedException {
+public class BioException extends Exception {
   /**
    * Create a new BioException with a message.
    *
@@ -63,9 +61,14 @@ public class BioException extends NestedException {
    *
    * @param ex  the Throwable that caused this BioException
    * @param message  the message
+   * @deprecated use new BioException(message, ex) instead
    */
   public BioException(Throwable ex, String message) {
-    super(ex, message);
+    this(message, ex);
+  }
+  
+  public BioException(String message, Throwable ex) {
+    super(message, ex);
   }
   
   /**

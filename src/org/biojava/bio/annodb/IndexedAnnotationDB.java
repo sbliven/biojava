@@ -42,7 +42,7 @@ implements AnnotationDB {
     int maxKeyLen,
     AnnotationType schema,
     ParserListenerFactory plFactory
-  ) throws IOException, NestedException {
+  ) throws BioException, CommitFailure, IOException, ParserException {
     // state
     BioStoreFactory bsf = new BioStoreFactory();
     bsf.setStoreName(dbName);
@@ -155,7 +155,7 @@ implements AnnotationDB {
         try {
           return process((Record) rli.next());
         } catch (Exception e) {
-          throw new NestedRuntimeException(e);
+          throw new RuntimeException(e);
         }
       }
       
@@ -233,7 +233,7 @@ implements AnnotationDB {
       try {
         return (ParserListener) method.invoke(null, new Object[] { tvl });
       } catch (Exception e) {
-        throw new NestedRuntimeException(e);
+        throw new AssertionFailure("Could not invoke underlying method.", e);
       }
     }
   }

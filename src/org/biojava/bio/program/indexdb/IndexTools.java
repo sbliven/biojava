@@ -41,7 +41,7 @@ import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.RNATools;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.io.*;
-import org.biojava.utils.NestedException;
+import org.biojava.utils.CommitFailure;
 import org.biojava.utils.ParserException;
 import org.biojava.utils.io.CountedBufferedReader;
 import org.biojava.utils.io.RAF;
@@ -287,7 +287,7 @@ public class IndexTools
         {
             store.commit();
         }
-        catch (NestedException ne)
+        catch (CommitFailure ne)
         {
             throw new BioException(ne, "Failed to commit new index to file");
         }
@@ -348,7 +348,7 @@ public class IndexTools
         {
             store.commit();
         }
-        catch (NestedException ne)
+        catch (CommitFailure ne)
         {
             throw new BioException(ne, "Failed to commit new index to file");
         }
@@ -399,7 +399,7 @@ public class IndexTools
         {
             store.commit();
         }
-        catch (NestedException ne)
+        catch (CommitFailure ne)
         {
             throw new BioException(ne, "Failed to commit new index to file");
         }

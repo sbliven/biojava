@@ -80,7 +80,7 @@ extends SequenceRendererWrapper {
       setFilter(filter);
       setRecurse(recurse);
     } catch (ChangeVetoException cve) {
-      throw new NestedError(cve, "Assertion Failure: Should have no listeners");
+      throw new AssertionFailure("Assertion Failure: Should have no listeners", cve);
     }
   }
   

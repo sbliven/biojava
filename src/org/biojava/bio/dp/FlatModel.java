@@ -61,6 +61,10 @@ class FlatModel
     }
   }
 
+  public int[] advance() {
+    return delegate.advance();
+  }
+  
   public Alphabet emissionAlphabet() {
     return delegate.emissionAlphabet();
   }

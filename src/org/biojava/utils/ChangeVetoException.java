@@ -30,7 +30,7 @@ package org.biojava.utils;
  * @since      1.1 
  */
 
-public class ChangeVetoException extends NestedException {
+public class ChangeVetoException extends Exception {
   private final ChangeEvent change;
 
   public ChangeVetoException() {
@@ -66,7 +66,7 @@ public class ChangeVetoException extends NestedException {
    *  Construct an exception to veto a change for a specified reason. 
    *
    * @param  change  An event which is being vetoed. 
-   * @param  reason  A detail message. 
+   * @param  reason  A detail message.
    */
 
   public ChangeVetoException(ChangeEvent change, String reason) {
@@ -78,10 +78,10 @@ public class ChangeVetoException extends NestedException {
    *  Propogate an exception without (additional) explanation. 
    *
    * @param  ex      A parent exception 
-   * @param  change  An event which is being vetoed. 
+   * @param  change  An event which is being vetoed.
    */
 
-  public ChangeVetoException(Exception ex, ChangeEvent change) {
+  public ChangeVetoException(Throwable ex, ChangeEvent change) {
     super(ex);
     this.change = change;
   }
@@ -91,11 +91,15 @@ public class ChangeVetoException extends NestedException {
    *
    * @param  ex      A parent exception 
    * @param  reason  A detail message. 
+   * @deprecated use new ChangeVetoException(reason, ex);
    */
 
-   public ChangeVetoException(Exception ex, String reason) {
-    super(ex, reason);
-    this.change = null;
+   public ChangeVetoException(Throwable ex, String reason) {
+    this(ex, null, reason);
+  }
+  
+  public ChangeVetoException(String reason, Throwable cause) {
+    this(cause, null, reason);
   }
 
   /**
@@ -107,11 +111,11 @@ public class ChangeVetoException extends NestedException {
    */
 
   public ChangeVetoException(
-    Exception ex, 
+    Throwable ex, 
     ChangeEvent change, 
     String reason
   ) {
-    super(ex, reason);
+    super(reason, ex);
     this.change = change;
   }
 

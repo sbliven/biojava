@@ -729,7 +729,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
           // if they are equal or max is greater or either is NaN
           // dump current value
           InstructionVector useOldMax = new InstructionVector();
-          useOldMax.add( ByteCode.make_pop2());
+          useOldMax.add( ByteCode.make_pop2(true));
 
           stateV.add( new IfExpression(
             ByteCode.op_ifge, // branch if int on stack is >= 0
@@ -997,7 +997,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
             ifLargerThanMax.add( ByteCode.make_dstore (max));
 
             InstructionVector ifSmallerThanMax = new InstructionVector();
-            ifSmallerThanMax.add( ByteCode.make_pop2 ());
+            ifSmallerThanMax.add( ByteCode.make_pop2 (true));
 
             stateV.add( new IfExpression(
               ByteCode.op_ifge, // branch if int on stack >= 0
@@ -1049,7 +1049,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
             scoreNotNaN.add( ByteCode.make_dadd());
 
             InstructionVector scoreIsNaN = new InstructionVector();
-            scoreIsNaN.add( ByteCode.make_pop2());
+            scoreIsNaN.add( ByteCode.make_pop2(true));
 
             stateV.add( new IfExpression(
               ByteCode.op_ifge,
@@ -1288,7 +1288,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
             InstructionVector ifSmallerThanMax = new InstructionVector();
             ifSmallerThanMax.add( debug(message("Smaller")));
             ifSmallerThanMax.add( debug(message("  max: ", max)));
-            ifSmallerThanMax.add( ByteCode.make_pop2 ());
+            ifSmallerThanMax.add( ByteCode.make_pop2 (true));
 
             stateV.add( new IfExpression(
               ByteCode.op_ifge, // branch if int on stack >= 0
@@ -1344,7 +1344,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
             scoreNotNaN.add( ByteCode.make_dadd());
 
             InstructionVector scoreIsNaN = new InstructionVector();
-            scoreIsNaN.add( ByteCode.make_pop2());
+            scoreIsNaN.add( ByteCode.make_pop2(true));
 
             stateV.add( new IfExpression(
               ByteCode.op_ifge,

@@ -136,7 +136,7 @@ implements UnigeneFactory {
     }
     try {
       dataStore.commit();
-    } catch (NestedException ne) {
+    } catch (CommitFailure ne) {
       throw new BioException(ne);
     }
   }
@@ -173,7 +173,7 @@ implements UnigeneFactory {
     }
     try {
       liStore.commit();
-    } catch (NestedException ne) {
+    } catch (CommitFailure ne) {
       throw new BioException(ne);
     }
   }
@@ -214,7 +214,7 @@ implements UnigeneFactory {
     }
     try {
       uniqueStore.commit();
-    } catch (NestedException ne) {
+    } catch (CommitFailure ne) {
       throw new BioException(ne);
     }
   }
@@ -255,8 +255,8 @@ implements UnigeneFactory {
     }
     try {
       allStore.commit();
-    } catch (NestedException ne) {
-      throw new BioException(ne);
+    } catch (CommitFailure cf) {
+      throw new BioException(cf);
     }
   }
 

@@ -59,11 +59,11 @@ class ConfigFile
     }
 
     public void commit()
-        throws BioException {
+        throws CommitFailure {
         try {
             writeFile();
         } catch (IOException e) {
-            throw new BioException(e, "Couldn't commit");
+            throw new CommitFailure("Couldn't commit", e);
         }
     }
 
@@ -71,7 +71,7 @@ class ConfigFile
         try {
             parseFile();
         } catch (IOException e) {
-            throw new BioError(e, "Couldn't roll back: your data may be invalid");
+            throw new AssertionFailure("Couldn't roll back: your data may be invalid", e);
         }
     }
 

@@ -88,7 +88,7 @@ extends SequenceRendererWrapper {
     try {
       setPadding(padding);
     } catch (ChangeVetoException cve) {
-      throw new NestedError(cve, "Assertion Failure: Should have no listeners");
+      throw new AssertionFailure("Assertion Failure: Should have no listeners", cve);
     }
   }
   

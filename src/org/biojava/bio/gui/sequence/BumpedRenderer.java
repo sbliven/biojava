@@ -204,7 +204,7 @@ extends SequenceRendererWrapper {
       } catch (ChangeVetoException cve) {
         throw new BioError(cve, "Pants");
       } catch (Throwable t) {
-        throw new NestedError(t, "Could not bump feature: " + f);
+        throw new AssertionFailure("Could not bump feature: " + f, t);
       }
     }
     

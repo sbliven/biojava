@@ -37,6 +37,7 @@ import org.biojava.bio.symbol.*;
  *
  * @author Thomas Down
  * @author Greg Cox
+ * @author Matthew Pocock
  * @since 1.1
  */
 
@@ -65,9 +66,13 @@ public class AssembledSymbolList extends AbstractSymbolList {
 	componentList.addAll(components.keySet());
     }
 
+    /**
+     * @throws IllegalArgumentException if sl would introduce a circularity
+     *   into the tree of components
+     */
     public void putComponent(Location l, SymbolList sl) {
       if(sl == this) {
-        throw new NestedError("Circular reference");
+        throw new IllegalArgumentException("Circular reference");
       }
 	components.put(l, sl);
 	componentList.clear();

@@ -55,10 +55,10 @@ public interface CandyVocabulary
      *
      * @param name of a vocabulary entry to be checked
      * @return true if the given entry exists in this vocabulary
-     * @throws NestedException if the vocabulary is suddenly not available
+     * @throws CandyException if the vocabulary is suddenly not available
      *************************************************************************/
     boolean contains (String name)
-	throws NestedException;
+	throws CandyException;
 
     /*************************************************************************
      * It returns a selected vocabulary entry.
@@ -66,37 +66,37 @@ public interface CandyVocabulary
      * @see #getAllEntries getAllEntries
      * @param name a name of a vocabulary entry to be looked up
      * @return a vocabulary entry
-     * @throws NestedException when the given vocabulary entry does not exist
+     * @throws CandyException when the given vocabulary entry does not exist
      *************************************************************************/
     CandyEntry getEntryByName (String name)
-	throws NestedException;
+	throws CandyException;
 
     /*************************************************************************
      * It returns all available vocabulary entries.
      *
      * @see #getEntryByName getEntryByName
      * @return an Enumeration object containing all available entries
-     * @throws NestedException if the vocabulary is suddenly not available
+     * @throws CandyException if the vocabulary is suddenly not available
      *************************************************************************/
     Enumeration getAllEntries()
-	throws NestedException;
+	throws CandyException;
 
     /*************************************************************************
      * It return all names (entry identifiers) available in this vocabulary.
      *
      * @return an Enumeration object containing all available names
-     * @throws NestedException if the vocabulary is suddenly not available
+     * @throws CandyException if the vocabulary is suddenly not available
      *************************************************************************/
     Enumeration getAllNames()
-	throws NestedException;
+	throws CandyException;
 
     /*************************************************************************
      * It frees all resources related to this vocabulary.
      *
-     * @throws NestedException if the vocabulary is suddenly not available
+     * @throws CandyException if the vocabulary is suddenly not available
      *************************************************************************/
     void destroy()
-	throws NestedException;
+	throws CandyException;
 
     /*************************************************************************
      * 
@@ -142,21 +142,21 @@ public interface CandyVocabulary
      *  The name should be unique within a {@link CandyFinder}
      *  instance who delivers this vocabulary.
      */
-    String getName() throws NestedException;
+    String getName() throws CandyException;
 
     /** It returns a description of this vocabulary. */
-    String getDescription() throws NestedException;
+    String getDescription() throws CandyException;
 
     /** It returns a vesrion of this vocabulary. */
-    String getVersion() throws NestedException;
+    String getVersion() throws CandyException;
 
     /** It returns a number of entries contained in this vocabulary. */
-    int getCount() throws NestedException;
+    int getCount() throws CandyException;
 
     /** It returns <tt>true</tt> if the vocabulary entries should
      *  be considered as case-sensitive.
      */
-    boolean isCaseSensitive() throws NestedException;
+    boolean isCaseSensitive() throws CandyException;
 
     /**
      * <p>

@@ -20,8 +20,6 @@
  */
 package org.biojava.bio;
 
-import org.biojava.utils.NestedRuntimeException;
-
 /**
  * A nestable biological exception.
  *
@@ -53,7 +51,7 @@ import org.biojava.utils.NestedRuntimeException;
  * catch the error.
  */
 
-public class BioRuntimeException extends NestedRuntimeException {
+public class BioRuntimeException extends RuntimeException {
   /**
    * Create a new BioRuntimeException with a message.
    *
@@ -78,9 +76,14 @@ public class BioRuntimeException extends NestedRuntimeException {
    *
    * @param ex  the Throwable that caused this BioRuntimeException
    * @param message  the message
+   * @deprecated use new BioRuntimeException(message, ex) instead
    */
   public BioRuntimeException(Throwable ex, String message) {
-    super(ex, message);
+    this(message, ex);
+  }
+  
+  public BioRuntimeException(String message, Throwable ex) {
+    super(message, ex);
   }
   
   /**

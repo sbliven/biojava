@@ -98,6 +98,7 @@ import java.util.*;
  * </p>
  *
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
+ * @author Matthew Pocock
  * @version $Id$
  */
 
@@ -308,11 +309,11 @@ public interface BibRefSupport {
      * they need to use any supporting utility.
      * </p>
      * 
-     * @throws NestedException if the connection/initialization cannot
+     * @throws BibRefException if the connection/initialization cannot
      * be established
      *************************************************************************/
     void connect()
-	throws NestedException;
+	throws BibRefException;
 
     /**************************************************************************
      * It checks if a utility object is available. The semantic of 
@@ -341,10 +342,10 @@ public interface BibRefSupport {
      * </p>
      * 
      * @return an instance implementing {@link CandyFinder} interface
-     * @throws NestedException if the vocabulary finder cannot be found
+     * @throws BibRefException if the vocabulary finder cannot be found
      *************************************************************************/
     CandyFinder getVocabularyFinder()
-	throws NestedException;
+	throws BibRefException;
 
     /**************************************************************************
      * <p>
@@ -367,11 +368,11 @@ public interface BibRefSupport {
      * @param attrName a name of an attribute whose values should be
      *        available from the returned vocabulary
      * @return a controlled vocabulary
-     * @throws NestedException if there is no such vocabulary available, or
+     * @throws BibRefException if there is no such vocabulary available, or
      *        something else wrong happened
      *************************************************************************/
     CandyVocabulary getSupportedValues (String resourceType, String attrName)
-	throws NestedException;
+	throws BibRefException;
 
     /**************************************************************************
      * <p>
@@ -381,10 +382,10 @@ public interface BibRefSupport {
      * 
      * @see #getSupportedCriteria(String) getSupportedCriteria for a repository subset
      * @return available criteria
-     * @throws NestedException if something bad happened
+     * @throws BibRefException if something bad happened
      *************************************************************************/
     BiblioCriterion[] getSupportedCriteria()
-	throws NestedException;
+	throws BibRefException;
 
     /**************************************************************************
      * <p>
@@ -398,11 +399,11 @@ public interface BibRefSupport {
      *                         as (possibly) defined in the controlled
      *                         vocabulary {@link #REPOSITORY_SUBSETS}
      * @return available criteria
-     * @throws NestedException if there is no such repository subset, or
+     * @throws BibRefException if there is no such repository subset, or
      *        something else wrong happened
      *************************************************************************/
     BiblioCriterion[] getSupportedCriteria (String repositorySubset)
-	throws NestedException;
+	throws BibRefException;
 
     /*************************************************************************
      * <p>
@@ -431,10 +432,10 @@ public interface BibRefSupport {
      * @param collections to be merged together
      * @param properties define features how to do merging
      * @return a merged collection
-     * @throws NestedException if merging failed (which may also happen when
+     * @throws BibRefException if merging failed (which may also happen when
      *         any of the collection is too large)
      *************************************************************************/
     BibRefQuery union (BibRefQuery[] collections, Hashtable properties)
-	throws NestedException;
+	throws BibRefException;
 
 }

@@ -247,6 +247,7 @@ import java.io.*;
  * </p>
  *
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
+ * @author Matthew Pocock
  * @version $Id$
  * @see BibRef
  * @see BibRefSupport
@@ -318,10 +319,10 @@ public interface BibRefQuery {
      * from the repository.
      * </p>
      *
-     * @throws NestedException if the connection cannot be established
+     * @throws BibRefException if the connection cannot be established
      *************************************************************************/
     void connect()
-	throws NestedException;
+	throws BibRefException;
 
     /**************************************************************************
      * <p>
@@ -335,11 +336,11 @@ public interface BibRefQuery {
      * @param collectionId a (usually persistent) token allowing to re-create
      *        a collection; the parameter is the same as an identifier returned
      *        earlier by method {@link #getCollectionId}
-     * @throws NestedException if the connection cannot be established, or if the
+     * @throws BibRefException if the connection cannot be established, or if the
      *        collection with the given ID cannot be re-created
      *************************************************************************/
     void connect (byte[] collectionId)
-	throws NestedException;
+	throws BibRefException;
 
     /**************************************************************************
      * It checks if the repository is available. The semantic of 
@@ -376,10 +377,10 @@ public interface BibRefQuery {
      * </p>
      *
      * @see #disconnect disconnect for less permanent action
-     * @throws NestedException if the connection to the repository is broken
+     * @throws BibRefException if the connection to the repository is broken
      *************************************************************************/
     void destroy()
-	throws NestedException;
+	throws BibRefException;
 
     /*************************************************************************
      * <p>
@@ -423,11 +424,11 @@ public interface BibRefQuery {
      * @param properties specify attributes excluded from the results and
      *                   requested criteria for the query
      * @return a new query (and query-able) collection
-     * @throws NestedException if query failed (which can have many reasons :-))
+     * @throws BibRefException if query failed (which can have many reasons :-))
      *         (note that an empty result does not cause an exception)
      *************************************************************************/
     BibRefQuery find (String[] keywords, String[] attrs, Hashtable properties)
-	throws NestedException;
+	throws BibRefException;
 
     /*************************************************************************
      * <p>
@@ -468,11 +469,11 @@ public interface BibRefQuery {
      * @param properties specify attributes excluded from the results and
      *                   requested criteria for the query
      * @return a new query (and query-able) collection
-     * @throws NestedException if query failed (which can have many reasons :-))
+     * @throws BibRefException if query failed (which can have many reasons :-))
      *         (note that an empty result does not cause an exception)
      *************************************************************************/
     BibRefQuery findByAuthor (BiblioProvider author, Hashtable properties)
-	throws NestedException;
+	throws BibRefException;
 
     /*************************************************************************
      * <p>
@@ -488,11 +489,11 @@ public interface BibRefQuery {
      * @see #findById(String,String[]) findById with limited returned attributes
      * @param bibRefId an identifier of a citation that is being looked for
      * @return a found bibliographic reference (citation)
-     * @throws NestedException if such citation was not found (or something else
+     * @throws BibRefException if such citation was not found (or something else
      *                     bad happened)
      *************************************************************************/
     BibRef findById (String bibRefId)
-	throws NestedException;
+	throws BibRefException;
 
     /*************************************************************************
      * <p>
@@ -534,11 +535,11 @@ public interface BibRefQuery {
      * @param onlyAttrs a list of attribute names; at least these attributes
      *                  will be included in the returned citation
      * @return a found bibliographic reference (citation)
-     * @throws NestedException if such citation was not found (or something else
+     * @throws BibRefException if such citation was not found (or something else
      *                     bad happened)
      *************************************************************************/
     BibRef findById (String bibRefId, String[] onlyAttrs)
-	throws NestedException;
+	throws BibRefException;
 
     /*************************************************************************
      * <p>
@@ -580,11 +581,11 @@ public interface BibRefQuery {
      * @param properties specify attributes excluded from the results and
      *                   requested criteria for the query
      * @return a new query (and query-able) collection
-     * @throws NestedException if query failed (which can have many reasons :-))
+     * @throws BibRefException if query failed (which can have many reasons :-))
      *         (note that an empty result does not cause an exception)
      *************************************************************************/
     BibRefQuery query (String query, Hashtable properties)
-	throws NestedException;
+	throws BibRefException;
 
     /*************************************************************************
      * <p>
@@ -592,10 +593,10 @@ public interface BibRefQuery {
      * </p>
      *
      * @return the size of this collection
-     * @throws NestedException if a connection with the repository is broken
+     * @throws BibRefException if a connection with the repository is broken
      *************************************************************************/
     int getBibRefCount()
-	throws NestedException;
+	throws BibRefException;
 
     /*************************************************************************
      * <p>
@@ -619,11 +620,11 @@ public interface BibRefQuery {
      * @param orderedBy a list of attribute names that the collection should
      *                  be sorted by
      * @return a sorted collection
-     * @throws NestedException if sorting failed (which may also happen when
+     * @throws BibRefException if sorting failed (which may also happen when
      *         the collection is too large)
      *************************************************************************/
     BibRefQuery sort (String[] orderedBy, Hashtable properties)
-	throws NestedException;
+	throws BibRefException;
 
     /*************************************************************************
      * <p>
@@ -641,11 +642,11 @@ public interface BibRefQuery {
      *
      * @see #getAllBibRefs(String[]) getAllBibRefs with limited returned attributes
      * @return all citations from the current collection
-     * @throws NestedException if the collection is too large, or if the connection
+     * @throws BibRefException if the collection is too large, or if the connection
      *        to the repository is broken
      *************************************************************************/
     BibRef[] getAllBibRefs()
-	throws NestedException;
+	throws BibRefException;
 
     /*************************************************************************
      * <p>
@@ -675,11 +676,11 @@ public interface BibRefQuery {
      * @see #getAllBibRefs getAllBibRefs with all attributes
      * @see #getAllIDs getAllIDs
      * @return all citations from the current collection
-     * @throws NestedException if the collection is too large, or if the connection
+     * @throws BibRefException if the collection is too large, or if the connection
      *        to the repository is broken
      *************************************************************************/
     BibRef[] getAllBibRefs (String[] onlyAttrs)
-	throws NestedException;
+	throws BibRefException;
 
     /*************************************************************************
      * <p>
@@ -687,11 +688,11 @@ public interface BibRefQuery {
      * </p>
      *
      * @return a list of all identifiers
-     * @throws NestedException if the collection is too large, or if the connection
+     * @throws BibRefException if the collection is too large, or if the connection
      *        to the repository is broken
      *************************************************************************/
     String[] getAllIDs()
-	throws NestedException;
+	throws BibRefException;
 
     /*************************************************************************
      * <p>
@@ -708,10 +709,10 @@ public interface BibRefQuery {
      *
      * @see #getAllBibRefs getAllBibRefs
      * @return an iterator over all citations
-     * @throws NestedException if the connection to the repository is broken
+     * @throws BibRefException if the connection to the repository is broken
      *************************************************************************/
     Enumeration getBibRefs()
-	throws NestedException;
+	throws BibRefException;
 
     /*************************************************************************
      * <p>
@@ -742,10 +743,10 @@ public interface BibRefQuery {
      * @see #getAllBibRefs getAllBibRefs
      * @see #getBibRefs getBibRefs with all attributes
      * @return an iterator over all citations
-     * @throws NestedException if the connection to the repository is broken
+     * @throws BibRefException if the connection to the repository is broken
      *************************************************************************/
     Enumeration getBibRefs (String[] onlyAttrs)
-	throws NestedException;
+	throws BibRefException;
 
     /*************************************************************************
      * <p>
@@ -762,11 +763,11 @@ public interface BibRefQuery {
      * @see #getAllBibRefs getAllBibRefs
      * @return an XML data stream containing all citations from the current
      *         collection
-     * @throws NestedException if the collection is too large, or if the connection
+     * @throws BibRefException if the collection is too large, or if the connection
      *        to the repository is broken
      *************************************************************************/
     InputStream getAllBibRefsAsXML()
-	throws NestedException;
+	throws BibRefException;
 
     /*************************************************************************
      * <p>
@@ -785,10 +786,10 @@ public interface BibRefQuery {
      * @see #getBibRefs getBibRefs
      * @see #getAllBibRefsAsXML getAllBibRefsAsXML
      * @return an iterator over all citations
-     * @throws NestedException if the connection to the repository is broken
+     * @throws BibRefException if the connection to the repository is broken
      *************************************************************************/
     Enumeration getBibRefsAsXML()
-	throws NestedException;
+	throws BibRefException;
 
     /*************************************************************************
      * <p>
@@ -804,10 +805,10 @@ public interface BibRefQuery {
      *
      * @param bibRef a citation being converted into an XML format
      * @return an XML representation of <tt>bibRef</tt>
-     * @throws NestedException if the implementation needs it :-)
+     * @throws BibRefException if the implementation needs it :-)
      *************************************************************************/
     String getBibRefAsXML (BibRef bibRef)
-	throws NestedException;
+	throws BibRefException;
 
 
 }

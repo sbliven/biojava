@@ -31,11 +31,11 @@ package org.biojava.utils;
  *   The text of the actual offending line (Null if unknown)
  *   Character offset (negative for unknown)
  * </pre>
- * @author Original author unknown
+ * @author Matthew Pocock
  * @author Greg Cox
  */
 
-public class ParserException extends NestedException {
+public class ParserException extends Exception {
     private String locator = null;
     private int lineNumber = -1;
     private int character = -1;
@@ -84,17 +84,24 @@ public class ParserException extends NestedException {
       super(t);
     }
 
+    /**
+     * @deprecated use new ParserException(detail, t)
+     */
     public ParserException(Throwable t, String detail) {
-      super(t, detail);
+      this(detail, t);
+    }
+    
+    public ParserException(String message, Throwable cause) {
+      super(message, cause);
     }
 
     public ParserException(Throwable t, String detail, String locator) {
-	super(t, detail);
+	super(detail, t);
 	this.locator = locator;
     }
 
     public ParserException(Throwable t, String detail, String locator, int line) {
-	super(t, detail);
+	super(detail, t);
 	this.locator = locator;
 	this.lineNumber = line;
     }
@@ -106,7 +113,7 @@ public class ParserException extends NestedException {
 			  int lineNumber,
 			  String line)
     {
-	super(t, detail);
+	super(detail, t);
 	this.locator = locator;
 	this.lineNumber = lineNumber;
 	this.line = line;
@@ -120,7 +127,7 @@ public class ParserException extends NestedException {
 			  String line,
 			  int character)
     {
-	super(t, detail);
+	super(detail, t);
 	this.locator = locator;
 	this.lineNumber = lineNumber;
 	this.character = character;

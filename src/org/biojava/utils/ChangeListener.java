@@ -92,6 +92,7 @@ public interface ChangeListener extends EventListener {
    *  An implementation that always vetoes everything. 
    *
    * @author     Thomas Down
+   * @author     Matthew Pocock
    * @since      1.1 
    */
 
@@ -110,13 +111,15 @@ public interface ChangeListener extends EventListener {
       );
     }
 
+    /**
+     * @throws AssertionFailure if this is called, as preChange should have
+     *   vetoed any change already
+     */
     public void postChange(ChangeEvent cev) {
-      throw new NestedError(
+      throw new AssertionFailure(
         new ChangeVetoException(
-          cev, "This object has been locked"
-        ),
-        "Assertion Failure: A locked object has been modified"
-      );
+          cev,
+          "This object has been locked" ));
     }
   }
   

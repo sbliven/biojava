@@ -28,8 +28,6 @@
 
 package org.biojava.bio;
 
-import org.biojava.utils.NestedError;
-
 /**
  * A nestable biological error.
  *
@@ -46,7 +44,7 @@ import org.biojava.utils.NestedError;
  * Throw this when something has gone wrong and in general people should not be
  * handeling it.
  */
-public class BioError extends NestedError {
+public class BioError extends Error {
   /**
    * Create a new BioError with a message.
    *
@@ -70,9 +68,14 @@ public class BioError extends NestedError {
    *
    * @param ex  the Throwable that caused this BioError
    * @param message  the message
+   * @deprecated Use BioError(message, ex) instead.
    */
   public BioError(Throwable ex, String message) {
-    super(ex, message);
+    this(message, ex);
+  }
+  
+  public BioError(String message, Throwable ex) {
+    super(message, ex);
   }
   
   /**

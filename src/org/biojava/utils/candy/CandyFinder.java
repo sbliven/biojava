@@ -42,6 +42,7 @@ import java.beans.*;
  * </p>
  *
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
+ * @author Matthew Pocock
  * @version $Id$
  */
 
@@ -61,10 +62,10 @@ public interface CandyFinder
      * they need to use the finder.
      * </p>
      *
-     * @throws NestedException if the connection/initialization cannot
+     * @throws CandyException if the connection/initialization cannot
      *         be established
      *************************************************************************/
-    void connect() throws NestedException;
+    void connect() throws CandyException;
 
     /**************************************************************************
      * It checks if a vocabulary finder object is available. The semantic of 
@@ -86,10 +87,10 @@ public interface CandyFinder
      * </p>
      *
      * @return a list of available vocabulary names
-     * @throws NestedException if the finder fails to communicate
+     * @throws CandyException if the finder fails to communicate
      *         with its vocabularies
      *************************************************************************/
-    String[] getAllVocabularyNames() throws NestedException;
+    String[] getAllVocabularyNames() throws CandyException;
 
     /*************************************************************************
      * It returns a selected vocabulary.
@@ -97,28 +98,28 @@ public interface CandyFinder
      * @see #getAllVocabularyNames
      * @param name a name of a vocabulary to be returned
      * @return a selected vocabulary
-     * @throws NestedException when the vocabulary cannot be found (likely the
+     * @throws CandyException when the vocabulary cannot be found (likely the
      *         given name is wrong)
      *************************************************************************/
     CandyVocabulary getVocabularyByName (String name)
-      throws NestedException;
+      throws CandyException;
 
     /*************************************************************************
      * It returns all available vocabularies.
      *
      * @return all available vocabularies
-     * @throws NestedException if the finder fails to communicate
+     * @throws CandyException if the finder fails to communicate
      *         with its vocabularies
      *************************************************************************/
-    CandyVocabulary[] getAllVocabularies() throws NestedException;
+    CandyVocabulary[] getAllVocabularies() throws CandyException;
 
     /*************************************************************************
      * It returns the number of available vocabularies.
      *
-     * @throws NestedException if the finder fails to communicate
+     * @throws CandyException if the finder fails to communicate
      *         with its vocabularies
      *************************************************************************/
-    int getNumCount() throws NestedException;
+    int getNumCount() throws CandyException;
 
     /*************************************************************************
      * 
@@ -156,8 +157,8 @@ public interface CandyFinder
     /*************************************************************************
      * It returns a name of this vocabulary finder.
      *
-     * @throws NestedException if the finder fails to return its name
+     * @throws CandyException if the finder fails to return its name
      *************************************************************************/
-    String getFinderName() throws NestedException;
+    String getFinderName() throws CandyException;
 
 }

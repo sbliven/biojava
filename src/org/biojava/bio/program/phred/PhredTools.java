@@ -143,7 +143,7 @@ public final class PhredTools {
       try{
         sl.addSymbol(getPhredSymbol(d,q));
       }catch(ChangeVetoException e){
-        throw new NestedError(e);
+        throw new AssertionFailure(e);
       }
     }
 
@@ -182,7 +182,7 @@ public final class PhredTools {
           try{
             qualDB.addSequence( new SimpleSequence(ql,p.getURN(),p.getName(),p.getAnnotation()));
           }catch(ChangeVetoException cve){
-            throw new NestedError(cve,"Cannot Add Quality Sequences to Database");
+            throw new AssertionFailure("Cannot Add Quality Sequences to Database", cve);
           }
         }
         else{
@@ -295,11 +295,11 @@ public final class PhredTools {
 
           dtc.train();
         }catch(IllegalAlphabetException iae){
-          throw new NestedError(iae,"Sequence "+s.getName()+" contains an illegal alphabet");
+          throw new AssertionFailure("Sequence "+s.getName()+" contains an illegal alphabet", iae);
         }catch(ChangeVetoException cve){
-          throw new NestedError(cve, "The Distribution has become locked");
+          throw new AssertionFailure("The Distribution has become locked", cve);
         }catch(IllegalSymbolException ise){
-          throw new NestedError(ise, "Sequence "+s.getName()+" contains an illegal symbol");
+          throw new AssertionFailure("Sequence "+s.getName()+" contains an illegal symbol", ise);
         }
       }
       return pos;

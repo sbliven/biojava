@@ -20,8 +20,6 @@
  */
 package org.biojava.directory;
 
-import org.biojava.utils.NestedException;
-
 /**
  * A <code>RegistryException</code> thrown when the registry cannot
  * find an implementation of a requested <code>SequenceDB</code>.
@@ -29,9 +27,10 @@ import org.biojava.utils.NestedException;
  * @author Brian Gilman
  * @author Thomas Down
  * @author Keith James
+ * @author Matthew Pocock
  * @version $Revision$
  */
-public class RegistryException extends NestedException {
+public class RegistryException extends Exception {
 
     /**
      * Creates a new <code>RegistryException</code> with no detail
@@ -67,8 +66,13 @@ public class RegistryException extends NestedException {
      *
      * @param t a <code>Throwable</code>.
      * @param message a <code>String</code>.
+     * @deprecated use new RegistryException(message, cause)
      */
     public RegistryException(Throwable t, String message) {
-	super(t, message);
+	this(message, t);
+    }
+    
+    public RegistryException(String message, Throwable t) {
+      super(message, t);
     }
 }

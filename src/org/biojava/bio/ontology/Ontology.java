@@ -30,6 +30,8 @@ import org.biojava.utils.*;
  * This class does not itself contain any reasoning functionality.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
+ *
  * @since 1.4
  */
 
@@ -87,6 +89,20 @@ public interface Ontology extends Changeable {
     public Set getTriples(Term subject, Term object, Term relation);
     
     /**
+     * Return the associated OntologyOps.
+     *
+     * @for.developer  This method should be implemented by ontology
+     * implementors to allow OntoTools
+     * to get optimized access to some usefull ontology operations. It is not
+     * intended that users will ever invoke this. A sensible dumb implementation
+     * of this would return a per-ontology instance of DefaultOps.
+     *
+     * @return the OntologyOps instance associated with this instance.
+     */
+     
+    public OntologyOps getOps();
+    
+    /**
      * Create a new term in this ontology
      *
      * @param name The name of the term (must be unique)
@@ -98,13 +114,21 @@ public interface Ontology extends Changeable {
      * @return The newly created term.
      */
     
-    public Term createTerm(String name, String description) throws AlreadyExistsException, ChangeVetoException, IllegalArgumentException;
+    public Term createTerm(String name, String description)
+    throws
+      AlreadyExistsException,
+      ChangeVetoException,
+      IllegalArgumentException;
     
     /**
      * Create a term which represents a set of triples
      */
      
-    public TripleTerm createTripleTerm(Term subject, Term object, Term relation) throws AlreadyExistsException, ChangeVetoException, IllegalArgumentException;
+    public TripleTerm createTripleTerm(Term subject, Term object, Term relation)
+    throws
+      AlreadyExistsException,
+      ChangeVetoException,
+      IllegalArgumentException;
     
     /**
      * Create a view of a term from another ontology.  If the requested term
@@ -112,13 +136,20 @@ public interface Ontology extends Changeable {
      * object.
      */
    
-    public RemoteTerm importTerm(Term t) throws AlreadyExistsException, ChangeVetoException, IllegalArgumentException;
+    public RemoteTerm importTerm(Term t)
+    throws
+      AlreadyExistsException,
+      ChangeVetoException,
+      IllegalArgumentException;
    
     /**
      * Create a new triple in this ontology
      */
     
-    public Triple createTriple(Term subject, Term object, Term relation) throws AlreadyExistsException, ChangeVetoException;
+    public Triple createTriple(Term subject, Term object, Term relation)
+    throws
+      AlreadyExistsException,
+      ChangeVetoException;
     
     /**
      * See if a triple exists in this ontology
@@ -146,12 +177,16 @@ public interface Ontology extends Changeable {
     
     /**
      * A basic in-memory implementation of an ontology
+     *
+     * @author Thomas Down
+     * @author Matthew Pocock
+     * @since 1.3
      */
      
     
     public final class Impl
     extends AbstractChangeable
-    implements Ontology, OntologyOps, java.io.Serializable {
+    implements Ontology, java.io.Serializable {
         private Map terms;
         private Set triples;
         private Map subjectTriples;
@@ -438,17 +473,8 @@ public interface Ontology extends Changeable {
             }
         }
         
-        public Ontology transitiveClosure(
-          Term subject,
-          Term object,
-          Term relation
-        ) throws OntologyException {
-          return ops.transitiveClosure(subject, object, relation);
-        }
-        
-        public boolean isa(Term subject, Term object)
-        throws OntologyException {
-          return ops.isa(subject, object);
+        public OntologyOps getOps() {
+          return ops;
         }
         
         public String toString() {

@@ -112,7 +112,7 @@ public class AnnotationBuilder
         Frame old = peek(annotationStack);
         old.type.setProperty(old.annotation, old.tag, last);
       } catch (ChangeVetoException cve) {
-        throw new NestedError(cve);
+        throw new AssertionFailure(cve);
       }
     }
   }
@@ -126,7 +126,7 @@ public class AnnotationBuilder
       Frame top = peek(annotationStack);
       top.type.setProperty(top.annotation, top.tag, value);
     } catch (ChangeVetoException cve) {
-      throw new NestedError(cve);
+      throw new AssertionFailure(cve);
     }
   }
   

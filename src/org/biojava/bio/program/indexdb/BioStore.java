@@ -266,10 +266,10 @@ public class BioStore implements IndexStore {
     /**
      * <code>commit</code> writes an index to disk.
      *
-     * @exception NestedException if an error occurs.
+     * @exception CommitFailure if an error occurs.
      */
     public void commit()
-        throws NestedException {
+        throws CommitFailure {
         Collections.sort(primaryList, primaryList.getComparator());
         primaryList.commit();
         for (Iterator i = idToList.values().iterator(); i.hasNext(); ) {
@@ -281,9 +281,11 @@ public class BioStore implements IndexStore {
         try {
             writeFileIDs();
         } catch (ChangeVetoException cve) {
-            throw new BioException(cve);
+            throw new CommitFailure(cve);
         } catch (IOException ioe) {
-            throw new BioException(ioe);
+            throw new CommitFailure(ioe);
+        } catch (BioException be) {
+          throw new CommitFailure(be);
         }
 
         metaData.commit();

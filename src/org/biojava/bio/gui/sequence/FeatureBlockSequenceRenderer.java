@@ -88,7 +88,7 @@ public class FeatureBlockSequenceRenderer extends AbstractChangeable
         try {
             setFeatureRenderer(new BasicFeatureRenderer());
         } catch (ChangeVetoException cve) {
-            throw new NestedError(cve, "Assertion Failure: Should have no listeners");
+            throw new AssertionFailure("Assertion Failure: Should have no listeners", cve);
         }
     }
 
@@ -102,7 +102,7 @@ public class FeatureBlockSequenceRenderer extends AbstractChangeable
         try {
             setFeatureRenderer(fRend);
         } catch (ChangeVetoException cve) {
-            throw new NestedError(cve, "Assertion Failure: Should have no listeners");
+            throw new AssertionFailure("Assertion Failure: Should have no listeners", cve);
         }
     }
     

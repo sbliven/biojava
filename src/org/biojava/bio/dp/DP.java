@@ -62,6 +62,24 @@ import org.biojava.bio.dist.*;
  * @author Thomas Down
  */
 public abstract class DP {
+  private static List NO_ADVANCE = new ArrayList();
+  
+  private int[] getNoAdvance() {
+    int heads = getModel().heads();
+    int[] no_advance = (int[]) NO_ADVANCE.get(heads);
+    
+    if(no_advance == null) {
+      no_advance = new int[heads];
+      for(int i = 0; i < heads; i++) {
+        no_advance[i] = 0;
+      }
+      
+      NO_ADVANCE.add(heads, no_advance);
+    }
+    
+    return no_advance;
+  }
+
   /**
     * Scores the SymbolList from symbol start to symbol (start+columns) with a
     * weight matrix.
@@ -100,7 +118,7 @@ public abstract class DP {
     return model;
   }
   
-  public static State[] stateList(MarkovModel mm)
+  public State[] stateList(MarkovModel mm)
   throws IllegalSymbolException, IllegalTransitionException,
   BioException
   {
@@ -131,6 +149,39 @@ public abstract class DP {
         }
       }
     }
+    
+    Collections.sort(emissionStates, new Comparator() {
+      public int compare(Object o1, Object o2) {
+        State s = (State) o1;
+        State t = (State) o2;
+        
+        // sort by advance
+        int[] sa;
+        if(s instanceof EmissionState) {
+          sa = ((EmissionState) s).getAdvance();
+        } else {
+          sa = getNoAdvance();
+        }
+        
+        int[] ta;
+        if(t instanceof EmissionState) {
+          ta = ((EmissionState) t).getAdvance();
+        } else {
+          ta = getNoAdvance();
+        }
+        
+        for(int i = 0; i < sa.length; i++) {
+          if(sa[i] > ta[i]) {
+            return -1;
+          } else if(sa[i] < ta[i]) {
+            return +1;
+          }
+        }
+        
+        // give up - sort by name
+        return s.getName().compareTo(t.getName());
+      }
+    });
     
     State[] sl = new State[emissionStates.size() + dotStates.size()];
     int i = 0;
@@ -584,7 +635,7 @@ public abstract class DP {
 	    if (transitionsTo(s2, s1)) {
         return GREATER_THAN;
       }
-
+      
 	    return DISJOINT;
     }
 

@@ -144,7 +144,7 @@ public class ChangeSupport {
    */
   public void addChangeListener(ChangeListener cl, ChangeType ct) {
     if (ct == null) {
-      throw new NestedError("Since 1.2, listeners registered for the null changetype are not meaningful.  Please register a listener for ChangeType.UNKNOWN instead");
+      throw new NullPointerException("Since 1.2, listeners registered for the null changetype are not meaningful.  Please register a listener for ChangeType.UNKNOWN instead");
     }
     
     if(isUnchanging(ct)) {

@@ -25,22 +25,27 @@ package org.biojava.utils;
  * Implementations of <code>Commitable</code> support atomic changes
  * from one known state to another via commit/rollback semantics.
  *
- * @author Unknown
+ * @author Matthew Pocock
  * @author Keith James
+ * @since 1.3
  */
 public interface Commitable {
 
     /**
      * <code>commit</code> commits pending changes.
      *
-     * @exception NestedException if an error occurs
+     * @throws CommitFailure if an error occurs
      */
     public void commit()
-        throws NestedException;
+        throws CommitFailure;
   
     /**
      * <code>rollback</code> reverses pending changes to restore
-     * initial (or prior commit) state.
+     * initial (or prior commit) state. This always succededs or raises an
+     * unchecked exception.
+     *
+     * @for.developer
+     * If the rollback fails, you <em>must</em> raise an AssertionFailure.
      */
     public void rollback();
 }
