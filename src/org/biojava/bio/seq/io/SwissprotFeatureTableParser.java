@@ -33,7 +33,7 @@ import org.biojava.bio.seq.*;
 /**
  * Simple parser for swissprot feature tables.
  *
- * @author Greg Cox (Based heavily off of FeatureTableParser)
+ * @author Greg Cox
  * @author Thomas Down
  */
 
@@ -72,7 +72,7 @@ class SwissprotFeatureTableParser
 	inFeature = true;
     }
 
-	public void featureData(String line) 
+	public void featureData(String line)
 	    throws BioException
 	{
 		boolean newFeature = false;
@@ -117,7 +117,7 @@ class SwissprotFeatureTableParser
 
 	    listener.startFeature(featureTemplate);
 	    listener.endFeature();
-	    
+
 	    inFeature = false;
 	}
 
@@ -138,27 +138,41 @@ class SwissprotFeatureTableParser
 	{
 		Index startIndex = this.getIndex(theTokens);
 		Index endIndex = this.getIndex(theTokens);
-		Integer startPoint = startIndex.point;
-		Integer endPoint = endIndex.point;
-		boolean startIsFuzzy = startIndex.isFuzzy;
-		boolean endIsFuzzy = endIndex.isFuzzy;
 
 		Location theLocation;
-		if(startIsFuzzy || endIsFuzzy) {
-		    theLocation = new FuzzyLocation(startIsFuzzy ? Integer.MIN_VALUE : startPoint.intValue(),
-						    endIsFuzzy ? Integer.MAX_VALUE : endPoint.intValue(),
-						    startPoint.intValue(),
-						    endPoint.intValue(),
-						    FuzzyLocation.RESOLVE_INNER);
-		} else {
-		    if(endPoint.equals(startPoint))
+		if(startIndex.isFuzzy() || endIndex.isFuzzy())
+		{
+			// This handles all locations with one of the following points:
+			// 		<nn
+			//		>nn
+			//		?nn
+			//		?
+			// All these get resolved into a fuzzy location, though with
+			// different combinations of start and end points.  The getIndex
+			// method does some preliminary work to find mins and maxes
+			if(startIndex.equals(endIndex))
 			{
-			    theLocation = new PointLocation(startPoint.intValue());
+				theLocation = new FuzzyPointLocation(startIndex.getMinValue(),
+						startIndex.getMaxValue(),
+						FuzzyPointLocation.RESOLVE_AVERAGE);
 			}
-		    else
+			else
 			{
-			    theLocation = new RangeLocation(startPoint.intValue(), endPoint.intValue());
+				theLocation = new FuzzyLocation(startIndex.getMinValue(),
+					endIndex.getMaxValue(), startIndex.getMaxValue(),
+					endIndex.getMinValue(), startIndex.isFuzzy(),
+					endIndex.isFuzzy(), FuzzyLocation.RESOLVE_INNER);
 			}
+		}
+		else if(startIndex.equals(endIndex))
+		{
+			// Fuzzy point locations were peeled off as fuzzy locations.  The
+			// point locations handled here are concrete point locations
+		    theLocation = new PointLocation(startIndex.getMinValue());
+		}
+	    else
+		{
+		    theLocation = new RangeLocation(startIndex.getMinValue(), endIndex.getMinValue());
 		}
 
 		return theLocation;
@@ -170,44 +184,101 @@ class SwissprotFeatureTableParser
 	 * @exception BioException Thrown if a non-number token is passed in
 	 * (fuzzy locations are handled)
 	 * @param theTokens The tokens to be processed
-	 * @return Index The integer in the next token and if it is a fuzzy integer
+	 * @return Index
 	 */
 	private Index getIndex(StringTokenizer theTokens)
 		throws BioException
 	{
 		String returnIndex = theTokens.nextToken();
-		boolean indexIsFuzzy = false;
-		if((returnIndex.indexOf('<') != -1) && (returnIndex.indexOf('>') != -1))
+		int minValue;
+		int maxValue;
+		boolean isFuzzy;
+		if(returnIndex.indexOf('<') != -1)
 		{
+			// Peel off cases "<nn"  Returned as MIN_VALUE to nn
 			returnIndex = returnIndex.substring(1);
-			indexIsFuzzy = true;
+			minValue = Integer.MIN_VALUE;
+			maxValue = Integer.parseInt(returnIndex);
+			isFuzzy = true;
+		}
+		else if(returnIndex.indexOf('>') != -1)
+		{
+			// Peel off cases ">nn"  Returned as nn to MAX_VALUE
+			returnIndex = returnIndex.substring(1);
+			maxValue = Integer.MAX_VALUE;
+			minValue = Integer.parseInt(returnIndex);
+			isFuzzy = true;
+		}
+		else if(returnIndex.indexOf('?') != -1)
+		{
+			// Two cases are handled here; '?' and "?nn"
+			if(returnIndex.length() == 1)
+			{
+				minValue = Integer.MIN_VALUE;
+				maxValue = Integer.MAX_VALUE;
+				isFuzzy = true;
+			}
+			else
+			{
+				returnIndex = returnIndex.substring(1);
+				minValue = Integer.parseInt(returnIndex);
+				maxValue = minValue;
+				isFuzzy = true;
+			}
+		}
+		else
+		{
+			// Plain vanilla location
+			minValue = Integer.parseInt(returnIndex);
+			maxValue = minValue;
+			isFuzzy = false;
 		}
 
-		Index returnValue;
-		try
-		{
-			returnValue = new Index(new Integer(returnIndex), indexIsFuzzy);
-		}
-		catch (NumberFormatException ex)
-		{
-			throw new BioException("bad locator: " + returnIndex);
-		}
-		return returnValue;
+		return(new Index(minValue, maxValue, isFuzzy));
 	}
 
 	/**
-	 * This inner class is a struct so that a boolean and an Int can be passed
-	 * around in location parsing
+	 * This inner class is a struct to pass back the information contained in
+	 * a Swissprot point
 	 */
 	private class Index
 	{
-		public boolean isFuzzy;
-		public Integer point;
+		protected int mMinValue;
+		protected int mMaxValue;
+		protected boolean isFuzzy;
 
-		public Index(Integer thePoint, boolean theFuzzyness)
+		public Index(int theMinValue, int theMaxValue, boolean theFuzzyness)
 		{
-			point = thePoint;
-			isFuzzy = theFuzzyness;
+			this.mMinValue = theMinValue;
+			this.mMaxValue = theMaxValue;
+			this.isFuzzy = theFuzzyness;
+		}
+
+		public int getMaxValue()
+		{
+			return this.mMaxValue;
+		}
+
+		public int getMinValue()
+		{
+			return this.mMinValue;
+		}
+
+		public boolean isFuzzy()
+		{
+			return this.isFuzzy;
+		}
+
+		public boolean equals(Index theIndex)
+		{
+			boolean returnValue = false;
+			if((this.mMinValue == theIndex.getMinValue()) &&
+				(this.mMaxValue == theIndex.getMaxValue()) &&
+				(this.isFuzzy == theIndex.isFuzzy()))
+			{
+				returnValue = true;
+			}
+			return returnValue;
 		}
 	}
 }

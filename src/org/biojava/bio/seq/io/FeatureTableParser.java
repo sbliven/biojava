@@ -47,7 +47,7 @@ import org.biojava.bio.seq.*;
  * Thomas Down: Post 1.1, finally got round to refactoring this to be
  *              a `nice' player in the newio world.  Needless to say,
  *              this simplified things quite a bit.
- * 
+ *
  * Keith James: Added support for reading fuzzy i.e. (123.567)
  *              locations in addition to unbounded i.e. <123..567
  *              locations.
@@ -161,19 +161,13 @@ public class FeatureTableParser {
      * Parse an EMBL location and fill in the location and strand fields of the
      * template. Updated to support a wider range of location types.
      */
-    private void parseLocation(String loc, StrandedFeature.Template fillin) 
-	throws BioException 
+    private void parseLocation(String loc, StrandedFeature.Template fillin)
+	throws BioException
     {
-	Object [] locStruct = locParser.parseLocation(loc);
+	StrandedLocation parsedLocation = locParser.parseLocation(loc);
 
-	if (((Boolean) locStruct[1]).booleanValue())
-	{
-	    fillin.strand = StrandedFeature.NEGATIVE;
-	} else {
-	    fillin.strand = StrandedFeature.POSITIVE;
-	}
-
-	fillin.location = (Location) locStruct[0];
+    fillin.strand = parsedLocation.getStrandType();
+	fillin.location = parsedLocation.getLocation();
     }
 
     /**

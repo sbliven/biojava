@@ -26,13 +26,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.symbol.CompoundLocation;
-import org.biojava.bio.symbol.FuzzyLocation;
-import org.biojava.bio.symbol.FuzzyPointLocation;
-import org.biojava.bio.symbol.Location;
-import org.biojava.bio.symbol.LocationTools;
-import org.biojava.bio.symbol.PointLocation;
-import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.*;
 
 /**
  * <code>EmblLikeLocationParser</code> parses EMBL/Genbank style
@@ -47,11 +42,11 @@ import org.biojava.bio.symbol.RangeLocation;
  *  (123.345)..(567.789)
  *   123..456
  *  <123..567 or 123..>567 or <123..>567
+ *   123^567
  * </pre>
  *
  * Specifically not supported are:
  * <pre>
- *   123^567
  *   AL123465:(123..567)
  * </pre>
  *
@@ -82,10 +77,13 @@ class EmblLikeLocationParser
     private boolean fuzzyCoord = false;
     private boolean unboundMin = false;
     private boolean unboundMax = false;
+    private boolean isBetweenLocation = false;
 
     // Currently set per Feature; this is a deficiency in the current
     // parser
-    private boolean isComplement = false;
+    // Features are assumed to be on the positive strand until complemented
+    // No features have a strand type of UNKNOWN
+    private StrandedFeature.Strand mStrandType = StrandedFeature.POSITIVE;
 
     EmblLikeLocationParser()
     {
@@ -101,113 +99,115 @@ class EmblLikeLocationParser
      *
      * @param location a location <code>String</code>.
      *
-     * @return an <code>Object []</code> value.
+     * @return a StrandedLocation with the location and strand information
+     * from the string
      *
      * @exception BioException if an error occurs.
      */
-    Object [] parseLocation(final String location)
-	throws BioException
+    StrandedLocation parseLocation(final String location)
+		throws BioException
     {
-	this.location = location;
+		this.location = location;
 
-	if ((countChar(location, '(')) != (countChar(location, '(')))
-	    throw new BioException("Unbalanced parentheses in location: "
+		if ((countChar(location, '(')) != (countChar(location, ')')))
+	    	throw new BioException("Unbalanced parentheses in location: "
 				   + location);
 
-	nextCharIndex = 0;
+		nextCharIndex = 0;
 
-	instructStack.clear();
-	subLocations.clear();
+		instructStack.clear();
+		subLocations.clear();
 
-	thisToken = lexer.getNextToken();
-	while (thisToken != null)
-	{
-	    if (String.class.isInstance(thisToken))
-	    {
-		String toke = (String) thisToken;
-		if (toke.equals(".."))
+		thisToken = lexer.getNextToken();
+		while (thisToken != null)
 		{
-		    // This token indicates that this isn't a point
-		    isPointLoc = false;
+		    if (String.class.isInstance(thisToken))
+		    {
+				String toke = (String) thisToken;
+				if (toke.equals(".."))
+				{
+			    	// This token indicates that this isn't a point
+			    	isPointLoc = false;
+				}
+				else
+				{
+				    instructStack.add(thisToken);
+				}
+		    }
+		    else if (Integer.class.isInstance(thisToken))
+		    {
+				if (isPointLoc)
+			    	startCoords.add(thisToken);
+				else
+				    endCoords.add(thisToken);
+		    }
+		    else if (Character.class.isInstance(thisToken))
+		    {
+				char toke = ((Character) thisToken).charValue();
+
+				switch (toke)
+				{
+			    	case '(': case ':':
+						break;
+
+				    case '^':
+						isBetweenLocation = true;
+
+				    case '<':
+						unboundMin = true;
+						break;
+
+				    case '>':
+						unboundMax = true;
+						break;
+
+				    case '.':
+						// Catch range: (123.567)
+						fuzzyCoord = true;
+						break;
+
+				    case ',':
+						processCoords();
+						break;
+
+				    case ')':
+						// Catch the end of range: (123.567)
+						if (fuzzyCoord)
+						{
+						    fuzzyCoord = false;
+						}
+						else
+						{
+						    processCoords();
+						    processInstructs();
+						}
+						break;
+
+				    default:
+						throw new BioException("Unknown character '"
+							       + toke
+							       + "' within location: "
+							       + location);
+				}
+		    }
+		    thisToken = lexer.getNextToken();
+		}
+		processCoords();
+
+		StrandedLocation returnLocation;
+		if (subLocations.size() == 1)
+		{
+		    returnLocation = new StrandedLocation((Location)subLocations.get(0),
+					   mStrandType);
 		}
 		else
 		{
-		    instructStack.add(thisToken);
+		    // EMBL ordering is in reverse on the complementary strand
+		    // but LocationTools sorts them anyway
+		    returnLocation = new StrandedLocation(LocationTools.union(subLocations),
+					   mStrandType);
 		}
-	    }
-	    else if (Integer.class.isInstance(thisToken))
-	    {
-		if (isPointLoc)
-		    startCoords.add(thisToken);
-		else
-		    endCoords.add(thisToken);
-	    }
-	    else if (Character.class.isInstance(thisToken))
-	    {
-		char toke = ((Character) thisToken).charValue();
-
-		switch (toke)
-		{
-		    case '(': case ':':
-			break;
-			
-		    case '^':
-			throw new BioException("Locations between residues are not supported: "
-					       + location);
-
-		    case '<':
-			unboundMin = true;
-			break;
-
-		    case '>':
-			unboundMax = true;
-			break;
-
-		    case '.':
-			// Catch range: (123.567)
-			fuzzyCoord = true;
-			break;
-
-		    case ',':
-			processCoords();
-			break;
-
-		    case ')':
-			// Catch the end of range: (123.567)
-			if (fuzzyCoord)
-			{
-			    fuzzyCoord = false;
-			}
-			else
-			{
-			    processCoords();
-			    processInstructs();
-			}
-			break;
-
-		    default:
-			throw new BioException("Unknown character '"
-					       + toke
-					       + "' within location: "
-					       + location);
-		}
-	    }
-	    thisToken = lexer.getNextToken();
-	}
-	processCoords();
-
-	if (subLocations.size() == 1)
-	{
-	    return new Object [] { subLocations.get(0),
-				   new Boolean(isComplement) };
-	}
-	else
-	{
-	    // EMBL ordering is in reverse on the complementary strand
-	    // but LocationTools sorts them anyway
-	    return new Object [] { LocationTools.union(subLocations),
-				   new Boolean(isComplement) };
-	}
+		return returnLocation;
     }
 
     /**
@@ -230,8 +230,16 @@ class EmblLikeLocationParser
 	if (startCoords.isEmpty() && endCoords.isEmpty())
 	    return;
 
+	// Range of form 5^6 or 5^7
+	if (isBetweenLocation)
+	{
+		// Create a ranged location, and wrap it in a between location
+		int minCoord = ((Integer)startCoords.get(0)).intValue();
+		int maxCoord = ((Integer)startCoords.get(1)).intValue();
+		subLocations.add(new BetweenLocation(new RangeLocation(minCoord, maxCoord)));
+	}
 	// Range of form: 123
-	if (startCoords.size() == 1 && endCoords.isEmpty())
+	else if (startCoords.size() == 1 && endCoords.isEmpty())
 	{
 	    innerMin = outerMin = ((Integer) startCoords.get(0)).intValue();
 	    innerMax = outerMax = innerMin;
@@ -347,7 +355,8 @@ class EmblLikeLocationParser
 	unboundMin   = false;
 	unboundMax   = false;
 	fuzzyCoord   = false;
-	isComplement = false;
+	isBetweenLocation = false;
+	mStrandType  = StrandedFeature.POSITIVE;
     }
 
     /**
@@ -374,9 +383,9 @@ class EmblLikeLocationParser
 	    // within a feature. However, BioJava Locations have no
 	    // concept of strand and therefore are unable to support
 	    // construction of Features where some ranges are on
-	    // different strands. As a result the isComplement boolean
+	    // different strands. As a result the mStrandType
 	    // flag currently sets the strand for the whole feature.
-	    isComplement = true;
+	    mStrandType = StrandedFeature.NEGATIVE;
 	}
 	else
 	{
@@ -402,6 +411,7 @@ class EmblLikeLocationParser
      *
      * @author Kim Rutherford
      * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+     * @author Greg Cox
      * @since 1.2
      */
     private class LocationLexer
@@ -469,12 +479,12 @@ class EmblLikeLocationParser
 	 */
 	private Integer followInteger()
 	{
-	    String intString = "";
+	    StringBuffer intString = new StringBuffer();
 	    char    thisChar = location.charAt(nextCharIndex);
 
 	    while (Character.isDigit(thisChar))
 	    {
-		intString += thisChar;
+		intString.append(thisChar);
 		nextCharIndex++;
 
 		if (nextCharIndex >= location.length())
@@ -482,7 +492,7 @@ class EmblLikeLocationParser
 
 		thisChar = location.charAt(nextCharIndex);
 	    }
-	    return new Integer(intString);
+	    return new Integer(intString.toString());
 	}
 
 	/**
@@ -492,17 +502,17 @@ class EmblLikeLocationParser
 	 */
 	private String followText()
 	{
-	    String textString = "";
+	    StringBuffer textString = new StringBuffer("");
 	    char     thisChar = location.charAt(nextCharIndex);
 
 	    // First character must be a letter
 	    if (! Character.isLetter(thisChar))
 		return "";
-	    
+
 	    while (Character.isLetterOrDigit(thisChar) ||
 		   thisChar == '.')
 	    {
-		textString += thisChar;
+		textString.append(thisChar);
 		nextCharIndex++;
 
 		if (nextCharIndex >= location.length())
@@ -510,7 +520,7 @@ class EmblLikeLocationParser
 
 		thisChar = location.charAt(nextCharIndex);
 	    }
-	    return textString;
+	    return textString.toString();
 	}
     }
 }
