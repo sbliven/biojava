@@ -81,6 +81,9 @@ public class LabelledSequenceRenderer extends AbstractChangeable implements Sequ
                                                                 SequenceRenderContext.REPAINT );
 
 
+    Color fillColor = Color.white ;
+    Color textColor = Color.black ;
+    
     protected ChangeSupport generateChangeSupport() {
         ChangeSupport cs    =   super.generateChangeSupport();
         rendererForwarder = new SequenceRenderer.RendererForwarder( this, cs );
@@ -254,10 +257,34 @@ public class LabelledSequenceRenderer extends AbstractChangeable implements Sequ
       return sVE;
     }
 
+    
+    /** Set the background color of the label area. 
+     * @author Andreas Prlic */
+    public void setFillColor(Color c){
+        fillColor = c;
+    }
+    /** Get the background color of the label area. 
+     * @author Andreas Prlic*/
+    public Color getFillColor(){
+        return fillColor;
+    }
+    
+    /** Set the color of the label text 
+     * @author Andreas Prlic*/
+    public void setTextColor (Color c) {
+        textColor = c;
+    }
+    
+    /** Get the color of the label text 
+     * @author Andreas Prlic*/
+    public Color getTextColor() {
+        return textColor;
+    }
+    
 
     public void paint( Graphics2D g, SequenceRenderContext sRC ) {
-        Paint           selectedFill        = Color.yellow;
-        Paint           textColor           = Color.black;
+        Paint           selectedFill        = fillColor;
+        Paint           textCol             = textColor;
         Paint           notSelectedFill     = g.getBackground();
         Stroke          beadStroke          = new BasicStroke();
 
@@ -290,15 +317,15 @@ public class LabelledSequenceRenderer extends AbstractChangeable implements Sequ
         labelArea.setRect( -width , 0.0, width, depth );
         g.clip( labelArea );
 
-                          //RoundRectangle2D labelBackground   =   new RoundRectangle2D.Double( 5.0, 5.0, width-25, depth-25 , 15.0, 15.0);
-        // darw the label area
+         
+        // draw the label area
         if( selected ) {
             g.setPaint( selectedFill );
         } else {
             g.setPaint( notSelectedFill );
         }
         g.fill( labelArea );
-        g.setPaint( textColor );
+        g.setPaint( textCol );
 
         // draw text
         float   drawPosY    = 3; // initial positions for text placement
