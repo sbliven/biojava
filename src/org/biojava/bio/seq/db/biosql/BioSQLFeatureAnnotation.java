@@ -96,9 +96,7 @@ class BioSQLFeatureAnnotation
 	}
     }
 
-    public Object getProperty(Object key)
-        throws NoSuchElementException
-    {
+    public Object getProperty(Object key) {
 	if (underlyingAnnotation == null) {
 	    initAnnotations();
 	}
