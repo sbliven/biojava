@@ -26,25 +26,34 @@ import java.util.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.tools.*;
 
-public class StateFactory {
-  public static AbstractState createState(
-    Alphabet alpha,
-    int [] advance,
-    String name
-  ) {
-    AbstractState state;
+/**
+ * A thing that can make states.
+ * <P>
+ * This decouples programs from needing to know what implementation of EmissionState
+ * to instantiate for a given alphabet. It also lets you parameterise model creation
+ * for things like profile HMMs.
+ */
+public interface StateFactory {
+  EmissionState createState(Alphabet alpha, int [] advance, String name);
+  
+  static StateFactory DEFAULT = new DefaultStateFactory();
+  
+  class DefaultStateFactory implements StateFactory {
+    public EmissionState createState(Alphabet alpha, int [] advance, String name) {
+      AbstractState state;
     
-    if(alpha == DNATools.getAlphabet()) {
-      state = new DNAState();
-    } else if(alpha == DNATools.getAmbiguity()) {
-      state = new AmbiguityState();
-    } else {
-      state = new SimpleState(alpha, advance);
+      if(alpha == DNATools.getAlphabet()) {
+        state = new DNAState();
+      } else if(alpha == DNATools.getAmbiguity()) {
+        state = new AmbiguityState();
+      } else {
+        state = new SimpleState(alpha, advance);
+      }
+      state.setName(name);
+    
+      return state;
     }
-    state.setName(name);
-    
-    return state;
-  }
+  };
 }
 
 

@@ -80,7 +80,7 @@ public class ComplementaryState implements EmissionState {
   
   public ComplementaryState(EmissionState other) {
     this.other = other;
-    this.cache = StateFactory.createState(other.alphabet(), other.getAdvance(), other.getName() + "-c");
+    this.cache = StateFactory.DEFAULT.createState(other.alphabet(), other.getAdvance(), other.getName() + "-c");
     for(Iterator i = other.alphabet().residues().iterator(); i.hasNext();) {
       Residue r = (Residue) i.next();
       try {
