@@ -16,7 +16,7 @@ implements _AnonymousSeq_Operations {
   
   private SeqType seqType;
   
-  public AnonymousSeqImpl(SymbolList resList) throws IllegalAlphabetException {
+  public AnonymousSeqImpl(SymbolList symList) throws IllegalAlphabetException {
     String alphaName = symList.getAlphabet().getName();
     seqType = null;
     if(alphaName.startsWith("DNA")) {

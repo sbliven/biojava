@@ -27,11 +27,18 @@ implements _PrimarySeqIterator_Operations {
       primarySeqIterator._orb().connect(pst);
       return pst;
     } catch (NoSuchElementException e) {
+      e.printStackTrace();
       throw new EndOfStream();
     } catch (IllegalAlphabetException iae) {
+      iae.printStackTrace();
       throw new UnableToProcess(iae.getMessage());
     } catch (BioException se) {
+      se.printStackTrace();
       throw new UnableToProcess(se.getMessage());
+    } catch (Throwable t) {
+      System.out.println("Got an unexpected error:");
+      t.printStackTrace();
+      throw new BioError(t, "Unexpected error");
     }
   }
 
