@@ -116,7 +116,9 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	int tCount = 0;
 	int oCount = 0;
 
-	for (int i = 0; i < syms.length; i++)
+	int end = start + length - 1;
+
+	for (int i = start; i <= end; i++)
 	{
 	    char c = syms[i].getToken();
 
@@ -156,8 +158,8 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	// Print sequence summary header
 	stream.println(sq);
 
-	int fullLine = syms.length / 60;
-	int partLine = syms.length % 60;
+	int fullLine = length / 60;
+	int partLine = length % 60;
 
 	int lineCount = fullLine;
 	if (partLine > 0)
@@ -188,7 +190,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	    Symbol [] sa = new Symbol [len];
 
 	    // Get symbols and format into blocks of tokens
-	    System.arraycopy(syms, (i * 60), sa, 0, len);
+	    System.arraycopy(syms, start + (i * 60), sa, 0, len);
 
 	    String blocks = (formatTokenBlock(ub, sa, 10)).toString();
 

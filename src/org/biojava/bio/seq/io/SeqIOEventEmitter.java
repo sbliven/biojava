@@ -123,7 +123,7 @@ public class SeqIOEventEmitter
 	    // Add symbols
 	    listener.addSymbols(seq.getAlphabet(),
 				(Symbol []) seq.toList().toArray(new Symbol [0]),
-				1,
+				0,
 				seq.length());
 	    
 	    // Inform listener of sequence end
