@@ -58,7 +58,7 @@ public class Alignment {
 	
 	objectType  = getObjectAnnotationType() ;	
 	scoreType   = getScoreAnnotationType()  ;
-	//segmentType is initialized in getBlockAnnotatioType
+	//segmentType is initialized in getBlockAnnotationType
 	blockType   = getBlockAnnotationType()  ;
 
 	
@@ -234,8 +234,8 @@ public class Alignment {
     public String toString() {
 	String str = "" ;
 	for ( int i=0;i<objects.size();i++){
-	    HashMap object = (HashMap)objects.get(i);
-	    str += "object: "+ (String)object.get("id")+"\n";	    
+	    Annotation object = (Annotation)objects.get(i);
+	    str += "object: "+ (String)object.getProperty("dbAccessionId")+"\n";	    
 	}
 	str += "number of blocks: "+blocks.size();
 	return str ;

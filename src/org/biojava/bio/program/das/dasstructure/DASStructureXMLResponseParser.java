@@ -211,7 +211,7 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
 
 	String name    = atts.getValue("name"   );
 	String type    = atts.getValue("type"   );
-	String groupid = atts.getValue("groupid");
+	String groupid = atts.getValue("groupID");
 	
 	current_group = getNewGroup(type,name);		   
 	current_group.setPDBCode(groupid);
@@ -220,10 +220,10 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
 	
     public void startElement (String uri, String name, String qName, Attributes atts){
 	//System.out.println("new element uri: >"+uri+"< name:>"+name+"< qname:>" +qName+"<");
-	if      (qName.equals("OBJECT")) OBJECThandler(atts) ;
-	else if (qName.equals("CHAIN") ) CHAINhandler (atts) ;
-	else if (qName.equals("ATOM")  ) ATOMhandler  (atts) ;
-	else if (qName.equals("GROUP") ) GROUPhandler (atts) ;
+	if      (qName.equals("object")) OBJECThandler(atts) ;
+	else if (qName.equals("chain") ) CHAINhandler (atts) ;
+	else if (qName.equals("atom")  ) ATOMhandler  (atts) ;
+	else if (qName.equals("group") ) GROUPhandler (atts) ;
 					
 	    
 	    
@@ -245,11 +245,11 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
     public void endElement(String uri, String name, String qName) {
 	//System.out.println("end >"+name+"<");
 
-	if ( qName.equals("GROUP")){
+	if ( qName.equals("group")){
 	    current_chain.addGroup(current_group);
 	}
 
-	if ( qName.equals("CHAIN")) {
+	if ( qName.equals("chain")) {
 	    // check if chain is already known ...
 
 	    Chain ch = isKnownChain(current_chain.getName());
