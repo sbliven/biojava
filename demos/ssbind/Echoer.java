@@ -2,6 +2,20 @@ package ssbind;
 
 import org.biojava.bio.search.*;
 
+/**
+ * <p>
+ * Echo the event stream to stdout with prety indenting.
+ * </p>
+ *
+ * <p>
+ * This class is most usefull to check that your parsing is working. You can use
+ * an Echoer as the last handler in a chain of filters, or attach it directly
+ * to the parser. It is an instructive way to work out what events are being
+ * fired when, and with what properties attached.
+ * </p>
+ *
+ * @author Matthew Pocock
+ */
 public class Echoer
 implements SearchContentHandler {
   private int indentDepth = 0;
