@@ -34,7 +34,7 @@ import java.util.List;
 import org.biojava.bio.BioRuntimeException;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.Location;
 
 /**
  * <code>SymbolSequenceRenderer</code> renders symbols of a
@@ -44,6 +44,7 @@ import org.biojava.bio.symbol.RangeLocation;
  * @author Thomas Down
  * @author David Huen
  * @author Keith James
+ * @author Kalle Näslund
  */
 public class SymbolSequenceRenderer implements SequenceRenderer
 {
@@ -114,7 +115,7 @@ public class SymbolSequenceRenderer implements SequenceRenderer
         throw new BioRuntimeException(ex);
       }
 
-      RangeLocation visible = GUITools.getVisibleRange(context, g2);
+      Location visible = GUITools.getVisibleRange(context, g2);
       for (int sPos = visible.getMin(); sPos <= visible.getMax(); sPos++)
       {
         double gPos = context.sequenceToGraphics(sPos);

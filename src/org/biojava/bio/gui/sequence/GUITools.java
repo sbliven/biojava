@@ -1,6 +1,8 @@
 package org.biojava.bio.gui.sequence;
 
+import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
+
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -10,12 +12,13 @@ import java.awt.geom.Rectangle2D;
  *
  *
  * @author Matthew Pocock
+ * @author Kalle Näslund
  * @since 1.4
  */
 public final class GUITools {
   private GUITools() {}
 
-  public static RangeLocation getVisibleRange(SequenceRenderContext src, Graphics2D g2) {
+  public static Location getVisibleRange(SequenceRenderContext src, Graphics2D g2) {
     Rectangle2D clip = g2.getClipBounds();
 
     int min = Math.max(
@@ -29,11 +32,14 @@ public final class GUITools {
             src.graphicsToSequence(
                     new Point2D.Double(clip.getMaxX(), clip.getMaxY())
             ) + 1 );
-
-    //System.err.println("Originally: " + src.getRange());
-    //System.err.println("Now: " + min + ".." + max);
-
-    return new RangeLocation(min, max);
+    
+    // this happens when the clip region doesnt overlap with the SymbolList range
+    if( min > max ) {
+        return Location.empty;
+    }
+    else {
+        return new RangeLocation(min, max);
+    }
   }
 
   public static Rectangle2D createOuterBounds(CircularRendererContext crc,

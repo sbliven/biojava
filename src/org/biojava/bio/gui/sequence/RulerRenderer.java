@@ -21,7 +21,7 @@
 
 package org.biojava.bio.gui.sequence;
 
-import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.Location;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
@@ -46,6 +46,7 @@ import java.util.List;
  * @author Thomas Down
  * @author David Huen
  * @author Keith James
+ * @author Kalle Näslund
  */
 public class RulerRenderer implements SequenceRenderer
 {
@@ -124,7 +125,11 @@ public class RulerRenderer implements SequenceRenderer
 
         g2.setPaint(Color.black);
 
-        RangeLocation visible = GUITools.getVisibleRange(context, g2);
+        Location visible = GUITools.getVisibleRange(context, g2);
+        if( visible == Location.empty ) {
+            return;
+        }
+        
         int min = visible.getMin();
         int max = visible.getMax();
         double minX = context.sequenceToGraphics(min);
