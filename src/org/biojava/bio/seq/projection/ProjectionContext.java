@@ -96,5 +96,21 @@ public interface ProjectionContext {
 
     public void removeFeature(Feature f, Feature dyingChild)
         throws ChangeVetoException;
+        
+    /**
+     * Delegate for addChangeListener
+     *
+     * @since 1.3
+     */
+     
+    public void addChangeListener(Feature f, ChangeListener cl, ChangeType ct);
+    
+    /**
+     * Delegate for removeChangeListener
+     *
+     * @since 1.3
+     */
+     
+    public void removeChangeListener(Feature f, ChangeListener cl, ChangeType ct);
 }
 

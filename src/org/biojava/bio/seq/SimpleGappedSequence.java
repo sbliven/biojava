@@ -104,6 +104,11 @@ implements GappedSequence {
 		{
 		    throw new ChangeVetoException("NO");
 		}
+        
+        // THOMASD -- should hook into a forwarding system.
+        
+        public void addChangeListener(Feature f, ChangeListener cl, ChangeType ct) {}
+        public void removeChangeListener(Feature f, ChangeListener cl, ChangeType ct) {}
 	    } ;
 
 	try {

@@ -25,12 +25,10 @@ import java.util.*;
 import java.lang.reflect.*;
 
 import org.biojava.utils.*;
-import org.biojava.utils.bytecode.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.seq.projection.*;
 import org.biojava.bio.symbol.*;
-import org.biojava.bio.program.das.*;
 
 /**
  * Helper class for projecting Feature objects into an alternative
@@ -62,23 +60,21 @@ import org.biojava.bio.program.das.*;
  * @since 1.1
  */
 
-public class ProjectedFeatureHolder extends AbstractFeatureHolder {
+public class ProjectedFeatureHolder extends AbstractFeatureHolder implements FeatureHolder, ProjectionContext {
     private final FeatureHolder wrapped;
     private final FeatureHolder parent;
     private final int translate;
     private final boolean oppositeStrand;
-
-    private FeatureFilter filter;
-
     private ChangeListener underlyingFeaturesChange;
-    private PFHContext projectionContext;    
+    private Map forwardersByFeature = new HashMap();
+    private ProjectionSet topLevelFeatures;
 
     public static FeatureHolder projectFeatureHolder(FeatureHolder fh,
-						     FeatureHolder parent, 
-						     int translation,
-						     boolean flip)
+						                             FeatureHolder parent, 
+                                                     int translation,
+                                                     boolean flip)
     {
-	    return new ProjectedFeatureHolder(fh, parent, translation, flip);    
+	    return new ProjectedFeatureHolder(fh, parent, translation, flip);
     }
 
     /**
@@ -106,13 +102,41 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
                                   int translation,
                                   boolean oppositeStrand) 
     {
+        this(new LazyFilterFeatureHolder(fh, filter),
+             parent,
+             translation,
+             oppositeStrand);
+    }
+
+    /**
+     * Construct a new FeatureHolder which projects a set of features
+     * into a new coordinate system.  If <code>translation</code> is 0
+     * and <code>oppositeStrand</code> is <code>false</code>, the features
+     * are simply reparented without any transformation.
+     *
+     * @param fh The set of features to project.
+     * @param parent The FeatureHolder which is to act as parent
+     *               for the projected features.
+     * @param translation The translation to apply to map locations into
+     *                    the projected coordinate system.  This is the point
+     *                    in the destination coordinate system which is equivalent
+     *                    to 0 in the source coordinate system.
+     * @param oppositeStrand <code>true</code> if translating into the opposite coordinate system.
+     *                       This alters the transformation applied to locations, and also flips
+     *                       the <code>strand</code> property of StrandedFeatures.
+     */
+
+    public ProjectedFeatureHolder(FeatureHolder fh,
+				                  FeatureHolder parent, 
+                                  int translation,
+                                  boolean oppositeStrand) 
+    {
         this.wrapped = fh;
         this.parent = parent;
         this.translate = translation;
         this.oppositeStrand = oppositeStrand;
-        this.filter = filter;
 
-        this.projectionContext = new PFHContext();
+        this.topLevelFeatures = new ProjectionSet(wrapped);
 
         underlyingFeaturesChange = new ChangeListener() {
             public void preChange(ChangeEvent e)
@@ -140,118 +164,146 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 
         wrapped.addChangeListener(underlyingFeaturesChange);
     }
-
-    /**
-     * Construct a new FeatureHolder which projects a set of features
-     * into a new coordinate system.  If <code>translation</code> is 0
-     * and <code>oppositeStrand</code> is <code>false</code>, the features
-     * are simply reparented without any transformation.
-     *
-     * @param fh The set of features to project.
-     * @param parent The FeatureHolder which is to act as parent
-     *               for the projected features.
-     * @param translation The translation to apply to map locations into
-     *                    the projected coordinate system.  This is the point
-     *                    in the destination coordinate system which is equivalent
-     *                    to 0 in the source coordinate system.
-     * @param oppositeStrand <code>true</code> if translating into the opposite coordinate system.
-     *                       This alters the transformation applied to locations, and also flips
-     *                       the <code>strand</code> property of StrandedFeatures.
-     */
-
-    public ProjectedFeatureHolder(FeatureHolder fh,
-				  FeatureHolder parent, 
-				  int translation,
-				  boolean oppositeStrand) 
-    {
-        this(fh, null, parent, translation, oppositeStrand);
+    
+    //
+    // Normal FeatureHolder methods get delegated to our top-level ProjectionSet
+    //
+    
+    public Iterator features() {
+        return topLevelFeatures.features();
     }
     
     public int countFeatures() {
-        if (filter != null) {
-            return wrapped.filter(filter, false).countFeatures();
-        } else {
-            return wrapped.countFeatures();
-        }
-    }
-
-    public Iterator features() {
-        final Iterator wrappedIterator;
-        if (filter == null) {
-            wrappedIterator = wrapped.features();
-        } else {
-            wrappedIterator = wrapped.filter(filter, false).features();
-        }
-        return new Iterator() {
-            public boolean hasNext() {
-                return wrappedIterator.hasNext();
-            }
-            
-            public Object next() {
-                return projectFeature((Feature) wrappedIterator.next());
-            }
-            
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        } ;
+        return topLevelFeatures.countFeatures();
     }
     
     public boolean containsFeature(Feature f) {
-        for (Iterator fi = features(); fi.hasNext(); ) {
-            if (f.equals(fi.next())) {
-                return true;
-            }
-        }
-        return false;
+        return topLevelFeatures.containsFeature(f);
     }
-
+    
     public FeatureHolder filter(FeatureFilter ff) {
-        return filter(ff, true); // bit of a hack for now.
+        return topLevelFeatures.filter(ff);
     }
     
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-        ff = transformFilter(ff);
-        if (filter != null) {
-            ff = new FeatureFilter.And(ff, filter);
+        return topLevelFeatures.filter(ff, recurse);
+    }
+    
+    public Feature createFeature(Feature.Template templ) 
+	        throws ChangeVetoException
+    {
+        throw new ChangeVetoException("Can't create features in this projection");
+    }
+
+    public void removeFeature(Feature f) 
+        throws ChangeVetoException
+	{
+        throw new ChangeVetoException("Can't create features in this projection");
+	}
+    
+    //
+    // Dumb set of features to which we delegate everything except the
+    // ChangeEvent stuff.
+    //
+    
+    private class ProjectionSet implements FeatureHolder {
+        private final FeatureHolder baseSet;
+        
+        ProjectionSet(FeatureHolder baseSet) {
+            this.baseSet = baseSet;
         }
-        FeatureHolder toProject = wrapped.filter(ff, recurse);
-        return new ProjectedFeatureHolder(toProject, parent, translate, oppositeStrand);
+        
+        public int countFeatures() {
+            return baseSet.countFeatures();
+        }
+
+        public Iterator features() {
+            final Iterator wrappedIterator = baseSet.features();
+            return new Iterator() {
+                public boolean hasNext() {
+                    return wrappedIterator.hasNext();
+                }
+            
+                public Object next() {
+                    return projectFeature((Feature) wrappedIterator.next());
+                }
+            
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            } ;
+        }
+    
+        public boolean containsFeature(Feature f) {
+            for (Iterator fi = features(); fi.hasNext(); ) {
+                if (f.equals(fi.next())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public FeatureHolder filter(FeatureFilter ff) {
+            return filter(ff, true); // bit of a hack for now.
+        }
+    
+        public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+            ff = transformFilter(ff);
+            FeatureHolder toProject = wrapped.filter(ff, recurse);
+            return new ProjectionSet(toProject);
+        }
+    
+        public Feature createFeature(Feature.Template templ) 
+	        throws ChangeVetoException
+        {
+            throw new ChangeVetoException("Can't create features in this projection");
+        }
+
+        public void removeFeature(Feature f) 
+                throws ChangeVetoException
+	    {
+	        throw new ChangeVetoException("Can't create features in this projection");
+	    }
+        
+        public void addChangeListener(ChangeListener cl) {}
+        public void removeChangeListener(ChangeListener cl) {}
+        public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+        public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
+        public boolean isUnchanging(ChangeType ct) { return true; }
     }
     
     private FeatureFilter transformFilter(FeatureFilter ff) {
-        FeatureFilter ff2 = _transformFilter(ff);
-        if (ff2 == null) {
-            System.err.println("Null filter!");
-        }
-        return ff2;
+        return FilterUtils.transformFilter(
+            ff,
+            new FilterUtils.FilterTransformer() {
+                public FeatureFilter transform(FeatureFilter ff) {
+                    if (ff instanceof FeatureFilter.OverlapsLocation) {
+                        return new FeatureFilter.OverlapsLocation(untransformLocation(((FeatureFilter.OverlapsLocation) ff).getLocation()));
+                    } else if (ff instanceof FeatureFilter.ContainedByLocation) {
+                        return new FeatureFilter.ContainedByLocation(untransformLocation(((FeatureFilter.ContainedByLocation) ff).getLocation()));
+                    } else if (ff instanceof FeatureFilter.StrandFilter) {
+                        return new FeatureFilter.StrandFilter(transformStrand(((FeatureFilter.StrandFilter) ff).getStrand()));
+                    } else {
+                        return ff;
+                    }
+                }   
+            }
+        ) ;
     }
     
-    private FeatureFilter _transformFilter(FeatureFilter ff) {
-        if (ff instanceof FeatureFilter.And) {
-            FeatureFilter ff1 = ((FeatureFilter.And) ff).getChild1();
-            FeatureFilter ff2 = ((FeatureFilter.And) ff).getChild2();
-            return new FeatureFilter.And(transformFilter(ff1), transformFilter(ff2));
-        } else if (ff instanceof FeatureFilter.Or) {
-            FeatureFilter ff1 = ((FeatureFilter.Or) ff).getChild1();
-            FeatureFilter ff2 = ((FeatureFilter.Or) ff).getChild2();
-            return new FeatureFilter.Or(transformFilter(ff1), transformFilter(ff2));
-        } else if (ff instanceof FeatureFilter.Not) {
-            return new FeatureFilter.Not(transformFilter(((FeatureFilter.Not) ff).getChild()));
-        } else if (ff instanceof FeatureFilter.OverlapsLocation) {
-            return new FeatureFilter.OverlapsLocation(untransformLocation(((FeatureFilter.OverlapsLocation) ff).getLocation()));
-        } else if (ff instanceof FeatureFilter.ContainedByLocation) {
-            return new FeatureFilter.ContainedByLocation(untransformLocation(((FeatureFilter.ContainedByLocation) ff).getLocation()));
-        } else if (ff instanceof FeatureFilter.StrandFilter) {
-            return new FeatureFilter.StrandFilter(transformStrand(((FeatureFilter.StrandFilter) ff).getStrand()));
+    protected StrandedFeature.Strand transformStrand(StrandedFeature.Strand strand) {
+        if (oppositeStrand) {
+            return strand.flip();
         } else {
-            // should check for unknown cases.
-            
-            return ff;
+            return strand;
         }
     }
     
-    private Location untransformLocation(Location oldLoc) {
+    protected Location transformLocation(Location oldLoc) {
+        return ProjectionUtils.transformLocation(oldLoc, translate, oppositeStrand);
+    }
+    
+    protected Location untransformLocation(Location oldLoc) {
         if (oppositeStrand) {
             if (oldLoc.isContiguous()) {
                 if (oldLoc instanceof PointLocation){
@@ -276,68 +328,50 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
         }
     }
     
-    private Location transformLocation(Location oldLoc) {
-        if (oppositeStrand) {
-            if (oldLoc.isContiguous()) {
-                if (oldLoc instanceof PointLocation){
-                    return new PointLocation(translate - oldLoc.getMin());
-                } else {
-                    return new RangeLocation(translate - oldLoc.getMax(),
-    	                                     translate - oldLoc.getMin());
-                }
-            } else {
-                Location compound = Location.empty;
-                List locList = new ArrayList();
-                for (Iterator i = oldLoc.blockIterator(); i.hasNext(); ) {
-                    Location oldBlock = (Location) i.next();
-                    locList.add(new RangeLocation(translate - oldBlock.getMax(),
-                    		      			translate - oldBlock.getMin()));
-                }
-                compound = LocationTools.union(locList);
-                return compound;
-            }
-        } else {
-            return oldLoc.translate(translate);
-        }
-    }
-    
-    private StrandedFeature.Strand transformStrand(StrandedFeature.Strand s) {
-        if (isOppositeStrand()) {
-            if (s == StrandedFeature.POSITIVE) {
-                return StrandedFeature.NEGATIVE;
-            } else if (s == StrandedFeature.NEGATIVE) {
-                return StrandedFeature.POSITIVE;
-            } else {
-                return StrandedFeature.UNKNOWN;
-            }
-        } else {
-            return s;
-        }
-    }
-    
     public Feature projectFeature(Feature f) {
-        return ProjectionEngine.DEFAULT.projectFeature(f, projectionContext);
+        return ProjectionEngine.DEFAULT.projectFeature(f, this);
     }
 
+    /**
+     * Return the translation component of the transformation applied by this FeatureHolder
+     */
+    
     public int getTranslation() {
         return translate;
     }
 
+    /**
+     * Return true if projected features should be flipped to the opposite strand
+     */
+    
     public boolean isOppositeStrand() {
         return oppositeStrand;
     }
 
+    /**
+     * Return the parent of all top-level features in this FeatureHolder.
+     */
+    
     public FeatureHolder getParent() {
         return parent;
     }
-        
-    /**
-     * ProjectionContext implementation tied to a given ProjectedFeatureHolder
-     */
-
-    private class PFHContext implements ProjectionContext {
+    
+    
+    //
+    // The following methods are our implementation of ProjectionContext
+    //
+    
         public FeatureHolder getParent(Feature f) {
-            return parent;
+            FeatureHolder oldP = f.getParent();
+            if (oldP instanceof Feature) {
+                if (wrapped.containsFeature(f)) {
+                    return parent;
+                } else {
+                    return projectFeature((Feature) oldP);
+                }
+            } else {
+                return parent;
+            }
         }	    
 
         public Sequence getSequence(Feature f) {
@@ -363,7 +397,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
         }
 
         public FeatureHolder projectChildFeatures(Feature f, FeatureHolder parent) {
-            return projectFeatureHolder(f, parent, getTranslation(), isOppositeStrand());
+            return new ProjectionSet(f);
         }
 
         public Feature createFeature(Feature f, Feature.Template templ) 
@@ -377,5 +411,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 	    {
 	        throw new ChangeVetoException("Can't create features in this projection");
 	    }
-    }
+        
+    public void addChangeListener(Feature f, ChangeListener cl, ChangeType ct) {}
+    public void removeChangeListener(Feature f, ChangeListener cl, ChangeType ct) {}
 }

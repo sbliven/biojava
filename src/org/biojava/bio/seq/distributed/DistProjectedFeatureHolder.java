@@ -254,5 +254,8 @@ class DistProjectedFeatureHolder extends AbstractFeatureHolder {
 	{
 	    throw new ChangeVetoException("Can't create features in this projection");
 	}
+        
+    public void addChangeListener(Feature f, ChangeListener cl, ChangeType ct) {}
+    public void removeChangeListener(Feature f, ChangeListener cl, ChangeType ct) {}
     }
 }

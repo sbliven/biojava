@@ -32,47 +32,24 @@ import org.biojava.bio.seq.*;
  * Internal class used by ProjectionEngine to wrap Feature objects.
  *
  * @author Thomas Down
- * @author Matthew Pocock
  * @since 1.1
  */
 
 public class ProjectedFeature
-  extends
-    AbstractChangeable
   implements
     Feature,
     Projection
-{
-  private transient ChangeSupport changeSupport;
-  private ChangeListener propertyForwarder; 
-  private ChangeListener locationClearer;
-  
+{ 
   private final Feature feature;
   private final ProjectionContext context;
-    // private Location newLocation;
-  private FeatureHolder projectedFeatures;
   
   public ProjectedFeature(
     Feature f,
     ProjectionContext ctx
-  ) {
+  ) 
+  {
     this.feature = f;
     this.context = ctx;
-  }
-  
-  protected ChangeSupport getChangeSupport() {
-    return changeSupport;
-  }
-  
-  protected ChangeSupport getChangeSupport(ChangeType ct) {
-    ChangeSupport changeSupport = super.getChangeSupport(ct);
-    
-    if(propertyForwarder == null) {
-      propertyForwarder = new ChangeForwarder(this, changeSupport);
-      feature.addChangeListener(propertyForwarder, ChangeType.UNKNOWN);
-    }
-    
-    return changeSupport;
   }
   
   public Feature getViewedFeature() {
@@ -91,21 +68,6 @@ public class ProjectedFeature
   }
   
   public Location getLocation() {
-//      if (newLocation == null) {
-//        if(locationClearer == null) {
-//          // listener to clear location to null if the underlying location changes
-//          feature.addChangeListener(
-//            locationClearer = new ChangeAdapter() {
-//              public void postChange(ChangeEvent ce) {
-//                newLocation = null;
-//              }
-//            },
-//            LOCATION
-//          );
-//        }
-//        newLocation = context.getLocation(feature);
-//      }
-//      return newLocation;
       return context.getLocation(feature);
   }
   
@@ -181,14 +143,11 @@ public class ProjectedFeature
   }
   
   protected FeatureHolder getProjectedFeatures() {
-    if (projectedFeatures == null) {
-      projectedFeatures = context.projectChildFeatures(feature, this);
-    }
-    return projectedFeatures;
+      return context.projectChildFeatures(feature, this);
   }
   
   public Iterator features() {
-    return getProjectedFeatures().features();
+      return getProjectedFeatures().features();
   }
   
   public FeatureHolder filter(FeatureFilter ff) {
@@ -211,18 +170,17 @@ public class ProjectedFeature
   }
   
   public Feature createFeature(Feature.Template temp)
-  throws ChangeVetoException, BioException
+    throws ChangeVetoException, BioException
   {
     return context.createFeature(feature, temp);
   }
   
   public void removeFeature(Feature f) 
-  throws ChangeVetoException
+    throws ChangeVetoException
   {
     context.removeFeature(feature, f);
   }
   
-
   public int hashCode() {
     return makeTemplate().hashCode();
   }
@@ -235,5 +193,25 @@ public class ProjectedFeature
       }
     }
     return false;
+  }
+  
+  public void addChangeListener(ChangeListener cl) {
+      addChangeListener(cl, ChangeType.UNKNOWN);
+  }
+  
+  public void removeChangeListener(ChangeListener cl) {
+      removeChangeListener(cl, ChangeType.UNKNOWN);
+  }
+  
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+      context.addChangeListener(feature, cl, ChangeType.UNKNOWN);
+  }
+  
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+      context.removeChangeListener(feature, cl, ChangeType.UNKNOWN);
+  }
+  
+  public boolean isUnchanging(ChangeType ct) {
+      return feature.isUnchanging(ct);
   }
 }

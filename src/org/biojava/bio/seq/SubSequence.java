@@ -382,6 +382,11 @@ public class SubSequence implements Sequence {
 		{
 		    removeProjectedFeature(f, f2);
 		}
+        
+        
+        
+    public void addChangeListener(Feature f, ChangeListener cl, ChangeType ct) {}
+    public void removeChangeListener(Feature f, ChangeListener cl, ChangeType ct) {}
 	    } ;
 
 	    try {
