@@ -37,6 +37,7 @@ import org.biojava.bio.symbol.*;
  *
  * @author Matthew Pocock
  * @author Keith James (docs)
+ * @author Greg Cox
  */
 public final class RNATools {
   private static final ReversibleTranslationTable complementTable;
@@ -273,8 +274,22 @@ public final class RNATools {
   }
 
   /**
-   * Retrieve a TranslationTable by name. The universal genetic code is under
-   * the name "UNIVERSAL".
+   * Retrieve a TranslationTable by name. The valid names are:
+   * <ul>
+   * <li>"UNIVERSAL"
+   * <li>"BACTERIAL"
+   * <li>"YEAST_MITOCHONDRIAL"
+   * <li>"VERTEBRATE_MITOCHONDRIAL"
+   * <li>"MOLD_MITOCHONDRIAL"
+   * <li>"INVERTEBRATE_MITOCHONDRIAL"
+   * <li>"ECHINODERM_MITOCHONDRIAL"
+   * <li>"ASCIDIAN_MITOCHONDRIAL"
+   * <li>"FLATWORM_MITOCHONDRIAL"
+   * <li>"CILIATE_NUCLEAR"
+   * <li>"EUPLOTID_NUCLEAR"
+   * <li>"ALTERNATIVE_YEAST_NUCLEAR"
+   * <li>"BLEPHARISMA_MACRONUCLEAR"
+   * </ul>
    *
    * @since 1.1
    */
@@ -300,7 +315,7 @@ public final class RNATools {
    * @since 1.1
    */
   public static SymbolList translate(SymbolList syms)
-    throws IllegalAlphabetException 
+    throws IllegalAlphabetException
   {
       if (syms.getAlphabet() == getRNA()) {
 	  syms = SymbolListViews.windowedSymbolList(syms, 3);
