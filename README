@@ -32,19 +32,9 @@ source tree.  For more information, see:
 In addition, the scripts will generate the non-cvs directories docs and
 class, which will contain the javadoc documentation and the class files.
 
-To build the project, change to biojava-live and type:
-
-> javac build/Builder.java
-> java build.Builder all
-> java build.Builder docs
-
-to build a list of packages type:
-
-> java build.Builder package package1 package2 ... packageN
-
-If you use the Java based build tool Ant, supplied by the Apache
-Jakarta Project (see http://jakarta.apache.org) you can use it to build
-BioJava. To build the project, change to biojava-live and type:
+BioJava now uses the Java based build tool Ant, supplied by the Apache
+Jakarta Project (see http://jakarta.apache.org). To build the project,
+change to biojava-live and type:
 
 ant package
 ant javadocs
