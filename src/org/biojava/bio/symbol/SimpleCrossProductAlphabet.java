@@ -130,7 +130,11 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
   }
 
   public SymbolList symbols() {
-    return new SimpleSymbolList(this, new ArrayList(ourSymbols.values()));
+      try {
+	  return new SimpleSymbolList(this, new ArrayList(ourSymbols.values()));
+      } catch (IllegalSymbolException ex) {
+	  throw new BioError(ex);
+      }
   }
 
   public int size() {

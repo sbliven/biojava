@@ -30,7 +30,7 @@ import org.biojava.bio.*;
 /**
  * Abstract helper implementation of the SymbolList core interface.
  * To produce a concrete SymbolList implementation, you need only
- * implement the <code>alphabet</code>, <code>length</code> and
+ * implement the <code>getAlphabet</code>, <code>length</code> and
  * <code>symbolAt</code> methods.  Iterators and sublists are
  * handled for you automatically.
  *

@@ -80,7 +80,11 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
   }
   
   public SymbolList symbols() {
-    return new SimpleSymbolList(this, new ArrayList(symbols));
+      try {
+	  return new SimpleSymbolList(this, new ArrayList(symbols));
+      } catch (IllegalSymbolException ex) {
+	  throw new BioError(ex);
+      }
   }
 
   public boolean contains(Symbol s) {

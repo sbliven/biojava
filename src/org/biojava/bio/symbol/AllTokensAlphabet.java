@@ -96,7 +96,11 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
           List resList = new ArrayList(seq.length());
           for(int i = 0; i < seq.length(); i++)
             resList.add(parseToken(seq.substring(i, i+1)));
-          return new SimpleSymbolList(getAlphabet(), resList);
+	  try {
+	      return new SimpleSymbolList(getAlphabet(), resList);
+	  } catch (IllegalSymbolException ex) {
+	      throw new BioError(ex);
+	  }
         }
         public Symbol parseToken(String token) {
           char c = token.charAt(0);
@@ -116,7 +120,11 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
   }
   
   public SymbolList symbols() {
-    return new SimpleSymbolList(this, new ArrayList(symbols));
+      try {
+	  return new SimpleSymbolList(this, new ArrayList(symbols));
+      } catch (IllegalSymbolException ex) {
+	  throw new BioError(ex);
+      }
   }
   
   public int size() {

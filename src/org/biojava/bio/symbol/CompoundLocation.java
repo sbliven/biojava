@@ -23,6 +23,7 @@ package org.biojava.bio.symbol;
 
 import java.util.*;
 import java.io.*;
+import org.biojava.bio.*;
 
 /**
  * A comlex location. It is made up from multiple sub-locations and is essential
@@ -134,7 +135,11 @@ public class CompoundLocation implements Location, Serializable {
       if(this.contains(p))
         res.add(s.symbolAt(p));
 
-    return new SimpleSymbolList(s.getAlphabet(), res);
+    try {
+	return new SimpleSymbolList(s.getAlphabet(), res);
+    } catch (IllegalSymbolException ex) {
+	throw new BioError(ex);
+    }
   }
 
   public void addLocation(Location l) {

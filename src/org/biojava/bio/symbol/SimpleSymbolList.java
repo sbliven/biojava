@@ -26,99 +26,124 @@ import java.util.*;
 import java.io.*;
 
 /**
- * A no-frills implementation of SymbolList, backed by a java.util.List.
+ * Basic implementation of SymbolList.  This
+ * is currently backed by a normal Java array.
  *
- * @author Matthew Pocock
+ * This is a new implementation which no longer uses the
+ * Java ArrayLists.  I hope that eventually it can be
+ * made immutable, but for now the legacy addSymbol method
+ * is implemented.
+ *
+ * @author Thomas Down
  */
-public class SimpleSymbolList implements SymbolList, Serializable {
-  /**
-   * The alphabet over which this symbol list is taken.
-   */
-  private Alphabet alphabet;
-  
-  /**
-   * The List of symbols that actualy stoors the sequence.
-   */
-  private List symbols;
 
-  public int length() {
-    return symbols.size();
-  }
+public class SimpleSymbolList extends AbstractSymbolList implements Serializable {
+    private static final int INCREMENT = 100;
 
-  public Alphabet getAlphabet() {
-    return alphabet;
-  }
+    private Alphabet alphabet;
+    private Symbol[] symbols;
+    private int length;
 
-  public SymbolList subList(int start, int end) {
-    return new SimpleSymbolList(getAlphabet(), symbols.subList(start-1, end));
-  }
+    /**
+     * Construct an empty SimpleSymbolList.
+     *
+     * @param alpha The alphabet of legal symbols in this list.
+     */
 
-  /**
-   * A zero indexed symbol list.
-   */
-  public List toList() {
-    return symbols;
-  }
-
-  /**
-   * An iterator over all symbols.
-   */
-  public Iterator iterator() {
-    return symbols.iterator();
-  }
-
-  public void addSymbol(Symbol res) throws IllegalSymbolException {
-    getAlphabet().validate(res);
-    symbols.add(res);
-  }
-
-  public Symbol symbolAt(int index)
-  throws IndexOutOfBoundsException {
-    if(index < 1 || index > length()) {
-      throw new IndexOutOfBoundsException(
-        "Index must be within (1 .. " + length() + "): " + index
-      );
+    public SimpleSymbolList(Alphabet alpha) {
+	this.alphabet = alpha;
+	this.length = 0;
+	this.symbols = new Symbol[INCREMENT];
     }
-    return (Symbol) symbols.get(index-1);
-  }
 
-  public SimpleSymbolList(Alphabet alpha) {
-    this.alphabet = alpha;
-    symbols = new ArrayList();
-  }
+    /**
+     * Construct a SymbolList containing the symbols in the specified list.
+     *
+     * @param alpha The alphabet of legal symbols for this list.
+     * @param rList A Java List of symbols.
+     * 
+     * @throws IllegalSymbolException if a Symbol is not in the specified alphabet.
+     * @throws ClassCastException if rList contains objects which do not implement Symbol.
+     */
 
-  /**
-   * Generates a new SimpleSymbolList that shairs the alphabet and symbols of
-   * rList.
-   *
-   * @param rList the SymbolList to copy
-   */
-  public SimpleSymbolList(SymbolList rList) {
-    this.alphabet = rList.getAlphabet();
-    symbols = new ArrayList(rList.toList());
-  }
-
-  public String seqString() {
-    return subStr(1, length());
-  }
-
-  public String subStr(int start, int end) {
-    StringBuffer sb = new StringBuffer();
-    for(int i = start; i <= end; i++) {
-      sb.append( symbolAt(i).getToken() );
+    public SimpleSymbolList(Alphabet alpha, List rList) 
+        throws IllegalSymbolException
+    {
+	this.alphabet = alpha;
+	this.length = rList.size();
+	symbols = new Symbol[length];
+	
+	int pos = 0;
+	for (Iterator i = rList.iterator(); i.hasNext(); ) {
+	    symbols[pos] = (Symbol) i.next();
+	    alphabet.validate(symbols[pos]);
+	    pos++;
+	}
     }
-    return sb.toString();
-  }
 
-  /**
-   * Not safe - doesn't check that rList contains symbols only in alpha.
-   * Use carefuly.
-   *
-   * @param alpha the alphabet for this symbol list
-   * @param rList a list of symbols that define the sequence
-   */
-  public SimpleSymbolList(Alphabet alpha, List rList) {
-    this.alphabet = alpha;
-    this.symbols = rList;
-  }
+    /**
+     * Construct a copy of an existing SymbolList.
+     *
+     * @param The list to copy.
+     */
+
+    public SimpleSymbolList(SymbolList sl) {
+	this.alphabet = sl.getAlphabet();
+	this.length = sl.length();
+	symbols = new Symbol[length];
+	for (int i = 0; i < length; ++i) {
+	    symbols[i] = sl.symbolAt(i + 1);
+	}
+    }
+
+    /**
+     * Get the alphabet of this SymbolList.
+     */
+
+    public Alphabet getAlphabet() {
+	return alphabet;
+    }
+
+    /**
+     * Get the length of this SymbolList.
+     */
+
+    public int length() {
+	return length;
+    }
+
+    /**
+     * Find a symbol at a specified offset in the SymbolList.
+     * NB. Speedups possible once this class is immutable.
+     * 
+     * @param pos Position in biological coordinates (1..length)
+     */
+
+    public Symbol symbolAt(int pos) {
+	if (pos > length || pos < 1)
+	    throw new IndexOutOfBoundsException();
+	return symbols[pos - 1];
+    }
+
+    /**
+     * Add a new Symbol to the end of this list.
+     * 
+     * @param sym Symbol to add
+     * @throws IllegalSymbolException if the Symbol is not in this list's alphabet.
+     *
+     * @deprecated Can we make SimpleSymbolList immutable [Thomas Down]
+     */
+
+    public void addSymbol(Symbol sym) 
+        throws IllegalSymbolException
+    {
+	alphabet.validate(sym);
+
+	if (symbols.length <= this.length) {
+	    Symbol[] newSymbols = new Symbol[symbols.length + INCREMENT];
+	    System.arraycopy(symbols, 0, newSymbols, 0, length);
+	    symbols = newSymbols;
+	}
+	symbols[length++] = sym;
+    }
 }

@@ -26,6 +26,7 @@ import java.io.*;
 import java.lang.reflect.*;
 
 import org.biojava.utils.*;
+import org.biojava.bio.*;
 
 /**
  * A biological location.
@@ -147,7 +148,11 @@ public interface Location {
     public Location intersection(Location l) { return empty; }
     public Location union(Location l) { return l; }
     public SymbolList symbols(SymbolList seq) {
-      return new SimpleSymbolList(seq.getAlphabet(), new ArrayList());
+	try {
+	    return new SimpleSymbolList(seq.getAlphabet(), new ArrayList());
+	} catch (IllegalSymbolException ex) {
+	    throw new BioError(ex);
+	}
     }
     public Location translate(int dist) { return this; }
     private Object writeReplace() throws ObjectStreamException {

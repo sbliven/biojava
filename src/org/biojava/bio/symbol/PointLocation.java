@@ -23,6 +23,7 @@ package org.biojava.bio.symbol;
 
 import java.util.*;
 import java.io.*;
+import org.biojava.bio.*;
 
 /**
  * A single symbol.
@@ -58,14 +59,18 @@ public class PointLocation implements Location, Serializable {
 
   public SymbolList symbols(SymbolList s)	{
     final Symbol res = s.symbolAt(this.point);
-    return new SimpleSymbolList(s.getAlphabet(), new AbstractList() {
-      public Object get(int index) throws IndexOutOfBoundsException {
-        if(index == 0)
-          return res;
-        throw new IndexOutOfBoundsException("Index " + index + " greater than 0");
-      }
-      public int size() { return 1; }
-    });
+    try {
+	return new SimpleSymbolList(s.getAlphabet(), new AbstractList() {
+	    public Object get(int index) throws IndexOutOfBoundsException {
+		if(index == 0)
+		    return res;
+		throw new IndexOutOfBoundsException("Index " + index + " greater than 0");
+	    }
+	    public int size() { return 1; }
+	});
+    } catch (IllegalSymbolException ex) {
+	throw new BioError(ex);
+    }
   }
 
   public Location translate(int dist) {
