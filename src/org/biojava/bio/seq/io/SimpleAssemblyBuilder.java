@@ -32,14 +32,13 @@ import org.biojava.bio.seq.impl.*;
 
 /**
  * Basic SequenceBuilder implementation which accumulates all
- * notified information and creates a SimpleSequence.
+ * notified information and creates a SimpleAssembly.
  *
- * @author Thomas Down
- * @author David Huen (modified to derive from SequenceBuilderBase)
- * @version 1.1 [newio proposal]
+ * @author David Huen
+ * @version 1.2
  */
 
-public class SimpleSequenceBuilder extends SequenceBuilderBase {
+public class SimpleAssemblyBuilder extends SequenceBuilderBase {
     public final static SequenceBuilderFactory FACTORY = new SSBFactory();
 
     private static class SSBFactory implements SequenceBuilderFactory, Serializable {
@@ -47,22 +46,39 @@ public class SimpleSequenceBuilder extends SequenceBuilderBase {
 	}
 
 	public SequenceBuilder makeSequenceBuilder() {
-	    return new SimpleSequenceBuilder();
+	    return new SimpleAssemblyBuilder();
 	}
 
 	private Object writeReplace() throws ObjectStreamException {
 	    try {
-		return new StaticMemberPlaceHolder(SimpleSequenceBuilder.class.getField("FACTORY"));
+		return new StaticMemberPlaceHolder(SimpleAssemblyBuilder.class.getField("FACTORY"));
 	    } catch (NoSuchFieldException nsfe) {
 		throw new NotSerializableException(nsfe.getMessage());
 	    }
 	}
     }
 
+    //
+    // State
+    //
+
+    private String name;
+    private String uri;
     private ChunkedSymbolListBuilder slBuilder;
+    private Annotation annotation;
+
+    private Set rootFeatures;
+    private List featureStack;
 
     {
-	slBuilder = new ChunkedSymbolListBuilder();
+    }
+
+    private void checkSeq()
+    {
+      // check that seq exists: if not, create it.
+      // this is done to permit lazy instatiation of the SimpleAssembly
+      // which gives time for name and uri to be set.
+      if (seq == null) seq = new SimpleAssembly(name, uri);
     }
 
     //
@@ -72,14 +88,21 @@ public class SimpleSequenceBuilder extends SequenceBuilderBase {
     public void addSymbols(Alphabet alpha, Symbol[] syms, int pos, int len)
         throws IllegalAlphabetException
     {
-	slBuilder.addSymbols(alpha, syms, pos, len);
+      System.err.println("SimpleAssemblyBuilder: illegal attempt to add symbols");
     }
 
+    public void addComponentSequence(ComponentFeature.Template cft)
+      throws BioException, ChangeVetoException
+    {
+        checkSeq();
 
-    public Sequence makeSequence() {
-	SymbolList symbols = slBuilder.makeSymbolList();
-	seq = new SimpleSequence(symbols, uri, name, annotation);
+        seq.createFeature(cft);
+    }
 
-        return super.makeSequence();
+    public Sequence makeSequence() 
+    {
+        checkSeq();
+
+	return super.makeSequence();
     }
 }
