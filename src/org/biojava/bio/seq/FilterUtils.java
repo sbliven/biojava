@@ -31,7 +31,7 @@ import org.biojava.bio.symbol.Location;
  */
 public class FilterUtils {
   /**
-   * Returns wether the set of features matched by sub can be proved to be a
+   * Returns wether the set of features matched by sub can be proven to be a
    * propper subset of the features matched by sup.
    * <P>
    * If the filter sub matches only features that are matched by sup, then it is
@@ -42,7 +42,7 @@ public class FilterUtils {
    * @param sup  the superset filter
    * @return boolean true if sub is a proper subset of sup
    */
-  public static boolean isProperSubset(FeatureFilter sub, FeatureFilter sup) {
+  public static boolean areProperSubset(FeatureFilter sub, FeatureFilter sup) {
     if(sub.equals(sup)) {
       return true;
     }
@@ -54,4 +54,25 @@ public class FilterUtils {
     return false;
   }
   
+  /**
+   * Returns wether the two queries can be proven to be disjoint.
+   * <P>
+   * They are disjoint if there is no element that is matched by both filters
+   * - that is, they have an empty intersection.
+   *
+   * @param a   the first FeatureFilter
+   * @param b   the second FeatureFilter
+   * @return true if they a proved to be disjoint, false otherwise
+   */
+  public static boolean areDisjoint(FeatureFilter a, FeatureFilter b) {
+    if(a.equals(b)) {
+      return false;
+    }
+    
+    if(a instanceof OptimizableFilter) {
+      return ((OptimizableFilter) a).isDisjoint(b);
+    }
+    
+    return false;
+  }
 }

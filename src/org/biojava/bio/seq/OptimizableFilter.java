@@ -39,4 +39,11 @@ interface OptimizableFilter extends FeatureFilter {
    * @return true if sup contains all features contained by this filter
    */
   boolean isProperSubset(FeatureFilter sup);
+  
+  /**
+   * Returns true if this filter is disjoint from filt - that is, there is no
+   * Feature that is accepted by both filters. The empty filter is disjoint from
+   * all other filters. The all filter is disjoint from none.
+   */
+  boolean isDisjoint(FeatureFilter filt);
 }

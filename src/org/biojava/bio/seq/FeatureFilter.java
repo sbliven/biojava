@@ -72,6 +72,10 @@ public interface FeatureFilter extends Serializable {
     public boolean isProperSubset(FeatureFilter sup) {
       return sup.equals(this);
     }
+    
+    public boolean isDisjoint(FeatureFilter filt) {
+      return filt instanceof AcceptNoneFilter;
+    }
   }
 
   /**
@@ -93,6 +97,10 @@ public interface FeatureFilter extends Serializable {
       return o instanceof AcceptNoneFilter;
     }
     public boolean isProperSubset(FeatureFilter sup) {
+      return true;
+    }
+    
+    public boolean isDisjoint(FeatureFilter filt) {
       return true;
     }
   }
@@ -133,7 +141,13 @@ public interface FeatureFilter extends Serializable {
         (((ByType) o).getType() == this.getType());
     }
     public boolean isProperSubset(FeatureFilter sup) {
-      return this.equals(sup);
+      return this.equals(sup) || (sup instanceof AcceptAllFilter);
+    }
+    public boolean isDisjoint(FeatureFilter filt) {
+      return (filt instanceof AcceptNoneFilter) || (
+        (filt instanceof ByType) &&
+        !getType().equals(((ByType) filt).getType())
+      );
     }
   }
 
@@ -169,7 +183,14 @@ public interface FeatureFilter extends Serializable {
     }
 
     public boolean isProperSubset(FeatureFilter sup) {
-      return this.equals(sup);
+      return this.equals(sup) || (sup instanceof AcceptAllFilter);
+    }
+
+    public boolean isDisjoint(FeatureFilter filt) {
+      return (filt instanceof AcceptNoneFilter) || (
+        (filt instanceof BySource) &&
+        !getSource().equals(((BySource) filt).getSource())
+      );
     }
   }
 
@@ -207,9 +228,18 @@ public interface FeatureFilter extends Serializable {
       if(sup instanceof ByClass) {
         Class supC = ((ByClass) sup).getTestClass();
         return supC.isAssignableFrom(this.getClass());
-      } else {
-        return false;
       }
+      return (sup instanceof AcceptAllFilter);
+    }
+    
+    public boolean isDisjoint(FeatureFilter feat) {
+      if(feat instanceof ByClass) {
+        Class featC = ((ByClass) feat).getClass();
+        return
+          ! (featC.isAssignableFrom(getClass())) &&
+          ! (getClass().isAssignableFrom(featC));
+      }
+      return (feat instanceof AcceptNoneFilter);
     }
   }
 
@@ -255,9 +285,17 @@ public interface FeatureFilter extends Serializable {
       } else if(sup instanceof OverlapsLocation) {
         Location supL = ((OverlapsLocation) sup).getLocation();
         return supL.contains(this.getLocation());
-      } else {
-        return false;
       }
+      return (sup instanceof AcceptAllFilter);
+    }
+    
+    public boolean isDisjoint(FeatureFilter filt) {
+      if(filt instanceof ContainedByLocation) {
+        Location loc = ((ContainedByLocation) filt).getLocation();
+        return !getLocation().overlaps(loc);
+      }
+      
+      return (filt instanceof AcceptNoneFilter);
     }
   }
   
@@ -300,9 +338,12 @@ public interface FeatureFilter extends Serializable {
       if(sup instanceof OverlapsLocation) {
         Location supL = ((OverlapsLocation) sup).getLocation();
         return supL.contains(this.getLocation());
-      } else {
-        return false;
       }
+      return (sup instanceof AcceptAllFilter);
+    }
+
+    public boolean isDisjoint(FeatureFilter filt) {
+      return (filt instanceof AcceptNoneFilter);
     }
   }
   
@@ -337,9 +378,13 @@ public interface FeatureFilter extends Serializable {
     public boolean isProperSubset(FeatureFilter sup) {
       if(sup instanceof Not) {
         FeatureFilter supC = ((Not) sup).getChild();
-        FilterUtils.isProperSubset(supC, this.getChild());
+        FilterUtils.areProperSubset(supC, this.getChild());
       }
-      return false;
+      return (sup instanceof AcceptAllFilter);
+    }
+    
+    public boolean isDisjoint(FeatureFilter filt) {
+      return FilterUtils.areProperSubset(filt, getChild());
     }
   }
 
@@ -379,8 +424,15 @@ public interface FeatureFilter extends Serializable {
     
     public boolean isProperSubset(FeatureFilter sup) {
       return
-        FilterUtils.isProperSubset(getChild1(), sup) ||
-        FilterUtils.isProperSubset(getChild2(), sup);
+        FilterUtils.areProperSubset(getChild1(), sup) ||
+        FilterUtils.areProperSubset(getChild2(), sup);
+    }
+    
+    public boolean isDisjoint(FeatureFilter filt) {
+      return (filt instanceof AcceptNoneFilter) || (
+        FilterUtils.areDisjoint(getChild1(), filt) ||
+        FilterUtils.areDisjoint(getChild2(), filt)
+      );
     }
   }
 
@@ -455,8 +507,15 @@ public interface FeatureFilter extends Serializable {
     
     public boolean isProperSubset(FeatureFilter sup) {
       return
-        FilterUtils.isProperSubset(getChild1(), sup) &&
-        FilterUtils.isProperSubset(getChild2(), sup);
+        FilterUtils.areProperSubset(getChild1(), sup) &&
+        FilterUtils.areProperSubset(getChild2(), sup);
+    }
+    
+    public boolean isDisjoint(FeatureFilter filt) {
+      return (filt instanceof AcceptNoneFilter) || (
+        FilterUtils.areDisjoint(getChild1(), filt) &&
+        FilterUtils.areDisjoint(getChild2(), filt)
+      );
     }
   }
   
@@ -519,6 +578,15 @@ public interface FeatureFilter extends Serializable {
     public boolean isProperSubset(FeatureFilter sup) {
       return this.equals(sup);
     }
+
+    public boolean isDisjoint(FeatureFilter filt) {
+      return (filt instanceof AcceptNoneFilter) || (
+        (filt instanceof ByAnnotation) && (
+          !(getKey().equals(((ByAnnotation) filt).getKey())) ||
+          !(getValue().equals(((ByAnnotation) filt).getValue()))
+        )
+      );
+    }
   }
   
   /**
@@ -563,6 +631,13 @@ public interface FeatureFilter extends Serializable {
     
     public boolean isProperSubset(FeatureFilter sup) {
       return this.equals(sup);
+    }
+
+    public boolean isDisjoint(FeatureFilter filt) {
+      return (filt instanceof AcceptNoneFilter) || (
+        (filt instanceof HasAnnotation) &&
+        !(getKey().equals(((HasAnnotation) filt).getKey()))
+      );
     }
   }
   
@@ -617,6 +692,13 @@ public interface FeatureFilter extends Serializable {
     
     public boolean isProperSubset(FeatureFilter sup) {
       return this.equals(sup);
+    }
+    
+    public boolean isDisjoint(FeatureFilter filt) {
+      return (filt instanceof AcceptNoneFilter) || (
+        (filt instanceof StrandFilter) &&
+        ((StrandFilter) filt).getStrand() == getStrand()
+      );
     }
   }
 }
