@@ -251,7 +251,7 @@ public final class RNATools {
    */
   static public Symbol forSymbol(char token)
   throws IllegalSymbolException {
-    String t = Character.toString(Character.toLowerCase(token));
+    String t = String.valueOf(token);
     SymbolTokenization toke;
 
     try{
