@@ -25,7 +25,8 @@ import java.text.NumberFormat;
  * @version 
  */
 public class TestDigestIO extends Object {
-
+    
+    private MassCalc massCalc;
     /** Creates new TestDigest2 */
     public TestDigestIO(String fileName) throws BioException, 
                                                 ChangeVetoException, 
@@ -33,15 +34,19 @@ public class TestDigestIO extends Object {
         //Initiate Digest
         Digest bioJavaDigest = new Digest();
         bioJavaDigest.setMaxMissedCleavages(2);
-        
+
+        massCalc = new MassCalc(SymbolPropertyTable.AVG_MASS);
+	try{
+	   massCalc.setSymbolModification('W', 100000.00); 
+        }catch(Exception e){}
         
        // Protease protease = new Protease();
        // String[] list = Protease.getProteaseList();
        // for(int i=0; i<list.length ;i++)
        //         System.out.println(list[i]);
         
-       String proteaseName = Protease.ASP_N;
-
+	//String proteaseName = Protease.ASP_N;
+	String proteaseName = Protease.TRYPSIN;
        bioJavaDigest.setProtese(Protease.getProteaseByName(proteaseName));
         
         //Get the Sequence Iterator
@@ -74,47 +79,48 @@ public class TestDigestIO extends Object {
         
     }
     
-    private  static void printFeatures(Iterator i, String prefix)
-           {
-                NumberFormat nf = NumberFormat.getInstance();
+    private  void printFeatures(Iterator i, String prefix)
+    {
+       NumberFormat nf = NumberFormat.getInstance();
 
-		nf.setMaximumFractionDigits(2);
-		nf.setMinimumFractionDigits(2);
+       nf.setMaximumFractionDigits(2);
+       nf.setMinimumFractionDigits(2);
 		
-                MassCalc massCalc = new MassCalc(SymbolPropertyTable.AVG_MASS);
-                                
-    try{
-        massCalc.setSymbolModification('W', 100000.00); 
-    }catch(Exception e){}
-               for (; i.hasNext(); ) {
-                   Feature f = (Feature) i.next();
-                   System.out.print(prefix);
-                   System.out.print(f.getType());
-                   System.out.print(f.getLocation().toString()+ " ");
+       
+                              
+       for (; i.hasNext(); ) {
+        Feature f = (Feature) i.next();
+        System.out.print(prefix);
+        System.out.print(f.getType());
+        System.out.print(f.getLocation().toString()+ " ");
                    
-                   //Use this for static 
-                   double mass = MassCalc.getMass(
-                                                f.getSymbols(), 
-                                                SymbolPropertyTable.AVG_MASS, 
-                                                true);
-                   System.out.print(nf.format(mass) + " ");
+        //Use this for static
+	try{
+	    double mass = MassCalc.getMass(
+                                       f.getSymbols(), 
+                                       SymbolPropertyTable.AVG_MASS, 
+                                       true);
+	    System.out.print(nf.format(mass) + " ");
                     
-                    //Use this for instances of MassCalc
-                   mass = massCalc.getMass(f.getSymbols(),true);
+	    //Use this for instances of MassCalc
+	    mass = massCalc.getMass(f.getSymbols(),true);
                     
-                    System.out.print(" PTM " + nf.format(mass) + " ");
+	    System.out.print(" PTM " + nf.format(mass) + " ");
                     
                     
-                   System.out.print(" " + f.getSymbols().seqString() + "    " );
+	    System.out.print(" " + f.getSymbols().seqString() + "    " );
                    
                    
                    
-                   System.out.println();
-                 //  printFeatures(f, pw, prefix + "    ");
+	    System.out.println();
+	    //  printFeatures(f, pw, prefix + "    ");
                 
-                
-               }
-           }
+	}
+	catch(IllegalSymbolException ise){
+	    System.out.println(ise.getMessage());
+	}
+    }
+  }
 
     /**
     * @param args the command line arguments
