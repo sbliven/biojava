@@ -21,7 +21,7 @@
     clean        cleans up the build & dist directories
 
   author:  Michael Heuer
-  version: $Id: biojava.ant,v 1.1 2000-04-17 08:02:41 mrp Exp $
+  version: $Id: biojava.ant,v 1.2 2000-04-19 10:10:07 mrp Exp $
         
   portions Copyright (c) 1999-2000 The Apache Software Foundation.
         
@@ -40,6 +40,7 @@
     <property name="license" value="./LICENSE"/>
     <property name="src.dir" value="./src"/>
     <property name="manifest.dir" value="./manifest"/>
+    <property name="manifest.file" value="defaultmanifest.txt"/>
     <property name="resources.dir" value="./resources"/>
 
     <property name="packages" value="org.*"/>
@@ -69,7 +70,7 @@
     <copydir src="${src.dir}" dest="${build.src}" excludes="CVS,cvs"/>
 
     <!-- copy manifest -->
-    <copydir src="${manifest.dir}" dest="${build.src}" includes="Manifest.mf"/>
+    <copydir src="${manifest.dir}" dest="${build.src}" includes="${manifest.file}"/>
 
     <!-- copy resources -->
     <copydir src="${resources.dir}" dest="${build.src}" excludes="CVS,cvs"/>
@@ -83,7 +84,7 @@
   <!-- Creates the class package -->
   <target name="package" depends="compile">
     <jar jarfile="${build.dir}/${name}.jar" basedir="${build.dest}"
-         manifest="${build.src}/Manifest.mf" includes="org/**"/>
+         manifest="${build.src}/${manifest.file}" includes="org/**"/>
   </target>
         
   <!-- Creates the API documentation -->
