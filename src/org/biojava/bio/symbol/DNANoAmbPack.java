@@ -6,19 +6,26 @@ import org.biojava.bio.seq.*;
 
 /**
  * @author Matthew Pocock
+ * @author Thomas Down
  */  
 public class DNANoAmbPack
   implements
     Packing
 {
-  Symbol placeHolder;
-  public DNANoAmbPack(Symbol placeHolder) {
-    this.placeHolder = placeHolder;
-  }
+  final byte placeHolder;
+    
+
+    public DNANoAmbPack(byte placeHolder) {
+	this.placeHolder = placeHolder;
+    }
   
-  public FiniteAlphabet getAlphabet() {
-    return DNATools.getDNA();
-  }
+    public DNANoAmbPack(Symbol placeHolderSymbol) {
+	this.placeHolder = pack(placeHolderSymbol);
+    }
+
+    public FiniteAlphabet getAlphabet() {
+	return DNATools.getDNA();
+    }
   
   public byte pack(Symbol sym) {
     if(false) {
@@ -32,7 +39,7 @@ public class DNANoAmbPack
       return 3;
     }
     
-    return pack(placeHolder);
+    return placeHolder;
   }
   
   public Symbol unpack(byte b)
