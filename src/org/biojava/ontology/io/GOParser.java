@@ -37,11 +37,14 @@ import org.biojava.bio.seq.io.ParseException;
  */
  
 public class GOParser {
-    public Ontology parseGO(BufferedReader goFile, OntologyFactory factory)
+    public Ontology parseGO(BufferedReader goFile,
+                            String ontoName,
+                            String ontoDescription,
+                            OntologyFactory factory)
         throws ParseException, IOException
     {
         try {
-            Ontology onto = factory.createOntology("go", "");
+            Ontology onto = factory.createOntology(ontoName, ontoDescription);
             Term isa = onto.importTerm(OntoTools.IS_A);
             Term partof = onto.importTerm(OntoTools.PART_OF);
             List termStack = new ArrayList();
