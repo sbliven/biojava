@@ -34,7 +34,7 @@ import java.util.*;
  * <h3>Example</h3>
  *
  * <pre>
- * StringBuffer out = new StringBuffer();
+ * StringWriter out = new StringWriter();
  * ProcessTools.exec(
  *          new String[] {"/usr/bin/wc", "-w"},
  *          "The quick brown fox jumps over the lazy dog",
@@ -63,10 +63,6 @@ public class ProcessTools {
       /** Win 9X/MEHome require the /C to specify what to run **/
       private static final String WINDOWS_9X_ME_COMMAND_2 = "/C";
 
-      /** String to send to STDERR if program exceeds max run time **/
-      private static final String MAX_RUN_TIME_EXCEEDED_STRING =
-	  "MAX_RUN_TIME_EXCEEDED";
-
     // Dummy constructor since this is just a tools class  
       
     private ProcessTools() {
@@ -77,8 +73,8 @@ public class ProcessTools {
      *
      * @param args the command line to execute.
      * @param input data to present to the process' standard input, or <code>null</code> if the process does not require input.
-     * @param stdout a <code>StringBuffer</code> which will be filled with data from the process' output stream, or <code>null</code> to ignore output.
-     * @param stderr a <code>StringBuffer</code> which will be filled with data from the process' error stream, or <code>null</code> to ignore output.
+     * @param stdout a <code>Writer</code> which will be filled with data from the process' output stream, or <code>null</code> to ignore output.
+     * @param stderr a <code>Writer</code> which will be filled with data from the process' error stream, or <code>null</code> to ignore output.
      * @param timeout maximum run-time for child process.  A value of 0 indicates no limit.
      * @return the process' return code.
      */
@@ -86,26 +82,26 @@ public class ProcessTools {
     public static int exec(
         String[] args,
         String input,
-        StringBuffer stdout,
-        StringBuffer stderr
+        Writer stdout,
+        Writer stderr
     )
         throws IOException
     {
-        try {
-            return exec(args, input, stdout, stderr, 0L);
+      try {
+          return exec(args, input, stdout, stderr, 0L);
         } catch (ProcessTimeoutException ex) {
             throw new Error("Assertion failed: unexpected process timeout");
         }
     }
-
+  
    /**
      * Execute the specified command and wait for it to return, or kill
      * it if the specified timeout expires first.
      *
      * @param args the command line to execute.
      * @param input data to present to the process' standard input, or <code>null</code> if the process does not require input.
-     * @param stdout a <code>StringBuffer</code> which will be filled with data from the process' output stream, or <code>null</code> to ignore output.
-     * @param stderr a <code>StringBuffer</code> which will be filled with data from the process' error stream, or <code>null</code> to ignore output.
+     * @param stdout a <code>Writer</code> which will be filled with data from the process' output stream, or <code>null</code> to ignore output.
+     * @param stderr a <code>Writer</code> which will be filled with data from the process' error stream, or <code>null</code> to ignore output.
      * @param timeout maximum run-time (in milliseconds) for the child process.  A value of 0 indicates no limit.
      * @return the process' return code.
      * @throws IOException if an error occurs while starting or communicating with the process
@@ -115,28 +111,30 @@ public class ProcessTools {
   public static int exec(
         String[] args,
         String input,
-        StringBuffer stdout,
-        StringBuffer stderr,
+        Writer stdout,
+        Writer stderr,
         long timeout
     )
         throws IOException, ProcessTimeoutException
     {
         Process proc = Runtime.getRuntime().exec(args);
-        Pump outPump, inPump, errPump;
+        CharPump outPump;
+        
+        CharPump inPump, errPump;
         
         if (input == null) {
             input = "";
         }
-        outPump = new PumpStreamToStream(new StringBufferInputStream(input), proc.getOutputStream());
+        outPump = new PumpReaderToWriter(new StringReader(input), new OutputStreamWriter(proc.getOutputStream()));
         if (stdout == null) {
-            inPump = new PumpStreamToNull(proc.getInputStream());
+            inPump = new PumpReaderToNull(new InputStreamReader(proc.getInputStream()));
         } else {
-            inPump = new PumpStreamToStringBuffer(proc.getInputStream(), stdout);
+            inPump = new PumpReaderToWriter(new InputStreamReader(proc.getInputStream()), stdout);
         }
         if (stderr == null) {
-            errPump = new PumpStreamToNull(proc.getErrorStream());
+            errPump = new PumpReaderToNull(new InputStreamReader(proc.getErrorStream()));
         } else {
-            errPump = new PumpStreamToStringBuffer(proc.getErrorStream(), stderr);
+          errPump = new PumpReaderToWriter(new InputStreamReader(proc.getErrorStream()), stderr);
         }
         
         TimeBomb tb = null;
@@ -185,9 +183,9 @@ public class ProcessTools {
    * @param command the command line to execute.
    * @param input data to present to the process' standard input, or
    * <code>null</code> if the process does not require input. 
-   * @param stdout a <code>StringBuffer</code> which will be filled with data
+   * @param stdout a <code>Writer</code> which will be filled with data
    * from the process' output stream, or <code>null</code> to ignore output. 
-   * @param stderr a <code>StringBuffer</code> which will be filled with data
+   * @param stderr a <code>Writer</code> which will be filled with data
    * from the process' error stream, or <code>null</code> to ignore output. 
    * @return the process' return code.
    * @throws IOException if an error occurs while starting or communicating
@@ -196,8 +194,8 @@ public class ProcessTools {
   public static int exec(
                          String command,
                          String input,
-                         StringBuffer stdout,
-                         StringBuffer stderr)
+                         Writer stdout,
+                         Writer stderr)
         throws IOException
   {
       try {
@@ -216,9 +214,9 @@ public class ProcessTools {
    * @param command the command line to execute.
    * @param input data to present to the process' standard input, or
    * <code>null</code> if the process does not require input. 
-   * @param stdout a <code>StringBuffer</code> which will be filled with data
+   * @param stdout a <code>Writer</code> which will be filled with data
    * from the process' output stream, or <code>null</code> to ignore output. 
-   * @param stderr a <code>StringBuffer</code> which will be filled with data
+   * @param stderr a <code>Writer</code> which will be filled with data
    * from the process' error stream, or <code>null</code> to ignore output. 
    * @param timeout maximum run-time (in milliseconds) for the child process.  A value of 0 indicates no limit.
    * @return the process' return code.
@@ -229,8 +227,8 @@ public class ProcessTools {
   public static int exec(
                          String command,
                          String input,
-                         StringBuffer stdout,
-                         StringBuffer stderr,
+                         Writer stdout,
+                         Writer stderr,
                          long timeout)
         throws IOException, ProcessTimeoutException
   {
@@ -266,13 +264,13 @@ public class ProcessTools {
 		 cmd[token++] = tokenString;
 	     }
 	 }
-         return exec(cmd,input,stdout,stderr);
+         return exec(cmd,input,stdout,stderr, timeout);
   }
   
     /**
      * Check the status of a Pump and re-throw any exception which may
      * have occured during its lifecycle
-     */
+     *
   
     private static void checkException(Pump p, String msg)
         throws IOException
@@ -281,8 +279,17 @@ public class ProcessTools {
         if (ioe != null) {
             throw new IOException("Exception processing " + msg);
         }
+    }*/
+
+  private static void checkException(CharPump p, String msg)
+        throws IOException
+    {
+        IOException ioe = p.getException();
+        if (ioe != null) {
+            throw new IOException("Exception processing " + msg);
+        }
     }
-    
+  
     /**
      * Thread which will kill the specified process if it is not defused before
      * the timeout expires.
@@ -330,26 +337,26 @@ public class ProcessTools {
      * must implement sourceData and sinkData.  They may also wish to override
      * shutdownHook, a dummy method which is called when the pump finishes (usually
      * because the end of the data source has been reached).
-     */
+     *
     
     private static abstract class Pump extends Thread {
         private IOException err = null;
         
         /**
          * Read bytes of data from some data source.
-         */
+         *
         
         protected abstract int sourceData(byte[] buf) throws IOException;
         
         /**
          * Write bytes of data to some data sink.
-         */
+         *
         
         protected abstract void sinkData(byte[] buf, int len) throws IOException;
         
         /**
          * Perform any required tidying operations when the Pump's job has finished.
-         */
+         *
         
         protected void shutdownHook() throws IOException {};
         
@@ -372,8 +379,52 @@ public class ProcessTools {
         public IOException getException() {
             return err;
         }
+    }*/
+
+  private static abstract class CharPump extends Thread {
+        private IOException err = null;
+        
+        /**
+         * Read bytes of data from some data source.
+         */
+        
+        protected abstract int sourceData(char[] buf) throws IOException;
+        
+        /**
+         * Write bytes of data to some data sink.
+         */
+        
+        protected abstract void sinkData(char[] buf, int len) throws IOException;
+        
+        /**
+         * Perform any required tidying operations when the Pump's job has finished.
+         */
+        
+        protected void shutdownHook() throws IOException {};
+        
+        public void run() {
+            try {
+                char[] buf = new char[256];
+                int cnt;
+                do {
+                    cnt = sourceData(buf);
+                    if (cnt > 0) {
+                        sinkData(buf, cnt);
+                    }
+                } while (cnt >= 0);
+                shutdownHook();
+            } catch (IOException e) {
+                this.err = e;
+            }
+        }
+        
+        public IOException getException() {
+            return err;
+        }
     }
-    
+
+
+  /*  
     private static final class PumpStreamToStringBuffer extends Pump {
         private final InputStream is;
         private final StringBuffer sb;
@@ -412,7 +463,57 @@ public class ProcessTools {
         protected void sinkData(byte[] buf, int len) {
         }       
     }
+  */
+  private static final class PumpReaderToNull extends CharPump {
+        private final Reader is;
+        
+    public PumpReaderToNull(Reader is) {
+            super();
+            this.is = is;
+        }
+        
+        protected int sourceData(char[] buf)
+            throws IOException
+        {
+            return is.read(buf);
+        }
+        
+        protected void sinkData(char[] buf, int len) {
+        }       
+    }
+  
 
+  private static final class PumpReaderToWriter extends CharPump {
+    private final Reader reader;
+    private final Writer writer;
+
+    public PumpReaderToWriter(Reader reader, Writer writer){
+      this.reader=reader;
+      this.writer=writer;
+    }
+    
+    protected int sourceData(char[] buf)
+      throws IOException
+    {
+      return reader.read(buf, 0, buf.length);
+    }
+
+    protected void sinkData(char[] buf, int len)
+      throws IOException
+    {
+      writer.write(buf, 0, len);
+      writer.flush();
+    }
+
+    protected void shutdownHook() 
+      throws IOException
+    {
+      writer.close();
+    }
+    
+  }
+  
+  /*
     private static final class PumpStreamToStream extends Pump {
         private final InputStream is;
         private final OutputStream os;
@@ -440,5 +541,5 @@ public class ProcessTools {
         {
             os.close();
         }
-    }
+        }*/
 }
