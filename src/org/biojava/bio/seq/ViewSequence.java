@@ -22,6 +22,7 @@
 package org.biojava.bio.seq;
 
 import java.util.*;
+import java.io.*;
 import java.lang.reflect.*;
 
 import org.biojava.utils.*;
@@ -38,7 +39,8 @@ import org.biojava.bio.seq.impl.*;
  * @author Matthew Pocock
  */
 
-public class ViewSequence implements Sequence, RealizingFeatureHolder {
+public class ViewSequence implements Sequence, RealizingFeatureHolder, Serializable {
+    private static final long serialVersionUID = 9866447;
     /**
      * Delegate Sequence.
      */
@@ -47,8 +49,22 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
     /**
      * FeatureHolder support
      */
-    private MergeFeatureHolder exposedFeatures;
-    private SimpleFeatureHolder addedFeatures;
+    private ViewSeqMergeFeatureHolder exposedFeatures;
+    /**
+     * For serialization support, all methods delegated to super
+     */
+    private class ViewSeqMergeFeatureHolder extends MergeFeatureHolder implements Serializable {
+        private static final long serialVersionUID = 68065743;
+    }
+
+
+    private ViewSeqSimpleFeatureHolder addedFeatures;
+    /**
+     * For serialization support, all methods delegated to super
+     */
+    private class ViewSeqSimpleFeatureHolder extends SimpleFeatureHolder implements Serializable {
+	private static final long serialVersionUID = 38475932;
+    }
 
     /**
      * IDs
@@ -64,7 +80,12 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
     /**
      * The FeatureRealizer we use.
      */
-    private FeatureRealizer featureRealizer;
+    private transient FeatureRealizer featureRealizer;
+
+    private void readObject(ObjectInputStream s)throws IOException, ClassNotFoundException{
+	s.defaultReadObject();
+	this.featureRealizer = FeatureImpl.DEFAULT;
+    }
 
     /**
      * Construct a view onto an existing sequence and give it a new
@@ -74,8 +95,8 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
         this.name = name;
 
 	seqDelegate = seq;
-	addedFeatures = new SimpleFeatureHolder();
-	exposedFeatures = new MergeFeatureHolder();
+	addedFeatures = new ViewSeqSimpleFeatureHolder();
+	exposedFeatures = new ViewSeqMergeFeatureHolder();
 	try {
 	    exposedFeatures.addFeatureHolder(new ProjectedFeatureHolder(seqDelegate, this, 0, false));
 	    exposedFeatures.addFeatureHolder(addedFeatures);
