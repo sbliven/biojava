@@ -42,28 +42,6 @@ import org.biojava.bio.seq.*;
  * readSequence to read from a Genbank stream and construct Ensembl
  * CORBA objects, just by specifying an Ensembl SequenceFactory.</p>
  *
- * <p>An <code>int</code> used to specify symbol alphabet and
- * sequence format type is derived thus:</p>
- *
- * <ul>
- *   <li>
- *    The two least significant bytes are reserved for format types
- *    such as RAW, FASTA, EMBL etc.
- *   </li>
- *
- *   <li>
- *    The two most significant bytes are reserved for alphabet and
- *    symbol information such as AMBIGUOUS, DNA, RNA, AA etc.
- *   </li>
- *
- *   <li>
- *    Bitwise OR combinations of each component <code>int</code> are used
- *    to specify combinations of format type and symbol information. To
- *    derive an <code>int</code> identifier for DNA with ambiguity codes
- *    in Fasta format, bitwise OR the AMBIGUOUS, DNA and FASTA values.
- *   </li>
- * </ul>
- *
  * @author Matthew Pocock
  * @author Thomas Down
  * @author Keith James
@@ -71,117 +49,6 @@ import org.biojava.bio.seq.*;
 
 public interface SequenceFormat
 {
-    /**
-     * <code>AMBIGUOUS</code> indicates that a sequence contains
-     * ambiguity symbols. The first bit of the most significant word
-     * of the int is set.
-     */
-    public static final int AMBIGUOUS = 1 << 16;
-
-    /**
-     * <code>DNA</code> indicates that a sequence contains DNA
-     * (deoxyribonucleic acid) symbols. The second bit of the most
-     * significant word of the int is set.
-     */
-    public static final int DNA = 1 << 17;
-
-    /**
-     * <code>RNA</code> indicates that a sequence contains RNA
-     * (ribonucleic acid) symbols. The third bit of the most
-     * significant word of the int is set.
-     */
-    public static final int RNA = 1 << 18;
-
-    /**
-     * <code>AA</code> indicates that a sequence contains AA (amino
-     * acid) symbols. The fourth bit of the most significant word of
-     * the int is set.
-     */
-    public static final int AA = 1 << 19;
-
-    /**
-     * <code>INTEGER</code> indicates that a sequence contains integer
-     * alphabet symbols, such as used to describe sequence quality
-     * data. The fifth bit of the most significant word of the int is
-     * set.
-     */
-    public static final int INTEGER = 1 << 20;
-
-    /**
-     * <code>UNKNOWN</code> indicates that the sequence format is
-     * unknown.
-     */
-    public static final int UNKNOWN = 0;
-
-    /**
-     * <code>RAW</code> indicates that the sequence format is raw
-     * (symbols only).
-     */
-    public static final int RAW = 1;
-
-    /**
-     * <code>FASTA</code> indicates that the sequence format is Fasta.
-     */
-    public static final int FASTA = 2;
-
-    /**
-     * <code>NBRF</code> indicates that the sequence format is NBRF.
-     */
-    public static final int NBRF = 3;
-
-    /**
-     * <code>IG</code> indicates that the sequence format is IG.
-     */
-    public static final int IG = 4;
-
-    /**
-     * <code>EMBL</code> indicates that the sequence format is EMBL.
-     * As EMBL is always DNA, the DNA bit is already set.
-     */
-    public static final int EMBL = 10 | DNA;
-
-    /**
-     * <code>SWISSPROT</code> indicates that the sequence format is
-     * SWISSPROT. As SWISSPROT is always AA, the AA bit is already
-     * set.
-     */
-    public static final int SWISSPROT = 11 | AA;
-
-    /**
-     * <code>GENBANK</code> indicates that the sequence format is
-     * GENBANK. As GENBANK is always DNA, the DNA bit is already set.
-     */
-    public static final int GENBANK = 12 | DNA;
-
-    /**
-     * <code>GENPEPT</code> indicates that the sequence format is
-     * GENPEPT. As GENPEPT is always AA, the AA bit is already set.
-     */
-    public static final int GENPEPT = 13 | AA;
-
-    /**
-     * <code>REFSEQ</code> indicates that the sequence format is
-     * REFSEQ.
-     */
-    public static final int REFSEQ = 14;
-
-    /**
-     * <code>GCG</code> indicates that the sequence format is GCG.
-     */
-    public static final int GCG = 15;
-
-    /**
-     * <code>GFF</code> indicates that the sequence format is GFF.
-     */
-    public static final int GFF = 20;
-
-    /**
-     * <code>PHRED</code> indicates that the sequence format is
-     * PHRED. As PHRED is always DNA and contains integer quality
-     * data, the DNA and INTEGER bits are already set.
-     */
-    public static final int PHRED = 30 | DNA | INTEGER;
-
     /**
      * Read a sequence and pass data on to a SeqIOListener.
      *
@@ -203,9 +70,9 @@ public interface SequenceFormat
      * stream.
      */
     public boolean readSequence(BufferedReader     reader,
-				SymbolTokenization symParser,
-				SeqIOListener      listener)
-	throws BioException, IllegalSymbolException, IOException;
+                                SymbolTokenization symParser,
+                                SeqIOListener      listener)
+        throws BioException, IllegalSymbolException, IOException;
 
     /**
      * <code>writeSequence</code> writes a sequence to the specified
@@ -215,7 +82,7 @@ public interface SequenceFormat
      * @param os the printstream to write to.
      */
     public void writeSequence(Sequence seq, PrintStream os)
-	throws IOException;
+        throws IOException;
 
     /**
      * <code>writeSequence</code> writes a sequence to the specified
@@ -232,7 +99,7 @@ public interface SequenceFormat
      * @deprecated use writeSequence(Sequence seq, PrintStream os)
      */
     public void writeSequence(Sequence seq, String format, PrintStream os)
-	throws IOException;
+        throws IOException;
 
     /**
      * <code>getDefaultFormat</code> returns the String identifier for

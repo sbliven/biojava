@@ -22,93 +22,106 @@
 package org.biojava.directory;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 /**
- * <p>
- * A registry that loads up the standard biodirectory files.
- * </p>
+ * <p>A registry that loads up the standard biodirectory files.</p>
  *
  * <p>
- * This class will search for the following classes in turn:
+ * This class will search for the following files in turn:
  * <ol>
  * <li>~/.bioinformatics/seqdatabase.ini where ~ is the JAVA user home system
  * property</li>
  * <li>/etc/bioinformatics/seqdatabase.ini</li>
- * <li>"http://www.open-bio.net/bioinformatics/seqdatabase.ini</li>
+ * <li>"http://www.open-bio.org/registry/seqdatabase.ini</li>
  * </ol>
- * </p>
- *
- * <p>
- * The first file found will be loaded and used as the configuration. There is
- * currently no support for cascading these so that local setting over-ride
- * more general ones.
  * </p>
  *
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Keith James
  */
-
 public class SystemRegistry {
-  private static Registry systemRegistry;
-  
-  /**
-   * Get the singleton Registry instance representing the system-wide default
-   * registry.
-   *
-   * @return the system-wide Registry object
-   */
-  public static Registry instance() {
-    if (systemRegistry == null) {
-      RegistryConfiguration.Composite regConfig
-        = new RegistryConfiguration.Composite();
-      Iterator i = getRegistryPath().iterator();
-      
-      while (i.hasNext()) {
-        try {
-          String locator = (String) i.next();
-          BufferedReader stream = new BufferedReader(
-            new InputStreamReader(
-              new URL(locator).openStream()
-            )
-          );
-          if (stream != null) {
-            try {
-              RegistryConfiguration cfg
-                = OBDARegistryParser.parseRegistry(stream, locator);
-              regConfig.addBottomConfig(cfg);
-            } catch (Exception ex) {
-              ex.printStackTrace(); // FIXME: we should log this or something
+
+    public static final String CONFIG_LOCATOR =
+        "http://www.open-bio.org/registry/seqdatabase.ini";
+
+    public static final String CONFIG_FILE = "seqdatabase.ini";
+
+    private static Registry systemRegistry;
+
+    /**
+     * Get the singleton Registry instance representing the system-wide
+     * default registry.
+     *
+     * @return the system-wide Registry object.
+     */
+    public static Registry instance() {
+        if (systemRegistry == null) {
+            RegistryConfiguration.Composite regConfig
+                = new RegistryConfiguration.Composite();
+            Iterator i = getRegistryPath().iterator();
+
+            while (i.hasNext()) {
+                try {
+                    String locator = (String) i.next();
+                    URL url = new URL(locator);
+
+                    if (url.getProtocol().equals("file")) {
+                        File file = new File(url.getPath());
+                        if (! file.exists() || ! file.canRead()) {
+                            // FIXME - log this
+                            continue;
+                        }
+                    }
+
+                    BufferedReader stream =
+                        new BufferedReader(new InputStreamReader(url.openStream()));
+
+                    if (stream != null) {
+                        try {
+                            RegistryConfiguration cfg =
+                                OBDARegistryParser.parseRegistry(stream,
+                                                                 locator);
+                            regConfig.addBottomConfig(cfg);
+                        } catch (Exception ex) {
+                            ex.printStackTrace(); // FIXME - log this
+                        }
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace(); // FIXME - log this
+                }
             }
-          }
-        } catch (Exception ex) {} // FIXME: logging?
-      }
-      
-      systemRegistry = new Registry(regConfig);
+
+            systemRegistry = new Registry(regConfig);
+        }
+
+        return systemRegistry;
     }
-    
-    return systemRegistry;
-  }
-  
-  /**
-   * Get the list of places that will be searched for registry files.
-   *
-   * @return a List of strings that are URLs to bioregistry files
-   */
-  public static List getRegistryPath() {
-    List registryPath = new ArrayList();
-    String userHome = System.getProperty("user.home");
-    if (userHome != null) {
-      registryPath.add("file:///" + userHome + "/.bioinformatics/seqdatabase.ini");
+
+    /**
+     * Get the list of places that will be searched for registry
+     * files.
+     *
+     * @return a List of strings that are URLs to bioregistry files.
+     */
+    public static List getRegistryPath() {
+        List registryPath = new ArrayList();
+        String userHome = System.getProperty("user.home");
+        if (userHome != null) {
+            registryPath.add("file:///"
+                             + userHome
+                             + "/.bioinformatics/"
+                             + CONFIG_FILE);
+        }
+
+        registryPath.add("file:///etc/bioinformatics/" + CONFIG_FILE);
+        registryPath.add(CONFIG_LOCATOR);
+        return registryPath;
     }
-    registryPath.add("file:///etc/bioinformatics/seqdatabase.ini");
-    registryPath.add("http://www.open-bio.net/bioinformatics/seqdatabase.ini");
-    return registryPath;
-  }
 }

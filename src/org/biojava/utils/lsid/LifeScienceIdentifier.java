@@ -190,13 +190,17 @@ public final class LifeScienceIdentifier
         throws LifeScienceIdentifierParseException
     {
         if (lsid.length() < 9)
-            throw new LifeScienceIdentifierParseException("couldn't parse: " + lsid + ", didn't contain urn prefix");
+            throw new LifeScienceIdentifierParseException("couldn't parse: "
+                                                          + lsid
+                                                          + ", didn't contain urn prefix");
         
         String urnPrefix = lsid.substring(0,9);
         lsid = lsid.substring(9);
         
         if (!("urn:lsid:".equalsIgnoreCase(urnPrefix)))
-            throw new LifeScienceIdentifierParseException("couldn't parse: " + lsid + ", incorrect urn prefix");
+            throw new LifeScienceIdentifierParseException("couldn't parse: "
+                                                          + lsid
+                                                          + ", incorrect urn prefix");
         
         StringTokenizer st = new StringTokenizer(lsid, ":", true);
         
@@ -220,13 +224,17 @@ public final class LifeScienceIdentifier
                 revisionId = st.nextToken();
             }
             if (st.hasMoreTokens())
-                throw new LifeScienceIdentifierParseException("couldn't parse: " + lsid + ", too many tokens");
+                throw new LifeScienceIdentifierParseException("couldn't parse: "
+                                                              + lsid
+                                                              + ", too many tokens");
             
             return valueOf(authorityId, namespaceId, objectId, revisionId);
         }
         else
         {
-            throw new LifeScienceIdentifierParseException("couldn't parse: " + lsid + ", unproperly formatted lsid");
+            throw new LifeScienceIdentifierParseException("couldn't parse: "
+                                                          + lsid
+                                                          + ", badly formatted lsid");
         }
     }
     
@@ -243,9 +251,9 @@ public final class LifeScienceIdentifier
      *   <code>namespaceId</code>, or <code>objectId</code> are null
      */	
     public static LifeScienceIdentifier valueOf(String authorityId,
-						String namespaceId,
-						String objectId,
-						String revisionId)
+                                                String namespaceId,
+                                                String objectId,
+                                                String revisionId)
     {
         if ((authorityId == null) ||
             (namespaceId == null) ||

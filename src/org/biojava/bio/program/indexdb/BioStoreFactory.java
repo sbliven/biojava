@@ -26,6 +26,7 @@ import java.util.*;
 
 import org.biojava.bio.*;
 import org.biojava.utils.*;
+import org.biojava.utils.lsid.LifeScienceIdentifier;
 
 /**
  * <code>BioStoreFactory</code> creates <code>BioStore</code>
@@ -37,8 +38,19 @@ import org.biojava.utils.*;
  * @author Greg Cox
  */
 public class BioStoreFactory {
+    /**
+     * <code>STORE_NAME</code> is the key used to identify the
+     * arbitrary name of the store in the OBDA config.dat files.
+     */
     public static final String STORE_NAME = "name";
-    
+
+    /**
+     * <code>SEQUENCE_FORMAT</code> is the key used to identify the
+     * format of the indexed sequence files represented by the store
+     * in the OBDA config.dat files.
+     */
+    public static final String SEQUENCE_FORMAT = "format";
+
     /**
      * <code>PRIMARY_KEY_NAME</code> is the key used to identify the
      * primary namespace in the OBDA config.dat files.
@@ -55,44 +67,42 @@ public class BioStoreFactory {
      * AnnotationType that all meta-data files should fit.
      */
     public static final AnnotationType META_DATA_TYPE;
-    
-    static {
-      try {
-        META_DATA_TYPE = new AnnotationType.Impl();
-        META_DATA_TYPE.setDefaultConstraints(PropertyConstraint.ANY, CardinalityConstraint.ANY);
-        
-        META_DATA_TYPE.setConstraints(
-          BioStoreFactory.PRIMARY_KEY_NAME,
-          new PropertyConstraint.ByClass(String.class),
-          CardinalityConstraint.ONE
-        );
-        
-        META_DATA_TYPE.setConstraints(
-          "index",
-          new PropertyConstraint.ByClass(String.class),
-          CardinalityConstraint.ONE
-        );
-        
-        META_DATA_TYPE.setConstraints(
-          BioStoreFactory.KEYS,
-          new PropertyConstraint.ByClass(String.class),
-          CardinalityConstraint.ONE
-        );
 
-        META_DATA_TYPE.setConstraints(
-          "name",
-          new PropertyConstraint.ByClass(String.class),
-          CardinalityConstraint.ZERO_OR_ONE
-        );
-      } catch (Exception e) {
-        throw new NestedError(e);
-      }
+    static {
+        try {
+            META_DATA_TYPE = new AnnotationType.Impl();
+            META_DATA_TYPE.setDefaultConstraints(PropertyConstraint.ANY,
+                                                 CardinalityConstraint.ANY);
+        
+            META_DATA_TYPE.setConstraints(BioStoreFactory.PRIMARY_KEY_NAME,
+                                          new PropertyConstraint.ByClass(String.class),
+                                          CardinalityConstraint.ONE);
+
+            META_DATA_TYPE.setConstraints("index",
+                                          new PropertyConstraint.ByClass(String.class),
+                                          CardinalityConstraint.ONE);
+
+            META_DATA_TYPE.setConstraints("format",
+                                          new PropertyConstraint.ByClass(LifeScienceIdentifier.class),
+                                          CardinalityConstraint.ONE);
+
+            META_DATA_TYPE.setConstraints(BioStoreFactory.KEYS,
+                                          new PropertyConstraint.ByClass(String.class),
+                                          CardinalityConstraint.ONE);
+
+            META_DATA_TYPE.setConstraints("name",
+                                          new PropertyConstraint.ByClass(String.class),
+                                          CardinalityConstraint.ZERO_OR_ONE);
+        } catch (Exception e) {
+            throw new NestedError(e);
+        }
     }
 
     private File storeLoc;
     private String primaryKey;
     private Map keys;
     private String name;
+    private LifeScienceIdentifier format;
 
     /**
      * Creates a new <code>BioStoreFactory</code>.
@@ -100,33 +110,69 @@ public class BioStoreFactory {
     public BioStoreFactory() {
         keys = new SmallMap();
     }
-    
+
+    /**
+     * <code>setStoreName</code> sets the name to be given to the new
+     * index.
+     *
+     * @param name a <code>String</code>.
+     */
     public void setStoreName(String name) {
-      this.name = name;
-    }
-    
-    public String getStoreName() {
-      return name;
+        this.name = name;
     }
 
     /**
-     * <code>setStoreLocation</code> sets the parent path of the
-     * store.
+     * <code>getStoreName</code> returns the name to be given to the
+     * new index.
      *
-     * @param storeLoc a <code>File</code> indicating the parent path.
+     * @return a <code>String</code>.
+     */
+    public String getStoreName() {
+        return name;
+    }
+
+    /**
+     * <code>setStoreLocation</code> sets the directory of the new
+     * index.
+     *
+     * @param storeLoc a <code>File</code>.
      */
     public void setStoreLocation(File storeLoc) {
         this.storeLoc = storeLoc;
     }
 
     /**
-     * <code>getStoreLocation</code> returns the parent path of the
-     * store.
+     * <code>getStoreLocation</code> returns the directory of the bew
+     * index.
      *
-     * @return a <code>File</code> indicating the parent path.
+     * @return a <code>File</code>.
      */
     public File getStoreLocation() {
         return storeLoc;
+    }
+
+    /**
+     * <code>setSequenceFormat</code> sets the sequence format name
+     * which will be indicated in the index.
+     *
+     * @param format a <code>LifeScienceIdentifier</code> which must
+     * be one of those mandated by the OBDA flatfile indexing
+     * specification.
+     */
+    public void setSequenceFormat(LifeScienceIdentifier format)
+    {
+        this.format = format;
+    }
+
+    /**
+     * <code>getSequenceFormat</code> returns the current sequence
+     * format name.
+     *
+     * @return a <code>LifeScienceIdentifier</code>.
+     */
+    public LifeScienceIdentifier getSequenceFormat()
+    {
+        return format;
     }
 
     /**
@@ -183,21 +229,25 @@ public class BioStoreFactory {
         throws BioException {
         try {
             if (storeLoc.exists()) {
-                throw new BioException("Store location already exists. Delete first: " + storeLoc);
+                throw new BioException("Store location already exists."
+                                       + " Delete first: " + storeLoc);
             }
 
             if (!keys.containsKey(primaryKey)) {
-                throw new BioException("Primary key is not listed as a key: " + primaryKey);
+                throw new BioException("Primary key is not listed as a key: "
+                                       + primaryKey);
             }
 
             storeLoc.mkdirs();
             ConfigFile ann = new ConfigFile(makeConfigFile(storeLoc));
             ann.setProperty("index", "flat/1");
 
-            if(name != null) {
-              ann.setProperty(STORE_NAME, name);
+            if (name != null) {
+                ann.setProperty(STORE_NAME, name);
             }
-            
+
+            // sequence format
+            ann.setProperty(SEQUENCE_FORMAT, format.toString());
             // primary key data
             ann.setProperty(PRIMARY_KEY_NAME, primaryKey);
 
@@ -238,9 +288,10 @@ public class BioStoreFactory {
 
     /**
      * <code>makeConfigFile</code> returns a file which represents an
-     * OBDA "config.dat" on the specified parent path.
+     * OBDA "config.dat" in the specified index directory.
      *
-     * @param storeLoc a <code>File</code> indicating the parent path.
+     * @param storeLoc a <code>File</code> indicating the index
+     * directory.
      *
      * @return a <code>File</code> representing "config.dat".
      *
@@ -254,7 +305,7 @@ public class BioStoreFactory {
     /**
      * <code>makePrimaryKeyFile</code> returns a file which represents
      * an OBDA "key_&lt;primary namespace&gt;.key" primary key file on the
-     * specified parent path.
+     * specified index directory.
      *
      * @param storeLoc a <code>File</code> indicating the parent path.
      * @param key a <code>String</code> primary key namespace.
@@ -272,7 +323,7 @@ public class BioStoreFactory {
     /**
      * <code>makeSecondaryFile</code> returns a file which represents
      * an OBDA "id_&lt;secondary namespace&gt;.index" secondary key file on
-     * the specified
+     * the specified.
      *
      * @param storeLoc a <code>File</code> indicating the parent path.
      * @param key a <code>String</code> secondary key namespace.
@@ -280,7 +331,7 @@ public class BioStoreFactory {
      * @return a <code>File</code> representing an "id_&lt;secondary
      * namespace&gt;.index" file.
      *
-     * @exception IOException if an error occurs
+     * @exception IOException if an error occurs.
      */
     public static File makeSecondaryFile(File storeLoc, String key)
         throws IOException {

@@ -54,7 +54,7 @@ public class Registry {
      * @param regConfig a <code>RegistryConfiguration</code>.
      */
     public Registry(RegistryConfiguration regConfig) {
-	this.regConfig = regConfig;
+        this.regConfig = regConfig;
     }
 
     /**
@@ -72,42 +72,52 @@ public class Registry {
     public SequenceDBLite getDatabase(String dbName)
         throws RegistryException, BioException {
 
-	Map dbConfig = null;
-	String providerName = "";
+        Map dbConfig = null;
+        String providerName = "";
 
-        dbConfig = (Map) getRegistryConfiguration().getConfiguration().get(dbName);
-	    
+        dbConfig =
+            (Map) getRegistryConfiguration().getConfiguration().get(dbName);
+
         if (dbConfig == null) {
-            throw new RegistryException("Couldn't find a configuration for database: " + dbName);
+            throw new RegistryException("Couldn't find a configuration"
+                                        + " for database: "
+                                        + dbName);
         }
 
-	try {
-	    providerName = (String) dbConfig.get("protocol");
-	} catch (Exception e) {
-	    throw new RegistryException("File for configuration cannot be found: " + e.toString());
-	}
+        try {
+            providerName = (String) dbConfig.get("protocol");
+        } catch (Exception e) {
+            throw new RegistryException("File for configuration "
+                                        + " cannot be found: "
+                                        + e.toString());
+        }
 
         return getProvider(providerName).getSequenceDB(dbConfig);
     }
-    
+
     private SequenceDBProvider getProvider(String providerName)
         throws RegistryException {
-	try {
-	    ClassLoader loader = getClass().getClassLoader();
-	    Iterator implNames = Services.getImplementationNames(SequenceDBProvider.class, loader).iterator();
-	    while (implNames.hasNext()) {
-		String className = (String) implNames.next();
-		Class clazz = loader.loadClass(className);
-		SequenceDBProvider seqDB = (SequenceDBProvider) clazz.newInstance();
-		if (seqDB.getName().equals(providerName)) {
-		    return seqDB;
-		}
-	    }
+        try {
+            ClassLoader loader = getClass().getClassLoader();
+            Iterator implNames =
+                Services.getImplementationNames(SequenceDBProvider.class, loader).iterator();
 
-	    throw new ProviderNotFoundException("No such provider exists: " + providerName);
-	} catch (Exception e) {
-	    throw new RegistryException(e, "Error accessing SequenceDBProvider services");
-	}
+            while (implNames.hasNext()) {
+                String className = (String) implNames.next();
+                Class clazz = loader.loadClass(className);
+                SequenceDBProvider seqDB =
+                    (SequenceDBProvider) clazz.newInstance();
+                if (seqDB.getName().equals(providerName)) {
+                    return seqDB;
+                }
+            }
+
+            throw new ProviderNotFoundException("No such provider exists: "
+                                                + providerName);
+        } catch (Exception e) {
+            throw new RegistryException(e, "Error accessing"
+                                        + " SequenceDBProvider services");
+        }
     }
 
     /**
@@ -117,6 +127,6 @@ public class Registry {
      * @return a <code>RegistryConfiguration</code>.
      */
     public RegistryConfiguration getRegistryConfiguration() {
-	return this.regConfig;
+        return this.regConfig;
     }
 }

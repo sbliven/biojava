@@ -67,8 +67,7 @@ import org.biojava.utils.*;
  * <p>'protocol' currently can be one of</p>
  *
  * <ul>
- *  <li>index-berkeleydb</li>
- *  <li>index-flat</li>
+ *  <li>flat</li>
  *  <li>biofetch</li>
  *  <li>bsane-corba</li>
  *  <li>biosql</li>
@@ -118,19 +117,20 @@ public interface RegistryConfiguration {
       this.configFileLocation = configFileLocation;
       this.config = config;
     }
-    
+
     public Map getConfiguration() {
       return config;
     }
-    
+
     public String getConfigLocator() {
       return configFileLocation;
     }
   }
   
   /**
-   * A RegistryConfiguration that allows you to treat other configurations
-   * as providing important or default configuration information.
+   * A RegistryConfiguration that allows you to treat other
+   * configurations as providing important or default configuration
+   * information.
    *
    * @author Matthew Pocock
    */
@@ -138,10 +138,10 @@ public interface RegistryConfiguration {
   implements RegistryConfiguration {
     private String configLocator;
     private Map config;
-    
+
     public Composite() {
     }
-    
+
     public Map getConfiguration() {
       if(config == null) {
         return Collections.EMPTY_MAP;
@@ -149,17 +149,19 @@ public interface RegistryConfiguration {
         return config;
       }
     }
-    
+
     public String getConfigLocator() {
       return configLocator;
     }
-    
+
     /**
      * Add a configuration as the most authorative place to look.
-     * During future lookups with this context, values in newConfig will
-     * take precedence over values in the previously existing configuration.
+     * During future lookups with this context, values in newConfig
+     * will take precedence over values in the previously existing
+     * configuration.
      *
-     * @param newConfig  the RegistryConfiguration to add as most important
+     * @param newConfig the RegistryConfiguration to add as most
+     * important
      */
     public void addTopConfig(RegistryConfiguration newConfig)
     throws RegistryException {
@@ -174,12 +176,13 @@ public interface RegistryConfiguration {
     }
 
     /**
-     * Add a configuration as the most default place to look.
-     * During future lookups with this context, values in newConfig will be
-     * used as default values only if the lookup would return nothing in the
-     * previously existing configuration.
+     * Add a configuration as the most default place to look. During
+     * future lookups with this context, values in newConfig will be
+     * used as default values only if the lookup would return nothing
+     * in the previously existing configuration.
      *
-     * @param newConfig  the RegistryConfiguration to add as the default
+     * @param newConfig the RegistryConfiguration to add as the
+     * default
      */
     public void addBottomConfig(RegistryConfiguration newConfig)
     throws RegistryException {

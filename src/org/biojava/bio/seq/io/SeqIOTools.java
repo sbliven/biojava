@@ -41,21 +41,6 @@ import org.biojava.utils.*;
  * @since 1.1
  */
 public final class SeqIOTools  {
-    //constants representing different filetypes
-    public static final int UNKNOWN = 0;
-    public static final int FASTADNA = 1;
-    public static final int FASTAPROTEIN = 2;
-    public static final int EMBL = 3;
-    public static final int GENBANK = 4;
-    public static final int SWISSPROT = 5;
-    public static final int GENPEPT = 6;
-    public static final int MSFDNA = 7;
-    public static final int FASTA = 8;              //only appropriate for writing
-    public static final int FASTAALIGNDNA = 9;
-    public static final int MSFPROTEIN = 10;
-    public static final int FASTAALIGNPROTEIN = 11;
-    public static final int MSF = 12;               //only appropriate for reading
-
     private static SequenceBuilderFactory _emblBuilderFactory;
     private static SequenceBuilderFactory _genbankBuilderFactory;
     private static SequenceBuilderFactory _genpeptBuilderFactory;
@@ -72,7 +57,8 @@ public final class SeqIOTools  {
         try {
             return DNATools.getDNA().getTokenization("token");
         } catch (BioException ex) {
-            throw new BioError(ex, "Assertion failing: Couldn't get DNA token parser");
+            throw new BioError(ex, "Assertion failing:"
+                               + " Couldn't get DNA token parser");
         }
     }
 
@@ -80,7 +66,8 @@ public final class SeqIOTools  {
         try {
             return RNATools.getRNA().getTokenization("token");
         } catch (BioException ex) {
-            throw new BioError(ex, "Assertion failing: Couldn't get RNA token parser");
+            throw new BioError(ex, "Assertion failing:"
+                               + " Couldn't get RNA token parser");
         }
     }
 
@@ -88,7 +75,8 @@ public final class SeqIOTools  {
         try {
             return NucleotideTools.getNucleotide().getTokenization("token");
         } catch (BioException ex) {
-            throw new BioError(ex, "Assertion failing: Couldn't get nucleotide token parser");
+            throw new BioError(ex, "Assertion failing:"
+                               + " Couldn't get nucleotide token parser");
         }
     }
 
@@ -96,7 +84,8 @@ public final class SeqIOTools  {
         try {
             return ProteinTools.getTAlphabet().getTokenization("token");
         } catch (BioException ex) {
-            throw new BioError(ex, "Assertion failing: Couldn't get PROTEIN token parser");
+            throw new BioError(ex, "Assertion failing:"
+                               + " Couldn't get PROTEIN token parser");
         }
     }
 
@@ -106,7 +95,8 @@ public final class SeqIOTools  {
      */
     public static SequenceBuilderFactory getEmblBuilderFactory() {
         if (_emblBuilderFactory == null) {
-            _emblBuilderFactory = new EmblProcessor.Factory(SmartSequenceBuilder.FACTORY);
+            _emblBuilderFactory =
+                new EmblProcessor.Factory(SmartSequenceBuilder.FACTORY);
         }
         return _emblBuilderFactory;
     }
@@ -147,7 +137,8 @@ public final class SeqIOTools  {
      */
     public static SequenceBuilderFactory getGenbankBuilderFactory() {
         if (_genbankBuilderFactory == null) {
-            _genbankBuilderFactory = new GenbankProcessor.Factory(SmartSequenceBuilder.FACTORY);
+            _genbankBuilderFactory =
+                new GenbankProcessor.Factory(SmartSequenceBuilder.FACTORY);
         }
         return _genbankBuilderFactory;
     }
@@ -168,7 +159,8 @@ public final class SeqIOTools  {
     */
     public static SequenceBuilderFactory getGenpeptBuilderFactory() {
         if (_genpeptBuilderFactory == null) {
-            _genpeptBuilderFactory = new GenbankProcessor.Factory(SmartSequenceBuilder.FACTORY);
+            _genpeptBuilderFactory =
+                new GenbankProcessor.Factory(SmartSequenceBuilder.FACTORY);
         }
         return _genpeptBuilderFactory;
     }
@@ -189,7 +181,8 @@ public final class SeqIOTools  {
      */
     public static SequenceBuilderFactory getSwissprotBuilderFactory() {
         if (_swissprotBuilderFactory == null) {
-            _swissprotBuilderFactory = new SwissprotProcessor.Factory(SmartSequenceBuilder.FACTORY);
+            _swissprotBuilderFactory =
+                new SwissprotProcessor.Factory(SmartSequenceBuilder.FACTORY);
         }
         return _swissprotBuilderFactory;
     }
@@ -210,7 +203,8 @@ public final class SeqIOTools  {
      */
     public static SequenceBuilderFactory getFastaBuilderFactory() {
         if (_fastaBuilderFactory == null) {
-            _fastaBuilderFactory = new FastaDescriptionLineParser.Factory(SmartSequenceBuilder.FACTORY);
+            _fastaBuilderFactory =
+                new FastaDescriptionLineParser.Factory(SmartSequenceBuilder.FACTORY);
         }
         return _fastaBuilderFactory;
     }
@@ -245,95 +239,112 @@ public final class SeqIOTools  {
                                 getFastaBuilderFactory());
     }
 
-  /**
-   * Create a sequence database from a fasta file provided as an input stream.
-   * Note this somewhat duplicates functionality in the readFastaDNA and readFastaProtein methods but
-   * uses a stream rather than a reader and returns a SequenceDB rather than a SequenceIterator. If
-   * the returned DB is likely to be large then the above mentioned methods should be used.
-   *
-   * @throws BioException if problems occur during reading of the stream.
-   * @since 1.2
-   */
-  public static SequenceDB readFasta(InputStream seqFile, Alphabet alpha) throws BioException{
-    HashSequenceDB db = new HashSequenceDB(IDMaker.byName);
-    SequenceBuilderFactory sbFact = new FastaDescriptionLineParser.Factory(SmartSequenceBuilder.FACTORY);
-    FastaFormat fFormat = new FastaFormat();
-    for(SequenceIterator seqI = new StreamReader(seqFile,fFormat,alpha.getTokenization("token"),sbFact);seqI.hasNext();){
-      Sequence seq = seqI.nextSequence();
-      try{
-        db.addSequence(seq);
-      }catch(ChangeVetoException cve){
-        throw new NestedError(cve,"Could not successfully add sequence "+seq.getName()+" to sequence database");
-      }
+    /**
+     * Create a sequence database from a fasta file provided as an
+     * input stream.  Note this somewhat duplicates functionality in
+     * the readFastaDNA and readFastaProtein methods but uses a stream
+     * rather than a reader and returns a SequenceDB rather than a
+     * SequenceIterator. If the returned DB is likely to be large then
+     * the above mentioned methods should be used.
+     *
+     * @throws BioException if problems occur during reading of the
+     * stream.
+     * @since 1.2
+     */
+    public static SequenceDB readFasta(InputStream seqFile, Alphabet alpha)
+        throws BioException {
+        HashSequenceDB db = new HashSequenceDB(IDMaker.byName);
+        SequenceBuilderFactory sbFact =
+            new FastaDescriptionLineParser.Factory(SmartSequenceBuilder.FACTORY);
+        FastaFormat fFormat = new FastaFormat();
+        for (SequenceIterator seqI = new StreamReader(seqFile,
+                                                      fFormat,
+                                                      alpha.getTokenization("token"),
+                                                      sbFact);seqI.hasNext();) {
+            Sequence seq = seqI.nextSequence();
+            try {
+                db.addSequence(seq);
+            } catch (ChangeVetoException cve) {
+                throw new NestedError(cve,"Could not successfully add sequence "
+                                      + seq.getName()
+                                      + " to sequence database");
+            }
+        }
+        return db;
     }
-    return db;
-  }
 
-  /**
-   * Write a sequenceDB to an output stream in fasta format.
-   *
-   * @throws IOException if problems occur during writing.
-   * @since 1.2
-   */
-  public static void writeFasta(OutputStream os, SequenceDB db) throws IOException{
-    StreamWriter sw = new StreamWriter(os,new FastaFormat());
-    sw.writeStream(db.sequenceIterator());
-  }
-  /**
-   * Writes sequences from a SequenceIterator to an OutputStream in Fasta Format.
-   * This makes for a useful format filter where a StreamReader can be sent to the
-   * StreamWriter after formatting.
-   *
-   * @throws IOException if problems occur during writing.
-   * @since 1.2
-   */
-   public static void writeFasta(OutputStream os, SequenceIterator in) throws IOException{
-      StreamWriter sw = new StreamWriter(os,new FastaFormat());
-      sw.writeStream(in);
-   }
+    /**
+     * Write a sequenceDB to an output stream in fasta format.
+     *
+     * @throws IOException if problems occur during writing.
+     * @since 1.2
+     */
+    public static void writeFasta(OutputStream os, SequenceDB db)
+        throws IOException {
+        StreamWriter sw = new StreamWriter(os,new FastaFormat());
+        sw.writeStream(db.sequenceIterator());
+    }
 
-   /**
-    * Writes a single Sequence to an OutputSream in fasta format.
-    *
-    * @param os  the OutputStream
-    * @param seq  the Sequence
-    * @throws IOException if there was an error writing it
-    */
-   public static void writeFasta(OutputStream os, Sequence seq)
-   throws IOException {
-     writeFasta(os, new SingleSeqIterator(seq));
-   }
+    /**
+     * Writes sequences from a SequenceIterator to an OutputStream in Fasta Format.
+     * This makes for a useful format filter where a StreamReader can be sent to the
+     * StreamWriter after formatting.
+     *
+     * @throws IOException if problems occur during writing.
+     * @since 1.2
+     */
+    public static void writeFasta(OutputStream os, SequenceIterator in)
+        throws IOException {
+        StreamWriter sw = new StreamWriter(os,new FastaFormat());
+        sw.writeStream(in);
+    }
 
-   /**
-    * The following methods write sequences from a SequenceIterator to an OutputStream.
-    */
-    public static void writeEmbl(OutputStream os, SequenceIterator in) throws IOException{
+    /**
+     * Writes a single Sequence to an OutputSream in fasta format.
+     *
+     * @param os  the OutputStream
+     * @param seq  the Sequence
+     * @throws IOException if there was an error writing it
+     */
+    public static void writeFasta(OutputStream os, Sequence seq)
+        throws IOException {
+        writeFasta(os, new SingleSeqIterator(seq));
+    }
+
+    /**
+     * The following methods write sequences from a SequenceIterator
+     * to an OutputStream.
+     */
+    public static void writeEmbl(OutputStream os, SequenceIterator in)
+        throws IOException {
         StreamWriter sw = new StreamWriter(os, new EmblLikeFormat());
         sw.writeStream(in);
     }
 
     public static void writeEmbl(OutputStream os, Sequence seq) throws IOException {
-      writeEmbl(os, new SingleSeqIterator(seq));
+        writeEmbl(os, new SingleSeqIterator(seq));
     }
 
-    public static void writeSwissprot(OutputStream os, SequenceIterator in) throws IOException, BioException {
+    public static void writeSwissprot(OutputStream os, SequenceIterator in)
+        throws IOException, BioException {
         SequenceFormat former = new EmblLikeFormat();
         PrintStream ps = new PrintStream(os);
         while (in.hasNext()) {
-            former.writeSequence(in.nextSequence(), "Swissprot", ps);
+            former.writeSequence(in.nextSequence(), ps);
         }
     }
 
     public static void writeSwissprot(OutputStream os, Sequence seq)
-    throws IOException, BioException {
-      writeSwissprot(os, new SingleSeqIterator(seq));
+        throws IOException, BioException {
+        writeSwissprot(os, new SingleSeqIterator(seq));
     }
 
-    public static void writeGenpept(OutputStream os, SequenceIterator in) throws IOException, BioException {
+    public static void writeGenpept(OutputStream os, SequenceIterator in)
+        throws IOException, BioException {
         SequenceFormat former = new GenbankFormat();
         PrintStream ps = new PrintStream(os);
         while (in.hasNext()) {
-            former.writeSequence(in.nextSequence(), "Genpept", ps);
+            former.writeSequence(in.nextSequence(), ps);
         }
     }
 
@@ -342,47 +353,151 @@ public final class SeqIOTools  {
       writeGenpept(os, new SingleSeqIterator(seq));
     }
 
-    public static void writeGenbank(OutputStream os, SequenceIterator in) throws IOException{
+    public static void writeGenbank(OutputStream os, SequenceIterator in)
+        throws IOException {
         StreamWriter sw = new StreamWriter(os, new GenbankFormat());
         sw.writeStream(in);
     }
 
     public static void writeGenbank(OutputStream os, Sequence seq)
-    throws IOException {
-      writeGenbank(os, new SingleSeqIterator(seq));
+        throws IOException {
+        writeGenbank(os, new SingleSeqIterator(seq));
     }
 
+   /**
+     * <code>identifyFormat</code> performs a case-insensitive mapping
+     * of a pair of common sequence format name (such as 'embl',
+     * 'genbank' or 'fasta') and alphabet name (such as 'dna', 'rna',
+     * 'protein', 'aa') to an integer. The value returned will be one
+     * of the public static final fields in
+     * <code>SeqIOConstants</code>, or a bitwise-or combination of
+     * them.
+     *
+     * @param formatName a <code>String</code>.
+     * @param alphabetName a <code>String</code>.
+     *
+     * @return an <code>int</code>.
+     */
+    public static int identifyFormat(String formatName, String alphabetName) {
+        int format, alpha;
+
+        if (formatName.equalsIgnoreCase("raw"))
+            format = SeqIOConstants.RAW;
+        else if (formatName.equalsIgnoreCase("fasta"))
+            format = SeqIOConstants.FASTA;
+        else if (formatName.equalsIgnoreCase("nbrf"))
+            format = SeqIOConstants.NBRF;
+        else if (formatName.equalsIgnoreCase("ig"))
+            format = SeqIOConstants.IG;
+        else if (formatName.equalsIgnoreCase("embl"))
+            format = SeqIOConstants.EMBL;
+        else if (formatName.equalsIgnoreCase("swissprot") ||
+                 formatName.equalsIgnoreCase("swiss"))
+            return SeqIOConstants.SWISSPROT;
+        else if (formatName.equalsIgnoreCase("genbank"))
+            format = SeqIOConstants.GENBANK;
+        else if (formatName.equalsIgnoreCase("genpept"))
+            return SeqIOConstants.GENPEPT;
+        else if (formatName.equalsIgnoreCase("refseq"))
+            format = SeqIOConstants.REFSEQ;
+        else if (formatName.equalsIgnoreCase("gcg"))
+            format = SeqIOConstants.GCG;
+        else if (formatName.equalsIgnoreCase("gff"))
+            format = SeqIOConstants.GFF;
+        else if (formatName.equalsIgnoreCase("pdb"))
+            return SeqIOConstants.PDB;
+        else if (formatName.equalsIgnoreCase("phred"))
+            return SeqIOConstants.PHRED;
+        else
+            return SeqIOConstants.UNKNOWN;
+
+        if (alphabetName.equalsIgnoreCase("dna"))
+            alpha = SeqIOConstants.DNA;
+        else if (alphabetName.equalsIgnoreCase("rna"))
+            alpha = SeqIOConstants.RNA;
+        else if (alphabetName.equalsIgnoreCase("aa") ||
+                 alphabetName.equalsIgnoreCase("protein"))
+            alpha = SeqIOConstants.AA;
+        else
+            return SeqIOConstants.UNKNOWN;
+
+        return (format | alpha);
+    }
+
+    public static SequenceBuilderFactory fileToFactory(int fileType)
+        throws BioException {
+        switch (fileType) {
+            case SeqIOConstants.FASTA_DNA:
+                return getFastaBuilderFactory();
+            case SeqIOConstants.FASTA_AA:
+                return getFastaBuilderFactory();
+            case SeqIOConstants.EMBL_DNA:
+            case SeqIOConstants.EMBL:
+                    return getEmblBuilderFactory();
+            case SeqIOConstants.GENBANK:
+            case SeqIOConstants.GENBANK_DNA:
+                return getGenbankBuilderFactory();
+            case SeqIOConstants.SWISSPROT:
+                return getSwissprotBuilderFactory();
+            case SeqIOConstants.GENPEPT:
+                return getGenpeptBuilderFactory();
+            default:
+                throw new BioException("Unknown file type '"
+                                       + fileType
+                                       + "'");
+        }
+    }
+
+    public static FiniteAlphabet fileToAlphabet(int fileType)
+        throws BioException {
+
+        // Mask the sequence format bytes
+        int alphaType = fileType & (~ 0xffff);
+
+        switch (alphaType) {
+            case SeqIOConstants.DNA:
+                return DNATools.getDNA();
+            case SeqIOConstants.RNA:
+                return RNATools.getRNA();
+            case SeqIOConstants.AA:
+                return ProteinTools.getAlphabet();
+            default:
+                throw new BioException("Unknown file type '"
+                                       + fileType
+                                       + "'");
+        }
+    }
 
     /**
-     * The following methods provide an alternate interface for reading and writing
-     * sequences and alignments. (Nimesh Singh).
+     * The following methods provide an alternate interface for
+     * reading and writing sequences and alignments. (Nimesh Singh).
      *
      */
 
     /**
-     * Attempts to guess the filetype of a file given the name.  For use with
-     * the functions below that take an int fileType as a parameter.  The
-     * constants used are above.
+     * Attempts to guess the filetype of a file given the name.  For
+     * use with the functions below that take an int fileType as a
+     * parameter.  The constants used are above.
      */
     public static int guessFileType(File seqFile)
-    throws IOException, FileNotFoundException {
+        throws IOException, FileNotFoundException {
         //First tries by matching an extension
         String fileName = seqFile.getName();
         try {
             if ((new RE(".*\\u002eem.*")).match(fileName)) {
-                return EMBL;
+                return SeqIOConstants.EMBL;
             }
             else if ((new RE(".*\\u002edat.*")).match(fileName)) {
-                return EMBL;
+                return SeqIOConstants.EMBL;
             }
             else if ((new RE(".*\\u002egb.*")).match(fileName)) {
-                return GENBANK;
+                return SeqIOConstants.GENBANK;
             }
             else if ((new RE(".*\\u002esp.*")).match(fileName)) {
-                return SWISSPROT;
+                return SeqIOConstants.SWISSPROT;
             }
             else if ((new RE(".*\\u002egp.*")).match(fileName)) {
-                return GENPEPT;
+                return SeqIOConstants.GENPEPT;
             }
             else if ((new RE(".*\\u002efa.*")).match(fileName)) {
                 return guessFastaType(seqFile);
@@ -391,8 +506,7 @@ public final class SeqIOTools  {
                 return guessMsfType(seqFile);
             }
         } catch (RESyntaxException e) {
-            // FIXME (kj): don't just swallow exceptions and don't print from lib
-            System.out.println("guessFileType -- Problem with regular expression matching for:" + seqFile);
+            throw new BioError(e, "Internal error in SeqIOTools");
         }
 
         //Reads the file to guess based on content
@@ -408,45 +522,166 @@ public final class SeqIOTools  {
             return guessMsfType(seqFile);
         }
         else if (line1.startsWith("!!AA_MULTIPLE_ALIGNMENT")) {
-            return MSFPROTEIN;
+            return AlignIOConstants.MSF_AA;
         }
         else if (line1.startsWith("!!NA_MULTIPLE_ALIGNMENT")) {
-            return MSFDNA;
+            return AlignIOConstants.MSF_DNA;
         }
         else if (line1.startsWith("ID")) {
             for (int i = 0; i < line1.length(); i++) {
                 if (Character.toUpperCase(line1.charAt(i)) == 'P' &&
                     Character.toUpperCase(line1.charAt(i+1)) == 'R' &&
                     Character.toUpperCase(line1.charAt(i+2)) == 'T') {
-                        return SWISSPROT;
+                    return SeqIOConstants.SWISSPROT;
                 }
             }
-            return EMBL;
+            return SeqIOConstants.EMBL;
         }
         else if (line1.toUpperCase().startsWith("LOCUS")) {
             for (int i = 0; i < line1.length(); i++) {
                 if (Character.toUpperCase(line1.charAt(i)) == 'A' &&
                     Character.toUpperCase(line1.charAt(i+1)) == 'A') {
-                        return GENPEPT;
+                    return SeqIOConstants.GENPEPT;
                 }
             }
-            return GENBANK;
+            return SeqIOConstants.GENBANK;
         }
         else if (line1.length() >= 45 &&
                  line1.substring(19, 45).equalsIgnoreCase("GENETIC SEQUENCE DATA BANK")) {
             return guessGenType(fileName);
         }
         else {
-            // fixme: mrp: We shouldn't have print statements inlibrary code
-            //System.out.println("guessFileType -- Could not guess file type.");
-            return UNKNOWN;
+            return SeqIOConstants.UNKNOWN;
+        }
+    }
+
+    /**
+     * Attempts to retreive the most appropriate SequenceBuilder
+     * object for some combination of <code>Alphabet</code> and
+     * <code>SequenceFormat</code>
+     * @param format currently supports <code>FastaFormat</code>,
+     * <code>GenbankFormat</code>, <code>EmblLikeFormat</code>
+     * @param alpha currently only supports the DNA and Protein
+     * alphabets
+     * @return the <code>SequenceBuilderFactory</code>
+     * @throws BioException if the combination of alpha and format is
+     * unrecognized.
+     */
+    public static SequenceBuilderFactory formatToFactory(
+        SequenceFormat format, Alphabet alpha)
+        throws BioException{
+
+        if ((format instanceof FastaFormat) &&
+           (alpha == DNATools.getDNA() ||
+            alpha == ProteinTools.getAlphabet())) {
+
+            return getFastaBuilderFactory();
+        }
+        else if (format instanceof GenbankFormat &&
+                alpha == DNATools.getDNA()) {
+
+            return getGenbankBuilderFactory();
+        }
+        else if (format instanceof GenbankFormat &&
+                 alpha == ProteinTools.getAlphabet()) {
+
+            return getGenpeptBuilderFactory();
+        }
+        else if (format instanceof EmblLikeFormat &&
+                 alpha == DNATools.getDNA()){
+            return getEmblBuilderFactory();
+        }
+        else if (format instanceof EmblLikeFormat &&
+                 alpha == ProteinTools.getAlphabet()) {
+            return getSwissprotBuilderFactory();
+        }
+        else {
+            throw new BioException("Unknown combination of"
+                                   + " Alphabet and Format");
+      }
+    }
+
+    public static SequenceFormat fileToFormat(int fileType)
+        throws BioException {
+        switch(fileType) {
+            case SeqIOConstants.FASTA_DNA:
+                return new FastaFormat();
+            case SeqIOConstants.FASTA_AA:
+                return new FastaFormat();
+            case SeqIOConstants.EMBL:
+                return new EmblLikeFormat();
+            case SeqIOConstants.GENBANK:
+                return new GenbankFormat();
+            case SeqIOConstants.SWISSPROT:
+                return new EmblLikeFormat();
+            default:
+                throw new BioException("Unknown file type '"
+                                       + fileType
+                                       + "'");
+        }
+    }
+
+    /**
+     * Reads a file and returns the corresponding Biojava object.  You need to cast it as
+     * an Alignment or a SequenceIterator as appropriate.
+     */
+    public static Object fileToBiojava(int fileType, BufferedReader br)
+        throws BioException {
+        switch (fileType) {
+            case AlignIOConstants.MSF:
+            case AlignIOConstants.MSF_DNA:
+            case AlignIOConstants.MSF_AA:
+            case AlignIOConstants.FASTA_DNA:
+            case AlignIOConstants.FASTA_AA:
+                return fileToAlign(fileType, br);
+            case SeqIOConstants.FASTA_DNA:
+            case SeqIOConstants.FASTA_AA:
+            case SeqIOConstants.EMBL:
+            case SeqIOConstants.GENBANK:
+            case SeqIOConstants.SWISSPROT:
+            case SeqIOConstants.GENPEPT:
+                return fileToSeq(fileType, br);
+            default:
+                throw new BioException("Unknown file type '"
+                                       + fileType
+                                       + "'");
+        }
+    }
+
+    /**
+     * Converts a Biojava object to the given filetype.
+     */
+    public static void biojavaToFile(int fileType, OutputStream os,
+                                     Object biojava)
+        throws BioException, IOException, IllegalSymbolException {
+        switch (fileType) {
+            case AlignIOConstants.MSF_DNA:
+            case AlignIOConstants.MSF_AA:
+            case AlignIOConstants.FASTA_DNA:
+            case AlignIOConstants.FASTA_AA:
+                alignToFile(fileType, os, (Alignment) biojava);
+                break;
+            case SeqIOConstants.FASTA:
+            case SeqIOConstants.FASTA_DNA:
+            case SeqIOConstants.FASTA_AA:
+            case SeqIOConstants.EMBL:
+            case SeqIOConstants.GENBANK:
+            case SeqIOConstants.SWISSPROT:
+            case SeqIOConstants.GENPEPT:
+                seqToFile(fileType, os, (SequenceIterator) biojava);
+                break;
+            default:
+                throw new BioException("Unknown file type '"
+                                       + fileType
+                                       + "'");
         }
     }
 
     /**
      * Helper function for guessFileName.
      */
-    private static int guessFastaType(File seqFile) throws IOException, FileNotFoundException {
+    private static int guessFastaType(File seqFile)
+        throws IOException, FileNotFoundException {
         BufferedReader br = new BufferedReader(new FileReader(seqFile));
         String line = br.readLine();
         line = br.readLine();
@@ -458,23 +693,25 @@ public final class SeqIOTools  {
                 Character.toUpperCase(line.charAt(i)) == 'P' ||
                 Character.toUpperCase(line.charAt(i)) == 'Q' ||
                 Character.toUpperCase(line.charAt(i)) == 'E') {
-                    return FASTAPROTEIN;
+                return SeqIOConstants.FASTA_AA;
             }
         }
-        return FASTADNA;
+
+        return SeqIOConstants.FASTA_DNA;
     }
 
     /**
      * Helper function for guessFileName.
      */
-    private static int guessMsfType(File seqFile) throws IOException, FileNotFoundException {
+    private static int guessMsfType(File seqFile)
+        throws IOException, FileNotFoundException {
         BufferedReader br = new BufferedReader(new FileReader(seqFile));
         String line = br.readLine();
         if (line.startsWith("!!NA_MULTIPLE_ALIGNMENT")) {
-            return MSFDNA;
+            return AlignIOConstants.MSF_DNA;
         }
         else if (line.startsWith("!!AA_MULTIPLE_ALIGNMENT")) {
-            return MSFPROTEIN;
+            return AlignIOConstants.MSF_AA;
         }
         else {
             while (line.indexOf("Type: ") == -1) {
@@ -483,15 +720,13 @@ public final class SeqIOTools  {
             br.close();
             int typeIndex = line.indexOf("Type: ") + 6;
             if (line.substring(typeIndex).startsWith("N")) {
-                return MSFDNA;
+                return AlignIOConstants.MSF_DNA;
             }
             else if (line.substring(typeIndex).startsWith("P")) {
-                return MSFPROTEIN;
+                return AlignIOConstants.MSF_AA;
             }
             else {
-                // FIXME (kj): don't print from lib
-                System.out.println("guessFileType -- Could not guess file type.");
-                return UNKNOWN;
+                return AlignIOConstants.UNKNOWN;
             }
         }
     }
@@ -499,7 +734,8 @@ public final class SeqIOTools  {
     /**
      * Helper function for guessFileName.
      */
-    private static int guessGenType(String fileName) throws IOException, FileNotFoundException {
+    private static int guessGenType(String fileName)
+        throws IOException, FileNotFoundException {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         String line = br.readLine();
         while (line.indexOf("LOCUS") == -1) {
@@ -509,262 +745,130 @@ public final class SeqIOTools  {
         for (int i = 0; i < line.length(); i++) {
             if (Character.toUpperCase(line.charAt(i)) == 'A' &&
                 Character.toUpperCase(line.charAt(i+1)) == 'A') {
-                    return GENPEPT;
+                    return SeqIOConstants.GENPEPT;
             }
         }
-        return GENBANK;
-    }
-
-    public static SequenceBuilderFactory fileToFactory(int fileType)
-    throws BioException {
-      switch(fileType) {
-            case FASTADNA:
-              return getFastaBuilderFactory();
-            case FASTAPROTEIN:
-              return getFastaBuilderFactory();
-            case EMBL:
-              return getEmblBuilderFactory();
-            case GENBANK:
-              return getGenbankBuilderFactory();
-            case SWISSPROT:
-              return getSwissprotBuilderFactory();
-            case GENPEPT:
-              return getGenpeptBuilderFactory();
-            default:
-              throw new BioException("Unknown format: " + fileType);
-      }
-    }
-
-    /**
-     * Attempts to retreive the most appropriate SequenceBuilder object
-     * for some combination of <code>Alphabet</code> and
-     * <code>SequenceFormat</code>
-     * @param format currently supports <code>FastaFormat</code>, <code>GenbankFormat</code>, <code>EmblLikeFormat</code>
-     * @param alpha currently only supports the DNA and Protein alphabets
-     * @return the <code>SequenceBuilderFactory</code>
-     * @throws BioException if the combination of alpha and format is unrecognized.
-     */
-    public static SequenceBuilderFactory formatToFactory(
-        SequenceFormat format, Alphabet alpha)
-        throws BioException{
-
-      if((format instanceof FastaFormat) &&
-         (alpha == DNATools.getDNA() || alpha == ProteinTools.getAlphabet())){
-
-        return getFastaBuilderFactory();
-      }
-
-      else if(format instanceof GenbankFormat &&
-              alpha == DNATools.getDNA()){
-
-        return getGenbankBuilderFactory();
-      }
-
-      else if(format instanceof GenbankFormat &&
-              alpha == ProteinTools.getAlphabet()){
-
-        return getGenpeptBuilderFactory();
-      }
-
-      else if(format instanceof EmblLikeFormat &&
-              alpha == DNATools.getDNA()){
-        return getEmblBuilderFactory();
-      }
-
-      else if(format instanceof EmblLikeFormat &&
-              alpha == ProteinTools.getAlphabet()){
-        return getSwissprotBuilderFactory();
-      }
-
-      else{
-        throw new BioException("Unknown combination of Alphabet and Format");
-      }
-    }
-
-    public static SequenceFormat fileToFormat(int fileType)
-    throws BioException {
-      switch(fileType) {
-            case FASTADNA:
-              return new FastaFormat();
-            case FASTAPROTEIN:
-              return new FastaFormat();
-            case EMBL:
-              return new EmblLikeFormat();
-            case GENBANK:
-              return new GenbankFormat();
-            case SWISSPROT:
-              return new EmblLikeFormat();
-            default:
-              throw new BioException("Unknown format: " + fileType);
-      }
-    }
-
-
-
-    /**
-     * Reads a file and returns the corresponding Biojava object.  You need to cast it as
-     * an Alignment or a SequenceIterator as appropriate.
-     */
-    public static Object fileToBiojava(int fileType, BufferedReader br) {
-        switch (fileType) {
-            case MSF:
-            case MSFDNA:
-            case MSFPROTEIN:
-            case FASTAALIGNDNA:
-            case FASTAALIGNPROTEIN:
-                return fileToAlign(fileType, br);
-            case FASTADNA:
-            case FASTAPROTEIN:
-            case EMBL:
-            case GENBANK:
-            case SWISSPROT:
-            case GENPEPT:
-                return fileToSeq(fileType, br);
-            default:
-                // fixme: mrp: don't print a message & return null,
-                // throw an exception!
-                System.out.println("fileToBiojava -- File type not recognized.");
-                return null;
-        }
+        return SeqIOConstants.GENBANK;
     }
 
     /**
      * Converts a file to an Biojava alignment.
      */
-    private static Alignment fileToAlign(int fileType, BufferedReader br) {
+    private static Alignment fileToAlign(int fileType, BufferedReader br)
+        throws BioException {
         switch(fileType) {
-            case MSF:
-            case MSFDNA:
-            case MSFPROTEIN:
+            case AlignIOConstants.MSF:
+            case AlignIOConstants.MSF_DNA:
+            case AlignIOConstants.MSF_AA:
                 return (new MSFAlignmentFormat()).read(br);
-            case FASTAALIGNDNA:
-            case FASTAALIGNPROTEIN:
+            case AlignIOConstants.FASTA_DNA:
+            case AlignIOConstants.FASTA_AA:
                 return (new FastaAlignmentFormat()).read(br);
             default:
-                // FIXME (kj): throw exception and don't return null
-                System.out.println("fileToAlign -- File type not recognized.");
-                return null;
+                throw new BioException("Unknown file type '"
+                                       + fileType
+                                       + "'");
         }
     }
 
     /**
      * Converts a file to a Biojava sequence.
      */
-    private static SequenceIterator fileToSeq(int fileType, BufferedReader br) {
+    private static SequenceIterator fileToSeq(int fileType,
+                                              BufferedReader br)
+        throws BioException {
         switch (fileType) {
-            case FASTADNA:
+            case SeqIOConstants.FASTA_DNA:
                 return SeqIOTools.readFastaDNA(br);
-            case FASTAPROTEIN:
+            case SeqIOConstants.FASTA_AA:
                 return SeqIOTools.readFastaProtein(br);
-            case EMBL:
+            case SeqIOConstants.EMBL:
                 return SeqIOTools.readEmbl(br);
-            case GENBANK:
+            case SeqIOConstants.GENBANK:
                 return SeqIOTools.readGenbank(br);
-            case SWISSPROT:
+            case SeqIOConstants.SWISSPROT:
                 return SeqIOTools.readSwissprot(br);
-            case GENPEPT:
+            case SeqIOConstants.GENPEPT:
                 return SeqIOTools.readGenpept(br);
             default:
-                // FIXME (kj): throw exception and don't return null
-                // and don't print from lib - sheesh!
-                System.out.println("fileToSeq -- File type not recognized.");
-                return null;
-        }
-    }
-
-    /**
-     * Converts a Biojava object to the given filetype.
-     */
-    public static void biojavaToFile(int fileType, OutputStream os, Object biojava)
-                            throws BioException, IOException, IllegalSymbolException {
-        switch (fileType) {
-            case MSFDNA:
-            case MSFPROTEIN:
-            case FASTAALIGNDNA:
-            case FASTAALIGNPROTEIN:
-                alignToFile(fileType, os, (Alignment) biojava);
-                break;
-            case FASTA:
-            case FASTADNA:
-            case FASTAPROTEIN:
-            case EMBL:
-            case GENBANK:
-            case SWISSPROT:
-            case GENPEPT:
-                seqToFile(fileType, os, (SequenceIterator) biojava);
-                break;
-            default:
-                // FIXME (kj): throw exception and don't print from lib
-                System.out.println("biojavaToFile -- File type not recognized.");
+                throw new BioException("Unknown file type '"
+                                       + fileType
+                                       + "'");
         }
     }
 
     /**
      * Converts a Biojava alignment to the given filetype.
      */
-    private static void alignToFile(int fileType, OutputStream os, Alignment align) throws BioException, IllegalSymbolException {
+    private static void alignToFile(int fileType, OutputStream os,
+                                    Alignment align)
+        throws BioException, IllegalSymbolException {
         switch(fileType) {
-            case MSFDNA:
+            case AlignIOConstants.MSF_DNA:
                 (new MSFAlignmentFormat()).writeDna(os, align);
                 break;
-            case MSFPROTEIN:
+            case AlignIOConstants.MSF_AA:
                 (new MSFAlignmentFormat()).writeProtein(os, align);
                 break;
-            case FASTAALIGNDNA:
+            case AlignIOConstants.FASTA_DNA:
                 (new FastaAlignmentFormat()).writeDna(os, align);
                 break;
-            case FASTAALIGNPROTEIN:
+            case AlignIOConstants.FASTA_AA:
                 (new FastaAlignmentFormat()).writeProtein(os, align);
                 break;
             default:
-                // FIXME (kj): throw exception and don't print from lib
-                System.out.println("alignToFile -- File type not recognized.");
+                throw new BioException("Unknown file type '"
+                                       + fileType
+                                       + "'");
         }
     }
 
     /**
      * Converts a Biojava sequence to the given filetype.
      */
-    private static void seqToFile(int fileType, OutputStream os, SequenceIterator seq) throws IOException, BioException {
+    private static void seqToFile(int fileType, OutputStream os,
+                                  SequenceIterator seq)
+        throws IOException, BioException {
         switch (fileType) {
-            case FASTADNA:
-            case FASTAPROTEIN:
-            case FASTA:
+            case SeqIOConstants.FASTA_DNA:
+            case SeqIOConstants.FASTA_AA:
+            case SeqIOConstants.FASTA:
                 SeqIOTools.writeFasta(os, seq);
                 break;
-            case EMBL:
+            case SeqIOConstants.EMBL:
                 SeqIOTools.writeEmbl(os, seq);
                 break;
-            case SWISSPROT:
+            case SeqIOConstants.SWISSPROT:
                 SeqIOTools.writeSwissprot(os, seq);
                 break;
-            case GENBANK:
+            case SeqIOConstants.GENBANK:
                 SeqIOTools.writeGenbank(os, seq);
                 break;
-            case GENPEPT:
+            case SeqIOConstants.GENPEPT:
                 SeqIOTools.writeGenpept(os, seq);
                 break;
             default:
-                // FIXME (kj): throw exception and don't print from lib
-                System.out.println("seqToFile -- File type not recognized.");
+                throw new BioException("Unknown file type '"
+                                       + fileType
+                                       + "'");
         }
     }
 
-  private static final class SingleSeqIterator
-  implements SequenceIterator {
-    private Sequence seq;
-    SingleSeqIterator(Sequence seq) {
-      this.seq = seq;
-    }
+    private static final class SingleSeqIterator
+        implements SequenceIterator {
+        private Sequence seq;
+        SingleSeqIterator(Sequence seq) {
+            this.seq = seq;
+        }
 
-    public boolean hasNext() {
-      return seq != null;
-    }
+        public boolean hasNext() {
+            return seq != null;
+        }
 
-    public Sequence nextSequence() {
-      Sequence seq = this.seq;
-      this.seq = null;
-      return seq;
+        public Sequence nextSequence() {
+            Sequence seq = this.seq;
+            this.seq = null;
+            return seq;
+        }
     }
-  }
 }

@@ -54,40 +54,45 @@ public class OBDARegistryParser {
      * @exception RegistryException if the configuration setup fails.
      */
     public static RegistryConfiguration parseRegistry(BufferedReader in,
-						      String locator)
+                                                      String locator)
         throws IOException, RegistryException {
-	String line = "";
-	String dbName = "";
-	String key = "";
-	String value = "";
-	Map config = new HashMap();
-	Map currentDB = null;
+        String line = "";
+        String dbName = "";
+        String key = "";
+        String value = "";
+        Map config = new HashMap();
+        Map currentDB = null;
 	
-	while ((line = in.readLine()) != null) {
-	    
-	    //System.out.println(line);
-	    if (line.trim().length() > 0) {
-		if (line.indexOf("[") > -1) {
-		    dbName = line.substring(1, line.indexOf("]"));
-		    currentDB = new HashMap();
+        while ((line = in.readLine()) != null) {
+
+            if (line.trim().length() > 0) {
+                // We currently don't do anything with the version
+                // number
+                if (line.startsWith("VERSION=")) {
+                    continue;
+                }
+
+                if (line.indexOf("[") > -1) {
+                    dbName = line.substring(1, line.indexOf("]"));
+                    currentDB = new HashMap();
                     //instantiate new hashtable for this tag
-		    config.put(dbName, currentDB); 
-		} else {
-		    StringTokenizer strTok = new StringTokenizer(line, "=");
-		    //here we assume that there are only key = value
-		    //pairs in the config file
-		    key = strTok.nextToken();
-		    if (strTok.hasMoreTokens()) {
-			value = strTok.nextToken();
+                    config.put(dbName, currentDB);
+                } else {
+                    StringTokenizer strTok = new StringTokenizer(line, "=");
+                    //here we assume that there are only key = value
+                    //pairs in the config file
+                    key = strTok.nextToken();
+                    if (strTok.hasMoreTokens()) {
+                        value = strTok.nextToken();
                     } else {
-			value = "";
-		    }
+                        value = "";
+                    }
 
-		    currentDB.put(key.trim(), value.trim());    
-		}
-	    }
-	}
+                    currentDB.put(key.trim(), value.trim());
+                }
+            }
+        }
 
-	return new RegistryConfiguration.Impl(locator, Collections.unmodifiableMap(config));
+        return new RegistryConfiguration.Impl(locator, Collections.unmodifiableMap(config));
     }
 }

@@ -38,11 +38,11 @@ public class Services {
      * given service interface in the classloader from 
      * which BioJava was loaded.
      */
-
     public static Set getImplementationNames(Class serviceIF)
         throws IOException
     {
-	return getImplementationNames(serviceIF, Services.class.getClassLoader());
+        return getImplementationNames(serviceIF,
+                                      Services.class.getClassLoader());
     }
 
     /**
@@ -50,24 +50,25 @@ public class Services {
      * given service interface available in a given
      * classloader.
      */
-
     public static Set getImplementationNames(Class serviceIF, ClassLoader loader)
         throws IOException
     {
-	String serviceName = serviceIF.getName();
-	Enumeration serviceFiles = loader.getResources("META-INF/services/" + serviceName);
-	Set names = new HashSet();
+        String serviceName = serviceIF.getName();
+        Enumeration serviceFiles = loader.getResources("META-INF/services/"
+                                                       + serviceName);
+        Set names = new HashSet();
 
-	while (serviceFiles.hasMoreElements()) {
-	    URL serviceFile = (URL) serviceFiles.nextElement();
-	    BufferedReader serviceReader = new BufferedReader(new InputStreamReader(serviceFile.openStream()));
-	    String implName;
+        while (serviceFiles.hasMoreElements()) {
+            URL serviceFile = (URL) serviceFiles.nextElement();
+            BufferedReader serviceReader =
+                new BufferedReader(new InputStreamReader(serviceFile.openStream()));
+            String implName;
 
-	    while ((implName = serviceReader.readLine()) != null) {
-		names.add(implName);
-	    }
-	}
+            while ((implName = serviceReader.readLine()) != null) {
+                names.add(implName);
+            }
+        }
 
-	return Collections.unmodifiableSet(names);
+        return Collections.unmodifiableSet(names);
     }
 }

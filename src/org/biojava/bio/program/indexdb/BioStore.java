@@ -38,11 +38,18 @@ import org.biojava.utils.io.*;
  * @author Keith James
  */
 public class BioStore implements IndexStore {
+
+    /**
+     * <code>STRING_CASE_SENSITIVE_ORDER</code> compares two
+     * <code>Object</code>s, which must both be <code>String</code>s,
+     * lexicographically using <code>compareTo</code>. The comparison
+     * is carried out 'a' to 'b'.
+     */
     static Comparator STRING_CASE_SENSITIVE_ORDER = new Comparator() {
-      public int compare(Object a, Object b) {
-        return ((String) a).compareTo(b);
-      }
-    };
+            public int compare(Object a, Object b) {
+                return ((String) a).compareTo(b);
+            }
+        };
     
     private ConfigFile metaData;
     private File location;
@@ -53,11 +60,11 @@ public class BioStore implements IndexStore {
     private int fileCount;
 
     /**
-     * Creates a new <code>BioStore</code> at the specified location
-     * with the specified caching behaviour.
+     * Creates a new <code>BioStore</code> flatfile index at the
+     * specified location with the specified caching behaviour.
      *
-     * @param location a <code>File</code> indicating the parent path
-     * of the store.
+     * @param location a <code>File</code> indicating the index
+     * directory.
      * @param cache a <code>boolean</code> indicating whether the
      * implementation should cache its state.
      *
@@ -65,8 +72,8 @@ public class BioStore implements IndexStore {
      * @exception BioException if an error occurs.
      */
     public BioStore(File location, boolean cache)
-    throws IOException, BioException {
-      this(location, cache, false);
+        throws IOException, BioException {
+        this(location, cache, false);
     }
     
     BioStore(File location, boolean cache, boolean mutable)
@@ -74,8 +81,9 @@ public class BioStore implements IndexStore {
         this.location = location;
 
         File configFile = BioStoreFactory.makeConfigFile(location);
-        if(!configFile.exists()) {
-          throw new BioException("Config file does not exist: " + configFile);
+        if (!configFile.exists()) {
+            throw new BioException("Config file does not exist: "
+                                   + configFile);
         }
         metaData = new ConfigFile(BioStoreFactory.makeConfigFile(location));
         idToList = new SmallMap();
@@ -93,7 +101,7 @@ public class BioStore implements IndexStore {
         StringTokenizer sTok = new StringTokenizer(keyList, "\t");
         while (sTok.hasMoreTokens()) {
             String k = sTok.nextToken();
-      
+
             File file = BioStoreFactory.makeSecondaryFile(location, k);
             if (cache) {
                 idToList.put(k, new CacheList(new SecondaryFileAsList(file, mutable)));
@@ -102,8 +110,6 @@ public class BioStore implements IndexStore {
             }
         }
 
-        //System.out.println("Primary key: " + plFile);
-
         readFileIDs();
     }
     
@@ -111,13 +117,19 @@ public class BioStore implements IndexStore {
      * The name of this store or null if the name has not been set.
      */
     public String getName() {
-      if(metaData.containsProperty(BioStoreFactory.STORE_NAME)) {
+      if (metaData.containsProperty(BioStoreFactory.STORE_NAME)) {
         return (String) metaData.getProperty(BioStoreFactory.STORE_NAME);
       } else {
         return null;
       }
     }
     
+    /**
+     * <code>getLocation</code> returns the directory where the index
+     * is located.
+     *
+     * @return a <code>File</code>.
+     */
     public File getLocation() {
       return location;
     }
@@ -241,10 +253,21 @@ public class BioStore implements IndexStore {
         }
     }
 
+    /**
+     * <code>getRecordList</code> returns all the <code>Record</code>s
+     * in the index.
+     *
+     * @return a <code>List</code> of <code>Record</code>s.
+     */
     public List getRecordList() {
         return primaryList;
     }
 
+    /**
+     * <code>commit</code> writes an index to disk.
+     *
+     * @exception NestedException if an error occurs.
+     */
     public void commit()
         throws NestedException {
         Collections.sort(primaryList, primaryList.getComparator());
