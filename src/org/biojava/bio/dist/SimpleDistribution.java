@@ -39,13 +39,34 @@ import org.biojava.bio.symbol.*;
 public class SimpleDistribution
 extends AbstractDistribution
 implements Serializable {
+  private FiniteAlphabet alphabet;
   private transient AlphabetIndex indexer;
+  private transient ChangeListener indexerListener;
   private double[] weights = null;
   private Distribution nullModel;
   
-  public Alphabet getAlphabet() {
-    return indexer.getAlphabet();
-  }
+    private AlphabetIndex getIndexer() {
+	if (indexer == null) {
+	    this.indexer = AlphabetManager.getAlphabetIndex(alphabet);
+	    this.indexerListener = new ChangeAdapter() {
+		public void preChange(ChangeEvent ce) throws ChangeVetoException {
+		    if(hasWeights()) {
+			throw new ChangeVetoException(
+						      ce,
+						      "Can't allow the index to change as we have probabilities."
+						      );
+		    }
+		}
+	    } ;
+	    indexer.addChangeListener(indexerListener, AlphabetIndex.INDEX);
+	}
+
+	return indexer;
+    }
+
+    public Alphabet getAlphabet() {
+	return alphabet;
+    }
   
   public Distribution getNullModel() {
     return this.nullModel;
@@ -62,7 +83,7 @@ implements Serializable {
   
   protected double[] getWeights() {
     if(weights == null) {
-      weights = new double[indexer.getAlphabet().size()];
+      weights = new double[getIndexer().getAlphabet().size()];
       for(int i = 0; i < weights.length; i++) {
         weights[i] = Double.NaN;
       }
@@ -76,7 +97,7 @@ implements Serializable {
     if(!hasWeights()) {
       return Double.NaN;
     } else {
-      return weights[indexer.indexForSymbol(s)];
+      return weights[getIndexer().indexForSymbol(s)];
     }
   }
 
@@ -89,24 +110,11 @@ implements Serializable {
         s.getName() + " -> " + w
       );
     }
-    weights[indexer.indexForSymbol(s)] = w;
+    weights[getIndexer().indexForSymbol(s)] = w;
   }
   
   public SimpleDistribution(FiniteAlphabet alphabet) {
-    this.indexer = AlphabetManager.getAlphabetIndex(alphabet);
-    indexer.addChangeListener(
-      new ChangeAdapter() {
-        public void preChange(ChangeEvent ce) throws ChangeVetoException {
-          if(hasWeights()) {
-            throw new ChangeVetoException(
-              ce,
-              "Can't allow the index to change as we have probabilities."
-            );
-          }
-        }
-      },
-      AlphabetIndex.INDEX
-    );
+      this.alphabet = alphabet;
     
     try {
       setNullModel(new UniformDistribution(alphabet));
@@ -127,7 +135,7 @@ implements Serializable {
     private final Count counts;
     
     public Trainer() {
-      counts = new IndexedCount(indexer);
+      counts = new IndexedCount(getIndexer());
     }
     
     public void addCount(DistributionTrainerContext dtc, AtomicSymbol sym, double times)
@@ -183,7 +191,7 @@ implements Serializable {
         double []total = new double[weights.length];
         double sum = 0.0;
         for(int i = 0; i < total.length; i++) {
-          AtomicSymbol s = (AtomicSymbol) indexer.symbolForIndex(i);
+          AtomicSymbol s = (AtomicSymbol) getIndexer().symbolForIndex(i);
           sum += total[i] = 
             getCount(dtc, s) +
             nullModel.getWeight(s) * weight;
