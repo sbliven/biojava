@@ -386,9 +386,9 @@ Changeable {
       }
       
       Shape oldClip = g2.getClip();
-      //g2.clip(clip);
+      g2.clip(clip);
       renderer.paint(g2, this, min, max);
-      //g2.setClip(oldClip);
+      g2.setClip(oldClip);
       
       if (direction == HORIZONTAL) {
           g2.translate(-alongDim, spacer + depth);
@@ -515,12 +515,11 @@ Changeable {
       int min = 1;
       this.offsets = new double[realLines];
       int li = 0;
-      double totDepth = 0.0;
       while(min <= sequence.length()) {
         int max = min + symbolsPerLine - 1;
         double depth = renderer.getDepth(this, min, max);
         acrossDim += depth + spacer;
-        offsets[li] = totDepth;
+        offsets[li] = acrossDim;
         min = max + 1;
         li++;
       }
