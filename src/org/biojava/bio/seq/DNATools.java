@@ -32,11 +32,13 @@ import org.biojava.bio.symbol.*;
  * @author Matthew Pocock
  */
 public final class DNATools {
-  static private FiniteAlphabet dna;
-  static private Symbol a;
-  static private Symbol g;
-  static private Symbol c;
-  static private Symbol t;
+  private static final ReversibleTranslationTable complementTable;
+  static private final FiniteAlphabet dna;
+  
+  static private final Symbol a;
+  static private final Symbol g;
+  static private final Symbol c;
+  static private final Symbol t;
   
   static private Map symbolToComplement;
 
@@ -65,6 +67,7 @@ public final class DNATools {
         }
         symbolToComplement.put(as, AlphabetManager.getAmbiguitySymbol(l));
       }
+      complementTable = new DNAComplementTranslationTable();
     } catch (Throwable t) {
       throw new BioError(t, "Unable to initialize DNATools");
     }
@@ -204,62 +207,59 @@ public final class DNATools {
   /**
    * Retrieve a complement view of list.
    *
-   * @param list  the ResidueList to complement
+   * @param list  the SymbolList to complement
    * @return a SymbolList that is the complement
    * @throws IllegalAlphabetException if list is not a complementable alphabet
    */
   public static SymbolList complement(SymbolList list)
   throws IllegalAlphabetException {
-    return new ComplementSymbolList(list);
+    return new TranslatedSymbolList(list, complementTable());
   }
 
   /**
    * Retrieve a reverse-complement view of list.
    *
-   * @param list  the ResidueList to complement
+   * @param list  the SymbolList to complement
    * @return a SymbolList that is the complement
    * @throws IllegalAlphabetException if list is not a complementable alphabet
    */
   public static SymbolList reverseComplement(SymbolList list)
   throws IllegalAlphabetException {
-    return new ComplementSymbolList(new ReverseSymbolList(list));
+    return new TranslatedSymbolList(new ReverseSymbolList(list), complementTable());
   }
+  
+  /**
+   * Get a translation table for complementing DNA symbols.
+   *
+   * @since 1.1
+   */
 
-    public static final ReversibleTranslationTable _complementTable = new DNAComplementTranslationTable();
+  public static ReversibleTranslationTable complementTable() {
+    return complementTable;
+  }
     
-    /**
-     * Get a translation table for complementing DNA symbols.
-     *
-     * @since 1.1
-     */
+  /**
+   * Sneaky class for complementing DNA bases.
+   */
 
-    public static ReversibleTranslationTable complementTable() {
-	return _complementTable;
-    }
-
-    /**
-     * Sneaky class for complementing DNA bases.
-     */
-
-    private static class DNAComplementTranslationTable implements ReversibleTranslationTable {
-	public Symbol translate(Symbol s) 
-	    throws IllegalSymbolException
-	{
+  private static class DNAComplementTranslationTable
+  implements ReversibleTranslationTable {
+    public Symbol translate(Symbol s) 
+	  throws IllegalSymbolException {
 	    return DNATools.complement(s);
-	}
+	  }
 
-	public Symbol untranslate(Symbol s) 
-	    throws IllegalSymbolException
-	{
+    public Symbol untranslate(Symbol s) 
+	  throws IllegalSymbolException	{
 	    return DNATools.complement(s);
-	}
+	  }
 
-	public Alphabet getSourceAlphabet() {
+	  public Alphabet getSourceAlphabet() {
 	    return DNATools.getDNA();
-	}
+	  }
 
-	public Alphabet getTargetAlphabet() {
+	  public Alphabet getTargetAlphabet() {
 	    return DNATools.getDNA();
-	}
-    }
+	  }
+  }
 }

@@ -21,6 +21,8 @@
 package org.biojava.bio.seq.impl;
 
 import java.util.*;
+
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.genomic.*;
 
@@ -34,14 +36,18 @@ public class SimpleGene extends SimpleStrandedFeature implements Gene {
   private Set exons;
   
   {
-    exons = new Set();
+    exons = new HashSet();
   }
   
   public Set getExons() {
     return Collections.unmodifiableSet(exons);
   }
   
-  public SimpleGene(Gene.Template template) {
-    super(template);
+  public SimpleGene(
+    Sequence sourceSeq,
+    FeatureHolder parent,
+    Gene.Template template
+  ) throws IllegalAlphabetException {
+    super(sourceSeq, parent, template);
   }
 }

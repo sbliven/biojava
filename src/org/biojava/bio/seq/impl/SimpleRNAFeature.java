@@ -21,6 +21,8 @@
 package org.biojava.bio.seq.impl;
 
 import java.util.*;
+
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.genomic.*;
 
@@ -30,15 +32,30 @@ import org.biojava.bio.seq.genomic.*;
  * @author Matthew Pocock
  * @since 1.1
  */
-public class SimpleRNAFeature implements RNAFeature extends SimpleStrandedFeature {
+public class SimpleRNAFeature extends SimpleStrandedFeature implements RNAFeature {
   protected Sequence rna;
     
   public Sequence getRNA() {
     return rna;
   }
   
-  public RNAFeature(RNAFeature.Template template) {
-    super(template);
+  public SimpleRNAFeature(
+    Sequence sourceSeq,
+    FeatureHolder parent,
+    RNAFeature.Template template
+  ) throws IllegalAlphabetException {
+    super(sourceSeq, parent, template);
     this.rna = rna;
+  }
+  
+  public Feature.Template makeTemplate() {
+    RNAFeature.Template rft = new RNAFeature.Template();
+    fillTemplate(rft);
+    return rft;
+  }
+  
+  protected void fillTemplate(RNAFeature.Template ft) {
+    super.fillTemplate(ft);
+    ft.rna = this.getRNA();
   }
 }

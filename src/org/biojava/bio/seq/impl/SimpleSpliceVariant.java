@@ -21,6 +21,10 @@
 package org.biojava.bio.seq.impl;
 
 import java.util.*;
+
+import org.biojava.utils.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.genomic.*;
 
@@ -34,11 +38,11 @@ public class SimpleSpliceVariant
 extends SimpleRNAFeature implements SpliceVariant {
   public Sequence getRNA() {
     if(rna == null) {
-      FeatureHolder fh = filter(new FeatureFilter.ByClass(Exon.class));
+      FeatureHolder fh = filter(new FeatureFilter.ByClass(Exon.class), false);
       Exon[] exons = new Exon[fh.countFeatures()];
-      int fi = 0;
+      int i = 0;
       for(Iterator fi = fh.features(); fi.hasNext(); ) {
-        exons[fi++] = (Exon) fi.next();
+        exons[i++] = (Exon) fi.next();
       }
       Arrays.sort(exons, new Comparator() {
         public int compare(Object a, Object b) {
@@ -48,7 +52,7 @@ extends SimpleRNAFeature implements SpliceVariant {
           return la.getMin() - lb.getMin();
         }
         
-        pubic boolean equals(Object o) {
+        public boolean equals(Object o) {
           return o == this;
         }
       });
@@ -69,7 +73,19 @@ extends SimpleRNAFeature implements SpliceVariant {
         cft.componentLocation = new RangeLocation(1, length);
         cft.location = new RangeLocation(last+1, last+length);
         last += length;
-        sa.createFeature(cft);
+        try {
+          sa.createFeature(cft);
+        } catch (BioException be) {
+          throw new BioError(
+            be,
+            "Assertion Failure: Could not splice exons together"
+          );
+        } catch (ChangeVetoException cve) {
+          throw new BioError(
+            cve,
+            "Assertion Failure: Spliced exons could not be modified"
+          );
+        }
       }
       
       rna = sa;
@@ -77,7 +93,17 @@ extends SimpleRNAFeature implements SpliceVariant {
     return rna;
   }
 
-  public SimpleSpliceVariant(SpliceVariant.Template template) {
-    super(template);
+  public SimpleSpliceVariant(
+    Sequence sourceSeq,
+    FeatureHolder parent,
+    SpliceVariant.Template template
+  ) throws IllegalAlphabetException {
+    super(sourceSeq, parent, template);
+  }
+  
+  public Feature.Template makeTemplate() {
+    SpliceVariant.Template svt = new SpliceVariant.Template();
+    fillTemplate(svt);
+    return svt;
   }
 }

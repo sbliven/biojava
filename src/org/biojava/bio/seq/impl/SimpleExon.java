@@ -21,6 +21,9 @@
 package org.biojava.bio.seq.impl;
 
 import java.util.*;
+
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.genomic.*;
 
@@ -31,7 +34,36 @@ import org.biojava.bio.seq.genomic.*;
  * @since 1.1
  */
 public class SimpleExon extends SimpleRNAFeature implements Exon {
-  public SimpleExon(Exon.Template template) {
-    super(template);
+  public Sequence getRNA() {
+    if(rna == null) {
+      SequenceFactory sf = new SimpleSequenceFactory();
+      SymbolList asRNA;
+      try {
+        asRNA = RNATools.transcribe(getSymbols());
+      } catch (IllegalAlphabetException iae) {
+        throw new BioError(iae, "Assertion Failure: Could not view sequence as RNA");
+      }
+      rna = sf.createSequence(
+        asRNA,
+        getSequence().getURN() + "/" + getType() + "/" + getLocation(),
+        getType() + "/" + getLocation(),
+        Annotation.EMPTY_ANNOTATION
+      );
+    }
+    return rna;
+  }
+  
+  public SimpleExon(
+    Sequence sourceSeq,
+    FeatureHolder parent,
+    Exon.Template template
+  ) throws IllegalAlphabetException {
+    super(sourceSeq, parent, template);
+  }
+  
+  public Feature.Template makeTemplate() {
+    Exon.Template et = new Exon.Template();
+    fillTemplate(et);
+    return et;
   }
 }

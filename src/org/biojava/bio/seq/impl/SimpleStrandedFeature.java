@@ -55,13 +55,14 @@ public class SimpleStrandedFeature extends SimpleFeature implements StrandedFeat
     }
   
   public Feature.Template makeTemplate() {
-    StrandedFeature.Template sft = new StrandedFeature.Template();
-    sft.location = getLocation();
-    sft.type = getType();
-    sft.source = getSource();
-    sft.annotation = getAnnotation();    
-    sft.strand = getStrand();
-    return sft;
+    StrandedFeature.Template ft = new StrandedFeature.Template();
+    fillTemplate(ft);
+    return ft;
+  }
+  
+  protected void fillTemplate(StrandedFeature.Template ft) {
+    super.fillTemplate(ft);
+    ft.strand = getStrand();
   }
   
     public SimpleStrandedFeature(Sequence sourceSeq,

@@ -21,6 +21,9 @@
 package org.biojava.bio.seq.impl;
 
 import java.util.*;
+
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.genomic.*;
 
@@ -35,8 +38,14 @@ extends SimpleRNAFeature implements PrimaryTranscript {
   public Sequence getRNA() {
     if(rna == null) {
       SequenceFactory sf = new SimpleSequenceFactory();
+      SymbolList asRNA;
+      try {
+        asRNA = RNATools.transcribe(getSymbols());
+      } catch (IllegalAlphabetException iae) {
+        throw new BioError(iae, "Assertion Failure: Could not view sequence as RNA");
+      }
       rna = sf.createSequence(
-        DNATools.complement(getSymbols()),
+        asRNA,
         getSequence().getURN() + "/" + getType() + "/" + getLocation(),
         getType() + "/" + getLocation(),
         Annotation.EMPTY_ANNOTATION
@@ -45,7 +54,11 @@ extends SimpleRNAFeature implements PrimaryTranscript {
     return rna;
   }
 
-  public SimplePrimaryTranscript(PrimaryTranscript.Template template) {
-    super(template);
+  public SimplePrimaryTranscript(
+    Sequence sourceSeq,
+    FeatureHolder parent,
+    PrimaryTranscript.Template template
+  ) throws IllegalAlphabetException {
+    super(sourceSeq, parent, template);
   }
 }

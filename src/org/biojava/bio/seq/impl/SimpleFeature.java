@@ -154,11 +154,15 @@ public class SimpleFeature implements Feature, RealizingFeatureHolder {
 
     public Feature.Template makeTemplate() {
       Feature.Template ft = new Feature.Template();
+      fillTemplate(ft);
+      return ft;
+    }
+    
+    protected void fillTemplate(Feature.Template ft) {
       ft.location = getLocation();
       ft.type = getType();
       ft.source = getSource();
       ft.annotation = getAnnotation();
-      return ft;
     }
     
     public SimpleFeature(Sequence sourceSeq, 
