@@ -1,4 +1,4 @@
-/* -*- c-basic-offset: 4-*- */
+/* -*- c-basic-offset: 4; indent-tabs-mode: nil -*- */
 /*
  *                    BioJava development code
  *
@@ -23,6 +23,7 @@
 package org.biojava.bio.seq.db.biosql;
 
 
+import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -75,6 +76,7 @@ import org.biojava.utils.cache.WeakValueHashMap;
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Simon Foote (modifications for schema version 1.0)
+ * @author Len Trigg
  * @since 1.3
  */
 public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
@@ -148,7 +150,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 	throws BioException
     {
 	helper = DBHelper.getDBHelperForURL(dbURL);
-        System.err.println(dbURL + " " + dbUser + " " + dbPass);
+        //System.err.println(dbURL + " " + dbUser + " " + dbPass);
 	pool = new JDBCConnectionPool(dbURL, dbUser, dbPass);
 	
 	// Check that BioSQL database schema is post-Singapore
@@ -253,7 +255,6 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 	try {
 	    conn = pool.takeConnection();
 	    conn.setAutoCommit(false);
-	    ResultSet rs;
 
 	    PreparedStatement create_bioentry = conn.prepareStatement(
                     "insert into bioentry " +
@@ -399,7 +400,8 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 		create_biosequence.setInt(1, bioentry_id);
 		create_biosequence.setInt(2, version);
 		create_biosequence.setInt(3, seq.length());
-		create_biosequence.setString(4, seqToke.tokenizeSymbolList(seq));
+                String seqstr = seqToke.tokenizeSymbolList(seq);
+		create_biosequence.setCharacterStream(4, new StringReader(seqstr), seqstr.length());
 		create_biosequence.setString(5, seqAlpha.getName());
 		create_biosequence.executeUpdate();
 		create_biosequence.close();
@@ -693,6 +695,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 delete_reference.executeUpdate();
                 delete_reference.close();
 
+                /// XXX this won't work with oracle (comment is a reserved word)
                 PreparedStatement delete_comment = conn.prepareStatement("delete from comment where bioentry_id = ?");
                 delete_comment.setInt(1, bioentry_id);
                 delete_comment.executeUpdate();
@@ -924,26 +927,12 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         return ontologySQL.termForID(termId).getName();
     }
         
-    
     private boolean hierarchyChecked = false;
     private boolean hierarchySupported = false;
 
     boolean isHierarchySupported() {
 	if (!hierarchyChecked) {
-	    try {
-		Connection conn = pool.takeConnection();
-		PreparedStatement ps = conn.prepareStatement("select * from seqfeature_relationship limit 1");
-		try {
-		    ps.executeQuery();
-		    hierarchySupported = true;
-		} catch (SQLException ex) {
-		    hierarchySupported = false;
-		}
-		ps.close();
-		pool.putConnection(conn);
-	    } catch (SQLException ex) {
-		throw new BioRuntimeException(ex);
-	    }
+            hierarchySupported = getDBHelper().containsTable(getPool(), "seqfeature_relationship");
 	    hierarchyChecked = true;
 	}
 
@@ -955,20 +944,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
     boolean isAssemblySupported() {
 	if (!assemblyChecked) {
-	    try {
-		Connection conn = pool.takeConnection();
-		PreparedStatement ps = conn.prepareStatement("select * from assembly limit 1");
-		try {
-		    ps.executeQuery();
-		    assemblySupported = true;
-		} catch (SQLException ex) {
-		    assemblySupported = false;
-		}
-		ps.close();
-		pool.putConnection(conn);
-	    } catch (SQLException ex) {
-		throw new BioRuntimeException(ex);
-	    }
+            assemblySupported = getDBHelper().containsTable(getPool(), "assembly");
 	    assemblyChecked = true;
 	}
 
@@ -980,20 +956,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
     boolean isDummySupported() {
 	if (!dummyChecked) {
-	    try {
-		Connection conn = pool.takeConnection();
-		PreparedStatement ps = conn.prepareStatement("select * from dummy limit 1");
-		try {
-		    ps.executeQuery();
-		    dummySupported = true;
-		} catch (SQLException ex) {
-		    dummySupported = false;
-		}
-		ps.close();
-		pool.putConnection(conn);
-	    } catch (SQLException ex) {
-		throw new BioRuntimeException(ex);
-	    }
+            dummySupported = getDBHelper().containsTable(getPool(), "dummy");
 	    dummyChecked = true;
 	}
 
@@ -1005,20 +968,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
     boolean isLocationQualifierSupported() {
 //  	if (!locationQualifierChecked) {
-//  	    try {
-//  		Connection conn = pool.takeConnection();
-//  		PreparedStatement ps = conn.prepareStatement("select * from location_qualifier_value limit 1");
-//  		try {
-//  		    ps.executeQuery();
-//  		    locationQualifierSupported = true;
-//  		} catch (SQLException ex) {
-//  		    locationQualifierSupported = false;
-//  		}
-//  		ps.close();
-//  		pool.putConnection(conn);
-//  	    } catch (SQLException ex) {
-//  		throw new BioRuntimeException(ex);
-//  	    }
+//  	    locationQualifierSupported = getDBHelper().containsTable(getPool(), "location_qualifier_value");
 //  	    locationQualifierChecked = true;
 //  	}
 
@@ -1032,20 +982,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
     boolean isBioentryPropertySupported() {
 	if (!bioentryPropertyChecked) {
-	    try {
-		Connection conn = pool.takeConnection();
-		PreparedStatement ps = conn.prepareStatement("select * from bioentry_qualifier_value limit 1");
-		try {
-		    ps.executeQuery();
-		    bioentryPropertySupported = true;
-		} catch (SQLException ex) {
-		    bioentryPropertySupported = false;
-		}
-		ps.close();
-		pool.putConnection(conn);
-	    } catch (SQLException ex) {
-		throw new BioRuntimeException(ex);
-	    }
+            bioentryPropertySupported = getDBHelper().containsTable(getPool(), "bioentry_qualifier_value");
 	    bioentryPropertyChecked = true;
 	}
 
@@ -1058,21 +995,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
     boolean isDbSchemaSupported() {
 	if (!dbSchemaChecked) {
-	    try {
-		Connection conn = pool.takeConnection();
-		PreparedStatement ps = conn.prepareStatement("select * from location limit 1");
-		try {
-		    ps.executeQuery();
-		    dbSchemaSupported = true;
-		} catch (SQLException ex) {
-		    dbSchemaSupported = false;
-		}
-		ps.close();
-		pool.putConnection(conn);
-	    } catch (SQLException ex) {
-              ex.printStackTrace();
-		throw new BioRuntimeException(ex);
-	    }
+            dbSchemaSupported = getDBHelper().containsTable(getPool(), "location");
 	    dbSchemaChecked = true;
 	}
 
@@ -1084,20 +1007,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
     boolean isDbxrefQualifierValueSupported() {
 	if (!dbxrefQualifierValueChecked) {
-	    try {
-		Connection conn = pool.takeConnection();
-		PreparedStatement ps = conn.prepareStatement("select * from dbxref_qualifier_value limit 1");
-		try {
-		    ps.executeQuery();
-		    dbxrefQualifierValueSupported = true;
-		} catch (SQLException ex) {
-		    dbxrefQualifierValueSupported = false;
-		}
-		ps.close();
-		pool.putConnection(conn);
-	    } catch (SQLException ex) {
-		throw new BioRuntimeException(ex);
-	    }
+            dbxrefQualifierValueSupported = getDBHelper().containsTable(getPool(), "dbxref_qualifier_value");
 	    dbxrefQualifierValueChecked = true;
 	}
 

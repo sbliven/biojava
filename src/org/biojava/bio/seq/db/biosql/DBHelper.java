@@ -1,3 +1,4 @@
+/* -*- c-basic-offset: 4; indent-tabs-mode: nil -*- */
 /*
  *                    BioJava development code
  *
@@ -22,20 +23,37 @@
 package org.biojava.bio.seq.db.biosql;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.utils.JDBCConnectionPool;
 
 /**
+ * Isolates all code that is specific to a particular RDBMS. To add
+ * support for a new RDBMS, write a new <code>DBHelper</code> subclass
+ * and ensure that it can be found by editing the
+ * <code>getDBHelperForURL</code> method in this class.
+ *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author Len Trigg
  */
 public abstract class DBHelper {
+
+    /**
+     * Returns a DBHelper implementation suitable for a particular
+     * database.
+     *
+     * @param ourURL the JDBC url
+     * @return a <code>DBHelper</code>.
+     */
     public static DBHelper getDBHelperForURL(String ourURL) {
 	if (ourURL.startsWith("jdbc:")) {
 	    ourURL = ourURL.substring(5);
 	}
-  if(!Character.isLetter(ourURL.charAt(0))) {
-    throw new IllegalArgumentException("URL must start with a letter: " + ourURL);
-  }
+        if (!Character.isLetter(ourURL.charAt(0))) {
+            throw new IllegalArgumentException("URL must start with a letter: " + ourURL);
+        }
   
 	int colon = ourURL.indexOf(':');
 	if (colon > 0) {
@@ -45,6 +63,8 @@ public abstract class DBHelper {
 	        return new MySQLDBHelper();
 	    } else if (protocol.equals("postgresql")) {
 		return new PostgreSQLDBHelper();
+// 	    } else if (protocol.equals("oracle")) {
+// 		return new OracleDBHelper();
 	    }
 	}
 
@@ -73,4 +93,38 @@ public abstract class DBHelper {
 	throws SQLException;
 
     public abstract DeleteStyle getDeleteStyle();
+
+    /**
+     * Detects whether a particular table is present in the database.
+     *
+     * @param pool a <code>JDBCConnectionPool</code> that will provide a connection to the database.
+     * @param tablename the name of the table.
+     * @return true if the table exists in the database.
+     * @throws NullPointerException if pool is null.
+     * @throws IllegalArgumentException if tablename is null or empty.
+     */
+    public boolean containsTable(JDBCConnectionPool pool, String tablename) {
+        if (pool == null) {
+            throw new NullPointerException("Require a connection pool.");
+        }
+        if ((tablename == null) || (tablename.length() == 0)) {
+            throw new IllegalArgumentException("Invalid table name given");
+        } 
+        try {
+            boolean present;
+            Connection conn = pool.takeConnection();
+            PreparedStatement ps = conn.prepareStatement("select * from " + tablename + " limit 1");
+            try {
+                ps.executeQuery();
+                present = true;
+            } catch (SQLException ex) {
+                present = false;
+            }
+            ps.close();
+            pool.putConnection(conn);
+            return present;
+        } catch (SQLException ex) {
+            throw new BioRuntimeException(ex);
+        }
+    }
 }
