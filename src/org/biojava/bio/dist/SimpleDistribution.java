@@ -81,10 +81,7 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
       if(!(s instanceof AtomicSymbol)) {
         return getAmbiguityWeight(s);
       } else {
-        throw new BioError(
-          "Requested weight for " + s.getName() +
-          " but something is odd & I can't find its weight"
-        );
+        return Double.NaN;
       }
     }
   }
@@ -114,9 +111,6 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
   public SimpleDistribution(FiniteAlphabet alphabet) {
     this.alphabet = alphabet;
     this.weight = new HashMap();
-    for(Iterator i = alphabet.iterator(); i.hasNext(); ) {
-      weight.put(i.next(), new Double(Double.NaN));
-    }
     try {
       setNullModel(new UniformDistribution(alphabet));
     } catch (Exception e) {
