@@ -60,6 +60,10 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder, BioSQLSequence
 	return seqDB.getDBHelper();
     }
 
+    public BioSQLSequenceDB getSequenceDB() {
+	return seqDB;
+    }
+
     BioSQLSequence(BioSQLSequenceDB seqDB,
 	           String name,
 	           int bioentry_id,

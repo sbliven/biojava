@@ -43,4 +43,6 @@ import org.biojava.bio.symbol.*;
 interface BioSQLSequenceI extends Sequence, RealizingFeatureHolder {
     void persistFeature(Feature f, int parent_id)
         throws BioException;
+    
+    BioSQLSequenceDB getSequenceDB();
 }
