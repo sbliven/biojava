@@ -23,6 +23,7 @@
 package org.biojava.bio.dp;
 
 import java.util.Map;
+import org.biojava.bio.seq.*;
 
 /**
  * Extends the Alignment interface so that it is explicitly used to represent
