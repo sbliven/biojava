@@ -24,6 +24,7 @@
  * where the constituent sequences have unequal lengths.</p>
  *
  * @author David Waring
+ * @author Mark Schreiber (docs and some minor changes)
  */
 
 
@@ -73,7 +74,7 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
         }
         return labelList;
     }
-  
+
     public Iterator symbolListIterator() {
       return new Alignment.SymbolListIterator(this);
     }
@@ -228,7 +229,7 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
                                  // this allows labels added to underlying Alignment to be seen
                                  // unless it was constructed with a Set of labels  NOT
 
-        public SubULAlignment (Set labels, Location loc) throws IndexOutOfBoundsException{
+        protected SubULAlignment (Set labels, Location loc) throws IndexOutOfBoundsException{
             this.start = loc.getMin();
             this.end = loc.getMax();
             if (start < 1 || end > AbstractULAlignment.this.length()){
@@ -268,6 +269,25 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
             return new RangeLocation(min,max);
         }
 
+        /**
+         * Retreives a subAlignment
+         * @param labels the labels of the <code>SymbolLists</code> to be in the Alignment
+         * @param min the left most coordinate
+         * @param max the right most coordinate
+         * @return an Alignment
+         * @throws NoSuchElementException if one of the values in <code>labels</code> is not in the parent alignment
+         */
+        public Alignment subAlignment(Set labels, int min, int max) throws NoSuchElementException{
+          return subAlignment(labels, LocationTools.makeLocation(min, max));
+        }
+
+        /**
+         * Retrieves a subalignment specified by the location.
+         * <p><b>WARNING:</b> It is assumed that the location is contiguous. If
+         * the location is non-contiguous it may be preferable to use a block iterator
+         * to retrieve each sub location independently.
+         * @see subAlignment(Set labels, int min, int max)
+         */
         public Alignment subAlignment(Set labels, Location loc) throws NoSuchElementException{
             int min = realPosition(loc.getMin());
             int max = realPosition(loc.getMax());
