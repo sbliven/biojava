@@ -60,13 +60,13 @@ public class GFFFilter {
   public static void main(String [] args) throws Exception {
     Map options = parseArgs(args);
 
-    if(args.length == 0 || args == null || args.containsKey("help")) {
+    if(args.length == 0 || options == null || options.containsKey("help")) {
       throw new Exception(
         "Use: GFFToFeatures [options]\n" +
         "    --infile in    read gff from file named in (stdin if absent or -)\n" +
         "    --outfile out  write gff to file named out (stdout if absent or -)\n" +
         "    --source [!]s  source==s or source!=s\n" +
-        "    --type [!]t    type==t or type!=t\n" +
+        "    --feature [!]f feature==f or feature!=f\n" +
         "    --seq [!]s     sequence==s or sequence!=s\n" +
         "    --frame [!]f   frame==f or frame!=f where f is one of 0, 1, 2\n" +
         "    --strand [!]s  strand==s or strand!=s where s is one of ., +, -\n" +
@@ -75,35 +75,159 @@ public class GFFFilter {
         "    --help         this help message\n"
       );
     }
-    
-    try {
-      BufferedReader in = null;
-      PrintWriter out = null;
 
-      if(args.length > 0) {
-        in = new BufferedReader(new InputStreamReader(new FileInputStream(new File(args[0]))));
-        if(args.length > 1) {
-          out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File(args[1]))));
-        }
-      }
-      
-      if(in == null) {
-        in = new BufferedReader(new InputStreamReader(System.in));
-      }
-      if(out == null) {
-        out = new PrintWriter(new OutputStreamWriter(System.out));
-      }
-
-      GFFParser parser = new GFFParser();
-      GFFWriter writer = new GFFWriter(out);
-      
-      parser.parse(in, writer);
-    } catch (Exception e) {
-      e.printStackTrace();
+    PrintWriter out = null;
+    String outFileName = (String) options.get("outfile");
+    if(outFileName == null || outFileName.equals("-")) {
+      out = new PrintWriter(new OutputStreamWriter(System.out));
+    } else {
+      out = new PrintWriter(new FileWriter(new File(outFileName)));
     }
+
+    GFFDocumentHandler handler = new GFFWriter(out);
+
+    for(Iterator ki = options.keySet().iterator(); ki.hasNext(); ) {
+      Object key = ki.next();
+      handler = processOpt((String) key, (String) options.get(key), handler);
+    }
+
+    BufferedReader in = null;
+    String inFileName = (String) options.get("infile");
+    if(inFileName == null || inFileName.equals("-")) {
+      in = new BufferedReader(new InputStreamReader(System.in));
+    } else {
+      in = new BufferedReader(new FileReader(new File(inFileName)));
+    }
+
+    GFFParser parser = new GFFParser();
+    parser.parse(in, handler);
   }
   
   private static Map parseArgs(String[] args) {
-      
+      Map options = new HashMap();
+
+      for(int i = 0; i < args.length; i+=2) {
+        String key = args[i];
+        String val = args[i+ 1];
+        while(key.startsWith("-")) {
+          key = key.substring(1);
+        }
+        options.put(key, val);
+      }
+
+      return options;
+  }
+
+  private static GFFDocumentHandler processOpt(
+    String key,
+    String val,
+    GFFDocumentHandler handler
+  ) {
+    boolean negate = false;
+
+    GFFRecordFilter filter = null;
+
+    if(val.startsWith("!")) {
+      negate = true;
+      val = val.substring(1);
+    }
+
+    if(false) { // syntactic sugar to make it easy to re-order statements
+    } else if(key.equals("end")) {
+      boolean before = false;
+      boolean after = false;
+      if(val.startsWith("<")) {
+        before = true;
+        val = val.substring(1);
+      }
+      if(val.startsWith(">")) {
+        after = true;
+        val = val.substring(1);
+      }
+      int pos = Integer.parseInt(val);
+      filter = new EndFilter(pos, before, after);
+    } else if(key.equals("start")) {
+      boolean before = false;
+      boolean after = false;
+      if(val.startsWith("<")) {
+        before = true;
+        val = val.substring(1);
+      }
+      if(val.startsWith(">")) {
+        after = true;
+        val = val.substring(1);
+      }
+      int pos = Integer.parseInt(val);
+      filter = new StartFilter(pos, before, after);
+    } else if(key.equals("strand")) {
+      filter = new GFFRecordFilter.StrandFilter(StrandParser.parseStrand(val));
+    } else if(key.equals("frame")) {
+      filter = new GFFRecordFilter.FrameFilter(Integer.parseInt(val));
+    } else if(key.equals("source")) {
+      filter = new GFFRecordFilter.SourceFilter(val);
+    } else if(key.equals("feature")) {
+      filter = new GFFRecordFilter.FeatureFilter(val); 
+    } else if(key.equals("seq")) {
+      filter = new GFFRecordFilter.SequenceFilter(val);
+    } else {
+      return handler; // unrecognized option
+    }
+
+    if(negate == true) {
+      filter = new GFFRecordFilter.NotFilter(filter);
+    }
+
+    return new GFFFilterer(handler, filter);
+  }
+
+  private abstract static class SE
+  implements GFFRecordFilter {
+    private int pos;
+    private boolean before;
+    private boolean after;
+
+    protected SE(int pos, boolean before, boolean after) {
+      this.pos = pos;
+      this.before = before;
+      this.after = after;
+    }
+
+    public int getPos() {
+      return pos;
+    }
+
+    public boolean isBefore() {
+      return before;
+    }
+
+    public boolean isAfter() {
+      return after;
+    }
+
+    public boolean accept(GFFRecord record) {
+      int co = getCoordinate(record);
+      return
+        (before && co < pos)
+        ||
+        (after && co > pos)
+        ||
+        (co == pos);
+    }
+
+    protected abstract int getCoordinate(GFFRecord record);
+  }
+
+  private static class StartFilter extends SE {
+    StartFilter(int pos, boolean before, boolean after) { super(pos, before, after); }
+    protected int getCoordinate(GFFRecord record) {
+      return record.getStart();
+    }
+  }
+
+  private static class EndFilter extends SE {
+    EndFilter(int pos, boolean before, boolean after) { super(pos, before, after); }
+    protected int getCoordinate(GFFRecord record) {
+      return record.getEnd();
+    }
   }
 }
