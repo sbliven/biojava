@@ -306,7 +306,7 @@ class BlastOutputHandler
                             if (databaseId != null) {
                                 AttributesImpl dbAttrs = new AttributesImpl();
 
-                                dbAttrs.addAttribute(biojavaUri, "id", "id", CDATA, queryId);
+                                dbAttrs.addAttribute(biojavaUri, "id", "id", CDATA, databaseId);
                                 dbAttrs.addAttribute(biojavaUri, "metadata", "metadata", CDATA, "none");
                                 listener.startElement(biojavaUri, "DatabaseId", biojavaUri + ":DatabaseId", dbAttrs);
                                 listener.endElement(biojavaUri, "DatabaseId", biojavaUri + ":DatabaseId");
