@@ -103,6 +103,11 @@ public class ProteinTools {
             getAlphabet(),
             SymbolPropertyTable.AVG_MASS
             );
+
+            SimpleSymbolPropertyTable pKPropertyTable = new SimpleSymbolPropertyTable(
+            getAlphabet(),
+            SymbolPropertyTable.PK
+            );
  
 	    SymbolTokenization tokens = getAlphabet().getTokenization("token");
 
@@ -131,14 +136,18 @@ public class ProteinTools {
 			} else if (name.equals(SymbolPropertyTable.AVG_MASS)) {
 			    String value = el.getAttribute("value");
 			    avgMassPropertyTable.setDoubleProperty(s, value);
-			    break;
-			}
+			} else if (name.equals(SymbolPropertyTable.PK)) {
+                            String value = el.getAttribute("value");
+                            pKPropertyTable.setDoubleProperty(s, value);
+                            break;
+                        }
 		    }
 		}
 	    }
 
             propertyTableMap.put(SymbolPropertyTable.MONO_MASS, (SymbolPropertyTable) monoMassPropertyTable);
             propertyTableMap.put(SymbolPropertyTable.AVG_MASS, (SymbolPropertyTable) avgMassPropertyTable);
+            propertyTableMap.put(SymbolPropertyTable.PK, (SymbolPropertyTable) pKPropertyTable);
         } catch (Exception e) {
             throw new BioError(e, " Could not initialize ProteinTools");
         }
