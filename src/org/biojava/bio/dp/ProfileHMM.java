@@ -135,6 +135,17 @@ public class ProfileHMM extends SimpleMarkovModel {
     
     return deleteStates[indx-1];
   }
+
+    /**
+     * @deprecated
+     */
+  public ProfileHMM(
+    Alphabet alpha, int columns,
+    DistributionFactory matchFactory, DistributionFactory insertFactory) throws IllegalSymbolException, IllegalTransitionException,  IllegalAlphabetException {
+    this(alpha, columns, matchFactory, insertFactory,"");
+  }
+
+
   
   /**
    * Create a new ProfileHMM.
@@ -157,10 +168,10 @@ public class ProfileHMM extends SimpleMarkovModel {
    */
   public ProfileHMM(
     Alphabet alpha, int columns,
-    DistributionFactory matchFactory, DistributionFactory insertFactory
-  ) throws IllegalSymbolException, IllegalTransitionException,
+    DistributionFactory matchFactory, DistributionFactory insertFactory, String name) 
+      throws IllegalSymbolException, IllegalTransitionException,
   IllegalAlphabetException {
-    super(1, alpha);
+    super(1, alpha,name);
 
     try {    
       this.columns = columns;
@@ -182,8 +193,6 @@ public class ProfileHMM extends SimpleMarkovModel {
     
       // first column - a leading insert & the magical state
       addState(iO);
-      createTransition(mO, iO);
-      createTransition(iO, iO);
     
       // 'body' columns
       for(int i = 1; i <= columns; i++) {
@@ -209,34 +218,13 @@ public class ProfileHMM extends SimpleMarkovModel {
         insertStates[i] = iN;
         deleteStates[i-1] = dN;
       
-        // from a model state
-        createTransition(mO, mN);
-        createTransition(mN, iN);
-        createTransition(mO, dN);
-      
-        // from an insert state
-        createTransition(iN, iN);
-        createTransition(iO, mN);
-        createTransition(iO, dN);
-      
-        // from a delete state
-        if(i > 1) {
-          createTransition(dO, dN);
-          createTransition(dO, mN);
-          createTransition(dN, iN);
-        }        
 
         mO = mN;
         iO = iN;
         dO = dN;
       }
-    
-      // for the transitions to end
-      createTransition(mO, magicalState());
-      createTransition(iO, magicalState());
-      createTransition(dO, magicalState());
-      
       matchStates[columns+1] = magicalState();
+      connectModel();
     } catch (ChangeVetoException cve) {
       throw new BioError(
         cve,
@@ -244,4 +232,45 @@ public class ProfileHMM extends SimpleMarkovModel {
       );
     }
   }
+
+    /** This is called by constructor in setting up the allowed transitions in the model */
+    protected void connectModel() throws 
+	ChangeVetoException, IllegalSymbolException, IllegalTransitionException,IllegalAlphabetException{
+	EmissionState mO = getMatch(0);
+	EmissionState iO = getInsert(0);
+	DotState dO = null;
+	createTransition(mO,iO);
+	createTransition(iO,iO);
+	for(int i = 1; i <= columns(); i++){
+	    EmissionState mN = getMatch(i);
+	    EmissionState iN = getInsert(i);
+	    DotState dN = getDelete(i);
+
+	    // from a model state
+	    createTransition(mO, mN);
+	    createTransition(mN, iN);
+	    createTransition(mO, dN);
+      
+	    // from an insert state
+	    createTransition(iN, iN);
+	    createTransition(iO, mN);
+	    createTransition(iO, dN);
+	    
+	    // from a delete state
+	    if(i > 1) {
+		createTransition(dO, dN);
+		createTransition(dO, mN);
+		createTransition(dN, iN);
+	    }        
+	    
+	    mO = mN;
+	    iO = iN;
+	    dO = dN;
+	}
+	// for the transitions to end
+	createTransition(mO, magicalState());
+	createTransition(iO, magicalState());
+	createTransition(dO, magicalState());
+    }
+  
 }
