@@ -118,21 +118,17 @@ class FastaSearchParser
      * @exception ParserException if the parser fails to parse a
      * line.
      */
-    public void parseSearch(final BufferedReader       reader,
-                            final SearchContentHandler handler)
+    public void parseSearch(BufferedReader       reader,
+                            SearchContentHandler handler)
         throws IOException, BioException, ParserException
     {
         lineNumber = 0;
-        boolean parsedQueryId = false;
-
         this.handler = handler;
 
     LINE:
         while ((line = reader.readLine()) != null)
         {
             lineNumber++;
-            // System.err.println("Parser working on:" + line);
-
             // This token indicates the end of the formatted search
             // data. Some outputs don't have any alignment consensus
             // tokens, so we need to check here as well as INALIGN
@@ -177,11 +173,10 @@ class FastaSearchParser
                     // about the query sequence ID which is normally
                     // redundant. However, when there are no hits this
                     // is the only place we can get this ID. I think
-                    // this is a deficiency in the format. We have to
-                    // try a parse here for this special case. We
-                    // don't set the flag saying we have parsed this
-                    // value so that later we overwrite this from the
-                    // "proper" source in the hit data, if it exists.
+                    // this is a deficiency in the format. If there
+                    // are long query sequence IDs, this is the only
+                    // place where they are not truncated.
+
                     if (line.startsWith(" >"))
                     {
                         String trimmed = line.trim();
@@ -192,11 +187,15 @@ class FastaSearchParser
                         // If there was a space in the line
                         // e.g. '>foo : bar baz'
                         if (i > 0)
+                        {
                             handler.setQuerySeq(trimmed.substring(1, i));
+                        }
                         // If there was no space
                         // e.g. '>foo'
                         else
+                        {
                             handler.setQuerySeq(trimmed.substring(1));
+                        }
                     }
 
                     // This token marks the line describing the query
@@ -271,13 +270,6 @@ class FastaSearchParser
                     if (line.startsWith(">"))
                     {
                         searchStatus = INQUERY;
-
-                        if (! parsedQueryId)
-                        {
-                            handler.setQuerySeq(parseId(line));
-                            parsedQueryId = true;
-                        }
-
                         handler.endHit();
                         handler.startSubHit();
                     }

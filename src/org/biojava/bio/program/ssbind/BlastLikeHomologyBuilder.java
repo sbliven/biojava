@@ -68,7 +68,7 @@ import org.biojava.utils.ChangeVetoException;
  * <code>StrandedFeature</code>.). This limits the searches currently
  * handled to BLASTN, TBLASTX and Fasta DNA.</p>
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class BlastLikeHomologyBuilder implements SearchContentHandler
@@ -150,7 +150,7 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
      * @param querySeqHolder a <code>SequenceDB</code> containing the
      * query sequence(s).
      */
-    public void setQuerySeqHolder(final SequenceDB querySeqHolder)
+    public void setQuerySeqHolder(SequenceDB querySeqHolder)
     {
         this.querySeqHolder = querySeqHolder;
     }
@@ -176,13 +176,12 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
      * @param subjectDBs a <code>SequenceDBInstallation</code>
      * containing the subject database(s)
      */
-    public void setSubjectDBInstallation(final SequenceDBInstallation subjectDBs)
+    public void setSubjectDBInstallation(SequenceDBInstallation subjectDBs)
     {
         this.subjectDBs = subjectDBs;
     }
 
-    public void setQuerySeq(final String querySeqId)
-        throws BioException
+    public void setQuerySeq(String querySeqId) throws BioException
     {
         if (querySeqHolder == null)
             throw new BioException("Running BlastLikeHomologyBuilder with null query SequenceDB");
@@ -199,8 +198,7 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
         queryView = new ViewSequence(temp);
     }
 
-    public void setSubjectDB(final String subjectDBName)
-        throws BioException
+    public void setSubjectDB(String subjectDBName) throws BioException
     {
         if (subjectDBs == null)
             throw new BioException("Running BlastLikeSearchBuilder with null subject SequenceDBInstallation");
@@ -220,7 +218,7 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
         return moreSearchesAvailable;
     }
 
-    public void setMoreSearches(final boolean value)
+    public void setMoreSearches(boolean value)
     {
         moreSearchesAvailable = value;
     }
@@ -266,17 +264,17 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
         }
     }
 
-    public void addSearchProperty(final Object key, final Object value)
+    public void addSearchProperty(Object key, Object value)
     {
         resultData.put(key, value);
     }
 
-    public void addHitProperty(final Object key, final Object value)
+    public void addHitProperty(Object key, Object value)
     {
         hitData.put(key, value);
     }
 
-    public void addSubHitProperty(final Object key, final Object value)
+    public void addSubHitProperty(Object key, Object value)
     {
         subHitData.put(key, value);
     }

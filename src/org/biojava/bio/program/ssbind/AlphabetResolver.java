@@ -32,7 +32,7 @@ import org.biojava.bio.symbol.FiniteAlphabet;
  * type of sequence <code>Alphabet</code> to expect from a search
  * result. Now public to allow use by anyone making custom handlers.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class AlphabetResolver

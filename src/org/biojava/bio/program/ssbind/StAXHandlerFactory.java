@@ -21,25 +21,26 @@
 
 package org.biojava.bio.program.ssbind;
 
-import org.xml.sax.ContentHandler;
+import org.biojava.utils.stax.StAXContentHandler;
 
 /**
- * <code>SSPropHandlerFactory</code> is an interface for factories
- * producing sequence similarity search property (SAX) handlers.
+ * <code>StAXHandlerFactory</code> is an interface for factories
+ * producing <code>StAXContentHandler</code>s which are used by the
+ * <code>SeqSimilarityStAXAdapter</code>.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
-public interface SSPropHandlerFactory
+public interface StAXHandlerFactory
 {
     /**
      * <code>getHandler</code> returns an appropriate
-     * <code>ContentHandler</code> implementation containing a
+     * <code>StAXContentHandler</code> implementation containing a
      * reference to a parent context.
      *
-     * @param context a <code>SeqSimilarityAdapter</code>.
+     * @param ssContext a <code>SeqSimilarityStAXAdapter</code>.
      *
-     * @return a <code>ContentHandler</code>.
+     * @return a <code>StAXContentHandler</code>.
      */
-    public ContentHandler getHandler(SeqSimilarityAdapter context);
+    public StAXContentHandler getHandler(SeqSimilarityStAXAdapter ssContext);
 }

@@ -86,7 +86,7 @@ import org.biojava.utils.ChangeVetoException;
  *     mixed hit strands</li>
  * </ul>
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class BlastLikeSearchBuilder implements SearchBuilder
@@ -130,7 +130,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
      *
      * @param target a <code>List</code>.
      */
-    public BlastLikeSearchBuilder(final List target)
+    public BlastLikeSearchBuilder(List target)
     {
         this.target = target;
 
@@ -170,7 +170,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
      * @param querySeqHolder a <code>SequenceDB</code> containing the
      * query sequence(s).
      */
-    public void setQuerySeqHolder(final SequenceDB querySeqHolder)
+    public void setQuerySeqHolder(SequenceDB querySeqHolder)
     {
         this.querySeqHolder = querySeqHolder;
     }
@@ -196,12 +196,12 @@ public class BlastLikeSearchBuilder implements SearchBuilder
      * @param subjectDBs a <code>SequenceDBInstallation</code>
      * containing the subject database(s)
      */
-    public void setSubjectDBInstallation(final SequenceDBInstallation subjectDBs)
+    public void setSubjectDBInstallation(SequenceDBInstallation subjectDBs)
     {
         this.subjectDBs = subjectDBs;
     }
 
-    public void setQuerySeq(final String querySeqId)
+    public void setQuerySeq(String querySeqId)
         throws BioException
     {
         if (querySeqHolder == null)
@@ -219,7 +219,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         querySeq = temp;
     }
 
-    public void setSubjectDB(final String subjectDBName)
+    public void setSubjectDB(String subjectDBName)
         throws BioException
     {
         if (subjectDBs == null)
@@ -240,7 +240,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         return moreSearchesAvailable;
     }
 
-    public void setMoreSearches(final boolean value)
+    public void setMoreSearches(boolean value)
     {
         moreSearchesAvailable = value;
     }
@@ -301,17 +301,17 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         }
     }
 
-    public void addSearchProperty(final Object key, final Object value)
+    public void addSearchProperty(Object key, Object value)
     {
         resultPreAnnotation.put(key, value);
     }
 
-    public void addHitProperty(final Object key, final Object value)
+    public void addHitProperty(Object key, Object value)
     {
         hitData.put(key, value);
     }
 
-    public void addSubHitProperty(final Object key, final Object value)
+    public void addSubHitProperty(Object key, Object value)
     {
         subHitData.put(key, value);
     }

@@ -28,17 +28,11 @@ import java.util.Map;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 import org.biojava.bio.search.SearchContentHandler;
-import org.biojava.bio.search.SeqSimilaritySearchHit;
-import org.biojava.bio.search.SeqSimilaritySearchResult;
-import org.biojava.bio.search.SeqSimilaritySearchSubHit;
-import org.biojava.bio.search.SequenceDBSearchSubHit;
-import org.biojava.bio.seq.StrandedFeature.Strand;
-import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.bio.symbol.SimpleAlignment;
+import org.biojava.utils.stax.SAX2StAXAdaptor;
 
 /**
  * A <code>SeqSimilarityAdapter</code> converts SAX events into method
@@ -49,64 +43,18 @@ import org.biojava.bio.symbol.SimpleAlignment;
  * <code>SearchContentHandler</code> interface, which will create
  * <code>SeqSimilaritySearchResult</code>s from the stream.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
-public class SeqSimilarityAdapter extends DefaultHandler
+public class SeqSimilarityAdapter implements ContentHandler
 {
-    // An empty/debugging handler
-    private static final ContentHandler empty = new DefaultHandler();
-
-    // SAX ContentHandler factories
-    private static Map hFactories = new HashMap();
-    // Acceptable element contexts
-    private static Map hContext = new HashMap();
-
-    // Stack of handler bindings
-    private List bStack;
-    // The currently operating binding
-    private HandlerBinding currentBinding;
-
-    // The name of the program which generated the results
-    private String program = "unknown";
-
-    static
-    {
-        // Associate SAX ContentHandler factories with elements
-        hFactories.put("BlastLikeDataSet", DataSetHandler.DATASET_HANDLER_FACTORY);
-        hFactories.put("RawOutput",        BlastDBQueryHandler.BLAST_DBQUERY_HANDLER_FACTORY);
-        hFactories.put("DatabaseId",       DatabaseIdHandler.DATABASE_ID_HANDLER_FACTORY);
-        hFactories.put("QueryId",          QueryIdHandler.QUERY_ID_HANDLER_FACTORY);
-        hFactories.put("Hit",              HitHandler.HIT_HANDLER_FACTORY);
-        hFactories.put("HitId",            HitIdHandler.HIT_ID_HANDLER_FACTORY);
-        hFactories.put("HitDescription",   HitDescHandler.HIT_DESC_HANDLER_FACTORY);
-        hFactories.put("HSPSummary",       SubHitSummaryHandler.SUBHIT_SUMMARY_HANDLER_FACTORY);
-        hFactories.put("QuerySequence",    AlignmentHandler.ALIGNMENT_HANDLER_FACTORY);
-        hFactories.put("HitSequence",      AlignmentHandler.ALIGNMENT_HANDLER_FACTORY);
-
-        // For elements which occur in more than one context, specify
-        // which context we are interested in:
-
-        // RawOutput only within Header
-        hContext.put("RawOutput",      "Header");
-        // HitId only within Hit
-        hContext.put("HitId",          "Hit");
-        // HitDescription only within Hit
-        hContext.put("HitDescription", "Hit");
-    }
-
-    /**
-     * The target handler
-     */
-    SearchContentHandler scHandler;
-
-    /**
-     * Creates a new <code>SeqSimilarityAdapter</code> object with an
-     * empty handler stack.
-     */
+    private SeqSimilarityStAXAdapter staxHandler;
+    private ContentHandler contentHandler;
+    
     public SeqSimilarityAdapter()
     {
-        bStack = new ArrayList();
+        staxHandler = new SeqSimilarityStAXAdapter();
+        contentHandler = new SAX2StAXAdaptor(staxHandler);
     }
 
     /**
@@ -117,7 +65,7 @@ public class SeqSimilarityAdapter extends DefaultHandler
      */
     public SearchContentHandler getSearchContentHandler()
     {
-        return scHandler;
+        return staxHandler.getSearchContentHandler();
     }
 
     /**
@@ -126,102 +74,72 @@ public class SeqSimilarityAdapter extends DefaultHandler
      *
      * @param scHandler a <code>SearchContentHandler</code>.
      */
-    public void setSearchContentHandler(final SearchContentHandler scHandler)
+    public void setSearchContentHandler(SearchContentHandler scHandler)
     {
-        this.scHandler = scHandler;
+        staxHandler.setSearchContentHandler(scHandler);
     }
 
-    /**
-     * <code>startElement</code> notifies of the start of an element.
-     *
-     * @param uri a <code>String</code>.
-     * @param localName a <code>String</code>.
-     * @param qName a <code>String</code>.
-     * @param attr an <code>Attributes</code> object.
-     *
-     * @exception SAXException if an error occurs.
-     */
-    public void startElement(String     uri,
-                             String     localName,
-                             String     qName,
-                             Attributes attr)
-        throws SAXException
+    public void startDocument() throws SAXException
     {
-        // Callbacks to SearchContentHandler interface
-        if (localName.equals("HSP"))
-            scHandler.startSubHit();
-        else if (localName.equals("Hit"))
-            scHandler.startHit();
-        else if (localName.equals("BlastLikeDataSet"))
-            scHandler.startSearch();
-        else if (localName.equals("BlastLikeDataSetCollection"))
-            scHandler.setMoreSearches(true);
-
-        // Check for a specific handler and element context
-        if (hFactories.containsKey(localName) && inContext(localName))
-        {
-            ContentHandler handler = ((SSPropHandlerFactory) hFactories
-                                      .get(localName)).getHandler(this);
-
-            // Make a new handler binding
-            currentBinding = new HandlerBinding(localName, handler);
-        }
-        else
-        {
-            // Make a binding to the empty handler
-            currentBinding = new HandlerBinding(localName, empty);
-        }
-
-        currentBinding.handler.startElement(uri, localName, qName, attr);
-        bStack.add(currentBinding);
+        contentHandler.startDocument();
     }
 
-    /**
-     * <code>endElement</code> notifies of the end of an element.
-     *
-     * @param uri a <code>String</code>.
-     * @param localName a <code>String</code>.
-     * @param qName a <code>String</code>.
-     *
-     * @exception SAXException if an error occurs.
-     */
-    public void endElement(String uri,
-                           String localName,
-                           String qName)
-        throws SAXException
+    public void endDocument() throws SAXException
     {
-        // Pop the current binding from the stack
-        currentBinding = (HandlerBinding) bStack.remove(bStack.size() - 1);
-        currentBinding.handler.endElement(uri, localName, qName);
-
-        // Callbacks to SearchContentHandler interface
-        if (localName.equals("HSP"))
-            scHandler.endSubHit();
-        else if (localName.equals("Hit"))
-            scHandler.endHit();
-        else if (localName.equals("BlastLikeDataSet"))
-            scHandler.endSearch();
-        else if (localName.equals("BlastLikeDataSetCollection"))
-            scHandler.setMoreSearches(false);
+        contentHandler.endDocument();
     }
 
-    /**
-     * <code>characters</code> notifies of character data.
-     *
-     * @param ch a <code>char []</code> array.
-     * @param start an <code>int</code>.
-     * @param length an <code>int</code>.
-     *
-     * @exception SAXException if an error occurs.
-     */
-    public void characters(char[] ch, int start, int length)
+    public void characters(char[] ch, int start, int end) throws SAXException
+    {
+	contentHandler.characters(ch, start, end);
+    }
+
+    public void ignorableWhitespace(char[] ch, int start, int end)
+	throws SAXException
+    {
+	contentHandler.ignorableWhitespace(ch, start, end);
+    }
+
+    public void startPrefixMapping(String prefix, String uri)
         throws SAXException
     {
-        if (bStack.isEmpty())
-            return;
+	contentHandler.startPrefixMapping(prefix, uri);
+    }
 
-        currentBinding = (HandlerBinding) bStack.get(bStack.size() - 1);
-        currentBinding.handler.characters(ch, start, length);
+    public void endPrefixMapping(String prefix) throws SAXException
+    {
+	contentHandler.endPrefixMapping(prefix);
+    }
+
+    public void processingInstruction(String target, String data)
+        throws SAXException
+    {
+	contentHandler.processingInstruction(target, data);
+    }
+
+    public void setDocumentLocator(Locator locator)
+    {
+	contentHandler.setDocumentLocator(locator);
+    }
+
+    public void skippedEntity(String name) throws SAXException
+    {
+	contentHandler.skippedEntity(name);
+    }
+
+    public void startElement(String     nsURI,
+			     String     localName,
+			     String     qName,
+			     Attributes attrs)
+	throws SAXException
+    {
+        contentHandler.startElement(nsURI, localName, qName, attrs);
+    }
+
+    public void endElement(String nsURI, String localName, String qName)
+        throws SAXException
+    {
+        contentHandler.endElement(nsURI, localName, qName);
     }
 
     /**
@@ -233,7 +151,7 @@ public class SeqSimilarityAdapter extends DefaultHandler
      */
     String getProgram()
     {
-        return program;
+        return staxHandler.getProgram();
     }
 
     /**
@@ -243,37 +161,8 @@ public class SeqSimilarityAdapter extends DefaultHandler
      * @param program a <code>String</code> indicating the progam
      * name.
      */
-    void setProgram(final String program)
+    void setProgram(String program)
     {
-        this.program = program;
-    }
-
-    /**
-     * <code>inContext</code> returns true if an element is found in
-     * the correct context (enclosing element) to be handled. This is
-     * used where an element may occur in several places, but should
-     * only be handled in a particular context.
-     *
-     * @param localName a <code>String</code> to check.
-     *
-     * @return a <code>boolean</code> value.
-     */
-    private boolean inContext(final String localName)
-    {
-        // If there is nothing specified for this context we assume it
-        // is good
-        if (! hContext.keySet().contains(localName))
-            return true;
-
-        String requiredContext = (String) hContext.get(localName);
-
-        // Look back down the stack to check that our context is good
-        for (int i = bStack.size(); --i > 0;)
-        {
-            if (((HandlerBinding) bStack.get(i)).name.equals(requiredContext))
-                return true;
-        }
-
-        return false;
+        staxHandler.setProgram(program);
     }
 }

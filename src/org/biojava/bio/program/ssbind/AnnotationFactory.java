@@ -37,7 +37,7 @@ import org.biojava.utils.ChangeVetoException;
  * search and homology builders. Now public to allow use by anyone
  * making custom handlers.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @author Thomas Down
  * @since 1.2
  */
