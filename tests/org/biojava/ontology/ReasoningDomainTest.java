@@ -83,7 +83,7 @@ extends TestCase {
     assertTrue(rDom5.getOntologies().contains(core));
   }
   
-  public void testReasoningOneNamespace()
+  public void testReasoningCoreNamespace()
   throws OntologyException, AlreadyExistsException, ChangeVetoException
   {
     Ontology core = OntoTools.getCoreOntology();
@@ -105,5 +105,41 @@ extends TestCase {
     assertTrue(coreD.isTrue(OntoTools.TRIPLE, OntoTools.SOURCE, OntoTools.HAS_A));
     assertFalse(coreD.isTrue(OntoTools.TRIPLE, OntoTools.REMOTE_TERM, OntoTools.HAS_A));
     assertTrue(coreD.isTrue(OntoTools.TRIPLE, OntoTools.ANY, OntoTools.HAS_A));
+  }
+  
+  public void testReasoningUserNamespace()
+      throws Exception
+  {
+      Ontology onto = new Ontology.Impl("biology", "Some random bits of biological knowledge");
+      
+      Term animal = onto.createTerm("animal", "Not vegetable or mineral");
+      Term mammal = onto.createTerm("mammal", "Homeothermic animals with mammary glands");
+      Term bird = onto.createTerm("bird", "Homeothermic animals which lay hard-shelled eggs");
+      Term cow = onto.createTerm("cow", "moo");
+      Term pig = onto.createTerm("pig", "oink");
+      Term isa = onto.importTerm(OntoTools.IS_A);
+      onto.createTriple(mammal, animal, isa);
+      onto.createTriple(cow, mammal, isa);
+      onto.createTriple(pig, mammal, isa);
+      onto.createTriple(bird, animal, isa);
+      
+      
+      Term organ = onto.createTerm("organ", "It's a bit of an animal");
+      Term has_organ = onto.createTerm("has_organ", "Animals have organs.  Yeah.");
+      onto.createTriple(animal, organ, has_organ);
+      onto.createTriple(has_organ, onto.importTerm(OntoTools.HAS_A), onto.importTerm(OntoTools.IS_A));
+      Term mammary_glands = onto.createTerm("mammary_glands", "mammals have these");
+      onto.createTriple(mammary_glands, organ, isa);
+      onto.createTriple(mammal, mammary_glands, has_organ);
+      
+      ReasoningDomain rd = new ReasoningDomain.Impl();
+      rd.addOntology(onto);
+      
+      assertTrue(rd.isTrue(cow, animal, OntoTools.IS_A));
+      assertTrue(rd.isTrue(bird, animal, OntoTools.IS_A));
+      assertFalse(rd.isTrue(pig, bird, OntoTools.IS_A));
+      
+      assertTrue(rd.isTrue(cow, mammary_glands, OntoTools.HAS_A));
+      assertFalse(rd.isTrue(bird, mammary_glands, OntoTools.HAS_A));
   }
 }
