@@ -60,7 +60,7 @@ public final class SequenceTools {
     String name,
     StrandedFeature.Strand strand
   ) throws IndexOutOfBoundsException, IllegalAlphabetException {
-    Sequence s = subSequence(seq, start, end, name, strand);
+    Sequence s = subSequence(seq, start, end, name);
     if(strand == StrandedFeature.NEGATIVE) {
       s = reverseComplement(s);
     }
