@@ -53,6 +53,7 @@ public class SixFrameRenderer
   private double blockWidth= 20.0;
   private Paint outline = Color.blue;
   private Paint fill = Color.red;
+  private Paint lines = Color.black;
 
   // the following ought to be exported elsewhere later
   // this is not threadsafe!
@@ -337,8 +338,12 @@ public class SixFrameRenderer
                 int base, 
                 StrandedFeature.Strand strand) {
 
+    Paint prevPaint = g.getPaint();
+    g.setPaint(lines);
+
     // compute the frame to use.
     int moduloFrame = base%3;
+
 //    System.out.println("drawLine: base,strand,modulo" + base + " " + strand + " " + moduloFrame);
     // get required offset for frame
     double offset = frameOffset(moduloFrame, strand);
@@ -355,6 +360,7 @@ public class SixFrameRenderer
       g.drawLine((int) offset, lineP,
                  (int)(offset + blockWidth), lineP);
     }
+    g.setPaint(prevPaint);
   }
 
   public void paint(
