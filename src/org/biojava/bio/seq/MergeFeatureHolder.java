@@ -160,10 +160,17 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
 		    results.put(filterResult, FeatureFilter.all);
 		}
 	    } else {
-		FeatureHolder filterResult = fh.filter(ff, false);
-		if (filterResult.countFeatures() > 0) {
-		    results.put(filterResult, new FeatureFilter.And(mf, ff));
+		FeatureHolder filterResult;
+		if (FilterUtils.areProperSubset(ff, mf)) {
+		    filterResult = fh;
+		} else {
+		    filterResult = fh.filter(ff, false);
+		    if (filterResult.countFeatures() == 0) {
+			continue;
+		    }
 		}
+
+		results.put(filterResult, new FeatureFilter.And(mf, ff));
 	    }
 	}
 

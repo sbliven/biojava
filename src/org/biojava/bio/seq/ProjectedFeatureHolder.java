@@ -58,6 +58,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
     private final int translate;
     private FeatureHolder projectedFeatures;
     private boolean oppositeStrand;
+    private boolean cachingProjections = true;
 
     private FeatureFilter filter;
 
@@ -124,7 +125,24 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 	wrapped.addChangeListener(underlyingFeaturesChange);
     }
 
-        /**
+    public boolean isCachingProjections() {
+	return cachingProjections;
+    }
+
+    /**
+     * Determine whether or not the projected features should be cached.
+     * This is a temporary optimization, and might go away once feature
+     * filtering is more intelligent.
+     *
+     * @since 1.2
+     */
+
+    public void setIsCachingProjections(boolean b) {
+	cachingProjections = b;
+	projectedFeatures = null;
+    }
+
+    /**
      * Construct a new FeatureHolder which projects a set of features
      * into a new coordinate system.  If <code>translation</code> is 0
      * and <code>oppositeStrand</code> is <code>false</code>, the features
@@ -151,28 +169,34 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
     }
 
     protected FeatureHolder getProjectedFeatures() {
-	if (projectedFeatures == null) {
-	    FeatureHolder toProject = wrapped;
-	    if (filter != null) {
-		toProject = toProject.filter(filter, false);
-	    }
+	if (projectedFeatures != null) {
+	    return projectedFeatures;
+	}
 
-	    SimpleFeatureHolder sfh = new SimpleFeatureHolder();
-	    for (Iterator i = toProject.features(); i.hasNext(); ) {
-		Feature f = (Feature) i.next();
-		Feature wf = projectFeature(f);
-		try {
-		    sfh.addFeature(wf);
-		} catch (ChangeVetoException cve) {
-		    throw new BioError(
-				       cve,
-			     "Assertion failure: Should be able to manipulate this FeatureHolder"
-				       );
-		}
+	FeatureHolder toProject = wrapped;
+	if (filter != null) {
+	    toProject = toProject.filter(filter, false);
+	}
+
+	SimpleFeatureHolder sfh = new SimpleFeatureHolder();
+	for (Iterator i = toProject.features(); i.hasNext(); ) {
+	    Feature f = (Feature) i.next();
+	    Feature wf = projectFeature(f);
+	    try {
+		sfh.addFeature(wf);
+	    } catch (ChangeVetoException cve) {
+		throw new BioError(
+				   cve,
+				   "Assertion failure: Should be able to manipulate this FeatureHolder"
+				   );
 	    }
+	}
+
+	if (cachingProjections) {
 	    projectedFeatures = sfh;
 	}
-	return projectedFeatures;
+
+	return sfh;
     }
 
     protected Feature projectFeature(Feature f) {
@@ -202,7 +226,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
     }
 
     public int countFeatures() {
-	return getProjectedFeatures().countFeatures();
+	return wrapped.countFeatures();
     }
 
     public Iterator features() {
