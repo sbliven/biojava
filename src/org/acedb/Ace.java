@@ -65,6 +65,7 @@ public class Ace {
      */
 
     static Database getDatabase(AceURL url) throws AceException {
+	url = rootURL(url);
 	Database db = (Database) databases.get(url);
 	if(db == null) {
 	    for(Iterator i = drivers.iterator(); i.hasNext(); ) {
@@ -88,6 +89,11 @@ public class Ace {
 	return db.fetch(url);
     }
 
+    public static Connection getConnection(AceURL url) throws AceException {
+	Database db = (Database) databases.get(url);
+	return db.getConnection();
+    }
+    
     /**
      * Get the root URL for a database.
      */
