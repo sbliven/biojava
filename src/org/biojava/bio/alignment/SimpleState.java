@@ -27,6 +27,7 @@ import org.biojava.bio.seq.*;
 
 public class SimpleState extends AbstractState {
   private Map residueToProb = new HashMap();
+    private int[] advance = {1};
   
   public double getWeight(Residue r) throws IllegalResidueException {
     alphabet().validate(r);
@@ -48,5 +49,9 @@ public class SimpleState extends AbstractState {
       modelTrainer.registerTrainerForState(this, new SimpleStateTrainer(this));
     }
   }
+
+    public int[] getAdvance() {
+	return advance;
+    }
 }
 

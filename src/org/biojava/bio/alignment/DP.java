@@ -538,6 +538,7 @@ public class DP {
   private static class MagicalState implements EmissionState {
     private char c;
     private Residue r;
+      private int[] advance = {1};
 
     public MagicalState(char c, Residue r) {
       this.c = c;
@@ -579,6 +580,10 @@ public class DP {
 
     public void registerWithTrainer(ModelTrainer modelTrainer) {
     }
+
+      public int[] getAdvance() {
+	  return advance;
+      }
   }
 
   private static class BackPointer {

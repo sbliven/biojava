@@ -64,4 +64,23 @@ public interface EmissionState extends State {
    * @return the residue sampled
    */
   public Residue sampleResidue() throws SeqException;
+
+    /**
+     * Determine the number of residues this state advances along
+     * one or more residue lists.  In the simple case, this method
+     * should almost always return {1} if it is a true `emmision'
+     * state, or {0} if it is a dot state which only emits a gap
+     * character.  For pairwise HMMs, it will normally return {1, 1}
+     * for match state, and {0, 1} or {1, 0} for a gap state.  Under
+     * some circumstances it may be valid to return values other
+     * than 1 or 0, but you should consider the consequences for
+     * HMM architecture very carefully.
+     *
+     * <P> 
+     * Note that the int array returned by this method should
+     * <em>never</em> be modified.
+     * </P>
+     */
+
+    public int[] getAdvance();
 }

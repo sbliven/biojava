@@ -34,6 +34,7 @@ import org.biojava.bio.seq.tools.DNATools;
  */
 public class DNAState extends AbstractState {
   private double [] scores;
+  private int[] advance = {1};
 
   {
     scores = new double[4];
@@ -66,6 +67,10 @@ public class DNAState extends AbstractState {
     }
   }
   
+    public int[] getAdvance() {
+	return advance;
+    }
+
   private class DNAStateTrainer implements StateTrainer {
     double c [] = new double[4];
       

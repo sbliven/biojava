@@ -158,6 +158,7 @@ public class WMAsMM implements MarkovModel {
   
   private class WMState extends AbstractState {
     private int index;
+      private int[] advance = {1};
     
     public int index() {
       return index;
@@ -180,6 +181,10 @@ public class WMAsMM implements MarkovModel {
       }
     }
     
+      public int[] getAdvance() {
+	return advance;
+      }
+      
     public WMState(int index) {
       super(queryAlphabet());
       this.index = index;

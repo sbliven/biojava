@@ -420,6 +420,10 @@ public class FlatModel implements MarkovModel {
       }
     }
     
+      public int[] getAdvance() {
+	  return wrappedState.getAdvance();
+      }
+
     public SimpleStateWrapper(EmissionState wrappedState, ModelInState modelInState) {
       super(modelInState.getSymbol(), modelInState.getName() + "-" + wrappedState.getName(), null);
       this.wrappedState = wrappedState;

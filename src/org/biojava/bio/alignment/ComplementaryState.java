@@ -74,6 +74,10 @@ public class ComplementaryState implements EmissionState {
     }
   }
   
+    public int[] getAdvance() {
+	return other.getAdvance();
+    }
+
   public ComplementaryState(EmissionState other) {
     this.other = other;
     this.cache = StateFactory.createState(other.alphabet());
