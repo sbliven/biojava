@@ -36,11 +36,6 @@ import org.biojava.bio.seq.io.*;
  * <P>
  * A non-atomic symbol is considered to be contained within this alphabet if
  * all of the atomic symbols that it could match are members of this alphabet.
- * <P>
- * The alphabet concept may need to be widened to include alphabets that extend
- * others, or checks to see if two alphabets are equivalent, or other set-wise
- * operations. As yet, I have baulked at this as it may make Alphabet too heavy
- * to easily implement.
  *
  * @author Matthew Pocock
  */
@@ -87,7 +82,7 @@ public interface Alphabet extends Annotatable {
 
   /**
    * Get a symbol from the Alphabet which corresponds
-   * to the specified ordered list of atomic symbols.
+   * to the specified ordered list of symbols.
    * <P>
    * The symbol at i in the list must be a member of the i'th alphabet in
    * getAlphabets. If all of the symbols in rl are attomic, then the resulting
@@ -106,7 +101,11 @@ public interface Alphabet extends Annotatable {
    * Get a symbol that represents the set of symbols in syms.
    * <P>
    * Syms must be a set of Symbol instances each of which is contained within
-   * this alphabet.
+   * this alphabet. This method is used to retrieve ambiguity symbols.
+   *
+   * @param syms  the Set of Symbols that will be found in getMatches of the
+   *            returned symbol
+   * @return a Symbol (possibly fly-weighted) for the Set of symbols in syms
    */
   public Symbol getAmbiguity(Set syms)
   throws IllegalSymbolException;

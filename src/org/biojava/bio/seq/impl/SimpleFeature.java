@@ -36,13 +36,14 @@ import org.biojava.bio.seq.*;
  * @author Thomas Down
  */
 
-public class SimpleFeature implements Feature, RealizingFeatureHolder, java.io.Serializable {
+public class SimpleFeature
+extends AbstractChangeable
+implements Feature, RealizingFeatureHolder, java.io.Serializable {
   /**
    * The FeatureHolder that we will delegate the FeatureHolder interface too.
    * This is lazily instantiated.
    */
   private SimpleFeatureHolder featureHolder;
-
 
   /**
    * The location of this feature.
@@ -205,10 +206,4 @@ public class SimpleFeature implements Feature, RealizingFeatureHolder, java.io.S
 	getFeatureHolder().addFeature(f);
 	return f;
     }
-    
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
-
 }

@@ -95,6 +95,7 @@ public final class AlphabetManager {
   }
     /**
     *Retrieve the symbol represented a String object
+    *
     *@param name of the string whose symbol you want to get
     * @throws NoSuchElementException if the string name is invalid.
     */
@@ -129,6 +130,17 @@ public final class AlphabetManager {
   /**
    * Get the special `gap' Symbol.
    * <P>
+   * The gap symbol is a Symbol that has an empty alphabet of matches. As such
+   *, ever alphabet contains gap, as there is no symbol that matches gap, so
+   * there is no case where an alphabet doesn't contain a symbol that matches
+   * gap.
+   * <P>
+   * Gap can be thought of as an empty sub-space within the space of all
+   * possible symbols. If you are working in a cross-product alphabet, you
+   * should chose wether to use gap to represent 'no symbol', or a basis symbol
+   * of the apropreate size built entirely of gaps to represent 'no symbol in
+   * each of the slots'. Perhaps this could be explained better.
+   *
    * @return the system-wide symbol that represents a gap
    */
   static public Symbol getGapSymbol() {
@@ -137,6 +149,14 @@ public final class AlphabetManager {
 
   /**
    * Generate a new AtomicSymbol instance with a token, name and Annotation.
+   * <P>
+   * Use this method if you wish to create an AtomicSymbol instance. Initialy it
+   * will not be a member of any alphabet.
+   *
+   * @param token  the Char token returned by getToken()
+   * @param name  the String returned by getName()
+   * @param annotatin the Annotation returned by getAnnotation()
+   * @return a new AtomicSymbol instance
    */
   static public AtomicSymbol createSymbol(
     char token, String name, Annotation annotation
@@ -148,6 +168,9 @@ public final class AlphabetManager {
   /**
    * Generates a new Symbol instance that represents the tuple of Symbols in
    * symList.
+   * <P>
+   * This method is most usefull for writing Alphabet implementations. It should
+   * not be invoked by casual users. Use alphabet.getSymbol(List) instead.
    *
    * @param token   the Symbol's token
    * @param symList a list of Symbol objects
@@ -228,6 +251,9 @@ public final class AlphabetManager {
   /**
    * Generates a new Symbol instance that represents the tuple of Symbols in
    * symList.
+   * <P>
+   * This method is most usefull for writing Alphabet implementations. It should
+   * not be invoked by users. Use alphabet.getSymbol(Set) instead.
    *
    * @param token   the Symbol's token
    * @param name    the Symbol's name
@@ -389,6 +415,9 @@ public final class AlphabetManager {
   /**
    * Retrieve a CrossProductAlphabet instance over the alphabets in aList.
    * <P>
+   * This method is most usefull for implementors of cross-product alphabets,
+   * allowing them to safely build the matches alphabets for ambiguity symbols.
+   * <P>
    * If all of the alphabets in aList implements FiniteAlphabet then the
    * method will return a FiniteAlphabet. Otherwise, it returns a non-finite
    * alphabet.
@@ -488,9 +517,13 @@ public final class AlphabetManager {
   }
   
   /**
-   * Return a list of BasisSymbol instances that uniquely sum up all AtomicSymbo
+   * Return a list of BasisSymbol instances that uniquely sum up all
+   * AtomicSymbol
    * instances in symSet. If the symbol can't be represented by a single list of
    * BasisSymbol instances, return null.
+   * <P>
+   * This method is most usefull for implementers of Alphabet and Symbol. It
+   * probably should not be invoked by users.
    *
    * @param symSet  the Set of AtomicSymbol instances
    * @param alpha   the Alphabet instance that the Symbols are from
@@ -832,13 +865,9 @@ public final class AlphabetManager {
    * The class representing the Gap symbol.
    * <P>
    * The gap is quite special. It is an ambiguity symbol with an empty alphabet.
-   * This means that it notionaly represents an unfilled slot in a sequence. It
-   * is identical to gap^n, so it is a CrossProductSymbol with an infinite list
-   * of child symbols, each being itself. It should be a singleton, hence the
+   * This means that it notionaly represents an unfilled slot in a sequence. 
+   * It should be a singleton, hence the
    * placement in AlphabetManager and also the method normalize.
-   * <P>
-   * Basicaly, this is a bit of a mess. We need to put our head together and
-   * figure out what is going on.
    *
    * @author Matthew Pocock
    */

@@ -36,6 +36,7 @@ import java.util.*;
  */
 
 public class SubSequence implements Sequence {
+    private Sequence parent;
     private SymbolList symbols;
     private FeatureHolder features;
     private String name;
@@ -52,8 +53,11 @@ public class SubSequence implements Sequence {
      */
 
     public SubSequence(Sequence seq, int start, int end) {
+        this.parent = seq;
 	symbols = seq.subList(start, end);
-	FeatureFilter overlapping = new FeatureFilter.OverlapsLocation(new RangeLocation(start, end));
+	FeatureFilter overlapping = new FeatureFilter.OverlapsLocation(
+                new RangeLocation(start, end)
+        );
 	features = new ProjectedFeatureHolder(seq,
 					      overlapping,
 					      this,
@@ -163,6 +167,7 @@ public class SubSequence implements Sequence {
     private transient ChangeListener forwarder;
 
     protected void allocChangeSupport() {
+      changeSupport = new ChangeSupport();
 	forwarder = new ChangeListener() {
 		public void preChange(ChangeEvent ev)
 		    throws ChangeVetoException
@@ -191,15 +196,17 @@ public class SubSequence implements Sequence {
     }
 
     public void addChangeListener(ChangeListener cl) {
-	if (changeSupport == null)
-	    allocChangeSupport();
-	changeSupport.addChangeListener(cl);
+      if (changeSupport == null) {
+        allocChangeSupport();
+      }
+      changeSupport.addChangeListener(cl);
     }
 
     public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	if (changeSupport == null)
-	    allocChangeSupport();
-	changeSupport.addChangeListener(cl, ct);
+      if (changeSupport == null) {
+        allocChangeSupport();
+      }
+      changeSupport.addChangeListener(cl, ct);
     }
 
     public void removeChangeListener(ChangeListener cl) {
@@ -215,4 +222,7 @@ public class SubSequence implements Sequence {
 	}
     }
     
+    public Sequence getParent() {
+      return this.parent;
+    }
 }
