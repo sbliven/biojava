@@ -43,7 +43,7 @@ import org.biojava.bio.symbol.*;
  */
 public final class RNATools {
   private static final ReversibleTranslationTable complementTable;
-  private static final ReversibleTranslationTable transcriptionTable;
+  private static final SimpleReversibleTranslationTable transcriptionTable;
   static private final FiniteAlphabet rna;
   static private final Map geneticCodes;
 
@@ -83,7 +83,12 @@ public final class RNATools {
 	  }
       }
       complementTable = new RNAComplementTranslationTable();
-      transcriptionTable = new TranscriptionTable();
+      
+      transcriptionTable = new SimpleReversibleTranslationTable(DNATools.getDNA(), rna);
+      transcriptionTable.setTranslation(DNATools.a(), a);
+      transcriptionTable.setTranslation(DNATools.c(), c);
+      transcriptionTable.setTranslation(DNATools.g(), g);
+      transcriptionTable.setTranslation(DNATools.t(), u);
 
       geneticCodes = new HashMap();
       loadGeneticCodes();
@@ -493,39 +498,6 @@ public final class RNATools {
 	  public Alphabet getTargetAlphabet() {
 	    return RNATools.getRNA();
 	  }
-  }
-
-  /**
-   * Sneaky class for converting DNA->RNA.
-   */
-
-  private static class TranscriptionTable
-  extends AbstractTT {
-    public AtomicSymbol doTranslate(AtomicSymbol s)
-    throws IllegalSymbolException {
-      if(s == DNATools.t()) {
-        return RNATools.u();
-      }
-      DNATools.getDNA().validate(s);
-      return s;
-    }
-
-    public AtomicSymbol doUntranslate(AtomicSymbol s)
-    throws IllegalSymbolException {
-      if(s == RNATools.u()) {
-        return DNATools.t();
-      }
-      RNATools.getRNA().validate(s);
-      return s;
-    }
-
-    public Alphabet getSourceAlphabet() {
-      return DNATools.getDNA();
-    }
-
-    public Alphabet getTargetAlphabet() {
-      return RNATools.getRNA();
-    }
   }
 }
 
