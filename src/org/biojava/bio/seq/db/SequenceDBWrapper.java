@@ -37,7 +37,7 @@ import org.biojava.bio.seq.*;
 public abstract class SequenceDBWrapper extends AbstractSequenceDB
 implements java.io.Serializable{
   private final SequenceDB parent;
-  private SequencesForwarder seqFor;
+  private transient SequencesForwarder seqFor;
   
   protected void generateChangeSupport(ChangeType ct) {
     super.generateChangeSupport(ct);
@@ -57,7 +57,7 @@ implements java.io.Serializable{
     return this.parent;
   }
   
-  protected class SequencesForwarder extends ChangeAdapter {
+  protected class SequencesForwarder extends ChangeForwarder {
     public SequencesForwarder(Object source, ChangeSupport cs) {
       super(source, cs);
     }

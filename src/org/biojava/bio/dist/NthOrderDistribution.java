@@ -19,7 +19,7 @@ public class NthOrderDistribution extends AbstractDistribution implements Serial
   private Map dists;
   private Distribution nullModel;
   
-  protected WeigthForwarder weightForwarder = null;
+  protected transient WeigthForwarder weightForwarder = null;
   
   protected void generateChangeSupport(ChangeType ct) {
     super.generateChangeSupport(ct);
@@ -182,7 +182,7 @@ public class NthOrderDistribution extends AbstractDistribution implements Serial
     }
   }
   
-  private class WeigthForwarder extends ChangeAdapter implements Serializable {
+  private class WeigthForwarder extends ChangeForwarder {
     public WeigthForwarder(Object source, ChangeSupport cs) {
       super(source, cs);
     }

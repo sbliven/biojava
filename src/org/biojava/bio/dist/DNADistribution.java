@@ -39,7 +39,7 @@ public final class DNADistribution
 extends AbstractDistribution implements Serializable {
   private double [] scores;
   private Distribution nullModel;
-  private ChangeListener nullModelListener; 
+  private transient ChangeListener nullModelListener; 
   
   {
     scores = new double[4];

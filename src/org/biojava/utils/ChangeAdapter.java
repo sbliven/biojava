@@ -21,49 +21,14 @@
 package org.biojava.utils;
 
 /**
- * This is a ChangeListener that is designed to adapt events of one type from
- * one source to events of another type emitted by another source. For example,
- * you could adapt events made by edits in a database to being events fired by
- * a sequence implementation.
+ * This is a ChangeListener that ignores everything. This is a usefull
+ * base-class for throw-a-way ChangeListener objects in a similar veign to
+ * MouseAdapter ect..
  *
  * @author Matthew Pocock
  */
-public abstract class ChangeAdapter implements ChangeListener {
-  private final Object source;
-  private final transient ChangeSupport changeSupport;
+public class ChangeAdapter implements ChangeListener {
+  public void preChange(ChangeEvent ce) {}
   
-  public ChangeAdapter(Object source, ChangeSupport changeSupport) {
-    this.source = source;
-    this.changeSupport = changeSupport;
-  }
-  
-  public Object getSource() { return source; }
-  public ChangeSupport changeSupport() { return changeSupport; }
-  
-  /**
-   * Return the new event to represent the originating event ce.
-   * <P>
-   * The returned ChangeEvent is the event that will be fired, and should be
-   * built from information in the original event. If it is null, then no event
-   * will be fired.
-   *
-   * @param ce  the originating ChangeEvent
-   * @return a new ChangeEvent to pass on, or null if no event should be sent
-   */
-  protected abstract ChangeEvent generateEvent(ChangeEvent ce);
-    
-  public void preChange(ChangeEvent ce)
-  throws ChangeVetoException {
-    ChangeEvent nce = generateEvent(ce);
-    if(nce != null) {
-      changeSupport.firePreChangeEvent(nce);
-    }
-  }
-  
-  public void postChange(ChangeEvent ce) {
-    ChangeEvent nce = generateEvent(ce);
-    if(nce != null) {
-      changeSupport.firePostChangeEvent(nce);
-    }
-  }
+  public void postChange(ChangeEvent ce) {}
 }

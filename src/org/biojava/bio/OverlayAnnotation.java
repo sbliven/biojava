@@ -43,7 +43,7 @@ public class OverlayAnnotation implements Annotation {
    * The object to do the hard work of informing others of changes.
    */
   protected transient ChangeSupport changeSupport = null;
-  private ChangeListener propertyForwarder = null;
+  private transient ChangeListener propertyForwarder = null;
 
   private Annotation parent;
   private Map overlay;
@@ -324,7 +324,7 @@ public class OverlayAnnotation implements Annotation {
     }
   }
   
-  protected class PropertyForwarder extends ChangeAdapter {
+  protected class PropertyForwarder extends ChangeForwarder {
     public PropertyForwarder(Object source, ChangeSupport cs) {
       super(source, cs);
     }

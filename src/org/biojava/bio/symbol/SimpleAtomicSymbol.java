@@ -37,7 +37,7 @@ public class SimpleAtomicSymbol implements AtomicSymbol {
   private final SingletonAlphabet alphabet;
 
   protected transient ChangeSupport changeSupport = null;
-  protected Annotatable.AnnotationForwarder annotationForwarder = null;
+  protected transient Annotatable.AnnotationForwarder annotationForwarder = null;
   
   public SimpleAtomicSymbol(char token, String name, Annotation annotation) {
     if(annotation == null) {

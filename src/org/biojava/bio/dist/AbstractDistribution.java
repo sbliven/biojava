@@ -49,7 +49,7 @@ import org.biojava.bio.symbol.*;
 
 public abstract class AbstractDistribution implements Distribution {
   protected transient ChangeSupport changeSupport = null;
-  protected Distribution.NullModelForwarder nullModelForwarder = null;
+  protected transient Distribution.NullModelForwarder nullModelForwarder = null;
   
   protected void generateChangeSupport(ChangeType ct) {
     if(changeSupport == null) {

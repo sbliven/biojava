@@ -63,7 +63,7 @@ public interface Annotatable extends Changeable {
    *
    * @author Matthew Pocock
    */
-  static class AnnotationForwarder extends ChangeAdapter {
+  static class AnnotationForwarder extends ChangeForwarder {
     public AnnotationForwarder(Object source, ChangeSupport cs) {
       super(source, cs);
     }

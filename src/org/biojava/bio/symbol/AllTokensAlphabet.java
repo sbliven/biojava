@@ -48,7 +48,7 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
   private Annotation annotation;
   
   protected transient ChangeSupport changeSupport = null;
-  protected Annotatable.AnnotationForwarder annotationForwarder = null;
+  protected transient Annotatable.AnnotationForwarder annotationForwarder = null;
 
   /**
    * Adds a symbol to the alphabet

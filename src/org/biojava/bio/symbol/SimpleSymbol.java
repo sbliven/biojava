@@ -39,7 +39,7 @@ public class SimpleSymbol implements Symbol, Serializable {
   private Alphabet matches;
   
   protected transient ChangeSupport changeSupport = null;
-  protected Annotatable.AnnotationForwarder annotationForwarder = null;
+  protected transient Annotatable.AnnotationForwarder annotationForwarder = null;
   
   protected void generateChangeSupport(ChangeType ct) {
     changeSupport = new ChangeSupport();

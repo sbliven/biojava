@@ -96,7 +96,7 @@ implements Distribution, Serializable {
   private final Distribution other;
   private final ReversibleTranslationTable table;
   protected transient ChangeSupport changeSupport = null;
-  private final ChangeListener forwarder = new Forwarder();
+  private transient ChangeListener forwarder = new Forwarder();
   
   public void addChangeListener(ChangeListener cl) {
     if(changeSupport == null) {
