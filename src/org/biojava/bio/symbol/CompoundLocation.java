@@ -40,9 +40,10 @@ import org.biojava.bio.*;
  * @author Thomas Down
  * @author Greg Cox
  */
-public class CompoundLocation
-extends AbstractLocation
-implements Location, Serializable {
+
+public class CompoundLocation extends AbstractLocation
+      implements Location, Serializable 
+{
   /**
    * The list of child locations in order. Should contain only RangeLocation
    * instances.
@@ -58,13 +59,6 @@ implements Location, Serializable {
    * Maximum index contained.
    */
   private int max = Integer.MIN_VALUE;
-
-  /**
-   * Set up the member variables.
-   */
-  {
-    locations = new ArrayList();
-  }
 
   /**
    * <p>
@@ -85,13 +79,14 @@ implements Location, Serializable {
    *        compound location
    */
   CompoundLocation(List locs) {
-    Location minL = (Location) locs.get(0);
-    Location maxL = (Location) locs.get(locs.size() - 1);
-    this.locations.addAll(locs);
+    this.locations = new ArrayList(locs);
     Collections.sort(locations, Location.naturalOrder);
+    locations = Collections.unmodifiableList(locations);
 
+    Location minL = (Location) locations.get(0);
+    Location maxL = (Location) locations.get(locs.size() - 1);
     this.min = minL.getMin();
-    this.max = maxL.getMax();;
+    this.max = maxL.getMax();
   }
 
 
@@ -183,6 +178,10 @@ implements Location, Serializable {
   public boolean isContiguous() {
     return locations.size() <= 1;
   }
+
+    List getBlockList() {
+	return locations;
+    }
 
   public Iterator blockIterator() {
     return locations.iterator();

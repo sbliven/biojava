@@ -1,9 +1,32 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import org.biojava.bio.*;
 
 /**
  * Repository for binary operators on Location instances.
+ *
  * @author Matthew Pocock
  * @author Greg Cox
  * @author Thomas Down
@@ -80,124 +103,290 @@ final public class LocationTools {
 
     if(isDecorated(locA) || isDecorated(locB))
     {
-                handleDecorations(locA, locB);
-                if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
-                {
-                        return BetweenLocationTools.intersection(locA, locB);
-                }
+	handleDecorations(locA, locB);
+	if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
+	    {
+		return BetweenLocationTools.intersection(locA, locB);
+	    }
     }
     if(locA.isContiguous() && locB.isContiguous()) {
-      // handle easy case of solid locations
-      if(locA.overlaps(locB)) {
-        int min = Math.max(locA.getMin(), locB.getMin());
-        int max = Math.min(locA.getMax(), locB.getMax());
-        return buildLoc(min, max);
-      } else {
-        return Location.empty;
-      }
+	// handle easy case of solid locations
+	// Ought to make this bit more efficient --THOMASD
+	if (LocationTools.contains(locA, locB)) {
+	    return locB;
+	} else if (LocationTools.contains(locB, locA)) {
+	    return locA;
+	} if(LocationTools.overlaps(locA, locB)) {
+	    int min = Math.max(locA.getMin(), locB.getMin());
+	    int max = Math.min(locA.getMax(), locB.getMax());
+	    return buildLoc(min, max);
+	} else {
+	    return Location.empty;
+	}
     } else {
+	// One or other of the locations is compound. Build a list of all
+	// locations created by finding intersection of all pairwise combinations
+	// of blocks in locA and locB. Ignore all Location.empty. Create the
+	// appropriate Location instance.
+	List locList = new ArrayList();
+	
+	List blA = getBlockList(locA);
+	{
+	    int minBlock = blockContainingOrFollowingPoint(blA, locB.getMin());
+	    int maxBlock = blockContainingOrPreceedingPoint(blA, locB.getMax());
+	    if (minBlock == -1 || maxBlock == -1) {
+		return Location.empty;
+	    } 
+	    blA = blA.subList(minBlock, maxBlock + 1);
+	}
+	List blB = getBlockList(locB);
+	{
+	    int minBlock = blockContainingOrFollowingPoint(blB, locA.getMin());
+	    int maxBlock = blockContainingOrPreceedingPoint(blB, locA.getMax());
+	    if (minBlock == -1 || maxBlock == -1) {
+		return Location.empty;
+	    } 
+	    blB = blB.subList(minBlock, maxBlock + 1);
+	}
 
-      // One or other of the locations is compound. Build a list of all
-      // locations created by finding intersection of all pairwise combinations
-      // of blocks in locA and locB. Ignore all Location.empty. Create the
-      // appropriate Location instance.
-      List locList = new ArrayList();
-      Iterator aI = locA.blockIterator();
-      while(aI.hasNext()) {
-        Location a = (Location) aI.next();
-        Iterator bI = locB.blockIterator();
-        while(bI.hasNext()) {
-          Location b = (Location) bI.next();
-          Location bIn = LocationTools.intersection(a, b);
-          if(bIn != Location.empty) {
-            locList.add(bIn);
-          }
-        }
-      }
+	if (blA.size() > blB.size()) {
+	    List temp = blA;
+	    blA = blB;
+	    blB = temp;
+	}
 
-      return buildLoc(locList);
+	for (Iterator i = blA.iterator(); i.hasNext(); ) {
+	    Location blocA = (Location) i.next();
+	    int minHitIndex = blockContainingOrFollowingPoint(blB, blocA.getMin());
+	    int maxHitIndex = blockContainingOrPreceedingPoint(blB, blocA.getMax());
+	    for (int hitIndex = minHitIndex; hitIndex <= maxHitIndex; ++hitIndex) {
+		Location blocB = (Location) blB.get(hitIndex);
+		locList.add(LocationTools.intersection(blocA, blocB));
+	    }
+	}
+
+	return buildLoc(locList);
     }
   }
 
-  /**
-   * Returns whether the two locations overlap or not.
-   * <p>
-   * Two locations overlap if they contain at least one index in common.
-   *
-   * @param locA  the first Location
-   * @param locB  the second Location
-   * @param return true if they overlap, false otherwise
-   */
-  public static boolean overlaps(Location locA, Location locB) {
+    /**
+     * Return an ordered list of non-overlapping blocks of a location
+     * (singleton list for contiguous locations, empty list for empty locations)
+     */
+
+    private static List getBlockList(Location l) {
+	if (l == Location.empty) {
+	    return Collections.EMPTY_LIST;
+	} else if (l instanceof CompoundLocation) {
+	    return ((CompoundLocation )l).getBlockList();
+	} else if (l.isContiguous()) {
+	    return Collections.nCopies(1, l);
+	} else {
+	    List bl = new ArrayList();
+	    for (Iterator bi = l.blockIterator(); bi.hasNext(); ) {
+		bl.add(bi.next());
+	    }
+	    Collections.sort(bl, Location.naturalOrder);
+	    return bl;
+	}
+    }
+
+    /**
+     * Return the index into <code>bl</code> of a block containing
+     * <code>point</code>, or -1 if it is not found.
+     */
+
+    private static int blockContainingPoint(List bl, int point) {
+	int start = 0;
+	int end = bl.size() - 1;
+	
+	while (start <= end) {
+	    int mid = (start + end) / 2;
+	    Location block = (Location) bl.get(mid);
+	    if (block.contains(point)) {
+		return mid;
+	    } else if (point < block.getMin()) {
+		end = mid - 1;
+	    } else if (point > block.getMax()) {
+		start = mid + 1;
+	    } else {
+		throw new BioError("Assertion failed: overrun in binary search");
+	    }
+	}
+	return -1;
+    }
+
+    /**
+     * Return the index of the block containing <code>point</code>, if it exists,
+     * or the block preceeding it.
+     */
+
+    private static int blockContainingOrPreceedingPoint(List bl, int point) {
+	// System.err.println("COPP");
+	int start = 0;
+	int length = bl.size();
+	int end = length - 1;
+	
+	while (start <= end) {
+	    int mid = (start + end) / 2;
+	    // System.err.println("Start=" + start + " mid=" + mid + " end=" + end);
+	    Location block = (Location) bl.get(mid);
+	    if (block.contains(point)) {
+		return mid;
+	    } else if (point < block.getMin()) {
+		end = mid - 1;
+	    } else if (point > block.getMax()) {
+		start = mid + 1;
+	    } else {
+		throw new BioError("Assertion failed: overrun in binary search");
+	    }
+	}
+
+	if (end < length) {
+	    return end;
+	} else {
+	    return -1;
+	}
+    }
+
+    /**
+     * Return the index of the block containing <code>point</code>, if it exists,
+     * or the block preceeding it.
+     */
+
+    private static int blockContainingOrFollowingPoint(List bl, int point) {
+	// System.err.println("COFP");
+	int start = 0;
+	int length = bl.size();
+	int end = length - 1;
+	
+	while (start <= end) {
+	    int mid = (start + end) / 2;
+	    // System.err.println("Start=" + start + " mid=" + mid + " end=" + end);
+	    Location block = (Location) bl.get(mid);
+	    if (block.contains(point)) {
+		return mid;
+	    } else if (point < block.getMin()) {
+		end = mid - 1;
+	    } else if (point > block.getMax()) {
+		start = mid + 1;
+	    } else {
+		throw new BioError("Assertion failed: overrun in binary search");
+	    }
+	}
+	if (start >= 0) {
+	    return start;
+	} else {
+	    return -1;
+	}
+    }
+
+    /**
+     * Returns whether the two locations overlap or not.
+     * <p>
+     * Two locations overlap if they contain at least one index in common.
+     *
+     * @param locA  the first Location
+     * @param locB  the second Location
+     * @param return true if they overlap, false otherwise
+     */
+
+    public static boolean overlaps(Location locA, Location locB) {
         if(isDecorated(locA) || isDecorated(locB))
         {
-                handleDecorations(locA, locB);
-                if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
+	    handleDecorations(locA, locB);
+	    if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
                 {
-                        return BetweenLocationTools.overlaps(locA, locB);
+		    return BetweenLocationTools.overlaps(locA, locB);
                 }
         }
-    if(locA.isContiguous() && locB.isContiguous()) {
-      // if they are both solid, return whether the extents overlap
-      return !(
-        (locA.getMax() < locB.getMin()) ||
-        (locA.getMin() > locB.getMax())
-      );
-    } else {
-      // one or the other is compound. Return true if any of the regions of one
-      // location overlap with any of the regions of the other.
-      for(Iterator aI = locA.blockIterator(); aI.hasNext(); ) {
-        Location a = (Location) aI.next();
-        for(Iterator bI = locB.blockIterator(); bI.hasNext(); ) {
-          Location b = (Location) bI.next();
-          if(LocationTools.overlaps(a, b)) {
-            return true;
-          }
-        }
-      }
 
-      // could find no overlapping regions - return false.
-      return false;
+	if(locA.isContiguous() && locB.isContiguous()) {
+	    // if they are both solid, return whether the extents overlap
+	    return !(
+		     (locA.getMax() < locB.getMin()) ||
+		     (locA.getMin() > locB.getMax())
+		     );
+	} else {
+	    // System.err.println("Doing complex overlap stuff");
+
+	    List blA = getBlockList(locA);
+	    {
+		// System.err.println("In A restriction");
+		int minBlock = blockContainingOrFollowingPoint(blA, locB.getMin());
+		int maxBlock = blockContainingOrPreceedingPoint(blA, locB.getMax());
+		if (minBlock == -1 || maxBlock == -1) {
+		    // System.err.println("blA empty: minBlock=" + minBlock +", maxBlock=" + maxBlock);
+		    return false;
+		} 
+		blA = blA.subList(minBlock, maxBlock + 1);
+	    }
+	    List blB = getBlockList(locB);
+	    {
+		// System.err.println("In B restriction");
+		int minBlock = blockContainingOrFollowingPoint(blB, locA.getMin());
+		int maxBlock = blockContainingOrPreceedingPoint(blB, locA.getMax());
+		if (minBlock == -1 || maxBlock == -1) {
+		    // System.err.println("blB empty: minBlock=" + minBlock +", maxBlock=" + maxBlock);
+		    return false;
+		} 
+		blB = blB.subList(minBlock, maxBlock + 1);
+	    }
+
+	    // System.err.println("Restricted lists");
+
+	    for(Iterator aI = blA.iterator(); aI.hasNext(); ) {
+		Location a = (Location) aI.next();
+		for(Iterator bI = blB.iterator(); bI.hasNext(); ) {
+		    Location b = (Location) bI.next();
+		    if(LocationTools.overlaps(a, b)) {
+			return true;
+		    }
+		}
+	    }
+
+	    return false;
+	}
     }
-  }
 
     /**
      * Return <code>true</code> iff <code>locB</code> is contained
      * entirely within <code>locA</code>.
      */
 
-  public static boolean contains(Location locA, Location locB) {
+    public static boolean contains(Location locA, Location locB) {
         if(isDecorated(locA) || isDecorated(locB))
         {
-                handleDecorations(locA, locB);
-                if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
+	    handleDecorations(locA, locB);
+	    if(BetweenLocationTools.isBetween(locA) || (BetweenLocationTools.isBetween(locB)))
                 {
-                        return BetweenLocationTools.contains(locA, locB);
+		    return BetweenLocationTools.contains(locA, locB);
                 }
         }
-    if(locA.isContiguous() && locB.isContiguous()) {
-      // both solid - check the extents
-      return
-        (locA.getMin() <= locB.getMin()) &&
-        (locA.getMax() >= locB.getMax());
-    } else {
-      // chech that every block in locB is contained by a block in locA.
-     OUTER:
-      for(Iterator bI = locB.blockIterator(); bI.hasNext(); ) {
-        Location b = (Location) bI.next();
-        for(Iterator aI = locA.blockIterator(); aI.hasNext(); ) {
-          Location a = (Location) aI.next();
-          if(LocationTools.contains(a, b)) {
-            continue OUTER;
-          }
-        }
-        // this block is not contained therefore b is not contained within a.
-        return false;
-      }
 
-      return true;
+	if (locA.getMin() <= locB.getMin() && locA.getMax() >= locB.getMax()) {
+	    if (locA.isContiguous()) {
+		return true;
+	    } else {
+		List blA = getBlockList(locA);
+		for (Iterator biB = locB.blockIterator(); biB.hasNext(); ) {
+		    Location bloc = (Location) biB.next();
+		    int hitIndex = blockContainingPoint(blA, bloc.getMin());
+		    if (hitIndex < 0) {
+			return false;
+		    } else {
+			Location hitBloc = (Location) blA.get(hitIndex);
+			if (bloc.getMax() > hitBloc.getMax()) {
+			    return false;
+			}
+		    }
+		}
+		return true;
+	    }
+	} else {
+	    return false;
+	}
     }
-  }
 
   /**
    * Return whether two locations are equal.
