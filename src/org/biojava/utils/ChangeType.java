@@ -59,7 +59,6 @@ import java.lang.reflect.*;
  *
  * @author     Thomas Down
  * @author     Matthew Pocock
- * @created    September 29, 2000 
  * @since      1.1 
  */
 

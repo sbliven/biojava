@@ -39,7 +39,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Line2D;
 
-
 import org.biojava.bio.symbol.SymbolList;
 
 /**
@@ -49,7 +48,7 @@ import org.biojava.bio.symbol.SymbolList;
  * @author Matthew Pocock
  * @author Thomas Down
  * @author David Huen
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  */
 public class SymbolSequenceRenderer implements SequenceRenderer
 {
@@ -76,7 +75,7 @@ public class SymbolSequenceRenderer implements SequenceRenderer
         return 0.0;
     }
 
-    public void paint(final Graphics2D g2, final SequenceRenderContext context)
+    public void paint(Graphics2D g2, SequenceRenderContext context)
     {
         Rectangle2D prevClip = g2.getClipBounds();
         AffineTransform prevTransform = g2.getTransform();
@@ -151,9 +150,9 @@ public class SymbolSequenceRenderer implements SequenceRenderer
         g2.setTransform(prevTransform);
     }
 
-    public SequenceViewerEvent processMouseEvent(final SequenceRenderContext context,
-                                                 final MouseEvent            me,
-                                                 final List                  path)
+    public SequenceViewerEvent processMouseEvent(SequenceRenderContext context,
+                                                 MouseEvent            me,
+                                                 List                  path)
     {
         path.add(this);
         int sPos = context.graphicsToSequence(me.getPoint());

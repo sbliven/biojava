@@ -35,7 +35,7 @@ import org.biojava.bio.BioException;
  * <code>SeqFileFormerFactory</code> are present as inner classes
  * within <code>SeqFileFormer</code> implementations.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @author Greg Cox
  * @since 1.2
  * @see <code>SequenceFormat</code>
@@ -46,23 +46,19 @@ public abstract class SeqFileFormerFactory
     private static Map factories = new HashMap();
 
     /**
-     * <p>
-     * <code>addFactory</code> installs the static factories
+     * <p<code>addFactory</code> installs the static factories
      * subclassed from <code>SeqFileFormerFactory</code> into its
      * factories hash, indexed by file format name. This method is
      * called from within a static block in each implementation of
      * <code>SeqFileFormer</code>. Thus, when the class is dynamically
-     * loaded its factory is automatically installed.
-     * </p>
+     * loaded its factory is automatically installed.</p>
      *
-     * <p>
-     * The valid arguments are described in the public static final
+     * <p>The valid arguments are described in the public static final
      * <code>Map</code> </code>SequenceFormat.FORMATS</code>. Those
      * currently available are Embl or Genbank. Capitalization is
-     * important.
-     * </p>
-     * <p>
-     * How the public methods see this depends on the
+     * important.</p>
+     *
+     * <p>How the public methods see this depends on the
      * implementation of <code>SequenceFormat</code>; see the
      * <code>writeSequence</code> method in each
      * implementation. Current implementations are
@@ -70,8 +66,7 @@ public abstract class SeqFileFormerFactory
      * argument to <code>writeSequence</code> using
      * <code>equalsIgnoreCase()</code> before calling this method
      * (which <strong>is</strong> case-sensitive) with the correct
-     * case.
-     * </p>
+     * case.</p>
      *
      * @param format a <code>String</code> identifer which specifies
      * the file format name.
@@ -81,7 +76,7 @@ public abstract class SeqFileFormerFactory
      * @see <code>EmblLikeFormat</code>
      * @see <code>GenbankFormat</code>
      */
-    static void addFactory(final String format, final SeqFileFormerFactory factory)
+    static void addFactory(String format, SeqFileFormerFactory factory)
     {
 	factories.put(format, factory);
     }
@@ -100,7 +95,7 @@ public abstract class SeqFileFormerFactory
      * @exception BioException if a non-existent file format is
      * requested.
      */
-    public static final SeqFileFormer makeFormer(final String format)
+    public static final SeqFileFormer makeFormer(String format)
 	throws BioException
     {
 	// If there is no Factory for this format load the class

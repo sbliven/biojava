@@ -37,6 +37,7 @@ import org.biojava.utils.stax.StringElementHandlerBase;
  * BioJava BlastLike XML.
  *
  * @author Keith James
+ * @since 1.3
  */
 public class HitStAXHandler extends SeqSimilarityStAXHandler
 {
@@ -125,7 +126,6 @@ public class HitStAXHandler extends SeqSimilarityStAXHandler
 
     /**
      * <code>HitIdStAXHandler</code> handles the hit ID.
-     *
      */
     private class HitIdStAXHandler extends StAXContentHandlerBase
     {
@@ -142,7 +142,6 @@ public class HitStAXHandler extends SeqSimilarityStAXHandler
 
     /**
      * <code>QueryIdStAXHandler</code> handles the query ID.
-     *
      */
     private class QueryIdStAXHandler extends StAXContentHandlerBase
     {

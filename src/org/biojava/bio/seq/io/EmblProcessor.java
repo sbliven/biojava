@@ -51,10 +51,6 @@ import org.biojava.utils.ParseErrorListener;
  *  (123.345)..(567.789)
  *   123..456
  *  <123..567 or 123..>567 or <123..>567
- * </pre>
- *
- * Specifically not supported are:
- * <pre>
  *   123^567
  *   AL123465:(123..567)
  * </pre>
@@ -69,7 +65,7 @@ import org.biojava.utils.ParseErrorListener;
  *
  * @author Thomas Down
  * @author Greg Cox
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.1
  */
 

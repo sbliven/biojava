@@ -36,12 +36,12 @@ import org.biojava.bio.seq.*;
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Greg Cox
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  */
 
 /*
  * Greg Cox: Changed private fields and methods to protected so that
- *           SwissProtFeatureTableParser could subclass and snag the *
+ *           SwissProtFeatureTableParser could subclass and snag the
  *           implementation.
  *
  * Thomas Down: Post 1.1, finally got round to refactoring this to be

@@ -194,7 +194,7 @@ public class FilterUtils {
    * <p>
    * The list is traversed from left to right. Each atomic filter can be
    * evaluated directly to be replaced by a set of features. Each logical
-   * operator grabs the required number of result sets from emediately before it
+   * operator grabs the required number of result sets from immediately before it
    * in the list and replaces itself and these with the result of it acting
    * upon these sets. In the end, the list should be left with a sing result
    * set which contains all matching features.

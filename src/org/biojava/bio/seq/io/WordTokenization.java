@@ -36,6 +36,7 @@ import org.biojava.bio.symbol.*;
  *
  * @author Thomas Down
  * @author Greg Cox
+ * @author Keith James
  * @since 1.2
  */
 
@@ -93,7 +94,7 @@ public abstract class WordTokenization
 
 	while (ptr < str.length()) {
 	    char c = str.charAt(ptr);
-	    if (Character.isSpace(c)) {
+	    if (Character.isWhitespace(c)) {
 		++ptr;
 	    } else if (c == '(') {
 		int nextPtr = findMatch(str, ptr, '(', ')');
@@ -117,7 +118,7 @@ public abstract class WordTokenization
 		    if (nc == '"') {
 			quoted = !quoted;
 		    }
-		} while (!Character.isSpace(nc));
+		} while (!Character.isWhitespace(nc));
 
 		sl.add(str.substring(ptr, nextPtr));
 		ptr = nextPtr;

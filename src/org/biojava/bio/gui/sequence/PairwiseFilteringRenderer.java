@@ -32,14 +32,7 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeForwarder;
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.Changeable;
+import org.biojava.utils.*;
 import org.biojava.utils.cache.CacheMap;
 import org.biojava.utils.cache.FixedSizeMap;
 
@@ -59,10 +52,7 @@ import org.biojava.utils.cache.FixedSizeMap;
  * flushed. As only the features overlapping the context's range are
  * filtered, changing the range will also result in re-filtering.</p>
  *
- * <p>This class is based on <code>FilteringRenderer</code> and credit
- * for the design should go to its author.</p>
- *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @author Matthew Pocock
  * @since 1.2
  */
@@ -190,7 +180,7 @@ public class PairwiseFilteringRenderer extends AbstractChangeable
      *
      * @exception ChangeVetoException if the change is vetoed.
      */
-    public void setRenderer(final PairwiseSequenceRenderer renderer)
+    public void setRenderer(PairwiseSequenceRenderer renderer)
         throws ChangeVetoException
     {
         if (hasListeners())
@@ -242,7 +232,7 @@ public class PairwiseFilteringRenderer extends AbstractChangeable
      *
      * @exception ChangeVetoException if the change is vetoed.
      */
-    public void setFilter(final FeatureFilter filter)
+    public void setFilter(FeatureFilter filter)
         throws ChangeVetoException
     {
         if (hasListeners())
@@ -302,14 +292,14 @@ public class PairwiseFilteringRenderer extends AbstractChangeable
         }
     }
 
-    public void paint(final Graphics2D g2, final PairwiseRenderContext context)
+    public void paint(Graphics2D g2, PairwiseRenderContext context)
     {
         renderer.paint(g2, getSubContext(context));
     }
   
-    public SequenceViewerEvent processMouseEvent(final PairwiseRenderContext context,
-                                                 final MouseEvent            me,
-                                                 final List                  path)
+    public SequenceViewerEvent processMouseEvent(PairwiseRenderContext context,
+                                                 MouseEvent            me,
+                                                 List                  path)
     {
         path.add(this);
         return renderer.processMouseEvent(getSubContext(context), me, path);
@@ -320,6 +310,7 @@ public class PairwiseFilteringRenderer extends AbstractChangeable
      * <code>FeatureHolder</code>s filtered using the current filter.
      *
      * @param context a <code>PairwiseRenderContext</code>.
+     *
      * @return a <code>PairwiseRenderContext</code>.
      */
     protected PairwiseRenderContext getSubContext(PairwiseRenderContext context)

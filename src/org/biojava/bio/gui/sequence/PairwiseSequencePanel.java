@@ -50,13 +50,7 @@ import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.utils.ChangeAdapter;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.Changeable;
+import org.biojava.utils.*;
 
 /**
  * <p>A <code>PairwiseSequencePanel</code> is a panel that displays a
@@ -92,7 +86,7 @@ import org.biojava.utils.Changeable;
  * <p>The change event handling code is based on the original panel
  * and other BioJava components by Matthew and Thomas.</p>
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class PairwiseSequencePanel extends JComponent

@@ -21,20 +21,19 @@
 package org.biojava.utils;
 
 /**
- * Listener for a ParseErrorEvent.  A ParseErrorEvent signals a problem
+ * Listener for a ParseErrorEvent. A ParseErrorEvent signals a problem
  * parsing a file.
  *
- * @see		   ParseErrorEvent
+ * @see        ParseErrorEvent
  * @author     Greg Cox
- * @created    Febuary 12, 2001
  */
 
 public interface ParseErrorListener extends java.util.EventListener
 {
-	/**
-	 * Method called when the parser encounters a bad line.
-	 *
-	 * @param theEvent The event that contains the line and token.
-	 */
-	public abstract void BadLineParsed(ParseErrorEvent theEvent);
+    /**
+     * Method called when the parser encounters a bad line.
+     *
+     * @param theEvent The event that contains the line and token.
+     */
+    public abstract void BadLineParsed(ParseErrorEvent theEvent);
 }

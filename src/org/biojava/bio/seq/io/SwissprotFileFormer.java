@@ -572,7 +572,7 @@ public class SwissprotFileFormer extends AbstractGenEmblFileFormer implements Se
 
 			if(blockCount == 6)
 			{
-				returnList.add(tempString.toString());
+				returnList.add(tempString.substring(0));
 				tempString.setLength(0);
 				blockCount = 0;
 				blockIndex = 0;
@@ -588,7 +588,7 @@ public class SwissprotFileFormer extends AbstractGenEmblFileFormer implements Se
 		// Add the last line on
 		if(tempString.length() != 0)
 		{
-			returnList.add(tempString.toString());
+			returnList.add(tempString.substring(0));
 		}
 		return returnList;
 	}

@@ -41,7 +41,7 @@ import org.biojava.bio.seq.*;
  * returned by the getDepth() method of that lane's renderer.
  *
  * @author Matthew Pocock
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.1
  */
 public class LayeredRenderer {

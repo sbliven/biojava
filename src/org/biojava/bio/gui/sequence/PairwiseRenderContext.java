@@ -36,7 +36,7 @@ import org.biojava.bio.seq.FeatureHolder;
  * to the implementation. The leading and trailing borders refer to
  * the primary sequence only.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public interface PairwiseRenderContext extends SequenceRenderContext

@@ -40,7 +40,7 @@ import org.biojava.utils.ChangeVetoException;
  * <code>Stroke</code>, feature depth, Y-axis displacement are
  * configurable.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class RectangularBeadRenderer extends AbstractBeadRenderer
@@ -83,9 +83,9 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
      * @param f a <code>Feature</code> to render.
      * @param context a <code>SequenceRenderContext</code> context.
      */
-    public void renderBead(final Graphics2D            g2,
-                           final Feature               f,
-                           final SequenceRenderContext context)
+    public void renderBead(Graphics2D            g2,
+                           Feature               f,
+                           SequenceRenderContext context)
     {
         Location loc = f.getLocation();
 
@@ -140,7 +140,7 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
      *
      * @return a <code>double</code>.
      */
-    public double getDepth(final SequenceRenderContext context)
+    public double getDepth(SequenceRenderContext context)
     {
         // Get max depth of delegates using base class method
         double maxDepth = super.getDepth(context);

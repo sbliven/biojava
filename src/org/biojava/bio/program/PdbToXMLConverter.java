@@ -53,7 +53,7 @@ import org.biojava.bio.program.xml.SimpleXMLEmitter;
  * @author Cambridge Antibody Technology (CAT)
  * @version 0.1
  * 
- * @see BlastLikeSAXParser
+ * @see org.biojava.bio.program.sax.BlastLikeSAXParser
  * @see SimpleXMLEmitter
  */
 public class PdbToXMLConverter {

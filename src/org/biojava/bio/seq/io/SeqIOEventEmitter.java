@@ -43,7 +43,7 @@ import org.biojava.bio.symbol.Symbol;
  * events. This class could benefit from parameterized feature
  * <code>Comparator</code>s to determine the order of events.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
 */
 public class SeqIOEventEmitter
@@ -61,8 +61,8 @@ public class SeqIOEventEmitter
      * @param seq a <code>Sequence</code>.
      * @param listener a <code>SeqIOListener</code>.
      */
-    public static void getSeqIOEvents(final Sequence      seq,
-				      final SeqIOListener listener)
+    public static void getSeqIOEvents(Sequence      seq,
+				      SeqIOListener listener)
 	throws BioException
     {
 	try
@@ -133,13 +133,13 @@ public class SeqIOEventEmitter
 	{
 	    // This should never happen as the alphabet is being used
 	    // by this Sequence instance
-	    throw new BioException("An internal error occurred processing symbols of "
+	    throw new BioException(iae, "An internal error occurred processing symbols of "
 				   + seq.toString()
 				   + " into SeqIO events");
 	}
 	catch (ParseException pe)
 	{
-	    throw new BioException("An internal error occurred processing "
+	    throw new BioException(pe, "An internal error occurred processing "
 				   + seq.toString()
 				   + " into SeqIO events");
 	}
@@ -151,9 +151,10 @@ public class SeqIOEventEmitter
      * <code>FeatureHolder</code>.
      *
      * @param fh a <code>FeatureHolder</code>.
+     *
      * @return a <code>List</code>.
      */
-    private static List getSubFeatures(final FeatureHolder fh)
+    private static List getSubFeatures(FeatureHolder fh)
     {
 	List subfeat = new ArrayList();
 

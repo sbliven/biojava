@@ -29,23 +29,17 @@ import java.io.Serializable;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.Changeable;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeForwarder;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.*;
 
 /**
  * <code>PairwiseOverlayRenderer</code> allows a list of other
  * <code>PairwiseSequenceRenderer</code>s to superimpose their
  * output. Operations on the child renderers (rendering, event
  * handling) are carried out in the order in which they were
- * added. This is based on the code in <code>MultiLineRenderer</code>
- * and credit should go to the author(s) for most of this.
+ * added.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
+ * @author Matthew Pocock
  * @since 1.2
  */
 public class PairwiseOverlayRenderer extends AbstractChangeable
@@ -79,7 +73,7 @@ public class PairwiseOverlayRenderer extends AbstractChangeable
      *
      * @exception ChangeVetoException if an error occurs.
      */
-    public void addRenderer(final PairwiseSequenceRenderer renderer)
+    public void addRenderer(PairwiseSequenceRenderer renderer)
         throws ChangeVetoException
     {
         if (hasListeners())
@@ -115,7 +109,7 @@ public class PairwiseOverlayRenderer extends AbstractChangeable
      *
      * @exception ChangeVetoException if an error occurs.
      */
-    public void removeRenderer(final PairwiseSequenceRenderer renderer)
+    public void removeRenderer(PairwiseSequenceRenderer renderer)
         throws ChangeVetoException
     {
         if (hasListeners())
@@ -187,7 +181,7 @@ public class PairwiseOverlayRenderer extends AbstractChangeable
      * @param g2 a <code>Graphics2D</code>.
      * @param context a <code>PairwiseRenderContext</code>.
      */
-    public void paint(final Graphics2D g2, final PairwiseRenderContext context)
+    public void paint(Graphics2D g2, PairwiseRenderContext context)
     {
         for (Iterator ri = renderers.iterator(); ri.hasNext();)
         {
@@ -236,9 +230,9 @@ public class PairwiseOverlayRenderer extends AbstractChangeable
      * @return a <code>SequenceViewerEvent</code> encapsulating the
      * mouse gesture.
      */
-    public SequenceViewerEvent processMouseEvent(final PairwiseRenderContext context,
-                                                 final MouseEvent            me,
-                                                 final List                  path)
+    public SequenceViewerEvent processMouseEvent(PairwiseRenderContext context,
+                                                 MouseEvent            me,
+                                                 List                  path)
     {
         path.add(this);
 

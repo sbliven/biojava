@@ -222,7 +222,7 @@ class DASRawSymbolList
 		int blockEnd = start + length;
 
 		while (parseStart < blockEnd) {
-		    while (parseStart < blockEnd && Character.isSpace(ch[parseStart])) {
+		    while (parseStart < blockEnd && Character.isWhitespace(ch[parseStart])) {
 			++parseStart;
 		    }
 		    if (parseStart >= blockEnd) {
@@ -230,7 +230,7 @@ class DASRawSymbolList
 		    }
 
 		    parseEnd = parseStart + 1;
-		    while (parseEnd < blockEnd && !Character.isSpace(ch[parseEnd])) {
+		    while (parseEnd < blockEnd && !Character.isWhitespace(ch[parseEnd])) {
 			++parseEnd;
 		    }
 

@@ -102,7 +102,7 @@ public class SimpleMarkovModel
   /**
    * Use this methods to customize the transition probabilities.
    * <p>
-   * By default, the distribution P(destination | source) is a totaly free
+   * By default, the distribution P(destination | source) is a totally free
    * distribution. This allows the different probabilities to vary. If you
    * wish to change this behaviour (for example, to make one set of transition
    * probabilities equal to another), then use this method to replace the

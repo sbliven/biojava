@@ -37,7 +37,8 @@ import org.biojava.utils.ObjectUtil;
  * sub-hits.</p>
  * 
  * @author Gerald Loeffler
- * @author Keith James */
+ * @author Keith James
+ */
 public class SimpleSeqSimilaritySearchHit
     implements SeqSimilaritySearchHit, Cloneable
 {

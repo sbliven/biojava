@@ -32,26 +32,13 @@ import java.util.Set;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.SmallAnnotation;
-import org.biojava.bio.search.SearchBuilder;
-import org.biojava.bio.search.SearchContentHandler;
-import org.biojava.bio.search.SeqSimilaritySearchHit;
-import org.biojava.bio.search.SeqSimilaritySearchResult;
-import org.biojava.bio.search.SeqSimilaritySearchResult;
-import org.biojava.bio.search.SeqSimilaritySearchSubHit;
-import org.biojava.bio.search.SequenceDBSearchHit;
-import org.biojava.bio.search.SequenceDBSearchResult;
-import org.biojava.bio.search.SequenceDBSearchSubHit;
+import org.biojava.bio.search.*;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.db.SequenceDBInstallation;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.Alignment;
-import org.biojava.bio.symbol.AlphabetManager;
-import org.biojava.bio.symbol.FiniteAlphabet;
-import org.biojava.bio.symbol.SimpleAlignment;
-import org.biojava.bio.symbol.SimpleSymbolList;
-import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.*;
 import org.biojava.utils.ChangeVetoException;
 
 /**

@@ -28,7 +28,7 @@ import java.io.IOException;
  * <code>EntryNamIdxReader</code> reads the "entrynam.idx" file of an
  * EMBL CD-ROM format binary index.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class EntryNamIdxReader extends EmblCDROMIndexReader

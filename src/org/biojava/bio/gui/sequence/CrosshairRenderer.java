@@ -32,13 +32,7 @@ import java.awt.geom.Line2D;
 import java.util.List;
 import javax.swing.SwingUtilities;
 
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.Changeable;
+import org.biojava.utils.*;
 
 /**
  * <p>
@@ -49,7 +43,7 @@ import org.biojava.utils.Changeable;
  * details of responses to various mouse actions.
  * </p>
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class CrosshairRenderer extends AbstractChangeable
@@ -63,29 +57,28 @@ public class CrosshairRenderer extends AbstractChangeable
         new ChangeType("The outline paint has changed",
                        "org.biojava.bio.gui.sequence.CrosshairRenderer",
                        "OUTLINE", SequenceRenderContext.REPAINT);
-
     
     /**
      * <code>xHair</code> is the vertical line positioned along the
      * X-axis.
      */
-    protected Line2D  xHair;
+    protected Line2D xHair;
 
     /**
      * <code>yHair</code> is the horizontal line positioned along the
      * Y-axis.
      */
-    protected Line2D  yHair;
+    protected Line2D yHair;
     /**
      * <code>point</code> is the current location (in sequence
      * coordinates) of the crosshair in the X and Y sequences.
      */
-    protected Point   point;
+    protected Point point;
 
-    // Crosshair loaction in sequence coordinates
+    // Crosshair location in sequence coordinates
     private int sPosX, sPosY;
     // Crosshair colour
-    private Paint   outline;
+    private Paint outline;
     // Display coordinates?
     private boolean display;
 
@@ -118,7 +111,7 @@ public class CrosshairRenderer extends AbstractChangeable
         this.outline = outline;
     }
 
-    public void paint(final Graphics2D g2, final PairwiseRenderContext context)
+    public void paint(Graphics2D g2, PairwiseRenderContext context)
     {
         Rectangle clip = g2.getClipBounds();
 
@@ -167,7 +160,7 @@ public class CrosshairRenderer extends AbstractChangeable
      *
      * @param display a <code>boolean</code>.
      */
-    public void coordinateDisplayOn(final boolean display)
+    public void coordinateDisplayOn(boolean display)
     {
         this.display = display;
     }
@@ -188,9 +181,10 @@ public class CrosshairRenderer extends AbstractChangeable
      * lines.
      *
      * @param outline a <code>Paint</code>.
+     *
      * @exception ChangeVetoException if an error occurs.
      */
-    public void setOutline(final Paint outline) throws ChangeVetoException
+    public void setOutline(Paint outline) throws ChangeVetoException
     {
         if (hasListeners())
         {
@@ -214,10 +208,8 @@ public class CrosshairRenderer extends AbstractChangeable
     }
 
     /**
-     * <p>
-     * <code>processMouseEvent</code> processes any
-     * <code>MouseEvent</code>s directed to the renderer.
-     * </p>
+     * <p><code>processMouseEvent</code> processes any
+     * <code>MouseEvent</code>s directed to the renderer.</p>
      *
      * <p>
      * Mouse actions are as follows (all are button-1 only):
@@ -242,9 +234,9 @@ public class CrosshairRenderer extends AbstractChangeable
      *
      * @return a <code>SequenceViewerEvent</code>.
      */
-    public SequenceViewerEvent processMouseEvent(final PairwiseRenderContext context,
-                                                 final MouseEvent            me,
-                                                 final List                  path)
+    public SequenceViewerEvent processMouseEvent(PairwiseRenderContext context,
+                                                 MouseEvent            me,
+                                                 List                  path)
     {
         path.add(this);
 

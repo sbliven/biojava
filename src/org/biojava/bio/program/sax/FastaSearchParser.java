@@ -46,7 +46,7 @@ import org.biojava.utils.ParserException;
  * framework, but is now only used to provide functionality for
  * <code>FastaSearchSAXParser</code>.</p>
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @author Greg Cox
  * @since 1.1
  */
@@ -384,15 +384,15 @@ class FastaSearchParser
     }
 
     /**
-     * The <code>fillSet</code> method populates a Set with the
-     * elements of an Array.
+     * The <code>fillSet</code> method populates a <code>Set</code>
+     * with the elements of an array.
      *
      * @param tokenArray a <code>String []</code> array.
      * @param set a <code>Set</code> to fill.
      *
-     * @return a Set object.
+     * @return a <code>Set</code>.
      */
-    private static Set fillSet(final String [] tokenArray, final Set set)
+    private static Set fillSet(String [] tokenArray, Set set)
     {
         for (int i = 0; i < tokenArray.length; i++)
             set.add(tokenArray[i]);
@@ -454,7 +454,7 @@ class FastaSearchParser
      *
      * @return a <code>String</code> containing the description.
      */
-    private String parseDesc(final String line)
+    private String parseDesc(String line)
     {
         String trimmed = line.trim();
         int firstSpace = trimmed.indexOf(' ');
@@ -475,7 +475,7 @@ class FastaSearchParser
      *
      * @exception ParserException if an error occurs.
      */
-    private String parseDB(final String line)
+    private String parseDB(String line)
         throws ParserException
     {
         StringTokenizer st = new StringTokenizer(line);
@@ -503,8 +503,8 @@ class FastaSearchParser
         return previous;
     }
 
-    private boolean parseHeaderLine(final String line,
-                                    final Set    tokenSet)
+    private boolean parseHeaderLine(String line,
+                                    Set    tokenSet)
         throws ParserException
     {
         String [] data = parseLine(line, tokenSet);
@@ -520,8 +520,8 @@ class FastaSearchParser
         }
     }
 
-    private boolean parseHitLine(final String line,
-                                 final Set    tokenSet)
+    private boolean parseHitLine(String line,
+                                 Set    tokenSet)
         throws ParserException
     {
         String [] data = parseLine(line, tokenSet);
@@ -535,8 +535,8 @@ class FastaSearchParser
         return false;
     }
 
-    private String [] parseLine(final String line,
-                                final Set    tokenSet)
+    private String [] parseLine(String line,
+                                Set    tokenSet)
         throws ParserException
     {
         int idTokenStart = line.indexOf(";");
@@ -554,7 +554,7 @@ class FastaSearchParser
             return new String [0];
     }
 
-    private void parseQuerySequence(final String line)
+    private void parseQuerySequence(String line)
     {
         String [] data = parseSequence(line);
 
@@ -570,7 +570,7 @@ class FastaSearchParser
         }
     }
 
-    private void parseSubjectSequence(final String line)
+    private void parseSubjectSequence(String line)
     {
         String [] data = parseSequence(line);
 
@@ -586,7 +586,7 @@ class FastaSearchParser
         }
     }
 
-    private String [] parseSequence(final String line)
+    private String [] parseSequence(String line)
     {
         if (line.startsWith(";"))
         {
@@ -634,7 +634,7 @@ class FastaSearchParser
      *
      * @return a <code>String</code> coordinate.
      */
-    private String parseCoord(final String line)
+    private String parseCoord(String line)
     {
         int sepIndex = line.lastIndexOf(":");
         return line.substring(sepIndex + 1).trim();

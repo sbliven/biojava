@@ -28,7 +28,7 @@ import java.io.IOException;
  * <code>AcnumHitReader</code> reads the "acnum.hit" file of an EMBL
  * CD-ROM format binary index.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
 */
 public class AcnumHitReader extends EmblCDROMIndexReader
@@ -40,7 +40,7 @@ public class AcnumHitReader extends EmblCDROMIndexReader
      *
      * @exception IOException if an error occurs.
      */
-    public AcnumHitReader(final InputStream input)
+    public AcnumHitReader(InputStream input)
         throws IOException
     {
         super(input);

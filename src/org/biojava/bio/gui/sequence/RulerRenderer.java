@@ -35,15 +35,19 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 /**
- * <code>RulerRenderer</code> renders numerical scales in sequence
+ * <p><code>RulerRenderer</code> renders numerical scales in sequence
  * coordinates. The tick direction may be set to point upwards (or
  * left when the scale is vertical) or downwards (right when the scale
- * is vertical).
+ * is vertical).</p>
+ *
+ * <p>Note: The Compaq Java VMs 1.3.1 - 1.4.0 on Tru64 appear to have
+ * a bug in font transformation which prevents a vertically oriented
+ * ruler displaying correctly rotated text.</p>
  *
  * @author Matthew Pocock
  * @author Thomas Down
  * @author David Huen
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  */
 public class RulerRenderer implements SequenceRenderer
 {
@@ -116,7 +120,7 @@ public class RulerRenderer implements SequenceRenderer
         return depth + 1.0;
     }
   
-    public void paint(final Graphics2D g2, final SequenceRenderContext context)
+    public void paint(Graphics2D g2, SequenceRenderContext context)
     {
         AffineTransform prevTransform = g2.getTransform();
 
@@ -244,9 +248,9 @@ public class RulerRenderer implements SequenceRenderer
         }
     }
   
-    public SequenceViewerEvent processMouseEvent(final SequenceRenderContext context,
-                                                 final MouseEvent            me,
-                                                 final List                  path)
+    public SequenceViewerEvent processMouseEvent(SequenceRenderContext context,
+                                                 MouseEvent            me,
+                                                 List                  path)
     {
         path.add(this);
         int sPos = context.graphicsToSequence(me.getPoint());

@@ -30,6 +30,7 @@ import org.biojava.utils.stax.StAXContentHandler;
  *
  * @author Thomas Down
  * @author Keith James
+ * @since 1.3
  */
 public interface StAXHandlerFactory
 {

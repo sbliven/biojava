@@ -33,7 +33,7 @@ import org.biojava.bio.symbol.IllegalAlphabetException;
  * between a query sequence and a subject sequence as produced by a
  * search program.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class SimpleSimilarityPairFeature extends SimpleStrandedFeature

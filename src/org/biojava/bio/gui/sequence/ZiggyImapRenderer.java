@@ -44,7 +44,8 @@ import org.biojava.utils.net.URLFactory;
  * coordinates correspond to the block regions of the image rather
  * than the "elbow" sections which join the locations.</p>
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
+ * @since 1.3
  */
 public class ZiggyImapRenderer implements ImageMapRenderer, Serializable
 {
@@ -105,9 +106,9 @@ public class ZiggyImapRenderer implements ImageMapRenderer, Serializable
      * @param f a <code>Feature</code>.
      * @param context a <code>SequenceRenderContext</code>.
      */
-    public void renderImageMap(final Graphics2D                 g2,
-                               final Feature                     f,
-                               final SequenceRenderContext context)
+    public void renderImageMap(Graphics2D                 g2,
+                               Feature                     f,
+                               SequenceRenderContext context)
     {
         Rectangle bounds = g2.getDeviceConfiguration().getBounds();
 
@@ -178,22 +179,22 @@ public class ZiggyImapRenderer implements ImageMapRenderer, Serializable
         }
     }
 
-    public void renderFeature(final Graphics2D                 g2,
-                              final Feature                     f,
-                              final SequenceRenderContext context)
+    public void renderFeature(Graphics2D                 g2,
+                              Feature                     f,
+                              SequenceRenderContext context)
     {
         renderImageMap(g2, f, context);
         renderer.renderFeature(g2, f, context);
     }
 
-    public double getDepth(final SequenceRenderContext context)
+    public double getDepth(SequenceRenderContext context)
     {
         return renderer.getDepth(context);
     }
 
-    public FeatureHolder processMouseEvent(final FeatureHolder         holder,
-                                           final SequenceRenderContext context,
-                                           final MouseEvent            mEvent)
+    public FeatureHolder processMouseEvent(FeatureHolder         holder,
+                                           SequenceRenderContext context,
+                                           MouseEvent            mEvent)
     {
         return renderer.processMouseEvent(holder, context, mEvent);
     }

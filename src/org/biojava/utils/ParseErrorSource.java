@@ -24,24 +24,23 @@ package org.biojava.utils;
  * Source for a ParseErrorEvent.  A ParseErrorEvent signals a problem parsing
  * a file.
  *
- * @see		   ParseErrorEvent
+ * @see        ParseErrorEvent
  * @author     Greg Cox
- * @created    Febuary 12, 2001
  */
 
 public interface ParseErrorSource
 {
-	/**
-	 * Adds a parse error listener to the list of listeners.
-	 *
-	 * @param theListener Listener to be added.
-	 */
-	public void addParseErrorListener(ParseErrorListener theListener);
+    /**
+     * Adds a parse error listener to the list of listeners.
+     *
+     * @param theListener Listener to be added.
+     */
+    public void addParseErrorListener(ParseErrorListener theListener);
 
-	/**
-	 * Removes a parse error listener from the list of listeners.
-	 *
-	 * @param theListener Listener to be removed.
-	 */
-	public void removeParseErrorListener(ParseErrorListener theListener);
+    /**
+     * Removes a parse error listener from the list of listeners.
+     *
+     * @param theListener Listener to be removed.
+     */
+    public void removeParseErrorListener(ParseErrorListener theListener);
 }

@@ -21,13 +21,14 @@
 
 package org.biojava.bio.seq.impl;
 
-import org.biojava.bio.seq.*;
-import java.util.*;
 import java.io.*;
 import java.lang.reflect.*;
+import java.util.*;
 import org.biojava.bio.*;
-import org.biojava.utils.*;
+import org.biojava.bio.molbio.RestrictionSite;
+import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.homol.*;
+import org.biojava.utils.*;
 
 /**
  * Wrap up default sets of Feature implementations.
@@ -74,6 +75,8 @@ public class FeatureImpl {
 				SimpleRemoteFeature.class);
             d.addImplementation(FramedFeature.Template.class,
                                 SimpleFramedFeature.class);
+            d.addImplementation(RestrictionSite.Template.class,
+                                SimpleRestrictionSite.class);
 	} catch (BioException ex) {
 	    throw new BioError(ex, "Couldn't initialize default FeatureRealizer");
 	}

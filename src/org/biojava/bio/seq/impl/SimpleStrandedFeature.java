@@ -68,7 +68,8 @@ public class SimpleStrandedFeature extends SimpleFeature implements StrandedFeat
     public SimpleStrandedFeature(Sequence sourceSeq,
 				 FeatureHolder parent,
 				 StrandedFeature.Template template)
-	throws IllegalArgumentException, IllegalAlphabetException 
+	throws IllegalArgumentException
+               //, IllegalAlphabetException 
     {
 	super(sourceSeq, parent, template);
 	this.strand = template.strand;

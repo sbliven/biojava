@@ -635,6 +635,7 @@ public interface FeatureFilter extends Serializable {
    * Retrieve features that contain a given annotation with a given value.
    *
    * @author Matthew Pocock
+   * @author Keith James
    * @since 1.1
    */
   public final static class ByAnnotation implements OptimizableFilter {
@@ -662,22 +663,27 @@ public interface FeatureFilter extends Serializable {
     }
 
     public boolean accept(Feature f) {
-      Annotation ann = f.getAnnotation();
-      // fixme - Annotation should have a hasProperty method
-      try {
-        Object v = ann.getProperty(key);
-        if(v == null ) {
-          if(value == null) {
-            return true;
-          } else {
+        Annotation ann = f.getAnnotation();
+        if (! ann.containsProperty(key)) {
             return false;
-          }
-        } else {
-          return v.equals(value);
         }
-      } catch (NoSuchElementException nsee) {
-        return false;
-      }
+        else
+        {
+            try {
+                Object v = ann.getProperty(key);
+                if (v == null) {
+                    if (value == null) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return v.equals(value);
+                }
+            } catch (NoSuchElementException nsee) {
+                return false;
+            }
+        }
     }
 
     public boolean equals(Object o) {
@@ -713,6 +719,7 @@ public interface FeatureFilter extends Serializable {
    * Retrieve features that contain a given annotation with any value.
    *
    * @author Matthew Pocock
+   * @author Keith James
    * @since 1.1
    */
   public final static class HasAnnotation implements FeatureFilter {
@@ -733,14 +740,18 @@ public interface FeatureFilter extends Serializable {
     }
 
     public boolean accept(Feature f) {
-      Annotation ann = f.getAnnotation();
-      // fixme - Annotation should have a hasProperty method
-      try {
-        Object v = ann.getProperty(key);
-        return true;
-      } catch (NoSuchElementException nsee) {
-        return false;
-      }
+        Annotation ann = f.getAnnotation();
+
+        if (! ann.containsProperty(key)) {
+            return false;
+        } else {
+            try {
+                Object v = ann.getProperty(key);
+                return true;
+            } catch (NoSuchElementException nsee) {
+                return false;
+            }
+        }
     }
 
     public boolean equals(Object o) {
@@ -1042,7 +1053,7 @@ public interface FeatureFilter extends Serializable {
      * are not <code>SimilarityPairFeature</code>s. The minimum value
      * accepted must be less than the maximum value.
      *
-     * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+     * @author Keith James
      * @since 1.3
      */
     public static final class ByPairwiseScore implements OptimizableFilter {

@@ -39,6 +39,7 @@ import org.biojava.utils.stax.StAXContentHandlerBase;
  * <code>SeqSimilarityStAXAdapter</code>.
  *
  * @author Keith James
+ * @since 1.3
  */
 public class SeqSimilarityStAXHandler extends StAXContentHandlerBase
 {

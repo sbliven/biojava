@@ -33,6 +33,7 @@ import org.biojava.utils.stax.StAXContentHandler;
  * BlastLike XML.
  *
  * @author Keith James
+ * @since 1.3
  */
 public class HSPStAXHandler extends SeqSimilarityStAXHandler
 {

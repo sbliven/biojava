@@ -35,6 +35,7 @@ import org.biojava.utils.stax.StringElementHandlerBase;
  * element of BioJava BlastLike XML.
  *
  * @author Keith James
+ * @since 1.3
  */
 public class AlignmentStAXHandler extends SeqSimilarityStAXHandler
 {

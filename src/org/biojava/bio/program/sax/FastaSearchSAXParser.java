@@ -50,7 +50,7 @@ import org.biojava.bio.search.SearchContentHandler;
  * BlastLikeDataSetCollection DTD. There is no requirement for an
  * intermediate conversion of native output to XML format.</p>
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
@@ -100,7 +100,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
         nl          = System.getProperty("line.separator");
     }
 
-    public void parse(final InputSource source)
+    public void parse(InputSource source)
         throws IOException, SAXException
     {
         BufferedReader content = getContentStream(source);
@@ -176,7 +176,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
         searchProperties = new HashMap();
     }
 
-    public void addSearchProperty(final Object key, final Object value)
+    public void addSearchProperty(Object key, Object value)
     {
         searchProperties.put(key, value);
     }
@@ -332,7 +332,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
         hitProperties = new HashMap();
     }
 
-    public void addHitProperty(final Object key, final Object value)
+    public void addHitProperty(Object key, Object value)
     {
         hitProperties.put(key, value);
     }
@@ -341,7 +341,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 
     public void startSubHit() { }
 
-    public void addSubHitProperty(final Object key, final Object value)
+    public void addSubHitProperty(Object key, Object value)
     {
         hitProperties.put(key, value);
     }
@@ -726,7 +726,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
      *
      * @return a <code>String</code> representation of the total count.
      */
-    private String countTokens(final char token, final String string)
+    private String countTokens(char token, String string)
     {
         int count = 0;
         for (int i = string.length(); --i >= 0;)
@@ -759,10 +759,10 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
      * @return a <code>String</code> value consisting of a subsequence
      * containing only the interesting alignment.
      */
-    private String prepSeqTokens(final StringBuffer seqTokens,
-                                 final int          alStart,
-                                 final int          alStop,
-                                 final int          alDispStart)
+    private String prepSeqTokens(StringBuffer seqTokens,
+                                 int          alStart,
+                                 int          alStop,
+                                 int          alDispStart)
     {
         // Strip leading gap characters
         while (seqTokens.charAt(0) == '-')

@@ -32,7 +32,7 @@ import org.biojava.utils.*;
 import org.biojava.utils.cache.*;
 
 /**
- ( <p>
+ * <p>
  * An efficient implementation of an Alphabet over the infinite set of integer
  * values.
  * </p>
@@ -194,9 +194,10 @@ public final class IntegerAlphabet
   }
 
   /**
+   * Creates a new parser (Mark Schreiber 3 May 2001).
+   *
    * @param name Currently only "token" is supported.
    * @return an IntegerParser.
-   * @author Mark Schreiber 3 May 2001.
    */
   public SymbolTokenization getTokenization(String name) {
     if(name.equals("token")){

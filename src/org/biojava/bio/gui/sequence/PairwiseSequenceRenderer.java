@@ -37,7 +37,7 @@ import org.biojava.utils.ChangeType;
  * <code>SequenceRenderer</code> for single sequences and is
  * extensively based on that code.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public interface PairwiseSequenceRenderer
@@ -83,8 +83,8 @@ public interface PairwiseSequenceRenderer
          * @param source a <code>PairwiseSequenceRenderer</code>.
          * @param cs a <code>ChangeSupport</code>.
          */
-        public PairwiseRendererForwarder(final PairwiseSequenceRenderer source,
-                                         final ChangeSupport            cs)
+        public PairwiseRendererForwarder(PairwiseSequenceRenderer source,
+                                         ChangeSupport            cs)
         {
             super(source, cs);
         }

@@ -25,10 +25,10 @@ import org.biojava.bio.BioException;
 
 /**
  * The <code>SearchBuilder</code> interface is to be used by objects
- * which accumulate state via a SearchContentHandler and then
- * construct a SeqSimilaritySearchResult object.
+ * which accumulate state via a <code>SearchContentHandler</code> and
+ * then construct a <code>SeqSimilaritySearchResult</code> object.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.1
  * @see SearchContentHandler
  */

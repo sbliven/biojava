@@ -52,16 +52,16 @@ import org.biojava.bio.seq.*;
  *
  * @author Thomas Down
  * @author Greg Cox
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.1
  */
 
 public class EmblLikeFormat
-	implements
-		SequenceFormat,
-		Serializable,
-		ParseErrorSource,
-		ParseErrorListener
+    implements
+            SequenceFormat,
+            Serializable,
+            ParseErrorSource,
+            ParseErrorListener
 {
     static
     {
@@ -292,72 +292,70 @@ public class EmblLikeFormat
         return "Embl";
     }
 
-	/**
-   * <p>
-	 * This method determines the behaviour when a bad line is processed.
-	 * Some options are to log the error, throw an exception, ignore it
-	 * completely, or pass the event through.
-   * </p>
-   *
-	 * <p>
-	 * This method should be overwritten when different behavior is desired.
-   * </p>
-	 *
-	 * @param theEvent The event that contains the bad line and token.
-	 */
-	public void BadLineParsed(ParseErrorEvent theEvent)
-	{
-		notifyParseErrorEvent(theEvent);
-	}
+    /**
+     * <p>
+     * This method determines the behaviour when a bad line is processed.
+     * Some options are to log the error, throw an exception, ignore it
+     * completely, or pass the event through.
+     * </p>
+     *
+     * <p>
+     * This method should be overwritten when different behavior is desired.
+     * </p>
+     *
+     * @param theEvent The event that contains the bad line and token.
+     */
+    public void BadLineParsed(ParseErrorEvent theEvent)
+    {
+        notifyParseErrorEvent(theEvent);
+    }
 
-	/**
-	 * Adds a parse error listener to the list of listeners if it isn't already
-	 * included.
-	 *
-	 * @param theListener Listener to be added.
-	 */
-	public synchronized void addParseErrorListener(
-			ParseErrorListener theListener)
-	{
-		if(mListeners.contains(theListener) == false)
-		{
-			mListeners.addElement(theListener);
-		}
-	}
+    /**
+     * Adds a parse error listener to the list of listeners if it isn't already
+     * included.
+     *
+     * @param theListener Listener to be added.
+     */
+    public synchronized void addParseErrorListener(ParseErrorListener theListener)
+    {
+        if(mListeners.contains(theListener) == false)
+        {
+            mListeners.addElement(theListener);
+        }
+    }
 
-	/**
-	 * Removes a parse error listener from the list of listeners if it is
-	 * included.
-	 *
-	 * @param theListener Listener to be removed.
-	 */
-	public synchronized void removeParseErrorListener(
-			ParseErrorListener theListener)
-	{
-		if(mListeners.contains(theListener) == true)
-		{
-			mListeners.removeElement(theListener);
-		}
-	}
+    /**
+     * Removes a parse error listener from the list of listeners if it is
+     * included.
+     *
+     * @param theListener Listener to be removed.
+     */
+    public synchronized void removeParseErrorListener(ParseErrorListener theListener)
+    {
+        if(mListeners.contains(theListener) == true)
+        {
+            mListeners.removeElement(theListener);
+        }
+    }
+ 
+    // Protected methods
+    /**
+     * Passes the event on to all the listeners registered for ParseErrorEvents.
+     *
+     * @param theEvent The event to be handed to the listeners.
+     */
+    protected void notifyParseErrorEvent(ParseErrorEvent theEvent)
+    {
+        Vector listeners;
+        synchronized(this)
+        {
+            listeners = (Vector)mListeners.clone();
+        }
 
-	// Protected methods
-	/**
-	 * Passes the event on to all the listeners registered for ParseErrorEvents.
-	 *
-	 * @param theEvent The event to be handed to the listeners.
-	 */
-	protected void notifyParseErrorEvent(ParseErrorEvent theEvent)
-	{
-		Vector listeners;
-		synchronized(this)
-		{
-			listeners = (Vector)mListeners.clone();
-		}
-
-		for (int index = 0; index < listeners.size(); index++)
-		{
-			ParseErrorListener client = (ParseErrorListener)listeners.elementAt(index);
-			client.BadLineParsed(theEvent);
-		}
-	}
+        for (int index = 0; index < listeners.size(); index++)
+        {
+            ParseErrorListener client = (ParseErrorListener)listeners.elementAt(index);
+            client.BadLineParsed(theEvent);
+        }
+    }
 }

@@ -41,7 +41,7 @@ import java.io.RandomAccessFile;
  * means delegating to the supplied <code>RecordParser</code> and
  * calling the appropriate method on it.</p>
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public abstract class EmblCDROMRandomAccess
@@ -113,7 +113,7 @@ public abstract class EmblCDROMRandomAccess
      *
      * @exception IOException if an error occurs.
      */
-    public Object [] findRecord(final String identifier)
+    public Object [] findRecord(String identifier)
         throws IOException
     {
         long startRecord = 0;
@@ -169,5 +169,5 @@ public abstract class EmblCDROMRandomAccess
      *
      * @return a <code>String</code>.
      */
-    protected abstract String getRecordKey(final Object [] record);
+    protected abstract String getRecordKey(Object [] record);
 }

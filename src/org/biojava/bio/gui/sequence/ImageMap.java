@@ -31,8 +31,9 @@ import java.util.List;
  * <code>ImageMap</code> represents a collection of image map
  * hotspots. It does not represent the raster image itself.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @author Greg Cox
+ * @since 1.3
  */
 public interface ImageMap
 {

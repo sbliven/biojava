@@ -49,7 +49,7 @@ public class AnnotationFactory
      * @param m a <code>Map</code> of raw data.
      * @return an <code>Annotation</code>.
      */
-    public static Annotation makeAnnotation(final Map m)
+    public static Annotation makeAnnotation(Map m)
     {
         int elements = m.size();
 

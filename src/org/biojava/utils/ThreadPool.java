@@ -27,6 +27,7 @@ package org.biojava.utils;
  * without requiring changes to BioJava.</p>
  *
  * @author Keith James
+ * @since 1.3
  */
 public interface ThreadPool
 {

@@ -27,7 +27,11 @@ import org.biojava.bio.seq.impl.*;
 import java.util.*;
 
 /**
- * <p>Title: AlignmentSequenceIterator</p>
+ * <p><code>AlignmentSequenceIterator</code> implements a
+ * <code>SequenceIterator</code> by creating new
+ * <code>Sequence</code>s which wrap the <code>SymbolList</code>s in
+ * an <code>Alignment</code>.</p>
+ *
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2002</p>
  * <p>Company: </p>

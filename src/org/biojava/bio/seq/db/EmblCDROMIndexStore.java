@@ -64,21 +64,21 @@ import org.biojava.bio.seq.io.SymbolTokenization;
  * <code>SequenceFormat</code> implementation for GCG format files.
  * </p>
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class EmblCDROMIndexStore implements IndexStore 
 {
-    private final File                   divisionLkp;
-    private final File                   entryNamIdx;
+    private File divisionLkp;
+    private File entryNamIdx;
 
     // Optional PATH prefix to append to the filename(s) extracted
     // from the binary indices
-    private File                         pathPrefix;
+    private File pathPrefix;
 
-    private final SequenceFormat         format;
-    private final SequenceBuilderFactory factory;
-    private final SymbolTokenization     parser;
+    private SequenceFormat         format;
+    private SequenceBuilderFactory factory;
+    private SymbolTokenization     parser;
 
     // Maps the file numbers used in the indices to the real file names
     private Map seqFiles;
@@ -188,7 +188,7 @@ public class EmblCDROMIndexStore implements IndexStore
      * @param prefix a <code>File</code> prefix specifying the
      * abstract path to append.
      */
-    public void setPathPrefix(final File pathPrefix)
+    public void setPathPrefix(File pathPrefix)
     {
 	this.pathPrefix = pathPrefix;
     }
@@ -214,10 +214,10 @@ public class EmblCDROMIndexStore implements IndexStore
      * @exception IllegalIDException if an error occurs.
      * @exception BioException if an error occurs.
      */
-    public void store(final Index index)
+    public void store(Index index)
         throws IllegalIDException, BioException
     {
-        throw new BioException("Failed to add Index: store is read-only. To add sequences, use the dbi programs supplied in EMBOSS");
+        throw new BioException("Failed to add Index: store is read-only. To add sequences use the dbi programs supplied in EMBOSS");
     }
 
     /**
@@ -229,7 +229,7 @@ public class EmblCDROMIndexStore implements IndexStore
      */
     public void commit() throws BioException
     {
-        throw new BioException("Failed to commit: store is read-only. To add sequences, use the dbi programs supplied in EMBOSS");
+        throw new BioException("Failed to commit: store is read-only. To add sequences use the dbi programs supplied in EMBOSS");
     }
 
     /**
@@ -239,7 +239,7 @@ public class EmblCDROMIndexStore implements IndexStore
      */
     public void rollback() { }
 
-    public Index fetch(final String id) throws IllegalIDException, BioException
+    public Index fetch(String id) throws IllegalIDException, BioException
     {
         Index index = null;
 
@@ -253,8 +253,7 @@ public class EmblCDROMIndexStore implements IndexStore
 	    // Append current pathPrefix
             index = new SimpleIndex(new File(pathPrefix, (String) seqFiles.get((Integer) enRecord[3])),
                                     ((Long) enRecord[1]).longValue(),
-                                    -1, // fixme - does the embl format give you
-                                        // lengths?
+                                    entryRecordLength,
                                     id);
         }
         catch (IOException ioe)

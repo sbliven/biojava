@@ -30,7 +30,7 @@ import java.io.IOException;
  * records within the "entrynam.idx" file of an EMBL CD-ROM format
  * binary index. Records are retrieved by their sequence ID.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class EntryNamRandomAccess extends EmblCDROMRandomAccess
@@ -71,7 +71,7 @@ public class EntryNamRandomAccess extends EmblCDROMRandomAccess
      *
      * @return a <code>String</code>.
      */
-    protected String getRecordKey(final Object [] record)
+    protected String getRecordKey(Object [] record)
     {
         return (String) record[0];
     }

@@ -75,7 +75,6 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
     private StringBuffer ccb = null;
     private StringBuffer ftb = new StringBuffer();
 
-
     private SymbolTokenization dnaTokenization;
 
     {

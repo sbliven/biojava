@@ -34,7 +34,7 @@ import org.biojava.bio.BioException;
  * includes any format consisting of a header followed by hits, each
  * of which may, or may not, have subhits.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.1
  */
 public interface SearchContentHandler

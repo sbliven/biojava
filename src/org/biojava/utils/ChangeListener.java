@@ -28,8 +28,7 @@ import java.util.*;
  *
  * @author     Thomas Down
  * @author     Matthew Pocock
- * @author     Keith James (docs)
- * @created    September 29, 2000
+ * @author     Keith James
  * @since      1.1 
  */
 
@@ -89,22 +88,20 @@ public interface ChangeListener extends EventListener {
 
   void postChange(ChangeEvent cev);
 
-
   /**
    *  An implementation that always vetoes everything. 
    *
    * @author     Thomas Down
-   * @created    September 29, 2000 
    * @since      1.1 
    */
 
   static class AlwaysVetoListener implements ChangeListener {
+
     /**
-     *  Private constructor to stop people pissing about.
+     *  Private constructor.
      */
     protected AlwaysVetoListener() {
     }
-
 
     public void preChange(ChangeEvent cev) throws ChangeVetoException {
       throw new ChangeVetoException(
@@ -112,7 +109,6 @@ public interface ChangeListener extends EventListener {
         "This object has been locked"
       );
     }
-
 
     public void postChange(ChangeEvent cev) {
       throw new NestedError(

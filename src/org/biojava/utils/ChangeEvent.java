@@ -28,16 +28,13 @@ import java.util.*;
  * @author     Thomas Down
  * @author     Matthew Pocock
  * @author     Greg Cox
- * @created    September 29, 2000
  * @since      1.1
  */
-
 public class ChangeEvent extends EventObject {
   private final ChangeType type;
   private final Object change;
   private final Object previous;
   private final ChangeEvent chain;
-
 
   /**
    *  Construct a ChangeEvent with no change details.
@@ -48,7 +45,6 @@ public class ChangeEvent extends EventObject {
   public ChangeEvent(Object source, ChangeType type) {
     this(source, type, null, null, null);
   }
-
 
   /**
    *
@@ -86,7 +82,6 @@ public class ChangeEvent extends EventObject {
     this(source, type, change, previous, null);
   }
 
-
   /**
    *
    * Construct a ChangeEvent to be fired because another ChangeEvent has
@@ -98,7 +93,6 @@ public class ChangeEvent extends EventObject {
    * @param  previous  The old value of the property being changed.
    * @param  chain     The event which caused this event to be fired.
    */
-
   public ChangeEvent(
     Object source,
     ChangeType type,
@@ -113,7 +107,6 @@ public class ChangeEvent extends EventObject {
     this.chain = chain;
   }
 
-
   /**
    *  Find the type of this event.
    *
@@ -123,7 +116,6 @@ public class ChangeEvent extends EventObject {
     return type;
   }
 
-
   /**
    *
    * Return an object which is to be the new value of some property,
@@ -132,7 +124,6 @@ public class ChangeEvent extends EventObject {
    *
    * @return    The Change value
    */
-
   public Object getChange() {
     return change;
   }
@@ -144,7 +135,6 @@ public class ChangeEvent extends EventObject {
    *
    * @return    The Previous value
    */
-
   public Object getPrevious() {
     return previous;
   }
@@ -156,7 +146,6 @@ public class ChangeEvent extends EventObject {
    *
    * @return    The ChainedEvent value
    */
-
   public ChangeEvent getChainedEvent() {
     return chain;
 

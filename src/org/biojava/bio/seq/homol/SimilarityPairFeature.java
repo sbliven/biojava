@@ -32,13 +32,7 @@ import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.AlignmentSequenceIterator;
-import org.biojava.bio.symbol.Alignment;
-import org.biojava.bio.symbol.Alphabet;
-import org.biojava.bio.symbol.Edit;
-import org.biojava.bio.symbol.IllegalAlphabetException;
-import org.biojava.bio.symbol.Location;
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.*;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
@@ -67,7 +61,7 @@ import org.biojava.utils.Unchangeable;
  * be used. This may also be useful if an implementation elides the
  * alignment data for some reason.</p>
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public interface SimilarityPairFeature extends StrandedFeature

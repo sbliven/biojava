@@ -83,10 +83,11 @@ public class AnnotationChanger extends AbstractAnnotation
     }
 
     /**
-     * <code>propertiesAllocated</code> Javadoc FIXME - this overrides
-     * a protected method and I'm not sure why (KJ).
+     * <code>propertiesAllocated</code> is a convenience method to see
+     * if we have allocated the properties <code>Map</code>.
      *
-     * @return a <code>boolean</code>.
+     * @return a <code>boolean</code> true if the properties have been
+     * allocated, false otherwise.
      */
     public boolean propertiesAllocated() {
         return true;

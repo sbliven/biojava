@@ -37,7 +37,7 @@ import org.biojava.bio.symbol.Location;
  * <code>GenbankFileFormer</code>. Some file formats, such as Fasta,
  * are very simple and don't require a <code>SeqFileFormer</code>.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public interface SeqFileFormer extends SeqIOListener
@@ -77,19 +77,19 @@ public interface SeqFileFormer extends SeqIOListener
      *
      * @return a <code>StringBuffer</code> with the location appended.
      */
-    public StringBuffer formatLocation(final StringBuffer           sb,
-				       final Location               loc,
-				       final StrandedFeature.Strand strand);
+    public StringBuffer formatLocation(StringBuffer           sb,
+				       Location               loc,
+				       StrandedFeature.Strand strand);
 
-	/**
-	 * Formats the location of a feature.  This version is required when
-	 * formatting remote locations, since the location field of a remote
-	 * feature is the projection of that feature on the sequence.  When a
-	 * distinction is made between 'order' and 'join' this method will likely
-	 * be extended for that also.
-	 *
-	 * @param theFeature The feature with the location to format
-	 * @return String The formatted location
-	 */
-	public String formatLocation(Feature theFeature);
+    /**
+     * Formats the location of a feature.  This version is required when
+     * formatting remote locations, since the location field of a remote
+     * feature is the projection of that feature on the sequence.  When a
+     * distinction is made between 'order' and 'join' this method will likely
+     * be extended for that also.
+     *
+     * @param theFeature The feature with the location to format
+     * @return String The formatted location
+     */
+    public String formatLocation(Feature theFeature);
 }

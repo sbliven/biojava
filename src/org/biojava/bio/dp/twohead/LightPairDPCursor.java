@@ -38,7 +38,6 @@ import org.biojava.bio.dp.*;
  * round of calcCell invocations.
  *
  * @author     Matthew Pocock 
- * @created    September 20, 2000 
  */
 public class LightPairDPCursor implements PairDPCursor {
   //    protected CrossProductAlphabet alpha;

@@ -29,22 +29,15 @@ import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SymbolList;
 
 /**
- * <p>
- * <code>SubPairwiseRenderContext</code> is a rendering context which
- * wraps a delegate context and effectively hides some of the
+ * <p><code>SubPairwiseRenderContext</code> is a rendering context
+ * which wraps a delegate context and effectively hides some of the
  * delegate's properties with its own. If any of the
  * <code>SymbolList</code>, <code>FeatureHolder</code> or
  * <code>RangeLocation</code> arguments are not null, their values are
  * returned. Otherwise the delegate's method is called and its return
- * value is returned instead.
- * </p>
+ * value is returned instead.</p>
  *
- * <p>
- * This class is based on <code>SubSequenceRenderContext<code> and
- * credit for the design should go to its author.
- * </p>
- *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @author Matthew Pocock
  * @since 1.2
  */

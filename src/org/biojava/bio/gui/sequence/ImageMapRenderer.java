@@ -39,7 +39,8 @@ import org.biojava.utils.ChangeVetoException;
  * decorator on a <code>FeatureRenderer</code> which will draw the
  * corresponding image area(s).
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
+ * @since 1.3
  */
 public interface ImageMapRenderer extends FeatureRenderer
 {

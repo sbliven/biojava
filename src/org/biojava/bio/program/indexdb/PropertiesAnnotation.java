@@ -5,6 +5,12 @@ import java.util.*;
 
 import org.biojava.bio.*;
 
+/**
+ * <code>PropertiesAnnotation</code>.
+ *
+ * @author Original author unknown
+ * @author Keith James
+ */
 class PropertiesAnnotation
 extends AbstractAnnotation {
   private Properties props;
@@ -25,7 +31,7 @@ extends AbstractAnnotation {
   
   public void commit() {
     try {
-      props.save(new FileOutputStream(propsFile), "Meta-Data");
+      props.store(new FileOutputStream(propsFile), "Meta-Data");
     } catch (IOException ioe) {
       try {
         rollback();

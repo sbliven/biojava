@@ -46,7 +46,7 @@ import org.biojava.utils.ChangeVetoException;
  * to short axis of the ellipse - this prevents long features also
  * becoming ever wider and obscuring neighbours.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class EllipticalBeadRenderer extends AbstractBeadRenderer
@@ -73,14 +73,14 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
     }
 
     /**
-     * Creates a new <code>EllipticalBeadRenderer</code> object.
+     * Creates a new <code>EllipticalBeadRenderer</code>.
      *
-     * @param beadDepth a <code>double</code> value.
-     * @param beadDisplacement a <code>double</code> value.
-     * @param beadOutline a <code>Paint</code> object.
-     * @param beadFill a <code>Paint</code> object.
-     * @param beadStroke a <code>Stroke</code> object.
-     * @param dimensionRatio a <code>double</code> value.
+     * @param beadDepth a <code>double</code>.
+     * @param beadDisplacement a <code>double</code>.
+     * @param beadOutline a <code>Paint</code>.
+     * @param beadFill a <code>Paint</code>.
+     * @param beadStroke a <code>Stroke</code>.
+     * @param dimensionRatio a <code>double</code>.
      */
     public EllipticalBeadRenderer(double beadDepth,
 				  double beadDisplacement,
@@ -100,9 +100,9 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
      * @param f a <code>Feature</code> to render.
      * @param context a <code>SequenceRenderContext</code> context.
      */
-    public void renderBead(final Graphics2D            g2,
-                           final Feature               f,
-                           final SequenceRenderContext context)
+    public void renderBead(Graphics2D            g2,
+                           Feature               f,
+                           SequenceRenderContext context)
     {
 	Location loc = f.getLocation();
 
@@ -153,9 +153,9 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
      *
      * @param context a <code>SequenceRenderContext</code> object.
      *
-     * @return a <code>double</code> value.
+     * @return a <code>double</code>.
      */
-    public double getDepth(final SequenceRenderContext context)
+    public double getDepth(SequenceRenderContext context)
     {
 	// Get max depth of delegates using base class method
   	double maxDepth = super.getDepth(context);
@@ -167,7 +167,7 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
      * long dimension to short dimension of the bead. This should be
      * equal, or greater than 1.
      *
-     * @return a <code>double</code> value.
+     * @return a <code>double</code>.
      */
     public double getDimensionRatio()
     {
@@ -179,11 +179,11 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
      * long dimension to short dimension of the bead. This should be
      * equal, or greater than 1.
      *
-     * @param depth a <code>double</code> value.
+     * @param depth a <code>double</code>.
      *
      * @exception ChangeVetoException if an error occurs.
      */
-    public void setDimensionRatio(final double ratio) throws ChangeVetoException
+    public void setDimensionRatio(double ratio) throws ChangeVetoException
     {
 	if (ratio < 1.0f)
 	    throw new ChangeVetoException("The long dimension may not be less than the short dimension (ratio >= 1.0)");

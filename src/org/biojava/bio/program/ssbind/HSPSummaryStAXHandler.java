@@ -31,6 +31,13 @@ import org.biojava.utils.stax.StAXContentHandler;
 import org.biojava.utils.stax.StAXContentHandlerBase;
 import org.biojava.utils.stax.StringElementHandlerBase;
 
+/**
+ * <code>HSPSummaryStAXHandler</code> handles the HSPSummary element
+ * of BioJava BlastLike XML.
+ *
+ * @author Keith James
+ * @since 1.3
+ */
 public class HSPSummaryStAXHandler extends SeqSimilarityStAXHandler
 {
     public static final StAXHandlerFactory HSPSUMMARY_HANDLER_FACTORY =

@@ -40,7 +40,8 @@ import org.biojava.utils.net.URLFactory;
  * create HTML image map coordinates which correspond to the feature
  * rendering produced by the <code>RectangularBeadRenderer</code>.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
+ * @since 1.3
  */
 public class RectangularImapRenderer
     implements BeadFeatureRenderer, ImageMapRenderer, Serializable
@@ -94,8 +95,8 @@ public class RectangularImapRenderer
      * @param filter an <code>OptimizableFilter</code>.
      * @param renderer a <code>BeadFeatureRenderer</code>.
      */
-    public void setDelegateRenderer(final OptimizableFilter   filter,
-                                    final BeadFeatureRenderer renderer)
+    public void setDelegateRenderer(OptimizableFilter   filter,
+                                    BeadFeatureRenderer renderer)
     {
         this.renderer.setDelegateRenderer(filter, renderer);
     }
@@ -113,9 +114,9 @@ public class RectangularImapRenderer
      * @param f a <code>Feature</code>.
      * @param context a <code>SequenceRenderContext</code>.
      */
-    public void renderImageMap(final Graphics2D                 g2,
-                               final Feature                     f,
-                               final SequenceRenderContext context)
+    public void renderImageMap(Graphics2D                 g2,
+                               Feature                     f,
+                               SequenceRenderContext context)
     {
         Rectangle bounds = g2.getDeviceConfiguration().getBounds();
 
@@ -190,22 +191,22 @@ public class RectangularImapRenderer
         }
     }
 
-    public void renderFeature(final Graphics2D                 g2,
-                              final Feature                     f,
-                              final SequenceRenderContext context)
+    public void renderFeature(Graphics2D                 g2,
+                              Feature                     f,
+                              SequenceRenderContext context)
     {
         renderImageMap(g2, f, context);
         renderer.renderFeature(g2, f, context);
     }
 
-    public void renderBead(final Graphics2D                 g2,
-                           final Feature                     f,
-                           final SequenceRenderContext context)
+    public void renderBead(Graphics2D                 g2,
+                           Feature                     f,
+                           SequenceRenderContext context)
     {
         renderer.renderBead(g2, f, context);
     }
 
-    public double getDepth(final SequenceRenderContext context)
+    public double getDepth(SequenceRenderContext context)
     {
         return renderer.getDepth(context);
     }
@@ -220,9 +221,9 @@ public class RectangularImapRenderer
         return renderer.getBeadDisplacement();
     }
 
-    public FeatureHolder processMouseEvent(final FeatureHolder         holder,
-                                           final SequenceRenderContext context,
-                                           final MouseEvent            mEvent)
+    public FeatureHolder processMouseEvent(FeatureHolder         holder,
+                                           SequenceRenderContext context,
+                                           MouseEvent            mEvent)
     {
         return renderer.processMouseEvent(holder, context, mEvent);
     }

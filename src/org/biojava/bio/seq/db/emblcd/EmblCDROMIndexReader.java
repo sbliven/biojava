@@ -53,7 +53,7 @@ import java.io.IOException;
  * full description, the source code of the dbi programs and the Ajax
  * library.</p>
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public abstract class EmblCDROMIndexReader

@@ -27,7 +27,6 @@ package org.biojava.utils;
  *
  * @author     Thomas Down
  * @author     Matthew Pocock
- * @created    September 29, 2000 
  * @since      1.1 
  */
 

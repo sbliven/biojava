@@ -37,6 +37,7 @@ import org.biojava.utils.stax.StAXContentHandlerBase;
  * at interface create various types of Java object from the XML data.
  *
  * @author Keith James
+ * @since 1.3
  */
 public class SeqSimilarityStAXAdapter extends StAXContentHandlerBase
 {

@@ -36,6 +36,7 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  * @author Greg Cox
+ * @author Nimesh Singh
  */
 public class SimpleAlignment
 extends AbstractSymbolList implements Alignment, Serializable {
@@ -152,7 +153,6 @@ extends AbstractSymbolList implements Alignment, Serializable {
   /**
    * Returns a SequenceIterator over the SymbolLists in this alignment.
    *
-   * @author Nimesh Singh
    */
   public SequenceIterator sequenceIterator() {
     return new AlignmentSequenceIterator(this);

@@ -47,14 +47,7 @@ import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.OptimizableFilter;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.symbol.Location;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeAdapter;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.Changeable;
+import org.biojava.utils.*;
 
 /**
  * <p><code>AbstractBeadRenderer</code> is a an abstract base class
@@ -73,7 +66,7 @@ import org.biojava.utils.Changeable;
  * filter is rendered with that renderer, while the remainder are
  * rendered by the current renderer.</p>
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public abstract class AbstractBeadRenderer extends AbstractChangeable
@@ -178,9 +171,9 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      *
      * @return a <code>FeatureHolder</code>.
      */
-    public FeatureHolder processMouseEvent(final FeatureHolder         holder,
-                                           final SequenceRenderContext context,
-                                           final MouseEvent            mEvent)
+    public FeatureHolder processMouseEvent(FeatureHolder         holder,
+                                           SequenceRenderContext context,
+                                           MouseEvent            mEvent)
     {
         return holder;
     }
@@ -194,9 +187,9 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * @param f a <code>Feature</code> to render.
      * @param context a <code>SequenceRenderContext</code> context.
      */
-    public void renderFeature(final Graphics2D            g2,
-                              final Feature               f,
-                              final SequenceRenderContext context)
+    public void renderFeature(Graphics2D            g2,
+                              Feature               f,
+                              SequenceRenderContext context)
     {
         // Check the cache first
         if (cache.containsKey(f))
@@ -246,8 +239,8 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * @exception IllegalArgumentException if the filter is not
      * disjoint with existing delegate filters.
      */
-    public void setDelegateRenderer(final OptimizableFilter   filter,
-                                    final BeadFeatureRenderer renderer)
+    public void setDelegateRenderer(OptimizableFilter   filter,
+                                    BeadFeatureRenderer renderer)
         throws IllegalArgumentException
     {
         Set delegateFilters = delegates.keySet();
@@ -290,7 +283,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      *
      * @return a <code>double</code>.
      */
-    public double getDepth(final SequenceRenderContext context)
+    public double getDepth(SequenceRenderContext context)
     {
         Collection delegateRenderers = delegates.values();
         double maxDepth = 0.0;
@@ -329,7 +322,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      *
      * @exception ChangeVetoException if an error occurs.
      */
-    public void setBeadDepth(final double depth) throws ChangeVetoException
+    public void setBeadDepth(double depth) throws ChangeVetoException
     {
         if (hasListeners())
         {
@@ -375,7 +368,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      *
      * @exception ChangeVetoException if an error occurs.
      */
-    public void setBeadDisplacement(final double displacement)
+    public void setBeadDisplacement(double displacement)
         throws ChangeVetoException
     {
         if (hasListeners())
@@ -416,7 +409,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      *
      * @exception ChangeVetoException if an error occurs.
      */
-    public void setBeadOutline(final Paint outline) throws ChangeVetoException
+    public void setBeadOutline(Paint outline) throws ChangeVetoException
     {
         if (hasListeners())
         {
@@ -456,7 +449,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      *
      * @exception ChangeVetoException if an error occurs.
      */
-    public void setBeadStroke(final Stroke stroke) throws ChangeVetoException
+    public void setBeadStroke(Stroke stroke) throws ChangeVetoException
     {
         if (hasListeners())
         {
@@ -496,7 +489,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      *
      * @exception ChangeVetoException if an error occurs.
      */
-    public void setBeadFill(final Paint fill) throws ChangeVetoException
+    public void setBeadFill(Paint fill) throws ChangeVetoException
     {
         if (hasListeners())
         {
@@ -527,9 +520,9 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * @param f a <code>Feature</code> to render.
      * @param context a <code>SequenceRenderContext</code> context.
      */
-    public abstract void renderBead(final Graphics2D            g2,
-                                    final Feature               f,
-                                    final SequenceRenderContext context);
+    public abstract void renderBead(Graphics2D            g2,
+                                    Feature               f,
+                                    SequenceRenderContext context);
 
     /**
      * <p><code>Cache</code> to hold the direct mapping of
@@ -546,7 +539,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * cache only listens for changes there. Features forward
      * ChangeEvents from their Annotation.</p>
      *
-     * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+     * @author Keith James
      * @since 1.2
      */
     private class Cache

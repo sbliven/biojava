@@ -37,7 +37,12 @@ import java.util.LinkedList;
  * queue. The worker threads wait on the queue when it is empty and
  * are notified when a new <code>Runnable</code> is submitted.</p>
  *
+ * <p>This implementation will prevent an application from exiting
+ * until <code>stopThreads()</code> is called unless the pool contains
+ * daemon threads.</p>
+ *
  * @author Keith James
+ * @since 1.3
  */
 public class SimpleThreadPool implements ThreadPool
 {

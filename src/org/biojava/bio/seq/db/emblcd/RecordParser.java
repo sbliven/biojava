@@ -25,7 +25,7 @@ package org.biojava.bio.seq.db.emblcd;
  * <code>RecordParser</code> is a general purpose parser for arrays of
  * bytes read from any the the EMBL CD-ROM format index files.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @author Greg Cox
  * @since 1.2
  */
@@ -58,7 +58,7 @@ class RecordParser
      *
      * @return a <code>long</code>.
      */
-    long parseInt4(final byte [] int4)
+    long parseInt4(byte [] int4)
     {
         int result = 0;
 
@@ -79,7 +79,7 @@ class RecordParser
      *
      * @return an <code>int</code>.
      */
-    int parseInt2(final byte [] int2)
+    int parseInt2(byte [] int2)
     {
         int result = 0;
 
@@ -93,18 +93,18 @@ class RecordParser
     }
 
     /**
-     * <code>parseDate</code> parses a String from an array of
-     * bytes. The date is stored in 4 bytes: 0, unused; 1, year; 2,
-     * month; 3, day. With a 1 byte year it's not very much use and
-     * I'm not sure that the EMBOSS programs set the value correctly
-     * anyway.
+     * <code>parseDate</code> parses a <code>String</code> from an
+     * array of bytes. The date is stored in 4 bytes: 0, unused; 1,
+     * year; 2, month; 3, day. With a 1 byte year it's not very much
+     * use and I'm not sure that the EMBOSS programs set the value
+     * correctly anyway.
      *
      * @param sb a <code>StringBuffer</code>.
      * @param dbDate a <code>byte []</code> array.
      *
      * @return a <code>String</code>.
      */
-    String parseDate(final StringBuffer sb, final byte [] dbDate)
+    String parseDate(StringBuffer sb, byte [] dbDate)
     {
         // The first byte is unused
         for (int i = dbDate.length; --i > 0;)
@@ -118,15 +118,15 @@ class RecordParser
     }
 
     /**
-     * <code>parseString</code> parses a String from an array of
-     * bytes, skipping the empties.
+     * <code>parseString</code> parses a <code>String</code> from an
+     * array of bytes, skipping the empties.
      *
      * @param sb a <code>StringBuffer</code>.
      * @param characters a <code>byte []</code> array.
      *
      * @return a <code>String</code>.
      */
-    String parseString(final StringBuffer sb, final byte [] characters)
+    String parseString(StringBuffer sb, byte [] characters)
     {
         for (int i = 0; i < characters.length; i++)
         {
@@ -147,7 +147,7 @@ class RecordParser
      *
      * @return an <code>Object []</code> array.
      */
-    Object [] parseDivRecord(final byte [] divRecord)
+    Object [] parseDivRecord(byte [] divRecord)
     {
         // The variable part of record is the name. Other parts are
 	// int which sum to 2

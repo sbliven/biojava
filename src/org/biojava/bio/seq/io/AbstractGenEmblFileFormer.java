@@ -48,21 +48,13 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.RemoteFeature;
-import org.biojava.bio.symbol.CompoundLocation;
-import org.biojava.bio.symbol.FuzzyLocation;
-import org.biojava.bio.symbol.FuzzyPointLocation;
-import org.biojava.bio.symbol.Location;
-import org.biojava.bio.symbol.PointLocation;
-import org.biojava.bio.symbol.RangeLocation;
-import org.biojava.bio.symbol.BetweenLocation;
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.*;
 
 /**
  * <code>AbstractGenEmblFileFormer</code> contain file formatting code
  * common to both GenBank and EMBL file formats.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @author Greg Cox
  * @since 1.2
  */
@@ -120,10 +112,10 @@ class AbstractGenEmblFileFormer
      * columns per line.
      * @return a <code>StringBuffer</code>.
      */
-    StringBuffer formatQualifierBlock(final StringBuffer sb,
-				      final String       text,
-				      final String       leader,
-				      final int          wrapWidth)
+    StringBuffer formatQualifierBlock(StringBuffer sb,
+				      String       text,
+				      String       leader,
+				      int          wrapWidth)
     {
 	int tokenType = FIRST;
 	int  position = leader.length();
@@ -216,7 +208,7 @@ class AbstractGenEmblFileFormer
      *
      * @return a <code>String</code> bounded by the correct tokens.
      */
-    StringBuffer formatQualifier(final StringBuffer sb, final Object key, final Object value)
+    StringBuffer formatQualifier(StringBuffer sb, Object key, Object value)
     {
 	sb.append("/" + key);
 
@@ -255,10 +247,10 @@ class AbstractGenEmblFileFormer
      *
      * @return a <code>StringBuffer</code>.
      */
-    StringBuffer formatTokenBlock(final StringBuffer       sb,
-				  final Symbol []          syms,
-				  final int                blockSize,
-				  final SymbolTokenization tokenization)
+    StringBuffer formatTokenBlock(StringBuffer       sb,
+				  Symbol []          syms,
+				  int                blockSize,
+				  SymbolTokenization tokenization)
 	throws IllegalSymbolException
     {
 	for (int i = 0; i < syms.length; i++)
@@ -270,89 +262,89 @@ class AbstractGenEmblFileFormer
 	return sb;
     }
 
-	/**
-	 * Formats the location of a feature.  This version is required when
-	 * formatting remote locations, since the location field of a remote
-	 * feature is the projection of that feature on the sequence.  When a
-	 * distinction is made between 'order' and 'join' this method will likely
-	 * be extended for that also.
-	 *
-	 * @param theFeature The feature with the location to format
-	 * @return String The formatted location
-	 */
-	public String formatLocation(Feature theFeature)
-	{
-		String formattedLocation = null;
-		StrandedFeature.Strand featureStrand = StrandedFeature.POSITIVE;
+    /**
+     * Formats the location of a feature.  This version is required when
+     * formatting remote locations, since the location field of a remote
+     * feature is the projection of that feature on the sequence.  When a
+     * distinction is made between 'order' and 'join' this method will likely
+     * be extended for that also.
+     *
+     * @param theFeature The feature with the location to format
+     * @return String The formatted location
+     */
+    public String formatLocation(Feature theFeature)
+    {
+        String formattedLocation = null;
+        StrandedFeature.Strand featureStrand = StrandedFeature.POSITIVE;
 
-		String joinType = "join";
-		if(theFeature.getAnnotation().containsProperty("JoinType"))
-		{
-			joinType = (String)theFeature.getAnnotation().getProperty("JoinType");
-		}
+        String joinType = "join";
+        if(theFeature.getAnnotation().containsProperty("JoinType"))
+        {
+            joinType = (String)theFeature.getAnnotation().getProperty("JoinType");
+        }
 
-		if(theFeature instanceof RemoteFeature)
-		{
-			StringBuffer tempBuffer = new StringBuffer();
-			List regionList = ((RemoteFeature)theFeature).getRegions();
+        if(theFeature instanceof RemoteFeature)
+        {
+            StringBuffer tempBuffer = new StringBuffer();
+            List regionList = ((RemoteFeature)theFeature).getRegions();
 
-			if(regionList.size() > 1)
-			{
-				tempBuffer.append(joinType);
-				tempBuffer.append("(");
-			}
-			java.util.ListIterator tempIterator = regionList.listIterator();
+            if(regionList.size() > 1)
+            {
+                tempBuffer.append(joinType);
+                tempBuffer.append("(");
+            }
+            java.util.ListIterator tempIterator = regionList.listIterator();
 
-			while(tempIterator.hasNext())
-			{
-				// Set up remote location
-				RemoteFeature.Region tempRegion = (RemoteFeature.Region)(tempIterator.next());
+            while(tempIterator.hasNext())
+            {
+                // Set up remote location
+                RemoteFeature.Region tempRegion = (RemoteFeature.Region)(tempIterator.next());
 
-				if(tempRegion.getSeqID() != null)
-				{
-					tempBuffer.append(tempRegion.getSeqID());
-					tempBuffer.append(':');
-				}
+                if(tempRegion.getSeqID() != null)
+                {
+                    tempBuffer.append(tempRegion.getSeqID());
+                    tempBuffer.append(':');
+                }
 
-				// Add the actual location
-				String tempLocation = null;
-				if(theFeature instanceof StrandedFeature)
-				{
-					featureStrand = ((StrandedFeature)theFeature).getStrand();
-				}
-				tempLocation = this.formatLocation(
-						tempRegion.getLocation(), featureStrand);
-				tempBuffer.append(tempLocation);
+                // Add the actual location
+                String tempLocation = null;
+                if(theFeature instanceof StrandedFeature)
+                {
+                    featureStrand = ((StrandedFeature)theFeature).getStrand();
+                }
+		tempLocation = this.formatLocation(
+				tempRegion.getLocation(), featureStrand);
+		tempBuffer.append(tempLocation);
 
-				// Only have commas between two subregions
-				if(tempIterator.hasNext())
-				{
-					tempBuffer.append(',');
-				}
-			}
+                // Only have commas between two subregions
+                if(tempIterator.hasNext())
+                {
+                    tempBuffer.append(',');
+                }
+            }
 
-			// Close out the join block if needed
-			if(regionList.size() > 1)
-			{
-				tempBuffer.append(')');
-			}
-			formattedLocation = tempBuffer.toString();
-		}
-		else
-		{
-			if(theFeature instanceof StrandedFeature)
-			{
-				featureStrand = ((StrandedFeature)theFeature).getStrand();
-			}
+            // Close out the join block if needed
+            if(regionList.size() > 1)
+            {
+                tempBuffer.append(')');
+            }
+            formattedLocation = tempBuffer.toString();
+        }
+        else
+        {
+            if(theFeature instanceof StrandedFeature)
+            {
+                featureStrand = ((StrandedFeature)theFeature).getStrand();
+            }
+            
+            StringBuffer tempBuffer = new StringBuffer();
+            formattedLocation = this.formatLocationBlock(tempBuffer,
+                                                         theFeature.getLocation(), featureStrand.getValue(), "",
+                                                         Integer.MAX_VALUE, joinType).toString();
+        }
 
-			StringBuffer tempBuffer = new StringBuffer();
-			formattedLocation = this.formatLocationBlock(tempBuffer,
-					theFeature.getLocation(), featureStrand.getValue(), "",
-					Integer.MAX_VALUE, joinType).toString();
-		}
-
-		return formattedLocation;
-	}
+        return formattedLocation;
+    }
 
     /**
      * <code>formatLocation</code> creates an EMBL/Genbank style
@@ -369,8 +361,8 @@ class AbstractGenEmblFileFormer
      *
      * @return a <code>StringBuffer</code>.
      */
-    public String formatLocation(final Location               loc,
-				 final StrandedFeature.Strand strand)
+    public String formatLocation(Location               loc,
+				 StrandedFeature.Strand strand)
     {
 	// Using arbitrary leader and wrapwidth wide enough to always
 	// make one line.
@@ -381,7 +373,7 @@ class AbstractGenEmblFileFormer
 					      Integer.MAX_VALUE,
 					      "join");
 
-	return sb.toString();
+	return sb.substring(0);
     }
 
     /**
@@ -398,11 +390,7 @@ class AbstractGenEmblFileFormer
      *  (123.345)..(567.789)
      *   123..456
      *  <123..567 or 123..>567 or <123..>567
-     *  123^567
-     * </pre>
-     *
-     * Specifically not supported is:
-     * <pre>
+     *   123^567
      *   AL123465:(123..567)
      * </pre>
      *
@@ -418,11 +406,11 @@ class AbstractGenEmblFileFormer
      * @param strand a <code>StrandedFeature.Strand</code>
      * indicating the <code>Location</code>'s strand.
      *
-     * @return a <code>StringBuffer</code> value.
+     * @return a <code>StringBuffer</code>.
      */
-    public StringBuffer formatLocation(final StringBuffer           sb,
-				       final Location               loc,
-				       final StrandedFeature.Strand strand)
+    public StringBuffer formatLocation(StringBuffer           sb,
+				       Location               loc,
+				       StrandedFeature.Strand strand)
     {
 	// Using arbitrary leader and wrapwidth wide enough to always
 	// make one line
@@ -450,14 +438,14 @@ class AbstractGenEmblFileFormer
      *
      * @return a <code>StringBuffer</code>.
      */
-    StringBuffer formatLocationBlock(final StringBuffer sb,
-				     final Location     loc,
-				     final int          strand,
-				     final String       leader,
-				     final int          wrapWidth)
+    StringBuffer formatLocationBlock(StringBuffer sb,
+				     Location     loc,
+				     int          strand,
+				     String       leader,
+				     int          wrapWidth)
     {
-		return this.formatLocationBlock(sb, loc, strand, leader, wrapWidth, "join");
-	}
+        return this.formatLocationBlock(sb, loc, strand, leader, wrapWidth, "join");
+    }
 
     /**
      * <code>formatLocationBlock</code> creates an EMBL/Genbank style
@@ -476,12 +464,12 @@ class AbstractGenEmblFileFormer
      *
      * @return a <code>StringBuffer</code>.
      */
-    StringBuffer formatLocationBlock(final StringBuffer sb,
-				     final Location     loc,
-				     final int          strand,
-				     final String       leader,
-				     final int          wrapWidth,
-				     final String		joinType)
+    StringBuffer formatLocationBlock(StringBuffer sb,
+				     Location     loc,
+				     int          strand,
+				     String       leader,
+				     int          wrapWidth,
+				     String	  joinType)
     {
 	// Indicates how many characters have been added to the
 	// current line
@@ -548,33 +536,33 @@ class AbstractGenEmblFileFormer
 		case POINT:
 		    PointLocation pl = (PointLocation) thisLoc;
 
-		    sb.append(complement                                   ?
-			      toComplement(formatPoint(ub, pl).toString()) :
-			      formatPoint(ub, pl).toString());
+		    sb.append(complement                                     ?
+			      toComplement(formatPoint(ub, pl).substring(0)) :
+			      formatPoint(ub, pl).substring(0));
 		    break;
 
 		case FUZZY_RANGE:
 		    FuzzyLocation fl = (FuzzyLocation) thisLoc;
 
-		    sb.append(complement                                        ?
-			      toComplement(formatFuzzyRange(ub, fl).toString()) :
-			      formatFuzzyRange(ub, fl).toString());
+		    sb.append(complement                                          ?
+			      toComplement(formatFuzzyRange(ub, fl).substring(0)) :
+			      formatFuzzyRange(ub, fl).substring(0));
 		    break;
 
 		case FUZZY_POINT:
 		    FuzzyPointLocation fpl = (FuzzyPointLocation) thisLoc;
 
-		    sb.append(complement                                         ?
-			      toComplement(formatFuzzyPoint(ub, fpl).toString()) :
-			      formatFuzzyPoint(ub, fpl).toString());
+		    sb.append(complement                                           ?
+			      toComplement(formatFuzzyPoint(ub, fpl).substring(0)) :
+			      formatFuzzyPoint(ub, fpl).substring(0));
 		    break;
 
 		case RANGE:
 		    RangeLocation rl = (RangeLocation) thisLoc;
 
-		    sb.append(complement                                   ?
-			      toComplement(formatRange(ub, rl).toString()) :
-			      formatRange(ub, rl).toString());
+		    sb.append(complement                                     ?
+			      toComplement(formatRange(ub, rl).substring(0)) :
+			      formatRange(ub, rl).substring(0));
 		    break;
 
 		case BETWEEN_LOCATION:
@@ -639,7 +627,7 @@ class AbstractGenEmblFileFormer
      *
      * @return a <code>String</code> representation of the location.
      */
-    private StringBuffer formatFuzzyRange(final StringBuffer sb, final FuzzyLocation fl)
+    private StringBuffer formatFuzzyRange(StringBuffer sb, FuzzyLocation fl)
     {
 	if (! fl.hasBoundedMin())
 	{
@@ -693,7 +681,7 @@ class AbstractGenEmblFileFormer
      *
      * @return a <code>String</code> representation of the location.
      */
-    private StringBuffer formatFuzzyPoint(final StringBuffer sb, final FuzzyPointLocation fpl)
+    private StringBuffer formatFuzzyPoint(StringBuffer sb, FuzzyPointLocation fpl)
     {
 	if (! fpl.hasBoundedMin())
 	{
@@ -727,7 +715,7 @@ class AbstractGenEmblFileFormer
      *
      * @return a <code>String</code> representation of the location.
      */
-    private StringBuffer formatRange(final StringBuffer sb, final RangeLocation rl)
+    private StringBuffer formatRange(StringBuffer sb, RangeLocation rl)
     {
 	// 123..567
 	sb.append(rl.getMin());
@@ -746,7 +734,7 @@ class AbstractGenEmblFileFormer
      *
      * @return a <code>String</code> representation of the location.
      */
-    private StringBuffer formatPoint(final StringBuffer sb, final PointLocation pl)
+    private StringBuffer formatPoint(StringBuffer sb, PointLocation pl)
     {
 	sb.append(Integer.toString(pl.getMin()));
 	return sb;
@@ -760,7 +748,7 @@ class AbstractGenEmblFileFormer
      *
      * @return A string representation of the location
      */
-    private StringBuffer formatBetween(final StringBuffer sb, final BetweenLocation theLocation)
+    private StringBuffer formatBetween(StringBuffer sb, BetweenLocation theLocation)
     {
 	sb.append(theLocation.getMin());
 	sb.append('^');
@@ -778,7 +766,7 @@ class AbstractGenEmblFileFormer
      * @return a <code>String</code> representation of the
      * complementary strand location.
      */
-    private String toComplement(final String value)
+    private String toComplement(String value)
     {
 	return "complement(" + value + ")";
     }
@@ -799,9 +787,9 @@ class AbstractGenEmblFileFormer
      * @param qualifierData a <code>Map</code> to populate with
      * qualifier data.
      */
-    static void loadFeatureData(final String featureDataFile,
-				final Map    featureData,
-				final Map    qualifierData)
+    static void loadFeatureData(String featureDataFile,
+				Map    featureData,
+				Map    qualifierData)
     {
 	try
 	{

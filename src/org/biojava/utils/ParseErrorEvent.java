@@ -26,7 +26,6 @@ import java.util.*;
  *  Event which signals a bad line when parsing a record.
  *
  * @author     Greg Cox
- * @created    Febuary 12, 2001
  */
 
 public class ParseErrorEvent extends EventObject

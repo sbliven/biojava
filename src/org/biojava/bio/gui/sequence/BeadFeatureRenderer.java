@@ -39,7 +39,8 @@ import org.biojava.bio.seq.OptimizableFilter;
  * filter is rendered with that renderer, while the remainder are
  * rendered by the current renderer.</p>
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
+ * @since 1.2
  */
 public interface BeadFeatureRenderer extends FeatureRenderer
 {
