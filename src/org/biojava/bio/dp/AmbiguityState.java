@@ -36,6 +36,7 @@ import org.biojava.bio.seq.DNATools;
  * symbols.
  */
 public class AmbiguityState extends AbstractState implements Serializable {
+  static final long serialVersionUID = -6063745195859460723L;
   private static int[] advance = {1};
 
   private final double [] score;
@@ -91,6 +92,10 @@ public class AmbiguityState extends AbstractState implements Serializable {
   
   public AmbiguityState() {
     super(DNATools.getAmbiguity());
+  }
+  
+  public Alphabet alphabet() {
+    return DNATools.getAmbiguity();
   }
   
   public void registerWithTrainer(ModelTrainer modelTrainer) {

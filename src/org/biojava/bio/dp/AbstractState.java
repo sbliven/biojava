@@ -57,7 +57,7 @@ public abstract class AbstractState implements EmissionState {
   }
 
 
-  public final Alphabet alphabet() {
+  public Alphabet alphabet() {
     return alpha;
   }
 

@@ -22,10 +22,6 @@ import java.util.*;
  */
 public class CachingKernel extends NestedKernel {
     transient private Map cache;
-
-    {
-      cache = new HashMap();
-    }
     
     public CachingKernel() {
     }
@@ -36,6 +32,9 @@ public class CachingKernel extends NestedKernel {
 
     public void setNestedKernel(SVMKernel k) {
       super.setNestedKernel(k);
+      if(cache == null) {
+        cache = new HashMap();
+      }
       cache.clear();
     }
 
