@@ -81,6 +81,18 @@ public class ChangeVetoException extends NestedException {
     super(ex);
     this.change = change;
   }
+  
+  /**
+   *  Propogate an exception, giving a detail message 
+   *
+   * @param  ex      A parent exception 
+   * @param  reason  A detail message. 
+   */
+
+   public ChangeVetoException(Exception ex, String reason) {
+    super(ex, reason);
+    this.change = null;
+  }
 
   /**
    *  Propogate an exception, giving a detail message 

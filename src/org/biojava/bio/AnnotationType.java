@@ -65,6 +65,21 @@ public interface AnnotationType {
    */
   public Set getProperties();
   
+  public static final AnnotationType ANY = new AnnotationType() {
+    public boolean instanceOf(Annotation ann) {
+      return true;
+    }
+    public boolean subTypeOf(AnnotationType subType) {
+      return true;
+    }
+    public PropertyConstraint getPropertyConstraint(Object key) {
+      return null;
+    }
+    public Set getProperties() {
+      return Collections.EMPTY_SET;
+    }
+  };
+  
   /**
    * <p>
    * An implementation of <code>AnnotationType</code>.

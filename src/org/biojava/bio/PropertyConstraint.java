@@ -9,6 +9,9 @@ public interface PropertyConstraint {
   
   public boolean subConstraintOf(PropertyConstraint subConstraint);
   
+  public void setProperty(Annotation ann, Object property, Object value)
+  throws ChangeVetoException;
+  
   public class Anything implements PropertyConstraint {
     public Anything() {}
     public boolean accept(Object value) {
@@ -17,6 +20,11 @@ public interface PropertyConstraint {
     
     public boolean subConstraintOf(PropertyConstraint subConstraint) {
       return true;
+    }
+    
+    public void setProperty(Annotation ann, Object property, Object value)
+    throws ChangeVetoException {
+      ann.setProperty(property, value);
     }
   }
   
@@ -42,6 +50,15 @@ public interface PropertyConstraint {
       }
       
       return false;
+    }
+    
+    public void setProperty(Annotation ann, Object property, Object value)
+    throws ChangeVetoException {
+      if(accept(value)) {
+        ann.setProperty(property, value);
+      } else {
+        throw new ChangeVetoException("Incorrect class: " + cl + " not " + value.getClass());
+      }
     }
   }
   
@@ -71,6 +88,15 @@ public interface PropertyConstraint {
       }
       
       return false;
+    }
+    
+    public void setProperty(Annotation ann, Object property, Object value)
+    throws ChangeVetoException {
+      if(accept(value)) {
+        ann.setProperty(property, value);
+      } else {
+        throw new ChangeVetoException("Incorrect annotation type");
+      }
     }
   }
   
@@ -134,6 +160,26 @@ public interface PropertyConstraint {
       
       return false;
     }
+    
+    public void setProperty(Annotation ann, Object property, Object value)
+    throws ChangeVetoException {
+      if(getElementType().accept(value)) {
+        Collection c;
+        if(ann.containsProperty(property)) {
+          c = (Collection) ann.getProperty(value);
+        } else {
+          try {
+            c = (Collection) getCollectionClass().newInstance();
+            ann.setProperty(property, c);
+          } catch (Exception e) {
+            throw new ChangeVetoException(e, "Can't create collection resource");
+          }
+        }
+        c.add(value);
+      } else {
+        throw new ChangeVetoException("Incorrect element type");
+      }
+    }
   }
   
   public class IsList extends IsCollectionOf {
@@ -187,6 +233,15 @@ public interface PropertyConstraint {
       }
       
       return false;
+    }
+    
+    public void setProperty(Annotation ann, Object property, Object value)
+    throws ChangeVetoException {
+      if(accept(property)) {
+        ann.setProperty(property, value);
+      } else {
+        throw new ChangeVetoException("Value not accepted");
+      }
     }
   }
 }
