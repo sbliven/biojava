@@ -34,7 +34,7 @@ import org.biojava.bio.*;
  * @author David Huen (refactoring)
  * @since 1.3
  */
-public class BioSQLEntryAnnotationChangeHub extends IndexedChangeHub
+class BioSQLEntryAnnotationChangeHub extends IndexedChangeHub
 {
     BioSQLSequenceDB seqDB;
     BioSQLEntryChangeHub entryHub;

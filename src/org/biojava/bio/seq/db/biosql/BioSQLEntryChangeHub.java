@@ -32,7 +32,7 @@ import org.biojava.bio.seq.db.*;
  * @author David Huen (refactoring)
  * @since 1.3
  */
-public class BioSQLEntryChangeHub extends IndexedChangeHub
+class BioSQLEntryChangeHub extends IndexedChangeHub
 {
     BioSQLSequenceDB seqDB;
 

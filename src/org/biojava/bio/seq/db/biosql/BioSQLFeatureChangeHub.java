@@ -34,7 +34,7 @@ import org.biojava.bio.seq.db.*;
  * @since 1.3
  */
 
-public class BioSQLFeatureChangeHub extends IndexedChangeHub
+class BioSQLFeatureChangeHub extends IndexedChangeHub
 {
     BioSQLSequenceDB seqDB;
     BioSQLEntryChangeHub entryHub;

@@ -27,7 +27,15 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.db.*;
 import org.biojava.bio.*;
 
-public class BioSQLFeatureAnnotationChangeHub extends IndexedChangeHub
+/**
+ * Handles ChangeEvents for BioSQLFeatureAnnotation instances.
+ *
+ * @author Thomas Down (original implementation)
+ * @author David Huen (refactoring)
+ * @since 1.3
+ */
+
+class BioSQLFeatureAnnotationChangeHub extends IndexedChangeHub
 {
     BioSQLSequenceDB seqDB;
     BioSQLFeatureChangeHub featureHub;
