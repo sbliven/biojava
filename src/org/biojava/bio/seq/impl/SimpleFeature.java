@@ -352,6 +352,8 @@ implements
       ft.type = getType();
       ft.source = getSource();
       ft.annotation = getAnnotation();
+      ft.sourceTerm = getSourceTerm();
+      ft.typeTerm = getTypeTerm();
     }
 
     /**

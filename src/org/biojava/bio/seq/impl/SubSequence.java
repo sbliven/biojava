@@ -306,7 +306,7 @@ public class SubSequence
   }
 
   /**
-   * Context that implements the mapping between the parent sequence and this
+   * TargetContext that implements the mapping between the parent sequence and this
    * sub-sequence.
    *
    * <p>
