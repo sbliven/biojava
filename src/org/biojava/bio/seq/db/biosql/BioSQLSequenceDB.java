@@ -166,11 +166,11 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
 	// Create adapters
 	featuresSQL = new FeaturesSQL(this);
-    try {
-        ontologySQL = new OntologySQL(this);
-    } catch (SQLException ex) {
-        throw new BioException("Error accessing ontologies", ex);
-    }
+        try {
+            ontologySQL = new OntologySQL(this);
+        } catch (SQLException ex) {
+            throw new BioException("Error accessing ontologies", ex);
+        }
 
 	// Create helpers
 //	changeHub = new BioSQLChangeHub(this);
@@ -864,8 +864,8 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         PreparedStatement insert_new;
         if (isSPASupported()) {
             insert_new = conn.prepareStatement("insert into bioentry_qualifier_value " +
-                                              "       (bioentry_id, term_id, value, rank) " +
-                    					      "values (?, intern_ontology_term( ? ), ?, ?)");
+                                               "       (bioentry_id, term_id, value, rank) " +
+                                               "values (?, intern_ontology_term( ? ), ?, ?)");
             if (value instanceof Collection) {
                 int cnt = 0;
                 for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
@@ -884,8 +884,8 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
             }
         } else {
             insert_new = conn.prepareStatement("insert into bioentry_qualifier_value " +
-                                              "       (bioentry_id, term_id, rank, value) " +
-					                          "values (?, ?, ?, ?)");
+                                               "       (bioentry_id, term_id, rank, value) " +
+                                               "values (?, ?, ?, ?)");
 	        int termID = intern_ontology_term(conn, keyString);
             if (value instanceof Collection) {
                 int cnt = 0;
@@ -917,20 +917,21 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     {
         Ontology legacy = ontologySQL.getLegacyOntology();
         String ts = s.trim();  // Hack for schema change
-				if (legacy.containsTerm(ts)) {
-					return ontologySQL.termID(legacy.getTerm(ts));
-				// Same term but different case causes error when try to add it
-				// These hacks prevent it.  ex. genbank can have ORGANISM & organism keys            
-				} else if (legacy.containsTerm(ts.toLowerCase())) {
-					return ontologySQL.termID(legacy.getTerm(ts.toLowerCase()));
-				} else if (legacy.containsTerm(ts.toUpperCase())) {
-					return ontologySQL.termID(legacy.getTerm(ts.toUpperCase()));
-
+        if (legacy.containsTerm(ts)) {
+            return ontologySQL.termID(legacy.getTerm(ts));
+            // Same term but different case causes error when try to add it
+            // These hacks prevent it.  ex. genbank can have ORGANISM & organism keys            
+        } else if (legacy.containsTerm(ts.toLowerCase())) {
+            return ontologySQL.termID(legacy.getTerm(ts.toLowerCase()));
+        } else if (legacy.containsTerm(ts.toUpperCase())) {
+            return ontologySQL.termID(legacy.getTerm(ts.toUpperCase()));
+            
         } else {
             try {
                 return ontologySQL.termID(legacy.createTerm(ts, ""));
             } catch (Exception ex) {
-//							System.err.println("Term: " + ts + "   " + ex.getMessage());
+                //ex.printStackTrace();
+                //System.err.println("Term: " + ts + "   " + ex.getMessage());
                 throw new SQLException("Couldn't create term in legacy ontology namespace");
             }
         }
