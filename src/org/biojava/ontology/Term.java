@@ -141,7 +141,7 @@ public interface Term extends Annotatable {
         if(getAnnotation() != null)
           value = 31 * (getAnnotation().hashCode() + 11);
 
-        System.out.println("value = "+ (-91 * value));
+        //System.out.println("value = "+ (-91 * value));
 
         return -91 * value;
       }
