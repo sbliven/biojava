@@ -55,7 +55,7 @@ public interface FeatureFilter extends Serializable {
    * All features are selected in with this filter.
    */
   static final public FeatureFilter all = new AcceptAllFilter();
-  
+
   /**
    * The class that accepts all features.
    * <P>
@@ -79,7 +79,7 @@ public interface FeatureFilter extends Serializable {
     public boolean isProperSubset(FeatureFilter sup) {
       return sup.equals(this);
     }
-    
+
     public boolean isDisjoint(FeatureFilter filt) {
       return filt instanceof AcceptNoneFilter;
     }
@@ -93,7 +93,7 @@ public interface FeatureFilter extends Serializable {
    * No features are selected in with this filter.
    */
   static final public FeatureFilter none = new AcceptNoneFilter();
-  
+
   /**
    * The class that accepts no features.
    * <P>
@@ -112,11 +112,11 @@ public interface FeatureFilter extends Serializable {
     public int hashCode() {
       return 1;
     }
-    
+
     public boolean isProperSubset(FeatureFilter sup) {
       return true;
     }
-    
+
     public boolean isDisjoint(FeatureFilter filt) {
       return true;
     }
@@ -125,7 +125,7 @@ public interface FeatureFilter extends Serializable {
 	  return "None";
       }
   }
-  
+
   /**
    * Construct one of these to filter features by type.
    *
@@ -134,11 +134,11 @@ public interface FeatureFilter extends Serializable {
    */
   final public static class ByType implements OptimizableFilter {
     private String type;
-    
+
     public String getType() {
       return type;
     }
-    
+
     /**
      * Create a ByType filter that filters in all features with type fields
      * equal to type.
@@ -148,28 +148,28 @@ public interface FeatureFilter extends Serializable {
     public ByType(String type) {
       this.type = type;
     }
-    
+
     /**
      * Returns true if the feature has a matching type property.
      */
     public boolean accept(Feature f) {
       return type.equals(f.getType());
     }
-    
+
     public boolean equals(Object o) {
       return
         (o instanceof ByType) &&
         (((ByType) o).getType().equals(this.getType()));
     }
-    
+
     public int hashCode() {
       return getType().hashCode();
     }
-    
+
     public boolean isProperSubset(FeatureFilter sup) {
       return this.equals(sup) || (sup instanceof AcceptAllFilter);
     }
-    
+
     public boolean isDisjoint(FeatureFilter filt) {
       return (filt instanceof AcceptNoneFilter) || (
         (filt instanceof ByType) &&
@@ -190,11 +190,11 @@ public interface FeatureFilter extends Serializable {
    */
   public final static class BySource implements OptimizableFilter {
     private String source;
-    
+
     public String getSource() {
       return source;
     }
-    
+
     /**
      * Create a BySource filter that filters in all features which have sources
      * equal to source.
@@ -204,9 +204,9 @@ public interface FeatureFilter extends Serializable {
     public BySource(String source) {
       this.source = source;
     }
-    
+
     public boolean accept(Feature f) { return source.equals(f.getSource()); }
-    
+
     public boolean equals(Object o) {
       return
         (o instanceof BySource) &&
@@ -220,7 +220,7 @@ public interface FeatureFilter extends Serializable {
     public int hashCode() {
       return getSource().hashCode();
     }
-    
+
     public boolean isDisjoint(FeatureFilter filt) {
       return (filt instanceof AcceptNoneFilter) || (
         (filt instanceof BySource) &&
@@ -241,32 +241,32 @@ public interface FeatureFilter extends Serializable {
    * @author Matthew Pocock
    * @since 1.1
    */
-   
+
   public final static class ByClass implements OptimizableFilter {
     private Class clazz;
-    
+
     public ByClass(Class clazz) {
       this.clazz = clazz;
     }
-    
+
     public boolean accept(Feature f) {
       return clazz.isInstance(f);
     }
-    
+
     public Class getTestClass() {
       return clazz;
     }
-    
+
     public boolean equals(Object o) {
       return
         (o instanceof ByClass) &&
         (((ByClass) o).getTestClass() == this.getTestClass());
     }
-    
+
     public int hashCode() {
       return getTestClass().hashCode();
     }
-    
+
     public boolean isProperSubset(FeatureFilter sup) {
       if(sup instanceof ByClass) {
         Class supC = ((ByClass) sup).getTestClass();
@@ -274,7 +274,7 @@ public interface FeatureFilter extends Serializable {
       }
       return (sup instanceof AcceptAllFilter);
     }
-    
+
     public boolean isDisjoint(FeatureFilter feat) {
       if(feat instanceof ByClass) {
         Class featC = ((ByClass) feat).getClass();
@@ -303,7 +303,7 @@ public interface FeatureFilter extends Serializable {
     public Location getLocation() {
       return loc;
     }
-    
+
     /**
      * Creates a filter that returns everything contained within loc.
      *
@@ -312,24 +312,24 @@ public interface FeatureFilter extends Serializable {
     public ContainedByLocation(Location loc) {
       this.loc = loc;
     }
-    
+
     /**
      * Returns true if the feature is within this filter's location.
      */
     public boolean accept(Feature f) {
       return loc.contains(f.getLocation());
     }
-    
+
     public boolean equals(Object o) {
       return
         (o instanceof ContainedByLocation) &&
         (((ContainedByLocation) o).getLocation().equals(this.getLocation()));
     }
-    
+
     public int hashCode() {
       return getLocation().hashCode();
     }
-    
+
     public boolean isProperSubset(FeatureFilter sup) {
       if(sup instanceof ContainedByLocation) {
         Location supL = ((ContainedByLocation) sup).getLocation();
@@ -340,7 +340,7 @@ public interface FeatureFilter extends Serializable {
       }
       return (sup instanceof AcceptAllFilter);
     }
-    
+
     public boolean isDisjoint(FeatureFilter filt) {
       if(filt instanceof ContainedByLocation) {
         Location loc = ((ContainedByLocation) filt).getLocation();
@@ -349,7 +349,7 @@ public interface FeatureFilter extends Serializable {
 	  Location filtL = ((OverlapsLocation) filt).getLocation();
 	  return !filtL.overlaps(this.getLocation());
       }
-      
+
       return (filt instanceof AcceptNoneFilter);
     }
 
@@ -357,7 +357,7 @@ public interface FeatureFilter extends Serializable {
       return "ContainedBy(" + loc + ")";
     }
   }
-  
+
   /**
    *  A filter that returns all features overlapping a location.
    *
@@ -366,11 +366,11 @@ public interface FeatureFilter extends Serializable {
    */
   public final static class OverlapsLocation implements OptimizableFilter {
     private Location loc;
-    
+
     public Location getLocation() {
       return loc;
     }
-    
+
     /**
      * Creates a filter that returns everything overlapping loc.
      *
@@ -379,24 +379,24 @@ public interface FeatureFilter extends Serializable {
     public OverlapsLocation(Location loc) {
       this.loc = loc;
     }
-    
+
     /**
      * Returns true if the feature overlaps this filter's location.
      */
     public boolean accept(Feature f) {
       return loc.overlaps(f.getLocation());
     }
-    
+
     public boolean equals(Object o) {
       return
         (o instanceof OverlapsLocation) &&
         (((OverlapsLocation) o).getLocation().equals(this.getLocation()));
     }
-    
+
     public int hashCode() {
       return getLocation().hashCode();
     }
-    
+
     public boolean isProperSubset(FeatureFilter sup) {
       if(sup instanceof OverlapsLocation) {
         Location supL = ((OverlapsLocation) sup).getLocation();
@@ -409,7 +409,7 @@ public interface FeatureFilter extends Serializable {
 	if (filt instanceof ContainedByLocation)  {
 	    Location loc = ((ContainedByLocation) filt).getLocation();
 	    return !getLocation().overlaps(loc);
-	} 
+	}
 	return (filt instanceof AcceptNoneFilter);
     }
 
@@ -417,7 +417,7 @@ public interface FeatureFilter extends Serializable {
       return "Overlaps(" + loc + ")";
     }
   }
-  
+
   /**
    *  A filter that returns all features not accepted by a child filter.
    *
@@ -431,7 +431,7 @@ public interface FeatureFilter extends Serializable {
     public FeatureFilter getChild() {
       return child;
     }
-    
+
     public Not(FeatureFilter child) {
         this.child = child;
     }
@@ -439,17 +439,17 @@ public interface FeatureFilter extends Serializable {
     public boolean accept(Feature f) {
         return !(child.accept(f));
     }
-    
+
     public boolean equals(Object o) {
       return
         (o instanceof Not) &&
         (((Not) o).getChild().equals(this.getChild()));
     }
-    
+
     public int hashCode() {
       return getChild().hashCode();
     }
-    
+
     public boolean isProperSubset(FeatureFilter sup) {
       if(sup instanceof Not) {
         FeatureFilter supC = ((Not) sup).getChild();
@@ -457,7 +457,7 @@ public interface FeatureFilter extends Serializable {
       }
       return (sup instanceof AcceptAllFilter);
     }
-    
+
     public boolean isDisjoint(FeatureFilter filt) {
       return FilterUtils.areProperSubset(filt, getChild());
     }
@@ -480,11 +480,11 @@ public interface FeatureFilter extends Serializable {
     public FeatureFilter getChild1() {
       return c1;
     }
-    
+
     public FeatureFilter getChild2() {
       return c2;
     }
-    
+
     public And(FeatureFilter c1, FeatureFilter c2) {
         this.c1 = c1;
         this.c2 = c2;
@@ -493,7 +493,7 @@ public interface FeatureFilter extends Serializable {
     public boolean accept(Feature f) {
         return (c1.accept(f) && c2.accept(f));
     }
-    
+
     public boolean equals(Object o) {
       return
         (o instanceof And) && ((
@@ -504,17 +504,17 @@ public interface FeatureFilter extends Serializable {
           ((And) o).getChild2().equals(this.getChild1())
         ));
     }
-    
+
     public int hashCode() {
       return getChild1().hashCode() ^ getChild2().hashCode();
     }
-    
+
     public boolean isProperSubset(FeatureFilter sup) {
       return
         FilterUtils.areProperSubset(getChild1(), sup) ||
         FilterUtils.areProperSubset(getChild2(), sup);
     }
-    
+
     public boolean isDisjoint(FeatureFilter filt) {
       return (filt instanceof AcceptNoneFilter) || (
         FilterUtils.areDisjoint(getChild1(), filt) ||
@@ -540,11 +540,11 @@ public interface FeatureFilter extends Serializable {
     public FeatureFilter getChild1() {
       return c1;
     }
-    
+
     public FeatureFilter getChild2() {
       return c2;
     }
-    
+
     public AndNot(FeatureFilter c1, FeatureFilter c2) {
         this.c1 = c1;
         this.c2 = c2;
@@ -553,14 +553,14 @@ public interface FeatureFilter extends Serializable {
     public boolean accept(Feature f) {
         return (c1.accept(f) && !c2.accept(f));
     }
-    
+
     public boolean equals(Object o) {
       return
         (o instanceof AndNot) &&
         (((AndNot) o).getChild1().equals(this.getChild1())) &&
         (((AndNot) o).getChild2().equals(this.getChild2()));
     }
-    
+
     public int hashCode() {
       return getChild1().hashCode() ^ getChild2().hashCode();
     }
@@ -583,11 +583,11 @@ public interface FeatureFilter extends Serializable {
     public FeatureFilter getChild1() {
       return c1;
     }
-    
+
     public FeatureFilter getChild2() {
       return c2;
     }
-    
+
     public Or(FeatureFilter c1, FeatureFilter c2) {
         this.c1 = c1;
         this.c2 = c2;
@@ -596,7 +596,7 @@ public interface FeatureFilter extends Serializable {
     public boolean accept(Feature f) {
         return (c1.accept(f) || c2.accept(f));
     }
-    
+
     public boolean equals(Object o) {
       return
         (o instanceof Or) && ((
@@ -607,7 +607,7 @@ public interface FeatureFilter extends Serializable {
           ((Or) o).getChild2().equals(this.getChild1())
         ));
     }
-    
+
     public int hashCode() {
       return getChild1().hashCode() ^ getChild2().hashCode();
     }
@@ -617,7 +617,7 @@ public interface FeatureFilter extends Serializable {
         FilterUtils.areProperSubset(getChild1(), sup) &&
         FilterUtils.areProperSubset(getChild2(), sup);
     }
-    
+
     public boolean isDisjoint(FeatureFilter filt) {
       return (filt instanceof AcceptNoneFilter) || (
         FilterUtils.areDisjoint(getChild1(), filt) &&
@@ -629,7 +629,7 @@ public interface FeatureFilter extends Serializable {
       return "Or(" + c1 + " , " + c2 + ")";
     }
   }
-  
+
   /**
    * Retrieve features that contain a given annotation with a given value.
    *
@@ -639,7 +639,7 @@ public interface FeatureFilter extends Serializable {
   public final static class ByAnnotation implements OptimizableFilter {
     private Object key;
     private Object value;
-    
+
     /**
      * Make a new ByAnnotation that will accept features with an annotation
      * bundle containing 'value' associated with 'key'.
@@ -651,15 +651,15 @@ public interface FeatureFilter extends Serializable {
       this.key = key;
       this.value = value;
     }
-    
+
     public Object getKey() {
       return key;
     }
-    
+
     public Object getValue() {
       return value;
     }
-    
+
     public boolean accept(Feature f) {
       Annotation ann = f.getAnnotation();
       // fixme - Annotation should have a hasProperty method
@@ -678,18 +678,18 @@ public interface FeatureFilter extends Serializable {
         return false;
       }
     }
-    
+
     public boolean equals(Object o) {
       return
         (o instanceof ByAnnotation) &&
         (((ByAnnotation) o).getKey().equals(this.getKey())) &&
         (((ByAnnotation) o).getValue().equals(this.getValue()));
     }
-    
+
     public int hashCode() {
       return getKey().hashCode() ^ getValue().hashCode();
     }
-    
+
     public boolean isProperSubset(FeatureFilter sup) {
       return this.equals(sup);
     }
@@ -702,12 +702,12 @@ public interface FeatureFilter extends Serializable {
         )
       );
     }
-    
+
     public String toString() {
       return getKey() + " == " + getValue();
     }
   }
-  
+
   /**
    * Retrieve features that contain a given annotation with any value.
    *
@@ -716,7 +716,7 @@ public interface FeatureFilter extends Serializable {
    */
   public final static class HasAnnotation implements FeatureFilter {
     private Object key;
-    
+
     /**
      * Make a new ByAnnotation that will accept features with an annotation
      * bundle containing any value associated with 'key'.
@@ -726,11 +726,11 @@ public interface FeatureFilter extends Serializable {
     public HasAnnotation(Object key) {
       this.key = key;
     }
-    
+
     public Object getKey() {
       return key;
     }
-    
+
     public boolean accept(Feature f) {
       Annotation ann = f.getAnnotation();
       // fixme - Annotation should have a hasProperty method
@@ -741,17 +741,17 @@ public interface FeatureFilter extends Serializable {
         return false;
       }
     }
-    
+
     public boolean equals(Object o) {
       return
         (o instanceof HasAnnotation) &&
         (((HasAnnotation) o).getKey().equals(this.getKey()));
     }
-    
+
     public int hashCode() {
       return getKey().hashCode();
     }
-    
+
     public boolean isProperSubset(FeatureFilter sup) {
       return this.equals(sup);
     }
@@ -763,7 +763,7 @@ public interface FeatureFilter extends Serializable {
       );
     }
   }
-  
+
   /**
    * Accept features with a given strandedness.
    *
@@ -772,7 +772,7 @@ public interface FeatureFilter extends Serializable {
    */
   public final static class StrandFilter implements OptimizableFilter {
     private StrandedFeature.Strand strand;
-    
+
     /**
      * Build a new filter that matches all features of a given strand.
      *
@@ -781,7 +781,7 @@ public interface FeatureFilter extends Serializable {
     public StrandFilter(StrandedFeature.Strand strand) {
       this.strand = strand;
     }
-    
+
     /**
      * Retrieve the strand this matches.
      *
@@ -790,7 +790,7 @@ public interface FeatureFilter extends Serializable {
     public StrandedFeature.Strand getStrand() {
       return strand;
     }
-    
+
     /**
      * Accept the Feature if it is an instance of StrandedFeature and matches
      * the value of getStrand().
@@ -806,17 +806,17 @@ public interface FeatureFilter extends Serializable {
         return strand == StrandedFeature.UNKNOWN;
       }
     }
-    
+
     public boolean equals(Object o) {
       return
         (o instanceof StrandFilter) &&
         (((StrandFilter) o).getStrand() == this.getStrand());
     }
-    
+
     public boolean isProperSubset(FeatureFilter sup) {
       return this.equals(sup);
     }
-    
+
     public boolean isDisjoint(FeatureFilter filt) {
       return (filt instanceof AcceptNoneFilter) || (
         (filt instanceof StrandFilter) &&
@@ -887,7 +887,7 @@ public interface FeatureFilter extends Serializable {
 	    FeatureFilter ancFilter = null;
 	    if (ff instanceof FeatureFilter.ByParent) {
 		ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
-	    } 
+	    }
 
 	    if (ancFilter != null) {
 		return FilterUtils.areDisjoint(ancFilter, filter);
@@ -905,7 +905,7 @@ public interface FeatureFilter extends Serializable {
      * parent is a sequence).
      *
      * @author Thomas Down
-     * @since 1.2 
+     * @since 1.2
      */
 
     public static class ByAncestor implements OptimizableFilter {
@@ -966,7 +966,7 @@ public interface FeatureFilter extends Serializable {
 		ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
 	    } else if (ff instanceof FeatureFilter.ByParent) {
 		ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
-	    } 
+	    }
 
 	    if (ancFilter != null) {
 		return FilterUtils.areDisjoint(ancFilter, filter);
@@ -975,4 +975,61 @@ public interface FeatureFilter extends Serializable {
 	    }
 	}
     }
+
+  /**
+   * Accept features with a given reading frame.
+   *
+   * @author Mark Schreiber
+   * @since 1.2
+   */
+  public final static class FrameFilter implements OptimizableFilter {
+    private FramedFeature.ReadingFrame frame;
+
+    /**
+     * Build a new filter that matches all features of a reading frame.
+     *
+     * @param frame the ReadingFrame to match
+     */
+    public FrameFilter(FramedFeature.ReadingFrame frame) {
+      this.frame = frame;
+    }
+
+    /**
+     * Retrieve the reading frame this filter matches.
+     */
+     public FramedFeature.ReadingFrame getFrame(){
+       return frame;
+     }
+
+    /**
+     * Accept the Feature if it is an instance of FramedFeature and matches
+     * the value of getFrame().
+     *
+     * @param f the Feature to check
+     * @return true if the frame matches, or false otherwise
+     */
+    public boolean accept(Feature f) {
+      if(f instanceof FramedFeature) {
+        FramedFeature ff = (FramedFeature) f;
+        return ff.getReadingFrame() == frame;
+      } else {
+        return false;
+      }
+    }
+
+    public boolean equals(Object o) {
+      return (o instanceof StrandFilter);
+    }
+
+    public boolean isProperSubset(FeatureFilter sup) {
+      return this.equals(sup);
+    }
+
+    public boolean isDisjoint(FeatureFilter filt) {
+      return (filt instanceof AcceptNoneFilter) || (
+        (filt instanceof FrameFilter) &&
+        ((FrameFilter) filt).getFrame() == getFrame()
+      );
+    }
+  }
 }

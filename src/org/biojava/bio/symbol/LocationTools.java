@@ -23,7 +23,7 @@ final public class LocationTools {
   public static Location union(Location locA, Location locB) {
   	if(isDecorated(locA) || isDecorated(locB))
   	{
-  		handleDecorations();
+  		handleDecorations(locA, locB);
   	}
 
     if(
@@ -72,7 +72,7 @@ final public class LocationTools {
 
     if(isDecorated(locA) || isDecorated(locB))
     {
-	handleDecorations();
+	handleDecorations(locA, locB);
     }
     if(locA.isContiguous() && locB.isContiguous()) {
       // handle easy case of solid locations
@@ -119,7 +119,7 @@ final public class LocationTools {
   public static boolean overlaps(Location locA, Location locB) {
   	if(isDecorated(locA) || isDecorated(locB))
   	{
-  		handleDecorations();
+  		handleDecorations(locA, locB);
   	}
     if(locA.isContiguous() && locB.isContiguous()) {
       // if they are both solid, return whether the extents overlap
@@ -153,7 +153,7 @@ final public class LocationTools {
   public static boolean contains(Location locA, Location locB) {
   	if(isDecorated(locA) || isDecorated(locB))
   	{
-  		handleDecorations();
+  		handleDecorations(locA, locB);
   	}
     if(locA.isContiguous() && locB.isContiguous()) {
       // both solid - check the extents
@@ -192,7 +192,7 @@ final public class LocationTools {
   public static boolean areEqual(Location locA, Location locB) {
   	if(isDecorated(locA) || isDecorated(locB))
   	{
-  		handleDecorations();
+  		handleDecorations(locA, locB);
   	}
     // simple check - if one is broken and the other isn't, they aren't equal.
     if(locA.isContiguous() != locB.isContiguous()) {
@@ -342,32 +342,53 @@ final public class LocationTools {
     }
   }
 
+    /**
+     * A simple method to generate a RangeLocation wrapped
+     * in a CircularLocation. The method will cope with situtations
+     * where the min is greater than the max. Either of min or max can
+     * be negative, or greater than the underlying sequence length.
+     *
+     * @param min the "left" end of the location
+     * @param max the "right" end of the location
+     * @param seqLength the lenght of the sequence that the location will
+     * be applied to (for purposes of determining origin).
+     * @throws IllegalArgumentException if min, max, or seqLength are 0;
+     *
+     * @author Mark Schreiber
+     */
+    public static CircularLocation makeCircularLocation(int min,
+                    int max, int seqLength){
+        return CircularLocationTools.makeCircLoc(min,max,seqLength);
+    }
+
   /**
    * Checks if the location has a decorator.
    *
-   * @todo Currently this method walks through circular and between
-   * decorators.  This is crude and ugly.
    * @param theLocation The location to test for decorators
    * @return True if the location has a decorator and false otherwise
    */
   protected static boolean isDecorated(Location theLocation)
   {
-  	// If you know a cleaner way to do this, please change it and drop me a line
-  	// gcox@netgenics.com
-	boolean hasCircular = theLocation.getDecorator(CircularLocation.class) != null;
-	boolean hasBetween = theLocation.getDecorator(BetweenLocation.class) != null;
-
-  	return(hasCircular || hasBetween);
+  	return (theLocation instanceof AbstractLocationDecorator);
   }
 
   /**
-   * Short answer: We don't.  This method logs a message and returns the empty
-   * location
+   * Currently only CircularLocations are handled and only if
+   * CircularLocationTools.safeOperation returns true. For this to be true
+   * the locations must have the same sequence length.
    *
-   * @todo Handle decorations.
+   * @todo Handle other decorations.
    */
-  protected static void handleDecorations()
-  {
+  protected static void handleDecorations(Location locA, Location locB){
+    if(CircularLocationTools.isCircular(locA)|| CircularLocationTools.isCircular(locB)){
+        if(CircularLocationTools.safeOperation(locA, locB) == false){
+              throw new UnsupportedOperationException(
+                "Binary operations between Circular and"+
+                " Non-Circular locations, or CircularLocations"+
+                " from sequences of differing length are currently unsupported.");
+        }
+      }else{
 	throw new ClassCastException("Decorated locations are not handled in this version");
+      }
   }
 }

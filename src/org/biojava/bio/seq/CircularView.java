@@ -38,7 +38,7 @@ import java.util.*;
  * <p>This code is currently experimental</p>
  *
  * @author Mark Schreiber
- * @version 1.0
+ * @version 1.1
  * @since 1.1
  */
 
@@ -94,6 +94,25 @@ public class CircularView extends ViewSequence{
       return toEnd + fromStart;
     }
   }
+
+  /**
+   * Over rides ViewSequence to allow the use of locations that have
+   * coordinates outside of the sequence length (which are needed to
+   * describe locations that overlap the origin of a circular sequence).
+   * @author Mark Schreiber
+   * @since 1.2
+   */
+  public Feature createFeature(Feature.Template template)
+        throws ChangeVetoException, BioException
+    {
+      Location loc = template.location;
+      if(loc.getMax() > length() && (loc instanceof CircularLocation == false)){
+        throw new BioException("Only CircularLocations may exceed sequence length");
+      }
+      Feature f = realizeFeature(this, template);
+      ((SimpleFeatureHolder)getAddedFeatures()).addFeature(f);
+      return f;
+    }
 
   /**
    * Over rides ViewSequence. Allows any integer index, positive or negative

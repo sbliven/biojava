@@ -18,7 +18,7 @@
  *      http://www.biojava.org/
  *
  */
- 
+
 package org.biojava.bio.program.gff;
 
 import java.io.*;
@@ -44,14 +44,14 @@ public class GFFEntrySet {
    * All of the lines - comments & records
    */
   private List lines;
-  
+
   /**
    * Make an empty <span class="type">GFFEntrySet</span>.
    */
   public GFFEntrySet() {
     lines = new ArrayList();
   }
-  
+
   /**
    * Loop over all lines in the set.
    * <P>
@@ -64,7 +64,7 @@ public class GFFEntrySet {
   public Iterator lineIterator() {
     return lines.iterator();
   }
-  
+
   /**
    * Add a comment to the end of this set.
    * <P>
@@ -76,7 +76,7 @@ public class GFFEntrySet {
   public void add(String comment) {
     lines.add(comment);
   }
-  
+
   /**
    * Add a <span class="type">GFFRecord</span> to the end of this set.
    *
@@ -85,7 +85,7 @@ public class GFFEntrySet {
   public void add(GFFRecord record) {
     lines.add(record);
   }
-  
+
   /**
    * Return how many lines are in this set.
    *
@@ -94,7 +94,7 @@ public class GFFEntrySet {
   public int size() {
     return lines.size();
   }
-  
+
   /**
    * Get an annotator that can add GFF features to a
    * <span class="type">Sequence</span> using the features in this
@@ -113,26 +113,40 @@ public class GFFEntrySet {
       public Sequence annotate(Sequence seq) throws BioException, ChangeVetoException {
         Feature.Template plain = new Feature.Template();
         StrandedFeature.Template stranded = new StrandedFeature.Template();
+        FramedFeature.Template framed = new FramedFeature.Template();
         plain.annotation = Annotation.EMPTY_ANNOTATION;
         stranded.annotation = Annotation.EMPTY_ANNOTATION;
+        framed.annotation = Annotation.EMPTY_ANNOTATION;
         for(Iterator i = lineIterator(); i.hasNext(); ) {
           Object o = i.next();
           if(o instanceof GFFRecord) {
             GFFRecord rec = (GFFRecord) o;
             if(rec.getSeqName().equals(seq.getName())) {
               if(rec.getStrand() == StrandedFeature.UNKNOWN) {
-                plain.location = new RangeLocation(Math.max(1, rec.getStart()),
-						   Math.min(rec.getEnd(), seq.length()));
+                plain.location = new RangeLocation(rec.getStart(), rec.getEnd());
                 plain.type = rec.getFeature();
                 plain.source = rec.getSource();
                 seq.createFeature(plain);
-              } else {
-                stranded.location = new RangeLocation(Math.max(1, rec.getStart()),
-						      Math.min(rec.getEnd(), seq.length()));
+              }else if (rec.getFrame()== GFFRecord.NO_FRAME){
+                stranded.location = new RangeLocation(rec.getStart(), rec.getEnd());
                 stranded.type = rec.getFeature();
                 stranded.source = rec.getSource();
                 stranded.strand = rec.getStrand();
                 seq.createFeature(stranded);
+              }else {
+                framed.location = new RangeLocation(rec.getStart(), rec.getEnd());
+                framed.type = rec.getFeature();
+                framed.source = rec.getSource();
+                framed.strand = rec.getStrand();
+                switch (rec.getFrame()) {
+                    case 0: framed.readingFrame = FramedFeature.FRAME_0;
+                      break;
+                    case 1: framed.readingFrame = FramedFeature.FRAME_1;
+                      break;
+                    case 2: framed.readingFrame = FramedFeature.FRAME_2;
+                      break;
+                }
+
               }
             }
           }
@@ -141,7 +155,7 @@ public class GFFEntrySet {
       }
     };
   }
-  
+
   /**
    * Filter this entry set into another set.
    *
@@ -160,10 +174,10 @@ public class GFFEntrySet {
         }
       }
     }
-    
+
     return accepted;
   }
-  
+
   /**
    * Get the <span class="type">GFFDocumentHandler</span> for adding to this
    * set.
@@ -174,7 +188,7 @@ public class GFFEntrySet {
   public GFFDocumentHandler getAddHandler() {
     return new EntrySetBuilder();
   }
-  
+
   /**
    * The type of object returned by <span class="method">getAddHandler</span>.
    *
@@ -184,11 +198,11 @@ public class GFFEntrySet {
   private class EntrySetBuilder implements GFFDocumentHandler {
     public void startDocument(String locator) {}
     public void endDocument()   {}
-  
+
     public void commentLine(String comment) {
       lines.add(comment);
     }
-    
+
     public void recordLine(GFFRecord record) {
       lines.add(record);
     }

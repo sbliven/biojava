@@ -35,6 +35,7 @@ import java.util.*;
  * @author Mark Schreiber
  * @since 1.1
  * @version 1.0
+ * @deprecated Use CircularView instead
  */
 
 public class CircularSequence extends SimpleSequence {
