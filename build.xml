@@ -30,8 +30,10 @@
        ant -Dtest.subtree=org/biojava/bio/symbol runtests
        ant -Dtest.subtree=org/biojava/bio/seq/** runtests
 
-  author:  Michael Heuer, modified by Keith James (JUnit support,
-           DocBook support), modified Greg Cox (fixed documentation)
+  author:  Michael Heuer, 
+           Keith James (JUnit support, DocBook support)
+           Greg Cox (fixed documentation)
+           Thomas Down (clean up, remove source-copying steps
   version: $Id$
 
   portions Copyright (c) 1999-2000 The Apache Software Foundation.
@@ -80,6 +82,7 @@
     </available>
 
     <!-- Echo information -->
+    <echo message="Building biojava-${version}" />
     <echo message="JUnit present:                   ${junit.present}" />
     <echo message="JUnit supported by Ant:          ${junit.support}" />
     <echo message="SableCC supported by Ant:        ${sableCC.support}" />
@@ -87,12 +90,9 @@
     <property name="readme" value="./README" />
     <property name="license" value="./LICENSE" />
     <property name="src.dir" value="./src" />
-    <property name="src14.dir" value="./src-1.4" />
     <property name="tests.dir" value="./tests" />
-    <property name="tests14.dir" value="./tests-1.4" />
     <property name="grammars.dir" value="./grammars" />
     <property name="demos.dir" value="./demos" />
-    <property name="demos14.dir" value="./demos-1.4" />
     <property name="apps.dir" value="./apps" />
     <property name="docs.dir" value="./docs" />
     <property name="doc.css.file" value="biojava-doc.css" />
@@ -103,7 +103,6 @@
 
     <!-- Main build directory -->
     <property name="build.dir" value="./ant-build" />
-    <property name="build.src.dir" value="${build.dir}/src" />
     <property name="build.classes.dir" value="${build.dir}/classes" />
 
     <!-- Javac properties -->
@@ -113,28 +112,24 @@
     <property name="javac.source" value="1.4" />
 
     <!-- Javadoc properties -->
-    <property name="build.src.docs" value="${build.dir}/src/docs" />
     <property name="build.dest.docs" value="${build.dir}/docs" />
     <property name="packages" value="org.*" />
 
     <!-- Subdirectories for main source and classes -->
     <property name="name.biojava" value="biojava" />
     <property name="Name.biojava" value="BioJava" />
-    <property name="build.src.biojava" value="${build.src.dir}/${name.biojava}" />
     <property name="build.dest.biojava" value="${build.classes.dir}/${name.biojava}" />
     <property name="build.docs.biojava" value="${build.dest.docs}/${name.biojava}" />
     <property name="jar.biojava" value="${build.dir}/${name.biojava}.jar" />
     <property name="manifest.file.biojava" value="${manifest.dir}/${name.biojava}.txt" />
     <!-- Subdirectories for tests source and classes -->
     <property name="name.tests" value="tests" />
-    <property name="build.src.tests" value="${build.src.dir}/${name.tests}" />
     <property name="build.dest.tests" value="${build.classes.dir}/${name.tests}" />
     <property name="build.docs.tests" value="${build.dest.docs}/${name.tests}" />
     <property name="reports.tests" value="./reports/tests" />
     <!-- Subdirectories for demos source and classes -->
     <property name="name.demos" value="demos" />
     <property name="Name.demos" value="BioJava Demos" />
-    <property name="build.src.demos" value="${build.src.dir}/${name.demos}" />
     <property name="build.dest.demos" value="${build.classes.dir}/${name.demos}" />
     <property name="build.docs.demos" value="${build.dest.docs}/${name.demos}" />
     <property name="jar.demos" value="${build.dir}/${name.demos}.jar" />
@@ -142,7 +137,6 @@
     <!-- Subdirectories for apps source and classes -->
     <property name="name.apps" value="apps" />
     <property name="Name.apps" value="BioJava Applications" />
-    <property name="build.src.apps" value="${build.src.dir}/${name.apps}" />
     <property name="build.dest.apps" value="${build.classes.dir}/${name.apps}" />
     <property name="build.docs.apps" value="${build.dest.docs}/${name.apps}" />
     <property name="jar.apps" value="${build.dir}/${name.apps}.jar" />
@@ -150,17 +144,14 @@
     <!-- Subdirectory for grammars -->
     <property name="name.grammars" value="grammars" />
     <property name="Name.grammars" value="BioJava Grammars" />
-    <property name="build.src.grammars" value="${build.src.dir}/${name.grammars}" />
-    <property name="build.src.grammars_java" value="${build.src.dir}/${name.grammars}_java" />
+    <property name="build.src.grammars_java" value="${build.dir}/${name.grammars}_java" />
     <property name="build.dest.grammars" value="${build.classes.dir}/${name.grammars}" />
     <property name="build.docs.grammars" value="${build.dest.docs}/${name.grammars}" />
-    <property name="jar.grammars" value="${build.dir}/${name.grammars}.jar" />
     <!-- Subdirectory for libraries used during build -->
     <property name="build.lib" value="${build.dir}/lib" />
     <!-- Subdirectory for taglets -->
     <property name="name.taglets" value="taglets" />
     <property name="Name.taglets" value="BioJava Taglets" />
-    <property name="build.src.taglets" value="${build.src.dir}/${name.taglets}" />
     <property name="build.dest.taglets" value="${build.classes.dir}/${name.taglets}" />
     <property name="build.docs.taglets" value="${build.dest.docs}/${name.taglets}" />
 
@@ -196,68 +187,23 @@
    description="Prepares the grammars">
 
     <!-- Creates directories -->
-    <mkdir dir="${build.src.grammars}" />
     <mkdir dir="${build.src.grammars_java}" />
     <mkdir dir="${build.dest.grammars}" />
     <mkdir dir="${build.docs.grammars}" />
-
-    <!-- Copies grammar files -->
-    <copy todir="${build.src.grammars}">
-      <fileset dir="${grammars.dir}">
-        <exclude name="**/CVS/**" />
-      </fileset>
-    </copy>
-
-    <!-- Copies manifest -->
-    <copy
-      file="${manifest.file.biojava}"
-      tofile="${build.src.grammars}/manifest.txt"
-    />
-
   </target>
 
   <!-- Copies taglet files -->
   <target name="prepare-taglets" depends="prepare" description="Copies taglet files">
-    <mkdir dir="${build.src.taglets}" />
     <mkdir dir="${build.dest.taglets}" />
     <mkdir dir="${build.docs.taglets}" />
-
-    <copy todir="${build.src.taglets}">
-      <fileset dir="${taglets.dir}">
-        <exclude name="**/CVS/**" />
-      </fileset>
-    </copy>
   </target>
 
   <!-- Prepares the biojava source code -->
   <target name="prepare-biojava" depends="prepare"
   description="Prepares biojava source files">
-
     <!-- Creates directories -->
-    <mkdir dir="${build.src.biojava}" />
     <mkdir dir="${build.dest.biojava}" />
     <mkdir dir="${build.docs.biojava}" />
-
-    <!-- Copies src files -->
-    <copy todir="${build.src.biojava}">
-      <fileset dir="${src.dir}">
-        <exclude name="**/CVS/**" />
-      </fileset>
-    </copy>
-
-    <!-- Copies manifest -->
-    <copy
-      file="${manifest.file.biojava}"
-      tofile="${build.src.biojava}/manifest.txt"
-    />
-
-    <!-- Copies resources -->
-    <copy todir="${build.dest.biojava}">
-      <fileset dir="${resources.dir}">
-        <exclude name="**/CVS/**" />
-      </fileset>
-    </copy>
-
   </target>
 
   <!-- Prepares the test source code -->
@@ -265,18 +211,9 @@
   description="Prepares the test source code">
 
     <!-- Creates directories -->
-    <mkdir dir="${build.src.tests}" />
     <mkdir dir="${build.dest.tests}" />
     <mkdir dir="${build.docs.tests}" />
     <mkdir dir="${reports.tests}" />
-
-    <!-- Copies test src files -->
-    <copy todir="${build.src.tests}">
-      <fileset dir="${tests.dir}">
-        <exclude name="**/CVS/**" />
-      </fileset>
-    </copy>
-
   </target>
 
   <!-- Prepares the demos code -->
@@ -284,23 +221,8 @@
   description="Prepares the demos code">
 
     <!-- Creates directories -->
-    <mkdir dir="${build.src.demos}" />
     <mkdir dir="${build.dest.demos}" />
     <mkdir dir="${build.docs.demos}" />
-
-    <!-- Copies demos files -->
-    <copy todir="${build.src.demos}">
-      <fileset dir="${demos.dir}">
-        <exclude name="**/CVS/**" />
-      </fileset>
-    </copy>
-
-    <!-- Copies demo manifest -->
-    <copy
-      file="${manifest.file.demos}"
-      tofile="${build.src.demos}/manifest.txt"
-    />
-
   </target>
 
   <!-- Prepares the apps code -->
@@ -308,38 +230,15 @@
   description="Prepares the apps code">
 
     <!-- Creates directories -->
-    <mkdir dir="${build.src.apps}" />
     <mkdir dir="${build.dest.apps}" />
     <mkdir dir="${build.docs.apps}" />
-
-    <!-- Copies apps files -->
-    <copy todir="${build.src.apps}">
-      <fileset dir="${apps.dir}">
-        <exclude name="**/CVS/**" />
-      </fileset>
-    </copy>
-
-    <!-- Copies apps manifest -->
-    <copy
-      file="${manifest.file.apps}"
-      tofile="${build.src.apps}/manifest.txt"
-    />
-
   </target>
 
   <!-- Prepares the javadocs -->
   <target name="prepare-javadocs" depends="prepare" description="Prepares the javadocs">
 
     <!-- Creates directories -->
-    <mkdir dir="${build.src.docs}" />
     <mkdir dir="${build.dest.docs}" />
-
-    <!-- Copies docs files -->
-    <copy todir="${build.src.docs}">
-      <fileset dir="${docs.dir}">
-        <exclude name="**/CVS/**" />
-      </fileset>
-    </copy>
   </target>
 
   <!-- Prepares DocBook environment and encloses it from older Ant versions -->
@@ -391,7 +290,7 @@
     <taskdef name="sablecc"
              classname="org.sablecc.ant.taskdef.Sablecc"
              classpath="${java.class.path}:${ant-tasks.path}" />
-    <sablecc src="${build.src.grammars}"
+    <sablecc src="${grammars.dir}"
              outputdirectory="${build.src.grammars_java}"
              includes="*.grammar" />
 
@@ -417,7 +316,7 @@
   <target name="compile-taglets" depends="init,prepare-taglets"
   description="Compiles the taglets directory">
     <javac
-      srcdir="${build.src.taglets}"
+      srcdir="${taglets.dir}"
       destdir="${build.dest.taglets}"
       depend="${javac.depend}"
       deprecation="${javac.deprecation}"
@@ -430,10 +329,10 @@
   </target>
 
   <!-- Compiles the source directory -->
-  <target name="compile-biojava" depends="prepare-biojava,package-grammars"
+  <target name="compile-biojava" depends="prepare-biojava,compile-grammars"
   description="Compiles the source directory">
     <javac
-      srcdir="${build.src.biojava}"
+      srcdir="${src.dir}"
       destdir="${build.dest.biojava}"
       depend="${javac.depend}"
       deprecation="${javac.deprecation}"
@@ -441,7 +340,7 @@
       debug="${javac.debug}">
       <classpath>
         <pathelement path="${classpath}" />
-        <pathelement path="${jar.grammars}" />
+        <pathelement path="${build.dest.grammars}" />
       </classpath>
     </javac>
   </target>
@@ -450,7 +349,7 @@
   <target name="compile-tests" depends="prepare-tests,package-biojava"
   description="Compiles the tests directory">
     <javac
-      srcdir="${build.src.tests}"
+      srcdir="${tests.dir}"
       destdir="${build.dest.tests}"
       depend="${javac.depend}"
       deprecation="${javac.deprecation}"
@@ -459,7 +358,6 @@
       <classpath>
         <pathelement path="${classpath}" />
         <pathelement path="${jar.biojava}" />
-        <pathelement path="${jar.grammars}" />
       </classpath>
     </javac>
   </target>
@@ -468,7 +366,7 @@
   <target name="compile-demos" depends="prepare-demos,package-biojava"
   description="Compiles the demos directory">
     <javac
-      srcdir="${build.src.demos}"
+      srcdir="${demos.dir}"
       destdir="${build.dest.demos}"
       depend="${javac.depend}"
       deprecation="${javac.deprecation}"
@@ -485,7 +383,7 @@
   <target name="compile-apps" depends="prepare-apps,package-biojava"
   description="Compiles the apps directory">
     <javac
-      srcdir="${build.src.apps}"
+      srcdir="${apps.dir}"
       destdir="${build.dest.apps}"
       depend="${javac.depend}"
       deprecation="${javac.deprecation}"
@@ -506,26 +404,21 @@
     a manifest for each distributable component.
   -->
 
-  <!-- Creates the grammars package -->
-  <target name="package-grammars" depends="compile-grammars" if="sableCC.support"
-  description="Creates the grammars jar file">
-    <jar
-      jarfile="${jar.grammars}"
-      basedir="${build.dest.grammars}"
-      manifest="${build.src.grammars}/manifest.txt"
-      includes="**"
-    />
-  </target>
-
-  <!-- Creates the class package (tests are left in the parallel tree) -->
+  <!-- Creates the biojava package (tests are left in the parallel tree) -->
+  
+  <!-- this ought to depend on compile-grammars at well, but until conditional
+        sablecc works, that's a Bad Idea -->
+  
   <target name="package-biojava" depends="compile-biojava"
   description="create biojava class jar file">
     <jar
       jarfile="${jar.biojava}"
-      basedir="${build.dest.biojava}"
-      manifest="${build.src.biojava}/manifest.txt"
-      includes="**"
-    />
+      manifest="${manifest.dir}/biojava.txt"
+    >
+      <fileset dir="${build.dest.biojava}" />
+      <fileset dir="${build.dest.grammars}" />
+      <fileset dir="${resources.dir}" />
+    </jar>
   </target>
 
   <!-- Create the demo package -->
@@ -533,10 +426,10 @@
   description="create the demo jar file">
     <jar
       jarfile="${jar.demos}"
-      basedir="${build.dest.demos}"
-      manifest="${build.src.demos}/manifest.txt"
-      includes="**"
-    />
+      manifest="${manifest.dir}/demos.txt"
+    >
+      <fileset dir="${build.dest.demos}" />
+    </jar>
   </target>
 
   <!-- Create the apps package -->
@@ -544,16 +437,16 @@
   description="create the apps jar file">
     <jar
       jarfile="${jar.apps}"
-      basedir="${build.dest.apps}"
-      manifest="${build.src.apps}/manifest.txt"
-      includes="**"
-    />
+      manifest="${manifest.dir}/apps.txt"
+    >
+      <fileset dir="${build.dest.apps}" />
+    </jar>
   </target>
 
 
   <target
     name="package-all"
-    depends="package-grammars,package-biojava,package-demos,package-apps"
+    depends="package-biojava,package-demos,package-apps"
     description="create all the jar files" />
 
 
@@ -567,7 +460,7 @@
   <target name="javadocs-taglets" depends="prepare-taglets"
   description="Create taglet API documentation">
     <javadoc
-      sourcepath="${build.src.taglets}"
+      sourcepath="${taglets.dir}"
       classpath="${classpath}:${java.home}/../lib/tools.jar"
       destdir="${build.docs.taglets}"
       author="true"
@@ -577,7 +470,7 @@
       windowtitle="${Name.taglets} API"
       doctitle="${Name.taglets}"
       maxmemory="96m">
-      <fileset dir="${build.src.taglets}" />
+      <fileset dir="${taglets.dir}" />
       <link href="http://java.sun.com/j2se/1.4.2/docs/api/" offline="false" />
       <link href="http://java.sun.com/j2se/1.4.2/docs/tooldocs/javadoc/doclet/"  offline="false"/>
     </javadoc>
@@ -607,8 +500,8 @@
   description="Creates the API documentation">
     <javadoc
       packagenames="${packages}"
-      sourcepath="${build.src.biojava}"
-      classpath="${classpath}:${jar.grammars}"
+      sourcepath="${src.dir}"
+      classpath="${classpath}:${build.dest.grammars}"
       destdir="${build.docs.biojava}"
       author="true"
       version="true"
@@ -651,12 +544,12 @@
   </target>
 
   <!-- Create demos API documentation -->
-  <target name="javadocs-demos" depends="prepare-demos,compile-taglets"
+  <target name="javadocs-demos" depends="prepare-demos,compile-biojava,compile-taglets"
   description="Create the demos API documentation">
     <javadoc
-      packagenames="${packages}"
-      sourcepath="${build.src.demos}"
-      classpath="${classpath}"
+      packagenames="**"
+      sourcepath="${demos.dir}"
+      classpath="${classpath}:${build.dest.biojava}"
       destdir="${build.docs.demos}"
       author="true"
       version="true"
@@ -675,11 +568,11 @@
   </target>
 
   <!-- Create apps API documentation -->
-  <target name="javadocs-apps" depends="prepare-apps,compile-taglets"
+  <target name="javadocs-apps" depends="prepare-apps,compile-biojava,compile-taglets"
   description="Create the apps API documentation">
     <javadoc
-      packagenames="${packages}"
-      sourcepath="${build.src.apps}"
+      packagenames="org.*"
+      sourcepath="${apps.dir}"
       classpath="${classpath}:${build.dest.biojava}"
       destdir="${build.docs.apps}"
       author="true"
@@ -704,7 +597,7 @@
   description="Creates the DocBook documentation">
 
     <xslt
-      in="${build.src.docs}/biojava-doc-main.xml"
+      in="${docs.dir}/biojava-doc-main.xml"
       out="${build.dest.docs}/index.html"
       style="${docbook.xsl}"
       force="true">
@@ -720,10 +613,10 @@
         <outputproperty name="indent" value="no" />
     </xslt>
     <!-- CSS file used by HTML output -->
-    <copy file="${build.src.docs}/${doc.css.file}" todir="${build.dest.docs}" />
+    <copy file="${docs.dir}/${doc.css.file}" todir="${build.dest.docs}" />
     <!-- Images used by HTML output -->
     <copy todir="${build.dest.docs}">
-      <fileset dir="${build.src.docs}">
+      <fileset dir="${docs.dir}">
         <include name="*/*.png" />
         <include name="*/*.jpg" />
         <include name="*/*.gif" />
@@ -750,11 +643,11 @@
         <!-- test classes from build -->
         <pathelement path="${build.dest.tests}" />
         <!-- test data from build -->
-        <pathelement path="${build.src.tests}" />
+        <pathelement path="${tests.dir}" />
         <!-- classes specified in this file -->
         <pathelement path="${classpath}" />
         <!-- classes generated by the grammars -->
-        <pathelement path="${jar.grammars}" />
+        <pathelement path="${build.dest.grammars}" />
         <!-- classes specified in system classpath -->
         <pathelement path="${java.class.path}" />
       </classpath>
@@ -774,9 +667,5 @@
   <target name="clean" depends="init"
   description="Cleans everything">
     <delete dir="${build.dir}" />
-    <delete dir="${dist.root}" />
-    <delete file="${name.biojava}-${version}.tar.gz" />
-    <delete file="${name.biojava}-${version}.tar" />
-    <delete file="${name.biojava}-${version}.zip" />
   </target>
 </project>

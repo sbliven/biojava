@@ -25,6 +25,8 @@ package org.biojava.bio.seq.db.biosql;
 
 import java.io.StringReader;
 import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -156,6 +158,35 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
         
         try {
             dataSource = JDBCPooledDataSource.getDataSource(dbDriver, dbURL, dbUser, dbPass);
+        } catch (Exception ex) {
+            throw new BioException("Error getting datasource", ex);
+        }
+        this.initDb(biodatabase, create);
+    }
+    
+    /**
+     * Connect to a BioSQL database.
+     *
+     * @param dbURL A JDBC database URL.  For example, <code>jdbc:postgresql://localhost/thomasd_biosql</code>
+     * @param dbUser The username to use when connecting to the database (or an empty string).
+     * @param dbPass The password to use when connecting to the database (or an empty string).
+     * @param biodatabase The identifier of a namespace within the physical BioSQL database.
+     * @param create If the requested namespace doesn't exist, and this flag is <code>true</code>,
+     *               a new namespace will be created.
+     *
+     * @throws BioException if an error occurs communicating with the database
+     */
+
+    public BioSQLSequenceDB(String dbURL,
+                            String dbUser,
+                            String dbPass,
+                            String biodatabase,
+                            boolean create)
+        throws BioException {
+        
+        try {
+            Driver drv = DriverManager.getDriver(dbURL);
+            dataSource = JDBCPooledDataSource.getDataSource(drv.getClass().getName(), dbURL, dbUser, dbPass);
         } catch (Exception ex) {
             throw new BioException("Error getting datasource", ex);
         }
