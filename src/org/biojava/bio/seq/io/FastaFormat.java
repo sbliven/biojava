@@ -121,7 +121,7 @@ public class FastaFormat implements SequenceFormat, Serializable {
 	    } else {
 		int parseStart = 0;
 		int parseEnd = 0;
-		while (!reachedEnd && parseStart < bytesRead) {
+		while (!reachedEnd && parseStart < bytesRead && cache[parseStart] != '>') {
 		    parseEnd = parseStart;
 
 		    while (parseEnd < bytesRead && 
@@ -139,13 +139,12 @@ public class FastaFormat implements SequenceFormat, Serializable {
 		    {
 			++parseStart;
 		    }
-
-		    if (parseStart < bytesRead && cache[parseStart] == '>') {
-			r.reset();
-			if (r.skip(parseStart) != parseStart)
-			    throw new IOException("Couldn't reset to start of next sequence");
-			reachedEnd = true;
-		    }
+		}
+		if (parseStart < bytesRead && cache[parseStart] == '>') {
+		    r.reset();
+		    if (r.skip(parseStart) != parseStart)
+			throw new IOException("Couldn't reset to start of next sequence");
+		    reachedEnd = true;
 		}
 	    }
 	}
