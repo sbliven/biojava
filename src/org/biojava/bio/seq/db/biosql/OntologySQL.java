@@ -1,3 +1,4 @@
+/* -*- c-basic-offset: 2; indent-tabs-mode: nil -*- */
 /*
  *                    BioJava development code
  *
@@ -83,9 +84,7 @@ class OntologySQL {
     return guano;
   }
 
-  public Ontology getOntology(String name)
-          throws NoSuchElementException
-  {
+  public Ontology getOntology(String name) {
     Ontology ont = (Ontology) ontologiesByName.get(name);
     if (ont == null) {
       throw new NoSuchElementException("Can't find ontology named " + name);
@@ -208,7 +207,7 @@ class OntologySQL {
                            Connection conn)
           throws AlreadyExistsException, ChangeVetoException, SQLException
   {
-    System.err.println("Processing term: " + t);
+    //System.err.println("Processing term: " + t);
     Term localTerm;
 
     if(localTerms.keySet().contains(t)) {
@@ -240,7 +239,7 @@ class OntologySQL {
 
     localTerms.put(t, localTerm);
 
-    System.err.println("Done processing term: " + t);
+    //System.err.println("Done processing term: " + t);
   }
 
   private void loadTerms(Ontology ont, int id)
@@ -281,7 +280,7 @@ class OntologySQL {
         int object_term_id = rs.getInt(6); 
         int predicate_term_id = rs.getInt(7);
 
-        System.err.println("Loading triple: " + term_relation_id + " -> " + subject_term_id + ", " + object_term_id + ", " + predicate_term_id);
+        //System.err.println("Loading triple: " + term_relation_id + " -> " + subject_term_id + ", " + object_term_id + ", " + predicate_term_id);
 
         t = ont.createTriple((Term) termsByID.get(new Integer(subject_term_id)),
                              (Term) termsByID.get(new Integer(object_term_id)),
@@ -289,7 +288,7 @@ class OntologySQL {
                              name, description);
       }
 
-      System.err.println("Loaded term: " + tid + " -> " + t);
+      //System.err.println("Loaded term: " + tid + " -> " + t);
 
       termsByID.put(tid, t);
       IDsByTerm.put(t, tid);
@@ -346,7 +345,9 @@ class OntologySQL {
         String description = rs.getString(3);
         Ontology ont = new Ontology.Impl(name, description);
         try {
+          //long start = System.currentTimeMillis();
           loadTerms(ont, id);
+          //System.err.println("Loading terms for " + name + " took " + (System.currentTimeMillis() - start) + "ms");
         } catch (OntologyException ex) {
           throw new BioException("Error loading ontology terms", ex);
         }
@@ -484,7 +485,7 @@ class OntologySQL {
           throws SQLException
   {
     try {
-      System.err.println("Persisting " + term + " using " + term.getName() + ", " + term.getDescription() + ", " + ontologyID(term.getOntology()));
+      //System.err.println("Persisting " + term + " using " + term.getName() + ", " + term.getDescription() + ", " + ontologyID(term.getOntology()));
 
       PreparedStatement import_term = conn.prepareStatement(
               "insert into term " +
@@ -500,7 +501,7 @@ class OntologySQL {
       Integer tid = new Integer(id);
       termsByID.put(tid, term);
       IDsByTerm.put(term, tid);
-      System.err.println("Persisted term: " + tid + " -> " + term);
+      //System.err.println("Persisted term: " + tid + " -> " + term);
     } catch (SQLException se) {
       throw (SQLException) new SQLException(
               "Failed to persist term: " + term +
@@ -559,7 +560,7 @@ class OntologySQL {
     link_trip_to_term.executeUpdate();
     link_trip_to_term.close();
 
-    System.err.println("Persisted triple: " + triple);
+    //System.err.println("Persisted triple: " + triple);
   }
 
   private void persistOntology(Ontology onto)
