@@ -21,15 +21,35 @@
 package org.biojava.utils;
 
 /**
+ * Useful base-class for objects implementing Changeable
+ *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
+ 
 public abstract class AbstractChangeable implements Changeable {
   private transient ChangeSupport changeSupport = null;
 
   protected boolean hasListeners() {
-    return changeSupport != null;
+    return changeSupport != null && changeSupport.hasListeners();
   }
 
+  /**
+   * Called the first time a ChangeSupport object is needed.  Override this if
+   * you want to set the Unchanging set on the ChangeSupport, or if you want to
+   * install listeners on other objects when the change system is initialized.
+   *
+   * @since 1.3
+   */
+  
+  protected ChangeSupport generateChangeSupport() {
+      return new ChangeSupport();
+  }
+  
+  /**
+   * Called to retrieve the ChangeSupport for this object
+   */
+  
   protected ChangeSupport getChangeSupport(ChangeType ct) {
     if(changeSupport != null) {
       return changeSupport;
@@ -37,7 +57,7 @@ public abstract class AbstractChangeable implements Changeable {
     
     synchronized(this) {
       if(changeSupport == null) {
-        changeSupport = new ChangeSupport();
+        changeSupport = generateChangeSupport();
       }
     }
     
