@@ -61,7 +61,7 @@ public interface SequenceRenderContext extends SwingConstants {
   int getDirection();
 
   /**
-   *  Gets the scale as pixles per Symbol 
+   *  Gets the scale as pixels per Symbol 
    *
    * @return    The scale value 
    */
@@ -87,7 +87,7 @@ public interface SequenceRenderContext extends SwingConstants {
   
   /**
    *  Converts a graphical position into a sequence coordinate. This will
-   * use getDirection to decide wether to use the x or y coordinate.
+   * use getDirection to decide whether to use the x or y coordinate.
    *
    * @param  point  a point representing the position
    * @return the corresponding sequence index 
@@ -111,13 +111,13 @@ public interface SequenceRenderContext extends SwingConstants {
   /**
    * The range of the SymbolList to render.
    *
-   * @return the RangeLocation specifying which indecies (inclusive) to render
+   * @return the RangeLocation specifying which indices (inclusive) to render
    */
   RangeLocation getRange();
   
   /**
    *  Gets the LeadingBorder attribute of the SequenceRenderContext object.
-   * This represents the space between the beginning of the redering area and
+   * This represents the space between the beginning of the rendering area and
    * the beginning of the sequence.
    *
    * @return    The LeadingBorder value 
@@ -127,7 +127,7 @@ public interface SequenceRenderContext extends SwingConstants {
   /**
    *  Gets the TrailingBorder attribute of the SequenceRenderContext object.
    * This represents the space between the end of the sequence and the end of
-   * the redering area.
+   * the rendering area.
    *
    * @return    The TrailingBorder value 
    */

@@ -405,7 +405,7 @@ Changeable {
     
     // do a transform to offset drawing to the neighbourhood of zero.
     // the 50 here is pretty arbitrary.  The precise value doesn't matter
-    setGraphicsOrigin(50.0-sequenceToGraphics(range.getMin()));
+    // setGraphicsOrigin(50.0-sequenceToGraphics(range.getMin()));
 
     double minAcross = sequenceToGraphics(range.getMin()) -
                        renderer.getMinimumLeader(this);
@@ -499,7 +499,7 @@ Changeable {
     Dimension d = null;
     
     if(!isActive()) {
-      System.out.println("No sequence");
+      // System.out.println("No sequence");
       // no sequence - collapse down to no size at all
       leadingBorder.setSize(0.0);
       trailingBorder.setSize(0.0);
@@ -524,7 +524,7 @@ Changeable {
     setPreferredSize(d);
     setMaximumSize(d);
     revalidate();
-    //System.out.println("resizeAndValidate ending");
+    // System.out.println("resizeAndValidate ending");
   }
 
   private class RendererMonitor implements PropertyChangeListener {
