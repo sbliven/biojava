@@ -62,6 +62,132 @@ public interface FeatureFilter extends Serializable {
    */
   static final public FeatureFilter none = new AcceptNoneFilter() {};
 
+
+  /**
+   *  A filter that returns all features not accepted by a child filter.
+   *
+   * @author Thomas Down
+   * @author Matthew Pocock
+   * @since 1.0
+   */
+  public final static class Not implements FeatureFilter {
+    FeatureFilter child;
+
+    public FeatureFilter getChild() {
+      return child;
+    }
+
+    public Not(FeatureFilter child) {
+        this.child = child;
+    }
+
+    public boolean accept(Feature f) {
+        return !(child.accept(f));
+    }
+
+    public boolean equals(Object o) {
+      return
+        (o instanceof Not) &&
+        (((Not) o).getChild().equals(this.getChild()));
+    }
+
+    public int hashCode() {
+      return getChild().hashCode();
+    }
+
+    public String toString() {
+      return "Not(" + child + ")";
+    }
+  }
+
+  /**
+   *  A filter that returns all features accepted by both child filter.
+   *
+   * @author Thomas Down
+   * @author Matthew Pocock
+   * @since 1.0
+   */
+  public final static class And implements FeatureFilter {
+    FeatureFilter c1, c2;
+
+    public FeatureFilter getChild1() {
+      return c1;
+    }
+
+    public FeatureFilter getChild2() {
+      return c2;
+    }
+
+    public And(FeatureFilter c1, FeatureFilter c2) {
+        this.c1 = c1;
+        this.c2 = c2;
+    }
+
+    public boolean accept(Feature f) {
+        return (c1.accept(f) && c2.accept(f));
+    }
+
+    public boolean equals(Object o) {
+      if(o instanceof FeatureFilter) {
+        return FilterUtils.areEqual(this, (FeatureFilter) o);
+      } else {
+        return false;
+      }
+    }
+
+    public int hashCode() {
+      return getChild1().hashCode() ^ getChild2().hashCode();
+    }
+
+      public String toString() {
+	  return "And(" + c1 + " , " + c2 + ")";
+       }
+  }
+
+  /**
+   *  A filter that returns all features accepted by at least one child filter.
+   *
+   * @author Thomas Down
+   * @author Matthew Pocock
+   * @since 1.0
+   */
+  public final static class Or implements FeatureFilter {
+    FeatureFilter c1, c2;
+
+    public FeatureFilter getChild1() {
+      return c1;
+    }
+
+    public FeatureFilter getChild2() {
+      return c2;
+    }
+
+    public Or(FeatureFilter c1, FeatureFilter c2) {
+        this.c1 = c1;
+        this.c2 = c2;
+    }
+
+    public boolean accept(Feature f) {
+        return (c1.accept(f) || c2.accept(f));
+    }
+
+    public boolean equals(Object o) {
+      if(o instanceof FeatureFilter) {
+        return FilterUtils.areEqual(this, (FeatureFilter) o);
+      } else {
+        return false;
+      }
+    }
+
+    public int hashCode() {
+      return getChild1().hashCode() ^ getChild2().hashCode();
+    }
+
+    public String toString() {
+      return "Or(" + c1 + " , " + c2 + ")";
+    }
+  }
+
   /**
    * Construct one of these to filter features by type.
    *
@@ -244,6 +370,113 @@ public interface FeatureFilter extends Serializable {
     }
   }
 
+
+  /**
+   * Accept features with a given strandedness.
+   *
+   * @author Matthew Pocock
+   * @since 1.1
+   */
+  public final static class StrandFilter implements OptimizableFilter {
+    private StrandedFeature.Strand strand;
+
+    /**
+     * Build a new filter that matches all features of a given strand.
+     *
+     * @param strand the Strand to match
+     */
+    public StrandFilter(StrandedFeature.Strand strand) {
+      this.strand = strand;
+    }
+
+    /**
+     * Retrieve the strand this matches.
+     *
+     * @return the Strand matched
+     */
+    public StrandedFeature.Strand getStrand() {
+      return strand;
+    }
+
+    /**
+     * Accept the Feature if it is an instance of StrandedFeature and matches
+     * the value of getStrand().
+     *
+     * @param f the Feature to check
+     * @return true if the strand matches, or false otherwise
+     */
+    public boolean accept(Feature f) {
+      if(f instanceof StrandedFeature) {
+        StrandedFeature sf = (StrandedFeature) f;
+        return sf.getStrand() == strand;
+      } else {
+        return strand == StrandedFeature.UNKNOWN;
+      }
+    }
+
+    public boolean equals(Object o) {
+      return
+        (o instanceof StrandFilter) &&
+        (((StrandFilter) o).getStrand() == this.getStrand());
+    }
+    
+    public int hashCode() {
+      return getStrand().hashCode();
+    }
+
+    public boolean isProperSubset(FeatureFilter sup) {
+      return this.equals(sup);
+    }
+
+    public boolean isDisjoint(FeatureFilter filt) {
+      return (filt instanceof AcceptNoneFilter) || (
+        (filt instanceof StrandFilter) &&
+        ((StrandFilter) filt).getStrand() == getStrand()
+      );
+    }
+  }
+  
+  /**
+   * Accept features that reside on a sequence with a particular name.
+   *
+   * @author Matthew Pocock
+   * @since 1.3
+   */
+  public final static class BySequeneName
+  implements OptimizableFilter {
+    private String seqName;
+    
+    public BySequeneName(String seqName) {
+      this.seqName = seqName;
+    }
+    
+    public String getSequenceName() {
+      return seqName;
+    }
+    
+    public boolean accept(Feature f) {
+      return f.getSequence().getName().equals(seqName);
+    }
+    
+    public boolean isProperSubset(FeatureFilter sup) {
+      return equals(sup);
+    }
+    
+    public boolean isDisjoint(FeatureFilter filt) {
+      return !equals(filt);
+    }
+
+    public boolean equals(Object o) {
+      return
+       (o instanceof BySequeneName) &&
+       ((BySequeneName) o).getSequenceName().equals(seqName);
+    }
+    
+    public int hashCode() {
+      return seqName.hashCode();
+    }
+  }
+  
   /**
    *  A filter that returns all features contained within a location.
    *
@@ -365,186 +598,25 @@ public interface FeatureFilter extends Serializable {
     }
 
     public boolean isDisjoint(FeatureFilter filt) {
-	if (filt instanceof ContainedByLocation)  {
-	    Location loc = ((ContainedByLocation) filt).getLocation();
-	    return !getLocation().overlaps(loc);
-	}
-	return (filt instanceof AcceptNoneFilter);
+      if (filt instanceof ContainedByLocation)  {
+        Location loc = ((ContainedByLocation) filt).getLocation();
+        return !getLocation().overlaps(loc);
+      }
+      return (filt instanceof AcceptNoneFilter);
     }
-
+    
     public String toString() {
       return "Overlaps(" + loc + ")";
     }
   }
-
-  /**
-   *  A filter that returns all features not accepted by a child filter.
-   *
-   * @author Thomas Down
-   * @author Matthew Pocock
-   * @since 1.0
-   */
-  public final static class Not implements FeatureFilter {
-    FeatureFilter child;
-
-    public FeatureFilter getChild() {
-      return child;
-    }
-
-    public Not(FeatureFilter child) {
-        this.child = child;
-    }
-
-    public boolean accept(Feature f) {
-        return !(child.accept(f));
-    }
-
-    public boolean equals(Object o) {
-      return
-        (o instanceof Not) &&
-        (((Not) o).getChild().equals(this.getChild()));
-    }
-
-    public int hashCode() {
-      return getChild().hashCode();
-    }
-
-    public String toString() {
-      return "Not(" + child + ")";
-    }
-  }
-
-  /**
-   *  A filter that returns all features accepted by both child filter.
-   *
-   * @author Thomas Down
-   * @author Matthew Pocock
-   * @since 1.0
-   */
-  public final static class And implements FeatureFilter {
-    FeatureFilter c1, c2;
-
-    public FeatureFilter getChild1() {
-      return c1;
-    }
-
-    public FeatureFilter getChild2() {
-      return c2;
-    }
-
-    public And(FeatureFilter c1, FeatureFilter c2) {
-        this.c1 = c1;
-        this.c2 = c2;
-    }
-
-    public boolean accept(Feature f) {
-        return (c1.accept(f) && c2.accept(f));
-    }
-
-    public boolean equals(Object o) {
-      if(o instanceof FeatureFilter) {
-        return FilterUtils.areEqual(this, (FeatureFilter) o);
-      } else {
-        return false;
-      }
-    }
-
-    public int hashCode() {
-      return getChild1().hashCode() ^ getChild2().hashCode();
-    }
-
-      public String toString() {
-	  return "And(" + c1 + " , " + c2 + ")";
-       }
-  }
-
-  /**
-   *  A filter that returns all features accepted by the first filter and
-   * rejected by the seccond.
-   *
-   * @author Matthew Pocock
-   * @since 1.2
-   */
-  public final static class AndNot implements FeatureFilter {
-    FeatureFilter c1, c2;
-
-    public FeatureFilter getChild1() {
-      return c1;
-    }
-
-    public FeatureFilter getChild2() {
-      return c2;
-    }
-
-    public AndNot(FeatureFilter c1, FeatureFilter c2) {
-        this.c1 = c1;
-        this.c2 = c2;
-    }
-
-    public boolean accept(Feature f) {
-        return (c1.accept(f) && !c2.accept(f));
-    }
-
-    public boolean equals(Object o) {
-      return
-        (o instanceof AndNot) &&
-        (((AndNot) o).getChild1().equals(this.getChild1())) &&
-        (((AndNot) o).getChild2().equals(this.getChild2()));
-    }
-
-    public int hashCode() {
-      return getChild1().hashCode() ^ getChild2().hashCode();
-    }
-
-    public String toString() {
-      return "AndNot(" + c1 + " , " + c2 + ")";
-     }
-  }
-
-  /**
-   *  A filter that returns all features accepted by at least one child filter.
-   *
-   * @author Thomas Down
-   * @author Matthew Pocock
-   * @since 1.0
-   */
-  public final static class Or implements FeatureFilter {
-    FeatureFilter c1, c2;
-
-    public FeatureFilter getChild1() {
-      return c1;
-    }
-
-    public FeatureFilter getChild2() {
-      return c2;
-    }
-
-    public Or(FeatureFilter c1, FeatureFilter c2) {
-        this.c1 = c1;
-        this.c2 = c2;
-    }
-
-    public boolean accept(Feature f) {
-        return (c1.accept(f) || c2.accept(f));
-    }
-
-    public boolean equals(Object o) {
-      if(o instanceof FeatureFilter) {
-        return FilterUtils.areEqual(this, (FeatureFilter) o);
-      } else {
-        return false;
-      }
-    }
-
-    public int hashCode() {
-      return getChild1().hashCode() ^ getChild2().hashCode();
-    }
-
-    public String toString() {
-      return "Or(" + c1 + " , " + c2 + ")";
-    }
-  }
   
+  /**
+   * A filter that returns all features that have an annotation bundle that is of a given
+   * annotation type.
+   *
+   * @author Matthew Pocock
+   * @since 1.3
+   */
   public static class ByAnnotationType
   implements OptimizableFilter {
     private AnnotationType type;
@@ -690,10 +762,6 @@ public interface FeatureFilter extends Serializable {
     public Object getValue() {
       return value;
     }
-
-//    public String toString() {
-//      return getKey() + " == " + getValue();
-//    }
   }
 
   /**
@@ -727,71 +795,6 @@ public interface FeatureFilter extends Serializable {
 
     public Object getKey() {
       return key;
-    }
-    
-//    public String toString() {
-//      return "Has annotation: " + getKey();
-//    }
-  }
-
-  /**
-   * Accept features with a given strandedness.
-   *
-   * @author Matthew Pocock
-   * @since 1.1
-   */
-  public final static class StrandFilter implements OptimizableFilter {
-    private StrandedFeature.Strand strand;
-
-    /**
-     * Build a new filter that matches all features of a given strand.
-     *
-     * @param strand the Strand to match
-     */
-    public StrandFilter(StrandedFeature.Strand strand) {
-      this.strand = strand;
-    }
-
-    /**
-     * Retrieve the strand this matches.
-     *
-     * @return the Strand matched
-     */
-    public StrandedFeature.Strand getStrand() {
-      return strand;
-    }
-
-    /**
-     * Accept the Feature if it is an instance of StrandedFeature and matches
-     * the value of getStrand().
-     *
-     * @param f the Feature to check
-     * @return true if the strand matches, or false otherwise
-     */
-    public boolean accept(Feature f) {
-      if(f instanceof StrandedFeature) {
-        StrandedFeature sf = (StrandedFeature) f;
-        return sf.getStrand() == strand;
-      } else {
-        return strand == StrandedFeature.UNKNOWN;
-      }
-    }
-
-    public boolean equals(Object o) {
-      return
-        (o instanceof StrandFilter) &&
-        (((StrandFilter) o).getStrand() == this.getStrand());
-    }
-
-    public boolean isProperSubset(FeatureFilter sup) {
-      return this.equals(sup);
-    }
-
-    public boolean isDisjoint(FeatureFilter filt) {
-      return (filt instanceof AcceptNoneFilter) || (
-        (filt instanceof StrandFilter) &&
-        ((StrandFilter) filt).getStrand() == getStrand()
-      );
     }
   }
 
@@ -947,6 +950,165 @@ public interface FeatureFilter extends Serializable {
 
             if (ancFilter != null) {
                 return FilterUtils.areDisjoint(ancFilter, filter);
+            } else {
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Filter by applying a nested <code>FeatureFilter</code> to the
+     * child features.  Always <code>false</code> if there are no children.
+     *
+     * @author Matthew Pocock
+     * @author Thomas Down
+     * @since 1.3
+     */
+
+    public static class ByChild implements OptimizableFilter, ByHierarchy {
+        private FeatureFilter filter;
+
+        public ByChild(FeatureFilter ff) {
+            filter = ff;
+        }
+
+        public FeatureFilter getFilter() {
+            return filter;
+        }
+
+        public boolean accept(Feature f) {
+          for(Iterator i = f.features(); i.hasNext(); ) {
+            if(filter.accept((Feature) i.next())) {
+              return true;
+            }
+          }
+
+          return false;
+        }
+
+        public int hashCode() {
+            return filter.hashCode() + 173;
+        }
+
+        public boolean equals(Object o) {
+            if (! (o instanceof FeatureFilter.ByChild)) {
+                return false;
+            }
+
+            FeatureFilter.ByChild ffbc = (FeatureFilter.ByChild) o;
+            return ffbc.getFilter().equals(filter);
+        }
+
+        public boolean isProperSubset(FeatureFilter ff) {
+            FeatureFilter descFilter = null;
+            if (ff instanceof FeatureFilter.ByChild) {
+                descFilter = ((FeatureFilter.ByChild) ff).getFilter();
+            } else if (ff instanceof FeatureFilter.ByDescendant) {
+                descFilter = ((FeatureFilter.ByDescendant) ff).getFilter();
+            }
+
+            if (descFilter != null) {
+                return FilterUtils.areProperSubset(descFilter, filter);
+            } else {
+                return false;
+            }
+        } 
+
+        public boolean isDisjoint(FeatureFilter ff) {
+            if (ff instanceof IsLeaf) {
+                return true;
+            }
+            
+            FeatureFilter descFilter = null;
+            if (ff instanceof FeatureFilter.ByChild) {
+                descFilter = ((FeatureFilter.ByChild) ff).getFilter();
+            }
+
+            if (descFilter != null) {
+                return FilterUtils.areDisjoint(descFilter, filter);
+            } else {
+                return false;
+            }
+        }
+    }
+
+
+    /**
+     * Filter by applying a nested <code>FeatureFilter</code> to all
+     * descendant features.  Returns <code>true</code> if at least one
+     * of them matches the filter.  Always <code>false</code> if the
+     * feature has no children.
+     *
+     * @author Matthew Pocock
+     * @author Thomas Down
+     * @since 1.2
+     */
+
+    public static class ByDescendant implements OptimizableFilter, ByHierarchy {
+        private FeatureFilter filter;
+
+        public ByDescendant(FeatureFilter ff) {
+            filter = ff;
+        }
+
+        public FeatureFilter getFilter() {
+            return filter;
+        }
+
+        public boolean accept(Feature f) {
+            do {
+                FeatureHolder fh = f.getParent();
+                if (fh instanceof Feature) {
+                    f = (Feature) fh;
+                    if (filter.accept(f)) {
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+            } while (true);
+        }
+
+        public int hashCode() {
+            return filter.hashCode() + 186;
+        }
+
+        public boolean equals(Object o) {
+            if (! (o instanceof FeatureFilter.ByDescendant)) {
+                return false;
+            }
+
+            FeatureFilter.ByDescendant ffba = (FeatureFilter.ByDescendant) o;
+            return ffba.getFilter().equals(filter);
+        }
+
+        public boolean isProperSubset(FeatureFilter ff) {
+            FeatureFilter ancFilter = null;
+            if (ff instanceof FeatureFilter.ByDescendant) {
+                ancFilter = ((FeatureFilter.ByDescendant) ff).getFilter();
+            }
+
+            if (ancFilter != null) {
+                return FilterUtils.areProperSubset(ancFilter, filter);
+            } else {
+                return false;
+            }
+        }
+
+        public boolean isDisjoint(FeatureFilter ff) {
+            if (ff instanceof IsTopLevel) {
+                return true;
+            }
+            
+            FeatureFilter descFilter = null;
+            if (ff instanceof FeatureFilter.ByChild) {
+                descFilter = ((FeatureFilter.ByChild) ff).getFilter();
+            } else if (ff instanceof FeatureFilter.ByDescendant) {
+                descFilter = ((FeatureFilter.ByDescendant) ff).getFilter();
+            }
+
+            if (descFilter != null) {
+                return FilterUtils.areDisjoint(descFilter, filter);
             } else {
                 return false;
             }
@@ -1191,6 +1353,7 @@ public interface FeatureFilter extends Serializable {
      * by the logic that the <code>parent</code> property of top-level features
      * will implement the <code>Sequence</code> interface.
      *
+     * @author Thomas Down
      * @since 1.3
      */
     
@@ -1219,6 +1382,43 @@ public interface FeatureFilter extends Serializable {
         
         public boolean isDisjoint(FeatureFilter ff) {
             return (ff instanceof ByParent) || (ff instanceof ByAncestor);
+        }
+    }
+
+    public static final FeatureFilter leaf = new IsLeaf();
+    
+    /**
+     * Accept features which themselves have no children.
+     *
+     * @author Matthew Pocock
+     * @since 1.3
+     */
+    
+    public static final class IsLeaf implements OptimizableFilter {
+        public boolean accept(Feature f) {
+            return f.countFeatures() == 0;
+        }
+        
+        public int hashCode() {
+            return 41;
+        }
+        
+        /**
+         * All instances are equal (this should really be a singleton, but
+         * that doesn't quite fit current </code>FeatureFilter</code>
+         * patterns.
+         */
+        
+        public boolean equals(Object o) {
+            return (o instanceof FeatureFilter.IsLeaf);
+        }
+       
+        public boolean isProperSubset(FeatureFilter ff) {
+            return (ff instanceof IsLeaf) || (ff instanceof AcceptAllFilter);
+        }
+        
+        public boolean isDisjoint(FeatureFilter ff) {
+            return ff instanceof ByChild || ff instanceof ByDescendant || ff instanceof AcceptNoneFilter;
         }
     }
 }
