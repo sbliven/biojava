@@ -125,10 +125,14 @@ public final class IntegerAlphabet
   /**
    * Canonicalization map for ints and references to symbols.
    */
-  private Map intToSymRef;
+    private Map intToSymRef;
+    private Map symRefToInt;
+    private ReferenceQueue queue;
   
   private IntegerAlphabet() {
-    intToSymRef = new HashMap();
+      intToSymRef = new HashMap();
+      symRefToInt = new HashMap();
+      queue = new ReferenceQueue();
   }
   
   /**
@@ -137,18 +141,32 @@ public final class IntegerAlphabet
    * @param val  the int to view
    * @return a IntegerSymbol embodying val
    */
-  public IntegerSymbol getSymbol(int val) {
-    Integer i = new Integer(val);
-    Reference ref = (Reference) intToSymRef.get(i);
-    Symbol sym; // stop premature reference clearup
+  public synchronized IntegerSymbol getSymbol(int val) {
+      Reference qref;
+      while ((qref = queue.poll()) != null) {
+	  // System.out.println("Clearing queue");
+	  Integer qi = (Integer) symRefToInt.get(qref);
+	  if (qi != null) {
+	      intToSymRef.remove(qi);
+	      symRefToInt.remove(qref);
+	  }
+	  qref.clear();
+      }
+
+      Integer i = new Integer(val);
+      Reference ref = (Reference) intToSymRef.get(i);
+      IntegerSymbol sym; // stop premature reference clearup
     
-    if(ref == null || ref.get() == null) {
-      // how accessible do we want this? Soft or Weak?
-      ref = new SoftReference(sym = new IntegerSymbol(val));
-      intToSymRef.put(i, ref);
-    }
-    
-    return (IntegerSymbol) ref.get();
+      if(ref == null || ref.get() == null) {
+	  // how accessible do we want this? Soft or Weak?
+	  sym = new IntegerSymbol(val);
+	  ref = new WeakReference(sym, queue);
+	  intToSymRef.put(i, ref);
+	  symRefToInt.put(ref, i);
+	  return sym;
+      } else {
+	  return (IntegerSymbol) ref.get();
+      }
   }
 
   public Symbol getGapSymbol() {
