@@ -168,7 +168,7 @@ class FeatureRequestManager {
 	    }
 
 	    InputSource is = new InputSource(huc.getInputStream());
-	    DASFeaturesHandler dfh = new DASFeaturesHandler(ticketsById);
+	    DASFeaturesHandler dfh = new DASFeaturesHandler(ticketsById, trigger);
 	    SAXParser parser = new SAXParser();
 	    parser.setContentHandler(new SAX2StAXAdaptor(dfh));
 	    parser.parse(is);
@@ -193,13 +193,15 @@ class FeatureRequestManager {
 	private Map ticketsById;
 	private Ticket thisTicket;
 	private List doneTickets = new ArrayList();
+        private Ticket trigger;
 
 	public List getDoneTickets() {
 	    return doneTickets;
 	}
 
-	public DASFeaturesHandler(Map ticketsById) {
+	public DASFeaturesHandler(Map ticketsById, Ticket trigger) {
 	    this.ticketsById = ticketsById;
+            this.trigger = trigger;
 	}
 
 	public void startElement(String nsURI,
@@ -260,6 +262,8 @@ class FeatureRequestManager {
 	    if (localName.equals("SEGMENT")) {
 		thisTicket.setAsFetched();
 		doneTickets.add(thisTicket);
+                DAS.activityProgress(trigger, doneTickets.size()
+                , ticketsById.size());
 	    }
 	}
     }
@@ -356,7 +360,7 @@ class FeatureRequestManager {
 		Map ticketsById = new HashMap();
 		ticketsById.put(t.getID(), t);
 		InputSource is = new InputSource(huc.getInputStream());
-		DASFeaturesHandler dfh = new DASFeaturesHandler(ticketsById);
+		DASFeaturesHandler dfh = new DASFeaturesHandler(ticketsById, t);
 		SAXParser parser = new SAXParser();
 		parser.setContentHandler(new SAX2StAXAdaptor(dfh));
 		parser.parse(is);

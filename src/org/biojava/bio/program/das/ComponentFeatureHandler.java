@@ -43,7 +43,14 @@ import org.xml.sax.*;
 
 public class ComponentFeatureHandler extends StrandedFeatureHandler {
     boolean inFeature = false;
-
+    
+    // workaround for compiler/vm bug
+    protected void setFeatureProperty(Object key, Object value) 
+        throws ChangeVetoException, ParseException
+    {
+      super.setFeatureProperty(key, value);
+    }
+    
     public static final XFFPartHandlerFactory COMPONENTFEATURE_HANDLER_FACTORY = new XFFPartHandlerFactory() {
 	    public StAXContentHandler getPartHandler(XFFFeatureSetHandler xffenv) {
 		return new ComponentFeatureHandler(xffenv);
@@ -86,7 +93,7 @@ public class ComponentFeatureHandler extends StrandedFeatureHandler {
 		    throws SAXException
 		{
 		    try {
-			ComponentFeatureHandler.this.setFeatureProperty("sequence.id", s);
+			setFeatureProperty("sequence.id", s);
 		    } catch (Exception ex) {
 			throw new SAXException("Couldn't set property", ex);
 		    }
