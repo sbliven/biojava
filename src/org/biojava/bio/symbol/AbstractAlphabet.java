@@ -223,13 +223,13 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
   protected abstract boolean containsImpl(AtomicSymbol s);
   
   public void addChangeListener(ChangeListener cl) {
-    getChangeSupport(null).addChangeListener(cl);
+    getChangeSupport(ChangeType.UNKNOWN).addChangeListener(cl);
   }
   public void addChangeListener(ChangeListener cl, ChangeType ct) {
     getChangeSupport(ct).addChangeListener(cl, ct);
   }
   public void removeChangeListener(ChangeListener cl) {
-    getChangeSupport(null).removeChangeListener(cl);
+    getChangeSupport(ChangeType.UNKNOWN).removeChangeListener(cl);
   }
   public void removeChangeListener(ChangeListener cl, ChangeType ct) {
     getChangeSupport(ct).removeChangeListener(cl, ct);

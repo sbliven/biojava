@@ -36,7 +36,7 @@ public abstract class AbstractChangeable implements Changeable {
   }
 
   public void addChangeListener(ChangeListener cl) {
-    ChangeSupport cs = getChangeSupport(null);
+    ChangeSupport cs = getChangeSupport(ChangeType.UNKNOWN);
     synchronized(cs) {
       cs.addChangeListener(cl);
     }
@@ -50,7 +50,7 @@ public abstract class AbstractChangeable implements Changeable {
   }
 
   public void removeChangeListener(ChangeListener cl) {
-    ChangeSupport cs = getChangeSupport(null);
+    ChangeSupport cs = getChangeSupport(ChangeType.UNKNOWN);
     synchronized(cs) {
       cs.removeChangeListener(cl);
     }
