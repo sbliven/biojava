@@ -72,7 +72,7 @@ class DistProjectedFeatureHolder extends ProjectedFeatureHolder {
     public Feature projectFeature(Feature f) {
 	    if (f instanceof ComponentFeature && getParent() instanceof DistributedSequence) {
             ComponentFeature pcf = (ComponentFeature) componentFeatureCache.get(f);
-            if (pcf != null) {
+            if (pcf == null) {
                 ComponentFeature.Template cft = (ComponentFeature.Template) ((ComponentFeature) f).makeTemplate();
                 if (cft.componentSequenceName == null) {
                     cft.componentSequenceName = cft.componentSequence.getName();
