@@ -77,8 +77,6 @@ public class AcePerlParser {
           Ace.rootURL(parent.toURL()).relativeURL(cl)
         );
 	    } else {
-        System.out.println("db url is " + parentDB.toURL());
-        System.out.println("relative url is " + parentDB.toURL().relativeURL(cl));
         obj = new StaticAceObject(
           va, 
 		      Ace.fetch(parentDB.toURL().relativeURL(cl)),
@@ -106,41 +104,30 @@ public class AcePerlParser {
 	StaticAceNode obj = null;
 
 	while (true) {
-	    String s = t.nextToken();
-	    if(s.equals(",")) {
-	    } else if (s.startsWith("ty=>")) {
-		if(ty != null) {
-		    throw new AceError("Resetting old ty value " + ty + " with " + s);
-		}
-		ty = s.substring(4).trim();
-	    } else if (s.startsWith("va=>")) {
-		if(va != null) {
-		    throw new AceError("Resetting old ty value " + va + " with " + s);
-		}
-		va = Ace.encode(s.substring(4));
-		boolean done = false;
-		do {
-		    String peek = t.peekToken();
-		    if (! (peek.equals(",") && peek.equals("}"))) {
-			va = va + " " + peek;
-		    } else {
-			done = true;
-		    }
-		} while (!done);
-		va = va.trim();
-	    } else if (s.startsWith("cl=>")) {
-		if(ty != null) {
-		    throw new AceError("Resetting old ty value " + cl + " with " + s);
-		}
-		cl = s.substring(4).trim();
-	    } else if (s.equals("Pn=>")) {
+   String s = t.nextToken();
+   if(s.equals(",")) {
+   } else if (s.startsWith("ty=>")) {
+     if(ty != null) {
+       throw new AceError("Resetting old ty value " + ty + " with " + s);
+     }
+     ty = s.substring(4).trim();
+	 } else if (s.equals("va=>")) {
+     if(va != null) {
+		   throw new AceError("Resetting old va value " + va + " with " + s);
+     }
+     va = Ace.encode(t.nextToken());
+   } else if (s.equals("cl=>")) {
+     if(cl != null) {
+       throw new AceError("Resetting old cl value " + cl + " with " + s);
+     }
+     cl = Ace.encode(t.nextToken());
+   } else if (s.equals("Pn=>")) {
 		if (! t.nextToken().equals("[")) {
 		    throw new AceError("Unrecoverable parsing error: expecting [");
 		}
 		if(ty == null) {
 		    throw new AceError("Got null ty field for object");
 		}
-		System.out.println("Constructing node with " + parent + ", " + ty + ", " + va + ", " + cl);
 		obj = constructNode(parent, ty, va, cl);
 		getChildren(obj, t);
 		ty = null;
@@ -154,7 +141,6 @@ public class AcePerlParser {
 		}
 	    } else {
 		ty = "model";
-		System.out.println("Found " + s);
 		va = Ace.encode(s.trim());
 	    }
 	}
@@ -178,17 +164,18 @@ public class AcePerlParser {
 class PeekStringTokenizer {
     private StringTokenizer toke;
     private String cache = null;
+    private static final String quote = "\01";
 
     public PeekStringTokenizer(String s) {
 	toke = new StringTokenizer(s);
     }
 
     public PeekStringTokenizer(String s, String b) {
-	toke = new StringTokenizer(s, b);
+      this(s, b, false);
     }
 
     public PeekStringTokenizer(String s, String b, boolean r) {
-	toke = new StringTokenizer(s, b, r);
+      toke = new StringTokenizer(s, b+quote, r);
     }
 
     public int countTokens() {
@@ -201,7 +188,7 @@ class PeekStringTokenizer {
 
     public String nextToken() {
 	if (cache == null) {
-	    return toke.nextToken();
+	    return extractToken();
 	} else {
 	    String t = cache;
 	    cache = null;
@@ -211,8 +198,20 @@ class PeekStringTokenizer {
 
     public String peekToken() {
 	if (cache == null) {
-	    cache = toke.nextToken();
+	    cache = extractToken();
 	}
 	return cache;
+    }
+    
+    private String extractToken() {
+      String t = toke.nextToken();
+      if(t.equals(quote)) {
+        StringBuffer tb = new StringBuffer();
+        for(String s = toke.nextToken(); !s.equals(quote); s = toke.nextToken()) {
+          tb.append(s);
+        }
+        t = tb.toString();
+      }
+      return t;
     }
 }
