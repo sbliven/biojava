@@ -379,6 +379,7 @@ class FeatureFetcher {
 			       StAXContentHandler handler)
 	    throws SAXException
 	{
+	    // System.err.println("endElement: " + localName);
 	    if (level == 1) {
 		try {
 		    siol.endSequence();

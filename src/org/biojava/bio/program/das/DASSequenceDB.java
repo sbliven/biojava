@@ -95,6 +95,14 @@ public class DASSequenceDB implements SequenceDB {
     public DASSequenceDB(URL dataSourceURL) 
 	throws BioException 
     {
+	String s = dataSourceURL.toString();
+	if (! (s.endsWith("/"))) {
+	    try {
+		dataSourceURL = new URL(s + "/");
+	    } catch (MalformedURLException ex) {
+		throw new BioError(ex, "Assertion failure: trivial URI manipulation failed");
+	    }
+	}
 	this.dataSourceURL = dataSourceURL;
     }
 

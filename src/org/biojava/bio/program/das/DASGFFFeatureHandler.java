@@ -54,9 +54,7 @@ public class DASGFFFeatureHandler extends StAXContentHandlerBase {
     private Location loc = null;
     private boolean isReferenceFeature = false;
     private String category = null;
-    private String refName = null;
-    private int refStart = -1;
-    private int refStop = -1;
+    private List groups = new ArrayList();
 
     public DASGFFFeatureHandler(SeqIOListener siol) {
 	this.featureListener = siol;
@@ -108,7 +106,8 @@ public class DASGFFFeatureHandler extends StAXContentHandlerBase {
 		    }
 		} );
 	} else if ("GROUP".equals(localName)) {
-	    dm.delegate(new StAXContentHandlerBase());
+	    Group groupHandler = new Group();
+	    dm.delegate(groupHandler);
 	} else {
 	    // Unknown element -- let's be flexible for now...
 
@@ -116,11 +115,47 @@ public class DASGFFFeatureHandler extends StAXContentHandlerBase {
 	}
     }
 
+    public void endElement(String nsURI,
+			   String localName,
+			   String qName,
+			   StAXContentHandler handler)
+	 throws SAXException
+    {
+	if (handler != null) {
+	    if (handler instanceof Group) {
+		groups.add(handler);
+	    }
+	}
+    }
+
     public void endTree()
         throws SAXException
     {
 	Feature.Template temp;
-	if (orientation.equals("+") || orientation.equals("-")) {
+	if (isReferenceFeature && category.equals("component")) {
+	    if (groups.size() != 1) {
+		throw new SAXException("Expecting 1 GROUP element in a component feature [FIXME?]");
+	    }
+	    Group targetGroup = (Group) groups.get(0);
+	    if (targetGroup.target_id == null) {
+		throw new SAXException("Target must be specified for component features");
+	    }
+
+	    ComponentFeature.Template ctemp = new ComponentFeature.Template();
+	    ctemp.componentLocation = new RangeLocation(targetGroup.target_start, 
+							targetGroup.target_stop);
+	    ctemp.strand = orientation.equals("+") ? StrandedFeature.POSITIVE :
+	                                             StrandedFeature.NEGATIVE;
+
+	    ctemp.annotation = new SmallAnnotation();
+	    try {
+		ctemp.annotation.setProperty("sequence.id", targetGroup.target_id);
+	    } catch (ChangeVetoException ex) {
+		throw new BioError(ex);
+	    }
+
+	    temp = ctemp;
+	} if (orientation.equals("+") || orientation.equals("-")) {
 	    StrandedFeature.Template stemp = new StrandedFeature.Template();
 	    stemp.strand = orientation.equals("+") ? StrandedFeature.POSITIVE :
 	                                             StrandedFeature.NEGATIVE;
@@ -158,6 +193,49 @@ public class DASGFFFeatureHandler extends StAXContentHandlerBase {
 	    featureListener.endFeature();
 	} catch (Exception ex) {
 	    throw new BioRuntimeException(ex);
+	}
+    }
+
+    private class Group extends StAXContentHandlerBase {
+	String gid;
+	String note;
+	String link;
+	String link_text;
+	String target_id;
+	int target_start;
+	int target_stop;
+
+	public void startElement(String nsURI,
+				 String localName,
+				 String qName,
+				 Attributes attrs,
+				 DelegationManager dm)
+	    throws SAXException
+	{
+	    if ("GROUP".equals(localName)) {
+		gid = attrs.getValue("id");
+	    } else if ("NOTE".equals(localName)) {
+		dm.delegate(new StringElementHandlerBase() {
+		    protected void setStringValue(String s) {
+		        note = s.trim();
+		    }
+		} );
+	    } else if ("LINK".equals(localName)) {
+		link = attrs.getValue("href");
+		dm.delegate(new StringElementHandlerBase() {
+		    protected void setStringValue(String s) {
+		        link_text = s.trim();
+		    }
+		} );
+	    } else if ("TARGET".equals(localName)) {
+		target_id = attrs.getValue("id");
+		try {
+		    target_start = Integer.parseInt(attrs.getValue("start"));
+		    target_stop = Integer.parseInt(attrs.getValue("stop"));
+		} catch (NumberFormatException ex) {
+		    throw new SAXException("Bad start/stop parsing TARGET");
+		}
+	    } 
 	}
     }
 }
