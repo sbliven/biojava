@@ -83,7 +83,7 @@ hemL putative glutamate-1-semialdehyde 2,1-aminom  ( 427)   77   25     9.9
 >>>NMA0159.aa, 425 aa vs files/fp_demo.db library
 ; mp_name: fasta33
 ; mp_ver: 33t06
-; mp_argv: fasta33 -m 10 NMA0159.aa nm.aa
+; mp_argv: fasta33 -m 10 NMA0159.aa files/fp_demo.db
 ; pg_name: FASTA
 ; pg_ver: 3.36 June 2000
 ; pg_matrix: BL50 (15:-5)
@@ -541,7 +541,7 @@ clpP endopeptidase 1420469:1421083 reverse MW:226  ( 204)   72   24     9.9
 >>>NMA0305.aa, 328 aa vs files/fp_demo.db library
 ; mp_name: fasta33
 ; mp_ver: 33t06
-; mp_argv: fasta33 -m 10 NMA0305.aa nm.aa
+; mp_argv: fasta33 -m 10 NMA0305.aa files/fp_demo.db
 ; pg_name: FASTA
 ; pg_ver: 3.36 June 2000
 ; pg_matrix: BL50 (15:-5)

@@ -20,17 +20,32 @@
  */
 package search;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.search.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-import org.biojava.bio.program.search.*;
+import java.util.List;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.db.IndexedSequenceDB;
+import org.biojava.bio.seq.db.TabIndexStore;
+import org.biojava.bio.seq.db.SimpleSequenceDBInstallation;
+
+import org.biojava.bio.search.SeqSimilaritySearchResult;
+import org.biojava.bio.search.SeqSimilaritySearchHit;
+import org.biojava.bio.search.SeqSimilaritySearchSubHit;
+
+import org.biojava.bio.program.search.SearchReader;
+import org.biojava.bio.program.search.SearchBuilder;
+import org.biojava.bio.program.search.FastaSearchBuilder;
+import org.biojava.bio.program.search.SearchParser;
+import org.biojava.bio.program.search.FastaSearchParser;
+
+import org.biojava.bio.symbol.Alignment;
 
 /**
  * <code>FastaSearchParse</code> is a demo of Fasta search output
@@ -55,10 +70,10 @@ public class FastaSearchParse
 	String fastaOutputFileName = args[2];
 
 	File queryFile    = new File(queryFileName);
-	File queryStore   = new File(queryFileName + ".store");
+	File queryIndex   = new File(queryFileName + ".index");
 
 	File subjectFile  = new File(subjectFileName);
-	File subjectStore = new File(subjectFileName + ".store");
+	File subjectIndex = new File(subjectFileName + ".index");
 
 	try
 	{
@@ -66,8 +81,8 @@ public class FastaSearchParse
 	    SequenceDB                   subjectDB;
 	    SimpleSequenceDBInstallation dbInstallation;
 
-	    queryDB   = new IndexedSequenceDB(TabIndexStore.open(queryStore));
-	    subjectDB = new IndexedSequenceDB(TabIndexStore.open(subjectStore));
+	    queryDB   = new IndexedSequenceDB(TabIndexStore.open(queryIndex));
+	    subjectDB = new IndexedSequenceDB(TabIndexStore.open(subjectIndex));
 
 	    dbInstallation = new SimpleSequenceDBInstallation();
 	    dbInstallation.addSequenceDB(subjectDB, new HashSet());
@@ -76,7 +91,7 @@ public class FastaSearchParse
 
 	    SearchBuilder handler =
 		new FastaSearchBuilder(dbInstallation, queryDB);
-	    FastaSearchParser parser = new FastaSearchParser();
+	    SearchParser parser = new FastaSearchParser();
 
 	    SearchReader searchReader = new SearchReader(reader,
 							 handler,
@@ -110,7 +125,7 @@ public class FastaSearchParse
 			System.out.println("--> SubHit: " + subHit);
 
 			Alignment al = subHit.getAlignment();
-			List labels  = al.getLabels();
+			List  labels = al.getLabels();
 
 			try
 			{

@@ -48,7 +48,7 @@ public class IndexFastaDB
 	"\nUsage: java -Dtype=(aa|nt) [-Dname=<database name>] "
 	+ "IndexFastaDB file(s)";
     static final String INDEX = ".index";
-    static final String STORE = ".store";
+    static final String  LIST = ".list";
 
     public static void main (String [] args)
 	throws Exception
@@ -104,7 +104,7 @@ public class IndexFastaDB
 
 	    File fastaFile = new File(fastaFileName);
 	    File indexFile = new File(dbName + INDEX);
-	    File storeFile = new File(dbName + STORE);
+	    File indexList = new File(dbName + LIST);
 
 	    System.out.println("Creating database with name '"
 			       + dbName
@@ -112,8 +112,8 @@ public class IndexFastaDB
 			       + fastaFileName);
 
 	    // Instantiate the store and index the first file
-	    indexStore = new TabIndexStore(storeFile,
-					   indexFile,
+	    indexStore = new TabIndexStore(indexFile,
+					   indexList,
 					   dbName,
 					   seqFormat,
 					   sbFactory,
