@@ -34,6 +34,9 @@ import org.biojava.bio.* ;
 import org.biojava.bio.program.ssbind.* ;
 /** a class to Parse the XML response of a DAS Alignment service 
  * returns an Alignment object
+ *
+ * @author Andreas Prlic
+ *
  */
 public class DASAlignmentXMLResponseParser  extends DefaultHandler{
     ArrayList alignments ;
@@ -70,7 +73,7 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
 	//System.out.println("startElement " + qName) ;
 	if (qName.equals("alignObject")     ) OBJECThandler     (atts);
 	//if (qName.equals("DESCRIPTION")) DESCRIPTIONhandler(atts);
-	//if (qName.equals("SEQUENCE")   ) SEQUENCEhandler   (atts);
+	if (qName.equals("sequence")   ) SEQUENCEhandler   (atts);
 	if (qName.equals("score")      ) SCOREhandler      (atts);
 	if (qName.equals("block")      ) BLOCKhandler      (atts);
 	if (qName.equals("segment")    ) SEGMENThandler    (atts);
@@ -131,8 +134,12 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
 	String end    = atts.getValue("end");
 	// orientation, not implemented yet ...
 	current_segment.put("intObjectId",id);
+	if ( start != null ) {
 	current_segment.put("start",start);
-	current_segment.put("end",end) ;
+	}
+	if ( end != null ) {
+	    current_segment.put("end",end) ;
+	}
 	
 	
     }
@@ -156,6 +163,19 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
     }
 
     
+    private void SEQUENCEhandler(Attributes atts) {
+	//System.out.println("sequence");
+	current_position = "sequence" ;
+	String start    = atts.getValue("start");
+	String end      = atts.getValue("end");
+	if ( start != null ) {
+	    current_object.put("seqStart",start);
+	}
+	if ( end != null ) {
+	    current_object.put("seqEnd",end);
+	}
+
+    }
 
 
     private void SCOREhandler(Attributes atts) {
@@ -173,14 +193,16 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
 	String dbAccessionId    = atts.getValue("dbAccessionId");
 	String objectVersion    = atts.getValue("objectVersion");
 	String intObjectId      = atts.getValue("intObjectId");
-	String type = "" ;
+	String type             = "" ;
+
 	try { type = atts.getValue("type");} catch (Exception e) {} 
 	
 
 	String dbSource         = atts.getValue("dbSource");
 	String dbVersion        = atts.getValue("dbVersion");
+	//System.out.println("here" + dbAccessionId + " | " + objectVersion + " | " + intObjectId + " | " + dbSource + " | " + dbVersion + " | " + type);
 	String dbCoordSys       = atts.getValue("dbCoordSys");
-
+	//System.out.println("there" + dbCoordSys);
 	
 	HashMap object = new HashMap() ;
 	object.put("dbAccessionId" ,dbAccessionId);
@@ -188,16 +210,20 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
 	object.put("intObjectId"   ,intObjectId);
 
 	object.put("dbSource"      ,dbSource) ;
-	object.put("dbCoordSys"    ,dbCoordSys);
+	//System.out.println("daga");
+	if ( dbCoordSys != null ) {
+	    object.put("dbCoordSys"    ,dbCoordSys);
+	} 
+	//System.out.println("dong");
 	object.put("dbVersion"     ,dbVersion) ;
 	
-	if ( ! type.equals("")){
+	if ( type != null ){
 	    object.put("type",type); 
-	}
+	} 
 	
 	
 	current_object = object ;
-
+	//System.out.println("done");
        
     }
     
@@ -218,6 +244,10 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
 	}
 	if ( current_position == "cigar"){
 	    current_segment.put("cigar",txt);
+	}
+	if (current_position == "sequence"){
+	    //System.out.println(txt);
+	    current_object.put("sequence",txt);
 	}
 
     }

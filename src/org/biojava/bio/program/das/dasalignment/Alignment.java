@@ -160,7 +160,17 @@ public class Alignment {
 			       new PropertyConstraint.ByClass(String.class),
 			       CardinalityConstraint.ANY );
 	
+	annType.setConstraints("sequence", 
+			       new PropertyConstraint.ByClass(String.class),
+			       CardinalityConstraint.ANY );
 
+	annType.setConstraints("seqStart", 
+			       new PropertyConstraint.ByClass(String.class),
+			       CardinalityConstraint.ANY );
+
+	annType.setConstraints("seqEnd", 
+			       new PropertyConstraint.ByClass(String.class),
+			       CardinalityConstraint.ANY );
 	return annType ;
     }
     
