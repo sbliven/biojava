@@ -61,10 +61,10 @@ implements StrandedFeature {
     super(sourceSeq, template);
     if(template.strand != POSITIVE && template.strand != NEGATIVE) {
       throw new IllegalArgumentException(
-        "strand was not POSITIVE or NEGATIVE but " + strand
+        "strand was not POSITIVE or NEGATIVE but " + template.strand
       );
     }
-    this.strand = strand;
+    this.strand = template.strand;
     if(!ComplementResidueList.isComplementable(sourceSeq.alphabet())) {
       throw new IllegalAlphabetException (
         "Can not create a stranded feature within a sequence of type " +

@@ -180,7 +180,7 @@ class FeatureTableParser {
 	    }
 	}
 
-	if (complementing)
+	if (isComplement)
 	    featureStrand = StrandedFeature.NEGATIVE;
 	else
 	    featureStrand = StrandedFeature.POSITIVE;
