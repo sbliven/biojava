@@ -22,7 +22,7 @@
 package org.biojava.bio.seq;
 
 import java.io.Serializable;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
@@ -609,6 +609,103 @@ public interface FeatureFilter extends Serializable {
       return "Or(" + c1 + " , " + c2 + ")";
     }
   }
+  
+  public final static class ByAnnotationType
+  implements OptimizableFilter {
+    private AnnotationType type;
+    
+    public ByAnnotationType(AnnotationType type) {
+      this.type = type;
+    }
+    
+    public AnnotationType getType() {
+      return type;
+    }
+    
+    public boolean accept(Feature f) {
+      return type.instanceOf(f.getAnnotation());
+    }
+    
+    public boolean equals(Object o) {
+      if(o instanceof ByAnnotationType) {
+        ByAnnotationType that = (ByAnnotationType) o;
+        return this.getType() == that.getType();
+      }
+      
+      return false;
+    }
+    
+    public int hashCode() {
+      return getType().hashCode();
+    }
+    
+    public boolean isDisjoint(FeatureFilter filter) {
+      if(filter instanceof AcceptNoneFilter) {
+        return true;
+      } else if(filter instanceof ByAnnotationType) {
+        // check for common property names
+        ByAnnotationType that = (ByAnnotationType) filter;
+        Set props = that.getType().getProperties();
+        Set ourProps = new HashSet(getType().getProperties());
+        ourProps.retainAll(props);
+        if(ourProps.isEmpty()) {
+          return true;
+        }
+        for(Iterator i = ourProps.iterator(); i.hasNext(); ) {
+          Object prop = i.next();
+          CardinalityConstraint thisC = this.getType().getCardinalityConstraint(prop);
+          CardinalityConstraint thatC = that.getType().getCardinalityConstraint(prop);
+          
+          if(
+            thisC.getMax() < thatC.getMin() ||
+            thisC.getMin() > thatC.getMax()
+          ) {
+            return true;
+          }
+          
+          PropertyConstraint thisP = this.getType().getPropertyConstraint(prop);
+          PropertyConstraint thatP = that.getType().getPropertyConstraint(prop);
+          return
+            !thisP.subConstraintOf(thatP) &&
+            !thatP.subConstraintOf(thisP);
+        }
+      }
+      
+      return false;
+    }
+    
+    public boolean isProperSubset(FeatureFilter filter) {
+      if(filter instanceof ByAnnotationType) {
+        ByAnnotationType that = (ByAnnotationType) filter;
+
+        Set thatProps = that.getType().getProperties();
+        for(Iterator i = this.getType().getProperties().iterator(); i.hasNext(); ) {
+          Object prop = i.next();
+          
+          if(!thatProps.contains(prop)) {
+            return false;
+          }
+          
+          CardinalityConstraint thisC = this.getType().getCardinalityConstraint(prop);
+          CardinalityConstraint thatC = that.getType().getCardinalityConstraint(prop);
+          PropertyConstraint thisP = this.getType().getPropertyConstraint(prop);
+          PropertyConstraint thatP = that.getType().getPropertyConstraint(prop);
+          
+          if(
+            !thatP.subConstraintOf(thisP) ||
+            thatC.getMin() > thisC.getMin() ||
+            thatC.getMax() < thisC.getMax()
+          ) {
+            return false;
+          }
+        }
+        
+        return true;
+      }
+      
+      return false;
+    }
+  }
 
   /**
    * Retrieve features that contain a given annotation with a given value.
@@ -648,19 +745,15 @@ public interface FeatureFilter extends Serializable {
         }
         else
         {
-            try {
-                Object v = ann.getProperty(key);
-                if (v == null) {
-                    if (value == null) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+            Object v = ann.getProperty(key);
+            if (v == null) {
+                if (value == null) {
+                    return true;
                 } else {
-                    return v.equals(value);
+                    return false;
                 }
-            } catch (NoSuchElementException nsee) {
-                return false;
+            } else {
+                return v.equals(value);
             }
         }
     }
@@ -721,16 +814,7 @@ public interface FeatureFilter extends Serializable {
     public boolean accept(Feature f) {
         Annotation ann = f.getAnnotation();
 
-        if (! ann.containsProperty(key)) {
-            return false;
-        } else {
-            try {
-                Object v = ann.getProperty(key);
-                return true;
-            } catch (NoSuchElementException nsee) {
-                return false;
-            }
-        }
+        return ann.containsProperty(key);
     }
 
     public boolean equals(Object o) {

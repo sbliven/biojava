@@ -230,6 +230,54 @@ public interface PropertyConstraint {
         }
     }
 
+    public class ExactValue implements PropertyConstraint {
+      private Object value;
+      
+      public ExactValue(Object value) {
+        this.value = value;
+      }
+      
+      public Object getValue() {
+        return value;
+      }
+      
+      public boolean accept(Object obj) {
+        return value.equals(obj);
+      }
+      
+      public boolean subConstraintOf(PropertyConstraint pc) {
+        return pc.accept(value);
+      }
+      
+      public void setProperty(Annotation ann, Object prop, Object val)
+      throws ChangeVetoException {
+        if(accept(val)) {
+          ann.setProperty(prop, val);
+        } else {
+          throw new ChangeVetoException(
+            "Can't set property " + prop +
+            " to " + val + " as it is not " + value
+          );
+        }
+      }
+      
+      public void addValue(Collection coll, Object val)
+      throws ChangeVetoException {
+        if(accept(val)) {
+          coll.add(val);
+        } else {
+          throw new ChangeVetoException(
+            "Can't set property to " + val +
+            " as it is not " + value
+          );
+        }
+      }
+      
+      public String toString() {
+        return "ExactValue: " + value;
+      }
+    }
+    
     /**
      * <code>Enumeration</code> accepts a property if it is present
      * in the specified set of values.

@@ -197,11 +197,14 @@ public class FastaFormat implements SequenceFormat,
 
     protected String describeSequence(Sequence seq) {
 	String description = null;
-	try {
-	    description = seq.getAnnotation().getProperty(PROPERTY_DESCRIPTIONLINE).toString();
-	} catch (NoSuchElementException ex) {
-	    description = seq.getName();
-	}
+        Annotation seqAnn = seq.getAnnotation();
+
+        if(seqAnn.containsProperty(PROPERTY_DESCRIPTIONLINE)) {
+          description = (String) seqAnn.getProperty(PROPERTY_DESCRIPTIONLINE);
+        } else {
+          description = seq.getName();
+        }
+
 	return description;
     }
 
