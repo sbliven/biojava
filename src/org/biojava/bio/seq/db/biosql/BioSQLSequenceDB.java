@@ -902,7 +902,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 //System.err.println("Term: " + ts + "   " + ex.getMessage());
                 throw (SQLException) new SQLException(
                         "Couldn't create term '" + ts +
-                        "' in legacy ontology namespace"
+                        "' for '" + s + "' in legacy ontology namespace"
                 ).initCause(ex);
             }
         }
