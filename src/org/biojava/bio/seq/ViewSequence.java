@@ -76,7 +76,7 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
 	seqDelegate = seq;
 	addedFeatures = new SimpleFeatureHolder();
 	exposedFeatures = new MergeFeatureHolder();
-	exposedFeatures.addFeatureHolder(seqDelegate);
+	exposedFeatures.addFeatureHolder(new ProjectedFeatureHolder(seqDelegate, this, 0));
 	exposedFeatures.addFeatureHolder(addedFeatures);
 
 	name = seqDelegate.getName();  // Is this sensible?
@@ -212,22 +212,6 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
       return f;
     }
 
-    /**
-     * @deprecated Please use 1-arg createFeature instead.
-     */
-
-    public Feature createFeature(FeatureHolder fh, Feature.Template template)
-	throws BioException 
-    {
-	if (fh != this) {
-	    if (! (fh instanceof Feature))
-		throw new BioException("fh must be the ListSequence or one of its features.");
-	    if (! (containsRecurse(addedFeatures, (Feature) fh)))
-		throw new BioException("fh is not a child which has been added to this ListSequence");
-	}
-	return fh.createFeature(template);
-    }
-
     private static boolean containsRecurse(FeatureHolder fh, Feature f) {
 	for (Iterator i = fh.features(); i.hasNext(); ) {
 	    if (i.next() == f)
@@ -239,5 +223,9 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
 		return true;
 	}
 	return false;
+    }
+
+    public FeatureHolder getAddedFeatures() {
+	return addedFeatures;
     }
 }
