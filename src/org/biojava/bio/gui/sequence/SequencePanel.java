@@ -554,20 +554,22 @@ public class SequencePanel
     }
   }
   
-  protected int [] calcDist() {
-    double minAcross = sequenceToGraphics(range.getMin()) -
-                       renderer.getMinimumLeader(this);
-    int [] dist = new int[2];
-    if(direction == HORIZONTAL) {
-      dist[0] = (int) minAcross;
-      dist[1] = 0;
-    } else {
-      dist[0] = 0;
-      dist[1] = (int) minAcross;
-    }
+    protected int [] calcDist() {
+        double minAcross = sequenceToGraphics(range.getMin()) -
+            renderer.getMinimumLeader(this);
+        Insets insets = getInsets();
+
+        int [] dist = new int[2];
+        if(direction == HORIZONTAL) {
+            dist[0] = (int) minAcross - insets.left;
+            dist[1] = -insets.top;
+        } else {
+            dist[0] = -insets.left;
+            dist[1] = (int) minAcross - insets.top;
+        }
     
-    return dist;
-  }
+        return dist;
+    }
   
   protected boolean isActive() {
     return
