@@ -61,12 +61,12 @@ public class LabelledSequenceRenderer extends AbstractChangeable implements Sequ
     private transient   ChangeForwarder rendererForwarder = null;
     // the ChangeEvents this renderer can emit, due to certain things
     public static final ChangeType RENDERER  = new ChangeType(  "The SequenceRenderer has been added or removed", 
-                                                                "SequenceLabelRenderer",
+                                                                LabelledSequenceRenderer.class,
                                                                 "RENDERER",
                                                                 SequenceRenderContext.LAYOUT );
     
     public static final ChangeType VALUES   = new ChangeType(   "The label value has changed",
-                                                                "SequenceLabelRenderer",
+                                                                LabelledSequenceRenderer.class,
                                                                 "VALUES",
                                                                 SequenceRenderContext.REPAINT );
     
