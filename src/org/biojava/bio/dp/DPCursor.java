@@ -28,7 +28,12 @@ import org.biojava.bio.seq.*;
  * Encapsulates the dynamic programmming matrix, and the context within algorithms work.
  * The cursor should put DP.MAGICAL_STATE residues at either end of the sequence.
  */
-public interface DPCursor {
+interface DPCursor {
+  /**
+   * The residue list being looped over.
+   */
+  ResidueList resList();
+  
   /**
    * The length of the sequence.
    * <P>

@@ -26,9 +26,14 @@ import java.util.*;
 import org.biojava.bio.seq.*;
 
 public class SmallCursor extends AbstractCursor {
+  private ResidueList resList;
   private int length;
   private double [] currentC;
   private double [] lastC;
+  
+  public ResidueList resList() {
+    return resList;
+  }
   
   public int length() {
     return length;
@@ -50,7 +55,7 @@ public class SmallCursor extends AbstractCursor {
     currentC = v;
   }
   
-  public SmallCursor(EmissionState [] states, int length, Iterator resIterator) {
+  public SmallCursor(EmissionState [] states, int length, ResidueList resList, Iterator resIterator) {
     super(resIterator);
     this.length = length;
     

@@ -62,7 +62,7 @@ public abstract class AbstractTrainer implements TrainingAlgorithm {
         new SimpleModelTrainer(model, nullModel, nullWeight, 0.000001, 1.0);
       do {
         cycle++;
-        DP dp = new DP(model);
+        DP dp = DPFactory.createDP(model);
         lastScore = currentScore;
         currentScore = 0.0;
         for(SequenceIterator si = db.sequenceIterator(); si.hasNext(); ) {

@@ -35,7 +35,7 @@ class SingleDP extends DP {
     * @return  the log probability or likelyhood of this weight matrix
     *          having generated residues 1 to columns of resList
     */
-  public static double score(WeightMatrix matrix, ResidueList resList)
+  public static double scoreWeightMatrix(WeightMatrix matrix, ResidueList resList)
   throws IllegalResidueException {
     double score = 0;
     int cols = matrix.columns();
@@ -110,7 +110,7 @@ class SingleDP extends DP {
 
     // new_l = transition(start, l)
     for (int l = 0; l < states.length; l++) {
-      v[l] = (states[l] == model.magicalState()) ? 0.0 : Double.NEGATIVE_INFINITY;
+      v[l] = (states[l] == getModel().magicalState()) ? 0.0 : Double.NEGATIVE_INFINITY;
     }
   }
 
@@ -120,7 +120,7 @@ class SingleDP extends DP {
 
     // new_l = transition(start, l)
     for (int l = 0; l < states.length; l++) {
-      v[l] = (states[l] == model.magicalState()) ? 0.0 : Double.NEGATIVE_INFINITY;
+      v[l] = (states[l] == getModel().magicalState()) ? 0.0 : Double.NEGATIVE_INFINITY;
     }
   }
 
@@ -217,7 +217,7 @@ class SingleDP extends DP {
     double [] scores = dpCursor.currentCol();
 
     int l = 0;
-    while (states[l] != model.magicalState())
+    while (states[l] != getModel().magicalState())
       l++;
 
     return scores[l];
@@ -228,7 +228,7 @@ class SingleDP extends DP {
     double [] scores = dpCursor.currentCol();
 
     int l = 0;
-    while (states[l] != model.magicalState())
+    while (states[l] != getModel().magicalState())
       l++;
 
     return scores[l];
@@ -243,6 +243,7 @@ class SingleDP extends DP {
   private StatePath viterbi(DPCursor dpCursor)
   throws IllegalResidueException {
     int seqLength = dpCursor.length();
+    State [] states = dpCursor.states();
 
     int [][] transitions = forwardTransitions;
     double [][] transitionScore = forwardTransitionScores;
@@ -254,7 +255,7 @@ class SingleDP extends DP {
     // initialize
     for (int l = 0; l < stateCount; l++) {
       double [] v = dpCursor.currentCol();
-      v[l] = (states[l] == model.magicalState()) ? 0.0 : Double.NEGATIVE_INFINITY;
+      v[l] = (states[l] == getModel().magicalState()) ? 0.0 : Double.NEGATIVE_INFINITY;
     }
 
     // viterbi
@@ -300,7 +301,7 @@ class SingleDP extends DP {
     BackPointer best = null;
     double bestScore = 0.0;
     for (int l = 0; l < stateCount; l++) {
-      if (states[l] == model.magicalState()) {
+      if (states[l] == getModel().magicalState()) {
         best = oldPointers[l].back;
         bestScore = dpCursor.currentCol()[l];
         break;
@@ -322,9 +323,9 @@ class SingleDP extends DP {
     };
 
     Map labelToResList = new HashMap();
-    labelToResList.put(StatePath.SEQUENCE, seq);
+    labelToResList.put(StatePath.SEQUENCE, dpCursor.resList());
     labelToResList.put(StatePath.STATES,
-                       new SimpleResidueList(model.stateAlphabet(), stateList));
+                       new SimpleResidueList(getModel().stateAlphabet(), stateList));
     labelToResList.put(StatePath.SCORES,
                        new SimpleResidueList(DoubleAlphabet.INSTANCE, scoreList));
     return new SimpleStatePath(bestScore, labelToResList);
