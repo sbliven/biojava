@@ -314,11 +314,11 @@ public class SequencePanel
   public void setSequence(SymbolList s) {
     SymbolList oldSequence = sequence;
     if(oldSequence != null) {
-      oldSequence.removeChangeListener(layoutListener);
+      oldSequence.removeChangeListener(layoutListener, ChangeType.UNKNOWN);
     }
     this.sequence = s;
     if(s != null) {
-      sequence.addChangeListener(layoutListener);
+      sequence.addChangeListener(layoutListener, ChangeType.UNKNOWN);
     }
 
     resizeAndValidate();
