@@ -40,6 +40,7 @@ import org.biojava.bio.symbol.SymbolList;
  * <code>SymbolList</code>s as it avoids creating a copy.
  *
  * @author Keith James
+ * @author Matthew Pocock
  * @since 1.3
  */
 public class SymbolListCharSequence implements CharSequence
@@ -110,7 +111,7 @@ public class SymbolListCharSequence implements CharSequence
 
     public CharSequence subSequence(int start, int end)
     {
-        return new SymbolListCharSequence(syms.subList(start + 1, end + 1),
+        return new SymbolListCharSequence(syms.subList(start + 1, end),
                                           alphaTokens);
     }
 
