@@ -17,10 +17,8 @@ public class SearchProfile{
   public static Distribution nullModel;
 
   
-  public static void main(String [] args) 
-  {
-    try 
-	{
+  public static void main(String [] args)   {
+    try 	{
       File seqFile = new File(args[0]);
 
       FiniteAlphabet PROTEIN = ProteinTools.getAlphabet();
