@@ -97,9 +97,9 @@ public interface Alphabet extends Annotatable {
    *
    * <p>
    * The symbol at i in the list must be a member of the i'th alphabet in
-   * getAlphabets. If all of the symbols in rl are attomic, then the resulting
+   * getAlphabets. If all of the symbols in rl are atomic, then the resulting
    * symbol will also be atomic. If any one of them is an ambiguity symbol then
-   * the resulting symbol will be the apropreate ambiguity symbol.
+   * the resulting symbol will be the appropriate ambiguity symbol.
    * </p>
    *
    * @param rl A list of Symbol instances
@@ -129,7 +129,7 @@ public interface Alphabet extends Annotatable {
   
   /**
    * <p>
-   * Get the 'gap' ambiguity symbol that is most apropreate for this alphabet.
+   * Get the 'gap' ambiguity symbol that is most appropriate for this alphabet.
    * </p>
    *
    * <p>
@@ -137,7 +137,7 @@ public interface Alphabet extends Annotatable {
    * AlphabetManager.getGapSymbol() the same length as the getAlphabets list.
    * </p>
    *
-   * @return the apropreate gap Symbol instance
+   * @return the appropriate gap Symbol instance
    */
   Symbol getGapSymbol();
   

@@ -153,7 +153,6 @@ public class EmblLikeFormat
                     break;
                 }
 
-
                 listener.endSequence();
                 return hasMoreSequence;
             }

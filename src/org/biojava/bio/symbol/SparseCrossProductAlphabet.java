@@ -30,7 +30,7 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.io.*;
 
 /**
- * Cross product of a list of arbitrary alphabets.  This is a memory efficicent
+ * Cross product of a list of arbitrary alphabets.  This is a memory efficient
  * implementation of CrossProductAlphabet that instantiates symbols as they are
  * needed. This is required as alphabets can get prohibatively large very
  * quickly (e.g. align 200 proteins & you need 20^200 Symbols).

@@ -51,7 +51,7 @@ import org.biojava.bio.*;
  * single ambiguous n'tuple.
  * <p>
  * There are three Symbol interfaces. Symbol is the most generic. It has the
- * methods getToken and getName so that the Symbol can be textualy represented.
+ * methods getToken and getName so that the Symbol can be textually represented.
  * In addition, it defines getMatches that returns an Alphabet over all the
  * AtomicSymbol instances that match the Symbol (N would return an Alphabet
  * containing {A, G, C, T}, and Gap would return {}).

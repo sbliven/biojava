@@ -129,7 +129,7 @@ public interface SymbolList extends Changeable {
   String subStr(int start, int end) throws IndexOutOfBoundsException;
   
   /**
-   * Aply an edit to the SymbolList as specified by the edit object.
+   * Apply an edit to the SymbolList as specified by the edit object.
    *
    * @param edit the Edit to perform
    * @throws IndexOutOfBoundsException if the edit does not lie within the

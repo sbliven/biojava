@@ -784,8 +784,8 @@ public class TranslatedSequencePanel extends JComponent
      */
     public void addChangeListener(ChangeListener cl, ChangeType ct)
     {
-      ChangeSupport cs = getChangeSupport(ct);
-      cs.addChangeListener(cl, ct);
+        ChangeSupport cs = getChangeSupport(ct);
+        cs.addChangeListener(cl, ct);
     }
   
     /**
@@ -795,7 +795,7 @@ public class TranslatedSequencePanel extends JComponent
      */
     public void removeChangeListener(ChangeListener cl)
     {
-      removeChangeListener(cl, ChangeType.UNKNOWN);
+        removeChangeListener(cl, ChangeType.UNKNOWN);
     }
   
     /**
@@ -806,15 +806,17 @@ public class TranslatedSequencePanel extends JComponent
      */
     public void removeChangeListener(ChangeListener cl, ChangeType ct)
     {
-      if(hasListeners()) {
-        ChangeSupport cs = getChangeSupport(ct);
-        cs.removeChangeListener(cl, ct);
-      }
+        if (hasListeners())
+        {
+            ChangeSupport cs = getChangeSupport(ct);
+            cs.removeChangeListener(cl, ct);
+        }
     }
     
-    public boolean isUnchanging(ChangeType ct) {
-      ChangeSupport cs = getChangeSupport(ct);
-      return cs.isUnchanging(ct);
+    public boolean isUnchanging(ChangeType ct)
+    {
+        ChangeSupport cs = getChangeSupport(ct);
+        return cs.isUnchanging(ct);
     }
 
     /**
@@ -871,17 +873,20 @@ public class TranslatedSequencePanel extends JComponent
      */
     protected ChangeSupport getChangeSupport(ChangeType ct)
     {
-      if(changeSupport != null) {
-        return changeSupport;
-      }
-      
-      synchronized(this) {
-        if (changeSupport == null) {
-            changeSupport = new ChangeSupport();
+        if (changeSupport != null)
+        {
+            return changeSupport;
         }
-    
-        return changeSupport;
-      }
+      
+        synchronized(this)
+        {
+            if (changeSupport == null)
+            {
+                changeSupport = new ChangeSupport();
+            }
+
+            return changeSupport;
+        }
     }
 
     /**

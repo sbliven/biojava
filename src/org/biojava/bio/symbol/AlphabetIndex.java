@@ -40,7 +40,7 @@ import org.biojava.utils.*;
  * An index should do whatever is necessary to stay synchronized with its
  * alphabet. It may chose to modify the index table with the alphabet, or to
  * veto all changes to the alphabet that would invalidate the indexing
- * scheim.
+ * scheme.
  * </p>
  *
  * @author Thomas Down

@@ -34,7 +34,7 @@ import org.biojava.utils.*;
  *
  * @since 1.3
  * @author Matthew Pocock
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a> (docs).
+ * @author Keith James (docs).
  */
 public interface AnnotationType {
     public static final AnnotationType ANY = new AnyAnnotationType();
@@ -136,6 +136,10 @@ public interface AnnotationType {
                 Map.Entry pair = (Map.Entry) i.next();
                 Object key = pair.getKey();
                 PropertyConstraint con = (PropertyConstraint) pair.getValue();
+
+                if (! ann.containsProperty(key))
+                    return false;
+
                 if (! con.accept(ann.getProperty(key))) {
                     return false;
                 }

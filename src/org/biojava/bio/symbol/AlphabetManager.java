@@ -204,8 +204,8 @@ public final class AlphabetManager {
    * <p>
    * Gap can be thought of as an empty sub-space within the space of all
    * possible symbols. If you are working in a cross-product alphabet, you
-   * should chose wether to use gap to represent 'no symbol', or a basis symbol
-   * of the apropreate size built entirely of gaps to represent 'no symbol in
+   * should chose whether to use gap to represent 'no symbol', or a basis symbol
+   * of the appropriate size built entirely of gaps to represent 'no symbol in
    * each of the slots'. Perhaps this could be explained better.
    * </p>
    *
@@ -217,17 +217,17 @@ public final class AlphabetManager {
 
   /**
    * <p>
-   * Get the gap symbol apropreate to this list of alphabets.
+   * Get the gap symbol appropriate to this list of alphabets.
    * </p>
    *
    * <p>
    * The gap symbol with have the same shape a the alphabet list. It will be as
    * long as the list, and if any of the alphabets in the list have a dimension
-   * greater than 1, it will also insert the apropreate gap there.
+   * greater than 1, it will also insert the appropriate gap there.
    * </p>
    *
    * @param alphas  List of alphabets
-   * @return the apropreate gap symbol for the alphabet list
+   * @return the appropriate gap symbol for the alphabet list
    */
   static public Symbol getGapSymbol(List alphas) {
     SizeQueen sq = new SizeQueen(alphas);
@@ -271,7 +271,7 @@ public final class AlphabetManager {
    * </p>
    *
    * <p>
-   * Use this method if you wish to create an AtomicSymbol instance. Initialy it
+   * Use this method if you wish to create an AtomicSymbol instance. Initially it
    * will not be a member of any alphabet.
    * </p>
    *
@@ -381,7 +381,7 @@ public final class AlphabetManager {
    * </p>
    *
    * <p>
-   * This method is most usefull for writing Alphabet implementations. It should
+   * This method is most useful for writing Alphabet implementations. It should
    * not be invoked by users. Use alphabet.getSymbol(Set) instead.
    * </p>
    *
@@ -674,7 +674,7 @@ public final class AlphabetManager {
    * </p>
    *
    * <p>
-   * This method is most usefull for implementers of Alphabet and Symbol. It
+   * This method is most useful for implementers of Alphabet and Symbol. It
    * probably should not be invoked by users.
    * </p>
    *

@@ -26,28 +26,22 @@ import java.util.*;
 import org.biojava.utils.*;
 
 /**
- * <p>
- * <code>PropertyConstraint</code>s describes a constraint applied to
- * the members of an annotation bundle.
- * </p>
+ * <p><code>PropertyConstraint</code>s describes a constraint applied
+ * to the members of an annotation bundle.</p>
  *
- * <p>
- * <code>PropertyConstraint</code>s are usualy used in conjunction with the
- * <code>AnnotationType</code> interface to describe a class of annotations by
- * the falues of their properties. In this way, you can generate controled
- * vocabularies over java objects.
- * </p>
+ * <p><code>PropertyConstraint</code>s are usually used in conjunction
+ * with the <code>AnnotationType</code> interface to describe a class
+ * of annotations by the values of their properties. In this way, you
+ * can generate controlled vocabularies over Java objects.</p>
  *
- * <p>
- * The constraints accept or reject individual objects and provide an accessor
- * method to appropreately manipulate properties of their type. In general,
- * it is not possible to get back a set of all items that would be accepted by
- * a particular constraint.
- * </p>
+ * <p>The constraints accept or reject individual objects and provide
+ * an accessor method to appropriately manipulate properties of their
+ * type. In general, it is not possible to get back a set of all items
+ * that would be accepted by a particular constraint.</p>
  *
  * @since 1.3
  * @author Matthew Pocock
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a> (docs).
+ * @author Keith James (docs).
  */
 public interface PropertyConstraint {
     /**
@@ -60,27 +54,22 @@ public interface PropertyConstraint {
     public boolean accept(Object value);
 
     /**
-     * <p>
-     * <code>subConstraintOf</code> returns true if the constraint is
-     * a sub-constraint.
-     * <p>
+     * <p><code>subConstraintOf</code> returns true if the constraint
+     * is a sub-constraint.<p>
      *
-     * <p>
-     * A pair of constraints super and sub are in a
-     * superConstraint/subConstraint relationship if every object accepted
-     * by sub is also accepted by super. To put it another way, if
-     * instanceOf was used as a set-membership indicator function over some
-     * set of objects, then the set produced by super would be a superset of
-     * that produced by sub.
-     * </p>
+     * <p>A pair of constraints super and sub are in a
+     * superConstraint/subConstraint relationship if every object
+     * accepted by sub is also accepted by super. To put it another
+     * way, if instanceOf was used as a set-membership indicator
+     * function over some set of objects, then the set produced by
+     * super would be a superset of that produced by sub.</p>
      *
-     * <p>
-     * It is not expected that constraints will necisarily maintain references
-     * to super/sub types. It will be more usual to infer this relationship by
-     * introspecting the constraints themselves. For example,
-     * PropertyConstraint.ByClass will infer subConstraintOf by looking at the
-     * possible class of all items matching subConstraint.
-     * </p>
+     * <p>It is not expected that constraints will neccesarily
+     * maintain references to super/sub types. It will be more usual
+     * to infer this relationship by introspecting the constraints
+     * themselves. For example, PropertyConstraint.ByClass will infer
+     * subConstraintOf by looking at the possible class of all items
+     * matching subConstraint.</p>
      *
      * @param subConstraint a <code>PropertyConstraint</code> to check.
      * @return a <code>boolean</code>.
@@ -88,8 +77,15 @@ public interface PropertyConstraint {
     public boolean subConstraintOf(PropertyConstraint subConstraint);
 
     /**
-     * <code>setProperty</code> sets a property in the Annotation such
-     * that it conforms to the constraint.
+     * <p><code>setProperty</code> sets a property in the Annotation
+     * such that it conforms to the constraint. For example, you
+     * create an Annotation having a key which is the String
+     * "gene_synonyms" and corresponding value which has a
+     * PropertyConstraint indicating that it must be an HashSet of
+     * between 1 and 10 Strings. To add a new String "xylR" to the Set
+     * you would call the method thus:
+     * <code>setProperty(annotationObj, "gene_synonyms",
+     * "xylR")</code>.</p>
      *
      * @param ann an <code>Annotation</code> to populate.
      * @param property an <code>Object</code> under which to add the
@@ -211,7 +207,7 @@ public interface PropertyConstraint {
          * collection of 0 - Integer.MAX_VALUE elements which
          * themselves conform to the specified constraint.
          *
-         * @param clazz a <code>Class</code> of collection..
+         * @param clazz a <code>Class</code> of collection.
          * @param elementType a <code>PropertyConstraint</code> to
          * constrain members of the collection.
          */
@@ -317,6 +313,30 @@ public interface PropertyConstraint {
             return false;
         }
 
+        /**
+         * <p><code>setProperty</code> sets a property in the Annotation
+         * such that it conforms to the constraint. For example, you
+         * create an Annotation having a key which is the String
+         * "gene_synonyms" and corresponding value which has a
+         * PropertyConstraint indicating that it must be an HashSet of
+         * between 1 and 10 Strings. To add a new String "xylR" to the Set
+         * you would call the method thus:
+         * <code>setProperty(annotationObj, "gene_synonyms",
+         * "xylR")</code>.</p>
+         *
+         * <p>If the specified property does not exist, a new, empty
+         * Collection instance is created automatically to hold the
+         * value you are adding.</p>
+         *
+         * <p>If size constraints have been set on the collection the
+         * addition may be vetoed.</p>
+         *
+         * @param ann an <code>Annotation</code> to populate.
+         * @param property an <code>Object</code> under which to add the
+         * value.
+         * @param value an <code>Object</code> to add.
+         * @exception ChangeVetoException if an error occurs.
+         */
         public void setProperty(Annotation ann, Object property, Object value)
             throws ChangeVetoException {
             if (getElementType().accept(value)) {
@@ -331,6 +351,11 @@ public interface PropertyConstraint {
                         throw new ChangeVetoException(e, "Can't create collection resource");
                     }
                 }
+
+                if (c.size() == maxTimes)
+                    throw new ChangeVetoException("Maximum elements ("
+                                                  + maxTimes + ") reached");
+
                 c.add(value);
             } else {
                 throw new ChangeVetoException("Incorrect element type");

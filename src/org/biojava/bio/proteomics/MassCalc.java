@@ -216,7 +216,7 @@ public class MassCalc {
         }
         
         //Calculate hydroxyl mass
-	double termMass = calcTermMass(isotopicType,MH_PLUS); 
+	double termMass = calcTermMass(isotopicType,MH_PLUS);
         
         if (pepMass != 0.0){
 	    pepMass += termMass;
@@ -278,10 +278,10 @@ public class MassCalc {
 	    termMass += Hmono + Omono + Hmono;
 	    //Add the extra H
 	    if(MH_PLUS){
-	      termMass += Hmono;	
+	      termMass += Hmono;
 	    }
         }
-	System.out.println(termMass);
+
 	return termMass;
     }
 }

@@ -139,7 +139,7 @@ extends AbstractSymbolList implements Alignment, Serializable {
             "The symbol list associated with " + label + " is null"
           );
         } else {
-          throw new BioError(nsee, "Something is screwey - map is lieing about key/values");
+          throw new BioError(nsee, "Something is screwey - map is lying about key/values");
         }
       }
     }
