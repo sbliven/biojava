@@ -21,7 +21,6 @@
 
 package org.biojava.bio.program.homologene;
 
-import java.util.Iterator;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -38,7 +37,7 @@ public interface OrthoPairCollection
     /**
      * Iterator for a OrthoPairCollection
      */
-    public interface GroupIterator
+    public interface Iterator
     {
         /**
          * are more OrthoPairSets available?
@@ -48,7 +47,7 @@ public interface OrthoPairCollection
         /**
          * returns the next OrthoPairSet
          */
-        public OrthoPairSet nextGroup();
+        public OrthoPairSet nextSet();
     }
 
 
@@ -58,7 +57,7 @@ public interface OrthoPairCollection
 
     public boolean isEmpty();
 
-    public GroupIterator iterator();
+    public Iterator iterator();
 
     public OrthoPairCollection filter(OrthoPairSetFilter filters);
 }

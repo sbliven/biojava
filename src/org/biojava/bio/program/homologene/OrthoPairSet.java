@@ -28,6 +28,13 @@ import java.util.Set;
  */
 public interface OrthoPairSet
 {
+    public interface Iterator
+    {
+        public boolean hasNext();
+
+        public OrthoPair nextOrthoPair();
+    }
+
     /**
      * retrieves name of this group.
      * Homologene itself does not assign names
@@ -53,10 +60,16 @@ public interface OrthoPairSet
     public void removeOrthoPair(OrthoPair orthology);
 
     /**
+     returns an iterator to the contents of the set.
+    /**
      * no. of entries in this Homologene group
      */
     public int size();
 
+    /**
+     * returns an iterator to the members of this set
+     */
+    public Iterator iterator();
     /**
      * get the taxa represented in this group
      */

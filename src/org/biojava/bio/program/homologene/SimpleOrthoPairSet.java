@@ -36,6 +36,27 @@ public class SimpleOrthoPairSet
     String name;
     Set orthologies = new HashSet();
 
+    public class Iterator implements OrthoPairSet.Iterator
+    {
+        private java.util.Iterator setIterator;
+
+        private Iterator(java.util.Iterator setIterator)
+        {
+            this.setIterator = setIterator;
+        }
+
+        public boolean hasNext()
+        {
+            return setIterator.hasNext();
+        }
+
+        public OrthoPair nextOrthoPair()
+        {
+            return (OrthoPair) setIterator.next();
+        }
+
+    }
+
     public String getName()
     {
         return name;
@@ -56,11 +77,16 @@ public class SimpleOrthoPairSet
         orthologies.remove(orthology);
     }
 
+    public OrthoPairSet.Iterator iterator()
+    {
+        return new Iterator(orthologies.iterator());
+    }
+
     public double getMinIdentity()
     {
         double min = 100.0;
 
-        for (Iterator orthologiesI = orthologies.iterator();
+        for (java.util.Iterator orthologiesI = orthologies.iterator();
              orthologiesI.hasNext(); )
         {
             OrthoPair currOrthoPair = (OrthoPair) orthologiesI.next();
@@ -80,7 +106,7 @@ public class SimpleOrthoPairSet
     {
         Set taxa = new HashSet();
 
-        for (Iterator orthoI = orthologies.iterator(); orthoI.hasNext(); ) {
+        for (java.util.Iterator orthoI = orthologies.iterator(); orthoI.hasNext(); ) {
             OrthoPair currOrtho = (OrthoPair) orthoI.next();
 
             // look up the Taxon
@@ -91,4 +117,3 @@ public class SimpleOrthoPairSet
         return taxa;
     }
 }
-

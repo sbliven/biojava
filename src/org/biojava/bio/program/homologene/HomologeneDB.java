@@ -16,15 +16,6 @@ package org.biojava.bio.program.homologene;
 public interface HomologeneDB
 {
     /**
-     * an iterator for OrthoPairSets
-     */
-    public interface OrthoPairSetIterator
-    {
-        public boolean hasNext();
-        public OrthoPairSet nextGroup();
-    }
-
-    /**
      * create a orthologue
      */
     public Orthologue createOrthologue(Taxon taxon, String locusID, String homologeneID, String accession);

@@ -32,6 +32,72 @@ public interface OrthoPairSetFilter
         public boolean accept(OrthoPairSet group) { return true; }
     }
 
+    public final static class Not implements OrthoPairSetFilter
+    {
+        OrthoPairSetFilter a;
+
+        public Not(OrthoPairSetFilter a)
+        {
+            this.a = a;
+        }
+
+        public boolean accept(OrthoPairSet group)
+        {
+            return !a.accept(group);
+        }
+    }
+
+    public final static class Or implements OrthoPairSetFilter
+    {
+        OrthoPairSetFilter a;
+        OrthoPairSetFilter b;
+
+        public Or(OrthoPairSetFilter a, OrthoPairSetFilter b)
+        {
+            this.a = a;
+            this.b = b;
+        }
+
+        public boolean accept(OrthoPairSet group)
+        {
+            return ((a.accept(group)) || (b.accept(group)));
+        }
+    }
+
+    public final static class And implements OrthoPairSetFilter
+    {
+        OrthoPairSetFilter a;
+        OrthoPairSetFilter b;
+
+        public And(OrthoPairSetFilter a, OrthoPairSetFilter b)
+        {
+            this.a = a;
+            this.b = b;
+        }
+
+        public boolean accept(OrthoPairSet group)
+        {
+            return ((a.accept(group)) && (b.accept(group)));
+        }
+    }
+
+    public final static class Xor implements OrthoPairSetFilter
+    {
+        OrthoPairSetFilter a;
+        OrthoPairSetFilter b;
+
+        public Xor(OrthoPairSetFilter a, OrthoPairSetFilter b)
+        {
+            this.a = a;
+            this.b = b;
+        }
+
+        public boolean accept(OrthoPairSet group)
+        {
+            return ((a.accept(group)) ^ (b.accept(group)));
+        }
+    }
+
     public final static class ByTaxon implements OrthoPairSetFilter
     {
         Taxon taxon;
@@ -64,4 +130,51 @@ public interface OrthoPairSetFilter
         }
     }
 
+    /**
+     * all OrthoPairs must meet the requirement
+     * defined by filter.
+     */
+    public final static class AllPairsInCollection implements OrthoPairSetFilter
+    {
+        OrthoPairFilter filter;
+
+        public AllPairsInCollection(OrthoPairFilter filter)
+        {
+            this.filter = filter;
+        }
+
+        public boolean accept(OrthoPairSet group)
+        {
+            for (OrthoPairSet.Iterator setI = group.iterator();
+                 setI.hasNext(); ) 
+            {
+                if (!filter.accept(setI.nextOrthoPair())) return false;
+            }
+            return true;
+        }
+    }
+
+    /**
+     * at least one OrthoPair must meet the requirement
+     * defined by filter.
+     */
+    public final static class SomePairsInCollection implements OrthoPairSetFilter
+    {
+        OrthoPairFilter filter;
+
+        public SomePairsInCollection(OrthoPairFilter filter)
+        {
+            this.filter = filter;
+        }
+
+        public boolean accept(OrthoPairSet group)
+        {
+            for (OrthoPairSet.Iterator setI = group.iterator();
+                 setI.hasNext(); )
+            {
+                if (filter.accept(setI.nextOrthoPair())) return true;
+            }
+            return false;
+        }
+    }
 }

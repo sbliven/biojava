@@ -29,26 +29,26 @@ import java.util.HashSet;
 import org.biojava.utils.ChangeVetoException;
 
 public class SimpleOrthoPairCollection
-    implements OrthoPairCollection
+    extends AbstractOrthoPairCollection
 {
     protected Set groups;
 
-    public class GroupIterator 
-        implements OrthoPairCollection.GroupIterator
+    public class Iterator 
+        implements OrthoPairCollection.Iterator
     {
-        private Iterator groupsI;
+        private java.util.Iterator groupsI;
 
         /**
          * constructor where the iterator is already created
          */
-        private GroupIterator(Iterator groupsI) { this.groupsI = groupsI; }
+        private Iterator(java.util.Iterator groupsI) { this.groupsI = groupsI; }
 
         public boolean hasNext()
         {
             return groupsI.hasNext();
         }
 
-        public OrthoPairSet nextGroup()
+        public OrthoPairSet nextSet()
         {
             return (OrthoPairSet) groupsI.next();
         }
@@ -76,17 +76,17 @@ public class SimpleOrthoPairCollection
 
     public boolean isEmpty() { return groups.isEmpty(); }
 
-    public OrthoPairCollection.GroupIterator iterator()
+    public OrthoPairCollection.Iterator iterator()
     {
-        return new GroupIterator(groups.iterator());
+        return new Iterator(groups.iterator());
     }
-
+/*
     public OrthoPairCollection filter(OrthoPairSetFilter filters)
     {
         OrthoPairCollection results = new SimpleOrthoPairCollection();
 
         // this method uses its privileged access to groups
-        for (Iterator groupsI = groups.iterator();
+        for (java.util.Iterator groupsI = groups.iterator();
                groupsI.hasNext(); )
         {
             OrthoPairSet group = (OrthoPairSet) groupsI.next();
@@ -102,5 +102,6 @@ public class SimpleOrthoPairCollection
         }
         return results;
     }
+*/
 }
 
