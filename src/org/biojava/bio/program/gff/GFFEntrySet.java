@@ -24,6 +24,7 @@ package org.biojava.bio.program.gff;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
@@ -46,9 +47,10 @@ import org.biojava.utils.ChangeVetoException;
  *
  * @author Matthew Pocock
  * @author Keith James (docs)
+ * @author Len Trigg
  */
 public class GFFEntrySet {
-    public static final String PROPERTY_GFF_SCORE = "org.biojava.bio.program.gff.gff_feature_score";
+  public static final String PROPERTY_GFF_SCORE = "org.biojava.bio.program.gff.gff_feature_score";
 
   /**
    * All of the lines - comments & records
@@ -90,7 +92,7 @@ public class GFFEntrySet {
   /**
    * Add a <span class="type">GFFRecord</span> to the end of this set.
    *
-   * @param comment a <span class="type">GFFRecord</span> to append
+   * @param record a <span class="type">GFFRecord</span> to append
    */
   public void add(GFFRecord record) {
     lines.add(record);
@@ -142,7 +144,7 @@ public class GFFEntrySet {
    * @param checkSeqName  boolean to indicate if only records with names
    *        matching the sequences name should be added
    * @return an <span class="type">SequenceAnnotator</span> that adds GFF featur
-es
+   es
    */
   public SequenceAnnotator getAnnotator(final boolean checkSeqName) {
     return new SequenceAnnotator() {
@@ -153,46 +155,54 @@ es
         plain.annotation = Annotation.EMPTY_ANNOTATION;
         stranded.annotation = Annotation.EMPTY_ANNOTATION;
         framed.annotation = Annotation.EMPTY_ANNOTATION;
-        for(Iterator i = lineIterator(); i.hasNext(); ) {
+        for (Iterator i = lineIterator(); i.hasNext();) {
           Object o = i.next();
-          if(o instanceof GFFRecord) {
+          if (o instanceof GFFRecord) {
             GFFRecord rec = (GFFRecord) o;
-            if(!checkSeqName || rec.getSeqName().equals(seq.getName())) {
-		Feature.Template thisTemplate;		
+            if (!checkSeqName || rec.getSeqName().equals(seq.getName())) {
+              Feature.Template thisTemplate;
 
-              if(rec.getStrand() == StrandedFeature.UNKNOWN) {
+              if (rec.getStrand() == StrandedFeature.UNKNOWN) {
                 plain.location = new RangeLocation(rec.getStart(), rec.getEnd());
                 plain.type = rec.getFeature();
                 plain.source = rec.getSource();
                 thisTemplate = plain;
-              }else if (rec.getFrame()== GFFRecord.NO_FRAME){
+              } else if (rec.getFrame() == GFFTools.NO_FRAME) {
                 stranded.location = new RangeLocation(rec.getStart(), rec.getEnd());
                 stranded.type = rec.getFeature();
                 stranded.source = rec.getSource();
                 stranded.strand = rec.getStrand();
-		thisTemplate = stranded;
-              }else {
+                thisTemplate = stranded;
+              } else {
                 framed.location = new RangeLocation(rec.getStart(), rec.getEnd());
                 framed.type = rec.getFeature();
                 framed.source = rec.getSource();
                 framed.strand = rec.getStrand();
                 switch (rec.getFrame()) {
-                    case 0: Template.readingFrame = FramedFeature.FRAME_0;
-                      break;
-                    case 1: Template.readingFrame = FramedFeature.FRAME_1;
-                      break;
-                    case 2: Template.readingFrame = FramedFeature.FRAME_2;
-                      break;
+                  case 0:
+                    Template.readingFrame = FramedFeature.FRAME_0;
+                    break;
+                  case 1:
+                    Template.readingFrame = FramedFeature.FRAME_1;
+                    break;
+                  case 2:
+                    Template.readingFrame = FramedFeature.FRAME_2;
+                    break;
                 }
-		thisTemplate = framed;
+                thisTemplate = framed;
               }
 
-	      thisTemplate.annotation = new SmallAnnotation();
-	      if (rec.getScore() != GFFRecord.NO_SCORE) {
-		  thisTemplate.annotation.setProperty(PROPERTY_GFF_SCORE, new Double(rec.getScore()));
-	      }
-
-	      seq.createFeature(thisTemplate);
+              thisTemplate.annotation = new SmallAnnotation();
+              if (rec.getScore() != GFFTools.NO_SCORE) {
+                thisTemplate.annotation.setProperty(PROPERTY_GFF_SCORE, new Double(rec.getScore()));
+              }
+              Map attributes = rec.getGroupAttributes();
+              Iterator it = attributes.keySet().iterator();
+              while (it.hasNext()) {
+                String key = (String) it.next();
+                thisTemplate.annotation.setProperty(key, attributes.get(key));
+              }
+              seq.createFeature(thisTemplate);
             }
           }
         }
@@ -210,11 +220,11 @@ es
    */
   public GFFEntrySet filter(GFFRecordFilter filter) {
     GFFEntrySet accepted = new GFFEntrySet();
-    for(Iterator i = lineIterator(); i.hasNext(); ) {
+    for (Iterator i = lineIterator(); i.hasNext();) {
       Object o = i.next();
-      if(o instanceof GFFRecord) {
+      if (o instanceof GFFRecord) {
         GFFRecord record = (GFFRecord) o;
-        if(filter.accept(record)) {
+        if (filter.accept(record)) {
           accepted.add(record);
         }
       }
@@ -233,25 +243,25 @@ es
   public GFFDocumentHandler getAddHandler() {
     return new EntrySetBuilder();
   }
-  
+
   /**
    * Write all records in this set out to a handler.
    *
    * @param handler  the GFFDocumentHandler to inform of the records
    */
   public void streamRecords(GFFDocumentHandler handler) {
-      handler.startDocument("");
-      
-      for(Iterator i = lineIterator(); i.hasNext(); ) {
-          Object line = i.next();
-          if(line instanceof String) {
-              handler.commentLine((String) line);
-          } else {
-              handler.recordLine((GFFRecord) line);
-          }
+    handler.startDocument("");
+
+    for (Iterator i = lineIterator(); i.hasNext();) {
+      Object line = i.next();
+      if (line instanceof String) {
+        handler.commentLine((String) line);
+      } else {
+        handler.recordLine((GFFRecord) line);
       }
-      
-      handler.endDocument();
+    }
+
+    handler.endDocument();
   }
 
   /**
@@ -261,8 +271,11 @@ es
    * @author Thomas Down
    */
   private class EntrySetBuilder implements GFFDocumentHandler {
-    public void startDocument(String locator) {}
-    public void endDocument()   {}
+    public void startDocument(String locator) {
+    }
+
+    public void endDocument() {
+    }
 
     public void commentLine(String comment) {
       lines.add(comment);
