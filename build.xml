@@ -445,14 +445,15 @@
       doctitle="${Name.biojava}"
       maxmemory="96m">
        <link href="http://java.sun.com/j2se/1.4.2/docs/api/" offline="false"/>
+
        <group title="Core biological packages"
-              packages="org.biojava.bio:org.biojava.bio.dist:org.biojava.bio.search:org.biojava.bio.seq:org.biojava.bio.seq.db:org.biojava.bio.seq.genomic:org.biojava.bio.seq.io:org.biojava.bio.symbol:org.biojava.bio.alignment:org.biojava.directory:org.biojava.bibliography:org.biojava.bio.taxa" />
+              packages="org.biojava.bio:org.biojava.bio.dist:org.biojava.bio.search:org.biojava.bio.seq:org.biojava.bio.seq.db:org.biojava.bio.seq.genomic:org.biojava.bio.seq.io:org.biojava.bio.symbol:org.biojava.bio.alignment:org.biojava.directory:org.biojava.bibliography:org.biojava.bio.taxa:org.biojava.bio.seq.filter" />
 
        <group title="User interface components"
               packages="org.biojava.bio.gui:org.biojava.bio.gui.sequence" />
 
        <group title="Sequence databases and formats"
-              packages="org.biojava.bio.seq.io.agave:org.biojava.bio.seq.io.game:org.biojava.bio.program.das:org.biojava.bio.seq.ragbag:org.biojava.bio.seq.db.emblcd:org.biojava.bio.program.xff:org.biojava.bio.seq.dist:org.biojava.bio.seq.io.game12:org.biojava.bio.seq.db.biofetch:org.biojava.bio.seq.db.flat:org.biojava.bio.seq.db.biosql:org.biojava.bio.program.indexdb" />
+              packages="org.biojava.bio.seq.io.agave:org.biojava.bio.seq.io.game:org.biojava.bio.program.das:org.biojava.bio.seq.ragbag:org.biojava.bio.seq.db.emblcd:org.biojava.bio.program.xff:org.biojava.bio.seq.dist:org.biojava.bio.seq.io.game12:org.biojava.bio.seq.db.biofetch:org.biojava.bio.seq.db.flat:org.biojava.bio.seq.db.biosql:org.biojava.bio.program.indexdb:org.biojava.bio.program.das.dasalignment:org.biojava.bio.program.homologene" />
 
        <group title="Handling output from external tools"
               packages="org.biojava.bio.program:org.biojava.bio.program.gff:org.biojava.bio.program.sax:org.biojava.bio.program.xml:org.biojava.bio.program.blast2html:org.biojava.bio.program.search:org.biojava.bio.program.ssbind:org.biojava.bio.program.phred:org.biojava.bio.program.hmmer:org.biojava.bio.program.sax.blastxml" />
@@ -463,12 +464,16 @@
        <group title="Chromatogram and trace file support"
               packages="org.biojava.bio.chromatogram:org.biojava.bio.program.abi:org.biojava.bio.program.scf:org.biojava.bio.chromatogram.graphic" />
 
+       <group title="Macromolecular structure"
+              packages="org.biojava.bio.structure:org.biojava.bio.structure.io:org.biojava.bio.program.das.dasstructure" />    
+              
        <group title="Utilities and developers' packages"
-              packages="org.biojava.bio.seq.impl:org.biojava.bio.seq.projection:org.biojava.utils:org.biojava.utils.cache:org.biojava.utils.xml:org.biojava.utils.stax:org.biojava.utils.io:org.biojava.utils.math:org.biojava.utils.net:org.biojava.utils.candy:org.biojava.bio.seq.io.filterxml:org.biojava.bio.program.tagvalue" />
+              packages="org.biojava.bio.seq.impl:org.biojava.bio.seq.projection:org.biojava.utils:org.biojava.utils.cache:org.biojava.utils.xml:org.biojava.utils.stax:org.biojava.utils.io:org.biojava.utils.math:org.biojava.utils.net:org.biojava.utils.candy:org.biojava.bio.seq.io.filterxml:org.biojava.bio.program.tagvalue:org.biojava.ontology:org.biojava.ontology.io:org.biojava.utils.automata:org.biojava.utils.regex:org.biojava.naming:org.biojava.utils.walker" />
 
        <group title="Experimental and new packages"
-              packages="org.biojava.bio.proteomics:org.biojava.bio.molbio:org.biojava.stats.svm:org.biojava.stats.svm.tools:org.biojava.bio.seq.homol:org.biojava.utils.lsid:org.biojava.bio.program.unigene:org.biojava.bio.program.ssaha:org.biojava.bio.seq.distributed:org.biojava.bio.annodb:org.biojava.bio.ontology:org.biojava.bio.ontology.io:org.biojava.bio.program.formats:org.biojava.bio.program.gff3:org.biojava.bio.structure" />
+              packages="org.biojava.bio.proteomics:org.biojava.bio.molbio:org.biojava.stats.svm:org.biojava.stats.svm.tools:org.biojava.bio.seq.homol:org.biojava.utils.lsid:org.biojava.bio.program.unigene:org.biojava.bio.program.ssaha:org.biojava.bio.seq.distributed:org.biojava.bio.annodb:org.biojava.bio.ontology:org.biojava.bio.ontology.io:org.biojava.bio.program.formats:org.biojava.bio.program.gff3" />
 
+       
       <taglet name="UserLevel" path="${build.dest.taglets}" />
       <taglet name="MetaData" path="${build.dest.taglets}:${classpath}:${jar.biojava}" />
       <taglet name="Useage" path="${build.dest.taglets}"/>
