@@ -32,7 +32,7 @@ import org.biojava.bio.seq.io.SeqIOAdapter;
  * dumps events being passed to the class
  */
 
-public class SeqIOTatler 
+public class SeqIOTatler
                extends SeqIOAdapter
 {
   List featureStack;
@@ -64,13 +64,13 @@ public class SeqIOTatler
     System.out.println(offset + "location: " + feature.location);
     System.out.println(offset + "source:   " + feature.source);
     System.out.println(offset + "type:     " + feature.type);
-    
+
     // handle subclass specific stuff
     if (feature instanceof StrandedFeature.Template) {
 //      System.out.println("SeqIOListener checking strand");
       System.out.println(offset + "strand:   " + ((StrandedFeature.Template)feature).strand.getToken());
     }
-    
+
     // dump annotation
 //    System.out.println("SeqIOTatler.endElement, check annotation bundle.");
     if (feature.annotation != Annotation.EMPTY_ANNOTATION) {

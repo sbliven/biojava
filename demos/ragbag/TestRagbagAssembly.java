@@ -1,4 +1,5 @@
 
+
 import java.io.*;
 import org.xml.sax.*;
 import org.biojava.utils.stax.*;
@@ -10,7 +11,7 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.ragbag.*;
 
 public class TestRagbagAssembly {
-    public static void main(String[] args) 
+    public static void main(String[] args)
         throws Exception
     {
       // create RagbagSequence doodad

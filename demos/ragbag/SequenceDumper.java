@@ -19,6 +19,8 @@
  *
  */
 
+
+
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.Feature;
@@ -70,7 +72,7 @@ public class SequenceDumper {
     // dump each feature in turn
     while (fi.hasNext()) {
       Feature currFeature = (Feature) fi.next();
-      dumpFeatures(currFeature);      
+      dumpFeatures(currFeature);
     }
 
     // restore offset
@@ -90,7 +92,7 @@ public class SequenceDumper {
     Annotation annotation = sequence.getAnnotation();
     if (annotation != null) {
       Set keys = annotation.keys();
- 
+
       // iterate over keys
       Iterator ki = keys.iterator();
       System.out.println("  <annotation>");

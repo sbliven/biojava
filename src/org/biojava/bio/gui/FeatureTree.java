@@ -1,3 +1,24 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package org.biojava.bio.gui;
 
 import java.util.*;
@@ -26,6 +47,7 @@ public class FeatureTree extends JTree{
 
   public FeatureTree() {
     super();
+    this.setModel(new FeatureModel(root));
   }
 
   /**
@@ -35,6 +57,7 @@ public class FeatureTree extends JTree{
     for(SequenceIterator i = db.sequenceIterator(); i.hasNext();){
       seqs.add(i.nextSequence());
     }
+    this.expandRow(0);
     this.repaint();
   }
 
