@@ -21,6 +21,8 @@
 
 package org.biojava.bio.symbol;
 
+import java.util.Set;
+
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.dist.Distribution;
 
@@ -28,15 +30,29 @@ import org.biojava.bio.dist.Distribution;
  * an object to return statistics about
  * the frequency of the wobble base
  * in a set of synonymous codons.
+ *
+ * @author David Huen
+ * @since 1.3
  */
 public interface WobbleDistribution
 {
+    /**
+     * returns the residue encoded by this WobbleDistribution
+     */
+    public Symbol getResidue();
+
+    /**
+     * returns Set containing the nonWobbleBases that
+     * occur in codons that encode this residue
+     */
+    public Set getNonWobbleBases();
+
     /**
      * returns the frequency with which
      * synonymous codons start with a
      * specified pair of bases.
      */
-    public Distribution getFrequencyByNonWobbleBases(Symbol nonWobbleBases);
+    public Distribution getFrequencyOfNonWobbleBases();
 
     /**
      * returns the frequency of a specific
