@@ -94,8 +94,22 @@ class FeatureTableParser {
 	switch (featureStatus) {
 	case LOCATION:
 	    featureBuf.append(line);
-	    if (countChar(featureBuf, '(') == countChar(featureBuf, ')')) {
+	    if (countChar(featureBuf, '(') == countChar(featureBuf, ')'))
+	    {
 		parseLocation(featureBuf.toString(), featureTemplate);
+
+		// Save the original location in the feature's
+		// annotation bundle
+		try
+		{
+		    featureTemplate.annotation.setProperty("location", featureBuf.toString());
+		}
+		catch (ChangeVetoException cve)
+		{
+		    throw new BioException("Unable to add location string to feature annotation: "
+					   + featureBuf);
+		}
+
 		listener.startFeature(featureTemplate);
 		featureStatus = WITHIN;
 	    }
@@ -111,7 +125,7 @@ class FeatureTableParser {
 		    featureStatus = ATTRIBUTE;
 		}
 	    } else {
-		throw new BioException("Invalid line in feature body: "+line);
+		throw new BioException("Invalid line in feature body: " + line);
 	    }
 	    break;
 	case ATTRIBUTE:

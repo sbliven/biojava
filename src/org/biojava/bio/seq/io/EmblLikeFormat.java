@@ -124,6 +124,7 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
 		// Needed for Swissprot files because there is no gap
 		// between the feature table and the sequence data
 		listener.addSequenceProperty("XX", "");
+
 		sparser = symParser.parseStream(listener);
 	    }
 	    else

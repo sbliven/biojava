@@ -122,8 +122,6 @@ class EmblLikeLocationParser
 	{
 	    if (String.class.isInstance(thisToken))
 	    {
-		// System.out.println("Got string: " + thisToken);
-
 		String toke = (String) thisToken;
 		if (toke.equals(".."))
 		{
@@ -131,12 +129,12 @@ class EmblLikeLocationParser
 		    isPointLoc = false;
 		}
 		else
+		{
 		    instructStack.add(thisToken);
+		}
 	    }
 	    else if (Integer.class.isInstance(thisToken))
 	    {
-		// System.out.println("Got integer: " + thisToken);
-
 		if (isPointLoc)
 		    startCoords.add(thisToken);
 		else
@@ -144,8 +142,6 @@ class EmblLikeLocationParser
 	    }
 	    else if (Character.class.isInstance(thisToken))
 	    {
-		// System.out.println("Got char: " + thisToken);
-
 		char toke = ((Character) thisToken).charValue();
 
 		switch (toke)
@@ -162,7 +158,7 @@ class EmblLikeLocationParser
 			break;
 
 		    case '>':
-			unboundMin = true;
+			unboundMax = true;
 			break;
 
 		    case '.':
@@ -177,7 +173,9 @@ class EmblLikeLocationParser
 		    case ')':
 			// Catch the end of range: (123.567)
 			if (fuzzyCoord)
+			{
 			    fuzzyCoord = false;
+			}
 			else
 			{
 			    processCoords();
@@ -231,28 +229,24 @@ class EmblLikeLocationParser
 	    innerMax = outerMax = innerMin;
 
 	    // This looks like a point, but is actually a range with
-	    // only a single residue within this entry. If we use an
-	    // OuterRangeResolver, we will always pick up the
-	    // unbounded status? I'm not sure that this works
+	    // only a single residue within this entry.
 	    if (unboundMin || unboundMax)
 	    {
 		// Range of form: <123 or >123 or <>123
 		throw new BioException("Unbounded point locations currently not supported: "
 				       + location);
-
-//  		subLocations.add(new FuzzyLocation(unboundMin ? Integer.MIN_VALUE : outerMin,
-//  						   unboundMax ? Integer.MAX_VALUE : outerMax,
-//  						   innerMin,
-//  						   innerMax,
-//  						   FuzzyLocation.RESOLVE_OUTER));
 	    }
 	    else if (isPointLoc)
+	    {
 		subLocations.add(new PointLocation(outerMin));
+	    }
 	    else
+	    {
 		// I'm really sorry about this exception message! This
 		// should not happen
 		throw new BioException("Internal error in location parsing; parser became confused: "
 				       + location);
+	    }
 	}
 	// Range of form: (123.567)
 	else if (startCoords.size() == 2 && endCoords.isEmpty())
@@ -274,8 +268,10 @@ class EmblLikeLocationParser
 						   innerMax,
 						   FuzzyLocation.RESOLVE_INNER));
 	    }
-	    else 
+	    else
+	    {
 		subLocations.add(new RangeLocation(outerMin, outerMax));
+	    }
 	}
 	// Range of form: (123.567)..789
 	else if (startCoords.size() == 2 && endCoords.size() == 1)
@@ -318,10 +314,12 @@ class EmblLikeLocationParser
 					       FuzzyLocation.RESOLVE_INNER));
 	}
 	else
+	{
 	    // I'm really sorry about this exception message! This
 	    // should not happen
 	    throw new BioException("Internal error in location parsing; parser became confused; "
 				   + location);
+	}
 
 	startCoords.clear();
 	endCoords.clear();
@@ -387,11 +385,9 @@ class EmblLikeLocationParser
      */
     private class LocationLexer
     {
-	private String peekToken;
-
 	/**
 	 * <code>getNextToken</code> returns the next token. A null
-	 * indiactes no more tokens.
+	 * indicates no more tokens.
 	 *
 	 * @return an <code>Object</code> value.
 	 */

@@ -40,7 +40,6 @@ import org.biojava.bio.symbol.*;
  */
 public class SeqIOEventEmitter
 {
-
     /**
      * <code>SeqIOEventEmitter</code> can not be instantiated.
      */
@@ -57,77 +56,120 @@ public class SeqIOEventEmitter
     public static void getSeqIOEvents(Sequence seq, SeqIOListener listener)
 	throws BioException
     {
+	// Some EMBL features cause exceptions futher down. This
+	// hasn't been debugged yet.
+
+	// Inform listener of sequence start
 	try
 	{
-	    // Inform listener of sequence start
 	    listener.startSequence();
+	}
+	catch (ParseException pe)
+	{
+	    pe.printStackTrace();
+	}
 
-	    // Pass name to listener
+	// Pass name to listener
+	try
+	{
 	    listener.setName(seq.getName());
+	}
+	catch (ParseException pe)
+	{
+	    pe.printStackTrace();
+	}
 
-	    // Pass URN to listener
+	// Pass URN to listener
+	try
+	{
 	    listener.setURI(seq.getURN());
+	}
+	catch (ParseException pe)
+	{
+	    pe.printStackTrace();
+	}
 
-	    // Pass sequence properties to listener
-	    Annotation a = seq.getAnnotation();
+	// Pass sequence properties to listener
+	Annotation a = seq.getAnnotation();
 
+	try
+	{
 	    for (Iterator ai = a.keys().iterator(); ai.hasNext();)
 	    {
 		Object key = ai.next();
 		listener.addSequenceProperty(key, a.getProperty(key));
 	    }
+	}
+	catch (ParseException pe)
+	{
+	    pe.printStackTrace();
+	}
 
-	    // Recurse through sub feature tree, flattening it for
-	    // EMBL
-	    List subs = getSubFeatures(seq);
-	    Collections.sort(subs, Feature.byLocationOrder);
+	// Recurse through sub feature tree, flattening it for
+	// EMBL
+	List subs = getSubFeatures(seq);
+	Collections.sort(subs, Feature.byLocationOrder);
 
-	    for (Iterator fi = subs.iterator(); fi.hasNext();)
-	    {		
-		// The template is required to call startFeature
-		Feature.Template t =
-		    ((Feature) fi.next()).makeTemplate();
-
-		// Inform listener of feature start
+	for (Iterator fi = subs.iterator(); fi.hasNext();)
+	{		
+	    // The template is required to call startFeature
+	    Feature.Template t =
+		((Feature) fi.next()).makeTemplate();
+	    
+	    // Inform listener of feature start
+	    try
+	    {
 		listener.startFeature(t);
+	    }
+	    catch (ParseException pe)
+	    {
+		pe.printStackTrace();
+	    }
 
-		// Pass feature properties (i.e. qualifiers to
-		// listener)
+	    // Pass feature properties (i.e. qualifiers to
+	    // listener)
+	    try
+	    {
 		for (Iterator ki = t.annotation.keys().iterator(); ki.hasNext();)
 		{
 		    Object key = ki.next();
 		    listener.addFeatureProperty(key, t.annotation.getProperty(key));
 		}
-
-		// Inform listener of feature end
-		listener.endFeature();
+	    }
+	    catch (ParseException pe)
+	    {
+		pe.printStackTrace();
 	    }
 
-	    // Pass sequence symbols to listener
+	    // Inform listener of feature end
+	    try
+	    {
+		listener.endFeature();
+	    }
+	    catch (ParseException pe)
+	    {
+		pe.printStackTrace();
+	    }
+	}
+
+	// Pass sequence symbols to listener
+	try
+	{
 	    listener.addSymbols(seq.getAlphabet(),
 				(Symbol []) seq.toList().toArray(new Symbol [0]),
 				1,
 				seq.length());
-
-	    // Inform listener of sequence end
-	    listener.endSequence();
-	}
-	catch (ParseException pe)
-	{
-	    // This should never happen as we are not actually parsing
-	    // anything, but the exception may theoretically be thrown
-	    throw new BioException("An internal error occurred processing "
-				   + seq.toString()
-				   + " into SeqIO events");
 	}
 	catch (IllegalAlphabetException iae)
 	{
 	    // This should never happen as the alphabet is being used
 	    // by this Sequence instance
-	    throw new BioException("An internal error occurred processing "
+	    throw new BioException("An internal error occurred processing symbols of "
 				   + seq.toString()
 				   + " into SeqIO events");
 	}
+	    // Inform listener of sequence end
+	    listener.endSequence();
     }
 
     /**
