@@ -76,8 +76,8 @@ extends SequenceRendererWrapper {
    * Build a new PaddingRenderer that wraps <code>renderer</code> and has
    * padding depth <code>padding</code>.
    *
-   * @param renderer  the SequenceRenderer that will actualy do the rendering
-   * @param padding  the number of pixles to leave both before and after
+   * @param renderer  the SequenceRenderer that will actually do the rendering
+   * @param padding  the number of pixels to leave both before and after
    *        rendering the child renderer
    */
   public PaddingRenderer(

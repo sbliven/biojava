@@ -25,7 +25,7 @@ package org.biojava.utils.cache;
  * Interface for managing caches of objects fetchable by key.
  * <P>
  * The map may chose to remove a mapping, for example to free memory, or if the
- * data has become too old to be usefull.
+ * data has become too old to be useful.
  *
  * @author Matthew Pocock
  * @since 1.1

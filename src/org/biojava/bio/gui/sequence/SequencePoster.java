@@ -38,10 +38,10 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.gui.sequence.*;
 
-import java.util.List; // usefull trick to 'hide' javax.swing.List
+import java.util.List; // useful trick to 'hide' javax.swing.List
 
 /**
- * A panel that visualy displays a Sequence.
+ * A panel that displays a Sequence.
  * <P>
  * A SequencePoster can either display the sequence from left-to-right
  * (HORIZONTAL) or from top-to-bottom (VERTICAL). It has an associated scale
@@ -341,14 +341,14 @@ Changeable {
   }
 
   /**
-   * Set the number of pixles to leave blank between each block of sequence
+   * Set the number of pixels to leave blank between each block of sequence
    * information.
    * <P>
    * If the SeqeuncePanel chooses to display the sequence information split
    * across multiple lines, then the spacer parameter indicates how many pixles
    * will seperate each line.
    *
-   * @param spacer  the number of pixles seperating each line of sequence
+   * @param spacer  the number of pixels seperating each line of sequence
    * information
    */
   public void setSpacer(int spacer) {
@@ -361,7 +361,7 @@ Changeable {
   /**
    * Retrieve the current spacer value
    *
-   * @return the number of pixles between each line of sequence information
+   * @return the number of pixels between each line of sequence information
    */
   public int getSpacer() {
     return spacer;
@@ -370,7 +370,7 @@ Changeable {
   /**
    * Set the scale.
    * <P>
-   * The scale parameter is interpreted as the number of pixles per symbol. This
+   * The scale parameter is interpreted as the number of pixels per symbol. This
    * may take on a wide range of values - for example, to render the symbols as
    * text, you will need a scale of > 8, where as to render chromosome 1 you
    * will want a scale &lt; 0.00000001
@@ -443,7 +443,7 @@ Changeable {
    * Paint this component.
    * <P>
    * This calls the paint method of the currently registered SequenceRenderer
-   * after setting up the graphics apropreately.
+   * after setting up the graphics appropriately.
    */
   public void paintComponent(Graphics g) {
     if(!isActive()) {

@@ -93,7 +93,7 @@ public class RulerRenderer implements SequenceRenderer {
     // tick spacing should be decided by the size of the text needed
     // to display the largest coordinate value and some
     // minimum spacing limit.
-    // we want ticks no closer than 40 pixels appart
+    // we want ticks no closer than 40 pixels apart
     double ten = Math.log(10);
 FontMetrics myFontMetrics = g.getFontMetrics();    
     int coordWidth = myFontMetrics.stringWidth(Integer.toString(max));

@@ -23,7 +23,8 @@ package org.biojava.bio.seq.io;
 
 import java.io.PrintStream;
 
-import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.Location;
 
 /**
  * Objects implementing the <code>SeqFileFormer</code> interface are
@@ -57,4 +58,20 @@ public interface SeqFileFormer extends SeqIOListener
      * @param stream a <code>PrintStream</code> to write to.
      */
     public void setPrintStream(PrintStream stream);
+
+    /**
+     * <code>formatLocation</code> creates a String representation of
+     * a <code>Location</code>. The strand may not be relevant for all
+     * formats (e.g. it is relevant for Genbank and EMBL, but not for
+     * SwissProt). In such cases the implementation may accept a
+     * strand of 'unknown', '0' or '.'.
+     *
+     * @param loc a <code>Location</code> to format.
+     * @param strand a <code>StrandedFeature.Strand</code> indicating
+     * any relevant strandedness.
+     *
+     * @return a <code>String</code> representation.
+     */
+    public String formatLocation(final Location               loc,
+				 final StrandedFeature.Strand strand);
 }

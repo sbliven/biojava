@@ -33,10 +33,10 @@ import org.biojava.bio.seq.*;
  * <P>
  * Renderers are always activated within the context of a particular
  * SequenceRenderContext.
- * A single LabelRenderer can be shaired among many sequence panels, or added
+ * A single LabelRenderer can be shared among many sequence panels, or added
  * multiple times to the same panel. The renderer is required to request how
  * much leading and trailing space it requires, as well as the depth (space
- * orthoganal to the direction that the sequence is rendered).
+ * orthogonal to the direction that the sequence is rendered).
  *
  * @author Matthew Pocock
  */

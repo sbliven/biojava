@@ -38,10 +38,10 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.gui.sequence.*;
 
-import java.util.List; // usefull trick to 'hide' javax.swing.List
+import java.util.List; // useful trick to 'hide' javax.swing.List
 
 /**
- * A panel that visualy displays a Sequence.
+ * A panel that displays a Sequence.
  * <P>
  * A SequencePanel can either display the sequence from left-to-right
  * (HORIZONTAL) or from top-to-bottom (VERTICAL). It has an associated scale
@@ -346,12 +346,12 @@ Changeable {
   /**
    * Set the scale.
    * <P>
-   * The scale parameter is interpreted as the number of pixles per symbol. This
+   * The scale parameter is interpreted as the number of pixels per symbol. This
    * may take on a wide range of values - for example, to render the symbols as
    * text, you will need a scale of > 8, where as to render chromosome 1 you
    * will want a scale &lt; 0.00000001
    *
-   * @param scale the new pixles-per-symbol ratio
+   * @param scale the new pixels-per-symbol ratio
    */
   public void setScale(double scale) {
     double oldScale = this.scale;
@@ -363,7 +363,7 @@ Changeable {
   /**
    * Retrieve the current scale.
    *
-   * @return the number of pixles used to render one symbol
+   * @return the number of pixels used to render one symbol
    */
   public double getScale() {
     return scale;
@@ -393,7 +393,7 @@ Changeable {
    * Paint this component.
    * <P>
    * This calls the paint method of the currently registered SequenceRenderer
-   * after setting up the graphics apropreately.
+   * after setting up the graphics appropriately.
    */
   public void paintComponent(Graphics g) {
     if(!isActive()) {

@@ -35,7 +35,7 @@ import org.biojava.bio.symbol.*;
  * <P>
  * If the filter is to be used in a remote process, it is recognized that it may
  * be serialized and sent over to run remotely, rather than each feature being
- * retrieved localy.
+ * retrieved locally.
  *
  * @since 1.0
  * @author Matthew Pocock

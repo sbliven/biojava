@@ -30,7 +30,9 @@ import java.util.List;
 
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.Symbol;
 
@@ -43,7 +45,8 @@ import org.biojava.bio.symbol.Symbol;
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
  */
-public class EmblFileFormer implements SeqFileFormer
+public class EmblFileFormer extends AbstractGenEmblFileFormer
+    implements SeqFileFormer
 {
     private ArrayList   fStack = new ArrayList();
     private PrintStream stream;
@@ -132,7 +135,12 @@ public class EmblFileFormer implements SeqFileFormer
             }
         }
 
-        StringBuffer sq = new StringBuffer("XX\nSQ   Sequence ");
+	// Get separator for system
+	String nl = System.getProperty("line.separator");
+
+        StringBuffer sq = new StringBuffer("XX");
+	sq.append(nl);
+	sq.append("SQ   Sequence ");
         sq.append(length + " BP; ");
         sq.append(aCount + " A; ");
         sq.append(cCount + " C; ");
@@ -173,7 +181,10 @@ public class EmblFileFormer implements SeqFileFormer
             // Get symbols and format into blocks of tokens
             System.arraycopy(syms, (i * 60), sa, 0, len);
 
-            String blocks = (SeqFormatTools.formatTokenBlock(sa, 10)).toString();
+            String blocks = (formatTokenBlock(new StringBuffer(sa.length),
+					      sa,
+					      10)).toString();
+
             sb.replace(5, blocks.length() + 5, blocks);
 
             // Calculate the running residue count and add to the line
@@ -213,10 +224,12 @@ public class EmblFileFormer implements SeqFileFormer
         if (templ instanceof StrandedFeature.Template)
             strand = ((StrandedFeature.Template) templ).strand.getValue();
 
-        StringBuffer lb = SeqFormatTools.formatLocationBlock(templ.location,
-                                                             strand,
-                                                             leader,
-                                                             80);
+        StringBuffer lb = formatLocationBlock(new StringBuffer(leader),
+					      templ.location,
+					      strand,
+					      leader,
+					      80);
+
         lb.replace(5, 5 + templ.type.length(), templ.type);
 
         stream.println(lb);
@@ -240,16 +253,21 @@ public class EmblFileFormer implements SeqFileFormer
         {
             for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
             {
-                stream.println(SeqFormatTools.formatQualifierBlock(SeqFormatTools.formatQualifier(key, vi.next()),
-                                                                   leader,
-                                                                   80));
+		StringBuffer sb = formatQualifierBlock(new StringBuffer(),
+						       formatQualifier(key, vi.next()),
+						       leader,
+						       80);
+
+		stream.println(sb);
             }
         }
         else
         {
-            stream.println(SeqFormatTools.formatQualifierBlock(SeqFormatTools.formatQualifier(key, value),
-                                                               leader,
-                                                               80));
+	    StringBuffer sb =formatQualifierBlock(new StringBuffer(),
+						  formatQualifier(key, value),
+						  leader,
+						  80);
+	    stream.println(sb);
         }
     }
 }

@@ -37,23 +37,24 @@ import java.util.List;
  * sequence.
  * <P>
  * Renderers are always activated within the context of a particular sequence
- * panel. A single Renderer can be shaired among many sequence panels, or added
+ * panel. A single Renderer can be shared among many sequence panels, or added
  * multiple times to the same panel. The renderer is required to request how
- * much leading and trailing srcace it requires, as well as the depth (srcace
- * orthoganal to the direction that the sequence is rendered).
+ * much leading and trailing space it requires, as well as the depth (space
+ * orthogonal to the direction in which the sequence is rendered).
  * <P>
- * The leading and trailing distances are the number of pixles overhang needed
+ * The leading and trailing distances are the number of pixels overhang needed
  * to cleanly render any line of sequence information. For example, a ruler will
- * need trailing srcace to render the total sequence length at the end.
+ * need trailing space to render the total sequence length at the end.
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author Keith James (docs)
  */
 public interface SequenceRenderer {
   
   /**
-   * Render a portion (possibly all) of the information for src to g, disrclaying
-v   * all of the data that would fall within seqBox.
+   * Render a portion (possibly all) of the information for src to g, displaying
+   * all of the data that would fall within seqBox.
    *
    * @param g the Graphics2D to render to
    * @param src the SequenceRenderContext that encapsulates the information to render
@@ -68,7 +69,7 @@ v   * all of the data that would fall within seqBox.
    * only renders a region of the sequence. The depth for one complete line may
    * be different from that for another due to the sequence having more or less
    * information in that region to show. For example, a feature renderer
-   * implementation may chose to collapse down to a depth of zero pixles if
+   * implementation may chose to collapse down to a depth of zero pixels if
    * there are no features to render within a region.
    *
    * @param src the SequenceRenderContext to return info for
@@ -99,10 +100,10 @@ v   * all of the data that would fall within seqBox.
   double getMinimumTrailer(SequenceRenderContext src);
   
   /**
-   * Produce a SequenceViewerEvent in resrconse to a mouse gesture.
+   * Produce a SequenceViewerEvent in response to a mouse gesture.
    * <P>
    * A SequenceRenderer that performs any form of coordinate remapping should
-   * ensure that it apropreately transforms the mouse event. However, in the
+   * ensure that it appropriately transforms the mouse event. However, in the
    * SequenceViewerEvent returned, the MouseEvent should be in untransformed
    * coordinates.
    * <P>

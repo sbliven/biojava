@@ -72,7 +72,7 @@ public interface SequenceRenderContext extends SwingConstants {
    * use this in conjunction with getDirection to correctly lay graphics out.
    *
    * @param  i  Index within the sequence
-   * @return    Equivalent graphical position in pixles 
+   * @return    Equivalent graphical position in pixels 
    */
   double sequenceToGraphics(int i);
 
@@ -80,7 +80,7 @@ public interface SequenceRenderContext extends SwingConstants {
    *  Converts a graphical position into a sequence coordinate. You will need
    * to have used getDirection to decide wether to use the x or y coordinate.
    *
-   * @param  d  A pixle position
+   * @param  d  A pixel position
    * @return    The corresponding sequence index 
    */
   int graphicsToSequence(double d);
@@ -159,9 +159,9 @@ public interface SequenceRenderContext extends SwingConstants {
     }
 
     /**
-     *  Sets the size of the border in number of pixles.
+     *  Sets the size of the border in number of pixels.
      *
-     * @param  size  The new size in pixles 
+     * @param  size  The new size in pixels 
      */
     public void setSize(double size) {
       this.size = size;
@@ -191,7 +191,7 @@ public interface SequenceRenderContext extends SwingConstants {
     }
 
     /**
-     *  Gets the current size of the border in pixles.
+     *  Gets the current size of the border in pixels.
      *
      * @return    The Size value 
      */

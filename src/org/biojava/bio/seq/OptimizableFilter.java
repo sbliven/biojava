@@ -28,7 +28,7 @@ package org.biojava.bio.seq;
  * @author Matthew Pocock
  * @since 1.2
  */
-interface OptimizableFilter extends FeatureFilter {
+public interface OptimizableFilter extends FeatureFilter {
   /**
    * Returns true if this filter is a proper subset of sup - that is, for every
    * feature that matches this, it also matches sup. The empty filter is a
@@ -38,12 +38,12 @@ interface OptimizableFilter extends FeatureFilter {
    * @param sup the potential super set
    * @return true if sup contains all features contained by this filter
    */
-  boolean isProperSubset(FeatureFilter sup);
+  public boolean isProperSubset(FeatureFilter sup);
   
   /**
    * Returns true if this filter is disjoint from filt - that is, there is no
    * Feature that is accepted by both filters. The empty filter is disjoint from
    * all other filters. The all filter is disjoint from none.
    */
-  boolean isDisjoint(FeatureFilter filt);
+    public boolean isDisjoint(FeatureFilter filt);
 }

@@ -135,9 +135,9 @@ public class LayeredRenderer {
       g.setClip(oldClip);
       
       if(dir == src.HORIZONTAL) {
-        g.translate(0.0, -offset);
+	  g.translate(0.0, -offset);
       } else {
-        g.translate(-offset, 0.0);
+	  g.translate(-offset, 0.0);
       }
       
       offset += sRend.getDepth(src);

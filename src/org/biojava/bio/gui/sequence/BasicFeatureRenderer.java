@@ -19,7 +19,7 @@
  *
  */
 
-package org.biojava.bio.gui.sequence;import java.awt.geom.*;
+package org.biojava.bio.gui.sequence;
 
 import java.util.*;
 import java.awt.*;
@@ -59,7 +59,7 @@ implements FeatureRenderer {
   );
   
   public static final ChangeType SCOOP = new ChangeType(
-    "The scoop of the arror has changed",
+    "The scoop of the arrow has changed",
     "org.biojava.bio.gui.sequence.BasicFeatureRenderer",
     "SCOOP",
     SequenceRenderContext.REPAINT

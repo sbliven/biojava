@@ -47,17 +47,24 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.CompoundLocation;
+import org.biojava.bio.symbol.FuzzyLocation;
+import org.biojava.bio.symbol.FuzzyPointLocation;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.BetweenLocation;
+import org.biojava.bio.symbol.Symbol;
 
 /**
- * <code>SeqFormatTools</code> is a utility class for common sequence
- * formatting operations required when writing flat files.
+ * <code>AbstractGenEmblFileFormer</code> contain file formatting code
+ * common to both GenBank and EMBL file formats.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @author Greg Cox
  * @since 1.2
  */
-public class SeqFormatTools
+class AbstractGenEmblFileFormer
 {
     private static final String FEATURE_DATA_FILE =
 	"org/biojava/bio/seq/io/FeatureQualifier.xml";
@@ -88,84 +95,11 @@ public class SeqFormatTools
     /* Defines the various types of Location available. Each is
      * represented differently within an EMBL/Genbank flatfile.
      */
-    private static final int       RANGE = 0;
-    private static final int       POINT = 1;
-    private static final int FUZZY_RANGE = 2;
-    private static final int FUZZY_POINT = 3;
-    private static final int BETWEEN_LOCATION = 4;
-
-    /**
-     * <code>SeqFormatTools</code> can not be instantiated.
-     */
-    private SeqFormatTools() { };
-
-
-    /**
-     * <code>writeFeatureAsTable</code> writes a single
-     * <code>Feature</code> as a feature table block. The leader
-     * string is set by a parameter to allow this to work for both
-     * EMBL and Genbank formats. There is some duplication of
-     * functionality from the <code>EmblFileFormer</code> and
-     * <code>GenbankFileFormer</code> classes. However, they print the
-     * data in response to SeqIO events. This convenience method dumps
-     * an entire feature at single method call.
-     *
-     * @param f a <code>Feature</code> to write.
-     * @param leader a <code>String</code> to attach to the start of
-     * each line. If this is shorter than the value returned by the
-     * <code>Feature</code>'s <code>getType()</code> method, you may
-     * get unexpected results. This is checked for.
-     * @param stream a <code>PrintStream</code> to write to.
-     */
-    public static void writeFeatureAsTable(final Feature     f,
-					   final String      leader,
-					   final PrintStream stream)
-    {
-        int strand = 0;
-	if (StrandedFeature.class.isInstance(f))
-	    strand = ((StrandedFeature) f).getStrand().getValue();
-
-	StringBuffer lb = formatLocationBlock(f.getLocation(),
-					      strand,
-					      leader,
-					      80);
-	String type = f.getType();
-
-	// Only substitute in the type name if there is room
-	if (leader.length() >= type.length())
-	    lb.replace(5, 5 + type.length(), type);
-
-	stream.println(lb);
-
-	Annotation fa = f.getAnnotation();
-
-	StringBuffer ab = new StringBuffer();
-
-	for (Iterator ai = fa.keys().iterator(); ai.hasNext();)
-	{
-	    Object key   = ai.next();
-	    Object value = fa.getProperty(key);
-
-	    if (key.equals(Feature.PROPERTY_DATA_KEY))
-		continue;
-
-	    if (Collection.class.isInstance(value))
-	    {
-		for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
-		{
-		    stream.println(formatQualifierBlock(formatQualifier(key, vi.next()),
-							leader,
-							80));
-		}
-	    }
-	    else
-	    {
-		stream.println(formatQualifierBlock(formatQualifier(key, value),
-						    leader,
-						    80));
-	    }
-	}
-    }
+    private static final int            RANGE = 0;
+    private static final int            POINT = 1;
+    private static final int      FUZZY_RANGE = 2;
+    private static final int      FUZZY_POINT = 3;
+    private static final int BETWEEN_LOCATION = 4
 
     /**
      * <code>formatQualifierBlock</code> formats text into
@@ -178,15 +112,18 @@ public class SeqFormatTools
      * columns per line.
      * @return a <code>StringBuffer</code> value.
      */
-    public static StringBuffer formatQualifierBlock(final String text,
-						    final String leader,
-						    final int    wrapWidth)
+    StringBuffer formatQualifierBlock(final StringBuffer sb,
+				      final String       text,
+				      final String       leader,
+				      final int          wrapWidth)
     {
+	// Get separator for system
+	String nl = System.getProperty("line.separator");
+
 	int tokenType = FIRST;
 	int  position = leader.length();
 
-	StringBuffer output = new StringBuffer(text.length());
-	output.append(leader);
+	sb.append(leader);
 
 	StringTokenizer t = new StringTokenizer(text);
 
@@ -218,7 +155,7 @@ public class SeqFormatTools
 		    // forcing a break
 		    if (! (position + s.length() > wrapWidth))
 		    {
-			output.append(s);
+			sb.append(s);
 			position += s.length();
 			tokenType = FIT;
 			continue TOKEN;
@@ -232,10 +169,10 @@ public class SeqFormatTools
 		    {
 			if (position == wrapWidth)
 			{
-			    output.append("\n" + leader);
+			    sb.append(nl + leader);
 			    position = leader.length();
 			}
-			output.append(s.charAt(i));
+			sb.append(s.charAt(i));
 			position++;
 		    }
 
@@ -244,13 +181,13 @@ public class SeqFormatTools
 
 		case NOFIT:
 		    // Token won't fit, so pass it to the next line
-		    output.append("\n" + leader + s);
+		    sb.append(nl + leader + s);
 		    position = s.length() + leader.length();
 		    break;
 
 		case FIT:
 		    // Token fits on this line
-		    output.append(separator + s);
+		    sb.append(separator + s);
 		    position += (s.length() + 1);
 		    break;
 
@@ -259,7 +196,8 @@ public class SeqFormatTools
 		    break;
 	    } // end switch
 	} // end while
-	return output;
+
+	return sb;
     }
 
     /**
@@ -273,10 +211,10 @@ public class SeqFormatTools
      *
      * @return a <code>String</code> bounded by the correct tokens.
      */
-    public static String formatQualifier(final Object key,
-					 final Object value)
+    String formatQualifier(final Object       key,
+			   final Object       value)
     {
-	StringBuffer tb = new StringBuffer("/" + key);
+	StringBuffer sb = new StringBuffer("/" + key);
 
 	// Default is to quote unknown qualifiers
 	String form = "quoted";
@@ -287,18 +225,18 @@ public class SeqFormatTools
         // qualifier which are unquoted unless they contain
         // spaces. We all love special cases, don't we?
         if (form.equals("quoted"))
-            tb.append("=\"" + value + "\"");
+            sb.append("=\"" + value + "\"");
         else if (form.equals("bare"))
-            tb.append("=" + value);
+            sb.append("=" + value);
         else if (form.equals("paren"))
-            tb.append("(" + value + ")");
+            sb.append("(" + value + ")");
         else if (! form.equals("empty"))
 	{
             System.err.println("Unrecognised qualifier format: " + form);
-	    tb.append("=" + value);
+	    sb.append("=" + value);
 	}
 
-        return tb.toString();
+        return sb.toString();
     }
 
     /**
@@ -313,10 +251,11 @@ public class SeqFormatTools
      *
      * @return a <code>StringBuffer</code>.
      */
-    public static StringBuffer formatTokenBlock(final Symbol [] syms,
-						final int       blockSize)
+    StringBuffer formatTokenBlock(final StringBuffer sb,
+				  final Symbol []    syms,
+				  final int          blockSize)
     {
-	StringBuffer sb = new StringBuffer(syms.length);
+	// StringBuffer sb = new StringBuffer(syms.length);
 
 	for (int i = 0; i < syms.length; i++)
 	{
@@ -328,10 +267,10 @@ public class SeqFormatTools
     }
 
     /**
-     * <code>formatLocationBlock</code> creates an EMBL/Genbank style
+     * <code>formatLocation</code> creates an EMBL/Genbank style
      * representation of a <code>Location</code>. Supported location
      * forms:
-     *
+     *     
      * <pre>
      *   123
      *  <123 or >123
@@ -341,15 +280,40 @@ public class SeqFormatTools
      *  (123.345)..(567.789)
      *   123..456
      *  <123..567 or 123..>567 or <123..>567
+     *  123^567
      * </pre>
      *
-     * Specifically not supported are:
+     * Specifically not supported is:
      * <pre>
      *   AL123465:(123..567)
      * </pre>
      *
      * Use of 'order' rather than 'join' is not retained over a
      * read/write cycle. i.e. 'order' is converted to 'join'.
+     *
+     * @param loc a <code>Location</code> to format.
+     * @param strand a <code>StrandedFeature.Strand</code> object
+     * indicating the <code>Location</code>'s strand.
+     * @return a <code>String</code> value.
+     */
+    public String formatLocation(final Location               loc,
+				 final StrandedFeature.Strand strand)
+    {
+	// Using arbitrary leader and wrapwidth wide enough to always
+	// make one line
+	StringBuffer sb = formatLocationBlock(new StringBuffer(),
+					      loc,
+					      strand.getValue(),
+					      "",
+					      Integer.MAX_VALUE);
+
+	return sb.toString();
+    }
+
+    /**
+     * <code>formatLocationBlock</code> creates an EMBL/Genbank style
+     * representation of a <code>Location</code> wrapped to a specific
+     * width.
      *
      * @param loc a <code>Location</code> object to use as a template.
      * @param strand an <code>int</code> value indicating the
@@ -361,11 +325,15 @@ public class SeqFormatTools
      *
      * @return a <code>StringBuffer</code>.
      */
-    public static StringBuffer formatLocationBlock(final Location loc,
-						   final int      strand,
-						   final String   leader,
-						   final int      wrapWidth)
+    StringBuffer formatLocationBlock(final StringBuffer sb,
+				     final Location     loc,
+				     final int          strand,
+				     final String       leader,
+				     final int          wrapWidth)
     {
+	// Get separator for system
+	String nl = System.getProperty("line.separator");
+
 	// Indicates how many characters have been added to the
 	// current line
 	int       position = leader.length();
@@ -381,13 +349,11 @@ public class SeqFormatTools
 	/* There are issues here about choosing various forms:
 	 * join(complement(...),complement(...))
 	 * complement(join(...,...))
-	 *
+	 * 
 	 * The former has the locations sorted in reverse order.
 	 */
 
 	Collections.sort(locs, Location.naturalOrder);
-
-	StringBuffer sb = new StringBuffer(leader);
 
 	if (loc instanceof CompoundLocation)
 	{
@@ -422,7 +388,7 @@ public class SeqFormatTools
 	    else if (FuzzyPointLocation.class.isInstance(thisLoc))
 		locType = FUZZY_POINT;
 	    else if (BetweenLocation.class.isInstance(thisLoc))
-	    locType = BETWEEN_LOCATION;
+		locType = BETWEEN_LOCATION;
 	    else
 		locType = RANGE;
 
@@ -461,14 +427,14 @@ public class SeqFormatTools
 		    break;
 
 		case BETWEEN_LOCATION:
-			BetweenLocation tempLocation = (BetweenLocation) thisLoc;
-			String formattedLocation = formatBetween(tempLocation);
-			if(complement)
-			{
-				formattedLocation = toComplement(formattedLocation);
-			}
-			sb.append(formattedLocation);
-			break;
+		    BetweenLocation tempLocation = (BetweenLocation) thisLoc;
+		    String formattedLocation = formatBetween(tempLocation);
+		    if(complement)
+		    {
+			formattedLocation = toComplement(formattedLocation);
+		    }
+		    sb.append(formattedLocation);
+		    break;
 
 		default:
 		    // Maybe exception here?
@@ -488,7 +454,7 @@ public class SeqFormatTools
 	    if ((position + diff) > wrapWidth)
 	    {
 		// Insert a newline just prior to this location string
-		sb.insert((sb.length() - diff), "\n" + leader);
+		sb.insert((sb.length() - diff), nl + leader);
 		position = leader.length() + diff;
 	    }
 	    else
@@ -504,7 +470,7 @@ public class SeqFormatTools
 	    // last range to the next line
 	    if ((position + 1) > wrapWidth)
 	    {
-		sb.insert((sb.length() - diff), "\n" + leader);
+		sb.insert((sb.length() - diff), nl + leader);
 		position++;
 		diff++;
 	    }
@@ -521,7 +487,7 @@ public class SeqFormatTools
      *
      * @return a <code>String</code> representation of the location.
      */
-    public static String formatFuzzyRange(final FuzzyLocation fl)
+    private String formatFuzzyRange(final FuzzyLocation fl)
     {
 	StringBuffer fb = new StringBuffer();
 
@@ -576,7 +542,7 @@ public class SeqFormatTools
      *
      * @return a <code>String</code> representation of the location.
      */
-    public static String formatFuzzyPoint(final FuzzyPointLocation fpl)
+    private String formatFuzzyPoint(final FuzzyPointLocation fpl)
     {
 	StringBuffer fb = new StringBuffer();
 
@@ -611,7 +577,7 @@ public class SeqFormatTools
      *
      * @return a <code>String</code> representation of the location.
      */
-    public static String formatRange(final RangeLocation rl)
+    private String formatRange(final RangeLocation rl)
     {
 	StringBuffer fb = new StringBuffer();
 
@@ -621,22 +587,7 @@ public class SeqFormatTools
 	fb.append(rl.getMax());
 
 	return fb.toString();
-	}
-
-	/**
-	 * Formats a between location x y into x^y.
-	 *
-	 * @param theLocation The between location object to be formatted
-	 * @return A string representation of the location
-	 */
-	public static String formatBetween(final BetweenLocation theLocation)
-	{
-		StringBuffer formattedLocation = new StringBuffer();
-		formattedLocation.append(theLocation.getMin());
-		formattedLocation.append('^');
-		formattedLocation.append(theLocation.getMax());
-		return formattedLocation.toString();
-	}
+    }
 
     /**
      * <code>formatPoint</code> creates an EMBL/Genbank style String
@@ -646,9 +597,24 @@ public class SeqFormatTools
      *
      * @return a <code>String</code> representation of the location.
      */
-    public static String formatPoint(final PointLocation pl)
+    private String formatPoint(final PointLocation pl)
     {
 	return Integer.toString(pl.getMin());
+    }
+
+    /**
+     * Formats a between location x y into x^y.
+     *
+     * @param theLocation The between location object to be formatted
+     * @return A string representation of the location
+     */
+    private String formatBetween(final BetweenLocation theLocation)
+    {
+	StringBuffer formattedLocation = new StringBuffer();
+	formattedLocation.append(theLocation.getMin());
+	formattedLocation.append('^');
+	formattedLocation.append(theLocation.getMax());
+	return formattedLocation.toString();
     }
 
     /**
@@ -661,7 +627,7 @@ public class SeqFormatTools
      * @return a <code>String</code> representation of the
      * complementary strand location.
      */
-    static String toComplement(final String value)
+    private String toComplement(final String value)
     {
 	return "complement(" + value + ")";
     }
@@ -682,9 +648,9 @@ public class SeqFormatTools
      * @param qualifierData a <code>Map</code> object to populate with
      * qualifier data.
      */
-    public static void loadFeatureData(final String featureDataFile,
-				       final Map    featureData,
-				       final Map    qualifierData)
+    static void loadFeatureData(final String featureDataFile,
+				final Map    featureData,
+				final Map    qualifierData)
     {
 	try
 	{
