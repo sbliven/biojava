@@ -27,6 +27,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.sql.DataSource;
 import org.biojava.bio.BioRuntimeException;
 //import org.biojava.utils.JDBCConnectionPool;
 
@@ -69,7 +70,7 @@ public class OracleDBHelper extends DBHelper {
 
 
     public boolean containsTable(DataSource ds, String tablename) {
-        if (pool == null) {
+        if (ds == null) {
             throw new NullPointerException("Require a datasource.");
         }
         if ((tablename == null) || (tablename.length() == 0)) {
