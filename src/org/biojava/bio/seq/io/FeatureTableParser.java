@@ -197,7 +197,8 @@ public class FeatureTableParser {
 
     private int countChar(StringBuffer s, char c) {
         int cnt = 0;
-        for (int i = 0; i < s.length(); ++i)
+        int length = s.length();
+        for (int i = 0; i < length; ++i)
             if (s.charAt(i) == c)
                 ++cnt;
         return cnt;
@@ -205,7 +206,8 @@ public class FeatureTableParser {
 
     private int countChar(String s, char c) {
         int cnt = 0;
-        for (int i = 0; i < s.length(); ++i)
+        int length = s.length();
+        for (int i = 0; i < length; ++i)
             if (s.charAt(i) == c)
                 ++cnt;
         return cnt;

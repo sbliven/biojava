@@ -121,9 +121,10 @@ public class EmblLikeLocationParser
     {
         this.location = location;
 
-        if ((countChar(location, '(')) != (countChar(location, ')')))
-            throw new BioException("Unbalanced parentheses in location: "
-                                   + location);
+        //fixme: mrp: removed this check - it may be killing performance
+        //if ((countChar(location, '(')) != (countChar(location, ')')))
+        //    throw new BioException("Unbalanced parentheses in location: "
+        //                           + location);
 
         nextCharIndex = 0;
 
