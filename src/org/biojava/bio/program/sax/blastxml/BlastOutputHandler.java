@@ -83,6 +83,7 @@ class BlastOutputHandler
     private String version = null;
     private String databaseId = null;
     private String queryId = null;
+    private String queryDef = null;
 
     /**
      * If set, the output is wrapped in a <biojava:BlastLikeDataSetCollection>.
@@ -249,8 +250,17 @@ class BlastOutputHandler
         );
 
         // delegate handling of <BlastOutput_query-def>
-//        super.addHandler(new ElementRecognizer.ByLocalName("BlastOutput_query-def"),
-//            SearchPropertyHandler.SEARCH_PROPERTY_HANDLER_FACTORY);
+        super.addHandler(new ElementRecognizer.ByLocalName("BlastOutput_query-def"),
+            new StAXHandlerFactory() {
+                public StAXContentHandler getHandler(StAXFeatureHandler staxenv) {
+                    return new StringElementHandlerBase() {
+                        public void setStringValue(String s)  throws SAXException {
+                            queryDef = s.trim();
+                        }
+                    };
+                }
+            }
+        );
 
         // delegate handling of <BlastOutput_query-len>
 //        super.addHandler(new ElementRecognizer.ByLocalName(""),
@@ -284,6 +294,13 @@ class BlastOutputHandler
                                 queryAttrs.addAttribute(biojavaUri, "metadata", "metadata", CDATA, "none");
                                 listener.startElement(biojavaUri, "QueryId", biojavaUri + ":QueryId", queryAttrs);
                                 listener.endElement(biojavaUri, "QueryId", biojavaUri + ":QueryId");
+                            }
+
+                            // generate <QueryDescription> if required
+                            if (queryDef != null) {
+                                listener.startElement(biojavaUri, "QueryDescription", biojavaUri + ":QueryDescription", new AttributesImpl());
+                                listener.characters(queryDef.toCharArray(), 0, queryDef.length());
+                                listener.endElement(biojavaUri, "QueryDescription", biojavaUri + ":QueryDescription");
                             }
 
                             if (databaseId != null) {
