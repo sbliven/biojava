@@ -35,20 +35,20 @@ public class SimpleTranslationTable implements TranslationTable, Serializable {
   private final Map transMap;
   private final FiniteAlphabet source;
   private final Alphabet target;
-  
+
   public Alphabet getSourceAlphabet() {
     return source;
   }
-  
+
   public Alphabet getTargetAlphabet() {
     return target;
   }
-  
+
   public Symbol translate(final Symbol sym)
   throws IllegalSymbolException {
     Symbol s = (Symbol) transMap.get(sym);
     if(s == null) {
-      if(s instanceof AtomicSymbol) {
+      if(sym instanceof AtomicSymbol) { //changed this from s to sym, since we already checked and s is null
         getSourceAlphabet().validate(sym);
         throw new IllegalSymbolException(
           "Unable to map " + sym.getName()
@@ -67,7 +67,7 @@ public class SimpleTranslationTable implements TranslationTable, Serializable {
     }
     return s;
   }
-  
+
   /**
    * Alter the translation mapping.
    *
@@ -82,7 +82,7 @@ public class SimpleTranslationTable implements TranslationTable, Serializable {
     target.validate(to);
     transMap.put(from, to);
   }
-  
+
   /**
    * Create a new translation table that will translate symbols from source to
    * target.
@@ -99,7 +99,7 @@ public class SimpleTranslationTable implements TranslationTable, Serializable {
     this.target = target;
     this.transMap = new HashMap();
   }
-  
+
   /**
    * Create a new translation table that will translate symbols from source to
    * target.

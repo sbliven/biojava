@@ -42,7 +42,7 @@ import org.biojava.utils.bytecode.*;
  * getting an alphabet instance. This is where the AlphabetManager comes in
  * handy. It helps out in serialization, generating derived alphabets and
  * building CrossProductAlphabet instances. It also contains limited support for
- * parsing complex alphabet names back into the alphabets. 
+ * parsing complex alphabet names back into the alphabets.
  *
  * @author Matthew Pocock
  * @author Thomas Down
@@ -100,7 +100,7 @@ public final class AlphabetManager {
     *@param name of the string whose symbol you want to get
     * @throws NoSuchElementException if the string name is invalid.
     */
-  static public Symbol symbolForName(String name) 
+  static public Symbol symbolForName(String name)
   throws NoSuchElementException {
     Symbol s = (Symbol) nameToSymbol.get(name);
     if(s == null) {
@@ -118,7 +118,7 @@ public final class AlphabetManager {
   static public void registerAlphabet(String name, Alphabet alphabet) {
     nameToAlphabet.put(name, alphabet);
   }
-  
+
   /**
    * Get an iterator over all alphabets known.
    *
@@ -147,11 +147,11 @@ public final class AlphabetManager {
   static public Symbol getGapSymbol() {
     return gapSymbol;
   }
-  
+
   static public Symbol getGapSymbol(List alphas) {
     SizeQueen sq = new SizeQueen(alphas);
     Symbol s = (Symbol) gapBySize.get(sq);
-    
+
     if(s == null) {
       if(alphas.size() == 0) { // should never be needed
         s = gapSymbol;
@@ -180,7 +180,7 @@ public final class AlphabetManager {
       }
       gapBySize.put(sq, s);
     }
-    
+
     return s;
   }
 
@@ -250,7 +250,7 @@ public final class AlphabetManager {
       );
     }
   }
-  
+
   /**
    * Expands a list of BasisSymbols into the set of AtomicSymbol instances
    * it matches.
@@ -369,7 +369,7 @@ public final class AlphabetManager {
       }
     }
   }
-  
+
   /**
    * Generates a new CrossProductAlphabet from the give name.
    *
@@ -385,7 +385,7 @@ public final class AlphabetManager {
         " into a cross-product alphabet as it is not bracketed"
       );
     }
-    
+
     name = name.substring(1, name.length()-1).trim();
     List aList = new ArrayList(); // the alphabets
     int i = 0;
@@ -423,10 +423,10 @@ public final class AlphabetManager {
         }
       }
     }
-    
+
     return getCrossProductAlphabet(aList);
   }
-  
+
   /**
    * Retrieve a CrossProductAlphabet instance over the alphabets in aList.
    * <P>
@@ -448,7 +448,7 @@ public final class AlphabetManager {
   static public Alphabet getCrossProductAlphabet(List aList) {
     return getCrossProductAlphabet(aList, null);
   }
-  
+
   /**
    * Retrieve a CrossProductAlphabet instance over the alphabets in aList.
    * <P>
@@ -476,9 +476,9 @@ public final class AlphabetManager {
   ) {
     // This trap means that the `product' operator can be
     // safely applied to a single alphabet.
-      
+
     if (aList.size() == 1)
-	return (Alphabet) aList.get(0);
+        return (Alphabet) aList.get(0);
 
     if(crossProductAlphabets == null) {
       crossProductAlphabets = new HashMap();
@@ -486,7 +486,7 @@ public final class AlphabetManager {
 
     ListWrapper aw = new ListWrapper(aList);
     Alphabet cpa = (Alphabet) crossProductAlphabets.get(aw);
-    
+
     int size = 1;
     if(cpa == null) {
       for(Iterator i = aList.iterator(); i.hasNext(); ) {
@@ -495,7 +495,12 @@ public final class AlphabetManager {
           cpa =  new InfiniteCrossProductAlphabet(aList);
           break;
         }
-        size *= ((FiniteAlphabet) aa).size();
+        //size *= ((FiniteAlphabet) aa).size();
+        // The above calculation produced spurious results for alignments of any appreciable size, resulting in integer overflow
+        // and negative values for the size.  Because of this, the SimpleCrossProductAlphabet might be called at innappropriate
+        // times.  It appears that using SparseCrossProductAlphabet below may work for more alignments.
+        // -Richard J. Fox 05/17/2001
+        size = 1000;
       }
       if(cpa == null) {
         try {
@@ -514,10 +519,10 @@ public final class AlphabetManager {
       crossProductAlphabets.put(aw, cpa);
       registerAlphabet(cpa.getName(), cpa);
     }
-    
+
     return cpa;
   }
-  
+
   private static Set expandMatches(Alphabet parent, List symList, List built) {
     int indx = built.size();
     if(indx < symList.size()) {
@@ -552,7 +557,7 @@ public final class AlphabetManager {
       }
     }
   }
-  
+
   /**
    * Return a list of BasisSymbol instances that uniquely sum up all
    * AtomicSymbol
@@ -593,9 +598,9 @@ public final class AlphabetManager {
     }
     return facts;
   }
-  
-  
-  
+
+
+
   /**
    * Initialize the static AlphabetManager resources.
    * <P>
@@ -636,7 +641,7 @@ public final class AlphabetManager {
         "org/biojava/bio/symbol/AlphabetManager.xml"
       );
       if (alphabetStream == null)
-	  throw new BioError("Couldn't locate AlphabetManager.xml.  Badly built biojava archive?");
+          throw new BioError("Couldn't locate AlphabetManager.xml.  Badly built biojava archive?");
 
       InputSource is = new InputSource(alphabetStream);
       DOMParser parser = new DOMParser();
@@ -645,9 +650,9 @@ public final class AlphabetManager {
 
       NodeList children = doc.getDocumentElement().getChildNodes();
       for(int i = 0; i < children.getLength(); i++) {
-	Node cnode = children.item(i);
-	if (! (cnode instanceof Element))
-	    continue;
+        Node cnode = children.item(i);
+        if (! (cnode instanceof Element))
+            continue;
 
         Element child = (Element) cnode;
         String name = child.getNodeName();
@@ -701,7 +706,7 @@ public final class AlphabetManager {
     for(int i = 0; i < children.getLength(); i++) {
       Node n = children.item(i);
       if (! (n instanceof Element))
-	  continue;
+          continue;
 
       Element el = (Element) n;
       String nodeName = el.getNodeName();
@@ -742,21 +747,21 @@ public final class AlphabetManager {
     String name = null;
     String description = null;
     Set syms = new HashSet();
-    
+
     NodeList children = symE.getChildNodes();
     for(int i = 0; i < children.getLength(); i++) {
       Node n = children.item(i);
       if (! (n instanceof Element))
-	  continue;
+          continue;
 
       Element el = (Element) n;
       String nodeName = el.getNodeName();
       if(nodeName.equals("symbol")) {
         NodeList symC = el.getChildNodes();
         for(int j = 0; j < symC.getLength(); j++) {
-	  Node en = symC.item(j);
-	  if (! (en instanceof Element))
-	      continue;
+          Node en = symC.item(j);
+          if (! (en instanceof Element))
+              continue;
 
           Element eel = (Element) en;
           String eName = eel.getNodeName();
@@ -806,7 +811,7 @@ public final class AlphabetManager {
     for(int i = 0; i < children.getLength(); i++) {
       Node n = children.item(i);
       if (! (n instanceof Element))
-	  continue;
+          continue;
 
       Element el = (Element) n;
       try {
@@ -857,8 +862,8 @@ public final class AlphabetManager {
         public OPH(String name) {
           this.name = name;
         }
-	
-  	    public OPH() {
+
+            public OPH() {
         }
 
         private Object readResolve() throws ObjectStreamException {
@@ -898,8 +903,8 @@ public final class AlphabetManager {
           this.alpha = alpha;
           this.name = name;
         }
-	
-	      private Object readResolve() throws ObjectStreamException {
+
+              private Object readResolve() throws ObjectStreamException {
           try {
             if(alpha != null) {
               return alpha.getParser("name").parseToken(name);
@@ -918,12 +923,12 @@ public final class AlphabetManager {
         }
       }
     }
-    
-  /** 
+
+  /**
    * The class representing the Gap symbol.
    * <P>
    * The gap is quite special. It is an ambiguity symbol with an empty alphabet.
-   * This means that it notionaly represents an unfilled slot in a sequence. 
+   * This means that it notionaly represents an unfilled slot in a sequence.
    * It should be a singleton, hence the
    * placement in AlphabetManager and also the method normalize.
    *
@@ -934,34 +939,34 @@ public final class AlphabetManager {
       }
 
       public String getName() {
-	  return "gap";
+          return "gap";
       }
 
       public char getToken() {
-	  return '-';
+          return '-';
       }
 
       public Annotation getAnnotation() {
-	  return Annotation.EMPTY_ANNOTATION;
+          return Annotation.EMPTY_ANNOTATION;
       }
 
       public Alphabet getMatches() {
-	  return Alphabet.EMPTY_ALPHABET;
+          return Alphabet.EMPTY_ALPHABET;
       }
 
       public void addChangeListener(ChangeListener cl) {
       }
-      
+
       public void addChangeListener(ChangeListener cl, ChangeType ct) {
       }
 
       public void removeChangeListener(ChangeListener cl) {
       }
-      
+
       public void removeChangeListener(ChangeListener cl, ChangeType ct) {
       }
   }
-  
+
   /**
    * Get an indexer for a specified alphabet.
    *
@@ -973,7 +978,7 @@ public final class AlphabetManager {
     FiniteAlphabet alpha
   ) {
     final int generateIndexSize = 160;
-    AlphabetIndex ai = (AlphabetIndex) alphabetToIndex.get(alpha); 
+    AlphabetIndex ai = (AlphabetIndex) alphabetToIndex.get(alpha);
     if(ai == null) {
       int size = alpha.size();
       if(size <= generateIndexSize) {
@@ -985,7 +990,7 @@ public final class AlphabetManager {
     }
     return ai;
   }
-  
+
   /**
    * Get an indexer for an array of symbols.
    *
@@ -998,18 +1003,18 @@ public final class AlphabetManager {
   ) throws IllegalSymbolException, BioException {
     return new LinearAlphabetIndex(syms);
   }
-  
+
   private static final class SizeQueen extends AbstractList {
     private final List alphas;
-    
+
     public SizeQueen(List alphas) {
       this.alphas = alphas;
     }
-    
+
     public int size() {
       return alphas.size();
     }
-    
+
     public Object get(int pos) {
       Alphabet a = (Alphabet) alphas.get(pos);
       List al = a.getAlphabets();
