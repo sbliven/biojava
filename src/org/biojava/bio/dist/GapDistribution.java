@@ -25,6 +25,7 @@ package org.biojava.bio.dist;
 import java.util.*;
 import java.io.Serializable;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
@@ -66,10 +67,20 @@ public class GapDistribution implements Distribution {
     return this;
   }
 
+  public void setNullModel(Distribution nullModel)
+  throws IllegalAlphabetException, ChangeVetoException {
+    throw new ChangeVetoException("Can't change null model for GapDistribution");
+  }
+  
   public void registerWithTrainer(DistributionTrainerContext dtc) {
     dtc.registerTrainer(this, IgnoreCountsTrainer.getInstance());
   }
-    
+  
+  public void addChangeListener(ChangeListener cl) {}
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+  public void removeChangeListener(ChangeListener cl) {}
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
+  
   public GapDistribution(Alphabet alpha) {
     this.alpha = alpha;
   }

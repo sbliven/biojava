@@ -23,7 +23,9 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
-import java.io.Serializable; 
+import java.io.Serializable;
+
+import org.biojava.utils.*; 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
@@ -36,24 +38,19 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
   private final Map transFrom;
   private final Map transTo;
   private final Map transWeights;
+  private final ChangeSupport changeSupport;
+  private final MarkovModel.DistributionForwarder distForwarder;
   
-  private transient List transitionListeners;
-
   private Transition _tran = new Transition(null, null);
   
   {
     transFrom = new HashMap();
     transTo = new HashMap();
     transWeights = new HashMap();
+    changeSupport = new ChangeSupport();
+    distForwarder = new MarkovModel.DistributionForwarder(this, changeSupport);
   }
 
-  protected List getTransitionListeners() {
-    if(transitionListeners == null) {
-      transitionListeners = new ArrayList();
-    }
-    return transitionListeners;
-  }
-  
   public Alphabet emissionAlphabet() { return emissionAlpha; }
   public FiniteAlphabet stateAlphabet() { return stateAlpha; }
   public int heads() { return magicalState().getAdvance().length; }
@@ -103,81 +100,74 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
   }
   
   public void createTransition(State from, State to)
-  throws IllegalSymbolException, ModelVetoException {
+  throws IllegalSymbolException, ChangeVetoException {
     stateAlphabet().validate(from);
     stateAlphabet().validate(to);
-    TransitionEvent te = new TransitionEvent(this, from, to);
+
+    ChangeEvent ce = new ChangeEvent(
+      this, MarkovModel.ARCHITECTURE,
+      new Object[] { from, to },
+      null
+    );
     
     FiniteAlphabet f = transitionsFrom(from);
     FiniteAlphabet t = transitionsTo(to);
 
     if(f.contains(to)) {
-      throw new ModelVetoException(
-        "Transition already exists: " + from.getName() + " -> " + to.getName(),
-        te
+      throw new ChangeVetoException(
+        ce,
+        "Transition already exists: " + from.getName() + " -> " + to.getName()
       );
     }
 
-    List transitionListeners = getTransitionListeners();
-    List tl;
-    synchronized(transitionListeners) {
-      tl = new ArrayList(transitionListeners);
-    }
-    
-    for(Iterator i = tl.iterator(); i.hasNext(); ) {
-      ((TransitionListener) i.next()).preCreateTransition(te);
-    }
-
-    f.addSymbol(to);
-    t.addSymbol(from);
-
-    for(Iterator i = tl.iterator(); i.hasNext(); ) {
-      ((TransitionListener) i.next()).postCreateTransition(te);
+    synchronized(changeSupport) {
+      changeSupport.firePreChangeEvent(ce);
+      
+      f.addSymbol(to);
+      t.addSymbol(from);
+      
+      changeSupport.firePostChangeEvent(ce);
     }
   }
   
   public void destroyTransition(State from, State to)
-  throws IllegalSymbolException, ModelVetoException {
+  throws IllegalSymbolException, ChangeVetoException {
     stateAlphabet().validate(from);
     stateAlphabet().validate(to);
 
-    TransitionEvent te = new TransitionEvent(this, from, to);
-
     FiniteAlphabet f = transitionsFrom(from);
     FiniteAlphabet t = transitionsTo(to);
+
+    ChangeEvent ce = new ChangeEvent(
+      this, MarkovModel.ARCHITECTURE,
+      null,
+      new Object[] { from, to }
+    );
     
     if(!f.contains(to)) {
-      throw new ModelVetoException(
-        "Transition does not exists: " + from.getName() + " -> " + to.getName(),
-        te
+      throw new ChangeVetoException(
+        ce,
+        "Transition does not exists: " + from.getName() + " -> " + to.getName()
       );
     }
 
     Distribution dist = getWeights(from);
     double w = dist.getWeight(to); 
     if(w != 0.0) {
-      throw new ModelVetoException(
+      throw new ChangeVetoException(
+        ce,
         "Can't remove transition as its weight is not zero: " +
-        from.getName() + " -> " + to.getName() + " = " + w,
-        te
+        from.getName() + " -> " + to.getName() + " = " + w
       );
     }
 
-    List transitionListeners = getTransitionListeners();
-    List tl;
-    synchronized(transitionListeners) {
-      tl = new ArrayList(transitionListeners);
-    }
-    
-    for(Iterator i = tl.iterator(); i.hasNext(); ) {
-      ((TransitionListener) i.next()).preDestroyTransition(te);
-    }
+    synchronized(changeSupport) {
+      changeSupport.firePreChangeEvent(ce);
 
-    transitionsFrom(from).removeSymbol(to);
-    transitionsTo(to).removeSymbol(from);
-    
-    for(Iterator i = tl.iterator(); i.hasNext(); ) {
-      ((TransitionListener) i.next()).postDestroyTransition(te);
+      transitionsFrom(from).removeSymbol(to);
+      transitionsTo(to).removeSymbol(from);
+      
+      changeSupport.firePostChangeEvent(ce);
     }
   }
   
@@ -219,7 +209,8 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     return s;
   }
 
-  public void addState(State toAdd) throws IllegalSymbolException {
+  public void addState(State toAdd)
+  throws IllegalSymbolException, ChangeVetoException {
     if(toAdd instanceof MagicalState && toAdd != magicalState) {
       throw new IllegalSymbolException("Can not add a MagicalState");
     }
@@ -249,12 +240,17 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
         );
       }
     }
-      
-    stateAlphabet().addSymbol(toAdd);
+
     FiniteAlphabet fa = new SimpleAlphabet("Transitions from " + toAdd.getName());
     transFrom.put(toAdd, fa);
     transTo.put(toAdd, new SimpleAlphabet("Transitions to " + toAdd.getName()));
     transWeights.put(toAdd, new SimpleDistribution(fa));
+    
+    if(toAdd instanceof EmissionState) {
+      Distribution dist = ((EmissionState) toAdd).getDistribution();
+      dist.addChangeListener(distForwarder, Distribution.WEIGHTS);
+      dist.addChangeListener(distForwarder, Distribution.NULL_MODEL);
+    }
   }
   
   public void removeState(State toGo)
@@ -283,6 +279,27 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     ((SimpleAlphabet) stateAlphabet()).removeSymbol(toGo);
     transFrom.remove(toGo);
     transTo.remove(toGo);
+    if(toGo instanceof EmissionState) {
+      Distribution dist = ((EmissionState) toGo).getDistribution();
+      toGo.removeChangeListener(distForwarder, Distribution.NULL_MODEL);
+      toGo.removeChangeListener(distForwarder, Distribution.WEIGHTS);
+    }
+  }
+
+  public void addChangeListener(ChangeListener cl) {
+    changeSupport.addChangeListener(cl);
+  }
+  
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+    changeSupport.addChangeListener(cl, ct);
+  }
+
+  public void removeChangeListener(ChangeListener cl) {
+    changeSupport.removeChangeListener(cl);
+  }
+  
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+    changeSupport.removeChangeListener(cl, ct);
   }
 
   public SimpleMarkovModel(int heads, Alphabet emissionAlpha, String name) {
@@ -301,21 +318,9 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     try {
       addState(magicalState);
     } catch (IllegalSymbolException ise) {
-      throw new BioError(ise, "Couldn't add magical state");
-    }
-  }
-  
-  public void addTransitionListener(TransitionListener tl) {
-    List transitionListeners = getTransitionListeners();
-    synchronized(transitionListeners) {
-      transitionListeners.add(tl);
-    }
-  }
-  
-  public void removeTransitionListener(TransitionListener tl) {
-    List transitionListeners = getTransitionListeners();
-    synchronized(transitionListeners) {
-      transitionListeners.remove(tl);
+      throw new BioError(ise, "Assertion failure: Couldn't add magical state");
+    } catch (ChangeVetoException cve) {
+      throw new BioError(cve, "Assertion failure: Couldn't add magical state");
     }
   }
 }

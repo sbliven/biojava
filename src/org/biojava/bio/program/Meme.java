@@ -25,6 +25,8 @@ package org.biojava.bio.program;
 import java.util.*;
 import java.io.*;
 
+import org.biojava.utils.*;
+import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 import org.biojava.bio.dp.*;
@@ -140,8 +142,12 @@ public class Meme {
             if(c == width)
               break READMOTIF;
         } else if (nt == st.TT_NUMBER) {
+          try {
             matrix.getColumn(c).setWeight(res.symbolAt(r+1), st.nval);
             r++;
+          } catch (ChangeVetoException cve) {
+            throw new BioError(cve, "Couldn't set up the distribution ");
+          }
         }
       }
 

@@ -117,6 +117,11 @@ public class IntegerAlphabet implements Alphabet, Serializable {
   public SymbolParser getParser(String name) {
     throw new NoSuchElementException("No parsers supported by IntegerAlphabet yet");
   }
+
+  public void addChangeListener(ChangeListener cl) {}
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+  public void removeChangeListener(ChangeListener cl) {}
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {} 
   
   /**
    * A single int value.
@@ -151,6 +156,11 @@ public class IntegerAlphabet implements Alphabet, Serializable {
       this.val = val;
       this.matches = new SingletonAlphabet(this);
     }
+
+    public void addChangeListener(ChangeListener cl) {}
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+    public void removeChangeListener(ChangeListener cl) {}
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {} 
   }
   
   /**

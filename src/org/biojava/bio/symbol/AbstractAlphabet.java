@@ -24,11 +24,13 @@ package org.biojava.bio.symbol;
 
 import java.util.*;
 
+import org.biojava.utils.*;
+
 /**
  * An abstract implementation of Alphabet.
  * <P>
  * This provides the frame-work for maintaining the SymbolParser <-> name
- * mappings.
+ * mappings and also for the ChangeListeners.
  * <P>
  * This class is for developers to derive from, not for use directly.
  *
@@ -67,6 +69,11 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
     }
     return parser;
   }
+
+  public void addChangeListener(ChangeListener cl) {}
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+  public void removeChangeListener(ChangeListener cl) {}
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {} 
   
   protected AbstractAlphabet() {}
 }

@@ -44,7 +44,16 @@ import org.biojava.utils.*;
  *
  * @author Matthew Pocock
  */
-public interface Annotation {
+public interface Annotation extends Changeable {
+  /**
+   * This type symbolizes that one or more properties have changed.
+   */
+  public static final ChangeType PROPERTY = new ChangeType(
+    "Properties have altered",
+    "org.biojava.bio",
+    "PROPERTY"
+  );
+  
   /**
    * Retrieve the value of a property by key.
    * <P>
@@ -66,12 +75,13 @@ public interface Annotation {
    *
    * @param key the key object
    * @param value the new value for this key
-   * @throws IllegalArgumentException if the property <code>key</code> cannot
-   *         be changed.
-   * @throws UnsupportedOperationException if this annotation object is immutable.
+   * @throws IllegalArgumentException if the property <code>key</code> is not
+   *         legal
+   * @throws ChangeVetoException if this annotation object can't be changed, or
+   *         if the change was vetoed
    */
   void setProperty(Object key, Object value)
-       throws IllegalArgumentException, UnsupportedOperationException;
+  throws IllegalArgumentException, ChangeVetoException;
        
   /**
    * Get a set of key objects.
@@ -104,12 +114,18 @@ public interface Annotation {
    */
   class EmptyAnnotation implements Annotation, Serializable {
     public Object getProperty(Object key) throws NoSuchElementException {
-      throw new NoSuchElementException("There are no keys in the Empty Annotaion object: " + key);
+      throw new NoSuchElementException(
+        "There are no keys in the Empty Annotaion object: " +
+        key
+      );
     }
     
-    public void setProperty(Object key, Object value) throws UnsupportedOperationException {
-      throw new UnsupportedOperationException("You can not add propertys to the Empy Annotaion object: " +
-        key + " -> " + value);
+    public void setProperty(Object key, Object value)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        "You can not add propertys to the Empy Annotaion object: " +
+        key + " -> " + value
+      );
     }
     
     public Set keys() {
@@ -120,6 +136,11 @@ public interface Annotation {
       //return Collections.EMPTY_MAP; 1.3
       return new HashMap();
     }
+    
+    public void addChangeListener(ChangeListener cl) {}
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+    public void removeChangeListener(ChangeListener cl) {}
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
     
     private Object writeReplace() throws ObjectStreamException {
       try {

@@ -1,7 +1,9 @@
 package org.biojava.bio.dist;
 
-import org.biojava.bio.symbol.*;
 import java.util.*;
+
+import org.biojava.utils.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * Provides an N'th order distribution.
@@ -72,7 +74,8 @@ public class NthOrderDistribution extends AbstractDistribution {
   	return dist.getWeight((Symbol) symL.get(lb1));
   }
   
-  public void setNullModel(Distribution nullModel) throws IllegalAlphabetException {
+  public void setNullModel(Distribution nullModel)
+  throws IllegalAlphabetException, ChangeVetoException {
   	if(nullModel == null) {
     	    throw new NullPointerException(
           	"The null model must not be null." +
@@ -135,6 +138,13 @@ public class NthOrderDistribution extends AbstractDistribution {
     
     public Distribution getNullModel() {
       return this;
+    }
+    
+    public void setNullModel(Distribution nullModel)
+    throws IllegalAlphabetException, ChangeVetoException {
+      throw new ChangeVetoException(
+        "Can't set the null model for NthOrderDistribution.UniformNullModel"
+      );
     }
   }
 }

@@ -23,6 +23,9 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 
+import org.biojava.utils.*;
+import org.biojava.bio.*;
+
 /**
  * A no-frills implementation of FeatureHolder.
  *
@@ -60,11 +63,37 @@ public class SimpleFeatureHolder extends AbstractFeatureHolder {
     *Add a feature to the featureholder
     */
 
-  public void addFeature(Feature f) {
-    features.add(f);
+  public void addFeature(Feature f)
+  throws ChangeVetoException {
+    if(changeSupport == null) {
+      features.add(f);
+    } else {
+      synchronized(changeSupport) {
+        ChangeEvent ce = new ChangeEvent(
+          this, FeatureHolder.FEATURES,
+          f, null
+        );
+        changeSupport.firePreChangeEvent(ce);
+        features.add(f);
+        changeSupport.firePostChangeEvent(ce);
+      }
+    }
   }
 
-  public void removeFeature(Feature f) {
-    features.remove(f);
+  public void removeFeature(Feature f)
+  throws ChangeVetoException {
+    if(changeSupport == null) {
+      features.remove(f);
+    } else {
+      synchronized(changeSupport) {
+        ChangeEvent ce = new ChangeEvent(
+          this, FeatureHolder.FEATURES,
+          null, f
+        );
+        changeSupport.firePreChangeEvent(ce);
+        features.remove(f);
+        changeSupport.firePostChangeEvent(ce);
+      }
+    }
   }
 }

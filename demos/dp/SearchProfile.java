@@ -30,13 +30,13 @@ public class SearchProfile {
 
     
       System.out.println("make dp object");
-      DP dp = DPFactory.createDP(profile);
+      DP dp = DPFactory.DEFAULT.createDP(profile);
 //      dumpDP(dp);
 
       Sequence [] seq1 = { seqDB.sequenceIterator().nextSequence() };
-      System.out.println("Viterbi: " + dp.viterbi(seq1, DP.PROBABILITY).getScore());
-      System.out.println("Forward: " + dp.forward(seq1, DP.PROBABILITY));
-      System.out.println("Backward: " + dp.backward(seq1, DP.PROBABILITY));
+      System.out.println("Viterbi: " + dp.viterbi(seq1, ScoreType.PROBABILITY).getScore());
+      System.out.println("Forward: " + dp.forward(seq1, ScoreType.PROBABILITY));
+      System.out.println("Backward: " + dp.backward(seq1, ScoreType.PROBABILITY));
       
       System.out.println("Training whole profile");
       TrainingAlgorithm ta = new BaumWelchTrainer(dp);
@@ -56,9 +56,9 @@ public class SearchProfile {
       for(SequenceIterator si = seqDB.sequenceIterator(); si.hasNext(); ) {
         Sequence seq = si.nextSequence();
         SymbolList [] rl = { seq };
-        StatePath statePath = dp.viterbi(rl, DP.PROBABILITY);
-        double fScore = dp.forward(rl, DP.PROBABILITY);
-        double bScore = dp.backward(rl, DP.PROBABILITY);
+        StatePath statePath = dp.viterbi(rl, ScoreType.PROBABILITY);
+        double fScore = dp.forward(rl, ScoreType.PROBABILITY);
+        double bScore = dp.backward(rl, ScoreType.PROBABILITY);
       
         System.out.println(
           seq.getName() +
@@ -167,7 +167,7 @@ public class SearchProfile {
     System.out.println("\n");
     
     int [][] forwardT = dp.getForwardTransitions();
-    double [][] forwardTS = dp.getForwardTransitionScores(DP.PROBABILITY);
+    double [][] forwardTS = dp.getForwardTransitionScores(ScoreType.PROBABILITY);
     for(int i = 0; i < states.length; i++) {
       System.out.print("Transitions from " + i + ": ");
       for(int j = 0; j < forwardT[i].length; j++) {

@@ -21,8 +21,10 @@
 
 package org.biojava.bio.seq;
 
-import org.biojava.bio.*;
 import java.util.*;
+
+import org.biojava.utils.*;
+import org.biojava.bio.*;
 
 /**
  * The interface for objects that contain features.
@@ -35,7 +37,17 @@ import java.util.*;
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public interface FeatureHolder {
+public interface FeatureHolder extends Changeable {
+  /**
+   * Signals that features have been added or removed directly within this
+   * FeatureHolder.
+   */
+  public static final ChangeType FEATURES = new ChangeType(
+    "Features have been added or removed",
+    "org.biojava.bio.seq.FeatureHolder",
+    "FEATURES"
+  );
+  
     /**
      * Count how many features are contained.
      *
@@ -67,20 +79,21 @@ public interface FeatureHolder {
      * method will generally only work on Sequences, and on some
      * Features which have been attached to Sequences.
      *
-     * @throws UnsupportedOperationException if this FeatureHolder does not
-     *                    support addition of new features.  
+     * @throws BioException if something went wrong during creating the feature
+     * @throws ChangeVetoException if this FeatureHolder does not support
+     *         creation of new features, or if the change was vetoed  
      */
-
-    public Feature createFeature(Feature.Template ft) throws BioException;
+    public Feature createFeature(Feature.Template ft)
+    throws BioException, ChangeVetoException;
 
     /**
      * Remove a feature from this FeatureHolder.
      *
-     * @throws UnsupportedOperationException if this FeatureHolder
-     *                     does not support feature removal.
+     * @throws ChangeVetoException if this FeatureHolder does not support
+     *         feature removal or if the change was vetoed
      */
-
-    public void removeFeature(Feature f);
+    public void removeFeature(Feature f)
+    throws ChangeVetoException;
 
     public static final FeatureHolder EMPTY_FEATURE_HOLDER =
 	new EmptyFeatureHolder();
@@ -105,5 +118,10 @@ public interface FeatureHolder {
 	public void removeFeature(Feature f) {
 	    throw new UnsupportedOperationException();
 	}
+    
+    public void addChangeListener(ChangeListener cl) {}
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+    public void removeChangeListener(ChangeListener cl) {}
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
     }
 }

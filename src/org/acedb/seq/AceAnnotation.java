@@ -25,6 +25,7 @@ package org.acedb.seq;
 import java.util.*;
 
 import org.acedb.*;
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 /**
  * @author Matthew Pocock
@@ -95,5 +96,10 @@ public class AceAnnotation implements Annotation {
   public AceAnnotation(AceNode node) {
     this.node = node;
   }
+  
+  public void addChangeListener(ChangeListener cl) {}
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+  public void removeChangeListener(ChangeListener cl) {}
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {} 
 }
     

@@ -44,7 +44,6 @@ import org.biojava.utils.*;
  * @author Matthew Pocock
  */
 public interface FiniteAlphabet extends Alphabet {
-  
   /**
    * The number of symbols in the alphabet.
    *
@@ -72,9 +71,11 @@ public interface FiniteAlphabet extends Alphabet {
    * @param s the Symbol to add
    * @throws IllegalSymbolException if the symbol is null, or if for any reason
    *         it can't be added
+   * @throws ChangeVetoException  if either the alphabet doesn't allow symbols
+   *         to be added, or the change was vetoed
    */
   public void addSymbol(Symbol s)
-  throws IllegalSymbolException;
+  throws IllegalSymbolException, ChangeVetoException;
   
   
   /**
@@ -86,9 +87,11 @@ public interface FiniteAlphabet extends Alphabet {
    * @param s the Symbol to remove
    * @throws IllegalSymbolException if the symbol is null, or if for any reason
    *         it can't be removed
+   * @throws ChangeVetoException  if either the alphabet doesn't allow symbols
+   *         to be added, or the change was vetoed
    */
   public void removeSymbol(Symbol s)
-  throws IllegalSymbolException;
+  throws IllegalSymbolException, ChangeVetoException;
   
   /**
    * A list of symbols that make up this alphabet.

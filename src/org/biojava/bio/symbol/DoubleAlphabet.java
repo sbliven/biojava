@@ -135,6 +135,11 @@ public class DoubleAlphabet implements Alphabet, Serializable {
     }
     return PARSER;    
   }
+
+  public void addChangeListener(ChangeListener cl) {}
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+  public void removeChangeListener(ChangeListener cl) {}
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {} 
   
   /**
    * A single double value.
@@ -173,6 +178,11 @@ public class DoubleAlphabet implements Alphabet, Serializable {
       this.val = val;
       this.matches = new SingletonAlphabet(this);
     }
+
+    public void addChangeListener(ChangeListener cl) {}
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+    public void removeChangeListener(ChangeListener cl) {}
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {} 
   }
   
   /**

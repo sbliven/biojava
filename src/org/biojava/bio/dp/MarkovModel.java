@@ -22,6 +22,7 @@
 
 package org.biojava.bio.dp;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
@@ -37,7 +38,33 @@ import org.biojava.bio.dist.*;
  * container->start and end->container. For the sample methods to work, the log
  * scores must be probabilities (sum to 1).
  */
-public interface MarkovModel {
+public interface MarkovModel extends Changeable {
+  /**
+   * Signals that the architecture of the model is changing.
+   * <P>
+   * For a transition creation, the changed field should be a two element
+   * array containing the source and destination states of the new transition,
+   * and the previous field should be null. Likewise for the removal of a
+   * transition, the previos should hold the array, and changed should be null.
+   */
+  public static final ChangeType ARCHITECTURE = new ChangeType(
+    "create or destroy a transition",
+    "org.biojava.bio.dp.MarkovModel",
+    "ARCHITECTURE"
+  );
+  
+  /**
+   * Signals that one or more parameters have altered.
+   * <P>
+   * If it is clear which parameter has changed, then this should be in the
+   * current and/or previous field. Otherwise, these should be null.
+   */
+  public static final ChangeType PARAMETER = new ChangeType(
+    "parameter altered",
+    "org.biojava.bio.dp.MarkovModel",
+    "PARAMETER"
+  );
+  
   /**
    * Alphabet that is emitted by the emission states.
    */
@@ -92,11 +119,11 @@ public interface MarkovModel {
    * @throws IllegalSymbolException if source is not a state in this model
    * @throws IllegalAlphabetException if the distribution has the wrong source
    *         alphabet
-   * @throws ModelVetoException if for any reason the distribution can't be
+   * @throws ChangeVetoException if for any reason the distribution can't be
    *         replaced at this time
    */
   void setWeights(State source, Distribution dist)
-  throws IllegalSymbolException, IllegalAlphabetException, ModelVetoException;
+  throws IllegalSymbolException, IllegalAlphabetException, ChangeVetoException;
   
   /**
    * Returns the FiniteAlphabet of all states that have a transition from 'source'.
@@ -131,50 +158,43 @@ public interface MarkovModel {
    * <P>
    * This should inform each TransitionListener that a transition is to be
    * created using preCreateTransition, and if none of the listeners fire a
-   * ModelVetoException, it should create the transition, and then inform each
+   * ChangeVetoException, it should create the transition, and then inform each
    * TransitionListener with postCreateTransition.
    *
    * @param from  the State currently occupied
    * @param to  the State to move to
    * @throws IllegalSymbolException if either from or to are not legal states
-   * @throws UnsupportedOperationException if an implementation does not allow
-   *         transitions to be created
-   * @throws ModelVetoException if creating the transition is vetoed
+   * @throws ChangeVetoException if creating the transition is vetoed
    */
   void createTransition(State from, State to)
-  throws IllegalSymbolException, UnsupportedOperationException,
-  ModelVetoException;
+  throws IllegalSymbolException, ChangeVetoException;
    
   /**
    * Breaks a transition between two states legal.
    * <P>
    * This should inform each TransitionListener that a transition is to be
    * broken using preDestroyTransition, and if none of the listeners fire a
-   * ModelVetoException, it should break the transition, and then inform each
+   * ChangeVetoException, it should break the transition, and then inform each
    * TransitionListener with postDestroyTransition.
    *
    * @param from  the State currently occupied
    * @param to  the State to move to
    * @throws IllegalSymbolException if either from or to are not legal states
-   * @throws UnsupportedOperationException if an implementation does not allow
-   *         transitions to be destroyed
-   * @throws ModelVetoException if breaking the transition is vetoed
+   * @throws ChangeVetoException if breaking the transition is vetoed
    */
   void destroyTransition(State from, State to)
-  throws IllegalSymbolException, UnsupportedOperationException,
-  ModelVetoException;
+  throws IllegalSymbolException, ChangeVetoException;
 
   /**
    * Adds a state to the model.
    *
    * @param newState  the state to add
-   * @throws UnsupportedOperationException if this MarkovModel doesn't allow
-   *         states to be added
    * @throws IllegalSymbolException if the state is not valid or is a MagicalState
+   * @throws ChangeVetoException  if either the model does not allow states to
+   *         be added, or the change was vetoed
    */
   void addState(State newState)
-  throws UnsupportedOperationException, IllegalSymbolException,
-  ModelVetoException;
+  throws IllegalSymbolException, ChangeVetoException;
 
   /**
    * Remove a state from the model.
@@ -183,30 +203,40 @@ public interface MarkovModel {
    * This is to avoid producing corrupted models by accident.
    *
    * @param toGo  the state to remove
-   * @throws UnsupportedOperationException if the MarkovModel doesn't allow
-   *         states to be removed
    * @throws IllegalSymbolException if the symbol is not part of this model
    *         or a MagicalState
    * @throws IllegalTransitionException if the state is currently involved in
    *         any transitions
+   * @throws ChangeVetoException  if either the model does not allow states to
+   *         be removed, or the change was vetoed
    */
   void removeState(State toGo)
-  throws UnsupportedOperationException, IllegalTransitionException,
-  IllegalSymbolException, ModelVetoException;
-    
-  /**
-   * Register a TransitionListener with the model.
-   *
-   * @param tl   a TransitionListener to notify when transitions are created,
-   *             destroyed or the probabilities changed
-   */
-  void addTransitionListener(TransitionListener tl);
+  throws IllegalTransitionException,
+  IllegalSymbolException, ChangeVetoException;
   
   /**
-   * Unregister a TransitionListener with the model.
+   * Add this as a listener to each distribution in a model. It will pump the
+   * WEIGHTS and NULL_MODEL events on the distribitions over to the HMM.
    *
-   * @param tl   a TransitionListener to no longer notify when transitions are
-   *             created, destroyed or the probabilities changed
+   * @author Matthew Pocock
+   * @since 1.1
    */
-  void removeTransitionListener(TransitionListener tl);
+  public class DistributionForwarder extends ChangeAdapter {
+    public DistributionForwarder(Object source, ChangeSupport cs) {
+      super(source, cs);
+    }
+    
+    protected ChangeEvent generateEvent(ChangeEvent ce) {
+      ChangeType ct = ce.getType();
+      if( (ct == Distribution.WEIGHTS) || (ct == Distribution.NULL_MODEL) ) {
+        return new ChangeEvent(
+          getSource(),
+          PARAMETER,
+          null, null,
+          ce
+        );
+      }
+      return null;
+    }
+  }
 }

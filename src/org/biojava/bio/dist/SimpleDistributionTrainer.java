@@ -25,11 +25,18 @@ package org.biojava.bio.dist;
 import java.util.*;
 import java.io.Serializable;
 
+import org.biojava.utils.*;
+import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
-*An implemenation of a simple distribution trainer
-*/
+ * A simple implemenation of a distribution trainer.
+ * <P>
+ * This requires the distribuiton being trained to have a working setWeight
+ * method that doesn't throw an UnsupportedOperationExcepiton.
+ *
+ * @author Matthew Pocock
+ */
 
 public final class SimpleDistributionTrainer
 implements DistributionTrainer, Serializable {
@@ -62,28 +69,34 @@ implements DistributionTrainer, Serializable {
   }
 
   public void train(double weight)
-  throws IllegalSymbolException {
+  throws ChangeVetoException {
     Distribution nullModel = dis.getNullModel();
     double sum = 0.0;
-    for(
-      Iterator i = ((FiniteAlphabet) dis.getAlphabet()).iterator();
-      i.hasNext();
-    ) {
-      Symbol s = (Symbol) i.next();
-      Double d = (Double) c.get(s);
-      sum += d.doubleValue() +
+    try {
+      for(
+        Iterator i = ((FiniteAlphabet) dis.getAlphabet()).iterator();
+        i.hasNext();
+      ) {
+        Symbol s = (Symbol) i.next();
+        Double d = (Double) c.get(s);
+        sum += d.doubleValue() +
              nullModel.getWeight(s) * weight;
-      // System.out.println(s.getName() + ": sum=" + sum);
-    }
-    for(
-      Iterator i = ((FiniteAlphabet) dis.getAlphabet()).iterator();
-      i.hasNext();
-    ) {
-      Symbol sym = (Symbol) i.next();
-      Double d = (Double) c.get(sym);
-      dis.setWeight(
-        sym,
-        (d.doubleValue() + nullModel.getWeight(sym) * weight) / sum
+             // System.out.println(s.getName() + ": sum=" + sum);
+      }
+      for(
+        Iterator i = ((FiniteAlphabet) dis.getAlphabet()).iterator();
+        i.hasNext();
+      ) {
+        Symbol sym = (Symbol) i.next();
+        Double d = (Double) c.get(sym);
+        dis.setWeight(
+          sym,
+          (d.doubleValue() + nullModel.getWeight(sym) * weight) / sum
+        );
+      }
+    } catch (IllegalSymbolException ise) {
+      throw new BioError(
+        "The alphabet for this distribution is not self-consistent"
       );
     }
   }

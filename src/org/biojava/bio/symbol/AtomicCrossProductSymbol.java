@@ -24,8 +24,6 @@ package org.biojava.bio.symbol;
 import java.util.*;
 import java.io.*;
 
-import org.biojava.bio.*;
-
 /**
  * Concrete implementation of a CrossProductSymbol that represents a single
  * point in a CrossProduct space.

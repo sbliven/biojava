@@ -24,6 +24,7 @@ package org.biojava.bio.dist;
 
 import java.util.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
@@ -47,15 +48,58 @@ import org.biojava.bio.symbol.*;
  */
 
 public abstract class AbstractDistribution implements Distribution {
-    /**
-     * Set the weight of a given symbol in this distribution.  This implementation
-     * simply throws an exception.
-     */
+  protected ChangeSupport changeSupport;
+  
+  {
+    changeSupport = new ChangeSupport();
+  }
+  
+  public void addChangeListener(ChangeListener cl) {
+    if(changeSupport == null) {
+      changeSupport = new ChangeSupport();
+    }
+    
+    synchronized(changeSupport) {
+      changeSupport.addChangeListener(cl);
+    }
+  }
+  
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+    if(changeSupport == null) {
+      changeSupport = new ChangeSupport();
+    }
 
+    synchronized(changeSupport) {
+      changeSupport.addChangeListener(cl, ct);
+    }
+  }
+  
+  public void removeChangeListener(ChangeListener cl) {
+    if(changeSupport != null) {
+      synchronized(changeSupport) {
+        changeSupport.removeChangeListener(cl);
+      }
+    }
+  }
+  
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+    if(changeSupport != null) {
+      synchronized(changeSupport) {
+        changeSupport.removeChangeListener(cl, ct);
+      }
+    }
+  }
+
+  /**
+   * Set the weight of a given symbol in this distribution.  This implementation
+   * simply throws an exception.
+   */
   public void setWeight(Symbol sym, double weight)
-  throws IllegalSymbolException, UnsupportedOperationException {
-    throw new UnsupportedOperationException(
-      "There is no way to set the emission weight for symbol " + sym.getName()
+  throws IllegalSymbolException, ChangeVetoException {
+    throw new ChangeVetoException(
+      "There is no way to set the emission weights " +
+      "in this distribution: symbol " +
+      sym.getName()
     );
   }
   
@@ -134,12 +178,11 @@ public abstract class AbstractDistribution implements Distribution {
     }
   }
   
-    /**
-     * Register an IgnoreCountsTrainer instance as the trainer for this
-     * distribution.  Override this if you wish to implement a trainable
-     * distribution.
-     */
-
+  /**
+   * Register an IgnoreCountsTrainer instance as the trainer for this
+   * distribution.  Override this if you wish to implement a trainable
+   * distribution.
+   */
   public void registerWithTrainer(DistributionTrainerContext dtc) {
     dtc.registerTrainer(this, IgnoreCountsTrainer.getInstance());
   }

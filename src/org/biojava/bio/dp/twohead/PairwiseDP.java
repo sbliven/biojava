@@ -75,8 +75,8 @@ public class PairwiseDP extends DP implements Serializable {
   // BACKWARD
   //
 
-  public void updateTransitions() {
-    super.updateTransitions();
+  public void update() {
+    super.update();
     // workaround for bug in vm
     if(emissionCache != null) {
       for(Iterator i = emissionCache.values().iterator(); i.hasNext(); ) {

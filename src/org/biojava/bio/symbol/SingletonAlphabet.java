@@ -25,6 +25,7 @@ package org.biojava.bio.symbol;
 import java.io.Serializable;
 import java.util.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
@@ -99,4 +100,9 @@ public class SingletonAlphabet implements FiniteAlphabet, Serializable {
       throw new BioError(ise, "This is impossible. I must contain me.");
     }
   }
+
+  public void addChangeListener(ChangeListener cl) {}
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+  public void removeChangeListener(ChangeListener cl) {}
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 }

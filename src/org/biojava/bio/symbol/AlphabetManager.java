@@ -491,7 +491,14 @@ public final class AlphabetManager {
     }
 
     AtomicSymbol res = new WellKnownSymbol(alpha, token, name, (Annotation) null);
-    res.getAnnotation().setProperty("description", description);
+    try {
+      res.getAnnotation().setProperty("description", description);
+    } catch (ChangeVetoException cve) {
+      throw new BioError(
+        cve,
+        "Assertion voilated: there should be nothing to veto this property"
+      );
+    }
     return res;
   }
 

@@ -22,6 +22,8 @@
 
 package org.biojava.bio;
 
+import org.biojava.utils.*;
+
 /**
  * Flags an object as having associated annotation.
  * <P>
@@ -31,11 +33,51 @@ package org.biojava.bio;
  *
  * @author  Matthew Pocock
  */
-public interface Annotatable {
+public interface Annotatable extends Changeable {
+  /**
+   * Signals that the associated Annotation has altered in some way. The
+   * chainedEvent property should refer back to the event fired by the
+   * Annotation object.
+   */
+  public static final ChangeType ANNOTATION = new ChangeType(
+    "the assicated annotation has changed",
+    "org.biojava.bio.Annotatable",
+    "ANNOTATION"
+  );
+    
   /**
    * Should return the associated annotation object.
    *
    * @return	an Annotation object, never null
    */
   Annotation getAnnotation();
+  
+  /**
+   * A helper class so that you don't have to worry about forwarding events from
+   * the Annotaion object to the Annotatable one.
+   * <P>
+   * Once a listener is added to your Annotatable that is interested in
+   * ANNOTATION events, then instantiate one of these and add it as a listener
+   * to the annotation object. It will forward the events to your listeners and
+   * translate them accordingly.
+   *
+   * @author Matthew Pocock
+   */
+  static class AnnotationForwarder extends ChangeAdapter {
+    public AnnotationForwarder(Object source, ChangeSupport cs) {
+      super(source, cs);
+    }
+    
+    protected ChangeEvent generateEvent(ChangeEvent ce) {
+      ChangeType ct = ce.getType();
+      if(ct == Annotation.PROPERTY) {
+        return new ChangeEvent(
+          getSource(),
+          ANNOTATION,
+          ct
+        );
+      }
+      return null;
+    }
+  }
 }

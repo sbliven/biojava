@@ -24,6 +24,7 @@ package org.biojava.bio.program.gff;
 import java.io.*;
 import java.util.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
@@ -108,7 +109,7 @@ public class GFFEntrySet {
    */
   public SequenceAnnotator getAnnotator() {
     return new SequenceAnnotator() {
-      public Sequence annotate(Sequence seq) throws BioException {
+      public Sequence annotate(Sequence seq) throws BioException, ChangeVetoException {
         Feature.Template plain = new Feature.Template();
         StrandedFeature.Template stranded = new StrandedFeature.Template();
         plain.annotation = Annotation.EMPTY_ANNOTATION;

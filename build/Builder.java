@@ -1,22 +1,21 @@
 /*
- *                    BioJava development code
- *
+ * BioJava development code
+ * 
  * This code may be freely distributed and modified under the
  * terms of the GNU Lesser General Public Licence.  This should
  * be distributed with the code.  If you do not have a copy,
  * see:
- *
- *      http://www.gnu.org/copyleft/lesser.html
- *
+ * 
+ * http://www.gnu.org/copyleft/lesser.html
+ * 
  * Copyright for this code is held jointly by the individual
  * authors.  These should be listed in @author doc comments.
- *
+ * 
  * For more information on the BioJava project and its aims,
  * or to join the biojava-l mailing list, visit the home page
  * at:
- *
- *      http://www.biojava.org/
- *
+ * 
+ * http://www.biojava.org
  */
 
 package build;
@@ -25,374 +24,575 @@ import java.util.*;
 import java.io.*;
 
 /**
- * Simple pure java build tool, intended for use with BioJava.
+ * Simple pure java build tool, intended for use with BioJava. 
+ * <P>
+ * Whenever the build tool is run, there should be a file build/Builder.props
+ * available. This file should contain the properties used to configure
+ * building. 
  *
- * @author Thomas Down <td2@sanger.ac.uk>
+ * @author     Thomas Down 
+<td2@sanger.ac.uk>
+ * @author     Matthew Pocock <mrp@sanger.ac.uk>
+ *        
+ * @created    September 20, 2000 
  */
 
 public class Builder {
-    private static FilenameFilter javaFiles = 
-             new EndsWithFilenameFilter(".java");
+  private static FilenameFilter javaFiles = 
+      new EndsWithFilenameFilter(".java");
 
-    private static List javacOptions = new ArrayList();
+  private static List javacOptions = new ArrayList();
 
-    public static void main(String[] args) throws Exception {
-	if (args.length == 0) {
-	    printUsage();
-	    return;
-	}
+  private static Properties props;
+  
+  /**
+   *  Gets the GroupName attribute of the Builder class 
+   *
+   * @param  pack             Description of Parameter 
+   * @return                  The GroupName value 
+   * @exception  IOException  Description of Exception 
+   */
+  public static String getGroupName(File pack) throws IOException {
+    File packInfo = new File(pack, "package.inf");
+    if (!packInfo.exists()) {
+      return null;
+    }
+    BufferedReader br = new BufferedReader(new FileReader(packInfo));
+    String tag = br.readLine();
+    if (!(tag.equals("!!BioJavaBuildTool1"))) {
+      System.out.println("Warning: package " + pack.getPath() + " has invalid package.inf file");
+    }
+    return br.readLine();
+  }
 
-	int thisArg = 0;
-	while (args[thisArg].startsWith("-")) {
-	    if(args[thisArg].startsWith("-C")) {
-		javacOptions.add(args[thisArg].substring(2));
-	    } else {
-		System.err.println("Unknown switch: " + args[thisArg]);
-	    }
 
-	    ++thisArg;
-	    if (thisArg >= args.length) {
-		printUsage();
-		return;
-	    }
-	}
-
-	String command = args[thisArg].toLowerCase();
-	if (command.equals("all"))
-	    buildAll();
-	else if (command.equals("package")) {
-	    List packList = new ArrayList();
-	    for (int i = 1; i < args.length; ++i)
-		packList.add(args[i]);
-	    buildPackages(packList);
-	} else if (command.equals("docs")) {
-	    buildDocs();
-	} else {
-	    printUsage();
-	}
+  /**
+   *  Gets the AllPackages attribute of the Builder class 
+   *
+   * @param  root             Description of Parameter 
+   * @param  dont             Description of Parameter 
+   * @return                  The AllPackages value 
+   * @exception  IOException  Description of Exception 
+   */
+  public static List getAllPackages(File root, boolean dont) throws IOException {
+    List l = new ArrayList();
+    boolean includeSelf = false;
+    File[] all = root.listFiles();
+    for (int i = 0; i < all.length; ++i) {
+      if (!dont && !includeSelf && javaFiles.accept(root, all[i].getName())) {
+        includeSelf = true;
+      }
+      if (all[i].isDirectory()) {
+        l.addAll(getAllPackages(all[i], false));
+      }
     }
 
-    public static void printUsage() {
-	System.out.println("BioJava integrated build tool 0.01");
-	System.out.println("java build.Builder [all | package <name> | docs]");
-	System.out.println("Compiler switched may be specified with -C before the action command");
-	System.out.println("Example: java build.Builder -C-deprecation all");
+    if (includeSelf) {
+      l.add(root);
     }
 
-    public static void buildAll() throws IOException {
-	System.out.println("Running complete build...");
-	File classDir = new File("class");
-	if (classDir.exists()) {
-	    System.out.println("Deleting old build tree...");
-	    rm_rf(classDir);
-	}
-	classDir.mkdir();
-	List packs = getAllPackages(new File("src"), true);
-	System.out.println("Compiling...");
-	for (Iterator i = packs.iterator(); i.hasNext(); ) {
-	    File pd = (File) i.next();
-	    List javaFiles = getJavaFiles(pd);
-	    if (compile(javaFiles) != 0)
-		throw new IOException("Couldn't build!");
-	}
-	System.out.println("Packaging...");
-	runcmd("jar -cf biojava.jar -C class .");
-	runcmd("jar -uf biojava.jar -C resources .");
-	runcmd("jar -ufm biojava.jar manifest/defaultmanifest.txt");
-	System.out.println("New biojava.jar built.  Share and enjoy!");
+    return l;
+  }
+
+
+  /**
+   *  Gets the JavaFiles attribute of the Builder class 
+   *
+   * @param  pd               Description of Parameter 
+   * @return                  The JavaFiles value 
+   * @exception  IOException  Description of Exception 
+   */
+  public static List getJavaFiles(File pd) throws IOException {
+    List jf = new ArrayList();
+    File[] javas = pd.listFiles(javaFiles);
+    for (int n = 0; n < javas.length; ++n) {
+      jf.add(javas[n]);
     }
+    return jf;
+  }
 
-    public static void buildPackages(List packs) throws IOException {
-	System.out.println("Running partial build...");
-	List newPacks = new ArrayList();
-	List newPackNames = new ArrayList();
-	for (Iterator i = packs.iterator(); i.hasNext(); ) {
-	    String pn = (String) i.next();
-	    StringBuffer npn = new StringBuffer("src");
-	    for (StringTokenizer toke = new StringTokenizer(pn, ".");
-		 toke.hasMoreTokens(); ) 
-	    {
-		npn.append(File.separatorChar);
-		npn.append(toke.nextToken());
-	    }
-	    File pf = new File(npn.toString());
-	    if (pf.isDirectory()) {
-		newPacks.add(pf);
-		newPackNames.add(npn.toString().substring(4)); // CAVE
-	    } else
-		System.err.println("Warning: package " + pn + " not found");
-	}
+  /**
+   * Extracts a list of paths from the javac.classpath property.
+   * <P>
+   * The property "javac.classpath" should contain a "|" seperated list of
+   * directories and files to be added to the comile-time classpath.
+   *
+   * @return an array of Strings containing each element of the classpath
+   */
 
-	if (newPacks.size() == 0) {
-	    System.err.println("No packages to build.");
-	    return;
-	}
-
-	System.out.println("Compiling...");
-	for (Iterator i = newPacks.iterator(); i.hasNext(); ) {
-	    File pd = (File) i.next();
-	    List javaFiles = getJavaFiles(pd);
-	    if (compile(javaFiles) != 0)
-		throw new IOException("Couldn't build!");
-	}
-	System.out.println("Packaging...");
-	String[] command = new String[6];
-	command[0] = "jar";
-	command[1] = "-uf";
-	command[2] = "biojava.jar";
-	command[3] = "-C";
-	command[4] = "class";
-	for (int i = 0; i < newPackNames.size(); ++i) {
-	    command[5] = (String) newPackNames.get(i);
-
-	    Process p = Runtime.getRuntime().exec(command);
-	    OutputSpinner os = new OutputSpinner(p.getErrorStream(), System.out);
-	    os.start();
-	    Thread.yield();
-	    try {
-		p.waitFor();
-	    } catch (InterruptedException ex) {
-		ex.printStackTrace();
-	    }
-	    Thread.yield();
-	    if (p.exitValue() != 0)
-		throw new IOException("Packaging error!");
-	}
-
-	System.out.println("" + newPacks.size() + " package(s) successfully rebuilt");
+  public static String [] getClassPath() {
+    String cp = props.getProperty("javac.classpath");
+    List cpl = new ArrayList();
+    for(StringTokenizer stok = new StringTokenizer(cp, "|"); stok.hasMoreTokens(); ) {
+      cpl.add(stok.nextToken());
     }
+    return (String []) cpl.toArray(new String[0]);
+  }
 
-    public static void buildDocs() throws IOException {
-	System.out.println("Building API documentation...");
-	File docDir = new File("docs");
-	if (docDir.exists()) {
-	    System.out.println("Deleting existing documentation tree...");
-	    rm_rf(docDir);
-	}
-	docDir.mkdir();
-	File apiDocDir = new File(docDir, "api");
-	apiDocDir.mkdir();
-	File srcDir = new File("src");
-	List packs = getAllPackages(srcDir, true);
-	List pkgNames = new ArrayList();
-	Map pkgGroups = new HashMap();
-	for (Iterator i = packs.iterator(); i.hasNext(); ) {
-	    File pack = (File) i.next();
-	    String path = pack.getPath();
-	    List temp = new LinkedList();
-	    for (File gopher = pack; !(gopher.equals(srcDir)); gopher = gopher.getParentFile()) {
-		temp.add(0, gopher.getName());
-	    }
-	    StringBuffer pn = new StringBuffer();
-	    for (int item = 0; item < temp.size(); ++item) {
-		if (item != 0)
-		    pn.append('.');
-		pn.append((String) temp.get(item));
-	    }
-
-	    pkgNames.add(pn.toString());
-
-	    String groupName = getGroupName(pack);
-	    if (groupName != null) {
-		List grp = (List) pkgGroups.get(groupName);
-		if (grp == null) {
-		    grp = new ArrayList();
-		    pkgGroups.put(groupName, grp);
-		}
-		grp.add(pn.toString());
-	    }
-	}
-
-	List groupsOrder = new ArrayList();
-	for (Iterator i = pkgGroups.keySet().iterator(); i.hasNext(); ) {
-	    String s = (String) i.next();
-	    if (s.startsWith("Core "))
-		groupsOrder.add(0, s);
-	    else
-		groupsOrder.add(s);
-	}
-
-	System.out.println("Running Javadoc...");
-	String[] command = new String[11 + pkgGroups.size() * 3 + pkgNames.size()];
-	command[0] = "javadoc";
-	command[1] = "-sourcepath";
-	command[2] = "src";
-	command[3] = "-classpath";
-	command[4] = makePath(new String[] {"class", "xerces.jar"});
-	command[5] = "-d";
-	command[6] = apiDocDir.getPath();
-	command[7] = "-version";
-	command[8] = "-author";
-	command[9] = "-windowtitle";
-	command[10] = "Biojava Public API documentation";
-	int indx = 11;
-	for (Iterator i = groupsOrder.iterator(); i.hasNext(); ) {
-	    String gname = (String) i.next();
-	    command[indx++] = "-group";
-	    command[indx++] = gname;
-	    StringBuffer sb = new StringBuffer();
-	    List grp = (List) pkgGroups.get(gname);
-	    for (Iterator gi = grp.iterator(); gi.hasNext(); ) {
-		if (sb.length() != 0)
-		    sb.append(':');
-		sb.append((String) gi.next());
-	    }
-	    command[indx++] = sb.toString();
-	}
-	for (Iterator i = pkgNames.iterator(); i.hasNext(); ) {
-	    command[indx++] = (String) i.next();
-	}
-	Process p = Runtime.getRuntime().exec(command);
-	OutputSpinner es = new OutputSpinner(p.getErrorStream(), System.err);
-	OutputSpinner os = new OutputSpinner(p.getInputStream(), null);
-	os.start();
-	es.start();
-	Thread.yield();
-	try {
-	    p.waitFor();
-	} catch (InterruptedException ex) {
-	    ex.printStackTrace();
-	}
-	Thread.yield();
-
-	if (p.exitValue() != 0)
-	    System.out.println("JavaDoc errors...");
-	else
-	    System.out.println("Documentation built okay...");
-    }
-
-    public static String getGroupName(File pack) throws IOException {
-	File packInfo = new File(pack, "package.inf");
-	if (!packInfo.exists())
-	    return null;
-	BufferedReader br = new BufferedReader(new FileReader(packInfo));
-	String tag = br.readLine();
-	if (! (tag.equals("!!BioJavaBuildTool1")))
-	    System.out.println("Warning: package " + pack.getPath() + " has invalid package.inf file");
-	return br.readLine();
+  public static String getJarTarget() {
+    return props.getProperty("jar.target");
+  }
+  
+  public static String getJarManifest() {
+    return props.getProperty("jar.manifest");
+  }
+  
+  /**
+   *  The main program for the Builder class 
+   *
+   * @param  args           The command line arguments 
+   * @exception  Exception  Description of Exception 
+   */
+  public static void main(String[] args) throws Exception {
+    if (args.length == 0) {
+      printUsage();
+      return;
     }
     
-    public static int compile(List filenames) throws IOException {
-	String[] command = new String[7 + filenames.size() + javacOptions.size()];
-	int pos = 0;
-	command[pos++] = "javac";
-	for (Iterator i = javacOptions.iterator(); i.hasNext(); ) {
-	    command[pos++] = (String) i.next();
-	}
-	command[pos++] = "-classpath";
-	command[pos++] = makePath(new String[] {"class", "xerces.jar"});
-	command[pos++] = "-sourcepath";
-	command[pos++] = "src";
-	command[pos++] = "-d";
-	command[pos++] = "class";
-  	for (Iterator i = filenames.iterator(); i.hasNext(); ) {
-  	    command[pos++] = ((File) i.next()).getCanonicalPath();
+    props = new Properties();
+    File propFile =
+        new File(System.getProperties().getProperty("user.dir") + "/build/Builder.props");
+    props.load(new FileInputStream(propFile));
+
+    int thisArg = 0;
+    while (args[thisArg].startsWith("-")) {
+      if (args[thisArg].startsWith("-C")) {
+        javacOptions.add(args[thisArg].substring(2));
+      }
+      else {
+        System.err.println("Unknown switch: " + args[thisArg]);
+      }
+
+      ++thisArg;
+      if (thisArg >= args.length) {
+        printUsage();
+        return;
+      }
+    }
+
+    String command = args[thisArg].toLowerCase();
+    if (command.equals("all")) {
+      buildAll();
+    }
+    else if (command.equals("package")) {
+      List packList = new ArrayList();
+      for (int i = 1; i < args.length; ++i) {
+        packList.add(args[i]);
+      }
+      buildPackages(packList);
+    }
+    else if (command.equals("docs")) {
+      buildDocs();
+    }
+    else {
+      printUsage();
+    }
+  }
+
+
+  /**
+   *  Description of the Method 
+   */
+  public static void printUsage() {
+    System.out.println("BioJava integrated build tool 0.01");
+    System.out.println("java build.Builder [all | package <name> | docs]");
+    System.out.println("Compiler switched may be specified with -C before the action command");
+    System.out.println("Example: java build.Builder -C-deprecation all");
+  }
+
+
+  /**
+   *  Description of the Method 
+   *
+   * @exception  IOException  Description of Exception 
+   */
+  public static void buildAll() throws IOException {
+    System.out.println("Running complete build...");
+    File classDir = new File("class");
+    if (classDir.exists()) {
+      System.out.println("Deleting old build tree...");
+      rm_rf(classDir);
+    }
+    classDir.mkdir();
+    List packs = getAllPackages(new File("src"), true);
+    System.out.println("Compiling...");
+    for (Iterator i = packs.iterator(); i.hasNext(); ) {
+      File pd = (File) i.next();
+      List javaFiles = getJavaFiles(pd);
+      if (compile(javaFiles) != 0) {
+        throw new IOException("Couldn't build!");
+      }
+    }
+    System.out.println("Packaging...");
+    String jarTarget = getJarTarget();
+    String jarManifest = getJarManifest();
+    
+    runcmd("jar -cf " + jarTarget + " -C class .");
+    runcmd("jar -uf " + jarTarget + " -C resources .");
+    if(jarManifest != null) {
+      runcmd("jar -ufm " + jarTarget + " " + jarManifest);
+    }
+    System.out.println("New " + jarTarget + " built.  Share and enjoy!");
+  }
+
+
+  /**
+   *  Description of the Method 
+   *
+   * @param  packs            Description of Parameter 
+   * @exception  IOException  Description of Exception 
+   */
+  public static void buildPackages(List packs) throws IOException {
+    System.out.println("Running partial build...");
+    List newPacks = new ArrayList();
+    List newPackNames = new ArrayList();
+    for (Iterator i = packs.iterator(); i.hasNext(); ) {
+      String pn = (String) i.next();
+      StringBuffer npn = new StringBuffer("src");
+      for (StringTokenizer toke = new StringTokenizer(pn, "."); 
+          toke.hasMoreTokens(); ) {
+        npn.append(File.separatorChar);
+        npn.append(toke.nextToken());
+      }
+      File pf = new File(npn.toString());
+      if (pf.isDirectory()) {
+        newPacks.add(pf);
+        newPackNames.add(npn.toString().substring(4));
+        // CAVE
+      }
+      else {
+        System.err.println("Warning: package " + pn + " not found");
+      }
+    }
+
+    if (newPacks.size() == 0) {
+      System.err.println("No packages to build.");
+      return;
+    }
+
+    System.out.println("Compiling...");
+    for (Iterator i = newPacks.iterator(); i.hasNext(); ) {
+      File pd = (File) i.next();
+      List javaFiles = getJavaFiles(pd);
+      if (compile(javaFiles) != 0) {
+        throw new IOException("Couldn't build!");
+      }
+    }
+    System.out.println("Packaging...");
+    String[] command = new String[6];
+    command[0] = "jar";
+    command[1] = "-uf";
+    command[2] = getJarTarget();
+    command[3] = "-C";
+    command[4] = "class";
+    for (int i = 0; i < newPackNames.size(); ++i) {
+      command[5] = (String) newPackNames.get(i);
+
+      Process p = Runtime.getRuntime().exec(command);
+      OutputSpinner os = new OutputSpinner(p.getErrorStream(), System.out);
+      os.start();
+      Thread.yield();
+      try {
+        p.waitFor();
+      }
+      catch (InterruptedException ex) {
+        ex.printStackTrace();
+      }
+      Thread.yield();
+      if (p.exitValue() != 0) {
+        throw new IOException("Packaging error!");
+      }
+    }
+
+    System.out.println("" + newPacks.size() + " package(s) successfully rebuilt");
+  }
+
+
+  /**
+   *  Description of the Method 
+   *
+   * @exception  IOException  Description of Exception 
+   */
+  public static void buildDocs() throws IOException {
+    System.out.println("Building API documentation...");
+    File docDir = new File("docs");
+    if (docDir.exists()) {
+      System.out.println("Deleting existing documentation tree...");
+      rm_rf(docDir);
+    }
+    docDir.mkdir();
+    File apiDocDir = new File(docDir, "api");
+    apiDocDir.mkdir();
+    File srcDir = new File("src");
+    List packs = getAllPackages(srcDir, true);
+    List pkgNames = new ArrayList();
+    Map pkgGroups = new HashMap();
+    for (Iterator i = packs.iterator(); i.hasNext(); ) {
+      File pack = (File) i.next();
+      String path = pack.getPath();
+      List temp = new LinkedList();
+      for (File gopher = pack; !(gopher.equals(srcDir)); gopher = gopher.getParentFile()) {
+        temp.add(0, gopher.getName());
+      }
+      StringBuffer pn = new StringBuffer();
+      for (int item = 0; item < temp.size(); ++item) {
+        if (item != 0) {
+          pn.append('.');
         }
-	
-	Process p = Runtime.getRuntime().exec(command);
-	OutputSpinner os = new OutputSpinner(p.getErrorStream(), System.out);
-	os.start();
-	Thread.yield();
-	try {
-	    p.waitFor();
-	} catch (InterruptedException ex) {
-	    ex.printStackTrace();
-	}
-	Thread.yield();
+        pn.append((String) temp.get(item));
+      }
 
-	return p.exitValue();
+      pkgNames.add(pn.toString());
+
+      String groupName = getGroupName(pack);
+      if (groupName != null) {
+        List grp = (List) pkgGroups.get(groupName);
+        if (grp == null) {
+          grp = new ArrayList();
+          pkgGroups.put(groupName, grp);
+        }
+        grp.add(pn.toString());
+      }
     }
 
-    public static List getAllPackages(File root, boolean dont) throws IOException {
-	List l = new ArrayList();
-	boolean includeSelf = false;
-	File[] all = root.listFiles();
-	for (int i = 0; i < all.length; ++i) {
-	    if (!dont && !includeSelf && javaFiles.accept(root, all[i].getName()))
-		includeSelf = true;
-            if (all[i].isDirectory())
-		l.addAll(getAllPackages(all[i], false));
-	}
-
-	if (includeSelf)
-	    l.add(root);
-
-	return l;
+    List groupsOrder = new ArrayList();
+    for (Iterator i = pkgGroups.keySet().iterator(); i.hasNext(); ) {
+      String s = (String) i.next();
+      if (s.startsWith("Core ")) {
+        groupsOrder.add(0, s);
+      }
+      else {
+        groupsOrder.add(s);
+      }
     }
 
-    public static List getJavaFiles(File pd) throws IOException {
-	List jf = new ArrayList();
-	File[] javas = pd.listFiles(javaFiles);
-	for (int n=0; n < javas.length; ++n)
-	    jf.add(javas[n]);
-	return jf;
+    System.out.println("Running Javadoc...");
+    String[] command = new String[11 + pkgGroups.size() * 3 + pkgNames.size()];
+    command[0] = "javadoc";
+    command[1] = "-sourcepath";
+    command[2] = "src";
+    command[3] = "-classpath";
+    command[4] = makePath(getClassPath());
+    command[5] = "-d";
+    command[6] = apiDocDir.getPath();
+    command[7] = "-version";
+    command[8] = "-author";
+    command[9] = "-windowtitle";
+    command[10] = "Biojava Public API documentation";
+    int indx = 11;
+    for (Iterator i = groupsOrder.iterator(); i.hasNext(); ) {
+      String gname = (String) i.next();
+      command[indx++] = "-group";
+      command[indx++] = gname;
+      StringBuffer sb = new StringBuffer();
+      List grp = (List) pkgGroups.get(gname);
+      for (Iterator gi = grp.iterator(); gi.hasNext(); ) {
+        if (sb.length() != 0) {
+          sb.append(':');
+        }
+        sb.append((String) gi.next());
+      }
+      command[indx++] = sb.toString();
+    }
+    for (Iterator i = pkgNames.iterator(); i.hasNext(); ) {
+      command[indx++] = (String) i.next();
+    }
+    Process p = Runtime.getRuntime().exec(command);
+    OutputSpinner es = new OutputSpinner(p.getErrorStream(), System.err);
+    OutputSpinner os = new OutputSpinner(p.getInputStream(), null);
+    os.start();
+    es.start();
+    Thread.yield();
+    try {
+      p.waitFor();
+    }
+    catch (InterruptedException ex) {
+      ex.printStackTrace();
+    }
+    Thread.yield();
+
+    if (p.exitValue() != 0) {
+      System.out.println("JavaDoc errors...");
+    }
+    else {
+      System.out.println("Documentation built okay...");
+    }
+  }
+
+
+  /**
+   *  Description of the Method 
+   *
+   * @param  filenames        Description of Parameter 
+   * @return                  Description of the Returned Value 
+   * @exception  IOException  Description of Exception 
+   */
+  public static int compile(List filenames) throws IOException {
+    String[] command = new String[7 + filenames.size() + javacOptions.size()];
+    int pos = 0;
+    command[pos++] = "javac";
+    for (Iterator i = javacOptions.iterator(); i.hasNext(); ) {
+      command[pos++] = (String) i.next();
+    }
+    command[pos++] = "-classpath";
+    command[pos++] = makePath(getClassPath());
+    command[pos++] = "-sourcepath";
+    command[pos++] = "src";
+    command[pos++] = "-d";
+    command[pos++] = "class";
+    for (Iterator i = filenames.iterator(); i.hasNext(); ) {
+      command[pos++] = ((File) i.next()).getCanonicalPath();
     }
 
-    public static int runcmd(String cmd) throws IOException {
-	Process p = Runtime.getRuntime().exec(cmd);
-	OutputSpinner os = new OutputSpinner(p.getErrorStream(), System.out);
-	os.start();
-	try {
-	    p.waitFor();
-	} catch (InterruptedException ex) {
-	}
-	return p.exitValue();
+    Process p = Runtime.getRuntime().exec(command);
+    OutputSpinner os = new OutputSpinner(p.getErrorStream(), System.out);
+    os.start();
+    Thread.yield();
+    try {
+      p.waitFor();
     }
+    catch (InterruptedException ex) {
+      ex.printStackTrace();
+    }
+    Thread.yield();
 
-    public static String makePath(String[] parts) {
-	StringBuffer path = new StringBuffer();
-	for (int i = 0; i < parts.length; ++i) {
-	    if (i > 0)
-		path.append(System.getProperty("path.separator"));
-	    path.append(parts[i]);
-	}
-	return path.toString();
-    }
+    return p.exitValue();
+  }
 
-    public static void rm_rf(File dir) throws IOException {
-	File[] f = dir.listFiles();
-        for (int i = 0; i < f.length; ++i) {
-	    if (f[i].isDirectory())
-		rm_rf(f[i]);
-	    else
-		f[i].delete();
-	}
-	dir.delete();
+
+  /**
+   *  Description of the Method 
+   *
+   * @param  cmd              Description of Parameter 
+   * @return                  Description of the Returned Value 
+   * @exception  IOException  Description of Exception 
+   */
+  public static int runcmd(String cmd) throws IOException {
+    Process p = Runtime.getRuntime().exec(cmd);
+    OutputSpinner os = new OutputSpinner(p.getErrorStream(), System.out);
+    os.start();
+    try {
+      p.waitFor();
     }
+    catch (InterruptedException ex) {
+    }
+    return p.exitValue();
+  }
+
+
+  /**
+   *  Description of the Method 
+   *
+   * @param  parts  Description of Parameter 
+   * @return        Description of the Returned Value 
+   */
+  public static String makePath(String[] parts) {
+    StringBuffer path = new StringBuffer();
+    for (int i = 0; i < parts.length; ++i) {
+      if (i > 0) {
+        path.append(System.getProperty("path.separator"));
+      }
+      path.append(parts[i]);
+    }
+    return path.toString();
+  }
+
+
+  /**
+   *  Description of the Method 
+   *
+   * @param  dir              Description of Parameter 
+   * @exception  IOException  Description of Exception 
+   */
+  public static void rm_rf(File dir) throws IOException {
+    File[] f = dir.listFiles();
+    for (int i = 0; i < f.length; ++i) {
+      if (f[i].isDirectory()) {
+        rm_rf(f[i]);
+      }
+      else {
+        f[i].delete();
+      }
+    }
+    dir.delete();
+  }
 }
 
-
+/**
+ *  Description of the Class 
+ *
+ * @author     mp1 
+ * @created    September 20, 2000 
+ */
 class OutputSpinner extends Thread {
-    private InputStream in;
-    private OutputStream out;
 
-    public OutputSpinner(InputStream in, OutputStream out) {
-	super();
-	this.in = in;
-	this.out = out;
-    }
 
-    public void run() {
-	try {
-	    int b;
-	    while ((b = in.read()) != -1)
-		if (out != null)
-		    out.write(b);
-	} catch (IOException ex) {
-	    ex.printStackTrace();
-	}
+  private InputStream in;
+  private OutputStream out;
+
+
+  /**
+   *  Constructor for the OutputSpinner object 
+   *
+   * @param  in   Description of Parameter 
+   * @param  out  Description of Parameter 
+   */
+  public OutputSpinner(InputStream in, OutputStream out) {
+    super();
+    this.in = in;
+    this.out = out;
+  }
+
+
+  /**
+   *  Main processing method for the OutputSpinner object 
+   */
+  public void run() {
+    try {
+      int b;
+      while ((b = in.read()) != -1) {
+        if (out != null) {
+          out.write(b);
+        }
+      }
     }
+    catch (IOException ex) {
+      ex.printStackTrace();
+    }
+  }
 }
 
-
+/**
+ *  Description of the Class 
+ *
+ * @author     mp1 
+ * @created    September 20, 2000 
+ */
 class EndsWithFilenameFilter implements FilenameFilter {
-    private String fs;
 
-    EndsWithFilenameFilter(String fs) {
-	this.fs = fs.toLowerCase();
-    }
 
-    public boolean accept(File dir, String name) {
-	return (name.toLowerCase().endsWith(fs) && !name.startsWith("."));
-    }
+  private String fs;
+
+
+  /**
+   *  Constructor for the EndsWithFilenameFilter object 
+   *
+   * @param  fs  Description of Parameter 
+   */
+  EndsWithFilenameFilter(String fs) {
+    this.fs = fs.toLowerCase();
+  }
+
+
+  /**
+   *  Description of the Method 
+   *
+   * @param  dir   Description of Parameter 
+   * @param  name  Description of Parameter 
+   * @return       Description of the Returned Value 
+   */
+  public boolean accept(File dir, String name) {
+    return (name.toLowerCase().endsWith(fs) && !name.startsWith("."));
+  }
 }
+

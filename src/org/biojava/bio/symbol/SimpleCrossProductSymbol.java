@@ -24,6 +24,7 @@ package org.biojava.bio.symbol;
 import java.util.*;
 import java.io.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
@@ -100,5 +101,10 @@ implements CrossProductSymbol, Serializable {
     }
     return this.matches;
   }
+
+  public void addChangeListener(ChangeListener cl) {}
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+  public void removeChangeListener(ChangeListener cl) {}
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {} 
 }
 

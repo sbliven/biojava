@@ -35,7 +35,17 @@ import org.biojava.utils.*;
  *
  * @author Matthew Pocock
  */
-public interface SymbolList {
+public interface SymbolList extends Changeable {
+  /**
+   * Signals that the SymbolList is being edited. The getChange field of the
+   * event should contain the SymbolList.Edit object describing the change.
+   */
+  public static final ChangeType EDIT = new ChangeType(
+    "the SymbolList has been edited",
+    "org.biojava.bio.symbol.SymbolList",
+    "EDIT"
+  );
+  
   /**
    * The alphabet that this SymbolList is over.
    * <P>
@@ -114,9 +124,24 @@ public interface SymbolList {
    * @param end the last symbol to include
    * @return the string representation
    * @throws IndexOutOfBoundsException if either start or end are not within the
-   *         sequence
+   *         SymbolList
    */
   String subStr(int start, int end) throws IndexOutOfBoundsException;
+  
+  /**
+   * Aply an edit to the SymbolList as specified by the edit object.
+   *
+   * @param edit the Edit to perform
+   * @throws IndexOutOfBoundsException if the edit does not lie within the
+   *         SymbolList
+   * @throws IllegalAlphabetException if the SymbolList to insert has an
+   *         incompatible alphabet
+   * @throws ChangeVetoException  if either the SymboList does not support the
+   *         edit, or if the change was vetoed
+   */
+  void edit(Edit edit)
+  throws IndexOutOfBoundsException, IllegalAlphabetException,
+  ChangeVetoException;
   
   /**
    * A useful object that represents an empty symbol list, to avoid returning
@@ -125,7 +150,7 @@ public interface SymbolList {
    * @author Matthew Pocock
    */
   static final SymbolList EMPTY_LIST = new EmptySymbolList();
-  
+    
   /**
    * The empty immutable implementation.
    */
@@ -164,6 +189,18 @@ public interface SymbolList {
         "You can not retrieve part of an empty symbol list"
       );
     }
+
+    public void edit(Edit edit)
+    throws IndexOutOfBoundsException, ChangeVetoException {
+      throw new ChangeVetoException(
+        "You can't edit the empty symbol list"
+      );
+    }
+    
+    public void addChangeListener(ChangeListener cl) {}
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+    public void removeChangeListener(ChangeListener cl) {}
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 
     private Object writeReplace() throws ObjectStreamException {
       try {

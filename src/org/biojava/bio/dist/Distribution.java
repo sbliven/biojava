@@ -24,13 +24,14 @@ package org.biojava.bio.dist;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.utils.*;
 
 /**
  * An encapsulation of a probability distribution over the Symbols within an
  * alphabet.
  * <P>
  * A distribution is effectively a map from symbol to probability. You may
- * choose to store odds instead ( p(x) / p(H_0) ), but it is not guaranteed that
+ * choose to store something else instead, but it is not guaranteed that
  * all algorithms will work correctly.
  * <P>
  * This interface should handle the case of emitting an ambiguity symbol. In
@@ -43,7 +44,36 @@ import org.biojava.bio.symbol.*;
  *
  * @author Matthew Pocock
  */
-public interface Distribution {
+public interface Distribution extends Changeable {
+  /**
+   * Whenever a distribution changes the values that would be returned by
+   * getWeight, they should fire a ChangeEvent with this object as the type.
+   * <P>
+   * If the whole distribution changes, then the change and previous fields of
+   * the ChangeEvent should be left null. If only a single weight is modified,
+   * then change should be of the form Object[] { symbol, new Double(newVal) }
+   * and previous should be of the form Object[] { symbol, new Double(oldVal) }
+   */
+  public static final ChangeType WEIGHTS = new ChangeType(
+    "distribution weights changed",
+    "org.biojava.bio.dist.Distribution",
+    "WEIGHTS"
+  );
+
+  /**
+   * Whenever the null model distribution changes the values that would be
+   * returned by getWeight, either by being edited or by being replaced, a
+   * ChangeEvent with this object as the type should be thrown.
+   * <P>
+   * If the null model has changed its weights, then the ChangeEvent should
+   * refer back to the ChangeEvent from the null model. 
+   */
+  public static final ChangeType NULL_MODEL = new ChangeType(
+    "distribution null model changed",
+    "org.biojava.bio.dist.Distribution",
+    "NULL_MODEL"
+  );
+  
   /**
    * The alphabet from which this spectrum emits symbols.
    *
@@ -71,11 +101,11 @@ public interface Distribution {
    * @throws IllegalSymbolException if s is not from this state's alphabet, or
    *         if it is an ambiguity symbol and the implementation can't handle
    *         this case
-   * @throws UnsupportedOperationException if this state does not allow weights
-   *         to be tampered with
+   * @throws ChangeVetoException if this state does not allow weights
+   *         to be tampered with, or if one of the listeners vetoed this change
    */
   void setWeight(Symbol s, double w)
-  throws IllegalSymbolException, UnsupportedOperationException;
+  throws IllegalSymbolException, ChangeVetoException;
 
   /**
    * Sample a symbol from this state's probability distribution.
@@ -90,6 +120,17 @@ public interface Distribution {
    * @return  the apropriate null model
    */
   Distribution getNullModel();
+  
+  /**
+   * Set the null model Distribution that this Distribution recognizes.
+   *
+   * @param nullDist  the new null model Distribution
+   * @throws IllegalAlphabetException if the null model has the wrong alphabet
+   * @throws ChangeVetoException  if this Distirbution doesn't support setting
+   *         the null model, or if one of its listeners objects
+   */
+  void setNullModel(Distribution nullDist)
+  throws IllegalAlphabetException, ChangeVetoException;
   
   /**
    * Register this distribution with a training context.

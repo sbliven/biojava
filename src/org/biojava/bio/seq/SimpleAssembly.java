@@ -23,8 +23,9 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 
-import org.biojava.bio.symbol.*;
+import org.biojava.utils.*;
 import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A Sequence which is assembled from other sequences contained
@@ -195,7 +196,7 @@ public class SimpleAssembly extends AbstractSymbolList
     }
 
     public Feature createFeature(Feature.Template temp) 
-        throws BioException
+        throws BioException, ChangeVetoException
     {
 	if (temp.location.getMin() < 1 || temp.location.getMax() > length)
 	    throw new BioException("Coordinates out of range");
@@ -219,10 +220,12 @@ public class SimpleAssembly extends AbstractSymbolList
 	return f;
     }
 
-    public void removeFeature(Feature f) {
-	if (f instanceof ComponentFeature)
-	    removeComponent(f.getLocation());
-	features.removeFeature(f);
+    public void removeFeature(Feature f)
+    throws ChangeVetoException {
+      if (f instanceof ComponentFeature) {
+        removeComponent(f.getLocation());
+      }
+      features.removeFeature(f);
     }
 
     //

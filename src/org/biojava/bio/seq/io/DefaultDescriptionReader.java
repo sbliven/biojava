@@ -25,6 +25,7 @@ package org.biojava.bio.seq.io;
 import java.util.NoSuchElementException;
 import java.io.Serializable;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 
@@ -61,10 +62,19 @@ implements FastaDescriptionReader, Serializable {
   public void parseAnnotation(String desc, Annotation annotation) {
     java.util.StringTokenizer toc = new java.util.StringTokenizer(desc);
     String id = toc.nextToken();
-    if(id != null)
-      annotation.setProperty("id", id);
-    if(toc.hasMoreTokens())
-      annotation.setProperty("description", toc.nextToken("******"));
+    try {
+      if(id != null) {
+        annotation.setProperty("id", id);
+      }
+      if(toc.hasMoreTokens()) {
+        annotation.setProperty("description", toc.nextToken("******"));
+      }
+    } catch (ChangeVetoException cve) {
+      throw new BioError(
+        cve,
+        "Couldn't parse decription as the annotation wouldn't let me add stuff"
+      );
+    }
   }
 
   public String writeDescription(Sequence seq) {

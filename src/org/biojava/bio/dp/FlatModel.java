@@ -25,6 +25,7 @@ package org.biojava.bio.dp;
 import java.util.*;
 import java.io.Serializable;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
@@ -42,12 +43,38 @@ class FlatModel implements MarkovModel, Serializable {
   private final MarkovModel source;
   private final MarkovModel delegate;
   
+  protected ChangeSupport changeSupport;
+  
+  protected void generateChangeSupport(ChangeType ct) {
+    if(changeSupport == null) {
+      changeSupport = new ChangeSupport();
+    }
+  }
+  
+  public void addChangeListener(ChangeListener cl) {
+    generateChangeSupport(null);
+    changeSupport.addChangeListener(cl);
+  }
+  
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+    generateChangeSupport(ct);
+    changeSupport.addChangeListener(cl, ct);
+  }
+
+  public void removeChangeListener(ChangeListener cl) {
+    changeSupport.removeChangeListener(cl);
+  }
+  
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+    changeSupport.removeChangeListener(cl, ct);
+  }
+
   protected void addAState(State ourState)
   throws IllegalSymbolException {
     try {
       delegate.addState(ourState);
-    } catch (ModelVetoException mve) {
-      throw new BioError(mve, "This model should be ours with no listeners");
+    } catch (ChangeVetoException cve) {
+      throw new BioError(cve, "This model should be ours with no listeners");
     }
   }
 
@@ -88,8 +115,8 @@ class FlatModel implements MarkovModel, Serializable {
   }
   
   public void setWeights(State source, Distribution dist)
-  throws ModelVetoException {
-    throw new ModelVetoException("Can't set weights in immutable view");
+  throws ChangeVetoException {
+    throw new ChangeVetoException("Can't set weights in immutable view");
   }
   
   public FlatModel(MarkovModel model)
@@ -217,9 +244,9 @@ class FlatModel implements MarkovModel, Serializable {
       SimpleReversibleTranslationTable table =
         (SimpleReversibleTranslationTable) dist.getTable();
       try {
-          delegate.setWeights(s, dist);
-      } catch (ModelVetoException mve) {
-        throw new BioError(mve, "Couldn't edit delegate model");
+        delegate.setWeights(s, dist);
+      } catch (ChangeVetoException cve) {
+        throw new BioError(cve, "Couldn't edit delegate model");
       }
       table.setTranslation(s, sOrig);
       
@@ -273,17 +300,13 @@ class FlatModel implements MarkovModel, Serializable {
   public void registerWithTrainer(ModelTrainer modelTrainer) {
     modelTrainer.registerModel(delegate);
   }
-  
-  public void addTransitionListener(TransitionListener tl) {
-  }
-  
-  public void removeTransitionListener(TransitionListener tl) {
-  }
-  
+    
   private static class Wrapper implements State, Serializable {
     private final State wrapped;
     private final String extra;
     private final Alphabet matches;
+    
+    protected ChangeSupport changeSupport = null;
 
     public char getToken() {
       return wrapped.getToken();
@@ -303,6 +326,30 @@ class FlatModel implements MarkovModel, Serializable {
 
     public Alphabet getMatches() {
       return matches;
+    }
+    
+    protected void generateChangeSupport(ChangeType ct) {
+      if(changeSupport == null) {
+        changeSupport = new ChangeSupport();
+      }
+    }
+    
+    public void addChangeListener(ChangeListener cl) {
+      generateChangeSupport(null);
+      changeSupport.addChangeListener(cl);
+    }
+    
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {
+      generateChangeSupport(ct);
+      changeSupport.addChangeListener(cl, ct);
+    }
+
+    public void removeChangeListener(ChangeListener cl) {
+      changeSupport.removeChangeListener(cl);
+    }
+
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+      changeSupport.removeChangeListener(cl, ct);
     }
     
     public Wrapper(State wrapped, String extra) {
@@ -332,6 +379,11 @@ class FlatModel implements MarkovModel, Serializable {
     private EmissionState getWrappedES() {
       return (EmissionState) getWrapped();
     }
+
+    public void setAdvance(int [] advance)
+    throws ChangeVetoException {
+      getWrappedES().setAdvance(advance);
+    }
     
     public int [] getAdvance() {
       return getWrappedES().getAdvance();
@@ -341,7 +393,8 @@ class FlatModel implements MarkovModel, Serializable {
       return getWrappedES().getDistribution();
     }
     
-    public void setDistribution(Distribution dis) {
+    public void setDistribution(Distribution dis)
+    throws ChangeVetoException {
       getWrappedES().setDistribution(dis);
     }
     

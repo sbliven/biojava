@@ -21,11 +21,12 @@
 
 package org.biojava.bio.seq;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-
 import java.util.*;
 import java.lang.reflect.*;
+
+import org.biojava.utils.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * A view onto another Sequence object.  This class allows new
@@ -39,39 +40,33 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
     /**
      * Delegate Sequence.
      */
-    
     private Sequence seqDelegate;
 
     /**
      * FeatureHolder support
      */
-
     private MergeFeatureHolder exposedFeatures;
     private SimpleFeatureHolder addedFeatures;
 
     /**
      * IDs
      */
-
     private String name;
     private String urn;
 
     /**
      * Our annotation.
      */
-
     private Annotation anno;
 
     /**
      * The FeatureRealizer we use.
      */
-
     private FeatureRealizer featureRealizer;
 
     /**
      * Construct a view onto an existing sequence.
      */
-
     public ViewSequence(Sequence seq) {
 	seqDelegate = seq;
 	addedFeatures = new SimpleFeatureHolder();
@@ -176,8 +171,9 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
      * is the correct behaviour.
      */
 
-    public void removeFeature(Feature f) {
-	addedFeatures.removeFeature(f);
+    public void removeFeature(Feature f)
+    throws ChangeVetoException {
+      addedFeatures.removeFeature(f);
     }
 
     //
@@ -199,7 +195,7 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
     }
 
     public Feature createFeature(Feature.Template template)
-        throws BioException
+        throws BioException, ChangeVetoException
     {
       Location loc = template.location;
       if(loc.getMin() < 1 || loc.getMax() > this.length()) {
@@ -228,4 +224,13 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
     public FeatureHolder getAddedFeatures() {
 	return addedFeatures;
     }
+ 
+  public void edit(Edit edit) throws ChangeVetoException {
+    throw new ChangeVetoException("ViewSequence is immutable");
+  }
+  
+    public void addChangeListener(ChangeListener cl) {}
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+    public void removeChangeListener(ChangeListener cl) {}
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}    
 }

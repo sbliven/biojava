@@ -95,10 +95,23 @@ public final class ChangeType implements Serializable {
       this.ourField = clazz.getField(fname);
     }
     catch (Exception ex) {
-      throw new NestedError("Couldn't find field " + fname + " in class " + clazz.getName());
+      throw new NestedError(ex, "Couldn't find field " + fname + " in class " + clazz.getName());
     }
   }
 
+
+  public ChangeType(String name, String className, String fieldName) {
+    this.name = name;
+    try {
+      Class clazz = Class.forName(className);
+      this.ourField = clazz.getField(fieldName);
+    } catch (Exception ex) {
+      throw new NestedError(ex,
+        "Couldn't find class or field " + className +
+        "->" + fieldName
+      );
+    }
+  }
 
   /**
    *  Return the name of this change. 

@@ -25,6 +25,7 @@ package org.biojava.bio.seq.io;
 import java.io.*;
 import java.util.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
@@ -253,7 +254,14 @@ private boolean hasHeaderTag(String line)
 				    accession,
 				    seqAnnotation);
 	for (Iterator i = features.getFeatures().iterator(); i.hasNext(); ) {
+    try {
 	    ss.createFeature((Feature.Template) i.next());
+    } catch (ChangeVetoException cve) {
+      throw new BioError(
+        cve,
+        "Assertion failure: Couldn't add feature to my new Sequence"
+      );
+    }
 	}
 
 	return ss;

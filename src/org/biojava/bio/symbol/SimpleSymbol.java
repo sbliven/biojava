@@ -24,6 +24,7 @@ package org.biojava.bio.symbol;
 
 import java.io.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
@@ -37,9 +38,30 @@ public class SimpleSymbol implements Symbol, Serializable {
   private String name;
   private Alphabet matches;
   
+  protected ChangeSupport changeSupport = null;
+  protected Annotatable.AnnotationForwarder annotationForwarder = null;
+  
+  protected void generateChangeSupport(ChangeType ct) {
+    changeSupport = new ChangeSupport();
+    
+    if(
+      ((ct == null) || (ct == Annotatable.ANNOTATION) ) &&
+      annotationForwarder == null
+    ) {
+      annotationForwarder = new Annotatable.AnnotationForwarder(this, changeSupport);
+      if(annotation != null) {
+        annotation.addChangeListener(annotationForwarder);
+      }
+    }
+  }
+  
   public Annotation getAnnotation() {
-    if(annotation == null)
+    if(annotation == null) {
       annotation = new SimpleAnnotation();
+      if(annotationForwarder != null) {
+        annotation.addChangeListener(annotationForwarder);
+      }
+    }
     return this.annotation;
   }
 
@@ -62,6 +84,38 @@ public class SimpleSymbol implements Symbol, Serializable {
   public Alphabet getMatches() {
     return this.matches;
   }
+
+  public void addChangeListener(ChangeListener cl) {
+    generateChangeSupport(null);
+
+    synchronized(changeSupport) {
+      changeSupport.addChangeListener(cl);
+    }
+  }
+  
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+    generateChangeSupport(ct);
+
+    synchronized(changeSupport) {
+      changeSupport.addChangeListener(cl, ct);
+    }
+  }
+  
+  public void removeChangeListener(ChangeListener cl) {
+    if(changeSupport != null) {
+      synchronized(changeSupport) {
+        changeSupport.removeChangeListener(cl);
+      }
+    }
+  }
+  
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+    if(changeSupport != null) {
+      synchronized(changeSupport) {
+        changeSupport.removeChangeListener(cl, ct);
+      }
+    }
+  }  
   
   /**
    * Create a new SimpleSymbol.

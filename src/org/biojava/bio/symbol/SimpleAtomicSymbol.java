@@ -22,6 +22,7 @@
 
 package org.biojava.bio.symbol;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
@@ -30,25 +31,80 @@ import org.biojava.bio.*;
  * @author Matthew Pocock
  */
 public class SimpleAtomicSymbol implements AtomicSymbol {
-  private final Symbol delegate;
+  private final char token;
+  private final String name;
+  private final Annotation annotation;
+  private final SingletonAlphabet alphabet;
+
+  protected ChangeSupport changeSupport = null;
+  protected Annotatable.AnnotationForwarder annotationForwarder = null;
   
   public SimpleAtomicSymbol(char token, String name, Annotation annotation) {
-    delegate = new SimpleSymbol(token, name, new SingletonAlphabet(this), annotation);
+    this.token = token;
+    this.name = name;
+    this.annotation = annotation;
+    this.alphabet = new SingletonAlphabet(this);
   }
   
   public char getToken() {
-    return delegate.getToken();
+    return token;
   }
   
   public String getName() {
-    return delegate.getName();
+    return name;
   }
   
   public Annotation getAnnotation() {
-    return delegate.getAnnotation();
+    return annotation;
   }
   
   public Alphabet getMatches() {
-    return delegate.getMatches();
+    return alphabet;
+  }
+  
+  protected void generateChangeSupport(ChangeType changeType) {
+    if(changeSupport == null) {
+      changeSupport = new ChangeSupport();
+    }
+    
+    if(
+      ((changeType == null) || (changeType == Annotation.PROPERTY)) &&
+      (annotationForwarder == null)
+    ) {
+      annotationForwarder = new Annotatable.AnnotationForwarder(this, changeSupport);
+      annotation.addChangeListener(annotationForwarder, Annotation.PROPERTY);
+    }
+  }
+  
+  public void addChangeListener(ChangeListener cl) {
+    generateChangeSupport(null);
+
+    synchronized(changeSupport) {
+      changeSupport.addChangeListener(cl);
+    }
+  }
+  
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+    generateChangeSupport(ct);
+
+    synchronized(changeSupport) {
+      changeSupport.addChangeListener(cl, ct);
+    }
+  }
+  
+  public void removeChangeListener(ChangeListener cl) {
+    if(changeSupport != null) {
+      synchronized(changeSupport) {
+        changeSupport.removeChangeListener(cl);
+      }
+    }
+  }
+  
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+    if(changeSupport != null) {
+      synchronized(changeSupport) {
+        changeSupport.removeChangeListener(cl, ct);
+      }
+    }
   }
 }

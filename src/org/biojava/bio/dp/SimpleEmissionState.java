@@ -24,6 +24,7 @@ package org.biojava.bio.dp;
 
 import java.io.Serializable;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
@@ -35,6 +36,7 @@ implements EmissionState, Serializable {
   private Annotation ann;
   private int [] advance;
   private Alphabet matches;
+  private ChangeSupport changeSupport = null;
   
   public final Annotation getAnnotation() {
     return this.ann;
@@ -48,16 +50,42 @@ implements EmissionState, Serializable {
     return this.dis;
   }
   
-  public final void setDistribution(Distribution dis) {
-    this.dis = dis;
+  public final void setDistribution(Distribution dis)
+  throws ChangeVetoException {
+    if(changeSupport == null) {
+      this.dis = dis;
+    } else {
+      ChangeEvent ce = new ChangeEvent(
+        this, EmissionState.DISTRIBUTION,
+        this.dis, dis
+      );
+      synchronized(changeSupport) {
+        changeSupport.firePreChangeEvent(ce);
+        this.dis = dis;
+        changeSupport.firePostChangeEvent(ce);
+      }
+    }
   }
   
   public int [] getAdvance() {
     return advance;
   }
   
-  public void setAdvance(int [] advance) {
-    this.advance = advance;
+  public void setAdvance(int [] advance)
+  throws ChangeVetoException {
+    if(changeSupport == null) {
+      this.advance = advance;
+    } else {
+      ChangeEvent ce = new ChangeEvent(
+        this, EmissionState.ADVANCE,
+        this.advance, advance
+      );
+      synchronized(changeSupport) {
+        changeSupport.firePreChangeEvent(ce);
+        this.advance = advance;
+        changeSupport.firePostChangeEvent(ce);
+      }
+    }
   }
   
   public char getToken() {
@@ -75,6 +103,42 @@ implements EmissionState, Serializable {
   public Alphabet getMatches() {
     return matches;
   }
+
+  public void addChangeListener(ChangeListener cl) {
+    if(changeSupport == null) {
+      changeSupport = new ChangeSupport();
+    }
+
+    synchronized(changeSupport) {
+      changeSupport.addChangeListener(cl);
+    }
+  }
+  
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+    if(changeSupport == null) {
+      changeSupport = new ChangeSupport();
+    }
+
+    synchronized(changeSupport) {
+      changeSupport.addChangeListener(cl, ct);
+    }
+  }
+  
+  public void removeChangeListener(ChangeListener cl) {
+    if(changeSupport != null) {
+      synchronized(changeSupport) {
+        changeSupport.removeChangeListener(cl);
+      }
+    }
+  }
+  
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+    if(changeSupport != null) {
+      synchronized(changeSupport) {
+        changeSupport.removeChangeListener(cl, ct);
+      }
+    }
+  }
   
   public SimpleEmissionState(
     String name,
@@ -82,10 +146,10 @@ implements EmissionState, Serializable {
     int [] advance,
     Distribution dis
   ) {
-    setName(name);
-    setAnnotation(ann);
+    this.name = name;
+    this.ann = ann;
     this.advance = advance;
-    setDistribution(dis);
+    this.dis = dis;
     this.matches = new SingletonAlphabet(this);
   }
   

@@ -25,6 +25,7 @@ package org.biojava.bio.seq.io;
 import java.io.*;
 import java.util.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
@@ -45,7 +46,14 @@ public class SimpleFeatureBuilder implements FeatureBuilder, Serializable {
 	t.annotation = new SimpleAnnotation();
 	for (Iterator i = attrs.entrySet().iterator(); i.hasNext(); ) {
 	    Map.Entry e = (Map.Entry) i.next();
-	    t.annotation.setProperty(e.getKey(), e.getValue());
+      try {
+        t.annotation.setProperty(e.getKey(), e.getValue());
+      } catch (ChangeVetoException cve) {
+        throw new BioError(
+          cve,
+          "Assertion Failure: Couldn't set up the annotation"
+        );
+      }
 	}
 
 	t.location = loc;

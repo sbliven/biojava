@@ -118,15 +118,15 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
     }
   }
 
-    /**
-     * Register a simple trainer for this distribution.
-     */
+  /**
+   * Register a simple trainer for this distribution.
+   */
 
-    public void registerWithTrainer(DistributionTrainerContext dtc) {
-	try {
+  public void registerWithTrainer(DistributionTrainerContext dtc) {
+    try {
 	    dtc.registerTrainer(this, new SimpleDistributionTrainer(this));
-	} catch (IllegalAlphabetException ex) {
+    } catch (IllegalAlphabetException ex) {
 	    throw new BioError("Couldn't register trainer for simple distribution");
-	}
     }
+  }
 }

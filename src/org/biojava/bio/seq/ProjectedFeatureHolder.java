@@ -23,8 +23,9 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 
-import org.biojava.bio.symbol.*;
+import org.biojava.utils.*;
 import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * Helper class for projecting Feature objects into an alternative
@@ -79,8 +80,14 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 		} else {
 		    wf = new ProjectedFeatureWrapper(f, parent, translate);
 		}
-
-		sfh.addFeature(wf);
+    try {
+      sfh.addFeature(wf);
+    } catch (ChangeVetoException cve) {
+      throw new BioError(
+        cve,
+        "Assertion failure: Should be able to manipulate this FeatureHolder"
+      );
+    }
 	    }
 	    projectedFeatures = sfh;
 	}

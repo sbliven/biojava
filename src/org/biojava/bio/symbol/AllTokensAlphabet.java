@@ -25,6 +25,7 @@ package org.biojava.bio.symbol;
 import java.util.*;
 import java.io.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
@@ -44,8 +45,10 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
   private Map nameToSymbol; // name->Symbol
   private Set symbols;
   private String name;
-  
   private Annotation annotation;
+  
+  protected ChangeSupport changeSupport = null;
+  protected Annotatable.AnnotationForwarder annotationForwarder = null;
 
   /**
    * Adds a symbol to the alphabet
@@ -151,6 +154,52 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
     );
   }
   
+  protected void generateChangeSupport(ChangeType changeType) {
+    if(changeSupport == null) {
+      changeSupport = new ChangeSupport();
+    }
+    
+    if(
+      ((changeType == null) || (changeType == Annotation.PROPERTY)) &&
+      (annotationForwarder == null)
+    ) {
+      annotationForwarder = new Annotatable.AnnotationForwarder(this, changeSupport);
+      annotation.addChangeListener(annotationForwarder, Annotation.PROPERTY);
+    }
+  }
+  
+  public void addChangeListener(ChangeListener cl) {
+    generateChangeSupport(null);
+
+    synchronized(changeSupport) {
+      changeSupport.addChangeListener(cl);
+    }
+  }
+  
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+    generateChangeSupport(ct);
+
+    synchronized(changeSupport) {
+      changeSupport.addChangeListener(cl, ct);
+    }
+  }
+  
+  public void removeChangeListener(ChangeListener cl) {
+    if(changeSupport != null) {
+      synchronized(changeSupport) {
+        changeSupport.removeChangeListener(cl);
+      }
+    }
+  }
+  
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+    if(changeSupport != null) {
+      synchronized(changeSupport) {
+        changeSupport.removeChangeListener(cl, ct);
+      }
+    }
+  }  
+
   public AllTokensAlphabet(String name) {
     this.name = name;
     this.symbols = new HashSet();

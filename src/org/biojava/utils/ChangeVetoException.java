@@ -46,6 +46,19 @@ public class ChangeVetoException extends NestedException {
   }
 
   /**
+   *  Create an exception with a detail message 
+   *
+   * @param  reason  A detail message. 
+   */
+
+  public ChangeVetoException(
+    String reason
+  ) {
+    super(reason);
+    this.change = null;
+  }
+
+  /**
    *  Construct an exception to veto a change for a specified reason. 
    *
    * @param  change  An event which is being vetoed. 

@@ -21,18 +21,18 @@
 
 package org.biojava.bio.seq;
 
-import org.biojava.bio.symbol.*;
 import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * Class used by ProjectedFeatureHolder to wrap ComponentFeatures.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.1
  */
 
 class ProjectedComponentFeatureWrapper extends ProjectedStrandedFeatureWrapper
-	 implements StrandedFeature
 {
     public ProjectedComponentFeatureWrapper(ComponentFeature f,
 					    FeatureHolder tParent,

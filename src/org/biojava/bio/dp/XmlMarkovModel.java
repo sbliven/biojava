@@ -27,6 +27,7 @@ import java.util.*;
 
 import org.w3c.dom.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
@@ -65,11 +66,16 @@ public class XmlMarkovModel {
         Element weightE = (Element) weights.item(j);
         String resName = weightE.getAttribute("res");
         Symbol res;
-        if(resName.length() > 1)
+        if(resName.length() > 1) {
           res = nameParser.parseToken(resName);
-        else
+        } else {
           res = symParser.parseToken(resName);
-        wm.getColumn(indx).setWeight(res, Double.parseDouble(weightE.getAttribute("prob")));
+        }
+        try {
+          wm.getColumn(indx).setWeight(res, Double.parseDouble(weightE.getAttribute("prob")));
+        } catch (ChangeVetoException cve) {
+          throw new BioError("Assertion failure: Should be able to set the weights");
+        }
       }      
     }
     
@@ -145,10 +151,23 @@ public class XmlMarkovModel {
           } else {
             res = symbolParser.parseToken(resName);
           }
-        }          
-        dis.setWeight(res, Double.parseDouble(weightE.getAttribute("prob")));
+        }
+        try {
+          dis.setWeight(res, Double.parseDouble(weightE.getAttribute("prob")));
+        } catch (ChangeVetoException cve) {
+          throw new BioError(
+            cve, "Assertion failure: Should be able to edit distribution"
+          );
+        }
       }
-      model.addState(state);
+      
+      try {
+        model.addState(state);
+      } catch (ChangeVetoException cve) {
+        throw new BioError(
+          cve, "Assertion failure: Should be able to add states to model"
+        );
+      }
     }
 
     NodeList transitions = root.getElementsByTagName("transition");
@@ -166,9 +185,9 @@ public class XmlMarkovModel {
           "We should have unlimited write-access to this model. " +
           "Something is very wrong."
         );
-      } catch (ModelVetoException mve) {
+      } catch (ChangeVetoException cve) {
         throw new BioError(
-          mve, 
+          cve, 
           "We should have unlimited write-access to this model. " +
           "Something is very wrong."
         );

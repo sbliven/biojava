@@ -25,6 +25,7 @@ package org.biojava.bio.dist;
 import java.util.*;
 import java.io.Serializable;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.DNATools;
@@ -36,11 +37,42 @@ import org.biojava.bio.seq.DNATools;
  */
 public final class DNADistribution
 extends AbstractDistribution implements Serializable {
-  private final double [] scores;
+  private double [] scores;
   private Distribution nullModel;
-
+  private ChangeListener nullModelListener; 
+  
   {
     scores = new double[4];
+    nullModelListener = new ChangeListener() {
+      public void preChange(ChangeEvent ce) throws ChangeVetoException {
+        if(changeSupport != null) {
+          // make a new change event that chains back to the source one
+          ChangeEvent nce = new ChangeEvent(
+            this,
+            NULL_MODEL,
+            null, null,
+            ce
+          );
+          synchronized(changeSupport) {
+            changeSupport.firePreChangeEvent(nce);
+          }
+        }
+      }
+      public void postChange(ChangeEvent ce) {
+        if(changeSupport != null) {
+          // make a new change event that chains back to the source one
+          ChangeEvent nce = new ChangeEvent(
+            this,
+            NULL_MODEL,
+            null, null,
+            ce
+          );
+          synchronized(changeSupport) {
+            changeSupport.firePostChangeEvent(nce);
+          }
+        }
+      }
+    };
   }
   
   public Alphabet getAlphabet() {
@@ -51,15 +83,8 @@ extends AbstractDistribution implements Serializable {
     return this.nullModel;
   }
   
-  /**
-  *Assign a background probability distribution to the DNA distribution.
-  *
-  *
-  *@param nullModel the Distribution to be added as the background distribution.
-  */
-  
   public void setNullModel(Distribution nullModel)
-  throws IllegalAlphabetException {
+  throws IllegalAlphabetException, ChangeVetoException {
     if(nullModel.getAlphabet() != getAlphabet()) {
       throw new IllegalAlphabetException(
         "Could not use distribution " + nullModel +
@@ -67,7 +92,28 @@ extends AbstractDistribution implements Serializable {
         " and this distribution's alphabet is " + getAlphabet().getName()
       );
     }
-    this.nullModel = nullModel;   
+    if(changeSupport == null) {
+      // if there are no listners yet, don't g through the overhead of
+      // synchronized regions or of trying to inform them.
+      this.nullModel.removeChangeListener(nullModelListener);
+      this.nullModel = nullModel;
+      nullModel.addChangeListener(nullModelListener);
+    } else {
+      // OK - so somebody is intereted in me. Do it properly this time.
+      ChangeEvent ce = new ChangeEvent(
+        this,
+        Distribution.NULL_MODEL,
+        nullModel,
+        this.nullModel
+      );
+      synchronized(changeSupport) {
+        changeSupport.firePreChangeEvent(ce);
+        this.nullModel.removeChangeListener(nullModelListener);
+        this.nullModel = nullModel;
+        nullModel.addChangeListener(nullModelListener);
+        changeSupport.firePostChangeEvent(ce);
+      }
+    }
   }
   
   public double getWeight(Symbol s)
@@ -87,15 +133,16 @@ extends AbstractDistribution implements Serializable {
   }
 
   public void setWeight(Symbol s, double score)
-  throws IllegalSymbolException {
+  throws IllegalSymbolException, ChangeVetoException {
+    int si;
     if(s == DNATools.a()) {
-      scores[0] = score;
+      si = 0;
     } else if (s == DNATools.g()) {
-      scores[1] = score;
+      si = 1;
     } else if (s == DNATools.c()) {
-      scores[2] = score;
+      si = 2;
     } else if (s == DNATools.t()) {
-      scores[3] = score;
+      si = 3;
     } else {
       getAlphabet().validate(s);
       throw new IllegalSymbolException(
@@ -103,13 +150,34 @@ extends AbstractDistribution implements Serializable {
         ". Either this is a cock-up, or it is an ambiguous symbol."
       );
     }
+    
+    if(changeSupport == null) {
+      // if there are no listners yet, don't g through the overhead of
+      // synchronized regions or of trying to inform them.
+      scores[si] = score;
+    } else {
+      // OK - so somebody is intereted in me. Do it properly this time.
+      ChangeEvent ce = new ChangeEvent(
+        this,
+        Distribution.WEIGHTS,
+        new Object[] {s, new Double(score)},
+        new Object[] {s, new Double(scores[si])}
+      );
+      synchronized(changeSupport) {
+        changeSupport.firePreChangeEvent(ce);
+        scores[si] = score;
+        changeSupport.firePostChangeEvent(ce);
+      }
+    }
   }
-  
+    
   public DNADistribution() {
     try {
       setNullModel(new UniformDistribution(DNATools.getDNA()));
     } catch (IllegalAlphabetException iae) {
-      throw new BioError(iae, "This should never fail. Something is screwed!");
+      throw new BioError(iae, "This should never fail. Something is screwed with alpahbets!");
+    } catch (ChangeVetoException cve) {
+      throw new BioError(cve, "This should never fail. Something is screwed with change listeners");
     }
   }
   
@@ -128,22 +196,66 @@ extends AbstractDistribution implements Serializable {
     }
       
     public void train(double weight)
-    throws IllegalSymbolException {
-      Distribution nullModel = getNullModel();
-      double sum = 0.0;
-      for(int i = 0; i < c.length; i++) {
-        Symbol s = DNATools.forIndex(i);
-        sum += c[i] + nullModel.getWeight(s)*weight;
+    throws ChangeVetoException {
+      if(changeSupport == null) {
+        // if there are no listners yet, don't g through the overhead of
+        // synchronized regions or of trying to inform them.
+        realTrain(weight);
+      } else {
+        // OK - so somebody is intereted in me. Do it properly this time.
+        ChangeEvent ce = new ChangeEvent(
+          DNADistribution.this,
+          Distribution.WEIGHTS
+        );
+        synchronized(changeSupport) {
+          changeSupport.firePreChangeEvent(ce);
+          realTrain(weight);
+          changeSupport.firePostChangeEvent(ce);
+        }
       }
+    }
+    
+    private void realTrain(double weight)
+    throws ChangeVetoException {
+      // this accesses the state of DNADistribution directly. We should be
+      // protected from nasties as long as the change event stuff is being used
+      // properly.
+      System.out.println("Training " + this);
+      System.out.println("Was:");
       for(int i = 0; i < c.length; i++) {
         Symbol s = DNATools.forIndex(i);
-        setWeight(s, (c[i] + nullModel.getWeight(s)*weight) / sum );
+        System.out.println("\t" + s.getName() + "->" + scores[i]);
+      }
+
+      try {
+        Distribution nullModel = getNullModel();
+        double sum = 0.0;
+        for(int i = 0; i < c.length; i++) {
+          Symbol s = DNATools.forIndex(i);
+          sum += c[i] + nullModel.getWeight(s)*weight;
+        }
+        
+        System.out.println("Sum: " + sum);
+        
+        for(int i = 0; i < c.length; i++) {
+          Symbol s = DNATools.forIndex(i);
+          scores[i] = (c[i] + nullModel.getWeight(s)*weight) / sum;
+        }
+        System.out.println("Is:");
+        for(int i = 0; i < c.length; i++) {
+          Symbol s = DNATools.forIndex(i);
+          System.out.println("\t" + s.getName() + "->" + scores[i]);
+        }
+      } catch (IllegalSymbolException ise) {
+        throw new BioError(ise, "Nullmodel alphabet incompatible with this distribution");
       }
     }
       
     public void clearCounts() {
-      for(int i = 0; i < c.length; i++)
+      System.out.println("Clearing counts for " + this);
+      for(int i = 0; i < c.length; i++) {
         c[i] = 0;
+      }
     }
   }
 }

@@ -22,6 +22,8 @@
 package org.biojava.bio.seq;
 
 import java.util.*;
+
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
@@ -138,7 +140,8 @@ class SimpleFeature implements Feature, RealizingFeatureHolder {
 	return Collections.EMPTY_LIST.iterator();
     }
 
-    public void removeFeature(Feature f) {
+    public void removeFeature(Feature f)
+    throws ChangeVetoException {
 	getFeatureHolder().removeFeature(f);
     }
 
@@ -148,6 +151,15 @@ class SimpleFeature implements Feature, RealizingFeatureHolder {
 	return new SimpleFeatureHolder();
     }
 
+    public Feature.Template makeTemplate() {
+      Feature.Template ft = new Feature.Template();
+      ft.location = getLocation();
+      ft.type = getType();
+      ft.source = getSource();
+      ft.annotation = getAnnotation();
+      return ft;
+    }
+    
     public SimpleFeature(Sequence sourceSeq, 
 			 FeatureHolder parent,
 			 Feature.Template template)
@@ -182,10 +194,15 @@ class SimpleFeature implements Feature, RealizingFeatureHolder {
     }
 
     public Feature createFeature(Feature.Template temp) 
-	throws BioException 
-    {
+    throws BioException, ChangeVetoException {
 	Feature f = realizeFeature(this, temp);
 	getFeatureHolder().addFeature(f);
 	return f;
     }
+    
+    public void addChangeListener(ChangeListener cl) {}
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+    public void removeChangeListener(ChangeListener cl) {}
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
+
 }

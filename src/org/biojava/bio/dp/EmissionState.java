@@ -22,6 +22,7 @@
 
 package org.biojava.bio.dp;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
@@ -35,7 +36,34 @@ import org.biojava.bio.dist.*;
  *
  * @author Matthew Pocock
  */
-public interface EmissionState extends State, Trainable {
+public interface EmissionState extends State, Trainable, Changeable {
+  /**
+   * This signals that the distribution associate with an EmissionState has
+   * been altered.
+   * <P>
+   * If the distribution has changed its weights, then the event'e
+   * getChainedEvent method will return the event fired by the distribution. If
+   * one distribution has been replaced by another, then the new and old
+   * Distributions will be in current and previous, respectively.
+   */
+  public static final ChangeType DISTRIBUTION = new ChangeType(
+    "The associated ditribution has changed",
+    "org.biojava.bio.dp.EmissionState",
+    "DISTRIBUTION"
+  );
+  
+  /**
+   * This signals that the advance array has been altered.
+   * <P>
+   * current and previous should hold the current and previous advances,
+   * respectively.
+   */
+  public static final ChangeType ADVANCE = new ChangeType(
+    "The associated advance array has changed",
+    "org.biojava.bio.dp.EmissionState",
+    "ADVANCE"
+  );
+  
   /**
    * Determine the number of symbols this state advances along
    * one or more symbol lists.  In the simple case, this method
@@ -45,14 +73,19 @@ public interface EmissionState extends State, Trainable {
    * for match state, and {0, 1} or {1, 0} for a gap state.  Under
    * some circumstances it may be valid to return values other
    * than 1 or 0, but you should consider the consequences for
-   * HMM architecture very carefully.
-   *
-   * <P> 
-   * Note that the int array returned by this method should
-   * <em>never</em> be modified.
-   * </P>
+   * HMM architecture very carefully, and contact the authors.
    */
   public int[] getAdvance();
+  
+  /**
+   * Set the advance array.
+   *
+   * @param advance  an array of ints, specifying how many symbols are consumed
+   *        from each sequence
+   * @throws ChangeVetoException  if the implementation doesn't support setting
+   *         advance, or if the change is vetoed
+   */
+  public void setAdvance(int[] advance) throws ChangeVetoException;
   
   /**
    * Get the Distribution associated with this state.
@@ -69,7 +102,9 @@ public interface EmissionState extends State, Trainable {
    * Set the Distribution associated with this state.
    * 
    * @param dis the new Distribution to use
+   * @throws ChangeVetoException  if the implementation doesn't support setting
+   *         the distribution, or if the change is vetoed
    */
   public void setDistribution(Distribution dis)
-  throws UnsupportedOperationException;
+  throws ChangeVetoException;
 }

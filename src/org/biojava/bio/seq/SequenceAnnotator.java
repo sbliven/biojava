@@ -21,6 +21,7 @@
 
 package org.biojava.bio.seq;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
@@ -52,11 +53,14 @@ public interface SequenceAnnotator {
      * @throws IllegalAlphabetException If the sequence is over
      *                                  an inappropriate alphabet for
      *                                  the annotated method being
-     *                                  encapsulated.
-     * @throws BioException if the sequence cannot be annotated.
+     *                                  encapsulated
+     * @throws BioException if the sequence fails to be annotated
+     * @throws ChangeVetoException if either the sequence doesn't allow
+     *         annotation or if the change was vetoed
      */
 
     public Sequence annotate(Sequence seq) throws BioException,
-                                              IllegalAlphabetException;
+                                              IllegalAlphabetException,
+                                              ChangeVetoException;
     
 }

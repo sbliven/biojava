@@ -25,6 +25,7 @@ package org.biojava.bio.dp;
 import java.util.*;
 import java.io.Serializable;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
@@ -327,17 +328,17 @@ public abstract class DP {
   
   public void lockModel() {
     if(lockCount++ == 0) {
-      getModel().addTransitionListener(BLOCKER);
+      getModel().addChangeListener(ChangeListener.ALWAYS_VETO);
     }
   }
   
   public void unlockModel() {
     if(--lockCount == 0) {
-      getModel().removeTransitionListener(BLOCKER);
+      getModel().removeChangeListener(ChangeListener.ALWAYS_VETO);
     }
   }
   
-  public void updateTransitions() {
+  public void update() {
     try {
       this.states = stateList(model);
       this.forwardTransitions = forwardTransitions(model, states);
@@ -363,9 +364,9 @@ public abstract class DP {
     this.model = model;
     this.forwardTransitionScores = new HashMap();
     this.backwardTransitionScores = new HashMap();
-    updateTransitions();
+    update();
     
-    model.addTransitionListener(UPDATER);
+    model.addChangeListener(UPDATER);
   }
 
   public abstract double forward(SymbolList [] resList, ScoreType scoreType)
@@ -534,56 +535,17 @@ public abstract class DP {
     }
   }
 
-  private static final TransitionListener BLOCKER = new TransitionListener() {
-    public void preCreateTransition(TransitionEvent te)
-    throws ModelVetoException {
-      complain(te);
-    }
+  private final ChangeListener UPDATER = new ChangeListener() {
+    public void preChange(ChangeEvent ce)
+    throws ChangeVetoException {}
   
-    public void postCreateTransition(TransitionEvent te) {}
-  
-    public void preDestroyTransition(TransitionEvent te)
-    throws ModelVetoException {
-      complain(te);
-    }
-  
-    public void postDestroyTransition(TransitionEvent te) {}
-  
-    public void preChangeTransitionScore(TransitionEvent te)
-    throws ModelVetoException {
-      complain(te);
-    }
-  
-    public void postChangeTransitionScore(TransitionEvent te) {}
-    
-    private void complain(TransitionEvent te) throws ModelVetoException {
-      throw new ModelVetoException(
-        "Can't currently alter model",
-        te
-      );
-    }    
-  };
-
-  private final TransitionListener UPDATER = new TransitionListener() {
-    public void preCreateTransition(TransitionEvent te)
-    throws ModelVetoException {}
-  
-    public void postCreateTransition(TransitionEvent te) {
-      updateTransitions();
-    }
-      
-    public void preDestroyTransition(TransitionEvent te)
-    throws ModelVetoException {}
-  
-    public void postDestroyTransition(TransitionEvent te) {
-      updateTransitions();
-    }
-  
-    public void preChangeTransitionScore(TransitionEvent te)
-    throws ModelVetoException {}
-        
-    public void postChangeTransitionScore(TransitionEvent te) {
-      updateTransitions();
+    public void postChange(ChangeEvent ce) {
+      if(
+        (ce.getType() == MarkovModel.ARCHITECTURE) ||
+        (ce.getType() == MarkovModel.PARAMETER)
+      ) {
+        update();
+      }
     }
   };
 

@@ -25,6 +25,7 @@ package org.biojava.bio.symbol;
 import java.util.*;
 import java.io.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable {
@@ -128,4 +129,10 @@ class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable
       "No parser for " + name + " is defined for " + getName()
     );
   }
+  
+  public void addChangeListener(ChangeListener cl) {}
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+  public void removeChangeListener(ChangeListener cl) {}
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {} 
+
 }

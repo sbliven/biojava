@@ -44,6 +44,32 @@ import org.biojava.bio.*;
  * @author Matthew Pocock
  */
 public interface Alphabet extends Annotatable {
+  /** 
+   * This ChangeType indicates that some symbols have been added or removed from
+   * the alphabet. The churrent and previous fields should indicate what symbols
+   * were there originaly, and what they have been replaced with.
+   * <P>
+   * If the alphabet wishes to propogate that the sybmol has changed state, then
+   * previous and current should be null, but the chainedEvent property should
+   * rever to the ChangeEvent on the unerlying Symbol.
+   */
+  public static ChangeType SYMBOLS = new ChangeType(
+    "The set of symbols in this alphabet has changed.",
+    "org.biojava.bio.symbol.Alphabet",
+    "SYMBOLS"
+  );
+  
+  /**
+   * This signals that the available parsers have changed. If a parser is added,
+   * it will appear in getChanged(). If it is removed, it will appear in
+   * getPrevious().
+   */
+  public static ChangeType PARSERS = new ChangeType(
+    "The set of parsers has changed.",
+    "org.biojava.bio.symbol.Alphabet",
+    "PARSERS"
+  );
+  
   /**
    * Get the name of the alphabet.
    *
@@ -97,7 +123,6 @@ public interface Alphabet extends Annotatable {
    */
   SymbolParser getParser(String name)
   throws NoSuchElementException, BioException;
-;
   
   /**
    * A really useful static alphabet that is always empty.
@@ -154,6 +179,11 @@ public interface Alphabet extends Annotatable {
         " in " + getName()
       );
     }
+    
+    public void addChangeListener(ChangeListener cl) {}
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+    public void removeChangeListener(ChangeListener cl) {}
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 
     private Object writeReplace() throws ObjectStreamException {
       try {
@@ -162,5 +192,5 @@ public interface Alphabet extends Annotatable {
         throw new NotSerializableException(nsfe.getMessage());
       }
     }
-  }  
+  }
 }

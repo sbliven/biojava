@@ -22,6 +22,7 @@
 
 package org.biojava.bio.dist;
 
+import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
 
 /**
@@ -53,8 +54,11 @@ public interface DistributionTrainer {
    * This method should not modify the underlying counts.
    *
    * @param weight  how many lots of the null model to add
+   * @throws ChangeVetoException if the distribution could not have its weights
+   *         modified
    */
-  void train(double weight) throws IllegalSymbolException;
+  void train(double weight)
+  throws ChangeVetoException;
   
   /**
    * Clears all of the counts to zero.

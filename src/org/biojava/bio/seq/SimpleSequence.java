@@ -24,6 +24,7 @@ package org.biojava.bio.seq;
 import java.lang.reflect.*;
 import java.util.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
@@ -167,7 +168,7 @@ public class SimpleSequence implements Sequence, RealizingFeatureHolder
     }
 
     public Feature createFeature(Feature.Template template)
-	throws BioException 
+	throws BioException, ChangeVetoException 
     {
 	Feature f = realizeFeature(this, template);
 	SimpleFeatureHolder fh = this.getFeatureHolder();
@@ -183,7 +184,7 @@ public class SimpleSequence implements Sequence, RealizingFeatureHolder
      */
 
     public Feature createFeature(FeatureHolder fh, Feature.Template template)
-	throws BioException 
+	throws BioException, ChangeVetoException 
     {
 	return fh.createFeature(template);
     }
@@ -192,10 +193,20 @@ public class SimpleSequence implements Sequence, RealizingFeatureHolder
      * Remove a feature attached to this sequence.
      */
 
-    public void removeFeature(Feature f) {
-	getFeatureHolder().removeFeature(f);
+    public void removeFeature(Feature f)
+    throws ChangeVetoException {
+      getFeatureHolder().removeFeature(f);
     }
 
+    public void edit(Edit edit) throws ChangeVetoException {
+      throw new ChangeVetoException("Can't edit the underlying SymbolList");
+    }
+   
+    public void addChangeListener(ChangeListener cl) {}
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+    public void removeChangeListener(ChangeListener cl) {}
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}    
+    
     /**
      * Create a SimpleSequence with the symbols and alphabet of res, and the
      * sequence properties listed.

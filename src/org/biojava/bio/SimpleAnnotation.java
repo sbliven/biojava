@@ -25,6 +25,8 @@ package org.biojava.bio;
 import java.util.*;
 import java.io.*;
 
+import org.biojava.utils.*;
+
 /**
  * A no-frills implementation of Annotation that is just a wrapper around a Map.
  * <P>
@@ -34,6 +36,11 @@ import java.io.*;
  * @author Matthew Pocock
  */
 public class SimpleAnnotation implements Annotation, Serializable {
+  /**
+   * The object to do the hard work of informing others of changes.
+   */
+  protected ChangeSupport changeSupport = null;
+  
   /**
    * The properties map.
    * <P>
@@ -75,8 +82,24 @@ public class SimpleAnnotation implements Annotation, Serializable {
     throw new NoSuchElementException("Property " + key + " unknown");
   }
 
-  public void setProperty(Object key, Object value) {
-    getProperties().put(key, value);
+  public void setProperty(Object key, Object value)
+  throws ChangeVetoException {
+    if(changeSupport == null) {
+      getProperties().put(key, value);
+    } else {
+      Map properties = getProperties();
+      ChangeEvent ce = new ChangeEvent(
+        this,
+        Annotation.PROPERTY,
+        new Object[] { key, value },
+        new Object[] { key, properties.get(value)} 
+      );
+      synchronized(changeSupport) {
+        changeSupport.firePreChangeEvent(ce);
+        properties.put(key, value);
+        changeSupport.firePostChangeEvent(ce);
+      }
+    }
   }
 
   public Set keys() {
@@ -107,6 +130,42 @@ public class SimpleAnnotation implements Annotation, Serializable {
     return new HashMap(getProperties());
   }
   
+  public void addChangeListener(ChangeListener cl) {
+    if(changeSupport == null) {
+      changeSupport = new ChangeSupport();
+    }
+
+    synchronized(changeSupport) {
+      changeSupport.addChangeListener(cl);
+    }
+  }
+  
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+    if(changeSupport == null) {
+      changeSupport = new ChangeSupport();
+    }
+
+    synchronized(changeSupport) {
+      changeSupport.addChangeListener(cl, ct);
+    }
+  }
+  
+  public void removeChangeListener(ChangeListener cl) {
+    if(changeSupport != null) {
+      synchronized(changeSupport) {
+        changeSupport.removeChangeListener(cl);
+      }
+    }
+  }
+  
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+    if(changeSupport != null) {
+      synchronized(changeSupport) {
+        changeSupport.removeChangeListener(cl, ct);
+      }
+    }
+  }  
+  
   public SimpleAnnotation() {
   }
   
@@ -119,10 +178,11 @@ public class SimpleAnnotation implements Annotation, Serializable {
     if(ann == Annotation.EMPTY_ANNOTATION) {
       return;
     }
+    Map properties = getProperties();
     for(Iterator i = ann.keys().iterator(); i.hasNext(); ) {
       Object key = i.next();
       try {
-        setProperty(key, ann.getProperty(key));
+        properties.put(key, ann.getProperty(key));
       } catch (IllegalArgumentException iae) {
         throw new BioError(
           iae,
@@ -141,10 +201,11 @@ public class SimpleAnnotation implements Annotation, Serializable {
     if(annMap.isEmpty()) {
       return;
     }
+    
+    Map properties = getProperties();
     for(Iterator i = annMap.keySet().iterator(); i.hasNext(); ) {
       Object key = i.next();
-      setProperty(key, annMap.get(key));
+      properties.put(key, annMap.get(key));
     }
   }
 }
-

@@ -25,6 +25,7 @@ package org.biojava.bio.dist;
 import java.io.Serializable;
 import java.util.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
 
 /**
@@ -83,7 +84,7 @@ implements DistributionTrainerContext, Serializable {
   }
   
   public void train()
-  throws IllegalSymbolException {
+  throws ChangeVetoException {
     for(Iterator i = trainers.iterator(); i.hasNext(); ) {
       ((DistributionTrainer) i.next()).train(getNullModelWeight());
     }

@@ -25,8 +25,8 @@ package org.biojava.bio.symbol;
 import java.util.*;
 import java.io.*;
 
-import org.biojava.bio.*;
 import org.biojava.utils.*;
+import org.biojava.bio.*;
 
 /**
  * Cross product of a list of arbitrary alphabets.  This is a memory efficicent
@@ -188,4 +188,8 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
     );
   }
 
+  public void addChangeListener(ChangeListener cl) {}
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+  public void removeChangeListener(ChangeListener cl) {}
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {} 
 }

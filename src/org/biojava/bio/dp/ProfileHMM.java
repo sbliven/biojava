@@ -22,6 +22,7 @@
 
 package org.biojava.bio.dp;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
@@ -236,9 +237,9 @@ public class ProfileHMM extends SimpleMarkovModel {
       createTransition(dO, magicalState());
       
       matchStates[columns+1] = magicalState();
-    } catch (ModelVetoException mve) {
+    } catch (ChangeVetoException cve) {
       throw new BioError(
-        mve,
+        cve,
         "Unable to construct profile HMM"
       );
     }

@@ -25,6 +25,7 @@ package org.biojava.bio.seq.io;
 import java.io.*;
 import java.util.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
@@ -181,7 +182,11 @@ class EmblContext {
 
     if ( line.length() > 4 ) {
       tagText += line.substring(5);
-      annotation.setProperty( tag, tagText );
+      try {
+        annotation.setProperty( tag, tagText );
+      } catch (ChangeVetoException cve) {
+        throw new BioError(cve, "Couldn't set property");
+      }
     }
   }
 
@@ -206,7 +211,11 @@ class EmblContext {
 
 	if (accession.size() > 0) {
 	    primaryAcc = (String) accession.get(0);
-	    annotation.setProperty("embl_accessions", accession);
+      try {
+        annotation.setProperty("embl_accessions", accession);
+      } catch (ChangeVetoException cve) {
+        throw new BioError(cve, "Couldn't set property");
+      }
 	}
 	
 	ss = sf.createSequence(new SimpleSymbolList(
@@ -215,7 +224,14 @@ class EmblContext {
 				    primaryAcc,
 				    annotation);
 	for (Iterator i = features.getFeatures().iterator(); i.hasNext(); ) {
+    try {
 	    ss.createFeature((Feature.Template) i.next());
+    } catch (ChangeVetoException cve) {
+      throw new BioError(
+        cve,
+        "Assertion Failure: Couldn't add feature to Sequence"
+      );
+    }
 	}
 	return ss;
     }

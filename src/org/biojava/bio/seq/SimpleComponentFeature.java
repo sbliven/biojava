@@ -23,13 +23,15 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 
-import org.biojava.bio.symbol.*;
+import org.biojava.utils.*;
 import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * ComponentFeature implementation used by SimpleAssembly.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  */
 
 class SimpleComponentFeature implements ComponentFeature {
@@ -74,6 +76,18 @@ class SimpleComponentFeature implements ComponentFeature {
 	this.projectedFeatures = new ProjectedFeatureHolder(componentSequence, this, translation);
     }
 
+    public Feature.Template makeTemplate() {
+      ComponentFeature.Template cft = new ComponentFeature.Template();
+      cft.location = getLocation();
+      cft.type = getType();
+      cft.source = getSource();
+      cft.annotation = getAnnotation();
+      cft.strand = getStrand();
+      cft.componentSequence = getComponentSequence();
+      cft.componentLocation = getComponentLocation();
+      return cft;
+    }
+    
     private int locationContent(Location l) {
 	if (l.isContiguous())
 	    return l.getMax() - l.getMin() + 1;
@@ -166,4 +180,9 @@ class SimpleComponentFeature implements ComponentFeature {
     {
 	throw new UnsupportedOperationException("Can't remove features from a ComponentFeature.");
     }
+    
+    public void addChangeListener(ChangeListener cl) {}
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+    public void removeChangeListener(ChangeListener cl) {}
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 }

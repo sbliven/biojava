@@ -26,10 +26,10 @@ import java.util.*;
 import java.io.*;
 import java.lang.reflect.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
-import org.biojava.utils.*;
 
 /**
  * Start/end state for HMMs.

@@ -2,6 +2,7 @@ package org.biojava.bridge.Biocorba.Seqcore;
 
 import java.util.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
@@ -20,10 +21,26 @@ public class FeatureAdapter implements Feature {
     SimpleAnnotation ann = new SimpleAnnotation();
     NameValueSet[] qualifiers = seqFeature.qualifiers();
     for(int i = 0; i < qualifiers.length; i++) {
-      ann.setProperty(qualifiers[i].name, qualifiers[i].values);
+      try {
+        ann.setProperty(qualifiers[i].name, qualifiers[i].values);
+      } catch (ChangeVetoException cve) {
+        throw new BioError(
+          cve,
+          "Assertion failure: Couldn't modify my annotations"
+        );
+      }
     }
     this.annotation = ann;
     this.location = new RangeLocation(seqFeature.start(), seqFeature.end());
+  }
+  
+  public Feature.Template makeTemplate() {
+    Feature.Template ft = new Feature.Template();
+    ft.location = getLocation();
+    ft.source = getSource();
+    ft.type = getType();
+    ft.annotation = getAnnotation();
+    return ft;
   }
   
   public Location getLocation() {
@@ -66,11 +83,18 @@ public class FeatureAdapter implements Feature {
     return annotation;
   }
 
-    public Feature createFeature(Feature.Template template) {
-	throw new UnsupportedOperationException();
-    }
+  public Feature createFeature(Feature.Template template)
+  throws ChangeVetoException {
+    throw new ChangeVetoException("FeatureAdapter is immutable");
+  }
 
-    public void removeFeature(Feature f) {
-	throw new UnsupportedOperationException();
-    }
+  public void removeFeature(Feature f)
+  throws ChangeVetoException {
+    throw new ChangeVetoException("FeatureAdapter is immutable");
+  }
+  
+  public void addChangeListener(ChangeListener cl) {}
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+  public void removeChangeListener(ChangeListener cl) {}
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 }

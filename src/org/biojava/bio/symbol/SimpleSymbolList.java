@@ -25,6 +25,8 @@ package org.biojava.bio.symbol;
 import java.util.*;
 import java.io.*;
 
+import org.biojava.utils.*;
+
 /**
  * Basic implementation of SymbolList.  This
  * is currently backed by a normal Java array.

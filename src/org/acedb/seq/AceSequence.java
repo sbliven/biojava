@@ -25,6 +25,7 @@ package org.acedb.seq;
 import java.util.*;
 
 import org.acedb.*;
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
@@ -218,4 +219,13 @@ public class AceSequence implements Sequence {
       throw new AceException(ex, "Fatal error constructing sequence for " + name);
     }
   }
+  
+  public void edit(Edit edit) throws ChangeVetoException {
+    throw new ChangeVetoException("Ace sequences are currently immutable");
+  }
+  
+  public void addChangeListener(ChangeListener cl) {}
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+  public void removeChangeListener(ChangeListener cl) {}
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {} 
 }

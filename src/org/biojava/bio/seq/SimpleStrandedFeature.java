@@ -53,6 +53,16 @@ class SimpleStrandedFeature extends SimpleFeature implements StrandedFeature {
 	return resList;
     }
   
+  public Feature.Template makeTemplate() {
+    StrandedFeature.Template sft = new StrandedFeature.Template();
+    sft.location = getLocation();
+    sft.type = getType();
+    sft.source = getSource();
+    sft.annotation = getAnnotation();    
+    sft.strand = getStrand();
+    return sft;
+  }
+  
     public SimpleStrandedFeature(Sequence sourceSeq,
 				 FeatureHolder parent,
 				 StrandedFeature.Template template)

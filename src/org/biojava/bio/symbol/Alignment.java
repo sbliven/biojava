@@ -23,6 +23,8 @@ package org.biojava.bio.symbol;
 
 import java.util.*;
 
+import org.biojava.utils.*;
+
 /**
  * An alignment containing multiple <span class="type">SymbolList</span>s.
  * <P>
@@ -40,6 +42,18 @@ import java.util.*;
  * <span class="type">GappedSymbolList</span> objects.
  */
 public interface Alignment extends SymbolList {
+  /**
+   * Signals that SymbolLists will be added to or removed from an alignment. The
+   * ChangeEvent will record Object[] { label, symbolList } in previous if it is
+   * being removed, in current if it is being added and in both if the
+   * SymbolList for a given name is swapped.
+   */
+  public static final ChangeType CONTENT = new ChangeType(
+    "The sequences contained in this alignment are being changed",
+    "org.biojava.bio.symbol.Alignment",
+    "CONTENT"
+  );
+  
   /**
    * The list of SymbolLists in the alignment.
    * <P>

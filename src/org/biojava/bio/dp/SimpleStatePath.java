@@ -25,6 +25,8 @@ package org.biojava.bio.dp;
 import java.io.Serializable;
 import java.util.*;
 
+import org.biojava.utils.*;
+import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
@@ -105,4 +107,14 @@ implements StatePath, Serializable {
   throws IndexOutOfBoundsException {
     return delegate.subStr(start, end);
   }
+
+  public void edit(Edit edit)
+  throws IllegalAlphabetException, IndexOutOfBoundsException, ChangeVetoException {
+    throw new ChangeVetoException("Can't edit SimpleStatePath");
+  }
+  
+  public void addChangeListener(ChangeListener cl) {}
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+  public void removeChangeListener(ChangeListener cl) {}
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 }

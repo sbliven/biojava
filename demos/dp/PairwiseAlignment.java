@@ -86,11 +86,11 @@ public class PairwiseAlignment {
           // tests minimal memory forwards
           double forwardMin;
           System.out.println("Forwards-:");
-          forwardMin = aligner.forward(seqs, DP.PROBABILITY);
+          forwardMin = aligner.forward(seqs, ScoreType.PROBABILITY);
           System.out.println("\t" + forwardMin);
-          forwardMin = aligner.forward(seqs, DP.ODDS);
+          forwardMin = aligner.forward(seqs, ScoreType.ODDS);
           System.out.println("\t" + forwardMin);
-          forwardMin = aligner.forward(seqs, DP.NULL_MODEL);
+          forwardMin = aligner.forward(seqs, ScoreType.NULL_MODEL);
           System.out.println("\t" + forwardMin);
           
           // uncomment to test explicit memory forwards
@@ -100,21 +100,21 @@ public class PairwiseAlignment {
           // tests explicit memory backwards
           double backward;
           System.out.println("Backwards:");
-          backward = aligner.backward(seqs, DP.PROBABILITY);
+          backward = aligner.backward(seqs, ScoreType.PROBABILITY);
           System.out.println("\t" + backward);
-          backward = aligner.backward(seqs, DP.ODDS);
+          backward = aligner.backward(seqs, ScoreType.ODDS);
           System.out.println("\t" + backward);
-          backward = aligner.backward(seqs, DP.NULL_MODEL);
+          backward = aligner.backward(seqs, ScoreType.NULL_MODEL);
           System.out.println("\t" + backward);
           
           // tests minimal memory viterbi
           StatePath result;
           System.out.println("Viterbi:");
-          result = aligner.viterbi(seqs, DP.PROBABILITY);
+          result = aligner.viterbi(seqs, ScoreType.PROBABILITY);
           System.out.println("\t" + result.getScore());
-          result = aligner.viterbi(seqs, DP.ODDS);
+          result = aligner.viterbi(seqs, ScoreType.ODDS);
           System.out.println("\t" + result.getScore());
-          result = aligner.viterbi(seqs, DP.NULL_MODEL);
+          result = aligner.viterbi(seqs, ScoreType.NULL_MODEL);
           System.out.println("\t" + result.getScore());
         }
       }
@@ -213,7 +213,7 @@ public class PairwiseAlignment {
     dist.setWeight(insert2, pExtendGap);
     dist.setWeight(hub, pEndGap);
     
-    return DPFactory.createDP(model);
+    return DPFactory.DEFAULT.createDP(model);
   }
   
   private static Distribution generateMatchDist(FiniteAlphabet dna2)

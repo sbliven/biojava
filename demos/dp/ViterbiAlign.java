@@ -93,7 +93,7 @@ public class ViterbiAlign {
       SymbolParser rParser = alpha.getParser("token");
 
       // make dp object
-      DP dp = DPFactory.createDP(model);
+      DP dp = DPFactory.DEFAULT.createDP(model);
       
       SequenceFactory sFact = new SimpleSequenceFactory();
       FastaFormat fFormat = new FastaFormat();
@@ -107,10 +107,10 @@ public class ViterbiAlign {
       {
         Sequence seq = seqI.nextSequence();
         SymbolList [] rl = { seq };
-        StatePath statePath = dp.viterbi(rl, DP.PROBABILITY);
+        StatePath statePath = dp.viterbi(rl, ScoreType.PROBABILITY);
 		
-        double fScore = dp.forward(rl, DP.PROBABILITY);
-        double bScore = dp.backward(rl, DP.PROBABILITY);
+        double fScore = dp.forward(rl, ScoreType.PROBABILITY);
+        double bScore = dp.backward(rl, ScoreType.PROBABILITY);
       
         System.out.println(
           seq.getName() +

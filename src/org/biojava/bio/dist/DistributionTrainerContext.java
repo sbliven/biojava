@@ -22,6 +22,7 @@
 
 package org.biojava.bio.dist;
 
+import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
 
 /**
@@ -93,8 +94,9 @@ public interface DistributionTrainerContext {
    *
    * @param nullModel the null model Distribution
    * @param weight  how many lots of the null model to add
+   * @throws ChangeVetoException  if any of the distributions can't be trained
    */
-  void train() throws IllegalSymbolException;
+  void train() throws ChangeVetoException;
   
   /**
    * Clears all of the counts to zero.

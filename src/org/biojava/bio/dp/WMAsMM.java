@@ -25,6 +25,7 @@ package org.biojava.bio.dp;
 import java.util.*;
 import java.io.Serializable;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
@@ -43,6 +44,9 @@ public class WMAsMM implements MarkovModel, Serializable {
   private final Map transFrom;
   private final Map transTo;
   private final Map transWeights;
+  
+  private final ChangeSupport changeSupport;
+  private final MarkovModel.DistributionForwarder distForwarder;
   
   public Alphabet emissionAlphabet() {
     return wm.getAlphabet();
@@ -67,8 +71,8 @@ public class WMAsMM implements MarkovModel, Serializable {
   }
   
   public void setWeights(State source, Distribution dist)
-  throws ModelVetoException {
-    throw new ModelVetoException(
+  throws ChangeVetoException {
+    throw new ChangeVetoException(
       "Can't replace distribution in immutable model"
     );
   }
@@ -98,19 +102,19 @@ public class WMAsMM implements MarkovModel, Serializable {
   }
   
   public void createTransition(State from, State to)
-  throws UnsupportedOperationException {
-    throw new UnsupportedOperationException(
+  throws ChangeVetoException {
+    throw new ChangeVetoException(
       "destroyTransition not supported by " + getClass());
   }
 
   public void destroyTransition(State from, State to)
-  throws UnsupportedOperationException {
-    throw new UnsupportedOperationException(
+  throws ChangeVetoException {
+    throw new ChangeVetoException(
       "destroyTransition not supported by " + getClass());
   }
   
   public void addState(State toAdd)
-  throws IllegalSymbolException, UnsupportedOperationException {
+  throws IllegalSymbolException, ChangeVetoException {
     if(stateAlphabet().contains(toAdd)) {
       throw new IllegalSymbolException(
         toAdd, 
@@ -118,14 +122,14 @@ public class WMAsMM implements MarkovModel, Serializable {
       );
     }
     
-    throw new UnsupportedOperationException("addState not supported by " + getClass());
+    throw new ChangeVetoException("addState not supported by " + getClass());
   }
   
   public void removeState(State toAdd)
-  throws IllegalSymbolException, UnsupportedOperationException {
+  throws IllegalSymbolException, ChangeVetoException {
     stateAlphabet().validate(toAdd);
     
-    throw new UnsupportedOperationException("removeState not supported by " + getClass());
+    throw new ChangeVetoException("removeState not supported by " + getClass());
   }
 
   public boolean containsTransition(State from, State to)
@@ -137,9 +141,6 @@ public class WMAsMM implements MarkovModel, Serializable {
     return transitionsFrom(from).contains(to);
   }
   
-  public void addTransitionListener(TransitionListener tl) {}
-  public void removeTransitionListener(TransitionListener tl) {}
-  
   protected int index(State s) {
     for(int i = 0; i < states.length; i++) {
       if(s == states[i]) {
@@ -149,8 +150,26 @@ public class WMAsMM implements MarkovModel, Serializable {
     
     return -1;
   }
- 
+  
+  public void addChangeListener(ChangeListener cl) {
+    changeSupport.addChangeListener(cl);
+  }
+
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+    changeSupport.addChangeListener(cl, ct);
+  }
+  
+  public void removeChangeListener(ChangeListener cl) {
+    changeSupport.removeChangeListener(cl);
+  }
+
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+    changeSupport.removeChangeListener(cl, ct);
+  }
+  
   public WMAsMM(WeightMatrix wm) throws IllegalSymbolException {
+    changeSupport = new ChangeSupport();
+    distForwarder = new MarkovModel.DistributionForwarder(this, changeSupport);
     transFrom = new HashMap();
     transTo = new HashMap();
     transWeights = new HashMap();
@@ -170,6 +189,7 @@ public class WMAsMM implements MarkovModel, Serializable {
             wm.getColumn(i)
           )
         );
+        wm.getColumn(i).addChangeListener(distForwarder);
       }
       State prev = (i == 0) ? magicalState : states[i-1];
       State current = (i == wm.columns()) ? magicalState : states[i];

@@ -23,13 +23,15 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 
-import org.biojava.bio.symbol.*;
+import org.biojava.utils.*;
 import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * Class used by ProjectedFeatureHolder to wrap Feature objects.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.1
  */
 
@@ -50,6 +52,10 @@ class ProjectedFeatureWrapper implements Feature {
 	this.newLocation = f.getLocation().translate(offset);
     }
 
+    public Feature.Template makeTemplate() {
+      return getFeature().makeTemplate();
+    }
+    
     public Feature getFeature() {
 	return feature;
     }
@@ -113,4 +119,9 @@ class ProjectedFeatureWrapper implements Feature {
     public void removeFeature(Feature f) {
 	throw new UnsupportedOperationException("Projected features don't have children (yet).");
     }
+        
+    public void addChangeListener(ChangeListener cl) {}
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+    public void removeChangeListener(ChangeListener cl) {}
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 }

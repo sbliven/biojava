@@ -103,11 +103,22 @@ public interface Feature extends FeatureHolder, Annotatable {
     /**
      * Return the <code>Sequence</code> object to which this feature
      * is (ultimately) attached.  For top level features, this will be
-     * equal to the <code>FeatureHolder</code> returned by <code>getParent</code>.
+     * equal to the <code>FeatureHolder</code> returned by
+     * <code>getParent</code>.
+     *
+     * @return the ultimate parent Sequence
      */
-
     public Sequence getSequence();
 
+    /**
+     * Create a new Template that could be used to generate a feature identical
+     * to this one. The fields of the template can be edited without changing
+     * the feature.
+     *
+     * @return a new Template that would make a feature like this one
+     */
+    public Template makeTemplate();
+    
     /**
      * Template class for a plain feature.
      * <P>

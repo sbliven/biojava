@@ -26,9 +26,9 @@ import java.util.*;
 import java.lang.ref.*;
 import java.io.Serializable;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
 
 /**
  * Class for pairing up two independant distributions.
@@ -79,6 +79,13 @@ extends AbstractDistribution implements Serializable {
   
   public Distribution getNullModel() {
     return getNullModel(first, second);
+  }
+  
+  public void setNullModel(Distribution nullModel)
+  throws IllegalAlphabetException, ChangeVetoException {
+    throw new ChangeVetoException(
+      "PairDistribution objects can't have their null models changed."
+    );
   }
   
   /**

@@ -22,8 +22,6 @@
 
 package org.biojava.bio.symbol;
 
-import org.biojava.bio.*;
-
 /**
  * A symbol that is indivisible.
  * <P>
@@ -34,8 +32,4 @@ import org.biojava.bio.*;
  * @author Matthew Pocock
  */
 public interface AtomicSymbol extends Symbol {
-  /**
-   * Return an alphabet containing only this symbol.
-   */
-  public Alphabet getMatches();
 }

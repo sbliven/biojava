@@ -90,11 +90,20 @@ public interface ChangeListener extends EventListener {
 
 
     public void preChange(ChangeEvent cev) throws ChangeVetoException {
-      throw new ChangeVetoException(cev);
+      throw new ChangeVetoException(
+        cev,
+        "This object sas been locked"
+      );
     }
 
 
     public void postChange(ChangeEvent cev) {
+      throw new NestedError(
+        new ChangeVetoException(
+          cev, "This object sas been locked"
+        ),
+        "Assertion failure: A locked object has been modified"
+      );
     }
   }
 }

@@ -2,6 +2,7 @@ package org.biojava.bridge.Biocorba.Seqcore;
 
 import java.util.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
@@ -73,4 +74,13 @@ public class SymbolListAdapter implements SymbolList {
   public List toList() {
     return symList.toList();
   }
+
+  public void edit(Edit edit) throws ChangeVetoException {
+    throw new ChangeVetoException("Can't modify SymbolList");
+  }
+  
+  public void addChangeListener(ChangeListener cl) {}
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
+  public void removeChangeListener(ChangeListener cl) {}
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
 }

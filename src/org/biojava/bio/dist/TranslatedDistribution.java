@@ -26,9 +26,9 @@ import java.util.*;
 import java.lang.ref.*;
 import java.io.Serializable;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
 
 /**
  * Creates a distribution that is a translated view of an underlying
@@ -95,7 +95,62 @@ implements Distribution, Serializable {
 
   private final Distribution other;
   private final ReversibleTranslationTable table;
+  protected ChangeSupport changeSupport = null;
+  private final ChangeListener forwarder = new Forwarder();
   
+  public void addChangeListener(ChangeListener cl) {
+    if(changeSupport == null) {
+      changeSupport = new ChangeSupport();
+    }
+    
+    synchronized(changeSupport) {
+      changeSupport.addChangeListener(cl);
+    }
+  }
+  
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+    if(changeSupport == null) {
+      changeSupport = new ChangeSupport();
+    }
+
+    synchronized(changeSupport) {
+      changeSupport.addChangeListener(cl, ct);
+    }
+  }
+  
+  public void removeChangeListener(ChangeListener cl) {
+    if(changeSupport != null) {
+      synchronized(changeSupport) {
+        changeSupport.removeChangeListener(cl);
+      }
+    }
+  }
+  
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+    if(changeSupport != null) {
+      synchronized(changeSupport) {
+        changeSupport.removeChangeListener(cl, ct);
+      }
+    }
+  }
+  
+  /**
+   * Users should make these thigs via getDistribuiton.
+   */     
+  private TranslatedDistribution(
+    ReversibleTranslationTable table, Distribution other
+  ) throws IllegalAlphabetException {
+    if(table.getTargetAlphabet() != other.getAlphabet()) {
+      throw new IllegalAlphabetException(
+        "Table target alphabet and distribution alphabet don't match: " +
+        table.getTargetAlphabet().getName() + " and " +
+        other.getAlphabet().getName()
+      );
+    }
+    this.other = other;
+    this.table = table;
+  }
+
   /**
    * Retrieve the translation table encapsulating the map from this emission
    * spectrum to the underlying one.
@@ -111,7 +166,7 @@ implements Distribution, Serializable {
   }
   
   public void setWeight(Symbol s, double score)
-  throws IllegalSymbolException, UnsupportedOperationException {
+  throws IllegalSymbolException, ChangeVetoException {
     other.setWeight(table.translate(s), score);
   }
   
@@ -134,6 +189,13 @@ implements Distribution, Serializable {
     return getDistribution(table, other.getNullModel()); 
   }
   
+  public void setNullModel(Distribution nullModel)
+  throws IllegalAlphabetException, ChangeVetoException {
+    throw new ChangeVetoException(
+      "TranslatedDistribution objects can't have their null models changed."
+    );
+  }
+  
   public void registerWithTrainer(DistributionTrainerContext dtc) {
     dtc.registerDistribution(other);
     dtc.registerTrainer(this, new IgnoreCountsTrainer() {
@@ -146,18 +208,59 @@ implements Distribution, Serializable {
       }
     });
   }
-    
-  private TranslatedDistribution(
-    ReversibleTranslationTable table, Distribution other
-  ) throws IllegalAlphabetException {
-    if(table.getTargetAlphabet() != other.getAlphabet()) {
-      throw new IllegalAlphabetException(
-        "Table target alphabet and distribution alphabet don't match: " +
-        table.getTargetAlphabet().getName() + " and " +
-        other.getAlphabet().getName()
-      );
+  
+  private class Forwarder implements ChangeListener {
+    private ChangeEvent generateChangeEvent(ChangeEvent ce) {
+      ChangeType ct = ce.getType();
+      Object change = ce.getChange();
+      Object previous = ce.getPrevious();
+      if(ct == Distribution.WEIGHTS) {
+        if( (change != null) && (change instanceof Object[]) ) {
+          Object[] ca = (Object[]) change;
+          if( (ca.length == 2) && (ca[0] instanceof Symbol) ) {
+            try {
+              change = new Object[] { table.translate((Symbol) ca[0]), ca[1] };
+            } catch (IllegalSymbolException ise) {
+              throw new BioError(ise, "Couldn't translate symbol");
+            }
+          }
+        }
+        if( (previous != null) && (previous instanceof Object[]) ) {
+          Object[] pa = (Object[]) previous;
+          if( (pa.length == 2) && (pa[0] instanceof Symbol) ) {
+            try {
+              previous = new Object[] { table.translate((Symbol) pa[0]), pa[1] };
+            } catch (IllegalSymbolException ise) {
+              throw new BioError(ise, "Couldn't translate symbol");
+            }
+          }
+        }
+      } else if(ct == Distribution.NULL_MODEL) {
+        change = null;
+        previous = null;
+      }
+      return new ChangeEvent(
+        TranslatedDistribution.this, ct,
+        change, previous, ce
+      ); 
     }
-    this.other = other;
-    this.table = table;
+    
+    public void preChange(ChangeEvent ce) throws ChangeVetoException {
+      if(changeSupport != null) {
+        ChangeEvent nce = generateChangeEvent(ce);
+        synchronized(changeSupport) {
+          changeSupport.firePreChangeEvent(nce);
+        }
+      }
+    }
+    
+    public void postChange(ChangeEvent ce) {
+      if(changeSupport != null) {
+        ChangeEvent nce = generateChangeEvent(ce);
+        synchronized(changeSupport) {
+          changeSupport.firePostChangeEvent(nce);
+        }
+      }
+    }
   }
 }

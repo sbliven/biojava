@@ -28,6 +28,22 @@ import java.util.*;
  * ChangeEvents.
  * <P>
  * This is loosly modeled after the standard PropertyChangeEvent objects.
+ * <P>
+ * For an object to correctly fire these events, they must follow a broad
+ * outline like this:
+ * <code><pre>
+ * public void mutator(foo arg) throw ChangeVetoException {
+ *   ChangeEvent cevt = new ChangeEvent(this, SOME_EVENT_TYPE, arg);
+ *   synchronized(changeSupport) {
+ *     changeSupport.firePreChangeEvent(cevt);
+ *     // update our state using arg
+ *     // ...
+ *     changeSupport.firePostChangeEvent(cevt);
+ *   }
+ * }
+ * </pre></code>
+ * The methods that delegate adding and removing listeners to a ChangeSupport
+ * must take responsibility for synchronizing on the delegate.
  *
  * @author Matthew Pocock
  * @author Thomas Down

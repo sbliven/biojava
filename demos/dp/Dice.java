@@ -102,12 +102,12 @@ public class Dice
     dist.setWeight(loadedS,               0.90);
     dist.setWeight(casino.magicalState(), 0.01);
 	
-	  DP dp=DPFactory.createDP(casino);
+	  DP dp=DPFactory.DEFAULT.createDP(casino);
     StatePath obs_rolls = dp.generate(300);
 	
 	  SymbolList roll_sequence = obs_rolls.symbolListForLabel(StatePath.SEQUENCE);
     SymbolList[] res_array = {roll_sequence};
-    StatePath v = dp.viterbi(res_array, DP.PROBABILITY);
+    StatePath v = dp.viterbi(res_array, ScoreType.PROBABILITY);
 	
 	  //print out obs_sequence, output, state symbols.
     for(int i = 1; i <= obs_rolls.length()/60; i++) {
@@ -122,7 +122,7 @@ public class Dice
       for(int j=i*60; j<Math.min((i+1)*60, obs_rolls.length()); j++)  {
         System.out.print(v.symbolAt(StatePath.STATES, j+1).getToken());
       }
-      System.out.print("\n\n");	  
+      System.out.print("\n\n");
     }
   }
 }

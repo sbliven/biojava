@@ -24,6 +24,7 @@ package org.biojava.bio.dp;
 import java.util.*;
 import java.io.Serializable;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
@@ -42,7 +43,7 @@ public class WeightMatrixAnnotator implements SequenceAnnotator, Serializable {
     private double threshold;
 
     public Sequence annotate(Sequence seq)
-	throws IllegalAlphabetException, BioException 
+	throws IllegalAlphabetException, BioException, ChangeVetoException
     {
 	seq = new ViewSequence(seq);
     

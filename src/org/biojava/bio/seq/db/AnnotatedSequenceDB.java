@@ -23,9 +23,10 @@ package org.biojava.bio.seq.db;
 
 import java.io.Serializable;
 
+import org.biojava.utils.*;
+import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
-import org.biojava.bio.*;
 import java.util.*;
 
 /**
@@ -56,7 +57,8 @@ public class AnnotatedSequenceDB implements SequenceDB, Serializable {
     return parent.getName() + " (" + annotator.toString() + ")";
   }
 
-  public Sequence getSequence(String id) throws BioException {
+  public Sequence getSequence(String id)
+  throws BioException {
     return doAnnotation(parent.getSequence(id));
   }
 
@@ -83,11 +85,13 @@ public class AnnotatedSequenceDB implements SequenceDB, Serializable {
     *@param seq the sequence to annotate.
     */
 
-  protected Sequence doAnnotation(Sequence seq) throws BioException {
+  protected Sequence doAnnotation(Sequence seq) throws BioException  {
     try {
-	    return annotator.annotate(seq);
+      return annotator.annotate(seq);
     } catch (IllegalAlphabetException ex) {
-	    throw new BioException(ex, "Couldn't apply annotator " + annotator.toString() + " to " + seq.getURN());
+      throw new BioException(ex, "Couldn't apply annotator " + annotator.toString() + " to " + seq.getURN());
+    } catch (ChangeVetoException cve) {
+      throw new BioException(cve, "Couldn't apply annotator " + annotator.toString() + " to " + seq.getURN());
     }
   }
 }
