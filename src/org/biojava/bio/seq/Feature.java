@@ -52,9 +52,20 @@ import org.biojava.bio.symbol.*;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  */
 
 public interface Feature extends FeatureHolder, Annotatable {
+
+    /**
+     * This is used as a key in the <code>Annotation</code> where it
+     * identifies internal data. This is not printed when the
+     * <code>Feature</code> is written to a flatfile. E.g. the
+     * original feature's EMBL location string (if it has one) is
+     * stored here
+     */
+    public static final String PROPERTY_DATA_KEY = "internal_data";
+
     /**
      * The location of this feature.
      * <P>

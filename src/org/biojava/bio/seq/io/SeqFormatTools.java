@@ -179,6 +179,8 @@ public class SeqFormatTools
      *     
      * <pre>
      *   123
+     *  <123 or >123
+     *  (123.567)
      *  (123.567)..789
      *   123..(567.789)
      *  (123.345)..(567.789)
@@ -188,8 +190,6 @@ public class SeqFormatTools
      *
      * Specifically not supported are:
      * <pre>
-     *  (123.567)
-     *  <123 or >123 or <>123
      *   123^567
      *   AL123465:(123..567)
      * </pre>
@@ -252,12 +252,12 @@ public class SeqFormatTools
 	{
 	    pre = sb.length();
 
-	    boolean point = (PointLocation.class.isInstance(la[i])) ? true : false;
-	    boolean fuzzy = (FuzzyLocation.class.isInstance(la[i])) ? true : false;
+	    boolean point      = (PointLocation.class.isInstance(la[i])) ? true : false;
+	    boolean fuzzy      = (FuzzyLocation.class.isInstance(la[i])) ? true : false;
+	    boolean fuzzyPoint = (FuzzyPointLocation.class.isInstance(la[i])) ? true : false;
 
 	    if (point)
 	    {		
-		// Fuzzy point locations are not supported yet
 		sb.append(la[i].getMin());
 	    }
 	    else if (fuzzy)
@@ -283,7 +283,7 @@ public class SeqFormatTools
 
 		sb.append("..");
 
-		if (! ((FuzzyLocation) la[i]).hasBoundedMax())
+		if (! fl.hasBoundedMax())
 		{
 		    // >567
 		    sb.append(">");
@@ -298,7 +298,31 @@ public class SeqFormatTools
 		}
 		else
 		    // 567
-		    sb.append(la[i].getMax());
+		    sb.append(fl.getMax());
+	    }
+	    else if (fuzzyPoint)
+	    {
+		FuzzyPointLocation fpl = (FuzzyPointLocation) la[i];
+
+		if (! fpl.hasBoundedMin())
+		{
+		    // <123
+		    sb.append("<");
+		    sb.append(fpl.getMax());
+		}
+		else if (! fpl.hasBoundedMax())
+		{
+		    // >567
+		    sb.append(">");
+		    sb.append(fpl.getMin());
+		}
+		else
+		{
+		    // (567.789)
+		    sb.append("(" + fpl.getMin());
+		    sb.append(".");
+		    sb.append(fpl.getMax() + ")");
+		}
 	    }
 	    else
 	    {
@@ -326,7 +350,9 @@ public class SeqFormatTools
 		position = leader.length() + diff;
 	    }
 	    else
+	    {
 		position += diff;
+	    }
 	}
 
 	if (join)

@@ -40,7 +40,8 @@ import org.biojava.bio.*;
  *
  * <pre>
  *   123
- *  <123 or >123 or <>123
+ *  <123 or >123
+ *  (123.567)
  *  (123.567)..789
  *   123..(567.789)
  *  (123.345)..(567.789)
@@ -50,8 +51,6 @@ import org.biojava.bio.*;
  *
  * Specifically not supported are:
  * <pre>
- *  (123.567)
- *  <123 or >123 or <>123
  *   123^567
  *   AL123465:(123..567)
  * </pre> 

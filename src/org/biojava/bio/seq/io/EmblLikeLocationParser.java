@@ -35,6 +35,8 @@ import java.util.ArrayList;
  *
  * <pre>
  *   123
+ *  <123 or >123
+ *  (123.567)
  *  (123.567)..789
  *   123..(567.789)
  *  (123.345)..(567.789)
@@ -44,8 +46,6 @@ import java.util.ArrayList;
  *
  * Specifically not supported are:
  * <pre>
- *  (123.567)
- *  <123 or >123 or <>123
  *   123^567
  *   AL123465:(123..567)
  * </pre>
@@ -228,17 +228,21 @@ class EmblLikeLocationParser
 	    innerMin = outerMin = ((Integer) startCoords.get(0)).intValue();
 	    innerMax = outerMax = innerMin;
 
-	    // This looks like a point, but is actually a range with
-	    // only a single residue within this entry.
+	    // This looks like a point, but is actually a range which
+	    // lies entirely outside the current entry
 	    if (unboundMin || unboundMax)
 	    {
 		// Range of form: <123 or >123 or <>123
-  		throw new BioException("Unbounded point locations currently not supported: "
-  				       + location);
+  		// throw new BioException("Unbounded point locations currently not supported: "
+  		//		       + location);
+
+		subLocations.add(new FuzzyPointLocation(unboundMin ? Integer.MIN_VALUE : innerMin,
+							unboundMax ? Integer.MAX_VALUE : innerMax,
+							FuzzyPointLocation.RESOLVE_AVERAGE));
 	    }
 	    else if (isPointLoc)
 	    {
-		subLocations.add(new PointLocation(outerMin));
+		subLocations.add(new PointLocation(innerMin));
 	    }
 	    else
 	    {
@@ -251,8 +255,15 @@ class EmblLikeLocationParser
 	// Range of form: (123.567)
 	else if (startCoords.size() == 2 && endCoords.isEmpty())
 	{
-  	    throw new BioException("Fuzzy point locations currently not supported: "
-  				   + location);
+  	    // throw new BioException("Fuzzy point locations currently not supported: "
+	    //		   + location);
+
+	    innerMin = outerMin = ((Integer) startCoords.get(0)).intValue();
+	    innerMax = outerMax = ((Integer) startCoords.get(1)).intValue();
+
+	    subLocations.add(new FuzzyPointLocation(innerMin,
+						    innerMax,
+						    FuzzyPointLocation.RESOLVE_AVERAGE));
 	}
 	// Range of form: 123..567 or <123..567 or 123..>567 or <123..>567
 	else if (startCoords.size() == 1 && endCoords.size() == 1)

@@ -27,17 +27,25 @@ import java.io.*;
 import org.biojava.bio.*;
 
 /**
- * <code>FuzzyPointLocation</code>.
- *
- * I wouldn't use this yet. I've just typed it in one go, so the logic
- * may be wrong. It isn't used in the parser yet.
+ * <code>FuzzyPointLocation</code> represents two types of EMBL-style
+ * partially-defined locations. These are the '(123.567)' type, which
+ * represent a single residue somewhere between these coordinates and
+ * the '<123' or '>123' type, which represent an unbounded location,
+ * not including the residue at that coordinate.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  */
 public class FuzzyPointLocation implements Location, Serializable
 {
+    // Use the minimum value
     public final static PointResolver RESOLVE_MIN;
+
+    // Use the maximum value
     public final static PointResolver RESOLVE_MAX;
+
+    // Use the arithmetic mean of the two values, unless they are
+    // unbounded, in which case Integer.MIN_VALUE or Integer.MAX_VALUE
+    // is returned
     public final static PointResolver RESOLVE_AVERAGE;
 
     static
@@ -51,16 +59,25 @@ public class FuzzyPointLocation implements Location, Serializable
     private int           max;
     private PointResolver resolver;
 
+    /**
+     * Creates a new <code>FuzzyPointLocation</code> object. Note that
+     * either the maximum or minimum may be unbounded, but not both.
+     *
+     * @param min an <code>int</code> value for the minimum boundary
+     * of the location, Integer.MIN_VALUE if unbounded.
+     * @param max an <code>int</code> value for the minimum boundary
+     * of the location, Integer.MAX_VALUE if unbounded.
+     * @param resolver a <code>PointResolver</code> which defines the
+     * policy used to calculate * the location's min and max
+     * properties.
+     *
+     * @exception IndexOutOfBoundsException if an error occurs.
+     */
     public FuzzyPointLocation(int min, int max, PointResolver resolver)
-	throws BioException
+	throws IndexOutOfBoundsException
     {
-	if ((min == Integer.MIN_VALUE) || (min == Integer.MAX_VALUE))
-	    if ((max == Integer.MIN_VALUE) || (max == Integer.MAX_VALUE))
-		throw new BioException("A fuzzy point may only have an unbounded max OR min"); 
-
-	if ((max == Integer.MIN_VALUE) || (max == Integer.MAX_VALUE))
-	    if ((min == Integer.MIN_VALUE) || (min == Integer.MAX_VALUE))
-		throw new BioException("A fuzzy point may only have an unbounded max OR min"); 
+	if ((min == Integer.MIN_VALUE) && max == Integer.MAX_VALUE)
+	    throw new IndexOutOfBoundsException("A fuzzy point may only have an unbounded max OR min"); 
 	    
 	this.min      = min;
 	this.max      = max;
@@ -69,14 +86,13 @@ public class FuzzyPointLocation implements Location, Serializable
 
     public int getMin()
     {
-	return resolver.resolve(this);
+	return min;
     }
 
     public int getMax()
     {
-	return resolver.resolve(this);
+	return max;
     }
-
 
     public boolean hasBoundedMin()
     {
@@ -95,6 +111,8 @@ public class FuzzyPointLocation implements Location, Serializable
 
     public boolean contains(Location loc)
     {
+	// If the location is unbounded, it is not certain that it
+	// contains any other specific location
 	return (hasBoundedMin() && hasBoundedMax()) &&
 	   (resolver.resolve(this) == loc.getMin()) &&
 	   (resolver.resolve(this) == loc.getMax()); 
@@ -102,7 +120,10 @@ public class FuzzyPointLocation implements Location, Serializable
 
     public boolean contains(int point)
     {
-	return resolver.resolve(this) == point;
+	// If the location is unbounded, it is not certain that it
+	// contains any other specific coordinate
+	return (hasBoundedMin() && hasBoundedMax()) &&
+	    resolver.resolve(this) == point;
     }
 
     public boolean equals(Location loc)
@@ -150,9 +171,9 @@ public class FuzzyPointLocation implements Location, Serializable
 		    }
 		});
 	}
-	catch (IllegalSymbolException ex)
+	catch (IllegalSymbolException ise)
 	{
-	    throw new BioError(ex);
+	    throw new BioError(ise);
 	}
     }
 
@@ -177,9 +198,9 @@ public class FuzzyPointLocation implements Location, Serializable
 					  this.max + dist,
 					  this.resolver);
 	}
-	catch (BioException bex)
+	catch (IndexOutOfBoundsException ioe)
 	{
-	    bex.printStackTrace();
+	    ioe.printStackTrace();
 	}
 
 	return this;
@@ -247,6 +268,7 @@ public class FuzzyPointLocation implements Location, Serializable
 	    // Range of form: <123 or >123
 	    else
 	    {
+		// Unbounded min/max are mutually exclusive
 		return loc.hasBoundedMin() ? Integer.MAX_VALUE : Integer.MIN_VALUE;
 	    }
 	}

@@ -100,7 +100,9 @@ class FeatureTableParser {
 		// annotation bundle
 		try
 		{
-		    featureTemplate.annotation.setProperty("location", featureBuf.toString());
+		    Map dat = new HashMap();
+		    dat.put("location", featureBuf.toString());
+		    featureTemplate.annotation.setProperty(Feature.PROPERTY_DATA_KEY, dat);
 		}
 		catch (ChangeVetoException cve)
 		{
