@@ -42,7 +42,7 @@
 
     <property name="build.compiler" value="modern" />
 
-    <property name="classpath" value="xerces.jar:jakarta-regexp.jar:bytecode.jar" />
+    <property name="classpath" value="xerces.jar:jakarta-regexp.jar:bytecode.jar:htmlparser.jar" />
 
     <!-- Save the current system classpath to pass to forked VMs -->
     <property name="env.classpath" value="${java.class.path}" />
