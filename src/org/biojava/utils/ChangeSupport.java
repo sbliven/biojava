@@ -71,8 +71,31 @@ public class ChangeSupport {
   private Reference[] listeners;
   private ChangeType[] types;
 
+  /**
+   * Return true if we have any listeners registered at all.
+   * 
+   * @return true if there are listeners
+   */
   public boolean hasListeners() {
       return (listenerCount > 0);
+  }
+  
+  /**
+   * Return true if we have listeners registered for a particular change type.
+   * 
+   * @param ct	the ChangeType to check
+   * @return	true if there are listeners for this type
+   */
+  public boolean hasListeners(ChangeType ct)
+  {
+  	for(int i = 0; i < types.length; i++ ) {
+  	  ChangeType type = (ChangeType) types[i];
+  	  if(type.isMatchingType(ct)) {
+  	  	return true;
+  	  }
+  	}
+  	
+  	return false;
   }
 
   /**
