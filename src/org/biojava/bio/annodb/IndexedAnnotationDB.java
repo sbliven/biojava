@@ -35,12 +35,25 @@ implements AnnotationDB {
   private final Parser recordParser;
   
   public IndexedAnnotationDB(
-    BioStore store,
+    String dbName,
+    File storeLoc,
+    Index2Model model,
+    List toIndex,
+    int maxKeyLen,
     AnnotationType schema,
     ParserListenerFactory plFactory
-  ) throws IOException {
+  ) throws IOException, NestedException {
     // state
-    this.store = store;
+    BioStoreFactory bsf = new BioStoreFactory();
+    bsf.setStoreName(dbName);
+    bsf.setPrimaryKey(model.getPrimaryKeyName());
+    
+    for(Iterator i = model.getKeys().iterator(); i.hasNext(); ) {
+      String key = (String) i.next();
+      bsf.addKey(key, maxKeyLen);
+    }
+    
+    this.store = bsf.createBioStore();
     this.schema = schema;
     this.plFactory = plFactory;
     this.annBuilder = new AnnotationBuilder(schema);
@@ -70,6 +83,19 @@ implements AnnotationDB {
     schemaTW.writeAnnotationType(schema, schemaWriter);
     schemaPW.flush();
     schemaPW.close();
+    
+    for(Iterator fi = toIndex.iterator(); fi.hasNext(); ) {
+      File file = (File) fi.next();
+      
+      Indexer2 ndx = new Indexer2(file, store, model);
+      ParserListener pl = plFactory.getParserListener(ndx);
+      Parser parser = new Parser();
+      while(parser.read(ndx.getReader(), pl.getParser(), pl.getListener())) {
+        ;
+      }
+    }
+    
+    store.commit();
   }
   
   public IndexedAnnotationDB(BioStore store) throws IOException, SAXException {

@@ -150,23 +150,23 @@ public class BioStoreFactory {
     }
 
     /**
-     * <code>addKey</code> adds a new secondary identifier namespace.
+     * <code>addKey</code> adds a new identifier namespace.
      *
      * @param keyName a <code>String</code>.
      * @param length an <code>int</code> indicating the byte length of
-     * the secondary key records.
+     * the key records.
      */
     public void addKey(String keyName, int length) {
         keys.put(keyName, new Integer(length));
     }
 
     /**
-     * <code>removeSecondaryKey</code> removes the specified
-     * secondary.
+     * <code>removeKey</code> removes the specified
+     * key.
      *
      * @param keyName a <code>String</code>.
      */
-    public void removeSecondaryKey(String keyName) {
+    public void removeKey(String keyName) {
         keys.remove(keyName);
     }
 

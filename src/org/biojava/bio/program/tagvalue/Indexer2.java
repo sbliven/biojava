@@ -58,7 +58,7 @@ import org.biojava.bio.program.indexdb.*;
  *
  * TagValueParser tvParser; // make this appropriate for your format
  * TagValueListener listener; // make this appropriate for your format
- *                            // and forward all events to changer
+ *                            // and forward all events to indexer
  * 
  * Parser parser = new Parser();
  * while(
@@ -73,12 +73,12 @@ import org.biojava.bio.program.indexdb.*;
  */
 public class Indexer2
 implements TagValueListener {
+  private final String primaryKeyName;
   private final RAF file;
   private final CountedBufferedReader reader;
   private final IndexStore indexStore;
   private final Map keys;
   private final Map keyValues;
-  private String primaryKeyName;
   private Object tag;
   private long offset;
   private int depth;
@@ -90,15 +90,23 @@ implements TagValueListener {
    * @param file  the file to be processed
    * @param indexStore  the IndexStore to write to
    */
-  public Indexer2(File file, IndexStore indexStore)
+  public Indexer2(File file, IndexStore indexStore, Index2Model model)
   throws FileNotFoundException {
     this.file = new RAF(file, "r");
     this.reader = new CountedBufferedReader(new FileReader(file));
     this.indexStore = indexStore;
-    this.keys = new SmallMap();
     this.keyValues = new SmallMap();
     this.depth = 0;
     this.stack = new Stack();
+    
+    this.keys = new SmallMap();
+    for(Iterator i = model.getKeys().iterator(); i.hasNext(); ) {
+      String key = (String) i.next();
+      Object val = model.getKeyPath(key);
+      
+      keys.put(val, key);
+    }
+    this.primaryKeyName = model.getPrimaryKeyName();
   }
   
   /**
@@ -108,68 +116,6 @@ implements TagValueListener {
    */
   public CountedBufferedReader getReader() {
     return reader;
-  }
-  
-  /**
-   * <p>
-   * Set the tag to use as a primary key in the index.
-   * </p>
-   *
-   * <p>
-   * Whenever a value for the primary key tag is seen, this is passed to the
-   * indexer as the primary key for indexing.
-   * </p>
-   *
-   * <p>
-   * Primary keys must be unique between entries, and each entry must provide
-   * exactly one primary key value.
-   * </p>
-   *
-   * @param primaryKeyName the tag to use as primary key
-   */
-  public void setPrimaryKeyName(String primaryKeyName) {
-    this.primaryKeyName = primaryKeyName;
-  }
-  
-  /**
-   * Retrieve the tag currently used as primary key.
-   *
-   * @return a String representing the primary key name
-   */
-  public String getPrimaryKeyName() {
-    return primaryKeyName;
-  }
-  
-  /**
-   * <p>
-   * Add a key and a path to that key in the tag-value hierachy.
-   * </p>
-   *
-   * <p>
-   * Secondary keys are potentialy non-unique properties of the entries being
-   * indexed. Multiple records can use the same secondary key values, and a
-   * single record can have multiple values for a secondary key. However, the
-   * primary key must be unique.
-   * </p>
-   *
-   * @param keyName  the name of the secondary key to add
-   * @param path  the names of each tag to follow to reach the value of the key
-   */
-  public void addKeyPath(String keyName, Object[] path) {
-    keys.put(path, new KeyState(keyName));
-  }
-  
-  /**
-   * Remove a key.
-   *
-   * @param keyName  the name of the key to remove
-   */
-  public void removeKeyPath(String keyName) {
-    keys.remove(keyName);
-  }
-  
-  public Object[] getKeyPath(String keyName) {
-    return (Object []) keys.get(keyName);
   }
   
   public void startRecord() {
