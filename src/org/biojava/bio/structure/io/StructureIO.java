@@ -36,32 +36,16 @@ import java.io.IOException ;
  */
 public interface StructureIO {
     
-    /** set PDB id. 
-     * @param id  a String specifying the id value (PDB code)
-     * @see #getId
-     */
-    public void setId(String id) ;
-
-    /** get PDB id. 
-     * @return PDB code
-     * @see #setId
-     */
-    public String getId() ;
-
-    /** parse the file/ connect to DB, etc. 
-     * requires id to be set before ...
+    /** Get a structure by providing a PDB code.
+     * 
+     * @param pdbId  a String specifying the id value (PDB code)
      * @return a Structure object
      * @throws IOException ...
      */
-    public Structure getStructure() throws IOException;
 
-    /** open filename and returns
-     * a Structure object.
-     * @param filename  a String
-     * @return a Structure object
-     * @throws IOException ...
-     */
-    public Structure getStructure(String filename) throws IOException ;
+    public Structure getStructureById(String pdbId) throws IOException;
+
+
     
 }
   
