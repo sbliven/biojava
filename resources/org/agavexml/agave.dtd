@@ -1,0 +1,901 @@
+<!-- ********************************************************************* -->
+<!--   AGAVE - Architecture for Genomic Annotation, Visualization and      -->
+<!--           Exchange                                                    -->
+<!--                                                                       -->
+<!-- AGAVE is designed to offer the life sciences community a              -->
+<!-- comprehensive, extensible and open format for sharing genomic         -->
+<!-- annotations. Information on AGAVE can be found at                     -->
+<!-- http://www.agavexml.org.                                              -->
+<!--                                                                       -->
+<!-- Copyright (c) 2001. DoubleTwist, Inc.  All Rights Reserved.  AGAVE is --> 
+<!-- a trademark of DoubleTwist, Inc.                                      -->
+<!--                                                                       -->
+<!-- Use of the Architecture for Genomic Annotation, Visualization and     -->
+<!-- Exchange (AGAVE) XML Document Type Definition (DTD), or any copies    -->
+<!-- thereof by you (either an individual or a single entity) is subject   -->
+<!-- to these Terms of Use ("Terms of Use").   Using the AGAVE XML DTD     -->
+<!-- constitutes your acceptance of these Terms of Use.                    -->
+<!--                                                                       -->
+<!-- CONDITIONS FOR USE                                                    -->
+<!-- Redistribution and use of AGAVE in source and binary forms, with or   -->
+<!-- without modification, are permitted provided that the following       -->
+<!-- conditions are met:                                                   -->
+<!--                                                                       -->
+<!--  1. Redistributions of source code must retain the above copyright    -->
+<!--     notice, this list of conditions and the following disclaimer.     -->
+<!--                                                                       -->
+<!--  2. Redistributions in binary form must reproduce the above copyright -->
+<!--     notice, this list of conditions and the following disclaimer in   -->
+<!--     the documentation and/or other materials provided with the        -->
+<!--     distribution.                                                     -->
+<!--                                                                       -->
+<!--  3. Redistributions of any form whatsoever must retain the following  -->
+<!--     acknowledgment:                                                   -->
+<!--     "This product includes software developed by DoubleTwist, Inc.    -->
+<!--     (http://www.doubletwist.com)"                                     -->
+<!--                                                                       -->
+<!--  4. The names "AGAVE" and "DoubleTwist" must not be used to endorse   -->
+<!--     or promote products derived from this software without prior      -->
+<!--     written permission. For written permission, please contact        -->
+<!--     info@agavexml.org.                                                -->
+<!--                                                                       -->
+<!--  5. Products derived from this software may not be called "AGAVE",    -->
+<!--     nor may "AGAVE" appear in their name, without prior written       -->
+<!--     permission of DoubleTwist, Inc.                                   -->
+<!--                                                                       -->
+<!-- NO WARRANTIES                                                         -->
+<!-- Because the AGAVE XML DTD and documentation are licensed free of      -->
+<!-- charge, there is no warranty for the AGAVE XML DTD and documentation. -->
+<!-- THE AGAVE XML DTD IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,   -->
+<!-- EITHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED -->
+<!-- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE    -->
+<!-- AND NON-INFRINGEMENT. SHOULD THE AGAVE XML DTD PROVE DEFECTIVE, YOU   -->
+<!-- ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION     -->
+<!-- RESULTING FROM SUCH DEFECT.                                           -->
+<!--                                                                       -->
+<!-- LIMITATION OF LIABILITY                                               -->
+<!-- IN NO EVENT WILL DOUBLETWIST BE LIABLE TO YOU FOR ANY DAMAGES OF ANY  -->
+<!-- KIND, INCLUDING WITHOUT LIMITATION ANY GENERAL, DIRECT, SPECIAL,      -->
+<!-- INCIDENTAL OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,   -->
+<!-- LOSS OF DATA, DATA RENDERED INACCURATE, OR LOSSES SUSTAINED BY YOU OR -->
+<!-- THIRD PARTIES, OR A FAILURE OF THE AGAVE XML DTD TO OPERATE WITH      -->
+<!-- AGAVE-VALID XML FILES), HOWEVER CAUSED AND ON ANY THEORY OF           -->
+<!-- LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING  -->
+<!-- NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS    -->
+<!-- SOFTWARE EVEN IF DOUBLETWIST HAS BEEN ADVISED OF THE POSSIBILITY OF   -->
+<!-- SUCH DAMAGES.                                                         -->
+<!--                                                                       -->
+<!-- INDEMNIFICATION                                                       -->
+<!-- You agree to indemnify and hold DoubleTwist, its officers, employees  -->
+<!-- and its suppliers harmless from any claim or demand, including        -->
+<!-- reasonable attorneys' fees, made by any third party due to or arising -->
+<!-- out of your use of the AGAVE XML DTD or breach of these Terms of Use  -->
+<!-- or violation of any rights of another.                                -->
+<!--                                                                       -->
+<!-- GENERAL                                                               -->
+<!-- You agree to access and use the AGAVE XML DTD in accordance with all  -->
+<!-- applicable law and regulations, including, without limitation, state  -->
+<!-- and federal laws and regulations.  User agrees not to use the Service -->
+<!-- for any illegal or wrongful purposes.  You shall be solely            -->
+<!-- responsible for your compliance with all applicable United States and -->
+<!-- foreign laws and regulations and international treaties with respect  -->
+<!-- to the export or import or use of the AGAVE XML DTD and               -->
+<!-- documentation.                                                        -->
+<!--                                                                       -->
+<!-- These Terms of Use shall be governed by and construed in accordance   -->
+<!-- with the laws of the State of California, United States of America,   -->
+<!-- without regard to or application of choice of law rules or            -->
+<!-- principles. User hereby consents to the personal and exclusive        -->
+<!-- jurisdiction and venue of the Northern District of California federal -->
+<!-- and state courts, as applicable.                                      -->
+<!--                                                                       -->
+<!-- If any provision of these Terms of Use is held by a court of          -->
+<!-- competent jurisdiction to be invalid, such provision shall be         -->
+<!-- reformed to as nearly as possible approximate the intent of the       -->
+<!-- parties and all other provisions shall remain in full force and       -->
+<!-- effect.  DoubleTwist's failure to exercise or enforce any right or    -->
+<!-- provision of these Terms of Use shall not constitute a waiver of such -->
+<!-- right or provision.                                                   -->
+<!--                                                                       -->
+<!-- These Terms of Use constitute the parties' final, exclusive and       -->
+<!-- complete understanding and agreement with respect to the subject      -->
+<!-- matter hereof and supersedes all prior and contemporaneous            -->
+<!-- understandings and agreements between the parties.                    -->
+<!--                                                                       -->
+<!-- The AGAVE XML DTD is an evolving specification; please obtain the     -->
+<!-- latest AGAVE XML DTD and documentation from www.agavexml.org.         -->
+<!-- DoubleTwist reserves the right to change, without notice, the AGAVE   -->
+<!-- XML DTD and documentation.                                            -->
+<!--                                                                       -->
+<!--                                                                       -->
+<!--   History:                                                            -->
+<!--                                                                       -->
+<!--   Jun. 30, 2000 version 2.0 Released with Prophecy 1.0                -->
+<!--   Aug. 25, 2000 version 2.1 Released with Prophecy 1.1.2              --> 
+<!--   Nov. 13, 2000 version 2.2 Released with Prophecy 2.0                -->
+<!--   Jul.  3, 2001 version 2.3 Released with Propehcy 3.0                --> 
+<!--                                                                       -->
+<!-- ********************************************************************* -->
+
+<!--                                                                       -->
+<!-- sciobj - The XML document root.                                       -->
+<!--                                                                       -->
+<!-- The version is incremented when an incompatible change is made.       -->
+<!-- The release changes to indicate compatible changes within a           -->
+<!-- version.  An incompatible change causes a "fatal error" in an XML     -->
+<!-- compliant parser when parsing data files formatted to a previous      -->
+<!-- version of the DTD.  Compatible changes may cause non-fatal errors    -->
+<!-- or warnings.                                                          -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- version: incremented to indicate incompatible changes.                -->
+<!-- release: incremented to indicate compatible changes.                  -->
+<!-- date:    The date this document was created.  The date does not       -->
+<!--          specify when the data in the document was created, only      -->
+<!--          when the data was assembled into this document. The date     -->
+<!--          format is YYYY-MM-DD on the Gregorian calendar, as           -->
+<!--          specified in W3C technical report                            -->
+<!--          http://www.w3.org/TR/NOTE-datetime-970915                    -->
+<!--                                                                       -->
+<!ELEMENT sciobj  (bio_sequence* , contig* , computation* , chromosome*)>
+<!ATTLIST sciobj  version  NMTOKEN "2" 
+                  release  NMTOKEN "3" 
+                  date     CDATA   #IMPLIED >
+
+<!-- ********************************************************************* -->
+<!--  Basic elements                                                       -->
+<!--                                                                       -->
+<!-- ********************************************************************* -->
+
+<!--                                                                       -->
+<!-- db_id is an identifier for an object in its source database.          -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- id:       a data identifier such as GenBank accession or PID.         -->
+<!-- db_code:  a code for the data source, e.g. GenBank is "gb".           --> 
+<!-- version:  version of the associated data.                             -->
+<!--                                                                       -->
+<!ELEMENT db_id EMPTY>
+<!ATTLIST db_id  id       CDATA  #REQUIRED
+                 version  CDATA  #IMPLIED
+                 db_code  CDATA  #REQUIRED >
+
+<!--                                                                       -->
+<!-- element_id contains an IDREF.  Use when need to have an IDREF in an   -->
+<!-- ELEMENT content model.  Useful for alternation of db_id or            -->
+<!-- element_id                                                            -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- id: the XML ID of another ELEMENT                                     -->
+<!--                                                                       -->
+<!ELEMENT element_id EMPTY>
+<!ATTLIST element_id  id IDREF  #REQUIRED >
+
+<!--                                                                       -->
+<!-- A user added note.                                                    -->
+<!--                                                                       -->
+<!ELEMENT note (#PCDATA )>
+
+
+<!--                                                                       -->
+<!-- A dataset name and version that identifies a set of annotations,      -->
+<!-- for example                                                           -->
+<!--                                                                       -->
+<!--    dataset name="Prophecy" version="1.1.1"                            -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- name:    a dataset name                                               -->
+<!-- version: version of the dataset                                       -->
+<!--                                                                       -->
+<!ELEMENT dataset EMPTY>
+<!ATTLIST dataset name     CDATA   #REQUIRED
+                  version  NMTOKEN #REQUIRED >
+
+
+<!--                                                                       -->
+<!-- related_annot relates sequence annotations and specifies the          -->
+<!-- relationship type.  This allows relationships other than              -->
+<!-- containment.  For example, a link between overlapping features can    -->
+<!-- be created.                                                           -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- rel:   a relationship type name                                       -->
+<!-- score: a score representing the strength of the relationship. Score   -->
+<!--        is scaled to an integer from 0-100                             -->
+<!--                                                                       -->
+<!-- Content:                                                              -->
+<!--                                                                       -->
+<!-- element_id: A reference to a comp_result or seq_feature in the same   -->
+<!--             document. Multiple references can be used because         -->
+<!--             more than one annotation may be in the same               -->
+<!--             relationship.                                             -->
+<!-- property:   A property of the relationship such as a score or         -->
+<!--             a description.                                            -->
+<!--                                                                       -->
+<!--                                                                       -->  
+<!ELEMENT related_annot (element_id+, sci_property*)>
+<!ATTLIST related_annot rel   CDATA  #REQUIRED
+                        score CDATA  #IMPLIED>
+
+<!--                                                                       -->
+<!-- sci_property is a name-value pair.                                    -->
+<!--                                                                       -->
+<!-- We use SQL types to specify the data_type because they are a well     -->
+<!-- established standard.  Using a diffent datatype set such as Java      -->
+<!-- datatypes would be equally valid.                                     -->
+<!--                                                                       -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- prop_type: The type of the property                                   -->                                             
+<!-- data_type: indicates if the content should be interpreted as a        -->
+<!--            number or a string                                         --> 
+<!--                                                                       -->
+<!ELEMENT sci_property  (#PCDATA )>
+<!ATTLIST sci_property  prop_type  CDATA  #REQUIRED
+                        data_type  (NUMBER | VARCHAR | LONG )  'NUMBER' >
+
+<!--                                                                       -->
+<!-- An assignment of type from a classification system.  For example,     -->
+<!-- an element may be classified as a "gene" with id "BCHE" which is a    -->
+<!-- concept in the HUGO classifcation system. This would be written as    -->
+<!--                                                                       -->
+<!-- classification code="HUGO"                                            -->
+<!--                id="BCHE"                                              -->
+<!--                type="gene"                                            -->
+<!--                assigned_by="locuslink"                                -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- system: the classification system, e.g. "HUGO"                        -->
+<!-- id:   the type id in the classification system.  For example, a       -->
+<!--       gene label.                                                     -->
+<!-- type: a type assignment such as "gene".                               -->
+<!--                                                                       -->
+<!-- assiged_by: person, organization, or algorithm who determined the     -->
+<!--             classification.                                           -->
+<!--                                                                       -->
+<!--                                                                       -->
+<!ELEMENT classification (description? , id_alias* , evidence? )> 
+<!ATTLIST classification system      CDATA  #REQUIRED
+                         id          CDATA  #REQUIRED
+                         type        CDATA  #REQUIRED 
+                         assigned_by CDATA  #IMPLIED >
+<!--                                                                       -->
+<!-- alternate ids in a classification                                     -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- id:   a type id in the classification system.                         -->
+<!-- type: The reason for the alias, such as "withdrawn", "misspelling",   -->
+<!--       "former".                                                       -->
+<!--                                                                       -->
+<!ELEMENT id_alias EMPTY>
+<!ATTLIST id_alias id   CDATA #REQUIRED 
+                   type CDATA #IMPLIED >
+
+<!--                                                                       -->
+<!-- Description.                                                          -->
+<!--                                                                       -->
+<!ELEMENT description  (#PCDATA )>
+
+
+<!--                                                                       -->
+<!-- A view is the range in a chromosome or contig which contains all      -->
+<!-- available annotations.  Since the number of annotations in a          -->
+<!-- chromosome or contig may be large, we have views to allow the         -->
+<!-- annotations to be divided among different documents.                  -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- start:  the start position in the container's coordinate system.      -->
+<!--         Must be an integer.                                           -->
+<!-- length: The length of the view.                                       -->
+<!--                                                                       -->
+<!ELEMENT view  EMPTY>
+<!ATTLIST view  start  CDATA #REQUIRED
+                length CDATA #REQUIRED >
+                  
+
+<!-- ********************************************************************* -->
+<!--   Computational results elements.                                     -->
+<!--                                                                       -->
+<!-- ********************************************************************* -->
+
+<!--                                                                       -->
+<!-- a computation element represents a particular run of an analysis      -->
+<!-- algorithm.  A computation contains comp_input, comp_results, and      -->
+<!-- possible comp_error if the computation fails.                         -->
+<!--                                                                       -->
+<!-- comp_results can contain sub comp_results in a result_group.          -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- element_id:        an XML ID for this ELEMENT                         -->
+<!-- computation_id:    a unique key for database storage                  -->
+<!-- algorithm:         Algorithm/program type                             -->
+<!-- algorithm_version: The algorithm/program version                      -->
+<!-- parameters:        Parameters that were used to run the program.      -->
+<!-- target_database:   Database type that was used to perform             -->
+<!--                    computation                                        -->
+<!--                                                                       -->
+<!--                                                                       -->
+<!ELEMENT computation (comp_input? , dataset? , (comp_error | result_group | results)*)>
+<!ATTLIST computation  element_id        ID       #IMPLIED
+                       computation_id    NMTOKEN  #IMPLIED
+                       algorithm         CDATA    #REQUIRED
+                       algorithm_version CDATA    #IMPLIED
+                       parameters        CDATA    #IMPLIED
+                       target_database   CDATA    #IMPLIED >
+
+<!--                                                                       -->
+<!-- Computational Input element                                           -->
+<!--                                                                       -->
+<!-- This takes one or more db_ids or biosequences as input.               -->
+<!-- Biosequences could be used when we want to include more info other    -->
+<!-- than the identifier (e.g. species or the sequence itself).            -->
+<!--                                                                       -->
+<!ELEMENT comp_input (db_id | bio_sequence)+>
+
+<!--                                                                       -->
+<!-- For storing error messages from programs                              -->
+<!-- The error message is the contents of the comp_error tag               -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- program:    name of program called                                    -->
+<!-- arguments:  arguments of program                                      -->
+<!-- errno:      formal error number (if available)                        -->
+<!-- returncode: OS return code (if available)                             -->
+<!-- source:     source of error (for multi-layer reporting)               -->
+<!-- time:       time of error                                             -->
+<!--                                                                       -->
+<!ELEMENT comp_error (#PCDATA)>
+<!ATTLIST comp_error   program     CDATA    #IMPLIED
+                       arguments   CDATA    #IMPLIED
+                       errorno     CDATA    #IMPLIED
+                       returncode  CDATA    #IMPLIED
+                       source      CDATA    #IMPLIED
+                       time        CDATA    #IMPLIED>
+
+<!--                                                                       -->
+<!-- comp_result contains result alignments, scores, and other             -->
+<!-- properties.  comp_results can be nested using a result_group          -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- element_id:   an XML ID for this ELEMENT                              -->
+<!-- result_id:    a unique key for database storage                       -->
+<!-- group_order:  is the order of a result when it appears inside a       --> 
+<!--               group. The group_order is only needed as a database     -->
+<!--               storage id.                                             -->
+<!-- result_type:  a result type code, for example grail_exon for a        -->
+<!--               Grail predicted Exon                                    -->
+<!-- feature_type: an assignment of the computed result_type to a          -->
+<!--               GenBank feature type.  Use "*alignment" for             -->
+<!--               feature_type if the result is an alignment not          -->
+<!--               interpreted as a feature.                               -->
+<!--                                                                       -->
+<!-- on_complement_strand: true when match is on complementary strand      -->
+<!--                                                                       -->
+<!-- confidence: an integer in the range 0-100.  It expresses the          -->
+<!--             confidence in the result, and is usually a rough          --> 
+<!--             summary of the algorithm scores.  Applications can use    -->
+<!--             the confidence score for filtering, querying, and         -->
+<!--             sorting.  We use an integer rather than a floating        -->
+<!--             point because as a rough estimate there is no useful      -->
+<!--             difference between an integral and a fractional score     -->
+<!--             in this range.                                            -->
+<!--                                                                       -->
+<!-- align_length: the length of the alignment in the alignment units      -->
+<!-- align_units:  the alignment length units                              -->
+<!--                                                                       -->
+<!ELEMENT comp_result  (note? , match_desc? , match_align? , query_region? , 
+                        match_region? , result_property* , result_group* , 
+                        related_annot*)>
+<!ATTLIST comp_result  element_id           ID       #IMPLIED
+                       result_id            NMTOKEN  #IMPLIED
+                       group_order          NMTOKEN  #IMPLIED
+                       result_type          CDATA    #REQUIRED
+                       feature_type         CDATA    #IMPLIED
+                       on_complement_strand  (true | false )  'false'
+                       confidence           NMTOKEN  #IMPLIED 
+                       align_length         NMTOKEN  #IMPLIED
+                       align_units          (bp | AA) #IMPLIED >
+<!--                                                                       -->
+<!-- result_group is an association class that holds the group_id          -->
+<!-- of a group of comp_results                                            -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- group_order: a unique key for database storage                        -->
+<!--                                                                       -->
+<!ELEMENT result_group  (comp_result+ )>
+<!ATTLIST result_group  group_order NMTOKEN  '0' >
+
+<!--                                                                       -->
+<!--  results contain comp_results that are not grouped.                   -->
+<!--                                                                       -->
+<!ELEMENT results  (comp_result+ )>
+
+<!--                                                                       -->
+<!-- result_property holds result values such as blast P scores            -->
+<!--                                                                       -->
+<!-- We use SQL types to specify the data_type because they are a well     -->
+<!-- established standard.  Using a diffent datatype set such as Java      -->
+<!-- datatypes would be equally valid.                                     -->
+<!--                                                                       -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- prop_type: The type of the property                                   -->                                             
+<!-- data_type: indicates if the content should be interpreted as a        -->
+<!--            number or a string                                         --> 
+<!--                                                                       -->
+<!ELEMENT result_property  (#PCDATA )>
+<!ATTLIST result_property  prop_type  CDATA  #REQUIRED
+                           data_type  (NUMBER | VARCHAR | LONG )  'NUMBER' >
+
+<!-- description of an alignment               -->
+<!--                                           -->
+<!ELEMENT match_desc  (#PCDATA )>
+
+<!-- the text representation of an alignment   -->
+<!--                                           -->
+<!ELEMENT match_align  (#PCDATA )>
+
+<!-- query_region is the region of the query sequence described by a       --> 
+<!-- comp_result.                                                          -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- start: start point on the query sequence                              -->                                                        
+<!-- end:   end point on the query sequence                                -->
+<!--                                                                       -->
+<!ELEMENT query_region  (db_id? )>
+<!ATTLIST query_region  start CDATA  #REQUIRED
+                        end   CDATA  #REQUIRED >
+
+<!-- match_region is the region of the match or hit sequence described     --> 
+<!-- by a comp_result.  The match can be identified by db_id, an           -->
+<!-- element_id containing an IDREF to a bio_sequence, or the              -->
+<!-- match_region can contain a bio_sequence that represents the match.    -->
+<!--                                                                       -->
+<!-- Note that the IDREF should refer to a bio_sequence defined earlier    -->
+<!-- the document to make it easy to use a SAX parser.                     -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- start: start point on the match sequence                              -->                                                        
+<!-- end:   end point on the match sequence                                --> 
+<!--                                                                       -->
+<!ELEMENT match_region  (db_id | element_id | bio_sequence)? >
+<!ATTLIST match_region  start CDATA  #REQUIRED
+                        end   CDATA  #REQUIRED >
+
+<!-- ********************************************************************* -->
+<!-- Sequence related elements.                                            -->
+<!--                                                                       -->
+<!-- ********************************************************************* -->
+
+<!--                                                                       -->
+<!-- The chromosome element contains sub-assemblies of DNA such as         -->
+<!-- contigs or BACs.                                                      -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- number:      The chromosome identifier, for example, "1", "2", "X".   -->
+<!-- length:      THe base pair length of the chromosome                   -->
+<!-- view_start:  The view_start and view_length specify the range of      -->
+<!--              contig annotations that are included in this document.   -->
+<!--              The view coordinates define a window on the contig       -->
+<!--              data.                                                    -->
+<!-- view_length: length of the view from view_start                       -->
+<!--                                                                       -->
+<!-- Content:                                                              -->
+<!--                                                                       -->
+<!-- view:   the range of the chromosome in which all available            -->
+<!--         annotations are included in this document.                    -->
+<!-- contig: an assembled DNA sequence.                                    -->
+<!--                                                                       -->
+<!ELEMENT chromosome (view? , contig*)>
+<!ATTLIST chromosome number      CDATA    #IMPLIED 
+                     length      NMTOKEN  #IMPLIED > 
+
+<!--                                                                       -->
+<!-- A bio_sequence represents a linear molecule such as DNA, RNA,         -->
+<!-- or a protein. The bio_sequence element contains a primary identifier, -->
+<!-- sequence, alternate identifiers, and cross references.                -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- element_id:  an XML ID for this ELEMENT                               -->
+<!-- sequence_id: a unique key for database storage                        --> 
+<!-- seq_length:  The length of the sequence                               -->
+<!-- molecule_type: The sequence molecule type                             -->
+<!-- organism_name: The organism name in form Genus Species                -->
+<!-- taxon_id:      NCBI Taxonomy database identifier                      -->
+<!-- clone_id:      Identifier of the clone from which this sequence was   -->
+<!--                derived                                                -->
+<!-- clone_library: the clone library                                      -->
+<!-- chromosome:    the chromosome name                                    -->
+<!-- map_position:  Cytogenetic Map position where sequence comes from     -->
+<!-- ec_number:     The Enzyme commision number which serves to            -->
+<!--                characterize the enzymatic activity of proteins        -->
+<!--                using a hierarchical classification scheme             -->
+<!-- create_date:   The date that the sequence was "created" or placed     -->
+<!--                in the original source database. Not currently used.   -->
+<!-- update_date:   date that sequence or annotation was updated.  Not     -->
+<!--                currently used.                                        -->
+<!--                                                                       -->
+<!-- Content:                                                              -->
+<!--                                                                       -->
+<!-- xrefs:         cross-references to other sequences or annotations.    -->
+<!-- map_location:  location of the sequence within a larger sequence      -->
+<!--                such as a chromosome or contig.                        -->
+<!--                                                                       -->
+<!ELEMENT bio_sequence  (db_id , note? , description?, keyword*, sequence? , 
+                         alt_ids? , xrefs? ,  sequence_map*, map_location* , 
+                         classification*)>
+<!ATTLIST bio_sequence  element_id    ID       #IMPLIED
+                        sequence_id   NMTOKEN  #IMPLIED
+                        seq_length    NMTOKEN  #IMPLIED
+                        molecule_type  (DNA | mRNA | rRNA | tRNA | cDNA | AA )  #IMPLIED
+                        organism_name CDATA    #IMPLIED
+                        taxon_id      CDATA    #IMPLIED
+                        clone_id      CDATA    #IMPLIED
+                        clone_library CDATA    #IMPLIED
+                        chromosome    CDATA    #IMPLIED
+                        map_position  CDATA    #IMPLIED
+                        ec_number     CDATA    #IMPLIED
+                        create_date   CDATA    #IMPLIED
+                        update_date   CDATA    #IMPLIED >
+
+<!--                                                                       -->
+<!-- seq_location contains a sequence location in GenBank format           -->
+<!--                                                                       -->
+<!-- the location format is defined on the NCBI web site. The location     -->
+<!-- may have ambiguous start and end points, and it may be a join of      -->
+<!-- many intervals.  For convenience applications may parse out the       -->
+<!-- least start point and greatest end point and store them in the        -->
+<!-- seq_location attributes.                                              -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- is_on_complement: true when feature is on complementary strand        -->
+<!--                                                                       -->
+<!-- least_start:  the smallest start point of the location.  For          -->
+<!--               example, the least_start of "(<25.50)..100" is 25.      -->
+<!-- greatest_end: the greatest end point of the location.  The            -->
+<!--               greatest_end of "50..(100.110)" is 110.                 -->
+<!--                                                                       -->
+<!ELEMENT seq_location  (#PCDATA )>
+<!ATTLIST seq_location is_on_complement (true | false )  #IMPLIED
+                       least_start      NMTOKEN #IMPLIED
+                       greatest_end     NMTOKEN #IMPLIED >
+
+<!--                                                                       -->
+<!-- A keyword.  Used in bio_sequence.                                     -->
+<!--                                                                       -->
+<!ELEMENT keyword  (#PCDATA )>
+
+<!--                                                                       -->
+<!-- A sequence of symbols representing a linear molecule such as DNA or   -->
+<!-- a protein.                                                            -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- start: index of the first symbol in the sequence when the sequence    -->
+<!--        is partial.  This is used in case there is a partial           -->
+<!--        sequence, such as sequence data within a view.                 -->
+<!--                                                                       -->
+<!ELEMENT sequence  (#PCDATA )>
+<!ATTLIST sequence  start NMTOKEN #IMPLIED>
+
+<!--                                                                       -->
+<!-- Alternate identifiers.  Used in bio_sequence.                         -->
+<!--                                                                       -->
+<!ELEMENT alt_ids  (db_id+ )>
+
+<!--                                                                       -->
+<!-- A list of cross references.                                           -->
+<!--                                                                       -->
+<!ELEMENT xrefs  (db_id | xref)+> 
+
+<!--                                                                       -->
+<!-- xref is a cross reference.  It optionally includes a relationship     -->
+<!-- descriptor, e.g. protein, and a list of properties.                   -->
+<!--                                                                       -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- relationship: The relationship between the cross-referenced           -->
+<!--               bio_sequences                                           -->
+<!--                                                                       -->  
+<!ELEMENT xref (db_id, xref_property*)>
+<!ATTLIST xref relationship  CDATA #IMPLIED>
+
+<!--                                                                       -->
+<!-- xref_property holds any data related to a cross reference             -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- prop_type: The type of the property                                   -->                                             
+<!-- data_type: indicates if the content should be interpreted as a        -->
+<!--            number or a string                                         -->
+<!--                                                                       -->
+<!ELEMENT xref_property  (#PCDATA )>
+<!ATTLIST xref_property  prop_type  CDATA  #REQUIRED
+                         data_type  (NUMBER | VARCHAR | LONG )  'VARCHAR' >
+
+
+<!--                                                                       -->
+<!-- The seq_feature element describes a feature of a bio_sequence region. -->
+<!--                                                                       -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- element_id:   an XML ID for this ELEMENT                              -->
+<!-- feature_type: The type of the feature.  Usually a GenBank feature     -->
+<!--               type such as "exon".                                    -->
+<!-- label:        a descriptive name used to refer to the feature.        -->
+<!--               Usually corresponds to a GenBank /gene or /label        -->
+<!--               qualifier.  Can be assigned by the user.                -->
+<!-- Content:                                                              -->
+<!--                                                                       -->
+<!-- xrefs:         cross-references to annotations.                       -->
+<!--                                                                       -->
+<!ELEMENT seq_feature  (classification* , note? , seq_location , xrefs? , 
+                        evidence? , qualifier* ,  seq_feature* , related_annot*)>
+<!ATTLIST seq_feature element_id   ID     #IMPLIED
+                      feature_type CDATA  #REQUIRED
+                      label        CDATA  #IMPLIED >
+
+<!--                                                                       -->
+<!-- The gene element inherits the content and attributes of a seq_feature -->
+<!-- and adds classifications and transcripts.                             -->
+<!--                                                                       -->
+<!--                                                                       -->
+<!-- Content:                                                              -->
+<!--                                                                       -->
+<!-- classification: classification of the gene.  Element order is not     -->
+<!--                 significant.                                          -->
+<!--                                                                       -->
+<!-- xrefs:      cross-references to annotations.                          -->
+<!-- transcript: alternate splice forms of the gene.  The first            -->
+<!--             transcript is the primary transcript.  The order of the   -->
+<!--             following transcripts is not significant.                 -->
+<!--                                                                       -->
+<!ELEMENT gene (classification* , note? , seq_location , xrefs? , 
+                evidence? , qualifier* , seq_feature* , related_annot* , 
+                transcript*)>
+<!ATTLIST gene  element_id   ID     #IMPLIED
+                label        CDATA  #IMPLIED >
+
+<!--                                                                       -->
+<!-- The transcript element is a subset of exons from a gene model along   -->
+<!-- with the possible translation of those exons into cds, mrna, and a    -->
+<!-- predicted_protein                                                     -->
+<!--                                                                       -->
+<!ELEMENT transcript (exons , cds? , mrna? , predicted_protein?)>
+
+<!--                                                                       -->
+<!-- The exons element contains a subset of exons from a gene model that   -->
+<!-- constitute a transcript.                                              -->
+<!--                                                                       -->
+<!-- Content:                                                              -->
+<!--                                                                       -->
+<!-- Each element_id refers to an exon seq_feature within the same gene.   -->
+<!--                                                                       -->
+<!ELEMENT exons (element_id+)>
+
+<!--                                                                       -->
+<!-- The cds element represents a CDS. We put bio_sequence here to support -->
+<!-- annotation of the CDS. For example, the CDS could be annotated with   -->  
+<!-- SNPs.                                                                 -->
+<!--                                                                       -->
+<!ELEMENT cds (bio_sequence)>
+
+<!--                                                                       -->
+<!-- The mrna element represents an mRNA. The bio_sequence supports        -->
+<!-- annotation of the mRNA.  For example, the mRNA could be annotated     -->
+<!-- to tell where cDNA starts and ends.                                   -->
+<!--                                                                       -->
+<!ELEMENT mrna (bio_sequence)>
+
+<!--                                                                       -->
+<!-- The predicted_protein element contains the translation of a           -->
+<!-- transcript into a protein.  The bio_sequence allows annotation        -->
+<!-- of the protein and cross references to known proteins.                -->
+<!--                                                                       -->
+<!ELEMENT predicted_protein (bio_sequence)>
+
+<!--                                                                       -->
+<!-- A qualifier-value pair.  Corresponds to GenBank feature qualifiers.   -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- qualifier_type: The type of the qualifier.  Usually a GenBank         --> 
+<!--                 feature qualifier.                                    -->
+<!--                                                                       -->                                            
+<!-- data_type: indicates if the content should be interpreted as a        -->
+<!--            number or a string                                         -->
+<!--                                                                       -->
+<!ELEMENT qualifier  (#PCDATA )>
+<!ATTLIST qualifier  qualifier_type CDATA  #REQUIRED
+                     data_type  (NUMBER | VARCHAR | LONG )  'VARCHAR' >
+
+<!--                                                                       -->
+<!-- The evidence element contains comp_results.  A computational result   -->
+<!-- may be the evidence for the existence of a feature.  The evidence     -->
+<!-- element may contain other types of evidence later.                    -->
+<!--                                                                       -->
+<!ELEMENT evidence  (element_id | comp_result)+>
+
+<!-- ********************************************************************* -->
+<!-- Sequence mapping elements                                             -->
+<!--                                                                       -->
+<!-- ********************************************************************* -->
+
+<!--                                                                       --> 
+<!-- A contig is an assembly of sequence fragments that may have come      -->
+<!-- from a contiguous source sequence.  A contig may represent a          -->
+<!-- Bacterial Artificial Chromosome (BAC).  contigs may be partially      -->
+<!-- ordered, so a contig contains ordered and unordered fragments.        -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- length: the length is the sum of the lengths of all the contained     -->
+<!--         sequences.                                                    -->
+<!--                                                                       -->
+<!-- Content:                                                              -->
+<!--                                                                       -->
+<!-- db_id: The identifier of the contig in its source database.           -->
+<!-- view:  the range of the chromosome in which all available             -->
+<!--        annotations are included in this document.                     -->
+<!-- note:  A user added note.                                             -->
+<!--                                                                       -->
+<!-- fragment_order: depreacted. Use assembly instead.                     -->
+<!--                                                                       -->
+<!-- unordered_fragments: deprecated.  Use assembly instead.               -->
+<!--                                                                       -->
+<!-- assembly:     an assembly or ordering of segments such as BACs to     -->
+<!--               make up the contig.  Use the bio_sequence               -->
+<!--               map_location to provide a position for the segments     -->
+<!--               within the contig.                                      -->
+<!--                                                                       -->
+<!-- bio_sequence: sub-sequences of the contig.                            -->
+<!--                                                                       -->
+<!-- map_location:  location of the sequence within a larger sequence      -->
+<!--                such as a chromosome or contig.                        -->
+<!--                                                                       -->
+<!ELEMENT contig (db_id , view? , note? , fragment_order* , unordered_fragments? ,  assembly? , 
+                  sequence? , sequence_map* ,  map_location* )>
+<!ATTLIST contig length NMTOKEN  #REQUIRED >
+
+
+<!--                                                                       -->
+<!-- fragment_order is a container for fragments that have a relative      -->
+<!-- ordering.  The ordering may have been determined computationally.     -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- group_id: a unique key for database storage                           -->
+<!--                                                                       -->
+<!-- Content:                                                              -->
+<!--                                                                       -->
+<!-- fragment_orientation is deprecated.  Use of bio_sequence with a       -->
+<!-- map_location is more flexible.                                        -->
+<!--                                                                       -->
+<!-- bio_sequence: a sequence fragment within the group of ordered         -->
+<!--               fragments.  It can be positioned relative to the        -->
+<!--               group by its map_location.                              -->
+<!--                                                                       -->
+<!-- map_location:  location of the fragment_order within a larger         -->
+<!--                sequence such as a contig.                             -->
+<!--                                                                       --> 
+<!ELEMENT fragment_order ((fragment_orientation+ | bio_sequence+) , map_location?) >
+<!ATTLIST fragment_order group_id CDATA   #IMPLIED 
+                         length   NMTOKEN #IMPLIED >
+
+<!--                                                                       -->
+<!-- unordered_fragments is a container for fragments that have no known   -->
+<!-- relative ordering,                                                    -->
+<!--                                                                       --> 
+<!ELEMENT unordered_fragments  (bio_sequence+ )>
+
+<!--                                                                       -->
+<!-- contains the assembled bio_sequences in a contig.  Assembled          -->
+<!-- sequences are contiguous and positioned within the contig.            --> 
+<!--                                                                       --> 
+<!ELEMENT assembly (bio_sequence | fragment_order)+ >
+ 
+<!--                                                                       -->
+<!-- fragment_orientation defines the orientation of a sequence fragment   -->
+<!-- within an ordering.                                                   -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- on_complement_strand: true when match is on complementary strand      -->
+<!-- has_5prime_end:       true if 5 prime end has BAC contamination       -->
+<!-- has_3prime_end:       true if 3 prime end has BAC contamination       -->
+<!-- is_all_BAC_vect:      true if the entire fragment is BAC              -->
+<!--                       contamination.                                  -->
+<!--                                                                       -->
+<!-- Content:                                                              -->
+<!--                                                                       -->        
+<!--                                                                       -->
+<!ELEMENT fragment_orientation (bio_sequence , map_location?)>
+<!ATTLIST fragment_orientation on_complement_strand    (true | false ) 'false'                                             
+                               has_5prime_end          (true | false ) #IMPLIED
+                               has_3prime_end          (true | false ) #IMPLIED
+                               is_all_BAC_vect         (true | false ) #IMPLIED>
+
+<!--                                                                       --> 
+<!-- A sequence_map is a set of annotations on a bio_sequence.  An         -->
+<!-- annotation is a seq_feature or a comp_result.                         -->
+<!--                                                                       -->
+<!--                                                                       -->
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- label: an identifying name for the map.  Usually an algorithm name.   -->
+<!--                                                                       -->
+<!ELEMENT sequence_map  (note? , computation? , annotations? )>
+<!ATTLIST sequence_map label        CDATA #IMPLIED >
+
+<!--                                                                       --> 
+<!-- annotations is a container for sequence annotations.                  -->
+<!--                                                                       -->
+<!ELEMENT annotations       (seq_feature | gene | comp_result )+ >
+
+<!--                                                                       --> 
+<!-- map_location is the location of a bio_sequence within a larger        -->
+<!-- sequence such as a chromosome. A location may be a single position    -->
+<!-- or a location within an interval.                                     -->
+<!--                                                                       --> 
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- map_type:   map type such as cytogentic, RH, or physical              --> 
+<!-- source:     the source of the map, i.e. who made it                   -->
+<!-- units:      units of measurement for the contained position.          -->
+<!-- chromosome: chromosome assignment                                     -->
+<!--                                                                       -->
+<!-- subseq_start: the start of the interval.  For example, the            -->
+<!--             starting position on a BAC which makes up a contig.       -->
+<!--             Must be an integer.                                       -->
+<!--                                                                       -->
+<!-- orientation: indicates the orientation within the larger sequence     -->
+<!--                                                                       -->
+<!-- Content:                                                              -->
+<!--                                                                       -->
+<!-- map_position:  a single position or the start of an interval          -->
+<!-- map_position?: the end of an interval                                 -->  
+<!--                                                                       -->
+<!ELEMENT map_location (map_position, map_position?)>
+<!ATTLIST map_location map_type     CDATA                           #REQUIRED
+                       source       CDATA                           #IMPLIED
+                       units        ( band | cR | cM | kb | bp )    #REQUIRED
+                       chromosome   CDATA                           #IMPLIED 
+                       subseq_start CDATA                           '1'
+                       orientation  ( forward | complement | none ) #IMPLIED >
+
+<!--                                                                       --> 
+<!-- A position relative to a genomic sequence such as a contig or         -->
+<!-- chromosome                                                            --> 
+<!--                                                                       --> 
+<!-- Attributes:                                                           -->
+<!--                                                                       -->
+<!-- pos: map position such as "13.2" or "7q11" measured in the units of   -->
+<!--      the containing map_location                                      -->
+<!-- Content:                                                              -->
+<!--                                                                       -->
+<!-- db_id: reference to the object that this position is on. We allow     -->
+<!--        multiples for aliases of the same object.                      -->
+<!--                                                                       -->
+<!ELEMENT map_position (db_id*)>
+<!ATTLIST map_position pos CDATA  #REQUIRED>
