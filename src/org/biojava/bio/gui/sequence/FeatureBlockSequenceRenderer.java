@@ -211,9 +211,15 @@ public class FeatureBlockSequenceRenderer extends AbstractChangeable
         for (Iterator i =
                  src.getFeatures().filter(new FeatureFilter.OverlapsLocation(src.getRange()),
                                           false).features(); i.hasNext();) {
+            Shape clip = g.getClip();
+            AffineTransform at = g.getTransform();
+
             Feature f = (Feature) i.next();
             Location l = f.getLocation();
             renderer.renderFeature(g, f, src);
+
+            g.setTransform(at);
+            g.setClip(clip);
         }
     }
 
