@@ -39,7 +39,7 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
   private final Map transTo;
   private final Map transWeights;
   private final transient ChangeSupport changeSupport;
-  private final MarkovModel.DistributionForwarder distForwarder;
+  private final transient MarkovModel.DistributionForwarder distForwarder;
   
   private Transition _tran = new Transition(null, null);
   
