@@ -1,10 +1,10 @@
-package org.biojava.bio.ontology;
+package org.biojava.ontology;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 import org.biojava.bio.BioError;
-import org.biojava.bio.ontology.io.TabDelimParser;
+import org.biojava.ontology.io.TabDelimParser;
 
 /**
  * Tools for manipulating ontologies.

@@ -1,16 +1,16 @@
-package org.biojava.bio.ontology.io;
+package org.biojava.ontology.io;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
 import org.biojava.bio.BioError;
-import org.biojava.bio.ontology.AlreadyExistsException;
-import org.biojava.bio.ontology.Ontology;
-import org.biojava.bio.ontology.OntologyException;
-import org.biojava.bio.ontology.OntologyFactory;
-import org.biojava.bio.ontology.Term;
-import org.biojava.bio.ontology.Triple;
+import org.biojava.ontology.AlreadyExistsException;
+import org.biojava.ontology.Ontology;
+import org.biojava.ontology.OntologyException;
+import org.biojava.ontology.OntologyFactory;
+import org.biojava.ontology.Term;
+import org.biojava.ontology.Triple;
 import org.biojava.utils.ChangeVetoException;
 
 /**

@@ -19,7 +19,7 @@
  *
  */
 
-package org.biojava.bio.ontology;
+package org.biojava.ontology;
 
 import junit.framework.TestCase;
 import org.biojava.utils.ChangeVetoException;

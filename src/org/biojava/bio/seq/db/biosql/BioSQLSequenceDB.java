@@ -38,7 +38,7 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.BioRuntimeException;
-import org.biojava.bio.ontology.Ontology;
+import org.biojava.ontology.Ontology;
 import org.biojava.bio.seq.ComponentFeature;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;

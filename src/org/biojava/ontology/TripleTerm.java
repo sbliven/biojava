@@ -19,7 +19,7 @@
  *
  */
 
-package org.biojava.bio.ontology; 
+package org.biojava.ontology; 
  
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioRuntimeException;

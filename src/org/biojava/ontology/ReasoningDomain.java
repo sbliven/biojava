@@ -1,4 +1,4 @@
-package org.biojava.bio.ontology;
+package org.biojava.ontology;
 
 import java.util.*;
 
