@@ -19,13 +19,14 @@
  *
  */
 
-package org.biojava.bio.seq;
+package org.biojava.bio.seq.impl;
 
 import java.util.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.*;
 
 /**
  * A no-frills implementation of a feature.
@@ -34,7 +35,7 @@ import org.biojava.bio.symbol.*;
  * @author Thomas Down
  */
 
-class SimpleFeature implements Feature, RealizingFeatureHolder {
+public class SimpleFeature implements Feature, RealizingFeatureHolder {
   /**
    * The FeatureHolder that we will delegate the FeatureHolder interface too.
    * This is lazily instantiated.

@@ -19,7 +19,7 @@
  *
  */
 
-package org.biojava.bio.seq;
+package org.biojava.bio.seq.impl;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -27,6 +27,7 @@ import java.util.*;
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.*;
 
 /**
  * A basic implementation of the <code>Sequence</code> interface.
@@ -222,7 +223,7 @@ public class SimpleSequence implements Sequence, RealizingFeatureHolder
 	setURN(urn);
 	setName(name);
 	this.annotation = annotation;
-	this.featureRealizer = SimpleFeatureRealizer.DEFAULT;
+	this.featureRealizer = FeatureImpl.DEFAULT;
     }
 
     /**

@@ -27,6 +27,7 @@ import java.lang.reflect.*;
 import org.biojava.utils.*;
 import org.biojava.utils.bytecode.*;
 import org.biojava.bio.*;
+import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
 
 /**

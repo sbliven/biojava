@@ -45,40 +45,6 @@ import org.biojava.utils.*;
  */
 
 public class SimpleFeatureRealizer implements FeatureRealizer, Serializable {
-    /**
-     * Default implementation of FeatureRealizer, which wraps simple
-     * implementations of Feature and StrandedFeature.  This is the
-     * default FeatureRealizer used by SimpleSequence and ViewSequence,
-     * and may also be used by others.  When building new FeatureRealizers,
-     * you may wish to use this as a `fallback' realizer, and benefit from
-     * the Feature and StrandedFeature implementations.
-     */
-
-    public final static FeatureRealizer DEFAULT;
-
-    static {
-	SimpleFeatureRealizer d  = new SimpleFeatureRealizer() {
-	    public Object writeReplace() {
-		try {
-		    return new StaticMemberPlaceHolder(SimpleFeatureRealizer.class.getField("DEFAULT"));
-		} catch (NoSuchFieldException ex) {
-		    throw new BioError(ex);
-		}
-	    }
-	} ;
-
-	try {
-	    d.addImplementation(Feature.Template.class, 
-				SimpleFeature.class);
-	    d.addImplementation(StrandedFeature.Template.class,
-				SimpleStrandedFeature.class);
-	} catch (BioException ex) {
-	    throw new BioError(ex, "Couldn't initialize default FeatureRealizer");
-	}
-
-	DEFAULT = d;
-    }
-
     private List templateToImpl;
     private FeatureRealizer fallBack;
 

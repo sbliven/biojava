@@ -19,10 +19,11 @@
  *
  */
 
-package org.biojava.bio.seq;
+package org.biojava.bio.seq.impl;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.*;
 
 /**
  * Class used by ProjectedFeatureHolder to wrap StrandedFeatures.

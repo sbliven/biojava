@@ -20,6 +20,8 @@
 
 package org.biojava.bio.seq.genomic;
 
+import org.biojava.bio.seq.*;
+
 /**
  * This is a feature that sits within a DNA sequence, and represents a region
  * that can be thought of as RNA. This may be a transcript, or an exon, or an

@@ -52,7 +52,7 @@ public class SimpleAssembly extends AbstractSymbolList
     private SortedMap components;
     private List componentList;
 
-    private FeatureRealizer featureRealizer = SimpleFeatureRealizer.DEFAULT;
+    private FeatureRealizer featureRealizer = org.biojava.bio.seq.impl.FeatureImpl.DEFAULT;
 
     private final static Symbol N;
 

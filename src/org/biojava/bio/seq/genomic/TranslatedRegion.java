@@ -20,6 +20,8 @@
 
 package org.biojava.bio.seq.genomic;
 
+import org.biojava.bio.seq.*;
+
 /**
  * This is a feature that sits within an RNA sequence, and represents a region
  * that is translated into protein. All sequence before this is 5'utr, and all

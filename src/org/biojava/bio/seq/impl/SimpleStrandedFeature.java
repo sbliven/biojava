@@ -19,9 +19,10 @@
  *
  */
 
-package org.biojava.bio.seq;
+package org.biojava.bio.seq.impl;
 
 import org.biojava.bio.*;
+import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 
 /**
@@ -30,7 +31,7 @@ import org.biojava.bio.symbol.*;
  * @author Matthew Pocock
  * @author Thomas Down
  */
-class SimpleStrandedFeature extends SimpleFeature implements StrandedFeature {
+public class SimpleStrandedFeature extends SimpleFeature implements StrandedFeature {
     private StrandedFeature.Strand strand;
     
     public StrandedFeature.Strand getStrand() {
@@ -41,7 +42,7 @@ class SimpleStrandedFeature extends SimpleFeature implements StrandedFeature {
 	SymbolList resList = super.getSymbols();
 	if(getStrand() == NEGATIVE) {
 	    try {
-		resList = new ComplementSymbolList(resList);
+		resList = DNATools.complement(resList);
 	    } catch (IllegalAlphabetException iae) {
 		throw new BioError(
 				   iae,
@@ -70,7 +71,7 @@ class SimpleStrandedFeature extends SimpleFeature implements StrandedFeature {
     {
 	super(sourceSeq, parent, template);
 	this.strand = template.strand;
-	if(!ComplementSymbolList.isComplementable(sourceSeq.getAlphabet())) {
+	if(sourceSeq.getAlphabet() != DNATools.getDNA()) {
 	    throw new IllegalAlphabetException (
 				"Can not create a stranded feature within a sequence of type " +
 				sourceSeq.getAlphabet().getName()

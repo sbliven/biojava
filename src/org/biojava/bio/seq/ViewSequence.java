@@ -27,6 +27,7 @@ import java.lang.reflect.*;
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.impl.*;
 
 /**
  * A view onto another Sequence object.  This class allows new
@@ -83,7 +84,7 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
 
 	anno = new OverlayAnnotation(seqDelegate.getAnnotation());
 	
-	featureRealizer = SimpleFeatureRealizer.DEFAULT;
+	featureRealizer = FeatureImpl.DEFAULT;
     }
 
     /**

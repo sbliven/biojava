@@ -34,7 +34,7 @@ import org.biojava.bio.symbol.*;
  * @author Thomas Down
  */
 public class SimpleSequenceFactory implements SequenceFactory, Serializable {
-    private FeatureRealizer realizer = SimpleFeatureRealizer.DEFAULT;
+    private FeatureRealizer realizer = org.biojava.bio.seq.impl.FeatureImpl.DEFAULT;
     
     /**
     *Returns the FeatureRealizer set by "setFeatureRealizer".
