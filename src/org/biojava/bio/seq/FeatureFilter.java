@@ -64,20 +64,46 @@ public interface FeatureFilter extends Serializable {
    * @author Matthew Pocock
    * @since 1.0
    */
-  public final static class AcceptAllFilter implements FeatureFilter {
+  public final static class AcceptAllFilter implements OptimizableFilter {
     public boolean accept(Feature f) { return true; }
     public boolean equals(Object o) {
       return o instanceof AcceptAllFilter;
     }
-  };
+    public boolean isProperSubset(FeatureFilter sup) {
+      return sup.equals(this);
+    }
+  }
 
+  /**
+   * No features are selected in with this filter.
+   */
+  static final public FeatureFilter none = new AcceptNoneFilter();
+  
+  /**
+   * The class that accepts no features.
+   * <P>
+   * Use the FeatureFilter.none member.
+   *
+   * @author Matthew Pocock
+   * @since 1.2
+   */
+  public final static class AcceptNoneFilter implements OptimizableFilter {
+    public boolean accept(Feature f) { return false; }
+    public boolean equals(Object o) {
+      return o instanceof AcceptNoneFilter;
+    }
+    public boolean isProperSubset(FeatureFilter sup) {
+      return true;
+    }
+  }
+  
   /**
    * Construct one of these to filter features by type.
    *
    * @author Matthew Pocock
    * @since 1.0
    */
-  final public static class ByType implements FeatureFilter {
+  final public static class ByType implements OptimizableFilter {
     private String type;
     
     public String getType() {
@@ -106,6 +132,9 @@ public interface FeatureFilter extends Serializable {
         (o instanceof ByType) &&
         (((ByType) o).getType() == this.getType());
     }
+    public boolean isProperSubset(FeatureFilter sup) {
+      return this.equals(sup);
+    }
   }
 
   /**
@@ -114,7 +143,7 @@ public interface FeatureFilter extends Serializable {
    * @author Matthew Pocock
    * @since 1.0
    */
-  public final static class BySource implements FeatureFilter {
+  public final static class BySource implements OptimizableFilter {
     private String source;
     
     public String getSource() {
@@ -125,49 +154,64 @@ public interface FeatureFilter extends Serializable {
      * Create a BySource filter that filters in all features which have sources
      * equal to source.
      *
-     * @param type  the String to match source fields against
+     * @param source  the String to match source fields against
      */
     public BySource(String source) {
       this.source = source;
     }
+    
     public boolean accept(Feature f) { return source.equals(f.getSource()); }
     
     public boolean equals(Object o) {
       return
         (o instanceof BySource) &&
-        (((ByType) o).getSource() == this.getSource());
+        (((BySource) o).getSource() == this.getSource());
+    }
+
+    public boolean isProperSubset(FeatureFilter sup) {
+      return this.equals(sup);
     }
   }
 
-    /**
-     * Filter which accepts only those filters which are an instance
-     * of a specific Java class
-     *
-     * @author Thomas Down
-     * @since 1.1
-     */
-
-    public final static class ByClass implements FeatureFilter {
-	private Class clazz;
-
-	public ByClass(Class clazz) {
-	    this.clazz = clazz;
-	}
-
-	public boolean accept(Feature f) {
-	    return clazz.isInstance(f);
-	}
-
-	public Class getTestClass() {
-	    return clazz;
-        }
-        
-        public boolean equals(Object o) {
-          return
-            (o instanceof ByClass) &&
-            (((ByClass) o).getTestClass() == this.getTestClass());
-        }
+  /**
+   * Filter which accepts only those filters which are an instance
+   * of a specific Java class
+   *
+   * @author Thomas Down
+   * @author Matthew Pocock
+   * @since 1.1
+   */
+   
+  public final static class ByClass implements OptimizableFilter {
+    private Class clazz;
+    
+    public ByClass(Class clazz) {
+      this.clazz = clazz;
     }
+    
+    public boolean accept(Feature f) {
+      return clazz.isInstance(f);
+    }
+    
+    public Class getTestClass() {
+      return clazz;
+    }
+    
+    public boolean equals(Object o) {
+      return
+        (o instanceof ByClass) &&
+        (((ByClass) o).getTestClass() == this.getTestClass());
+    }
+    
+    public boolean isProperSubset(FeatureFilter sup) {
+      if(sup instanceof ByClass) {
+        Class supC = ((ByClass) sup).getTestClass();
+        return supC.isAssignableFrom(this.getClass());
+      } else {
+        return false;
+      }
+    }
+  }
 
   /**
    *  A filter that returns all features contained within a location.
@@ -175,7 +219,7 @@ public interface FeatureFilter extends Serializable {
    * @author Matthew Pocock
    * @since 1.0
    */
-  public final static class ContainedByLocation implements FeatureFilter {
+  public final static class ContainedByLocation implements OptimizableFilter {
     private Location loc;
 
     public Location getLocation() {
@@ -203,6 +247,18 @@ public interface FeatureFilter extends Serializable {
         (o instanceof ContainedByLocation) &&
         (((ContainedByLocation) o).getLocation() == this.getLocation());
     }
+    
+    public boolean isProperSubset(FeatureFilter sup) {
+      if(sup instanceof ContainedByLocation) {
+        Location supL = ((ContainedByLocation) sup).getLocation();
+        return supL.contains(this.getLocation());
+      } else if(sup instanceof OverlapsLocation) {
+        Location supL = ((OverlapsLocation) sup).getLocation();
+        return supL.contains(this.getLocation());
+      } else {
+        return false;
+      }
+    }
   }
   
   /**
@@ -211,7 +267,7 @@ public interface FeatureFilter extends Serializable {
    * @author Matthew Pocock
    * @since 1.0
    */
-  public final static class OverlapsLocation implements FeatureFilter {
+  public final static class OverlapsLocation implements OptimizableFilter {
     private Location loc;
     
     public Location getLocation() {
@@ -239,6 +295,15 @@ public interface FeatureFilter extends Serializable {
         (o instanceof OverlapsLocation) &&
         (((OverlapsLocation) o).getLocation() == this.getLocation());
     }
+    
+    public boolean isProperSubset(FeatureFilter sup) {
+      if(sup instanceof OverlapsLocation) {
+        Location supL = ((OverlapsLocation) sup).getLocation();
+        return supL.contains(this.getLocation());
+      } else {
+        return false;
+      }
+    }
   }
   
   /**
@@ -248,7 +313,7 @@ public interface FeatureFilter extends Serializable {
    * @author Matthew Pocock
    * @since 1.0
    */
-  public final static class Not implements FeatureFilter {
+  public final static class Not implements OptimizableFilter {
     FeatureFilter child;
 
     public FeatureFilter getChild() {
@@ -267,6 +332,15 @@ public interface FeatureFilter extends Serializable {
       return
         (o instanceof Not) &&
         (((Not) o).getChild() == this.getChild());
+    }
+    
+    public boolean isProperSubset(FeatureFilter sup) {
+      if(sup instanceof Not) {
+        FeatureFilter supC = ((Not) sup).getChild();
+        FilterUtils.isProperSubset(supC, this.getChild());
+      }
+      return false;
+    }
   }
 
   /**
@@ -276,7 +350,7 @@ public interface FeatureFilter extends Serializable {
    * @author Matthew Pocock
    * @since 1.0
    */
-  public final static class And implements FeatureFilter {
+  public final static class And implements OptimizableFilter {
     FeatureFilter c1, c2;
 
     public FeatureFilter getChild1() {
@@ -301,6 +375,48 @@ public interface FeatureFilter extends Serializable {
         (o instanceof And) &&
         (((And) o).getChild1() == this.getChild1()) &&
         (((And) o).getChild2() == this.getChild2());
+    }
+    
+    public boolean isProperSubset(FeatureFilter sup) {
+      return
+        FilterUtils.isProperSubset(getChild1(), sup) ||
+        FilterUtils.isProperSubset(getChild2(), sup);
+    }
+  }
+
+  /**
+   *  A filter that returns all features accepted by the first filter and
+   * rejected by the seccond.
+   *
+   * @author Matthew Pocock
+   * @since 1.2
+   */
+  public final static class AndNot implements FeatureFilter {
+    FeatureFilter c1, c2;
+
+    public FeatureFilter getChild1() {
+      return c1;
+    }
+    
+    public FeatureFilter getChild2() {
+      return c2;
+    }
+    
+    public AndNot(FeatureFilter c1, FeatureFilter c2) {
+        this.c1 = c1;
+        this.c2 = c2;
+    }
+
+    public boolean accept(Feature f) {
+        return (c1.accept(f) && !c2.accept(f));
+    }
+    
+    public boolean equals(Object o) {
+      return
+        (o instanceof AndNot) &&
+        (((And) o).getChild1() == this.getChild1()) &&
+        (((And) o).getChild2() == this.getChild2());
+    }
   }
 
   /**
@@ -310,7 +426,7 @@ public interface FeatureFilter extends Serializable {
    * @author Matthew Pocock
    * @since 1.0
    */
-  public final static class Or implements FeatureFilter {
+  public final static class Or implements OptimizableFilter {
     FeatureFilter c1, c2;
 
     public FeatureFilter getChild1() {
@@ -335,6 +451,13 @@ public interface FeatureFilter extends Serializable {
         (o instanceof Or) &&
         (((Or) o).getChild1() == this.getChild1()) &&
         (((Or) o).getChild2() == this.getChild2());
+    }
+    
+    public boolean isProperSubset(FeatureFilter sup) {
+      return
+        FilterUtils.isProperSubset(getChild1(), sup) &&
+        FilterUtils.isProperSubset(getChild2(), sup);
+    }
   }
   
   /**
@@ -343,7 +466,7 @@ public interface FeatureFilter extends Serializable {
    * @author Matthew Pocock
    * @since 1.1
    */
-  public final static class ByAnnotation implements FeatureFilter {
+  public final static class ByAnnotation implements OptimizableFilter {
     private Object key;
     private Object value;
     
@@ -392,6 +515,10 @@ public interface FeatureFilter extends Serializable {
         (((ByAnnotation) o).getKey() == this.getKey()) &&
         (((ByAnnotation) o).getValue() == this.getValue());
     }
+    
+    public boolean isProperSubset(FeatureFilter sup) {
+      return this.equals(sup);
+    }
   }
   
   /**
@@ -433,6 +560,10 @@ public interface FeatureFilter extends Serializable {
         (o instanceof HasAnnotation) &&
         (((HasAnnotation) o).getKey() == this.getKey());
     }
+    
+    public boolean isProperSubset(FeatureFilter sup) {
+      return this.equals(sup);
+    }
   }
   
   /**
@@ -441,7 +572,7 @@ public interface FeatureFilter extends Serializable {
    * @author Matthew Pocock
    * @since 1.1
    */
-  public final static class StrandFilter implements FeatureFilter {
+  public final static class StrandFilter implements OptimizableFilter {
     private StrandedFeature.Strand strand;
     
     /**
@@ -482,6 +613,10 @@ public interface FeatureFilter extends Serializable {
       return
         (o instanceof StrandFilter) &&
         (((StrandFilter) o).getStrand() == this.getStrand());
+    }
+    
+    public boolean isProperSubset(FeatureFilter sup) {
+      return this.equals(sup);
     }
   }
 }
