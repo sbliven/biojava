@@ -182,10 +182,13 @@ public class SimpleModelTrainer implements ModelTrainer {
     State source,
     State destination
   ) throws BioException {
-    if(trainer == null)
-      throw new NullPointerException("Attempted to use a null trainer");
-    if(!getAllTransitionTrainers().contains(trainer))
+    if(trainer == null) {
+      throw new NullPointerException("Attempted to register a null trainer");
+    }
+    
+    if(!getAllTransitionTrainers().contains(trainer)) {
       throw new BioException("Trainer not registered.");
+    }
       
     _tran.from = from;
     _tran.to = to;

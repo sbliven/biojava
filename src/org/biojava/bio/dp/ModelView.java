@@ -144,6 +144,13 @@ public abstract class ModelView implements MarkovModel {
             State t = (State) j.next();
             ModelTransition mt = getMT(s, t);
             TransitionTrainer tt = modelTrainer.getTrainerForModel(mt.model);
+            if(tt == null) {
+              throw new BioException(
+                "Couldn't find transition trainer for " +
+                mt.model.stateAlphabet().getName() + " from " + s.getName() +
+                " to " + t.getName()
+              );
+            }
             modelTrainer.registerTrainerForTransition(
               s, t, tt, mt.from, mt.to
             );
