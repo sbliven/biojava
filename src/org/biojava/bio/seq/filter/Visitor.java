@@ -1,7 +1,5 @@
 package org.biojava.bio.seq.filter;
 
-import org.biojava.bio.seq.FeatureFilter;
-
 /**
  * Things that will be shown filters.
  *
@@ -10,6 +8,12 @@ import org.biojava.bio.seq.FeatureFilter;
  * of traversing filters like And, Or and ByParent that wrap other filters.
  * </p>
  *
+ * <p>
+ * Visitor implementations must be public or package-private. This is because
+ * the walker implementation needs to bind to methods directly, and not via a
+ * publicly accessible interface.
+ * </p>
+ * 
  * <p>
  * The simplest form of a
  * visitor has the single method void featureFilter(FeatureFilter ff). In this

@@ -186,34 +186,27 @@ public class ProjectionEngine {
         );
         //System.err.println("Generating proxy class: " + pclass.getName());
 
-        List baseInitArgsList = new ArrayList();
-        baseInitArgsList.add(IntrospectedCodeClass.forClass(Feature.class));
-        baseInitArgsList.add(IntrospectedCodeClass.forClass(ProjectionContext.class));
+        CodeClass[] baseInitArgsList = new CodeClass[] {
+          IntrospectedCodeClass.forClass(Feature.class),
+          IntrospectedCodeClass.forClass(ProjectionContext.class)
+        };
 
-        CodeClass voidC = IntrospectedCodeClass.forClass(Void.TYPE);
-        CodeClass featureC = IntrospectedCodeClass.forClass(Feature.class);
-        CodeClass projectionContextC = IntrospectedCodeClass.forClass(ProjectionContext.class);
-        CodeClass ourContextC = IntrospectedCodeClass.forClass(ctxtClass);
+        CodeClass voidC
+                = IntrospectedCodeClass.forClass(Void.TYPE);
+        CodeClass projectionContextC
+                = IntrospectedCodeClass.forClass(ProjectionContext.class);
+        CodeClass ourContextC
+                = IntrospectedCodeClass.forClass(ctxtClass);
 
-        CodeMethod m_ourBase_init = new SimpleCodeMethod(
-                "<init>",
-                baseClassC,
-                CodeUtils.TYPE_VOID,
-                baseInitArgsList,
-                CodeUtils.ACC_PUBLIC);
-        CodeMethod m_ourBase_getViewedFeature = new SimpleCodeMethod(
+        CodeMethod m_ourBase_init = baseClassC.getConstructor(baseInitArgsList);
+
+        CodeMethod m_ourBase_getViewedFeature = baseClassC.getMethod(
                 "getViewedFeature",
-                baseClassC,
-                featureC,
-                Collections.EMPTY_LIST,
-                CodeUtils.ACC_PUBLIC);
+                CodeUtils.EMPTY_LIST);
 
-        CodeMethod m_ourBase_getProjectionContext = new SimpleCodeMethod(
+        CodeMethod m_ourBase_getProjectionContext = baseClassC.getMethod(
                 "getProjectionContext",
-                baseClassC,
-                projectionContextC,
-                Collections.EMPTY_LIST,
-                CodeUtils.ACC_PUBLIC);
+                CodeUtils.EMPTY_LIST);
 
         GeneratedCodeMethod init = pclass.createMethod(
                 "<init>",
@@ -386,6 +379,8 @@ public class ProjectionEngine {
         registerClass(face, ctxtClass, projection);
       } catch (CodeException ex) {
         throw new BioError(ex);
+      } catch (NoSuchMethodException nsme) {
+        throw new BioError(nsme);
       }
 
     }

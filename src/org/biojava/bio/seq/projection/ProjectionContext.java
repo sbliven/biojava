@@ -128,11 +128,13 @@ import org.biojava.utils.*;
  * do a lot of complex work for you.
  *
  * @for.developer
- * Every ProjectionContext implementation must be a public class. This is
+ * Every ProjectionContext implementation must be a public or package-private
+ * class. This is
  * because ProjectionEngine wires method calls from the projected features back
  * into the context. These methods are not necessarily defined by the context
  * interface (if they are project/revert pairs), so the class itself must be
- * directly accessible.
+ * directly accessible. The ProjectionEngine creates accessory classes in the
+ * same package as the context it is using.
  *
  * @author Thomas Down
  * @author Matthew Pocock

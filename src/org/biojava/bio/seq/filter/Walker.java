@@ -7,6 +7,13 @@ import org.biojava.bio.seq.FeatureFilter;
  * Objects that can walk over a filter expression, showing each element to a
  * visitor.
  *
+ * <p>
+ * Walker implementations are not guaranteed to be thread-safe. In particular,
+ * it is not possible to use the same Walker instance with more than one
+ * thread if the visitor has return values. Walker implementations can be
+ * re-used once the previous walk has been completed.
+ * </p>
+ *
  * @for.user
  * You should use FilterUtils.visitFilter to apply a visitor to a feature
  * filter.
