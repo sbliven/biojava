@@ -1,3 +1,4 @@
+/* -*- c-basic-offset: 4-*- */
 /*
  *                    BioJava development code
  *
@@ -21,6 +22,7 @@
 
 package org.biojava.bio.seq.db.biosql;
 
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -33,7 +35,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
@@ -53,6 +54,8 @@ import org.biojava.bio.seq.io.OrganismParser;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.taxa.EbiFormat;
+import org.biojava.bio.taxa.Taxon;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeVetoException;
@@ -74,7 +77,6 @@ import org.biojava.utils.cache.WeakValueHashMap;
  * @author Simon Foote (modifications for schema version 1.0)
  * @since 1.3
  */
-
 public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
     private JDBCConnectionPool pool;
     private int dbid = -1;
@@ -146,6 +148,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 	throws BioException
     {
 	helper = DBHelper.getDBHelperForURL(dbURL);
+        System.err.println(dbURL + " " + dbUser + " " + dbPass);
 	pool = new JDBCConnectionPool(dbURL, dbUser, dbPass);
 	
 	// Check that BioSQL database schema is post-Singapore
@@ -323,15 +326,32 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 	    conn.setAutoCommit(false);
 	    ResultSet rs;
 
+            //
+            // we will need this annotation bundle for various things
+            //
+
+            Annotation ann = seq.getAnnotation();
+
+	    //
+	    // Magic for taxonomy.  Move this!
+	    //
+            int taxon_id = (ann.containsProperty(OrganismParser.PROPERTY_ORGANISM)) 
+                ? getTaxonID(conn, (Taxon) ann.getProperty(OrganismParser.PROPERTY_ORGANISM))
+                : -1;
+
 	    PreparedStatement create_bioentry = conn.prepareStatement(
                     "insert into bioentry " +
-                    "(biodatabase_id, name, accession, version, division) " +
-		    "values (?, ?, ?, ?, ?)");
+                    "(biodatabase_id, name, accession, version, division" + (taxon_id == -1 ? "" : ", taxon_id") + ") " +
+		    "values (?, ?, ?, ?, ?" + (taxon_id == -1 ? "" : ", ?") + ")"
+                    );
 	    create_bioentry.setInt(1, dbid);
 	    create_bioentry.setString(2, seqName);
 	    create_bioentry.setString(3, seqName);
 	    create_bioentry.setInt(4, version);
 	    create_bioentry.setString(5, "?");
+	    if (taxon_id != -1) {
+                create_bioentry.setInt(6, taxon_id);
+            }
 	    create_bioentry.executeUpdate();
 	    create_bioentry.close();
 
@@ -403,12 +423,6 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
 	    // System.err.println("Stored features");
 
-            //
-            // we will need this annotation bundle for various things
-            //
-
-            Annotation ann = seq.getAnnotation();
-
 	    //
 	    // Store generic properties
 	    //
@@ -425,67 +439,6 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 		}
 	    }
 
-	    //
-	    // Magic for taxonomy.  Move this!
-	    //
-
-        /*
-        
-	    if(ann.containsProperty(OrganismParser.PROPERTY_ORGANISM)) {
-                Taxon taxon = (Taxon) ann.getProperty(OrganismParser.PROPERTY_ORGANISM);
-                Annotation ta = taxon.getAnnotation();
-                int taxonID;
-                {
-		    Object t  = ta.getProperty(EbiFormat.PROPERTY_NCBI_TAXON);
-		    if(t instanceof List) {
-			t = (String) ((List) t).get(0);
-		    }
-		    taxonID = Integer.parseInt((String) t);
-                }
-
-                int taxa_id;
-                PreparedStatement select_taxa = conn.prepareStatement(
-								      "select taxa_id " +
-								      "from taxa " +
-								      "where ncbi_taxa_id = ? "
-								      );
-                select_taxa.setInt(1, taxonID);
-                ResultSet trs = select_taxa.executeQuery();
-                if(trs.next()) {
-		    // entry exists - link to it
-		    taxa_id = trs.getInt(1);
-                } else {
-		    // entry does not exist - create it and link to it
-		    String name = EbiFormat.getInstance().serialize(taxon);
-		    String common = taxon.getCommonName();
-		    PreparedStatement create_taxa = conn.prepareStatement(
-									  "insert into taxa " +
-									  "(full_lineage, common_name, ncbi_taxa_id) " +
-									  "values (?, ?, ?)"
-									  );
-		    create_taxa.setString(1, name);
-		    create_taxa.setString(2, common);
-		    create_taxa.setInt(3, taxonID);
-		    create_taxa.executeUpdate();
-		    create_taxa.close();
-		    taxa_id = getDBHelper().getInsertID(conn, "taxa", "taxa_id");
-                }
-                select_taxa.close();
-
-                PreparedStatement create_bioentry_taxa = conn.prepareStatement(
-									       "insert into bioentry_taxa " +
-									       "(bioentry_id, taxa_id) " +
-									       "values (?, ?)"
-									       );
-
-                create_bioentry_taxa.setInt(1, bioentry_id);
-                create_bioentry_taxa.setInt(2, taxa_id);
-                create_bioentry_taxa.executeUpdate();
-                create_bioentry_taxa.close();
-	    }
-        
-        */
-
 	    conn.commit();
 	    pool.putConnection(conn);
 	} catch (SQLException ex) {
@@ -500,6 +453,82 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 					(rolledback ? " (rolled back successfully)" : ""), ex);
 	}
     }
+
+
+    /**
+     * Gets the id by the database refers to the specified
+     * <code>Taxon</code> object. If the <code>Taxon</code> is not
+     * represented in the database, it will be added (along with its
+     * parents).
+     *
+     * @param taxon a <code>Taxon</code>. The <code>Taxon</code> must
+     * be annotated with the NCBI taxon id
+     * (<code>key=EbiFormat.PROPERTY_ORGANISM</code>).
+     * @return an <code>int</code> that corresponds to the
+     * <code>Taxon</code> in the database.
+     */
+    private int getTaxonID(Connection conn, Taxon taxon) throws SQLException {
+        // Find the NCBI taxon id annotation
+        Annotation anno = taxon.getAnnotation();
+        Object t  = anno.getProperty(EbiFormat.PROPERTY_NCBI_TAXON);
+        if (t instanceof List) {
+            t = (String) ((List) t).get(0);
+        }
+        int ncbi_taxon_id = Integer.parseInt((String) t);
+        PreparedStatement selectTaxon = conn.prepareStatement(
+                                                              "select taxon_id " 
+                                                              + "from taxon " 
+                                                              + "where ncbi_taxon_id = ? "
+                                                              );
+        selectTaxon.setInt(1, ncbi_taxon_id);
+        ResultSet trs = selectTaxon.executeQuery();
+        int taxon_id;
+        if (trs.next()) {
+            // entry exists - link to it
+            taxon_id = trs.getInt(1);
+        } else {
+            // Taxon entry does not exist - create it
+            Taxon parent = taxon.getParent();
+            int parent_taxon_id = (parent != null) 
+                ? getTaxonID(conn, parent)
+                : -1;
+            PreparedStatement createTaxon = conn.prepareStatement(
+                                                                  "insert into taxon " 
+                                                                  + "(ncbi_taxon_id, parent_taxon_id) " 
+                                                                  + "values (?, ?)"
+                                                                  );
+            createTaxon.setInt(1, ncbi_taxon_id);
+            createTaxon.setInt(2, parent_taxon_id);
+            createTaxon.executeUpdate();
+            createTaxon.close();
+            taxon_id = getDBHelper().getInsertID(conn, "taxon", "taxon_id");
+            addTaxonNames(conn, taxon, taxon_id);
+        }
+        selectTaxon.close();
+        return taxon_id;
+    }
+
+    private void addTaxonNames(Connection conn, Taxon taxon, int taxon_id) throws SQLException {
+        Map names = (Map) taxon.getAnnotation().getProperty(EbiFormat.PROPERTY_TAXON_NAMES);
+        if (names != null) {
+            Iterator it = names.keySet().iterator();
+            while (it.hasNext()) {
+                String nameClass = (String) it.next();
+                String name = (String) names.get(nameClass);
+                PreparedStatement createTaxon = conn.prepareStatement(
+                                                                      "insert into taxon_name " 
+                                                                      + "(taxon_id, name, name_class) " 
+                                                                      + "values (?, ?, ?)"
+                                                                      );
+                createTaxon.setInt(1, taxon_id);
+                createTaxon.setString(2, name);
+                createTaxon.setString(3, nameClass);
+                createTaxon.executeUpdate();
+                createTaxon.close();
+            }
+        }
+    }
+
 
     public Sequence getSequence(String id)
         throws BioException, IllegalIDException
@@ -1041,6 +1070,7 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 		ps.close();
 		pool.putConnection(conn);
 	    } catch (SQLException ex) {
+              ex.printStackTrace();
 		throw new BioRuntimeException(ex);
 	    }
 	    dbSchemaChecked = true;

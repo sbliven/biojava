@@ -78,6 +78,7 @@ class BioSQLFeatureAnnotation
 	    get_annotations.setInt(1, feature_id);
 	    ResultSet rs = get_annotations.executeQuery();
 	    
+            underlyingAnnotation = new SmallAnnotation(); // Initialize here in case there are no resultset entries.
 	    while (rs.next()) {
 		String key = rs.getString(1).trim();   // HACK due to stupid schema change
 		String value = rs.getString(2);

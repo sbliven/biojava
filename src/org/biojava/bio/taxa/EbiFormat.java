@@ -33,6 +33,7 @@ import org.biojava.utils.ChangeVetoException;
  */
 public class EbiFormat implements TaxonParser {
   public static final String PROPERTY_NCBI_TAXON = EbiFormat.class + ":NCBI_TAXON";
+  public static final String PROPERTY_TAXON_NAMES = EbiFormat.class + ":TAXON_NAMES";
   private static EbiFormat INSTANCE = new EbiFormat();
   
   public static final EbiFormat getInstance() {
