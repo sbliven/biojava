@@ -67,13 +67,12 @@ public class FeatureTableParser {
     private SeqIOListener          listener;
     private EmblLikeLocationParser locParser;
 
-    FeatureTableParser(SeqIOListener listener, String source)
-    {
-	this.listener      = listener;
-	this.featureSource = source;
+    FeatureTableParser(SeqIOListener listener, String source) {
+        this.listener      = listener;
+        this.featureSource = source;
 
-	featureBuf = new StringBuffer();
-	locParser  = new EmblLikeLocationParser();
+        featureBuf = new StringBuffer();
+        locParser  = new EmblLikeLocationParser();
     }
 
     //
@@ -81,86 +80,84 @@ public class FeatureTableParser {
     //
 
     public void startFeature(String type) throws BioException {
-	featureStatus = LOCATION;
-	featureBuf.setLength(0);
+        featureStatus = LOCATION;
+        featureBuf.setLength(0);
 
-	if (this.featureSource.equals("RefSeq:Protein"))
-	{
-		featureTemplate= new Feature.Template();
-	}
-	else
-	{
-		featureTemplate = new StrandedFeature.Template();
-	}
-	featureTemplate.type = type;
-	featureTemplate.source = featureSource;
-	featureTemplate.annotation = new SimpleAnnotation();
+        if (this.featureSource.equals("RefSeq:Protein")) {
+            featureTemplate= new Feature.Template();
+        }
+        else {
+            featureTemplate = new StrandedFeature.Template();
+        }
+        featureTemplate.type = type;
+        featureTemplate.source = featureSource;
+        featureTemplate.annotation = new SimpleAnnotation();
     }
 
     public void featureData(String line) throws BioException {
-	switch (featureStatus) {
-	case LOCATION:
-	    featureBuf.append(line);
-	    if (countChar(featureBuf, '(') == countChar(featureBuf, ')'))
-	    {
-		// Save the original location in the feature's
-		// annotation bundle
-		try
-		{
-		    Map dat = new HashMap();
-		    dat.put("location", featureBuf.toString());
-		    featureTemplate.annotation.setProperty(Feature.PROPERTY_DATA_KEY, dat);
-		}
-		catch (ChangeVetoException cve)
-		{
-		    throw new BioException("Unable to add location string to feature annotation: "
-					   + featureBuf);
-		}
+        switch (featureStatus) {
+            case LOCATION:
+                featureBuf.append(line);
+                if (countChar(featureBuf, '(') == countChar(featureBuf, ')')) {
+                    // Save the original location in the feature's
+                    // annotation bundle
+                    try {
+                        Map dat = new HashMap();
+                        dat.put("location", featureBuf.toString());
+                        featureTemplate.annotation.setProperty(Feature.PROPERTY_DATA_KEY, dat);
+                    }
+                    catch (ChangeVetoException cve) {
+                        throw new BioException("Unable to add location string to feature annotation: "
+                                               + featureBuf);
+                    }
 
-		featureTemplate = locParser.parseLocation(featureBuf.toString(), featureTemplate);
-		listener.startFeature(featureTemplate);
-		featureStatus = WITHIN;
-	    }
-	    break;
-	case WITHIN:
-	    if (line.charAt(0) == '/') {
-		// System.out.println("got '/', quotes = " + countChar(line, '"'));
-		if (countChar(line, '"') % 2 == 0)
-		    processAttribute(line);
-		else {
-		    featureBuf.setLength(0);
-		    featureBuf.append(line);
-		    featureStatus = ATTRIBUTE;
-		}
-	    } else {
-		throw new BioException("Invalid line in feature body: " + line);
-	    }
-	    break;
-	case ATTRIBUTE:
-	    // If the attribute contains whitespace it probably
-	    // consists of whitespace-delimited words. Therefore a
-	    // space should be inserted at EOL otherwise words will
-	    // get fused.
-	    if (countChar(featureBuf, ' ') > 0)
-		featureBuf.append(" ");
-	    featureBuf.append(line);
-	    if (countChar(featureBuf, '"') % 2 == 0) {
-		processAttribute(featureBuf.toString());
-		featureStatus = WITHIN;
-	    }
-	    break;
-	}
+                    featureTemplate = locParser.parseLocation(featureBuf.toString(), featureTemplate);
+                    listener.startFeature(featureTemplate);
+                    featureStatus = WITHIN;
+                }
+                break;
+
+            case WITHIN:
+                if (line.charAt(0) == '/') {
+                    // System.out.println("got '/', quotes = " + countChar(line, '"'));
+                    if (countChar(line, '"') % 2 == 0)
+                        processAttribute(line);
+                    else {
+                        featureBuf.setLength(0);
+                        featureBuf.append(line);
+                        featureStatus = ATTRIBUTE;
+                    }
+                } else {
+                    throw new BioException("Invalid line in feature body: " + line);
+                }
+                break;
+
+            case ATTRIBUTE:
+                // If the attribute contains whitespace it probably
+                // consists of whitespace-delimited words. Therefore a
+                // space should be inserted at EOL otherwise words will
+                // get fused (unless there is a space already there)
+                if ((countChar(featureBuf, ' ') > 0) &&
+                    featureBuf.charAt(featureBuf.length()-1) != ' ')
+                    featureBuf.append(" ");
+                featureBuf.append(line);
+
+                if (countChar(featureBuf, '"') % 2 == 0) {
+                    processAttribute(featureBuf.toString());
+                    featureStatus = WITHIN;
+                }
+                break;
+        }
     }
 
     public void endFeature()
-	throws BioException
-    {
-	listener.endFeature();
-	featureStatus = WITHOUT;
+        throws BioException {
+        listener.endFeature();
+        featureStatus = WITHOUT;
     }
 
     public boolean inFeature() {
-	return (featureStatus != WITHOUT);
+        return (featureStatus != WITHOUT);
     }
 
     /**
@@ -168,52 +165,55 @@ public class FeatureTableParser {
      * attribute, and fire it off to our listener.
      */
     private void processAttribute(String attr) throws BioException {
-	// System.err.println(attr);
-	int eqPos = attr.indexOf('=');
-	if (eqPos == -1) {
-	    listener.addFeatureProperty(attr.substring(1), Boolean.TRUE);
-	} else {
-	    String tag = attr.substring(1, eqPos);
-	    eqPos++;
-	    if (attr.charAt(eqPos) == '"')
-		++eqPos;
-	    int max = attr.length();
-	    if (attr.charAt(max - 1) == '"')
-		--max;
-	    String val = attr.substring(eqPos, max);
-	    if (val.indexOf('"') >= 0) {
-		StringBuffer sb = new StringBuffer();
-		boolean escape = false;
-		for (int i = 0; i < val.length(); ++i) {
-		    char c = val.charAt(i);
-		    if (c == '"') {
-			if (escape)
-			    sb.append(c);
-			escape = !escape;
-		    } else {
-			sb.append(c);
-			escape = false;
-		    }
-		}
-		val = sb.toString();
-	    }
-	    listener.addFeatureProperty(tag, val);
-	}
+        // System.err.println(attr);
+        int eqPos = attr.indexOf('=');
+        if (eqPos == -1) {
+            listener.addFeatureProperty(attr.substring(1), Boolean.TRUE);
+        } else {
+            String tag = attr.substring(1, eqPos);
+            eqPos++;
+
+            if (attr.charAt(eqPos) == '"')
+                ++eqPos;
+            int max = attr.length();
+
+            if (attr.charAt(max - 1) == '"')
+                --max;
+            String val = attr.substring(eqPos, max);
+
+            if (val.indexOf('"') >= 0) {
+                StringBuffer sb = new StringBuffer();
+                boolean escape = false;
+                for (int i = 0; i < val.length(); ++i) {
+                    char c = val.charAt(i);
+                    if (c == '"') {
+                        if (escape)
+                            sb.append(c);
+                        escape = !escape;
+                    } else {
+                        sb.append(c);
+                        escape = false;
+                    }
+                }
+                val = sb.toString();
+            }
+            listener.addFeatureProperty(tag, val);
+        }
     }
 
     private int countChar(StringBuffer s, char c) {
-	int cnt = 0;
-	for (int i = 0; i < s.length(); ++i)
-	    if (s.charAt(i) == c)
-		++cnt;
-	return cnt;
+        int cnt = 0;
+        for (int i = 0; i < s.length(); ++i)
+            if (s.charAt(i) == c)
+                ++cnt;
+        return cnt;
     }
 
     private int countChar(String s, char c) {
-	int cnt = 0;
-	for (int i = 0; i < s.length(); ++i)
-	    if (s.charAt(i) == c)
-		++cnt;
-	return cnt;
+        int cnt = 0;
+        for (int i = 0; i < s.length(); ++i)
+            if (s.charAt(i) == c)
+                ++cnt;
+        return cnt;
     }
 }
