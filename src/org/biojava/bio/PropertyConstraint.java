@@ -41,7 +41,7 @@ import org.biojava.utils.*;
  *
  * @since 1.3
  * @author Matthew Pocock
- * @author Keith James (docs).
+ * @author Keith James.
  */
 public interface PropertyConstraint {
     /**
@@ -67,7 +67,8 @@ public interface PropertyConstraint {
      * <p>It is not expected that constraints will neccesarily
      * maintain references to super/sub types. It will be more usual
      * to infer this relationship by introspecting the constraints
-     * themselves. For example, PropertyConstraint.ByClass will infer
+     * themselves. For example,
+     * <code>PropertyConstraint.ByClass</code> will infer
      * subConstraintOf by looking at the possible class of all items
      * matching subConstraint.</p>
      *
@@ -271,7 +272,7 @@ public interface PropertyConstraint {
          * <code>getMaxTimes</code> returns the maximum number of
          * conforming elements for the collection to be accepted.
          *
-         * @return an <code>int</code> value.
+         * @return an <code>int</code>.
          */
         public int getMaxTimes() {
             return maxTimes;
@@ -314,19 +315,21 @@ public interface PropertyConstraint {
         }
 
         /**
-         * <p><code>setProperty</code> sets a property in the Annotation
-         * such that it conforms to the constraint. For example, you
-         * create an Annotation having a key which is the String
-         * "gene_synonyms" and corresponding value which has a
-         * PropertyConstraint indicating that it must be an HashSet of
-         * between 1 and 10 Strings. To add a new String "xylR" to the Set
-         * you would call the method thus:
-         * <code>setProperty(annotationObj, "gene_synonyms",
-         * "xylR")</code>.</p>
+         * <p><code>setProperty</code> sets a property in the
+         * <code>Annotation</code> such that it conforms to the
+         * constraint. For example, you create an
+         * <code>Annotation</code> having a key which is the
+         * <code>String</code> "gene_synonyms" and corresponding value
+         * which has a <code>PropertyConstraint</code> indicating that
+         * it must be an <code>HashSet</code> of between 1 and 10
+         * <code>String</code>s. To add a new <code>String</code>
+         * "xylR" to the <code>HashSet</code> you would call the
+         * method thus: <code>setProperty(annotationObj,
+         * "gene_synonyms", "xylR")</code>.</p>
          *
          * <p>If the specified property does not exist, a new, empty
-         * Collection instance is created automatically to hold the
-         * value you are adding.</p>
+         * <code>Collection</code> instance is created automatically
+         * to hold the value you are adding.</p>
          *
          * <p>If size constraints have been set on the collection the
          * addition may be vetoed.</p>
@@ -387,7 +390,7 @@ public interface PropertyConstraint {
          * <code>getValues</code> returns the set of values which
          * constrain the property.
          *
-         * @return a <code>Set</code> value.
+         * @return a <code>Set</code>.
          */
         public Set getValues() {
             return values;
@@ -409,7 +412,7 @@ public interface PropertyConstraint {
 
         public void setProperty(Annotation ann, Object property, Object value)
             throws ChangeVetoException {
-            if (accept(property)) {
+            if (accept(value)) {
                 ann.setProperty(property, value);
             } else {
                 throw new ChangeVetoException("Value not accepted");
