@@ -10,7 +10,7 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 
-public class TestDASG {
+public class TestDASH {
     public static void main(String[] args) throws Exception {
 	if (args.length != 4)
 	    throw new Exception("java das.TestDAS <url> <seq> <min> <max>");
@@ -44,7 +44,7 @@ public class TestDASG {
 				     String prefix)
 	throws Exception
     {
-	for (Iterator i = fh.filter(ff, false).features(); i.hasNext(); ) {
+	for (Iterator i = fh.filter(ff, true).features(); i.hasNext(); ) {
 	    Feature f = (Feature) i.next();
 	    pw.print(prefix);
 	    pw.print(f.getType());
@@ -56,7 +56,7 @@ public class TestDASG {
 	    } catch (NoSuchElementException ex) {
 	    }
 	    pw.println();
-	    printFeatures(f, ff, pw, prefix + "    ");
+	    //printFeatures(f, ff, pw, prefix + "    ");
 	}
     }
 }
