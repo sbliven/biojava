@@ -141,6 +141,7 @@ class AceSocket implements Connection {
 
     public void dispose() throws AceException {
 	try {
+	    defunct = true;
 	    sock.close();
 	} catch (IOException ex) {
 	    throw new AceException(ex);
