@@ -221,7 +221,7 @@ public interface MarkovModel extends Changeable {
    * @author Matthew Pocock
    * @since 1.1
    */
-  public class DistributionForwarder extends ChangeAdapter {
+  public class DistributionForwarder extends ChangeAdapter implements java.io.Serializable {
     public DistributionForwarder(Object source, ChangeSupport cs) {
       super(source, cs);
     }
