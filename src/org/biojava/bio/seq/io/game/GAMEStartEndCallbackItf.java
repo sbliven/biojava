@@ -20,7 +20,7 @@
  *
  */
 
-package org.biojava.bio.program.game;
+package org.biojava.bio.seq.io.game;
 
 import java.lang.String;
 
