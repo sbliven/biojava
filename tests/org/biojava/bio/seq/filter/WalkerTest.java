@@ -56,12 +56,105 @@ extends TestCase {
     }
   }
 
+  public void testCountSome() {
+    try {
+      CountByClass cbc = new CountByClass();
+      Walker walker = WalkerFactory.getInstance().getWalker(cbc);
+
+      walker.walk(booring1, cbc);
+      assertEquals("One filter, none interesting", 0, cbc.count);
+
+      cbc.count = 0;
+      walker.walk(booring2, cbc);
+      assertEquals("One filter, one interesting", 1, cbc.count);
+
+      cbc.count = 0;
+      walker.walk(andOr, cbc);
+      assertEquals("Five filter, two interesting", 2, cbc.count);
+    } catch (BioException be) {
+      throw (AssertionError) new AssertionError(
+              "Could not instantiate visitor").initCause(be);
+    }
+  }
+
+  public void testCountWithFallback() {
+    try {
+      CountWithFallback cwf = new CountWithFallback();
+      Walker walker = WalkerFactory.getInstance().getWalker(cwf);
+
+      walker.walk(booring1, cwf);
+      assertEquals("One filter, one booring", 0, cwf.others);
+      assertEquals("One filter, zero interesting", 1, cwf.byLoc);
+
+      cwf.others = cwf.byLoc = 0;
+      walker.walk(booring2, cwf);
+      assertEquals("One filter, one booring", 1, cwf.others);
+      assertEquals("One filter, zero interesting", 0, cwf.byLoc);
+
+      cwf.others = cwf.byLoc = 0;
+      walker.walk(andOr, cwf);
+      assertEquals("One filter, four booring", 4, cwf.others);
+      assertEquals("One filter, one interesting", 1, cwf.byLoc);
+    } catch (BioException be) {
+      throw (AssertionError) new AssertionError(
+              "Could not instantiate visitor").initCause(be);
+    }
+  }
+
+  public void testReturnAll() {
+    try {
+      ReturnOne ra = new ReturnOne();
+      Walker walker = WalkerFactory.getInstance().getWalker(ra);
+
+      walker.walk(booring1, ra);
+      assertEquals("One filter", new Integer(1), walker.getValue());
+
+      walker.walk(andOr, ra);
+      assertEquals("Five filters", new Integer(1), walker.getValue());
+    } catch (BioException be) {
+      throw (AssertionError) new AssertionError(
+              "Could not instantiate visitor").initCause(be);
+    }
+  }
+
   public class CountAll implements Visitor {
     int count = 0;
 
     public void featureFilter(FeatureFilter filter) {
-      System.err.println("Increasing counter");
+      System.err.println("Increasing counter: " + filter);
       count++;
+    }
+  }
+
+  public class CountByClass
+  implements Visitor {
+    int count = 0;
+
+    public void byClass(FeatureFilter.ByClass byClass) {
+      count++;
+    }
+  }
+
+  public class CountWithFallback
+  implements Visitor {
+    int byLoc = 0;
+    int others = 0;
+
+    public void featureFilter(FeatureFilter filter) {
+      System.err.println("Feature: " + filter);
+      others++;
+    }
+
+    public void overlapsLocation(FeatureFilter.OverlapsLocation overlaps) {
+      System.err.println("OverlapsLocation: " + overlaps);
+      byLoc++;
+    }
+  }
+
+  public class ReturnOne
+  implements Visitor {
+    public Integer featureFilter(FeatureFilter filter) {
+      return new Integer(1);
     }
   }
 }

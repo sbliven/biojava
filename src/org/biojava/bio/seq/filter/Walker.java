@@ -25,5 +25,21 @@ import org.biojava.bio.seq.FeatureFilter;
  * @author Matthew Pocock
  */
 public interface Walker {
+  /**
+   * This walks the feature tree, showing the visitor each filter in
+   * the expression.
+   *
+   * @param filter
+   * @param visitor
+   */
   public void walk(FeatureFilter filter, Visitor visitor);
+
+  /**
+   * If the visitor has a return value, then the result of applying the visitor
+   * to the tree can be obtained using this method, otherwise the result will
+   * be null.
+   *
+   * @return the visitor's return value, or null
+   */
+  public Object getValue();
 }

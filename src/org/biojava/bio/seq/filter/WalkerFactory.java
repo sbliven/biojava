@@ -79,18 +79,6 @@ public class WalkerFactory {
               new CodeClass[]{c_Walker},
               CodeUtils.ACC_PUBLIC | CodeUtils.ACC_SUPER);
 
-      // constructor - no args, forward to SUPER
-      CodeMethod m_WalkerBase_init = c_WalkerBase.getConstructor(CodeUtils.EMPTY_LIST);
-      GeneratedCodeMethod init = walkerClass.createMethod("<init>",
-                                                          CodeUtils.TYPE_VOID,
-                                                          CodeUtils.EMPTY_LIST,
-                                                          CodeUtils.ACC_PUBLIC);
-      InstructionVector initIV = new InstructionVector();
-      initIV.add(ByteCode.make_aload(init.getThis()));
-      initIV.add(ByteCode.make_invokespecial(m_WalkerBase_init));
-      initIV.add(ByteCode.make_return());
-      walkerClass.setCodeGenerator(init, initIV);
-
       // get all visitor methods
       Method[] methods = visitorClass.getMethods();
       List visitorMeths = new ArrayList();
@@ -100,7 +88,6 @@ public class WalkerFactory {
       // barf if the return type is not consistent
       for(int mi = 0; mi < methods.length; mi++) {
         Method method = methods[mi];
-        System.err.println("Evaluating method: " + method);
 
         Class ret = method.getReturnType();
         Class[] args = method.getParameterTypes();
@@ -108,7 +95,6 @@ public class WalkerFactory {
         // is this one of our classes?
         if(args.length > 0) {
           Class arg0 = args[0];
-          System.err.println("Has arguments");
 
           // If arg0 is inner class, strip off outer-class name to make our name
           String methName = method.getName();
@@ -126,15 +112,11 @@ public class WalkerFactory {
           arg0Name = arg0Name.substring(0,1).toLowerCase() +
                   arg0Name.substring(1);
 
-          System.err.println("Comparing names: " + arg0Name + " " + methName);
-
           // we have a naming match?
           if(arg0Name.equals(methName)) {
-            System.err.println("Name matches arg0 type");
             // check argument 0 is a feature filter
 
             if(FeatureFilter.class.isAssignableFrom(arg0)) {
-              System.err.println("Good arg type");
               // we have a live one.
               // check that the return type is good
               if(retClass == null) {
@@ -176,8 +158,8 @@ public class WalkerFactory {
         public int compare(Object o1, Object o2) {
           Method m1 = (Method) o1; Class c1 = m1.getParameterTypes()[0];
           Method m2 = (Method) o2; Class c2 = m2.getParameterTypes()[0];
-          if(c1.isInstance(c2)) return +1;
-          if(c2.isInstance(c1)) return -1;
+          if(c1.isAssignableFrom(c2)) return +1;
+          if(c2.isAssignableFrom(c1)) return -1;
           return 0;
         }
       });
@@ -185,7 +167,6 @@ public class WalkerFactory {
       // now let's implement our dispatcher
       CodeClass c_retClass = IntrospectedCodeClass.forClass(retClass);
       CodeClass[] walkParams = new CodeClass[]{ c_FeatureFilter, c_Visitor};
-      CodeMethod m_Walker_walk = c_Walker.getMethod("walk", walkParams);
 
       GeneratedCodeMethod doWalk = walkerClass.createMethod(
               "doWalk",
@@ -194,7 +175,6 @@ public class WalkerFactory {
               new String[]{"filter", "visitor"},
               CodeUtils.ACC_PUBLIC);
       InstructionVector walkIV = new InstructionVector();
-      LocalVariable lv_this = doWalk.getThis();
       LocalVariable lv_filter = doWalk.getVariable("filter");
       LocalVariable lv_visitor = doWalk.getVariable("visitor");
       LocalVariable lv_visitor2 = new LocalVariable(c_ourVisitor, "visitor2");
@@ -218,19 +198,20 @@ public class WalkerFactory {
         CodeClass c_ourFilter = IntrospectedCodeClass.forClass(filtClass);
 
         Method[] filtMeth = filtClass.getMethods();
-        Iterator lvi = wrappedLVs.iterator();
+        int lvi = 0;
 
         for(int mi = 0; mi < filtMeth.length; mi++) {
           Method m = filtMeth[mi];
 
           // no args, returns a filter
           if(m.getParameterTypes().length == 0 &&
-                  FeatureFilter.class.isInstance(m.getReturnType())) {
+                  FeatureFilter.class.isAssignableFrom(m.getReturnType()))
+          {
             CodeMethod m_getFilter = IntrospectedCodeClass.forMethod(m);
 
             LocalVariable lv;
-            if(lvi.hasNext()) {
-              lv = (LocalVariable) lvi.next();
+            if(lvi < wrappedLVs.size()) {
+              lv = (LocalVariable) wrappedLVs.get(lvi);
             } else {
               lv = new LocalVariable(c_retClass);
               wrappedLVs.add(lv);
@@ -239,12 +220,12 @@ public class WalkerFactory {
             // res_i = this.walk(
             //       ((c_ourFilter) filter).m_getFilter(),
             //       visitor );
-            wfiv.add(ByteCode.make_aload(lv_this));
+            wfiv.add(ByteCode.make_aload(doWalk.getThis()));
             wfiv.add(ByteCode.make_aload(lv_filter));
             wfiv.add(ByteCode.make_checkcast(c_ourFilter));
             wfiv.add(ByteCode.make_invokevirtual(m_getFilter));
             wfiv.add(ByteCode.make_aload(lv_visitor));
-            wfiv.add(ByteCode.make_invokevirtual(m_Walker_walk));
+            wfiv.add(ByteCode.make_invokevirtual(doWalk));
 
             if(c_retClass != CodeUtils.TYPE_VOID) {
               wfiv.add(ByteCode.make_astore(lv));
@@ -257,12 +238,9 @@ public class WalkerFactory {
         // }
         walkIV.add(ByteCode.make_aload(lv_filter));
         walkIV.add(ByteCode.make_instanceof(c_ourFilter));
-        walkIV.add(ByteCode.make_iconst(1));
-        walkIV.add(new IfExpression(
-                ByteCode.op_ifeq,
-                wfiv,
-                CodeUtils.DO_NOTHING));
-        walkIV.add(wfiv);
+        walkIV.add(new IfExpression(ByteCode.op_ifne,
+                                    wfiv,
+                                    CodeUtils.DO_NOTHING));
       }
 
 
@@ -277,7 +255,6 @@ public class WalkerFactory {
 
       for(Iterator mi = visitorMeths.iterator(); mi.hasNext(); ) {
         Method meth = (Method) mi.next();
-        System.err.println("Generating call-back for method: " + meth);
 
         // the viewer method is invoked as:
         //
@@ -302,8 +279,7 @@ public class WalkerFactory {
         // wrap this in an if(filt instanceof Foo)
         walkIV.add(ByteCode.make_aload(lv_filter));
         walkIV.add(ByteCode.make_instanceof(c_thisFiltType));
-        walkIV.add(ByteCode.make_iconst(1));
-        walkIV.add(new IfExpression(ByteCode.op_ifeq,
+        walkIV.add(new IfExpression(ByteCode.op_ifne,
                                     bodyIV,
                                     CodeUtils.DO_NOTHING));
       }
@@ -319,25 +295,73 @@ public class WalkerFactory {
 
       walkerClass.setCodeGenerator(doWalk, walkIV);
 
-      // Wire doWalk to walk
+      // Wire doWalk to walk and if necisary create field
       //
-      GeneratedCodeMethod walkImpl = walkerClass.createMethod(
-              "walk",
-              CodeUtils.TYPE_VOID,
-              walkParams,
-              CodeUtils.ACC_PUBLIC);
-      InstructionVector wiIV = new InstructionVector();
-      wiIV.add(ByteCode.make_aload(walkImpl.getThis()));
-      wiIV.add(ByteCode.make_aload(walkImpl.getVariable(0)));
-      wiIV.add(ByteCode.make_aload(walkImpl.getVariable(1)));
-      wiIV.add(ByteCode.make_invokespecial(doWalk));
+      CodeField f_value = null;
       if(c_retClass != CodeUtils.TYPE_VOID) {
-        wiIV.add(ByteCode.make_pop());
+        f_value = walkerClass.createField("value",
+                                          CodeUtils.TYPE_OBJECT,
+                                          CodeUtils.ACC_PRIVATE);
       }
-      wiIV.add(ByteCode.make_return());
 
-      walkerClass.setCodeGenerator(walkImpl, wiIV);
-      System.err.println("Done creating: " + walkerClass.getName());
+      { // protect us from leakey locals
+        GeneratedCodeMethod walkImpl = walkerClass.createMethod(
+                "walk",
+                CodeUtils.TYPE_VOID,
+                walkParams,
+                CodeUtils.ACC_PUBLIC);
+        InstructionVector wiIV = new InstructionVector();
+        if (c_retClass != CodeUtils.TYPE_VOID) {
+          wiIV.add(ByteCode.make_aload(walkImpl.getThis()));
+        }
+        wiIV.add(ByteCode.make_aload(walkImpl.getThis()));
+        wiIV.add(ByteCode.make_aload(walkImpl.getVariable(0)));
+        wiIV.add(ByteCode.make_aload(walkImpl.getVariable(1)));
+        wiIV.add(ByteCode.make_invokevirtual(doWalk));
+        if (c_retClass != CodeUtils.TYPE_VOID) {
+          wiIV.add(ByteCode.make_putfield(f_value));
+        }
+        wiIV.add(ByteCode.make_return());
+
+        walkerClass.setCodeGenerator(walkImpl, wiIV);
+      }
+
+      // generate the getValue() method
+      { // protect us from leakey locals
+        GeneratedCodeMethod getValue = walkerClass.createMethod(
+                "getValue",
+                CodeUtils.TYPE_OBJECT,
+                CodeUtils.EMPTY_LIST,
+                CodeUtils.ACC_PUBLIC);
+        InstructionVector gvIV = new InstructionVector();
+        if (c_retClass == CodeUtils.TYPE_VOID) {
+          gvIV.add(ByteCode.make_aconst_null());
+        } else {
+          gvIV.add(ByteCode.make_aload(getValue.getThis()));
+          gvIV.add(ByteCode.make_getfield(f_value));
+        }
+        gvIV.add(ByteCode.make_areturn());
+        walkerClass.setCodeGenerator(getValue, gvIV);
+      }
+
+      // constructor - no args, forward to SUPER, intialize field if needed
+      { // protect us from leaky locals
+        CodeMethod m_WalkerBase_init = c_WalkerBase.getConstructor(CodeUtils.EMPTY_LIST);
+        GeneratedCodeMethod init = walkerClass.createMethod("<init>",
+                                                            CodeUtils.TYPE_VOID,
+                                                            CodeUtils.EMPTY_LIST,
+                                                            CodeUtils.ACC_PUBLIC);
+        InstructionVector initIV = new InstructionVector();
+        initIV.add(ByteCode.make_aload(init.getThis()));
+        initIV.add(ByteCode.make_invokespecial(m_WalkerBase_init));
+        if (c_retClass != CodeUtils.TYPE_VOID) {
+          initIV.add(ByteCode.make_aload(init.getThis()));
+          initIV.add(ByteCode.make_aconst_null());
+          initIV.add(ByteCode.make_putfield(f_value));
+        }
+        initIV.add(ByteCode.make_return());
+        walkerClass.setCodeGenerator(init, initIV);
+      }
 
       return classLoader.defineClass(walkerClass);
     } catch (CodeException ce) {
