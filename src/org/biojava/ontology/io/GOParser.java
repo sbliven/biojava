@@ -53,7 +53,7 @@ public class GOParser {
     {
         try {
             Ontology onto = factory.createOntology(ontoName, ontoDescription);
-            Term isa = onto.importTerm(OntoTools.SUB_TYPE_OF, null);
+            Term isa = onto.importTerm(OntoTools.IS_A, null);
             Term partof = null; // fixme: onto.importTerm(OntoTools.PART_OF, null);
             List termStack = new ArrayList();
             String line;

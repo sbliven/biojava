@@ -42,7 +42,7 @@ public class TripleImplTest extends TestCase {
         onto = OntoTools.getDefaultFactory().createOntology("test", "");
         subject = onto.createTerm("subject", "");
         object = onto.createTerm("object", "");
-        relation = onto.importTerm(OntoTools.SUB_TYPE_OF, null);
+        relation = onto.importTerm(OntoTools.IS_A, null);
     }
 
     public void testEqualsWhenEqual() throws ChangeVetoException, AlreadyExistsException {

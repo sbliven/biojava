@@ -76,6 +76,7 @@ public class EntryNamIdxReaderTest extends TestCase
     protected void tearDown() throws Exception
     {
         ent.close();
+        ent = null;
     }
 
     public void testReadFileLength()

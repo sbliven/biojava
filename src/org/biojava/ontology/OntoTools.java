@@ -6,7 +6,7 @@ import java.io.PushbackReader;
 
 import org.biojava.utils.ClassTools;
 import org.biojava.bio.BioError;
-import org.biojava.ontology.io.TriplesParser;
+import org.biojava.ontology.io.TabDelimParser;
 
 /**
  * Tools for manipulating ontologies.
@@ -19,28 +19,29 @@ public final class OntoTools {
   private static final IntegerOntology CORE_INTEGER;
   //private static final Ontology CORE_STRING;
 
-  public static final Term TYPE;
+  // public static final Term TYPE;
   public static final Term RELATION;
   public static final Term ANY;
   public static final Term NONE;
-  public static final Term SUB_TYPE_OF;
-  public static final Term INSTANCE_OF;
-  public static final Term DOMAIN;
-  public static final Term CO_DOMAIN;
-  public static final Term HAS_DOMAIN;
-  public static final Term HAS_CO_DOMAIN;
+  public static final Term IS_A;
+  // public static final Term SUB_TYPE_OF;
+  // public static final Term INSTANCE_OF;
+  // public static final Term DOMAIN;
+  // public static final Term CO_DOMAIN;
+  // public static final Term HAS_DOMAIN;
+  // public static final Term HAS_CO_DOMAIN;
 
-  public static final Term BOOLEAN;
-  public static final Term TRUE;
-  public static final Term FALSE;
-  public static final Term PREDICATE;
+  // public static final Term BOOLEAN;
+  // public static final Term TRUE;
+  // public static final Term FALSE;
+  // public static final Term PREDICATE;
 
-  public static final Term AND;
-  public static final Term OR;
-  public static final Term XOR;
-  public static final Term EQUAL;
-  public static final Term NOT_EQUAL;
-  public static final Term IMPLIES;
+  // public static final Term AND;
+  // public static final Term OR;
+  // public static final Term XOR;
+  // public static final Term EQUAL;
+  // public static final Term NOT_EQUAL;
+  // public static final Term IMPLIES;
 
   public static final Term REFLEXIVE;
   public static final Term SYMMETRIC;
@@ -60,48 +61,46 @@ public final class OntoTools {
       BufferedReader reader = new BufferedReader(
         new InputStreamReader(
           ClassTools.getClassLoader(OntoTools.class).getResourceAsStream(
-            "org/biojava/ontology/core.pred"
+            "org/biojava/ontology/core.onto"
           )
         )
       );
 
       CORE_INTEGER = new IntegerOntology();
+      CORE_ONTOLOGY = new TabDelimParser().parse(
+              reader,
+              DEFAULT_FACTORY
+      );
 
-      ReasoningDomain rdom = new ReasoningDomain.Impl();
-      rdom.addOntology(CORE_INTEGER);
-      CORE_ONTOLOGY = new TriplesParser().parse(
-              new PushbackReader(reader),
-              DEFAULT_FACTORY,
-              rdom);
-
-      TYPE = CORE_ONTOLOGY.getTerm("type");
+      // TYPE = CORE_ONTOLOGY.getTerm("type");
       RELATION = CORE_ONTOLOGY.getTerm("relation");
       ANY = CORE_ONTOLOGY.getTerm("any");
       NONE = CORE_ONTOLOGY.getTerm("none");
-      SUB_TYPE_OF = CORE_ONTOLOGY.getTerm("sub_type_of");
-      INSTANCE_OF = CORE_ONTOLOGY.getTerm("instance_of");
-      DOMAIN = CORE_ONTOLOGY.getTerm("domain");
-      CO_DOMAIN = CORE_ONTOLOGY.getTerm("co_domain");
-      HAS_DOMAIN = CORE_ONTOLOGY.getTerm("has_domain");
-      HAS_CO_DOMAIN = CORE_ONTOLOGY.getTerm("has_co_domain");
+      IS_A = CORE_ONTOLOGY.getTerm("is-a");
+      // SUB_TYPE_OF = CORE_ONTOLOGY.getTerm("sub_type_of");
+      // INSTANCE_OF = CORE_ONTOLOGY.getTerm("instance_of");
+      // DOMAIN = CORE_ONTOLOGY.getTerm("domain");
+      // CO_DOMAIN = CORE_ONTOLOGY.getTerm("co_domain");
+      // HAS_DOMAIN = CORE_ONTOLOGY.getTerm("has_domain");
+      // HAS_CO_DOMAIN = CORE_ONTOLOGY.getTerm("has_co_domain");
 
-      BOOLEAN = CORE_ONTOLOGY.getTerm("boolean");
-      TRUE = CORE_ONTOLOGY.getTerm("true");
-      FALSE = CORE_ONTOLOGY.getTerm("false");
-      PREDICATE = CORE_ONTOLOGY.getTerm("predicate");
+      // BOOLEAN = CORE_ONTOLOGY.getTerm("boolean");
+      // TRUE = CORE_ONTOLOGY.getTerm("true");
+      // FALSE = CORE_ONTOLOGY.getTerm("false");
+      // PREDICATE = CORE_ONTOLOGY.getTerm("predicate");
 
-      AND = CORE_ONTOLOGY.getTerm("and");
-      OR = CORE_ONTOLOGY.getTerm("or");
-      XOR = CORE_ONTOLOGY.getTerm("xor");
-      EQUAL = CORE_ONTOLOGY.getTerm("equal");
-      NOT_EQUAL = CORE_ONTOLOGY.getTerm("not_equal");
-      IMPLIES = CORE_ONTOLOGY.getTerm("implies");
+      // AND = CORE_ONTOLOGY.getTerm("and");
+      // OR = CORE_ONTOLOGY.getTerm("or");
+      // XOR = CORE_ONTOLOGY.getTerm("xor");
+      // EQUAL = CORE_ONTOLOGY.getTerm("equal");
+      // NOT_EQUAL = CORE_ONTOLOGY.getTerm("not_equal");
+      // IMPLIES = CORE_ONTOLOGY.getTerm("implies");
 
       REFLEXIVE = CORE_ONTOLOGY.getTerm("reflexive");
       EQUIVALENCE = CORE_ONTOLOGY.getTerm("equivalence");
       SYMMETRIC = CORE_ONTOLOGY.getTerm("symmetric");
       TRANSITIVE = CORE_ONTOLOGY.getTerm("transitive");
-      PARTIAL_ORDER = CORE_ONTOLOGY.getTerm("partial_order");
+      PARTIAL_ORDER = CORE_ONTOLOGY.getTerm("partial-order");
 
     } catch (Exception e) {
       throw new BioError("Could not initialize OntoTools", e);

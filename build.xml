@@ -20,7 +20,6 @@
     runtests-fork     runs all tests in separate virtual machines
     javadocs-biojava  builds biojava API documentation
     javadocs-taglets  builds taglets API documentation
-    javadocs-grammars builds grammars API documentation
     javadocs-demos    builds demos API documentation
     javadocs-all      builds API documentation for all the above
     docbook           builds DocBook documentation
@@ -77,11 +76,6 @@
                property="java14">
     </available>
 
-    <available classpath="${java.class.path}:${ant-tasks.path}"
-               classname="org.sablecc.ant.taskdef.Sablecc"
-               property="sableCC.support">
-    </available>
-
     <available classpath="${classpath}"
                classname="org.hsqldb.jdbcDriver"
                property="sqlDriver.hsqldb">
@@ -91,14 +85,12 @@
     <echo message="Building biojava-${version}" />
     <echo message="JUnit present:                   ${junit.present}" />
     <echo message="JUnit supported by Ant:          ${junit.support}" />
-    <echo message="SableCC supported by Ant:        ${sableCC.support}" />
     <echo message="HSQLDB driver presend:           ${sqlDriver.hsqldb}" />
 
     <property name="readme" value="./README" />
     <property name="license" value="./LICENSE" />
     <property name="src.dir" value="./src" />
     <property name="tests.dir" value="./tests" />
-    <property name="grammars.dir" value="./grammars" />
     <property name="demos.dir" value="./demos" />
     <property name="apps.dir" value="./apps" />
     <property name="docs.dir" value="./docs" />
@@ -150,12 +142,6 @@
     <property name="build.docs.apps" value="${build.dest.docs}/${name.apps}" />
     <property name="jar.apps" value="${build.dir}/${name.apps}.jar" />
     <property name="manifest.file.apps" value="${manifest.dir}/${name.apps}.txt" />
-    <!-- Subdirectory for grammars -->
-    <property name="name.grammars" value="grammars" />
-    <property name="Name.grammars" value="BioJava Grammars" />
-    <property name="build.src.grammars_java" value="${build.dir}/${name.grammars}_java" />
-    <property name="build.dest.grammars" value="${build.classes.dir}/${name.grammars}" />
-    <property name="build.docs.grammars" value="${build.dest.docs}/${name.grammars}" />
     <!-- Subdirectory for libraries used during build -->
     <property name="build.lib" value="${build.dir}/lib" />
     <!-- Subdirectory for taglets -->
@@ -189,16 +175,6 @@
       </fileset>
     </copy>
 
-  </target>
-
-  <!-- Prepares the grammars -->
-  <target name="prepare-grammars" depends="prepare" if="sableCC.support"
-   description="Prepares the grammars">
-
-    <!-- Creates directories -->
-    <mkdir dir="${build.src.grammars_java}" />
-    <mkdir dir="${build.dest.grammars}" />
-    <mkdir dir="${build.docs.grammars}" />
   </target>
 
   <!-- Copies taglet files -->
@@ -293,35 +269,6 @@
     .class files.
   -->
 
-  <!-- Compiles the grammars directory -->
-  <target name="compile-grammars" depends="prepare-grammars" if="sableCC.support"
-  description="Compiles the grammars directory">
-    <!-- Turn the grammars into java code -->
-    <taskdef name="sablecc"
-             classname="org.sablecc.ant.taskdef.Sablecc"
-             classpath="${java.class.path}:${ant-tasks.path}" />
-    <sablecc src="${grammars.dir}"
-             outputdirectory="${build.src.grammars_java}"
-             includes="*.grammar" />
-
-    <!-- Compile that java code -->
-    <javac
-      srcdir="${build.src.grammars_java}"
-      destdir="${build.dest.grammars}"
-      depend="${javac.depend}"
-      deprecation="${javac.deprecation}"
-      source="${javac.source}"
-      debug="${javac.debug}">
-    </javac>
-
-    <!-- Copy all the non-java files generated -->
-    <copy todir="${build.dest.grammars}">
-      <fileset dir="${build.src.grammars_java}">
-        <exclude name="*.java" />
-      </fileset>
-    </copy>
-  </target>
-
   <!-- Compiles the taglets directory -->
   <target name="compile-taglets" depends="init,prepare-taglets"
   description="Compiles the taglets directory">
@@ -339,7 +286,7 @@
   </target>
 
   <!-- Compiles the source directory -->
-  <target name="compile-biojava" depends="prepare-biojava,compile-grammars"
+  <target name="compile-biojava" depends="prepare-biojava"
   description="Compiles the source directory">
     <javac
       srcdir="${src.dir}"
@@ -350,7 +297,6 @@
       debug="${javac.debug}">
       <classpath>
         <pathelement path="${classpath}" />
-        <pathelement path="${build.dest.grammars}" />
       </classpath>
     </javac>
   </target>
@@ -416,8 +362,6 @@
 
   <!-- Creates the biojava package (tests are left in the parallel tree) -->
 
-  <!-- this ought to depend on compile-grammars at well, but until conditional
-        sablecc works, that's a Bad Idea -->
 
   <target name="package-biojava" depends="compile-biojava"
   description="create biojava class jar file">
@@ -426,7 +370,6 @@
       manifest="${manifest.dir}/biojava.txt"
     >
       <fileset dir="${build.dest.biojava}" />
-      <fileset dir="${build.dest.grammars}" />
       <fileset dir="${resources.dir}" />
     </jar>
   </target>
@@ -486,32 +429,13 @@
     </javadoc>
   </target>
 
-  <!-- Create grammar API documentation -->
-  <target name="javadocs-grammars" depends="compile-grammars" if="sableCC.support"
-  description="Create grammar API documentation">
-    <javadoc
-      packagenames="${packages}"
-      sourcepath="${build.src.grammars_java}"
-      classpath="${classpath}"
-      destdir="${build.docs.grammars}"
-      author="true"
-      version="true"
-      use="true"
-      source="1.4"
-      windowtitle="${Name.grammars} API"
-      doctitle="${Name.grammars}"
-      maxmemory="96m">
-      <link href="http://java.sun.com/j2se/1.4.2/docs/api/" offline="false"/>
-    </javadoc>
-  </target>
-
   <!-- Creates the API documentation -->
   <target name="javadocs-biojava" depends="prepare-biojava,compile-taglets"
   description="Creates the API documentation">
     <javadoc
       packagenames="${packages}"
       sourcepath="${src.dir}"
-      classpath="${classpath}:${build.dest.grammars}"
+      classpath="${classpath}"
       destdir="${build.docs.biojava}"
       author="true"
       version="true"
@@ -521,7 +445,6 @@
       doctitle="${Name.biojava}"
       maxmemory="96m">
        <link href="http://java.sun.com/j2se/1.4.2/docs/api/" offline="false"/>
-       <link href="../grammars" offline="true" packagelistLoc="${build.docs.grammars}/package-list}"/>
        <group title="Core biological packages"
               packages="org.biojava.bio:org.biojava.bio.dist:org.biojava.bio.search:org.biojava.bio.seq:org.biojava.bio.seq.db:org.biojava.bio.seq.genomic:org.biojava.bio.seq.io:org.biojava.bio.symbol:org.biojava.bio.alignment:org.biojava.directory:org.biojava.bibliography:org.biojava.bio.taxa" />
 
@@ -636,7 +559,7 @@
 
   <target
     name="javadocs-all"
-    depends="javadocs-taglets,javadocs-grammars,javadocs-biojava,javadocs-demos,javadocs-apps,docbook"
+    depends="javadocs-taglets,javadocs-biojava,javadocs-demos,javadocs-apps,docbook"
     description="Creates the javadocs for all components"
   />
 
@@ -660,8 +583,6 @@
         <pathelement path="${tests.dir}" />
         <!-- classes specified in this file -->
         <pathelement path="${classpath}" />
-        <!-- classes generated by the grammars -->
-        <pathelement path="${build.dest.grammars}" />
         <!-- classes specified in system classpath -->
         <pathelement path="${java.class.path}" />
       </classpath>
@@ -695,8 +616,6 @@
         <pathelement path="${tests.dir}" />
         <!-- classes specified in this file -->
         <pathelement path="${classpath}" />
-        <!-- classes generated by the grammars -->
-        <pathelement path="${build.dest.grammars}" />
         <!-- classes specified in system classpath -->
         <pathelement path="${java.class.path}" />
       </classpath>
@@ -718,7 +637,7 @@
       docletpath="doccheck.jar"
       packagenames="${packages}"
       sourcepath="${src.dir}"
-      classpath="${classpath}:${build.dest.grammars}"
+      classpath="${classpath}"
       destdir="${build.doccheck.biojava}"
       source="1.4"
       maxmemory="96m">
