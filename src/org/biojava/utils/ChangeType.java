@@ -1,20 +1,20 @@
 /*
  *                  BioJava development code
- * 
+ *
  * This code may be freely distributed and modified under the
  * terms of the GNU Lesser General Public Licence.  This should
  * be distributed with the code.  If you do not have a copy,
  * see:
- * 
+ *
  *   http://www.gnu.org/copyleft/lesser.html
- * 
+ *
  * Copyright for this code is held jointly by the individual
  * authors.  These should be listed in @author doc comments.
- * 
+ *
  * For more information on the BioJava project and its aims,
  * or to join the biojava-l mailing list, visit the home page
  * at:
- * 
+ *
  *   http://www.biojava.org
  */
 
@@ -29,7 +29,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
- *  
+ *
  * Class for all constants which are used to indicate change
  * types.  Note that all ChangeType objects must be accessible
  * via a public static field of some class or interface.  These should
@@ -63,14 +63,14 @@ import java.util.Set;
  *
  * @author     Thomas Down
  * @author     Matthew Pocock
- * @since      1.1 
+ * @since      1.1
  */
 
 public final class ChangeType implements Serializable {
     private final String name;
     private final Field ourField;
     private final ChangeType superType;
-  
+
   /**
    * Constant ChangeType field which indicates that a change has
    * occured which can't otherwise be represented.  Please do not
@@ -87,11 +87,11 @@ public final class ChangeType implements Serializable {
   public static final ChangeType UNKNOWN;
 
     /**
-     *  Construct a new ChangeType. 
+     *  Construct a new ChangeType.
      *
-     * @param  name      The name of this change. 
-     * @param  ourField  The public static field which contains this 
-     *                   ChangeType. 
+     * @param  name      The name of this change.
+     * @param  ourField  The public static field which contains this
+     *                   ChangeType.
      * @param  superType The supertype of this type.
      *
      * @since 1.2
@@ -104,11 +104,11 @@ public final class ChangeType implements Serializable {
   }
 
   /**
-   *  Construct a new ChangeType with superType UNKNOWN. 
+   *  Construct a new ChangeType with superType UNKNOWN.
    *
-   * @param  name      The name of this change. 
-   * @param  ourField  The public static field which contains this 
-   *      ChangeType. 
+   * @param  name      The name of this change.
+   * @param  ourField  The public static field which contains this
+   *      ChangeType.
    */
   public ChangeType(String name, Field ourField) {
       this(name, ourField, ChangeType.UNKNOWN);
@@ -117,12 +117,12 @@ public final class ChangeType implements Serializable {
   /**
    *  Construct a new ChangeType with supertype UNKNOWN.
    *
-   * @param  name   The name of this change. 
-   * @param  clazz  The class which is going to contain this change. 
-   * @param  fname  
-   * The name of the field in <code>clazz</code> which 
+   * @param  name   The name of this change.
+   * @param  clazz  The class which is going to contain this change.
+   * @param  fname
+   * The name of the field in <code>clazz</code> which
    * is to contain a reference to this change.
-   * @throws        BioError If the field cannot be found. 
+   * @throws        BioError If the field cannot be found.
    */
   public ChangeType(String name, Class clazz, String fname) {
       this(name, clazz, fname, ChangeType.UNKNOWN);
@@ -131,15 +131,15 @@ public final class ChangeType implements Serializable {
   /**
    *  Construct a new ChangeType with supertype UNKNOWN
    *
-   * @param  name   The name of this change. 
-   * @param  clazz  The class which is going to contain this change. 
-   * @param  fname  
-   * The name of the field in <code>clazz</code> which 
+   * @param  name   The name of this change.
+   * @param  clazz  The class which is going to contain this change.
+   * @param  fname
+   * The name of the field in <code>clazz</code> which
    * is to contain a reference to this change.
    * @param superType the supertype of this type.
    * @throws        BioError If the field cannot be found.
    *
-   * @since 1.2 
+   * @since 1.2
    */
   public ChangeType(String name, Class clazz, String fname, ChangeType superType) {
     this.name = name;
@@ -172,9 +172,9 @@ public final class ChangeType implements Serializable {
     }
 
   /**
-   *  Return the name of this change. 
+   *  Return the name of this change.
    *
-   * @return    The Name value 
+   * @return    The Name value
    */
   public String getName() {
     return name;
@@ -189,18 +189,18 @@ public final class ChangeType implements Serializable {
     }
 
   /**
-   *  Return a string representation of this change. 
+   *  Return a string representation of this change.
    *
-   * @return    Description of the Returned Value 
+   * @return    Description of the Returned Value
    */
   public String toString() {
     return "ChangeType: " + name;
   }
 
   /**
-   *  Make a placeholder for this object in a serialized stream. 
+   *  Make a placeholder for this object in a serialized stream.
    *
-   * @return    Description of the Returned Value 
+   * @return    Description of the Returned Value
    */
   private Object writeReplace() {
     return new StaticMemberPlaceHolder(ourField);
@@ -208,8 +208,8 @@ public final class ChangeType implements Serializable {
 
   static {
     UNKNOWN = new ChangeType(
-      "Unknown change", 
-      ChangeType.class, 
+      "Unknown change",
+      ChangeType.class,
       "UNKNOWN",
       null
     );
@@ -224,7 +224,7 @@ public final class ChangeType implements Serializable {
      * @param clazz A class to introspect
      */
 
-    public static Set getChangeTypes(Class clazz) 
+    public static Set getChangeTypes(Class clazz)
     {
 	Set types = new HashSet();
 	Field[] fields = clazz.getFields();
@@ -281,7 +281,8 @@ public final class ChangeType implements Serializable {
 
     /**
      * Return <code>true</code> iff <code>ct</code> is equal to this type
-     * or any of it's supertypes (including ChangeType.UNKNOWN).
+     * or any of it's supertypes (including ChangeType.UNKNOWN). If this is
+     * true, then ct is more general than this.
      *
      * @since 1.2
      */

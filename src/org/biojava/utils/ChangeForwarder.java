@@ -43,14 +43,14 @@ public class ChangeForwarder implements ChangeListener {
     this.source = source;
     this.changeSupport = changeSupport;
   }
-  
+
   /**
    * Retrieve the 'source' object for <code>ChangeEvent</code>s fired by this forwarder.
    *
    * @return the source Object
    */
   public Object getSource() { return source; }
-  
+
   /**
    * Return the underlying <code>ChangeSupport</code> instance that can be used to
    * fire <code>ChangeEvent</code>s and mannage listeners.
@@ -58,7 +58,7 @@ public class ChangeForwarder implements ChangeListener {
    * @return the ChangeSupport delegate
    */
   public ChangeSupport changeSupport() { return changeSupport; }
-  
+
   /**
    * <p>
    * Return the new event to represent the originating event ce.
@@ -87,20 +87,26 @@ public class ChangeForwarder implements ChangeListener {
       ce
     );
   }
-    
+
   public void preChange(ChangeEvent ce)
   throws ChangeVetoException {
     ChangeEvent nce = generateEvent(ce);
     if(nce != null) {
-      changeSupport.firePreChangeEvent(nce);
+      // todo: this should be coupled with the synchronization in postChange
+      synchronized(changeSupport) {
+        changeSupport.firePreChangeEvent(nce);
+      }
     }
   }
-  
+
   public void postChange(ChangeEvent ce) {
     try {
       ChangeEvent nce = generateEvent(ce);
       if(nce != null) {
-        changeSupport.firePostChangeEvent(nce);
+        // todo: this should be coupled with the synchronization in preChange
+        synchronized(changeSupport) {
+          changeSupport.firePostChangeEvent(nce);
+        }
       }
     } catch (ChangeVetoException cve) {
       throw new AssertionFailure(

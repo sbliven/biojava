@@ -11,6 +11,32 @@ public class MergingSet
         extends AbstractSet
 {
   private final Set sets;
+  private Set modifiable;
+
+  public static MergingSet merge(Set first, Set seccond)
+  {
+    MergingSet ms = new MergingSet();
+    ms.add(first);
+    ms.add(seccond);
+    return ms;
+  }
+
+  public static MergingSet modifiableMerge()
+  {
+    MergingSet ms = new MergingSet();
+    ms.modifiable = new HashSet();
+    ms.addSet(ms.modifiable);
+    return ms;
+  }
+
+  public static MergingSet modifiableMerge(Set original)
+  {
+    MergingSet ms = new MergingSet();
+    ms.modifiable = new HashSet();
+    ms.addSet(ms.modifiable);
+    ms.addSet(original);
+    return ms;
+  }
 
   public MergingSet() {
     this.sets = new SmallSet();
@@ -25,7 +51,16 @@ public class MergingSet
   }
 
   public boolean removeSet(Set set) {
+    if(set == modifiable) {
+      throw new IllegalArgumentException(
+              "Can't remove the set that contains modifications");
+    }
     return sets.remove(set);
+  }
+
+  public Set getModifiable()
+  {
+    return modifiable;
   }
 
   public int size() {
@@ -52,5 +87,28 @@ public class MergingSet
 
   public Iterator iterator() {
     return new MergingIterator(sets.iterator());
+  }
+
+  public boolean add(Object o)
+  {
+    if(modifiable == null) {
+      throw new UnsupportedOperationException();
+    }
+
+    return modifiable.add(o);
+  }
+
+  public boolean remove(Object o)
+  {
+    if(modifiable == null) {
+      throw new UnsupportedOperationException();
+    }
+
+    if(this.contains(o) && !modifiable.contains(o)) {
+      throw new IllegalArgumentException(
+              "Can't remove items not added to this merged view");
+    }
+
+    return modifiable.remove(o);
   }
 }

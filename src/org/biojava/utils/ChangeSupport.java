@@ -74,7 +74,7 @@ public class ChangeSupport {
   public boolean hasListeners() {
       return (listenerCount > 0);
   }
-  
+
   /**
    * Generate a new ChangeSupport instance.
    */
@@ -106,7 +106,7 @@ public class ChangeSupport {
   public ChangeSupport(int initialSize, int delta) {
     this(Collections.EMPTY_SET, initialSize, delta);
   }
-  
+
   public ChangeSupport(Set unchanging) {
     this(unchanging, 0, 5);
   }
@@ -149,11 +149,11 @@ public class ChangeSupport {
     if (ct == null) {
       throw new NullPointerException("Since 1.2, listeners registered for the null changetype are not meaningful.  Please register a listener for ChangeType.UNKNOWN instead");
     }
-    
+
     if(isUnchanging(ct)) {
       return;
     }
-    
+
     synchronized(this) {
       growIfNecessary();
       types[listenerCount] = ct;
@@ -238,12 +238,18 @@ public class ChangeSupport {
    * or if ce.getType() is equal to the type they are registered for.
    * </p>
    *
+   * <p>
+   * This method must be called while the current thread holds the lock on this change support.
+   * </p>
+   * 
    * @param ce  the ChangeEvent to pass on
    * @throws ChangeVetoException if any of the listeners veto this change
    */
   public void firePreChangeEvent(ChangeEvent ce)
   throws ChangeVetoException {
-      boolean needToReap = false;
+    assert Thread.holdsLock(this)
+            : "firePreChangeEvent must be called in a synchronized block locking the ChangeSupport";
+    boolean needToReap = false;
 
     ChangeType ct = ce.getType();
     int listenerCount = this.listenerCount;
@@ -257,16 +263,17 @@ public class ChangeSupport {
       ChangeType lt = types[i];
       if( ct.isMatchingType(lt)) {
         ChangeListener cl = (ChangeListener) listeners[i].get();
-	if (cl != null) {
-	    cl.preChange(ce);
-	} else {
-	    needToReap = true;
-	}
+        if (cl != null) {
+          cl.preChange(ce);
+        } else {
+          needToReap = true;
+        }
       }
     }
 
-    if (needToReap)
-	reapGarbageListeners();
+    if (needToReap) {
+      reapGarbageListeners();
+    }
   }
 
   /**
@@ -280,11 +287,17 @@ public class ChangeSupport {
    * or if ce.getType() is equal to the type they are registered for.
    * </p>
    *
+   * <p>
+   * This method must be called while the current thread holds the lock on this change support.
+   * </p>
+   *
    * @param ce  the ChangeEvent to pass on
    */
 
   public void firePostChangeEvent(ChangeEvent ce) {
-      boolean needToReap = false;
+    assert Thread.holdsLock(this)
+            : "firePostChangeEvent must be called in a synchronized block locking the ChangeSupport";
+    boolean needToReap = false;
 
     ChangeType ct = ce.getType();
     int listenerCount = this.listenerCount;
@@ -298,29 +311,46 @@ public class ChangeSupport {
       ChangeType lt = types[i];
       if( ct.isMatchingType(lt) ) {
         ChangeListener cl = (ChangeListener) listeners[i].get();
-	if (cl != null) {
-	    cl.postChange(ce);
-	} else {
-	    needToReap = true;
-	}
+        if (cl != null) {
+          cl.postChange(ce);
+        } else {
+          needToReap = true;
+        }
       }
     }
 
-    if (needToReap)
-	reapGarbageListeners();
+    if (needToReap) {
+      reapGarbageListeners();
+    }
   }
-  
+
   public boolean isUnchanging(ChangeType ct) {
     if(unchanging == null) {
       return false;
     }
-    
+
     for(Iterator i = ct.matchingTypes(); i.hasNext(); ) {
       if(unchanging.contains(i.next())) {
         return true;
       }
     }
-    
+
     return false;
+  }
+
+  public String displayString()
+  {
+    StringBuffer sb = new StringBuffer();
+    sb.append(this.toString());
+    sb.append("\n");
+    for(int i = 0; i < listenerCount; i++) {
+      sb.append("\t");
+      sb.append(listeners[i].get());
+      sb.append("\t");
+      sb.append(types[i]);
+      sb.append("\n");
+    }
+
+    return sb.toString();
   }
 }
