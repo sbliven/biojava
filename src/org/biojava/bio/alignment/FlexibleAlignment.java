@@ -49,7 +49,7 @@ public class FlexibleAlignment
     protected Map data;
     protected List labelOrder;
     protected  Location alignmentRange;
-        
+    List alphaList = new ArrayList();
     
     /**
     * construct this object with the reference sequence which can either be a gappedSymbolList or not
@@ -62,9 +62,9 @@ public class FlexibleAlignment
         data = new Hashtable();
         labelOrder = new Vector();
         alignmentRange = new RangeLocation(1,1);
-        List alphaList = new ArrayList();
-        Alphabet lastAlpha = null;
         
+        Alphabet lastAlpha = null;
+        int k=0;
         // go through the list make sure that all seqs are GappedSymbolLists
         for (Iterator i = seqList.iterator();i.hasNext();){
             Object element = i.next();
@@ -85,7 +85,7 @@ public class FlexibleAlignment
             int min = lesser(alignmentRange.getMin(),loc.getMin());
             int max = greater(alignmentRange.getMax(),loc.getMax());
             alignmentRange = new RangeLocation(min,max);
-            
+            k++;
         }
         this.alphabet = AlphabetManager.getCrossProductAlphabet(alphaList);
         try {
@@ -95,6 +95,15 @@ public class FlexibleAlignment
         }
         
     }
+
+    private int getOrder(Object label) throws Exception{
+	for (int i=0; i<labelOrder.size(); i++){
+	    if(labelOrder.get(i).equals(label))
+		return i;
+	}
+	throw new Exception("did not find label");
+    }
+
     
    
     /**
@@ -123,11 +132,14 @@ public class FlexibleAlignment
         }
         data.put(label,ae);
         labelOrder.add(label);
+	alphaList.add(seq.getAlphabet());
+        this.alphabet = AlphabetManager.getCrossProductAlphabet(alphaList);        
+
         int min = lesser(alignmentRange.getMin(),loc.getMin()); 
         int max = greater(alignmentRange.getMax(),loc.getMax());
         alignmentRange = new RangeLocation(min,max);
         resetRange();
-        
+
         cs.firePostChangeEvent(cevt);                    
         
     }
@@ -145,11 +157,16 @@ public class FlexibleAlignment
         
         // let the listeners know what we want to do
         cs.firePreChangeEvent(cevt);
-        
+	try{
+	    alphaList.remove(getOrder(label));
+	    this.alphabet = AlphabetManager.getCrossProductAlphabet(alphaList);
+	}
+	catch (Throwable e){
+	    e.printStackTrace();   
+        }
         data.remove(label);
         labelOrder.remove(label);
         resetRange();
-                
         cs.firePostChangeEvent(cevt);
              
     }         
