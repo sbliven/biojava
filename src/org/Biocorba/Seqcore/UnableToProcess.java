@@ -18,4 +18,8 @@ public final class UnableToProcess
 	super();
 	reason = __reason;
     }
+    
+    public String getMessage() {
+      return reason;
+    }
 }

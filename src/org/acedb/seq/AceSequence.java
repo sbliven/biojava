@@ -49,7 +49,7 @@ public class AceSequence implements Sequence {
   }
   
   public Alphabet alphabet() {
-    return DNATools.getAlphabet();
+    return DNATools.getAmbiguity();
   }
   
   public Annotation getAnnotation() {
@@ -120,7 +120,7 @@ public class AceSequence implements Sequence {
       Connection con = aceDB.getConnection();
       String selectString = con.transact("Find Sequence " + id);
       String dnaString = con.transact("dna");
-      SymbolParser rParser = alphabet().getParser("symbol");
+      SymbolParser rParser = alphabet().getParser("token");
       List rl = new ArrayList();
       StringTokenizer st = new StringTokenizer(dnaString, "\n");
       while(st.hasMoreElements()) {
@@ -171,7 +171,7 @@ public class AceSequence implements Sequence {
             IntValue start = (IntValue) an;
             for(Iterator eI = start.iterator(); eI.hasNext(); ) {
               IntValue end = (IntValue) eI.next();
-              Annotation fAnn = null;
+              Annotation fAnn;
               if((end.size() > 0)) {
                 StringBuffer comment = new StringBuffer();
                 Iterator cI = end.nameIterator();
@@ -180,6 +180,8 @@ public class AceSequence implements Sequence {
                   comment.append("\n" + cI.next());
                 fAnn = new SimpleAnnotation();
                 fAnn.setProperty("description", comment.toString());
+              } else {
+                fAnn = Annotation.EMPTY_ANNOTATION;
               }
               template.location = new RangeLocation(start.toInt(), end.toInt());
               template.source = "ACeDB";
@@ -192,8 +194,6 @@ public class AceSequence implements Sequence {
         }
       }
     } catch (Exception ex) {
-      if(ex instanceof AceException || ex instanceof BioException)
-        throw (AceException) ex;
       throw new AceException(ex, "Fatal error constructing sequence for " + id);
     }
   }

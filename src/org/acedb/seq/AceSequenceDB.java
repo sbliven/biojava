@@ -46,19 +46,21 @@ public class AceSequenceDB implements SequenceDB {
   
   public Set ids() {
     return new AbstractSet() {
-	public int size() {
-	    return seqSet.size();
-	}
+      public int size() {
+        return seqSet.size();
+      }
 
-	public Iterator iterator() {
-	    return seqSet.nameIterator();
-	}
+      public Iterator iterator() {
+        return seqSet.nameIterator();
+      }
 
-	public boolean contains(Object o) {
-	    if (! (o instanceof String))
-		return false;
-	    return seqSet.contains((String) o);
-	}
+      public boolean contains(Object o) {
+        if (! (o instanceof String)) {
+          return false;
+        } else {
+          return seqSet.contains((String) o);
+        }
+      }
     };
   }
   

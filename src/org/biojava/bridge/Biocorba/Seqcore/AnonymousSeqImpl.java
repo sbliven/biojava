@@ -19,11 +19,11 @@ implements _AnonymousSeq_Operations {
   public AnonymousSeqImpl(SymbolList resList) throws IllegalAlphabetException {
     String alphaName = resList.alphabet().getName();
     seqType = null;
-    if(alphaName.equals("DNA")) {
+    if(alphaName.startsWith("DNA")) {
       seqType = SeqType.DNA;
-    } else if(alphaName.equals("RNA")) {
+    } else if(alphaName.startsWith("RNA")) {
       seqType = SeqType.RNA;
-    } else if(alphaName.equals("PROTEIN")) {
+    } else if(alphaName.startsWith("PROTEIN")) {
       seqType = SeqType.PROTEIN;
     } else {
       throw new IllegalAlphabetException("Can only serve DNA, RNA or PROTEIN");
