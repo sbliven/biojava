@@ -28,13 +28,14 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.dp.onehead.SingleDPMatrix;
 
 public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
   protected double singleSequenceIteration(
     ModelTrainer trainer,
     SymbolList resList
   ) throws IllegalSymbolException, IllegalTransitionException, IllegalAlphabetException {
-    DP.ScoreType scoreType = DP.PROBABILITY;
+    ScoreType scoreType = ScoreType.PROBABILITY;
     DP dp = getDP();
     State [] states = dp.getStates();
     int [][] forwardTransitions = dp.getForwardTransitions();

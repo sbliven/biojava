@@ -650,35 +650,5 @@ public abstract class DP {
 	    return false;
     }
   }
-  
-  public static abstract class ScoreType {
-    protected ScoreType() {}
-    abstract double calculateScore(Distribution dist, Symbol sym)
-    throws IllegalSymbolException;
-  }
-  
-  public final static ScoreType PROBABILITY = new ScoreType() {
-    double calculateScore(Distribution dist, Symbol sym)
-    throws IllegalSymbolException {
-      return dist.getWeight(sym);
-    }
-  };
-  
-  public final static ScoreType ODDS = new ScoreType() {
-    double calculateScore(Distribution dist, Symbol sym)
-    throws IllegalSymbolException {
-      double d = dist.getWeight(sym);
-      double n = dist.getNullModel().getWeight(sym);
-      //System.out.println("Odds for " + sym.getName() + "\t= " + d + " / " + n);
-      return d / n;
-    }
-  };
-  
-  public final static ScoreType NULL_MODEL = new ScoreType() {
-    double calculateScore(Distribution dist, Symbol sym)
-    throws IllegalSymbolException {
-      return dist.getNullModel().getWeight(sym);
-    }
-  };
 }
 

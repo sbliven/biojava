@@ -20,7 +20,7 @@
  */
 
 
-package org.biojava.bio.dp;
+package org.biojava.bio.dp.onehead;
 
 import org.biojava.bio.symbol.*;
 

@@ -24,19 +24,40 @@ package org.biojava.bio.dp;
 
 import org.biojava.bio.*;
 
-public class DPFactory {
-  public static DP createDP(MarkovModel model)
-  throws IllegalArgumentException, BioException {
-    int heads = model.heads();
-    MarkovModel flat = DP.flatView(model);
-    if(heads == 1) {
-      return new SingleDP(flat);
-    } else if(heads == 2) {
-      return new PairwiseDP(flat);
-    } else {
-      throw new IllegalArgumentException(
-        "Can't create DPFactory for models with " + heads + " heads"
-      );
+import org.biojava.bio.dp.onehead.SingleDP;
+import org.biojava.bio.dp.twohead.*;
+
+/**
+ * The interface for objects that can generate a DP object for a MarkovModel.
+ *
+ * @author Matthew Pocock
+ */ 
+public interface DPFactory {
+  public DP createDP(MarkovModel model)
+  throws IllegalArgumentException, BioException;
+  
+  public static final DPFactory DEFAULT = new DefaultFactory(new DPInterpreter.Maker());
+  
+  public static class DefaultFactory implements DPFactory {
+    private final CellCalculatorFactoryMaker cfFacM;
+    
+    public DefaultFactory(CellCalculatorFactoryMaker cfFacM) {
+      this.cfFacM = cfFacM;
+    }
+    
+    public DP createDP(MarkovModel model)
+    throws IllegalArgumentException, BioException {
+      int heads = model.heads();
+      MarkovModel flat = DP.flatView(model);
+      if(heads == 1) {
+        return new SingleDP(flat);
+      } else if(heads == 2) {
+        return new PairwiseDP(flat, cfFacM);
+      } else {
+        throw new IllegalArgumentException(
+          "Can't create DPFactory for models with " + heads + " heads"
+        );
+      }
     }
   }
 }

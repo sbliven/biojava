@@ -20,7 +20,7 @@
  */
 
 
-package org.biojava.bio.dp;
+package org.biojava.bio.dp.onehead;
 
 import java.util.*;
 import java.io.Serializable;
@@ -29,8 +29,9 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.dp.*;
 
-class SingleDP extends DP implements Serializable {
+public class SingleDP extends DP implements Serializable {
   private final HashMap emissionsProb;
   private final HashMap emissionsOdds;
   private final HashMap emissionsNull;
@@ -60,11 +61,11 @@ class SingleDP extends DP implements Serializable {
   protected double [] getEmission(Symbol sym, ScoreType scoreType)
   throws IllegalSymbolException {
     Map emissions;
-    if(scoreType == DP.PROBABILITY) {
+    if(scoreType == ScoreType.PROBABILITY) {
       emissions = emissionsProb;
-    } else if(scoreType == DP.ODDS) {
+    } else if(scoreType == ScoreType.ODDS) {
       emissions = emissionsOdds;
-    } else if(scoreType == DP.NULL_MODEL) {
+    } else if(scoreType == ScoreType.NULL_MODEL) {
       emissions = emissionsNull;
     } else {
       throw new BioError("Unknown ScoreType object: " + scoreType);
@@ -127,7 +128,7 @@ class SingleDP extends DP implements Serializable {
     lockModel();
     SingleDPMatrix matrix = new SingleDPMatrix(this, seq[0]);
     DPCursor dpCursor = new MatrixCursor(matrix, seq[0].iterator(), +1);
-    matrix.score = forward(dpCursor, scoreType);
+    matrix.setScore(forward(dpCursor, scoreType));
     unlockModel();
     
     return matrix;
@@ -142,7 +143,7 @@ class SingleDP extends DP implements Serializable {
     lockModel();
     SingleDPMatrix matrix = new SingleDPMatrix(this, seq[0]);
     DPCursor dpCursor = new MatrixCursor(matrix, new ReverseIterator(seq[0]), -1);
-    matrix.score = backward(dpCursor, scoreType);
+    matrix.setScore(backward(dpCursor, scoreType));
     unlockModel();
     
     return matrix;
@@ -158,7 +159,7 @@ class SingleDP extends DP implements Serializable {
     lockModel();
     SingleDPMatrix sm = (SingleDPMatrix) matrix;
     DPCursor dpCursor = new MatrixCursor(sm, seq[0].iterator(), +1);
-    sm.score = forward(dpCursor, scoreType);
+    sm.setScore(forward(dpCursor, scoreType));
     unlockModel();
     
     return sm;
@@ -174,7 +175,7 @@ class SingleDP extends DP implements Serializable {
     lockModel();
     SingleDPMatrix sm = (SingleDPMatrix) matrix;
     DPCursor dpCursor = new MatrixCursor(sm, new ReverseIterator(seq[0]), -1);
-    sm.score = backward(dpCursor, scoreType);
+    sm.setScore(backward(dpCursor, scoreType));
     unlockModel();
     
     return sm;
@@ -460,7 +461,7 @@ class SingleDP extends DP implements Serializable {
         if(states[l] == getModel().magicalState()) {
           //System.out.println("Initializing start state to 0.0");
           vc[l] = vl[l] = 0.0;
-          oldPointers[l] = newPointers[l] = new BackPointer(states[l], 1.0);
+          oldPointers[l] = newPointers[l] = new BackPointer(states[l]);
         } else {
           vc[l] = vl[l] = Double.NEGATIVE_INFINITY;
         }
@@ -638,29 +639,5 @@ class SingleDP extends DP implements Serializable {
       new SimpleSymbolList(getModel().stateAlphabet(), stateList),
       DoubleAlphabet.fromArray(scores)
     );
-  }
-
-  private static class BackPointer {
-    public State state;
-    public BackPointer back;
-    public double score;
-
-    public BackPointer(State state, BackPointer back, double score) {
-      if(back == null) {
-        throw new BioError(
-          "Attempted to make a backpointer with a null 'back' from state " +
-          state.getName() + ", " + score
-        );
-      }
-      this.state = state;
-      this.back = back;
-      this.score = score;
-    }
-    
-    public BackPointer(State state, double score) {
-      this.state = state;
-      this.score = score;
-      this.back = this;
-    }
   }
 }

@@ -20,10 +20,11 @@
  */
 
 
-package org.biojava.bio.dp;
+package org.biojava.bio.dp.onehead;
 
 import java.util.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.dp.*;
 
 /**
  * Constant-memory implementation of single-head DP cursor.
