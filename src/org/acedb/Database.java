@@ -34,23 +34,6 @@ import java.net.URL;
  */
 
 public interface Database {
-  /**
-   * Performs a search, and returns an AceSet with the results.
-   *
-   * @param classType an object representing the class to
-   *                  search.
-   * @param namePattern an object name pattern.  Can contain * wildcards.
-   * @returns an AceSet containing 0 or more matches.
-   * @throws AceException if the search fails.
-   */
-  public AceSet select(AceType.ClassType classType, String namePattern)
-      throws AceException;
-  
-  /**
-   * Retrieves the model for a class.
-   */
-    // public ModelNode getModel(AceType.ClassType classType);
-  
     /**
      * Return a connection object which allows ACeDB commands to
      * be executed directly on the server.
@@ -61,15 +44,12 @@ public interface Database {
   /**
    * Returns the url to the database.
    */
-  public URL toURL();
+  public AceURL toURL();
 
     /**
-     * Get a <em>single</em> object from the database.  This
-     * is provided primarily for internal use in ACeDBC drivers.
-     * Normal clients should normally use search instead.
+     * Return objects from the database.
      */
 
-    public AceObject getObject(AceType.ClassType classType, String name)
-	throws AceException;
+    public AceSet fetch(AceURL url) throws AceException;
 }
 

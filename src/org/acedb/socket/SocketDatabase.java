@@ -19,13 +19,6 @@
  *
  */
 
-
-/*
- * @(#)SocketDatabase.java      0.1 99/11/12
- *
- * By Thomas Down <td2@sanger.ac.uk>
- */
-
 package org.acedb.socket;
 
 import java.util.*;

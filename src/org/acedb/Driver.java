@@ -36,15 +36,10 @@ public interface Driver {
   /**
    * Returns whether this driver can handle this url type.
    */
-  boolean accept(URL url);
+  boolean accept(AceURL url);
   
   /**
    * Return a database that is connected to this url.
    */
-  Database connect(URL url) throws AceException;
-
-  /**
-   * Return a database that is connected to this url.
-   */
-  Database connect(URL url, String user, String passwd) throws AceException;
+  Database connect(AceURL url) throws AceException;
 }
