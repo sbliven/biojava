@@ -816,7 +816,7 @@ public final class AlphabetManager {
   private static Set expandMatches(Alphabet parent, List symList, List built) {
     int indx = built.size();
     if(indx < symList.size()) {
-      BasisSymbol bs = (BasisSymbol) symList.get(indx);
+      Symbol bs = (Symbol) symList.get(indx);
       if(bs instanceof AtomicSymbol) {
         built.add(bs);
         return expandMatches(parent, symList, built);
