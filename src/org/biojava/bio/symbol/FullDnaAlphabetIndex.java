@@ -39,7 +39,7 @@ class FullDnaAlphabetIndex
   extends
     Unchangeable
   implements
-    AlphabetIndex
+    AlphabetIndex, java.io.Serializable
 {
     static Symbol [] symbolArray = null;
     FiniteAlphabet dna = null;

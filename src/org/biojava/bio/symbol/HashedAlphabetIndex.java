@@ -38,7 +38,7 @@ import org.biojava.utils.ChangeListener;
  * @since 1.1
  */
 class HashedAlphabetIndex
-extends AbstractChangeable implements AlphabetIndex {
+extends AbstractChangeable implements AlphabetIndex, java.io.Serializable {
   private static final Comparator cmp = new HashComparator();
 
   private final Reference alphaRef;

@@ -43,11 +43,14 @@ import org.biojava.utils.ChangeVetoException;
  * @author Matthew Pocock
  * @since 1.1
  */
-class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
+class LinearAlphabetIndex
+        extends AbstractChangeable
+        implements AlphabetIndex, java.io.Serializable
+{
   private /*final*/ Reference alphaRef;
   private Symbol[] symbols;
-  private ChangeListener indexBuilder;
-  private ChangeListener adapter;
+  private ChangeListener indexBuilder;  // todo: not used - can we nuke this?
+  private ChangeListener adapter;       // todo: not used - can we nuke this?
 
   // hack for bug in compaq 1.2?
   protected ChangeSupport getChangeSupport(ChangeType ct) {
@@ -152,6 +155,7 @@ class LinearAlphabetIndex extends AbstractChangeable implements AlphabetIndex {
         return null;
       }
 
+      // todo: can this be dropped now? MRP
       /*
       Object change = ce.getChange();
       Object previous = ce.getPrevious();
