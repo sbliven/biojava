@@ -28,14 +28,18 @@ import org.biojava.bio.symbol.SymbolList;
  * Utility class for dealing with {@link Chromatogram}s.
  *
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
+ * @author Matthew Pocock
  */
 public class ChromatogramTools {
-    /** Static utility class */
+    /** Static utility class - don't allow it to be instantiated. */
     private ChromatogramTools() { }
     
     /**
      * Get the called DNA sequence from a chromatogram.  A synonym for
      * <code>chromat.getBaseCalls().symbolListForLabel(Chromatogram.DNA)</code>.
+     *
+     * @param chromat  the Chromatogram to process
+     * @return a SymbolList containing the DNA
      */
     public static final SymbolList getDNASequence(Chromatogram chromat) {
         return chromat.getBaseCalls().symbolListForLabel(Chromatogram.DNA);
@@ -44,6 +48,9 @@ public class ChromatogramTools {
     /**
      * Get the peak offsets for the called bases of a chromatogram.  A synonym 
      * for <code>chromat.getBaseCalls().symbolListForLabel(Chromatogram.OFFSETS)</code>.
+     *
+     * @param chromat  the Chromatogram to process
+     * @return a SymbolList of offsets
      */
     public static final SymbolList getTraceOffsets(Chromatogram chromat) {
         return chromat.getBaseCalls().symbolListForLabel(Chromatogram.OFFSETS);
@@ -60,6 +67,9 @@ public class ChromatogramTools {
      *    doSomething(getTraceOffsetArray(c)[i]);
      * </pre>
      * is not recommended.
+     *
+     * @param chromat the Chromatogram to process
+     * @return an array of integers representing peak offsets
      */
     public static final int[] getTraceOffsetArray(Chromatogram chromat) {
         int[] array = new int[chromat.getSequenceLength()];
@@ -76,6 +86,7 @@ public class ChromatogramTools {
      * @param chromat the chromatogram to examine
      * @param which which symbol in the trace offset sequence to
      *        get.  1-based index.
+     * @return the offset for that peak
      */
     public static final int getTraceOffset(Chromatogram chromat, int which) {
         return getIntFromSymbolList(chromat.getBaseCalls().symbolListForLabel(Chromatogram.OFFSETS), which);
@@ -86,6 +97,7 @@ public class ChromatogramTools {
      * SymbolList containing {@link org.biojava.bio.symbol.IntegerAlphabet.IntegerSymbol}s.
      * @param list the target list
      * @param which which symbol to unwrap and return.  1-based index.
+     * @return the integer represented by the symbol at that position
      */
     public static final int getIntFromSymbolList(SymbolList list, int which) {
         return ((IntegerAlphabet.IntegerSymbol) list.symbolAt(which)).intValue();

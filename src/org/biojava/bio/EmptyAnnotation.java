@@ -36,6 +36,8 @@ import org.biojava.utils.StaticMemberPlaceHolder;
 import org.biojava.utils.Unchangeable;
 
 /**
+ * An always-empty Annotation.
+ *
  * @author Matthew Pocock
  * @author Thomas Down
  */

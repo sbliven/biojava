@@ -17,7 +17,14 @@ public class SimpleAnnotationDB implements AnnotationDB {
   private final String name;
   private final Set anns;
   private final AnnotationType schema;
-  
+
+  /**
+   * Create a no-frills AnnotationDB instancec.
+   *
+   * @param name    the name of this Annotation DB
+   * @param anns    a Set of Annotation instances it contains
+   * @param schema  an AnnotationType schema that applies to them
+   */
   public SimpleAnnotationDB(String name, Set anns, AnnotationType schema) {
     this.name = name;
     this.anns = anns;

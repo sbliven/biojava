@@ -38,10 +38,24 @@ package org.biojava.bibliography;
 public class BiblioJournalArticle
     extends BiblioArticle {
 
+  /**
+   * The journal volume.
+   */
     public String volume;
+
+  /**
+   *  The issue of the journal.
+   */
     public String issue;
+
+  /**
+   * Suplement.
+   */
     public String issueSupplement;
+
+  /**
+   * The journal that this article is in.
+   */
     public BiblioJournal fromJournal;
 
 }
-

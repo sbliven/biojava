@@ -112,14 +112,15 @@ public interface Annotation extends Changeable {
       throws IllegalArgumentException, ChangeVetoException;
       
   /**
-   * Delete a property
+   * Delete a property.
    *
    * @param key the key object
    * @throws NoSuchElementException if the property doesn't exist
    * @throws ChangeVetoException if the change is vetoed
    * @since 1.3
    *
-   * @for.user Normal raw access to the property. For cleverer access, use
+   * @for.user
+   * Normal raw access to the property. For cleverer access, use
    * methods in AnnotationType.
    */
    

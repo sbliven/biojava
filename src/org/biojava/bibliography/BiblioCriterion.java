@@ -35,11 +35,14 @@ package org.biojava.bibliography;
  */
 
 public class BiblioCriterion {
-
-    //
-    // Criteria types
-    //
+  /**
+   * A query criterion.
+   */
     public static final int QUERY_CRITERION = 0;
+
+  /**
+   * A sort criterion.
+   */ 
     public static final int SORT_CRITERION  = 1;
 
     /**

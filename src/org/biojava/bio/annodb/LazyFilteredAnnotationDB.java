@@ -8,13 +8,26 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.AnnotationTools;
 import org.biojava.bio.AnnotationType;
 
+/**
+ * An implementation of AnnotationDB that lazily applies a filter.
+ *
+ * @author Matthew Pocock
+ * @since 1.3
+ */
 public class LazyFilteredAnnotationDB
 implements AnnotationDB {
   private final String name;
   private final AnnotationDB source;
   private final AnnotationType schema;
   private AnnotationDB result;
-  
+
+  /**
+   * Create a new DB by wrapping another with a schema.
+   *
+   * @param name    the name for the SB
+   * @param source  the underlying DB
+   * @param schema  the schema to apply to the underlying DB to make this one
+   */
   public LazyFilteredAnnotationDB(String name, AnnotationDB source, AnnotationType schema) {
     this.name = name;
     this.source = source;
@@ -24,7 +37,7 @@ implements AnnotationDB {
   public String getName() {
     return "";
   }
-  
+
   public AnnotationType getSchema() {
     if(result == null) {
       return this.schema;

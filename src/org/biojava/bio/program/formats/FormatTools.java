@@ -22,7 +22,7 @@ public class FormatTools {
   new ChangeTable.Changer() {
     public Object change(Object value) {
       String sv = (String) value;
-      return new EcNumber.Impl(sv);
+      return EcNumber.Impl.valueOf(sv);
     }
   };
 

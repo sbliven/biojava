@@ -150,7 +150,7 @@ class InfiniteCrossProductAlphabet
       }
     }
 
-    return AlphabetManager.createSymbol('?', Annotation.EMPTY_ANNOTATION, sList, this);
+    return AlphabetManager.createSymbol(Annotation.EMPTY_ANNOTATION, sList, this);
   }
 
   public Symbol getGapSymbol() {

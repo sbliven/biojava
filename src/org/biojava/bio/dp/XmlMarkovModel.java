@@ -280,7 +280,7 @@ public class XmlMarkovModel {
     FiniteAlphabet stateA = model.stateAlphabet();
     FiniteAlphabet symA = (FiniteAlphabet) model.emissionAlphabet();
 
-    out.println("<MarkovModel heads=\"" + model.heads() + "\">");
+    out.println("<MarkovModel heads=\"" + model.advance().length + "\">");
     out.println("<alphabet name=\"" + symA.getName() + "\"/>");
 
     // print out states & scores

@@ -125,7 +125,7 @@ class FlatModel
   throws IllegalSymbolException, IllegalAlphabetException {
     this.source = model;
     this.delegate = new SimpleMarkovModel(
-      source.heads(),
+      source.advance().length,
       source.emissionAlphabet(),
       "flat"
     );

@@ -40,5 +40,8 @@ package org.biojava.bibliography;
 public class BiblioService
     extends BiblioProvider {
 
+  /**
+   * The name of a bibliographic service.
+   */
     public String name;
 }

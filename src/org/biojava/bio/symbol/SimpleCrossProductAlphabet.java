@@ -128,7 +128,7 @@ implements Serializable {
     } else {
       try {
         ss = (AtomicSymbol) AlphabetManager.createSymbol(
-          tokenSeed++, Annotation.EMPTY_ANNOTATION, s, this
+          Annotation.EMPTY_ANNOTATION, s, this
         );
       } catch (IllegalSymbolException ise) {
         throw new BioError(

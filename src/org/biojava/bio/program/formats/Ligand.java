@@ -74,7 +74,7 @@ public class Ligand {
           if(spc != -1) { // remove obsolete - should publish this better
             sv = sv.substring(0, spc);
           }
-          return new EcNumber.Impl(sv);
+          return EcNumber.Impl.valueOf(sv);
         }
       });
 

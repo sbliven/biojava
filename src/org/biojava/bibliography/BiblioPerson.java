@@ -38,11 +38,34 @@ package org.biojava.bibliography;
 public class BiblioPerson
     extends BiblioProvider {
 
+  /**
+   * The person's sirname (family name).
+   */
     public String surname;
+
+  /**
+   * The person's christian name (first name).
+   */
     public String firstName;
+
+  /**
+   * Any middle innitials.
+   */
     public String midInitials;
+
+  /**
+   * Their e-mail address.
+   */
     public String email;
+
+  /**
+   * Their postal address.
+   */
     public String postalAddress;
+
+  /**
+   * Their affiliation.
+   */
     public String affiliation;
 
 }

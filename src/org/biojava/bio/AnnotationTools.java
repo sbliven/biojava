@@ -150,6 +150,8 @@ public final class AnnotationTools {
      *
      * @param ann  the Annotation to scan
      * @param query  the AnnotationType to match against all nodes in the tree
+     * @return the set of all annotations matching the query
+     *
      * @for.user when trying to find interesting bits of data presented as
      * Annotations.
      * @for.developer as a fall-through implementation of AnnotationDB.search()
@@ -186,7 +188,7 @@ public final class AnnotationTools {
      * by both types.
      *
      * @param ann1  the first AnnotationType
-     * @param ann1  the seccond AnnotationType
+     * @param ann2  the seccond AnnotationType
      * @return the intersection AnnotationType
      *
      * @for.powerUser
@@ -457,8 +459,13 @@ public final class AnnotationTools {
     }
 
     /**
-     * Return the CollectionConstraint which accept only collections accepted by both
-     * of those specified.
+     * Return the CollectionConstraint which accept only collections accepted by
+     * both of those specified.
+     *
+     * @param cc1 the first CollectionConstraint
+     * @param cc2 the seccond CollectionConstrant
+     * @return a CollectionConstraint representing the intersection of the other
+     *    two
      */
 
     public static CollectionConstraint intersection(CollectionConstraint cc1, CollectionConstraint cc2) {
@@ -526,6 +533,14 @@ public final class AnnotationTools {
         }
     }
 
+  /**
+   * Calculate a CollectionConstaint that will accept all items accepted by
+   * either constraint.
+   *
+   * @param cc1   the first CollectionConstraint
+   * @param cc2   the seccond collectionConstraint
+   * @return      a CollectionConstraint representing the union of the other two
+   */
     public static CollectionConstraint union(CollectionConstraint cc1, CollectionConstraint cc2) {
         if (cc1.subConstraintOf(cc2)) {
             return cc1;

@@ -345,6 +345,8 @@ public interface BibRefQuery {
     /**************************************************************************
      * It checks if the repository is available. The semantic of 
      * <em>available</em>depends on the implementation.
+     *
+     * @return true if it is ready
      *************************************************************************/
     boolean isReady();
 
@@ -619,6 +621,7 @@ public interface BibRefQuery {
      *
      * @param orderedBy a list of attribute names that the collection should
      *                  be sorted by
+     * @param properties FIXME: docs & params out of sync
      * @return a sorted collection
      * @throws BibRefException if sorting failed (which may also happen when
      *         the collection is too large)
@@ -675,6 +678,8 @@ public interface BibRefQuery {
      *
      * @see #getAllBibRefs getAllBibRefs with all attributes
      * @see #getAllIDs getAllIDs
+     *
+     * @param onlyAttrs  attributes to attempt to include
      * @return all citations from the current collection
      * @throws BibRefException if the collection is too large, or if the connection
      *        to the repository is broken
@@ -742,6 +747,8 @@ public interface BibRefQuery {
      *
      * @see #getAllBibRefs getAllBibRefs
      * @see #getBibRefs getBibRefs with all attributes
+     *
+     * @param onlyAttrs attributes to attempt to fetch
      * @return an iterator over all citations
      * @throws BibRefException if the connection to the repository is broken
      *************************************************************************/

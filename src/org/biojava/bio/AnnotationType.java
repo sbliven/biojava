@@ -397,7 +397,7 @@ public interface AnnotationType {
      * This is a human-readable description of the property.
      *
      * @param property the property to get a comment for
-     * @param comment  the comment
+     * @return the comment
      */
     public String getComment(Object property);
     
@@ -627,8 +627,7 @@ public interface AnnotationType {
         /**
          * Create a new Impl with a default collection constraint.
          *
-         * @param defaultPC  the default PropertyConstraint
-         * @param defaultCC  the default CardinalityConstraint
+         * @param unknown  the default CollectionConstraint
          */
         public Impl(CollectionConstraint unknown) {
             this();

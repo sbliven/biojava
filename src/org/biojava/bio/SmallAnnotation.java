@@ -58,15 +58,28 @@ public class SmallAnnotation extends AbstractAnnotation {
     return properties != null;
   }
 
+  /**
+   * Return a new SmallAnnotation optimised for small sets of properties.
+   */
   public SmallAnnotation() {
     super();
   }
-  
-  public SmallAnnotation(Annotation ann)
-  throws IllegalArgumentException {
+
+  /**
+   * Return a new SmallAnnotation that copies all values from another annoation.
+   *
+   * @param ann  the Annoation to copy all values from
+   * @throws NullPointerException if ann is null
+   */
+  public SmallAnnotation(Annotation ann) {
     super(ann);
   }
-  
+
+  /**
+   * Return a new SmallAnnotation that copies all values from a Map.
+   *
+   * @param map  the Map to copy values from
+   */
   public SmallAnnotation(Map map) {
     super(map);
   }

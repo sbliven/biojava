@@ -319,6 +319,8 @@ public interface BibRefSupport {
     /**************************************************************************
      * It checks if a utility object is available. The semantic of 
      * <em>available</em>depends on the implementation.
+     *
+     * @return true if it is ready
      *************************************************************************/
     boolean isReady();
 

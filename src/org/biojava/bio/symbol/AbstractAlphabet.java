@@ -163,7 +163,7 @@ public abstract class AbstractAlphabet
         throws IllegalSymbolException
     {
         return AlphabetManager.createSymbol(
-                    '*', Annotation.EMPTY_ANNOTATION,
+                    Annotation.EMPTY_ANNOTATION,
                     syms, this
                 );  
     }
@@ -201,7 +201,7 @@ public abstract class AbstractAlphabet
       return getSymbolImpl(syms);
     } else {
       return AlphabetManager.createSymbol(
-        '*', Annotation.EMPTY_ANNOTATION,
+        Annotation.EMPTY_ANNOTATION,
         syms, this
       );
     }

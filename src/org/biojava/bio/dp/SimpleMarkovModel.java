@@ -145,7 +145,7 @@ public class SimpleMarkovModel
    * probabilities equal to another), then use this method to replace the
    * Distribution with one of your own.
    *
-   * @param the source State
+   * @param source source State
    * @param dist  the new Distribution over the transition probabilites from source
    * @throws IllegalSymbolException if source is not a member of this model
    * @throws IllegalAlphabetException if dist is not a distribution over the
@@ -309,7 +309,7 @@ public class SimpleMarkovModel
     }
 
     if(toAdd instanceof ModelInState) {
-      int esh = ((ModelInState) toAdd).getModel().heads();
+      int esh = ((ModelInState) toAdd).getModel().advance().length;
       if(esh != heads()) {
         throw new IllegalSymbolException(
           "This model " + stateAlphabet().getName() +

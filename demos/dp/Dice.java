@@ -23,7 +23,6 @@ package dp;
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
 import org.biojava.bio.dist.*;
 import org.biojava.bio.dp.*;
 
@@ -85,7 +84,7 @@ public class Dice
 
     for(int i=1;i<7;i++) {
       try {
-        rolls[i-1]= AlphabetManager.createSymbol((char)('0'+i),""+i,Annotation.EMPTY_ANNOTATION);
+        rolls[i-1]= AlphabetManager.createSymbol(String.valueOf(i),Annotation.EMPTY_ANNOTATION);
         diceAlphabet.addSymbol(rolls[i-1]);
       } catch (Exception e) {
         throw new AssertionFailure(

@@ -48,6 +48,7 @@ import org.biojava.utils.ChangeListener;
  * properties of a chromatogram.
  *
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
+ * @author Matthew Pocock
  *
  * @for.user
  * Chromatograms should be created using {@link ChromatogramFactory} or a
@@ -59,14 +60,17 @@ public abstract class AbstractChromatogram implements Chromatogram {
     private static int G = 2; // Array index for 'G'-related material
     private static int T = 3; // Array index for 'T'-related material
 
-    /** 2D array containing all the samples for all 4 traces */
+    /** 2D array containing all the samples for all 4 traces. */
     private int[][] traceSample;
-    /** Array containing the single highest value for each trace */
+    /** Array containing the single highest value for each trace. */
     private int[] maxTraceValue;
-    /** The immutable Alignment that will be returned by getBaseCalls() */
+    /** The immutable Alignment that will be returned by getBaseCalls(). */
     private Alignment baseCalls;
     private int significantBits;
 
+  /**
+   * Create a new AbstractChromatogram.
+   */
     public AbstractChromatogram() {
         maxTraceValue = new int[4];
         traceSample = new int[4][];
@@ -97,11 +101,34 @@ public abstract class AbstractChromatogram implements Chromatogram {
         return maxTraceValue[nucToIndex(nucleotide)];
     }
 
+  /**
+   * Return the total number of base calls.
+   *
+   * @return the total number of base calls
+   */
     public Alignment getBaseCalls()  { return baseCalls; }
+
+  /**
+   * Return the sequence length.
+   *
+   * @return the sequence length
+   */
     public int getSequenceLength()   { return baseCalls.length(); }
+
+  /**
+   * Return the number of significant bits.
+   *
+   * @return the significant bits
+   */
     public int getSignificantBits()  { return significantBits; }
 
-    /** Convert a DNA symbol to an internal array index */
+    /**
+     * Convert a DNA symbol to an internal array index.
+     *
+     * @param nuc  the nucleotide to convert
+     * @return an integer giving it's internal index value
+     * @throws IllegalSymbolException if the symbol is not recognised
+     */
     private final int nucToIndex(AtomicSymbol nuc) throws IllegalSymbolException {
         if      (nuc == DNATools.a()) return A;
         else if (nuc == DNATools.c()) return C;
@@ -213,6 +240,8 @@ public abstract class AbstractChromatogram implements Chromatogram {
 
     /** Returns a new instance of this AbstractChromatogram subclass for use in
      * {@link #reverseComplement}.
+     *
+     * @return a reverse-complemented AbstractChromatogram
      */
     protected abstract AbstractChromatogram reverseComplementInstance();
 
@@ -282,6 +311,8 @@ public abstract class AbstractChromatogram implements Chromatogram {
      * their offsets lists must override this method, at least for the case where
      * <code>label == {@link #OFFSETS}</code>.
      * </p>
+     *
+     * @param label the label Object
      * @return an appropriately reverse-complemented SymbolList, or null if the
      *          label is unhandled.
      */
@@ -341,6 +372,7 @@ public abstract class AbstractChromatogram implements Chromatogram {
      * @param labelsToSymLists a {@link Map} whose keys are desired labels
      *        for the alignment and whose values are the SymbolLists.
      *        All the SymbolLists must be the same length.
+     * @return a new Alignment
      * @throws IllegalArgumentException if the lists aren't all the same length
      * @throws ClassCastException if any of the values in the map aren't
      *         SymbolLists
@@ -352,7 +384,13 @@ public abstract class AbstractChromatogram implements Chromatogram {
         return sa;
     }
 
-    /** Utility method for reversing an int[] array. Visible for subclass use. */
+    /**
+     *  Utility method for reversing an int[] array. Visible for subclass use.
+     *
+     * @param src  the source array
+     * @return an array of the same length containing all values in src in
+     *     reverse order
+     */
     protected final static int[] reverse(int[] src) {
         int[] dst = new int[src.length];
         for (int i = 0 ; i < src.length ; i++)

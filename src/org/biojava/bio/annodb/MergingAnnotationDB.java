@@ -12,31 +12,58 @@ import org.biojava.bio.AnnotationType;
  * <p>An AnnotationDB that provides a merged view of a list of underlying DBs.</p>
  *
  * @author Matthew Pocock
+ * @since 1.3
  */
 public class MergingAnnotationDB implements AnnotationDB {
   private final String name;
   private final List merged;
-  
+
+  /**
+   * Create a new MergingAnnotationDB with a name and no DBs to merge.
+   *
+   * @param name  the name of this DB
+   */
   public MergingAnnotationDB(String name) {
     this.name = name;
     this.merged = new ArrayList();
   }
-  
+
+  /**
+   * Create a new MergingAnnotationDB with a name and a list of DBs to merge.
+   *
+   * @param name    the name of this DB
+   * @param merged  a list of DBs to merge
+   */
   public MergingAnnotationDB(String name, List merged) {
     this.name = name;
     this.merged = new ArrayList(merged);
   }
-  
+
+  /**
+   * Add a DB to be merged in this view.
+   *
+   * @param toAdd the AnnotationDB to add
+   */
   public void addAnnotationDB(AnnotationDB toAdd) {
     if(!merged.contains(toAdd)) {
       merged.add(toAdd);
     }
   }
-  
+
+  /**
+   * Remove a DB from this view.
+   *
+   * @param toRemove  the AnnotationDB to remove
+   */
   public void removeAnnotationDB(AnnotationDB toRemove) {
     merged.remove(toRemove);
   }
-  
+
+  /**
+   * Return a list of merged DBs. This can be modified independantly of this DB.
+   *
+   * @return a List of merged DBs
+   */
   public List getMerged() {
     return new ArrayList(merged);
   }

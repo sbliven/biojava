@@ -57,11 +57,14 @@ public abstract class AbstractAnnotation
     Serializable
 {
   /**
-   * Implement this to return the Map delegate.
+   * Implement this to return the Map delegate. Modifying this return value will
+   * modify the properties associated with this annotation.
    *
    * From code in the 1.2 version of AbstractAnnotation
    * @for.developer This is required for the implementation of an Annotation that
    *            extends AbstractAnnotation
+   *
+   * @return a Map containing all properties
    */
   protected abstract Map getProperties();
 
@@ -76,10 +79,6 @@ public abstract class AbstractAnnotation
   protected abstract boolean propertiesAllocated();
 
 
-  /**
-   * @param key The key whose property to retrieve.
-   * @throws NoSuchElementException if the property 'key' does not exist
-   */
   public Object getProperty(Object key) throws NoSuchElementException {
     if(propertiesAllocated()) {
       Map prop = getProperties();
@@ -173,12 +172,28 @@ public abstract class AbstractAnnotation
     return Collections.unmodifiableMap(getProperties());
   }
 
+  /**
+   * Protected no-args constructor intended for sub-classes. This class is
+   * abstract and can not be directly instantiated.
+   */
   protected AbstractAnnotation() {
   }
 
-  protected AbstractAnnotation(Annotation ann) throws IllegalArgumentException {
+  /**
+   * Copy-constructor.
+   *
+   * <p>
+   * This does a shallow copy of the annotation. The result is an annotation
+   * with the same properties and values, but which is independant of the
+   * original annotation.
+   * </p>
+   *
+   * @param ann  the Annotation to copy
+   * @throws NullPointerException  if ann is null
+   */
+  protected AbstractAnnotation(Annotation ann) {
     if(ann == null) {
-      throw new IllegalArgumentException(
+      throw new NullPointerException(
         "Null annotation not allowed. Use Annotation.EMPTY_ANNOTATION instead."
       );
     }
@@ -198,6 +213,12 @@ public abstract class AbstractAnnotation
     }
   }
 
+  /**
+   * Create a new Annotation by copying the key-value pairs from a map. The
+   * resulting Annotation is independant of the map.
+   *
+   * @param annMap  the Map to copy from.
+   */
   public AbstractAnnotation(Map annMap) {
     if(annMap == null) {
       throw new IllegalArgumentException(

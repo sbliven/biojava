@@ -82,6 +82,12 @@ public class BioRuntimeException extends RuntimeException {
     this(message, ex);
   }
   
+  /**
+   * Create a new BioRuntimeException with a cause and a message.
+   *
+   * @param message  the message
+   * @param ex  the Throwable that caused this BioRuntimeException
+   */
   public BioRuntimeException(String message, Throwable ex) {
     super(message, ex);
   }

@@ -36,14 +36,19 @@ import org.biojava.utils.io.CachingInputStream;
  * four bytes of the stream (the magic number).
  *
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
+ * @author Matthew Pocock
  */
 public class ChromatogramFactory {
-    /** The magic number for SCF files */
+    /**
+     *  The magic number for SCF files.
+     */
     public static final int SCF_MAGIC = (((byte) '.') << 24)
                                       + (((byte) 's') << 16)
                                       + (((byte) 'c') << 8)
                                       + (((byte) 'f'));
-    /** The magic number for ABIF files */
+    /**
+     *  The magic number for ABIF files.
+     */
     public static final int ABI_MAGIC = (((byte) 'A') << 24)
                                       + (((byte) 'B') << 16)
                                       + (((byte) 'I') << 8)
@@ -52,6 +57,8 @@ public class ChromatogramFactory {
     /**
      * Creates a new <code>Chromatogram</code> object from the named file.
      * @param f the file to read
+     * @return a new Chromatogram
+     *
      * @throws IOException when the file can't be read or some other I/O error occurs
      * @throws UnsupportedChromatogramFormatException when the file doesn't
      *         contain a chromatogram in a supported format
@@ -85,6 +92,7 @@ public class ChromatogramFactory {
      * </p>
      *
      * @param in the stream from which to read the chromatogram.
+     * @return a new Chromatogram
      * @throws IOException when there's a problem with the stream
      * @throws UnsupportedChromatogramFormatException when the file doesn't
      *         contain a chromatogram in a supported format
@@ -114,12 +122,26 @@ public class ChromatogramFactory {
 
     }
 
+  /**
+   * Extract the magic number as an integer from a byte-array.
+   *
+   * <p>
+   * This assumes the magic array has at least 4 elements.
+   * </p>
+   *
+   * @param magic  the byte array of magic values
+   * @return the magic number integer
+   */
     private static int makeMagic(byte[] magic) {
         return (magic[0] << 24) | (magic[1] << 16) | (magic[2] << 8) | (magic[3]);
     }
 
     /**
-     * Reads the next four bytes from a stream to build a 32-bit magic number
+     * Reads the next four bytes from a stream to build a 32-bit magic number.
+     *
+     * @param src the source InputStream
+     * @return an integer representing the magic number
+     * @throws IOException if data could not be read from src
      */
     private static int magicFromStream(InputStream src) throws IOException {
         byte[] magicBytes = new byte[4];

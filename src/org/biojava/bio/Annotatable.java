@@ -120,6 +120,13 @@ public interface Annotatable extends Changeable {
    * listeners about changes in the Annotation.
    */
   static class AnnotationForwarder extends ChangeForwarder {
+    /**
+     * Create a new AnnotationForwarder that will forward events for a source
+     * using a change support.
+     *
+     * @param source  the Object to forward events on behalf of
+     * @param cs      the change support that manages listeners
+     */
     public AnnotationForwarder(Object source, ChangeSupport cs) {
       super(source, cs);
     }

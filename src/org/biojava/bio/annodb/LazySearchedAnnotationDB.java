@@ -8,13 +8,26 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.AnnotationTools;
 import org.biojava.bio.AnnotationType;
 
+/**
+ * An implementation of AnnotationDB that does a JIT search on another set.
+ *
+ * @author Matthew Pocock
+ * @since 1.3
+ */
 public class LazySearchedAnnotationDB
 implements AnnotationDB {
   private final String name;
   private final AnnotationDB source;
   private final AnnotationType schema;
   private AnnotationDB result;
-  
+
+  /**
+   * Create a new DB from an old one by applying a schema.
+   *
+   * @param name    the name of this DB
+   * @param source  the original DB to search
+   * @param schema  the schema AnnotationType to apply
+   */
   public LazySearchedAnnotationDB(String name, AnnotationDB source, AnnotationType schema) {
     this.name = name;
     this.source = source;

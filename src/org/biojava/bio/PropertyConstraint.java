@@ -138,6 +138,11 @@ public interface PropertyConstraint {
             this.cl = cl;
         }
 
+      /**
+       * Get the Class used as the constraint.
+       *
+       * @return the Class all properties must be instances of
+       */
         public Class getPropertyClass() {
             return cl;
         }
@@ -200,6 +205,11 @@ public interface PropertyConstraint {
             this.annType = annType;
         }
 
+      /**
+       * Get the AnnotationType used as a constraint.
+       *
+       * @return the AnnotationType constraint
+       */
         public AnnotationType getAnnotationType() {
             return annType;
         }
@@ -256,7 +266,12 @@ public interface PropertyConstraint {
       public ExactValue(Object value) {
         this.value = value;
       }
-      
+
+      /**
+       * Get the value that all properties must match.
+       *
+       * @return  the value Object
+       */
       public Object getValue() {
         return value;
       }

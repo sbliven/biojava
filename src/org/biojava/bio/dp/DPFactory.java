@@ -48,7 +48,7 @@ public interface DPFactory {
     
     public DP createDP(MarkovModel model)
     throws IllegalArgumentException, BioException {
-      int heads = model.heads();
+      int heads = model.advance().length;
       MarkovModel flat = DP.flatView(model);
       if(heads == 1) {
         return new SingleDP(flat);

@@ -82,7 +82,7 @@ public class GFFWriter implements GFFDocumentHandler {
       record.getEnd()     + "\t"
     );
     double score = record.getScore();
-    if(score == GFFRecord.NO_SCORE) {
+    if(score == GFFTools.NO_SCORE) {
       out.print(".\t");
     } else {
       out.print(score + "\t");
@@ -98,7 +98,7 @@ public class GFFWriter implements GFFDocumentHandler {
     }
     
     int frame = record.getFrame();
-    if(frame == GFFRecord.NO_FRAME) {
+    if(frame == GFFTools.NO_FRAME) {
       out.print(".");
     } else {
       out.print(frame + "");

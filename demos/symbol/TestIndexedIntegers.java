@@ -15,7 +15,7 @@ public class TestIndexedIntegers {
       char token = (char) i;
       String name = String.valueOf(i);
       Annotation ann = Annotation.EMPTY_ANNOTATION;
-    	AtomicSymbol symb = AlphabetManager.createSymbol(token, name, ann);
+    	AtomicSymbol symb = AlphabetManager.createSymbol(name, ann);
     	alph.addSymbol(symb);
     }
     

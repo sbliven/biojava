@@ -49,6 +49,7 @@ public class BeanAsAnnotation extends AbstractAnnotation {
    * Create a new BeanAsAnnotation for a bean.
    *
    * @param bean the JavaBean to view
+   * @throws IntrospectionException  if the bean could not be introspected
    */
   public BeanAsAnnotation(Object bean)
   throws IntrospectionException {

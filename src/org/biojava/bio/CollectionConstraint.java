@@ -45,7 +45,7 @@ public interface CollectionConstraint {
      * <code>accept</code> returns true if the value fulfills the
      * constraint.
      *
-     * @param value a <code>Collection</code> to check.
+     * @param values a <code>Collection</code> to check.
      *
      * @for.powerUser Manually compare items with the CollectionConstraint. Node:
      * this will ususaly be done for you in an AnnotationType instance
@@ -87,8 +87,14 @@ public interface CollectionConstraint {
      * <code>newValue</code> to <code>current</code> would be accepted
      * by this constraint.
      *
-     * @for.developer Implementations may <em>not</em> assume that <code>current</code>
-     *                 is valid.
+     * @for.developer
+     * Implementations may <em>not</em> assume that <code>current</code>
+     * is valid.
+     *
+     * @param current  a Collection containing the current values
+     * @param newValue the new value to add
+     * @return true if adding the new value will result in an acceptable
+     *    property
      */
     
     public boolean validateAddValue(Collection current, Object newValue);
@@ -98,9 +104,15 @@ public interface CollectionConstraint {
      * <code>newValue</code> from <code>current</code> would be accepted
      * by this constraint.
      *
-     * @for.developer Implementations may <em>not</em> assume that <code>current</code>
-     *                 is valid.  However, <code>current</code> will already have been
-     *                 checked to ensure that it contains <code>victim</code>.
+     * @for.developer
+     * Implementations may <em>not</em> assume that <code>current</code>
+     * is valid.  However, <code>current</code> will already have been
+     * checked to ensure that it contains <code>victim</code>.
+     *
+     * @param current a Collection containing the current values
+     * @param victim  the value to remove
+     * @return true   if removing the victim will result in an acceptable
+     *    property value set
      */
     
     public boolean validateRemoveValue(Collection current, Object victim);
@@ -147,16 +159,35 @@ public interface CollectionConstraint {
     public class AllValuesIn implements CollectionConstraint {
         private PropertyConstraint pc;
         private Location card;
-        
+
+      /**
+       * Create an AllValuesIn based upon a PropertyConstraint and a
+       * cardinality.
+       *
+       * @param pc    the PropertyConstraint to apply to each property value
+       * @param card  the cardinality constraint restricting the number of
+       *    values
+       */
         public AllValuesIn(PropertyConstraint pc, Location card) {
             this.pc = pc;
             this.card = card;
         }
-        
+
+      /**
+       * Get the PropertyConstraint used to validate each property value.
+       *
+       * @return  the PropertyConstraint used
+       */
         public PropertyConstraint getPropertyConstraint() {
             return pc;
         }
-        
+
+      /**
+       * Get the cardinality constraint used to validate the number of property
+       * values.
+       *
+       * @return  the cardinality constraint as a Location
+       */
         public Location getCardinalityConstraint() {
             return card;
         }
@@ -270,15 +301,34 @@ public interface CollectionConstraint {
         private PropertyConstraint pc;
         private Location card;
         
+      /**
+       * Create a Contains based upon a PropertyConstraint and a
+       * cardinality.
+       *
+       * @param pc    the PropertyConstraint to apply to each property value
+       * @param card  the cardinality constraint restricting the number of
+       *    values
+       */
         public Contains(PropertyConstraint pc, Location card) {
             this.pc = pc;
             this.card = card;
         }
         
+      /**
+       * Get the PropertyConstraint used to validate each property value.
+       *
+       * @return  the PropertyConstraint used
+       */
         public PropertyConstraint getPropertyConstraint() {
             return pc;
         }
         
+      /**
+       * Get the cardinality constraint used to validate the number of property
+       * values.
+       *
+       * @return  the cardinality constraint as a Location
+       */
         public Location getCardinalityConstraint() {
             return card;
         }

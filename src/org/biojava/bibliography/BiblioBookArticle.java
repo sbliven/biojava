@@ -36,6 +36,9 @@ package org.biojava.bibliography;
 public class BiblioBookArticle
     extends BiblioArticle {
 
+  /**
+   * Book this is from.
+   */
     public BiblioBook fromBook;
 
 }

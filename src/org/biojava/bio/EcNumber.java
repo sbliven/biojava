@@ -37,10 +37,22 @@ import java.util.regex.Pattern;
  * @since 1.4
  */
 public interface EcNumber {
+  /**
+   * A Pattern that can be used to parse EC strings into the indiidual numbers.
+   */
   public static final Pattern EC_PATTERN =
     Pattern.compile("((\\d*)|(-))\\.((\\d*)|(-))\\.((\\d*)|(-))\\.((\\d*)|(-))");
 
+  /**
+   * Constant that represents EC number components that are not defined. This
+   * is often represented as a '-' in EC strings.
+   */
   public static final int UNDEFINED = -1;
+
+  /**
+   * Constant that represents EC number components that are as yet unclassified.
+   * This is often represented as 99 in EC strings.
+   */
   public static final int UNCLASSIFIED = 99;
 
   /**
@@ -61,13 +73,17 @@ public interface EcNumber {
 
     /**
      * Make a new EcNumber.Impl with the data provided.
+     *
+     * @param mainClass     the main class number
+     * @param subClass      the sub class number
+     * @param subSubClass   the sub-sub class number
+     * @param group         the group number
      */
     public Impl(int mainClass, int subClass, int subSubClass, int group) {
       this.classes = new int[] { mainClass, subClass, subSubClass, group };
     }
 
-    // should be a static factory method - valueOf(String)
-    public Impl(String ecString) {
+    private Impl(String ecString) {
       Matcher matcher = EC_PATTERN.matcher(ecString);
       if(!matcher.matches()) {
         throw new IllegalArgumentException(
@@ -138,6 +154,10 @@ public interface EcNumber {
         getClassNumber(1) * 10000 +
         getClassNumber(2) * 100 +
         getClassNumber(3);
+    }
+
+    public static Impl valueOf(String ecString) {
+      return new Impl(ecString);
     }
   }
 }

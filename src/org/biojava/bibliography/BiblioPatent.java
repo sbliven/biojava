@@ -38,9 +38,24 @@ package org.biojava.bibliography;
 public class BiblioPatent
     extends BibRef {
 
+  /**
+   * The document number.
+   */
     public String docNumber;
+
+  /**
+   * Document office
+   */
     public String docOffice;
+
+  /**
+   * Document type.
+   */
     public String docType;
+
+  /**
+   * Array of applicants.
+   */
     public String[] applicants;
 
 }

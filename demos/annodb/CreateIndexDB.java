@@ -3,10 +3,15 @@ package annodb;
 import java.util.*;
 import java.io.*;
 
-import org.biojava.bio.*;
 import org.biojava.bio.annodb.*;
 import org.biojava.bio.program.tagvalue.*;
 
+/**
+ * Creates an index DB.
+ *
+ * @author Matthew Pocock
+ * @since 1.3
+ */ 
 public class CreateIndexDB {
   public static void main(String[] args)
   throws Exception {

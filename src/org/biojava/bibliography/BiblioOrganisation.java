@@ -39,5 +39,8 @@ package org.biojava.bibliography;
 public class BiblioOrganisation
     extends BiblioProvider {
 
+  /**
+   * The name of the organisation.
+   */
     public String name;
 }

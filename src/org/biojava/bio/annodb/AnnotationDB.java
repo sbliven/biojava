@@ -18,11 +18,15 @@ import org.biojava.bio.AnnotationType;
  * @author Matthew Pocock
  */
 public interface AnnotationDB {
+  /**
+   * An AnnotationDB that is always empty.
+   */
   public static AnnotationDB EMPTY = new EmptyAnnotationDB();
   
   /**
    * <p>The name of this AnnotationDB.</p>
    *
+   * @return the name of this AnnotationDB
    */
   public String getName();
   

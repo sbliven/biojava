@@ -71,7 +71,7 @@ implements Format {
 
     changeTable.setChanger("ID", new ChangeTable.Changer() {
       public Object change(Object value) {
-        return new EcNumber.Impl((String) value);
+        return EcNumber.Impl.valueOf((String) value);
       }
     });
     changeTable.setChanger("AN", trailingDotStripper);

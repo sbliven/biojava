@@ -1,12 +1,10 @@
 package symbol;
 
-import java.io.*;
 import java.util.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
 
 public class TestAlphabetIndexers {
   public static void main(String [] args) throws Exception {
@@ -22,7 +20,7 @@ public class TestAlphabetIndexers {
     for(int i = 0; i < size; i++) {
       System.out.println("Creating symbol " + (char) (c+i));
       testAlpha.addSymbol(AlphabetManager.createSymbol(
-        (char) (c + i), "Symbol " + i, Annotation.EMPTY_ANNOTATION
+        "Symbol " + i, Annotation.EMPTY_ANNOTATION
       ));
     }
     
@@ -43,7 +41,7 @@ public class TestAlphabetIndexers {
     
     for(int ii = size; ii < size+extra; ii++) {
       testAlpha.addSymbol(AlphabetManager.createSymbol(
-        (char) (c + ii), "Symbol " + ii, Annotation.EMPTY_ANNOTATION
+        "Symbol " + ii, Annotation.EMPTY_ANNOTATION
       ));
       for(int i = 0; i < ii; i++) {
         System.out.println(i + " -> " + ai.symbolForIndex(i).getName());

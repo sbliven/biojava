@@ -29,7 +29,6 @@ import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.io.SeqIOTools;
-import org.biojava.bio.seq.io.SequenceBuilder;
 import org.biojava.bio.seq.io.SequenceBuilderFactory;
 import org.biojava.bio.seq.io.SequenceFormat;
 import org.biojava.bio.seq.io.StreamReader;
@@ -62,7 +61,8 @@ implements SequenceDBLite {
    * @param id the unique ID
    * @return the matching sequence
    * @throws BioException if the ID is invalid
-   * @throws IOException if the io operation times out or has problems connecting. Can also indicate an invalid URL has been constructed.
+   * @throws BioException if the io operation times out or has problems
+   *    connecting. Can also indicate an invalid URL has been constructed.
    */
   public Sequence getSequence(String id)
   throws BioException {
@@ -82,7 +82,6 @@ implements SequenceDBLite {
 
       Alphabet alpha = getAlphabet();
       SequenceBuilderFactory sFact = SeqIOTools.formatToFactory(sFormat,alpha);
-      SequenceBuilder sbuilder = sFact.makeSequenceBuilder();
       SymbolTokenization rParser = alpha.getTokenization("token");
       System.err.println("got data from "+ queryURL);
       SequenceIterator seqI = new StreamReader(

@@ -38,11 +38,17 @@ package org.biojava.bibliography;
 public class BiblioWebResource
     extends BibRef {
 
+  /**
+   * The URL of the resource.
+   */
     public String url;
 
     /** An estomated size in kilobytes. */
     public int estimatedSize = 0;
 
+  /**
+   * The cost of accessing the resource.
+   */
     public String cost;
 
 }

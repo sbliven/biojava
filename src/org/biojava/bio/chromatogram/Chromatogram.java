@@ -32,9 +32,14 @@ import org.biojava.bio.symbol.IllegalSymbolException;
  *  @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
  */
 public interface Chromatogram {
-    /** The sequence label for the list of called bases */
+    /**
+     * The sequence label for the list of called bases.
+     */
     public static Object DNA = "dna";
-    /** The sequence label for the trace offsets of the called bases */
+
+    /**
+     * The sequence label for the trace offsets of the called bases.
+     */
     public static Object OFFSETS = "trace-offsets";
     
     /** Gets the max intensity from all the traces.  Must be equivalent

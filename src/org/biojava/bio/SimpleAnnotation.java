@@ -68,9 +68,9 @@ public class SimpleAnnotation extends AbstractAnnotation {
    * one. The new Annotation instance will be independant of the original.
    *
    * @param ann  the Annotation to copy
+   * @throws NullPointerException if ann is null
    */
-  public SimpleAnnotation(Annotation ann)
-  throws IllegalArgumentException {
+  public SimpleAnnotation(Annotation ann) {
     super(ann);
   }
   

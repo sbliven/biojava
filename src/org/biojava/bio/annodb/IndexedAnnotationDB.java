@@ -58,7 +58,22 @@ implements AnnotationDB {
   private final ParserListener parserListener;
   private final AnnotationBuilder annBuilder;
   private final Parser recordParser;
-  
+
+  /**
+   * Create a new IndexedAnnotationDB.
+   *
+   * @param dbName
+   * @param storeLoc
+   * @param model
+   * @param toIndex
+   * @param maxKeyLen
+   * @param schema
+   * @param plFactory
+   * @throws BioException
+   * @throws CommitFailure
+   * @throws IOException
+   * @throws ParserException
+   */
   public IndexedAnnotationDB(
     String dbName,
     File storeLoc,
@@ -123,7 +138,14 @@ implements AnnotationDB {
     
     store.commit();
   }
-  
+
+  /**
+   * Initialise the db from a store.
+   *
+   * @param store         the BioStore to initalise from
+   * @throws IOException  if there was an IO fault accessing the store
+   * @throws SAXException if the XML configuration file is corrupted
+   */
   public IndexedAnnotationDB(BioStore store) throws IOException, SAXException {
     this.store = store;
     
@@ -207,7 +229,12 @@ implements AnnotationDB {
   public AnnotationDB search(AnnotationType at) {
     return new LazySearchedAnnotationDB("", this, at);
   }
-  
+
+  /**
+   * Get the ParserListenerFactory used by this IndexedAnnotationDB.
+   *
+   * @return the ParserListenerFactory
+   */
   public ParserListenerFactory getParserListenerFactory() {
     return plFactory;
   }
@@ -220,16 +247,42 @@ implements AnnotationDB {
     recordParser.read(reader, parserListener.getParser(), parserListener.getListener());
     return annBuilder.getLast();
   }
-  
+
+  /**
+   * A factory for retrieving parsers and listeners.
+   *
+   * @author Matthew Pocock
+   * @since 1.3
+   */
   public static interface ParserListenerFactory
   extends Serializable {
+    /**
+     * Get the ParserListener for a TagValueListener.
+     *
+     * @param listener the TagValueListener to process
+     * @return the ParserListener for this
+     */
     public ParserListener getParserListener(TagValueListener listener);
   }
-  
+
+  /**
+   * An implementation of ParserListenerFactory that uses a static method.
+   *
+   * @author Matthew Pocock
+   * @since 1.3
+   */
   public static class StaticMethodRPFactory
   implements ParserListenerFactory {
     private final  Method method;
-    
+
+    /**
+     * Create a new StaticMethodRPFactory for a method.
+     *
+     * @param method  a Method to use
+     * @throws IllegalArgumentException  if the Method is not statically scoped,
+     *    or does not return a ParserListener or take a single argument of type
+     *    TagValueListener
+     */
     public StaticMethodRPFactory(Method method)
     throws IllegalArgumentException {
       if( (method.getModifiers() & Modifier.STATIC) != Modifier.STATIC ) {
@@ -249,7 +302,12 @@ implements AnnotationDB {
       
       this.method = method;
     }
-    
+
+    /**
+     * Get the Method used.
+     *
+     * @return  the Method used.
+     */
     public Method getMethod() {
       return method;
     }

@@ -36,10 +36,29 @@ package org.biojava.bibliography;
 public class BiblioBook
     extends BibRef {
 
+  /**
+   * ISBN number.
+   */
     public String isbn;
+
+  /**
+   * Book volume.
+   */
     public String volume;
+
+  /**
+   * Edition
+   */
     public String edition;
+
+  /**
+   * Book series.
+   */
     public String series;
+
+  /**
+   * Editor
+   */ 
     public BiblioProvider editor;
 
 }

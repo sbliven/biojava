@@ -38,7 +38,14 @@ package org.biojava.bibliography;
 public class BiblioArticle
     extends BibRef {
 
+  /**
+   * First page of the article.
+   */
     public String firstPage;
+
+  /**
+   * Last page of the article.
+   */
     public String lastPage;
 
 }

@@ -90,10 +90,15 @@ public class OverlayAnnotation
     return changeSupport;
   }
 
+  /**
+   * Get the map used for the overlay. Modifying this modifies the Annotation.
+   *
+   * @return the overlay Map
+   */
     protected Map getOverlay() {
-	if (overlay == null)
-	    overlay = new HashMap();
-	return overlay;
+      if (overlay == null)
+        overlay = new HashMap();
+      return overlay;
     }
 
   /**
@@ -192,6 +197,8 @@ public class OverlayAnnotation
    * visible in this annotation.  The <code>Set</code> is
    * unmodifiable, but will dynamically reflect changes made
    * to the annotation.
+   *
+   * @return the keys as a Set
    */
   public Set keys() {
     return new OAKeySet();
@@ -201,6 +208,8 @@ public class OverlayAnnotation
    * Return a <code>Map</code> view onto this annotation.
    * The returned <code>Map</code> is unmodifiable, but will
    * dynamically reflect any changes made to this annotation.
+   *
+   * @return a view of this Annotation as an immutable Map
    */
 
   public Map asMap() {
@@ -372,7 +381,19 @@ public class OverlayAnnotation
     }
   }
 
+  /**
+   * Forwards change events from the underlying Annotation to this one.
+   *
+   * @author Thomas Down
+   * @author Matthew Pocock
+   */
   protected class PropertyForwarder extends ChangeForwarder {
+    /**
+     * Forward on behalf of source using the change support provided.
+     *
+     * @param source  the source Object
+     * @param cs      the ChangeSupport to use
+     */
     public PropertyForwarder(Object source, ChangeSupport cs) {
       super(source, cs);
     }

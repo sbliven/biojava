@@ -120,7 +120,7 @@ public class SequencesAsGFF {
 	    Location loc = f.getLocation();
 	    record.setStart(loc.getMin());
 	    record.setEnd(loc.getMax());
-	    record.setScore(GFFRecord.NO_SCORE);
+	    record.setScore(GFFTools.NO_SCORE);
 	    record.setStrand(StrandedFeature.UNKNOWN);
 	    if(f instanceof StrandedFeature) {
         StrandedFeature sf = (StrandedFeature) f;
@@ -130,7 +130,7 @@ public class SequencesAsGFF {
           record.setStrand(StrandedFeature.NEGATIVE);
         }
 	    }
-	    record.setFrame(GFFRecord.NO_FRAME);
+	    record.setFrame(GFFTools.NO_FRAME);
       Map fMap = f.getAnnotation().asMap();
       Map fMap2 = new HashMap();
       for(Iterator ki = fMap.keySet().iterator(); ki.hasNext(); ) {

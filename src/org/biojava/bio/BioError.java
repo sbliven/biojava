@@ -73,7 +73,13 @@ public class BioError extends Error {
   public BioError(Throwable ex, String message) {
     this(message, ex);
   }
-  
+
+  /**
+   * Create a new BioError with a cause and a message.
+   *
+   * @param message  the message
+   * @param ex  the Throwable that caused this BioError
+   */
   public BioError(String message, Throwable ex) {
     super(message, ex);
   }

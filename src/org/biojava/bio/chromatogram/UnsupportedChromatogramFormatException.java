@@ -28,10 +28,18 @@ package org.biojava.bio.chromatogram;
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
  */
 public class UnsupportedChromatogramFormatException extends org.biojava.bio.BioException {
+  /**
+   * Create a new UnsupportedChromatogramFormatException.
+   */
     public UnsupportedChromatogramFormatException() {
         super();
     }
 
+  /**
+   * Create a new UnsupportedChromatogramFormatException with a message.
+   *
+   * @param message  the message to use
+   */
     public UnsupportedChromatogramFormatException(String message) {
         super(message);
     }

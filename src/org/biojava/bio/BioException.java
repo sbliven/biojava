@@ -67,6 +67,12 @@ public class BioException extends Exception {
     this(message, ex);
   }
   
+  /**
+   * Create a new BioException with a cause and a message.
+   *
+   * @param message  the message
+   * @param ex  the Throwable that caused this BioException
+   */
   public BioException(String message, Throwable ex) {
     super(message, ex);
   }
