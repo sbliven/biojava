@@ -40,50 +40,69 @@ public class HitMerger implements SearchListener {
     int hitOffset,
     int hitLength
   ) {
-    hitList.add(new Record(hitID, queryOffset, hitOffset, hitLength));
+    Hit hit = new Hit(hitID, queryOffset, hitOffset, hitLength);
+    hitList.add(hit);
   }
-  
+
   public void endSearch(String seqID) {
-    if(!hitList.isEmpty()) {
-      Collections.sort(hitList);
-      
-      Iterator i = hitList.iterator();
-      Record last = (Record) i.next();
-      while(i.hasNext()) {
-        Record current = (Record) i.next();
-        if(
-          (current.hitID == last.hitID)
-         &&
-          (current.queryOffset <= last.queryOffset + last.hitLength)
-         &&
-          (current.hitOffset <= last.hitOffset + last.hitLength)
-         &&
-          ((current.hitOffset - last.hitOffset) == (current.queryOffset - last.queryOffset))
-        ) {
-          last.hitLength = current.hitOffset + current.hitLength - last.hitOffset;
-        } else {
-          if(last.hitLength >= minLength) {
-            delegate.hit(last.hitID, last.queryOffset, last.hitOffset, last.hitLength);
-          }
-          last = current;
+    Collections.sort(hitList);
+
+   OUTER:
+    for(int i = 0 ; i < hitList.size(); i++) {
+      Hit low = (Hit) hitList.get(i);
+      int ubound = low.queryOffset + low.hitOffset + low.hitLength * 2;
+
+      for(int j = i+1; j < hitList.size(); j++) {
+        Hit high = (Hit) hitList.get(j);
+
+        if(ubound < high.queryOffset + high.hitOffset) {
+          break;
+        }
+
+        if(doOverlap(low, high)) {
+          hitList.set(j, merge(low, high));
+          continue OUTER;
         }
       }
-      if(last.hitLength >= minLength) {
-        delegate.hit(last.hitID, last.queryOffset, last.hitOffset, last.hitLength);
+
+      if(low.hitLength >= minLength) {
+        delegate.hit(low.hitID, low.queryOffset, low.hitOffset, low.hitLength);
       }
     }
-    
+
     delegate.endSearch(seqID);
   }
+
+  private Hit merge(Hit a, Hit b) {
+    int qo = Math.min(a.queryOffset, b.queryOffset);
+    int ho = Math.min(a.hitOffset, b.hitOffset);
+    int len = Math.max(
+      a.queryOffset + a.hitLength,
+      b.queryOffset + b.hitLength ) -
+      qo;
+
+    return new Hit(a.hitID, qo, ho, len);
+  }
+
+  private boolean doOverlap(Hit a, Hit b) {
+    return
+      // same sequence
+      (a.hitID == b.hitID) &&
+      // overlap in query offset space
+      ( !(a.queryOffset + a.hitLength < b.queryOffset ||
+          a.queryOffset > b.queryOffset + b.hitLength ) ) && 
+      // on the same diagonal
+      ( a.queryOffset - b.queryOffset == a.hitOffset - b.hitOffset);
+  }
   
-  private static class Record
+  private static class Hit
   implements Comparable {
     public int hitID;
     public int queryOffset;
     public int hitOffset;
     public int hitLength;
     
-    public Record(
+    public Hit(
       int hitID,
       int queryOffset,
       int hitOffset,
@@ -96,8 +115,8 @@ public class HitMerger implements SearchListener {
     }
     
     public boolean equals(Object o) {
-      if(o instanceof Record) {
-        Record r = (Record) o;
+      if(o instanceof Hit) {
+        Hit r = (Hit) o;
         return
           hitID == r.hitID &&
           queryOffset == r.queryOffset &&
@@ -108,7 +127,7 @@ public class HitMerger implements SearchListener {
     }
     
     public int compareTo(Object o) {
-      Record r = (Record) o;
+      Hit r = (Hit) o;
       
       if(hitID > r.hitID) {
         return 1;

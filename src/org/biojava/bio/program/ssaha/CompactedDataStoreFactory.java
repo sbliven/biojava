@@ -20,6 +20,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Packing;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.utils.Constants;
+import org.biojava.utils.AssertionFailure;
 
 /**
  * <p>
@@ -145,6 +146,13 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
       words * (int) Constants.BYTES_IN_INT; // hash table entries
     
     //System.out.println("Allocated:\t" + hashTableSize);
+    if(hashTableSize < words) {
+      throw new AssertionFailure(
+        "Possible underflow. number of words: " + words +
+        "\tsize of hash table: " + hashTableSize +
+        "\tcompared to Integer.MAX_VALUE " + Integer.MAX_VALUE);
+    }
+
     final MappedByteBuffer hashTable_MB = channel.map(
       FileChannel.MapMode.READ_WRITE,
       hashTablePos,
@@ -408,6 +416,7 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
 	public void setName(String name) 
 	    throws ParseException
 	{
+            //System.err.println(this + " setting name to " + name);
 	    nameChars += name.length();
 	}
 
@@ -427,7 +436,7 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
 	private int seqNumber = 0;
 	private int concatOffset = 0;
 
-	private String name = null;
+	private String name = ""; // fixme: we need to be cleverer
 	private int length = -1;
 
 //  	public void startSequence()
@@ -446,6 +455,20 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
 			   MappedByteBuffer hitTable) 
 	{
 	    super(packing, wordLength, stepSize);
+
+            if( (hashTable == null) ||
+                (nameArray == null) ||
+                (nameTable == null) ||
+                (hitTable  == null) )
+            {
+              throw new NullPointerException(
+                "Buffers must not be null. " +
+                "\thashTable: " + hashTable +
+                "\tnameArray: " + nameArray +
+                "\tnameTable: " + nameTable +
+                "\thitTable: " + hitTable );
+            }
+
 	    this.hashTable = hashTable;
 	    this.nameArray = nameArray;
 	    this.nameTable = nameTable;
@@ -455,6 +478,7 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
 	}
 
 	public void setName(String name) {
+            //System.err.println(this + " setting name to " + name);
 	    this.name = name;
 	}
 
