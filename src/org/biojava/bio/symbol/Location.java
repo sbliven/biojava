@@ -152,8 +152,8 @@ public interface Location {
    *
    * @param seq	the SymbolList to process
    * @return	the SymbolList containing the symbols in seq in this range
-   * @deprecated this was a mistake which has not been necisary since the
-   *             introduction of blockIterator()
+   * @deprecated this is not been necessary since the introduction of
+   *              blockIterator()
    */
   SymbolList symbols(SymbolList seq);
 

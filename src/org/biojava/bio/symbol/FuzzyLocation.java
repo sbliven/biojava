@@ -97,44 +97,43 @@ implements Serializable {
   ) {
   	boolean isMinFuzzy = false;
   	boolean isMaxFuzzy = false;
-  	if(outerMin != innerMin)
+  	if (outerMin != innerMin)
 	{
-		isMinFuzzy = true;
+            isMinFuzzy = true;
 	}
-	if(outerMax != innerMax)
+	if (outerMax != innerMax)
 	{
-		isMaxFuzzy = true;
+            isMaxFuzzy = true;
 	}
 	this.initializeVariables(outerMin, outerMax, innerMin, innerMax, isMinFuzzy, isMaxFuzzy, resolver);
   }
 
-	/**
-	 * Create a new FuzzyLocation with endpoints (outerMin.innerMin) and
-	 * (innerMax.outerMax).  This constructor allows you to explicitly mark an
-	 * endpoint as fuzzy, even if there is no other information about it.  For
-	 * example, a valid swissprot location "?5 10" would be a fuzzy location 5
-	 * to 10 where the min is fuzzy and the max is not.
-	 *
-	 * @param outerMin the lower bound on the location's min value.
-	 *				 Integer.MIN_VALUE indicates unbounded.
-	 * @param outerMax the upper bound on the location's max value.
-	 * 				 Integer.MAX_VALUE indicates unbounded.
-	 * @param innerMin the upper bound on the location's min value.
-	 * @param innerMax the lower bound on the location's max value.
-	 * @param isMinFuzzy Explictly state if the minimum is fuzzy
-	 * @param isMaxFuzzy Explictly state if the maximum is fuzzy
-	 * @param resolver a RangeResolver object which defines the policy used to
-	 * 				   calculate the location's min and max properties.
-	 */
+    /**
+     * Create a new FuzzyLocation with endpoints (outerMin.innerMin) and
+     * (innerMax.outerMax).  This constructor allows you to explicitly mark an
+     * endpoint as fuzzy, even if there is no other information about it.  For
+     * example, a valid swissprot location "?5 10" would be a fuzzy location 5
+     * to 10 where the min is fuzzy and the max is not.
+     *
+     * @param outerMin the lower bound on the location's min value.
+     *				 Integer.MIN_VALUE indicates unbounded.
+     * @param outerMax the upper bound on the location's max value.
+     * 				 Integer.MAX_VALUE indicates unbounded.
+     * @param innerMin the upper bound on the location's min value.
+     * @param innerMax the lower bound on the location's max value.
+     * @param isMinFuzzy Explictly state if the minimum is fuzzy
+     * @param isMaxFuzzy Explictly state if the maximum is fuzzy
+     * @param resolver a RangeResolver object which defines the policy used to
+     * 				   calculate the location's min and max properties.
+     */
 
-	public FuzzyLocation(int outerMin, int outerMax,
-						 int innerMin, int innerMax,
-						 boolean isMinFuzzy, boolean isMaxFuzzy,
-						 RangeResolver resolver)
-	{
-		this.initializeVariables(outerMin, outerMax, innerMin, innerMax, isMinFuzzy, isMaxFuzzy, resolver);
-	}
-
+    public FuzzyLocation(int outerMin, int outerMax,
+                         int innerMin, int innerMax,
+                         boolean isMinFuzzy, boolean isMaxFuzzy,
+                         RangeResolver resolver)
+    {
+        this.initializeVariables(outerMin, outerMax, innerMin, innerMax, isMinFuzzy, isMaxFuzzy, resolver);
+    }
 
   public Location translate(int dist) {
     return new FuzzyLocation(
@@ -200,10 +199,10 @@ implements Serializable {
 	    + "]";
     }
 
-  public static interface RangeResolver {
-    public int resolveMin(FuzzyLocation loc);
-    public int resolveMax(FuzzyLocation loc);
-  }
+    public static interface RangeResolver extends Serializable {
+        public int resolveMin(FuzzyLocation loc);
+        public int resolveMax(FuzzyLocation loc);
+    }
 
     private static class InnerRangeResolver implements RangeResolver {
 	public int resolveMin(FuzzyLocation loc) {
@@ -249,42 +248,41 @@ implements Serializable {
 		return loc.getInnerMax();
 	    }
 	}
-	}
+    }
 
-	public boolean isMinFuzzy()
-	{
-		return mIsMinFuzzy;
-	}
+    public boolean isMinFuzzy()
+    {
+        return mIsMinFuzzy;
+    }
 
-	public boolean isMaxFuzzy()
-	{
-		return mIsMaxFuzzy;
-	}
+    public boolean isMaxFuzzy()
+    {
+        return mIsMaxFuzzy;
+    }
 
-	/**
-	 * Refactored initialization code from the constructors.
-	 *
-	 * @param outerMin the lower bound on the location's min value.
-	 *				 Integer.MIN_VALUE indicates unbounded.
-	 * @param outerMax the upper bound on the location's max value.
-	 * 				 Integer.MAX_VALUE indicates unbounded.
-	 * @param innerMin the upper bound on the location's min value.
-	 * @param innerMax the lower bound on the location's max value.
-	 * @param resolver a RangeResolver object which defines the policy used to calculate
-	 *                 the location's min and max properties.
-	 */
-
-	protected void initializeVariables(int outerMin, int outerMax,
-									   int innerMin, int innerMax,
-									   boolean isMinFuzzy, boolean isMaxFuzzy,
-									   RangeResolver resolver)
-	{
-		this.outerMin = outerMin;
-	    this.outerMax = outerMax;
-	    this.innerMin = innerMin;
-	    this.innerMax = innerMax;
-	    this.resolver = resolver;
-		this.mIsMinFuzzy = isMinFuzzy;
-		this.mIsMaxFuzzy = isMaxFuzzy;
-	}
+    /**
+     * Refactored initialization code from the constructors.
+     *
+     * @param outerMin the lower bound on the location's min value.
+     *				 Integer.MIN_VALUE indicates unbounded.
+     * @param outerMax the upper bound on the location's max value.
+     * 				 Integer.MAX_VALUE indicates unbounded.
+     * @param innerMin the upper bound on the location's min value.
+     * @param innerMax the lower bound on the location's max value.
+     * @param resolver a RangeResolver object which defines the policy used to calculate
+     *                 the location's min and max properties.
+     */
+    protected void initializeVariables(int outerMin, int outerMax,
+                                       int innerMin, int innerMax,
+                                       boolean isMinFuzzy, boolean isMaxFuzzy,
+                                       RangeResolver resolver)
+    {
+        this.outerMin = outerMin;
+        this.outerMax = outerMax;
+        this.innerMin = innerMin;
+        this.innerMax = innerMax;
+        this.resolver = resolver;
+        this.mIsMinFuzzy = isMinFuzzy;
+        this.mIsMaxFuzzy = isMaxFuzzy;
+    }
 }

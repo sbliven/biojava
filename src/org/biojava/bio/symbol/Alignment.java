@@ -121,7 +121,7 @@ public interface Alignment extends SymbolList {
    * similar to iterating over the labels and then fetching each SymbolList, but
    * the order is not guaranteed to be the same.
    *
-   * @return a SequenceIterator
+   * @return an Iterator
    */
   Iterator symbolListIterator();
   
