@@ -27,11 +27,32 @@ import java.util.*;
 import org.biojava.bio.seq.*;
 
 /**
- * Annotates a database of annotated sequences, returning all sequences modified.
+ * Annotates a database of annotated sequences, returning all sequences
+ * modified.
+ * <P>
+ * It is hoped that this interface would be implemented by searchers to mark up
+ * domains in proteins, genes in genomes and all sorts of other things.
+ *
+ * @author Matthew Pocock
  */
 public interface Annotator {
-  public SequenceDB annotate(SequenceDB sdb, FeatureFactory ffact)
-         throws IllegalResidueException, java.io.IOException;
-  public boolean annotate(Sequence seq, FeatureFactory ffact)
-         throws IllegalResidueException;
+  /**
+   * Loop over each sequence of sdb adding features.
+   * <P>
+   * Only the sequences implementing MutableFeatureHolder can be annotated.
+   *
+   * @param sdb the sequence database to loop over
+   * @return a database of all modified sequences
+   */
+  public SequenceDB annotate(SequenceDB sdb)
+  throws IllegalResidueException, java.io.IOException;
+  
+  /**
+   * Annotate this single sequence.
+   * <P>
+   * If it does not implement MutableFeatureHolder then it will not be
+   * annotated.
+   */
+  public boolean annotate(Sequence seq)
+  throws IllegalResidueException;
 }

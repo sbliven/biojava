@@ -28,13 +28,15 @@ import org.biojava.bio.seq.*;
 
 /**
  * Annotates a database with hits to a weight-matrix.
+ *
+ * @author Matthew Pocock
  */
 public class WeightMatrixAnnotator implements Annotator {
   private WeightMatrix matrix;
   private double prior;
   private double threshold;
 
-  public SequenceDB annotate(SequenceDB sdb, FeatureFactory ffact)
+  public SequenceDB annotate(SequenceDB sdb)
         throws IllegalResidueException, java.io.IOException {
     HashSequenceDB hitDB = new HashSequenceDB(null);
 
@@ -42,8 +44,9 @@ public class WeightMatrixAnnotator implements Annotator {
       try {
         String id = (String) i.next();
         Sequence seq = sdb.getSequence(id);
-        if(annotate(seq, ffact))
+        if(annotate(seq)) {
           hitDB.addSequence(id, seq);
+        }
       } catch (SeqException se){
       }
     }
@@ -51,25 +54,25 @@ public class WeightMatrixAnnotator implements Annotator {
     return hitDB;
   }
 
-  public boolean annotate(Sequence seq, FeatureFactory ffact)
+  public boolean annotate(Sequence seq)
          throws IllegalResidueException {
+    if(!(seq instanceof MutableFeatureHolder)) {
+      return false;
+    }
+    
     int cols = matrix.columns();
-    System.out.println("Seq length = " + seq.length());
-    System.out.println("wm cols = " + cols);
-    System.out.println("max index = " + (seq.length() - cols + 1));
     for(int offset = 1;
         offset <= seq.length() - cols + 1;
         offset++) {
-      System.out.println("Trying " + offset);
       double score = DP.score(matrix, seq.subList(offset, offset+cols-1));
       double q = Math.exp(score) * prior;
       double pmd = q/(1.0+q);
       if(pmd >= threshold) {
         Feature hit =
-         ffact.createFeature(new RangeLocation(offset, offset+cols-1),
-                            "WeightMatrix", "WeightMatrix",
-                            seq, seq, null);
-        System.out.println("Hit at " + offset + " to " + (offset+cols-1));
+         seq.createFeature((MutableFeatureHolder) seq,
+                           new RangeLocation(offset, offset+cols-1),
+                           "WeightMatrix", "WeightMatrix",
+                           null);
         hit.getAnnotation().setProperty("score", new Double(score));
         hit.getAnnotation().setProperty("weightMatrix", matrix);
         hit.getAnnotation().setProperty("p-value", new Double(pmd));
