@@ -65,95 +65,47 @@ extends SequenceRendererWrapper {
     return this.label;
   }
   
-  public double getDepth(SequenceRenderContext ctx, RangeLocation pos) {
-    SequenceRenderContext subctx = new SequenceRenderContextForLabel(
+  public double getDepth(SequenceRenderContext ctx) {
+    SequenceRenderContext subctx = contextForLabel(
       ctx, getLabel()
     );
-    return super.getDepth(subctx, pos);
+    return super.getDepth(subctx);
   }
   
-  public double getMinimumLeader(SequenceRenderContext ctx, RangeLocation pos) {
-    SequenceRenderContext subctx = new SequenceRenderContextForLabel(
+  public double getMinimumLeader(SequenceRenderContext ctx) {
+    SequenceRenderContext subctx = contextForLabel(
       ctx, getLabel()
     );
-    return super.getMinimumLeader(subctx, pos);
+    return super.getMinimumLeader(subctx);
   }
   
-  public double getMinimumTrailer(SequenceRenderContext ctx, RangeLocation pos) {
-    SequenceRenderContext subctx = new SequenceRenderContextForLabel(
+  public double getMinimumTrailer(SequenceRenderContext ctx) {
+    SequenceRenderContext subctx = contextForLabel(
       ctx, getLabel()
     );
-    return super.getMinimumTrailer(subctx, pos);
+    return super.getMinimumTrailer(subctx);
   }
   
   public void paint(
         Graphics2D g,
-        SequenceRenderContext ctx,
-        RangeLocation pos
+        SequenceRenderContext ctx
   ) {
-    SequenceRenderContext subctx = new SequenceRenderContextForLabel(
+    SequenceRenderContext subctx = contextForLabel(
       ctx, getLabel()
     );
-    super.paint(g, subctx, pos);
+    super.paint(g, subctx);
   }
 
-  private class SequenceRenderContextForLabel implements SequenceRenderContext {
-    private SequenceRenderContext parent;
-    private Object label;
-    
-    private SequenceRenderContextForLabel(
-            SequenceRenderContext parent,
-            Object label
-    ) {
-      this.parent = parent;
-      this.label = label;
+  public SequenceRenderContext contextForLabel(
+    SequenceRenderContext src, Object label
+  ) {
+    Alignment ali = (Alignment) src.getSymbols();
+    SymbolList sl = ali.symbolListForLabel(label);
+    FeatureHolder features = null;
+    if(sl instanceof FeatureHolder) {
+      features = (FeatureHolder) sl;
     }
     
-    public int getDirection() {
-      return parent.getDirection();
-    }
-    
-    public double getScale() {
-      return parent.getScale();
-    }
-    
-    public double sequenceToGraphics(int i) {
-      return parent.sequenceToGraphics(i);
-    }
-    
-    public int graphicsToSequence(double d) {
-      return parent.graphicsToSequence(d);
-    }
-    
-    public int graphicsToSequence(Point point) {
-      return parent.graphicsToSequence(point);
-    }
-    
-    public SymbolList getSequence() {
-      SymbolList sl = null;
-      SymbolList pseq = parent.getSequence();
-      if (pseq instanceof Alignment) {
-        Alignment aseq = (Alignment) parent.getSequence();
-        sl = aseq.symbolListForLabel(label);
-      }
-      
-      if(sl == null) {
-        sl = SymbolList.EMPTY_LIST;
-      }
-      
-      return sl;
-    }
-    
-    public SequenceRenderContext.Border getLeadingBorder() {
-      return parent.getLeadingBorder();
-    }
-    
-    public SequenceRenderContext.Border getTrailingBorder() {
-      return parent.getTrailingBorder();
-    }
-    
-    public Font getFont() {
-      return parent.getFont();
-    }
+    return new SubSequenceRenderContext(src, sl, features, null);
   }
 }

@@ -46,6 +46,34 @@ import org.biojava.bio.*;
  */
 public interface Location {
   /**
+   * Create a new instance of Location with all of the same decorators as this
+   * instance but with the data stored in <code>loc</code>.
+   * <P>
+   * The default behavior is to return <loc>loc</loc> unchanged. If the class is
+   * a location decorator then it should instantiate an instance of the same
+   * type that decorates <code>loc</code>.
+   *
+   * @param loc  the Location to use as template
+   * @return a Location instance based on loc with the same decorators as the
+   *         current instance
+   */
+  Location newInstance(Location loc);
+  
+  /**
+   * Checks the decorator chain for an instance of <class>decoratorClass</class>
+   * and return true if found.
+   * <P>
+   * The default behavior is to return false. If the current object is a
+   * decorator and is an instance of <class>decoratorClass</class> it should
+   * return true. Otherwise, the decorator should chain this method onto the
+   * instance it wraps.
+   *
+   * @param decoratorClass  the Class to check
+   * @return true if an instance of this class is present in the decorator chain
+   *         and false otherwise.
+   */
+  boolean hasDecorator(Class decoratorClass);
+  /**
    * The minimum position contained.
    *
    * @return	the minimum position contained
@@ -66,6 +94,7 @@ public interface Location {
    *
    * @param l	the Location to check
    * @return	true if they overlap, otherwise false
+   * @deprecated use LocationTools.areOverlapping(Location a, Location b)
    */
   boolean overlaps(Location l);
   /**
@@ -76,6 +105,7 @@ public interface Location {
    *
    * @param l	the Location to check
    * @return	true if this contains l, otherwise false
+   * @deprecated use LocationTools.isContainedBy(Location a, Location b)
    */
   boolean contains(Location l);
   /**
@@ -90,7 +120,9 @@ public interface Location {
    * Checks if this location is equivalent to the other.
    * <P>
    * Abstractly, a location is equal to another if for every point in one
-   * it is also in the other. This is equivalent to a.contains(b) && b.contains(a).
+   * it is also in the other. This is equivalent to
+   * a.contains(b) && b.contains(a). You should call LocationTools.areEqual
+   * after casting l to Location.
    *
    * @param l	the Object to check
    * @return	true if this equals l, otherwise false
@@ -103,6 +135,7 @@ public interface Location {
    * @param l	the Location to intersect with
    * @return	a Location containing all points common to both, or
    *              the empty range if there are no such points
+   * @deprecated use LocationTools.intersection(Location a, Location b)
    */
   Location intersection(Location l);
   /**
@@ -110,6 +143,7 @@ public interface Location {
    *
    * @param l	the Location to union with
    * @return	a Location representing the union
+   * @deprecated use LocationTools.union(Location a, Location b)
    */
   Location union(Location l);
 
@@ -118,6 +152,8 @@ public interface Location {
    *
    * @param seq	the SymbolList to process
    * @return	the SymbolList containing the symbols in seq in this range
+   * @deprecated this was a mistake which has not been necisary since the
+   *             introduction of blockIterator()
    */
   SymbolList symbols(SymbolList seq);
 
@@ -174,6 +210,10 @@ public interface Location {
    * @author Matthew Pocock
    */
   static final class EmptyLocation implements Location, Serializable {
+    public boolean hasDecorator(Class decoratorClass) {
+      return decoratorClass.isInstance(this);
+    }
+    public Location newInstance(Location loc) { return loc; }
     public int getMin() { return Integer.MAX_VALUE; }
     public int getMax() { return Integer.MIN_VALUE; }
     public boolean overlaps(Location l) { return false; }
@@ -208,6 +248,9 @@ public interface Location {
       } catch (NoSuchFieldException nsfe) {
         throw new NotSerializableException(nsfe.getMessage());
       }
+    }
+    public String toString() {
+      return "{}";
     }
   }
   

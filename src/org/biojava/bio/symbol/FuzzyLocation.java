@@ -102,6 +102,16 @@ implements Serializable {
     this.resolver = resolver;
   }
   
+  public Location translate(int dist) {
+    return new FuzzyLocation(
+      outerMin + dist,
+      outerMax + dist, 
+      innerMin + dist,
+      innerMax + dist,
+      resolver
+    );
+  }
+  
   /**
    * Retrieve the Location that this decorates.
    *

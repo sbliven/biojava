@@ -67,8 +67,8 @@ public class EmblViewer2 {
         }
       }
       
-      public double getDepth(SequenceRenderContext context, RangeLocation pos) {
-        return Math.max(fr.getDepth(context, pos), split.getDepth(context, pos));
+      public double getDepth(SequenceRenderContext context) {
+        return Math.max(fr.getDepth(context), split.getDepth(context));
       }
       
       public FeatureHolder processMouseEvent(

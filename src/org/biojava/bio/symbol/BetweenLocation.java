@@ -19,33 +19,37 @@
  *
  */
 
-package org.biojava.bio.gui.sequence;
+package org.biojava.bio.symbol;
+
+import org.biojava.bio.*;
+import org.biojava.utils.*;
+import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.impl.*;
+import org.biojava.bio.seq.io.*;
 
 import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.gui.*;
-
-import java.util.List;
-
-public interface FeatureRenderer {
-  void renderFeature(
-    Graphics2D g,
-    Feature f,
-    SequenceRenderContext context
-  );
+/**
+ * Between view onto an underlying Location instance.
+ *
+ * @author Matthew Pocock
+ * @author Mark Schreiber
+ * @since 1.2
+ */
+public class BetweenLocation
+extends AbstractDecorator {
+  private final int length;
   
-  double getDepth(SequenceRenderContext src);
+  public final int getLength() {
+    return length;
+  }
+
+  public BetweenLocation(Location wrapped, int length) {
+    super(wrapped);
+    this.length = length;
+  }
   
-  public FeatureHolder processMouseEvent(
-    FeatureHolder hits,
-    SequenceRenderContext src,
-    MouseEvent me
-  );
+  protected Location decorate(Location loc) {
+    return new BetweenLocation(loc, getLength());
+  }
 }

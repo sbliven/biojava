@@ -35,14 +35,21 @@ import org.biojava.bio.seq.*;
 
 public class SubSequenceRenderContext
 implements SequenceRenderContext {
-  private final Sequence seq;
   private final SequenceRenderContext src;
+  private final SymbolList symbols;
+  private final FeatureHolder features;
+  private final RangeLocation range;
   
   public SubSequenceRenderContext(
-    SequenceRenderContext src, FeatureHolder fh 
+    SequenceRenderContext src,
+    SymbolList symbols,
+    FeatureHolder features,
+    RangeLocation range
   ) {
     this.src = src;
-    this.seq = new PartialSequence((Sequence) src.getSequence(), fh);
+    this.symbols = symbols;
+    this.features = features;
+    this.range = range;
   }
   
   public int getDirection() {
@@ -65,8 +72,28 @@ implements SequenceRenderContext {
     return src.graphicsToSequence(point);
   }
 
-  public SymbolList getSequence() {
-    return seq;
+  public SymbolList getSymbols() {
+    if(symbols == null) {
+      return src.getSymbols();
+    } else {
+      return symbols;
+    }
+  }
+
+  public FeatureHolder getFeatures() {
+    if(features == null) {
+      return src.getFeatures();
+    } else {
+      return features;
+    }
+  }
+  
+  public RangeLocation getRange() {
+    if(range == null) {
+      return src.getRange();
+    } else {
+      return range;
+    }
   }
   
   public SequenceRenderContext.Border getLeadingBorder() {
@@ -79,98 +106,5 @@ implements SequenceRenderContext {
   
   public Font getFont() {
     return src.getFont();
-  }
-  
-  private static class PartialSequence implements Sequence {
-    private final Sequence seq;
-    private final FeatureHolder fh;
-    
-    public PartialSequence(Sequence seq, FeatureHolder fh) {
-      this.seq = seq;
-      this.fh = fh;
-    }
-    
-    public String getURN() {
-      return seq.getURN();
-    }
-    
-    public String getName() {
-      return seq.getName();
-    }
-    
-    public Annotation getAnnotation() {
-      return seq.getAnnotation();
-    }
-    
-    public int countFeatures() {
-      return fh.countFeatures();
-    }
-    
-    public Iterator features() {
-      return fh.features();
-    }
-    
-    public FeatureHolder filter(FeatureFilter fc, boolean recurse) {
-      return fh.filter(fc, recurse);
-    }
-    
-    public Feature createFeature(Feature.Template ft)
-    throws BioException, ChangeVetoException {
-      return fh.createFeature(ft);
-    }
-    
-    public void removeFeature(Feature f)
-    throws ChangeVetoException {
-      fh.removeFeature(f);
-    }
-    
-    public boolean containsFeature(Feature f) {
-      return fh.containsFeature(f);
-    }
-    
-    public Alphabet getAlphabet() {
-      return seq.getAlphabet();
-    }
-    
-    public int length() {
-      return seq.length();
-    }
-    
-    public Symbol symbolAt(int index) throws IndexOutOfBoundsException {
-      return seq.symbolAt(index);
-    }
-    
-    public List toList() {
-      return seq.toList();
-    }
-    
-    public Iterator iterator() {
-      return seq.iterator();
-    }
-    
-    public SymbolList subList(int start, int end)
-    throws IndexOutOfBoundsException {
-      return seq.subList(start, end);
-    }
-    
-    public String seqString() {
-      return seq.seqString();
-    }
-    
-    public String subStr(int start, int end)
-    throws IndexOutOfBoundsException {
-      return seq.subStr(start, end);
-    }
-    
-    public void edit(Edit edit)
-    throws IndexOutOfBoundsException, IllegalAlphabetException,
-    ChangeVetoException {
-      seq.edit(edit);
-    }
-    
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
   }
 }

@@ -153,39 +153,34 @@ implements SequenceRenderer, Serializable {
   }
    
   
-  public double getDepth(SequenceRenderContext src, RangeLocation pos) {
+  public double getDepth(SequenceRenderContext src) {
     return LayeredRenderer.INSTANCE.getDepth(
       Collections.nCopies(renderers.size(), src),
-      pos,
       renderers
     );
   }
   
-  public double getMinimumLeader(SequenceRenderContext src, RangeLocation pos) {
+  public double getMinimumLeader(SequenceRenderContext src) {
     return LayeredRenderer.INSTANCE.getMinimumLeader(
       Collections.nCopies(renderers.size(), src),
-      pos,
       renderers
     );
   }
 
-  public double getMinimumTrailer(SequenceRenderContext src, RangeLocation pos) {
+  public double getMinimumTrailer(SequenceRenderContext src) {
     return LayeredRenderer.INSTANCE.getMinimumTrailer(
       Collections.nCopies(renderers.size(), src),
-      pos,
       renderers
     );
   }
   
   public void paint(
     Graphics2D g,
-    SequenceRenderContext src,
-    RangeLocation pos
+    SequenceRenderContext src
   ) {
     LayeredRenderer.INSTANCE.paint(
       g,
       Collections.nCopies(renderers.size(), src),
-      pos,
       renderers
     );
   }
@@ -193,15 +188,13 @@ implements SequenceRenderer, Serializable {
   public SequenceViewerEvent processMouseEvent(
     SequenceRenderContext src,
     MouseEvent me,
-    List path,
-    RangeLocation pos
+    List path
   ) {
     path.add(this);
     SequenceViewerEvent sve = LayeredRenderer.INSTANCE.processMouseEvent(
       Collections.nCopies(renderers.size(), src),
       me,
       path,
-      pos,
       renderers
     );
     

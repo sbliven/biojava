@@ -50,43 +50,38 @@ extends SequenceRendererWrapper {
     return super.getChangeSupport(ct);
   }
   
-  public double getDepth(SequenceRenderContext src, RangeLocation pos) {
-    List layers = layer(src, pos);
+  public double getDepth(SequenceRenderContext src) {
+    List layers = layer(src);
     return LayeredRenderer.INSTANCE.getDepth(
       layers,
-      pos,
       Collections.nCopies(layers.size(), getRenderer())
     );
   }
   
-  public double getMinimumLeader(SequenceRenderContext src, RangeLocation pos) {
-    List layers = layer(src, pos);
+  public double getMinimumLeader(SequenceRenderContext src) {
+    List layers = layer(src);
     return LayeredRenderer.INSTANCE.getMinimumLeader(
       layers,
-      pos,
       Collections.nCopies(layers.size(), getRenderer())
     );
   }
   
-  public double getMinimumTrailer(SequenceRenderContext src, RangeLocation pos) {
-    List layers = layer(src, pos);
+  public double getMinimumTrailer(SequenceRenderContext src) {
+    List layers = layer(src);
     return LayeredRenderer.INSTANCE.getMinimumTrailer(
       layers,
-      pos,
       Collections.nCopies(layers.size(), getRenderer())
     );
   }
   
   public void paint(
     Graphics2D g,
-    SequenceRenderContext src,
-    RangeLocation pos
+    SequenceRenderContext src
   ) {
-    List layers = layer(src, pos);
+    List layers = layer(src);
     LayeredRenderer.INSTANCE.paint(
       g,
       layers,
-      pos,
       Collections.nCopies(layers.size(), getRenderer())
     );
   }
@@ -94,16 +89,14 @@ extends SequenceRendererWrapper {
   public SequenceViewerEvent processMouseEvent(
     SequenceRenderContext src,
     MouseEvent me,
-    List path,
-    RangeLocation pos
+    List path
   ) {
     path.add(this);
-    List layers = layer(src, pos);
+    List layers = layer(src);
     SequenceViewerEvent sve = LayeredRenderer.INSTANCE.processMouseEvent(
       layers,
       me,
       path,
-      pos,
       Collections.nCopies(layers.size(), getRenderer())
     );
     
@@ -120,18 +113,18 @@ extends SequenceRendererWrapper {
     return sve;
   }
 
-  private CacheMap contextCache = new FixedSizeMap(10);
+  private CacheMap contextCache = new FixedSizeMap(5);
   private Set flushers = new HashSet();
   
-  protected List layer(SequenceRenderContext src, RangeLocation pos) {
-    FeatureFilter filt = new FeatureFilter.OverlapsLocation(pos);
+  protected List layer(SequenceRenderContext src) {
+    FeatureFilter filt = new FeatureFilter.OverlapsLocation(src.getRange());
     CtxtFilt gopher = new CtxtFilt(src, filt, false);
     List layers = (List) contextCache.get(gopher);
     if(layers == null) {
       layers = doLayer(src, filt);
       contextCache.put(gopher, layers);
       CacheFlusher cf = new CacheFlusher(gopher);
-      ((Sequence) src.getSequence()).addChangeListener(cf, FeatureHolder.FEATURES);
+      ((Changeable) src.getSymbols()).addChangeListener(cf, FeatureHolder.FEATURES);
       flushers.add(cf);
     }
     
@@ -139,12 +132,12 @@ extends SequenceRendererWrapper {
   }
   
   protected List doLayer(SequenceRenderContext src, FeatureFilter filt) {
-    Sequence seq = (Sequence) src.getSequence();
+    FeatureHolder features = src.getFeatures();
     List layers = new ArrayList();
     List layerLocs = new ArrayList();
     
     for(
-      Iterator fi = seq.filter(
+      Iterator fi = features.filter(
         filt, false
       ).features();
       fi.hasNext();
@@ -189,7 +182,9 @@ extends SequenceRendererWrapper {
       FeatureHolder layer = (FeatureHolder) i.next();
       contexts.add(new SubSequenceRenderContext(
         src,
-        layer
+        null,
+        layer,
+        null
       ));
     }
     

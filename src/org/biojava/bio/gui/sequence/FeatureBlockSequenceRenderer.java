@@ -113,30 +113,29 @@ implements SequenceRenderer {
     }
   }
   
-  public double getDepth(SequenceRenderContext src, RangeLocation pos) {
-    Sequence sp = (Sequence) src.getSequence();
+  public double getDepth(SequenceRenderContext src) {
+    FeatureHolder features = src.getFeatures();
     FeatureFilter filter =
-      new FeatureFilter.OverlapsLocation(pos);
-    FeatureHolder fh = sp.filter(filter, false);
+      new FeatureFilter.OverlapsLocation(src.getRange());
+    FeatureHolder fh = features.filter(filter, false);
     if(fh.countFeatures() > 0) {
-      return renderer.getDepth(src, pos);
+      return renderer.getDepth(src);
     } else {
       return 0.0;
     }
   }
   
-  public double getMinimumLeader(SequenceRenderContext src, RangeLocation pos) {
+  public double getMinimumLeader(SequenceRenderContext src) {
     return 0.0;
   }
   
-  public double getMinimumTrailer(SequenceRenderContext src, RangeLocation pos) {
+  public double getMinimumTrailer(SequenceRenderContext src) {
     return 0.0;
   }
   
   public void paint(
       Graphics2D g,
-      SequenceRenderContext sp, 
-      RangeLocation pos
+      SequenceRenderContext src
   ) {
     Shape oldClip = g.getClip();
     
@@ -144,28 +143,27 @@ implements SequenceRenderer {
     Rectangle2D box = new Rectangle2D.Double();
     
     for(
-      Iterator i = ((Sequence) sp.getSequence()).filter(
-        new FeatureFilter.OverlapsLocation(pos), false
+      Iterator i = src.getFeatures().filter(
+        new FeatureFilter.OverlapsLocation(src.getRange()), false
       ).features();
       i.hasNext();
     ) {
       Feature f = (Feature) i.next();
       Location l = f.getLocation();
       
-      renderer.renderFeature(g, f, sp);
+      renderer.renderFeature(g, f, src);
     }
   }
 
   public SequenceViewerEvent processMouseEvent(
     SequenceRenderContext src,
     MouseEvent me,
-    List path,
-    RangeLocation pos
+    List path
   ) {
     path.add(this);
     int sPos = src.graphicsToSequence(me.getPoint());
     
-    FeatureHolder hits = ((Sequence) src.getSequence()).filter(
+    FeatureHolder hits = src.getFeatures().filter(
       new FeatureFilter.OverlapsLocation(new PointLocation(sPos)), false
     );
 

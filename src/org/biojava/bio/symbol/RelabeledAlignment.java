@@ -1,0 +1,123 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
+package org.biojava.bio.symbol;
+
+import java.util.*;
+
+import org.biojava.utils.*;
+
+/**
+ * An alignment that relabels another alignment.
+ */
+public class RelabeledAlignment implements Alignment {
+  private Alignment delegate;
+  private Map labelMap = new HashMap();
+  
+  public RelabeledAlignment(Alignment delegate) {
+    this.delegate = delegate;
+    for(Iterator i = delegate.getLabels().iterator(); i.hasNext(); ) {
+      Object label = i.next();
+      labelMap.put(label, label);
+    }
+  }
+  
+  public List getLabels() {
+    return new ArrayList(labelMap.keySet());
+  }
+  
+  public Symbol symbolAt(Object label, int column)
+  throws NoSuchElementException {
+    return delegate.symbolAt(map(label), column);
+  }
+  
+  public SymbolList symbolListForLabel(Object label)
+  throws NoSuchElementException {
+    return delegate.symbolListForLabel(map(label));
+  }
+  
+  public Alignment subAlignment(Set labels, Location loc)
+  throws NoSuchElementException {
+    return new RelabeledAlignment(delegate.subAlignment(map(labels), loc));
+  }
+  
+  public String seqString() {
+    return delegate.seqString();
+  }
+  
+  public String subStr(int min, int max) {
+    return delegate.subStr(min, max);
+  }
+  
+  public Alphabet getAlphabet() {
+    return delegate.getAlphabet();
+  }
+  
+  public Iterator iterator() {
+    return delegate.iterator();
+  }
+  
+  public int length() {
+    return delegate.length();
+  }
+  
+  public List toList() {
+    return delegate.toList();
+  }
+  
+  public SymbolList subList(int min, int max) {
+    return delegate.subList(min, max);
+  }
+  
+  public Symbol symbolAt(int pos) {
+    return delegate.symbolAt(pos);
+  }
+  
+  public void edit(Edit edit)
+  throws IllegalAlphabetException, ChangeVetoException {
+    delegate.edit(edit);
+  }
+  
+  public void addChangeListener(ChangeListener cl) {
+  }
+  
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+  }
+  
+  public void removeChangeListener(ChangeListener cl) {
+  }
+  
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+  }
+
+  protected Set map(Set labels) {
+    Set set = new HashSet();
+    for(Iterator i = labels.iterator(); i.hasNext(); ) {
+      set.add(map(i.next()));
+    }
+    return set;
+  }
+  
+  protected Object map(Object label) {
+    return labelMap.get(label);
+  }
+}
+

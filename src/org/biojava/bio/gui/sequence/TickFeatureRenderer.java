@@ -203,7 +203,7 @@ implements FeatureRenderer {
     }
   }
   
-  public double getDepth(SequenceRenderContext src, RangeLocation pos) {
+  public double getDepth(SequenceRenderContext src) {
       return depth;
   }
   

@@ -36,23 +36,23 @@ import java.util.List;
 public class SymbolSequenceRenderer implements SequenceRenderer {
     private double depth = 25.0;
     
-    public double getDepth(SequenceRenderContext src, RangeLocation pos) {
+    public double getDepth(SequenceRenderContext src) {
       return depth + 1.0;
     }
 
-    public double getMinimumLeader(SequenceRenderContext src, RangeLocation pos) {
+    public double getMinimumLeader(SequenceRenderContext src) {
       return 0.0;
     }
 
-    public double getMinimumTrailer(SequenceRenderContext src, RangeLocation pos) {
+    public double getMinimumTrailer(SequenceRenderContext src) {
       return 0.0;
     }
 
     public void paint(
-      Graphics2D g, SequenceRenderContext src,
-      RangeLocation pos
+      Graphics2D g,
+      SequenceRenderContext src
     ) {
-      SymbolList seq = src.getSequence();
+      SymbolList seq = src.getSymbols();
       int direction = src.getDirection();
       
       g.setFont(src.getFont());
@@ -80,7 +80,7 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
         
         int leading;
         int trailing;
-        int symOffset = pos.getMin();
+        int symOffset = src.getRange().getMin();
         double graphOffset = src.sequenceToGraphics(symOffset);
         if(src.getDirection() == src.HORIZONTAL) {
           leading = src.graphicsToSequence(oldClip.getMinX());
@@ -97,11 +97,11 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
         }
         Rectangle2D clip = g.getClipBounds();
         
-        int min = Math.max(pos.getMin(), leading);
-        int max = Math.min(pos.getMax(), trailing+1);
+        int min = Math.max(src.getRange().getMin(), leading);
+        int max = Math.min(src.getRange().getMax(), trailing+1);
         
         System.out.println("oldTrans: " + oldTrans);
-        System.out.println("pos: " + pos);
+        System.out.println("pos: " + src.getRange());
         System.out.println("symOffset: " + symOffset);
         System.out.println("graphOffset: " + graphOffset);
         System.out.println("leading: " + leading);
@@ -144,8 +144,7 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
   public SequenceViewerEvent processMouseEvent(
     SequenceRenderContext src,
     MouseEvent me,
-    List path,
-    RangeLocation pos
+    List path
   ) {
     path.add(this);
     int sPos = src.graphicsToSequence(me.getPoint());

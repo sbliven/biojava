@@ -35,7 +35,7 @@ import org.biojava.bio.*;
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  */
-public class FuzzyPointLocation implements Location, Serializable
+public class FuzzyPointLocation extends AbstractLocation
 {
     // Use the minimum value
     public final static PointResolver RESOLVE_MIN;
@@ -142,14 +142,6 @@ public class FuzzyPointLocation implements Location, Serializable
 	    : Location.empty;
     }
 
-    public Location union(Location loc)
-    {
-	List locations = new ArrayList();
-	locations.add(this);
-	locations.add(loc);
-	CompoundLocation cl = new CompoundLocation(locations);
-	return cl;
-    }
 
     public SymbolList symbols(SymbolList slist)
     {

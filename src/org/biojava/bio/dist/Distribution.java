@@ -34,12 +34,10 @@ import org.biojava.utils.*;
  * choose to store something else instead, but it is not guaranteed that
  * all algorithms will work correctly.
  * <P>
- * This interface should handle the case of emitting an ambiguity symbol. In
- * classical statistics, this would be just the sum of the probabiltiy of
- * emitting each matching symbol. However, in our domain, only one symbol can
- * actualy be produced, and the ambiguity symbol means 'one of these', not
- * 'each of these', you should take a weighted average:<code>
- * <pre>P(A|S, Null) = [ sum_i P(a_i|S) * P(a_i|Null) ] / [ sum_i P(a_i|Null) ]</pre>
+ * This interface should handle the case of emitting an ambiguity symbol.
+ * This should be just the sum of the probabiltiy of emitting each matching
+ * symbol. It is up to the code using the Distribution instance to divide out
+ * the null model appropreately.
  * </code>
  *
  * @author Matthew Pocock
@@ -84,8 +82,8 @@ public interface Distribution extends Changeable {
   /**
    * Return the probability that Symbol s is emited by this spectrum.
    * <P>
-   * If the symbol is an AmbiguitySymbol, then it is the probability that
-   * exactly one of the symbols matching it was emitted.
+   * If the symbol is  ambiguou, then it is the sum of the probability that
+   * each one of the matching symbols was emitted.
    *
    * @param s the Symbol emitted
    * @return  the probability of emitting that symbol

@@ -70,7 +70,7 @@ Changeable {
     SequenceRenderContext.LAYOUT
   );
 
-  private SymbolList sequence;
+  private Sequence sequence;
   private RangeLocation range;
   private int direction;
   private double scale;
@@ -94,8 +94,7 @@ Changeable {
       SequenceViewerEvent sve = renderer.processMouseEvent(
         SequencePanel.this,
         me,
-        new ArrayList(),
-        range
+        new ArrayList()
       );
       me.translatePoint(-dist[0], -dist[1]);
       svSupport.fireMouseClicked(sve);
@@ -110,8 +109,7 @@ Changeable {
       SequenceViewerEvent sve = renderer.processMouseEvent(
         SequencePanel.this,
         me,
-        new ArrayList(),
-        range
+        new ArrayList()
       );
       me.translatePoint(-dist[0], -dist[1]);
       svSupport.fireMousePressed(sve);
@@ -126,8 +124,7 @@ Changeable {
       SequenceViewerEvent sve = renderer.processMouseEvent(
         SequencePanel.this,
         me,
-        new ArrayList(),
-        range
+        new ArrayList()
       );
       me.translatePoint(-dist[0], -dist[1]);
       svSupport.fireMouseReleased(sve);
@@ -151,8 +148,7 @@ Changeable {
       SequenceViewerEvent sve = renderer.processMouseEvent(
         SequencePanel.this,
         me,
-        new ArrayList(),
-        range
+        new ArrayList()
       );
       me.translatePoint(-dist[0], -dist[1]);
       svmSupport.fireMouseDragged(sve);
@@ -167,8 +163,7 @@ Changeable {
       SequenceViewerEvent sve = renderer.processMouseEvent(
         SequencePanel.this,
         me,
-        new ArrayList(),
-        range
+        new ArrayList()
       );
       me.translatePoint(-dist[0], -dist[1]);
       svmSupport.fireMouseMoved(sve);
@@ -258,7 +253,7 @@ Changeable {
    *
    * @param s  the SymboList to render
    */
-  public void setSequence(SymbolList s) {
+  public void setSequence(Sequence s) {
     SymbolList oldSequence = sequence;
     if(oldSequence != null) {
       oldSequence.removeChangeListener(layoutListener);
@@ -272,12 +267,20 @@ Changeable {
     firePropertyChange("sequence", oldSequence, s);
   }
 
+  public Sequence getSequence() {
+    return sequence;
+  }
+  
   /**
    * Retrieve the currently rendered SymbolList
    *
    * @return  the current SymbolList
    */
-  public SymbolList getSequence() {
+  public SymbolList getSymbols() {
+    return sequence;
+  }
+  
+  public FeatureHolder getFeatures() {
     return sequence;
   }
 
@@ -383,11 +386,11 @@ Changeable {
     Rectangle2D currentClip = g2.getClip().getBounds2D();
     
     double minAcross = sequenceToGraphics(range.getMin()) -
-                       renderer.getMinimumLeader(this, range);
+                       renderer.getMinimumLeader(this);
     double maxAcross = sequenceToGraphics(range.getMax()) + 1 +
-                       renderer.getMinimumTrailer(this, range);
+                       renderer.getMinimumTrailer(this);
     double alongDim = maxAcross - minAcross;
-    double depth = renderer.getDepth(this, range);
+    double depth = renderer.getDepth(this);
     Rectangle2D.Double clip = new Rectangle2D.Double();
     if (direction == HORIZONTAL) {
       clip.x = minAcross;
@@ -405,7 +408,7 @@ Changeable {
 
     Shape oldClip = g2.getClip();
     g2.clip(clip);
-    renderer.paint(g2, this, range);
+    renderer.paint(g2, this);
     g2.setClip(oldClip);
     g2.setTransform(oldTransform);
   }
@@ -476,12 +479,12 @@ Changeable {
     } else {
       double minAcross = sequenceToGraphics(range.getMin());
       double maxAcross = sequenceToGraphics(range.getMax());
-      double lb = renderer.getMinimumLeader(this, range);
-      double tb = renderer.getMinimumTrailer(this, range);
+      double lb = renderer.getMinimumLeader(this);
+      double tb = renderer.getMinimumTrailer(this);
       double alongDim =
         (maxAcross - minAcross) +
         lb + tb;
-      double depth = renderer.getDepth(this, range);
+      double depth = renderer.getDepth(this);
       if(direction == HORIZONTAL) {
         d = new Dimension((int) Math.ceil(alongDim), (int) Math.ceil(depth));
       } else {
@@ -504,7 +507,7 @@ Changeable {
   
   protected int [] calcDist() {
     double minAcross = sequenceToGraphics(range.getMin()) -
-                       renderer.getMinimumLeader(this, range);
+                       renderer.getMinimumLeader(this);
     int [] dist = new int[2];
     if(direction == HORIZONTAL) {
       dist[0] = (int) minAcross;

@@ -62,4 +62,12 @@ implements Serializable {
     this.min = min;
     this.max = max;
   }
+  
+  public Location translate(int dist) {
+    return new RangeLocation(min + dist, max + dist);
+  }
+  
+  public String toString() {
+    return "[" + getMin() + "," + getMax() + "]";
+  }
 }

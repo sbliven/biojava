@@ -38,16 +38,16 @@ import java.util.List;
 public class RulerRenderer implements SequenceRenderer {
   private double depth = 25.0;
   
-  public double getDepth(SequenceRenderContext src, RangeLocation pos) {
+  public double getDepth(SequenceRenderContext src) {
     return depth + 1.0;
   }
   
-  public double getMinimumLeader(SequenceRenderContext src, RangeLocation pos) {
+  public double getMinimumLeader(SequenceRenderContext src) {
     return 0.0;
   }
   
-  public double getMinimumTrailer(SequenceRenderContext src, RangeLocation pos) {
-    String lengthString = String.valueOf(src.getSequence().length());
+  public double getMinimumTrailer(SequenceRenderContext src) {
+    String lengthString = String.valueOf(src.getSymbols().length());
     Font f = src.getFont();
     FontRenderContext frc = new FontRenderContext(null, true, true);
     GlyphVector gv = f.createGlyphVector(frc, lengthString);
@@ -55,13 +55,12 @@ public class RulerRenderer implements SequenceRenderer {
   }
   
   public void paint(
-    Graphics2D g, SequenceRenderContext src,
-    RangeLocation pos
+    Graphics2D g, SequenceRenderContext src
   ) {
     g.setPaint(Color.black);
     
-    int min = pos.getMin();
-    int max = pos.getMax();
+    int min = src.getRange().getMin();
+    int max = src.getRange().getMax();
     double minX = src.sequenceToGraphics(min);
     double maxX = src.sequenceToGraphics(max);
     double scale = src.getScale();
@@ -102,8 +101,7 @@ public class RulerRenderer implements SequenceRenderer {
   public SequenceViewerEvent processMouseEvent(
     SequenceRenderContext src,
     MouseEvent me,
-    List path,
-    RangeLocation pos
+    List path
   ) {
     path.add(this);
     int sPos = src.graphicsToSequence(me.getPoint());

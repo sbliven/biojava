@@ -70,7 +70,7 @@ Changeable {
     SequenceRenderContext.LAYOUT
   );
 
-  private SymbolList sequence;
+  private Sequence sequence;
   private int direction;
   private double scale;
   private int lines;
@@ -99,10 +99,12 @@ Changeable {
       int[] lineExtent = calcLineExtent(me);
       me.translatePoint(-lineExtent[2], -lineExtent[3]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
-        SequencePoster.this,
+        new SubSequenceRenderContext(
+          SequencePoster.this, null, null,
+          new RangeLocation(lineExtent[0], lineExtent[1])
+        ), 
         me,
-        new ArrayList(),
-        new RangeLocation(lineExtent[0], lineExtent[1])
+        new ArrayList()
       );
       me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svSupport.fireMouseClicked(sve);
@@ -115,10 +117,12 @@ Changeable {
       int[] lineExtent = calcLineExtent(me);
       me.translatePoint(-lineExtent[2], -lineExtent[3]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
-        SequencePoster.this,
+        new SubSequenceRenderContext(
+          SequencePoster.this, null, null,
+          new RangeLocation(lineExtent[0], lineExtent[1])
+        ), 
         me,
-        new ArrayList(),
-        new RangeLocation(lineExtent[0], lineExtent[1])
+        new ArrayList()
       );
       me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svSupport.fireMousePressed(sve);
@@ -131,10 +135,12 @@ Changeable {
       int[] lineExtent = calcLineExtent(me);
       me.translatePoint(-lineExtent[2], -lineExtent[3]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
-        SequencePoster.this,
+        new SubSequenceRenderContext(
+          SequencePoster.this, null, null,
+          new RangeLocation(lineExtent[0], lineExtent[1])
+        ), 
         me,
-        new ArrayList(),
-        new RangeLocation(lineExtent[0], lineExtent[1])
+        new ArrayList()
       );
       me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svSupport.fireMouseReleased(sve);
@@ -156,10 +162,12 @@ Changeable {
       int[] lineExtent = calcLineExtent(me);
       me.translatePoint(-lineExtent[2], -lineExtent[3]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
-        SequencePoster.this,
+        new SubSequenceRenderContext(
+          SequencePoster.this, null, null,
+          new RangeLocation(lineExtent[0], lineExtent[1])
+        ), 
         me,
-        new ArrayList(),
-        new RangeLocation(lineExtent[0], lineExtent[1])
+        new ArrayList()
       );
       me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svmSupport.fireMouseDragged(sve);
@@ -172,10 +180,12 @@ Changeable {
       int[] lineExtent = calcLineExtent(me);
       me.translatePoint(-lineExtent[2], -lineExtent[3]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
-        SequencePoster.this,
+        new SubSequenceRenderContext(
+          SequencePoster.this, null, null,
+          new RangeLocation(lineExtent[0], lineExtent[1])
+        ), 
         me,
-        new ArrayList(),
-        new RangeLocation(lineExtent[0], lineExtent[1])
+        new ArrayList()
       );
       me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svmSupport.fireMouseMoved(sve);
@@ -267,8 +277,8 @@ Changeable {
    *
    * @param s  the SymboList to render
    */
-  public void setSequence(SymbolList s) {
-    SymbolList oldSequence = sequence;
+  public void setSequence(Sequence s) {
+    Sequence oldSequence = sequence;
     if(oldSequence != null) {
       oldSequence.removeChangeListener(layoutListener);
     }
@@ -279,15 +289,27 @@ Changeable {
     firePropertyChange("sequence", oldSequence, s);
   }
 
+  public Sequence getSequence() {
+    return sequence;
+  }
+  
   /**
    * Retrieve the currently rendered SymbolList
    *
    * @return  the current SymbolList
    */
-  public SymbolList getSequence() {
+  public SymbolList getSymbols() {
     return sequence;
   }
 
+  public FeatureHolder getFeatures() {
+    return sequence;
+  }
+  
+  public RangeLocation getRange() {
+    return new RangeLocation(1, sequence.length());
+  }
+  
   /**
    * Set the direction that this SequencePoster renders in. The direction can be
    * one of HORIZONTAL or VERTICAL. Once the direction is set, the display will
@@ -488,7 +510,7 @@ Changeable {
       
       Shape oldClip = g2.getClip();
       g2.clip(clip);
-      renderer.paint(g2, this, pos);
+      renderer.paint(g2, this);
       g2.setClip(oldClip);
       
       if (direction == HORIZONTAL) {
@@ -594,8 +616,8 @@ Changeable {
       acrossDim = 0.0;
       
       RangeLocation range = new RangeLocation(1, sequence.length());
-      double insetBefore = renderer.getMinimumLeader(this, range);
-      double insetAfter = renderer.getMinimumTrailer(this, range);
+      double insetBefore = renderer.getMinimumLeader(this);
+      double insetAfter = renderer.getMinimumTrailer(this);
 
       leadingBorder.setSize(insetBefore);
       trailingBorder.setSize(insetAfter);
@@ -636,7 +658,7 @@ Changeable {
       while(min <= sequence.length()) {
         int max = min + symbolsPerLine - 1;
         RangeLocation pos = new RangeLocation(min, max);
-        double depth = renderer.getDepth(this, pos);
+        double depth = renderer.getDepth(this);
         acrossDim += depth + spacer;
         offsets[li] = acrossDim;
         min = max + 1;

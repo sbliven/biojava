@@ -122,50 +122,46 @@ extends SequenceRendererWrapper {
     return this.recurse;
   }
 
-  public double getDepth(SequenceRenderContext src, RangeLocation pos) {
-    return super.getDepth(getContext(src, pos), pos);
+  public double getDepth(SequenceRenderContext src) {
+    return super.getDepth(getContext(src));
   }    
   
-  public double getMinimumLeader(SequenceRenderContext src, RangeLocation pos) {
-    return super.getMinimumLeader(getContext(src, pos), pos);
+  public double getMinimumLeader(SequenceRenderContext src) {
+    return super.getMinimumLeader(getContext(src));
   }
   
-  public double getMinimumTrailer(SequenceRenderContext src, RangeLocation pos) {
-    return super.getMinimumTrailer(getContext(src, pos), pos);
+  public double getMinimumTrailer(SequenceRenderContext src) {
+    return super.getMinimumTrailer(getContext(src));
   }
   
   public void paint(
     Graphics2D g,
-    SequenceRenderContext src,
-    RangeLocation pos
+    SequenceRenderContext src
   ) {
-    super.paint(g, getContext(src, pos), pos);
+    super.paint(g, getContext(src));
   }
   
   public SequenceViewerEvent processMouseEvent(
     SequenceRenderContext src,
     MouseEvent me,
-    List path,
-    RangeLocation pos
+    List path
   ) {
     return super.processMouseEvent(
-      getContext(src, pos),
+      getContext(src),
       me,
-      path,
-      pos
+      path
     );
   }
   
-  private CacheMap contextCache = new FixedSizeMap(10);
+  private CacheMap contextCache = new FixedSizeMap(5);
   private Set flushers = new HashSet();
   
   protected SequenceRenderContext getContext(
-    SequenceRenderContext src,
-    RangeLocation pos
+    SequenceRenderContext src
   ) {
     FeatureFilter actual = new FeatureFilter.And(
       filter,
-      new FeatureFilter.OverlapsLocation(pos)
+      new FeatureFilter.OverlapsLocation(src.getRange())
     );
     
     CtxtFilt gopher = new CtxtFilt(src, actual, recurse);
@@ -173,11 +169,13 @@ extends SequenceRendererWrapper {
     if(subSrc == null) {
       subSrc = new SubSequenceRenderContext(
                 src,
-                ((Sequence) src.getSequence()).filter(actual, recurse)
+                null,
+                src.getFeatures().filter(actual, recurse),
+                null
       );
       contextCache.put(gopher, subSrc);
       CacheFlusher cf = new CacheFlusher(gopher);
-      ((Sequence) src.getSequence()).addChangeListener(cf, FeatureHolder.FEATURES);
+      ((Changeable) src.getSymbols()).addChangeListener(cf, FeatureHolder.FEATURES);
       flushers.add(cf);
     }
     

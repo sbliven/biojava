@@ -31,8 +31,9 @@ import org.biojava.bio.gui.*;
 
 /**
  * A context within sequence information may be rendered. It encapsulates the
- * rendering direction, the size of the leading and trailing (header/footer
- *, left/right areas), scale and the currently rendered sequence.
+ * rendering direction, the size of the leading and trailing (header/footer,
+ * left/right areas), scale and the currently rendered symbols, features and
+ * region.
  *
  * @author     Thomas Down
  * @author     Matthew Pocock
@@ -94,12 +95,26 @@ public interface SequenceRenderContext extends SwingConstants {
   int graphicsToSequence(Point point);
 
   /**
-   *  The Sequence that is currently rendered by this SequenceRenderContext. 
+   *  The SymbolList that is currently rendered by this SequenceRenderContext. 
    *
    * @return    The Sequence value 
    */
-  SymbolList getSequence();
+  SymbolList getSymbols();
 
+  /**
+   * The features to render.
+   *
+   * @return a FeatureHolder with the Features to render
+   */
+  FeatureHolder getFeatures();
+  
+  /**
+   * The range of the SymbolList to render.
+   *
+   * @return the RangeLocation specifying which indecies (inclusive) to render
+   */
+  RangeLocation getRange();
+  
   /**
    *  Gets the LeadingBorder attribute of the SequenceRenderContext object.
    * This represents the space between the beginning of the redering area and

@@ -99,34 +99,32 @@ implements SequenceRenderer, Serializable {
     return this.renderer;
   }
   
-  public double getDepth(SequenceRenderContext src, RangeLocation pos) {
-    return getRenderer().getDepth(src, pos);
+  public double getDepth(SequenceRenderContext src) {
+    return getRenderer().getDepth(src);
   }
   
-  public double getMinimumLeader(SequenceRenderContext src, RangeLocation pos) {
-    return getRenderer().getMinimumLeader(src, pos);
+  public double getMinimumLeader(SequenceRenderContext src) {
+    return getRenderer().getMinimumLeader(src);
   }
   
-  public double getMinimumTrailer(SequenceRenderContext src, RangeLocation pos) {
-    return getRenderer().getMinimumTrailer(src, pos);
+  public double getMinimumTrailer(SequenceRenderContext src) {
+    return getRenderer().getMinimumTrailer(src);
   }
   
   public void paint(
     Graphics2D g,
-    SequenceRenderContext src,
-    RangeLocation pos
+    SequenceRenderContext src
   ) {
-    getRenderer().paint(g, src, pos);
+    getRenderer().paint(g, src);
   }
   
   public SequenceViewerEvent processMouseEvent(
     SequenceRenderContext src,
     MouseEvent me,
-    List path,
-    RangeLocation pos
+    List path
   ) {
     path.add(this);
-    return getRenderer().processMouseEvent(src, me, path, pos);
+    return getRenderer().processMouseEvent(src, me, path);
   }
 }
 

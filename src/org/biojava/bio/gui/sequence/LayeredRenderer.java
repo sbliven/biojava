@@ -38,7 +38,6 @@ public class LayeredRenderer {
   
   public double getDepth(
     List srcL,
-    RangeLocation pos,
     List renderers
   ) {
     if(srcL.size() != renderers.size()) {
@@ -53,12 +52,12 @@ public class LayeredRenderer {
     while(srcI.hasNext() && i.hasNext()) {
       SequenceRenderContext src = (SequenceRenderContext) srcI.next();
       SequenceRenderer sRend = (SequenceRenderer) i.next();
-      depth += sRend.getDepth(src, pos);
+      depth += sRend.getDepth(src);
     }
     return depth;
   }
   
-  public double getMinimumLeader(List srcL, RangeLocation pos, List renderers) {
+  public double getMinimumLeader(List srcL, List renderers) {
     if(srcL.size() != renderers.size()) {
       throw new IllegalArgumentException(
         "srcL and renderers must be the same size: " +
@@ -71,12 +70,12 @@ public class LayeredRenderer {
     while(srcI.hasNext() && i.hasNext()) {
       SequenceRenderContext src = (SequenceRenderContext) srcI.next();
       SequenceRenderer sRend = (SequenceRenderer) i.next();
-      max = Math.max(max, sRend.getMinimumLeader(src, pos));
+      max = Math.max(max, sRend.getMinimumLeader(src));
     }
     return max;
   }
   
-  public double getMinimumTrailer(List srcL, RangeLocation pos, List renderers) {
+  public double getMinimumTrailer(List srcL, List renderers) {
     if(srcL.size() != renderers.size()) {
       throw new IllegalArgumentException(
         "srcL and renderers must be the same size: " +
@@ -89,7 +88,7 @@ public class LayeredRenderer {
     while(srcI.hasNext() && i.hasNext()) {
       SequenceRenderContext src = (SequenceRenderContext) srcI.next();
       SequenceRenderer sRend = (SequenceRenderer) i.next();
-      max = Math.max(max, sRend.getMinimumTrailer(src, pos));
+      max = Math.max(max, sRend.getMinimumTrailer(src));
     }
     return max;
   }
@@ -97,7 +96,6 @@ public class LayeredRenderer {
   public void paint(
     Graphics2D g,
     List srcL,
-    RangeLocation pos,
     List renderers
   ) {
     if(srcL.size() != renderers.size()) {
@@ -117,11 +115,11 @@ public class LayeredRenderer {
       SequenceRenderContext src = (SequenceRenderContext) srcI.next();
       SequenceRenderer sRend = (SequenceRenderer) i.next();
       int dir = src.getDirection();
-      double depth = sRend.getDepth(src, pos);
-      double minP = src.sequenceToGraphics(pos.getMin()) -
-                    sRend.getMinimumLeader(src, pos);
-      double maxP = src.sequenceToGraphics(pos.getMax()) +
-                    sRend.getMinimumTrailer(src, pos);
+      double depth = sRend.getDepth(src);
+      double minP = src.sequenceToGraphics(src.getRange().getMin()) -
+                    sRend.getMinimumLeader(src);
+      double maxP = src.sequenceToGraphics(src.getRange().getMax()) +
+                    sRend.getMinimumTrailer(src);
       
       if(dir == src.HORIZONTAL) {
         clip.setFrame(minP, 0.0, maxP - minP, depth);
@@ -133,7 +131,7 @@ public class LayeredRenderer {
       
       Shape oldClip = g.getClip();
       g.clip(clip);
-      sRend.paint(g, src, pos);
+      sRend.paint(g, src);
       g.setClip(oldClip);
       
       if(dir == src.HORIZONTAL) {
@@ -142,7 +140,7 @@ public class LayeredRenderer {
         g.translate(-offset, 0.0);
       }
       
-      offset += sRend.getDepth(src, pos);
+      offset += sRend.getDepth(src);
     }
   }
   
@@ -150,7 +148,6 @@ public class LayeredRenderer {
     List srcL,
     MouseEvent me,
     List path,
-    RangeLocation pos,
     List renderers
   ) {
     if(srcL.size() != renderers.size()) {
@@ -167,14 +164,14 @@ public class LayeredRenderer {
     while(srcI.hasNext() && i.hasNext()) {
       SequenceRenderContext src = (SequenceRenderContext) srcI.next();
       SequenceRenderer sRend = (SequenceRenderer) i.next();
-      double depth = sRend.getDepth(src, pos);
+      double depth = sRend.getDepth(src);
       
       SequenceViewerEvent sve = null;
       if(src.getDirection() == src.HORIZONTAL) {
         if( (me.getY() >= offset) && (me.getY() < offset + depth) ) {
           me.translatePoint(0, (int) -offset);
           sve = sRend.processMouseEvent(
-            src, me, path, pos
+            src, me, path
           );
           me.translatePoint(0, (int) +offset);
         }
@@ -182,7 +179,7 @@ public class LayeredRenderer {
         if( (me.getX() >= offset) && (me.getX() < offset + depth) ) {
           me.translatePoint((int) -offset, 0);
           sve = sRend.processMouseEvent(
-            src, me, path, pos
+            src, me, path
           );
           me.translatePoint((int) +offset, 0);
         }

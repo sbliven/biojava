@@ -32,7 +32,9 @@ import org.biojava.bio.*;
  *
  * @author Matthew Pocock
  */
-public class PointLocation implements Location, Serializable {
+public class PointLocation
+extends AbstractLocation
+implements Location, Serializable {
   /**
    * The actual index contained.
    */
@@ -40,40 +42,8 @@ public class PointLocation implements Location, Serializable {
 
   public int getMin()	{ return point; }
   public int getMax()	{ return point; }
-  public boolean overlaps(Location l)	{ return l.contains(this); }
-  public boolean contains(Location l)	{ return (this.point == l.getMin()) &&
-                                                   (this.point == l.getMax()); }
   public boolean contains(int p)	{ return this.point == p; }
-  /**
-  *Test for equality with another Location object
-  *@param l location to compare with
-  */
-  public boolean equals(Object o) {
-    if(!(o instanceof Location)) {
-      return false;
-    }
-    
-    Location other = (Location) o;
-    return this.contains(other) && other.contains(this);
-  }
   
-  public int hashCode() {
-    return point;
-  }
-  
-  public Location intersection(Location l) {
-    return l.contains(this)
-      ? this
-      : Location.empty;
-  }
-  public Location union(Location l)	{
-    List locations = new ArrayList();
-    locations.add(this);
-    locations.add(l);
-    CompoundLocation cl = new CompoundLocation(locations);
-    return cl;
-  }
-
   public SymbolList symbols(SymbolList s)	{
     final Symbol sym = s.symbolAt(this.point);
     try {

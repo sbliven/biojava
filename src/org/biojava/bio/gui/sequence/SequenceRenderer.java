@@ -39,12 +39,12 @@ import java.util.List;
  * Renderers are always activated within the context of a particular sequence
  * panel. A single Renderer can be shaired among many sequence panels, or added
  * multiple times to the same panel. The renderer is required to request how
- * much leading and trailing space it requires, as well as the depth (space
+ * much leading and trailing srcace it requires, as well as the depth (srcace
  * orthoganal to the direction that the sequence is rendered).
  * <P>
  * The leading and trailing distances are the number of pixles overhang needed
  * to cleanly render any line of sequence information. For example, a ruler will
- * need trailing space to render the total sequence length at the end.
+ * need trailing srcace to render the total sequence length at the end.
  *
  * @author Thomas Down
  * @author Matthew Pocock
@@ -52,21 +52,16 @@ import java.util.List;
 public interface SequenceRenderer {
   
   /**
-   * Render a portion (possibly all) of the information for sp to g, displaying
+   * Render a portion (possibly all) of the information for src to g, disrclaying
 v   * all of the data that would fall within seqBox.
    *
    * @param g the Graphics2D to render to
-   * @param sp the SequencePanel that encapsulates the information to render
-   * @param min the minimum symbol to render (inclusive)
-   * @param max the maximum symbol to render (inclusive)
+   * @param src the SequenceRenderContext that encapsulates the information to render
    */
-  void paint(
-    Graphics2D g, SequenceRenderContext sp,
-    RangeLocation pos
-  );
+  void paint(Graphics2D g, SequenceRenderContext src);
   
   /**
-   * Retrieve the depth of this renderer when rendering sp.
+   * Retrieve the depth of this renderer when rendering src.
    * <P>
    * The depth may vary between sequence panels - for example based upon
    * sequence length. Each line of information in the SequenceRendererContext
@@ -76,37 +71,35 @@ v   * all of the data that would fall within seqBox.
    * implementation may chose to collapse down to a depth of zero pixles if
    * there are no features to render within a region.
    *
-   * @param sp the SequencePanel to return info for
-   * @param min the first symbol rendered (inclusive)
-   & @param max the last symbol rendered (inclusive)
+   * @param src the SequenceRenderContext to return info for
    * @return the depth of the renderer for that sequence panel
    */
-  double getDepth(SequenceRenderContext sp, RangeLocation pos);
+  double getDepth(SequenceRenderContext src);
 
   /**
-   * Retrieve the minimum leading distance for this renderer when rendering sp.
+   * Retrieve the minimum leading distance for this renderer when rendering src.
    * <P>
    * The leading distance may vary between sequence panels - for example based
    * upon sequence length.
    *
-   * @param sp the SequencePanel to return info for
+   * @param src the SequenceRenderContext to return info for
    * @return the leading distance of the renderer for that sequence panel
    */
-  double getMinimumLeader(SequenceRenderContext sp, RangeLocation pos);
+  double getMinimumLeader(SequenceRenderContext src);
     
   /**
-   * Retrieve the minimum trailing distance for this renderer when rendering sp.
+   * Retrieve the minimum trailing distance for this renderer when rendering src.
    * <P>
    * The trailing distance may vary between sequence panels - for example based
    * upon sequence length.
    *
-   * @param sp the SequencePanel to return info for
+   * @param src the SequenceRenderContext to return info for
    * @return the trailing distance of the renderer for that sequence panel
    */
-  double getMinimumTrailer(SequenceRenderContext sp, RangeLocation pos);
+  double getMinimumTrailer(SequenceRenderContext src);
   
   /**
-   * Produce a SequenceViewerEvent in response to a mouse gesture.
+   * Produce a SequenceViewerEvent in resrconse to a mouse gesture.
    * <P>
    * A SequenceRenderer that performs any form of coordinate remapping should
    * ensure that it apropreately transforms the mouse event. However, in the
@@ -119,8 +112,6 @@ v   * all of the data that would fall within seqBox.
    * @param src the SequenceRenderContext currently in scope
    * @param me  a MouseEvent that caused this request
    * @param path the List of SequenceRenderer instances passed through so far
-   * @param min the minimum sequence index
-   * @param max the maximum sequence index
    * @return a SequenceViewerEvent encapsulating the mouse gesture
    *
    * @since 1.2
@@ -128,8 +119,7 @@ v   * all of the data that would fall within seqBox.
   SequenceViewerEvent processMouseEvent(
     SequenceRenderContext src,
     MouseEvent me,
-    List path,
-    RangeLocation pos
+    List path
   );
   
   public static class RendererForwarder extends ChangeForwarder {

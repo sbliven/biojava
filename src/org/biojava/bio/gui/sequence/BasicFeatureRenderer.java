@@ -270,7 +270,7 @@ implements FeatureRenderer {
     }
   }
   
-  public double getDepth(SequenceRenderContext src, RangeLocation pos) {
+  public double getDepth(SequenceRenderContext src) {
     return arrowSize + 2.0 * arrowScoop + 1.0;
   }
   

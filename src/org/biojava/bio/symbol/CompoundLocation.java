@@ -35,7 +35,9 @@ import org.biojava.bio.*;
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public class CompoundLocation implements Location, Serializable {
+public class CompoundLocation
+extends AbstractLocation
+implements Location, Serializable {
   /**
    * The list of child locations in order. Should contain only RangeLocation
    * instances.
@@ -62,62 +64,33 @@ public class CompoundLocation implements Location, Serializable {
   /** 
    * Generate a new CompoundLocation from a list of locations.
    * <P>
-   * The generated location will contain exactly those points that are within
-   * at least one of the Locations in the list.
+   * You will nearly always want to generate these beasts using the
+   * Location.union method.
+   * <P>
+   * The locations list should contain contiguous locations, sorted by getMin()
+   * and guaranteed to be non-overlapping.
    *
    * @param locations a list of Location instances to combine into a single
    *        compound location
    */
   public CompoundLocation(List locs) {
-      //      System.out.println("\n\n\nInput: " + locs.toString());
-
-    List working = new ArrayList();
-    for(Iterator i = locs.iterator(); i.hasNext(); ) {
-      for(Iterator bi = ((Location) i.next()).blockIterator(); bi.hasNext(); ) {
-        Location bl = (Location) bi.next();
-        if(bl != Location.empty) {
-          working.add(bl);
-        }
-      }
-    }
-
-    Collections.sort(working, Location.naturalOrder);
-
-    // 
-    // NB the following code assumes that all elements in
-    // `working' are contiguous blocks, and it may break
-    // if this is not true.
-    //
-
-    Iterator i = working.iterator();
-    Location last = Location.empty;
-    if(i.hasNext()) {
-      last = (Location) i.next();
-    }
-    while(i.hasNext()) {
-      Location cur = (Location) i.next();
-      if (last.overlaps(cur)) {
-	    last = new RangeLocation(Math.min(last.getMin(), cur.getMin()),
-				     Math.max(last.getMax(), cur.getMax()));
-      } else {
-	if (last != Location.empty) {
-	    this.locations.add(last);
-        }
-        last = cur;
-      }
-    }
-    if(last != Location.empty) {
-      this.locations.add(last);
-    }
-
-    if (this.locations.size() != 0) {
-	min = ((Location) this.locations.get(0)).getMin();
-	max = ((Location) this.locations.get(this.locations.size() - 1)).getMax();
-    }
-
-    // System.out.println("Output: " + this.locations.toString());
+    Location minL = (Location) locs.get(0);
+    Location maxL = (Location) locs.get(locs.size() - 1);
+    
+    this.locations.addAll(locs);
+    this.min = minL.getMin();
+    this.max = maxL.getMax();;
   }
   
+
+  public int getMin() {
+    return min;
+  }
+
+  public int getMax() {
+    return max;
+  }
+
   public boolean contains(int p) {
     if(p < min || p > max)
       return false;
@@ -130,61 +103,30 @@ public class CompoundLocation implements Location, Serializable {
     return false;
   }
 
-  // may be broken in the case when l spans more than one of the sub-locations
   public boolean contains(Location l) {
-    if(l.getMin() > max || l.getMax() < min)
-      return false;
-
-    for(Iterator i = locations.iterator(); i.hasNext(); ) {
-      if( ((Location) i.next()).contains(l) )
-        return true;
-    }
-
-    return false;
+    return LocationTools.contains(this, l);
   }
 
   public boolean overlaps(Location l) {
-    if(l.getMin() > max || l.getMax() < min)
+    return LocationTools.overlaps(this, l);
+  }
+  
+  public Location union(Location loc) {
+    return LocationTools.union(this, loc);
+  }
+  
+  public Location intersection(Location loc) {
+    return LocationTools.intersection(this, loc);
+  }
+
+  public boolean equals(Object o) {
+    if(!(o instanceof Location)) {
       return false;
-
-    for(Iterator i = locations.iterator(); i.hasNext(); ) {
-      if( ((Location) i.next()).overlaps(l) )
-        return true;
+    } else {
+      return LocationTools.areEqual(this, (Location) o);
     }
-
-    return false;
   }
-
-  public int getMin() {
-    return min;
-  }
-
-  public int getMax() {
-    return max;
-  }
-
-  public Location intersection(Location l) {
-    List res = new ArrayList();
-
-    for(Iterator i = locations.iterator(); i.hasNext(); ) {
-      Location loc = ((Location) i.next()).intersection(l);
-      if(loc != Location.empty) {
-        res.add(loc);
-      }
-    }
-
-    if(res.size() != 0)
-      return new CompoundLocation(res);
-    return Location.empty;
-  }
-
-  public Location union(Location l) {
-    List res = new ArrayList(this.locations);
-    res.add(l);
-
-    return new CompoundLocation(res);
-  }
-
+  
   public SymbolList symbols(SymbolList seq) {
       if (isContiguous())
 	  return seq.subList(min, max);
@@ -209,9 +151,10 @@ public class CompoundLocation implements Location, Serializable {
 
     List res = new ArrayList();
 
-    for(Iterator i = locations.iterator(); i.hasNext(); )
+    for(Iterator i = locations.iterator(); i.hasNext(); ) {
       res.add( ((Location) i.next()).translate(dist) );
-
+    }
+    
     return new CompoundLocation(res);
   }
 
@@ -221,34 +164,6 @@ public class CompoundLocation implements Location, Serializable {
   
   public Iterator blockIterator() {
     return locations.iterator();
-  }
-  
-  public boolean equals(Object o) {
-    if(!(o instanceof Location)) {
-      return false;
-    }
-    
-    Location loc = (Location) o;
-
-    if(loc.getMin() != getMin()) { return false; }
-    if(loc.getMax() != getMax()) { return false; }
-    
-    Iterator thisI = blockIterator();
-    Iterator thatI = loc.blockIterator();
-    
-    while(thisI.hasNext() && thatI.hasNext()) {
-      Location thisL = (Location) thisI.next();
-      Location thatL = (Location) thatI.next();
-      if(!thisL.equals(thatL)) {
-        return false;
-      }
-    }
-    
-    if(thisI.hasNext() || thatI.hasNext()) {
-      return false;
-    }
-    
-    return true;
   }
   
   public int hashCode() {

@@ -107,7 +107,7 @@ implements FeatureRenderer, java.io.Serializable {
     return blockDepth;
   }
   
-  public double getDepth(SequenceRenderContext src, RangeLocation pos) {
+  public double getDepth(SequenceRenderContext src) {
     return blockDepth + 1.0;
   }
   
