@@ -51,6 +51,8 @@ class DASComponentFeature implements ComponentFeature {
     private DASSequence componentSequence;
     private Location componentLocation;
 
+    private final FeatureFilter membershipFilter;
+
     public DASComponentFeature(DASSequence parent,
 			       ComponentFeature.Template temp)
         throws BioException
@@ -72,6 +74,8 @@ class DASComponentFeature implements ComponentFeature {
 	this.type = temp.type;
 	this.source = temp.source;
 	this.annotation = temp.annotation;
+
+	membershipFilter = new FeatureFilter.ContainedByLocation(this.location);
 
 	if (temp.componentSequence != null) {
 	    componentSequence = (DASSequence) temp.componentSequence;
@@ -187,14 +191,7 @@ class DASComponentFeature implements ComponentFeature {
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
 	Location l = null;
 
-	if (ff instanceof FeatureFilter.ContainedByLocation) {
-	    l = ((FeatureFilter.ContainedByLocation) ff).getLocation();
-	} else if (ff instanceof FeatureFilter.OverlapsLocation) {
-	    l = ((FeatureFilter.OverlapsLocation) ff).getLocation();
-	}
-
-	if (l != null && !l.overlaps(getLocation())) {
-	    // None of our children are of interest...
+	if (FilterUtils.areDisjoint(ff, membershipFilter)) { 
 	    return FeatureHolder.EMPTY_FEATURE_HOLDER;
 	}
 
