@@ -725,9 +725,11 @@ class AbstractGenEmblFileFormer
         else if (fl.getOuterMin() != fl.getInnerMin())
         {
             // (123.567)
-            sb.append('(' + fl.getOuterMin());
+            sb.append('(');
+            sb.append(fl.getOuterMin());
             sb.append('.');
-            sb.append(fl.getInnerMin() + ')');
+            sb.append(fl.getInnerMin());
+            sb.append(')');
         }
         else
         {
@@ -746,9 +748,11 @@ class AbstractGenEmblFileFormer
         else if (fl.getInnerMax() != fl.getOuterMax())
         {
             // (567.789)
-            sb.append('(' + fl.getInnerMax());
+            sb.append('(');
+            sb.append(fl.getInnerMax());
             sb.append('.');
-            sb.append(fl.getOuterMax() + ')');
+            sb.append(fl.getOuterMax());
+            sb.append(')');
         }
         else
         {
@@ -785,9 +789,11 @@ class AbstractGenEmblFileFormer
         else
         {
             // (567.789)
-            sb.append('(' + fpl.getMin());
+            sb.append('(');
+            sb.append(fpl.getMin());
             sb.append('.');
-            sb.append(fpl.getMax() + ')');
+            sb.append(fpl.getMax());
+            sb.append(')');
         }
 
         return sb;
