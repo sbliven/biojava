@@ -32,6 +32,7 @@ import org.biojava.bio.symbol.*;
 import org.biojava.utils.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
+import javax.xml.parsers.*;
 
 
 /**
@@ -72,19 +73,26 @@ public class XMLDistributionReader extends DefaultHandler {
      * @throws SAXException if the XML is not as expected.
      */
     public Distribution parseXML(InputStream is) throws IOException, SAXException{
-        org.xml.sax.XMLReader parser = new org.apache.xerces.parsers.SAXParser();
+        //org.xml.sax.XMLReader parser = new org.apache.xerces.parsers.SAXParser();
+        SAXParserFactory fact = SAXParserFactory.newInstance();
+        fact.setNamespaceAware(true);
+        try {
+          SAXParser parser = fact.newSAXParser();
 
-        parser.setContentHandler(this);
+//          parser.setContentHandler(this);
+//
+//          parser.setErrorHandler(this);
 
-        parser.setErrorHandler(this);
+          InputSource xml = null;
 
-        InputSource xml = null;
+          xml = new InputSource(new InputStreamReader(is));
 
-
-        xml = new InputSource(new InputStreamReader(is));
-
-        parser.parse(xml);
-
+          parser.parse(xml, this);
+        }
+        catch (ParserConfigurationException ex) {
+         //really shouldn't happen
+         throw new SAXException("Cannot make SAXParser",ex);
+        }
 
         return this.getDist();
     }
@@ -94,7 +102,7 @@ public class XMLDistributionReader extends DefaultHandler {
      * method directly. Use ParseXML instead.
      *
      */
-    public void startElement(String uri, String localName, String qName, Attributes attributes)
+    public void startElement(String nameSpaceURI, String localName, String rawName, Attributes attributes)
                       throws SAXException{
         if (localName.equals("Distribution") || localName.equals("OrderNDistribution")) {
             processDistElement(attributes);
