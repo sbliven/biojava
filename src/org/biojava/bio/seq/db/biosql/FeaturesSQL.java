@@ -100,8 +100,8 @@ class FeaturesSQL {
 			"       ontology_term.term_name, " +
 			"       seqfeature_source.source_name " +
 			"  from ontology_term, seqfeature_source, seqfeature_location, " +
-			"       (seqfeature left outer join seqfeature_relationship " +
-                        "                   on seqfeature.seqfeature_id = seqfeature_relationship.parent_seqfeature_id) " +
+			"       seqfeature left outer join seqfeature_relationship " +
+                        "                   on seqfeature.seqfeature_id = seqfeature_relationship.parent_seqfeature_id " +
 			" where ontology_term.ontology_term_id = seqfeature.seqfeature_key_id and " +
 			"       seqfeature_source.seqfeature_source_id = seqfeature.seqfeature_source_id and " +
 			"       seqfeature.bioentry_id = ? and " +
@@ -220,8 +220,8 @@ class FeaturesSQL {
 			"       seqfeature_location.seq_end, " +
 			"       seqfeature_location.seq_strand " +
 			"  from seqfeature_location, seqfeature_location as sfl2, " +
-			"       (seqfeature left outer join seqfeature_relationship " +
-                        "                   on seqfeature.seqfeature_id = seqfeature_relationship.parent_seqfeature_id) " +
+			"       seqfeature left outer join seqfeature_relationship " +
+                        "                   on seqfeature.seqfeature_id = seqfeature_relationship.parent_seqfeature_id " +
 			" where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
 			"       seqfeature.bioentry_id = ? and " +
 			"       sfl2.seqfeature_id = seqfeature.seqfeature_id and " +

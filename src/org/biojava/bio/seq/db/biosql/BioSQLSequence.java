@@ -214,10 +214,10 @@ class BioSQLSequence
 
     private RealizingFeatureHolder getFeatures() {
 	if (features == null) {
-	    if (length() < 100000) {
+	    if (length() < 5000000) {
 		features = new BioSQLAllFeatures(this, seqDB, bioentry_id);
 	    } else {
-		features = new BioSQLTiledFeatures(this, seqDB, bioentry_id, 50000);
+		features = new BioSQLTiledFeatures(this, seqDB, bioentry_id, 5000000);
 	    }
 	}
 	return features;

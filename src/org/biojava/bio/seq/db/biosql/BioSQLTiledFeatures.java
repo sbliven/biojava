@@ -243,6 +243,7 @@ class BioSQLTiledFeatures implements FeatureHolder, RealizingFeatureHolder
 	    }
 
 	    try {
+		// System.err.println("*** Fetching" + tileNumber);
 		SimpleFeatureHolder features = new SimpleFeatureHolder();
 		FeaturesSQL adaptor = seqDB.getFeaturesSQL();
 		adaptor.retrieveFeatures(bioentry_id, 
