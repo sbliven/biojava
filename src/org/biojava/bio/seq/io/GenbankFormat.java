@@ -43,6 +43,20 @@ import org.biojava.bio.seq.*;
 
 public class GenbankFormat implements SequenceFormat, Serializable
 {
+	protected static final String END_SEQUENCE_TAG = "//";
+	protected static final String FEATURE_TAG = "FEATURES";
+	protected static final String START_SEQUENCE_TAG = "ORIGIN";
+	protected static final String FEATURE_LINE_PREFIX = "     ";
+	protected static final String FEATURE_FLAG = "FT";
+	protected static final String ACCESSION_TAG = "ACCESSION";
+	protected static final String LOCUS_TAG = "LOCUS";
+	protected static final String SIZE_TAG = "SIZE";
+	protected static final String TYPE_TAG = "TYPE";
+	protected static final String DIVISION_TAG = "DIVISION";
+	protected static final String DATE_TAG = "MDAT";
+	protected static final String VERSION_TAG = "VERSION";
+	protected static final String GI_TAG = "GI";
+
 	/**
 	 * Reads a sequence from the specified reader using the Symbol parser and
 	 * Sequence Factory provided.  The sequence read in must be in Genbank
@@ -64,7 +78,7 @@ public class GenbankFormat implements SequenceFormat, Serializable
 		listener.startSequence();
 		while ((line = reader.readLine()) != null)
 		{
-			if (line.startsWith("//"))
+			if (line.startsWith(END_SEQUENCE_TAG))
 			{
 				if(sParser != null)
 				{   // End of symbol data
@@ -157,12 +171,12 @@ class GenbankContext
 	protected void processLine(String line)
 		throws ParseException, IllegalSymbolException
 	{
-		if (line.startsWith("FEATURES"))
+		if (line.startsWith(GenbankFormat.FEATURE_TAG))
 		{
 			status = FEATURES;
 			this.saveSeqAnno();
 		}
-		else if (line.startsWith("ORIGIN"))
+		else if (line.startsWith(GenbankFormat.START_SEQUENCE_TAG))
 		{
 			status = SEQUENCE;
 			this.saveSeqAnno();
@@ -238,13 +252,13 @@ class GenbankContext
 			throws ParseException
 	{
 		// Check the line is really a feature line
-		if(line.startsWith("     "))
+		if(line.startsWith(GenbankFormat.FEATURE_LINE_PREFIX))
 		{
 			this.saveSeqAnno();
 			// Flag value as a feature line for GenbankProcessor.  By a
 			// strange coincidence, this happens to be the same as the EMBL
 			// value
-			headerTag = "FT";
+			headerTag = GenbankFormat.FEATURE_FLAG;
 			headerTagText = new StringBuffer(line.substring(5));
 		}
 		else
@@ -264,7 +278,7 @@ class GenbankContext
 	private	void processHeaderLine(String line)
 			throws ParseException
 	{
-		if(line.startsWith("LOCUS"))
+		if(line.startsWith(GenbankFormat.LOCUS_TAG))
 		{
 			// the LOCUS line is a special case because it contains the
 			// locus, size, molecule type, GenBank division, and the date
@@ -275,29 +289,29 @@ class GenbankContext
 			headerTagText = new StringBuffer(lineTokens.nextToken());
 
 			this.saveSeqAnno();
-			headerTag = "SIZE";
+			headerTag = GenbankFormat.SIZE_TAG;
 			headerTagText = new StringBuffer(lineTokens.nextToken());
 
 			this.saveSeqAnno();
-			headerTag = "TYPE"; // Check this; may be under PROP
+			headerTag = GenbankFormat.TYPE_TAG; // Check this; may be under PROP
 			// Read past 'bp'
 			headerTagText = new StringBuffer(lineTokens.nextToken());
 			headerTagText = new StringBuffer(lineTokens.nextToken());
 
 			this.saveSeqAnno();
-			headerTag = "DIVISION"; // May be under PROP
+			headerTag = GenbankFormat.DIVISION_TAG; // May be under PROP
 			headerTagText = new StringBuffer(lineTokens.nextToken());
 
 			this.saveSeqAnno();
-			headerTag = "MDAT";
+			headerTag = GenbankFormat.DATE_TAG;
 			headerTagText = new StringBuffer(lineTokens.nextToken());
 		}
-		else if(line.startsWith("VERSION"))
+		else if(line.startsWith(GenbankFormat.VERSION_TAG))
 		{
 			// VERSION line is a special case because it contains both
 			// the VERSION field and the GI number
 			this.saveSeqAnno();
-			headerTag = "VERSION";
+			headerTag = GenbankFormat.VERSION_TAG;
 			headerTagText = new StringBuffer(line.substring(
 					TAG_LENGTH, TAG_LENGTH + VERSION_LENGTH).trim());
 			int lengthProcessed =
@@ -305,10 +319,10 @@ class GenbankContext
 
 			String remainingString = line.substring(lengthProcessed);
 			remainingString.trim();
-			if(remainingString.startsWith("GI:"))
+			if(remainingString.startsWith(GenbankFormat.GI_TAG))
 			{
 				this.saveSeqAnno();
-				headerTag = "GI"; // Possibly should be UID?
+				headerTag = GenbankFormat.GI_TAG; // Possibly should be UID?
 				headerTagText =
 						new StringBuffer(remainingString.substring(3));
 			}
@@ -348,13 +362,13 @@ class GenbankContext
 	 */
 	private	boolean	hasHeaderTag(String	line)
 	{
-		boolean isHeaderTag =	false;
+		boolean isHeaderTag = false;
 		char[] l = line.toCharArray();
 		for (int i = 0; i < TAG_LENGTH; i++)
 		{
 			if(l[i] != ' ')
 			{
-				isHeaderTag =	true;
+				isHeaderTag = true;
 				break;
 			}
 		}

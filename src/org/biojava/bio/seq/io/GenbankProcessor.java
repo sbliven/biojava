@@ -87,12 +87,12 @@ public class GenbankProcessor extends SequenceBuilderFilter
 	{
 		try
 		{
-			if (features.inFeature() && !(key.equals("FT")))
+			if (features.inFeature() && !(key.equals(GenbankFormat.FEATURE_FLAG)))
 			{
 				features.endFeature();
 			}
 
-			if(key.equals("FT"))
+			if(key.equals(GenbankFormat.FEATURE_FLAG))
 			{
 				String featureLine = value.toString();
 				if (featureLine.charAt(0) != ' ')
@@ -109,7 +109,7 @@ public class GenbankProcessor extends SequenceBuilderFilter
 			else
 			{
 				getDelegate().addSequenceProperty(key, value);
-				if (key.equals("ACCESSION"))
+				if (key.equals(GenbankFormat.ACCESSION_TAG))
 				{
 					accessions.add(value);
 				}
