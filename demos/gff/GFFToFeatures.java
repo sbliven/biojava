@@ -69,7 +69,7 @@ public class GFFToFeatures {
 
       // add the features to the sequences
       System.out.println("Adding features from gff to sequences");
-      gffEntries.getAnnotator().annotate(seqDB);
+      aSeqDB = new AnnotatedSequenceDB(seqDB, gffEntries.getAnnotator());
     
       // now converting back to gff
       System.out.println("Dumping sequence features as GFF");
@@ -77,7 +77,7 @@ public class GFFToFeatures {
       GFFWriter writer = new GFFWriter(out);
       SequencesAsGFF seqsAsGFF = new SequencesAsGFF();
       
-      seqsAsGFF.processDB(seqDB, writer);
+      seqsAsGFF.processDB(aSeqDB, writer);
       
     } catch (Exception e) {
       e.printStackTrace();

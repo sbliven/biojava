@@ -95,20 +95,24 @@ public class GFFEntrySet {
   
   /**
    * Get an annotator that can add GFF features to a
-   * <span class="type">SequenceDB</span> or an individual
    * <span class="type">Sequence</span> using the features in this
-   * <span class="type">GFFEntrySet</span>.
+   * <span class="type">GFFEntrySet</span>.  The SequenceAnnotator
+   * returned by this method currently adds new features to an
+   * existing sequence (assuming it implements MutableFeatureHolder).
    *
-   * @return an <span class="type">Annotator</span> that adds GFF features
+   * <p>Sequences are only annotated if their getName() method returns
+   * a name equal to the sequence name field of one or more records
+   * in this GFFEntrySet.</p>
+   *
+   * @return an <span class="type">SequenceAnnotator</span> that adds GFF features
    */
-  public Annotator getAnnotator() {
-    return new AbstractAnnotator() {
-      public boolean annotate(Sequence seq) throws BioException {
+  public SequenceAnnotator getAnnotator() {
+    return new SequenceAnnotator() {
+      public Sequence annotate(Sequence seq) throws BioException {
         Feature.Template plain = new Feature.Template();
         StrandedFeature.Template stranded = new StrandedFeature.Template();
         plain.annotation = Annotation.EMPTY_ANNOTATION;
         stranded.annotation = Annotation.EMPTY_ANNOTATION;
-        boolean addedAny = false;
         for(Iterator i = lineIterator(); i.hasNext(); ) {
           Object o = i.next();
           if(o instanceof GFFRecord) {
@@ -119,7 +123,6 @@ public class GFFEntrySet {
                 plain.type = rec.getFeature();
                 plain.source = rec.getSource();
                 seq.createFeature((MutableFeatureHolder) seq, plain);
-                addedAny = true;
               } else {
                 stranded.location = new RangeLocation(rec.getStart(), rec.getEnd());
                 stranded.type = rec.getFeature();
@@ -131,12 +134,11 @@ public class GFFEntrySet {
                   stranded.strand = StrandedFeature.NEGATIVE;
                 }
                 seq.createFeature((MutableFeatureHolder) seq, stranded);
-                addedAny = true;
               }
             }
           }
         }
-        return addedAny;
+        return seq;
       }
     };
   }
