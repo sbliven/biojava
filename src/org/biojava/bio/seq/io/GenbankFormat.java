@@ -19,7 +19,7 @@
  *
  */
 
-package	org.biojava.bio.seq.io;
+package org.biojava.bio.seq.io;
 
 import java.io.*;
 import java.util.*;
@@ -39,6 +39,8 @@ import org.biojava.bio.seq.*;
  * tag is not included.	Stored in sequence.getName().
  * @author Greg	Cox
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Matthew Pocock
+ * @author Ron Kuhn
  */
 
 public class GenbankFormat
@@ -508,50 +510,20 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
     {
         if(line.startsWith(GenbankFormat.LOCUS_TAG))
         {
-            // the LOCUS line is a special case because it contains the
-            // locus, size, molecule type, GenBank division, and the date
-            // of last modification.
-            this.saveSeqAnno();
-            StringTokenizer lineTokens = new StringTokenizer(line);
-            headerTag = lineTokens.nextToken();
-            headerTagText = new StringBuffer(lineTokens.nextToken());
-
-            this.saveSeqAnno();
-            headerTag = GenbankFormat.SIZE_TAG;
-            headerTagText = new StringBuffer(lineTokens.nextToken());
-            // read past 'bp'
-            lineTokens.nextToken();
-
-            // At this point there are three optional fields, strand number,
-            // type, and circularity.
-            if(line.charAt(34) != ' ')
-            {
-                this.saveSeqAnno();
-                headerTag = GenbankFormat.STRAND_NUMBER_TAG;
-                headerTagText = new StringBuffer(lineTokens.nextToken());
-            }
-
-            if(line.charAt(37) != ' ')
-            {
-                this.saveSeqAnno();
-                headerTag = GenbankFormat.TYPE_TAG;// Check this; may be under PROP
-                headerTagText = new StringBuffer(lineTokens.nextToken());
-            }
-
-            if(line.charAt(43) != ' ')
-            {
-                this.saveSeqAnno();
-                headerTag = GenbankFormat.CIRCULAR_TAG;
-                headerTagText = new StringBuffer(lineTokens.nextToken());
-            }
-
-            this.saveSeqAnno();
-            headerTag = GenbankFormat.DIVISION_TAG; // May be under PROP
-            headerTagText = new StringBuffer(lineTokens.nextToken());
-
-            this.saveSeqAnno();
-            headerTag = GenbankFormat.DATE_TAG;
-            headerTagText = new StringBuffer(lineTokens.nextToken());
+          // the LOCUS line is a special case because it contains the
+          // locus, size, molecule type, GenBank division, and the date
+          // of last modification.
+          if (line.length() < 73) {
+            throw new ParseException("LOCUS line too short [" + line + "]");
+          }
+          
+          saveSeqAnno2(GenbankFormat.LOCUS_TAG, line.substring(12, 22));
+          saveSeqAnno2(GenbankFormat.SIZE_TAG, line.substring(22, 29));
+          saveSeqAnno2(GenbankFormat.STRAND_NUMBER_TAG, line.substring(33, 35));
+          saveSeqAnno2(GenbankFormat.TYPE_TAG, line.substring(36, 41));
+          saveSeqAnno2(GenbankFormat.CIRCULAR_TAG, line.substring(42, 52));
+          saveSeqAnno2(GenbankFormat.DIVISION_TAG, line.substring(52, 55));
+          saveSeqAnno2(GenbankFormat.DATE_TAG, line.substring(62, 73));
         }
         else if (line.startsWith(GenbankFormat.VERSION_TAG))
         {
@@ -602,6 +574,26 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
 	    headerTagText = new StringBuffer("");
 	}
     }
+
+    /**
+     * Private method to process a header tag and associated value.
+     *
+     * @param tag The tag to add
+     * @param value The value of the associated tag
+     * @throws ParseException Thrown when an error occurs parsing the file
+     */
+	private void saveSeqAnno2(String tag, String value)
+	throws ParseException
+	{
+		value = value.trim();	// strip whitespace
+		if (value.length() > 0) {
+			this.saveSeqAnno();
+			headerTag = tag;
+	    	headerTagText = new StringBuffer(value);
+		}
+	}
+
+
 
     /**
      * @return does the line contain a header tag.
