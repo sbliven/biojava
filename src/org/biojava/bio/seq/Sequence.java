@@ -41,11 +41,24 @@ import org.biojava.bio.symbol.*;
 
 public interface Sequence extends SymbolList, FeatureHolder, Annotatable {
   /**
-   * The URN for this sequence. This will be something like
-   * <code>urn:sequence/embl:U32766</code> or
-   * <code>urn:sequence/fasta:sequences.fasta|hox3</code>.
+   * A <a href="http://www.rfc-editor.org/rfc/rfc2396.txt">Uniform
+   * Resource Identifier</a> (URI) which identifies the sequence
+   * represented by this object.  For sequences in well-known
+   * database, this may be a URN, e.g.
    *
-   * @return the urn as a String
+   * <pre>
+   * urn:sequence/embl:AL121903
+   * </pre>
+   *
+   * It may also be a URL identifying a specific resource, either
+   * locally or over the network
+   *
+   * <pre>
+   * file:///home/thomas/myseq.fa|seq22
+   * http://www.mysequences.net/chr22.seq
+   * </pre>
+   *
+   * @return the URI as a String
    */
   String getURN();
   

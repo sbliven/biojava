@@ -38,7 +38,8 @@ public interface SequenceFactory {
    * Creates a sequence using these parameters.
    *
    * @param symList the SymbolList defining the 'sequence'
-   * @param uri the uri
+   * @param uri the uri of the sequence.  This will be returned
+   *            by the getURN() method on Sequence.
    * @param name   the name
    * @param annotation  a hint for the annotation of the resulting sequence
    * @return  a new Sequence object
