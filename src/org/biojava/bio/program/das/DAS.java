@@ -103,7 +103,7 @@ public class DAS extends AbstractChangeable {
       huc.connect();
       int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
       if(status == 0) {
-        throw new BioException("Not a DAS server");
+        throw new BioException("Not a DAS server: " + dsnURL);
       } else if(status != 200) {
         throw new BioException("DAS error (status code = " + status + ")"); 
       }

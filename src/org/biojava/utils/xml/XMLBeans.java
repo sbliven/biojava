@@ -95,6 +95,11 @@ public class XMLBeans {
 		    Object targ = null;
 		    if (! ref.equals("")) {
 			targ = refs.get(ref);
+                        if(targ == null) {
+                          throw new NullPointerException(
+                            "Can't find target for: " + ref
+                          );
+                        }
 		    } else {
 			targ = instantiateBean(echild);
 		    }

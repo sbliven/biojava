@@ -34,6 +34,7 @@ import java.util.*;
  * to sequences retrieved from a SequenceDB.
  * 
  * @author Thomas Down
+ * @author Matthew Pocock
  */
 
 public class AnnotatedSequenceDB
