@@ -64,6 +64,10 @@ public abstract class AbstractRangeLocation implements Location {
     }
   }
 
+  public int hashCode() {
+    return getMin() ^ getMax();
+  }
+  
   public Location intersection(Location l) {
     int start = Math.max(getMin(), l.getMin());
     int end = Math.min(getMax(), l.getMax());

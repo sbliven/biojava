@@ -198,6 +198,13 @@ public class ChangeSupport {
       boolean needToReap = false;
 
     ChangeType ct = ce.getType();
+    int listenerCount = this.listenerCount;
+    ChangeType[] types = new ChangeType[listenerCount];
+    System.arraycopy(this.types, 0, types, 0, listenerCount);
+    
+    Reference[] listeners = new Reference[listenerCount];
+    System.arraycopy(this.listeners, 0, listeners, 0, listenerCount);
+    
     for(int i = 0; i < listenerCount; i++) {
       ChangeType lt = types[i];
       if( ct.isMatchingType(lt)) {
@@ -228,6 +235,13 @@ public class ChangeSupport {
       boolean needToReap = false;
 
     ChangeType ct = ce.getType();
+    int listenerCount = this.listenerCount;
+    ChangeType[] types = new ChangeType[listenerCount];
+    System.arraycopy(this.types, 0, types, 0, listenerCount);
+    
+    Reference[] listeners = new Reference[listenerCount];
+    System.arraycopy(this.listeners, 0, listeners, 0, listenerCount);
+
     for(int i = 0; i < listenerCount; i++) {
       ChangeType lt = types[i];
       if( ct.isMatchingType(lt) ) {

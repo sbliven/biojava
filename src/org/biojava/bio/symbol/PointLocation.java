@@ -48,7 +48,19 @@ public class PointLocation implements Location, Serializable {
   *Test for equality with another Location object
   *@param l location to compare with
   */
-  public boolean equals(Location l)	{ return this.contains(l) && l.contains(this); }
+  public boolean equals(Object o) {
+    if(!(o instanceof Location)) {
+      return false;
+    }
+    
+    Location other = (Location) o;
+    return this.contains(other) && other.contains(this);
+  }
+  
+  public int hashCode() {
+    return point;
+  }
+  
   public Location intersection(Location l) {
     return l.contains(this)
       ? this

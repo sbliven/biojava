@@ -28,6 +28,7 @@ import java.util.*;
 import java.util.List;
 
 import org.biojava.utils.*;
+import org.biojava.utils.cache.*;
 import org.biojava.bio.*;
 import org.biojava.bio.gui.*;
 import org.biojava.bio.symbol.*;
@@ -39,6 +40,14 @@ extends SequenceRendererWrapper {
   
   public BumpedRenderer(SequenceRenderer renderer) {
     super(renderer);
+  }
+
+  protected boolean hasListeners() {
+    return super.hasListeners();
+  }
+
+  protected ChangeSupport getChangeSupport(ChangeType ct) {
+    return super.getChangeSupport(ct);
   }
   
   public double getDepth(SequenceRenderContext src, RangeLocation pos) {
@@ -110,15 +119,33 @@ extends SequenceRendererWrapper {
     
     return sve;
   }
+
+  private CacheMap contextCache = new FixedSizeMap(10);
+  private Set flushers = new HashSet();
   
   protected List layer(SequenceRenderContext src, RangeLocation pos) {
+    FeatureFilter filt = new FeatureFilter.OverlapsLocation(pos);
+    CtxtFilt gopher = new CtxtFilt(src, filt, false);
+    List layers = (List) contextCache.get(gopher);
+    if(layers == null) {
+      layers = doLayer(src, filt);
+      contextCache.put(gopher, layers);
+      CacheFlusher cf = new CacheFlusher(gopher);
+      ((Sequence) src.getSequence()).addChangeListener(cf, FeatureHolder.FEATURES);
+      flushers.add(cf);
+    }
+    
+    return layers;
+  }
+  
+  protected List doLayer(SequenceRenderContext src, FeatureFilter filt) {
     Sequence seq = (Sequence) src.getSequence();
     List layers = new ArrayList();
     List layerLocs = new ArrayList();
     
     for(
       Iterator fi = seq.filter(
-        new FeatureFilter.OverlapsLocation(pos), false
+        filt, false
       ).features();
       fi.hasNext();
     ) {
@@ -167,5 +194,59 @@ extends SequenceRendererWrapper {
     }
     
     return contexts;
+  }
+
+  private class CacheFlusher implements ChangeListener {
+    private CtxtFilt ctxtFilt;
+    
+    public CacheFlusher(CtxtFilt ctxtFilt) {
+      this.ctxtFilt = ctxtFilt;
+    }
+    
+    public void preChange(ChangeEvent ce) {
+    }
+    
+    public void postChange(ChangeEvent ce) {
+      contextCache.remove(ctxtFilt);
+      flushers.remove(this);
+      
+      if(hasListeners()) {
+        ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
+        synchronized(cs) {
+          ChangeEvent ce2 = new ChangeEvent(
+            BumpedRenderer.this,
+            SequenceRenderContext.LAYOUT
+          );
+          cs.firePostChangeEvent(ce2);
+        }
+      }
+    }
+  }
+  
+  private class CtxtFilt {
+    private SequenceRenderContext src;
+    private FeatureFilter filter;
+    private boolean recurse;
+    
+    public CtxtFilt(SequenceRenderContext src, FeatureFilter filter, boolean recurse) {
+      this.src = src;
+      this.filter = filter;
+      this.recurse = recurse;
+    }
+    
+    public boolean equals(Object o) {
+      if(! (o instanceof CtxtFilt) ) {
+        return false;
+      }
+      CtxtFilt that = (CtxtFilt) o;
+      return
+        src.equals(that.src) &&
+        filter.equals(that.filter) && 
+        (recurse == that.recurse);
+    }
+    
+    public int hashCode() {
+      return src.hashCode() ^ filter.hashCode();
+    }
   }
 }

@@ -155,14 +155,6 @@ public class CompoundLocation implements Location, Serializable {
     return false;
   }
 
-  public boolean equals(Object l) {
-    if(l instanceof Location) {
-      return Location.naturalOrder.areEqual(this, (Location) l);
-    } else {
-      return false;
-    }
-  }
-
   public int getMin() {
     return min;
   }
@@ -229,6 +221,38 @@ public class CompoundLocation implements Location, Serializable {
   
   public Iterator blockIterator() {
     return locations.iterator();
+  }
+  
+  public boolean equals(Object o) {
+    if(!(o instanceof Location)) {
+      return false;
+    }
+    
+    Location loc = (Location) o;
+    if(loc.isContiguous())       { return false; }
+    if(loc.getMin() != getMin()) { return false; }
+    if(loc.getMax() != getMax()) { return false; }
+    
+    Iterator thisI = blockIterator();
+    Iterator thatI = loc.blockIterator();
+    
+    while(thisI.hasNext() && thatI.hasNext()) {
+      Location thisL = (Location) thisI.next();
+      Location thatL = (Location) thatI.next();
+      if(!thisL.equals(thatL)) {
+        return false;
+      }
+    }
+    
+    if(thisI.hasNext() || thatI.hasNext()) {
+      return false;
+    }
+    
+    return true;
+  }
+  
+  public int hashCode() {
+    return getMin() ^ getMax();
   }
 
   public String toString() {

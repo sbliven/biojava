@@ -130,6 +130,10 @@ public class FuzzyPointLocation implements Location, Serializable
     {
 	return this.contains(loc) && loc.contains(this);
     }
+    
+    public int hashCode() {
+      return getMin();
+    }
 
     public Location intersection(Location loc)
     {

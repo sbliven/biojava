@@ -28,6 +28,7 @@ import java.util.*;
 import java.util.List;
 
 import org.biojava.utils.*;
+import org.biojava.utils.cache.*;
 import org.biojava.bio.*;
 import org.biojava.bio.gui.*;
 import org.biojava.bio.symbol.*;
@@ -52,6 +53,14 @@ extends SequenceRendererWrapper {
   protected FeatureFilter filter;
   protected boolean recurse;
 
+  protected boolean hasListeners() {
+    return super.hasListeners();
+  }
+
+  protected ChangeSupport getChangeSupport(ChangeType ct) {
+    return super.getChangeSupport(ct);
+  }
+  
   public FilteringRenderer() {
     filter = FeatureFilter.all;
     recurse = false;
@@ -147,6 +156,9 @@ extends SequenceRendererWrapper {
     );
   }
   
+  private CacheMap contextCache = new FixedSizeMap(10);
+  private Set flushers = new HashSet();
+  
   protected SequenceRenderContext getContext(
     SequenceRenderContext src,
     RangeLocation pos
@@ -155,9 +167,74 @@ extends SequenceRendererWrapper {
       filter,
       new FeatureFilter.OverlapsLocation(pos)
     );
-    return new SubSequenceRenderContext(
-      src,
-      ((Sequence) src.getSequence()).filter(actual, recurse)
-    );
+    
+    CtxtFilt gopher = new CtxtFilt(src, actual, recurse);
+    SequenceRenderContext subSrc = (SequenceRenderContext) contextCache.get(gopher);
+    if(subSrc == null) {
+      subSrc = new SubSequenceRenderContext(
+                src,
+                ((Sequence) src.getSequence()).filter(actual, recurse)
+      );
+      contextCache.put(gopher, subSrc);
+      CacheFlusher cf = new CacheFlusher(gopher);
+      ((Sequence) src.getSequence()).addChangeListener(cf, FeatureHolder.FEATURES);
+      flushers.add(cf);
+    }
+    
+    return subSrc;
+  }
+  
+  private class CacheFlusher implements ChangeListener {
+    private CtxtFilt ctxtFilt;
+    
+    public CacheFlusher(CtxtFilt ctxtFilt) {
+      this.ctxtFilt = ctxtFilt;
+    }
+    
+    public void preChange(ChangeEvent ce) {
+    }
+    
+    public void postChange(ChangeEvent ce) {
+      contextCache.remove(ctxtFilt);
+      flushers.remove(this);
+      
+      if(hasListeners()) {
+        ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
+        synchronized(cs) {
+          ChangeEvent ce2 = new ChangeEvent(
+            FilteringRenderer.this,
+            SequenceRenderContext.LAYOUT
+          );
+          cs.firePostChangeEvent(ce2);
+        }
+      }
+    }
+  }
+  
+  private class CtxtFilt {
+    private SequenceRenderContext src;
+    private FeatureFilter filter;
+    private boolean recurse;
+    
+    public CtxtFilt(SequenceRenderContext src, FeatureFilter filter, boolean recurse) {
+      this.src = src;
+      this.filter = filter;
+      this.recurse = recurse;
+    }
+    
+    public boolean equals(Object o) {
+      if(! (o instanceof CtxtFilt) ) {
+        return false;
+      }
+      CtxtFilt that = (CtxtFilt) o;
+      return
+        src.equals(that.src) &&
+        filter.equals(that.filter) && 
+        (recurse == that.recurse);
+    }
+    
+    public int hashCode() {
+      return src.hashCode() ^ filter.hashCode();
+    }
   }
 }

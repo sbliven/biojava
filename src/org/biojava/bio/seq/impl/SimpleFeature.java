@@ -197,7 +197,7 @@ implements Feature, RealizingFeatureHolder, java.io.Serializable {
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
 	if(featureHolderAllocated())
 	    return getFeatureHolder().filter(ff, recurse);
-	return new SimpleFeatureHolder();
+	return FeatureHolder.EMPTY_FEATURE_HOLDER;
     }
 
     public Feature.Template makeTemplate() {

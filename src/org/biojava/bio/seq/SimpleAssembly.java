@@ -163,7 +163,7 @@ public class SimpleAssembly extends AbstractSymbolList
 
     public SymbolList subList(int start, int end) {
 	Location l = locationOfPoint(start);
-	if (l.contains(end)) {
+	if ( (l != null) && (l.contains(end)) ) {
 	    SymbolList symbols = (SymbolList) components.get(l);
 	    int tstart = start - l.getMin() + 1;
 	    int tend = end - l.getMin() + 1;

@@ -66,9 +66,15 @@ public interface FeatureFilter extends Serializable {
    */
   public final static class AcceptAllFilter implements OptimizableFilter {
     public boolean accept(Feature f) { return true; }
+
     public boolean equals(Object o) {
       return o instanceof AcceptAllFilter;
     }
+
+    public int hashCode() {
+      return 0;
+    }
+
     public boolean isProperSubset(FeatureFilter sup) {
       return sup.equals(this);
     }
@@ -77,9 +83,9 @@ public interface FeatureFilter extends Serializable {
       return filt instanceof AcceptNoneFilter;
     }
 
-      public String toString() {
-	  return "All";
-      }
+    public String toString() {
+      return "All";
+    }
   }
 
   /**
@@ -97,9 +103,15 @@ public interface FeatureFilter extends Serializable {
    */
   public final static class AcceptNoneFilter implements OptimizableFilter {
     public boolean accept(Feature f) { return false; }
+
     public boolean equals(Object o) {
       return o instanceof AcceptNoneFilter;
     }
+
+    public int hashCode() {
+      return 1;
+    }
+    
     public boolean isProperSubset(FeatureFilter sup) {
       return true;
     }
@@ -149,6 +161,10 @@ public interface FeatureFilter extends Serializable {
         (((ByType) o).getType().equals(this.getType()));
     }
     
+    public int hashCode() {
+      return getType().hashCode();
+    }
+    
     public boolean isProperSubset(FeatureFilter sup) {
       return this.equals(sup) || (sup instanceof AcceptAllFilter);
     }
@@ -160,9 +176,9 @@ public interface FeatureFilter extends Serializable {
       );
     }
 
-       public String toString() {
-	  return "ByType(" + type + ")";
-       }
+    public String toString() {
+      return "ByType(" + type + ")";
+    }
   }
 
   /**
@@ -200,6 +216,10 @@ public interface FeatureFilter extends Serializable {
       return this.equals(sup) || (sup instanceof AcceptAllFilter);
     }
 
+    public int hashCode() {
+      return getSource().hashCode();
+    }
+    
     public boolean isDisjoint(FeatureFilter filt) {
       return (filt instanceof AcceptNoneFilter) || (
         (filt instanceof BySource) &&
@@ -242,6 +262,10 @@ public interface FeatureFilter extends Serializable {
         (((ByClass) o).getTestClass() == this.getTestClass());
     }
     
+    public int hashCode() {
+      return getTestClass().hashCode();
+    }
+    
     public boolean isProperSubset(FeatureFilter sup) {
       if(sup instanceof ByClass) {
         Class supC = ((ByClass) sup).getTestClass();
@@ -261,9 +285,9 @@ public interface FeatureFilter extends Serializable {
       return (feat instanceof AcceptNoneFilter);
     }
 
-      public String toString() {
-	  return "ByClass(" + clazz.getName() + ")";
-       }
+    public String toString() {
+      return "ByClass(" + clazz.getName() + ")";
+    }
   }
 
   /**
@@ -301,6 +325,10 @@ public interface FeatureFilter extends Serializable {
         (((ContainedByLocation) o).getLocation().equals(this.getLocation()));
     }
     
+    public int hashCode() {
+      return getLocation().hashCode();
+    }
+    
     public boolean isProperSubset(FeatureFilter sup) {
       if(sup instanceof ContainedByLocation) {
         Location supL = ((ContainedByLocation) sup).getLocation();
@@ -324,9 +352,9 @@ public interface FeatureFilter extends Serializable {
       return (filt instanceof AcceptNoneFilter);
     }
 
-      public String toString() {
-	  return "ContainedBy(" + loc + ")";
-       }
+    public String toString() {
+      return "ContainedBy(" + loc + ")";
+    }
   }
   
   /**
@@ -364,6 +392,10 @@ public interface FeatureFilter extends Serializable {
         (((OverlapsLocation) o).getLocation().equals(this.getLocation()));
     }
     
+    public int hashCode() {
+      return getLocation().hashCode();
+    }
+    
     public boolean isProperSubset(FeatureFilter sup) {
       if(sup instanceof OverlapsLocation) {
         Location supL = ((OverlapsLocation) sup).getLocation();
@@ -380,9 +412,9 @@ public interface FeatureFilter extends Serializable {
 	return (filt instanceof AcceptNoneFilter);
     }
 
-      public String toString() {
-	  return "Overlaps(" + loc + ")";
-       }
+    public String toString() {
+      return "Overlaps(" + loc + ")";
+    }
   }
   
   /**
@@ -413,6 +445,10 @@ public interface FeatureFilter extends Serializable {
         (((Not) o).getChild().equals(this.getChild()));
     }
     
+    public int hashCode() {
+      return getChild().hashCode();
+    }
+    
     public boolean isProperSubset(FeatureFilter sup) {
       if(sup instanceof Not) {
         FeatureFilter supC = ((Not) sup).getChild();
@@ -425,9 +461,9 @@ public interface FeatureFilter extends Serializable {
       return FilterUtils.areProperSubset(filt, getChild());
     }
 
-      public String toString() {
-	  return "Not(" + child + ")";
-      }
+    public String toString() {
+      return "Not(" + child + ")";
+    }
   }
 
   /**
@@ -466,6 +502,10 @@ public interface FeatureFilter extends Serializable {
           ((And) o).getChild1().equals(this.getChild2()) &&
           ((And) o).getChild2().equals(this.getChild1())
         ));
+    }
+    
+    public int hashCode() {
+      return getChild1().hashCode() ^ getChild2().hashCode();
     }
     
     public boolean isProperSubset(FeatureFilter sup) {
@@ -519,10 +559,14 @@ public interface FeatureFilter extends Serializable {
         (((AndNot) o).getChild1().equals(this.getChild1())) &&
         (((AndNot) o).getChild2().equals(this.getChild2()));
     }
+    
+    public int hashCode() {
+      return getChild1().hashCode() ^ getChild2().hashCode();
+    }
 
-      public String toString() {
-	  return "AndNot(" + c1 + " , " + c2 + ")";
-       }
+    public String toString() {
+      return "AndNot(" + c1 + " , " + c2 + ")";
+     }
   }
 
   /**
@@ -563,6 +607,10 @@ public interface FeatureFilter extends Serializable {
         ));
     }
     
+    public int hashCode() {
+      return getChild1().hashCode() ^ getChild2().hashCode();
+    }
+
     public boolean isProperSubset(FeatureFilter sup) {
       return
         FilterUtils.areProperSubset(getChild1(), sup) &&
@@ -576,9 +624,9 @@ public interface FeatureFilter extends Serializable {
       );
     }
 
-      public String toString() {
-	  return "Or(" + c1 + " , " + c2 + ")";
-       }
+    public String toString() {
+      return "Or(" + c1 + " , " + c2 + ")";
+    }
   }
   
   /**
@@ -637,6 +685,10 @@ public interface FeatureFilter extends Serializable {
         (((ByAnnotation) o).getValue().equals(this.getValue()));
     }
     
+    public int hashCode() {
+      return getKey().hashCode() ^ getValue().hashCode();
+    }
+    
     public boolean isProperSubset(FeatureFilter sup) {
       return this.equals(sup);
     }
@@ -689,6 +741,10 @@ public interface FeatureFilter extends Serializable {
       return
         (o instanceof HasAnnotation) &&
         (((HasAnnotation) o).getKey().equals(this.getKey()));
+    }
+    
+    public int hashCode() {
+      return getKey().hashCode();
     }
     
     public boolean isProperSubset(FeatureFilter sup) {
