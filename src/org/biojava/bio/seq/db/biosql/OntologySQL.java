@@ -182,27 +182,10 @@ class OntologySQL {
             persistOntology(conn, ont);
 
             Map localTerms = new HashMap();
+            System.err.println("*** Importing terms");
             for (Iterator i = old.getTerms().iterator(); i.hasNext(); ) {
                 Term t = (Term) i.next();
-                Term localTerm;
-                if (t instanceof RemoteTerm) {
-                    localTerm = ont.importTerm(((RemoteTerm) t).getRemoteTerm(), null);
-                } else {
-                    localTerm = ont.createTerm(t.getName(), t.getDescription());
-                    persistTerm(conn, localTerm);
-                }
-                localTerms.put(t, localTerm);
-            }
-            for (Iterator i = old.getTriples(null, null, null).iterator(); i.hasNext(); ) {
-                Triple t = (Triple) i.next();
-                Triple localT = ont.createTriple(
-                (Term) localTerms.get(t.getSubject()),
-                (Term) localTerms.get(t.getObject()),
-                (Term) localTerms.get(t.getPredicate()),
-                null, null
-                );
-
-                persistTriple(conn, ont, localT);
+                processTerm(t, localTerms, ont, conn);
             }
 
             conn.commit();
@@ -216,6 +199,47 @@ class OntologySQL {
         } catch (ChangeVetoException ex) {
             throw new BioError("Unexpected veto altering internal Ontology object",ex);
         }
+    }
+
+    private void processTerm(Term t,
+                             Map localTerms,
+                             Ontology ont,
+                             Connection conn)
+            throws AlreadyExistsException, ChangeVetoException, SQLException
+    {
+       System.err.println("Processing term: " + t);
+       Term localTerm;
+
+       if(localTerms.keySet().contains(t)) {
+         // don't double-import
+         return;
+       }
+
+       if (t instanceof Triple) {
+         Triple trip = (Triple) t;
+
+         processTerm(trip.getSubject(),   localTerms, ont, conn);
+         processTerm(trip.getObject(),    localTerms, ont, conn);
+         processTerm(trip.getPredicate(), localTerms, ont, conn);
+
+         localTerm = ont.createTriple(
+           (Term) localTerms.get(trip.getSubject()),
+                (Term) localTerms.get(trip.getObject()),
+                (Term) localTerms.get(trip.getPredicate()),
+                null, null
+                );
+
+         persistTriple(conn, ont, (Triple) localTerm);
+       } else if (t instanceof RemoteTerm) {
+         localTerm = ont.importTerm(((RemoteTerm) t).getRemoteTerm(), null);
+       } else {
+         localTerm = ont.createTerm(t.getName(), t.getDescription());
+         persistTerm(conn, localTerm);
+       }
+
+       localTerms.put(t, localTerm);
+
+       System.err.println("Done processing term: " + t);
     }
 
     private void loadTerms(Ontology ont, int id)
@@ -468,6 +492,7 @@ class OntologySQL {
         Integer tid = new Integer(id);
         termsByID.put(tid, term);
         IDsByTerm.put(term, tid);
+        System.err.println("Persisted term: " + tid + " -> " + term);
       } catch (SQLException se) {
         throw (SQLException) new SQLException(
                 "Failed to persist term: " + term +
@@ -502,6 +527,8 @@ class OntologySQL {
     private void persistTriple(Connection conn, Ontology ont, Triple triple)
         throws SQLException
     {
+        persistTerm(conn, triple);
+
         PreparedStatement import_trip = conn.prepareStatement(
             "insert into term_relationship " +
             "       (subject_term_id, predicate_term_id, object_term_id, ontology_id) " +
@@ -513,6 +540,7 @@ class OntologySQL {
         import_trip.setInt(4, ontologyID(ont));
         import_trip.executeUpdate();
         import_trip.close();
+        System.err.println("Persisted triple: " + triple);
     }
 
     private void persistOntology(Ontology onto)
