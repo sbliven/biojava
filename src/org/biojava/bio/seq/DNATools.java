@@ -224,4 +224,42 @@ public final class DNATools {
   throws IllegalAlphabetException {
     return new ComplementSymbolList(new ReverseSymbolList(list));
   }
+
+    public static final ReversibleTranslationTable _complementTable = new DNAComplementTranslationTable();
+    
+    /**
+     * Get a translation table for complementing DNA symbols.
+     *
+     * @since 1.1
+     */
+
+    public static ReversibleTranslationTable complementTable() {
+	return _complementTable;
+    }
+
+    /**
+     * Sneaky class for complementing DNA bases.
+     */
+
+    private static class DNAComplementTranslationTable implements ReversibleTranslationTable {
+	public Symbol translate(Symbol s) 
+	    throws IllegalSymbolException
+	{
+	    return DNATools.complement(s);
+	}
+
+	public Symbol untranslate(Symbol s) 
+	    throws IllegalSymbolException
+	{
+	    return DNATools.complement(s);
+	}
+
+	public Alphabet getSourceAlphabet() {
+	    return DNATools.getDNA();
+	}
+
+	public Alphabet getTargetAlphabet() {
+	    return DNATools.getDNA();
+	}
+    }
 }
