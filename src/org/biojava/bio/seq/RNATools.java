@@ -299,64 +299,6 @@ public final class RNATools {
     return new TranslatedSymbolList(syms, getGeneticCode("UNIVERSAL"));
   }
   
-  /**
-   * Sneaky class for complementing RNA bases.
-   */
-
-  private static class RNAComplementTranslationTable
-  implements ReversibleTranslationTable {
-    public Symbol translate(Symbol s) 
-	  throws IllegalSymbolException {
-	    return RNATools.complement(s);
-	  }
-
-	  public Symbol untranslate(Symbol s) 
-	  throws IllegalSymbolException {
-	    return RNATools.complement(s);
-    }
-
-	  public Alphabet getSourceAlphabet() {
-	    return RNATools.getRNA();
-	  }
-
-	  public Alphabet getTargetAlphabet() {
-	    return RNATools.getRNA();
-	  }
-  }
-  
-  /**
-   * Sneaky class for converting DNA->RNA.
-   */
-   
-  private static class TranscriptionTable
-  implements ReversibleTranslationTable {
-    public Symbol translate(Symbol s)
-    throws IllegalSymbolException {
-      if(s == DNATools.t()) {
-        return u;
-      }
-      DNATools.getDNA().validate(s);
-      return s;
-    }
-    
-    public Symbol untranslate(Symbol s)
-    throws IllegalSymbolException {
-      if(s == u) {
-        return DNATools.t();
-      }
-      rna.validate(s);
-      return s;
-    }
-    
-    public Alphabet getSourceAlphabet() {
-      return DNATools.getDNA();
-    }
-    
-    public Alphabet getTargetAlphabet() {
-      return RNATools.getRNA();
-    }
-  }
-
   private static void loadGeneticCodes() {
     try {
       InputStream tablesStream = RNATools.class.getClassLoader().getResourceAsStream(
@@ -416,3 +358,62 @@ public final class RNATools {
     }
   }
 }
+
+  /**
+   * Sneaky class for complementing RNA bases.
+   */
+
+  /*private static*/ class RNAComplementTranslationTable
+  implements ReversibleTranslationTable {
+    public Symbol translate(Symbol s) 
+	  throws IllegalSymbolException {
+	    return RNATools.complement(s);
+	  }
+
+	  public Symbol untranslate(Symbol s) 
+	  throws IllegalSymbolException {
+	    return RNATools.complement(s);
+    }
+
+	  public Alphabet getSourceAlphabet() {
+	    return RNATools.getRNA();
+	  }
+
+	  public Alphabet getTargetAlphabet() {
+	    return RNATools.getRNA();
+	  }
+  }
+  
+  /**
+   * Sneaky class for converting DNA->RNA.
+   */
+   
+  /*private static*/ class TranscriptionTable
+  implements ReversibleTranslationTable {
+    public Symbol translate(Symbol s)
+    throws IllegalSymbolException {
+      if(s == DNATools.t()) {
+        return RNATools.u();
+      }
+      DNATools.getDNA().validate(s);
+      return s;
+    }
+    
+    public Symbol untranslate(Symbol s)
+    throws IllegalSymbolException {
+      if(s == RNATools.u()) {
+        return DNATools.t();
+      }
+      RNATools.getRNA().validate(s);
+      return s;
+    }
+    
+    public Alphabet getSourceAlphabet() {
+      return DNATools.getDNA();
+    }
+    
+    public Alphabet getTargetAlphabet() {
+      return RNATools.getRNA();
+    }
+  }
+
