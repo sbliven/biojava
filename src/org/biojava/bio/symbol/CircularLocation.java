@@ -1,85 +1,52 @@
 /*
-
  *                    BioJava development code
-
  *
-
  * This code may be freely distributed and modified under the
-
  * terms of the GNU Lesser General Public Licence.  This should
-
  * be distributed with the code.  If you do not have a copy,
-
  * see:
-
  *
-
  *      http://www.gnu.org/copyleft/lesser.html
-
  *
-
  * Copyright for this code is held jointly by the individual
-
  * authors.  These should be listed in @author doc comments.
-
  *
-
  * For more information on the BioJava project and its aims,
-
  * or to join the biojava-l mailing list, visit the home page
-
  * at:
-
  *
-
  *      http://www.biojava.org/
-
- *
-
  */
 
-
-
 package org.biojava.bio.symbol;
-
-
-
-import org.biojava.bio.*;
-
-import org.biojava.utils.*;
-
-import org.biojava.bio.seq.*;
-
-import org.biojava.bio.seq.impl.*;
-
-import org.biojava.bio.seq.io.*;
-
-
 
 import java.util.*;
 
 
+import org.biojava.bio.*;
+
+
 
 /**
-
  * Circular view onto an underlying Location instance. If the location overlaps
-
  * the origin of the sequence the underlying location will be a CompoundLocation
-
  * Note that in this case isContiguous() will return false. This behaviour is
-
  * desirable for proper treatment of the location with LocationTools.
-
  * To find if a location overlaps the origin use the overlapsOrigin() method
-
+ * <p>
+ * Note also that as a location that overlaps the origin is a compound location it's
+ * min will be 1 and its max will be length (by default). In these cases it is imperative to
+ * use the block iterator if you wish to know the 'true' min and max (bearing in mind that
+ * there is no logical value for a min or max on a circular sequence).
+ * </p>
+ *  <p>
+ * The symbols() method has been overridden to handle the weirdness of a location crossing the
+ * origin.
+ * </p>
  *
-
  * @author Matthew Pocock
-
  * @author Mark Schreiber
-
  * @since 1.2
-
  */
 
 public class CircularLocation
@@ -175,79 +142,6 @@ extends AbstractLocationDecorator {
 
   }
 
-  public int getMax() {
-
-    if(getWrapped().isContiguous()){
-
-      if(getWrapped().getMin() ==1 && getWrapped().getMax() == length){
-
-        return length;
-
-      }
-
-    }
-
-    if(overlaps){
-
-      int max = 1;
-
-      for(Iterator i = getWrapped().blockIterator();i.hasNext();){
-
-        Location l = ((Location)i.next());
-
-        if(l.getMin() == 1) max = l.getMax();
-
-      }
-
-      return max;
-
-    }else{
-
-      return super.getMax();
-
-    }
-
-  }
-
-  public int getMin() {
-
-    if(getWrapped().isContiguous()){
-
-      if(getWrapped().getMin() ==1 && getWrapped().getMax() == length){
-
-        return 1;
-
-      }
-
-    }
-
-    if(overlaps){
-
-      int min = 1;
-
-      for(Iterator i = getWrapped().blockIterator();i.hasNext();){
-
-        Location l = ((Location)i.next());
-
-        if(l.getMax() == length) min = l.getMin();
-
-      }
-
-      return min;
-
-    }else{
-
-      return super.getMin();
-
-    }
-
-  }
-
-
-
-
-
-
 
   public String toString(){
 
@@ -260,26 +154,14 @@ extends AbstractLocationDecorator {
   }
 
 
-
+  /**
+   * Delegates to the wrapped location. Currently as locations that cross
+   * the origin are wrapped CompoundLocations they are not considered contiguous.
+   * This is desirable from the point of view of logical operations as it greatly
+   * simplifies the calculations of things such as contains, overlaps etc.
+   */
   public boolean isContiguous() {
-
-    boolean a = false;
-    boolean b = false;
-    int i = 1;
-
-    if(super.isContiguous()) return true;
-    if(getWrapped() instanceof CompoundLocation){
-      CompoundLocation l = (CompoundLocation)getWrapped();
-
-      for(Iterator iter = l.blockIterator(); iter.hasNext(); i++){
-        if(i > 2) return false;
-        Location block = (Location)iter.next();
-        if(block.getMin() == 1) a = true;
-        if(block.getMax() == this.getLength()) b = true;
-      }
-    }
-
-    return(a && b);
+    return getWrapped().isContiguous();
   }
 
 

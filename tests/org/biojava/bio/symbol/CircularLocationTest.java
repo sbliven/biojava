@@ -38,19 +38,25 @@ public class CircularLocationTest extends TestCase
     protected CircularLocation r3;
     protected CircularLocation r4;
     protected CircularLocation r5;
+    protected CircularLocation r6;
+    protected CircularLocation r7;
 
     public CircularLocationTest(String name)
     {
-	super(name);
+        super(name);
     }
 
     protected void setUp() throws Exception
     {
-	r1 = LocationTools.makeCircularLocation(1, 100, 200);
-	r2 = LocationTools.makeCircularLocation(1, 200, 200);
-	r3 = LocationTools.makeCircularLocation(105, 300, 200);
-	r4 = LocationTools.makeCircularLocation(-50, 20, 200);
-	r5 = LocationTools.makeCircularLocation(90, 110, 200);
+        r1 = LocationTools.makeCircularLocation(1, 100, 200);
+        r2 = LocationTools.makeCircularLocation(1, 200, 200);
+        r3 = LocationTools.makeCircularLocation(105, 300, 200);
+        r4 = LocationTools.makeCircularLocation(-50, 20, 200);
+        r5 = LocationTools.makeCircularLocation(90, 110, 200);
+
+        r6 = LocationTools.makeCircularLocation(18,24,20);
+        r7 = LocationTools.makeCircularLocation(2,8,20);
+
     }
 
      /**
@@ -59,11 +65,11 @@ public class CircularLocationTest extends TestCase
      */
     public void testConstruction()
     {
-  	assertTrue(r1 != null);
-	assertTrue(r2 != null);
-	assertTrue(r3 != null);
-	assertTrue(r4 != null);
-	assertTrue(r5 != null);
+        assertTrue(r1 != null);
+        assertTrue(r2 != null);
+        assertTrue(r3 != null);
+        assertTrue(r4 != null);
+        assertTrue(r5 != null);
     }
     /**
      * <code>testEquals</code> tests equality directly.
@@ -71,9 +77,11 @@ public class CircularLocationTest extends TestCase
      */
     public void testEquals()
     {
-  	assertEquals(r1, r1);
-  	assertEquals(r1, LocationTools.makeCircularLocation(1, 100, 200));
+        assertEquals(r1, r1);
+        assertEquals(r1, LocationTools.makeCircularLocation(1, 100, 200));
     }
+
+
 
     /**
      * <code>testAreEqual</code> tests equality via
@@ -82,8 +90,8 @@ public class CircularLocationTest extends TestCase
      */
     public void testAreEqual()
     {
-	assertTrue(LocationTools.areEqual(r1, r1));
-	assertTrue(LocationTools.areEqual(r1, LocationTools.makeCircularLocation(1, 100, 200)));
+        assertTrue(LocationTools.areEqual(r1, r1));
+        assertTrue(LocationTools.areEqual(r1, LocationTools.makeCircularLocation(1, 100, 200)));
     }
 
     /**
@@ -93,15 +101,18 @@ public class CircularLocationTest extends TestCase
      */
     public void testOverlaps()
     {
-	assertTrue(LocationTools.overlaps(r1, r1));
-	assertTrue(LocationTools.overlaps(r2, r2));
-	assertTrue(LocationTools.overlaps(r1, r2));
-	assertTrue(LocationTools.overlaps(r2, r1));
-	assertTrue(LocationTools.overlaps(r4, r2));
-	assertTrue(LocationTools.overlaps(r2, r4));
-	assertTrue(LocationTools.overlaps(r5, r3));
-	
-	assertTrue(! LocationTools.overlaps(r5, r4));
+        assertTrue(LocationTools.overlaps(r1, r1));
+        assertTrue(LocationTools.overlaps(r2, r2));
+        assertTrue(LocationTools.overlaps(r1, r2));
+        assertTrue(LocationTools.overlaps(r2, r1));
+        assertTrue(LocationTools.overlaps(r4, r2));
+        assertTrue(LocationTools.overlaps(r2, r4));
+        assertTrue(LocationTools.overlaps(r5, r3));
+        assertTrue(LocationTools.overlaps(r3 ,r5));
+        assertTrue(LocationTools.overlaps(r6 ,r7));
+        assertTrue(LocationTools.overlaps(r7 ,r6));
+
+        assertTrue(! LocationTools.overlaps(r5, r4));
     }
 
     /**
@@ -111,20 +122,20 @@ public class CircularLocationTest extends TestCase
      */
     public void testContains()
     {
-	assertTrue(LocationTools.contains(r2, r1));
-	assertTrue(LocationTools.contains(r2, r3));
-	assertTrue(LocationTools.contains(r2, r4));
-	assertTrue(LocationTools.contains(r2, r5));
-	assertTrue(LocationTools.contains(r3, r4));
-	
-	assertTrue(! LocationTools.contains(r4, r5));
-	assertTrue(! LocationTools.contains(r4, r3));
-	assertTrue(! LocationTools.contains(r1, r2));
+        assertTrue(LocationTools.contains(r2, r1));
+        assertTrue(LocationTools.contains(r2, r3));
+        assertTrue(LocationTools.contains(r2, r4));
+        assertTrue(LocationTools.contains(r2, r5));
+        assertTrue(LocationTools.contains(r3, r4));
 
-	assertTrue(r1.contains(1));
-	assertTrue(r1.contains(100));
-	assertTrue(r1.contains(202));
-	assertTrue(! r1.contains(101));
+        assertTrue(! LocationTools.contains(r4, r5));
+        assertTrue(! LocationTools.contains(r4, r3));
+        assertTrue(! LocationTools.contains(r1, r2));
+
+        assertTrue(r1.contains(1));
+        assertTrue(r1.contains(100));
+        assertTrue(r1.contains(202));
+        assertTrue(! r1.contains(101));
     }
 
     /**
@@ -134,12 +145,12 @@ public class CircularLocationTest extends TestCase
      */
     public void testIntersection()
     {
-	assertEquals(LocationTools.intersection(r1, r2),
-		     LocationTools.intersection(r2, r1));
-	assertEquals(LocationTools.intersection(r5, r4),
-		     Location.empty);
-	assertEquals(LocationTools.intersection(r4, r5),
-		     Location.empty);
+        assertEquals(LocationTools.intersection(r1, r2),
+                     LocationTools.intersection(r2, r1));
+        assertEquals(LocationTools.intersection(r5, r4),
+                     Location.empty);
+        assertEquals(LocationTools.intersection(r4, r5),
+                     Location.empty);
     }
 
     /**
@@ -149,9 +160,9 @@ public class CircularLocationTest extends TestCase
      */
     public void testUnion()
     {
-	assertEquals(r1, LocationTools.union(r1, r1));
-	assertEquals(LocationTools.union(r1, r2),
-		     LocationTools.union(r2, r1));
+        assertEquals(r1, LocationTools.union(r1, r1));
+        assertEquals(LocationTools.union(r1, r2),
+                     LocationTools.union(r2, r1));
     }
 
     /**
@@ -160,14 +171,14 @@ public class CircularLocationTest extends TestCase
      */
     public void testIsContiguous()
     {
-	assertTrue(r1.isContiguous());
-	assertTrue(r2.isContiguous());
-	assertTrue(r3.isContiguous());
-	assertTrue(r4.isContiguous());
-	assertTrue(r5.isContiguous());
-	
-	Location l = LocationTools.union(new RangeLocation(1,4),new RangeLocation(7,10));
+        assertTrue(r1.isContiguous());
+        assertTrue(r2.isContiguous());
+        assertTrue(! r3.isContiguous());
+        assertTrue(! r4.isContiguous());
+        assertTrue(r5.isContiguous());
+
+        Location l = LocationTools.union(new RangeLocation(1,4),new RangeLocation(7,10));
         CircularLocation cl = new CircularLocation(l,200);
-	assertTrue(! cl.isContiguous());
-    } 
+        assertTrue(! cl.isContiguous());
+    }
 }
