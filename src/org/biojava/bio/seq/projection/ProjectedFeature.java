@@ -49,7 +49,7 @@ class ProjectedFeature
   
   private final Feature feature;
   private final ProjectionContext context;
-  private Location newLocation;
+    // private Location newLocation;
   private FeatureHolder projectedFeatures;
   
   public ProjectedFeature(
@@ -91,27 +91,28 @@ class ProjectedFeature
   }
   
   public Location getLocation() {
-    if (newLocation == null) {
-      if(locationClearer == null) {
-        // listener to clear location to null if the underlying location changes
-        feature.addChangeListener(
-          locationClearer = new ChangeAdapter() {
-            public void postChange(ChangeEvent ce) {
-              newLocation = null;
-            }
-          },
-          LOCATION
-        );
-      }
-      newLocation = context.getLocation(feature);
-    }
-    return newLocation;
+//      if (newLocation == null) {
+//        if(locationClearer == null) {
+//          // listener to clear location to null if the underlying location changes
+//          feature.addChangeListener(
+//            locationClearer = new ChangeAdapter() {
+//              public void postChange(ChangeEvent ce) {
+//                newLocation = null;
+//              }
+//            },
+//            LOCATION
+//          );
+//        }
+//        newLocation = context.getLocation(feature);
+//      }
+//      return newLocation;
+      return context.getLocation(feature);
   }
   
   public void setLocation(Location loc)
   throws ChangeVetoException {
     throw new ChangeVetoException(new ChangeEvent(
-      this, LOCATION, this.newLocation, loc
+      this, LOCATION, getLocation(), loc
     ));
     
     // fixme: loc should get reverse-projected through the context
