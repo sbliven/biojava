@@ -143,4 +143,19 @@ public class RoundRectangularBeadRenderer extends AbstractBeadRenderer
 	g.setPaint(beadOutline);
 	g.draw(shape);
     }
+
+    /**
+     * <code>getDepth</code> calculates the depth required by this
+     * renderer to display its beads.
+     *
+     * @param context a <code>SequenceRenderContext</code> object.
+     *
+     * @return a <code>double</code> value.
+     */
+    public double getDepth(final SequenceRenderContext context)
+    {
+	// Get max depth of delegates using base class method
+  	double maxDepth = super.getDepth(context);
+  	return Math.max(maxDepth, (beadDepth + beadDisplacement));
+    }
 }

@@ -38,6 +38,7 @@ import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 
+import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.gui.sequence.FeatureRenderer;
 import org.biojava.bio.gui.sequence.SequenceRenderContext;
@@ -48,10 +49,13 @@ import org.biojava.bio.seq.OptimizableFilter;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.symbol.Location;
 import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeAdapter;
 import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
 
 /**
  * <code>AbstractBeadRenderer</code> is a an abstract base
@@ -76,29 +80,49 @@ import org.biojava.utils.ChangeVetoException;
 public abstract class AbstractBeadRenderer extends AbstractChangeable
     implements FeatureRenderer
 {
-        public static final ChangeType DISPLACEMENT =
+    /**
+     * constant <code>DISPLACEMENT</code> indicating a change to the
+     * Y-axis displacement of the feature.
+     */
+    public static final ChangeType DISPLACEMENT =
 	new ChangeType("The displacement of the features has changed",
-		       "org.biojava.bio.gui.sequence.GeometricBeadFeatureRenderer",
+		       "org.biojava.bio.gui.sequence.AbstractBeadRenderer",
 		       "DISPLACEMENT", SequenceRenderContext.LAYOUT);
     
+    /**
+     * constant <code>DEPTH</code> indicating a change to the depth of
+     * the renderer.
+     */
     public static final ChangeType DEPTH =
 	new ChangeType("The depth of the renderer has changed",
-		       "org.biojava.bio.gui.sequence.GeometricBeadFeatureRenderer",
+		       "org.biojava.bio.gui.sequence.AbstractBeadRenderer",
 		       "DEPTH", SequenceRenderContext.LAYOUT);
 
+    /**
+     * constant <code>OUTLINE</code> indicating a change to the
+     * outline paint of the feature.
+     */
     public static final ChangeType OUTLINE =
 	new ChangeType("The outline of the features has changed",
-		       "org.biojava.bio.gui.sequence.GeometricBeadFeatureRenderer",
+		       "org.biojava.bio.gui.sequence.AbstractBeadRenderer",
 		       "OUTLINE", SequenceRenderContext.REPAINT);
 
+    /**
+     * constant <code>STROKE</code> indicating a change to the outline
+     * stroke of the feature.
+     */
     public static final ChangeType STROKE =
 	new ChangeType("The stroke of the features has changed",
-		       "org.biojava.bio.gui.sequence.GeometricBeadFeatureRenderer",
+		       "org.biojava.bio.gui.sequence.AbstractBeadRenderer",
 		       "STROKE", SequenceRenderContext.REPAINT);
     
+    /**
+     * constant <code>FILL</code> indicating a change to the fill of
+     * the feature.
+     */
     public static final ChangeType FILL =
 	new ChangeType("The fill of the features has changed",
-		       "org.biojava.bio.gui.sequence.GeometricBeadFeatureRenderer",
+		       "org.biojava.bio.gui.sequence.AbstractBeadRenderer",
 		       "FILL", SequenceRenderContext.REPAINT);
 
     protected double        beadDepth;
@@ -108,7 +132,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
     protected Stroke       beadStroke;
 
     protected Map           delegates;
-    protected Map               cache;
+    protected Cache             cache;
 
     /**
      * Creates a new <code>AbstractBeadRenderer</code> with no
@@ -117,11 +141,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      */
     public AbstractBeadRenderer()
     {
-	this(10.0f, 0.0f, Color.black, Color.black,
-	     new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
-
-	delegates = new HashMap();
-	cache     = new WeakHashMap();
+	this(10.0f, 0.0f, Color.black, Color.black, new BasicStroke());
     }
 
     /**
@@ -144,6 +164,9 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 	this.beadOutline      = beadOutline;
 	this.beadFill         = beadFill;
 	this.beadStroke       = beadStroke;
+
+	delegates = new HashMap();
+	cache     = new Cache();
     }
 
     /**
@@ -177,7 +200,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 	// Check the cache first
 	if (cache.containsKey(f))
 	{
-	    System.err.println("Used cache for: " + f);
+	    // System.err.println("Used cache for: " + f);
 
 	    AbstractBeadRenderer cachedRenderer =
 		(AbstractBeadRenderer) cache.get(f);
@@ -296,10 +319,6 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 
 	    return maxDepth;
 	}
-
-	// Get max depth of delegates using base class method
-//  	double maxDepth = super.getDepth(context);
-//  	return Math.max(maxDepth, (beadDepth + beadDisplacement));
     }
 
     /**
@@ -508,6 +527,58 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 	else
 	{
 	    beadFill = fill;
+	}
+    }
+
+    /**
+     * <p><code>Cache</code> to hold the direct mapping of
+     * <code>Feature</code>s to their renderers. This is used to
+     * bypass recursion through the delegate renderers once the
+     * relationship has been established by an initial recursive
+     * search.</p>
+     *
+     * <p>The <code>Feature</code>s register themselves with a
+     * <code>ChangeListener</code> in the cache. When a feature
+     * changes its rendered representation may need to be updated, so
+     * the listener removes the feature from the cache. Currently
+     * features are immutable, apart from their Annotation, so the
+     * cache only listens for changes there. Features forward
+     * ChangeEvents from their Annotation.</p>
+     *
+     * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+     * @since 1.2
+     */
+    private class Cache
+    {
+	private WeakHashMap map = new WeakHashMap();
+
+	private ChangeListener listener = new ChangeAdapter()
+	{
+	    public void postChange(ChangeEvent cev)
+	    {
+		Changeable changedFeature = (Changeable) cev.getSource();
+		map.remove(changedFeature);
+		changedFeature.removeChangeListener(listener);
+	    }
+	};
+
+	public void put(Object key, Object value)
+	{
+	    map.put(key, value);
+	    if (Changeable.class.isInstance(key))
+	    {
+		((Changeable) key).addChangeListener(listener, Annotation.PROPERTY);
+	    }
+	}
+
+	public Object get(Object key)
+	{
+	    return map.get(key);
+	}
+
+	public boolean containsKey(Object key)
+	{
+	    return map.containsKey(key);
 	}
     }
 }

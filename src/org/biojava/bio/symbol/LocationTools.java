@@ -315,7 +315,7 @@ final public class LocationTools {
         joinList.add(last);
       }
 
-      // now make the apropreate Location instance
+      // now make the appropriate Location instance
       return buildLoc(joinList);
     }
 

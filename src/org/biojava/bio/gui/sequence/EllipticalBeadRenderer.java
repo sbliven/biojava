@@ -58,7 +58,7 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
     /**
      * Creates a new <code>EllipticalBeadRenderer</code> object
      * with the default settings.
-      */
+     */
     public EllipticalBeadRenderer()
     {
 	super();
@@ -137,6 +137,21 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
 	g.setStroke(beadStroke);
 	g.setPaint(beadFill);
 	g.draw(shape);
+    }
+
+    /**
+     * <code>getDepth</code> calculates the depth required by this
+     * renderer to display its beads.
+     *
+     * @param context a <code>SequenceRenderContext</code> object.
+     *
+     * @return a <code>double</code> value.
+     */
+    public double getDepth(final SequenceRenderContext context)
+    {
+	// Get max depth of delegates using base class method
+  	double maxDepth = super.getDepth(context);
+  	return Math.max(maxDepth, (beadDepth + beadDisplacement));
     }
 
     /**

@@ -61,27 +61,38 @@ public class FuzzyPointLocation extends AbstractLocation
 
     /**
      * Creates a new <code>FuzzyPointLocation</code> object. Note that
-     * either the maximum or minimum may be unbounded, but not both.
+     * either the maximum or minimum may be unbounded, but not
+     * both. The minumum and maximum may not be the same coordinate as
+     * that would become an ordinary <code>PointLocation</code>.
      *
      * @param min an <code>int</code> value for the minimum boundary
      * of the location, Integer.MIN_VALUE if unbounded.
      * @param max an <code>int</code> value for the minimum boundary
      * of the location, Integer.MAX_VALUE if unbounded.
      * @param resolver a <code>PointResolver</code> which defines the
-     * policy used to calculate * the location's min and max
+     * policy used to calculate the location's min and max
      * properties.
      *
-     * @exception IndexOutOfBoundsException if an error occurs.
+     * @exception IndexOutOfBoundsException if the minimum and maximum
+     * are both unbounded or are equal.
      */
     public FuzzyPointLocation(int min, int max, PointResolver resolver)
 	throws IndexOutOfBoundsException
     {
 	if ((min == Integer.MIN_VALUE) && max == Integer.MAX_VALUE)
 	    throw new IndexOutOfBoundsException("A fuzzy point may only have an unbounded max OR min"); 
-	    
+
+	if (min == max)
+	    throw new IndexOutOfBoundsException("A fuzzy point may not have equal max and min"); 
+
 	this.min      = min;
 	this.max      = max;
 	this.resolver = resolver;
+    }
+
+    public PointResolver getResolver()
+    {
+	return resolver;
     }
 
     public int getMin()
@@ -114,8 +125,8 @@ public class FuzzyPointLocation extends AbstractLocation
 	// If the location is unbounded, it is not certain that it
 	// contains any other specific location
 	return (hasBoundedMin() && hasBoundedMax()) &&
-	   (resolver.resolve(this) == loc.getMin()) &&
-	   (resolver.resolve(this) == loc.getMax()); 
+	    (resolver.resolve(this) == loc.getMin()) &&
+	    (resolver.resolve(this) == loc.getMax()); 
     }
 
     public boolean contains(int point)
@@ -131,8 +142,9 @@ public class FuzzyPointLocation extends AbstractLocation
 	return this.contains(loc) && loc.contains(this);
     }
     
-    public int hashCode() {
-      return getMin();
+    public int hashCode()
+    {
+	return getMin();
     }
 
     public Location intersection(Location loc)
@@ -250,7 +262,7 @@ public class FuzzyPointLocation extends AbstractLocation
 	    // Range of form: (123.567)
 	    if (loc.hasBoundedMin() && loc.hasBoundedMax())
 	    {
-		return loc.getMin() + loc.getMax() / 2;
+		return (loc.getMin() + loc.getMax()) / 2;
 	    }
 	    // Range of form: <123 or >123
 	    else
