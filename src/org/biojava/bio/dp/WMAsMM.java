@@ -112,7 +112,8 @@ public class WMAsMM implements MarkovModel {
     return Collections.singleton(stateList[toWM.index()-1]);
   }
   
-  public void registerWithTrainer(ModelTrainer modelTrainer) {
+  public void registerWithTrainer(ModelTrainer modelTrainer)
+  throws SeqException {
     for(Iterator i = stateAlphabet().residues().iterator(); i.hasNext(); ) {
       EmissionState s = (EmissionState) i.next();
       s.registerWithTrainer(modelTrainer);

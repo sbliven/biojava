@@ -85,11 +85,14 @@ public final class AlphabetManager {
     return (Alphabet) nameToAlphabet.get(name);
   }
 
-    private Residue residueForName(String name) 
-        throws NoSuchElementException
-    {
-	return (Residue) nameToResidue.get(name);
+  Residue residueForName(String name) 
+  throws NoSuchElementException {
+    Residue r = (Residue) nameToResidue.get(name);
+    if(r == null) {
+      throw new NoSuchElementException("Could not find residue under the name " + name);
     }
+    return r;
+  }
 
   /**
    * Register an alphabet by name.

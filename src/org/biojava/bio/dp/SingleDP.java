@@ -152,21 +152,26 @@ class SingleDP extends DP {
     double [] v = dpCursor.currentCol();
     State [] states = getStates();
 
-    // new_l = transition(start, l)
     for (int l = 0; l < states.length; l++) {
-      v[l] = (states[l] == getModel().magicalState()) ? 0.0 : Double.NEGATIVE_INFINITY;
+      if(states[l] == getModel().magicalState()) {
+        v[l] = 0.0;
+      } else {
+        v[l] = Double.NEGATIVE_INFINITY;
+      }
     }
   }
 
   private void backward_initialize(DPCursor dpCursor)
     throws IllegalResidueException {
-    double [] vc = dpCursor.currentCol();
-    double [] vl = dpCursor.lastCol();
+    double [] v = dpCursor.currentCol();
     State [] states = getStates();
 
-    // new_l = transition(start, l)
     for (int l = 0; l < states.length; l++) {
-      vc[l] = vl[l] = 0.0; //(states[l] == getModel().magicalState()) ? 0.0 : Double.NEGATIVE_INFINITY;
+      if(states[l] == getModel().magicalState()) {
+        v[l] = 0.0;
+      } else {
+        v[l] = Double.NEGATIVE_INFINITY;
+      }
     }
   }
 
@@ -183,10 +188,10 @@ class SingleDP extends DP {
       // System.out.println("\n*** Index=" + _index + " ***");
       dpCursor.advance();
       Residue res = dpCursor.currentRes();
+//      System.out.println("Consuming " + res.getName());
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
-      for (int l = 0; l < getDotStatesIndex(); l++) { // all emission states
-        // state l for residue i  sum(p(k->l))
+      for (int l = 0; l < getDotStatesIndex(); l++) { //any -> emission
         double weight = ((EmissionState) states[l]).getWeight(res);
         if (weight == Double.NEGATIVE_INFINITY) {
           // System.out.println("*");
@@ -197,8 +202,10 @@ class SingleDP extends DP {
           double [] trs = transitionScore[l];
           // System.out.println("l=" + states[l].getName());
           int ci = 0;
-          while (ci < tr.length &&
-              lastCol[tr[ci]] == Double.NEGATIVE_INFINITY) {
+          while (
+            ci < tr.length &&
+            lastCol[tr[ci]] == Double.NEGATIVE_INFINITY
+          ) {
             ci++;
           }
           double constant = (ci < tr.length) ? lastCol[tr[ci]] : 0.0;
@@ -208,15 +215,19 @@ class SingleDP extends DP {
             // System.out.println("k=" + states[k].getName());
             if (lastCol[k] != Double.NEGATIVE_INFINITY) {
               double t = trs[kc];
-              // System.out.println("t=" + t);
-              score += Math.exp(t + lastCol[k] - constant);
+              //System.out.println("t=" + t);
+              //System.out.println("lastCol[k]=" + lastCol[k]);
+              score += Math.exp(t + (lastCol[k] - constant));
             } else {
               // System.out.println("-");
             }
           }
           // new_l = emission_l(res) * sum_k(transition(k, l) * old_k)
-          currentCol[l] = weight + Math.log(score) + constant;
-          // System.out.println("currentCol[" + states[l].getName() + "]=" + currentCol[l]);
+          currentCol[l] = (weight + Math.log(score)) + constant;
+          //System.out.println("Weight " + weight);
+          //System.out.println("score " + score + " = " + Math.log(score));
+          //System.out.println("constant " + constant);
+          //System.out.println("currentCol[" + states[l].getName() + "]=" + currentCol[l]);
         }
       }
       for(int l = getDotStatesIndex(); l < states.length; l++) { // all dot states from emissions
@@ -227,56 +238,23 @@ class SingleDP extends DP {
         int ci = 0;
         while(
           ci < tr.length  &&
-          tr[ci] < getDotStatesIndex() &&
           currentCol[tr[ci]] == Double.NEGATIVE_INFINITY
         ) {
           ci++;
-        }
-        double constant = (ci < tr.length) ? lastCol[tr[ci]] : 0.0;
-        
-        for(int kc = 0; kc < tr.length; kc++) {
-          int k = tr[kc];
-          if(k >= getDotStatesIndex()) {
-            break;
-          }
-
-          if(currentCol[k] != Double.NEGATIVE_INFINITY) {
-            double t = trs[kc];
-            score += Math.exp(t + currentCol[k] - constant);
-          } else {
-          }
-        }
-        currentCol[l] = Math.log(score) + constant;
-      }
-      for(int l = getDotStatesIndex(); l < states.length; l++) { // all dot states to each other
-        double score = 0.0;
-        int [] tr = transitions[l];
-        double [] trs = transitionScore[l];
-        
-        int ci = tr.length-1;
-        while(
-          ci >= getDotStatesIndex()  &&
-          lastCol[tr[ci]] == Double.NEGATIVE_INFINITY
-        ) {
-          ci--;
         }
         double constant = (ci < tr.length) ? currentCol[tr[ci]] : 0.0;
         
         for(int kc = 0; kc < tr.length; kc++) {
           int k = tr[kc];
-          if(k < getDotStatesIndex()) {
-            continue;
-          }
-          if(k >= l) {
-            break;
-          }
+
           if(currentCol[k] != Double.NEGATIVE_INFINITY) {
             double t = trs[kc];
-            score += Math.exp(t + currentCol[k] - constant);
+            score += Math.exp(t + (currentCol[k] - constant));
           } else {
           }
         }
-        currentCol[l] += Math.log(score) + constant;
+        currentCol[l] = Math.log(score) + constant;
+        //System.out.println("currentCol[" + states[l].getName() + "]=" + currentCol[l]);
       }
     }
   }
@@ -294,7 +272,8 @@ class SingleDP extends DP {
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
 //System.out.println(res.getName());
-      for (int k = 0; k < stateCount; k++) {
+      for (int k = stateCount-1; k >= 0; k--) {
+//System.out.println("State " + k + " of " + stateCount + ", " + transitions.length);
 //System.out.println(states[k].getName());
         int [] tr = transitions[k];
         double [] trs = transitionScore[k];
@@ -308,10 +287,10 @@ class SingleDP extends DP {
         }
         double constant = (ci < tr.length) ? lastCol[tr[ci]] : 0.0;
 //System.out.println("Chosen constant: " + constant);
-        for (int lc = 0; lc < tr.length; lc++) { // any->emission
+        for (int lc = tr.length-1; lc >= 0; lc--) { // any->emission
           int l = tr[lc];
           if(l >= getDotStatesIndex()) {
-            break;
+            continue;
           }
 //System.out.println(states[k].getName() + " -> " + states[l].getName());
           double weight = ((EmissionState) states[l]).getWeight(res);
@@ -321,22 +300,23 @@ class SingleDP extends DP {
             weight != Double.NEGATIVE_INFINITY
           ) {
             double t = trs[lc];
-            score += Math.exp(t + lastCol[l] + weight - constant);
-//System.out.println("Score changed to: " + score);
+            score += Math.exp(t + weight + (lastCol[l] - constant));
           }
         }
 //System.out.println("Score = " + score);
-        for(int lc = tr.length-1; lc >= 0; lc--) { // dot->dot
+        for(int lc = tr.length-1; lc >= 0; lc--) { // any->dot
           int l = tr[lc];
-          if(l < getDotStatesIndex()) {
+          if(l < getDotStatesIndex() || l <= k) {
             break;
           }
-          //System.out.println("Processing dot-state transition");
+          /*System.out.println(
+            "Processing dot-state transition " +
+            states[k].getName() + " -> " + states[l].getName()
+          );*/
           if(currentCol[l] != Double.NEGATIVE_INFINITY) {
-            score += Math.exp(trs[lc] + currentCol[l] - constant);
+            score += Math.exp(trs[lc] + (currentCol[l] - constant));
           }
         }
-        // new_k = sum_l( transition(k, l) * old_l * emission_l(res) )
 //System.out.println("Score = " + score);
         currentCol[k] = Math.log(score) + constant;
 //System.out.println("currentCol = " + currentCol[k]);
@@ -388,15 +368,17 @@ class SingleDP extends DP {
     BackPointer [] newPointers = new BackPointer[stateCount];
 
     // initialize
-    for (int l = 0; l < stateCount; l++) {
+    {
       double [] vc = dpCursor.currentCol();
       double [] vl = dpCursor.lastCol();
-      if(states[l] == getModel().magicalState()) {
-        //System.out.println("Initializing start state to 0.0");
-        vc[l] = vl[l] = 0.0;
-        oldPointers[l] = newPointers[l] = new BackPointer(states[l], 1.0);
-      } else {
-        vc[l] = vl[l] = Double.NEGATIVE_INFINITY;
+      for (int l = 0; l < stateCount; l++) {
+        if(states[l] == getModel().magicalState()) {
+          //System.out.println("Initializing start state to 0.0");
+          vc[l] = vl[l] = 0.0;
+          oldPointers[l] = newPointers[l] = new BackPointer(states[l], 1.0);
+        } else {
+          vc[l] = vl[l] = Double.NEGATIVE_INFINITY;
+        }
       }
     }
 

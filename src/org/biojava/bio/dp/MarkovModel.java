@@ -188,5 +188,6 @@ public interface MarkovModel {
    * <P>
    * A model may be registered with multiple trainers.
    */
-  void registerWithTrainer(ModelTrainer mt);
+  void registerWithTrainer(ModelTrainer mt)
+  throws SeqException;
 }

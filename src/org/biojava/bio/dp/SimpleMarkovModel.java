@@ -225,15 +225,11 @@ public class SimpleMarkovModel implements MarkovModel {
     transTo.put(magicalState, new HashSet());
   }
 
-  public void registerWithTrainer(ModelTrainer modelTrainer) {
+  public void registerWithTrainer(ModelTrainer modelTrainer)
+  throws SeqException {
     if(modelTrainer.getTrainerForModel(this) == null) {
       TransitionTrainer tTrainer = new SimpleTransitionTrainer(this);
-      try {
-        modelTrainer.registerTrainerForModel(this, tTrainer);
-      } catch (SeqException se) {
-        throw new BioError("Can't register trainer for model, even though " + 
-          " there is no trainer associated with the model");
-      }
+      modelTrainer.registerTrainerForModel(this, tTrainer);
       for(Iterator i = stateAlphabet().residues().iterator(); i.hasNext(); ) {
         State s = (State) i.next();
         if(s instanceof EmissionState) {
@@ -245,11 +241,12 @@ public class SimpleMarkovModel implements MarkovModel {
             modelTrainer.registerTrainerForTransition(s, t, tTrainer, s, t);
           }
         } catch (IllegalResidueException ire) {
-          throw new BioError(ire, "State " + s.getName() +
-                             " listed in alphabet " +
-                             stateAlphabet().getName() + " dissapeared.");
-        } catch (SeqException se) {
-          throw new BioError(se, "Somehow, my trainer is not registered.");
+          throw new SeqException(
+            ire,
+            "State " + s.getName() +
+            " listed in alphabet " +
+            stateAlphabet().getName() + " dissapeared."
+          );
         }
       }
     }

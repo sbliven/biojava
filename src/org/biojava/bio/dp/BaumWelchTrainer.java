@@ -43,10 +43,12 @@ public class BaumWelchTrainer extends AbstractTrainer {
     System.out.println("Forward");
     SingleDPMatrix fm = (SingleDPMatrix) dp.forwardMatrix(rll);
     double fs = fm.getScore();
-
+    System.out.println("fs = " + fs);
+    
     System.out.println("Backward");
     SingleDPMatrix bm = (SingleDPMatrix) dp.backwardMatrix(rll);
     double bs = bm.getScore();
+    System.out.println("bs = " + bs);
 
     System.out.println("State training");
     // state trainer

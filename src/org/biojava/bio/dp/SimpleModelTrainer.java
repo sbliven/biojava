@@ -221,9 +221,11 @@ public class SimpleModelTrainer implements ModelTrainer {
     allTransitionTrainers.add(trainer);
   }
   
-  public SimpleModelTrainer(MarkovModel model,
-                            EmissionState nullState, double nullStateWeight,
-                            double transCounts, double transCountWeight) {
+  public SimpleModelTrainer(
+    MarkovModel model,
+    EmissionState nullState, double nullStateWeight,
+    double transCounts, double transCountWeight
+  ) throws SeqException {
     this.model = model;
     this.nullState = nullState;
     this.nullStateWeight = nullStateWeight;

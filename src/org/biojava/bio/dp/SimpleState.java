@@ -48,6 +48,9 @@ public class SimpleState extends AbstractState {
 
   public void setWeight(Residue r, double val) throws IllegalResidueException {
     alphabet().validate(r);
+    if(Double.isNaN(val)) {
+      throw new Error("Can't set weight for " + r.getName() + " to " + val);
+    }
     residueToProb.put(r, new Double(val));
   }
   

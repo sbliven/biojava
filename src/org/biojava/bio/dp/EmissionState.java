@@ -90,6 +90,7 @@ public interface EmissionState extends State {
    *
    * @return a StateTrainer
    */
-  public void registerWithTrainer(ModelTrainer mt);
+  public void registerWithTrainer(ModelTrainer mt)
+  throws SeqException;
 
 }

@@ -26,19 +26,24 @@ import java.util.*;
 import org.biojava.bio.seq.*;
 
 public class SimpleStateTrainer implements StateTrainer {
-  private EmissionState state;
-  private Map c = new HashMap();
-
-  {
-    for (Iterator i = state.alphabet().residues().iterator(); i.hasNext();)
-      c.put(i.next(), new Double(0.0));
-  }
+  private final EmissionState state;
+  private final Map c;
 
   public void addCount(Residue res, double count) throws IllegalResidueException {
     Double d = (Double) c.get(res);
-    if (d == null)
-      throw new IllegalResidueException("Residue " + res +
-                                        " not found in " + state.alphabet().getName());
+    if (d == null) {
+      throw new IllegalResidueException(
+        "Residue " + res +
+        " not found in " + state.alphabet().getName() +
+        " within state " + state.getName()
+      );
+    }
+    if(count < 0) {
+      throw new Error(
+        "Can't add a negative count to " + state.getName() +
+        " of " + count
+      );
+    }
     c.put(res, new Double(d.doubleValue() + count));
   }
 
@@ -46,7 +51,7 @@ public class SimpleStateTrainer implements StateTrainer {
                     double weight) throws IllegalResidueException {
     for (Iterator i = state.alphabet().residues().iterator(); i.hasNext();) {
       Residue r = (Residue) i.next();
-      addCount(r, nullModel.getWeight(r) * weight);
+      addCount(r, Math.exp(nullModel.getWeight(r) + weight));
     }
     
     double sum = 0.0;
@@ -54,10 +59,19 @@ public class SimpleStateTrainer implements StateTrainer {
       Residue r = (Residue) i.next();
       sum += ((Double) c.get(r)).doubleValue();
     }
+    //System.out.println(state.getName() + ": sum=" + sum);
     for (Iterator i = state.alphabet().residues().iterator(); i.hasNext();) {
       Residue res = (Residue) i.next();
-      state.setWeight(res,
-                      Math.log(((Double) c.get(res)).doubleValue() / sum));
+      Double d = (Double) c.get(res);
+      /*System.out.println(
+        state.getName() + ": Setting " + res.getName() +
+        " counts to " + d
+      );*/
+      state.setWeight(
+        res,
+        Math.log(d.doubleValue() / sum)
+      );
+      //System.out.println(state.getName() + ": Done");
     }
   }
 
@@ -69,6 +83,10 @@ public class SimpleStateTrainer implements StateTrainer {
   }
 
   public SimpleStateTrainer(EmissionState s) {
+    this.c = new HashMap();
     this.state = s;
+    for (Iterator i = state.alphabet().residues().iterator(); i.hasNext();) {
+      c.put(i.next(), new Double(0.0));
+    }
   }
 }

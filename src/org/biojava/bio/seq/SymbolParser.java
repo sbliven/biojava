@@ -60,9 +60,12 @@ public class SymbolParser implements ResidueParser {
   
   public Residue parseToken(String token) throws IllegalResidueException {
     Residue res = (Residue) symbolToResidue.get(token);
-    if(res == null)
-      throw new IllegalResidueException("No residue for token '" +
-                                        token + "' found");
+    if(res == null) {
+      throw new IllegalResidueException(
+        "No residue for token '" + token +
+        "' found in alphabet " + alphabet.getName()
+      );
+    }
     return res;
   }
   

@@ -204,11 +204,11 @@ public class ProfileHMM extends SimpleMarkovModel {
         createTransition(dO, dN);
         createTransition(dO, mN);
         createTransition(dN, iN);
-        
-        mO = mN;
-        iO = iN;
-        dO = dN;
-      }
+      }        
+
+      mO = mN;
+      iO = iN;
+      dO = dN;
     }
     
     // for the transitions to end

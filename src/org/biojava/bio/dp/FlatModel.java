@@ -128,7 +128,35 @@ public class FlatModel implements MarkovModel {
     throw new IllegalTransitionException(from, to);
   }
 
-  public void registerWithTrainer(ModelTrainer modelTrainer) {
+  public void registerWithTrainer(ModelTrainer modelTrainer)
+  throws SeqException {
+    TransitionTrainer thisT = modelTrainer.getTrainerForModel(this);
+    if(thisT == null) {
+      source.registerWithTrainer(modelTrainer);
+      TransitionTrainer sourceT = modelTrainer.getTrainerForModel(source);
+      thisT = new FlatTransitionTrainer();
+      modelTrainer.registerTrainerForModel(this, thisT);
+      
+      for(Iterator i = stateAlphabet().residues().iterator(); i.hasNext(); ) {
+        State s = (State) i.next();
+        if(s instanceof EmissionState && ! (s instanceof MagicalState) ) {
+          EmissionState es = (EmissionState) s;
+          es.registerWithTrainer(modelTrainer);
+        }
+        try {
+          for(Iterator j = transitionsFrom(s).iterator(); j.hasNext(); ) {
+            State t = (State) j.next();
+            ModelTransition mt = getMT(s, t);
+            TransitionTrainer tt = modelTrainer.getTrainerForModel(mt.model);
+            modelTrainer.registerTrainerForTransition(
+              s, t, tt, mt.from, mt.to
+            );
+          }
+        } catch (IllegalResidueException ire) {
+          throw new SeqException(ire, "Residue dissapeard on me: " + s.getName());
+        }
+      }
+    }
   }
   
   private void createTransition(
@@ -450,8 +478,19 @@ public class FlatModel implements MarkovModel {
       return wrapped.getAdvance();
     }
     
-    public void registerWithTrainer(ModelTrainer trainer) {
-      wrapped.registerWithTrainer(trainer);
+    public void registerWithTrainer(ModelTrainer trainer)
+    throws SeqException {
+      Set stateT = trainer.trainersForState(this);
+      if(stateT.isEmpty()) {
+        wrapped.registerWithTrainer(trainer);
+        for(
+          Iterator i = trainer.trainersForState(wrapped).iterator();
+          i.hasNext();
+        ) {
+          StateTrainer st = (StateTrainer) i.next();
+          trainer.registerTrainerForState(this, st);
+        }
+      }
     }
     
     public Residue sampleResidue() {
@@ -497,6 +536,22 @@ public class FlatModel implements MarkovModel {
       this.model = model;
       this.from = from;
       this.to = to;      
+    }
+  }
+  
+  public class FlatTransitionTrainer implements TransitionTrainer {
+    public void addCount(State from, State to, double count)
+    throws IllegalResidueException, IllegalTransitionException {
+      return;
+    }
+    
+    public void train(double nullModel, double weight)
+    throws IllegalResidueException {
+      return;
+    }
+    
+    public void clearCounts() {
+      return;
     }
   }
 }

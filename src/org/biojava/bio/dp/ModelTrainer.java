@@ -60,6 +60,8 @@ public interface ModelTrainer {
    * <P>
    * More than one trainer may be associated with the same state, in which
    * case any counts will be added to each trainer.
+   * More than one state may be associated with the same trainer, in which
+   * case the trainer is responsible for each state.
    *
    * @param state the EmissionState to associate with a trainer
    * @param trainer the trainer to add to the list of trainers for the state

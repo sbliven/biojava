@@ -3,7 +3,7 @@
 <!DOCTYPE alphabetManager [
   <!ELEMENT alphabetManager (residue|alphabet)*>
 
-  <!ELEMENT residue (short, long, description)>
+  <!ELEMENT residue (short, long, description?)>
   <!ATTLIST residue
     name	ID	#IMPLIED>
 
@@ -114,6 +114,11 @@
     <long>gap</long>
     <description>There is a gap here</description>
   </residue>
+  <residue name="X">
+    <short>X</short>
+    <long>UNK</long>
+    <description>Unknown amino-acid</description>
+  </residue>
   
   <alphabet>
     <name>DNA</name>
@@ -159,5 +164,108 @@
     <residueref name="guanine"/>
     <residueref name="cytosine"/>
     <residueref name="uracil"/>
+  </alphabet>
+  <alphabet>
+    <name>PROTEIN</name>
+    <description>Unmodified Amino-acids commonly found in proteins</description>
+  <residue>
+    <short>A</short>
+    <long>ALA</long>
+  </residue>
+  
+  <residue>
+    <short>R</short>
+    <long>ARG</long>
+  </residue>
+  
+  <residue>
+    <short>N</short>
+    <long>ASN</long>
+  </residue>
+  
+  <residue>
+    <short>D</short>
+    <long>ASP</long>
+  </residue>
+  
+  <residue>
+    <short>C</short>
+    <long>CYS</long>
+  </residue>
+  
+  <residue>
+    <short>Q</short>
+    <long>GLN</long>
+  </residue>
+  
+  <residue>
+    <short>E</short>
+    <long>GLU</long>
+  </residue>
+
+  <residue>
+    <short>G</short>
+    <long>GLY</long>
+  </residue>
+  
+  <residue>
+    <short>H</short>
+    <long>HIS</long>
+  </residue>
+  
+  <residue>
+    <short>I</short>
+    <long>ILE</long>
+  </residue>
+  
+  <residue>
+    <short>L</short>
+    <long>LEU</long>
+  </residue>
+  
+  <residue>
+    <short>K</short>
+    <long>LYS</long>
+  </residue>
+  
+  <residue>
+    <short>M</short>
+    <long>MET</long>
+  </residue>
+  
+  <residue>
+    <short>F</short>
+    <long>PHE</long>
+  </residue>
+  
+  <residue>
+    <short>P</short>
+    <long>PRO</long>
+  </residue>
+  
+  <residue>
+    <short>S</short>
+    <long>SER</long>
+  </residue>
+  
+  <residue>
+    <short>T</short>
+    <long>THR</long>
+  </residue>
+  
+  <residue>
+    <short>W</short>
+    <long>TRP</long>
+  </residue>
+  
+  <residue>
+    <short>Y</short>
+    <long>TRY</long>
+  </residue>
+  
+  <residue>
+    <short>V</short>
+    <long>VAL</long>
+  </residue>
   </alphabet>
 </alphabetManager>

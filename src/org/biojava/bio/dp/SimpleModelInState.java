@@ -32,7 +32,8 @@ public class SimpleModelInState extends SimpleResidue implements ModelInState {
     return model;
   }
   
-  public void registerWithTrainer(ModelTrainer modelTrainer) {
+  public void registerWithTrainer(ModelTrainer modelTrainer)
+  throws SeqException {
     getModel().registerWithTrainer(modelTrainer);
   }
   

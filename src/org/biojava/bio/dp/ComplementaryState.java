@@ -66,7 +66,8 @@ public class ComplementaryState implements EmissionState {
     }
   }
   
-  public void registerWithTrainer(ModelTrainer modelTrainer) {
+  public void registerWithTrainer(ModelTrainer modelTrainer)
+  throws SeqException {
     other.registerWithTrainer(modelTrainer);
     for(Iterator i = modelTrainer.trainersForState(other).iterator(); i.hasNext();) {
       StateTrainer st = (StateTrainer) i.next();

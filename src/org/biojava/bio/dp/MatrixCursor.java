@@ -32,7 +32,7 @@ public class MatrixCursor extends AbstractCursor {
   private int index;
   
   public int length() {
-    return matrix.scores[0].length - 1;
+    return matrix.resList()[0].length() + 2;
   }
   
   public ResidueList resList() {
@@ -49,7 +49,7 @@ public class MatrixCursor extends AbstractCursor {
 
   public void advance() {
     super.advance();
-    index += dir;    
+    index += dir;
   }
   
   public MatrixCursor(
@@ -63,6 +63,6 @@ public class MatrixCursor extends AbstractCursor {
     this.dir = dir;
     this.index = (dir == 1) ?
                     0     :
-                    length() + 2;
+                    length()-1;
   }
 }

@@ -114,11 +114,11 @@ public class ViterbiAlign {
           ", backwards: " + bScore
         );
         for(int i = 0; i <= statePath.length() / 60; i++) {
-          for(int j = i*60; j < Math.min((i+1)*60, seq.length()); j++) {
+          for(int j = i*60; j < Math.min((i+1)*60, statePath.length()); j++) {
             System.out.print(statePath.residueAt(StatePath.SEQUENCE, j+1).getSymbol()); 
           }
           System.out.print("\n");
-          for(int j = i*60; j < Math.min((i+1)*60, seq.length()); j++) {
+          for(int j = i*60; j < Math.min((i+1)*60, statePath.length()); j++) {
             System.out.print(statePath.residueAt(StatePath.STATES, j+1).getSymbol()); 
           }
           System.out.print("\n");
@@ -130,4 +130,3 @@ public class ViterbiAlign {
     }
   } 
 } 
-    
