@@ -22,6 +22,7 @@
 package org.biojava.bio.gui.sequence;
 
 import java.util.*;
+import java.lang.reflect.*;
 import java.beans.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
@@ -33,19 +34,18 @@ import java.awt.geom.*;
 
 import java.util.List;
 
-public class FeatureBlockSequenceRenderer implements SequenceRenderer {
+public class FeatureBlockSequenceRenderer implements SequenceRenderer, PropertyChangeListener {
     private FeatureFilter filter;
     private double depth = 25.0;
-    private Paint fill;
-    private Paint outline;
+    private FeatureRenderer renderer;
+    
     
     protected PropertyChangeSupport pcs;
 
     public FeatureBlockSequenceRenderer() {
-	filter = FeatureFilter.all;
-	fill = Color.red;
-	outline = Color.black;
 	pcs = new PropertyChangeSupport(this);
+	filter = FeatureFilter.all;
+	setFeatureRenderer(new BasicFeatureRenderer());
     }
 
     public FeatureFilter getFilter() {
@@ -56,7 +56,53 @@ public class FeatureBlockSequenceRenderer implements SequenceRenderer {
 	FeatureFilter oldFilter = filter;
 	filter = f;
 	pcs.firePropertyChange("filter", oldFilter, filter);
-	
+    }
+    
+    public FeatureRenderer getFeatureRenderer() {
+	return renderer;
+    }
+
+    public void setFeatureRenderer (FeatureRenderer r) {
+	if (renderer != null) {
+	    try {
+		BeanInfo bi = Introspector.getBeanInfo(renderer.getClass());
+		EventSetDescriptor[] esd = bi.getEventSetDescriptors();
+		for (int i = 0; i < esd.length; ++i) {
+		    if (esd[i].getListenerType() == PropertyChangeListener.class) {
+			Method alm = esd[i].getRemoveListenerMethod();
+			Object[] args = { this };
+			alm.invoke(renderer, args);
+		    }
+		}
+	    } catch (Exception ex) {
+		ex.printStackTrace();
+	    }
+	}
+
+	FeatureRenderer oldRenderer = renderer;
+	renderer = r;
+
+	try {
+	    BeanInfo bi = Introspector.getBeanInfo(renderer.getClass());
+	    EventSetDescriptor[] esd = bi.getEventSetDescriptors();
+	    for (int i = 0; i < esd.length; ++i) {
+		if (esd[i].getListenerType() == PropertyChangeListener.class) {
+		    Method alm = esd[i].getAddListenerMethod();
+		    Object[] args = { this };
+		    alm.invoke(renderer, args);
+		}
+	    }
+	} catch (Exception ex) {
+	    ex.printStackTrace();
+	}
+
+	pcs.firePropertyChange("featureRenderer", oldRenderer, renderer);
+    }
+
+    public void setDepth(double d) {
+	double oldDepth = depth;
+	depth = d;
+	pcs.firePropertyChange("depth", new Double(oldDepth), new Double(d));
     }
 
     public double getDepth(SequencePanel sp) {
@@ -71,30 +117,12 @@ public class FeatureBlockSequenceRenderer implements SequenceRenderer {
 	return 0.0;
     }
 
-    public void setFill(Paint p) {
-	Paint oldFill = fill;
-	fill = p;
-	pcs.firePropertyChange("fill", oldFill, fill);
-    }
-
-    public Paint getFill() {
-	return fill;
-    }
-
-    public void setOutline(Paint p) {
-	Paint oldOutline = outline;
-	outline = p;
-	pcs.firePropertyChange("outline", oldOutline, outline);
-    }
-
-    public Paint getOutline() {
-	return outline;
-    }
 
     public void paint(Graphics2D g, SequencePanel sp) {
 	for (Iterator i = sp.getSequence().filter(filter, true).features();
 	     i.hasNext(); )
 	{
+	    Rectangle2D clip = g.getClipBounds();
 	    Feature f = (Feature) i.next();
 	    Location l = f.getLocation();
 	    double min = sp.sequenceToGraphics(l.getMin());
@@ -102,15 +130,11 @@ public class FeatureBlockSequenceRenderer implements SequenceRenderer {
 
 	    Rectangle2D box = null;
 	    if (sp.getDirection() == SequencePanel.HORIZONTAL)
-		box = new Rectangle2D.Double(min, 5, max-min, 15);
+		box = new Rectangle2D.Double(min, 3, Math.max(1.0, max-min), depth - 6);
 	    else
-		box = new Rectangle2D.Double(5, min, 15, max-min);
-	    g.setPaint(fill);
-	    g.fill(box);
-	    if (outline != fill) {
-		g.setPaint(outline);
-		g.draw(box);
-	    }
+		box = new Rectangle2D.Double(3, min, depth - 6, Math.max(1.0, max-min));
+	    if (box.intersects(clip))
+		renderer.renderFeature(g, f, box, sp);
 	}
     }
 
@@ -129,6 +153,10 @@ public class FeatureBlockSequenceRenderer implements SequenceRenderer {
     public void removePropertyChangeListener(String p,
 					     PropertyChangeListener l) {
 	pcs.removePropertyChangeListener(p, l);
+    }
+
+    public void propertyChange(PropertyChangeEvent ev) {
+	pcs.firePropertyChange("featureRenderer", null, renderer);
     }
 }
 

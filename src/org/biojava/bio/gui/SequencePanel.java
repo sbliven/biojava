@@ -78,6 +78,7 @@ public class SequencePanel extends JComponent {
 	this.sequence = s;
 	firePropertyChange("sequence", oldSequence, s);
 	invalidate();
+	repaint();
     }
 
     public Sequence getSequence() {
@@ -89,6 +90,7 @@ public class SequencePanel extends JComponent {
 	direction = dir;
 	firePropertyChange("direction", oldDirection, direction);
 	invalidate();
+	repaint();
     }
 
     public int getDirection() {
@@ -100,6 +102,7 @@ public class SequencePanel extends JComponent {
 	this.scale = scale;
 	firePropertyChange("scale", oldScale, scale);
 	invalidate();
+	repaint();
     }
 
     public double getScale() {
@@ -108,7 +111,9 @@ public class SequencePanel extends JComponent {
 
     public void paintComponent(Graphics g) {
 	Graphics2D g2 = (Graphics2D) g;
+	Rectangle2D oldClip = g2.getClipBounds();
 	Rectangle2D.Double clip = new Rectangle2D.Double();
+	Rectangle2D.Double actualClip = new Rectangle2D.Double();
 
 	switch (direction) {
 	case HORIZONTAL:
@@ -133,7 +138,8 @@ public class SequencePanel extends JComponent {
 		clip.width = depth;
 		break;
 	    }
-	    g2.setClip(clip);
+	    Rectangle2D.intersect(clip, oldClip, actualClip);
+	    g2.setClip(actualClip);
 	    
 	    r.paint(g2, this);
 
