@@ -29,62 +29,68 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.io.*;
+import org.biojava.utils.*;
 
 /**
  * Functions for access to a web based database that returns sequences
  * in a variety of formats.
  *
  * @author Jason Stajich
+ * @author Matthew Pocock
  */
 
-abstract public class WebSequenceDB implements SequenceDBLite {
-  abstract SequenceFormat getSequenceFormat();
-  abstract URL getAddress(String id);
+public abstract class WebSequenceDB
+extends AbstractChangeable
+implements SequenceDBLite {
+  protected abstract SequenceFormat getSequenceFormat();
   
-  public Sequence getSequence(String id) throws BioException
-  {
+  protected abstract URL getAddress(String id)
+  throws MalformedURLException;
+  
+  protected abstract Alphabet getAlphabet();
+  
+  public Sequence getSequence(String id)
+  throws BioException {
     if( id.equals("") ) {
       throw new BioException("did not specify a valid id for getSequence");
     }
     
-    URL queryURL = getAddress(id);      
-    
-    Sequence seq = null;
     try {
+      URL queryURL = getAddress(id);      
       System.err.println("query is "+ queryURL.toString());
       URLConnection connection = queryURL.openConnection();
       SequenceFormat sFormat = getSequenceFormat();
       SequenceBuilder sbuilder = new SimpleSequenceBuilder();
       FastaDescriptionLineParser sFact =
         new FastaDescriptionLineParser(sbuilder);
-      Alphabet alpha = DNATools.getDNA();
+      Alphabet alpha = getAlphabet();
       SymbolTokenization rParser = alpha.getTokenization("token");
       System.err.println("got data from "+ queryURL);
-      SequenceIterator seqI = new
-        StreamReader(connection.getInputStream(),
-                     (SequenceFormat)sFormat, rParser, 
-                     (SequenceBuilderFactory)sFact);
-
-      BufferedReader in = new BufferedReader(new 
-					     InputStreamReader(connection.getInputStream()));
-    
-      if( seqI.hasNext() ) {
-        seq = seqI.nextSequence();
-        System.out.println(seq.getName() + " has " + 
-                           seq.countFeatures() + " features");
-      }
-      String line;
+      SequenceIterator seqI = new StreamReader(
+        connection.getInputStream(),
+        (SequenceFormat)sFormat, rParser, 
+        (SequenceBuilderFactory)sFact
+      );
       
-      while( in.ready() ) {
-        line = in.readLine();   
-        System.out.println(line);
-      }
-      
-    }
-    catch ( Exception e ){
+      return seqI.nextSequence();
+    } catch ( Exception e ){
       throw new BioException(e);
-    }
-    return seq;
+    } 
   }
   
+  public void addSequence(Sequence seq)
+  throws ChangeVetoException {
+    throw new ChangeVetoException(
+      "Can't add sequences from web sequence DB: " +
+      seq.getName()
+    );
+  }
+  
+  public void removeSequence(String id)
+  throws ChangeVetoException {
+    throw new ChangeVetoException(
+      "Can't remove sequences from web sequence DB: " +
+      id
+    );
+  }
 }
