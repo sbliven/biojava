@@ -176,6 +176,17 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
 	}
     }
 
+    /**
+     * Get a map of featureHolders to filters.  This might well go away
+     * once we have more sophisticated optimizable filters.
+     *
+     * @since 1.2 (temporary)
+     */
+
+    public Map getMergeMap() {
+	return Collections.unmodifiableMap(featureHolders);
+    }
+
     private class MFHIterator implements Iterator {
 	private Iterator fhIterator;
 	private Iterator fIterator;

@@ -245,7 +245,7 @@ public interface FeatureFilter extends Serializable {
     public boolean isProperSubset(FeatureFilter sup) {
       if(sup instanceof ByClass) {
         Class supC = ((ByClass) sup).getTestClass();
-        return supC.isAssignableFrom(this.getClass());
+        return supC.isAssignableFrom(this.getTestClass());
       }
       return (sup instanceof AcceptAllFilter);
     }
@@ -257,6 +257,7 @@ public interface FeatureFilter extends Serializable {
           ! (featC.isAssignableFrom(getClass())) &&
           ! (getClass().isAssignableFrom(featC));
       }
+
       return (feat instanceof AcceptNoneFilter);
     }
 

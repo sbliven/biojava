@@ -69,6 +69,10 @@ public class FilterUtils {
    * @return true if they a proved to be disjoint, false otherwise
    */
   public static boolean areDisjoint(FeatureFilter a, FeatureFilter b) {
+      return areDisjointOneWay(a, b) || areDisjointOneWay(b, a);
+  }
+
+  private static boolean areDisjointOneWay(FeatureFilter a, FeatureFilter b) {
     if(a.equals(b)) {
       return false;
     }
