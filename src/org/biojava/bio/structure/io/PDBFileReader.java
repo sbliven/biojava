@@ -136,7 +136,7 @@ public class PDBFileReader implements StructureIOFile {
 	header.put ("title","");
 	header.put ("technique","");
 	header.put ("resolution","");
-	//header.put ("modDate","0000-00-00");
+	header.put ("modDate","0000-00-00");
 	//header.put ("journalRef","");
 	//header.put ("author","");
 	//header.put ("compound","");
@@ -301,7 +301,7 @@ public class PDBFileReader implements StructureIOFile {
     
     */
    private void pdb_HEADER_Handler(String line) {
-       System.out.println(line);
+       //System.out.println(line);
 
        String classification  = line.substring (10, 50).trim() ;
        String deposition_date = line.substring (50, 59).trim() ;
@@ -316,6 +316,44 @@ public class PDBFileReader implements StructureIOFile {
        structure.setPDBCode(idCode);
        setId(idCode);
        
+    }
+
+    /** 
+	Handler for 
+	REVDAT Record format:
+
+COLUMNS       DATA TYPE      FIELD         DEFINITION
+----------------------------------------------------------------------------------
+ 1 -  6       Record name    "REVDAT"
+ 8 - 10       Integer        modNum        Modification number.
+11 - 12       Continuation   continuation  Allows concatenation of multiple
+                                           records.
+14 - 22       Date           modDate       Date of modification (or release for
+                                           new entries).  This is not repeated
+                                           on continuation lines.
+24 - 28       String(5)      modId         Identifies this particular
+                                           modification.  It links to the
+                                           archive used internally by PDB.
+                                           This is not repeated on continuation
+                                           lines.
+32            Integer        modType       An integer identifying the type of
+                                           modification.  In case of revisions
+                                           with more than one possible modType,
+                                           the highest value applicable will be
+                                           assigned.
+40 - 45       LString(6)     record        Name of the modified record.
+47 - 52       LString(6)     record        Name of the modified record.
+54 - 59       LString(6)     record        Name of the modified record.
+61 - 66       LString(6)     record        Name of the modified record.
+    */
+    private void pdb_REVDAT_Handler(String line) {
+
+	String modDate = (String) header.get("modDate");
+	if ( modDate.equals("0000-00-00") ) {
+	    // modDate is still initialized
+	    String modificationDate = line.substring (13, 22).trim() ;       
+	    header.put("modDate",modificationDate);
+	}
     }
 
     /** Handler for
@@ -791,6 +829,7 @@ public class PDBFileReader implements StructureIOFile {
 		else if ( recordName.equals("EXPDTA")) pdb_EXPDTA_Handler(line);
 		else if ( recordName.equals("REMARK")) pdb_REMARK_Handler(line);
 		else if ( recordName.equals("CONECT")) pdb_CONECT_Handler(line);
+		else if ( recordName.equals("REVDAT")) pdb_REVDAT_Handler(line);
 		else {
 		    // this line type is not supported, yet.
 		}
@@ -801,7 +840,14 @@ public class PDBFileReader implements StructureIOFile {
 	    }
 
 	    // finish and add ...
-	    System.out.println("final checks...");
+
+	    String modDate = (String) header.get("modDate");
+	    if ( modDate.equals("0000-00-00") ) {
+		// modification date = deposition date
+		String depositionDate = (String) header.get("depDate");
+		header.put("modDate",depositionDate) ;
+	    }
+
 	    current_chain.addGroup(current_group);
 	    if (isKnownChain(current_chain.getName()) == null) {
 		current_model.add(current_chain);
