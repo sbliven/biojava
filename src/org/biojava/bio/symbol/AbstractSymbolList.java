@@ -1,20 +1,20 @@
 /*
  * BioJava development code
- * 
+ *
  * This code may be freely distributed and modified under the
  * terms of the GNU Lesser General Public Licence.  This should
  * be distributed with the code.  If you do not have a copy,
  * see:
- * 
+ *
  * http://www.gnu.org/copyleft/lesser.html
- * 
+ *
  * Copyright for this code is held jointly by the individual
  * authors.  These should be listed in @author doc comments.
- * 
+ *
  * For more information on the BioJava project and its aims,
  * or to join the biojava-l mailing list, visit the home page
  * at:
- * 
+ *
  * http://www.biojava.org
  *
  */
@@ -29,7 +29,7 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.io.*;
 
-/**  
+/**
  * <p>
  * Abstract helper implementation of the SymbolList core interface.
  * To produce a concrete SymbolList implementation, you need only
@@ -53,7 +53,7 @@ import org.biojava.bio.seq.io.*;
  * listeners.
  * </p>
  *
- * @author     Thomas Down 
+ * @author     Thomas Down
  * @author     Matthew Pocock
  */
 
@@ -67,12 +67,12 @@ implements SymbolList {
     return new SymbolIterator(1, length());
   }
 
-  public SymbolList subList(int start, int end) 
+  public SymbolList subList(int start, int end)
   {
       if (start < 0 || end > length()) {
-	  throw new IndexOutOfBoundsException(
-	          "Sublist index out of bounds " + length() + ":" + start + "," + end
-	  );
+          throw new IndexOutOfBoundsException(
+                  "Sublist index out of bounds " + length() + ":" + start + "," + end
+          );
       }
 
       if (end < start) {
@@ -89,17 +89,17 @@ implements SymbolList {
 
   public String seqString() {
       try {
-	  SymbolTokenization toke = getAlphabet().getTokenization("token");
-	  return toke.tokenizeSymbolList(this);
+          SymbolTokenization toke = getAlphabet().getTokenization("token");
+          return toke.tokenizeSymbolList(this);
       } catch (BioException ex) {
-	  throw new BioRuntimeException(ex, "Couldn't tokenize sequence");
+          throw new BioRuntimeException(ex, "Couldn't tokenize sequence");
       }
   }
 
   public String subStr(int start, int end) {
       return subList(start, end).seqString();
   }
-  
+
   public void edit(Edit edit)
   throws IndexOutOfBoundsException, IllegalAlphabetException,
   ChangeVetoException {
@@ -107,7 +107,46 @@ implements SymbolList {
       "AbstractSymbolList is immutable"
     );
   }
-  
+
+  /**
+   * Provides logical equality for two SymbolLists that share the same list
+   * of canonical symbols
+   * @author Mark Schreiber
+   */
+  public boolean equals(Object o){
+    if(this == o) return true;//just for optimality
+    if(o == null) return false;
+    if(!(o instanceof SymbolList)) return false;
+    return compare(this, (SymbolList)o);
+  }
+
+  private volatile int hashCode = 0; //for caching purposes
+  public int hashCode(){
+    if(hashCode == 0){
+      int result = 17;
+      for(Iterator i = iterator(); i.hasNext();){
+        result = 37*result + i.next().hashCode();
+      }
+      hashCode = result;
+    }
+    return hashCode;
+  }
+
+  private boolean compare(SymbolList sl1, SymbolList sl2){
+    if (sl1.length() != sl2.length()) {
+      return false;
+    }
+
+    Iterator si1 = sl1.iterator();
+    Iterator si2 = sl2.iterator();
+    while (si1.hasNext()) {
+      if (! (si1.next() == si2.next())) {
+         return false;
+      }
+    }
+    return true;
+  }
+
   /**
    * <p>
    * An Iterator over each Symbol in a range of a SymbolList.
@@ -118,7 +157,7 @@ implements SymbolList {
    * <code>AbstractSymbolList.iterator</code>.
    * </p>
    *
-   * @author     Thomas Down 
+   * @author     Thomas Down
    */
 
   private class SymbolIterator implements Iterator, Serializable {
@@ -168,7 +207,7 @@ implements SymbolList {
    * <code>AbstractSymbolList.subList</code>.
    * </p>
    *
-   * @author     Thomas Down 
+   * @author     Thomas Down
    * @author     Matthew Pocock
    */
 
@@ -224,16 +263,16 @@ implements SymbolList {
 
 
       public String seqString() {
-	  try {
-	      SymbolTokenization toke = getAlphabet().getTokenization("token");
-	      return toke.tokenizeSymbolList(this);
-	  } catch (BioException ex) {
-	      throw new BioRuntimeException(ex, "Couldn't tokenize sequence");
-	  }
+          try {
+              SymbolTokenization toke = getAlphabet().getTokenization("token");
+              return toke.tokenizeSymbolList(this);
+          } catch (BioException ex) {
+              throw new BioRuntimeException(ex, "Couldn't tokenize sequence");
+          }
       }
 
       public String subStr(int start, int end) {
-	  return subList(start, end).seqString();
+          return subList(start, end).seqString();
       }
 
     public List toList() {
@@ -248,10 +287,10 @@ implements SymbolList {
         edit.pos + this.start - 1, edit.length, edit.replacement
       ));
     }
-    
+
     protected ChangeSupport getChangeSupport(ChangeType changeType) {
       ChangeSupport cs = super.getChangeSupport(changeType);
-      
+
       if(
         ((changeType == null) || (changeType == SymbolList.EDIT)) &&
         (editTranslater == null)
@@ -259,7 +298,7 @@ implements SymbolList {
         editTranslater = new EditTranslater(this, cs, start, end);
         AbstractSymbolList.this.addChangeListener(editTranslater, SymbolList.EDIT);
       }
-            
+
       if(
         ((changeType == null) || (changeType == Annotation.PROPERTY)) &&
         (annotationForwarder == null)
@@ -267,8 +306,32 @@ implements SymbolList {
         annotationForwarder = new Annotatable.AnnotationForwarder(this, cs);
         AbstractSymbolList.this.addChangeListener(annotationForwarder, Annotation.PROPERTY);
       }
-      
+
       return cs;
+    }
+
+    /**
+     * Provides logical equality for two SymbolLists that share the same list
+     * of canonical symbols
+     * @author Mark Schreiber
+     */
+    public boolean equals(Object o){
+      if(this == o) return true;//just for optimality
+      if(o == null) return false;
+      if(!(o instanceof SymbolList)) return false;
+      return compare(this, (SymbolList)o);
+    }
+
+    private volatile int hashCode = 0; //for caching purposes
+    public int hashCode(){
+      if(hashCode == 0){
+        int result = 17;
+        for(Iterator i = iterator(); i.hasNext();){
+          result = 37*result + i.next().hashCode();
+        }
+        hashCode = result;
+      }
+      return hashCode;
     }
   }
 
@@ -282,7 +345,7 @@ implements SymbolList {
    * <code>AbstractSymbolList.asList</code>.
    * </p>
    *
-   * @author     Thomas Down 
+   * @author     Thomas Down
    */
 
   private static class ListView extends AbstractList implements Serializable {
@@ -291,7 +354,7 @@ implements SymbolList {
     /**
      * Build a new ListView to view a SymbolList as a list.
      *
-     * @param  symList  the SymbolList to view 
+     * @param  symList  the SymbolList to view
      */
 
     ListView(SymbolList symList) {
@@ -307,7 +370,7 @@ implements SymbolList {
     }
   }
 
-  
+
   /**
    * This adapter screens all edit events to see if they overlap with a window
    * of interest. If they do, then a new edit event is built for the overlapping
@@ -318,7 +381,7 @@ implements SymbolList {
   public class EditScreener extends ChangeForwarder {
     protected final int min;
     protected final int max;
-    
+
     public EditScreener(
       Object source, ChangeSupport cs,
       int min, int max
@@ -327,7 +390,7 @@ implements SymbolList {
       this.min = min;
       this.max = max;
     }
-    
+
     protected ChangeEvent generateEvent(ChangeEvent ce) {
       ChangeType ct = ce.getType();
       if(ct == SymbolList.EDIT) {
@@ -351,7 +414,7 @@ implements SymbolList {
       return null;
     }
   }
-  
+
   /**
    * This translates edit events that fall within a window into window co-ordinates.
    *
@@ -364,7 +427,7 @@ implements SymbolList {
     ) {
       super(source, cs, min, max);
     }
-    
+
     protected ChangeEvent generateEvent(ChangeEvent ce) {
       ce = super.generateEvent(ce);
       if(ce != null) {

@@ -55,6 +55,13 @@ public class SimpleSymbolListTest extends TestCase {
 	assertTrue(compareSymbolList(tsl, sl1));
     }
 
+   public void testEquals() throws Exception{
+     SymbolList sl = DNATools.createDNA("gataca");
+     assertTrue(sl.equals(sl1));
+     assertTrue(sl1.equals(sl));
+     assertTrue(! sl.equals(sl2));
+   }
+
     public void testAddSymbol()
         throws Exception
     {
