@@ -256,7 +256,7 @@ public final class RestrictionEnzymeManager
 
             // Basic linesplit parser
             LineSplitParser lsParser = new LineSplitParser();
-            lsParser.setEndOfRecord(TagValueParser.BLANK_LINE_EOR);
+            lsParser.setEndOfRecord(TagValueParser.EMPTY_LINE_EOR);
             lsParser.setSplitOffset(3);
             lsParser.setContinueOnEmptyTag(true);
             lsParser.setMergeSameTag(true);
