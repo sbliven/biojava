@@ -98,6 +98,12 @@ public class ChunkedSymbolListFactory
     private int headChunkPos = 0;
     private List chunkL = new ArrayList();
 
+    // cached info for speedups
+    private int currentMin = Integer.MAX_VALUE;
+    private int currentMax = Integer.MIN_VALUE;
+    private SymbolList currentChunk = null;
+
+
     // interlocks
     // you can only use symbolAt() or make(), not both.
     private boolean canDoMake = true;
@@ -136,16 +142,22 @@ public class ChunkedSymbolListFactory
         }
 
         public Symbol symbolAt(int pos) {
-            try {
-                --pos; // the inevitable...
+            int offset;
+
+            --pos;
+            if ((pos < currentMin) || (pos > currentMax)) {
                 int chnk = pos / chunkSize;
-                int spos = (pos % chunkSize) + 1;
-                return chunks[chnk].symbolAt(spos);
-            } catch (IndexOutOfBoundsException ioobe) {
-                ++pos;
-                throw new IndexOutOfBoundsException("Attempted to access symbol at "
-                + pos + " of ChunkedSymbolList length " + length);
+                offset =  pos % chunkSize;
+
+                currentMin = pos - offset;
+                currentMax = currentMin + chunkSize - 1;
+                currentChunk = chunks[chnk];
             }
+            else {
+                offset = pos - currentMin;
+            }
+
+            return currentChunk.symbolAt(offset + 1);
         }
 
         public SymbolList subList(int start, int end) {

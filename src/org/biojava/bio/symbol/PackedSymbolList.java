@@ -235,8 +235,6 @@ public class PackedSymbolList
     int offset;
 
     if ((indx < currentMin) || (indx > currentMax)) {
-//      int word = indx / symsPerElement;
-//      int offset = indx % symsPerElement;
       word = indx / symsPerElement;
       offset = indx % symsPerElement;
 
@@ -248,7 +246,6 @@ public class PackedSymbolList
       offset = indx - currentMin;
     }
 
-//    long l = syms[word];
     long l = currentWord;
     int jj = offset * packing.wordSize();
     
