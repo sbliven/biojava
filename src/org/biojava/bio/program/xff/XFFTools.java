@@ -23,7 +23,6 @@ package org.biojava.bio.program.xff;
 import java.io.*;
 
 import org.xml.sax.*;
-import org.apache.xerces.parsers.*;
 
 import org.biojava.utils.xml.*;
 import org.biojava.utils.stax.*;

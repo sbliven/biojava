@@ -22,7 +22,6 @@
 package org.biojava.utils.xml;
 
 import org.w3c.dom.*;
-import org.apache.xerces.parsers.*;
 import org.xml.sax.*;
 import java.io.*;
 

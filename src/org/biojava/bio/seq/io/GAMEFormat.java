@@ -27,7 +27,6 @@ import java.net.*;
 
 import org.xml.sax.*;
 import org.biojava.utils.stax.*;
-import org.apache.xerces.parsers.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
