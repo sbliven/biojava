@@ -217,12 +217,6 @@ class EmblLikeLocationParser
 		{
 			// This is a remote feature, so a new template has to be made
 			RemoteFeature.Template newTemplate = new RemoteFeature.Template(theTemplate);
-			java.util.Iterator iter = subLocations.iterator();
-			while (iter.hasNext())
-			{
-				Location loc = (Location)(iter.next());
-				subRegions.add(new RemoteFeature.Region(loc, null));
-			}
 			newTemplate.regions = subRegions;
 // FIXME:
 // I don't know how to create an appropriate resolver, so I'm leaving it
@@ -377,6 +371,7 @@ class EmblLikeLocationParser
 	if(mRegionSeqID == null)
 	{
 		subLocations.add(createdLocation);
+		subRegions.add(new RemoteFeature.Region(createdLocation, null));
 	}
 	else
 	{
