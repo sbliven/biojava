@@ -69,16 +69,16 @@ public class SimpleSymbolList extends AbstractSymbolList implements Serializable
     public SimpleSymbolList(Alphabet alpha, List rList) 
         throws IllegalSymbolException
     {
-	this.alphabet = alpha;
-	this.length = rList.size();
-	symbols = new Symbol[length];
+      this.alphabet = alpha;
+      this.length = rList.size();
+      symbols = new Symbol[length];
 	
-	int pos = 0;
-	for (Iterator i = rList.iterator(); i.hasNext(); ) {
-	    symbols[pos] = (Symbol) i.next();
-	    alphabet.validate(symbols[pos]);
-	    pos++;
-	}
+	    int pos = 0;
+      for (Iterator i = rList.iterator(); i.hasNext(); ) {
+        symbols[pos] = (Symbol) i.next();
+        alphabet.validate(symbols[pos]);
+        pos++;
+      }
     }
 
     /**
@@ -88,12 +88,12 @@ public class SimpleSymbolList extends AbstractSymbolList implements Serializable
      */
 
     public SimpleSymbolList(SymbolList sl) {
-	this.alphabet = sl.getAlphabet();
-	this.length = sl.length();
-	symbols = new Symbol[length];
-	for (int i = 0; i < length; ++i) {
-	    symbols[i] = sl.symbolAt(i + 1);
-	}
+      this.alphabet = sl.getAlphabet();
+      this.length = sl.length();
+      symbols = new Symbol[length];
+      for (int i = 0; i < length; ++i) {
+        symbols[i] = sl.symbolAt(i + 1);
+      }
     }
 
     /**
@@ -101,7 +101,7 @@ public class SimpleSymbolList extends AbstractSymbolList implements Serializable
      */
 
     public Alphabet getAlphabet() {
-	return alphabet;
+      return alphabet;
     }
 
     /**
@@ -109,7 +109,7 @@ public class SimpleSymbolList extends AbstractSymbolList implements Serializable
      */
 
     public int length() {
-	return length;
+      return length;
     }
 
     /**
@@ -120,9 +120,13 @@ public class SimpleSymbolList extends AbstractSymbolList implements Serializable
      */
 
     public Symbol symbolAt(int pos) {
-	if (pos > length || pos < 1)
-	    throw new IndexOutOfBoundsException();
-	return symbols[pos - 1];
+      if (pos > length || pos < 1) {
+        throw new IndexOutOfBoundsException(
+          "Can't access " + pos +
+          " as it is not within 1.." + length
+        );
+      }
+      return symbols[pos - 1];
     }
 
     /**

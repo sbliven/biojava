@@ -49,8 +49,8 @@ public class PairwiseAlignment {
       
       DP aligner = generateAligner(
         alpha,
-        0.5, 0.5,
-        0.5, 0.5
+        0.5, 0.8,
+        0.5, 0.8
       );
       
       SymbolParser rParser = alpha.getParser("token");
@@ -76,13 +76,19 @@ public class PairwiseAlignment {
         );
         while(targetI.hasNext()) {
           Sequence targetSeq = targetI.nextSequence();
-          StatePath result = aligner.viterbi(new Sequence [] {
+          Sequence [] seqs = new Sequence [] {
             sourceSeq, targetSeq
-          });
+          };
           System.out.println(
-            "Score " + sourceSeq.getName() + ":" + targetSeq.getName() +
-            " = " + result.getScore()
+            "Aligning " + sourceSeq.getName() + ":" + targetSeq.getName()
           );
+
+          double forward = aligner.forward(seqs);
+          System.out.println("Forwards:  " + forward);
+          double backward = aligner.backward(seqs);
+          System.out.println("Backwards: " + backward);
+          StatePath result = aligner.viterbi(seqs);
+          System.out.println("Viterbi:   " + result.getScore());
         }
       }
     } catch (Throwable t) {
@@ -178,7 +184,7 @@ public class PairwiseAlignment {
     int size = dna2.size();
     int matches = (int) Math.sqrt(size);
     
-    double pMatch = 0.5;
+    double pMatch = 0.15;
     
     double matchWeight = pMatch / matches;
     double missWeigth = (1.0 - pMatch) / (size - matches);

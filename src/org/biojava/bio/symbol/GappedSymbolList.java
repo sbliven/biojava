@@ -31,12 +31,16 @@ import org.biojava.bio.seq.*;
 /**
  * This implementation of SymbolList wrappes another one, allowing you to insert gaps.
  * <P>
- * You could make a SymbolList that contains the gap character in its alphabet. However, this
+ * You could make a SymbolList that contains gaps directly. However, this
  * leaves you with a nasty problem if you wish to support gap-edit opperations. Also, the orriginal
  * SymbolList must either be coppied or lost.
  * <P>
  * GappedSymbolList solves these problems. It wraps up a source sequence, and views it through
  * a data-structure that places gaps. You can add and remove the gaps by using the public API.
+ * <P>
+ * For gap-insert operations, the insert index is the position that will become a gap. The
+ * symbol currently there will move to a higher index. To insert leading gaps, add gaps at index
+ * 1. To insert trailing gaps, add gaps at index length+1.
  *
  * @author Matthew Pocock
  */

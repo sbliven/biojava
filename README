@@ -45,12 +45,23 @@ the package.
 
 To use biojava, put biojava.jar and xml.jar into your classpath.
 
-To build the demos:
+To build and run the demos:
 
 make sure that biojava.jar and xml.jar are in your classpath.
-change into a demo directory
-type:
-> javac demoName.java
+change into the demos directory, and make sure that it is also in your
+classpath. type:
+
+> javac demoDir/demoName.java
+> java demoDir.demoName
+
+e.g.
+
+> javac dp/Dice.java
+> java dp.Dice
+
+on unix systems, you may be able to build all of the demos at once by typing:
+
+> find . -name "*.java" | xargs javac
 
 Most demos have either a comment explaining their purpose, or will print out a
 usage message when run without arguments.
