@@ -251,15 +251,15 @@ public class SubSequence implements Sequence {
 		    public void preChange(ChangeEvent cev)
 		        throws ChangeVetoException
 		    {
-			if (changeSupport != null) {
-			    changeSupport.firePreChangeEvent(cev);
+			if (CroppedFeatureSet.this.changeSupport != null) {
+			    CroppedFeatureSet.this.changeSupport.firePreChangeEvent(cev);
 			}
 		    }
 
 		    public void postChange(ChangeEvent cev) {
 			flushFeatures();
-			if (changeSupport != null) {
-			    changeSupport.firePostChangeEvent(cev);
+			if (CroppedFeatureSet.this.changeSupport != null) {
+			    CroppedFeatureSet.this.changeSupport.firePostChangeEvent(cev);
 			}
 		    }
 		} ;
