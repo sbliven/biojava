@@ -327,31 +327,43 @@ public class FiniteAutomaton
 
     private int START = 0;
     private int END = -1;
-    protected Node start = new Node(START);
-    protected Node end = new Node(END);
+    protected Node start;
+    protected Node end;
 
     FiniteAutomaton(String name, FiniteAlphabet alfa)
     {
         this.alfa = alfa;
         this.name = name;
         alfaIdx = AlphabetManager.getAlphabetIndex(alfa);
+
+        // ensure that the start and end are created
+        // end stored in the node structures.
+        nodes.add(start = new Node(START));
+        nodes.add(end = new Node(END));
     }
 
     FiniteAlphabet getAlphabet() { return alfa; }
     String getName() { return name; }
-    Node getStart() { return start; }
-    Node getEnd() { return end; }
+    public Node getStart() { return start; }
+    public Node getEnd() { return end; }
 
-    void addTransition(Node start, Node end, Symbol sym)
+    public FiniteAutomaton getAutomaton()
     {
-        transitions.add(new Transition(start, end, sym));
+        return this;
+    }
+
+    public Transition addTransition(Node start, Node end, Symbol sym)
+    {
+        Transition newTransition = new Transition(start, end, sym);
+        transitions.add(newTransition);
+        return newTransition;
     }
 
     /**
      * Add a node to the FA.
      * @param terminal Is the Node terminal?
      */
-    Node addNode(boolean terminal)
+    public Node addNode(boolean terminal)
     {
         Node node = new Node(terminal);
         nodes.add(node);
@@ -363,7 +375,7 @@ public class FiniteAutomaton
     /**
      * get all Nodes within this instance.
      */
-    NodeSet getNodes()
+    public NodeSet getNodes()
     {
         NodeSet nodeSet = createNodeSet();
         nodeSet.addAll(nodes);
@@ -411,7 +423,7 @@ public class FiniteAutomaton
     /**
      * retrieve Set of all transitions in instance.
      */
-    Set getTransitions()
+     public Set getTransitions()
     {
         return Collections.unmodifiableSet(transitions);
     }
@@ -439,7 +451,7 @@ public class FiniteAutomaton
         return transitionSet;
     }
 
-    NodeSet createNodeSet() { return new NodeSet(); }
+    public NodeSet createNodeSet() { return new NodeSet(); }
 
     /**
      * dumps internal data of Nodes and Transitions that describe

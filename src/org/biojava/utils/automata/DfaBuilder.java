@@ -92,8 +92,10 @@ public class DfaBuilder
         throws AutomatonException
     {
         //System.out.println("constructSubsets() called.");
-        // create a NodeSet comprising only the start state.
+        // the initial NodeSet needs to contain the start state
+        // and the lambda closure of the start state.
         FiniteAutomaton.NodeSet initialSet = nfa.createNodeSet();
+        initialSet.addNodeSet(nfa.getLambdaClosure(nfa.getStart()));
         //System.out.println("adding initial node to dfa.");
         initialSet.addNode(nfa.getStart());
         
@@ -120,6 +122,11 @@ public class DfaBuilder
             symbolSet.addAll(nfa.getSymbols(node));
         }
 
+        // if there are lambda transitions from the source node set,
+        // record this fact then remove LAMBDA from the symbol set.
+        boolean isLambdaAffected = symbolSet.contains(Nfa.LAMBDA);
+        if (isLambdaAffected) symbolSet.remove(Nfa.LAMBDA);
+
         // for each of the NFA nodes and each Symbol, compute
         // the next closure Sets and their associated DFA node.
         //System.out.println("constructSubsets going thru symbols for closure. " + symbolSet);
@@ -132,10 +139,12 @@ public class DfaBuilder
             for (Iterator closI = closureSet.iterator(); closI.hasNext(); ) {
                 org.biojava.utils.automata.Nfa.Node node = (org.biojava.utils.automata.Nfa.Node) closI.next();
 
-                // compute closure set for current symbol for this NFA node    
+                // add closure set for current symbol for this NFA node to closureSet
                 FiniteAutomaton.NodeSet currNodeSet = nfa.getClosure(node, currSymbol);
                 //System.out.println("closure set for " + currSymbol.getName() + " from NFA node " + node.getID() + " is " + currNodeSet.toString());
                 closureForSymbol.addNodeSet(currNodeSet);
+                // add lambda closure to closureSet too.
+                closureForSymbol.addNodeSet(nfa.getLambdaClosure(node));
             }
 
             if (!closureForSymbol.isEmpty()) {

@@ -28,11 +28,12 @@ import org.biojava.bio.symbol.Symbol;
  */
 public class Nfa
     extends FiniteAutomaton
+    implements NfaBuilder
 {
     // Used to indicate a silent transition that can be munged and optimised away.
-    private Symbol EPSILON = null;
+    static Symbol EPSILON = null;
     // Used to indicate a silent transition that must be preserved during munging.
-    private Symbol LAMBDA = AlphabetManager.createSymbol("lambda");
+    static Symbol LAMBDA = AlphabetManager.createSymbol("lambda");
 
     public Nfa(String name, FiniteAlphabet alfa)
     {
@@ -44,20 +45,22 @@ public class Nfa
         return nodes.contains(node);
     }
 
+//    public void addNode() { super.addNode(); }
+
     /**
      * Add a silent optimisable transition to instance.
      */
-    public void addEpsilonTransition(Node start, Node end)
+    public Transition addEpsilonTransition(Node start, Node end)
     {
-        addTransition(start, end, EPSILON);
+        return addTransition(start, end, EPSILON);
     }
 
     /**
      * Add a silent persistent transition to instance.
      */
-    public void addLambdaTransition(Node start, Node end)
+    public Transition addLambdaTransition(Node start, Node end)
     {
-        addTransition(start, end, LAMBDA);
+        return addTransition(start, end, LAMBDA);
     }
 
     /**
@@ -125,9 +128,19 @@ public class Nfa
      * Retrieve all Nodes reachable from the specified node by
      * emissionless lambda transitions.
      */
+    // FIXME: take into consideration cycles of lambda transitions!
     NodeSet getLambdaClosure(Node node)
         throws AutomatonException
     {
+        return _getLambdaClosure(node, createNodeSet());
+    }
+
+    private NodeSet _getLambdaClosure(Node node, NodeSet visitedNodes)
+        throws AutomatonException
+    {
+        // I've visited this one too!
+        visitedNodes.addNode(node);
+
         NodeSet closureSet = createNodeSet();
 
         NodeSet thisClosure = getClosure(node, LAMBDA);
@@ -135,7 +148,8 @@ public class Nfa
 
         for (Iterator closI = thisClosure.iterator(); closI.hasNext(); ) {
             Node currNode = (Node) closI.next();
-            closureSet.addNodeSet(getLambdaClosure(currNode));
+            if (visitedNodes.contains(currNode)) continue;
+            closureSet.addNodeSet(_getLambdaClosure(currNode, visitedNodes));
         }
 
         return closureSet;
