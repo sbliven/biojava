@@ -148,8 +148,7 @@ public interface Structure {
     /** retrieve a chain by it's position within the Structure and model number*/
     public Chain getChain(int pos, int modelnr);
 
-    
 
- 
-
+    /** create a String that contains the contents of a PDB file */
+    public String toPDB();
 }

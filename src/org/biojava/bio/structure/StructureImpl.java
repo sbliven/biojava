@@ -25,6 +25,7 @@ package org.biojava.bio.structure;
 
 import java.util.ArrayList ;
 import java.util.HashMap ;
+import java.text.DecimalFormat;
 
 /**
  * Implementation of a PDBStructure. This class
@@ -202,6 +203,83 @@ public class StructureImpl implements Structure {
 	return model ;
     }    
 
+
+    private String alignRight(String input, int length){
+
+	String str = "" ;
+	int diff = length - input.length() ;
+	
+	for (int i = length; i>0; i--) {
+
+	    if  ( i <= diff) {
+		str = " " + str;
+	    } else {
+		int pos = input.length() - length +  i -1;
+		//System.out.println(input + " " +pos + " " + input.charAt(pos) );
+		str = input.charAt(pos) + str ;
+	    }                    
+        }
+	return str ;
+    }
+
+    /** create a String that contains the contents of a PDB file */
+    public String toPDB() {
+	GroupIterator iter = new GroupIterator(this);
+
+	String str = "";
+	int i = 0 ;
+	
+	DecimalFormat d3 = new DecimalFormat("0.000");
+	DecimalFormat d2 = new DecimalFormat("0.00");
+	    
+	while ( iter.hasNext() ) {
+	    Group g = (Group)iter.next();
+	    String type = g.getType() ;
+	    String record = "" ;
+	    if ( type.equals("hetatm") ) {
+		record = "HETATM";
+	    } else {
+		record = "ATOM  ";
+	    }
+	   
+
+	   
+	    // format output ...
+	    	    AtomIterator aiter = new AtomIterator(g) ;
+	    String line = "" ;
+	    		    
+	    while ( aiter.hasNext() ) {
+		i ++ ;
+		//if ( i > 40 ) continue ;
+		Atom a = (Atom) aiter.next() ;
+
+		int    seri       = a.getPDBserial() ;
+		String serial     = alignRight(""+seri,5);
+		String fullname   = a.getFullName() ;
+		String altLoc     = " " ; // not supported, yet!
+		String chainID    = " " ;
+		String resseq     = alignRight(""+g.getPDBCode(),4);
+		String resName    = g.getPDBName();
+		String x          = alignRight(""+d3.format(a.getX()),8);
+		String y          = alignRight(""+d3.format(a.getY()),8);
+		String z          = alignRight(""+d3.format(a.getZ()),8);
+		String occupancy  = alignRight(""+d2.format(a.getOccupancy()),6);
+		String tempfactor = alignRight(""+d2.format(a.getTempFactor()),6);
+		
+		line = record + serial + " " + fullname +altLoc 
+		    + resName + " " + chainID + resseq 
+		    + "    " + x+y+z 
+		    + occupancy + tempfactor;
+		str += line + "\n";
+	    }
+	   
+	    
+	}
+
+
+	return str ;
+	
+    }
    
     
 }
