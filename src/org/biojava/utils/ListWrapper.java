@@ -6,6 +6,7 @@ import java.util.*;
  * Simple wrapper to assist in list-comparisons.
  *
  * @author Thomas Down
+ * @deprecated this violates the List hashCode contract and is very inefficient
  */
 public class ListWrapper implements java.io.Serializable {
   private List l; // should be moved private

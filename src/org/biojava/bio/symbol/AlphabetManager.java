@@ -484,8 +484,7 @@ public final class AlphabetManager {
       crossProductAlphabets = new HashMap();
     }
 
-    ListWrapper aw = new ListWrapper(aList);
-    Alphabet cpa = (Alphabet) crossProductAlphabets.get(aw);
+    Alphabet cpa = (Alphabet) crossProductAlphabets.get(aList);
 
     int size = 1;
     if(cpa == null) {
@@ -513,7 +512,7 @@ public final class AlphabetManager {
           );
         }
       }
-      crossProductAlphabets.put(aw, cpa);
+      crossProductAlphabets.put(new ArrayList(aList), cpa);
       registerAlphabet(cpa.getName(), cpa);
     }
 

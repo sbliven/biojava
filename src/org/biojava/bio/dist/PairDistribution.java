@@ -43,25 +43,23 @@ implements Serializable, Distribution {
   
   static {
     cache = new HashMap();
-    gopher = new ListWrapper();
   }
   
   protected static Distribution getNullModel(Distribution first, Distribution second) {
     synchronized(cache) {
       first = first.getNullModel();
       second = second.getNullModel();
-      List distL = Arrays.asList(new Object [] { first, second } );
-      gopher.setList(distL);
-      SoftReference ref = (SoftReference) cache.get(gopher);
+      List distL = new ListTools.Doublet(first, second);
+      SoftReference ref = (SoftReference) cache.get(distL);
       Distribution dist;
       if(ref == null) {
         dist = new PairDistribution(first, second);
-        cache.put(new ListWrapper(distL), new SoftReference(dist));
+        cache.put(distL, new SoftReference(dist));
       } else {
         dist = (Distribution) ref.get();
         if(dist == null) {
           dist = new PairDistribution(first, second);
-          cache.put(new ListWrapper(distL), new SoftReference(dist));
+          cache.put(distL, new SoftReference(dist));
         }
       }
       return dist;

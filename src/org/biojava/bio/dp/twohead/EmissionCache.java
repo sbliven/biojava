@@ -38,7 +38,6 @@ import org.biojava.bio.dp.*;
  */
 public class EmissionCache {
   private final Map eMap;
-  private final ListWrapper gopher;
   private final Alphabet alpha;
   private final State[] states;
   private final int dsi;
@@ -52,7 +51,6 @@ public class EmissionCache {
     ScoreType scoreType
   ) {
     this.eMap = new HashMap();
-    this.gopher = new ListWrapper();
     this.alpha = alpha;
     this.states = states;
     this.dsi = dsi;
@@ -67,12 +65,11 @@ public class EmissionCache {
   
   public final double [] getEmissions(List symList)
   throws IllegalSymbolException {
-    gopher.setList(symList);
-    double [] emission = (double []) eMap.get(gopher);
+    double [] emission = (double []) eMap.get(symList);
     if(emission == null) {
       //System.out.println(".");
       Symbol sym[][] = new Symbol[2][2];
-      List ll = new ArrayList(symList);
+      List ll = ListTools.createList(symList);
       sym[0][0] = AlphabetManager.getGapSymbol();
       sym[1][1] = alpha.getSymbol(Arrays.asList(new Symbol [] {
         (Symbol) symList.get(0),
@@ -100,7 +97,7 @@ public class EmissionCache {
           emission[i]
         );*/
       }
-      eMap.put(new ListWrapper(ll), emission);
+      eMap.put(ll, emission);
     } else {
       //System.out.print("-");
     }

@@ -67,7 +67,7 @@ implements Serializable {
         );
       }
     }
-    alphas = Collections.unmodifiableList(new ArrayList(a));
+    alphas = ListTools.createList(a);
     ourSymbols = new HashMap();
     populateSymbols(new ArrayList());
   }
@@ -78,11 +78,11 @@ implements Serializable {
   
   private void populateSymbols(List symList) {
     if (symList.size() == alphas.size()) {
-	    putSymbol(symList);
+    putSymbol(symList);
     } else {
-	    int indx = symList.size();
-	    FiniteAlphabet a = (FiniteAlphabet) alphas.get(indx);
-	    Iterator i = a.iterator();
+      int indx = symList.size();
+      FiniteAlphabet a = (FiniteAlphabet) alphas.get(indx);
+      Iterator i = a.iterator();
       if(i.hasNext()) {
         symList.add(i.next());
         populateSymbols(symList);
@@ -115,7 +115,7 @@ implements Serializable {
         );
       }
     }
-    ourSymbols.put(new ListWrapper(ss.getSymbols()), ss);
+    ourSymbols.put(ss.getSymbols(), ss);
     return ss;
   }
 
@@ -173,23 +173,10 @@ implements Serializable {
     return alphas;
   }
 
-  private transient ListWrapper gopher;
-  
-  private ListWrapper getGopher() {
-    if(gopher == null) {
-      gopher = new ListWrapper();
-    }
-    return gopher;
-  }
-
   public AtomicSymbol getSymbolImpl(List l)
   throws IllegalSymbolException {
     AtomicSymbol cps;
-    ListWrapper gopher = getGopher();
-    synchronized(gopher) {
-      gopher.setList(l);
-      cps = (AtomicSymbol) ourSymbols.get(gopher);
-    }
+    cps = (AtomicSymbol) ourSymbols.get(l);
     
     if(cps == null) {
       throw new IllegalSymbolException("Can't find symbol for " + l);

@@ -94,14 +94,14 @@ implements Serializable {
   }
   
   public SymbolList symbols() {
-      try {
-	  return new SimpleSymbolList(this, new ArrayList(symbols));
-      } catch (IllegalSymbolException ex) {
-	  throw new BioError(
-      ex,
-      "There should be no circumstances under which this failed"
-    );
-      }
+    try {
+      return new SimpleSymbolList(this, new ArrayList(symbols));
+    } catch (IllegalSymbolException ex) {
+      throw new BioError(
+        ex,
+        "There should be no circumstances under which this failed"
+      );
+    }
   }
 
   protected boolean containsImpl(AtomicSymbol s) {
@@ -170,9 +170,9 @@ implements Serializable {
     return this.alphabets;
   }
   
-  public AtomicSymbol getSymbolImpl(List rl)
+  public AtomicSymbol getSymbolImpl(List symL)
   throws IllegalSymbolException {
-    AtomicSymbol s = (AtomicSymbol) rl.get(0);
+    AtomicSymbol s = (AtomicSymbol) symL.get(0);
     return s;
   }
   

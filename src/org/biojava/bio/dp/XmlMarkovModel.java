@@ -136,13 +136,15 @@ public class XmlMarkovModel {
         )
     ) {
       dFact = OrderNDistributionFactory.DEFAULT;
+      System.out.println("2nd order state");
     } else {
       dFact = DistributionFactory.DEFAULT;
+      System.out.println("1st order state");
     }
     for(int i = 0; i < states.getLength(); i++) {
       Element stateE = (Element) states.item(i);
       String name = stateE.getAttribute("name");
-      Distribution dis = DistributionFactory.DEFAULT.createDistribution(seqAlpha);
+      Distribution dis = dFact.createDistribution(seqAlpha);
       EmissionState state = new SimpleEmissionState(
         name, Annotation.EMPTY_ANNOTATION, advance, dis
       );

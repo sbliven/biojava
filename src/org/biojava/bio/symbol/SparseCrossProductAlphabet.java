@@ -118,23 +118,23 @@ implements Serializable {
     );
   }
 
-  private ListWrapper gopher =
-    new ListWrapper();
-
   protected AtomicSymbol getSymbolImpl(List sList)
   throws IllegalSymbolException {
     AtomicSymbol s;
-    synchronized(gopher) {
-      gopher.setList(sList);
-      s = (AtomicSymbol) knownSymbols.get(gopher);
-    }
+    s = (AtomicSymbol) knownSymbols.get(sList);
 
     if(s == null) {
+      Iterator si = sList.iterator();
+      Iterator ai = getAlphabets().iterator();
+      while(ai.hasNext()) {
+        ((Alphabet) ai.next()).validate((Symbol) si.next());
+      }
+      
       List l = new ArrayList(sList);
       s = (AtomicSymbol) AlphabetManager.createSymbol(
         tokenSeed++, Annotation.EMPTY_ANNOTATION, l, this
       );
-      knownSymbols.put(new ListWrapper(s.getSymbols()), s);
+      knownSymbols.put(s.getSymbols(), s);
     }
     
     return s;

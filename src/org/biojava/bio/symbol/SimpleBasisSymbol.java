@@ -49,7 +49,7 @@ implements BasisSymbol {
         "Can't create BasisSymbol for an empty list. Use the Gap symbol."
       );
     }
-    this.symbols = Collections.unmodifiableList(new ArrayList(symbols));
+    this.symbols = ListTools.createList(symbols);
   }
   
   protected SimpleBasisSymbol(

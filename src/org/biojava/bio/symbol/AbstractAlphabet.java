@@ -103,11 +103,11 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
   
   public final Symbol getSymbol(List syms)
   throws IllegalSymbolException {
-      if (syms.size() == 1) {
-	  Symbol s = (Symbol) syms.get(0);
-	  validate(s);
-	  return s;
-      }
+    if (syms.size() == 1) {
+      Symbol s = (Symbol) syms.get(0);
+      validate(s);
+      return s;
+    }
 
     List alphas = getAlphabets();
     
@@ -124,7 +124,7 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
     while(si.hasNext()) {
       Symbol s = (Symbol) si.next();
       Alphabet a = (Alphabet) ai.next();
-      a.validate(s);
+      //a.validate(s); // very expensive for requent fetches!
       if(s instanceof AtomicSymbol) {
         atomic++;
       }
