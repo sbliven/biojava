@@ -36,7 +36,7 @@ import org.biojava.bio.*;
  * @since 1.1
  */
 
-public class FundamentalAtomicSymbol extends AbstractSymbol implements AtomicSymbol {
+public class FundamentalAtomicSymbol extends AbstractSymbol implements AtomicSymbol, Serializable {
     private final String name;
     private final char token;
     private final Annotation annotation;
