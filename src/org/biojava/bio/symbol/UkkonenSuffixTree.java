@@ -52,7 +52,7 @@ import org.biojava.utils.Unchangeable;
  * biojava-dev@biojava.org and I'll add it in there.
  *<\p>
  * @author Francois Pepin
- * @version $Revision$
+ * @version 1.3
  */
 public class UkkonenSuffixTree{
 
@@ -84,7 +84,7 @@ public class UkkonenSuffixTree{
    */
   public UkkonenSuffixTree(){
     terminationChar = DEFAULT_TERM_CHAR;
-    root = new SuffixNode();
+    root = new SimpleNode();
     e=0;
     sequences = "";
     alpha=null;
@@ -487,7 +487,7 @@ public class UkkonenSuffixTree{
 
   private void doRule2(SuffixNode parent, int splittingPos, int suffixStart){
     //int number = getAllNodes(root, null, false).size();
-    SuffixNode leaf = new SuffixNode (parent, suffixStart);
+    SuffixNode leaf = new SimpleNode (parent, suffixStart);
 
     parent.children.put(new Character(sequences.charAt(splittingPos)), leaf);
     //System.out.println("rule 2: "+sequences.charAt(splittingPos)+" from "+getLabel(parent)+ " to "+getLabel(leaf));
@@ -500,7 +500,7 @@ public class UkkonenSuffixTree{
     //			       suffixStart);
     //int number = getAllNodes(root, null, false).size();
     SuffixNode parent = child.parent;
-    SuffixNode middle= new SuffixNode(parent,suffixStart,splittingPos);
+    SuffixNode middle= new SimpleNode(parent,suffixStart,splittingPos);
     Character x=new Character(
                               sequences.charAt(child.labelStart+getPathLength(child)-getEdgeLength(child)));
 
@@ -536,17 +536,68 @@ public class UkkonenSuffixTree{
    * end Tree modification methods
    ******************************************************************/
 
-  class SuffixNode {
+  public static abstract class SuffixNode {
+    
     static final int A_LEAF=-1;
     SuffixNode parent;
     SuffixNode suffixLink;
     int labelStart, labelEnd;
     HashMap children;
     int[] additionalLabels;
+    
+    /**
+       * Determine is this node is terminal (has no children).
+       *<p>
+       * Note that this only happens at the terminated node (if the sequences
+       * have been terminated.
+       *
+       * @return <code>true</code> if and only if this node has no children.
+       */
+
+    abstract public boolean isTerminal();
+      
+    /**
+     * Determine if this node has a child corresponding to a given character
+     *
+     * @param i the first <code>Character</code> of the edge coming down this node.
+     * @return <code>true</code> if the node has a child going down from that character,
+     * false otherwise
+     */
+    abstract public boolean hasChild(Character i);
+
+    /** Gets the child of of a node that is coming down from that particular
+     * node. It returns null if no child exists or if no child exists starting
+     * on that particular character.
+     *
+     * @param i the first <code>Character</code> of the edge coming down this node
+     * @return the appropriate child <code>SuffixNode</code>, or null if it
+     * doesn't exists.
+     */
+    abstract SuffixNode getChild(Character i);
+    //abstract void addChild(SuffixTree tree, int i, SuffixNode n);
+
+    /**
+     * Returns the parent of this node, null if it's the root.
+     *
+     * @return the parent of this node, null if it's the root.
+     */
+    abstract SuffixNode getParent();
+    
+  }
+  
+
+  class SimpleNode extends SuffixNode{
+    
+    //static final int A_LEAF=-1;
+    //SuffixNode parent;
+    //SuffixNode suffixLink;
+    //int labelStart, labelEnd;
+    //HashMap children;
+    //int[] additionalLabels;
 
     /** Creates a root
      */
-    public SuffixNode(){
+    public SimpleNode(){
       parent=null;
       suffixLink=null;
       labelStart=0;
@@ -559,7 +610,7 @@ public class UkkonenSuffixTree{
      * @param parent the parent node
      * @param position the starting value of the suffix
      */
-    public SuffixNode(SuffixNode parent, int position){
+    public SimpleNode(SuffixNode parent, int position){
       this();
       this.parent=parent;
       labelStart=position;
@@ -573,7 +624,7 @@ public class UkkonenSuffixTree{
      * @param labelStart the starting point of the path label
      * @param labelStop the ending point of the path label
      */
-    public SuffixNode(SuffixNode parent, int labelStart, int labelStop){
+    public SimpleNode(SuffixNode parent, int labelStart, int labelStop){
       this();
       this.parent=parent;
       this.labelStart=labelStart;
@@ -583,6 +634,11 @@ public class UkkonenSuffixTree{
     
     
     public boolean isTerminal(){return children==null;}
+    public boolean hasChild(Character x){return getChild(x)==null;}
+    public SuffixNode getChild(Character x){
+      return (children==null)?null:(SuffixNode)children.get(x);
+    }
+    public SuffixNode getParent(){return parent;}
   }
 
   /** This is simply a debugging method to check that a node was created
