@@ -25,29 +25,29 @@ package org.biojava.bio.seq;
 /**
  * Factory for creating sequences.
  * <P>
- * This is important, as some implementations of sequence may only allow certain
- * features to be created, or you may wish to generate java features on an ACeDB
- * object, or some other horrible thing. This is part of the machinery to
- * support layerd and distributed annotations.
+ * The responsibility of this interface is to create a new feature, but not to
+ * wire it into the hierachy of feature objects. The factory method is passed
+ * all the information necisary to set the feature properties.
  *
  * @author Matthew Pocock
  */
 public interface FeatureFactory {
   /**
-   * Creates a feature within fh that refers to the location loc within seq.
+   * Creates a feature that refers to the location loc within seq.
    * <P>
    * There is no guarantee that the getAnnotation method of the resulting
    * feature will be equal to the annotation passed in. However, it is a hint to
    * the factory that it should contain all of those keys and values if
    * possible.
    *
+   * @param seq the sequence within which the feature ultimately resides
    * @param loc the Location of the feature, relative to the parent sequence
    * @param type  the type of feature
    * @param source the source of the feature
-   * @param seq the sequence within which the feature ultimately resides
-   * @param fh  the feature holder that directly contains the feature
    * @param annotation  any annotation to add to the feature
+   * @return a new Feature, not yet wired into the hierachy
    */
-  Feature createFeature(Location loc, String type, String source,
-                        Sequence seq, FeatureHolder fh, Annotation annotation);
+  Feature createFeature(Sequence seq, Location loc,
+                        String type, String source,
+                        Annotation annotation);
 }

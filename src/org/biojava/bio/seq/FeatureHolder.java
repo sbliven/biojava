@@ -29,10 +29,7 @@ import java.util.*;
  * <P>
  * Feature holders abstract the containment of a feature from the objects
  * that implements both the real container or the features. FeatureHolders are
- * like bags of features. I guess they should be like sets, but who cares.
- * <P>
- * The add/remove methods need shawing up to throw exceptions & allow read-only
- * implementations.
+ * like sets of features.
  *
  * @author Matthew Pocock
  */
@@ -51,20 +48,6 @@ public interface FeatureHolder {
    * @return  an Iterator
    */
   Iterator features();
-  
-  /**
-   * Add a feature to this holder.
-   *
-   * @param f the Feature to add
-   */
-  void addFeature(Feature f);
-  
-  /**
-   * Remove a feature from this holder.
-   *
-   * @param f the feature to remove
-   */
-  void removeFeature(Feature f);
 
   /**
    * Return a new FeatureHolder that contains all of the children of this one

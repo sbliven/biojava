@@ -33,6 +33,7 @@ import java.util.*;
  * This class is for developers to derive from, not for use directly.
  *
  * @author Matthew Pocock
+ */
 public abstract class AbstractAlphabet implements Alphabet {
   private Map parserByName;
   {

@@ -29,7 +29,14 @@ import java.util.*;
  *
  * @author Matthew Pocock
  */
-public class SimpleFeature implements Feature {
+public class SimpleFeature implements Feature, MutableFeatureHolder {
+  /**
+   * The FeatureHolder that we will delegate the FeatureHolder interface too.
+   * This is lazily instantiated.
+   */
+  private MutableFeatureHolder featureHolder;
+
+
   /**
    * The location of this feature.
    */
@@ -49,11 +56,6 @@ public class SimpleFeature implements Feature {
    */
   private Sequence sourceSeq;
   /**
-   * The TeatureHolder that we will delegate the FeatureHolder interface too.
-   * This is lazily instantiated.
-   */
-  private FeatureHolder featureHolder;
-  /**
    * The annotation object.
    * This is lazily instantiated.
    */
@@ -65,9 +67,9 @@ public class SimpleFeature implements Feature {
    *
    * @return  the FeatureHolder delegate
    */
-  protected FeatureHolder getFeatureHolder() {
+  protected MutableFeatureHolder getFeatureHolder() {
     if(featureHolder == null)
-      featureHolder = new SimpleFeatureHolder();
+      featureHolder = new SimpleMutableFeatureHolder();
     return featureHolder;
   }
 
@@ -135,12 +137,13 @@ public class SimpleFeature implements Feature {
     return new SimpleFeatureHolder();
   }
 
-  public SimpleFeature(Location loc, String type, String source,
-                       Sequence sourceSeq, Annotation annotation) {
+  public SimpleFeature(Sequence sourceSeq, Location loc,
+                       String type, String source,
+                       Annotation annotation) {
+    this.sourceSeq = sourceSeq;
     this.loc = loc;
     this.type = type;
     this.source = source;
-    this.sourceSeq = sourceSeq;
     this.annotation = annotation;
   }
 

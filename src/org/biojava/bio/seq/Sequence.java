@@ -30,7 +30,7 @@ package org.biojava.bio.seq;
  * can add information to regions of it.
  * <P>
  * It is expected that there may be several implementations of this interface,
- * each of which may be failry heavy-weight. It takes the ResidueList interface]
+ * each of which may be failry heavy-weight. It takes the ResidueList interface
  * that is nice mathematicaly, and turns it into a biologicaly useful object.
  *
  * @author Matthew Pocock
@@ -73,4 +73,27 @@ public interface Sequence extends ResidueList, FeatureHolder, Annotatable {
    * @return the string representation
    */
   String subStr(int start, int end);
+  
+  /**
+   * Creates a feature within fh that refers to the location loc.
+   * <P>
+   * There is no guarantee that the getAnnotation method of the resulting
+   * feature will be equal to the annotation passed in. However, it is a hint to
+   * the factory that it should contain all of those keys and values if
+   * possible. However, some implementations may use this annotation object. Be
+   * careful untill the standards are nailed down.
+   * <P>
+   * This method replaces the FeatureFactory interface so as to provide proper
+   * encapsulation.
+   *
+   * @param loc the Location of the feature, relative to the parent sequence
+   * @param type  the type of feature
+   * @param source the source of the feature
+   * @param fh  the feature holder that will directly contain the feature
+   * @param annotation  any annotation to add to the feature
+   * @return  the newly created and added Feature
+   * @throws  UnsupportedOperationException if this Sequence is immutable
+   */
+  Feature createFeature(MutableFeatureHolder fh, Location loc,
+                        String type, String source, Annotation annotation);
 }

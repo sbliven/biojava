@@ -34,14 +34,15 @@ import java.util.*;
  * @author Matthew Pocock
  */
 public class SimpleSequence extends SimpleResidueList implements Sequence {
+  private FeatureFactory fFact;
   private String urn;
   private String name;
   private Annotation annotation;
-  private FeatureHolder featureHolder;
+  private MutableFeatureHolder featureHolder;
  
-  protected FeatureHolder getFeatureHolder() {
+  protected MutableFeatureHolder getFeatureHolder() {
     if(featureHolder == null)
-      featureHolder = new SimpleFeatureHolder();
+      featureHolder = new SimpleMutableFeatureHolder();
     return featureHolder;
   }
 
@@ -49,6 +50,13 @@ public class SimpleSequence extends SimpleResidueList implements Sequence {
     return featureHolder != null;
   }
 
+  public FeatureFactory getFeatureFactory() {
+    return fFact;
+  }
+  
+  public void setFeatureFactory(FeatureFactory fFact) {
+    this.fFact = fFact;
+  }
 
   public String getURN() {
     return urn;
@@ -96,18 +104,20 @@ public class SimpleSequence extends SimpleResidueList implements Sequence {
     return Collections.EMPTY_LIST.iterator();
   }
 
-  public void addFeature(Feature f) {
-    getFeatureHolder().addFeature(f);
-  }
-
-  public void removeFeature(Feature f) {
-    getFeatureHolder().removeFeature(f);
-  }
-
   public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
     if(featureHolderAllocated())
       return getFeatureHolder().filter(ff, recurse);
     return new SimpleFeatureHolder();
+  }
+
+  public Feature createFeature(MutableFeatureHolder fh, Location loc,
+                               String type, String source, Annotation annotation) {
+    Feature f = fFact.createFeature(this, loc, type, source, annotation);
+    if(fh == this) {
+      fh = this.getFeatureHolder();
+    }
+    fh.addFeature(f);
+    return f;
   }
 
   /**

@@ -24,13 +24,28 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 
+/**
+ * A no-frills implementation of FeatureHolder.
+ *
+ * @author Matthew Pocock
+ */
 public class SimpleFeatureHolder implements FeatureHolder {
+  /**
+   * The child features.
+   */
   private List features;
 
+  /**
+   * Initialize features.
+   */
   {
     features = new ArrayList();
   }
 
+  protected List getFeatures() {
+    return features;
+  }
+  
   public int countFeatures() {
     return features.size();
   }
@@ -48,7 +63,7 @@ public class SimpleFeatureHolder implements FeatureHolder {
   }
 
   public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-    FeatureHolder res = new SimpleFeatureHolder();
+    MutableFeatureHolder res = new SimpleMutableFeatureHolder();
     for(Iterator f = features(); f.hasNext();) {
       Feature feat = (Feature) f.next();
       if(ff.accept(feat))
