@@ -64,7 +64,7 @@ public class AutoClearCacheMap implements CacheMap {
       this.maxKeysToClear = maxKeysToClear;
 
       map = new HashMap();
-      janitor = new Timer();
+      janitor = new Timer(true);
 
       janitor.schedule(new Janitor(), 1000*clearInterval, 1000*clearInterval);
   }
