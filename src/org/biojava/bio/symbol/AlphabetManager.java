@@ -965,7 +965,12 @@ public final class AlphabetManager {
              }
 
              public void endTree() {
-                 symbol = new FundamentalAtomicSymbol(name, annotation);
+                 symbol = new WellKnownAtomicSymbol(
+                    new FundamentalAtomicSymbol(
+                        name,
+                        annotation
+                    )
+                 );
              }
 
              Symbol getSymbol() {
@@ -1268,22 +1273,20 @@ public final class AlphabetManager {
 
     private static class WellKnownAlphabet
         extends SimpleAlphabet
-    {
-      protected void addSymbolImpl(AtomicSymbol s)
-          throws IllegalSymbolException, ChangeVetoException
-      {
-          super.addSymbolImpl(new WellKnownAtomicSymbol(this, s));
-      }
-      
-      protected Symbol getAmbiguityImpl(Set s)
-          throws IllegalSymbolException
-      {
-          Symbol sym = new WellKnownBasisSymbol(
-                this,
-                (BasisSymbol) super.getAmbiguityImpl(s)
-          );
-          return sym;
-      }
+    { 
+        public WellKnownAlphabet() {
+            super();
+        }
+        
+        public WellKnownAlphabet(Set s) {
+            super(s);
+        }
+        
+        protected Symbol getAmbiguityImpl(Set s)
+            throws IllegalSymbolException
+        {
+            return getWellKnownAmbiguitySymbol(s);
+        }
     }
     
     /**
@@ -1331,9 +1334,6 @@ public final class AlphabetManager {
              
              public OPH(String name) {
                  this.name = name;
-             }
-             
-             public OPH() {
              }
              
              private Object readResolve() throws ObjectStreamException {
@@ -1415,8 +1415,8 @@ public final class AlphabetManager {
      */
 
     private static class WellKnownAtomicSymbol extends WellKnownBasisSymbol implements AtomicSymbol {
-        WellKnownAtomicSymbol(WellKnownAlphabet alpha, AtomicSymbol symbol) {
-            super(alpha, symbol);
+        WellKnownAtomicSymbol(AtomicSymbol symbol) {
+            super(symbol);
         }
         
         public Alphabet getMatches() {
@@ -1424,115 +1424,40 @@ public final class AlphabetManager {
         }
         
         private Object writeReplace() {
-            return new OPH(alpha.getName(), getName());
-        }
-    }
-     
-    private static class WellKnownSubAlphabet extends Unchangeable implements FiniteAlphabet {
-        private FiniteAlphabet alpha;
-        private FiniteAlphabet superAlpha;
-        
-        public WellKnownSubAlphabet(FiniteAlphabet alpha, FiniteAlphabet superAlpha) {
-            this.alpha = alpha;
-            this.superAlpha = superAlpha;
+            return new OPH(getName());
         }
         
-        public boolean contains(Symbol s) {
-            if (s instanceof AtomicSymbol) {
-                return alpha.contains(s);
-            } else {
-                for (Iterator i = ((FiniteAlphabet) s.getMatches()).iterator(); i.hasNext(); ) {
-                    if (!alpha.contains((Symbol) i.next())) {
-                        return false;
-                    }
-                }
-                return true;
+        private static class OPH implements Serializable {
+            private String name;
+            
+            public OPH(String name) {
+                this.name = name;
             }
-        }
-        
-        public List getAlphabets() {
-            return alpha.getAlphabets();
-        }
-        
-        public Symbol getAmbiguity(Set s) 
-            throws IllegalSymbolException
-        {
-            for (Iterator i = s.iterator(); i.hasNext(); ) {
-                validate((Symbol) i.next());
+            
+            private Object readResolve() throws ObjectStreamException {
+                try {
+                    return symbolForName(name);
+                } catch (NoSuchElementException ex) {
+                    throw new InvalidObjectException(
+                        "Couldn't resolve symbol:" + name
+                    );
+                } 
             }
-            return superAlpha.getAmbiguity(s);
-        }
-        
-        public Symbol getGapSymbol() {
-            return superAlpha.getGapSymbol();
-        }
-        
-        public String getName() {
-            return alpha.getName();
-        }
-        
-        public Symbol getSymbol(List l) 
-            throws IllegalSymbolException
-        {
-            return alpha.getSymbol(l);
-        }
-        
-        public SymbolTokenization getTokenization(String name)
-            throws BioException
-        {
-            return superAlpha.getTokenization(name);
-        }
-        
-        public void validate(Symbol s)
-            throws IllegalSymbolException
-        {
-            if (s instanceof AtomicSymbol) {
-                alpha.validate(s);
-            } else {
-                for (Iterator i = ((FiniteAlphabet) s.getMatches()).iterator(); i.hasNext(); ) {
-                    alpha.validate((Symbol) i.next());
-                }
-            }
-        }
-        
-        public void addSymbol(Symbol s)
-            throws ChangeVetoException
-        {
-            throw new ChangeVetoException("Can't add symbols to WellKnownSubAlphabets");
-        }
-        
-        public void removeSymbol(Symbol s)
-            throws ChangeVetoException
-        {
-            throw new ChangeVetoException("Can't remove symbols from WellKnownSubAlphabets");
-        }
-        
-        public Iterator iterator() {
-            return  alpha.iterator();
-        }
-        
-        public int size() {
-            return alpha.size();
-        }
-        
-        public SymbolList symbols() {
-            return alpha.symbols();
-        }
-        
-        public Annotation getAnnotation() {
-            return alpha.getAnnotation();
         }
     }
      
     private static class WellKnownBasisSymbol extends Unchangeable implements BasisSymbol, Serializable {
-        protected WellKnownAlphabet alpha;
         protected BasisSymbol symbol;
+        private Set matches;
         
-        WellKnownBasisSymbol(WellKnownAlphabet alpha, BasisSymbol symbol) {
+        WellKnownBasisSymbol(BasisSymbol symbol) {
             super();
             symbol.addChangeListener(ChangeListener.ALWAYS_VETO, ChangeType.UNKNOWN); // Immutable
-            this.alpha = alpha;
             this.symbol = symbol;
+            this.matches = new HashSet();
+            for (Iterator i = ((FiniteAlphabet) symbol.getMatches()).iterator(); i.hasNext(); ) {
+                matches.add(i.next());
+            }
         }
         
         Symbol getSymbol() {
@@ -1556,7 +1481,7 @@ public final class AlphabetManager {
         }
         
         public Alphabet getMatches() {
-            return new WellKnownSubAlphabet((FiniteAlphabet) symbol.getMatches(), alpha);
+            return symbol.getMatches();
         }
         
         public List getSymbols() {
@@ -1568,32 +1493,19 @@ public final class AlphabetManager {
         }
         
         private Object writeReplace() {
-            return new OPH(alpha.getName(), getName());
+            return new OPH(matches);
         }
 
         
-        protected static class OPH implements Serializable {
-            private String alphaName;
-            private String name;
+        private static class OPH implements Serializable {
+            private Set matches;
             
-            public OPH(String alphaName, String name) {
-                this.alphaName = alphaName;
-                this.name = name;
+            public OPH(Set matches) {
+                OPH.this.matches = matches;
             }
             
-            private Object readResolve() throws ObjectStreamException {
-                try {
-                    Alphabet alpha = alphabetForName(alphaName);
-                    return alpha.getTokenization("name").parseToken(name);
-                } catch (NoSuchElementException ex) {
-                    throw new InvalidObjectException(
-                        "Couldn't resolve symbol " + alphaName + ":" + name
-                    );
-                } catch (BioException ise) {
-                    throw new InvalidObjectException(
-                        "Couldn't resolve symbol " + name + ": " + ise.getMessage()
-                    );
-                }
+            private Object readResolve() /* throws ObjectStreamException */ {
+                return getWellKnownAmbiguitySymbol(matches);
             }
         }
     }
@@ -1705,5 +1617,15 @@ public final class AlphabetManager {
         return new Integer(size);
       }
     }
+  }
+  
+  private static Symbol getWellKnownAmbiguitySymbol(Set s) {
+      Symbol sym = (Symbol) ambiguitySymbols.get(s);
+      if (sym == null) {
+          SimpleAlphabet matchAlpha = new WellKnownAlphabet(s);
+          sym = new WellKnownBasisSymbol(new SimpleBasisSymbol(Annotation.EMPTY_ANNOTATION, matchAlpha));
+          ambiguitySymbols.put(new HashSet(s), sym);
+      }
+      return sym;
   }
 }
