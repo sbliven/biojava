@@ -30,6 +30,7 @@ import org.acedb.seq.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.db.*;
 import org.biojava.bio.seq.io.*;
 
 public class SequenceFetch {

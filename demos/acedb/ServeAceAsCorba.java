@@ -28,6 +28,7 @@ import org.omg.CORBA.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.db.*;
 
 import org.acedb.*;
 import org.acedb.socket.*;
