@@ -33,10 +33,10 @@ import org.biojava.utils.*;
  * <P>
  * Biological information often does not fit design patterns very well, and can
  * be a jumble of facts and relationships. Annotation object provide a standard
- * way for you to stoor this mess as a property of an object.
+ * way for you to store this mess as a property of an object.
  * <P>
  * Annotations may contain keys that have Annotations as values. In this way,
- * annotations can be shaired among multiple Annotatable objects, and you can
+ * annotations can be shared among multiple Annotatable objects, and you can
  * represent semi-structured data.
  * <P>
  * It is perfectly possible to wrap up almost any tree-like or flat data
@@ -83,7 +83,8 @@ public interface Annotation {
   /**
    * Retern a map that contains the same key/values as this Annotation.
    * <P>
-   * If the annotation changes, the map may not reflect this.
+   * If the annotation changes, the map may not reflect this.  The Map
+   * may be unmodifiable.
    *
    * @return a Map
    */
