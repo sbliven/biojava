@@ -93,7 +93,25 @@ public class XmlMarkovModel {
       advance[i] = 1;
     }
       
-    ResidueParser nameParser = seqAlpha.getParser("name");
+    ResidueParser nameParser = null;
+    ResidueParser symbolParser = null;
+    
+    try {
+      nameParser = seqAlpha.getParser("name");
+    } catch (NoSuchElementException nsee) {
+    }
+    
+    try {
+      symbolParser = seqAlpha.getParser("symbol");
+    } catch (NoSuchElementException nsee) {
+    }
+    
+    if(nameParser == null && symbolParser == null) {
+      throw new SeqException(
+        "Couldn't find a parser for alphabet " +
+        seqAlpha.getName()
+      );
+    }
     
     Map nameToState = new HashMap();
     nameToState.put("_start_", model.magicalState());
@@ -111,7 +129,19 @@ public class XmlMarkovModel {
         Element weightE = (Element) weights.item(j);
         String resName = weightE.getAttribute("res");
         Residue res;
-        res = nameParser.parseToken(resName);
+        if(resName.length() == 1) {
+          if(symbolParser != null) {
+            res = symbolParser.parseToken(resName);
+          } else {
+            res = nameParser.parseToken(resName);
+          }
+        } else {
+          if(nameParser != null) {
+            res = nameParser.parseToken(resName);
+          } else {
+            res = symbolParser.parseToken(resName);
+          }
+        }          
         state.setWeight(res, Math.log(Double.parseDouble(weightE.getAttribute("prob"))));
       }
       model.addState(state);
@@ -152,7 +182,9 @@ public class XmlMarkovModel {
     out.println("</MarkovModel>");
   }
   
-  public static void writeModel(FlatModel model, PrintStream out) throws Exception {
+  public static void writeModel(MarkovModel model, PrintStream out)
+  throws Exception {
+    model = DP.flatView(model);
     FiniteAlphabet stateA = model.stateAlphabet();
     FiniteAlphabet resA = (FiniteAlphabet) model.emissionAlphabet();
     ResidueList stateR = stateA.residues();

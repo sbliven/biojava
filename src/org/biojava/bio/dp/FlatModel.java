@@ -36,7 +36,7 @@ import org.biojava.bio.seq.*;
  * <P>
  * You can train the resulting flat model, and the underlying models will be altered.
  */
-public class FlatModel extends ModelView {
+class FlatModel extends ModelView {
   private final MarkovModel source;
   private final SimpleAlphabet stateAlpha;
   
@@ -111,7 +111,7 @@ public class FlatModel extends ModelView {
       } else if(s instanceof ModelInState) { // complex model inside state
         //System.out.println("Adding a model-in-state");
         ModelInState mis = (ModelInState) s;
-        FlatModel flatM = new FlatModel(mis.getModel());
+        MarkovModel flatM = DP.flatView(mis.getModel());
 
         DotStateWrapper start = new DotStateWrapper(mis, "start");
         DotStateWrapper end = new DotStateWrapper(mis, "end");

@@ -48,7 +48,7 @@ class SingleDP extends DP {
     return score;
   }
 
-  public SingleDP(FlatModel flat)
+  public SingleDP(MarkovModel flat)
   throws IllegalResidueException, IllegalTransitionException {
     super(flat);
   }

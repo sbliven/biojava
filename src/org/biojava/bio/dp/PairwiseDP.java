@@ -40,7 +40,7 @@ public class PairwiseDP extends DP {
     private EmissionState magicalState;
     private Residue magicalResidue;
 
-    public PairwiseDP(FlatModel mm) throws IllegalResidueException,
+    public PairwiseDP(MarkovModel mm) throws IllegalResidueException,
                                            IllegalTransitionException
     {
 	super(mm);

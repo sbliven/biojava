@@ -29,6 +29,21 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.tools.DoubleAlphabet;
 
 public abstract class DP {
+  public static MarkovModel flatView(MarkovModel model)
+  throws IllegalAlphabetException, IllegalResidueException {
+    for(Iterator i = model.stateAlphabet().iterator(); i.hasNext(); ) {
+      State s = (State) i.next();
+      if(
+        !(s instanceof DotState) ||
+        !(s instanceof EmissionState)
+      ) {
+        return new FlatModel(model);
+      }
+    }
+    
+    return model;
+  }
+  
     public static State[] stateList(MarkovModel mm)
 	throws IllegalResidueException, IllegalTransitionException
     {
@@ -67,67 +82,74 @@ public abstract class DP {
 	return sl;
     }
 
-    private static class HMMOrderByTransition {
-	public final static Object GREATER_THAN = new Object();
-	public final static Object LESS_THAN = new Object();
-	public final static Object EQUAL = new Object();
-	public final static Object DISJOINT = new Object();
+  private static class HMMOrderByTransition {
+    public final static Object GREATER_THAN = new Object();
+    public final static Object LESS_THAN = new Object();
+    public final static Object EQUAL = new Object();
+    public final static Object DISJOINT = new Object();
 
-	private MarkovModel mm;
+    private MarkovModel mm;
 
-	HMMOrderByTransition(MarkovModel mm) {
+    HMMOrderByTransition(MarkovModel mm) {
 	    this.mm = mm;
-	}
+    }
 
-	public Object compare(Object o1, Object o2) 
-	    throws IllegalTransitionException,
-		   IllegalResidueException
-	{
-	    if (o1 == o2)
-		return EQUAL;
+    public Object compare(Object o1, Object o2)
+    throws IllegalTransitionException, IllegalResidueException {
+	    if (o1 == o2) {
+       return EQUAL;
+      }
 	    State s1 = (State) o1;
 	    State s2 = (State) o2;
 
-	    if (transitionsTo(s1, s2))
-		return LESS_THAN;
-	    if (transitionsTo(s2, s1))
-		return GREATER_THAN;
+	    if (transitionsTo(s1, s2)) {
+        return LESS_THAN;
+      }
+	    if (transitionsTo(s2, s1)) {
+        return GREATER_THAN;
+      }
 
 	    return DISJOINT;
-	}
+    }
 
-	private boolean transitionsTo(State from, State to)
-	    throws IllegalTransitionException,
-		   IllegalResidueException
-	{
+    private boolean transitionsTo(State from, State to)
+	  throws IllegalTransitionException, IllegalResidueException {
 	    Set checkedSet = new HashSet();
 	    Set workingSet = mm.transitionsFrom(from);
 	    while (workingSet.size() > 0) {
-		Set newWorkingSet = new HashSet();
-		for (Iterator i = workingSet.iterator(); i.hasNext(); ) {
-		    State s = (State) i.next();
-		    if (s instanceof EmissionState)
-			continue;
-		    if (s == from)
-			throw new IllegalTransitionException(from, from, "Loop in dot states.");
-		    if (s == to)
-			return true;
-		    for (Iterator j = mm.transitionsFrom(s).iterator(); j.hasNext(); ) {
-			State s2 = (State) j.next();
-			if (!workingSet.contains(s2) && !checkedSet.contains(s2))
-			    newWorkingSet.add(s2);
-		    }
-		    checkedSet.add(s);
-		}
-		workingSet = newWorkingSet;
+        Set newWorkingSet = new HashSet();
+        for (Iterator i = workingSet.iterator(); i.hasNext(); ) {
+          State s = (State) i.next();
+          if (s instanceof EmissionState) {
+            continue;
+          }
+          if (s == from) {
+            throw new IllegalTransitionException(
+              from, from, "Loop in dot states."
+            );
+          }
+          if (s == to) {
+            return true;
+          }
+          for (Iterator j = mm.transitionsFrom(s).iterator(); j.hasNext(); ) {
+            State s2 = (State) j.next();
+            if (!workingSet.contains(s2) && !checkedSet.contains(s2)) {
+              newWorkingSet.add(s2);
+            }
+          }
+          checkedSet.add(s);
+        }
+        workingSet = newWorkingSet;
 	    }
 
 	    return false;
-	}
     }
+  }
 
-  public static int [][] forwardTransitions(MarkovModel model,
-      State [] states) throws IllegalResidueException {
+  public static int [][] forwardTransitions(
+    MarkovModel model,
+    State [] states
+  ) throws IllegalResidueException {
     int stateCount = states.length;
     int [][] transitions = new int[stateCount][];
 
@@ -135,10 +157,8 @@ public abstract class DP {
       int [] tmp = new int[stateCount];
       int len = 0;
       Set trans = model.transitionsTo(states[i]);
-      // System.out.println("trans has size " + trans.size());
       for (int j = 0; j < stateCount; j++) {
         if (trans.contains(states[j])) {
-          // System.out.println(states[j].getName() + " -> " + states[i].getName());
           tmp[len++] = j;
         }
       }
@@ -151,9 +171,11 @@ public abstract class DP {
     return transitions;
   }
 
-  public static double [][] forwardTransitionScores(MarkovModel model,
-      State [] states,
-      int [][] transitions) throws IllegalResidueException {
+  public static double [][] forwardTransitionScores(
+    MarkovModel model,
+    State [] states,
+    int [][] transitions
+  ) throws IllegalResidueException {
     int stateCount = states.length;
     double [][] scores = new double[stateCount][];
 
@@ -167,8 +189,6 @@ public abstract class DP {
           throw new BioError(ite,
             "Transition listed in transitions array has dissapeared.");
         }
-        // System.out.println(states[transitions[i][j]].getName() + " -> " + states[i].getName()
-        //                   + " = " + scores[i][j]);
       }
     }
 
@@ -198,8 +218,8 @@ public abstract class DP {
   }
 
   public static double [][] backwardTransitionScores(MarkovModel model,
-      State [] states,
-      int [][] transitions) throws IllegalResidueException {
+    State [] states,
+    int [][] transitions) throws IllegalResidueException {
     int stateCount = states.length;
     double [][] scores = new double[stateCount][];
 
@@ -219,7 +239,7 @@ public abstract class DP {
     return scores;
   }
 
-  private FlatModel model;
+  private MarkovModel model;
   private State[] states;
   private int [][] forwardTransitions;
   private double [][] forwardTransitionScores;
@@ -227,11 +247,11 @@ public abstract class DP {
   private double [][] backwardTransitionScores;
   private int dotStatesIndex;
 
-    public int getDotStatesIndex() {
-	return dotStatesIndex;
-    }
+  public int getDotStatesIndex() {
+    return dotStatesIndex;
+  }
 
-  public FlatModel getModel() {
+  public MarkovModel getModel() {
     return model;
   }
   
@@ -255,7 +275,7 @@ public abstract class DP {
     return backwardTransitionScores;
   }
   
-  public DP(FlatModel model) throws IllegalResidueException,
+  public DP(MarkovModel model) throws IllegalResidueException,
                                     IllegalTransitionException
   {
     this.model = model;

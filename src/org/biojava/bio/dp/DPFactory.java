@@ -26,12 +26,7 @@ public class DPFactory {
   public static DP createDP(MarkovModel model)
   throws Exception {
     int heads = model.heads();
-    FlatModel flat;
-    if(model instanceof FlatModel) {
-      flat = (FlatModel) model;
-    } else {
-      flat = new FlatModel(model);
-    }
+    MarkovModel flat = DP.flatView(model);
     if(heads == 1) {
       return new SingleDP(flat);
     } else if(heads == 2) {
