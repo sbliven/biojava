@@ -62,15 +62,15 @@ public final class AlphabetManager {
      */
 
     public static Symbol getAllAmbiguitySymbol(FiniteAlphabet alpha) {
-	Set allSymbols = new HashSet();
-	for (Iterator i = alpha.iterator(); i.hasNext(); ) {
-	    allSymbols.add(i.next());
-	}
-	try {
-	    return alpha.getAmbiguity(allSymbols);
-	} catch (IllegalSymbolException ex) {
-	    throw new BioError(ex, "Assertion failure: coudn't recover all-ambiguity symbol");
-	}
+        Set allSymbols = new HashSet();
+        for (Iterator i = alpha.iterator(); i.hasNext(); ) {
+            allSymbols.add(i.next());
+        }
+        try {
+            return alpha.getAmbiguity(allSymbols);
+        } catch (IllegalSymbolException ex) {
+            throw new BioError(ex, "Assertion failure: coudn't recover all-ambiguity symbol");
+        }
     }
 
     /**
@@ -82,31 +82,31 @@ public final class AlphabetManager {
      */
 
     public static Set getAllSymbols(FiniteAlphabet alpha) {
-	Set allSymbols = new HashSet();
-	List orderedAlpha = new ArrayList(alpha.size());
-	for (Iterator i = alpha.iterator(); i.hasNext(); ) {
-	    orderedAlpha.add(i.next());
-	}
+        Set allSymbols = new HashSet();
+        List orderedAlpha = new ArrayList(alpha.size());
+        for (Iterator i = alpha.iterator(); i.hasNext(); ) {
+            orderedAlpha.add(i.next());
+        }
 
-	int atomicSyms = alpha.size();
-	int totalSyms = 1 << atomicSyms;
-	
-	for (int cnt = 0; cnt < totalSyms; ++cnt) {
-	    Set matchSet = new HashSet();
-	    for (int atom = 0; atom < atomicSyms; ++atom) {
-		if ((cnt & (1 << atom)) != 0) {
-		    matchSet.add(orderedAlpha.get(atom));
-		}
-	    }
+        int atomicSyms = alpha.size();
+        int totalSyms = 1 << atomicSyms;
 
-	    try {
-		allSymbols.add(alpha.getAmbiguity(matchSet));
-	    } catch (IllegalSymbolException ex) {
-		throw new BioError(ex, "Assertion failed: couldn't get ambiguity symbol");
-	    }
-	}
+        for (int cnt = 0; cnt < totalSyms; ++cnt) {
+            Set matchSet = new HashSet();
+            for (int atom = 0; atom < atomicSyms; ++atom) {
+                if ((cnt & (1 << atom)) != 0) {
+                    matchSet.add(orderedAlpha.get(atom));
+                }
+            }
 
-	return allSymbols;
+            try {
+                allSymbols.add(alpha.getAmbiguity(matchSet));
+            } catch (IllegalSymbolException ex) {
+                throw new BioError(ex, "Assertion failed: couldn't get ambiguity symbol");
+            }
+        }
+
+        return allSymbols;
     }
 
   /**
@@ -511,7 +511,9 @@ public final class AlphabetManager {
           aList.add(alphabetForName(name.substring(i).trim()));
           i = name.length();
         } else {
-          aList.add(alphabetForName(name.substring(i, j).trim()));
+          if(i != j){
+            aList.add(alphabetForName(name.substring(i, j).trim()));
+          }
           i = j + " x ".length();
         }
       }
@@ -550,7 +552,7 @@ public final class AlphabetManager {
     return getCrossProductAlphabet(aList, (Alphabet) null);
   }
 
-  static public Alphabet getCrossProductAlphabet(List aList, String name) 
+  static public Alphabet getCrossProductAlphabet(List aList, String name)
   throws IllegalAlphabetException {
     Alphabet currentAlpha = (Alphabet) nameToAlphabet.get(name);
     if(currentAlpha != null) {
@@ -747,10 +749,10 @@ public final class AlphabetManager {
     gapSymbol = new GapSymbol();
     gapBySize = new HashMap();
     gapBySize.put(new SizeQueen(new ArrayList()), gapSymbol);
-    
+
     nameToAlphabet.put("INTEGER", IntegerAlphabet.getInstance());
     nameToAlphabet.put("DOUBLE", DoubleAlphabet.getInstance());
-    
+
     try {
       gapBySize.put(
         new SizeQueen(Arrays.asList(
@@ -788,14 +790,14 @@ public final class AlphabetManager {
     /**
      * Load additional Alphabets, defined in XML format, into the AlphabetManager's registry.
      * These can the be retrieved by calling <code>alphabetForName</code>.
-     * 
+     *
      * @param is an <code>InputSource</code> encapsulating the document to be parsed
      * @throws IOException if there is an error accessing the stream
      * @throws SAXException if there is an error while parsing the document
      * @throws BioException if a problem occurs when creating the new Alphabets.
      * @since 1.3
      */
-  
+
     public static void loadAlphabets(InputSource is)
         throws SAXException, IOException, BioException
     {
@@ -807,19 +809,19 @@ public final class AlphabetManager {
             parser.parse(is);
         } catch (ParserConfigurationException ex) {
             throw new BioException(ex, "Unable to create XML parser");
-        } 
+        }
     }
-    
+
     /**
      * StAX handler for the alphabetManager element
      */
-    
+
     private static class AlphabetManagerHandler extends StAXContentHandlerBase {
         public void startElement(String nsURI,
-			                     String localName,
-			                     String qName,
-			                     Attributes attrs,
-			                     DelegationManager dm)
+                                             String localName,
+                                             String qName,
+                                             Attributes attrs,
+                                             DelegationManager dm)
              throws SAXException
          {
              if (localName.equals("alphabetManager")) {
@@ -839,9 +841,9 @@ public final class AlphabetManager {
                  throw new SAXException("Unknown element in alphabetManager: " + localName);
              }
          }
-         
+
          public void endElement(String nsURI,
-			                    String localName,
+                                            String localName,
                                 String qName,
                                 StAXContentHandler delegate)
             throws SAXException
@@ -859,20 +861,20 @@ public final class AlphabetManager {
                  String name = ah.getName();
                  Alphabet alpha = ah.getAlphabet();
                  registerAlphabet(name, alpha);
-             } 
+             }
          }
-         
+
          private class SymbolHandler extends StAXContentHandlerBase {
              private String name;
              private Symbol symbol;
              private Annotation annotation = new SmallAnnotation();
-             
+
              public SymbolHandler(String name) {
                  this.name = name;
              }
-             
+
              public void startElement(String nsURI,
-			                         String localName,
+                                                 String localName,
                                      String qName,
                                      Attributes attrs,
                                      DelegationManager dm)
@@ -894,33 +896,33 @@ public final class AlphabetManager {
                      throw new SAXException("Unknown element in symbol: " + localName);
                  }
              }
-             
+
              public void endTree() {
                  symbol = new WellKnownSymbol(null, '?', name, annotation);
              }
-             
+
              Symbol getSymbol() {
                  return symbol;
              }
-             
+
              String getName() {
                  return name;
              }
          }
-        
+
          private class AlphabetHandler extends StAXContentHandlerBase {
              private String name;
              private Map localSymbols;
              private WellKnownAlphabet alpha;
-             
+
              String getName() {
                  return name;
              }
-             
+
              Alphabet getAlphabet() {
                  return alpha;
              }
-             
+
              public AlphabetHandler(String name, FiniteAlphabet parent) {
                  this.name = name;
                  localSymbols = new OverlayMap(nameToSymbol);
@@ -938,9 +940,9 @@ public final class AlphabetManager {
                      }
                  }
              }
-                 
+
              public void startElement(String nsURI,
-			                         String localName,
+                                                 String localName,
                                      String qName,
                                      Attributes attrs,
                                      DelegationManager dm)
@@ -976,9 +978,9 @@ public final class AlphabetManager {
                      throw new SAXException("Unknown element in alphabetl: " + localName);
                  }
              }
-             
+
              public void endElement(String nsURI,
-			                        String localName,
+                                                String localName,
                                     String qName,
                                     StAXContentHandler delegate)
                   throws SAXException
@@ -994,9 +996,9 @@ public final class AlphabetManager {
                      String name = cth.getName();
                      SymbolTokenization toke = cth.getTokenization();
                      alpha.putTokenization(name, toke);
-                 } 
+                 }
              }
-             
+
              private void addSymbol(Symbol sym)
                  throws SAXException
              {
@@ -1009,33 +1011,33 @@ public final class AlphabetManager {
                  }
              }
          }
-         
+
          private class CharacterTokenizationHandler extends StAXContentHandlerBase {
              private String name;
              private Map localSymbols;
              private CharacterTokenization toke;
-             
+
              String getName() {
                  return name;
              }
-             
+
              SymbolTokenization getTokenization() {
                  return toke;
              }
-             
-             public CharacterTokenizationHandler(String name, 
+
+             public CharacterTokenizationHandler(String name,
                                                  FiniteAlphabet alpha,
                                                  Map localSymbols,
-                                                 boolean caseSensitive) 
+                                                 boolean caseSensitive)
              {
-                    
+
                  this.name = name;
                  this.localSymbols = localSymbols;
                  toke = new WellKnownTokenization(alpha, name, caseSensitive);
              }
-                 
+
              public void startElement(String nsURI,
-			                         String localName,
+                                                 String localName,
                                      String qName,
                                      Attributes attrs,
                                      DelegationManager dm)
@@ -1051,19 +1053,19 @@ public final class AlphabetManager {
                      throw new SAXException("Unknown element in characterTokenization: " + localName);
                  }
              }
-             
+
              private class MappingHandler extends StAXContentHandlerBase {
                  public MappingHandler(boolean isAtomic) {
                      this.isAtomic = isAtomic;
                  }
-                 
+
                  boolean isAtomic;
                  Set symbols = new HashSet();
                  char c = '\0';
                  int level = 0;
-                 
+
                  public void startElement(String nsURI,
-			                              String localName,
+                                                      String localName,
                                           String qName,
                                           Attributes attrs,
                                           DelegationManager dm)
@@ -1085,18 +1087,18 @@ public final class AlphabetManager {
                      }
                      ++level;
                  }
-                 
+
                  public void endElement(String nsURI,
-			                            String localName,
+                                                    String localName,
                                         String qName,
                                         StAXContentHandler delegate)
                      throws SAXException
                  {
                      --level;
                  }
-                 
+
                  public void endTree()
-                     throws SAXException 
+                     throws SAXException
                  {
                      try {
                          Symbol ambiSym = toke.getAlphabet().getAmbiguity(symbols);
@@ -1110,34 +1112,34 @@ public final class AlphabetManager {
     }
 
     private static class WellKnownTokenization extends CharacterTokenization implements Serializable {
-	private String name;
+        private String name;
 
-	WellKnownTokenization(Alphabet alpha, String name, boolean caseSensitive) {
-	    super(alpha, caseSensitive);
-	    this.name = name;
-	}
+        WellKnownTokenization(Alphabet alpha, String name, boolean caseSensitive) {
+            super(alpha, caseSensitive);
+            this.name = name;
+        }
 
-	public Object writeReplace() {
-	    return new OPH(getAlphabet(), name);
-	}
+        public Object writeReplace() {
+            return new OPH(getAlphabet(), name);
+        }
 
-	private static class OPH implements Serializable {
-	    private Alphabet alphabet;
-	    private String name;
+        private static class OPH implements Serializable {
+            private Alphabet alphabet;
+            private String name;
 
-	    OPH(Alphabet alphabet, String name) {
-		this.alphabet = alphabet;
-		this.name = name;
-	    }
+            OPH(Alphabet alphabet, String name) {
+                this.alphabet = alphabet;
+                this.name = name;
+            }
 
-	    private Object readResolve() throws ObjectStreamException {
-		try {
-		    return alphabet.getTokenization(name);
-		} catch (Exception ex) {
-		    throw new InvalidObjectException("Couldn't resolve tokenization " + name + " in alphabet " + alphabet.getName());
-		}
-	    }
-	}
+            private Object readResolve() throws ObjectStreamException {
+                try {
+                    return alphabet.getTokenization(name);
+                } catch (Exception ex) {
+                    throw new InvalidObjectException("Couldn't resolve tokenization " + name + " in alphabet " + alphabet.getName());
+                }
+            }
+        }
     }
 
     /**
@@ -1205,10 +1207,10 @@ public final class AlphabetManager {
           this.name = name;
         }
 
-	private Object readResolve() throws ObjectStreamException {
+        private Object readResolve() throws ObjectStreamException {
           try {
             if(alpha != null) {
-		return alpha.getTokenization("name").parseToken(name);
+                return alpha.getTokenization("name").parseToken(name);
             } else {
               return symbolForName(name);
             }
