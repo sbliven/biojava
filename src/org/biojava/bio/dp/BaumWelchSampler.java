@@ -103,6 +103,7 @@ public class BaumWelchSampler extends AbstractTrainer implements Serializable {
             : gap;
       double [] fsc = fm.scores[i];
       double [] bsc = bm.scores[i+1];
+      double [] bsc2 = bm.scores[i];
       double[] weightVector = dp.getEmission(sym, scoreType);
       for (int s = 0; s < states.length; s++) {  // any -> emission transitions
         int [] ts = backwardTransitions[s];
@@ -111,15 +112,16 @@ public class BaumWelchSampler extends AbstractTrainer implements Serializable {
         double p = Math.random();
         for (int tc = 0; tc < ts.length; tc++) {
           int t = ts[tc];
-          // double weight = (states[t] instanceof EmissionState)
-          //   ? ((EmissionState) states[t]).getDistribution().getWeight(sym)
-          //  : 1.0;
           double weight = 1.0;
           if (states[t] instanceof EmissionState) {
             weight = Math.exp(weightVector[t]);
           }
           if (weight != 0.0) {
-            p -= Math.exp(fsc[s] + tss[tc] + bsc[t] - fs) * weight;
+            if(t < dp.getDotStatesIndex()) {
+              p -= Math.exp(fsc[s] + tss[tc] + bsc[t] - fs) * weight;
+            } else {
+              p -= Math.exp(fsc[s] + tss[tc] + bsc2[t] - fs);
+            }
             if (p <= 0.0) {
               try {
                 trainer.addCount(

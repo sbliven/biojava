@@ -97,6 +97,7 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
             : gap;
       double [] fsc = fm.scores[i];
       double [] bsc = bm.scores[i+1];
+      double [] bsc2 = bm.scores[i];
       double[] weightVector = dp.getEmission(sym, scoreType);
       for (int s = 0; s < states.length; s++) {  // any -> emission transitions
         int [] ts = backwardTransitions[s];
@@ -104,11 +105,9 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
         Distribution dist = model.getWeights(states[s]);
         for (int tc = 0; tc < ts.length; tc++) {
           int t = ts[tc];
-          double weight = (states[t] instanceof EmissionState)
-            ? Math.exp(weightVector[t])
-            : 1.0;
-          if (weight != 0.0) {
-            try {
+          if(t < dp.getDotStatesIndex()) {
+            double weight = Math.exp(weightVector[t]);
+            if (weight != 0.0) {
               trainer.addCount(
                 dist, states[t],
                 Math.exp(
@@ -117,11 +116,16 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
                   fs
                 ) * weight
               );
-            } catch (IllegalSymbolException ise) {
-              throw new BioError(
-                "Transition in backwardTransitions[][] dissapeared", ise
-              );
             }
+          } else {
+            trainer.addCount(
+              dist, states[t],
+              Math.exp(
+                fsc[s] + tss[tc] + bsc2[t]
+                -
+                fs
+              )
+            );
           }
         }
       }
