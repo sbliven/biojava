@@ -311,9 +311,25 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
             Annotation ann = seq.getAnnotation();
             
 	    //
-	    // Store organism
+	    // Store generic properties
 	    //
 	    
+	    for (Iterator i = ann.asMap().entrySet().iterator(); i.hasNext(); ) {
+		Map.Entry me = (Map.Entry) i.next();
+		Object key = me.getKey();
+		Object value = me.getValue();
+
+		if (key.equals(OrganismParser.PROPERTY_ORGANISM)) {
+		    continue;
+		} else {
+		    persistBioentryProperty(conn, bioentry_id, key, value, false, true);
+		}
+	    }
+
+	    //
+	    // Magic for taxonomy.  Move this!
+	    //
+
 	    if(ann.containsProperty(OrganismParser.PROPERTY_ORGANISM)) {
                 Taxa taxa = (Taxa) ann.getProperty(OrganismParser.PROPERTY_ORGANISM);
                 Annotation ta = taxa.getAnnotation();
@@ -762,6 +778,66 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	insert_new.close();
     }
 
+    void persistBioentryProperty(Connection conn,
+				 int bioentry_id,
+				 Object key,
+				 Object value,
+				 boolean removeFirst,
+				 boolean silent)
+        throws SQLException
+    {
+	String keyString = key.toString();
+
+	// Ought to check for special-case keys. (or just wait 'til the special case
+	// tables get nuked :-)
+	
+	if (!isBioentryPropertySupported()) {
+	    if (silent) {
+		return;
+	    } else {
+		throw new SQLException("Can't persist this property since the bioentry_property table isn't available");
+	    }
+	}
+
+	if (removeFirst) {
+	    int id = intern_seqfeature_qualifier(conn, keyString);
+	    PreparedStatement remove_old_value = conn.prepareStatement("delete from bioentry_property_value " +
+								       " where bioentry_id = ? and seqfeature_qualifier_id = ?");
+	    remove_old_value.setInt(1, bioentry_id);
+	    remove_old_value.setInt(2, id);
+	    remove_old_value.executeUpdate();
+	    remove_old_value.close();
+	}
+	
+	PreparedStatement insert_new;
+	if (isSPASupported()) {
+	    insert_new= conn.prepareStatement("insert into bioentry_property " +
+                                              "       (bioentry_id, seqfeature_qualifier_id, property_value) " +
+					      "values (?, intern_seqfeature_qualifier( ? ), ?)");
+	    insert_new.setString(2, keyString);
+	} else {
+	    insert_new= conn.prepareStatement("insert into seqfeature_qualifier_value " +
+                                              "       (bioentry_id, seqfeature_qualifier_id, property_value) " +
+					      "values (?, ?, ?)");
+	    insert_new.setInt(2, intern_seqfeature_qualifier(conn, keyString));
+	}
+
+	insert_new.setInt(1, bioentry_id);	
+	if (value instanceof Collection) {
+	    int cnt = 0;
+	    for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+		// insert_new.setInt(3, ++cnt);
+		insert_new.setString(3, i.next().toString());
+		insert_new.executeUpdate();
+	    }
+	} else {
+	    // insert_new.setInt(3, 1);
+	    insert_new.setString(3, value.toString());
+	    insert_new.executeUpdate();
+	}
+	insert_new.close();
+    }
+
     int intern_seqfeature_key(Connection conn, String s)
         throws SQLException
     {
@@ -926,6 +1002,31 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	}
 
 	return locationQualifierSupported;
+    }
+
+    private boolean bioentryPropertyChecked = false;
+    private boolean bioentryPropertySupported = false;
+
+    boolean isBioentryPropertySupported() {
+	if (!bioentryPropertyChecked) {
+	    try {
+		Connection conn = pool.takeConnection();
+		PreparedStatement ps = conn.prepareStatement("select * from bioentry_property limit 1");
+		try {
+		    ps.executeQuery();
+		    bioentryPropertySupported = true;
+		} catch (SQLException ex) {
+		    bioentryPropertySupported = false;
+		}
+		ps.close();
+		pool.putConnection(conn);
+	    } catch (SQLException ex) {
+		throw new BioRuntimeException(ex);
+	    }
+	    bioentryPropertyChecked = true;
+	}
+
+	return bioentryPropertySupported;
     }
 
     private boolean spaChecked = false;

@@ -63,6 +63,10 @@ class BioSQLSequenceAnnotation implements Annotation {
 	try {
 	    Connection conn = seqDB.getPool().takeConnection();
 	    
+	    //
+	    // Handle all the hacky special cases first
+	    //
+
 	    PreparedStatement get_annotations = conn.prepareStatement("select comment_text from comment where bioentry_id = ?");
 	    get_annotations.setInt(1, bioentry_id);
 	    ResultSet rs = get_annotations.executeQuery();
@@ -71,13 +75,6 @@ class BioSQLSequenceAnnotation implements Annotation {
 	    while (rs.next()) {
 		String value = rs.getString(1);
 		String key = "comment";
-		if (value.startsWith("(")) {
-		    int closeBracket = value.indexOf(')');
-		    if (closeBracket > 0) {
-			key = value.substring(1, closeBracket);
-			value = value.substring(closeBracket + 1);
-		    }
-		}
 		underlyingAnnotation.setProperty(key, value);
 	    }
 	    get_annotations.close();
@@ -99,6 +96,26 @@ class BioSQLSequenceAnnotation implements Annotation {
 						 );
 		underlyingAnnotation.setProperty(OrganismParser.PROPERTY_ORGANISM, taxa);
 	    }
+
+	    //
+	    // General-purpose tagvalue data.
+	    //
+
+	    if (seqDB.isBioentryPropertySupported()) {
+		PreparedStatement get_properties = conn.prepareStatement(
+			"select seqfeature_qualifier.qualifier_name, bioentry_property.property_value " +
+			"  from bioentry_property, seqfeature_qualifier " +
+			" where bioentry_property.bioentry_id = ? " +
+			"   and seqfeature_qualifier.seqfeature_qualifier_id = bioentry_property.seqfeature_qualifier_id");
+		get_properties.setInt(1, bioentry_id);
+		rs = get_properties.executeQuery();
+		while (rs.next()) {
+		    String key = rs.getString(1);
+		    String value = rs.getString(2);
+		    underlyingAnnotation.setProperty(key, value);
+		}
+	    }
+	    
 	    seqDB.getPool().putConnection(conn);
 	} catch (SQLException ex) {
 	    throw new BioRuntimeException(ex, "Error fetching annotations");
@@ -109,7 +126,7 @@ class BioSQLSequenceAnnotation implements Annotation {
 	}
     }
 
-        public Object getProperty(Object key)
+    public Object getProperty(Object key)
         throws NoSuchElementException
     {
 	if (underlyingAnnotation == null) {
@@ -137,19 +154,37 @@ class BioSQLSequenceAnnotation implements Annotation {
     private void _setProperty(Object key, Object value) 
         throws ChangeVetoException
     {
+	persistProperty(key, value);
 	if (underlyingAnnotation != null) {
 	    underlyingAnnotation.setProperty(key, value);
 	}
-	persistProperty(key, value);
     }
 
     private void persistProperty(Object key, Object value)
         throws ChangeVetoException
     {
-	throw new ChangeVetoException("FIXME");
+	Connection conn = null;
+	try {
+	    conn = seqDB.getPool().takeConnection();
+	    conn.setAutoCommit(false);
+
+	    seqDB.persistBioentryProperty(conn, bioentry_id, key, value, true, false);
+	    
+	    conn.commit();
+	    seqDB.getPool().putConnection(conn);
+	} catch (SQLException ex) {
+	    boolean rolledback = false;
+	    if (conn != null) {
+		try {
+		    conn.rollback();
+		    rolledback = true;
+		} catch (SQLException ex2) {}
+	    }
+	    throw new BioRuntimeException(ex, "Error adding BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""));
+	}
     }
 
-        public boolean containsProperty(Object key) {
+    public boolean containsProperty(Object key) {
 	if (underlyingAnnotation == null) {
 	    initAnnotations();
 	}
