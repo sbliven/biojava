@@ -26,7 +26,7 @@ public class PatternBlitz
     private StateMachineToolkit factory;
     private AlphabetIndex alfaIdx;
 
-    PatternBlitz(FiniteAlphabet alfa, StateMachineToolkit factory)
+    public PatternBlitz(FiniteAlphabet alfa, StateMachineToolkit factory)
     {
         this.alfa = alfa;
         alfaIdx = AlphabetManager.getAlphabetIndex(alfa);
@@ -57,6 +57,7 @@ public class PatternBlitz
 
             // convert to state machine
             StateMachineFactory instanceFactory = factory.getFactory(pattern, dfa);
+            instanceFactory.setListener(listener);
 
             // save in pattern store
             patternStore.addLast(instanceFactory);

@@ -26,5 +26,6 @@ public interface StateMachineFactory
      * is valid otherwise null.
      */
     public StateMachineInstance startInstance(int symIdx, int start);
+    public void setListener(PatternListener listener);
 }
 

@@ -219,7 +219,7 @@ public class ArrayStateMachineToolkit
             this.name = name;
             alfa = fa.getAlphabet();
             int alfaSize = alfa.size();
-            entryPoints = new int [alfaSize];
+            entryPoints = new int [fa.nodeCount()];
             transitions = new byte [alfaSize * fa.nodeCount()];
             this.greedy = greedy;
 
@@ -227,7 +227,7 @@ public class ArrayStateMachineToolkit
             fa = null;   // release FA for GC.
         }
     
-        void setListener(PatternListener listener)
+        public void setListener(PatternListener listener)
         {
             this.listener = listener;
         }
@@ -258,7 +258,8 @@ public class ArrayStateMachineToolkit
                     FiniteAutomaton.Transition currTransition = (FiniteAutomaton.Transition) transI.next();
         
                     int symIdx = alfaIdx.indexForSymbol(currTransition.getSymbol());
-                    transitions[entryPoints[Math.abs(currTransition.getSource().getID()) + symIdx]]
+                    //System.out.println(currTransition.getSymbol() + " " + symIdx + " " + currTransition.getSource().getID() + " " + currTransition.getDest().getID());
+                    transitions[entryPoints[Math.abs(currTransition.getSource().getID())] + symIdx]
                         = (byte) currTransition.getDest().getID();
                 }
             }
@@ -294,11 +295,13 @@ public class ArrayStateMachineToolkit
         public StateMachineInstance startInstance(int symIdx, int start)
         {
             int nextState = transitions[symIdx];
+            //System.out.println("startInstance called with " + symIdx + " " + start + " " + nextState);
             if (nextState != ERROR_STATE) {
                 if (greedy) {
                     return new GreedyInstance(start, start + 1, nextState);
                 }
                 else {
+                    //System.out.println("creating new Instance.");
                     return new Instance(start, start + 1, nextState);
                 }
             }
