@@ -85,12 +85,16 @@ public class XMLBeans {
 	    if (child instanceof Element) {
 		Element echild = (Element) child;
 		String tag = echild.getTagName();
+		String name = echild.getAttribute("name");
+		Object valueObject = null;
+		Class valueType = null;
+
 		if (tag.equals("string")) {
-		    String name = echild.getAttribute("name");
-		    String value = echild.getAttribute("value");
-		    setProp(clazz, bean, name, value, value.getClass());
-		} else if (tag.equals("bean")) {
-		    String name = echild.getAttribute("name");
+		    valueObject = echild.getAttribute("value");
+		    valueType = valueObject.getClass();
+		} else if (tag.equals("bean") || tag.equals("child")) {
+		    // child supported for backwards compatibility.
+
 		    String ref = echild.getAttribute("ref");
 		    Object targ = null;
 		    if (! ref.equals("")) {
@@ -103,36 +107,54 @@ public class XMLBeans {
 		    } else {
 			targ = instantiateBean(echild);
 		    }
-		    setProp(clazz, bean, name, targ, targ.getClass());
+		    
+		    valueObject = targ;
+		    valueType = targ.getClass();
 		} else if (tag.equals("int")) {
-		    String name = echild.getAttribute("name");
 		    String value = echild.getAttribute("value");
 		    try {
 			int val = Integer.parseInt(value);
-			setProp(clazz, bean, name, new Integer(val), Integer.TYPE);
+			valueObject = new Integer(val);
+			valueType = Integer.TYPE;
 		    } catch (NumberFormatException ex) {
 			throw new AppException("Invalid int: " + value);
 		    }
 		} else if (tag.equals("double")) {
-		    String name = echild.getAttribute("name");
 		    String value = echild.getAttribute("value");
 		    try {
 			double val = Double.parseDouble(value);
-			setProp(clazz, bean, name, new Double(val), Double.TYPE);
+			valueObject = new Double(val);
+			valueType = Double.TYPE;
 		    } catch (NumberFormatException ex) {
 			throw new AppException("Invalid double: " + value);
 		    }
 		} else if (tag.equals("boolean")) {
-		    String name = echild.getAttribute("name");
 		    String value = echild.getAttribute("value");
-		    Boolean val = Boolean.valueOf(value);
-		    setProp(clazz, bean, name, val, Boolean.TYPE);
-		} else if (tag.equals("child")) {
-		    if (! (bean instanceof Collection))
-			throw new AppException("Only Collections can have children");
-		    Object childBean = instantiateBean(echild);
-		    ((Collection) bean).add(childBean);
+		    valueObject = new Boolean(value);
+		    valueType = Boolean.TYPE;
+		} else if (tag.equals("set")) {
+		    valueObject = new HashSet();
+		    configureBean(valueObject, echild, refs);
+		    valueType = valueObject.getClass();
+		} else if (tag.equals("list")) {
+		    valueObject = new ArrayList();
+		    configureBean(valueObject, echild, refs);
+		    valueType = valueObject.getClass();
+		} else {
+		    throw new AppException("Unknown element `" + tag + "' in XML-bean");
 		}
+
+		
+		if (name != null && name.length() > 0) {
+		    setProp(clazz, bean, name, valueObject, valueType);
+		} else {
+		    if (bean instanceof Collection) {
+			((Collection) bean).add(valueObject);
+		    } else {
+			throw new AppException("Anonymous beans are only allowed as children of Collections");
+		    }
+		}
+		
 	    }
 	    child = child.getNextSibling();
 	}
