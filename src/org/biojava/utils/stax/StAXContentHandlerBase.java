@@ -72,7 +72,10 @@ public class StAXContentHandlerBase implements StAXContentHandler {
     {
     }
 
-    public void endElement(String nsURI, String localName, String qName)
+    public void endElement(String nsURI,
+			   String localName,
+			   String qName,
+			   StAXContentHandler delegate)
         throws SAXException
     {
     }

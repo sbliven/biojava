@@ -86,39 +86,53 @@ public class SAX2StAXAdaptor implements ContentHandler {
 			     final Attributes attrs)
 	throws SAXException
     {
+	S2SDelegationManager dm = new S2SDelegationManager();
 	current.handler.startElement(nsURI,
 				     localName,
 				     qName,
 				     attrs,
-				     new DelegationManager() {
+				     dm);
 
-	     public void delegate(StAXContentHandler handler) 
-	         throws SAXException
-	     {
-		 current = new HandlerBinding(handler);
-		 stack.add(current);
-		 current.handler.startTree();
-		 current.handler.startElement(nsURI,
-					      localName,
-					      qName,
-					      attrs,
-					      this);
-	     }
+	if (dm.getDelegate() != null) {
+	    current = new HandlerBinding(dm.getDelegate());
+	    stack.add(current);
+	    current.handler.startTree();
+	    startElement(nsURI, localName, qName, attrs); // Recurse until someone
+	                                                  // takes responsibility. 
+	} else {
+	    current.count++;
+	}
+    }
 
-					 } );
-	current.count++;
+    private static class S2SDelegationManager implements DelegationManager {
+	private StAXContentHandler delegate;
+
+	public void delegate(StAXContentHandler handler) 
+	    throws SAXException
+	{
+	    if (this.delegate != null) {
+		throw new SAXException("Tried to multiply delegate a single StAX element");
+	    }
+
+	    this.delegate = handler;
+	}
+
+	private StAXContentHandler getDelegate() {
+	    return delegate;
+	}
     }
 
     public void endElement(String nsURI, String localName, String qName)
         throws SAXException
     {
-	current.handler.endElement(nsURI, localName, qName);
+	current.handler.endElement(nsURI, localName, qName, null);
 	current.count--;
 	while (current.count == 0 && stack.size() > 1) {
+	    StAXContentHandler oldHandler = current.handler;
 	    current.handler.endTree();
 	    stack.remove(stack.size() - 1);
 	    current = (HandlerBinding) stack.get(stack.size() - 1);
-	    current.handler.endElement(nsURI, localName, qName);
+	    current.handler.endElement(nsURI, localName, qName, oldHandler);
 	}
     }
 

@@ -56,6 +56,9 @@ public interface StAXContentHandler {
 			     DelegationManager dm)
 	throws SAXException;
 
-    public void endElement(String nsURI, String localName, String qName)
+    public void endElement(String nsURI,
+			   String localName,
+			   String qName,
+			   StAXContentHandler delegate)
         throws SAXException;
 }
