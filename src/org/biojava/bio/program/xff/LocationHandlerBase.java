@@ -28,6 +28,14 @@ import org.biojava.utils.*;
 import org.biojava.utils.stax.*;
 import org.xml.sax.*;
 
+/**
+ * Handler to the XFF location type.  To use this, write a simple
+ * subclass which takes the location and stores it somewhere sensible.
+ *
+ * @author Thomas Down
+ * @since 1.2
+ */
+
 public abstract class LocationHandlerBase extends StAXContentHandlerBase {
     private int level = 0;
     private Location location = Location.empty;

@@ -23,6 +23,20 @@ package org.biojava.bio.program.xff;
 
 import org.biojava.utils.stax.*;
 
+/**
+ * Factory for StAX content handlers.
+ *
+ * @author Thomas Down
+ * @since 1.2
+ */
+
 public interface XFFPartHandlerFactory {
+    /**
+     * Return a suitable StAX content handler.
+     *
+     * @param xffenv An XFFFeatureSetHandler which defines the current
+     *        XFF parsing `environment'.
+     */
+
     public StAXContentHandler getPartHandler(XFFFeatureSetHandler xffenv);
 }

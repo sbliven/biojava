@@ -36,6 +36,29 @@ import org.xml.sax.*;
  * StAX handler for the basic <code>feature</code> type of XFF.
  * This class can also be subclassed to handle other XFF types.
  *
+ * <p>
+ * In general, to handle a <code>feature</code> subclass, you will
+ * with to:
+ * </p>
+ *
+ * <ul>
+ * <li>If necessary, override createFeatureTemplate to build the appropriate BioJava
+ *     Feature.Template</li>
+ * <li>Add your own <code>startElement</code> and <code>endElement</code>
+ *     methods which handle extra extra elements in your feature type.  These
+ *     should normally pass on all the standard elements to
+ *     <code>super.startElement</code> and <code>super.endElement</code>.</li>
+ * </ul>
+ *
+ * <p>
+ * Note that, since <code>FeatureHandler</code> does some basic housekeeping,
+ * if you `consume' a startElement notification (i.e. don't pass it on to the
+ * superclass) you must also consume the matching endElement.  Since FeatureHandler
+ * silently ignores all unrecognized elements, it is usually safe to pass on
+ * all startElement and endElement notifications -- even those which are specific
+ * to your feature type.
+ * </p>
+ *
  * @author Thomas Down
  * @since 1.2
  */
@@ -93,7 +116,12 @@ public class FeatureHandler extends StAXContentHandlerBase {
     }
 
     /**
-     * Fire the startFeature event.
+     * Fire the startFeature event.  You should wrap this method if you want
+     * to perform any validation on the Feature.Template before the
+     * startFeature is fired.
+     *
+     * @throws ParseException if the startFeature notification fails, or if
+     *                        it has already been made.
      */
 
     protected void fireStartFeature() 
@@ -131,7 +159,9 @@ public class FeatureHandler extends StAXContentHandlerBase {
     }
 
     /**
-     * Set a property.
+     * Set a property.  If the startFeature notification has not yet been fired,
+     * the property is added directly to the annotation bundle in the feature
+     * template, otherwise an addFeatureProperty event is generated.
      */
 
     protected void setFeatureProperty(Object key, Object value) 
@@ -148,7 +178,11 @@ public class FeatureHandler extends StAXContentHandlerBase {
 	}
     }
     
-    
+    /**
+     * StAX callback for element starts.  Wrap this method to handle extra
+     * elements within your own feature types.
+     */
+
     public void startElement(String nsURI,
 			     String localName,
 			     String qName,
@@ -203,6 +237,11 @@ public class FeatureHandler extends StAXContentHandlerBase {
 	    }
 	}
     }
+
+    /**
+     * StAX callback for element ends.  Wrap this method to handle extra
+     * elements within your own feature types.
+     */
 
     public void endElement(String nsURI,
 			   String localName,

@@ -27,6 +27,17 @@ import org.biojava.utils.*;
 import org.biojava.utils.stax.*;
 import org.xml.sax.*;
 
+/**
+ * StAX handler for any element which just contains a string.  This class
+ * collects the string data, and when it is complete, passes it to the
+ * (abstract) setStringValue method.  Typical use of this class is as
+ * a base for a small (often anonymous) class which takes the string value
+ * and stores it in some variable.
+ *
+ * @author Thomas Down
+ * @since 1.2
+ */
+
 public abstract class StringElementHandlerBase extends StAXContentHandlerBase {
     private int level = 0;
     private StringBuffer data = new StringBuffer();

@@ -33,7 +33,14 @@ import org.biojava.utils.stax.*;
 import org.xml.sax.*;
 
 /**
- * StAX handler for XFF strandedFeature type.
+ * StAX handler for XFF strandedFeature type.  By default, XFFFeatureSetHandler
+ * uses this handler for all feature elements which have the <code>strand</code>
+ * attribute.
+ *
+ * <p>
+ * Like the basic <code>FeatureHandler</code>, this class can be subclassed
+ * to give handlers for more specialized feature types.
+ * </p>
  *
  * @author Thomas Down
  * @since 1.2

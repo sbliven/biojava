@@ -59,7 +59,7 @@ public class XFFFeatureSetHandler extends StAXContentHandlerBase {
     // Current parse status
     //
 
-    boolean inFeatureSet = false;
+    private boolean inFeatureSet = false;
 
     /**
      * Construct a new XFFFeatureSetHandler with the default set of handlers.
@@ -83,15 +83,35 @@ public class XFFFeatureSetHandler extends StAXContentHandlerBase {
 	featureListener = siol;
     }
 
+    /**
+     * Return the object which receives startFeature/endFeature notifications.
+     */
+
     public SeqIOListener getFeatureListener() {
 	return featureListener;
     }
+
+    /**
+     * Extend this FeatureSetHandler to delegate certain feature elements
+     * to the specified handler type.
+     *
+     * @param rec A selector for some sub-set of feature elements.
+     * @param handler A factory which returns StAX handlers for matching elements.
+     */
 
     public void addFeatureHandler(ElementRecognizer rec,
 				  XFFPartHandlerFactory handler)
     {
 	featureHandlers.add(new Binding(rec, handler));
     }
+
+    /**
+     * Extend this FeatureSetHandler to delegate certain detail elements
+     * to the specified handler type.
+     *
+     * @param rec A selector for some sub-set of detail elements.
+     * @param handler A factory which returns StAX handlers for matching elements.
+     */
 
     public void addDetailHandler(ElementRecognizer rec,
 				 XFFPartHandlerFactory handler)
@@ -143,6 +163,12 @@ public class XFFFeatureSetHandler extends StAXContentHandlerBase {
 	    inFeatureSet = false;
 	}
     }
+
+    /**
+     * Return a handler for the XFF <code>details</code> element.
+     * This handler will, in turn, delegate to the specific detail
+     * handlers provided with <code>addDetailHandler</code>
+     */
 
     public StAXContentHandlerBase getDetailsHandler() {
 	return new XFFDetailsHandler();

@@ -34,9 +34,11 @@ import org.biojava.utils.stax.*;
 import org.xml.sax.*;
 
 /**
- * StAX handler for xff:prop detail elements.
+ * StAX handler for xff:prop detail elements.  prop details are simple
+ * tag-value text, and they are added directly as properties of the feature.
  *
  * @author Thomas Down
+ * @since 1.2
  */
 
 public class PropDetailHandler extends StringElementHandlerBase {
