@@ -25,6 +25,7 @@ import java.io.*;
 import java.util.*;
 
 import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 /**

@@ -23,6 +23,8 @@ package org.biojava.bio.seq;
 
 import java.io.Serializable;
 
+import org.biojava.bio.symbol.*;
+
 /**
  * A filter for accepting or rejecting a feature.
  * <P>

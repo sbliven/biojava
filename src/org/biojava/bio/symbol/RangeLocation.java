@@ -19,9 +19,7 @@
  *
  */
 
-package org.biojava.bio.seq;
-
-import org.biojava.bio.symbol.*;
+package org.biojava.bio.symbol;
 
 /**
  * A simple implementation of Location that contains all points between
