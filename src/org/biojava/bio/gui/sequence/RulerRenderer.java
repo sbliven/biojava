@@ -22,6 +22,8 @@
 package org.biojava.bio.gui.sequence;
 
 import java.util.*;
+import java.awt.event.*;
+
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
@@ -90,5 +92,21 @@ public class RulerRenderer implements SequenceRenderer {
       }
       g.draw(line);
     }
+  }
+  
+  public SequenceViewerEvent processMouseEvent(
+    SequenceRenderContext src,
+    MouseEvent me,
+    List path,
+    int min, int max
+  ) {
+    path.add(this);
+    int pos;
+    if(src.getDirection()==src.HORIZONTAL) {
+      pos = src.graphicsToSequence(me.getX());
+    } else {
+      pos = src.graphicsToSequence(me.getY());
+    }
+    return new SequenceViewerEvent(this, new Integer(pos), me, path);
   }
 }

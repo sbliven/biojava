@@ -22,15 +22,15 @@
 package org.biojava.bio.gui.sequence;
 
 import java.util.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.gui.*;
-
-import java.awt.*;
-import java.awt.geom.*;
 
 import java.util.List;
 
@@ -227,5 +227,13 @@ implements FeatureRenderer, java.io.Serializable {
     g.draw(line);
     line.setLine(midP, endP);
     g.draw(line);
+  }
+  
+  public FeatureHolder processMouseEvent(
+    FeatureHolder hits,
+    SequenceRenderContext src,
+    MouseEvent me
+  ) {
+    return hits;
   }
 }

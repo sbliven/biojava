@@ -22,6 +22,7 @@
 package org.biojava.bio.gui.sequence;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.*;
 import java.util.*;
 import java.util.List;
@@ -74,6 +75,23 @@ extends SequenceRendererWrapper {
     LayeredRenderer.INSTANCE.paint(
       g,
       layers,
+      min, max,
+      Collections.nCopies(layers.size(), getRenderer())
+    );
+  }
+  
+  public SequenceViewerEvent processMouseEvent(
+    SequenceRenderContext src,
+    MouseEvent me,
+    List path,
+    int min, int max
+  ) {
+    path.add(this);
+    List layers = layer(src);
+    return LayeredRenderer.INSTANCE.processMouseEvent(
+      layers,
+      me,
+      path,
       min, max,
       Collections.nCopies(layers.size(), getRenderer())
     );

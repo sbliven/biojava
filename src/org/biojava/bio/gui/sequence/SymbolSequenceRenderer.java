@@ -22,13 +22,14 @@
 package org.biojava.bio.gui.sequence;
 
 import java.util.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.*;
+
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.gui.*;
-
-import java.awt.*;
-import java.awt.geom.*;
 
 import java.util.List;
 
@@ -102,4 +103,20 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
         }
       }
     }
+  
+  public SequenceViewerEvent processMouseEvent(
+    SequenceRenderContext src,
+    MouseEvent me,
+    List path,
+    int min, int max
+  ) {
+    path.add(this);
+    int pos;
+    if(src.getDirection()==src.HORIZONTAL) {
+      pos = src.graphicsToSequence(me.getX());
+    } else {
+      pos = src.graphicsToSequence(me.getY());
+    }
+    return new SequenceViewerEvent(this, new Integer(pos), me, path);
+  }
 }

@@ -95,11 +95,14 @@ public class EmblViewer {
     BumpedRenderer lsr = new BumpedRenderer();
     lsr.setRenderer(features);
     
-    sp.addRenderer(new FilteringRenderer(repeats, repeatFilter, false));
-    sp.addRenderer(new FilteringRenderer(misc, miscFilter, false));
-    sp.addRenderer(new FilteringRenderer(lsr, featuresFilter, false));
-    sp.addRenderer(new SymbolSequenceRenderer());
-    sp.addRenderer(new RulerRenderer());
+    MultiLineRenderer mlRend = new MultiLineRenderer();
+    mlRend.addRenderer(new FilteringRenderer(repeats, repeatFilter, false));
+    mlRend.addRenderer(new FilteringRenderer(misc, miscFilter, false));
+    mlRend.addRenderer(new FilteringRenderer(lsr, featuresFilter, false));
+    mlRend.addRenderer(new SymbolSequenceRenderer());
+    mlRend.addRenderer(new RulerRenderer());
+
+    sp.addRenderer(mlRend);
     f.getContentPane().setLayout(new BorderLayout());
     f.getContentPane().add(new JScrollPane(sp), BorderLayout.CENTER);
     JPanel panel = new JPanel();

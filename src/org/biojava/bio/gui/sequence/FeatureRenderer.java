@@ -22,23 +22,29 @@
 package org.biojava.bio.gui.sequence;
 
 import java.util.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.gui.*;
 
-import java.awt.*;
-import java.awt.geom.*;
-
 import java.util.List;
 
 public interface FeatureRenderer {
-    public void renderFeature(
-        Graphics2D g,
-        Feature f,
-        SequenceRenderContext context
-    );
-    
-    public double getDepth(SequenceRenderContext src);
+  void renderFeature(
+    Graphics2D g,
+    Feature f,
+    SequenceRenderContext context
+  );
+  
+  double getDepth(SequenceRenderContext src);
+  
+  public FeatureHolder processMouseEvent(
+    FeatureHolder hits,
+    SequenceRenderContext src,
+    MouseEvent me
+  );
 }

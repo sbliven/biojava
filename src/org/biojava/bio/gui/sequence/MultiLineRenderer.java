@@ -22,6 +22,7 @@
 package org.biojava.bio.gui.sequence;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.*;
 import java.io.Serializable;
 import java.util.*;
@@ -182,6 +183,22 @@ implements SequenceRenderer, Serializable {
     LayeredRenderer.INSTANCE.paint(
       g,
       Collections.nCopies(renderers.size(), src),
+      min, max,
+      renderers
+    );
+  }
+  
+  public SequenceViewerEvent processMouseEvent(
+    SequenceRenderContext src,
+    MouseEvent me,
+    List path,
+    int min, int max
+  ) {
+    path.add(this);
+    return LayeredRenderer.INSTANCE.processMouseEvent(
+      Collections.nCopies(renderers.size(), src),
+      me,
+      path,
       min, max,
       renderers
     );

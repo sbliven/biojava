@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.*;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.*;
 
 import org.biojava.utils.*;
@@ -116,6 +117,16 @@ implements SequenceRenderer, Serializable {
     int min, int max
   ) {
     getRenderer().paint(g, src, min, max);
+  }
+  
+  public SequenceViewerEvent processMouseEvent(
+    SequenceRenderContext src,
+    MouseEvent me,
+    List path,
+    int min, int max
+  ) {
+    path.add(this);
+    return getRenderer().processMouseEvent(src, me, path, min, max);
   }
 }
 

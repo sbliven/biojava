@@ -22,6 +22,7 @@
 package org.biojava.bio.gui.sequence;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.*;
 import java.util.*;
 import java.util.List;
@@ -131,6 +132,58 @@ public class LayeredRenderer {
       
       offset += sRend.getDepth(src, min, max);
     }
+  }
+  
+  public SequenceViewerEvent processMouseEvent(
+    List srcL,
+    MouseEvent me,
+    List path,
+    int min, int max,
+    List renderers
+  ) {
+    if(srcL.size() != renderers.size()) {
+      throw new IllegalArgumentException(
+        "srcL and renderers must be the same size: " +
+        srcL.size() + ":" + renderers.size()
+      );
+    }
+
+    double offset = 0.0;
+    
+    Iterator srcI = srcL.iterator();
+    Iterator i = renderers.iterator();
+    while(srcI.hasNext() && i.hasNext()) {
+      SequenceRenderContext src = (SequenceRenderContext) srcI.next();
+      SequenceRenderer sRend = (SequenceRenderer) i.next();
+      double depth = sRend.getDepth(src, min, max);
+      
+      SequenceViewerEvent sve = null;
+      if(src.getDirection() == src.HORIZONTAL) {
+        if( (me.getX() > offset) && (me.getX() <= offset + depth) ) {
+          me.translatePoint((int) offset, 0);
+          sve = sRend.processMouseEvent(
+            src, me, path, min, max
+          );
+          me.translatePoint((int) -offset, 0);
+        }
+      } else {
+        if( (me.getY() > offset) && (me.getY() <= offset + depth) ) {
+          me.translatePoint(0, (int) offset);
+          sve = sRend.processMouseEvent(
+            src, me, path, min, max
+          );
+          me.translatePoint(0, (int) -offset);
+        }
+      }
+      
+      if(sve != null) {
+        return sve;
+      }
+      
+      offset += depth;
+    }
+    
+    return null;
   }
 }
 

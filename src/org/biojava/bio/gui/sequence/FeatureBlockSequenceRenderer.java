@@ -25,6 +25,7 @@ import java.util.*;
 import java.lang.reflect.*;
 import java.beans.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.*;
 import java.awt.font.*;
 
@@ -145,6 +146,37 @@ implements SequenceRenderer {
       
       renderer.renderFeature(g, f, sp);
     }
+  }
+
+  public SequenceViewerEvent processMouseEvent(
+    SequenceRenderContext src,
+    MouseEvent me,
+    List path,
+    int min, int max
+  ) {
+    path.add(this);
+    int pos;
+    if(src.getDirection()==src.HORIZONTAL) {
+      pos = src.graphicsToSequence(me.getX());
+    } else {
+      pos = src.graphicsToSequence(me.getY());
+    }
+    
+    FeatureHolder hits = ((Sequence) src.getSequence()).filter(
+      new FeatureFilter.OverlapsLocation(new PointLocation(pos)), false
+    );
+    
+    hits = renderer.processMouseEvent(hits, src, me);
+    
+    return new SequenceViewerEvent(
+      this,
+      new Object[] {
+        new Integer(pos),
+        hits
+      },
+      me,
+      path
+    );
   }
 }
 

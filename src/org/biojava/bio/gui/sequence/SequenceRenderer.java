@@ -22,11 +22,14 @@
 package org.biojava.bio.gui.sequence;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.gui.*;
 import org.biojava.bio.seq.*;
+
+import java.util.List;
 
 /**
  * The interface for things that can render a line of information about a
@@ -100,6 +103,33 @@ v   * all of the data that would fall within seqBox.
    * @return the trailing distance of the renderer for that sequence panel
    */
   double getMinimumTrailer(SequenceRenderContext sp);
+  
+  /**
+   * Produce a SequenceViewerEvent in response to a mouse gesture.
+   * <P>
+   * A SequenceRenderer that performs any form of coordinate remapping should
+   * ensure that it apropreately transforms the mouse event. However, in the
+   * SequenceViewerEvent returned, the MouseEvent should be in untransformed
+   * coordinates.
+   * <P>
+   * The SequenceRenderer implementation should append itself to the path list
+   * before constructing the SequenceViewerEvent.
+   *
+   * @param src the SequenceRenderContext currently in scope
+   * @param me  a MouseEvent that caused this request
+   * @param path the List of SequenceRenderer instances passed through so far
+   * @param min the minimum sequence index
+   * @param max the maximum sequence index
+   * @return a SequenceViewerEvent encapsulating the mouse gesture
+   *
+   * @since 1.2
+   */
+  SequenceViewerEvent processMouseEvent(
+    SequenceRenderContext src,
+    MouseEvent me,
+    List path,
+    int min, int max
+  );
   
   public static class RendererForwarder extends ChangeForwarder {
     public RendererForwarder(SequenceRenderer source, ChangeSupport cs) {
