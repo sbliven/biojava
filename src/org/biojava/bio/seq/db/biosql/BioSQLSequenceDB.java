@@ -1204,4 +1204,172 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 
 	return spaSupported;
     }
+
+    private class SqlizedFilter {
+	private List tables = new ArrayList();
+	private String filter;
+	private int used_ot = 0;
+	private int used_sfs = 0;
+	private int used_sqv = 0;
+
+	SqlizedFilter(FeatureFilter ff) {
+	    filter = sqlizeFilter(ff, false);
+	}
+
+	private String sqlizeFilter(FeatureFilter ff, boolean negate) {
+	    if (ff instanceof FeatureFilter.ByType) {
+		String type = ((FeatureFilter.ByType) ff).getType();
+		String tableName = "ot_" + (used_ot++);
+		tables.add("ontology_term as " + tableName);
+		return tableName + ".term_name " + eq(negate) + qw(type) + " and seqfeature.seqfeature_key_id = " + tableName + ".ontology_term_id";
+	    } else if (ff instanceof FeatureFilter.BySource) {
+		String source = ((FeatureFilter.BySource) ff).getSource();
+		String tableName = "sfs_" + (used_sfs++);
+		tables.add("seqfeature_source as " + tableName);
+		return tableName + ".source_name " + eq(negate) + qw(source) + " and seqfeature.seqfeature_source_id = " + tableName + ".seqfeature_source_id";
+	    } else if (ff instanceof FeatureFilter.ByAnnotation) {
+		FeatureFilter.ByAnnotation ffba = (FeatureFilter.ByAnnotation) ff;
+		Object key = ffba.getKey();
+		Object value = ffba.getValue();
+		String keyString = key.toString();
+		String valueString = value.toString();
+
+		String otName = "ot_" + (used_ot++);
+		tables.add("ontology_term as " + otName);
+
+		String sqvName = "sqv_" + (used_sqv++);
+		tables.add("seqfeature_qualifier_value as " + sqvName);
+
+		// FIXME this doesn't actually do negate quite right -- it doesn't
+		// match if the property isn't defined.  Should do an outer join
+		// to fix this.  But for now, we'll just punt :-(
+
+		if (negate) {
+		    return "";
+		}
+
+		return sqvName + ".qualifier_value" + eq(negate) + qw(valueString) + " and " +
+		       sqvName + ".ontology_term_id = " + otName + ".ontology_term_id and " +
+		       otName + ".term_name = " + qw(keyString) + " and " +
+		       "seqfeature.seqfeature_id = " + sqvName + ".seqfeature_id";
+	    } else if (ff instanceof FeatureFilter.And) {
+		FeatureFilter.And and = (FeatureFilter.And) ff;
+		FeatureFilter ff1 = and.getChild1();
+		FeatureFilter ff2 = and.getChild2();
+		String filter1 = sqlizeFilter(ff1, negate);
+		String filter2 = sqlizeFilter(ff2, negate);
+		if (filter1.length() > 0) {
+		    if (filter2.length() > 0) {
+			return filter1 + " and " + filter2;
+		    } else {
+			return filter1;
+		    }
+		} else {
+		    if (filter2.length() > 0) {
+			return filter2;
+		    } else {
+			return "";
+		    }
+		}
+	    } else  if (ff instanceof FeatureFilter.Not) {
+		FeatureFilter child = ((FeatureFilter.Not) ff).getChild();
+		return sqlizeFilter(child, !negate);
+	    } else {
+		return "";
+	    }
+	}
+
+	private String eq(boolean negate) {
+	    if (negate) {
+		return " <> ";
+	    } else {
+		return "=";
+	    }
+	}
+
+	private String qw(String word) {
+	    return "'" + word + "'";
+	}
+
+	public String getQuery() {
+	    StringBuffer query = new StringBuffer();
+	    query.append("select bioentry.accession, seqfeature.seqfeature_id ");
+	    query.append("  from seqfeature, bioentry");
+	    for (Iterator i = tables.iterator(); i.hasNext(); ) {
+		query.append(", ");
+		query.append((String) i.next());
+	    }
+	    query.append(" where bioentry.bioentry_id = seqfeature.bioentry_id");
+	    query.append("   and bioentry.biodatabase_id = ?");
+	    if (filter.length() > 0) {
+		query.append(" and ");
+		query.append(filter);
+	    }
+	    query.append(" order by bioentry.accession");
+
+	    return query.toString();
+	}
+    }
+
+    private class FilterByInternalID implements FeatureFilter {
+	private int id;
+
+	public FilterByInternalID(int id) {
+	    this.id = id;
+	}
+
+	public boolean accept(Feature f) {
+	    if (! (f instanceof BioSQLFeatureI)) {
+		return false;
+	    }
+
+	    int intID = ((BioSQLFeatureI) f)._getInternalID();
+	    return (intID == id);
+	}
+    }
+
+    public FeatureHolder filter(FeatureFilter ff) {
+	try {
+	    SqlizedFilter sqf = new SqlizedFilter(ff);
+	    System.err.println("Doing BioSQL filter");
+	    System.err.println(sqf.getQuery());
+
+	    Connection conn = pool.takeConnection();
+	    PreparedStatement get_features = conn.prepareStatement(sqf.getQuery());
+	    get_features.setInt(1, dbid);
+	    ResultSet rs = get_features.executeQuery();
+
+	    String lastAcc = "";
+	    Sequence seq = null;
+	    SimpleFeatureHolder fh = new SimpleFeatureHolder();
+
+	    while (rs.next()) {
+		String accession = rs.getString(1);
+		int fid = rs.getInt(2);
+
+		System.err.println(accession + "\t" + fid);
+		
+		if (seq == null || ! lastAcc.equals(accession)) {
+		    seq = getSequence(accession);
+		}
+
+		FeatureHolder hereFeature = seq.filter(new FilterByInternalID(fid), true);
+		Feature f = (Feature) hereFeature.features().next();
+		if (ff.accept(f)) {
+		    fh.addFeature(f);
+		}
+	    }
+
+	    get_features.close();
+	    pool.putConnection(conn);
+
+	    return fh;
+	} catch (SQLException ex) {
+	    throw new BioRuntimeException(ex, "Error accessing BioSQL tables");
+	} catch (ChangeVetoException ex) {
+	    throw new BioError(ex, "Assert failed: couldn't modify internal FeatureHolder");
+	} catch (BioException ex) {
+	    throw new BioRuntimeException(ex, "Error fetching sequence");
+	}
+    }
 }
