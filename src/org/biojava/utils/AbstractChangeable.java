@@ -22,32 +22,44 @@ package org.biojava.utils;
 
 public abstract class AbstractChangeable implements Changeable {
   private transient ChangeSupport changeSupport = null;
-  
+
   protected boolean hasListeners() {
     return changeSupport != null;
   }
-  
+
   protected ChangeSupport getChangeSupport(ChangeType ct) {
     if(changeSupport == null) {
       changeSupport = new ChangeSupport();
     }
-    
+
     return changeSupport;
   }
-  
+
   public void addChangeListener(ChangeListener cl) {
-    getChangeSupport(null).addChangeListener(cl);
+    ChangeSupport cs = getChangeSupport(null);
+    synchronized(cs) {
+      cs.addChangeListener(cl);
+    }
   }
-  
+
   public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    getChangeSupport(ct).addChangeListener(cl, ct);
+    ChangeSupport cs = getChangeSupport(ct);
+    synchronized(cs) {
+      cs.addChangeListener(cl, ct);
+    }
   }
-  
+
   public void removeChangeListener(ChangeListener cl) {
-    getChangeSupport(null).removeChangeListener(cl);
+    ChangeSupport cs = getChangeSupport(null);
+    synchronized(cs) {
+      cs.removeChangeListener(cl);
+    }
   }
-  
+
   public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-    getChangeSupport(ct).removeChangeListener(cl, ct);
+    ChangeSupport cs = getChangeSupport(ct);
+    synchronized(cs) {
+      cs.removeChangeListener(cl, ct);
+    }
   }
-} 
+}
