@@ -50,15 +50,11 @@ extends AbstractChangeable implements AlphabetIndex {
     int indx = Arrays.binarySearch(hashes, s.hashCode());
     if(indx < 0) {
       getAlphabet().validate(s);
-      if(s instanceof AtomicSymbol) {
-        throw new BioError(
-          "Assertion Failure: " +
-          "Symbol " + s.getName() + " was not an indexed member of the alphabet " +
-          getAlphabet().getName() + " despite being in the alphabet."
-        );
-      } else {
-        throw new IllegalSymbolException("Symbol must be atomic to be indexed.");
-      }
+      throw new BioError(
+        "Assertion Failure: " +
+        "Symbol " + s.getName() + " was not an indexed member of the alphabet " +
+        getAlphabet().getName() + " despite being in the alphabet."
+      );
     }
 
     // we hit the correct symbol first time
