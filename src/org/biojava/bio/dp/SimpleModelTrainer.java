@@ -225,6 +225,16 @@ public class SimpleModelTrainer implements ModelTrainer {
     allTransitionTrainers.add(trainer);
   }
   
+  /**
+   * Create a model trainer for a particular model.
+   *
+   * @param model the MarkovModel to train
+   * @param nullState  the null state model - possibly null
+   * @param nullStateWeight how many times to add the null model
+   * @param transCounts the counts to add to each transition
+   * @param transCountWeight how many times to add them
+   * @throws BioException  if for any reason the trainer could not be built
+   */
   public SimpleModelTrainer(
     MarkovModel model,
     EmissionState nullState, double nullStateWeight,

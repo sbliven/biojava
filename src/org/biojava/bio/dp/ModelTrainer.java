@@ -33,12 +33,25 @@ import org.biojava.bio.symbol.*;
 public interface ModelTrainer {
   /**
    * Adds some counts to a state for a given symbol.
+   *
+   * @param s  the EmissionState that emitted the symbol
+   * @param r  the Symbol that was emitted
+   * @param count  the number of counts to add
+   * @throws IllegalSymbolException if r is not emitted by s or if s is not a
+   *         state known by this trainer
    */
   void addStateCount(EmissionState s, Symbol r, double count)
   throws IllegalSymbolException;
   
   /**
    * Adds some counts to the transition between two states.
+   *
+   * @param from  the source of the transition
+   * @param to  the destination of the transition
+   * @param counts how many counts to add
+   * @throws IllegalSymbolException if either from or to are not in the model
+   * @throws IllegalTransitionException if the model doesn't contain a
+   *         transition between the states
    */
   void addTransitionCount(State from, State to, double count)
   throws IllegalSymbolException, IllegalTransitionException;
@@ -46,7 +59,13 @@ public interface ModelTrainer {
   /**
    * Trains up the transitions in this model with the counts so far.
    * <P>
-   * After training, the counts are all reset to zero.
+   * This method should not throw any exceptions. I am considering making this
+   * much tighter now that we have the vetoable mutator methods.
+   *
+   * @throws IllegalSymbolException if something went wrong with locating
+   *         symbols in an emission spectrum or if a state couldn't be located
+   * @throws IllegalTransitionException if an attempt was made to train a
+   *         transition that couldn't be located
    */
   void train()
   throws IllegalSymbolException, IllegalTransitionException;

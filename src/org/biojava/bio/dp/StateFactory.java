@@ -32,13 +32,38 @@ import org.biojava.bio.seq.DNATools;
  * This decouples programs from needing to know what implementation of EmissionState
  * to instantiate for a given alphabet. It also lets you parameterise model creation
  * for things like profile HMMs.
+ *
+ * @author Matthew Pocock
  */
 public interface StateFactory {
+  /**
+   * Generate a new EmissionState as requested.
+   *
+   * @param alpha  the emission alphabet for the state
+   * @param advance the advance array
+   * @param name  the state name
+   * @throws IllegalAlphabetException if the factory is unable to generate a
+   *         state for the required alphabet
+   */
   EmissionState createState(Alphabet alpha, int [] advance, String name)
   throws IllegalAlphabetException;
   
+  /**
+   * The default state factory object.
+   * <P>
+   * You may wish to alias this within your scripts with something like:
+   * StateFactory sFact = StateFactory.DEFAULT; sFact.createState(...);
+   */
   static StateFactory DEFAULT = new DefaultStateFactory();
   
+  /**
+   * The default state factory implementation.
+   * <P>
+   * It knows about hand-optimized implementations for some alphabets (like DNA)
+   * without the optimized classes needing to be exposed from the DP package.
+   *
+   * @author Matthew Pocock
+   */
   class DefaultStateFactory implements StateFactory {
     public EmissionState createState(Alphabet alpha, int [] advance, String name)
     throws IllegalAlphabetException {
