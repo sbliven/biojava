@@ -22,14 +22,12 @@
 package org.biojava.bio.symbol;
 
 import junit.framework.TestCase;
-
-import java.util.Set;
-import java.util.Iterator;
-
+import org.biojava.bio.dist.Distribution;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.RNATools;
-import org.biojava.bio.dist.Distribution;
-import org.biojava.bio.symbol.WobbleDistribution;
+
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * tests the SimpleWobbleDistributionTest object
@@ -93,7 +91,7 @@ public class SimpleWobbleDistributionTest extends TestCase
             assertTrue(
                 Math.abs(
                     nonWobbleDist.getWeight(testNonWobble) - 0.333333
-                ) 
+                )
                 < 0.0001
             );
 
@@ -106,10 +104,10 @@ public class SimpleWobbleDistributionTest extends TestCase
                 < 0.0001
             );
         }
-        catch (IllegalSymbolException ise) 
-        { 
+        catch (IllegalSymbolException ise)
+        {
             ise.printStackTrace();
-            fail("unexpected IllegalSymbolException"); 
+            fail("unexpected IllegalSymbolException");
         }
     }
 }

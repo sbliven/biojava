@@ -21,10 +21,10 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.List;
-import java.util.ArrayList;
-
 import junit.framework.TestCase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <code>CompoundLocationTest</code> tests the behaviour of
@@ -46,8 +46,8 @@ public class CompoundLocationTest extends TestCase
     protected Location r7;
     protected Location r8;
     protected Location r9;
-  
-    
+
+
     private   List     locs1;
     private   List     locs2;
     private   List     locs3;
@@ -57,9 +57,9 @@ public class CompoundLocationTest extends TestCase
     private   List     locs7;
     private   List     locs8;
     private   List     locs9;
-  
-  
-  
+
+
+
     public CompoundLocationTest(String name)
     {
 	super(name);
@@ -72,7 +72,7 @@ public class CompoundLocationTest extends TestCase
   {
     junit.textui.TestRunner.run(CompoundLocationTest.class);
   }
-  
+
     protected void setUp() throws Exception
     {
 	locs1 = new ArrayList();
@@ -105,8 +105,8 @@ public class CompoundLocationTest extends TestCase
         locs9 = new ArrayList();
         locs9.add(new RangeLocation(256, 300));
         locs9.add(new RangeLocation(350, 400));
-        
-        
+
+
 	r1 = LocationTools.buildLoc(locs1);
 	r2 = LocationTools.buildLoc(locs2);
 	r3 = LocationTools.buildLoc(locs3);
@@ -203,7 +203,7 @@ public class CompoundLocationTest extends TestCase
 	assertEquals(LocationTools.union(r1, r3),
                      LocationTools.union(r3, r1));
         assertEquals(r3, LocationTools.union(r8,r9));
-        
+
     }
 
     /**
@@ -226,7 +226,7 @@ public class CompoundLocationTest extends TestCase
 	assertTrue(LocationTools.overlaps(r4, r5));
 	assertTrue(!LocationTools.overlaps(r4, r7));
     }
-    
+
     public void testContainsBig()
     {
 	assertTrue(LocationTools.contains(r4, r6));
@@ -238,7 +238,7 @@ public class CompoundLocationTest extends TestCase
 	assertEquals(LocationTools.intersection(r4, r5), r6);
 	assertEquals(LocationTools.intersection(r4, r7), Location.empty);
     }
-    
+
     public void testSubtract() {
         Location l1 = new RangeLocation(100, 200);
         Location l2 = LocationTools.union(
@@ -265,13 +265,13 @@ public class CompoundLocationTest extends TestCase
                 new RangeLocation(180, 1019)
             ),
             new RangeLocation(100, 179)
-        );    
+        );
         assertEquals(
             LocationTools.subtract(
                 l2,
                 Location.empty
             ),
             l2
-        );    
+        );
     }
 }

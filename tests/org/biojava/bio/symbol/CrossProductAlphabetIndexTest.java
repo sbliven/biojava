@@ -21,13 +21,12 @@
 
 package org.biojava.bio.symbol;
 
-import java.io.*;
-import junit.framework.*;
+import junit.framework.TestCase;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.ProteinTools;
 
-import org.biojava.bio.program.phred.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * <p>Title: CrossProductSybmolIndexTest</p>
@@ -58,7 +57,7 @@ public class CrossProductAlphabetIndexTest extends TestCase {
             { subint, dna, prot }
           )
         );
-        
+
         index = new CrossProductAlphabetIndex(product);
     }
 
@@ -79,7 +78,7 @@ public class CrossProductAlphabetIndexTest extends TestCase {
         assertTrue(j >= 0 && j < product.size());
       }
     }
-    
+
     public void testISI() throws Exception {
       for(int i = 0; i < product.size(); i++) {
         assertTrue(
@@ -90,7 +89,7 @@ public class CrossProductAlphabetIndexTest extends TestCase {
         );
       }
     }
-    
+
     public void testSIS() throws Exception {
       for(Iterator i = product.iterator(); i.hasNext(); ) {
         Symbol s = (Symbol) i.next();
@@ -103,7 +102,7 @@ public class CrossProductAlphabetIndexTest extends TestCase {
         );
       }
     }
-    
+
     public static void main(String[] args)
     throws Throwable {
       CrossProductAlphabetIndexTest test = new CrossProductAlphabetIndexTest("test");

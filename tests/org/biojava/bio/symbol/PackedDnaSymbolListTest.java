@@ -20,11 +20,13 @@
  */
 package org.biojava.bio.symbol;
 
-import org.biojava.bio.seq.*;
-import org.biojava.bio.dist.*;
-
-import java.util.*;
 import junit.framework.TestCase;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.dist.UniformDistribution;
+import org.biojava.bio.seq.DNATools;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * JUnit test for the PackedDnaSymbolList object
@@ -36,7 +38,7 @@ public class PackedDnaSymbolListTest extends TestCase
     /*
      * tests should be done with full cache lines,
      * a part-filled cache line with only one symbol,
-     * ditto with full storage unit and ditto with 
+     * ditto with full storage unit and ditto with
      * full storage unit plus one symbol
      * for a byte-sized storage unit and a 16 symbol
      * cache, appropriate lengths will be 16, 17, 18 and 19.
@@ -65,7 +67,7 @@ public class PackedDnaSymbolListTest extends TestCase
         }
         return new SimpleSymbolList(alpha, rl);
     }
-    
+
     private boolean compareSymbolLists(SymbolList list0, SymbolList list1)
     {
         // lists must be identical in length

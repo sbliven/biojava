@@ -21,8 +21,11 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import junit.framework.*;
+import junit.framework.TestCase;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * <p>Title: MergeLocationTest</p>
@@ -67,7 +70,7 @@ public class MergeLocationTest extends TestCase {
   {
     junit.textui.TestRunner.run(MergeLocationTest.class);
   }
-  
+
   protected void setUp() throws java.lang.Exception {
     super.setUp();
 
@@ -129,7 +132,7 @@ public class MergeLocationTest extends TestCase {
     assertTrue(fg.getComponentList(true).size() == 2);
     assertTrue(fg.isContiguous());
   }
-  
+
 
   public void testCompoundABC(){
     int blocks = 0;

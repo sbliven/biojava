@@ -23,9 +23,6 @@ package org.biojava.bio.symbol;
 
 import junit.framework.TestCase;
 
-import org.biojava.bio.symbol.CodonPref;
-import org.biojava.bio.symbol.CodonPrefTools;
-
 /**
  * Tests the CodonPrefTools class and
  * the CodonPref functionality.

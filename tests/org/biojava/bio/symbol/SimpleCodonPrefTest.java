@@ -21,20 +21,13 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.Iterator;
-import java.util.Set;
-
 import junit.framework.TestCase;
-
-import org.biojava.bio.symbol.TranslationTable;
-import org.biojava.bio.symbol.ManyToOneTranslationTable;
-import org.biojava.bio.symbol.CodonPref;
-import org.biojava.bio.symbol.CodonPrefTools;
-import org.biojava.bio.symbol.FiniteAlphabet;
-import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.seq.RNATools;
 import org.biojava.bio.dist.Distribution;
 import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.seq.RNATools;
+
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Tests the CodonPrefTools class and
@@ -159,6 +152,6 @@ public class SimpleCodonPrefTest extends TestCase
         }
         catch (IllegalSymbolException ise) {
             fail("IllegalSymbolException occurred on wobble frequency lookup");
-        }        
+        }
     }
 }

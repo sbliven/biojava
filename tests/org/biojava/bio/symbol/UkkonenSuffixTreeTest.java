@@ -1,8 +1,8 @@
 package org.biojava.bio.symbol;
 
-import junit.framework.*;
-import java.util.*;
-import org.biojava.bio.seq.*;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import org.biojava.bio.seq.DNATools;
 
 /** List of tests for for UkkonenSuffixTree.
  * @author Francois Pepin
@@ -78,8 +78,8 @@ public class UkkonenSuffixTreeTest extends TestCase {
     assertTrue(test.getRoot().hasChild(new Character('g')));
     assertTrue(test.getRoot().getChild(new Character(UkkonenSuffixTree.DEFAULT_TERM_CHAR)).isTerminal());
   }
-  
-  
+
+
   public void testlongAddition(){
     test.addSequence(dna, "name", false);
     int before = test.getAllNodes(test.getRoot(), null, false).size();

@@ -21,10 +21,14 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
 import junit.framework.TestCase;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.io.SymbolTokenization;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Test for tokenization of cross-product symbols.

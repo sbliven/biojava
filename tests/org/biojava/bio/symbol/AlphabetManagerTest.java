@@ -22,10 +22,11 @@
 package org.biojava.bio.symbol;
 
 
-import org.biojava.bio.symbol.*;
-import junit.framework.*;
+import junit.framework.TestCase;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.ProteinTools;
+
 import java.util.*;
-import org.biojava.bio.seq.*;
 
 
 public class AlphabetManagerTest extends TestCase {
@@ -76,8 +77,8 @@ public class AlphabetManagerTest extends TestCase {
       System.err.println("Exception thrown:  "+e);
     }
   }
-  
-  public void testGetAllSymbols() 
+
+  public void testGetAllSymbols()
       throws Exception
   {
       FiniteAlphabet dna = DNATools.getDNA();
@@ -98,7 +99,7 @@ public class AlphabetManagerTest extends TestCase {
           assertTrue(found);
       }
   }
-  
+
   public void testSharedSymbols()
     throws Exception
   {
@@ -118,7 +119,7 @@ public class AlphabetManagerTest extends TestCase {
       }
   }
 
-    public void testGapInCrossProductAlphabet() 
+    public void testGapInCrossProductAlphabet()
         throws Exception
     {
         Alphabet protein = ProteinTools.getAlphabet();

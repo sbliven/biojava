@@ -21,7 +21,7 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
+import java.util.Iterator;
 
 public class SymbolUtils {
     public static boolean compareSymbolLists(SymbolList sl1,
@@ -30,7 +30,7 @@ public class SymbolUtils {
 	if (sl1.length() != sl2.length()) {
 	    return false;
 	}
-	
+
 	Iterator si1 = sl1.iterator();
 	Iterator si2 = sl2.iterator();
 	while (si1.hasNext()) {

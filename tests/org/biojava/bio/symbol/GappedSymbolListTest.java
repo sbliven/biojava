@@ -21,12 +21,12 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.impl.SimpleSequence;
-import org.biojava.bio.seq.impl.SimpleGappedSequence;
-import org.biojava.bio.seq.io.*;
 import junit.framework.TestCase;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.impl.SimpleGappedSequence;
+import org.biojava.bio.seq.impl.SimpleSequence;
+import org.biojava.bio.seq.io.SymbolTokenization;
 
 /**
  * Test for gapped symbol lists.

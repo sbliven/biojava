@@ -42,19 +42,19 @@ public abstract class AbstractSymbol
     Symbol
 {
   protected transient ChangeForwarder annotationForwarder = null;
-  
+
   protected ChangeSupport getChangeSupport(ChangeType changeType) {
     ChangeSupport changeSupport = super.getChangeSupport(changeType);
 
     if(
-      (changeType.isMatchingType(Annotatable.ANNOTATION) || Annotatable.ANNOTATION.isMatchingType(changeType)) &&
+      (Annotatable.ANNOTATION.isMatchingType(changeType)) &&
       (annotationForwarder == null)
     ) {
       annotationForwarder =
-              new ChangeForwarder.Retyper(this, changeSupport, Annotation.PROPERTY);
+              new ChangeForwarder.Retyper(this, changeSupport, Annotatable.ANNOTATION);
       getAnnotation().addChangeListener(annotationForwarder, Annotation.PROPERTY);
     }
-    
+
     return changeSupport;
   }
 

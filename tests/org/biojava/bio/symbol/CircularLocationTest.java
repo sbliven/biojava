@@ -22,7 +22,9 @@
 package org.biojava.bio.symbol;
 
 import junit.framework.TestCase;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * <code>CircularLocationTest</code> tests the behaviour of
@@ -44,7 +46,7 @@ public class CircularLocationTest extends TestCase
     protected CircularLocation r7;
     protected CircularLocation r8;
     protected CircularLocation r9;
-  
+
 
     public CircularLocationTest(String name)
     {
@@ -58,7 +60,7 @@ public class CircularLocationTest extends TestCase
   {
     junit.textui.TestRunner.run(CircularLocationTest.class);
   }
-  
+
     protected void setUp() throws Exception
     {
         r1 = LocationTools.makeCircularLocation(1, 100, 200);

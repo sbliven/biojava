@@ -305,7 +305,7 @@ public class ProjectionEngine {
               proxyIV.add(ByteCode.make_invokevirtual(projMeth));
               proxyIV.add(ByteCode.make_return(getterMethod));
               pclass.setCodeGenerator(getterMethod, proxyIV);
-              //System.err.println("Context proxy: " + getterMethod + " " + projMeth);
+              //System.err.println("TargetContext proxy: " + getterMethod + " " + projMeth);
             }
           }
 
@@ -368,7 +368,7 @@ public class ProjectionEngine {
                 proxyIV.add(ByteCode.make_invokevirtual(revertMeth));
                 proxyIV.add(ByteCode.make_invokeinterface(faceMethod));
                 pclass.setCodeGenerator(setterMethod, proxyIV);
-                //System.err.println("Context proxy: " + setterMethod + " " + revertMeth);
+                //System.err.println("TargetContext proxy: " + setterMethod + " " + revertMeth);
               }
             }
           }

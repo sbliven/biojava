@@ -21,15 +21,18 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
 import junit.framework.TestCase;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.io.SymbolTokenization;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class NameTokenizationTest extends TestCase {
     private FiniteAlphabet simple_alpha;
     private SymbolList simple_atomicSymbols;
-    private SymbolList simple_allSymbols; 
+    private SymbolList simple_allSymbols;
     private SymbolTokenization nameTokenization;
 
     public NameTokenizationTest(String name) {

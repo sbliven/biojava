@@ -20,15 +20,16 @@
  */
 package org.biojava.bio.symbol;
 
-import org.biojava.utils.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.dist.*;
-
-import java.util.*;
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.io.ChunkedSymbolListFactory;
+import org.biojava.utils.ChangeVetoException;
+
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * JUnit test for SymbolList objects
@@ -76,7 +77,7 @@ public class SymbolListTest extends TestCase
 
         return array;
     }
-    
+
     /**
      * compares a SymbolList against a Symbol array
      */

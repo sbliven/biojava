@@ -21,10 +21,12 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
 import junit.framework.TestCase;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.seq.RNATools;
+
+import java.util.Iterator;
 
 public class TranslationTest extends TestCase {
     private SymbolList dnaForm;
@@ -58,7 +60,7 @@ public class TranslationTest extends TestCase {
 	if (sl1.length() != sl2.length()) {
 	    return false;
 	}
-	
+
 	Iterator si1 = sl1.iterator();
 	Iterator si2 = sl2.iterator();
 	while (si1.hasNext()) {

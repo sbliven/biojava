@@ -21,23 +21,18 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import junit.framework.TestCase;
-
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.utils.AssertionFailure;
 
+import java.util.*;
+
 public class MotifToolsTest
     extends TestCase {
-    
+
     protected String n;
-    
+
     protected void setUp() {
       try {
           StringBuffer sb = new StringBuffer();
@@ -75,7 +70,7 @@ public class MotifToolsTest
           throw new AssertionFailure("Couldn't initialize motif tools test", e);
       }
     }
-      
+
     public MotifToolsTest(String name) {
         super(name);
     }

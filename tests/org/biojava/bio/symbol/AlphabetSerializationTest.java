@@ -21,13 +21,14 @@
 
 package org.biojava.bio.symbol;
 
-import java.io.*;
-import junit.framework.*;
+import junit.framework.TestCase;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.program.phred.PhredTools;
+import org.biojava.bio.seq.DNATools;
 
-import org.biojava.bio.program.phred.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.*;
-import java.util.*;
+import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <p>Title: AlphabetSerializationTest</p>

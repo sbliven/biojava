@@ -22,7 +22,6 @@
 package org.biojava.bio.symbol;
 
 import junit.framework.TestCase;
-import junit.framework.Assert;
 
 /**
  * Automated tests for BetweenLocation operations.
