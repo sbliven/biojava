@@ -49,7 +49,7 @@ public final class PhredTools {
    static{
      List l = new ArrayList(2);
      l.add(DNATools.getDNA());
-     l.add(IntegerAlphabet.getSubAlphabet(0,90));
+     l.add(IntegerAlphabet.getSubAlphabet(0,99));
      SimpleAlphabet a = new SimpleAlphabet(
        new HashSet(
          ((FiniteAlphabet)AlphabetManager.getCrossProductAlphabet(l)).symbols().toList()
@@ -60,10 +60,10 @@ public final class PhredTools {
 
   /**
    * Retrieves the PHRED alphabet from the AlphabetManager. The Phred alphabet
-   * is a cross product of a subset of the IntegerAlphabet from 0...90 and the
+   * is a cross product of a subset of the IntegerAlphabet from 0...99 and the
    * DNA alphabet. The Phred alphabet is finite.
    *
-   * The Phred Alphabet contains 364 BasisSymbols named, for example, (guanine 47).
+   * The Phred Alphabet contains 400 BasisSymbols named, for example, (guanine 47).
    * The BasisSymbols can be fragmented into their component AtomicSymbols using
    * the <code>getSymbols()</code> method of BasisSymbol.
    */
@@ -105,7 +105,7 @@ public final class PhredTools {
 
   /**
    * Merges a Symbol List from the DNA alphabet with a SymbolList from the
-   * [0..90] subset of the IntegerAlphabet into a SymbolList from
+   * [0..99] subset of the IntegerAlphabet into a SymbolList from
    * the PHRED alphabet.
    * @throws IllegalAlphabetException if the alphabets are not of the required alphabets
    * @throws IllegalArgumentException if the two SymbolLists are not of equal length.
@@ -124,7 +124,7 @@ public final class PhredTools {
         "Expecting SymbolList 'dna' to use the DNA alphabet, uses "
         +dna.getAlphabet().getName());
     }
-    Alphabet subint = IntegerAlphabet.getSubAlphabet(0,90);
+    Alphabet subint = IntegerAlphabet.getSubAlphabet(0,99);
     if(quality.getAlphabet() != subint && quality.getAlphabet() != IntegerAlphabet.getInstance()){
       throw new IllegalAlphabetException(
         "Expecting SymbolList quality to use the "+subint.getName()+" alphabet"+
@@ -208,9 +208,7 @@ public final class PhredTools {
       getFastaBuilderFactory());
   }
 
-  public static PhredSequence makePhredSequence(Sequence seq, Sequence quality, String name, String urn, Annotation anno){
-    return new PhredSequence(seq,quality,name,urn,anno);
-  }
+
 
   /**
    * Calls SeqIOTools.readFastaDNA(br), added here for convinience.
@@ -285,7 +283,7 @@ public final class PhredTools {
 
       for (int i = 0; i < s.length(); i++) {// for each symbol in the phred sequence
         Symbol qual = s.getQualityAt(i);
-        Symbol base = s.symbolAt(i);
+        Symbol base = s.getDNAAt(i);
         double pBase = pFromQuality((IntegerAlphabet.IntegerSymbol)qual);
         double pOthers = (1.0 - pBase)/3;
 
