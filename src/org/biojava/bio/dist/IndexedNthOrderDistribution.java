@@ -6,7 +6,8 @@ import java.io.*;
 import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
 
-class IndexedNthOrderDistribution extends AbstractOrderNDistribution implements ObjectInputValidation {
+class IndexedNthOrderDistribution extends AbstractOrderNDistribution {
+    public static final long serialVersionUID = 5959499231593592515L;
     private Distribution[] dists;
     private transient AlphabetIndex index;
 
@@ -23,9 +24,10 @@ class IndexedNthOrderDistribution extends AbstractOrderNDistribution implements 
 	}
     }
 
-    public void validateObject() throws InvalidObjectException {
+    private Object readResolve() throws ObjectStreamException {
 	try {
 	    index = AlphabetManager.getAlphabetIndex(getConditioningAlphabet(), false);
+		return this;
 	} catch (IllegalAlphabetException ex) {
 	    throw new InvalidObjectException("Couldn't regenerate index");
 	}
