@@ -2,6 +2,8 @@ package org.biojava.bio.symbol;
 
 import java.util.*;
 
+import org.biojava.utils.*;
+
 /*
  * Implementatoin of AlphabetIndex that stores the symbols in an array and does
  * a linear shearch through the list for a given symbol to find its index.
@@ -14,6 +16,7 @@ class LinearAlphabetIndex implements AlphabetIndex {
   private Symbol[] symbols;
   
   public LinearAlphabetIndex(FiniteAlphabet alpha) {
+    alpha.addChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
     this.alpha = alpha;
     symbols = new Symbol[alpha.size()];
     
@@ -21,7 +24,7 @@ class LinearAlphabetIndex implements AlphabetIndex {
     Iterator s = alpha.iterator();
     while(s.hasNext()) {
       symbols[i++] = (Symbol) s.next();
-    }  
+    }
   }
 
   public FiniteAlphabet getAlphabet() {

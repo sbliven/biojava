@@ -2,6 +2,7 @@ package org.biojava.bio.symbol;
 
 import java.util.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 
@@ -41,6 +42,7 @@ public class HashedAlphabetIndex implements AlphabetIndex {
   }
   
   public HashedAlphabetIndex(FiniteAlphabet alpha) {
+    alpha.addChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
     this.alpha = alpha;
     symbols = new Symbol[alpha.size()];
     hashes = new int[alpha.size()];

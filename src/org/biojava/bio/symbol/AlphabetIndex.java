@@ -29,6 +29,11 @@ package org.biojava.bio.symbol;
  * unique index. The resulting table can be used to look up array indecies by
  * symbol, which in many cases will be more efficient than performing a Map
  * operation on, for example, a HashMap.
+ * <P>
+ * An index should do whatever is necisary to stay synchronized with its
+ * alphabet. It may chose to modify the index table with the alphabet, or to
+ * veto all changes to the alphabet that would invalidate the indexing
+ * scheim.
  *
  * @author Thomas Down
  * @author Matthew pocock
