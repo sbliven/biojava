@@ -40,7 +40,7 @@ public class DistSerTest extends TestCase {
       uniform = new UniformDistribution(DNATools.getDNA());
       gap = new GapDistribution(DNATools.getDNA());
       pair =  new PairDistribution(dist,gap);
-      List l = Collections.nCopies(2,DNATools.getDNA());
+      List l = Collections.nCopies(3,DNATools.getDNA());
       comp = AlphabetManager.getCrossProductAlphabet(l);
       orderN = (OrderNDistribution)OrderNDistributionFactory.DEFAULT.createDistribution(comp);
     } catch (IllegalAlphabetException iae) {
@@ -129,18 +129,14 @@ public class DistSerTest extends TestCase {
       for(Iterator i = ((FiniteAlphabet)orderN.getConditioningAlphabet()).iterator(); i.hasNext();){
 	Symbol s = (Symbol)i.next();
 	assertTrue(DistributionTools.areEmissionSpectraEqual(orderN.getDistribution(s), orderN.getDistribution(s)));
-	System.out.println("ConditionedDistClass = "+orderN.getDistribution(s).getClass().getName());
       }
       assertTrue(orderN.conditionedDistributions().size() == ((OrderNDistribution)dist2).conditionedDistributions().size());
       for(Iterator i = ((FiniteAlphabet)orderN.getConditioningAlphabet()).iterator(); i.hasNext();){
-	  System.out.println("Testing post Ser vs post Ser");
 	Symbol s = (Symbol)i.next();
-	System.out.println("ConditionedDistClass = "+((OrderNDistribution)dist2).getDistribution(s).getClass().getName());
 	assertTrue(DistributionTools.areEmissionSpectraEqual(((OrderNDistribution)dist2).getDistribution(s),
                                                               ((OrderNDistribution)dist2).getDistribution(s)));
       }
       for(Iterator i = ((FiniteAlphabet)orderN.getConditioningAlphabet()).iterator(); i.hasNext();){
-	  System.out.println("Testing pre Ser vs post Ser");
 	Symbol s = (Symbol)i.next();
 	assertTrue(DistributionTools.areEmissionSpectraEqual(orderN.getDistribution(s), ((OrderNDistribution)dist2).getDistribution(s)));
       }
