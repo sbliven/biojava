@@ -52,7 +52,7 @@ public class PostgreSQLDBHelper implements DBHelper {
 	*/
 
 	sequenceName.append(table);
-	sequenceName.append("_pkey_seq");
+	sequenceName.append("_pk_seq");
 
 	Statement st = conn.createStatement();
 	ResultSet rs = st.executeQuery("select currval('" + sequenceName.toString() + "')");
