@@ -328,6 +328,10 @@ public class FilterUtils {
       expandAnd(filter, filters);
       //System.out.println("as list: " + filters);
       
+      for(int i = 0; i < filters.size(); i++) {
+        filters.set(i, optimize((FeatureFilter) filters.get(i)));
+      }
+      
       int i = 0;
       int j = 0;
       
@@ -393,6 +397,10 @@ public class FilterUtils {
       expandOr(filter, filters);
       
       //System.out.println("as list: " + filters);
+      
+      for(int i = 0; i < filters.size(); i++) {
+        filters.set(i, optimize((FeatureFilter) filters.get(i)));
+      }
       
       int i = 0;
       int j = 0;

@@ -407,6 +407,16 @@ public class FilterUtilsTest extends TestCase
       optimizeExact(none_or_none, FilterUtils.none());
     }
     
+    public void testAndOrAllNone() {
+      optimizeExact(FilterUtils.or(all_and_all, FilterUtils.all()), FilterUtils.all());
+      optimizeExact(FilterUtils.or(all_and_none, FilterUtils.all()), FilterUtils.all());
+
+      optimizeExact(FilterUtils.or(all_and_all, FilterUtils.none()), FilterUtils.all());
+      optimizeExact(FilterUtils.or(all_and_none, FilterUtils.none()), FilterUtils.none());
+
+      optimizeExact(FilterUtils.and(all_or_all, FilterUtils.all()), FilterUtils.all());
+    }
+    
     private void optimizeExact(FeatureFilter raw, FeatureFilter target) {
       FeatureFilter result = FilterUtils.optimize(raw);
       assertTrue("optimize: " + raw + " should be " + target + " but is " + result, result == target);
