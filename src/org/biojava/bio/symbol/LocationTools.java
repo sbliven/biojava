@@ -92,7 +92,7 @@ final public class LocationTools {
       }
       catch (BioException ex) {
         //this shouldn't happen as conditions have been checked above
-        throw new BioError(ex,"Assertion Error, cannot build MergeLocation");
+        throw new BioError("Assertion Error, cannot build MergeLocation",ex);
       }
       return mloc;
 
@@ -209,6 +209,9 @@ final public class LocationTools {
      *
      * Note that from this point of view, contiguous circular locations
      * aren't necessarily contiguous :-(.
+     *
+     * @param l the <code>Location</code> to get the blocks from
+     * @return and ordered <code>List</code> of <code>Locations</code>
      */
 
     private static List getBlockList(Location l) {
@@ -326,7 +329,7 @@ final public class LocationTools {
      *
      * @param locA  the first Location
      * @param locB  the second Location
-     * @param return <code>true</code> if they overlap, <code>false</code> otherwise
+     * @return <code>true</code> if they overlap, <code>false</code> otherwise
      */
 
     public static boolean overlaps(Location locA, Location locB) {
@@ -580,7 +583,7 @@ final public class LocationTools {
             last = MergeLocation.mergeLocations(last,cur);
           }
           catch (BioException ex) {
-            throw new BioError(ex,"Cannot make MergeLocation");
+            throw new BioError("Cannot make MergeLocation",ex);
           }
         } else {
           joinList.add(last);
@@ -628,8 +631,7 @@ final public class LocationTools {
      * @param max the "right" end of the location
      * @param seqLength the lenght of the sequence that the location will
      * be applied to (for purposes of determining origin).
-     * @throws IllegalArgumentException if min, max, or seqLength are 0;
-     *
+     * @return the new <code>CircularLocation</code>
      */
     public static CircularLocation makeCircularLocation(int min, int max, int seqLength){
         return CircularLocationTools.makeCircLoc(min,max,seqLength);
