@@ -30,32 +30,34 @@ import junit.framework.TestCase;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.db.HashSequenceDB;
 import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.impl.SimpleSequence;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.SimpleSymbolList;
-import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
- * <code>SequenceDBSearchResultTest</code> tests the behaviour of
- * <code>SequenceDBSearchResult</code>.
+ * <code>SimpleSeqSimilaritySearchResultTest</code> tests the
+ * behaviour of <code>SimpleSeqSimilaritySearchResult</code>.
  *
  * @author Keith James
  */
-public class SequenceDBSearchResultTest extends TestCase
+public class SimpleSeqSimilaritySearchResultTest extends TestCase
 {
     private SeqSimilaritySearchResult r1;
     private SeqSimilaritySearchResult r2;
 
     private SequenceDB database;
     private Map        parameters;
-    private SymbolList query;
+    private Sequence   query;
 
     private String querySeqTokens = "TRYPASNDEF";
 
-    public SequenceDBSearchResultTest(String name)
+    public SimpleSeqSimilaritySearchResultTest(String name)
     {
         super(name);
     }
@@ -67,19 +69,21 @@ public class SequenceDBSearchResultTest extends TestCase
 
         SymbolTokenization tp = ProteinTools.getAlphabet().getTokenization("token");
 
-        query = new SimpleSymbolList(tp, querySeqTokens);
+        query = new SimpleSequence(new SimpleSymbolList(tp, querySeqTokens),
+                                   "query", "",
+                                   Annotation.EMPTY_ANNOTATION);
 
-        r1 = new SequenceDBSearchResult(query,
-                                        database,
-                                        parameters,
-                                        new ArrayList(),
-                                        Annotation.EMPTY_ANNOTATION);
+        r1 = new SimpleSeqSimilaritySearchResult(query,
+                                                 database,
+                                                 parameters,
+                                                 new ArrayList(),
+                                                 Annotation.EMPTY_ANNOTATION);
 
-        r2 = new SequenceDBSearchResult(query,
-                                        database,
-                                        parameters,
-                                        new ArrayList(),
-                                        Annotation.EMPTY_ANNOTATION);
+        r2 = new SimpleSeqSimilaritySearchResult(query,
+                                                 database,
+                                                 parameters,
+                                                 new ArrayList(),
+                                                 Annotation.EMPTY_ANNOTATION);
     }
 
     public void testEquals()
@@ -107,7 +111,7 @@ public class SequenceDBSearchResultTest extends TestCase
 
     public void testAnnotation()
     {
-        assertEquals(((SequenceDBSearchResult) r1).getAnnotation(),
+        assertEquals(r1.getAnnotation(),
                      Annotation.EMPTY_ANNOTATION);
     }
 }

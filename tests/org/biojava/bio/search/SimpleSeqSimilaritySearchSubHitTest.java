@@ -37,12 +37,12 @@ import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.*;
 
 /**
- * <code>SequenceDBSearchSubHitTest</code> tests the behaviour of
- * <code>SequenceDBSearchSubHit</code>.
+ * <code>SimpleSeqSimilaritySearchSubHitTest</code> tests the
+ * behaviour of <code>SimpleSeqSimilaritySearchSubHit</code>.
  *
  * @author Keith James
  */
-public class SequenceDBSearchSubHitTest extends TestCase
+public class SimpleSeqSimilaritySearchSubHitTest extends TestCase
 {
     private SeqSimilaritySearchSubHit sh1;
     private SeqSimilaritySearchSubHit sh2;
@@ -64,7 +64,7 @@ public class SequenceDBSearchSubHitTest extends TestCase
     private String   querySeqTokens = "TRYPASNDEF";
     private String subjectSeqTokens = "-RYPASND--";
 
-    public SequenceDBSearchSubHitTest(String name)
+    public SimpleSeqSimilaritySearchSubHitTest(String name)
     {
         super(name);
     }
@@ -89,29 +89,29 @@ public class SequenceDBSearchSubHitTest extends TestCase
 
         al2 = new SimpleAlignment(labelMap2);
 
-        sh1 = new SequenceDBSearchSubHit(score,
-                                         eValue,
-                                         pValue,
-                                         queryStart,
-                                         queryEnd,
-                                         querySeqStrand,
-                                         subjectStart,
-                                         subjectEnd,
-                                         subjectSeqStrand,
-                                         al1,
-                                         Annotation.EMPTY_ANNOTATION);
+        sh1 = new SimpleSeqSimilaritySearchSubHit(score,
+                                                  eValue,
+                                                  pValue,
+                                                  queryStart,
+                                                  queryEnd,
+                                                  querySeqStrand,
+                                                  subjectStart,
+                                                  subjectEnd,
+                                                  subjectSeqStrand,
+                                                  al1,
+                                                  Annotation.EMPTY_ANNOTATION);
 
-        sh2 = new SequenceDBSearchSubHit(score,
-                                         eValue,
-                                         pValue,
-                                         queryStart,
-                                         queryEnd,
-                                         querySeqStrand,
-                                         subjectStart,
-                                         subjectEnd,
-                                         subjectSeqStrand,
-                                         al2,
-                                         Annotation.EMPTY_ANNOTATION);
+        sh2 = new SimpleSeqSimilaritySearchSubHit(score,
+                                                  eValue,
+                                                  pValue,
+                                                  queryStart,
+                                                  queryEnd,
+                                                  querySeqStrand,
+                                                  subjectStart,
+                                                  subjectEnd,
+                                                  subjectSeqStrand,
+                                                  al2,
+                                                  Annotation.EMPTY_ANNOTATION);
     }
 
     public void testEquals()
@@ -141,5 +141,10 @@ public class SequenceDBSearchSubHitTest extends TestCase
         assertEquals(sh1.getSubjectStart(), 2);
         assertEquals(sh1.getSubjectEnd(),   8);
         assertEquals(sh1.getSubjectStrand(), StrandedFeature.POSITIVE);
+    }
+
+    public void testAnnotation()
+    {
+        assertEquals(sh1.getAnnotation(), Annotation.EMPTY_ANNOTATION);
     }
 }
