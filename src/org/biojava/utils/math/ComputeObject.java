@@ -26,11 +26,16 @@ package org.biojava.utils.math;
  * interface for classes that return a single
  * double precision value for a single double
  * precision argument.
+ * Used to represent equations of type y = f(x) = 0.
+ *
+ * @author David Huen
+ * @since 1.22
  */
 public interface ComputeObject
 {
     /**
-     * workhorse method for this class
+     * workhorse method for this class.
+     * computes f(x) for given x.
      */
     public double compute(double arg);
 }

@@ -29,14 +29,20 @@ import org.biojava.bio.*;
  * solves y = f(x) = 0 by binary search.
  * Only really suitable for monotonic functions as
  * the method will check that the initial values
- * lie on opposite sides of the X-axis.
+ * lie on opposite sides of the X=0 axis.
+ *
+ * @author David Huen
  */
 public class BinarySearch
 {
 
     /**
-     * @param min lower bound of search space
-     * @param max upper bound of search space
+     * method that will attempt solving the equation.
+     *
+     * @param min lower bound of search space.
+     * @param max upper bound of search space.
+     * @param minimum change in x required to continue iteration.
+     * @param obj the class of ComputeObject class representing the equation to be solved.
      */
     public static double solve(double min, double max, double tolerance, ComputeObject obj)
         throws BioException
