@@ -71,7 +71,7 @@ public class PDBMSDReader
      * 
      * 
      * @param pdbId  a String specifying the id value (PDB code)
-     * @return a Structure object
+     * @return a Structure object, or null if no structure with matching PDB code has been found
      * @throws IOException ...
      */
 
@@ -197,8 +197,13 @@ public class PDBMSDReader
 		prevType    = pdb_Group ;
 	    }
 	    //System.out.println("adding!" + g + current_chain);
-	    current_chain.addGroup(g);
-	    structure.addChain(current_chain) ;
+	    if ( g != null) {
+		current_chain.addGroup(g);
+		structure.addChain(current_chain) ;
+	    } else {
+		// no structure found 
+		return null ;
+	    }
 	} catch ( Exception e ){	    
 	    e.printStackTrace();
 	  
