@@ -2,6 +2,7 @@ package org.biojava.bio.seq.io;
 
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.BioException;
 import java.io.*;
 import java.util.*;
 
@@ -62,7 +63,7 @@ public class FastaAlignmentFormat implements AlignmentFormat {
     /**
      * Writes out the alignment to an FASTA file.
      */
-    public void write(OutputStream os, Alignment align, int fileType) throws Exception {
+    public void write(OutputStream os, Alignment align, int fileType) throws BioException, IllegalSymbolException {
         PrintStream out = new PrintStream(os);
         Iterator labels = align.getLabels().listIterator();
         Object curLabel = null;
@@ -95,11 +96,11 @@ public class FastaAlignmentFormat implements AlignmentFormat {
         }
     } //end write
 
-    public void writeDna(OutputStream os, Alignment align) throws Exception {
+    public void writeDna(OutputStream os, Alignment align) throws BioException, IllegalSymbolException {
         write(os, align, DNA);
     }
 
-    public void writeProtein(OutputStream os, Alignment align) throws Exception {
+    public void writeProtein(OutputStream os, Alignment align) throws BioException, IllegalSymbolException {
         write(os, align, PROTEIN);
     }
 }

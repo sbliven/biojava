@@ -28,9 +28,8 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.db.*;
 import org.biojava.utils.*;
-import org.apache.regexp.RE;
+import org.apache.regexp.*;
 
-import org.apache.regexp.RE;
 
 /**
  * A set of convenience methods for handling common file formats.
@@ -291,25 +290,29 @@ public class SeqIOTools  {
      * the functions below that take an int fileType as a parameter.  The
      * constants used are above.
      */
-    public static int guessFileType(String fileName) throws Exception {
+    public static int guessFileType(String fileName) throws IOException, FileNotFoundException {
         //First tries by matching an extension
-        if ((new RE(".*\\u002eem.*")).match(fileName)) {
-            return EMBL;
-        }
-        else if ((new RE(".*\\u002egb.*")).match(fileName)) {
-            return GENBANK;
-        }
-        else if ((new RE(".*\\u002esp.*")).match(fileName)) {
-            return SWISSPROT;
-        }
-        else if ((new RE(".*\\u002egp.*")).match(fileName)) {
-            return GENPEPT;
-        }
-        else if ((new RE(".*\\u002efa.*")).match(fileName)) {
-            return guessFastaType(fileName);
-        }
-        else if ((new RE(".*\\u002emsf.*")).match(fileName)) {
-            return guessMsfType(fileName);
+        try {
+            if ((new RE(".*\\u002eem.*")).match(fileName)) {
+                return EMBL;
+            }
+            else if ((new RE(".*\\u002egb.*")).match(fileName)) {
+                return GENBANK;
+            }
+            else if ((new RE(".*\\u002esp.*")).match(fileName)) {
+                return SWISSPROT;
+            }
+            else if ((new RE(".*\\u002egp.*")).match(fileName)) {
+                return GENPEPT;
+            }
+            else if ((new RE(".*\\u002efa.*")).match(fileName)) {
+                return guessFastaType(fileName);
+            }
+            else if ((new RE(".*\\u002emsf.*")).match(fileName)) {
+                return guessMsfType(fileName);
+            }
+        } catch (RESyntaxException e) {
+            System.out.println("guessFileType -- Problem with regular expression matching.");
         }
 
         //Reads the file to guess based on content
@@ -362,7 +365,7 @@ public class SeqIOTools  {
     /**
      * Helper function for guessFileName.
      */
-    private static int guessFastaType(String fileName) throws Exception {
+    private static int guessFastaType(String fileName) throws IOException, FileNotFoundException {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         String line = br.readLine();
         line = br.readLine();
@@ -383,7 +386,7 @@ public class SeqIOTools  {
     /**
      * Helper function for guessFileName.
      */
-    private static int guessMsfType(String fileName) throws Exception {
+    private static int guessMsfType(String fileName) throws IOException, FileNotFoundException {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         String line = br.readLine();
         if (line.startsWith("!!NA_MULTIPLE_ALIGNMENT")) {
@@ -414,7 +417,7 @@ public class SeqIOTools  {
     /**
      * Helper function for guessFileName.
      */
-    private static int guessGenType(String fileName) throws Exception {
+    private static int guessGenType(String fileName) throws IOException, FileNotFoundException {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         String line = br.readLine();
         while (line.indexOf("LOCUS") == -1) {
@@ -434,7 +437,7 @@ public class SeqIOTools  {
      * Reads a file and returns the corresponding Biojava object.  You need to cast it as
      * an Alignment or a SequenceIterator as appropriate.
      */
-    public static Object fileToBiojava(int fileType, BufferedReader br) throws Exception {
+    public static Object fileToBiojava(int fileType, BufferedReader br) {
         switch (fileType) {
             case MSF:
             case MSFDNA:
@@ -458,7 +461,7 @@ public class SeqIOTools  {
     /**
      * Converts a file to an Biojava alignment.
      */
-    private static Alignment fileToAlign(int fileType, BufferedReader br) throws Exception{
+    private static Alignment fileToAlign(int fileType, BufferedReader br) {
         switch(fileType) {
             case MSF:
             case MSFDNA:
@@ -499,7 +502,8 @@ public class SeqIOTools  {
     /**
      * Converts a Biojava object to the given filetype.
      */
-    public static void biojavaToFile(int fileType, OutputStream os, Object biojava) throws Exception {
+    public static void biojavaToFile(int fileType, OutputStream os, Object biojava)
+                            throws BioException, IOException, IllegalSymbolException {
         switch (fileType) {
             case MSFDNA:
             case MSFPROTEIN:
@@ -524,7 +528,7 @@ public class SeqIOTools  {
     /**
      * Converts a Biojava alignment to the given filetype.
      */
-    private static void alignToFile(int fileType, OutputStream os, Alignment align) throws Exception{
+    private static void alignToFile(int fileType, OutputStream os, Alignment align) throws BioException, IllegalSymbolException {
         switch(fileType) {
             case MSFDNA:
                 (new MSFAlignmentFormat()).writeDna(os, align);
@@ -567,6 +571,16 @@ public class SeqIOTools  {
                 break;
             default:
                 System.out.println("seqToFile -- File type not recognized.");
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new FileReader("U:/prot.msf.txt"));
+        Alignment align = (Alignment) fileToBiojava(MSF, br);
+        SequenceIterator seqIt = align.sequenceIterator();
+        while (seqIt.hasNext()) {
+            Sequence seq = seqIt.nextSequence();
+            System.out.println(seq.getName() + ": " + seq.seqString());
         }
     }
 

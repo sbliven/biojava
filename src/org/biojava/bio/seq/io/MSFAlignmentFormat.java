@@ -9,6 +9,7 @@ package  org.biojava.bio.seq.io;
 import  org.biojava.bio.seq.io.AlignmentFormat;
 import  org.biojava.bio.symbol.Alignment;
 import  org.biojava.bio.symbol.*;
+import  org.biojava.bio.BioException;
 import  java.io.BufferedReader;
 import  org.apache.regexp.*;
 import  org.biojava.bio.seq.*;
@@ -25,8 +26,8 @@ import  java.util.*;
  * Company:
  * @version 1.0
  */
-public class MSFAlignmentFormat {
-       // implements AlignmentFormat {
+public class MSFAlignmentFormat
+       implements AlignmentFormat {
     private static final boolean DEBUGPRINT = false;
     private static final int DNA = 1;
     private static final int PROTEIN = 2;
@@ -61,7 +62,7 @@ public class MSFAlignmentFormat {
      * @param reader
      * @return Alignment
      */
-    public Alignment read (BufferedReader reader) throws Exception{
+    public Alignment read (BufferedReader reader) {
         Vector sequenceNames = new Vector();
         String sequenceName = null;
         String sequenceData[] = null;
@@ -194,13 +195,13 @@ public class MSFAlignmentFormat {
             return  (new SimpleAlignment(sequenceDataMap));
         } catch (Exception e) {
             System.err.println("MSFFormatReader " + e.getMessage());
-             throw (e);
+            // throw (e);
         }
-        //return  (null);
+        return  (null);
     }           //end read it
 
     //This is where I am writing an alignment writer
-    public void write(OutputStream os, Alignment align, int fileType) throws Exception {
+    public void write(OutputStream os, Alignment align, int fileType) throws BioException, IllegalSymbolException {
         PrintStream out = new PrintStream(os);
         Object labels[] = align.getLabels().toArray();
         int numSeqs = labels.length;
@@ -273,11 +274,11 @@ public class MSFAlignmentFormat {
 
     } //end write
 
-    public void writeDna(OutputStream os, Alignment align) throws Exception {
+    public void writeDna(OutputStream os, Alignment align) throws BioException, IllegalSymbolException {
         write(os, align, DNA);
     }
 
-    public void writeProtein(OutputStream os, Alignment align) throws Exception {
+    public void writeProtein(OutputStream os, Alignment align) throws BioException, IllegalSymbolException {
         write(os, align, PROTEIN);
     }
 
