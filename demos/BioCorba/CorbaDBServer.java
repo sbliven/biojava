@@ -28,14 +28,14 @@ public class CorbaDBServer {
       throw new NullPointerException("Alphabet " + args[1] + " not known");
     }    
     SymbolParser rParser = alpha.getParser("token");
-    SequenceFactory sFact = new SimpleSequenceFactory();
-    
+    SequenceBuilderFactory sFact = new FastaDescriptionLineParser.Factory(SimpleSequenceBuilder.FACTORY);
     // load it
-    System.out.println("Loading fasta database: " + seqDBFile);
+    System.err.println("Loading fasta database: " + seqDBFile);
     HashSequenceDB seqDB = new HashSequenceDB(
       IDMaker.byURN, seqDBFile.toString()
     );
     SequenceFormat sFormat = new FastaFormat();
+
     InputStream seqDBI = new FileInputStream(seqDBFile);
     SequenceIterator seqI = new StreamReader(seqDBI,
                                              sFormat, rParser, sFact);
