@@ -21,10 +21,12 @@
 
 package org.biojava.bio.seq.io;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
 import org.biojava.bio.BioException;
+import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.CompoundLocation;
 import org.biojava.bio.symbol.FuzzyLocation;
 import org.biojava.bio.symbol.FuzzyPointLocation;
@@ -197,11 +199,19 @@ class EmblLikeLocationParser
 	processCoords();
 
 	if (subLocations.size() == 1)
+	{
 	    return new Object [] { subLocations.get(0),
 				   new Boolean(isComplement) };
+	}
 	else
+	{
+	    // EMBL ordering is in reverse on the complementary strand
+	    // but we apply the sort in all cases for safety
+	    Collections.sort(subLocations, Location.naturalOrder);
+
 	    return new Object [] { new CompoundLocation(subLocations),
 				   new Boolean(isComplement) };
+	}
     }
 
     /**
