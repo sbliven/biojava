@@ -142,7 +142,10 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	public void endSequence() {
 	    structure = structureF;
 	    if (structure.countFeatures() > 0) {
+		System.err.println("*** We have structure: " + getName());
 		features.addFeatureHolder(structure);
+	    } else {
+		System.err.println("*** No structure: " + getName());
 	    }
 	}
 

@@ -49,6 +49,9 @@ class DASFeatureSet implements FeatureHolder {
     private SimpleFeatureHolder            unrulyFeatures = new SimpleFeatureHolder();
     private FeatureHolder                  allFeatures;
 
+    private Map                            typesMap;
+    private FeatureRequestManager.Ticket   typesTicket;
+
     private DASSequence refSequence;
     private URL dataSource;
     private String sourceID;
@@ -63,13 +66,65 @@ class DASFeatureSet implements FeatureHolder {
 	dataSourceString = dataSource.toString();
     }
 
-    private final static int TILE_SIZE = 100000;
+    private final static int TILE_THRESHOLD_LENGTH   = 1000000;
+    private final static int TILE_THRESHOLD_COUNT    = 2000;
+    private final static int TILE_SIZE               = 100000;
+
+    private Map getTypesMap() 
+    {
+	if (typesMap == null) {
+	    if (typesTicket == null) {
+		FeatureRequestManager frm = refSequence.getParentDB().getFeatureRequestManager();
+		typesTicket = frm.requestTypes(dataSource,
+					       new Segment(refSequence.getName()),
+					       new DASTypesPopulator());
+	    }
+
+	    try {
+		typesTicket.doFetch();
+	    } catch (Exception ex) {
+		throw new BioRuntimeException(ex, "Error fetching types");
+	    }
+	}
+	if (typesMap == null) {
+	    throw new BioError("Assertion failure: types fetch hasn't happened yet");
+	}
+
+	return typesMap;
+    }
+	
 
     private Location[] getTiles() {
 	if (tiles == null) {
+	    boolean doTiling = false;
 	    int seqLength = refSequence.length();
-	    if (seqLength > 2000000 &&
-		refSequence.filter(new FeatureFilter.ByClass(ComponentFeature.class), false).countFeatures() == 0)
+	    
+	    if (seqLength > TILE_THRESHOLD_LENGTH) {
+		System.err.print("*** Considering tiling...");
+		Map types = getTypesMap();
+		int totalCount = 0;
+		for (Iterator ti = types.values().iterator(); ti.hasNext(); ) {
+		    Integer count = (Integer) ti.next();
+		    if (count != null) {
+			totalCount += count.intValue();
+		    } else {
+			doTiling = true;
+		    }
+		}
+
+		if (doTiling) {
+		    System.err.println("yes (unknown total)");
+		} else {
+		    doTiling = (totalCount > TILE_THRESHOLD_COUNT);
+		    if (doTiling) {
+			System.err.println("yes (" + totalCount + ")");
+		    } else {
+			System.err.println("no.");
+		    }
+		}
+	    }
+
+	    if (doTiling)
 	    {
 		int numTiles = (int) Math.ceil(1.0 * seqLength / TILE_SIZE);
 		tiles = new Location[numTiles];
@@ -191,6 +246,30 @@ class DASFeatureSet implements FeatureHolder {
     public void addChangeListener(ChangeListener cl, ChangeType ct) {}
     public void removeChangeListener(ChangeListener cl) {}
     public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
+
+    //
+    // Listener for recieving the types document
+    //
+
+    private class DASTypesPopulator implements TypesListener {
+	private Map types;
+
+	public void startSegment() {
+	    types = new HashMap();
+	}
+
+	public void registerType(String type) {
+	    types.put(type, null);
+	}
+
+	public void registerType(String type, int count) {
+	    types.put(type, new Integer(count));
+	}
+
+	public void endSegment() {
+	    typesMap = types;
+	}
+    }
 
     //
     // Listener which is responsible for populating this FeatureSet

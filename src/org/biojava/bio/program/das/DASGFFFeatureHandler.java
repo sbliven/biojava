@@ -155,7 +155,9 @@ public class DASGFFFeatureHandler extends StAXContentHandlerBase {
 	    }
 
 	    temp = ctemp;
-	} if (orientation.equals("+") || orientation.equals("-")) {
+
+	    System.err.println("*** Parsed a componentFeature: " + targetGroup.target_id);
+	} else if (orientation.equals("+") || orientation.equals("-")) {
 	    StrandedFeature.Template stemp = new StrandedFeature.Template();
 	    stemp.strand = orientation.equals("+") ? StrandedFeature.POSITIVE :
 	                                             StrandedFeature.NEGATIVE;
@@ -228,7 +230,7 @@ public class DASGFFFeatureHandler extends StAXContentHandlerBase {
 		    }
 		} );
 	    } else if ("TARGET".equals(localName)) {
-		target_id = attrs.getValue("id");
+		target_id = attrs.getValue("ref");
 		try {
 		    target_start = Integer.parseInt(attrs.getValue("start"));
 		    target_stop = Integer.parseInt(attrs.getValue("stop"));

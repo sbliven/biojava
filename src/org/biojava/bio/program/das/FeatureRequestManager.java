@@ -42,21 +42,6 @@ import org.biojava.bio.program.xff.*;
  */
 
 class FeatureRequestManager {
-//      private static Map requestManagers;
-
-//      static {
-//  	requestManagers = new HashMap();
-//      }
-
-//      public static FeatureRequestManager getManager(URL dataSource) {
-//  	FeatureRequestManager frm = (FeatureRequestManager) requestManagers.get(dataSource);
-//  	if (frm == null) {
-//  	    frm = new FeatureRequestManager();
-//  	    requestManagers.put(dataSource, frm);
-//  	}
-//  	return frm;
-//      }
-
     private Set openTickets;
     private DASSequenceDB seqDB;
 
@@ -87,7 +72,22 @@ class FeatureRequestManager {
 				  String type,
 				  String category)
     {
-	Ticket t = new Ticket(ds, id, l, loc, type, category);
+	Segment seg;
+	if (loc != null) {
+	    seg = new Segment(id, loc.getMin(), loc.getMax());
+	} else {
+	    seg = new Segment(id);
+	}
+	Ticket t = new FeatureTicket(ds, seg, type, category, l);
+	openTickets.add(t);
+	return t;
+    }
+
+    public Ticket requestTypes(URL ds,
+			       Segment segment,
+			       TypesListener l)
+    {
+	Ticket t = new TypeTicket(ds, segment, null, null, l);
 	openTickets.add(t);
 	return t;
     }
@@ -99,22 +99,22 @@ class FeatureRequestManager {
 	return a.equals(b);
     }
 
-    private FeatureFetcher makeFeatureFetcher(URL dataSourceURL,
-					      String triggerType,
-					      String triggerCategory)
+    private Fetcher makeFetcher(Ticket trigger)
 	throws BioException
     {
-	FeatureFetcher ffetcher = new FeatureFetcher(dataSourceURL, triggerType, triggerCategory);
-	try {
-  	    boolean doXMLRequest = DASCapabilities.checkCapable(new URL(dataSourceURL, "../"),
-  								DASCapabilities.CAPABILITY_EXTENDED,
-  								DASCapabilities.CAPABILITY_EXTENDED_FEATURES);
-  	    ffetcher.setUseXMLFetch(doXMLRequest);
-  	} catch (MalformedURLException ex) {
-  	    throw new BioException(ex);
+	if (trigger instanceof FeatureTicket) {
+	    FeatureFetcher ffetcher = new FeatureFetcher(trigger.getDataSource(), 
+							 trigger.getType(), 
+							 trigger.getCategory());
+	    return ffetcher;
+	} else if (trigger instanceof TypeTicket) {
+	    Fetcher f = new TypesFetcher(trigger.getDataSource(), 
+					 trigger.getType(), 
+					 trigger.getCategory());
+	    return f;
+	} else {
+	    throw new BioError("Unknown ticket class");
 	}
-
-	return ffetcher;
     }
 
     private synchronized void fetch(Ticket trigger) 
@@ -124,17 +124,19 @@ class FeatureRequestManager {
 
 	String triggerType = trigger.getType();
 	String triggerCategory = trigger.getCategory();
+	Class triggerClass = trigger.getClass();
 	Map fetchers = new HashMap();
 	   
 	for (Iterator i = openTickets.iterator(); i.hasNext(); ) {
 	    Ticket t = (Ticket) i.next();
-	    if (stringCompare(triggerType, t.getType()) && 
+	    if (triggerClass.isInstance(t) &&
+		stringCompare(triggerType, t.getType()) && 
 		stringCompare(triggerCategory, t.getCategory())) 
 	    {
 		URL dataSourceURL = t.getDataSource();
-		FeatureFetcher ffetcher = (FeatureFetcher) fetchers.get(dataSourceURL);
+		Fetcher ffetcher = (Fetcher) fetchers.get(dataSourceURL);
 		if (ffetcher == null) {
-		    ffetcher = makeFeatureFetcher(dataSourceURL, triggerType, triggerCategory);
+		    ffetcher = makeFetcher(t);
 		    fetchers.put(dataSourceURL, ffetcher);
 		}
 		ffetcher.addTicket(t);
@@ -151,16 +153,16 @@ class FeatureRequestManager {
 	if (DAS.getThreadFetches() && (fetchers.size() > 1)) {
 	    FetchMonitor monitor = new FetchMonitor();
 	    for (Iterator i = fetchers.values().iterator(); i.hasNext(); ) {
-		monitor.addJob((FeatureFetcher) i.next());
+		monitor.addJob((Fetcher) i.next());
 	    }
 	    List okay = monitor.doFetches();
 	    for (Iterator i = okay.iterator(); i.hasNext(); ) {
-		FeatureFetcher ffetcher = (FeatureFetcher) i.next();
+		Fetcher ffetcher = (Fetcher) i.next();
 		openTickets.removeAll(ffetcher.getDoneTickets());
 	    }
 	} else {
 	    for (Iterator i = fetchers.values().iterator(); i.hasNext(); ) {
-		FeatureFetcher ffetcher = (FeatureFetcher) i.next();
+		Fetcher ffetcher = (Fetcher) i.next();
 		ffetcher.runFetch();
 		openTickets.removeAll(ffetcher.getDoneTickets());
 	    }
@@ -174,7 +176,7 @@ class FeatureRequestManager {
 	private FetchJob failedJob;
 	private Exception failure;
 
-	public void addJob(FeatureFetcher ff) {
+	public void addJob(Fetcher ff) {
 	    pending.add(new FetchJob(ff, this));
 	}
 
@@ -231,17 +233,17 @@ class FeatureRequestManager {
     }
 
     private class FetchJob extends Thread {
-	private FeatureFetcher fetcher;
+	private Fetcher fetcher;
 	private FetchMonitor monitor;
 	
-	FetchJob(FeatureFetcher fetcher,
+	FetchJob(Fetcher fetcher,
 		 FetchMonitor monitor) 
 	{
 	    this.fetcher = fetcher;
 	    this.monitor = monitor;
 	}
 
-	public FeatureFetcher getFetcher() {
+	public Fetcher getFetcher() {
 	    return fetcher;
 	}
 
@@ -255,40 +257,73 @@ class FeatureRequestManager {
 	}
     }
 
-    public class Ticket {
+    class FeatureTicket extends Ticket {
+	private SeqIOListener outputListener;
+
+	public FeatureTicket(URL dataSource,
+			     Segment segment,
+			     String type,
+			     String category,
+			     SeqIOListener outputListener)
+	{
+	    super(dataSource, segment, type, category);
+	    this.outputListener = outputListener;
+	}
+
+	public SeqIOListener getOutputListener() {
+	    return outputListener;
+	}
+
+	void setAsFetched() {
+	    super.setAsFetched();
+	    outputListener = null;
+	}
+    }
+
+    
+    class TypeTicket extends Ticket {
+	private TypesListener outputListener;
+
+	public TypeTicket(URL dataSource,
+			  Segment segment,
+			  String type,
+			  String category,
+			  TypesListener outputListener)
+	{
+	    super(dataSource, segment, type, category);
+	    this.outputListener = outputListener;
+	}
+
+	public TypesListener getTypesListener() {
+	    return outputListener;
+	}
+
+	void setAsFetched() {
+	    super.setAsFetched();
+	    outputListener = null;
+	}
+    }
+
+    public abstract class Ticket {
 	private boolean _isFired = false;
-	private String id;
-	private Location location;
+	private Segment segment;
 	private String type;
 	private String category;
-	private SeqIOListener outputListener;
 	private URL dataSource;
 
 	public Ticket(URL dataSource,
-		      String id,
-		      SeqIOListener listener,
-		      Location location,
+		      Segment segment,
 		      String type,
 		      String category)
 	{
 	    this.dataSource = dataSource;
-	    this.id = id;
-	    this.outputListener = listener;
 	    this.type = type;
 	    this.category = category;
-	    this.location = location;
+	    this.segment = segment;
 	}
 
 	private URL getDataSource() {
 	    return dataSource;
-	}
-
-	String getID() {
-	    return id;
-	}
-
-	SeqIOListener getOutputListener() {
-	    return outputListener;
 	}
 
 	private String getType() {
@@ -299,14 +334,13 @@ class FeatureRequestManager {
 	    return category;
 	}
 
-	public Location getLocation() {
-	    return location;
+
+	public Segment getSegment() {
+	    return segment;
 	}
 
 	void setAsFetched() {
 	    _isFired = true;
-	    id = null;
-	    outputListener = null;
 	}
 
         public void doFetch() 

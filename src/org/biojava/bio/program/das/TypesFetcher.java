@@ -39,14 +39,14 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
 /**
- * Encapsulate a single batch of feature requests to a DAS server.
+ * Encapsulate a single batch of types requests to a DAS server.
  *
  * @since 1.2
  * @author Thomas Down
  * @author David Huen
  */
 
-class FeatureFetcher implements Fetcher {
+class TypesFetcher implements Fetcher {
     private HashMap ticketsBySegment;
     private List doneTickets = Collections.EMPTY_LIST;
     private String category;
@@ -57,7 +57,7 @@ class FeatureFetcher implements Fetcher {
 	ticketsBySegment = new HashMap();
     }
 
-    FeatureFetcher(URL dataSource, String type, String category) {
+    TypesFetcher(URL dataSource, String type, String category) {
 	this.dataSource = dataSource;
 	this.type = type;
 	this.category = category;
@@ -82,24 +82,11 @@ class FeatureFetcher implements Fetcher {
     public void runFetch() 
 	throws BioException, ParseException
     {
-        // get time
-        long startFetch = (new Date()).getTime();
 	DAS.startedActivity(this);
 	URL fURL = null;
 	    
 	
 	try {
-	    String fetchEncoding = "dasgff";
-	    if (DASCapabilities.checkCapable(new URL(dataSource, "../"), 
-					     DASCapabilities.CAPABILITY_FEATURETABLE,
-					     DASCapabilities.CAPABILITY_FEATURETABLE_XFF))
-	    {
-		fetchEncoding = "xff";
-	    }
-
-	    // We don't bother with XML-encoded fetches any more.
-	    // Nice idea, but now kind-of redundant.
-
 	    HttpURLConnection huc = null;
 	    Set segmentObjs = ticketsBySegment.keySet();
 	    StringBuffer sb = new StringBuffer();
@@ -120,14 +107,9 @@ class FeatureFetcher implements Fetcher {
 		}
 	    }
 	    String segments = sb.toString();
-	    // System.err.println("Fetching: " + segments);
+	    System.err.println("*** Types-Fetching: " + segments);
 	    
-	    String encodingRequest = "categorize=yes;";
-	    if (fetchEncoding.equals("dasgff")) {
-		encodingRequest += "";
-	    } else {
-		encodingRequest += "encoding=" + fetchEncoding + ";";
-	    }
+	    String encodingRequest = "";
 	    
 	    String typeRequest = "";
 	    if (type != null) {
@@ -141,11 +123,11 @@ class FeatureFetcher implements Fetcher {
 
 	    String queryString = encodingRequest + categoryRequest + typeRequest + segments;
 
-	    // fURL = new URL(dataSource, "features?" + encodingRequest + categoryRequest + typeRequest + segments);
+	    // fURL = new URL(dataSource, "types?" + encodingRequest + categoryRequest + typeRequest + segments);
 	    // huc = (HttpURLConnection) fURL.openConnection();
 	    // huc.setRequestProperty("Accept-Encoding", "gzip");
 	    
-	    fURL = new URL(dataSource, "features");
+	    fURL = new URL(dataSource, "types");
 	    huc = (HttpURLConnection) fURL.openConnection();
 	    huc.setRequestMethod("POST");
 	    huc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -181,7 +163,7 @@ class FeatureFetcher implements Fetcher {
 
 	    InputSource is = new InputSource(inStream);
 	    is.setSystemId(fURL.toString());
-	    DASFeaturesHandler dfh = new DASFeaturesHandler(ticketsBySegment, this, fetchEncoding);
+	    DASTypesHandler dfh = new DASTypesHandler(ticketsBySegment, this);
 	    XMLReader parser = DASSequence.nonvalidatingSAXParser();
 	    parser.setContentHandler(new SAX2StAXAdaptor(dfh));
 	    parser.parse(is);
@@ -197,28 +179,25 @@ class FeatureFetcher implements Fetcher {
     }
 
     //
-    // StAX handler for the new, generic, DASFEATURES document
+    // StAX handler for the DASTYPES document
     //
 
-    private class DASFeaturesHandler extends StAXContentHandlerBase {
+    private class DASTypesHandler extends StAXContentHandlerBase {
 	private boolean inDocument = false;
 	private Map ticketsBySegment;
 	private FeatureRequestManager.Ticket thisTicket;
 	private List doneTickets = new ArrayList();
-	private String fetchEncoding; 
         private Object trigger;
 
 	public List getDoneTickets() {
 	    return doneTickets;
 	}
 
-	public DASFeaturesHandler(Map ticketsBySegment,
-				  Object trigger,
-				  String fetchEncoding) 
+	public DASTypesHandler(Map ticketsBySegment,
+			       Object trigger)
 	{
 	    this.ticketsBySegment = ticketsBySegment;
             this.trigger = trigger;
-	    this.fetchEncoding = fetchEncoding;
 	}
 
 	public void startElement(String nsURI,
@@ -251,7 +230,7 @@ class FeatureFetcher implements Fetcher {
 
 		    // System.err.println("Got segment: " + segID);
 
-		    dm.delegate(new DASSegmentHandler(((FeatureRequestManager.FeatureTicket) thisTicket).getOutputListener(), fetchEncoding));
+		    dm.delegate(new DASSegmentHandler(((FeatureRequestManager.TypeTicket) thisTicket).getTypesListener()));
 		} else if (localName.equals("segmentNotAnnotated")) {
 		    String segID = attrs.getValue("id");
 		    if (segID == null) {
@@ -269,13 +248,9 @@ class FeatureFetcher implements Fetcher {
 			}
 		    }
 
-		    SeqIOListener siol = ((FeatureRequestManager.FeatureTicket) thisTicket).getOutputListener();
-		    try {
-			siol.startSequence();
-			siol.endSequence();
-		    } catch (ParseException ex) {
-			throw new SAXException(ex);
-		    }
+		    TypesListener siol = ((FeatureRequestManager.TypeTicket) thisTicket).getTypesListener();
+		    siol.startSegment();
+		    siol.endSegment();
 		    
 		    thisTicket.setAsFetched();
 		    doneTickets.add(thisTicket);
@@ -304,15 +279,12 @@ class FeatureFetcher implements Fetcher {
     }
 
     private class DASSegmentHandler extends StAXContentHandlerBase {
-	private SeqIOListener siol;
+	private TypesListener tl;
 	private int level = 0;
-	private String fetchEncoding;
 
-	public DASSegmentHandler(SeqIOListener siol,
-				 String fetchEncoding) 
+	public DASSegmentHandler(TypesListener tl)
 	{
-	    this.siol = siol;
-	    this.fetchEncoding = fetchEncoding;
+	    this.tl = tl;
 	}
 
 	public void startElement(String nsURI,
@@ -324,38 +296,25 @@ class FeatureFetcher implements Fetcher {
 	{
 	    ++level;
 	    if (level == 1) {
-		try {
-		    siol.startSequence();
-		
-		    String segStart = attrs.getValue("start");
-		    if (segStart != null) {
-			siol.addSequenceProperty("sequence.start", segStart);
-		    }
-		    String segStop = attrs.getValue("stop");
-		    if (segStop != null) {
-			siol.addSequenceProperty("sequence.stop", segStop);
-		    }
-		    String segVersion = attrs.getValue("version");
-		    if (segVersion != null) {
-			siol.addSequenceProperty("sequence.version", segVersion);
-		    }
-		} catch (ParseException ex) {
-		    throw new SAXException(ex);
-		}
+		tl.startSegment();
 	    } else {
-		if (localName.equals("featureSet")) {
-		    XFFFeatureSetHandler xffh = new XFFFeatureSetHandler();
-		    xffh.setFeatureListener(siol);
-		    xffh.addFeatureHandler(new ElementRecognizer.ByLocalName("componentFeature"),
-					   ComponentFeatureHandler.COMPONENTFEATURE_HANDLER_FACTORY);
-		    xffh.addDetailHandler(new ElementRecognizer.ByNSName("http://www.biojava.org/dazzle",
-									 "links"),
-					  DASLinkHandler.LINKDETAIL_HANDLER_FACTORY);
-		    dm.delegate(xffh);
-		} else if (localName.equals("FEATURE")) {
-		    dm.delegate(new DASGFFFeatureHandler(siol));
+		if (localName.equals("TYPE")) {
+		    final String typeId = attrs.getValue("id");
+		    dm.delegate(new StringElementHandlerBase() {
+			    protected void setStringValue(String s) {
+				String count = s.trim();
+				if (count.length() > 0) {
+				    try {
+					tl.registerType(typeId, Integer.parseInt(count));
+					return;
+				    } catch (NumberFormatException ex) {
+				    }
+				}
+				tl.registerType(typeId);
+			    }
+			} );
 		} else {
-		    throw new SAXException("Expecting an XFF featureSet or DASGFF FEATURE, but got " + localName);
+		    throw new SAXException("Unexpected element in DASTYPES: " + localName);
 		}
 	    }
 	}
@@ -368,11 +327,7 @@ class FeatureFetcher implements Fetcher {
 	{
 	    // System.err.println("endElement: " + localName);
 	    if (level == 1) {
-		try {
-		    siol.endSequence();
-		} catch (ParseException ex) {
-		    throw new SAXException(ex);
-		}
+		tl.endSegment();
 	    }
 	    --level;
 	}
