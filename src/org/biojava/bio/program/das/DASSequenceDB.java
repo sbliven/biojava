@@ -53,7 +53,7 @@ public class DASSequenceDB implements SequenceDB {
     private Map sequences;
     private Cache symbolsCache;
     private FixedSizeCache featuresCache;
-    private boolean gotAllIDs = false;
+    private Set rootIDs;
     private FeatureRequestManager frm;
 
     {
@@ -98,50 +98,44 @@ public class DASSequenceDB implements SequenceDB {
 	this.dataSourceURL = dataSourceURL;
     }
 
+    DASSequence _getSequence(String id) 
+        throws BioException, IllegalIDException
+    {
+	return _getSequence(id, Collections.singleton(dataSourceURL));
+    }
+
+    DASSequence _getSequence(String id, Set annoURLs) 
+        throws BioException, IllegalIDException
+    {
+	DASSequence seq = (DASSequence) sequences.get(id);
+	if (seq == null) {
+	    seq = new DASSequence(this, dataSourceURL, id, annoURLs);
+	    sequences.put(id, seq);
+	}
+	return seq;
+    }
+
     /**
      * Return a SequenceDB exposing /all/ the entry points
      * in this DAS datasource.
      *
      */
 
-    private SequenceDB allEntryPoints;
+    private SequenceDBLite allEntryPoints;
 
-    public SequenceDB allEntryPointsDB() {
+    public SequenceDBLite allEntryPointsDB() {
 	if (allEntryPoints == null) {
-	    // allEntryPoints = new HashSequenceDB("All entry points from " + getURL().toString());
-	    //  try {
-//  		for (SequenceIterator si = sequenceIterator(); si.hasNext(); ) {
-//  		    Sequence seq = si.nextSequence();
-//  		    allEntryPoints.addSequence(seq);
-//  		    FeatureHolder allComponents = seq.filter(
-//  		            new FeatureFilter.ByClass(ComponentFeature.class),
-//  			    true);
-//  		    for (Iterator cfi = allComponents.features(); cfi.hasNext(); ) {
-//  			ComponentFeature cf = (ComponentFeature) cfi.next();
-//  			allEntryPoints.addSequence(cf.getComponentSequence());
-//  		    }
-//  		}
-//  	    } catch (BioException ex) {
-//  		throw new BioError(ex);
-//  	    } catch (ChangeVetoException ex) {
-//  		throw new BioError(ex, "Assertion failed: Couldn't modify our SequenceDB");
-//  	    }
-
 	    allEntryPoints = new AllEntryPoints();
 	}
 
 	return allEntryPoints;
     }
 
-    private class AllEntryPoints implements SequenceDB {
+    private class AllEntryPoints implements SequenceDBLite {
 	public Sequence getSequence(String id)
-	    throws BioException
+	    throws BioException, IllegalIDException
 	{
-	    return new DASSequence(DASSequenceDB.this, dataSourceURL, id);
-	}
-
-	public Set ids() {
-	    throw new BioError("ImplementMe");
+	    return _getSequence(id);
 	}
 
 	public void addSequence(Sequence seq)
@@ -154,10 +148,6 @@ public class DASSequenceDB implements SequenceDB {
 	    throws ChangeVetoException
 	{
 	    throw new ChangeVetoException("No way we're removing sequences from DAS");
-	}
-
-	public SequenceIterator sequenceIterator() {
-	    throw new BioError("ImplementMe");
 	}
 
 	public String getName() {
@@ -187,24 +177,20 @@ public class DASSequenceDB implements SequenceDB {
 	return dataSourceURL.toString();
     }
 
-    public Sequence getSequence(String id) {
-	// if (! sequences.containsKey(id))
-	//    throw new NoSuchElementException("Couldn't find sequence " + id);
-	Sequence seq = (Sequence) sequences.get(id);
-	if (seq == null) {
-	    try {
-		seq = new DASSequence(this, dataSourceURL, id);
-	    } catch (Exception ex) {
-		throw new BioError(ex);
-	    }
-	    sequences.put(id, seq);
+    public Sequence getSequence(String id) 
+        throws BioException, IllegalIDException
+    {
+	if (! (ids().contains(id))) {
+	    throw new IllegalIDException("Database does not contain " + id + " as a top-level sequence");
 	}
-	return seq;
+	return _getSequence(id);
     }
 
     public Set ids() {
-	if (!gotAllIDs) {
+	if (rootIDs == null) {
 	    try {
+		Set ids = new HashSet();
+
 		URL epURL = new URL(dataSourceURL, "entry_points");
 		HttpURLConnection huc = (HttpURLConnection) epURL.openConnection();
 		try {
@@ -212,7 +198,6 @@ public class DASSequenceDB implements SequenceDB {
 		} catch (Exception e) {
 		    throw new BioException(e, "Can't connect to " + epURL);
 		}
-		// int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
 		int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
 		if (status == 0)
 		    throw new BioException("Not a DAS server: " + dataSourceURL + " Query: " + epURL);
@@ -231,11 +216,10 @@ public class DASSequenceDB implements SequenceDB {
 		for (int i = 0; i < segl.getLength(); ++i) {
 		    el = (Element) segl.item(i);
 		    String id = el.getAttribute("id");
-		    if (! sequences.containsKey(id)) 
-			sequences.put(id, null);
+		    ids.add(id);
 		}
 
-		gotAllIDs = true;
+		rootIDs = Collections.unmodifiableSet(ids);
 	    } catch (SAXException ex) {
 		throw new BioError(ex, "Exception parsing DAS XML");
 	    } catch (IOException ex) {
@@ -247,7 +231,7 @@ public class DASSequenceDB implements SequenceDB {
 	    }
 	}
 
-	return sequences.keySet();
+	return rootIDs;
     }
 
     public void addSequence(Sequence seq)
@@ -262,7 +246,8 @@ public class DASSequenceDB implements SequenceDB {
 	throw new ChangeVetoException("No way we're removing sequences from DAS");
     }
 
-    public SequenceIterator sequenceIterator() {
+    public SequenceIterator sequenceIterator() 
+    {
 	return new SequenceIterator() {
 	    private Iterator i = ids().iterator();
 
@@ -270,7 +255,9 @@ public class DASSequenceDB implements SequenceDB {
 		return i.hasNext();
 	    }
 
-	    public Sequence nextSequence() {
+	    public Sequence nextSequence() 
+	        throws BioException
+	    {
 		return getSequence((String) i.next());
 	    }
 	} ;

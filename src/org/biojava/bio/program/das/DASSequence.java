@@ -31,6 +31,7 @@ import org.biojava.utils.cache.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
+import org.biojava.bio.seq.db.*;
 import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
 
@@ -100,7 +101,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     }
 
     DASSequence(DASSequenceDB db, URL dataSourceURL, String seqID, Set dataSources) 
-        throws BioException
+        throws BioException, IllegalIDException
     {
 	this.parentdb = db;
 	this.dataSourceURL = dataSourceURL;
@@ -128,12 +129,6 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    featureSets.put(annoURL, newFeatureSet);
 	    features.addFeatureHolder(newFeatureSet);
 	}
-    }
-
-    DASSequence(DASSequenceDB db, URL dataSourceURL, String seqID) 
-        throws BioException
-    {
-	this(db, dataSourceURL, seqID, Collections.singleton(dataSourceURL));
     }
 
     private class SkeletonListener extends SeqIOAdapter {
@@ -215,19 +210,17 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
         throws BioException, ChangeVetoException
     {
         FeatureHolder structure = getStructure();
-	if(!featureSets.containsKey(dataSourceURL)) {
-	    for (Iterator i = structure.features(); i.hasNext(); ) {
-		DASComponentFeature dcf = (DASComponentFeature) i.next();
-		DASSequence seq = dcf.getSequenceLazy();
-		if (seq != null) {
-		    seq.addAnnotationSource(dataSourceURL);
-		}
+	for (Iterator i = structure.features(); i.hasNext(); ) {
+	    DASComponentFeature dcf = (DASComponentFeature) i.next();
+	    DASSequence seq = dcf.getSequenceLazy();
+	    if (seq != null) {
+		seq.addAnnotationSource(dataSourceURL);
 	    }
-
-	    FeatureHolder fs = new DASFeatureSet(this, dataSourceURL, this.seqID);
-	    featureSets.put(dataSourceURL, fs);
-	    features.addFeatureHolder(fs);
 	}
+
+	FeatureHolder fs = new DASFeatureSet(this, dataSourceURL, this.seqID);
+	featureSets.put(dataSourceURL, fs);
+	features.addFeatureHolder(fs);
     }
     
     public Set dataSourceURLs() {
@@ -237,19 +230,21 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     public void addAnnotationSource(URL dataSourceURL) 
         throws BioException, ChangeVetoException
     {
-	if (changeSupport == null) {
-	    _addAnnotationSource(dataSourceURL);
-	} else {
-	    synchronized (changeSupport) {
-		ChangeEvent ce = new ChangeEvent(
-		    this,
-		    ANNOTATIONS,
-		    null,
-		    null
-		) ;
-		changeSupport.firePreChangeEvent(ce);
+	if(!featureSets.containsKey(dataSourceURL)) {
+	    if (changeSupport == null) {
 		_addAnnotationSource(dataSourceURL);
-		changeSupport.firePostChangeEvent(ce);
+	    } else {
+		synchronized (changeSupport) {
+		    ChangeEvent ce = new ChangeEvent(
+						     this,
+						     ANNOTATIONS,
+						     null,
+						     null
+						     ) ;
+		    changeSupport.firePreChangeEvent(ce);
+		    _addAnnotationSource(dataSourceURL);
+		    changeSupport.firePostChangeEvent(ce);
+		}
 	    }
 	}
     }
@@ -276,19 +271,21 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     public void removeAnnotationSource(URL dataSourceURL) 
         throws ChangeVetoException, BioException
     {
-	if (changeSupport == null) {
-	    _removeAnnotationSource(dataSourceURL);
-	} else {
-	    synchronized (changeSupport) {
-		ChangeEvent ce = new ChangeEvent(
-		    this,
-		    ANNOTATIONS,
-		    null,
-		    null
-		) ;
-		changeSupport.firePreChangeEvent(ce);
+	if (featureSets.containsKey(dataSourceURL)) {
+	    if (changeSupport == null) {
 		_removeAnnotationSource(dataSourceURL);
-		changeSupport.firePostChangeEvent(ce);
+	    } else {
+		synchronized (changeSupport) {
+		    ChangeEvent ce = new ChangeEvent(
+						     this,
+						     ANNOTATIONS,
+						     null,
+						     null
+						     ) ;
+		    changeSupport.firePreChangeEvent(ce);
+		    _removeAnnotationSource(dataSourceURL);
+		    changeSupport.firePostChangeEvent(ce);
+		}
 	    }
 	}
     }
