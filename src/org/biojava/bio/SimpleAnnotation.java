@@ -95,7 +95,7 @@ public class SimpleAnnotation implements Annotation, Serializable {
 	Object oldValue = null;
 	try
 	{
-		if(properties.containsKey(key))
+		if(this.getProperties().containsKey(key))
 		{
 			oldValue = this.getProperty(key);
 			// If the old value is already a list, append the new value to it.

@@ -101,7 +101,7 @@ public class OverlayAnnotation implements Annotation, Serializable {
 	Object oldValue = null;
 	try
 	{
-		if(overlay.containsKey(key))
+		if(this.getOverlay().containsKey(key))
 		{
 			oldValue = this.getProperty(key);
 			// If the old value is already a list, append the new value to it.
