@@ -54,6 +54,7 @@ public class CircularLocation
 extends AbstractLocationDecorator {
 
   private final int length;
+  private int fivePrimeEnd;
 
   private final boolean overlaps;
 
@@ -66,7 +67,11 @@ extends AbstractLocationDecorator {
   }
 
 
-
+  /**
+   * Does the Location overlap the origin (position 1) of the sequence?
+   * <p> If it does the Location will internally be composed of a CompoundLocation.
+   * @return true if it does, false otherwise
+   */
   public boolean overlapsOrigin(){
 
     return overlaps;
@@ -81,9 +86,25 @@ extends AbstractLocationDecorator {
    * @param length the length of the Sequence
    */
   public CircularLocation(Location wrapped, int length) {
+    this(wrapped, length, wrapped.getMin());
+  }
+
+  public CircularLocation(Location wrapped, int length, int fivePrimeEnd){
     super(wrapped);
     this.length = length;
     this.overlaps = CircularLocationTools.overlapsOrigin(this);
+
+    //the 5' end must be the min of one of the blocks of the wrapped location
+    for(Iterator i = wrapped.blockIterator(); i.hasNext();){
+      if( ((Location)i.next()).getMin() == fivePrimeEnd){
+        this.fivePrimeEnd = fivePrimeEnd;
+      }
+    }
+
+    if(get5PrimeEnd() == 0){
+      throw new IllegalArgumentException(
+          "The 5' End must be either the minimum of the wrapped location or the minimum of one of its components");
+    }
   }
 
 
@@ -162,6 +183,10 @@ extends AbstractLocationDecorator {
    */
   public boolean isContiguous() {
     return getWrapped().isContiguous();
+  }
+
+  public int get5PrimeEnd(){
+    return fivePrimeEnd;
   }
 
 

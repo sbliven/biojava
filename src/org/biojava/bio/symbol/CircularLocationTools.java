@@ -134,9 +134,26 @@ final class CircularLocationTools {
     }
 
 
+    /**
+     * Creates a union of two <code>Locations</code> in a Circular context. This
+     * is effectively a join operation. If <code>locA</code> and <code>locB</code> overlap they will be merged.
+     * <p> The order in which <code>Location</code>s are joined is important in a
+     * circular context. It will be assumed that the 5' end of the resulting join
+     * will be the 5' end of <code>locA</code>
+     * <p> If the union event merges two locations such that it is not sensible to
+     * maintain the original 5' end of <code>locA</code> the 5' end will become the
+     * minimum value of the resulting merged Location eg the value returned by <code>getMin()</code>.
+     *
+     * @param locA the first Location (also determines the 5' End)
+     * @param locB the second Location
+     * @return the joined location.
+     */
   protected static CircularLocation union(CircularLocation locA, CircularLocation locB){
     int length = locA.getLength();
+    int fivePrimeEnd = locA.get5PrimeEnd();
     Location temp;
+
+
     if(
       locA.isContiguous() &&
       locB.isContiguous() &&
@@ -151,8 +168,11 @@ final class CircularLocationTools {
         throw new BioError(ex,"Assertion Error, cannot build MergeLocation");
       }
 
-
-      return new CircularLocation(temp, length);
+      try{
+        return new CircularLocation(temp, length, fivePrimeEnd);
+      }catch(IllegalArgumentException ae){
+        return new CircularLocation(temp, length);
+      }
 
     } else {
       // either may be compound. They may not overlap. We must build the
@@ -173,7 +193,11 @@ final class CircularLocationTools {
       }
 
       temp = LocationTools._union(locList);
-      return new CircularLocation(temp, length);
+      try{
+        return new CircularLocation(temp, length, fivePrimeEnd);
+      }catch(IllegalArgumentException iae){
+        return new CircularLocation(temp, length);
+      }
     }
   }
 

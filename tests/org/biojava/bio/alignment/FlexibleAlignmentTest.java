@@ -29,6 +29,10 @@ import org.biojava.bio.seq.*;
 /* @author Lachlan Coin */
 public class FlexibleAlignmentTest extends TestCase {
 
+  public FlexibleAlignmentTest(String name){
+    super(name);
+  }
+
     //public static void main(String[] args) throws Exception{
     //	FlexibleAlignmentTest aat = new FlexibleAlignmentTest();
     //	aat.setUp();
@@ -38,8 +42,8 @@ public class FlexibleAlignmentTest extends TestCase {
 
 
     final static String[] alignment = new String[] {"A-C",
-				       "AGC",
-				       "A-A"};
+                                       "AGC",
+                                       "A-A"};
 
 
     final static String[] names = new String[] {"MOUSE", "HUMAN","SCHPO"};
@@ -48,11 +52,11 @@ public class FlexibleAlignmentTest extends TestCase {
     final static FlexibleAlignment alignProt = parse(names, alignment, false);
 
     protected void setUp() throws Exception{
-	
+
     }
 
 
-  public void testDNA() 
+  public void testDNA()
       throws Exception
   {
       List syms = ((BasisSymbol) alignDNA.symbolAt(2)).getSymbols();
@@ -61,7 +65,7 @@ public class FlexibleAlignmentTest extends TestCase {
   }
 
 
-  public void testProtein() 
+  public void testProtein()
       throws Exception
   {
       List syms = ((BasisSymbol) alignProt.symbolAt(2)).getSymbols();
@@ -74,26 +78,26 @@ public class FlexibleAlignmentTest extends TestCase {
     {
         try
         {
-	    List sequences = new ArrayList();
-	    for(int i=0; i<alignment.length; i++)
+            List sequences = new ArrayList();
+            for(int i=0; i<alignment.length; i++)
             {
                 GappedSequence seq;
-		if(dna)
-		    seq = DNATools.createGappedDNASequence(alignment[i],names[i]);
-		else
-		    seq = ProteinTools.createGappedProteinSequence(alignment[i],names[i]);
-		AlignmentElement ae = new SimpleAlignmentElement(names[i], seq, LocationTools.makeLocation(1, alignment[i].length()));
-		//         System.out.println(seq.seqString());
+                if(dna)
+                    seq = DNATools.createGappedDNASequence(alignment[i],names[i]);
+                else
+                    seq = ProteinTools.createGappedProteinSequence(alignment[i],names[i]);
+                AlignmentElement ae = new SimpleAlignmentElement(names[i], seq, LocationTools.makeLocation(1, alignment[i].length()));
+                //         System.out.println(seq.seqString());
                 sequences.add(ae);
             }
-	    FlexibleAlignment al = new FlexibleAlignment(sequences);
-	    return al;
+            FlexibleAlignment al = new FlexibleAlignment(sequences);
+            return al;
         }
         catch (Throwable t)
         {
             t.printStackTrace();
-	    //System.exit(0);
-	    return null;
+            //System.exit(0);
+            return null;
         }
     }
 

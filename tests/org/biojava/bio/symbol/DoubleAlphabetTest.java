@@ -55,7 +55,7 @@ public class DoubleAlphabetTest extends TestCase
     assertTrue(DoubleAlphabet.getSubAlphabet(1.0,2.5) ==
                DoubleAlphabet.getSubAlphabet(1.0,2.5));
 
-    assertFalse(DoubleAlphabet.getSubAlphabet(1.0,2.5) ==
+    assertTrue(DoubleAlphabet.getSubAlphabet(1.0,2.5) !=
                DoubleAlphabet.getSubAlphabet(1.00001,2.5));
   }
 
