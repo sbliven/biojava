@@ -110,6 +110,16 @@ public class DASSequence
 	features = new DASMergeFeatureHolder();
     }
 
+    private class StructureWrapper extends LazyFeatureHolder {
+        protected FeatureHolder createFeatureHolder() {
+            try {
+                return getStructure();
+            } catch (BioException ex) {
+                throw new BioRuntimeException(ex, "Error fetching structure");
+            }
+        }
+    }
+    
     DASSequence(DASSequenceDB db, URL dataSourceURL, String seqID, Set dataSources) 
         throws BioException, IllegalIDException
     {
@@ -125,6 +135,11 @@ public class DASSequence
 	SeqIOListener listener = new SkeletonListener();
 	FeatureRequestManager frm = getParentDB().getFeatureRequestManager();
 	this.structureTicket = frm.requestFeatures(getDataSourceURL(), seqID, listener, null, "component");
+    try {
+        features.addFeatureHolder(new StructureWrapper(), new FeatureFilter.ByClass(ComponentFeature.class));
+    } catch (ChangeVetoException cve) {
+		throw new BioError(cve);
+	}    
 
 	//
 	// Pick up some annotations
@@ -153,13 +168,13 @@ public class DASSequence
 
 	public void endSequence() {
 	    structure = structureF;
-	    if (structure.countFeatures() > 0) {
-		try {
-		    features.addFeatureHolder(structure, new FeatureFilter.ByClass(ComponentFeature.class));
-		} catch (ChangeVetoException cve) {
-		    throw new BioError(cve);
-		}
-	    } 
+	    // if (structure.countFeatures() > 0) {
+		// try {
+		    // features.addFeatureHolder(structure, new FeatureFilter.ByClass(ComponentFeature.class));
+		// } catch (ChangeVetoException cve) {
+		//    throw new BioError(cve);
+		// }
+	    // } 
 	}
 
 	public void addSequenceProperty(Object key, Object value)

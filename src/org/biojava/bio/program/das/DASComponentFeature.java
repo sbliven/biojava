@@ -250,7 +250,8 @@ class DASComponentFeature
     }
 
     public Iterator features() {
-	return getProjectedFeatures().features();
+        // System.err.println("Going to iterate over DASComponentFeature: " + getComponentSequenceName());
+        return getProjectedFeatures().features();
     }
     
     public boolean containsFeature(Feature f) {
@@ -258,6 +259,7 @@ class DASComponentFeature
     }
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+        // System.err.println("Filtering in DASComponentFEature:" + getComponentSequenceName());
 	    if (FilterUtils.areDisjoint(ff, membershipFilter)) { 
             // System.err.println("Wheeeee! Disjunction in DASComponentFeature");
 
@@ -311,6 +313,7 @@ class DASComponentFeature
     }
 
     public FeatureHolder getOptimizedSubset(FeatureFilter ff) throws BioException {
+        // System.err.println("getOptimizedSubset on DASComponentFeature " + getComponentSequenceName() + ": " + ff.toString());
 	FeatureHolder fh = getProjectedFeatures();
 	if (fh instanceof DASOptimizableFeatureHolder) {
 	    return ((DASOptimizableFeatureHolder) fh).getOptimizedSubset(ff);
