@@ -173,8 +173,6 @@ public class Blast2HTMLHandler extends DefaultHandler  {
 		if ( firstSummary ) {
 		    oRenderer.startSummaryTable( oHitSummary );
 		    firstSummary = false;
-		} else {
-		    oRenderer.writeCurrentSummary( oHitSummary );
 		}
 
 		//
@@ -268,8 +266,9 @@ public class Blast2HTMLHandler extends DefaultHandler  {
 	    oDesc.hitDescription = sb.toString();
 	    
 	} else 	if ( poElementName.equals( "Summary" ) ) {
-	    oRenderer.writeCurrentSummary( oHitSummary );
 	    oRenderer.endSummaryTable();
+	} else 	if ( poElementName.equals( "HitSummary" ) ) {
+	    oRenderer.writeCurrentSummary( oHitSummary );
 	} else 	if ( poElementName.equals( "Detail" ) ) {
 	    oRenderer.endDetailTable();
 	} else 	if ( poElementName.equals( "RawOutput" ) ) {
