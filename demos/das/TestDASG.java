@@ -12,8 +12,9 @@ import java.util.*;
 
 public class TestDASG {
     public static void main(String[] args) throws Exception {
-	if (args.length != 4)
-	    throw new Exception("java das.TestDAS <url> <seq> <min> <max>");
+      if (args.length < 4) {
+        throw new Exception("java das.TestDAS <url> <seq> <min> <max> [ann*]");
+      }
 	String dbURLString = args[0];
 	String seqName = args[1];
         int min = Integer.parseInt(args[2]);
@@ -22,13 +23,11 @@ public class TestDASG {
 	URL dbURL = new URL(dbURLString);
 	
 	DASSequenceDB dasDB = new DASSequenceDB(dbURL);
-	//  System.out.println("Top-level entry points:");
-//  	Set ids = dasDB.ids();
-//  	for (Iterator i = ids.iterator(); i.hasNext(); ) {
-//  	    System.out.println(i.next().toString());
-//  	}
-
+        
 	DASSequence dasSeq = (DASSequence) dasDB.getSequence(seqName);
+        for(int i = 4; i < args.length; i++) {
+          dasSeq.addAnnotationSource(new URL(args[i]));
+        }
 	// dasSeq.addAnnotationSource(annoURL);
 	// dasSeq.addAnnotationSource(miscURL);
 	System.out.println("Length: " + dasSeq.length());
@@ -47,7 +46,7 @@ public class TestDASG {
 	for (Iterator i = fh.filter(ff, false).features(); i.hasNext(); ) {
 	    Feature f = (Feature) i.next();
 	    pw.print(prefix);
-	    pw.print(f.getType());
+	    pw.print(f.getType() + " : " + f.getSource());
 	    pw.print(" at ");
 	    pw.print(f.getLocation().toString());
 	    try {
