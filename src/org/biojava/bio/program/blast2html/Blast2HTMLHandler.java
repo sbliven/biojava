@@ -53,6 +53,7 @@ import java.util.*;
  * under the LGPL license.
  *
  * @author Cambridge Antibody Technology Group plc
+ * @author Greg Cox
  * @version 1.0
  */
 public class Blast2HTMLHandler extends DefaultHandler  {
@@ -90,11 +91,11 @@ public class Blast2HTMLHandler extends DefaultHandler  {
 	oHSP.oAlignment   = oAlignment;
 	oAlignment.oQuerySeq = oQuerySeq;
 	oAlignment.oHitSeq = oHitSeq;
-	
+
     }
 
     private String oRawOutput = null;
-    
+
     // Flow control flags
     private boolean inCollection = false;
     private boolean firstSummary = true;
@@ -152,10 +153,10 @@ public class Blast2HTMLHandler extends DefaultHandler  {
 	if ( inCollection ) {
 
 	    if ( poElementName.equals( "BlastLikeDataSet" ) ) {
-        
+
 		oProgram = poAtts.getValue( "program" );
 		oVersion = poAtts.getValue( "version" );
-		sb.setLength( 0 );	
+		sb.setLength( 0 );
 	    } else if ( poElementName.equals( "HitSummary" ) ) {
 
 		oHitSummary.score       = poAtts.getValue( "score" );
@@ -187,13 +188,13 @@ public class Blast2HTMLHandler extends DefaultHandler  {
 		if ( firstDetail ) {
 		    oRenderer.startDetailTable();
 		    firstDetail = false;
-		} 
+		}
 
 		oDetailHit.sequenceLength = poAtts.getValue
 		    ( "sequenceLength" );
 
 	    } else if ( poElementName.equals( "HSPSummary" ) ) {
-		
+
 		oHSPSummary.percentageIdentity  = poAtts.getValue
 		    ( "percentageIdentity" );
 		oHSPSummary.score       = poAtts.getValue( "score" );
@@ -224,17 +225,17 @@ public class Blast2HTMLHandler extends DefaultHandler  {
 	    } else if ( poElementName.equals( "HitDescription" ) ) {
 		sb.setLength( 0 );
 	    } else if ( poElementName.equals( "QuerySequence" ) ) {
-		oAlignment.oQuerySeq.startPosition = 
+		oAlignment.oQuerySeq.startPosition =
 		    poAtts.getValue( "startPosition" );
-		oAlignment.oQuerySeq.stopPosition  = 
+		oAlignment.oQuerySeq.stopPosition  =
 		    poAtts.getValue( "stopPosition" );
 		sb.setLength( 0 );
 	    } else if ( poElementName.equals( "MatchConsensus" ) ) {
 		sb.setLength( 0 );
 	    } else if ( poElementName.equals( "HitSequence" ) ) {
-		oAlignment.oHitSeq.startPosition 
+		oAlignment.oHitSeq.startPosition
 		    = poAtts.getValue( "startPosition" );
-		oAlignment.oHitSeq.stopPosition 
+		oAlignment.oHitSeq.stopPosition
 		    = poAtts.getValue( "stopPosition" );
 		sb.setLength( 0 );
 	    }  else if ( poElementName.equals( "RawOutput" ) ) {
@@ -263,8 +264,8 @@ public class Blast2HTMLHandler extends DefaultHandler  {
 				      oQuery, oDatabase );
 
 	} else 	if ( poElementName.equals( "HitDescription" ) ) {
-	    oDesc.hitDescription = sb.toString();
-	    
+	    oDesc.hitDescription = sb.substring(0);
+
 	} else 	if ( poElementName.equals( "Summary" ) ) {
 	    oRenderer.endSummaryTable();
 	} else 	if ( poElementName.equals( "HitSummary" ) ) {
@@ -272,22 +273,22 @@ public class Blast2HTMLHandler extends DefaultHandler  {
 	} else 	if ( poElementName.equals( "Detail" ) ) {
 	    oRenderer.endDetailTable();
 	} else 	if ( poElementName.equals( "RawOutput" ) ) {
-	    oRawOutput  = sb.toString();	    
+	    oRawOutput  = sb.substring(0);
 	} else 	if ( poElementName.equals( "HSPSummary" ) ) {
 	    oHSPSummary.rawOutput = oRawOutput;
 	} else if ( poElementName.equals( "QuerySequence" ) ) {
-	    oAlignment.oQuerySeq.seq = sb.toString();
+	    oAlignment.oQuerySeq.seq = sb.substring(0);
 	} else if ( poElementName.equals( "MatchConsensus" ) ) {
-	    oAlignment.oConsensus = sb.toString();
+	    oAlignment.oConsensus = sb.substring(0);
 	} else if ( poElementName.equals( "HitSequence" ) ) {
-	    oAlignment.oHitSeq.seq = sb.toString();
+	    oAlignment.oHitSeq.seq = sb.substring(0);
 	} else if ( poElementName.equals( "HSP" ) ) {
 	    oRenderer.writeCurrentHSP( oHSPSummary, oAlignment );
 	} else 	if ( poElementName.equals( "BlastLikeDataSetCollection" ) ) {
-	    this.reInit();	    
+	    this.reInit();
 	}
 
-    } // end 
+    } // end
 
     /**
      * Describe <code>characters</code> method here.
@@ -297,12 +298,12 @@ public class Blast2HTMLHandler extends DefaultHandler  {
      * @param length - the stop position of relavent chars in passes array
      */
     public void characters( char[] charBuffer, int start, int length) {
-	
+
 	// note this may be called more than once for a particular tag
 	// ie loaded in chunks.
 	// So the correct way to handle this stuff is to buffer contents
 	// and deal with buffer when endElement is called.
-	
+
 	sb.append( charBuffer, start, length );
     }
 
@@ -320,7 +321,7 @@ public class Blast2HTMLHandler extends DefaultHandler  {
 	oRawOutput = null;
 	sb.setLength( 0 );
     }
-    
+
 
     /**
      * Parses out query and database id's from, the rawoutput.
@@ -331,8 +332,8 @@ public class Blast2HTMLHandler extends DefaultHandler  {
     void getQueryIdAndDatabase() {
 
 	BufferedReader reader = new BufferedReader
-            ( new StringReader( sb.toString() ) );
-	
+            ( new StringReader( sb.substring(0) ) );
+
         String oLine;
 
         try {

@@ -76,6 +76,6 @@ public class ParseErrorEvent extends EventObject
 			"[" +
 			this.getMessage() +
 			"]");
-		return representation.toString();
+		return representation.substring(0);
   }
 }

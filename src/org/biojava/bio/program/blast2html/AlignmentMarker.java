@@ -35,7 +35,7 @@ import java.awt.Color;
  * <ol>
  *   <li>Whether to colour or not in the <CODE>ColourCommand.isColoured()</CODE>
  *    method</li>
- *   <li>what the colours are in the <CODE>AlignmentStyler.getStyle()</CODE> 
+ *   <li>what the colours are in the <CODE>AlignmentStyler.getStyle()</CODE>
  *    method</li>
  * </ol>
  * </p>
@@ -44,7 +44,7 @@ import java.awt.Color;
  * This allows simple choices to highlight the mismatches, the identities or
  * simply colour up everything.
  * </p>
- * 
+ *
  * <p>
  * The current implemention of step 2. is a simple colour lookup.
  * </p>
@@ -54,8 +54,8 @@ import java.awt.Color;
  * </p>
  *
  * <p>
- * As the FONT styles need to be defined before being used in the HTML, 
- * it means the all colours to be used have to calculated up front. 
+ * As the FONT styles need to be defined before being used in the HTML,
+ * it means the all colours to be used have to calculated up front.
  * </p>
  *
  * <p>
@@ -86,10 +86,11 @@ import java.awt.Color;
  * </p>
  *
  * @author Cambridge Antibody Technology Group plc
+ * @author Greg Cox
  * @version 1.0
  */
 public class AlignmentMarker {
-    
+
     /**
      * Resuable StringBuffers for the markup of the alignments
      */
@@ -143,7 +144,7 @@ public class AlignmentMarker {
 	oStyler  = poStyler;
     }
 
-    
+
     /**
      * <p>
      * Delegate to the AlignmentStyler
@@ -153,7 +154,7 @@ public class AlignmentMarker {
      * Returns a fragment of HTML that defines the FONT
      * styles to be used in the alignment markup.
      * </p>
-     * 
+     *
      * <p>
      * For example:
      * <PRE>
@@ -169,7 +170,7 @@ public class AlignmentMarker {
      * @return String - the HTML
      */
     String getAlignmentStyles() {
-	 
+
 	 return oStyler.getAlignmentStyles();
      }
 
@@ -189,17 +190,17 @@ public class AlignmentMarker {
 	    System.err.println( "-->" + poAlignment[0] + "<--" );
 	    System.err.println( "-->" + poAlignment[1] + "<--" );
 	    System.err.println( "-->" + poAlignment[2] + "<--" );
-	    
+
 	    throw new IllegalArgumentException
 		( "Only accept array of three strings, all of same length" );
 	}
-	
+
 	if ( oStyler == null ) { // then no styles
 	    return;
 	}
 
 	// Initialise
-	
+
 	markedUp[0].setLength(0);
 	markedUp[1].setLength(0);
 	markedUp[2].setLength(0);
@@ -209,12 +210,12 @@ public class AlignmentMarker {
 	oCurrentStyle[2] = null;
 
 	// For each position
-	
+
 	for( int i= 0, n = poAlignment[0].length(); i < n ; i++) {
-		    
+
 	    String oFirst  = String.valueOf( poAlignment[0].charAt( i ) );
 	    String oSecond = String.valueOf( poAlignment[1].charAt( i ) );
-	    
+
 	    // Decide whether to apply colours.
 	    if ( oColourCommand.isColoured( oFirst, oSecond ) ) {
 		oStyler.getStyle( oFirst, oSecond,
@@ -230,19 +231,19 @@ public class AlignmentMarker {
 	    this.applyStyles( oCurrentStyle, oNewStyle, markedUp );
 
 	    markedUp[0].append( oFirst );
-	    markedUp[1].append( oSecond );	
-	    markedUp[2].append( poAlignment[2].charAt( i ) );	
- 
+	    markedUp[1].append( oSecond );
+	    markedUp[2].append( poAlignment[2].charAt( i ) );
+
 	    System.arraycopy( oNewStyle, 0, oCurrentStyle,
 			      0, oNewStyle.length );
-	    
+
 	} // for each char in sequence
 
 	this.flushStyles( oCurrentStyle, markedUp );
 
-	poAlignment[0] = markedUp[0].toString();
-	poAlignment[1] = markedUp[1].toString();
-	poAlignment[2] = markedUp[2].toString();
+	poAlignment[0] = markedUp[0].substring(0);
+	poAlignment[1] = markedUp[1].substring(0);
+	poAlignment[2] = markedUp[2].substring(0);
     }
 
 
@@ -251,10 +252,10 @@ public class AlignmentMarker {
      * seq2.
      *
      * @param poCurrentStyle a <code>String[]</code>
-     * @param poNewStyle a <code>String[]</code> 
+     * @param poNewStyle a <code>String[]</code>
      * @param poMarkedUp a <code>StringBuffer[]</code>
      */
-    private void applyStyles( String[] poCurrentStyle, 
+    private void applyStyles( String[] poCurrentStyle,
 			      String[] poNewStyle,
 			      StringBuffer[] poMarkedUp ) {
 
@@ -283,12 +284,12 @@ public class AlignmentMarker {
 	//
 	// If new style is null we just need to close the old style
 	// if it was different.
-	// 
+	//
 	//   else if the new style is different from the old
 	//     start a new style.
 	//
-	if ( poNewStyle == null ) { 
-		
+	if ( poNewStyle == null ) {
+
 	    if ( poCurrentStyle != null ) {
 		poOutput.append( "</FONT>" );
 	    }
@@ -298,19 +299,19 @@ public class AlignmentMarker {
 	    }
 	    // start a new one
 	    poOutput.append("<FONT CLASS=" + poNewStyle + ">");
-	} 
+	}
     }
 
     /**
      * If the last style is not null then close it.
-     * 
+     *
      */
     private void flushStyles( String[] poCurrentStyle,
                               StringBuffer[] poMarkedUp ) {
-	
+
 	for ( int i=0, n = poCurrentStyle.length; i < n ; i++ ) {
 	    if ( poCurrentStyle[i] != null ) { //then close
-		poMarkedUp[i].append( "</FONT>" );	    
+		poMarkedUp[i].append( "</FONT>" );
 	    }
 	}
     }

@@ -45,6 +45,7 @@ import org.biojava.utils.stax.*;
  * A segment of DNA fetched for a DAS reference server.
  *
  * @author Thomas Down
+ * @author Greg Cox
  * @since 1.2
  */
 
@@ -99,7 +100,7 @@ class DASRawSymbolList
 	return getRawSymbols().subStr(start, end);
     }
 
-    public void edit(Edit edit) 
+    public void edit(Edit edit)
         throws ChangeVetoException
     {
 	throw new ChangeVetoException("Can't edit sequence");
@@ -109,7 +110,7 @@ class DASRawSymbolList
 	if (rawSymbols == null) {
 	    try {
 		DAS.startedActivity(this);
-		
+
 		StringBuffer qb = new StringBuffer();
 		qb.append("dna?segment=");
 		qb.append(segment.getID());
@@ -119,14 +120,14 @@ class DASRawSymbolList
 		    qb.append(',');
 		    qb.append(segment.getStop());
 		}
-		URL dnaURL = new URL(sequence.getDataSourceURL(), qb.toString());
+		URL dnaURL = new URL(sequence.getDataSourceURL(), qb.substring(0));
 		HttpURLConnection huc = (HttpURLConnection) dnaURL.openConnection();
 		huc.setRequestProperty("Accept-Encoding", "gzip");
 
 		huc.connect();
 		// int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
 		int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
-		
+
 		if (status == 0)
 		    throw new BioRuntimeException("Not a DAS server");
 		else if (status != 200)
@@ -137,13 +138,13 @@ class DASRawSymbolList
 		sb.setName(sequence.getName());
 		SymbolTokenization sparser = DNATools.getDNA().getTokenization("token");
 		StreamParser ssparser = sparser.parseStream(sb);
-		
+
 		StAXContentHandler dnaHandler = new DNAHandler(ssparser);
 
 		// determine if I'm getting a gzipped reply
 		String contentEncoding = huc.getContentEncoding();
 		InputStream inStream = huc.getInputStream();
-		
+
 		if (contentEncoding != null) {
 		    if (contentEncoding.indexOf("gzip") != -1) {
 			// we have gzip encoding
@@ -151,7 +152,7 @@ class DASRawSymbolList
 			// System.out.println("gzip encoded dna!");
 		    }
 		}
-		
+
 		InputSource is = new InputSource(inStream);
 		is.setSystemId(dnaURL.toString());
 		XMLReader parser = DASSequence.nonvalidatingSAXParser();
@@ -212,7 +213,7 @@ class DASRawSymbolList
 	    }
 	}
 
-	public void characters(char[] ch, int start, int length) 
+	public void characters(char[] ch, int start, int length)
 	    throws SAXException
 	{
 	    try {

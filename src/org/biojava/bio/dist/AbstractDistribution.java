@@ -47,6 +47,7 @@ import org.biojava.bio.symbol.*;
  * @author Matthew Pocock
  * @author Thomas Down
  * @author Mark Schreiber (serialization support)
+ * @author Greg Cox
  */
 
 public abstract class AbstractDistribution
@@ -84,7 +85,7 @@ public abstract class AbstractDistribution
       nullModelForwarder = new Distribution.NullModelForwarder(this, changeSupport);
       getNullModel().addChangeListener(nullModelForwarder, Distribution.WEIGHTS);
     }
-    
+
     return changeSupport;
   }
 
@@ -239,7 +240,7 @@ public abstract class AbstractDistribution
       }
       throw new BioError(
         "Could not find a symbol to emit from alphabet " + getAlphabet() +
-        ". Do the probabilities sum to 1?" + "\np=" + p + "\n" + sb.toString()
+        ". Do the probabilities sum to 1?" + "\np=" + p + "\n" + sb.substring(0)
       );
     } catch (IllegalSymbolException ire) {
       throw new BioError(

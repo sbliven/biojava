@@ -19,6 +19,11 @@
  *
  */
 
+/**
+ * @author Primary aauthor unknown
+ * @author Greg Cox
+ */
+
 package org.biojava.bio.seq.db.biosql;
 
 import java.sql.*;
@@ -55,13 +60,13 @@ public class PostgreSQLDBHelper implements DBHelper {
 	sequenceName.append("_pk_seq");
 
 	Statement st = conn.createStatement();
-	ResultSet rs = st.executeQuery("select currval('" + sequenceName.toString() + "')");
+	ResultSet rs = st.executeQuery("select currval('" + sequenceName.substring(0) + "')");
 	int id = -1;
 	if (rs.next()) {
 	    id = rs.getInt(1);
 	}
 	st.close();
-	
+
 	if (id < 1) {
 	    throw new SQLException("Couldn't get last_insert_id()");
 	}

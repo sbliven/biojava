@@ -40,6 +40,7 @@ import org.xml.sax.*;
  * </p>
  *
  * @author Matthew Pocock
+ * @author Greg Cox
  * @since 1.2
  */
 
@@ -68,10 +69,10 @@ public abstract class BooleanElementHandlerBase extends StAXContentHandlerBase {
   ) throws SAXException {
     level--;
     if (level == 0) {
-      setBooleanValue("true".equals(data.toString()));
+      setBooleanValue("true".equals(data.substring(0)));
     }
   }
-  
+
   public void characters(char[] ch, int start, int end) throws SAXException {
     data.append(ch, start, end);
   }

@@ -34,6 +34,7 @@ import org.biojava.bio.*;
  * lengthed sequences and doesn't contain any gap-editing concepts.
  *
  * @author Matthew Pocock
+ * @author Greg Cox
  */
 public class SimpleAlignment
 extends AbstractSymbolList implements Alignment, Serializable {
@@ -41,15 +42,15 @@ extends AbstractSymbolList implements Alignment, Serializable {
   private List labels;
   private Alphabet alphabet;
   private int length;
-  
+
   public int length() {
     return length;
   }
-  
+
   public Alphabet getAlphabet() {
     return alphabet;
   }
-  
+
   public Symbol symbolAt(int index) {
     try {
       return alphabet.getSymbol(new ColAsList(index));
@@ -60,15 +61,15 @@ extends AbstractSymbolList implements Alignment, Serializable {
       );
     }
   }
-  
+
   public List getLabels() {
     return labels;
   }
-  
+
   public Symbol symbolAt(Object label, int column) {
     return symbolListForLabel(label).symbolAt(column);
   }
-  
+
   public Alignment subAlignment(Set labels, Location loc)
   throws NoSuchElementException {
     Map labelsToResList = new HashMap();
@@ -88,7 +89,7 @@ extends AbstractSymbolList implements Alignment, Serializable {
     }
     return new SimpleAlignment(labelsToResList);
   }
-  
+
   public SymbolList symbolListForLabel(Object label)
   throws NoSuchElementException {
     SymbolList rl = (SymbolList) labelToSymbolList.get(label);
@@ -97,7 +98,7 @@ extends AbstractSymbolList implements Alignment, Serializable {
     }
     return rl;
   }
-  
+
   /**
    * Generate an alignment from a list of SymbolLists.
    * <p>
@@ -110,7 +111,7 @@ extends AbstractSymbolList implements Alignment, Serializable {
   public SimpleAlignment(Map labelToResList) throws IllegalArgumentException {
     this.labels = Collections.unmodifiableList(new ArrayList(labelToResList.keySet()));
     this.labelToSymbolList = labelToResList;
-    
+
     int length = -1;
     List alphaList = new ArrayList();
     for(Iterator li = labels.iterator(); li.hasNext(); ) {
@@ -128,7 +129,7 @@ extends AbstractSymbolList implements Alignment, Serializable {
               sb.append("\n\t" + lab + " (" + symbolListForLabel(lab).length() + ")");
             }
             throw new IllegalArgumentException(
-              "All SymbolLists must be the same length: " + sb.toString()
+              "All SymbolLists must be the same length: " + sb.substring(0)
             );
           }
         }
@@ -142,33 +143,33 @@ extends AbstractSymbolList implements Alignment, Serializable {
         }
       }
     }
-    
+
     this.alphabet = AlphabetManager.getCrossProductAlphabet(alphaList);
     this.length = length;
   }
-  
-  /** 
+
+  /**
    * Makes a column of the alignment behave like a list.
    *
    * @author Matthew Pocock
    */
   private final class ColAsList extends AbstractList implements Serializable {
     private final int col;
-    
+
     public ColAsList(int col) {
       this.col = col;
     }
-    
+
     protected ColAsList() {
       this.col = 0;
     }
-    
+
     public Object get(int indx) {
       return symbolAt(labels.get(indx), col);
     }
-    
+
     public int size() {
       return labels.size();
     }
-  }    
+  }
 }

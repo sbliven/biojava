@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
  * A Helper class for parsing summary lines of Blast-like
  * output. For example:
  *
- * Y00365 Chinese hamster high mobility group prote...   246  1e-62 
+ * Y00365 Chinese hamster high mobility group prote...   246  1e-62
  *
  * The number of tokens from the right-hand side to collect
  * is specified by the calling method. In the above case,
@@ -48,6 +48,7 @@ import org.xml.sax.SAXException;
  * under the LGPL license.
  *
  * @author Cambridge Antibody Technology Group plc
+ * @author Greg Cox
  * @version 0.1
  *
  */
@@ -62,7 +63,7 @@ final class NcbiBlastSummaryLineHelper implements SummaryLineHelperIF{
      * L38477 Mus musculus (clone Clebp-1) high...   353  7e-95
      *
      * And parses it according to the following rules
-     * 
+     *
      * From the left, and tokenizing on white space, extracts the
      * first token (above, this would be "L38477") and places
      * it as a String in the object Buffer.
@@ -81,14 +82,14 @@ final class NcbiBlastSummaryLineHelper implements SummaryLineHelperIF{
     public void parse(String poLine, HashMap poMap,
 		      BlastLikeVersionSupport poVersion) throws SAXException {
 
-			     
+
 	int iGrab = 2;
 	int iCount;
 	StringBuffer oHitDescription = new StringBuffer();
 
 	StringTokenizer oSt = new StringTokenizer(poLine);
 
-	
+
 	//ncbi-blast all flavours - two tokens:
 	//first is score
 	//next is Evalue
@@ -96,7 +97,7 @@ final class NcbiBlastSummaryLineHelper implements SummaryLineHelperIF{
 
 	iGrab = 2;
 
-	
+
 	//populate Map...
 	iCount = oSt.countTokens() - iGrab - 1;
 	//first token is the hit id
@@ -107,7 +108,7 @@ final class NcbiBlastSummaryLineHelper implements SummaryLineHelperIF{
 	    oHitDescription.append(oSt.nextToken());
 	    oHitDescription.append(" ");
 	}
-	poMap.put("hitDescription",oHitDescription.toString());
+	poMap.put("hitDescription",oHitDescription.substring(0));
 
 	//now collect score and e-value
 	poMap.put("score",oSt.nextToken());

@@ -43,6 +43,7 @@ import org.biojava.bio.seq.io.*;
  * Company:      AgResearch<p>
  *
  * @author Mark Schreiber
+ * @author Greg Cox
  * @since 1.1
  */
 
@@ -206,7 +207,7 @@ public class PhredFormat implements SequenceFormat, Serializable {
           int val = ((IntegerAlphabet.IntegerSymbol)seq.symbolAt(i)).intValue();
           String s = Integer.toString(val);
           if((line.length() + s.length()) > lineWidth){
-            os.println(line.toString());
+            os.println(line.substring(0));
             line = new StringBuffer();
           }
           line.append(s + " ");

@@ -28,12 +28,12 @@ import org.xml.sax.SAXException;
  * A Helper class for parsing summary lines of Blast-like
  * output. For example:
  * <p>
- * GB_PR9:HUMPSULTRA  Begin: 1 End: 213 
+ * GB_PR9:HUMPSULTRA  Begin: 1 End: 213
  * !L25275 Human estrogen sulfotransferase mRNA, ...          381  e-103
  * <p>
  * The first token from the left side of the first line becomes
  * the start of the description.
- * For GCG, 2 tokens are taken from the right hand side of 
+ * For GCG, 2 tokens are taken from the right hand side of
  * the second line.  In the above case, the 2 right-most tokens
  * are 381 and e-103.
  * <p>
@@ -47,6 +47,7 @@ import org.xml.sax.SAXException;
  * under the LGPL license.
  *
  * @author Mayo Foundation
+ * @author Greg Cox
  * @version 0.1
  *
  */
@@ -61,14 +62,14 @@ final class GCGBlastSummaryLineHelper implements SummaryLineHelperIF {
     /**
      * GCG Summary lines come in pairs and look like this
      *
-     * GB_PR4:AK027092  Begin: 685 End: 988 
+     * GB_PR4:AK027092  Begin: 685 End: 988
      * !AK027092 Homo sapiens cDNA: FLJ23439 fis, clone...    504  e-140
      *
      * Because of the two lines per hit, there are two states
-     * for the helper to deal with.  
+     * for the helper to deal with.
      *
      * They are parsed according to the following rules:
-     * 
+     *
      * The first line becomes the beginning of the description.
      *
      * The second line is handled like this:
@@ -100,15 +101,15 @@ final class GCGBlastSummaryLineHelper implements SummaryLineHelperIF {
             oHitDescription= new StringBuffer();
         }
         StringTokenizer oSt = new StringTokenizer(poLine);
-    
+
         //GCG-blast all flavors - two tokens:
         //first is score
         //next is Evalue
-        //These tokens are on the seocnd line.  
+        //These tokens are on the seocnd line.
         //NOTE:  For GCG, if the next match is for the same
-        //Accession number then, the score and evalue are not 
+        //Accession number then, the score and evalue are not
         //repeated
-        
+
         if (!firstLine) {
             //populate Map...
             iCount = oSt.countTokens() - iGrab - 1;
@@ -116,18 +117,18 @@ final class GCGBlastSummaryLineHelper implements SummaryLineHelperIF {
             String hitID = oSt.nextToken();
             poMap.put("hitId",hitID);
             //oHitDescription.setLength(0);
-    
+
             for (int i = 0; i < iCount; i++) {
                 oHitDescription.append(oSt.nextToken());
                 oHitDescription.append(" ");
             }
-            poMap.put("hitDescription",oHitDescription.toString());
-    
-            //If the Previous hitID is the same as this, then 
+            poMap.put("hitDescription",oHitDescription.substring(0));
+
+            //If the Previous hitID is the same as this, then
             //GCG does not repeat the evalue.  So use the previous e-value
             //now collect score and e-value
             if (hitID.equals(previousHitID)) {
-            System.out.println("curr: " + hitID + " prev: " + previousHitID); 
+            System.out.println("curr: " + hitID + " prev: " + previousHitID);
 	            poMap.put("score",previousScore);
     	        poMap.put("expectValue",previousEValue);
     	    } else {
@@ -137,7 +138,7 @@ final class GCGBlastSummaryLineHelper implements SummaryLineHelperIF {
             	poMap.put("score",previousScore);
             	poMap.put("expectValue",previousEValue);
             }
-    
+
         } else {
             //initalize description
             oHitDescription.setLength(0);

@@ -67,6 +67,7 @@ import org.xml.sax.helpers.AttributesImpl;
  *</ul>
  *
  * @author Cambridge Antibody Technology (CAT)
+ * @author Greg Cox
  * @version 1.0
  *
  */
@@ -103,7 +104,7 @@ public class ClustalWAlignmentSAXParser extends AbstractNativeAppSAXParser {
      *
      * @param nil	 -
      */
-    public void parse(InputSource poSource ) 
+    public void parse(InputSource poSource )
 	throws IOException,SAXException {
 
 	BufferedReader            oContents;
@@ -162,7 +163,7 @@ public class ClustalWAlignmentSAXParser extends AbstractNativeAppSAXParser {
 			this.prefix("SequenceCollection")),
 				  (Attributes)oAtts);
 	    this.changeState(IN_STREAM);
-	}	    
+	}
 
 	if (iState == IN_STREAM) {
 
@@ -185,27 +186,27 @@ public class ClustalWAlignmentSAXParser extends AbstractNativeAppSAXParser {
 	//First token is sequence name
 	oSeqName = oSt.nextToken();
 	//System.out.println(oSeqName);
-	
+
 	oSeq.setLength(0);
         while (oSt.hasMoreTokens()) {
           oSeq.append(oSt.nextToken());
-        }     
+        }
 	//System.out.println(oSeq);
 
 	//At this point, have name of sequence, and a segment of the sequence
-	
+
 	//Update object...
-	
+
 	if (oAlignment.get(oSeqName) == null) {
 	    //Here if on first occurence of this sequence
 	    //Add to alignment
-	    oAlignment.put(oSeqName,oSeq.toString());
+	    oAlignment.put(oSeqName,oSeq.substring(0));
 	    //maintain ordered list of sequence names
 	    oSeqNameList.add(oSeqName);
 	} else {
 	    //Here if building up an existing sequence
 	    oTmpSeq = (String) oAlignment.get(oSeqName);
-	    oAlignment.put(oSeqName,oTmpSeq.concat(oSeq.toString()));
+	    oAlignment.put(oSeqName,oTmpSeq.concat(oSeq.substring(0)));
 	}
     }
 
@@ -228,7 +229,7 @@ public class ClustalWAlignmentSAXParser extends AbstractNativeAppSAXParser {
 
 	    //System.out.println("Irrelevant|"+poLine+"|");
 	    return false;
-	} 
+	}
 
 	//if here,line is part of alignment, so return true
 	return true;

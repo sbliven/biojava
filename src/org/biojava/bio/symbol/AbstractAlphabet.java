@@ -44,6 +44,7 @@ import org.biojava.bio.seq.io.*;
  * </p>
  *
  * @author Matthew Pocock
+ * @author Greg Cox
  * @since 1.1
  */
 public abstract class AbstractAlphabet
@@ -61,12 +62,12 @@ public abstract class AbstractAlphabet
     tokenizationsByName = new HashMap();
     ambCache = new HashMap();
   }
-  
+
 
   /**
    * To prevent duplication of a what should be a
    * single instance of an existing alphabet. This method
-   * was written as protected so that subclasses even from 
+   * was written as protected so that subclasses even from
    * other packages will inherit it. It should only be overridden
    * with care.
    */
@@ -80,7 +81,7 @@ public abstract class AbstractAlphabet
     }
 
   }
-  
+
   /**
    * <p>
    * Assigns a symbol parser to a String object.
@@ -93,7 +94,7 @@ public abstract class AbstractAlphabet
   public void putTokenization(String name, SymbolTokenization parser) {
     tokenizationsByName.put(name, parser);
   }
-  
+
   public SymbolTokenization getTokenization(String name)
 	throws NoSuchElementException, BioException
     {
@@ -115,7 +116,7 @@ public abstract class AbstractAlphabet
     }
 
   public final Symbol getAmbiguity(Set syms)
-      throws IllegalSymbolException 
+      throws IllegalSymbolException
   {
       if (syms.size() == 0) {
 	  return getGapSymbol();
@@ -129,7 +130,7 @@ public abstract class AbstractAlphabet
           for (Iterator i = syms.iterator(); i.hasNext(); ) {
             validate((Symbol) i.next());
           }
-          
+
           s = AlphabetManager.createSymbol(
 					      '*', Annotation.EMPTY_ANNOTATION,
 					      syms, this
@@ -139,7 +140,7 @@ public abstract class AbstractAlphabet
         return s;
       }
   }
-  
+
   public final Symbol getSymbol(List syms)
   throws IllegalSymbolException {
     if (syms.size() == 1) {
@@ -149,14 +150,14 @@ public abstract class AbstractAlphabet
     }
 
     List alphas = getAlphabets();
-    
+
     if(alphas.size() != syms.size()) {
       throw new IllegalSymbolException(
         "Can't retrieve symbol as symbol list is the wrong length " +
         syms.size() + ":" + alphas.size()
       );
     }
-    
+
     Iterator si = syms.iterator();
     Iterator ai = getAlphabets().iterator();
     int atomic = 0;
@@ -168,7 +169,7 @@ public abstract class AbstractAlphabet
         atomic++;
       }
     }
-    
+
     if(atomic == syms.size()) {
       return getSymbolImpl(syms);
     } else {
@@ -178,10 +179,10 @@ public abstract class AbstractAlphabet
       );
     }
   }
-  
+
   protected abstract AtomicSymbol getSymbolImpl(List symList)
   throws IllegalSymbolException;
-  
+
   protected abstract void addSymbolImpl(AtomicSymbol s)
   throws IllegalSymbolException, ChangeVetoException;
 
@@ -192,7 +193,7 @@ public abstract class AbstractAlphabet
         "You can not add null as a symbol to alphabet " + getName()
       );
     }
-    
+
     if(hasListeners()) {
       ChangeSupport cs = getChangeSupport(Alphabet.SYMBOLS);
       synchronized(cs) {
@@ -205,7 +206,7 @@ public abstract class AbstractAlphabet
       doAddSymbol(s);
     }
   }
-  
+
   private void doAddSymbol(Symbol s)
   throws IllegalSymbolException, ChangeVetoException {
     Alphabet sa = s.getMatches();
@@ -220,7 +221,7 @@ public abstract class AbstractAlphabet
       }
     }
   }
-  
+
   public final boolean contains(Symbol sym) {
     if(sym instanceof AtomicSymbol) {
       return containsImpl((AtomicSymbol) sym);
@@ -252,11 +253,11 @@ public abstract class AbstractAlphabet
       return true;
     }
   }
-  
+
   public final Symbol getGapSymbol() {
     return AlphabetManager.getGapSymbol(getAlphabets());
   }
-  
+
   public final void validate(Symbol sym)
   throws IllegalSymbolException {
     if(!contains(sym)) {
@@ -270,44 +271,44 @@ public abstract class AbstractAlphabet
         sb.append(((Symbol) i.next()).getName());
       }
       sb.append("}");*/
-        
+
       throw new IllegalSymbolException(
         "Symbol " + sym.getName() + " not found in alphabet " + this.getName() +
-        " " + sb.toString()
+        " " + sb.substring(0)
       );
     }
   }
-  
+
   protected abstract boolean containsImpl(AtomicSymbol s);
-  
+
   public boolean equals(Object o) {
     if(o == this) {
       return true;
     }
-    
+
     if(!(o instanceof FiniteAlphabet)) {
       return false;
     }
-    
+
     FiniteAlphabet that = (FiniteAlphabet) o;
-    
+
     if(this.size() != that.size()) {
       return false;
     }
-    
+
     for(Iterator i = that.iterator(); i.hasNext(); ) {
       if(!this.contains((AtomicSymbol) i.next())) {
         return false;
       }
     }
-    
+
     return true;
   }
-  
+
   public String toString() {
     return getName();
   }
-  
+
   protected AbstractAlphabet() {}
 }
 

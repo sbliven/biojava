@@ -40,6 +40,7 @@ import org.xml.sax.*;
  * </p>
  *
  * @author Matthew Pocock
+ * @author Greg Cox
  * @since 1.2
  */
 
@@ -69,13 +70,13 @@ public abstract class DoubleElementHandlerBase extends StAXContentHandlerBase {
     level--;
     if (level == 0) {
       try {
-        setDoubleValue(Double.parseDouble((data.toString()).trim()));
+        setDoubleValue(Double.parseDouble((data.substring(0)).trim()));
       } catch (NumberFormatException nfe) {
         throw new SAXException(nfe);
       }
     }
   }
-  
+
   public void characters(char[] ch, int start, int end) throws SAXException {
     data.append(ch, start, end);
   }

@@ -37,6 +37,7 @@ import org.xml.sax.*;
  *
  * @author David Huen
  * @author Hanning Ni     Doubletwist Inc
+ * @author Greg Cox
  */
 public class AGAVEBioSeqHandler
                extends StAXFeatureHandler
@@ -116,7 +117,7 @@ public class AGAVEBioSeqHandler
            if( c != ' '  && c != '\n' && c!= '\t')
               sb.append( c  );
        }
-       dna = DNATools.createDNA( sb.toString() );
+       dna = DNATools.createDNA( sb.substring(0) );
      }catch(Exception e){ e.printStackTrace() ; }
   }
 

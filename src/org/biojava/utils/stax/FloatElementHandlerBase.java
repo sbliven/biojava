@@ -36,6 +36,7 @@ import org.xml.sax.*;
  * and stores it in some variable.
  *
  * @author Matthew Pocock
+ * @author Greg Cox
  * @since 1.2
  */
 
@@ -65,13 +66,13 @@ public abstract class FloatElementHandlerBase extends StAXContentHandlerBase {
     level--;
     if (level == 0) {
       try {
-        setFloatValue(Float.parseFloat((data.toString()).trim()));
+        setFloatValue(Float.parseFloat((data.substring(0)).trim()));
       } catch (NumberFormatException nfe) {
         throw new SAXException(nfe);
       }
     }
   }
-  
+
   public void characters(char[] ch, int start, int end) throws SAXException {
     data.append(ch, start, end);
   }

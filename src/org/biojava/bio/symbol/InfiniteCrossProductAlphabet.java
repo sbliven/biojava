@@ -19,6 +19,10 @@
  *
  */
 
+/**
+ * @author Primary author unknown
+ * @author Greg Cox
+ */
 
 package org.biojava.bio.symbol;
 
@@ -42,11 +46,11 @@ class InfiniteCrossProductAlphabet
   InfiniteCrossProductAlphabet(List alphas) {
     this.alphas = alphas;
   }
-  
+
   public Symbol getAmbiguity(Set symSet) {
     throw new BioError("Not implemented yet");
   }
-  
+
   public String getName() {
     StringBuffer name = new StringBuffer("(");
     for (int i = 0; i < alphas.size(); ++i) {
@@ -57,7 +61,7 @@ class InfiniteCrossProductAlphabet
       }
     }
     name.append(")");
-    return name.toString();
+    return name.substring(0);
   }
 
   public boolean contains(Symbol s) {
@@ -77,15 +81,15 @@ class InfiniteCrossProductAlphabet
       }
     } else {
       AtomicSymbol cs = (AtomicSymbol) s;
-      
+
       List sl = cs.getSymbols();
       if(sl.size() != alphas.size()) {
         return false;
       }
-      
+
       Iterator ai = alphas.iterator();
       Iterator si = sl.iterator();
-      
+
       while(ai.hasNext() && si.hasNext()) {
         Alphabet aa = (Alphabet) ai.next();
         Symbol ss = (Symbol) si.next();
@@ -93,11 +97,11 @@ class InfiniteCrossProductAlphabet
           return false;
         }
       }
-      
+
       return true;
     }
   }
-  
+
   public void validate(Symbol s) throws IllegalSymbolException {
     if(!this.contains(s)) {
 	    throw new IllegalSymbolException(
@@ -115,7 +119,7 @@ class InfiniteCrossProductAlphabet
   public List getAlphabets() {
     return alphas;
   }
-  
+
   public Symbol getSymbol(List sList)
   throws IllegalSymbolException {
     if(sList.size() != alphas.size()) {
@@ -124,10 +128,10 @@ class InfiniteCrossProductAlphabet
         ":" + sList.size() + ")"
       );
     }
-    
+
     Iterator ai = alphas.iterator();
     Iterator si = sList.iterator();
-    
+
     while(ai.hasNext() && si.hasNext()) {
       Alphabet aa = (Alphabet) ai.next();
       Symbol ss = (Symbol) si.next();
@@ -139,14 +143,14 @@ class InfiniteCrossProductAlphabet
         );
       }
     }
-    
+
     return AlphabetManager.createSymbol('?', Annotation.EMPTY_ANNOTATION, sList, this);
   }
-  
+
   public Symbol getGapSymbol() {
     return AlphabetManager.getGapSymbol(getAlphabets());
   }
-  
+
   public SymbolTokenization getTokenization(String name)
   throws NoSuchElementException, BioException {
       if(name == "name") {

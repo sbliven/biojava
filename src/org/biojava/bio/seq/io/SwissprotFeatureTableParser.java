@@ -107,7 +107,7 @@ class SwissprotFeatureTableParser
 	    if (descBuf.length() > 0) {
 		featureTemplate.annotation = new SimpleAnnotation();
 		try {
-		    featureTemplate.annotation.setProperty(SwissprotProcessor.PROPERTY_SWISSPROT_FEATUREATTRIBUTE, descBuf.toString());
+		    featureTemplate.annotation.setProperty(SwissprotProcessor.PROPERTY_SWISSPROT_FEATUREATTRIBUTE, descBuf.substring(0));
 		} catch (ChangeVetoException ex) {
 		    throw new BioException(ex, "Couldn't alter annotation");
 		}

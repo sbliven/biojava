@@ -32,6 +32,7 @@ import java.util.List;
  * hotspots. It does not represent the raster image itself.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Greg Cox
  */
 public interface ImageMap
 {
@@ -118,7 +119,7 @@ public interface ImageMap
          * @param url a <code>URL</code> target.
          * @param coordinates an <code>Integer []</code> array of
          * hotspot coordinates, in order.
-         * @param userObject an <code>Object</code> 
+         * @param userObject an <code>Object</code>
          */
         public HotSpot(String type, URL url, Integer [] coordinates, Object userObject)
         {
@@ -250,7 +251,7 @@ public interface ImageMap
 
             sb.append("</map>");
 
-            return sb.toString();
+            return sb.substring(0);
         }
     }
 
@@ -303,7 +304,7 @@ public interface ImageMap
                 }
             }
 
-            return sb.toString().trim();
+            return sb.substring(0).trim();
         }
     }
 }

@@ -30,7 +30,7 @@ import java.util.*;
  * Makes an assumption that the gap character is '-',
  * should parameterize.
  *
- * 
+ *
  * Primary author -
  *                 Colin Hardman      (CAT)
  * Other authors  -
@@ -48,6 +48,7 @@ import java.util.*;
  * under the LGPL license.
  *
  * @author Cambridge Antibody Technology Group plc
+ * @author Greg Cox
  * @version 1.0
  */
 public class HTMLRenderer  {
@@ -75,7 +76,7 @@ public class HTMLRenderer  {
 
     private AlignmentMarker oAlignmentMarker;
 
-    private static String oJavaScriptDef 
+    private static String oJavaScriptDef
 	= "<script language=\"JavaScript\">\nfunction setStatus(msgStr) { \n status=msgStr;\n  document.retVal = true;\n}\n</script>";
 
     private char[] padding = new char[100];
@@ -95,7 +96,7 @@ public class HTMLRenderer  {
     private boolean wasEmpty = true;
 
     /**
-     * Creates an HTMLRenderer, that outputs the HTML to the specified 
+     * Creates an HTMLRenderer, that outputs the HTML to the specified
      * PrintWriter. <p>
      *
      * The style definition is expected to defines the following styles
@@ -112,7 +113,7 @@ public class HTMLRenderer  {
      *  <LI> summaryBodyLineOdd
      *  <LI> summaryBodyLineEven
      * </UL
-     * 
+     *
      * The Javascript function setStatus overrides status text for some links.
      *
      * The URLGeneratorFactory provides a list of objects that can convert a
@@ -120,17 +121,17 @@ public class HTMLRenderer  {
      * the ID to be parsed correctly.<B>
      * These URL's are used in two places, in the summary and detail sections.
      * The first URLGenerator is used for the summary, and all for the detail.
-     * 
+     *
      *
      * @param poPrintWriter - the output stream to write the HTML to.
      * @param poStyleDef - definition of styles, if null uses hard coded.
      * @param piAlignmentWidth width in characters of the alignment regions
      *                         of output
-     * @param poFactory <code>URLGeneratorFactory</code> provides an array of 
+     * @param poFactory <code>URLGeneratorFactory</code> provides an array of
      *                  <code>DatabaseURLGenerator</code>s, null for no links
-     * @param poAlignmentMarker - for configurable markup of alignments, 
+     * @param poAlignmentMarker - for configurable markup of alignments,
      *                            for no markup use null.
-     * @param poOptions properties of 
+     * @param poOptions properties of
      */
     public HTMLRenderer( PrintWriter poPrintWriter,
 			 String      poStyleDef,
@@ -145,7 +146,7 @@ public class HTMLRenderer  {
 
 	    oURLGeneratorList = poFactory.getDatabaseURLGenerators();
 	    if ( !oURLGeneratorList.isEmpty() ) {
-		oFirstURLGenerator 
+		oFirstURLGenerator
 		    = (DatabaseURLGenerator) oURLGeneratorList.get( 0 );
 	    }
 	}
@@ -154,7 +155,7 @@ public class HTMLRenderer  {
 	    throw new IllegalArgumentException
 		( "Alignment length must be > 0, not " + piAlignmentWidth );
 	}
-	
+
 	iAlignLen = piAlignmentWidth;
 	oStyleDef = poStyleDef ;
 
@@ -180,13 +181,13 @@ public class HTMLRenderer  {
 	// initialize other stuff
 	tAlternateSummary = false;
 	iSummaryCount =0;
-	tNeedComma = false;	
+	tNeedComma = false;
 	wasEmpty = true;
 
-	align.setLength( 0 ); 
-	alignMarkUp1.setLength( 0 ); 
-	alignMarkUp2.setLength( 0 ); 
-	pcDataBuffer.setLength( 0 ); 
+	align.setLength( 0 );
+	alignMarkUp1.setLength( 0 );
+	alignMarkUp2.setLength( 0 );
+	pcDataBuffer.setLength( 0 );
     }
 
     /**
@@ -252,7 +253,7 @@ public class HTMLRenderer  {
     public String getHeaderDefinitions() {
 
 	StringBuffer sb = new StringBuffer();
-	
+
 	sb.append("<STYLE TYPE=\"text/css\">\n");
 	sb.append("<!--\n");
 	sb.append( oStyleDef );
@@ -261,9 +262,9 @@ public class HTMLRenderer  {
  	}
 	sb.append( "-->\n</STYLE>\n" );
 	sb.append( oJavaScriptDef );
-	return sb.toString();
+	return sb.substring(0);
     }
-    
+
 
     /**
      * Called when first summary item is reached.
@@ -280,39 +281,39 @@ public class HTMLRenderer  {
      	out.println( "<td colspan=\"4\" class=\"titleLevel2\" align=\"left\">Overview of Results</td>" );
      	out.println( "</tr>" );
 	out.println( "</table>" );
-	
+
 	out.println( "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">" );
-	
+
  	out.println( "<td class=\"titleLevel3\" >" );
         out.println( "<table  width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">" );
  	out.println( "<tr> " );
-	
+
 	out.println( "<td class=\"titleLevel3\" width=\"40%\" align=\"left\" >Hit Id</td>" );
  	out.println( "<td class=\"titleLevel3\" width=\"60%\" align=\"left\">Hit Description</td>" );
- 	out.println( "</tr>" );	
+ 	out.println( "</tr>" );
 
  	out.println( "</table>" );
  	out.println( "</td> " );
 
 	if ( oHitSummary.readingFrame != null ) {
-	    out.println( "<td width=\"7%\" class=\"titleLevel3\" align=\"center\">Frame</td>" );	    
+	    out.println( "<td width=\"7%\" class=\"titleLevel3\" align=\"center\">Frame</td>" );
 	}
 
  	out.println( "<td width=\"7%\" class=\"titleLevel3\" align=\"center\">Score</td>" );
 
 	if ( oHitSummary.expectValue != null ) {
 	    out.println( "<td width=\"7%\" class=\"titleLevel3\" align=\"center\">E value</td>" );
-	} 
+	}
 	if ( oHitSummary.smallestSumProbability != null ) {
 	    out.println( "<td width=\"7%\" class=\"titleLevel3\" align=\"center\">P(N)</td>" );
-	} 
+	}
 	if ( oHitSummary.numberOfHSPs != null ) {
 	    out.println( "<td width=\"7%\" class=\"titleLevel3\" align=\"left\">HSPs</td>" );
-	} 
+	}
 	if ( oHitSummary.numberOfContributingHSPs != null ) {
 	    out.println( "<td width=\"7%\" class=\"titleLevel3\" align=\"center\">HSPs</td>" );
-	} 
-	
+	}
+
  	out.println( "</tr>" );
 	// start a new summary table
 	iSummaryCount = 10;
@@ -338,7 +339,7 @@ public class HTMLRenderer  {
 
 	out.print( "<td class=\"" );
 	if ( tAlternateSummary ) {
-	    out.print( "summaryBodyLineEven" ); 
+	    out.print( "summaryBodyLineEven" );
 	} else {
 	    out.print( "summaryBodyLineOdd" );
 	}
@@ -351,7 +352,7 @@ public class HTMLRenderer  {
 	out.print( "<td width=\"40%\" class=\"" );
 
 	if ( tAlternateSummary ) {
-	    out.print( "summaryBodyLineEven" ); 
+	    out.print( "summaryBodyLineEven" );
 	} else {
 	    out.print( "summaryBodyLineOdd" );
 	}
@@ -372,7 +373,7 @@ public class HTMLRenderer  {
 
 	out.print( "<td width=\"60%\" class=\"" );
 	if ( tAlternateSummary ) {
-	    out.print( "summaryBodyLineEven" ); 
+	    out.print( "summaryBodyLineEven" );
 	} else {
 	    out.print( "summaryBodyLineOdd" );
 	}
@@ -383,23 +384,23 @@ public class HTMLRenderer  {
 	this.writeContentChars( oHitSummary.oDesc.hitDescription );
 
 	out.println( "</a></td>" );
-	out.println( "</tr>" );	
-	
+	out.println( "</tr>" );
+
 	out.println( "</table>" );
  	out.println( "</td> " );
 
 	// reading frame
 	this.writeSummaryColumn( oHitSummary.readingFrame, "center" );
-	
+
 	// score
  	out.print( "<td width=\"7%\" align=\"center\" class=\"" );
  	if ( tAlternateSummary ) {
- 	    out.print( "summaryBodyLineEven" ); 
+ 	    out.print( "summaryBodyLineEven" );
  	} else {
- 	    out.print( "summaryBodyLineOdd" ); 
+ 	    out.print( "summaryBodyLineOdd" );
  	}
  	out.print( "\"><a href=\"#Anchor" );
- 	out.print( oHitSummary.oHitId.id );	
+ 	out.print( oHitSummary.oHitId.id );
  	out.print( "\" onMouseOver=\"setStatus('Jump to detailed results');return document.retVal\" onMouseOut=\"setStatus(' ');return document.retVal\">" );
  	out.print(  oHitSummary.score );
  	out.println( "</a></td>" );
@@ -412,7 +413,7 @@ public class HTMLRenderer  {
 	this.writeSummaryColumn( oHitSummary.numberOfHSPs, "center");
 	// numberOfContributingHSPs
 	this.writeSummaryColumn( oHitSummary.numberOfContributingHSPs, "center" );
-	out.println( "</tr>" );	
+	out.println( "</tr>" );
 
 	tAlternateSummary = !tAlternateSummary;
 	iSummaryCount ++;
@@ -430,12 +431,12 @@ public class HTMLRenderer  {
 	    out.print( poAlign );
 	    out.print( "\" class=\"" );
 	    if ( tAlternateSummary ) {
-		out.print( "summaryBodyLineEven" ); 
+		out.print( "summaryBodyLineEven" );
 	    } else {
-		out.print( "summaryBodyLineOdd" ); 
+		out.print( "summaryBodyLineOdd" );
 	    }
 	    out.print( "\">" );
-	    out.print( poValue );	
+	    out.print( poValue );
 	    out.println( "</td>" );
 	}
     }
@@ -491,7 +492,7 @@ public class HTMLRenderer  {
 	out.print( "<p>Sequence length of hit = " );
 	out.print( oDetailHit.sequenceLength);
 	out.println( "</span></td>" );
-	out.println( "<br>" );	
+	out.println( "<br>" );
 
 	if ( oURLGeneratorList != null && !oURLGeneratorList.isEmpty() ) {
 	    out.println( "<tr align=\"left\" valign=\"top\"> " );
@@ -504,7 +505,7 @@ public class HTMLRenderer  {
 
 		DatabaseURLGenerator oURLGenerator = ( DatabaseURLGenerator )
 		    oURLGeneratorList.get( i );
-		out.print( oURLGenerator.toLink( oDetailHit.oHitId.id, 
+		out.print( oURLGenerator.toLink( oDetailHit.oHitId.id,
 						 oOptions ));
 	    }
 	    out.println( "</p></td>" );
@@ -515,7 +516,7 @@ public class HTMLRenderer  {
 	//	out.println( "<br>" );
      }
 
-    
+
 
     /**
      * Utility for writing out each HSP info item, such as
@@ -563,11 +564,11 @@ public class HTMLRenderer  {
 
 	 if ( oHSPSummary.numberOfIdentities != null ||
 	      oHSPSummary.percentageIdentity != null ) {
-	     
+
 	     out.print( ", Identities&nbsp;=&nbsp;" );
 	     if ( oHSPSummary.numberOfIdentities != null ) {
 		 out.print( oHSPSummary.numberOfIdentities );
-		 
+
 		 if ( oHSPSummary.alignmentSize != null ) {
 		     out.print( "/" );
 		     out.print( oHSPSummary.alignmentSize );
@@ -583,11 +584,11 @@ public class HTMLRenderer  {
 
 	 if ( oHSPSummary.numberOfPositives != null ||
 	      oHSPSummary.percentagePositives != null ) {
-	     
+
 	     out.print( ", Positives&nbsp;=&nbsp;" );
 	     if ( oHSPSummary.numberOfPositives != null ) {
 		 out.print( oHSPSummary.numberOfPositives );
-		 
+
 		 if ( oHSPSummary.alignmentSize != null ) {
 		     out.print( "/" );
 		     out.print( oHSPSummary.alignmentSize );
@@ -602,17 +603,17 @@ public class HTMLRenderer  {
 	 }
 
 	 this.writeHSPInfo( "Length", oHSPSummary.alignmentSize );
-	 this.writeHSPInfo( "Query Frame", 
+	 this.writeHSPInfo( "Query Frame",
 			    this.toSign( oHSPSummary.queryFrame ) );
-	 this.writeHSPInfo( "Hit Frame", 
+	 this.writeHSPInfo( "Hit Frame",
 			    this.toSign( oHSPSummary.hitFrame ) );
-	 
+
 	 if ( oHSPSummary.queryFrame == null ) {
-	     this.writeHSPInfo( "Query Strand", 
+	     this.writeHSPInfo( "Query Strand",
 				this.toSign( oHSPSummary.queryStrand ) );
 	 }
 	 if ( oHSPSummary.hitFrame == null ) {
-	     this.writeHSPInfo( "Hit Strand", 
+	     this.writeHSPInfo( "Hit Strand",
 				this.toSign( oHSPSummary.hitStrand ));
 	 }
 
@@ -676,11 +677,11 @@ public class HTMLRenderer  {
 	align.append( this.padTo( piQueryStart, iMax) );
 
 	align.append( oFormattedSeq[0] );
-	align.append( "  ");	 
+	align.append( "  ");
 	align.append( this.padTo( piQueryStop, iMax) );
 
 	align.append( "\n");
-	
+
 	align.append( oConsensusPad );
 
 	align.append( oFormattedSeq[2] );
@@ -689,7 +690,7 @@ public class HTMLRenderer  {
 	align.append( this.padTo( piHitStart, iMax ) );
 
 	align.append( oFormattedSeq[1] );
-	align.append( "  ");	 
+	align.append( "  ");
 	align.append( this.padTo( piHitStop, iMax) );
 	align.append( "</span></PRE> " );
 	align.append( "\n");
@@ -700,7 +701,7 @@ public class HTMLRenderer  {
 	align.append( "</tr>" );
 	align.append( "\n");
 
-	return align.toString();
+	return align.substring(0);
     }
 
 
@@ -730,7 +731,7 @@ public class HTMLRenderer  {
 	while ( ( index = oAlignment.oHitSeq.seq.indexOf( '-', index+1 ) ) != -1 ) {
 	    iNumberOfHitGaps++;
 	}
-	
+
 	int iQStop = Integer.parseInt( oAlignment.oQuerySeq.stopPosition );
 	int iHStop = Integer.parseInt( oAlignment.oHitSeq.stopPosition );
 
@@ -747,7 +748,7 @@ public class HTMLRenderer  {
 
   	int iQueryMultiplier = (( iQStop  - iCurrentQueryStart ) + queryDirection)/
  	    ( iQueryLen - iNumberOfQueryGaps );
-	    
+
   	int iHitMultiplier   = (( iHStop - iCurrentHitStart ) + hitDirection )/
  	    ( iHitLen - iNumberOfHitGaps );
 
@@ -756,14 +757,14 @@ public class HTMLRenderer  {
 
 
 	//
-	// 
+	//
 	// Substring  ( i*iAlignLen, (i+1)*iAlignLen )
 	//
 	// Increment the end number by ( (iAlign-numberofgaps)* multiplier )
 	//
 	// The end check should be the current end number
 	//
-	    
+
 	while( ((i+1)*iAlignLen) < iQueryLen ) {
 
 	    String oCurrentQueryString =  oAlignment.oQuerySeq.seq.substring
@@ -774,9 +775,9 @@ public class HTMLRenderer  {
 	    iNumberOfQueryGaps = this.countNumberOfGaps( oCurrentQueryString );
 	    iNumberOfHitGaps   = this.countNumberOfGaps( oCurrentHitString );
 
-	    iCurrentQueryEnd = iCurrentQueryStart + 
+	    iCurrentQueryEnd = iCurrentQueryStart +
 		( ( iAlignLen - iNumberOfQueryGaps ) * iQueryMultiplier );
-	    iCurrentHitEnd =   iCurrentHitStart   + 
+	    iCurrentHitEnd =   iCurrentHitStart   +
 		(( iAlignLen - iNumberOfHitGaps   ) * iHitMultiplier );
 
 	    out.println( drawSubAlignment
@@ -787,10 +788,10 @@ public class HTMLRenderer  {
 			   oCurrentQueryString,
 			   oAlignment.oConsensus.substring
 			   ( i*iAlignLen, (i+1)*iAlignLen ) ,
-			   oCurrentHitString ) 
+			   oCurrentHitString )
 			 );
 	    i++;
-	    iCurrentQueryStart += ( ( iAlignLen - iNumberOfQueryGaps ) 
+	    iCurrentQueryStart += ( ( iAlignLen - iNumberOfQueryGaps )
 				    * iQueryMultiplier );
 	    iCurrentHitStart   += ( ( iAlignLen - iNumberOfHitGaps   )
 				    * iHitMultiplier );
@@ -798,7 +799,7 @@ public class HTMLRenderer  {
 	} // end while
 
 	if ( iQStop != iCurrentQueryEnd ) {
-	    
+
 	    iCurrentQueryEnd = iQStop;
 	    iCurrentHitEnd = iHStop;
 
@@ -811,10 +812,10 @@ public class HTMLRenderer  {
 					   oAlignment.oConsensus.substring
 					   ( i*iAlignLen ) ,
 					   oAlignment.oHitSeq.seq.substring
-					   ( i*iAlignLen ) ) 
+					   ( i*iAlignLen ) )
 			 );
 	}
-	
+
     }
 
     /**
@@ -844,7 +845,7 @@ public class HTMLRenderer  {
      * @return new <code>String</code>
      */
     private String toSign( String poString ) {
-	
+
 	String oSign = null;
 
 	if ( poString != null ) {
@@ -853,7 +854,7 @@ public class HTMLRenderer  {
 		if ( poString.length() > 4 ) {
 		    oSign = oSign.concat( poString.substring( 4 ));
 		}
-		
+
 	    } else if ( poString.startsWith( "minus" )) {
 		oSign = "-";
 		if ( poString.length() > 5 ) {
@@ -886,8 +887,8 @@ public class HTMLRenderer  {
 	pcDataBuffer.setLength( 0 );
 	pcDataBuffer.append( poInputString );
 	int iLength = ( pcDataBuffer.length() );
-    
-	for (int i = iLength; --i >= 0; ) { 
+
+	for (int i = iLength; --i >= 0; ) {
 	    if (  (pcDataBuffer.charAt(i) == '<') ) {
 		pcDataBuffer.deleteCharAt(i);
 		// then insert escape char to the LHS
@@ -903,18 +904,18 @@ public class HTMLRenderer  {
 	    } // end if
 	} // end for
 
-	return pcDataBuffer.toString();
+	return pcDataBuffer.substring(0);
     }
 
-    private String replace( String poInputString, 
+    private String replace( String poInputString,
 			    char pcCharToReplace,
 			    String poReplacementString ) {
-	
+
 	pcDataBuffer.setLength( 0 );
 	pcDataBuffer.append( poInputString );
 	int iLength = ( pcDataBuffer.length() );
-    
-	for (int i = iLength; --i >= 0; ) { 
+
+	for (int i = iLength; --i >= 0; ) {
 	    if (  pcDataBuffer.charAt(i) == pcCharToReplace ) {
 		pcDataBuffer.deleteCharAt(i);
 		// then insert escape char to the LHS
@@ -922,7 +923,7 @@ public class HTMLRenderer  {
 	    } // end if
 	} // end for
 
-	return pcDataBuffer.toString();
+	return pcDataBuffer.substring(0);
     }
 
 

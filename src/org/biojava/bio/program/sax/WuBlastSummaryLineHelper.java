@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
  * A Helper class for parsing summary lines of Wu-Blast
  * output. For example:
  *
- * Y00365 Chinese hamster high mobility group prote...   246  1e-62 
+ * Y00365 Chinese hamster high mobility group prote...   246  1e-62
  *
  * The number of tokens from the right-hand side to collect
  * is specified by the calling method. In the above case,
@@ -48,6 +48,7 @@ import org.xml.sax.SAXException;
  * under the LGPL license.
  *
  * @author Cambridge Antibody Technology Group plc
+ * @author Greg Cox
  * @version 0.1
  *
  */
@@ -62,7 +63,7 @@ final class WuBlastSummaryLineHelper implements SummaryLineHelperIF{
      * L38477 Mus musculus (clone Clebp-1) high...   353  7e-95
      *
      * And parses it according to the following rules
-     * 
+     *
      * From the left, and tokenizing on white space, extracts the
      * first token (above, this would be "L38477") and places
      * it as a String in the object Buffer.
@@ -100,7 +101,7 @@ final class WuBlastSummaryLineHelper implements SummaryLineHelperIF{
 	    //here if BLASTX, TBLASTN or TBLASTX
 	    iGrab = 4;
 	}
-	
+
 	//populate Map...
 	iCount = oSt.countTokens() - iGrab - 1;
 	//first token is the hit id
@@ -111,7 +112,7 @@ final class WuBlastSummaryLineHelper implements SummaryLineHelperIF{
 	    oHitDescription.append(oSt.nextToken());
 	    oHitDescription.append(" ");
 	}
-	poMap.put("hitDescription",oHitDescription.toString());
+	poMap.put("hitDescription",oHitDescription.substring(0));
 
 	//now collect values
 	if (iGrab == 4) {

@@ -40,6 +40,7 @@ import org.xml.sax.*;
  * </p>
  *
  * @author Matthew Pocock
+ * @author Greg Cox
  * @since 1.2
  */
 
@@ -69,13 +70,13 @@ public abstract class ByteElementHandlerBase extends StAXContentHandlerBase {
     level--;
     if (level == 0) {
       try {
-        setByteValue(Byte.parseByte(data.toString()));
+        setByteValue(Byte.parseByte(data.substring(0)));
       } catch (NumberFormatException nfe) {
         throw new SAXException(nfe);
       }
     }
   }
-  
+
   public void characters(char[] ch, int start, int end) throws SAXException {
     data.append(ch, start, end);
   }

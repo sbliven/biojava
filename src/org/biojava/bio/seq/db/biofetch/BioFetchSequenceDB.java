@@ -38,6 +38,7 @@ import org.biojava.bio.seq.io.*;
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author Greg Cox
  * @since 1.3
  */
 
@@ -50,7 +51,7 @@ public class BioFetchSequenceDB
     private final String prefix;
     private final String type;
     private final String db;
-    
+
     public BioFetchSequenceDB(String prefix,
 			      String type,
 			      String db)
@@ -64,7 +65,7 @@ public class BioFetchSequenceDB
 	return db;
     }
 
-    
+
     public void addSequence(Sequence seq)
         throws ChangeVetoException
     {
@@ -89,9 +90,9 @@ public class BioFetchSequenceDB
 	uri.append(db);
 	uri.append(";id=");
 	uri.append(id);
-	
+
 	try {
-	    HttpURLConnection huc = (HttpURLConnection) new URL(uri.toString()).openConnection();
+	    HttpURLConnection huc = (HttpURLConnection) new URL(uri.substring(0)).openConnection();
 	    huc.connect();
 	    BufferedReader data = new BufferedReader(new InputStreamReader(huc.getInputStream()));
 	    data.mark(1000);
@@ -109,7 +110,7 @@ public class BioFetchSequenceDB
 		} else {
 		    throw new BioException("Error fetching from BioFetch: firstLine");
 		}
-	    } 
+	    }
 
 	    data.reset();
 	    if ("embl".equals(type)) {

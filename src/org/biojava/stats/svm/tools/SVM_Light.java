@@ -12,6 +12,7 @@ import org.biojava.stats.svm.*;
 
 /**
  * @author Thomas Down
+ * @author Greg Cox
  */
 
 public class SVM_Light {
@@ -34,7 +35,7 @@ public class SVM_Light {
 	public SparseVector getVector() {
 	    return v;
 	}
-	
+
 	public double getLabel() {
 	    return label;
 	}
@@ -43,9 +44,9 @@ public class SVM_Light {
 	    return comment;
 	}
     }
-  
-    public static LabelledVector parseExample(String ex) 
-	throws NumberFormatException 
+
+    public static LabelledVector parseExample(String ex)
+	throws NumberFormatException
     {
 	String comment = null;
 	int hashPos = ex.indexOf('#');
@@ -56,7 +57,7 @@ public class SVM_Light {
 
 	StringTokenizer toke = new StringTokenizer(ex);
 	double label = Double.parseDouble(toke.nextToken());
-	
+
   	int size = toke.countTokens();
 	SparseVector v = new SparseVector(size);
 	while (toke.hasMoreTokens()) {
@@ -79,22 +80,22 @@ public class SVM_Light {
 
 	for (int i = 0; i < v.size(); ++i) {
 	    double x = v.getValueAtIndex(i);
-	    
+
 	    if (first) {
 		first = false;
 	    } else {
 		sb.append(' ');
 	    }
-      
+
 	    sb.append(v.getDimAtIndex(i));
 	    sb.append(':');
 	    sb.append(x);
 	}
-	return sb.toString();
+	return sb.substring(0);
     }
 
     public static SVMClassifierModel readModelFile(String fileName)
-	throws IOException 
+	throws IOException
     {
 	BufferedReader r = new BufferedReader(new FileReader(fileName));
 	String format = firstToken(r.readLine());
@@ -169,8 +170,8 @@ public class SVM_Light {
     } else {
       throw new IOException("Can't write SVM_Light file with kernel type " + k.getClass().toString());
     }
-	    
-	
+
+
     PrintWriter pw = new PrintWriter(new FileWriter(fileName));
     pw.println("SVM-light Version V3.01");
     pw.println("" + kType + " # kernel type");
@@ -187,7 +188,7 @@ public class SVM_Light {
         numSV++;
       }
     }
-      
+
     pw.println("" + numSV + " # number of support vectors");
     pw.println("" + model.getThreshold() + " # threshold b");
 
@@ -197,7 +198,7 @@ public class SVM_Light {
         continue;
       }
       pw.print(model.getAlpha(i));
-	    
+
       SparseVector v = (SparseVector) item;
       for (int j = 0; j <= v.maxIndex(); ++j) {
         double x = v.get(j);

@@ -47,6 +47,7 @@ import org.biojava.utils.ParserException;
  * <code>FastaSearchSAXParser</code>.</p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Greg Cox
  * @since 1.1
  */
 class FastaSearchParser
@@ -148,9 +149,9 @@ class FastaSearchParser
                 }
 
                 // Pass final data to handler
-                handler.addSubHitProperty("querySeqTokens",   querySeqTokens.toString());
-                handler.addSubHitProperty("subjectSeqTokens", subjectSeqTokens.toString());
-                handler.addSubHitProperty("matchTokens",      matchTokens.toString());
+                handler.addSubHitProperty("querySeqTokens",   querySeqTokens.substring(0));
+                handler.addSubHitProperty("subjectSeqTokens", subjectSeqTokens.substring(0));
+                handler.addSubHitProperty("matchTokens",      matchTokens.substring(0));
 
                 handler.endSubHit();
                 handler.endSearch();
@@ -310,9 +311,9 @@ class FastaSearchParser
                         searchStatus = INHIT;
 
                         // Pass data to handler
-                        handler.addSubHitProperty("querySeqTokens",   querySeqTokens.toString());
-                        handler.addSubHitProperty("subjectSeqTokens", subjectSeqTokens.toString());
-                        handler.addSubHitProperty("matchTokens",      matchTokens.toString());
+                        handler.addSubHitProperty("querySeqTokens",   querySeqTokens.substring(0));
+                        handler.addSubHitProperty("subjectSeqTokens", subjectSeqTokens.substring(0));
+                        handler.addSubHitProperty("matchTokens",      matchTokens.substring(0));
 
                         handler.endSubHit();
                         handler.startHit();
@@ -336,9 +337,9 @@ class FastaSearchParser
                         searchStatus = INHIT;
 
                         // Pass data to handler
-                        handler.addSubHitProperty("querySeqTokens",   querySeqTokens.toString());
-                        handler.addSubHitProperty("subjectSeqTokens", subjectSeqTokens.toString());
-                        handler.addSubHitProperty("matchTokens",      matchTokens.toString());
+                        handler.addSubHitProperty("querySeqTokens",   querySeqTokens.substring(0));
+                        handler.addSubHitProperty("subjectSeqTokens", subjectSeqTokens.substring(0));
+                        handler.addSubHitProperty("matchTokens",      matchTokens.substring(0));
 
                         handler.endSubHit();
                         handler.startHit();
@@ -355,9 +356,9 @@ class FastaSearchParser
                         searchStatus = NODATA;
 
                         // Pass final data to handler
-                        handler.addSubHitProperty("querySeqTokens",   querySeqTokens.toString());
-                        handler.addSubHitProperty("subjectSeqTokens", subjectSeqTokens.toString());
-                        handler.addSubHitProperty("matchTokens",      matchTokens.toString());
+                        handler.addSubHitProperty("querySeqTokens",   querySeqTokens.substring(0));
+                        handler.addSubHitProperty("subjectSeqTokens", subjectSeqTokens.substring(0));
+                        handler.addSubHitProperty("matchTokens",      matchTokens.substring(0));
 
                         handler.endSubHit();
                         handler.endSearch();
@@ -504,7 +505,7 @@ class FastaSearchParser
 
     private boolean parseHeaderLine(final String line,
                                     final Set    tokenSet)
-        throws ParserException      
+        throws ParserException
     {
         String [] data = parseLine(line, tokenSet);
 
@@ -521,7 +522,7 @@ class FastaSearchParser
 
     private boolean parseHitLine(final String line,
                                  final Set    tokenSet)
-        throws ParserException      
+        throws ParserException
     {
         String [] data = parseLine(line, tokenSet);
 

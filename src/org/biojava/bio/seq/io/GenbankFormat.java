@@ -665,7 +665,7 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
     {
 	if (!headerTag.equals(""))
 	{ // save tag and its text
-	    listener.addSequenceProperty(headerTag, headerTagText.toString());
+	    listener.addSequenceProperty(headerTag, headerTagText.substring(0));
 	    headerTag = "";
 	    headerTagText = new StringBuffer("");
 	}

@@ -248,7 +248,7 @@ public class SwissprotFileFormer implements SeqFileFormer
 	public String formatLocation(Feature theFeature)
 	{
 		StringBuffer toReturn = this.formatLocation(new StringBuffer(), theFeature.getLocation());
-		return toReturn.toString();
+		return toReturn.substring(0);
 	}
 
 // Public methods
@@ -301,7 +301,7 @@ public class SwissprotFileFormer implements SeqFileFormer
 					tempLocation.getOuterMax(), tempLocation.isMaxFuzzy());
 		}
 
-		return new StringBuffer(startPoint.toString() + " " + endPoint.toString());
+		return new StringBuffer(startPoint.substring(0) + " " + endPoint.substring(0));
 	}
 
 // Protected methods
@@ -375,7 +375,7 @@ public class SwissprotFileFormer implements SeqFileFormer
 
 			if(blockCount == 6)
 			{
-				returnList.add(tempString.toString());
+				returnList.add(tempString.substring(0));
 				tempString.setLength(0);
 				blockCount = 0;
 				blockIndex = 0;
@@ -391,7 +391,7 @@ public class SwissprotFileFormer implements SeqFileFormer
 		// Add the last line on
 		if(tempString.length() != 0)
 		{
-			returnList.add(tempString.toString());
+			returnList.add(tempString.substring(0));
 		}
 		return returnList;
 	}

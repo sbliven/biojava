@@ -31,6 +31,7 @@ import org.biojava.utils.*;
  * providing an apropreate implementatin of Map.
  *
  * @author Matthew Pocock
+ * @author Greg Cox
  */
 public abstract class AbstractAnnotation
   extends
@@ -45,7 +46,7 @@ public abstract class AbstractAnnotation
    * From code in the 1.2 version of AbstractAnnotation
    */
   protected abstract Map getProperties();
-  
+
   /**
    * A convenience method to see if we have allocated the properties
    * Map.
@@ -53,7 +54,7 @@ public abstract class AbstractAnnotation
    * @return true if the properties have been allocated, false otherwise
    */
   protected abstract boolean propertiesAllocated();
-  
+
 
   /**
    * @param key The key whose property to retrieve.
@@ -90,14 +91,14 @@ public abstract class AbstractAnnotation
     }
   }
 
-  public boolean containsProperty(Object key) {  
+  public boolean containsProperty(Object key) {
     if(propertiesAllocated()) {
       return getProperties().containsKey(key);
     } else {
       return false;
     }
   }
-  
+
   public Set keys() {
     if(propertiesAllocated()) {
       return getProperties().keySet();
@@ -119,7 +120,7 @@ public abstract class AbstractAnnotation
       sb.append("," + key + "=" + prop.get(key));
     }
     sb.append("}");
-    return sb.toString();
+    return sb.substring(0);
   }
 
   public Map asMap() {
@@ -169,7 +170,7 @@ public abstract class AbstractAnnotation
     }
   }
 
-    
+
   public int hashCode() {
     return asMap().hashCode();
   }
@@ -178,7 +179,7 @@ public abstract class AbstractAnnotation
     if (! (o instanceof Annotation)) {
       return false;
     }
-    
+
     return ((Annotation) o).asMap().equals(asMap());
   }
 }

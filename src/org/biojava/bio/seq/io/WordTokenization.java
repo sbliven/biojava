@@ -35,6 +35,7 @@ import org.biojava.bio.symbol.*;
  * either double-quotes ("), brackets (), or square brackets [].
  *
  * @author Thomas Down
+ * @author Greg Cox
  * @since 1.2
  */
 
@@ -45,7 +46,7 @@ public abstract class WordTokenization
     SymbolTokenization
 {
     private Alphabet alphabet;
- 
+
     public WordTokenization(Alphabet fab) {
 	this.alphabet = fab;
     }
@@ -77,19 +78,19 @@ public abstract class WordTokenization
 		sb.append(' ');
 	    }
 	}
-	return sb.toString();
+	return sb.substring(0);
     }
 
     public StreamParser parseStream(SeqIOListener siol) {
 	return new WordStreamParser(siol);
     }
 
-    protected List splitString(String str) 
-	throws IllegalSymbolException 
+    protected List splitString(String str)
+	throws IllegalSymbolException
     {
 	int ptr = 0;
 	List sl = new ArrayList();
-	
+
 	while (ptr < str.length()) {
 	    char c = str.charAt(ptr);
 	    if (Character.isSpace(c)) {
@@ -117,16 +118,16 @@ public abstract class WordTokenization
 			quoted = !quoted;
 		    }
 		} while (!Character.isSpace(nc));
-		
+
 		sl.add(str.substring(ptr, nextPtr));
 		ptr = nextPtr;
 	    }
 	}
-	
+
 	return sl;
     }
 
-    protected Symbol[] parseString(String s) 
+    protected Symbol[] parseString(String s)
         throws IllegalSymbolException
     {
 	List split = splitString(s);
@@ -152,7 +153,7 @@ public abstract class WordTokenization
 	public void close()
 	    throws IllegalSymbolException
 	{
-	    String str = sb.toString();
+	    String str = sb.substring(0);
 	    Symbol[] syms = parseString(str);
 	    try {
 		listener.addSymbols(alphabet, syms, 0, syms.length);

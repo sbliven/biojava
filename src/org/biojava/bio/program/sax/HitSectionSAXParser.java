@@ -48,6 +48,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * under the LGPL license.
  *
  * @author Cambridge Antibody Technology Group plc
+ * @author Greg Cox
  * @version 0.1
  *
  */
@@ -58,7 +59,7 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 
     private BufferedReader       oContents;
     private AttributesImpl       oAtts              = new AttributesImpl();
-    private QName                oAttQName          = new QName(this);     
+    private QName                oAttQName          = new QName(this);
     private char[]               aoChars;
     private char[]               aoLineSeparator;
     private String               oGlobalEndSignal;
@@ -87,13 +88,13 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
     this.setNamespacePrefix(poNamespacePrefix);
     //For XSLT Parser Compliance
     this.addPrefixMapping("biojava","http://www.biojava.org");
-    
+
     this.changeState(STARTUP);
     aoLineSeparator = System.getProperty("line.separator").toCharArray();
     }
 
     public void parse(BufferedReader poContents, String poLine,
-              String poEndSignal) 
+              String poEndSignal)
     throws SAXException {
 
         oLine = null;
@@ -123,14 +124,14 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 
 
             oLine = oContents.readLine();
-        
+
         } // end while
 
     } catch (java.io.IOException x) {
         System.out.println(x.getMessage());
         System.out.println("File read interupted");
     } // end try/catch
-    } 
+    }
     /**
      * Typically parse a single line, and return
      *
@@ -178,7 +179,7 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
                   (Attributes)oAtts);
 
         //Here, oStringBuffer contains ID + Description
-        oSt = new StringTokenizer(oStringBuffer.toString());
+        oSt = new StringTokenizer(oStringBuffer.substring(0));
 
         int iCount = oSt.countTokens();
 
@@ -216,7 +217,7 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
             this.startElement(new QName(this,this.prefix("HitDescription")),
                       (Attributes)oAtts);
 
-            aoChars = oDescription.toString().trim().toCharArray();
+            aoChars = oDescription.substring(0).trim().toCharArray();
             this.characters(aoChars,0,aoChars.length);
 
             this.endElement(new QName(this,this.prefix("HitDescription")));
@@ -285,12 +286,12 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
         this.outputHSPInfo();
         this.endElement(new QName(this,this.prefix("HSP")));
         }
-        
+
     } catch (java.io.IOException x) {
         System.out.println(x.getMessage());
         System.out.println("File read interupted");
     } // end try/catch
-    
+
     //Here at the end of dealing with HSPCollection
     //Could go on to next hit, or on to trailer...
 
@@ -364,7 +365,7 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 
         //Start accumulating all HSP summary information
         //into buffer...
-        
+
         oStringBuffer.setLength(0);
         oStringBuffer.append(poLine);
 
@@ -373,7 +374,7 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
         oBuffer.clear();
         oBuffer.add(poLine);
         this.changeState(IN_HSP_SUMMARY);
-        
+
         return;
     }
     //continue to accumulate summary info
@@ -390,7 +391,7 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
         //so don't output HSPSummary element info yet
 
         //Put available HSPSummary info into a Map
-        HSPSummaryHelper.parse(oStringBuffer.toString(),oMap,
+        HSPSummaryHelper.parse(oStringBuffer.substring(0),oMap,
                        oVersion);
 
         //really need to get alignment parsed before outputing
@@ -404,11 +405,11 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 
         oAlignmentBuffer.clear();
         oAlignmentBuffer.add(poLine);
-        
+
         return;
         } //end if found first line of alignment
-        //append summary 
-        
+        //append summary
+
         //ignore blank lines
         if (poLine.trim().equals("")) return;
 
@@ -476,7 +477,7 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
         //System.out.println(oMap.get(aoKeys[i]));
     }
 
-    
+
     this.startElement(new QName(this,this.prefix("HSPSummary")),
               (Attributes)oAtts);
     //Raw HSPSummary Data
@@ -504,7 +505,7 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
     //Output Alignment info via delegation to
     //a BlastLikeAlignmentSAXParser
 
-    oAlignmentParser = 
+    oAlignmentParser =
         new BlastLikeAlignmentSAXParser(this.getNamespacePrefix());
 
     oAlignmentParser.setContentHandler(oHandler);

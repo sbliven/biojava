@@ -87,6 +87,7 @@ import org.biojava.utils.ChangeVetoException;
  * </ul>
  *
  * @author Keith James
+ * @author Greg Cox
  * @since 1.2
  */
 public class BlastLikeSearchBuilder implements SearchBuilder
@@ -378,7 +379,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
 
             qStart = Math.min(qStart, subs[i].getQueryStart());
             qEnd   = Math.max(qEnd,   subs[i].getQueryEnd());
-            
+
             sStart = Math.min(sStart, subs[i].getSubjectStart());
             sEnd   = Math.max(sEnd,   subs[i].getSubjectEnd());
         }
@@ -521,13 +522,13 @@ public class BlastLikeSearchBuilder implements SearchBuilder
 
         tokenBuffer.setLength(0);
         tokenBuffer.append((String) subHitData.get("querySequence"));
-        labelMap.put(SeqSimilaritySearchSubHit.QUERY_LABEL, 
-                     new SimpleSymbolList(tokenParser, tokenBuffer.toString()));
+        labelMap.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
+                     new SimpleSymbolList(tokenParser, tokenBuffer.substring(0)));
 
         tokenBuffer.setLength(0);
         tokenBuffer.append((String) subHitData.get("subjectSequence"));
-        labelMap.put(hitData.get("HitId"), 
-                     new SimpleSymbolList(tokenParser, tokenBuffer.toString()));
+        labelMap.put(hitData.get("HitId"),
+                     new SimpleSymbolList(tokenParser, tokenBuffer.substring(0)));
 
         return new SequenceDBSearchSubHit(sc, ev, pv,
                                           qStart, qEnd, qStrand,

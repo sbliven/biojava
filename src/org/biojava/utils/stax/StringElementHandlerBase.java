@@ -34,6 +34,7 @@ import org.xml.sax.*;
  * and stores it in some variable.
  *
  * @author Thomas Down
+ * @author Greg Cox
  * @since 1.2
  */
 
@@ -63,11 +64,11 @@ public abstract class StringElementHandlerBase extends StAXContentHandlerBase {
     {
 	level--;
 	if (level == 0) {
-	    setStringValue(data.toString());
+	    setStringValue(data.substring(0));
 	}
     }
 
-    public void characters(char[] ch, int start, int length) 
+    public void characters(char[] ch, int start, int length)
         throws SAXException
     {
 	data.append(ch, start, length);

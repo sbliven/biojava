@@ -46,6 +46,7 @@ import org.xml.sax.Attributes;
  *</ul>
  *
  * @author Cambridge Antibody Technology (CAT)
+ * @author Greg Cox
  * @version 1.01
  *
  */
@@ -96,7 +97,7 @@ class BaseXMLWriterTestHelper {
         oStr.append((String)oElementStack.pop());
         oStr.append(">");
         tLastWritePCData = false;
-        return oStr.toString();
+        return oStr.substring(0);
     }
 
     private void increaseIndent()
@@ -106,7 +107,7 @@ class BaseXMLWriterTestHelper {
 
     public String indent()
     {
-        return oIndent.toString();
+        return oIndent.substring(0);
     }
 
     public String nl()
@@ -126,7 +127,7 @@ class BaseXMLWriterTestHelper {
         oStr.append(">");
         increaseIndent();
         tLastWritePCData = false;
-        return oStr.toString();
+        return oStr.substring(0);
     }
 
     public String startElement(String string, Attributes attributes)
@@ -150,7 +151,7 @@ class BaseXMLWriterTestHelper {
             oAttValue = attributes.getValue(i);
             oStr.append(" ");
             if (i > 0)
-                oStr.append(oSpaceStore.toString());
+                oStr.append(oSpaceStore.substring(0));
             oStr.append(oAttName);
             oStr.append("=\"");
             oStr.append(oAttValue);
@@ -163,7 +164,7 @@ class BaseXMLWriterTestHelper {
         oAttValue = attributes.getValue(i);
         oStr.append(" ");
         if (attributes.getLength() > 1)
-            oStr.append(oSpaceStore.toString());
+            oStr.append(oSpaceStore.substring(0));
         oStr.append(oAttName);
         oStr.append("=\"");
         oStr.append(oAttValue);
@@ -171,7 +172,7 @@ class BaseXMLWriterTestHelper {
         oStr.append(">");
         increaseIndent();
         tLastWritePCData = false;
-        return oStr.toString();
+        return oStr.substring(0);
     }
 
     public String writeEmptyElement(String string)
@@ -184,7 +185,7 @@ class BaseXMLWriterTestHelper {
         oStr.append(string);
         oStr.append("/>");
         tLastWritePCData = false;
-        return oStr.toString();
+        return oStr.substring(0);
     }
 
     public String writeEmptyElement(String string, Attributes attributes)
@@ -208,7 +209,7 @@ class BaseXMLWriterTestHelper {
         }
         oStr.append("/>");
         tLastWritePCData = false;
-        return oStr.toString();
+        return oStr.substring(0);
     }
 
     public String writeHeader()
@@ -216,7 +217,7 @@ class BaseXMLWriterTestHelper {
         oStr.setLength(0);
         oStr.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         tLastWritePCData = false;
-        return oStr.toString();
+        return oStr.substring(0);
     }
 
     public String writePCData(String poPCData)
@@ -224,6 +225,6 @@ class BaseXMLWriterTestHelper {
         oStr.setLength(0);
         oStr.append(poPCData);
         tLastWritePCData = true;
-        return oStr.toString();
+        return oStr.substring(0);
     }
 }

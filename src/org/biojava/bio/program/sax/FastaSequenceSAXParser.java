@@ -57,6 +57,7 @@ import org.xml.sax.helpers.AttributesImpl;
  *</ul>
  *
  * @author Cambridge Antibody Technology (CAT)
+ * @author Greg Cox
  * @version 1.0
  *
  */
@@ -66,7 +67,7 @@ public class FastaSequenceSAXParser extends AbstractNativeAppSAXParser {
 
     private AttributesImpl          oAtts     = new AttributesImpl();
     private ArrayList               oHeader   = new ArrayList();
-    private QName                   oAttQName = new QName(this);     
+    private QName                   oAttQName = new QName(this);
     private char[]                  aoChars;
 
     private StringBuffer            oSeqName  = new StringBuffer();
@@ -91,7 +92,7 @@ public class FastaSequenceSAXParser extends AbstractNativeAppSAXParser {
      *
      * @param nil	 -
      */
-    public void parse(InputSource poSource ) 
+    public void parse(InputSource poSource )
 	throws IOException,SAXException {
 
 	BufferedReader            oContents;
@@ -142,7 +143,7 @@ public class FastaSequenceSAXParser extends AbstractNativeAppSAXParser {
 			this.prefix("SequenceCollection")),
 				  (Attributes)oAtts);
 	    this.changeState(IN_STREAM);
-	}	    
+	}
 
 	if (iState == IN_STREAM) {
 	    //look for the start of first record i.e.a header
@@ -168,7 +169,7 @@ public class FastaSequenceSAXParser extends AbstractNativeAppSAXParser {
     private void parseHeaderLine(String poLine) {
 	oSeqName.setLength(0);
 	oSeqName.append(poLine.substring(1));
-	
+
 	//flip flag to begin emitting sequence elements
 	tOnFirst = false;
 	//System.out.println(oSeqName);
@@ -183,7 +184,7 @@ public class FastaSequenceSAXParser extends AbstractNativeAppSAXParser {
 	StringTokenizer oSt = new StringTokenizer(poLine,"\n\t\r ");
         while (oSt.hasMoreTokens()) {
           oSeq.append(oSt.nextToken());
-        }     
+        }
     }
     /**
      * Describe <code>emitSequence</code> method here.
@@ -196,14 +197,14 @@ public class FastaSequenceSAXParser extends AbstractNativeAppSAXParser {
 	    oAtts.addAttribute(oAttQName.getURI(),
 			   oAttQName.getLocalName(),
 			   oAttQName.getQName(),
-			   "CDATA",oSeqName.toString());
+			   "CDATA",oSeqName.substring(0));
 
 	    this.startElement(
 	      new QName(this,
 			this.prefix("Sequence")),
 				  (Attributes)oAtts);
 
-	    aoChars = oSeq.toString().toCharArray();
+	    aoChars = oSeq.substring(0).toCharArray();
 	    this.characters(aoChars,0,aoChars.length);
 	    this.endElement(new QName(this,this.prefix("Sequence")));
 

@@ -71,6 +71,7 @@ import org.biojava.utils.ChangeVetoException;
  * processing.</p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Greg Cox
  * @since 1.2
  */
 public class SimilarityPairBuilder implements SearchContentHandler
@@ -405,12 +406,12 @@ public class SimilarityPairBuilder implements SearchContentHandler
             tokenBuffer.setLength(0);
             tokenBuffer.append((String) subHitData.get("querySequence"));
             labelMap.put(SimilarityPairFeature.QUERY_LABEL,
-                         new SimpleSymbolList(tokenParser, tokenBuffer.toString()));
+                         new SimpleSymbolList(tokenParser, tokenBuffer.substring(0)));
 
             tokenBuffer.setLength(0);
             tokenBuffer.append((String) subHitData.get("subjectSequence"));
             labelMap.put(SimilarityPairFeature.SUBJECT_LABEL,
-                         new SimpleSymbolList(tokenParser, tokenBuffer.toString()));
+                         new SimpleSymbolList(tokenParser, tokenBuffer.substring(0)));
 
             double score = 0.0;
             if (subHitData.containsKey("score"))

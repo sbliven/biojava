@@ -38,8 +38,8 @@ import java.awt.Color;
  * </p>
  *
  * <p>
- * So high scoring matches will be dark blue and large negative scoring 
- * pairs will result in dark red. Scores in the middle will have a hue 
+ * So high scoring matches will be dark blue and large negative scoring
+ * pairs will result in dark red. Scores in the middle will have a hue
  * between red and blue and be very pale.
  * </p>
  *
@@ -79,6 +79,7 @@ import java.awt.Color;
  * </p>
  *
  * @author Cambridge Antibody Technology Group plc
+ * @author Greg Cox
  * @version 1.0
  */
 class BlastMatrixAlignmentStyler extends SimpleAlignmentStyler {
@@ -92,11 +93,11 @@ class BlastMatrixAlignmentStyler extends SimpleAlignmentStyler {
     public BlastMatrixAlignmentStyler() {
 
 	super( SimpleAlignmentStyler.SHOW_ALL );
-	
+
 	super.readColourMap();
 
 	String oPropFilename = System.getProperty("blastMatrix");
-    
+
 	if( oPropFilename == null ) {
             System.err.println
 		("No blast matrix specified " +
@@ -135,7 +136,7 @@ class BlastMatrixAlignmentStyler extends SimpleAlignmentStyler {
 
  	    FileReader oFileReader = new FileReader( oFile );
  	    in = new BufferedReader( oFileReader );
-	    
+
  	    StringBuffer sb = new StringBuffer();
  	    String oLine = in.readLine();
 
@@ -144,16 +145,16 @@ class BlastMatrixAlignmentStyler extends SimpleAlignmentStyler {
  	    int iCurrent = 0;
 
 	    // 	     assuming a symmetrical layout to matrix
-	    
+
  	    while( oLine != null ) {
-		
+
  		if ( oLine.startsWith( "#" ) || oLine.trim().equals("") )
-		    
+
 		    { // skip comments
 			oLine = in.readLine();
 			continue;
  		}
-		
+
  		if ( isFirst ) {
 		    //     read header
  		    StringTokenizer st = new StringTokenizer( oLine );
@@ -219,7 +220,7 @@ class BlastMatrixAlignmentStyler extends SimpleAlignmentStyler {
  		    iMatchMax = iCurrent;
  		}
  	    }
- 	}  //end for 
+ 	}  //end for
 
  	int iRange = iMatchMax - iMatchMin;
 
@@ -244,41 +245,41 @@ class BlastMatrixAlignmentStyler extends SimpleAlignmentStyler {
 		dNorm = dNorm * 0.33;
 		// create saturation weighting
 		float var = (float) (( dNorm- (0.33/2) ) *( dNorm- (0.33/2)));
-		//	 create colour 
-  		Color oColor = Color.getHSBColor( (float)1.00 - (float)dNorm, 
-						  (float)0.0 + (var*20), 
+		//	 create colour
+  		Color oColor = Color.getHSBColor( (float)1.00 - (float)dNorm,
+						  (float)0.0 + (var*20),
   						  (float)1.00    );
  		 // convert to hex
  		String oColourString = this.toHex( oColor );
-	    
+
  		String oColourClass  = getColourClass
  		    ( oColourString );
 
  		oColourMap.put( "!".concat( aoChars[i].concat( aoChars[j] ) ),
 				oColourClass );
  	    }
- 	}// end for 	
+ 	}// end for
 
     }
-    
+
 
     private String toHex( Color poColor ) {
 
 	StringBuffer sb = new StringBuffer( 7 );
 	sb.append( padHex(Integer.toHexString( poColor.getRed())) );
 	sb.append( padHex(Integer.toHexString( poColor.getGreen())) );
-	sb.append( padHex(Integer.toHexString( poColor.getBlue()) ));   
+	sb.append( padHex(Integer.toHexString( poColor.getBlue()) ));
 
-	return sb.toString();
+	return sb.substring(0);
     }
-    
+
     private String padHex( String poHex ) {
         if ( poHex.length() == 1 ) {
             return "0".concat( poHex );
         } else {
             return poHex;
         }
-    }  
+    }
 
     /**
      * <p>
@@ -298,8 +299,8 @@ class BlastMatrixAlignmentStyler extends SimpleAlignmentStyler {
 			  String[] poStyleHolder ) {
 
 
-	poStyleHolder[0] = (String)oColourMap.get( poFirst );	    
-	poStyleHolder[1] = (String)oColourMap.get( poSecond );	    
+	poStyleHolder[0] = (String)oColourMap.get( poFirst );
+	poStyleHolder[1] = (String)oColourMap.get( poSecond );
 
 	poStyleHolder[2] = (String)oColourMap.get( "!".concat(poFirst).concat
 						   (poSecond) );

@@ -48,6 +48,7 @@ import org.xml.sax.SAXException;
  * under the LGPL license.
  *
  * @author Cambridge Antibody Technology Group plc
+ * @author Greg Cox
  * @version 0.1
  *
  */
@@ -62,7 +63,7 @@ final class HmmerSummaryLineHelper implements SummaryLineHelperIF{
      * fr|3|ui|376298|db|507116|gi|1262483|gb|D83810     118.7    2.9e-30   1
      *
      * And parses it according to the following rules
-     * 
+     *
      * From the left, and tokenizing on white space, extracts the
      * first token (above, this would be "L38477") and places
      * it as a String in the object Buffer.
@@ -102,7 +103,7 @@ final class HmmerSummaryLineHelper implements SummaryLineHelperIF{
 
 	iGrab = 3;
 
-	
+
 	//populate Map...
 	iCount = oSt.countTokens() - iGrab - 1;
 	//first token is the hit id
@@ -113,7 +114,7 @@ final class HmmerSummaryLineHelper implements SummaryLineHelperIF{
 	    oHitDescription.append(oSt.nextToken());
 	    oHitDescription.append(" ");
 	}
-	poMap.put("hitDescription",oHitDescription.toString());
+	poMap.put("hitDescription",oHitDescription.substring(0));
 
 	poMap.put("score",oSt.nextToken());
 	poMap.put("expectValue",oSt.nextToken());

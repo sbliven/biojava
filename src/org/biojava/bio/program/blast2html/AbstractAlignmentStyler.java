@@ -58,6 +58,7 @@ import java.util.Iterator;
  * </p>
  *
  * @author Cambridge Antibody Technology Group plc
+ * @author Greg Cox
  * @version 1.0
  *
  */
@@ -118,7 +119,7 @@ public abstract class AbstractAlignmentStyler implements AlignmentStyler {
      * Returns a fragment of HTML that defines the FONT
      * styles to be used in the alignment markup.
      * </p>
-     * 
+     *
      * <p>
      * For example:
      * <PRE>
@@ -149,7 +150,7 @@ public abstract class AbstractAlignmentStyler implements AlignmentStyler {
 	}
 
 	//	sb.append( "-->\n</STYLE>\n" );
-	return sb.toString();
+	return sb.substring(0);
     }
 
     /**
@@ -169,7 +170,7 @@ public abstract class AbstractAlignmentStyler implements AlignmentStyler {
     public abstract void getStyle( String poFirst, String poSecond,
 				   String[] poStyleHolder );
 
-    
+
     /**
      * Add a colour style to this Styler.
      *
@@ -178,7 +179,7 @@ public abstract class AbstractAlignmentStyler implements AlignmentStyler {
      *                 ( R = FF, G = A2 and B = A2 )
      */
     public void addStyle ( String poChar, String poColour ) {
-	
+
 	String oColourClass  = this.getColourClass
 	    ( poColour );
 
@@ -204,7 +205,7 @@ public abstract class AbstractAlignmentStyler implements AlignmentStyler {
 	if ( oColourClass == null ) {
 	    // otherwise create a new one
 	    oColourClass  = "C" + iNumberOfColours + "-S" ;
-	
+
 	    StringBuffer sb = new StringBuffer( 50 );
 
 	    sb.append ( "FONT." );
@@ -213,9 +214,9 @@ public abstract class AbstractAlignmentStyler implements AlignmentStyler {
 	    sb.append ( poColour );
 	    sb.append ( ";color:#000000}\n" );
 
-	    oColourSet.add( sb.toString() );
+	    oColourSet.add( sb.substring(0) );
 	    oColourClassMap.put( poColour, oColourClass );
-	
+
 	    iNumberOfColours++;
 	}
 	return oColourClass;

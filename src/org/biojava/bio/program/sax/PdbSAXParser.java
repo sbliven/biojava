@@ -30,7 +30,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * A SAX2 parser for dealing with native PDB files.  That is,
- * this class allows native PDB format files to be processed 
+ * this class allows native PDB format files to be processed
  * as if they were in PdbXML format, but without an interconversion
  * step.  That is, events are generated that call methods
  * on an XML document handler.
@@ -56,6 +56,7 @@ import org.xml.sax.helpers.AttributesImpl;
  *
  *
  * @author Cambridge Antibody Technology (CAT)
+ * @author Greg Cox
  * @version 0.8
  *
  */
@@ -70,7 +71,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 
     private AttributesImpl          oAtts     = new AttributesImpl();
     private ArrayList               oHeader   = new ArrayList();
-    private QName                   oAttQName = new QName(this);     
+    private QName                   oAttQName = new QName(this);
 
     /**
      * Sets namespace prefix to "biojava"
@@ -78,7 +79,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
     public PdbSAXParser() {
 	this.setNamespacePrefix("biojava");
     }
-  
+
     public void parse (String poURI) throws IOException,SAXException {
 	this.parse(new InputSource(poURI));
     }
@@ -87,7 +88,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
      *
      * @param nil	 -
      */
-    public void parse(InputSource poSource ) 
+    public void parse(InputSource poSource )
 	throws IOException,SAXException {
 
 	BufferedReader            oContents;
@@ -107,21 +108,21 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 		//System.out.println(oLine);
 		oLine = oContents.readLine();
 	    } // end while
-	    
+
 	    //-----------------------
 
 	    //At this point, have the entire raw file in core memory.
 	    //Now parse it and fire of relevant events
-	    
+
 	    //First preprocess file
 
 	    //Rule
 	    //If there are no model records, then insert records
 	    //for a single model.  MODEL record before first ATOM,
 	    //ENDMDL and before, CONECT, MASTER, END
-		
+
 	    boolean tIsModel = false;
-	    
+
 	    for (int i = 0; i < oRecordList.size(); i++) {
 		oRecord = (String)oRecordList.get(i);
 		if (oRecord.startsWith("MODEL")) {
@@ -135,7 +136,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 		//System.out.println("No MODEL records");
 		for (int i = 0; i < oRecordList.size(); i++) {
 		    oRecord = (String)oRecordList.get(i);
-	  
+
 		    if ( ((oRecord.startsWith("ATOM  ")) ||
 			  (oRecord.startsWith("HETATM")))  &&
 			(!tFoundFirstAtom))             {
@@ -151,12 +152,12 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 		boolean tFoundLastAtom = false;
 		for (int i = oRecordList.size() - 1; i > 0; i--) {
 		    oRecord = (String)oRecordList.get(i);
-	  
+
 		    if ( ((oRecord.startsWith("ATOM  ")) ||
 			  (oRecord.startsWith("HETATM")) ||
 			  (oRecord.startsWith("TER")  )) &&
 			 (!tFoundLastAtom))                 {
-			
+
 			tFoundLastAtom = true;
 
 			//System.out.println("Found last atom>"+i+"<");
@@ -191,8 +192,8 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 	    //need this for multiple passes through
 	    //to get protein, dna, solvent etc.
 
-	    iModelStart = 0;  
-	    iModelStop = 0;  
+	    iModelStart = 0;
+	    iModelStop = 0;
 	    String oModelId;
 	    String oStructureId;
 	    while (iPos < oRecordList.size()) {
@@ -237,10 +238,10 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 		if (oRecord.startsWith("ENDMDL")) {
 		    //keep position of the end of this model
 		    iModelStop = iPos;
-	  
+
 		    //at this point have start and end positions
 		    //of current model
-			
+
 		    //do multiple passes for each type of molecule
 
 		    //parse protein for this model...
@@ -269,7 +270,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 					      this.prefix("ProteinChainList")));
 
 		    //todo parse solvent, dna etc.
-			
+
 		    //having parsed all content, end model
 		    this.endElement(new QName(this,this.prefix("MolecularStructure")));
 
@@ -296,14 +297,14 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
      *
      * @param nil	 -
      */
-    private void parseProtein(int piStart, int piStop) 
+    private void parseProtein(int piStart, int piStop)
 	throws SAXException {
-    
+
 	String oChainId;
-    
+
 	String oAtomId;
 	String oAtomType;
-    
+
 	String  oResidueId;
 	String  oResidueType;
 
@@ -331,7 +332,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 	    if ( (oRecord.startsWith("ATOM  ")) ||
 		 (oRecord.startsWith("HETATM"))  ) {
 		//System.out.println(">"+oRecord.substring(17,20)+"<");
-	
+
 		oAtomId = oRecord.substring(6,11).trim();
 		oAtomType = oRecord.substring(12,16).trim();
 
@@ -339,7 +340,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 
 		//go straight to next atom if this one not protein
 		if (!checkIfProtein(oResidueType)) continue;
-	    
+
 		//assign varables from ATOM record
 		oChainId = oRecord.substring(21,23).trim();
 		oResidueId = oRecord.substring(23,27).trim();
@@ -350,7 +351,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 
 		oOccupancy = oRecord.substring(54,60).trim();
 		oTemperatureFactor = oRecord.substring(60,66).trim();
-		
+
 		oElement = oRecord.substring(76,78).trim();
 
 		//check new residue event
@@ -418,7 +419,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 				   oAttQName.getLocalName(),
 				   oAttQName.getQName(),
 				   "CDATA",oAtomType);
-		
+
 		if ( ! oElement.equals("") ) {
 		    oAttQName.setQName("element");
 		    oAtts.addAttribute(oAttQName.getURI(),
@@ -432,7 +433,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 				   oAttQName.getLocalName(),
 				   oAttQName.getQName(),
 				   "CDATA",oOccupancy);
-		
+
 		oAttQName.setQName("temperatureFactor");
 		oAtts.addAttribute(oAttQName.getURI(),
 				   oAttQName.getLocalName(),
@@ -455,7 +456,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 				   oAttQName.getLocalName(),
 				   oAttQName.getQName(),
 				   "CDATA",oY);
-		
+
 		oAttQName.setQName("z");
 		oAtts.addAttribute(oAttQName.getURI(),
 				   oAttQName.getLocalName(),
@@ -472,7 +473,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 
 	    }
 	}
-    
+
     }
 
 
@@ -487,7 +488,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
     private void parseAtomRecord(String poRecord) {
 
 	String oChainId;
-    
+
 	String oAtomId;
 	String oAtomType;
 
@@ -540,7 +541,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 
 	if (poValue.equals("")) {
 	    return "missing";
-	} 
+	}
 
 	return poValue;
     }
@@ -584,7 +585,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 
 	oBuff.append(aoInsert);
 
-	return oBuff.toString();
+	return oBuff.substring(0);
     }
-  
+
 }

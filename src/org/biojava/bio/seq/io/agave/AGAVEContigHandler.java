@@ -35,6 +35,7 @@ import org.xml.sax.*;
  *
  * Handles the AGAVE &lt;contig&gt; element
  * @author Hanning Ni    Doubletwist Inc
+ * @author Greg Cox
  */
 public class AGAVEContigHandler
                extends StAXFeatureHandler  implements AGAVEContigCallbackItf, SequenceHandler
@@ -101,7 +102,7 @@ public class AGAVEContigHandler
            if( c != ' '  && c != '\n' && c!= '\t')
               sb.append( c  );
        }
-     this.dna = DNATools.createDNA( sb.toString() );
+     this.dna = DNATools.createDNA( sb.substring(0) );
      }catch(Exception e){
        e.printStackTrace( );
      }

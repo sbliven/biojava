@@ -30,7 +30,7 @@ import org.biojava.bio.*;
  * A complex location. It is made up from multiple sub-locations and is essentially
  * the point-wise union of the child locations.
  * </p>
- * 
+ *
  * <p>
  * <strong>NOTE:</strong> It is no longer possible to directly construct
  * CompoundLocations.  Use LocationTools.union instead.
@@ -38,6 +38,7 @@ import org.biojava.bio.*;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ * @author Greg Cox
  */
 public class CompoundLocation
 extends AbstractLocation
@@ -64,7 +65,7 @@ implements Location, Serializable {
   {
     locations = new ArrayList();
   }
-  
+
   /**
    * <p>
    * Generate a new CompoundLocation from a list of locations.
@@ -85,14 +86,14 @@ implements Location, Serializable {
    */
   CompoundLocation(List locs) {
     Location minL = (Location) locs.get(0);
-    Location maxL = (Location) locs.get(locs.size() - 1);    
+    Location maxL = (Location) locs.get(locs.size() - 1);
     this.locations.addAll(locs);
     Collections.sort(locations, Location.naturalOrder);
 
     this.min = minL.getMin();
     this.max = maxL.getMax();;
   }
-  
+
 
   public int getMin() {
     return min;
@@ -111,7 +112,7 @@ implements Location, Serializable {
     while (m >= n) {
 	int i = (m + n) / 2;
 	Location l = (Location) locations.get(i);
-	
+
 	if (p < l.getMin()) {
 	    m = i - 1;
 	} else if (p > l.getMax()) {
@@ -131,11 +132,11 @@ implements Location, Serializable {
   public boolean overlaps(Location l) {
     return LocationTools.overlaps(this, l);
   }
-  
+
   public Location union(Location loc) {
     return LocationTools.union(this, loc);
   }
-  
+
   public Location intersection(Location loc) {
     return LocationTools.intersection(this, loc);
   }
@@ -147,7 +148,7 @@ implements Location, Serializable {
       return LocationTools.areEqual(this, (Location) o);
     }
   }
-  
+
   public SymbolList symbols(SymbolList seq) {
       if (isContiguous())
 	  return seq.subList(min, max);
@@ -175,18 +176,18 @@ implements Location, Serializable {
     for(Iterator i = locations.iterator(); i.hasNext(); ) {
       res.add( ((Location) i.next()).translate(dist) );
     }
-    
+
     return new CompoundLocation(res);
   }
 
   public boolean isContiguous() {
     return locations.size() <= 1;
   }
-  
+
   public Iterator blockIterator() {
     return locations.iterator();
   }
-  
+
   public int hashCode() {
     return getMin() ^ getMax();
   }
@@ -201,6 +202,6 @@ implements Location, Serializable {
       sb.append(", (" + i.next() + ")");
     sb.append("}");
 
-    return sb.toString();
+    return sb.substring(0);
   }
 }

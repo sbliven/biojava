@@ -28,6 +28,7 @@ import org.biojava.bio.seq.StrandedFeature;
  * A no-frills implementation of a <span class="type">GFFRecord</span>.
  *
  * @author Matthew Pocock
+ * @author Greg Cox
  */
 public class SimpleGFFRecord implements GFFRecord {
   /**
@@ -71,7 +72,7 @@ public class SimpleGFFRecord implements GFFRecord {
    * The comment.
    */
   private String comment;
-  
+
   /**
    * Set the sequence name to <span class="arg">seqName</span>.
    *
@@ -80,11 +81,11 @@ public class SimpleGFFRecord implements GFFRecord {
   public void setSeqName(String seqName) {
     this.seqName = seqName;
   }
-  
+
   public String getSeqName() {
     return seqName;
   }
-  
+
   /**
    * Set the feature source to <span class="arg">source</source>.
    *
@@ -93,11 +94,11 @@ public class SimpleGFFRecord implements GFFRecord {
   public void setSource(String source) {
     this.source = source;
   }
-  
+
   public String getSource() {
     return source;
   }
-  
+
   /**
    * Set the feature type to <span class="arg">type</source>.
    *
@@ -106,11 +107,11 @@ public class SimpleGFFRecord implements GFFRecord {
   public void setFeature(String feature) {
     this.feature = feature;
   }
-  
+
   public String getFeature() {
     return feature;
   }
-  
+
   /**
    * Set the start coordinate to <span class="arg">start</source>.
    *
@@ -119,11 +120,11 @@ public class SimpleGFFRecord implements GFFRecord {
   public void setStart(int start) {
     this.start = start;
   }
-  
+
   public int getStart() {
     return start;
   }
-  
+
   /**
    * Set the end coordinate to <span class="arg">end</source>.
    *
@@ -132,11 +133,11 @@ public class SimpleGFFRecord implements GFFRecord {
   public void setEnd(int end) {
     this.end = end;
   }
-  
+
   public int getEnd() {
     return end;
   }
-  
+
   /**
    * Set the score to <span class="arg">score</source>.
    * <p>
@@ -149,24 +150,24 @@ public class SimpleGFFRecord implements GFFRecord {
   public void setScore(double score) {
     this.score = score;
   }
-  
+
   public double getScore() {
     return score;
   }
-  
+
   /**
    * Set the strand to <span class="arg">strand</source>.
    *
-   * @param strand the new Strand 
+   * @param strand the new Strand
    */
   public void setStrand(StrandedFeature.Strand strand) {
     this.strand = strand;
   }
-  
+
   public StrandedFeature.Strand getStrand() {
     return strand;
   }
-  
+
   /**
    * Set the frame to <span class="arg">frame</source>.
    * <p>
@@ -184,13 +185,13 @@ public class SimpleGFFRecord implements GFFRecord {
     }
     this.frame = frame;
   }
-  
+
   public int getFrame() {
     return frame;
   }
-  
+
   /**
-   * Replace the group-attribute <span class="type">Map</span> with 
+   * Replace the group-attribute <span class="type">Map</span> with
    * <span class="arg">ga</span>.
    * <p>
    * To efficiently add a key, call <span class="method">getGroupAttributes()</span>
@@ -201,14 +202,14 @@ public class SimpleGFFRecord implements GFFRecord {
   public void setGroupAttributes(Map ga) {
     this.groupAttributes = ga;
   }
-  
+
   public Map getGroupAttributes() {
     if(groupAttributes == null) {
       groupAttributes = new HashMap();
     }
     return groupAttributes;
   }
-  
+
   /**
    * Set the comment to <span class="arg">comment</source>.
    * <p>
@@ -219,11 +220,11 @@ public class SimpleGFFRecord implements GFFRecord {
   public void setComment(String comment) {
     this.comment = comment;
   }
-  
+
   public String getComment() {
     return comment;
   }
-  
+
   /**
    * Create a <span class="type">String</span> representation of
    * <span class="arg">attMap</span>.
@@ -262,9 +263,9 @@ public class SimpleGFFRecord implements GFFRecord {
         } else {
           sBuff.append(" " + value);
         }
-      }      
+      }
     }
-    return sBuff.toString();
+    return sBuff.substring(0);
   }
 }
 

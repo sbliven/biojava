@@ -47,6 +47,7 @@ import java.util.*;
  * under the LGPL license.
  *
  * @author Cambridge Antibody Technology Group plc
+ * @author Greg Cox
  * @version 0.1
  *
  */
@@ -72,7 +73,7 @@ final class HSPSummaryHelper {
      * @exception SAXException if an error occurs
      */
     public static void parse(String poLine, HashMap poMap,
-              BlastLikeVersionSupport poVersion) 
+              BlastLikeVersionSupport poVersion)
     throws SAXException {
 
     int iProgram = poVersion.getProgram();
@@ -108,7 +109,7 @@ final class HSPSummaryHelper {
         concat(poVersion.getProgramString()).
             concat(" is not supported.")));
     }
-    
+
     static void parseNCBIBlast(String poLine, HashMap poMap,
                    BlastLikeVersionSupport poVersion) {
 
@@ -148,7 +149,7 @@ final class HSPSummaryHelper {
             //assume "Token = value ..."
             oSt2.nextToken(); //skip =
             oValue = oSt2.nextToken(); //grab score
-            
+
             poMap.put(oKey,oValue);
             break;
         }
@@ -160,7 +161,7 @@ final class HSPSummaryHelper {
             //assume " Token = value"
             oSt2.nextToken(); //skip =
             oValue = oSt2.nextToken();
-            
+
             poMap.put(oKey,oValue);
             break;
         }
@@ -181,7 +182,7 @@ final class HSPSummaryHelper {
             oKey = "alignmentSize";
             oValue = oTmp.nextToken();
             poMap.put(oKey,oValue);
-            
+
             //here next token is (76%)
 
             oTmp = new StringTokenizer(oSt2.nextToken(),"(%)");
@@ -203,7 +204,7 @@ final class HSPSummaryHelper {
             oKey = "numberOfPositives";
             oValue = oTmp.nextToken();
             poMap.put(oKey,oValue);
-            
+
 
             //here next token is like (76%)
 
@@ -228,7 +229,7 @@ final class HSPSummaryHelper {
             oKey = "queryStrand";
             oValue = oSt2.nextToken();
             poMap.put(oKey,oValue);
-            
+
             oSt2.nextToken(); //skip "/"
 
             oKey = "hitStrand";
@@ -258,7 +259,7 @@ final class HSPSummaryHelper {
                 oTmpBuffer.append("minus");
             }
             oTmpBuffer.append(aoTmpArray[1]);
-            oValue = oTmpBuffer.toString();
+            oValue = oTmpBuffer.substring(0);
             poMap.put(oKey,oValue);
             break;
             }
@@ -275,7 +276,7 @@ final class HSPSummaryHelper {
                 oTmpBuffer.append("minus");
             }
             oTmpBuffer.append(aoTmpArray[1]);
-            oValue = oTmpBuffer.toString();
+            oValue = oTmpBuffer.substring(0);
             poMap.put(oKey,oValue);
             break;
             }
@@ -291,7 +292,7 @@ final class HSPSummaryHelper {
                 oTmpBuffer.append("minus");
             }
             oTmpBuffer.append(aoTmpArray[1]);
-            oValue = oTmpBuffer.toString();
+            oValue = oTmpBuffer.substring(0);
             poMap.put(oKey,oValue);
 
             //skip "/"
@@ -307,7 +308,7 @@ final class HSPSummaryHelper {
                 oTmpBuffer.append("minus");
             }
             oTmpBuffer.append(aoTmpArray[1]);
-            oValue = oTmpBuffer.toString();
+            oValue = oTmpBuffer.substring(0);
             poMap.put(oKey,oValue);
 
             break;
@@ -366,7 +367,7 @@ final class HSPSummaryHelper {
             //assume "Token = value ..."
             oSt2.nextToken(); //skip =
             oValue = oSt2.nextToken(); //grab score
-            
+
             poMap.put(oKey,oValue);
             break;
         }
@@ -378,7 +379,7 @@ final class HSPSummaryHelper {
             //assume " Token = value"
             oSt2.nextToken(); //skip =
             oValue = oSt2.nextToken();
-            
+
             poMap.put(oKey,oValue);
             break;
         }
@@ -399,7 +400,7 @@ final class HSPSummaryHelper {
             oKey = "alignmentSize";
             oValue = oTmp.nextToken();
             poMap.put(oKey,oValue);
-            
+
             //here next token is (76%)
 
             oTmp = new StringTokenizer(oSt2.nextToken(),"(%)");
@@ -421,7 +422,7 @@ final class HSPSummaryHelper {
             oKey = "numberOfPositives";
             oValue = oTmp.nextToken();
             poMap.put(oKey,oValue);
-            
+
 
             //here next token is like (76%)
 
@@ -446,7 +447,7 @@ final class HSPSummaryHelper {
             oKey = "queryStrand";
             oValue = oSt2.nextToken();
             poMap.put(oKey,oValue);
-            
+
             oSt2.nextToken(); //skip "/"
 
             oKey = "hitStrand";
@@ -476,7 +477,7 @@ final class HSPSummaryHelper {
                 oTmpBuffer.append("minus");
             }
             oTmpBuffer.append(aoTmpArray[1]);
-            oValue = oTmpBuffer.toString();
+            oValue = oTmpBuffer.substring(0);
             poMap.put(oKey,oValue);
             break;
             }
@@ -493,7 +494,7 @@ final class HSPSummaryHelper {
                 oTmpBuffer.append("minus");
             }
             oTmpBuffer.append(aoTmpArray[1]);
-            oValue = oTmpBuffer.toString();
+            oValue = oTmpBuffer.substring(0);
             poMap.put(oKey,oValue);
             break;
             }
@@ -509,7 +510,7 @@ final class HSPSummaryHelper {
                 oTmpBuffer.append("minus");
             }
             oTmpBuffer.append(aoTmpArray[1]);
-            oValue = oTmpBuffer.toString();
+            oValue = oTmpBuffer.substring(0);
             poMap.put(oKey,oValue);
 
             //skip "/"
@@ -525,7 +526,7 @@ final class HSPSummaryHelper {
                 oTmpBuffer.append("minus");
             }
             oTmpBuffer.append(aoTmpArray[1]);
-            oValue = oTmpBuffer.toString();
+            oValue = oTmpBuffer.substring(0);
             poMap.put(oKey,oValue);
 
             break;

@@ -46,13 +46,14 @@ import org.xml.sax.helpers.AttributesImpl;
  * under the LGPL license.
  *
  * @author Cambridge Antibody Technology Group plc
+ * @author Greg Cox
  * @version 0.1
  *
  */
 final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 
     private AttributesImpl       oAtts            = new AttributesImpl();
-    private QName                oAttQName        = new QName(this);     
+    private QName                oAttQName        = new QName(this);
     private char[]               aoChars;
     private ArrayList            oAlignment;
     private String               oLine;
@@ -139,17 +140,17 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
     oAtts.addAttribute(oAttQName.getURI(),
                oAttQName.getLocalName(),
                oAttQName.getQName(),
-               "CDATA",oQueryStartId.toString());
+               "CDATA",oQueryStartId.substring(0));
 
     oAttQName.setQName("stopPosition");
     oAtts.addAttribute(oAttQName.getURI(),
                oAttQName.getLocalName(),
                oAttQName.getQName(),
-               "CDATA",oQueryStopId.toString());
+               "CDATA",oQueryStopId.substring(0));
 
     this.startElement(new QName(this,this.prefix("QuerySequence")),
               (Attributes)oAtts);
-    aoChars = oQuery.toString().toCharArray();
+    aoChars = oQuery.substring(0).toCharArray();
     this.characters(aoChars,0,aoChars.length);
     this.endElement(new QName(this,this.prefix("QuerySequence")));
 
@@ -163,7 +164,7 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
                "NMTOKEN","preserve");
     this.startElement(new QName(this,this.prefix("MatchConsensus")),
               (Attributes)oAtts);
-    aoChars = oMatchConsensus.toString().toCharArray();
+    aoChars = oMatchConsensus.substring(0).toCharArray();
     this.characters(aoChars,0,aoChars.length);
 
     this.endElement(new QName(this,this.prefix("MatchConsensus")));
@@ -175,17 +176,17 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
     oAtts.addAttribute(oAttQName.getURI(),
                oAttQName.getLocalName(),
                oAttQName.getQName(),
-               "CDATA",oHitStartId.toString());
+               "CDATA",oHitStartId.substring(0));
 
     oAttQName.setQName("stopPosition");
     oAtts.addAttribute(oAttQName.getURI(),
                oAttQName.getLocalName(),
                oAttQName.getQName(),
-               "CDATA",oHitStopId.toString());
+               "CDATA",oHitStopId.substring(0));
 
     this.startElement(new QName(this,this.prefix("HitSequence")),
               (Attributes)oAtts);
-    aoChars = oHit.toString().toCharArray();
+    aoChars = oHit.substring(0).toCharArray();
     this.characters(aoChars,0,aoChars.length);
     this.endElement(new QName(this,this.prefix("HitSequence")));
 
@@ -193,7 +194,7 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
     //end Alignment
     this.endElement(new QName(this,
                   this.prefix(this.prefix("BlastLikeAlignment"))));
-    } 
+    }
     /**
      * Describe 'parseLine' method here.
      *
@@ -226,7 +227,7 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 
        //System.out.println(oSeq);
        //To get numbers robustly, tokenize on letters, gaps, and unknowns
-       
+
        oSt = new StringTokenizer(oSeq," ABCDEFGHIJKLMNOPQRSTUVWXYZ-*");
 
        //System.out.println("Token Count----->" + oSt.countTokens());
@@ -239,10 +240,10 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
         " an unexpected character."));
        }
        //here if tokens for start and stop OK
-       
+
        oStartId.setLength(0);
        oStartId.append(oSt.nextToken().trim());
-       
+
        oStopId.setLength(0);
        oStopId.append(oSt.nextToken().trim());
 
@@ -250,7 +251,7 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 
 
        //To get sequence robustly, tokenize on numbers only
-       
+
        oSt = new StringTokenizer(oSeq,"0123456789");
 
        //System.out.println("Token Count----->" + oSt.countTokens());
@@ -294,7 +295,7 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 		( new String( oPadding ) );
 	}
     }
-    
+
     //get startIds for query and subject
     if (iState == ON_FIRST_SEGMENT) {
         //here if on first block of an alignment
@@ -337,13 +338,13 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
         tJustDoneQuery     = false;
         tJustDoneConsensus = true;
         tJustDoneHit       = false;
-        
+
     } //end if onFirstSegment
 
     //if inside the alignment, set the stopids each time
     //so that they are correct for multi-block alignments
     if (iState == DONE_FIRST_SEGMENT) {
-        
+
         if (poLine.startsWith("QUERY:")) {
 	    oQueryStopId.setLength(0);
 	    oQueryStopId.append(oStopId);
@@ -367,7 +368,7 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 			     iEnd-iOffset,
 			     ' ' );
 		oMatchConsensus.append( new String( oPadding) );
-		
+
 	    }
 	    tJustDoneQuery     = false;
 	    tJustDoneConsensus = false;

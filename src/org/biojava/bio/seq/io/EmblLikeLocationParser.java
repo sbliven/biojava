@@ -542,7 +542,7 @@ public class EmblLikeLocationParser
 
 		thisChar = location.charAt(nextCharIndex);
 	    }
-	    return new Integer(intString.toString());
+	    return new Integer(intString.substring(0));
 	}
 
 	/**
@@ -570,7 +570,7 @@ public class EmblLikeLocationParser
 
 		thisChar = location.charAt(nextCharIndex);
 	    }
-	    return textString.toString();
+	    return textString.substring(0);
 	}
     }
 }

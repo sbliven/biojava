@@ -336,7 +336,7 @@ class AbstractGenEmblFileFormer
 			{
 				tempBuffer.append(')');
 			}
-			formattedLocation = tempBuffer.toString();
+			formattedLocation = tempBuffer.substring(0);
 		}
 		else
 		{
@@ -348,7 +348,7 @@ class AbstractGenEmblFileFormer
 			StringBuffer tempBuffer = new StringBuffer();
 			formattedLocation = this.formatLocationBlock(tempBuffer,
 					theFeature.getLocation(), featureStrand.getValue(), "",
-					Integer.MAX_VALUE, joinType).toString();
+					Integer.MAX_VALUE, joinType).substring(0);
 		}
 
 		return formattedLocation;
@@ -381,7 +381,7 @@ class AbstractGenEmblFileFormer
 					      Integer.MAX_VALUE,
 					      "join");
 
-	return sb.toString();
+	return sb.substring(0);
     }
 
     /**
@@ -552,37 +552,37 @@ class AbstractGenEmblFileFormer
 		    PointLocation pl = (PointLocation) thisLoc;
 
 		    sb.append(complement                                   ?
-			      toComplement(formatPoint(ub, pl).toString()) :
-			      formatPoint(ub, pl).toString());
+			      toComplement(formatPoint(ub, pl).substring(0)) :
+			      formatPoint(ub, pl).substring(0));
 		    break;
 
 		case FUZZY_RANGE:
 		    FuzzyLocation fl = (FuzzyLocation) thisLoc;
 
 		    sb.append(complement                                        ?
-			      toComplement(formatFuzzyRange(ub, fl).toString()) :
-			      formatFuzzyRange(ub, fl).toString());
+			      toComplement(formatFuzzyRange(ub, fl).substring(0)) :
+			      formatFuzzyRange(ub, fl).substring(0));
 		    break;
 
 		case FUZZY_POINT:
 		    FuzzyPointLocation fpl = (FuzzyPointLocation) thisLoc;
 
 		    sb.append(complement                                         ?
-			      toComplement(formatFuzzyPoint(ub, fpl).toString()) :
-			      formatFuzzyPoint(ub, fpl).toString());
+			      toComplement(formatFuzzyPoint(ub, fpl).substring(0)) :
+			      formatFuzzyPoint(ub, fpl).substring(0));
 		    break;
 
 		case RANGE:
 		    RangeLocation rl = (RangeLocation) thisLoc;
 
 		    sb.append(complement                                   ?
-			      toComplement(formatRange(ub, rl).toString()) :
-			      formatRange(ub, rl).toString());
+			      toComplement(formatRange(ub, rl).substring(0)) :
+			      formatRange(ub, rl).substring(0));
 		    break;
 
 		case BETWEEN_LOCATION:
 		    BetweenLocation tempLocation = (BetweenLocation) thisLoc;
-		    String formattedLocation = formatBetween(ub, tempLocation).toString();
+		    String formattedLocation = formatBetween(ub, tempLocation).substring(0);
 		    if (complement)
 		    {
 			formattedLocation = toComplement(formattedLocation);

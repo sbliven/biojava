@@ -26,6 +26,7 @@ package org.biojava.bio.seq.db.emblcd;
  * bytes read from any the the EMBL CD-ROM format index files.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Greg Cox
  * @since 1.2
  */
 class RecordParser
@@ -113,7 +114,7 @@ class RecordParser
 
         // Remove the trailing ':'
         sb.deleteCharAt(sb.length() - 1);
-        return sb.toString();
+        return sb.substring(0);
     }
 
     /**
@@ -135,7 +136,7 @@ class RecordParser
             sb.append((char) characters[i]);
         }
 
-        return sb.toString();
+        return sb.substring(0);
     }
 
     /**

@@ -69,6 +69,7 @@ import org.biojava.utils.ChangeVetoException;
  * handled to BLASTN, TBLASTX and Fasta DNA.</p>
  *
  * @author Keith James
+ * @author Greg Cox
  * @since 1.2
  */
 public class BlastLikeHomologyBuilder implements SearchContentHandler
@@ -413,7 +414,7 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
 
             // Map the new feature to the alignment SymbolList
             labelMap.put(queryView.createFeature(qt),
-                         new SimpleSymbolList(tokenParser, tokenBuffer.toString()));
+                         new SimpleSymbolList(tokenParser, tokenBuffer.substring(0)));
 
             tokenBuffer.setLength(0);
             tokenBuffer.append((String) subHitData.get("subjectSequence"));
@@ -429,7 +430,7 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
 
             // Map the new feature to the alignment SymbolList
             labelMap.put(subjectView.createFeature(st),
-                         new SimpleSymbolList(tokenParser, tokenBuffer.toString()));
+                         new SimpleSymbolList(tokenParser, tokenBuffer.substring(0)));
 
             Alignment a = new SimpleAlignment(labelMap);
             homology.setAlignment(a);

@@ -103,7 +103,7 @@ public class FeatureTableParser {
                     // annotation bundle
                     try {
                         Map dat = new HashMap();
-                        dat.put("location", featureBuf.toString());
+                        dat.put("location", featureBuf.substring(0));
                         featureTemplate.annotation.setProperty(Feature.PROPERTY_DATA_KEY, dat);
                     }
                     catch (ChangeVetoException cve) {
@@ -111,7 +111,7 @@ public class FeatureTableParser {
                                                + featureBuf);
                     }
 
-                    featureTemplate = locParser.parseLocation(featureBuf.toString(), featureTemplate);
+                    featureTemplate = locParser.parseLocation(featureBuf.substring(0), featureTemplate);
                     listener.startFeature(featureTemplate);
                     featureStatus = WITHIN;
                 }
@@ -143,7 +143,7 @@ public class FeatureTableParser {
                 featureBuf.append(line);
 
                 if (countChar(featureBuf, '"') % 2 == 0) {
-                    processAttribute(featureBuf.toString());
+                    processAttribute(featureBuf.substring(0));
                     featureStatus = WITHIN;
                 }
                 break;
@@ -195,7 +195,7 @@ public class FeatureTableParser {
                         escape = false;
                     }
                 }
-                val = sb.toString();
+                val = sb.substring(0);
             }
             listener.addFeatureProperty(tag, val);
         }

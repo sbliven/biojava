@@ -33,35 +33,35 @@ import org.xml.sax.helpers.AttributesImpl;
  * alignment as produced by Needle (EMBOSS) outputing .needle format.
  * For example,
  * <pre>
-TGFBG4_frame2                                                          
+TGFBG4_frame2
 
-TGFB1           136      NTSELREAVPEPVLLSRAELRLLRLKLKVEQHVELYQKYSNNSWR 180     
-                                                                      
-TGFBG4_frame2                                                          
+TGFB1           136      NTSELREAVPEPVLLSRAELRLLRLKLKVEQHVELYQKYSNNSWR 180
 
-TGFB1           181      YLSNRLLAPSDSPEWLSFDVTGVVRQWLSRG.............. 211     
-                                                       |              
-TGFBG4_frame2   1                                     LGELHSQTGFPLATPT 16      
+TGFBG4_frame2
 
-TGFB1           212      GEIEGFRLSAHCSCDSRDNTLQVDIN................... 237     
-                         ||||||||||||||||||||||||||                   
-TGFBG4_frame2   17       GEIEGFRLSAHCSCDSRDNTLQVDINGEACFPGHAQLRVCVCVFP 61      
+TGFB1           181      YLSNRLLAPSDSPEWLSFDVTGVVRQWLSRG.............. 211
+                                                       |
+TGFBG4_frame2   1                                     LGELHSQTGFPLATPT 16
 
-TGFB1           238      ........................GFTTGRRGDLATIHGMNRPFL 258     
+TGFB1           212      GEIEGFRLSAHCSCDSRDNTLQVDIN................... 237
+                         ||||||||||||||||||||||||||
+TGFBG4_frame2   17       GEIEGFRLSAHCSCDSRDNTLQVDINGEACFPGHAQLRVCVCVFP 61
+
+TGFB1           238      ........................GFTTGRRGDLATIHGMNRPFL 258
                                                  |||||||||||||||||||||
-TGFBG4_frame2   62       SAPRPTYLSLECVCMSPIPLPHKAGFTTGRRGDLATIHGMNRPFL 106     
+TGFBG4_frame2   62       SAPRPTYLSLECVCMSPIPLPHKAGFTTGRRGDLATIHGMNRPFL 106
 
-TGFB1           259      LLMATPLERAQHLQSSRHRRALDTNYCFSSTEKNCCVRQLYIDFR 303     
-                         |||||||||||||||||||||||||||| :               
-TGFBG4_frame2   107      LLMATPLERAQHLQSSRHRRALDTNYCFRALP............. 138     
+TGFB1           259      LLMATPLERAQHLQSSRHRRALDTNYCFSSTEKNCCVRQLYIDFR 303
+                         |||||||||||||||||||||||||||| :
+TGFBG4_frame2   107      LLMATPLERAQHLQSSRHRRALDTNYCFRALP............. 138
 
-TGFB1           304      KDLGWKWIHEPKGYHANFCLGPCPYIWSLDTQYSKVLALYNQHNP 348     
-                            ||:    |    |                             
-TGFBG4_frame2   139      ...GWR....PSRLGAL                             148     
+TGFB1           304      KDLGWKWIHEPKGYHANFCLGPCPYIWSLDTQYSKVLALYNQHNP 348
+                            ||:    |    |
+TGFBG4_frame2   139      ...GWR....PSRLGAL                             148
 
-TGFB1           349      GASAAPCCVPQALEPLPIVYYVGRKPKVEQLSNMIVRSCKCS    390     
-                                                                   
-TGFBG4_frame2                                                          
+TGFB1           349      GASAAPCCVPQALEPLPIVYYVGRKPKVEQLSNMIVRSCKCS    390
+
+TGFBG4_frame2
  * </pre>
  * <p>
  * Please note, this parser reads the whole alignment in to
@@ -90,6 +90,7 @@ TGFBG4_frame2
  *</ul>
  *
  * @author Cambridge Antibody Technology (CAT)
+ * @author Greg Cox
  * @version 1.0
  *
  */
@@ -99,7 +100,7 @@ class NeedleAlignmentSAXParser extends AbstractNativeAppSAXParser {
 
     private AttributesImpl          oAtts      = new AttributesImpl();
     private ArrayList               oHeader    = new ArrayList();
-    private QName                   oAttQName  = new QName(this);     
+    private QName                   oAttQName  = new QName(this);
     private char[]                  aoChars;
 
     private String                  oSeqName;
@@ -126,7 +127,7 @@ class NeedleAlignmentSAXParser extends AbstractNativeAppSAXParser {
      *
      * @param nil	 -
      */
-    public void parse(InputSource poSource ) 
+    public void parse(InputSource poSource )
 	throws IOException,SAXException {
 
 	BufferedReader            oContents;
@@ -155,7 +156,7 @@ class NeedleAlignmentSAXParser extends AbstractNativeAppSAXParser {
 	//gaps
 
 	this.nibbleEndGaps();
-	
+
 
 	// now cycle through and emit elements
 	for (int i = 0; i < oSeqNameList.size(); i++) {
@@ -188,7 +189,7 @@ class NeedleAlignmentSAXParser extends AbstractNativeAppSAXParser {
 			this.prefix("SequenceCollection")),
 				  (Attributes)oAtts);
 	    this.changeState(IN_STREAM);
-	}	    
+	}
 
 	if (iState == IN_STREAM) {
 
@@ -213,7 +214,7 @@ class NeedleAlignmentSAXParser extends AbstractNativeAppSAXParser {
 	//First token is sequence name
 	oSeqName = oSt.nextToken();
 	//System.out.println(oSeqName);
-	
+
 
 	oSeq.setLength(0);
 
@@ -221,8 +222,8 @@ class NeedleAlignmentSAXParser extends AbstractNativeAppSAXParser {
 	//line length etc.
 
 	//Postions 25 to 69
-	    
-	    
+
+
 	oTmpSeq = poLine.substring(25,70).replace('.','-').replace(' ','-');
 
 	oSeq.append(oTmpSeq);
@@ -231,19 +232,19 @@ class NeedleAlignmentSAXParser extends AbstractNativeAppSAXParser {
 	//System.out.println(oSeq);
 
 	//At this point, have name of sequence, and a segment of the sequence
-	
+
 	//Update object...
-	
+
 	if (oAlignment.get(oSeqName) == null) {
 	    //Here if on first occurence of this sequence
 	    //Add to alignment
-	    oAlignment.put(oSeqName,oSeq.toString());
+	    oAlignment.put(oSeqName,oSeq.substring(0));
 	    //maintain ordered list of sequence names
 	    oSeqNameList.add(oSeqName);
 	} else {
 	    //Here if building up an existing sequence
 	    oTmpSeq = (String) oAlignment.get(oSeqName);
-	    oAlignment.put(oSeqName,oTmpSeq.concat(oSeq.toString()));
+	    oAlignment.put(oSeqName,oTmpSeq.concat(oSeq.substring(0)));
 	}
     }
 
@@ -269,7 +270,7 @@ class NeedleAlignmentSAXParser extends AbstractNativeAppSAXParser {
 
 	    //System.out.println("Irrelevant|"+poLine+"|");
 	    return false;
-	} 
+	}
 
 	//if here,line is part of alignment, so return true
 	return true;
@@ -303,7 +304,7 @@ class NeedleAlignmentSAXParser extends AbstractNativeAppSAXParser {
     /**
      * After the alignment is parsed, the ends of the sequences are
      * padded out with blanks to the end of the last line:
-     * 
+     *
      * e.g.
      * GCACACA---------------------------------
      * CAC-------------------------------------
@@ -312,7 +313,7 @@ class NeedleAlignmentSAXParser extends AbstractNativeAppSAXParser {
      *
      * GCACACA
      * CAC----
-     *    
+     *
      */
     private void nibbleEndGaps() {
 

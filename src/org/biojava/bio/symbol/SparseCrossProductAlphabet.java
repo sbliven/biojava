@@ -34,8 +34,9 @@ import org.biojava.bio.seq.io.*;
  * implementation of CrossProductAlphabet that instantiates symbols as they are
  * needed. This is required as alphabets can get prohibatively large very
  * quickly (e.g. align 200 proteins & you need 20^200 Symbols).
- * 
+ *
  * @author Matthew Pocock
+ * @author Greg Cox
  */
 
 class SparseCrossProductAlphabet
@@ -45,7 +46,7 @@ implements Serializable {
   private final List alphas;
   private final Map knownSymbols;
   private char tokenSeed = 'A';
-  
+
   SparseCrossProductAlphabet(List alphas) {
     this.alphas = alphas;
     knownSymbols = new HashMap();
@@ -56,7 +57,7 @@ implements Serializable {
     }
     this.size = size;
   }
-  
+
   public SymbolList symbols() {
     try {
       List symL = new ArrayList();
@@ -68,7 +69,7 @@ implements Serializable {
       throw new BioError(ise, "Assertion Failure");
     }
   }
-  
+
   public String getName() {
     StringBuffer name = new StringBuffer("(");
     for (int i = 0; i < alphas.size(); ++i) {
@@ -79,17 +80,17 @@ implements Serializable {
       }
     }
     name.append(")");
-    return name.toString();
+    return name.substring(0);
   }
 
   public int size() {
     return size;
   }
-  
+
   protected boolean containsImpl(AtomicSymbol s) {
     return knownSymbols.values().contains(s);
   }
-  
+
   public Annotation getAnnotation() {
     return Annotation.EMPTY_ANNOTATION;
   }
@@ -97,7 +98,7 @@ implements Serializable {
   public List getAlphabets() {
     return alphas;
   }
-  
+
   public Iterator iterator() {
     return new SparseIterator(this);
   }
@@ -113,24 +114,24 @@ implements Serializable {
       while(ai.hasNext()) {
         ((Alphabet) ai.next()).validate((Symbol) si.next());
       }
-      
+
       List l = new ArrayList(sList);
       s = (AtomicSymbol) AlphabetManager.createSymbol(
         tokenSeed++, Annotation.EMPTY_ANNOTATION, l, this
       );
       knownSymbols.put(s.getSymbols(), s);
     }
-    
+
     return s;
   }
-    
+
   public void addSymbolImpl(AtomicSymbol sym) throws IllegalSymbolException {
     throw new IllegalSymbolException(
       "Can't add symbols to alphabet: " + sym.getName() +
       " in " + getName()
     );
   }
-  
+
   public void removeSymbol(Symbol sym) throws IllegalSymbolException {
     throw new IllegalSymbolException(
       "Can't remove symbols from alphabet: " + sym.getName() +
@@ -145,14 +146,14 @@ implements Serializable {
     private AtomicSymbol []as;
     private boolean hasNext;
     private List symList;
-    
+
     public SparseIterator(FiniteAlphabet parent) {
       this.parent = parent;
       this.alphas = (FiniteAlphabet []) parent.getAlphabets().toArray(new FiniteAlphabet[0]);
       this.symI = new Iterator[this.alphas.length];
       this.as = new AtomicSymbol[this.alphas.length];
       this.hasNext = true;
-      
+
       for(int i = 0; i < this.alphas.length; i++) {
         this.symI[i] = alphas[i].iterator();
         if(!symI[i].hasNext()) {
@@ -161,18 +162,18 @@ implements Serializable {
         }
         this.as[i] = (AtomicSymbol) symI[i].next();
       }
-      
+
       symList = Arrays.asList(as);
     }
-    
+
     public boolean hasNext() {
       return hasNext;
     }
-    
+
     public Object next() {
       try {
         Symbol sym = parent.getSymbol(symList);
-        
+
         for(int i = 0; i <= alphas.length; i++) {
           if(i == alphas.length) {
             hasNext = false;
@@ -191,8 +192,8 @@ implements Serializable {
         throw new BioError(ise, "Assertion Failure: I should contain this symbol");
       }
     }
-    
-    public void remove() 
+
+    public void remove()
     throws UnsupportedOperationException {
       throw new UnsupportedOperationException();
     }

@@ -130,7 +130,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    }
 	} catch (SQLException ex) {
 	    throw new BioException(ex, "Error connecting to BioSQL database");
-	} 
+	}
     }
 
     public String getName() {
@@ -183,7 +183,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    // System.err.println("Created bioentry");
 
 	    int bioentry_id = getDBHelper().getInsertID(conn, "bioentry", "bioentry_id");
-	    
+
 	    PreparedStatement create_dummy = conn.prepareStatement("insert into biosequence " +
 								   "       (bioentry_id, seq_version, molecule, seq_length) " +
 								   "values (?, ?, ?, ?)");
@@ -211,7 +211,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 
     public void addSequence(Sequence seq)
 	throws IllegalIDException, ChangeVetoException, BioException
-    {   
+    {
       if (!hasListeners()) {
         _addSequence(seq);
       } else {
@@ -260,7 +260,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    // System.err.println("Created bioentry");
 
 	    int bioentry_id = getDBHelper().getInsertID(conn, "bioentry", "bioentry_id");
-	    
+
 	    if (isAssemblySupported() && seq.filter(new FeatureFilter.ByClass(ComponentFeature.class), false).countFeatures() > 0) {
 		PreparedStatement create_assembly = conn.prepareStatement("insert into assembly " +
 									  "       (bioentry_id, length, molecule) " +
@@ -307,10 +307,10 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 		create_biosequence.close();
 		int biosequence_id = getDBHelper().getInsertID(conn, "biosequence", "biosequence_id");
 	    }
-	    
+
 	    // System.err.println("Stored sequence");
 
-	    // 
+	    //
 	    // Store the features
 	    //
 
@@ -323,19 +323,19 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 		}
 	    }
 	    persistFeatures(conn, bioentry_id, features, -1);
-	    
+
 	    // System.err.println("Stored features");
 
             //
             // we will need this annotation bundle for various things
             //
-            
+
             Annotation ann = seq.getAnnotation();
-            
+
 	    //
 	    // Store generic properties
 	    //
-	    
+
 	    for (Iterator i = ann.asMap().entrySet().iterator(); i.hasNext(); ) {
 		Map.Entry me = (Map.Entry) i.next();
 		Object key = me.getKey();
@@ -363,7 +363,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 		    }
 		    taxonID = Integer.parseInt((String) t);
                 }
-                
+
                 int taxa_id;
                 PreparedStatement select_taxa = conn.prepareStatement(
 								      "select taxa_id " +
@@ -392,13 +392,13 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 		    taxa_id = getDBHelper().getInsertID(conn, "taxa", "taxa_id");
                 }
                 select_taxa.close();
-                
+
                 PreparedStatement create_bioentry_taxa = conn.prepareStatement(
 									       "insert into bioentry_taxa " +
 									       "(bioentry_id, taxa_id) " +
 									       "values (?, ?)"
 									       );
-                
+
                 create_bioentry_taxa.setInt(1, bioentry_id);
                 create_bioentry_taxa.setInt(2, taxa_id);
                 create_bioentry_taxa.executeUpdate();
@@ -424,7 +424,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
     {
 	for (Iterator fi = features.features(); fi.hasNext(); ) {
 	    Feature f = (Feature) fi.next();
-	    
+
 	    if (! (f instanceof ComponentFeature) /* && !(f.getType().equals("similarity")) */ ) {
 		int id = persistFeature(conn, bioentry_id, f, parent);
 		if (isHierarchySupported()) {
@@ -455,7 +455,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    int bioentry_id = -1;
 	    if (rs.next()) {
 		bioentry_id = rs.getInt(1);
-	    } 
+	    }
 	    get_bioentry.close();
 
 	    if (bioentry_id < 0) {
@@ -482,7 +482,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    }
 
 	    if (seq == null && isAssemblySupported()) {
-		PreparedStatement get_assembly = conn.prepareStatement("select assembly_id, length, molecule " + 
+		PreparedStatement get_assembly = conn.prepareStatement("select assembly_id, length, molecule " +
 								       "from   assembly " +
 								       "where  bioentry_id = ?");
 		get_assembly.setInt(1, bioentry_id);
@@ -511,7 +511,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 
     public void removeSequence(String id)
 	throws IllegalIDException, ChangeVetoException, BioException
-    {   
+    {
       if (!hasListeners()) {
         _removeSequence(id);
       } else {
@@ -525,7 +525,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
       }
     }
 
-    private void _removeSequence(String id) 
+    private void _removeSequence(String id)
         throws BioException, IllegalIDException, ChangeVetoException
     {
 	Sequence seq = (Sequence) outstandingSequences.get(id);
@@ -547,7 +547,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	try {
 	    conn = pool.takeConnection();
 	    conn.setAutoCommit(false);
-	    
+
 	    PreparedStatement get_sequence = conn.prepareStatement("select bioentry.bioentry_id, biosequence.biosequence_id " +
 								   "from bioentry, biosequence " +
 								   "where bioentry.accession = ? and " +
@@ -563,49 +563,49 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
                 delete_taxa.setInt(1, bioentry_id);
                 delete_taxa.executeUpdate();
                 delete_taxa.close();
-                
+
                 PreparedStatement delete_reference = conn.prepareStatement("delete from bioentry_reference where bioentry_id = ?");
                 delete_reference.setInt(1, bioentry_id);
                 delete_reference.executeUpdate();
                 delete_reference.close();
-                
+
                 PreparedStatement delete_comment = conn.prepareStatement("delete from comment where bioentry_id = ?");
                 delete_comment.setInt(1, bioentry_id);
                 delete_comment.executeUpdate();
                 delete_comment.close();
-                
+
                 PreparedStatement delete_qv = conn.prepareStatement("delete from bioentry_qualifier_value where bioentry_id = ?");
                 delete_qv.setInt(1, bioentry_id);
                 delete_qv.executeUpdate();
                 delete_qv.close();
-                
+
                 PreparedStatement delete_locs = conn.prepareStatement("delete from seqfeature_location " +
                                                                        " where seqfeature_location.seqfeature_id = seqfeature.seqfeature_id and " +
                                                                        "       seqfeature.bioentry_id = ?");
                 delete_locs.setInt(1, bioentry_id);
                 delete_locs.executeUpdate();
                 delete_locs.close();
-                
+
                 PreparedStatement delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value " +
                                                                       " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id " +
                                                                       "   and seqfeature.bioentry_id = ?");
                 delete_fqv.setInt(1, bioentry_id);
                 delete_fqv.executeUpdate();
                 delete_fqv.close();
-                
+
                 PreparedStatement delete_rel = conn.prepareStatement("delete from seqfeature_relationship " +
                                                                      " where parent_seqfeature_id = seqfeature.seqfeature_id " +
                                                                      "   and seqfeature.bioentry_id = ?");
                 delete_rel.setInt(1, bioentry_id);
                 delete_rel.executeUpdate();
                 delete_rel.close();
-                
+
                 PreparedStatement delete_features = conn.prepareStatement("delete from seqfeature " +
                                                                           " where bioentry_id = ?");
                 delete_features.setInt(1, bioentry_id);
                 delete_features.executeUpdate();
                 delete_features.close();
-                
+
                 PreparedStatement delete_biosequence = conn.prepareStatement("delete from biosequence where biosequence_id = ?");
 		delete_biosequence.setInt(1, biosequence_id);
 		delete_biosequence.executeUpdate();
@@ -615,7 +615,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 		delete_entry.setInt(1, bioentry_id);
 		delete_entry.executeUpdate();
 		delete_entry.close();
-	    } 
+	    }
 	    get_sequence.close();
 
 	    conn.commit();
@@ -716,7 +716,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	} else {
 	    int seqfeature_key = intern_ontology_term(conn, f.getType());
 	    int seqfeature_source = intern_seqfeature_source(conn, f.getSource());
-	    
+
 	    PreparedStatement add_feature = conn.prepareStatement(
 		"insert into seqfeature "+
 		"       (bioentry_id, seqfeature_key_id, seqfeature_source_id) " +
@@ -728,7 +728,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    add_feature.executeUpdate();
 	    add_feature.close();
 
-	    id = getDBHelper().getInsertID(conn, "seqfeature", "seqfeature_id"); 
+	    id = getDBHelper().getInsertID(conn, "seqfeature", "seqfeature_id");
 	}
 
 	if (!locationWritten) {
@@ -737,7 +737,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	            "       (seqfeature_id, seq_start, seq_end, seq_strand, location_rank) " +
     		    "values (?, ?, ?, ?, ?)"
 	    );
-	    
+
 	    int strandNum;
 
 	    if (f instanceof StrandedFeature) {
@@ -764,11 +764,11 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 		add_locationspan.executeUpdate();
 	    }
 	    add_locationspan.close();
-	} 
-	
-	// 
+	}
+
+	//
 	// Persist anything in the annotation bundle, as well.
-	//	
+	//
 
 	for (Iterator ai = f.getAnnotation().asMap().entrySet().iterator(); ai.hasNext(); ) {
 	    Map.Entry akv = (Map.Entry) ai.next();
@@ -778,7 +778,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	//
 	// Persist link to parent
 	//
-	
+
 	if (parent_id >= 0) {
 	    PreparedStatement add_hierarchy = conn.prepareStatement(
 		"insert into seqfeature_relationship "+
@@ -794,7 +794,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 
 	return id;
     }
-			     
+
     void removeFeature(BioSQLFeatureI f)
         throws ChangeVetoException
     {
@@ -802,9 +802,9 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
         try {
             conn = pool.takeConnection();
             conn.setAutoCommit(false);
-            
+
             removeFeature(conn, f);
-            
+
             conn.commit();
             pool.putConnection(conn);
         } catch (SQLException ex) {
@@ -818,7 +818,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    throw new BioRuntimeException(ex, "Error removing from BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""));
 	}
     }
-    
+
     private void removeFeature(Connection conn, BioSQLFeatureI f)
         throws SQLException, ChangeVetoException
     {
@@ -829,34 +829,34 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
                 removeFeature(conn, (BioSQLFeatureI) f2);
             }
         }
-        
+
         int feature_id = f._getInternalID();
-        
+
         PreparedStatement delete_locs = conn.prepareStatement("delete from seqfeature_location " +
                                                               " where seqfeature_location.seqfeature_id = ?");
         delete_locs.setInt(1, feature_id);
         delete_locs.executeUpdate();
         delete_locs.close();
-                
+
         PreparedStatement delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value " +
                                                              " where seqfeature_qualifier_value.seqfeature_id = ?");
         delete_fqv.setInt(1, feature_id);
         delete_fqv.executeUpdate();
         delete_fqv.close();
-        
+
         PreparedStatement delete_rel = conn.prepareStatement("delete from seqfeature_relationship " +
                                                              " where child_seqfeature_id = ?");
         delete_rel.setInt(1, feature_id);
         delete_rel.executeUpdate();
         delete_rel.close();
-        
+
         PreparedStatement delete_feature = conn.prepareStatement("delete from seqfeature " +
                                                                  " where seqfeature_id = ?");
         delete_feature.setInt(1, feature_id);
         delete_feature.executeUpdate();
         delete_feature.close();
     }
-                             
+
     void persistProperty(Connection conn,
 			 int feature_id,
 			 Object key,
@@ -865,7 +865,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
         throws SQLException
     {
 	String keyString = key.toString();
-	
+
 	if (removeFirst) {
 	    int id = intern_ontology_term(conn, keyString);
 	    PreparedStatement remove_old_value = conn.prepareStatement("delete from seqfeature_qualifier_value " +
@@ -875,7 +875,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    remove_old_value.executeUpdate();
 	    remove_old_value.close();
 	}
-	
+
 	PreparedStatement insert_new;
 	if (isSPASupported()) {
 	    insert_new= conn.prepareStatement("insert into seqfeature_qualifier_value " +
@@ -937,7 +937,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 
 	// Ought to check for special-case keys. (or just wait 'til the special case
 	// tables get nuked :-)
-	
+
 	if (!isBioentryPropertySupported()) {
 	    if (silent) {
 		return;
@@ -955,7 +955,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    remove_old_value.executeUpdate();
 	    remove_old_value.close();
 	}
-	
+
 	PreparedStatement insert_new;
 	if (isSPASupported()) {
 	    insert_new= conn.prepareStatement("insert into bioentry_qualifier_value " +
@@ -1000,8 +1000,8 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    }
 	}
 
-		
-	
+
+
 	insert_new.close();
     }
 
@@ -1024,8 +1024,8 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	insert.close();
 
 	int id = getDBHelper().getInsertID(conn, "seqfeature_source", "seqfeature_source_id");
-	return id;		      
-    }    
+	return id;
+    }
 
     int intern_ontology_term(Connection conn, String s)
         throws SQLException
@@ -1046,8 +1046,8 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	insert.close();
 
 	int id = getDBHelper().getInsertID(conn, "ontology_term", "ontology_term_id");
-	return id;		      
-    }    
+	return id;
+    }
 
     private boolean hierarchyChecked = false;
     private boolean hierarchySupported = false;
@@ -1192,7 +1192,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 			if (level >= 2) {
 			    spaSupported = true;
 			    // System.err.println("*** Accelerators present in the database: level " + level);
-			} 
+			}
 		    }
 		} catch (SQLException ex) {
 		}
@@ -1202,7 +1202,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 		spaChecked = true;
 	    } catch (SQLException ex) {
 		throw new BioRuntimeException(ex);
-	    }	    
+	    }
 	}
 
 	return spaSupported;
@@ -1310,7 +1310,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    }
 	    query.append(" order by bioentry.accession");
 
-	    return query.toString();
+	    return query.substring(0);
 	}
     }
 
@@ -1351,7 +1351,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 		int fid = rs.getInt(2);
 
 		System.err.println(accession + "\t" + fid);
-		
+
 		if (seq == null || ! lastAcc.equals(accession)) {
 		    seq = getSequence(accession);
 		}

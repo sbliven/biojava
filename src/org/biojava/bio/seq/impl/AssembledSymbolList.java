@@ -36,6 +36,7 @@ import org.biojava.bio.symbol.*;
  * for an example.
  *
  * @author Thomas Down
+ * @author Greg Cox
  * @since 1.1
  */
 
@@ -115,7 +116,7 @@ public class AssembledSymbolList extends AbstractSymbolList {
 
 	int first = 0;
 	int last = componentList.size() - 1;
-	
+
 	while (first <= last) {
 	    int check = (first + last) / 2;
 	    Location checkL = (Location) componentList.get(check);
@@ -123,21 +124,21 @@ public class AssembledSymbolList extends AbstractSymbolList {
 		lastLocation = checkL;
 		return checkL;
 	    }
-	    
+
 	    if (p < checkL.getMin()) {
 		last = check - 1;
 	    } else {
 		first = check + 1;
 	    }
 	}
-	
+
 	return null;
     }
 
     private Location locationUpstreamOfPoint(int p) {
 	int first = 0;
 	int last = componentList.size() - 1;
-	
+
 	int check = 0;
 	Location checkL = null;
 	while (first <= last) {
@@ -151,7 +152,7 @@ public class AssembledSymbolList extends AbstractSymbolList {
 	    else
 		first = check + 1;
 	}
-	
+
 	try {
 	    if (p < checkL.getMin()) {
 		return checkL;
@@ -242,7 +243,7 @@ public class AssembledSymbolList extends AbstractSymbolList {
 		}
 	    }
 	}
-	
-	return sb.toString();
+
+	return sb.substring(0);
     }
 }

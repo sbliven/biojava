@@ -3,6 +3,11 @@ package org.biojava.utils;
 import java.io.*;
 import java.util.*;
 
+/**
+ * @author Primary author unknown
+ * @author Greg Cox
+ */
+
 public abstract class FileAsList
 extends
   AbstractList
@@ -17,7 +22,7 @@ implements
   private Object lastRec;
   private byte[] buffer;
   private int sizeCache = -1;
-  
+
   public FileAsList(File mappedFile, int recordLength)
   throws IOException {
     if(mappedFile.exists()) {
@@ -37,16 +42,16 @@ implements
     for(int i = rl.length; i < LEADER; i++) {
       this.mappedFile.write(' ');
     }
-    
+
     this.mappedFile.close();
   }
-  
+
   public FileAsList(File mappedFile)
   throws IOException {
     if(!mappedFile.exists()) {
       throw new IOException("Can't load mapped list as the file does not exist: " + mappedFile);
     }
-    
+
     this.mappedFile = new RandomAccessFile(mappedFile, "rw");
     StringBuffer sbuff = new StringBuffer();
     this.mappedFile.seek(0l);
@@ -54,15 +59,15 @@ implements
       char c = (char) this.mappedFile.readByte();
       sbuff.append(c);
     }
-    
-    buffer = new byte[Integer.parseInt(sbuff.toString().trim())];
+
+    buffer = new byte[Integer.parseInt(sbuff.substring(0).trim())];
   }
-  
+
   public byte[] rawGet(int indx) {
     if(indx < 0 || indx >= size()) {
       throw new IndexOutOfBoundsException("Can't access element: " + indx + " of " + size());
     }
-    
+
     if(indx != lastIndx) {
       long offset = fixOffset(indx * buffer.length);
       try {
@@ -76,20 +81,20 @@ implements
 
     return buffer;
   }
-  
+
   public Object get(int indx) {
     if(indx == lastIndx) {
       return lastRec;
     }
-    
+
     byte[] buffer = rawGet(indx);
-    
+
     lastRec = parseRecord(buffer);
     lastIndx = indx;
-    
+
     return lastRec;
   }
-  
+
   public int size() {
     if(sizeCache < 0) {
       try {
@@ -98,29 +103,29 @@ implements
         throw new NestedError(ioe, "Can't read file length");
       }
     };
-    
+
     return sizeCache;
   }
-  
+
   public boolean add(Object o) {
     sizeCache = -1;
-    
+
     try {
       generateRecord(buffer, o);
     } catch (NestedException ne) {
       throw new NestedError(ne, "Failed to write index");
     }
-    
+
     try {
       mappedFile.seek(mappedFile.length());
       mappedFile.write(buffer);
     } catch (IOException ioe) {
       throw new NestedError(ioe, "Failed to write index");
     }
-    
+
     return true;
   }
-  
+
   /**
    * This always returns null, not the previous object
    */
@@ -130,17 +135,17 @@ implements
     } catch (NestedException ne) {
       throw new NestedError(ne, "Failed to write index");
     }
-    
+
     try {
       mappedFile.seek(fixOffset(indx * buffer.length));
       mappedFile.write(buffer);
     } catch (IOException ioe) {
       throw new NestedError(ioe, "Failed to write index");
     }
-    
+
     return null;
   }
-  
+
   public void clear() {
     try {
       mappedFile.setLength(fixOffset(0));
@@ -153,7 +158,7 @@ implements
   public void commit() {
     commitedRecords = this.size();
   }
-  
+
   public void rollback() {
     try {
       mappedFile.setLength(fixOffset((long) commitedRecords * (long) buffer.length));
@@ -165,33 +170,33 @@ implements
       );
     }
   }
-  
+
   private long fixOffset(long offset) {
     return offset + (long) LEADER;
   }
-  
+
   private long unFixOffset(long offset) {
     return offset - (long) LEADER;
   }
-  
+
   protected abstract Object parseRecord(byte[] buffer);
   protected abstract void generateRecord(byte[] buffer, Object item)
   throws NestedException;
-  
+
   public abstract Comparator getComparator();
-  
+
   public Iterator iterator() {
     return new Iterator() {
       int i = 0;
-      
+
       public Object next() {
         return get(i++);
       }
-      
+
       public boolean hasNext() {
         return i < size();
       }
-      
+
       public void remove() {}
     };
   }

@@ -24,6 +24,7 @@ import java.util.* ;
 /**
  * xref
  *  @author Hanning Ni    Doubletwist Inc
+ * @author Greg Cox
 */
 public class AGAVEXref {
     private AGAVEDbId id ;
@@ -71,7 +72,7 @@ public class AGAVEXref {
            tmp.append( ((AGAVEProperty)it.next()).toString(indent + indent_unit, indent_unit) ) ;
        }
        tmp.append(indent + "</xref>" + "\n" );
-       return tmp.toString() ;
+       return tmp.substring(0) ;
     }
     /** return the agave xml representation of this instance **/
     public String toString()

@@ -34,6 +34,7 @@ import org.biojava.bio.seq.db.*;
  * A no-frills implementation of a remote feature.
  *
  * @author Matthew Pocock
+ * @author Greg Cox
  * @since 1.2
  */
 public class SimpleRemoteFeature
@@ -41,31 +42,31 @@ extends SimpleFeature
 implements RemoteFeature, java.io.Serializable {
   private List regions;
   private RemoteFeature.Resolver resolver;
-  
+
   public List getRegions() {
     return Collections.unmodifiableList(regions);
   }
-  
+
   public RemoteFeature.Resolver getResolver() {
     return resolver;
   }
-  
+
   public Feature getRemoteFeature() throws BioException {
     return getResolver().resolve(this);
   }
-  
+
   public Feature.Template makeTemplate() {
     RemoteFeature.Template rt = new RemoteFeature.Template();
     fillTemplate(rt);
     return rt;
   }
-  
+
   protected void fillTemplate(RemoteFeature.Template rt) {
     super.fillTemplate(rt);
     rt.resolver = getResolver();
     rt.regions = new ArrayList(getRegions());
   }
-  
+
   public SimpleRemoteFeature(
     Sequence sourceSeq,
     FeatureHolder parent,
@@ -75,33 +76,33 @@ implements RemoteFeature, java.io.Serializable {
     this.regions = new ArrayList(template.regions);
     this.resolver = template.resolver;
   }
-  
+
   public static class DBResolver implements RemoteFeature.Resolver {
     private SequenceDB seqDB;
-    
+
     public SequenceDB getSeqDB() {
       return seqDB;
     }
-    
+
     public DBResolver(SequenceDB seqDB) {
       this.seqDB = seqDB;
     }
-    
+
     public Feature resolve(RemoteFeature rFeat) throws BioException {
       FeatureFilter remoteFilter
         = new FeatureFilter.ByClass(RemoteFeature.class);
-      
+
       Set seqs = new HashSet();
       LinkedList ids = new LinkedList();
       Set feats = new HashSet();
-      
+
       Sequence parent = rFeat.getSequence();
       ids.add(parent);
-      
+
       while(!ids.isEmpty()) {
         Sequence seq = (Sequence) ids.removeFirst();
         seqs.add(seq);
-        
+
         FeatureHolder remotes = seq.filter(remoteFilter, false);
         for(Iterator fi = remotes.features(); fi.hasNext(); ) {
           RemoteFeature rf = (RemoteFeature) fi.next();
@@ -119,7 +120,7 @@ implements RemoteFeature, java.io.Serializable {
           }
         }
       }
-      
+
       StringBuffer nameBuff = new StringBuffer();
       {
         Iterator si = seqs.iterator();
@@ -131,10 +132,10 @@ implements RemoteFeature, java.io.Serializable {
           nameBuff.append(nextSeq.getName());
         }
       }
-      Sequence assembly = new SimpleAssembly(nameBuff.toString(), "");
-      
-      
-      
+      Sequence assembly = new SimpleAssembly(nameBuff.substring(0), "");
+
+
+
       return null;
     }
   }

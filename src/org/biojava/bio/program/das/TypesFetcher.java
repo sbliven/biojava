@@ -44,6 +44,7 @@ import org.xml.sax.helpers.*;
  * @since 1.2
  * @author Thomas Down
  * @author David Huen
+ * @author Greg Cox
  */
 
 class TypesFetcher implements Fetcher {
@@ -84,13 +85,13 @@ class TypesFetcher implements Fetcher {
 	nullSegmentHandler = tl;
     }
 
-    public void runFetch() 
+    public void runFetch()
 	throws BioException, ParseException
     {
 	DAS.startedActivity(this);
 	URL fURL = null;
-	    
-	
+
+
 	try {
 	    HttpURLConnection huc = null;
 	    Set segmentObjs = ticketsBySegment.keySet();
@@ -106,16 +107,16 @@ class TypesFetcher implements Fetcher {
 		    sb.append(',');
 		    sb.append(segment.getStop());
 		}
-		
+
 		if (i.hasNext()) {
 		    sb.append(';');
 		}
 	    }
-	    String segments = sb.toString();
+	    String segments = sb.substring(0);
 	    // System.err.println("*** Types-Fetching: " + segments);
-	    
+
 	    String encodingRequest = "";
-	    
+
 	    String typeRequest = "";
 	    if (type != null) {
 		typeRequest = "type=" + type + ";";
@@ -131,7 +132,7 @@ class TypesFetcher implements Fetcher {
 	    // fURL = new URL(dataSource, "types?" + encodingRequest + categoryRequest + typeRequest + segments);
 	    // huc = (HttpURLConnection) fURL.openConnection();
 	    // huc.setRequestProperty("Accept-Encoding", "gzip");
-	    
+
 	    fURL = new URL(dataSource, "types");
 	    huc = (HttpURLConnection) fURL.openConnection();
 	    if (queryString.length() > 0) {
@@ -159,7 +160,7 @@ class TypesFetcher implements Fetcher {
 
             // determine if I'm getting a gzipped reply
             String contentEncoding = huc.getContentEncoding();
-            
+
             InputStream inStream = huc.getInputStream();
 
 	    if (contentEncoding != null) {
@@ -176,7 +177,7 @@ class TypesFetcher implements Fetcher {
 	    XMLReader parser = DASSequence.nonvalidatingSAXParser();
 	    parser.setContentHandler(new SAX2StAXAdaptor(dfh));
 	    parser.parse(is);
-	    
+
 	    doneTickets = dfh.getDoneTickets();
 	} catch (IOException ex) {
 	    throw new ParseException(ex);
@@ -235,7 +236,7 @@ class TypesFetcher implements Fetcher {
 			    seg = new Segment(segID, start, stop);
 			    thisTicket = (FeatureRequestManager.Ticket) ticketsBySegment.get(seg);
 			    if (thisTicket == null) {
-				throw new SAXException("Response segment " + segID + ":" + start + 
+				throw new SAXException("Response segment " + segID + ":" + start +
 						       "," + stop + " wasn't requested");
 			    }
 			    segID = segID + ":" + start + "," + stop;
@@ -258,7 +259,7 @@ class TypesFetcher implements Fetcher {
 			seg = new Segment(segID, start, stop);
 			thisTicket = (FeatureRequestManager.Ticket) ticketsBySegment.get(seg);
 			if (thisTicket == null) {
-			    throw new SAXException("Response segment " + segID + ":" + start + 
+			    throw new SAXException("Response segment " + segID + ":" + start +
 						   "," + stop + " wasn't requested");
 			}
 		    }
@@ -268,7 +269,7 @@ class TypesFetcher implements Fetcher {
 		    TypesListener siol = ((FeatureRequestManager.TypeTicket) thisTicket).getTypesListener();
 		    siol.startSegment();
 		    siol.endSegment();
-		    
+
 		    thisTicket.setAsFetched();
 		    doneTickets.add(thisTicket);
 		} else if (localName.equals("segmentError") || localName.equals("SEGMENTERROR")) {
@@ -280,7 +281,7 @@ class TypesFetcher implements Fetcher {
 	    }
 	}
 
-	
+
 	public void endTree()
 	    throws SAXException
 	{
@@ -304,7 +305,7 @@ class TypesFetcher implements Fetcher {
 		if (thisTicket != null) {
 		    thisTicket.setAsFetched();
 		    doneTickets.add(thisTicket);
-		
+
 		    DAS.activityProgress(trigger, doneTickets.size()
 					 , ticketsBySegment.size());
 		}

@@ -31,6 +31,8 @@ package org.biojava.utils;
  *   The text of the actual offending line (Null if unknown)
  *   Character offset (negative for unknown)
  * </pre>
+ * @author Original author unknown
+ * @author Greg Cox
  */
 
 public class ParserException extends NestedException {
@@ -81,11 +83,11 @@ public class ParserException extends NestedException {
     public ParserException(Throwable t) {
       super(t);
     }
-    
+
     public ParserException(Throwable t, String detail) {
       super(t, detail);
     }
-    
+
     public ParserException(Throwable t, String detail, String locator) {
 	super(t, detail);
 	this.locator = locator;
@@ -201,6 +203,6 @@ public class ParserException extends NestedException {
 	    }
 	}
 	sb.append('\n');
-	return sb.toString();
+	return sb.substring(0);
     }
 }

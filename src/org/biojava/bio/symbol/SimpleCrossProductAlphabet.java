@@ -34,9 +34,10 @@ import org.biojava.bio.seq.io.*;
  * most flexible implementation of CrossProductAlphabet, but it
  * is likely to be possible to produce more efficient implementations
  * for specific tasks.
- * 
+ *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author Greg Cox
  */
 
 class SimpleCrossProductAlphabet
@@ -54,7 +55,7 @@ implements Serializable {
   throws IllegalAlphabetException {
     this(a, null);
   }
-  
+
   public SimpleCrossProductAlphabet(List a, Alphabet parent)
   throws IllegalAlphabetException {
     this.parent = parent;
@@ -71,11 +72,11 @@ implements Serializable {
     ourSymbols = new HashMap();
     populateSymbols(new ArrayList());
   }
-  
+
   public Iterator iterator() {
     return ourSymbols.values().iterator();
   }
-  
+
   private void populateSymbols(List symList) {
     if (symList.size() == alphas.size()) {
     putSymbol(symList);
@@ -108,7 +109,7 @@ implements Serializable {
         ss = (AtomicSymbol) AlphabetManager.createSymbol(
           tokenSeed++, Annotation.EMPTY_ANNOTATION, s, this
         );
-      } catch (IllegalSymbolException ise) { 
+      } catch (IllegalSymbolException ise) {
         throw new BioError(
           ise,
           "Assertion Failure: Should have a legal symbol."
@@ -133,7 +134,7 @@ implements Serializable {
       }
     }
     name.append(")");
-    return name.toString();
+    return name.substring(0);
   }
 
   public SymbolList symbols() {
@@ -160,14 +161,14 @@ implements Serializable {
   throws IllegalSymbolException {
     AtomicSymbol cps;
     cps = (AtomicSymbol) ourSymbols.get(l);
-    
+
     if(cps == null) {
       throw new IllegalSymbolException("Can't find symbol for " + l);
     }
-    
+
     return cps;
   }
-  
+
   protected void addSymbolImpl(AtomicSymbol sym)
   throws IllegalSymbolException {
     throw new IllegalSymbolException(
@@ -175,7 +176,7 @@ implements Serializable {
       " in " + getName()
     );
   }
-  
+
   public void removeSymbol(Symbol sym) throws IllegalSymbolException {
     throw new IllegalSymbolException(
       "Can't remove symbols from alphabet: " + sym.getName() +

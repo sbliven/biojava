@@ -37,13 +37,14 @@ import org.biojava.bio.symbol.*;
  * but any tokenization can be used.
  *
  * @author Thomas Down
+ * @author Greg Cox
  * @since 1.2
  */
 
 public class CrossProductTokenization extends WordTokenization {
     private List subTokenizations;  // List<SymbolTokenization>
 
-    public CrossProductTokenization(Alphabet alpha) 
+    public CrossProductTokenization(Alphabet alpha)
         throws BioException
     {
 	super(alpha);
@@ -72,7 +73,7 @@ public class CrossProductTokenization extends WordTokenization {
 	    } else {
 		List split = splitString(token.substring(1, token.length() - 1));
 		List syms = new ArrayList();
-		
+
 		Iterator si = split.iterator();
 		Iterator ti = subTokenizations.iterator();
 		while (si.hasNext()) {
@@ -101,13 +102,13 @@ public class CrossProductTokenization extends WordTokenization {
 
     public String tokenizeSymbol(Symbol s) throws IllegalSymbolException {
 	getAlphabet().validate(s);
-	
+
 	if (s instanceof BasisSymbol) {
 	    StringBuffer sb = new StringBuffer();
 	    sb.append('(');
 	    Iterator si = ((BasisSymbol) s).getSymbols().iterator();
 	    Iterator ti = subTokenizations.iterator();
-	    
+
 	    while (si.hasNext()) {
 		Symbol subSym = (Symbol) si.next();
 		SymbolTokenization subToke = (SymbolTokenization) ti.next();
@@ -118,7 +119,7 @@ public class CrossProductTokenization extends WordTokenization {
 		}
 	    }
 	    sb.append(')');
-	    return sb.toString();
+	    return sb.substring(0);
 	} else {
 	    StringBuffer sb = new StringBuffer();
 	    sb.append('[');
@@ -131,7 +132,7 @@ public class CrossProductTokenization extends WordTokenization {
 		}
 	    }
 	    sb.append(']');
-	    return sb.toString();
+	    return sb.substring(0);
 	}
     }
 }

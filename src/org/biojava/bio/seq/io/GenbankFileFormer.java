@@ -46,6 +46,7 @@ import org.biojava.bio.symbol.Symbol;
  * be factored out.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Greg Cox
  * @since 1.2
  */
 public class GenbankFileFormer extends AbstractGenEmblFileFormer
@@ -130,13 +131,13 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	    int gCount = 0;
 	    int tCount = 0;
 	    int oCount = 0;
-	    
+
 	    int end = start + length - 1;
-	    
+
 	    for (int i = start; i <= end; i++)
 		{
 		    char c = dnaTokenization.tokenizeSymbol(syms[i]).charAt(0);
-		    
+
 		    switch (c)
 			{
 			case 'a': case 'A':
@@ -151,7 +152,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 			case 't': case 'T':
 			    tCount++;
 			    break;
-			    
+
 			default:
 			    oCount++;
 			}
@@ -159,7 +160,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 
 	    // Get separator for system
 	    String nl = System.getProperty("line.separator");
-	    
+
 	    sq.setLength(0);
 	    sq.append("BASE COUNT    ");
 	    sq.append(aCount + " a ");
@@ -169,7 +170,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	    sq.append(nl);
 	    sq.append("ORIGIN");
 	    sq.append(nl);
-	    
+
 	    // Print sequence summary header
 	    stream.println(sq);
 
@@ -179,13 +180,13 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 	    int lineCount = fullLine;
 	    if (partLine > 0)
 		lineCount++;
-	    
+
 	    int lineLens [] = new int [lineCount];
-	    
+
 	    // All lines are 60, except last (if present)
 	    Arrays.fill(lineLens, 60);
 	    lineLens[lineCount - 1] = partLine;
-	    
+
 	    // Prepare line 80 characters wide, sequence is subset of this
 	    char [] emptyLine = new char [80];
 
@@ -195,32 +196,32 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 		    sq.setLength(0);
 		    // Empty the utility buffer
 		    ub.setLength(0);
-		    
+
 		    // How long is this chunk?
 		    int len = lineLens[i];
-		    
+
 		    // Prep the whitespace
 		    Arrays.fill(emptyLine, ' ');
 		    sq.append(emptyLine);
 
 		    // Prepare a Symbol array same length as chunk
 		    Symbol [] sa = new Symbol [len];
-		    
+
 		    // Get symbols and format into blocks of tokens
 		    System.arraycopy(syms, start + (i * 60), sa, 0, len);
-		    
-		    String blocks = (formatTokenBlock(ub, sa, 10, dnaTokenization)).toString();
-		    
+
+		    String blocks = (formatTokenBlock(ub, sa, 10, dnaTokenization)).substring(0);
+
 		    sq.replace(10, blocks.length() + 10, blocks);
-		    
+
 		    // Calculate the running residue count and add to the line
 		    String count = Integer.toString((i * 60) + 1);
 		    sq.replace((9 - count.length()), 9, count);
-		    
+
 		    // Print formatted sequence line
 		    stream.println(sq);
 		}
-	    
+
 	    // Print end of entry
 	    stream.println("//");
 	} catch (IllegalSymbolException ex) {
@@ -289,7 +290,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 		qb.setLength(0);
 		ub.setLength(0);
 		StringBuffer fb = formatQualifierBlock(qb,
-						       formatQualifier(ub, key, vi.next()).toString(),
+						       formatQualifier(ub, key, vi.next()).substring(0),
 						       leader,
 						       80);
 		stream.println(fb);
@@ -300,7 +301,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
             qb.setLength(0);
             ub.setLength(0);
 	    StringBuffer fb = formatQualifierBlock(qb,
-						   formatQualifier(ub, key, value).toString(),
+						   formatQualifier(ub, key, value).substring(0),
 						   leader,
 						   80);
 	    stream.println(fb);

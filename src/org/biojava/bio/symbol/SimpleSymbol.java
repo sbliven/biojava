@@ -32,6 +32,7 @@ import org.biojava.bio.*;
  * A no-frills implementation of Symbol.
  *
  * @author Matthew Pocock
+ * @author Greg Cox
  */
 class SimpleSymbol
   extends
@@ -43,13 +44,13 @@ class SimpleSymbol
   private final char token;
   private final Annotation annotation;
   protected Alphabet matches;
-  
-  protected SimpleSymbol(char token, Annotation annotation) 
+
+  protected SimpleSymbol(char token, Annotation annotation)
   {
     this.token = token;
     this.annotation = new SimpleAnnotation(annotation);
   }
-  
+
   public SimpleSymbol(
     char token, Annotation annotation,
     Alphabet matches
@@ -63,22 +64,22 @@ class SimpleSymbol
       this.matches = matches;
     }
   }
-  
+
   public char getToken() {
     return token;
   }
-  
+
   public Annotation getAnnotation() {
     return annotation;
   }
-  
+
   public Alphabet getMatches() {
     if(matches == null) {
       matches = createMatches();
     }
     return matches;
   }
-  
+
   protected Alphabet createMatches() {
     throw new BioError(
       "Assertion Failure: Matches alphabet is null in " + this
@@ -103,15 +104,15 @@ class SimpleSymbol
           sb.append(sym.getName());
         }
         sb.append(')');
-        return sb.toString();
+        return sb.substring(0);
       }
     }
-    
+
     // not a basis symbol - let's name it by they symbols it contains.
     Alphabet a = getMatches();
     if (a instanceof FiniteAlphabet) {
       FiniteAlphabet fa = (FiniteAlphabet) a;
-      
+
       StringBuffer sb = new StringBuffer();
       sb.append('[');
       Iterator si = fa.iterator();
@@ -125,9 +126,9 @@ class SimpleSymbol
         sb.append(sym.getName());
       }
       sb.append(']');
-      return sb.toString();
+      return sb.substring(0);
     }
-    
+
     // an infinite alphabet - pants!
     return "Infinite";
   }
