@@ -424,13 +424,15 @@ class GenbankContext
 	    headerTag = lineTokens.nextToken();
 	    headerTagText = new StringBuffer(lineTokens.nextToken());
 
-	    String nextToken = lineTokens.nextToken();
-	    if(nextToken.startsWith(GenbankFormat.GI_TAG))
-	    {
-		this.saveSeqAnno();
-		headerTag = GenbankFormat.GI_TAG; // Possibly should be UID?
-		headerTagText =
-		    new StringBuffer(nextToken.substring(3));
+	    if (lineTokens.hasMoreTokens()) {
+		String nextToken = lineTokens.nextToken();
+		if(nextToken.startsWith(GenbankFormat.GI_TAG))
+		{
+		    this.saveSeqAnno();
+		    headerTag = GenbankFormat.GI_TAG; // Possibly should be UID?
+		    headerTagText =
+			new StringBuffer(nextToken.substring(3));
+		}
 	    }
 	}
 	else if (hasHeaderTag(line))
