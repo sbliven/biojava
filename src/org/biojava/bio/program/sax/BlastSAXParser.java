@@ -80,7 +80,8 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
     private HitSectionSAXParser          oHits;
     private SummaryLineHelperIF          oSummaryLineHelper;
 
-
+    private String                       oQueryId;
+    private String                       oDatabaseId;
 
     private static final int STARTUP             = 0;
     private static final int IN_TRAILER          = 1;
@@ -88,7 +89,7 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
     private static final int IN_HEADER           = 3;
     private static final int IN_SUMMARY          = 4;
     private static final int FINISHED_HITS       = 5;
-
+    
     private boolean          tDoneSummary        = false;
 
     /**
@@ -99,81 +100,79 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
      * @exception SAXException if an error occurs
      */
     BlastSAXParser(BlastLikeVersionSupport poVersion, 
-           String poNamespacePrefix) throws SAXException {
+                   String poNamespacePrefix) throws SAXException {
 
-    oVersion = poVersion;
-    this.setNamespacePrefix(poNamespacePrefix);
+        oVersion = poVersion;
+        this.setNamespacePrefix(poNamespacePrefix);
     
-    this.addPrefixMapping("biojava","http://www.biojava.org");
+        this.addPrefixMapping("biojava","http://www.biojava.org");
 
+        oHits = new HitSectionSAXParser(oVersion,this.getNamespacePrefix());
 
-    oHits = new HitSectionSAXParser(oVersion,this.getNamespacePrefix());
+        this.changeState(STARTUP);
+        aoLineSeparator = System.getProperty("line.separator").toCharArray();
 
-    this.changeState(STARTUP);
-    aoLineSeparator = System.getProperty("line.separator").toCharArray();
-
-    //Beginnings of using a Builder type pattern to create
-    //parser from part objects. Only for done
-    //Summary sections at present according to program type
-    //at present. Significant benefit would be
-    //for detail, allowing choice of part object optimised
-    //for speed of processing etc.
-    this.choosePartImplementations();
+        //Beginnings of using a Builder type pattern to create
+        //parser from part objects. Only for done
+        //Summary sections at present according to program type
+        //at present. Significant benefit would be
+        //for detail, allowing choice of part object optimised
+        //for speed of processing etc.
+        this.choosePartImplementations();
     }
     /**
      * Describe 'parse' method here.
      *
      */
     public String parse(BufferedReader poContents, String poLine)
-    throws SAXException {
+        throws SAXException {
 
-    String         oLine = null;
+        String oLine = null;
 
-    oContents = poContents;
+        oQueryId    = "";
+        oDatabaseId = "";
+        oContents = poContents;
 
-    //First deal with first line which must be the start of 
-    //a new Blast output
-    //For a brand new collection, check for the start of a 
-    //new BlastDataSet
+        //First deal with first line which must be the start of 
+        //a new Blast output
+        //For a brand new collection, check for the start of a 
+        //new BlastDataSet
 
         //look for characteristic of start of dataset
         if (oVersion.isStartOfDataSet(poLine)) {
-        //just figure out whether it's a new DataSet
-        //or not. i The onNewBlastDatSet method
-        //takes care of the rest...
-        this.onNewBlastDataSet(poLine);
-
+            //just figure out whether it's a new DataSet
+            //or not. i The onNewBlastDatSet method
+            //takes care of the rest...
+            this.onNewBlastDataSet(poLine);
         } else {
-        //should throw excpetion here
-        //message should be unexpected poLine parameter
-        return poLine;
-        
+            //should throw excpetion here
+            //message should be unexpected poLine parameter
+            return poLine;
         }
         //now parse stream...
         try {
-
-        oLine = oContents.readLine();
-        while ( (oLine != null) &&
-            (!checkNewBlastLikeDataSet(oLine)) ) {
-
-            //System.out.println(oLine);
-            
-            //interpret line and send messages accordingly
-            this.interpret(oLine);
             oLine = oContents.readLine();
+            while ((oLine != null) &&
+                    (!checkNewBlastLikeDataSet(oLine))) {
+
+                //System.out.println(oLine);
             
-        } // end while
+                //interpret line and send messages accordingly
+                this.interpret(oLine);
+                oLine = oContents.readLine();
+            
+            } // end while
         } catch (java.io.IOException x) {
-        System.out.println(x.getMessage());
-        System.out.println("File read interrupted");
+            System.out.println(x.getMessage());
+            System.out.println("File read interrupted");
         } // end try/catch
 
 
         //Now close open elements...
         if (iState == IN_TRAILER) {
-        this.emitRawOutput(oBuffer);
-        this.endElement(new QName(this,this.prefix("Trailer")));
-        this.changeState(AT_END);
+            this.emitRawOutput(oBuffer);
+            this.endElement(new QName(this,this.prefix("Trailer")));
+            this.changeState(AT_END);
         }
 
         this.endElement(new QName(this,this.prefix("BlastLikeDataSet")));
@@ -187,142 +186,183 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
      */
     private void interpret(String poLine) throws SAXException {
 
+        if (iState == IN_HEADER) {
+            //accumulate header information
 
-    if (iState == IN_HEADER) {
-        //accumulate header information
+            //things that can end header section
+            //start of summmary section
+            //start of detail section
 
-        //things that can end header section
-        //start of summmary section
-        //start of detail section
+            if (poLine.startsWith("Query=")) {
+                int i = poLine.indexOf("=");
+                oQueryId = poLine.substring(i + 1).trim();
+            }
 
-        if ( (poLine.startsWith(
-              "Sequences producing significant alignments")) ||
-         (poLine.startsWith(
-                  "Sequences producing High-scoring Segment Pairs")) ||
-         (poLine.startsWith(
-                  "-------- ")) ) {
+            if (poLine.startsWith("Database:")) {
+                int i = poLine.indexOf(":");
+                oDatabaseId = poLine.substring(i + 1).trim();
+            }
 
-        this.emitRawOutput(oBuffer);
+            if ((poLine.startsWith("Sequences producing significant alignments")) ||
+                (poLine.startsWith("Sequences producing High-scoring Segment Pairs")) ||
+                (poLine.startsWith("-------- "))) {
 
-        this.endElement(new QName(this,this.prefix("Header")));
+                this.emitRawOutput(oBuffer);
+
+                // Set attributes for QueryId element
+                oAtts.clear();
+                oAttQName.setQName("id");
+                oAtts.addAttribute(oAttQName.getURI(),
+                                   oAttQName.getLocalName(),
+                                   oAttQName.getQName(),
+                                   "CDATA", oQueryId);
+                oAttQName.setQName("metaData");
+                oAtts.addAttribute(oAttQName.getURI(),
+                                   oAttQName.getLocalName(),
+                                   oAttQName.getQName(),
+                                   "CDATA", "none");
+
+                // Fire the QueryId element
+                this.startElement(new QName(this,this.prefix("QueryId")),
+                                  (Attributes) oAtts);
+                this.endElement(new QName(this,this.prefix("QueryId")));
+
+                // Set attributes for DatabaseId element
+                oAtts.clear();
+                oAttQName.setQName("id");
+                oAtts.addAttribute(oAttQName.getURI(),
+                                   oAttQName.getLocalName(),
+                                   oAttQName.getQName(),
+                                   "CDATA", oDatabaseId);
+                oAttQName.setQName("metaData");
+                oAtts.addAttribute(oAttQName.getURI(),
+                                   oAttQName.getLocalName(),
+                                   oAttQName.getQName(),
+                                   "CDATA", "none");
+
+                // Fire the DatabaseId element
+                this.startElement(new QName(this,this.prefix("DatabaseId")),
+                                  (Attributes) oAtts);
+                this.endElement(new QName(this,this.prefix("DatabaseId")));
+
+                oAtts.clear();
+                this.endElement(new QName(this,this.prefix("Header")));
         
-        //change state
-        this.changeState(IN_SUMMARY);
-        oAtts.clear();
-        this.startElement(new QName(this,this.prefix("Summary")),
-                      (Attributes)oAtts);
+                //change state
+                this.changeState(IN_SUMMARY);
+                oAtts.clear();
+                this.startElement(new QName(this,this.prefix("Summary")),
+                                  (Attributes)oAtts);
 
-        //eat a blank line if there is one...
-        //          this.interpret(oLine);
-        //read next line
+                //eat a blank line if there is one...
+                //          this.interpret(oLine);
+                //read next line
 
-        try {
-            poLine = oContents.readLine();
+                try {
+                    poLine = oContents.readLine();
 
-        } catch (java.io.IOException x) {
-            System.err.println(x.getMessage());
-            System.err.println("File read interrupted");
-        } // end try/catch
+                } catch (java.io.IOException x) {
+                    System.err.println(x.getMessage());
+                    System.err.println("File read interrupted");
+                } // end try/catch
 
-        if (poLine.trim().equals("")) {
-            //System.out.println("BLANK LINE");
-        } else {
-            //recursively interpret it...
-            this.interpret(poLine);
-        }
+                if (poLine.trim().equals("")) {
+                    //System.out.println("BLANK LINE");
+                } else {
+                    //recursively interpret it...
+                    this.interpret(poLine);
+                }
 
-        return;
-        } //end check start of summary
+                return;
+            } //end check start of summary
 
-        //Currently doesn't handle output that starts
-        //with a detail section i.e. no summary.
-        //This is a BUG/FEATURE.
+            //Currently doesn't handle output that starts
+            //with a detail section i.e. no summary.
+            //This is a BUG/FEATURE.
 
-        oBuffer.add(poLine);
-    } //end if inHeader state
+            oBuffer.add(poLine);
+        } //end if inHeader state
 
-    //Deal with summary state
-    if (iState == IN_SUMMARY) {
-        //check to see if end of summary
-        //has been reached...
+        //Deal with summary state
+        if (iState == IN_SUMMARY) {
+            //check to see if end of summary
+            //has been reached...
 
-        //(signal is a blank line for NCBIBlast and Wu-Blast, 
-        //(signal is either a blank line or 
-        //Signal is \\End of List for GCG
+            //(signal is a blank line for NCBIBlast and Wu-Blast, 
+            //(signal is either a blank line or 
+            //Signal is \\End of List for GCG
 
-	// HMMR has a longer summary section to include the
-	// domain summary and the check for a blank line
-	// will prematurely end the summary section so
-	// skip this check for HMMR 
+            // HMMR has a longer summary section to include the
+            // domain summary and the check for a blank line
+            // will prematurely end the summary section so
+            // skip this check for HMMR
 
 
-	int iProgram = oVersion.getProgram();
+            int iProgram = oVersion.getProgram();
     
-	if ( iProgram == BlastLikeVersionSupport.HMMER ) {
+            if (iProgram == BlastLikeVersionSupport.HMMER) {
 
-	    if ( poLine.trim().equals("") ) {
-		return; // skip
-	    }
+                if (poLine.trim().equals("")) {
+                    return; // skip
+                }
 
-	    //HMMER-specific
-	    if (poLine.startsWith("Parsed for domains:")) {
-		//signifies domain summary info
-		String oAfterHmmr =  this.hmmerDomainSummaryReached(poLine);
-		//		System.err.println( "Last-->" + oAfterHmmr + "<--" );
-		return;
-	    } 
-	} else if ( (poLine.trim().equals("")) ||
-		    (poLine.trim().startsWith("[no more scores")) ||
-		    (poLine.trim().startsWith("\\")) ) {
-	    //Can't change state, because we still want to
-	    //check for start of detail... 
+                //HMMER-specific
+                if (poLine.startsWith("Parsed for domains:")) {
+                    //signifies domain summary info
+                    String oAfterHmmr =  this.hmmerDomainSummaryReached(poLine);
+                    //		System.err.println( "Last-->" + oAfterHmmr + "<--" );
+                    return;
+                }
+            } else if ((poLine.trim().equals("")) ||
+                       (poLine.trim().startsWith("[no more scores")) ||
+                       (poLine.trim().startsWith("\\")) ) {
+                //Can't change state, because we still want to
+                //check for start of detail... 
 
-        //Forgive non-standard white-space
-	    //between end of summary and start of detail
-	    if (!tDoneSummary) {
-		tDoneSummary = true;
-		this.endElement(new QName(this,this.prefix("Summary")));
-	    } 
-	    return; //return before attempting to parse Summary Line
+                //Forgive non-standard white-space
+                //between end of summary and start of detail
+                if (!tDoneSummary) {
+                    tDoneSummary = true;
+                    this.endElement(new QName(this,this.prefix("Summary")));
+                }
+                return; //return before attempting to parse Summary Line
+            }
 
+            if (poLine.startsWith(">")) {
+                //signifies start of detail section
+                this.hitsSectionReached(poLine);
+
+                return;
+            }
+            //need to check that we've end of summary
+            //'cos could be spurious data between end of
+            //summary and start of detail e.g. multi-line WARNINGs
+            //at end of Summary section in Wu-Blast.
+            if (!tDoneSummary) {
+                this.parseSummaryLine(poLine);
+            }
+            return;
         }
+        //State set to this when parsing of Hits finished
+        if (iState == FINISHED_HITS) {
 
-        if (poLine.startsWith(">")) {
-        //signifies start of detail section
-        this.hitsSectionReached(poLine);
+            //check end of detail section
 
-        return;
+            this.endElement(new QName(this,this.prefix("Detail")));
+            oAtts.clear();
+            this.startElement(new QName(this,this.prefix("Trailer")),
+                              (Attributes)oAtts);
+
+            //change state to Trailer and initialse Buffer
+            this.changeState(IN_TRAILER);
+            oBuffer.clear();
+            return;
+
+        } //end if finishedHists
+
+        if (iState == IN_TRAILER) {
+            oBuffer.add(poLine);
         }
-        //need to check that we've end of summary
-        //'cos could be spurious data between end of
-        //summary and start of detail e.g. multi-line WARNINGs
-        //at end of Summary section in Wu-Blast.
-        if (!tDoneSummary) {
-	    this.parseSummaryLine(poLine);
-        }
-        return;
-    }
-    //State set to this when parsing of Hits finished
-    if (iState == FINISHED_HITS) {
-
-        //check end of detail section
-
-        this.endElement(new QName(this,this.prefix("Detail")));
-        oAtts.clear();
-        this.startElement(new QName(this,this.prefix("Trailer")),
-                  (Attributes)oAtts);
-
-        //change state to Trailer and initialse Buffer
-        this.changeState(IN_TRAILER);
-        oBuffer.clear();
-        return;
-
-
-    } //end if finishedHists
-
-    if (iState == IN_TRAILER) {
-        oBuffer.add(poLine);
-    }
     }
     /**
      * This method is called when a line indicating that
@@ -356,26 +396,26 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
     oAtts.clear();
     oAttQName.setQName("program");
     oAtts.addAttribute(oAttQName.getURI(),
-               oAttQName.getLocalName(),
-               oAttQName.getQName(),
-               "CDATA",oVersion.getProgramString());
+                       oAttQName.getLocalName(),
+                       oAttQName.getQName(),
+                       "CDATA",oVersion.getProgramString());
 
     oAttQName.setQName("version");
     oAtts.addAttribute(oAttQName.getURI(),
-               oAttQName.getLocalName(),
-               oAttQName.getQName(),
-               "CDATA",oVersion.getVersionString());
-
+                       oAttQName.getLocalName(),
+                       oAttQName.getQName(),
+                       "CDATA",oVersion.getVersionString());
+    
     this.startElement(new QName(this,this.prefix("BlastLikeDataSet")),
-              (Attributes)oAtts);
+                      (Attributes)oAtts);
 
     //change state to reflect the fact we're in the Header
     iState = IN_HEADER;
     oBuffer.clear();
-    
+
     oAtts.clear();
     this.startElement(new QName(this,this.prefix("Header")),
-              (Attributes)oAtts);
+                      (Attributes)oAtts);
     }
     /**
      * Describe constructor here.
@@ -384,27 +424,27 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
      */
     private void emitRawOutput(ArrayList poList) throws SAXException {
 
-    oAtts.clear();
-    oAttQName.setQName("xml:space");
-    oAtts.addAttribute(oAttQName.getURI(),
-               oAttQName.getLocalName(),
-               oAttQName.getQName(),
-               "NMTOKEN","preserve");
-    this.startElement(new QName (this,this.prefix("RawOutput")),
-              (Attributes)oAtts);
+        oAtts.clear();
+        oAttQName.setQName("xml:space");
+        oAtts.addAttribute(oAttQName.getURI(),
+                           oAttQName.getLocalName(),
+                           oAttQName.getQName(),
+                           "NMTOKEN","preserve");
+        this.startElement(new QName (this,this.prefix("RawOutput")),
+                          (Attributes)oAtts);
 
-    //Cycle through ArrayList and send character array data to
-    //XML ContentHandler.
+        //Cycle through ArrayList and send character array data to
+        //XML ContentHandler.
 
-    int iTmpListSize = poList.size();
-    for (int i = 0; i < iTmpListSize; i++) {
-        //System.out.println("RAW:" + (String)poList.get(i));
-        aoChars = ((String)poList.get(i)).toCharArray();
-        this.characters(aoLineSeparator,0,1);
-        this.characters(aoChars,0,aoChars.length);
-    }
+        int iTmpListSize = poList.size();
+        for (int i = 0; i < iTmpListSize; i++) {
+            //System.out.println("RAW:" + (String)poList.get(i));
+            aoChars = ((String)poList.get(i)).toCharArray();
+            this.characters(aoLineSeparator,0,1);
+            this.characters(aoChars,0,aoChars.length);
+        }
 
-    this.endElement(new QName(this,this.prefix("RawOutput")));
+        this.endElement(new QName(this,this.prefix("RawOutput")));
     }
     /**
      * Parses a summary line.  Actualy parsing functionality
@@ -424,92 +464,91 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
      */
     private void parseSummaryLine(String poLine) throws SAXException {
 
-    //Also remember in header add query attribute and database type?
+        //Also remember in header add query attribute and database type?
 
-    //Should split this out into different implementations
-    //according to program and version
+        //Should split this out into different implementations
+        //according to program and version
 
-    oSummaryLineHelper.parse(poLine,oMap,oVersion);
-    //Eat a line for GCG, which has two lines for a summary.
-    //The first line becomes the beginning of the description
-    if (iVer == BlastLikeVersionSupport.GCG_BLASTN) {
-        try {
-            poLine = oContents.readLine();
-            oSummaryLineHelper.parse(poLine,oMap,oVersion);
-        } catch (IOException x) {
-            System.out.println(x.getMessage());
-            System.out.println("GCG File read interrupted");
-        } // end try/catch
-    }
-
-    /* Note have to do this check a hmmer can have empty summary
-     * sections and oMap.keySet().toArray will return an array
-     * of size 1 with a null first element if the map is empty.
-     */
-    if ( oMap.size() == 0 ) {
-	return;
-    }
-
-    aoKeys = (String[])(oMap.keySet().toArray(aoArrayType));
-
-    oAtts.clear();
-
-    //output contents of Map as either elements or
-    //attribute lists
-
-    //two passes first get HitsSummary element started
-    for (int i = 0; i < aoKeys.length; i++) {
-        
-        if ( (aoKeys[i].equals("hitId")) || 
-         (aoKeys[i].equals("hitDescription")) ) {
-        //do nothing
-        } else {
-
-    oAttQName.setQName(aoKeys[i]);
-    oAtts.addAttribute(oAttQName.getURI(),
-               oAttQName.getLocalName(),
-               oAttQName.getQName(),
-               "CDATA",(String)oMap.get(aoKeys[i]));
+        oSummaryLineHelper.parse(poLine,oMap,oVersion);
+        //Eat a line for GCG, which has two lines for a summary.
+        //The first line becomes the beginning of the description
+        if (iVer == BlastLikeVersionSupport.GCG_BLASTN) {
+            try {
+                poLine = oContents.readLine();
+                oSummaryLineHelper.parse(poLine,oMap,oVersion);
+            } catch (IOException x) {
+                System.out.println(x.getMessage());
+                System.out.println("GCG File read interrupted");
+            } // end try/catch
         }
-    }
 
-    this.startElement(new QName(this,this.prefix("HitSummary")),
-              (Attributes)oAtts);
-
-    for (int i = 0; i < aoKeys.length; i++) {
-        
-        if (aoKeys[i].equals("hitId")) {
-        oAtts.clear();
-        oAttQName.setQName("id");
-        oAtts.addAttribute(oAttQName.getURI(),
-                   oAttQName.getLocalName(),
-                   oAttQName.getQName(),
-                   "CDATA",(String)oMap.get(aoKeys[i]));
-
-        oAttQName.setQName("metaData");
-        oAtts.addAttribute(oAttQName.getURI(),
-                   oAttQName.getLocalName(),
-                   oAttQName.getQName(),
-                   "CDATA","none");
-        this.startElement(new QName(this,this.prefix("HitId")),
-                  (Attributes)oAtts);
-        this.endElement(new QName(this,this.prefix("HitId")));
-
-        } else if (aoKeys[i].equals("hitDescription")) {
-        oAtts.clear();
-        this.startElement(new QName(this,this.prefix("HitDescription")),
-                  (Attributes)oAtts);
-        aoChars = ((String)oMap.get(aoKeys[i])).toCharArray();
-        this.characters(aoChars,0,aoChars.length);
-        this.endElement(new QName(this,this.prefix("HitDescription")));
-
+        /* Note have to do this check a hmmer can have empty summary
+         * sections and oMap.keySet().toArray will return an array
+         * of size 1 with a null first element if the map is empty.
+         */
+        if ( oMap.size() == 0 ) {
+            return;
         }
-        //System.out.print(aoKeys[i] + ": ");
-        //System.out.println(oMap.get(aoKeys[i]));
-    }
-    this.endElement(new QName(this,this.prefix("HitSummary")));
 
-    oMap.clear();
+        aoKeys = (String[])(oMap.keySet().toArray(aoArrayType));
+
+        oAtts.clear();
+
+        //output contents of Map as either elements or
+        //attribute lists
+
+        //two passes first get HitsSummary element started
+        for (int i = 0; i < aoKeys.length; i++) {
+        
+            if ((aoKeys[i].equals("hitId")) || 
+                (aoKeys[i].equals("hitDescription")) ) {
+                //do nothing
+            } else {
+
+                oAttQName.setQName(aoKeys[i]);
+                oAtts.addAttribute(oAttQName.getURI(),
+                                   oAttQName.getLocalName(),
+                                   oAttQName.getQName(),
+                                   "CDATA",(String)oMap.get(aoKeys[i]));
+            }
+        }
+
+        this.startElement(new QName(this,this.prefix("HitSummary")),
+                          (Attributes)oAtts);
+
+        for (int i = 0; i < aoKeys.length; i++) {
+        
+            if (aoKeys[i].equals("hitId")) {
+                oAtts.clear();
+                oAttQName.setQName("id");
+                oAtts.addAttribute(oAttQName.getURI(),
+                                   oAttQName.getLocalName(),
+                                   oAttQName.getQName(),
+                                   "CDATA",(String)oMap.get(aoKeys[i]));
+
+                oAttQName.setQName("metaData");
+                oAtts.addAttribute(oAttQName.getURI(),
+                                   oAttQName.getLocalName(),
+                                   oAttQName.getQName(),
+                                   "CDATA","none");
+                this.startElement(new QName(this,this.prefix("HitId")),
+                                  (Attributes)oAtts);
+                this.endElement(new QName(this,this.prefix("HitId")));
+
+            } else if (aoKeys[i].equals("hitDescription")) {
+                oAtts.clear();
+                this.startElement(new QName(this,this.prefix("HitDescription")),
+                                  (Attributes)oAtts);
+                aoChars = ((String)oMap.get(aoKeys[i])).toCharArray();
+                this.characters(aoChars,0,aoChars.length);
+                this.endElement(new QName(this,this.prefix("HitDescription")));
+            }
+            //System.out.print(aoKeys[i] + ": ");
+            //System.out.println(oMap.get(aoKeys[i]));
+        }
+        this.endElement(new QName(this,this.prefix("HitSummary")));
+
+        oMap.clear();
     }
     /**
      * From the specified line, hand over
@@ -520,46 +559,43 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
      * @exception  thrown if
      */
     private void hitsSectionReached(String poLine)
-    throws SAXException {
+        throws SAXException {
 
-    //Parse Contents stream up to end of Hits
-    oHits.setContentHandler(oHandler);
+        //Parse Contents stream up to end of Hits
+        oHits.setContentHandler(oHandler);
 
-    //this returns when end of hits section reached...
+        //this returns when end of hits section reached...
 
-    oAtts.clear();
-    this.startElement(new QName(this,this.prefix("Detail")),
-              (Attributes)oAtts);
+        oAtts.clear();
+        this.startElement(new QName(this,this.prefix("Detail")),
+                          (Attributes)oAtts);
 
-    int iProgram = oVersion.getProgram();
+        int iProgram = oVersion.getProgram();
 
-    if ( (iProgram == BlastLikeVersionSupport.NCBI_BLASTN) ||
-         (iProgram == BlastLikeVersionSupport.NCBI_BLASTX) ||
-         (iProgram == BlastLikeVersionSupport.NCBI_BLASTP) ||
-         (iProgram == BlastLikeVersionSupport.NCBI_TBLASTN) ||
-         (iProgram == BlastLikeVersionSupport.NCBI_TBLASTX) ) {
+        if ((iProgram == BlastLikeVersionSupport.NCBI_BLASTN) ||
+            (iProgram == BlastLikeVersionSupport.NCBI_BLASTX) ||
+            (iProgram == BlastLikeVersionSupport.NCBI_BLASTP) ||
+            (iProgram == BlastLikeVersionSupport.NCBI_TBLASTN) ||
+            (iProgram == BlastLikeVersionSupport.NCBI_TBLASTX)) {
 
-        oHits.parse(oContents,poLine,"Database:");
+            oHits.parse(oContents,poLine,"Database:");
+        }
 
-    }
+        if ((iProgram == BlastLikeVersionSupport.WU_BLASTN) ||
+            (iProgram == BlastLikeVersionSupport.WU_BLASTX) ||
+            (iProgram == BlastLikeVersionSupport.WU_BLASTP) ||
+            (iProgram == BlastLikeVersionSupport.WU_TBLASTN) ||
+            (iProgram == BlastLikeVersionSupport.WU_TBLASTX)) {
 
-    if ( (iProgram == BlastLikeVersionSupport.WU_BLASTN) ||
-         (iProgram == BlastLikeVersionSupport.WU_BLASTX) ||
-         (iProgram == BlastLikeVersionSupport.WU_BLASTP) ||
-         (iProgram == BlastLikeVersionSupport.WU_TBLASTN) ||
-         (iProgram == BlastLikeVersionSupport.WU_TBLASTX) ) {
+            oHits.parse(oContents,poLine,"Parameters:");
+        }
 
-        oHits.parse(oContents,poLine,"Parameters:");
+        //Same as NCBI, left here for organization I suppose
+        if (iProgram == BlastLikeVersionSupport.GCG_BLASTN) {
+            oHits.parse(oContents,poLine,"Database:");
+        }
 
-    }
-
-    //Same as NCBI, left here for organization I suppose
-    if  (iProgram == BlastLikeVersionSupport.GCG_BLASTN) {
-        oHits.parse(oContents,poLine,"Database:");
-    }
-
-    this.changeState(FINISHED_HITS);
-
+        this.changeState(FINISHED_HITS);
     }
 
     /**
@@ -569,157 +605,148 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
      * @exception SAXException if an error occurs
      */
     private String hmmerDomainSummaryReached(String poLine)
-	throws SAXException {
+        throws SAXException {
 
-	//To be implemented - parse Contents stream up to end of 
-	//domain summary via delegation (analagous to hits parsing
+        //To be implemented - parse Contents stream up to end of 
+        //domain summary via delegation (analagous to hits parsing
+
+        oAtts.clear();
+        this.startElement(new QName(this,this.prefix("DomainSummary")),
+                          (Attributes)oAtts);
+
+        int iProgram = oVersion.getProgram();
     
+        if (iProgram == BlastLikeVersionSupport.HMMER) {
 
-	oAtts.clear();
-	this.startElement(new QName(this,this.prefix("DomainSummary")),
-			  (Attributes)oAtts);
+            DomainSectionSAXParser oDomains = new DomainSectionSAXParser
+                (oVersion, this.getNamespacePrefix());
 
-	int iProgram = oVersion.getProgram();
-    
-	if ( iProgram == BlastLikeVersionSupport.HMMER ) {
-
-	    DomainSectionSAXParser oDomains = new DomainSectionSAXParser
-		( oVersion, this.getNamespacePrefix() );
-
-	    oDomains.setContentHandler( oHandler );
+            oDomains.setContentHandler(oHandler);
 	    
-	    oDomains.parse( oContents, poLine );
+            oDomains.parse(oContents, poLine);
 
-	    this.endElement(new QName(this,this.prefix("DomainSummary")));
-	    this.endElement(new QName(this,this.prefix("Summary")));
+            this.endElement(new QName(this,this.prefix("DomainSummary")));
+            this.endElement(new QName(this,this.prefix("Summary")));
 
+            String oLine = null;
+            try {
 
-	    String oLine = null;
-	    try {
-
-		oLine = oContents.readLine();
-		while( oLine != null && 
-		       ( !oLine.startsWith
-			 ( "Alignments of top-scoring domains:" ) ) &&
-		       ( !oLine.startsWith( "//" ) ) &&
-		       ( !oLine.startsWith( "Histogram of all scores:" ) )	       
-		       ) {
-		    oLine = oContents.readLine();	    
-		}
-	    } catch ( IOException e ) {
-		System.err.println( e.getMessage());
-		System.err.println("File read interrupted");
-		throw new SAXException( "File read interrupted" );
-	    }
+                oLine = oContents.readLine();
+                while (oLine != null &&
+                       (!oLine.startsWith
+                        ("Alignments of top-scoring domains:")) &&
+                       (!oLine.startsWith("//")) &&
+                       (!oLine.startsWith("Histogram of all scores:"))) {
+                    oLine = oContents.readLine();
+                }
+            } catch (IOException e) {
+                System.err.println(e.getMessage());
+                System.err.println("File read interrupted");
+                throw new SAXException("File read interrupted");
+            }
 		
-	    if ( oLine != null && 
-		 oLine.startsWith( "Alignments of top-scoring domains:" ) ) {
+            if (oLine != null && 
+                oLine.startsWith("Alignments of top-scoring domains:")) {
  
-		oAtts.clear();
-		this.startElement(new QName(this,this.prefix("Detail")),
-				  (Attributes)oAtts);		
+                oAtts.clear();
+                this.startElement(new QName(this,this.prefix("Detail")),
+                                  (Attributes)oAtts);		
 
-		HmmerAlignmentSAXParser oAlignments = new HmmerAlignmentSAXParser
-		    ( oVersion, this.getNamespacePrefix() );
+                HmmerAlignmentSAXParser oAlignments = new HmmerAlignmentSAXParser
+                    (oVersion, this.getNamespacePrefix());
 
-		oAlignments.setContentHandler( oHandler );
+                oAlignments.setContentHandler(oHandler);
 	    
-		String oLastLine = oAlignments.parse( oContents, poLine );
+                String oLastLine = oAlignments.parse(oContents, poLine);
 
-		if ( oLastLine.trim().equals("//") ) { // hmmpfam
+                if (oLastLine.trim().equals("//")) { // hmmpfam
 
-		    // then close details, BlastLikeDataSet
-		    // if more stuff
+                    // then close details, BlastLikeDataSet
+                    // if more stuff
 
-		    this.endElement(new QName(this,this.prefix("Detail")));
+                    this.endElement(new QName(this,this.prefix("Detail")));
 
-		    try {
-			oLine = oContents.readLine();
-			while ( (oLine != null) &&
-				(!oLine.startsWith( "Query:" ) ) ) {
+                    try {
+                        oLine = oContents.readLine();
+                        while ((oLine != null) &&
+                               (!oLine.startsWith( "Query:"))) {
 
-			    oLine = oContents.readLine();
-			}
-		    } catch ( IOException e ) {
-			System.err.println( "Read interrupted" );
-			System.err.println( e );
+                            oLine = oContents.readLine();
+                        }
+                    } catch (IOException e) {
+                        System.err.println("Read interrupted");
+                        System.err.println(e);
 
-			e.printStackTrace();
-			throw new SAXException( "File read interupted" );
-		    }
-		    if ( oLine == null ) {
-			this.changeState(AT_END);
-			return oLine;
-		    } else {
-			this.endElement(new QName(this,this.prefix
-						  ("BlastLikeDataSet")));
-			// need to start a new one ( if there is )
-			oAtts.clear();
-			oAttQName.setQName("program");
-			oAtts.addAttribute(oAttQName.getURI(),
-					   oAttQName.getLocalName(),
-					   oAttQName.getQName(),
-					   "CDATA",oVersion.getProgramString());
+                        e.printStackTrace();
+                        throw new SAXException("File read interupted");
+                    }
+                    if (oLine == null) {
+                        this.changeState(AT_END);
+                        return oLine;
+                    } else {
+                        this.endElement(new QName(this,this.prefix
+                                                  ("BlastLikeDataSet")));
+                        // need to start a new one (if there is)
+                        oAtts.clear();
+                        oAttQName.setQName("program");
+                        oAtts.addAttribute(oAttQName.getURI(),
+                                           oAttQName.getLocalName(),
+                                           oAttQName.getQName(),
+                                           "CDATA",oVersion.getProgramString());
 		
-			oAttQName.setQName("version");
-			oAtts.addAttribute(oAttQName.getURI(),
-					   oAttQName.getLocalName(),
-					   oAttQName.getQName(),
-					   "CDATA",oVersion.getVersionString());
+                        oAttQName.setQName("version");
+                        oAtts.addAttribute(oAttQName.getURI(),
+                                           oAttQName.getLocalName(),
+                                           oAttQName.getQName(),
+                                           "CDATA",oVersion.getVersionString());
 
-			this.startElement(new QName(this,this.prefix
-						    ("BlastLikeDataSet")),
-					  (Attributes)oAtts);
+                        this.startElement(new QName(this,this.prefix
+                                                    ("BlastLikeDataSet")),
+                                          (Attributes)oAtts);
 
-			
-			oAtts.clear();
-			this.startElement(new QName(this,this.prefix("Header")),
-					  (Attributes)oAtts);
-			oBuffer.clear();
-			oBuffer.add( oLine );
-			this.emitRawOutput(oBuffer);
-			this.endElement(new QName(this,this.prefix("Header")));
+                        oAtts.clear();
+                        this.startElement(new QName(this,this.prefix("Header")),
+                                          (Attributes)oAtts);
+                        oBuffer.clear();
+                        oBuffer.add(oLine);
+                        this.emitRawOutput(oBuffer);
+                        this.endElement(new QName(this,this.prefix("Header")));
 
-			this.changeState( IN_SUMMARY );
+                        this.changeState(IN_SUMMARY);
 
-			oAtts.clear();
-			this.startElement(new QName(this,this.prefix
-						    ("Summary")),
-					  (Attributes)oAtts);
+                        oAtts.clear();
+                        this.startElement(new QName(this,this.prefix
+                                                    ("Summary")),
+                                          (Attributes)oAtts);
 
-			try{
-			// fast forward to first summary
-			    while (! oLine.startsWith( "-------- " ) ) {
-				oLine = oContents.readLine();
-			    }  
-			} catch (java.io.IOException x) {
-			    System.err.println(x.getMessage());
-			    System.err.println("File read interrupted");
-			    throw new SAXException( "File read interrupted" );
-			} // end try/catch
-		    }
-
-		} else {
-		    //		    System.err.println( "FINISHED HITS>>>>>>" );
-		    oLine = oLastLine;
-		    this.changeState( FINISHED_HITS );
-		}
+                        try{
+                            // fast forward to first summary
+                            while (! oLine.startsWith( "-------- ")) {
+                                oLine = oContents.readLine();
+                            }
+                        } catch (IOException x) {
+                            System.err.println(x.getMessage());
+                            System.err.println("File read interrupted");
+                            throw new SAXException("File read interrupted");
+                        } // end try/catch
+                    }
+                } else {
+                    //		    System.err.println("FINISHED HITS>>>>>>");
+                    oLine = oLastLine;
+                    this.changeState(FINISHED_HITS);
+                }	
+            } else { // passed Alignment section
+                //
+                // Either trailer with histogram or a new entry with '//'
+                // look for the start of a new file with 'hmmsearch'?
 		
-		
-	    } else { // passed Alignment section
-		//
-		// Either trailer with histogram or a new entry with '//'
-		// look for the start of a new file with 'hmmsearch'?
-		
-		this.changeState(FINISHED_HITS);
+                this.changeState(FINISHED_HITS);
+            }
+            return oLine;
+        }
+        return poLine;
 
-	    }
-	    return oLine;
-	}
-	return poLine;
-
-    //    this.endElement(new QName(this,this.prefix("Detail")));
-
+        //    this.endElement(new QName(this,this.prefix("Detail")));
     }
 
     /**
@@ -734,15 +761,13 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
      */
     private boolean checkNewBlastLikeDataSet(String poLine) {
 
-	if ( (poLine.startsWith("BLAST")) ||
-	     (poLine.startsWith("TBLAST"))
-	     )
+        if ((poLine.startsWith("BLAST")) ||
+            (poLine.startsWith("TBLAST")))
 	    {
-		return true;
+            return true;
 	    } else {
-		return false;
+            return false;
 	    }
-
     }
     /**
      * Choose particular implementations of Part objects
@@ -753,50 +778,48 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
      */
     private void choosePartImplementations() throws SAXException {
 
-    iVer = oVersion.getProgram();
+        iVer = oVersion.getProgram();
 
-    if ( (iVer == BlastLikeVersionSupport.NCBI_BLASTN) ||
-         (iVer == BlastLikeVersionSupport.NCBI_BLASTX) ||
-         (iVer == BlastLikeVersionSupport.NCBI_BLASTP) ||
-         (iVer == BlastLikeVersionSupport.NCBI_TBLASTN) ||
-         (iVer == BlastLikeVersionSupport.NCBI_TBLASTX) ) {
-          oSummaryLineHelper = 
-          (SummaryLineHelperIF) new NcbiBlastSummaryLineHelper();
-          return;
-    }
+        if ((iVer == BlastLikeVersionSupport.NCBI_BLASTN) ||
+            (iVer == BlastLikeVersionSupport.NCBI_BLASTX) ||
+            (iVer == BlastLikeVersionSupport.NCBI_BLASTP) ||
+            (iVer == BlastLikeVersionSupport.NCBI_TBLASTN) ||
+            (iVer == BlastLikeVersionSupport.NCBI_TBLASTX)) {
+            oSummaryLineHelper =
+                (SummaryLineHelperIF) new NcbiBlastSummaryLineHelper();
+            return;
+        }
 
-    if ( (iVer == BlastLikeVersionSupport.WU_BLASTN) ||
-         (iVer == BlastLikeVersionSupport.WU_BLASTX) ||
-         (iVer == BlastLikeVersionSupport.WU_BLASTP) ||
-         (iVer == BlastLikeVersionSupport.WU_TBLASTN) ||
-         (iVer == BlastLikeVersionSupport.WU_TBLASTX) ) {
-          oSummaryLineHelper = 
-          (SummaryLineHelperIF) new WuBlastSummaryLineHelper();
-          return;
-      }
+        if ((iVer == BlastLikeVersionSupport.WU_BLASTN) ||
+            (iVer == BlastLikeVersionSupport.WU_BLASTX) ||
+            (iVer == BlastLikeVersionSupport.WU_BLASTP) ||
+            (iVer == BlastLikeVersionSupport.WU_TBLASTN) ||
+            (iVer == BlastLikeVersionSupport.WU_TBLASTX)) {
+            oSummaryLineHelper = 
+                (SummaryLineHelperIF) new WuBlastSummaryLineHelper();
+            return;
+        }
 
-    if (iVer == BlastLikeVersionSupport.HMMER) {
-          oSummaryLineHelper = 
-          (SummaryLineHelperIF) new HmmerSummaryLineHelper();
-          return;
-      }
+        if (iVer == BlastLikeVersionSupport.HMMER) {
+            oSummaryLineHelper = 
+                (SummaryLineHelperIF) new HmmerSummaryLineHelper();
+            return;
+        }
     
-    if (iVer == BlastLikeVersionSupport.GCG_BLASTN) {
-          oSummaryLineHelper = 
-          (SummaryLineHelperIF) new GCGBlastSummaryLineHelper();
-          return;
-      }
+        if (iVer == BlastLikeVersionSupport.GCG_BLASTN) {
+            oSummaryLineHelper = 
+                (SummaryLineHelperIF) new GCGBlastSummaryLineHelper();
+            return;
+        }
     
-    //If get to here, no implementation available
+        //If get to here, no implementation available
 
-    //Exception to help SAX parser writers track down
-    //problems writing software to support the framework
-    throw (new SAXException(
-    "Could not choose a suitable implementation of the ".
-        concat("SummaryLineHelperIF for program ").
-        concat(oVersion.getProgramString()).
-        concat(" version ").
-        concat(oVersion.getVersionString())));
-
+        //Exception to help SAX parser writers track down
+        //problems writing software to support the framework
+        throw (new SAXException("Could not choose a suitable implementation of the ".
+                                concat("SummaryLineHelperIF for program ").
+                                concat(oVersion.getProgramString()).
+                                concat(" version ").
+                                concat(oVersion.getVersionString())));
     }
 }
