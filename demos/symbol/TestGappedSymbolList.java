@@ -38,7 +38,7 @@ public class TestGappedSymbolList {
     final int trials = 10;
     
     System.out.println("Starting with:\n" + res.seqString());
-    GappedSymbolList gl = new GappedSymbolList(res);
+    SimpleGappedSymbolList gl = new SimpleGappedSymbolList(res);
     System.out.println("Gapped version:\n" + gl.seqString());
     gl.dumpBlocks();
     for(int i = 0; i < trials; i++) {
