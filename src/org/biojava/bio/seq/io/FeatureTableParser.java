@@ -147,37 +147,49 @@ class FeatureTableParser {
     }
 
     private Location parseLocation(String loc) throws BioException {
-	boolean joining = false;
-	boolean complementing = false;
-	boolean isComplement = false;
-	boolean ranging = false;
-	
-	int start = -1;
+	    boolean joining = false;    
+	    boolean complementing = false;
+	    boolean isComplement = false;
+	    boolean ranging = false;
+	    boolean fuzzyMin = false;
+        boolean fuzzyMax = false;
+    
+	    int start = -1;
 
-	Location result = null;
-	List locationList = null;
+	    Location result = null;
+	    List locationList = null;
 	
-	StringTokenizer toke = new StringTokenizer(loc, "(),. ><", true);
-	int level = 0;
-	while (toke.hasMoreTokens()) {
-	    String t = toke.nextToken();
-	    // System.err.println(t);
-	    if (t.equals("join") || t.equals("order")) {
-		joining = true;
-	    locationList = new ArrayList();
-	    } else if (t.equals("complement")) {
-		complementing = true;
-		isComplement = true;
-	    } else if (t.equals("(")) {
-		++level;
-	    } else if (t.equals(")")) {
-		--level;
-	    } else if (t.equals(".")) {
-	    } else if (t.equals(",")) {
-	    } else if (t.equals(">")) {
-	    } else if (t.equals("<")) {
-	    } else if (t.equals(" ")) {
-	    } else {
+	    StringTokenizer toke = new StringTokenizer(loc, "(),. ><", true);
+	    int level = 0;
+	    while (toke.hasMoreTokens()) {
+	        String t = toke.nextToken();
+	        // System.err.println(t);
+	        if (t.equals("join") || t.equals("order")) {
+		        joining = true;
+	            locationList = new ArrayList();
+	        } else if (t.equals("complement")) {
+		        complementing = true;
+		        isComplement = true;
+	        } else if (t.equals("(")) {
+		        ++level;
+	        } else if (t.equals(")")) {
+		        --level;
+	        } else if (t.equals(".")) {
+	        } else if (t.equals(",")) {
+	        } else if (t.equals(">")) {
+                if (ranging) {
+                    fuzzyMax = true;
+                } else {
+                    fuzzyMin = true;
+                }
+	        } else if (t.equals("<")) {
+                if (ranging) {
+                    fuzzyMax = true;
+                } else {
+                    fuzzyMin = true;
+                }
+	        } else if (t.equals(" ")) {
+	        } else {
 		// System.err.println("Range! " + ranging);
 		// This ought to be an actual coordinate.
 		int pos = -1;
@@ -192,6 +204,10 @@ class FeatureTableParser {
 		    ranging = true;
 		} else {
 		    Location rl = new RangeLocation(start, pos);
+            if (fuzzyMin || fuzzyMax) {
+                rl = new FuzzyLocation(rl, fuzzyMin, fuzzyMax);
+            }
+            
 		    if (joining) {
 			locationList.add(rl);
 		    } else {
@@ -205,6 +221,7 @@ class FeatureTableParser {
 		    }
 		    ranging = false;
 		    complementing = false;
+            fuzzyMin = fuzzyMax = false;
 		}
 	    }
 	}
