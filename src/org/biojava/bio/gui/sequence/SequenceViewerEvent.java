@@ -81,4 +81,12 @@ public class SequenceViewerEvent extends EventObject {
   public MouseEvent getMouseEvent() {
     return mouseEvent;
   }
+  
+  public String toString() {
+    return "[" +
+        super.toString() + "]" +
+        "target: "+ target +
+        "pos: " + pos +
+        "mosuseEvent: " + mouseEvent;
+  }
 }

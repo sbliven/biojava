@@ -126,6 +126,10 @@ extends SequenceRendererWrapper {
       return parent.graphicsToSequence(d);
     }
     
+    public int graphicsToSequence(Point point) {
+      return parent.graphicsToSequence(point);
+    }
+    
     public SymbolList getSequence() {
       SymbolList sl = null;
       SymbolList pseq = parent.getSequence();

@@ -101,12 +101,7 @@ public class RulerRenderer implements SequenceRenderer {
     int min, int max
   ) {
     path.add(this);
-    int pos;
-    if(src.getDirection()==src.HORIZONTAL) {
-      pos = src.graphicsToSequence(me.getX());
-    } else {
-      pos = src.graphicsToSequence(me.getY());
-    }
+    int pos = src.graphicsToSequence(me.getPoint());
     return new SequenceViewerEvent(this, null, pos, me, path);
   }
 }

@@ -90,6 +90,94 @@ Changeable {
 
   private transient ChangeSupport changeSupport = null;
   
+  private SequenceViewerSupport svSupport = new SequenceViewerSupport();
+  private MouseListener mouseListener = new MouseAdapter() {
+    public void mouseClicked(MouseEvent me) {
+      if(renderer == null) {
+        return;
+      }
+      int[] lineExtent = calcLineExtent(me);
+      SequenceViewerEvent sve = renderer.processMouseEvent(
+        SequencePanel.this,
+        me,
+        new ArrayList(),
+        lineExtent[0], lineExtent[1]
+      );
+      svSupport.fireMouseClicked(sve);
+    }
+    
+    public void mousePressed(MouseEvent me) {
+      if(renderer == null) {
+        return;
+      }
+      int[] lineExtent = calcLineExtent(me);
+      SequenceViewerEvent sve = renderer.processMouseEvent(
+        SequencePanel.this,
+        me,
+        new ArrayList(),
+        lineExtent[0], lineExtent[1]
+      );
+      svSupport.fireMousePressed(sve);
+    }
+    
+    public void mouseReleased(MouseEvent me) {
+      if(renderer == null) {
+        return;
+      }
+      int[] lineExtent = calcLineExtent(me);
+      SequenceViewerEvent sve = renderer.processMouseEvent(
+        SequencePanel.this,
+        me,
+        new ArrayList(),
+        lineExtent[0], lineExtent[1]
+      );
+      svSupport.fireMouseReleased(sve);
+    }
+  };
+  public void addSequenceViewerListener(SequenceViewerListener svl) {
+    svSupport.addSequenceViewerListener(svl);
+  }
+  public void removeSequenceViewerListener(SequenceViewerListener svl) {
+    svSupport.removeSequenceViewerListener(svl);
+  }
+
+  private SequenceViewerMotionSupport svmSupport = new SequenceViewerMotionSupport();
+  private MouseMotionListener mouseMotionListener = new MouseMotionListener() {
+    public void mouseDragged(MouseEvent me) {
+      if(renderer == null) {
+        return;
+      }
+      int[] lineExtent = calcLineExtent(me);
+      SequenceViewerEvent sve = renderer.processMouseEvent(
+        SequencePanel.this,
+        me,
+        new ArrayList(),
+        lineExtent[0], lineExtent[1]
+      );
+      svmSupport.fireMouseDragged(sve);
+    }
+    
+    public void mouseMoved(MouseEvent me) {
+      if(renderer == null) {
+        return;
+      }
+      int[] lineExtent = calcLineExtent(me);
+      SequenceViewerEvent sve = renderer.processMouseEvent(
+        SequencePanel.this,
+        me,
+        new ArrayList(),
+        lineExtent[0], lineExtent[1]
+      );
+      svmSupport.fireMouseMoved(sve);
+    }
+  };
+  public void addSequenceViewerMotionListener(SequenceViewerMotionListener svml) {
+    svmSupport.addSequenceViewerMotionListener(svml);
+  }
+  public void removeSequenceViewerMotionListener(SequenceViewerMotionListener svml) {
+    svmSupport.removeSequenceViewerMotionListener(svml);
+  }
+  
   protected boolean hasChangeListeners() {
     return changeSupport != null;
   }
@@ -159,6 +247,8 @@ Changeable {
       setFont(new Font("Times New Roman", Font.PLAIN, 12));
     }
     this.addPropertyChangeListener(theMonitor);
+    this.addMouseListener(mouseListener);
+    this.addMouseMotionListener(mouseMotionListener);
   }
   
   /**
@@ -340,16 +430,16 @@ Changeable {
       maxPos = currentClip.getMaxX();
     }
     
-    System.out.println("minPos: " + minPos);
+    //System.out.println("minPos: " + minPos);
     int minOffset = Arrays.binarySearch(offsets, minPos);
     if(minOffset < 0) {
       minOffset = -minOffset - 1;
     }
-    System.out.println("minOffset: " + minOffset);
+    //System.out.println("minOffset: " + minOffset);
     double minCoord = (minOffset == 0) ? 0.0 : offsets[minOffset-1];
-    System.out.println("minCoord: " + minCoord);
+    //System.out.println("minCoord: " + minCoord);
     int minP = 1 + (int) ((double) minOffset * symbolsPerLine);
-    System.out.println("minP: " + minP);
+    //System.out.println("minP: " + minP);
     
     Rectangle2D.Double clip = new Rectangle2D.Double();
     if (direction == HORIZONTAL) {
@@ -415,22 +505,30 @@ Changeable {
       );
       ChangeSupport cs = getChangeSupport(RENDERER);
       synchronized(cs) {
-        if( (this.renderer != null) && (this.renderer instanceof Changeable) ) {
-          Changeable c = (Changeable) this.renderer;
-          c.removeChangeListener(layoutListener, SequenceRenderContext.LAYOUT);
-          c.removeChangeListener(repaintListener, SequenceRenderContext.REPAINT);
-        }
-        this.renderer = r;
-        if( (r != null) && (r instanceof Changeable) ) {
-          Changeable c = (Changeable) r;
-          c.addChangeListener(layoutListener, SequenceRenderContext.LAYOUT);
-          c.addChangeListener(repaintListener, SequenceRenderContext.REPAINT);
-        }
+        cs.firePreChangeEvent(ce);
+        _setRenderer(r);
+        cs.firePostChangeEvent(ce);
       }
     } else {
-      this.renderer = r;
+      _setRenderer(r);
     }
     resizeAndValidate();
+  }
+  
+  protected void _setRenderer(SequenceRenderer r) {
+    if( (this.renderer != null) && (this.renderer instanceof Changeable) ) {
+      Changeable c = (Changeable) this.renderer;
+      c.removeChangeListener(layoutListener, SequenceRenderContext.LAYOUT);
+      c.removeChangeListener(repaintListener, SequenceRenderContext.REPAINT);
+    }
+
+    this.renderer = r;
+
+    if( (r != null) && (r instanceof Changeable) ) {
+      Changeable c = (Changeable) r;
+      c.addChangeListener(layoutListener, SequenceRenderContext.LAYOUT);
+      c.addChangeListener(repaintListener, SequenceRenderContext.REPAINT);
+    }
   }
 
   public double sequenceToGraphics(int seqPos) {
@@ -440,9 +538,17 @@ Changeable {
   public int graphicsToSequence(double gPos) {
     return (int) (gPos / scale) + 1;
   }
+  
+  public int graphicsToSequence(Point point) {
+    if(direction == HORIZONTAL) {
+      return graphicsToSequence(point.getX());
+    } else {
+      return graphicsToSequence(point.getY());
+    }
+  }
 
   public void resizeAndValidate() {
-    System.out.println("resizeAndValidate starting");
+    //System.out.println("resizeAndValidate starting");
     Dimension d = null;
     double acrossDim;
     
@@ -482,8 +588,8 @@ Changeable {
       leadingBorder.setSize(insetBefore);
       trailingBorder.setSize(insetAfter);
       double insets = insetBefore + insetAfter;
-      System.out.println("insetBefore: " + insetBefore);
-      System.out.println("insetAfter: " + insetAfter);
+      //System.out.println("insetBefore: " + insetBefore);
+      //System.out.println("insetAfter: " + insetAfter);
       
       if(lines > 0) {
         // Fixed number of lines. Calculate width needed to lay out rectangle.
@@ -542,13 +648,31 @@ Changeable {
     setMinimumSize(d);
     setPreferredSize(d);
     revalidate();
-    System.out.println("resizeAndValidate ending");
+    //System.out.println("resizeAndValidate ending");
   }
 
   private class RendererMonitor implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent ev) {
       repaint();
     }
+  }
+  
+  protected int[] calcLineExtent(MouseEvent me) {
+    int pos;
+    if(direction == HORIZONTAL) {
+      pos = me.getX();
+    } else {
+      pos = me.getY();
+    }
+    
+    int minOffset = Arrays.binarySearch(offsets, pos);
+    if(minOffset < 0) {
+      minOffset = -minOffset - 1;
+    }
+    int min = 1 + (int) ((double) minOffset * symbolsPerLine);
+    int max = min + symbolsPerLine - 1;
+    
+    return new int[] { min, max };
   }
   
   public class Border

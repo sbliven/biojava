@@ -195,12 +195,24 @@ implements SequenceRenderer, Serializable {
     int min, int max
   ) {
     path.add(this);
-    return LayeredRenderer.INSTANCE.processMouseEvent(
+    SequenceViewerEvent sve = LayeredRenderer.INSTANCE.processMouseEvent(
       Collections.nCopies(renderers.size(), src),
       me,
       path,
       min, max,
       renderers
     );
+    
+    if(sve == null) {
+      sve = new SequenceViewerEvent(
+        this,
+        null,
+        src.graphicsToSequence(me.getPoint()),
+        me,
+        path
+      );
+    }
+    
+    return sve;
   }
 }

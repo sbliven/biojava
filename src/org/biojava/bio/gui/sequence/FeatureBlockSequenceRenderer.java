@@ -155,12 +155,7 @@ implements SequenceRenderer {
     int min, int max
   ) {
     path.add(this);
-    int pos;
-    if(src.getDirection()==src.HORIZONTAL) {
-      pos = src.graphicsToSequence(me.getX());
-    } else {
-      pos = src.graphicsToSequence(me.getY());
-    }
+    int pos = src.graphicsToSequence(me.getPoint());
     
     FeatureHolder hits = ((Sequence) src.getSequence()).filter(
       new FeatureFilter.OverlapsLocation(new PointLocation(pos)), false

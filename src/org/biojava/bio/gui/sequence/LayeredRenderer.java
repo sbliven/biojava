@@ -159,20 +159,20 @@ public class LayeredRenderer {
       
       SequenceViewerEvent sve = null;
       if(src.getDirection() == src.HORIZONTAL) {
-        if( (me.getX() > offset) && (me.getX() <= offset + depth) ) {
-          me.translatePoint((int) offset, 0);
+        if( (me.getY() > offset) && (me.getY() <= offset + depth) ) {
+          me.translatePoint(0, (int) -offset);
           sve = sRend.processMouseEvent(
             src, me, path, min, max
           );
-          me.translatePoint((int) -offset, 0);
+          me.translatePoint(0, (int) +offset);
         }
       } else {
-        if( (me.getY() > offset) && (me.getY() <= offset + depth) ) {
-          me.translatePoint(0, (int) offset);
+        if( (me.getX() > offset) && (me.getX() <= offset + depth) ) {
+          me.translatePoint((int) -offset, 0);
           sve = sRend.processMouseEvent(
             src, me, path, min, max
           );
-          me.translatePoint(0, (int) -offset);
+          me.translatePoint((int) +offset, 0);
         }
       }
       

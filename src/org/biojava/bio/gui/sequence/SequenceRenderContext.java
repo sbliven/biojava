@@ -83,6 +83,15 @@ public interface SequenceRenderContext extends SwingConstants {
    * @return    The corresponding sequence index 
    */
   int graphicsToSequence(double d);
+  
+  /**
+   *  Converts a graphical position into a sequence coordinate. This will
+   * use getDirection to decide wether to use the x or y coordinate.
+   *
+   * @param  point  a point representing the position
+   * @return the corresponding sequence index 
+   */
+  int graphicsToSequence(Point point);
 
   /**
    *  The Sequence that is currently rendered by this SequenceRenderContext. 

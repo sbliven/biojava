@@ -111,6 +111,20 @@ public class EmblViewer {
     mlRend.addRenderer(new RulerRenderer());
 
     sp.setRenderer(mlRend);
+    sp.addSequenceViewerListener(new SequenceViewerListener() {
+      public void mouseClicked(SequenceViewerEvent sve) {
+        System.out.println("clicked: " + sve);
+      }
+      
+      public void mousePressed(SequenceViewerEvent sve) {
+        System.out.println("pressed: " + sve);
+      }
+      
+      public void mouseReleased(SequenceViewerEvent sve) {
+        System.out.println("released: " + sve);
+      }
+    });
+    
     f.getContentPane().setLayout(new BorderLayout());
     f.getContentPane().add(new JScrollPane(sp), BorderLayout.CENTER);
     JPanel panel = new JPanel();

@@ -61,6 +61,10 @@ implements SequenceRenderContext {
     return src.graphicsToSequence(d);
   }
   
+  public int graphicsToSequence(Point point) {
+    return src.graphicsToSequence(point);
+  }
+
   public SymbolList getSequence() {
     return seq;
   }

@@ -88,13 +88,25 @@ extends SequenceRendererWrapper {
   ) {
     path.add(this);
     List layers = layer(src);
-    return LayeredRenderer.INSTANCE.processMouseEvent(
+    SequenceViewerEvent sve = LayeredRenderer.INSTANCE.processMouseEvent(
       layers,
       me,
       path,
       min, max,
       Collections.nCopies(layers.size(), getRenderer())
     );
+    
+    if(sve == null) {
+      sve = new SequenceViewerEvent(
+        this,
+        null,
+        src.graphicsToSequence(me.getPoint()),
+        me,
+        path
+      );
+    }
+    
+    return sve;
   }
   
   protected List layer(SequenceRenderContext src) {
