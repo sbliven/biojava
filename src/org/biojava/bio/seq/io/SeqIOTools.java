@@ -826,6 +826,26 @@ public final class SeqIOTools  {
     }
 
     /**
+     * Writes a Biojava <code>SequenceIterator</code>,
+     * <code>SequenceDB</code>, <code>Sequence</code> or <code>Aligment</code>
+     * to an <code>OutputStream</code>
+     *
+     * @param formatName eg fasta, GenBank (case insensitive)
+     * @param alphabetName eg DNA, RNA (case insensititve)
+     * @param os where to write to
+     * @param biojava the object to write
+     * @throws BioException problems getting data from the biojava object.
+     * @throws IOException if there are IO problems
+     * @throws IllegalSymbolException a Symbol cannot be parsed
+     */
+    public static void biojavaToFile(String formatName, String alphabetName,
+                                     OutputStream os, Object biojava)
+    throws BioException, IOException, IllegalSymbolException{
+      int fileType = identifyFormat(formatName,alphabetName);
+      biojavaToFile(fileType, os, biojava);
+    }
+
+    /**
      * Converts a Biojava object to the given filetype.
      */
     public static void biojavaToFile(int fileType, OutputStream os,
@@ -844,7 +864,13 @@ public final class SeqIOTools  {
             case SeqIOConstants.GENBANK_DNA:
             case SeqIOConstants.SWISSPROT:
             case SeqIOConstants.GENPEPT:
-                seqToFile(fileType, os, (SequenceIterator) biojava);
+                if(biojava instanceof SequenceDB){
+                  seqToFile(fileType, os, ((SequenceDB)biojava).sequenceIterator());
+                }else if(biojava instanceof Sequence){
+                  seqToFile(fileType, os, new SingleSeqIterator((Sequence)biojava));
+                }else{
+                  seqToFile(fileType, os, (SequenceIterator) biojava);
+                }
                 break;
             default:
                 throw new BioException("Unknown file type '"
