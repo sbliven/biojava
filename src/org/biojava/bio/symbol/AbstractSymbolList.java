@@ -67,8 +67,20 @@ implements SymbolList {
     return new SymbolIterator(1, length());
   }
 
-  public SymbolList subList(int start, int end) {
-    return new SubList(start, end);
+  public SymbolList subList(int start, int end) 
+  {
+      if (start < 0 || end > length()) {
+	  throw new IndexOutOfBoundsException(
+	          "Sublist index out of bounds " + length() + ":" + start + "," + end
+	  );
+      }
+
+      if (end < start) {
+        throw new IndexOutOfBoundsException(
+            "send must not be lower than sstart: start=" + start + ", end=" + end
+        );
+      }
+      return new SubList(start, end);
   }
 
   public List toList() {
@@ -195,7 +207,7 @@ implements SymbolList {
     }
 
     public SymbolList subList(int sstart, int send) {
-      if (sstart < 1 || send > length() || send < 1 || send > length()) {
+      if (sstart < 1 || send > length()) {
         throw new IndexOutOfBoundsException(
             "Sublist index out of bounds " + length() + ":" + start + "," + send
             );
