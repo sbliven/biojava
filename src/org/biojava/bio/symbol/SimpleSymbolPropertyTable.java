@@ -1,16 +1,36 @@
 /*
- * SimpleSymbolPropertyTable.java
+ *                    BioJava development code
  *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
+/*
  * Created on December 20, 2000, 7:19 PM
  */
 
 package org.biojava.bio.symbol;
 
-
 import java.util.*;
+
 /**
- *
- * @author  mjones
+ * Class that implements the SymbolPropertyTable interface
+ * @author  Mike Jones (primary author)
+ * @author  David Huen (minor, extended class to cover pK)
  */
 public class SimpleSymbolPropertyTable implements SymbolPropertyTable {
 
@@ -21,7 +41,8 @@ public class SimpleSymbolPropertyTable implements SymbolPropertyTable {
     
     private final Map doublePropMap;
     
-    public SimpleSymbolPropertyTable(Alphabet source, String name){
+    public SimpleSymbolPropertyTable(Alphabet source, String name)
+    {
         this.source = source;
         this.name = name;
         doublePropMap = new HashMap();
