@@ -22,6 +22,7 @@
 package org.biojava.bio.ontology;
 
 import java.util.*;
+import org.biojava.utils.*;
 
 import junit.framework.TestCase;
 
@@ -32,104 +33,56 @@ import junit.framework.TestCase;
  * @author Matthew Pocock
  * @since 1.4
  */
-public class OntologyTest extends TestCase {
-    protected Ontology onto;
-    protected Term widget;
-    protected Term sprocket;
-    protected Term machine;
-    protected Term blueWidget;
-    protected Term isa;
-    protected Term partof;
-    protected Term dummy;
+public class OntologyTest
+extends TestCase {
+  // fixme: this needs splitting into multiple tests
+  // we need a basic ontology to do tests over
+  public void testProperties()
+  throws OntologyException, AlreadyExistsException, ChangeVetoException
+  {
+    String name = "Tester";
+    String description = "Our Description";
     
-    public OntologyTest(String name) {
-        super(name);
-    }
+    Ontology onto = OntoTools.getDefaultFactory().createOntology(name, description);
+    Term isa = onto.importTerm(OntoTools.IS_A);
+    Term animal = onto.createTerm("Animal", "An animal");
+    Term fish = onto.createTerm("Fish", "A swimming, cold-blooded thingy");
+    Term mamal = onto.createTerm("Mamal", "A milk-producing quadraped");
+    Term human = onto.createTerm("Human", "Us");
+    
+    Triple fish_isa_animal = onto.createTriple(fish, animal, isa);
+    Triple mamal_isa_animal = onto.createTriple(mamal, animal, isa);
+    Triple human_isa_mamal = onto.createTriple(human, mamal, isa);
+    
+    // basic properties
+    assertEquals(onto.getName(), name);
+    assertEquals(onto.getDescription(), description);
+    
+    // terms
+    assertEquals(onto.getTerms().size(), 5);
+    assertTrue(onto.getTerms().contains(animal));
+    assertTrue(onto.getTerms().contains(fish));
+    assertTrue(onto.getTerms().contains(mamal));
+    assertTrue(onto.getTerms().contains(human));
+    
+    // terms by name
+    assertEquals(onto.getTerm("Animal"), animal);
+    assertEquals(onto.getTerm("Human"), human);
+    
+    // triples
+    assertEquals(onto.getTriples(null, null, null).size(), 3);
+    assertTrue(onto.getTriples(null, null, null).contains(fish_isa_animal));
+    assertTrue(onto.getTriples(null, null, null).contains(mamal_isa_animal));
+    assertTrue(onto.getTriples(null, null, null).contains(human_isa_mamal));
+    
+    // triple searching
+    assertEquals(onto.getTriples(null, animal, null).size(), 2);
+    assertEquals(onto.getTriples(null, mamal, null).size(), 1);
+    assertEquals(onto.getTriples(null, human, null).size(), 0);
+    assertEquals(onto.getTriples(null, mamal, isa), onto.getTriples(human, null, isa));
+    assertEquals(onto.getTriples(human, mamal, isa).size(), 1);
+    assertEquals(onto.getTriples(human, animal, isa).size(), 0);
+  }
   
-    protected void setUp() throws Exception {
-        Ontology relations = new Ontology.Impl("relations", "Some standard relations");
-        Term master_isa = relations.createTerm("is-a", "");
-        Term master_partof = relations.createTerm("part-of", "");
-        
-        onto = new Ontology.Impl("test", "Test ontology");
-        machine = onto.createTerm("machine", "A fancy machine");
-        sprocket = onto.createTerm("sprocket", "");
-        widget = onto.createTerm("widget", "");
-        blueWidget = onto.createTerm("blueWidget", "");
-        isa = onto.importTerm(master_isa);
-        partof = onto.importTerm(master_partof);
-        
-        dummy = new Ontology.Impl("", "").createTerm("dummy", "Silly dummy term");
-        
-        onto.createTriple(sprocket, machine, partof);
-        onto.createTriple(widget, machine, partof);
-        onto.createTriple(blueWidget, widget, isa);
-    }
-  
-    public void testGetBySubject() {
-        assertEquals(onto.getTriples(widget, null, null).size(), 1);
-        assertEquals(onto.getTriples(machine, null, null).size(), 0);
-        assertEquals(onto.getTriples(dummy, null, null).size(), 0);
-    }
-    
-    public void testGetByObject() {
-        assertEquals(onto.getTriples(null, machine, null).size(), 2);
-        assertEquals(onto.getTriples(null, widget, null).size(), 1);
-        assertEquals(onto.getTriples(null, dummy, null).size(), 0);
-    }
-    
-    public void testGetByRelation() {
-        assertEquals(onto.getTriples(null, null, partof).size(), 2);
-        assertEquals(onto.getTriples(null, null, isa).size(), 1);
-        assertEquals(onto.getTriples(null, null, dummy).size(), 0);
-    }
-    
-    public void testGetByMulti() {
-        assertEquals(onto.getTriples(sprocket, machine, null).size(), 1);
-        assertEquals(onto.getTriples(sprocket, machine, partof).size(), 1);
-        assertEquals(onto.getTriples(sprocket, machine, isa).size(), 0);
-    }
-    
-    public void testOntoToos_Core() {
-      Ontology onto = OntoTools.getCoreOntology();
-      
-      onto.getTriples(null, null, null);
-    }
-    
-    public void testCoreISA()
-    throws OntologyException {
-      Ontology onto = OntoTools.getCoreOntology();
-      
-      doIsaTest(OntoTools.IS_A, OntoTools.IS_A, true);
-      doIsaTest(OntoTools.HAS_A, OntoTools.IS_A, false);
-      doIsaTest(OntoTools.RELATION, OntoTools.ANY, true);
-      doIsaTest(OntoTools.REFLEXIVE, OntoTools.RELATION, true);
-      doIsaTest(OntoTools.EQUIVALENCE, OntoTools.REFLEXIVE, true);
-      doIsaTest(OntoTools.EQUIVALENCE, OntoTools.RELATION, true);
-      doIsaTest(OntoTools.EQUIVALENCE, OntoTools.ANY, true);
-      doIsaTest(OntoTools.EQUIVALENCE, OntoTools.PARTIAL_ORDER, false);
-    }
-    
-    private void doIsaTest(Term t1, Term t2, boolean yesno)
-    throws OntologyException {
-      boolean res = OntoTools.isa(t1, t2);
-      assertEquals(
-        "Terms: " + t1 + " , " + t2,
-        yesno, res
-      );
-    }
-    
-    public void testSimpleISA()
-    throws OntologyException, org.biojava.utils.ChangeVetoException {
-      Ontology onto = OntoTools.getDefaultFactory().createOntology(
-        "is-a tester",
-        "Lets just get this is-a relationship stuff tested across ontologies"
-      );
-      
-      Term local_isa = onto.importTerm(OntoTools.IS_A);
-      
-      doIsaTest(local_isa, OntoTools.IS_A, true);
-      doIsaTest(local_isa, OntoTools.HAS_A, false);
-    }
 }
 

@@ -384,8 +384,8 @@
       <!-- The junit task doesn't support 'if' so we test for JUnit here -->
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
         <fileset dir="${build.dest.tests}">
-          <include name="**/*Test*" />
-          <exclude name="**/*$*" />
+          <include name="**/*Test.class" />
+          <include name="**/*TestSuite.class" />
         </fileset>
       </batchtest>
     </junit>
@@ -410,9 +410,10 @@
       <!-- The junit task doesn't support 'if' so we test for JUnit here -->
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
         <fileset dir="${build.dest.tests}">
-          <include name="**/*Test*" />
-          <exclude name="**/*$*" />
-          <exclude name="**/ssbind/*Test*" />
+          <include name="**/*Test.class" />
+          <include name="**/*TestSuite.class" />
+          <exclude name="**/ssbind/*Test.class" />
+          <exclude name="**/ssbind/*TestSuite.class" />
         </fileset>
       </batchtest>
     </junit>
@@ -436,8 +437,8 @@
       <!-- The junit task doesn't support 'if' so we test for JUnit here -->
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
         <fileset dir="${build.dest.tests}">
-          <include name="org/biojava/bio/seq/*Test*" />
-          <include name="org/biojava/bio/seq/*$*" />
+          <include name="org/biojava/bio/seq/*Test.class" />
+          <include name="org/biojava/bio/seq/*TestSuite.class" />
         </fileset>
       </batchtest>
     </junit>
@@ -461,8 +462,8 @@
       <!-- The junit task doesn't support 'if' so we test for JUnit here -->
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
         <fileset dir="${build.dest.tests}">
-          <include name="org/biojava/bio/symbol/*Test*" />
-          <exclude name="org/biojava/bio/symbol/*$*" />
+          <include name="org/biojava/bio/symbol/*Test.class" />
+          <include name="org/biojava/bio/symbol/*TestSuite.class" />
         </fileset>
       </batchtest>
     </junit>
@@ -486,8 +487,8 @@
       <!-- The junit task doesn't support 'if' so we test for JUnit here -->
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
         <fileset dir="${build.dest.tests}">
-          <include name="org/biojava/bio/*Test*" />
-          <exclude name="org/biojava/bio/*$*" />
+          <include name="org/biojava/bio/*Test.class" />
+          <include name="org/biojava/bio/*TestSuite.class" />
         </fileset>
       </batchtest>
     </junit>
@@ -511,8 +512,8 @@
       <!-- The junit task doesn't support 'if' so we test for JUnit here -->
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
         <fileset dir="${build.dest.tests}">
-          <include name="org/biojava/bio/ontology/*Test*" />
-          <exclude name="org/biojava/bio/ontology/*$*" />
+          <include name="org/biojava/bio/ontology/*Test.class" />
+          <include name="org/biojava/bio/ontology/*TestSuite.class" />
         </fileset>
       </batchtest>
     </junit>

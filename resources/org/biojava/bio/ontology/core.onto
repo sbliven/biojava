@@ -13,6 +13,7 @@ has-a	is-a	relation
 disjoint	is-a	relation
 relation	has-a	size
 size	is-a	positive-integer
+identity	is-a	equivalence
 
 # We need to be able to talk about the core object model so that we can plumb
 # magic in without making it totaly obvious

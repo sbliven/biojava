@@ -129,18 +129,42 @@ extends Changeable {
    * this relation holds if there is any other relation that would imply it, and
    * that relation holds.</p>
    *
-   * <p>The first special case of implication is identity. If two terms are
-   * identical, then anything that is true for one is also true of the other.
-   * the most common case of this is when terms are imported. The imported term
-   * and the original term have an implicit identity relationship.</p>
+   * <p>Imported terms should be handled using the seccond clause. If x, y or S
+   * are imported versions of a, b or R respectively, then the proposition
+   * holds.</p>
    *
-   * <p>The seccond special case of implication is via inheritance. In particular, if
-   * the relationship holds for any parent terms of the subject or object, and
-   * and child terms of the relation, then it holds for that triple. For
-   * example, if you have stated that humans are mamals, and that mamals have
-   * eyes, then we know that humans have eyes. Likewise, if we know that Jane
-   * has a father Mark, then we know that Jane has a parent Mark, as father is
-   * a sub-type of parent.</p>
+   * @for.developer
+   * <p>There are four types of relation that allow you to explore solutions
+   * involving a range of related terms for a given relation.</p>
+   *
+   * <table>
+   * <tr><td>symmetric</td><td>i R j implies j R i</td></tr>
+   * <tr><td>antisymmetric</td><td>i R j and j R i implies i = j</td></tr>
+   * <tr><td>transitive</td><td>i R j and j R k implies i R k</td></tr>
+   * <tr><td>reflexive</td><td>i R i</td></tr>
+   * </table>
+   *
+   * @for.developer
+   * <p>It is important to treat the relations themselves as things to be
+   * reasoned over. Here is a simple example.</p>
+   *
+   * <pre>
+   * relations X, Y;
+   * ( X is-a Y and a X b ) implies ( a Y b )
+   * </pre>
+   *
+   * <p>To be fully functional, though, it is necissary to work with inferred
+   * relations.</p>
+   *
+   * @for.developer
+   * <p>One flip that may be usefull is the following inference:</p>
+   *
+   * <pre>
+   * (a => b) <=> (!b => !a)
+   * </pre>
+   *
+   * <p>This lets you make inferences about a statement based upon the falseness
+   * of it's implications.</p>
    *
    * @for.developer
    * It is probably worth caching inheritance and identity information
@@ -179,7 +203,7 @@ extends Changeable {
      *
      * Relation->true means we can prove that the relation holds
      * Relation->false means that we can not prove that the relation holds
-     * Relation->null means taht we are in the process of proving things
+     * Relation->null means that we are in the process of proving things
      */
     private Map knownTrue;
     
@@ -198,6 +222,7 @@ extends Changeable {
       Set all = recSearch(onto, false);
       
       if(all.size() == 0) {
+        doAdd(onto, Collections.singleton(onto));
         return;
       }
       
@@ -239,9 +264,14 @@ extends Changeable {
     
     public void removeOntology(Ontology onto)
     throws ChangeVetoException {
+      if(!allOntologies.containsKey(onto)) {
+        return;
+      }
+      
       Set all = recSearch(onto, true);
       
       if(all.size() == 0) {
+        doRemove(onto, Collections.singleton(onto));
         return;
       }
       
@@ -286,12 +316,17 @@ extends Changeable {
     throws InvalidTermException {
       Relation rel = new Relation(subject, object, relation);
       
+      System.err.println("isTrue(" + rel + ")");
+      
       // see if we know anything about this one
+      System.err.println("Check proven facts: " + rel);
       if(knownTrue.containsKey(rel)) {
         Boolean val = (Boolean) knownTrue.get(rel);
         if(val == Boolean.TRUE) {
+          System.err.println("We already know this is true: " + rel);
           return true;
         } else {
+          System.err.println("We already know this is false, or unproven: " + rel);
           return false;
         }
       }
@@ -299,15 +334,25 @@ extends Changeable {
       // we're working on it...
       knownTrue.put(rel, null);
       
+      // for every Term x, x IS_A x
+      System.err.println("Check for self-isa: " + rel);
+      if(subject == object && relation == OntoTools.IS_A) {
+        knownTrue.put(rel, Boolean.TRUE);
+        System.err.println("For every term x, x IS_A x holds");
+        return true;
+      }
+      
       // true(a, b, R)  = (a, b, R) member_of triples
       //               or (x, y, S) implies (a, b, R) and true(x, y, S)
       
       // do (a, b, R) member_of triples
+      System.err.println("Check for direct support: " + rel);
       if(subject.getOntology() == object.getOntology() &&
          subject.getOntology() == relation.getOntology() &&
          subject.getOntology().containsTriple(subject, object, relation)
       ) {
         knownTrue.put(rel, Boolean.TRUE);
+        System.err.println("Directly supported by the ontology: " + rel);
         return true;
       }
       
@@ -317,66 +362,81 @@ extends Changeable {
       // 1st case - implicit identity due to imports
       
       // subject import
+      System.err.println("Check for subject imports");
       for(Iterator ti = findIdentities(subject).iterator(); ti.hasNext(); ) {
         Term t = (Term) ti.next();
+        System.err.println("Trying identity of the subject: " + t + ", " + rel);
         if(isTrue(t, object, relation) )
         {
           knownTrue.put(rel, Boolean.TRUE);
+          System.err.println("True of an identity of the subject: " + rel);
           return true;
         }
       }
       // object import
+      System.err.println("Check for object imports");
       for(Iterator ti = findIdentities(object).iterator(); ti.hasNext(); ) {
         Term t = (Term) ti.next();
+        System.err.println("Trying identity of the object: " + t + ", " + rel);
         if(isTrue(subject, t, relation) )
         {
           knownTrue.put(rel, Boolean.TRUE);
+          System.err.println("True of an identity of the object: " + rel);
           return true;
         }
       }
       // relation import
+      System.err.println("Check for relation imports");
       for(Iterator ti = findIdentities(relation).iterator(); ti.hasNext(); ) {
         Term t = (Term) ti.next();
+        System.err.println("Trying identity of the relation: " + t + ", " + rel);
         if(isTrue(subject, object, t) )
         {
           knownTrue.put(rel, Boolean.TRUE);
+          System.err.println("True of an identity of the relation: " + rel);
           return true;
         }
       }
       
-      // 2nd case - walk inheritance tree
+      // checking for reflexive relation: i R i
+      System.err.println("Checking for reflexive relation: " + rel);
+      if(object.equals(subject) && isReflexive(relation)) {
+        knownTrue.put(rel, Boolean.TRUE);
+        System.err.println("Reflexive proposition true: " + rel);
+        return true;
+      }
       
-      // subject
-      for(Iterator ti = findParents(subject).iterator(); ti.hasNext(); ) {
-        Term t = (Term) ti.next();
-        if(isTrue(t, object, relation))
-        {
+      // checking for symmetric relation: a R b => b R a
+      System.err.println("Checking for symmetric relation: " + rel);
+      if(isSymmetric(relation)) {
+        if(isTrue(object, subject, relation)) {
           knownTrue.put(rel, Boolean.TRUE);
-          return true;
-        }
-      }
-      // object
-      for(Iterator ti = findParents(object).iterator(); ti.hasNext(); ) {
-        Term t = (Term) ti.next();
-        if(isTrue(subject, t, relation))
-        {
-          knownTrue.put(rel, Boolean.TRUE);
-          return true;
-        }
-      }
-      // relation
-      for(Iterator ti = findChildren(relation).iterator(); ti.hasNext(); ) {
-        Term t = (Term) ti.next();
-        if(isTrue(subject, object, t))
-        {
-          knownTrue.put(rel, Boolean.TRUE);
+          System.err.println("Symmetric proposition true: " + rel);
           return true;
         }
       }
       
-      // we should do the more esoteric implies here - this is what would make
-      // it a full reasoning engine.
+      // checking for transitive relation: x R y && y R z => x R z
+      // we have a potential x & z - search for a suitable y.
+      System.err.println("Checking for transitive relation: " + rel);
+      if(isTransitive(relation)) {
+        // this brute-force search should be replaced by something more
+        // optimised
+        for(Iterator ti = getAllTerms().iterator(); ti.hasNext(); ) {
+          Term t = (Term) ti.next();
+          System.err.println("Checking transitive possibility for: " + t + ", " + rel);
+          if(isTrue(subject, t, relation) &&
+             isTrue(t, object, relation) )
+          {
+            knownTrue.put(rel, Boolean.TRUE);
+            System.err.println("Transitive proposition true: " + rel);
+            return true;
+          }
+        }
+      }
       
+      // not able to prove this proposition.
+      System.err.println("Unable to prove: " + rel);
       knownTrue.put(rel, Boolean.FALSE);
       return false;
     }
@@ -388,15 +448,19 @@ extends Changeable {
     }
     
     private void recSearchImpl(Set res, Ontology onto, boolean toRemove) {
+      Set dependants = (Set) allOntologies.get(onto);
+      if(toRemove && dependants != null && dependants.size() == 1) {
+        res.add(onto);
+      } else if(!toRemove && dependants == null) {
+        res.add(onto);
+      }
+      
       for(Iterator i = onto.getTerms().iterator(); i.hasNext(); ) {
         Term t = (Term) i.next();
         if(t instanceof RemoteTerm) {
           RemoteTerm rt = (RemoteTerm) t;
           Ontology ro = rt.getRemoteTerm().getOntology();
-          if(res.contains(ro) == toRemove) {
-            res.add(ro);
-            recSearchImpl(res, ro, toRemove);
-          }
+          recSearchImpl(res, ro, toRemove);
         }
       }
     }
@@ -438,17 +502,14 @@ extends Changeable {
     throws InvalidTermException {
       Set parents = null;
       
-      for(Iterator tripI = term.getOntology().getTriples(term, null, null).iterator();
+      for(Iterator tripI = term.getOntology().getTriples(term, null, OntoTools.IS_A).iterator();
           tripI.hasNext(); )
       {
         Triple trip = (Triple) tripI.next();
-        // nasty nasty way to prove this - optimization needed desperately
-        if(isTrue(trip.getRelation(), OntoTools.IS_A, OntoTools.IS_A)) {
-          if(parents == null) {
-            parents = new HashSet();
-          }
-          parents.add(trip.getObject());
+        if(parents == null) {
+          parents = new HashSet();
         }
+        parents.add(trip.getObject());
       }
       
       if(parents == null) {
@@ -463,17 +524,14 @@ extends Changeable {
     throws InvalidTermException {
       Set children = null;
       
-      for(Iterator tripI = term.getOntology().getTriples(null, term, null).iterator();
+      for(Iterator tripI = term.getOntology().getTriples(null, term, OntoTools.IS_A).iterator();
           tripI.hasNext(); )
       {
         Triple trip = (Triple) tripI.next();
-        // nasty nasty way to prove this - optimization needed desperately
-        if(isTrue(trip.getRelation(), OntoTools.IS_A, OntoTools.IS_A)) {
-          if(children == null) {
-            children = new HashSet();
-          }
-          children.add(trip.getObject());
+        if(children == null) {
+          children = new HashSet();
         }
+        children.add(trip.getObject());
       }
       
       if(children == null) {
@@ -481,6 +539,43 @@ extends Changeable {
       } else {
         return children;
       }
+    }
+    
+    private boolean isReflexive(Term relation)
+    throws InvalidTermException {
+      if(relation == OntoTools.IS_A) {
+        return true;
+      } else {
+        return isa(relation, OntoTools.REFLEXIVE);
+      }
+    }
+    
+    private boolean isSymmetric(Term relation)
+    throws InvalidTermException {
+      return isa(relation, OntoTools.SYMMETRIC);
+    }
+    
+    private boolean isTransitive(Term relation)
+    throws InvalidTermException {
+      if(relation == OntoTools.IS_A) {
+        return true;
+      } else {
+        return isa(relation, OntoTools.TRANSITIVE);
+      }
+    }
+    
+    private Set getAllTerms() {
+      Set all = new HashSet();
+      for(Iterator i = allOntologies.keySet().iterator(); i.hasNext(); ) {
+        Ontology onto = (Ontology) i.next();
+        all.addAll(onto.getTerms());
+      }
+      return all;
+    }
+    
+    private boolean isa(Term subject, Term object)
+    throws InvalidTermException {
+      return isTrue(subject, object, OntoTools.IS_A);
     }
   }
   
@@ -522,6 +617,14 @@ extends Changeable {
       return getSubject().hashCode() +
         31 * getObject().hashCode() +
         31 * 31 * getRelation().hashCode();
+    }
+    
+    public String toString() {
+      return
+        "Relation [subject: " + getSubject()
+        + ", object: " + getObject()
+        + ", relation: " + getRelation()
+        + "]";
     }
   }
 }
