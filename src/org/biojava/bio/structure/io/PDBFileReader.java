@@ -46,6 +46,8 @@ import java.util.Calendar;
 
 /**
  * A PDB file parser.
+ * @author Andreas Prlic
+ *
  */
 public class PDBFileReader implements StructureIOFile {
 
@@ -55,9 +57,9 @@ public class PDBFileReader implements StructureIOFile {
 
     // required for parsing:
     StructureImpl structure      ;
-    ArrayList        current_model  ;
+    ArrayList     current_model  ;
     ChainImpl     current_chain  ;
-    Group            current_group  ;
+    Group         current_group  ;
 
     // for conversion 3code 1code
     SymbolTokenization threeLetter ;
@@ -120,7 +122,7 @@ public class PDBFileReader implements StructureIOFile {
        
      */
     public void addExtension(String s){
-	System.out.println("add Extension "+s);
+	//System.out.println("add Extension "+s);
 	extensions.add(s);
     }
 
@@ -163,7 +165,7 @@ public class PDBFileReader implements StructureIOFile {
     private FileInputStream getInputStream() 
 	throws IOException
     {
-	System.out.println("checking file");
+	//System.out.println("checking file");
 
 	// compression formats supported
 	String[] str = {".gz",".zip",".Z"};
@@ -176,11 +178,11 @@ public class PDBFileReader implements StructureIOFile {
 	String fpath = path+"/"+pdb_code;
 	for (int i=0 ; i<extensions.size();i++){
 	    String ex = (String)extensions.get(i) ;
-	    System.out.println("testing: "+fpath+ex);
+	    //System.out.println("testing: "+fpath+ex);
 	    f = new File(fpath+ex) ;
 
 	    if ( f.exists()) {
-		System.out.println("found!");
+		//System.out.println("found!");
 		pdbFile = fpath+ex ;
 		inputStream = new FileInputStream(pdbFile);
 		break;
@@ -778,7 +780,7 @@ COLUMNS       DATA TYPE      FIELD         DEFINITION
 	throws IOException, PDBParseException
     {
 
-	System.out.println("preparing buffer");
+	//System.out.println("preparing buffer");
 	BufferedReader buf ;
 	try {
 	    buf = getBufferedReader(inStream);
@@ -787,7 +789,7 @@ COLUMNS       DATA TYPE      FIELD         DEFINITION
 	    e.printStackTrace();
 	    throw new IOException ("error initializing BufferedReader");
 	}
-	System.out.println("done");
+	//System.out.println("done");
 
 	return parsePDBFile(buf);
 	
@@ -797,7 +799,7 @@ COLUMNS       DATA TYPE      FIELD         DEFINITION
     public Structure parsePDBFile(BufferedReader buf) 
 	throws IOException, PDBParseException 
     {
-	System.out.println("parsePDBFile");
+
 
 	// (re)set structure 
 
@@ -814,7 +816,13 @@ COLUMNS       DATA TYPE      FIELD         DEFINITION
 	    String line = buf.readLine ();
 	    String recordName = "";
 
-	    //System.out.println (line);
+	    // if line is null already for the first time, the bufferede Reader had a problem
+	    if ( line == null ) {
+		throw new IOException ("could not parse PDB File, BufferedReader returns null!");
+	    }
+
+	    //System.out.println ("starting to parse:");
+	    //System.out.println (line); 
 
 	    while (line != null) {
 		//System.out.println (line);
@@ -847,10 +855,14 @@ COLUMNS       DATA TYPE      FIELD         DEFINITION
 		String depositionDate = (String) header.get("depDate");
 		header.put("modDate",depositionDate) ;
 	    }
-
-	    current_chain.addGroup(current_group);
-	    if (isKnownChain(current_chain.getName()) == null) {
-		current_model.add(current_chain);
+	    
+	    // a problem occured earlier so current_chain = null ...
+	    // most likely the buffered reader did not provide data ...
+	    if ( current_chain != null ) {
+		current_chain.addGroup(current_group);
+		if (isKnownChain(current_chain.getName()) == null) {
+		    current_model.add(current_chain);
+		}
 	    }
 	    structure.addModel(current_model);
 	    structure.setHeader(header);
@@ -878,9 +890,9 @@ COLUMNS       DATA TYPE      FIELD         DEFINITION
 
 	FileInputStream inStream = getInputStream();
 	try{
-	    System.out.println("Starting to parse PDB file " + getTimeStamp());
+	    //System.out.println("Starting to parse PDB file " + getTimeStamp());
 	    parsePDBFile(inStream) ;
-	    System.out.println("Done parsing PDB file " + getTimeStamp());
+	    //System.out.println("Done parsing PDB file " + getTimeStamp());
 	} catch(Exception ex){
 	    ex.printStackTrace();
 	}
