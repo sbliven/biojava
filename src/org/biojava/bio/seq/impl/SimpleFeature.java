@@ -55,6 +55,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Thomas Down
  * @author Kalle N�slund
  * @author Paul Seed
+ * @author Len Trigg
  */
 
 public class SimpleFeature
@@ -364,11 +365,9 @@ implements
      * @param template the template for the feature
      */
     public SimpleFeature(Sequence sourceSeq, 
-			             FeatureHolder parent,
-                         Feature.Template template)
-	throws IllegalArgumentException
-    {
-        if(template.location == null) {
+                         FeatureHolder parent,
+                         Feature.Template template) {
+        if (template.location == null) {
             throw new IllegalArgumentException(
 		         "Location can not be null. Did you mean Location.EMPTY_LOCATION?"
             );
@@ -383,19 +382,17 @@ implements
 
 	this.parent = parent;
 	this.loc = template.location;
-    this.typeTerm = template.typeTerm != null ? template.typeTerm : OntoTools.ANY;
-    this.sourceTerm = template.sourceTerm != null ? template.sourceTerm : OntoTools.ANY;
+        this.typeTerm = template.typeTerm != null ? template.typeTerm : OntoTools.ANY;
+        this.sourceTerm = template.sourceTerm != null ? template.sourceTerm : OntoTools.ANY;
 	this.type = template.type != null ? template.type : typeTerm.getName();
 	this.source = template.source != null ? template.source : sourceTerm.getName();
-    if (this.type == null) {
-        throw new NullPointerException("Either type or typeTerm must have a non-null value");
-    }
-    if (this.source == null) {
-        throw new NullPointerException("Either source or sourceTerm must have a non-null value");
-    }
-        this.annotation = (template.annotation == Annotation.EMPTY_ANNOTATION) ?
-                               new SimpleAnnotation() :
-                               template.annotation;
+        if (this.type == null) {
+            throw new NullPointerException("Either type or typeTerm must have a non-null value");
+        }
+        if (this.source == null) {
+            throw new NullPointerException("Either source or sourceTerm must have a non-null value");
+        }
+        this.annotation = template.annotation != null ? new SimpleAnnotation(template.annotation) : null;
     }
 
     public String toString() {
