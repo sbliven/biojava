@@ -73,7 +73,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     public static final String PROPERTY_FEATUREID = "org.biojava.bio.program.das.feature_id";
     public static final String PROPERTY_FEATURELABEL = "org.biojava.bio.program.das.feature_label";
 
-    public static final int SIZE_THRESHOLD = 1000000;
+    public static final int SIZE_THRESHOLD = 2000000;
     
     private DASSequenceDB parentdb;
     private Alphabet alphabet = DNATools.getDNA();
@@ -134,6 +134,19 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     }
 
     private class SkeletonListener extends SeqIOAdapter {
+	private SimpleFeatureHolder structureF;
+
+	public void startSequence() {
+	    structureF = new SimpleFeatureHolder();
+	}
+
+	public void endSequence() {
+	    structure = structureF;
+	    if (structure.countFeatures() > 0) {
+		features.addFeatureHolder(structure);
+	    }
+	}
+
 	public void addSequenceProperty(Object key, Object value)
 	    throws ParseException
 	{
@@ -161,7 +174,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 		    ComponentFeature.Template ctemp = (ComponentFeature.Template) temp;
 		    ComponentFeature cf = new DASComponentFeature(DASSequence.this,
 								  ctemp);
-		    ((SimpleFeatureHolder) structure).addFeature(cf);
+		    structureF.addFeature(cf);
 		    
 		    length = Math.max(length, ctemp.location.getMax());
 		} catch (BioException ex) {
@@ -186,14 +199,11 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     }
     
     private FeatureHolder getStructure() throws BioException {
-      if(!this.structureTicket.isFetched()) {
-        this.structureTicket.doFetch();
-	if (this.structure.countFeatures() > 0) {
-	    this.features.addFeatureHolder(this.structure);
+	if(!this.structureTicket.isFetched()) {
+	    this.structureTicket.doFetch();   
 	}
-      }
       
-      return this.structure;
+	return this.structure;
     }
 
     private void _addAnnotationSource(URL dataSourceURL) 
@@ -290,9 +300,15 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 
         FeatureHolder structure = getStructure();
 	if (length() < SIZE_THRESHOLD) {
+	    List sequences = new ArrayList();
 	    for (Iterator fi = structure.features(); fi.hasNext(); ) {
 		ComponentFeature cf = (ComponentFeature) fi.next();
 		DASSequence cseq = (DASSequence) cf.getComponentSequence();
+		sequences.add(cseq);
+	    }
+
+	    for (Iterator si = sequences.iterator(); si.hasNext(); ) {
+		DASSequence cseq = (DASSequence) si.next();
 		cseq.registerFeatureFetchers();
 	    }
 	}
@@ -304,20 +320,34 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
         FeatureHolder structure = getStructure();
 	if (structure.countFeatures() > 0 && (l.getMax() - l.getMin()) < SIZE_THRESHOLD) {
 	    FeatureHolder componentsBelow = structure.filter(new FeatureFilter.OverlapsLocation(l), false);
+
+	    Map sequencesToRegions = new HashMap();
+
 	    for (Iterator fi = componentsBelow.features(); fi.hasNext(); ) {
 		ComponentFeature cf = (ComponentFeature) fi.next();
 		DASSequence cseq = (DASSequence) cf.getComponentSequence();
 		if (l.contains(cf.getLocation())) {
-		    cseq.registerFeatureFetchers();
+		    sequencesToRegions.put(cseq, null);
 		} else {
 		    Location partNeeded = l.intersection(cf.getLocation());
 		    if (cf.getStrand() == StrandedFeature.POSITIVE) {
 			partNeeded = partNeeded.translate(cf.getComponentLocation().getMin() - cf.getLocation().getMin());
-			cseq.registerFeatureFetchers(partNeeded);
+			sequencesToRegions.put(cseq, partNeeded);
 		    } else {
 			// FIXME: Couldn't work out the appropriate xform.
-			cseq.registerFeatureFetchers();
+			sequencesToRegions.put(cseq, null);
 		    }
+		}
+	    }
+
+	    for (Iterator sri = sequencesToRegions.entrySet().iterator(); sri.hasNext(); ) {
+		Map.Entry srme = (Map.Entry) sri.next();
+		DASSequence cseq = (DASSequence) srme.getKey();
+		Location partNeeded = (Location) srme.getValue();
+		if (partNeeded != null) {
+		    cseq.registerFeatureFetchers(partNeeded);
+		} else {
+		    cseq.registerFeatureFetchers();
 		}
 	    }
 	}
@@ -340,58 +370,63 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     }
 
     public int length() {
-      try {
-	// If the sequence isn't an assembly we're actually in a kind-of bad
-	// way for getting the length.  Right now I'm getting the DNA.
+	try {
+	    if (length < 0 && !structureTicket.isFetched()) {
+		// Hope that the length is set when we get the structure
+		
+		structureTicket.doFetch();    
+	    }
 
-	if (length < 0) {
-	    length = getSymbols().length();
+	    if (length < 0) {
+		// Nasty fallback
+
+		length = getSymbols().length();
+	    }
+		
+	    return length;
+	} catch (BioException be) {
+	    throw new BioError(be, "Can't calculate length");
 	}
-
-	return length;
-      } catch (BioException be) {
-        throw new BioError(be, "Can't calculate length");
-      }
     }
 
     public String seqString() {
-      try {
-	return getSymbols().seqString();
-      } catch (BioException be) {
-        throw new BioError(be, "Can't create seqString");
-      }
+	try {
+	    return getSymbols().seqString();
+	} catch (BioException be) {
+	    throw new BioError(be, "Can't create seqString");
+	}
     }
 
     public String subStr(int start, int end) {
-      try {
-	return getSymbols().subStr(start, end);
-      } catch (BioException be) {
-        throw new BioError(be, "Can't create substring");
-      }
+	try {
+	    return getSymbols().subStr(start, end);
+	} catch (BioException be) {
+	    throw new BioError(be, "Can't create substring");
+	}
     }
 
     public SymbolList subList(int start, int end) {
-      try {
-	return getSymbols().subList(start, end);
-      } catch (BioException be) {
-        throw new BioError(be, "Can't create subList");
-      }
+	try {
+	    return getSymbols().subList(start, end);
+	} catch (BioException be) {
+	    throw new BioError(be, "Can't create subList");
+	}
     }
 
     public Symbol symbolAt(int pos) {
-      try {
-	return getSymbols().symbolAt(pos);
-      } catch (BioException be) {
-        throw new BioError(be, "Can't fetch symbol");
-      }
+	try {
+	    return getSymbols().symbolAt(pos);
+	} catch (BioException be) {
+	    throw new BioError(be, "Can't fetch symbol");
+	}
     }
 
     public List toList() {
-      try {
-	return getSymbols().toList();
-      } catch (BioException be) {
-        throw new BioError(be, "Can't create list");
-      }
+	try {
+	    return getSymbols().toList();
+	} catch (BioException be) {
+	    throw new BioError(be, "Can't create list");
+	}
     }
 
     public void edit(Edit e) 
@@ -511,58 +546,73 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     }
     
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-      try {
-	//
-	// We optimise for the case of just wanting `structural' features,
-	// which improves the scalability of the Dazzle server (and probably
-	// other applications, too)
-	//
+	try {
+	    //
+	    // We optimise for the case of just wanting `structural' features,
+	    // which improves the scalability of the Dazzle server (and probably
+	    // other applications, too)
+	    //
+	    
+	    FeatureHolder structure = getStructure();
+	    FeatureFilter structureMembershipFilter = new FeatureFilter.ByClass(ComponentFeature.class);
 
-        FeatureHolder structure = getStructure();
-	if (ff instanceof FeatureFilter.ByClass) {
-	    FeatureFilter.ByClass ffbc = (FeatureFilter.ByClass) ff;
-	    if (ffbc.getTestClass() == ComponentFeature.class) {
+	    if (FilterUtils.areProperSubset(ff, structureMembershipFilter)) {
 		if (recurse) {
-		    SimpleFeatureHolder sfh = new SimpleFeatureHolder();
-		    try {
-			for (Iterator i = structure.features(); i.hasNext(); ) {
-			    Feature f = (Feature) i.next();
-			    sfh.addFeature(f);
-			    for (Iterator j = f.filter(ff, true).features(); j.hasNext(); ) {
-				sfh.addFeature((Feature) j.next());
-			    }
-			}
-		    } catch (ChangeVetoException ex) {
-			throw new BioError(ex, "Assertion failure");
+		    for (Iterator fi = structure.features(); fi.hasNext(); ) {
+			ComponentFeature cf = (ComponentFeature) fi.next();
+			Sequence cseq = cf.getComponentSequence(); 
+			// Just ensuring that the sequence is instantiated should be sufficient. 
 		    }
-		    return sfh;
+		}
+		return structure.filter(ff, recurse);
+	    }
+
+	    //
+	    // Otherwise they want /real/ features, I'm afraid...
+	    //
+	    
+	    Location ffl = extractInterestingLocation(ff);
+	    if (ffl != null) {
+		registerFeatureFetchers(ffl);
+	    } else {
+		registerFeatureFetchers();
+	    }
+	    
+	    return features.filter(ff, recurse);
+	} catch (BioException be) {
+	    throw new BioError(be, "Can't filter");
+	}
+    }
+
+
+    private Location extractInterestingLocation(FeatureFilter ff) {
+	if (ff instanceof FeatureFilter.OverlapsLocation) {
+	    return ((FeatureFilter.OverlapsLocation) ff).getLocation();
+	} else if (ff instanceof FeatureFilter.ContainedByLocation) {
+	    return ((FeatureFilter.ContainedByLocation) ff).getLocation();
+	} else if (ff instanceof FeatureFilter.And) {
+	    FeatureFilter.And ffa = (FeatureFilter.And) ff;
+	    Location l1 = extractInterestingLocation(ffa.getChild1());
+	    Location l2 = extractInterestingLocation(ffa.getChild2());
+
+	    if (l1 != null) {
+		if (l2 != null) {
+		    return l1.intersection(l2);
 		} else {
-		    return structure;
+		    return l1;
+		}
+	    } else {
+		if (l2 != null) {
+		    return l2;
+		} else {
+		    return null;
 		}
 	    }
 	}
 
-	//
-	// Otherwise they want /real/ features, I'm afraid...
-	//
+	// Don't know how this filter relates to location.
 
-	if (ff instanceof FeatureFilter.OverlapsLocation || ff instanceof FeatureFilter.ContainedByLocation)
-	{
-	    Location l = null;
-	    if (ff instanceof FeatureFilter.OverlapsLocation) {
-		l = ((FeatureFilter.OverlapsLocation) ff).getLocation();
-	    } else {
-		l = ((FeatureFilter.ContainedByLocation) ff).getLocation();
-	    }
-	    registerFeatureFetchers(l);
-	} else {
-	    registerFeatureFetchers();
-	}
-
-	return features.filter(ff, recurse);
-      } catch(BioException be) {
-        throw new BioError(be, "Can't filter");
-      }
+	return null;
     }
     
     public int countFeatures() {

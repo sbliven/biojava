@@ -189,9 +189,11 @@ class DASComponentFeature implements ComponentFeature {
     }
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	Location l = null;
+	// System.err.println("In DASComponentFeature.filter(" + ff.toString() + ", " + recurse + ")");
 
 	if (FilterUtils.areDisjoint(ff, membershipFilter)) { 
+	    // System.err.println("Wheeeee! Disjunction in DASComponentFeature");
+
 	    return FeatureHolder.EMPTY_FEATURE_HOLDER;
 	}
 
