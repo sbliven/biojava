@@ -54,7 +54,7 @@ public interface AnnotationType {
      * @return true if ann conforms to this type and false if it doesn't.
      */
     public boolean instanceOf(Annotation ann);
-    
+
     /**
      * Validate an Annotation to an exact type. Exact matches will also
      * return true for instanceOf but will have no properties not found
@@ -93,7 +93,7 @@ public interface AnnotationType {
      * must be accepted.
      */
     public PropertyConstraint getPropertyConstraint(Object key);
-    
+
     /**
      * <p>Retrieve the cardinality constraint associated with properties.</p>
      *
@@ -119,7 +119,7 @@ public interface AnnotationType {
       PropertyConstraint con,
       CardinalityConstraint card
     );
-    
+
     /**
      * <p>Retrieve the complete set of properties that must be present for
      * an <code>Annotation</code> to be accepted by this
@@ -133,7 +133,7 @@ public interface AnnotationType {
         throws ChangeVetoException;
 
     /**
-     * <p>An abstract base class usefull fo reriving AnnotationType
+     * <p>An abstract base class useful for retrieving AnnotationType
      * instances</p>
      *
      * @author Matthew Pocock
@@ -145,7 +145,7 @@ public interface AnnotationType {
             Object key = i.next();
             PropertyConstraint con = getPropertyConstraint(key);
             CardinalityConstraint card = getCardinalityConstraint(key);
-            
+
             if(!validate(ann, key, con, card)) {
               return false;
             }
@@ -153,7 +153,7 @@ public interface AnnotationType {
 
           return true;
         }
-        
+
         private boolean validate(
           Annotation ann,
           Object key,
@@ -231,14 +231,14 @@ public interface AnnotationType {
      * first invoke the no-args constructor, and then use the
      * setPropertyConstraint method to build the property->constraint
      * mapping.</p>
-     * 
+     *
      * @since 1.3
      * @author Matthew Pocock
      */
     public class Impl extends AnnotationType.Abstract {
         private Map cons;
         private Map cards;
-    
+
         /**
          * Create a new Impl with no constraints.
          */
@@ -262,7 +262,7 @@ public interface AnnotationType {
             }
             return card;
         }
-        
+
         public void setConstraints(
           Object key,
           PropertyConstraint con,
@@ -276,18 +276,18 @@ public interface AnnotationType {
             return cons.keySet();
         }
 
-        
+
         public boolean exactInstanceOf(Annotation ann) {
           Set keys = new HashSet(ann.keys());
           keys.removeAll(cons.keySet());
-          
+
           if(keys.isEmpty()) {
-            return instanceOf(ann);
+            return this.instanceOf(ann);
           } else {
             return false;
           }
         }
-    
+
         public boolean subTypeOf(AnnotationType subType) {
             for (Iterator i = cons.keySet().iterator(); i.hasNext();) {
                 Object key = i.next();
@@ -312,7 +312,7 @@ public interface AnnotationType {
     extends AnnotationType.Abstract {
         private PropertyConstraint constraint;
         private CardinalityConstraint cardinality;
-    
+
         /**
          * Create a new Impl with no constraints.
          */
@@ -324,11 +324,11 @@ public interface AnnotationType {
         public PropertyConstraint getPropertyConstraint(Object key) {
             return constraint;
         }
-        
+
         public CardinalityConstraint getCardinalityConstraint(Object key) {
           return cardinality;
         }
-        
+
 
         public void setConstraints(
           Object key,
@@ -353,18 +353,18 @@ public interface AnnotationType {
 
             return true;
         }
-        
+
         public boolean exactInstanceOf(Annotation ann) {
           return ann.keys().isEmpty();
         }
-    
+
         public boolean subTypeOf(AnnotationType subType) {
           for(Iterator pi = subType.getProperties().iterator(); pi.hasNext(); ) {
             if(!constraint.subConstraintOf(subType.getPropertyConstraint(pi.next()))) {
               return false;
             }
           }
-          
+
           return true;
         }
     }
