@@ -573,6 +573,25 @@ implements GappedSymbolList, Serializable {
 	}
     }
 
+    /**
+     * Translates a Location from the gapped view into the underlying sequence.
+     * End points that are in gaps are moved 'inwards' to shorten the location.
+     *
+     * @since 1.3
+     */
+    
+    public Location gappedToLocation(Location l) {
+      if(l.isContiguous()) {
+        return gappedToBlock(l);
+      } else {
+        List lblocks = new ArrayList();
+        for(Iterator i = l.blockIterator(); i.hasNext(); ) {
+          lblocks.add(gappedToBlock((Location) i.next()));
+        }
+        return LocationTools.union(lblocks);
+      }
+    }
+    
     private Location blockToGapped(Location l) {
 	int start = l.getMin();
 	int end = l.getMax();
@@ -591,6 +610,40 @@ implements GappedSymbolList, Serializable {
 	return LocationTools.union(lblocks);
     }
 
+    private Location gappedToBlock(Location l) {
+      int start = l.getMin();
+      int end = l.getMax();
+      
+      int startBlockI = findViewBlock(start);
+      int endBlockI = findViewBlock(end);
+      
+      if(startBlockI < 0) { // in a gap
+        int sb = -startBlockI - 1;
+        Block startBlock = (Block) blocks.get(sb);
+        
+        start = startBlock.sourceStart;
+      } else {
+        Block startBlock = (Block) blocks.get(startBlockI);
+        start = start - startBlock.viewStart + startBlock.sourceStart;
+      }
+      
+      if(endBlockI < 0) { // in a gap
+        int eb = -endBlockI - 1;
+        Block endBlock = (Block) blocks.get(eb - 1);
+        
+        end = endBlock.sourceEnd;
+      } else {
+        Block endBlock = (Block) blocks.get(endBlockI);
+        end = end - endBlock.viewEnd + endBlock.sourceEnd;
+      }
+      
+      if(start > end) {
+        return Location.empty;
+      } else {
+        return new RangeLocation(start, end);
+      }
+    }
+    
     /**
      * Return the underlying (ungapped) SymbolList.
      *

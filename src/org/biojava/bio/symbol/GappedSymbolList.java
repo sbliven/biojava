@@ -34,7 +34,7 @@ import org.biojava.bio.seq.*;
  * <p>
  * You could make a SymbolList that contains gaps directly. However, this
  * leaves you with a nasty problem if you wish to support gap-edit operations. Also, the original
- * Symb`olList must either be coppied or lost.
+ * SymbolList must either be coppied or lost.
  * <p>
  * GappedSymbolList solves these problems. It will maintain
  * a data-structure that places gaps. You can add and remove the gaps by using the public API.

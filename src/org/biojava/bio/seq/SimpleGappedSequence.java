@@ -110,7 +110,8 @@ implements GappedSequence {
       public Feature createFeature(Feature f, Feature.Template templ)
       throws ChangeVetoException, BioException
       {
-        throw new ChangeVetoException("NO");
+        templ.location = gappedToLocation(templ.location);
+        return projectFeature(getWrapped().createFeature(templ));
       }
       
       public void removeFeature(Feature f, Feature f2)

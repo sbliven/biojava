@@ -140,14 +140,18 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
             }
         } ;
 
-        wrapped.addChangeListener(underlyingFeaturesChange);
+        getWrapped().addChangeListener(underlyingFeaturesChange);
     }
     
     private FeatureHolder getTopLevelFeatures() {
         if (topLevelFeatures == null) {
-            topLevelFeatures = makeProjectionSet(wrapped);
+            topLevelFeatures = makeProjectionSet(getWrapped());
         }
         return topLevelFeatures;
+    }
+    
+    protected FeatureHolder getWrapped() {
+      return wrapped;
     }
     
     //
