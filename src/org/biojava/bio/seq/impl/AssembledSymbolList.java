@@ -81,6 +81,10 @@ public class AssembledSymbolList extends AbstractSymbolList {
 	return cf.getSymbols();
     }
 
+    public Set getComponentLocationSet() {
+	return components.keySet();
+    }
+
     /**
      * Find the location containing p in a sorted list of non-overlapping contiguous
      * locations.

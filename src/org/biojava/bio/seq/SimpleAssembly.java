@@ -25,6 +25,7 @@ import java.util.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
+import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
 
 /**
@@ -41,70 +42,21 @@ import org.biojava.bio.symbol.*;
  * @since 1.1
  */
 
-public class SimpleAssembly extends AbstractSymbolList 
+public class SimpleAssembly
     implements Sequence, RealizingFeatureHolder 
 {
-    private int length = 0;
+    protected transient ChangeSupport changeSupport = null;
     private String name;
     private String uri;
     private Annotation annotation;
     private SimpleFeatureHolder features;
-
-    private SortedMap components;
-    private List componentList;
+    private AssembledSymbolList assembly;
 
     private FeatureRealizer featureRealizer = org.biojava.bio.seq.impl.FeatureImpl.DEFAULT;
 
-    private final static Symbol N;
-
-    static {
-	try {
-	    N = DNATools.getDNA().getParser("token").parseToken("n");
-	} catch (BioException ex) {
-	    throw new BioError(ex);
-	}
-    }
-
     {
+	assembly = new AssembledSymbolList();
 	features = new SimpleFeatureHolder();
-	components = new TreeMap(Location.naturalOrder);
-	componentList = new ArrayList();
-    }
-
-    private void putComponent(Location loc, SymbolList symbols) {
-	components.put(loc, symbols);
-	componentList.clear();
-	componentList.addAll(components.keySet());
-    }
-
-    private void removeComponent(Location loc) {
-	components.remove(loc);
-	componentList.clear();
-	componentList.addAll(components.keySet());
-    }
-
-    /**
-     * Find the location containing p in a sorted list of non-overlapping contiguous
-     * locations.
-     */
-
-    private Location locationOfPoint(int p) {
-	int first = 0;
-	int last = componentList.size() - 1;
-	
-	while (first <= last) {
-	    int check = (first + last) / 2;
-	    Location checkL = (Location) componentList.get(check);
-	    if (checkL.contains(p))
-		return checkL;
-
-	    if (p < checkL.getMin())
-		last = check - 1;
-	    else
-		first = check + 1;
-	}
-	
-	return null;
     }
 
     /**
@@ -119,9 +71,9 @@ public class SimpleAssembly extends AbstractSymbolList
      */
 
     public SimpleAssembly(int length, String name, String uri) {
-	this.length = length;
 	this.name = name;
 	this.uri = uri;
+	assembly.setLength(length);
     }
 
     /**
@@ -144,35 +96,41 @@ public class SimpleAssembly extends AbstractSymbolList
     //
 
     public Alphabet getAlphabet() {
-	return DNATools.getDNA();
+	return assembly.getAlphabet();
     }
 
     public int length() {
-	return length;
+	return assembly.length();
     }
 
     public Symbol symbolAt(int pos) {
-	Location l = locationOfPoint(pos);
-	if (l != null) {
-	    SymbolList syms = (SymbolList) components.get(l);
-	    return syms.symbolAt(pos - l.getMin() + 1);
-	}
-
-	return N;
+	return assembly.symbolAt(pos);
     }
 
     public SymbolList subList(int start, int end) {
-	Location l = locationOfPoint(start);
-	if ( (l != null) && (l.contains(end)) ) {
-	    SymbolList symbols = (SymbolList) components.get(l);
-	    int tstart = start - l.getMin() + 1;
-	    int tend = end - l.getMin() + 1;
-	    return symbols.subList(tstart, tend);
-	}
+	return assembly.subList(start, end);
+    }
 
-	// All is lost.  Fall back onto `view' subList from AbstractSymbolList
+    public String seqString() {
+	return assembly.seqString();
+    }
 
-	return super.subList(start, end);
+    public String subStr(int start, int end) {
+	return assembly.subStr(start, end);
+    }
+
+    public Iterator iterator() {
+	return assembly.iterator();
+    }
+
+    public List toList() {
+	return assembly.toList();
+    }
+
+    public void edit(Edit e) 
+        throws IllegalAlphabetException, ChangeVetoException
+    {
+	assembly.edit(e);
     }
 
     //
@@ -222,7 +180,7 @@ public class SimpleAssembly extends AbstractSymbolList
 	    throw new BioException("Coordinates out of range");
 
 	if (temp instanceof ComponentFeature.Template) {
-	    for (Iterator i = components.keySet().iterator(); i.hasNext(); ) {
+	    for (Iterator i = assembly.getComponentLocationSet().iterator(); i.hasNext(); ) {
 		Location l = (Location) i.next();
 		if (l.overlaps(temp.location))
 		    throw new BioError("Can't create overlapping ComponentFeature");
@@ -234,9 +192,10 @@ public class SimpleAssembly extends AbstractSymbolList
 	if (f instanceof ComponentFeature) {
 	    ComponentFeature cf = (ComponentFeature) f;
 	    Location loc = cf.getLocation();
-	    SymbolList cfsyms = cf.getSymbols();
-	    putComponent(loc, cfsyms);
-	    length = Math.max(length, loc.getMax());
+	    if (loc.getMax() > assembly.length()) {
+		assembly.setLength(loc.getMax());
+	    }
+	    assembly.putComponent(loc, cf);
 	}
 	return f;
     }
@@ -244,7 +203,7 @@ public class SimpleAssembly extends AbstractSymbolList
     public void removeFeature(Feature f)
     throws ChangeVetoException {
       if (f instanceof ComponentFeature) {
-        removeComponent(f.getLocation());
+        assembly.removeComponent(f.getLocation());
       }
       features.removeFeature(f);
     }
@@ -271,6 +230,46 @@ public class SimpleAssembly extends AbstractSymbolList
 		gopher = ((Feature) gopher).getParent();
 	    }
 	    return featureRealizer.realizeFeature(this, fh, temp);
+	}
+    }
+
+    //
+    // Changeable
+    //
+
+    public void addChangeListener(ChangeListener cl) {
+	if(changeSupport == null) {
+	    changeSupport = new ChangeSupport();
+	}
+
+	synchronized(changeSupport) {
+	    changeSupport.addChangeListener(cl);
+	}
+    }
+
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {
+	if(changeSupport == null) {
+	    changeSupport = new ChangeSupport();
+	}
+
+	synchronized(changeSupport) {
+	    changeSupport.addChangeListener(cl, ct);
+	}
+    }
+
+    public void removeChangeListener(ChangeListener cl) {
+	if(changeSupport != null) {
+	    synchronized(changeSupport) {
+		changeSupport.removeChangeListener(cl);
+	    }
+	}
+    }
+
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+	if(changeSupport != null) {
+	    synchronized(changeSupport) {
+		changeSupport.removeChangeListener(cl, ct);
+	    }
 	}
     }
 }
