@@ -22,6 +22,7 @@
 package org.biojava.utils.cache;
 
 import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,7 +71,7 @@ public class AutoClearCacheMap implements CacheMap {
   }
 
   public synchronized void put(Object key, Object value) {
-      map.put(key, new WeakReference(value));
+      map.put(key, new SoftReference(value));
   }
   
   public Object get(Object key) {
