@@ -16,6 +16,8 @@ public interface SymbolPropertyTable {
 
   public static String MONO_MASS = "monoMass";
 
+  public static String PK = "pK";
+
   // the name of the property e.g. "isotopic mass"
   public String getName();
 
