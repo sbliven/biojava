@@ -106,11 +106,11 @@ implements SequenceRenderer {
 
 
 
-      g.setColor(Color.red);
+      g.setColor(Color.green);
 
       renderTrace(baseCalls, traceA, g, ctxt, min, max);
 
-      g.setColor(Color.green);
+      g.setColor(Color.black);
 
       renderTrace(baseCalls, traceG, g, ctxt, min, max);
 
@@ -118,7 +118,7 @@ implements SequenceRenderer {
 
       renderTrace(baseCalls, traceC, g, ctxt, min, max);
 
-      g.setColor(Color.black);
+      g.setColor(Color.red);
 
       renderTrace(baseCalls, traceT, g, ctxt, min, max);
 
