@@ -120,13 +120,17 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
 	}
 	
 	String chain_id = atts.getValue("id");
+	String spCode   = atts.getValue("SwissprotId");
 	//System.out.println("new chain "+chain_id);
 	if ( current_chain ==null) {
 	    // first chain
 	    current_chain = new ChainImpl();
 	    current_chain.setName(chain_id);
+	    current_chain.setSwissprotId(spCode);
 	    return ;
 	}
+	
+
 
 	// not the first chain
 	// paranoic: check if we had it already ..
@@ -140,6 +144,8 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
 	} else {
 	    current_chain = new ChainImpl();
 	    current_chain.setName(chain_id);
+	    current_chain.setSwissprotId(spCode);
+	    
 	}
 	
     }
