@@ -77,6 +77,7 @@ public class SeqSimilarityAdapter extends DefaultHandler
         hFactories.put("RawOutput",        BlastDBQueryHandler.BLAST_DBQUERY_HANDLER_FACTORY);
         hFactories.put("DatabaseId",       DatabaseIdHandler.DATABASE_ID_HANDLER_FACTORY);
         hFactories.put("QueryId",          QueryIdHandler.QUERY_ID_HANDLER_FACTORY);
+        hFactories.put("Hit",              HitHandler.HIT_HANDLER_FACTORY);
         hFactories.put("HitId",            HitIdHandler.HIT_ID_HANDLER_FACTORY);
         hFactories.put("HitDescription",   HitDescHandler.HIT_DESC_HANDLER_FACTORY);
         hFactories.put("HSPSummary",       SubHitSummaryHandler.SUBHIT_SUMMARY_HANDLER_FACTORY);
@@ -141,10 +142,10 @@ public class SeqSimilarityAdapter extends DefaultHandler
      * @exception SAXException if an error occurs.
      */
     public void startElement(String     uri,
-			     String     localName,
-			     String     qName,
-			     Attributes attr)
-	throws SAXException
+                             String     localName,
+                             String     qName,
+                             Attributes attr)
+        throws SAXException
     {
         // Callbacks to SearchContentHandler interface
         if (localName.equals("HSP"))
@@ -185,9 +186,9 @@ public class SeqSimilarityAdapter extends DefaultHandler
      * @exception SAXException if an error occurs.
      */
     public void endElement(String uri,
-			   String localName,
-			   String qName)
-	throws SAXException
+                           String localName,
+                           String qName)
+        throws SAXException
     {
         // Pop the current binding from the stack
         currentBinding = (HandlerBinding) bStack.remove(bStack.size() - 1);
@@ -214,7 +215,7 @@ public class SeqSimilarityAdapter extends DefaultHandler
      * @exception SAXException if an error occurs.
      */
     public void characters(char[] ch, int start, int length)
-	throws SAXException
+        throws SAXException
     {
         if (bStack.isEmpty())
             return;

@@ -85,7 +85,7 @@ public class HitDescHandler extends DefaultHandler
     {
         level++;
         if (level > 1)
-	    throw new SAXException("Found child element when expecting character data");
+            throw new SAXException("Found child element when expecting character data");
     }
 
     /**
@@ -100,7 +100,7 @@ public class HitDescHandler extends DefaultHandler
     public void characters(char[] ch, int start, int length) 
         throws SAXException
     {
-	data.append(ch, start, length);
+        data.append(ch, start, length);
     }
 
     /**
@@ -113,14 +113,14 @@ public class HitDescHandler extends DefaultHandler
      * @exception SAXException if an error occurs.
      */
     public void endElement(String nsURI,
-			   String localName,
-			   String qName)
+                           String localName,
+                           String qName)
 	throws SAXException
     {
-	level--;
+        level--;
 
-	if (level == 0)
-	    setStringValue(data.toString());
+        if (level == 0)
+            setStringValue(data.toString());
     }
 
     /**
@@ -136,3 +136,4 @@ public class HitDescHandler extends DefaultHandler
         context.scHandler.addHitProperty("desc", s);
     }
 }
+

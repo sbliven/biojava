@@ -107,8 +107,8 @@ public class BlastDBQueryHandler extends DefaultHandler
      * @exception SAXException if an error occurs.
      */
     public void endElement(String nsURI,
-			   String localName,
-			   String qName)
+                           String localName,
+                           String qName)
 	throws SAXException
     {
         level--;

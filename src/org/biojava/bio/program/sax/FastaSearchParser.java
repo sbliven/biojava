@@ -42,6 +42,10 @@ import org.biojava.utils.ParserException;
  * be sent to the handler before the dataset ends. The handler is
  * responsible for dealing with this state.</p>
  *
+ * <p>This class was originally used outside of the BioJava SAX
+ * framework, but is now only used to provide functionality for
+ * <code>FastaSearchSAXParser</code>.</p>
+ *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.1
  */
