@@ -191,6 +191,7 @@ public class EmblCDROMIndexStoreTest extends TestCase
         {
             emblCDIndexStore.store(new SimpleIndex(new File("dummy"),
                                                    0,
+						   -1,
                                                    "dummyID"));
         }
         catch (BioException be)
