@@ -29,6 +29,7 @@ import org.biojava.bio.seq.StrandedFeature;
  *
  * @author Matthew Pocock
  * @author Greg Cox
+ * @author Aroul Ramadass
  */
 public class SimpleGFFRecord implements GFFRecord {
   /**
@@ -72,6 +73,42 @@ public class SimpleGFFRecord implements GFFRecord {
    * The comment.
    */
   private String comment;
+
+	/**
+	* Constructor - taking GFFRecord as an argument
+	*/
+
+	public SimpleGFFRecord(GFFRecord rec) {
+		this.seqName = rec.getSeqName();
+		this.source = rec.getSource();
+		this.feature = rec.getFeature();
+		this.start = rec.getStart();
+		this.end = rec.getEnd();
+		this.score = rec.getScore();
+		this.strand = rec.getStrand();
+		this.frame = rec.getFrame();
+		this.comment = rec.getComment();
+		this.groupAttributes = new HashMap(rec.getGroupAttributes());
+	}
+
+
+   /**
+	 * Constructor - Setting everything to null or zero
+	 */
+
+	public SimpleGFFRecord() {
+		this.seqName = null;
+		this.source = null;
+		this.feature = null;
+		this.start = 0;
+		this.end = 0;
+		this.score = 0;
+		this.strand = null;
+		this.frame = 0;
+		this.comment = null;
+		this.groupAttributes = null;
+		
+	}
 
   /**
    * Set the sequence name to <span class="arg">seqName</span>.
