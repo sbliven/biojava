@@ -44,7 +44,8 @@ public class GAMEFeatureSpanHandler extends StAXFeatureHandler {
   // is only known from reading the nested <type> element.  The bloody
   // strand and coordinates are nested 4-deep within the element.
   // this element could be a start codon feature or an exon.
-
+  // Also, the lower value coordinate is one less than than the equivalent
+  // EMBL coordinate but the higher value is the same.
   private int start = 0;
   private int end = 0;
   private StAXFeatureHandler staxenv;

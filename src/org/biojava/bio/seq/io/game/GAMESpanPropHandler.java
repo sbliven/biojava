@@ -106,12 +106,12 @@ public class GAMESpanPropHandler
 
     // go set strandedness and range
     if (start < stop) {
-      templ.location = new RangeLocation(start, stop);
+      templ.location = new RangeLocation(start + 1, stop);
       if (isStrandedTemplate)
         ((StrandedFeature.Template) templ).strand = StrandedFeature.POSITIVE;
     }
     else if (start > stop) {
-      staxenv.featureTemplate.location = new RangeLocation(stop, start);
+      staxenv.featureTemplate.location = new RangeLocation(stop + 1, start);
       if (isStrandedTemplate)
         ((StrandedFeature.Template) templ).strand = StrandedFeature.NEGATIVE;
     }

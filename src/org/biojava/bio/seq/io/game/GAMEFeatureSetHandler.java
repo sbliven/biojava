@@ -37,7 +37,7 @@ import org.xml.sax.*;
  * Handles the &lt;feature_set&gt; element
  *
  * @author David Huen
- * @since 1.8
+ * @since 1.2
  */
 public class GAMEFeatureSetHandler
                extends StAXFeatureHandler
@@ -139,8 +139,10 @@ public class GAMEFeatureSetHandler
                 StAXContentHandler handler)
   {
     // set the extent of the transcript to its limits
-    if (transcriptRange != null)
-      featureTemplate.location = new RangeLocation(transcriptRange.getMin(), transcriptRange.getMax());
+    if (transcriptRange != null) {
+//      featureTemplate.location = new RangeLocation(transcriptRange.getMin(), transcriptRange.getMax());
+      featureTemplate.location = transcriptRange;      
+    }
     else
       featureTemplate.location = Location.empty;
 
