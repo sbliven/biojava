@@ -11,7 +11,7 @@ public class CardinalityConstraint {
     = new CardinalityConstraint(0, 0);
   public static final CardinalityConstraint ZERO_OR_ONE
     = new CardinalityConstraint(0, 1);
-  public static final CardinalityConstraint ZERO_OR_MORE
+  public static final CardinalityConstraint ANY
     = new CardinalityConstraint(0, Integer.MAX_VALUE);
   public static final CardinalityConstraint ONE
     = new CardinalityConstraint(1, 1);
@@ -32,6 +32,10 @@ public class CardinalityConstraint {
   
   public int getMax() {
     return max;
+  }
+  
+  public boolean accept(int c) {
+    return getMin() <= c && c <= getMax();
   }
   
   public int hashCode() {

@@ -90,10 +90,6 @@ public class AnnotationBuilder
     } else {
       Frame old = peek(annotationStack);
       PropertyConstraint pc = old.type.getPropertyConstraint(old.tag);
-      if(pc instanceof PropertyConstraint.IsCollectionOf) {
-        PropertyConstraint.IsCollectionOf pcc = (PropertyConstraint.IsCollectionOf) pc;
-        pc = pcc.getElementType();
-      }
       if(pc instanceof PropertyConstraint.ByAnnotationType) {
         PropertyConstraint.ByAnnotationType pcat = (PropertyConstraint.ByAnnotationType) pc;
         top.type = pcat.getAnnotationType();

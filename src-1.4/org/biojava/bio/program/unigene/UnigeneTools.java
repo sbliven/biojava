@@ -43,70 +43,62 @@ public class UnigeneTools {
     // annotation bundles
     PropertyConstraint pc_string = new PropertyConstraint.ByClass(String.class);
     PropertyConstraint pc_int = new PropertyConstraint.ByClass(Integer.class);
-    PropertyConstraint pc_string_list = new PropertyConstraint.IsCollectionOf(
-      SmallSet.class, pc_string
-    );
     
     AnnotationType.Impl at_sts = new AnnotationType.Impl();
-    at_sts.setPropertyConstraint("NAME", pc_string);
-    //at_sts.setPropertyConstraint("ACC", pc_string);  // optional
-    //at_sts.setPropertyConstraint("DSEG", pc_string); // optional
-    at_sts.setPropertyConstraint("UNISTS", pc_string);
-    PropertyConstraint pc_sts = new PropertyConstraint.IsCollectionOf(
-      SmallSet.class,
-      new PropertyConstraint.ByAnnotationType(at_sts)
-    );
+    at_sts.setConstraints("NAME",   pc_string, CardinalityConstraint.ONE);
+    at_sts.setConstraints("ACC",    pc_string, CardinalityConstraint.ZERO_OR_ONE);
+    at_sts.setConstraints("DSEG",   pc_string, CardinalityConstraint.ZERO_OR_ONE);
+    at_sts.setConstraints("UNISTS", pc_string, CardinalityConstraint.ONE);
+    PropertyConstraint pc_sts = new PropertyConstraint.ByAnnotationType(at_sts);
     
     AnnotationType.Impl at_txmap = new AnnotationType.Impl();
-    at_txmap.setPropertyConstraint("MARKER", pc_string);
-    at_txmap.setPropertyConstraint("RHPANEL", pc_string);
-    PropertyConstraint pc_txmap = new PropertyConstraint.IsCollectionOf(
-      SmallSet.class,
-      new PropertyConstraint.ByAnnotationType(at_txmap)
-    );
+    at_txmap.setConstraints("MARKER", pc_string, CardinalityConstraint.ONE);
+    at_txmap.setConstraints("RHPANEL", pc_string, CardinalityConstraint.ONE);
+    PropertyConstraint pc_txmap = new PropertyConstraint.ByAnnotationType(at_txmap);
     
     AnnotationType.Impl at_protsim = new AnnotationType.Impl();
-    at_protsim.setPropertyConstraint("ORG", pc_string);
-    at_protsim.setPropertyConstraint("PROTGI", pc_string);
-    at_protsim.setPropertyConstraint("PROTID", pc_string);
-    at_protsim.setPropertyConstraint("PCT", pc_string);
-    at_protsim.setPropertyConstraint("ALN", pc_int);
-    PropertyConstraint pc_prosim = new PropertyConstraint.IsCollectionOf(
-      SmallSet.class,
-      new PropertyConstraint.ByAnnotationType(at_protsim)
-    );
+    at_protsim.setConstraints("ORG", pc_string, CardinalityConstraint.ONE);
+    at_protsim.setConstraints("PROTGI", pc_string, CardinalityConstraint.ONE);
+    at_protsim.setConstraints("PROTID", pc_string, CardinalityConstraint.ONE);
+    at_protsim.setConstraints("PCT", pc_string, CardinalityConstraint.ONE);
+    at_protsim.setConstraints("ALN", pc_int, CardinalityConstraint.ONE);
+    PropertyConstraint pc_prosim = new PropertyConstraint.ByAnnotationType(at_protsim);
     
     AnnotationType.Impl at_sequence = new AnnotationType.Impl();
-    at_sequence.setPropertyConstraint("ACC", pc_string);
-    at_sequence.setPropertyConstraint("NID", pc_string);
-    PropertyConstraint pc_sequence = new PropertyConstraint.IsCollectionOf(
-      SmallSet.class,
-      new PropertyConstraint.ByAnnotationType(at_sequence)
-    );
+    at_sequence.setConstraints("ACC", pc_string, CardinalityConstraint.ONE);
+    at_sequence.setConstraints("NID", pc_string, CardinalityConstraint.ONE);
+    at_sequence.setConstraints("PID", pc_string, CardinalityConstraint.ZERO_OR_ONE);
+    at_sequence.setConstraints("CLONE", pc_string, CardinalityConstraint.ZERO_OR_ONE);
+    at_sequence.setConstraints("END", pc_string, CardinalityConstraint.ZERO_OR_ONE);
+    at_sequence.setConstraints("LID", pc_string, CardinalityConstraint.ZERO_OR_ONE);
+    at_sequence.setConstraints("MGC", pc_string, CardinalityConstraint.ZERO_OR_ONE);
+    PropertyConstraint pc_sequence = new PropertyConstraint.ByAnnotationType(at_sequence);
     
     AnnotationType.Impl unigene = new AnnotationType.Impl();
-    unigene.setPropertyConstraint("ID", pc_string);
-    unigene.setPropertyConstraint("TITLE", pc_string);
-    unigene.setPropertyConstraint("GENE", pc_string);
-    unigene.setPropertyConstraint("CYTOBAND", pc_string);
-    unigene.setPropertyConstraint("EXPRESS", pc_string);
-    unigene.setPropertyConstraint("GNM_TERMINUS",
-      new PropertyConstraint.Enumeration(new Object[] { "T", "I", "S" } ));
-    unigene.setPropertyConstraint("LOCUSLINK", pc_string);
-    unigene.setPropertyConstraint("CHROMOSOME", pc_string);
-    unigene.setPropertyConstraint("STS", pc_sts);
-    unigene.setPropertyConstraint("TXMAP", pc_txmap);
-    unigene.setPropertyConstraint("PROSIM", pc_prosim);
-    unigene.setPropertyConstraint("SCOUNT", pc_int);
-    unigene.setPropertyConstraint("SEQUENCE", pc_sequence);
+    unigene.setConstraints("ID", pc_string, CardinalityConstraint.ONE);
+    unigene.setConstraints("TITLE", pc_string, CardinalityConstraint.ONE);
+    unigene.setConstraints("GENE", pc_string, CardinalityConstraint.ONE);
+    unigene.setConstraints("CYTOBAND", pc_string, CardinalityConstraint.ONE);
+    unigene.setConstraints("EXPRESS", pc_string, CardinalityConstraint.ONE);
+    unigene.setConstraints(
+      "GNM_TERMINUS",
+      new PropertyConstraint.Enumeration(new Object[] { "T", "I", "S" } ),
+      CardinalityConstraint.ONE);
+    unigene.setConstraints("LOCUSLINK", pc_string, CardinalityConstraint.ONE);
+    unigene.setConstraints("CHROMOSOME", pc_string, CardinalityConstraint.ONE);
+    unigene.setConstraints("STS", pc_sts, CardinalityConstraint.ANY);
+    unigene.setConstraints("TXMAP", pc_txmap, CardinalityConstraint.ANY);
+    unigene.setConstraints("PROSIM", pc_prosim, CardinalityConstraint.ANY);
+    unigene.setConstraints("SCOUNT", pc_int, CardinalityConstraint.ONE);
+    unigene.setConstraints("SEQUENCE", pc_sequence, CardinalityConstraint.ANY);
     
     UNIGENE_ANNOTATION = unigene;
     
     AnnotationType.Impl library = new AnnotationType.Impl();
-    library.setPropertyConstraint("ID", pc_string);
-    library.setPropertyConstraint("TITLE", pc_string);
-    library.setPropertyConstraint("TISSUE", pc_string);
-    library.setPropertyConstraint("VECTOR", pc_string);
+    library.setConstraints("ID", pc_string, CardinalityConstraint.ONE);
+    library.setConstraints("TITLE", pc_string, CardinalityConstraint.ONE);
+    library.setConstraints("TISSUE", pc_string, CardinalityConstraint.ONE);
+    library.setConstraints("VECTOR", pc_string, CardinalityConstraint.ONE);
     
     LIBRARY_ANNOTATION = library;
   }

@@ -79,14 +79,7 @@ public interface PropertyConstraint {
 
     /**
      * <p><code>setProperty</code> sets a property in the Annotation
-     * such that it conforms to the constraint. For example, you
-     * create an Annotation having a key which is the String
-     * "gene_synonyms" and corresponding value which has a
-     * PropertyConstraint indicating that it must be an HashSet of
-     * between 1 and 10 Strings. To add a new String "xylR" to the Set
-     * you would call the method thus:
-     * <code>setProperty(annotationObj, "gene_synonyms",
-     * "xylR")</code>.</p>
+     * such that it conforms to the constraint.</p>
      *
      * @param ann an <code>Annotation</code> to populate.
      * @param property an <code>Object</code> under which to add the
@@ -97,6 +90,16 @@ public interface PropertyConstraint {
     public void setProperty(Annotation ann, Object property, Object value)
         throws ChangeVetoException;
 
+    /**
+     * <p>Adds a value to the collection.</p>
+     *
+     * @param coll the Collection to modufy to include value
+     * @param value  the value to add
+     * @throws ChangeVetoException if the value can not be added
+     */
+    public void addValue(Collection coll, Object value)
+        throws ChangeVetoException;
+        
     /**
      * <code>ANY</code> is a constraint which accepts a property for
      * addition under all conditions.
@@ -139,8 +142,23 @@ public interface PropertyConstraint {
             if (accept(value)) {
                 ann.setProperty(property, value);
             } else {
-                throw new ChangeVetoException("Incorrect class: expecting " + cl + " but got " + value.getClass());
+                throw new ChangeVetoException(
+                  "Incorrect class: expecting " + cl +
+                  " but got " + value.getClass()
+                );
             }
+        }
+        
+        public void addValue(Collection coll, Object value)
+        throws ChangeVetoException {
+          if(accept(value)) {
+            coll.add(value);
+          } else {
+            throw new ChangeVetoException(
+              "Incorrect class: expecting " + cl +
+              " but got " + value.getClass()
+            );
+          }
         }
         
         public String toString() {
@@ -195,193 +213,20 @@ public interface PropertyConstraint {
             }
         }
         
-        public String toString() {
-          return "AnnotationType:" + annType.getProperties();
-        }
-    }
-
-    /**
-     * <code>IsCollectionOf</code> accepts a property value if it is a
-     * collection of objects which themselves conform to a specified
-     * constraint.
-     *
-     * @since 1.3
-     * @author Matthew Pocock
-     */
-    public class IsCollectionOf implements PropertyConstraint {
-        private PropertyConstraint elementType;
-        private Class clazz;
-        private int minTimes;
-        private int maxTimes;
-
-        /**
-         * Creates a new <code>IsCollectionOf</code> which accepts a
-         * collection of 0 - Integer.MAX_VALUE elements which
-         * themselves conform to the specified constraint.
-         *
-         * @param clazz a <code>Class</code> of collection.
-         * @param elementType a <code>PropertyConstraint</code> to
-         * constrain members of the collection.
-         */
-        public IsCollectionOf(Class clazz, PropertyConstraint elementType) {
-            this(clazz, elementType, 0, Integer.MAX_VALUE);
-        }
-
-        /**
-         * Creates a new <code>IsCollectionOf</code> which accepts a
-         * collection of minTimes - maxTimes elements which themselves
-         * conform to the specified constraint.
-         *
-         * @param clazz a <code>Class</code> of collection.
-         * @param elementType a <code>PropertyConstraint</code> to
-         * constrain members of the collection.
-         * @param minTimes an <code>int</code> which is the minimum
-         * number of conforming elements for the collection to be
-         * accepted.
-         * @param maxTimes an <code>int</code> which is the maximum
-         * number of conforming elements for the collection to be
-         * accepted.
-         *
-         * @exception IllegalArgumentException if an error occurs.
-         */
-        public IsCollectionOf(Class clazz,
-                              PropertyConstraint elementType,
-                              int minTimes,
-                              int maxTimes) throws IllegalArgumentException {
-            if (! Collection.class.isAssignableFrom(clazz) ||
-                java.lang.reflect.Modifier.isAbstract(clazz.getModifiers()) ||
-                java.lang.reflect.Modifier.isInterface(clazz.getModifiers())) {
-                throw new IllegalArgumentException("Class must be a non-virtual collection");
-            }
-            this.clazz = clazz;
-            this.elementType = elementType;
-            this.minTimes = minTimes;
-            this.maxTimes = maxTimes;
-        }
- 
-        /**
-         * <code>getElementType</code> returns the constraint on
-         * element type in the collection.
-         *
-         * @return a <code>PropertyConstraint</code>.
-         */
-        public PropertyConstraint getElementType() {
-            return elementType;
-        }
-
-        /**
-         * <code>getMinTimes</code> returns the minumum number of
-         * conforming elements for the collection to be accepted.
-         *
-         * @return an <code>int</code>.
-         */
-        public int getMinTimes() {
-            return minTimes;
-        }
-
-        /**
-         * <code>getMaxTimes</code> returns the maximum number of
-         * conforming elements for the collection to be accepted.
-         *
-         * @return an <code>int</code>.
-         */
-        public int getMaxTimes() {
-            return maxTimes;
-        }
-
-        /**
-         * <code>getCollectionClass</code> returns the Java class of
-         * the conforming collection.
-         *
-         * @return a <code>Class</code>.
-         */
-        protected Class getCollectionClass() {
-            return clazz;
-        }
-
-        public boolean accept(Object item) {
-            if (item instanceof Collection) {
-                Collection c = (Collection) item;
-                int size = c.size();
-                return
-                    (size >= minTimes) &&
-                    (size <= maxTimes) &&
-                    getCollectionClass().isInstance(item);
-            }
-
-            return false;
-        }
-
-        public boolean subConstraintOf(PropertyConstraint subC) {
-            if (subC instanceof IsCollectionOf) {
-                IsCollectionOf ico = (IsCollectionOf) subC;
-                return
-                    (minTimes <= ico.getMinTimes()) &&
-                    (maxTimes >= ico.getMaxTimes()) &&
-                    (elementType.subConstraintOf(ico.getElementType())) &&
-                    (getCollectionClass().isAssignableFrom(ico.getCollectionClass()));
-            }
-
-            return false;
-        }
-
-        /**
-         * <p><code>setProperty</code> sets a property in the
-         * <code>Annotation</code> such that it conforms to the
-         * constraint. For example, you create an
-         * <code>Annotation</code> having a key which is the
-         * <code>String</code> "gene_synonyms" and corresponding value
-         * which has a <code>PropertyConstraint</code> indicating that
-         * it must be an <code>HashSet</code> of between 1 and 10
-         * <code>String</code>s. To add a new <code>String</code>
-         * "xylR" to the <code>HashSet</code> you would call the
-         * method thus: <code>setProperty(annotationObj,
-         * "gene_synonyms", "xylR")</code>.</p>
-         *
-         * <p>If the specified property does not exist, a new, empty
-         * <code>Collection</code> instance is created automatically
-         * to hold the value you are adding.</p>
-         *
-         * <p>If size constraints have been set on the collection the
-         * addition may be vetoed.</p>
-         *
-         * @param ann an <code>Annotation</code> to populate.
-         * @param property an <code>Object</code> under which to add the
-         * value.
-         * @param value an <code>Object</code> to add.
-         * @exception ChangeVetoException if an error occurs.
-         */
-        public void setProperty(Annotation ann, Object property, Object value)
-            throws ChangeVetoException {
-            if (getElementType().accept(value)) {
-                Collection c;
-                if (ann.containsProperty(property)) {
-                    c = (Collection) ann.getProperty(property);
-                } else {
-                    try {
-                        c = (Collection) getCollectionClass().newInstance();
-                        ann.setProperty(property, c);
-                    } catch (Exception e) {
-                        throw new ChangeVetoException(e, "Can't create collection resource");
-                    }
-                }
-
-                if (c.size() == maxTimes)
-                    throw new ChangeVetoException("Maximum elements ("
-                                                  + maxTimes + ") reached");
-
-                c.add(value);
-            } else {
-                throw new ChangeVetoException(
-                  "Incorrect element type. Got: " + value.getClass() + " " + 
-                  value.toString() + " but expected " + getElementType().toString()
-                );
-            }
+        public void addValue(Collection coll, Object value)
+        throws ChangeVetoException {
+          if(accept(value)) {
+            coll.add(value);
+          } else {
+            throw new ChangeVetoException(
+              "value: " + value +
+              " is not an annotation implementing " + annType.getProperties()
+            );
+          }
         }
         
         public String toString() {
-          return "Collection(" + clazz + ", " + minTimes + "-" + maxTimes +
-            ")<" + getElementType() + ">";
+          return "AnnotationType:" + annType.getProperties();
         }
     }
 
@@ -454,6 +299,18 @@ public interface PropertyConstraint {
             }
         }
         
+        public void addValue(Collection coll, Object value)
+        throws ChangeVetoException {
+          if(accept(value)) {
+            coll.add(value);
+          } else {
+            throw new ChangeVetoException(
+              "Value not accepted: '" + value + "'" +
+              " not in " + values
+            );
+          }
+        }
+        
         public String toString() {
           return "Enumeration:" + values;
         }
@@ -472,5 +329,10 @@ class AnyPropertyConstraint implements PropertyConstraint  {
     public void setProperty(Annotation ann, Object property, Object value)
         throws ChangeVetoException {
         ann.setProperty(property, value);
+    }
+    
+    public void addValue(Collection coll, Object value)
+    throws ChangeVetoException {
+      coll.add(value);
     }
 }

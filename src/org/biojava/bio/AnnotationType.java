@@ -42,7 +42,10 @@ public interface AnnotationType {
      * other annotations. Only an empty annotation is an exact instance of
      * this type.
      */
-    public static final AnnotationType ANY = new AnyAnnotationType();
+    public static final AnnotationType ANY = new AnyOfType(
+      PropertyConstraint.ANY,
+      CardinalityConstraint.ANY
+    );
 
     /**
      * Validate an Annotation against this AnnotationType.
@@ -90,7 +93,33 @@ public interface AnnotationType {
      * must be accepted.
      */
     public PropertyConstraint getPropertyConstraint(Object key);
+    
+    /**
+     * <p>Retrieve the cardinality constraint associated with properties.</p>
+     *
+     * <p>For an annotation to be acceptable, the property must have a number
+     * of values that matches the cardinality constraint. Common values are
+     * represented by static fields of CardinalityConstraint.</p>
+     *
+     * @param key the property to be validated
+     * @return a CardinalityConstraint giving the number of values assocated
+     *         with the property
+     */
+    public CardinalityConstraint getCardinalityConstraint(Object key);
 
+    /**
+     * Set the constraints associated with a property.
+     *
+     * @param key  the name of the property to constrain
+     * @param con  the PropertyConstraint to enforce
+     * @param card the CardinalityCnstraint to enforce
+     */
+    public void setConstraints(
+      Object key,
+      PropertyConstraint con,
+      CardinalityConstraint card
+    );
+    
     /**
      * <p>Retrieve the complete set of properties that must be present for
      * an <code>Annotation</code> to be accepted by this
@@ -116,12 +145,14 @@ public interface AnnotationType {
      */
     public class Impl implements AnnotationType {
         private Map cons;
+        private Map cards;
     
         /**
          * Create a new Impl with no constraints.
          */
         public Impl() {
             cons = new SmallMap();
+            cards = new SmallMap();
         }
 
         public PropertyConstraint getPropertyConstraint(Object key) {
@@ -132,14 +163,21 @@ public interface AnnotationType {
             return pc;
         }
 
-        /**
-         * Sets a constraint for a property.
-         *
-         * @param key the property to constrain.
-         * @param con the PropertyConstraint to constrain the property.
-         */
-        public void setPropertyConstraint(Object key, PropertyConstraint con) {
+        public CardinalityConstraint getCardinalityConstraint(Object key) {
+            CardinalityConstraint card = (CardinalityConstraint) cards.get(key);
+            if (card == null) {
+                card = CardinalityConstraint.ANY;
+            }
+            return card;
+        }
+        
+        public void setConstraints(
+          Object key,
+          PropertyConstraint con,
+          CardinalityConstraint card
+        ) {
             cons.put(key, con);
+            cards.put(key, card);
         }
 
         public Set getProperties() {
@@ -147,20 +185,64 @@ public interface AnnotationType {
         }
 
         public boolean instanceOf(Annotation ann) {
-            for (Iterator i = cons.entrySet().iterator(); i.hasNext();) {
-                Map.Entry pair = (Map.Entry) i.next();
-                Object key = pair.getKey();
-                PropertyConstraint con = (PropertyConstraint) pair.getValue();
-
-                if (! ann.containsProperty(key))
-                    return false;
-
-                if (! con.accept(ann.getProperty(key))) {
-                    return false;
-                }
+          for (Iterator i = getProperties().iterator(); i.hasNext();) {
+            Object key = i.next();
+            PropertyConstraint con = getPropertyConstraint(key);
+            CardinalityConstraint card = getCardinalityConstraint(key);
+            
+            if(!validate(ann, key, con, card)) {
+              return false;
             }
+          }
 
+          return true;
+        }
+        
+        private boolean validate(
+          Annotation ann,
+          Object key,
+          PropertyConstraint con,
+          CardinalityConstraint card
+        ) {
+          if(
+            CardinalityConstraint.ZERO.equals(card) &&
+            !ann.containsProperty(key)
+          ) {
             return true;
+          } else if(
+            CardinalityConstraint.ONE.equals(card) &&
+            ann.containsProperty(key) &&
+            con.accept(ann.getProperty(key))
+          ) {
+            return true;
+          } else if(
+            CardinalityConstraint.ZERO_OR_ONE.equals(card) && (
+              !ann.containsProperty(key) ||
+              con.accept(ann.getProperty(key))
+            )
+          ) {
+            return true;
+          } else {
+            if(!ann.containsProperty(key)) {
+              return card.accept(0);
+            } else {
+              Object val = ann.getProperty(key);
+              if(val instanceof Collection) {
+                Collection vals = (Collection) val;
+                if(!card.accept(vals.size())) {
+                  return false;
+                }
+                for(Iterator i = vals.iterator(); i.hasNext(); ) {
+                  if(!con.accept(i.next())) {
+                    return false;
+                  }
+                }
+                return true;
+              } else {
+                return false;
+              }
+            }
+          }
         }
         
         public boolean exactInstanceOf(Annotation ann) {
@@ -190,7 +272,20 @@ public interface AnnotationType {
         public void setProperty(Annotation ann, Object property, Object value)
         throws ChangeVetoException {
           try {
-            getPropertyConstraint(property).setProperty(ann, property, value);
+            PropertyConstraint prop = getPropertyConstraint(property);
+            CardinalityConstraint card = getCardinalityConstraint(property);
+            if(card.getMax() > 1) {
+              Collection vals = null;
+              if(ann.containsProperty(property)) {
+                vals = (Collection) ann.getProperty(property);
+              } else {
+                vals = new ArrayList();
+                ann.setProperty(property, vals);
+              }
+              prop.addValue(vals, value);
+            } else {
+              prop.setProperty(ann, property, value);
+            }
           } catch (ChangeVetoException cve) {
             throw new ChangeVetoException(cve, "Failed to change property " + property);
           }
@@ -198,33 +293,39 @@ public interface AnnotationType {
     }
     /**
      * This, like any, will accept empty annotations. If keys do exist, it will
-     * expect all values to conform to a single type.
+     * expect all values to conform to a single type and cardinality.
      *
-     * @author Matthew Pocock
+     * @author Matthew Pocock`
      */
     public class AnyOfType
     implements AnnotationType {
         private PropertyConstraint constraint;
+        private CardinalityConstraint cardinality;
     
         /**
          * Create a new Impl with no constraints.
          */
-        public AnyOfType(PropertyConstraint constraint) {
+        public AnyOfType(PropertyConstraint constraint, CardinalityConstraint cardinality) {
             this.constraint = constraint;
+            this.cardinality = cardinality;
         }
 
         public PropertyConstraint getPropertyConstraint(Object key) {
             return constraint;
         }
+        
+        public CardinalityConstraint getCardinalityConstraint(Object key) {
+          return cardinality;
+        }
+        
 
-        /**
-         * Sets a constraint for a property.
-         *
-         * @param key the property to constrain.
-         * @param con the PropertyConstraint to constrain the property.
-         */
-        public void setPropertyConstraint(Object key, PropertyConstraint con) {
-            constraint = con;
+        public void setConstraints(
+          Object key,
+          PropertyConstraint con,
+          CardinalityConstraint card
+        ) {
+          constraint = con;
+          cardinality = card;
         }
 
         public Set getProperties() {
@@ -267,33 +368,3 @@ public interface AnnotationType {
     }
 }
 
-class AnyAnnotationType implements AnnotationType {
-    public boolean instanceOf(Annotation ann) {
-        return true;
-    }
-    
-    public boolean exactInstanceOf(Annotation ann) {
-      return ann.keys().isEmpty();
-    }
-
-    public boolean subTypeOf(AnnotationType subType) {
-        return true;
-    }
-
-    public PropertyConstraint getPropertyConstraint(Object key) {
-        return PropertyConstraint.ANY;
-    }
-
-    public Set getProperties() {
-        return Collections.EMPTY_SET;
-    }
-
-    public void setProperty(Annotation ann, Object property, Object value)
-    throws ChangeVetoException {
-      try {
-        getPropertyConstraint(property).setProperty(ann, property, value);
-      } catch (ChangeVetoException cve) {
-        throw new ChangeVetoException(cve, "Failed to change property " + property);
-      }
-    }
-}
