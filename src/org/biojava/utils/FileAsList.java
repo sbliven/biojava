@@ -90,16 +90,21 @@ public abstract class FileAsList
      *
      * @param mappedFile a <code>File</code> used to back the
      * list. This file must already exist.
+     * @param mutable true if this list should support edits, false otherwise
      *
      * @exception IOException if an error occurs.
      */
-    public FileAsList(File mappedFile)
+    public FileAsList(File mappedFile, boolean mutable)
         throws IOException {
         if(!mappedFile.exists()) {
             throw new IOException("Can't load mapped list as the file does not exist: " + mappedFile);
         }
 
-        this.mappedFile = new RandomAccessFile(mappedFile, "rw");
+        if(mutable) {
+          this.mappedFile = new RandomAccessFile(mappedFile, "rw");
+        } else {
+          this.mappedFile = new RandomAccessFile(mappedFile, "r");
+        }
         StringBuffer sbuff = new StringBuffer();
         this.mappedFile.seek(0L);
         for(int i = 0; i < Math.min(LEADER, mappedFile.length()); i++) {
