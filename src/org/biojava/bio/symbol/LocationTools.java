@@ -767,4 +767,21 @@ final public class LocationTools {
         }
         return LocationTools.union(spans);
     }
+    
+    /**
+     * Return the number of positions which are covered by a <code>Location</code>
+     *
+     * @param loc A location
+     * @return the number of distinct points contained by that location
+     * @since 1.4
+     */
+    
+    public static int coverage(Location loc) {
+        int cov = 0;
+        for (Iterator i = loc.blockIterator(); i.hasNext(); ) {
+            Location bloc = (Location) i.next();
+            cov += (bloc.getMax() - bloc.getMin() + 1);
+        }
+        return cov;
+    }
 }
