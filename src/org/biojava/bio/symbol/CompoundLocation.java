@@ -67,11 +67,11 @@ public class CompoundLocation implements Location, Serializable {
    * @param locations a list of Location instances to combine into a single
    *        compound location
    */
-  public CompoundLocation(List locations) {
-      System.out.println(locations.toString());
+  public CompoundLocation(List locs) {
+      //      System.out.println("\n\n\nInput: " + locs.toString());
 
     List working = new ArrayList();
-    for(Iterator i = locations.iterator(); i.hasNext(); ) {
+    for(Iterator i = locs.iterator(); i.hasNext(); ) {
       for(Iterator bi = ((Location) i.next()).blockIterator(); bi.hasNext(); ) {
         Location bl = (Location) bi.next();
         if(bl != Location.empty) {
@@ -79,8 +79,11 @@ public class CompoundLocation implements Location, Serializable {
         }
       }
     }
-    Collections.sort(this.locations, Location.naturalOrder);
-    
+
+    Collections.sort(working, Location.naturalOrder);
+
+    // System.out.println("Sorted: " + working.toString());
+
     Location last = Location.empty;
     for(int i = 0; i < working.size(); i++) {
       Location cur = (Location) working.get(i);
@@ -101,7 +104,7 @@ public class CompoundLocation implements Location, Serializable {
 	max = ((Location) this.locations.get(this.locations.size() - 1)).getMax();
     }
 
-    System.out.println(this.locations.toString());
+    // System.out.println("Output: " + this.locations.toString());
   }
   
   public boolean contains(int p) {
