@@ -234,7 +234,7 @@ implements FeatureRenderer {
             path.closePath();
             s = path;
           } else if(strand == StrandedFeature.NEGATIVE) {
-            float midY = minX + (float) arrowSize;
+            float midY = minY + (float) arrowSize;
             GeneralPath path = new GeneralPath();
             path.moveTo(minXS, maxY);
             path.lineTo(minXS, midY);
