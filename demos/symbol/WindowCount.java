@@ -42,9 +42,9 @@ Collections.nCopies(order.intValue(),DNATools.getDNA())
       //create a distribution for the alphabet and a trainer.
       Distribution d =
 DistributionFactory.DEFAULT.createDistribution(nOrderAlpha);
-      DistributionTrainer dt = new SimpleDistributionTrainer(d);
       DistributionTrainerContext context =
                                new SimpleDistributionTrainerContext();
+      context.registerDistribution(d);
 
       //for each sequence
       SequenceIterator iter = seqs.sequenceIterator();
@@ -57,13 +57,7 @@ SymbolListViews.orderNSymbolList(s,order.intValue());
         Iterator nmers = nseq.iterator();
         while(nmers.hasNext()){
           Object nmer = nmers.next();
-          try{
-            dt.addCount(context,(AtomicSymbol)nmer,1.0);
-            //System.out.println("+");
-          }catch(ClassCastException cce){
-            //System.err.println(".");
-            continue;// ignore the redundant basis symbols
-          }
+          context.addCount(d,(AtomicSymbol)nmer,1.0);
         }
       }
 
