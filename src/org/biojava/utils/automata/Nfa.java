@@ -41,6 +41,7 @@ public class Nfa
     }
 
     protected int alphaIndex(Symbol sym)
+        throws IllegalSymbolException
     {
         if (sym == LAMBDA) return 998;
         else
