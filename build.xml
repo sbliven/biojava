@@ -43,7 +43,7 @@
     <property name="manifest.file" value="defaultmanifest.txt"/>
     <property name="resources.dir" value="./resources"/>
 
-    <property name="classpath" value="xerces.jar:gnu-regexp.jar:bytecode.jar" />
+    <property name="classpath" value="xerces.jar:jakarta-regexp.jar:bytecode.jar" />
 
     <property name="packages" value="org.*"/>
         
