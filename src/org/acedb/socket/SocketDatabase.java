@@ -36,7 +36,7 @@ import org.acedb.staticobj.*;
 class SocketDatabase implements Database {
     private List socks;
 
-    private URL dbURL;
+    private AceURL dbURL;
     private String host;
     private int port;
     private String user;
@@ -45,6 +45,7 @@ class SocketDatabase implements Database {
     private AcePerlParser parser;
 
     private Map cache;
+    private AceSet allClassesSet = null;
 
     {
 	socks = new LinkedList();
@@ -52,26 +53,14 @@ class SocketDatabase implements Database {
 	parser = new AcePerlParser(this);
     }
 
-    public SocketDatabase(URL dbURL) throws AceException {
-	this.dbURL = dbURL;
-	host = dbURL.getHost();
-	port = dbURL.getPort();
-	user = "anonymous";
-	passwd = "";
-	
-	// check we can connect...
-	AceSocket as = takeSocket();
-	putSocket(as);
-    }
-
-    public SocketDatabase(URL dbURL, String user, String passwd) 
+    public SocketDatabase(AceURL dbURL) 
 	throws AceException 
     {
 	this.dbURL = dbURL;
 	host = dbURL.getHost();
 	port = dbURL.getPort();
-	this.user = user;
-	this.passwd = passwd;
+	this.user = dbURL.getUserInfo();
+	this.passwd = dbURL.getAuthorization();
 	
 	// check we can connect...
 	AceSocket as = takeSocket();
@@ -114,37 +103,65 @@ class SocketDatabase implements Database {
 	return null;
     }
 
-    public String rawQuery(String queryString) throws AceException {
-	String result = null;
-	AceSocket sock = null;
+    private AceSet fetch(AceURL url) throws AceException {
+	AceSet resultSet = null
 
-	try {
-	    sock = takeSocket();
-	    result = sock.transact(queryString);
-	} finally {
-	    if (sock != null)
-		putSocket(sock);
+	String file = url.getFile();
+
+	if (file == null || file.length() == 0)
+	    return allClasses();
+	StringTokenizer toke = new StringTokenizer(file);
+	if (toke.countTokens() == 1) {
+	    String clazz = toke.nextToken();
+	    resultSet = allClasses().retrieve(clazz);
+	} else {
+	    String clazz = toke.nextToken();
+	    String objname = toke.nextToken();
+	    resultSet = getObject(clazz, objname);
+
+	    while (toke.hasMoreTokens()) {
+		String path = toke.nextToken();
+		resultSet = resultSet.retrieve(path);
+	    }
 	}
-	return result;
+
+	String query = url.getQuery();
+	if (query != null && query.length() != 0) {
+	    resultSet = resultSet.filter(query);
+	}
+
+	return resultSet;
     }
 
-    public List rawQuery(List queries) throws AceException {
-	List results = new ArrayList();
-	AceSocket sock = null;
-
-	try {
-	    sock = takeSocket();
-	    for (Iterator i = queries.iterator(); i.hasNext(); )
-		results.add(sock.transact((String) i.next()));
-	} finally {
-	    if (sock != null)
-		putSocket(sock);
+    private AceSet allClasses() 
+        throws AceException
+    {
+	if (allClassesSet == null) {
+	    AceSocket sock = null();
+	    try {
+		sock = takeSocket();
+		String result = sock.transact("classes");
+		StaticAceSet set = new StaticAceSet(null, dbURL);
+		for(StringTokenizer toke = new StringTokenizer(result, '\r\n'); toke.hasMoreTokens(); ) {
+		    String line = toke.nextToken();
+		    if (line.charAt(0) <= 32) {
+			StringTokenizer lineToke = new StringTokenizer(line);
+			String name = lineToke.nextToken();
+			set.add(name, new SocketClassSet(dbURL, name));
+		    }
+		}
+		allClassesSet = set;
+	    } finally {
+		if (sock != null)
+		    putSocket(sock);
+	    }
 	}
-	return results;
+
+	return allClassesSet;
     }
 
-    public AceSet select(AceType.ClassType clazz, String namePattern)
-                throws AceException
+    private AceSet select(AceType.ClassType clazz, String namePattern)
+	                  throws AceException
     {
 	AceSocket sock = null;
 	try {
@@ -171,8 +188,6 @@ class SocketDatabase implements Database {
 		    nameList.add(ltoke.nextToken());
 		}
 	    }
-
-	    // System.out.println("Actually got :" + nameList.size());
 	    
 	    return new SocketResultSet(this, clazz, nameList);
 	} finally {
@@ -181,7 +196,7 @@ class SocketDatabase implements Database {
 	}
     }
 
-    public URL toURL() {
+    public AceURL toURL() {
 	return dbURL;
     }
 
@@ -237,14 +252,6 @@ class SocketDatabase implements Database {
 	public void finalize() throws IOException {
 	    putSocket(sock);
 	    sock = null;
-	}
-    }
-
-    public static void printRes(AceNode n, String prefix) {
-	System.out.println(prefix + "("+n.getType().getName()+") " + n.getName()  + " [" + n.toURL().toString() + "]");
-	for (Iterator i = n.iterator(); i.hasNext(); ) {
-	    AceNode nn = (AceNode) i.next();
-	    printRes(nn, prefix + "    ");
 	}
     }
 }

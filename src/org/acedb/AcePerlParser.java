@@ -19,13 +19,6 @@
  *
  */
 
-
-/*
- * @(#)AcePerlParser.java      0.1 99/11/15
- *
- * By Thomas Down <td2@sanger.ac.uk>
- */
-
 package org.acedb;
 
 import java.util.*;
