@@ -54,4 +54,9 @@ public class DummySequenceDBInstallation implements SequenceDBInstallation
     {
         return Collections.unmodifiableSet(sequenceDBs);
     }
+
+    /**
+     * As this is a dummy implementation adding a sequenceDB doesn't do anything
+     */
+    public void addSequenceDB(SequenceDB sequenceDB, Set otherIdentifiers){}
 }
