@@ -22,6 +22,7 @@
 
 package org.biojava.bio.seq.io;
 
+import java.util.NoSuchElementException;
 import org.biojava.bio.seq.*;
 
 /**
@@ -66,7 +67,7 @@ public class DefaultDescriptionReader implements FastaDescriptionReader {
     String id = null;
     try {
       id = (String) seq.getAnnotation().getProperty("id");
-    } catch (IllegalArgumentException iae) {
+    } catch (NoSuchElementException nsee) {
       id = seq.getName();
       if(id == null)
         id = seq.getURN();
