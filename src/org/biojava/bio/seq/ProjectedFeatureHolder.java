@@ -67,7 +67,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
     private final boolean oppositeStrand;
     private ChangeListener underlyingFeaturesChange;
     private Map forwardersByFeature = new HashMap();
-    private ProjectionSet topLevelFeatures;
+    private FeatureHolder topLevelFeatures;
 
     public static FeatureHolder projectFeatureHolder(FeatureHolder fh,
 						                             FeatureHolder parent, 
@@ -136,7 +136,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
         this.translate = translation;
         this.oppositeStrand = oppositeStrand;
 
-        this.topLevelFeatures = new ProjectionSet(wrapped);
+        this.topLevelFeatures = makeProjectionSet(wrapped);
 
         underlyingFeaturesChange = new ChangeListener() {
             public void preChange(ChangeEvent e)
@@ -242,7 +242,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
         public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
             ff = transformFilter(ff);
             FeatureHolder toProject = baseSet.filter(ff, recurse);
-            return new ProjectionSet(toProject);
+            return makeProjectionSet(toProject);
         }
     
         public Feature createFeature(Feature.Template templ) 
@@ -352,6 +352,13 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
         return parent;
     }
     
+    /**
+     * Called internally to construct a lightweight projected view of a set of features
+     */
+    
+    protected FeatureHolder makeProjectionSet(FeatureHolder fh) {
+        return new ProjectionSet(fh);
+    }
     
     //
     // The following methods are our implementation of ProjectionContext
@@ -393,7 +400,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
         }
 
         public FeatureHolder projectChildFeatures(Feature f, FeatureHolder parent) {
-            return new ProjectionSet(f);
+            return makeProjectionSet(f);
         }
 
         public Feature createFeature(Feature f, Feature.Template templ) 
