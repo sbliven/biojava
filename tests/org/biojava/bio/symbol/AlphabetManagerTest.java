@@ -22,8 +22,8 @@
 package org.biojava.bio.symbol;
 
 import junit.framework.*;
+import java.util.*;
 import org.biojava.bio.seq.*;
-
 
 
 public class AlphabetManagerTest extends TestCase {
@@ -42,7 +42,7 @@ public class AlphabetManagerTest extends TestCase {
     String name1=  "DNA";
     String name2 = "PROTEIN";
     String name3 = "(DNA x DNA x DNA)";
-    String name4 = "(DNA x DNA x DNA) x PROTEIN";
+    String name4 = "((DNA x DNA x DNA) x PROTEIN)";
     String name5 = "(PROTEIN x (DNA x DNA x DNA))";
     String name6 = "((DNA x DNA x DNA) x DNA x (PROTEIN x DNA))";
 
@@ -68,5 +68,27 @@ public class AlphabetManagerTest extends TestCase {
     catch(Exception e) {
       System.err.println("Exception thrown:  "+e);
     }
+  }
+  
+  public void testGetAllSymbols() 
+      throws Exception
+  {
+      FiniteAlphabet dna = DNATools.getDNA();
+      Set allDna = AlphabetManager.getAllSymbols(dna);
+      Symbol n = DNATools.n();
+      Set allN = AlphabetManager.getAllSymbols((FiniteAlphabet) n.getMatches());
+      assertEquals(allDna.size(), 16);
+      assertEquals(allN.size(), 16);
+      for (Iterator i = allN.iterator(); i.hasNext(); ) {
+          Symbol is = (Symbol) i.next();
+          boolean found = false;
+          for (Iterator j = allDna.iterator(); j.hasNext(); ) {
+              Symbol js = (Symbol) j.next();
+              if (is == js) {
+                  found = true;
+              }
+          }
+          assertTrue(found);
+      }
   }
 }
