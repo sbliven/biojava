@@ -478,13 +478,13 @@ public class SequencePanel
                   clip.y = 0.0;
                   clip.width = alongDim;
                   clip.height = depth;
-                  g2.translate(leadingBorder.getSize() - minAcross + insets.left, insets.top);
+                  g2.translate(leadingBorder.getSize() - minAcross + insets.left + getX(), insets.top + getY());
           } else {
                   clip.x = 0.0;
                   clip.y = minAcross;
                   clip.width = depth;
                   clip.height = alongDim;
-                  g2.translate(insets.left, leadingBorder.getSize() - minAcross + insets.top);
+                  g2.translate(insets.left + getX(), leadingBorder.getSize() - minAcross + insets.top + getY());
           }
 
           Shape oldClip = g2.getClip();

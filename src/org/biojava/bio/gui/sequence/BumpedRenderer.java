@@ -31,10 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.biojava.bio.BioError;
-import org.biojava.bio.seq.Feature;
-import org.biojava.bio.seq.FeatureFilter;
-import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.seq.SimpleFeatureHolder;
+import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.utils.AssertionFailure;
@@ -158,7 +155,7 @@ extends SequenceRendererWrapper {
   private Set flushers = new HashSet();
 
   protected List layer(SequenceRenderContext src) {
-    FeatureFilter filt = new FeatureFilter.OverlapsLocation(src.getRange());
+    FeatureFilter filt = FilterUtils.overlapsLocation(src.getRange());
     CtxtFilt gopher = new CtxtFilt(src, filt, false);
     List layers = (List) contextCache.get(gopher);
     if(layers == null) {

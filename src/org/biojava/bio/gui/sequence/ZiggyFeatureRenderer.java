@@ -54,7 +54,7 @@ implements FeatureRenderer, java.io.Serializable {
   private Paint outline = Color.black;
   private Paint fill = Color.yellow;
   private double blockDepth = 10.0;
-  
+
   public void setFill(Paint p)
   throws ChangeVetoException {
     if(hasListeners()) {
@@ -95,7 +95,7 @@ implements FeatureRenderer, java.io.Serializable {
   public Paint getOutline() {
     return outline;
   }
-  
+
   public void setBlockDepth(double depth)
   throws ChangeVetoException {
     if(hasListeners()) {
@@ -110,15 +110,15 @@ implements FeatureRenderer, java.io.Serializable {
       this.blockDepth = depth;
     }
   }
-  
+
   public double getBlockDepth() {
     return blockDepth;
   }
-  
+
   public double getDepth(SequenceRenderContext src) {
     return blockDepth + 1.0;
   }
-  
+
   public void renderFeature(
     Graphics2D g, Feature f, SequenceRenderContext context
   ) {
@@ -136,7 +136,7 @@ implements FeatureRenderer, java.io.Serializable {
       last = next;
     }
   }
-    
+
   private void renderLocation(
     Graphics2D g, Location loc, SequenceRenderContext context
   ) {
@@ -163,7 +163,7 @@ implements FeatureRenderer, java.io.Serializable {
       g.draw(block);
     }
   }
-    
+
     private StrandedFeature.Strand getStrand(Feature f) {
 	if (f instanceof StrandedFeature) {
 	    return ((StrandedFeature) f).getStrand();
@@ -195,8 +195,8 @@ implements FeatureRenderer, java.io.Serializable {
         midP   = new Point2D.Double(mid,   blockDepth);
         endP   = new Point2D.Double(end,   half);
       } else {
-        double start = context.sequenceToGraphics(source.getMax());
-        double end = context.sequenceToGraphics(dest.getMin()+1);
+        double start = context.sequenceToGraphics(source.getMax()+1);
+        double end = context.sequenceToGraphics(dest.getMin());
         double mid = (start + end) * 0.5;
         startP = new Point2D.Double(start, half);
         midP   = new Point2D.Double(mid,   0.0);
@@ -204,8 +204,8 @@ implements FeatureRenderer, java.io.Serializable {
       }
     } else {
       if (getStrand(f) == StrandedFeature.NEGATIVE) {
-        double start = context.sequenceToGraphics(dest.getMin());
-        double end = context.sequenceToGraphics(source.getMax()+1);
+        double start = context.sequenceToGraphics(dest.getMin()+1);
+        double end = context.sequenceToGraphics(source.getMax());
         double mid = (start + end) * 0.5;
         startP = new Point2D.Double(half,       start);
         midP   = new Point2D.Double(blockDepth, mid);
@@ -225,7 +225,7 @@ implements FeatureRenderer, java.io.Serializable {
     line.setLine(midP, endP);
     g.draw(line);
   }
-  
+
   public FeatureHolder processMouseEvent(
     FeatureHolder hits,
     SequenceRenderContext src,

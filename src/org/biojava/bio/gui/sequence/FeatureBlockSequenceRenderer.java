@@ -195,7 +195,7 @@ public class FeatureBlockSequenceRenderer extends AbstractChangeable
     public double getDepth(SequenceRenderContext src) {
         FeatureHolder features = src.getFeatures();
         FeatureFilter filter =
-            new FeatureFilter.OverlapsLocation(src.getRange());
+            FilterUtils.overlapsLocation(src.getRange());
         FeatureHolder fh = features.filter(filter, false);
         if (!isCollapsing || fh.countFeatures() > 0) {
             return renderer.getDepth(src);
@@ -213,10 +213,10 @@ public class FeatureBlockSequenceRenderer extends AbstractChangeable
     }
 
   public void paint(Graphics2D g, SequenceRenderContext src) {
-    FeatureFilter filt = FilterUtils.overlapsLocation(
+    FeatureFilter filt = FilterUtils.overlapsExtent(
             GUITools.getVisibleRange(src, g) );
     FeatureHolder feats = src.getFeatures().filter(filt, false);
-    
+
     for (Iterator i =feats.features(); i.hasNext();) {
       Shape clip = g.getClip();
       AffineTransform at = g.getTransform();

@@ -72,6 +72,7 @@ import org.biojava.utils.Changeable;
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @deprecated This doesn't handle loads of stuff. Use SequencePoster.
  */
 public class SequencePoster
   extends
