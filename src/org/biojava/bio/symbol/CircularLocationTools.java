@@ -135,7 +135,7 @@ final class CircularLocationTools {
 	}
 	return intersect;
     }
-	
+
 
   protected static CircularLocation union(CircularLocation locA, CircularLocation locB){
     int length = locA.getLength();
@@ -146,10 +146,14 @@ final class CircularLocationTools {
       locA.overlaps(locB)
     ) {
       // the simple case
-      temp =  LocationTools.buildLoc(
-        Math.min(locA.getMin(), locB.getMin()),
-        Math.max(locA.getMax(), locB.getMax())
-      );
+      try {
+        temp = MergeLocation.mergeLocations(locA,locB);
+      }
+      catch (BioException ex) {
+        //this shouldn't happen as conditions have been checked above
+        throw new BioError(ex,"Assertion Error, cannot build MergeLocation");
+      }
+
 
       return new CircularLocation(temp, length);
 

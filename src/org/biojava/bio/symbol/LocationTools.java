@@ -63,10 +63,16 @@ final public class LocationTools {
       locA.overlaps(locB)
     ) {
       // the simple case
-      return buildLoc(
-        Math.min(locA.getMin(), locB.getMin()),
-        Math.max(locA.getMax(), locB.getMax())
-      );
+      Location mloc = null;
+      try {
+        mloc = MergeLocation.mergeLocations(locA, locB);
+      }
+      catch (BioException ex) {
+        //this shouldn't happen as conditions have been checked above
+        throw new BioError(ex,"Assertion Error, cannot build MergeLocation");
+      }
+      return mloc;
+
     } else {
       // either may be compound. They may not overlap. We must build the
       // complete list of blocks, merge overlapping blocks and then create the
@@ -133,14 +139,14 @@ final public class LocationTools {
 	// of blocks in locA and locB. Ignore all Location.empty. Create the
 	// appropriate Location instance.
 	List locList = new ArrayList();
-	
+
 	List blA = getBlockList(locA);
 	{
 	    int minBlock = blockContainingOrFollowingPoint(blA, locB.getMin());
 	    int maxBlock = blockContainingOrPreceedingPoint(blA, locB.getMax());
 	    if (minBlock == -1 || maxBlock == -1) {
 		return Location.empty;
-	    } 
+	    }
 	    blA = blA.subList(minBlock, maxBlock + 1);
 	}
 	List blB = getBlockList(locB);
@@ -149,7 +155,7 @@ final public class LocationTools {
 	    int maxBlock = blockContainingOrPreceedingPoint(blB, locA.getMax());
 	    if (minBlock == -1 || maxBlock == -1) {
 		return Location.empty;
-	    } 
+	    }
 	    blB = blB.subList(minBlock, maxBlock + 1);
 	}
 
@@ -206,7 +212,7 @@ final public class LocationTools {
     private static int blockContainingPoint(List bl, int point) {
 	int start = 0;
 	int end = bl.size() - 1;
-	
+
 	while (start <= end) {
 	    int mid = (start + end) / 2;
 	    Location block = (Location) bl.get(mid);
@@ -233,7 +239,7 @@ final public class LocationTools {
 	int start = 0;
 	int length = bl.size();
 	int end = length - 1;
-	
+
 	while (start <= end) {
 	    int mid = (start + end) / 2;
 	    // System.err.println("Start=" + start + " mid=" + mid + " end=" + end);
@@ -266,7 +272,7 @@ final public class LocationTools {
 	int start = 0;
 	int length = bl.size();
 	int end = length - 1;
-	
+
 	while (start <= end) {
 	    int mid = (start + end) / 2;
 	    // System.err.println("Start=" + start + " mid=" + mid + " end=" + end);
@@ -325,7 +331,7 @@ final public class LocationTools {
 		if (minBlock == -1 || maxBlock == -1) {
 		    // System.err.println("blA empty: minBlock=" + minBlock +", maxBlock=" + maxBlock);
 		    return false;
-		} 
+		}
 		blA = blA.subList(minBlock, maxBlock + 1);
 	    }
 	    List blB = getBlockList(locB);
@@ -336,7 +342,7 @@ final public class LocationTools {
 		if (minBlock == -1 || maxBlock == -1) {
 		    // System.err.println("blB empty: minBlock=" + minBlock +", maxBlock=" + maxBlock);
 		    return false;
-		} 
+		}
 		blB = blB.subList(minBlock, maxBlock + 1);
 	    }
 
@@ -514,6 +520,7 @@ final public class LocationTools {
       // lists and also careful to merge overlaps before adding to joinList.
       Iterator i = locList.iterator();
       Location last = Location.empty;
+      ArrayList mergeComponents = new ArrayList();
 
       // prime last
       if(i.hasNext()) {
@@ -524,10 +531,30 @@ final public class LocationTools {
       while(i.hasNext()) {
         Location cur = (Location) i.next();
         if(last.overlaps(cur)) {
+          //add to list of merge components
+          if(mergeComponents.isEmpty()){
+            //need to add last to the component list as well
+            mergeComponents.add(last);
+          }
+          mergeComponents.add(cur);
+
           int min = Math.min(last.getMin(), cur.getMin());
           int max = Math.max(last.getMax(), cur.getMax());
           last = buildLoc(min, max);
         } else {
+          if(! mergeComponents.isEmpty()){
+            //make last a MergeLocation so as to store all its components
+            try {
+              last = MergeLocation.mergeLocations(mergeComponents);
+
+              //reset merge components
+              mergeComponents.clear();
+            }
+            catch (BioException ex) {
+              //this shouldn't happen as conditions have been checked above
+              throw new BioError(ex,"Assertion Error, cannot build MergeLocation");
+            }
+          }
           joinList.add(last);
           last = cur;
         }

@@ -75,6 +75,11 @@ public class MergeLocation extends RangeLocation {
       for(Iterator i = componentLocations.iterator(); i.hasNext();){
         Object o = i.next();
 
+        //what if its decorated?
+        if(o instanceof AbstractLocationDecorator){
+          o = ((AbstractLocationDecorator)o).getWrapped();
+        }
+
         if (o instanceof MergeLocation) {
           List ll = ((MergeLocation)o).getComponentList(true);
           l.addAll(ll);
@@ -147,5 +152,18 @@ public class MergeLocation extends RangeLocation {
     }
 
     return new MergeLocation(min, max, componentLocations);
+  }
+
+  public static MergeLocation mergeLocations(Location locA,
+      Location locB) throws BioException{
+
+    int min = Math.min(locA.getMin(), locB.getMin());
+    int max = Math.max(locA.getMax(), locB.getMax());
+
+    List l = new ArrayList(2);
+    l.add(locA);
+    l.add(locB);
+
+    return new MergeLocation(min, max, l);
   }
 }
