@@ -282,7 +282,13 @@ public class SubSequence implements Sequence {
         return annotation;
     }
 
-    public Sequence getParent() {
+    /**
+     * Return the parent sequence of which this is a partial view
+     *
+     * @since 1.3
+     */
+    
+    public Sequence getSequence() {
         return this.parent;
     }
 
@@ -322,7 +328,7 @@ public class SubSequence implements Sequence {
         }
         
         SubProjectedFeatureHolder(SubSequence ssthis) {
-            super(ssthis.getParent(), ssthis, 1 - ssthis.getStart(), false);
+            super(ssthis.getSequence(), ssthis, 1 - ssthis.getStart(), false);
             this.ssthis = ssthis;
             parentLocation = new RangeLocation(ssthis.getStart(), ssthis.getEnd());
         }
