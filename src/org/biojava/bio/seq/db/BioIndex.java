@@ -14,40 +14,18 @@ public class BioIndex implements IndexStore {
     }
   };
   
-  private static Comparator COMPARATOR = new Comparator() {
-    public int compare(Object a, Object b) {
-      String as;
-      String bs;
-      
-      if(a instanceof Index) {
-        as = ((Index) a).getID();
-      } else {
-        as = (String) a;
-      }
-      
-      if(b instanceof Index) {
-        bs = ((Index) b).getID();
-      } else {
-        bs = (String) b;
-      }
-      
-      return STRING_CASE_SENSITIVE_ORDER.compare(a, b);
-    }
-    
-    public boolean equals(Object o) {
-      return o == COMPARATOR;
-    }
-  };
-  
   private File indexDirectory;
   
-  private Map fileIDToFile;
+  private int fileCount;
+  private File[] fileIDToFile;
   private Map fileToFileID;
   
   private RandomAccessFile indxFile;
   
   private int recordLength;
-  private List indxList;
+  private FileAsList indxList;
+  private Map secondaryKeyToFileAsList;
+  
   private Set idSet = new ListAsSet();
   private int commitedRecords;
   private String name;
@@ -57,16 +35,55 @@ public class BioIndex implements IndexStore {
   
   public BioIndex(
     File indexDirectory
-  ) {
+  ) throws IOException, BioException {
     this.indexDirectory = indexDirectory;
+    
+    // set up file set
+    fileCount = 0;
+    fileIDToFile = new File[4];
+    
+    BufferedReader fi = new BufferedReader(
+      new FileReader(
+        new File(indexDirectory, "fileids.dat")
+      )
+    );
+    for(String line = fi.readLine(); line != null; line = fi.readLine()) {
+      StringTokenizer sTok = new StringTokenizer("\t");
+      int id = Integer.parseInt(sTok.nextToken());
+      File file = new File(sTok.nextToken());
+      long fileLength = Long.parseLong(sTok.nextToken());
+      
+      if(file.length() != fileLength) {
+        throw new BioException("File length changed: " + file + " "
+        + file.length() + " vs " + fileLength);
+      }
+      
+      fileIDToFile[id] = file;
+    }
   }
   
-  private File getFileForID(String id) {
-    return (File) fileIDToFile.get(id);
+  private File getFileForID(int fileId) {
+    return fileIDToFile[fileId];
   }
   
-  private String getIDForFile(File file) {
-    return (String) fileToFileID.get(file);
+  private int getIDForFile(File file) {
+    // scan list
+    for(int i = 0; i < fileCount; i++) {
+      if(file.equals(fileIDToFile[i])) {
+        return i;
+      }
+    }
+    
+    // extend fileIDToFile array
+    if(fileCount >= fileIDToFile.length) {
+      File[] tmp = new File[fileIDToFile.length + 4]; // 4 is magic number
+      System.arraycopy(fileIDToFile, 0, tmp, 0, fileCount);
+      fileIDToFile = tmp;
+    }
+    
+    // add the unseen file to the list
+    fileIDToFile[fileCount] = file;
+    return fileCount++;
   }
   
   public String getName() {
@@ -75,7 +92,7 @@ public class BioIndex implements IndexStore {
   
   public Index fetch(String id)
   throws IllegalIDException, BioException {
-    int indx = Collections.binarySearch(indxList, id, COMPARATOR);
+    int indx = Collections.binarySearch(indxList, id, indxList.getComparator());
     if(indx < 0) {
       throw new IllegalIDException("Can't find sequence for " + id);
     }
@@ -90,7 +107,26 @@ public class BioIndex implements IndexStore {
   public void commit()
   throws BioException {
     try {
-      Collections.sort(indxList, COMPARATOR);
+      // write files
+      {
+        PrintStream fo = new PrintStream(
+          new FileOutputStream(
+            new File(indexDirectory, "fileids.dat")
+          )
+        );
+        for(int i = 0; i < fileCount; i++) {
+          fo.print(i);
+          fo.print('\t');
+          fo.print(fileIDToFile[i]);
+          fo.print('\t');
+          fo.print(fileIDToFile[i].length());
+          fo.println();
+        }
+        fo.close();
+      }
+      
+      // write sequences
+      Collections.sort(indxList, indxList.getComparator());
       
       commitedRecords = indxList.size();
     } catch (Exception e) {
@@ -116,7 +152,7 @@ public class BioIndex implements IndexStore {
   }
   
   public Set getFiles() {
-    return new HashSet(fileIDToFile.values());
+    return new HashSet(Arrays.asList(fileIDToFile));
   }
   
   public SequenceFormat getFormat() {
@@ -133,14 +169,16 @@ public class BioIndex implements IndexStore {
   
   // records stored as:
   // seqID(\w+) \t fileID(\w+) \t start(\d+) \t length(\d+) ' ' * \n
-  private class FileAsList
+  private abstract class FileAsList
   extends AbstractList
   implements RandomAccess {
+    private RandomAccessFile mappedFile;
     private int lastIndx;
-    private Index lastRec;
+    private Object lastRec;
     private byte[] buffer;
     
-    {
+    public FileAsList(RandomAccessFile mappedFile, int recordLength) {
+      this.mappedFile = mappedFile;
       buffer = new byte[recordLength];
     }
     
@@ -161,29 +199,8 @@ public class BioIndex implements IndexStore {
         throw new BioError(ioe, "Failed to seek for record");
       }
       
-      int lastI = 0;
-      int newI = 0;
-      while(buffer[newI] != '\t') {
-        newI++;
-      }
-      String id = new String(buffer, lastI, newI);
-      
-      while(buffer[newI] != '\t') {
-        newI++;
-      }
-      File file = getFileForID(new String(buffer, lastI, newI).trim());
-
-      while(buffer[newI] != '\t') {
-        newI++;
-      }
-      long start = Long.parseLong(new String(buffer, lastI, newI));
-      
-      int length = Integer.parseInt(
-        new String(buffer, newI + 1, recordLength)
-      );
-      
+      lastRec = parseRecord(buffer);
       lastIndx = indx;
-      lastRec = new SimpleIndex(file, start, length, id);
       return lastRec;
     }
     
@@ -196,10 +213,79 @@ public class BioIndex implements IndexStore {
     }
     
     public boolean add(Object o) {
-      Index indx = (Index) o;
+      generateRecord(buffer, o);
+      
+      try {
+        indxFile.seek(indxFile.length());
+        indxFile.write(buffer);
+      } catch (IOException ioe) {
+        throw new BioError(ioe, "Failed to write index");
+      }
+      
+      return true;
+    }
+    
+    protected abstract Object parseRecord(byte[] buffer);
+    protected abstract void generateRecord(byte[] buffer, Object item);
+    protected abstract Comparator getComparator();
+  }
+  
+  private class IndexFileAsList extends FileAsList {
+    private Comparator INDEX_COMPARATOR = new Comparator() {
+      public int compare(Object a, Object b) {
+        String as;
+        String bs;
+        
+        if(a instanceof Index) {
+          as = ((Index) a).getID();
+        } else {
+          as = (String) a;
+        }
+        
+        if(b instanceof Index) {
+          bs = ((Index) b).getID();
+        } else {
+          bs = (String) b;
+        }
+        
+        return STRING_CASE_SENSITIVE_ORDER.compare(a, b);
+      }
+    };
+    
+    public IndexFileAsList(RandomAccessFile file, int recordLength) {
+      super(file, recordLength);
+    }
+
+    protected Object parseRecord(byte[] buffer) {
+      int lastI = 0;
+      int newI = 0;
+      while(buffer[newI] != '\t') {
+        newI++;
+      }
+      String id = new String(buffer, lastI, newI);
+
+      while(buffer[newI] != '\t') {
+        newI++;
+      }
+      File file = getFileForID(Integer.parseInt(new String(buffer, lastI, newI).trim()));
+
+      while(buffer[newI] != '\t') {
+        newI++;
+      }
+      long start = Long.parseLong(new String(buffer, lastI, newI));
+      
+      int length = Integer.parseInt(
+        new String(buffer, newI + 1, recordLength)
+      );
+      
+      return new SimpleIndex(file, start, length, id);
+    }
+    
+    protected void generateRecord(byte[] buffer, Object item) {
+      Index indx = (Index) item;
       
       String id = indx.getID();
-      String fileID = getIDForFile(indx.getFile());
+      int fileID = getIDForFile(indx.getFile());
       String start = String.valueOf(indx.getStart());
       String length = String.valueOf(indx.getLength());
       
@@ -213,7 +299,7 @@ public class BioIndex implements IndexStore {
       
       buffer[i++] = '\t';
       
-      str = fileID.getBytes();
+      str = String.valueOf(fileID).getBytes();
       for(int j = 0; j < str.length; j++) {
         buffer[i++] = str[j];
       }
@@ -237,15 +323,100 @@ public class BioIndex implements IndexStore {
       }
       
       buffer[i] = '\n';
+    }
+    
+    public Comparator getComparator() {
+      return INDEX_COMPARATOR;
+    }
+  }
+  
+  private static final class Record {
+    private final String key;
+    private final String value;
+    
+    public Record(String key, String value) {
+      this.key = key;
+      this.value = value;
+    }
+    
+    public String getKey() {
+      return key;
+    }
+    
+    public String getValue() {
+      return value;
+    }
+    
+    public int hashCode() {
+      return key.hashCode();
+    }
+  }
+  
+  private class SecondaryIDFileAsList extends FileAsList {
+    private Comparator RECORD_COMPARATOR = new Comparator() {
+      public int compare(Object a, Object b) {
+        String as;
+        String bs;
+        
+        if(a instanceof Record) {
+          as = ((Record) a).getKey();
+        } else {
+          as = (String) a;
+        }
+        
+        if(b instanceof Index) {
+          bs = ((Record) b).getKey();
+        } else {
+          bs = (String) b;
+        }
+        
+        return STRING_CASE_SENSITIVE_ORDER.compare(a, b);
+      }
+    };
+    
+    public SecondaryIDFileAsList(RandomAccessFile file, int recordLength) {
+      super(file, recordLength);
+    }
+
+    public Object parseRecord(byte[] buffer) {
+      int tab = 0;
       
-      try {
-        indxFile.seek(indxFile.length());
-        indxFile.write(buffer);
-      } catch (IOException ioe) {
-        throw new BioError(ioe, "Failed to write index");
+      while(buffer[tab] != '\t') {
+        tab++;
       }
       
-      return true;
+      String key = new String(buffer, 0, tab);
+      String value = new String(buffer, tab + 1, buffer.length).trim();
+      
+      return new Record(key, value);
+    }
+    
+    protected void generateRecord(byte[] buffer, Object item) {
+      Record rec = (Record) item;
+      byte[] str;
+      int indx = 0;
+      
+      str = rec.getKey().getBytes();
+      for(int i = 0; i < str.length; i++) {
+        buffer[indx++] = str[i];
+      }
+      
+      buffer[indx++] = '\t';
+      
+      str = rec.getValue().getBytes();
+      for(int i = 0; i < str.length; i++) {
+        buffer[indx++] = str[i];
+      }
+      
+      while(indx < buffer.length - 1) {
+        buffer[indx++] = ' ';
+      }
+      
+      buffer[buffer.length - 1] = '\n';
+    }
+    
+    protected Comparator getComparator() {
+      return RECORD_COMPARATOR;
     }
   }
   
