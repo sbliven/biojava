@@ -42,7 +42,7 @@ import java.util.StringTokenizer;
 public class OBDARegistryParser {
 
     /**
-     * <code>parseRegistry</code> parses an Open Bio Sequence Database
+     * <code>parseRegistry</code> parses an Open Bioinformatics Database
      * Access (OBDA) configuration file.
      *
      * @param in a <code>BufferedReader</code>.

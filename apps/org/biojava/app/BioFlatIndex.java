@@ -42,14 +42,15 @@ import org.biojava.utils.lsid.LifeScienceIdentifierParseException;
 
 /**
  * <p><code>BioFlatIndex</code> is a user application for performing
- * sequence flat file indexing. It may be used to create a new index
- * or to update an existing index with new files. When creating a new
- * index the sequence file format (currently one of 'fasta',
- * 'swissprot', 'embl' or 'genbank', case-insensitive) and alphabet
- * ('dna', 'rna', 'aa', case-insensitive) must be indicated. This
- * information is stored in the index and is used by the sequence
- * retrieval code to determine how to treat the indexed file(s). See
- * the FLAT-DATABASES-HOWTO for more information.</p>
+ * sequence flat file indexing according to the Open Bioinformatics
+ * Database Access (OBDA) indexing standard. It may be used to create
+ * a new index or to update an existing index with new files. When
+ * creating a new index the sequence file format (currently one of
+ * 'fasta', 'swissprot', 'embl' or 'genbank', case-insensitive) and
+ * alphabet ('dna', 'rna', 'aa', case-insensitive) must be
+ * indicated. This information is stored in the index and is used by
+ * the sequence retrieval code to determine how to treat the indexed
+ * file(s). See the FLAT-DATABASES-HOWTO for more information.</p>
  *
  * <pre>
  * usage: java org.biojava.app.BioFlatIndex

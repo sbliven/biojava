@@ -33,6 +33,25 @@ import org.biojava.bio.seq.io.SeqIOTools;
 import org.biojava.directory.Registry;
 import org.biojava.directory.SystemRegistry;
 
+/**
+ * <p><code>BioGetSeq</code> is a user application for retrieving
+ * sequences from flat file databanks which have been indexed
+ * according to the Open Bioinformatics Database Access (OBDA)
+ * indexing standard. See the BIODATABASE-ACCESS-HOWTO for more
+ * information.</p>
+ *
+ * <pre>
+ * usage: java org.biojava.app.BioGetSeq
+ *  -d,--dbname       Specifies a symbolic data source
+ *  -f,--format       Specifies the output format (optional, defaults to
+ *                    'fasta')
+ *  -h,--help         Command line help
+ *  -n,--namespace    Specifies the namespace within which to search
+ *                    (optional, defaults to 'ID')
+ * </pre>
+ *
+ * @author Keith James
+ */
 public class BioGetSeq
 {
     public static void main(String [] argv) throws Exception
@@ -49,6 +68,9 @@ public class BioGetSeq
             }
 
             String namespace = cmd.getOptionValue('n', "id");
+ 
+            // Currently BioJava SequenceDBs only understand the ID
+            // namespace
             if (! namespace.equalsIgnoreCase("ID"))
             {
                 exitHelp(opts, 1, "Only the 'ID' namespace is supported");

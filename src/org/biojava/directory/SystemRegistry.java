@@ -29,6 +29,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * <p>A registry that loads up the standard biodirectory files.</p>
@@ -43,6 +44,12 @@ import java.util.List;
  * </ol>
  * </p>
  *
+ * <p>The default search path may be replaced by an alternative search
+ * path specified by the <code>OBDA_SEARCH_PATH</code> system
+ * environment variable. This environment variable is a "+" delimted
+ * string of files and URLs. The search order proceeds from read left
+ * to right.</p>
+ *
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Keith James
@@ -53,6 +60,8 @@ public class SystemRegistry {
         "http://www.open-bio.org/registry/seqdatabase.ini";
 
     public static final String CONFIG_FILE = "seqdatabase.ini";
+
+    public static final String OBDA_SEARCH_ENV = "OBDA_SEARCH_PATH";
 
     private static Registry systemRegistry;
 
@@ -93,8 +102,7 @@ public class SystemRegistry {
                     if (stream != null) {
                         try {
                             RegistryConfiguration cfg =
-                                OBDARegistryParser.parseRegistry(stream,
-                                                                 locator);
+                                OBDARegistryParser.parseRegistry(stream, locator);
                             regConfig.addBottomConfig(cfg);
                         } catch (Exception ex) {
                             // FIXME - log this
@@ -121,16 +129,30 @@ public class SystemRegistry {
      */
     public static List getRegistryPath() {
         List registryPath = new ArrayList();
-        String userHome = System.getProperty("user.home");
-        if (userHome != null) {
-            registryPath.add("file://"
-                             + userHome
-                             + "/.bioinformatics/"
-                             + CONFIG_FILE);
+
+        String customPath = System.getProperty(OBDA_SEARCH_ENV);
+        if (customPath != null)
+        {
+            StringTokenizer st = new StringTokenizer(customPath, "+");
+            while (st.hasMoreTokens())
+            {
+                registryPath.add(st.nextToken());
+            }
+        }
+        else
+        {
+            String userHome = System.getProperty("user.home");
+            if (userHome != null) {
+                registryPath.add("file://"
+                                 + userHome
+                                 + "/.bioinformatics/"
+                                 + CONFIG_FILE);
+            }
+
+            registryPath.add("file:///etc/bioinformatics/" + CONFIG_FILE);
+            registryPath.add(CONFIG_LOCATOR);
         }
 
-        registryPath.add("file:///etc/bioinformatics/" + CONFIG_FILE);
-        registryPath.add(CONFIG_LOCATOR);
         return registryPath;
     }
 }
