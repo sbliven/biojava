@@ -31,8 +31,8 @@ public class EmblViewer {
     final BasicFeatureRenderer fr;
     final FeatureRenderer split;
     
-    SequenceFormat ef = new EmblFormat();
-    SequenceFactory sf = new SimpleSequenceFactory();
+    SequenceFormat ef = new EmblLikeFormat();
+    SequenceBuilderFactory sf = new EmblProcessor.Factory(SimpleSequenceBuilder.FACTORY);
     InputStream is = new FileInputStream(seqFile);
 	    
     StreamReader sr = new StreamReader(is, ef, DNATools.getDNA().getParser("token"), sf);
