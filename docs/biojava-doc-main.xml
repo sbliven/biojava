@@ -61,7 +61,8 @@
     </revhistory>
   </bookinfo>
 
-  <preface>
+  <!-- This demonstrates the id convention for a preface -->
+  <preface id="bd-pre01">
     <title>Foreward</title>
 
     <para>The <ulink url="http://biojava.org">BioJava Project</ulink>
@@ -74,68 +75,105 @@
     developed.</para>
 
     <para>The BioJava documentation aims to provide information about
-    all aspects of BioJava and to link into other resources, such as
+    all aspects of BioJava and links to into other resources, such as
     the API documentation.</para>
   </preface>
 
-  <preface>
+  <preface id="bd-pre02">
     <title>Introduction to the documentation</title>
 
     <para>The documentation takes as its model the <ulink
-    url="http://linuxdoc.org">Linux Documentation Project</ulink>
-    (LDP) which aims to develop free, high quality documentation for
-    the GNU/Linux operating system. By using an SGML/XML-based
-    authoring format (<ulink
+    url="http://linuxdoc.org">Linux Documentation Project
+    (LDP)</ulink> which aims to develop free, high quality
+    documentation for the GNU/Linux operating system. By using an
+    SGML/XML-based authoring format (<ulink
     url="http://www.oasis-open.org/docbook/">DocBook</ulink>) many
     different types of output may be generated from a single source,
     including HTML and printable formats, without compromising quality
-    or portability across computing platforms.</para>
-
-    <para></para>
-
+    or portability across computing platforms. To find out more about
+    DocBook see <xref linkend="bd-apdx02">.</para>
   </preface>
 
-  <chapter>
+  <!-- Table of contents is automatically generated here -->
+  <toc></toc>
+
+  <!-- This demonstrates the id convention for chapters -->
+  <chapter id="bd-ch01">
     <title>Beginning BioJava</title>
 
     <sect1>
       <title>Obtaining BioJava</title>
+
+      <sect2>
+        <title>Binary distrubution</title>
+
+        <para>Binary distributions in .jar (Java ARchive) format may
+        be obtained from the <ulink
+        url="http://biojava.org/download/binaries/">binaries
+        directory</ulink> of the web site <ulink
+        url="http://biojava.org/download/">download
+        area</ulink>.</para>
+
+        <para>You will also need a Java bytecode generation library
+        (bytecode-0.90.jar) which may be obtained from the same
+        place.</para>
+
+      </sect2>
+
+      <sect2>
+        <title>Source code distribution</title>
+
+        <para></para>
+      </sect2>
+
+      <sect2>
+        <title>BioJava dependencies</title>
+
+        <para></para>
+      </sect2>
+
 
     </sect1>
 
     <sect1>
       <title>Installing BioJava</title>
 
+      <para></para>
     </sect1>
 
     <sect1>
       <title>Running the demo programs</title>
 
+      <para></para>
     </sect1>
   </chapter>
 
-
-  <appendix label="A">
+  <!-- This demonstrates the id convention for appendices -->
+  <appendix label="A" id="bd-apdx01">
     <title>Style guide</title>
 
+    <para></para>
   </appendix>
 
-  <appendix label="B">
+  <appendix label="B" id="bd-apdx02" xreflabel="Appendix B: Using DocBook">
     <title>Using DocBook</title>
 
     <sect1>
       <title>What is DocBook</title>
 
+      <para></para>
     </sect1>
 
     <sect1>
       <title>Why use DocBook?</title>
 
+      <para></para>
     </sect1>
 
     <sect1>
       <title>DocBook and the BioJava Documentation</title>
 
+      <para></para>
     </sect1>
 
   </appendix>
