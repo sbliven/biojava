@@ -19,6 +19,11 @@
  *
  */
 
+package org.biojava.bio.symbol;
+
+import java.util.List;
+import java.util.ArrayList;
+
 /**
  * Class to perform arbitrary regex-like searches on
  * any FiniteAlphabet.
@@ -29,10 +34,6 @@
  * @author David Huen
  * @since 1.4
  */
-package org.biojava.bio.symbol;
-
-import java.util.List;
-import java.util.ArrayList;
 
 public class PatternSearch
 {
@@ -68,6 +69,13 @@ public class PatternSearch
 //    private static MatchStatus FAILED = new MatchStatus();
 //    private static MatchStatus MATCHED = new MatchStatus();
 
+    /**
+     * Class to describe a regex-like pattern.  The pattern
+     * is a list of other patterns or Symbols in the target
+     * FiniteAlphabet.  These are added to the list with
+     * addSymbol and addPattern calls.  The pattern can be
+     * reiterated a number of times (deafult is once).
+     */
     public static class Pattern
     {
         private List patternList;
@@ -76,6 +84,10 @@ public class PatternSearch
         private int max = 1;
         private String label;
 
+        /**
+         * @param label A String describing the Pattern.
+         * @param alfa The FiniteAlphabet the Pattern is defined over.
+         */
         public Pattern(String label, FiniteAlphabet alfa)
         {
             this.alfa = alfa;
@@ -83,6 +95,9 @@ public class PatternSearch
             patternList = new ArrayList();
         }
 
+        /**
+         * Add a Symbol to the end of the Pattern.
+         */
         public void addSymbol(Symbol sym)
             throws IllegalAlphabetException
         {
@@ -92,6 +107,9 @@ public class PatternSearch
             patternList.add(sym);
         }
 
+        /**
+         * Add a Pattern to the end of the Pattern.
+         */
         public void addPattern(Pattern pattern)
             throws IllegalAlphabetException
         {
@@ -106,6 +124,9 @@ public class PatternSearch
         public int getMax() { return max; }
         public String getLabel() { return label; }
 
+        /**
+         * Minimum number of times the Pattern is to be matched.
+         */
         public void setMin(int min)
             throws IllegalArgumentException
         {
@@ -115,6 +136,9 @@ public class PatternSearch
                 this.min = min;
         }
 
+        /**
+         * Maximum number of times the Pattern is to be matched.
+         */
         public void setMax(int max)
         {
             if (max < 0)
