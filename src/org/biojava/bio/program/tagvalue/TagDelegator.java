@@ -22,6 +22,7 @@
 package org.biojava.bio.program.tagvalue;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.biojava.utils.ParserException;
 import org.biojava.utils.SmallMap;
@@ -52,14 +53,32 @@ public class TagDelegator
 {
   private Map parsers;
   private Map listeners;
+  private TagValueParser delegateParser;
   
   private TagValueParser parser;
   private TagValueListener listener;
+
+  {
+    parsers = new SmallMap();
+    listeners = new SmallMap();
+  }
+
+  public TagDelegator() {
+    super();
+  }
   
   public TagDelegator(TagValueListener delegate) {
     super(delegate);
     parsers = new SmallMap();
     listeners = new SmallMap();
+  }
+
+  public void setDelegateParser(TagValueParser delegateParser) {
+    this.delegateParser = delegateParser;
+  }
+
+  public TagValueParser getDelegateParser() {
+    return delegateParser;
   }
   
   public void startTag(Object tag)
@@ -76,6 +95,8 @@ public class TagDelegator
       tvc.pushParser(parser, listener);
     } else if(listener != null) {
       listener.value(tvc, value);
+    } else if(delegateParser != null) {
+      tvc.pushParser(delegateParser, getDelegate());
     } else {
       super.value(tvc, value);
     }
@@ -95,5 +116,17 @@ public class TagDelegator
     TagValueListener listener
   ) {
     listeners.put(tag, listener);
+  }
+
+  public TagValueParser getParser(Object tag) {
+    return (TagValueParser) parsers.get(tag);
+  }
+
+  public TagValueListener getListener(Object tag) {
+    return (TagValueListener) listeners.get(tag);
+  }
+
+  public Set getTags() {
+    return listeners.keySet();
   }
 }

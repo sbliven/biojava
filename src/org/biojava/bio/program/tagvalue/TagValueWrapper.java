@@ -53,9 +53,17 @@ public abstract class TagValueWrapper
   public TagValueWrapper(TagValueListener delegate) {
     this.delegate = delegate;
   }
+
+  public TagValueWrapper() {
+    delegate = null;
+  }
   
   public TagValueListener getDelegate() {
     return delegate;
+  }
+
+  public void setDelegate(TagValueListener delegate) {
+    this.delegate = delegate;
   }
   
   public void startRecord()

@@ -36,6 +36,14 @@ public class TagDropper
 extends TagValueWrapper {
   private Set tags;
   boolean propagate;
+
+  {
+    tags = new SmallSet();
+  }
+
+  public TagDropper() {
+    super();
+  }
   
   /**
    * Create a new TagDropper that will pass on all retained tags and values to
@@ -45,7 +53,6 @@ extends TagValueWrapper {
    */
   public TagDropper(TagValueListener tvl) {
     super(tvl);
-    this.tags = new SmallSet();
   }
   
   /**
@@ -64,6 +71,10 @@ extends TagValueWrapper {
    */
   public void removeTag(Object tag) {
     tags.remove(tag);
+  }
+
+  public Set getTags() {
+    return tags;
   }
   
   public void startTag(Object tag)

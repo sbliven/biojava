@@ -44,6 +44,10 @@ public class ValueChanger
   private ChangeTable.Changer changer;
   private ChangeTable.Splitter splitter;
   
+  public ValueChanger() {
+    super();
+  }
+
   /** 
    * Create a new changer that will pass the modified event stream to a
    * delegate.
@@ -93,6 +97,14 @@ public class ValueChanger
    */
   public ChangeTable.Splitter getDefaultSplitter() {
     return defaultS;
+  }
+
+  public ChangeTable getChangeTable() {
+    return changeTable;
+  }
+
+  public void setChangeTable(ChangeTable changeTable) {
+    this.changeTable = changeTable;
   }
   
   public void startTag(Object tag)
