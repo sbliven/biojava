@@ -291,7 +291,8 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     }
   }
   
-  private void doAddState(State toAdd) throws IllegalSymbolException {
+  private void doAddState(State toAdd)
+  throws IllegalSymbolException, ChangeVetoException {
     ((SimpleAlphabet) stateAlphabet()).addSymbol(toAdd);
     FiniteAlphabet fa = new SimpleAlphabet("Transitions from " + toAdd.getName());
     transFrom.put(toAdd, fa);

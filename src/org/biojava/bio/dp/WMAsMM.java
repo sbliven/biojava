@@ -168,37 +168,49 @@ public class WMAsMM implements MarkovModel, Serializable {
   }
   
   public WMAsMM(WeightMatrix wm) throws IllegalSymbolException {
-    changeSupport = new ChangeSupport();
-    distForwarder = new MarkovModel.DistributionForwarder(this, changeSupport);
-    transFrom = new HashMap();
-    transTo = new HashMap();
-    transWeights = new HashMap();
-    this.wm = wm;
-    this.magicalState = MagicalState.getMagicalState(wm.getAlphabet(), 1);
-    SimpleAlphabet sa = new SimpleAlphabet();
-    sa.addSymbol(magicalState);
-    this.stateAlpha = sa;
-    this.states = new EmissionState[wm.columns()];
-    for(int i = 0; i <= wm.columns(); i++) {
-      if(i < wm.columns()) {
-        sa.addSymbol(
-          this.states[i] = new SimpleEmissionState(
-            i + "",
-            Annotation.EMPTY_ANNOTATION,
-            this.advance,
-            wm.getColumn(i)
-          )
-        );
-        wm.getColumn(i).addChangeListener(distForwarder);
+    try {
+      changeSupport = new ChangeSupport();
+      distForwarder = new MarkovModel.DistributionForwarder(this, changeSupport);
+      transFrom = new HashMap();
+      transTo = new HashMap();
+      transWeights = new HashMap();
+      this.wm = wm;
+      this.magicalState = MagicalState.getMagicalState(wm.getAlphabet(), 1);
+      SimpleAlphabet sa = new SimpleAlphabet();
+      sa.addSymbol(magicalState);
+      this.stateAlpha = sa;
+      this.states = new EmissionState[wm.columns()];
+      for(int i = 0; i <= wm.columns(); i++) {
+        if(i < wm.columns()) {
+          sa.addSymbol(
+            this.states[i] = new SimpleEmissionState(
+              i + "",
+              Annotation.EMPTY_ANNOTATION,
+              this.advance,
+              wm.getColumn(i)
+            )
+          );
+          wm.getColumn(i).addChangeListener(distForwarder);
+        }
+        State prev = (i == 0) ? magicalState : states[i-1];
+        State current = (i == wm.columns()) ? magicalState : states[i];
+        FiniteAlphabet fa = (FiniteAlphabet) prev.getMatches();
+        transFrom.put(prev, current.getMatches());
+        transTo.put(current, fa);
+        Distribution dist = new UniformDistribution(fa);
+        transWeights.put(prev, fa);
       }
-      State prev = (i == 0) ? magicalState : states[i-1];
-      State current = (i == wm.columns()) ? magicalState : states[i];
-      FiniteAlphabet fa = (FiniteAlphabet) prev.getMatches();
-      transFrom.put(prev, current.getMatches());
-      transTo.put(current, fa);
-      Distribution dist = new UniformDistribution(fa);
-      transWeights.put(prev, fa);
+      sa.setName("Weight Matrix columns");
+    } catch (ChangeVetoException cve) {
+      throw new BioError(
+        cve,
+        "Assertion Failure: Should be able to manipulate my state alphabet."
+      );
+    } catch (IllegalSymbolException ise) {
+      throw new BioError(
+        ise,
+        "Assertion Failure: Should be able to manipulate my state alphabet."
+      );
     }
-    sa.setName("Weight Matrix columns");
   }
 }
