@@ -26,6 +26,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -293,6 +294,9 @@ public class TranslatedSequencePanel extends JComponent
         // Add our listener to the sequence, if necessary
         if (sequence != null)
             sequence.addChangeListener(layoutListener);
+
+        resizeAndValidate();
+        firePropertyChange("sequence", prevSequence, sequence);
     }
 
     /**
@@ -372,6 +376,7 @@ public class TranslatedSequencePanel extends JComponent
         int prevDirection = this.direction;
         this.direction = direction;
 
+        resizeAndValidate();
         firePropertyChange("direction", prevDirection, direction);
     }
 
@@ -387,7 +392,8 @@ public class TranslatedSequencePanel extends JComponent
     }
 
     /**
-     * <code>setScale</code> sets the scale in pixels per <code>Symbol</code>.
+     * <code>setScale</code> sets the scale in pixels per
+     * <code>Symbol</code>.
      *
      * @param scale a <code>double</code>.
      */
@@ -396,6 +402,7 @@ public class TranslatedSequencePanel extends JComponent
         double prevScale = this.scale;
         this.scale = scale;
 
+        resizeAndValidate();
         firePropertyChange("scale", prevScale, scale);
     }
 
@@ -448,6 +455,7 @@ public class TranslatedSequencePanel extends JComponent
             this.translation = translation;
         }
 
+        resizeAndValidate();
         firePropertyChange("translation", prevTranslation, translation);
     }
 
@@ -511,6 +519,7 @@ public class TranslatedSequencePanel extends JComponent
         {
             _setRenderer(renderer);
         }
+        resizeAndValidate();
     }
 
     /**
@@ -552,7 +561,7 @@ public class TranslatedSequencePanel extends JComponent
      */
     public double sequenceToGraphics(int sequencePos)
     {
-        return Math.floor(((double) (sequencePos - translation - 1)) * scale);
+        return (sequencePos - translation - 1) * scale;
     }
 
     /**
@@ -596,14 +605,18 @@ public class TranslatedSequencePanel extends JComponent
      */
     public int getVisibleSymbolCount()
     {
+        // The BioJava borders
         double totalBorders = leadingBorder.getSize()
             + trailingBorder.getSize() + rendererBorders;
+
+        // The Insets
+        Insets insets = getInsets();
 
         int visible;
 
         if (direction == HORIZONTAL)
         {
-            int width = getWidth();
+            int width = getWidth() - insets.left - insets.right;
 
             if (width <= totalBorders) 
                 return 0;
@@ -612,7 +625,7 @@ public class TranslatedSequencePanel extends JComponent
         }
         else
         {
-            int height = getHeight();
+            int height = getHeight() - insets.top - insets.bottom;
 
             if (height <= totalBorders)
                 return 0;
@@ -653,7 +666,7 @@ public class TranslatedSequencePanel extends JComponent
             // Set the width to visible symbols + the delegate
             // renderer's minimum trailer (which may have something in
             // it to render)
-            clip.width = sequenceToGraphics(getVisibleSymbolCount() + 5)
+            clip.width = sequenceToGraphics(getVisibleSymbolCount())
                 + renderer.getMinimumTrailer(this);
             clip.height = renderer.getDepth(this);
 
@@ -668,7 +681,7 @@ public class TranslatedSequencePanel extends JComponent
             // Set the height to visible symbols + the delegate
             // renderer's minimum trailer (which may have something in
             // it to render)
-            clip.height = sequenceToGraphics(getVisibleSymbolCount() + 5)
+            clip.height = sequenceToGraphics(getVisibleSymbolCount())
                 + renderer.getMinimumTrailer(this);
 
             g2.translate(0.0, leadingBorder.getSize());
@@ -681,6 +694,40 @@ public class TranslatedSequencePanel extends JComponent
         // Restore saved settings
         g2.setClip(prevClip);
         g2.setTransform(prevTransform);
+    }
+
+    public void resizeAndValidate()
+    {
+        Dimension d = null;
+
+        if (! isActive())
+        {
+            leadingBorder.setSize(0.0);
+            trailingBorder.setSize(0.0);
+            d = new Dimension(0, 0);
+        }
+        else
+        {
+            double width = sequenceToGraphics(getVisibleSymbolCount())
+                + rendererBorders;
+            double depth = renderer.getDepth(this);
+
+            if (direction == HORIZONTAL)
+            {
+                d = new Dimension((int) Math.ceil(width),
+                                  (int) Math.ceil(depth));
+            }
+            else
+            {
+                d = new Dimension((int) Math.ceil(depth),
+                                  (int) Math.ceil(width));
+            }
+        }
+
+        setMinimumSize(d);
+        setPreferredSize(d);
+        setMaximumSize(d);
+        revalidate();
     }
 
     /**
