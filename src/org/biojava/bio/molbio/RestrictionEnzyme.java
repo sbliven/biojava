@@ -88,8 +88,8 @@ public class RestrictionEnzyme implements Serializable
     private String summary;
 
     /**
-     * Creates a new <code>RestrictionEnzyme</code> which cuts with or
-     * downstream of the recognition site. The cut position indices
+     * Creates a new <code>RestrictionEnzyme</code> which cuts within
+     * or downstream of the recognition site. The cut position indices
      * are <strong>always</strong> in the same coordinate space as the
      * recognition site. <code>RestrictionEnzyme</code>s are
      * immutable.

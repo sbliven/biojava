@@ -230,7 +230,8 @@ public final class RestrictionEnzymeManager
      * to <code>Feature</code>s which represent restriction sites. The
      * annotation produced currently contains one key "dbxref" in line
      * with the GenBank/EMBL qualifier for the "misc_binding" feature
-     * key. The key has a corresponding value "REBASE:<enzyme name>".
+     * key. The key has a corresponding value "REBASE:&lt;enzyme
+     * name&gt;".
      *
      * @param enzyme a <code>RestrictionEnzyme</code>.
      *
