@@ -1,6 +1,6 @@
-<!--DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook V4.1//EN"
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook V4.1//EN"
                          "/usr/share/sgml/docbook/sgml-dtd-4.1/docbook.dtd" [
-]-->
+]>
 
 <chapter id="bd-ch06">
   <title>Representing Search Results</title>
@@ -140,10 +140,126 @@ public interface SeqSimilaritySearchSubHit {
     interested in and as there is a single DTD shared between several
     analysis programs, there is potential for re-use of those
     <classname>ContentHandler</classname>s. BioJava provides some
-    ready-made <classname>ContentHandler</classname>s in the
+    ready-made <classname>StAXContentHandler</classname>s in the
     <classname>org.biojava.bio.program.ssbind</classname> package and
-    the <classname>org.biojava.utils.stax</classname> package for
+    also the <classname>org.biojava.utils.stax</classname> package for
     writing modular XML handlers of your own.</para>
 
+    <sect2 id="bd-ch06-fromblast">
+      <title>Creating objects from Blast output</title>
+
+      <para>This example assumes that you have some Blast search
+      results in a file. However, the changes required to process
+      output from another source such as a running Blast program are
+      minimal; simply create the relevant
+      <classname>InputStream</classname>.</para>
+
+      <para>Create a <classname>BlastLikeSAXParser</classname> to be
+      the source of SAX events. The
+      <classname>ContentHandler</classname> for these events is a
+      <classname>SeqSimilarityAdapter</classname> which is an adapter
+      class which converts the SAX events into method calls on a
+      <classname>SearchContentHandler</classname>. There are various
+      <classname>SearchContentHandler</classname> implementations in
+      the <classname>org.biojava.bio.program.ssbind</classname>
+      package, each of which build different types of object. Here we
+      use <classname>BlastLikeSearchBuilder</classname>, which creates
+      <classname>SequenceDBSearchResult</classname>s.</para>
+
+<programlisting>
+InputStream searchStream = new BufferedInputStream(new
+    FileInputStream(blastFileName));
+
+XMLReader reader = (XMLReader) new BlastLikeSAXParser();
+SeqSimilarityAdapter adapter = new SeqSimilarityAdapter();
+reader.setContentHandler(adapter);
+
+List searchResults = new ArrayList(50);
+BlastLikeSearchBuilder builder = new BlastLikeSearchBuilder(searchResults);
+
+adapter.setSearchContentHandler(builder);
+</programlisting>
+
+      <para>A <classname>BlastLikeSearchBuilder</classname> must be
+      primed with two sources of data. The first is a
+      <classname>SequenceDB</classname> containing all of the query
+      sequences used to create the Blast results in the stream (bear
+      in mind that there may be many in the same stream) and the
+      second is a <classname>SequenceDBInstallation</classname> which
+      contains <classname>SequenceDB</classname>s representing all of
+      the databases searched against. These may seem like excessive
+      requirements, yet once in place any combination of query and
+      database in the stream can be handled. If the sequences and
+      databases are unavailable then anonymous inner classes which
+      implement limited but sufficient functionality could be
+      used. For example a simple <classname>SequenceDB</classname>
+      which always returns the same empty
+      <classname>Sequence</classname> and a
+      <classname>SequenceDBInstallation</classname> which always
+      returns that <classname>SequenceDB</classname> could be
+      used. Take care that any such implementations are not exposed in
+      places where they could surprise others!</para>
+
+      <para>Once the builder is set up, calling the
+      <methodname>parse</methodname> method on the
+      <classname>BlastLikeSAXParser</classname> will populate the
+      <classname>List</classname> passed to its constructor with
+      <classname>SequenceDBSearchResult</classname>s.</para>
+
+<programlisting>
+builder.setQuerySeqHolder(queryDB);
+builder.setSubjectDBInstallation(dbs);
+
+reader.parse(new InputSource(searchStream));
+</programlisting>
+
+      <para>The result objects may then be examined.</para>
+
+<programlisting>
+for (Iterator ri = searchResults.iterator(); ri.hasNext();) {
+    SeqSimilaritySearchResult result =
+        (SeqSimilaritySearchResult) ri.next();
+
+    printResult(result);
+}
+</programlisting>
+
+      <para>The <classname>BlastLikeSearchBuilder</classname> operates
+      a simple strategy of instantiating all available results in
+      memory. This will not be acceptable in many situations such as
+      where there are very long streams of results, or where results
+      need to be filtered by score, coverage or otherwise selectively
+      instantiated. The solution here is to write your own handler
+      which does exactly what you want. You may find that you can
+      re-use some of the modular handlers in the package to help
+      you.</para>
+    </sect2>
+
+    <sect2 id="bd-ch06-fromfasta">
+      <title>Creating objects from Fasta output</title>
+
+      <para>The procedure for creating
+      <classname>SequenceDBSearchResult</classname>s from the output
+      of the Fasta search program is almost identical. The difference
+      is in the initial SAX event generator.</para>
+
+<programlisting>
+XMLReader reader = (XMLReader) new FastaSearchSAXParser();
+SeqSimilarityAdapter adapter = new SeqSimilarityAdapter();
+reader.setContentHandler(adapter);
+</programlisting>
+    </sect2>
+  </sect1>
+
+  <sect1 id="bd-ch06-blastnative">
+    <title>Handling native Blast XML</title>
+
+    <para>NCBI Blast now produces result data its own XML
+    format. Currently we do not include any handlers for this
+    output. Support is on the to-do list, probably in the form of an
+    <classname>XMLFilter</classname> to perform a transformation to
+    the BioJava DTD or XSLT. The former is more likely as the latter
+    introduces an extra library dependency for the XSL
+    transformer (probably Apache Xalan-Java).</para>
   </sect1>
 </chapter>
