@@ -82,7 +82,7 @@ class FeatureFetcher {
     }
 
     void setUseXMLFetch(boolean b) {
-	useXMLFetch = true;
+	useXMLFetch = b;
     }
 
     void runFetch() 
@@ -92,7 +92,7 @@ class FeatureFetcher {
 	
 	try {
 	    String fetchEncoding = "dasgff";
-	    if (DASCapabilities.checkCapable(new URL(dataSource, ".."), 
+	    if (DASCapabilities.checkCapable(new URL(dataSource, "../"), 
 					     DASCapabilities.CAPABILITY_FEATURETABLE,
 					     DASCapabilities.CAPABILITY_FEATURETABLE_XFF))
 	    {
@@ -145,7 +145,7 @@ class FeatureFetcher {
 		}
 
 		String encodingRequest;
-		if (fetchEncoding == "dasgff") {
+		if (fetchEncoding.equals("dasgff")) {
 		    encodingRequest = "";
 		} else {
 		    encodingRequest = "encoding=" + fetchEncoding + ";";
