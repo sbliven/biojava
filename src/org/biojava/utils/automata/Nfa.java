@@ -113,33 +113,39 @@ public class Nfa
      */
     private void replaceNode(Set oldNodes, Node newNode)
     {
+        System.out.println("oldNodes: " + oldNodes);
+        System.out.println("newNode:  " + newNode);
         // prepare to replace entire contents of transitions
         Transition [] transitionArray = new Transition[transitions.size()];
-        transitions.clear();
 
         // loop thru' all transitions replacing the oldNodes
-        for (int i=0; i < transitionArray.length; i++) {
-            Transition currTransition = transitionArray[i];
-
+        int j = 0;
+        for (Iterator tranI = transitions.iterator(); tranI.hasNext();) {
+            Transition currTransition = (Transition) tranI.next();
+            System.out.println(currTransition);
             if (oldNodes.contains(currTransition.source)) {
                 currTransition.source = newNode;
             }
             if (oldNodes.contains(currTransition.dest)) {
                 currTransition.dest = newNode;
             }
+            transitionArray[j++] = currTransition;
         }
 
         // put back in transitions. Set behaviour will remove duplicates.
-        for (int i=0; i < transitionArray.length; i++) {
+        transitions.clear();
+        System.out.println("j is " + j);
+        for (int i=0; i < j; i++) {
             // put back in all non-silly transitions: epsilon self-transitions are silly.
             Transition currTransition = transitionArray[i];
 
             if ((currTransition.sym != EPSILON) ||
                 (currTransition.source != currTransition.dest))
-                transitions.add(transitionArray[i]);
+                transitions.add(currTransition);
         }
 
         // now clean up the nodes
+        System.out.println("removing oldNodes");
         for (Iterator oldI = oldNodes.iterator(); oldI.hasNext(); ) {
             nodes.remove(oldI.next());
         }
