@@ -27,6 +27,7 @@ import java.io.*;
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.db.*;
 
 /**
  * @author Mark Schreiber
@@ -100,5 +101,35 @@ public class GFFTools {
       throw new BioError(ex,"Assertion Error: Unable to annotate sequence");
     }
     return annotated;
+  }
+
+  public static SequenceDB annotateSequences(SequenceDB seqs, GFFEntrySet ents)
+    throws IllegalIDException, BioException{
+    Set names = new HashSet();
+
+    //get the list of names for each sequence
+    for (Iterator i = ents.lineIterator(); i.hasNext(); ) {
+      GFFRecord record = (GFFRecord)i.next();
+      if(! names.contains(record.getSeqName())){
+        names.add(record.getSeqName());
+      }
+    }
+
+    //filter entry set into subsets with same names, use that subset to annotate
+    //the correct sequence.
+    for (Iterator i = names.iterator(); i.hasNext(); ) {
+      final String name = (String)i.next();
+      GFFRecordFilter filt = new GFFRecordFilter(){
+        public boolean accept(GFFRecord rec){
+          return rec.getSeqName().equals(name);
+        }
+      };
+
+      GFFEntrySet filtered = ents.filter(filt);
+      Sequence seq = seqs.getSequence(name);
+      seq = GFFTools.annotateSequence(seq, filtered);
+    }
+
+    return seqs;
   }
 }
