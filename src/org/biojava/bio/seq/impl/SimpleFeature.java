@@ -155,7 +155,7 @@ implements Feature, RealizingFeatureHolder, java.io.Serializable {
 	try {
 	    return (Sequence) fh;
 	} catch (ClassCastException ex) {
-	    throw new BioError("Feature doesn't seem to have a Sequence ancestor.");
+	    throw new BioError("Feature doesn't seem to have a Sequence ancestor: " + fh);
 	}
     }
 
