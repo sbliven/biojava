@@ -55,6 +55,6 @@ public class SimpleSequenceFactory implements SequenceFactory, Serializable {
 
     public Sequence createSequence(SymbolList resList,
 				   String uri, String name, Annotation annotation) {
-	return new SimpleSequence(resList, uri, name, annotation, realizer);
+	return new org.biojava.bio.seq.impl.SimpleSequence(resList, uri, name, annotation, realizer);
     }
 }
