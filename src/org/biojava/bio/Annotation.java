@@ -50,7 +50,7 @@ public interface Annotation extends Changeable {
    */
   public static final ChangeType PROPERTY = new ChangeType(
     "Properties have altered",
-    "org.biojava.bio",
+    "org.biojava.bio.Annotation",
     "PROPERTY"
   );
   
