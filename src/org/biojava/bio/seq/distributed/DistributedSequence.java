@@ -73,7 +73,7 @@ class DistributedSequence
 			DistDataSource seqSource,
 			Set featureSources)
     {
-	System.err.println("*** Constructing DistributedSequence: " + id);
+	//System.err.println("*** Constructing DistributedSequence: " + id);
 
 	this.id = id;
 	this.seqSource = seqSource;
@@ -238,7 +238,6 @@ class DistributedSequence
 		}
 	    }
 	}
-
 	return mfh;
     }
     

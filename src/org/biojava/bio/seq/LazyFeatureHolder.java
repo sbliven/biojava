@@ -110,10 +110,20 @@ public abstract class LazyFeatureHolder
     }
 
     public FeatureHolder filter(FeatureFilter ff) {
+        // FIXME: we need to optimize here
         return getFeatureHolder().filter(ff);
     }
     
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+        if(!recurse) {
+          if(FilterUtils.areDisjoint(ff, getSchema())) {
+            return FeatureHolder.EMPTY_FEATURE_HOLDER;
+          } else if (FilterUtils.areProperSubset(ff, getSchema())) {
+            return this;
+          }
+        }
+
+        // FIXME: There are other optimisations we should be making
         return getFeatureHolder().filter(ff, recurse);
     }
 

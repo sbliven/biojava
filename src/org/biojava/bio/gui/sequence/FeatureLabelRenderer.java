@@ -112,28 +112,16 @@ implements FeatureRenderer {
     Location loc = feat.getLocation();
     String label = labelMaker.makeLabel(feat);
 
-    System.err.println(
-      "Feature: " + feat +
-      " source: " + feat.getSource() +
-      " type: " + feat.getType() +
-      " loc: " + feat.getLocation() +
-      " ann: " + feat.getAnnotation()
-    );
-
-    System.err.println("range: " + src.getRange());
-
     g.setPaint(Color.black);
     int min = Math.max(loc.getMin(), src.getRange().getMin());
     int max = Math.min(loc.getMax(), src.getRange().getMax());
     int mid = (min + max) / 2;
 
-    System.err.println("min: " + min + " max: " + max + " mid: " + mid);
     g.drawString(
       label,
       (float) (src.sequenceToGraphics(mid)),
       (float) (getDepth(src) + 2.0)
     );
-    System.err.println("rendered: " + label);
   }
 
   public FeatureHolder processMouseEvent(
