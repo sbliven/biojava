@@ -27,21 +27,27 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
+ * This is a <code>DBHelper</code> that provides support for MySQL
+ * databases.
+ *
  * @author Thomas Down
  * @author Matthew Pocock
  */
 public class MySQLDBHelper extends DBHelper {
+
+    // Inherit docs
     public int getInsertID(Connection conn,
 			   String table,
 			   String columnName)
 	throws SQLException
     {
-	Statement st = conn.createStatement();
+        Statement st = conn.createStatement();
 	ResultSet rs = st.executeQuery("select last_insert_id()");
 	int id = -1;
 	if (rs.next()) {
 	    id = rs.getInt(1);
 	}
+        rs.close();
 	st.close();
 	
 	if (id < 1) {
@@ -50,7 +56,7 @@ public class MySQLDBHelper extends DBHelper {
 	return id;
     }
 
-
+    // Inherit docs
     public DeleteStyle getDeleteStyle() {
 	return DELETE_MYSQL4;
     }
