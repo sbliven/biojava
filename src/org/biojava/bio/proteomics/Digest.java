@@ -26,12 +26,14 @@ import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.Annotation;
 
 import org.biojava.bio.BioException;
 import org.biojava.utils.ChangeVetoException;
 import java.util.ListIterator;
 import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -40,42 +42,44 @@ import java.util.LinkedList;
  * @author Michael Jones
  */
 public class Digest {
-
-    private Protease protease = new Protease();
-
+    
+    private Protease protease;
+    
     private Sequence sequence;
-
+    
     private int maxMissedCleavages = 0;
     
     public static String PEPTIDE_FEATURE_TYPE = "Peptide";
     
-    public LinkedList peptideQue; 
+    public LinkedList peptideQue;
     // private
-
+    
     /** Creates new Digest */
     public Digest() {
+        try{
+            protease = new Protease();
+        }catch (Exception e){
+            //Should never happen
+            e.printStackTrace();
+        }
     }
-
-    public void setProtese(Protease protease)
-    {
+    
+    public void setProtese(Protease protease) {
         this.protease = protease;
     }
-
-    public void setSequence(Sequence sequence)
-    {
+    
+    public void setSequence(Sequence sequence) {
         this.sequence = sequence;
     }
-
-    public Sequence getSequence()
-    {
+    
+    public Sequence getSequence() {
         return sequence;
     }
     
-    public void setMaxMissedCleavages(int maxMissedCleavages)
-    {
+    public void setMaxMissedCleavages(int maxMissedCleavages) {
         this.maxMissedCleavages = maxMissedCleavages;
     }
-
+    
     /** Adds peptides as features to the Sequence in this class.
      * For Example:
      * <CODE>
@@ -90,54 +94,53 @@ public class Digest {
      * </CODE>
      * @throws BioException
      */
-    public void addDigestFeatures() throws BioException, ChangeVetoException 
-    {
+    public void addDigestFeatures() throws BioException, ChangeVetoException {
         peptideQue = new LinkedList();
         
         if(protease == null){
-           throw new BioException("Protease is null"); 
+            throw new BioException("Protease is null");
         }
         
-        String cleaveSites = protease.getCleaveageResidues();
+        List cleaveSites = protease.getCleaveageResidues().toList();
         boolean endoProtease = protease.isEndoProtease();
-        String notCleave = protease.getNotCleaveResidues();
+        List notCleave = protease.getNotCleaveResidues().toList();
         int nTerm = 1;
-	SymbolTokenization toke = sequence.getAlphabet().getTokenization("token"); // FIXME THOMASD
-
+        
         if(cleaveSites == null || notCleave == null){
             throw new BioException("Protease contains null parameter");
         }
-        for (int j = 1; j < sequence.length(); j++) {
-                for (int i = 0; i < cleaveSites.length(); i++) {
-                        if (toke.tokenizeSymbol(sequence.symbolAt(j)).charAt(0) == cleaveSites.charAt(i)) {
-                                if (endoProtease) {
-                                        boolean cleave = true;
-                                        if (j < sequence.length())  {
-                                                if (notCleave.indexOf(toke.tokenizeSymbol(sequence.symbolAt(j + 1)).charAt(0) - 1) != -1) {
-                                                        cleave = false;
-                                                }
-                                        }
-
-                                        if (cleave)  {
-                                                Location loc = new RangeLocation(nTerm, j);
-                                                peptideQue.add(loc);
-                                                nTerm = j + 1;
-                                        }
-                                } else {
-                                    if (j > 0) {
-                                            Location loc = new RangeLocation(nTerm, j-1);
-                                            peptideQue.add(loc);
-                                            nTerm = j;
-                                    }
-                                }
-                                break;
+        
+        for (int j = 1; j <= sequence.length(); j++) {
+            Symbol aa = sequence.symbolAt(j);
+            if(cleaveSites.contains(aa)){
+                if (endoProtease) {
+                    boolean cleave = true;
+                    if (j < sequence.length())  {
+                        Symbol nextAA = sequence.symbolAt(j+1);
+                        if(notCleave.contains(nextAA)){
+                            cleave = false;
                         }
-                }			
-        }				
-
-        if (nTerm < sequence.length()) {      
-             Location loc = new RangeLocation(nTerm, sequence.length());
-             peptideQue.add(loc);
+                    }
+                    
+                    if (cleave)  {
+                        Location loc = new RangeLocation(nTerm, j);
+                        peptideQue.add(loc);
+                        nTerm = j + 1;
+                    }
+                } else {
+                    if (j > 1) {
+                        Location loc = new RangeLocation(nTerm, j-1);
+                        peptideQue.add(loc);
+                        System.out.println(peptideQue);
+                        nTerm = j;
+                    }
+                }
+            }
+        }
+        
+        if (nTerm <= sequence.length()) {
+            Location loc = new RangeLocation(nTerm, sequence.length());
+            peptideQue.add(loc);
         }
         
         addMissedCleavages();
@@ -148,44 +151,42 @@ public class Digest {
         }
     }
     
-    private void addMissedCleavages() throws BioException
-    {   
+    private void addMissedCleavages() throws BioException {
         LinkedList missedList = new LinkedList();
-        if(maxMissedCleavages>0){           
+        if(maxMissedCleavages>0){
             for(ListIterator li = peptideQue.listIterator(); li.hasNext(); ){
                 Location loc = (Location)li.next();
                 Location loc2 = null;
                 int min = loc.getMin();
                 int max = 0;
-
+                
                 //Get the numMissedCleavages location ahead of the current location
                 int numAdvanced = 0;
                 for(int i=0; i<maxMissedCleavages; i++){
-                   if(li.hasNext()) {
-                      numAdvanced++;
-                      loc2 = ((Location)li.next());
-                      max = loc2.getMax();
-                      missedList.add(new RangeLocation(min, max));
-                   }                    
-                }               
+                    if(li.hasNext()) {
+                        numAdvanced++;
+                        loc2 = ((Location)li.next());
+                        max = loc2.getMax();
+                        missedList.add(new RangeLocation(min, max));
+                    }
+                }
                 //Revert back to the original location
                 for(int i=0; i<numAdvanced; i++){
-                   loc = ((Location)li.previous());
+                    loc = ((Location)li.previous());
                 }
-            }      
+            }
             //Add all the missed peptides to the overall list
             peptideQue.addAll(missedList);
         }
     }
     
-    private void createPeptideFeature(Location loc) 
-                    throws BioException, ChangeVetoException
-    {
-       Feature.Template template = new Feature.Template();
-       template.type = PEPTIDE_FEATURE_TYPE;
-       template.source = this.getClass().getName();
-       template.location = loc;
-       template.annotation = Annotation.EMPTY_ANNOTATION;
-       sequence.createFeature(template);
+    private void createPeptideFeature(Location loc)
+    throws BioException, ChangeVetoException {
+        Feature.Template template = new Feature.Template();
+        template.type = PEPTIDE_FEATURE_TYPE;
+        template.source = this.getClass().getName();
+        template.location = loc;
+        template.annotation = Annotation.EMPTY_ANNOTATION;
+        sequence.createFeature(template);
     }
 }
