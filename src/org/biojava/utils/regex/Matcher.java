@@ -140,7 +140,10 @@ public class Matcher
      */
     public boolean matches() { return matcher.matches(); }
 
-    org.biojava.utils.regex.Pattern pattern()
+    /**
+     * Returns the Pattern object that compiled this Matcher.
+     */
+    public org.biojava.utils.regex.Pattern pattern()
     {
         return pattern;
     }
