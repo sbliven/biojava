@@ -32,6 +32,8 @@ import java.util.HashMap ;
 
 import org.biojava.bio.* ;
 import org.biojava.bio.program.ssbind.* ;
+import org.biojava.bio.structure.AtomImpl ;
+
 /** A class to Parse the XML response of a DAS Alignment service. 
  * returns an Alignment object.
  *
@@ -48,15 +50,23 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
     ArrayList segments ;
     AnnotationFactory annf ;
 
+    ArrayList vectors ;
+    ArrayList matrices ;
 
-
+    String intObjectId ;
     public DASAlignmentXMLResponseParser() {
 	super() ;
 	//System.out.println("in init DASAlignmentXMLResponseParser");
-	alignment = new Alignment() ;
+
 	current_position = "start";
+
+	alignment  = new Alignment() ;
+
 	alignments = new ArrayList() ;
-	segments = new ArrayList() ;
+	segments   = new ArrayList() ;
+	vectors    = new ArrayList() ;
+	matrices   = new ArrayList() ;
+	
     }
 
     /**
@@ -83,14 +93,15 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
 
     public void startElement (String uri, String name, String qName, Attributes atts){
 	//System.out.println("startElement " + qName) ;
-	if (qName.equals("alignObject")     ) OBJECThandler     (atts);
-	//if (qName.equals("DESCRIPTION")) DESCRIPTIONhandler(atts);
+	if (qName.equals("alignObject")) OBJECThandler     (atts);
 	if (qName.equals("sequence")   ) SEQUENCEhandler   (atts);
 	if (qName.equals("score")      ) SCOREhandler      (atts);
 	if (qName.equals("block")      ) BLOCKhandler      (atts);
 	if (qName.equals("segment")    ) SEGMENThandler    (atts);
 	if (qName.equals("cigar")      ) CIGARhandler      (atts);
-	if (qName.equals("geo3D")      ) GEO3Dhandler      (atts);
+	if (qName.equals("geo3D")      ) GEO3Dhandler     (atts);
+	if (qName.equals("vector")     ) VECTORhandler     (atts);
+	if (qName.equals("matrix")     ) MATRIXhandler     (atts);
 	
 	
 	    
@@ -98,7 +109,10 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
 
     public void endElement (String uri, String name, String qName){
 	//System.out.println("endElement >" + qName + "< >" + name + "<") ;
-	
+	if (qName.equals("geo3D")) {	
+	    intObjectId = null ;
+	}
+
 	if (qName.equals("alignObject")) {
 	    try {
 		Annotation oba = annf.makeAnnotation(current_object) ;
@@ -193,12 +207,70 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
     private void SCOREhandler(Attributes atts) {
 	System.out.println("SCOREhandler not implemented,yet...");
 
+	HashMap score = new HashMap() ;
+	
+	String metnam = atts.getValue("methodName");
+	String value  = atts.getValue("value");
+	score.put("methodName",metnam);
+	score.put("value",value);
+	Annotation s = annf.makeAnnotation(score);
+	try {
+	    alignment.addScore(s);
+	} catch (DASException e ) {
+	    e.printStackTrace();
+	    return ;
+	}
     }
 
     private void GEO3Dhandler(Attributes atts) {
-	System.out.println("GEO3D not implemented,yet...");
-
+	intObjectId      = atts.getValue("intObjectId");
     }
+
+    private void VECTORhandler(Attributes atts) {
+	//System.out.println("VECTORhandler");
+	//String intObjectId      = atts.getValue("intObjectId");
+	String xs = atts.getValue("x");
+	String ys = atts.getValue("y");
+	String zs = atts.getValue("z");
+	
+	AtomImpl atom = new AtomImpl();
+	atom.setX(Double.parseDouble(xs));
+	atom.setY(Double.parseDouble(ys));
+	atom.setZ(Double.parseDouble(zs));
+	HashMap vector = new HashMap() ;
+	vector.put("intObjectId"   ,intObjectId);
+	vector.put("vector",atom);
+
+	try {
+	    Annotation oba = annf.makeAnnotation(vector) ;
+	    alignment.addVector(oba);
+	} catch ( DASException  e) {
+	    e.printStackTrace() ;
+	}	
+    }
+
+    private void MATRIXhandler(Attributes atts) {
+	HashMap matrix = new HashMap() ;
+	//String intObjectId      = atts.getValue("intObjectId");
+	matrix.put("intObjectId"  ,intObjectId);
+
+	for ( int x=1; x<=3; x++){
+	    for ( int y=1; y<=3; y++){
+		String mat = "mat"+x+y;
+		String val = atts.getValue(mat);
+		//System.out.println(mat+" " + val);
+		matrix.put(mat,val) ;
+	    }
+	}
+
+	try {
+	    Annotation oba = annf.makeAnnotation(matrix) ;
+	    alignment.addMatrix(oba);
+	} catch ( DASException  e) {
+	    e.printStackTrace() ;
+	}
+    }
+    
 
     private void OBJECThandler(Attributes atts) {
 	// found a new object
