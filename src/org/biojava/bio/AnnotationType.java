@@ -87,7 +87,7 @@ import org.biojava.bio.symbol.LocationTools;
  * ensures that all members of the collection match a specified <code>PropertyConstraint</code>,
  * and that the size of the collection matches a cardinality constraint.  This is the
  * most important type of constraint when defining datatypes.  However, when using
- * <code>AnnotationTypes</code> to specify a query over a set of Annotations, it may be more 
+ * <code>AnnotationTypes</code> to specify a query over a set of Annotations, it may be more
  * useful to ask whether a slot <em>contains</em> a given value:  For example
  * </p>
  *
@@ -103,7 +103,7 @@ import org.biojava.bio.symbol.LocationTools;
  *      )
  * );
  * </pre>
- * 
+ *
  * <p>It is usually left up to the AnnotationType instance to work out how
  * multiple values should be packed into a single property slot in an Annotation
  * instance. Commonly, things that are allowed a cardinality of 1 will store one
@@ -126,7 +126,7 @@ import org.biojava.bio.symbol.LocationTools;
  * <code>AnnotationType</code> instances can be used as queries
  * to select from a set of Annotations based on the value of one
  * or more properties.  Commonly, this is used in conjunction
- * with <code>FeatureFilter.ByAnnotationType</code>. 
+ * with <code>FeatureFilter.ByAnnotationType</code>.
  *
  * @for.powerUser
  * Make AnnotationType instances that describe what should and
@@ -159,7 +159,7 @@ public interface AnnotationType {
       PropertyConstraint.ANY,
       CardinalityConstraint.ANY
     );
-    
+
     /**
      * The type that accepts no annotations at all and is the subtype of all
      * other annotations.
@@ -244,12 +244,12 @@ public interface AnnotationType {
      *
      * @for.powerUser When you are building your own AnnotationType
      */
-     
+
     public void setConstraint(
         Object key,
         CollectionConstraint con
     );
-    
+
     /**
      * Set the constraints that will apply to all properties without an
      * explicitly defined set of constraints.  This method constrains
@@ -264,7 +264,7 @@ public interface AnnotationType {
      * @for.powerUser When you are building your own AnnotationType
      */
     public void setDefaultConstraints(PropertyConstraint pc, Location cc);
-    
+
     /**
      * Specifies the default constraint to apply to properties where no
      * other constraint is specified.
@@ -272,9 +272,9 @@ public interface AnnotationType {
      * @param cc The default constraint.
      * @for.powerUser When you are building your own AnnotationType
      */
-     
+
     public void setDefaultConstraint(CollectionConstraint cc);
-    
+
     /**
      * Get the CollectionConstraint that will be applied to all properties without
      * an explicit binding. This defaults to CollectionConstraint.ALL.
@@ -312,7 +312,7 @@ public interface AnnotationType {
      */
     public void setProperty(Annotation ann, Object property, Object value)
         throws ChangeVetoException;
-        
+
     /**
      * Add a value to the specified property slot.
      *
@@ -345,7 +345,7 @@ public interface AnnotationType {
      */
     public Collection getProperty(Annotation ann, Object property)
         throws ChangeVetoException;
-        
+
     /**
      * Remove a value from the specified property slot.
      *
@@ -360,7 +360,7 @@ public interface AnnotationType {
      */
     public void removeProperty(Annotation ann, Object property, Object value)
         throws ChangeVetoException;
-    
+
     /**
      * <p>An abstract base class useful for implementing AnnotationType
      * instances.</p>
@@ -381,11 +381,11 @@ public interface AnnotationType {
         public void setConstraints(Object key, PropertyConstraint pc, Location cc) {
             setConstraint(key, new CollectionConstraint.AllValuesIn(pc, cc));
         }
-        
+
         public void setDefaultConstraints(PropertyConstraint pc, Location cc) {
             setDefaultConstraint(new CollectionConstraint.AllValuesIn(pc, cc));
         }
-        
+
         public boolean instanceOf(Annotation ann) {
           Set props = new HashSet();
           props.addAll(getProperties());
@@ -412,7 +412,7 @@ public interface AnnotationType {
           Annotation ann,
           Object property,
           Object value
-        ) throws ChangeVetoException 
+        ) throws ChangeVetoException
         {
             CollectionConstraint cons = getConstraint(property);
             if (cons.accept(value)) {
@@ -421,11 +421,11 @@ public interface AnnotationType {
                 throw new ChangeVetoException("Setting property " + property + " to " + value + " would violate constraints");
             }
         }
-        
+
         public final Collection getProperty(Annotation ann, Object property)
         throws ChangeVetoException {
           Collection vals = null;
-          
+
           if(!ann.containsProperty(property)) {
             vals = Collections.EMPTY_SET;
           } else {
@@ -436,15 +436,15 @@ public interface AnnotationType {
               vals = Collections.singleton(val);
             }
           }
-          
+
           return vals;
         }
-        
+
         public final void addProperty(
           Annotation ann,
           Object key,
           Object value
-        ) throws ChangeVetoException 
+        ) throws ChangeVetoException
         {
             CollectionConstraint cons = getConstraint(key);
             Collection oldValue;
@@ -466,12 +466,12 @@ public interface AnnotationType {
                 throw new ChangeVetoException("Adding value " + value + " to " + key + " would violate constraints");
             }
         }
-        
+
         public final void removeProperty(
           Annotation ann,
           Object key,
           Object value
-        ) throws ChangeVetoException 
+        ) throws ChangeVetoException
         {
             CollectionConstraint cons = getConstraint(key);
             Collection oldValue;
@@ -501,20 +501,20 @@ public interface AnnotationType {
                 }
             }
         }
-        
+
         public String toString() {
           StringBuffer sb = new StringBuffer("AnnotationType: {");
-          
+
           for(Iterator i = getProperties().iterator(); i.hasNext(); ) {
             Object key = i.next();
             CollectionConstraint cc = getConstraint(key);
-            
+
             sb.append(" [" + key + ", " + cc + "]");
           }
           sb.append(" [*, " + getDefaultConstraint() + "]");
-          
+
           sb.append(" }");
-          
+
           return sb.toString();
         }
 
@@ -525,7 +525,7 @@ public interface AnnotationType {
 
             for (Iterator i = props.iterator(); i.hasNext();) {
                 Object key = i.next();
-         
+
                 CollectionConstraint thisPC = getConstraint(key);
                 CollectionConstraint subPC = subType.getConstraint(key);
                 if (! thisPC.subConstraintOf(subPC)) {
@@ -552,7 +552,7 @@ public interface AnnotationType {
      * @for.powerUser A convenient class for when you need an AnnotationType
      * instance and don't want to write your own
      */
-     
+
     public class Impl extends AnnotationType.Abstract {
         private Map cons;
         private CollectionConstraint unknown;
@@ -573,9 +573,9 @@ public interface AnnotationType {
          */
         public Impl(PropertyConstraint defaultPC, Location defaultCC) {
             this();
-            setDefaultConstraints(defaultPC, defaultCC);
+            this.setDefaultConstraints(defaultPC, defaultCC);
         }
-        
+
         /**
          * Create a new Impl with a default collection constraint.
          *
@@ -590,7 +590,7 @@ public interface AnnotationType {
         public void setDefaultConstraint(CollectionConstraint cc) {
             this.unknown = cc;
         }
-        
+
         public CollectionConstraint getDefaultConstraint() {
             return unknown;
         }
