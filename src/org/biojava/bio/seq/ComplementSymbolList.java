@@ -1,0 +1,69 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
+package org.biojava.bio.seq;
+
+import java.util.*;
+import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
+
+/**
+ * SymbolList which gives a view of the reverse complement of
+ * another SymbolList.
+ * <P>
+ * The parent SymbolList must use
+ * either the DNA or DNA-AMBIGUITY alphabet, as provided
+ * by the DNATools utility class.
+ *
+ * @author Thomas Down
+ */
+
+public class ComplementSymbolList extends AbstractSymbolList {
+    private SymbolList parent;
+
+    public ComplementSymbolList(SymbolList p) throws IllegalAlphabetException {
+	Alphabet a = p.alphabet();
+	if (!isComplementable(a))
+	    throw new IllegalAlphabetException("Only DNA can be complemented.");
+	parent = p;
+    }
+
+    public Alphabet alphabet() {
+	return parent.alphabet();
+    }
+
+    public int length() {
+	return parent.length();
+    }
+
+    public Symbol symbolAt(int pos) {
+	try {
+	    return DNATools.complement(parent.symbolAt(parent.length() - pos + 1));
+	} catch (IllegalSymbolException ex) {
+	    throw new BioError(ex);
+	}
+    }
+    
+    public static boolean isComplementable(Alphabet alpha) {
+      return alpha == DNATools.getAlphabet() ||
+             alpha == DNATools.getAmbiguity();
+    }
+}
