@@ -33,7 +33,7 @@ import org.biojava.bio.seq.tools.*;
 
 public class XmlMarkovModel {
   public static WeightMatrix readMatrix(Element root)
-  throws IllegalResidueException, IllegalAlphabetException {
+  throws IllegalResidueException, IllegalAlphabetException, SeqException {
     Element alphaE = (Element) root.getElementsByTagName("alphabet").item(0);
     Alphabet sa = AlphabetManager.instance().alphabetForName(
       alphaE.getAttribute("name"));
@@ -93,7 +93,6 @@ public class XmlMarkovModel {
       advance[i] = 1;
     }
       
-    ResidueParser symParser = seqAlpha.getParser("symbol");
     ResidueParser nameParser = seqAlpha.getParser("name");
     
     Map nameToState = new HashMap();
@@ -112,10 +111,7 @@ public class XmlMarkovModel {
         Element weightE = (Element) weights.item(j);
         String resName = weightE.getAttribute("res");
         Residue res;
-        if(resName.length() > 1)
-          res = nameParser.parseToken(resName);
-        else
-          res = symParser.parseToken(resName);
+        res = nameParser.parseToken(resName);
         state.setWeight(res, Math.log(Double.parseDouble(weightE.getAttribute("prob"))));
       }
       model.addState(state);

@@ -93,7 +93,7 @@ public class MagicalState implements EmissionState {
   }
 
   public String getName() {
-    return "!";
+    return "!-" + advance.length;
   }
 
   public Annotation getAnnotation() {

@@ -34,7 +34,7 @@ package org.biojava.bio.seq;
  *
  * @author Matthew Pocock
  */
-public class IllegalResidueException extends Exception {
+public class IllegalResidueException extends SeqException {
   private final Residue res;
   
   /**
@@ -48,15 +48,22 @@ public class IllegalResidueException extends Exception {
    * Make the exception with a message.
    */
   public IllegalResidueException(String message) {
-    super(message);
-    this.res = null;
+    this(null, null, message);
   }
   
   /**
    * Make the exception with a message and a residue.
    */
   public IllegalResidueException(Residue res, String message) {
-    super(message);
+    this(null, res, message);
+  }
+  
+  public IllegalResidueException(Throwable cause, String message) {
+    this(cause, null, message);
+  }
+  
+  public IllegalResidueException(Throwable cause, Residue res, String message) {
+    super(cause, message);
     this.res = res;
   }
 }

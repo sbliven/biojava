@@ -38,7 +38,14 @@ public class SimpleState extends AbstractState {
     if(r == MagicalState.MAGICAL_RESIDUE) {
       return Double.NEGATIVE_INFINITY;
     }
-    alphabet().validate(r);
+    try {
+      alphabet().validate(r);
+    } catch (IllegalResidueException ire) {
+      throw new IllegalResidueException(
+        ire,
+        "Couldn't retrieve weight for " + r.getName() + " in state " + getName()
+      );
+    }
     Double d = (Double) residueToProb.get(r);
     if(d == null) {
       return Double.NEGATIVE_INFINITY;

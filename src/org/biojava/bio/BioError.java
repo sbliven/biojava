@@ -79,8 +79,9 @@ public class BioError extends Error {
       }
       // trim mes
       index = mes.length();
-      for(int i = 1; i < lines ; i++)
+      for(int i = 1; i < lines ; i++) {
         index = mes.lastIndexOf("\n", index-1);
+      }
       pw.println(mes.substring(0, index));
       pw.print("rethrown as ");
       pw.print(mes2);

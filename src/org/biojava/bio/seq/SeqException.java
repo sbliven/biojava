@@ -34,12 +34,12 @@ public class SeqException extends BioException {
   	super(message);
   }
 
-  public SeqException(Exception ex) {
-    super(ex);
+  public SeqException(Throwable t) {
+    super(t);
   }
 
-  public SeqException(Exception ex, String message) {
-    super(ex, message);
+  public SeqException(Throwable t, String message) {
+    super(t, message);
   }
   
   public SeqException() {

@@ -31,6 +31,8 @@ import org.biojava.bio.seq.*;
  * <P>
  * In practice, what this means is that you can view a DNA sequence into an
  * overlapping dinucleotide sequence without having to do any work yourself.
+ *
+ * @author Matthew Pocock
  */
 public class OrderNResidueList extends AbstractResidueList {
   /**

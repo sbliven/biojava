@@ -24,7 +24,7 @@ package org.biojava.bio.dp;
 
 import java.util.*;
 
-import org.biojava.bio.BioError;
+import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.tools.DoubleAlphabet;
 
@@ -299,6 +299,41 @@ public abstract class DP {
     
   public abstract StatePath viterbi(ResidueList [] resList)
   throws IllegalResidueException, IllegalArgumentException, IllegalAlphabetException, IllegalTransitionException;
+  
+  public DPMatrix forwardsBackwards(ResidueList [] resList)
+  throws BioException {
+    try {
+      System.out.println("Making backward matrix");
+      final DPMatrix bMatrix = backwardMatrix(resList);
+      System.out.println("Making forward matrix");
+      final DPMatrix fMatrix = forwardMatrix(resList);
+    
+      System.out.println("Making forward/backward matrix");
+      return new DPMatrix() {
+        public double getCell(int [] index) {
+          return fMatrix.getCell(index) + bMatrix.getCell(index);
+        }
+      
+        public double getScore() {
+          return fMatrix.getScore();
+        }
+      
+        public MarkovModel model() {
+          return fMatrix.model();
+        }
+      
+        public ResidueList [] resList() {
+          return fMatrix.resList();
+        }
+      
+        public State [] States() {
+          return fMatrix.States();
+        }
+      };
+    } catch (Exception e) {
+      throw new BioException(e, "Couldn't build forwards-backwards matrix");
+    }
+  }
 
   /**
     * Generates an alignment from a model.

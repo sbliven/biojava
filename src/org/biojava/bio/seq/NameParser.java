@@ -77,9 +77,12 @@ public class NameParser implements ResidueParser {
   
   public Residue parseToken(String token) throws IllegalResidueException {
     Residue res = (Residue) nameToResidue.get(token);
-    if(res == null)
-      throw new IllegalResidueException("No residue for token '" + token +
-                                        "' found");
+    if(res == null) {
+      throw new IllegalResidueException(
+        "No residue for token '" + token +
+         "' found in name parser for " + alphabet().getName()
+       );
+    }
     return res;
   }
   
