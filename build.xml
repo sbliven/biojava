@@ -219,32 +219,6 @@
     </copy>
   </target>
 
-  <target name="prepare-14" if="java14">
-    <copy todir="${build.src.main}">
-      <fileset dir="${src14.dir}">
-        <exclude name="**/CVS/**" />
-      </fileset>
-    </copy>
-    <copy todir="${build.src.tests}">
-      <fileset dir="${tests14.dir}">
-        <exclude name="**/CVS/**" />
-      </fileset>
-    </copy>
-    <copy todir="${build.src.demos}">
-      <fileset dir="${demos14.dir}">
-        <exclude name="**/CVS/**" />
-      </fileset>
-    </copy>
-  </target>
-
-  <target name="prepare-14demos" depends="init" if="java14">
-    <copy todir="${build.src.demos}">
-      <fileset dir="${demo14.dir}">
-        <exclude name="**/CVS/**" />
-      </fileset>
-    </copy>
-  </target>
-  
   <target name="prepare-14taglets" depends="init" if="java14">
     <mkdir dir="${build.src.taglets}" />
     <mkdir dir="${build.dest.taglets}" />
@@ -290,7 +264,7 @@
     </unjar>
   </target>
 
-  <target name="prepare-src" depends="init,prepare-core,prepare-14" />
+  <target name="prepare-src" depends="init,prepare-core" />
 
   <!-- Compiles the source directory -->
   <target name="compile" depends="init,prepare-src">
