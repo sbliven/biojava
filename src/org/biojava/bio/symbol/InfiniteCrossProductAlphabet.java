@@ -124,7 +124,7 @@ class InfiniteCrossProductAlphabet implements Alphabet, Serializable {
     
     while(ai.hasNext() && si.hasNext()) {
       Alphabet aa = (Alphabet) ai.next();
-      AtomicSymbol ss = (AtomicSymbol) si.next();
+      Symbol ss = (Symbol) si.next();
       if(!aa.contains(ss)) {
         throw new IllegalSymbolException(
           "CrossProductAlphabet " + getName() + " does not accept " + sList +
