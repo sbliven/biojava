@@ -287,7 +287,7 @@ class FeatureFetcher implements Fetcher {
 		    
 		    thisTicket.setAsFetched();
 		    doneTickets.add(thisTicket);
-		} else if (localName.equals("segmentError") || localNAme.equals("SEGMENTERROR")) {
+		} else if (localName.equals("segmentError") || localName.equals("SEGMENTERROR")) {
 		    String segID = attrs.getValue("id");
 		    String segError = attrs.getValue("error");
 
@@ -303,7 +303,7 @@ class FeatureFetcher implements Fetcher {
 		Map.Entry me = (Map.Entry) i.next();
 		Segment seg = (Segment) me.getKey();
 		System.err.println("*** Not got anything back for segment " + seg.toString());
-		SeqIOListener siol = ((FeatureRequestManager.FeatureTicket) me.getValue).getOutputListener();
+		SeqIOListener siol = ((FeatureRequestManager.FeatureTicket) me.getValue()).getOutputListener();
 		try {
 		    siol.startSequence();
 		    siol.endSequence();
