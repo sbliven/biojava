@@ -168,9 +168,9 @@ implements SequenceRenderer {
     FeatureHolder hits = ((Sequence) src.getSequence()).filter(
       new FeatureFilter.OverlapsLocation(new PointLocation(sPos)), false
     );
-    
+
     hits = renderer.processMouseEvent(hits, src, me);
-    
+
     return new SequenceViewerEvent(
       this,
       hits,

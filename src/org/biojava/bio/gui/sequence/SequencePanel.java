@@ -89,12 +89,15 @@ Changeable {
       if(!isActive()) {
         return;
       }
+      int [] dist = calcDist();
+      me.translatePoint(+dist[0], +dist[1]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
         SequencePanel.this,
         me,
         new ArrayList(),
         range
       );
+      me.translatePoint(-dist[0], -dist[1]);
       svSupport.fireMouseClicked(sve);
     }
     
@@ -102,12 +105,15 @@ Changeable {
       if(!isActive()) {
         return;
       }
+      int [] dist = calcDist();
+      me.translatePoint(+dist[0], +dist[1]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
         SequencePanel.this,
         me,
         new ArrayList(),
         range
       );
+      me.translatePoint(-dist[0], -dist[1]);
       svSupport.fireMousePressed(sve);
     }
     
@@ -115,12 +121,15 @@ Changeable {
       if(!isActive()) {
         return;
       }
+      int [] dist = calcDist();
+      me.translatePoint(+dist[0], +dist[1]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
         SequencePanel.this,
         me,
         new ArrayList(),
         range
       );
+      me.translatePoint(-dist[0], -dist[1]);
       svSupport.fireMouseReleased(sve);
     }
   };
@@ -137,12 +146,15 @@ Changeable {
       if(!isActive()) {
         return;
       }
+      int [] dist = calcDist();
+      me.translatePoint(+dist[0], +dist[1]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
         SequencePanel.this,
         me,
         new ArrayList(),
         range
       );
+      me.translatePoint(-dist[0], -dist[1]);
       svmSupport.fireMouseDragged(sve);
     }
     
@@ -150,12 +162,15 @@ Changeable {
       if(!isActive()) {
         return;
       }
+      int [] dist = calcDist();
+      me.translatePoint(+dist[0], +dist[1]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
         SequencePanel.this,
         me,
         new ArrayList(),
         range
       );
+      me.translatePoint(-dist[0], -dist[1]);
       svmSupport.fireMouseMoved(sve);
     }
   };
@@ -483,6 +498,21 @@ Changeable {
     public void propertyChange(PropertyChangeEvent ev) {
       repaint();
     }
+  }
+  
+  protected int [] calcDist() {
+    double minAcross = sequenceToGraphics(range.getMin()) -
+                       renderer.getMinimumLeader(this, range);
+    int [] dist = new int[2];
+    if(direction == HORIZONTAL) {
+      dist[0] = (int) minAcross;
+      dist[1] = 0;
+    } else {
+      dist[0] = 0;
+      dist[1] = (int) minAcross;
+    }
+    
+    return dist;
   }
   
   protected boolean isActive() {
