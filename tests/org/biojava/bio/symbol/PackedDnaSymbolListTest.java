@@ -26,6 +26,11 @@ import org.biojava.bio.dist.*;
 import java.util.*;
 import junit.framework.TestCase;
 
+/**
+ * JUnit test for the PackedDnaSymbolList object
+ * @author David Huen
+ * @since 1.3
+ */
 public class PackedDnaSymbolListTest extends TestCase
 {
     /*
@@ -101,7 +106,7 @@ public class PackedDnaSymbolListTest extends TestCase
     }
 
     /**
-     * tests the the constructor
+     * tests the constructor
      * that takes a SymbolList argument.
      */
     public void testSymbolListConstructor()
@@ -131,6 +136,10 @@ public class PackedDnaSymbolListTest extends TestCase
         return true;
     }
 
+    /**
+     * tests the constructor that takes a previously
+     * initilaised byte array.
+     */
     public void testByteBufferConstructor()
         throws Exception
     {
