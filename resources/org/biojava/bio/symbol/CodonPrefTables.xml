@@ -1,0 +1,166 @@
+<?xml version="1.0" ?>
+<CodonPrefs>
+    <CodonPref id="jUnit use only!!!!" geneticCodeId="UNIVERSAL">
+      <frequency codon="uuu"    value="0.015625"/>
+      <frequency codon="uuc"    value="0.015625"/>
+      <frequency codon="uua"    value="0.015625"/>
+      <frequency codon="uug"    value="0.015625"/>
+
+      <frequency codon="ucu"    value="0.015625"/>
+      <frequency codon="ucc"    value="0.015625"/>
+      <frequency codon="uca"    value="0.015625"/>
+      <frequency codon="ucg"    value="0.015625"/>
+
+      <frequency codon="uau"    value="0.015625"/>
+      <frequency codon="uac"    value="0.015625"/>
+      <frequency codon="uaa"    value="0.015625"/>
+      <frequency codon="uag"    value="0.015625"/>
+
+      <frequency codon="ugu"    value="0.015625"/>
+      <frequency codon="ugc"    value="0.015625"/>
+      <frequency codon="uga"    value="0.015625"/>
+      <frequency codon="ugg"    value="0.015625"/>
+
+      <frequency codon="cuu"    value="0.015625"/>
+      <frequency codon="cuc"    value="0.015625"/>
+      <frequency codon="cua"    value="0.015625"/>
+      <frequency codon="cug"    value="0.015625"/>
+
+      <frequency codon="ccu"    value="0.015625"/>
+      <frequency codon="ccc"    value="0.015625"/>
+      <frequency codon="cca"    value="0.015625"/>
+      <frequency codon="ccg"    value="0.015625"/>
+
+      <frequency codon="cau"    value="0.015625"/>
+      <frequency codon="cac"    value="0.015625"/>
+      <frequency codon="caa"    value="0.015625"/>
+      <frequency codon="cag"    value="0.015625"/>
+
+      <frequency codon="cgu"    value="0.015625"/>
+      <frequency codon="cgc"    value="0.015625"/>
+      <frequency codon="cga"    value="0.015625"/>
+      <frequency codon="cgg"    value="0.015625"/>
+
+      <frequency codon="auu"    value="0.015625"/>
+      <frequency codon="auc"    value="0.015625"/>
+      <frequency codon="aua"    value="0.015625"/>
+      <frequency codon="aug"    value="0.015625"/>
+
+      <frequency codon="acu"    value="0.015625"/>
+      <frequency codon="acc"    value="0.015625"/>
+      <frequency codon="aca"    value="0.015625"/>
+      <frequency codon="acg"    value="0.015625"/>
+
+      <frequency codon="aau"    value="0.015625"/>
+      <frequency codon="aac"    value="0.015625"/>
+      <frequency codon="aaa"    value="0.015625"/>
+      <frequency codon="aag"    value="0.015625"/>
+
+      <frequency codon="agu"    value="0.0078125"/>
+      <frequency codon="agc"    value="0.0234375"/>
+      <frequency codon="aga"    value="0.015625"/>
+      <frequency codon="agg"    value="0.015625"/>
+
+      <frequency codon="guu"    value="0.015625"/>
+      <frequency codon="guc"    value="0.015625"/>
+      <frequency codon="gua"    value="0.015625"/>
+      <frequency codon="gug"    value="0.015625"/>
+
+      <frequency codon="gcu"    value="0.015625"/>
+      <frequency codon="gcc"    value="0.015625"/>
+      <frequency codon="gca"    value="0.015625"/>
+      <frequency codon="gcg"    value="0.015625"/>
+
+      <frequency codon="gau"    value="0.015625"/>
+      <frequency codon="gac"    value="0.015625"/>
+      <frequency codon="gaa"    value="0.015625"/>
+      <frequency codon="gag"    value="0.015625"/>
+
+      <frequency codon="ggu"    value="0.015625"/>
+      <frequency codon="ggc"    value="0.015625"/>
+      <frequency codon="gga"    value="0.015625"/>
+      <frequency codon="ggg"    value="0.015625"/>
+    </CodonPref>
+    <CodonPref id="Drosophila melanogaster-nuclear" geneticCodeId="UNIVERSAL">
+      <frequency codon="uuu"    value="0.0132"/>
+      <frequency codon="uuc"    value="0.022"/>
+      <frequency codon="uua"    value="0.0044"/>
+      <frequency codon="uug"    value="0.0161"/>
+
+      <frequency codon="ucu"    value="0.007"/>
+      <frequency codon="ucc"    value="0.0195"/>
+      <frequency codon="uca"    value="0.0078"/>
+      <frequency codon="ucg"    value="0.0166"/>
+
+      <frequency codon="uau"    value="0.0107"/>
+      <frequency codon="uac"    value="0.0184"/>
+      <frequency codon="uaa"    value="0.0008"/>
+      <frequency codon="uag"    value="0.0006"/>
+
+      <frequency codon="ugu"    value="0.0054"/>
+      <frequency codon="ugc"    value="0.0132"/>
+      <frequency codon="uga"    value="0.0005"/>
+      <frequency codon="ugg"    value="0.0099"/>
+
+      <frequency codon="cuu"    value="0.009"/>
+      <frequency codon="cuc"    value="0.0139"/>
+      <frequency codon="cua"    value="0.0082"/>
+      <frequency codon="cug"    value="0.0385"/>
+
+      <frequency codon="ccu"    value="0.007"/>
+      <frequency codon="ccc"    value="0.0180"/>
+      <frequency codon="cca"    value="0.0135"/>
+      <frequency codon="ccg"    value="0.0159"/>
+
+      <frequency codon="cau"    value="0.0105"/>
+      <frequency codon="cac"    value="0.016"/>
+      <frequency codon="caa"    value="0.0156"/>
+      <frequency codon="cag"    value="0.0364"/>
+
+      <frequency codon="cgu"    value="0.0088"/>
+      <frequency codon="cgc"    value="0.0182"/>
+      <frequency codon="cga"    value="0.0084"/>
+      <frequency codon="cgg"    value="0.0083"/>
+
+      <frequency codon="auu"    value="0.0165"/>
+      <frequency codon="auc"    value="0.0229"/>
+      <frequency codon="aua"    value="0.0094"/>
+      <frequency codon="aug"    value="0.0235"/>
+
+      <frequency codon="acu"    value="0.0096"/>
+      <frequency codon="acc"    value="0.0213"/>
+      <frequency codon="aca"    value="0.0109"/>
+      <frequency codon="acg"    value="0.0145"/>
+
+      <frequency codon="aau"    value="0.0210"/>
+      <frequency codon="aac"    value="0.0263"/>
+      <frequency codon="aaa"    value="0.0166"/>
+      <frequency codon="aag"    value="0.0397"/>
+
+      <frequency codon="agu"    value="0.0115"/>
+      <frequency codon="agc"    value="0.0204"/>
+      <frequency codon="aga"    value="0.0051"/>
+      <frequency codon="agg"    value="0.0063"/>
+
+      <frequency codon="guu"    value="0.0109"/>
+      <frequency codon="guc"    value="0.0139"/>
+      <frequency codon="gua"    value="0.0063"/>
+      <frequency codon="gug"    value="0.028"/>
+
+      <frequency codon="gcu"    value="0.0144"/>
+      <frequency codon="gcc"    value="0.0335"/>
+      <frequency codon="gca"    value="0.0128"/>
+      <frequency codon="gcg"    value="0.014"/>
+
+      <frequency codon="gau"    value="0.0274"/>
+      <frequency codon="gac"    value="0.0247"/>
+      <frequency codon="gaa"    value="0.021"/>
+      <frequency codon="gag"    value="0.043"/>
+
+      <frequency codon="ggu"    value="0.0132"/>
+      <frequency codon="ggc"    value="0.0267"/>
+      <frequency codon="gga"    value="0.0177"/>
+      <frequency codon="ggg"    value="0.0047"/>
+    </CodonPref>
+</CodonPrefs>
+
