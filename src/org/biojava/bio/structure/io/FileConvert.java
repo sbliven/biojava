@@ -27,6 +27,10 @@ import java.util.ArrayList ;
 import java.util.HashMap ;
 import java.text.DecimalFormat;
 
+// xml writer ...
+import org.biojava.utils.xml.*;
+import java.io.IOException ;
+
 public class FileConvert {
     Structure structure ;
 
@@ -81,6 +85,7 @@ public class FileConvert {
 		int nrGroups = chain.getLength();
 		for ( int h=0; h<nrGroups;h++){
 		    Group g= chain.getGroup(h);
+		    //System.out.println(g);
 		    String type = g.getType() ;
 		    String record = "" ;
 		    if ( type.equals("hetatm") ) {
@@ -90,7 +95,6 @@ public class FileConvert {
 		    }
 	   
 		    // format output ...
-		    //AtomIterator aiter = new AtomIterator(g) ;
 		    int groupsize  = g.size();
 		    String resName = g.getPDBName();
 		    String pdbcode = g.getPDBCode();
@@ -106,15 +110,15 @@ public class FileConvert {
 			    continue ;
 			}
 
-			int    seri       = a.getPDBserial() ;
-			String serial     = alignRight(""+seri,5);
-			String fullname   = a.getFullName() ;
-			String altLoc     = " " ; // not supported, yet!
+			int    seri       = a.getPDBserial()        ;
+			String serial     = alignRight(""+seri,5)   ;
+			String fullname   = a.getFullName()         ;
+			Character  altLoc = a.getAltLoc()           ;
 			String resseq     = alignRight(""+pdbcode,4);
 			String x          = alignRight(""+d3.format(a.getX()),8);
 			String y          = alignRight(""+d3.format(a.getY()),8);
 			String z          = alignRight(""+d3.format(a.getZ()),8);
-			String occupancy  = alignRight(""+d2.format(a.getOccupancy()),6);
+			String occupancy  = alignRight(""+d2.format(a.getOccupancy()),6) ;
 			String tempfactor = alignRight(""+d2.format(a.getTempFactor()),6);
 		
 			line = record + serial + " " + fullname +altLoc 
@@ -133,4 +137,120 @@ public class FileConvert {
 
 	return str.toString() ;
     }
+
+    // convert a protein Structure to a DAS Structure XML response .
+    public void toDASStructure(XMLWriter xw)
+	throws IOException 
+    {
+	
+	// do for all models
+	for (int modelnr = 0;modelnr<structure.nrModels();modelnr++){
+	    
+	    // do for all chains:
+	    for (int chainnr = 0;chainnr<structure.size(modelnr);chainnr++){
+		Chain chain = (Chain)structure.getChain(modelnr,chainnr); 
+		xw.openTag("CHAIN");
+		xw.attribute("id",chain.getName());
+		if (structure.isNmr()){
+		    xw.attribute("model",Integer.toString(modelnr+1));
+		}
+		
+		//do for all groups:
+		for (int groupnr =0;groupnr<chain.getLength();groupnr++){
+		    Group gr = chain.getGroup(groupnr);
+		    xw.openTag("GROUP");
+		    xw.attribute("name",gr.getPDBName());
+		    xw.attribute("type",gr.getType());
+		    xw.attribute("groupid",gr.getPDBCode());
+		    
+		    
+		    // do for all atoms:
+		    //Atom[] atoms  = gr.getAtoms();
+		    ArrayList atoms = gr.getAtoms();
+		    for (int atomnr=0;atomnr<atoms.size();atomnr++){
+			Atom atom = (Atom)atoms.get(atomnr);
+			xw.openTag("ATOM");
+			xw.attribute("atomID",Integer.toString(atom.getPDBserial()));
+			xw.attribute("atomName",atom.getFullName());
+			xw.attribute("x",Double.toString(atom.getX()));
+			xw.attribute("y",Double.toString(atom.getY()));
+			xw.attribute("z",Double.toString(atom.getZ()));
+			xw.closeTag("ATOM");
+		    }
+		    xw.closeTag("GROUP") ;
+		}
+		
+		xw.closeTag("CHAIN");
+
+
+		ArrayList cons = structure.getConnections();
+		for (int cnr = 0; cnr<cons.size();cnr++){
+		
+
+		    /*
+		      the HashMap for a single CONECT line contains the following fields:
+		      <ul>
+		      <li>atomserial (mandatory) : Atom serial number
+		      <li>bond1 .. bond4 (optional): Serial number of bonded atom
+		      <li>hydrogen1 .. hydrogen4 (optional):Serial number of hydrogen bonded atom
+		      <li>salt1 .. salt2 (optional): Serial number of salt bridged atom
+		      </ul>
+		    */
+		    
+		    HashMap con = (HashMap)cons.get(cnr);
+		    Integer as = (Integer)con.get("atomserial");
+		    int atomserial = as.intValue();
+		    
+		    
+		    ArrayList atomids = new ArrayList() ;
+		    
+		    // test salt and hydrogen first //
+		    if (con.containsKey("salt1")) atomids.add(con.get("salt1"));
+		    if (con.containsKey("salt2")) atomids.add(con.get("salt2"));
+		    
+		    if (atomids.size()!=0){
+			addConnection(xw,"salt",atomserial,atomids);
+			atomids = new ArrayList() ;		    
+		    }
+		    if (con.containsKey("hydrogen1")) atomids.add(con.get("hydrogen1"));
+		    if (con.containsKey("hydrogen2")) atomids.add(con.get("hydrogen2"));		
+		    if (con.containsKey("hydrogen3")) atomids.add(con.get("hydrogen3"));		
+		    if (con.containsKey("hydrogen4")) atomids.add(con.get("hydrogen4"));
+		    if (atomids.size()!=0){
+			addConnection(xw,"hydrogen",atomserial,atomids);
+			atomids = new ArrayList() ;		    
+		    }
+		    
+		    if (con.containsKey("bond1")) atomids.add(con.get("bond1"));
+		    if (con.containsKey("bond2")) atomids.add(con.get("bond2"));
+		    if (con.containsKey("bond3")) atomids.add(con.get("bond3"));
+		    if (con.containsKey("bond4")) atomids.add(con.get("bond4"));
+		    
+		    if (atomids.size()!=0){
+			addConnection(xw,"bond",atomserial,atomids);
+		    }
+		}
+	    }
+	}
+    }
+
+        private void addConnection(XMLWriter xw,String connType, int atomserial, ArrayList atomids){
+	try{
+	    xw.openTag("CONNECT");
+	    xw.attribute("atomserial",Integer.toString(atomserial));
+	    xw.attribute("connectionType",connType);
+	    for (int i=0;i<atomids.size();i++){
+		Integer atomid = (Integer)atomids.get(i);
+		int aid = atomid.intValue();
+		xw.openTag("ATOMID");
+		xw.attribute("atomid",Integer.toString(aid));
+		xw.closeTag("ATOMID");
+	    }
+	    xw.closeTag("CONNECT"); 
+	} catch( Exception e) {
+	    e.printStackTrace();
+	}
+    }
+
+
 }
