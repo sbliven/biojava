@@ -32,8 +32,9 @@ import org.biojava.bio.seq.io.*;
 /**
  * Demonstration of the OrderNDistribution class.
  * <P>
- * This program generates a random DNA sequence of length 100. It then constructs
- * views of this sequence of the required order
+ * This program generates a random DNA sequence. It then constructs
+ * views of this sequence of the required order and collates the frequencies
+ * of given n-mers.
  *
  * @author David Huen, who cobbled it together from code by all and sundry.
  */
