@@ -44,7 +44,7 @@ import org.biojava.bio.BioException;
  */
 public class Pattern
 {
-    private List [] patternList;
+    private List patternList;
     private FiniteAlphabet alfa;
     private int min = 1;
     private int max = 1;
@@ -60,7 +60,6 @@ public class Pattern
         this.alfa = alfa;
         this.label = label;
         patternList = new ArrayList();
-        patternList.add(new ArrayList());
     }
 
     /**
