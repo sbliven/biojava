@@ -46,6 +46,8 @@ public class RandomAccessReader extends Reader
     private int bufferEnd = 0;
     private long raPtrPos = 0;
 
+    private boolean atEOF = false;
+
     /**
      * Creates a new <code>RandomAccessReader</code> wrapping the
      * <code>RandomAccessFile</code> and using a default-sized buffer
@@ -118,6 +120,9 @@ public class RandomAccessReader extends Reader
      */
     public final int read() throws IOException
     {
+	if (atEOF)
+	    return -1;
+
         if (bufferPos >= bufferEnd)
             if (fill() < 0)
                 return -1;
@@ -144,6 +149,9 @@ public class RandomAccessReader extends Reader
      */
     public int read(char [] cbuf, int off, int len) throws IOException
     {
+	if (atEOF)
+	    return -1;
+
         int remainder = bufferEnd - bufferPos;
 
         // If there are enough chars in the buffer to handle this
@@ -159,15 +167,22 @@ public class RandomAccessReader extends Reader
         // Otherwise start getting more chars from the delegate
         for (int i = 0; i < len; i++)
         {
-            // Read from out own method which checks the buffer
+            // Read from our own method which checks the buffer
             // first
             int c = read();
 
             if (c != -1)
                 cbuf[off + i] = (char) c;
             else
+	    {
+		// Need to remember that EOF was reached to return -1
+		// next read
+		atEOF= true;
+
                 return i;
+	    }
         }
+
         return len;
     }
 
