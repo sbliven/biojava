@@ -136,13 +136,6 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
      */
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	// MergeFeatureHolder mfh = new MergeFeatureHolder();
-	// for (Iterator fhi = featureHolders.iterator(); fhi.hasNext(); ) {
-	//    FeatureHolder fh = (FeatureHolder) fhi.next();
-	//    mfh.addFeatureHolder(fh.filter(ff, recurse));
-	// }
-	// return mfh;
-
 	Map results = new HashMap();
 	for (Iterator fhi = featureHolders.entrySet().iterator(); fhi.hasNext(); ) {
 	    Map.Entry me = (Map.Entry) fhi.next();
@@ -160,17 +153,14 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
 		    results.put(filterResult, FeatureFilter.all);
 		}
 	    } else {
-		FeatureHolder filterResult;
-		if (FilterUtils.areProperSubset(ff, mf)) {
-		    filterResult = fh;
+		if (FilterUtils.areProperSubset(mf, ff)) {
+		    results.put(fh, mf);
 		} else {
-		    filterResult = fh.filter(ff, false);
-		    if (filterResult.countFeatures() == 0) {
-			continue;
+		    FeatureHolder filterResult = fh.filter(ff, false);
+		    if (filterResult.countFeatures() != 0) {
+			results.put(filterResult, new FeatureFilter.And(mf, ff));
 		    }
 		}
-
-		results.put(filterResult, new FeatureFilter.And(mf, ff));
 	    }
 	}
 
