@@ -62,11 +62,18 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
     {
 	final BufferedReader in = context.getReader();
 	String line;
+	StreamParser sparser = null;
 
 	listener.startSequence();
-
+	
 	while ((line = in.readLine()) != null) {
 	    if (line.startsWith("//")) {
+		if (sparser != null) {
+		    // End of symbol data
+		    sparser.close();
+		    sparser = null;
+		}
+
 		in.mark(2);
 		if (in.read() == -1)
 		    context.streamEmpty();
@@ -76,24 +83,20 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
 		listener.endSequence();
 		return;
 	    } else if (line.startsWith("SQ")) {
-		EmblSymbolReader esr = new EmblSymbolReader(symParser, in);
-		Symbol[] buffer = new Symbol[256];
-		while (esr.hasMoreSymbols()) {
-		    int num = esr.readSymbols(buffer, 0, buffer.length);
-		    try {
-			listener.addSymbols(esr.getAlphabet(), buffer, 0, num);
-		    } catch (IllegalAlphabetException ex) {
-			throw new IOException("Fussy SeqIOListener");
-		    }
-		}
+		sparser = symParser.parseStream(listener);
 	    } else {
-		// Normal attribute line
-		String tag = line.substring(0, 2);
-		String rest = null;
-		if (line.length() > 5) {
-		    rest = line.substring(5);
+		if (sparser == null) {
+		    // Normal attribute line
+		    String tag = line.substring(0, 2);
+		    String rest = null;
+		    if (line.length() > 5) {
+			rest = line.substring(5);
+		    }
+		    listener.addSequenceProperty(tag, rest);
+		} else {
+		    // Sequence line
+		    processSequenceLine(line, sparser);
 		}
-		listener.addSequenceProperty(tag, rest);
 	    }
 	}
 
@@ -101,98 +104,34 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
     }
 
     /**
-     * Simple SymbolReader implementation for EMBL files and the like.  This is
-     * currently based on the /old/ NFastaFormat SymbolReader, and could
-     * probably be made more efficient in lots of ways.
-     *
-     * @author Thomas Down
-     * @since 1.1
+     * Dispatch symbol data from SQ-block line of an EMBL-like file.
      */
 
-    private class EmblSymbolReader implements SymbolReader {
-	private String symbolCache;
-	private boolean theEnd;
+    protected void processSequenceLine(String line, StreamParser parser) 
+        throws IllegalSymbolException
+    {
+	char[] cline = line.toCharArray();
+	int parseStart = 0;
+	int parseEnd = 0;
 
-	private SymbolParser parser;
-	private BufferedReader br;
+	while (parseStart < cline.length) {
+	    while( parseStart < cline.length && cline[parseStart] == ' ')
+		++parseStart;
+	    if (parseStart >= cline.length)
+		break;
 
-	public EmblSymbolReader(SymbolParser p, BufferedReader br) {
-	    parser = p;
-	    this.br = br;
-	}
+	    if (Character.isDigit(cline[parseStart]))
+		return;
 
-	public Alphabet getAlphabet() {
-	    return parser.getAlphabet();
-	}
+	    parseEnd = parseStart + 1;
+	    while (parseEnd < cline.length && cline[parseEnd] != ' ')
+		++parseEnd;
 
-	public Symbol readSymbol() throws IOException, IllegalSymbolException {
-	    if (symbolCache == null)
-		symbolCache = readSymbolLine();
-	    if (symbolCache == null)
-		throw new IOException("Attempting to read beyond end of EMBL sequence.");
-	    Symbol s = parser.parseToken(symbolCache.substring(0, 1));
-	    symbolCache = (symbolCache.length() == 1 ? null : symbolCache.substring(1));
-	    return s;
-	}
+	    // Got a segment of read sequence data
 
-	public int readSymbols(Symbol[] buffer,
-			       int pos,
-			       int length)
-	    throws IOException, IllegalSymbolException
-	{
-	    if (symbolCache == null)
-		symbolCache = readSymbolLine();
-	    if (symbolCache == null)
-		throw new IOException("Attempting to read beyond end of EMBL sequence.");
-	    int i = 0;
-	    int scl = symbolCache.length();
-	    while (i < length && i < scl) {
-		buffer[pos + i] = parser.parseToken(symbolCache.substring(i, i+1));
-		++i;
-	    }
-	    if (i == scl)
-		symbolCache = null;
-	    else
-		symbolCache = symbolCache.substring(i);
+	    parser.characters(cline, parseStart, parseEnd - parseStart);
 
-	    return i;
-	}
-
-	public boolean hasMoreSymbols() {
-	    try {
-		if (symbolCache == null)
-		    symbolCache = readSymbolLine();
-		return (symbolCache != null);
-	    } catch (IOException ex) {
-		return false;
-	    }
-	}
-
-	private String readSymbolLine() 
-	    throws IOException
-	{
-	    if (theEnd)
-		return null;
-
-	    br.mark(20);
-	    String line = br.readLine();
-	    if (line == null)
-		throw new IOException("Premature end of EMBL-like file");
-
-	    if (line.startsWith("//")) {
-		br.reset();
-		theEnd = true;
-		return null;
-	    } else {
-		StringBuffer sb = new StringBuffer();
-		StringTokenizer toke = new StringTokenizer(line);
-		while (toke.hasMoreTokens()) {
-		    String token = toke.nextToken();
-		    if (!Character.isDigit(token.charAt(0)))
-			sb.append(token);
-		}
-		return sb.toString();
-	    }
+	    parseStart = parseEnd;
 	}
     }
 
