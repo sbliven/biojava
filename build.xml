@@ -221,16 +221,16 @@
     <junit printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
       <formatter type="plain" usefile="true" />
       <classpath>
-        <!-- classes specified in this file -->
-        <pathelement path="${classpath}" />
-        <!-- classes specified in system classpath -->
-        <pathelement path="${env.classpath}" />
         <!-- main classes from build -->
         <pathelement path="${build.dest.main}" />
         <!-- test classes from build -->
         <pathelement path="${build.dest.tests}" />
         <!-- test data from build -->
         <pathelement path="${build.src.tests}" />
+        <!-- classes specified in this file -->
+        <pathelement path="${classpath}" />
+        <!-- classes specified in system classpath -->
+        <pathelement path="${env.classpath}" />
       </classpath>
       <!-- The junit task doesn't support 'if' so we test for JUnit here -->
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
@@ -245,16 +245,16 @@
     <junit printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
       <formatter type="plain" usefile="true" />
       <classpath>
-        <!-- classes specified in this file -->
-        <pathelement path="${classpath}" />
-        <!-- classes specified in system classpath -->
-        <pathelement path="${env.classpath}" />
         <!-- main classes from build -->
         <pathelement path="${build.dest.main}" />
         <!-- test classes from build -->
         <pathelement path="${build.dest.tests}" />
         <!-- test data from build -->
         <pathelement path="${build.src.tests}" />
+        <!-- classes specified in this file -->
+        <pathelement path="${classpath}" />
+        <!-- classes specified in system classpath -->
+        <pathelement path="${env.classpath}" />
       </classpath>
       <!-- The junit task doesn't support 'if' so we test for JUnit here -->
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
