@@ -78,11 +78,11 @@ public interface DistributionFactory {
       }
       FiniteAlphabet fa = (FiniteAlphabet) alpha;
       
-      if(fa == DNATools.getDNA()) {
-        dis = new DNADistribution();
-      } else {
+      //if(fa == DNATools.getDNA()) {
+      //  dis = new DNADistribution();
+      //} else {
         dis = new SimpleDistribution(fa);
-      }
+      //}
     
       return dis;
     }

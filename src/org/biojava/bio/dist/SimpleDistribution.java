@@ -140,7 +140,15 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
     public void addCount(DistributionTrainerContext dtc, Symbol sym, double times)
     throws IllegalSymbolException {
       try {
-        counts.increaseCount(sym, times);
+        if(sym instanceof AtomicSymbol) {
+          counts.increaseCount(sym, times);
+        } else {
+          FiniteAlphabet fa = (FiniteAlphabet) sym.getMatches();
+          times /= ((double) fa.size());
+          for(Iterator i = fa.iterator(); i.hasNext(); ) {
+            counts.increaseCount((Symbol) i.next(), times);
+          }
+        }
       } catch (ChangeVetoException cve) {
         throw new BioError(
           cve, "Assertion Failure: Change to Count object vetoed"
