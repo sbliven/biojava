@@ -1,0 +1,131 @@
+package org.biojava.utils;
+
+import java.util.*;
+import java.lang.reflect.*;
+import java.beans.*;
+
+public class BeanAsMap
+  extends
+    AbstractMap
+{
+  private static Map beanInfoCache;
+  private static Object[] NO_PARAMS;
+  
+  static {
+    beanInfoCache = new HashMap();
+    NO_PARAMS = new Object[] {};
+  }
+  
+  private static BeanInfo getBeanInfo(Class clazz)
+  throws IntrospectionException {
+    BeanInfo bi = (BeanInfo) beanInfoCache.get(clazz);
+    
+    if(bi == null) {
+      beanInfoCache.put(clazz, bi = Introspector.getBeanInfo(clazz));
+    }
+    
+    return bi;
+  }
+  
+  private final BeanInfo beanInfo;
+  private final Object bean;
+  private final PropertyDescriptor[] descriptors;
+  private final Set entrySet;
+  
+  public BeanAsMap(Object bean)
+  throws IntrospectionException {
+    this.beanInfo = getBeanInfo(bean.getClass());
+    this.bean = bean;
+    this.descriptors = this.beanInfo.getPropertyDescriptors();
+    this.entrySet = new PropertySet();
+  }
+  
+  public int size() {
+    return entrySet.size();
+  }
+  
+  public Set entrySet() {
+    return entrySet;
+  }
+  
+  public Object put(Object key, Object value) {
+    for(Iterator i = entrySet.iterator(); i.hasNext(); ) {
+      PropertyEntry pe = (PropertyEntry) i.next();
+      if(pe.getKey().equals(key)) {
+        return pe.setValue(value);
+      }
+    }
+    throw new IllegalArgumentException("BeanAsMap does not support key: " + key);
+  }
+  
+  private class PropertySet
+    extends
+      AbstractSet
+  {
+    private PropertyEntry[] entries;
+    
+    public PropertySet() {
+      entries = new PropertyEntry[descriptors.length];
+      for(int i = 0; i < entries.length; i++) {
+        entries[i] = new PropertyEntry(descriptors[i]);
+      }
+    }
+    
+    public int size() {
+      return entries.length;
+    }
+    
+    public Iterator iterator() {
+      return new Iterator() {
+        int i = 0;
+        
+        public boolean hasNext() {
+          return i < entries.length;
+        }
+        
+        public Object next() {
+          return entries[i++];
+        }
+        
+        public void remove() {
+          throw new UnsupportedOperationException();
+        }
+      };
+    }
+  }
+  
+  private class PropertyEntry implements Map.Entry {
+    private final PropertyDescriptor pd;
+    
+    public PropertyEntry(PropertyDescriptor pd) {
+      this.pd = pd;
+    }
+    
+    public Object getKey() {
+      return pd.getName();
+    }
+    
+    public Object getValue() {
+      try {
+        return pd.getReadMethod().invoke(bean, NO_PARAMS);
+      } catch (IllegalAccessException iae) {
+        throw new NestedError(iae, "Could not set property");
+      } catch (InvocationTargetException ite) {
+        throw new NestedError(ite, "Could not invoke property");
+      }
+    }
+    
+    public Object setValue(Object value) {
+      try {
+        Object old = getValue();
+        pd.getWriteMethod().invoke(bean, new Object[] { value });
+        
+        return old;
+      } catch (IllegalAccessException iae) {
+        throw new NestedError(iae, "Could not access property");
+      } catch (InvocationTargetException ite) {
+        throw new NestedError(ite, "Could not invoke property");
+      }
+    }
+  }
+}
