@@ -33,7 +33,7 @@ import org.biojava.bio.PropertyConstraint;
 
 /**
  * Alignment object to contain/manage a DAS alignment.  
- * @see also DAS specification at http://wwwdev.sanger.ac.uk/xml/das/documentation/new_spec.html
+ * @see also DAS specification at <a href="http://wwwdev.sanger.ac.uk/xml/das/documentation/new_spec.html">http://wwwdev.sanger.ac.uk/xml/das/documentation/new_spec.html</a>
  *
  * @author Andreas Prlic
  * @since 1.4
@@ -181,8 +181,8 @@ public class Alignment {
 		}
     }
 
-    public List getObjects(){
-        return objects ;
+    public Annotation[] getObjects(){
+        return (Annotation[]) objects.toArray(new Annotation[objects.size()]) ;
     }
 
     public void addScore(Annotation score)
@@ -202,8 +202,8 @@ public class Alignment {
 
     }
     
-    public List getScores(){
-        return scores ;
+    public Annotation[] getScores(){
+        return (Annotation[])scores.toArray(new Annotation[scores.size()]) ;
     }
 
     public void addBlock(Annotation block)
@@ -225,8 +225,8 @@ public class Alignment {
     }
 
 
-    public List getBlocks() {
-        return blocks;
+    public Annotation[] getBlocks() {
+        return (Annotation[])blocks.toArray(new Annotation[blocks.size()]);
     }
     
     public String toString() {
@@ -238,17 +238,4 @@ public class Alignment {
 	str += "number of blocks: "+blocks.size();
 	return str ;
     }
-
-   
-    /*
-    static void  validateMap(Map m, Object[] requiredKeys)
-	throws DASException
-    {
-	for (int i = 0; i < requiredKeys.length; ++i) {
-	    if (!m.containsKey(requiredKeys[i])) {
-		throw new DASException("Required key >" + requiredKeys[i] + "< is not present");
-	    }
-	}
-    }
-    */
 }

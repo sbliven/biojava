@@ -67,7 +67,7 @@ public class DASAlignmentCall {
 	return a biojava Structure object
     */
     
-    public ArrayList getAlignments(String query)
+    public Alignment[] getAlignments(String query)
 	throws IOException
     {
 	/* now connect to DAS server */
@@ -83,9 +83,9 @@ public class DASAlignmentCall {
 	InputStream inStream = connectDASServer(dasUrl);
 	
 
-	ArrayList ali = null;
+	Alignment[] ali = null;
 	try{
-	    ali = parseDASResponse(inStream) ;
+	    ali =  parseDASResponse(inStream) ;
 	} catch (Exception e) {
 	    e.printStackTrace() ;
 	}
@@ -123,7 +123,7 @@ public class DASAlignmentCall {
 
     /** parse the Response of a DAS ALignment service and return a
      * biojava Alignment object */
-    private ArrayList parseDASResponse(InputStream inStream) 
+    private Alignment[] parseDASResponse(InputStream inStream) 
 	throws IOException, SAXException
     {
 	

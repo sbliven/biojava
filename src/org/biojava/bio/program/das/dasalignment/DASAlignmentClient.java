@@ -59,14 +59,14 @@ public class DASAlignmentClient {
 	return query ;
     }
 
-    public  ArrayList getAlignments(String que)
+    public  Alignment[] getAlignments(String que)
 	throws IOException
     {
 	query = que ;
 	return getAlignments() ;
     }
 
-    public ArrayList getAlignments()
+    public Alignment[] getAlignments()
 	throws IOException
     {
 	if (query == null) {
@@ -74,7 +74,7 @@ public class DASAlignmentClient {
 	}
 	
 	DASAlignmentCall alicall = new DASAlignmentCall(serverurl);
-	ArrayList ali = alicall.getAlignments(query);
+	Alignment[] ali =  alicall.getAlignments(query);
 	return ali ;
 	
     }

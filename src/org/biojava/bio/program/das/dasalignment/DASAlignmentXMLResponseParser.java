@@ -49,16 +49,16 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
 
     public DASAlignmentXMLResponseParser() {
 	super() ;
-	System.out.println("in init DASAlignmentXMLResponseParser");
+	//System.out.println("in init DASAlignmentXMLResponseParser");
 	alignment = new Alignment() ;
 	current_position = "start";
 	alignments = new ArrayList() ;
 	segments = new ArrayList() ;
     }
 
-    public ArrayList getAlignments() {
+    public Alignment[] getAlignments() {
 
-	return alignments;
+	return (Alignment[])alignments.toArray(new Alignment[alignments.size()]);
     }
 
     public Alignment getAlignment(int position) {
