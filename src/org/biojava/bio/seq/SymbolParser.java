@@ -26,11 +26,22 @@ import java.util.*;
 
 /**
  * This uses residue symbols to parse characters into residues.
+ *
+ * @author Matthew Pocock
  */
 public class SymbolParser implements ResidueParser {
+  /**
+   * The alphabet to parse into.
+   */
   private Alphabet alphabet;
+  /**
+   * The map from symbol to residue.
+   */
   private Map symbolToResidue;
   
+  /**
+   * Initialize symbolToResidue.
+   */
   {
     symbolToResidue = new HashMap();
   }
@@ -54,6 +65,14 @@ public class SymbolParser implements ResidueParser {
     return res;
   }
   
+  /**
+   * Generate a new SymbolParser for an alphabet.
+   * <P>
+   * It will be correct at the time of creation. If the alphabet is edited in
+   * any way that affects the residues contained, this parser becomes invalid.
+   *
+   * @param alpha the Alphabet to parse symbols into
+   */
   public SymbolParser(Alphabet alpha) {
     this.alphabet = alpha;
     for(Iterator i = alpha.residues().iterator(); i.hasNext(); ) {

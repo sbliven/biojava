@@ -24,20 +24,61 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 
+/**
+ * A no-frills implementation of a feature.
+ *
+ * @author Matthew Pocock
+ */
 public class SimpleFeature implements Feature {
+  /**
+   * The location of this feature.
+   */
   private Location loc;
+  /**
+   * The type of this feature - something like Exon.
+   * This is included for cheap interoperability with GFF.
+   */
   private String type;
+  /**
+   * The source of this feature - the program that generated it.,
+   * This is included for cheap interoperability with GFF.
+   */
   private String source;
+  /**
+   * The sequence that this feature ultimately resides in.
+   */
   private Sequence sourceSeq;
+  /**
+   * The TeatureHolder that we will delegate the FeatureHolder interface too.
+   * This is lazily instantiated.
+   */
   private FeatureHolder featureHolder;
+  /**
+   * The annotation object.
+   * This is lazily instantiated.
+   */
   private Annotation annotation;
  
+  /**
+   * A utility function to retrieve the feature holder delegate, creating it if
+   * necisary.
+   *
+   * @return  the FeatureHolder delegate
+   */
   protected FeatureHolder getFeatureHolder() {
     if(featureHolder == null)
       featureHolder = new SimpleFeatureHolder();
     return featureHolder;
   }
 
+  /**
+   * A utility function to find out if the feature holder delegate has been
+   * instantiated yet. If it has not, we may avoid instantiating it by returning
+   * some pre-canned result.
+   *
+   * @return true if the feature holder delegate has been created and false
+   *         otherwise
+   */
   protected boolean featureHolderAllocated() {
     return featureHolder != null;
   }

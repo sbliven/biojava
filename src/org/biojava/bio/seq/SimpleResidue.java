@@ -23,7 +23,9 @@
 package org.biojava.bio.seq;
 
 /**
- * A simple implementation of a residue.
+ * A no-frills implementation of a residue.
+ *
+ * @author Matthew Pocock
  */
 public class SimpleResidue implements Residue {
   /**
@@ -59,6 +61,14 @@ public class SimpleResidue implements Residue {
     this.name = name;
   }
   
+  /**
+   * Create a new SimpleResidue.
+   *
+   * @param symbol  the char to represent this residue when sequences are
+   *                stringified
+   * @param name  the long name
+   * @param annotation the annotation
+   */
   public SimpleResidue(char symbol, String name, Annotation annotation) {
     this.symbol = symbol;
     this.name = name;

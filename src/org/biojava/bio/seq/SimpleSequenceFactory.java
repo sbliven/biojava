@@ -22,6 +22,12 @@
 
 package org.biojava.bio.seq;
 
+/**
+ * A no-frills implementation of SequenceFactory that produces SimpleSequence
+ * objects.
+ *
+ * @author Matthew Pocock
+ */
 public class SimpleSequenceFactory implements SequenceFactory {
   public Sequence createSequence(ResidueList resList,
                                  String uri, String name, Annotation annotation) {

@@ -22,7 +22,31 @@
 
 package org.biojava.bio.seq;
 
+/**
+ * A simple implementation of a feature factory for adding SimpleFeature objects
+ * to a sequence.
+ *
+ * @author Matthew Pocock
+ */
 public class SimpleFeatureFactory implements FeatureFactory {
+  /**
+   * Creates a new feature for a sequence and adds it to a feature holder.
+   * <P>
+   * This implementation creates SimpleFeature objects, and adds them to a
+   * sequence, assuming it to be a SimpleSequence.
+   * <P>
+   * I have a niggeling suspician that this interface should become part of
+   * Sequence, but I am not yet sure of the implications of adding features of
+   * multiple implementations to a sequence. This is all up for argument.
+   *
+   * @param loc    the Location of the feature
+   * @param type   the type property
+   * @param source the source property
+   * @param seq    the Sequence within which the feature ultimately resides
+   * @param fh     the feature holder that will directly contain this feature
+   * @param annotation a hint as to the annotations that should be added
+   * @return       the newly created and added Feature
+   */
   public Feature createFeature(Location loc, String type, String source,
                                Sequence seq, FeatureHolder fh, Annotation annotation) {
     Feature f = new SimpleFeature(loc, type, source, seq, annotation);

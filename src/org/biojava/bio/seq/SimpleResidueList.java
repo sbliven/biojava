@@ -25,10 +25,19 @@ package org.biojava.bio.seq;
 import java.util.*;
 
 /**
- * A list of residues, starting at index 1
+ * A no-frills implementation of ResidueList, backed by a java.util.List.
+ *
+ * @author Matthew Pocock
  */
 public class SimpleResidueList implements ResidueList {
+  /**
+   * The alphabet over which this residue list is taken.
+   */
   private Alphabet alphabet;
+  
+  /**
+   * The List of residues that actualy stoors the sequence.
+   */
   private List residues;
 
   public int length() {
@@ -71,13 +80,23 @@ public class SimpleResidueList implements ResidueList {
     residues = new ArrayList();
   }
 
+  /**
+   * Generates a new SimpleResidueList that shairs the alphabet and residues of
+   * rList.
+   *
+   * @param rList the ResidueList to copy
+   */
   public SimpleResidueList(ResidueList rList) {
     this.alphabet = rList.alphabet();
     residues = new ArrayList(rList.toList());
   }
 
   /**
-   * Not safe - doesn't check rList contains residues in alpha
+   * Not safe - doesn't check that rList contains residues only in alpha.
+   * Use carefuly.
+   *
+   * @param alpha the alphabet for this residue list
+   * @param rList a list of residues that define the sequence
    */
   public SimpleResidueList(Alphabet alpha, List rList) {
     this.alphabet = alpha;

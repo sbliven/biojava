@@ -24,6 +24,15 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 
+/**
+ * A no-frills implementation of Sequence.
+ * <P>
+ * It implements the ResidueList portion of Sequence by extending
+ * SimpleResideList. This should probably be changed to delegation to allow
+ * custom ResidueList implementations to be wrapped.
+ *
+ * @author Matthew Pocock
+ */
 public class SimpleSequence extends SimpleResidueList implements Sequence {
   private String urn;
   private String name;
@@ -100,7 +109,16 @@ public class SimpleSequence extends SimpleResidueList implements Sequence {
       return getFeatureHolder().filter(ff, recurse);
     return new SimpleFeatureHolder();
   }
-  
+
+  /**
+   * Create a SimpleSequence with the residues and alphabet of res, and the
+   * sequence properties listed.
+   *
+   * @param res the ResidueList to wrap as a sequence
+   * @param urn the URN
+   * @param name the name - should be unique if practical
+   * @param annotation the annotation object to use or null
+   */
   public SimpleSequence(ResidueList res, String urn, String name, Annotation annotation) {
     super(res);
     setURN(urn);

@@ -26,6 +26,9 @@ import java.util.*;
 
 /**
  * A no-frills implementation of Annotation that is just a wrapper around a Map.
+ * <P>
+ * It will allow you to set any property, but will throw exceptions if you try
+ * to retrieve a property that is not set.
  *
  * @author Matthew Pocock
  */
@@ -57,6 +60,9 @@ public class SimpleAnnotation implements Annotation {
     return properties != null;
   }
 
+  /**
+   * @throws IllegalArgumentException if the property 'key' does not exist
+   */
   public Object getProperty(Object key) throws IllegalArgumentException {
     if(propertiesAllocated())
       return getProperties().get(key);
