@@ -41,7 +41,7 @@ public class AceSequence implements Sequence {
   private String name;
   private SymbolList resList;
   private Annotation annotation;
-  private SimpleMutableFeatureHolder fHolder;
+  private SimpleFeatureHolder fHolder;
   
   public String getName() {
     return name;
@@ -105,14 +105,33 @@ public class AceSequence implements Sequence {
    * Ace sequences are currently immutable. This may be changed in the future.
    * This method will always throw an UnsupportedOperationException.
    */
-  public Feature createFeature(MutableFeatureHolder fh, Feature.Template template)
+  public Feature createFeature(FeatureHolder fh, Feature.Template template)
   throws UnsupportedOperationException {
     throw new UnsupportedOperationException("ACeDB sequences can't be modified");
   }
+
+  /**
+   * Add a new feature to this sequence.
+   * <P>
+   * Ace sequences are currently immutable. This may be changed in the future.
+   * This method will always throw an UnsupportedOperationException.
+   */
+  public Feature createFeature(Feature.Template template)
+  throws UnsupportedOperationException {
+    throw new UnsupportedOperationException("ACeDB sequences can't be modified");
+  }
+   
+    public Feature realizeFeature(Feature.Template template) {
+	throw new UnsupportedOperationException("Cannot realize new features on ACeDB sequences.");
+    }
+ 
+    public void removeFeature(Feature f) {
+	throw new UnsupportedOperationException("ACeDB sequences can't be modified");
+    }
     
   public AceSequence(AceObject seqObj) throws AceException, BioException {
     this.name = seqObj.getName();
-    this.fHolder = new SimpleMutableFeatureHolder();
+    this.fHolder = new SimpleFeatureHolder();
     
     try {
       // load in relevent ACeDB object & construct annotation wrapper
@@ -156,7 +175,7 @@ public class AceSequence implements Sequence {
               template.location = new RangeLocation(start.toInt(), end.toInt());
               template.source = "ACeDB";
               template.type = name;
-              Feature f = SimpleFeatureRealizer.DEFAULT.realizeFeature(this, template);
+              Feature f = SimpleFeatureRealizer.DEFAULT.realizeFeature(this, this, template);
               fHolder.addFeature(f);
             }
           }
@@ -189,7 +208,7 @@ public class AceSequence implements Sequence {
               template.source = "ACeDB";
               template.type = name;
               template.annotation = fAnn;
-              Feature f = SimpleFeatureRealizer.DEFAULT.realizeFeature(this, template);
+              Feature f = SimpleFeatureRealizer.DEFAULT.realizeFeature(this, this, template);
               fHolder.addFeature(f);
             }
           }

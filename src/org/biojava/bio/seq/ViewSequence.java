@@ -32,14 +32,10 @@ import java.lang.reflect.*;
  * features and annotations to be overlayed onto an existing
  * Sequence without modifying it.
  *
- * <p>This currently uses feature realization code cut and
- * pasted from SimpleSequence.  We need to sort out feature
- * realization a bit better...</p>
- *
  * @author Thomas Down
  */
 
-public class ViewSequence implements Sequence, MutableFeatureHolder {
+public class ViewSequence implements Sequence, RealizingFeatureHolder {
     /**
      * Delegate Sequence.
      */
@@ -51,7 +47,7 @@ public class ViewSequence implements Sequence, MutableFeatureHolder {
      */
 
     private MergeFeatureHolder exposedFeatures;
-    private MutableFeatureHolder addedFeatures;
+    private SimpleFeatureHolder addedFeatures;
 
     /**
      * IDs
@@ -78,7 +74,7 @@ public class ViewSequence implements Sequence, MutableFeatureHolder {
 
     public ViewSequence(Sequence seq) {
 	seqDelegate = seq;
-	addedFeatures = new SimpleMutableFeatureHolder();
+	addedFeatures = new SimpleFeatureHolder();
 	exposedFeatures = new MergeFeatureHolder();
 	exposedFeatures.addFeatureHolder(seqDelegate);
 	exposedFeatures.addFeatureHolder(addedFeatures);
@@ -172,10 +168,6 @@ public class ViewSequence implements Sequence, MutableFeatureHolder {
     // MutableFeatureHolder methods -- delegate to addedFeatures
     //
 
-    public void addFeature(Feature f) {
-	addedFeatures.addFeature(f);
-    }
-
     /**
      * Remove a feature from this sequence.  <strong>NOTE:</strong> This
      * method will only succeed for features which were added to this
@@ -197,10 +189,28 @@ public class ViewSequence implements Sequence, MutableFeatureHolder {
     }
 
     //
-    // Feature realization stuff, C+P from SimpleSequence.
+    // Feature realization stuff
     //
 
-    public Feature createFeature(MutableFeatureHolder fh, Feature.Template template)
+    public Feature realizeFeature(FeatureHolder parent, Feature.Template template)
+        throws BioException
+    {
+	return featureRealizer.realizeFeature(this, parent, template);
+    }
+
+    public Feature createFeature(Feature.Template template)
+        throws BioException
+    {
+	Feature f = realizeFeature(this, template);
+	addedFeatures.addFeature(f);
+	return f;
+    }
+
+    /**
+     * @deprecated Please use 1-arg createFeature instead.
+     */
+
+    public Feature createFeature(FeatureHolder fh, Feature.Template template)
 	throws BioException 
     {
 	if (fh != this) {
@@ -209,9 +219,7 @@ public class ViewSequence implements Sequence, MutableFeatureHolder {
 	    if (! (containsRecurse(addedFeatures, (Feature) fh)))
 		throw new BioException("fh is not a child which has been added to this ListSequence");
 	}
-	Feature f = featureRealizer.realizeFeature(this, template);
-	fh.addFeature(f);
-	return f;
+	return fh.createFeature(template);
     }
 
     private static boolean containsRecurse(FeatureHolder fh, Feature f) {

@@ -73,6 +73,10 @@ public class PointLocation implements Location, Serializable {
     }
   }
 
+    public boolean isContiguous() {
+	return true;
+    }
+
   public Location translate(int dist) {
     return new PointLocation(this.point + dist);
   }

@@ -156,6 +156,13 @@ public class CompoundLocation implements Location, Serializable {
 
     return res;
   }
+
+    public boolean isContiguous() {
+	for (int pos = getMin(); pos <= getMax(); ++pos)
+	    if (! contains(pos))
+		return false;
+	return true;
+    }
   
   public String toString() {
     StringBuffer sb = new StringBuffer();

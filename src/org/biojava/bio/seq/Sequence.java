@@ -29,14 +29,16 @@ import org.biojava.bio.symbol.*;
  * <P>
  * This interface is a symbol list, so it contains symbols. It is annotatable
  * so that you can add annotation to it, and it is a FeatureHolder so that you
- * can add information to regions of it.
+ * can add information about specific regions.
  * <P>
  * It is expected that there may be several implementations of this interface,
- * each of which may be failry heavy-weight. It takes the SymbolList interface
+ * each of which may be fairly heavy-weight. It takes the SymbolList interface
  * that is nice mathematicaly, and turns it into a biologicaly useful object.
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
+
 public interface Sequence extends SymbolList, FeatureHolder, Annotatable {
   /**
    * The URN for this sequence. This will be something like
@@ -55,19 +57,4 @@ public interface Sequence extends SymbolList, FeatureHolder, Annotatable {
    * @return the name as a String
    */
   String getName();
-  
-  /**
-   * Add a feature within fh using a feature template to fill its fields.
-   * <P>
-   * This api is not the cleanest. Anybody got better ideas?
-   *
-   * @param fh  the feature holder that will directly contain the feature
-   * @param featureTemplate  the Feature.Template that will specify the fields
-   *        of the resulting feature
-   * @throws  UnsupportedOperationException if this Sequence is immutable
-   * @throws IllegalArgumentException if either the template or feature holder
-   *         are of no use
-   */
-  Feature createFeature(MutableFeatureHolder fh, Feature.Template featureTemplate)
-  throws UnsupportedOperationException, IllegalArgumentException, BioException;
 }

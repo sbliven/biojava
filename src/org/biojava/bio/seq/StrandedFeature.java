@@ -28,7 +28,7 @@ import org.biojava.bio.symbol.*;
  * <P>
  * Strandedness only applies to some types of sequence, such as DNA. Any
  * implementation should blow chunks to avoid being added to a sequence for
- * which strand is a foreighn concept.
+ * which strand is a foreign concept.
  *
  * @author Matthew Pocock
  */
@@ -69,6 +69,11 @@ public interface StrandedFeature extends Feature {
    */
   static final int NEGATIVE = -1;
   
+    /**
+     * Template class for parameterizing the creation of a new
+     * <code>StrandedFeature</code>.
+     */
+
   public class Template extends Feature.Template {
     public int strand;
   }

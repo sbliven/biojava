@@ -171,7 +171,7 @@ public class GenbankFormat implements SequenceFormat, Serializable {
 				    accession,
 				    Annotation.EMPTY_ANNOTATION);
 	    for (Iterator i = features.getFeatures().iterator(); i.hasNext(); ) {
-		ss.createFeature((MutableFeatureHolder) ss, (Feature.Template) i.next());
+		ss.createFeature((Feature.Template) i.next());
 	    }
 	    return ss;
 	}

@@ -36,10 +36,19 @@ implements Sequence {
     }
   }
   
-  public Feature createFeature(MutableFeatureHolder fh, Feature.Template template)
+  public Feature createFeature(FeatureHolder fh, Feature.Template template)
   throws UnsupportedOperationException {
     throw new UnsupportedOperationException("Can not add features to a CORBA sequence");
   }
+
+  public Feature createFeature(Feature.Template template)
+  throws UnsupportedOperationException {
+    throw new UnsupportedOperationException("Can not add features to a CORBA sequence");
+  }
+
+    public void removeFeature(Feature f) {
+	throw new UnsupportedOperationException("Cannot remove features from a CORBA sequence");
+    }
 
   public String getName() {
     return getPrimarySeq().display_id();

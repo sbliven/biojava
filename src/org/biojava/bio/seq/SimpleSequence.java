@@ -36,12 +36,19 @@ import org.biojava.bio.symbol.*;
  * the underlying SymbolList will be silently reflected in
  * the SimpleSequence.  In general, SimpleSequences should <em>only</em>
  * be constructed from SymbolLists which are known to be immutable.
- * <p>
+ * </p>
+ *
+ * <p>By default, features attached to a SimpleSequence are 
+ * realized as simple in-memory implementations using
+ * <code>SimpleFeatureRealizer.DEFAULT</code>.  If you need
+ * alternative feature realization behaviour, any
+ * <code>FeatureRealizer</code> implementation may be
+ * supplied at construction-time.</p>
  *
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public class SimpleSequence implements Sequence, MutableFeatureHolder 
+public class SimpleSequence implements Sequence, RealizingFeatureHolder
 {
     //
     // This section is for the SymbolList implementation-by-delegation
@@ -92,12 +99,12 @@ public class SimpleSequence implements Sequence, MutableFeatureHolder
     private String urn;
     private String name;
     private Annotation annotation;
-    private MutableFeatureHolder featureHolder;
+    private SimpleFeatureHolder featureHolder;
     private FeatureRealizer featureRealizer;
 
-    protected MutableFeatureHolder getFeatureHolder() {
+    protected SimpleFeatureHolder getFeatureHolder() {
 	if(featureHolder == null)
-	    featureHolder = new SimpleMutableFeatureHolder();
+	    featureHolder = new SimpleFeatureHolder();
 	return featureHolder;
     }
     
@@ -145,23 +152,40 @@ public class SimpleSequence implements Sequence, MutableFeatureHolder
 	return FeatureHolder.EMPTY_FEATURE_HOLDER;
     }
 
-    public Feature createFeature(MutableFeatureHolder fh, Feature.Template template)
+    public Feature realizeFeature(FeatureHolder parent, Feature.Template template)
+        throws BioException
+    {
+	return featureRealizer.realizeFeature(this, parent, template);
+    }
+
+    public Feature createFeature(Feature.Template template)
 	throws BioException 
     {
-	Feature f = featureRealizer.realizeFeature(this, template);
-	if(fh == this) {
-	    fh = this.getFeatureHolder();
-	}
+	Feature f = realizeFeature(this, template);
+	SimpleFeatureHolder fh = this.getFeatureHolder();
 	fh.addFeature(f);
 	return f;
     }
 
-    public void addFeature(Feature f) {
-	throw new UnsupportedOperationException();
+    /**
+     * Create a new feature in any FeatureHolder associated
+     * with this sequence.
+     *
+     * @deprecated Please use new 1-arg createFeature instead.
+     */
+
+    public Feature createFeature(FeatureHolder fh, Feature.Template template)
+	throws BioException 
+    {
+	return fh.createFeature(template);
     }
 
+    /**
+     * Remove a feature attached to this sequence.
+     */
+
     public void removeFeature(Feature f) {
-	featureHolder.removeFeature(f);
+	getFeatureHolder().removeFeature(f);
     }
 
     /**

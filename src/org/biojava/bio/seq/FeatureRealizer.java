@@ -42,11 +42,15 @@ public interface FeatureRealizer {
      *
      * @param seq The sequence to which the feature will be added.
      * @param template A description of the desired feature.
+     * @param parent The FeatureHolder which is to be the Feature's
+     *               immediate parent.
      * @returns A newly constructed feature, to be added to the sequence.
      * @throws BioException If the feature could not be constructed.
      */
 
-    public Feature realizeFeature(Sequence seq, Feature.Template template)
+    public Feature realizeFeature(Sequence seq,
+				  FeatureHolder parent,
+				  Feature.Template template)
             throws BioException;
 }
 

@@ -122,7 +122,7 @@ public class GFFEntrySet {
                 plain.location = new RangeLocation(rec.getStart(), rec.getEnd());
                 plain.type = rec.getFeature();
                 plain.source = rec.getSource();
-                seq.createFeature((MutableFeatureHolder) seq, plain);
+                seq.createFeature(plain);
               } else {
                 stranded.location = new RangeLocation(rec.getStart(), rec.getEnd());
                 stranded.type = rec.getFeature();
@@ -133,7 +133,7 @@ public class GFFEntrySet {
                 } else if(strand == GFFRecord.NEGATIVE_STRAND) {
                   stranded.strand = StrandedFeature.NEGATIVE;
                 }
-                seq.createFeature((MutableFeatureHolder) seq, stranded);
+                seq.createFeature(stranded);
               }
             }
           }

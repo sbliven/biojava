@@ -42,6 +42,14 @@ public class FeatureAdapter implements Feature {
     return seqFeature.type();
   }
   
+    public FeatureHolder getParent() {
+	return parent;
+    }
+
+    public Sequence getSequence() {
+	return parent;
+    }
+
   public int countFeatures() {
     return FeatureHolder.EMPTY_FEATURE_HOLDER.countFeatures();
   }
@@ -57,4 +65,12 @@ public class FeatureAdapter implements Feature {
   public Annotation getAnnotation() {
     return annotation;
   }
+
+    public Feature createFeature(Feature.Template template) {
+	throw new UnsupportedOperationException();
+    }
+
+    public void removeFeature(Feature f) {
+	throw new UnsupportedOperationException();
+    }
 }

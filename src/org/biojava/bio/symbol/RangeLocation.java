@@ -95,6 +95,10 @@ public class RangeLocation implements Location, Serializable {
     return new RangeLocation(getMin() + dist, getMax() + dist);
   }
   
+    public boolean isContiguous() {
+	return true;
+    }
+
   public RangeLocation(int min, int max) {
     this.min = min;
     this.max = max;

@@ -61,7 +61,7 @@ public class WeightMatrixAnnotator implements SequenceAnnotator, Serializable {
 		ann.setProperty("score", new Double(q));
 		ann.setProperty("weightMatrix", matrix);
 		template.annotation = ann;
-		seq.createFeature((MutableFeatureHolder) seq, template);
+		seq.createFeature(template);
 	    }
 	}
 	return seq;

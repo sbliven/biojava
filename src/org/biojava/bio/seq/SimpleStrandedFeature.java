@@ -28,55 +28,58 @@ import org.biojava.bio.symbol.*;
  * A no-frills implementation of StrandedFeature.
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
 class SimpleStrandedFeature extends SimpleFeature implements StrandedFeature {
-  private int strand;
+    private int strand;
     
-  public int getStrand() {
-    return strand;
-  }
+    public int getStrand() {
+	return strand;
+    }
   
-  public SymbolList getSymbols() {
-    SymbolList resList = super.getSymbols();
-    if(getStrand() == NEGATIVE) {
-      try {
-        resList = new ComplementSymbolList(resList);
-      } catch (IllegalAlphabetException iae) {
-        throw new BioError(
-          iae,
-          "Could not retrieve symbols for feature as " +
-          "the alphabet can not be complemented."
-        );
-      }
+    public SymbolList getSymbols() {
+	SymbolList resList = super.getSymbols();
+	if(getStrand() == NEGATIVE) {
+	    try {
+		resList = new ComplementSymbolList(resList);
+	    } catch (IllegalAlphabetException iae) {
+		throw new BioError(
+				   iae,
+				   "Could not retrieve symbols for feature as " +
+				   "the alphabet can not be complemented."
+				   );
+	    }
+	}
+	return resList;
     }
-    return resList;
-  }
   
-  public SimpleStrandedFeature(Sequence sourceSeq,
-                               StrandedFeature.Template template)
-  throws IllegalArgumentException, IllegalAlphabetException {
-    super(sourceSeq, template);
-    if(template.strand != POSITIVE && template.strand != NEGATIVE) {
-      throw new IllegalArgumentException(
-        "strand was not POSITIVE or NEGATIVE but " + template.strand
-      );
+    public SimpleStrandedFeature(Sequence sourceSeq,
+				 FeatureHolder parent,
+				 StrandedFeature.Template template)
+	throws IllegalArgumentException, IllegalAlphabetException 
+    {
+	super(sourceSeq, parent, template);
+	if(template.strand != POSITIVE && template.strand != NEGATIVE) {
+	    throw new IllegalArgumentException(
+			     "strand was not POSITIVE or NEGATIVE but " + template.strand
+					       );
+	}
+	this.strand = template.strand;
+	if(!ComplementSymbolList.isComplementable(sourceSeq.getAlphabet())) {
+	    throw new IllegalAlphabetException (
+				"Can not create a stranded feature within a sequence of type " +
+				sourceSeq.getAlphabet().getName()
+						);
+	}
     }
-    this.strand = template.strand;
-    if(!ComplementSymbolList.isComplementable(sourceSeq.getAlphabet())) {
-      throw new IllegalAlphabetException (
-        "Can not create a stranded feature within a sequence of type " +
-        sourceSeq.getAlphabet().getName()
-      );
-    }
-  }
   
-  public String toString() {
-    String pm;
-    if(getStrand() == POSITIVE) {
-      pm = "+";
-    } else {
-      pm = "-";
+    public String toString() {
+	String pm;
+	if(getStrand() == POSITIVE) {
+	    pm = "+";
+	} else {
+	    pm = "-";
+	}
+	return super.toString() + " " + pm;
     }
-    return super.toString() + " " + pm;
-  }
 }

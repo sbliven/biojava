@@ -172,7 +172,7 @@ public class EmblFormat implements SequenceFormat, Serializable {
 				    primaryAcc,
 				    annotation);
 	    for (Iterator i = features.getFeatures().iterator(); i.hasNext(); ) {
-		ss.createFeature((MutableFeatureHolder) ss, (Feature.Template) i.next());
+		ss.createFeature((Feature.Template) i.next());
 	    }
 	    return ss;
 	}

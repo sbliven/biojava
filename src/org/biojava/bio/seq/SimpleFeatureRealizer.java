@@ -98,7 +98,7 @@ public class SimpleFeatureRealizer implements FeatureRealizer, Serializable {
      * Install a new mapping from a class of Feature.Template to
      * a class of Feature implementations.  The implementation
      * class MUST have a public constructor of the form
-     * (Sequence, Feature.Template).
+     * (Sequence, FeatureHolder, Feature.Template).
      *
      * <p>A newly added implementation takes precendence over
      * any existing implementations if a template can be realized
@@ -115,17 +115,19 @@ public class SimpleFeatureRealizer implements FeatureRealizer, Serializable {
 	templateToImpl.add(0, ti);
     }
 
-    public Feature realizeFeature(Sequence seq, Feature.Template temp)
+    public Feature realizeFeature(Sequence seq,
+				  FeatureHolder parent,
+				  Feature.Template temp)
 	throws BioException 
     {
 	for (Iterator i = templateToImpl.iterator(); i.hasNext(); ) {
 	    TemplateImpl ti = (TemplateImpl) i.next();
 	    if (ti.accept(temp))
-		return ti.realize(seq, temp);
+		return ti.realize(seq, parent, temp);
 	}
 
 	if (fallBack != null)
-	    return fallBack.realizeFeature(seq, temp);
+	    return fallBack.realizeFeature(seq, parent, temp);
 
 	throw new BioException("Couldn't find realized implementation for template of class " + 
 			       temp.getClass().getName());
@@ -138,9 +140,10 @@ public class SimpleFeatureRealizer implements FeatureRealizer, Serializable {
 	private TemplateImpl(Class template, Class impl) 
 	    throws BioException
 	{
-	    Class[] signature = new Class[2];
+	    Class[] signature = new Class[3];
 	    signature[0] = Sequence.class;
-	    signature[1] = template;
+	    signature[1] = FeatureHolder.class;
+	    signature[2] = template;
 	    this.template = template;
 
 	    try {
@@ -154,12 +157,15 @@ public class SimpleFeatureRealizer implements FeatureRealizer, Serializable {
 	    return template.isInstance(temp);
 	}
 
-	public Feature realize(Sequence seq, Feature.Template temp) 
+	public Feature realize(Sequence seq, 
+			       FeatureHolder parent,
+			       Feature.Template temp) 
 	    throws BioException
 	{
-	    Object[] consArgs = new Object[2];
+	    Object[] consArgs = new Object[3];
 	    consArgs[0] = seq;
-	    consArgs[1] = temp;
+	    consArgs[1] = parent;
+	    consArgs[2] = temp;
 	    try {
 		return (Feature) cons.newInstance(consArgs);
 	    } catch (Exception ex) {

@@ -35,8 +35,14 @@ import org.biojava.bio.*;
  * It is not required to contain all locations within this range. It is meant
  * to contain getMin or getMax. In the event that an operation would produce an
  * invalid or nonsensical range, empty should be returned.
+ * </p>
+ *
+ * <p>
+ * Location objects are <strong>always</strong> immutable.
+ * </p>
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
 public interface Location {
   /**
@@ -121,6 +127,16 @@ public interface Location {
    */
   Location translate(int dist);
    
+    /**
+     * Determine if a Location is contiguous.
+     *
+     * @return <code>true</code> if and only if this Location
+     *         contains every point from <code>min</code> to
+     *         <code>max</code> inclusive.
+     */
+
+    public boolean isContiguous();
+
   /**
    * The empty range.
    * <P>
@@ -129,7 +145,7 @@ public interface Location {
    * equal to nothing. Intersection results in the empty range. Union
    * results in the argument range. Symbols returns an empty array.
    * <P>
-   * Every day, in every way, emty becomes more and more booring.
+   * Every day, in every way, empty becomes more and more booring.
    */
   static final Location empty = new EmptyLocation();
   
@@ -155,6 +171,7 @@ public interface Location {
 	}
     }
     public Location translate(int dist) { return this; }
+    public boolean isContiguous() { return true; }
     private Object writeReplace() throws ObjectStreamException {
       try {
         return new StaticMemberPlaceHolder(Location.class.getField("empty"));

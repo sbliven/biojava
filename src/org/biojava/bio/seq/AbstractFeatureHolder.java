@@ -33,7 +33,7 @@ import java.util.*;
  */
 public abstract class AbstractFeatureHolder implements FeatureHolder {
   public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-    MutableFeatureHolder res = new SimpleMutableFeatureHolder();
+    SimpleFeatureHolder res = new SimpleFeatureHolder();
     for(Iterator f = features(); f.hasNext();) {
       Feature feat = (Feature) f.next();
       if(ff.accept(feat))
@@ -47,4 +47,12 @@ public abstract class AbstractFeatureHolder implements FeatureHolder {
     }
     return res;
   }
+
+    public Feature createFeature(Feature.Template temp) {
+	throw new UnsupportedOperationException("This FeatureHolder does not support creation of new Features.");
+    }
+
+    public void removeFeature(Feature f) {
+	throw new UnsupportedOperationException("This FeatureHolder does not support removal of Features.");
+    }
 }

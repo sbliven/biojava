@@ -29,13 +29,15 @@ import org.biojava.bio.symbol.*;
  * A no-frills implementation of a feature.
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
-class SimpleFeature implements Feature, MutableFeatureHolder {
+
+class SimpleFeature implements Feature, RealizingFeatureHolder {
   /**
    * The FeatureHolder that we will delegate the FeatureHolder interface too.
    * This is lazily instantiated.
    */
-  private MutableFeatureHolder featureHolder;
+  private SimpleFeatureHolder featureHolder;
 
 
   /**
@@ -53,9 +55,9 @@ class SimpleFeature implements Feature, MutableFeatureHolder {
    */
   private String source;
   /**
-   * The sequence that this feature ultimately resides in.
+   * Our parent FeatureHolder.
    */
-  private Sequence sourceSeq;
+  private FeatureHolder parent;
   /**
    * The annotation object.
    * This is lazily instantiated.
@@ -68,9 +70,9 @@ class SimpleFeature implements Feature, MutableFeatureHolder {
    *
    * @return  the FeatureHolder delegate
    */
-  protected MutableFeatureHolder getFeatureHolder() {
+  protected SimpleFeatureHolder getFeatureHolder() {
     if(featureHolder == null)
-      featureHolder = new SimpleMutableFeatureHolder();
+      featureHolder = new SimpleFeatureHolder();
     return featureHolder;
   }
 
@@ -86,74 +88,104 @@ class SimpleFeature implements Feature, MutableFeatureHolder {
     return featureHolder != null;
   }
 
-  public Location getLocation() {
-    return loc;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public String getSource() {
-    return source;
-  }
-
-  protected Sequence getSourceSeq() {
-    return sourceSeq;
-  }
-
-  public Annotation getAnnotation() {
-    if(annotation == null)
-      annotation = new SimpleAnnotation();
-    return annotation;
-  }
-  
-  public SymbolList getSymbols() {
-    return getLocation().symbols(getSourceSeq());
-  }
-
-  public int countFeatures() {
-    if(featureHolderAllocated())
-      return getFeatureHolder().countFeatures();
-    return 0;
-  }
-
-  public Iterator features() {
-    if(featureHolderAllocated())
-      return getFeatureHolder().features();
-    return Collections.EMPTY_LIST.iterator();
-  }
-
-  public void addFeature(Feature f) {
-    getFeatureHolder().addFeature(f);
-  }
-
-  public void removeFeature(Feature f) {
-    getFeatureHolder().removeFeature(f);
-  }
-
-  public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-    if(featureHolderAllocated())
-      return getFeatureHolder().filter(ff, recurse);
-    return new SimpleFeatureHolder();
-  }
-
-  public SimpleFeature(Sequence sourceSeq, Feature.Template template)
-  throws IllegalArgumentException{
-    if(template.location == null) {
-      throw new IllegalArgumentException(
-        "Location can not be null. Did you mean Location.EMPTY_LOCATION?"
-      );
+    public Location getLocation() {
+	return loc;
     }
-    this.sourceSeq = sourceSeq;
-    this.loc = template.location;
-    this.type = template.type;
-    this.source = template.source;
-    this.annotation = new SimpleAnnotation(template.annotation);
-  }
+    
+    public String getType() {
+	return type;
+    }
 
-  public String toString() {
-    return "Feature " + getType() + " " +
-              getSource() + " (" + getLocation() + ")";
-  }
+    public String getSource() {
+	return source;
+    }
+
+    public FeatureHolder getParent() {
+	return parent;
+    }
+
+    public Sequence getSequence() {
+	FeatureHolder fh = this;
+	while (fh instanceof Feature) {
+	    fh = ((Feature) fh).getParent();
+	}
+	try {
+	    return (Sequence) fh;
+	} catch (ClassCastException ex) {
+	    throw new BioError("Feature doesn't seem to have a Sequence ancestor.");
+	}
+    }
+
+    public Annotation getAnnotation() {
+	if(annotation == null)
+	    annotation = new SimpleAnnotation();
+	return annotation;
+    }
+  
+    public SymbolList getSymbols() {
+	return getLocation().symbols(getSequence());
+    }
+
+    public int countFeatures() {
+	if(featureHolderAllocated())
+	    return getFeatureHolder().countFeatures();
+	return 0;
+    }
+
+    public Iterator features() {
+	if(featureHolderAllocated())
+	    return getFeatureHolder().features();
+	return Collections.EMPTY_LIST.iterator();
+    }
+
+    public void removeFeature(Feature f) {
+	getFeatureHolder().removeFeature(f);
+    }
+
+    public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+	if(featureHolderAllocated())
+	    return getFeatureHolder().filter(ff, recurse);
+	return new SimpleFeatureHolder();
+    }
+
+    public SimpleFeature(Sequence sourceSeq, 
+			 FeatureHolder parent,
+			 Feature.Template template)
+	throws IllegalArgumentException
+    {
+	if(template.location == null) {
+	    throw new IllegalArgumentException(
+		     "Location can not be null. Did you mean Location.EMPTY_LOCATION?"
+					      );
+	}
+	this.parent = parent;
+	this.loc = template.location;
+	this.type = template.type;
+	this.source = template.source;
+	this.annotation = new SimpleAnnotation(template.annotation);
+    }
+
+    public String toString() {
+	return "Feature " + getType() + " " +
+	    getSource() + " (" + getLocation() + ")";
+    }
+
+    public Feature realizeFeature(FeatureHolder fh, Feature.Template templ)
+        throws BioException
+    {
+	try {
+	    RealizingFeatureHolder rfh = (RealizingFeatureHolder) getParent();
+	    return rfh.realizeFeature(fh, templ);
+	} catch (ClassCastException ex) {
+	    throw new BioException("Couldn't propogate feature creation request.");
+	}
+    }
+
+    public Feature createFeature(Feature.Template temp) 
+	throws BioException 
+    {
+	Feature f = realizeFeature(this, temp);
+	getFeatureHolder().addFeature(f);
+	return f;
+    }
 }
