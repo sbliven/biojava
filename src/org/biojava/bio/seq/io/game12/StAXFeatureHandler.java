@@ -33,8 +33,7 @@ import org.biojava.bio.seq.io.game.ElementRecognizer;
  *
  * @author     Thomas Down
  * @author     David Huen
- * @created    19 January 2002
- * @since      1.8
+ * @since      1.2
  */
 
 public class StAXFeatureHandler extends StAXContentHandlerBase {

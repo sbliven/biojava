@@ -29,7 +29,6 @@ import org.biojava.bio.seq.io.game.ElementRecognizer;
  *  Handles the GAME &lt;dbxref&gt; element
  *
  * @author     David Huen
- * @created    19 January 2002
  * @since      1.2
  */
 public class GAMEPropertyHandler

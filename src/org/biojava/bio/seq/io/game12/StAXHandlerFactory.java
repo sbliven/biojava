@@ -27,7 +27,6 @@ import org.biojava.utils.stax.*;
  *  Factory for StAX content handlers.
  *
  *@author     Thomas Down
- *@created    19 January 2002
  *@since      1.2
  */
 

@@ -35,7 +35,7 @@ import org.biojava.utils.NestedException;
  * Throw this whenever you have caught a Throwable and need to throw an
  * Exception or BioException in your method.
  *
- * @for.powerUsers
+ * @for.powerUser
  * Be sure to wrap up any causual throwable. It makes debugging your (and
  * other peoples') code much easier.
  */

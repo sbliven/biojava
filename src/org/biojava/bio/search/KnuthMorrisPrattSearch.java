@@ -30,30 +30,33 @@ import org.biojava.bio.*;
 import java.util.*;
 
 /**
- * Title:        KnuthMorrisPrattSearch<p>
- * Description:  An object to find exact subsequences within a sequence<p>
- * Copyright:    Copyright (c) 2002<p>
- * Company:      AgResearch<p>
- *
+ * An object to find exact subsequences within a sequence.
+ * 
+ * <p>
  * Reference: KNUTH D.E., MORRIS (Jr) J.H., PRATT V.R., 1977,
  * Fast pattern matching in strings, SIAM Journal on Computing 6(1):323-350.
+ * </P.
  *
- * <b>USAGE:</b><p>
+ * <p><b>USAGE:</b></p>
  * When the object is constructed the <code>findMatches()</code>
  * method would be called. This will return an int[] giving the offsets
  * (ie the location of the first symbol of each match in the text).
  * The <code>getKMPNextTable()</code> returns the table of border lengths
  * used in the algorithm. This method is protected as it is unlikely it
- * will be needed except for debugging.<p>
+ * will be needed except for debugging.</p>
  *
+ * <p>
  * The algorithm finds exact matches therefore ambiguity symbols will match
  * only themselves. The class cannot perform regular expressions. The class
  * operates on all alphabets thus if searching for a DNA pattern you should
- * compile both the pattern and its reverse complement.<p>
+ * compile both the pattern and its reverse complement.</p>
  *
- * <b>WARNING the behaviour of a pattern containing gaps is undefined.
- *  It's not recommended that you try it.</b>
+ * <p><b>WARNING the behaviour of a pattern containing gaps is undefined.
+ *  It's not recommended that you try it.</b></p>
  *
+ * <p>Copyright:    Copyright (c) 2002</p>
+ * <p>Company:      AgResearch</p>
+ * 
  * @author Mark Schreiber
  * @version 1.0
  */

@@ -30,7 +30,6 @@ import org.biojava.bio.seq.io.game.ElementRecognizer;
  *  Handles the GAME &lt;annotation&gt; element
  *
  * @author     David Huen
- * @created    19 January 2002
  * @since      1.2
  */
 public class GAMEGeneHandler
@@ -125,7 +124,6 @@ public class GAMEGeneHandler
      *  Description of the Class
      *
      *@author     david
-     *@created    19 January 2002
      */
     private class NameHandler extends StringElementHandlerBase {
         /**
@@ -138,13 +136,6 @@ public class GAMEGeneHandler
         }
     }
 
-
-    /**
-     *  Description of the Class
-     *
-     *@author     david
-     *@created    19 January 2002
-     */
 //    private class SynonymHandler extends StringElementHandlerBase {
 //        /**
 //         *  Sets the stringValue attribute of the SynonymHandler object

@@ -25,7 +25,7 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
- * <p>Registry of known types of features</p>
+ * Registry of known types of features.
  *
  * <p>Historically, the type of a feature within a sequence has been represented
  * by the class or interface of the feature, or by the type property. Different

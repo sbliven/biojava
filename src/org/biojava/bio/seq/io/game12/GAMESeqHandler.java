@@ -28,7 +28,6 @@ import org.biojava.bio.seq.io.game.ElementRecognizer;
 /**
  *  Handles the GAME &lt;seq&gt; element
  *
- * @created    19 January 2002
  * @author     David Huen
  * @since      1.2
  */

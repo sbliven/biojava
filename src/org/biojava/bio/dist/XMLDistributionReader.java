@@ -35,13 +35,11 @@ import org.xml.sax.helpers.*;
 
 
 /**
- *
- * <p>Title: XMLDistributionReader</p>
- * <p>Description: A SAX parser that reads an XML representation of a
- *      Distribution from a file and recreates it as a Distribution Object.
- *      Handles OrderNDistributions and Simple Distributions but
- *      ensure the OrderNDistributions being read in was made using
- *      conditioning and conditioned Alphabets.</p>
+ * A SAX parser that reads an XML representation of a
+ * Distribution from a file and recreates it as a Distribution Object.
+ * Handles OrderNDistributions and Simple Distributions but
+ * ensure the OrderNDistributions being read in was made using
+ * conditioning and conditioned Alphabets.
  *
  * @author Russell Smithies & Mark Schreiber
  * @version 1.0

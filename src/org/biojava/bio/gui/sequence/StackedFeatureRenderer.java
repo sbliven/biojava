@@ -35,7 +35,7 @@ import org.biojava.bio.gui.*;
 import java.util.List;
 
 /**
- * Allows you to stack multiple feature renderers up (e.g. a label renderer and
+ * Allows you to stack multiple feature renderers up (for example a label renderer and
  * a beaded renderer) and have them treated as a single renderer for layout.
  *
  * @author Matthew Pocock

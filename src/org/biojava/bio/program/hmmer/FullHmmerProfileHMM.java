@@ -32,10 +32,12 @@ import org.biojava.bio.dp.*;
 import java.util.*; 
 import java.io.*; 
 
-/** This is a class for representing the full HMMER generated Profile HMM (i.e. including loop
- *  states N and C terminal looping states.
+/** 
+ * This is a class for representing the full HMMER generated Profile HMM (including loop
+ * states N and C terminal looping states).
  *
- *  @author Lachlan Coin
+ * @author Lachlan Coin
+ * @since 1.3
  */
 public class FullHmmerProfileHMM extends SimpleMarkovModel{
 

@@ -25,12 +25,11 @@ import java.util.*;
 import org.biojava.bio.BioException;
 
 /**
- * <p>Title: MergeLocation</p>
- * <p>Description: Produced by LocationTools as a result of union operations.
- *  It's a <code>RangeLocation</code> and can be used
- *  as such but it also retains knowledge of which individual components made
- *  it up. None of the methods of RangeLocation are overridden only new methods
- *  have been added to get the subcomponents.</p>
+ * Produced by LocationTools as a result of union operations.
+ * It's a <code>RangeLocation</code> and can be used
+ * as such but it also retains knowledge of which individual components made
+ * it up. None of the methods of RangeLocation are overridden only new methods
+ * have been added to get the subcomponents.</p>
  *
  *  <p>For example a union operation between the following locations
  * [1,20],[27,45],[30-70] will produce a <code>CompoundLocation</code>

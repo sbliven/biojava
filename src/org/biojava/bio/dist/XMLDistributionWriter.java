@@ -31,9 +31,8 @@ import org.biojava.bio.symbol.*;
 
 
 /**
- * <p>Title:       XMLDistributionWriter </p>
- * <p>Description: Writes an OrderNDistribution or simple Distribution
- *                 to an XML file.</p>
+ * Writes an OrderNDistribution or simple Distribution to an XML file.
+ *
  * @author         Russell Smithies & Mark Schreiber
  * @version        1.0
  */
