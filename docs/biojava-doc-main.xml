@@ -27,13 +27,23 @@
   <title>The BioJava Documentation</title>
   
   <bookinfo>
-    <!-- Add your name as a collaborative author if you contribute -->
+    <!-- Add your name as a collaborative author if you contribute.
+    Authors are in alphabetical order. -->
     <authorgroup>
+      <collab>
+        <collabname>Thomas Down</collabname>
+        <affiliation>
+          <orgname>The Wellcome Trust Sanger Institute</orgname>
+        </affiliation>
+      </collab>
       <collab>
         <collabname>Keith James</collabname>
         <affiliation>
           <orgname>The Wellcome Trust Sanger Institute</orgname>
         </affiliation>
+      </collab>
+      <collab>
+        <collabname>Matthew Pocock</collabname>
       </collab>
     </authorgroup>
 
@@ -82,16 +92,12 @@
   <preface id="bd-pre02">
     <title>Introduction to the documentation</title>
 
-    <para>The documentation takes as its model the <ulink
-    url="http://linuxdoc.org">Linux Documentation Project
-    (LDP)</ulink> which aims to develop free, high quality
-    documentation for the GNU/Linux operating system. By using an
-    SGML/XML-based authoring format (<ulink
-    url="http://www.oasis-open.org/docbook/">DocBook</ulink>) many
-    different types of output may be generated from a single source,
-    including HTML and printable formats, without compromising quality
-    or portability across computing platforms. To find out more about
-    DocBook see <xref linkend="bd-apdx03">.</para>
+    <para>The documentation uses an SGML/XML-based authoring format
+    (<ulink url="http://www.oasis-open.org/docbook/">DocBook</ulink>)
+    which allows different types of output, including HTML and
+    printable formats, to be generated from a single source without
+    compromising quality or portability across computing platforms. To
+    find out more about DocBook see <xref linkend="bd-apdx03">.</para>
   </preface>
 
   <!-- Table of contents is automatically generated here -->
@@ -102,10 +108,10 @@
     <title>Beginning BioJava</title>
 
     <sect1 id="bd-ch01-obtain">
-      <title>Obtaining BioJava</title>
+      <title>Obtaining</title>
 
       <sect2 id="bd-ch01-obtain-bin">
-        <title>Binary distrubution</title>
+        <title>Binary distribution</title>
 
         <para>Binary distributions in .jar (Java ARchive) format may
         be obtained from the <ulink
@@ -113,16 +119,21 @@
         directory</ulink> of the web site <ulink
         url="http://biojava.org/download/">download
         area</ulink>.</para>
-
-        <para>You will also need a Java bytecode generation library
-        (bytecode-0.90.jar) which may be obtained from the same
-        place.</para>
       </sect2>
 
       <sect2 id="bd-ch01-obtain-src">
         <title>Source code distribution</title>
 
-        <para></para>
+        <para>If you want to modify BioJava, you can obtain a copy of
+        the source code from the <ulink
+        url="http://biojava.org/download/source/">source
+        directory</ulink> of the web site <ulink
+        url="http://biojava.org/download/">download
+        area</ulink>. Source releases are distributed in .tar.gz
+        format for Unix machines and as ZIP archives for Windows
+        users. You can also obtain up-to-the-minute source code from
+        the <ulink url="http://cvs.biojava.org">anonymous CVS
+        server</ulink>.</para>
       </sect2>
 
       <sect2 id="bd-ch01-obtain-cvs">
@@ -134,14 +145,104 @@
       <sect2 id="bd-ch01-depend">
         <title>Dependencies</title>
 
-        <para></para>
+        <para>BioJava will compile and run on any computer with a Java
+        virtual machine complying to the Java 2 Standard Edition 1.2
+        (or later) specifications.</para>
+
+        <note>
+          <para>We have seen some problems due to a bug in the Classic
+          VM in Java 1.2. Hotspot for Java 1.2 works fine, as does the
+          Classic VM from later releases.</para
+        </note>
+
+        <para>BioJava requires the following software packages:</para>
+        <itemizedlist>
+          <listitem>
+            <para>A Java bytecode generation library
+            (bytecode-0.90.jar) which may be obtained from the <ulink
+            url="http://biojava.org/download/binaries/">binaries
+            directory</ulink> of the web site <ulink
+            url="http://biojava.org/download/">download
+            area</ulink>.</para>
+          </listitem>
+          <listitem>
+            <para>The <ulink url="http://xml.apache.org">Xerces-J XML
+            parser</ulink>.</para>
+          </listitem>
+        </itemizedlist>
+        
       </sect2>
     </sect1>
 
     <sect1 id="bd-ch01-install">
       <title>Installation</title>
 
-      <para></para>
+      <sect2 id="bd-ch01-install-bin">
+        <title>Binary distribution</title>
+
+        <para>To use the binary distribution add the biojava.jar,
+        bytecode.jar and xerces.jar files to your CLASSPATH
+        environment variable.</para>
+
+        <variablelist>
+          <varlistentry>
+            <term>UNIX (bourne shell)</term>
+            <listitem>
+              <para>
+                <screen>
+export CLASSPATH=/usr/local/share/java/biojava.jar:\
+/usr/local/share/java/xerces.jar:\
+/usr/local/share/java/bytecode.jar:.
+                </screen>
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>UNIX (C shell)</term>
+            <listitem>
+              <para>
+               <screen>
+setenv CLASSPATH /usr/local/share/java/biojava.jar:\
+/usr/local/share/java/xerces.jar:\
+/usr/local/share/java/bytecode.jar:.
+               </screen>
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Windows from command line</term>
+            <listitem>
+              <para>
+               <screen>
+set CLASSPATH C:\biojava.jar;C:\xerces.jar;C:\bytecode.jar;.
+               </screen>
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Windows from autoexec.bat</term>
+            <listitem>
+              <para>
+               <screen>
+set CLASSPATH=C:\biojava.jar;C:\xerces.jar;C:\bytecode.jar;.
+               </screen>
+              </para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </sect2>
+
+      <sect2 id="bd-ch01-install-src">
+        <title>Source distribution</title>
+
+        <para>BioJava uses the <ulink
+        url="http://jakarta.apache.org/ant">Ant build tool</ulink>, a
+        Java equivalent of the common Make utilities. You will need to
+        obtain and install a copy of Ant.</para>
+      </sect2>
     </sect1>
 
     <sect1 id="bd-ch01-demos">
@@ -157,13 +258,16 @@
 
     <itemizedlist>
       <listitem>
-        <para><ulink url="javadoc/index.html">API overview with frames</ulink></para>
+        <para><ulink url="javadoc/index.html">API overview with
+        frames</ulink></para>
       </listitem>
       <listitem>
-        <para><ulink url="javadoc/overview-summary.html">API overview without frames</ulink></para>
+        <para><ulink url="javadoc/overview-summary.html">API overview
+        without frames</ulink></para>
       </listitem>
       <listitem>
-        <para><ulink url="javadoc/index-all.html">Full API index</ulink></para>
+        <para><ulink url="javadoc/index-all.html">Full API
+        index</ulink></para>
       </listitem>
     </itemizedlist>
   </appendix>
@@ -171,7 +275,52 @@
   <appendix label="B" id="bd-apdx02">
     <title>Style guide</title>
 
-    <para></para>
+    <itemizedlist>
+      <listitem>
+        <para>All Java files must contain the license header.</para>
+      </listitem>
+      <listitem>
+        <para>Place an @author tag in every file that you edit. The
+        'maintainer' (either the original author, or the person
+        currently overseeing the code) should be first, and then all
+        other authors follow. Don't be shy - anything from spelling
+        corrections in the JavaDoc through to re-writing a whole
+        method counts.</para>
+      </listitem>
+      <listitem>
+        <para>Always indent with spaces, not tabs. This makes it much
+        easier for those of us with tab-paranoid editors.</para>
+      </listitem>
+      <listitem>
+        <para>Javadoc all interface methods fully. An interface is
+        defined by the method signatures, clear documentation and a
+        reference implementation.</para>
+      </listitem>
+      <listitem>
+        <para> Javadoc class methods when they are not implementing an
+        interface method. Javadoc methods that implement an interface
+        method only if clarification is needed, otherwise trust the
+        documentation inheritance.</para>
+      </listitem>
+      <listitem>
+        <para>Methods should nearly always specify types by interface,
+        not concrete implementations. This makes it easier to extend
+        the code later.</para>
+      </listitem>
+      <listitem>
+        <para>With every interface X that defines a useful object,
+        provide an implementation named SimpleX in the same package
+        that is a plain, pure-Java reference version. This gives other
+        people a clearer idea of what the interface is meant to
+        encapsulate. It also often makes it obvious if something is
+        missing.</para>
+      </listitem>
+      <listitem>
+        <para>Add appropriate unit tests to the test suite for your
+        new class(es). BioJava uses JUnit which makes this a quick and
+        easy task.</para>
+      </listitem>
+    </itemizedlist>
   </appendix>
 
   <appendix label="C" id="bd-apdx03" xreflabel="Appendix C: Using DocBook">
@@ -180,10 +329,10 @@
     <sect1 id="bd-apdx03-whatis">
       <title>What is DocBook</title>
 
-      <para>DocBook is an document authoring system which allows the
+      <para>DocBook is a document authoring system which allows the
       structure and information content of a piece of work to be
       separated from the presentation formatting. Once the document is
-      written there are programs which do all the work of formatting
+      written, there are programs which do all the work of formatting
       it into an elegantly typeset printable document, a series of
       HTML pages or a PDF document, all from the single source.</para>
 
@@ -199,15 +348,15 @@
       <para>The advantage of this approach over an "all-in-one"
       system, such as a WYSIWYG word processor, is that the majority
       of the writing effort can be focussed on the document's content
-      and structure. This is because layout and formatting is carried
+      and structure. This is because layout and formatting are carried
       out automatically, leading to a shorter development cycle and
       greater consistency between the various presentation
       formats.</para>
 
       <para>Java has extensive support for XML document formats,
       making DocBook an obvious choice for BioJava. In addition, the
-      tools available for processing SGML DocBook documents are able
-      to operate on XML DocBook documents.</para>
+      tools available for processing SGML DocBook documents are also
+      able to operate on XML DocBook documents.</para>
     </sect1>
 
     <sect1 id="bd-apdx03-biojava">
