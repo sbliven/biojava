@@ -104,31 +104,31 @@ extends TestCase {
   public void testCardinalitySubConstraint() {
     // zero
     assertTrue("are subconstraint: " + cc_zero + ", " + cc_zero, cc_zero.subConstraintOf(cc_zero));
-    assertFalse("not subconstraint: " + cc_zero_or_one + ", " + cc_zero, cc_zero.subConstraintOf(cc_zero_or_one));
-    assertFalse("not subconstraint: " + cc_one + ", " + cc_zero, cc_zero.subConstraintOf(cc_one));
-    assertFalse("not subconstraint: " + cc_one_or_more + ", " + cc_zero, cc_zero.subConstraintOf(cc_one_or_more));
-    assertFalse("not subconstraint: " + cc_any + ", " + cc_zero, cc_zero.subConstraintOf(cc_any));
+    assertTrue("not subconstraint: " + cc_zero_or_one + ", " + cc_zero, !cc_zero.subConstraintOf(cc_zero_or_one));
+    assertTrue("not subconstraint: " + cc_one + ", " + cc_zero, !cc_zero.subConstraintOf(cc_one));
+    assertTrue("not subconstraint: " + cc_one_or_more + ", " + cc_zero, !cc_zero.subConstraintOf(cc_one_or_more));
+    assertTrue("not subconstraint: " + cc_any + ", " + cc_zero, !cc_zero.subConstraintOf(cc_any));
 
     // zero_or_one
     assertTrue("are subconstraint: " + cc_zero + ", " + cc_zero_or_one, cc_zero_or_one.subConstraintOf(cc_zero));
     assertTrue("are subconstraint: " + cc_zero_or_one + ", " + cc_zero_or_one, cc_zero_or_one.subConstraintOf(cc_zero_or_one));
     assertTrue("are subconstraint: " + cc_one + ", " + cc_zero_or_one, cc_zero_or_one.subConstraintOf(cc_one));
-    assertFalse("not subconstraint: " + cc_one_or_more + ", " + cc_zero_or_one, cc_zero_or_one.subConstraintOf(cc_one_or_more));
-    assertFalse("not subconstraint: " + cc_any + ", " + cc_zero_or_one, cc_zero_or_one.subConstraintOf(cc_any));
+    assertTrue("not subconstraint: " + cc_one_or_more + ", " + cc_zero_or_one, !cc_zero_or_one.subConstraintOf(cc_one_or_more));
+    assertTrue("not subconstraint: " + cc_any + ", " + cc_zero_or_one, !cc_zero_or_one.subConstraintOf(cc_any));
     
     // one
-    assertFalse("not subconstraint: " + cc_zero + ", " + cc_one, cc_one.subConstraintOf(cc_zero));
-    assertFalse("not subconstraint: " + cc_zero_or_one + ", " + cc_one, cc_one.subConstraintOf(cc_zero_or_one));
+    assertTrue("not subconstraint: " + cc_zero + ", " + cc_one, !cc_one.subConstraintOf(cc_zero));
+    assertTrue("not subconstraint: " + cc_zero_or_one + ", " + cc_one, !cc_one.subConstraintOf(cc_zero_or_one));
     assertTrue("are subconstraint: " + cc_one + ", " + cc_one, cc_one.subConstraintOf(cc_one));
-    assertFalse("not subconstraint: " + cc_one_or_more + ", " + cc_one, cc_one.subConstraintOf(cc_one_or_more));
-    assertFalse("not subconstraint: " + cc_any + ", " + cc_one, cc_one.subConstraintOf(cc_any));
+    assertTrue("not subconstraint: " + cc_one_or_more + ", " + cc_one, !cc_one.subConstraintOf(cc_one_or_more));
+    assertTrue("not subconstraint: " + cc_any + ", " + cc_one, !cc_one.subConstraintOf(cc_any));
     
     // one_or_more
-    assertFalse("not subconstraint: " + cc_zero + ", " + cc_one_or_more, cc_one_or_more.subConstraintOf(cc_zero));
-    assertFalse("not subconstraint: " + cc_zero_or_one + ", " + cc_one_or_more, cc_one_or_more.subConstraintOf(cc_zero_or_one));
+    assertTrue("not subconstraint: " + cc_zero + ", " + cc_one_or_more, !cc_one_or_more.subConstraintOf(cc_zero));
+    assertTrue("not subconstraint: " + cc_zero_or_one + ", " + cc_one_or_more, !cc_one_or_more.subConstraintOf(cc_zero_or_one));
     assertTrue("are subconstraint: " + cc_one + ", " + cc_one_or_more, cc_one_or_more.subConstraintOf(cc_one));
     assertTrue("are subconstraint: " + cc_one_or_more + ", " + cc_one_or_more, cc_one_or_more.subConstraintOf(cc_one_or_more));
-    assertFalse("not subconstraint: " + cc_any + ", " + cc_one_or_more, cc_one_or_more.subConstraintOf(cc_any));
+    assertTrue("not subconstraint: " + cc_any + ", " + cc_one_or_more, !cc_one_or_more.subConstraintOf(cc_any));
     
     // any
     assertTrue("are subconstraint: " + cc_zero + ", " + cc_any, cc_any.subConstraintOf(cc_zero));
@@ -146,21 +146,21 @@ extends TestCase {
     assertTrue("are subconstraint: " + pc_any + ", " + pc_class_arraylist, pc_any.subConstraintOf(pc_class_arraylist));
 
     // pc_class_string
-    assertFalse("not subconstraint: " + pc_class_string + ", " + pc_any, pc_class_string.subConstraintOf(pc_any));
+    assertTrue("not subconstraint: " + pc_class_string + ", " + pc_any, !pc_class_string.subConstraintOf(pc_any));
     assertTrue("are subconstraint: " + pc_class_string + ", " + pc_class_string, pc_class_string.subConstraintOf(pc_class_string));
-    assertFalse("not subconstraint: " + pc_class_string + ", " + pc_class_list, pc_class_string.subConstraintOf(pc_class_list));
-    assertFalse("not subconstraint: " + pc_class_string + ", " + pc_class_arraylist, pc_class_string.subConstraintOf(pc_class_arraylist));
+    assertTrue("not subconstraint: " + pc_class_string + ", " + pc_class_list, !pc_class_string.subConstraintOf(pc_class_list));
+    assertTrue("not subconstraint: " + pc_class_string + ", " + pc_class_arraylist, !pc_class_string.subConstraintOf(pc_class_arraylist));
 
     // pc_class_list
-    assertFalse("not subconstraint: " + pc_class_list + ", " + pc_any, pc_class_list.subConstraintOf(pc_any));
-    assertFalse("not subconstraint: " + pc_class_list + ", " + pc_class_string, pc_class_list.subConstraintOf(pc_class_string));
+    assertTrue("not subconstraint: " + pc_class_list + ", " + pc_any, !pc_class_list.subConstraintOf(pc_any));
+    assertTrue("not subconstraint: " + pc_class_list + ", " + pc_class_string, !pc_class_list.subConstraintOf(pc_class_string));
     assertTrue("are subconstraint: " + pc_class_list + ", " + pc_class_list, pc_class_list.subConstraintOf(pc_class_list));
     assertTrue("are subconstraint: " + pc_class_list + ", " + pc_class_arraylist, pc_class_list.subConstraintOf(pc_class_arraylist));
 
     // pc_class_arraylist
-    assertFalse("not subconstraint: " + pc_class_arraylist + ", " + pc_any, pc_class_arraylist.subConstraintOf(pc_any));
-    assertFalse("not subconstraint: " + pc_class_arraylist + ", " + pc_class_string, pc_class_arraylist.subConstraintOf(pc_class_string));
-    assertFalse("not subconstraint: " + pc_class_arraylist + ", " + pc_class_list, pc_class_arraylist.subConstraintOf(pc_class_list));
+    assertTrue("not subconstraint: " + pc_class_arraylist + ", " + pc_any, !pc_class_arraylist.subConstraintOf(pc_any));
+    assertTrue("not subconstraint: " + pc_class_arraylist + ", " + pc_class_string, !pc_class_arraylist.subConstraintOf(pc_class_string));
+    assertTrue("not subconstraint: " + pc_class_arraylist + ", " + pc_class_list, !pc_class_arraylist.subConstraintOf(pc_class_list));
     assertTrue("are subconstraint: " + pc_class_arraylist + ", " + pc_class_arraylist, pc_class_arraylist.subConstraintOf(pc_class_arraylist));
   }
   
@@ -170,47 +170,47 @@ extends TestCase {
     assertTrue("are subconstraints: " + pc_exact_dog + ", " + pc_exact_dog, pc_exact_dog.subConstraintOf(pc_exact_dog));
     
     // not self
-    assertFalse("not subconstraints: " + pc_exact_fish + ", " + pc_exact_dog, pc_exact_fish.subConstraintOf(pc_exact_dog));
-    assertFalse("not subconstraints: " + pc_exact_dog + ", " + pc_exact_fish, pc_exact_dog.subConstraintOf(pc_exact_fish));
+    assertTrue("not subconstraints: " + pc_exact_fish + ", " + pc_exact_dog, !pc_exact_fish.subConstraintOf(pc_exact_dog));
+    assertTrue("not subconstraints: " + pc_exact_dog + ", " + pc_exact_fish, !pc_exact_dog.subConstraintOf(pc_exact_fish));
     
     // vs all
-    assertFalse("not subconstraints: " + pc_exact_fish + ", " + pc_any, pc_exact_fish.subConstraintOf(pc_any));
+    assertTrue("not subconstraints: " + pc_exact_fish + ", " + pc_any, !pc_exact_fish.subConstraintOf(pc_any));
     assertTrue("are subconstraints: " + pc_any + ", " + pc_exact_fish, pc_any.subConstraintOf(pc_exact_fish));
     
     // vs pc_class_string
-    assertFalse("not subconstraints: " + pc_exact_fish + ", " + pc_class_string, pc_exact_fish.subConstraintOf(pc_class_string));
+    assertTrue("not subconstraints: " + pc_exact_fish + ", " + pc_class_string, !pc_exact_fish.subConstraintOf(pc_class_string));
     assertTrue("are subconstraints: " + pc_class_string + ", " + pc_exact_fish, pc_class_string.subConstraintOf(pc_exact_fish));
     
     // vs pc_class_list
-    assertFalse("not subconstraints: " + pc_exact_fish + ", " + pc_class_list, pc_exact_fish.subConstraintOf(pc_class_list));
-    assertFalse("not subconstraints: " + pc_class_list + ", " + pc_exact_fish, pc_class_list.subConstraintOf(pc_exact_fish));
+    assertTrue("not subconstraints: " + pc_exact_fish + ", " + pc_class_list, !pc_exact_fish.subConstraintOf(pc_class_list));
+    assertTrue("not subconstraints: " + pc_class_list + ", " + pc_exact_fish, !pc_class_list.subConstraintOf(pc_exact_fish));
   }
   
   public void testEnumProperties() {
     // all
     assertTrue("are subconstraints: " + pc_any + ", " + pc_enum_animals, pc_any.subConstraintOf(pc_enum_animals));
-    assertFalse("not subconstraints: " + pc_enum_animals + ", " + pc_any, pc_enum_animals.subConstraintOf(pc_any));
+    assertTrue("not subconstraints: " + pc_enum_animals + ", " + pc_any, !pc_enum_animals.subConstraintOf(pc_any));
     
     // compare them
     assertTrue("are subconstraints: " + pc_enum_animals + ", " + pc_enum_animals, pc_enum_animals.subConstraintOf(pc_enum_animals));
     assertTrue("are subconstraints: " + pc_enum_animals + ", " + pc_enum_birds, pc_enum_animals.subConstraintOf(pc_enum_birds));
-    assertFalse("not subconstraints: " + pc_enum_animals + ", " + pc_enum_colors, pc_enum_animals.subConstraintOf(pc_enum_colors));
-    assertFalse("not subconstraints: " + pc_enum_birds + ", " + pc_enum_animals, pc_enum_birds.subConstraintOf(pc_enum_animals));
+    assertTrue("not subconstraints: " + pc_enum_animals + ", " + pc_enum_colors, !pc_enum_animals.subConstraintOf(pc_enum_colors));
+    assertTrue("not subconstraints: " + pc_enum_birds + ", " + pc_enum_animals, !pc_enum_birds.subConstraintOf(pc_enum_animals));
     
     // to pc_class_string
-    assertFalse("not subconstraints: " + pc_enum_animals + ", " + pc_class_string, pc_enum_animals.subConstraintOf(pc_class_string));
+    assertTrue("not subconstraints: " + pc_enum_animals + ", " + pc_class_string, !pc_enum_animals.subConstraintOf(pc_class_string));
     assertTrue("are subconstraints: " + pc_class_string + ", " + pc_enum_animals, pc_class_string.subConstraintOf(pc_enum_animals));
     
     // to pc_exact_dog
     assertTrue("are subconstraints: " + pc_enum_animals + ", " + pc_exact_dog, pc_enum_animals.subConstraintOf(pc_exact_dog));
-    assertFalse("not subconstraints: " + pc_exact_dog + ", " + pc_enum_animals, pc_exact_dog.subConstraintOf(pc_enum_animals));
-    assertFalse("not subconstraints: " + pc_enum_colors + ", " + pc_exact_dog, pc_enum_colors.subConstraintOf(pc_exact_dog));
+    assertTrue("not subconstraints: " + pc_exact_dog + ", " + pc_enum_animals, !pc_exact_dog.subConstraintOf(pc_enum_animals));
+    assertTrue("not subconstraints: " + pc_enum_colors + ", " + pc_exact_dog, !pc_enum_colors.subConstraintOf(pc_exact_dog));
   }
   
   public void testAllTypes() {
     // all
     assertTrue("are subconstraints: " + at_any + ", " + at_color, at_any.subTypeOf(at_color));
-    assertFalse("not subconstraints: " + at_color + ", " + at_any, at_color.subTypeOf(at_any));
+    assertTrue("not subconstraints: " + at_color + ", " + at_any, !at_color.subTypeOf(at_any));
   }
   
   public void testColorTypes() {
@@ -218,12 +218,12 @@ extends TestCase {
     assertTrue("are subtypes: " + at_colorsish + ", " + at_colors, at_colorsish.subTypeOf(at_colors));
     assertTrue("are subtypes: " + at_colorsish + ", " + at_color, at_colorsish.subTypeOf(at_color));
 
-    assertFalse("not subtypes: " + at_colors + ", " + at_colorsish, at_colors.subTypeOf(at_colorsish));
+    assertTrue("not subtypes: " + at_colors + ", " + at_colorsish, !at_colors.subTypeOf(at_colorsish));
     assertTrue("are subtypes: " + at_colors + ", " + at_colors, at_colors.subTypeOf(at_colors));
     assertTrue("are subtypes: " + at_colors + ", " + at_color, at_colors.subTypeOf(at_color));
 
-    assertFalse("not subtypes: " + at_color + ", " + at_colorsish, at_color.subTypeOf(at_colorsish));
-    assertFalse("not subtypes: " + at_color + ", " + at_colors, at_color.subTypeOf(at_colors));
+    assertTrue("not subtypes: " + at_color + ", " + at_colorsish, !at_color.subTypeOf(at_colorsish));
+    assertTrue("not subtypes: " + at_color + ", " + at_colors, !at_color.subTypeOf(at_colors));
     assertTrue("are subtypes: " + at_color + ", " + at_color, at_color.subTypeOf(at_color));
   }
   
@@ -232,12 +232,12 @@ extends TestCase {
     assertTrue("are subtypes: " + at_color + ", " + at_color_name, at_color.subTypeOf(at_color_name));
     assertTrue("are subtypes: " + at_color + ", " + at_color, at_color_dog.subTypeOf(at_color_dog));
 
-    assertFalse("not subtypes: " + at_color_name + ", " + at_color, at_color_name.subTypeOf(at_color));
+    assertTrue("not subtypes: " + at_color_name + ", " + at_color, !at_color_name.subTypeOf(at_color));
     assertTrue("are subtypes: " + at_color_name + ", " + at_color_name, at_color_name.subTypeOf(at_color_name));
     assertTrue("are subtypes: " + at_color_name + ", " + at_color_dog, at_color_name.subTypeOf(at_color_dog));
 
-    assertFalse("not subtypes: " + at_color_dog + ", " + at_color, at_color_dog.subTypeOf(at_color));
-    assertFalse("not subtypes: " + at_color_dog + ", " + at_color_name, at_color_dog.subTypeOf(at_color_name));
+    assertTrue("not subtypes: " + at_color_dog + ", " + at_color, !at_color_dog.subTypeOf(at_color));
+    assertTrue("not subtypes: " + at_color_dog + ", " + at_color_name, !at_color_dog.subTypeOf(at_color_name));
     assertTrue("are subtypes: " + at_color_dog + ", " + at_color_dog, at_color_dog.subTypeOf(at_color_dog));
   }
 }

@@ -21,11 +21,35 @@
 
 package org.biojava.bio.symbol;
 
+import java.util.Iterator;
 import junit.framework.TestCase;
 import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.utils.NestedError;
 
 public class MotifToolsTest
     extends TestCase {
+    
+    protected String n;
+    
+    protected void setUp() {
+      try {
+        StringBuffer sb = new StringBuffer();
+        sb.append("[");
+        SymbolTokenization sTok = DNATools.getDNA().getTokenization("token");
+        FiniteAlphabet na = (FiniteAlphabet) DNATools.n().getMatches();
+        for(Iterator i = na.iterator(); i.hasNext(); ) {
+          Symbol sym = (Symbol) i.next();
+          sb.append(sTok.tokenizeSymbol(sym));
+        }
+        sb.append("]");
+        
+        n = sb.toString();
+      } catch (Exception e) {
+        throw new NestedError(e, "Couldn't initialize motif tools test");
+      }
+    }
+      
     public MotifToolsTest(String name) {
         super(name);
     }
@@ -67,19 +91,19 @@ public class MotifToolsTest
     }
 
     public void testAmbStart() {
-        doTest("ngct", "[tacg]gct");
+        doTest("ngct", n + "gct");
     }
 
     public void testAmbMiddle() {
-        doTest("anct", "a[tacg]ct");
+        doTest("anct", "a" + n + "ct");
     }
 
     public void testAmbEnd() {
-        doTest("agcn", "agc[tacg]");
+        doTest("agcn", "agc" + n);
     }
 
     public void testTwoAmbOnly() {
-        doTest("nn", "[tacg]{2}");
+        doTest("nn", n + "{2}");
     }
 
     void doTest(String pattern, String target) {
