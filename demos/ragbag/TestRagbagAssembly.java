@@ -17,7 +17,9 @@ public class TestRagbagAssembly {
       File f = new File(args[0]);
 
       RagbagSequenceFactory sf = new RagbagSoftRefSeqFactory();
-      RagbagAssembly rs = new RagbagAssembly(f, sf);
+
+      RagbagAssembly rs = new RagbagAssembly(f, sf, new RagbagHashedComponentDirectory());
+//      RagbagAssembly rs = new RagbagAssembly(f, sf, RagbagComponentDirectory.UNLOGGED);
 
       System.out.println("completed RagbagDirectoryHandler");
 

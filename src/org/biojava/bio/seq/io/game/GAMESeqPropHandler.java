@@ -36,7 +36,7 @@ import org.xml.sax.*;
  * Handles the GAME &lt;seq&gt; element
  *
  * @since David Huen
- * @since 1.8
+ * @since 1.2
  */
 public class GAMESeqPropHandler 
                extends StAXPropertyHandler 
@@ -99,7 +99,7 @@ public class GAMESeqPropHandler
 	 throws SAXException
   {
     // pick up the sequence details set them on the sequence object
-    // I will assume the length is equivalent to the coordinate ragne
+    // I will assume the length is equivalent to the coordinate range
     String lengthString =  attrs.getValue("length");
 
     if (lengthString != null) {
