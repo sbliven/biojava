@@ -100,7 +100,8 @@ public class EmblFormat implements SequenceFormat {
 	private List residues;
 	private FeatureTableParser features;
 
-	private String accession;
+	private Annotation annotation;
+	private List accession;
 
 	EmblContext(ResidueParser resParser, SequenceFactory sf) {
 	    this.resParser = resParser;
@@ -108,6 +109,8 @@ public class EmblFormat implements SequenceFormat {
 
 	    residues = new ArrayList();
 	    features = new FeatureTableParser(featureBuilder);
+	    annotation = new SimpleAnnotation();
+	    accession = new ArrayList();
 	}
 
 	void processLine(String line) throws SeqException {
@@ -120,7 +123,10 @@ public class EmblFormat implements SequenceFormat {
 		features.endFeature();
 
 	    if (tag.equals("AC")) {
-		accession = line.substring(5, line.length()-1);
+		String acc= line.substring(5, line.length()-1);
+		StringTokenizer toke = new StringTokenizer(acc, "; ");
+		while (toke.hasMoreTokens())
+		    accession.add(toke.nextToken());
 	    } else if (tag.equals("FT")) {
 		if (line.charAt(5) != ' ') {
 		    // Has a featureType field -- should be a new feature
@@ -151,11 +157,18 @@ public class EmblFormat implements SequenceFormat {
 
 	Sequence makeSequence() throws SeqException {
 	    Sequence ss;
+	    String primaryAcc = "unknown";
+
+	    if (accession.size() > 0) {
+		primaryAcc = (String) accession.get(0);
+		annotation.setProperty("embl_accessions", accession);
+	    }
+
 	    ss = sf.createSequence(new SimpleResidueList(
 				   resParser.alphabet(),residues),
-				    "urn:whatever",
-				    accession,
-				    Annotation.EMPTY_ANNOTATION);
+				    "urn:sequence/embl:" + primaryAcc,
+				    primaryAcc,
+				    annotation);
 	    for (Iterator i = features.getFeatures().iterator(); i.hasNext(); ) {
 		ss.createFeature((MutableFeatureHolder) ss, (Feature.Template) i.next());
 	    }

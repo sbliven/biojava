@@ -92,7 +92,7 @@ class FeatureTableParser {
 	    break;
 	case ATTRIBUTE:
 	    featureBuf.append(line);
-	    if (countChar(featureBuf, '"') == 2) {
+	    if (countChar(featureBuf, '"') % 2 == 0) {
 		processAttribute(featureBuf.toString());
 		featureStatus = WITHIN;
 	    }
@@ -205,7 +205,24 @@ class FeatureTableParser {
 	    int max = attr.length();
 	    if (attr.charAt(max - 1) == '"')
 		--max;
-	    featureAttributes.put(tag, attr.substring(eqPos, max));
+	    String val = attr.substring(eqPos, max);
+	    if (val.indexOf('"') >= 0) {
+		StringBuffer sb = new StringBuffer();
+		boolean escape = false;
+		for (int i = 0; i < val.length(); ++i) {
+		    char c = val.charAt(i);
+		    if (c == '"') {
+			if (escape)
+			    sb.append(c);
+			escape = !escape;
+		    } else {
+			sb.append(c);
+			escape = false;
+		    }
+		}
+		val = sb.toString();
+	    }
+	    featureAttributes.put(tag, val);
 	}
     }
 
