@@ -97,6 +97,7 @@ public class SAX2StAXAdaptor implements ContentHandler {
 	     {
 		 current = new HandlerBinding(handler);
 		 stack.add(current);
+		 current.handler.startTree();
 		 current.handler.startElement(nsURI,
 					      localName,
 					      qName,
@@ -114,6 +115,7 @@ public class SAX2StAXAdaptor implements ContentHandler {
 	current.handler.endElement(nsURI, localName, qName);
 	current.count--;
 	while (current.count == 0 && stack.size() > 1) {
+	    current.handler.endTree();
 	    stack.remove(stack.size() - 1);
 	    current = (HandlerBinding) stack.get(stack.size() - 1);
 	    current.handler.endElement(nsURI, localName, qName);

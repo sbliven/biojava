@@ -74,6 +74,12 @@ public final class ChangeType implements Serializable {
    * use this when there is another, more sensible, option. This
    * is the fallback for when you realy don't know what else to
    * do.
+   *
+   * <p>
+   * As of BioJava 1.2, this type is the root of the ChangeType
+   * hierarchy.  Listening for this type is equivalent to listening
+   * for all ChangeTypes.
+   * </p>
    */
   public static final ChangeType UNKNOWN;
 
