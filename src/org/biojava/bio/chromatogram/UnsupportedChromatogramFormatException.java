@@ -26,6 +26,8 @@ package org.biojava.bio.chromatogram;
  * a supported chromatogram format.
  *
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
+ * @author Matthew Pocock
+ * @since 1.3
  */
 public class UnsupportedChromatogramFormatException extends org.biojava.bio.BioException {
   /**

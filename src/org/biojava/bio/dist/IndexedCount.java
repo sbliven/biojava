@@ -50,6 +50,7 @@ import org.biojava.utils.ChangeVetoException;
  *
  * @author Matthew Pocock
  * @author Mark Schreiber (serialization)
+ * @since 1.1
  */
 public final class IndexedCount
   extends
@@ -199,10 +200,20 @@ public final class IndexedCount
     symbolIndices = null;
   }
 
+  /**
+   * Get a new IdexedCount for an alphabet using the default indexer.
+   *
+   * @param fa  the FiniteAlphabet to count
+   */
   public IndexedCount(FiniteAlphabet fa) {
     this(AlphabetManager.getAlphabetIndex(fa));
   }
 
+  /**
+   * Get a new InexedCount for an alphabet indexer.
+   *
+   * @param indexer  the AlphabetIndex used to map between symbols and indecies
+   */
   public IndexedCount(AlphabetIndex indexer) {
     indexer.addChangeListener(ChangeListener.ALWAYS_VETO, AlphabetIndex.INDEX);
     this.indexer = indexer;

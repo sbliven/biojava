@@ -36,16 +36,13 @@ import org.biojava.bio.symbol.FiniteAlphabet;
  
 public class UntrainableDistribution extends SimpleDistribution {
     /**
-     * Construct a new untrainable distribution over the specified alphabet
+     * Construct a new untrainable distribution over the specified alphabet.
+     *
+     * @param alpha  the finite alphabet to be over
      */
-    
     public UntrainableDistribution(FiniteAlphabet alpha) {
         super(alpha);
     }
-    
-    /**
-     * Dummy implementation which registers an IgnoreCountsTrainer.
-     */
     
     public void registerWithTrainer(DistributionTrainerContext dtc) {
         dtc.registerTrainer(this, IgnoreCountsTrainer.getInstance());

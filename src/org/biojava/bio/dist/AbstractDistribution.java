@@ -63,6 +63,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Thomas Down
  * @author Mark Schreiber (serialization support)
  * @author Greg Cox
+ * @since 1.0
  */
 
 public abstract class AbstractDistribution
@@ -72,11 +73,20 @@ public abstract class AbstractDistribution
     Distribution,
     Serializable
 {
+  /**
+   * Forwarder for modifications to the null model.
+   */
   protected transient Distribution.NullModelForwarder nullModelForwarder = null;
-  protected Map symbolIndices = null;//used for serialization
+
+  /**
+   * Used for serialization.
+   */
+  protected Map symbolIndices = null;
 
   /**
    * Governs serialization behaivour.
+   *
+   * @param stream  the ObjectOutputStream to write to
    */
   private void writeObject(ObjectOutputStream stream)throws IOException{
     AlphabetIndex index = AlphabetManager.getAlphabetIndex((FiniteAlphabet)getAlphabet());
@@ -107,6 +117,19 @@ public abstract class AbstractDistribution
     return changeSupport;
   }
 
+  /**
+   * Implement this to actualy set the weight.
+   *
+   * <p>
+   * Do not inform any listneres. This has already been done for you. Just
+   * update state.
+   * </p>
+   *
+   * @param sym     the AtomicSymbol to update for
+   * @param weight  the new weight for that symbol
+   * @throws IllegalSymbolException if the symbol is not known
+   * @throws ChangeVetoException    if the change is to be prevented
+   */
   abstract protected void setWeightImpl(AtomicSymbol sym, double weight)
   throws IllegalSymbolException, ChangeVetoException;
 
@@ -116,6 +139,11 @@ public abstract class AbstractDistribution
    * This implementation informs all listeners of the change, and then calls
    * setWeightImpl to make the actual change. Sub-classes should over-ride
    * setWeightImpl to implement the actual storage of the weights.
+   *
+   * @param sym  the Symbol to set the weight for
+   * @param weight  it's new weight
+   * @throws IllegalSymbolException if sym is not known
+   * @throws ChangeVetoException    if the update was prevented
    */
   final public void setWeight(Symbol sym, double weight)
   throws IllegalSymbolException, ChangeVetoException {
@@ -154,6 +182,19 @@ public abstract class AbstractDistribution
     }
   }
 
+  /**
+   * Implemnet this to set the null model.
+   *
+   * <p>
+   * You should not inform any change listeners in this method. All of that
+   * work has been done for you.
+   * </p>
+   *
+   * @param nullModel  the new null model Distribution
+   * @throws IllegalAlphabetException if the null model is for the wrong alphabet
+   * @throws ChangeVetoException  if your implementation wishes to block this
+   *    opperation
+   */
   abstract protected void setNullModelImpl(Distribution nullModel)
   throws IllegalAlphabetException, ChangeVetoException;
 
@@ -201,7 +242,7 @@ public abstract class AbstractDistribution
    * for each attomic symbol should be calculated by the getWeightImpl
    * functions.
    *
-   * @param amb the Symbol to find the probability of
+   * @param sym the Symbol to find the probability of
    * @return the probability that one of the symbols matching amb was emitted
    * @throws IllegalSymbolException if for any reason the symbols within amb
    *         are not recognized by this state
@@ -240,6 +281,15 @@ public abstract class AbstractDistribution
     }
   }
 
+  /**
+   * Over-ride this method to implement getting the weigth for an attomic
+   * symbol. You should just do what is necisary to fetch state. All the work
+   * with exceptions and listeners will have been handled for you.
+   *
+   * @param sym   the AtomicSymbol to get the weight for
+   * @return      the weight
+   * @throws IllegalSymbolException if sym is not known
+   */
   protected abstract double getWeightImpl(AtomicSymbol sym)
   throws IllegalSymbolException;
 
@@ -276,6 +326,8 @@ public abstract class AbstractDistribution
    * Register an IgnoreCountsTrainer instance as the trainer for this
    * distribution.  Override this if you wish to implement a trainable
    * distribution.
+   *
+   * @param dtc  the context to register with
    */
   public void registerWithTrainer(DistributionTrainerContext dtc) {
     dtc.registerTrainer(this, IgnoreCountsTrainer.getInstance());

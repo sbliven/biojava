@@ -67,6 +67,12 @@ public interface EcNumber {
    */
   public int getClassNumber(int level);
 
+  /**
+   * A simple implementation of EcNumber.
+   *
+   * @author Matthew Pocock
+   * @since 1.4
+   */
   public static class Impl
   implements EcNumber {
     private int[] classes;
@@ -156,6 +162,17 @@ public interface EcNumber {
         getClassNumber(3);
     }
 
+    /**
+     * Process a string into an EcNumber.
+     *
+     * <p>
+     * This method uses the {@link EcNumber#EC_PATTERN} regular expression.
+     * </p>
+     *
+     * @param ecString  String to parse
+     * @return a new EcNumber
+     * @throws IllegalArgumentException  if ecString could not be parsed
+     */
     public static Impl valueOf(String ecString) {
       return new Impl(ecString);
     }

@@ -49,6 +49,7 @@ import org.biojava.utils.ListTools;
  * @author Matthew Pocock
  * @author Thomas Down
  * @author Samiul Hasan
+ * @since 1.1
  */
 
 
@@ -61,6 +62,14 @@ implements Serializable, Distribution {
     cache = new HashMap();
   }
 
+  /**
+   * Get a uniform null model over a PairDistribution over [first,second].
+   *
+   * @param first   the first Alphabet
+   * @param second  the second Alphabet
+   * @return    a Distribution that is a uniform distribution over the product
+   *    of first and second
+   */
   protected static Distribution getNullModel(Distribution first, Distribution second) {
     synchronized(cache) {
       first = first.getNullModel();
@@ -141,6 +150,16 @@ implements Serializable, Distribution {
     );
   }
 
+  /**
+   * Create a new PairDistribution that represents the product of two other
+   * distributions. The alphabet will be the product of the first and seccond
+   * distribution's alphabets, and the weights will be the products of the
+   * weights for the first and seccond distributions given the first and second
+   * component of the symbol respectively.
+   *
+   * @param first   the first distribution
+   * @param second  the second distribution
+   */
   public PairDistribution(Distribution first, Distribution second) {
     this.first = first;
     this.second = second;

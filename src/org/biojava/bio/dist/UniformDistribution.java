@@ -37,6 +37,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Matthew Pocock
  * @author Mark Schreiber
  * @author Thomas Down
+ * @since 1.0
  */
 
 public class UniformDistribution
@@ -56,10 +57,14 @@ public class UniformDistribution
   public Distribution getNullModel() {
     return nullModel;
   }
-   /**
-  *Assign a background distribution
-  * @param nullModel the background distribution to assign
-  */
+
+  /**
+   * Assign a background distribution.
+   *
+   * @param nullModel the background distribution to assign
+   * @throws IllegalAlphabetException if nullModel is over an incompattible
+   *    alphabet
+   */
   protected void setNullModelImpl(Distribution nullModel)
   throws IllegalAlphabetException {
     this.nullModel = nullModel;
@@ -81,6 +86,11 @@ public class UniformDistribution
     dtc.registerTrainer(this, IgnoreCountsTrainer.getInstance());
   }
 
+  /**
+   * Create a new UniformDistribution.
+   *
+   * @param alphabet  the finite alphabet to be over
+   */
   public UniformDistribution(FiniteAlphabet alphabet) {
     this.alphabet = alphabet;
     this.nullModel = this;

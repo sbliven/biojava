@@ -40,6 +40,7 @@ import org.biojava.utils.Unchangeable;
  * symbol has a matches alphabet that contains the empty set. Or is this so?
  *
  * @author Matthew Pocock
+ * @since 1.0
  */
 public class GapDistribution
   extends
@@ -83,7 +84,12 @@ public class GapDistribution
   public void registerWithTrainer(DistributionTrainerContext dtc) {
     dtc.registerTrainer(this, IgnoreCountsTrainer.getInstance());
   }
-  
+
+  /**
+   * Get a GapDistribution for an alphabet.
+   *
+   * @param alpha  the Alphabet that this distribution is over
+   */
   public GapDistribution(Alphabet alpha) {
     this.alpha = alpha;
   }

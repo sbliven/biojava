@@ -31,8 +31,8 @@ import org.biojava.utils.*;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ * @since 1.4
  */
- 
 class NoneCollectionConstraint implements CollectionConstraint {
   public boolean accept(Object value) {
     return false;

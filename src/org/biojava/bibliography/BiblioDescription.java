@@ -42,6 +42,7 @@ package org.biojava.bibliography;
  *
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
  * @version $Id$
+ * @since 1.3
  */
 
 public class BiblioDescription {

@@ -41,10 +41,12 @@ import org.biojava.utils.SmallMap;
  * </p>
  *
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
+ * @author Matthew Pocock
+ * @since 1.3
  */
 public class SimpleChromatogram extends AbstractChromatogram {
     
-    /** Creates a new instance of SimpleChromatogram */
+    /** Creates a new instance of SimpleChromatogram. */
     public SimpleChromatogram() {
         super();
     }

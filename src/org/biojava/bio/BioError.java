@@ -43,6 +43,8 @@ package org.biojava.bio;
  * @for.developer
  * Throw this when something has gone wrong and in general people should not be
  * handeling it.
+ *
+ * @since 1.0
  */
 public class BioError extends Error {
   /**

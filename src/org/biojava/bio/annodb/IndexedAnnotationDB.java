@@ -49,6 +49,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * <p>A database of Annotation instances backed by an indexed file set.</p>
  *
  * @author Matthew Pocock
+ * @since 1.3
  */
 public class IndexedAnnotationDB
 implements AnnotationDB {

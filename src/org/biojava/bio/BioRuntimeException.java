@@ -49,6 +49,8 @@ package org.biojava.bio;
  * Catch the failure and throw it as a BioError. If you want people to handle
  * this gracefully in their scripts, then document this behavior and hope they
  * catch the error.
+ *
+ * @since 1.0
  */
 
 public class BioRuntimeException extends RuntimeException {

@@ -43,12 +43,14 @@ import org.biojava.utils.StaticMemberPlaceHolder;
  * </p>
  *
  * @author Matthew Pocock
+ * @since 1.0
  */
 public interface DistributionFactory {
   /**
    * Generate a new Distribution as requested.
    *
    * @param alpha  the emission alphabet for the state
+   * @return a new Distribution instance
    * @throws IllegalAlphabetException if the factory is unable to generate a
    *         distribution for the required alphabet
    */

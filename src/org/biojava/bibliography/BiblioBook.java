@@ -31,6 +31,7 @@ package org.biojava.bibliography;
  *
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
  * @version $Id$
+ * @since 1.3
  */
 
 public class BiblioBook
@@ -47,7 +48,7 @@ public class BiblioBook
     public String volume;
 
   /**
-   * Edition
+   * Edition.
    */
     public String edition;
 
@@ -57,7 +58,7 @@ public class BiblioBook
     public String series;
 
   /**
-   * Editor
+   * Editor.
    */ 
     public BiblioProvider editor;
 

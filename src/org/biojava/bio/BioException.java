@@ -36,6 +36,8 @@ package org.biojava.bio;
  * @for.powerUser
  * Be sure to wrap up any causual throwable. It makes debugging your (and
  * other peoples') code much easier.
+ *
+ * @since 1.0
  */
 public class BioException extends Exception {
   /**

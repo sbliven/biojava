@@ -40,6 +40,7 @@ import org.biojava.utils.Changeable;
  * </p>
  *
  * @author Matthew Pocock
+ * @since 1.1
  */
 public interface Count extends Changeable {
   /**
@@ -72,6 +73,7 @@ public interface Count extends Changeable {
    * Return the counts for a given Symbol.
    *
    * @param s the Symbol
+   * @return  the number of counts for this symbol
    * @throws IllegalSymbolException if s is not from this Count's alphabet
    */
   double getCount(AtomicSymbol s) throws IllegalSymbolException;

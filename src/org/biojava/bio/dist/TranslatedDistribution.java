@@ -46,6 +46,7 @@ import org.biojava.utils.ChangeVetoException;
  * distribution.
  *
  * @author Matthew Pocock
+ * @since 1.1
  */
 public class TranslatedDistribution
   extends
@@ -60,7 +61,14 @@ public class TranslatedDistribution
   private transient ChangeListener forwarder;
 
   /**
-   * Users should make these thigs via getDistribuiton.
+   * Create a new TranslatedDistribution.
+   *
+   * @for.user make these thigs via getDistribuiton.
+   *
+   * @param table    a ReversibleTranslationTable used to map the symbols
+   * @param other    the underlying ditribution
+   * @param distFact a DistributionFactory used to create a delegate for
+   *    stooring mapped weights
    */
   public TranslatedDistribution(
     ReversibleTranslationTable table,

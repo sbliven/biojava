@@ -49,6 +49,7 @@ import org.biojava.bio.symbol.Symbol;
  * @author Thomas Down
  * @author Samiul Hasan
  * @author Matthew Pocock
+ * @since 1.0
  */
 
 public interface OrderNDistribution extends Distribution {
@@ -58,6 +59,8 @@ public interface OrderNDistribution extends Distribution {
      * of those alphabets.  If it is a cross-product of more than two alphabets,
      * the conditioning alphabet is the cross-product of all but the last
      * alphabet.
+     *
+     * @return the conditioning Alphabet
      */
 
     public Alphabet getConditioningAlphabet();
@@ -66,12 +69,29 @@ public interface OrderNDistribution extends Distribution {
      * Get the conditioned alphabet.  This is the last alphabet in the
      * distribution's overall cross-product.  It will be the alphabet of
      * all the sub-distributions contained within this OrderNDistribution.
+     *
+     * @return the conditioned Alphabet
      */
 
     public Alphabet getConditionedAlphabet();
 
+  /**
+   * Get the conditioned distributions.
+   *
+   * @return  the conditioned distributions
+   */
+  //fixme: I'm sure this should return a list
     public Collection conditionedDistributions();
 
+  /**
+   * Set the distribution assocated with a symbol.
+   *
+   * @param sym   the symbol in the conditioning Alphabet
+   * @param dist  a distribution over the conditioned Alphabet
+   * @throws IllegalSymbolException   if sym is not in the conditioning Alphabet
+   * @throws IllegalAlphabetException if dist is not over the conditioned
+   *    Alphabet
+   */
       public abstract void setDistribution(Symbol sym, Distribution dist)
       throws IllegalSymbolException, IllegalAlphabetException;
   

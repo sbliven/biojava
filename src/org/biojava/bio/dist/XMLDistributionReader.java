@@ -53,10 +53,15 @@ import org.xml.sax.helpers.DefaultHandler;
  * ensure the OrderNDistributions being read in was made using
  * conditioning and conditioned Alphabets.
  *
- * @author Russell Smithies & Mark Schreiber
- * @version 1.0
+ * @author Russell Smithies
+ * @author Mark Schreiber
+ * @author Matthew Pocock
+ * @since 1.3
  */
 public class XMLDistributionReader extends DefaultHandler {
+  //fixme: the handler and the user API seem to be muddled up - can the
+  // DefaultHandler impl be factored out into a static and hopefully private
+  // class?
     private Alphabet alpha = null;
     private Distribution dist = null;
     private DistributionFactory fact = null;
@@ -76,7 +81,7 @@ public class XMLDistributionReader extends DefaultHandler {
     } //end getDist
 
     /**
-     * Reads an XML representation of a Distribution from a file
+     * Reads an XML representation of a Distribution from a file.
      *
      * @param is input in XML format
      * @return dist the Distribution created.
@@ -109,9 +114,12 @@ public class XMLDistributionReader extends DefaultHandler {
     }
 
     /**
-     * Required by SAXParser to be public. It is not reccomended that you use this
-     * method directly. Use ParseXML instead.
+     * Required by SAXParser to be public.
      *
+     * <p>
+     * It is not reccomended that you use this method directly. Use ParseXML
+     * instead.
+     * </p>
      */
     public void startElement(String nameSpaceURI, String localName, String rawName, Attributes attributes)
                       throws SAXException{

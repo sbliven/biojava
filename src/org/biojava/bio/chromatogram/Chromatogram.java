@@ -30,6 +30,8 @@ import org.biojava.bio.symbol.IllegalSymbolException;
  * Read-only.
  *
  *  @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
+ * @author Matthew Pocock
+ * @since 1.3
  */
 public interface Chromatogram {
     /**

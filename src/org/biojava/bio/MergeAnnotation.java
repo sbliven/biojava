@@ -135,13 +135,6 @@ public class MergeAnnotation
     return false;
   }
 
-  /**
-   * Return a <code>Set</code> containing all key objects
-   * visible in this annotation.  The <code>Set</code> is
-   * unmodifiable, but will dynamically reflect changes made
-   * to the annotation.
-   */
-
   public Set keys() {
     Set s = new HashSet();
     for (Iterator i = mergeSet.iterator(); i.hasNext();) {
@@ -150,14 +143,6 @@ public class MergeAnnotation
     }
     return s;
   }
-
-  /**
-   * Return a <code>Map</code> view onto this annotation.
-   * The returned <code>Map</code> is unmodifiable, but will
-   * dynamically reflect any changes made to this annotation.
-   *
-   * @return the Map view of this Annotation
-   */
 
   public Map asMap() {
     return new MAMap();
@@ -255,7 +240,20 @@ public class MergeAnnotation
     }
   }
 
+  /**
+   * Listener used to forward changes for any of the underlying annotations to
+   * listeners on this annotation.
+   *
+   * @author Thomas Down
+   * @author Matthew Pocock
+   * @since 1.2
+   */
   protected class PropertyForwarder extends ChangeForwarder {
+    /**
+     * Create a new forwarder on behalf of a source using the change support.
+     * @param source  the new source of events
+     * @param cs      the ChangeSupport used to manage listeners
+     */
     public PropertyForwarder(Object source, ChangeSupport cs) {
       super(source, cs);
     }

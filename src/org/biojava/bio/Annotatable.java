@@ -83,6 +83,8 @@ import org.biojava.utils.Changeable;
  * (instantiate the Annotation instance and event forwarders when the first
  * request comes in). It can also be implemented by returning throw-away
  * immutable Annotatoin instances that are built from scratch each time.
+ *
+ * @since 1.0
  */
 public interface Annotatable extends Changeable {
   /**

@@ -39,6 +39,7 @@ import org.biojava.utils.ChangeVetoException;
  * A no-frills implementation of DistributionTrainerContext.
  *
  * @author Matthew Pocock
+ * @since 1.0
  */
 public class SimpleDistributionTrainerContext
 implements DistributionTrainerContext, Serializable {
@@ -47,17 +48,10 @@ implements DistributionTrainerContext, Serializable {
   
   private double nullModelWeight;
   
-  /**
-  * Retrieve the weight of the background distribution
-  */   
   public double getNullModelWeight() {
     return this.nullModelWeight;
   }
 
-  /**
-  * Assign a weight to the background distribution
-  * @param nullModelWeight the weight of the null model to assign.
-  */ 
   public void setNullModelWeight(double nullModelWeight) {
     this.nullModelWeight = nullModelWeight;
   }
@@ -115,7 +109,6 @@ implements DistributionTrainerContext, Serializable {
       return dt.getCount(this, (AtomicSymbol) sym);
     } else {
       double totWeight = 0.0;
-      Distribution nullModel = dist.getNullModel();
       for (
         Iterator asi = ((FiniteAlphabet) sym.getMatches()).iterator();
         asi.hasNext();
@@ -139,7 +132,10 @@ implements DistributionTrainerContext, Serializable {
       ((DistributionTrainer) i.next()).clearCounts(this);
     }
   }
-  
+
+  /**
+   * Create a new context with no initial distributions or trainers.
+   */
   public SimpleDistributionTrainerContext() {
     this.distToTrainer = new HashMap();
     this.trainers = new HashSet();

@@ -8,6 +8,10 @@ import org.biojava.bio.chromatogram.ChromatogramTools;
  * A {@link ChromatogramNonlinearScaler} that scales all the 
  * base calls in a chromatogram to the same width in pixels,
  * optionally biasing the peak of the call to the center.
+ *
+ * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
+ * @author Matthew Pocock
+ * @since 1.3
  */
 public class FixedBaseWidthScaler implements ChromatogramNonlinearScaler {
     /** Set to true to get copious, cryptic debugging output on System.out */
@@ -58,6 +62,8 @@ public class FixedBaseWidthScaler implements ChromatogramNonlinearScaler {
     /**
      * Calculates all the scaled x-coordinates for the given chromatogram,
      * but only if it isn't the one that we already have the scales for.
+     *
+     * @param c  the Chromatogram to calculate the scale for
      */
     private synchronized void calcAllScales(Chromatogram c) {
         if (c == null) return;
@@ -103,7 +109,7 @@ public class FixedBaseWidthScaler implements ChromatogramNonlinearScaler {
      * @param left the leftmost sample index of the base (inclusive)
      * @param center the peak sample index
      * @param right the rightmost sample index of the base (inclusive)
-     * @param widthSoFar the total width of all the scaled bases up to this one
+     * @param nextX the total width of all the scaled bases up to this one
      * @param lastBase true if this is the last base, false otherwise.  The
      *        last base must be handled specially so that the last sample is 
      *        at baseWidth * c.sequenceLength.

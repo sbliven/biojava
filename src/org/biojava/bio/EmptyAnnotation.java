@@ -40,6 +40,9 @@ import org.biojava.utils.Unchangeable;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ *
+ * @since 1.0 as part of Annotation
+ * @since 1.4 as top-level class
  */
 class EmptyAnnotation
 extends Unchangeable

@@ -33,6 +33,7 @@ import java.util.Map;
  *
  * @author Matthew Pocock
  * @author Greg Cox
+ * @since 1.0
  *
  * @for.user
  * When you need to make a new Annotation instance and will want to populate

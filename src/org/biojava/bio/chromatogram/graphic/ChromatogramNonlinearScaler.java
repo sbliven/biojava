@@ -28,12 +28,17 @@ import org.biojava.bio.chromatogram.Chromatogram;
  * a Chromatogram with a non-linear horizontal scale.
  *
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
+ * @author Matthew Pocock
+ * @since 1.3
  */
 public interface ChromatogramNonlinearScaler {
     /**
      * Returns the remapped coordinate for the provided trace sample index of the
      * given chromatogram.
-     * @returns the new coordinagte
+     *
+     * @param c  the Chromatogram
+     * @param sampleIndex the sample index
+     * @return the new coordinagte
      */
     public float scale(Chromatogram c, int sampleIndex) 
         throws IndexOutOfBoundsException;
@@ -44,6 +49,11 @@ public interface ChromatogramNonlinearScaler {
     public static class Identity implements ChromatogramNonlinearScaler {
         private static Identity INSTANCE;
 
+      /**
+       * Retrieve the singleton instance of this class.
+       *
+       * @return the Identity instance
+       */
         public static Identity getInstance() {
             if (INSTANCE == null)
                 INSTANCE = new Identity();

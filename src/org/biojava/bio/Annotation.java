@@ -57,6 +57,8 @@ import org.biojava.utils.Changeable;
  *
  * @for.user Other than when using the constructor, you should be able to
  * interact with nearly all Annotation implementations via this API.
+ *
+ * @since 1.0
  */
 public interface Annotation extends Changeable {
   /**

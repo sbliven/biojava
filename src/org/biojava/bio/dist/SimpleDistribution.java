@@ -48,13 +48,10 @@ import org.biojava.utils.ChangeVetoException;
  * @author Matthew Pocock
  * @author Thomas Down
  * @author Mark Schreiber
+ * @since 1.0
  * @serial WARNING serilized versions of this class may not be compatible with later versions of BioJava
  */
-
-
-
 public class SimpleDistribution
-
 extends AbstractDistribution implements Serializable{
 
   private transient AlphabetIndex indexer;
@@ -112,13 +109,25 @@ extends AbstractDistribution implements Serializable{
   }
 
 
-
+  /**
+   * Indicate wether the weights array has been allocated yet.
+   *
+   * @return  true if the weights are allocated
+   */
   protected boolean hasWeights() {
     return weights != null;
   }
 
 
-
+  /**
+   * Get the underlying array that stores the weights.
+   *
+   * <p>
+   * Modifying this will modify the state of the distribution.
+   * </p>
+   *
+   * @return  the weights array
+   */
   protected double[] getWeights() {
     if(weights == null) {
       weights = new double[((FiniteAlphabet)getAlphabet()).size()];
@@ -142,7 +151,6 @@ extends AbstractDistribution implements Serializable{
       return weights[index];
     }
   }
-
 
 
   protected void setWeightImpl(AtomicSymbol s, double w)
@@ -181,20 +189,23 @@ extends AbstractDistribution implements Serializable{
     }
   }
 
-
-
-  /**
-   * Register a simple trainer for this distribution.
-   */
   public void registerWithTrainer(DistributionTrainerContext dtc) {
    dtc.registerTrainer(this, new Trainer());
   }
 
 
-
+  /**
+   * A simple implementation of a trainer for this class.
+   *
+   * @author Matthew Pocock
+   * @since 1.0
+   */
   protected class Trainer implements DistributionTrainer {
     private final Count counts;
 
+    /**
+     * Create a new trainer.
+     */
     public Trainer() {
       counts = new IndexedCount(indexer);
     }

@@ -31,6 +31,8 @@ import org.biojava.utils.*;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ *
+ * @since 1.3
  */
 class AnyPropertyConstraint implements PropertyConstraint  {
     public boolean accept(Object value) {

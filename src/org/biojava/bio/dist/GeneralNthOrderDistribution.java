@@ -37,6 +37,7 @@ import org.biojava.bio.symbol.Symbol;
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Mark Schreiber
+ * @since 1.1
  */
 class GeneralNthOrderDistribution extends AbstractOrderNDistribution implements Serializable{
     private Map dists;

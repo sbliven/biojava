@@ -37,6 +37,7 @@ import org.biojava.utils.io.CachingInputStream;
  *
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
  * @author Matthew Pocock
+ * @since 1.3
  */
 public class ChromatogramFactory {
     /**

@@ -46,6 +46,7 @@ public interface CollectionConstraint {
      * constraint.
      *
      * @param values a <code>Collection</code> to check.
+     * @return true if the values are acceptable
      *
      * @for.powerUser Manually compare items with the CollectionConstraint. Node:
      * this will ususaly be done for you in an AnnotationType instance

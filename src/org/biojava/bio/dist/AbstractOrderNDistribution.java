@@ -39,11 +39,12 @@ import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 
 /**
- * Simple base class for OrderNDistributions
+ * Simple base class for OrderNDistributions.
  *
  * @author Samiul Hasan
  * @author Matthew Pocock
  * @author Thomas Down
+ * @since 1.2
  */
 public abstract class AbstractOrderNDistribution
 extends AbstractDistribution
@@ -52,7 +53,11 @@ implements OrderNDistribution{
   private Alphabet firstA;
   private Alphabet lastA;
   private Distribution nullModel;
-  
+
+  /**
+   * The listener that will forward events from the underlying distributions to
+   * listeners for this distribution.
+   */
   protected transient WeigthForwarder weightForwarder = null;
   
   protected ChangeSupport getChangeSupport(ChangeType ct) {
@@ -74,6 +79,8 @@ implements OrderNDistribution{
   
     /**
      * Construct a new NthOrderDistribution.
+     *
+     * @param alpha  the Alpahbet this is over
      */
 
   protected AbstractOrderNDistribution(Alphabet alpha)
@@ -96,6 +103,8 @@ implements OrderNDistribution{
      * of those alphabets.  If it is a cross-product of more than two alphabets,
      * the conditioning alphabet is the cross-product of all but the last
      * alphabet.
+     *
+     * @return the conditioning Alphabet
      */
 
     public Alphabet getConditioningAlphabet() {
@@ -119,6 +128,10 @@ implements OrderNDistribution{
     /**
      * Get a weight from one of the sub-distributions, conditioned
      * on the first part of the symbol.
+     *
+     * @param sym  the symbol to look up
+     * @return the weight
+     * @throws IllegalSymbolException  if sym is not recognised
      */
 
   protected double getWeightImpl(AtomicSymbol sym) throws IllegalSymbolException {
@@ -138,6 +151,9 @@ implements OrderNDistribution{
      * Set a weight in one of the conditioned distributions.  It is the callers
      * responsibility to ensure that all the conditioned distributions have total
      * weights which sum to 1.0.
+     *
+     * @param sym   the symbol to set the weight for
+     * @param w     the new weight
      */
 
     public void setWeightImpl(AtomicSymbol sym, double w) 
@@ -172,7 +188,7 @@ implements OrderNDistribution{
         AtomicSymbol sym,
         double count
       ) throws IllegalSymbolException {
-        List symL = ((BasisSymbol) sym).getSymbols();
+        List symL = sym.getSymbols();
         int lb1 = symL.size() - 1;
         Symbol firstS;
         if(lb1 == 1) {
@@ -188,7 +204,7 @@ implements OrderNDistribution{
         DistributionTrainerContext dtc,
         AtomicSymbol sym
       ) throws IllegalSymbolException {
-        List symL = ((BasisSymbol) sym).getSymbols();
+        List symL = sym.getSymbols();
         int lb1 = symL.size() - 1;
         Symbol firstS;
         if(lb1 == 1) {

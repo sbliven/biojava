@@ -48,6 +48,8 @@ import org.biojava.utils.ChangeVetoException;
  * @for.developer If you are still reading this, then you must be trying to
  * implement Annotation. To do that, extend this class and implement
  * <code>getProperties()</code> and <code>propertiesAllocated()</code>.
+ *
+ * @since 1.0
  */
 public abstract class AbstractAnnotation
   extends

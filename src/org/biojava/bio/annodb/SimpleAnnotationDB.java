@@ -12,6 +12,7 @@ import org.biojava.bio.AnnotationType;
  * <p>A no-frills implementation of AnnotationDB.</p>
  *
  * @author Matthew Pocock
+ * @since 1.3
  */
 public class SimpleAnnotationDB implements AnnotationDB {
   private final String name;

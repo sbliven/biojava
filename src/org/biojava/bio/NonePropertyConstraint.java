@@ -31,6 +31,7 @@ import org.biojava.utils.*;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ * @since 1.4
  */
 class NonePropertyConstraint implements PropertyConstraint {
   public boolean accept(Object value) {

@@ -56,6 +56,7 @@ import org.biojava.utils.Changeable;
  * </p>
  *
  * @author Matthew Pocock
+ * @since 1.0
  */
 public interface Distribution extends Changeable {
   /**
@@ -184,6 +185,12 @@ public interface Distribution extends Changeable {
    * @since 1.1
    */
   public class NullModelForwarder extends ChangeForwarder {
+    /**
+     * Create a new forwarder.
+     *
+     * @param source  the Object who events are forwarded on behalf of
+     * @param cs      the change support that manages the listeners
+     */
     public NullModelForwarder(Object source, ChangeSupport cs) {
       super(source, cs);
     }

@@ -30,6 +30,7 @@ import org.biojava.utils.ChangeVetoException;
  * A context within a group of DistributionTrainers can be trained together.
  *
  * @author Matthew Pocock
+ * @since 1.0
  */
 public interface DistributionTrainerContext {
     /**
@@ -83,7 +84,8 @@ public interface DistributionTrainerContext {
   /**
   * Return the Distribution trainer object from the current context.
   *
-  * @param dist the Distribution whose trainer is required.
+  * @param dist the Distribution whose trainer is required
+  * @return the DistributionTrainer for the distribution
   */
    DistributionTrainer getTrainer(Distribution dist);
   
@@ -100,6 +102,7 @@ public interface DistributionTrainerContext {
    * @param dist the Distribution that the symbol was associated with
    * @param sym the Symbol seen
    * @param times the number of times to add
+   * @throws IllegalSymbolException if sym is not recognised by dist
    */
   void addCount(Distribution dist, Symbol sym, double times)
   throws IllegalSymbolException;
@@ -107,6 +110,12 @@ public interface DistributionTrainerContext {
   /**
    * Return the number of counts of a particular symbol which will be used
    * to train the specified distribution.
+   *
+   * @param dist  the Distribution to return counts for
+   * @param sym   the symbol to get the count for
+   * @return the number of counts
+   * @throws IllegalSymbolException if the symbol is not accepted by the
+   *     distribution
    */
   
   double getCount(Distribution dist, Symbol sym)
@@ -122,8 +131,6 @@ public interface DistributionTrainerContext {
    * the null model to generate the new weights.
    * </p>
    *
-   * @param nullModel the null model Distribution
-   * @param weight  how many lots of the null model to add
    * @throws ChangeVetoException  if any of the distributions can't be trained
    */
   void train() throws ChangeVetoException;

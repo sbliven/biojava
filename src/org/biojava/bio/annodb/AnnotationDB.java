@@ -16,6 +16,7 @@ import org.biojava.bio.AnnotationType;
  * handled as a unit.</p>
  *
  * @author Matthew Pocock
+ * @since 1.3
  */
 public interface AnnotationDB {
   /**

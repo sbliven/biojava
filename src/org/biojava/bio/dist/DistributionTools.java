@@ -57,21 +57,24 @@ import org.biojava.utils.ChangeVetoException;
 import org.xml.sax.SAXException;
 
 /**
- * Title:        DistributionTools.java
- * Description:  A class to hold static methods for calculations and
- * manipulations using Distributions.
+ * A class to hold static methods for calculations and manipulations using
+ * Distributions.
+ *
  * @author Mark Schreiber
+ * @author Matthew Pocock
+ * @since 1.2
  */
 
 public final class DistributionTools {
 
   /**
-   * Overide the constructer to prevent subclassing
+   * Overide the constructer to prevent subclassing.
    */
   private DistributionTools(){}
 
   /**
    * Writes a Distribution to XML that can be read with the readFromXML method.
+   *
    * @param d the Distribution to write.
    * @param os where to write it to.
    * @throws IOException if writing fails
@@ -80,13 +83,22 @@ public final class DistributionTools {
     new XMLDistributionWriter().writeDistribution(d, os);
   }
 
+  /**
+   * Read a distribution from XML.
+   *
+   * @param is  an InputStream to read from
+   * @return  a Distribution parameterised by the xml in is
+   * @throws IOException  if is failed
+   * @throws SAXException if is could not be processed as XML
+   */
   public static Distribution readFromXML(InputStream is)throws IOException, SAXException{
     XMLDistributionReader writer = new XMLDistributionReader();
     return writer.parseXML(is);
   }
 
   /**
-   * Randomizes the weights of a <code>Distribution</code>
+   * Randomizes the weights of a <code>Distribution</code>.
+   *
    * @param d the <code>Distribution</code> to randomize
    * @throws ChangeVetoException if the Distribution is locked
    */
@@ -111,7 +123,7 @@ public final class DistributionTools {
   }
 
   /**
-   * Make a distribution from a count
+   * Make a distribution from a count.
    *
    * @param c the count
    * @return a Distrubution over the same <code>FiniteAlphabet</code> as <code>c</code>
@@ -143,7 +155,8 @@ public final class DistributionTools {
   }
 
   /**
-   * Compares the emission spectra of two distributions
+   * Compares the emission spectra of two distributions.
+   *
    * @return true if alphabets and symbol weights are equal for the two distributions.
    * @throws BioException if one or both of the Distributions are over infinite alphabets.
    * @since 1.2
@@ -172,7 +185,8 @@ public final class DistributionTools {
   }
 
   /**
-   * Compares the emission spectra of two distribution arrays
+   * Compares the emission spectra of two distribution arrays.
+   *
    * @return true if alphabets and symbol weights are equal for each pair
    * of distributions. Will return false if the arrays are of unequal length.
    * @throws BioException if one of the Distributions is over an infinite
@@ -196,7 +210,7 @@ public final class DistributionTools {
     }
 
   /**
-   * A method to calculate the Kullback-Liebler Distance (relative entropy)
+   * A method to calculate the Kullback-Liebler Distance (relative entropy).
    *
    * @param logBase  - the log base for the entropy calculation. 2 is standard.
    * @param observed - the observed frequence of <code>Symbols </code>.
@@ -229,7 +243,7 @@ public final class DistributionTools {
   }
 
   /**
-   * A method to calculate the Shannon Entropy for a Distribution
+   * A method to calculate the Shannon Entropy for a Distribution.
    *
    * @param logBase  - the log base for the entropy calculation. 2 is standard.
    * @param observed - the observed frequence of <code>Symbols </code>.
@@ -292,19 +306,29 @@ public final class DistributionTools {
     return Math.log((double)size)/Math.log(2.0) - totalEntropy;
   }
 
+  /**
+   * Equivalent to distOverAlignment(a, false, 0.0).
+   *
+   * @param a  the Alignment
+   * @return   an array of Distribution instances representing columns of the
+   *     alignment
+   * @throws IllegalAlphabetException  if the alignment alphabet is not
+   *    compattible
+   */
   public static Distribution[] distOverAlignment(Alignment a)
       throws IllegalAlphabetException{
     return distOverAlignment(a,false,0.0);
   }
 
   /**
-   * Creates a joint distribution
+   * Creates a joint distribution.
+   *
    * @throws IllegalAlphabetException if all sequences don't use the same alphabet
    * @param a the <code>Alignment </code>to build the <code>Distribution[]</code> over.
    * @param countGaps if true gaps will be included in the distributions
    * (NOT YET IMPLEMENTED!!, CURRENTLY EITHER OPTION WILL PRODUCE THE SAME RESULT)
    * @param nullWeight the number of pseudo counts to add to each distribution
-   * @param int[] a list of positions in the alignment to include in the joint distribution
+   * @param cols a list of positions in the alignment to include in the joint distribution
    * @return a <code>Distribution</code>
    * @since 1.2
    */
@@ -357,7 +381,8 @@ public final class DistributionTools {
     return dist;
 }
   /**
-   * Creates an array of distributions, one for each column of the alignment
+   * Creates an array of distributions, one for each column of the alignment.
+   *
    * @throws IllegalAlphabetException if all sequences don't use the same alphabet
    * @param a the <code>Alignment </code>to build the <code>Distribution[]</code> over.
    * @param countGaps if true gaps will be included in the distributions
@@ -470,7 +495,8 @@ public final class DistributionTools {
   }
 
   /**
-   * Produces a sequence by randomly sampling the Distribution
+   * Produces a sequence by randomly sampling the Distribution.
+   *
    * @param name the name for the sequence
    * @param d the distribution to sample. If this distribution is of order N a
    * seed sequence is generated allowed to 'burn in' for 1000 iterations and used
@@ -500,6 +526,16 @@ public final class DistributionTools {
     return new SimpleSequence(sl,name,name,Annotation.EMPTY_ANNOTATION);
   }
 
+  /**
+   * Generate a sequence by sampling a distribution.
+   *
+   * Should this be private?
+   *
+   * @param name    the name of the sequence
+   * @param d       the distribution to sample
+   * @param length  the length of the sequence
+   * @return        a new sequence with the required composition
+   */
   protected static final Sequence generateOrderNSequence(String name, OrderNDistribution d, int length){
     SymbolList sl = null;
     List l = new ArrayList(length);

@@ -37,6 +37,7 @@ import org.biojava.utils.ChangeVetoException;
  * </p>
  *
  * @author Matthew Pocock
+ * @since 1.0
  */
 public interface DistributionTrainer {
   /**
@@ -52,6 +53,7 @@ public interface DistributionTrainer {
    * @param dtc the DistributionTrainerContext within which the count was added
    * @param sym the Symbol seen
    * @param times the number of times to add
+   * @throws IllegalSymbolException if sym is not recognised
    */
   void addCount(DistributionTrainerContext dtc, AtomicSymbol sym, double times)
   throws IllegalSymbolException;
@@ -70,6 +72,7 @@ public interface DistributionTrainer {
    * @param dtc the DistributionTrainerContext within which the count was added
    * @param sym the Symbol seen
    * @return the agregate of the counts
+   * @throws IllegalSymbolException  if sym is not recognised
    */
   double getCount(DistributionTrainerContext dtc, AtomicSymbol sym)
   throws IllegalSymbolException;
@@ -88,6 +91,7 @@ public interface DistributionTrainer {
    * This method should not modify the underlying counts.
    * </p>
    *
+   * @param dtc     the context to use
    * @param weight  how many lots of the null model to add
    * @throws ChangeVetoException if the distribution could not have its weights
    *         modified

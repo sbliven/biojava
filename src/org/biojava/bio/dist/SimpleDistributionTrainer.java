@@ -41,8 +41,10 @@ import org.biojava.utils.ChangeVetoException;
  * <p>
  * This requires the distribuiton being trained to have a working setWeight
  * method that doesn't throw an UnsupportedOperationExcepiton.
+ * </p>
  *
  * @author Matthew Pocock
+ * @deprecated  Distribution impls should be providing custom trainers.
  */
 
 public final class SimpleDistributionTrainer

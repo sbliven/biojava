@@ -252,6 +252,7 @@ import java.util.Hashtable;
  * @see BibRef
  * @see BibRefSupport
  * @see BiblioCriterion
+ * @since 1.3
  */
 
 public interface BibRefQuery {

@@ -50,9 +50,11 @@ import org.biojava.bio.symbol.SymbolList;
  * into a graphics context.  
  *
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
+ * @author Matthew Pocock
+ * @since 1.3
  */
 public class ChromatogramGraphic implements Cloneable {
-    /** A pseudo call list for use when a Chromatogram has no base calls */
+    /** A pseudo call list for use when a Chromatogram has no base calls. */
     private static SymbolList SINGLE_CALL = 
         new SimpleSymbolList(new Symbol[] { DNATools.getDNA().getGapSymbol() }, 
                              1, DNATools.getDNA());
@@ -63,7 +65,15 @@ public class ChromatogramGraphic implements Cloneable {
     private Chromatogram chromat;
     private float vertScale, horizScale;
     private int width, height;
-    protected boolean subpathsValid, callboxesValid, drawableCallboxesValid;
+
+  /** Flag for subpaths. */
+    protected boolean subpathsValid;
+
+  /** Flag for call boxes. */
+  protected boolean callboxesValid;
+
+  /** Flag for drawable call boxes. */
+  protected boolean drawableCallboxesValid;
     
     private GeneralPath[][] subpaths;
     private Rectangle2D.Float[] callboxes;
@@ -77,7 +87,7 @@ public class ChromatogramGraphic implements Cloneable {
     /** The map containing the fill colors for callboxes.  Keys are DNA Symbols. */
     protected Map fillColors;
     
-    /** The default values for the {@link colors} map. */
+    /** The default values for the {@link #colors} map. */
     private static final Map DEFAULT_COLORS = new HashMap();
     static {
         DEFAULT_COLORS.put(DNATools.a(),   Color.green);
@@ -94,6 +104,8 @@ public class ChromatogramGraphic implements Cloneable {
     /**
      * Creates a new <code>ChromatogramGraphic</code>, initially displaying
      * the given chromatogram.
+     *
+     * @param c the Chromomatogram to display
      */
     public ChromatogramGraphic(Chromatogram c) {
         options = new HashMap(Option.DEFAULTS);
@@ -267,23 +279,38 @@ public class ChromatogramGraphic implements Cloneable {
         //System.out.println("chromatgfx[w=" + width + "; h=" + height + "; hs=" + horizScale + "; vs=" + vertScale + "]");
     }
     
-    /** Returns the width of the whole graphic (in pixels). */
+    /**
+     * Returns the width of the whole graphic (in pixels).
+     *
+     * @return the width
+     */
     public int getWidth()  { return width;  }
-    /** Returns the height of the whole graphic (in pixels). */
+
+    /**
+     * Returns the height of the whole graphic (in pixels).
+     *
+     * @return the height
+     */
     public int getHeight() { return height; }
+
     /**
      * Returns the in-use horizontal scale factor.
      * The "units" of this value are (trace samples) / pixel.
      * For example, a horizontal scale of 1.0 means that there will be one 
-     * pixel horizontally for each trace sample.  
+     * pixel horizontally for each trace sample.
+     *
+     * @return the horizontal scale
      */
     public float getHorizontalScale() { return horizScale; }
-    /** 
+
+    /**
      * Returns the in use vertical scale factor.  
      * The "units" of this value are (trace value bins) / pixel.
      * For example, a vertical scale of 1.0 means that there will be one 
      * pixel vertically for each value in the range 
      * [0, <code>getChromatogram().getMax()</code>].
+     *
+     * @return the vertical scale
      */
     public float getVerticalScale()   { return vertScale;  }
     
@@ -291,6 +318,8 @@ public class ChromatogramGraphic implements Cloneable {
      * Returns the width of the graphic as it will be rendered.
      * This means that the {@link Option#FROM_TRACE_SAMPLE} and 
      * {@link Option#TO_TRACE_SAMPLE} bounds are taken into account.
+     *
+     * @return the rendered width
      */
     public int getRenderedWidth() { 
         return getRenderedWidth(horizScale);
@@ -300,6 +329,9 @@ public class ChromatogramGraphic implements Cloneable {
      * Returns the width of the graphic as it would be rendered with
      * the specified horizontal scale. The {@link Option#FROM_TRACE_SAMPLE} and 
      * {@link Option#TO_TRACE_SAMPLE} bounds are taken into account.
+     *
+     * @param horizontalScale  the horizontal scale
+     * @return the rendered width at that scale
      */
     public int getRenderedWidth(float horizontalScale) {
         return (int) Math.ceil(
@@ -313,6 +345,7 @@ public class ChromatogramGraphic implements Cloneable {
     /**
      * Sets the height (in pixels).  This will also change the
      * vertical scale.
+     *
      * @param h the desired height in pixels
      * @see Option#HEIGHT_IS_AUTHORITATIVE
      */
@@ -328,6 +361,7 @@ public class ChromatogramGraphic implements Cloneable {
     /**
      * Sets the vertical scale (proportional).  This will also
      * change the height.
+     *
      * @param vs the desired vertical scale.  See {@link #getVerticalScale}
      *        for semantics.
      * @see Option#HEIGHT_IS_AUTHORITATIVE
@@ -344,6 +378,7 @@ public class ChromatogramGraphic implements Cloneable {
     /**
      * Sets the width of the whole graphic (in pixels).  This will also change 
      * the horizontal scale.
+     *
      * @param w the desired width in pixels
      * @see Option#WIDTH_IS_AUTHORITATIVE
      */
@@ -361,6 +396,7 @@ public class ChromatogramGraphic implements Cloneable {
     /**
      * Sets the horizontal scale (proportional).  This will also
      * change the width.
+     *
      * @param hs the desired vertical scale.  See {@link #getHorizontalScale}
      *        for semantics.
      * @see Option#WIDTH_IS_AUTHORITATIVE
@@ -423,7 +459,9 @@ public class ChromatogramGraphic implements Cloneable {
     
     /**
      * Returns the screen-coordinate bounds of the callbox for a given call.
-     * @param index the callbox for which to get the bounds <b>0-based</b>.
+     *
+     * @param index the callbox for which to get the bounds <b>0-based</b>
+     * @return a Rectangle2D giving the bounds of the call box
      */
     public Rectangle2D getCallboxBounds(int index) {
         return getCallboxBounds(index, true);
@@ -490,6 +528,9 @@ public class ChromatogramGraphic implements Cloneable {
     /** 
      * Synonym for {@link #getCallContaining(Point2D, boolean)} with
      * <code>pointOnScreen</code>=true.
+     *
+     * @param point  the Point2D to search with
+     * @return the call containing this point
      */
     public int getCallContaining(Point2D point) {
         return getCallContaining(point, true);
@@ -498,9 +539,11 @@ public class ChromatogramGraphic implements Cloneable {
     /**
      * Same as {@link #getCallContaining(Point2D, boolean)}, except that
      * only the x-coordinate of the point is specified.
+     *
      * @param x the x-coordinate to search for
      * @param xOnScreen whether the coordinate in screen space or chromatogram
      *        space
+     * @return the index of the call containing the position x
      */
     public int getCallContaining(float x, boolean xOnScreen) {
         return getCallContaining(new Point2D.Float(x, 0), xOnScreen);
@@ -509,6 +552,9 @@ public class ChromatogramGraphic implements Cloneable {
     /** 
      * Synonym for {@link #getCallContaining(float, boolean)} with
      * <code>pointOnScreen</code>=true.
+     *
+     * @param x the x-coordinate to search for
+     * @return the index of the call containing the position x
      */
     public int getCallContaining(float x) {
         return getCallContaining(x, true);
@@ -560,6 +606,8 @@ public class ChromatogramGraphic implements Cloneable {
     
     /**
      * Draws the chromatogram onto the provided graphics context.
+     *
+     * @param g2  the Graphics2D to draw to
      */
     public void drawTo(Graphics2D g2) {
         //System.out.println("drawTo(" + g2 + ", " + fromTraceSample + ", " + toTraceSample + ")");
@@ -710,6 +758,9 @@ public class ChromatogramGraphic implements Cloneable {
      * Sets a new value for the specified option.  Be sure that the
      * value is appropriate per the documentation, or you'll induce a 
      * ClassCastException somewhere else.
+     *
+     * @param opt Option to set
+     * @param value new value for the option
      * @see Option
      */
     public void setOption(Option opt, Object value) {
@@ -739,7 +790,9 @@ public class ChromatogramGraphic implements Cloneable {
     /**
      * Helper method for converting a {@link java.lang.Boolean}-valued
      * option into a <code>boolean</code> primitive.
+     *
      * @param opt the {@link Option} to convert
+     * @return true if the option is enabled
      * @throws ClassCastException when the option isn't <code>Boolean</code>-valued
      */
     public boolean optionIsTrue(Option opt) throws ClassCastException {
@@ -775,7 +828,12 @@ public class ChromatogramGraphic implements Cloneable {
             throw new ClassCastException("Option \""+opt+"\" is not set to a Number value");
     }
     
-    /** Utility method for determining whether to draw a callbox for a particular called Symbol */
+    /**
+     * Utility method for determining whether to draw a callbox for a particular called Symbol.
+     *
+     * @param bc Symbol to evaluate
+     * @return true if this should be drawn
+     */
     private boolean doDrawCallbox(Symbol bc) {
         if      (bc == DNATools.a()) return optionIsTrue(Option.DRAW_CALL_A);
         else if (bc == DNATools.c()) return optionIsTrue(Option.DRAW_CALL_C);
@@ -785,7 +843,11 @@ public class ChromatogramGraphic implements Cloneable {
         else return false;
     }
     
-    /** Performs a partial deep copy and invalidates regenerable structures */
+    /**
+     * Performs a partial deep copy and invalidates regenerable structures.
+     *
+     * @return an Object that is castable to ChromatogramGraphic
+     */
     public Object clone() {
         ChromatogramGraphic copy = null;
         try {
@@ -815,10 +877,18 @@ public class ChromatogramGraphic implements Cloneable {
      * enumerated options.
      *
      * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
+     * @since 1.3
      */
     public static class Option {
         private String desc;
         private static Map map = new HashMap();
+
+      /**
+       * Create a new Obtion.
+       *
+       * @param desc  option description
+       * @param def   option default
+       */
         private Option(String desc, Object def) {
             this.desc = desc;
             map.put(desc, this);

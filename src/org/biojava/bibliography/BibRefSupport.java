@@ -101,6 +101,7 @@ import org.biojava.utils.candy.CandyVocabulary;
  * @author <A HREF="mailto:senger@ebi.ac.uk">Martin Senger</A>
  * @author Matthew Pocock
  * @version $Id$
+ * @since 1.3
  */
 
 public interface BibRefSupport {

@@ -49,6 +49,7 @@ import org.biojava.utils.ChangeListener;
  *
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
  * @author Matthew Pocock
+ * @since 1.3
  *
  * @for.user
  * Chromatograms should be created using {@link ChromatogramFactory} or a

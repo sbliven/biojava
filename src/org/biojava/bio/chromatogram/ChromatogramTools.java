@@ -29,6 +29,7 @@ import org.biojava.bio.symbol.SymbolList;
  *
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
  * @author Matthew Pocock
+ * @since 1.3
  */
 public class ChromatogramTools {
     /** Static utility class - don't allow it to be instantiated. */

@@ -29,6 +29,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
  * A distribution trainer that just ignores all counts.
  *
  * @author Matthew Pocock
+ * @since 1.0
  */
 public class IgnoreCountsTrainer implements DistributionTrainer {
   public void addCount(DistributionTrainerContext dtc, AtomicSymbol sym, double times) 
@@ -40,14 +41,19 @@ public class IgnoreCountsTrainer implements DistributionTrainer {
   
   public void train(DistributionTrainerContext dtc, double weight) {}
   public void clearCounts(DistributionTrainerContext dtc) {}
-  
+
+  /**
+   * Constructor intended for sub-classes.
+   */
   protected IgnoreCountsTrainer() {}
   
   private static IgnoreCountsTrainer instance = new IgnoreCountsTrainer();
+
   /**
-  *Returns the global singleton instance of the IgnoreCountsTrainer
-  */
-  
+   * Returns the global singleton instance of the IgnoreCountsTrainer.
+   *
+   * @return the singleton instance of this trainer
+   */
   public static IgnoreCountsTrainer getInstance() {
     return instance;
   }

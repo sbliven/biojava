@@ -51,6 +51,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Greg Cox
+ * @since 1.1
  *
  * @for.powerUser
  * In the case where you wish to wrap an underlying Annotation in a view that

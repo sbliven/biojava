@@ -34,6 +34,7 @@ import org.biojava.bio.symbol.IllegalAlphabetException;
  *
  * @author Thomas Down
  * @author Mark Schreiber
+ * @since 1.1
  */
 
 public class OrderNDistributionFactory implements DistributionFactory {
@@ -64,7 +65,7 @@ public class OrderNDistributionFactory implements DistributionFactory {
 
 
     /**
-     * Creates an OrderNDistribution of the appropriate type
+     * Creates an OrderNDistribution of the appropriate type.
      *
      * @param alpha the Alphabet should be in a form that clearly indicates the
      * conditioning and the conditioned alphabet unless it is very obvious. For

@@ -73,10 +73,12 @@ extends AbstractOrderNDistribution implements Serializable{
    *  Sets the Distribution attribute of the IndexedNthOrderDistribution
    *  object
    *
-   * @param  sym                           The new Distribution value
-   * @param  dist                          The new Distribution value
-   * @exception  IllegalSymbolException    Description of Exception
-   * @exception  IllegalAlphabetException  Description of Exception
+   * @param  sym                           a symbol in the conditioning alphabet
+   * @param  dist                          the new Distribution
+   * @exception  IllegalSymbolException    if the symbol is not in the
+   *  conditioning alpahbet
+   * @exception  IllegalAlphabetException  if the Distribution is not over the
+   *   conditioned alphabet
    */
   public void setDistribution(Symbol sym, Distribution dist)
        throws IllegalSymbolException, IllegalAlphabetException {
@@ -103,9 +105,9 @@ extends AbstractOrderNDistribution implements Serializable{
    *  Gets the Distribution attribute of the IndexedNthOrderDistribution
    *  object
    *
-   * @param  sym                         Description of Parameter
-   * @return                             The Distribution value
-   * @exception  IllegalSymbolException  Description of Exception
+   * @param  sym                         a symbol
+   * @return                             the Distribution for that symbol
+   * @exception  IllegalSymbolException  if the symbol is not acceptable
    */
   public Distribution getDistribution(Symbol sym)
        throws IllegalSymbolException {
@@ -113,11 +115,13 @@ extends AbstractOrderNDistribution implements Serializable{
   }
 
   /**
-   *  Description of the Method
+   * Retrieve all of the distributions that are conditioned upon the
+   * conditioning distributions.
    *
-   * @return    Description of the Returned Value
+   * @return    a Collection of conditioned Distribution instances
    */
   public Collection conditionedDistributions() {
+    //fixme: I'm sure this should return a List
     return Arrays.asList(dists);
   }
 
