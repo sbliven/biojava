@@ -43,6 +43,10 @@ public class DistributionTools {
 
   /**
    * Make a distribution from a count
+   *
+   * @param c the count
+   * @return a Distrubution over the same <code>FiniteAlphabet</code> as <code>c</code>
+   * and trained with the counts of <code>c</code>
    */
   public static Distribution countToDistribution(Count c){
     FiniteAlphabet a  = (FiniteAlphabet)c.getAlphabet();
@@ -68,8 +72,12 @@ public class DistributionTools {
   /**
    * Compares the emission spectra of two distributions
    * @return true if alphabets and symbol weights are equal for the two distributions.
-   * @throws IllegalAlphabetException if one or both of the Distributions are over infinite alphabets.
+   * @throws BioException if one or both of the Distributions are over infinite alphabets.
    * @since 1.2
+   * @param a A <code>Distribution</code> with the same <code>Alphabet</code> as
+   * <code>b</code>
+   * @param b A <code>Distribution</code> with the same <code>Alphabet</code> as
+   * <code>a</code>
    */
   public static final boolean areEmissionSpectraEqual(Distribution a, Distribution b)
     throws BioException{
@@ -97,6 +105,10 @@ public class DistributionTools {
    * @throws BioException if one of the Distributions is over an infinite
    * alphabet.
    * @since 1.3
+   * @param a A <code>Distribution[]</code> consisting of <code>Distributions</code>
+   * over a <code>FiniteAlphabet </code>
+   * @param b A <code>Distribution[]</code> consisting of <code>Distributions</code>
+   * over a <code>FiniteAlphabet </code>
    */
   public static final boolean areEmissionSpectraEqual(Distribution[] a,
                                                       Distribution[] b)
@@ -114,6 +126,8 @@ public class DistributionTools {
    * A method to calculate the Kullback-Liebler Distance (relative entropy)
    *
    * @param logBase  - the log base for the entropy calculation. 2 is standard.
+   * @param observed - the observed frequence of <code>Symbols </code>.
+   * @param expected - the excpected or background frequency.
    * @return  - A HashMap mapping Symbol to <code>(Double)</code> relative entropy.
    * @since 1.2
    */
@@ -145,6 +159,7 @@ public class DistributionTools {
    * A method to calculate the Shannon Entropy for a Distribution
    *
    * @param logBase  - the log base for the entropy calculation. 2 is standard.
+   * @param observed - the observed frequence of <code>Symbols </code>.
    * @return  - A HashMap mapping Symbol to <code>(Double)</code> entropy.
    * @since 1.2
    */
@@ -171,6 +186,8 @@ public class DistributionTools {
 
   /**
    * Calculates the total bits of information for a distribution.
+   * @param observed - the observed frequence of <code>Symbols </code>.
+   * @return the total information content of the <code>Distribution </code>.
    * @since 1.2
    */
   public static final double bitsOfInformation(Distribution observed){
@@ -187,8 +204,12 @@ public class DistributionTools {
   /**
    * Creates an array of distributions, one for each column of the alignment
    * @throws IllegalAlphabetException if all sequences don't use the same alphabet
+   * @param a the <code>Alignment </code>to build the <code>Distribution[]</code> over.
    * @param countGaps if true gaps will be included in the distributions
    * @param nullWeight the number of pseudo counts to add to each distribution
+   * @return a <code>Distribution[]</code> where each member of the array is a
+   * <code>Distribution </code>of the <code>Symbols </code>found at that position
+   * of the <code>Alignment </code>.
    * @since 1.2
    */
   public static final Distribution[] distOverAlignment(Alignment a,
@@ -236,9 +257,12 @@ public class DistributionTools {
    * Creates an array of distributions, one for each column of the alignment.
    * No pseudo counts are used.
    * @param countGaps if true gaps will be included in the distributions
+   * @param a the <code>Alignment </code>to build the <code>Distribution[]</code> over.
    * @throws IllegalAlphabetException if the alignment is not composed from sequences all
    *         with the same alphabet
-   *
+   * @return a <code>Distribution[]</code> where each member of the array is a
+   * <code>Distribution </code>of the <code>Symbols </code>found at that position
+   * of the <code>Alignment </code>.
    * @since 1.2
    */
   public static final Distribution[] distOverAlignment(Alignment a,
@@ -250,6 +274,9 @@ public class DistributionTools {
   /**
    * Averages two or more distributions. NOTE the current implementation ignore the null model.
    * @since 1.2
+   * @param dists the <code>Distributions </code>to average
+   * @return a <code>Distribution </code>were the weight of each <code>Symbol </code>
+   * is the average of the weights of that <code>Symbol </code>in each <code>Distribution </code>.
    */
   public static final Distribution average (Distribution [] dists){
 
