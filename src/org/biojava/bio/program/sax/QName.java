@@ -32,7 +32,7 @@ import java.io.*;
  * It takes a qName, and allows the SAXParser applications writers to
  * obtain prefix and local names.  Note, whether these
  * values are reported or not, or reported as unknown, should be
- * controlled by the namespace and namespeace-prefix properties
+ * controlled by the namespace and namespace-prefix properties
  * of the parser.
  *
  * For attributes, the LocalName will be reported as an empty string

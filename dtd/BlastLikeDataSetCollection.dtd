@@ -139,7 +139,7 @@
                 stopPosition        CDATA #REQUIRED >
 
 
-<!-- A MatchConsensus elemenet represents the consensus information
+<!-- A MatchConsensus element represents the consensus information
      present in a pairwise alignment produced by Blast-like programs
      (i.e. the middle line of the alignment).                          -->
 

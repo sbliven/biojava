@@ -76,7 +76,7 @@ public class ClustalWAlignmentSAXParser extends AbstractNativeAppSAXParser {
 
     private AttributesImpl          oAtts      = new AttributesImpl();
     private ArrayList               oHeader    = new ArrayList();
-    private QName                   oAttQName  = new QName(this);     
+    private QName                   oAttQName  = new QName(this);
     private char[]                  aoChars;
 
     private String                  oSeqName;
@@ -123,7 +123,7 @@ public class ClustalWAlignmentSAXParser extends AbstractNativeAppSAXParser {
 	    } // end while
 	} catch (java.io.IOException x) {
 	    System.out.println(x.getMessage());
-	    System.out.println("Stream read interupted");
+	    System.out.println("Stream read interrupted");
 	} // end try/catch
 
 	//at end of stream...

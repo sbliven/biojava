@@ -223,9 +223,9 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
 
 	    SeqIOEventEmitter.getSeqIOEvents(seq, former);
 	}
-	catch (BioException bex)
+	catch (BioException be)
 	{
-	    throw new IOException(bex.getMessage());
+	    throw new IOException(be.getMessage());
 	}
     }
 
@@ -259,9 +259,9 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
 
 	    SeqIOEventEmitter.getSeqIOEvents(seq, former);
 	}
-	catch (BioException bex)
+	catch (BioException be)
 	{
-	    throw new IOException(bex.getMessage());
+	    throw new IOException(be.getMessage());
 	}
     }
 

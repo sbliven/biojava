@@ -21,12 +21,19 @@
 
 package org.biojava.bio.seq.io;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
-import org.biojava.bio.BioException;
 import org.biojava.bio.Annotation;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * <code>SeqIOEventEmitter</code> is a utility class which scans a
@@ -130,7 +137,7 @@ public class SeqIOEventEmitter
 				   + seq.toString()
 				   + " into SeqIO events");
 	}
-	catch (ParseException pex)
+	catch (ParseException pe)
 	{
 	    throw new BioException("An internal error occurred processing "
 				   + seq.toString()

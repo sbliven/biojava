@@ -21,7 +21,7 @@
 
 package org.biojava.bio.program.search;
 
-import org.biojava.bio.search.*;
+import org.biojava.bio.search.SeqSimilaritySearchResult;
 import org.biojava.bio.BioException;
 
 /**

@@ -21,17 +21,23 @@
 
 package org.biojava.bio.seq.io;
 
-import java.io.*;
-import java.util.*;
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * <code>EmblFileFormer</code> performs the detailed formatting of
  * EMBL entries for writing to a PrintStream. There is some code
- * dupication with <code>GenbankFileFormer</code> which could be
+ * duplication with <code>GenbankFileFormer</code> which could be
  * factored out.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
@@ -90,10 +96,10 @@ public class EmblFileFormer implements SeqFileFormer
 
     public void setURI(final String uri) throws ParseException { }
 
-    public void addSymbols(final Alphabet alpha,
-                           final Symbol[] syms,
-                           final int      start,
-                           final int      length)
+    public void addSymbols(final Alphabet  alpha,
+                           final Symbol [] syms,
+                           final int       start,
+                           final int       length)
         throws IllegalAlphabetException
     {
         int aCount = 0;
@@ -222,7 +228,7 @@ public class EmblFileFormer implements SeqFileFormer
         throws ParseException
     {
         // There are 19 spaces in the leader
-        String   leader = "FT                   ";
+        String leader = "FT                   ";
 
 	// Don't print internal data structures
 	if (key.equals(Feature.PROPERTY_DATA_KEY))

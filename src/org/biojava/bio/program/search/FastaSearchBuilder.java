@@ -23,16 +23,33 @@ package org.biojava.bio.program.search;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.lang.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.biojava.bio.*;
-import org.biojava.bio.search.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioException;
+import org.biojava.bio.SimpleAnnotation;
+import org.biojava.bio.search.SeqSimilaritySearchHit;
+import org.biojava.bio.search.SeqSimilaritySearchResult;
+import org.biojava.bio.search.SeqSimilaritySearchSubHit;
+import org.biojava.bio.search.SequenceDBSearchHit;
+import org.biojava.bio.search.SequenceDBSearchResult;
+import org.biojava.bio.search.SequenceDBSearchSubHit;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.db.SequenceDBInstallation;
 import org.biojava.bio.seq.io.TokenParser;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
+import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleAlignment;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * A <code>FastaSearchBuilder</code> object organises search data
@@ -126,9 +143,9 @@ public class FastaSearchBuilder implements SearchBuilder
 	    // System.out.println("Setting Query sequence with ID: " + querySeqID);
 	    querySeq = (SymbolList) querySeqHolder.getSequence(querySeqID);
 	}
-	catch (BioException bex)
+	catch (BioException be)
 	{
-	    throw new BioException(bex, "Failed to retrieve query sequence from holder using ID: "
+	    throw new BioException(be, "Failed to retrieve query sequence from holder using ID: "
 				   + querySeqID);
 	}
     }
@@ -208,9 +225,9 @@ public class FastaSearchBuilder implements SearchBuilder
 	    SeqSimilaritySearchHit hit = createHit(hitData, hitAnnotation);
 	    searchHits.add(hit);
 	}
-	catch (BioException bex)
+	catch (BioException be)
 	{
-	    bex.printStackTrace();
+	    be.printStackTrace();
 	}
     }
 

@@ -56,6 +56,7 @@ public class BaseXMLWriter {
     private String oLineSeparator;
     private StringBuffer oSpaceStore;
     private boolean tLastWritePCData;
+    private boolean tLastWriteStartElement;
     private String oAttName;
     private String oAttValue;
     private static final String oLt = "<";
@@ -76,6 +77,7 @@ public class BaseXMLWriter {
         oLineSeparator = System.getProperty("line.separator");
         oIndent.setLength(0);
         tLastWritePCData = false;
+	tLastWriteStartElement = false;
     }
 
     private void decreaseIndent()
@@ -87,7 +89,7 @@ public class BaseXMLWriter {
     {
         decreaseIndent();
         oStr.setLength(0);
-        if (!tLastWritePCData)
+        if (!tLastWriteStartElement && !tLastWritePCData)
         {
             oStr.append(nl());
             oStr.append(indent());
@@ -96,6 +98,7 @@ public class BaseXMLWriter {
         oStr.append((String)oElementStack.pop());
         oStr.append(">");
         tLastWritePCData = false;
+	tLastWriteStartElement = false;
         return oStr.toString();
     }
 
@@ -126,6 +129,7 @@ public class BaseXMLWriter {
         oStr.append(">");
         increaseIndent();
         tLastWritePCData = false;
+	tLastWriteStartElement = true;
         return oStr.toString();
     }
 
@@ -171,6 +175,7 @@ public class BaseXMLWriter {
         oStr.append(">");
         increaseIndent();
         tLastWritePCData = false;
+	tLastWriteStartElement = true;
         return oStr.toString();
     }
 
@@ -184,6 +189,7 @@ public class BaseXMLWriter {
         oStr.append(string);
         oStr.append("/>");
         tLastWritePCData = false;
+	tLastWriteStartElement = false;
         return oStr.toString();
     }
 
@@ -208,6 +214,7 @@ public class BaseXMLWriter {
         }
         oStr.append("/>");
         tLastWritePCData = false;
+	tLastWriteStartElement = false;
         return oStr.toString();
     }
 
@@ -224,6 +231,7 @@ public class BaseXMLWriter {
         oStr.setLength(0);
         oStr.append(poPCData);
         tLastWritePCData = true;
+	tLastWriteStartElement = false;
         return oStr.toString();
     }
 }

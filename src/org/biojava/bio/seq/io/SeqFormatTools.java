@@ -21,17 +21,39 @@
 
 package org.biojava.bio.seq.io;
 
-import java.io.*;
-import java.lang.StringBuffer;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
-import org.w3c.dom.*;
-import org.apache.xerces.parsers.*;
-import org.xml.sax.*;
+import org.apache.xerces.parsers.DOMParser;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import org.xml.sax.SAXException;
+import org.xml.sax.InputSource;
+
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.CompoundLocation;
+import org.biojava.bio.symbol.FuzzyLocation;
+import org.biojava.bio.symbol.FuzzyPointLocation;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * <code>SeqFormatTools</code> is a utility class for common sequence
@@ -699,13 +721,13 @@ public class SeqFormatTools
 		}
 	    }
 	}
-	catch (IOException ie)
+	catch (IOException ioe)
 	{
-	    ie.printStackTrace();
+	    ioe.printStackTrace();
 	}
-	catch (SAXException sxe)
+	catch (SAXException se)
 	{
-	    sxe.printStackTrace();
+	    se.printStackTrace();
 	}
 	catch (BioError be)
 	{

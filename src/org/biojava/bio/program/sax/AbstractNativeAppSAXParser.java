@@ -270,7 +270,7 @@ abstract class AbstractNativeAppSAXParser
      * @param atts an <code>Attributes</code> value
      * @exception SAXException if an error occurs
      */
-    protected void startElement(QName poQName, Attributes atts) 
+    protected void startElement(QName poQName, Attributes atts)
     throws SAXException{
 
     oHandler.startElement(poQName.getURI(),

@@ -36,7 +36,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * <p>
  * The SAX2 events produced are as if the input to the parser was
  * an XML file validating against the biojava BlastLikeDataSetCollection DTD.
- * There is no requirement for an intermediate conversion of natve output to
+ * There is no requirement for an intermediate conversion of native output to
  * XML format. An application of the parsing framework, however, is to
  * create XML format files from native output files.
  * <p>

@@ -21,10 +21,10 @@
 
 package org.biojava.bio.seq.io;
 
-import org.biojava.bio.BioException;
+import java.util.Map;
+import java.util.HashMap;
 
-import java.lang.*;
-import java.util.*;
+import org.biojava.bio.BioException;
 
 /**
  * <code>SeqFileFormerFactory</code> is an abstract base class for

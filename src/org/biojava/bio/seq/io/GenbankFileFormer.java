@@ -21,12 +21,17 @@
 
 package org.biojava.bio.seq.io;
 
-import java.io.*;
-import java.util.*;
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * <code>GenbankFileFormer</code> performs the detailed formatting of
@@ -89,10 +94,10 @@ public class GenbankFileFormer implements SeqFileFormer
 
     public void setURI(String uri) throws ParseException { }
 
-    public void addSymbols(Alphabet alpha,
-			   Symbol[] syms,
-			   int      start,
-			   int      length)
+    public void addSymbols(Alphabet  alpha,
+			   Symbol [] syms,
+			   int       start,
+			   int       length)
 	throws IllegalAlphabetException
     {
 	int aCount = 0;

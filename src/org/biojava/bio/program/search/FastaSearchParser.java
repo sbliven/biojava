@@ -21,13 +21,13 @@
 
 package org.biojava.bio.program.search;
 
-import java.io.IOException;
 import java.io.BufferedReader;
-import java.lang.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
 
-import org.biojava.bio.*;
-import org.biojava.bio.search.*;
+import org.biojava.bio.BioException;
 import org.biojava.utils.ParserException;
 
 /**

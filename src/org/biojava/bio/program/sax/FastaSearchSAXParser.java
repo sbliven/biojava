@@ -21,26 +21,40 @@
 
 package org.biojava.bio.program.sax;
 
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.xml.sax.SAXException;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import org.biojava.bio.BioException;
 import org.biojava.utils.ParserException;
 
-import org.biojava.bio.program.search.SearchParser;
-import org.biojava.bio.program.search.SearchContentHandler;
 import org.biojava.bio.program.search.FastaSearchParser;
 import org.biojava.bio.program.search.SearchContentHandler;
+import org.biojava.bio.program.search.SearchParser;
 
 /**
- * <code>FastaSearchSAXParser</code> preliminary implementation.
+ * <code>FastaSearchSAXParser</code> is a SAX2 compliant parser for
+ * '-m 10' format output from the the Fasta search program (see the
+ * Fasta documentation for details of this format).
+ *
+ * <p>The SAX2 events produced are as if the input to the parser was
+ * an XML file validating against the biojava
+ * BlastLikeDataSetCollection DTD. There is no requirement for an
+ * intermediate conversion of native output to XML format.</p>
+ *
+ * <p>This class is backed by the
+ * <code>org.biojava.bio.program.search.FastaSearchParser</code>
+ * parser, so changes to that class will be reflected in the output
+ * from this one.</p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
@@ -63,6 +77,9 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
     // For formatting rounded numbers
     private NumberFormat nFormat;
 
+    // Platform independent linebreaks
+    private String nl;
+
     // For creating character events
     private String  stringOut;
     private char []   charOut;
@@ -80,6 +97,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	attributes  = new AttributesImpl();
 	qName       = new QName(this);
 	nFormat     = new DecimalFormat("###.0");
+	nl          = System.getProperty("line.separator");
     }
 
     public void parse(final InputSource source) throws IOException, SAXException
@@ -169,7 +187,8 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	}
 	catch (SAXException se)
 	{
-	    se.printStackTrace();
+	    System.err.println("An error occurred while creating an endElement() SAX event: "
+			       + se.getMessage());
 	}
     }
 
@@ -224,11 +243,11 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 
 	    StringBuffer props = new StringBuffer(2048);
 
-	    props.append("\n");
+	    props.append(nl);
 	    for (int i = 0; i < searchPropKeys.length; i++)
 	    {
 		props.append(searchPropKeys[i] + ": ");
-		props.append((String) searchProperties.get(searchPropKeys[i]) + "\n");
+		props.append((String) searchProperties.get(searchPropKeys[i]) + nl);
 	    }
 
 	    charOut = new char [props.length()];
@@ -245,7 +264,8 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	}
 	catch (SAXException se)
 	{
-	    se.printStackTrace();
+	    System.err.println("An error occurred while creating SAX events from header data: "
+			       + se.getMessage());
 	}
     }
 
@@ -265,7 +285,8 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	    }
 	    catch (SAXException se)
 	    {
-		se.printStackTrace();
+		System.err.println("An error occurred while creating startElement() SAX event from hit data: "
+				   + se.getMessage());
 	    }
 	}
 
@@ -425,14 +446,14 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 
 	    StringBuffer props = new StringBuffer(2048);
 
-	    props.append("\n");
+	    props.append(nl);
 	    for (int i = 0; i < hitPropKeys.length; i++)
 	    {
 		// Skip the sequence and consensus tokens
 		if (((String) hitPropKeys[i]).endsWith("Tokens"))
 		    continue;
 		props.append(hitPropKeys[i] + ": ");
-		props.append(hitProperties.get(hitPropKeys[i]).toString() + "\n");
+		props.append(hitProperties.get(hitPropKeys[i]).toString() + nl);
 	    }
 
 	    charOut = new char [props.length()];
@@ -552,7 +573,9 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	}
 	catch (SAXException se)
 	{
-	    se.printStackTrace();
+	    System.err.println("An error occurred while creating SAX events from hit data: "
+			       + se.getMessage());
+		
 	}
     }
 

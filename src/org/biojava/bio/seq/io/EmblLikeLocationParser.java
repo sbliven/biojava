@@ -21,13 +21,15 @@
 
 package org.biojava.bio.seq.io;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.BioException;
-
-import java.lang.String;
-import java.lang.StringBuffer;
 import java.util.List;
 import java.util.ArrayList;
+
+import org.biojava.bio.BioException;
+import org.biojava.bio.symbol.CompoundLocation;
+import org.biojava.bio.symbol.FuzzyLocation;
+import org.biojava.bio.symbol.FuzzyPointLocation;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.RangeLocation;
 
 /**
  * <code>EmblLikeLocationParser</code> parses EMBL/Genbank style
@@ -375,7 +377,7 @@ class EmblLikeLocationParser
 	    // This is a primary accession number
 	    // e.g. J00194:(100..202)
   	     throw new BioException("Remote locations are not supported: "
-	      		       + location);
+				    + location);
 	}
     }
 

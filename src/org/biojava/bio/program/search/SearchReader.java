@@ -28,9 +28,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.search.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.utils.*;
+import org.biojava.utils.ParserException;
 
 /**
  * A <code>SearchReader</code> parses a stream into result objects. It
@@ -82,9 +80,9 @@ public class SearchReader implements Iterator
 	    {
 		reader.close();
 	    }
-	    catch (IOException iox)
+	    catch (IOException ioe)
 	    {
-		iox.printStackTrace();
+		ioe.printStackTrace();
 	    }
 	return moreSearchesAvailable;
     }
@@ -109,21 +107,21 @@ public class SearchReader implements Iterator
 	    moreSearchesAvailable = parser.parseSearch(reader, handler);
 	    return handler.makeSearchResult();
 	}
-	catch (ParserException pex)
+	catch (ParserException pe)
 	{
 	    throw new NoSuchElementException("No valid search result could be parsed from this stream: "
 					     + "parse failed at line "
-					     + pex.getLineNumber()
+					     + pe.getLineNumber()
 					     + " of input");
 	}
-	catch (IOException iox)
+	catch (IOException ioe)
 	{
 	    throw new NoSuchElementException("No valid search result could be parsed from this stream");
 	}
-	catch (BioException bex)
+	catch (BioException be)
 	{
 	    throw new NoSuchElementException("No valid search result could be parsed from this stream: "
-					     + bex.getMessage());
+					     + be.getMessage());
 	}
     }
 
