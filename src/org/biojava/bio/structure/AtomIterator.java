@@ -1,0 +1,123 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ * Created on 24.05.2004
+ * @author Andreas Prlic
+ *
+ */
+
+package org.biojava.bio.structure;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.ArrayList ;
+
+/** an iterator over all atoms of a structure / group */
+
+public class AtomIterator implements Iterator {
+    Structure structure     ;
+    Group     group         ;
+    int current_atom_pos    ;
+    GroupIterator groupiter ;
+
+    public AtomIterator(Structure struct) {
+	structure = struct;
+	current_atom_pos = -1 ;
+	
+	groupiter = new GroupIterator(structure) ;
+	if ( groupiter.hasNext() ) {
+	    group = (Group) groupiter.next() ;
+	}
+	else 
+	    group = null ;
+    }
+
+    
+    public AtomIterator(Group g) {
+	structure = null;
+	group = g ;
+	current_atom_pos = -1 ;
+	groupiter = null ;
+	
+
+    }
+
+    /** is there a next atom ? */
+    public boolean hasNext() {
+	
+	// if there is another group ...
+	if ( current_atom_pos < group.size()-1 ) {	    
+	    return true ;
+	} else { 
+	    // search through the next groups if they contain an atom
+	    if (groupiter != null) {
+		GroupIterator tmp = (GroupIterator) groupiter.clone() ;
+		while (tmp.hasNext()) {
+		    Group tmpg = (Group) tmp.next() ;
+		    
+		    if ( tmpg.size() > 0 ) {
+			return true ;
+		    }
+		    
+		}
+	    } else {
+		// just an iterator over one group ...
+		return false ;
+	    }
+	}
+	return false ;
+    }
+
+    /** return next atom */
+    public Object next() 
+	throws NoSuchElementException
+    {
+	current_atom_pos++ ;
+	if ( current_atom_pos >= group.size() ) {
+	    if ( groupiter == null ) {
+		throw new NoSuchElementException("no more atoms found in group!");
+		
+	    }
+	    if ( groupiter.hasNext() ) {
+		group = (Group) groupiter.next() ;
+		current_atom_pos = 0 ;
+	    } else {
+		throw new NoSuchElementException("no more atoms found in structure!");
+	    }
+	} 
+
+	
+	Atom a ;
+	try {
+	    a = group.getAtom(current_atom_pos);
+	} catch (StructureException e) {
+	    e.printStackTrace();
+	    throw new NoSuchElementException("error wile trying to retrieve atom");
+	}
+	    
+	return a ;
+	
+    }
+
+    /** does nothing */
+    public void remove() {
+    }
+
+}
+    

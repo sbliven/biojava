@@ -35,12 +35,16 @@ public class AtomImpl implements Atom {
     String pdbline  ;
     int pdbserial   ;
 
+    double occupancy ;
+    double tempfactor;
+
     public AtomImpl () {
 	name     = null        ;
 	fullName = null        ;
 	coords   = new double[3];
 	pdbline  = ""          ;  
-
+	occupancy  = 0.0       ;
+	tempfactor = 0.0       ;
     }
 
     /** trimmed version of atom name, e.g. "CA" */
@@ -58,10 +62,7 @@ public class AtomImpl implements Atom {
     public int  getPDBserial()      { return pdbserial ; }
 
     /** the coordinates */    
-    public void     setCoords( double[] c ) {
-	coords = c; 
-
-    } 
+    public void     setCoords( double[] c ) { coords = c   ; } 
     /** get the coordinates as a double[3] array */
     public double[] getCoords()            { return coords ; }
 
@@ -85,4 +86,12 @@ public class AtomImpl implements Atom {
 	String str = name +" "+ pdbserial + " " + coords[0] + " " + coords[1] + " " + coords[2];
 	return str ;
     }
+
+    public void   setOccupancy(double occu){ occupancy = occu ;} ;
+    public double getOccupancy(){ return occupancy; } ;
+
+    public void   setTempFactor(double temp){ tempfactor = temp ;} ;
+    public double getTempFactor(){ return tempfactor; } ;
+
+    
 }

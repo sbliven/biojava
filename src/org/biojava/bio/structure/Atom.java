@@ -54,4 +54,12 @@ public interface Atom {
     /** store the whole line */
     public void   setPDBline(String s) ;
     public String getPDBline() ;
+
+    /** set occupancy */
+    public void setOccupancy(double occupancy) ;
+    /** get occupancy */
+    public double getOccupancy();
+
+    public void   setTempFactor(double temp) ;
+    public double getTempFactor() ;
 }
