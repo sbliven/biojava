@@ -41,7 +41,7 @@ import org.biojava.bio.seq.StrandedFeature;
  * <code>SSBindFasta3_3t08Test</code> tests object bindings for
  * Blast-like SAX events.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class SSBindFasta3_3t08Test extends SSBindCase
@@ -63,14 +63,8 @@ public class SSBindFasta3_3t08Test extends SSBindCase
                         6, 422, null,
                         12, 430, null);
 
-        String fastaOutputFileName = "fasta_3.3t08.out.gz";
-
-        URL fastaOutputURL = SSBindFasta3_3t08Test.class
-            .getResource(fastaOutputFileName);
-        File fastaOutputFile = new File(fastaOutputURL.getFile());
-
-        searchStream = new GZIPInputStream(new BufferedInputStream(new
-            FileInputStream(fastaOutputFile)));
+        searchStream =
+            new GZIPInputStream(new BufferedInputStream(getClass().getResourceAsStream("fasta_3.3t08.out.gz")));
 
         // XMLReader -> (SAX events) -> adapter -> builder -> objects
         XMLReader reader = (XMLReader) new FastaSearchSAXParser();

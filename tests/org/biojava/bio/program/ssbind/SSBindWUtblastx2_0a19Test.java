@@ -49,7 +49,7 @@ import org.biojava.bio.seq.StrandedFeature;
  * <code>SSBindWUtblastx2_0a19Test</code> tests object bindings for
  * Blast-like SAX events.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.2
  */
 public class SSBindWUtblastx2_0a19Test extends SSBindCase
@@ -71,14 +71,8 @@ public class SSBindWUtblastx2_0a19Test extends SSBindCase
                         1, 2575, StrandedFeature.UNKNOWN,
                         123, 1019, StrandedFeature.UNKNOWN);
 
-        String blastOutputFileName = "wu_tblastx_2.0a19.out.gz";
-
-        URL blastOutputURL = SSBindWUtblastx2_0a19Test.class
-            .getResource(blastOutputFileName);
-        File blastOutputFile = new File(blastOutputURL.getFile());
-
-        searchStream = new GZIPInputStream(new BufferedInputStream(new
-            FileInputStream(blastOutputFile)));
+        searchStream =
+            new GZIPInputStream(new BufferedInputStream(getClass().getResourceAsStream("wu_tblastx_2.0a19.out.gz")));
 
         // XMLReader -> (SAX events) -> adapter -> builder -> objects
         XMLReader reader = (XMLReader) new BlastLikeSAXParser();
