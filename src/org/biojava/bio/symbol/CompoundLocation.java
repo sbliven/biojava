@@ -41,7 +41,7 @@ import org.biojava.bio.*;
  * @author Greg Cox
  */
 
-public class CompoundLocation extends AbstractLocation
+class CompoundLocation extends AbstractLocation
       implements Location, Serializable 
 {
   /**

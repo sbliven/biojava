@@ -26,11 +26,11 @@ import java.io.*;
 import org.biojava.bio.*;
 
 /**
- * An abstract location that provides the glue from the old Location interface
- * to the new combination of Location and LocationTools.
+ * An abstract implementation of <code>Location</code>.
  *
+ * @for.developer This provides implementations of the binary operators which delegate to
+ *                the <code>LocationTools</code> class.
  * @author Matthew Pocock
- * @deprecated this should be removed prior to the 1.2 releases
  */
 public abstract class AbstractLocation
 implements Location, Serializable {

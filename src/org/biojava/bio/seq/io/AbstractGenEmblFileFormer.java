@@ -578,7 +578,7 @@ class AbstractGenEmblFileFormer
 
         Collections.sort(locs, Location.naturalOrder);
 
-        if (loc instanceof CompoundLocation)
+        if (!loc.isContiguous())
         {
             join = true;
             sb.append(joinType);

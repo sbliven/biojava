@@ -70,10 +70,10 @@ final class BetweenLocationTools
 		// 1..10 intersect 10^11.  This reduces to the empty location
 		if(tempIntersection.getMin() == tempIntersection.getMax())
 		{
-			tempIntersection = new Location.EmptyLocation();
+			tempIntersection = Location.empty;
 		}
 
-		if(!LocationTools.areEqual(tempIntersection, new Location.EmptyLocation()))
+		if(!LocationTools.areEqual(tempIntersection, Location.empty))
 		{
 			tempIntersection = new BetweenLocation(tempIntersection);
 		}
@@ -85,7 +85,7 @@ final class BetweenLocationTools
 		boolean toReturn = true;
 
 		Location tempLocation = BetweenLocationTools.intersection(locationA, locationB);
-		if(LocationTools.areEqual(tempLocation, new Location.EmptyLocation()))
+		if(LocationTools.areEqual(tempLocation, Location.empty))
 		{
 			toReturn = false;
 		}

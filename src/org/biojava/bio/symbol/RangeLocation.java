@@ -53,6 +53,10 @@ implements Serializable {
     return max;
   }
 
+  /**
+   * Construct a new RangeLocation from <code>min</code> to <code>max</code>.
+   */
+  
   public RangeLocation(int min, int max) throws IndexOutOfBoundsException {
     if(max < min) {
       throw new IndexOutOfBoundsException(

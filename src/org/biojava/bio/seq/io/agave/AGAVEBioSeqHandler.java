@@ -26,7 +26,7 @@ import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.program.das.*;
-import org.biojava.bio.symbol.Location.EmptyLocation;
+import org.biojava.bio.symbol.Location;
 import org.biojava.utils.*;
 import org.xml.sax.*;
 

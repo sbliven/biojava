@@ -29,10 +29,22 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
+ * Abstract <code>Location</code> decorator (wrapper).
+ *
+ * <p>
+ * These wrap up a normal <code>Location</code> object, and act as markers to indicate that
+ * the location has some kind of special semantics.
+ * </p>
+ *
+ * @for.developer When implementing a new Location decorator.
  * @author Matthew Pocock
  */
 public abstract class AbstractLocationDecorator implements Location {
   private final Location wrapped;
+  
+  /**
+   * Construct a new decorator wrapping the specified Location.
+   */
   
   protected AbstractLocationDecorator(Location wrapped) {
     this.wrapped = wrapped;

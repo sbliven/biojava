@@ -81,7 +81,7 @@ public class BetweenLocationTest extends TestCase
 
 	public void testIntersectionOneTenBetweenTenEleven()
 	{
-		Location expected = new Location.EmptyLocation();
+		Location expected = Location.empty;
 
 		Location result = LocationTools.intersection(rangeOneTen, betweenTenEleven);
 

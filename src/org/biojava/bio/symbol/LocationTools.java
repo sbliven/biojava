@@ -25,20 +25,36 @@ import java.util.*;
 import org.biojava.bio.*;
 
 /**
- * Repository for binary operators on Location instances.
+ * Tools class containing a number of operators for working with <code>Location</code> objects.
+ *
+ * <p>
+ * Most of the methods in this class are simple set-wise binary operators: for example,
+ * calculate the intersection of two locations.
+ * </p>
+ *
+ * @for.user This class provides helpful methods for set-wise manipulation of Location objects.
  *
  * @author Matthew Pocock
  * @author Greg Cox
  * @author Thomas Down
- * @author Mark Schreiber (makeCircularLocation)
+ * @author Mark Schreiber
  * @since 1.2
  */
 final public class LocationTools {
+    /**
+     * Nobody needs one of these.
+     */
+    
+    private LocationTools() {
+    }
+    
   /**
    * Return the union of two locations.
+   *
    * <p>
    * The union will be a Location instance that contains every index contained
    * by either locA or locB.
+   * </p>
    *
    * @param locA  the first Location
    * @param locB  the second Location
@@ -100,6 +116,7 @@ final public class LocationTools {
    * <p>
    * The intersection will be a Location instance that contains every index
    * contained by both locA and locB.
+   * </p>
    *
    * @param locA  the first Location
    * @param locB  the second Location
@@ -129,7 +146,7 @@ final public class LocationTools {
 	} if(LocationTools.overlaps(locA, locB)) {
 	    int min = Math.max(locA.getMin(), locB.getMin());
 	    int max = Math.min(locA.getMax(), locB.getMax());
-	    return buildLoc(min, max);
+	    return makeLocation(min, max);
 	} else {
 	    return Location.empty;
 	}
@@ -295,13 +312,14 @@ final public class LocationTools {
     }
 
     /**
-     * Returns whether the two locations overlap or not.
+     * Determines whether the locations overlap or not.
      * <p>
      * Two locations overlap if they contain at least one index in common.
+     * </p>
      *
      * @param locA  the first Location
      * @param locB  the second Location
-     * @param return true if they overlap, false otherwise
+     * @param return <code>true</code> if they overlap, <code>false</code> otherwise
      */
 
     public static boolean overlaps(Location locA, Location locB) {
@@ -363,8 +381,12 @@ final public class LocationTools {
     }
 
     /**
-     * Return <code>true</code> iff <code>locB</code> is contained
-     * entirely within <code>locA</code>.
+     * Return <code>true</code> iff all indices in <code>locB</code> are also contained
+     * by <code>locA</code>.
+     *
+     * @param locA The containing location
+     * @param locB The contained location
+     * @return <code>true</code> is locA contains locB
      */
 
     public static boolean contains(Location locA, Location locB) {
@@ -406,6 +428,7 @@ final public class LocationTools {
    * <p>
    * They are equal if both a contains b and b contains a. Equivalently, they
    * are equal if for every point p, locA.contains(p) == locB.contains(p).
+   * </p>
    *
    * @param locA the first Location
    * @param locB the second Location
@@ -508,7 +531,7 @@ final public class LocationTools {
     }
 
 
-    protected static Location _union(List locList) {
+    static Location _union(List locList) {
       // sort these blocks
       Collections.sort(locList, Location.naturalOrder);
 
@@ -564,7 +587,7 @@ final public class LocationTools {
    * @param max  the Location max value
    * @return a new Location from min to max
    */
-  protected static Location buildLoc(int min, int max) {
+  public static Location makeLocation(int min, int max) {
     if(min == max) {
       return new PointLocation(min);
     } else {
@@ -585,8 +608,7 @@ final public class LocationTools {
      * @throws IllegalArgumentException if min, max, or seqLength are 0;
      *
      */
-    public static CircularLocation makeCircularLocation(int min,
-                    int max, int seqLength){
+    public static CircularLocation makeCircularLocation(int min, int max, int seqLength){
         return CircularLocationTools.makeCircLoc(min,max,seqLength);
     }
 
@@ -596,7 +618,7 @@ final public class LocationTools {
    * @param theLocation The location to test for decorators
    * @return True if the location has a decorator and false otherwise
    */
-  protected static boolean isDecorated(Location theLocation)
+  static boolean isDecorated(Location theLocation)
   {
         return (theLocation instanceof AbstractLocationDecorator);
   }
@@ -612,7 +634,7 @@ final public class LocationTools {
    * The default behavior is to not handle decorators.  Any new decorators
    * will have to re-visit this method
    */
-  protected static void handleDecorations(Location locA, Location locB){
+  private static void handleDecorations(Location locA, Location locB){
     if(CircularLocationTools.isCircular(locA)|| CircularLocationTools.isCircular(locB)){
         if(CircularLocationTools.safeOperation(locA, locB) == false){
               throw new UnsupportedOperationException(
@@ -626,12 +648,12 @@ final public class LocationTools {
         // Intentionally blank
     }
     else{
-        throw new ClassCastException("Decorated locations are not handled in this version");
+        throw new ClassCastException("Decorated locations are not handled in this version: " + locA.getClass().getName() + ", " + locB.getClass().getName());
       }
   }
 
   /**
-   * <p>Flips a location relative to a length.</p>
+   * Flips a location relative to a length.
    *
    * <p>It is very common in biological sequences to represent locations on a sequence and then reverse that
    * sequence. This method allows locations in the original coordinate space to be transformed int
@@ -658,4 +680,38 @@ final public class LocationTools {
           return res;
       }
   }
+  
+    /**
+     * Subtract one location from another.  This methods calculates the set of
+     * points which are contains in location <code>x</code> but not in <code>y</code>.
+     *
+     * @param x A location
+     * @param y A location
+     * @return a location containing all points which are in x but not y
+     * @since 1.3
+     */
+  
+    public static Location subtract(Location x, Location y) {
+        if (isDecorated(x) || isDecorated(y)) {
+            handleDecorations(x, y);
+        }
+        
+        List spans = new ArrayList();
+        for (Iterator i = x.blockIterator(); i.hasNext(); ) {
+            Location xb = (Location) i.next();
+            Location yb = LocationTools.intersection(xb, y);
+            int pos = xb.getMin();
+            for (Iterator j = yb.blockIterator(); j.hasNext(); ) {
+                Location sb = (Location) j.next();
+                if (sb.getMin() > pos) {
+                    spans.add(new RangeLocation(pos, sb.getMin() - 1));
+                }
+                pos = sb.getMax() + 1;
+            }
+            if (pos <= xb.getMax()) {
+                spans.add(new RangeLocation(pos, xb.getMax()));
+            }
+        }
+        return LocationTools.union(spans);
+    }
 }

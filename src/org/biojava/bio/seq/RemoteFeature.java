@@ -76,7 +76,7 @@ public interface RemoteFeature extends StrandedFeature {
 	public Template()
 	{
 		super();
-		location = new Location.EmptyLocation();
+		location = Location.empty;
 		regions = new ArrayList();
 		resolver = null;
 	}
@@ -94,7 +94,7 @@ public interface RemoteFeature extends StrandedFeature {
 	    location = theTemplate.location;
 	    if(location == null)
 	    {
-	    	location = new Location.EmptyLocation();
+	    	location = Location.empty;
 	    }
 	    type = theTemplate.type;
 	    source = theTemplate.source;

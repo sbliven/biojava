@@ -308,7 +308,7 @@ public class StAXFeatureHandler extends StAXContentHandlerBase
 
     st.annotation = annot ;
 
-    st.location = new  Location.EmptyLocation();
+    st.location = Location.empty;
 
     if( staxenv != null )
 

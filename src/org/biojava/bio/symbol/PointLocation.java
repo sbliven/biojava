@@ -26,14 +26,16 @@ import java.io.*;
 import org.biojava.bio.*;
 
 /**
- * A single symbol.
+ * A location representing a single point.  This can be considered as
+ * the singleton set of one integer.
  * <p>
- * min and max equal the location of the single symbol.
+ * min and max are always equal for this implementation
+ * </p>
  *
  * @author Matthew Pocock
  */
 public class PointLocation
-extends AbstractLocation
+extends AbstractRangeLocation
 implements Location, Serializable {
   /**
    * The actual index contained.
@@ -43,31 +45,6 @@ implements Location, Serializable {
   public int getMin()	{ return point; }
   public int getMax()	{ return point; }
   public boolean contains(int p)	{ return this.point == p; }
-  
-  public SymbolList symbols(SymbolList s)	{
-    final Symbol sym = s.symbolAt(this.point);
-    try {
-      return new SimpleSymbolList(s.getAlphabet(), new AbstractList() {
-        public Object get(int index) throws IndexOutOfBoundsException {
-          if(index == 0) {
-            return sym;
-          }
-          throw new IndexOutOfBoundsException("Index " + index + " greater than 0");
-        }
-        public int size() { return 1; }
-      });
-    } catch (IllegalSymbolException ex) {
-      throw new BioError(ex);
-    }
-  }
-
-  public boolean isContiguous() {
-    return true;
-  }
-
-  public Iterator blockIterator() {
-    return Collections.singleton(this).iterator();
-  }
   
   public Location translate(int dist) {
       if (dist == 0)

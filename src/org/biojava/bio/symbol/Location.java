@@ -29,21 +29,38 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
- * A biological location.
+ * A set of integers, often used to represent positions on biological sequences.
+ *
  * <p>
- * The location will contain some symbols between getMin and getMax inclusive.
- * It is not required to contain all locations within this range. It is meant
- * to contain getMin or getMax. In the event that an operation would produce an
- * invalid or nonsensical range, empty should be returned.
+ * The location will contain some indices between getMin and getMax inclusive.
+ * It is not required to contain all indices within this range. It is meant
+ * to contain the indices returned by the getMin or getMax. In the event that 
+ * an operation would produce an
+ * invalid or nonsensical range, <code>Location.empty</code> should be returned.
  * </p>
  *
  * <p>
  * Location objects are <strong>always</strong> immutable.
  * </p>
  *
+ * <h2>Working with locations</h2>
+ *
+ * <p>
+ * Locations can be constructed in a number of ways:
+ * </p>
+ *
+ * <pre>
+ * Location l1 = LocationTools.makeLocation(10, 20);  // Makes a RangeLocation
+ * Location l2 = LocationTools.makeLocation(25, 25);  // Makes a PointLocation
+ * Location l3 = LocationTools.union(l1, l2); // Construct a non-contiguous
+ *                                            // location containing the
+ *                                            // points from l1 and l2
+ * </pre>
+ *
  * @author Matthew Pocock
  * @author Thomas Down
  */
+ 
 public interface Location {
   /**
    * Create a new instance of Location with all of the same decorators as this
@@ -191,7 +208,8 @@ public interface Location {
   Iterator blockIterator();
 
   /**
-   * The empty range.
+   * The <code>Location</code> which contains no points.
+   *
    * <p>
    * This object contains nothing. Its minimum value is Integer.MAX_VALUE.
    * Its maximum value is Integer.MIN_VALUE. It overlaps nothing. It is
@@ -202,14 +220,17 @@ public interface Location {
    */
   static final Location empty = new EmptyLocation();
   
-  static final LocationComparator naturalOrder = new LocationComparator();
-  
   /**
-   * The implementation of Location that contains no positions at all.
-   *
-   * @author Matthew Pocock
+   * Comparator which orders Locations naturally.  Locations
+   * are sorted primarily on the basis of their <code>getMin()</code>
+   * value.  In cases where that is equal, they are secondarily sorted
+   * by <code>getMax()</code> value.
    */
-  static final class EmptyLocation implements Location, Serializable {
+  
+  static final LocationComparator naturalOrder = new LocationComparator();
+}
+
+class EmptyLocation implements Location, Serializable {
     public Location getDecorator(Class decoratorClass) {
       if(decoratorClass.isInstance(this)) {
         return this;
@@ -256,9 +277,9 @@ public interface Location {
     public String toString() {
       return "{}";
     }
-  }
+}
   
-  static final class LocationComparator implements Comparator, Serializable {
+class LocationComparator implements Comparator, Serializable {
     public int compare(Object o1, Object o2) {
       int d = 0;
         
@@ -321,5 +342,4 @@ public interface Location {
         throw new NotSerializableException(nsfe.getMessage());
       }
     }
-  }
 }

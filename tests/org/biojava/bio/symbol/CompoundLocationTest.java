@@ -32,6 +32,7 @@ import junit.framework.TestCase;
  * <code>LocationTools</code>.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Thomas Down
  */
 public class CompoundLocationTest extends TestCase
 {
@@ -208,5 +209,41 @@ public class CompoundLocationTest extends TestCase
     public void testIntersectionBig() {
 	assertEquals(LocationTools.intersection(r4, r5), r6);
 	assertEquals(LocationTools.intersection(r4, r7), Location.empty);
+    }
+    
+    public void testSubtract() {
+        Location l1 = new RangeLocation(100, 200);
+        Location l2 = LocationTools.union(
+            new RangeLocation(100, 119),
+            new RangeLocation(180, 200)
+        );
+        assertEquals(
+            LocationTools.subtract(
+                l1,
+                new RangeLocation(120, 179)
+            ),
+            l2
+        );
+        assertEquals(
+            LocationTools.subtract(
+                l1,
+                new RangeLocation(80, 119)
+            ),
+            new RangeLocation(120, 200)
+        );
+        assertEquals(
+            LocationTools.subtract(
+                l1,
+                new RangeLocation(180, 1019)
+            ),
+            new RangeLocation(100, 179)
+        );    
+        assertEquals(
+            LocationTools.subtract(
+                l2,
+                Location.empty
+            ),
+            l2
+        );    
     }
 }
