@@ -66,7 +66,8 @@ import org.biojava.bio.*;
  * @author Thomas Down
  * @author Greg Cox
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
- * @since 1.1 */
+ * @since 1.1
+ */
 
 public class EmblProcessor extends SequenceBuilderFilter {
     public static final String PROPERTY_EMBL_ACCESSIONS = "embl_accessions";

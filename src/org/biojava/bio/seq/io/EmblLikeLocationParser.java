@@ -26,10 +26,11 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.CompoundLocation;
 import org.biojava.bio.symbol.FuzzyLocation;
 import org.biojava.bio.symbol.FuzzyPointLocation;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.LocationTools;
 import org.biojava.bio.symbol.PointLocation;
 import org.biojava.bio.symbol.RangeLocation;
 
@@ -206,10 +207,8 @@ class EmblLikeLocationParser
 	else
 	{
 	    // EMBL ordering is in reverse on the complementary strand
-	    // but we apply the sort in all cases for safety
-	    Collections.sort(subLocations, Location.naturalOrder);
-
-	    return new Object [] { new CompoundLocation(subLocations),
+	    // but LocationTools sorts them anyway
+	    return new Object [] { LocationTools.union(subLocations),
 				   new Boolean(isComplement) };
 	}
     }

@@ -102,6 +102,50 @@ class AbstractGenEmblFileFormer
     private static final int BETWEEN_LOCATION = 4;
 
     /**
+     * <code>formatLocation</code> creates an EMBL/Genbank style
+     * representation of a <code>Location</code>. Supported location
+     * forms:
+     *     
+     * <pre>
+     *   123
+     *  <123 or >123
+     *  (123.567)
+     *  (123.567)..789
+     *   123..(567.789)
+     *  (123.345)..(567.789)
+     *   123..456
+     *  <123..567 or 123..>567 or <123..>567
+     *   123^567
+     * </pre>
+     *
+     * Specifically not supported is:
+     * <pre>
+     *   AL123465:(123..567)
+     * </pre>
+     *
+     * Use of 'order' rather than 'join' is not retained over a
+     * read/write cycle. i.e. 'order' is converted to 'join'.
+     *
+     * @param loc a <code>Location</code> to format.
+     * @param strand a <code>StrandedFeature.Strand</code> object
+     * indicating the <code>Location</code>'s strand.
+     * @return a <code>String</code> value.
+     */
+    public String formatLocation(final Location               loc,
+				 final StrandedFeature.Strand strand)
+    {
+	// Using arbitrary leader and wrapwidth wide enough to always
+	// make one line
+	StringBuffer sb = formatLocationBlock(new StringBuffer(),
+					      loc,
+					      strand.getValue(),
+					      "",
+					      Integer.MAX_VALUE);
+
+	return sb.toString();
+    }
+
+    /**
      * <code>formatQualifierBlock</code> formats text into
      * EMBL/Genbank style qualifiers.
      *
@@ -254,8 +298,6 @@ class AbstractGenEmblFileFormer
 				  final Symbol []    syms,
 				  final int          blockSize)
     {
-	// StringBuffer sb = new StringBuffer(syms.length);
-
 	for (int i = 0; i < syms.length; i++)
 	{
 	    sb.append(syms[i].getToken());
@@ -263,50 +305,6 @@ class AbstractGenEmblFileFormer
 		sb.append(' ');
 	}
 	return sb;
-    }
-
-    /**
-     * <code>formatLocation</code> creates an EMBL/Genbank style
-     * representation of a <code>Location</code>. Supported location
-     * forms:
-     *     
-     * <pre>
-     *   123
-     *  <123 or >123
-     *  (123.567)
-     *  (123.567)..789
-     *   123..(567.789)
-     *  (123.345)..(567.789)
-     *   123..456
-     *  <123..567 or 123..>567 or <123..>567
-     *  123^567
-     * </pre>
-     *
-     * Specifically not supported is:
-     * <pre>
-     *   AL123465:(123..567)
-     * </pre>
-     *
-     * Use of 'order' rather than 'join' is not retained over a
-     * read/write cycle. i.e. 'order' is converted to 'join'.
-     *
-     * @param loc a <code>Location</code> to format.
-     * @param strand a <code>StrandedFeature.Strand</code> object
-     * indicating the <code>Location</code>'s strand.
-     * @return a <code>String</code> value.
-     */
-    public String formatLocation(final Location               loc,
-				 final StrandedFeature.Strand strand)
-    {
-	// Using arbitrary leader and wrapwidth wide enough to always
-	// make one line
-	StringBuffer sb = formatLocationBlock(new StringBuffer(),
-					      loc,
-					      strand.getValue(),
-					      "",
-					      Integer.MAX_VALUE);
-
-	return sb.toString();
     }
 
     /**
