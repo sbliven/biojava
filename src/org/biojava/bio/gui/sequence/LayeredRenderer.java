@@ -106,6 +106,7 @@ public class LayeredRenderer {
     }
 
     double offset = 0.0;
+    double allocatedOffset = 0.0;
     
     Iterator srcI = srcL.iterator();
     Iterator i = renderers.iterator();
@@ -140,7 +141,15 @@ public class LayeredRenderer {
 	  g.translate(-offset, 0.0);
       }
       
-      offset += sRend.getDepth(src);
+      if (sRend instanceof OverlayMarker)  {
+        // overlay, just record maximum allocation
+        allocatedOffset = Math.max(allocatedOffset, sRend.getDepth(src));
+      }
+      else {
+        // non-overlaid: apply all relevant offsets
+        offset += Math.max(sRend.getDepth(src), allocatedOffset);
+        allocatedOffset = 0.0;  // clear it as it is now applied.
+      }
     }
   }
   
@@ -189,7 +198,7 @@ public class LayeredRenderer {
         return sve;
       }
       
-      offset += depth;
+      if (!(sRend instanceof OverlayMarker)) offset += depth;
     }
     
     return null;
