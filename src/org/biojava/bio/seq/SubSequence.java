@@ -318,7 +318,13 @@ public class SubSequence implements Sequence {
         private static final FeatureFilter remoteFilter = new FeatureFilter.ByClass(RemoteFeature.class);
         
         protected FeatureFilter untransformFilter(FeatureFilter ff) {
-            return FilterUtils.transformFilter(super.transformFilter(ff),
+            return FilterUtils.transformFilter(
+                super.untransformFilter(
+                    new FeatureFilter.And(
+                        ff,
+                        new FeatureFilter.OverlapsLocation(new RangeLocation(1, ssthis.length()))
+                    )
+                ),
                 new FilterUtils.FilterTransformer() {
                     public FeatureFilter transform(FeatureFilter ff) {
                         if (ff.equals(remoteFilter)) {
