@@ -64,4 +64,19 @@ class ProjectedStrandedFeature extends ProjectedFeature
             getSource() + " " + getLocation() + " " + pm;
     }
 
+    public SymbolList getSymbols() {
+	SymbolList symList = super.getSymbols();
+	if(getStrand() == NEGATIVE) {
+	    try {
+		symList = DNATools.reverseComplement(symList);
+	    } catch (IllegalAlphabetException iae) {
+		throw new BioError(
+				   iae,
+				   "Could not retrieve symbols for feature as " +
+				   "the alphabet can not be complemented."
+				   );
+	    }
+	}
+	return symList;
+    }
 }
