@@ -1,5 +1,7 @@
 package org.biojava.bio.seq.filter;
 
+import org.biojava.bio.seq.FeatureFilter;
+
 /**
  * Things that will be shown filters.
  *
@@ -79,5 +81,4 @@ package org.biojava.bio.seq.filter;
  * @since 1.4
  */
 public interface Visitor {
-
 }
