@@ -280,6 +280,7 @@ public class QueryTools {
   private static final Node findMergableFiltersStart;
   
   static {
+      try {
     Tuple.ClassList queryNodeClassList
       = new SimpleTuple.ClassList( new Class[] {Query.class, Node.class} );
     Tuple.ClassList queryArcClassList
@@ -401,5 +402,8 @@ public class QueryTools {
                  new Tuple.FollowObject(queryNodeClassList, 1));
     
     findMergableFiltersQuery = fmfqb.buildQuery();
+      } catch (OperationException ex) {
+	  throw new NestedError(ex, "Couldn't initialize QueryTools");
+      }
   }
 }
