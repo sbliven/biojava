@@ -260,8 +260,8 @@ public class ProfileHMM extends SimpleMarkovModel {
 	    if(i > 1) {
 		createTransition(dO, dN);
 		createTransition(dO, mN);
-		createTransition(dN, iN);
 	    }        
+	    createTransition(dN,iN);
 	    
 	    mO = mN;
 	    iO = iN;
