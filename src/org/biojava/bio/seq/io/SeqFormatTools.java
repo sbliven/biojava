@@ -42,6 +42,17 @@ import org.biojava.bio.symbol.*;
  */
 public class SeqFormatTools
 {
+    private static final String featureDataFile =
+	"org/biojava/bio/seq/io/FeatureQualifier.xml";
+
+    private static final Map   featureData = new HashMap();
+    private static final Map qualifierData = new HashMap();
+
+    static
+    {
+	loadFeatureData(featureDataFile, featureData, qualifierData);
+    }
+
     /* Defines types of qualifier lines encountered: FIRST - the first
      * line of the qualifier, OVERWIDE - contains a very wide token
      * which can not be wrapped without breaking it, NOFIT - a line
@@ -159,6 +170,44 @@ public class SeqFormatTools
 	    } // end switch
 	} // end while
 	return output;
+    }
+
+    /**
+     * <code>formatQualifier</code> creates a qualifier string and
+     * adds quotes or parens to EMBL/Genbank qualifier values as
+     * specified in the internally loaded XML feature table
+     * description.
+     *
+     * @param key an <code>Object</code> value (the qualifier key).
+     * @param value an <code>Object</code> value (the qualifier content).
+     *
+     * @return a <code>String</code> bounded by the correct tokens.
+     */
+    public static String formatQualifier(final Object key,
+					 final Object value)
+    {
+	StringBuffer tb = new StringBuffer("/" + key);
+
+	String form = "quoted";
+	if (qualifierData.containsKey(key))
+            form = (String) ((Map) qualifierData.get(key)).get("form");
+
+	// This is a slight simplification. There are some types of
+        // qualifier which are unquoted unless they contain
+        // spaces. We all love special cases, don't we?
+        if (form.equals("quoted"))
+            tb.append("=\"" + value + "\"");
+        else if (form.equals("bare"))
+            tb.append("=" + value);
+        else if (form.equals("paren"))
+            tb.append("(" + value + ")");
+        else if (! form.equals("empty"))
+	{
+            System.err.println("Unrecognised qualifier format: " + form);
+	    tb.append("=" + value);
+	}
+
+        return tb.toString();
     }
 
     /**

@@ -39,23 +39,11 @@ import org.biojava.bio.symbol.*;
  */
 public class GenbankFileFormer implements SeqFileFormer
 {
-    private static String featureDataFile =
-	"org/biojava/bio/seq/io/FeatureQualifier.xml";
-
-    private static Map   featureData = new HashMap();
-    private static Map qualifierData = new HashMap();
-
     private PrintStream stream;
 
     static
     {
 	SeqFileFormerFactory.addFactory("Genbank", new GenbankFileFormer.Factory());
-
-	// This loads an XML file containing information on which
-	// qualifiers are valid (or even mandatory) for a particular
-	// feature key. It also indicates whether the value should be
-	// contained within quotes.
-	SeqFormatTools.loadFeatureData(featureDataFile, featureData, qualifierData);
     }
 
     private static class Factory extends SeqFileFormerFactory
@@ -232,13 +220,10 @@ public class GenbankFileFormer implements SeqFileFormer
     {
 	// There are 21 spaces in the leader
 	String   leader = "                     ";
-	// Default is to quote unknown qualifiers
-	String     form = "quoted";
 
-	StringBuffer tb = new StringBuffer("/" + key);
-
-	if (qualifierData.containsKey(key))
-	    form = (String) ((Map) qualifierData.get(key)).get("form");
+	// Don't print internal data structures
+	if (key.equals(Feature.PROPERTY_DATA_KEY))
+	    return;
 
 	// The value may be a collection if several qualifiers of the
 	// same type are present in a feature
@@ -246,33 +231,18 @@ public class GenbankFileFormer implements SeqFileFormer
 	{
 	    for (Iterator vi = ((Collection) value).iterator(); vi.hasNext();)
 	    {
-		tb.append(makeStringsByForm(vi.next(), form));
+		String qualifier = SeqFormatTools.formatQualifier(key, vi.next());
+		stream.println(SeqFormatTools.formatQualifierBlock(qualifier,
+                                                                   leader,
+                                                                   80));
 	    }
 	}
 	else
 	{
-	    tb.append(makeStringsByForm(value, form));
+	    String qualifier = SeqFormatTools.formatQualifier(key, value);
+	    stream.println(SeqFormatTools.formatQualifierBlock(qualifier,
+							       leader,
+							       80));
 	}
-	stream.println(SeqFormatTools.formatQualifierBlock(tb.toString(),
-							   leader,
-							   80));
-    }
-
-    private String makeStringsByForm(Object value, String form)
-	throws ParseException
-    {
-	// This is a slight simplification. There are some types of
-	// qualifier which are unquoted unless they contain
-	// spaces. We all love special cases, don't we?
-	if (form.equals("quoted"))
-	    return "=\"" + value + "\"";
-	else if (form.equals("bare"))
-	    return "=" + value;
-	else if (form.equals("paren"))
-	    return "(" + value + ")";
-	else if (form.equals("empty"))
-	    return "";
-
-	throw new ParseException("Unrecognised qualifier format: " + form);
     }
 }
