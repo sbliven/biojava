@@ -34,6 +34,7 @@ public class SimpleAssemblyTest {
 	cft.type = "fragment";
 	cft.source = "SATest";
 	cft.annotation = Annotation.EMPTY_ANNOTATION;
+	cft.strand = StrandedFeature.POSITIVE;
 	
 	cft.location = new RangeLocation(1, 1 + seq1.length() - 1);
 	cft.componentSequence = seq1;
@@ -41,12 +42,17 @@ public class SimpleAssemblyTest {
 	contig.createFeature(cft);
 
 	cft.location = new RangeLocation(10, 10 + seq2.length() - 1);
-	// cft.strand = StrandedFeature.NEGATIVE;
+	cft.strand = StrandedFeature.NEGATIVE;
 	cft.componentSequence = seq2;
 	cft.componentLocation = new RangeLocation(1, seq2.length());
 	contig.createFeature(cft);
 
 	System.out.println(contig.seqString());
+	System.out.println(contig.subList(1, 1).seqString());
+	System.out.println(contig.subList(1, 5).seqString());
+	System.out.println(contig.subList(3, 9).seqString());
+	System.out.println(contig.subList(3, 11).seqString());
+	System.out.println(contig.subList(10, 12).seqString());
 	printFeatures(contig);
     }
 
