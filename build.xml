@@ -46,7 +46,7 @@
 
     <property name="build.compiler" value="modern" />
 
-    <property name="classpath" value="bytecode.jar:htmlparser.jar:commons-cli.jar:commons-dbcp.jar:commons-pool.jar" />
+    <property name="classpath" value="bytecode.jar:htmlparser.jar:commons-cli.jar:commons-dbcp-1.1.jar:commons-pool-1.1.jar" />
 
     <property name="ant-tasks.path" value="ant-lib/sablecc.jar:ant-lib/anttask.jar" />
 
