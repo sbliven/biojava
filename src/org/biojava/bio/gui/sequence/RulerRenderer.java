@@ -72,14 +72,14 @@ public class RulerRenderer implements SequenceRenderer {
     
     g.draw(line);
     
-    // we want ticks ~ 50 pixles appart
-    int realSymsPerGap = src.graphicsToSequence(50.0);
-    System.out.println("Real syms: " + realSymsPerGap);
+    // we want ticks no closer than 40 pixles appart
+    int realSymsPerGap = src.graphicsToSequence(40.0);
+    //System.out.println("Real syms: " + realSymsPerGap);
     double ten = Math.log(10);
     int snapSymsPerGap = (int) Math.exp(
       Math.ceil(Math.log(realSymsPerGap) / ten) * ten
     );
-    System.out.println("Snapped syms: " + snapSymsPerGap);
+    //System.out.println("Snapped syms: " + snapSymsPerGap);
     
     int minP = min + (snapSymsPerGap - min) % snapSymsPerGap;
     for(int indx = minP; indx <= max; indx += snapSymsPerGap) {

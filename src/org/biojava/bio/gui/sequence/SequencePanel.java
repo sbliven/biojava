@@ -58,7 +58,18 @@ import java.util.List; // usefull trick to 'hide' javax.swing.List
  * @author Thomas Down
  * @author Matthew Pocock
  */
-public class SequencePanel extends JComponent implements SwingConstants, SequenceRenderContext {
+public class SequencePanel
+extends JComponent
+implements SwingConstants,
+SequenceRenderContext,
+Changeable {
+  public static final ChangeType RENDERER = new ChangeType(
+    "The renderer for this SequencePanel has changed",
+    "org.biojava.bio.gui.sequence.SequencePanel",
+    "RENDERER",
+    SequenceRenderContext.LAYOUT
+  );
+
   private SymbolList sequence;
   private int direction;
   private double scale;
@@ -68,14 +79,51 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
   private SequenceRenderContext.Border leadingBorder;
   private SequenceRenderContext.Border trailingBorder;
 
-  private List views;
-  private List lineInfos = new ArrayList();
+  private SequenceRenderer renderer;
   private double[] offsets;
+  private int realLines;
   private double alongDim = 0.0;
   private double acrossDim = 0.0;
   private int symbolsPerLine = 0;
 
   private RendererMonitor theMonitor;
+
+  private transient ChangeSupport changeSupport = null;
+  
+  protected boolean hasChangeListeners() {
+    return changeSupport != null;
+  }
+  
+  protected ChangeSupport getChangeSupport(ChangeType ct) {
+    if(changeSupport == null) {
+      changeSupport = new ChangeSupport();
+    }
+    
+    return changeSupport;
+  }
+  
+  public void addChangeListener(ChangeListener cl) {
+    addChangeListener(cl, ChangeType.UNKNOWN);
+  }
+  
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+    ChangeSupport cs = getChangeSupport(ct);
+    synchronized(cs) {
+      cs.addChangeListener(cl);
+    }
+  }
+  
+  public void removeChangeListener(ChangeListener cl) {
+    removeChangeListener(cl, ChangeType.UNKNOWN);
+  }
+  
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+    ChangeSupport cs = getChangeSupport(ct);
+    synchronized(cs) {
+      cs.removeChangeListener(cl);
+    }
+  }
+
   private ChangeListener layoutListener = new ChangeAdapter() {
     public void postChange(ChangeEvent ce) {
       resizeAndValidate();
@@ -92,7 +140,6 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
    */
 
   {
-    views = new ArrayList();
     direction = HORIZONTAL;
     scale = 12.0;
     lines = 1;
@@ -101,8 +148,6 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
     theMonitor = new RendererMonitor();
     leadingBorder = new SequenceRenderContext.Border();
     trailingBorder = new SequenceRenderContext.Border();
-//    leadingBorder.addPropertyChangeListener(theMonitor);
-//    trailingBorder.addPropertyChangeListener(theMonitor);
   }
 
   /**
@@ -275,11 +320,11 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
   /**
    * Paint this component.
    * <P>
-   * This calls the paint method of each SequenceRenderer registered with this
-   * SequncePanel after setting up the graphics apropreately.
+   * This calls the paint method of the currently registered SequenceRenderer
+   * after setting up the graphics apropreately.
    */
   public void paintComponent(Graphics g) {
-    if(sequence == null) {
+    if( (sequence == null) || (renderer == null) ) {
       return;
     }
     
@@ -295,12 +340,16 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
       maxPos = currentClip.getMaxX();
     }
     
+    System.out.println("minPos: " + minPos);
     int minOffset = Arrays.binarySearch(offsets, minPos);
     if(minOffset < 0) {
       minOffset = -minOffset - 1;
     }
+    System.out.println("minOffset: " + minOffset);
     double minCoord = (minOffset == 0) ? 0.0 : offsets[minOffset-1];
+    System.out.println("minCoord: " + minCoord);
     int minP = 1 + (int) ((double) minOffset * symbolsPerLine);
+    System.out.println("minP: " + minP);
     
     Rectangle2D.Double clip = new Rectangle2D.Double();
     if (direction == HORIZONTAL) {
@@ -313,11 +362,9 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
         g2.translate(minCoord, leadingBorder.getSize() - alongDim * minOffset);
     }
     
-    LineInfo currentLI;
     int min = minP;
-    for(int l = minOffset; l < lineInfos.size(); l++) {
+    for(int l = minOffset; l < realLines; l++) {
       int max = Math.min(min + symbolsPerLine - 1, sequence.length());
-      currentLI = (LineInfo) lineInfos.get(l);
       
       if (direction == HORIZONTAL) {
           clip.x = l * alongDim;
@@ -327,47 +374,62 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
           clip.y = l * alongDim;
       }
       
-      for (Iterator i = views.iterator(); i.hasNext(); ) {
-        SequenceRenderer r = (SequenceRenderer) i.next();
-        double depth = currentLI.getDepth(r);
-        if (direction == HORIZONTAL) {
-            clip.height = depth;
-        } else {
-            clip.width = depth;
-        }
-        
-        Shape oldClip = g2.getClip();
-        g2.clip(clip);
-        r.paint(g2, this, min, max);
-        g2.setClip(oldClip);
-        
-        if (direction == HORIZONTAL) {
-            g2.translate(0.0, depth);
-        } else {
-            g2.translate(depth, 0.0);
-        }
+      double depth = offsets[l] - spacer;
+      if(l != 0) {
+        depth -= offsets[l-1];
       }
+      
       if (direction == HORIZONTAL) {
-          g2.translate(-alongDim, spacer);
+          clip.height = depth;
       } else {
-          g2.translate(spacer, -alongDim);
+          clip.width = depth;
+      }
+      
+      Shape oldClip = g2.getClip();
+      //g2.clip(clip);
+      renderer.paint(g2, this, min, max);
+      //g2.setClip(oldClip);
+      
+      if (direction == HORIZONTAL) {
+          g2.translate(-alongDim, spacer + depth);
+      } else {
+          g2.translate(spacer + depth, -alongDim);
       }
       
       min += symbolsPerLine;
 
-      if(offsets[l] > maxPos) {
+      if( (min > sequence.length()) || (offsets[l] > maxPos)) {
         break;
       }
     }
   }
 
-  public void addRenderer(SequenceRenderer r) {
-    if(r instanceof Changeable) {
-      Changeable c = (Changeable) r;
-      c.addChangeListener(layoutListener, SequenceRenderContext.LAYOUT);
-      c.addChangeListener(repaintListener, SequenceRenderContext.REPAINT);
+  public void setRenderer(SequenceRenderer r)
+  throws ChangeVetoException {
+    if(hasChangeListeners()) {
+      ChangeEvent ce = new ChangeEvent(
+        this,
+        RENDERER,
+        r,
+        this.renderer
+      );
+      ChangeSupport cs = getChangeSupport(RENDERER);
+      synchronized(cs) {
+        if( (this.renderer != null) && (this.renderer instanceof Changeable) ) {
+          Changeable c = (Changeable) this.renderer;
+          c.removeChangeListener(layoutListener, SequenceRenderContext.LAYOUT);
+          c.removeChangeListener(repaintListener, SequenceRenderContext.REPAINT);
+        }
+        this.renderer = r;
+        if( (r != null) && (r instanceof Changeable) ) {
+          Changeable c = (Changeable) r;
+          c.addChangeListener(layoutListener, SequenceRenderContext.LAYOUT);
+          c.addChangeListener(repaintListener, SequenceRenderContext.REPAINT);
+        }
+      }
+    } else {
+      this.renderer = r;
     }
-    views.add(r);
     resizeAndValidate();
   }
 
@@ -382,10 +444,9 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
   public void resizeAndValidate() {
     System.out.println("resizeAndValidate starting");
     Dimension d = null;
-    int realLines;
     double acrossDim;
     
-    if(sequence == null) {
+    if( (sequence == null) || (renderer == null) ) {
       System.out.println("No sequence");
       // no sequence - collapse down to no size at all
       alongDim = 0.0;
@@ -415,14 +476,9 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
       + alongDim);
       acrossDim = 0.0;
       
-      double insetBefore = 0.0;
-      double insetAfter = 0.0;
-      for (Iterator i = views.iterator(); i.hasNext(); ) {
-        SequenceRenderer r = (SequenceRenderer) i.next();
-        System.out.println("Renderer: " + r);
-        insetBefore = Math.max(insetBefore, r.getMinimumLeader(this));
-        insetAfter = Math.max(insetAfter, r.getMinimumTrailer(this));
-      }
+      double insetBefore = renderer.getMinimumLeader(this);
+      double insetAfter = renderer.getMinimumTrailer(this);
+
       leadingBorder.setSize(insetBefore);
       trailingBorder.setSize(insetAfter);
       double insets = insetBefore + insetAfter;
@@ -457,31 +513,16 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
         throw new Error("Pants");
       }
       int min = 1;
-      lineInfos.clear();
+      this.offsets = new double[realLines];
+      int li = 0;
+      double totDepth = 0.0;
       while(min <= sequence.length()) {
-        //System.out.println("LineInfor for line starting: " + min);
-        LineInfo li = new LineInfo();
         int max = min + symbolsPerLine - 1;
-        for(Iterator i = views.iterator(); i.hasNext(); ) {
-          SequenceRenderer sr = (SequenceRenderer) i.next();
-          li.setDepth(sr, sr.getDepth(this, min, max));
-        }
-        acrossDim += li.getTotalDepth();
-        lineInfos.add(li);
+        double depth = renderer.getDepth(this, min, max);
+        acrossDim += depth + spacer;
+        offsets[li] = totDepth;
         min = max + 1;
-      }
-      offsets = new double[lineInfos.size()];
-      {
-        int i = 0;
-        double totDepth = 0.0;
-        Iterator lii = lineInfos.iterator();
-        while(lii.hasNext()) {
-          LineInfo li = (LineInfo) lii.next();
-          totDepth += li.getTotalDepth();
-          totDepth += spacer;
-          offsets[i] = totDepth;
-          i++;
-        }
+        li++;
       }
       
       acrossDim += spacer * (realLines - 1);
