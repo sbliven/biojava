@@ -610,9 +610,13 @@ public interface FeatureFilter extends Serializable {
     }
   }
   
-  public final static class ByAnnotationType
+  public static class ByAnnotationType
   implements OptimizableFilter {
     private AnnotationType type;
+    
+    protected ByAnnotationType() {
+      this(AnnotationType.ANY);
+    }
     
     public ByAnnotationType(AnnotationType type) {
       this.type = type;
@@ -620,6 +624,10 @@ public interface FeatureFilter extends Serializable {
     
     public AnnotationType getType() {
       return type;
+    }
+    
+    protected void setType(AnnotationType type) {
+      this.type = type;
     }
     
     public boolean accept(Feature f) {
@@ -649,7 +657,7 @@ public interface FeatureFilter extends Serializable {
         Set ourProps = new HashSet(getType().getProperties());
         ourProps.retainAll(props);
         if(ourProps.isEmpty()) {
-          return true;
+          return false; // we can't prove they are disjoint because there is nothing to check for dissagreements:
         }
         for(Iterator i = ourProps.iterator(); i.hasNext(); ) {
           Object prop = i.next();
@@ -714,7 +722,8 @@ public interface FeatureFilter extends Serializable {
    * @author Keith James
    * @since 1.1
    */
-  public final static class ByAnnotation implements OptimizableFilter {
+  public final static class ByAnnotation
+  extends ByAnnotationType {
     private Object key;
     private Object value;
 
@@ -728,6 +737,14 @@ public interface FeatureFilter extends Serializable {
     public ByAnnotation(Object key, Object value) {
       this.key = key;
       this.value = value;
+      
+      AnnotationType.Impl type = new AnnotationType.Impl();
+      type.setConstraints(
+        key,
+        new PropertyConstraint.ExactValue(value),
+        CardinalityConstraint.ONE
+      );
+      setType(type);
     }
 
     public Object getKey() {
@@ -736,50 +753,6 @@ public interface FeatureFilter extends Serializable {
 
     public Object getValue() {
       return value;
-    }
-
-    public boolean accept(Feature f) {
-        Annotation ann = f.getAnnotation();
-        if (! ann.containsProperty(key)) {
-            return false;
-        }
-        else
-        {
-            Object v = ann.getProperty(key);
-            if (v == null) {
-                if (value == null) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                return v.equals(value);
-            }
-        }
-    }
-
-    public boolean equals(Object o) {
-      return
-        (o instanceof ByAnnotation) &&
-        (((ByAnnotation) o).getKey().equals(this.getKey())) &&
-        (((ByAnnotation) o).getValue().equals(this.getValue()));
-    }
-
-    public int hashCode() {
-      return getKey().hashCode() ^ getValue().hashCode();
-    }
-
-    public boolean isProperSubset(FeatureFilter sup) {
-      return this.equals(sup);
-    }
-
-    public boolean isDisjoint(FeatureFilter filt) {
-      return (filt instanceof AcceptNoneFilter) || (
-        (filt instanceof ByAnnotation) && (
-          !(getKey().equals(((ByAnnotation) filt).getKey())) ||
-          !(getValue().equals(((ByAnnotation) filt).getValue()))
-        )
-      );
     }
 
     public String toString() {
@@ -794,7 +767,8 @@ public interface FeatureFilter extends Serializable {
    * @author Keith James
    * @since 1.1
    */
-  public final static class HasAnnotation implements FeatureFilter {
+  public final static class HasAnnotation
+  extends ByAnnotationType {
     private Object key;
 
     /**
@@ -805,37 +779,22 @@ public interface FeatureFilter extends Serializable {
      */
     public HasAnnotation(Object key) {
       this.key = key;
+      
+      AnnotationType.Impl type = new AnnotationType.Impl();
+      type.setConstraints(
+        key,
+        PropertyConstraint.ANY,
+        CardinalityConstraint.ANY
+      );
+      setType(type);
     }
 
     public Object getKey() {
       return key;
     }
-
-    public boolean accept(Feature f) {
-        Annotation ann = f.getAnnotation();
-
-        return ann.containsProperty(key);
-    }
-
-    public boolean equals(Object o) {
-      return
-        (o instanceof HasAnnotation) &&
-        (((HasAnnotation) o).getKey().equals(this.getKey()));
-    }
-
-    public int hashCode() {
-      return getKey().hashCode();
-    }
-
-    public boolean isProperSubset(FeatureFilter sup) {
-      return this.equals(sup);
-    }
-
-    public boolean isDisjoint(FeatureFilter filt) {
-      return (filt instanceof AcceptNoneFilter) || (
-        (filt instanceof HasAnnotation) &&
-        !(getKey().equals(((HasAnnotation) filt).getKey()))
-      );
+    
+    public String toString() {
+      return "Has annotation: " + getKey();
     }
   }
 

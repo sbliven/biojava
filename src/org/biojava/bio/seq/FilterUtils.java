@@ -52,51 +52,47 @@ public class FilterUtils {
      */
 
     public static boolean areProperSubset(FeatureFilter sub, FeatureFilter sup) {
-        // Preconditions
-        
-        if (sub == null) {
-            throw new NullPointerException("Null FeatureFilter: sub");
-        }
-        if (sup == null) {
-            throw new NullPointerException("Null FeatureFilter: sup");
-        }
-        
-        // Body
-        
-        if(sub.equals(sup)) {
-            return true;
-        }
-	
-	    if (sup instanceof FeatureFilter.AcceptAllFilter) {
-            return true;
-        } else if (sub instanceof FeatureFilter.AcceptAllFilter) {
-            return false;
-        } else if (sub instanceof FeatureFilter.AcceptNoneFilter) {
-            return false;
-        } else if (sup instanceof FeatureFilter.AcceptNoneFilter) {
-            return false;
-        } else if (sup instanceof FeatureFilter.And) {
-            FeatureFilter.And and_sup = (FeatureFilter.And) sup;
-            return areProperSubset(sub, and_sup.getChild1()) && areProperSubset(sub, and_sup.getChild2());
-        } else if (sub instanceof FeatureFilter.And) {
-            FeatureFilter.And and_sub = (FeatureFilter.And) sub;
-            return areProperSubset(and_sub.getChild1(), sup) || areProperSubset(and_sub.getChild2(), sup);
-        } else if (sub instanceof FeatureFilter.Or) {
-            FeatureFilter.Or or_sub = (FeatureFilter.Or) sub;
-            return areProperSubset(or_sub.getChild1(), sup) && areProperSubset(or_sub.getChild2(), sup);
-        } else if (sup instanceof FeatureFilter.Or) {
-            FeatureFilter.Or or_sup = (FeatureFilter.Or) sup;
-            return areProperSubset(sub, or_sup.getChild1()) || areProperSubset(sub, or_sup.getChild2());
-        } else if (sup instanceof FeatureFilter.Not) {
-            FeatureFilter not_sup = ((FeatureFilter.Not) sup).getChild();
-            return areDisjoint(sub, not_sup);
-        } else if (sub instanceof FeatureFilter.Not) {
-            // How do we prove this one?
-        } else if (sub instanceof OptimizableFilter) {
-            return ((OptimizableFilter) sub).isProperSubset(sup);
-        }
-    
-	    return false;
+      // Preconditions
+      
+      if (sub == null) {
+        throw new NullPointerException("Null FeatureFilter: sub");
+      }
+      if (sup == null) {
+        throw new NullPointerException("Null FeatureFilter: sup");
+      }
+      
+      // Body
+      
+      if(sub.equals(sup)) {
+        return true;
+      }
+      
+      if (sup instanceof FeatureFilter.AcceptAllFilter) {
+        return true;
+      } else if (sub instanceof FeatureFilter.AcceptNoneFilter) {
+        return true;
+      } else if (sup instanceof FeatureFilter.And) {
+        FeatureFilter.And and_sup = (FeatureFilter.And) sup;
+        return areProperSubset(sub, and_sup.getChild1()) && areProperSubset(sub, and_sup.getChild2());
+      } else if (sub instanceof FeatureFilter.And) {
+        FeatureFilter.And and_sub = (FeatureFilter.And) sub;
+        return areProperSubset(and_sub.getChild1(), sup) || areProperSubset(and_sub.getChild2(), sup);
+      } else if (sub instanceof FeatureFilter.Or) {
+        FeatureFilter.Or or_sub = (FeatureFilter.Or) sub;
+        return areProperSubset(or_sub.getChild1(), sup) && areProperSubset(or_sub.getChild2(), sup);
+      } else if (sup instanceof FeatureFilter.Or) {
+        FeatureFilter.Or or_sup = (FeatureFilter.Or) sup;
+        return areProperSubset(sub, or_sup.getChild1()) || areProperSubset(sub, or_sup.getChild2());
+      } else if (sup instanceof FeatureFilter.Not) {
+        FeatureFilter not_sup = ((FeatureFilter.Not) sup).getChild();
+        return areDisjoint(sub, not_sup);
+      } else if (sub instanceof FeatureFilter.Not) {
+        // How do we prove this one?
+      } else if (sub instanceof OptimizableFilter) {
+        return ((OptimizableFilter) sub).isProperSubset(sup);
+      }
+      
+      return false;
     }
   
     /**
@@ -113,52 +109,54 @@ public class FilterUtils {
      */
 
     public static boolean areDisjoint(FeatureFilter a, FeatureFilter b) {
-        // Preconditions
-        
-        if (a == null) {
-            throw new NullPointerException("Null FeatureFilter: a");
-        }
-        if (b == null) {
-            throw new NullPointerException("Null FeatureFilter: b");
-        }
-        
-        // Body
-        
-        if(a.equals(b)) {
-            return false;
-        }
-	
-	    if (a instanceof FeatureFilter.AcceptAllFilter || b instanceof FeatureFilter.AcceptAllFilter) {
-            return false;
-        } else if (a instanceof FeatureFilter.AcceptNoneFilter || b instanceof FeatureFilter.AcceptNoneFilter) {
-            return true;
-        } if (a instanceof FeatureFilter.And) {
-            FeatureFilter.And and_a = (FeatureFilter.And) a;
-            return areDisjoint(and_a.getChild1(), b) || areDisjoint(and_a.getChild2(), b);
-        } else if (b instanceof FeatureFilter.And) {
-            FeatureFilter.And and_b = (FeatureFilter.And) b;
-            return areDisjoint(a, and_b.getChild1()) || areDisjoint(a, and_b.getChild2());
-        } else if (a instanceof FeatureFilter.Or) {
-            FeatureFilter.Or or_a = (FeatureFilter.Or) a;
-            return areDisjoint(or_a.getChild1(), b) && areDisjoint(or_a.getChild2(), b);
-        } else if (b instanceof FeatureFilter.Or) {
-            FeatureFilter.Or or_b = (FeatureFilter.Or) b;
-            return areDisjoint(a, or_b.getChild1()) && areDisjoint(a, or_b.getChild2());
-        } else if (a instanceof FeatureFilter.Not) {
-            FeatureFilter not_a = ((FeatureFilter.Not) a).getChild();
-            return areProperSubset(b, not_a);
-        } else if (b instanceof FeatureFilter.Not) {
-            FeatureFilter not_b = ((FeatureFilter.Not) b).getChild();
-            return areProperSubset(a, not_b);
-        } else if (a instanceof OptimizableFilter) {
-            return ((OptimizableFilter) a).isDisjoint(b);
-        } else if (b instanceof OptimizableFilter) {
-            return ((OptimizableFilter) b).isDisjoint(a);
-        }
-
-        // *SIGH* we don't have a proof here...
-
+      // Preconditions
+      
+      if (a == null) {
+        throw new NullPointerException("Null FeatureFilter: a");
+      }
+      if (b == null) {
+        throw new NullPointerException("Null FeatureFilter: b");
+      }
+      
+      // Body
+      
+      if(a.equals(b)) {
         return false;
+      }
+      
+      if (a instanceof FeatureFilter.AcceptAllFilter) {
+        return areProperSubset(b, FeatureFilter.none);
+      } else if(b instanceof FeatureFilter.AcceptAllFilter) {
+        return areProperSubset(a, FeatureFilter.none);
+      } else if (a instanceof FeatureFilter.AcceptNoneFilter || b instanceof FeatureFilter.AcceptNoneFilter) {
+        return true;
+      } if (a instanceof FeatureFilter.And) {
+        FeatureFilter.And and_a = (FeatureFilter.And) a;
+        return areDisjoint(and_a.getChild1(), b) || areDisjoint(and_a.getChild2(), b);
+      } else if (b instanceof FeatureFilter.And) {
+        FeatureFilter.And and_b = (FeatureFilter.And) b;
+        return areDisjoint(a, and_b.getChild1()) || areDisjoint(a, and_b.getChild2());
+      } else if (a instanceof FeatureFilter.Or) {
+        FeatureFilter.Or or_a = (FeatureFilter.Or) a;
+        return areDisjoint(or_a.getChild1(), b) && areDisjoint(or_a.getChild2(), b);
+      } else if (b instanceof FeatureFilter.Or) {
+        FeatureFilter.Or or_b = (FeatureFilter.Or) b;
+        return areDisjoint(a, or_b.getChild1()) && areDisjoint(a, or_b.getChild2());
+      } else if (a instanceof FeatureFilter.Not) {
+        FeatureFilter not_a = ((FeatureFilter.Not) a).getChild();
+        return areProperSubset(b, not_a);
+      } else if (b instanceof FeatureFilter.Not) {
+        FeatureFilter not_b = ((FeatureFilter.Not) b).getChild();
+        return areProperSubset(a, not_b);
+      } else if (a instanceof OptimizableFilter) {
+        return ((OptimizableFilter) a).isDisjoint(b);
+      } else if (b instanceof OptimizableFilter) {
+        return ((OptimizableFilter) b).isDisjoint(a);
+      }
+      
+      // *SIGH* we don't have a proof here...
+      
+      return false;
     }
     
     /**

@@ -30,10 +30,21 @@ import junit.framework.TestCase;
  * properSubset and disjunction.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.2
  */
 public class FilterUtilsTest extends TestCase
 {
+    protected FeatureFilter all_and_all;
+    protected FeatureFilter all_and_none;
+    protected FeatureFilter none_and_all;
+    protected FeatureFilter none_and_none;
+    
+    protected FeatureFilter all_or_all;
+    protected FeatureFilter all_or_none;
+    protected FeatureFilter none_or_all;
+    protected FeatureFilter none_or_none;
+    
     protected FeatureFilter tf1;
     protected FeatureFilter tf2;
     protected FeatureFilter tf3;
@@ -41,6 +52,9 @@ public class FilterUtilsTest extends TestCase
     protected FeatureFilter pf1;
     protected FeatureFilter pf2;
     protected FeatureFilter pf3;
+    protected FeatureFilter pf4;
+    protected FeatureFilter pf5;
+    protected FeatureFilter pf6;
    
     protected FeatureFilter cf_StrandedFeature;
     protected FeatureFilter cf_ComponentFeature;
@@ -85,7 +99,23 @@ public class FilterUtilsTest extends TestCase
     }
 
     protected void setUp() throws Exception {
-	//
+      //
+      // pure and logicals
+      //
+      all_and_all = new FeatureFilter.And(FeatureFilter.all, FeatureFilter.all);
+      all_and_none = new FeatureFilter.And(FeatureFilter.all, FeatureFilter.none);
+      none_and_all = new FeatureFilter.And(FeatureFilter.none, FeatureFilter.all);
+      none_and_none = new FeatureFilter.And(FeatureFilter.none, FeatureFilter.none);
+      
+      //
+      // pure or logicals
+      //
+      all_or_all = new FeatureFilter.Or(FeatureFilter.all, FeatureFilter.all);
+      all_or_none = new FeatureFilter.Or(FeatureFilter.all, FeatureFilter.none);
+      none_or_all = new FeatureFilter.Or(FeatureFilter.none, FeatureFilter.all);
+      none_or_none = new FeatureFilter.Or(FeatureFilter.none, FeatureFilter.none);
+
+  //
 	// Three type filters (opaque but mutually disjoint).
 	//
 
@@ -101,6 +131,14 @@ public class FilterUtilsTest extends TestCase
 	pf2 = new FeatureFilter.HasAnnotation("bar");
 	pf3 = new FeatureFilter.HasAnnotation("baz");
 
+  //
+  // Three annotation-property filters with values
+  //
+  
+  pf4 = new FeatureFilter.ByAnnotation("foo", "fish");
+  pf5 = new FeatureFilter.ByAnnotation("foo", "cat");
+  pf6 = new FeatureFilter.ByAnnotation("bar", "fish");
+  
 	//
 	// Class filters
 	//
@@ -225,19 +263,70 @@ public class FilterUtilsTest extends TestCase
     }
 
     public void testAnd() throws Exception {
-	assertTrue(FilterUtils.areProperSubset(pf1_and_pf2, pf1));
-	assertTrue(! FilterUtils.areDisjoint(pf1_and_pf2, pf1));
-	assertTrue(FilterUtils.areProperSubset(pf1_and_pf2, pf2));
-	assertTrue(! FilterUtils.areProperSubset(pf1_and_pf2, pf3));
-	assertTrue(! FilterUtils.areProperSubset(pf2_and_pf3, pf1_and_pf2));
-	assertTrue(FilterUtils.areProperSubset(pf1_and_pf2_and_pf3, pf1_and_pf2));
-	assertTrue(FilterUtils.areProperSubset(pf1_and_pf2_and_pf3, pf2_and_pf3));
+      //all_and_all vs all
+      assertTrue("are subset: " + all_and_all + ", " + FeatureFilter.all, FilterUtils.areProperSubset(all_and_all, FeatureFilter.all));
+      assertFalse("not disjoint: " + all_and_all + ", " + FeatureFilter.all, FilterUtils.areDisjoint(all_and_all, FeatureFilter.all));
+      assertTrue("are subset: " + FeatureFilter.all + ", " + all_and_all, FilterUtils.areProperSubset(FeatureFilter.all, all_and_all));
+      assertFalse("not disjoint: " + FeatureFilter.all + ", " + all_and_all, FilterUtils.areDisjoint(FeatureFilter.all, all_and_all));
 
-	assertTrue(FilterUtils.areProperSubset(pf1_and_pf2_and_tf1, pf1_and_pf2));
-	assertTrue(FilterUtils.areProperSubset(pf1_and_pf2_and_tf1, pf1_and_tf1));
+      // all_and_all vs none
+      assertFalse("not subset: " + all_and_all + ", " + FeatureFilter.none, FilterUtils.areProperSubset(all_and_all, FeatureFilter.none));
+      assertTrue("are disjoint: " + all_and_all + ", " + FeatureFilter.none, FilterUtils.areDisjoint(all_and_all, FeatureFilter.none));
+      assertTrue("are subset: " + FeatureFilter.none + ", " + all_and_all, FilterUtils.areProperSubset(FeatureFilter.none, all_and_all));
+      assertTrue("are disjoint: " + FeatureFilter.none + ", " + all_and_all, FilterUtils.areDisjoint(FeatureFilter.none, all_and_all));
+      
+      // all_and_none vs all
+      assertTrue("are subset: " + all_and_none + ", " + FeatureFilter.all, FilterUtils.areProperSubset(all_and_none, FeatureFilter.all));
+      assertTrue("are disjoint: " + all_and_none + ", " + FeatureFilter.all, FilterUtils.areDisjoint(all_and_none, FeatureFilter.all));
+      assertFalse("not subset: " + FeatureFilter.all + ", " + all_and_none, FilterUtils.areProperSubset(FeatureFilter.all, all_and_none));
+      assertTrue("are disjoint: " + FeatureFilter.all + ", " + all_and_none, FilterUtils.areDisjoint(FeatureFilter.all, all_and_none));
+      
+      // all_and_none vs none
+      assertTrue("are subset: " + all_and_none + ", " + FeatureFilter.none, FilterUtils.areProperSubset(all_and_none, FeatureFilter.none));
+      assertTrue("are disjoint: " + all_and_none + ", " + FeatureFilter.none, FilterUtils.areDisjoint(all_and_none, FeatureFilter.none));
+      assertTrue("are subset: " + FeatureFilter.none + ", " + all_and_none, FilterUtils.areProperSubset(FeatureFilter.none, all_and_none));
+      assertTrue("are disjoint: " + FeatureFilter.none + ", " + all_and_none, FilterUtils.areDisjoint(FeatureFilter.none, all_and_none));
 
-	assertTrue(FilterUtils.areDisjoint(pf1_and_tf1, tf2));
-	assertTrue(FilterUtils.areDisjoint(pf1_and_pf2_and_tf1, tf2));	   
+      // none_and_all vs all
+      assertTrue("are subset: " + none_and_all + ", " + FeatureFilter.all, FilterUtils.areProperSubset(none_and_all, FeatureFilter.all));
+      assertTrue("are disjoint: " + none_and_all + ", " + FeatureFilter.all, FilterUtils.areDisjoint(none_and_all, FeatureFilter.all));
+      assertFalse("not subset: " + FeatureFilter.all + ", " + none_and_all, FilterUtils.areProperSubset(FeatureFilter.all, none_and_all));
+      assertTrue("are disjoint: " + FeatureFilter.all + ", " + none_and_all, FilterUtils.areDisjoint(FeatureFilter.all, none_and_all));
+      
+      // none_and_all vs none
+      assertTrue("are subset: " + none_and_all + ", " + FeatureFilter.none, FilterUtils.areProperSubset(none_and_all, FeatureFilter.none));
+      assertTrue("are disjoint: " + none_and_all + ", " + FeatureFilter.none, FilterUtils.areDisjoint(none_and_all, FeatureFilter.none));
+      assertTrue("are subset: " + FeatureFilter.none + ", " + none_and_all, FilterUtils.areProperSubset(FeatureFilter.none, none_and_all));
+      assertTrue("are disjoint: " + FeatureFilter.none + ", " + none_and_all, FilterUtils.areDisjoint(FeatureFilter.none, none_and_all));
+      
+      // none_and_none vs all
+      assertTrue("are subset: " + none_and_none + ", " + FeatureFilter.all, FilterUtils.areProperSubset(none_and_none, FeatureFilter.all));
+      assertTrue("are disjoint: " + none_and_none + ", " + FeatureFilter.all, FilterUtils.areDisjoint(none_and_none, FeatureFilter.all));
+      assertFalse("not subset: " + FeatureFilter.all + ", " + none_and_none, FilterUtils.areProperSubset(FeatureFilter.all, none_and_none));
+      assertTrue("are disjoint: " + FeatureFilter.all + ", " + none_and_none, FilterUtils.areDisjoint(FeatureFilter.all, none_and_none));
+      
+      // none_and_none vs none
+      assertTrue("are subset: " + none_and_none + ", " + FeatureFilter.none, FilterUtils.areProperSubset(none_and_none, FeatureFilter.none));
+      assertTrue("are disjoint: " + none_and_none + ", " + FeatureFilter.none, FilterUtils.areDisjoint(none_and_none, FeatureFilter.none));
+      assertTrue("are subset: " + FeatureFilter.none + ", " + none_and_none, FilterUtils.areProperSubset(FeatureFilter.none, none_and_none));
+      assertTrue("are disjoint: " + FeatureFilter.none + ", " + none_and_none, FilterUtils.areDisjoint(FeatureFilter.none, none_and_none));
+      
+      // pf1_and_pf2 vs pf1, pf2
+      assertTrue("are subset: " + pf1_and_pf2 + ", " + pf1, FilterUtils.areProperSubset(pf1_and_pf2, pf1));
+      assertFalse("not disjoint: " + pf1_and_pf2 + ", " + pf1, FilterUtils.areDisjoint(pf1_and_pf2, pf1));
+      assertTrue("are subset: " + pf1_and_pf2 + ", " + pf2, FilterUtils.areProperSubset(pf1_and_pf2, pf2));
+      assertFalse("not disjoint: " + pf1_and_pf2 + ", " + pf2, FilterUtils.areDisjoint(pf1_and_pf2, pf2));
+      
+      assertFalse("not subset: " + pf1_and_pf2 + ", " + pf3, FilterUtils.areProperSubset(pf1_and_pf2, pf3));
+      assertFalse("not subset: " + pf2_and_pf3 + ", " + pf1_and_pf2, FilterUtils.areProperSubset(pf2_and_pf3, pf1_and_pf2));
+      assertTrue("are subset: " + pf1_and_pf2_and_pf3 + ", " + pf1_and_pf2, FilterUtils.areProperSubset(pf1_and_pf2_and_pf3, pf1_and_pf2));
+      assertTrue("are subset: " + pf1_and_pf2_and_pf3 + ", " + pf2_and_pf3, FilterUtils.areProperSubset(pf1_and_pf2_and_pf3, pf2_and_pf3));
+      
+      assertTrue("are subset: " + pf1_and_pf2_and_tf1 + ", " + pf1_and_pf2, FilterUtils.areProperSubset(pf1_and_pf2_and_tf1, pf1_and_pf2));
+      assertTrue("are subset: " + pf1_and_pf2_and_tf1 + ", " + pf1_and_tf1, FilterUtils.areProperSubset(pf1_and_pf2_and_tf1, pf1_and_tf1));
+      
+      assertTrue("are disjoint: " + pf1_and_tf1 + ", " + tf2, FilterUtils.areDisjoint(pf1_and_tf1, tf2));
+      assertTrue("are disjoint: " + pf1_and_pf2_and_tf1 + ", " + tf2, FilterUtils.areDisjoint(pf1_and_pf2_and_tf1, tf2));	   
     }
 
     public void testAndOr() throws Exception {
@@ -250,5 +339,51 @@ public class FilterUtilsTest extends TestCase
 	assertTrue(! FilterUtils.areProperSubset(ancestor_cf_ComponentFeature, parent_cf_ComponentFeature));
 	assertTrue(FilterUtils.areDisjoint(ancestor_cf_ComponentFeature, not_ancestor_cf_ComponentFeature));
 	assertTrue(FilterUtils.areDisjoint(not_ancestor_cf_ComponentFeature, parent_cf_ComponentFeature));
+    }
+    
+    public void testHasProperty() throws Exception {
+      assertFalse("not disjoint: " + pf1 + ", " + pf2, FilterUtils.areDisjoint(pf1, pf2));
+      assertFalse("not disjoint: " + pf2 + ", " + pf3, FilterUtils.areDisjoint(pf2, pf3));
+      assertFalse("not disjoint: " + pf1 + ", " + pf3, FilterUtils.areDisjoint(pf1, pf3));
+      
+      assertFalse("not subset: " + pf1 + ", " + pf2, FilterUtils.areProperSubset(pf1, pf2));
+      assertFalse("not subset: " + pf1 + ", " + pf3, FilterUtils.areProperSubset(pf1, pf3));
+      assertFalse("not subset: " + pf2 + ", " + pf3, FilterUtils.areProperSubset(pf2, pf3));
+
+      assertTrue("are subset: " + pf1 + ", " + pf1, FilterUtils.areProperSubset(pf1, pf1));
+      assertTrue("are subset: " + pf2 + ", " + pf2, FilterUtils.areProperSubset(pf2, pf2));
+      assertTrue("are subset: " + pf3 + ", " + pf3, FilterUtils.areProperSubset(pf3, pf3));
+
+      assertFalse("not disjoint: " + pf1 + ", " + pf1, FilterUtils.areDisjoint(pf1, pf1));
+      assertFalse("not disjoint: " + pf2 + ", " + pf2, FilterUtils.areDisjoint(pf2, pf2));
+      assertFalse("not disjoint: " + pf3 + ", " + pf3, FilterUtils.areDisjoint(pf3, pf3));
+    }
+    
+    public void testByProperty() throws Exception {
+      assertTrue("are disjoint: " + pf4 + ", " + pf5, FilterUtils.areDisjoint(pf4, pf5));
+      assertFalse("not disjoint: " + pf4 + ", " + pf6, FilterUtils.areDisjoint(pf4, pf6));
+      assertFalse("not disjoint: " + pf5 + ", " + pf6, FilterUtils.areDisjoint(pf5, pf6));
+      
+      assertFalse("not subset: " + pf4 + ", " + pf5, FilterUtils.areProperSubset(pf4, pf5));
+      assertFalse("not subset: " + pf4 + ", " + pf6, FilterUtils.areProperSubset(pf4, pf6));
+      assertFalse("not subset: " + pf5 + ", " + pf6, FilterUtils.areProperSubset(pf5, pf6));
+
+      assertTrue("are subset: " + pf4 + ", " + pf4, FilterUtils.areProperSubset(pf4, pf4));
+    }
+    
+    public void testHasByProperty() throws Exception {
+      assertFalse("not disjoint: " + pf1 + ", " + pf4, FilterUtils.areDisjoint(pf1, pf4));
+      assertFalse("not disjoint: " + pf2 + ", " + pf4, FilterUtils.areDisjoint(pf2, pf4));
+      assertFalse("not disjoint: " + pf3 + ", " + pf4, FilterUtils.areDisjoint(pf3, pf4));
+      
+      assertFalse("not subset: " + pf1 + ", " + pf4, FilterUtils.areProperSubset(pf1, pf4));
+      assertTrue("are subset: " + pf4 + ", " + pf1, FilterUtils.areProperSubset(pf4, pf1));
+      assertTrue("are subset: " + pf5 + ", " + pf1, FilterUtils.areProperSubset(pf5, pf1));
+      assertFalse("not subset: " + pf6 + ", " + pf1, FilterUtils.areProperSubset(pf6, pf1));
+
+      assertFalse("not subset: " + pf2 + ", " + pf4, FilterUtils.areProperSubset(pf2, pf4));
+      assertFalse("not subset: " + pf4 + ", " + pf2, FilterUtils.areProperSubset(pf4, pf2));
+      assertFalse("not subset: " + pf5 + ", " + pf2, FilterUtils.areProperSubset(pf5, pf2));
+      assertTrue("are subset: " + pf6 + ", " + pf2, FilterUtils.areProperSubset(pf6, pf2));
     }
 }

@@ -132,6 +132,17 @@ public interface PropertyConstraint {
             if (subConstraint instanceof ByClass) {
                 ByClass sc = (ByClass) subConstraint;
                 return cl.isAssignableFrom(sc.getPropertyClass());
+            } else if(subConstraint instanceof Enumeration) {
+              Set values = ((Enumeration) subConstraint).getValues();
+              for(Iterator i = values.iterator(); i.hasNext(); ) {
+                if(!accept(i.next())) {
+                  return false;
+                }
+              }
+              
+              return true;
+            } else if(subConstraint instanceof ExactValue) {
+              return accept(((ExactValue) subConstraint).getValue());
             }
 
             return false;
@@ -246,7 +257,14 @@ public interface PropertyConstraint {
       }
       
       public boolean subConstraintOf(PropertyConstraint pc) {
-        return pc.accept(value);
+        if(pc instanceof ExactValue) {
+          return value.equals(((ExactValue) pc).getValue());
+        } else if(pc instanceof Enumeration) {
+          Enumeration e = (Enumeration) pc;
+          return e.getValues().size() == 1 && e.accept(value);
+        }
+        
+        return false;
       }
       
       public void setProperty(Annotation ann, Object prop, Object val)
@@ -328,8 +346,9 @@ public interface PropertyConstraint {
         public boolean subConstraintOf(PropertyConstraint subConstraint) {
             if (subConstraint instanceof Enumeration) {
                 Enumeration subE = (Enumeration) subConstraint;
-
                 return values.containsAll(subE.getValues());
+            } else if(subConstraint instanceof ExactValue) {
+              return accept(((ExactValue) subConstraint).getValue());
             }
 
             return false;
@@ -382,5 +401,9 @@ class AnyPropertyConstraint implements PropertyConstraint  {
     public void addValue(Collection coll, Object value)
     throws ChangeVetoException {
       coll.add(value);
+    }
+    
+    public String toString() {
+      return "ANY";
     }
 }

@@ -42,6 +42,9 @@ public class CardinalityConstraint {
     return min * max;
   }
   
+  /**
+   * Decides if this is a super constraint of subConstraint.
+   */
   public boolean subConstraintOf(CardinalityConstraint subConstraint) {
     return
       getMin() <= subConstraint.getMin() &&
@@ -57,5 +60,9 @@ public class CardinalityConstraint {
     }
     
     return false;
+  }
+  
+  public String toString() {
+    return "CardinalityConstraint[" + getMin() + ".." + getMax() + "]";
   }
 }

@@ -222,6 +222,22 @@ public interface AnnotationType {
             throw new ChangeVetoException(cve, "Failed to change property " + property);
           }
         }
+        
+        public String toString() {
+          StringBuffer sb = new StringBuffer("AnnotationType: {");
+          
+          for(Iterator i = getProperties().iterator(); i.hasNext(); ) {
+            Object key = i.next();
+            PropertyConstraint pc = getPropertyConstraint(key);
+            CardinalityConstraint cc = getCardinalityConstraint(key);
+            
+            sb.append(" [" + key + ", " + pc + ", " + cc + "]");
+          }
+          
+          sb.append(" }");
+          
+          return sb.toString();
+        }
     }
 
     /**
@@ -291,10 +307,17 @@ public interface AnnotationType {
         public boolean subTypeOf(AnnotationType subType) {
             for (Iterator i = cons.keySet().iterator(); i.hasNext();) {
                 Object key = i.next();
-                PropertyConstraint thisPropertyConstraint = getPropertyConstraint(key);
-                PropertyConstraint subPropertyConstraint = subType.getPropertyConstraint(key);
-                if (! thisPropertyConstraint.subConstraintOf(subPropertyConstraint)) {
+                
+                PropertyConstraint thisPC = getPropertyConstraint(key);
+                PropertyConstraint subPC = subType.getPropertyConstraint(key);
+                if (! thisPC.subConstraintOf(subPC)) {
                     return false;
+                }
+                
+                CardinalityConstraint thisCC = getCardinalityConstraint(key);
+                CardinalityConstraint subCC = subType.getCardinalityConstraint(key);
+                if (!thisCC.subConstraintOf(subCC)) {
+                  return false;
                 }
             }
 
