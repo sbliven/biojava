@@ -89,5 +89,7 @@ implements EmissionState, Serializable {
     this.matches = new SingletonAlphabet(this);
   }
   
-  public void registerWithTrainer(ModelTrainer trainer) {}
+  public void registerWithTrainer(ModelTrainer trainer) {
+    trainer.registerDistribution(getDistribution());
+  }
 }

@@ -62,6 +62,7 @@ public abstract class AbstractTrainer implements TrainingAlgorithm {
                     double nullWeight, StoppingCriteria stopper)
   throws IllegalSymbolException, BioException {
     try {
+      System.out.println("Training cycle about to start");
       ModelTrainer trainer =
         new SimpleModelTrainer(dp.getModel(), nullModel, nullWeight, 0.000001, 1.0);
       do {
