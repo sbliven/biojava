@@ -73,7 +73,7 @@ public class TestOrderNAlphabet {
             dtc.train();
         }
         catch (ChangeVetoException cve) {
-            throw new NestedError("couldn't train distribution");
+            throw new AssertionFailure("couldn't train distribution");
         }
 
         // we have to be able to tokenise the symbols!

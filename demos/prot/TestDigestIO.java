@@ -65,7 +65,7 @@ public class TestDigestIO extends Object {
         //         System.out.println(list[i]);
         
         //String proteaseName = Protease.ASP_N;
-        bioJavaDigest.setProtese(Protease.getProteaseByName(Protease.TRYPSIN));
+        bioJavaDigest.setProtease(Protease.getProteaseByName(Protease.TRYPSIN));
         
         
         SequenceIterator sourceI = getSeqIterator(fileName);
@@ -89,7 +89,7 @@ public class TestDigestIO extends Object {
         
         
         
-        bioJavaDigest.setProtese(Protease.getProteaseByName(Protease.CNBr));
+        bioJavaDigest.setProtease(Protease.getProteaseByName(Protease.CNBr));
         
         //Get the Sequence Iterator
      //   sourceI = getSeqIterator(fileName);

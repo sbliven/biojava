@@ -88,8 +88,8 @@ public class Dice
         rolls[i-1]= AlphabetManager.createSymbol((char)('0'+i),""+i,Annotation.EMPTY_ANNOTATION);
         diceAlphabet.addSymbol(rolls[i-1]);
       } catch (Exception e) {
-        throw new NestedError(
-          e, "Can't create symbols to represent dice rolls"
+        throw new AssertionFailure(
+          "Can't create symbols to represent dice rolls", e
         );
       }
     }
@@ -101,7 +101,7 @@ public class Dice
       fairD = DistributionFactory.DEFAULT.createDistribution(diceAlphabet);
       loadedD = DistributionFactory.DEFAULT.createDistribution(diceAlphabet);
     } catch (Exception e) {
-      throw new NestedError(e, "Can't create distributions");
+      throw new AssertionFailure("Can't create distributions", e);
     }
     EmissionState fairS = new SimpleEmissionState("fair", Annotation.EMPTY_ANNOTATION, advance, fairD);
     EmissionState loadedS = new SimpleEmissionState("loaded", Annotation.EMPTY_ANNOTATION, advance, loadedD);
@@ -111,7 +111,7 @@ public class Dice
       casino.addState(fairS);
       casino.addState(loadedS);
     } catch (Exception e) {
-      throw new NestedError(e, "Can't add states to model");
+      throw new AssertionFailure("Can't add states to model", e);
     }
 
     //set up transitions between states.
@@ -125,7 +125,7 @@ public class Dice
       casino.createTransition(fairS,fairS);
       casino.createTransition(loadedS,loadedS);
     } catch (Exception e) {
-      throw new NestedError(e, "Can't create transitions");
+      throw new AssertionFailure("Can't create transitions", e);
     }
 
     //set up emission probabilities.
@@ -136,7 +136,7 @@ public class Dice
       }
       loadedD.setWeight(rolls[5],0.5);
     } catch (Exception e) {
-      throw new NestedError(e, "Can't set emission probabilities");
+      throw new AssertionFailure("Can't set emission probabilities", e);
     }
 
     //set up transition scores.
@@ -157,7 +157,7 @@ public class Dice
       dist.setWeight(loadedS,               0.90);
       dist.setWeight(casino.magicalState(), 0.01);
     } catch (Exception e) {
-      throw new NestedError(e, "Can't set transition probabilities");
+      throw new AssertionFailure("Can't set transition probabilities", e);
     }
 
     return casino;
