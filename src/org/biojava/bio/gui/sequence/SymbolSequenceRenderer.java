@@ -25,6 +25,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.geom.Point2D;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -104,8 +105,20 @@ public class SymbolSequenceRenderer implements SequenceRenderer
                 yFontOffset = - maxCharBounds.getCenterY() * 3.0;
             }
 
-            int min = context.getRange().getMin();
-            int max = context.getRange().getMax();
+            Rectangle2D clip = g2.getClipBounds();
+
+            // attempt to only render visible symbols
+            int min = Math.max(
+              context.getRange().getMin(),
+              context.graphicsToSequence(
+                new Point2D.Double(clip.getMinX(), clip.getMinY())
+              ) - 1 );
+            int max = Math.min(
+              context.getRange().getMax(),
+              context.graphicsToSequence(
+                new Point2D.Double(clip.getMaxX(), clip.getMaxY())
+              ) + 1 );
+
             SymbolList seq = context.getSymbols();
 	    SymbolTokenization toke = null;
 	    try {

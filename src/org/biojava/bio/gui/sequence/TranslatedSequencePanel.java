@@ -26,7 +26,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.MouseAdapter;
@@ -618,11 +618,11 @@ public class TranslatedSequencePanel extends JComponent
      * <code>graphicsToSequence</code> converts a graphical position
      * to a sequence index.
      *
-     * @param point the <code>Point</code> to transform
+     * @param point the <code>Point2D</code> to transform
      *
      * @return an <code>int</code>.
      */
-    public int graphicsToSequence(Point point)
+    public int graphicsToSequence(Point2D point)
     {
         if (direction == HORIZONTAL)
             return graphicsToSequence(point.getX());

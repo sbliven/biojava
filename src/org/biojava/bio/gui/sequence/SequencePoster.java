@@ -25,7 +25,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.MouseAdapter;
@@ -602,7 +602,7 @@ public class SequencePoster
     return (int) (gPos / scale) + 1;
   }
 
-  public int graphicsToSequence(Point point) {
+  public int graphicsToSequence(Point2D point) {
     if(direction == HORIZONTAL) {
       return graphicsToSequence(point.getX());
     } else {

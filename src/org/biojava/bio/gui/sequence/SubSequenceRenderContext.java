@@ -22,13 +22,21 @@
 package org.biojava.bio.gui.sequence;
 
 import java.awt.Font;
-import java.awt.Point;
+import java.awt.geom.Point2D;
 
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SymbolList;
 
 /**
+ * Allows a new renderer to "wrap" another one, replacing one or more values.
+ *
+ * <p>
+ * Use this when implementing SequenceRenderer classes that modify the data
+ * that is passed on to delegate renderers e.g. filtering the features,
+ * transforming the sequence or moving the rendering co-ordinates.
+ * </p>
+ *
  * @author Matthew Pocock
  */
 public class SubSequenceRenderContext
@@ -78,7 +86,7 @@ implements SequenceRenderContext {
     return src.graphicsToSequence(d) - symOffset;
   }
 
-  public int graphicsToSequence(Point point) {
+  public int graphicsToSequence(Point2D point) {
     return src.graphicsToSequence(point) - symOffset;
   }
 

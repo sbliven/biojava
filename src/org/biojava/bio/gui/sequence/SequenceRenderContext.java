@@ -22,7 +22,7 @@
 package org.biojava.bio.gui.sequence;
 
 import java.awt.Font;
-import java.awt.Point;
+import java.awt.geom.Point2D;
 
 import javax.swing.SwingConstants;
 
@@ -94,7 +94,7 @@ public interface SequenceRenderContext extends SwingConstants {
    * @param  point  a point representing the position
    * @return the corresponding sequence index 
    */
-  int graphicsToSequence(Point point);
+  int graphicsToSequence(Point2D point);
 
   /**
    *  The SymbolList that is currently rendered by this SequenceRenderContext. 

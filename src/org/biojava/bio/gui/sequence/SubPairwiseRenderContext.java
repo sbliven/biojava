@@ -23,6 +23,7 @@ package org.biojava.bio.gui.sequence;
 
 import java.awt.Font;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.symbol.RangeLocation;
@@ -198,7 +199,7 @@ public class SubPairwiseRenderContext implements PairwiseRenderContext
         return context.graphicsToSequence(graphicsPos);
     }
 
-    public int graphicsToSequence(Point point)
+    public int graphicsToSequence(Point2D point)
     {
         return context.graphicsToSequence(point);
     }

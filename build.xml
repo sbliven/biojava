@@ -600,7 +600,7 @@
     <javadoc
       packagenames="${packages}"
       sourcepath="${build.src.main}"
-      classpath="${build.dir}/${name}.jar"
+      classpath="${classpath}"
       destdir="${build.dest.javadocs}"
       author="true"
       version="true"
@@ -633,7 +633,7 @@
               packages="org.biojava.bio.proteomics:org.biojava.bio.molbio:org.biojava.stats.svm:org.biojava.stats.svm.tools:org.biojava.bio.seq.homol:org.biojava.utils.lsid:org.biojava.bio.program.unigene:org.biojava.bio.program.ssaha:org.biojava.bio.seq.distributed:org.biojava.bio.annodb:org.biojava.bio.ontology:org.biojava.bio.ontology.io:org.biojava.bio.program.formats:org.biojava.bio.program.gff3:org.biojava.bio.structure" />
 	      
        <taglet name="UserLevel" path="${build.dest.taglets}" />
-       <taglet name="MetaData" path="${build.dest.taglets}" />
+       <taglet name="MetaData" path="${build.dest.taglets}:${classpath}:${build.dir}/${name}.jar" />
     </javadoc>
   </target>
 

@@ -26,7 +26,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.MouseAdapter;
@@ -542,7 +542,7 @@ public class SequencePanel
     return ((int) ((gPos - pixelOffset) / scale)) + 1;
   }
 
-  public int graphicsToSequence(Point point) {
+  public int graphicsToSequence(Point2D point) {
     if(direction == HORIZONTAL) {
       return graphicsToSequence(point.getX());
     } else {

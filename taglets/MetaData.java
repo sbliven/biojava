@@ -34,9 +34,11 @@ implements Taglet {
   }
 
   private final Set toStringable;
+  private final Set excludeMethods;
 
   private MetaData() {
     toStringable = new HashSet();
+    excludeMethods = new HashSet();
 
     toStringable.add(String.class);
     toStringable.add(Color.class);
@@ -48,6 +50,8 @@ implements Taglet {
     toStringable.add(Long.class);
     toStringable.add(Float.class);
     toStringable.add(Double.class);
+
+    excludeMethods.add("getClass");
   }
 
   public boolean inConstructor() {
@@ -84,6 +88,7 @@ implements Taglet {
 
   public String toString(Tag tag) {
     StringBuffer sb = new StringBuffer();
+    Set seen = new HashSet();
 
     String message = tag.text();
     System.err.println("Got tag: " + message);
@@ -102,7 +107,7 @@ System.err.println("Name; " + matcher.group(1));
     Object val = decoder.readObject();
 
     try {
-      dump(val, sb);
+      dump(val, sb, seen);
     } catch (IntrospectionException e) {
       throw new Error(e);
     } catch (IllegalAccessException e) {
@@ -129,13 +134,17 @@ System.err.println("Name; " + matcher.group(1));
     return sb.toString();
   }
 
-  private void dump(Object val, StringBuffer sb)
+  private void dump(Object val, StringBuffer sb, Set seen)
           throws IntrospectionException, IllegalAccessException, InvocationTargetException {
-    if(val == null) {
+    System.err.println("Dumping: " + val);
+    if(seen.contains(val)) {
+      sb.append("Seen this before - discarding circular refference");
+    } else if(val == null) {
       sb.append("NULL");
     } else if(toStringable.contains(val.getClass())) {
       sb.append(val.toString());
     } else {
+      seen.add(val);
       sb.append(val.getClass() + "<table>");
 
       BeanInfo bInf = Introspector.getBeanInfo(val.getClass());
@@ -143,13 +152,20 @@ System.err.println("Name; " + matcher.group(1));
       for(int i = 0; i < pds.length; i++) {
         PropertyDescriptor pd = pds[i];
         String name = pd.getName();
-        sb.append("<tr><td>" + name + "</td>");
         Method readMethod = pd.getReadMethod();
-        if(readMethod != null) {
-          sb.append("<td>");
-          dump(readMethod.invoke(val, new Class[] {}), sb);
-          sb.append("</td>");
+        if(readMethod == null) {
+          continue;
         }
+
+        if(excludeMethods.contains(readMethod.getName())) {
+          continue;
+        }
+System.err.println("Following: " + name);
+
+        sb.append("<tr><td>" + name + "</td>");
+        sb.append("<td>");
+        dump(readMethod.invoke(val, new Class[] {}), sb, seen);
+        sb.append("</td>");
         sb.append("</tr>");
       }
 

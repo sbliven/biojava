@@ -21,7 +21,7 @@
 package org.biojava.bio.gui.sequence;
 
 import java.awt.Font;
-import java.awt.Point;
+import java.awt.geom.Point2D;
 
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.Sequence;
@@ -128,7 +128,7 @@ implements SequenceRenderContext {
     return ((double) (i - 1)) * scale + offset;
   }
   
-  public int graphicsToSequence(Point point) {
+  public int graphicsToSequence(Point2D point) {
     return graphicsToSequence(point.getX());
   }
   

@@ -34,6 +34,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
@@ -88,6 +89,7 @@ import org.biojava.utils.Changeable;
  * and other BioJava components by Matthew and Thomas.</p>
  *
  * @author Keith James
+ * @author Matthew Pocock
  * @since 1.2
  */
 public class PairwiseSequencePanel extends JComponent
@@ -790,7 +792,7 @@ public class PairwiseSequencePanel extends JComponent
      *
      * @return an <code>int</code>.
      */
-    public int graphicsToSequence(Point point)
+    public int graphicsToSequence(Point2D point)
     {
         if (direction == HORIZONTAL)
             return graphicsToSequence(point.getX());
