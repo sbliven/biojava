@@ -183,25 +183,10 @@ public class SimpleSeqSimilaritySearchHit
     {
         return subjectID;
     }
-
-    /**
-     * The identifier of the hit within the sequence database which
-     * was searched.
-     *
-     * @return the (unique) sequence identifier for this hit, valid
-     * within the sequence database against which this search was
-     * performed. Never returns null.
-     *
-     * @deprecated use <code>getSubjectID</code>.
-     */
-    public String getSequenceID()
-    {
-        return getSubjectID();
-    }
   
     public List getSubHits()
     {
-        return Collections.unmodifiableList(subHits);
+        return subHits;
     }
   
     public boolean equals(Object o)

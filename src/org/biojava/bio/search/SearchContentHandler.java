@@ -136,36 +136,6 @@ public interface SearchContentHandler
     public void addSubHitProperty(Object key, Object value);
 
     /**
-     * <code>setQuerySeq</code> identifies the query sequence by a
-     * name, ID or URN.
-     *
-     * @param identifier a <code>String</code> which should be an
-     * unique identifer for the sequence.
-     *
-     * @exception BioException if the sequence cannot be obtained from
-     * the identifier.
-     *
-     * @deprecated use <code>setQueryID</code> instead.
-     */
-    public void setQuerySeq(String identifier)
-	throws BioException;
-
-    /**
-     * <code>setSubjectDB</code> identifies the database searched by a
-     * name, ID or URN.
-     *
-     * @param identifier a <code>String</code> which should be an
-     * unique identifier for the database searched.
-     *
-     * @exception BioException if the database cannot be obtained from
-     * the identifier.
-     *
-     * @deprecated use <code>setDatabaseID</code> instead.
-     */
-    public void setSubjectDB(String identifier)
-	throws BioException;
-
-    /**
      * <code>setQueryID</code> identifies the query sequence by a
      * name, ID or URN.
      *

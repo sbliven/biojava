@@ -24,7 +24,6 @@ package org.biojava.bio.program.ssbind;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
@@ -54,9 +53,6 @@ public class SSBindFasta3_3t08Test extends SSBindCase
     protected void setUp() throws Exception
     {
         super.setUp();
-
-        queryID = "CISY_ECOLI";
-        databaseID = "%L";
 
         setTopHitValues(3266.4D, "CISY_ECOLI",
                         1, 427, null,

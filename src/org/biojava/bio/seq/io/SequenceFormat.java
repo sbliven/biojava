@@ -42,8 +42,8 @@ import org.biojava.bio.seq.*;
  * readSequence to read from a Genbank stream and construct Ensembl
  * CORBA objects, just by specifying an Ensembl SequenceFactory.</p>
  *
- * <p>The <code>int</code>s used to specify symbol alphabet and
- * sequence format type are arranged thus:</p>
+ * <p>An <code>int</code> used to specify symbol alphabet and
+ * sequence format type is derived thus:</p>
  *
  * <ul>
  *   <li>
@@ -57,10 +57,10 @@ import org.biojava.bio.seq.*;
  *   </li>
  *
  *   <li>
- *    Bitwise OR combinations of the <code>int</code>s are used to
- *    specify combinations of format type and symbol information. To
+ *    Bitwise OR combinations of each component <code>int</code> are used
+ *    to specify combinations of format type and symbol information. To
  *    derive an <code>int</code> identifier for DNA with ambiguity codes
- *    in Fasta format sequence, bitwise OR AMBIGUOUS, DNA and FASTA.
+ *    in Fasta format, bitwise OR the AMBIGUOUS, DNA and FASTA values.
  *   </li>
  * </ul>
  *
@@ -73,39 +73,39 @@ public interface SequenceFormat
 {
     /**
      * <code>AMBIGUOUS</code> indicates that a sequence contains
-     * ambiguity symbols. The first bit of the most significant byte
+     * ambiguity symbols. The first bit of the most significant word
      * of the int is set.
      */
-    public static final int AMBIGUOUS = 1 << 24;
+    public static final int AMBIGUOUS = 1 << 16;
 
     /**
      * <code>DNA</code> indicates that a sequence contains DNA
      * (deoxyribonucleic acid) symbols. The second bit of the most
-     * significant byte of the int is set.
+     * significant word of the int is set.
      */
-    public static final int DNA = 1 << 25;
+    public static final int DNA = 1 << 17;
 
     /**
      * <code>RNA</code> indicates that a sequence contains RNA
      * (ribonucleic acid) symbols. The third bit of the most
-     * significant byte of the int is set.
+     * significant word of the int is set.
      */
-    public static final int RNA = 1 << 26;
+    public static final int RNA = 1 << 18;
 
     /**
      * <code>AA</code> indicates that a sequence contains AA (amino
-     * acid) symbols. The fourth bit of the most significant byte of
+     * acid) symbols. The fourth bit of the most significant word of
      * the int is set.
      */
-    public static final int AA = 1 << 27;
+    public static final int AA = 1 << 19;
 
     /**
      * <code>INTEGER</code> indicates that a sequence contains integer
      * alphabet symbols, such as used to describe sequence quality
-     * data. The fifth bit of the most significant byte of the int is
+     * data. The fifth bit of the most significant word of the int is
      * set.
      */
-    public static final int INTEGER = 1 << 28;
+    public static final int INTEGER = 1 << 20;
 
     /**
      * <code>UNKNOWN</code> indicates that the sequence format is

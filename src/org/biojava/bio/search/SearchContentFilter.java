@@ -97,23 +97,13 @@ implements SearchContentHandler {
     delegate.endSubHit();
   }
 
-  public void setQuerySeq(String seqID)
-  throws BioException {
-    delegate.setQuerySeq(seqID);
+  public void setQueryID(String queryID) {
+      delegate.setQueryID(queryID);
   }
 
-  public void setSubjectDB(String dbID)
-  throws BioException {
-    delegate.setSubjectDB(dbID);
+  public void setDatabaseID(String databaseID) {
+      delegate.setDatabaseID(databaseID);
   }
-
-    public void setQueryID(String queryID) {
-        delegate.setQueryID(queryID);
-    }
-
-    public void setDatabaseID(String databaseID) {
-        delegate.setDatabaseID(databaseID);
-    }
 
   public boolean getMoreSearches() {
     return delegate.getMoreSearches();

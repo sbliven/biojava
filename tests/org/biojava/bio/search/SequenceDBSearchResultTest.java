@@ -49,9 +49,11 @@ public class SequenceDBSearchResultTest extends TestCase
     private SeqSimilaritySearchResult r1;
     private SeqSimilaritySearchResult r2;
 
-    private String queryID;
-    private String databaseID;
-    private Map    parameters;
+    private SequenceDB database;
+    private Map        parameters;
+    private SymbolList query;
+
+    private String querySeqTokens = "TRYPASNDEF";
 
     public SequenceDBSearchResultTest(String name)
     {
@@ -60,18 +62,21 @@ public class SequenceDBSearchResultTest extends TestCase
 
     protected void setUp() throws Exception
     {
-        queryID    = "queryID";
-        databaseID = "databaseID";
+        database   = new HashSequenceDB("test");
         parameters = new HashMap();
 
-        r1 = new SequenceDBSearchResult(queryID,
-                                        databaseID,
+        SymbolTokenization tp = ProteinTools.getAlphabet().getTokenization("token");
+
+        query = new SimpleSymbolList(tp, querySeqTokens);
+
+        r1 = new SequenceDBSearchResult(query,
+                                        database,
                                         parameters,
                                         new ArrayList(),
                                         Annotation.EMPTY_ANNOTATION);
 
-        r2 = new SequenceDBSearchResult(queryID,
-                                        databaseID,
+        r2 = new SequenceDBSearchResult(query,
+                                        database,
                                         parameters,
                                         new ArrayList(),
                                         Annotation.EMPTY_ANNOTATION);
@@ -85,22 +90,22 @@ public class SequenceDBSearchResultTest extends TestCase
         assertEquals(r2, r1);
     }
 
-    public void testGetQueryID()
+    public void testSequenceDB()
     {
-        assertEquals("queryID", r1.getQueryID());
-    }
-
-    public void testGetDatabaseID()
-    {
-        assertEquals("databaseID", r1.getDatabaseID());
+        assertEquals(r1.getSequenceDB(), database);
     }
 
     public void testSearchParameters()
     {
-        assertEquals(new HashMap(), r1.getSearchParameters());
+        assertEquals(r1.getSearchParameters(), parameters);
     }
 
-    public void testGetAnnotation()
+    public void testQuerySequence()
+    {
+        assertEquals(r1.getQuerySequence(), query);
+    }
+
+    public void testAnnotation()
     {
         assertEquals(((SequenceDBSearchResult) r1).getAnnotation(),
                      Annotation.EMPTY_ANNOTATION);

@@ -132,37 +132,9 @@ public class SimilarityPairBuilder extends ViewSequenceFactory
         return (Sequence) subjectViewCache.get(subjectID);
     }
 
-    /**
-     * <code>setQuerySeq</code> identifies the query sequence by a
-     * name, ID or URN.
-     *
-     * @param identifier a <code>String</code> which should be an
-     * unique identifer for the sequence.
-     *
-     * @deprecated use <code>setQueryID</code> instead.
-     */
-    public void setQuerySeq(String identifier)
-    {
-        setQueryID(identifier);
-    }
-
     public void setQueryID(String queryID)
     {
         this.queryID = queryID;
-    }
-
-    /**
-     * <code>setSubjectDB</code> identifies the database searched by a
-     * name, ID or URN.
-     *
-     * @param identifier a <code>String</code> which should be an
-     * unique identifier for the database searched.
-     *
-     * @deprecated use <code>setDatabaseID</code> instead.
-     */
-    public void setSubjectDB(String identifier)
-    {
-        setDatabaseID(identifier);
     }
 
     public void setDatabaseID(String databaseID)

@@ -51,9 +51,6 @@ public class SSBindNCBIblastx2_0_11Test extends SSBindCase
     {
         super.setUp();
 
-        queryID = "ECGLTA01_3";
-        databaseID = "swall-1; swall-2";
-
         setTopHitValues(879.0D, "CISY_ECOLI",
                         1, 1281, StrandedFeature.POSITIVE,
                         1, 427, null);

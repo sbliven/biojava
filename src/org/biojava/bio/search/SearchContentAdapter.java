@@ -47,8 +47,6 @@ implements SearchContentHandler {
   public void endSearch() {}
   public void startSubHit() {}
   public void endSubHit() {}
-  public void setQuerySeq(String seqID) throws BioException {}
-  public void setSubjectDB(String dbID) throws BioException {}
   public void setQueryID(String queryID) {}
   public void setDatabaseID(String databaseID) {}
 

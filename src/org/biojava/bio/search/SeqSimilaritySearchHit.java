@@ -123,18 +123,6 @@ public interface SeqSimilaritySearchHit
      * @return the (unique) sequence identifier for this hit, valid
      * within the sequence database against which this search was
      * performed. Never returns null.
-     *
-     * @deprecated use <code>getSubjectID</code>.
-     */
-    public String getSequenceID();
-
-    /**
-     * The sequence identifier of this hit within the sequence
-     * database against which the search was performed.
-     *
-     * @return the (unique) sequence identifier for this hit, valid
-     * within the sequence database against which this search was
-     * performed. Never returns null.
      */
     public String getSubjectID();
 

@@ -47,12 +47,12 @@ import org.biojava.bio.seq.db.SequenceDBInstallation;
  */
 public class SSBindCase extends TestCase
 {
-    protected String queryID;
-    protected String databaseID;
+    protected SequenceDB             queryDB;
+    protected SequenceDBInstallation dbInstallation;
 
     protected SeqSimilarityAdapter adapter;
-    protected InputStream searchStream;
-    protected List        searchResults;
+    protected InputStream          searchStream;
+    protected List                 searchResults;
 
     protected double   topHitScore;
     protected String   topHitSeqID;
@@ -79,11 +79,17 @@ public class SSBindCase extends TestCase
 
     protected void setUp() throws Exception
     {
+        queryDB        = new DummySequenceDB("query");
+        dbInstallation = new DummySequenceDBInstallation();
         searchResults  = new ArrayList();
 
         // Set builder to build into a List
         BlastLikeSearchBuilder builder =
             new BlastLikeSearchBuilder(searchResults);
+
+        // Set the holder for query sequences and databases
+        builder.setQuerySeqHolder(queryDB);
+        builder.setSubjectDBInstallation(dbInstallation);
 
         // Adapter from SAX -> search result construction interface
         adapter = new SeqSimilarityAdapter();
@@ -102,20 +108,20 @@ public class SSBindCase extends TestCase
         assertEquals(1, searchResults.size());
     }
 
-    public void testResultGetQueryID() throws Exception
+    public void testResultGetQuerySequence() throws Exception
     {
         SeqSimilaritySearchResult result =
             (SeqSimilaritySearchResult) searchResults.get(0);
 
-        assertEquals(queryID, result.getQueryID());
+        assertEquals(queryDB.getSequence(""), result.getQuerySequence());
     }
 
-    public void testResultGetDatabaseID()
+    public void testResultGetSequenceDB()
     {
         SeqSimilaritySearchResult result =
             (SeqSimilaritySearchResult) searchResults.get(0);
 
-        assertEquals(databaseID, result.getDatabaseID());
+        assertEquals(dbInstallation.getSequenceDB(""), result.getSequenceDB());
     }
 
     public void testResultGetAnnotation()

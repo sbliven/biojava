@@ -36,8 +36,8 @@ public interface SearchBuilder extends SearchContentHandler
 {
     /**
      * The <code>makeSearchResult</code> method returns a
-     * SeqSimilaritySearchResult instance created from data
-     * accumulated from an associated SearchParser.
+     * <code>SeqSimilaritySearchResult</code> instance created from
+     * accumulated data.
      *
      * @return a <code>SeqSimilaritySearchResult</code>.
      *

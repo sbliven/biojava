@@ -219,24 +219,9 @@ public class SequenceDBSearchHit extends AbstractChangeable
         return subjectID;
     }
 
-    /**
-     * The identifier of the hit within the sequence database which
-     * was searched.
-     *
-     * @return the (unique) sequence identifier for this hit, valid
-     * within the sequence database against which this search was
-     * performed. Never returns null.
-     *
-     * @deprecated use <code>getSubjectID</code>.
-     */
-    public String getSequenceID()
-    {
-        return getSubjectID();
-    }
-
     public List getSubHits()
     {
-        return Collections.unmodifiableList(subHits);
+        return subHits;
     }
 
     /**
@@ -294,19 +279,19 @@ public class SequenceDBSearchHit extends AbstractChangeable
             + " with score " + getScore();
     }
 
-    protected ChangeSupport getChangeSupport(ChangeType ct){
-      ChangeSupport cs = super.getChangeSupport(ct);
+    protected ChangeSupport getChangeSupport(ChangeType ct)
+    {
+        ChangeSupport cs = super.getChangeSupport(ct);
 
-      if(annotationForwarder == null &&
-        (ct == null || ct == Annotatable.ANNOTATION)){
-        annotationForwarder = new Annotatable.AnnotationForwarder(
-            this,
-            cs);
-        getAnnotation().addChangeListener(
-            annotationForwarder,
-            Annotatable.ANNOTATION);
-      }
-      return cs;
+        if (annotationForwarder == null &&
+            (ct == null || ct == Annotatable.ANNOTATION))
+        {
+            annotationForwarder =
+                new Annotatable.AnnotationForwarder(this, cs);
+            getAnnotation().addChangeListener(annotationForwarder,
+                                              Annotatable.ANNOTATION);
+        }
+
+        return cs;
     }
-
 }

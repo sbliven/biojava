@@ -33,9 +33,11 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.SmallAnnotation;
 import org.biojava.bio.search.*;
+import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.db.SequenceDBInstallation;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.*;
 import org.biojava.utils.ChangeVetoException;
@@ -75,7 +77,8 @@ import org.biojava.utils.ChangeVetoException;
  * <p>
  * This class has special meanings for particular keys: if you want to
  * adapt this class for another parser, you will need to be aware of
- * this.
+ * this. These originate from and are fully described in the 
+ * BlastLikeDataSetCollection DTD.
  * </p>
  * <table>
  * <tr>
@@ -85,12 +88,12 @@ import org.biojava.utils.ChangeVetoException;
  * <tr>
  *   <td>program</td>
  *   <td>either this value or the hitSequenceType value must be set. This can take values 
- *       acceptable to AlphabetResolver.  These are BLASTN, BLASTP, BLASTX, TBLASTN,
+ *       acceptable to AlphabetResolver. These are BLASTN, BLASTP, BLASTX, TBLASTN,
  *       TBLASTX, DNA and PROTEIN. </td>
  * </tr>
  * <tr>
  *   <td>hitSequenceType</td>
- *   <td>type of sequence that hit is.  Can be DNA or PROTEIN.</td>
+ *   <td>type of sequence that hit is. Can be DNA or PROTEIN.</td>
  * </tr>
  * <tr>
  *   <td>HitId</td>
@@ -98,11 +101,11 @@ import org.biojava.utils.ChangeVetoException;
  * </tr>
  * <tr>
  *   <td>queryStrand</td>
- *   <td>Strandedness of query in alignment.  Takes values of "plus" and "minus"</td>
+ *   <td>Strandedness of query in alignment. Takes values of "plus" and "minus"</td>
  * </tr>
  * <tr>
  *   <td>subjectStrand</td>
- *   <td>Strandedness of query in alignment.  Takes values of "plus" and "minus"</td>
+ *   <td>Strandedness of query in alignment. Takes values of "plus" and "minus"</td>
  * </tr>
  * <tr>
  *   <td>queryFrame</td>
@@ -148,6 +151,11 @@ import org.biojava.utils.ChangeVetoException;
  */
 public class BlastLikeSearchBuilder implements SearchBuilder
 {
+    // Supplier of instances of searched databases
+    private SequenceDBInstallation subjectDBs;
+    // Holder for all query sequences
+    private SequenceDB querySeqHolder;
+
     // The ID of the database searched
     private String databaseID;
     // The ID of the query sequence
@@ -194,47 +202,80 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         tokenBuffer         = new StringBuffer(1024);
     }
 
+    /**
+     * Creates a new <code>BlastLikeSearchBuilder</code> which will
+     * instantiate results into the <code>List</code> target.
+     *
+     * @param target a <code>List</code>.
+     * @param querySeqHolder a <code>SequenceDB</code> of query
+     * sequences.
+     * @param subjectDBs a <code>SequenceDBInstallation</code> of
+     * databases searched.
+     */
+    public BlastLikeSearchBuilder(List                   target,
+                                  SequenceDB             querySeqHolder,
+                                  SequenceDBInstallation subjectDBs)
+    {
+        this(target);
+        this.querySeqHolder = querySeqHolder;
+        this.subjectDBs = subjectDBs;
+    }
+
     public SeqSimilaritySearchResult makeSearchResult()
         throws BioException
     {
-        return new SequenceDBSearchResult(queryID,
-                                          databaseID,
+        if (querySeqHolder == null)
+            throw new BioException("Running BlastLikeSearchBuilder with null query SequenceDB");
+
+        if (subjectDBs == null)
+            throw new BioException("Running BlastLikeSearchBuilder with null subject SequenceDB installation");
+
+        Sequence query = querySeqHolder.getSequence(queryID);
+        if (query == null)
+            throw new BioException("Failed to retrieve query sequence from queryDB using ID '"
+                                   + queryID
+                                   + "' (sequence was null)");
+
+        SequenceDB subjectDB = subjectDBs.getSequenceDB(databaseID);
+        if (subjectDB == null)
+	    throw new BioException("Failed to retrieve database from installation using ID '"
+				   + databaseID
+                                   + "' (database was null)");
+
+        return new SequenceDBSearchResult(query,
+                                          subjectDB,
 					  searchParameters,
                                           hits,
 					  resultAnnotation);
     }
 
     /**
-     * <code>setQuerySeq</code> identifies the query sequence by a
-     * name, ID or URN.
+     * <code>setQuerySeqHolder</code> sets the query sequence holder
+     * to a specific database.
      *
-     * @param identifier a <code>String</code> which should be an
-     * unique identifer for the sequence.
-     *
-     * @deprecated use <code>setQueryID</code> instead.
+     * @param querySeqHolder a <code>SequenceDB</code> containing the
+     * query sequence(s).
      */
-    public void setQuerySeq(String identifier)
+    public void setQuerySeqHolder(SequenceDB querySeqHolder)
     {
-        setQueryID(identifier);
+        this.querySeqHolder = querySeqHolder;
+    }
+
+    /**
+     * <code>setSubjectDBInstallation</code> sets the subject database
+     * holder to a specific installation.
+     *
+     * @param subjectDBs a <code>SequenceDBInstallation</code>
+     * containing the subject database(s)
+     */
+    public void setSubjectDBInstallation(SequenceDBInstallation subjectDBs)
+    {
+        this.subjectDBs = subjectDBs;
     }
 
     public void setQueryID(String queryID)
     {
         this.queryID = queryID;
-    }
-
-    /**
-     * <code>setSubjectDB</code> identifies the database searched by a
-     * name, ID or URN.
-     *
-     * @param id a <code>String</code> which should be an unique
-     * identifier for the database searched.
-     *
-     * @deprecated use <code>setDatabaseID</code> instead.
-     */
-    public void setSubjectDB(String identifier)
-    {
-        setDatabaseID(identifier);
     }
 
     public void setDatabaseID(String databaseID)

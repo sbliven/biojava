@@ -38,63 +38,28 @@ import org.biojava.bio.symbol.SymbolList;
 public interface SeqSimilaritySearchResult
 {
     /**
-     * <code>getQueryID</code> returns an identifier for the query
-     * sequence which was used to perform the search. This may be used
-     * to locate the query <code>SymbolList</code> in the appropriate
-     * <code>SequenceDB</code>.
-     *
-     * @return a <code>String</code> identifier.
-     *
-     * @see org.biojava.bio.symbol.SymbolList
-     * @see org.biojava.bio.seq.db.SequenceDB
-     */
-    public String getQueryID();
-
-    /**
-     * <code>getDatabaseID</code> returns an identifier for the
-     * sequence database against which the search was conducted. This
-     * may be used to locate a <code>SequenceDB</code> in the
-     * appropriate <code>SequenceDBInstallation</code>.
-     *
-     * @return a <code>String</code> identifier.
-     *
-     * @see org.biojava.bio.seq.db.SequenceDBInstallation
-     */
-    public String getDatabaseID();
-
-    /**
-     * Return the query sequence which was used to perform the search.
+     * Returns the query sequence which was used to perform the search.
      *
      * @return the <code>SymbolList</code> object used to search the
      * <code>SequenceDB</code>. Never returns null.
-     *
-     * @deprecated use <code>getQueryID</code> to obtain a database
-     * identifier which may then be used to locate the query
-     * <code>SymbolList</code> in the appropriate
-     * <code>SequenceDB</code>.
      */
     public SymbolList getQuerySequence();
 
     /**
-     * Return the sequence database against which the search that
-     * produced this search result was performed.
+     * Returns the sequence database against which the search was
+     * performed.
      *
-     * @return the <code>SequenceDB</code> object against which the
+     * @return the <code>SequenceDB object</code> against which the
      * search was carried out. Never returns null.
-     *
-     * @deprecated use <code>getDatabaseID</code> to obtain a database
-     * identifier which may then be used to locate a
-     * <code>SequenceDB</code> in the appropriate
-     * <code>SequenceDBInstallation</code>.
      */
     public SequenceDB getSequenceDB();
 
     /**
-     * Return the search parameters used in the search that produced
+     * Returns the search parameters used in the search that produced
      * this search result.
      *
-     * @return the (immutable) search parameter <code>Map</code>
-     * object. May return null.
+     * @return the (immutable) search parameter <code>Map
+     * object</code>. May return null.
      */
     public Map getSearchParameters();
 

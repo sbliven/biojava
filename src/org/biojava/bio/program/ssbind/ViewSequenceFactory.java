@@ -26,7 +26,6 @@ import java.util.Map;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.ViewSequence;
-import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.db.SequenceDBInstallation;
 
@@ -113,30 +112,19 @@ public abstract class ViewSequenceFactory
         }
         else
         {
-            Sequence temp = null;
-
-            try
-            {
-                temp = querySeqHolder.getSequence(queryID);
-            }
-            catch (IllegalIDException iie)
-            {
-                throw new BioException(iie, "Failed to retrieve query sequence from holder using ID '"
-                                       + queryID
-                                       + "'");
-            }
+            Sequence query = querySeqHolder.getSequence(queryID);
 
             // It shouldn't happen, but it can with some implementations
             // of SequenceDB
-            if (temp == null)
+            if (query == null)
                 throw new BioException("Failed to retrieve query sequence from holder using ID '"
                                        + queryID
                                        + "' (sequence was null)");
 
-            temp = new ViewSequence(temp);
-            queryViewCache.put(queryID, temp);
+            query = new ViewSequence(query);
+            queryViewCache.put(queryID, query);
 
-            return temp;
+            return query;
         }
     }
 
@@ -161,30 +149,19 @@ public abstract class ViewSequenceFactory
         }
         else
         {
-            Sequence temp = null;
-
-            try
-            {
-                temp = subjectDB.getSequence(subjectID);
-            }
-            catch (IllegalIDException iie)
-            {
-                throw new BioException(iie, "Failed to retrieve subject sequence from subjectDB using ID '"
-                                       + subjectID
-                                       + "'");
-            }
+            Sequence subject = subjectDB.getSequence(subjectID);
 
             // It shouldn't happen, but it can with some implementations
             // of SequenceDB
-            if (temp == null)
+            if (subject == null)
                 throw new BioException("Failed to retrieve subject sequence from subjectDB using ID '"
                                        + subjectID
                                        + "' (sequence was null)");
 
-            temp = new ViewSequence(temp);
-            subjectViewCache.put(subjectID, temp);
+            subject = new ViewSequence(subject);
+            subjectViewCache.put(subjectID, subject);
 
-            return temp;
+            return subject;
         }
     }
 }

@@ -21,22 +21,30 @@
 
 package org.biojava.bio.search;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.List;
 
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ObjectUtil;
+import org.biojava.bio.seq.db.SequenceDBInstallation;
 
 /**
  * <code>SequenceDBSearchResult</code> objects represent a result of a
- * search of a SymbolList against the sequences within a SequenceDB
- * object. The core data (query sequence, database, search parameters,
- * hits) have accessors, while supplementary data are stored in the
- * Annotation object. Supplementary data are typically the more
- * loosely formatted details which vary from one search program to
- * another (and between versions of those programs).
+ * search of a <code>SymbolList</code> against the sequences within a
+ * <code>SequenceDB</code> object. The core data (query sequence,
+ * database, search parameters, hits) have accessors, while
+ * supplementary data are stored in the <code>Annotation</code>
+ * object. Supplementary data are typically the more loosely formatted
+ * details which vary from one search program to another (and between
+ * versions of those programs).
  *
  * @author Keith James
  * @since 1.1
@@ -47,12 +55,13 @@ import org.biojava.utils.*;
 public class SequenceDBSearchResult extends AbstractChangeable
     implements SeqSimilaritySearchResult, Annotatable
 {
-    private String     queryID;
-    private String     databaseID;
-    private Map        searchParameters;
-    private List       hits;
-    private Annotation annotation;
     protected transient AnnotationForwarder annotationForwarder;
+
+    private SymbolList querySequence;
+    private SequenceDB sequenceDB;
+    private Map        searchParameters;
+    private Annotation annotation;
+    private List       hits;
 
     // Hashcode is cached after first calculation because the data on
     // which is is based do not change
@@ -62,29 +71,34 @@ public class SequenceDBSearchResult extends AbstractChangeable
     /**
      * Creates a new <code>SequenceDBSearchResult</code>.
      *
-     * @param queryID a <code>String</code>.
-     * @param databaseID a <code>String</code>.
+     * @param querySequence a <code>SymbolList</code>.
+     * @param sequenceDB a <code>SequenceDB</code>.
      * @param searchParameters a <code>Map</code>.
-     * @param hits a <code>List</code>.
      * @param annotation an <code>Annotation</code>.
+     * @param hits a <code>List</code>.
      */
-    public SequenceDBSearchResult(String     queryID,
-                                  String     databaseID,
+    public SequenceDBSearchResult(SymbolList querySequence,
+                                  SequenceDB sequenceDB,
                                   Map        searchParameters,
                                   List       hits,
                                   Annotation annotation)
     {
-        if (queryID  == null)
+        if (querySequence == null)
         {
-            throw new IllegalArgumentException("queryID was null");
+            throw new IllegalArgumentException("querySequence was null");
         }
 
-        if (databaseID == null)
+        if (sequenceDB == null)
         {
-            throw new IllegalArgumentException("databaseID was null");
+            throw new IllegalArgumentException("sequenceDB was null");
         }
 
-        // searchParameters may be null
+        if (searchParameters != null)
+        {
+            this.searchParameters =
+                Collections.unmodifiableMap(searchParameters);
+        }
+
         if (annotation == null)
         {
             throw new IllegalArgumentException("annotation was null");
@@ -95,74 +109,48 @@ public class SequenceDBSearchResult extends AbstractChangeable
             throw new IllegalArgumentException("hits was null");
         }
 
-        this.queryID          = queryID;
-        this.databaseID       = databaseID;
-        this.searchParameters = searchParameters;
-        this.hits             = Collections.unmodifiableList(hits);
-        this.annotation       = annotation;
+        // Lock the sequenceDB by vetoing all changes
+        sequenceDB.addChangeListener(ChangeListener.ALWAYS_VETO);
+
+        // Lock the querySeq by vetoing all changes
+        querySequence.addChangeListener(ChangeListener.ALWAYS_VETO);
 
         // Lock the annotation by vetoing all changes to properties
-        this.annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
+        annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
+
+        this.querySequence = querySequence;
+        this.sequenceDB    = sequenceDB;
+        this.annotation    = annotation;
+        this.hits          = Collections.unmodifiableList(hits);
+
+        hcCalc = false;
     }
 
-    public String getQueryID()
-    {
-        return queryID;
-    }
-
-    public String getDatabaseID()
-    {
-        return databaseID;
-    }
-
-    /**
-     * Return the query sequence which was used to perform the search.
-     *
-     * @return the <code>SymbolList</code> object used to search the
-     * <code>SequenceDB</code>. Never returns null.
-     *
-     * @deprecated use <code>getQueryID</code> to obtain a database
-     * identifier which may then be used to locate the query
-     * <code>SymbolList</code> in the appropriate
-     * <code>SequenceDB</code>.
-     */
     public SymbolList getQuerySequence()
     {
-        throw new UnsupportedOperationException();
+        return querySequence;
     }
 
-    /**
-     * Return the sequence database against which the search that
-     * produced this search result was performed.
-     *
-     * @return the <code>SequenceDB</code> object against which the
-     * search was carried out. Never returns null.
-     *
-     * @deprecated use <code>getDatabaseID</code> to obtain a database
-     * identifier which may then be used to locate a
-     * <code>SequenceDB</code> in the appropriate
-     * <code>SequenceDBInstallation</code>.
-     */
     public SequenceDB getSequenceDB()
     {
-        throw new UnsupportedOperationException();
+        return sequenceDB;
     }
 
     public Map getSearchParameters()
     {
-        return (searchParameters == null ? null : Collections.unmodifiableMap(searchParameters));
+        return searchParameters;
     }
 
     public List getHits()
     {
-        return Collections.unmodifiableList(hits);
+        return hits;
     }
 
     /**
      * <code>getAnnotation</code> returns the Annotation associated
      * with this hit.
      *
-     * @return an <code>Annotation</code> value.
+     * @return an <code>Annotation</code>.
      */
     public Annotation getAnnotation()
     {
@@ -178,15 +166,15 @@ public class SequenceDBSearchResult extends AbstractChangeable
 
         SequenceDBSearchResult that = (SequenceDBSearchResult) other;
 
-        if (! ObjectUtil.equals(this.queryID, that.queryID))
+        if (! ObjectUtil.equals(this.querySequence, that.querySequence))
             return false;
-        if (! ObjectUtil.equals(this.databaseID, that.databaseID))
+        if (! ObjectUtil.equals(this.sequenceDB, that.sequenceDB))
             return false;
         if (! ObjectUtil.equals(this.searchParameters, that.searchParameters))
             return false;
-        if (! ObjectUtil.equals(this.hits, that.hits))
-            return false;
         if (! ObjectUtil.equals(this.annotation, that.annotation))
+            return false;
+        if (! ObjectUtil.equals(this.hits, that.hits))
             return false;
 
         return true;
@@ -196,8 +184,8 @@ public class SequenceDBSearchResult extends AbstractChangeable
     {
         if (! hcCalc)
         {
-            hc = ObjectUtil.hashCode(hc, queryID);
-            hc = ObjectUtil.hashCode(hc, databaseID);
+            hc = ObjectUtil.hashCode(hc, querySequence);
+            hc = ObjectUtil.hashCode(hc, sequenceDB);
             hc = ObjectUtil.hashCode(hc, searchParameters);
             hc = ObjectUtil.hashCode(hc, hits);
             hc = ObjectUtil.hashCode(hc, annotation);
@@ -209,23 +197,23 @@ public class SequenceDBSearchResult extends AbstractChangeable
 
     public String toString()
     {
-        return "SequenceDBSearchResult of " + queryID
-            + " against " + databaseID;
+        return "SequenceDBSearchResult of " + getQuerySequence()
+            + " against " + getSequenceDB().getName();
     }
 
-    protected ChangeSupport getChangeSupport(ChangeType ct){
-      ChangeSupport cs = super.getChangeSupport(ct);
+    protected ChangeSupport getChangeSupport(ChangeType ct)
+    {
+        ChangeSupport cs = super.getChangeSupport(ct);
 
-      if(annotationForwarder == null &&
-        (ct == null || ct == Annotatable.ANNOTATION)){
-        annotationForwarder = new Annotatable.AnnotationForwarder(
-            this,
-            cs);
-        getAnnotation().addChangeListener(
-            annotationForwarder,
-            Annotatable.ANNOTATION);
-      }
-      return cs;
+        if (annotationForwarder == null &&
+            (ct == null || ct == Annotatable.ANNOTATION))
+        {
+            annotationForwarder =
+                new Annotatable.AnnotationForwarder(this, cs);
+            getAnnotation().addChangeListener(annotationForwarder,
+                                              Annotatable.ANNOTATION);
+        }
+
+        return cs;
     }
-
 }
