@@ -82,7 +82,7 @@ public class FlatSequenceDB extends Unchangeable implements SequenceDBLite
         {
             throw new BioException(lse, "Malformed OBDA index '"
                                    + location
-                                   + "' is not a vaid LSID");
+                                   + "' has a format identifier which is not a valid LSID");
         }
     }
 
