@@ -5,16 +5,36 @@ import java.util.*;
 import org.biojava.utils.AssertionFailure;
 import org.biojava.bio.symbol.*;
 
+/**
+ * Matcher class that pairs with SeqContentPattern.
+ *
+ * <p>
+ * This matcher is responsible for searching through a symbol list for regions
+ * that match a pattern. It is implemented in a non-thread-safe way. Either
+ * have multiple independant matchers, or synchronize externaly.
+ * </p>
+ *
+ * <p>
+ * Instances of this class are obtained from SeqContentPattern.matcher(SymbolList) and it can not be instantiated directly.
+ * </p>
+ *
+ * @author Matthew Pocock
+ * @since 1.4
+ * @see SeqContentPattern
+ */
 public class SeqContentMatcher {
+  // constants
   private final AlphabetIndex index;
   private final SymbolList symList;
   private final int[] minCounts;
   private final int[] maxCounts;
   private final int length;
 
+  // state
   private int pos;
   private int[] curCounts;
 
+  // package-private constructor - should only be invoked by SeqContentPattern
   SeqContentMatcher(
     SymbolList symList,
     AlphabetIndex index,
@@ -33,6 +53,22 @@ public class SeqContentMatcher {
     pos = 0;
   }
 
+  /**
+   * Attempt to find the next match.
+   *
+   * <p>
+   * If the pattern can be found, then this will return true. If it could not,
+   * then it will return false. This is convenient within for or while loops.
+   * </p>
+   *
+   * <p>
+   * Each time this is called, the next match will be found. The start() and
+   * end() values will increase each time, regardless of wether you called any
+   * other methods.
+   * </p>
+   *
+   * @return true if there is another match
+   */
   public boolean find() {
     try {
       // are we doing the 1st find?
@@ -105,6 +141,7 @@ public class SeqContentMatcher {
       }
 
       // no match could be found
+      pos = symList.size() + 1;
       return false;
     } catch (IllegalSymbolException ise) {
       throw new AssertionFailure(
@@ -123,15 +160,57 @@ public class SeqContentMatcher {
     return true;
   }
 
+  /**
+   * Get the first symbol index that matches the pattern.
+   * 
+   * @return the start of the current match
+   * @throws IllegalStateException if there is no current match
+   */
   public int start() {
+    if(pos == 0) {
+      throw new IllegalStateException("Can't call start() before find()");
+    }
+
+    if(pos > symList.size()) {
+      throw new IllegalStateException("Can't call start() after find() has returned false");
+    }
+
     return pos;
   }
 
+  /**
+   * Get the last symbol index that matches the pattern.
+   *
+   * @return the end of the current match
+   * @throws IllegalStateException if there is no current match
+   */
   public int end() {
+    if(pos == 0) { 
+      throw new IllegalStateException("Can't call end() before find()"); 
+    } 
+
+    if(pos > symList.size()) {
+      throw new IllegalStateException("Can't call end() after find() has returned false");
+    }
+
     return pos + length - 1;
   }
 
+  /**
+   * Get the matching region as a SymbolList.
+   *
+   * @return the matching symbols
+   * @throws IllegalStateException if there is no current match
+   */
   public SymbolList group() {
+    if(pos == 0) { 
+      throw new IllegalStateException("Can't call group() before find()"); 
+    } 
+
+    if(pos > symList.size()) {
+      throw new IllegalStateException("Can't call group() after find() has returned false");
+    }
+
     return symList.subList(pos, pos + length - 1);
   }
 }
