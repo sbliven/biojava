@@ -17,7 +17,7 @@ import org.biojava.utils.ParserException;
  * @author Keith James (enabled empty line EOR)
  * @since 1.3
  */
-public class RegexpParser
+public class RegexParser
   implements
     TagValueParser
 {
@@ -40,9 +40,9 @@ public class RegexpParser
   private String tag;
   
   /**
-   * Create a new RegexpParser with all boolean values set to false.
+   * Create a new RegexParser with all boolean values set to false.
    */
-  public RegexpParser() {}
+  public RegexParser() {}
   
   /** 
    * Set the Pattern used to split lines.
