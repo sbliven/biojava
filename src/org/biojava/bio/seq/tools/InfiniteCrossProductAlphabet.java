@@ -116,9 +116,9 @@ class InfiniteCrossProductAlphabet implements CrossProductAlphabet {
   }
   
   public CrossProductResidue getResidue(List rList)
-  throws IllegalAlphabetException {
+  throws IllegalResidueException {
     if(rList.size() != alphas.size()) {
-      throw new IllegalAlphabetException(
+      throw new IllegalResidueException(
         "List of residues is the wrong length (" + alphas.size() +
         ":" + rList.size() + ")"
       );
@@ -131,7 +131,7 @@ class InfiniteCrossProductAlphabet implements CrossProductAlphabet {
       Alphabet aa = (Alphabet) ai.next();
       Residue rr = (Residue) ri.next();
       if(!aa.contains(rr)) {
-        throw new IllegalAlphabetException(
+        throw new IllegalResidueException(
           "CrossProductAlphabet " + getName() + " does not accept " + rList +
           " as residue " + rr.getName() + " is not a member of the alphabet " +
           aa.getName()

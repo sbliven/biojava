@@ -28,20 +28,29 @@ import org.biojava.bio.seq.*;
 public class ProteinTools {
   private static final FiniteAlphabet proteinAlpha;
   private static final FiniteAlphabet proteinXAlpha;
+  private static final FiniteAlphabet proteinTAlpha;
   private static final Residue x;
+  private static final Residue termination;
   
   static {
     try {
       AlphabetManager am = AlphabetManager.instance();
       proteinAlpha = (FiniteAlphabet) am.alphabetForName("PROTEIN");
       SimpleAlphabet xAlpha = new SimpleAlphabet();
+      SimpleAlphabet tAlpha = new SimpleAlphabet();
       xAlpha.setName(proteinAlpha.getName() + "+X");
+      tAlpha.setName(proteinAlpha.getName() + "+T");
       for(Iterator i = proteinAlpha.iterator(); i.hasNext(); ) {
-        xAlpha.addResidue((Residue) i.next());
+        Residue r = (Residue) i.next();
+        xAlpha.addResidue(r);
+        tAlpha.addResidue(r);
       }
       x = am.residueForName("X");
+      termination = am.residueForName("termination");
       xAlpha.addResidue(x);
+      tAlpha.addResidue(termination);
       proteinXAlpha = xAlpha;
+      proteinTAlpha = tAlpha;
     } catch (IllegalResidueException ire) {
       throw new BioError(ire, " Could not initialize ProteinTools");
     }
@@ -57,5 +66,13 @@ public class ProteinTools {
   
   public static final Residue getXResidue() {
     return x;
+  }
+  
+  public static final FiniteAlphabet getTAlphabet() {
+    return proteinTAlpha;
+  }
+  
+  public static final Residue getTResidue() {
+    return termination;
   }
 }

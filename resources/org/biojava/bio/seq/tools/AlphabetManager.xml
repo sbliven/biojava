@@ -119,6 +119,11 @@
     <long>UNK</long>
     <description>Unknown amino-acid</description>
   </residue>
+  <residue name="termination">
+    <short>*</short>
+    <long>TER</long>
+    <description>Termination signal during translation</description>
+  </residue>
   
   <alphabet>
     <name>DNA</name>
@@ -260,7 +265,7 @@
   
     <residue>
       <short>Y</short>
-      <long>TRY</long>
+      <long>TYR</long>
     </residue>
   
     <residue>

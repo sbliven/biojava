@@ -50,11 +50,11 @@ public interface CrossProductAlphabet extends Alphabet {
      * to the specified ordered list of residues.
      *
      * @param rl A list of residues.
-     * @throws IllegalAlphabetException if the members of rl are
+     * @throws IllegalResidueException if the members of rl are
      *            not Residues over the alphabets returned from
      *            <code>getAlphabets</code>
      */
 
     public CrossProductResidue getResidue(List rl) 
-	         throws IllegalAlphabetException;
+	         throws IllegalResidueException;
 }

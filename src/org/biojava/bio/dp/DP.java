@@ -45,7 +45,8 @@ public abstract class DP {
   }
   
   public static State[] stateList(MarkovModel mm)
-  throws IllegalResidueException, IllegalTransitionException
+  throws IllegalResidueException, IllegalTransitionException,
+  BioException
   {
     FiniteAlphabet alpha = mm.stateAlphabet();
 
@@ -78,6 +79,14 @@ public abstract class DP {
     for (Iterator si = emissionStates.iterator(); si.hasNext(); ) {
       EmissionState ex = (EmissionState) si.next();
       int [] ad = ex.getAdvance();
+      if(ad.length != mm.heads()) {
+        throw new BioException(
+          "Advance (" + ad.length +
+          ") is not the same size as the number of heads (" + mm.heads() +
+          " for state " + ex.getName() + " in model "
+          + mm.stateAlphabet().getName()
+        );
+      }
       for(int adi = 0; ad != null && adi < ad.length; adi++) {
         if(ad[adi] != 0) {
           ad = null;
@@ -290,7 +299,8 @@ public abstract class DP {
   }
   
   public DP(MarkovModel model) throws IllegalResidueException,
-                                    IllegalTransitionException
+                                    IllegalTransitionException,
+                                    BioException
   {
     this.model = model;
     this.states = stateList(model);

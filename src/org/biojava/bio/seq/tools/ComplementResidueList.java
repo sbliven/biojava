@@ -27,7 +27,9 @@ import org.biojava.bio.seq.*;
 
 /**
  * ResidueList which gives a view of the reverse complement of
- * another ResidueList.  The parent ResidueList must use
+ * another ResidueList.
+ * <P>
+ * The parent ResidueList must use
  * either the DNA or DNA-AMBIGUITY alphabet, as provided
  * by the DNATools utility class.
  *

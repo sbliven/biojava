@@ -24,7 +24,7 @@ package org.biojava.bio.dp;
 
 import java.util.*;
 
-import org.biojava.bio.BioError;
+import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.tools.*;
 
@@ -34,6 +34,7 @@ import org.biojava.bio.seq.tools.*;
  * Based on a single-head DP implementation by Matt Pocock.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  */
 
 public class PairwiseDP extends DP {
@@ -41,7 +42,8 @@ public class PairwiseDP extends DP {
     private Residue magicalResidue;
 
     public PairwiseDP(MarkovModel mm) throws IllegalResidueException,
-                                           IllegalTransitionException
+                                           IllegalTransitionException,
+                                           BioException
     {
 	super(mm);
 	magicalState = mm.magicalState();
@@ -314,7 +316,7 @@ public class PairwiseDP extends DP {
     private static List gappedResList = new ArrayList();
 
     private static Residue getResWrapper(CrossProductAlphabet a, List l) 
-        throws IllegalAlphabetException
+        throws IllegalResidueException
     {
 //      System.out.println(a.getName() + " getting:");
 //      for (Iterator i = l.iterator(); i.hasNext(); ) {

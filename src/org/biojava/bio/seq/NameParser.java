@@ -76,7 +76,7 @@ public class NameParser implements ResidueParser {
   }
   
   public Residue parseToken(String token) throws IllegalResidueException {
-    Residue res = (Residue) nameToResidue.get(token);
+    Residue res = (Residue) nameToResidue.get(token.toLowerCase());
     if(res == null) {
       throw new IllegalResidueException(
         "No residue for token '" + token +
@@ -90,7 +90,7 @@ public class NameParser implements ResidueParser {
     this.alphabet = alpha;
     for(Iterator i = alpha.iterator(); i.hasNext(); ) {
       Residue res = (Residue) i.next();
-      nameToResidue.put(res.getName(), res);
+      nameToResidue.put(res.getName().toLowerCase(), res);
     }
   }
   

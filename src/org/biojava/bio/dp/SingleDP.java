@@ -49,7 +49,7 @@ class SingleDP extends DP {
   }
 
   public SingleDP(MarkovModel flat)
-  throws IllegalResidueException, IllegalTransitionException {
+  throws IllegalResidueException, IllegalTransitionException, BioException {
     super(flat);
   }
   

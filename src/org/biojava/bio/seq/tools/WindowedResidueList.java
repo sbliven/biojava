@@ -99,7 +99,7 @@ public class WindowedResidueList extends AbstractResidueList {
     
     try {
       return alpha.getResidue(source.subList(index, index+width-1).toList());
-    } catch (IllegalAlphabetException iae) {
+    } catch (IllegalResidueException iae) {
       throw new BioError(iae, "Alphabet changed underneath me");
     }
   }

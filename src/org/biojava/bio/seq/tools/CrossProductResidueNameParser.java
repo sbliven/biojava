@@ -129,14 +129,7 @@ public class CrossProductResidueNameParser implements ResidueParser {
       }
     }
     
-    try {
-      return alpha.getResidue(rList);
-    } catch (IllegalAlphabetException iae) {
-      throw new IllegalResidueException(
-        "Unable to create residue because: " +
-        iae.getMessage()
-      );
-    }
+    return alpha.getResidue(rList);
   }
   
   public CrossProductResidueNameParser(CrossProductAlphabet alpha)

@@ -140,14 +140,15 @@ class SimpleCrossProductAlphabet implements FiniteAlphabet, CrossProductAlphabet
   private AlphabetManager.ListWrapper gopher =
     new AlphabetManager.ListWrapper();
 
-  public CrossProductResidue getResidue(List l) throws IllegalAlphabetException {
+  public CrossProductResidue getResidue(List l)
+  throws IllegalResidueException {
     CrossProductResidue r;
     synchronized(gopher) {
       gopher.l = l;
       r = (CrossProductResidue) ourResidues.get(gopher);
     }
     if (r == null) {
-      throw new IllegalAlphabetException(
+      throw new IllegalResidueException(
         "Unable to find CrossProduct residue for " +
         new SimpleCrossProductResidue(l, '?').getName() + " in alphabet " + getName()
       );
