@@ -84,8 +84,8 @@ public class TabIndexStore implements IndexStore, Serializable {
       throw new BioException("Files already exist");
     }
     
-    this.storeFile = storeFile;
-    this.indexFile = indexFile;
+    this.storeFile = storeFile.getAbsoluteFile();
+    this.indexFile = indexFile.getAbsoluteFile();
     this.name = name;
     this.format = format;
     this.sbFactory = sbFactory;
