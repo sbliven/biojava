@@ -23,6 +23,7 @@ package org.biojava.bio.search;
 
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.BasisSymbol;
 
 /**
  * A BioMatcher class returned by MaxMismatchPattern.matcher() that implements
@@ -45,6 +46,9 @@ implements BioMatcher {
     private final int maxPatternSymbolIdx;
     private final int seqLength;
     private final int minMatches;
+    private final boolean [] ambiguousPosition; // indicates if the corresponding position in patternSymbol represents
+                                                // an ambiguity
+    private boolean hasAmbiguity =false;
 
     // working numbers
     private final int[] matches; // this is a modulo'd rotating register that keeps track of the match count
@@ -64,15 +68,20 @@ implements BioMatcher {
 
         // construct reversed pattern array
         patternSymbol = new Symbol[patLength];
+        ambiguousPosition = new boolean[patLength];
         for (int i=0; i < patLength; i++) {
             patternSymbol[i] = pattern.symbolAt(patLength - i);
+            if (patternSymbol[i] instanceof BasisSymbol) {
+                ambiguousPosition[i] = true;
+                hasAmbiguity = true;
+            }
         }
 
         // initialize matches
         matches = new int[patLength];
         for(int i = 0; i < matches.length; i++) matches[i] = 0;
 
-        pos = 0;
+        pos = 1;
     }
 
     public boolean find() 
@@ -98,10 +107,25 @@ implements BioMatcher {
     {
         Symbol sym = seq.symbolAt(pos);
         // compute matches for continuation of match
-        for (int i=0; i < maxPatternSymbolIdx; i++) {
-            int idx = (pos + i) % patLength;
-            if (sym == patternSymbol[i])
-                matches[idx]++;
+        if (hasAmbiguity) {
+            for (int i=0; i < maxPatternSymbolIdx; i++) {
+                int idx = (pos + i) % patLength;
+                if (ambiguousPosition[i]) {
+                    if (patternSymbol[i].getMatches().contains(sym))
+                        matches[idx]++;
+                }
+                else {
+                    if (sym == patternSymbol[i])
+                        matches[idx]++;
+                }
+            }
+        }
+        else {
+            for (int i=0; i < maxPatternSymbolIdx; i++) {
+                int idx = (pos + i) % patLength;
+                if (sym == patternSymbol[i])
+                    matches[idx]++;
+            }
         }
 
         // initialise and compute initial match
