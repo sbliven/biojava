@@ -58,33 +58,26 @@ public class SequenceDBSearchResultTest extends TestCase
         super(name);
     }
 
-    protected void setUp()
+    protected void setUp() throws Exception
     {
         database   = new HashSequenceDB("test");
         parameters = new HashMap();
 
         TokenParser tp = new TokenParser(ProteinTools.getAlphabet());
 
-        try
-        {
-            query = tp.parse(querySeqTokens);
+        query = tp.parse(querySeqTokens);
 
-            r1 = new SequenceDBSearchResult(database,
-                                            parameters,
-                                            query,
-                                            Annotation.EMPTY_ANNOTATION,
-                                            new ArrayList());
+        r1 = new SequenceDBSearchResult(database,
+                                        parameters,
+                                        query,
+                                        Annotation.EMPTY_ANNOTATION,
+                                        new ArrayList());
 
-            r2 = new SequenceDBSearchResult(database,
-                                            parameters,
-                                            query,
-                                            Annotation.EMPTY_ANNOTATION,
-                                            new ArrayList());
-        }
-        catch (IllegalSymbolException ise)
-        {
-            ise.printStackTrace();
-        }                       
+        r2 = new SequenceDBSearchResult(database,
+                                        parameters,
+                                        query,
+                                        Annotation.EMPTY_ANNOTATION,
+                                        new ArrayList());
     }
 
     public void testEquals()

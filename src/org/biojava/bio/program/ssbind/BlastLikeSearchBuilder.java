@@ -228,7 +228,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         }
         catch (BioException be)
         {
-            System.err.println("SubHit construction failed: ");
+            System.err.println("Failed to build SubHit: ");
             be.printStackTrace();
         }
     }
@@ -357,7 +357,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
             else if (resultPreAnnotation.containsKey("program"))
                 identifier = (String) resultPreAnnotation.get("program");
             else
-                throw new BioException("Unable to determine sequence type");
+                throw new BioException("Failed to determine sequence type");
 
             FiniteAlphabet alpha = alphaResolver.resolveAlphabet(identifier);
             tokenParser = new TokenParser(alpha);

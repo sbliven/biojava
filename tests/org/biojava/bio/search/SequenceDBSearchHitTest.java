@@ -76,82 +76,75 @@ public class SequenceDBSearchHitTest extends TestCase
         super(name);
     }
 
-    protected void setUp()
+    protected void setUp() throws Exception
     {
          TokenParser tp = new TokenParser(ProteinTools.getAlphabet());
 
-        try
-        {
-            Map labelMap1 = new HashMap();
-            labelMap1.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
-                          tp.parse(querySeqTokens));
-            labelMap1.put(subjectSeqID,
-                          tp.parse(subjectSeqTokens));
+         Map labelMap1 = new HashMap();
+         labelMap1.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
+                       tp.parse(querySeqTokens));
+         labelMap1.put(subjectSeqID,
+                       tp.parse(subjectSeqTokens));
 
-            al1 = new SimpleAlignment(labelMap1);
+         al1 = new SimpleAlignment(labelMap1);
 
-            Map labelMap2 = new HashMap();
-            labelMap2.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
-                          tp.parse(querySeqTokens));
-            labelMap2.put(subjectSeqID,
-                          tp.parse(subjectSeqTokens));
+         Map labelMap2 = new HashMap();
+         labelMap2.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
+                       tp.parse(querySeqTokens));
+         labelMap2.put(subjectSeqID,
+                       tp.parse(subjectSeqTokens));
 
-            al2 = new SimpleAlignment(labelMap2);
+         al2 = new SimpleAlignment(labelMap2);
 
-            subHits1 = new ArrayList();
-            subHits1.add(new SequenceDBSearchSubHit(score,
-                                                    eValue,
-                                                    pValue,
-                                                    queryStart,
-                                                    queryEnd,
-                                                    querySeqStrand,
-                                                    subjectStart,
-                                                    subjectEnd,
-                                                    subjectSeqStrand,
-                                                    al1));
+         subHits1 = new ArrayList();
+         subHits1.add(new SequenceDBSearchSubHit(score,
+                                                 eValue,
+                                                 pValue,
+                                                 queryStart,
+                                                 queryEnd,
+                                                 querySeqStrand,
+                                                 subjectStart,
+                                                 subjectEnd,
+                                                 subjectSeqStrand,
+                                                 al1));
 
-            subHits2 = new ArrayList();
-            subHits2.add(new SequenceDBSearchSubHit(score,
-                                                    eValue,
-                                                    pValue,
-                                                    queryStart,
-                                                    queryEnd,
-                                                    querySeqStrand,
-                                                    subjectStart,
-                                                    subjectEnd,
-                                                    subjectSeqStrand,
-                                                    al2));
+         subHits2 = new ArrayList();
+         subHits2.add(new SequenceDBSearchSubHit(score,
+                                                 eValue,
+                                                 pValue,
+                                                 queryStart,
+                                                 queryEnd,
+                                                 querySeqStrand,
+                                                 subjectStart,
+                                                 subjectEnd,
+                                                 subjectSeqStrand,
+                                                 al2));
 
-            h1 = new SequenceDBSearchHit(score,
-                                         eValue,
-                                         pValue,
-                                         queryStart,
-                                         queryEnd,
-                                         querySeqStrand,
-                                         subjectStart,
-                                         subjectEnd,
-                                         subjectSeqStrand,
-                                         subjectSeqID,
-                                         Annotation.EMPTY_ANNOTATION,
-                                         subHits1);
+         h1 = new SequenceDBSearchHit(score,
+                                      eValue,
+                                      pValue,
+                                      queryStart,
+                                      queryEnd,
+                                      querySeqStrand,
+                                      subjectStart,
+                                      subjectEnd,
+                                      subjectSeqStrand,
+                                      subjectSeqID,
+                                      Annotation.EMPTY_ANNOTATION,
+                                      subHits1);
 
-            h2 = new SequenceDBSearchHit(score,
-                                         eValue,
-                                         pValue,
-                                         queryStart,
-                                         queryEnd,
-                                         querySeqStrand,
-                                         subjectStart,
-                                         subjectEnd,
-                                         subjectSeqStrand,
-                                         subjectSeqID,
-                                         Annotation.EMPTY_ANNOTATION,
-                                         subHits2);
-        }
-        catch (IllegalSymbolException ise)
-        {
-            ise.printStackTrace();
-        }
+         h2 = new SequenceDBSearchHit(score,
+                                      eValue,
+                                      pValue,
+                                      queryStart,
+                                      queryEnd,
+                                      querySeqStrand,
+                                      subjectStart,
+                                      subjectEnd,
+                                      subjectSeqStrand,
+                                      subjectSeqID,
+                                      Annotation.EMPTY_ANNOTATION,
+                                      subHits2);
     }
 
     public void testEquals()

@@ -82,6 +82,7 @@ public class SearchReader implements Iterator
 	    }
 	    catch (IOException ioe)
 	    {
+                System.err.println("Failed to close reader cleanly");
 		ioe.printStackTrace();
 	    }
 	return moreSearchesAvailable;
@@ -89,7 +90,10 @@ public class SearchReader implements Iterator
 
     /**
      * <code>next</code> returns the next Object from the stream. It
-     * is up to the client to cast this to a suitable search result.
+     * is up to the client to cast this to a suitable search
+     * result. If the stream runs out of valid results or there is a
+     * failure in parsing, the reader will attempt to close the
+     * stream.
      *
      * @return an Object instance.
      *
@@ -99,32 +103,49 @@ public class SearchReader implements Iterator
     public Object next()
 	throws NoSuchElementException
     {
-	if (! moreSearchesAvailable)
-	    throw new NoSuchElementException("Attempt to read search result from empty stream");
+        try
+        {
+            if (! moreSearchesAvailable)
+            {
+                reader.close();
+                throw new NoSuchElementException("Attempt to read search result from empty stream");
+            }
 
-	try
-	{
-	    parser.parseSearch(reader, handler);
-            moreSearchesAvailable = handler.getMoreSearches();
+            try
+            {
+                parser.parseSearch(reader, handler);
+                moreSearchesAvailable = handler.getMoreSearches();
 
-	    return handler.makeSearchResult();
-	}
-	catch (ParserException pe)
+                return handler.makeSearchResult();
+            }
+            catch (ParserException pe)
+            {
+                reader.close();
+                throw new NoSuchElementException("No valid search result could be parsed from this stream: "
+                                                 + "parse failed at line "
+                                                 + pe.getLineNumber()
+                                                 + " of input: "
+                                                 + pe.getMessage());
+            }
+            catch (BioException be)
+            {
+                reader.close();
+                throw new NoSuchElementException("No valid search result could be parsed from this stream: "
+                                                 + be.getMessage());
+            }
+        }
+        catch (IOException ioe)
 	{
-	    throw new NoSuchElementException("No valid search result could be parsed from this stream: "
-					     + "parse failed at line "
-					     + pe.getLineNumber()
-					     + " of input: "
-					     + pe.getMessage());
-	}
-	catch (IOException ioe)
-	{
+            try
+            {
+                reader.close();
+            }
+            catch (IOException ioe2)
+            {
+                System.err.println("Failed to close reader cleanly");
+            }
+
 	    throw new NoSuchElementException("No valid search result could be parsed from this stream");
-	}
-	catch (BioException be)
-	{
-	    throw new NoSuchElementException("No valid search result could be parsed from this stream: "
-					     + be.getMessage());
 	}
     }
 

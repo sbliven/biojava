@@ -61,7 +61,7 @@ class AlphabetResolver
         else if (identifier.equalsIgnoreCase("protein"))
             return ProteinTools.getAlphabet();
         else
-            throw new BioException("Unable to resolve sequence type from identifier '"
+            throw new BioException("Failed to resolve sequence type from identifier '"
                                    + identifier
                                    + "'");
     }

@@ -48,7 +48,7 @@ public class CompoundLocationTest extends TestCase
 	super(name);
     }
 
-    protected void setUp()
+    protected void setUp() throws Exception
     {
 	locs1 = new ArrayList();
 	locs1.add(new RangeLocation(1, 100));

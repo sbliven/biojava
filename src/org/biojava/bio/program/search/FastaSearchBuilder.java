@@ -343,7 +343,9 @@ public class FastaSearchBuilder implements SearchBuilder
 	catch (IllegalSymbolException ise)
 	{
 	    throw new BioException("Failed to create alignment for hit to "
-				   + subjectSeqID);
+				   + subjectSeqID
+                                   + ": "
+                                   + ise.getMessage());
 	}
 
         // For Fasta the query/subject start/end/strand are easy to

@@ -55,11 +55,11 @@ import org.biojava.bio.symbol.Alignment;
  * fp_demo.db (a subjectFile) and fp_demo.m10 (a fastaOutputFile).
  *
  * Run the demo like so: <code>java search/FastaSearchParse
- * files/fp_queries.db files/fp_demo.db files/fp_demo.m10</code>
+ * files/fp_queries.db files/fp_demo.db
+ * files/fp_demo.m10</code>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
- * @version 1.0
- * @since 1.1 
+ * @since 1.1
  */
 public class FastaSearchParse
 {

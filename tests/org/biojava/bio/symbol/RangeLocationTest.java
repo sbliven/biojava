@@ -43,7 +43,7 @@ public class RangeLocationTest extends TestCase
 	super(name);
     }
 
-    protected void setUp()
+    protected void setUp() throws Exception
     {
 	r1 = new RangeLocation(1, 100);
 	r2 = new RangeLocation(90, 190);

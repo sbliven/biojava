@@ -67,32 +67,25 @@ public class SequenceDBSearchSubHitTest extends TestCase
         super(name);
     }
 
-    protected void setUp()
+    protected void setUp() throws Exception
     {
         TokenParser tp = new TokenParser(ProteinTools.getAlphabet());
 
-        try
-        {
-            Map labelMap1 = new HashMap();
-            labelMap1.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
-                          tp.parse(querySeqTokens));
-            labelMap1.put(subjectSeqID,
-                          tp.parse(subjectSeqTokens));
+        Map labelMap1 = new HashMap();
+        labelMap1.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
+                      tp.parse(querySeqTokens));
+        labelMap1.put(subjectSeqID,
+                      tp.parse(subjectSeqTokens));
 
-            al1 = new SimpleAlignment(labelMap1);
+        al1 = new SimpleAlignment(labelMap1);
 
-            Map labelMap2 = new HashMap();
-            labelMap2.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
-                          tp.parse(querySeqTokens));
-            labelMap2.put(subjectSeqID,
-                          tp.parse(subjectSeqTokens));
+        Map labelMap2 = new HashMap();
+        labelMap2.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
+                      tp.parse(querySeqTokens));
+        labelMap2.put(subjectSeqID,
+                      tp.parse(subjectSeqTokens));
 
-            al2 = new SimpleAlignment(labelMap2);
-        }
-        catch (IllegalSymbolException ise)
-        {
-            ise.printStackTrace();
-        }
+        al2 = new SimpleAlignment(labelMap2);
 
         sh1 = new SequenceDBSearchSubHit(score,
                                          eValue,

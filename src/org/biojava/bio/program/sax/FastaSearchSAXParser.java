@@ -472,7 +472,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
             else if (hitProperties.containsKey("sw_overlap"))
                 overlap = hitProperties.get("sw_overlap").toString();
 	    else
-                throw new SAXException("Unable to retrieve hit overlap from search data");
+                throw new SAXException("Failed to retrieve hit overlap from search data");
 
 	    // alignmentSize attribute
 	    qName.setQName("alignmentSize");

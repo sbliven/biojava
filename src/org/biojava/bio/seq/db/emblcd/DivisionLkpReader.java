@@ -37,8 +37,11 @@ public class DivisionLkpReader extends EmblCDROMIndexReader
      * Creates a new <code>DivisionLkpReader</code>.
      *
      * @param input an <code>InputStream</code>.
+     *
+     * @exception IOException if an error occurs.
      */
     public DivisionLkpReader(InputStream input)
+        throws IOException
     {
         super(input);
     }

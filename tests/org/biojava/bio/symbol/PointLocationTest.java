@@ -41,7 +41,7 @@ public class PointLocationTest extends TestCase
 	super(name);
     }
 
-    protected void setUp()
+    protected void setUp() throws Exception
     {
 	r1 = new PointLocation(1);
 	r2 = new PointLocation(10);

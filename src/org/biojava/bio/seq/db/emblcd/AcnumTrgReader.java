@@ -37,8 +37,11 @@ public class AcnumTrgReader extends EmblCDROMIndexReader
      * Creates a new <code>AcnumTrgReader</code>.
      *
      * @param input an <code>InputStream</code>.
+     *
+     * @exception IOException if an error occurs.
      */
     public AcnumTrgReader(InputStream input)
+        throws IOException
     {
         super(input);
     }

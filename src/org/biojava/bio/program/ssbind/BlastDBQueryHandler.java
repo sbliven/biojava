@@ -168,9 +168,9 @@ public class BlastDBQueryHandler extends DefaultHandler
         }
 
         if (query == null)
-            throw new SAXException("Unable to parse query sequence ID");
+            throw new SAXException("Failed to parse query sequence ID");
         else if (database == null)
-            throw new SAXException("Unable to parse database ID");
+            throw new SAXException("Failed to parse database ID");
 
         try
         {

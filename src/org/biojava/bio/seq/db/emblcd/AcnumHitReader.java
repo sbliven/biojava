@@ -37,8 +37,11 @@ public class AcnumHitReader extends EmblCDROMIndexReader
      * Creates a new <code>AcnumHitReader</code>.
      *
      * @param input an <code>InputStream</code>.
+     *
+     * @exception IOException if an error occurs.
      */
     public AcnumHitReader(InputStream input)
+        throws IOException
     {
         super(input);
     }

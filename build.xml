@@ -177,6 +177,8 @@
         <pathelement path="${build.dest.main}" />
         <!-- test classes from build -->
         <pathelement path="${build.dest.tests}" />
+        <!-- test data from build -->
+        <pathelement path="${build.src.tests}" />
       </classpath>
       <!-- The junit task doesn't support 'if' so we test for JUnit here -->
       <batchtest fork="yes" todir="${reports.tests}" if="junit.present">

@@ -632,6 +632,7 @@ class AbstractGenEmblFileFormer
      *
      * @param sb a <code>StringBuffer</code> to format the location into.
      * @param theLocation The between location object to be formatted
+     *
      * @return A string representation of the location
      */
     private StringBuffer formatBetween(final StringBuffer sb, final BetweenLocation theLocation)
@@ -732,6 +733,8 @@ class AbstractGenEmblFileFormer
 		    }
 		    featureData.put(featureKey, qualifierData.keySet());
 		}
+
+                featureDataStream.close();
 	    }
 	}
 	catch (IOException ioe)

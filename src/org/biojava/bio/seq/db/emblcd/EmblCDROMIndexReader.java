@@ -62,12 +62,6 @@ public abstract class EmblCDROMIndexReader
     protected StringBuffer sb;
     protected RecordParser recParser;
 
-    /**
-     * <code>headerParsed</code> is a flag indicating that the 300
-     * byte header has been parsed and the contents cached.
-     */
-    private boolean headerParsed = false;
-
     // Header fields
     private byte []      int4 = new byte [4];
     private byte []      int2 = new byte [2];
@@ -89,12 +83,17 @@ public abstract class EmblCDROMIndexReader
      * <code>BufferedInputStream</code> is probably the most suitable.
      *
      * @param input an <code>InputStream</code>.
+     *
+     * @exception IOException if an error occurs.
      */
     public EmblCDROMIndexReader(InputStream input)
+        throws IOException
     {
         this.input = input;
         sb = new StringBuffer(512);
         recParser = new RecordParser();
+
+        parseHeader();
     }
 
     /**
@@ -103,14 +102,9 @@ public abstract class EmblCDROMIndexReader
      * may be called more than once as the value is cached.
      *
      * @return a <code>long</code>.
-     *
-     * @exception IOException if an error occurs.
      */
-    public long readFileLength() throws IOException
+    public long readFileLength()
     {
-        if (! headerParsed)
-            parseHeader();
-
         return fileLength;
     }
 
@@ -120,14 +114,9 @@ public abstract class EmblCDROMIndexReader
      * cached.
      *
      * @return a <code>long</code>.
-     *
-     * @exception IOException if an error occurs.
      */
-    public long readRecordCount() throws IOException
+    public long readRecordCount()
     {
-        if (! headerParsed)
-            parseHeader();
-
         return recordCount;
     }
 
@@ -137,14 +126,9 @@ public abstract class EmblCDROMIndexReader
      * cached.
      *
      * @return an <code>int</code>.
-     *
-     * @exception IOException if an error occurs.
      */
-    public int readRecordLength() throws IOException
+    public int readRecordLength()
     {
-        if (! headerParsed)
-            parseHeader();
-
         return recordLength;
     }
 
@@ -154,14 +138,9 @@ public abstract class EmblCDROMIndexReader
      * cached.
      *
      * @return a <code>String</code>.
-     *
-     * @exception IOException if an error occurs.
      */
-    public String readDBName() throws IOException
+    public String readDBName()
     {
-        if (! headerParsed)
-            parseHeader();
-
         return name;
     }
 
@@ -171,14 +150,9 @@ public abstract class EmblCDROMIndexReader
      * value is cached.
      *
      * @return a <code>String</code>.
-     *
-     * @exception IOException if an error occurs.
      */
-    public String readDBRelease() throws IOException
+    public String readDBRelease()
     {
-        if (! headerParsed)
-            parseHeader();
-
         return release;
     }
 
@@ -190,15 +164,10 @@ public abstract class EmblCDROMIndexReader
      * anyway.
      *
      * @return a <code>String</code>.
-     *
-     * @exception IOException if an error occurs.
      */
-    public String readDBDate() throws IOException
+    public String readDBDate()
     
     {
-        if (! headerParsed)
-            parseHeader();
-
         return date;
     }
 
@@ -226,12 +195,20 @@ public abstract class EmblCDROMIndexReader
     {
         int eof = input.read(record);
         if (eof == -1)
-        {
             input.close();
-            throw new IOException("Attempted to read beyond EOF; the InputStream was closed because of this.");
-        }
 
         return record;
+    }
+
+    /**
+     * <code>close</code> closes the underlying
+     * <code>InputStream</code>.
+     *
+     * @exception IOException if an error occurs.
+     */
+    public void close() throws IOException
+    {
+        input.close();
     }
 
     /**
@@ -247,26 +224,20 @@ public abstract class EmblCDROMIndexReader
 
         eof = input.read(int4);
         if (eof == -1)
-        {
             input.close();
-            throw new IOException("Failed to read full header; the InputStream was closed because of this.");
-        }
+
         fileLength = recParser.parseInt4(int4);
 
         eof = input.read(int4);
         if (eof == -1)
-        {
             input.close();
-            throw new IOException("Failed to read full header; the InputStream was closed because of this.");
-        }
+
         recordCount = recParser.parseInt4(int4);
 
         eof = input.read(int2);
         if (eof == -1)
-        {
             input.close();
-            throw new IOException("Failed to read full header; the InputStream was closed because of this.");
-        }
+
         recordLength = recParser.parseInt2(int2);
 
         // Set up array for reading records now that we know their
@@ -275,34 +246,26 @@ public abstract class EmblCDROMIndexReader
 
         eof = input.read(dbName);
         if (eof == -1)
-        {
             input.close();
-            throw new IOException("Failed to read full header; the InputStream was closed because of this.");
-        }
+
         sb.setLength(0);
         name = recParser.parseString(sb, dbName);
 
         eof = input.read(dbRelease);
         if (eof == -1)
-        {
             input.close();
-            throw new IOException("Failed to read full header; the InputStream was closed because of this.");
-        }
+
         sb.setLength(0);
         release = recParser.parseString(sb, dbRelease);
 
         eof = input.read(dbDate);
         if (eof == -1)
-        {
             input.close();
-            throw new IOException("Failed to read full header; the InputStream was closed because of this.");
-        }
+
         sb.setLength(0);
         date = recParser.parseDate(sb, dbDate);
 
         // Skip the remainder of the header (padding)
         input.skip(256);
-
-        headerParsed = true;
     }
 }
