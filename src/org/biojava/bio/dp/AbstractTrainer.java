@@ -52,7 +52,7 @@ public abstract class AbstractTrainer implements TrainingAlgorithm {
   }
   
   protected abstract double singleSequenceIteration(ModelTrainer trainer,
-                                                    SymbolList resList)
+                                                    SymbolList symList)
   throws IllegalSymbolException, IllegalTransitionException, IllegalAlphabetException;
   
   /**

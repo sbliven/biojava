@@ -46,16 +46,16 @@ implements ReversibleTranslationTable, Serializable {
     revMap.put(to, from);
   }
   
-  public Symbol untranslate(Symbol res)
+  public Symbol untranslate(Symbol sym)
   throws IllegalSymbolException {
-    Symbol r = (Symbol) revMap.get(res);
-    if(r == null) {
-      getTargetAlphabet().validate(res);
+    Symbol s = (Symbol) revMap.get(sym);
+    if(s == null) {
+      getTargetAlphabet().validate(sym);
       throw new IllegalSymbolException(
-        "Unable to map " + res.getName()
+        "Unable to map " + sym.getName()
       );
     }
-    return r;
+    return s;
   }
 
   /**

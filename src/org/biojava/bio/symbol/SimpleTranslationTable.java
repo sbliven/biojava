@@ -44,16 +44,16 @@ public class SimpleTranslationTable implements TranslationTable, Serializable {
     return target;
   }
   
-  public Symbol translate(Symbol res)
+  public Symbol translate(Symbol sym)
   throws IllegalSymbolException {
-    Symbol r = (Symbol) transMap.get(res);
-    if(r == null) {
-      source.validate(res);
+    Symbol s = (Symbol) transMap.get(sym);
+    if(s == null) {
+      source.validate(sym);
       throw new IllegalSymbolException(
-        "Unable to map " + res.getName()
+        "Unable to map " + sym.getName()
       );
     }
-    return r;
+    return s;
   }
   
   /**

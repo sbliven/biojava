@@ -123,23 +123,23 @@ public final class RNATools {
    * <P>
    * The index for a symbol is stable accross virtual machines & invokations.
    *
-   * @param res  the Symbol to index
+   * @param sym  the Symbol to index
    * @return     the index for that symbol
-   * @throws IllegalSymbolException if res is not a member of the DNA alphabet
+   * @throws IllegalSymbolException if sym is not a member of the DNA alphabet
    */
-  public static int index(Symbol res) throws IllegalSymbolException {
-    if(res == a) {
+  public static int index(Symbol sym) throws IllegalSymbolException {
+    if(sym == a) {
       return 0;
-    } else if(res == g) {
+    } else if(sym == g) {
       return 1;
-    } else if(res == c) {
+    } else if(sym == c) {
       return 2;
-    } else if(res == u) {
+    } else if(sym == u) {
       return 3;
     }
-    getRNA().validate(res);
+    getRNA().validate(sym);
     throw new IllegalSymbolException("Realy confused. Can't find index for " +
-                                      res.getName());
+                                      sym.getName());
   }
   
   /**
@@ -168,8 +168,8 @@ public final class RNATools {
    * Complement the symbol.
    *
    * @param sym  the symbol to complement
-   * @return a Symbol that is the complement of res
-   * @throws IllegalSymbolException if res is not a member of the DNA alphabet
+   * @return a Symbol that is the complement of sym
+   * @throws IllegalSymbolException if sym is not a member of the DNA alphabet
    */
   static public Symbol complement(Symbol sym)
   throws IllegalSymbolException {

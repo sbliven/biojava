@@ -59,7 +59,7 @@ public class PairDPMatrix implements DPMatrix, Serializable {
 	return model;
     }
 
-    public SymbolList[] resList() {
+    public SymbolList[] symList() {
 	return seqs;
     }
 

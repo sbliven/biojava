@@ -57,7 +57,7 @@ public interface SequenceFormat {
    * the format should be read in either as features, or as annotation.
    *
    * @param context the context to parse from
-   * @param resParser the parser to parse chars to Symbol objects
+   * @param symParser the parser to parse chars to Symbol objects
    * @param sf the sequence factory for generating a full sequence
    * @return the resulting sequence
    */

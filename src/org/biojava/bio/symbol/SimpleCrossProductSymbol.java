@@ -71,8 +71,8 @@ implements CrossProductSymbol, Serializable {
     } else {
       StringBuffer name = new StringBuffer("(");
       for (int i = 0; i < l.size(); ++i) {
-        Symbol r = (Symbol) l.get(i);
-        name.append(r.getName());
+        Symbol s = (Symbol) l.get(i);
+        name.append(s.getName());
         if (i < l.size() - 1) {
           name.append(", ");
         }

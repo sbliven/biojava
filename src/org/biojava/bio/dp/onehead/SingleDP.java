@@ -265,9 +265,9 @@ public class SingleDP extends DP implements Serializable {
       // _index++;
       // System.out.println("\n*** Index=" + _index + " ***");
       dpCursor.advance();
-      Symbol res = dpCursor.currentRes();
-      double [] emissions = getEmission(res, scoreType);
-//      System.out.println("Consuming " + res.getName());
+      Symbol sym = dpCursor.currentRes();
+      double [] emissions = getEmission(sym, scoreType);
+//      System.out.println("Consuming " + sym.getName());
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
       for (int l = 0; l < getDotStatesIndex(); l++) { //any -> emission
@@ -301,7 +301,7 @@ public class SingleDP extends DP implements Serializable {
               // System.out.println("-");
             }
           }
-          // new_l = emission_l(res) * sum_k(transition(k, l) * old_k)
+          // new_l = emission_l(sym) * sum_k(transition(k, l) * old_k)
           currentCol[l] = (weight + Math.log(score)) + constant;
           //System.out.println("Weight " + weight);
           //System.out.println("score " + score + " = " + Math.log(score));
@@ -348,15 +348,15 @@ public class SingleDP extends DP implements Serializable {
 
     while (dpCursor.canAdvance()) {
       dpCursor.advance();
-      Symbol res = dpCursor.lastRes();
-      double [] emissions = getEmission(res, scoreType);
+      Symbol sym = dpCursor.lastRes();
+      double [] emissions = getEmission(sym, scoreType);
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
       for(int k = getDotStatesIndex() - 1; k >= 0; k--) {
         prevScores[k] = emissions[k];
       }
       
-//System.out.println(res.getName());
+//System.out.println(sym.getName());
       for (int k = stateCount-1; k >= 0; k--) {
 //System.out.println("State " + k + " of " + stateCount + ", " + transitions.length);
 //System.out.println(states[k].getName());
@@ -433,9 +433,9 @@ public class SingleDP extends DP implements Serializable {
     return scores[l];
   }
   
-  public StatePath viterbi(SymbolList [] resList, ScoreType scoreType)
+  public StatePath viterbi(SymbolList [] symList, ScoreType scoreType)
   throws IllegalSymbolException {
-    SymbolList r = resList[0];
+    SymbolList r = symList[0];
     DPCursor dpCursor = new SmallCursor(getStates(), r, r.iterator());
     return viterbi(dpCursor, scoreType);
   }
@@ -501,9 +501,9 @@ public class SingleDP extends DP implements Serializable {
     // viterbi
     while (dpCursor.canAdvance()) { // symbol i
       dpCursor.advance();
-      Symbol res = dpCursor.currentRes();
-      double [] emissions = getEmission(res, scoreType);
-      //System.out.println(res.getName());
+      Symbol sym = dpCursor.currentRes();
+      double [] emissions = getEmission(sym, scoreType);
+      //System.out.println(sym.getName());
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
       for (int l = 0; l < states.length; l++) {
@@ -596,9 +596,9 @@ public class SingleDP extends DP implements Serializable {
     };
 
     Map aMap = new HashMap();
-    aMap.put(dpCursor.resList(), dpCursor.resList());
+    aMap.put(dpCursor.symList(), dpCursor.symList());
     Alignment ali = new SimpleAlignment(aMap);
-    GappedSymbolList resView = new GappedSymbolList(ali);
+    GappedSymbolList symView = new GappedSymbolList(ali);
     double [] scores = new double[len];
     List stateList = new ArrayList(len);
     for (int j = 0; j < len; j++) {
@@ -606,7 +606,7 @@ public class SingleDP extends DP implements Serializable {
     }
 
     b2 = best;
-    int ri = dpCursor.resList().length()+1;
+    int ri = dpCursor.symList().length()+1;
     int lc = len;
     int gaps = 0;
     while(b2.back != b2) {
@@ -618,7 +618,7 @@ public class SingleDP extends DP implements Serializable {
       }
       stateList.set(lc, b2.state);
       if(b2.state instanceof DotState) {
-        resView.addGapInSource(ri);
+        symView.addGapInSource(ri);
         gaps++;
       } else {
         ri--;
@@ -629,14 +629,14 @@ public class SingleDP extends DP implements Serializable {
 
     /*System.out.println("Counted " + emC + " emissions and " + dotC + " dots");
     System.out.println("Counted backpointers. Alignment of length " + len);
-    System.out.println("Input list had length " + dpCursor.resList().length());
+    System.out.println("Input list had length " + dpCursor.symList().length());
     System.out.println("Added gaps: " + gaps);
-    System.out.println("Gapped view has length " + resView.length());*/
+    System.out.println("Gapped view has length " + symView.length());*/
 
     unlockModel();
     return new SimpleStatePath(
       bestScore,
-      resView,
+      symView,
       new SimpleSymbolList(getModel().stateAlphabet(), stateList),
       DoubleAlphabet.fromArray(scores)
     );

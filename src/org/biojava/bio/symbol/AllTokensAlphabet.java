@@ -55,13 +55,13 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
    *
    * @param r the symbol to add
    */
-  public void addSymbol(Symbol r) {
-    symbols.add(r);
-    Character token = new Character(r.getToken());
+  public void addSymbol(Symbol s) {
+    symbols.add(s);
+    Character token = new Character(s.getToken());
     if(!tokenToSymbol.keySet().contains(token)) {
-      tokenToSymbol.put(token, r);
+      tokenToSymbol.put(token, s);
     }
-    nameToSymbol.put(r.getName(), r);
+    nameToSymbol.put(s.getName(), s);
   }
 
   public Iterator iterator() {
@@ -74,8 +74,8 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
     return annotation;
   }
   
-  public boolean contains(Symbol r) {
-    return symbols.contains(r);
+  public boolean contains(Symbol s) {
+    return symbols.contains(s);
   }
   
   public String getName() {
@@ -101,11 +101,11 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
           return AllTokensAlphabet.this;
         }
         public SymbolList parse(String seq) {
-          List resList = new ArrayList(seq.length());
+          List symList = new ArrayList(seq.length());
           for(int i = 0; i < seq.length(); i++)
-            resList.add(parseToken(seq.substring(i, i+1)));
+            symList.add(parseToken(seq.substring(i, i+1)));
 	  try {
-	      return new SimpleSymbolList(getAlphabet(), resList);
+	      return new SimpleSymbolList(getAlphabet(), symList);
 	  } catch (IllegalSymbolException ex) {
 	      throw new BioError(ex);
 	  }
@@ -139,11 +139,11 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
     return symbols.size();
   }
   
-  public void validate(Symbol r)
+  public void validate(Symbol s)
   throws IllegalSymbolException {
-    if(contains(r))
+    if(contains(s))
       return;
-    throw new IllegalSymbolException("No symbol " + r.getName() +
+    throw new IllegalSymbolException("No symbol " + s.getName() +
                                       " in alphabet " + getName());
   }
   

@@ -369,36 +369,36 @@ public abstract class DP {
     model.addChangeListener(UPDATER);
   }
 
-  public abstract double forward(SymbolList [] resList, ScoreType scoreType)
+  public abstract double forward(SymbolList [] symList, ScoreType scoreType)
   throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;
   
-  public abstract double backward(SymbolList [] resList, ScoreType scoreType)
+  public abstract double backward(SymbolList [] symList, ScoreType scoreType)
   throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;
 
-  public abstract DPMatrix forwardMatrix(SymbolList [] resList, ScoreType scoreType)
+  public abstract DPMatrix forwardMatrix(SymbolList [] symList, ScoreType scoreType)
   throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;
   
-  public abstract DPMatrix backwardMatrix(SymbolList [] resList, ScoreType scoreType)
+  public abstract DPMatrix backwardMatrix(SymbolList [] symList, ScoreType scoreType)
   throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;
 
-  public abstract DPMatrix forwardMatrix(SymbolList [] resList, DPMatrix matrix, ScoreType scoreType)
+  public abstract DPMatrix forwardMatrix(SymbolList [] symList, DPMatrix matrix, ScoreType scoreType)
   throws IllegalArgumentException, IllegalSymbolException,
   IllegalAlphabetException, IllegalTransitionException;
   
-  public abstract DPMatrix backwardMatrix(SymbolList [] resList, DPMatrix matrix, ScoreType scoreType)
+  public abstract DPMatrix backwardMatrix(SymbolList [] symList, DPMatrix matrix, ScoreType scoreType)
   throws IllegalArgumentException, IllegalSymbolException,
   IllegalAlphabetException, IllegalTransitionException;
     
-  public abstract StatePath viterbi(SymbolList [] resList, ScoreType scoreType)
+  public abstract StatePath viterbi(SymbolList [] symList, ScoreType scoreType)
   throws IllegalSymbolException, IllegalArgumentException, IllegalAlphabetException, IllegalTransitionException;
   
-  public DPMatrix forwardsBackwards(SymbolList [] resList, ScoreType scoreType)
+  public DPMatrix forwardsBackwards(SymbolList [] symList, ScoreType scoreType)
   throws BioException {
     try {
       System.out.println("Making backward matrix");
-      final DPMatrix bMatrix = backwardMatrix(resList, scoreType);
+      final DPMatrix bMatrix = backwardMatrix(symList, scoreType);
       System.out.println("Making forward matrix");
-      final DPMatrix fMatrix = forwardMatrix(resList, scoreType);
+      final DPMatrix fMatrix = forwardMatrix(symList, scoreType);
     
       System.out.println("Making forward/backward matrix");
       return new DPMatrix() {
@@ -414,8 +414,8 @@ public abstract class DP {
           return fMatrix.model();
         }
       
-        public SymbolList [] resList() {
-          return fMatrix.resList();
+        public SymbolList [] symList() {
+          return fMatrix.symList();
         }
       
         public State [] states() {
@@ -444,7 +444,7 @@ public abstract class DP {
     List stateList = new ArrayList();
     List scoreList = new ArrayList();
     double totScore = 0.0;
-    double resScore = 0.0;
+    double symScore = 0.0;
     int i = length;
     State oldState;
     Symbol token;
@@ -452,7 +452,7 @@ public abstract class DP {
     oldState = (State) model.getWeights(model.magicalState()).sampleSymbol();
     Distribution oldDist = model.getWeights(oldState);
     try {
-      resScore += oldDist.getWeight(oldState);
+      symScore += oldDist.getWeight(oldState);
     } catch (IllegalSymbolException ite) {
       throw new BioError(ite,
         "Transition returned from sampleTransition is invalid");
@@ -461,12 +461,12 @@ public abstract class DP {
     if (oldState instanceof EmissionState) {
       EmissionState eState = (EmissionState) oldState;
       token = eState.getDistribution().sampleSymbol();
-      resScore += eState.getDistribution().getWeight(token);
+      symScore += eState.getDistribution().getWeight(token);
       stateList.add(oldState);
       tokenList.add(token);
-      scoreList.add(dAlpha.getSymbol(resScore));
-      totScore += resScore;
-      resScore = 0.0;
+      scoreList.add(dAlpha.getSymbol(symScore));
+      totScore += symScore;
+      symScore = 0.0;
       i--;
     }
 
@@ -477,7 +477,7 @@ public abstract class DP {
         newState = (State) dist.sampleSymbol();
       } while (newState == model.magicalState() && i > 0);
       try {
-        resScore += dist.getWeight(newState);
+        symScore += dist.getWeight(newState);
       } catch (IllegalSymbolException ise) {
         throw new BioError(ise,
           "Transition returned from sampleTransition is invalid");
@@ -490,12 +490,12 @@ public abstract class DP {
       if (newState instanceof EmissionState) {
         EmissionState eState = (EmissionState) newState;
         token = eState.getDistribution().sampleSymbol();
-        resScore += eState.getDistribution().getWeight(token);
+        symScore += eState.getDistribution().getWeight(token);
         stateList.add(newState);
         tokenList.add(token);
-        scoreList.add(dAlpha.getSymbol(resScore));
-        totScore += resScore;
-        resScore = 0.0;
+        scoreList.add(dAlpha.getSymbol(symScore));
+        totScore += symScore;
+        symScore = 0.0;
         i--;
       }
       oldState = newState;
@@ -514,12 +514,12 @@ public abstract class DP {
   }
 
   public static class ReverseIterator implements Iterator, Serializable {
-    private SymbolList res;
+    private SymbolList sym;
     private int index;
 
-    public ReverseIterator(SymbolList res) {
-      this.res = res;
-      index = res.length();
+    public ReverseIterator(SymbolList sym) {
+      this.sym = sym;
+      index = sym.length();
     }
 
     public boolean hasNext() {
@@ -527,7 +527,7 @@ public abstract class DP {
     }
 
     public Object next() {
-      return res.symbolAt(index--);
+      return sym.symbolAt(index--);
     }
 
     public void remove() throws UnsupportedOperationException {

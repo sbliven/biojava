@@ -63,12 +63,12 @@ public class PointLocation implements Location, Serializable {
   }
 
   public SymbolList symbols(SymbolList s)	{
-    final Symbol res = s.symbolAt(this.point);
+    final Symbol sym = s.symbolAt(this.point);
     try {
       return new SimpleSymbolList(s.getAlphabet(), new AbstractList() {
         public Object get(int index) throws IndexOutOfBoundsException {
           if(index == 0) {
-            return res;
+            return sym;
           }
           throw new IndexOutOfBoundsException("Index " + index + " greater than 0");
         }

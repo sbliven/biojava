@@ -60,14 +60,14 @@ public class TokenParser implements SymbolParser, Serializable {
   }
   
   public Symbol parseToken(String token) throws IllegalSymbolException {
-    Symbol res = (Symbol) tokenToSymbol.get(token);
-    if(res == null) {
+    Symbol sym = (Symbol) tokenToSymbol.get(token);
+    if(sym == null) {
       throw new IllegalSymbolException(
         "No symbol for token '" + token +
         "' found in alphabet " + alphabet.getName()
       );
     }
-    return res;
+    return sym;
   }
   
   /**
@@ -81,17 +81,17 @@ public class TokenParser implements SymbolParser, Serializable {
   public TokenParser(FiniteAlphabet alpha) {
     this.alphabet = alpha;
     for(Iterator i = alpha.iterator(); i.hasNext(); ) {
-      Symbol res = (Symbol) i.next();
-      char c = res.getToken();
-      tokenToSymbol.put(Character.toLowerCase(c) + "", res);
-      tokenToSymbol.put(Character.toUpperCase(c) + "", res);
+      Symbol sym = (Symbol) i.next();
+      char c = sym.getToken();
+      tokenToSymbol.put(Character.toLowerCase(c) + "", sym);
+      tokenToSymbol.put(Character.toUpperCase(c) + "", sym);
     }
     if(alpha instanceof SimpleAlphabet) {
       for(Iterator i = ((SimpleAlphabet) alpha).ambiguities(); i.hasNext(); ) {
-        Symbol res = (Symbol) i.next();
-        char c = res.getToken();
-        tokenToSymbol.put(Character.toLowerCase(c) + "", res);
-        tokenToSymbol.put(Character.toUpperCase(c) + "", res);
+        Symbol sym = (Symbol) i.next();
+        char c = sym.getToken();
+        tokenToSymbol.put(Character.toLowerCase(c) + "", sym);
+        tokenToSymbol.put(Character.toUpperCase(c) + "", sym);
       }
     }
   }

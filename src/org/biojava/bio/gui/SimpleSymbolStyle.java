@@ -56,16 +56,16 @@ public class SimpleSymbolStyle implements SymbolStyle {
     try {
       if(fill == null || outline == null) {
         for(Iterator i = alphabet.iterator(); i.hasNext(); ) {
-          Symbol r = (Symbol) i.next();
+          Symbol s = (Symbol) i.next();
           if(outline == null) {
-            setOutlinePaint(r, Color.black);
+            setOutlinePaint(s, Color.black);
           } else {
-            setOutlinePaint(r, (Paint) outline.get(r));
+            setOutlinePaint(s, (Paint) outline.get(s));
           }
           if(fill == null) {
-            setFillPaint(r, Color.gray);
+            setFillPaint(s, Color.gray);
           } else {
-            setOutlinePaint(r, (Paint) fill.get(r));
+            setOutlinePaint(s, (Paint) fill.get(s));
           }
         }
       }
@@ -74,26 +74,26 @@ public class SimpleSymbolStyle implements SymbolStyle {
     }
   }
   
-  public Paint outlinePaint(Symbol r) throws IllegalSymbolException {
-    getAlphabet().validate(r);
-    return (Paint) outlinePaint.get(r);
+  public Paint outlinePaint(Symbol s) throws IllegalSymbolException {
+    getAlphabet().validate(s);
+    return (Paint) outlinePaint.get(s);
   }
   
-  public Paint fillPaint(Symbol r) throws IllegalSymbolException {
-    getAlphabet().validate(r);
-    return (Paint) fillPaint.get(r);
+  public Paint fillPaint(Symbol s) throws IllegalSymbolException {
+    getAlphabet().validate(s);
+    return (Paint) fillPaint.get(s);
   }
   
-  public void setOutlinePaint(Symbol r, Paint paint)
+  public void setOutlinePaint(Symbol s, Paint paint)
   throws IllegalSymbolException {
-    getAlphabet().validate(r);
-    outlinePaint.put(r, paint);
+    getAlphabet().validate(s);
+    outlinePaint.put(s, paint);
   }
 
-  public void setFillPaint(Symbol r, Paint paint)
+  public void setFillPaint(Symbol s, Paint paint)
   throws IllegalSymbolException {
-    getAlphabet().validate(r);
-    fillPaint.put(r, paint);
+    getAlphabet().validate(s);
+    fillPaint.put(s, paint);
   }
 
   private static Map standardFillPaints;

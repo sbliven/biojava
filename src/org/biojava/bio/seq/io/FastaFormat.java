@@ -81,7 +81,7 @@ public class FastaFormat implements SequenceFormat, Serializable {
     }
 
     public void readSequence(StreamReader.Context context,
-			     SymbolParser resParser,
+			     SymbolParser symParser,
 			     SeqIOListener siol)
 	throws IllegalSymbolException, IOException 
     {
@@ -97,7 +97,7 @@ public class FastaFormat implements SequenceFormat, Serializable {
 	String description = line.substring(1).trim();
 	siol.addSequenceProperty(PROPERTY_DESCRIPTIONLINE, description);
 
-	FASymbolReader fasr = new FASymbolReader(resParser, in);
+	FASymbolReader fasr = new FASymbolReader(symParser, in);
 	Symbol[] buffer = new Symbol[256];
 	while (fasr.hasMoreSymbols()) {
 	    int num = fasr.readSymbols(buffer, 0, buffer.length);

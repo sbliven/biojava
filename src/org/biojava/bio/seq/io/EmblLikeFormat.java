@@ -56,7 +56,7 @@ import org.biojava.bio.seq.*;
 
 public class EmblLikeFormat implements SequenceFormat, Serializable {
     public void readSequence(StreamReader.Context context,
-			     SymbolParser resParser,
+			     SymbolParser symParser,
 			     SeqIOListener listener)
 	throws IllegalSymbolException, IOException
     {
@@ -76,7 +76,7 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
 		listener.endSequence();
 		return;
 	    } else if (line.startsWith("SQ")) {
-		EmblSymbolReader esr = new EmblSymbolReader(resParser, in);
+		EmblSymbolReader esr = new EmblSymbolReader(symParser, in);
 		Symbol[] buffer = new Symbol[256];
 		while (esr.hasMoreSymbols()) {
 		    int num = esr.readSymbols(buffer, 0, buffer.length);

@@ -80,11 +80,11 @@ extends AbstractSymbolList implements Alignment, Serializable {
     }
     while(i.hasNext()) {
       Object label = i.next();
-      SymbolList res = symbolListForLabel(label);
+      SymbolList sym = symbolListForLabel(label);
       if(loc != null) {
-        res = loc.symbols(res);
+        sym = loc.symbols(sym);
       }
-      labelsToResList.put(label, res);
+      labelsToResList.put(label, sym);
     }
     return new SimpleAlignment(labelsToResList);
   }

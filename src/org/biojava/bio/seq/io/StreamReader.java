@@ -58,7 +58,7 @@ public class StreamReader implements SequenceIterator {
   /**
    * The symbol parser.
    */
-  private SymbolParser resParser;
+  private SymbolParser symParser;
   
   /**
    * The sequence format.
@@ -89,7 +89,7 @@ public class StreamReader implements SequenceIterator {
 
 	try {
 	    SequenceBuilder builder = sf.makeSequenceBuilder();
-	    format.readSequence(context, resParser, builder);
+	    format.readSequence(context, symParser, builder);
 	    return builder.makeSequence();
 	} catch (Exception e) {
 	    throw new BioException(e, "Could not read sequence");
@@ -102,21 +102,21 @@ public class StreamReader implements SequenceIterator {
 
   public StreamReader(InputStream is,
 		      SequenceFormat format,
-                      SymbolParser resParser,
+                      SymbolParser symParser,
                       SequenceBuilderFactory sf)  {
     context = new Context(is);
     this.format = format;
-    this.resParser = resParser;
+    this.symParser = symParser;
     this.sf = sf;
   }
 
   public StreamReader(BufferedReader reader,
 		      SequenceFormat format,
-                      SymbolParser resParser,
+                      SymbolParser symParser,
                       SequenceBuilderFactory sf)  {
     context = new Context(reader);
     this.format = format;
-    this.resParser = resParser;
+    this.symParser = symParser;
     this.sf = sf;
   }
 

@@ -62,18 +62,18 @@ public class FixedWidthParser implements SymbolParser, Serializable {
   }
 
   public SymbolList parse(String seq) throws IllegalSymbolException {
-    SimpleSymbolList res = new SimpleSymbolList(alpha);
+    SimpleSymbolList sym = new SimpleSymbolList(alpha);
     for(int i = 0; i < seq.length(); i+= tokenLength) {
-      res.addSymbol(parseToken(seq.substring(i, i+tokenLength)));
+      sym.addSymbol(parseToken(seq.substring(i, i+tokenLength)));
     }
-    return res;
+    return sym;
   }
 
   public Symbol parseToken(String token) throws IllegalSymbolException {
-    Symbol res = (Symbol) tokenToSymbol.get(token);
-    if(res == null)
+    Symbol sym = (Symbol) tokenToSymbol.get(token);
+    if(sym == null)
       throw new IllegalSymbolException("No symbol associated with token " + token);
-    return res;
+    return sym;
   }
 
     /**

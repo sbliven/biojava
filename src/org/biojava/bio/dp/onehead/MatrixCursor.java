@@ -37,11 +37,11 @@ class MatrixCursor extends AbstractCursor {
   private int index;
   
   public int length() {
-    return matrix.resList()[0].length() + 2;
+    return matrix.symList()[0].length() + 2;
   }
   
-  public SymbolList resList() {
-    return matrix.resList()[0];
+  public SymbolList symList() {
+    return matrix.symList()[0];
   }
   
   public double [] currentCol() {
@@ -59,10 +59,10 @@ class MatrixCursor extends AbstractCursor {
   
   public MatrixCursor(
     SingleDPMatrix matrix,
-    Iterator resIterator,
+    Iterator symIterator,
     int dir
   ) throws IllegalArgumentException {
-    super(resIterator);
+    super(symIterator);
     
     this.matrix = matrix;
     this.dir = dir;

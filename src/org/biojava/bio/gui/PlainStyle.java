@@ -36,11 +36,11 @@ public class PlainStyle implements SymbolStyle {
   private Paint outlinePaint;
   private Paint fillPaint;
   
-  public Paint outlinePaint(Symbol r) {
+  public Paint outlinePaint(Symbol s) {
     return outlinePaint;
   }
   
-  public Paint fillPaint(Symbol r) {
+  public Paint fillPaint(Symbol s) {
     return fillPaint;
   }
   

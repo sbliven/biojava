@@ -53,7 +53,7 @@ public class Meme {
     return seqIDs;
   }
 
-  public Meme(InputStream is, SymbolParser resParser)
+  public Meme(InputStream is, SymbolParser symParser)
          throws IOException, IllegalSymbolException, IllegalAlphabetException {
     StreamTokenizer st = new StreamTokenizer(
       new BufferedReader(new InputStreamReader(is)));
@@ -61,7 +61,7 @@ public class Meme {
     st.wordChars('*', '*');
     st.parseNumbers();
 
-    SymbolList res = null;
+    SymbolList sym = null;
 
    ALPHABET:
     while( true ) {
@@ -71,7 +71,7 @@ public class Meme {
       } else if (nt == st.TT_WORD) {
           if(st.sval.startsWith("ALPHABET")) {
             while(st.nextToken() != st.TT_WORD) {}
-            res = resParser.parse(st.sval);
+            sym = symParser.parse(st.sval);
             break ALPHABET;
           }
       }
@@ -124,7 +124,7 @@ public class Meme {
       }
 
       SimpleWeightMatrix matrix = new SimpleWeightMatrix(
-        (FiniteAlphabet) resParser.getAlphabet(),
+        (FiniteAlphabet) symParser.getAlphabet(),
         width,
         DistributionFactory.DEFAULT
       );
@@ -143,7 +143,7 @@ public class Meme {
               break READMOTIF;
         } else if (nt == st.TT_NUMBER) {
           try {
-            matrix.getColumn(c).setWeight(res.symbolAt(r+1), st.nval);
+            matrix.getColumn(c).setWeight(sym.symbolAt(r+1), st.nval);
             r++;
           } catch (ChangeVetoException cve) {
             throw new BioError(cve, "Couldn't set up the distribution ");

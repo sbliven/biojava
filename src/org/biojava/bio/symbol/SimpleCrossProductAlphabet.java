@@ -93,21 +93,21 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
     }
   }
 
-  private void putSymbol(List r) {
-    if(r.size() == 0) {
+  private void putSymbol(List s) {
+    if(s.size() == 0) {
       return;
     }
-    CrossProductSymbol rr;
+    CrossProductSymbol ss;
     if(parent != null) {
       try {
-        rr = parent.getSymbol(r);
+        ss = parent.getSymbol(s);
       } catch (IllegalSymbolException ise) {
         throw new BioError(ise, "Balls up - couldn't fetch symbol from parent");
       }
     } else {
-      rr = new AtomicCrossProductSymbol(tokenSeed++, r);
+      ss = new AtomicCrossProductSymbol(tokenSeed++, s);
     }
-    ourSymbols.put(new ListWrapper(rr.getSymbols()), rr);
+    ourSymbols.put(new ListWrapper(ss.getSymbols()), ss);
   }
 
   public boolean contains(Symbol s) {

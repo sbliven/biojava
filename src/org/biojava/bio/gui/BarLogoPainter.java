@@ -55,11 +55,11 @@ public class BarLogoPainter implements LogoPainter {
       Iterator i = ((FiniteAlphabet) dis.getAlphabet()).iterator();
       i.hasNext();
     ) {
-      Symbol r = (Symbol) i.next();
+      Symbol s = (Symbol) i.next();
       double rh = 0.0;
      
       try {
-        rh = dis.getWeight(r) * scale;
+        rh = dis.getWeight(s) * scale;
       } catch (IllegalSymbolException ire) {
         throw new BioError(ire, "State alphabet has changed while painting");
       }
@@ -67,14 +67,14 @@ public class BarLogoPainter implements LogoPainter {
       Shape outline = new Rectangle2D.Double(w, height - rh, stepWidth, rh);
       
       try {
-        g2.setPaint(style.fillPaint(r));
+        g2.setPaint(style.fillPaint(s));
       } catch (IllegalSymbolException ire) {
         g2.setPaint(Color.black);
       }
       g2.fill(outline);
       
       try {
-        g2.setPaint(style.outlinePaint(r));
+        g2.setPaint(style.outlinePaint(s));
       } catch (IllegalSymbolException ire) {
         g2.setPaint(Color.gray);
       }

@@ -44,7 +44,7 @@ public interface SymbolStyle {
    * @throws IllegalSymbolException if this SymbolStyle can not handle the
    *         symbol
    */
-  Paint outlinePaint(Symbol r) throws IllegalSymbolException;
+  Paint outlinePaint(Symbol s) throws IllegalSymbolException;
 
   /**
    * Return the fill paint for a symbol.
@@ -54,5 +54,5 @@ public interface SymbolStyle {
    * @throws IllegalSymbolException if this SymbolStyle can not handle the
    *         symbol
    */
-  Paint fillPaint(Symbol r) throws IllegalSymbolException;
+  Paint fillPaint(Symbol s) throws IllegalSymbolException;
 }

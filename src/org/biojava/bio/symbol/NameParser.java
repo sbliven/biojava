@@ -77,21 +77,21 @@ public class NameParser implements SymbolParser, Serializable {
   }
   
   public Symbol parseToken(String token) throws IllegalSymbolException {
-    Symbol res = (Symbol) nameToSymbol.get(token.toLowerCase());
-    if(res == null) {
+    Symbol sym = (Symbol) nameToSymbol.get(token.toLowerCase());
+    if(sym == null) {
       throw new IllegalSymbolException(
         "No symbol for token '" + token +
          "' found in name parser for " + getAlphabet().getName()
        );
     }
-    return res;
+    return sym;
   }
   
   public NameParser(FiniteAlphabet alpha) {
     this.alphabet = alpha;
     for(Iterator i = alpha.iterator(); i.hasNext(); ) {
-      Symbol res = (Symbol) i.next();
-      nameToSymbol.put(res.getName().toLowerCase(), res);
+      Symbol sym = (Symbol) i.next();
+      nameToSymbol.put(sym.getName().toLowerCase(), sym);
     }
   }
   

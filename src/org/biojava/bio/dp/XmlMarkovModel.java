@@ -64,15 +64,15 @@ public class XmlMarkovModel {
       NodeList weights = colE.getElementsByTagName("weight");
       for(int j = 0; j < weights.getLength(); j++) {
         Element weightE = (Element) weights.item(j);
-        String resName = weightE.getAttribute("res");
-        Symbol res;
-        if(resName.length() > 1) {
-          res = nameParser.parseToken(resName);
+        String symName = weightE.getAttribute("res");
+        Symbol sym;
+        if(symName.length() > 1) {
+          sym = nameParser.parseToken(symName);
         } else {
-          res = symParser.parseToken(resName);
+          sym = symParser.parseToken(symName);
         }
         try {
-          wm.getColumn(indx).setWeight(res, Double.parseDouble(weightE.getAttribute("prob")));
+          wm.getColumn(indx).setWeight(sym, Double.parseDouble(weightE.getAttribute("prob")));
         } catch (ChangeVetoException cve) {
           throw new BioError("Assertion failure: Should be able to set the weights");
         }
@@ -137,23 +137,23 @@ public class XmlMarkovModel {
       NodeList weights = stateE.getElementsByTagName("weight");
       for(int j = 0; j < weights.getLength(); j++) {
         Element weightE = (Element) weights.item(j);
-        String resName = weightE.getAttribute("res");
-        Symbol res;
-        if(resName.length() == 1) {
+        String symName = weightE.getAttribute("res");
+        Symbol sym;
+        if(symName.length() == 1) {
           if(symbolParser != null) {
-            res = symbolParser.parseToken(resName);
+            sym = symbolParser.parseToken(symName);
           } else {
-            res = nameParser.parseToken(resName);
+            sym = nameParser.parseToken(symName);
           }
         } else {
           if(nameParser != null) {
-            res = nameParser.parseToken(resName);
+            sym = nameParser.parseToken(symName);
           } else {
-            res = symbolParser.parseToken(resName);
+            sym = symbolParser.parseToken(symName);
           }
         }
         try {
-          dis.setWeight(res, Double.parseDouble(weightE.getAttribute("prob")));
+          dis.setWeight(sym, Double.parseDouble(weightE.getAttribute("prob")));
         } catch (ChangeVetoException cve) {
           throw new BioError(
             cve, "Assertion failure: Should be able to edit distribution"
@@ -218,16 +218,16 @@ public class XmlMarkovModel {
   }
  
   public static void writeMatrix(WeightMatrix matrix, PrintStream out) throws Exception {
-    FiniteAlphabet resA = (FiniteAlphabet) matrix.getAlphabet();
+    FiniteAlphabet symA = (FiniteAlphabet) matrix.getAlphabet();
     
-    out.println("<MarkovModel>\n  <alphabet name=\"" + resA.getName() + "\"/>");
+    out.println("<MarkovModel>\n  <alphabet name=\"" + symA.getName() + "\"/>");
     
     for(int i = 0; i < matrix.columns(); i++) {
       out.println("  <col indx=\"" + (i+1) + "\">");
-      for(Iterator ri = resA.iterator(); ri.hasNext(); ) {
-        Symbol r = (Symbol) ri.next();
-        out.println("    <weight res=\"" + r.getName() +
-                             "\" prob=\"" + matrix.getColumn(i).getWeight(r) + "\"/>");
+      for(Iterator si = symA.iterator(); si.hasNext(); ) {
+        Symbol s = (Symbol) si.next();
+        out.println("    <weight sym=\"" + s.getName() +
+                             "\" prob=\"" + matrix.getColumn(i).getWeight(s) + "\"/>");
         }
       out.println("  </col>");
     }
@@ -239,13 +239,13 @@ public class XmlMarkovModel {
   throws Exception {
     model = DP.flatView(model);
     FiniteAlphabet stateA = model.stateAlphabet();
-    FiniteAlphabet resA = (FiniteAlphabet) model.emissionAlphabet();
+    FiniteAlphabet symA = (FiniteAlphabet) model.emissionAlphabet();
     SymbolList stateR = stateA.symbols();
     List stateL = stateR.toList();
-    SymbolList resR = resA.symbols();
+    SymbolList symR = symA.symbols();
     
     out.println("<MarkovModel heads=\"" + model.heads() + "\">");
-    out.println("<alphabet name=\"" + resA.getName() + "\"/>");
+    out.println("<alphabet name=\"" + symA.getName() + "\"/>");
     
     // print out states & scores
     for(Iterator stateI = stateL.iterator(); stateI.hasNext(); ) {
@@ -255,10 +255,10 @@ public class XmlMarkovModel {
         if(s instanceof EmissionState) {
           EmissionState es = (EmissionState) s;
           Distribution dis = es.getDistribution();
-          for(Iterator resI = resR.iterator(); resI.hasNext(); ) {
-            Symbol r = (Symbol) resI.next();
-            out.println("    <weight res=\"" + r.getName() +
-                        "\" prob=\"" + dis.getWeight(r) + "\"/>");
+          for(Iterator symI = symR.iterator(); symI.hasNext(); ) {
+            Symbol sym = (Symbol) symI.next();
+            out.println("    <weight sym=\"" + sym.getName() +
+                        "\" prob=\"" + dis.getWeight(sym) + "\"/>");
           }
         }
         out.println("  </state>");

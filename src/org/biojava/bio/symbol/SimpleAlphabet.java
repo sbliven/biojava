@@ -95,17 +95,17 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
       }
   }
 
-  public boolean contains(Symbol r) {
-    if(r == null) {
+  public boolean contains(Symbol s) {
+    if(s == null) {
       return false;
-    } else if(symbols.contains(r)) {
+    } else if(symbols.contains(s)) {
       return true;
     } else  {
-      Alphabet sa = r.getMatches();
+      Alphabet sa = s.getMatches();
       if(!(sa instanceof FiniteAlphabet)) {
         return false;
       } else {
-        Iterator i = ((FiniteAlphabet) r.getMatches()).iterator();
+        Iterator i = ((FiniteAlphabet) s.getMatches()).iterator();
         while(i.hasNext()) {
           Symbol sym = (Symbol) i.next();
           if(!symbols.contains(sym)) {

@@ -33,7 +33,7 @@ import org.biojava.bio.dp.onehead.SingleDPMatrix;
 public class BaumWelchSampler extends AbstractTrainer implements Serializable {
   protected double singleSequenceIteration(
     ModelTrainer trainer,
-    SymbolList resList
+    SymbolList symList
   ) throws IllegalSymbolException, IllegalTransitionException, IllegalAlphabetException {
     ScoreType scoreType = ScoreType.PROBABILITY;
     DP dp = getDP();
@@ -44,7 +44,7 @@ public class BaumWelchSampler extends AbstractTrainer implements Serializable {
     double [][] backwardTransitionScores = dp.getBackwardTransitionScores(scoreType);
     MarkovModel model = dp.getModel(); 
     
-    SymbolList [] rll = { resList };
+    SymbolList [] rll = { symList };
     
     System.out.println("Forward");
     SingleDPMatrix fm = (SingleDPMatrix) dp.forwardMatrix(rll, scoreType);
@@ -57,8 +57,8 @@ public class BaumWelchSampler extends AbstractTrainer implements Serializable {
     Symbol gap = AlphabetManager.getGapSymbol();
     
     // state trainer
-    for (int i = 1; i <= resList.length(); i++) {
-      Symbol res = resList.symbolAt(i);
+    for (int i = 1; i <= symList.length(); i++) {
+      Symbol sym = symList.symbolAt(i);
       double p = Math.random();
       for (int s = 0; s < dp.getDotStatesIndex(); s++) {
         if (! (states[s] instanceof MagicalState)) {
@@ -66,7 +66,7 @@ public class BaumWelchSampler extends AbstractTrainer implements Serializable {
           if (p <= 0.0) {
             trainer.addCount(
               ((EmissionState) states[s]).getDistribution(),
-              res, 1.0
+              sym, 1.0
             );
             break;
           }
@@ -75,8 +75,8 @@ public class BaumWelchSampler extends AbstractTrainer implements Serializable {
     }
 
     // transition trainer
-    for (int i = 0; i <= resList.length(); i++) {
-      Symbol res = (i < resList.length()) ? resList.symbolAt(i + 1) :
+    for (int i = 0; i <= symList.length(); i++) {
+      Symbol sym = (i < symList.length()) ? symList.symbolAt(i + 1) :
                    gap;
       for (int s = 0; s < states.length; s++) {
         int [] ts = backwardTransitions[s];
@@ -86,7 +86,7 @@ public class BaumWelchSampler extends AbstractTrainer implements Serializable {
         for (int tc = 0; tc < ts.length; tc++) {
           int t = ts[tc];
           double weight = (states[t] instanceof EmissionState)
-            ? ((EmissionState) states[t]).getDistribution().getWeight(res)
+            ? ((EmissionState) states[t]).getDistribution().getWeight(sym)
             : 1.0;
           if (weight != 0.0) {
             p -= Math.exp(fm.scores[i][s] + tss[tc] + bm.scores[i+1][t] - fs) * weight;

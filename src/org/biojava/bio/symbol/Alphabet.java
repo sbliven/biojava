@@ -85,10 +85,10 @@ public interface Alphabet extends Annotatable {
    * alphabet. That means that every one of the symbols that could mach the
    * ambiguity symbol is also a member of this alphabet.
    *
-   * @param r the Symbol to check
+   * @param s the Symbol to check
    * @return  boolean true if the Alphabet contains the symbol and false otherwise
    */
-  boolean contains(Symbol r);
+  boolean contains(Symbol s);
 
   /**
    * Throws a precanned IllegalSymbolException if the symbol is not contained
@@ -99,10 +99,10 @@ public interface Alphabet extends Annotatable {
    * IllegalSymbolException. There is a preferred style of handling this,
    * which should be covererd in the package documentation.
    *
-   * @param r the Symbol to validate
+   * @param s the Symbol to validate
    * @throws  IllegalSymbolException if r is not contained in this alphabet
    */
-  void validate(Symbol r) throws IllegalSymbolException;
+  void validate(Symbol s) throws IllegalSymbolException;
   
   /**
    * Get a parser by name.
@@ -145,9 +145,9 @@ public interface Alphabet extends Annotatable {
       return s == AlphabetManager.getGapSymbol();
     }
     
-    public void validate(Symbol res) throws IllegalSymbolException {
+    public void validate(Symbol sym) throws IllegalSymbolException {
       throw new IllegalSymbolException(
-        "The empty alphabet does not contain symbol " + res.getName());
+        "The empty alphabet does not contain symbol " + sym.getName());
     }
     
     public SymbolParser getParser(String name) throws NoSuchElementException {

@@ -136,42 +136,42 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
   private ListWrapper gopher =
     new ListWrapper();
 
-  public CrossProductSymbol getSymbol(List rList)
+  public CrossProductSymbol getSymbol(List sList)
   throws IllegalSymbolException {
-    if(rList.size() != alphas.size()) {
+    if(sList.size() != alphas.size()) {
       throw new IllegalSymbolException(
         "List of symbols is the wrong length (" + alphas.size() +
-        ":" + rList.size() + ")"
+        ":" + sList.size() + ")"
       );
     }
     
-    CrossProductSymbol r;
+    CrossProductSymbol s;
     synchronized(gopher) {
-      gopher.setList(rList);
-      r = (CrossProductSymbol) knownSymbols.get(gopher);
+      gopher.setList(sList);
+      s = (CrossProductSymbol) knownSymbols.get(gopher);
     }
 
-    if(r == null) {
-      for(Iterator i = rList.iterator(), j = alphas.iterator(); i.hasNext(); ) {
-        Symbol res = (Symbol) i.next();
+    if(s == null) {
+      for(Iterator i = sList.iterator(), j = alphas.iterator(); i.hasNext(); ) {
+        Symbol sym = (Symbol) i.next();
         Alphabet alp = (Alphabet) j.next();
         try {
-          alp.validate(res);
+          alp.validate(sym);
         } catch (IllegalSymbolException ire) {
           throw new IllegalSymbolException(
             ire,
             "Can't retrieve symbol for " +
-            AlphabetManager.getCrossProductSymbol('?', rList) + " in alphabet " +
+            AlphabetManager.getCrossProductSymbol('?', sList) + " in alphabet " +
             getName()
           );
         }
       }
-      List l = new ArrayList(rList);
-      r = AlphabetManager.getCrossProductSymbol(tokenSeed++, l);
-      knownSymbols.put(new ListWrapper(r.getSymbols()), r);
+      List l = new ArrayList(sList);
+      s = AlphabetManager.getCrossProductSymbol(tokenSeed++, l);
+      knownSymbols.put(new ListWrapper(s.getSymbols()), s);
     }
     
-    return r;
+    return s;
   }
     
   public void addSymbol(Symbol sym) throws IllegalSymbolException {

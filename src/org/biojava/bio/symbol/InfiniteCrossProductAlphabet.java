@@ -75,10 +75,10 @@ class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable
     return true;
   }
   
-  public void validate(Symbol r) throws IllegalSymbolException {
-    if(!this.contains(r)) {
+  public void validate(Symbol s) throws IllegalSymbolException {
+    if(!this.contains(s)) {
 	    throw new IllegalSymbolException(
-        "CrossProductAlphabet " + getName() + " does not accept " + r.getName() +
+        "CrossProductAlphabet " + getName() + " does not accept " + s.getName() +
         " as it is not an instance of CrossProductSymbol or " +
         " an AmbiguitySymbol over a subset of symbols in this alphabet."
       );
@@ -93,31 +93,31 @@ class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable
     return alphas;
   }
   
-  public CrossProductSymbol getSymbol(List rList)
+  public CrossProductSymbol getSymbol(List sList)
   throws IllegalSymbolException {
-    if(rList.size() != alphas.size()) {
+    if(sList.size() != alphas.size()) {
       throw new IllegalSymbolException(
         "List of symbols is the wrong length (" + alphas.size() +
-        ":" + rList.size() + ")"
+        ":" + sList.size() + ")"
       );
     }
     
     Iterator ai = alphas.iterator();
-    Iterator ri = rList.iterator();
+    Iterator si = sList.iterator();
     
-    while(ai.hasNext() && ri.hasNext()) {
+    while(ai.hasNext() && si.hasNext()) {
       Alphabet aa = (Alphabet) ai.next();
-      Symbol rr = (Symbol) ri.next();
-      if(!aa.contains(rr)) {
+      Symbol ss = (Symbol) si.next();
+      if(!aa.contains(ss)) {
         throw new IllegalSymbolException(
-          "CrossProductAlphabet " + getName() + " does not accept " + rList +
-          " as symbol " + rr.getName() + " is not a member of the alphabet " +
+          "CrossProductAlphabet " + getName() + " does not accept " + sList +
+          " as symbol " + ss.getName() + " is not a member of the alphabet " +
           aa.getName()
         );
       }
     }
     
-    return AlphabetManager.getCrossProductSymbol(tokenSeed++, rList);
+    return AlphabetManager.getCrossProductSymbol(tokenSeed++, sList);
   }
 
   public SymbolParser getParser(String name)

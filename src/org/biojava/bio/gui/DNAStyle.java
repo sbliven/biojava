@@ -44,26 +44,26 @@ public class DNAStyle implements SymbolStyle {
     fillPaint = new HashMap();
   }
   
-  public Paint outlinePaint(Symbol r) throws IllegalSymbolException {
-    DNATools.getDNA().validate(r);
-    return (Paint) outlinePaint.get(r);
+  public Paint outlinePaint(Symbol s) throws IllegalSymbolException {
+    DNATools.getDNA().validate(s);
+    return (Paint) outlinePaint.get(s);
   }
   
-  public Paint fillPaint(Symbol r) throws IllegalSymbolException {
-    DNATools.getDNA().validate(r);
-    return (Paint) fillPaint.get(r);
+  public Paint fillPaint(Symbol s) throws IllegalSymbolException {
+    DNATools.getDNA().validate(s);
+    return (Paint) fillPaint.get(s);
   }
   
-  public void setOutlinePaint(Symbol r, Paint paint)
+  public void setOutlinePaint(Symbol s, Paint paint)
   throws IllegalSymbolException {
-    DNATools.getDNA().validate(r);
-    outlinePaint.put(r, paint);
+    DNATools.getDNA().validate(s);
+    outlinePaint.put(s, paint);
   }
 
-  public void setFillPaint(Symbol r, Paint paint)
+  public void setFillPaint(Symbol s, Paint paint)
   throws IllegalSymbolException {
-    DNATools.getDNA().validate(r);
-    fillPaint.put(r, paint);
+    DNATools.getDNA().validate(s);
+    fillPaint.put(s, paint);
   }
   
   public DNAStyle() {

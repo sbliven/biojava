@@ -37,12 +37,12 @@ public interface SequenceFactory {
   /**
    * Creates a sequence using these parameters.
    *
-   * @param resList the SymbolList defining the 'sequence'
+   * @param symList the SymbolList defining the 'sequence'
    * @param uri the uri
    * @param name   the name
    * @param annotation  a hint for the annotation of the resulting sequence
    * @return  a new Sequence object
    */
-  Sequence createSequence(SymbolList resList,
+  Sequence createSequence(SymbolList symList,
                           String uri, String name, Annotation annotation);
 }

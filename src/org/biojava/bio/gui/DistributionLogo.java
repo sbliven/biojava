@@ -158,9 +158,9 @@ public class DistributionLogo extends JComponent {
    * @param r the symbol to calculate for
    * @throws IllegalSymbolException if r is not within the dist.
    */
-  public double entropy(Symbol r) throws IllegalSymbolException {
+  public double entropy(Symbol s) throws IllegalSymbolException {
     Distribution dist = getDistribution();
-    double p = dist.getWeight(r);
+    double p = dist.getWeight(s);
     double lp = Math.log(p);
     
     return -p * lp / bits;
@@ -190,9 +190,9 @@ public class DistributionLogo extends JComponent {
       Iterator i = ((FiniteAlphabet) eDistribution.getAlphabet()).iterator();
       i.hasNext();
     ) {
-      Symbol r = (Symbol) i.next();
+      Symbol s = (Symbol) i.next();
       try {
-        inf -= entropy(r);
+        inf -= entropy(s);
       } catch (IllegalSymbolException ire) {
         throw new BioError(ire,
         "Symbol evaporated while calculating information");

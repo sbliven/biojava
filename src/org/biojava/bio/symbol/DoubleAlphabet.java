@@ -107,18 +107,19 @@ public class DoubleAlphabet implements Alphabet, Serializable {
     return Annotation.EMPTY_ANNOTATION;
   }
   
-  public boolean contains(Symbol r) {
-    if(r instanceof DoubleSymbol) {
+  public boolean contains(Symbol s) {
+    if(s instanceof DoubleSymbol) {
       return true;
+    } else {
+      return false;
     }
-    return false;
   }
   
-  public void validate(Symbol r) throws IllegalSymbolException {
-    if(!contains(r)) {
+  public void validate(Symbol s) throws IllegalSymbolException {
+    if(!contains(s)) {
       throw new IllegalSymbolException(
         "Only symbols of type DoubleAlphabet.DoubleSymbol are valid for this alphabet.\n" +
-        "(" + r.getClass() + ") " + r.getName()
+        "(" + s.getClass() + ") " + s.getName()
       );
     }
   }

@@ -27,7 +27,7 @@ import org.biojava.bio.symbol.*;
 public interface DPMatrix {
   State [] states();
   MarkovModel model();
-  SymbolList [] resList();
+  SymbolList [] symList();
   double getScore();
   double getCell(int [] index) throws IndexOutOfBoundsException;
 }

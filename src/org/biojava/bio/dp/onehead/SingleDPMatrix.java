@@ -30,7 +30,7 @@ import org.biojava.bio.dp.*;
 public class SingleDPMatrix implements DPMatrix, Serializable {
   private final State [] states;
   private final MarkovModel model;
-  private final SymbolList [] resList;
+  private final SymbolList [] symList;
   public final double [][] scores; // [symbol][state]
   private double score;
  
@@ -42,8 +42,8 @@ public class SingleDPMatrix implements DPMatrix, Serializable {
     return model;
   }
   
-  public SymbolList [] resList() {
-    return resList;
+  public SymbolList [] symList() {
+    return symList;
   }
   
   public double getScore() {
@@ -62,11 +62,11 @@ public class SingleDPMatrix implements DPMatrix, Serializable {
     return scores[index[1]][index[0]];
   }
   
-  public SingleDPMatrix(DP dp, SymbolList resList) {
+  public SingleDPMatrix(DP dp, SymbolList symList) {
     this.model = dp.getModel();
     this.states = dp.getStates();
-    this.resList = new SymbolList [] { resList };
+    this.symList = new SymbolList [] { symList };
     this.score = Double.NaN;
-    this.scores = new double[resList.length() + 2][states.length];
+    this.scores = new double[symList.length() + 2][states.length];
   }
 }

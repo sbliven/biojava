@@ -209,16 +209,16 @@ public class SimpleSequence implements Sequence, RealizingFeatureHolder, java.io
     public void removeChangeListener(ChangeListener cl, ChangeType ct) {}    
     
     /**
-     * Create a SimpleSequence with the symbols and alphabet of res, and the
+     * Create a SimpleSequence with the symbols and alphabet of sym, and the
      * sequence properties listed.
      *
-     * @param res the SymbolList to wrap as a sequence
+     * @param sym the SymbolList to wrap as a sequence
      * @param urn the URN
      * @param name the name - should be unique if practical
      * @param annotation the annotation object to use or null
      */
-    public SimpleSequence(SymbolList res, String urn, String name, Annotation annotation) {
-	symList = res;
+    public SimpleSequence(SymbolList sym, String urn, String name, Annotation annotation) {
+	symList = sym;
 	
 	setURN(urn);
 	setName(name);
@@ -229,19 +229,19 @@ public class SimpleSequence implements Sequence, RealizingFeatureHolder, java.io
     /**
      * Create a SimpleSequence using a specified FeatureRealizer.
      *
-     * @param res the SymbolList to wrap as a sequence
+     * @param sym the SymbolList to wrap as a sequence
      * @param urn the URN
      * @param name the name - should be unique if practical
      * @param annotation the annotation object to use or null
      * @param realizer the FeatureRealizer implemetation to use when adding features
      */
-    public SimpleSequence(SymbolList res, 
+    public SimpleSequence(SymbolList sym, 
 			  String urn,
 			  String name,
 			  Annotation annotation,
 			  FeatureRealizer realizer) 
     {
-	symList = res;
+	symList = sym;
 	
 	setURN(urn);
 	setName(name);

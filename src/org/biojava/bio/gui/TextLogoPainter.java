@@ -130,8 +130,8 @@ public class TextLogoPainter implements LogoPainter {
         Iterator i = ((FiniteAlphabet) dis.getAlphabet()).iterator();
         i.hasNext();
       ) {
-        Symbol r = (Symbol) i.next();
-        info.add(new ResVal(r, dis.getWeight(r) * scale));
+        Symbol s = (Symbol) i.next();
+        info.add(new ResVal(s, dis.getWeight(s) * scale));
       }
     } catch (IllegalSymbolException ire) {
       throw new BioError(ire, "Symbol dissapeared from dis alphabet");
@@ -189,8 +189,8 @@ public class TextLogoPainter implements LogoPainter {
       return value;
     }
     
-    public ResVal(Symbol res, double val) {
-      symbol = res;
+    public ResVal(Symbol sym, double val) {
+      symbol = sym;
       value = val;
     }
   }

@@ -465,17 +465,17 @@ public final class AlphabetManager {
   /**
    * Build an individual symbol.
    *
-   * @param resE an XML Element specifying the element
+   * @param symE an XML Element specifying the element
    * @return the new AtomicSymbol object
    */
   static private AtomicSymbol symbolFromXML(
-    Element resE, WellKnownAlphabet alpha
+    Element symE, WellKnownAlphabet alpha
   ) {
     char token = '\0';
     String name = null;
     String description = null;
 
-    NodeList children = resE.getChildNodes();
+    NodeList children = symE.getChildNodes();
     for(int i = 0; i < children.getLength(); i++) {
       Node n = children.item(i);
       if (! (n instanceof Element))
@@ -493,34 +493,34 @@ public final class AlphabetManager {
       }
     }
 
-    AtomicSymbol res = new WellKnownSymbol(
+    AtomicSymbol sym = new WellKnownSymbol(
       alpha, token, name, Annotation.EMPTY_ANNOTATION
     );
     try {
-      res.getAnnotation().setProperty("description", description);
+      sym.getAnnotation().setProperty("description", description);
     } catch (ChangeVetoException cve) {
       throw new BioError(
         cve,
         "Assertion voilated: there should be nothing to veto this property"
       );
     }
-    return res;
+    return sym;
   }
 
   /**
    * Build an individual symbol.
    *
-   * @param resE an XML Element specifying the element
+   * @param symE an XML Element specifying the element
    * @return the new AmbiguitySymbol object
    */
-  static private Symbol ambiguityFromXML(Element resE, Map nameToSym)
+  static private Symbol ambiguityFromXML(Element symE, Map nameToSym)
   throws IllegalSymbolException {
     char token = '\0';
     String name = null;
     String description = null;
     List syms = new ArrayList();
     
-    NodeList children = resE.getChildNodes();
+    NodeList children = symE.getChildNodes();
     for(int i = 0; i < children.getLength(); i++) {
       Node n = children.item(i);
       if (! (n instanceof Element))
@@ -558,8 +558,8 @@ public final class AlphabetManager {
       }
     }
 
-    Symbol res = getAmbiguitySymbol(token, name, (Annotation) null, syms);
-    return res;
+    Symbol sym = getAmbiguitySymbol(token, name, (Annotation) null, syms);
+    return sym;
   }
 
   /**

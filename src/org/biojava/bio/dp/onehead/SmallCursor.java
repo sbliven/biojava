@@ -32,16 +32,16 @@ import org.biojava.bio.dp.*;
  * @author Matthew Pocock
  */
 class SmallCursor extends AbstractCursor {
-  private final SymbolList resList;
+  private final SymbolList symList;
   private double [] currentC;
   private double [] lastC;
   
-  public SymbolList resList() {
-    return resList;
+  public SymbolList symList() {
+    return symList;
   }
   
   public int length() {
-    return resList.length();
+    return symList.length();
   }
   
   public double [] currentCol() {
@@ -60,9 +60,9 @@ class SmallCursor extends AbstractCursor {
     currentC = v;
   }
   
-  public SmallCursor(State [] states, SymbolList resList, Iterator resIterator) {
-    super(resIterator);
-    this.resList = resList;
+  public SmallCursor(State [] states, SymbolList symList, Iterator symIterator) {
+    super(symIterator);
+    this.symList = symList;
     
     this.currentC = new double[states.length];
     this.lastC = new double[states.length];

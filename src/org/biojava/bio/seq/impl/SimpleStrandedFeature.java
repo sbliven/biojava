@@ -39,10 +39,10 @@ public class SimpleStrandedFeature extends SimpleFeature implements StrandedFeat
     }
   
     public SymbolList getSymbols() {
-	SymbolList resList = super.getSymbols();
+	SymbolList symList = super.getSymbols();
 	if(getStrand() == NEGATIVE) {
 	    try {
-		resList = DNATools.complement(resList);
+		symList = DNATools.complement(symList);
 	    } catch (IllegalAlphabetException iae) {
 		throw new BioError(
 				   iae,
@@ -51,7 +51,7 @@ public class SimpleStrandedFeature extends SimpleFeature implements StrandedFeat
 				   );
 	    }
 	}
-	return resList;
+	return symList;
     }
   
   public Feature.Template makeTemplate() {

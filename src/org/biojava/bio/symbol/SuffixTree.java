@@ -59,7 +59,7 @@ import org.biojava.bio.seq.*;
 public class SuffixTree implements Serializable {
   private FiniteAlphabet alphabet;
   private SuffixNode root;
-  private List resList;
+  private List symList;
   private List counts;
   
     /**
@@ -85,11 +85,11 @@ public class SuffixTree implements Serializable {
      * one if need be.  This method is here due to memory optimisations.
      */
 
-  public SuffixNode getChild(SuffixNode node, Symbol r) {
-    if(!getAlphabet().contains(r)) {
+  public SuffixNode getChild(SuffixNode node, Symbol s) {
+    if(!getAlphabet().contains(s)) {
       return null;
     }
-    int index = indexForSymbol(r);
+    int index = indexForSymbol(s);
     return getChild(node, index);
   }
   
@@ -119,12 +119,12 @@ public class SuffixTree implements Serializable {
     for(int i = 0; i < window; i++)
       buf[i] = getRoot();
     for(int p = 1; p <= rList.length(); p++) {
-      Symbol r = rList.symbolAt(p);
+      Symbol s = rList.symbolAt(p);
       buf[p % window] = getRoot();
       for(int i = 0; i < window; i++) {
         int pi = (p + i) % window;
         if(buf[pi] != null) {
-          buf[pi] = getChild(buf[pi], r);
+          buf[pi] = getChild(buf[pi], s);
           if(buf[pi] != null) {
             counts[i]++;
             buf[pi].setNumber(buf[pi].getNumber() + 1.0f);
@@ -132,9 +132,9 @@ public class SuffixTree implements Serializable {
         }
       }
     }
-    for(int i = 0; i < window; i++)
+    for(int i = 0; i < window; i++) {
       incCounts(i+1, counts[i]);
-      
+    } 
   }
   
   protected void incCounts(int i, int c) {
@@ -175,7 +175,7 @@ public class SuffixTree implements Serializable {
 
   public SuffixTree(FiniteAlphabet alphabet) {
     this.alphabet = alphabet;
-    this.resList = alphabet.symbols().toList();
+    this.symList = alphabet.symbols().toList();
     this.counts = new ArrayList();
     this.root = new SimpleNode(alphabet.size());
   }
@@ -185,7 +185,7 @@ public class SuffixTree implements Serializable {
      */
 
   public Symbol symbolForIndex(int i) {
-    return (Symbol) resList.get(i);
+    return (Symbol) symList.get(i);
   }
 
     /**
@@ -194,8 +194,8 @@ public class SuffixTree implements Serializable {
      * to build the tree efficiently.
      */
 
-  public int indexForSymbol(Symbol r) {
-    return resList.indexOf(r);
+  public int indexForSymbol(Symbol s) {
+    return symList.indexOf(s);
   }
   
   /**

@@ -32,7 +32,7 @@ interface DPCursor {
   /**
    * The symbol list being looped over.
    */
-  SymbolList resList();
+  SymbolList symList();
   
   /**
    * The length of the sequence.

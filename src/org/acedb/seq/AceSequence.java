@@ -42,7 +42,7 @@ import org.biojava.bio.seq.impl.*;
 public class AceSequence implements Sequence {
   protected AceObject seqObj;
   private String name;
-  private SymbolList resList;
+  private SymbolList symList;
   private Annotation annotation;
   private SimpleFeatureHolder fHolder;
   
@@ -63,31 +63,31 @@ public class AceSequence implements Sequence {
   }
 
   public Iterator iterator() {
-    return resList.iterator();
+    return symList.iterator();
   }
   
   public int length() {
-    return resList.length();
+    return symList.length();
   }
   
   public Symbol symbolAt(int index) {
-    return resList.symbolAt(index);
+    return symList.symbolAt(index);
   }
   
   public List toList() {
-    return resList.toList();
+    return symList.toList();
   }
   
   public SymbolList subList(int start, int end) {
-    return resList.subList(start, end);
+    return symList.subList(start, end);
   }
   
   public String subStr(int start, int end) {
-    return resList.subStr(start, end);
+    return symList.subStr(start, end);
   }
   
   public String seqString() {
-    return resList.seqString();
+    return symList.seqString();
   }
   
   public int countFeatures() {
@@ -155,7 +155,7 @@ public class AceSequence implements Sequence {
           rl.addAll(rParser.parse(line).toList());
         }
       }
-      resList = new SimpleSymbolList(getAlphabet(), rl);
+      symList = new SimpleSymbolList(getAlphabet(), rl);
       con.dispose();
       
       // Feature template for stuff

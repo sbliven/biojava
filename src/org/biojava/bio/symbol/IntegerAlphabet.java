@@ -61,7 +61,7 @@ public class IntegerAlphabet implements Alphabet, Serializable {
    * Retrieve a SymbolList view of an array of integers.
    * <P>
    * The returned object is a view onto the underlying array, and does not copy
-   * it. Changes made to the original array will alter the resulting SymbolList.
+   * it. Changes made to the original array will alter the symulting SymbolList.
    *
    * @param iArray  the array of integers to view
    * @return a SymbolList over the IntegerAlphabet that represent the values in
@@ -94,18 +94,19 @@ public class IntegerAlphabet implements Alphabet, Serializable {
     return Annotation.EMPTY_ANNOTATION;
   }
   
-  public boolean contains(Symbol r) {
-    if(r instanceof IntegerSymbol) {
+  public boolean contains(Symbol s) {
+    if(s instanceof IntegerSymbol) {
       return true;
+    } else {
+      return false;
     }
-    return false;
   }
   
-  public void validate(Symbol r) throws IllegalSymbolException {
-    if(!contains(r)) {
+  public void validate(Symbol s) throws IllegalSymbolException {
+    if(!contains(s)) {
       throw new IllegalSymbolException(
         "Only symbols of type IntegerAlphabet.IntegerSymbol are valid for this alphabet.\n" +
-        "(" + r.getClass() + ") " + r.getName()
+        "(" + s.getClass() + ") " + s.getName()
       );
     }
   }
