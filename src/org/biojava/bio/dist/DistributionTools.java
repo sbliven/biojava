@@ -43,6 +43,31 @@ public class DistributionTools {
   private DistributionTools(){}
 
   /**
+   * Randomizes the weights of a <code>Distribution</code>
+   * @param d the <code>Distribution</code> to randomize
+   * @throws ChangeVetoException if the Distribution is locked
+   */
+  public static void randomizeDistribution(Distribution d)
+    throws ChangeVetoException{
+    Random rand = new Random();
+    FiniteAlphabet a = (FiniteAlphabet)d.getAlphabet();
+    AlphabetIndex ind = AlphabetManager.getAlphabetIndex(a);
+    DistributionTrainerContext dtc = new SimpleDistributionTrainerContext();
+    dtc.registerDistribution(d);
+
+    for(int i = 0; i < a.size(); i++){
+      try {
+        dtc.addCount(d,ind.symbolForIndex(i),rand.nextDouble());
+      }
+      catch (IllegalSymbolException ex) {
+        throw new BioError(ex,"Alphabet has Illegal Symbols!!");
+      }
+    }
+
+    dtc.train();
+  }
+
+  /**
    * Make a distribution from a count
    *
    * @param c the count
