@@ -162,12 +162,14 @@ public final class RNATools {
    */
   public static SymbolList createRNA(String rna)
   throws IllegalSymbolException {
+    SymbolTokenization p = null;
     try {
-      SymbolTokenization p = getRNA().getTokenization("token");
-      return new SimpleSymbolList(p, rna);
-    } catch (BioException se) {
-      throw new BioError("Something has gone badly wrong with RNA", se);
+      p = getRNA().getTokenization("token");
+    } catch (BioException e) {
+      throw new BioError("Something has gone badly wrong with RNA", e);
     }
+    return new SimpleSymbolList(p, rna);
+
   }
 
   /**
