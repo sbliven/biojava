@@ -63,9 +63,10 @@ public abstract class DP {
     for(Iterator i = model.stateAlphabet().iterator(); i.hasNext(); ) {
       State s = (State) i.next();
       if(
-        !(s instanceof DotState) ||
+        !(s instanceof DotState) &&
         !(s instanceof EmissionState)
       ) {
+        System.out.println("Got state " + s + " with name " + s.getName());
         return new FlatModel(model);
       }
     }

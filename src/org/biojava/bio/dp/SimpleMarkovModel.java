@@ -287,8 +287,8 @@ public class SimpleMarkovModel implements MarkovModel {
       modelTrainer.registerTrainerForModel(this, tTrainer);
       for(Iterator i = stateAlphabet().iterator(); i.hasNext(); ) {
         State s = (State) i.next();
-        if(s instanceof EmissionState) {
-          ((EmissionState) s).registerWithTrainer(modelTrainer);
+        if(s instanceof Trainable) {
+          ((Trainable) s).registerWithTrainer(modelTrainer);
         }
         try {
           for(Iterator j = transitionsFrom(s).iterator(); j.hasNext(); ) {

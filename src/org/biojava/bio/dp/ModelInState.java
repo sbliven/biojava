@@ -28,7 +28,7 @@ import org.biojava.bio.symbol.*;
 /**
  * A state that contains an entire sub-model.
  */
-public interface ModelInState extends State {
+public interface ModelInState extends State, Trainable {
   /**
    * The model that is inside this state.
    */

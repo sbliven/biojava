@@ -32,7 +32,7 @@ import org.biojava.bio.symbol.*;
  * They are the states that actualy make your observed sequence. They also must supply
  * training behaviour to set the emission spectrum up.
  */
-public interface EmissionState extends State {
+public interface EmissionState extends State, Trainable {
   /**
    * The alphabet from which this state emits symbols.
    *
@@ -85,13 +85,4 @@ public interface EmissionState extends State {
      */
 
     public int[] getAdvance();
-    
-  /**
-   * Return a StateTrainer for this particular State implementation.
-   *
-   * @return a StateTrainer
-   */
-  public void registerWithTrainer(ModelTrainer mt)
-  throws BioException;
-
 }

@@ -35,6 +35,7 @@ public class SimpleModelInState extends SimpleSymbol implements ModelInState {
   
   public void registerWithTrainer(ModelTrainer modelTrainer)
   throws BioException {
+    System.out.println("Registering " + getName() + " and the model contained");
     getModel().registerWithTrainer(modelTrainer);
   }
   

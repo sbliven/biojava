@@ -128,6 +128,10 @@ public abstract class ModelView implements MarkovModel {
   throws BioException {
     TransitionTrainer thisT = modelTrainer.getTrainerForModel(this);
     if(thisT == null) {
+      System.out.println(
+        "Registering " + getSource().stateAlphabet().getName() +
+        " with trainer"
+      );
       getSource().registerWithTrainer(modelTrainer);
       TransitionTrainer sourceT = modelTrainer.getTrainerForModel(getSource());
       thisT = new ViewTransitionTrainer();

@@ -37,7 +37,7 @@ import org.biojava.bio.symbol.*;
  * container->start and end->container. For the sample methods to work, the log
  * scores must be probabilities (sum to 1).
  */
-public interface MarkovModel {
+public interface MarkovModel extends Trainable {
   /**
    * Alphabet that is emitted by the emission states.
    */
@@ -210,15 +210,7 @@ public interface MarkovModel {
   void removeState(State toGo)
   throws UnsupportedOperationException, IllegalTransitionException,
   IllegalSymbolException, ModelVetoException;
-  
-  /**
-   * Register this model with a trainer.
-   * <P>
-   * A model may be registered with multiple trainers.
-   */
-  void registerWithTrainer(ModelTrainer mt)
-  throws BioException;
-  
+    
   /**
    * Register a TransitionListener with the model.
    *
