@@ -41,8 +41,6 @@ import org.biojava.utils.AssertionFailure;
 public class SimpleGappedSymbolList
 extends AbstractSymbolList
 implements GappedSymbolList, Serializable {
-  private static final boolean assertion = true;
-
   /**
    * The Alphabet - the same as source but guaranteed to include the gap character.
    */
@@ -407,11 +405,7 @@ implements GappedSymbolList, Serializable {
     }
     renumber(i+1, length);
 
-    if(assertion) {
-      if(!isSane()) {
-        throw new AssertionError("Data corrupted: " + blocks);
-      }
-    }
+    assert isSane() : "Data corrupted: " + blocks;
   }
 
   public void removeGap(int pos)
@@ -442,11 +436,7 @@ implements GappedSymbolList, Serializable {
       }
     }
 
-    if(assertion) {
-      if(!isSane()) {
-        throw new AssertionError("Data corrupted: " + blocks);
-      }
-    }
+    assert isSane() : "Data corrupted: " + blocks;
   }
 
   public void removeGaps(int pos, int length)
@@ -497,12 +487,8 @@ implements GappedSymbolList, Serializable {
       }
     }
 
-    if(assertion) {
-      if(!isSane()) {
-        throw new AssertionError("Data corrupted: removeGaps(" + pos +
-                                 "," + length + ") " + blocks);
-      }
-    }
+    assert isSane() : "Data corrupted: removeGaps(" + pos +
+                                 "," + length + ") " + blocks;
   }
 
   public Alphabet getAlphabet() {
@@ -744,11 +730,7 @@ implements GappedSymbolList, Serializable {
 
       // fixme: should be using 1.4 assertion syntax
       //assert isSane() : "Block is a sane shape: " + this.toString();
-      if(assertion) {
-        if(!isSane()) {
-          throw new AssertionError("Block is a sane shape: " + this.toString());
-        }
-      }
+      assert isSane() : "Block is a sane shape: " + this.toString();
     }
 
     public String toString() {
