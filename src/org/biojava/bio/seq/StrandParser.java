@@ -24,9 +24,9 @@ public final class StrandParser {
   public static final StrandedFeature.Strand parseStrand(String strand) {
     if("+".equals(strand) || "1".equals(strand)) {
       return StrandedFeature.POSITIVE;
-    } else if("-".equals(strand) || "-1".equals(strand)) {
+    } else if("-".equals(strand) || "-1".equals(strand) || "minus".equals(strand)) {
       return StrandedFeature.NEGATIVE;
-    } else if(".".equals(strand) || "0".equals(strand)) {
+    } else if(".".equals(strand) || "0".equals(strand) || "plus".equals(strand)) {
       return StrandedFeature.UNKNOWN;
     }
 
