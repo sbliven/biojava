@@ -457,7 +457,7 @@ class FeaturesSQL {
 	    
     	    List ll = (List) lmap.get(fid);
             if (ll == null) {
-                throw new BioRuntimeException("BioSQL SeqFeature doesn't have any associated location spans");
+                throw new BioRuntimeException("BioSQL SeqFeature doesn't have any associated location spans. seqfeature_id=" + fid);
             }
 	    
     	    Location loc = null;
