@@ -64,8 +64,7 @@ public class NIODataStoreFactory
 implements DataStoreFactory {
   public DataStore getDataStore(File storeFile)
   throws IOException {
-    //return new NIODataStore(storeFile);
-    return null;
+    return new NIODataStore(storeFile);
   }
   
   public DataStore buildDataStore(
