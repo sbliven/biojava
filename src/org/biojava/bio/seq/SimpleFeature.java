@@ -31,6 +31,22 @@ import java.util.*;
  */
 public class SimpleFeature implements Feature, MutableFeatureHolder {
   /**
+   * Register SimpleFeature with SimpleSequence as being good for
+   * Feature.Template objects.
+   */
+  static {
+    try {
+      SimpleSequence.addFeatureImplementation(
+        new SimpleSequence.TemplateFeature(
+          Feature.Template.class, SimpleFeature.class
+        )
+      );
+    } catch (NoSuchMethodException msme) {
+      throw new org.biojava.bio.BioError(msme, "Could not find apropreate constructor");
+    }
+  }
+  
+  /**
    * The FeatureHolder that we will delegate the FeatureHolder interface too.
    * This is lazily instantiated.
    */
@@ -137,14 +153,12 @@ public class SimpleFeature implements Feature, MutableFeatureHolder {
     return new SimpleFeatureHolder();
   }
 
-  public SimpleFeature(Sequence sourceSeq, Location loc,
-                       String type, String source,
-                       Annotation annotation) {
+  public SimpleFeature(Sequence sourceSeq, Feature.Template template) {
     this.sourceSeq = sourceSeq;
-    this.loc = loc;
-    this.type = type;
-    this.source = source;
-    this.annotation = annotation;
+    this.loc = template.location;
+    this.type = template.type;
+    this.source = template.source;
+    this.annotation = new SimpleAnnotation(annotation);
   }
 
   public String toString() {

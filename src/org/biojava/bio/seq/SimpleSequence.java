@@ -22,6 +22,7 @@
 
 package org.biojava.bio.seq;
 
+import java.lang.reflect.*;
 import java.util.*;
 
 /**
@@ -34,16 +35,36 @@ import java.util.*;
  * @author Matthew Pocock
  */
 public class SimpleSequence extends SimpleResidueList implements Sequence {
-  /**
-   * The default feature factory for all SimpleSequence objects.
-   */
-  protected static FeatureFactory SIMPLE_FEATURE_FACTORY;
+  protected static List templateClassToFeatureClass;
+  public static void addFeatureImplementation(TemplateFeature tf) {
+    templateClassToFeatureClass.add(0, tf);
+  }
+  
+  protected static Feature createFeatureFromTemplate(Sequence parent, Feature.Template template)
+  throws SeqException {
+    for(Iterator i = templateClassToFeatureClass.iterator(); i.hasNext(); ) {
+      TemplateFeature tf = (TemplateFeature) i.next();
+      if(template.getClass().isInstance(tf.templateClass)) {
+        try {
+          Object [] args = { parent, template };
+          return (Feature) tf.con.newInstance(args);
+        } catch (InstantiationException ie) {
+          throw new SeqException(ie);
+        } catch (IllegalAccessException iae) {
+          throw new SeqException(iae);
+        } catch (InvocationTargetException ite) {
+          throw new SeqException(ite);
+        }
+      }
+    }
+    throw new SeqException("Could not find feature associated with " + template);
+  }
   
   /**
    * Initialize SIMPLE_FEATURE_FACTORY.
    */
   static {
-    SIMPLE_FEATURE_FACTORY = new SimpleFeatureFactory();
+    templateClassToFeatureClass = new ArrayList();
   }
   
   private FeatureFactory fFact;
@@ -52,12 +73,6 @@ public class SimpleSequence extends SimpleResidueList implements Sequence {
   private Annotation annotation;
   private MutableFeatureHolder featureHolder;
 
-  /**
-   * Initialize fFact.
-   */
-  {
-    fFact = SIMPLE_FEATURE_FACTORY;
-  }
   
   protected MutableFeatureHolder getFeatureHolder() {
     if(featureHolder == null)
@@ -117,9 +132,8 @@ public class SimpleSequence extends SimpleResidueList implements Sequence {
     return new SimpleFeatureHolder();
   }
 
-  public Feature createFeature(MutableFeatureHolder fh, Location loc,
-                               String type, String source, Annotation annotation) {
-    Feature f = fFact.createFeature(this, loc, type, source, annotation);
+  public Feature createFeature(MutableFeatureHolder fh, Feature.Template template) {
+    Feature f = fFact.createFeature(this, template);
     if(fh == this) {
       fh = this.getFeatureHolder();
     }
@@ -141,5 +155,19 @@ public class SimpleSequence extends SimpleResidueList implements Sequence {
     setURN(urn);
     setName(name);
     this.annotation = annotation;
+  }
+  
+  private static Class [] conTypes = { Sequence.class, Feature.Template.class };
+  public static class TemplateFeature {
+   public Class templateClass;
+    public Class featureClass;
+    public Constructor con;
+    
+    public TemplateFeature(Class templateClass, Class featureClass)
+    throws NoSuchMethodException {
+      this.templateClass = templateClass;
+      this.featureClass = featureClass;
+      this.con = featureClass.getConstructor(conTypes);
+    }
   }
 }

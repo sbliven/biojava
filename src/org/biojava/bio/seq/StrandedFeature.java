@@ -66,4 +66,8 @@ public interface StrandedFeature extends Feature {
    * int flag to indicate that a feature is on the negative strand.
    */
   static final int NEGATIVE = -1;
+  
+  public class Template extends Feature.Template {
+    int strand;
+  }
 }

@@ -55,26 +55,17 @@ public interface Sequence extends ResidueList, FeatureHolder, Annotatable {
   String getName();
   
   /**
-   * Creates a feature within fh that refers to the location loc.
+   * Add a feature within fh using a feature template to fill its fields.
    * <P>
-   * There is no guarantee that the getAnnotation method of the resulting
-   * feature will be equal to the annotation passed in. However, it is a hint to
-   * the factory that it should contain all of those keys and values if
-   * possible. However, some implementations may use this annotation object. Be
-   * careful untill the standards are nailed down.
-   * <P>
-   * This method replaces the FeatureFactory interface so as to provide proper
-   * encapsulation.
+   * This api is not the cleanest. Anybody got better ideas?
    *
-   * @param loc the Location of the feature, relative to the parent sequence
-   * @param type  the type of feature
-   * @param source the source of the feature
    * @param fh  the feature holder that will directly contain the feature
-   * @param annotation  any annotation to add to the feature
-   * @return  the newly created and added Feature
+   * @param featureTemplate  the Feature.Template that will specify the fields
+   *        of the resulting feature
    * @throws  UnsupportedOperationException if this Sequence is immutable
+   * @throws IllegalArgumentException if either the template or feature holder
+   *         are of no use
    */
-  Feature createFeature(MutableFeatureHolder fh, Location loc,
-                        String type, String source, Annotation annotation)
-  throws UnsupportedOperationException;
+  Feature createFeature(MutableFeatureHolder fh, Feature.Template featureTemplate)
+  throws UnsupportedOperationException, IllegalArgumentException;
 }

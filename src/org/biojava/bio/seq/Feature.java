@@ -71,4 +71,19 @@ public interface Feature extends FeatureHolder, Annotatable {
    *          within this feature in the order they appear in the parent
    */
   ResidueList getResidues();
+  
+  /**
+   * Template class for a plain feature.
+   * <P>
+   * This just has fields for representing the stuff a basic feature has. Each
+   * sub-interface should provide a template class that inherits off this, and
+   * the constructor or factory methods should make a particular feature
+   * implementation from the template.
+   */
+  public static class Template {
+    public Location location;
+    public String type;
+    public String source;
+    public Annotation annotation;
+  }
 }

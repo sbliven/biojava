@@ -24,6 +24,8 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 
+import org.biojava.bio.*;
+
 /**
  * A no-frills implementation of Annotation that is just a wrapper around a Map.
  * <P>
@@ -64,8 +66,12 @@ public class SimpleAnnotation implements Annotation {
    * @throws IllegalArgumentException if the property 'key' does not exist
    */
   public Object getProperty(Object key) throws IllegalArgumentException {
-    if(propertiesAllocated())
-      return getProperties().get(key);
+    if(propertiesAllocated()) {
+      Map prop = getProperties();
+      if(prop.containsKey(key)) {
+        return prop.get(key);
+      }
+    }
     throw new IllegalArgumentException("Property " + key + " unknown");
   }
 
@@ -91,6 +97,23 @@ public class SimpleAnnotation implements Annotation {
     }
     sb.append("}");
     return sb.toString();
+  }
+  
+  public SimpleAnnotation() {
+  }
+  
+  public SimpleAnnotation(Annotation ann) {
+    for(Iterator i = ann.keys().iterator(); i.hasNext(); ) {
+      Object key = i.next();
+      try {
+        setProperty(key, ann.getProperty(key));
+      } catch (IllegalArgumentException iae) {
+        throw new BioError(
+          iae,
+          "Property was there and then dissapeared: " + key
+        );
+      }
+    }
   }
 }
 
