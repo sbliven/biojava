@@ -59,7 +59,7 @@ public class SeqIOToolsTest extends TestCase
         return true;
     }
 
-    public void testDNAReaders()
+    public void testDNAReadersAndWriters()
     {
         /******* test readFastaDNA *********/
 
@@ -83,6 +83,17 @@ public class SeqIOToolsTest extends TestCase
 
         // is its length correct?
         assertEquals("Fasta sequence AY069118.fa had incorrect length", fastaDNASeq.length(), 1502);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+          SeqIOTools.writeFasta(baos, fastaDNASeq);
+        }
+        catch (IOException ex) {
+          fail(ex.getMessage());
+        }
+
+
+
 
         /******* test readGenbank **********/
 
@@ -110,6 +121,15 @@ public class SeqIOToolsTest extends TestCase
         // compare with fasta reference
         assertTrue(compareSymbolLists(fastaDNASeq, genbankDNASeq));
 
+        baos = new ByteArrayOutputStream();
+        try {
+          SeqIOTools.writeFasta(baos, genbankDNASeq);
+        }
+        catch (IOException ex) {
+          fail(ex.getMessage());
+        }
+
+
         /******* test readEmblNucleotide **********/
 
         // get access to the test file
@@ -135,9 +155,18 @@ public class SeqIOToolsTest extends TestCase
 
         // compare with fasta reference
         assertTrue(compareSymbolLists(fastaDNASeq, emblDNASeq));
-    }
 
-    public void testProteinReaders()
+        baos = new ByteArrayOutputStream();
+        try {
+          SeqIOTools.writeFasta(baos, emblDNASeq);
+        }
+        catch (IOException ex) {
+          fail(ex.getMessage());
+        }
+
+      }
+
+    public void testProteinReadersAndWriters()
     {
         /******* test readFastaProtein *********/
 
@@ -162,7 +191,15 @@ public class SeqIOToolsTest extends TestCase
         // is its length correct?
         assertEquals("Fasta sequence AAL39263.fa had incorrect length", fastaProteinSeq.length(), 370);
 
-        /******* test readGenbank **********/
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+          SeqIOTools.writeFasta(baos, fastaProteinSeq);
+        }
+        catch (IOException ex) {
+          fail(ex.getMessage());
+        }
+
+        /******* test readGenpept **********/
 
         // get access to the test file
         inputS = this.getClass().getResourceAsStream("/files/AAL039263.gb");
@@ -188,7 +225,16 @@ public class SeqIOToolsTest extends TestCase
         // compare with fasta reference
         assertTrue(compareSymbolLists(fastaProteinSeq, genbankProteinSeq));
 
-        /******* test readEmblNucleotide **********/
+        baos = new ByteArrayOutputStream();
+        try {
+          SeqIOTools.writeGenpept(baos, genbankProteinSeq);
+        }
+        catch (Exception ex) {
+          fail(ex.getMessage());
+        }
+
+
+        /******* test readSwissProt **********/
 
         // get access to the test file
         inputS = this.getClass().getResourceAsStream("/files/AAL039263.em");
@@ -209,10 +255,19 @@ public class SeqIOToolsTest extends TestCase
         assertNotNull(emblProteinSeq);
 
         // is its length correct?
-        assertEquals("Genbank sequence AAL39263.em had incorrect length", emblProteinSeq.length(), 370);
+        assertEquals("SwissProt sequence AAL39263.em had incorrect length", emblProteinSeq.length(), 370);
 
         // compare with fasta reference
         assertTrue(compareSymbolLists(fastaProteinSeq, emblProteinSeq));
+
+        baos = new ByteArrayOutputStream();
+        try {
+          SeqIOTools.writeSwissprot(baos, emblProteinSeq);
+        }
+        catch (Exception ex) {
+          fail(ex.getMessage());
+        }
+
     }
 
     public void testBigDNA()
@@ -263,7 +318,7 @@ public class SeqIOToolsTest extends TestCase
         assertEquals("Genbank sequence NC_004432.gb had incorrect length", bigGenbankDNASeq.length(), 1358633);
 
         // compare with fasta reference
-        assertTrue(compareSymbolLists(bigFastaDNASeq, bigGenbankDNASeq));      
+        assertTrue(compareSymbolLists(bigFastaDNASeq, bigGenbankDNASeq));
     }
 
     public void testIdentifyFormat()
