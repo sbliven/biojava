@@ -784,4 +784,20 @@ final public class LocationTools {
         }
         return cov;
     }
+    
+    /**
+     * Return a contiguous location running from the minimum to the maximum points of
+     * the specified location.
+     * 
+     * @param loc a location
+     * @return a corresponding contiguous location
+     */
+    
+    public static Location shadow(Location loc) {
+        if (loc.isContiguous()) {
+            return loc;
+        } else {
+            return new RangeLocation(loc.getMin(), loc.getMax());
+        }
+    }
 }
