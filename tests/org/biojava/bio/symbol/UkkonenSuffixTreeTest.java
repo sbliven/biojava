@@ -2,7 +2,6 @@ package org.biojava.bio.symbol;
 
 import junit.framework.*;
 import java.util.*;
-import ca.mcgill.mcb.dog.overrepresentation.*;
 import org.biojava.bio.seq.*;
 
 /** List of tests for for UkkonenSuffixTree.
