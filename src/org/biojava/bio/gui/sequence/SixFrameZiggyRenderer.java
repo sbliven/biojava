@@ -146,7 +146,7 @@ public class SixFrameZiggyRenderer
     // finds in a SymbolList the specified phase with
     // longest ORF and returns the phase.
     int[] lastStop = {0, 0, 0};
-    int[] longestORF = {0, 0, 0};
+//    int[] longestORF = {0, 0, 0};
     int bestPhase = 0;
     int highestORFSize = 0;
 
@@ -175,7 +175,7 @@ public class SixFrameZiggyRenderer
         if (currORFSize > highestORFSize) {
           bestPhase = phase;
           highestORFSize= currORFSize;
-          longestORF[phase] = currORFSize;
+//          longestORF[phase] = currORFSize;
         }
         lastStop[phase] = i;
 //        System.out.println("findORF i phase, largest: " + i + " "
@@ -183,21 +183,23 @@ public class SixFrameZiggyRenderer
       }
     }
 
-    // just a sanity check for a frame without a stop at all
-    // most unlikely but if it happens, just return first
-    // stopless phase.
+    // there is always the possibility that there are a few stops
+    // near the beginning then no more.  
+    // The best phase will then be misdetected.
+    // Assume closure at end of frame.
     for (int i=0; i < 3; i++) {
-      if (lastStop[i] == 0) {
-//        System.out.println("findORF bailout");
-        return i;
+      int currORFSize = endSearch - lastStop[i];
+      if (currORFSize > highestORFSize) {
+        bestPhase = i;
+        highestORFSize= currORFSize;
+//        longestORF[phase] = currORFSize;
       }
     }
-//    System.out.println("successful findORF: bestPhase, largest " +
-//                bestPhase + " " + highestORFSize);
+
     return bestPhase;
   }
 
-  private Sequence assembleFusedSequence(Feature f) {
+  private Sequence assembleFusedSequence(Feature [] block, Sequence seq) {
     // assembles a fused sequence from component features
     // only assembles in the forward direction but will
     // sort exons as necessary.
@@ -206,22 +208,13 @@ public class SixFrameZiggyRenderer
     ComponentFeature.Template cft = new ComponentFeature.Template();
     cft.annotation = Annotation.EMPTY_ANNOTATION;
     cft.strand = StrandedFeature.POSITIVE;
-    cft.componentSequence = f.getSequence();
-
-    // sort the exons into ascending order to avoid
-    // disappointment...
-    int featureCount = f.countFeatures();
-    Feature[] block = new Feature[featureCount];
-    int i=0;
-    for (Iterator fi=f.features(); fi.hasNext();) {
-      block[i++] = (Feature) fi.next();
-    }
-    Arrays.sort(block, new Feature.ByLocationComparator());
+    cft.componentSequence = seq;
 
     int last = 0;
-    for (int j= 0; j < featureCount; j++) {
+    for (int j= 0; j < block.length; j++) {
       // fuse all "exons" irrespective of orientation.
       Feature thisExon = block[j];
+
       cft.componentLocation = thisExon.getLocation();
       int length = cft.componentLocation.getMax() - 
                      cft.componentLocation.getMin() + 1;
@@ -272,7 +265,21 @@ public class SixFrameZiggyRenderer
     // the phase of successive exons can be computed from just the
     // previous exon phase and the preceding intron size.
 
-    Sequence fused = assembleFusedSequence(f);
+    //filter for only the exons
+    FeatureFilter filt = new FeatureFilter.ByType("exon");
+    FeatureHolder exons = f.filter(filt, false);
+
+    // sort the returned exons in ascending order
+    // disappointment...
+    int featureCount = exons.countFeatures();
+    Feature[] orderedExons = new Feature[featureCount];
+    int i=0;
+    for (Iterator fi=exons.features(); fi.hasNext();) {
+      orderedExons[i++] = (Feature) fi.next();
+    }
+    Arrays.sort(orderedExons, new Feature.ByLocationComparator());
+
+    Sequence fused = assembleFusedSequence(orderedExons, f.getSequence());
 
     StrandedFeature.Strand strand = ((StrandedFeature) f).getStrand();
 
@@ -281,21 +288,26 @@ public class SixFrameZiggyRenderer
     // embedded into the sequence
     int phase = findORF(fused, strand);
 
-//    System.out.println("fused length, phase: " + fused.length() + " " 
-//                        + phase);
+//    System.out.println("fused length, phase, strand: " + fused.length() + " " 
+//                        + phase + " " + strand);
 //    System.out.println("sequence is :- " + fused.seqString());
-    Location loc = f.getLocation();
-    Iterator i = loc.blockIterator();
 
-    // Iterate over the LOCATIONS, not child features.
-    Location block;
-    if(i.hasNext()) {
-      block = (Location) i.next();
-      pane.startZiggy(strand, (2 + block.getMin() + phase)%3);
-      pane.renderLocation(g, context, block);
+    // Iterate over exon child features: these are already ordered.
+    Location loc = null;
+    for (i = 0; i < orderedExons.length; i++) {
+      loc = ((Feature) orderedExons[i]).getLocation();
+      if (i == 0) {
+        // first exon
+        pane.startZiggy(strand, (2 + loc.getMin() + phase)%3);
+        pane.renderLocation(g, context, loc);
+//        System.out.println("block value is " + loc);
+      }
+      else {
+        pane.renderLocation(g, context, loc);
+//        System.out.println("block value is " + loc);
+      }
     }
-    while(i.hasNext())
-      pane.renderLocation(g, context, (Location)i.next());
+      
   }
 
   public FeatureHolder processMouseEvent(
