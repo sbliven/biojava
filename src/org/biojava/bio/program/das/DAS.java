@@ -137,7 +137,11 @@ public class DAS extends AbstractChangeable {
           
           String sourceID = source.getAttribute("id");
           String sourceText = ((Text) source.getFirstChild()).getData().trim();
-          URL mapURL = new URL(((Text) mapmaster.getFirstChild()).getData().trim());
+	  String mapURLString = ((Text) mapmaster.getFirstChild()).getData().trim();
+	  if (! (mapURLString.charAt(mapURLString.length() - 1) == '/')) {
+	      mapURLString = mapURLString + '/';
+	  }
+          URL mapURL = new URL(mapURLString);
           String descrText = ((Text) description.getFirstChild()).getData().trim();
           
           URL dsURL = new URL(dasURL, sourceID + "/");

@@ -207,7 +207,7 @@ public class DASSequenceDB implements SequenceDB {
 		// int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
 		int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
 		if (status == 0)
-		    throw new BioException("Not a DAS server: " + dataSourceURL);
+		    throw new BioException("Not a DAS server: " + dataSourceURL + " Query: " + epURL);
 		else if (status != 200)
 		    throw new BioException("DAS error (status code = " + status +
 					   ") connecting to " + dataSourceURL + " with query " + epURL);
