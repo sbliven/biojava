@@ -265,7 +265,10 @@ Changeable {
   }
 
   public void setRange(RangeLocation range) {
+    RangeLocation oldRange = this.range;
     this.range = range;
+    resizeAndValidate();
+    firePropertyChange("range", oldRange, range);
   }
   
   public RangeLocation getRange() {

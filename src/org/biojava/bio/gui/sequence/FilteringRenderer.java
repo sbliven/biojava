@@ -114,15 +114,15 @@ extends SequenceRendererWrapper {
   }
 
   public double getDepth(SequenceRenderContext src, RangeLocation pos) {
-    return super.getDepth(getContext(src), pos);
+    return super.getDepth(getContext(src, pos), pos);
   }    
   
   public double getMinimumLeader(SequenceRenderContext src, RangeLocation pos) {
-    return super.getMinimumLeader(getContext(src), pos);
+    return super.getMinimumLeader(getContext(src, pos), pos);
   }
   
   public double getMinimumTrailer(SequenceRenderContext src, RangeLocation pos) {
-    return super.getMinimumTrailer(getContext(src), pos);
+    return super.getMinimumTrailer(getContext(src, pos), pos);
   }
   
   public void paint(
@@ -130,7 +130,7 @@ extends SequenceRendererWrapper {
     SequenceRenderContext src,
     RangeLocation pos
   ) {
-    super.paint(g, getContext(src), pos);
+    super.paint(g, getContext(src, pos), pos);
   }
   
   public SequenceViewerEvent processMouseEvent(
@@ -140,21 +140,24 @@ extends SequenceRendererWrapper {
     RangeLocation pos
   ) {
     return super.processMouseEvent(
-      getContext(src),
+      getContext(src, pos),
       me,
       path,
       pos
     );
   }
   
-  protected SequenceRenderContext getContext(SequenceRenderContext src) {
-    if( (filter == FeatureFilter.all) && (recurse == true) ) {
-      return src;
-    } else {
-      return new SubSequenceRenderContext(
-        src,
-        ((Sequence) src.getSequence()).filter(filter, recurse)
-      );
-    }
+  protected SequenceRenderContext getContext(
+    SequenceRenderContext src,
+    RangeLocation pos
+  ) {
+    FeatureFilter actual = new FeatureFilter.And(
+      filter,
+      new FeatureFilter.OverlapsLocation(pos)
+    );
+    return new SubSequenceRenderContext(
+      src,
+      ((Sequence) src.getSequence()).filter(filter, recurse)
+    );
   }
 }

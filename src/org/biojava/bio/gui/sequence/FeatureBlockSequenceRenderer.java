@@ -75,6 +75,14 @@ implements SequenceRenderer {
       throw new NestedError(cve, "Assertion Failure: Should have no listeners");
     }
   }
+  
+  public FeatureBlockSequenceRenderer(FeatureRenderer fRend) {
+    try {
+      setFeatureRenderer(new BasicFeatureRenderer());
+    } catch (ChangeVetoException cve) {
+      throw new NestedError(cve, "Assertion Failure: Should have no listeners");
+    }
+  }
     
   public FeatureRenderer getFeatureRenderer() {
     return renderer;
