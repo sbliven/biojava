@@ -34,12 +34,55 @@ import org.biojava.utils.*;
  * <p>
  * The advantage is that those SymbolLists can be packed
  * implementations.
- * e.g.
+ *
+ * <p>
+ * You can build a SequenceBuilderFactory to create a packed chunked sequence from
+ * an input file without making an intermediate symbol list with:-
  * <pre>
- * ChunkedSymbolListFactory factory 
- *     = new ChunkedSymbolListFactory(new PackedSymbolListFactory(true));
- * SymbolList symList = factory.make(new SymbolReader(...));
+ * public class PackedChunkedListFactory implements SequenceBuilderFactory
+ * {
+ *   public SequenceBuilder makeSequenceBuilder()
+ *   {
+ *     return new SequenceBuilderBase() {
+ *       private ChunkedSymbolListFactory chunker = new ChunkedSymbolListFactory(new PackedSymbolListFactory(true));
+ *
+ *       // deal with symbols
+ *       public void addSymbols(Alphabet alpha, Symbol[] syms, int pos, int len)
+ *         throws IllegalAlphabetException
+ *           {
+ *             chunker.addSymbols(alpha, syms, pos, len);
+ *           }
+ *
+ *           // make the sequence
+ *           public Sequence makeSequence()
+ *           {
+ *             try {
+ *               // make the SymbolList
+ *               SymbolList symbols = chunker.makeSymbolList();
+ *               seq = new SimpleSequence(symbols, uri, name, annotation);
+ *
+ *               // call superclass method
+ *               return super.makeSequence();
+ *             }
+ *             catch (IllegalAlphabetException iae) {
+ *               throw new BioError("couldn't create symbol list");
+ *             }
+ *           }
+ *     };
+ *   }
+ * }
  * </pre>
+ *
+ * <p>
+ * Then reading in FASTA files can be done with something like:-
+ * <p>
+ * <pre>
+ * SequenceIterator seqI = new StreamReader(br, new FastaFormat(), 
+ *     DNATools.getDNA().getTokenization("token"), 
+ *     new PackedChunkedListFactory() );
+ * </pre>
+ * <p>
+ * Blend to suit taste.
  * <p>
  * Alternatively, you can input Symbols to the factory with addSymbols
  * make the sequence eventually with makeSymbolList.
