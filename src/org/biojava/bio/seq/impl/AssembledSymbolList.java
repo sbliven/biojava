@@ -26,6 +26,7 @@ import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.utils.*;
+import org.biojava.bio.symbol.*;
 
 /**
  * Support class for applications which need to patch together sections

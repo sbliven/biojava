@@ -60,7 +60,7 @@ class SimpleComponentFeature implements ComponentFeature {
 	    throw new BioException("Component and container locations must contain an equal number of symbols.");
 	}
 
-	if (!temp.location.isContiguous() || temp.componentLocation.isContiguous()) {
+	if (!temp.location.isContiguous() || !temp.componentLocation.isContiguous()) {
 	    throw new BioException("Can only include contiguous segments in an assembly [may change in future]");
 	}
 	
