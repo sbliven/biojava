@@ -25,9 +25,9 @@ import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
-
-import com.sun.xml.parser.Resolver;
-import com.sun.xml.tree.XmlDocument;
+import org.w3c.dom.*;
+import org.apache.xerces.parsers.*;
+import org.xml.sax.*;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -35,8 +35,9 @@ import org.xml.sax.SAXException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
-import java.io.IOException;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ResourceBundle;
 import java.util.MissingResourceException;
 import java.net.URL;
@@ -66,15 +67,26 @@ public class ProteinTools {
     static {
 
         Document doc = null;
-        try {
+     /*   try {
             URL proteaseManagerURL = ProteinTools.class.getClassLoader().getResource(
             "org/biojava/bio/symbol/ResidueProperties.xml"
             );
             //If I try and do this here on compile it says "An exception can't be thrown by an initializer"
             InputSource is = Resolver.createInputSource(proteaseManagerURL, true);
-            doc = XmlDocument.createXmlDocument(is, true);
+            doc = XmlDocument.createXmlDocument(is, true);*/
 
+      try {
+          InputStream tablesStream = ProteinTools.class.getClassLoader().getResourceAsStream(
+            "org/biojava/bio/symbol/ResidueProperties.xml"
+          );
+          if(tablesStream == null ) {
+            throw new BioError("Couldn't locate ResidueProperties.xml.");
+          }
 
+          InputSource is = new InputSource(tablesStream);
+          DOMParser parser = new DOMParser();
+          parser.parse(is);
+          doc = parser.getDocument();
 
         }catch (MissingResourceException mre) {
             System.err.println(mre.getMessage());
@@ -93,15 +105,24 @@ public class ProteinTools {
             while(it.hasNext()){
                 Symbol s = (Symbol)it.next();
                 //  simplePropertyTable.setDoubleProperty(s, "1202.00");
-                for(int i = 0; i < children.getLength(); i++) {
-                    Element child = (Element) children.item(i);                   
+                for(int i = 0; i < children.getLength(); i++) {                   
+                    Node cnode = (Node) children.item(i); 
+                    if(! (cnode instanceof Element)) {
+                        continue;
+                    }
+                    Element child = (Element) cnode;
                     if(child.getNodeName().equals("residue")) {
+                        
                         if(child.getAttribute("token").equals(s.getToken()+"")){
                             
                             NodeList properyNodes = child.getChildNodes();
                             for(int j = 0; j < properyNodes.getLength(); j++)
                             {
-                                Element el = (Element) properyNodes.item(j);
+                                cnode = (Node) properyNodes.item(j);
+                                if(! (cnode instanceof Element)) {
+                                    continue;
+                                }
+                                Element el = (Element) cnode;
                                 String name = el.getAttribute("name");
                                 if(name.equals(SymbolPropertyTable.MONO_MASS)) {
                                     String value = el.getAttribute("value");
@@ -127,13 +148,22 @@ public class ProteinTools {
                 Symbol s = (Symbol)it.next();
                 //  simplePropertyTable.setDoubleProperty(s, "1202.00");
                 for(int i = 0; i < children.getLength(); i++) {
-                    Element child = (Element) children.item(i);                   
+                     Node cnode = (Node) children.item(i); 
+                    if(! (cnode instanceof Element)) {
+                        continue;
+                    }
+                    Element child = (Element) cnode;
+                               
                     if(child.getNodeName().equals("residue")) {
                         if(child.getAttribute("token").equals(s.getToken()+"")){                           
                             NodeList properyNodes = child.getChildNodes();
                             for(int j = 0; j < properyNodes.getLength(); j++)
                             {
-                                Element el = (Element) properyNodes.item(j);
+                                cnode = (Node) properyNodes.item(j);
+                                if(! (cnode instanceof Element)) {
+                                    continue;
+                                }
+                                Element el = (Element) cnode;
                                 String name = el.getAttribute("name");
                                  
                                 if(name.equals(SymbolPropertyTable.AVG_MASS)) {
