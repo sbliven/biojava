@@ -12,6 +12,9 @@
 ]>
 
 <residueTable>
+  <!-- The Residue masses were obtained from the Micromass reference table
+  http://www.micromass.co.uk/resources/reference_tables/refp1s1.asp
+    -->
   <residue token="A">
     <property name="monoMass" value="71.03711"/>
     <property name="avgMass" value="71.0788"/>
