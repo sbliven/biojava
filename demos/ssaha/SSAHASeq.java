@@ -15,8 +15,19 @@ public class SSAHASeq {
   throws Throwable {
     File dataStoreFile = new File(args[0]);
     String seqStr = args[1];
+    String tableFormat = "classic";
+    if (args.length > 2) {
+	tableFormat = args[2];
+    }
+
+    DataStoreFactory dsf;
+    if ("compact".equals(tableFormat)) {
+	dsf = new CompactedDataStoreFactory();
+    } else {
+	dsf = new MappedDataStoreFactory();
+    }
     
-    final DataStore ds = new MappedDataStoreFactory().getDataStore(
+    final DataStore ds = dsf.getDataStore(
       dataStoreFile
     );
     
