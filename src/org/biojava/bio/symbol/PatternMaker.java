@@ -1,3 +1,23 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
 
 package org.biojava.bio.symbol;
 
@@ -5,6 +25,12 @@ import org.biojava.bio.BioException;
 import org.biojava.utils.ParserException;
 import org.biojava.bio.seq.io.SymbolTokenization;
 
+/**
+ * This class creates PatternSearch.Pattern objects from
+ * String description of the object.
+ * @author David Huen
+ * @since 1.4
+`*/
 public class PatternMaker
 {
     private class Range
@@ -55,7 +81,8 @@ public class PatternMaker
             // symbol tokens assumed to be alphas.
             if (Character.isLetter(nextCh))
                 return SYMBOL_TOKEN;
-
+            if (Character.isDigit(nextCh))
+                return NUMERIC;
             // now check for specific chars
             if (nextCh == '{')
                 return LEFT_BRACE;
@@ -98,6 +125,9 @@ public class PatternMaker
     private SymbolTokenization symToke;
     private FiniteAlphabet alfa;
 
+    /**
+     * Convert String into a PatternSearch.Pattern object in the specified alphabet.
+     */
     public PatternSearch.Pattern parsePattern(String patternTxt, FiniteAlphabet alfa)
         throws BioException, IllegalSymbolException, IllegalAlphabetException, ParserException
     {
@@ -115,7 +145,7 @@ public class PatternMaker
             switch (tokenType) {
                 case Tokenizer.SYMBOL_TOKEN:
                     Symbol sym = symToke.parseToken(Character.toString(toke.getToken()));
-                    if (toke.getToken() == Tokenizer.LEFT_BRACE) {
+                    if (toke.nextTokenType() == Tokenizer.LEFT_BRACE) {
                         Range range = getIterations();
                         PatternSearch.Pattern thisP = new PatternSearch.Pattern(symToke.tokenizeSymbol(sym), alfa);
                         thisP.addSymbol(sym);
@@ -129,7 +159,7 @@ public class PatternMaker
                     break;
                 case Tokenizer.LEFT_BRACKET:
                     PatternSearch.Pattern thisP = parsePattern();
-                    if (toke.getToken() == Tokenizer.LEFT_BRACE) {
+                    if (toke.nextTokenType() == Tokenizer.LEFT_BRACE) {
                         Range range = getIterations();
                         thisP.setMin(range.getMin());
                         thisP.setMax(range.getMax());
@@ -154,17 +184,20 @@ public class PatternMaker
 
         // there can either be one or two numbers
         boolean onSecondArg = false;
+        StringBuffer numString = new StringBuffer();
+
         while (toke.hasNext()) {
             int tokenType = toke.nextTokenType();
-            StringBuffer numString = new StringBuffer();
 
             switch (tokenType) {
                 case Tokenizer.NUMERIC:
+                    //System.out.println("adding symbol");
                     numString.append(toke.getToken());
                     break;
                 case Tokenizer.COMMA:
                     toke.getToken();
                     if (!onSecondArg) {
+                        //System.out.println("numString is " + numString);
                         range.setMin(Integer.parseInt(numString.toString()));
                         numString = new StringBuffer();
                         onSecondArg = true;
@@ -206,7 +239,8 @@ public class PatternMaker
             switch (tokenType) {
                 case Tokenizer.SYMBOL_TOKEN:
                     Symbol sym = symToke.parseToken(Character.toString(toke.getToken()));
-                    if (toke.getToken() == Tokenizer.LEFT_BRACE) {
+                    hasContent = true;
+                    if (toke.nextTokenType() == Tokenizer.LEFT_BRACE) {
                         Range range = getIterations();
                         PatternSearch.Pattern thisP = new PatternSearch.Pattern("", alfa);
                         thisP.addSymbol(sym);
@@ -220,7 +254,8 @@ public class PatternMaker
                     break;
                 case Tokenizer.LEFT_BRACKET:
                     PatternSearch.Pattern thisP = parsePattern();
-                    if (toke.getToken() == Tokenizer.LEFT_BRACE) {
+                    hasContent = true;
+                    if (toke.nextTokenType() == Tokenizer.LEFT_BRACE) {
                         Range range = getIterations();
                         thisP.setMin(range.getMin());
                         thisP.setMax(range.getMax());

@@ -23,6 +23,8 @@ package org.biojava.bio.symbol;
 
 import java.util.List;
 import java.util.ArrayList;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.BioException;
 
 /**
  * Class to perform arbitrary regex-like searches on
@@ -76,6 +78,7 @@ public class PatternSearch
         private int min = 1;
         private int max = 1;
         private String label;
+        private SymbolTokenization symToke = null;
 
         /**
          * @param label A String describing the Pattern.
@@ -143,6 +146,59 @@ public class PatternSearch
         private List getPatternList()
         {
             return patternList;
+        }
+
+        public String toString()
+        {
+            try {
+                return toString(Pattern.this);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+                return "";
+            }     
+        }
+
+        private String stringify()
+            throws BioException, IllegalSymbolException
+        {
+            if (symToke == null) symToke = alfa.getTokenization("token");
+
+            StringBuffer s = new StringBuffer();
+
+            for (int i=0; i < patternList.size(); i++) {
+                Object currElem = patternList.get(i);
+                if (currElem instanceof Symbol) {
+                    //System.out.println("symbol is " + ((Symbol) currElem).getName());
+                    s.append(symToke.tokenizeSymbol((Symbol) currElem));
+                }
+                else if (currElem instanceof Pattern) {
+                    s.append(toString((Pattern) currElem));
+                }
+            }
+
+            return s.toString();
+        }
+
+        private String toString(Pattern p)
+            throws BioException, IllegalSymbolException
+        {
+            StringBuffer s = new StringBuffer();
+
+            boolean hasCount = (p.getMin() != 1) || (p.getMax() != 1);
+            boolean needParen = hasCount || (p.getPatternList().size() > 1);
+            if (needParen) s.append('(');
+            s.append(p.stringify());
+            if (needParen) s.append(')');
+            if (hasCount) {
+                s.append('{');
+                s.append(Integer.toString(p.getMin()));
+                s.append(',');     
+                s.append(Integer.toString(p.getMax()));
+                s.append('}');
+            }
+
+            return s.toString();
         }
     }
 
