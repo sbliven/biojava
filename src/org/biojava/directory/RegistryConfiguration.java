@@ -24,6 +24,8 @@ package org.biojava.directory;
 import java.io.*;
 import java.util.*;
 
+import org.biojava.utils.*;
+
 /**
  * <p>The BioDirectory Registry is a simple system for specifying
  * where to find services which provide sequence databases. A client
@@ -80,48 +82,115 @@ import java.util.*;
  *
  * @author Brian Gilman
  * @author Keith James
+ * @author Matthew Pocock
  * @version $Revision$
  */
 public interface RegistryConfiguration {
-
-    /**
-     * <code>getConfiguration</code> returns a mapping of registry
-     * database names to collections of tag-value pairs.
-     *
-     * @return a <code>Map</code>.
-     *
-     * @exception RegistryException if an error occurs.
-     */
-    public Map getConfiguration() throws RegistryException;
-
-    /**
-     * <code>getConfigLocator</code> returns a locator for the
-     * configuration.
-     *
-     * @return a <code>String</code>.
-     */
-    public String getConfigLocator();
-
-    /**
-     * <code>Impl</code> is the default implementation of
-     * <code>RegistryConfiguration</code> where the location is a file
-     * name.
-     */
-    public static class Impl implements RegistryConfiguration {
-	private String configFileLocation = null;
-	private Map config = null;
-	
-	public Impl(String configFileLocation, Map config){
-	    this.configFileLocation = configFileLocation;
-	    this.config = config;
-	}
-
-	public Map getConfiguration() {
-	    return config;
-	}
-
-	public String getConfigLocator() {
-	    return configFileLocation;
-	}
+  /**
+   * <code>getConfiguration</code> returns a mapping of registry
+   * database names to collections of tag-value pairs.
+   *
+   * @return a <code>Map</code>.
+   *
+   * @exception RegistryException if an error occurs.
+   */
+  public Map getConfiguration() throws RegistryException;
+  
+  /**
+   * <code>getConfigLocator</code> returns a locator for the
+   * configuration.
+   *
+   * @return a <code>String</code>.
+   */
+  public String getConfigLocator();
+  
+  /**
+   * A simple implementation of RegistryConfiguration backed by a Map.
+   *
+   * @author Brian Gilman
+   * @author Matthew Pocock
+   */
+  public static class Impl implements RegistryConfiguration {
+    private String configFileLocation = null;
+    private Map config = null;
+    
+    public Impl(String configFileLocation, Map config){
+      this.configFileLocation = configFileLocation;
+      this.config = config;
     }
+    
+    public Map getConfiguration() {
+      return config;
+    }
+    
+    public String getConfigLocator() {
+      return configFileLocation;
+    }
+  }
+  
+  /**
+   * A RegistryConfiguration that allows you to treat other configurations
+   * as providing important or default configuration information.
+   *
+   * @author Matthew Pocock
+   */
+  public static class Composite
+  implements RegistryConfiguration {
+    private String configLocator;
+    private Map config;
+    
+    public Composite() {
+    }
+    
+    public Map getConfiguration() {
+      if(config == null) {
+        return Collections.EMPTY_MAP;
+      } else {
+        return config;
+      }
+    }
+    
+    public String getConfigLocator() {
+      return configLocator;
+    }
+    
+    /**
+     * Add a configuration as the most authorative place to look.
+     * During future lookups with this context, values in newConfig will
+     * take precedence over values in the previously existing configuration.
+     *
+     * @param newConfig  the RegistryConfiguration to add as most important
+     */
+    public void addTopConfig(RegistryConfiguration newConfig)
+    throws RegistryException {
+      Map cfg = newConfig.getConfiguration();
+      if(config == null) {
+        config = cfg;
+        configLocator = newConfig.getConfigLocator();
+      } else {
+        config = new OverlayMap(config, cfg);
+        configLocator = newConfig.getConfigLocator() + "::" + configLocator;
+      }
+    }
+
+    /**
+     * Add a configuration as the most default place to look.
+     * During future lookups with this context, values in newConfig will be
+     * used as default values only if the lookup would return nothing in the
+     * previously existing configuration.
+     *
+     * @param newConfig  the RegistryConfiguration to add as the default
+     */
+    public void addBottomConfig(RegistryConfiguration newConfig)
+    throws RegistryException {
+      Map cfg = newConfig.getConfiguration();
+      if(config == null) {
+        config = cfg;
+        configLocator = newConfig.getConfigLocator();
+      } else {
+        config = new OverlayMap(cfg, config);
+        configLocator = configLocator + "::" + newConfig.getConfigLocator();
+      }
+    }
+  }
 }

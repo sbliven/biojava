@@ -30,71 +30,85 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * <p><code>SystemRegistry</code> is used to retrieve a reference to
- * the system OBDA registry.</p>
+ * <p>
+ * A registry that loads up the standard biodirectory files.
+ * </p>
  *
+ * <p>
+ * This class will search for the following classes in turn:
+ * <ol>
+ * <li>~/.bioinformatics/seqdatabase.ini where ~ is the JAVA user home system
+ * property</li>
+ * <li>/etc/bioinformatics/seqdatabase.ini</li>
+ * <li>"http://www.open-bio.net/bioinformatics/seqdatabase.ini</li>
+ * </ol>
+ * </p>
+ *
+ * <p>
+ * The first file found will be loaded and used as the configuration. There is
+ * currently no support for cascading these so that local setting over-ride
+ * more general ones.
+ * </p>
+ *
+ * @author Thomas Down
+ * @author Matthew Pocock
  * @author Keith James
  */
+
 public class SystemRegistry {
-    private static Registry systemRegistry;
-
-    /**
-     * <p><code>instance</code> retrieves a registry reference. The
-     * registry path is searched in the order specified in the OBDA
-     * standard and the first instance found is returned. The path
-     * is</p>
-     *
-     * <pre>
-     *    $HOME/.bioinformatics/seqdatabase.ini
-     *    /etc/bioinformatics/seqdatabase.ini
-     *    http://www.open-bio.org/registry/seqdatabase.ini
-     * </pre>
-     *
-     * @return a <code>Registry</code>.
-     */
-    public static Registry instance() {
-	if (systemRegistry == null) {
-	    String locator = null;
-	    BufferedReader stream = null;
-	    Iterator i = getRegistryPath().iterator();
-
-	    while (stream == null && i.hasNext()) {
-		try {
-		    locator = (String) i.next();
-		    stream = new BufferedReader(new InputStreamReader(new URL(locator).openStream()));
-		} catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-	    }
-
-	    if (stream != null) {
-		try {
-		    systemRegistry = new Registry(OBDARegistryParser.parseRegistry(stream, locator));
-		} catch (Exception ex) {
-		    ex.printStackTrace();
-		}
-	    } else {
-		systemRegistry = new Registry(new RegistryConfiguration.Impl("<none>", Collections.EMPTY_MAP));
-	    }
-	}
-
-	return systemRegistry;
+  private static Registry systemRegistry;
+  
+  /**
+   * Get the singleton Registry instance representing the system-wide default
+   * registry.
+   *
+   * @return the system-wide Registry object
+   */
+  public static Registry instance() {
+    if (systemRegistry == null) {
+      RegistryConfiguration.Composite regConfig
+        = new RegistryConfiguration.Composite();
+      Iterator i = getRegistryPath().iterator();
+      
+      while (i.hasNext()) {
+        try {
+          String locator = (String) i.next();
+          BufferedReader stream = new BufferedReader(
+            new InputStreamReader(
+              new URL(locator).openStream()
+            )
+          );
+          if (stream != null) {
+            try {
+              RegistryConfiguration cfg
+                = OBDARegistryParser.parseRegistry(stream, locator);
+              regConfig.addBottomConfig(cfg);
+            } catch (Exception ex) {
+              ex.printStackTrace(); // FIXME: we should log this or something
+            }
+          }
+        } catch (Exception ex) {} // FIXME: logging?
+      }
+      
+      systemRegistry = new Registry(regConfig);
     }
-
-    /**
-     * <code>getRegistryPath</code> returns a <code>List</code> of URL
-     * <code>String</code>s.
-     *
-     * @return a <code>List</code> URL <code>String</code>s.
-     */
-    public static List getRegistryPath() {
-	List registryPath = new ArrayList();
-	String userHome = System.getProperty("user.home");
-	if (userHome != null) {
-	    registryPath.add("file:///" + userHome + "/.bioinformatics/seqdatabase.ini");
-	}
-	registryPath.add("file:///etc/bioinformatics/seqdatabase.ini");
-	registryPath.add("http://www.open-bio.net/bioinformatics/seqdatabase.ini");
-	return registryPath;
+    
+    return systemRegistry;
+  }
+  
+  /**
+   * Get the list of places that will be searched for registry files.
+   *
+   * @return a List of strings that are URLs to bioregistry files
+   */
+  public static List getRegistryPath() {
+    List registryPath = new ArrayList();
+    String userHome = System.getProperty("user.home");
+    if (userHome != null) {
+      registryPath.add("file:///" + userHome + "/.bioinformatics/seqdatabase.ini");
     }
+    registryPath.add("file:///etc/bioinformatics/seqdatabase.ini");
+    registryPath.add("http://www.open-bio.net/bioinformatics/seqdatabase.ini");
+    return registryPath;
+  }
 }

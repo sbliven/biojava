@@ -24,21 +24,37 @@ package org.biojava.utils;
 import java.util.*;
 
 /**
- * Overlap one map onto another.
+ * <p>
+ * Overlap one map onto another. This allows you to have a map with local values
+ * and default values. The local and default values are provided by a child and
+ * parent map.
+ * </p>
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  */
 
 public class OverlayMap extends AbstractMap {
     private Map parent;
     private Map overlay;
 
+    /**
+     * Build a new map with default key-value pairs.
+     *
+     * @param parent  the default fall-through Map
+     * @param overlay the overriding Map
+     */
     public OverlayMap(Map parent, Map overlay) {
 	super();
 	this.parent = parent;
 	this.overlay = overlay;
     }
 
+    /**
+     * Build a new map with default key-value pairs.
+     *
+     * @param parent  the default fall-through Map
+     */
     public OverlayMap(Map parent) {
 	super();
 	this.parent = parent;
@@ -47,6 +63,9 @@ public class OverlayMap extends AbstractMap {
 
     /**
      * Return the object containing the fallback mappings.
+     * This is the actual parent map, not a copy.
+     *
+     * @return the parent map
      */
 
     public Map getParentMap() {
@@ -55,6 +74,9 @@ public class OverlayMap extends AbstractMap {
 
     /**
      * Return the object containing the overlay mappings.
+     * This is the actual child map, not a copy.
+     *
+     * @return the child map
      */
 
     public Map getOverlayMap() {

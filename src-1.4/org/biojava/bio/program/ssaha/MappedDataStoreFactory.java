@@ -11,6 +11,8 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.db.*;
 
+import org.biojava.utils.Constants;
+
 /**
  * <p>
  * Builder for a data store that is backed by a java.nio.MappedByteBuffer.

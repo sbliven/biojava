@@ -25,15 +25,51 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
- * A sequence.
+ * <p>
+ * A biological sequence.
+ * </p>
+ *
+ * <h2>Instantiation</h2>
+ *
+ * <pre>
+ * Sequence myDNA = DNATools.createDNASequence("ATTATTCGTG", "mySeq");
+ * Sequence myFasta = SeqIOTools.readFastaProtein("mySeq.fa");
+ * Sequence myGenbank = SeqIOTools.readGenbank("mySeq.gb");
+ * </pre>
+ *
+ * <h2>Common operations</h2>
+ *
+ * <pre>
+ * System.out.println("Length: " + myGenbank.length());
+ * System.out.println("Features: " + myGenbank.countFeatures());
+ * for(Iterator fi = myGenbank.features(); fi.hasNext(); ) {
+ *   Feature f = (Feature) fi.next();
+ *   System.out.println(f.getType() + "\t" + f.getLocation());
+ * }
+ *
+ * // create a new feature on a sequence
+ * StrandedFeature.Template ft = new StrandedFeature.Template();
+ * ft.type = "span";
+ * ft.location = new RangeLocation(230, 450);
+ * ft.source = "hand_made";
+ * ft.strand = StrandedFeature.NEGATIVE;
+ *
+ * StrandedFeature newSpan = (StrandedFeature) mySeq.createFeature(ft);
+ * </pre>
+ *
+ * <h2>Description</h2>
+ *
  * <p>
  * This interface is a symbol list, so it contains symbols. It is annotatable
  * so that you can add annotation to it, and it is a FeatureHolder so that you
  * can add information about specific regions.
+ * </p>
+ *
  * <p>
  * It is expected that there may be several implementations of this interface,
  * each of which may be fairly heavy-weight. It takes the SymbolList interface
  * that is nice mathematically, and turns it into a biologically useful object.
+ * </p>
  *
  * @author Matthew Pocock
  * @author Thomas Down

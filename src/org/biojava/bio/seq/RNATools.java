@@ -30,6 +30,7 @@ import org.xml.sax.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.seq.io.*;
+import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
 
 /**
@@ -125,6 +126,29 @@ public final class RNATools {
     }
   }
 
+  /**
+   * Return a new RNA <span class="type">Sequence</span> for
+   * <span class="arg">rna</span>.
+   *
+   * @param rna a <span class="type">String</span> to parse into RNA
+   * @param name a <span class="type">String</span> to use as the name
+   * @return a <span class="type">Sequence</span> created form
+   *         <span class="arg">dna</span>
+   * @throws IllegalSymbolException if <span class="arg">rna</span> contains
+   *         any non-DNA characters
+   */
+  public static Sequence createRNASequence(String rna, String name)
+  throws IllegalSymbolException {
+    try {
+      return new SimpleSequenceFactory().createSequence(
+        createRNA(rna),
+        "", name, new SimpleAnnotation()
+      );
+    } catch (BioException se) {
+      throw new BioError(se, "Something has gone badly wrong with RNA");
+    }
+  }
+  
   /**
    * Return an integer index for a symbol - compatible with forIndex.
    * <p>

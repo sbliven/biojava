@@ -27,30 +27,27 @@ import org.biojava.bio.BioException;
 import org.biojava.bio.seq.db.SequenceDBLite;
 
 /**
- * <code>SequenceDBProvider</code> describes a source of sequence
- * databases defined by the OBDA standard.
+ * Interfaces for named resources that can provide sequences via a database
+ * given some configuration information as defined by the OBDA standard.
  *
+ * @author Thomas Down
  * @author Keith James
+ * @author Matthew Pocock
  */
 public interface SequenceDBProvider {
-
     /**
-     * <code>getName</code> returns the name of a provider.
+     * The name of this provider.
      *
-     * @return a <code>String</code>.
+     * @return the provider's name
      */
     public String getName();
-
+    
     /**
-     * <code>getSequenceDB</code> retrieves a reference to a database.
+     * Get a sequence database.
      *
-     * @param config a <code>Map</code> containing configuration.
-     *
-     * @return a <code>SequenceDBLite</code>.
-     *
-     * @exception RegistryException if the registry fails.
-     * @exception BioException if an error occurs.
+     * @param config  a Map containing key-value pairs identifying the db to
+     *                resolve
+     * @return a SequenceDBLite that was resolved
      */
-    public SequenceDBLite getSequenceDB(Map config)
-        throws RegistryException, BioException;
+    public SequenceDBLite getSequenceDB(Map config) throws RegistryException, BioException;
 }

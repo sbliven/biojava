@@ -33,6 +33,37 @@ import org.biojava.utils.*;
 /**
  * A feature within a sequence, or nested within another feature.
  *
+ * <h2>Common operations</h2>
+ *
+ * <pre>
+ * // loop over all features in a sequence
+ * for(Iterator fi = mySeq.features(); fi.hasNext(); ) {
+ *   Feature f = (Feature) fi.next();
+ *   System.out.println(f.getType() + "\t" + f.getLocation());
+ * }
+ *
+ * // loop over all features that are children of this one, such as exons in a
+ * // gene
+ * for(Iterator cfi = feature.features(); cfi.hasNext(); ) {
+ *   ...
+ *
+ * // extract all stranded features that are directly on a sequence
+ * FeatureHolder strandedFeatures = mySeq.filter(
+ *   new FeatureFilter.ByClass(StrandedFeature.class),
+ *   false
+ *  );
+ * for(fi = strandedFeatures.features(); ...
+ *
+ * // find all features with the type property set to "EXON" no matter how
+ * // far down the feature hierachy they are
+ * FeatureHolder repeats = mySeq.filter(
+ *   new FeatureFilter.ByType("EXON"),
+ *   true;
+ * );
+ * </pre>
+ *
+ * <h2>Description</h2>
+ *
  *<p> Features contain annotation and a location. The type of the
  * feature is something like 'Repeat' or 'BetaStrand'. Where the
  * feature has been read from an EMBL or Genbank source the type will

@@ -24,6 +24,7 @@ package org.biojava.bio.seq;
 import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.io.*;
+import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
 import javax.xml.parsers.*;
 
@@ -194,4 +195,27 @@ public class ProteinTools {
 			throw new BioError(se, "Something has gone badly wrong with Protein");
 		}
 	}
+
+  /**
+   * Return a new PROTEIN <span class="type">Sequence</span> for
+   * <span class="arg">protein</span>.
+   *
+   * @param protein a <span class="type">String</span> to parse into PROTEIN
+   * @param name a <span class="type">String</span> to use as the name
+   * @return a <span class="type">Sequence</span> created form
+   *         <span class="arg">protein</span>
+   * @throws IllegalSymbolException if <span class="arg">protein</span> contains
+   *         any non-PROTEIN characters
+   */
+  public static Sequence createDNASequence(String protein, String name)
+  throws IllegalSymbolException {
+    try {
+      return new SimpleSequenceFactory().createSequence(
+        createProtein(protein),
+        "", name, new SimpleAnnotation()
+      );
+    } catch (BioException se) {
+      throw new BioError(se, "Something has gone badly wrong with DNA");
+    }
+  }
 }
