@@ -139,6 +139,9 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 
 	    while (moreSearchesAvailable)
 	    {
+                // This method returns once a single result is
+                // parsed. The parser also informs us of subsequent
+                // results via the setMoreSearches() method.
                 fastaParser.parseSearch(content, this);
 	    }
 
@@ -203,8 +206,8 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	}
 	catch (SAXException se)
 	{
-	    System.err.println("An error occurred while creating an endElement SAX event: "
-			       + se.getMessage());
+	    System.err.println("An error occurred while creating an endElement SAX event: ");
+            se.printStackTrace();
 	}
     }
 
@@ -307,8 +310,8 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	}
 	catch (SAXException se)
 	{
-	    System.err.println("An error occurred while creating SAX events from header data: "
-			       + se.getMessage());
+  	    System.err.println("An error occurred while creating SAX events from header data: ");
+            se.printStackTrace();
 	}
     }
 
@@ -328,8 +331,8 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	    }
 	    catch (SAXException se)
 	    {
-		System.err.println("An error occurred while creating startElement SAX event from hit data: "
-				   + se.getMessage());
+		System.err.println("An error occurred while creating startElement SAX event from hit data: ");
+                se.printStackTrace();
 	    }
 	}
 
@@ -466,6 +469,8 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	    String overlap;
 	    if (hitProperties.containsKey("fa_overlap"))
 		overlap = hitProperties.get("fa_overlap").toString();
+            else if (hitProperties.containsKey("sw_overlap"))
+                overlap = hitProperties.get("sw_overlap").toString();
 	    else
                 throw new SAXException("Unable to retrieve hit overlap from search data");
 
@@ -709,9 +714,8 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	}
 	catch (SAXException se)
 	{
-	    System.err.println("An error occurred while creating SAX events from hit data: "
-			       + se.getMessage());
-		
+  	    System.err.println("An error occurred while creating SAX events from hit data: ");
+            se.printStackTrace();
 	}
     }
 

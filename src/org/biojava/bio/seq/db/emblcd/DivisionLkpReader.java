@@ -33,8 +33,6 @@ import java.io.IOException;
  */
 public class DivisionLkpReader extends EmblCDROMIndexReader
 {
-    private byte []  fNumBytes = new byte [2];
-
     /**
      * Creates a new <code>DivisionLkpReader</code>.
      *
@@ -53,22 +51,8 @@ public class DivisionLkpReader extends EmblCDROMIndexReader
      *
      * @exception IOException if an error occurs.
      */
-    public Object [] readRecord()  throws IOException
+    public Object [] readRecord() throws IOException
     {
-        byte [] divRecord = readRawRecord();
-
-	// The variable part of record is the name. Other parts are
-	// int which sum to 2
-	int nameLen = divRecord.length - 2;
-	byte [] fNameBytes = new byte [nameLen];
-
-        System.arraycopy(divRecord, 0, fNumBytes, 0, 2);
-        System.arraycopy(divRecord, 2, fNameBytes, 0, nameLen);
-
-        sb.delete(0, sb.length());
-        Integer fileNumber = new Integer(parseInt2(fNumBytes));
-        String    fileName = parseString(sb, fNameBytes);
-
-        return new Object [] { fileNumber, fileName };
+        return recParser.parseDivRecord(readRawRecord());
     }
 }

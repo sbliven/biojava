@@ -33,8 +33,6 @@ import java.io.IOException;
 */
 public class AcnumHitReader extends EmblCDROMIndexReader
 {
-    private byte [] recNumBytes = new byte [4];
-
     /**
      * Creates a new <code>AcnumHitReader</code>.
      *
@@ -55,12 +53,6 @@ public class AcnumHitReader extends EmblCDROMIndexReader
      */
     public Object [] readRecord() throws IOException
     {
-        byte [] rnRecord = readRawRecord();
-
-        System.arraycopy(rnRecord, 0, recNumBytes, 0, 4);
-
-        Long rNumber = new Long(parseInt4(recNumBytes));
-
-        return new Object [] { rNumber };
+        return recParser.parseAcnumHitRecord(readRawRecord());
     }
 }

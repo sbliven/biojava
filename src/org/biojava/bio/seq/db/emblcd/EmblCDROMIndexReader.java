@@ -25,11 +25,12 @@ import java.io.InputStream;
 import java.io.IOException;
 
 /**
- * <p><code>EmblCDROMIndexReader</code> reads EMBL CD-ROM format
- * indices from an underlying <code>InputStream</code>. This format is
- * used by the EMBOSS package for database indexing (see programs
- * dbiblast, dbifasta, dbiflat and dbigcg). Indexing produces four
- * binary files with a simple format:</p>
+ * <p><code>EmblCDROMIndexReader</code> is an abstract class whose
+ * concrete subclasses read EMBL CD-ROM format indices from an
+ * underlying <code>InputStream</code>. This format is used by the
+ * EMBOSS package for database indexing (see programs dbiblast,
+ * dbifasta, dbiflat and dbigcg). Indexing produces four binary files
+ * with a simple format:</p>
  * 
  * <ul>
  *   <li>division.lkp : master index</li>
@@ -46,7 +47,7 @@ import java.io.IOException;
  *
  * <p>The EMBL CD-ROM format stores the date in 4 bytes. One byte is
  * unused (the first one), leaving one byte for the day, one for the
- * month and one (!)  for the year.</p>
+ * month and one (!) for the year.</p>
  *
  * <p>For further information see the EMBOSS documentation, or for a
  * full description, the source code of the dbi programs and the Ajax
@@ -57,8 +58,9 @@ import java.io.IOException;
  */
 public abstract class EmblCDROMIndexReader
 {
-    protected InputStream input;
+    protected InputStream  input;
     protected StringBuffer sb;
+    protected RecordParser recParser;
 
     /**
      * <code>headerParsed</code> is a flag indicating that the 300
@@ -75,13 +77,12 @@ public abstract class EmblCDROMIndexReader
     // Record field
     private byte []    record;
 
-    long   fileLength;
-    long  recordCount;
-    int  recordLength;
-
-    String name;
-    String release;
-    String date;
+    private long   fileLength;
+    private long   recordCount;
+    private int    recordLength;
+    private String name;
+    private String release;
+    private String date;
 
     /**
      * Creates a new <code>EmblCDROMIndexReader</code> instance. A
@@ -93,6 +94,7 @@ public abstract class EmblCDROMIndexReader
     {
         this.input = input;
         sb = new StringBuffer(512);
+        recParser = new RecordParser();
     }
 
     /**
@@ -189,7 +191,8 @@ public abstract class EmblCDROMIndexReader
      *
      * @return a <code>String</code>.
      *
-     * @exception IOException if an error occurs.  */
+     * @exception IOException if an error occurs.
+     */
     public String readDBDate() throws IOException
     
     {
@@ -225,99 +228,10 @@ public abstract class EmblCDROMIndexReader
         if (eof == -1)
         {
             input.close();
-            throw new IOException("Failed to read a record; the InputStream was closed because of this.");
+            throw new IOException("Attempted to read beyond EOF; the InputStream was closed because of this.");
         }
 
         return record;
-    }
-
-    /**
-     * <code>parseInt4</code> creates a long from Little-endian. Named
-     * after the EMBOSS Ajax function which wrote the data.
-     *
-     * @param int4 a <code>byte []</code> array.
-     *
-     * @return a <code>long</code>.
-     */
-    long parseInt4(byte [] int4)
-    {
-        int result = 0;
-
-        for (int i = 4; --i >= 0;)
-        {
-            if (int4[i] != 0)
-                result += ((int4[i] & 0xff) << (8 * i));
-        }
-
-        return result;
-    }
-
-    /**
-     * <code>parseInt2</code> creates an int from Little-endian. Named
-     * after the EMBOSS Ajax function which wrote the data.
-     *
-     * @param int2 a <code>byte []</code> array.
-     *
-     * @return an <code>int</code>.
-     */
-    int parseInt2(byte [] int2)
-    {
-        int result = 0;
-
-        for (int i = 2; --i >= 0;)
-        {
-            if (int2[i] != 0)
-                result += ((int2[i] & 0xff) << (8 * i));
-        }
-
-        return result;
-    }
-
-    /**
-     * <code>parseDate</code> parses a String from an array of
-     * bytes. The date is stored in 4 bytes: 0, unused; 1, year; 2,
-     * month; 3, day. With a 1 byte year it's not very much use and
-     * I'm not sure that the EMBOSS programs set the value correctly
-     * anyway.
-     *
-     * @param sb a <code>StringBuffer</code>.
-     * @param dbDate a <code>byte []</code> array.
-     *
-     * @return a <code>String</code>.
-     */
-    String parseDate(StringBuffer sb, byte [] dbDate)
-    {
-        // The first byte is unused
-        for (int i = dbDate.length; --i > 0;)
-        {
-            sb.append(dbDate[i] + ":");
-        }
-
-        // Remove the trailing ':'
-        sb.deleteCharAt(sb.length() - 1);
-        return sb.toString();
-    }
-
-    /**
-     * <code>parseString</code> parses a String from an array of
-     * bytes, skipping the empties.
-     *
-     * @param sb a <code>StringBuffer</code>.
-     * @param characters a <code>byte []</code> array.
-     *
-     * @return a <code>String</code>.
-     */
-    String parseString(StringBuffer sb, byte [] characters)
-    {
-        for (int i = 0; i < characters.length; i++)
-        {
-            if (characters[i] == 0)
-                break;
-
-            sb.append((char) characters[i]);
-        }
-
-        return sb.toString();
     }
 
     /**
@@ -325,7 +239,7 @@ public abstract class EmblCDROMIndexReader
      * byte header (common to all the index types) when first
      * encountered.
      *
-     * @exception IOException if an error occurs
+     * @exception IOException if an error occurs.
      */
     private void parseHeader() throws IOException
     {
@@ -337,7 +251,7 @@ public abstract class EmblCDROMIndexReader
             input.close();
             throw new IOException("Failed to read full header; the InputStream was closed because of this.");
         }
-        fileLength = parseInt4(int4);
+        fileLength = recParser.parseInt4(int4);
 
         eof = input.read(int4);
         if (eof == -1)
@@ -345,7 +259,7 @@ public abstract class EmblCDROMIndexReader
             input.close();
             throw new IOException("Failed to read full header; the InputStream was closed because of this.");
         }
-        recordCount = parseInt4(int4);
+        recordCount = recParser.parseInt4(int4);
 
         eof = input.read(int2);
         if (eof == -1)
@@ -353,7 +267,7 @@ public abstract class EmblCDROMIndexReader
             input.close();
             throw new IOException("Failed to read full header; the InputStream was closed because of this.");
         }
-        recordLength = parseInt2(int2);
+        recordLength = recParser.parseInt2(int2);
 
         // Set up array for reading records now that we know their
         // length
@@ -366,7 +280,7 @@ public abstract class EmblCDROMIndexReader
             throw new IOException("Failed to read full header; the InputStream was closed because of this.");
         }
         sb.setLength(0);
-        name = parseString(sb, dbName);
+        name = recParser.parseString(sb, dbName);
 
         eof = input.read(dbRelease);
         if (eof == -1)
@@ -375,7 +289,7 @@ public abstract class EmblCDROMIndexReader
             throw new IOException("Failed to read full header; the InputStream was closed because of this.");
         }
         sb.setLength(0);
-        release = parseString(sb, dbRelease);
+        release = recParser.parseString(sb, dbRelease);
 
         eof = input.read(dbDate);
         if (eof == -1)
@@ -384,7 +298,7 @@ public abstract class EmblCDROMIndexReader
             throw new IOException("Failed to read full header; the InputStream was closed because of this.");
         }
         sb.setLength(0);
-        date = parseDate(sb, dbDate);
+        date = recParser.parseDate(sb, dbDate);
 
         // Skip the remainder of the header (padding)
         input.skip(256);

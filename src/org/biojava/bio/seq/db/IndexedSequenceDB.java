@@ -40,7 +40,7 @@ import org.biojava.bio.seq.io.*;
  * such as calculating the sequence file offsets, and parsing
  * individual sequences based upon file offsets. The actual persistant
  * storage of all this information is delegated to an instance of
- * IndexStore. 
+ * IndexStore.
  *
  * <P> Note: We may be able to improve the indexing speed further by
  * discarding all feature creation & annotation requests during index
@@ -116,7 +116,7 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
     public void addFile(File seqFile)
 	throws IllegalIDException, BioException, ChangeVetoException 
     {
-      boolean completed = false; // initialy assume that we will fail
+      boolean completed = false; // initially assume that we will fail
       try {
         seqFile = seqFile.getAbsoluteFile();
         CountedBufferedReader bReader = new CountedBufferedReader(new FileReader(seqFile));

@@ -33,10 +33,6 @@ import java.io.IOException;
  */
 public class EntryNamIdxReader extends EmblCDROMIndexReader
 {
-    private byte [] rPosBytes = new byte [4];
-    private byte [] sPosBytes = new byte [4];
-    private byte [] fNumBytes = new byte [2];
-
     /**
      * Creates a new <code>EntryNamIdxReader</code>.
      *
@@ -57,24 +53,6 @@ public class EntryNamIdxReader extends EmblCDROMIndexReader
      */
     public Object [] readRecord() throws IOException
     {
-        byte [] enRecord = readRawRecord();
-
-	// The variable part of record is the id. Other parts are
-	// long, long, int which sum to 10
-	int idLen = enRecord.length - 10;
-	byte [] idBytes =  new byte [idLen];
-
-        System.arraycopy(enRecord, 0,           idBytes, 0, idLen);
-        System.arraycopy(enRecord, idLen,     rPosBytes, 0, 4);
-        System.arraycopy(enRecord, idLen + 4, sPosBytes, 0, 4);
-        System.arraycopy(enRecord, idLen + 8, fNumBytes, 0, 2);
-
-        sb.delete(0, sb.length());
-        String       seqID = parseString(sb, idBytes);
-        Long     rPosition = new Long(parseInt4(rPosBytes));
-        Long     sPosition = new Long(parseInt4(sPosBytes));
-        Integer fileNumber = new Integer(parseInt2(fNumBytes));
-
-        return new Object [] { seqID, rPosition, sPosition, fileNumber };
+        return recParser.parseEntryNamRecord(readRawRecord());
     }
 }

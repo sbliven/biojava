@@ -31,11 +31,15 @@ import org.biojava.bio.BioException;
 import org.biojava.utils.ParserException;
 
 /**
- * <code>FastaSearchParser</code> objects provide Fasta search parsing
- * functionality for the '-m 10' output format (see the Fasta
+ * <p><code>FastaSearchParser</code> objects provide Fasta search
+ * parsing functionality for the '-m 10' output format (see the Fasta
  * documentation). Data are passed to a SearchContentHandler which
  * coordinates its interpretation and creation of objects representing
- * the result.
+ * the result.</p>
+ *
+ * <p>If the search output contains no hits only the header data will
+ * be sent to the handler before the dataset ends. The handler is
+ * responsible for dealing with this state.</p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.1
@@ -94,15 +98,13 @@ public class FastaSearchParser implements SearchParser
 
     /**
      * The <code>parseSearch</code> method performs the core parsing
-     * operations.
+     * operations. It parses one result from the stream before
+     * returning. The handler is informed whether or not there are
+     * further searches in the stream.
      *
      * @param reader a <code>BufferedReader</code> to read from.
      * @param handler a <code>SearchContentHandler</code> to notify
      * of events.
-     *
-     * @return a <code>boolean</code> value, true if a further search
-     * result remains to be parsed, false if no further results were
-     * detected.
      *
      * @exception IOException if the BufferedReader fails.
      * @exception BioException if the parser (via the registered
@@ -152,7 +154,8 @@ public class FastaSearchParser implements SearchParser
 		searchParsed = true;
                 handler.setMoreSearches(true);
 
-		continue LINE;
+		// We have parsed one result, so return
+                return;
 	    }
 
 	STATUS:
@@ -180,7 +183,9 @@ public class FastaSearchParser implements SearchParser
 			{
 			    searchParsed = false;
                             handler.setMoreSearches(true);
-			    break LINE;
+
+			    // We have parsed one result, so return
+                            return;
 			}
 			break STATUS;
 		    }
@@ -334,7 +339,7 @@ public class FastaSearchParser implements SearchParser
 	    } // end switch
 	} // end while
 
-	// This is false if we reach here
+	// This is false if we reach here and return
         handler.setMoreSearches(false);
     }
 

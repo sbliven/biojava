@@ -103,8 +103,6 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         searchParameters    = new HashMap();
         hitData             = new HashMap();
         subHitData          = new HashMap();
-        hits                = new ArrayList();
-        subHits             = new ArrayList();
         alphaResolver       = new AlphabetResolver();
         tokenBuffer         = new StringBuffer(1024);
     }
@@ -181,7 +179,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
 
     public void startSearch()
     {
-        hits.clear();
+        hits = new ArrayList();
     }
 
     public void endSearch()
@@ -209,7 +207,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
     public void startHit()
     {
         hitData.clear();
-        subHits.clear();
+        subHits = new ArrayList();
     }
 
     public void endHit()
@@ -374,7 +372,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
 
         tokenBuffer.setLength(0);
         tokenBuffer.append((String) subHitData.get("HitSequence"));
-        labelMap.put(subHitData.get("HitId"), 
+        labelMap.put(hitData.get("HitId"), 
                      tokenParser.parse(tokenBuffer.toString()));
 
         return new SequenceDBSearchSubHit(sc, ev, pv,
