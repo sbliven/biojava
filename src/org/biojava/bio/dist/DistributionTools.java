@@ -508,12 +508,27 @@ public final class DistributionTools {
    * seed sequence is generated allowed to 'burn in' for 1000 iterations and used
    * to produce a sequence over the conditioned alphabet.
    * @param length the number of symbols in the sequence.
-   * @return a SimpleSequence with name and urn = to name and an Empty Annotation.
+   * @return a Sequence with name and urn = to name and an Empty Annotation.
    */
   public static final Sequence generateSequence(String name, Distribution d, int length){
-    if(d instanceof OrderNDistribution){
-      return generateOrderNSequence(name, (OrderNDistribution)d, length);
-    }
+    SymbolList sl = generateSymbolList(d, length);
+    SequenceFactory fact = new SimpleSequenceFactory();
+    return fact.createSequence(sl, name, name, Annotation.EMPTY_ANNOTATION);
+    //return new SimpleSequence(sl,name,name,Annotation.EMPTY_ANNOTATION);
+  }
+
+/**
+ * Produces a <code>SymbolList</code> by randomly sampling a Distribution.
+ *
+ * @param d the distribution to sample. If this distribution is of order N a
+ * seed sequence is generated allowed to 'burn in' for 1000 iterations and used
+ * to produce a sequence over the conditioned alphabet.
+ * @param length the number of symbols in the sequence.
+ * @return a SymbolList or length <code>length</code>
+ */
+  public static final SymbolList generateSymbolList(Distribution d, int length){
+    if(d instanceof OrderNDistribution)
+      return generateOrderNSymbolList((OrderNDistribution)d, length);
 
     SymbolList sl = null;
 
@@ -540,22 +555,11 @@ public final class DistributionTools {
       //shouldn't happen but...
       throw new BioError("Distribution emitting Symbols not from its Alphabet?");
     }
-    SequenceFactory fact = new SimpleSequenceFactory();
-    return fact.createSequence(sl, name, name, Annotation.EMPTY_ANNOTATION);
-    //return new SimpleSequence(sl,name,name,Annotation.EMPTY_ANNOTATION);
+
+    return sl;
   }
 
-  /**
-   * Generate a sequence by sampling a distribution.
-   *
-   * Should this be private?
-   *
-   * @param name    the name of the sequence
-   * @param d       the distribution to sample
-   * @param length  the length of the sequence
-   * @return        a new sequence with the required composition
-   */
-  protected static final Sequence generateOrderNSequence(String name, OrderNDistribution d, int length){
+  private static final SymbolList generateOrderNSymbolList(OrderNDistribution d, int length){
     SymbolList sl = null;
     List l = new ArrayList(length);
 
@@ -607,7 +611,23 @@ public final class DistributionTools {
       throw new BioError("Distribution emitting Symbols not from its Alphabet?",ex);
     }
 
+    return sl;
+  }
+
+  /**
+   * Generate a sequence by sampling a distribution.
+   *
+   * @deprecated use generateSequence() or generateSymbolList() instead.
+   * @param name    the name of the sequence
+   * @param d       the distribution to sample
+   * @param length  the length of the sequence
+   * @return        a new sequence with the required composition
+   */
+  protected static final Sequence generateOrderNSequence(String name, OrderNDistribution d, int length){
+
+    SymbolList sl = generateOrderNSymbolList(d, length);
     SequenceFactory fact = new SimpleSequenceFactory();
+
     return fact.createSequence(sl, name, name, Annotation.EMPTY_ANNOTATION);
     //return new SimpleSequence(sl, name, name, Annotation.EMPTY_ANNOTATION);
   }
