@@ -26,7 +26,7 @@ public class SymbolListAdapter implements SymbolList {
     } else if(type == SeqType.RNA) {
       alpha = am.alphabetForName("RNA");
     } else if(type == SeqType.PROTEIN) {
-      alpha = ProteinTools.getXAlphabet();
+      alpha = ProteinTools.getAlphabet();
     } else {
       throw new IllegalAlphabetException("Could not find alphabet for " + type);
     }
