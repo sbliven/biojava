@@ -181,7 +181,13 @@ public class CompactedDataStore implements DataStore {
 		} else if (pos > endOffset) {
 		    minBound = mid + 1;
 		} else {
-		    throw new Error("Ooops");
+		    throw new Error("Ooops: could not locate seq name for " +
+                                    "\tpos: " + pos +
+                                    "\tmid: " + mid +
+                                    "\toffset: " + offset +
+                                    "\tendOffset: " + endOffset +
+                                    "\tminBound: " + minBound +
+                                    "\tmaxBound: " + maxBound);
 		}
 	    }
 	}
