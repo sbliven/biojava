@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.HashSet;
 
-import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
@@ -32,7 +32,7 @@ public class Search
          * @param start start coordinate of match.
          * @param end end of match plus one.
          */
-        public void reportMatch(Sequence seq, Pattern pattern, int start, int end);
+        public void reportMatch(SymbolList seq, Pattern pattern, int start, int end);
     }
 
     private class PatternInfo
@@ -100,7 +100,17 @@ public class Search
     /**
      * search the Sequence with the patterns already registered with this object.
      */
-    public void search(Sequence seq)
+    public void search(SymbolList seq)
+    {
+        search(seq, 1, seq.length());
+    }
+
+    /**
+     * search part of the SymbolList with the patterns already registered with this object.
+     * @param loLimit low limit of search range.
+     * @param hiLimit high limit of search range.
+     */
+    public void search(SymbolList seq, int loLimit, int hiLimit)
     {
         for (Iterator patternsI = patterns.iterator(); patternsI.hasNext(); ) {
             PatternInfo info = (PatternInfo) patternsI.next();
@@ -112,16 +122,18 @@ public class Search
             }
 
             // now exhaustively search the sequence
-            int begin = 1;
+            int begin = loLimit;
             while (info.matcher.find(begin)) {
                 // got a hit
                 int start = info.matcher.start();
                 int end = info.matcher.end();
+                if ((listener != null) && (start <= hiLimit)) listener.reportMatch(seq, info.pattern, start, end);
+                // compute where next search begins
                 if (info.overlap)
-                    begin = Math.min(start + 1, seq.length());
+                    begin = start + 1;
                 else
-                    begin = Math.min(end, seq.length());
-                if (listener != null) listener.reportMatch(seq, info.pattern, start, end);
+                    begin = end;
+                if (begin >= hiLimit) break;
             }
         }
     }
