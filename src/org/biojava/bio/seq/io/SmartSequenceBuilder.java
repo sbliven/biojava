@@ -38,59 +38,68 @@ import org.biojava.utils.StaticMemberPlaceHolder;
 /**
  * Basic SequenceBuilder implementation which accumulates all
  * notified information and chooses a sequence implementation
- * suited to the size of the sequence.
+ * suited to the size of the sequence. This may or may not bit-encode
+ * the symbols (using PackedSymbolList), and may or may not store the
+ * symbols in multiple fixed-length chunks (using ChunkedSymbolList).
  *
+ * @author David Huen
+ * @author Matthew Pocock
  */
 
 public class SmartSequenceBuilder extends SequenceBuilderBase {
-    public final static SequenceBuilderFactory FACTORY = new SSBFactory();
+  public final static SequenceBuilderFactory FACTORY = new SSBFactory(-1);
+  public final static SequenceBuilderFactory BIT_PACKED = new SSBFactory(0);
 
-    private static class SSBFactory implements SequenceBuilderFactory, Serializable {
-	private SSBFactory() {
-	}
+  private static class SSBFactory implements SequenceBuilderFactory, Serializable {
+    private final int threshold;
 
-	public SequenceBuilder makeSequenceBuilder() {
-	    return new SmartSequenceBuilder();
-	}
-
-	private Object writeReplace() throws ObjectStreamException {
-	    try {
-		return new StaticMemberPlaceHolder(SimpleSequenceBuilder.class.getField("FACTORY"));
-	    } catch (NoSuchFieldException nsfe) {
-		throw new NotSerializableException(nsfe.getMessage());
-	    }
-	}
+    private SSBFactory(int threshold) {
+      this.threshold = threshold;
     }
 
-    private ChunkedSymbolListFactory slFactory;
-
-    {
-	slFactory = new ChunkedSymbolListFactory(new PackedSymbolListFactory(), -1);
+    public SequenceBuilder makeSequenceBuilder() {
+      return new SmartSequenceBuilder(threshold);
     }
 
-    //
-    // SeqIOListener
-    //
+    private Object writeReplace() throws ObjectStreamException {
+      try {
+        return new StaticMemberPlaceHolder(SimpleSequenceBuilder.class.getField("FACTORY"));
+      } catch (NoSuchFieldException nsfe) {
+        throw new NotSerializableException(nsfe.getMessage());
+      }
+    }
+  }
 
-    public void addSymbols(Alphabet alpha, Symbol[] syms, int pos, int len)
-        throws IllegalAlphabetException
-    {
-	slFactory.addSymbols(alpha, syms, pos, len);
+  private ChunkedSymbolListFactory slFactory;
+
+  private SmartSequenceBuilder(int threshold) {
+    slFactory = new ChunkedSymbolListFactory(
+            new PackedSymbolListFactory(), threshold);
+  }
+
+  //
+  // SeqIOListener
+  //
+
+  public void addSymbols(Alphabet alpha, Symbol[] syms, int pos, int len)
+          throws IllegalAlphabetException
+  {
+    slFactory.addSymbols(alpha, syms, pos, len);
+  }
+
+
+  public Sequence makeSequence()
+          throws BioException
+  {
+    SymbolList symbols;
+    try {
+      symbols = slFactory.makeSymbolList();
+      seq = new SimpleSequence(symbols, uri, name, annotation);
+    }
+    catch (IllegalAlphabetException iae) {
+      // this shouldn't happen!!!
     }
 
-
-    public Sequence makeSequence() 
-        throws BioException
-    {
-        SymbolList symbols;
-        try {
-	    symbols = slFactory.makeSymbolList();
-            seq = new SimpleSequence(symbols, uri, name, annotation);
-        }
-        catch (IllegalAlphabetException iae) {
-            // this shouldn't happen!!!
-        }
-
-        return super.makeSequence();
-    }
+    return super.makeSequence();
+  }
 }

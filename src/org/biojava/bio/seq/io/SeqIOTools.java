@@ -187,10 +187,49 @@ public final class SeqIOTools  {
      */
     public static SequenceBuilderFactory getFastaBuilderFactory() {
         if (_fastaBuilderFactory == null) {
-            _fastaBuilderFactory =
-                new FastaDescriptionLineParser.Factory(SmartSequenceBuilder.FACTORY);
+            _fastaBuilderFactory = new FastaDescriptionLineParser.Factory(
+                        SmartSequenceBuilder.FACTORY);
         }
         return _fastaBuilderFactory;
+    }
+
+    /**
+     * Read a fasta file.
+     *
+     * @param br    the BufferedReader to read data from
+     * @param sTok  a SymbolTokenization that understands the sequences
+     * @return      a SequenceIterator over each sequence in the fasta file
+     */
+    public static SequenceIterator readFasta(
+            BufferedReader br, SymbolTokenization sTok)
+    {
+      return new StreamReader(br,
+                              new FastaFormat(),
+                              sTok,
+                              getFastaBuilderFactory());
+    }
+
+    /**
+     * Read a fasta file using a custom type of SymbolList. For example,
+     * use SmartSequenceBuilder.FACTORY to emulate readFasta(BufferedReader,
+     * SymbolTokenization) and SmartSequenceBuilder.BIT_PACKED to force all
+     * symbols to be encoded using bit-packing.
+     *
+     * @param br          the BufferedReader to read data from
+     * @param sTok        a SymbolTokenization that understands the sequences
+     * @param seqFactory  a factory used to build a SymbolList
+     * @return
+     */
+    public static SequenceIterator readFasta(
+            BufferedReader br,
+            SymbolTokenization sTok,
+            SequenceBuilderFactory seqFactory)
+    {
+      return new StreamReader(
+              br,
+              new FastaFormat(),
+              sTok,
+              new FastaDescriptionLineParser.Factory(seqFactory));
     }
 
     /**
