@@ -21,6 +21,7 @@
 
 package org.biojava.bio.seq;
 
+import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.genomic.*;
 import junit.framework.TestCase;
@@ -417,8 +418,53 @@ public class FilterUtilsTest extends TestCase
       optimizeExact(FilterUtils.and(all_or_all, FilterUtils.all()), FilterUtils.all());
     }
     
+    public void testUseCases() {
+      // schemas for our database features
+      FeatureFilter transcript = FilterUtils.byType("transcript");
+      FeatureFilter exon = FilterUtils.byType("exon");
+      FeatureFilter repeat = FilterUtils.byType("repeat");
+      
+      AnnotationType.Impl tsType = new AnnotationType.Impl();
+      tsType.setConstraints("transcript.id", new PropertyConstraint.ByClass(String.class), CardinalityConstraint.ONE);
+      tsType.setDefaultConstraints(PropertyConstraint.NONE, CardinalityConstraint.NONE);
+      FeatureFilter tsID = FilterUtils.byAnnotationType(tsType);
+      
+      AnnotationType.Impl exType = new AnnotationType.Impl();
+      exType.setConstraints("id", new PropertyConstraint.ByClass(String.class), CardinalityConstraint.ONE);
+      exType.setDefaultConstraints(PropertyConstraint.NONE, CardinalityConstraint.NONE);
+      FeatureFilter exID = FilterUtils.byAnnotationType(exType);
+      
+      AnnotationType.Impl rpType = new AnnotationType.Impl();
+      rpType.setConstraints("id", PropertyConstraint.ANY, CardinalityConstraint.ONE);
+      rpType.setDefaultConstraints(PropertyConstraint.NONE, CardinalityConstraint.NONE);
+      FeatureFilter repeatID = FilterUtils.hasAnnotation(rpType);
+      
+      FeatureFilter tsSchema = FilterUtils.and(transcript, tsID);
+      FeatureFilter exSchema = FilterUtils.and(exon, exID);
+      FeatureFilter reSchema = FilterUtils.and(repeat, repeatID);
+      
+      FeatureFilter dbFilter = FilterUtils.or(tsSchema, FilterUtils.or(exSchema, reSchema));
+      
+      // pull out a feature by transcript.id
+      FeatureFilter aTranscript = FilterUtils.byAnnotation("transcript.id", "ts:42");
+      
+      // pull out a feature by id
+      FeatureFilter hasID = FilterUtils.hasAnnotation("id");
+
+      
+      // let the fun commence
+      optimizeEquals(FilterUtils.and(tsSchema, aTranscript), FilterUtils.and(transcript, aTranscript));
+      optimizeExact(FilterUtils.and(exSchema, aTranscript), aTranscript);
+      optimizeEquals(FilterUtils.and(dbFilter, aTranscript), FilterUtils.and(transcript, aTranscript));
+    }
+    
     private void optimizeExact(FeatureFilter raw, FeatureFilter target) {
       FeatureFilter result = FilterUtils.optimize(raw);
       assertTrue("optimize: " + raw + " should be " + target + " but is " + result, result == target);
+    }
+    
+    private void optimizeEquals(FeatureFilter raw, FeatureFilter target) {
+      FeatureFilter result = FilterUtils.optimize(raw);
+      assertTrue("optimize: " + raw + " should be " + target + " but is " + result, result.equals(target));
     }
 }

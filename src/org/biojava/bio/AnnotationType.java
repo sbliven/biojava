@@ -261,6 +261,9 @@ public interface AnnotationType {
     public class Impl extends AnnotationType.Abstract {
         private Map cons;
         private Map cards;
+        
+        private PropertyConstraint unknownPC;
+        private Location unknownCC;
 
         /**
          * Create a new Impl with no constraints.
@@ -268,12 +271,27 @@ public interface AnnotationType {
         public Impl() {
             cons = new SmallMap();
             cards = new SmallMap();
+            unknownPC = PropertyConstraint.ANY;
+            unknownCC = CardinalityConstraint.ANY;
+        }
+        
+        public void setDefaultConstraints(PropertyConstraint pc, Location cc) {
+          unknownPC = pc;
+          unknownCC = cc;
+        }
+        
+        public PropertyConstraint getDefaultPropertyConstraint() {
+          return unknownPC;
+        }
+        
+        public Location getDefaultCardinalityConstraint() {
+          return unknownCC;
         }
 
         public PropertyConstraint getPropertyConstraint(Object key) {
             PropertyConstraint pc = (PropertyConstraint) cons.get(key);
             if (pc == null) {
-                pc = PropertyConstraint.ANY;
+                pc = unknownPC;
             }
             return pc;
         }
@@ -281,7 +299,7 @@ public interface AnnotationType {
         public Location getCardinalityConstraint(Object key) {
             Location card = (Location) cards.get(key);
             if (card == null) {
-                card = CardinalityConstraint.ANY;
+                card = unknownCC;
             }
             return card;
         }

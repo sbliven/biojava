@@ -451,6 +451,8 @@ public interface FeatureFilter extends Serializable {
           ((And) o).getChild2().equals(this.getChild1())
         ));
     }
+    
+    
 
     public int hashCode() {
       return getChild1().hashCode() ^ getChild2().hashCode();
@@ -650,6 +652,10 @@ public interface FeatureFilter extends Serializable {
       }
       
       return false;
+    }
+    
+    public String toString() {
+      return "Annotation Type: " + type;
     }
   }
 
