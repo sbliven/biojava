@@ -87,59 +87,55 @@ public class GenbankFormat
 				SeqIOListener listener)
 	throws IllegalSymbolException, IOException, ParseException
     {
-	GenbankContext ctx = new GenbankContext(symParser, listener);
-    ctx.addParseErrorListener(this);
-	String line;
-	boolean hasAnotherSequence    = true;
-	boolean hasInternalWhitespace = false;
+        GenbankContext ctx = new GenbankContext(symParser, listener);
+        ctx.addParseErrorListener(this);
+        String line;
+        boolean hasAnotherSequence    = true;
+        boolean hasInternalWhitespace = false;
 
-	listener.startSequence();
+        listener.startSequence();
 
-	while ((line = reader.readLine()) != null)
-	{
-  	    if (line.startsWith(END_SEQUENCE_TAG))
-  	    {
-		// To close the StreamParser encapsulated in the
-		// GenbankContext object
-		ctx.processLine(line);
+        while ((line = reader.readLine()) != null)
+        {
+            if (line.startsWith(END_SEQUENCE_TAG))
+            {
+                // To close the StreamParser encapsulated in the
+                // GenbankContext object
+                ctx.processLine(line);
 
-		// Allows us to tolerate trailing whitespace without
-		// thinking that there is another Sequence to follow
-		char [] cbuf = new char [1];
+                // Allows us to tolerate trailing whitespace without
+                // thinking that there is another Sequence to follow
+                while (true)
+                {
+                    reader.mark(1);
+                    int c = reader.read();
 
-		while (true)
-		{
-		    reader.mark(1);
+                    if (c == -1)
+                    {
+                        hasAnotherSequence = false;
+                        break;
+                    }
 
-		    if (reader.read() == -1)
-		    {
-			hasAnotherSequence = false;
-			break;
-		    }
+                    if (Character.isWhitespace((char) c))
+                    {
+                        hasInternalWhitespace = true;
+                        continue;
+                    }
 
-		    reader.read(cbuf, 0, 1);
+                    if (hasInternalWhitespace)
+                        System.err.println("Warning: whitespace found between sequence entries");
 
-		    if (Character.isWhitespace(cbuf[0]))
-		    {
-			hasInternalWhitespace = true;
-			continue;
-		    }
-		    else
-		    {
-			if (hasInternalWhitespace)
-			    System.err.println("Warning: whitespace found between sequence entries");
-			reader.reset();
-			break;
-		    }
-		}
+                    reader.reset();
+                    break;
+                }
 
-		listener.endSequence();
-		return hasAnotherSequence;
-	    }
-	    ctx.processLine(line);
-	}
+                listener.endSequence();
+                return hasAnotherSequence;
+            }
+            ctx.processLine(line);
+        }
 
-	throw new IOException("Premature end of stream for GENBANK");
+        throw new IOException("Premature end of stream for GENBANK");
     }
 
     public void	writeSequence(Sequence seq, PrintStream os)
