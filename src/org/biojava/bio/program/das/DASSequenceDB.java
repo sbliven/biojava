@@ -48,6 +48,7 @@ import org.w3c.dom.*;
  */
 
 public class DASSequenceDB implements SequenceDB {
+    private static final int MAX_CAPACITY = 3000;
     private URL dataSourceURL;
     private Map sequences;
     private Cache symbolsCache;
@@ -65,7 +66,14 @@ public class DASSequenceDB implements SequenceDB {
 	return symbolsCache;
     }
 
-    void ensureFeaturesCacheCapacity(int min) {
+    /**
+     * @throws BioException if the capacity can't be reached.
+     */
+    void ensureFeaturesCacheCapacity(int min) throws BioException {
+      if(min > MAX_CAPACITY) {
+        throw new BioException( "Capacity of (" + MAX_CAPACITY +
+                                " exceeded by " + min);
+      }
 	if (featuresCache.getLimit() < min) {
 	    System.err.println("Setting cache limit up to " + min);
 	    featuresCache.setLimit(min);

@@ -495,12 +495,14 @@ public final class AlphabetManager {
           cpa =  new InfiniteCrossProductAlphabet(aList);
           break;
         }
-        //size *= ((FiniteAlphabet) aa).size();
-        // The above calculation produced spurious results for alignments of any appreciable size, resulting in integer overflow
-        // and negative values for the size.  Because of this, the SimpleCrossProductAlphabet might be called at innappropriate
-        // times.  It appears that using SparseCrossProductAlphabet below may work for more alignments.
-        // -Richard J. Fox 05/17/2001
-        size = 1000;
+        size *= ((FiniteAlphabet) aa).size();
+        // Richard J. Fox found an overflow error here. I think we can just stop
+        // incrementing size at our decision value and everything wil work
+        // except in the special case where we are working with individual
+        // finite alphabets with > 2^32 elements
+        if(size >= 1000) {
+          break;
+        }
       }
       if(cpa == null) {
         try {
