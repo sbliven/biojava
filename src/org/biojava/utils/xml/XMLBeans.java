@@ -44,7 +44,7 @@ public class XMLBeans {
     public Object instantiateBean(Element bel) 
         throws AppException
     {
-	return instantiateBean(bel, ClassLoader.getSystemClassLoader(), Collections.EMPTY_MAP);
+	return instantiateBean(bel, ClassLoader.getSystemClassLoader(), new HashMap());
     }
 
     public Object instantiateBean(Element bel, ClassLoader cloader, Map beanRefs) 
