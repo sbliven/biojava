@@ -5,9 +5,16 @@ import org.biojava.bio.seq.FeatureHolder;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 
 /**
  * Renders a sequence as a circle using a CircularRenderer.
+ *
+ * <p>
+ * This component will first transform the graphic coordinates so that 0,0 is at
+ * the centre of the circle. The size of the circle is estimated from the radius
+ * property and the depth of the renderer.
+ * </p>
  *
  * @author Matthew Pocock
  * @since 1.4
@@ -61,7 +68,10 @@ extends JComponent {
     super.paintComponent(g);
     if(!isActive()) return;
 
+    double depth = renderer.getDepth(ctxt);
+
     Graphics2D g2 = (Graphics2D) g;
+    g2.translate((depth + radius), (depth + radius));
 
     renderer.paint(g2, ctxt);
   }
@@ -77,11 +87,11 @@ extends JComponent {
     }
 
     public double getAngle(int indx) {
-      return ((double) indx) * 2.0 * Math.PI / ((double) symList.length());
+      return ((double) indx) * 2.0 * Math.PI / ((double) symList.length()) + offset;
     }
 
     public int getIndex(double angle) {
-      return (int) (angle * ((double) symList.length()) / (2.0 * Math.PI));
+      return (int) ( (angle - offset) * ((double) symList.length()) / (2.0 * Math.PI));
     }
 
     public double getRadius() {

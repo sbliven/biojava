@@ -35,4 +35,13 @@ public final class GUITools {
 
     return new RangeLocation(min, max);
   }
+
+  public static Rectangle2D createBounds(CircularRendererContext crc,
+                                         CircularRenderer cr)
+  {
+    // do we need some extra data in crc to deal with origins not at 0?
+    double outer = crc.getRadius() + cr.getDepth(crc);
+
+    return new Rectangle2D.Double(-outer, -outer, 2.0 * outer, 2.0 * outer);
+  }
 }
