@@ -24,6 +24,7 @@ import  java.util.*;
  * Copyright:    Copyright (c) 2000
  * Company:
  * @version 1.0
+ * @author Guoneng Zhong <travelgz@yahoo.com>
  */
 public class MSFAlignmentFormat
         implements AlignmentFormat {
@@ -137,27 +138,21 @@ public class MSFAlignmentFormat
             StringBuffer testString = new StringBuffer();
             int agct = 0;
             for (currSeqCount = 0; currSeqCount < sequenceNames.size(); currSeqCount++) {
-                testString.append(sequenceData[currSeqCount]);
+                String seqLine = sequenceData[currSeqCount];
+                RE removeDots = new RE("(\\.|\\-|\\*)");
+                seqLine = removeDots.subst(seqLine,"",RE.REPLACE_ALL);
+                testString.append(seqLine.toUpperCase());
             }
-            StringTokenizer st = null;
-            st = new StringTokenizer(testString.toString().toLowerCase(), "a");
-            agct += st.countTokens();
-            st = new StringTokenizer(testString.toString().toLowerCase(), "g");
-            agct += st.countTokens();
-            st = new StringTokenizer(testString.toString().toLowerCase(), "c");
-            agct += st.countTokens();
-            st = new StringTokenizer(testString.toString().toLowerCase(), "t");
-            agct += st.countTokens();
-            st = new StringTokenizer(testString.toString().toLowerCase(), "u");
-            agct += st.countTokens();
+            agct += count(testString,new char[]{'A','C','T','U','G'});
             //now parse through them and create gapped symbol lists
             HashMap sequenceDataMap = new HashMap();
             Symbol sym = null;
             FiniteAlphabet alph = null;
-            if ((agct/testString.length()) > 0.90) {            //if DNA alph
-                if (st.countTokens() > 0) {                     //rna alph
+            double ratio = ((double)agct)/((double)testString.length());
+            if (ratio > 0.90) {            //if DNA alph
+                if (count(testString,'U') > count(testString,'C')) {                     //rna alph
                     //get the rna alph
-                    alph = DNATools.getDNA();
+                    alph = RNATools.getRNA();
                 }
                 else {          //get DNA alph
                     alph = DNATools.getDNA();
@@ -184,6 +179,40 @@ public class MSFAlignmentFormat
         }
         return  (null);
     }           //end read it
+
+    /**
+     * @author guoneng <travelgz@yahoo.com>
+     * returns the number of times given character appears
+     * @param line the line whose characters you are comparing against
+     * @param ch character used for the search
+     * @return int number of times ch appears
+     */
+    private static int count(StringBuffer line,char ch){
+        return count(line,new char[]{ch});
+    }
+
+    /**
+     * @author guoneng <travelgz@yahoo.com>
+     * returns the number of times the given set of characters appear in the line
+     * @param line the line whose characters you are comparing against
+     * @param ch array of characters used for the search
+     * @return int number of times ch appears
+     */
+    private static int count(StringBuffer line,char[] ch){
+        if(ch.length==0) return 0;
+
+        int count = 0;
+        for(int i=0;i<line.length();i++){
+            // is the character at i in the given char array?
+            for(int j=0;j<ch.length;j++){
+                if(line.charAt(i)==ch[j]){
+                    count++;
+                    break;
+                }
+            }
+        }
+        return count;
+    }
 }               //end class
 
 
