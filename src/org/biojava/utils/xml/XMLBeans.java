@@ -38,10 +38,16 @@ public class XMLBeans {
 	INSTANCE = new XMLBeans();
     }
 
-    private XMLBeans() {
+    protected XMLBeans() {
     }
 
     public Object instantiateBean(Element bel) 
+        throws AppException
+    {
+	return instantiateBean(bel, ClassLoader.getSystemClassLoader(), Collections.EMPTY_MAP);
+    }
+
+    public Object instantiateBean(Element bel, ClassLoader cloader, Map beanRefs) 
         throws AppException
     {
 	String cl = bel.getAttribute("jclass");
@@ -51,9 +57,9 @@ public class XMLBeans {
 	Object bean = null;
 
 	try {
-	    Class clazz = Class.forName(cl);
+	    Class clazz = cloader.loadClass(cl);
 	    bean = clazz.newInstance();
-	    configureBean(bean, bel);
+	    configureBean(bean, bel, beanRefs);
 	    if (bean instanceof Initializable)
 		((Initializable) bean).init();   // FIXME
 	} catch (ClassNotFoundException ex) {
@@ -69,7 +75,7 @@ public class XMLBeans {
 	return bean;
     }
 
-    private void configureBean(Object bean, Element el) 
+    private void configureBean(Object bean, Element el, Map refs) 
         throws AppException
     {
 	Class clazz = bean.getClass();
@@ -85,7 +91,13 @@ public class XMLBeans {
 		    setProp(clazz, bean, name, value, value.getClass());
 		} else if (tag.equals("bean")) {
 		    String name = echild.getAttribute("name");
-		    Object targ = instantiateBean(echild);
+		    String ref = echild.getAttribute("ref");
+		    Object targ = null;
+		    if (ref != null) {
+			targ = refs.get(ref);
+		    } else {
+			targ = instantiateBean(echild);
+		    }
 		    setProp(clazz, bean, name, targ, targ.getClass());
 		} else if (tag.equals("int")) {
 		    String name = echild.getAttribute("name");
