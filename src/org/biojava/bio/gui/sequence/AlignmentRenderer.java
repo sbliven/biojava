@@ -34,7 +34,8 @@ import org.biojava.bio.symbol.*;
 
 import java.util.List;
 
-public class AlignmentRenderer implements SequenceRenderer, PropertyChangeListener {
+public class AlignmentRenderer
+implements SequenceRenderer, PropertyChangeListener {
     private List renderList;
     protected PropertyChangeSupport pcs;
     protected Map cache;  // FIXME: is a simple cache the Right Way to solve
@@ -103,7 +104,9 @@ public class AlignmentRenderer implements SequenceRenderer, PropertyChangeListen
 
 	for (Iterator i = renderList.iterator(); i.hasNext(); ) {
 	    LabelAndRenderer lar = (LabelAndRenderer) i.next();
-	    SequenceRenderContext subctx = new SequenceRenderContextForLabel(ctx, lar.getLabel());
+	    SequenceRenderContext subctx = new SequenceRenderContextForLabel(
+        ctx, lar.getLabel()
+      );
 
 	    System.out.println(lar.getLabel().toString() + " " + offset);
 

@@ -1,4 +1,4 @@
-//package seqviewer;
+package seqviewer;
 
 import java.io.*;
 import java.util.*;
@@ -11,6 +11,7 @@ import java.util.List;  // Tie-breaker
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
+import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.gui.*;
 import org.biojava.bio.gui.sequence.*;
@@ -50,7 +51,7 @@ public class EmblViewer {
     sp.setSpacer(10);
     sp.setDirection(SequencePanel.HORIZONTAL);
     fr = new BasicFeatureRenderer();
-    split = new CompoundFeatureRenderer();
+    split = new ZiggyFeatureRenderer();
     FeatureRenderer frChooser = new FeatureRenderer() {
       public void renderFeature(
         Graphics2D g, Feature f, Rectangle2D box, SequenceRenderContext context
@@ -86,10 +87,16 @@ public class EmblViewer {
     repeats.setFilter(repeatFilter);
     misc.setFilter(miscFilter);
 
+    LayeredRenderer lsr = new LayeredRenderer();
+    lsr.setFilter(notSource);
+    lsr.setRecurse(false);
+    lsr.setLineRenderer(features);
+    
     sp.addRenderer(repeats);
     sp.addRenderer(misc);
     sp.addRenderer(features);
     sp.addRenderer(new SymbolSequenceRenderer());
+    sp.addRenderer(lsr);
     f.getContentPane().setLayout(new BorderLayout());
     f.getContentPane().add(new JScrollPane(sp), BorderLayout.CENTER);
     JPanel panel = new JPanel();
@@ -151,7 +158,7 @@ public class EmblViewer {
     f.setVisible(true);
   }
   
-  public static class CompoundFeatureRenderer implements FeatureRenderer {
+  /*public static class CompoundFeatureRenderer implements FeatureRenderer {
     private Paint outline = Color.black;
     private Paint fill = Color.yellow;
     private double borderDepth = 3.0;
@@ -248,5 +255,5 @@ public class EmblViewer {
       line.setLine(midP, endP);
       g.draw(line);
     }
-  }
+  }*/
 }
