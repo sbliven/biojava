@@ -64,7 +64,7 @@ public class NameParser implements SymbolParser, Serializable {
   }
   
   public SymbolList parse(String seq) throws IllegalSymbolException {
-    SimpleSymbolList rList = new SimpleSymbolList(getAlphabet());
+      List rList = new ArrayList();
     String [] names = (String []) nameToSymbol.keySet().toArray(new String[0]);
     while(seq.length() > 0) {
       int chosen = -1;
@@ -81,10 +81,10 @@ public class NameParser implements SymbolParser, Serializable {
         throw new IllegalSymbolException("Unable to find symbol name matching from " + seq);
       }
       
-      rList.addSymbol(parseToken(names[chosen]));
+      rList.add(parseToken(names[chosen]));
       seq = seq.substring(names[chosen].length());
     }
-    return rList;
+    return new SimpleSymbolList(getAlphabet(), rList);
   }
   
   public Symbol parseToken(String token) throws IllegalSymbolException {

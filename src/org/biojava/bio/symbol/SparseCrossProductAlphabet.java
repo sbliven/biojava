@@ -59,11 +59,11 @@ implements Serializable {
   
   public SymbolList symbols() {
     try {
-      SimpleSymbolList symL = new SimpleSymbolList(this);
+      List symL = new ArrayList();
       for(Iterator i = iterator(); i.hasNext(); ) {
-        symL.addSymbol((Symbol) i.next());
+        symL.add((Symbol) i.next());
       }
-      return symL;
+      return new SimpleSymbolList(this, symL);
     } catch (IllegalSymbolException ise) {
       throw new BioError(ise, "Assertion Failure");
     }

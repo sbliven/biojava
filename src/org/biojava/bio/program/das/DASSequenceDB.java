@@ -70,10 +70,10 @@ public class DASSequenceDB implements SequenceDB {
      * @throws BioException if the capacity can't be reached.
      */
     void ensureFeaturesCacheCapacity(int min) throws BioException {
-      if(min > MAX_CAPACITY) {
-        throw new BioException( "Capacity of (" + MAX_CAPACITY +
-                                " exceeded by " + min);
-      }
+      //  if(min > MAX_CAPACITY) {
+//          throw new BioException( "Capacity of (" + MAX_CAPACITY +
+//                                  " exceeded by " + min);
+//        }
 	if (featuresCache.getLimit() < min) {
 	    // System.err.println("Setting cache limit up to " + min);
 	    featuresCache.setLimit(min);
