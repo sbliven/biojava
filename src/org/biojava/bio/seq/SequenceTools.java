@@ -41,6 +41,9 @@ import org.biojava.utils.ChangeVetoException;
  * @author Matthew Pocock
  */
 public final class SequenceTools {
+  private SequenceTools() {
+  }
+    
   public static Sequence createSequence(
     SymbolList syms, String uri, String name, Annotation ann
   ) {

@@ -117,6 +117,10 @@ public final class DNATools {
   public static AtomicSymbol t() { return t; }
   public static Symbol n() { return n; }
 
+  
+  private DNATools() {
+  }
+  
   /**
    * Return the DNA alphabet.
    *

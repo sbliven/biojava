@@ -42,6 +42,9 @@ import org.biojava.bio.symbol.RangeLocation;
  */
 
 public class FilterUtils {
+    private FilterUtils() {
+    }
+    
     /**
      * Determines if the set of features matched by sub can be <code>proven</code> to be a
      * proper subset of the features matched by sup.
@@ -278,43 +281,101 @@ public class FilterUtils {
     }
   }
 
+  /**
+   * Construct a filter which matches features with a specific <code>type</code>
+   * value.
+   */
+  
   public final static FeatureFilter byType(String type) {
     return new FeatureFilter.ByType(type);
   }
 
+  /**
+   * Construct a filter which matches features with a specific <code>source</code>
+   * value.
+   */
+  
   public final static FeatureFilter bySource(String source) {
     return new FeatureFilter.BySource(source);
   }
 
+  /**
+   * Construct a filter which matches features which are assignable to the
+   * specified class or interface.
+   */
+  
   public final static FeatureFilter byClass(Class clazz)
   throws ClassCastException {
     return new FeatureFilter.ByClass(clazz);
   }
 
+  /** 
+   * Construct a filter which matches features with locations wholly contained
+   * by the specified <code>Location</code>.
+   */
+  
   public final static FeatureFilter containedByLocation(Location loc) {
     return new FeatureFilter.ContainedByLocation(loc);
   }
 
+  /** 
+   * Construct a filter which matches features with locations contained by or
+   * overlapping the specified <code>Location</code>.
+   */
+  
   public final static FeatureFilter overlapsLocation(Location loc) {
     return new FeatureFilter.OverlapsLocation(loc);
   }
 
-  public final static FeatureFilter overlapsExtent(Location loc) {
-    return new FeatureFilter.OverlapsExtent(loc);
+  /** 
+   * Construct a filter which matches features with locations where the interval
+   * between the <code>min</code> and <code>max</code> positions are contained by or
+   * overlap the specified <code>Location</code>.
+   */
+  
+  public final static FeatureFilter shadowOverlapsLocation(Location loc) {
+      return new FeatureFilter.ShadowOverlapsLocation(loc);
+  }
+  
+  /** 
+   * Construct a filter which matches features with locations where the interval
+   * between the <code>min</code> and <code>max</code> positions are contained by 
+   * the specified <code>Location</code>.
+   */
+  
+  public final static FeatureFilter shadowContainedByLocation(Location loc) {
+      return new FeatureFilter.ShadowContainedByLocation(loc);
   }
 
+  /**
+   * Match features attached to sequences with a specified name.
+   */
+  
   public final static FeatureFilter bySequenceName(String name) {
     return new FeatureFilter.BySequenceName(name);
   }
 
+  /**
+   * Construct a new filter which is the negation of <code>filter</code>.
+   */
+  
   public final static FeatureFilter not(FeatureFilter filter) {
     return new FeatureFilter.Not(filter);
   }
 
+  /**
+   * Construct a new filter which matches the intersection of two other
+   * filters.
+   */
+  
   public final static FeatureFilter and(FeatureFilter c1, FeatureFilter c2) {
     return new FeatureFilter.And(c1, c2);
   }
 
+  /**
+   * Constructs a new filter which matches the intersection of a set of filters.
+   */
+  
   public final static FeatureFilter and(FeatureFilter[] filters) {
     if(filters.length == 0) {
       return all();
@@ -329,10 +390,18 @@ public class FilterUtils {
     }
   }
 
+  /**
+   * Construct a new filter which matches the union of two filters.
+   */
+  
   public final static FeatureFilter or(FeatureFilter c1, FeatureFilter c2) {
     return new FeatureFilter.Or(c1, c2);
   }
 
+  /**
+   * Construct a new filter which matches the intersection of two filters.
+   */
+  
   public final static FeatureFilter or(FeatureFilter[] filters) {
     if(filters.length == 0) {
       return none();
@@ -347,81 +416,165 @@ public class FilterUtils {
     }
   }
 
+  /**
+   * Match features with annotations matching the specified <code>AnnotationType</code>
+   */
+  
   public final static FeatureFilter byAnnotationType(AnnotationType type) {
     return new FeatureFilter.ByAnnotationType(type);
   }
 
+  /**
+   * Match features where the annotation property named <code>key</code> is
+   * equal to <code>value</code>.
+   */
+  
   public final static FeatureFilter byAnnotation(Object key, Object value) {
     return new FeatureFilter.ByAnnotation(key, value);
   }
 
+  /**
+   * Match features where the annotation property named <code>key</code> is
+   * an instance of <code>valClass</code>.
+   */
+  
   public final static FeatureFilter byAnnotationType(Object key, Class valClass) {
     AnnotationType type = new AnnotationType.Impl();
     type.setConstraints(key, new PropertyConstraint.ByClass(valClass), CardinalityConstraint.ANY);
     return byAnnotationType(type);
   }
 
+  /**
+   * Match features where the property <code>key</code> has been defined as having
+   * some value, regardless of the exact value.
+   */
+  
   public final static FeatureFilter hasAnnotation(Object key) {
     return new FeatureFilter.HasAnnotation(key);
   }
 
+  /**
+   * Match StrandedFeatures on the specified strand.
+   */
+  
   public final static FeatureFilter byStrand(StrandedFeature.Strand strand) {
     return new FeatureFilter.StrandFilter(strand);
   }
 
+  /**
+   * Match features where the parent feature matches the specified filter.
+   * This cannot match top-level features.
+   */
+  
   public final static FeatureFilter byParent(FeatureFilter parentFilter) {
     return new FeatureFilter.ByParent(parentFilter);
   }
 
+  /**
+   * Match features where at least one of the ancestors matches the specified
+   * filter.  This cannot match top-level features.
+   */
+  
   public final static FeatureFilter byAncestor(FeatureFilter ancestorFilter) {
     return new FeatureFilter.ByAncestor(ancestorFilter);
   }
 
+  /**
+   * Match features where at least one child feature matches the supplied filter.
+   * This does not match leafFeatures.
+   */
+  
   public final static FeatureFilter byChild(FeatureFilter childFilter) {
     return new FeatureFilter.ByChild(childFilter);
   }
 
+  /**
+   * Match features where at least one decendant feature -- possibly but not necessarily an
+   * immediate child -- matches the specified filter.
+   */
+  
   public final static FeatureFilter byDescendant(FeatureFilter descFilter) {
     return new FeatureFilter.ByDescendant(descFilter);
   }
 
+  /**
+   * Construct a filter which matches features whose children all match the
+   * specified filter.  This filter always matches leaf features.
+   */
+  
   public final static FeatureFilter onlyChildren(FeatureFilter child) {
     return new FeatureFilter.OnlyChildren(child);
   }
 
+  /**
+   * Construct a filter which matches features whose decendants all match the
+   * specified filter.  This filter always matches leaf features.
+   */
+  
   public final static FeatureFilter onlyDescendants(FeatureFilter desc) {
     return new FeatureFilter.OnlyDescendants(desc);
   }
 
+  /**
+   * Construct a filter which matches FramedFeatures with the specified reading
+   * frame.
+   */
+  
   public final static FeatureFilter byFrame(FramedFeature.ReadingFrame frame) {
     return new FeatureFilter.FrameFilter(frame);
   }
 
+  /**
+   * Match SeqSimilaritiy features with scores in the specified range.
+   */
+  
   public final static FeatureFilter byPairwiseScore(double minScore, double maxScore) {
     return new FeatureFilter.ByPairwiseScore(minScore, maxScore);
   }
 
+  /**
+   * Construct a filter which matches all features which implement the
+   * <code>ComponentFeature</code> interface and have a <code>componentName</code>
+   * property equal to the specified value
+   */
+  
   public final static FeatureFilter byComponentName(String compName) {
     return new FeatureFilter.ByComponentName(compName);
   }
 
+  /**
+   * Return a filter which matches all top-level features.  These are features
+   * which are direct children of a <code>Sequence</code> rather than another
+   * <code>Feature</code>.
+   */
+  
   public final static FeatureFilter topLevel() {
     return FeatureFilter.top_level;
   }
 
+  /**
+   * Return a filter which matches features with zero children.
+   */
+  
   public final static FeatureFilter leaf() {
     return FeatureFilter.leaf;
   }
 
+  /**
+   * Return a filter which matches all features.
+   */
+  
   public final static FeatureFilter all() {
     return FeatureFilter.all;
   }
 
+  /**
+   * Return a filter which matches no features.
+   */
+  
   public final static FeatureFilter none() {
     return FeatureFilter.none;
   }
-
-  private static int depth = 0;
 
   /**
    * Attempts to reduce a FeatureFilter to an equivalent FeatureFilter with
@@ -446,7 +599,7 @@ public class FilterUtils {
    * @return an optimized version
    */
   public final static FeatureFilter optimize(FeatureFilter filter) {
-    depth++;
+    //depth++;
     //System.out.println(depth + ":" + "Optimizing " + filter);
     try {
     if(filter instanceof FeatureFilter.And) {
@@ -651,7 +804,7 @@ public class FilterUtils {
       return filter;
     }
     } finally {
-      depth--;
+      // depth--;
     }
   }
 

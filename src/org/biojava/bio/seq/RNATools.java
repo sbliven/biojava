@@ -134,6 +134,9 @@ public final class RNATools {
   public static AtomicSymbol u() { return u; }
   public static Symbol n() { return n; }
 
+  private RNATools() {
+  }
+  
   /**
    * Return the RNA alphabet.
    *

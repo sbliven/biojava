@@ -173,6 +173,10 @@ public class ProteinTools {
             throw new BioError(" Could not initialize ProteinTools", e);
         }
     }
+    
+    private ProteinTools() {
+    }
+    
     /**
      *Gets the protein alphabet
      */

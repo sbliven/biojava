@@ -249,6 +249,8 @@ public final class NucleotideTools {
   public static Symbol n() { return n; }
 
 
+  private NucleotideTools() {
+  }
 
   /**
 

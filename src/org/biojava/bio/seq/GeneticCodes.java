@@ -38,6 +38,9 @@ public class GeneticCodes
 
 // Constructors and initialization
 
+    private GeneticCodes() {
+    }
+
 // Interface implementations
 
 // Public methods

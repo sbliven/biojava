@@ -1863,21 +1863,5 @@ public interface FeatureFilter extends Serializable {
             }
         }
     }
-
-  public class OverlapsExtent
-          implements FeatureFilter
-  {
-    private Location loc;
-
-    public OverlapsExtent(Location loc){
-      this.loc = loc;
-    }
-
-    public boolean accept(Feature f)
-    {
-      Location floc = f.getLocation();
-      return !(floc.getMin() > loc.getMax() || floc.getMax() < loc.getMin());
-    }
-  }
 }
 
