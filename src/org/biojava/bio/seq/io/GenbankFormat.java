@@ -461,6 +461,9 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
 	    parseEnd = parseStart + 1;
 	    while ((parseEnd < cline.length && cline[parseEnd] != ' '))
 	    {
+                if (cline[parseEnd] == '.' || cline[parseEnd] == '~') {
+                    cline[parseEnd] = '-';
+                }
 		++parseEnd;
 	    }
 
@@ -577,18 +580,27 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
     private void parseLocusLinePre127(String theLine)
     	throws ParseException
     {
-		if (theLine.length() < 73)
-		{
-			throw new ParseException("LOCUS line too short [" + theLine + "]");
-		}
-
-		saveSeqAnno2(GenbankFormat.LOCUS_TAG, theLine.substring(12, 22));
-		saveSeqAnno2(GenbankFormat.SIZE_TAG, theLine.substring(22, 29));
-		saveSeqAnno2(GenbankFormat.STRAND_NUMBER_TAG, theLine.substring(33, 35));
-		saveSeqAnno2(GenbankFormat.TYPE_TAG, theLine.substring(36, 41));
-		saveSeqAnno2(GenbankFormat.CIRCULAR_TAG, theLine.substring(42, 52));
-		saveSeqAnno2(GenbankFormat.DIVISION_TAG, theLine.substring(52, 55));
-		saveSeqAnno2(GenbankFormat.DATE_TAG, theLine.substring(62, 73));
+        if (theLine.length() < 73)
+        {
+            StringTokenizer locusTokens = new StringTokenizer(theLine);
+            //Locus Tag
+            locusTokens.nextToken();
+            if (locusTokens.hasMoreTokens()) {
+                saveSeqAnno2(GenbankFormat.LOCUS_TAG, locusTokens.nextToken());
+            }
+            else {
+                throw new ParseException("LOCUS line too short [" + theLine + "]");
+            }
+        }
+        else {
+            saveSeqAnno2(GenbankFormat.LOCUS_TAG, theLine.substring(12, 22));
+            saveSeqAnno2(GenbankFormat.SIZE_TAG, theLine.substring(22, 29));
+            saveSeqAnno2(GenbankFormat.STRAND_NUMBER_TAG, theLine.substring(33, 35));
+            saveSeqAnno2(GenbankFormat.TYPE_TAG, theLine.substring(36, 41));
+            saveSeqAnno2(GenbankFormat.CIRCULAR_TAG, theLine.substring(42, 52));
+            saveSeqAnno2(GenbankFormat.DIVISION_TAG, theLine.substring(52, 55));
+            saveSeqAnno2(GenbankFormat.DATE_TAG, theLine.substring(62, 73));
+        }
     }
 
     /**
@@ -603,56 +615,63 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
     private void parseLocusLinePost127(String theLine)
     	throws ParseException
     {
-		if (theLine.length() < 79)
-		{
-			throw new ParseException("LOCUS line too short [" + theLine + "]");
-		}
+        if (theLine.length() < 79)
+        {
+            throw new ParseException("LOCUS line too short [" + theLine + "]");
+        }
 
-		StringTokenizer locusTokens = new StringTokenizer(theLine);
-		if((locusTokens.countTokens() == 8) || (locusTokens.countTokens() == 7))
-		{
-			// While Genbank 127 documentation doesn't allow the strand tag to
-			// be optional, some files don't have it.  A key assumption here is
-			// that this is the only tag that is optional.  The parser will
-			// generate incorrect data if this assumption is violated.
-			boolean includedStrandTag = (locusTokens.countTokens() == 8);
+        StringTokenizer locusTokens = new StringTokenizer(theLine);
+        if((locusTokens.countTokens() == 8) || (locusTokens.countTokens() == 7))
+        {
+            // While Genbank 127 documentation doesn't allow the strand tag to
+            // be optional, some files don't have it.  A key assumption here is
+            // that this is the only tag that is optional.  The parser will
+            // generate incorrect data if this assumption is violated.
+            boolean includedStrandTag = (locusTokens.countTokens() == 8);
 
-			// LOCUS tag; not stored
-			locusTokens.nextToken();
-			// Locus name
-			saveSeqAnno2(GenbankFormat.LOCUS_TAG, locusTokens.nextToken());
-			// Sequence length
-			saveSeqAnno2(GenbankFormat.SIZE_TAG, locusTokens.nextToken());
-			// "bp"; not stored
-			locusTokens.nextToken();
-			// Strand information
-			// Both the strand and type are in the same token.  The strand
-			// information is an optional part, so this is a bit hairy
-			// Some files do not have a strand token.  While this is not allowed
-			// by Genbank's documentation, we will treat this as an optional
-			// token.  It is the only optional token this parser will allow.
-			if (includedStrandTag)
-			{
-				String strandString = locusTokens.nextToken();
-				StringTokenizer strandTokens = new StringTokenizer(strandString, "-");
-				if(strandTokens.countTokens() > 1)
-				{
-					saveSeqAnno2(GenbankFormat.STRAND_NUMBER_TAG, strandTokens.nextToken());
-				}
-				saveSeqAnno2(GenbankFormat.TYPE_TAG, strandTokens.nextToken());
-			}
+            // LOCUS tag; not stored
+            locusTokens.nextToken();
+            // Locus name
+            saveSeqAnno2(GenbankFormat.LOCUS_TAG, locusTokens.nextToken());
+            // Sequence length
+            saveSeqAnno2(GenbankFormat.SIZE_TAG, locusTokens.nextToken());
+            // "bp"; not stored
+            locusTokens.nextToken();
+            // Strand information
+            // Both the strand and type are in the same token.  The strand
+            // information is an optional part, so this is a bit hairy
+            // Some files do not have a strand token.  While this is not allowed
+            // by Genbank's documentation, we will treat this as an optional
+            // token.  It is the only optional token this parser will allow.
+            if (includedStrandTag)
+            {
+                String strandString = locusTokens.nextToken();
+                StringTokenizer strandTokens = new StringTokenizer(strandString, "-");
+                if(strandTokens.countTokens() > 1)
+                {
+                    saveSeqAnno2(GenbankFormat.STRAND_NUMBER_TAG, strandTokens.nextToken());
+                }
+                saveSeqAnno2(GenbankFormat.TYPE_TAG, strandTokens.nextToken());
+            }
 
-			// Circularity
-			saveSeqAnno2(GenbankFormat.CIRCULAR_TAG, locusTokens.nextToken());
-			// Division code
-			saveSeqAnno2(GenbankFormat.DIVISION_TAG, locusTokens.nextToken());
-			// Date in dd-MMM-yyyy format
-			saveSeqAnno2(GenbankFormat.DATE_TAG, locusTokens.nextToken());
-		}
-		else
-		{
-			throw new ParseException("LOCUS line incorrectly tokenized [" + theLine + "]");
-		}
+            // Circularity
+            saveSeqAnno2(GenbankFormat.CIRCULAR_TAG, locusTokens.nextToken());
+            // Division code
+            saveSeqAnno2(GenbankFormat.DIVISION_TAG, locusTokens.nextToken());
+            // Date in dd-MMM-yyyy format
+            saveSeqAnno2(GenbankFormat.DATE_TAG, locusTokens.nextToken());
+        }
+        else
+        {
+            //Try using currently specified positions for tokens
+            saveSeqAnno2(GenbankFormat.LOCUS_TAG, theLine.substring(12, 28));
+            saveSeqAnno2(GenbankFormat.SIZE_TAG, theLine.substring(29, 40));
+            saveSeqAnno2(GenbankFormat.STRAND_NUMBER_TAG, theLine.substring(44, 46));
+            saveSeqAnno2(GenbankFormat.TYPE_TAG, theLine.substring(47, 53));
+            saveSeqAnno2(GenbankFormat.CIRCULAR_TAG, theLine.substring(55, 63));
+            saveSeqAnno2(GenbankFormat.DIVISION_TAG, theLine.substring(64, 67));
+            saveSeqAnno2(GenbankFormat.DATE_TAG, theLine.substring(68, 79));
+        }
     }
 
     /**
