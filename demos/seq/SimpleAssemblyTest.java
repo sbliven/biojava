@@ -5,6 +5,7 @@ import java.io.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.impl.*;
 import org.biojava.bio.symbol.*;
 
 public class SimpleAssemblyTest {

@@ -8,12 +8,13 @@ public class TestTranslation {
   public static void main(String [] args) {
     try {
       SymbolList randomSeq = symbol.Tools.createSymbolList(30);
-      SymbolList rev = new ReverseSymbolList(randomSeq);
+      SymbolList rev = SymbolListViews.reverse(randomSeq);
       SymbolList revComp = DNATools.complement(rev);
-      SymbolList codons = new WindowedSymbolList(revComp, 3);
-      SymbolList translation = new TranslatedSymbolList(
+      SymbolList rnaView = RNATools.transcribe(revComp);
+      SymbolList codons = SymbolListViews.windowedSymbolList(rnaView, 3);
+      SymbolList translation = SymbolListViews.translate(
         codons,
-        GeneticCode.UNIVERSAL
+        RNATools.getGeneticCode("UNIVERSAL")
       );
 
       System.out.println("DNA:\t" + randomSeq.seqString());

@@ -10,6 +10,10 @@ import org.biojava.bio.seq.io.*;
 public class TestGenbank {
   public static void main(String [] args) {
     try {
+	throw new Exception("This demo is broken until someone writes a new GENBANK parser :(");
+
+	/*
+
       if(args.length != 1) {
         throw new Exception("Use: TestGenbank genbankFile");
       }
@@ -18,16 +22,18 @@ public class TestGenbank {
       SequenceFormat gFormat = new GenbankFormat();
       BufferedReader gReader = new BufferedReader(
         new InputStreamReader(new FileInputStream(genbankFile)));
-      SequenceFactory sFact = new SimpleSequenceFactory();
+      SequenceBuilderFactory sbFact = SimpleSequenceBuilder.FACTORY;
       Alphabet alpha = DNATools.getDNA();
       SymbolParser rParser = alpha.getParser("token");
       SequenceIterator seqI =
-        new StreamReader(gReader, gFormat, rParser, sFact);
+        new StreamReader(gReader, gFormat, rParser, sbFact);
         
       while(seqI.hasNext()) {
         Sequence seq = seqI.nextSequence();
         System.out.println(seq.getName() + " has " + seq.countFeatures() + " features");
       }
+
+	*/
     } catch (Throwable t) {
       t.printStackTrace();
       System.exit(1);
