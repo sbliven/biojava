@@ -200,7 +200,7 @@ public abstract class AbstractDistribution implements Distribution {
         double div = 0.0;
         for(Iterator i = fa.iterator(); i.hasNext(); ) {
           AtomicSymbol as = (AtomicSymbol) i.next();
-          double nm = getNullModel().getWeight(sym);
+          double nm = getNullModel().getWeight(as);
           sum += getWeightImpl(as) * nm;
           div += nm;
         }
