@@ -53,6 +53,14 @@ public class FixedSizeCache implements Cache {
 	return cr;
     }
 
+    public int getLimit() {
+	return sizeLimit;
+    }
+
+    public void setLimit(int limit) {
+	this.sizeLimit = limit;
+    }
+
     private class FixedSizeCacheReference implements CacheReference {
 	private Object o;
 
