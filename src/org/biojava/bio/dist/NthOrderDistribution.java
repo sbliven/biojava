@@ -7,10 +7,27 @@ import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
 
 /**
- * Provides an N'th order distribution.
+ * Provides an N'th order distribution.  This is a distribution over one
+ * alphabet which is conditioned on having previously observed one or
+ * more other symbols (potentially from different alphabets).
+ *
+ * <p>
+ * Order-N distributions are always over a CrossProductAlphabet.
+ * </p>
+ *
+ * <p>
+ * <strong>Note:</strong> Unlike normal distributions, the total weights for
+ * all symbols in the overall alphabet do <em>not</em> sum to 1.0.  Instead,
+ * the weights of each sub-distribution should sum to 1.0.
+ * </p>
+ *
+ * <p>
+ * This would typically be used in conjunction with an OrderNSymbolList.
+ * </p>
  *
  * @author Samiul Hasan
  * @author Matthew Pocock
+ * @author Thomas Down
  */
 public class NthOrderDistribution extends AbstractDistribution implements Serializable {
   private CrossProductAlphabet alphabet;
@@ -35,6 +52,10 @@ public class NthOrderDistribution extends AbstractDistribution implements Serial
     }
   }
   
+    /**
+     * Construct a new NthOrderDistribution.
+     */
+
   public NthOrderDistribution(CrossProductAlphabet alpha, DistributionFactory df)
   throws IllegalAlphabetException  {
     this.alphabet = alpha;
@@ -55,6 +76,28 @@ public class NthOrderDistribution extends AbstractDistribution implements Serial
     }
   }
   
+    /**
+     * Get the conditioning alphabet of this distribution.  If the `overall'
+     * alphabet is a cross-product of two alphabets, this will be the first 
+     * of those alphabets.  If it is a cross-product of more than two alphabets,
+     * the conditioning alphabet is the cross-product of all but the last
+     * alphabet.
+     */
+
+    public Alphabet getConditioningAlphabet() {
+	return firstA;
+    }
+
+    /**
+     * Get the conditioned alphabet.  This is the last alphabet in the
+     * distribution's overall cross-product.  It will be the alphabet of
+     * all the sub-distributions contained within this OrderNDistribution.
+     */
+
+    public Alphabet getConditionedAlphabet() {
+	return lastA;
+    }
+    
   public void setDistribution(Symbol sym, Distribution dist)
   throws IllegalSymbolException, IllegalAlphabetException {
     firstA.validate(sym);
@@ -90,6 +133,11 @@ public class NthOrderDistribution extends AbstractDistribution implements Serial
     return alphabet;
   }
   
+    /**
+     * Get a weight from one of the sub-distributions, conditioned
+     * on the first part of the symbol.
+     */
+
   public double getWeight(Symbol sym) throws IllegalSymbolException {
     if(sym instanceof AtomicSymbol) {
       CrossProductSymbol cps = (CrossProductSymbol) sym;
@@ -107,6 +155,32 @@ public class NthOrderDistribution extends AbstractDistribution implements Serial
       return getAmbiguityWeight(sym);
     }
   }
+
+    /**
+     * Set a weight in one of the conditioned distributions.  It is the callers
+     * responsibility to ensure that all the conditioned distributions have total
+     * weights which sum to 1.0.
+     */
+
+    public void setWeight(Symbol sym, double w) 
+        throws IllegalSymbolException, ChangeVetoException
+    {
+	if (sym instanceof AtomicSymbol) {
+	    CrossProductSymbol cps = (CrossProductSymbol) sym;
+	    List symL = cps.getSymbols();
+	    int lb1 = symL.size() - 1;
+	    Symbol firstS;
+	    if(symL.size() == 2) {
+		firstS = (Symbol) symL.get(0);
+	    } else {
+		firstS = ((CrossProductAlphabet) firstA).getSymbol(symL.subList(0, lb1));
+	    }
+	    Distribution dist = getDistribution(firstS);
+	    dist.setWeight((Symbol) symL.get(lb1), w);
+	} else {
+	    throw new IllegalSymbolException("Can't set a weight for an ambiguity symbol");
+	}
+    }
   
   public void setNullModel(Distribution nullModel)
   throws IllegalAlphabetException, ChangeVetoException {
@@ -169,7 +243,7 @@ public class NthOrderDistribution extends AbstractDistribution implements Serial
       int lb1 = symL.size() - 1;
       return nullModel.getWeight((Symbol) symL.get(lb1));
     }
-    
+      
     public Distribution getNullModel() {
       return this;
     }
