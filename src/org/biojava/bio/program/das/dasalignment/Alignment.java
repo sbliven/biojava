@@ -21,8 +21,9 @@
  */
 
 package org.biojava.bio.program.das.dasalignment;
+
 import org.biojava.bio.program.ssbind.* ;
-import org.biojava.bio .* ;
+import org.biojava.bio.* ;
 import org.biojava.bio.CollectionConstraint.AllValuesIn ;
 import java.util.* ;
 
@@ -64,7 +65,7 @@ public class Alignment {
     }
 
     /** define the alignment Score Annotation Type */
-    private AnnotationType getScoreAnnotationType() {
+    public AnnotationType getScoreAnnotationType() {
 	AnnotationType annType ;
 	
 	    annType  = new AnnotationType.Impl();
@@ -79,7 +80,7 @@ public class Alignment {
     }
 
     /** define the alignment Block Annotation Type */
-    private AnnotationType getBlockAnnotationType() {
+    public AnnotationType getBlockAnnotationType() {
 	AnnotationType annType ;
 	
 	segmentType = getSegmentAnnotationType();
@@ -101,7 +102,7 @@ public class Alignment {
     }
 
       /** define the alignment Segment Annotation Type */
-    private AnnotationType getSegmentAnnotationType() {
+    public AnnotationType getSegmentAnnotationType() {
 	AnnotationType annType ;
 	
 	annType  = new AnnotationType.Impl();
@@ -126,7 +127,7 @@ public class Alignment {
 
 
     /** define the alignment object Annotation Type */
-    private AnnotationType getObjectAnnotationType() {
+    public AnnotationType getObjectAnnotationType() {
 
 	AnnotationType annType;
 	
@@ -135,7 +136,7 @@ public class Alignment {
 	annType.setConstraints("dbAccessionId",
 			       new PropertyConstraint.ByClass(String.class),
 			       CardinalityConstraint.ONE );
-	annType.setConstraints("intObjecId",
+	annType.setConstraints("intObjectId",
 			       new PropertyConstraint.ByClass(String.class),
 			       CardinalityConstraint.ONE );
 	annType.setConstraints("objectVersion",
