@@ -136,7 +136,7 @@ public class FastaFormat implements SequenceFormat,
     StreamParser sparser = parser.parseStream(listener);
     
     while (!reachedEnd) {
-      r.mark(cache.length);
+      r.mark(cache.length + 1);
       int bytesRead = r.read(cache, 0, cache.length);
       if (bytesRead < 0) {
         reachedEnd = seenEOF = true;
@@ -157,8 +157,8 @@ public class FastaFormat implements SequenceFormat,
           
           parseStart = parseEnd + 1;
           while (parseStart < bytesRead &&
-            cache[parseStart] == '\n' &&
-            cache[parseStart] == '\r')
+            (cache[parseStart] == '\n' ||
+             cache[parseStart] == '\r') )
             {
               ++parseStart;
             }
