@@ -268,31 +268,27 @@ public class PairwiseDP extends DP implements Serializable {
 
         // Find base for addition
         double constant = Double.NaN;
+        double score = 0.0;
         for(
           int ci = 0;
-          ci < tr.length && (
-            constant == Double.NEGATIVE_INFINITY ||
-            constant == Double.NaN
-          );
+          ci < tr.length;
           ci++
         ) {
-          constant = sourceScores[tr[ci]];
+          int trc = tr[ci];
+          double skc = sourceScores[ci];
+          if(skc != Double.NEGATIVE_INFINITY && !Double.isNaN(skc)) {
+            if(Double.isNaN(constant)) {
+              constant = skc;
+            }
+            double sk = trs[ci];
+            if(!Double.isNaN(sk) && sk != Double.NEGATIVE_INFINITY) {
+              score += Math.exp(skc + sk - constant);
+            }
+          }
         }
         if(Double.isNaN(constant)) {
           curCol[l] = Double.NaN;
         } else {
-          double score = 0.0;
-          for (int kc = 0; kc < tr.length; ++kc) {
-            //System.out.println("In from " + states[kc].getName());
-            //System.out.println("prevScore = " + sourceScores[kc]);
-
-            int k = tr[kc];
-            double skc = sourceScores[kc];
-            if (skc != Double.NEGATIVE_INFINITY && !Double.isNaN(skc)) {
-              double t = trs[kc];
-              score += Math.exp(t + skc - constant);
-            }
-          }
           curCol[l] = Math.log(score) + constant;
           //System.out.println(curCol[l]);
         }
@@ -451,35 +447,29 @@ public class PairwiseDP extends DP implements Serializable {
 	
           // Find base for addition
           double constant = Double.NaN;
+          double score = 0.0;
           for (
             int ci = 0;
-            ci < tr.length && (
-              constant == Double.NEGATIVE_INFINITY ||
-              Double.isNaN(constant)
-            );
+            ci < tr.length;
             ci++
           ) {
-            constant = sourceScores[tr[ci]];
-            //System.out.println("trying source: " + states[tr[ci]].getName() + " = " + constant);
+            int trc = tr[ci];
+            double trSc = sourceScores[trc];
+            if(!Double.isNaN(trSc) && trSc != Double.NEGATIVE_INFINITY) {
+              if(Double.isNaN(constant)) {
+                constant = trSc;
+              }
+              double sk = trs[ci];
+              if(!Double.isNaN(sk) && sk != Double.NEGATIVE_INFINITY) {
+                score += Math.exp(trSc + sk - constant);
+              }
+            }
           }
           if(Double.isNaN(constant)) {
             curCol[l] = Double.NaN;
             //System.out.println("found no source");
           } else {
-            double score = 0.0;
-            for (int kc = 0; kc < tr.length; ++kc) {
-              //System.out.println("In from " + states[kc].getName());
-              //System.out.println("prevScore = " + sourceScores[kc]);
-
-              int k = tr[kc];
-              double sk = sourceScores[k];
-              if (sk != Double.NEGATIVE_INFINITY && !Double.isNaN(sk)) {
-                double t = trs[kc];
-                score += Math.exp(t + sk - constant);
-              }
-            }
             curCol[l] = weight + Math.log(score) + constant;
-            //System.out.println("Setting col score to " + curCol[l]);
           }
         } catch (Exception e) {
           throw new BioError(
