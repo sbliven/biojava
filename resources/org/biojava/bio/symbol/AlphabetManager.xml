@@ -1,365 +1,742 @@
 <?xml version="1.0"?>
 
+
+
 <!DOCTYPE alphabetManager [
+
   <!ELEMENT alphabetManager (symbol|alphabet)*>
 
+
+
   <!ELEMENT symbol (short, long?, description?)>
+
   <!ATTLIST symbol
+
     name	ID	#IMPLIED>
 
+
+
   <!ELEMENT short (#PCDATA)>
+
   <!ELEMENT long (#PCDATA)>
+
   <!ELEMENT description (#PCDATA)>
+
+
 
   <!ELEMENT ambiguity (symbol, symbolref*)>
 
+
+
   <!ELEMENT alphabet (description?, (symbol|symbolref)*, ambiguity*)>
+
   <!ATTLIST alphabet
+
     name ID #IMPLIED
+
     parent IDREF #IMPLIED>
+
     
+
   <!ELEMENT name (#PCDATA)>
+
   <!ELEMENT symbolref EMPTY>
+
   <!ATTLIST symbolref
+
     name	IDREF	#REQUIRED>
+
 ]>
 
+
+
 <alphabetManager>
+
   <symbol name="adenine">
+
     <short>a</short>
+
     <long>adenine</long>
+
     <description>pairs with T in DNA, and U in RNA</description>
+
   </symbol>
+
   <symbol name="guanine">
+
     <short>g</short>
+
     <long>guanine</long>
+
     <description>pairs with C</description>
+
   </symbol>
+
   <symbol name="cytosine">
+
     <short>c</short>
+
     <long>cytosine</long>
+
     <description>pairs with G</description>
+
   </symbol>
+
   <symbol name="thymine">
+
     <short>t</short>
+
     <long>thymine</long>
+
     <description>pairs with A</description>
+
   </symbol>
+
   <symbol name="uracil">
+
     <short>u</short>
+
     <long>uracyl</long>
+
     <description>pairs with A, replacing T in RNA</description>
+
   </symbol>
+
+
 
   <alphabet name="DNA">
+
     <description>Deoxy-Ribose Nucleic Acid. The stuff of life.</description>
+
     <symbolref name="adenine"/>
+
     <symbolref name="guanine"/>
+
     <symbolref name="cytosine"/>
+
     <symbolref name="thymine"/>
+
     <ambiguity>
+
       <symbol>
+
         <short>r</short>
+
         <long>ag</long>
+
       </symbol>
+
       <symbolref name="adenine"/>
+
       <symbolref name="guanine"/>
+
     </ambiguity>
+
     <ambiguity>
+
       <symbol>
+
         <short>y</short>
+
         <long>ct</long>
+
       </symbol>
+
       <symbolref name="cytosine"/>
+
       <symbolref name="thymine"/>
+
     </ambiguity>
+
     <ambiguity>
+
       <symbol>
+
         <short>m</short>
+
         <long>ac</long>
+
       </symbol>
+
       <symbolref name="adenine"/>
+
       <symbolref name="cytosine"/>
+
     </ambiguity>
+
     <ambiguity>
+
       <symbol>
+
         <short>k</short>
+
         <long>GT</long>
+
       </symbol>
+
       <symbolref name="guanine"/>
+
       <symbolref name="thymine"/>
+
     </ambiguity>
+
     <ambiguity>
+
       <symbol>
+
         <short>s</short>
+
         <long>gc</long>
+
       </symbol>
+
       <symbolref name="guanine"/>
+
       <symbolref name="cytosine"/>
+
     </ambiguity>
+
     <ambiguity>
+
       <symbol>
+
         <short>w</short>
+
         <long>at</long>
+
       </symbol>
+
       <symbolref name="adenine"/>
+
       <symbolref name="thymine"/>
+
     </ambiguity>
+
     <ambiguity>
+
       <symbol>
+
         <short>h</short>
+
         <long>act</long>
+
       </symbol>
+
       <symbolref name="adenine"/>
+
       <symbolref name="cytosine"/>
+
       <symbolref name="thymine"/>
+
     </ambiguity>
+
     <ambiguity>
+
       <symbol>
+
         <short>b</short>
+
         <long>gtc</long>
+
       </symbol>
+
       <symbolref name="guanine"/>
+
       <symbolref name="cytosine"/>
+
       <symbolref name="thymine"/>
+
     </ambiguity>
+
     <ambiguity>
+
       <symbol>
+
         <short>v</short>
+
         <long>gac</long>
+
       </symbol>
+
       <symbolref name="guanine"/>
+
       <symbolref name="adenine"/>
+
       <symbolref name="cytosine"/>
+
     </ambiguity>
+
     <ambiguity>
+
       <symbol>
+
         <short>d</short>
+
         <long>gat</long>
+
       </symbol>
+
       <symbolref name="guanine"/>
+
       <symbolref name="adenine"/>
+
       <symbolref name="thymine"/>
+
     </ambiguity>
+
     <ambiguity>
+
       <symbol>
+
         <short>n</short>
+
         <long>agct</long>
+
       </symbol>
+
       <symbolref name="guanine"/>
+
       <symbolref name="adenine"/>
+
       <symbolref name="cytosine"/>
+
       <symbolref name="thymine"/>
+
     </ambiguity>
+
     <ambiguity>
+
       <symbol>
+
         <short>-</short>
+
         <long>gap</long>
+
       </symbol>
+
     </ambiguity>
+
   </alphabet>
+
   
+
   <alphabet name="RNA">
+
     <description>Ribose Nucleic Acid. Intermediate between genomic DNA and protein.</description>
+
     <symbolref name="adenine"/>
+
     <symbolref name="guanine"/>
+
     <symbolref name="cytosine"/>
+
     <symbolref name="uracil"/>
+
   </alphabet>
+
   <alphabet name="PROTEIN">
+
     <description>Unmodified Amino-acids commonly found in proteins</description>
+
     <symbol name="A">
+
       <short>A</short>
+
       <long>ALA</long>
-    </symbol>
-  
-    <symbol name="R">
-      <short>R</short>
-      <long>ARG</long>
-    </symbol>
-  
-    <symbol name="N">
-      <short>N</short>
-      <long>ASN</long>
-    </symbol>
-  
-    <symbol name="D">
-      <short>D</short>
-      <long>ASP</long>
-    </symbol>
-  
-    <symbol name="C">
-      <short>C</short>
-      <long>CYS</long>
-    </symbol>
-  
-    <symbol name="Q">
-      <short>Q</short>
-      <long>GLN</long>
-    </symbol>
-  
-    <symbol name="E">
-      <short>E</short>
-      <long>GLU</long>
+
     </symbol>
 
+  
+
+    <symbol name="R">
+
+      <short>R</short>
+
+      <long>ARG</long>
+
+    </symbol>
+
+  
+
+    <symbol name="N">
+
+      <short>N</short>
+
+      <long>ASN</long>
+
+    </symbol>
+
+  
+
+    <symbol name="D">
+
+      <short>D</short>
+
+      <long>ASP</long>
+
+    </symbol>
+
+  
+
+    <symbol name="C">
+
+      <short>C</short>
+
+      <long>CYS</long>
+
+    </symbol>
+
+  
+
+    <symbol name="Q">
+
+      <short>Q</short>
+
+      <long>GLN</long>
+
+    </symbol>
+
+  
+
+    <symbol name="E">
+
+      <short>E</short>
+
+      <long>GLU</long>
+
+    </symbol>
+
+
+
     <symbol name="G">
+
       <short>G</short>
+
       <long>GLY</long>
+
     </symbol>
+
   
+
     <symbol name="H">
+
       <short>H</short>
+
       <long>HIS</long>
+
     </symbol>
+
   
+
     <symbol name="I">
+
       <short>I</short>
+
       <long>ILE</long>
+
     </symbol>
+
   
+
     <symbol name="L">
+
       <short>L</short>
+
       <long>LEU</long>
+
     </symbol>
+
   
+
     <symbol name="K">
+
       <short>K</short>
+
       <long>LYS</long>
+
     </symbol>
+
   
+
     <symbol name="M">
+
       <short>M</short>
+
       <long>MET</long>
+
     </symbol>
+
   
+
     <symbol name="F">
+
       <short>F</short>
+
       <long>PHE</long>
+
     </symbol>
+
   
+
     <symbol name="P">
+
       <short>P</short>
+
       <long>PRO</long>
+
     </symbol>
+
   
+
     <symbol name="S">
+
       <short>S</short>
+
       <long>SER</long>
+
     </symbol>
+
   
+
     <symbol name="T">
+
       <short>T</short>
+
       <long>THR</long>
+
     </symbol>
+
   
+
     <symbol name="W">
+
       <short>W</short>
+
       <long>TRP</long>
+
     </symbol>
+
   
+
     <symbol name="Y">
+
       <short>Y</short>
+
       <long>TYR</long>
+
     </symbol>
+
   
+
     <symbol name="V">
+
       <short>V</short>
+
       <long>VAL</long>
+
     </symbol>
+
     
+
     <ambiguity>
+
       <symbol>
+
         <short>X</short>
+
         <long>UNK</long>
+
       </symbol>
+
       <symbolref name="A"/>
+
       <symbolref name="R"/>
+
       <symbolref name="N"/>
+
       <symbolref name="D"/>
+
       <symbolref name="C"/>
+
       <symbolref name="Q"/>
+
       <symbolref name="E"/>
+
       <symbolref name="G"/>
+
       <symbolref name="H"/>
+
       <symbolref name="I"/>
+
       <symbolref name="L"/>
+
       <symbolref name="K"/>
+
       <symbolref name="M"/>
+
       <symbolref name="F"/>
+
       <symbolref name="P"/>
+
       <symbolref name="S"/>
+
       <symbolref name="T"/>
+
       <symbolref name="W"/>
+
       <symbolref name="Y"/>
+
       <symbolref name="V"/>
+
     </ambiguity>
+
     <ambiguity>
+
       <symbol>
+
         <short>B</short>
+
         <long>ASX</long>
+
       </symbol>
+
       <symbolref name="D"/>
+
       <symbolref name="N"/>
+
     </ambiguity>
+
     <ambiguity>
+
       <symbol>
+
         <short>Z</short>
+
         <long>GLZ</long>
+
       </symbol>
+
       <symbolref name="E"/>
+
       <symbolref name="Q"/>
+
     </ambiguity>
+
+    <ambiguity>
+
+      <symbol>
+
+        <short>-</short>
+
+        <long>gap</long>
+
+      </symbol>
+
+    </ambiguity>
+
   </alphabet>
+
   <alphabet name="TERM" parent="PROTEIN">
+
     <symbol name="termination">
+
       <short>*</short>
+
       <long>TER</long>
+
       <description>Termination signal during translation</description>
+
     </symbol>
+
   </alphabet>
+
   <alphabet name="STRUCTURE">
+
     <symbol>
+
       <short> </short>
+
       <long>nothing</long>
+
       <description>The structure here is undetermined</description>
+
     </symbol>
+
     <symbol>
+
       <short>c</short>
+
       <long>coil</long>
+
       <description>Random coil</description>
+
     </symbol>
+
     <symbol>
+
       <short>h</short>
+
       <long>alpha-helix</long>
+
       <description>part of an alpha-helix</description>
+
     </symbol>
+
     <symbol>
+
       <short>g</short>
+
       <long>3(10) helix</long>
+
     </symbol>
+
     <symbol>
+
       <short>i</short>
+
       <long>Pi-helix</long>
+
     </symbol>
+
     <symbol>
+
       <short>e</short>
+
       <long>sheet</long>
+
       <description>part of an extended hydrogen bonded beta-strand (extended strand, logs of Bs)</description>
+
     </symbol>
+
     <symbol>
+
       <short>b</short>
+
       <long>beta-bridge</long>
+
       <description>like a lone E</description>
+
     </symbol>
+
     <symbol>
+
       <short>t</short>
+
       <long>turn</long>
+
     </symbol>
+
     <symbol>
+
       <short>s</short>
+
       <long>bend</long>
+
       <description>five-residue bend centred at residue i</description>
+
     </symbol>
+
   </alphabet>
+
 </alphabetManager>
+
