@@ -72,20 +72,20 @@ public class CharacterTokenization
     private boolean caseSensitive;
 
     public CharacterTokenization(Alphabet alpha, boolean caseSensitive) {
-	alphabet = alpha;
-	this.caseSensitive = caseSensitive;
+        alphabet = alpha;
+        this.caseSensitive = caseSensitive;
     }
 
     public Alphabet getAlphabet() {
-	return alphabet;
+        return alphabet;
     }
 
     public TokenType getTokenType() {
-	return CHARACTER;
+        return CHARACTER;
     }
 
     public Annotation getAnnotation() {
-	return Annotation.EMPTY_ANNOTATION;
+        return Annotation.EMPTY_ANNOTATION;
     }
 
     /**
@@ -110,90 +110,90 @@ public class CharacterTokenization
      * @param c  the char to bind it to
      */
     public void bindSymbol(Symbol s, char c) {
-	Character chr = new Character(c);
+        Character chr = new Character(c);
 
-	if (!symbolsToCharacters.containsKey(s)) {
-	    symbolsToCharacters.put(s, chr);
-	}
-	if (!charactersToSymbols.containsKey(chr)) {
-	    charactersToSymbols.put(chr, s);
-	}
-	tokenTable = null;
+        if (!symbolsToCharacters.containsKey(s)) {
+            symbolsToCharacters.put(s, chr);
+        }
+        if (!charactersToSymbols.containsKey(chr)) {
+            charactersToSymbols.put(chr, s);
+        }
+        tokenTable = null;
     }
 
     public Symbol parseToken(String token)
         throws IllegalSymbolException
     {
-	if (token.length() != 1) {
-	    throw new IllegalSymbolException("This Tokenization only accepts single-character tokens");
-	}
-	return parseTokenChar(token.charAt(0));
+        if (token.length() != 1) {
+            throw new IllegalSymbolException("This Tokenization only accepts single-character tokens");
+        }
+        return parseTokenChar(token.charAt(0));
     }
 
     protected Symbol[] getTokenTable() {
-	if (tokenTable == null) {
-	    int maxChar = 0;
-	    for (Iterator i = charactersToSymbols.keySet().iterator(); i.hasNext(); ) {
-		Character c = (Character) i.next();
-		char cv = c.charValue();
-		if (caseSensitive) {
-		    maxChar = Math.max(maxChar, cv);
-		} else {
-		    maxChar = Math.max(maxChar, Character.toUpperCase(cv));
-		    maxChar = Math.max(maxChar, Character.toLowerCase(cv));
-		}
-	    }
+        if (tokenTable == null) {
+            int maxChar = 0;
+            for (Iterator i = charactersToSymbols.keySet().iterator(); i.hasNext(); ) {
+                Character c = (Character) i.next();
+                char cv = c.charValue();
+                if (caseSensitive) {
+                    maxChar = Math.max(maxChar, cv);
+                } else {
+                    maxChar = Math.max(maxChar, Character.toUpperCase(cv));
+                    maxChar = Math.max(maxChar, Character.toLowerCase(cv));
+                }
+            }
 
-	    tokenTable = new Symbol[maxChar + 1];
+            tokenTable = new Symbol[maxChar + 1];
 
-	    for (Iterator i = charactersToSymbols.entrySet().iterator(); i.hasNext(); ) {
-		Map.Entry me = (Map.Entry) i.next();
-		Symbol sym = (Symbol) me.getValue();
-		Character c = (Character) me.getKey();
-		char cv = c.charValue();
-		if (caseSensitive) {
-		    tokenTable[cv] = sym;
-		} else {
-		    tokenTable[Character.toUpperCase(cv)] = sym;
-		    tokenTable[Character.toLowerCase(cv)] = sym;
-		}
-	    }
-	}
+            for (Iterator i = charactersToSymbols.entrySet().iterator(); i.hasNext(); ) {
+                Map.Entry me = (Map.Entry) i.next();
+                Symbol sym = (Symbol) me.getValue();
+                Character c = (Character) me.getKey();
+                char cv = c.charValue();
+                if (caseSensitive) {
+                    tokenTable[cv] = sym;
+                } else {
+                    tokenTable[Character.toUpperCase(cv)] = sym;
+                    tokenTable[Character.toLowerCase(cv)] = sym;
+                }
+            }
+        }
 
-	return tokenTable;
+        return tokenTable;
     }
 
     protected Symbol parseTokenChar(char c)
         throws IllegalSymbolException
     {
-	Symbol[] tokenTable = getTokenTable();
-	Symbol sym = null;
-	if (c < tokenTable.length) {
-	    sym = tokenTable[c];
-	}
-	if (sym == null) {
-	    throw new IllegalSymbolException("This tokenization doesn't contain character: '" + c + "'");
-	}
+        Symbol[] tokenTable = getTokenTable();
+        Symbol sym = null;
+        if (c < tokenTable.length) {
+            sym = tokenTable[c];
+        }
+        if (sym == null) {
+            throw new IllegalSymbolException("This tokenization doesn't contain character: '" + c + "'");
+        }
 
-	return sym;
+        return sym;
     }
 
     private Character _tokenizeSymbol(Symbol s)
         throws IllegalSymbolException
     {
-	Character c = (Character) symbolsToCharacters.get(s);
-	if (c == null) {
-	    Alphabet alpha = getAlphabet();
-	    alphabet.validate(s);
-	    if (alpha instanceof FiniteAlphabet) {
-		c = (Character) symbolsToCharacters.get(AlphabetManager.getAllAmbiguitySymbol((FiniteAlphabet) alpha));
-	    }
-	    if (c == null) {
-		throw new IllegalSymbolException("No mapping for symbol " + s.getName());
-	    }
-	}
+        Character c = (Character) symbolsToCharacters.get(s);
+        if (c == null) {
+            Alphabet alpha = getAlphabet();
+            alphabet.validate(s);
+            if (alpha instanceof FiniteAlphabet) {
+                c = (Character) symbolsToCharacters.get(AlphabetManager.getAllAmbiguitySymbol((FiniteAlphabet) alpha));
+            }
+            if (c == null) {
+                throw new IllegalSymbolException("No mapping for symbol " + s.getName());
+            }
+        }
 
-	return c;
+        return c;
     }
 
     public String tokenizeSymbol(Symbol s) throws IllegalSymbolException {
@@ -203,60 +203,60 @@ public class CharacterTokenization
     public String tokenizeSymbolList(SymbolList sl)
         throws IllegalAlphabetException
     {
-	if (sl.getAlphabet() != getAlphabet()) {
-	    throw new IllegalAlphabetException("Alphabet " + sl.getAlphabet().getName() + " does not match " + getAlphabet().getName());
-	}
-	StringBuffer sb = new StringBuffer();
-	for (Iterator i = sl.iterator(); i.hasNext(); ) {
-	    Symbol sym = (Symbol) i.next();
-	    try {
-		Character c = _tokenizeSymbol(sym);
-		sb.append(c.charValue());
-	    } catch (IllegalSymbolException ex) {
-		throw new IllegalAlphabetException(ex, "Couldn't tokenize");
-	    }
-	}
+        if (sl.getAlphabet() != getAlphabet()) {
+            throw new IllegalAlphabetException("Alphabet " + sl.getAlphabet().getName() + " does not match " + getAlphabet().getName());
+        }
+        StringBuffer sb = new StringBuffer();
+        for (Iterator i = sl.iterator(); i.hasNext(); ) {
+            Symbol sym = (Symbol) i.next();
+            try {
+                Character c = _tokenizeSymbol(sym);
+                sb.append(c.charValue());
+            } catch (IllegalSymbolException ex) {
+                throw new IllegalAlphabetException(ex, "Couldn't tokenize");
+            }
+        }
 
-	return sb.substring(0);
+        return sb.substring(0);
     }
 
     public StreamParser parseStream(SeqIOListener listener) {
-	return new TPStreamParser(listener);
+        return new TPStreamParser(listener);
     }
 
     private class TPStreamParser implements StreamParser {
-	private SeqIOListener listener;
-	private Symbol[] buffer;
+        private SeqIOListener listener;
+        private Symbol[] buffer;
 
-	{
-	    buffer = new Symbol[256];
-	}
+        {
+            buffer = new Symbol[256];
+        }
 
-	public TPStreamParser(SeqIOListener l) {
-	    this.listener = l;
-	}
+        public TPStreamParser(SeqIOListener l) {
+            this.listener = l;
+        }
 
-	public void characters(char[] data, int start, int len)
-	    throws IllegalSymbolException
-	{
-	    int cnt = 0;
-	    while (cnt < len) {
-		int bcnt = 0;
-		while (cnt < len && bcnt < buffer.length) {
-		    buffer[bcnt++] = parseTokenChar(data[start + (cnt++)]);
-		}
-		try {
-		    listener.addSymbols(getAlphabet(),
-					buffer,
-					0,
-					bcnt);
-		} catch (IllegalAlphabetException ex) {
-		    throw new BioError(ex, "Assertion failed: can't add symbols.");
-		}
-	    }
-	}
+        public void characters(char[] data, int start, int len)
+            throws IllegalSymbolException
+        {
+            int cnt = 0;
+            while (cnt < len) {
+                int bcnt = 0;
+                while (cnt < len && bcnt < buffer.length) {
+                    buffer[bcnt++] = parseTokenChar(data[start + (cnt++)]);
+                }
+                try {
+                    listener.addSymbols(getAlphabet(),
+                                        buffer,
+                                        0,
+                                        bcnt);
+                } catch (IllegalAlphabetException ex) {
+                    throw new BioError( "Assertion failed: can't add symbols.", ex);
+                }
+            }
+        }
 
-	public void close() {
-	}
+        public void close() {
+        }
     }
 }

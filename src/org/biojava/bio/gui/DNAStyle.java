@@ -40,22 +40,22 @@ import org.biojava.bio.symbol.Symbol;
 public class DNAStyle implements SymbolStyle {
   private Map outlinePaint;
   private Map fillPaint;
-  
+
   {
     outlinePaint = new HashMap();
     fillPaint = new HashMap();
   }
-  
+
   public Paint outlinePaint(Symbol s) throws IllegalSymbolException {
     DNATools.getDNA().validate(s);
     return (Paint) outlinePaint.get(s);
   }
-  
+
   public Paint fillPaint(Symbol s) throws IllegalSymbolException {
     DNATools.getDNA().validate(s);
     return (Paint) fillPaint.get(s);
   }
-  
+
   public void setOutlinePaint(Symbol s, Paint paint)
   throws IllegalSymbolException {
     DNATools.getDNA().validate(s);
@@ -67,7 +67,7 @@ public class DNAStyle implements SymbolStyle {
     DNATools.getDNA().validate(s);
     fillPaint.put(s, paint);
   }
-  
+
   public DNAStyle() {
     try {
       setOutlinePaint(DNATools.t(), Color.black);
@@ -79,7 +79,7 @@ public class DNAStyle implements SymbolStyle {
       setOutlinePaint(DNATools.c(), Color.black);
       setFillPaint(DNATools.c(), Color.yellow);
     } catch (IllegalSymbolException ire) {
-      throw new BioError(ire, "DNA symbols dissapeared from DNA alphabet");
+      throw new BioError("DNA symbols dissapeared from DNA alphabet", ire);
     }
   }
 }

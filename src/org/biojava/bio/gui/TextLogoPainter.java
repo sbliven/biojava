@@ -62,17 +62,17 @@ public class TextLogoPainter implements LogoPainter {
    * A comparator to set up our letters & information scores nicely.
    */
   private static final Comparator COMP = new ResValComparator();
-  
+
   /**
    * Supports the bean property logoFont.
    */
   private PropertyChangeSupport pcs;
-  
+
   /**
    * The property for the logoFont.
    */
   private Font logoFont;
-  
+
   /**
    * Retrieve the current font.
    *
@@ -81,7 +81,7 @@ public class TextLogoPainter implements LogoPainter {
   public Font getLogoFont() {
     return logoFont;
   }
-  
+
   /**
    * Set the current logo font.
    *
@@ -103,11 +103,11 @@ public class TextLogoPainter implements LogoPainter {
   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     pcs.addPropertyChangeListener(propertyName, listener);
   }
-                                        
+
   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     pcs.removePropertyChangeListener(propertyName, listener);
   }
-  
+
   public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
     pcs.firePropertyChange(propertyName, oldValue, newValue);
   }
@@ -127,18 +127,18 @@ public class TextLogoPainter implements LogoPainter {
   public boolean hasListeners(String propertyName) {
     return pcs.hasListeners(propertyName);
   }
-  
+
   public void paintLogo(LogoContext ctxt) {
     Graphics2D g2 = ctxt.getGraphics();
     Distribution dist = ctxt.getDistribution();
     SymbolStyle style = ctxt.getStyle();
     SymbolTokenization toke = null;
     try {
-	toke = dist.getAlphabet().getTokenization("token");
+        toke = dist.getAlphabet().getTokenization("token");
     } catch (BioException ex) {
-	throw new BioRuntimeException(ex);
+        throw new BioRuntimeException(ex);
     }
-    
+
     Rectangle bounds = ctxt.getBounds();
     double width = bounds.getWidth();
     double height = bounds.getHeight();
@@ -149,7 +149,7 @@ public class TextLogoPainter implements LogoPainter {
     );
 
     SortedSet info = new TreeSet(COMP);
-    
+
     try {
       for(
         Iterator i = ((FiniteAlphabet) dist.getAlphabet()).iterator();
@@ -159,67 +159,67 @@ public class TextLogoPainter implements LogoPainter {
         info.add(new ResVal(s, dist.getWeight(s) * scale));
       }
     } catch (IllegalSymbolException ire) {
-      throw new BioError(ire, "Symbol distsapeared from dist alphabet");
+      throw new BioError("Symbol distsapeared from dist alphabet", ire);
     }
-    
+
     FontRenderContext frc = g2.getFontRenderContext();
     for(Iterator i = info.iterator(); i.hasNext();) {
       ResVal rv = (ResVal) i.next();
-      
+
       String s = null;
       try {
-	  s = toke.tokenizeSymbol(rv.getToken());
+          s = toke.tokenizeSymbol(rv.getToken());
       } catch (IllegalSymbolException ex) {
-	  throw new BioRuntimeException(ex);
+          throw new BioRuntimeException(ex);
       }
       GlyphVector gv = logoFont.createGlyphVector(frc, s);
       Shape outline = gv.getOutline();
       Rectangle2D oBounds = outline.getBounds2D();
-      
+
       AffineTransform at = new AffineTransform();
       at.setToTranslation(0.0, base-rv.getValue());
       at.scale(width / oBounds.getWidth(), rv.getValue() / oBounds.getHeight());
       at.translate(-oBounds.getMinX(), -oBounds.getMinY());
       outline = at.createTransformedShape(outline);
-      
+
       try {
         g2.setPaint(style.fillPaint(rv.getToken()));
       } catch (IllegalSymbolException ire) {
         g2.setPaint(Color.black);
       }
       g2.fill(outline);
-      
+
       try {
         g2.setPaint(style.outlinePaint(rv.getToken()));
       } catch (IllegalSymbolException ire) {
         g2.setPaint(Color.gray);
       }
       g2.draw(outline);
-      
+
       base -= rv.getValue();
     }
   }
-  
+
   public TextLogoPainter() {
     pcs = new PropertyChangeSupport(this);
     logoFont = new Font("Tahoma", Font.PLAIN, 12);
   }
-  
+
   /**
    * A symbol/information tuple.
    */
   private static class ResVal {
     private Symbol symbol;
     private double value;
-    
+
     public final Symbol getToken() {
       return symbol;
     }
-    
+
     public final double getValue() {
       return value;
     }
-    
+
     public ResVal(Symbol sym, double val) {
       symbol = sym;
       value = val;
@@ -233,7 +233,7 @@ public class TextLogoPainter implements LogoPainter {
     public final int compare(Object o1, Object o2) {
       ResVal rv1 = (ResVal) o1;
       ResVal rv2 = (ResVal) o2;
-      
+
       double diff = rv1.getValue() - rv2.getValue();
       if(diff < 0) return -1;
       if(diff > 0) return +1;

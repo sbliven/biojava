@@ -102,7 +102,7 @@ implements SymbolList {
           SymbolTokenization toke = getAlphabet().getTokenization("token");
           return toke.tokenizeSymbolList(this);
       } catch (BioException ex) {
-          throw new BioRuntimeException(ex, "Couldn't tokenize sequence");
+          throw new BioRuntimeException("Couldn't tokenize sequence", ex);
       }
   }
 
@@ -280,7 +280,7 @@ implements SymbolList {
               SymbolTokenization toke = getAlphabet().getTokenization("token");
               return toke.tokenizeSymbolList(this);
           } catch (BioException ex) {
-              throw new BioRuntimeException(ex, "Couldn't tokenize sequence");
+              throw new BioRuntimeException("Couldn't tokenize sequence", ex);
           }
       }
 

@@ -46,7 +46,7 @@ extends AbstractSymbolList implements SymbolList {
    * The source symbol list to translate.
    */
   private final SymbolList source;
-  
+
   /**
    * The TranslationTable that will be used to translate source->view symbols
    */
@@ -56,19 +56,19 @@ extends AbstractSymbolList implements SymbolList {
 *Obtain the translation table associated with this symbol list
 */
 
-  
+
   public TranslationTable getTranslationTable() {
     return transTable;
   }
 
     /**
 *Returns the symbol list associated with this translated symbol list.
-*/  
-  
+*/
+
   public SymbolList getSource() {
     return source;
   }
-  
+
   public TranslatedSymbolList(SymbolList source, TranslationTable transTable)
   throws IllegalAlphabetException {
     if(transTable.getSourceAlphabet() != source.getAlphabet()) {
@@ -78,27 +78,26 @@ extends AbstractSymbolList implements SymbolList {
         transTable.getSourceAlphabet().getName()
       );
     }
-    
+
     this.source = source;
     this.transTable = transTable;
   }
-  
+
   public int length() {
     return source.length();
   }
-  
+
   public Symbol symbolAt(int indx) {
     try {
       return transTable.translate(source.symbolAt(indx));
     } catch (IllegalSymbolException ire) {
       throw new BioError(
-        ire,
         "I thought that I had checked that the translation table was compatible with " +
-        "my source, but apparently something has messed up."
+        "my source, but apparently something has messed up.", ire
       );
     }
   }
-  
+
   public Alphabet getAlphabet() {
     return transTable.getTargetAlphabet();
   }

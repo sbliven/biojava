@@ -58,10 +58,10 @@ public class TranslatedDistribution
   private final Distribution delegate;
   private final ReversibleTranslationTable table;
   private transient ChangeListener forwarder;
-  
+
   /**
    * Users should make these thigs via getDistribuiton.
-   */     
+   */
   public TranslatedDistribution(
     ReversibleTranslationTable table,
     Distribution other,
@@ -82,30 +82,30 @@ public class TranslatedDistribution
   public Alphabet getAlphabet() {
     return table.getSourceAlphabet();
   }
-  
+
   public double getWeight(Symbol sym)
   throws IllegalSymbolException {
     return delegate.getWeight(sym);
   }
-  
+
   public void setWeight(Symbol sym, double weight)
   throws IllegalSymbolException, ChangeVetoException {
     delegate.setWeight(sym, weight);
   }
-  
+
   public Symbol sampleSymbol() {
     return delegate.sampleSymbol();
   }
-  
+
   public Distribution getNullModel() {
     return delegate.getNullModel();
   }
-  
+
   public void setNullModel(Distribution dist)
   throws IllegalAlphabetException, ChangeVetoException {
     delegate.setNullModel(dist);
   }
-  
+
   /**
    * Retrieve the translation table encapsulating the map from this emission
    * spectrum to the underlying one.
@@ -115,10 +115,10 @@ public class TranslatedDistribution
   public ReversibleTranslationTable getTable() {
     return table;
   }
-  
+
   public void registerWithTrainer(DistributionTrainerContext dtc) {
     dtc.registerDistribution(other);
-    
+
     dtc.registerTrainer(this, new DistributionTrainer() {
       public void addCount(
         DistributionTrainerContext dtc,
@@ -127,14 +127,14 @@ public class TranslatedDistribution
       ) throws IllegalSymbolException {
         dtc.addCount(other, table.translate(s), count);
       }
-      
+
       public double getCount(
         DistributionTrainerContext dtc,
         AtomicSymbol s
       ) throws IllegalSymbolException {
         return dtc.getCount(other, table.translate(s));
       }
-      
+
       public void train(DistributionTrainerContext dtc, double weight)
       throws ChangeVetoException {
         DistributionTrainerContext subCtxt
@@ -154,35 +154,35 @@ public class TranslatedDistribution
                 dtc.getCount(other, sym)
             );
           } catch (IllegalSymbolException ise) {
-            throw new BioError(ise, "Assertion Failed: Can't train");
+            throw new BioError("Assertion Failed: Can't train", ise);
           }
         }
         subCtxt.train();
       }
-      
+
       public void clearCounts(DistributionTrainerContext dtc) {
       }
     });
   }
-  
+
   protected ChangeSupport getChangeSupport(ChangeType ct) {
     ChangeSupport cs = super.getChangeSupport(ct);
-    
-    if(forwarder == null && 
-       (Distribution.WEIGHTS.isMatchingType(ct) || ct.isMatchingType(Distribution.WEIGHTS))) 
+
+    if(forwarder == null &&
+       (Distribution.WEIGHTS.isMatchingType(ct) || ct.isMatchingType(Distribution.WEIGHTS)))
     {
       forwarder = new Forwarder(this, cs);
       delegate.addChangeListener(forwarder, Distribution.WEIGHTS);
     }
-    
+
     return cs;
   }
-  
+
   private class Forwarder extends ChangeForwarder {
     public Forwarder(Object source, ChangeSupport changeSupport) {
       super(source, changeSupport);
     }
-    
+
     protected ChangeEvent generateChangeEvent(ChangeEvent ce) {
       ChangeType ct = ce.getType();
       Object change = ce.getChange();
@@ -194,7 +194,7 @@ public class TranslatedDistribution
             try {
               change = new Object[] { table.translate((Symbol) ca[0]), ca[1] };
             } catch (IllegalSymbolException ise) {
-              throw new BioError(ise, "Couldn't translate symbol");
+              throw new BioError("Couldn't translate symbol", ise);
             }
           }
         }
@@ -204,7 +204,7 @@ public class TranslatedDistribution
             try {
               previous = new Object[] { table.translate((Symbol) pa[0]), pa[1] };
             } catch (IllegalSymbolException ise) {
-              throw new BioError(ise, "Couldn't translate symbol");
+              throw new BioError("Couldn't translate symbol", ise);
             }
           }
         }
@@ -215,7 +215,7 @@ public class TranslatedDistribution
       return new ChangeEvent(
         TranslatedDistribution.this, ct,
         change, previous, ce
-      ); 
+      );
     }
   }
 }

@@ -39,31 +39,31 @@ import org.biojava.bio.symbol.SymbolList;
  */
 public abstract class AbstractTrainer implements TrainingAlgorithm {
   private DP dp;
-  
+
   private double lastScore = -Double.NEGATIVE_INFINITY;
   private double currentScore = -Double.NEGATIVE_INFINITY;
   private int cycle;
-  
+
   public double getLastScore() {
     return lastScore;
   }
-  
+
   public double getCurrentScore() {
     return currentScore;
   }
-  
+
   public int getCycle() {
     return cycle;
   }
-  
+
   public DP getDP() {
     return dp;
   }
-  
+
   protected abstract double singleSequenceIteration(ModelTrainer trainer,
                                                     SymbolList symList)
   throws IllegalSymbolException, IllegalTransitionException, IllegalAlphabetException;
-  
+
   /**
    * Trains the sequences in db until stopper says to finnish.
    */
@@ -76,7 +76,7 @@ public abstract class AbstractTrainer implements TrainingAlgorithm {
       ModelTrainer trainer = new SimpleModelTrainer();
       trainer.setNullModelWeight(nullModelWeight);
       trainer.registerModel(dp.getModel());
-        
+
       do {
         cycle++;
         lastScore = currentScore;
@@ -89,13 +89,13 @@ public abstract class AbstractTrainer implements TrainingAlgorithm {
         trainer.clearCounts();
       } while(!stopper.isTrainingComplete(this));
     } catch (Exception e) {
-      throw new BioException(e, "Unable to train");
+      throw new BioException("Unable to train", e);
     }
   }
-  
+
   public AbstractTrainer(DP dp) {
     this.dp = dp;
   }
-  
+
   protected AbstractTrainer() {}
 }

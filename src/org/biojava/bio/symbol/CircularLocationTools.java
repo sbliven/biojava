@@ -170,7 +170,7 @@ final class CircularLocationTools {
       }
       catch (BioException ex) {
         //this shouldn't happen as conditions have been checked above
-        throw new BioError(ex,"Assertion Error, cannot build MergeLocation");
+        throw new BioError("Assertion Error, cannot build MergeLocation", ex);
       }
 
       try{

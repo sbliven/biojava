@@ -66,14 +66,14 @@ public class XmlMarkovModel {
     FiniteAlphabet seqAlpha = (FiniteAlphabet) sa;
     SymbolTokenization symParser = seqAlpha.getTokenization("token");
     SymbolTokenization nameParser = seqAlpha.getTokenization("name");
-    
+
     int columns = 0;
     NodeList colL = root.getElementsByTagName("col");
     for(int i = 0; i < colL.getLength(); i++) {
       int indx = Integer.parseInt(((Element) colL.item(i)).getAttribute("indx"));
       columns = Math.max(columns, indx);
     }
-    
+
     WeightMatrix wm = new SimpleWeightMatrix(seqAlpha, columns, DistributionFactory.DEFAULT);
 
     colL = root.getElementsByTagName("col");
@@ -95,18 +95,18 @@ public class XmlMarkovModel {
         } catch (ChangeVetoException cve) {
           throw new BioError("Assertion failure: Should be able to set the weights");
         }
-      }      
+      }
     }
-    
+
     return wm;
   }
-  
+
   public static MarkovModel readModel(Element root)
   throws BioException, IllegalSymbolException, IllegalAlphabetException {
     if(root.getTagName().equals("WeightMatrix")) {
       return new WMAsMM(readMatrix(root));
     }
-    
+
     int heads = Integer.parseInt(root.getAttribute("heads"));
     Element alphaE = (Element) root.getElementsByTagName("alphabet").item(0);
     Alphabet seqAlpha = AlphabetManager.alphabetForName(
@@ -117,27 +117,27 @@ public class XmlMarkovModel {
     for(int i = 0; i < heads; i++) {
       advance[i] = 1;
     }
-      
+
     SymbolTokenization nameParser = null;
     SymbolTokenization symbolParser = null;
-    
+
     try {
       nameParser = seqAlpha.getTokenization("name");
     } catch (NoSuchElementException nsee) {
     }
-    
+
     try {
       symbolParser = seqAlpha.getTokenization("token");
     } catch (NoSuchElementException nsee) {
     }
-    
+
     if(nameParser == null && symbolParser == null) {
       throw new BioException(
         "Couldn't find a parser for alphabet " +
         seqAlpha.getName()
       );
     }
-    
+
     Map nameToState = new HashMap();
     nameToState.put("_start_", model.magicalState());
     nameToState.put("_end_", model.magicalState());
@@ -164,7 +164,7 @@ public class XmlMarkovModel {
       EmissionState state = new SimpleEmissionState(
         name, Annotation.EMPTY_ANNOTATION, advance, dis
       );
-      
+
       nameToState.put(name, state);
       NodeList weights = stateE.getElementsByTagName("weight");
       for(int j = 0; j < weights.getLength(); j++) {
@@ -188,23 +188,23 @@ public class XmlMarkovModel {
               sym = symbolParser.parseToken(symName);
             }
           } catch (IllegalSymbolException ise) {
-            throw new BioException(ise, "Can't extract symbol from " + weightE + " in " + stateE);
+            throw new BioException("Can't extract symbol from " + weightE + " in " + stateE, ise);
           }
         }
         try {
           dis.setWeight(sym, Double.parseDouble(weightE.getAttribute("prob")));
         } catch (ChangeVetoException cve) {
           throw new BioError(
-            cve, "Assertion failure: Should be able to edit distribution"
+            "Assertion failure: Should be able to edit distribution", cve
           );
         }
       }
-      
+
       try {
         model.addState(state);
       } catch (ChangeVetoException cve) {
         throw new BioError(
-          cve, "Assertion failure: Should be able to add states to model"
+         "Assertion failure: Should be able to add states to model",  cve
         );
       }
     }
@@ -219,20 +219,20 @@ public class XmlMarkovModel {
         model.createTransition(from, to);
       } catch (IllegalSymbolException ite) {
         throw new BioError(
-          ite, 
+
           "We should have unlimited write-access to this model. " +
-          "Something is very wrong."
+          "Something is very wrong.", ite
         );
       } catch (ChangeVetoException cve) {
         throw new BioError(
-          cve, 
+
           "We should have unlimited write-access to this model. " +
-          "Something is very wrong."
+          "Something is very wrong.", cve
         );
       }
     }
-    
-	for(int i = 0; i < transitions.getLength(); i++) {
+
+        for(int i = 0; i < transitions.getLength(); i++) {
       Element transitionE = (Element) transitions.item(i);
       State from = (State) nameToState.get(transitionE.getAttribute("from"));
       State to = (State) nameToState.get(transitionE.getAttribute("to"));
@@ -241,26 +241,26 @@ public class XmlMarkovModel {
         model.getWeights(from).setWeight(to, prob);
       } catch (IllegalSymbolException ite) {
         throw new BioError(
-          ite, 
+
           "We should have unlimited write-access to this model. " +
-          "Something is very wrong."
+          "Something is very wrong.", ite
         );
       } catch (ChangeVetoException cve) {
         throw new BioError(
-          cve, 
+
           "We should have unlimited write-access to this model. " +
-          "Something is very wrong."
+          "Something is very wrong.", cve
         );
       }
     }
     return model;
   }
- 
+
   public static void writeMatrix(WeightMatrix matrix, PrintStream out) throws Exception {
     FiniteAlphabet symA = (FiniteAlphabet) matrix.getAlphabet();
-    
+
     out.println("<MarkovModel>\n  <alphabet name=\"" + symA.getName() + "\"/>");
-    
+
     for(int i = 0; i < matrix.columns(); i++) {
       out.println("  <col indx=\"" + (i+1) + "\">");
       for(Iterator si = symA.iterator(); si.hasNext(); ) {
@@ -270,19 +270,19 @@ public class XmlMarkovModel {
         }
       out.println("  </col>");
     }
-    
+
     out.println("</MarkovModel>");
   }
-  
+
   public static void writeModel(MarkovModel model, PrintStream out)
   throws Exception {
     model = DP.flatView(model);
     FiniteAlphabet stateA = model.stateAlphabet();
     FiniteAlphabet symA = (FiniteAlphabet) model.emissionAlphabet();
-    
+
     out.println("<MarkovModel heads=\"" + model.heads() + "\">");
     out.println("<alphabet name=\"" + symA.getName() + "\"/>");
-    
+
     // print out states & scores
     for(Iterator stateI = stateA.iterator(); stateI.hasNext(); ) {
       State s = (State) stateI.next();
@@ -306,10 +306,10 @@ public class XmlMarkovModel {
       State from = (State) i.next();
       printTransitions(model, from, out);
     }
-    
+
     out.println("</MarkovModel>");
   }
-  
+
   static private void printTransitions(MarkovModel model, State from, PrintStream out) throws IllegalSymbolException {
     for(Iterator i = model.transitionsFrom(from).iterator(); i.hasNext(); ) {
       State to = (State) i.next();
@@ -318,8 +318,8 @@ public class XmlMarkovModel {
                              "\" to=\"" + ((to instanceof MagicalState) ? "_end_" : to.getName()) +
                              "\" prob=\"" + model.getWeights(from).getWeight(to) + "\"/>");
       } catch (IllegalSymbolException ite) {
-        throw new BioError(ite, "Transition listed in transitionsFrom(" +
-                           from.getName() + ") has dissapeared");
+        throw new BioError("Transition listed in transitionsFrom(" +
+                           from.getName() + ") has dissapeared", ite);
       }
     }
   }

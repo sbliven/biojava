@@ -74,7 +74,7 @@ public class PairwiseFilteringRenderer extends AbstractChangeable
                        "org.biojava.bio.gui.sequence.PairwiseFilteringRenderer",
                        "FILTER",
                        SequenceRenderContext.LAYOUT);
-  
+
     /**
      * Constant <code>RECURSE</code> indicating a change to the
      * renderer's filter recursion flag.
@@ -145,14 +145,14 @@ public class PairwiseFilteringRenderer extends AbstractChangeable
         }
         catch (ChangeVetoException cve)
         {
-            throw new BioError(cve, "Assertion failed: should have no listeners");
+            throw new BioError("Assertion failed: should have no listeners", cve);
         }
     }
 
     protected ChangeSupport getChangeSupport(ChangeType ct)
     {
         ChangeSupport cs = super.getChangeSupport(ct);
-    
+
         if (rendererForwarder == null)
         {
             rendererForwarder =
@@ -302,7 +302,7 @@ public class PairwiseFilteringRenderer extends AbstractChangeable
     {
         renderer.paint(g2, getSubContext(context));
     }
-  
+
     public SequenceViewerEvent processMouseEvent(PairwiseRenderContext context,
                                                  MouseEvent            me,
                                                  List                  path)
@@ -418,7 +418,7 @@ public class PairwiseFilteringRenderer extends AbstractChangeable
     private class CacheFlusher implements ChangeListener
     {
         private FilteredSubContext fsc;
-    
+
         public CacheFlusher(FilteredSubContext fsc)
         {
             this.fsc = fsc;
@@ -430,7 +430,7 @@ public class PairwiseFilteringRenderer extends AbstractChangeable
         {
             subContextCache.remove(fsc);
             cacheFlushers.remove(this);
-      
+
             if (hasListeners())
             {
                 ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);

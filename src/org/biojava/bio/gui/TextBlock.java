@@ -45,7 +45,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
  */
 public class TextBlock implements BlockPainter {
   private Font logoFont = new Font("Tahoma", Font.PLAIN, 12);
-  
+
   /**
    * Retrieve the current font.
    *
@@ -54,7 +54,7 @@ public class TextBlock implements BlockPainter {
   public Font getLogoFont() {
     return logoFont;
   }
-  
+
   /**
    * Set the current logo font.
    *
@@ -70,42 +70,42 @@ public class TextBlock implements BlockPainter {
     Distribution dist = ctxt.getDistribution();
     SymbolTokenization toke = null;
     try {
-	toke = dist.getAlphabet().getTokenization("token");
+        toke = dist.getAlphabet().getTokenization("token");
     } catch (BioException ex) {
-	throw new BioRuntimeException(ex);
+        throw new BioRuntimeException(ex);
     }
-    
+
     FontRenderContext frc = g2.getFontRenderContext();
     try {
-	GlyphVector gv = logoFont.createGlyphVector(frc, toke.tokenizeSymbol(sym));
-    
-	Shape outline = gv.getOutline();
-	Rectangle2D oBounds = outline.getBounds2D();
-    
-	AffineTransform at = new AffineTransform();
-	at.setToTranslation(block.getX(), block.getY());
-	at.scale(
-		 block.getWidth() / oBounds.getWidth(),
-		 block.getHeight() / oBounds.getHeight()
-		 );
-	at.translate(-oBounds.getMinX(), -oBounds.getMinY());
-	outline = at.createTransformedShape(outline);
-	
-	try {
-	    g2.setPaint(style.fillPaint(sym));
-	} catch (IllegalSymbolException ire) {
-	    g2.setPaint(Color.black);
-	}
-	g2.fill(outline);
-	
-	try {
-	    g2.setPaint(style.outlinePaint(sym));
-	} catch (IllegalSymbolException ire) {
-	    g2.setPaint(Color.gray);
-	}
-	g2.draw(outline);
+        GlyphVector gv = logoFont.createGlyphVector(frc, toke.tokenizeSymbol(sym));
+
+        Shape outline = gv.getOutline();
+        Rectangle2D oBounds = outline.getBounds2D();
+
+        AffineTransform at = new AffineTransform();
+        at.setToTranslation(block.getX(), block.getY());
+        at.scale(
+                 block.getWidth() / oBounds.getWidth(),
+                 block.getHeight() / oBounds.getHeight()
+                 );
+        at.translate(-oBounds.getMinX(), -oBounds.getMinY());
+        outline = at.createTransformedShape(outline);
+
+        try {
+            g2.setPaint(style.fillPaint(sym));
+        } catch (IllegalSymbolException ire) {
+            g2.setPaint(Color.black);
+        }
+        g2.fill(outline);
+
+        try {
+            g2.setPaint(style.outlinePaint(sym));
+        } catch (IllegalSymbolException ire) {
+            g2.setPaint(Color.gray);
+        }
+        g2.draw(outline);
     } catch (IllegalSymbolException ex) {
-	throw new BioError(ex, "Couldn't tokenize symbol");
+        throw new BioError("Couldn't tokenize symbol", ex);
     }
   }
 }

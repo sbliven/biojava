@@ -110,14 +110,14 @@ public abstract class AbstractAnnotation
       }
     }
   }
-  
+
   public void removeProperty(Object key)
     throws ChangeVetoException, NoSuchElementException
   {
     if (!getProperties().containsKey(key)) {
         throw new NoSuchElementException("Can't remove key " + key.toString());
     }
-    
+
     if(!hasListeners()) {
       getProperties().remove(key);
     } else {
@@ -192,8 +192,7 @@ public abstract class AbstractAnnotation
         properties.put(key, ann.getProperty(key));
       } catch (IllegalArgumentException iae) {
         throw new BioError(
-          iae,
-          "Property was there and then disappeared: " + key
+          "Property was there and then disappeared: " + key, iae
         );
       }
     }

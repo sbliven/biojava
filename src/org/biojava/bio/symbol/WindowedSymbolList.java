@@ -40,12 +40,12 @@ extends AbstractSymbolList implements Serializable {
    * The source sequence that we will transliterate.
    */
   private final SymbolList source;
-  
+
   /**
    * The alphabet of window Symbols.
    */
   private final Alphabet alpha;
-  
+
   /**
    * The width of the window.
    */
@@ -59,7 +59,7 @@ extends AbstractSymbolList implements Serializable {
   public SymbolList getSource() {
     return source;
   }
-  
+
   /**
    * Create a WindowedSymbolList with the given window width.
    */
@@ -78,7 +78,7 @@ extends AbstractSymbolList implements Serializable {
     );
     this.width = width;
   }
-  
+
   public Alphabet getAlphabet() {
     return alpha;
   }
@@ -86,7 +86,7 @@ extends AbstractSymbolList implements Serializable {
   public int length() {
     return source.length() / width;
   }
-  
+
   public Symbol symbolAt(int index)
   throws IndexOutOfBoundsException {
     if(index < 1 || index > length()) {
@@ -95,13 +95,13 @@ extends AbstractSymbolList implements Serializable {
         length() + "), not " + index
       );
     }
-    
+
     index = (index-1)*width + 1;
-    
+
     try {
       return alpha.getSymbol(source.subList(index, index+width-1).toList());
     } catch (IllegalSymbolException iae) {
-      throw new BioError(iae, "Alphabet changed underneath me");
+      throw new BioError("Alphabet changed underneath me", iae);
     }
   }
 }

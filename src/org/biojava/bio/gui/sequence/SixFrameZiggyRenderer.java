@@ -61,8 +61,8 @@ public class SixFrameZiggyRenderer
   public SixFrameZiggyRenderer(SixFrameRenderer pane) {
     this.pane = pane;
   }
-  
-  public void setFill(Paint p) 
+
+  public void setFill(Paint p)
     throws ChangeVetoException {
     pane.setFill(p);
   }
@@ -71,7 +71,7 @@ public class SixFrameZiggyRenderer
     return pane.getFill();
   }
 
-  public void setOutline(Paint p) 
+  public void setOutline(Paint p)
     throws ChangeVetoException {
     pane.setOutline(p);
   }
@@ -79,16 +79,16 @@ public class SixFrameZiggyRenderer
   public Paint getOutline() {
     return pane.getOutline();
   }
-  
+
   public void setBlockDepth(double depth)
     throws ChangeVetoException {
     pane.setBlockWidth(depth);
   }
-  
+
   public double getBlockDepth() {
     return pane.getBlockWidth();
   }
-  
+
   public double getDepth(SequenceRenderContext src) {
     return pane.getDepth(src);
   }
@@ -104,11 +104,11 @@ public class SixFrameZiggyRenderer
       // search top strand
       // first base must be t
       if (seq.symbolAt(base) != DNATools.t()) return false;
- 
+
       // second base cannot be c or t
       if (seq.symbolAt(base+1) == DNATools.c()) return false;
       if (seq.symbolAt(base+1) == DNATools.t()) return false;
- 
+
       // if second base is g, the third must be a
       if (seq.symbolAt(base+1) == DNATools.g()) {
         if (seq.symbolAt(base+2) != DNATools.a()) return false;
@@ -118,19 +118,19 @@ public class SixFrameZiggyRenderer
         if (seq.symbolAt(base+2) == DNATools.c()) return false;
         if (seq.symbolAt(base+2) == DNATools.t()) return false;
       }
- 
+
       // oh well, must be a stop, innit?
       return true;
- 
+
     } else {
       // search bottom strand
       // first base must be t
       if (seq.symbolAt(base) != DNATools.a()) return false;
- 
+
       // second base cannot be c or t on reverse strand
       if (seq.symbolAt(base-1) == DNATools.a()) return false;
       if (seq.symbolAt(base-1) == DNATools.g()) return false;
- 
+
       // if second base is g, the third must be a
       if (seq.symbolAt(base-1) == DNATools.c()) {
         if (seq.symbolAt(base-2) != DNATools.t()) return false;
@@ -140,14 +140,14 @@ public class SixFrameZiggyRenderer
         if (seq.symbolAt(base-2) == DNATools.a()) return false;
         if (seq.symbolAt(base-2) == DNATools.g()) return false;
       }
- 
+
       // ach! a stop!
       return true;
     }
   }
 
   private int findORF(
-                Sequence seq, 
+                Sequence seq,
                 StrandedFeature.Strand strand) {
     // finds in a SymbolList the specified phase with
     // longest ORF and returns the phase.
@@ -169,7 +169,7 @@ public class SixFrameZiggyRenderer
     else {
       startSearch = 3;
       endSearch = length;
-    }     
+    }
 
     for (int i=startSearch; i <= endSearch; i++) {
       if (isStop(seq, i, strand)) {
@@ -190,7 +190,7 @@ public class SixFrameZiggyRenderer
     }
 
     // there is always the possibility that there are a few stops
-    // near the beginning then no more.  
+    // near the beginning then no more.
     // The best phase will then be misdetected.
     // Assume closure at end of frame.
     for (int i=0; i < 3; i++) {
@@ -222,7 +222,7 @@ public class SixFrameZiggyRenderer
       Feature thisExon = block[j];
 
       cft.componentLocation = thisExon.getLocation();
-      int length = cft.componentLocation.getMax() - 
+      int length = cft.componentLocation.getMax() -
                      cft.componentLocation.getMin() + 1;
       cft.location = new RangeLocation(last+1, last+length);
       last += length;
@@ -233,23 +233,22 @@ public class SixFrameZiggyRenderer
       }
       catch (BioException be) {
         throw new BioError(
-          be,
-          "Couldn't merge exons."
+          "Couldn't merge exons.", be
           );
       }
       catch (ChangeVetoException cve) {
         throw new BioError(
-          cve,
-          "Couldn't merge exons."
+
+          "Couldn't merge exons.",cve
           );
       }
     }
     return sa;
   }
-    
+
   public void renderFeature(
-                Graphics2D g, 
-                Feature f, 
+                Graphics2D g,
+                Feature f,
                 SequenceRenderContext context) {
 //    System.out.println("SixFrameZiggyRenderer called");
 
@@ -294,7 +293,7 @@ public class SixFrameZiggyRenderer
     // embedded into the sequence
     int phase = findORF(fused, strand);
 
-//    System.out.println("fused length, phase, strand: " + fused.length() + " " 
+//    System.out.println("fused length, phase, strand: " + fused.length() + " "
 //                        + phase + " " + strand);
 //    System.out.println("sequence is :- " + fused.seqString());
 
@@ -313,7 +312,7 @@ public class SixFrameZiggyRenderer
 //        System.out.println("block value is " + loc);
       }
     }
-      
+
   }
 
   public FeatureHolder processMouseEvent(

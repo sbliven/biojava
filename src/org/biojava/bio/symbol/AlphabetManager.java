@@ -98,7 +98,7 @@ public final class AlphabetManager {
         try {
             return alpha.getAmbiguity(allSymbols);
         } catch (IllegalSymbolException ex) {
-            throw new BioError(ex, "Assertion failure: coudn't recover all-ambiguity symbol");
+            throw new BioError( "Assertion failure: coudn't recover all-ambiguity symbol", ex);
         }
     }
 
@@ -131,7 +131,7 @@ public final class AlphabetManager {
             try {
                 allSymbols.add(alpha.getAmbiguity(matchSet));
             } catch (IllegalSymbolException ex) {
-                throw new BioError(ex, "Assertion failed: couldn't get ambiguity symbol");
+                throw new BioError( "Assertion failed: couldn't get ambiguity symbol", ex);
             }
         }
 
@@ -291,8 +291,7 @@ public final class AlphabetManager {
           );
         } catch (IllegalSymbolException ise) {
           throw new BioError(
-            ise,
-            "Assertion Failure: Should be able to make gap basis"
+            "Assertion Failure: Should be able to make gap basis", ise
           );
         }
       }
@@ -479,8 +478,7 @@ public final class AlphabetManager {
         return Collections.singleton(alpha.getSymbol(built));
       } catch (IllegalSymbolException ise) {
         throw new BioError(
-          ise,
-          "Assertion Failure: Should just have legal AtomicSymbol instances."
+          "Assertion Failure: Should just have legal AtomicSymbol instances.", ise
         );
       }
     }
@@ -818,7 +816,7 @@ public final class AlphabetManager {
           return syms;
         }
       } catch (IllegalSymbolException ise) {
-        throw new BioError(ise, "Assertion Failure: Couldn't create symbol.");
+        throw new BioError("Assertion Failure: Couldn't create symbol.", ise);
       }
     }
   }
@@ -906,8 +904,8 @@ public final class AlphabetManager {
       );
     } catch (IllegalSymbolException ise) {
       throw new BioError(
-        ise,
-        "Assertion Failure: Should be able to make gap basis"
+
+        "Assertion Failure: Should be able to make gap basis", ise
       );
     }
 
@@ -922,7 +920,7 @@ public final class AlphabetManager {
       InputSource is = new InputSource(alphabetStream);
       loadAlphabets(is);
     } catch (Exception t) {
-      throw new BioError(t, "Unable to initialize AlphabetManager");
+      throw new BioError( "Unable to initialize AlphabetManager", t);
     }
   }
 
@@ -947,7 +945,7 @@ public final class AlphabetManager {
             parser.setContentHandler(new SAX2StAXAdaptor(new AlphabetManagerHandler()));
             parser.parse(is);
         } catch (ParserConfigurationException ex) {
-            throw new BioException(ex, "Unable to create XML parser");
+            throw new BioException( "Unable to create XML parser", ex);
         }
     }
 
@@ -1027,7 +1025,7 @@ public final class AlphabetManager {
                              try {
                                  annotation.setProperty("description", s);
                              } catch (ChangeVetoException ex) {
-                                 throw new BioError(ex, "Assertion failure: veto while modifying new Annotation");
+                                 throw new BioError( "Assertion failure: veto while modifying new Annotation", ex);
                              }
                          }
                      } );
@@ -1084,7 +1082,7 @@ public final class AlphabetManager {
                          try {
                              alpha.addSymbol(sym);
                          } catch (Exception ex) {
-                             throw new BioError(ex, "Couldn't initialize alphabet from parent");
+                             throw new BioError( "Couldn't initialize alphabet from parent", ex);
                          }
                          localSymbols.put(sym.getName(), sym);
                      }
@@ -1120,7 +1118,7 @@ public final class AlphabetManager {
                              try {
                                  alpha.getAnnotation().setProperty("description", s);
                              } catch (ChangeVetoException ex) {
-                                 throw new BioError(ex, "Assertion failure: veto while modifying new Annotation");
+                                 throw new BioError( "Assertion failure: veto while modifying new Annotation", ex);
                              }
                          }
                      } );
@@ -1155,7 +1153,7 @@ public final class AlphabetManager {
                  try {
                      alpha.addSymbol(sym);
                  } catch (ChangeVetoException cve) {
-                     throw new BioError(cve, "Assertion failure: veto while modifying new Alphabet");
+                     throw new BioError( "Assertion failure: veto while modifying new Alphabet", cve);
                  } catch (IllegalSymbolException ex) {
                      throw new SAXException("IllegalSymbolException adding symbol to alphabet");
                  }

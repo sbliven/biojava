@@ -69,7 +69,7 @@ implements Serializable {
           Alphabet a = (Alphabet) i.next();
           if (!a.isUnchanging(Alphabet.SYMBOLS)) {
               return new ChangeSupport();
-          } 
+          }
       }
       return new ChangeSupport(Collections.singleton(Alphabet.SYMBOLS));
   }
@@ -77,9 +77,9 @@ implements Serializable {
   public String getName() {
     StringBuffer name = new StringBuffer("(");
     for (int i = 0; i < alphas.size(); ++i) {
-	    Alphabet a = (Alphabet) alphas.get(i);
-	    name.append(a.getName());
-	    if (i < alphas.size() - 1) {
+            Alphabet a = (Alphabet) alphas.get(i);
+            name.append(a.getName());
+            if (i < alphas.size() - 1) {
         name.append(" x ");
       }
     }
@@ -193,7 +193,7 @@ implements Serializable {
         }
         return sym;
       } catch (IllegalSymbolException ise) {
-        throw new BioError(ise, "Assertion Failure: I should contain this symbol");
+        throw new BioError( "Assertion Failure: I should contain this symbol", ise);
       }
     }
 

@@ -41,12 +41,12 @@ class OrderNSymbolList extends AbstractSymbolList implements Serializable {
    * The source sequence that we will transliterate.
    */
   private final SymbolList source;
-  
+
   /**
    * The alphabet for each overlapping tuple.
    */
   private final Alphabet alpha;
-  
+
   /**
    * The view order.
    */
@@ -60,7 +60,7 @@ class OrderNSymbolList extends AbstractSymbolList implements Serializable {
   public SymbolList getSource() {
     return source;
   }
-  
+
   /**
    * Create an order n OrderNSymbolList from source.
    */
@@ -73,7 +73,7 @@ class OrderNSymbolList extends AbstractSymbolList implements Serializable {
     );
     this.order = order;
   }
-  
+
   public Alphabet getAlphabet() {
     return alpha;
   }
@@ -81,7 +81,7 @@ class OrderNSymbolList extends AbstractSymbolList implements Serializable {
   public int length() {
     return source.length() - order + 1;
   }
-  
+
   public Symbol symbolAt(int index)
   throws IndexOutOfBoundsException {
     if(index < 1 || index > length()) {
@@ -90,7 +90,7 @@ class OrderNSymbolList extends AbstractSymbolList implements Serializable {
         length() + "), not " + index
       );
     }
-    
+
     try {
       // changed to this form to avoid constructing the sub-list objects
       Symbol [] syms = new Symbol[order];
@@ -99,7 +99,7 @@ class OrderNSymbolList extends AbstractSymbolList implements Serializable {
       }
       return alpha.getSymbol(Arrays.asList(syms));
     } catch (IllegalSymbolException iae) {
-      throw new BioError(iae, "Alphabet changed underneath me");
+      throw new BioError("Alphabet changed underneath me", iae);
     }
   }
 }

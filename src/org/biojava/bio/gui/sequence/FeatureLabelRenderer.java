@@ -66,7 +66,7 @@ implements FeatureRenderer {
     try {
       setLabelMaker(labelMaker);
     } catch (ChangeVetoException cve) {
-      throw new BioError(cve, "Assertion Failure: could not set label maker");
+      throw new BioError("Assertion Failure: could not set label maker",cve);
     }
   }
 

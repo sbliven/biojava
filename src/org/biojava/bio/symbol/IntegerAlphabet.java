@@ -428,9 +428,9 @@ public final class IntegerAlphabet
             return sym;
           } catch (IllegalSymbolException ise) {
             throw new BioError(
-              ise,
               "Assertion Failure: symbol " + indx +
               " produced by iterator but not found in " + getName()
+              ,ise
             );
           }
         }

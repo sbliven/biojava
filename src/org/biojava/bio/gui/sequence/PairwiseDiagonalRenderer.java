@@ -70,7 +70,7 @@ import org.biojava.utils.ChangeVetoException;
  */
 public class PairwiseDiagonalRenderer extends AbstractChangeable
     implements PairwiseSequenceRenderer, Serializable
-{    
+{
     /**
      * Constant <code>OUTLINE</code> indicating a change to the fill of
      * the features.
@@ -97,7 +97,7 @@ public class PairwiseDiagonalRenderer extends AbstractChangeable
         }
         catch (Exception e)
         {
-            throw new BioError(e, "Failed to load Class for " + className);
+            throw new BioError("Failed to load Class for " + className, e);
         }
     }
 
@@ -105,7 +105,7 @@ public class PairwiseDiagonalRenderer extends AbstractChangeable
      * <code>line</code> is the line to be drawn for each feature.
      */
     protected Line2D.Float line;
-    
+
     /**
      * <code>outline</code> is the line colour.
      */

@@ -103,7 +103,7 @@ public final class DistributionTools {
         dtc.addCount(d,ind.symbolForIndex(i),rand.nextDouble());
       }
       catch (IllegalSymbolException ex) {
-        throw new BioError(ex,"Alphabet has Illegal Symbols!!");
+        throw new BioError("Alphabet has Illegal Symbols!!", ex);
       }
     }
 

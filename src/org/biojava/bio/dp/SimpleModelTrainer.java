@@ -40,7 +40,7 @@ public class SimpleModelTrainer
 extends SimpleDistributionTrainerContext
 implements ModelTrainer, Serializable {
   private Set models = new HashSet();
-  
+
   public void registerModel(MarkovModel model) {
     if(!models.contains(model)) {
       for(Iterator i = model.stateAlphabet().iterator(); i.hasNext(); ) {
@@ -49,7 +49,7 @@ implements ModelTrainer, Serializable {
           Distribution dist = model.getWeights(s);
           registerDistribution(dist);
         } catch (IllegalSymbolException ise) {
-          throw new BioError(ise, "Couldn't register states from model");
+          throw new BioError("Couldn't register states from model", ise);
         }
         if(s instanceof EmissionState) {
           Distribution dist = ((EmissionState) s).getDistribution();

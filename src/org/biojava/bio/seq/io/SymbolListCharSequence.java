@@ -66,7 +66,7 @@ public class SymbolListCharSequence implements CharSequence
         }
         catch (BioException be)
         {
-            throw new BioError(be, "Internal error: failed to get SymbolTokenization for SymbolList alphabet");
+            throw new BioError("Internal error: failed to get SymbolTokenization for SymbolList alphabet", be);
         }
 
         if (sToke.getTokenType() != SymbolTokenization.CHARACTER)
@@ -88,7 +88,7 @@ public class SymbolListCharSequence implements CharSequence
         }
         catch (IllegalSymbolException ise)
         {
-            throw new BioError(ise, "Internal error: failed to tokenize a Symbol from an existing SymbolList");
+            throw new BioError("Internal error: failed to tokenize a Symbol from an existing SymbolList", ise);
         }
     }
 

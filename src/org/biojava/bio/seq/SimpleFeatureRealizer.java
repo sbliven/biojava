@@ -52,15 +52,15 @@ public class SimpleFeatureRealizer implements FeatureRealizer, Serializable {
     private FeatureRealizer fallBack;
 
     {
-	templateToImpl = new ArrayList();
+        templateToImpl = new ArrayList();
     }
 
     public SimpleFeatureRealizer() {
-	fallBack = null;
+        fallBack = null;
     }
 
     public SimpleFeatureRealizer(FeatureRealizer fallBack) {
-	this.fallBack = fallBack;
+        this.fallBack = fallBack;
     }
 
     /**
@@ -74,78 +74,78 @@ public class SimpleFeatureRealizer implements FeatureRealizer, Serializable {
      * any existing implementations if a template can be realized
      * by more than one implementation.
      * </p>
-     * 
+     *
      * @param template The class of templates to implement.
      * @param impl A class of Feature which can be used to implement these templates.
      */
 
-    public void addImplementation(Class template, Class impl) 
+    public void addImplementation(Class template, Class impl)
         throws BioException
     {
-	TemplateImpl ti = new TemplateImpl(template, impl);
-	templateToImpl.add(0, ti);
+        TemplateImpl ti = new TemplateImpl(template, impl);
+        templateToImpl.add(0, ti);
     }
 
     public Feature realizeFeature(Sequence seq,
-				  FeatureHolder parent,
-				  Feature.Template temp)
-	throws BioException 
+                                  FeatureHolder parent,
+                                  Feature.Template temp)
+        throws BioException
     {
-	for (Iterator i = templateToImpl.iterator(); i.hasNext(); ) {
-	    TemplateImpl ti = (TemplateImpl) i.next();
-	    if (ti.accept(temp))
-		return ti.realize(seq, parent, temp);
-	}
+        for (Iterator i = templateToImpl.iterator(); i.hasNext(); ) {
+            TemplateImpl ti = (TemplateImpl) i.next();
+            if (ti.accept(temp))
+                return ti.realize(seq, parent, temp);
+        }
 
-	if (fallBack != null)
-	    return fallBack.realizeFeature(seq, parent, temp);
+        if (fallBack != null)
+            return fallBack.realizeFeature(seq, parent, temp);
 
-	throw new BioException("Couldn't find realized implementation for template of class " + 
-			       temp.getClass().getName());
+        throw new BioException("Couldn't find realized implementation for template of class " +
+                               temp.getClass().getName());
     }
 
     private static class TemplateImpl {
-	private Class template;
-	private Constructor cons;
+        private Class template;
+        private Constructor cons;
 
-	private TemplateImpl(Class template, Class impl) 
-	    throws BioException
-	{
-	    Class[] signature = new Class[3];
-	    signature[0] = Sequence.class;
-	    signature[1] = FeatureHolder.class;
-	    signature[2] = template;
-	    this.template = template;
+        private TemplateImpl(Class template, Class impl)
+            throws BioException
+        {
+            Class[] signature = new Class[3];
+            signature[0] = Sequence.class;
+            signature[1] = FeatureHolder.class;
+            signature[2] = template;
+            this.template = template;
 
-	    try {
-		this.cons = impl.getConstructor(signature);
-	    } catch (NoSuchMethodException ex) {
-		throw new BioException(ex, "Class " + impl.getName() + " does not have suitable constructor");
-	    }
-	}
+            try {
+                this.cons = impl.getConstructor(signature);
+            } catch (NoSuchMethodException ex) {
+                throw new BioException("Class " + impl.getName() + " does not have suitable constructor", ex);
+            }
+        }
 
-	public boolean accept(Feature.Template temp) {
-	    return template.isInstance(temp);
-	}
+        public boolean accept(Feature.Template temp) {
+            return template.isInstance(temp);
+        }
 
-	public Feature realize(Sequence seq, 
-			       FeatureHolder parent,
-			       Feature.Template temp) 
-	    throws BioException
-	{
-	    Object[] consArgs = new Object[3];
-	    consArgs[0] = seq;
-	    consArgs[1] = parent;
-	    consArgs[2] = temp;
-	    try {
-		return (Feature) cons.newInstance(consArgs);
-	    } catch (Exception ex) {
-		Throwable t = ex;
-		if(ex instanceof InvocationTargetException) {
-		    t = ((InvocationTargetException) ex).getTargetException();
-		}
-                throw new BioException(t, "Couldn't realize feature");
-	    }
-	}
+        public Feature realize(Sequence seq,
+                               FeatureHolder parent,
+                               Feature.Template temp)
+            throws BioException
+        {
+            Object[] consArgs = new Object[3];
+            consArgs[0] = seq;
+            consArgs[1] = parent;
+            consArgs[2] = temp;
+            try {
+                return (Feature) cons.newInstance(consArgs);
+            } catch (Exception ex) {
+                Throwable t = ex;
+                if(ex instanceof InvocationTargetException) {
+                    t = ((InvocationTargetException) ex).getTargetException();
+                }
+                throw new BioException("Couldn't realize feature", t);
+            }
+        }
     }
 }

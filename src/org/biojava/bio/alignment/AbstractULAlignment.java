@@ -65,8 +65,7 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
           return alphabet.getSymbol(new ColAsList(index));
         } catch (IllegalSymbolException ire) {
           throw new BioError(
-            ire,
-            "Somehow my crossproduct alphabet is incompatible with column " + index
+            "Somehow my crossproduct alphabet is incompatible with column " + index, ire
           );
         }
     }

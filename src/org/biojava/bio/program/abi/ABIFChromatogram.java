@@ -179,7 +179,7 @@ public class ABIFChromatogram extends AbstractChromatogram {
             try {
                 setTrace(sym, trace, max);
             } catch (IllegalSymbolException ise) {
-                throw new BioError(ise, "Can't happen");
+                throw new BioError("Can't happen", ise);
             }
         }
 
@@ -224,7 +224,7 @@ public class ABIFChromatogram extends AbstractChromatogram {
                     dna.add(ABIFParser.decodeDNAToken(token));
                 }
             } catch (IllegalSymbolException ise) {
-                throw new BioError(ise, "Can't happen");
+                throw new BioError("Can't happen", ise);
             }
             // create the base call alignment and set it
             try {
@@ -233,9 +233,9 @@ public class ABIFChromatogram extends AbstractChromatogram {
                 baseCalls.put(Chromatogram.OFFSETS, createImmutableSymbolList(IntegerAlphabet.getInstance(), offsets));
                 setBaseCallAlignment(createImmutableAlignment(baseCalls));
             } catch (IllegalAlphabetException iae) {
-                throw new BioError(iae, "Can't happen");
+                throw new BioError("Can't happen", iae);
             } catch (IllegalSymbolException ise) {
-                throw new BioError(ise, "Can't happen");
+                throw new BioError("Can't happen", ise);
             }
         }
     }

@@ -79,7 +79,7 @@ public class TabDelimParser {
     String name = "";
     String description = "";
     Ontology onto = null;
-    
+
     for(
       String line = in.readLine();
       line != null;
@@ -89,7 +89,7 @@ public class TabDelimParser {
       if(line.length() > 0) {
         if(line.startsWith("#")) {
           // comment line - let's try to pull out name or description
-          
+
           if(line.startsWith("#name:")) {
             name = line.substring("#name:".length()).trim();
           } else if(line.startsWith("#description:")) {
@@ -101,29 +101,29 @@ public class TabDelimParser {
             if(onto == null) {
               onto = of.createOntology(name, description);
             }
-            
+
             // build a tripple
-            
+
             /*
-            
+
             int t1 = line.indexOf("\t");
             int t2 = line.indexOf("\t", t1 + 1);
-            
+
             String subject  = line.substring(0, t1);
             String relation = line.substring(t1 + 1, t2);
             String object   = line.substring(t2 + 1);
-            
+
             */
-            
+
             StringTokenizer toke = new StringTokenizer(line);
             String subject = toke.nextToken();
             String relation = toke.nextToken();
             String object = toke.nextToken();
-            
+
             Term subT = resolveTerm(subject, onto);
             Term objT = resolveTerm(object, onto);
             Term relT = resolveTerm(relation, onto);
-            
+
             Triple trip = resolveTriple(subT, objT, relT, onto);
           } catch (StringIndexOutOfBoundsException e) {
             throw new IOException("Could not parse line: " + line);
@@ -131,13 +131,13 @@ public class TabDelimParser {
         }
       }
     }
-    
+
     return onto;
   }
-  
+
   private Term resolveTerm(String termName, Ontology onto) {
     boolean isTrippleTerm = termName.startsWith("(") && termName.endsWith(")");
-    
+
     if(onto.containsTerm(termName)) {
       return onto.getTerm(termName);
     } else {
@@ -145,27 +145,27 @@ public class TabDelimParser {
         if(isTrippleTerm) {
           int c1 = termName.indexOf(",");
           int c2 = termName.indexOf(",", c1 + 1);
-          
+
           String source = termName.substring(1, c1);
           String target = termName.substring(c2 + 1, termName.length() - 1);
           String relation = termName.substring(c1 + 1, c2);
-          
+
           Term st = resolveTerm(source, onto);
           Term tt = resolveTerm(target, onto);
           Term rt = resolveTerm(relation, onto);
-          
+
           return onto.createTripleTerm(st, tt, rt);
         } else {
           return onto.createTerm(termName, "");
         }
       } catch (AlreadyExistsException aee) {
-        throw new BioError(aee, "Assertion Failure: Could not create term");
+        throw new BioError("Assertion Failure: Could not create term", aee);
       } catch (ChangeVetoException cve) {
-        throw new BioError(cve, "Assertion Failure: Could not create term");
+        throw new BioError("Assertion Failure: Could not create term", cve);
       }
     }
   }
-  
+
   private Triple resolveTriple(Term sub, Term obj, Term rel, Ontology onto) {
     if(onto.containsTriple(sub, obj, rel)) {
       return (Triple) onto.getTriples(sub, obj, rel).iterator().next();
@@ -173,9 +173,9 @@ public class TabDelimParser {
       try {
         return onto.createTriple(sub, obj, rel);
       } catch (AlreadyExistsException aee) {
-        throw new BioError(aee, "Assertion Failure: Could not create triple");
+        throw new BioError("Assertion Failure: Could not create triple",aee);
       } catch (ChangeVetoException cve) {
-        throw new BioError(cve, "Assertion Failure: Could not create triple");
+        throw new BioError("Assertion Failure: Could not create triple", cve);
       }
     }
   }

@@ -192,7 +192,7 @@ public final class RestrictionEnzymeManager
             throw new IllegalArgumentException("Unknown RestrictionEnzyme name '"
                                                + name
                                                + "'");
-        
+
         return Collections.unmodifiableSet((Set) nameToIsoschizomers.get(name));
     }
 
@@ -330,7 +330,7 @@ public final class RestrictionEnzymeManager
         }
         catch (ChangeVetoException cve)
         {
-            throw new BioError(cve, "Assertion Failure: failed to modify Annotation");
+            throw new BioError("Assertion Failure: failed to modify Annotation", cve);
         }
 
         annotation.addChangeListener(ChangeListener.ALWAYS_VETO);

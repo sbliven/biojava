@@ -38,27 +38,27 @@ import org.biojava.bio.symbol.IllegalSymbolException;
  */
 public class DPInterpreter implements CellCalculatorFactory {
   private final DP dp;
-  
+
   public DPInterpreter(DP dp) {
     this.dp = dp;
   }
-  
+
   public CellCalculator forwards(ScoreType scoreType)
   throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException {
     return new Forward(dp, scoreType);
   }
-  
+
   public CellCalculator backwards(ScoreType scoreType)
   throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException {
     return new Backward(dp, scoreType);
   }
-  
+
   public CellCalculator viterbi(ScoreType scoreType, BackPointer terminal)
   throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException {
     return new Viterbi(dp, scoreType, terminal);
   }
 
-  
+
   private static class Forward implements CellCalculator {
     private final int[][] transitions;
     private final double[][] transitionScores;
@@ -82,7 +82,7 @@ public class DPInterpreter implements CellCalculatorFactory {
     {
       _calcCell(cells, true);
     }
-    
+
     public void calcCell(Cell [][] cells)
     throws
       IllegalSymbolException,
@@ -90,8 +90,8 @@ public class DPInterpreter implements CellCalculatorFactory {
       IllegalTransitionException
     {
       _calcCell(cells, false);
-    }   
-    
+    }
+
     public void _calcCell(Cell [][] cells, boolean initializationHack)
     throws
       IllegalSymbolException,
@@ -102,7 +102,7 @@ public class DPInterpreter implements CellCalculatorFactory {
       double[] curCol = curCell.scores;
       double[] emissions = curCell.emissions;
       //System.out.println("curCol = " + curCol);
-      
+
      STATELOOP:
       for (int l = 0; l < states.length; ++l) {
         State curState = states[l];
@@ -117,7 +117,7 @@ public class DPInterpreter implements CellCalculatorFactory {
             //System.out.println("Initialized state to " + curCol[l]);
             continue STATELOOP;
           }
-          
+
           //System.out.println("Calculating weight");
           double[] sourceScores;
           double weight;
@@ -131,7 +131,7 @@ public class DPInterpreter implements CellCalculatorFactory {
               curCol[l] = Double.NaN;
               continue STATELOOP;
             }
-            int [] advance = ((EmissionState)curState).getAdvance(); 
+            int [] advance = ((EmissionState)curState).getAdvance();
             sourceScores = cells[advance[0]][advance[1]].scores;
             //System.out.println("Values from " + advance[0] + ", " + advance[1] + " " + sourceScores);
           }
@@ -139,7 +139,7 @@ public class DPInterpreter implements CellCalculatorFactory {
 
           int [] tr = transitions[l];
           double[] trs = transitionScores[l];
-          
+
           /*for(int ci = 0; ci < tr.length; ci++) {
             System.out.println(
               "Source = " + states[tr[ci]].getName() +
@@ -149,7 +149,7 @@ public class DPInterpreter implements CellCalculatorFactory {
 
           // Calculate probabilities for states with transitions
           // here.
-	
+
           // Find base for addition
           double constant = Double.NaN;
           double score = 0.0;
@@ -178,13 +178,13 @@ public class DPInterpreter implements CellCalculatorFactory {
           }
         } catch (Exception e) {
           throw new BioError(
-            e,
-            "Problem with state " + l + " -> " + states[l].getName()
+
+            "Problem with state " + l + " -> " + states[l].getName(), e
           );
         } catch (BioError e) {
           throw new BioError(
-            e,
-            "Error  with state " + l + " -> " + states[l].getName()
+
+            "Error  with state " + l + " -> " + states[l].getName(), e
           );
         }
       }
@@ -196,8 +196,8 @@ public class DPInterpreter implements CellCalculatorFactory {
         );
       }*/
     }
-  }  
-  
+  }
+
   private static class Backward implements CellCalculator {
     private final int[][] transitions;
     private final double[][] transitionScores;
@@ -225,7 +225,7 @@ public class DPInterpreter implements CellCalculatorFactory {
     {
       _calcCell(cells, true);
     }
-    
+
     public void calcCell(Cell [][] cells)
     throws
       IllegalSymbolException,
@@ -233,15 +233,15 @@ public class DPInterpreter implements CellCalculatorFactory {
       IllegalTransitionException
     {
       _calcCell(cells, false);
-    }   
-    
+    }
+
     public void _calcCell(Cell [][] cells, boolean initializationHack)
     throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
     {
       Cell curCell = cells[0][0];
       double[] curCol = curCell.scores;
 
-     STATELOOP:      
+     STATELOOP:
       for (int l = states.length - 1; l >= 0; --l) {
         //System.out.println("State = " + states[l].getName());
         State curState = states[l];
@@ -259,7 +259,7 @@ public class DPInterpreter implements CellCalculatorFactory {
         // Calculate probabilities for states with transitions
         // here.
 
-  	    double[] sourceScores = new double[tr.length];
+            double[] sourceScores = new double[tr.length];
         for (int ci = 0; ci < tr.length; ++ci) {
           double[] sCol;
           double weight;
@@ -327,7 +327,7 @@ public class DPInterpreter implements CellCalculatorFactory {
   }
 
 
-  private class Viterbi implements CellCalculator { 
+  private class Viterbi implements CellCalculator {
     private final int[][] transitions;
     private final double[][] transitionScores;
     private final State[] states;
@@ -341,7 +341,7 @@ public class DPInterpreter implements CellCalculatorFactory {
       IllegalTransitionException
     {
       TERMINAL_BP = terminal;
-      states = dp.getStates();      
+      states = dp.getStates();
       transitions = dp.getForwardTransitions();
       transitionScores = dp.getForwardTransitionScores(scoreType);
       magicalState = dp.getModel().magicalState();
@@ -355,7 +355,7 @@ public class DPInterpreter implements CellCalculatorFactory {
     {
       _calcCell(cells, true);
     }
-    
+
     public void calcCell(Cell[][] cells)
     throws
       IllegalSymbolException,
@@ -364,7 +364,7 @@ public class DPInterpreter implements CellCalculatorFactory {
     {
       _calcCell(cells, false);
     }
-    
+
     public void _calcCell(Cell [][] cells, boolean initializationHack)
     throws
       IllegalSymbolException,
@@ -379,7 +379,7 @@ public class DPInterpreter implements CellCalculatorFactory {
      STATELOOP:
       for (int l = 0; l < states.length; ++l) {
         State curState = states[l];
-  	    //System.out.println("State = " + l + "=" + states[l].getName());
+            //System.out.println("State = " + l + "=" + states[l].getName());
         try {
           //System.out.println("trying initialization");
           if(initializationHack && (curState instanceof EmissionState)) {
@@ -457,9 +457,9 @@ public class DPInterpreter implements CellCalculatorFactory {
               );
             } catch (Throwable t) {
               throw new BioError(
-                t,
+
                 "Couldn't generate backpointer for " + states[l].getName() +
-                " back to " + states[bestK].getName()
+                " back to " + states[bestK].getName(), t
               );
             }
           } else {
@@ -469,13 +469,13 @@ public class DPInterpreter implements CellCalculatorFactory {
           }
         } catch (Exception e) {
           throw new BioError(
-            e,
-            "Problem with state " + l + " -> " + states[l].getName()
+
+            "Problem with state " + l + " -> " + states[l].getName(),e
           );
         } catch (BioError e) {
           throw new BioError(
-            e,
-            "Error  with state " + l + " -> " + states[l].getName()
+
+            "Error  with state " + l + " -> " + states[l].getName(),e
           );
         }
       }
@@ -495,7 +495,7 @@ public class DPInterpreter implements CellCalculatorFactory {
       initializationHack = false;
     }
   }
-  
+
   public static class Maker implements CellCalculatorFactoryMaker {
     public CellCalculatorFactory make(DP dp) {
       return new DPInterpreter(dp);

@@ -110,7 +110,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
       });
       return new Factory(dp, forward, backward, viterbi);
     } catch (NoSuchMethodException nsme) {
-      throw new BioError(nsme, "Couldn't find constructor on generated class");
+      throw new BioError("Couldn't find constructor on generated class", nsme);
     }
   }
 
@@ -123,7 +123,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
         nameBuffer.append(model.transitionsFrom((State) i.next()).size());
       } catch (IllegalSymbolException ise) {
         throw new BioError(
-          ise, "Assertion Failure: State dissapeared from model"
+          "Assertion Failure: State dissapeared from model", ise
         );
       }
     }
@@ -261,9 +261,9 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
           clazz.createCode(out);
           out.close();
         } catch (FileNotFoundException fnfe) {
-          throw new BioError(fnfe, "Couldn't dump dp class");
+          throw new BioError("Couldn't dump dp class", fnfe);
         } catch (IOException ioe) {
-          throw new BioError(ioe, "Couldn't dump dp class");
+          throw new BioError("Couldn't dump dp class", ioe);
         }
       }
 
@@ -272,18 +272,18 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
      try {
           return classLoader.loadClass(name);
         } catch (Exception e) {
-          throw new BioError(e, "Can't find previously generated class for " + name);
+          throw new BioError("Can't find previously generated class for " + name, e);
         }
     } catch (CodeException ce) {
-      throw new BioError(ce, "Couldn't generate class");
+      throw new BioError("Couldn't generate class", ce);
     } catch (NoSuchMethodException nsme) {
-      throw new BioError(nsme, "Couldn't find method");
+      throw new BioError( "Couldn't find method", nsme);
     } catch (NoSuchFieldException nsfe) {
-      throw new BioError(nsfe, "Couldn't find field");
+      throw new BioError("Couldn't find field", nsfe);
     } catch (IllegalSymbolException ise) {
-      throw new BioError(ise, "Couldn't find symbol");
+      throw new BioError("Couldn't find symbol", ise);
     } catch (BioException be) {
-      throw new BioError(be, "Couldn't create indexer");
+      throw new BioError("Couldn't create indexer", be);
     }
   }
 
@@ -408,9 +408,9 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
           clazz.createCode(out);
           out.close();
         } catch (FileNotFoundException fnfe) {
-          throw new BioError(fnfe, "Couldn't dump dp class");
+          throw new BioError( "Couldn't dump dp class", fnfe);
         } catch (IOException ioe) {
-          throw new BioError(ioe, "Couldn't dump dp class");
+          throw new BioError( "Couldn't dump dp class", ioe);
         }
       }
 
@@ -419,18 +419,18 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
      try {
           return classLoader.loadClass(name);
         } catch (Exception e) {
-          throw new BioError(e, "Can't find previously generated class for " + name);
+          throw new BioError("Can't find previously generated class for " + name, e);
         }
     } catch (CodeException ce) {
-      throw new BioError(ce, "Couldn't generate class");
+      throw new BioError("Couldn't generate class", ce);
     } catch (NoSuchMethodException nsme) {
-      throw new BioError(nsme, "Couldn't find method");
+      throw new BioError( "Couldn't find method", nsme);
     } catch (NoSuchFieldException nsfe) {
-      throw new BioError(nsfe, "Couldn't find field");
+      throw new BioError( "Couldn't find field", nsfe);
     } catch (IllegalSymbolException ise) {
-      throw new BioError(ise, "Couldn't find symbol");
+      throw new BioError( "Couldn't find symbol", ise);
     } catch (BioException be) {
-      throw new BioError(be, "Couldn't create indexer");
+      throw new BioError( "Couldn't create indexer", be);
     }
   }
 
@@ -559,9 +559,9 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
           clazz.createCode(out);
           out.close();
         } catch (FileNotFoundException fnfe) {
-          throw new BioError(fnfe, "Couldn't dump dp class");
+          throw new BioError( "Couldn't dump dp class", fnfe);
         } catch (IOException ioe) {
-          throw new BioError(ioe, "Couldn't dump dp class");
+          throw new BioError( "Couldn't dump dp class", ioe);
         }
       }
 
@@ -570,18 +570,18 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
      try {
           return classLoader.loadClass(name);
         } catch (Exception e) {
-          throw new BioError(e, "Can't find previously generated class for " + name);
+          throw new BioError( "Can't find previously generated class for " + name, e);
         }
     } catch (CodeException ce) {
-      throw new BioError(ce, "Couldn't generate class");
+      throw new BioError( "Couldn't generate class", ce);
     } catch (NoSuchMethodException nsme) {
-      throw new BioError(nsme, "Couldn't find method");
+      throw new BioError( "Couldn't find method", nsme);
     } catch (NoSuchFieldException nsfe) {
-      throw new BioError(nsfe, "Couldn't find field");
+      throw new BioError( "Couldn't find field", nsfe);
     } catch (IllegalSymbolException ise) {
-      throw new BioError(ise, "Couldn't find symbol");
+      throw new BioError( "Couldn't find symbol", ise);
     } catch (BioException be) {
-      throw new BioError(be, "Couldn't create indexer");
+      throw new BioError( "Couldn't create indexer", be);
     }
   }
 
@@ -1605,9 +1605,9 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
 
       return iv;
     } catch (NoSuchFieldException nsfe) {
-      throw new BioError(nsfe, "Can't make message statements");
+      throw new BioError( "Can't make message statements", nsfe);
     } catch (NoSuchMethodException nsme) {
-      throw new BioError(nsme, "Can't make message statements");
+      throw new BioError( "Can't make message statements", nsme);
     }
   }
 
@@ -1647,11 +1647,11 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
 
       return iv;
     } catch (NoSuchFieldException nsfe) {
-      throw new BioError(nsfe, "Can't make message statements");
+      throw new BioError( "Can't make message statements", nsfe);
     } catch (NoSuchMethodException nsme) {
-      throw new BioError(nsme, "Can't make message statements");
+      throw new BioError( "Can't make message statements", nsme);
     } catch (CodeException ce) {
-      throw new BioError(ce, "Can't make message statements");
+      throw new BioError( "Can't make message statements", ce);
     }
   }
 
@@ -1736,11 +1736,11 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
       try {
         return (CellCalculator) viterbi.newInstance(new Object[] { dp, scoreType, terminal });
       } catch (InstantiationException ie) {
-        throw new BioError(ie, "Counld not instantiate auto-generated class");
+        throw new BioError( "Counld not instantiate auto-generated class", ie);
       } catch (IllegalAccessException ie) {
-        throw new BioError(ie, "Counld not instantiate auto-generated class-");
+        throw new BioError( "Counld not instantiate auto-generated class-", ie);
       } catch (InvocationTargetException ie) {
-        throw new BioError(ie, "Counld not instantiate auto-generated class using " + viterbi + " with " + dp + ", " + scoreType + ", " + terminal);
+        throw new BioError("Counld not instantiate auto-generated class using " + viterbi + " with " + dp + ", " + scoreType + ", " + terminal, ie);
       }
     }
   }

@@ -42,13 +42,13 @@ public class IllegalAlphabetException extends BioException {
    * Just make the exception.
    */
   public IllegalAlphabetException() { super(); }
-  
+
   /**
    * Make the exception with a message.
    */
   public IllegalAlphabetException(String message) { super(message); }
-  
+
   public IllegalAlphabetException(Throwable t) { super(t); }
-  
-  public IllegalAlphabetException(Throwable t, String message) { super(t, message); }
+
+  public IllegalAlphabetException(Throwable t, String message) { super( message, t); }
 }

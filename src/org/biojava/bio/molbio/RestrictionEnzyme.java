@@ -196,7 +196,7 @@ public class RestrictionEnzyme implements Serializable
         }
         catch (IllegalAlphabetException iae)
         {
-            throw new BioError(iae, "RestrictionEnzyme site was not composed of a complementable Alphabet");
+            throw new BioError("RestrictionEnzyme site was not composed of a complementable Alphabet", iae);
         }
 
         StringBuffer sb = new StringBuffer();
@@ -219,7 +219,7 @@ public class RestrictionEnzyme implements Serializable
         }
         catch (IllegalSymbolException ise)
         {
-            throw new BioError(ise, "RestrictionEnzyme site contained non-DNA Symbol");
+            throw new BioError("RestrictionEnzyme site contained non-DNA Symbol", ise);
         }
 
         sb.append(" (");
@@ -230,7 +230,7 @@ public class RestrictionEnzyme implements Serializable
 
         summary = sb.substring(0);
     }
-    
+
     /**
      * <code>getName</code> returns the enzyme name.
      *

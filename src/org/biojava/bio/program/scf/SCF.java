@@ -381,9 +381,9 @@ public class SCF extends AbstractChromatogram {
                 baseCalls.put(PROB_UNDERCALL,    out.createImmutableSymbolList(getProbabilityAlphabet(), probs[6]));
                 out.setBaseCallAlignment(out.createImmutableAlignment(baseCalls));
             } catch (IllegalSymbolException ise) {
-                throw new BioError(ise, "Can't happen unless the decoder is returning non-DNA symbols");
+                throw new BioError("Can't happen unless the decoder is returning non-DNA symbols", ise);
             } catch (IllegalAlphabetException iae) {
-                throw new BioError(iae, "Can't happen");
+                throw new BioError("Can't happen", iae);
             }
         }
 
@@ -487,7 +487,7 @@ public class SCF extends AbstractChromatogram {
                 out.setTrace(DNATools.g(), trace[2], maxVal[2]);
                 out.setTrace(DNATools.t(), trace[3], maxVal[3]);
             } catch (IllegalSymbolException ise) {
-                throw new BioError(ise, "Can't happen");
+                throw new BioError("Can't happen", ise);
             }
         }
 
@@ -550,7 +550,7 @@ public class SCF extends AbstractChromatogram {
                     }
                 }
             } catch (IllegalSymbolException ise) {
-                throw new BioError(ise, "Can't happen unless there's a misdefinition of getProbabilityAlphabet() or IntegerAlphabet");
+                throw new BioError("Can't happen unless there's a misdefinition of getProbabilityAlphabet() or IntegerAlphabet", ise);
             }
             // create/set base call list
             createAndSetBaseCallAlignment(dna, offsets, probs);
@@ -595,7 +595,7 @@ public class SCF extends AbstractChromatogram {
                 out.setTrace(DNATools.g(), trace[2], maxVal[2]);
                 out.setTrace(DNATools.t(), trace[3], maxVal[3]);
             } catch (IllegalSymbolException ise) {
-                throw new BioError(ise, "Can't happen");
+                throw new BioError("Can't happen", ise);
             }
         }
 

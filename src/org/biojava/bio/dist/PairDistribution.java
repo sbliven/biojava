@@ -56,11 +56,11 @@ public class PairDistribution
 extends AbstractChangeable
 implements Serializable, Distribution {
   private static Map cache;
-  
+
   static {
     cache = new HashMap();
   }
-  
+
   protected static Distribution getNullModel(Distribution first, Distribution second) {
     synchronized(cache) {
       first = first.getNullModel();
@@ -80,29 +80,29 @@ implements Serializable, Distribution {
       }
       return dist;
     }
-  }  
-  
+  }
+
   private Distribution first;
   private Distribution second;
   private Alphabet alphabet;
-  
+
   private Distribution nullModel;
-  
+
   public Alphabet getAlphabet() {
     return alphabet;
   }
-  
+
   public Distribution getNullModel() {
     return getNullModel(first, second);
   }
-  
+
   public void setNullModel(Distribution nullModel)
   throws IllegalAlphabetException, ChangeVetoException {
     throw new ChangeVetoException(
       "PairDistribution objects can't have their null models changed."
     );
   }
-  
+
   /**
    * Register this paired distribution with a model trainer.
    * @param trainer the trainer to register this distribution with.
@@ -110,7 +110,7 @@ implements Serializable, Distribution {
   public void registerWithTrainer(org.biojava.bio.dp.ModelTrainer trainer) {
     trainer.registerDistribution(first);
     trainer.registerDistribution(second);
-    
+
     trainer.registerTrainer(this, new PairTrainer());
   }
 
@@ -120,7 +120,7 @@ implements Serializable, Distribution {
       List symL = ((BasisSymbol) sym).getSymbols();
       Symbol f = (Symbol) symL.get(0);
       Symbol s = (Symbol) symL.get(1);
-      
+
       return first.getWeight(f) * second.getWeight(s);
     } else {
       double score = 0.0;
@@ -132,7 +132,7 @@ implements Serializable, Distribution {
       return score;
     }
   }
-  
+
   public void setWeight(Symbol sym, double weight)
   throws ChangeVetoException {
     throw new ChangeVetoException(
@@ -140,7 +140,7 @@ implements Serializable, Distribution {
       "You must set the weights in the underlying distributions."
     );
   }
-  
+
   public PairDistribution(Distribution first, Distribution second) {
     this.first = first;
     this.second = second;
@@ -150,28 +150,28 @@ implements Serializable, Distribution {
       })
     );
   }
-  
+
   public void registerWithTrainer(DistributionTrainerContext dtc) {
     dtc.registerTrainer(this, new PairTrainer());
   }
-  
+
   private class PairTrainer
   extends IgnoreCountsTrainer
   implements Serializable {
     public double getCount(DistributionTrainerContext dtc, AtomicSymbol as)
     throws IllegalSymbolException {
       getAlphabet().validate(as);
-      
+
       List symL = as.getSymbols();
       Symbol f = (Symbol) symL.get(0);
       Symbol s = (Symbol) symL.get(1);
-      
+
       // I don't think this is correct. Pants!
-      return 
+      return
         (dtc.getCount(first, f) + dtc.getCount(second, s)) * 0.5;
-      
+
     }
-    
+
     public void addCount(
       DistributionTrainerContext dtc, Symbol sym, double times
     ) throws IllegalSymbolException {
@@ -187,12 +187,12 @@ implements Serializable, Distribution {
       List symL = ((BasisSymbol) sym).getSymbols();
       Symbol f = (Symbol) symL.get(0);
       Symbol s = (Symbol) symL.get(1);
-      
+
       dtc.addCount(first, f, times);
       dtc.addCount(second, s, times);
     }
   }
-  
+
   public Symbol sampleSymbol() {
     try {
       return getAlphabet().getSymbol(Arrays.asList( new Symbol[] {
@@ -200,7 +200,7 @@ implements Serializable, Distribution {
         second.sampleSymbol()
       }));
     } catch (IllegalSymbolException ise) {
-      throw new BioError(ise, "Couldn't sample symbol");
+      throw new BioError("Couldn't sample symbol", ise);
     }
   }
 }

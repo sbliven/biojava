@@ -38,7 +38,7 @@ import org.biojava.bio.symbol.SymbolList;
  * <p>
  * Train a hidden markov model using maximum likelihood.
  * </p>
- * 
+ *
  * <p>
  * Note: this class currently only works for one-head models.
  * </p>
@@ -55,13 +55,13 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
     SingleDP dp = (SingleDP) getDP();
     State [] states = dp.getStates();
     int [][] forwardTransitions = dp.getForwardTransitions();
-    double [][] forwardTransitionScores = dp.getForwardTransitionScores(scoreType);    
+    double [][] forwardTransitionScores = dp.getForwardTransitionScores(scoreType);
     int [][] backwardTransitions = dp.getBackwardTransitions();
-    double [][] backwardTransitionScores = dp.getBackwardTransitionScores(scoreType);    
+    double [][] backwardTransitionScores = dp.getBackwardTransitionScores(scoreType);
     MarkovModel model = dp.getModel();
-    
+
     SymbolList [] rll = { symList };
-    
+
     // System.out.print("Forward...  ");
     SingleDPMatrix fm = (SingleDPMatrix) dp.forwardMatrix(rll, scoreType);
     double fs = fm.getScore();
@@ -73,7 +73,7 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
     // System.out.println("Score = " + bs);
 
     Symbol gap = AlphabetManager.getGapSymbol();
-    
+
     // state trainer
     for (int i = 1; i <= symList.length(); i++) {
       Symbol sym = symList.symbolAt(i);
@@ -97,7 +97,7 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
             : gap;
       double [] fsc = fm.scores[i];
       double [] bsc = bm.scores[i+1];
-      double[] weightVector = dp.getEmission(sym, scoreType); 
+      double[] weightVector = dp.getEmission(sym, scoreType);
       for (int s = 0; s < states.length; s++) {  // any -> emission transitions
         int [] ts = backwardTransitions[s];
         double [] tss = backwardTransitionScores[s];
@@ -119,18 +119,17 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
               );
             } catch (IllegalSymbolException ise) {
               throw new BioError(
-                ise,
-                "Transition in backwardTransitions[][] dissapeared"
+                "Transition in backwardTransitions[][] dissapeared", ise
               );
             }
           }
         }
       }
     }
-    
+
     return fs;
   }
-  
+
   public BaumWelchTrainer(DP dp) {
     super(dp);
   }

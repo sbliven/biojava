@@ -33,16 +33,16 @@ public class ParseException extends BioException {
   public ParseException() {
     super();
   }
-  
+
   public ParseException(String message) {
     super(message);
   }
-  
+
   public ParseException(Throwable nested) {
     super(nested);
   }
-  
+
   public ParseException(Throwable nested, String message) {
-    super(nested, message);
+    super(message, nested);
   }
 }

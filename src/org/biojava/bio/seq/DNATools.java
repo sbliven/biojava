@@ -99,7 +99,7 @@ public final class DNATools {
 
       complementTable = new DNAComplementTranslationTable();
     } catch (Throwable t) {
-      throw new BioError(t, "Unable to initialize DNATools");
+      throw new BioError("Unable to initialize DNATools", t);
     }
   }
 
@@ -142,7 +142,7 @@ public final class DNATools {
       SymbolTokenization p = getDNA().getTokenization("token");
       return new SimpleSymbolList(p, dna);
     } catch (BioException se) {
-      throw new BioError(se, "Something has gone badly wrong with DNA");
+      throw new BioError( "Something has gone badly wrong with DNA", se);
     }
   }
 
@@ -165,22 +165,22 @@ public final class DNATools {
         "", name, new SimpleAnnotation()
       );
     } catch (BioException se) {
-      throw new BioError(se, "Something has gone badly wrong with DNA");
+      throw new BioError("Something has gone badly wrong with DNA", se);
     }
   }
 
 
     /** Get a new dna as a GappedSequence */
     public static GappedSequence createGappedDNASequence(String dna, String name) throws IllegalSymbolException{
-	String dna1 = dna.replaceAll("-", "");
-	Sequence dnaSeq = createDNASequence(dna1, name);
-	GappedSequence dnaSeq1 = new SimpleGappedSequence(dnaSeq);
-	int pos = dna.indexOf('-', 0);
-	while(pos!=-1){
-	    dnaSeq1.addGapInView(pos+1);
-	    pos = dna.indexOf('-', pos+1);
-	}
-	return dnaSeq1;
+        String dna1 = dna.replaceAll("-", "");
+        Sequence dnaSeq = createDNASequence(dna1, name);
+        GappedSequence dnaSeq1 = new SimpleGappedSequence(dnaSeq);
+        int pos = dna.indexOf('-', 0);
+        while(pos!=-1){
+            dnaSeq1.addGapInView(pos+1);
+            pos = dna.indexOf('-', pos+1);
+        }
+        return dnaSeq1;
     }
 
 
@@ -284,7 +284,7 @@ public final class DNATools {
     try{
       toke = getDNA().getTokenization("token");
     }catch(BioException e){
-      throw new BioError(e, "Cannot find the 'token' Tokenization for DNA!?");
+      throw new BioError("Cannot find the 'token' Tokenization for DNA!?", e);
     }
     return toke.parseToken(t);
   }

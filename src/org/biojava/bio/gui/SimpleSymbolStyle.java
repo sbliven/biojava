@@ -44,16 +44,16 @@ public class SimpleSymbolStyle implements SymbolStyle {
   private final Map outlinePaint;
   private final Map fillPaint;
   private final FiniteAlphabet alphabet;
-  
+
   {
     outlinePaint = new HashMap();
     fillPaint = new HashMap();
   }
-  
+
   public Alphabet getAlphabet() {
     return alphabet;
   }
-  
+
   public SimpleSymbolStyle(FiniteAlphabet alphabet) {
     this.alphabet = alphabet;
     Map outline = getStandardOutlinePaints(alphabet);
@@ -75,20 +75,20 @@ public class SimpleSymbolStyle implements SymbolStyle {
         }
       }
     } catch (IllegalSymbolException ire) {
-      throw new BioError(ire, "Symbol dissapeared from my alphabet");
+      throw new BioError("Symbol dissapeared from my alphabet", ire);
     }
   }
-  
+
   public Paint outlinePaint(Symbol s) throws IllegalSymbolException {
     getAlphabet().validate(s);
     return (Paint) outlinePaint.get(s);
   }
-  
+
   public Paint fillPaint(Symbol s) throws IllegalSymbolException {
     getAlphabet().validate(s);
     return (Paint) fillPaint.get(s);
   }
-  
+
   public void setOutlinePaint(Symbol s, Paint paint)
   throws IllegalSymbolException {
     getAlphabet().validate(s);
@@ -103,19 +103,19 @@ public class SimpleSymbolStyle implements SymbolStyle {
 
   private static Map standardFillPaints;
   private static Map standardOutlinePaints;
-  
+
   public static Map getStandardFillPaints(Alphabet alpha) {
     return (Map) standardFillPaints.get(alpha);
   }
-  
+
   public static Map getStandardOutlinePaints(Alphabet alpha) {
     return (Map) standardOutlinePaints.get(alpha);
   }
-  
+
   static {
     standardFillPaints = new HashMap();
     standardOutlinePaints = new HashMap();
-    
+
     Map dnaFill = new HashMap();
     dnaFill.put(DNATools.t(), Color.red);
     dnaFill.put(DNATools.g(), Color.blue);

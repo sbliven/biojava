@@ -177,7 +177,7 @@ extends AbstractDistribution implements Serializable{
     try {
       setNullModel(new UniformDistribution(alphabet));
     } catch (Exception e) {
-      throw new BioError(e, "This should never fail. Something is screwed!");
+      throw new BioError("This should never fail. Something is screwed!", e);
     }
   }
 
@@ -205,7 +205,7 @@ extends AbstractDistribution implements Serializable{
           counts.increaseCount(sym, times);
       } catch (ChangeVetoException cve) {
         throw new BioError(
-          cve, "Assertion Failure: Change to Count object vetoed"
+          "Assertion Failure: Change to Count object vetoed", cve
         );
       }
     }
@@ -225,7 +225,7 @@ extends AbstractDistribution implements Serializable{
         }
       } catch (ChangeVetoException cve) {
         throw new BioError(
-          cve, "Assertion Failure: Change to Count object vetoed"
+          "Assertion Failure: Change to Count object vetoed",cve
         );
       }
     }
@@ -273,8 +273,8 @@ extends AbstractDistribution implements Serializable{
           weights[i] = total[i] * sum_inv;
         }
       } catch (IllegalSymbolException ise) {
-        throw new BioError(ise,
-          "Assertion Failure: Should be impossible to mess up the symbols."
+        throw new BioError(
+          "Assertion Failure: Should be impossible to mess up the symbols.",ise
         );
       }
     }

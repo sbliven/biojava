@@ -134,8 +134,8 @@ class RestrictionSiteFinder implements Runnable
         }
         catch (Exception e)
         {
-            throw new BioRuntimeException(e, "Failed to complete search for "
-                                          + enzyme);
+            throw new BioRuntimeException("Failed to complete search for "
+                                          + enzyme,e);
         }
     }
 }

@@ -54,51 +54,51 @@ public class WMAsMM
     Serializable
 {
   private static final int [] advance = {1};
-  
+
   private final WeightMatrix wm;
   private final FiniteAlphabet stateAlpha;
   private final MagicalState magicalState;
   private final EmissionState [] states;
-  
+
   private final Map transFrom;
   private final Map transTo;
   private final Map transWeights;
-  
+
   private final transient MarkovModel.DistributionForwarder distForwarder;
-  
+
   public int[] advance() {
     return new int[] { 1 }; // fixme: this should be cleverer:x
   }
-  
+
   public Alphabet emissionAlphabet() {
     return wm.getAlphabet();
   }
-  
+
   public FiniteAlphabet stateAlphabet() {
     return stateAlpha;
   }
-  
+
   public int heads() {
     return 1;
   }
-  
+
   public MagicalState magicalState() {
     return magicalState;
   }
-  
+
   public Distribution getWeights(State source)
   throws IllegalSymbolException {
     stateAlpha.validate(source);
     return (Distribution) transWeights.get(source);
   }
-  
+
   public void setWeights(State source, Distribution dist)
   throws ChangeVetoException {
     throw new ChangeVetoException(
       "Can't replace distribution in immutable model"
     );
   }
-  
+
   public FiniteAlphabet transitionsFrom(State from)
   throws IllegalSymbolException {
     Alphabet sAlpha = stateAlphabet();
@@ -106,7 +106,7 @@ public class WMAsMM
 
     return (FiniteAlphabet) transFrom.get(from);
   }
-    
+
   public FiniteAlphabet transitionsTo(State to)
   throws IllegalSymbolException {
     Alphabet sAlpha = stateAlphabet();
@@ -114,7 +114,7 @@ public class WMAsMM
 
     return (FiniteAlphabet) transTo.get(to);
   }
-  
+
   public void registerWithTrainer(ModelTrainer modelTrainer)
   throws BioException {
 /*    for(Iterator i = stateAlphabet().iterator(); i.hasNext(); ) {
@@ -122,7 +122,7 @@ public class WMAsMM
       s.registerWithTrainer(modelTrainer);
     }*/
   }
-  
+
   public void createTransition(State from, State to)
   throws ChangeVetoException {
     throw new ChangeVetoException(
@@ -134,23 +134,23 @@ public class WMAsMM
     throw new ChangeVetoException(
       "destroyTransition not supported by " + getClass());
   }
-  
+
   public void addState(State toAdd)
   throws IllegalSymbolException, ChangeVetoException {
     if(stateAlphabet().contains(toAdd)) {
       throw new IllegalSymbolException(
-        toAdd, 
+        toAdd,
         "Can't add a state to a model that already contains it"
       );
     }
-    
+
     throw new ChangeVetoException("addState not supported by " + getClass());
   }
-  
+
   public void removeState(State toAdd)
   throws IllegalSymbolException, ChangeVetoException {
     stateAlphabet().validate(toAdd);
-    
+
     throw new ChangeVetoException("removeState not supported by " + getClass());
   }
 
@@ -162,17 +162,17 @@ public class WMAsMM
 
     return transitionsFrom(from).contains(to);
   }
-  
+
   protected int index(State s) {
     for(int i = 0; i < states.length; i++) {
       if(s == states[i]) {
         return i;
       }
     }
-    
+
     return -1;
   }
-  
+
   public WMAsMM(WeightMatrix wm) throws IllegalSymbolException {
     try {
       ChangeSupport changeSupport = getChangeSupport(ChangeType.UNKNOWN);
@@ -209,13 +209,13 @@ public class WMAsMM
       sa.setName("Weight Matrix columns");
     } catch (ChangeVetoException cve) {
       throw new BioError(
-        cve,
-        "Assertion Failure: Should be able to manipulate my state alphabet."
+
+        "Assertion Failure: Should be able to manipulate my state alphabet.", cve
       );
     } catch (IllegalSymbolException ise) {
       throw new BioError(
-        ise,
-        "Assertion Failure: Should be able to manipulate my state alphabet."
+
+        "Assertion Failure: Should be able to manipulate my state alphabet.", ise
       );
     }
   }

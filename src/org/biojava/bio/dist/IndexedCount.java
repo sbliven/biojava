@@ -142,7 +142,7 @@ public final class IndexedCount
       }
     } catch (IllegalSymbolException ise) {
       throw new BioError(
-        ise, "Assertion Failure: Should have no illegal symbols"
+        "Assertion Failure: Should have no illegal symbols", ise
       );
     }
   }

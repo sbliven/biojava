@@ -56,7 +56,7 @@ extends AbstractSymbolList implements Alignment, Serializable {
       super.finalize();
       // System.err.println("Finalizing a SimpleAlignement");
   }
-  
+
   public int length() {
     return length;
   }
@@ -70,8 +70,8 @@ extends AbstractSymbolList implements Alignment, Serializable {
       return alphabet.getSymbol(new ColAsList(index));
     } catch (IllegalSymbolException ire) {
       throw new BioError(
-        ire,
-        "Somehow my crossproduct alphabet is incompatible with column " + index
+
+        "Somehow my crossproduct alphabet is incompatible with column " + index, ire
       );
     }
   }
@@ -130,7 +130,7 @@ extends AbstractSymbolList implements Alignment, Serializable {
 
     this.labels = Collections.unmodifiableList(new ArrayList(labelToResList.keySet()));
     this.labelToSymbolList = labelToResList;
-    
+
     int length = -1;
     List alphaList = new ArrayList();
     for(Iterator li = labels.iterator(); li.hasNext(); ) {
@@ -158,7 +158,7 @@ extends AbstractSymbolList implements Alignment, Serializable {
             "The symbol list associated with " + label + " is null"
           );
         } else {
-          throw new BioError(nsee, "Something is screwey - map is lying about key/values");
+          throw new BioError("Something is screwey - map is lying about key/values", nsee);
         }
       }
     }

@@ -243,8 +243,8 @@ public class DistributionLogo extends JComponent {
       try {
         inf -= entropy(dist, s);
       } catch (IllegalSymbolException ire) {
-        throw new BioError(ire,
-        "Symbol evaporated while calculating information");
+        throw new BioError(
+        "Symbol evaporated while calculating information", ire);
       }
     }
 

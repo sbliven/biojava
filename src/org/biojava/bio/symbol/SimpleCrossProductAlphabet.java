@@ -83,13 +83,13 @@ implements Serializable {
     ourSymbols = new HashMap();
     populateSymbols(new ArrayList());
   }
-  
+
   protected ChangeSupport generateChangeSupport() {
       for (Iterator i = alphas.iterator(); i.hasNext(); ) {
           Alphabet a = (Alphabet) i.next();
           if (!a.isUnchanging(Alphabet.SYMBOLS)) {
               return new ChangeSupport();
-          } 
+          }
       }
       return new ChangeSupport(Collections.singleton(Alphabet.SYMBOLS));
   }
@@ -123,7 +123,7 @@ implements Serializable {
       try {
         ss = (AtomicSymbol) parent.getSymbol(s);
       } catch (IllegalSymbolException ise) {
-        throw new BioError(ise, "Balls up - couldn't fetch symbol from parent");
+        throw new BioError("Balls up - couldn't fetch symbol from parent", ise);
       }
     } else {
       try {
@@ -132,8 +132,8 @@ implements Serializable {
         );
       } catch (IllegalSymbolException ise) {
         throw new BioError(
-          ise,
-          "Assertion Failure: Should have a legal symbol: " + s
+
+          "Assertion Failure: Should have a legal symbol: " + s, ise
         );
       }
     }

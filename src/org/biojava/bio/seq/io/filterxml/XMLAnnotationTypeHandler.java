@@ -52,85 +52,85 @@ import org.xml.sax.SAXException;
  * @author Thomas Down
  * @since 1.3
  */
- 
+
 public class XMLAnnotationTypeHandler extends StAXContentHandlerBase {
     private Map handlerFactories = new HashMap();
     private Map collectionHandlerFactories = new HashMap();
     private AnnotationType annotationType = new AnnotationType.Impl();
     private int depth = 0;
-    
+
     /**
      * Return the AnnotationType built by this handler
      */
-    
+
     public AnnotationType getAnnotationType() {
         return annotationType;
     }
 
     /**
      * Handler for an individual <code>PropertyConstraint</code> in an AnnotationType.
-     * Implement this if you want to add support for additional types of 
+     * Implement this if you want to add support for additional types of
      * PropertyConstraint.
      */
-    
+
     public static interface PropertyConstraintHandler extends StAXContentHandler {
         public PropertyConstraint getPropertyConstraint() throws SAXException;
-    }            
-    
+    }
+
     /**
      * Handler Factory for a <code>PropertyConstraint</code> in an AnnotationType.
-     * Implement this if you want to add support for additional types of 
+     * Implement this if you want to add support for additional types of
      * PropertyConstraint.
      */
-    
+
     public static interface PropertyConstraintHandlerFactory {
-        public PropertyConstraintHandler makeHandler(String nsURI, 
+        public PropertyConstraintHandler makeHandler(String nsURI,
                                                      String localName)
              throws SAXException;
     }
-    
+
     /**
      * Handler for an individual <code>CollectionConstraint</code> in an AnnotationType.
-     * Implement this if you want to add support for additional types of 
+     * Implement this if you want to add support for additional types of
      * CollectionConstraint.
      */
-    
+
     public static interface CollectionConstraintHandler extends StAXContentHandler {
         public CollectionConstraint getCollectionConstraint() throws SAXException;
-    }            
-    
+    }
+
     /**
      * Handler Factory for a <code>CollectionConstraint</code> in an AnnotationType.
-     * Implement this if you want to add support for additional types of 
+     * Implement this if you want to add support for additional types of
      * CollectionConstraint.
      */
-    
+
     public static interface CollectionConstraintHandlerFactory {
-        public CollectionConstraintHandler makeHandler(String nsURI, 
+        public CollectionConstraintHandler makeHandler(String nsURI,
                                                        String localName)
              throws SAXException;
     }
-    
+
     /**
      * Register a factory used to create handlers for the specified tag in an
      * XML AnnotationType
      */
-    
+
     public void registerPropertyHandlerFactory(String nsURI, String localName, PropertyConstraintHandlerFactory factory) {
         handlerFactories.put(new QName(nsURI, localName), factory);
     }
-    
+
     /**
      * Register a factory used to create handlers for the specified tag in an
      * XML AnnotationType
      */
-    
+
     public void registerCollectionHandlerFactory(String nsURI, String localName, CollectionConstraintHandlerFactory factory) {
         collectionHandlerFactories.put(new QName(nsURI, localName), factory);
     }
-    
-    
-    
+
+
+
     private PropertyConstraintHandler getHandler(String nsURI, String localName)
         throws SAXException
     {
@@ -141,7 +141,7 @@ public class XMLAnnotationTypeHandler extends StAXContentHandlerBase {
             throw new SAXException("Unrecognized element (property context) " + nsURI + ":" + localName);
         }
     }
-    
+
     private CollectionConstraintHandler getCollectionHandler(String nsURI, String localName)
         throws SAXException
     {
@@ -152,11 +152,11 @@ public class XMLAnnotationTypeHandler extends StAXContentHandlerBase {
             throw new SAXException("Unrecognized element (collection context) " + nsURI + ":" + localName);
         }
     }
-    
+
     /**
      * Construct a new XMLAnnotationTypeHandler which can parse the builtin PropertyConstraints.
      */
-    
+
     public XMLAnnotationTypeHandler() {
         registerPropertyHandlerFactory(
             XMLAnnotationTypeWriter.XML_ANNOTATIONTYPE_NS,
@@ -189,7 +189,7 @@ public class XMLAnnotationTypeHandler extends StAXContentHandlerBase {
             XMLAnnotationTypeWriter.XML_ANNOTATIONTYPE_NS,
             "byClass",
             new CDATAHandlerFactory() {
-                protected PropertyConstraint stringToConstraint(String s) 
+                protected PropertyConstraint stringToConstraint(String s)
                     throws SAXException
                 {
                     try {
@@ -253,8 +253,8 @@ public class XMLAnnotationTypeHandler extends StAXContentHandlerBase {
             "byAnnotationType",
             new ByAnnotationTypeHandlerFactory()
         );
-        
-        
+
+
         registerCollectionHandlerFactory(
             XMLAnnotationTypeWriter.XML_ANNOTATIONTYPE_NS,
             "any",
@@ -339,9 +339,9 @@ public class XMLAnnotationTypeHandler extends StAXContentHandlerBase {
             }
         );
     }
-    
+
     public void startElement(String nsURI,
-			                         String localName,
+                                                 String localName,
                                      String qName,
                                      Attributes attrs,
                                      DelegationManager dm)
@@ -375,70 +375,70 @@ public class XMLAnnotationTypeHandler extends StAXContentHandlerBase {
     }
 
     public void endElement(String nsURI,
-			                       String localName,
-			                       String qName,
-			                       StAXContentHandler delegate)
+                                               String localName,
+                                               String qName,
+                                               StAXContentHandler delegate)
                  throws SAXException
     {
         --depth;
     }
-    
+
     private abstract class PropertyHandler extends StAXContentHandlerBase {
         private CollectionConstraint cons;
         private int depth = 0;
-        
+
         public void startElement(String nsURI,
-			                         String localName,
+                                                 String localName,
                                      String qName,
                                      Attributes attrs,
                                      DelegationManager dm)
                 throws SAXException
-        {   
+        {
             if (depth == 1) {
                 dm.delegate(getCollectionHandler(nsURI, localName));
             }
-            
+
             ++depth;
         }
-        
+
         public void endElement(String nsURI,
-			                       String localName,
-			                       String qName,
-			                       StAXContentHandler delegate)
+                                               String localName,
+                                               String qName,
+                                               StAXContentHandler delegate)
                  throws SAXException
         {
             --depth;
-            
+
             /*
-            
+
             if (delegate instanceof CardinalityHandler) {
                 cardinality = ((CardinalityHandler) delegate).getCardinality();
             } else if (delegate instanceof PropertyConstraintHandler) {
                 cons = ((PropertyConstraintHandler) delegate).getPropertyConstraint();
             }
-            
+
             */
             if (delegate instanceof CollectionConstraintHandler) {
                 cons = ((CollectionConstraintHandler) delegate).getCollectionConstraint();
             }
         }
-        
+
         public void endTree() {
             try {
                 setConstraint(cons);
             } catch (ChangeVetoException ex) {
-                throw new BioError(ex, "Assertion failed: couldn't modify AnnotationType");
+                throw new BioError("Assertion failed: couldn't modify AnnotationType", ex);
             }
         }
-        
+
         protected abstract void setConstraint(CollectionConstraint cc) throws ChangeVetoException;
     }
-    
+
     private class CardinalityHandler extends StAXContentHandlerBase {
         private List spans = new ArrayList();
-        
+
         public void startElement(String nsURI,
-			                         String localName,
+                                                 String localName,
                                      String qName,
                                      Attributes attrs,
                                      DelegationManager dm)
@@ -457,44 +457,44 @@ public class XMLAnnotationTypeHandler extends StAXContentHandlerBase {
                 spans.add(new RangeLocation(start, stop));
             }
         }
-        
+
         public Location getCardinality() {
             // System.err.println("GetCardinality");
             return LocationTools.union(spans);
         }
     }
-    
+
     private abstract class CDATAHandlerFactory implements PropertyConstraintHandlerFactory {
         private class CDATAHandler extends StringElementHandlerBase implements PropertyConstraintHandler {
             private PropertyConstraint cons;
-            
+
             public PropertyConstraint getPropertyConstraint() {
                 return cons;
             }
-            
-            protected void setStringValue(String s) 
+
+            protected void setStringValue(String s)
                 throws SAXException
             {
                 cons = stringToConstraint(s);
                 // System.err.println("stringToConstraint returned " + cons);
             }
         }
-        
+
         protected abstract PropertyConstraint stringToConstraint(String s) throws SAXException;
-        
+
         public PropertyConstraintHandler makeHandler(String nsURI, String localName) {
             // System.err.println("Making CDATAHandler for " + localName);
             return new CDATAHandler();
         }
     }
-    
+
     private abstract class ConstraintsHandlerFactory implements PropertyConstraintHandlerFactory {
         private class ConstraintsHandler extends StAXContentHandlerBase implements PropertyConstraintHandler {
             private List constraintChildren = new ArrayList();
             private int depth = 0;
-            
+
             public void startElement(String nsURI,
-			                         String localName,
+                                                 String localName,
                                      String qName,
                                      Attributes attrs,
                                      DelegationManager dm)
@@ -508,9 +508,9 @@ public class XMLAnnotationTypeHandler extends StAXContentHandlerBase {
             }
 
             public void endElement(String nsURI,
-			                       String localName,
-			                       String qName,
-			                       StAXContentHandler delegate)
+                                               String localName,
+                                               String qName,
+                                               StAXContentHandler delegate)
                  throws SAXException
             {
                 if (delegate instanceof PropertyConstraintHandler) {
@@ -518,28 +518,28 @@ public class XMLAnnotationTypeHandler extends StAXContentHandlerBase {
                 }
                 --depth;
             }
-            
-            public PropertyConstraint getPropertyConstraint() 
+
+            public PropertyConstraint getPropertyConstraint()
                 throws SAXException
             {
                 return constraintsToConstraint(constraintChildren);
             }
         }
-        
+
         protected abstract PropertyConstraint constraintsToConstraint(List filters) throws SAXException;
-        
+
         public PropertyConstraintHandler makeHandler(String nsURI, String localName) {
             return new ConstraintsHandler();
         }
     }
-    
+
     private class ByAnnotationTypeHandlerFactory implements PropertyConstraintHandlerFactory {
         private class ByAnnotationTypeHandler extends StAXContentHandlerBase implements PropertyConstraintHandler {
             private int depth = 0;
             private AnnotationType annoType;
-            
+
             public void startElement(String nsURI,
-			                         String localName,
+                                                 String localName,
                                      String qName,
                                      Attributes attrs,
                                      DelegationManager dm)
@@ -552,9 +552,9 @@ public class XMLAnnotationTypeHandler extends StAXContentHandlerBase {
             }
 
             public void endElement(String nsURI,
-			                       String localName,
-			                       String qName,
-			                       StAXContentHandler delegate)
+                                               String localName,
+                                               String qName,
+                                               StAXContentHandler delegate)
                  throws SAXException
             {
                 if (delegate instanceof XMLAnnotationTypeHandler) {
@@ -562,50 +562,50 @@ public class XMLAnnotationTypeHandler extends StAXContentHandlerBase {
                 }
                 --depth;
             }
-            
-            public PropertyConstraint getPropertyConstraint() 
+
+            public PropertyConstraint getPropertyConstraint()
                 throws SAXException
             {
                 return new PropertyConstraint.ByAnnotationType(annoType);
             }
         }
-        
+
         public PropertyConstraintHandler makeHandler(String nsURI, String localName) {
             return new ByAnnotationTypeHandler();
         }
     }
-    
+
     private abstract class CDATACollectionHandlerFactory implements CollectionConstraintHandlerFactory {
         private class CDATAHandler extends StringElementHandlerBase implements CollectionConstraintHandler {
             private CollectionConstraint cons;
-            
+
             public CollectionConstraint getCollectionConstraint() {
                 return cons;
             }
-            
-            protected void setStringValue(String s) 
+
+            protected void setStringValue(String s)
                 throws SAXException
             {
                 cons = stringToConstraint(s);
                 // System.err.println("stringToConstraint returned " + cons);
             }
         }
-        
+
         protected abstract CollectionConstraint stringToConstraint(String s) throws SAXException;
-        
+
         public CollectionConstraintHandler makeHandler(String nsURI, String localName) {
             // System.err.println("Making CDATAHandler for " + localName);
             return new CDATAHandler();
         }
     }
-    
+
     private abstract class ConstraintsCollectionHandlerFactory implements CollectionConstraintHandlerFactory {
         private class ConstraintsHandler extends StAXContentHandlerBase implements CollectionConstraintHandler {
             private List constraintChildren = new ArrayList();
             private int depth = 0;
-            
+
             public void startElement(String nsURI,
-			                         String localName,
+                                                 String localName,
                                      String qName,
                                      Attributes attrs,
                                      DelegationManager dm)
@@ -619,9 +619,9 @@ public class XMLAnnotationTypeHandler extends StAXContentHandlerBase {
             }
 
             public void endElement(String nsURI,
-			                       String localName,
-			                       String qName,
-			                       StAXContentHandler delegate)
+                                               String localName,
+                                               String qName,
+                                               StAXContentHandler delegate)
                  throws SAXException
             {
                 if (delegate instanceof CollectionConstraintHandler) {
@@ -629,29 +629,29 @@ public class XMLAnnotationTypeHandler extends StAXContentHandlerBase {
                 }
                 --depth;
             }
-            
-            public CollectionConstraint getCollectionConstraint() 
+
+            public CollectionConstraint getCollectionConstraint()
                 throws SAXException
             {
                 return constraintsToConstraint(constraintChildren);
             }
         }
-        
+
         protected abstract CollectionConstraint constraintsToConstraint(List filters) throws SAXException;
-        
+
         public CollectionConstraintHandler makeHandler(String nsURI, String localName) {
             return new ConstraintsHandler();
         }
     }
-    
+
     private abstract class PropCardCollectionHandlerFactory implements CollectionConstraintHandlerFactory {
         private class PropCardHandler extends StAXContentHandlerBase implements CollectionConstraintHandler {
             private Location cardinality;
             private PropertyConstraint pc;
             private int depth = 0;
-            
+
             public void startElement(String nsURI,
-			                         String localName,
+                                                 String localName,
                                      String qName,
                                      Attributes attrs,
                                      DelegationManager dm)
@@ -676,9 +676,9 @@ public class XMLAnnotationTypeHandler extends StAXContentHandlerBase {
             }
 
             public void endElement(String nsURI,
-			                       String localName,
-			                       String qName,
-			                       StAXContentHandler delegate)
+                                               String localName,
+                                               String qName,
+                                               StAXContentHandler delegate)
                  throws SAXException
             {
                 if (delegate instanceof CardinalityHandler) {
@@ -688,16 +688,16 @@ public class XMLAnnotationTypeHandler extends StAXContentHandlerBase {
                 }
                 --depth;
             }
-            
-            public CollectionConstraint getCollectionConstraint() 
+
+            public CollectionConstraint getCollectionConstraint()
                 throws SAXException
             {
                 return constraintsToConstraint(cardinality, pc);
             }
         }
-        
+
         protected abstract CollectionConstraint constraintsToConstraint(Location card, PropertyConstraint pc) throws SAXException;
-        
+
         public CollectionConstraintHandler makeHandler(String nsURI, String localName) {
             return new PropCardHandler();
         }

@@ -66,61 +66,61 @@ class FlatModel
 {
   private final MarkovModel source;
   private final MarkovModel delegate;
-  
+
   protected void addAState(State ourState)
   throws IllegalSymbolException {
     try {
       delegate.addState(ourState);
     } catch (ChangeVetoException cve) {
-      throw new BioError(cve, "This model should be ours with no listeners");
+      throw new BioError("This model should be ours with no listeners", cve);
     }
   }
 
   public int[] advance() {
     return delegate.advance();
   }
-  
+
   public Alphabet emissionAlphabet() {
     return delegate.emissionAlphabet();
   }
-  
+
   public FiniteAlphabet stateAlphabet() {
     return delegate.stateAlphabet();
   }
-  
+
   public int heads() {
     return delegate.heads();
   }
-  
+
   public MagicalState magicalState() {
     return delegate.magicalState();
   }
-  
+
   public Distribution getWeights(State source)
   throws IllegalSymbolException {
     return delegate.getWeights(source);
   }
-  
+
   public boolean containsTransition(State from, State to)
   throws IllegalSymbolException {
     return delegate.containsTransition(from, to);
   }
-  
+
   public FiniteAlphabet transitionsFrom(State from)
   throws IllegalSymbolException {
     return delegate.transitionsFrom(from);
   }
-  
+
   public FiniteAlphabet transitionsTo(State to)
   throws IllegalSymbolException {
     return delegate.transitionsTo(to);
   }
-  
+
   public void setWeights(State source, Distribution dist)
   throws ChangeVetoException {
     throw new ChangeVetoException("Can't set weights in immutable view");
   }
-  
+
   public FlatModel(MarkovModel model)
   throws IllegalSymbolException, IllegalAlphabetException {
     this.source = model;
@@ -129,7 +129,7 @@ class FlatModel
       source.emissionAlphabet(),
       "flat"
     );
-    
+
     // add all the states
     //System.out.println("Adding states");
     Map toM = new HashMap();
@@ -138,7 +138,7 @@ class FlatModel
     Map misEnd = new HashMap();
     Map modelStart = new HashMap();
     Map modelEnd = new HashMap();
-    
+
     for(Iterator i = model.stateAlphabet().iterator(); i.hasNext(); ) {
       State s = (State) i.next();
       if(s instanceof DotState) { // simple dot state in model
@@ -207,12 +207,12 @@ class FlatModel
     // wire
     for(Iterator i = delegate.stateAlphabet().iterator(); i.hasNext(); ) {
       State s = (State) i.next();
-      
+
       State sOrig;
       MarkovModel sModel;
-      
+
       //System.out.println("Processing transitions from " + s.getName());
-      
+
       // find underlying state and model for s
       if(s instanceof MagicalState) { // from magic
         sOrig = s;
@@ -238,7 +238,7 @@ class FlatModel
           sOrig = s;
         }
       }
-      
+
       //
       // FIXME -- Matthew broked this...
       //
@@ -253,10 +253,10 @@ class FlatModel
       try {
         delegate.setWeights(s, dist);
       } catch (ChangeVetoException cve) {
-        throw new BioError(cve, "Couldn't edit delegate model");
+        throw new BioError("Couldn't edit delegate model", cve);
       }
       table.setTranslation(s, sOrig);
-      
+
       // find all reachable states from s
       for(
         Iterator j = sModel.transitionsFrom(sOrig).iterator();
@@ -277,7 +277,7 @@ class FlatModel
       }
     }
   }
-  
+
   public void createTransition(State from, State to)
   throws IllegalSymbolException, UnsupportedOperationException {
     Alphabet a = stateAlphabet();
@@ -303,11 +303,11 @@ class FlatModel
   throws UnsupportedOperationException {
     throw new UnsupportedOperationException("removeState not supported by FlatModel");
   }
-  
+
   public void registerWithTrainer(ModelTrainer modelTrainer) {
     modelTrainer.registerModel(delegate);
   }
-    
+
   private static class Wrapper
     extends
       AbstractChangeable
@@ -318,17 +318,17 @@ class FlatModel
     private final State wrapped;
     private final String extra;
     private final Alphabet matches;
-    
+
     protected transient ChangeSupport changeSupport = null;
-    
+
     public String getName() {
       return wrapped.getName() + "-" + extra;
     }
-    
+
     public Annotation getAnnotation() {
       return wrapped.getAnnotation();
     }
-    
+
     public State getWrapped() {
       return wrapped;
     }
@@ -336,15 +336,15 @@ class FlatModel
     public Alphabet getMatches() {
       return matches;
     }
-    
+
     public Set getBases() {
       return Collections.singleton(this);
     }
-    
+
     public List getSymbols() {
       return new SingletonList(this);
     }
-    
+
     public Wrapper(State wrapped, String extra) {
       if(wrapped == null) {
         throw new NullPointerException("Can't wrap null");
@@ -354,13 +354,13 @@ class FlatModel
       this.matches = new SingletonAlphabet(this);
     }
   }
-  
+
   private static class DotStateWrapper
   extends Wrapper implements DotState {
     public DotStateWrapper(State wrapped, String extra) {
       super(wrapped, extra);
     }
-      
+
     public DotStateWrapper(State wrapped)
     throws NullPointerException {
       this(wrapped, "f");
@@ -377,7 +377,7 @@ class FlatModel
     throws ChangeVetoException {
       getWrappedES().setAdvance(advance);
     }
-    
+
     public int [] getAdvance() {
       return getWrappedES().getAdvance();
     }
@@ -385,18 +385,18 @@ class FlatModel
     public Distribution getDistribution() {
       return getWrappedES().getDistribution();
     }
-    
+
     public void setDistribution(Distribution dis)
     throws ChangeVetoException {
       getWrappedES().setDistribution(dis);
     }
-    
+
     public void registerWithTrainer(ModelTrainer trainer) {}
-    
+
     public EmissionWrapper(EmissionState wrapped) {
       this(wrapped, "-f");
     }
-    
+
     public EmissionWrapper(EmissionState wrapped, String extra) {
       super(wrapped, extra);
     }

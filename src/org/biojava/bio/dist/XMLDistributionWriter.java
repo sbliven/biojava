@@ -64,7 +64,7 @@ public class XMLDistributionWriter{
           try {
             conditionedDist = ond.getDistribution(sym);
           } catch (IllegalSymbolException ex) {
-            throw new BioError(ex,"Distribution has been built with Illegal Symbols !?");
+            throw new BioError("Distribution has been built with Illegal Symbols !?", ex);
           }
 
           conditionedAlpha = (FiniteAlphabet) conditionedDist.getAlphabet();
@@ -76,7 +76,7 @@ public class XMLDistributionWriter{
             try {
               weight = conditionedDist.getWeight(condSym);
             } catch (IllegalSymbolException ex) {
-              throw new BioError(ex,"Distribution has been built with Illegal Symbols !?");
+              throw new BioError("Distribution has been built with Illegal Symbols !?", ex);
             }
 
             out.write("<weight sym=\"" + condSym.getName() +
@@ -109,7 +109,7 @@ public class XMLDistributionWriter{
            try {
              weight = d.getWeight(sym);
            } catch (IllegalSymbolException ex) {
-             throw new BioError(ex,"Distribution has been built with Illegal Symbols !?");
+             throw new BioError("Distribution has been built with Illegal Symbols !?", ex);
            }
 
            out.write("<weight sym=\"" + sym.getName() +

@@ -14,7 +14,7 @@ import org.biojava.bio.ontology.io.TabDelimParser;
 public final class OntoTools {
   private static final Ontology CORE_ONTOLOGY;
   private static final OntologyFactory DEFAULT_FACTORY;
-  
+
   public static final Term IS_A;
   public static final Term HAS_A;
   public static final Term ANY;
@@ -31,7 +31,7 @@ public final class OntoTools {
   public static final Term PARTIAL_ORDER;
   public static final Term PART_OF;
   public static final Term INVERSE;
-  
+
   static {
     DEFAULT_FACTORY = new OntologyFactory() {
       public Ontology createOntology(String name, String desc)
@@ -39,7 +39,7 @@ public final class OntoTools {
         return new Ontology.Impl(name, desc);
       }
     };
-    
+
     try {
       BufferedReader reader = new BufferedReader(
         new InputStreamReader(
@@ -48,9 +48,9 @@ public final class OntoTools {
           )
         )
       );
-      
+
       CORE_ONTOLOGY = new TabDelimParser().parse(reader, DEFAULT_FACTORY);
-      
+
       IS_A = CORE_ONTOLOGY.getTerm("is-a");
       HAS_A = CORE_ONTOLOGY.getTerm("has-a");
       ANY = CORE_ONTOLOGY.getTerm("any");
@@ -68,13 +68,13 @@ public final class OntoTools {
       PART_OF = CORE_ONTOLOGY.getTerm("part-of");
       INVERSE = CORE_ONTOLOGY.getTerm("inverse");
     } catch (Exception e) {
-      throw new BioError(e, "Could not initialize OntoTools");
+      throw new BioError("Could not initialize OntoTools", e);
     }
   }
-  
-  
+
+
   private OntoTools() {}
-  
+
   /**
    * Get the Ontology that defines our core "central dogma".
    *
@@ -87,7 +87,7 @@ public final class OntoTools {
   public static Ontology getCoreOntology() {
     return CORE_ONTOLOGY;
   }
-  
+
   public static OntologyFactory getDefaultFactory() {
     return DEFAULT_FACTORY;
   }

@@ -38,34 +38,34 @@ import org.biojava.bio.BioException;
  */
 public class IllegalSymbolException extends BioException {
   private final Symbol sym;
-  
+
   /**
    * Retrieve the symbol that caused this exception, or null.
    */
   public Symbol getSymbol() {
     return sym;
   }
-  
+
   /**
    * Make the exception with a message.
    */
   public IllegalSymbolException(String message) {
     this(null, null, message);
   }
-  
+
   /**
    * Make the exception with a message and a symbol.
    */
   public IllegalSymbolException(Symbol sym, String message) {
     this(null, sym, message);
   }
-  
+
   public IllegalSymbolException(Throwable cause, String message) {
     this(cause, null, message);
   }
-  
+
   public IllegalSymbolException(Throwable cause, Symbol sym, String message) {
-    super(cause, message);
+    super(message, cause);
     this.sym = sym;
   }
 }

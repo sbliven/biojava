@@ -48,17 +48,17 @@ public class XMLAnnotationTypeWriter {
     /**
      * XML namespace string used to the AnnotationType representation
      */
-    
+
     public static final String XML_ANNOTATIONTYPE_NS = "http://www.biojava.org/AnnotationType";
     private static final Class[] NO_ARGS = new Class[0];
     private static final Object[] NO_ARGS_VAL = new Object[0];
-    
+
     private Map constraintWritersByObject = new HashMap();
     private Map constraintWritersByClass = new HashMap();
     private Map colConstraintWritersByObject = new HashMap();
     private Map colConstraintWritersByClass = new HashMap();
     private boolean strict = false;
-    
+
     /**
      * Writer for types of CollectionConstraint.  Implement this to add support
      * for a new type of CollectionConstraint.
@@ -66,14 +66,14 @@ public class XMLAnnotationTypeWriter {
      * @author Thomas Down
      * @since 1.3
      */
-    
+
     public interface XMLCollectionConstraintWriter {
         public void writeCollectionConstraint(CollectionConstraint pc,
                                               XMLWriter xw,
                                               XMLAnnotationTypeWriter config)
             throws ClassCastException, IOException, IllegalArgumentException;
     }
-    
+
     /**
      * Writer for types of PropertyConstraint.  Implement this to add support
      * for a new type of PropertyConstraint.
@@ -81,18 +81,18 @@ public class XMLAnnotationTypeWriter {
      * @author Thomas Down
      * @since 1.3
      */
-    
+
     public interface XMLPropertyConstraintWriter {
         public void writePropertyConstraint(PropertyConstraint pc,
                                             XMLWriter xw,
                                             XMLAnnotationTypeWriter config)
             throws ClassCastException, IOException, IllegalArgumentException;
     }
-    
+
     /**
      * Construct a new AnnotationTypeWriter which knows about the builtin types of PropertyConstraint
      */
-    
+
     public XMLAnnotationTypeWriter() {
         try {
             addXMLPropertyConstraintWriter(
@@ -127,7 +127,7 @@ public class XMLAnnotationTypeWriter {
                     PropertyConstraint.ByAnnotationType.class,
                     new AnnotationTypeConstraintWriter()
             );
-            
+
             addXMLCollectionConstraintWriter(
                     CollectionConstraint.ANY,
                     new BlankCollectionConstraintWriter(XML_ANNOTATIONTYPE_NS, "any")
@@ -157,61 +157,61 @@ public class XMLAnnotationTypeWriter {
                     new ContainsCollectionConstraintWriter()
             );
         } catch (Exception ex) {
-            throw new BioError(ex, "Assertion failed: couldn't initialize XMLFilterWriters");
+            throw new BioError("Assertion failed: couldn't initialize XMLFilterWriters", ex);
         }
     }
-    
+
     /**
      * Register a writer for the specified class of property constraint
      */
-    
+
     public void addXMLPropertyConstraintWriter(Class clazz, XMLPropertyConstraintWriter xfw) {
         constraintWritersByClass.put(clazz, xfw);
     }
-    
+
     /**
      * Register a writer for a singleton property constraint.
      */
-     
+
     public void addXMLPropertyConstraintWriter(PropertyConstraint pc, XMLPropertyConstraintWriter xfw) {
         constraintWritersByObject.put(pc, xfw);
     }
-    
+
     /**
      * Register a writer for the specified class of collection constraint
      */
-    
+
     public void addXMLCollectionConstraintWriter(Class clazz, XMLCollectionConstraintWriter xfw) {
         colConstraintWritersByClass.put(clazz, xfw);
     }
-    
+
     /**
      * Register a writer for a singleton property constraint.
      */
-     
+
     public void addXMLCollectionConstraintWriter(CollectionConstraint pc, XMLCollectionConstraintWriter xfw) {
         colConstraintWritersByObject.put(pc, xfw);
     }
-    
+
     /**
      * Determine if this writer is in strict mode.
      */
-    
+
     public boolean isStrict() {
         return strict;
     }
-    
+
     /**
      * Selects strict mode.  In strict mode, the writer will throw an <code>IllegalArgumentException</code>
      * if it encounters a type of <code>PropertyConstraint</code> it doesn't recognize.  When not
      * in strict model, unrecognized constraints are silently replaced by <code>PropertyConstraint.ANY</code>.
      * Default is <code>false</code>.
      */
-    
+
     public void setIsStrict(boolean b) {
         this.strict = b;
     }
-    
+
     private void writeCardinality(Location card,
                                   XMLWriter xw)
         throws IllegalArgumentException, IOException
@@ -240,7 +240,7 @@ public class XMLAnnotationTypeWriter {
             xw.closeTag(XML_ANNOTATIONTYPE_NS, "cardinality");
         }
     }
-    
+
     private String intToString(int i) {
         if (i == Integer.MAX_VALUE) {
             return "infinity";
@@ -248,11 +248,11 @@ public class XMLAnnotationTypeWriter {
             return "" + i;
         }
     }
-    
+
     /**
      * Writes a single property constraint.
      */
-    
+
     void writePropertyConstraint(PropertyConstraint pc,
                                  XMLWriter xw)
         throws IllegalArgumentException, IOException
@@ -270,11 +270,11 @@ public class XMLAnnotationTypeWriter {
         }
         xpcw.writePropertyConstraint(pc, xw, this);
     }
-    
+
     /**
      * Writes a single collection constraint
      */
-    
+
     void writeCollectionConstraint(CollectionConstraint pc,
                                    XMLWriter xw)
         throws IllegalArgumentException, IOException
@@ -292,7 +292,7 @@ public class XMLAnnotationTypeWriter {
         }
         xpcw.writeCollectionConstraint(pc, xw, this);
     }
-    
+
     /**
      * Write an <code>AnnotationType</code> to the specified XMLWriter.
      *
@@ -300,24 +300,24 @@ public class XMLAnnotationTypeWriter {
      *                                  constraints, and the writer is in strict mode.
      * @throws IOException if an error occurs while outputting XML.
      */
-    
-    public void writeAnnotationType(AnnotationType at, XMLWriter xw) 
+
+    public void writeAnnotationType(AnnotationType at, XMLWriter xw)
         throws IllegalArgumentException, IOException
     {
         xw.openTag(XML_ANNOTATIONTYPE_NS, "annotationType");
         Set propKeys = at.getProperties();
-        
+
         xw.openTag(XML_ANNOTATIONTYPE_NS, "propertyDefault");
         CollectionConstraint.AllValuesIn defaultcc = (CollectionConstraint.AllValuesIn) at.getDefaultConstraint();
         // writeCardinality(defaultcc.getCardinalityConstraint(), xw);
         // writePropertyConstraint(defaultcc.getPropertyConstraint(), xw);
         writeCollectionConstraint(defaultcc, xw);
         xw.closeTag(XML_ANNOTATIONTYPE_NS, "propertyDefault");
-        
+
         for (Iterator pi = propKeys.iterator(); pi.hasNext(); ) {
             Object propKey = pi.next();
             CollectionConstraint cc = at.getConstraint(propKey);
-            
+
             xw.openTag(XML_ANNOTATIONTYPE_NS, "property");
             xw.attribute(XML_ANNOTATIONTYPE_NS, "name", propKey.toString());
             // CollectionConstraint.AllValuesIn cc = (CollectionConstraint.AllValuesIn) at.getConstraint(propKey);
@@ -328,16 +328,16 @@ public class XMLAnnotationTypeWriter {
         }
         xw.closeTag(XML_ANNOTATIONTYPE_NS, "annotationType");
     }
-    
+
     private static class BlankConstraintWriter implements XMLPropertyConstraintWriter {
         private String nsURI;
         private String localName;
-        
+
         BlankConstraintWriter(String nsURI, String localName) {
             this.nsURI = nsURI;
             this.localName =  localName;
         }
-        
+
         public void writePropertyConstraint(PropertyConstraint pc,
                                             XMLWriter xw,
                                             XMLAnnotationTypeWriter config)
@@ -347,7 +347,7 @@ public class XMLAnnotationTypeWriter {
             xw.closeTag(nsURI, localName);
         }
     }
-    
+
     private static class ExactValueConstraintWriter implements XMLPropertyConstraintWriter {
         public void writePropertyConstraint(PropertyConstraint pc,
                                             XMLWriter xw,
@@ -360,7 +360,7 @@ public class XMLAnnotationTypeWriter {
             xw.closeTag(XML_ANNOTATIONTYPE_NS, "value");
         }
     }
-    
+
     private static class ByClassConstraintWriter implements XMLPropertyConstraintWriter {
         public void writePropertyConstraint(PropertyConstraint pc,
                                             XMLWriter xw,
@@ -373,7 +373,7 @@ public class XMLAnnotationTypeWriter {
             xw.closeTag(XML_ANNOTATIONTYPE_NS, "byClass");
         }
     }
-    
+
     private static class AndConstraintWriter implements XMLPropertyConstraintWriter {
         public void writePropertyConstraint(PropertyConstraint pc,
                                             XMLWriter xw,
@@ -385,7 +385,7 @@ public class XMLAnnotationTypeWriter {
             writeSubConstraint(pca, xw, config);
             xw.closeTag(XML_ANNOTATIONTYPE_NS, "and");
         }
-        
+
         private void writeSubConstraint(PropertyConstraint pc,
                                         XMLWriter xw,
                                         XMLAnnotationTypeWriter config)
@@ -400,7 +400,7 @@ public class XMLAnnotationTypeWriter {
             }
         }
     }
-    
+
     private static class OrConstraintWriter implements XMLPropertyConstraintWriter {
         public void writePropertyConstraint(PropertyConstraint pc,
                                             XMLWriter xw,
@@ -412,7 +412,7 @@ public class XMLAnnotationTypeWriter {
             writeSubConstraint(pca, xw, config);
             xw.closeTag(XML_ANNOTATIONTYPE_NS, "or");
         }
-        
+
         private void writeSubConstraint(PropertyConstraint pc,
                                         XMLWriter xw,
                                         XMLAnnotationTypeWriter config)
@@ -427,7 +427,7 @@ public class XMLAnnotationTypeWriter {
             }
         }
     }
-    
+
     private static class EnumConstraintWriter implements XMLPropertyConstraintWriter {
         public void writePropertyConstraint(PropertyConstraint pc,
                                             XMLWriter xw,
@@ -444,7 +444,7 @@ public class XMLAnnotationTypeWriter {
             xw.closeTag(XML_ANNOTATIONTYPE_NS, "or");
         }
     }
-    
+
     private static class AnnotationTypeConstraintWriter implements XMLPropertyConstraintWriter {
         public void writePropertyConstraint(PropertyConstraint pc,
                                             XMLWriter xw,
@@ -455,18 +455,18 @@ public class XMLAnnotationTypeWriter {
             config.writeAnnotationType(pcbat.getAnnotationType(), xw);
         }
     }
-    
-    
-    
+
+
+
     private static class BlankCollectionConstraintWriter implements XMLCollectionConstraintWriter {
         private String nsURI;
         private String localName;
-        
+
         BlankCollectionConstraintWriter(String nsURI, String localName) {
             this.nsURI = nsURI;
             this.localName =  localName;
         }
-        
+
         public void writeCollectionConstraint(CollectionConstraint pc,
                                               XMLWriter xw,
                                               XMLAnnotationTypeWriter config)
@@ -476,7 +476,7 @@ public class XMLAnnotationTypeWriter {
             xw.closeTag(nsURI, localName);
         }
     }
-    
+
     private static class AndCollectionConstraintWriter implements XMLCollectionConstraintWriter {
         public void writeCollectionConstraint(CollectionConstraint pc,
                                               XMLWriter xw,
@@ -488,7 +488,7 @@ public class XMLAnnotationTypeWriter {
             writeSubConstraint(pca, xw, config);
             xw.closeTag(XML_ANNOTATIONTYPE_NS, "and");
         }
-        
+
         private void writeSubConstraint(CollectionConstraint pc,
                                         XMLWriter xw,
                                         XMLAnnotationTypeWriter config)
@@ -503,7 +503,7 @@ public class XMLAnnotationTypeWriter {
             }
         }
     }
-    
+
     private static class OrCollectionConstraintWriter implements XMLCollectionConstraintWriter {
         public void writeCollectionConstraint(CollectionConstraint pc,
                                               XMLWriter xw,
@@ -515,7 +515,7 @@ public class XMLAnnotationTypeWriter {
             writeSubConstraint(pca, xw, config);
             xw.closeTag(XML_ANNOTATIONTYPE_NS, "or");
         }
-        
+
         private void writeSubConstraint(CollectionConstraint pc,
                                         XMLWriter xw,
                                         XMLAnnotationTypeWriter config)
@@ -530,7 +530,7 @@ public class XMLAnnotationTypeWriter {
             }
         }
     }
-    
+
     private static class AllValuesInCollectionConstraintWriter implements XMLCollectionConstraintWriter {
         public void writeCollectionConstraint(CollectionConstraint pc,
                                               XMLWriter xw,
@@ -543,9 +543,9 @@ public class XMLAnnotationTypeWriter {
             config.writePropertyConstraint(cc.getPropertyConstraint(), xw);
             xw.closeTag(XML_ANNOTATIONTYPE_NS, "allValuesIn");
         }
-        
+
     }
-    
+
     private static class ContainsCollectionConstraintWriter implements XMLCollectionConstraintWriter {
         public void writeCollectionConstraint(CollectionConstraint pc,
                                               XMLWriter xw,
@@ -558,6 +558,6 @@ public class XMLAnnotationTypeWriter {
             config.writePropertyConstraint(cc.getPropertyConstraint(), xw);
             xw.closeTag(XML_ANNOTATIONTYPE_NS, "contains");
         }
-        
+
     }
 }

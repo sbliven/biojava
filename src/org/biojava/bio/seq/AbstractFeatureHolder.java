@@ -46,7 +46,7 @@ public abstract class AbstractFeatureHolder
         boolean recurse = FilterUtils.areProperSubset(filter, FeatureFilter.top_level);
         return filter(filter, recurse);
     }
-    
+
   public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
     SimpleFeatureHolder res = new SimpleFeatureHolder();
     for(Iterator f = features(); f.hasNext();) {
@@ -67,8 +67,7 @@ public abstract class AbstractFeatureHolder
             res.addFeature((Feature) rf.next());
           } catch (ChangeVetoException cve) {
             throw new BioError(
-              cve,
-              "Assertion failure: Should be able to manipulate this FeatureHolder"
+              "Assertion failure: Should be able to manipulate this FeatureHolder", cve
             );
           }
         }

@@ -123,7 +123,7 @@ public final class RNATools {
       geneticCodes = new HashMap();
       loadGeneticCodes();
     } catch (Throwable t) {
-      throw new BioError(t, "Unable to initialize RNATools");
+      throw new BioError("Unable to initialize RNATools", t);
     }
   }
 
@@ -166,7 +166,7 @@ public final class RNATools {
       SymbolTokenization p = getRNA().getTokenization("token");
       return new SimpleSymbolList(p, rna);
     } catch (BioException se) {
-      throw new BioError(se, "Something has gone badly wrong with RNA");
+      throw new BioError("Something has gone badly wrong with RNA", se);
     }
   }
 
@@ -189,7 +189,7 @@ public final class RNATools {
         "", name, new SimpleAnnotation()
       );
     } catch (BioException se) {
-      throw new BioError(se, "Something has gone badly wrong with RNA");
+      throw new BioError("Something has gone badly wrong with RNA", se);
     }
   }
 
@@ -284,7 +284,7 @@ public final class RNATools {
     try{
       toke = getRNA().getTokenization("token");
     }catch(BioException e){
-      throw new BioError(e, "Cannot find the 'token' Tokenization for RNA!?");
+      throw new BioError("Cannot find the 'token' Tokenization for RNA!?", e);
     }
     return toke.parseToken(t);
   }
@@ -469,7 +469,7 @@ public final class RNATools {
         }
       }
     } catch (Exception e) {
-      throw new BioError(e, "Couldn't parse TranslationTables.xml");
+      throw new BioError("Couldn't parse TranslationTables.xml", e);
     }
   }
 

@@ -266,9 +266,8 @@ public abstract class AbstractDistribution
       );
     } catch (IllegalSymbolException ire) {
       throw new BioError(
-        ire,
         "Unable to iterate over all symbols in alphabet - " +
-        "things changed beneath me!"
+        "things changed beneath me!", ire
       );
     }
   }

@@ -46,7 +46,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
  * @author Matthew Pocock
  */
 public class StackedLogoPainter implements LogoPainter {
-    
+
   /**
    * Supports the bean property logoFont.
    */
@@ -63,11 +63,11 @@ public class StackedLogoPainter implements LogoPainter {
   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     pcs.addPropertyChangeListener(propertyName, listener);
   }
-                                        
+
   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     pcs.removePropertyChangeListener(propertyName, listener);
   }
-  
+
   public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
     pcs.firePropertyChange(propertyName, oldValue, newValue);
   }
@@ -87,15 +87,15 @@ public class StackedLogoPainter implements LogoPainter {
   public boolean hasListeners(String propertyName) {
     return pcs.hasListeners(propertyName);
   }
-  
+
   public void paintLogo(LogoContext lCtxt) {
     Distribution dis = lCtxt.getDistribution();
     SymbolStyle style = lCtxt.getStyle();
     SymbolTokenization toke = null;
     try {
-	toke = dis.getAlphabet().getTokenization("token");
+        toke = dis.getAlphabet().getTokenization("token");
     } catch (BioException ex) {
-	throw new BioRuntimeException(ex);
+        throw new BioRuntimeException(ex);
     }
 
     Rectangle bounds = lCtxt.getBounds();
@@ -104,7 +104,7 @@ public class StackedLogoPainter implements LogoPainter {
     double base = height;
 
     SortedSet info = new TreeSet(new ResValComparator(toke));
-    
+
     try {
       for(
         Iterator i = ((FiniteAlphabet) dis.getAlphabet()).iterator();
@@ -114,9 +114,9 @@ public class StackedLogoPainter implements LogoPainter {
         info.add(new ResVal(s, dis.getWeight(s) * height));
       }
     } catch (IllegalSymbolException ire) {
-      throw new BioError(ire, "Symbol dissapeared from dis alphabet");
+      throw new BioError("Symbol dissapeared from dis alphabet", ire);
     }
-    
+
     Rectangle r = new Rectangle();
     r.x = bounds.x;
     r.y = 0;
@@ -124,32 +124,32 @@ public class StackedLogoPainter implements LogoPainter {
     for(Iterator i = info.iterator(); i.hasNext();) {
       ResVal rv = (ResVal) i.next();
       r.height = (int) rv.getValue();
-      
+
       lCtxt.getBlockPainter().paintBlock(lCtxt, r, rv.getToken());
-      
+
       r.y -= rv.getValue();
     }
   }
-  
+
   public StackedLogoPainter() {
     pcs = new PropertyChangeSupport(this);
   }
-  
+
   /**
    * A symbol/information tuple.
    */
   private static class ResVal {
     private AtomicSymbol symbol;
     private double value;
-    
+
     public final AtomicSymbol getToken() {
       return symbol;
     }
-    
+
     public final double getValue() {
       return value;
     }
-    
+
     public ResVal(AtomicSymbol sym, double val) {
       symbol = sym;
       value = val;
@@ -163,20 +163,20 @@ public class StackedLogoPainter implements LogoPainter {
       private SymbolTokenization toke;
 
       public ResValComparator(SymbolTokenization toke) {
-	  this.toke = toke;
+          this.toke = toke;
       }
 
     public final int compare(Object o1, Object o2) {
       ResVal rv1 = (ResVal) o1;
       ResVal rv2 = (ResVal) o2;
-      
+
       double diff = rv1.getValue() - rv2.getValue();
       if(diff < 0) return -1;
       if(diff > 0) return +1;
       try {
-	  return toke.tokenizeSymbol(rv1.getToken()).compareTo(toke.tokenizeSymbol(rv2.getToken()));
+          return toke.tokenizeSymbol(rv1.getToken()).compareTo(toke.tokenizeSymbol(rv2.getToken()));
       } catch (IllegalSymbolException ex) {
-	  throw new BioError(ex, "Couldn't tokenize symbols");
+          throw new BioError("Couldn't tokenize symbols", ex);
       }
     }
   }

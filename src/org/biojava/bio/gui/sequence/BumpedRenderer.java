@@ -56,7 +56,7 @@ extends SequenceRendererWrapper {
   private int trailingPixles;
 
   public BumpedRenderer() {}
-  
+
   public BumpedRenderer(SequenceRenderer renderer) {
     super(renderer);
   }
@@ -90,7 +90,7 @@ extends SequenceRendererWrapper {
   protected ChangeSupport getChangeSupport(ChangeType ct) {
     return super.getChangeSupport(ct);
   }
-  
+
   public double getDepth(SequenceRenderContext src) {
     List layers = layer(src);
     return LayeredRenderer.INSTANCE.getDepth(
@@ -98,7 +98,7 @@ extends SequenceRendererWrapper {
       Collections.nCopies(layers.size(), getRenderer())
     );
   }
-  
+
   public double getMinimumLeader(SequenceRenderContext src) {
     List layers = layer(src);
     return LayeredRenderer.INSTANCE.getMinimumLeader(
@@ -106,7 +106,7 @@ extends SequenceRendererWrapper {
       Collections.nCopies(layers.size(), getRenderer())
     );
   }
-  
+
   public double getMinimumTrailer(SequenceRenderContext src) {
     List layers = layer(src);
     return LayeredRenderer.INSTANCE.getMinimumTrailer(
@@ -114,7 +114,7 @@ extends SequenceRendererWrapper {
       Collections.nCopies(layers.size(), getRenderer())
     );
   }
-  
+
   public void paint(
     Graphics2D g,
     SequenceRenderContext src
@@ -126,7 +126,7 @@ extends SequenceRendererWrapper {
       Collections.nCopies(layers.size(), getRenderer())
     );
   }
-  
+
   public SequenceViewerEvent processMouseEvent(
     SequenceRenderContext src,
     MouseEvent me,
@@ -140,7 +140,7 @@ extends SequenceRendererWrapper {
       path,
       Collections.nCopies(layers.size(), getRenderer())
     );
-    
+
     if(sve == null) {
       sve = new SequenceViewerEvent(
         this,
@@ -150,13 +150,13 @@ extends SequenceRendererWrapper {
         path
       );
     }
-    
+
     return sve;
   }
 
   private CacheMap contextCache = new FixedSizeMap(5);
   private Set flushers = new HashSet();
-  
+
   protected List layer(SequenceRenderContext src) {
     FeatureFilter filt = new FeatureFilter.OverlapsLocation(src.getRange());
     CtxtFilt gopher = new CtxtFilt(src, filt, false);
@@ -168,10 +168,10 @@ extends SequenceRendererWrapper {
       ((Changeable) src.getSymbols()).addChangeListener(cf, FeatureHolder.FEATURES);
       flushers.add(cf);
     }
-    
+
     return layers;
   }
-  
+
   protected List doLayer(SequenceRenderContext src, FeatureFilter filt) {
     FeatureHolder features = src.getFeatures();
     List layers = new ArrayList();
@@ -189,7 +189,7 @@ extends SequenceRendererWrapper {
       try {
         Location fLoc = f.getLocation();
         fLoc = new RangeLocation(fLoc.getMin() - lead, fLoc.getMax() + trail);
-        
+
         Iterator li = layerLocs.iterator();
         Iterator fhI = layers.iterator();
         SimpleFeatureHolder fhLayer = null;
@@ -215,12 +215,12 @@ extends SequenceRendererWrapper {
         listLayer.add(fLoc);
         fhLayer.addFeature(f);
       } catch (ChangeVetoException cve) {
-        throw new BioError(cve, "Pants");
+        throw new BioError("Pants", cve);
       } catch (Throwable t) {
         throw new AssertionFailure("Could not bump feature: " + f, t);
       }
     }
-    
+
     List contexts = new ArrayList(layers.size());
     for(Iterator i = layers.iterator(); i.hasNext(); ) {
       FeatureHolder layer = (FeatureHolder) i.next();
@@ -231,24 +231,24 @@ extends SequenceRendererWrapper {
         null
       ));
     }
-    
+
     return contexts;
   }
 
   private class CacheFlusher implements ChangeListener {
     private CtxtFilt ctxtFilt;
-    
+
     public CacheFlusher(CtxtFilt ctxtFilt) {
       this.ctxtFilt = ctxtFilt;
     }
-    
+
     public void preChange(ChangeEvent ce) {
     }
-    
+
     public void postChange(ChangeEvent ce) {
       contextCache.remove(ctxtFilt);
       flushers.remove(this);
-      
+
       if(hasListeners()) {
         ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
         synchronized(cs) {
@@ -261,18 +261,18 @@ extends SequenceRendererWrapper {
       }
     }
   }
-  
+
   private class CtxtFilt {
     private SequenceRenderContext src;
     private FeatureFilter filter;
     private boolean recurse;
-    
+
     public CtxtFilt(SequenceRenderContext src, FeatureFilter filter, boolean recurse) {
       this.src = src;
       this.filter = filter;
       this.recurse = recurse;
     }
-    
+
     public boolean equals(Object o) {
       if(! (o instanceof CtxtFilt) ) {
         return false;
@@ -280,10 +280,10 @@ extends SequenceRendererWrapper {
       CtxtFilt that = (CtxtFilt) o;
       return
         src.equals(that.src) &&
-        filter.equals(that.filter) && 
+        filter.equals(that.filter) &&
         (recurse == that.recurse);
     }
-    
+
     public int hashCode() {
       return src.hashCode() ^ filter.hashCode();
     }

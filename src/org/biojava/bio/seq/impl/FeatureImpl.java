@@ -56,35 +56,35 @@ public class FeatureImpl {
     public final static FeatureRealizer DEFAULT;
 
     static {
-	SimpleFeatureRealizer d  = new SimpleFeatureRealizer() {
-	    public Object writeReplace() {
-		try {
-		    return new StaticMemberPlaceHolder(SimpleFeatureRealizer.class.getField("DEFAULT"));
-		} catch (NoSuchFieldException ex) {
-		    throw new BioError(ex);
-		}
-	    }
-	} ;
+        SimpleFeatureRealizer d  = new SimpleFeatureRealizer() {
+            public Object writeReplace() {
+                try {
+                    return new StaticMemberPlaceHolder(SimpleFeatureRealizer.class.getField("DEFAULT"));
+                } catch (NoSuchFieldException ex) {
+                    throw new BioError(ex);
+                }
+            }
+        } ;
 
-	try {
-	    d.addImplementation(Feature.Template.class,
-				SimpleFeature.class);
-	    d.addImplementation(StrandedFeature.Template.class,
-				SimpleStrandedFeature.class);
-	    d.addImplementation(HomologyFeature.Template.class,
-				SimpleHomologyFeature.class);
+        try {
+            d.addImplementation(Feature.Template.class,
+                                SimpleFeature.class);
+            d.addImplementation(StrandedFeature.Template.class,
+                                SimpleStrandedFeature.class);
+            d.addImplementation(HomologyFeature.Template.class,
+                                SimpleHomologyFeature.class);
             d.addImplementation(SimilarityPairFeature.Template.class,
-				SimpleSimilarityPairFeature.class);
+                                SimpleSimilarityPairFeature.class);
             d.addImplementation(RemoteFeature.Template.class,
-				SimpleRemoteFeature.class);
+                                SimpleRemoteFeature.class);
             d.addImplementation(FramedFeature.Template.class,
                                 SimpleFramedFeature.class);
             d.addImplementation(RestrictionSite.Template.class,
                                 SimpleRestrictionSite.class);
-	} catch (BioException ex) {
-	    throw new BioError(ex, "Couldn't initialize default FeatureRealizer");
-	}
+        } catch (BioException ex) {
+            throw new BioError("Couldn't initialize default FeatureRealizer", ex);
+        }
 
-	DEFAULT = d;
+        DEFAULT = d;
     }
 }

@@ -91,7 +91,7 @@ implements SequenceRenderer {
       g.setColor(Color.red);
       renderTrace(baseCalls, traceT, g, ctxt, min, max);
     } catch (IllegalSymbolException ise) {
-      throw new BioError(ise, "Can't process trace file");
+      throw new BioError("Can't process trace file", ise);
     }
   }
 

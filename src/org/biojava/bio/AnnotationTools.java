@@ -93,7 +93,7 @@ public final class AnnotationTools {
             try {
                 res.setProperty(tag, annotation.getProperty(tag));
             } catch (ChangeVetoException cve) {
-                throw new BioError(cve, "Assertion Failure: Can't alter an annotation");
+                throw new BioError("Assertion Failure: Can't alter an annotation", cve);
             }
         }
 
@@ -128,14 +128,14 @@ public final class AnnotationTools {
                 try {
                     res.setProperty(tag, annotation.getProperty(tag));
                 } catch (ChangeVetoException cve) {
-                    throw new BioError(cve, "Assertion Failure: Can't alter an annotation");
+                    throw new BioError("Assertion Failure: Can't alter an annotation", cve);
                 }
             }
         }
 
         return res;
     }
-    
+
     /**
      * <p>
      * Scans an Annotation with an AnnotationType and returns all Annotation
@@ -159,12 +159,12 @@ public final class AnnotationTools {
       searchAnnotation(ann, query, hits);
       return hits;
     }
-    
+
     private static void searchAnnotation(Annotation ann, AnnotationType query, Set hits) {
       if(query.instanceOf(ann)) {
         hits.add(ann);
       }
-      
+
       for(Iterator i = ann.keys().iterator(); i.hasNext(); ) {
         Object prop = i.next();
         Object val = ann.getProperty(prop);
@@ -180,7 +180,7 @@ public final class AnnotationTools {
         }
       }
     }
-    
+
     /**
      * Calculate an AnnotationType that matches all Annotation instances matched
      * by both types.
@@ -205,29 +205,29 @@ public final class AnnotationTools {
         Set props = new HashSet();
         props.addAll(ann1.getProperties());
         props.addAll(ann2.getProperties());
-        
+
         AnnotationType.Impl intersect = new AnnotationType.Impl();
         for(Iterator i = props.iterator(); i.hasNext(); ) {
           Object key = i.next();
-          
+
           CollectionConstraint pc1 = ann1.getConstraint(key);
           CollectionConstraint pc2 = ann2.getConstraint(key);
           CollectionConstraint pc = intersection(pc1, pc2);
           if (pc == CollectionConstraint.NONE) {
             return AnnotationType.NONE;
           }
-          
+
           intersect.setConstraint(key, pc);
         }
 
         intersect.setDefaultConstraint(
           intersection(ann1.getDefaultConstraint(), ann2.getDefaultConstraint())
         );
-        
+
         return intersect;
       }
     }
-    
+
     /**
      * Calculate the intersection of two PropertyConstraint instances.
      *
@@ -256,7 +256,7 @@ public final class AnnotationTools {
         PropertyConstraint.ByClass pc2c = (PropertyConstraint.ByClass) pc2;
         Class c1 = pc1c.getPropertyClass();
         Class c2 = pc2c.getPropertyClass();
-        
+
         if(!c1.isInterface() && !c2.isInterface()) {
           return new PropertyConstraint.And(pc1c, pc2c);
         } else {
@@ -266,7 +266,7 @@ public final class AnnotationTools {
         return intersection(pc2, pc1);
       } else if(pc1 instanceof PropertyConstraint.ByClass) {
         PropertyConstraint.ByClass pc1c = (PropertyConstraint.ByClass) pc1;
-        
+
         if(pc2 instanceof PropertyConstraint.Enumeration) {
           PropertyConstraint.Enumeration pc2e = (PropertyConstraint.Enumeration) pc2;
           Set values = new HashSet();
@@ -284,7 +284,7 @@ public final class AnnotationTools {
             return new PropertyConstraint.Enumeration(values);
           }
         }
-        
+
         if(pc2 instanceof PropertyConstraint.ExactValue) {
           // we've already checked for containment - we know this value is of
           // the wrong class
@@ -323,7 +323,7 @@ public final class AnnotationTools {
       ) {
         PropertyConstraint.ByAnnotationType pc1a = (PropertyConstraint.ByAnnotationType) pc1;
         PropertyConstraint.ByAnnotationType pc2a = (PropertyConstraint.ByAnnotationType) pc2;
-        
+
         AnnotationType intersect = intersection(
           pc1a.getAnnotationType(),
           pc2a.getAnnotationType()
@@ -334,10 +334,10 @@ public final class AnnotationTools {
           return new PropertyConstraint.ByAnnotationType(intersect);
         }
       }
-      
+
       return new PropertyConstraint.And(pc1, pc2);
     }
-    
+
     /**
      * Create an AnnotationType that matches all Anntotations that are accepted
      * by two others.
@@ -362,22 +362,22 @@ public final class AnnotationTools {
         Set props = new HashSet();
         props.addAll(ann1.getProperties());
         props.addAll(ann2.getProperties());
-        
+
         AnnotationType.Impl union = new AnnotationType.Impl();
         for(Iterator i = props.iterator(); i.hasNext(); ) {
           Object key = i.next();
-          
+
           CollectionConstraint pc1 = ann1.getConstraint(key);
           CollectionConstraint pc2 = ann2.getConstraint(key);
           CollectionConstraint pc = union(pc1, pc2);
-          
+
           union.setConstraint(key, pc);
         }
-        
+
         return union;
       }
     }
-    
+
     /**
      * Create a PropertyConstraint that matches all Objects that are accepted
      * by two others.
@@ -410,7 +410,7 @@ public final class AnnotationTools {
         return intersection(pc2, pc1);
       } else if(pc1 instanceof PropertyConstraint.ByClass) {
         PropertyConstraint.ByClass pc1c = (PropertyConstraint.ByClass) pc1;
-        
+
         if(pc2 instanceof PropertyConstraint.Enumeration) {
           PropertyConstraint.Enumeration pc2e = (PropertyConstraint.Enumeration) pc2;
           Set values = new HashSet();
@@ -434,7 +434,7 @@ public final class AnnotationTools {
             );
           }
         }
-        
+
         if(pc2 instanceof PropertyConstraint.ExactValue) {
           // we've already checked for containment - we know this value is of
           // the wrong class
@@ -446,28 +446,28 @@ public final class AnnotationTools {
       ) {
         PropertyConstraint.ByAnnotationType pc1a = (PropertyConstraint.ByAnnotationType) pc1;
         PropertyConstraint.ByAnnotationType pc2a = (PropertyConstraint.ByAnnotationType) pc2;
-        
+
         return new PropertyConstraint.ByAnnotationType(union(
           pc1a.getAnnotationType(),
           pc2a.getAnnotationType()
         ));
       }
-      
+
       return new PropertyConstraint.Or(pc1, pc2);
     }
-    
+
     /**
      * Return the CollectionConstraint which accept only collections accepted by both
      * of those specified.
      */
-    
+
     public static CollectionConstraint intersection(CollectionConstraint cc1, CollectionConstraint cc2) {
         if (cc1.subConstraintOf(cc2)) {
             return cc2;
         } else if (cc2.subConstraintOf(cc1)) {
             return cc1;
         } else if (cc1 instanceof CollectionConstraint.AllValuesIn &&
-                   cc2 instanceof CollectionConstraint.AllValuesIn) 
+                   cc2 instanceof CollectionConstraint.AllValuesIn)
         {
             PropertyConstraint pc1 = ((CollectionConstraint.AllValuesIn) cc1).getPropertyConstraint();
             PropertyConstraint pc2 = ((CollectionConstraint.AllValuesIn) cc2).getPropertyConstraint();
@@ -476,7 +476,7 @@ public final class AnnotationTools {
             Location card = LocationTools.intersection(card1, card2);
             if (card == Location.empty) {
                 return CollectionConstraint.NONE;
-            } 
+            }
             PropertyConstraint pc = intersection(pc1, pc2);
             if (pc == PropertyConstraint.NONE && !card.contains(0)) {
                 return CollectionConstraint.NONE;
@@ -484,7 +484,7 @@ public final class AnnotationTools {
                 return new CollectionConstraint.AllValuesIn(pc, card);
             }
         } else if (cc1 instanceof CollectionConstraint.Contains &&
-                   cc2 instanceof CollectionConstraint.Contains) 
+                   cc2 instanceof CollectionConstraint.Contains)
         {
             PropertyConstraint pc1 = ((CollectionConstraint.Contains) cc1).getPropertyConstraint();
             PropertyConstraint pc2 = ((CollectionConstraint.Contains) cc2).getPropertyConstraint();
@@ -493,7 +493,7 @@ public final class AnnotationTools {
             Location card = LocationTools.intersection(card1, card2);
             if (card == Location.empty) {
                 return CollectionConstraint.NONE;
-            } 
+            }
             PropertyConstraint pc = intersection(pc1, pc2);
             if (pc == PropertyConstraint.NONE && !card.contains(0)) {
                 return CollectionConstraint.NONE;
@@ -501,7 +501,7 @@ public final class AnnotationTools {
                 return new CollectionConstraint.Contains(pc, card);
             }
         } else if (cc1 instanceof CollectionConstraint.Contains &&
-                   cc2 instanceof CollectionConstraint.AllValuesIn) 
+                   cc2 instanceof CollectionConstraint.AllValuesIn)
         {
             PropertyConstraint pc1 = ((CollectionConstraint.Contains) cc1).getPropertyConstraint();
             PropertyConstraint pc2 = ((CollectionConstraint.AllValuesIn) cc2).getPropertyConstraint();
@@ -518,14 +518,14 @@ public final class AnnotationTools {
                 return new CollectionConstraint.Contains(pc, card1);
             }
         } else if (cc1 instanceof CollectionConstraint.AllValuesIn &&
-                   cc2 instanceof CollectionConstraint.Contains) 
+                   cc2 instanceof CollectionConstraint.Contains)
         {
             return intersection(cc2, cc1);
         } else {
             return new CollectionConstraint.And(cc1, cc2);
         }
     }
-    
+
     public static CollectionConstraint union(CollectionConstraint cc1, CollectionConstraint cc2) {
         if (cc1.subConstraintOf(cc2)) {
             return cc1;

@@ -45,38 +45,38 @@ public class BarLogoPainter implements LogoPainter {
     Distribution dis = lCtxt.getDistribution();
     SymbolStyle style = lCtxt.getStyle();
     BlockPainter blockPainter = lCtxt.getBlockPainter();
-    
+
     Rectangle bounds = lCtxt.getBounds();
     double width = bounds.getWidth();
     double stepWidth = width / (double) ((FiniteAlphabet) dis.getAlphabet()).size();
     double height = bounds.getHeight();
 
-    double w = 0.0;    
+    double w = 0.0;
     for(
       Iterator i = ((FiniteAlphabet) dis.getAlphabet()).iterator();
       i.hasNext();
     ) {
       AtomicSymbol s = (AtomicSymbol) i.next();
       double rh = 0.0;
-     
+
       try {
         rh = dis.getWeight(s) * height;
       } catch (IllegalSymbolException ire) {
-        throw new BioError(ire, "State alphabet has changed while painting");
+        throw new BioError("State alphabet has changed while painting", ire);
       }
-      
+
       Rectangle2D outline = new Rectangle2D.Double(
         bounds.getX() + w,
         bounds.getY() + height - rh,
         stepWidth,
         rh
       );
-      
+
       blockPainter.paintBlock(lCtxt, outline, s);
-      
+
       w += stepWidth;
     }
   }
-  
+
   public BarLogoPainter() {}
 }

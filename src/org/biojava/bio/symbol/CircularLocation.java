@@ -263,7 +263,7 @@ extends AbstractLocationDecorator {
         syms.edit(ed);
       }
       catch (Exception ex) {
-        throw new BioError(ex,"Illegal edit operation");
+        throw new BioError("Illegal edit operation", ex);
       }
     }
     return syms;
