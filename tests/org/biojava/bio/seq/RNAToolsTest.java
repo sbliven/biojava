@@ -46,7 +46,9 @@ import java.util.*;
  * @author Moses Hohman
  */
 public class RNAToolsTest extends TestCase {
-
+    public RNAToolsTest(String name){
+      super(name);
+    }
     public void testSymbols() throws IllegalSymbolException {
         assertEquals("a", getRNATokenization().tokenizeSymbol(RNATools.a()));
         assertEquals("c", getRNATokenization().tokenizeSymbol(RNATools.c()));
