@@ -78,7 +78,7 @@ implements SequenceRenderer {
   
   public FeatureBlockSequenceRenderer(FeatureRenderer fRend) {
     try {
-      setFeatureRenderer(new BasicFeatureRenderer());
+      setFeatureRenderer(fRend);
     } catch (ChangeVetoException cve) {
       throw new NestedError(cve, "Assertion Failure: Should have no listeners");
     }

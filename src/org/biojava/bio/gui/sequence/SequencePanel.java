@@ -249,7 +249,9 @@ Changeable {
       oldSequence.removeChangeListener(layoutListener);
     }
     this.sequence = s;
-    sequence.addChangeListener(layoutListener);
+    if(s != null) {
+      sequence.addChangeListener(layoutListener);
+    }
     
     resizeAndValidate();
     firePropertyChange("sequence", oldSequence, s);
