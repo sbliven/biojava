@@ -951,6 +951,50 @@ public interface FeatureFilter extends Serializable {
       return value;
     }
   }
+  
+  /**
+   * Retrieve features that contain a given annotation, and that the set of values
+   * contains the value given.
+   *
+   * @author Thomas Down
+   * @since 1.3
+   */
+  public final static class AnnotationContains
+  extends ByAnnotationType {
+    private Object key;
+    private Object value;
+
+    /**
+     * Make a new AnnotationContains that will accept features with an annotation
+     * bundle where the value-set assosiated with the property <code>key</code>
+     * contains a member equal to <code>value</code>.
+     *
+     * @param key  the Object used as a key in the annotation
+     * @param value the Object associated with key in the annotation
+     */
+    public AnnotationContains(Object key, Object value) {
+      this.key = key;
+      this.value = value;
+      
+      AnnotationType.Impl type = new AnnotationType.Impl();
+      type.setConstraint(
+        key,
+        new CollectionConstraint.Contains(
+            new PropertyConstraint.ExactValue(value),
+            CardinalityConstraint.ONE
+        )
+      );
+      setType(type);
+    }
+
+    public Object getKey() {
+      return key;
+    }
+
+    public Object getValue() {
+      return value;
+    }
+  }
 
   /**
    * Retrieve features that contain a given annotation with any value.
