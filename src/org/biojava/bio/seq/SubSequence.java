@@ -23,6 +23,8 @@ package org.biojava.bio.seq;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.impl.*;
+import org.biojava.bio.seq.projection.*;
 import org.biojava.utils.*;
 
 import java.util.*;
@@ -32,17 +34,55 @@ import java.util.*;
  * features intersecting that region.
  *
  * @author Thomas Down
- * @author Matthew Pocock
- * @since 1.1
+ * @since 1.2
  */
 
 public class SubSequence implements Sequence {
     private Sequence parent;
     private SymbolList symbols;
-    private FeatureHolder features;
     private String name;
     private String uri;
     private Annotation annotation;
+    private int start;
+    private int end;
+    private transient FeatureHolder cachedFeatures;
+
+    private transient ChangeSupport changeSupport;
+    private transient ChangeListener seqListener;
+
+    private void allocChangeSupport() {
+	if (seqListener == null) {
+	    installSeqListener();
+	}
+	changeSupport = new ChangeSupport();
+    }
+
+    private void installSeqListener() {
+	seqListener = new ChangeListener() {
+		public void preChange(ChangeEvent cev)
+		    throws ChangeVetoException
+		{
+		    if (changeSupport != null) {
+			changeSupport.firePreChangeEvent(makeChainedEvent(cev));
+		    }
+		}
+
+		public void postChange(ChangeEvent cev) {
+		    cachedFeatures = null;
+		    if (changeSupport != null) {
+			changeSupport.firePostChangeEvent(makeChainedEvent(cev));
+		    }
+		}
+
+		private ChangeEvent makeChainedEvent(ChangeEvent cev) {
+		    return new ChangeEvent(SubSequence.this,
+					   FeatureHolder.FEATURES,
+					   null, null,
+					   cev);
+		}
+	    } ;
+	parent.addChangeListener(seqListener, FeatureHolder.FEATURES);
+    }
 
     /**
      * Construct a new SubSequence of the specified sequence.
@@ -53,18 +93,12 @@ public class SubSequence implements Sequence {
      * @throws IndexOutOfBoundsException is the start or end position is illegal.
      */
 
-    public SubSequence(Sequence seq, int start, int end) {
+    public SubSequence(Sequence seq, final int start, final int end) {
         this.parent = seq;
-	symbols = seq.subList(start, end);
-	FeatureFilter overlapping = new FeatureFilter.OverlapsLocation(
-                new RangeLocation(start, end)
-        );
-	features = new ProjectedFeatureHolder(seq,
-					      overlapping,
-					      this,
-					      1 - start,
-					      false);
+	this.start = start;
+	this.end = end;
 
+	symbols = seq.subList(start, end);
 	name = seq.getName() + " (" + start + " - " + end + ")";
 	uri = seq.getURN() + "?start=" + start + ";end=" + end;
 	annotation = seq.getAnnotation();
@@ -113,35 +147,46 @@ public class SubSequence implements Sequence {
     }
 
     //
-    // FeatureHolder stuff
+    // Implements featureholder
     //
 
     public int countFeatures() {
-	return features.countFeatures();
+	return getFeatures().countFeatures();
     }
 
     public Iterator features() {
-	return features.features();
+	return getFeatures().features();
+    }
+
+    public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+	return getFeatures().filter(ff, recurse);
     }
 
     public boolean containsFeature(Feature f) {
-      return features.containsFeature(f);
-    }
-    
-    public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	return features.filter(ff, recurse);
+	return getFeatures().containsFeature(f);
     }
 
     public Feature createFeature(Feature.Template templ)
-        throws ChangeVetoException
+        throws BioException, ChangeVetoException
     {
-	throw new ChangeVetoException("Can't add features to subsequences");
+	throw new ChangeVetoException("Can't create features on SubSequence");
     }
 
-    public void removeFeature(Feature f)
+    public void removeFeature(Feature f) 
         throws ChangeVetoException
     {
-	throw new ChangeVetoException("Can't remove features from subsequences");
+	throw new ChangeVetoException("Can't remove features from SubSequence");
+    }
+
+    protected FeatureHolder getFeatures() {
+	if (seqListener == null) {
+	    installSeqListener();
+	}
+
+	if (cachedFeatures == null) {
+	    cachedFeatures = new CroppedFeatureSet(parent, this);
+	}
+	return cachedFeatures;
     }
 
     //
@@ -164,70 +209,147 @@ public class SubSequence implements Sequence {
 	return annotation;
     }
 
-    //
-    // Changeable
-    //
+    public Sequence getParent() {
+      return this.parent;
+    }
 
-    protected transient ChangeSupport changeSupport;
-    private transient ChangeListener forwarder;
+    private class CroppedFeatureSet extends LazyFeatureHolder {
+	FeatureHolder features;
+	FeatureHolder featureParent;
 
-    protected void allocChangeSupport() {
-      changeSupport = new ChangeSupport();
-	forwarder = new ChangeListener() {
-		public void preChange(ChangeEvent ev)
-		    throws ChangeVetoException
-		{
-		    if (changeSupport != null) {
-			changeSupport.firePreChangeEvent(new ChangeEvent(this,
-									 ev.getType(),
-									 ev.getChange(),
-									 ev.getPrevious(),
-									 ev));
+	private CroppedFeatureSet(FeatureHolder features, FeatureHolder featureParent) {
+	    this.features = features;
+	    this.featureParent = featureParent;
+	}
+
+	protected FeatureHolder createFeatureHolder() {
+	    ProjectionContext pc = new ProjectionContext() {
+		public FeatureHolder getParent(Feature f) {
+		    return featureParent;
+		}
+
+		public Sequence getSequence(Feature f) {
+		    return SubSequence.this;
+		}
+
+		public Location getLocation(Feature f) {
+		    return f.getLocation().translate(1 - start);
+		}
+
+		public StrandedFeature.Strand getStrand(StrandedFeature f) {
+		    return f.getStrand();
+		}
+
+		public Annotation getAnnotation(Feature f) {
+		    return f.getAnnotation();
+		}
+
+		public FeatureHolder projectChildFeatures(Feature f, FeatureHolder parent) {
+		    return ProjectedFeatureHolder.projectFeatureHolder(f, parent, 1 - start, false);
+		}
+	    } ;
+
+	    try {
+		SimpleFeatureHolder results = new SimpleFeatureHolder();
+		FeatureHolder rawFeatures = features.filter(new FeatureFilter.OverlapsLocation(new RangeLocation(start, end)), false);
+		for (Iterator i = rawFeatures.features(); i.hasNext(); ) {
+		    final Feature f = (Feature) i.next();
+
+		    Location l = f.getLocation();
+		    if (l.getMin() >= start && l.getMax() <= end) {
+			results.addFeature(ProjectionEngine.DEFAULT.projectFeature(f, pc));
+		    } else {
+			RemoteFeature.Template rft = new RemoteFeature.Template();
+			rft.type = f.getType();
+			rft.source = f.getSource();
+			rft.annotation = f.getAnnotation();
+			rft.location = LocationTools.intersection(l.translate(1 - start), 
+								  new RangeLocation(1, end - start + 1));
+			rft.resolver = new RemoteFeature.Resolver() {
+				public Feature resolve(RemoteFeature rFeat) {
+				    return f;
+				}
+			    } ;
+			rft.regions = Collections.nCopies(1, new RemoteFeature.Region(f.getLocation(), f.getSequence().getName()));
+			
+			results.addFeature(new SSRemoteFeature(SubSequence.this, this, rft, f));
 		    }
 		}
 		
-		public void postChange(ChangeEvent ev) {
-		    if (changeSupport != null) {
-			changeSupport.firePostChangeEvent(new ChangeEvent(this,
-									  ev.getType(),
-									  ev.getChange(),
-									  ev.getPrevious(),
-									  ev));
-		    }
-		}
-	    } ;
-	symbols.addChangeListener(forwarder);
-	features.addChangeListener(forwarder);
-    }
-
-    public void addChangeListener(ChangeListener cl) {
-      if (changeSupport == null) {
-        allocChangeSupport();
-      }
-      changeSupport.addChangeListener(cl);
-    }
-
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {
-      if (changeSupport == null) {
-        allocChangeSupport();
-      }
-      changeSupport.addChangeListener(cl, ct);
-    }
-
-    public void removeChangeListener(ChangeListener cl) {
-	if (changeSupport != null) {
-	    changeSupport.removeChangeListener(cl);
+		return results;
+	    } catch (ChangeVetoException cve) {
+		throw new BioError("Assertion failure: can't modify newly created feature holder");
+	    }
 	}
     }
 
+    //
+    // Simple RemoteFeature implementation
+    // (this could be usefully replaced by a more specific RemoteFeature)
+    //
+
+    private class SSRemoteFeature extends SimpleRemoteFeature {
+	private FeatureHolder childFeatures;
+	
+	private SSRemoteFeature(Sequence seq,
+				FeatureHolder parent,
+				RemoteFeature.Template templ,
+				Feature f) {
+	    super(seq, parent, templ);
+	    childFeatures = new CroppedFeatureSet(f, this);
+	}
+
+	public int countFeatures() {
+	    return getFeatures().countFeatures();
+	}
+
+	public Iterator features() {
+	    return getFeatures().features();
+	}
+
+	public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+	    return getFeatures().filter(ff, recurse);
+	}
+
+	public boolean containsFeature(Feature f) {
+	    return getFeatures().containsFeature(f);
+	}
+	
+	public Feature createFeature(Feature.Template templ)
+	    throws BioException, ChangeVetoException
+	{
+	    throw new ChangeVetoException("Can't create features on SubSequence");
+	}
+	
+	public void removeFeature(Feature f) 
+	    throws ChangeVetoException
+	{
+	    throw new ChangeVetoException("Can't remove features from SubSequence");
+	}
+	
+	protected FeatureHolder getFeatures() {
+	    return childFeatures;
+	}
+    }
+    
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {
+	if (changeSupport == null) {
+	    allocChangeSupport();
+	}
+	changeSupport.addChangeListener(cl, ct);
+    }
+    
+    public void addChangeListener(ChangeListener cl) {
+	addChangeListener(cl, ChangeType.UNKNOWN);
+    }
 
     public void removeChangeListener(ChangeListener cl, ChangeType ct) {
 	if (changeSupport != null) {
 	    changeSupport.removeChangeListener(cl, ct);
 	}
     }
-    
-    public Sequence getParent() {
-      return this.parent;
+
+    public void removeChangeListener(ChangeListener cl) {
+	removeChangeListener(cl, ChangeType.UNKNOWN);
     }
 }
