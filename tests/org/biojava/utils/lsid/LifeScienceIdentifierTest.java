@@ -136,7 +136,7 @@ public class LifeScienceIdentifierTest
         }
     }
     
-    private boolean throwsException(String value)
+    private boolean throwsParseException(String value)
     {
         try
         {
@@ -167,12 +167,43 @@ public class LifeScienceIdentifierTest
         for (Iterator i = parseErrors.iterator(); i.hasNext(); )
         {
             String value = (String) i.next();
-            if (! (throwsException(value)))
+            if (! (throwsParseException(value)))
             {
                 fail("expected LifeScienceIdentifierParseException for: " + value);
             }
         }
     }
+
+    private boolean throwsNullPointerException(String authorityId,
+                                               String namespaceId,
+                                               String objectId)
+    {
+        try
+        {
+            LifeScienceIdentifier lsid = LifeScienceIdentifier.valueOf(authorityId,
+                                                                       namespaceId,
+                                                                       objectId);
+        }
+        catch (NullPointerException e)
+        {
+            return true;
+        }
+        
+        return false;
+    }
+
+    public void testValueOfThrowsNullPointerException()
+    {
+        if (! (throwsNullPointerException(null, "namespaceId", "objectId")))
+            fail("expected NullPointerException for null, namespaceId, objectId");
+
+        if (! (throwsNullPointerException("authorityId", null, "objectId")))
+            fail("expected NullPointerException for authorityId, null, objectId");
+
+        if (! (throwsNullPointerException("authorityId", "namespaceId", null)))
+            fail("expected NullPointerException for authorityId, namespaceId, null");
+    }
+
     public void testObjectContract()
     {
         LifeScienceIdentifier lsid0 = LifeScienceIdentifier.valueOf("authorityId",

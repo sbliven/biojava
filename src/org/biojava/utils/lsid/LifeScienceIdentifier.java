@@ -239,7 +239,7 @@ public final class LifeScienceIdentifier
      * @param objectId identifer of the object within namespace
      * @param revisionId optional version information
      *
-     * @throws IllegalArgumentException if any of <code>authorityId</code>,
+     * @throws NullPointerException if any of <code>authorityId</code>,
      *   <code>namespaceId</code>, or <code>objectId</code> are null
      */	
     public static LifeScienceIdentifier valueOf(String authorityId,
@@ -247,6 +247,12 @@ public final class LifeScienceIdentifier
 						String objectId,
 						String revisionId)
     {
+        if ((authorityId == null) ||
+            (namespaceId == null) ||
+            (objectId == null))
+            throw new NullPointerException("all of authorityId, namespaceId, objectId " +
+                                           "must not be null");
+
         return new LifeScienceIdentifier(authorityId,
                                          namespaceId,
                                          objectId,
@@ -261,13 +267,19 @@ public final class LifeScienceIdentifier
      * @param namespaceId namespace to scope the identifier value
      * @param objectId identifer of the object within namespace
      *
-     * @throws IllegalArgumentException if any of <code>authorityId</code>,
+     * @throws NullPointerException if any of <code>authorityId</code>,
      *   <code>namespaceId</code>, or <code>objectId</code> are null
      */	
     public static LifeScienceIdentifier valueOf(String authorityId,
                                                 String namespaceId,
                                                 String objectId)
     {
+        if ((authorityId == null) ||
+            (namespaceId == null) ||
+            (objectId == null))
+            throw new NullPointerException("all of authorityId, namespaceId, objectId " +
+                                           "must not be null");
+
         return new LifeScienceIdentifier(authorityId,
                                          namespaceId,
                                          objectId,
