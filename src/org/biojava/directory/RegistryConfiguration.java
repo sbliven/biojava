@@ -1,3 +1,24 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package org.biojava.directory;
 
 import java.io.*;
@@ -12,53 +33,25 @@ import java.util.*;
  */
 
 
-public class RegistryConfiguration{
+public interface RegistryConfiguration {
+    public Map getConfiguration() throws RegistryException;
+    public String getConfigLocator();
 
-    private String configFileLocation = null;
-    private HashMap config = null;
-    
-    public RegistryConfiguration(String configFileLocation){
-
-	this.configFileLocation = configFileLocation;
-    }
-
-    public HashMap getConfiguration() throws FileNotFoundException, IOException{
+    public static class Impl implements RegistryConfiguration {
+	private String configFileLocation = null;
+	private Map config = null;
 	
-	BufferedReader in = new BufferedReader(new FileReader(configFileLocation));
-	String line = "";
-	String dbName = "";
-	String key = "";
-	String value = "";
-	config = new HashMap();
-	Map currentDB = null;
-	
-	while((line = in.readLine()) != null){
-	    
-	    //System.out.println(line);
-	    if(line.trim().length() > 0){
-		if(line.indexOf("[") > -1){
-		    dbName = line.substring(1, line.indexOf("]"));
-		    currentDB = new HashMap();
-		    config.put(dbName, currentDB); //instantiate new hashtable 
-		    //for this tag
-		    
-		}else{
-		    StringTokenizer strTok = new StringTokenizer(line, "=");
-		    //here we assume that there are only key = value pairs in the
-		    //config file
-		    key = strTok.nextToken();
-		    if(strTok.hasMoreTokens()){
-			value = strTok.nextToken();
-		    }else{
-			value = "";
-		    }
-		    
-		    currentDB.put(key.trim(), value.trim());    
-		}
-	    }
+	public Impl(String configFileLocation, Map config){
+	    this.configFileLocation = configFileLocation;
+	    this.config = config;
 	}
-	return config;
-    }
-}	
-    
 
+	public Map getConfiguration() {
+	    return config;
+	}
+
+	public String getConfigLocator() {
+	    return configFileLocation;
+	}
+    }
+}

@@ -37,37 +37,19 @@ import org.biojava.bio.seq.db.biosql.*;
  * of the biojava SequenceDB interface
  *
  * @author Brian Gilman
+ * @author Thomas Down
  * @version $Revision$
  */
 
 
-public class SequenceDBFactory {
-
-    /**
-     * SequenceDB handle
-     */
-    private SequenceDB seqDB = null;
-    /**
-     * Private Instance to satisfy singleton paradigm
-     */
-    private static SequenceDBFactory instance = null;
-    
+public class Registry {
     /**
      * Registry Configuration instance
      */
     private RegistryConfiguration regConfig = null;
 
-    
-    private SequenceDBFactory(){
-	
-    }
-    
-    public static SequenceDBFactory getInstance(){
-	if(instance == null){
-	    instance = new SequenceDBFactory();
-	}
-	
-	return instance;
+    public Registry(RegistryConfiguration regConfig) {
+	this.regConfig = regConfig;
     }
 
     public SequenceDBLite getDatabase(String dbName) throws RegistryException, BioException{
@@ -112,11 +94,6 @@ public class SequenceDBFactory {
 	}
     }
     
-    
-    public void setRegistryConfiguration(RegistryConfiguration regConfig){
-	this.regConfig = regConfig;
-    }
-
     public RegistryConfiguration getRegistryConfiguration(){
 	return this.regConfig;
     }
