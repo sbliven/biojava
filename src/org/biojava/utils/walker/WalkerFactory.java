@@ -18,41 +18,69 @@ public class WalkerFactory {
   private static Map factories = new HashMap();
 
   /**
-   * make a WalkerFactory that handles a Visitor for
-   * a filter class of type filterClazz.
+   * Make a WalkerFactory that handles a Visitor for
+   * a class of type typeClazz.
+   *
+   * @param typeClazz  the Class this factory will walk over
    */
-  public synchronized static WalkerFactory getInstance(Class filterClazz)
+  public synchronized static WalkerFactory getInstance(Class typeClazz)
   {
     WalkerFactory instance;
-    String filterName = filterClazz.getName();
+    String typeName = typeClazz.getName();
 
-    if ((instance = (WalkerFactory) factories.get(filterName))  == null) {
-      instance = new WalkerFactory(filterClazz);
-      factories.put(filterName, instance);
+    if ((instance = (WalkerFactory) factories.get(typeName))  == null) {
+      instance = new WalkerFactory(typeClazz);
+      factories.put(typeName, instance);
     }
     return instance;
   }
- 
+
   public synchronized static WalkerFactory getInstance() {
-    return getInstance(FeatureFilter.class); 
+    return getInstance(FeatureFilter.class);
   }
 
   private final Map walkers;
   private final GeneratedClassLoader classLoader;
-  private final List filtersWithParents;
-  private final Class filterClazz;
+  private final List typesWithParents;
+  private final Class typeClazz;
 
-  private WalkerFactory(Class filterClazz) {
+  private WalkerFactory(Class typeClazz) {
     walkers = new HashMap();
     classLoader = new GeneratedClassLoader(this.getClass().getClassLoader());
-    filtersWithParents = new ArrayList();
-    this.filterClazz = filterClazz;
+    typesWithParents = new ArrayList();
+    this.typeClazz = typeClazz;
   }
 
-  public synchronized void addFilterWithParent(Class filterClass) {
-    filtersWithParents.add(filterClass);
+  public Class getTypeClass()
+  {
+    return typeClazz;
   }
 
+  /**
+   * Register a type as being a 'container' class.
+   * Container classes will be scanned for methods for retrieving child
+   * instances that can be walked to.
+   *
+   * @for.user
+   * You should never need to call this. The library authors should take care
+   * of this for you.
+   *
+   * @for.developer
+   * Register 'structural' classes here - those with children.
+   *
+   * @param type  the Class of the type with children
+   */
+  public synchronized void addTypeWithParent(Class type) {
+    typesWithParents.add(type);
+  }
+
+  /**
+   * Get a Walker that is customosed to a particular visitor.
+   *
+   * @param visitor  the Visitor this walker will scan with
+   * @return  a Walker bound to this visitor
+   * @throws BioException if the walker could not be built
+   */
   public synchronized Walker getWalker(Visitor visitor)
   throws BioException {
     Class walkerClass = (Class) walkers.get(visitor.getClass());
@@ -86,7 +114,6 @@ public class WalkerFactory {
       CodeClass c_Walker = IntrospectedCodeClass.forClass(Walker.class);
       CodeClass c_WalkerBase = IntrospectedCodeClass.forClass(Object.class);
       CodeClass c_Object = IntrospectedCodeClass.forClass(Object.class);
-      CodeClass c_FeatureFilter = IntrospectedCodeClass.forClass(filterClazz);
 
       // make a class
       GeneratedCodeClass walkerClass = new GeneratedCodeClass(
@@ -130,9 +157,8 @@ public class WalkerFactory {
 
           // we have a naming match?
           if(arg0Name.equals(methName)) {
-            // check argument 0 is a feature filter
-
-            if(FeatureFilter.class.isAssignableFrom(arg0)) {
+            // check argument 0 is of the type we are visiting
+            if(typeClazz.isAssignableFrom(arg0)) {
               // we have a live one.
               // check that the return type is good
               if(retClass == null) {
@@ -151,7 +177,8 @@ public class WalkerFactory {
                 Class argI = args[ai];
                 if(argI != retClass) {
                   throw new BioException(
-                          "The first argument to a handler method must be a filter. " +
+                          "The first argument to a handler method must be a " +
+                          typeClazz.toString() +
                           "All subsequent arguments must match the return type.  In: " +
                           method);
                 }
@@ -169,7 +196,7 @@ public class WalkerFactory {
         retClass = Void.TYPE;
       }
 
-      // sort by filter class - most derived first
+      // sort by type - most derived first
       Collections.sort(visitorMeths,  new Comparator() {
         public int compare(Object o1, Object o2) {
           Method m1 = (Method) o1; Class c1 = m1.getParameterTypes()[0];
@@ -188,10 +215,10 @@ public class WalkerFactory {
               "doWalk",
               c_retClass,
               walkParams,
-              new String[]{"filter", "visitor"},
+              new String[]{"target", "visitor"},
               CodeUtils.ACC_PUBLIC);
       InstructionVector walkIV = new InstructionVector();
-      LocalVariable lv_filter = doWalk.getVariable("filter");
+      LocalVariable lv_target = doWalk.getVariable("target");
       LocalVariable lv_visitor = doWalk.getVariable("visitor");
       LocalVariable lv_visitor2 = new LocalVariable(c_ourVisitor, "visitor2");
       walkIV.add(ByteCode.make_aload(lv_visitor));
@@ -203,16 +230,16 @@ public class WalkerFactory {
 
 
 
-      // firstly, we should call And, Or, Not, etc., wrapped filters
+      // firstly, we should call And, Or, Not, etc., wrapped targets
       //
-      // These are all listed in filtersWithParents.
+      // These are all listed in typesWithParents.
       InstructionVector wrapperIV = new InstructionVector();
-      for(Iterator fwpi = filtersWithParents.iterator(); fwpi.hasNext(); ) {
+      for(Iterator fwpi = typesWithParents.iterator(); fwpi.hasNext(); ) {
         InstructionVector wfiv = new InstructionVector();
 
         // find the methods that get the wrapped
         Class filtClass = (Class) fwpi.next();
-        CodeClass c_ourFilter = IntrospectedCodeClass.forClass(filtClass);
+        CodeClass c_ourType = IntrospectedCodeClass.forClass(filtClass);
 
         Method[] filtMeth = filtClass.getMethods();
         int lvi = 0;
@@ -220,11 +247,11 @@ public class WalkerFactory {
         for(int mi = 0; mi < filtMeth.length; mi++) {
           Method m = filtMeth[mi];
 
-          // no args, returns a filter
+          // no args, returns a typeClazz
           if(m.getParameterTypes().length == 0 &&
-                  FeatureFilter.class.isAssignableFrom(m.getReturnType()))
+                  typeClazz.isAssignableFrom(m.getReturnType()))
           {
-            CodeMethod m_getFilter = IntrospectedCodeClass.forMethod(m);
+            CodeMethod m_getChild = IntrospectedCodeClass.forMethod(m);
             LocalVariable lv = null;
 
             if (c_retClass != CodeUtils.TYPE_VOID) {
@@ -238,12 +265,12 @@ public class WalkerFactory {
             }
 
             // res_i = this.walk(
-            //       ((c_ourFilter) filter).m_getFilter(),
+            //       ((c_ourType) target).m_getChild(),
             //       visitor );
             wfiv.add(ByteCode.make_aload(doWalk.getThis()));
-            wfiv.add(ByteCode.make_aload(lv_filter));
-            wfiv.add(ByteCode.make_checkcast(c_ourFilter));
-            wfiv.add(ByteCode.make_invokevirtual(m_getFilter));
+            wfiv.add(ByteCode.make_aload(lv_target));
+            wfiv.add(ByteCode.make_checkcast(c_ourType));
+            wfiv.add(ByteCode.make_invokevirtual(m_getChild));
             wfiv.add(ByteCode.make_aload(lv_visitor));
             wfiv.add(ByteCode.make_invokevirtual(doWalk));
 
@@ -253,11 +280,11 @@ public class WalkerFactory {
           }
         }
 
-        // if (filter instanceof ourFilter ) {
+        // if (target instanceof ourType) {
         //   do the above block
         // }
-        wrapperIV.add(ByteCode.make_aload(lv_filter));
-        wrapperIV.add(ByteCode.make_instanceof(c_ourFilter));
+        wrapperIV.add(ByteCode.make_aload(lv_target));
+        wrapperIV.add(ByteCode.make_instanceof(c_ourType));
         wrapperIV.add(new IfExpression(ByteCode.op_ifne,
                                     wfiv,
                                     CodeUtils.DO_NOTHING));
@@ -270,7 +297,7 @@ public class WalkerFactory {
       }
       walkIV.add(wrapperIV);
 
-      // the big if/else/if/else stack goes here - switching on feature filter
+      // the big if/else/if/else stack goes here - switching on the
       // type for each method using instanceof
       //
       // if(filter instanceof Filt1) {
@@ -293,7 +320,7 @@ public class WalkerFactory {
 
         InstructionVector bodyIV = new InstructionVector();
         bodyIV.add(ByteCode.make_aload(lv_visitor2));
-        bodyIV.add(ByteCode.make_aload(lv_filter));
+        bodyIV.add(ByteCode.make_aload(lv_target));
         bodyIV.add(ByteCode.make_checkcast(c_thisFiltType));
         for(int ai = 1; ai < ourMeth.numParameters(); ai++) {
           bodyIV.add(ByteCode.make_aload((LocalVariable) wrappedLVs.get(ai-1)));
@@ -302,7 +329,7 @@ public class WalkerFactory {
         bodyIV.add(ByteCode.make_return(doWalk));
 
         // wrap this in an if(filt instanceof Foo)
-        walkIV.add(ByteCode.make_aload(lv_filter));
+        walkIV.add(ByteCode.make_aload(lv_target));
         walkIV.add(ByteCode.make_instanceof(c_thisFiltType));
         walkIV.add(new IfExpression(ByteCode.op_ifne,
                                     bodyIV,
