@@ -9,7 +9,7 @@ import org.apache.xerces.parsers.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
-import org.biojava.bio.program.ragbag.*;
+import org.biojava.bio.seq.ragbag.*;
 
 public class RagbagMapTest {
     public static void main(String[] args) 
