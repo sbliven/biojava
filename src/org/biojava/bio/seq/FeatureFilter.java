@@ -66,6 +66,9 @@ public interface FeatureFilter extends Serializable {
    */
   public final static class AcceptAllFilter implements FeatureFilter {
     public boolean accept(Feature f) { return true; }
+    public boolean equals(Object o) {
+      return o instanceof AcceptAllFilter;
+    }
   };
 
   /**
@@ -97,6 +100,12 @@ public interface FeatureFilter extends Serializable {
     public boolean accept(Feature f) {
       return type.equals(f.getType());
     }
+    
+    public boolean equals(Object o) {
+      return
+        (o instanceof ByType) &&
+        (((ByType) o).getType() == this.getType());
+    }
   }
 
   /**
@@ -122,6 +131,12 @@ public interface FeatureFilter extends Serializable {
       this.source = source;
     }
     public boolean accept(Feature f) { return source.equals(f.getSource()); }
+    
+    public boolean equals(Object o) {
+      return
+        (o instanceof BySource) &&
+        (((ByType) o).getSource() == this.getSource());
+    }
   }
 
     /**
@@ -145,6 +160,12 @@ public interface FeatureFilter extends Serializable {
 
 	public Class getTestClass() {
 	    return clazz;
+        }
+        
+        public boolean equals(Object o) {
+          return
+            (o instanceof ByClass) &&
+            (((ByClass) o).getTestClass() == this.getTestClass());
         }
     }
 
@@ -176,6 +197,12 @@ public interface FeatureFilter extends Serializable {
     public boolean accept(Feature f) {
       return loc.contains(f.getLocation());
     }
+    
+    public boolean equals(Object o) {
+      return
+        (o instanceof ContainedByLocation) &&
+        (((ContainedByLocation) o).getLocation() == this.getLocation());
+    }
   }
   
   /**
@@ -206,6 +233,12 @@ public interface FeatureFilter extends Serializable {
     public boolean accept(Feature f) {
       return loc.overlaps(f.getLocation());
     }
+    
+    public boolean equals(Object o) {
+      return
+        (o instanceof OverlapsLocation) &&
+        (((OverlapsLocation) o).getLocation() == this.getLocation());
+    }
   }
   
   /**
@@ -229,6 +262,11 @@ public interface FeatureFilter extends Serializable {
     public boolean accept(Feature f) {
         return !(child.accept(f));
     }
+    
+    public boolean equals(Object o) {
+      return
+        (o instanceof Not) &&
+        (((Not) o).getChild() == this.getChild());
   }
 
   /**
@@ -257,6 +295,12 @@ public interface FeatureFilter extends Serializable {
     public boolean accept(Feature f) {
         return (c1.accept(f) && c2.accept(f));
     }
+    
+    public boolean equals(Object o) {
+      return
+        (o instanceof And) &&
+        (((And) o).getChild1() == this.getChild1()) &&
+        (((And) o).getChild2() == this.getChild2());
   }
 
   /**
@@ -285,6 +329,12 @@ public interface FeatureFilter extends Serializable {
     public boolean accept(Feature f) {
         return (c1.accept(f) || c2.accept(f));
     }
+    
+    public boolean equals(Object o) {
+      return
+        (o instanceof Or) &&
+        (((Or) o).getChild1() == this.getChild1()) &&
+        (((Or) o).getChild2() == this.getChild2());
   }
   
   /**
@@ -335,6 +385,13 @@ public interface FeatureFilter extends Serializable {
         return false;
       }
     }
+    
+    public boolean equals(Object o) {
+      return
+        (o instanceof ByAnnotation) &&
+        (((ByAnnotation) o).getKey() == this.getKey()) &&
+        (((ByAnnotation) o).getValue() == this.getValue());
+    }
   }
   
   /**
@@ -369,6 +426,12 @@ public interface FeatureFilter extends Serializable {
       } catch (NoSuchElementException nsee) {
         return false;
       }
+    }
+    
+    public boolean equals(Object o) {
+      return
+        (o instanceof HasAnnotation) &&
+        (((HasAnnotation) o).getKey() == this.getKey());
     }
   }
   
@@ -413,6 +476,12 @@ public interface FeatureFilter extends Serializable {
       } else {
         return strand == StrandedFeature.UNKNOWN;
       }
+    }
+    
+    public boolean equals(Object o) {
+      return
+        (o instanceof StrandFilter) &&
+        (((StrandFilter) o).getStrand() == this.getStrand());
     }
   }
 }
