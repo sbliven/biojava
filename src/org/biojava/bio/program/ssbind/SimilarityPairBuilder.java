@@ -48,8 +48,7 @@ import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.utils.ChangeVetoException;
 
 /**
- * <p>
- * <code>SimilarityPairBuilder</code> annotates query and subject
+ * <p><code>SimilarityPairBuilder</code> annotates query and subject
  * <code>Sequence</code> with <code>SimilarityPairFeature</code>s
  * created from SAX events supplied via a
  * <code>SeqSimilarityAdapter</code>. The objective is to describe a
@@ -59,19 +58,30 @@ import org.biojava.utils.ChangeVetoException;
  * an explicit distinction between query and subject sequences in the
  * alignment. The SAX events should describe elements conforming to
  * the BioJava BlastLikeDataSetCollection DTD. Suitable sources are
- * <code>BlastLikeSAXParser</code> or <code>FastaSAXParser</code>.
- * </p>
+ * <code>BlastLikeSAXParser</code> or <code>FastaSAXParser</code>.</p>
  *
- * <p>
- * Annotated <code>ViewSequence</code>s wrapping both query and
- * subject sequences are created.
- * </p>
+ * <p>Annotated <code>ViewSequence</code>s wrapping both query and
+ * subject sequences are created.</p>
+ *
+ * <p><strong>The current implementation should be used with care on
+ * streams containing more than one search output.</strong>. This is
+ * because the builder will not stop after each report has been
+ * processed and as a result all the subject sequences get
+ * instantiated and a large object network could be created during
+ * processing.</p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
  */
 public class SimilarityPairBuilder implements SearchContentHandler
 {
+    /**
+     * Constant <code>SIMILARITY_PAIR_FEATURE_TYPE</code> the type
+     * String used by <code>SimilarityPairBuilder</code> when creating
+     * <code>SimilarityPairFeature</code>s. This is the String which
+     * is returned when an <code>SimilarityPairFeature</code>'s
+     * <code>getType()</code> method is called.
+     */
     public static final String SIMILARITY_PAIR_FEATURE_TYPE = "similarity";
 
     // Supplier of instances of searched databases

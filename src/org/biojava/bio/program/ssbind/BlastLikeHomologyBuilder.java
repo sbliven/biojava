@@ -51,8 +51,7 @@ import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.utils.ChangeVetoException;
 
 /**
- * <p>
- * <code>BlastLikeHomologyBuilder</code> populates a
+ * <p><code>BlastLikeHomologyBuilder</code> populates a
  * <code>List</code> with <code>Homology</code> instances created from
  * SAX events supplied via a <code>SeqSimilarityAdapter</code>. The
  * SAX events should describe elements conforming to the BioJava
@@ -61,16 +60,13 @@ import org.biojava.utils.ChangeVetoException;
  * <code>FastaSAXParser</code>. Annotated <code>ViewSequence</code>s
  * wrapping both query and subject sequences are created and populated
  * with <code>HomologyFeature</code>s. See the documentation of
- * <code>Homology</code> and <code>HomologyFeature</code>.
- * </p>
+ * <code>Homology</code> and <code>HomologyFeature</code>.</p>
  *
- * <p>
- * As <code>SimpleHomologyFeature</code>s are created on views of
+ * <p>As <code>SimpleHomologyFeature</code>s are created on views of
  * the query and subject sequences, both query and subject should be
  * nucleotide sequences (<code>SimpleHomologyFeature</code> extends
  * <code>StrandedFeature</code>.). This limits the searches currently
- * handled to BLASTN, TBLASTX and Fasta DNA.
- * </p>
+ * handled to BLASTN, TBLASTX and Fasta DNA.</p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
@@ -89,29 +85,28 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
     // Supplier of instances of searched databases
     private SequenceDBInstallation subjectDBs;
     // The specific database searched
-    private SequenceDB             subjectDB;
+    private SequenceDB subjectDB;
     // Holder for all query sequences
-    private SequenceDB             querySeqHolder;
+    private SequenceDB querySeqHolder;
     // View of query sequence instance
-    private Sequence               queryView;
+    private Sequence queryView;
 
     // Cache which holds view(s) of subject sequence(s) which have
     // been instantiated for annotation
-    private Map                    subjectViewCache;
+    private Map subjectViewCache;
 
     // Data holders for search result properties
-    private Map                    resultData;
-    private Map                    hitData;
-    private Map                    subHitData;
+    private Map resultData;
+    private Map hitData;
+    private Map subHitData;
 
-    private AlphabetResolver       alphaResolver;
-    private SymbolTokenization     tokenParser;
-
-    private StringBuffer           tokenBuffer;
+    private AlphabetResolver   alphaResolver;
+    private SymbolTokenization tokenParser;
+    private StringBuffer       tokenBuffer;
 
     // List for holding homologies from current search. There may be
     // more than one search result in a stream
-    private List                   homologies;
+    private List homologies;
     // Flag indicating whether there are more results in the stream
     private boolean moreSearchesAvailable = false;
 
