@@ -16,6 +16,8 @@ biojava-live
  |- resources : resource files - images, xml documents
  |
  |- build : scripts for managing your copy of the repository
+ |
+ |- demos : demo programs that test usefull functionality
 
 In addition, the scripts will generate the non-cvs directories docs and
 class, which will contain the javadoc documentation and the class files.
@@ -40,6 +42,18 @@ to check for edits type:
 > cvs update
 and then for each directory under src with at least one modified file, build
 the package.
+
+To use biojava, put biojava.jar and xml.jar into your classpath.
+
+To build the demos:
+
+make sure that biojava.jar and xml.jar are in your classpath.
+change into a demo directory
+type:
+> javac demoName.java
+
+Most demos have either a comment explaining their purpose, or will print out a
+usage message when run without arguments.
 
 Contact Matthew Pocock (mrp@sanger.ac.uk) for more details, or mail the
 biojava mailing list (biojava-l@biojava.org).
