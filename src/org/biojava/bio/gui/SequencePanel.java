@@ -305,73 +305,81 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
   }
 
   public void resizeAndValidate() {
-    alongDim = (sequence == null)
-      ? 0.0
-      : scale * sequence.length();
-    acrossDim = 0.0;
-    double insetBefore = 0.0;
-    double insetAfter = 0.0;
-    for (Iterator i = views.iterator(); i.hasNext(); ) {
-      SequenceRenderer r = (SequenceRenderer) i.next();
-      double depth = r.getDepth(this);
-      depths.put(r, new Double(depth));
-      acrossDim += depth;
-      insetBefore = Math.max(insetBefore, r.getMinimumLeader(this));
-      insetAfter = Math.max(insetAfter, r.getMinimumTrailer(this));
-    }
-    lineDepth = acrossDim;
-    leadingBorder.setSize(insetBefore);
-    trailingBorder.setSize(insetAfter);
-    
     Dimension d = null;    
-    if(lines < 1) {
-      // fit to component size for across, and wrap as many times as is needed
-      // to accomodate whole sequence;
-      Dimension parentSize = (getParent() != null)
-        ? getParent().getSize()
-        : new Dimension();
-      int width = 0;
-      if (direction == HORIZONTAL) {
-	  width = parentSize.width;
-      } else {
-          width = parentSize.height;
-      }
-      // set width to something that takes whole numbers of 'scale'
-      width = (int) Math.ceil((Math.ceil((double) width / scale)) * scale);
-      // set width to include leading/trailing space
-      width = (int) Math.ceil((double) width - insetBefore - insetAfter);
-      realLines = (int) Math.ceil((double) alongDim / (double) width);
-      acrossDim = acrossDim * realLines + spacer * (realLines - 1);
-      alongDim = Math.ceil((double) width);
-      if (direction == HORIZONTAL) {
-          d = new Dimension(
-            (int) Math.ceil(alongDim + insetBefore + insetAfter),
-            (int) acrossDim
-          );
-      } else {
-          d = new Dimension(
-            (int) acrossDim,
-            (int) Math.ceil(alongDim + insetBefore + insetAfter)
-          );
-      }
+    if(sequence == null) {
+      alongDim = 0.0;
+      acrossDim = 0.0;
+      lineDepth = 0.0;
+      realLines = 0;
+      leadingBorder.setSize(0.0);
+      trailingBorder.setSize(0.0);
+      d = new Dimension(0, 0);
     } else {
-      // fit depth to lines*acrossDim and make as wide as necisary to 
-      // accomodoate the whole sequence
-      realLines = lines;
-      alongDim = Math.ceil(alongDim / (double) lines);
-      // alongDim must be multiple of scale
-      alongDim = Math.ceil((Math.ceil(alongDim / scale)) * scale);
-      acrossDim = Math.ceil((double) lines * acrossDim + (double) (lines-1) * spacer);  
-      if (direction == HORIZONTAL) {
+      alongDim = scale * sequence.length();
+      acrossDim = 0.0;
+      double insetBefore = 0.0;
+      double insetAfter = 0.0;
+      for (Iterator i = views.iterator(); i.hasNext(); ) {
+        SequenceRenderer r = (SequenceRenderer) i.next();
+        double depth = r.getDepth(this);
+        depths.put(r, new Double(depth));
+        acrossDim += depth;
+        insetBefore = Math.max(insetBefore, r.getMinimumLeader(this));
+        insetAfter = Math.max(insetAfter, r.getMinimumTrailer(this));
+      }
+      lineDepth = acrossDim;
+      leadingBorder.setSize(insetBefore);
+      trailingBorder.setSize(insetAfter);
+      
+      if(lines < 1) {
+        // fit to component size for across, and wrap as many times as is needed
+        // to accomodate whole sequence;
+        Dimension parentSize = (getParent() != null)
+                ? getParent().getSize()
+                : new Dimension();
+        int width = 0;
+        if (direction == HORIZONTAL) {
+	  width = parentSize.width;
+        } else {
+          width = parentSize.height;
+        }
+        // set width to something that takes whole numbers of 'scale'
+        width = (int) Math.ceil((Math.ceil((double) width / scale)) * scale);
+        // set width to include leading/trailing space
+        width = (int) Math.ceil((double) width - insetBefore - insetAfter);
+        realLines = (int) Math.ceil((double) alongDim / (double) width);
+        acrossDim = acrossDim * realLines + spacer * (realLines - 1);
+        alongDim = Math.ceil((double) width);
+        if (direction == HORIZONTAL) {
           d = new Dimension(
             (int) Math.ceil(alongDim + insetBefore + insetAfter),
             (int) acrossDim
           );
-      } else {
+        } else {
           d = new Dimension(
             (int) acrossDim,
             (int) Math.ceil(alongDim + insetBefore + insetAfter)
           );
+        }
+      } else {
+        // fit depth to lines*acrossDim and make as wide as necisary to 
+        // accomodoate the whole sequence
+        realLines = lines;
+        alongDim = Math.ceil(alongDim / (double) lines);
+        // alongDim must be multiple of scale
+        alongDim = Math.ceil((Math.ceil(alongDim / scale)) * scale);
+        acrossDim = Math.ceil((double) lines * acrossDim + (double) (lines-1) * spacer);  
+        if (direction == HORIZONTAL) {
+          d = new Dimension(
+            (int) Math.ceil(alongDim + insetBefore + insetAfter),
+            (int) acrossDim
+          );
+        } else {
+          d = new Dimension(
+            (int) acrossDim,
+            (int) Math.ceil(alongDim + insetBefore + insetAfter)
+          );
+        }
       }
     }
     
