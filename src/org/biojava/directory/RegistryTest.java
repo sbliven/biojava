@@ -19,7 +19,7 @@ public class RegistryTest{
 
 	    dbFactory.setRegistryConfiguration(new RegistryConfiguration(args[0]));
 	    
-	    SequenceDB seqDB = dbFactory.getDatabase("EMBL");
+	    SequenceDB seqDB = (SequenceDB) dbFactory.getDatabase("EMBL");
 	    
 	    Sequence seq = seqDB.getSequence(args[1]);
 	    
