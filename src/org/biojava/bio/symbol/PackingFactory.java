@@ -13,10 +13,10 @@ import org.biojava.bio.seq.*;
  * <p>
  * There are many ways to pack the symbols for an alphabet as binary.
  * Different applications will wish to have different representations for
- * reasons such as integration with external formats, wether to store
+ * reasons such as integration with external formats, whether to store
  * ambiguity or not and what algorithms may be used on the bit-packed
  * representation. Also, it has utility methods to arrange the bit-strings
- * for symbols within a Java int primative.
+ * for symbols within a Java int primitive.
  * </p>
  *
  * @author Matthew Pocock
