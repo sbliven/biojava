@@ -173,7 +173,10 @@ implements Serializable {
     cps = (AtomicSymbol) ourSymbols.get(l);
 
     if(cps == null) {
-      throw new IllegalSymbolException("Can't find symbol for " + l);
+      throw new IllegalSymbolException(
+        "Can't find symbol for " + l +
+        " in alphabet " + getName()
+      );
     }
 
     return cps;

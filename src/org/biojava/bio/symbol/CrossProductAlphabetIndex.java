@@ -20,7 +20,9 @@
  */
 package org.biojava.bio.symbol;
 
-//import org.biojava.bio.symbol.*;
+import java.io.Serializable;
+
+import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.utils.*;
 
@@ -34,7 +36,7 @@ import java.lang.*;
  * @author Matthew Pocock
  * @author David Huen
  *
- * @since ?
+ * @since 1.3
  */
 
 // things to change and improve perhaps ?
@@ -44,7 +46,8 @@ import java.lang.*;
 // 2) just dont rethrow the IndexOutOfBounds exception in the
 //    symbolForIndex method    
 
-class CrossProductAlphabetIndex extends AbstractChangeable implements AlphabetIndex, ChangeListener
+class CrossProductAlphabetIndex extends AbstractChangeable
+implements AlphabetIndex, ChangeListener, Serializable
 {	
 	// The alphabet we are indexing
 	FiniteAlphabet	Alpha 	 	= null;
@@ -119,7 +122,7 @@ class CrossProductAlphabetIndex extends AbstractChangeable implements AlphabetIn
 	
 			index = index * currentAlphabet.size() + currentAlphaInd.indexForSymbol( currentSymbol );
 		}
-		return( index );				 
+		return( index );
 	}
 
 	public Symbol symbolForIndex( int index ) throws IndexOutOfBoundsException {
@@ -136,11 +139,9 @@ class CrossProductAlphabetIndex extends AbstractChangeable implements AlphabetIn
 			return( Alpha.getSymbol( symbols ) );
 		}
 		catch( IllegalSymbolException isE ) {
-			isE.printStackTrace();
-			throw new IndexOutOfBoundsException();
+			throw new BioError(isE);
 		}
 		catch( IndexOutOfBoundsException ioobE ) {
-			ioobE.printStackTrace();
 			// this is most likely bad, but i just rethrow the exception, i should do something
 			// clever here
 			throw ioobE;
