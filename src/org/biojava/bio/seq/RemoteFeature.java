@@ -194,7 +194,7 @@ public interface RemoteFeature extends StrandedFeature {
      * @return true if this is a remote Region, false otherwise
      */
     public boolean isRemote() {
-      return seqID == null;
+      return seqID != null;
     }
   }
 }
