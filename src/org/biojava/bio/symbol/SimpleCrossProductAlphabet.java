@@ -147,14 +147,6 @@ implements Serializable {
     return name.substring(0);
   }
 
-  public SymbolList symbols() {
-      try {
-          return new SimpleSymbolList(this, new ArrayList(ourSymbols.values()));
-      } catch (IllegalSymbolException ex) {
-          throw new BioError(ex);
-      }
-  }
-
   public int size() {
     return ourSymbols.size();
   }

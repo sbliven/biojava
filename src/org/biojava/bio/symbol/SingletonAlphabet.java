@@ -97,12 +97,4 @@ implements FiniteAlphabet, Serializable {
   throws IllegalSymbolException {
     return (AtomicSymbol) symList.get(0);
   }
-  
-  public SymbolList symbols() {
-    try {
-      return new SimpleSymbolList(this, Collections.nCopies(1, sym));
-    } catch (IllegalSymbolException ise) {
-      throw new BioError(ise, "This is impossible. I must contain me.");
-    }
-  }
 }

@@ -596,7 +596,14 @@ public abstract class DP {
     private boolean transitionsTo(State from, State to)
 	  throws IllegalTransitionException, IllegalSymbolException {
 	    Set checkedSet = new HashSet();
-	    Set workingSet = new HashSet(mm.transitionsFrom(from).symbols().toList());
+	    Set workingSet = new HashSet();
+            for(
+              Iterator i = mm.transitionsFrom(from).iterator();
+              i.hasNext();
+            ) {
+              workingSet.add(i);
+            }
+
 	    while (workingSet.size() > 0) {
         Set newWorkingSet = new HashSet();
         for (Iterator i = workingSet.iterator(); i.hasNext(); ) {

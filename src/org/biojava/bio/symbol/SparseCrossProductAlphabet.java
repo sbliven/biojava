@@ -67,18 +67,6 @@ implements Serializable {
       }
       return new ChangeSupport(Collections.singleton(Alphabet.SYMBOLS));
   }
-  
-  public SymbolList symbols() {
-    try {
-      List symL = new ArrayList();
-      for(Iterator i = iterator(); i.hasNext(); ) {
-        symL.add((Symbol) i.next());
-      }
-      return new SimpleSymbolList(this, symL);
-    } catch (IllegalSymbolException ise) {
-      throw new BioError(ise, "Assertion Failure");
-    }
-  }
 
   public String getName() {
     StringBuffer name = new StringBuffer("(");

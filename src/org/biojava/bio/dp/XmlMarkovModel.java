@@ -266,22 +266,19 @@ public class XmlMarkovModel {
     model = DP.flatView(model);
     FiniteAlphabet stateA = model.stateAlphabet();
     FiniteAlphabet symA = (FiniteAlphabet) model.emissionAlphabet();
-    SymbolList stateR = stateA.symbols();
-    List stateL = stateR.toList();
-    SymbolList symR = symA.symbols();
     
     out.println("<MarkovModel heads=\"" + model.heads() + "\">");
     out.println("<alphabet name=\"" + symA.getName() + "\"/>");
     
     // print out states & scores
-    for(Iterator stateI = stateL.iterator(); stateI.hasNext(); ) {
+    for(Iterator stateI = stateA.iterator(); stateI.hasNext(); ) {
       State s = (State) stateI.next();
       if(! (s instanceof MagicalState)) {
         out.println("  <state name=\"" + s.getName() + "\">");
         if(s instanceof EmissionState) {
           EmissionState es = (EmissionState) s;
           Distribution dis = es.getDistribution();
-          for(Iterator symI = symR.iterator(); symI.hasNext(); ) {
+          for(Iterator symI = symA.iterator(); symI.hasNext(); ) {
             Symbol sym = (Symbol) symI.next();
             out.println("    <weight sym=\"" + sym.getName() +
                         "\" prob=\"" + dis.getWeight(sym) + "\"/>");
@@ -292,7 +289,7 @@ public class XmlMarkovModel {
     }
 
     // print out transitions
-    for(Iterator i = stateL.iterator(); i.hasNext(); ) {
+    for(Iterator i = stateA.iterator(); i.hasNext(); ) {
       State from = (State) i.next();
       printTransitions(model, from, out);
     }

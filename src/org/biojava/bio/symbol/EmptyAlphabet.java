@@ -92,10 +92,6 @@ class EmptyAlphabet
 	return SymbolList.EMPTY_LIST.iterator();
     }
 
-    public SymbolList symbols() {
-	return SymbolList.EMPTY_LIST;
-    }
-
     public void addSymbol(Symbol sym) throws IllegalSymbolException {
       throw new IllegalSymbolException(
         "Can't add symbols to alphabet: " + sym.getName() +

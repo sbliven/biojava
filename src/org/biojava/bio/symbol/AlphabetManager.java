@@ -1420,10 +1420,6 @@ public final class AlphabetManager {
             return alpha.size();
         }
 
-        public SymbolList symbols() {
-            return alpha.symbols();
-        }
-
         public Annotation getAnnotation() {
             return alpha.getAnnotation();
         }

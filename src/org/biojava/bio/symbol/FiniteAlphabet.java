@@ -92,17 +92,4 @@ public interface FiniteAlphabet extends Alphabet {
    */
   public void removeSymbol(Symbol s)
   throws IllegalSymbolException, ChangeVetoException;
-  
-  /**
-   * A list of symbols that make up this alphabet.
-   * <p>
-   * Subsequent calls to this method are not required to return either the same
-   * symbol list, or even a symbol list with the symbols in the same order.
-   *
-   * @return  a SymbolList containing one AtomicSymbol for each AtomicSymbol in
-   *          this alphabet
-   * @deprecated use AlphabetManager.getAlphabetIndex to enforce an ordering
-   *          over an alphabet, or FiniteAlphabet.iterator() to loop over them
-   */
-  SymbolList symbols();
 }

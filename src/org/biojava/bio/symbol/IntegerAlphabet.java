@@ -393,11 +393,6 @@ public final class IntegerAlphabet
       );
     }
 
-    public SymbolList symbols()
-    throws UnsupportedOperationException {
-      throw new UnsupportedOperationException();
-    }
-
     public Iterator iterator() {
       return new Iterator() {
         int indx = min;

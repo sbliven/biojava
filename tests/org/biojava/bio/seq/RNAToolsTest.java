@@ -302,9 +302,6 @@ public class RNAToolsTest extends TestCase {
                     public void removeChangeListener(ChangeListener cl, ChangeType ct) {
                     }
 
-                    public SymbolList symbols() {
-                        return null;
-                    }
 
                     public Symbol getGapSymbol() {
                         return null;

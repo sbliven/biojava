@@ -59,7 +59,7 @@ import org.biojava.bio.seq.*;
 public class SuffixTree implements Serializable {
   private FiniteAlphabet alphabet;
   private SuffixNode root;
-  private List symList;
+  private AlphabetIndex indexer;
   private List counts;
   
     /**
@@ -85,11 +85,12 @@ public class SuffixTree implements Serializable {
      * one if need be.  This method is here due to memory optimisations.
      */
 
-  public SuffixNode getChild(SuffixNode node, Symbol s) {
+  public SuffixNode getChild(SuffixNode node, Symbol s)
+  throws IllegalSymbolException {
     if(!getAlphabet().contains(s)) {
       return null;
     }
-    int index = indexForSymbol(s);
+    int index = indexer.indexForSymbol(s);
     return getChild(node, index);
   }
   
@@ -113,7 +114,8 @@ public class SuffixTree implements Serializable {
      * @param window The maximum motif length to count.
      */
 
-  public void addSymbols(SymbolList sList, int window) {
+  public void addSymbols(SymbolList sList, int window)
+  throws IllegalSymbolException {
     SuffixNode [] buf = new SuffixNode[window];
     int [] counts = new int[window];
     for(int i = 0; i < window; i++) {
@@ -178,27 +180,9 @@ public class SuffixTree implements Serializable {
 
   public SuffixTree(FiniteAlphabet alphabet) {
     this.alphabet = alphabet;
-    this.symList = alphabet.symbols().toList();
+    this.indexer = AlphabetManager.getAlphabetIndex(alphabet);
     this.counts = new ArrayList();
     this.root = new SimpleNode(alphabet.size());
-  }
-  
-    /**
-     * Return the Symbol corresponding to a specified index number.
-     */
-
-  public Symbol symbolForIndex(int i) {
-    return (Symbol) symList.get(i);
-  }
-
-    /**
-     * Return an internal index number corresponding to the given
-     * Symbol.  These numbers are used by the SuffixTree implementation
-     * to build the tree efficiently.
-     */
-
-  public int indexForSymbol(Symbol s) {
-    return symList.indexOf(s);
   }
   
   /**

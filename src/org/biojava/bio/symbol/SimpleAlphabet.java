@@ -79,17 +79,6 @@ implements Serializable {
     return symbols.size();
   }
 
-  public SymbolList symbols() {
-    try {
-      return new SimpleSymbolList(this, new ArrayList(symbols));
-    } catch (IllegalSymbolException ex) {
-      throw new BioError(
-        ex,
-        "There should be no circumstances under which this failed"
-      );
-    }
-  }
-
   protected boolean containsImpl(AtomicSymbol s) {
     return symbols.contains(s);
   }
