@@ -61,7 +61,7 @@ public class FeatureTableParser {
 
     private int featureStatus = WITHOUT;
     private StringBuffer featureBuf;
-    private StrandedFeature.Template featureTemplate;
+    private Feature.Template featureTemplate;
 
     private String                 featureSource;
     private SeqIOListener          listener;
@@ -84,7 +84,14 @@ public class FeatureTableParser {
 	featureStatus = LOCATION;
 	featureBuf.setLength(0);
 
-	featureTemplate = new StrandedFeature.Template();
+	if (this.featureSource.equals("RefSeq:Protein"))
+	{
+		featureTemplate= new Feature.Template();
+	}
+	else
+	{
+		featureTemplate = new StrandedFeature.Template();
+	}
 	featureTemplate.type = type;
 	featureTemplate.source = featureSource;
 	featureTemplate.annotation = new SimpleAnnotation();
@@ -161,13 +168,16 @@ public class FeatureTableParser {
      * Parse an EMBL location and fill in the location and strand fields of the
      * template. Updated to support a wider range of location types.
      */
-    private void parseLocation(String loc, StrandedFeature.Template fillin)
+    private void parseLocation(String loc, Feature.Template fillin)
 	throws BioException
     {
-	StrandedLocation parsedLocation = locParser.parseLocation(loc);
+		StrandedLocation parsedLocation = locParser.parseLocation(loc);
+		fillin.location = parsedLocation.getLocation();
 
-    fillin.strand = parsedLocation.getStrandType();
-	fillin.location = parsedLocation.getLocation();
+		if(fillin instanceof StrandedFeature.Template)
+		{
+		    ((StrandedFeature.Template)fillin).strand = parsedLocation.getStrandType();
+		}
     }
 
     /**

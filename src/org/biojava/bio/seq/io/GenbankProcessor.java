@@ -59,7 +59,7 @@ public class GenbankProcessor extends SequenceBuilderFilter
 		}
 	}
 
-	private FeatureTableParser features;
+	protected FeatureTableParser features;
 	private static HashSet featureKeys = null;
 	private List accessions;
 	{

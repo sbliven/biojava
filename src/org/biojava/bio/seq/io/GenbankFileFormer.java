@@ -73,7 +73,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
      * Private <code>GenbankFileFormer</code> constructor. Instances
      * are made by the <code>Factory</code>.
      */
-    private GenbankFileFormer() { }
+    protected GenbankFileFormer() { }
 
     /**
      * Creates a new <code>GenbankFileFormer</code> object. Instances
@@ -81,7 +81,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
      *
      * @param stream a <code>PrintStream</code> object.
      */
-    private GenbankFileFormer(PrintStream stream)
+    protected GenbankFileFormer(PrintStream stream)
     {
 	this.stream = stream;
     }
