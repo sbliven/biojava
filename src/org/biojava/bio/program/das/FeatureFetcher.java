@@ -89,6 +89,8 @@ class FeatureFetcher {
 	throws BioException, ParseException
     {
 	DAS.startedActivity(this);
+	URL fURL = null;
+	    
 	
 	try {
 	    String fetchEncoding = "dasgff";
@@ -99,7 +101,6 @@ class FeatureFetcher {
 		fetchEncoding = "xff";
 	    }
 
-	    URL fURL = null;
 	    HttpURLConnection huc = null;
 	    
 	    if (useXMLFetch) {
@@ -192,7 +193,7 @@ class FeatureFetcher {
 	} catch (IOException ex) {
 	    throw new ParseException(ex);
 	} catch (SAXException ex) {
-	    throw new ParseException(ex);
+	    throw new ParseException(ex, "Error parsing XML from " + fURL);
 	} finally {
 	    DAS.completedActivity(this);
 	}

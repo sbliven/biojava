@@ -134,7 +134,7 @@ class FeatureRequestManager {
 	    return;
 	}
 
-	System.err.println("*** Built " + fetchers.size() + " feature-fetch jobs");
+	// System.err.println("*** Built " + fetchers.size() + " feature-fetch jobs");
 
 	if (DAS.getThreadFetches() && (fetchers.size() > 1)) {
 	    FetchMonitor monitor = new FetchMonitor();
@@ -176,7 +176,7 @@ class FeatureRequestManager {
 		    pending.notifyAll();
 		}
 	    }
-	    System.err.println("*** Job checked in (success)");
+	    // System.err.println("*** Job checked in (success)");
 	}
 
 	public void jobFailed(FetchJob j, Exception ex) {
@@ -191,7 +191,7 @@ class FeatureRequestManager {
 		    pending.notifyAll();
 		}
 	    }
-	    System.err.println("*** Job checked in (failure)");
+	    // System.err.println("*** Job checked in (failure)");
 	}
 
 	public List doFetches() throws BioException {
@@ -199,7 +199,7 @@ class FeatureRequestManager {
 		for (Iterator i = pending.iterator(); i.hasNext(); ) {
 		    FetchJob job = (FetchJob) i.next();
 		    job.start();
-		    System.err.println("*** Job checked out");
+		    // System.err.println("*** Job checked out");
 		}
 		try {
 		    pending.wait();

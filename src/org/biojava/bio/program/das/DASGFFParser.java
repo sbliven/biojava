@@ -51,6 +51,7 @@ import org.w3c.dom.*;
 class DASGFFParser {
     private Map ticketsByID;
     private List doneTickets = new ArrayList();
+    private int seqStart, seqStop;
     
     DASGFFParser(Map ticketsByID) {
 	this.ticketsByID = ticketsByID;
@@ -61,9 +62,8 @@ class DASGFFParser {
     }
 
     void parseStream(InputStream data)
-        throws BioException, ParseException, IOException
+        throws BioException, ParseException, IOException, SAXException
     {
-	try {
 	    InputSource is = new InputSource(data);
 	    DOMParser parser = new DOMParser();
 	    parser.parse(is);
@@ -119,9 +119,6 @@ class DASGFFParser {
 
 		n = n.getNextSibling();
 	    }
-	} catch (SAXException sex) {
-	    throw new ParseException(sex, "Error parsing DAS XML");
-	}
     }
 
 
@@ -132,10 +129,16 @@ class DASGFFParser {
 	
 	String segStart = el.getAttribute("start");
 	if (segStart != null) {
+	    try {
+		seqStart = Integer.parseInt(segStart);
+	    } catch (NumberFormatException ex) {}
 	    siol.addSequenceProperty("sequence.start", segStart);
 	}
 	String segStop = el.getAttribute("stop");
 	if (segStop != null) {
+	    try {
+		seqStop = Integer.parseInt(segStop);
+	    } catch (NumberFormatException ex) {}
 	    siol.addSequenceProperty("sequence.stop", segStop);
 	}
 
@@ -145,8 +148,10 @@ class DASGFFParser {
 		Element featureEl = (Element) segChld;
 		if (featureEl.getTagName().equals("FEATURE")) {
 		    Feature.Template temp = parseDASFeature(featureEl);
-		    siol.startFeature(temp);
-		    siol.endFeature();
+		    if (temp != null) {
+			siol.startFeature(temp);
+			siol.endFeature();
+		    }
 		}
 	    }
 	    segChld = segChld.getNextSibling();
@@ -236,6 +241,15 @@ class DASGFFParser {
 	if (isReferenceFeature && category.equals("component")) {
 	    if (refName == null) {
 		throw new ParseException("Can't template componentFeature without a specified TARGET");
+	    }
+
+	    //
+	    // Ugly check for componentFeatures that aren't...
+	    //
+
+	    if (start < seqStart || start > seqStop || end < seqStart || end > seqStop || refStop == 0) {
+		// System.err.println("*** Eliding strange componentFeature: " + refName);
+		return null;
 	    }
 
 	    ComponentFeature.Template ctemp = new ComponentFeature.Template();
