@@ -18,7 +18,6 @@ public class EmblViewer {
   public static SequencePanel sp;
   static JFrame f;
   static BasicFeatureRenderer fr;
-  static FeatureBlockSequenceRenderer features;
 
   public static void main(String[] args) throws Exception {
     String seqFile = null;
@@ -35,19 +34,30 @@ public class EmblViewer {
     StreamReader sr = new StreamReader(is, ef, DNATools.getDNA().getParser("token"), sf);
     Sequence seq = sr.nextSequence();
 
+    FeatureFilter notSource = new FeatureFilter.Not(
+      new FeatureFilter.ByType("source")
+    );
+    FeatureFilter repeatFilter = new FeatureFilter.ByType("repeat_region");
+    
     f = new JFrame("Sequence test");
     sp = new SequencePanel();
     sp.setSequence(seq);
     sp.setScale(20.0);
     sp.setDirection(SequencePanel.HORIZONTAL);
     fr = new BasicFeatureRenderer();
-    features = new FeatureBlockSequenceRenderer();
+    FeatureBlockSequenceRenderer features = new FeatureBlockSequenceRenderer();
+    FeatureBlockSequenceRenderer repeats = new FeatureBlockSequenceRenderer();
     features.setFeatureRenderer(fr);
+    repeats.setFeatureRenderer(fr);
     features.setFilter(
-      new FeatureFilter.Not(
-        new FeatureFilter.ByType("source")
+      new FeatureFilter.And(
+        new FeatureFilter.Not(repeatFilter),
+        notSource
       )
     );
+    repeats.setFilter(repeatFilter);
+
+    sp.addRenderer(repeats);    
     sp.addRenderer(features);
     sp.addRenderer(new SymbolSequenceRenderer());
     f.getContentPane().setLayout(new BorderLayout());
@@ -91,12 +101,21 @@ public class EmblViewer {
         }
       } 
     );
+    JScrollBar lines = new JScrollBar(JScrollBar.HORIZONTAL, 1, 1, 0, 5);
+    lines.addAdjustmentListener(
+      new AdjustmentListener() {
+        public void adjustmentValueChanged(AdjustmentEvent e) {
+          sp.setLines(e.getValue());
+        }
+      } 
+    );
     
     panel.add(vert);
     panel.add(horiz);
     panel.add(blue);
     panel.add(red);
     panel.add(scale);
+    panel.add(lines);
 
     f.setSize(500, 500);
     f.setVisible(true);
