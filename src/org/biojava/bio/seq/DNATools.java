@@ -499,7 +499,7 @@ public final class DNATools {
    * @param range Range to be searched.  If null, whole sequence will be searched.  Features that merely overlap
    *            the range are rejected.
    */
-  public boolean match(String patternAsString, Sequence seq, boolean bothStrands, RangeLocation range)
+  public static boolean match(String patternAsString, Sequence seq, boolean bothStrands, RangeLocation range)
     throws IllegalAlphabetException, ChangeVetoException, ParseException, BioException
   {
     // create a Pattern
