@@ -206,7 +206,7 @@ public class TextLogoPainter implements LogoPainter {
       double diff = rv1.getValue() - rv2.getValue();
       if(diff < 0) return -1;
       if(diff > 0) return +1;
-      return 0;
+      return rv1.getToken().getToken() - rv2.getToken().getToken();
     }
   }
 }

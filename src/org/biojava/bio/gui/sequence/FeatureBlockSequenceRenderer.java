@@ -243,17 +243,15 @@ implements SequenceRenderer, PropertyChangeListener {
       double across = 0.0;
       if (sp.getDirection() == sp.HORIZONTAL) {
         across = labelBox.getCenterY() - bounds.getCenterY();
-        switch (border.getAlignment()) {
-          case border.LEADING:
+	int balign = border.getAlignment();
+        
+        if (balign == border.LEADING) 
             along = labelBox.getMinX() - bounds.getMinX();
-            break;
-          case border.TRAILING:
+        else if (balign == border.TRAILING)
             along = labelBox.getMaxX() - bounds.getMaxX();
-            break;
-          case border.CENTER:
+        else if (balign == border.CENTER)
             along = labelBox.getCenterX() - bounds.getCenterX();
-            break;
-        }
+
         AffineTransform at = g.getTransform();
         g.translate(along, across);
         g.fill(gv);
@@ -261,17 +259,15 @@ implements SequenceRenderer, PropertyChangeListener {
         g.setTransform(at);
       } else {
         across = labelBox.getCenterX() - bounds.getCenterX();
-        switch (border.getAlignment()) {
-          case border.LEADING:
+	int balign = border.getAlignment();
+
+	if (balign == border.LEADING)
             along = labelBox.getMinY() - bounds.getMinY();
-            break;
-          case border.TRAILING:
+        else if (balign == border.TRAILING)
             along = labelBox.getMaxY() - bounds.getMaxY();
-            break;
-          case border.CENTER:
+        else if (balign == border.CENTER)
             along = labelBox.getCenterY() - bounds.getCenterY();
-            break;
-        }
+
         AffineTransform at = g.getTransform();
         g.translate(across, along);
         g.fill(gv);
