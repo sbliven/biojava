@@ -11,26 +11,29 @@ import org.biojava.bio.program.indexdb.*;
 import org.biojava.bio.program.tagvalue.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.db.*;
+import org.biojava.bio.seq.io.*;
 
 import org.biojava.bio.program.indexdb.IndexStore;
 
 class FlatFileUnigeneDB
 implements UnigeneDB {
-  private final IndexStore dataStore;
-  private final IndexStore liStore;
-  private final IndexStore uniqueStore;
-  private final IndexStore allStore;
+  private final BioStore dataStore;
+  private final BioStore liStore;
+  private final BioStore uniqueStore;
+  private final BioStore allStore;
   
   private final Map clusterCache;
+  private final Map allCache;
+  private final SequenceDB uniqueDB;
   private final ParserListener dataPL;
   private final Parser dataParser;
   private final AnnotationBuilder dataBuilder;
   
   public FlatFileUnigeneDB(
-    IndexStore dataStore,
-    IndexStore liStore,
-    IndexStore uniqueStore,
-    IndexStore allStore
+    BioStore dataStore,
+    BioStore liStore,
+    BioStore uniqueStore,
+    BioStore allStore
   ) throws BioException {
     this.dataStore = dataStore;
     this.liStore = liStore;
@@ -39,6 +42,16 @@ implements UnigeneDB {
     
     try {
       clusterCache = new WeakValueHashMap();
+      allCache = new WeakValueHashMap();
+      
+      FastaFormat fasta = new FastaFormat();
+      uniqueDB = new CachingSequenceDB(
+        new BioIndexSequenceDB(
+          uniqueStore,
+          fasta
+        )
+      );
+
       dataBuilder = new AnnotationBuilder(
         UnigeneTools.UNIGENE_ANNOTATION
       );
@@ -53,11 +66,11 @@ implements UnigeneDB {
   throws BioException {
     UnigeneCluster cluster = (UnigeneCluster) clusterCache.get(clusterID);
     if(cluster == null) {
-      Record rec = dataStore.get(clusterID);
       synchronized(dataParser) {
         cluster = (UnigeneCluster) clusterCache.get(clusterID);
         if(cluster == null) { // break race condition
           try {
+            Record rec = dataStore.get(clusterID);
             RandomAccessReader rar = new RandomAccessReader(rec.getFile());
             rar.seek(rec.getOffset());
             BufferedReader reader = new BufferedReader(rar);
@@ -75,12 +88,25 @@ implements UnigeneDB {
     return cluster;
   }
   
-  public SequenceDB getAll(String clusterID) {
-    return null;
+  public SequenceDB getAll(String clusterID)
+  throws BioException {
+    SequenceDB db = (SequenceDB) allCache.get(clusterID);
+    
+    if(db == null) {
+      synchronized(db) {
+        db = (SequenceDB) allCache.get(clusterID);
+        if(db == null) {
+          allCache.put(clusterID, db = new AllDB(clusterID));
+        }
+      }
+    }
+    
+    return db;
   }
   
-  public Sequence getUnique(String clusterID) {
-    return null;
+  public Sequence getUnique(String clusterID)
+  throws IllegalIDException, BioException {
+    return uniqueDB.getSequence(clusterID);
   }
   
   private class AnnotationCluster
@@ -101,15 +127,79 @@ implements UnigeneDB {
     }
     
     public SequenceDB getAll() {
-      return FlatFileUnigeneDB.this.getAll(getID());
+      try {
+        return FlatFileUnigeneDB.this.getAll(getID());
+      } catch (BioException be) {
+        throw new BioError(be);
+      }
     }
     
     public Sequence getUnique() {
-      return FlatFileUnigeneDB.this.getUnique(getID());
+      try {
+        return FlatFileUnigeneDB.this.getUnique(getID());
+      } catch (BioException be) {
+        throw new BioError(be);
+      }
     }
     
     public Annotation getAnnotation() {
       return ann;
+    }
+  }
+  
+  private static class BioIndexSequenceDB
+  extends AbstractSequenceDB {
+    private final BioStore store;
+    private final SequenceFormat format;
+    private Set ids = null;
+    
+    public BioIndexSequenceDB(BioStore store, SequenceFormat format) {
+      this.store = store;
+      this.format = format;
+    }
+    
+    public Set ids() {
+      if(ids == null) {
+        ids = new AbstractSet() {
+          public int size() {
+            return store.getRecordList().size();
+          }
+          
+          public boolean contains(Object o) {
+            return store.get((String) o) != null;
+          }
+          
+          public Iterator iterator() {
+            return store.getRecordList().iterator();
+          }
+        };
+      }
+      
+      return ids;
+    }
+    
+    public String getName() {
+      return "UniqueStore";
+    }
+    
+    public Sequence getSequence(String id)
+    throws BioException {
+      try {
+        Record rec = store.get(id);
+        RandomAccessReader rar = new RandomAccessReader(rec.getFile());
+        rar.seek(rec.getOffset());
+        BufferedReader reader = new BufferedReader(rar);
+        return SeqIOTools.readFastaDNA(reader).nextSequence();
+      } catch (IOException ioe) {
+        throw new BioException(ioe);
+      }
+    }
+  }
+  
+  private static class AllDB
+  extends DummySequenceDB {
+    public AllDB(String name) {
+      super("All:" + name);
     }
   }
 }
