@@ -63,8 +63,8 @@ class DASLinkHandler extends StAXContentHandlerBase {
     {
 	++level;
 	if (level == 2 && localName.equals("link")) {
-	    String url = attrs.getValue("http://www.w3.org/2000/xlink", "href");
-	    String role = attrs.getValue("http://www.w3.org/2000/xlink", "role");
+	    String url = attrs.getValue("http://www.w3.org/1999/xlink", "href");
+	    String role = attrs.getValue("http://www.w3.org/1999/xlink", "role");
 	    if (url != null) {
 		try {
 		    xffenv.getFeatureListener().addFeatureProperty(DASSequence.PROPERTY_LINKS,

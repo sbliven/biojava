@@ -731,7 +731,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    // dp.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 	    dp.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
 	    dp.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-	    dp.setFeature("http://xml.org/sax/features/namespaces", true);
+	    // dp.setFeature("http://xml.org/sax/features/namespaces", true);
 	} catch (SAXNotRecognizedException ex) {
 	    ex.printStackTrace();
 	} catch (SAXNotSupportedException ex) {
