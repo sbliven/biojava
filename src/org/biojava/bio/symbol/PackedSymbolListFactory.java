@@ -62,7 +62,17 @@ public class PackedSymbolListFactory
         opMode = USER_SELECT;
         this.ambiguity = ambiguity;
     }
-
+ /**
+   * Makes a packed SymbolList out of a list of Symbols.
+   *
+   * @param symbolArray the symbols to be make in a packed SymbolList
+   * @param size the length of the symbolArray array.
+   * @param alfa the Alphabet over which the SymbolList shoudl be
+   * @return a packed SymbolList with the Symbols in symbolArray and the
+   * Alphabet in alfa
+   * @exception IllegalAlphabetException if alfa and the Symbols in
+   *symbolArray disagree.
+   */
     public SymbolList makeSymbolList(Symbol [] symbolArray, int size, Alphabet alfa)
         throws IllegalAlphabetException
     {
