@@ -67,6 +67,8 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     );
 
     public static final String PROPERTY_ANNOTATIONSERVER = "org.biojava.bio.program.das.annotation_server";
+    public static final String PROPERTY_FEATUREID = "org.biojava.bio.program.das.feature_id";
+    public static final String PROPERTY_FEATURELABEL = "org.biojava.bio.program.das.feature_label";
 
     private final DASSequenceDB parentdb;
     private final Alphabet alphabet = DNATools.getDNA();

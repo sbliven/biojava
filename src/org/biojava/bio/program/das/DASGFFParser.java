@@ -116,6 +116,8 @@ class DASGFFParser {
     private Feature.Template parseDASFeature(Element fe) 
         throws NumberFormatException, ParseException
     {
+	String f_id = null;
+	String f_label = null;
 	String type = "unknown";
 	String method = "unknown";
 	int start = -1, end = -1;
@@ -131,6 +133,9 @@ class DASGFFParser {
 	//
 	// Phase one: get stuff out of the XML
 	//
+
+	f_id = fe.getAttribute("id");
+	f_label = fe.getAttribute("label");
 
 	Node n = fe.getFirstChild();
 	while (n != null) {
@@ -225,7 +230,18 @@ class DASGFFParser {
 	}
 
 	if (temp.annotation == null) {
-	    temp.annotation = Annotation.EMPTY_ANNOTATION;
+	    temp.annotation = new SimpleAnnotation();
+	}
+
+	try {
+	    if (f_id.length() > 0) {
+		temp.annotation.setProperty(DASSequence.PROPERTY_FEATUREID, f_id);
+	    }
+	    if (f_label.length() > 0) {
+		temp.annotation.setProperty(DASSequence.PROPERTY_FEATURELABEL, f_label);
+	    }
+	} catch (ChangeVetoException ex) {
+	    throw new BioError(ex);
 	}
 
 	return temp;

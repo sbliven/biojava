@@ -105,8 +105,8 @@ class DASXFFParser {
 	    throw new ParseException(ex);
 	}
     }
-
-    private void parseXFFFeatureSet(Element fe, SeqIOListener siol) 
+    
+    public void parseXFFFeatureSet(Element fe, SeqIOListener siol) 
         throws ParseException
     {
 	Node chld = fe.getFirstChild();
@@ -199,6 +199,17 @@ class DASXFFParser {
 		    templ.source = getChildText(e);
 		} else if (tagName.equals("location")) {
 		    templ.location = parseXFFLocation(e);
+		} else if (tagName.equals("id")) {
+		    String id = getChildText(e);
+
+		    if (templ.annotation == null) {
+			templ.annotation = new SimpleAnnotation();
+		    }
+		    try {
+			templ.annotation.setProperty(DASSequence.PROPERTY_FEATUREID, id);
+		    } catch (ChangeVetoException ex) {
+			throw new BioError(ex);
+		    }
 		}
 	    }
 	    chld = chld.getNextSibling();
