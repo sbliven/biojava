@@ -321,6 +321,7 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
 	{
 	    pos = 0;
 	    word = 0;
+	    lengthFromUnknown = 0;
 	}
 
 	public void endSequence()
@@ -361,6 +362,7 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
 		}
 
 		++pos;
+		// System.out.println("Pos = " + pos + "        lengthFromUnknown = " + lengthFromUnknown);
 		if (--stepCounter == 0) {
 		    stepCounter = stepSize;
 		    if (lengthFromUnknown >= wordLength) {
@@ -421,6 +423,13 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
 	private String name = null;
 	private int length = -1;
 
+//  	public void startSequence()
+//  	    throws ParseException
+//  	{
+//  	    super.startSequence();
+//  	    System.out.println("Starting sequence");
+//  	}
+
 	SecondPassListener(Packing packing, 
 			   int wordLength, 
 			   int stepSize,
@@ -466,6 +475,9 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
 	public void processWord(int word, int pos)
 	    throws ParseException
 	{
+	    if (pos < 1) {
+		throw new ParseException("pos < 1");
+	    }
 	    writeRecord(hashTable, hitTable, pos + concatOffset, seqNumber, word);
 	}
     }
