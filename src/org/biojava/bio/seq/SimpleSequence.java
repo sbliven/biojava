@@ -146,7 +146,6 @@ public class SimpleSequence implements Sequence, MutableFeatureHolder
     }
   }
   
-  private FeatureFactory fFact;
   private String urn;
   private String name;
   private Annotation annotation;
@@ -161,14 +160,6 @@ public class SimpleSequence implements Sequence, MutableFeatureHolder
 
   protected boolean featureHolderAllocated() {
     return featureHolder != null;
-  }
-
-  public FeatureFactory getFeatureFactory() {
-    return fFact;
-  }
-  
-  public void setFeatureFactory(FeatureFactory fFact) {
-    this.fFact = fFact;
   }
 
   public String getURN() {

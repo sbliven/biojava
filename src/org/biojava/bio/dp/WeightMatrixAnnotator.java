@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.biojava.bio.dp;
 
 import java.util.*;
@@ -30,48 +29,48 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 /**
- * Annotates a database with hits to a weight-matrix.
+ * Annotates a sequence with hits to a weight-matrix.
+ *
+ * <p>This SequenceAnnotator implementation returns a new
+ * ViewSequence wrapping the underlying Sequence</p>
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
-public class WeightMatrixAnnotator
-extends AbstractAnnotator implements Serializable {
-  private WeightMatrix matrix;
-  private double prior;
-  private double threshold;
+public class WeightMatrixAnnotator implements SequenceAnnotator, Serializable {
+    private WeightMatrix matrix;
+    private double threshold;
 
-  public boolean annotate(Sequence seq)
-         throws IllegalSymbolException, BioException {
-    if(!(seq instanceof MutableFeatureHolder)) {
-      return false;
-    }
+    public Sequence annotate(Sequence seq)
+	throws IllegalAlphabetException, BioException 
+    {
+	seq = new ViewSequence(seq);
     
-    int cols = matrix.columns();
-    Feature.Template template = new Feature.Template();
-    template.source = "WeightMatrixAnnotator";
-    template.type = "hit";
-    for(int offset = 1;
-        offset <= seq.length() - cols + 1;
-        offset++) {
-      double score = SingleDP.scoreWeightMatrix(matrix, seq, offset);
-      double q = Math.exp(score) * prior;
-      double pmd = q/(1.0+q);
-      if(pmd >= threshold) {
-        template.location = new RangeLocation(offset, offset+cols-1);
-        SimpleAnnotation ann = new SimpleAnnotation();
-        ann.setProperty("score", new Double(score));
-        ann.setProperty("weightMatrix", matrix);
-        ann.setProperty("p-value", new Double(pmd));
-        seq.createFeature((MutableFeatureHolder) seq, template);
-        return true;
-      }
+	int cols = matrix.columns();
+	Feature.Template template = new Feature.Template();
+	template.source = "WeightMatrixAnnotator";
+	template.type = "hit";
+	for(int offset = 1;
+	    offset <= seq.length() - cols + 1;
+	    offset++) {
+	    double score = DP.scoreWeightMatrix(matrix, seq, offset);
+	    double q = Math.exp(score);
+	    if(q >= threshold) {
+		template.location = new RangeLocation(offset, offset+cols-1);
+		SimpleAnnotation ann = new SimpleAnnotation();
+		ann.setProperty("score", new Double(q));
+		ann.setProperty("weightMatrix", matrix);
+		template.annotation = ann;
+		seq.createFeature((MutableFeatureHolder) seq, template);
+	    }
+	}
+	return seq;
     }
-    return false;
-  }
 
-  public WeightMatrixAnnotator(WeightMatrix wm, double prior, double threshold) {
-    this.matrix = wm;
-    this.prior = prior;
-    this.threshold = threshold;
-  }
+    public WeightMatrixAnnotator(WeightMatrix wm, double threshold) {
+	this.matrix = wm;
+	this.threshold = threshold;
+    }
 }
+
+

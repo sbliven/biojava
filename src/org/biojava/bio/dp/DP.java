@@ -47,7 +47,7 @@ public abstract class DP {
     int cols = matrix.columns();
 
     for (int c = 0; c < cols; c++)
-      score += matrix.getColumn(c).getWeight(symList.symbolAt(c + start));
+      score += Math.log(matrix.getColumn(c).getWeight(symList.symbolAt(c + start)));
 
     return score;
   }

@@ -36,8 +36,6 @@ import org.biojava.bio.symbol.*;
 public interface SequenceFactory {
   /**
    * Creates a sequence using these parameters.
-   * <P>
-   * The annotation is under the same contract as in FeatureFactory.
    *
    * @param resList the SymbolList defining the 'sequence'
    * @param uri the uri
