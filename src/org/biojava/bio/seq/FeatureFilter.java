@@ -345,7 +345,11 @@ public interface FeatureFilter extends Serializable {
     }
 
     public boolean isDisjoint(FeatureFilter filt) {
-      return (filt instanceof AcceptNoneFilter);
+	if (filt instanceof ContainedByLocation)  {
+	    Location loc = ((ContainedByLocation) filt).getLocation();
+	    return !getLocation().overlaps(loc);
+	}
+	return (filt instanceof AcceptNoneFilter);
     }
   }
   
