@@ -243,6 +243,9 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
                                     BeadFeatureRenderer renderer)
         throws IllegalArgumentException
     {
+	// Ensure the cache doesn't hide the new delegate
+	cache.clear();
+	
         Set delegateFilters = delegates.keySet();
 
         if (delegateFilters.size() == 0)
@@ -268,6 +271,20 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
                 }
             }
         }
+    }
+
+    /**
+     * <code>removeDelegateRenderer</code> removes any association
+     * of the given <code>OptimizableFilter</code> with a
+     * <code>BeadFeatureRenderer</code>.
+     *
+     * @param filter an <code>OptimizableFilter</code>.
+     */
+    public void removeDelegateRenderer(OptimizableFilter   filter)
+    {
+	// Ensure the cache doesn't hide the change of delegate
+	cache.clear();
+	delegates.remove(filter);
     }
 
     /**
@@ -575,5 +592,9 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
         {
             return map.containsKey(key);
         }
+
+	protected void clear() {
+	    map.clear();
+	}
     }
 }
