@@ -26,8 +26,7 @@ import java.io.*;
 
 import org.w3c.dom.*;
 import org.xml.sax.*;
-import com.sun.xml.tree.*;
-import com.sun.xml.parser.*;
+import org.apache.xerces.parsers.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
@@ -83,8 +82,10 @@ public class ViterbiAlign {
       File stateFile = null;
 
       // load in the markov model
-      InputSource is = Resolver.createInputSource(modelURL, true);
-      XmlDocument doc = XmlDocument.createXmlDocument(is, false);
+      InputSource is = new InputSource(modelURL.openStream());
+      DOMParser parser = new DOMParser();
+      parser.parse(is);
+      Document doc = parser.getDocument();
       MarkovModel model = XmlMarkovModel.readModel(doc.getDocumentElement());
 
       // make alphabets
