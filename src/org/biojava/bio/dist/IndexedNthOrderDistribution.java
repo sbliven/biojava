@@ -16,17 +16,19 @@ class IndexedNthOrderDistribution extends AbstractOrderNDistribution {
     {
 	super(alpha);
 
-	index = AlphabetManager.getAlphabetIndex(getConditioningAlphabet(), false); // Throws if alpha isn't indexable
-	dists = new Distribution[index.size()];
+  FiniteAlphabet conditioning = (FiniteAlphabet) getConditioningAlphabet();
+	index = AlphabetManager.getAlphabetIndex( conditioning, false); // Throws if alpha isn't indexable
+	dists = new Distribution[conditioning.size()];
 
-	for(int i = 0; i < index.size(); ++i) {
+	for(int i = 0; i < conditioning.size(); ++i) {
 	    dists[i] = df.createDistribution(getConditionedAlphabet());
 	}
     }
 
     private Object readResolve() throws ObjectStreamException {
+      // FIXME: new index may be in different order to distribution array
 	try {
-	    index = AlphabetManager.getAlphabetIndex(getConditioningAlphabet(), false);
+	    index = AlphabetManager.getAlphabetIndex((FiniteAlphabet) getConditioningAlphabet(), false);
 		return this;
 	} catch (IllegalAlphabetException ex) {
 	    throw new InvalidObjectException("Couldn't regenerate index");

@@ -9,7 +9,7 @@ import org.biojava.bio.seq.*;
  * @author Thomas Down
  */
 
-class DNAIndex implements AlphabetIndex {
+public class DNAIndex implements AlphabetIndex {
     private final static Symbol a = DNATools.a();
     private final static Symbol c = DNATools.c();
     private final static Symbol g = DNATools.g();

@@ -151,10 +151,12 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 		CodeClass baseClassC = IntrospectedCodeClass.forClass(baseClass);
 		CodeClass faceClassC = IntrospectedCodeClass.forClass(face);
 
-		GeneratedCodeClass pclass = new GeneratedCodeClass("org.biojava.bio.seq.impl.Projection_" + faceName + "_" + (seed++),
-								   baseClassC,
-								   Collections.singleton(faceClassC),
-								   CodeUtils.ACC_PUBLIC | CodeUtils.ACC_SUPER);
+		GeneratedCodeClass pclass = new GeneratedCodeClass(
+      "org.biojava.bio.seq.impl.Projection_" + faceName + "_" + (seed++),
+			baseClassC,
+		  new CodeClass[] { faceClassC },
+			CodeUtils.ACC_PUBLIC | CodeUtils.ACC_SUPER
+    );
 
 		List baseInitArgsList = new ArrayList();
 		baseInitArgsList.add(baseClass == ProjectedStrandedFeatureWrapper.class ?
@@ -172,12 +174,14 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 									     new ArrayList(),
 									     CodeUtils.ACC_PUBLIC);
 
-		List initArgsList = new ArrayList();
-		initArgsList.add(faceClassC);
-		initArgsList.add(IntrospectedCodeClass.forClass(ProjectedFeatureHolder.class));
 		GeneratedCodeMethod init = pclass.createMethod("<init>",
 							       IntrospectedCodeClass.forClass(Void.TYPE),
-							       initArgsList,
+							       new CodeClass[] {
+                       faceClassC,
+                       IntrospectedCodeClass.forClass(
+                         ProjectedFeatureHolder.class
+                       )
+                     },
 							       CodeUtils.ACC_PUBLIC);
 		InstructionVector iv = new InstructionVector();
 		iv.add(ByteCode.make_aload(init.getThis()));
@@ -201,7 +205,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 		    
 		    GeneratedCodeMethod proxyMethod = pclass.createMethod(faceMethod.getName(),
 									  faceMethod.getReturnType(),
-									  new ArrayList(),
+									  CodeUtils.EMPTY_LIST,
 									  CodeUtils.ACC_PUBLIC);
 		    iv = new InstructionVector();
 		    iv.add(ByteCode.make_aload(proxyMethod.getThis()));

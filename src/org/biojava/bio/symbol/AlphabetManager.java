@@ -22,6 +22,7 @@
 
 package org.biojava.bio.symbol;
 
+import java.lang.reflect.*;
 import java.io.*;
 import java.util.*;
 import java.net.*;
@@ -32,6 +33,7 @@ import org.xml.sax.*;
 
 import org.biojava.bio.*;
 import org.biojava.utils.*;
+import org.biojava.utils.bytecode.*;
 
 /**
  * The first port of call for retrieving standard alphabets.
@@ -68,6 +70,7 @@ public final class AlphabetManager {
   static private Map crossProductAlphabets;
   static private Map ambiguitySymbols;
   static private GapSymbol gapSymbol;
+  static private Map alphabetToIndex = new HashMap();
 
   /**
    * Retrieve the alphabet for a specific name.
@@ -729,36 +732,30 @@ public final class AlphabetManager {
       };
     }
   }
-
-
-    private static AlphabetIndex DNA_INDEX;
-    private static AlphabetIndex DNA_AMBIGUITY_INDEX;
-
-    /**
-     * Get an indexer for a specified alphabet.
-     *
-     * @param alpha The alphabet to index.
-     * @param allowAmbiguity Should the index recognise ambiguous symbols?
-     * @returns an index.
-     * @throws IllegalAlphabetException if this alphabet cannot be indexed for some reason.
-     * @since 1.1
-     */
-
-    public static AlphabetIndex getAlphabetIndex(Alphabet alpha, boolean allowAmbiguity) 
-        throws IllegalAlphabetException
-    {
-	if (alpha == org.biojava.bio.seq.DNATools.getDNA()) {
-	    if (allowAmbiguity) {
-		if (DNA_AMBIGUITY_INDEX == null)
-		    DNA_AMBIGUITY_INDEX = new DNAAmbiguityIndex();
-		return DNA_AMBIGUITY_INDEX;
-	    } else {
-		if (DNA_INDEX == null)
-		    DNA_INDEX = new DNAIndex();
-		return DNA_INDEX;
-	    }
-	}
-
-	throw new IllegalAlphabetException("[FIXME] Right now we can only index DNA");
+  
+  /**
+   * Get an indexer for a specified alphabet.
+   *
+   * @param alpha The alphabet to index.
+   * @param allowAmbiguity Should the index recognise ambiguous symbols?
+   * @returns an index.
+   * @throws IllegalAlphabetException if this alphabet cannot be indexed for some reason.
+   * @since 1.1
+   */
+  public static AlphabetIndex getAlphabetIndex(
+    FiniteAlphabet alpha, boolean allowAmbiguity
+  ) throws IllegalAlphabetException {
+    final int generateIndexSize = 16;
+    AlphabetIndex ai = (AlphabetIndex) alphabetToIndex.get(alpha); 
+    if(ai == null) {
+      int size = alpha.size();
+      if(size <= generateIndexSize) {
+        ai = new LinearAlphabetIndex(alpha);
+      } else {
+        ai = new HashedAlphabetIndex(alpha);
+      }
+      alphabetToIndex.put(alpha, ai);
     }
+    return ai;
+  }
 }
