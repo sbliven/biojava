@@ -49,16 +49,12 @@ implements AtomicSymbol {
     char token, String name, Annotation annotation,
     List syms
   ) throws IllegalSymbolException {
-    super(token, name, annotation, syms, null);
+    super(token, name, annotation, syms);
   }
   
   protected List createSymbols() {
     List syms = new SingletonList(this);
     return syms;
-  }
-  
-  protected Set createBases() {
-    return Collections.singleton(this);
   }
   
   protected Alphabet createMatches() {

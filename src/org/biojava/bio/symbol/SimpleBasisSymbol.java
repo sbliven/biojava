@@ -39,7 +39,7 @@ implements BasisSymbol {
   
   public SimpleBasisSymbol(
     char token, String name, Annotation annotation,
-    List symbols, Set matches
+    List symbols
   ) throws IllegalSymbolException {
     this(token, name, annotation);
     if(symbols == null) {
@@ -51,34 +51,27 @@ implements BasisSymbol {
       );
     }
     this.symbols = Collections.unmodifiableList(new ArrayList(symbols));
-    if(matches != null) {
-      for(Iterator i = matches.iterator(); i.hasNext(); ) {
-        Object obj = i.next();
-        if(obj instanceof AtomicSymbol) {
-        } else {
-          throw new ClassCastException(
-            "Can't cast " + obj + " to AtomicSymbol"
-          );
-        }
-      }
-      this.matches = new SimpleAlphabet(matches);
-    }
   }
   
   protected SimpleBasisSymbol(
     char token, String name, Annotation annotation
   ) {
-    super(token, name, annotation, null);
+    super(token, name, annotation);
   }
   
   public SimpleBasisSymbol(
     char token, String name, Annotation annotation,
-    Set syms
+    Alphabet matches
   ) {
     this(token, name, annotation);
-    this.symbols = new SingletonList(this);
-    this.bases = Collections.singleton(this);
-    this.matches = new SimpleAlphabet(syms);
+  }
+  
+  public SimpleBasisSymbol(
+    char token, String name, Annotation annotation,
+    List symbols, Alphabet matches
+  ) throws IllegalSymbolException {
+    this(token, name, annotation, symbols);
+    this.symbols = symbols;
   }
   
   public final List getSymbols() {
@@ -91,8 +84,7 @@ implements BasisSymbol {
         "\n\ttoken: " + getToken() +
         "\n\tname: " + getName() +
         "\n\tsymbols: " + this.symbols +
-        "\n\tmatches: " + this.matches +
-        "\n\tbases: " + this.bases
+        "\n\tmatches: " + this.matches
       );
     }
     return symbols;

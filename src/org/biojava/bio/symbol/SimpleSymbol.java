@@ -39,19 +39,26 @@ implements Symbol, Serializable {
   private final String name;
   private final Annotation annotation;
   protected Alphabet matches;
-  protected Set bases;
   
-  public SimpleSymbol(
-    char token, String name, Annotation annotation,
-    Set bases
+  protected SimpleSymbol(
+    char token, String name, Annotation annotation
   ) {
     this.token = token;
     this.name = name;
     this.annotation = new SimpleAnnotation(annotation);
-    if(bases == null) {
-      this.bases = null;
+  }
+  
+  public SimpleSymbol(
+    char token, String name, Annotation annotation,
+    Alphabet matches
+  ) {
+    this(token, name, annotation);
+    if(matches == null) {
+      throw new NullPointerException(
+        "Can't construct SimpleSymbol with a null matches alphabet"
+      );
     } else {
-      this.bases = Collections.unmodifiableSet(bases);
+      this.matches = matches;
     }
   }
   
@@ -75,30 +82,6 @@ implements Symbol, Serializable {
   }
   
   protected Alphabet createMatches() {
-    Set bases = getBases();
-    Set mat = new HashSet();
-    for(Iterator i = bases.iterator(); i.hasNext(); ) {
-      BasisSymbol bs = (BasisSymbol) i.next();
-      if(bs instanceof AtomicSymbol) {
-        mat.add(bs);
-      } else {
-        FiniteAlphabet ma = (FiniteAlphabet) bs.getMatches();
-        for(Iterator j = ma.iterator(); j.hasNext(); ) {
-          mat.add((AtomicSymbol) j.next());
-        }
-      }
-    }
-    return new SimpleAlphabet(mat);
-  }
-  
-  public Set getBases() {
-    if(bases == null) {
-      bases = createBases();
-    }
-    return bases;
-  }
-  
-  protected Set createBases() {
-    throw new BioError("Assertion Failure: Bases set is null");
+    throw new BioError("Assertion Failure: Matches alphabet is null");
   }
 }

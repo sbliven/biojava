@@ -47,36 +47,30 @@ import org.biojava.bio.*;
  * these complex symbols. For example, you could construct a Symbol instance
  * that represents the codons atn. This matches the codons {ata, att, atg, atc}.
  * It is also possible to build a Symbol instance that represents all stop
- * codons {taa, tag, tga}, which can not be easily represented in terms of a
- * single ambiguous n'tuple (In this case, the codons could be represented by
- * {ta[ag], tga} or {t[ag]a, tag} but not by t[ag][ag] as this would also
- * contain tgg).
+ * codons {taa, tag, tga}, which can not be represented in terms of a
+ * single ambiguous n'tuple.
  * <P>
  * There are three Symbol interfaces. Symbol is the most generic. It has the
  * methods getToken and getName so that the Symbol can be textualy represented.
  * In addition, it defines getMatches that returns an Alphabet over all the
  * AtomicSymbol instances that match the Symbol (N would return an Alphabet
- * containing {A, G, C, T}, and Gap would return {}). In addition, it defines
- * getBases, which returns a Set of BasisSymbol instances. These should be a
- * minimal set of (possibly) ambiguous Symbols that contain every Symbol in
- * getMatches. For example, in the atn case, getBases would return a Set
- * containing only atn, and getMatches would return the four matching
- * Atomic Symbols. The stop-codon ambiguity symbol would return a Set like
- * {ta[ag], tga} that represents all of the matching codons as compactly as
- * possible.
+ * containing {A, G, C, T}, and Gap would return {}).
  * <P>
- * Invoking getBases for a BasisSymbol will always return a Set containing just
- * that Symbol. BasisSymbol adds the getSymbols method that returns the List of
- * BasisSymbol instances that are concatonated together to make that Symbol.
- * For example, the getSymbols method for the BasisSymbol instance for ant would
- * return the List [a, n, t].
+ * BasisSymbol instances can always be represented by an n'tuple of BasisSymbol
+ * instances. It adds the method getSymbols so that you can retrieve this list.
+ * For example, the tuple [ant] is a BasisSymbol, as it is uniquely specified
+ * with those three BasisSymbol instances a, n and t. n is a BasisSymbol
+ * instance as it is uniquely represented by itself.
  * <P>
  * AtomicSymbol instances specialize BasisSymbol by guaranteeing that getMatches
  * returns a set containing only that instance. That is, they are indivisable.
  * The DNA nucleotides are instances of AtomicSymbol, as are individual codons.
  * The stop codon {tag} will have a getMatches method that returns {tag},
  * a getBases method that also returns {tag} and a getSymbols method that returns
- * the List [t, a, g].
+ * the List [t, a, g]. {tna} is a BasisSymbol but not an AtomicSymbol as it
+ * matches four AtomicSymbol instances {taa, tga, tca, tta}. It follows that
+ * each symbol in getSymbols for an AtomicSymbol instance will also be
+ * AtomicSymbol instances.
  *
  * @author Matthew Pocock
  */
@@ -107,12 +101,4 @@ public interface Symbol extends Annotatable {
    *          symbol
    */
   Alphabet getMatches();
-  
-  /**
-   * The set of (possibly ambiguous) BasisSymbols that allow the entire set of
-   * symbols in getMatches to be spanned.
-   *
-   * @return a Set of BasisSymbol instances
-   */
-  Set getBases();
 }

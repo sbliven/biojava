@@ -29,14 +29,16 @@ import java.util.List;
  * <P>
  * BasisSymbol instances can always be represented uniquely as a single List of
  * BasisSymbol instances. The symbol N is a BasisSymbol - it can be uniquely
- * represented by N. It matches {a, g, c, t}, and getBases will return the set
- * {N}. Similarly, the symbol atn is a BasisSymbol, as it can be uniquely
+ * represented by N. It matches {a, g, c, t}.
+ * Similarly, the symbol atn is a BasisSymbol, as it can be uniquely
  * represented with a single list of symbols [a, t, n]. Its getMatches will
  * return the set {ata, att, atg, atc}.
  * <P>
  * The getSymbols method returns the unique list of BasisSymbol instances that
  * this is composed from. For example, the codon ambiguity symbol atn will have
- * a getSymbols method that returns the list [a, t, n].
+ * a getSymbols method that returns the list [a, t, n]. The getMatches method
+ * will return an Alphabet containing each AtomicSymbol that can be made by
+ * expanding the list of BasisSymbol instances.
  *
  * @author Matthew Pocock
  */
@@ -46,7 +48,7 @@ public interface BasisSymbol extends Symbol {
    * <P>
    * In the usual case, this list will contain just this single symbol. In the
    * case where a symbol represents an ordered combination of other symbols,
-   * the list will contain each of these Symbols.
+   * the list will contain each of these BasisSymbols.
    *
    * @return the List of Symbols that this Symbol is built from
    */

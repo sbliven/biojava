@@ -180,16 +180,24 @@ public final class AlphabetManager {
     } else if(basis == symList.size()) {
       return new SimpleBasisSymbol(
         token, name, Annotation.EMPTY_ANNOTATION,
-        symList, expandMatches(alpha, symList, new ArrayList())
+        symList, new SimpleAlphabet(
+          expandMatches(alpha, symList, new ArrayList())
+        )
       );
     } else {
       return new SimpleSymbol(
         token, name, Annotation.EMPTY_ANNOTATION,
-        expandBases(alpha, symList, new ArrayList())
+        new SimpleAlphabet(
+          expandBases(alpha, symList, new ArrayList())
+        )
       );
     }
   }
   
+  /**
+   * Expands a list of BasisSymbols into the set of AtomicSymbol instances
+   * it matches.
+   */
   private static Set expandBases(Alphabet alpha, List symList, List built) {
     int indx = built.size();
     if(indx < symList.size()) {
@@ -199,11 +207,11 @@ public final class AlphabetManager {
         return expandBases(alpha, symList, built);
       } else {
         Set res = new HashSet();
-        Iterator i = ((FiniteAlphabet) s.getBases()).iterator();
+        Iterator i = ((FiniteAlphabet) s.getMatches()).iterator();
         while(i.hasNext()) {
-          BasisSymbol bs = (BasisSymbol) i.next();
+          AtomicSymbol as = (AtomicSymbol) i.next();
           List built2 = new ArrayList(built);
-          built2.add(bs);
+          built2.add(as);
           res.addAll(expandBases(alpha, symList, built2));
         }
         return res;
@@ -237,7 +245,7 @@ public final class AlphabetManager {
     if(symSet.size() == 0) {
       return getGapSymbol();
     }
-    Set basisSet = new HashSet();
+    Set asSet = new HashSet();
     int len = -1;
     for(
       Iterator i = symSet.iterator();
@@ -255,7 +263,7 @@ public final class AlphabetManager {
             "length"
           );
         }
-        basisSet.add(as);
+        asSet.add(as);
       } else {
         for(Iterator j = ((FiniteAlphabet) s.getMatches()).iterator();
           j.hasNext();
@@ -270,23 +278,33 @@ public final class AlphabetManager {
               "length"
             );
           }
-          basisSet.add(as);
+          asSet.add(as);
         }
       }
     }
-    if(basisSet.size() == 0) {
+    if(asSet.size() == 0) {
       return getGapSymbol();
-    } else if(basisSet.size() == 1) {
-      return (Symbol) basisSet.iterator().next();
+    } else if(asSet.size() == 1) {
+      return (Symbol) asSet.iterator().next();
     } else {
       if(len == 1) {
         return new SimpleBasisSymbol(
           token, name, annotation,
-          basisSet
+          new SimpleAlphabet(asSet)
         );
       } else {
-        // fixme: need to factorize these atomic symbols into BasisSymbols
-        throw new BioError("Not implemented yet");
+        List fs = factorize(alpha, asSet);
+        if(fs == null) {
+          return new SimpleSymbol(
+            token, name, annotation,
+            new SimpleAlphabet(asSet)
+          );
+        } else {
+          return new SimpleBasisSymbol(
+            token, name, annotation,
+            fs
+          );
+        }
       }
     }
   }
@@ -457,16 +475,42 @@ public final class AlphabetManager {
   }
   
   /**
-   * Return a Set of BasisSymbol instances that span all of the AtomicSymbl
-   * instances in symSet.
+   * Return a list of BasisSymbol instances that uniquely sum up all AtomicSymbo
+   * instances in symSet. If the symbol can't be represented by a single list of
+   * BasisSymbol instances, return null.
    *
    * @param symSet  the Set of AtomicSymbol instances
    * @param alpha   the Alphabet instance that the Symbols are from
-   * @return a Set containing BasisSymbol instances
+   * @return a List of BasisSymbols
    */
-  public static Set factorize(Set symSet, Alphabet alpha) {
-    return null;
+  public static List factorize(Alphabet alpha, Set symSet)
+  throws IllegalSymbolException {
+    List alphas = alpha.getAlphabets();
+    List facts = new ArrayList();
+    int size = symSet.size();
+    Set syms = new HashSet();
+    for(int col = 0; col < alphas.size(); col++) {
+      Alphabet a = (Alphabet) alphas.get(col);
+      for(Iterator i = symSet.iterator(); i.hasNext(); ) {
+        syms.add(
+          (AtomicSymbol) ((AtomicSymbol)
+          i.next()).getSymbols().get(col)
+        );
+      }
+      int s = syms.size();
+      if( (size % s) != 0 ) {
+        return null;
+      }
+      size /= s;
+      facts.add(a.getAmbiguity(syms));
+      syms.clear();
+    }
+    if(size != 1) {
+      return null;
+    }
+    return facts;
   }
+  
   
   
   /**
@@ -788,7 +832,10 @@ public final class AlphabetManager {
   private static class GapSymbol
   extends SimpleSymbol {
     public GapSymbol() {
-      super('-', "gap", Annotation.EMPTY_ANNOTATION, Collections.EMPTY_SET);
+      super(
+        '-', "gap", Annotation.EMPTY_ANNOTATION,
+        Alphabet.EMPTY_ALPHABET
+      );
     }
   }
   
