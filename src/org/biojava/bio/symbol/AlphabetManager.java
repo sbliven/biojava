@@ -429,11 +429,13 @@ public final class AlphabetManager {
    */
   static public Symbol createSymbol(
     Annotation annotation,
-    List symList, Alphabet alpha
-  ) throws IllegalSymbolException {
+    List symList, Alphabet alpha)
+          throws IllegalSymbolException
+  {
     Iterator i = symList.iterator();
     int basis = 0;
     int atomC = 0;
+    int gaps = 0;
     while(i.hasNext()) {
       Symbol s = (Symbol) i.next();
       if(s instanceof BasisSymbol) {
@@ -441,36 +443,38 @@ public final class AlphabetManager {
         if(s instanceof AtomicSymbol) {
           atomC++;
         }
+      } else {
+        Alphabet matches = s.getMatches();
+        if(matches instanceof FiniteAlphabet) {
+          if(((FiniteAlphabet) matches).size() == 0) {
+            gaps++;
+          }
+        }
       }
     }
 
     try {
       if(atomC == symList.size()) {
         return new SimpleAtomicSymbol(annotation, symList);
-      } else if(basis == symList.size()) {
+      } else if((gaps + basis) == symList.size()) {
         return new SimpleBasisSymbol(
-        annotation,
-        symList,
-        new SimpleAlphabet(
-        expandMatches(alpha, symList, new ArrayList())
-        )
-        );
+                annotation,
+                symList,
+                new SimpleAlphabet(
+                        expandMatches(alpha, symList, new ArrayList())));
       } else {
         return new SimpleSymbol(
-        annotation,
-        new SimpleAlphabet(
-        expandBasis(alpha, symList, new ArrayList())
-        )
-        );
+                annotation,
+                new SimpleAlphabet(
+                        expandBasis(alpha, symList, new ArrayList())));
       }
     } catch (IllegalSymbolException ise) {
       throw new IllegalSymbolException(
-        ise,
-        "Could not create a new symbol with: " +
-        annotation + "\t" +
-        symList + "\t" +
-        alpha
-      );
+              ise,
+              "Could not create a new symbol with: " +
+              annotation + "\t" +
+              symList + "\t" +
+              alpha);
     }
   }
 
