@@ -379,11 +379,12 @@ Changeable {
       return;
     }
     Graphics2D g2 = (Graphics2D) g;
+    AffineTransform oldTransform = g2.getTransform();
     Rectangle2D currentClip = g2.getClip().getBounds2D();
     
     double minAcross = sequenceToGraphics(range.getMin()) -
                        renderer.getMinimumLeader(this, range);
-    double maxAcross = sequenceToGraphics(range.getMax()) +
+    double maxAcross = sequenceToGraphics(range.getMax()) + 1 +
                        renderer.getMinimumTrailer(this, range);
     double alongDim = maxAcross - minAcross;
     double depth = renderer.getDepth(this, range);
@@ -406,6 +407,7 @@ Changeable {
     g2.clip(clip);
     renderer.paint(g2, this, range);
     g2.setClip(oldClip);
+    g2.setTransform(oldTransform);
   }
 
   public void setRenderer(SequenceRenderer r)
@@ -446,11 +448,11 @@ Changeable {
   }
 
   public double sequenceToGraphics(int seqPos) {
-    return ((double) (seqPos-1) * scale);
+    return ((double) (seqPos-1)) * scale;
   }
 
   public int graphicsToSequence(double gPos) {
-    return (int) (gPos / scale) + 1;
+    return ((int) (gPos / scale)) + 1;
   }
   
   public int graphicsToSequence(Point point) {

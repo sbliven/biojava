@@ -58,6 +58,8 @@ public class RulerRenderer implements SequenceRenderer {
     Graphics2D g, SequenceRenderContext src,
     RangeLocation pos
   ) {
+    g.setPaint(Color.black);
+    
     int min = pos.getMin();
     int max = pos.getMax();
     double minX = src.sequenceToGraphics(min);
@@ -75,9 +77,10 @@ public class RulerRenderer implements SequenceRenderer {
     g.draw(line);
     
     // we want ticks no closer than 40 pixles appart
-    int realSymsPerGap = src.graphicsToSequence(40.0);
-    //System.out.println("Real syms: " + realSymsPerGap);
     double ten = Math.log(10);
+    double minGap = Math.log(max) / ten * 7.0;
+    int realSymsPerGap = src.graphicsToSequence(minGap + 5.0);
+    //System.out.println("Real syms: " + realSymsPerGap);
     int snapSymsPerGap = (int) Math.exp(
       Math.ceil(Math.log(realSymsPerGap) / ten) * ten
     );

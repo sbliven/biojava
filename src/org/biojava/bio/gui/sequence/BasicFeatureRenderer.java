@@ -260,7 +260,7 @@ implements FeatureRenderer {
       g.setPaint(fill);
       g.fill(s);
     }
-    if (outline != null) {
+    if ( (outline != null) && ( (max - min) > 4.0) ) {
       g.setPaint(outline);
       g.draw(s);
     }

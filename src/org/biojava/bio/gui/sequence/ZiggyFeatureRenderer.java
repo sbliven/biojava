@@ -49,7 +49,6 @@ implements FeatureRenderer, java.io.Serializable {
   private Paint outline = Color.black;
   private Paint fill = Color.yellow;
   private double blockDepth = 10.0;
-  private double zigDepth = 5.0;
   
   public void setFill(Paint p)
   throws ChangeVetoException {
@@ -108,27 +107,8 @@ implements FeatureRenderer, java.io.Serializable {
     return blockDepth;
   }
   
-  public void setZigDepth(double depth)
-  throws ChangeVetoException {
-    if(hasListeners()) {
-      ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
-      synchronized(cs) {
-        ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.LAYOUT);
-        cs.firePreChangeEvent(ce);
-        this.zigDepth = depth;
-        cs.firePostChangeEvent(ce);
-      }
-    } else {
-      this.zigDepth = depth;
-    }
-  }
-  
-  public double getZigDepth() {
-    return zigDepth;
-  }
-  
   public double getDepth(SequenceRenderContext src, RangeLocation pos) {
-    return 2.0 * zigDepth + blockDepth + 1.0;
+    return blockDepth + 1.0;
   }
   
   public void renderFeature(
@@ -157,12 +137,12 @@ implements FeatureRenderer, java.io.Serializable {
     double max = context.sequenceToGraphics(loc.getMax()+1);
     if(context.getDirection() == context.HORIZONTAL) {
       block.setFrame(
-        min, zigDepth,
+        min, 0.0,
         max - min, blockDepth
       );
     } else {
       block.setFrame(
-        zigDepth, min,
+        0.0, min,
         blockDepth, max - min
       );
     }
@@ -184,6 +164,7 @@ implements FeatureRenderer, java.io.Serializable {
     Point2D startP;
     Point2D midP;
     Point2D endP;
+    double half = blockDepth * 0.5;
     if(context.getDirection() == context.HORIZONTAL) {
       if(
         (f instanceof StrandedFeature) &&
@@ -192,16 +173,16 @@ implements FeatureRenderer, java.io.Serializable {
         double start = context.sequenceToGraphics(dest.getMin());
         double end = context.sequenceToGraphics(source.getMax()+1);
         double mid = (start + end) * 0.5;
-        startP = new Point2D.Double(start, zigDepth + blockDepth);
-        midP   = new Point2D.Double(mid,   zigDepth + blockDepth + zigDepth);
-        endP   = new Point2D.Double(end,   zigDepth + blockDepth);
+        startP = new Point2D.Double(start, half);
+        midP   = new Point2D.Double(mid,   blockDepth);
+        endP   = new Point2D.Double(end,   half);
       } else {
         double start = context.sequenceToGraphics(source.getMax());
         double end = context.sequenceToGraphics(dest.getMin()+1);
         double mid = (start + end) * 0.5;
-        startP = new Point2D.Double(start, zigDepth);
+        startP = new Point2D.Double(start, half);
         midP   = new Point2D.Double(mid,   0.0);
-        endP   = new Point2D.Double(end,   zigDepth);
+        endP   = new Point2D.Double(end,   half);
       }
     } else {
       if(
@@ -211,18 +192,19 @@ implements FeatureRenderer, java.io.Serializable {
         double start = context.sequenceToGraphics(dest.getMin());
         double end = context.sequenceToGraphics(source.getMax()+1);
         double mid = (start + end) * 0.5;
-        startP = new Point2D.Double(zigDepth + blockDepth,              start);
-        midP   = new Point2D.Double(zigDepth + blockDepth + zigDepth,   mid);
-        endP   = new Point2D.Double(zigDepth + blockDepth,              end);
+        startP = new Point2D.Double(half,       start);
+        midP   = new Point2D.Double(blockDepth, mid);
+        endP   = new Point2D.Double(half,       end);
       } else {
         double start = context.sequenceToGraphics(source.getMax());
         double end = context.sequenceToGraphics(dest.getMin()+1);
         double mid = (start + end) * 0.5;
-        startP = new Point2D.Double(zigDepth, start);
-        midP   = new Point2D.Double(0.0,      mid);
-        endP   = new Point2D.Double(zigDepth, end);
+        startP = new Point2D.Double(half, start);
+        midP   = new Point2D.Double(0.0,  mid);
+        endP   = new Point2D.Double(half, end);
       }
     }
+    g.setPaint(getOutline());
     line.setLine(startP, midP);
     g.draw(line);
     line.setLine(midP, endP);

@@ -56,7 +56,8 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
       int direction = sp.getDirection();
       
       g.setFont(sp.getFont());
-      Rectangle2D clip = g.getClipBounds();
+      Rectangle2D oldClip = g.getClipBounds();
+      AffineTransform oldTrans = g.getTransform();
       
       g.setColor(Color.black);
       
@@ -79,29 +80,61 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
         
         int leading;
         int trailing;
+        int symOffset = pos.getMin();
+        double graphOffset = sp.graphicsToSequence(symOffset);
         if(sp.getDirection() == sp.HORIZONTAL) {
-          leading = sp.graphicsToSequence(clip.getMinX());
-          trailing = sp.graphicsToSequence(clip.getMaxX());
+          leading = sp.graphicsToSequence(oldClip.getMinX());
+          trailing = sp.graphicsToSequence(oldClip.getMaxX());
+          g.translate(-graphOffset, 0.0);
+          g.setClip(AffineTransform.getTranslateInstance(-graphOffset, 0.0)
+            .createTransformedShape(oldClip));
         } else {
-          leading = sp.graphicsToSequence(clip.getMinY());
-          trailing = sp.graphicsToSequence(clip.getMaxY());
+          leading = sp.graphicsToSequence(oldClip.getMinY());
+          trailing = sp.graphicsToSequence(oldClip.getMaxY());
+          g.translate(0.0, -graphOffset);
+          g.setClip(AffineTransform.getTranslateInstance(0.0, -graphOffset)
+            .createTransformedShape(oldClip));
         }
+        Rectangle2D clip = g.getClipBounds();
+        
         int min = Math.max(pos.getMin(), leading);
         int max = Math.min(pos.getMax(), trailing+1);
         
+        System.out.println("oldTrans: " + oldTrans);
+        System.out.println("pos: " + pos);
+        System.out.println("symOffset: " + symOffset);
+        System.out.println("leading: " + leading);
+        System.out.println("trailing: " + trailing);
+        System.out.println("min: " + min);
+        System.out.println("max: " + max);
+        System.out.println("-");
+        
         for (int sPos = min; sPos <= max; ++sPos) {
-          double gPos = sp.sequenceToGraphics(sPos);
+          double gPos = sp.sequenceToGraphics(sPos - symOffset);
           char c = seq.symbolAt(sPos).getToken();
           if (direction == SequencePanel.HORIZONTAL) {
             //charBox.x = gPos;
-            g.drawString("" + c, (int) (gPos + fudgeAcross), (int) fudgeDown);
+            //g.drawString(
+            //  String.valueOf(c),
+            //  (int) (gPos + fudgeAcross), (int) fudgeDown
+            //);
+            g.drawString(
+              String.valueOf(sPos).substring(0, 1),
+              (int) (gPos + fudgeAcross), (int) fudgeDown
+            );
           } else {
             //charBox.y = gPos;
-            g.drawString("" + c, (int) fudgeAcross, (int) (gPos + fudgeDown));
+            g.drawString(
+              String.valueOf(c),
+              (int) fudgeAcross, (int) (gPos + fudgeDown)
+            );
           }
           //g.draw(charBox);
         }
       }
+      
+      g.setTransform(oldTrans);
+      g.setClip(oldClip);
     }
   
   public SequenceViewerEvent processMouseEvent(
