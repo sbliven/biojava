@@ -70,9 +70,9 @@ public class SimpleSeqSimilaritySearchSubHit
      * @param score a <code>double</code> value; the score of the
      * subhit, which may not be NaN.
      * @param eValue a <code>double</code> the E-value of the
-     * subhit, which may not be NaN.
+     * subhit, which may be NaN.
      * @param pValue a <code>double</code> value; the P-value of the
-     * hit, which may not be NaN.
+     * hit, which may be NaN.
      * @param alignment an <code>Alignment</code> object containing
      * the alignment described by the subhit region, which may not be
      * null.
