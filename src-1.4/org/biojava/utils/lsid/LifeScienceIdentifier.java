@@ -28,15 +28,16 @@ import java.io.Serializable;
  *
  * LSID syntax:
  * <p>
- * <authority>:<namespace>:<value>:<version>:<security>
+ * &lt;authority&gt;:&lt;namespace&gt;:&lt;value&gt;:&lt;version&gt;:&lt;security&gt;
  * <p>
  * The elements of a LSID are as follows:
  * <ul>
- * <li>authority = <authority> identifies the organization
- * <li>namespace = <namespace> namespace to scope the identifier value
- * <li>object_id = <object_id> identifier of the object within namespace
- * <li>version = <version> optional version information
- * <li>security = <security> optional security information
+ * <li>authority = &lt;authority&gt; identifies the organization
+ * <li>namespace = &lt;namespace&gt; namespace to scope the identifier value
+ * <li>object_id = &lt;object_id&gt; identifier of the object within namespace
+ * <li>version = &lt;version&gt; optional version information
+ * <li>security = &lt;security&gt; optional security information
+ * </ul>
  */
 public  interface LifeScienceIdentifier
     extends Immutable, Serializable {
