@@ -32,9 +32,11 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.db.HashSequenceDB;
 import org.biojava.bio.seq.db.SequenceDB;
-import org.biojava.bio.seq.io.TokenParser;
+import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.AlphabetManager;
 
 /**
  * <code>SequenceDBSearchResultTest</code> tests the behaviour of
@@ -63,9 +65,9 @@ public class SequenceDBSearchResultTest extends TestCase
         database   = new HashSequenceDB("test");
         parameters = new HashMap();
 
-        TokenParser tp = new TokenParser(ProteinTools.getAlphabet());
+        SymbolTokenization tp = ProteinTools.getAlphabet().getTokenization("token");
 
-        query = tp.parse(querySeqTokens);
+        query = new SimpleSymbolList(tp, querySeqTokens);
 
         r1 = new SequenceDBSearchResult(database,
                                         parameters,

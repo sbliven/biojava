@@ -39,8 +39,9 @@ import org.biojava.bio.seq.io.FastaFormat;
 import org.biojava.bio.seq.io.SequenceBuilderFactory;
 import org.biojava.bio.seq.io.SequenceFormat;
 import org.biojava.bio.seq.io.SimpleSequenceBuilder;
-import org.biojava.bio.seq.io.SymbolParser;
+import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.AlphabetManager;
 
 /**
  * <code>EmblCDROMIndexStoreTest</code> contains unit tests for EMBL
@@ -53,7 +54,7 @@ public class EmblCDROMIndexStoreTest extends TestCase
 {
     protected SequenceFormat         format;
     protected Alphabet               alpha;
-    protected SymbolParser           parser;
+    protected SymbolTokenization     parser;
     protected SequenceBuilderFactory factory;
 
     protected IndexStore emblCDIndexStore;
@@ -73,7 +74,7 @@ public class EmblCDROMIndexStoreTest extends TestCase
 
         format  = new FastaFormat();
         alpha   = ProteinTools.getAlphabet();
-        parser  = alpha.getParser("token");
+        parser  = alpha.getTokenization("token");
         factory =
             new FastaDescriptionLineParser.Factory(SimpleSequenceBuilder.FACTORY);
 

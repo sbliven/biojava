@@ -77,7 +77,6 @@ public class SimpleAssemblyTest extends TestCase
     public void testAssembledSymbols()
 	throws Exception
     {
-	System.err.println(assembly.seqString());
 	assertTrue(compareSymbolList(assembly,
 				     DNATools.createDNA("acgtngcatcaa")));
 	assertTrue(compareSymbolList(assembly.subList(1,4),

@@ -32,10 +32,12 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.bio.seq.io.TokenParser;
+import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleAlignment;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.AlphabetManager;
 
 /**
  * <code>SequenceDBSearchHitTest</code> tests the behaviour of
@@ -78,21 +80,21 @@ public class SequenceDBSearchHitTest extends TestCase
 
     protected void setUp() throws Exception
     {
-         TokenParser tp = new TokenParser(ProteinTools.getAlphabet());
+	SymbolTokenization tp = ProteinTools.getAlphabet().getTokenization("token");
 
          Map labelMap1 = new HashMap();
          labelMap1.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
-                       tp.parse(querySeqTokens));
+                       new SimpleSymbolList(tp, querySeqTokens));
          labelMap1.put(subjectSeqID,
-                       tp.parse(subjectSeqTokens));
+                       new SimpleSymbolList(tp, subjectSeqTokens));
 
          al1 = new SimpleAlignment(labelMap1);
 
          Map labelMap2 = new HashMap();
          labelMap2.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
-                       tp.parse(querySeqTokens));
+                       new SimpleSymbolList(tp, querySeqTokens));
          labelMap2.put(subjectSeqID,
-                       tp.parse(subjectSeqTokens));
+                       new SimpleSymbolList(tp, subjectSeqTokens));
 
          al2 = new SimpleAlignment(labelMap2);
 
