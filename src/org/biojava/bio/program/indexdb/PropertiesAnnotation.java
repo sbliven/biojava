@@ -25,6 +25,7 @@ import java.io.*;
 import java.util.*;
 
 import org.biojava.bio.*;
+import org.biojava.utils.Commitable;
 
 /**
  * <code>PropertiesAnnotation</code> creates an
