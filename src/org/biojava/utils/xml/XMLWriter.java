@@ -122,4 +122,12 @@ public interface XMLWriter {
      */
      
     public void declareNamespace(String nsURI, String prefixHint) throws IOException;
+    
+    /**
+     * Close this XMLWriter, and it's underlying stream.
+     *
+     * @since 1.4
+     */
+    
+    public void close() throws IOException;
 }

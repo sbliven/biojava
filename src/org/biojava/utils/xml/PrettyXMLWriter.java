@@ -310,4 +310,10 @@ public class PrettyXMLWriter implements XMLWriter {
 	writer.print((int) c);
 	writer.print(';');
     }
+    
+    public void close()
+        throws IOException
+    {
+        writer.close();
+    }
 }
