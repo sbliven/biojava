@@ -48,7 +48,8 @@ import org.biojava.bio.symbol.*;
  *
  * @since 1.3
  * @author Matthew Pocock
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a> (docs).
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a> (docs)
+ * @author Thomas Down
  *
  * @for.powerUser
  * Comparing types and annotations. For example, FilterTools uses these methods
@@ -253,8 +254,20 @@ public final class AnnotationTools {
         (pc2 instanceof PropertyConstraint.Enumeration ||
          pc2 instanceof PropertyConstraint.ExactValue)
       ) {
-        // they are iterated value types, but we know they are disjoint
-        return PropertyConstraint.NONE;
+        if (pc1 instanceof PropertyConstraint.Enumeration && pc2 instanceof PropertyConstraint.Enumeration) {
+            Set intersection = new HashSet(((PropertyConstraint.Enumeration) pc1).getValues());
+            intersection.retainAll(((PropertyConstraint.Enumeration) pc2).getValues());
+            if (intersection.size() == 0) {
+                return PropertyConstraint.NONE;
+            } else if (intersection.size() == 1) {
+                return new PropertyConstraint.ExactValue(intersection.iterator().next());
+            } else {
+                return new PropertyConstraint.Enumeration(intersection);
+            }
+        } else {
+            // This case already handled by subset/superset logic
+            return PropertyConstraint.NONE;
+        }
       } else if(
         (pc1 instanceof PropertyConstraint.ByAnnotationType &&
          !(pc2 instanceof PropertyConstraint.ByAnnotationType)) ||
