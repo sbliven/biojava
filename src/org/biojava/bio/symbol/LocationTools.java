@@ -45,6 +45,7 @@ import org.biojava.bio.BioException;
  * @author Greg Cox
  * @author Thomas Down
  * @author Mark Schreiber
+ * @author Francois Pepin
  * @since 1.2
  */
 final public class LocationTools {

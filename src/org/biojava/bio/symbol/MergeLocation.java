@@ -43,6 +43,7 @@ import org.biojava.bio.BioException;
  * <p>Copyright: Copyright (c) 2002</p>
  * <p>Company: AgResearch</p>
  * @author Mark Schreiber
+ * @author Francois Pepin
  * @version 1.0
  */
 
