@@ -23,10 +23,17 @@ package org.biojava.directory;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
+/**
+ * <code>OBDARegistryParserTest</code> tests that registry config
+ * files are correctly parsed.
+ *
+ * @author Keith James
+ */
 public class OBDARegistryParserTest extends TestCase
 {
     public OBDARegistryParserTest(String name)
@@ -58,11 +65,21 @@ public class OBDARegistryParserTest extends TestCase
         assertTrue(conf.containsKey("databank_0"));
         assertTrue(conf.containsKey("databank_1"));
 
-        Map dbConfig = (Map) conf.get("databank_0");
+        List dbConfigs = (List) conf.get("databank_0");
+        assertEquals(1, dbConfigs.size());
+ 
+        Map dbConfig = (Map) dbConfigs.get(0);
         assertEquals("<protocol-type 0>", dbConfig.get("protocol"));
         assertEquals("<location-string 0>", dbConfig.get("location"));
 
-        dbConfig = (Map) conf.get("databank_1");
+        dbConfigs = (List) conf.get("databank_1");
+        assertEquals(2, dbConfigs.size());
+
+        dbConfig = (Map) dbConfigs.get(0);
+        assertEquals("<protocol-type 1a>", dbConfig.get("protocol"));
+        assertEquals("<location-string 1a>", dbConfig.get("location"));
+
+        dbConfig = (Map) dbConfigs.get(1);
         assertEquals("<protocol-type 1b>", dbConfig.get("protocol"));
         assertEquals("<location-string 1b>", dbConfig.get("location"));
     }

@@ -22,6 +22,7 @@
 package org.biojava.directory;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.biojava.bio.BioException;
@@ -31,8 +32,8 @@ import org.biojava.utils.Services;
 
 /**
  * <p><code>Registry</code> is a factory which gets implementations of
- * the BioJava <code>SequenceDB</code> interface. This is the point of
- * entry for OBDA access.</p>
+ * the BioJava <code>SequenceDBLite</code> interface. This is the
+ * point of entry for OBDA access.</p>
  *
  * @author Brian Gilman
  * @author Thomas Down
@@ -72,27 +73,42 @@ public class Registry {
     public SequenceDBLite getDatabase(String dbName)
         throws RegistryException, BioException {
 
-        Map dbConfig = null;
         String providerName = "";
 
-        dbConfig =
-            (Map) getRegistryConfiguration().getConfiguration().get(dbName);
+        List dbConfigs =
+            (List) getRegistryConfiguration().getConfiguration().get(dbName);
 
-        if (dbConfig == null) {
-            throw new RegistryException("Couldn't find a configuration"
+        if (dbConfigs == null) {
+            throw new RegistryException("Failed to find a configuration"
                                         + " for database: "
                                         + dbName);
         }
 
-        try {
+        for (Iterator ci = dbConfigs.iterator(); ci.hasNext();) {
+            Map dbConfig = (Map) ci.next();
             providerName = (String) dbConfig.get("protocol");
-        } catch (Exception e) {
-            throw new RegistryException("File for configuration "
-                                        + " cannot be found: "
-                                        + e.toString());
+
+            SequenceDBLite db = null;
+            try {
+                db = getProvider(providerName).getSequenceDB(dbConfig);
+            } catch (RegistryException re) {
+                // We allow RegistryExceptions to cause a fallback to
+                // an alternative provider in the same config
+                continue;
+            }
+            catch (Exception e) {
+                // But more serious exceptions cause a failure
+                throw new RegistryException("Failed to configure database "
+                                            + dbName);
+            }
+
+            if (db != null)
+                return db;
         }
 
-        return getProvider(providerName).getSequenceDB(dbConfig);
+        throw new RegistryException("Failed to find a configuration"
+                                    + " for database: "
+                                    + dbName);
     }
 
     private SequenceDBProvider getProvider(String providerName)

@@ -41,6 +41,11 @@ import junit.framework.TestCase;
 public class SeqIOToolsTest extends TestCase
 {
 
+    public SeqIOToolsTest(String name)
+    {
+        super(name);
+    }
+
     private boolean compareSymbolLists(SymbolList sl0, SymbolList sl1)
     {
         // compare lengths
@@ -259,6 +264,61 @@ public class SeqIOToolsTest extends TestCase
 
         // compare with fasta reference
         assertTrue(compareSymbolLists(bigFastaDNASeq, bigGenbankDNASeq));      
+    }
+
+    public void testIdentifyFormat()
+    {
+        // Test formats which may be in any alphabet
+        String [] formats = new String [] { "raw", "fasta",
+                                            "nbrf", "ig",
+                                            "embl", "genbank",
+                                            "refseq", "gcg",
+                                            "gff" };
+
+        int [] formatIds = new int [] { SeqIOConstants.RAW, SeqIOConstants.FASTA,
+                                        SeqIOConstants.NBRF, SeqIOConstants.IG,
+                                        SeqIOConstants.EMBL, SeqIOConstants.GENBANK,
+                                        SeqIOConstants.REFSEQ, SeqIOConstants.GCG,
+                                        SeqIOConstants.GFF };
+
+        String [] alphas = new String [] { "dna", "rna",
+                                           "aa", "protein" };
+
+        int [] alphaIds = new int [] { SeqIOConstants.DNA, SeqIOConstants.RNA,
+                                       SeqIOConstants.AA, SeqIOConstants.AA };
+
+        for (int i = 0; i < formats.length; i++)
+        {
+            for (int j = 0; j < alphas.length; j++)
+            {
+                assertEquals((formatIds[i] | alphaIds[j]),
+                             SeqIOTools.identifyFormat(formats[i], alphas[j]));
+            }
+        }
+
+        // Test formats which throw exceptions unless in a specific
+        // alphabet
+        assertEquals(SeqIOConstants.SWISSPROT,
+                     SeqIOTools.identifyFormat("swissprot", "protein"));
+        assertEquals(SeqIOConstants.SWISSPROT,
+                     SeqIOTools.identifyFormat("swissprot", "aa"));
+        assertEquals(SeqIOConstants.SWISSPROT,
+                     SeqIOTools.identifyFormat("swiss", "protein"));
+        assertEquals(SeqIOConstants.SWISSPROT,
+                     SeqIOTools.identifyFormat("swiss", "aa"));
+
+        assertEquals(SeqIOConstants.GENPEPT,
+                     SeqIOTools.identifyFormat("genpept", "protein"));
+        assertEquals(SeqIOConstants.GENPEPT,
+                     SeqIOTools.identifyFormat("genpept", "aa"));
+
+        assertEquals(SeqIOConstants.PDB,
+                     SeqIOTools.identifyFormat("pdb", "protein"));
+        assertEquals(SeqIOConstants.PDB,
+                     SeqIOTools.identifyFormat("pdb", "aa"));
+
+        assertEquals(SeqIOConstants.PHRED,
+                     SeqIOTools.identifyFormat("phred", "dna"));
     }
 
     // creates a suite

@@ -391,7 +391,11 @@ public final class SeqIOTools  {
      * 'protein', 'aa') to an integer. The value returned will be one
      * of the public static final fields in
      * <code>SeqIOConstants</code>, or a bitwise-or combination of
-     * them.
+     * them. The method will reject known illegal combinations of
+     * format and alphabet (such as swissprot + dna) by throwing an
+     * <code>IllegalArgumentException</code>. It will return the
+     * <code>SeqIOConstants.UNKNOWN</code> value when either format or
+     * alphabet are unknown.
      *
      * @param formatName a <code>String</code>.
      * @param alphabetName a <code>String</code>.
@@ -400,45 +404,88 @@ public final class SeqIOTools  {
      */
     public static int identifyFormat(String formatName, String alphabetName) {
         int format, alpha;
-        if (formatName.equalsIgnoreCase("raw"))
+        if (formatName.equalsIgnoreCase("raw")) {
             format = SeqIOConstants.RAW;
-        else if (formatName.equalsIgnoreCase("fasta"))
+        }
+        else if (formatName.equalsIgnoreCase("fasta")) {
             format = SeqIOConstants.FASTA;
-        else if (formatName.equalsIgnoreCase("nbrf"))
+        }
+        else if (formatName.equalsIgnoreCase("nbrf")) {
             format = SeqIOConstants.NBRF;
-        else if (formatName.equalsIgnoreCase("ig"))
+        }
+        else if (formatName.equalsIgnoreCase("ig")) {
             format = SeqIOConstants.IG;
-        else if (formatName.equalsIgnoreCase("embl"))
+        }
+        else if (formatName.equalsIgnoreCase("embl")) {
             format = SeqIOConstants.EMBL;
+        }
         else if (formatName.equalsIgnoreCase("swissprot") ||
-                 formatName.equalsIgnoreCase("swiss"))
-            return SeqIOConstants.SWISSPROT;
-        else if (formatName.equalsIgnoreCase("genbank"))
+                 formatName.equalsIgnoreCase("swiss")) {
+            if (alphabetName.equalsIgnoreCase("aa") ||
+                alphabetName.equalsIgnoreCase("protein")) {
+                return SeqIOConstants.SWISSPROT;
+            } else {
+                throw new IllegalArgumentException("Illegal format and alphabet "
+                                                   + "combination "
+                                                   + formatName
+                                                   + " + "
+                                                   + alphabetName);
+            }
+        } else if (formatName.equalsIgnoreCase("genbank")) {
             format = SeqIOConstants.GENBANK;
-        else if (formatName.equalsIgnoreCase("genpept"))
-            return SeqIOConstants.GENPEPT;
-        else if (formatName.equalsIgnoreCase("refseq"))
+        } else if (formatName.equalsIgnoreCase("genpept")) {
+            if (alphabetName.equalsIgnoreCase("aa") ||
+                alphabetName.equalsIgnoreCase("protein")) {
+                return SeqIOConstants.GENPEPT;
+            } else {
+                throw new IllegalArgumentException("Illegal format and alphabet "
+                                                   + "combination "
+                                                   + formatName
+                                                   + " + "
+                                                   + alphabetName);
+            }
+        } else if (formatName.equalsIgnoreCase("refseq")) {
             format = SeqIOConstants.REFSEQ;
-        else if (formatName.equalsIgnoreCase("gcg"))
+        } else if (formatName.equalsIgnoreCase("gcg")) {
             format = SeqIOConstants.GCG;
-        else if (formatName.equalsIgnoreCase("gff"))
+        } else if (formatName.equalsIgnoreCase("gff")) {
             format = SeqIOConstants.GFF;
-        else if (formatName.equalsIgnoreCase("pdb"))
-            return SeqIOConstants.PDB;
-        else if (formatName.equalsIgnoreCase("phred"))
-            return SeqIOConstants.PHRED;
-        else
+        }
+        else if (formatName.equalsIgnoreCase("pdb")) {
+            if (alphabetName.equalsIgnoreCase("aa") ||
+                alphabetName.equalsIgnoreCase("protein")) {
+                return SeqIOConstants.PDB;
+            } else {
+                throw new IllegalArgumentException("Illegal format and alphabet "
+                                                   + "combination "
+                                                   + formatName
+                                                   + " + "
+                                                   + alphabetName);
+            }
+        } else if (formatName.equalsIgnoreCase("phred")) {
+            if (alphabetName.equalsIgnoreCase("dna")) {
+                return SeqIOConstants.PHRED;
+            } else {
+                throw new IllegalArgumentException("Illegal format and alphabet "
+                                                   + "combination "
+                                                   + formatName
+                                                   + " + "
+                                                   + alphabetName);
+            }
+        } else {
             return SeqIOConstants.UNKNOWN;
+        }
 
-        if (alphabetName.equalsIgnoreCase("dna"))
+        if (alphabetName.equalsIgnoreCase("dna")) {
             alpha = SeqIOConstants.DNA;
-        else if (alphabetName.equalsIgnoreCase("rna"))
+        } else if (alphabetName.equalsIgnoreCase("rna")) {
             alpha = SeqIOConstants.RNA;
-        else if (alphabetName.equalsIgnoreCase("aa") ||
-                 alphabetName.equalsIgnoreCase("protein"))
+        } else if (alphabetName.equalsIgnoreCase("aa") ||
+                 alphabetName.equalsIgnoreCase("protein")) {
             alpha = SeqIOConstants.AA;
-        else
+        } else {
             return SeqIOConstants.UNKNOWN;
+        }
 
         return (format | alpha);
     }
@@ -458,23 +505,33 @@ public final class SeqIOTools  {
      */
     public static SequenceFormat getSequenceFormat(int identifier)
         throws BioException {
+
+        // Mask the sequence format bytes
+        int alphaType = identifier & (~ 0xffff);
+        if (alphaType == 0)
+            throw new IllegalArgumentException("No alphabet was set in the identifier");
+
+        // Mask alphabet bytes
+        int formatType = identifier & (~ 0xffff0000);
+        if (formatType == 0)
+            throw new IllegalArgumentException("No format was set in the identifier");
+
         switch (identifier) {
             case SeqIOConstants.FASTA_DNA:
             case SeqIOConstants.FASTA_RNA:
             case SeqIOConstants.FASTA_AA:
                 return new FastaFormat();
-            case SeqIOConstants.EMBL:
             case SeqIOConstants.EMBL_DNA:
             case SeqIOConstants.EMBL_RNA:
                 return new EmblLikeFormat();
-            case SeqIOConstants.GENBANK:
             case SeqIOConstants.GENBANK_DNA:
             case SeqIOConstants.GENBANK_RNA:
                 return new GenbankFormat();
             case SeqIOConstants.SWISSPROT:
                 return new EmblLikeFormat();
             default:
-                throw new BioException("Unknown file type '"
+                throw new BioException("No SequenceFormat available for "
+                                       + "format/alphabet identifier '"
                                        + identifier
                                        + "'");
         }
@@ -495,15 +552,24 @@ public final class SeqIOTools  {
      */
     public static SequenceBuilderFactory getBuilderFactory(int identifier)
         throws BioException {
+
+        // Mask the sequence format bytes
+        int alphaType = identifier & (~ 0xffff);
+        if (alphaType == 0)
+            throw new IllegalArgumentException("No alphabet was set in the identifier");
+
+        // Mask alphabet bytes
+        int formatType = identifier & (~ 0xffff0000);
+        if (formatType == 0)
+            throw new IllegalArgumentException("No format was set in the identifier");
+
         switch (identifier) {
             case SeqIOConstants.FASTA_DNA:
             case SeqIOConstants.FASTA_RNA:
             case SeqIOConstants.FASTA_AA:
                 return getFastaBuilderFactory();
             case SeqIOConstants.EMBL_DNA:
-            case SeqIOConstants.EMBL:
                     return getEmblBuilderFactory();
-            case SeqIOConstants.GENBANK:
             case SeqIOConstants.GENBANK_DNA:
                 return getGenbankBuilderFactory();
             case SeqIOConstants.SWISSPROT:
@@ -511,7 +577,8 @@ public final class SeqIOTools  {
             case SeqIOConstants.GENPEPT:
                 return getGenpeptBuilderFactory();
             default:
-                throw new BioException("Unknown file type '"
+                throw new BioException("No SequenceBuilderFactory available for "
+                                       + "format/alphabet identifier '"
                                        + identifier
                                        + "'");
         }
@@ -532,8 +599,16 @@ public final class SeqIOTools  {
      */
     public static FiniteAlphabet getAlphabet(int identifier)
         throws BioException {
+
         // Mask the sequence format bytes
         int alphaType = identifier & (~ 0xffff);
+        if (alphaType == 0)
+            throw new IllegalArgumentException("No alphabet was set in the identifier");
+
+        // Mask alphabet bytes
+        int formatType = identifier & (~ 0xffff0000);
+        if (formatType == 0)
+            throw new IllegalArgumentException("No format was set in the identifier");
 
         switch (alphaType) {
             case SeqIOConstants.DNA:
@@ -543,10 +618,9 @@ public final class SeqIOTools  {
             case SeqIOConstants.AA:
                 return ProteinTools.getAlphabet();
             default:
-                throw new BioException("Unknown file type '"
+                throw new BioException("No FiniteAlphabet available for "
+                                       + "alphabet identifier '"
                                        + identifier
-                                       + "' which indicates alphabet type '"
-                                       + alphaType
                                        + "'");
         }
     }
@@ -621,7 +695,7 @@ public final class SeqIOTools  {
                     return SeqIOConstants.SWISSPROT;
                 }
             }
-            return SeqIOConstants.EMBL;
+            return SeqIOConstants.EMBL_DNA;
         }
         else if (line1.toUpperCase().startsWith("LOCUS")) {
             for (int i = 0; i < line1.length(); i++) {
@@ -630,7 +704,7 @@ public final class SeqIOTools  {
                     return SeqIOConstants.GENPEPT;
                 }
             }
-            return SeqIOConstants.GENBANK;
+            return SeqIOConstants.GENBANK_DNA;
         }
         else if (line1.length() >= 45 &&
                  line1.substring(19, 45).equalsIgnoreCase("GENETIC SEQUENCE DATA BANK")) {
@@ -699,8 +773,18 @@ public final class SeqIOTools  {
      */
     public static Object fileToBiojava(int fileType, BufferedReader br)
         throws BioException {
+
+        // Mask the sequence format bytes
+        int alphaType = fileType & (~ 0xffff);
+        if (alphaType == 0)
+            throw new IllegalArgumentException("No alphabet was set in the identifier");
+
+        // Mask alphabet bytes
+        int formatType = fileType & (~ 0xffff0000);
+        if (formatType == 0)
+            throw new IllegalArgumentException("No format was set in the identifier");
+
         switch (fileType) {
-            case AlignIOConstants.MSF:
             case AlignIOConstants.MSF_DNA:
             case AlignIOConstants.MSF_AA:
             case AlignIOConstants.FASTA_DNA:
@@ -708,8 +792,8 @@ public final class SeqIOTools  {
                 return fileToAlign(fileType, br);
             case SeqIOConstants.FASTA_DNA:
             case SeqIOConstants.FASTA_AA:
-            case SeqIOConstants.EMBL:
-            case SeqIOConstants.GENBANK:
+            case SeqIOConstants.EMBL_DNA:
+            case SeqIOConstants.GENBANK_DNA:
             case SeqIOConstants.SWISSPROT:
             case SeqIOConstants.GENPEPT:
                 return fileToSeq(fileType, br);
@@ -733,11 +817,10 @@ public final class SeqIOTools  {
             case AlignIOConstants.FASTA_AA:
                 alignToFile(fileType, os, (Alignment) biojava);
                 break;
-            case SeqIOConstants.FASTA:
             case SeqIOConstants.FASTA_DNA:
             case SeqIOConstants.FASTA_AA:
-            case SeqIOConstants.EMBL:
-            case SeqIOConstants.GENBANK:
+            case SeqIOConstants.EMBL_DNA:
+            case SeqIOConstants.GENBANK_DNA:
             case SeqIOConstants.SWISSPROT:
             case SeqIOConstants.GENPEPT:
                 seqToFile(fileType, os, (SequenceIterator) biojava);
@@ -865,7 +948,6 @@ public final class SeqIOTools  {
     private static Alignment fileToAlign(int fileType, BufferedReader br)
         throws BioException {
         switch(fileType) {
-            case AlignIOConstants.MSF:
             case AlignIOConstants.MSF_DNA:
             case AlignIOConstants.MSF_AA:
                 return (new MSFAlignmentFormat()).read(br);
@@ -890,9 +972,9 @@ public final class SeqIOTools  {
                 return SeqIOTools.readFastaDNA(br);
             case SeqIOConstants.FASTA_AA:
                 return SeqIOTools.readFastaProtein(br);
-            case SeqIOConstants.EMBL:
+            case SeqIOConstants.EMBL_DNA:
                 return SeqIOTools.readEmbl(br);
-            case SeqIOConstants.GENBANK:
+            case SeqIOConstants.GENBANK_DNA:
                 return SeqIOTools.readGenbank(br);
             case SeqIOConstants.SWISSPROT:
                 return SeqIOTools.readSwissprot(br);
@@ -940,16 +1022,15 @@ public final class SeqIOTools  {
         switch (fileType) {
             case SeqIOConstants.FASTA_DNA:
             case SeqIOConstants.FASTA_AA:
-            case SeqIOConstants.FASTA:
                 SeqIOTools.writeFasta(os, seq);
                 break;
-            case SeqIOConstants.EMBL:
+            case SeqIOConstants.EMBL_DNA:
                 SeqIOTools.writeEmbl(os, seq);
                 break;
             case SeqIOConstants.SWISSPROT:
                 SeqIOTools.writeSwissprot(os, seq);
                 break;
-            case SeqIOConstants.GENBANK:
+            case SeqIOConstants.GENBANK_DNA:
                 SeqIOTools.writeGenbank(os, seq);
                 break;
             case SeqIOConstants.GENPEPT:

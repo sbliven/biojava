@@ -28,6 +28,16 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+/**
+ * <code>RegistryConfigurationTest</code> tests basic behaviour of
+ * <code>RegistryConfiguration</code>s. Note that the OBDA
+ * implementation maps a database identifier string to a
+ * <code>List</code> of <code>Map</code>s which acts as a sequence of
+ * fallback mappings. The test maps the database identifier string
+ * directly to config <code>Map</code>s for simplicity.
+ *
+ * @author Keith James
+ */
 public class RegistryConfigurationTest extends TestCase
 {
     protected Map confParams0;
@@ -60,8 +70,8 @@ public class RegistryConfigurationTest extends TestCase
         confParams2.put("parameter-x", "<value 2>");
 
         locator0 = "<locator0>";
-        locator0 = "<locator1>";
-        locator0 = "<locator2>";
+        locator1 = "<locator1>";
+        locator2 = "<locator2>";
     }
 
     public void testSimpleRegistry() throws Exception

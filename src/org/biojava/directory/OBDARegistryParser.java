@@ -23,8 +23,10 @@ package org.biojava.directory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -75,12 +77,21 @@ public class OBDARegistryParser {
                 if (line.indexOf("[") > -1) {
                     dbName = line.substring(1, line.indexOf("]"));
                     currentDB = new HashMap();
-                    //instantiate new hashtable for this tag
-                    config.put(dbName, currentDB);
+
+                    // Create a List of Maps through which we can fall
+                    // back if the first does not work
+                    if (config.containsKey(dbName)) {
+                        ((List) config.get(dbName)).add(currentDB);
+                    } else {
+                        List fallbacks = new ArrayList();
+                        fallbacks.add(currentDB);
+                        config.put(dbName, fallbacks);
+                    }
+
                 } else {
                     StringTokenizer strTok = new StringTokenizer(line, "=");
-                    //here we assume that there are only key = value
-                    //pairs in the config file
+                    // Here we assume that there are only key = value
+                    // pairs in the config file
                     key = strTok.nextToken();
                     if (strTok.hasMoreTokens()) {
                         value = strTok.nextToken();

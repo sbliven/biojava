@@ -40,12 +40,7 @@ import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.RNATools;
 import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.seq.io.FastaFormat;
-import org.biojava.bio.seq.io.SeqIOAdapter;
-import org.biojava.bio.seq.io.SequenceBuilder;
-import org.biojava.bio.seq.io.SequenceBuilderFactory;
-import org.biojava.bio.seq.io.StreamReader;
-import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.seq.io.*;
 import org.biojava.utils.NestedException;
 import org.biojava.utils.ParserException;
 import org.biojava.utils.io.CountedBufferedReader;
@@ -64,83 +59,170 @@ public class IndexTools
     // Cannot be instantiated
     private IndexTools() { }
 
-    public static void indexFastaDNA(File location, File [] seqFiles)
+    /**
+     * <code>indexFasta</code> indexes DNA, RNA or protein Fasta
+     * format sequence files on primary identifier.
+     *
+     * @param location a <code>File</code> directory which will
+     * contain the indices.
+     * @param seqFiles a <code>File []</code> array of files to index.
+     * @param alphabetIdentifier an <code>int</code> indicating the
+     * type of sequence to be indexed. May be one of
+     * <code>SeqIOConstants.DNA SeqIOConstants.RNA
+     * SeqIOConstants.AA</code>.
+     * @exception FileNotFoundException if an error occurs.
+     * @exception IOException if an error occurs.
+     * @exception ParserException if an error occurs.
+     * @exception BioException if an error occurs.
+     */
+    public static void indexFasta(File location, File [] seqFiles,
+                                  int alphabetIdentifier)
         throws FileNotFoundException, IOException, ParserException,
                BioException
     {
         BioStoreFactory bsf = new BioStoreFactory();
-        bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
-                                                            "fasta",
-                                                            "dna" ));
-        indexFasta(bsf, location, seqFiles);
+
+        switch (alphabetIdentifier)
+        {
+            case (SeqIOConstants.DNA):
+                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
+                                                                    "fasta",
+                                                                    "dna" ));
+                break;
+            case (SeqIOConstants.RNA):
+                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
+                                                                    "fasta",
+                                                                    "rna" ));
+                break;
+            case (SeqIOConstants.AA):
+                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
+                                                                    "fasta",
+                                                                    "protein" ));
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unknown alphabet identifier '"
+                                                   + alphabetIdentifier
+                                                   + "'");
+        }
+
+        _indexFasta(bsf, location, seqFiles);
     }
 
-    public static void indexFastaRNA(File location, File [] seqFiles)
+    /**
+     * <code>indexEmbl</code> indexes DNA, RNA or protein EMBL format
+     * sequence files on ID as primary identifier and AC as secondary.
+     *
+     * @param location a <code>File</code> directory which will
+     * contain the indices.
+     * @param seqFiles a <code>File []</code> array of files to index.
+     * @param alphabetIdentifier an <code>int</code> indicating the
+     * type of sequence to be indexed. May be one of
+     * <code>SeqIOConstants.DNA SeqIOConstants.RNA
+     * SeqIOConstants.AA</code>.
+     * @exception FileNotFoundException if an error occurs.
+     * @exception IOException if an error occurs.
+     * @exception ParserException if an error occurs.
+     * @exception BioException if an error occurs.
+     */
+    public static void indexEmbl(File location, File [] seqFiles,
+                                 int alphabetIdentifier)
         throws FileNotFoundException, IOException, ParserException,
                BioException
     {
         BioStoreFactory bsf = new BioStoreFactory();
-        bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
-                                                            "fasta",
-                                                            "rna" ));
-        indexFasta(bsf, location, seqFiles);
+
+        switch (alphabetIdentifier)
+        {
+            case (SeqIOConstants.DNA):
+                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
+                                                                    "embl",
+                                                                    "dna" ));
+                break;
+            case (SeqIOConstants.RNA):
+                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
+                                                                    "embl",
+                                                                    "rna" ));
+                break;
+            case (SeqIOConstants.AA):
+                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
+                                                                    "embl",
+                                                                    "protein" ));
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unknown alphabet identifier '"
+                                                   + alphabetIdentifier
+                                                   + "'");
+        }
+
+        _indexEmblLike(bsf, location, seqFiles);
     }
 
-    public static void indexFastaProtein(File location, File [] seqFiles)
+    /**
+     * <code>indexGenbank</code> indexes DNA, RNA or protein Genbank
+     * format sequence files on LOCUS as primary identifier and
+     * ACCESSION as secondary.
+     *
+     * @param location a <code>File</code> directory which will
+     * contain the indices.
+     * @param seqFiles a <code>File []</code> array of files to index.
+     * @param alphabetIdentifier an <code>int</code> indicating the
+     * type of sequence to be indexed. May be one of
+     * <code>SeqIOConstants.DNA SeqIOConstants.RNA
+     * SeqIOConstants.AA</code>.
+     * @exception FileNotFoundException if an error occurs.
+     * @exception IOException if an error occurs.
+     * @exception ParserException if an error occurs.
+     * @exception BioException if an error occurs.
+     */
+    public static void indexGenbank(File location, File [] seqFiles,
+                                    int alphabetIdentifier)
         throws FileNotFoundException, IOException, ParserException,
                BioException
     {
         BioStoreFactory bsf = new BioStoreFactory();
-        bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
-                                                            "fasta",
-                                                            "protein" ));
-        indexFasta(bsf, location, seqFiles);
+
+        switch (alphabetIdentifier)
+        {
+            case (SeqIOConstants.DNA):
+                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
+                                                                    "genbank",
+                                                                    "dna" ));
+                break;
+            case (SeqIOConstants.RNA):
+                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
+                                                                    "genbank",
+                                                                    "rna" ));
+                break;
+            case (SeqIOConstants.AA):
+                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
+                                                                    "genbank",
+                                                                    "protein" ));
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unknown alphabet identifier '"
+                                                   + alphabetIdentifier
+                                                   + "'");
+        }
+
+        _indexGenbank(bsf, location, seqFiles);
     }
 
-    public static void indexEmblDNA(File location, File [] seqFiles)
-        throws FileNotFoundException, IOException, ParserException,
-               BioException
-    {
-        BioStoreFactory bsf = new BioStoreFactory();
-        bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
-                                                            "embl",
-                                                            "dna" ));
-        indexEmblLike(bsf, location, seqFiles);
-    }
 
-    public static void indexEmblRNA(File location, File [] seqFiles)
-        throws FileNotFoundException, IOException, ParserException,
-               BioException
-    {
-        BioStoreFactory bsf = new BioStoreFactory();
-        bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
-                                                            "embl",
-                                                            "rna" ));
-        indexEmblLike(bsf, location, seqFiles);
-    }
-
-    public static void indexGenbankDNA(File location, File [] seqFiles)
-        throws FileNotFoundException, IOException, ParserException,
-               BioException
-    {
-        BioStoreFactory bsf = new BioStoreFactory();
-        bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
-                                                            "genbank",
-                                                            "dna" ));
-        indexGenbank(bsf, location, seqFiles);
-    }
-
-    public static void indexGenbankRNA(File location, File [] seqFiles)
-        throws FileNotFoundException, IOException, ParserException,
-               BioException
-    {
-        BioStoreFactory bsf = new BioStoreFactory();
-        bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
-                                                            "genbank",
-                                                            "rna" ));
-        indexGenbank(bsf, location, seqFiles);
-    }
-
+    /**
+     * <code>indexSwissprot</code> indexes Swissprot format protein
+     * sequence files on ID as primary identifier.
+     *
+     * @param location a <code>File</code> directory which will
+     * contain the indices.
+     * @param seqFiles a <code>File []</code> array of files to index.
+     * @exception FileNotFoundException if an error occurs.
+     * @exception IOException if an error occurs.
+     * @exception ParserException if an error occurs.
+     * @exception BioException if an error occurs.
+     */
     public static void indexSwissprot(File location, File [] seqFiles)
         throws FileNotFoundException, IOException, ParserException,
                BioException
@@ -149,11 +231,11 @@ public class IndexTools
         bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
                                                             "swiss",
                                                             "protein" ));
-        indexEmblLike(bsf, location, seqFiles);
+        _indexEmblLike(bsf, location, seqFiles);
     }
 
-    private static void indexFasta(BioStoreFactory bsf,
-                                   File location, File [] seqFiles)
+    private static void _indexFasta(BioStoreFactory bsf,
+                                    File location, File [] seqFiles)
        throws FileNotFoundException, IOException, BioException
     {
         bsf.setPrimaryKey("ID");
@@ -219,8 +301,8 @@ public class IndexTools
         }
     }
 
-    private static void indexEmblLike(BioStoreFactory bsf,
-                                      File location, File [] seqFiles)
+    private static void _indexEmblLike(BioStoreFactory bsf,
+                                       File location, File [] seqFiles)
         throws FileNotFoundException, IOException, ParserException,
                BioException
     {
@@ -245,7 +327,11 @@ public class IndexTools
                     {
                         String s = (String) value;
                         int i = s.indexOf(" ");
-                        return s.substring(0, i);
+
+                        if (i < 0)
+                            return s;
+                        else
+                            return s.substring(0, i);
                     }
                 });
 
@@ -276,8 +362,8 @@ public class IndexTools
         }
     }
 
-    private static void indexGenbank(BioStoreFactory bsf,
-                                     File location, File [] seqFiles)
+    private static void _indexGenbank(BioStoreFactory bsf,
+                                      File location, File [] seqFiles)
         throws FileNotFoundException, IOException, ParserException,
                BioException
     {
@@ -302,17 +388,11 @@ public class IndexTools
                     {
                         String s = (String) value;
                         int i = s.indexOf(" ");
-                        return s.substring(0, i);
-                    }
-                });
 
-            changeTable.setChanger("ACCESSION", new ChangeTable.Changer()
-                {
-                    public Object change(Object value)
-                    {
-                        String s = (String) value;
-                        int i = s.indexOf(" ");
-                        return s.substring(0, i);
+                        if (i < 0)
+                            return s;
+                        else
+                            return s.substring(0, i);
                     }
                 });
 

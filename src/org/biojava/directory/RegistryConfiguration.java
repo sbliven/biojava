@@ -69,9 +69,7 @@ import org.biojava.utils.*;
  * <ul>
  *  <li>flat</li>
  *  <li>biofetch</li>
- *  <li>bsane-corba</li>
  *  <li>biosql</li>
- *  <li>xembl</li>
  * </ul>
  *
  * <p>'location' is a string specific to the protocol. Any number of
@@ -155,7 +153,7 @@ public interface RegistryConfiguration {
     }
 
     /**
-     * Add a configuration as the most authorative place to look.
+     * Add a configuration as the most authoritative place to look.
      * During future lookups with this context, values in newConfig
      * will take precedence over values in the previously existing
      * configuration.

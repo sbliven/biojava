@@ -34,6 +34,11 @@ import org.biojava.bio.seq.db.SequenceDBLite;
 import org.biojava.bio.seq.db.flat.FlatSequenceDB;
 import org.biojava.bio.seq.io.SeqIOConstants;
 
+/**
+ * <code>IndexToolsTest</code> tests indexing of flat files.
+ *
+ * @author Keith James
+ */
 public class IndexToolsTest extends TestCase
 {
     protected String location;
@@ -54,9 +59,12 @@ public class IndexToolsTest extends TestCase
 
     public void testIndexFastaDNA() throws Exception
     {
-        SequenceDBLite db = createFastaDB(SeqIOConstants.DNA, "dna",
-                                          new String [] { "dna1.fasta",
-                                                          "dna2.fasta" });
+        File [] files = getDBFiles(new String [] { "dna1.fasta",
+                                                   "dna2.fasta" });
+        IndexTools.indexFasta(new File(location), files, SeqIOConstants.DNA);
+
+        SequenceDBLite db = new FlatSequenceDB(location, "dna");
+
         Sequence seq1 = db.getSequence("id1");
         assertEquals("gatatcgatt", seq1.seqString());
         Sequence seq2 = db.getSequence("id2");
@@ -73,9 +81,12 @@ public class IndexToolsTest extends TestCase
 
     public void testIndexFastaRNA() throws Exception
     {
-        SequenceDBLite db = createFastaDB(SeqIOConstants.RNA, "rna",
-                                          new String [] { "rna1.fasta",
-                                                          "rna2.fasta" });
+        File [] files = getDBFiles(new String [] { "rna1.fasta",
+                                                   "rna2.fasta" });
+        IndexTools.indexFasta(new File(location), files, SeqIOConstants.RNA);
+
+        SequenceDBLite db = new FlatSequenceDB(location, "rna");
+
         Sequence seq1 = db.getSequence("id1");
         assertEquals("gauaucgauu", seq1.seqString());
         Sequence seq2 = db.getSequence("id2");
@@ -88,9 +99,12 @@ public class IndexToolsTest extends TestCase
 
     public void testIndexFastaProtein() throws Exception
     {
-        SequenceDBLite db = createFastaDB(SeqIOConstants.AA, "protein",
-                                          new String [] { "protein1.fasta",
-                                                          "protein2.fasta" });
+        File [] files = getDBFiles(new String [] { "protein1.fasta",
+                                                   "protein2.fasta" });
+        IndexTools.indexFasta(new File(location), files, SeqIOConstants.AA);
+
+        SequenceDBLite db = new FlatSequenceDB(location, "protein");
+
         Sequence seq1 = db.getSequence("id1");
         assertEquals("MTTSRGGGGG", seq1.seqString());
         Sequence seq2 = db.getSequence("id2");
@@ -105,7 +119,7 @@ public class IndexToolsTest extends TestCase
     {
         File [] files = getDBFiles(new String [] { "part1.embl",
                                                    "part2.embl" });
-        IndexTools.indexEmblDNA(new File(location), files);
+        IndexTools.indexEmbl(new File(location), files, SeqIOConstants.DNA);
 
         SequenceDBLite db = new FlatSequenceDB(location, "embl");
 
@@ -124,28 +138,28 @@ public class IndexToolsTest extends TestCase
         assertEquals(557, seq6.length());
     }
 
-//     public void testIndexGenbankDNA() throws Exception
-//     {
-//         File [] files = getDBFiles(new String [] { "part1.gb",
-//                                                    "part2.gb" });
-//         IndexTools.indexGenbankDNA(new File(location), files);
+    public void testIndexGenbankDNA() throws Exception
+    {
+        File [] files = getDBFiles(new String [] { "part1.gb",
+                                                   "part2.gb" });
+        IndexTools.indexGenbank(new File(location), files, SeqIOConstants.DNA);
 
-//         SequenceDBLite db = new FlatSequenceDB(location, "genbank");
+        SequenceDBLite db = new FlatSequenceDB(location, "genbank");
 
-//         Sequence seq1 = db.getSequence("");
-//         assertEquals(, seq1.length());
-//         Sequence seq2 = db.getSequence("");
-//         assertEquals(, seq2.length());
-//         Sequence seq3 = db.getSequence("");
-//         assertEquals(, seq3.length());
+        Sequence seq1 = db.getSequence("A16SRRNA");
+        assertEquals(1497, seq1.length());
+        Sequence seq2 = db.getSequence("A16STM112");
+        assertEquals(1346, seq2.length());
+        Sequence seq3 = db.getSequence("A16STM146");
+        assertEquals(1352, seq3.length());
 
-//         Sequence seq4 = db.getSequence("");
-//         assertEquals(, seq4.length());
-//         Sequence seq5 = db.getSequence("");
-//         assertEquals(, seq5.length());
-//         Sequence seq6 = db.getSequence("");
-//         assertEquals(, seq6.length());
-//     }
+        Sequence seq4 = db.getSequence("AY080928");
+        assertEquals(557, seq4.length());
+        Sequence seq5 = db.getSequence("AY080929");
+        assertEquals(556, seq5.length());
+        Sequence seq6 = db.getSequence("AY080930");
+        assertEquals(557, seq6.length());
+    }
 
     public void testIndexSwissprot() throws Exception
     {
@@ -167,33 +181,6 @@ public class IndexToolsTest extends TestCase
         assertEquals(493, seq5.length());
         Sequence seq6 = db.getSequence("11SB_CUCMA");
         assertEquals(480, seq6.length());
-    }
-
-    private SequenceDBLite createFastaDB(int alphabetId, String name,
-                                         String [] fileNames)
-        throws Exception
-    {
-        File [] files = getDBFiles(fileNames);
-
-        switch (alphabetId)
-        {
-            case SeqIOConstants.DNA:
-                IndexTools.indexFastaDNA(new File(location), files);
-                break;
-            case SeqIOConstants.RNA:
-                IndexTools.indexFastaRNA(new File(location), files);
-                break;
-            case SeqIOConstants.AA:
-                IndexTools.indexFastaProtein(new File(location), files);
-                break;
-
-            default:
-                throw new IllegalArgumentException("Unknown alphabet ID '"
-                                                   + alphabetId
-                                                   + "'");
-        }
-
-        return new FlatSequenceDB(location, name);
     }
 
     private File [] getDBFiles(String [] fileNames) throws Exception

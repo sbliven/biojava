@@ -27,6 +27,13 @@ import junit.framework.TestCase;
 
 import org.biojava.bio.seq.db.SequenceDBLite;
 
+/**
+ * <code>SystemRegistryTest</code> tests that a registry can be
+ * created and that it will look in the correct places for a
+ * configuration file.
+ *
+ * @author Keith James
+ */
 public class SystemRegistryTest extends TestCase
 {
     public SystemRegistryTest(String name)
@@ -38,8 +45,6 @@ public class SystemRegistryTest extends TestCase
     {
         Registry registry = SystemRegistry.instance();
         assertNotNull(registry);
-
-        SequenceDBLite db = registry.getDatabase("embl");
     }
 
     public void testGetRegistryPath()
