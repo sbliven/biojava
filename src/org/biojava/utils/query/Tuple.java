@@ -16,28 +16,93 @@ public interface Tuple {
    * @author Matthew Pocock
    * @since 1.2
    */
-  public interface ClassList {
+  public abstract class TypeList implements Type {
     /**
-     * The class associated with a slot index.
+     * The type associated with a slot index.
      *
      * @param indx the slot index
-     * @return the Class at that slot
+     * @return the Type at that slot
      */
-    public Class getClass(int indx);
+    public abstract Type getType(int indx);
     
     /**
-     * The number of slots in any n'tuple with this ClassList.
+     * The number of slots in any n'tuple with this TypeList.
      *
      * @return the size of the n'tuple
      */
-    public int size();
+    public abstract int size();
+    
+    public boolean isInstance(Object obj) {
+      if(obj instanceof Tuple) {
+        Tuple tup = (Tuple) obj;
+        return isAssignableFrom(tup.getTypeList());
+      }
+      
+      return false;
+    }
+    
+    public boolean isAssignableFrom(Type type) {
+      if(type instanceof Tuple.TypeList) {
+        Tuple.TypeList typeList = (Tuple.TypeList) type;
+        if(size() != typeList.size()) {
+          return false;
+        }
+        for(int i = 0; i < size(); i++) {
+          if(!getType(i).equals(typeList.getType(i))) {
+            return false;
+          }
+          return true;
+        }
+      }
+      
+      return false;
+    }
+    
+    public int hashCode() {
+      int hc = getType(0).hashCode();
+      for(int i = 1; i < size(); i++) {
+        hc = hc ^ getType(i).hashCode();
+      }
+      return hc;
+    }
+    
+    public boolean equals(Object o) {
+      if(o instanceof Tuple.TypeList) {
+        Tuple.TypeList tl = (Tuple.TypeList) o;
+        if(size() == tl.size()) {
+          for(int i = 0; i < size(); i++) {
+            if(getType(i) != tl.getType(i)) {
+              return false;
+            }
+          }
+          return true;
+        }
+      }
+      
+      return false;
+    }
+    
+    public String getName() {
+      StringBuffer sb = new StringBuffer("(");
+      sb.append(getType(0).toString());
+      for(int i = 1; i < size(); i++) {
+        sb.append(",");
+        sb.append(getType(i).toString());
+      }
+      sb.append(")");
+      return sb.toString();
+    }
+      
+    public String toString() {
+      return getName();
+    }
   }
   
   /**
    * Retrieve the Object at an index.
    * <P>
-   * The Object at an index should be assignable to the Class at the same index
-   * in the associated ClassList.
+   * The Object at an index should be assignable to the Type at the same index
+   * in the associated TypeList.
    *
    * @param indx
    * @return the Object at that index
@@ -45,11 +110,11 @@ public interface Tuple {
   public Object getObject(int indx);
   
   /**
-   * Retrieve the ClassList that defines the types of the slots in this n'tuple.
+   * Retrieve the TypeList that defines the types of the slots in this n'tuple.
    *
-   * @return the ClassList associated with this Tuple
+   * @return the TypeList associated with this Tuple
    */
-  public ClassList getClassList();
+  public TypeList getTypeList();
   
   /**
    * Follow from a Tuple to the Object in a given slot.
@@ -59,10 +124,10 @@ public interface Tuple {
    */
   public static class FollowObject extends Follow {
     private final int indx;
-    private final ClassList classList;
+    private final TypeList typeList;
     
-    public FollowObject(ClassList classList, int indx) {
-      this.classList = classList;
+    public FollowObject(TypeList typeList, int indx) {
+      this.typeList = typeList;
       this.indx = indx;
     }
     
@@ -72,20 +137,20 @@ public interface Tuple {
       return QueryTools.createSingleton(ti.getObject(indx));
     }
     
-    public Class getInputClass() {
-      return Tuple.class;
+    public Type getInputType() {
+      return typeList;
     }
     
-    public Class getOutputClass() {
-      return classList.getClass(indx);
+    public Type getOutputType() {
+      return typeList.getType(indx);
     }
     
     public int getIndex() {
       return indx;
     }
     
-    public ClassList getClassList() {
-      return classList;
+    public TypeList getTypeList() {
+      return typeList;
     }
   }
   
@@ -99,25 +164,29 @@ public interface Tuple {
    */
   public static class Permutate extends Follow {
     private final int[] order;
+    private final Tuple.TypeList input;
+    private final PermutedTuple.TypeList output;
     
-    public Permutate(int[] order) {
+    public Permutate(int[] order, Tuple.TypeList inputTypeList) {
       this.order = order;
+      this.input = inputTypeList;
+      this.output = new PermutedTuple.TypeList(order, input);
     }
     
     public Queryable follow(Object item) {
       Tuple ti = (Tuple) item;
       
       return QueryTools.createSingleton(
-        new PermutedTuple(ti, order)
+        new PermutedTuple(ti, output)
       );
     }
     
-    public Class getInputClass() {
-      return Tuple.class;
+    public Type getInputType() {
+      return input;
     }
     
-    public Class getOutputClass() {
-      return Tuple.class;
+    public Type getOutputType() {
+      return output;
     }
   }
   
@@ -130,13 +199,13 @@ public interface Tuple {
    */
   public static class FollowToTuple extends Follow {
     private final Follow follow;
-    private final ClassList classList;
+    private final TypeList typeList;
     
     public FollowToTuple(Follow follow) {
       this.follow = follow;
-      classList = new SimpleTuple.ClassList(new Class[] {
-        follow.getInputClass(),
-        follow.getOutputClass(),
+      typeList = new SimpleTuple.TypeList(new Type[] {
+        follow.getInputType(),
+        follow.getOutputType(),
       });
     }
     
@@ -147,24 +216,25 @@ public interface Tuple {
       
       for(Iterator i = res.iterator(); i.hasNext(); ) {
         Object o = i.next();
-        items.add(new SimpleTuple(new Object[] { item, o }, classList));
+        items.add(new SimpleTuple(new Object[] { item, o }, typeList));
       }
       
-      return QueryTools.createQueryable(items, getOutputClass());
+      return QueryTools.createQueryable(items, getOutputType());
     }
     
-    public Class getInputClass() {
-      return follow.getInputClass();
+    public Type getInputType() {
+      return follow.getInputType();
     }
     
-    public Class getOutputClass() {
-      return Tuple.class;
+    public Type getOutputType() {
+      return typeList;
     }
   }
   
   public static class FilterByIndex extends Filter {
     private final Filter filter;
-    private int indx;
+    private final int indx;
+    private final Tuple.TypeList typeList;
     
     public Filter getFilter() {
       return filter;
@@ -174,9 +244,10 @@ public interface Tuple {
       return indx;
     }
     
-    public FilterByIndex(Filter filter, int indx) {
+    public FilterByIndex(Filter filter, int indx, Tuple.TypeList typeList) {
       this.filter = filter;
       this.indx = indx;
+      this.typeList = typeList;
     }
     
     public boolean accept(Object item)
@@ -185,12 +256,12 @@ public interface Tuple {
       return filter.accept(tup.getObject(indx));
     }
     
-    public Class getInputClass() {
-      return Tuple.class;
+    public Type getInputType() {
+      return typeList;
     }
     
-    public Class getOutputClass() {
-      return Tuple.class;
+    public Type getOutputType() {
+      return typeList;
     }
     
     public int hashCode() {
@@ -205,6 +276,12 @@ public interface Tuple {
         return false;
       }
     }
+    
+    public String toString() {
+      return
+        "Tuple.FilterByIndex[index=" + indx +
+        " filter=" + filter + "]";
+    }
   }
 
   /**
@@ -217,7 +294,8 @@ public interface Tuple {
   public static class FollowTupleTo extends Follow {
     private final Follow follow;
     private final int indx;
-    private final ClassList classList;
+    private final TypeList inputTypeList;
+    private final TypeList outputTypeList;
     
     public Follow getFollow() {
       return follow;
@@ -227,27 +305,24 @@ public interface Tuple {
       return indx;
     }
     
-    public ClassList getClassList() {
-      return classList;
-    }
-    
-    public FollowTupleTo(int indx, Follow follow, ClassList classList) {
+    public FollowTupleTo(int indx, Follow follow, TypeList typeList) {
       this.indx = indx;
       this.follow = follow;
-      Class[] classes = new Class[classList.size()];
-      for(int i = 0; i < classes.length; i++) {
-        classes[i] = (i == indx) ? follow.getOutputClass()
-                                 : classList.getClass(i);
+      this.inputTypeList = typeList;
+      Type[] types = new Type[typeList.size()];
+      for(int i = 0; i < types.length; i++) {
+        types[i] = (i == indx) ? follow.getOutputType()
+                                 : typeList.getType(i);
       }
-      this.classList = new SimpleTuple.ClassList(classes);
+      this.outputTypeList = new SimpleTuple.TypeList(types);
     }
     
     public Queryable follow(Object item)
     throws OperationException {
       Tuple tup = (Tuple) item;
-      if(tup.getClassList().size() != classList.size()) {
-        throw new OperationException(
-          "Can't apply " + tup.getClassList() + " to " + classList
+      if(!inputTypeList.isAssignableFrom(tup.getTypeList())) {
+        throw new TypeCastException(
+          "Can't apply " + tup.getTypeList() + " to " + inputTypeList
         );
       }
       Queryable res = follow.follow(tup.getObject(indx));
@@ -255,26 +330,26 @@ public interface Tuple {
       
       for(Iterator ri = res.iterator(); ri.hasNext(); ) {
         Object o = ri.next();
-        Object [] values = new Object[classList.size()];
+        Object [] values = new Object[outputTypeList.size()];
         for(int i = 0; i < values.length; i++) {
           values[i] = (i == indx) ? o : tup.getObject(i);
         }
-        items.add(new SimpleTuple(values, classList));
+        items.add(new SimpleTuple(values, outputTypeList));
       }
       
-      return QueryTools.createQueryable(items, getOutputClass());
+      return QueryTools.createQueryable(items, getOutputType());
     }
     
-    public Class getInputClass() {
-      return Tuple.class;
+    public Type getInputType() {
+      return inputTypeList;
     }
     
-    public Class getOutputClass() {
-      return Tuple.class;
+    public Type getOutputType() {
+      return outputTypeList;
     }
     
     public int hashCode() {
-      return follow.hashCode() ^ classList.hashCode();
+      return follow.hashCode() ^ inputTypeList.hashCode();
     }
     
     public boolean equals(Object o) {
@@ -282,7 +357,7 @@ public interface Tuple {
         Tuple.FollowTupleTo that = (Tuple.FollowTupleTo) o;
         return
           this.getFollow().equals(that.getFollow()) &&
-          this.getClassList().equals(that.getClassList()) &&
+          this.getInputType().equals(that.getInputType()) &&
           this.getIndex() == that.getIndex();
       } else {
         return false;
@@ -309,45 +384,54 @@ public interface Tuple {
    */
   public static class FollowMethod extends Follow {
     private final Method method;
-    private final ClassList classList;
+    private final TypeList inputTypeList;
+    private final TypeList outputTypeList;
     private final int indx;
     
     public Method getMethod() {
       return method;
     }
     
-    public ClassList getClassList() {
-      return classList;
-    }
-    
-    public FollowMethod(Method method, ClassList classList) {
+    public FollowMethod(Method method, TypeList typeList) {
       this.method = method;
-      Class methodClass = method.getDeclaringClass();
+      this.inputTypeList = typeList;
       
-      Class[] paramTypes = method.getParameterTypes();
-      Class returnType = method.getReturnType();
+      Type methodType = JavaType.getType(method.getDeclaringClass());
+      Type paramTypes = JavaType.getType(method.getParameterTypes());
+      Type returnType = JavaType.getType(method.getReturnType());
+      Tuple.TypeList tl = (paramTypes instanceof Tuple.TypeList)
+        ? (Tuple.TypeList) paramTypes : null;
       
-      this.indx = classList.size() - paramTypes.length;
+      this.indx = typeList.size()
+        - ((tl == null)
+          ? 1 : tl.size());
       
-      if(!methodClass.isAssignableFrom(classList.getClass(indx-1))) {
+      if(!methodType.isAssignableFrom(typeList.getType(indx-1))) {
         throw new IllegalArgumentException("Can't apply " + method + " to "
-        + methodClass + " at index " + (indx-1) + " in " + classList);
+        + methodType + " at index " + (indx-1) + " in " + typeList);
       }
-      for(int i = indx; i < classList.size(); i++) {
-        if(!paramTypes[i-indx].isAssignableFrom(classList.getClass(indx))) {
-          throw new IllegalArgumentException("Illegal argument type in " + method +
-          " at index " + (i) + " in " + classList );
+      if(tl == null) {
+        if(!paramTypes.isAssignableFrom(typeList.getType(indx))) {
+          throw new TypeCastException("Illegal argument type in " + method +
+          " at index " + (indx) + " in " + typeList );
+        }
+      } else {
+        for(int i = indx; i < tl.size(); i++) {
+          if(!tl.getType(i-indx).isAssignableFrom(typeList.getType(indx))) {
+            throw new TypeCastException("Illegal argument type in " + method +
+            " at index " + (i) + " in " + typeList );
+          }
         }
       }
       
-      Class[] classArray = new Class[indx];
+      Type[] typeArray = new Type[indx];
       
       for(int i = 0; i < indx-1; i++) {
-        classArray[i] = classList.getClass(i);
+        typeArray[i] = typeList.getType(i);
       }
-      classArray[indx-1] = returnType;
+      typeArray[indx-1] = returnType;
       
-      this.classList = new SimpleTuple.ClassList(classArray);
+      this.outputTypeList = new SimpleTuple.TypeList(typeArray);
     }
     
     public Queryable follow(Object item)
@@ -371,7 +455,7 @@ public interface Tuple {
           "Wrong arguments for" + 
           "\n\tmethod " + method +
           "\n\ton " + tup.getObject(indx-1) +
-          "\n\tin tuple of type " + tup.getClassList() +
+          "\n\tin tuple of type " + tup.getTypeList() +
           "\n\ton tuple " + tup +
           "\n\twith index " + indx);
       }
@@ -384,31 +468,31 @@ public interface Tuple {
           items[i] = tup.getObject(i);
         }
         items[indx-1] = val;
-        return QueryTools.createSingleton(new SimpleTuple(items, classList));
+        return QueryTools.createSingleton(new SimpleTuple(items, outputTypeList));
       }
     }
     
-    public Class getInputClass() {
-      return Tuple.class;
+    public Type getInputType() {
+      return inputTypeList;
     }
     
-    public Class getOutputClass() {
+    public Type getOutputType() {
       if(indx == 1) {
-        return method.getReturnType();
+        return outputTypeList.getType(0);
       } else {
-        return Tuple.class;
+        return outputTypeList;
       }
     }
     
     public int hashCode() {
-      return method.hashCode() ^ classList.hashCode();
+      return method.hashCode() ^ getInputType().hashCode();
     }
     
     public boolean equals(Object o) {
       if(o instanceof Tuple.FollowMethod) {
         Tuple.FollowMethod that = (Tuple.FollowMethod) o;
         return
-          that.getClassList().equals(this.getClassList()) &&
+          that.getInputType().equals(this.getInputType()) &&
           that.getMethod().equals(this.getMethod());
       } else {
         return false;
@@ -416,7 +500,7 @@ public interface Tuple {
     }
     
     public String toString() {
-      return "Tuple.FollowMethod: " + method + " classList: " + classList;
+      return "Tuple.FollowMethod: " + method + " type: " + inputTypeList;
     }
   }
 }

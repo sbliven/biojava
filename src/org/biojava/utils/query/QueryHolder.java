@@ -17,8 +17,8 @@ public class QueryHolder implements Query {
   }
   
   public void setQuery(Query query) throws NestedException {
-    if(query != null) {
-      throw new NestedException("Can't set query once it has been set.");
+    if(this.query != null) {
+      throw new NestedException("Can't set query once it has been set: " + this.query + " " + this);
     }
     
     this.query = query;
@@ -42,5 +42,13 @@ public class QueryHolder implements Query {
   
   public Set getArcsTo(Node to) {
     return query.getArcsTo(to);
+  }
+  
+  public int hashCode() {
+    return query.hashCode();
+  }
+  
+  public boolean equals(Object o) {
+    return query.equals(o);
   }
 }

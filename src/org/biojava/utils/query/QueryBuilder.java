@@ -98,29 +98,20 @@ public class QueryBuilder {
   
   public void addArc(Arc arc, Operation op)
   throws OperationException {
-    if(
-      !QueryTools.convertPrimatives(op.getInputClass())
-      .isAssignableFrom(QueryTools.convertPrimatives(arc.from.getOutputClass()))
-    ) {
-      throw new OperationException(
-        "Invalid operation input: can't assign " + arc.from.getOutputClass() +
-        " to " + op.getInputClass() +
-        " in " + arc.from + " -> " + arc.to +
-        " for operator " + op
-      );
+    try {
+      checkTypes(op.getInputType(), arc.from.getOutputType());
+    } catch (TypeCastException tce) {
+      throw new TypeCastException(tce, " while connecting from node " + arc.from
+      + " to operation " + op);
     }
-    if(
-      !QueryTools.convertPrimatives(arc.to.getInputClass())
-      .isAssignableFrom(QueryTools.convertPrimatives(op.getOutputClass())) 
-    ) {
-      throw new OperationException(
-        "Invalid operation output: can't assign " + op.getOutputClass() +
-        " to " + arc.to.getInputClass() +
-        " in " + arc.from + " -> " + arc.to +
-        " for operator " + op
-      );
+    
+    try {
+      checkTypes(arc.to.getInputType(), op.getOutputType());
+    } catch (TypeCastException tce) {
+      throw new TypeCastException(tce, " while connecting from operation " + op
+      + " to node " + arc.to);
     }
-
+    
     nodes.add(arc.from);
     nodes.add(arc.to);
     
@@ -163,5 +154,18 @@ public class QueryBuilder {
   
   public Query buildQuery() {
     return new SimpleQuery(nodes, operationsToLabel);
+  }
+
+  // ensures that superType is infact a supertype of subType - that is
+  //, subType can be cast to superType.
+  private static void checkTypes(Type superType, Type subType) {
+    if(
+      !superType.isAssignableFrom(subType)
+    ) {
+      throw new TypeCastException(
+        "Invalid operation input: can't assign to " + superType +
+        " from " + subType
+      );
+    }
   }
 }

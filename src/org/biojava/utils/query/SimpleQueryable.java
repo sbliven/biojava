@@ -11,11 +11,11 @@ import java.util.*;
 public class SimpleQueryable implements Queryable {
   // package private to allow speed-optimizations - can this be done better?
   final Set items;
-  private final Class clazz;
+  private final Type type;
   
-  public SimpleQueryable(Set items, Class clazz) {
+  public SimpleQueryable(Set items, Type type) {
     this.items = items;
-    this.clazz = clazz;
+    this.type = type;
   }
   
   public int size() {
@@ -26,8 +26,8 @@ public class SimpleQueryable implements Queryable {
     return items.iterator();
   }
   
-  public Class getQueryClass() {
-    return clazz;
+  public Type getItemType() {
+    return type;
   }
   
   public boolean contains(Object item) {

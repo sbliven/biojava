@@ -77,17 +77,18 @@ public class FilterByQuery extends Filter {
       query,
       startNode,
       endNode,
-      QueryTools.createQueryable(Collections.singleton(object), Object.class)
+      QueryTools.createQueryable(Collections.singleton(object),
+                                 JavaType.getType(Object.class))
     );
     
     return comparison.compare(res.size(), value);
   }
   
-  public Class getInputClass() {
-    return startNode.getInputClass();
+  public Type getInputType() {
+    return startNode.getInputType();
   }
   
-  public Class getOutputClass() {
-    return startNode.getInputClass();
+  public Type getOutputType() {
+    return startNode.getInputType();
   }
 }

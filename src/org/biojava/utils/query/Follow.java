@@ -13,7 +13,7 @@ import java.lang.reflect.*;
 public abstract class Follow implements Operation {
   public Queryable apply(Queryable items)
   throws OperationException {
-    Queryable result = new Queryable.Empty(getOutputClass());
+    Queryable result = new Queryable.Empty(getOutputType());
     for(Iterator i = items.iterator(); i.hasNext(); ) {
       Object o = (Object) i.next();
       Queryable fo = follow(o);
@@ -51,26 +51,26 @@ public abstract class Follow implements Operation {
    * @author Matthew Pocock
    */
   public static final class FollowCollectionToMembers extends Follow {
-    private final Class outputClass;
+    private final Type outputType;
     
-    public FollowCollectionToMembers(Class outputClass) {
-      this.outputClass = outputClass;
+    public FollowCollectionToMembers(Type outputType) {
+      this.outputType = outputType;
     }
     
     public Queryable follow(Object item) {
       Set si = (Set) item;
       return QueryTools.createQueryable(
         si,
-        getOutputClass()
+        getOutputType()
       );
     }
     
-    public Class getInputClass() {
-      return Set.class;
+    public Type getInputType() {
+      return JavaType.getType(Set.class);
     }
     
-    public Class getOutputClass() {
-      return outputClass;
+    public Type getOutputType() {
+      return outputType;
     }
   }
   
@@ -106,12 +106,12 @@ public abstract class Follow implements Operation {
       }
     }
     
-    public Class getInputClass() {
-      return method.getDeclaringClass();
+    public Type getInputType() {
+      return JavaType.getType(method.getDeclaringClass());
     }
     
-    public Class getOutputClass() {
-      return method.getReturnType();
+    public Type getOutputType() {
+      return JavaType.getType(method.getReturnType());
     }
   }
   
@@ -131,12 +131,29 @@ public abstract class Follow implements Operation {
       }
     }
     
-    public Class getInputClass() {
-      return field.getDeclaringClass();
+    public Type getInputType() {
+      return JavaType.getType(field.getDeclaringClass());
     }
     
-    public Class getOutputClass() {
-      return field.getType();
+    public Type getOutputType() {
+      return JavaType.getType(field.getType());
+    }
+    
+    public int hashCode() {
+      return field.hashCode();
+    }
+    
+    public boolean equals(Object o) {
+      if(o instanceof FollowField) {
+        FollowField ff = (FollowField) o;
+        return field.equals(ff.field);
+      }
+      
+      return false;
+    }
+    
+    public String toString() {
+      return "Follow.FollowField[" + field + "]";
     }
   }
 }

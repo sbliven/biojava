@@ -31,12 +31,6 @@ import java.util.*;
  */
 public interface Query {
   /**
-   * Usefull instance of a Query that will always return everything that you put
-   * into it.
-   */
-  public static IdentityQuery IDENTITY_QUERY = new IdentityQuery(Object.class);
-
-  /**
    * The Query that return everything put in to it.
    *
    * @author Matthew Pocock
@@ -46,8 +40,8 @@ public interface Query {
     private final Node node;
     private final Set nodeSet;
     
-    public IdentityQuery(Class clazz) {
-      node = new SimpleNode("result", clazz);
+    public IdentityQuery(Type type) {
+      node = new SimpleNode("result", type);
       nodeSet = Collections.singleton(node);
     }
     

@@ -16,34 +16,33 @@ import java.util.*;
  */
 public class FilterSet extends Filter {
   private Set filters;
-  private Class inputClass;
-  private Class outputClass;
+  private Type inputType;
+  private Type outputType;
   
   /**
    * Create a new FilterSet instance.
    */
   public FilterSet() {
     filters = new HashSet();
-    inputClass = Object.class;
-    outputClass = Object.class;
+    inputType = JavaType.getType(Object.class);
+    outputType = JavaType.getType(Object.class);
   }
   
   public FilterSet(Set filters) {
-    this.filters = filters;
-    inputClass = Object.class;
-    outputClass = Object.class;
+    this();
+    this.filters.addAll(filters);
   }
   
   public Iterator filters() {
     return filters.iterator();
   }
   
-  public Class getInputClass() {
-    return inputClass;
+  public Type getInputType() {
+    return inputType;
   }
   
-  public Class getOutputClass() {
-    return outputClass;
+  public Type getOutputType() {
+    return outputType;
   }
   
   public boolean accept(Object o)

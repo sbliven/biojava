@@ -7,20 +7,20 @@ package org.biojava.utils.query;
  * @since 1.2
  */
 public class SimpleNode implements Node {
-  private final Class clazz;
+  private final Type type;
   private final String label;
   
-  public SimpleNode(String label, Class clazz) {
+  public SimpleNode(String label, Type type) {
     this.label = label;
-    this.clazz = clazz;
+    this.type = type;
   }
   
-  public Class getInputClass() {
-    return clazz;
+  public Type getInputType() {
+    return type;
   }
   
-  public Class getOutputClass() {
-    return clazz;
+  public Type getOutputType() {
+    return type;
   }
   
   public String getLabel() {

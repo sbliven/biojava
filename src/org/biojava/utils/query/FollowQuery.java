@@ -65,15 +65,16 @@ public class FollowQuery extends Follow {
       query,
       startNode,
       endNode,
-      QueryTools.createQueryable(Collections.singleton(item), Object.class)
+      QueryTools.createQueryable(Collections.singleton(item),
+                                 JavaType.getType(Object.class))
     );
   }
   
-  public Class getInputClass() {
-    return startNode.getInputClass();
+  public Type getInputType() {
+    return startNode.getInputType();
   }
   
-  public Class getOutputClass() {
-    return endNode.getOutputClass();
+  public Type getOutputType() {
+    return endNode.getOutputType();
   }
 }

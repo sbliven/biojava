@@ -32,7 +32,7 @@ public interface Queryable {
    *
    * @param the class of contained items
    */
-  Class getQueryClass();
+  Type getItemType();
   
   /**
    * Find out if an item is contained within this Queryable.
@@ -50,10 +50,10 @@ public interface Queryable {
 
   public class Empty
   implements Queryable {
-    private Class clazz;
+    private Type type;
     
-    public Empty(Class clazz) {
-      this.clazz = clazz;
+    public Empty(Type type) {
+      this.type = type;
     }
     
     public int size() {
@@ -64,8 +64,8 @@ public interface Queryable {
       return Collections.EMPTY_SET.iterator();
     }
     
-    public Class getQueryClass() {
-      return clazz;
+    public Type getItemType() {
+      return type;
     }
     
     public boolean contains(Object item) {
@@ -117,8 +117,8 @@ public interface Queryable {
       return Collections.singleton(item).iterator();
     }
     
-    public Class getQueryClass() {
-      return item.getClass();
+    public Type getItemType() {
+      return JavaType.getType(item.getClass());
     }
     
     public boolean contains(Object item) {

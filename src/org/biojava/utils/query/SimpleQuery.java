@@ -79,8 +79,8 @@ class SimpleQuery implements Query {
     if(o instanceof Query) {
       Query that = (Query) o;
       return
-        that.getNodes() == this.getNodes() &&
-        that.getArcsToOperators() == this.getArcsToOperators();
+        that.getNodes().equals(this.getNodes()) &&
+        that.getArcsToOperators().equals(this.getArcsToOperators());
     } else {
       return false;
     }

@@ -1,66 +1,97 @@
 package org.biojava.utils.query;
 
 class PermutedTuple implements Tuple {
-  private final Tuple source;
-  private final int[] order;
-  private final Tuple.ClassList classList;
-  
-  public PermutedTuple(Tuple source, int[] order)
-  throws IllegalArgumentException {
-    int size = source.getClassList().size();
-    for(int i = 0; i < order.length; i++) {
-      if(order[i] >= size) {
-        throw new IllegalArgumentException("Can't create perumutation: "
-        + i + ":" + order[i] + " >= " + size);
+  static class TypeList extends Tuple.TypeList {
+    private final int[] order;
+    private final Tuple.TypeList typeList;
+    
+    public TypeList(int[] order, Tuple.TypeList typeList) {
+      this.order = order;
+      this.typeList = typeList;
+    }
+    
+    public int size() {
+      return order.length;
+    }
+    
+    public int mapIndex(int indx) {
+      try {
+        return order[indx];
+      } catch (IndexOutOfBoundsException iobe) {
+        throw new IndexOutOfBoundsException(
+          "index " + indx + " not in array length " + order.length
+        );
       }
     }
     
-    this.source = source;
-    this.order = order;
-    classList = new Tuple.ClassList() {
-      public Class getClass(int indx) {
-        return PermutedTuple.this.source.getClassList().getClass(
-          PermutedTuple.this.order[indx]
-        );
-      }
-      
-      public int size() {
-        return PermutedTuple.this.order.length;
-      }
+    public Type getType(int indx) {
+      return typeList.getType(mapIndex(indx));
+    }
     
-      public String toString() {
-        StringBuffer sb = new StringBuffer(getClass(0).toString());
-        for(int i = 1; i < size(); i++) {
-          sb.append(",");
-          sb.append(getClass(i).toString());
-        }
-        return sb.toString();
-      }
-    };
+    public Type getOriginalType() {
+      return typeList;
+    }
+  }
+  
+  private final Tuple source;
+  private final PermutedTuple.TypeList typeList;
+  
+  public PermutedTuple(Tuple source, PermutedTuple.TypeList typeList)
+  throws IllegalArgumentException {
+    if(!typeList.getOriginalType().isAssignableFrom(source.getTypeList())) {
+      throw new TypeCastException(
+        "Can't cast from " + source.getTypeList()
+        + " to " + typeList.getOriginalType()
+      );
+    }
+
+    this.source = source;
+    this.typeList = typeList;
   }
   
   public Object getObject(int indx) {
-    try {
-      return source.getObject(order[indx]);
-    } catch (IndexOutOfBoundsException iobe) {
-      throw new IndexOutOfBoundsException(
-        "index " + indx + " not in array length " + order.length
-      );
-    }
+    return source.getObject(typeList.mapIndex(indx));
   }
   
-  public Tuple.ClassList getClassList() {
-    return classList;
+  public Tuple.TypeList getTypeList() {
+    return typeList;
   }
   
   public String toString() {
     StringBuffer sb = new StringBuffer("(");
-    sb.append(order[0] + ":" + getObject(0).toString());
-    for(int i = 1; i < getClassList().size(); i++) {
-      sb.append("," + order[i] + ":");
+    sb.append(typeList.mapIndex(0) + ":" + getObject(0).toString());
+    for(int i = 1; i < typeList.size(); i++) {
+      sb.append("," + typeList.mapIndex(i) + ":");
       sb.append(getObject(i).toString());
     }
     sb.append(")");
     return sb.toString();
+  }
+  
+  public int hashCode() {
+    int hc = getObject(0).hashCode();
+    for(int i = 1; i < getTypeList().size(); i++) {
+      hc = hc ^ getObject(i).hashCode();
+    }
+    return hc;
+  }
+  
+  public boolean equals(Object o) {
+    if(o instanceof Tuple) {
+      Tuple tup = (Tuple) o;
+      if(!getTypeList().equals(tup.getTypeList())) {
+        return false;
+      }
+      
+      for(int i = 0; i < getTypeList().size(); i++) {
+        if(!getObject(i).equals(tup.getObject(i))) {
+          return false;
+        }
+      }
+      
+      return true;
+    }
+    
+    return false;
   }
 }

@@ -15,7 +15,7 @@ public abstract class Filter extends Follow {
     if(accept(item)) {
       return new Queryable.Singleton(item);
     } else {
-      return new Queryable.Empty(getOutputClass());
+      return new Queryable.Empty(getOutputType());
     }
   }
   
@@ -28,7 +28,7 @@ public abstract class Filter extends Follow {
         matches.add(o);
       }
     }
-    return QueryTools.createQueryable(matches, getOutputClass());
+    return QueryTools.createQueryable(matches, getOutputType());
   }
   
   /**
@@ -48,22 +48,22 @@ public abstract class Filter extends Follow {
    */
   public static final class RejectAll
   extends Filter {
-    private final Class clazz;
+    private final Type type;
     
-    public RejectAll(Class clazz) {
-      this.clazz = clazz;
+    public RejectAll(Type type) {
+      this.type = type;
     }
     
     public boolean accept(Object item) {
       return false;
     }
     
-    public Class getInputClass() {
-      return clazz;
+    public Type getInputType() {
+      return type;
     }
     
-    public Class getOutputClass() {
-      return clazz;
+    public Type getOutputType() {
+      return type;
     }
   }
   
@@ -75,22 +75,47 @@ public abstract class Filter extends Follow {
    */
   public static final class AcceptAll
   extends Filter {
-    private final Class clazz;
+    private final Type type;
 
-    public AcceptAll(Class clazz) {
-      this.clazz = clazz;
+    public AcceptAll(Type type) {
+      this.type = type;
     }
     
     public boolean accept(Object item) {
-      return false;
+      return true;
     }
 
-    public Class getInputClass() {
-      return clazz;
+    public Type getInputType() {
+      return type;
     }
     
-    public Class getOutputClass() {
-      return clazz;
+    public Type getOutputType() {
+      return type;
+    }
+  }
+  
+  public static final class Not extends Filter {
+    private final Filter filter;
+    
+    public Not(Filter filter) {
+      this.filter = filter;
+    }
+    
+    public Filter getFilter() {
+      return filter;
+    }
+    
+    public boolean accept(Object item)
+    throws OperationException {
+      return !filter.accept(item);
+    }
+    
+    public Type getInputType() {
+      return getFilter().getInputType();
+    }
+    
+    public Type getOutputType() {
+      return getFilter().getOutputType(); // is this true?
     }
   }
   
@@ -102,11 +127,11 @@ public abstract class Filter extends Follow {
    */
   public final static class Equals extends Filter {
     private final Object item;
-    private final Class clazz;
+    private final Type type;
     
-    public Equals(Object item, Class clazz) {
+    public Equals(Object item, Type type) {
       this.item = item;
-      this.clazz = clazz;
+      this.type = type;
     }
     
     public Object getItem() {
@@ -117,40 +142,83 @@ public abstract class Filter extends Follow {
       return this.item.equals(item);
     }
 
-    public Class getInputClass() {
-      return clazz;
+    public Type getInputType() {
+      return type;
     }
     
-    public Class getOutputClass() {
-      return clazz;
+    public Type getOutputType() {
+      return type;
+    }
+    
+    public int hashCode() {
+      return item.hashCode();
+    }
+    
+    public boolean equals(Object o) {
+      if(o instanceof Filter.Equals) {
+        Filter.Equals fe = (Filter.Equals) o;
+        return
+          this.item.equals(fe.item);
+      }
+      
+      return false;
+    }
+    
+    public String toString() {
+      return "Filter.Equals[" + item + "]";
     }
   }
   
   /**
-   * Filters by class.
+   * Filters by Type.
    *
    * @author Matthew Pocock
    * @since 1.2
    */
-  public final static class ByClass extends Filter {
-    private Class inputClass;
-    private Class outputClass;
+  public final static class ByType extends Filter {
+    private Type inputType;
+    private Type outputType;
     
-    public ByClass(Class inputClass, Class outputClass) {
-      this.inputClass = inputClass;
-      this.outputClass = outputClass;
+    public ByType(Type inputType, Type outputType) {
+      if(!inputType.isAssignableFrom(outputType)) {
+        throw new TypeCastException(
+          "Can't filter to a type that is not a subtype: " +
+          inputType + " " + outputType
+        );
+      }
+      this.inputType = inputType;
+      this.outputType = outputType;
     }
     
     public boolean accept(Object item) {
-      return getOutputClass().isInstance(item);
+      return getOutputType().isInstance(item);
     }
     
-    public Class getInputClass() {
-      return inputClass;
+    public Type getInputType() {
+      return inputType;
     }
     
-    public Class getOutputClass() {
-      return outputClass;
+    public Type getOutputType() {
+      return outputType;
+    }
+    
+    public int hashCode() {
+      return getInputType().hashCode() ^ getOutputType().hashCode();
+    }
+    
+    public boolean equals(Object o) {
+      if(o instanceof Filter.ByType) {
+        Filter.ByType fbt = (Filter.ByType) o;
+        return
+          getInputType().equals(fbt.getInputType()) &&
+          getOutputType().equals(fbt.getOutputType());
+      }
+      
+      return false;
+    }
+    
+    public String toString() {
+      return "Filter.ByType[" + inputType + " -> " + outputType + "]";
     }
   }
    
@@ -182,12 +250,12 @@ public abstract class Filter extends Follow {
       return cmp.compare(i.intValue(), value);
     }
 
-    public Class getInputClass() {
-      return Integer.class;
+    public Type getInputType() {
+      return JavaType.getType(Integer.class);
     }
     
-    public Class getOutputClass() {
-      return Integer.class;
+    public Type getOutputType() {
+      return JavaType.getType(Integer.class);
     }
     
     /**

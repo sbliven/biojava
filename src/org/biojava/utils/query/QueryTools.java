@@ -26,8 +26,8 @@ public class QueryTools {
    * @return the union
    */
   public static Queryable union(Queryable a, Queryable b)
-  throws ClassCastException {
-    Class clazz = guessClass(a, b);
+  throws TypeCastException {
+    Type type = guessType(a.getItemType(), b.getItemType());
     
     if(a instanceof Queryable.Empty) {
       return b;
@@ -38,7 +38,7 @@ public class QueryTools {
     Set result = new HashSet();
     addAll(result, a);
     addAll(result, b);
-    return new SimpleQueryable(result, clazz);
+    return new SimpleQueryable(result, type);
   }
   
   /**
@@ -72,10 +72,10 @@ public class QueryTools {
    * @return the union
    */
   public static Queryable intersection(Queryable a, Queryable b) {
-    Class clazz = guessClass(a, b);
+    Type type = guessType(a.getItemType(), b.getItemType());
     
     if(a instanceof Queryable.Empty || b instanceof Queryable.Empty) {
-      return new Queryable.Empty(clazz);
+      return new Queryable.Empty(type);
     } else {
       if(b instanceof Queryable.Singleton) {
         Queryable q = b;
@@ -87,7 +87,7 @@ public class QueryTools {
         if(b.contains(item)) {
           return a;
         } else {
-          return new Queryable.Empty(clazz);
+          return new Queryable.Empty(type);
         }
       } else {
         Set result = new HashSet();
@@ -102,7 +102,7 @@ public class QueryTools {
             result.add(item);
           }
         }
-        return new SimpleQueryable(result, clazz);
+        return new SimpleQueryable(result, type);
       }
     }
   }
@@ -112,7 +112,7 @@ public class QueryTools {
       return a;
     } else if(a instanceof Queryable.Singleton) {
       if(b.contains(((Queryable.Singleton) a).getItem())) {
-        return new Queryable.Empty(a.getQueryClass());
+        return new Queryable.Empty(a.getItemType());
       } else {
         return a;
       }
@@ -126,41 +126,41 @@ public class QueryTools {
           result.add(o);
         }
       }
-      return createQueryable(result, a.getQueryClass());
+      return createQueryable(result, a.getItemType());
     }
   }
   /**
    * Attempts to guess a Class from <code>a</code> and <code>b</code>.
    */
-  public static Class guessClass(Queryable a, Queryable b) {
-    Class clazz;
+  public static Type guessType(Type a, Type b) {
+    Type type;
     
-    if(a.getQueryClass().isAssignableFrom(b.getQueryClass())) {
-      clazz = b.getQueryClass();
-    } else if(b.getQueryClass().isAssignableFrom(a.getQueryClass())) {
-      clazz = a.getQueryClass();
+    if(a.isAssignableFrom(b)) {
+      type = b;
+    } else if(b.isAssignableFrom(a)) {
+      type = a;
     } else {
-      clazz = Object.class;
+      type = JavaType.getType(Object.class);
     }
     
-    return clazz;
+    return type;
   }
   
   /**
    * Create a new Queryable from a set of items and a Class.
    *
    * @param items  a set of Object instances
-   * @param clazz  the Class that all items should implement
+   * @param type  the Class that all items should implement
    * @return a Queryable containing <code>items</code> and qualified by
-   *         Class <code>clazz</code>
+   *         Class <code>type</code>
    */
-  public static Queryable createQueryable(Set items, Class clazz) {
+  public static Queryable createQueryable(Set items, Type type) {
     if(items.size() == 0) {
-      return new  Queryable.Empty(clazz);
+      return new  Queryable.Empty(type);
     } else if(items.size() == 1) {
       return new Queryable.Singleton(items.iterator().next());
     } else {
-      return new SimpleQueryable(items, clazz);
+      return new SimpleQueryable(items, type);
     }
   }
   
@@ -192,7 +192,40 @@ public class QueryTools {
     Node endNode,
     Queryable items
   ) throws OperationException {
+    return select(query, startNode, endNode, items, cacheMap);
+  }
+  
+  static Map cacheMap = new HashMap();
+  
+  private static Queryable select(
+    Query query,
+    Node startNode,
+    Node endNode,
+    Queryable items,
+    Map cache
+  ) throws OperationException {
     final boolean debug = false;
+    //final boolean debug = true;
+    
+    List frame = new ArrayList();
+    frame.add(query);
+    frame.add(startNode);
+    frame.add(endNode);
+    frame.add(items);
+    
+    if(cache.containsKey(frame)) {
+      if(debug) System.out.println("Got data associated with frame: " + frame + "->" + cache.get(frame));
+      Object val = cache.get(frame);
+      if(val instanceof Queryable) {
+        return (Queryable) val;
+      } else {
+        return new Queryable.Empty(items.getItemType());
+      }
+    } else {
+      if(debug) System.out.println("In frame: " + frame);
+    }
+    
+    cache.put(frame, frame);
     
     if(debug) System.out.println("Executing at " + startNode + " with " + items);
 
@@ -206,7 +239,7 @@ public class QueryTools {
       if(debug) System.out.println("reached end node - selecting current items");
       selected = items;
     } else {
-      selected = new Queryable.Empty(items.getQueryClass());
+      selected = new Queryable.Empty(items.getItemType());
     }
     
     if(debug) System.out.println("Following " + query.getArcsFrom(startNode).size() +
@@ -228,18 +261,25 @@ public class QueryTools {
           throw new OperationException(cce, "Failed to execute " + arc + " " + op);
         } catch (IllegalArgumentException iae) {
           throw new OperationException(iae, "Failed to execute " + arc + " " + op);
+        } catch (TypeCastException tce) {
+          throw new OperationException(tce, "Failed to execute " + arc + " " + op);
         }
+        if(debug) System.out.println("In arc " + arc + " for " + op +
+          " accepted " + res);
         if(res.size() != 0) {
           selected = QueryTools.union(selected, select(
             query, 
             arc.to,
             endNode,
-            res
+            res,
+            cache
           ));
         }
       }
     }
-    if(debug) System.out.println("Selected " + startNode + " " + selected);
+    if(debug) System.out.println("Selected " + frame + " " + selected);
+    
+    cache.put(frame, selected);
     return selected;
   }
   
@@ -252,13 +292,198 @@ public class QueryTools {
    *
    * @param query  the input Query
    * @param startNode  the Node that a query would start from
-   * @param targetNode  the Node that will signal that items should be selected
+   * @param endNode  the Node that will signal that items should be selected
    * @param an optimized view of this
    */
-  public static Query optimize(Query query, Node startNode, Node targetNode)
+  public static Query optimize(Query query, Node startNode, Node endNode)
   throws OperationException {
+    Queryable nodesInPath = pruneQuery(query, startNode, endNode);
+    QueryBuilder pruneQB = new QueryBuilder();
+    pruneQB.addQuery(query);
+    for(Iterator i = query.getNodes().iterator(); i.hasNext(); ) {
+      Node n = (Node) i.next();
+      if(!nodesInPath.contains(n)) {
+        System.out.println("Removing " + n);
+        pruneQB.removeNode(n);
+      }
+    }
+    query = pruneQB.buildQuery();
+    
+    Query findMergableFiltersQuery;
+    Node findMergableFiltersStart;
+    Node findMergableFiltersEnd;
+    
+    try {
+      Tuple.TypeList TypeList_queryNode
+        = (Tuple.TypeList) JavaType.getType( new Class[] {Query.class, Node.class} );
+      Tuple.TypeList TypeList_queryQueryNode
+        = (Tuple.TypeList) JavaType.getType( new Class[] {Query.class, Query.class, Node.class} );
+      Tuple.TypeList TypeList_querySet
+        = (Tuple.TypeList) JavaType.getType( new Class[] {Query.class, Set.class } );
+      Tuple.TypeList TypeList_queryArc
+        = (Tuple.TypeList) JavaType.getType( new Class[] {Query.class, Arc.class} );
+      Tuple.TypeList TypeList_queryOperation
+        = (Tuple.TypeList) JavaType.getType( new Class[] {Query.class, Operation.class} );
+      Tuple.TypeList TypeList_queryQuerySet
+        = (Tuple.TypeList) JavaType.getType( new Class[] {Query.class, Query.class, Set.class} );
+      
+    Operation doubleQueryNode = new Tuple.Permutate(new int[] { 0, 0, 1 }, TypeList_queryNode);
+    
+    Method Query_getArcsFrom;
+    Method Query_getArcsTo;
+    Method Query_getOperations;
+    Method Query_getNodes;
+    Method Collection_size;
+    try {
+      Query_getArcsFrom = Query.class.getMethod(
+        "getArcsFrom",
+        new Class[] { Node.class }
+      );
+      Query_getArcsTo = Query.class.getMethod(
+        "getArcsTo",
+        new Class[] { Node.class }
+      );
+      Query_getOperations = Query.class.getMethod(
+        "getOperations",
+        new Class[] { Arc.class }
+      );
+      Query_getNodes = Query.class.getMethod(
+        "getNodes",
+        Follow.FollowMethod.EMPTY_CLASSES
+      );
+      Collection_size = Collection.class.getMethod(
+        "size",
+        Follow.FollowMethod.EMPTY_CLASSES
+      );
+    } catch (NoSuchMethodException nsme) {
+      throw new NestedError(nsme);
+    }
+
+    // mini query that counts the number of items in a set and then checks that
+    // it is 1
+    QueryBuilder sqb = new QueryBuilder();
+    Node collectionSizeIs1Start = new SimpleNode("sizeCheckStart",  JavaType.getType(Set.class));
+    Node setSize = new SimpleNode("setSize",  JavaType.getType(Integer.class));
+    Node collectionSizeIs1End = new SimpleNode("sizeIs1",  JavaType.getType(Integer.class));
+    sqb.addArc(new Arc(collectionSizeIs1Start, setSize),
+               new Follow.FollowMethod(Collection_size));
+    sqb.addArc(new Arc(setSize, collectionSizeIs1End),
+               new Filter.Equals(new Integer(1), JavaType.getType(Integer.class)));
+    Query collectionSizeIs1Query = sqb.buildQuery();
+    
+    // build query to find query,node tuples with just one way in or out where
+    // that way is an instance of Filter
+    QueryBuilder arcsQB = new QueryBuilder();
+    Node arcsFromStart = new SimpleNode("arcs from start (query,node)", TypeList_queryNode);
+    Node arcsFromQueryQueryNode = new SimpleNode("from prepared (query,query,node)", TypeList_queryQueryNode);
+    Node arcsToStart = new SimpleNode("arcs to start (query,node)", TypeList_queryNode);
+    Node arcsToQueryQueryNode = new SimpleNode("to prepared (query,query,node)", TypeList_queryQueryNode);
+    Node queryArcs = new SimpleNode("query,{arc}",  TypeList_querySet);
+    Node queryArcs1 = new SimpleNode("query,{arc} size is 1",  TypeList_querySet);
+    Node queryArc = new SimpleNode("query,arc", TypeList_queryArc);
+    Node opSet = new SimpleNode("operator set",  JavaType.getType(Set.class));
+    Node opSet1 = new SimpleNode("size is 1",  JavaType.getType(Set.class));
+    Node ops = new SimpleNode("operator",  JavaType.getType(Operation.class));
+    Node filterOps = new SimpleNode("filter op",  JavaType.getType(Filter.class));
+    
+    arcsQB.addArc(new Arc(arcsFromStart, arcsFromQueryQueryNode),
+                  doubleQueryNode);
+    arcsQB.addArc(new Arc(arcsFromQueryQueryNode, queryArcs),
+                  new Tuple.FollowMethod(Query_getArcsFrom, TypeList_queryQueryNode));
+    arcsQB.addArc(new Arc(arcsToStart, arcsToQueryQueryNode),
+                  doubleQueryNode);
+    arcsQB.addArc(new Arc(arcsToQueryQueryNode, queryArcs),
+                  new Tuple.FollowMethod(Query_getArcsTo, TypeList_queryQueryNode));
+    arcsQB.addArc(new Arc(queryArcs, queryArcs1),
+                  new Tuple.FilterByIndex(
+                    new FilterByQuery(collectionSizeIs1Query,
+                                      collectionSizeIs1Start,
+                                      collectionSizeIs1End,
+                                      Filter.CompareInteger.EQ,
+                                      1),
+                    1,
+                    TypeList_querySet));
+    arcsQB.addArc(new Arc(queryArcs1, queryArc),
+                  new Tuple.FollowTupleTo(
+                    1,
+                    new Follow.FollowCollectionToMembers(JavaType.getType(Arc.class)),
+                    TypeList_queryOperation));
+    arcsQB.addArc(new Arc(queryArc, opSet),
+                  new Tuple.FollowMethod(Query_getOperations,
+                                         TypeList_queryArc));
+    arcsQB.addArc(new Arc(opSet, opSet1),
+                  new FilterByQuery(collectionSizeIs1Query,
+                                    collectionSizeIs1Start,
+                                    collectionSizeIs1End,
+                                    Filter.CompareInteger.EQ,
+                                    1));
+    arcsQB.addArc(new Arc(opSet1, ops),
+                  new Follow.FollowCollectionToMembers(JavaType.getType(Operation.class)));
+    arcsQB.addArc(new Arc(ops, filterOps),
+                  new Filter.ByType(JavaType.getType(Operation.class), JavaType.getType(Filter.class)));
+    
+    Query arcsQuery = arcsQB.buildQuery();
+    
+    QueryBuilder fmfqb = new QueryBuilder();
+    
+    findMergableFiltersStart =  new SimpleNode("start",  JavaType.getType(Query.class));
+    Node qns =                  new SimpleNode("query,{node}", TypeList_querySet);
+    Node qn =                   new SimpleNode("query,node", TypeList_queryNode);
+    Node notStart =             new SimpleNode("not start node",  TypeList_queryNode);
+    Node notEnd =               new SimpleNode("not end node",  TypeList_queryNode);
+    Node oneFrom =              new SimpleNode("oneFrom",  TypeList_queryNode);
+    Node oneTo =                new SimpleNode("oneTo",  TypeList_queryNode);
+    findMergableFiltersEnd =    new SimpleNode("nodes",  JavaType.getType(Node.class));
+    
+    fmfqb.addArc(new Arc(findMergableFiltersStart, qns),
+                 new Tuple.FollowToTuple(new Follow.FollowMethod(Query_getNodes)));
+    fmfqb.addArc(new Arc(qns, qn),
+                 new Tuple.FollowTupleTo(
+                   1,
+                   new Follow.FollowCollectionToMembers(JavaType.getType(Node.class)),
+                   TypeList_querySet));
+    fmfqb.addArc(new Arc(qn, notStart),
+                 new Tuple.FilterByIndex(
+                     new Filter.Not(new Filter.Equals(
+                       startNode,
+                       JavaType.getType(Node.class)
+                     )
+                   ),
+                   1,
+                   TypeList_queryNode));
+    fmfqb.addArc(new Arc(notStart, notEnd),
+                 new Tuple.FilterByIndex(
+                   new Filter.Not(
+                     new Filter.Equals(
+                       endNode,
+                       JavaType.getType(Node.class)
+                     )
+                   ),
+                   1,
+                   TypeList_queryNode));
+    fmfqb.addArc(new Arc(notEnd, oneFrom),
+                 new FilterByQuery(arcsQuery,
+                                   arcsFromStart,
+                                   filterOps,
+                                   Filter.CompareInteger.EQ,
+                                   1));
+    
+    fmfqb.addArc(new Arc(oneFrom, oneTo),
+                 new FilterByQuery(arcsQuery,
+                                   arcsToStart,
+                                   filterOps,
+                                   Filter.CompareInteger.EQ,
+                                   1));
+    
+    fmfqb.addArc(new Arc(oneTo, findMergableFiltersEnd),
+                 new Tuple.FollowObject(TypeList_queryNode, 1));
+    
+    findMergableFiltersQuery = fmfqb.buildQuery();
+  } catch (OperationException oe) {
+    throw new NestedError(oe, "Can't initialize optimization queries");
+  }
     // find all nodes that have only 1 entry and 1 exit and for which these are
-    // labeld with filter operations
+    // labeld with filter operations, ignoring the start & end node
     Queryable mergableNodes = select(
       findMergableFiltersQuery,
       findMergableFiltersStart,
@@ -313,187 +538,12 @@ public class QueryTools {
       }
       mergableNodes = subtraction(
         mergableNodes,
-        createQueryable(visitedNodes, mergableNodes.getQueryClass())
+        createQueryable(visitedNodes, mergableNodes.getItemType())
       );
       qb.addArc(new Arc(from, to), new FilterSet(chainOps));
     }
     
     return qb.buildQuery();
-  }
-  
-  private static final Query findMergableFiltersQuery;
-  private static final Node findMergableFiltersStart;
-  private static final Node findMergableFiltersEnd;
-  
-  private static final Query collectionSizeIs1Query;
-  private static final Node collectionSizeIs1Start;
-  private static final Node collectionSizeIs1End;
-  
-  static {
-    try {
-    Tuple.ClassList queryNodeClassList
-      = new SimpleTuple.ClassList( new Class[] {Query.class, Node.class} );
-    Tuple.ClassList queryQueryNodeClassList
-      = new SimpleTuple.ClassList( new Class[] {Query.class, Query.class, Node.class} );
-    Tuple.ClassList querySetClassList
-    = new SimpleTuple.ClassList( new Class[] {Query.class, Set.class } );
-    Tuple.ClassList queryArcClassList
-      = new SimpleTuple.ClassList( new Class[] {Query.class, Arc.class} );
-    Tuple.ClassList queryOperationClassList
-      = new SimpleTuple.ClassList( new Class[] {Query.class, Operation.class} );
-    Tuple.ClassList queryQuerySetClassList
-      = new SimpleTuple.ClassList( new Class[] {Query.class, Query.class, Set.class} );
-
-    Operation doubleQueryNode = new Tuple.Permutate(new int[] { 0, 0, 1 });
-    
-    Method Query_getArcsFrom;
-    Method Query_getArcsTo;
-    Method Query_getOperations;
-    Method Query_getNodes;
-    Method Collection_size;
-    try {
-      Query_getArcsFrom = Query.class.getMethod(
-        "getArcsFrom",
-        new Class[] { Node.class }
-      );
-      Query_getArcsTo = Query.class.getMethod(
-        "getArcsTo",
-        new Class[] { Node.class }
-      );
-      Query_getOperations = Query.class.getMethod(
-        "getOperations",
-        new Class[] { Arc.class }
-      );
-      Query_getNodes = Query.class.getMethod(
-        "getNodes",
-        Follow.FollowMethod.EMPTY_CLASSES
-      );
-      Collection_size = Collection.class.getMethod(
-        "size",
-        Follow.FollowMethod.EMPTY_CLASSES
-      );
-    } catch (NoSuchMethodException nsme) {
-      throw new NestedError(nsme);
-    }
-
-    // mini query that counts the number of items in a set and then checks that
-    // it is 1
-    QueryBuilder sqb = new QueryBuilder();
-    collectionSizeIs1Start = new SimpleNode("sizeCheckStart", Set.class);
-    Node setSize = new SimpleNode("setSize", Integer.class);
-    collectionSizeIs1End = new SimpleNode("sizeIs1", Integer.class);
-    sqb.addArc(new Arc(collectionSizeIs1Start, setSize),
-               new Follow.FollowMethod(Collection_size));
-    sqb.addArc(new Arc(setSize, collectionSizeIs1End),
-               new Filter.Equals(new Integer(1), Integer.class));
-    collectionSizeIs1Query = sqb.buildQuery();
-    
-    // build query to find query,node tuples with just one way in or out where
-    // that way is an instance of Filter
-    QueryBuilder arcsQB = new QueryBuilder();
-    Node arcsFromStart = new SimpleNode("arcs from start (query,node)", Tuple.class);
-    Node arcsFromQueryQueryNode = new SimpleNode("from prepared (query,query,node)", Tuple.class);
-    Node arcsToStart = new SimpleNode("arcs to start (query,node)", Tuple.class);
-    Node arcsToQueryQueryNode = new SimpleNode("to prepared (query,query,node)", Tuple.class);
-    Node queryArcs = new SimpleNode("query,{arc}", Tuple.class);
-    Node queryArcs1 = new SimpleNode("query,{arc} size is 1", Tuple.class);
-    Node queryArc = new SimpleNode("query,arc", Tuple.class);
-    Node opSet = new SimpleNode("operator set", Set.class);
-    Node opSet1 = new SimpleNode("size is 1", Set.class);
-    Node ops = new SimpleNode("operator", Operation.class);
-    Node filterOps = new SimpleNode("filter op", Filter.class);
-    
-    arcsQB.addArc(new Arc(arcsFromStart, arcsFromQueryQueryNode),
-                  doubleQueryNode);
-    arcsQB.addArc(new Arc(arcsFromQueryQueryNode, queryArcs),
-                  new Tuple.FollowMethod(Query_getArcsFrom, queryQueryNodeClassList));
-    arcsQB.addArc(new Arc(arcsToStart, arcsToQueryQueryNode),
-                  doubleQueryNode);
-    arcsQB.addArc(new Arc(arcsToQueryQueryNode, queryArcs),
-                  new Tuple.FollowMethod(Query_getArcsTo, queryQueryNodeClassList));
-    arcsQB.addArc(new Arc(queryArcs, queryArcs1),
-                  new Tuple.FilterByIndex(
-                    new FilterByQuery(collectionSizeIs1Query,
-                                      collectionSizeIs1Start,
-                                      collectionSizeIs1End,
-                                      Filter.CompareInteger.EQ,
-                                      1),
-                    1));
-    arcsQB.addArc(new Arc(queryArcs1, queryArc),
-                  new Tuple.FollowTupleTo(
-                    1,
-                    new Follow.FollowCollectionToMembers(Arc.class),
-                    queryOperationClassList));
-    arcsQB.addArc(new Arc(queryArc, opSet),
-                  new Tuple.FollowMethod(Query_getOperations,
-                                         queryArcClassList));
-    arcsQB.addArc(new Arc(opSet, opSet1),
-                  new FilterByQuery(collectionSizeIs1Query,
-                                    collectionSizeIs1Start,
-                                    collectionSizeIs1End,
-                                    Filter.CompareInteger.EQ,
-                                    1));
-    arcsQB.addArc(new Arc(opSet1, ops),
-                  new Follow.FollowCollectionToMembers(Operation.class));
-    arcsQB.addArc(new Arc(ops, filterOps),
-                  new Filter.ByClass(Operation.class, Filter.class));
-    
-    Query arcsQuery = arcsQB.buildQuery();
-    
-    QueryBuilder fmfqb = new QueryBuilder();
-    
-    findMergableFiltersStart =  new SimpleNode("start", Query.class);
-    Node qns =                  new SimpleNode("query,{node}", Tuple.class);
-    Node qn =                   new SimpleNode("query,node", Tuple.class);
-    Node oneFrom =              new SimpleNode("oneFrom", Tuple.class);
-    Node oneTo =                new SimpleNode("oneTo", Tuple.class);
-    findMergableFiltersEnd =    new SimpleNode("nodes", Node.class);
-    
-    fmfqb.addArc(new Arc(findMergableFiltersStart, qns),
-                 new Tuple.FollowToTuple(new Follow.FollowMethod(Query_getNodes)));
-    fmfqb.addArc(new Arc(qns, qn),
-                 new Tuple.FollowTupleTo(
-                   1,
-                   new Follow.FollowCollectionToMembers(Node.class),
-                   querySetClassList));
-    fmfqb.addArc(new Arc(qn, oneFrom),
-                 new FilterByQuery(arcsQuery,
-                                   arcsFromStart,
-                                   filterOps,
-                                   Filter.CompareInteger.EQ,
-                                   1));
-    
-    fmfqb.addArc(new Arc(oneFrom, oneTo),
-                 new FilterByQuery(arcsQuery,
-                                   arcsToStart,
-                                   filterOps,
-                                   Filter.CompareInteger.EQ,
-                                   1));
-    
-    fmfqb.addArc(new Arc(oneTo, findMergableFiltersEnd),
-                 new Tuple.FollowObject(queryNodeClassList, 1));
-    
-    findMergableFiltersQuery = fmfqb.buildQuery();
-  } catch (OperationException oe) {
-    throw new NestedError(oe, "Can't initialize optimization queries");
-  }
-  }
-  
-  public static Class convertPrimatives(Class inputClass) {
-    if(inputClass.isPrimitive()) {
-      if(false) ; // syntactic sugar to make the rest line up
-      else if(inputClass == Boolean.TYPE)   inputClass = Boolean.class;
-      else if(inputClass == Character.TYPE) inputClass = Character.class;
-      else if(inputClass == Byte.TYPE)      inputClass = Byte.class;
-      else if(inputClass == Short.TYPE)     inputClass = Short.class;
-      else if(inputClass == Integer.TYPE)   inputClass = Integer.class;
-      else if(inputClass == Long.TYPE)      inputClass = Long.class;
-      else if(inputClass == Float.TYPE)     inputClass = Float.class;
-      else if(inputClass == Double.TYPE)    inputClass = Double.class;
-      else throw new IllegalArgumentException("Can't convert VOID");
-    }
-    
-    return inputClass;
   }
   
   public static Queryable findNodeByLabel(Query query, String label) {
@@ -516,29 +566,29 @@ public class QueryTools {
       // build query to check if node label is equal to label argument
       QueryBuilder nlqb = new QueryBuilder();
       
-      Node nodeLabelQueryStart = new SimpleNode("start", Node.class);
-      Node labelNode = new SimpleNode("label", String.class);
-      Node nodeLabelQueryEnd = new SimpleNode("end", String.class);
+      Node nodeLabelQueryStart = new SimpleNode("start",  JavaType.getType(Node.class));
+      Node labelNode = new SimpleNode("label",  JavaType.getType(String.class));
+      Node nodeLabelQueryEnd = new SimpleNode("end",  JavaType.getType(String.class));
       
       nlqb.addArc(new Arc(nodeLabelQueryStart, labelNode),
                   new Follow.FollowMethod(Node_getLabel));
       nlqb.addArc(new Arc(labelNode, nodeLabelQueryEnd),
-                  new Filter.Equals(label, String.class));
+                  new Filter.Equals(label, JavaType.getType(String.class)));
       
       Query nodeLabelQuery = nlqb.buildQuery();
       
       // biuld query to extract nodes from query with the given label
       QueryBuilder findNodeQB = new QueryBuilder();
       
-      Node start = new SimpleNode("start", Query.class);
-      Node nodeSet = new SimpleNode("nodeSet", Set.class);
-      Node node = new SimpleNode("node", Node.class);
-      Node end = new SimpleNode("end", Node.class);
+      Node start = new SimpleNode("start",  JavaType.getType(Query.class));
+      Node nodeSet = new SimpleNode("nodeSet",  JavaType.getType(Set.class));
+      Node node = new SimpleNode("node",  JavaType.getType(Node.class));
+      Node end = new SimpleNode("end",  JavaType.getType(Node.class));
       
       findNodeQB.addArc(new Arc(start, nodeSet),
                         new Follow.FollowMethod(Query_getNodes));
       findNodeQB.addArc(new Arc(nodeSet, node),
-                        new Follow.FollowCollectionToMembers(Node.class));
+                        new Follow.FollowCollectionToMembers(JavaType.getType(Node.class)));
       findNodeQB.addArc(new Arc(node, end),
                         new FilterByQuery(nodeLabelQuery,
                                           nodeLabelQueryStart,
@@ -576,78 +626,79 @@ public class QueryTools {
       throw new NestedError(nsfe);
     }
     
-    Tuple.ClassList ClassList_queryNode = new SimpleTuple.ClassList(
+    Tuple.TypeList TypeList_queryNode = (Tuple.TypeList) JavaType.getType(
       new Class[] {Query.class,
                    Node.class});
-    Tuple.ClassList ClassList_queryQueryNode = new SimpleTuple.ClassList(
+    Tuple.TypeList TypeList_queryQueryNode = (Tuple.TypeList) JavaType.getType(
       new Class[] {Query.class,
                    Query.class,
                    Node.class});
-    Tuple.ClassList ClassList_querySet = new SimpleTuple.ClassList(
+    Tuple.TypeList TypeList_querySet = (Tuple.TypeList) JavaType.getType(
       new Class[] {Query.class,
                    Set.class});
-    Tuple.ClassList ClassList_queryArc = new SimpleTuple.ClassList(
+    Tuple.TypeList TypeList_queryArc = (Tuple.TypeList) JavaType.getType(
       new Class[] {Query.class,
                    Arc.class});
     
     QueryBuilder pruneQB = new QueryBuilder();
     QueryHolder pruneHolder = new QueryHolder();
     
-    Operation acceptAllTuples = new Filter.AcceptAll(Tuple.class);
+    Operation acceptAllTuples = new Filter.AcceptAll(TypeList_queryNode);
     
-    Node pruneStart = new SimpleNode("start", Tuple.class);
-    Node accepted = new SimpleNode("accepted", Tuple.class);
-    Node inPath = new SimpleNode("inPath", Tuple.class);
-    Node path = new SimpleNode("path", Tuple.class);
-    Node pruneEnd = new SimpleNode("end", Node.class);
-    Node pruneInput = new SimpleNode("pruneInput", Tuple.class);
-    Node arcForNodeInput = new SimpleNode("arcForNodeInput", Tuple.class);
-    Node queryArcs = new SimpleNode("queryArcs", Tuple.class);
-    Node queryArc = new SimpleNode("queryArc", Tuple.class);
+    Node pruneStart = new SimpleNode("start", TypeList_queryNode);
+    Node accepted = new SimpleNode("accepted", TypeList_queryNode);
+    Node inPath = new SimpleNode("inPath", TypeList_queryNode);
+    Node pruneEnd = new SimpleNode("end", JavaType.getType(Node.class));
+    Node pruneInput = new SimpleNode("pruneInput", TypeList_queryNode);
+    Node arcForNodeInput = new SimpleNode("arcForNodeInput", TypeList_queryQueryNode);
+    Node queryArcs = new SimpleNode("queryArcs",  TypeList_querySet);
+    Node queryArc = new SimpleNode("queryArc", TypeList_queryArc);
     
-    // arc to check for node==endNode - accept this case
+    // arc to check for node==queryEnd - accept this case
     pruneQB.addArc(new Arc(pruneStart, accepted),
                    new Tuple.FilterByIndex(new Filter.Equals(queryEnd,
-                                                             Node.class),
-                                           1));
+                                                             JavaType.getType(Node.class)),
+                                           1,
+                                           TypeList_queryNode));
     
     // pass on all (query,node) tuples that have dependants in path to endNode,
     // along with all (query,node) tuples in that path
     pruneQB.addArc(new Arc(pruneStart, inPath),
                    new FilterByQuery(pruneHolder,
                                      pruneInput,
-                                     pruneEnd,
+                                     accepted,
                                      Filter.CompareInteger.GT,
                                      0));
     pruneQB.addArc(new Arc(inPath, accepted),
                    acceptAllTuples);
-    pruneQB.addArc(new Arc(inPath, path),
+    pruneQB.addArc(new Arc(inPath, accepted),
                    new FollowQuery(pruneHolder,
                                    pruneInput,
-                                   pruneEnd));
-    pruneQB.addArc(new Arc(path, accepted),
-                   acceptAllTuples);
+                                   accepted));
 
     // accepted query,node - extract node and put it into pruneEnd
     pruneQB.addArc(new Arc(accepted, pruneEnd),
-                   new Tuple.FollowObject(ClassList_queryNode, 1));
+                   new Tuple.FollowObject(TypeList_queryNode, 1));
 
                    Query pruneQuery = pruneQB.buildQuery();
 
     // follow from pruneInput through query,node to query,arc to query,node
     // again and feed this into pruneStart
     pruneQB.addArc(new Arc(pruneInput, arcForNodeInput),
-                   new Tuple.Permutate(new int[] { 0, 0, 1 }));
+                   new Tuple.Permutate(new int[] { 0, 0, 1 }, TypeList_queryNode));
     pruneQB.addArc(new Arc(arcForNodeInput, queryArcs),
                    new Tuple.FollowMethod(Query_getArcsFrom,
-                                          ClassList_querySet));
+                                          TypeList_queryQueryNode));
     pruneQB.addArc(new Arc(queryArcs, queryArc),
                    new Tuple.FollowTupleTo(
                      1,
-                     new Follow.FollowCollectionToMembers(Arc.class),
-                     ClassList_queryArc));
+                     new Follow.FollowCollectionToMembers(JavaType.getType(Arc.class)),
+                     TypeList_queryArc));
     pruneQB.addArc(new Arc(queryArc, pruneStart),
-                   new Follow.FollowField(Arc_to));
+                   new Tuple.FollowTupleTo(
+                     1,
+                     new Follow.FollowField(Arc_to),
+                     TypeList_queryArc));
     
     pruneQuery = pruneQB.buildQuery();
     try {
@@ -658,7 +709,7 @@ public class QueryTools {
     
     Tuple startTup = new SimpleTuple(
       new Object[] {query, queryStart},
-      ClassList_queryNode
+      TypeList_queryNode
     );
     return QueryTools.select(
       pruneQuery,

@@ -13,18 +13,18 @@ import java.util.*;
  */
 public interface Operation {
   /**
-   * All of the items in the input set will be castable to this Class.
+   * All of the items in the input set will be castable to this Type.
    *
-   * @return the Class of all input objects
+   * @return the Type of all input objects
    */
-  public Class getInputClass();
+  public Type getInputType();
 
   /**
-   * All of the items in the output set will be castable to this Class.
+   * All of the items in the output set will be castable to this Type.
    *
-   * @return the Class of all output objects
+   * @return the Type of all output objects
    */
-  public Class getOutputClass();
+  public Type getOutputType();
   
   /**
    * Return wether this operation selects a subset of the items selected
@@ -60,8 +60,8 @@ public interface Operation {
   
   /**
    * Return a Queryable by applying this Operation to <code>items</code>.
-   * The items set should be castable to getInputClass and the result set should
-   * be castable to getOutputClass.
+   * The items set should be castable to getInputType and the result set should
+   * be castable to getOutputType.
    *
    * @param items a Queryable containing each item to process
    * @return a Queryable produced by applying this operation
@@ -78,18 +78,18 @@ public interface Operation {
    * @since 1.2
    */
   public static final class Count implements Operation {
-    private final Class inputClass;
+    private final Type inputType;
     
-    public Count(Class inputClass) {
-      this.inputClass = inputClass;
+    public Count(Type inputType) {
+      this.inputType = inputType;
     }
     
-    public Class getInputClass() {
-      return inputClass;
+    public Type getInputType() {
+      return inputType;
     }
     
-    public Class getOutputClass() {
-      return Integer.class;
+    public Type getOutputType() {
+      return JavaType.getType(Integer.class);
     }
     
     public boolean isSubsetOf(Operation op) {
@@ -103,7 +103,7 @@ public interface Operation {
     public Queryable apply(Queryable items) {
       return QueryTools.createQueryable(
         Collections.singleton(new Integer(items.size())),
-        getOutputClass()
+        getOutputType()
       );
     }
   }

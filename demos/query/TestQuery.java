@@ -6,6 +6,8 @@ import java.util.*;
 import org.biojava.utils.query.*;
 
 public class TestQuery {
+  private static Type Type_Map = JavaType.getType(Map.class);
+  
   public static void main(String[] args) throws Throwable {
     Set carSet = new HashSet();
     Map c1;
@@ -16,10 +18,11 @@ public class TestQuery {
     Set peopleSet = new HashSet();
     peopleSet.add(buildPerson("ted", 32, c1));
     peopleSet.add(buildPerson("matt", 25, c1));
+    
     peopleSet.add(buildPerson("caroline", 25, c2));
     
-    Queryable cars = QueryTools.createQueryable(carSet, Map.class);
-    Queryable people = QueryTools.createQueryable(peopleSet, Map.class);
+    Queryable cars = QueryTools.createQueryable(carSet, Type_Map);
+    Queryable people = QueryTools.createQueryable(peopleSet, Type_Map);
     
     // filter people by age
     Query ageQuery25 = buildAgeQuery(25);
@@ -96,8 +99,8 @@ public class TestQuery {
   public static Query buildAgeQuery(int age)
   throws OperationException {
     QueryBuilder qb = new QueryBuilder();
-    Node startNode = new SimpleNode("start", Map.class);
-    Node endNode = new SimpleNode("end", Map.class);
+    Node startNode = new SimpleNode("start", Type_Map);
+    Node endNode = new SimpleNode("end", Type_Map);
 
     qb.addArc(
       new Arc(startNode, endNode),
@@ -110,12 +113,12 @@ public class TestQuery {
   public static Query buildCarQuery()
   throws OperationException {
     QueryBuilder qb = new QueryBuilder();
-    Node startNode = new SimpleNode("start", Map.class);
-    Node endNode = new SimpleNode("end", Map.class);
+    Node startNode = new SimpleNode("start", Type_Map);
+    Node endNode = new SimpleNode("end", Type_Map);
 
     qb.addArc(
       new Arc(startNode, endNode),
-      new MapFollower("car", Map.class)
+      new MapFollower("car", Type_Map)
     );
     
     return qb.buildQuery();
@@ -125,9 +128,9 @@ public class TestQuery {
   throws OperationException {
     QueryBuilder qb = new QueryBuilder();
     
-    Node startNode = new SimpleNode("start", Map.class);
-    Node endNode = new SimpleNode("end", Map.class);
-    Node ageSelected = new SimpleNode("ageSelected", Map.class);
+    Node startNode = new SimpleNode("start", Type_Map);
+    Node endNode = new SimpleNode("end", Type_Map);
+    Node ageSelected = new SimpleNode("ageSelected", Type_Map);
 
     qb.addArc(
       new Arc(startNode, ageSelected),
@@ -135,7 +138,7 @@ public class TestQuery {
     );
     qb.addArc(
       new Arc(ageSelected, endNode),
-      new MapFollower("car", Map.class)
+      new MapFollower("car", Type_Map)
     );
     
     return qb.buildQuery();
@@ -145,8 +148,8 @@ public class TestQuery {
   throws OperationException {
     QueryBuilder qb = new QueryBuilder();
     
-    Node startNode = new SimpleNode("start", Map.class);
-    Node endNode = new SimpleNode("end", Map.class);
+    Node startNode = new SimpleNode("start", Type_Map);
+    Node endNode = new SimpleNode("end", Type_Map);
     Arc startSelect = new Arc(startNode, endNode);
 
     qb.addArc(startSelect, new MapValueFilter("age", new Integer(age1)));
@@ -159,9 +162,9 @@ public class TestQuery {
   throws OperationException {
     QueryBuilder qb = new QueryBuilder();
     
-    Node startNode = new SimpleNode("start", Map.class);
-    Node aged = new SimpleNode("aged", Map.class);
-    Node endNode = new SimpleNode("end", Map.class);
+    Node startNode = new SimpleNode("start", Type_Map);
+    Node aged = new SimpleNode("aged", Type_Map);
+    Node endNode = new SimpleNode("end", Type_Map);
     
     qb.addArc(
       new Arc(startNode, aged),
@@ -177,15 +180,15 @@ public class TestQuery {
   
   public static Query buildPersonByCarQuery(Map car)
   throws OperationException {
-    Node startNode = new SimpleNode("start", Map.class);
-    Node endNode = new SimpleNode("end", Map.class);
+    Node startNode = new SimpleNode("start", Type_Map);
+    Node endNode = new SimpleNode("end", Type_Map);
     
     // select cars,  and count them
     QueryBuilder qb1 = new QueryBuilder();
-    Node cars = new SimpleNode("cars", Map.class);
-    Node ourCar = new SimpleNode("ourCar", Map.class);
-    qb1.addArc(new Arc(startNode, cars), new MapFollower("car", Map.class));
-    qb1.addArc(new Arc(cars, ourCar), new Filter.Equals(car, Map.class));
+    Node cars = new SimpleNode("cars", Type_Map);
+    Node ourCar = new SimpleNode("ourCar", Type_Map);
+    qb1.addArc(new Arc(startNode, cars), new MapFollower("car", Type_Map));
+    qb1.addArc(new Arc(cars, ourCar), new Filter.Equals(car, Type_Map));
     Query carQuery = qb1.buildQuery();
     
     Filter sizeFilter = new FilterByQuery(
@@ -201,14 +204,14 @@ public class TestQuery {
   
   public static Query buildPersonByCarColorQuery(Color color)
   throws OperationException {
-    Node startNode = new SimpleNode("start", Map.class);
-    Node endNode = new SimpleNode("end", Map.class);
+    Node startNode = new SimpleNode("start", Type_Map);
+    Node endNode = new SimpleNode("end", Type_Map);
     
     // select cars,  and count them
     QueryBuilder qb1 = new QueryBuilder();
-    Node cars = new SimpleNode("cars", Map.class);
-    Node ourCar = new SimpleNode("ourCar", Map.class);
-    qb1.addArc(new Arc(startNode, cars), new MapFollower("car", Map.class));
+    Node cars = new SimpleNode("cars", Type_Map);
+    Node ourCar = new SimpleNode("ourCar", Type_Map);
+    qb1.addArc(new Arc(startNode, cars), new MapFollower("car", Type_Map));
     qb1.addArc(new Arc(cars, ourCar), new MapValueFilter("color", color));
     Query carQuery = qb1.buildQuery();
     
@@ -239,27 +242,27 @@ public class TestQuery {
   }
   
   public static class MapFollower extends Follow {
-    private Class clazz;
+    private Type type;
     private final Object key;
     
-    public MapFollower(Object key, Class clazz) {
+    public MapFollower(Object key, Type type) {
       this.key = key;
-      this.clazz = clazz;
+      this.type = type;
     }
     
     public Queryable follow(Object item) {
       return QueryTools.createQueryable(
         Collections.singleton(((Map) item).get(key)),
-        clazz
+        type
       );
     }
     
-    public Class getInputClass() {
-      return Map.class;
+    public Type getInputType() {
+      return Type_Map;
     }
     
-    public Class getOutputClass() {
-      return clazz;
+    public Type getOutputType() {
+      return type;
     }
   }
   
@@ -277,12 +280,12 @@ public class TestQuery {
       return m.get(key).equals(value);
     }
     
-    public Class getInputClass() {
-      return Map.class;
+    public Type getInputType() {
+      return Type_Map;
     }
     
-    public Class getOutputClass() {
-      return Map.class;
+    public Type getOutputType() {
+      return Type_Map;
     }
     
     public String toString() {
