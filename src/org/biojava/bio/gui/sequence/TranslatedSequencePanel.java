@@ -301,9 +301,17 @@ public class TranslatedSequencePanel extends JComponent
 
         this.sequence = sequence;
 
-        // Add our listener to the sequence, if necessary
+        // Add our listener to the sequence, if necessary. Also update
+        // rendererBorders cache which can be affected by changes in
+        // sequence
         if (sequence != null)
+        {
+            if (renderer != null)
+                rendererBorders = renderer.getMinimumLeader(this)
+                + renderer.getMinimumTrailer(this);
+
             sequence.addChangeListener(layoutListener);
+        }
 
         firePropertyChange("sequence", prevSequence, sequence);
         resizeAndValidate();
@@ -509,6 +517,9 @@ public class TranslatedSequencePanel extends JComponent
     public void setRenderer(SequenceRenderer renderer)
         throws ChangeVetoException
     {
+        if (! isActive())
+            _setRenderer(renderer);
+
         if (hasListeners())
         {
             ChangeSupport cs = getChangeSupport(RENDERER);
@@ -908,9 +919,13 @@ public class TranslatedSequencePanel extends JComponent
 
         this.renderer = renderer;
 
-        // Update our cache of the renderer's total border size
-        rendererBorders = renderer.getMinimumLeader(this)
-            + renderer.getMinimumTrailer(this);
+        // Update our cache of the renderer's total border size, but
+        // only is the sequence is not null. If the sequence was null
+        // this value is no longer correct, so we have to update
+        // rendererBorders in setSequence too.
+        if (sequence != null)
+            rendererBorders = renderer.getMinimumLeader(this)
+                + renderer.getMinimumTrailer(this);
 
         // Add our listeners to the new renderer, if necessary
         if (renderer != null &&

@@ -58,10 +58,10 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
      * @param beadStroke a <code>Stroke</code>.
      */
     public RectangularBeadRenderer(final double beadDepth,
-				   final double beadDisplacement,
-				   final Paint  beadOutline,
-				   final Paint  beadFill,
-				   final Stroke beadStroke)
+                                   final double beadDisplacement,
+                                   final Paint  beadOutline,
+                                   final Paint  beadFill,
+                                   final Stroke beadStroke)
     {
 	super(beadDepth, beadDisplacement, beadOutline, beadFill, beadStroke);
         rect = new Rectangle2D.Double();
@@ -75,14 +75,14 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
      * @param context a <code>SequenceRenderContext</code> context.
      */
     protected void renderBead(final Graphics2D            g2,
-			      final Feature               f,
-			      final SequenceRenderContext context)
+                              final Feature               f,
+                              final SequenceRenderContext context)
     {
-	Location loc = f.getLocation();
+        Location loc = f.getLocation();
 
-	int min = loc.getMin();
-	int max = loc.getMax();
-	int dif = max - min;
+        int min = loc.getMin();
+        int max = loc.getMax();
+        int dif = max - min;
 
 	if (context.getDirection() == context.HORIZONTAL)
 	{
