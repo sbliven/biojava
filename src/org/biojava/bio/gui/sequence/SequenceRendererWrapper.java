@@ -79,7 +79,7 @@ implements SequenceRenderer, Serializable {
       ChangeSupport cs = getChangeSupport(RENDERER);
       synchronized(cs) {
         cs.firePreChangeEvent(ce);
-        if((renderer != null) && (renderer instanceof Changeable)) {
+        if((this.renderer != null) && (this.renderer instanceof Changeable)) {
           Changeable c = (Changeable) this.renderer;
           c.removeChangeListener(rendForwarder);
         }
@@ -100,22 +100,40 @@ implements SequenceRenderer, Serializable {
   }
   
   public double getDepth(SequenceRenderContext src) {
-    return getRenderer().getDepth(src);
+    SequenceRenderer sr = getRenderer();
+    if(sr == null) {
+      return 0.0;
+    } else {
+      return sr.getDepth(src);
+    }
   }
   
   public double getMinimumLeader(SequenceRenderContext src) {
-    return getRenderer().getMinimumLeader(src);
+    SequenceRenderer sr = getRenderer();
+    if(sr == null) {
+      return 0.0;
+    } else {
+      return sr.getMinimumLeader(src);
+    }
   }
   
   public double getMinimumTrailer(SequenceRenderContext src) {
-    return getRenderer().getMinimumTrailer(src);
+    SequenceRenderer sr = getRenderer();
+    if(sr == null) {
+      return 0.0;
+    } else {
+      return sr.getMinimumTrailer(src);
+    }
   }
   
   public void paint(
     Graphics2D g,
     SequenceRenderContext src
   ) {
-    getRenderer().paint(g, src);
+    SequenceRenderer sr = getRenderer();
+    if(sr != null) {
+      sr.paint(g, src);
+    }
   }
   
   public SequenceViewerEvent processMouseEvent(
