@@ -23,6 +23,7 @@ package org.biojava.bio.seq;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.lang.reflect.*;
 
 import java.util.*;
 import org.biojava.bio.*;
@@ -150,12 +151,69 @@ public interface Feature extends FeatureHolder, Annotatable {
      * sub-interface should provide a template class that inherits off this, and
      * the constructor or factory methods should make a particular feature
      * implementation from the template.
+     *
+     * <p>
+     * Equals and Hashcode methods are defined such that two templates
+     * are equal if all their fields are equal.  These are implemented
+     * by reflection, and automatically pick up any extra fields
+     * added in subclasses.
+     * </p>
+     *
+     * @author Thomas Down
      */
+
     public static class Template implements Serializable {
-      public Location location;
-      public String type;
-      public String source;
-      public Annotation annotation;
+	public Location location;
+	public String type;
+	public String source;
+	public Annotation annotation;
+
+	public int hashCode() {
+	    Class templClazz = getClass();
+	    Field[] fields = templClazz.getFields();
+	    int hc = 0;
+	    for (int i = 0; i < fields.length; ++i) {
+		try {
+		    Object o = fields[i].get(this);
+		    if (o != null) {
+			hc += o.hashCode();
+		    }
+		} catch (Exception ex) {
+		    throw new BioError(ex, "Can't access template fields");
+		}
+	    }
+	    
+	    return hc;
+	}
+
+	public boolean equals(Object b) {
+	    Class aClazz = getClass();
+	    Class bClazz = b.getClass();
+	    if (! aClazz.equals(bClazz)) {
+		return false;
+	    }
+
+	    Field[] fields = aClazz.getFields();
+	    for (int i = 0; i < fields.length; ++i) {
+		try {
+		    Object ao = fields[i].get(this);
+		    Object bo = fields[i].get(b);
+		    if (ao != bo) {
+			if (ao == null) {
+			    return false;
+			} else {
+			    if (! (ao.equals(bo))) {
+				return false;
+			    }
+			}
+		    }
+		} catch (Exception ex) {
+		    throw new BioError(ex, "Can't access template fields");
+		}
+	    }
+	    
+	    return true;
+	}
     }
 
     /**
