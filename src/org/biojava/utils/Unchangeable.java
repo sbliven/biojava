@@ -20,6 +20,8 @@
 
 package org.biojava.utils;
 
+import java.util.*;
+
 /**
  * This is a utility implementation of Changeable that doesn't fire any events
  * or keep references to any listeners. Use this when you have a final immutable * class and can't be bothered to fill in all those method stubs.
@@ -33,9 +35,17 @@ implements Changeable {
   
   public final void addChangeListener(ChangeListener cl, ChangeType ct) {}
 
+  public final Set getListeners(ChangeType ct) { return Collections.EMPTY_SET; }
+  
   public final void removeChangeListener(ChangeListener cl) {}
 
   public final void removeChangeListener(ChangeListener cl, ChangeType ct) {}
+
+  public final void addForwarder(ChangeForwarder cf, ChangeType ct) {}
+  
+  public final void removeForwarder(ChangeForwarder cf, ChangeType ct) {}
+  
+  public final Set getForwarders(ChangeType ct) { return Collections.EMPTY_SET; }
   
   public final boolean isUnchanging(ChangeType ct) { return true; }
 }
