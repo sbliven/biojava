@@ -301,6 +301,7 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
 	private final int wordLength;
 	private int pos = -1;
 	private int word = 0;
+	private int lengthFromUnknown = 0;
 
 	public PackingListener(Packing packing, int wordLength) {
 	    this.packing = packing;
@@ -340,13 +341,18 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
 		word = word >> (int) packing.wordSize();
 		try {
 		    int p = packing.pack(syms[i]);
-		    word |= (int) p << ((int) (wordLength - 1) * packing.wordSize());
+		    if (p < 0) {
+			lengthFromUnknown = 0;
+		    } else {
+			lengthFromUnknown++;
+			word |= (int) p << ((int) (wordLength - 1) * packing.wordSize());
+		    }
 		} catch (IllegalSymbolException ex) {
 		    throw new BioRuntimeException(ex);
 		}
 
 		++pos;
-		if (pos > wordLength) {
+		if (lengthFromUnknown >= wordLength) {
 		    try {
 			processWord(word, pos - wordLength);
 		    } catch (ParseException ex) {
