@@ -117,7 +117,8 @@ public abstract class DP {
     int cols = matrix.columns();
 
     for (int c = 0; c < cols; c++) {
-      score += Math.log(matrix.getColumn(c).getWeight(symList.symbolAt(c + start)));
+      score += Math.log(
+              matrix.getColumn(c).getWeight(symList.symbolAt(c + start)));
     }
 
     return score;
@@ -151,7 +152,8 @@ public abstract class DP {
     int cols = matrix.columns();
 
     for (int c = 0; c < cols; c++) {
-      score += scoreType.calculateScore(matrix.getColumn(c), symList.symbolAt(c + start));
+      score += Math.log(scoreType.calculateScore(
+              matrix.getColumn(c), symList.symbolAt(c + start)));
     }
 
     return score;
