@@ -38,6 +38,7 @@ import java.util.*;
  *                 Tim Dilks          (CAT)
  *                 Colin Hardman      (CAT)
  *                 Stuart Johnston    (CAT)
+ *                 Mathieu Wiepert    (Mayo Foundation)
  *
  * Copyright 2000 Cambridge Antibody Technology Group plc.
  * All Rights Reserved.
@@ -65,476 +66,481 @@ final class HSPSummaryHelper {
      * key: bitScore       -     value: 210
      * key: expectValue    -     value: 6e-53
      *
-     * @param poLine	 A String representation of the HSP Summary.
+     * @param poLine     A String representation of the HSP Summary.
      * @param HashMap    To put key/value info in.
      * @param oVersion a <code>BlastLikeVersionSupport</code> value
      * @exception SAXException if an error occurs
      */
     public static void parse(String poLine, HashMap poMap,
-		      BlastLikeVersionSupport poVersion) 
+              BlastLikeVersionSupport poVersion) 
     throws SAXException {
 
-	int iProgram = poVersion.getProgram();
+    int iProgram = poVersion.getProgram();
 
-	if ( (iProgram == BlastLikeVersionSupport.NCBI_BLASTN) ||
-	     (iProgram == BlastLikeVersionSupport.NCBI_BLASTX) ||
-	     (iProgram == BlastLikeVersionSupport.NCBI_BLASTP) ||
-	     (iProgram == BlastLikeVersionSupport.NCBI_TBLASTN) ||
-	     (iProgram == BlastLikeVersionSupport.NCBI_TBLASTX) ) {
+    if ( (iProgram == BlastLikeVersionSupport.NCBI_BLASTN) ||
+         (iProgram == BlastLikeVersionSupport.NCBI_BLASTX) ||
+         (iProgram == BlastLikeVersionSupport.NCBI_BLASTP) ||
+         (iProgram == BlastLikeVersionSupport.NCBI_TBLASTN) ||
+         (iProgram == BlastLikeVersionSupport.NCBI_TBLASTX) ) {
 
-	    parseNCBIBlast(poLine,poMap,poVersion);
-	    return;
-	}
-
-	if ( (iProgram == BlastLikeVersionSupport.WU_BLASTN) ||
-	     (iProgram == BlastLikeVersionSupport.WU_BLASTX) ||
-	     (iProgram == BlastLikeVersionSupport.WU_BLASTP) ||
-	     (iProgram == BlastLikeVersionSupport.WU_TBLASTN) ||
-	     (iProgram == BlastLikeVersionSupport.WU_TBLASTX) ) {
-
-	    parseWUBlast(poLine,poMap,poVersion);
-	    return;
-	}
-
-	//If get here, then program is not supported.
-	throw (new SAXException(
-		"Failed attempting to parse an HSP Summary because program ".
-		concat(poVersion.getProgramString()).
-	        concat(" is not supported.")));
-
+        parseNCBIBlast(poLine,poMap,poVersion);
+        return;
     }
+
+    if ( (iProgram == BlastLikeVersionSupport.WU_BLASTN) ||
+         (iProgram == BlastLikeVersionSupport.WU_BLASTX) ||
+         (iProgram == BlastLikeVersionSupport.WU_BLASTP) ||
+         (iProgram == BlastLikeVersionSupport.WU_TBLASTN) ||
+         (iProgram == BlastLikeVersionSupport.WU_TBLASTX) ) {
+
+        parseWUBlast(poLine,poMap,poVersion);
+        return;
+    }
+
+    if ( (iProgram == BlastLikeVersionSupport.GCG_BLASTN)) {
+        //Similar enough to use NCBI parser for now
+        parseNCBIBlast(poLine,poMap,poVersion);
+        return;
+    }
+    //If get here, then program is not supported.
+    throw (new SAXException(
+        "Failed attempting to parse an HSP Summary because program ".
+        concat(poVersion.getProgramString()).
+            concat(" is not supported.")));
+    }
+    
     static void parseNCBIBlast(String poLine, HashMap poMap,
-			       BlastLikeVersionSupport poVersion) {
+                   BlastLikeVersionSupport poVersion) {
 
-	String oToken;
-	String oToken2;
-	String oKey;
-	String oValue;
-	char[]  aoTmpArray;
-	StringTokenizer oSt;
-	StringTokenizer oSt2;
-	StringTokenizer oTmp;
-	StringBuffer    oTmpBuffer = new StringBuffer();
-	poMap.clear();
+    String oToken;
+    String oToken2;
+    String oKey;
+    String oValue;
+    char[]  aoTmpArray;
+    StringTokenizer oSt;
+    StringTokenizer oSt2;
+    StringTokenizer oTmp;
+    StringBuffer    oTmpBuffer = new StringBuffer();
+    poMap.clear();
 
-	//System.out.println(">>>>" + poLine);
+    //System.out.println(">>>>" + poLine);
 
-	//Tokenize on commas, and make lower case...
-	oSt = new StringTokenizer(poLine.toLowerCase(),",");
+    //Tokenize on commas, and make lower case...
+    oSt = new StringTokenizer(poLine.toLowerCase(),",");
 
-	while (oSt.hasMoreTokens()) {
+    while (oSt.hasMoreTokens()) {
 
-	    oToken = oSt.nextToken().trim();
+        oToken = oSt.nextToken().trim();
 
-	    oSt2 = new StringTokenizer(oToken);
+        oSt2 = new StringTokenizer(oToken);
 
-	    while (oSt2.hasMoreTokens()) {
+        while (oSt2.hasMoreTokens()) {
 
-		oToken2 = oSt2.nextToken().trim();
+        oToken2 = oSt2.nextToken().trim();
 
-		//now grab info on a case-by-case basis
-		//and put into HashMap...
+        //now grab info on a case-by-case basis
+        //and put into HashMap...
 
-		//NCBI-BLAST, WU-BLAST
-		if (oToken2.equals("score")) {
+        //NCBI-BLAST, WU-BLAST
+        if (oToken2.equals("score")) {
 
-		    oKey = "score";
-		    //assume "Token = value ..."
-		    oSt2.nextToken(); //skip =
-		    oValue = oSt2.nextToken(); //grab score
-		    
-		    poMap.put(oKey,oValue);
-		    break;
-		}
+            oKey = "score";
+            //assume "Token = value ..."
+            oSt2.nextToken(); //skip =
+            oValue = oSt2.nextToken(); //grab score
+            
+            poMap.put(oKey,oValue);
+            break;
+        }
 
-		//NCBI Blast, WU-BLAST
-		if (oToken2.startsWith("expect")) {
-		    //could be "expect" or "expect(2) etc."
-		    oKey = "expectValue";
-		    //assume " Token = value"
-		    oSt2.nextToken(); //skip =
-		    oValue = oSt2.nextToken();
-		    
-		    poMap.put(oKey,oValue);
-		    break;
-		}
+        //NCBI Blast, WU-BLAST
+        if (oToken2.startsWith("expect")) {
+            //could be "expect" or "expect(2) etc."
+            oKey = "expectValue";
+            //assume " Token = value"
+            oSt2.nextToken(); //skip =
+            oValue = oSt2.nextToken();
+            
+            poMap.put(oKey,oValue);
+            break;
+        }
 
-		//NCBI Blast, WU-BLAST
+        //NCBI Blast, WU-BLAST
 
-		if (oToken2.equals("identities")) {
+        if (oToken2.equals("identities")) {
 
-		    //assume " identities = 129/168 (76%)"
-		    oSt2.nextToken(); //skip =
+            //assume " identities = 129/168 (76%)"
+            oSt2.nextToken(); //skip =
 
-		    //this token is 129/157
-		    oTmp = new StringTokenizer(oSt2.nextToken(),"/");
-		    oKey = "numberOfIdentities";
-		    oValue = oTmp.nextToken();
-		    poMap.put(oKey,oValue);
+            //this token is 129/157
+            oTmp = new StringTokenizer(oSt2.nextToken(),"/");
+            oKey = "numberOfIdentities";
+            oValue = oTmp.nextToken();
+            poMap.put(oKey,oValue);
 
-		    oKey = "alignmentSize";
-		    oValue = oTmp.nextToken();
-		    poMap.put(oKey,oValue);
-		    
-		    //here next token is (76%)
+            oKey = "alignmentSize";
+            oValue = oTmp.nextToken();
+            poMap.put(oKey,oValue);
+            
+            //here next token is (76%)
 
-		    oTmp = new StringTokenizer(oSt2.nextToken(),"(%)");
-		    oKey = "percentageIdentity";
-		    oValue = oTmp.nextToken();
-		    poMap.put(oKey,oValue);
+            oTmp = new StringTokenizer(oSt2.nextToken(),"(%)");
+            oKey = "percentageIdentity";
+            oValue = oTmp.nextToken();
+            poMap.put(oKey,oValue);
 
-		    break;
-		}
+            break;
+        }
 
-		//NCBI Blast, WU-BLAST
-		if (oToken2.equals("positives")) {
+        //NCBI Blast, WU-BLAST
+        if (oToken2.equals("positives")) {
 
-		    //assume " positives = 129/168 (76%)"
-		    oSt2.nextToken(); //skip =
+            //assume " positives = 129/168 (76%)"
+            oSt2.nextToken(); //skip =
 
-		    //this token is 129/157
-		    oTmp = new StringTokenizer(oSt2.nextToken(),"/");
-		    oKey = "numberOfPositives";
-		    oValue = oTmp.nextToken();
-		    poMap.put(oKey,oValue);
-		    
+            //this token is 129/157
+            oTmp = new StringTokenizer(oSt2.nextToken(),"/");
+            oKey = "numberOfPositives";
+            oValue = oTmp.nextToken();
+            poMap.put(oKey,oValue);
+            
 
-		    //here next token is like (76%)
+            //here next token is like (76%)
 
-		    oTmp = new StringTokenizer(oSt2.nextToken(),"(%)");
-		    oKey = "percentagePositives";
-		    oValue = oTmp.nextToken();
-		    poMap.put(oKey,oValue);
-
-
-		    break;
-		}
+            oTmp = new StringTokenizer(oSt2.nextToken(),"(%)");
+            oKey = "percentagePositives";
+            oValue = oTmp.nextToken();
+            poMap.put(oKey,oValue);
 
 
-		//NCBI Blast, WU-BLAST
-		if (oToken2.equals("strand")) {
-
-		    //assume " strand = plus / minus"
-		    oSt2.nextToken(); //skip =
-
-		    //this token is "plus"
-
- 		    oKey = "queryStrand";
- 		    oValue = oSt2.nextToken();
- 		    poMap.put(oKey,oValue);
-		    
-		    oSt2.nextToken(); //skip "/"
-
- 		    oKey = "hitStrand";
- 		    oValue = oSt2.nextToken();
- 		    poMap.put(oKey,oValue);
-
-		    break;
-		}
+            break;
+        }
 
 
+        //NCBI Blast, WU-BLAST
+        if (oToken2.equals("strand")) {
 
-		if (oToken2.equals("frame")) {
+            //assume " strand = plus / minus"
+            oSt2.nextToken(); //skip =
 
-		    //assume " Frame = +3 " for blastx and tblastn
-		    //assume " Frame = +3 / -1" for tblastx
+            //this token is "plus"
 
-		    oSt2.nextToken(); //skip =
+            oKey = "queryStrand";
+            oValue = oSt2.nextToken();
+            poMap.put(oKey,oValue);
+            
+            oSt2.nextToken(); //skip "/"
 
-		    if (poVersion.getProgram() ==
-			BlastLikeVersionSupport.NCBI_BLASTX) {
-			oKey = "queryFrame";
-			aoTmpArray = oSt2.nextToken().toCharArray();
-			oTmpBuffer.setLength(0);
-			if (aoTmpArray[0] == '+') {
-			    oTmpBuffer.append("plus");
-			} else {
-			    oTmpBuffer.append("minus");
-			}
-			oTmpBuffer.append(aoTmpArray[1]);
-			oValue = oTmpBuffer.toString();
-			poMap.put(oKey,oValue);
-			break;
-		    }
+            oKey = "hitStrand";
+            oValue = oSt2.nextToken();
+            poMap.put(oKey,oValue);
 
-
-		    if (poVersion.getProgram() ==
-			BlastLikeVersionSupport.NCBI_TBLASTN) {
-			oKey = "hitFrame";
-			aoTmpArray = oSt2.nextToken().toCharArray();
-			oTmpBuffer.setLength(0);
-			if (aoTmpArray[0] == '+') {
-			    oTmpBuffer.append("plus");
-			} else {
-			    oTmpBuffer.append("minus");
-			}
-			oTmpBuffer.append(aoTmpArray[1]);
-			oValue = oTmpBuffer.toString();
-			poMap.put(oKey,oValue);
-			break;
-		    }
-
-		    if (poVersion.getProgram() ==
-			BlastLikeVersionSupport.NCBI_TBLASTX) {
-			oKey = "queryFrame";
-			aoTmpArray = oSt2.nextToken().toCharArray();
-			oTmpBuffer.setLength(0);
-			if (aoTmpArray[0] == '+') {
-			    oTmpBuffer.append("plus");
-			} else {
-			    oTmpBuffer.append("minus");
-			}
-			oTmpBuffer.append(aoTmpArray[1]);
-			oValue = oTmpBuffer.toString();
-			poMap.put(oKey,oValue);
-
-			//skip "/"
-
-			oSt2.nextToken();
-
-			oKey = "hitFrame";
-			aoTmpArray = oSt2.nextToken().toCharArray();
-			oTmpBuffer.setLength(0);
-			if (aoTmpArray[0] == '+') {
-			    oTmpBuffer.append("plus");
-			} else {
-			    oTmpBuffer.append("minus");
-			}
-			oTmpBuffer.append(aoTmpArray[1]);
-			oValue = oTmpBuffer.toString();
-			poMap.put(oKey,oValue);
-
-			break;
-		    }
-
-
-		}
+            break;
+        }
 
 
 
+        if (oToken2.equals("frame")) {
 
-	    } //end loop over
+            //assume " Frame = +3 " for blastx and tblastn
+            //assume " Frame = +3 / -1" for tblastx
 
-	    //System.out.println(oToken);
-	} //end loop over "score = 119 bits" type tokens
+            oSt2.nextToken(); //skip =
+
+            if (poVersion.getProgram() ==
+            BlastLikeVersionSupport.NCBI_BLASTX) {
+            oKey = "queryFrame";
+            aoTmpArray = oSt2.nextToken().toCharArray();
+            oTmpBuffer.setLength(0);
+            if (aoTmpArray[0] == '+') {
+                oTmpBuffer.append("plus");
+            } else {
+                oTmpBuffer.append("minus");
+            }
+            oTmpBuffer.append(aoTmpArray[1]);
+            oValue = oTmpBuffer.toString();
+            poMap.put(oKey,oValue);
+            break;
+            }
+
+
+            if (poVersion.getProgram() ==
+            BlastLikeVersionSupport.NCBI_TBLASTN) {
+            oKey = "hitFrame";
+            aoTmpArray = oSt2.nextToken().toCharArray();
+            oTmpBuffer.setLength(0);
+            if (aoTmpArray[0] == '+') {
+                oTmpBuffer.append("plus");
+            } else {
+                oTmpBuffer.append("minus");
+            }
+            oTmpBuffer.append(aoTmpArray[1]);
+            oValue = oTmpBuffer.toString();
+            poMap.put(oKey,oValue);
+            break;
+            }
+
+            if (poVersion.getProgram() ==
+            BlastLikeVersionSupport.NCBI_TBLASTX) {
+            oKey = "queryFrame";
+            aoTmpArray = oSt2.nextToken().toCharArray();
+            oTmpBuffer.setLength(0);
+            if (aoTmpArray[0] == '+') {
+                oTmpBuffer.append("plus");
+            } else {
+                oTmpBuffer.append("minus");
+            }
+            oTmpBuffer.append(aoTmpArray[1]);
+            oValue = oTmpBuffer.toString();
+            poMap.put(oKey,oValue);
+
+            //skip "/"
+
+            oSt2.nextToken();
+
+            oKey = "hitFrame";
+            aoTmpArray = oSt2.nextToken().toCharArray();
+            oTmpBuffer.setLength(0);
+            if (aoTmpArray[0] == '+') {
+                oTmpBuffer.append("plus");
+            } else {
+                oTmpBuffer.append("minus");
+            }
+            oTmpBuffer.append(aoTmpArray[1]);
+            oValue = oTmpBuffer.toString();
+            poMap.put(oKey,oValue);
+
+            break;
+            }
+
+
+        }
+
+
+
+
+        } //end loop over
+
+        //System.out.println(oToken);
+    } //end loop over "score = 119 bits" type tokens
 
     }
 
 
     static void parseWUBlast(String poLine, HashMap poMap,
-			       BlastLikeVersionSupport poVersion) {
+                   BlastLikeVersionSupport poVersion) {
 
-	String oToken;
-	String oToken2;
-	String oKey;
-	String oValue;
-	char[]  aoTmpArray;
-	StringTokenizer oSt;
-	StringTokenizer oSt2;
-	StringTokenizer oTmp;
-	StringBuffer    oTmpBuffer = new StringBuffer();
-	poMap.clear();
+    String oToken;
+    String oToken2;
+    String oKey;
+    String oValue;
+    char[]  aoTmpArray;
+    StringTokenizer oSt;
+    StringTokenizer oSt2;
+    StringTokenizer oTmp;
+    StringBuffer    oTmpBuffer = new StringBuffer();
+    poMap.clear();
 
-	//System.out.println(">>>>" + poLine);
+    //System.out.println(">>>>" + poLine);
 
-	//Tokenize on commas, and make lower case...
-	oSt = new StringTokenizer(poLine.toLowerCase(),",");
+    //Tokenize on commas, and make lower case...
+    oSt = new StringTokenizer(poLine.toLowerCase(),",");
 
-	while (oSt.hasMoreTokens()) {
+    while (oSt.hasMoreTokens()) {
 
-	    oToken = oSt.nextToken().trim();
+        oToken = oSt.nextToken().trim();
 
-	    oSt2 = new StringTokenizer(oToken);
+        oSt2 = new StringTokenizer(oToken);
 
-	    while (oSt2.hasMoreTokens()) {
+        while (oSt2.hasMoreTokens()) {
 
-		oToken2 = oSt2.nextToken().trim();
+        oToken2 = oSt2.nextToken().trim();
 
-		//now grab info on a case-by-case basis
-		//and put into HashMap...
+        //now grab info on a case-by-case basis
+        //and put into HashMap...
 
-		//NCBI-BLAST, WU-BLAST
-		if (oToken2.equals("score")) {
+        //NCBI-BLAST, WU-BLAST
+        if (oToken2.equals("score")) {
 
-		    oKey = "score";
-		    //assume "Token = value ..."
-		    oSt2.nextToken(); //skip =
-		    oValue = oSt2.nextToken(); //grab score
-		    
-		    poMap.put(oKey,oValue);
-		    break;
-		}
+            oKey = "score";
+            //assume "Token = value ..."
+            oSt2.nextToken(); //skip =
+            oValue = oSt2.nextToken(); //grab score
+            
+            poMap.put(oKey,oValue);
+            break;
+        }
 
-		//NCBI Blast, WU-BLAST
-		if (oToken2.startsWith("expect")) {
-		    //could be "expect" or "expect(2) etc."
-		    oKey = "expectValue";
-		    //assume " Token = value"
-		    oSt2.nextToken(); //skip =
-		    oValue = oSt2.nextToken();
-		    
-		    poMap.put(oKey,oValue);
-		    break;
-		}
+        //NCBI Blast, WU-BLAST
+        if (oToken2.startsWith("expect")) {
+            //could be "expect" or "expect(2) etc."
+            oKey = "expectValue";
+            //assume " Token = value"
+            oSt2.nextToken(); //skip =
+            oValue = oSt2.nextToken();
+            
+            poMap.put(oKey,oValue);
+            break;
+        }
 
-		//NCBI Blast, WU-BLAST
+        //NCBI Blast, WU-BLAST
 
-		if (oToken2.equals("identities")) {
+        if (oToken2.equals("identities")) {
 
-		    //assume " identities = 129/168 (76%)"
-		    oSt2.nextToken(); //skip =
+            //assume " identities = 129/168 (76%)"
+            oSt2.nextToken(); //skip =
 
-		    //this token is 129/157
-		    oTmp = new StringTokenizer(oSt2.nextToken(),"/");
-		    oKey = "numberOfIdentities";
-		    oValue = oTmp.nextToken();
-		    poMap.put(oKey,oValue);
+            //this token is 129/157
+            oTmp = new StringTokenizer(oSt2.nextToken(),"/");
+            oKey = "numberOfIdentities";
+            oValue = oTmp.nextToken();
+            poMap.put(oKey,oValue);
 
-		    oKey = "alignmentSize";
-		    oValue = oTmp.nextToken();
-		    poMap.put(oKey,oValue);
-		    
-		    //here next token is (76%)
+            oKey = "alignmentSize";
+            oValue = oTmp.nextToken();
+            poMap.put(oKey,oValue);
+            
+            //here next token is (76%)
 
-		    oTmp = new StringTokenizer(oSt2.nextToken(),"(%)");
-		    oKey = "percentageIdentity";
-		    oValue = oTmp.nextToken();
-		    poMap.put(oKey,oValue);
+            oTmp = new StringTokenizer(oSt2.nextToken(),"(%)");
+            oKey = "percentageIdentity";
+            oValue = oTmp.nextToken();
+            poMap.put(oKey,oValue);
 
-		    break;
-		}
+            break;
+        }
 
-		//NCBI Blast, WU-BLAST
-		if (oToken2.equals("positives")) {
+        //NCBI Blast, WU-BLAST
+        if (oToken2.equals("positives")) {
 
-		    //assume " positives = 129/168 (76%)"
-		    oSt2.nextToken(); //skip =
+            //assume " positives = 129/168 (76%)"
+            oSt2.nextToken(); //skip =
 
-		    //this token is 129/157
-		    oTmp = new StringTokenizer(oSt2.nextToken(),"/");
-		    oKey = "numberOfPositives";
-		    oValue = oTmp.nextToken();
-		    poMap.put(oKey,oValue);
-		    
+            //this token is 129/157
+            oTmp = new StringTokenizer(oSt2.nextToken(),"/");
+            oKey = "numberOfPositives";
+            oValue = oTmp.nextToken();
+            poMap.put(oKey,oValue);
+            
 
-		    //here next token is like (76%)
+            //here next token is like (76%)
 
-		    oTmp = new StringTokenizer(oSt2.nextToken(),"(%)");
-		    oKey = "percentagePositives";
-		    oValue = oTmp.nextToken();
-		    poMap.put(oKey,oValue);
-
-
-		    break;
-		}
+            oTmp = new StringTokenizer(oSt2.nextToken(),"(%)");
+            oKey = "percentagePositives";
+            oValue = oTmp.nextToken();
+            poMap.put(oKey,oValue);
 
 
-		//NCBI Blast, WU-BLAST
-		if (oToken2.equals("strand")) {
-
-		    //assume " strand = plus / minus"
-		    oSt2.nextToken(); //skip =
-
-		    //this token is "plus"
-
- 		    oKey = "queryStrand";
- 		    oValue = oSt2.nextToken();
- 		    poMap.put(oKey,oValue);
-		    
-		    oSt2.nextToken(); //skip "/"
-
- 		    oKey = "hitStrand";
- 		    oValue = oSt2.nextToken();
- 		    poMap.put(oKey,oValue);
-
-		    break;
-		}
+            break;
+        }
 
 
+        //NCBI Blast, WU-BLAST
+        if (oToken2.equals("strand")) {
 
-		if (oToken2.equals("frame")) {
+            //assume " strand = plus / minus"
+            oSt2.nextToken(); //skip =
 
-		    //assume " Frame = +3 " for blastx and tblastn
-		    //assume " Frame = +3 / -1" for tblastx
+            //this token is "plus"
 
-		    oSt2.nextToken(); //skip =
+            oKey = "queryStrand";
+            oValue = oSt2.nextToken();
+            poMap.put(oKey,oValue);
+            
+            oSt2.nextToken(); //skip "/"
 
-		    if (poVersion.getProgram() ==
-			BlastLikeVersionSupport.WU_BLASTX) {
-			oKey = "queryFrame";
-			aoTmpArray = oSt2.nextToken().toCharArray();
-			oTmpBuffer.setLength(0);
-			if (aoTmpArray[0] == '+') {
-			    oTmpBuffer.append("plus");
-			} else {
-			    oTmpBuffer.append("minus");
-			}
-			oTmpBuffer.append(aoTmpArray[1]);
-			oValue = oTmpBuffer.toString();
-			poMap.put(oKey,oValue);
-			break;
-		    }
+            oKey = "hitStrand";
+            oValue = oSt2.nextToken();
+            poMap.put(oKey,oValue);
 
-
-		    if (poVersion.getProgram() ==
-			BlastLikeVersionSupport.WU_TBLASTN) {
-			oKey = "hitFrame";
-			aoTmpArray = oSt2.nextToken().toCharArray();
-			oTmpBuffer.setLength(0);
-			if (aoTmpArray[0] == '+') {
-			    oTmpBuffer.append("plus");
-			} else {
-			    oTmpBuffer.append("minus");
-			}
-			oTmpBuffer.append(aoTmpArray[1]);
-			oValue = oTmpBuffer.toString();
-			poMap.put(oKey,oValue);
-			break;
-		    }
-
-		    if (poVersion.getProgram() ==
-			BlastLikeVersionSupport.WU_TBLASTX) {
-			oKey = "queryFrame";
-			aoTmpArray = oSt2.nextToken().toCharArray();
-			oTmpBuffer.setLength(0);
-			if (aoTmpArray[0] == '+') {
-			    oTmpBuffer.append("plus");
-			} else {
-			    oTmpBuffer.append("minus");
-			}
-			oTmpBuffer.append(aoTmpArray[1]);
-			oValue = oTmpBuffer.toString();
-			poMap.put(oKey,oValue);
-
-			//skip "/"
-
-			oSt2.nextToken();
-
-			oKey = "hitFrame";
-			aoTmpArray = oSt2.nextToken().toCharArray();
-			oTmpBuffer.setLength(0);
-			if (aoTmpArray[0] == '+') {
-			    oTmpBuffer.append("plus");
-			} else {
-			    oTmpBuffer.append("minus");
-			}
-			oTmpBuffer.append(aoTmpArray[1]);
-			oValue = oTmpBuffer.toString();
-			poMap.put(oKey,oValue);
-
-			break;
-		    }
-
-
-		}
+            break;
+        }
 
 
 
+        if (oToken2.equals("frame")) {
 
-	    } //end loop over
+            //assume " Frame = +3 " for blastx and tblastn
+            //assume " Frame = +3 / -1" for tblastx
 
-	    //System.out.println(oToken);
-	} //end loop over "score = 119 bits" type tokens
+            oSt2.nextToken(); //skip =
+
+            if (poVersion.getProgram() ==
+            BlastLikeVersionSupport.WU_BLASTX) {
+            oKey = "queryFrame";
+            aoTmpArray = oSt2.nextToken().toCharArray();
+            oTmpBuffer.setLength(0);
+            if (aoTmpArray[0] == '+') {
+                oTmpBuffer.append("plus");
+            } else {
+                oTmpBuffer.append("minus");
+            }
+            oTmpBuffer.append(aoTmpArray[1]);
+            oValue = oTmpBuffer.toString();
+            poMap.put(oKey,oValue);
+            break;
+            }
+
+
+            if (poVersion.getProgram() ==
+            BlastLikeVersionSupport.WU_TBLASTN) {
+            oKey = "hitFrame";
+            aoTmpArray = oSt2.nextToken().toCharArray();
+            oTmpBuffer.setLength(0);
+            if (aoTmpArray[0] == '+') {
+                oTmpBuffer.append("plus");
+            } else {
+                oTmpBuffer.append("minus");
+            }
+            oTmpBuffer.append(aoTmpArray[1]);
+            oValue = oTmpBuffer.toString();
+            poMap.put(oKey,oValue);
+            break;
+            }
+
+            if (poVersion.getProgram() ==
+            BlastLikeVersionSupport.WU_TBLASTX) {
+            oKey = "queryFrame";
+            aoTmpArray = oSt2.nextToken().toCharArray();
+            oTmpBuffer.setLength(0);
+            if (aoTmpArray[0] == '+') {
+                oTmpBuffer.append("plus");
+            } else {
+                oTmpBuffer.append("minus");
+            }
+            oTmpBuffer.append(aoTmpArray[1]);
+            oValue = oTmpBuffer.toString();
+            poMap.put(oKey,oValue);
+
+            //skip "/"
+
+            oSt2.nextToken();
+
+            oKey = "hitFrame";
+            aoTmpArray = oSt2.nextToken().toCharArray();
+            oTmpBuffer.setLength(0);
+            if (aoTmpArray[0] == '+') {
+                oTmpBuffer.append("plus");
+            } else {
+                oTmpBuffer.append("minus");
+            }
+            oTmpBuffer.append(aoTmpArray[1]);
+            oValue = oTmpBuffer.toString();
+            poMap.put(oKey,oValue);
+
+            break;
+            }
+
+
+        }
+
+
+
+
+        } //end loop over
+
+        //System.out.println(oToken);
+    } //end loop over "score = 119 bits" type tokens
 
     }
 

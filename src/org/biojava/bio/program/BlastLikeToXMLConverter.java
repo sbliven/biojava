@@ -45,17 +45,17 @@ import org.biojava.bio.program.xml.SimpleXMLEmitter;
  * simply built from the following code, <i>viz.</i>:
  * <pre>
  *
- *    !**
- *      * The following code creates a parser for native output
- *      * from BlastLike programs. That is,
- *      * Create a SAX2 Parser that takes the native output
- *      * from blast-like bioinformatics software.
- *      *!
- *      <font color="#0000FF">
- *       XMLReader oParser =
- *	    (XMLReader) new BlastLikeSAXParser();
- *      </font>
- *	!**
+ *      !**
+ *       * The following code creates a parser for native output
+ *       * from BlastLike programs. That is,
+ *       * Create a SAX2 Parser that takes the native output
+ *       * from blast-like bioinformatics software.
+ *       *!
+ *       <font color="#0000FF">
+ *        XMLReader oParser =
+ *       (XMLReader) new BlastLikeSAXParser();
+ *       </font>
+ *     !**
  *       * Namespace support controls the way in which
  *       * XML elements are reported. In XML, when an element
  *       * looks something like <biojava:Hit> then,
@@ -68,26 +68,26 @@ import org.biojava.bio.program.xml.SimpleXMLEmitter;
  *       * If you don't want to change default namespace support, you
  *       * can ignore the next piece of code.
  *       *
- *	 * Dynamically change configuration of the parser
- *	 * in regard of Namespace support. Here,
- *	 * the xml.org/features/namespaces feature is simply "reset"
- *	 * to its default value for SAX2.
- *	 * The xml.org/features/namespaces-prefixes feature is
- *	 * also set to true.  This is to ensure that xmlns attributes
- *	 * are reported by the parser. These are required because we want
- *	 * to configure the XMLEmitter to output qualified names (see below).
- *	 *!
+ *       * Dynamically change configuration of the parser
+ *       * in regard of Namespace support. Here,
+ *       * the xml.org/features/namespaces feature is simply "reset"
+ *       * to its default value for SAX2.
+ *       * The xml.org/features/namespaces-prefixes feature is
+ *       * also set to true.  This is to ensure that xmlns attributes
+ *       * are reported by the parser. These are required because we want
+ *       * to configure the XMLEmitter to output qualified names (see below).
+ *       *!
  *      <font color="#0000FF">
- *	try {
- *	    oParser.setFeature("http://xml.org/features/namespaces",true);
- *	    oParser.setFeature(
- *              "http://xml.org/features/namespace-prefixes",true);
+ *      try {
+ *      oParser.setFeature("http://xml.org/sax/features/namespaces",true);
+ *      oParser.setFeature(
+ *              "http://xml.org/sax/features/namespace-prefixes",true);
  *
- *	} catch (Exception e) {
- *	}
+ *      } catch (Exception e) {
+ *      }
  *      </font>
  *
- *	!**
+ *      !**
  *       * Having selected the parser, we now want to
  *       * choose an object to deal with the SAX2 events
  *       * that the parser produces. This is the class
@@ -97,37 +97,37 @@ import org.biojava.bio.program.xml.SimpleXMLEmitter;
  *       * you would inherit from a SAX2 helper class that
  *       * implements this interface for you.
  *       *
- *	 * Create an XML ContentHandler. This
- *	 * implementation of the DocumentHandler
- *	 * interface simply outputs nicely formatted
- *	 * XML. Passing a true value to the SimpleXMLEmitter
- *	 * constructor instructs the ContentHandler
- *	 * to take QNames from the SAXParser, rather
- *	 * than LocalNames.
- *	 *
+ *       * Create an XML ContentHandler. This
+ *       * implementation of the DocumentHandler
+ *       * interface simply outputs nicely formatted
+ *       * XML. Passing a true value to the SimpleXMLEmitter
+ *       * constructor instructs the ContentHandler
+ *       * to take QNames from the SAXParser, rather
+ *       * than LocalNames.
+ *       *
  *      <font color="#0000FF">
- *	ContentHandler oHandler  = 
- *	    (ContentHandler) new SimpleXMLEmitter(true);
+ *      ContentHandler oHandler  = 
+ *      (ContentHandler) new SimpleXMLEmitter(true);
  *      </font>
  *
- *	!**
+ *      !**
  *       * Now, link the Parser and the ContentHandler.
  *       *
- *	 * Give the parser a reference to the ContentHandler
- *	 * so that it can send SAX2 mesagges.
- *	 *!
+ *       * Give the parser a reference to the ContentHandler
+ *       * so that it can send SAX2 mesagges.
+ *       *!
  *      <font color="#0000FF">
- *	oParser.setContentHandler(oHandler);
+ *      oParser.setContentHandler(oHandler);
  *      </font>
- *	!**
+ *      !**
  *       * Finally, parse your Blast-like output.
  *       *
- *	 * Now make the Parser parse the output from the
- *	 * blast-like software and emit XML as specificed
- *	 * by the ContentHandler.
- *	 *!
+ *       * Now make the Parser parse the output from the
+ *       * blast-like software and emit XML as specificed
+ *       * by the ContentHandler.
+ *       *!
  *      <font color="#0000FF">
- *	oParser.parse(oInput);  
+ *      oParser.parse(oInput);  
  *      </font>
  * </pre>
  *
@@ -142,6 +142,7 @@ import org.biojava.bio.program.xml.SimpleXMLEmitter;
  * <li>Tim Dilks          (CAT)
  * <li>Colin Hardman      (CAT)
  * <li>Stuart Johnston    (CAT)
+ * <li>Mathieu Wiepert    (Mayo Foundation)
  *</ul>
  *
  *
@@ -162,91 +163,92 @@ public class BlastLikeToXMLConverter {
      *
      */
     public BlastLikeToXMLConverter(String poInput) {
-	oInput = poInput;
+    oInput = poInput;
     }
 
     public void convert() throws java.io.IOException,
                                  org.xml.sax.SAXException {
 
-	//Access functionality of biojava classes through
-	//standard org.xml.sax interfaces...
+    //Access functionality of biojava classes through
+    //standard org.xml.sax interfaces...
 
-	/**
-	 * Create a SAX Parser that takes the native output
-	 * from blast-like bioinformatics software.
-	 */
-	oParser = (XMLReader) new BlastLikeSAXParser();
+    /**
+     * Create a SAX Parser that takes the native output
+     * from blast-like bioinformatics software.
+     */
+    oParser = (XMLReader) new BlastLikeSAXParser();
 
-	if (tStrict) {
-	    ((BlastLikeSAXParser) oParser).setModeStrict();
-	} else {
-	    ((BlastLikeSAXParser) oParser).setModeLazy();
-	}
-	/**
-	 * Dynamically change configuration of the parser
-	 * in regard of Namespace support. Here,
-	 * the xml.org/features/namespaces feature is simply "reset"
-	 * to its default value for SAX2.
-	 * The xml.org/features/namespaces-prefixes feature is
-	 * also set to true.  This is to ensure that xmlns attributes
-	 * are reported by the parser. These are required because we want
-	 * to configure the XMLEmitter to output qualified names (see below).
-	 */
-	try {
-	    oParser.setFeature("http://xml.org/features/namespaces",true);
-	    oParser.setFeature("http://xml.org/features/namespace-prefixes",
-			       true);
+    if (tStrict) {
+        ((BlastLikeSAXParser) oParser).setModeStrict();
+    } else {
+        ((BlastLikeSAXParser) oParser).setModeLazy();
+    }
+    /**
+     * Dynamically change configuration of the parser
+     * in regard of Namespace support. Here,
+     * the xml.org/sax/features/namespaces feature is simply "reset"
+     * to its default value for SAX2.
+     * The xml.org/sax/features/namespaces-prefixes feature is
+     * also set to true.  This is to ensure that xmlns attributes
+     * are reported by the parser. These are required because we want
+     * to configure the XMLEmitter to output qualified names (see below).
+     */
+    try {
+        oParser.setFeature("http://xml.org/sax/features/namespaces",true);
+        oParser.setFeature("http://xml.org/sax/features/namespace-prefixes",
+                   true);
 
-	} catch (Exception e) {
-	    //If an illegal conmbination of features is chosen,
-	    //roll back to default settings. Output a warning,
-	    //even though this might mess up the output...
-	    System.out.println("WARNING: ignoring attempt to set illegal " +
-			       "combination of parser features");
-	}
-	/**
-	 * Create an XML ContentHandler. This
-	 * implementation of the DocumentHandler
-	 * interface simple outputs nicely formatted
-	 * XML. Passing a true value to the SimpleXMLEmitter
-	 * constructor instructs the ContentHandler
-	 * to take QNames from the SAXParser, rather
-	 * than LocalNames.
-	 */
-	ContentHandler oHandler  = 
-	    (ContentHandler) new SimpleXMLEmitter(true);
+    } catch (Exception e) {
+        //If an illegal conmbination of features is chosen,
+        //roll back to default settings. Output a warning,
+        //even though this might mess up the output...
+        System.out.println("WARNING: ignoring attempt to set illegal " +
+                   "combination of parser features");
+        System.out.println(e);
+    }
+    /**
+     * Create an XML ContentHandler. This
+     * implementation of the DocumentHandler
+     * interface simple outputs nicely formatted
+     * XML. Passing a true value to the SimpleXMLEmitter
+     * constructor instructs the ContentHandler
+     * to take QNames from the SAXParser, rather
+     * than LocalNames.
+     */
+    ContentHandler oHandler  = 
+        (ContentHandler) new SimpleXMLEmitter(true);
 
-	/**
-	 * Give the parser a reference to the ContentHandler
-	 * so that it can send SAX2 mesagges.
-	 */
-	oParser.setContentHandler(oHandler);
-	/**
-	 * Now make the Parser parse the output from the
-	 * blast-like software and emit XML as specificed
-	 * by the DocumentHandler.
-	 */
-	//Test direct specification of URI
-	//oParser.parse(oInput);  
+    /**
+     * Give the parser a reference to the ContentHandler
+     * so that it can send SAX2 mesagges.
+     */
+    oParser.setContentHandler(oHandler);
+    /**
+     * Now make the Parser parse the output from the
+     * blast-like software and emit XML as specificed
+     * by the DocumentHandler.
+     */
+    //Test direct specification of URI
+    //oParser.parse(oInput);  
 
-	
-	
-	//Test direct specification of URI via InputSource
-	//oParser.parse(new InputSource(oInput));  
+    
+    
+    //Test direct specification of URI via InputSource
+    //oParser.parse(new InputSource(oInput));  
 
 
 
-	FileInputStream           oInputFileStream;
-	BufferedReader            oContents;
-	String                    oLine            = null;
+    FileInputStream           oInputFileStream;
+    BufferedReader            oContents;
+    String                    oLine            = null;
 
-	//Test parsing using ByteSteam as InputSource
+    //Test parsing using ByteSteam as InputSource
         // Open file and read all lines from file sequentially
 //         try{
 //             oInputFileStream = new FileInputStream(oInput);
 //             // create input stream
 
-// 	    oParser.parse(new InputSource(oInputFileStream));
+//      oParser.parse(new InputSource(oInputFileStream));
 
 //         } catch (java.io.FileNotFoundException x) {
 //             System.out.println(x.getMessage());
@@ -255,7 +257,7 @@ public class BlastLikeToXMLConverter {
 //         }
 
 
-	//Test parsing using CharacterStream as InputSource
+    //Test parsing using CharacterStream as InputSource
         // Open file and read all lines from file sequentially
         try{
              oInputFileStream = new FileInputStream(oInput);
@@ -263,24 +265,24 @@ public class BlastLikeToXMLConverter {
              oContents = new
                  BufferedReader(new InputStreamReader(oInputFileStream));
 
- 	    oParser.parse(new InputSource(oContents));
+        oParser.parse(new InputSource(oContents));
 
          } catch (java.io.FileNotFoundException x) {
              System.out.println(x.getMessage());
              System.out.println("Couldn't open file");
              System.exit(0);
-	 }
+     }
 
 
-	System.out.println();
-	
+    System.out.println();
+    
     }
 
     public void setModeStrict() {
-	tStrict = true;
+    tStrict = true;
     }
     public void setModeLazy() {
-	tStrict = false;
+    tStrict = false;
 
     }
 

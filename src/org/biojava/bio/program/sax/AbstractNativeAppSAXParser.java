@@ -23,6 +23,8 @@ package org.biojava.bio.program.sax;
 import java.util.*;
 
 import java.io.*;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 import org.xml.sax.*;
 import org.xml.sax.Attributes;
@@ -71,6 +73,7 @@ import org.xml.sax.Attributes;
  * <li>Tim Dilks          (CAT)
  * <li>Colin Hardman      (CAT)
  * <li>Stuart Johnston    (CAT)
+ * <li>Mathieu Wiepert    (Mayo Foundation)
  *</ul>
  *
  * This code was first released to the biojava.org project, July 2000.
@@ -108,11 +111,11 @@ abstract class AbstractNativeAppSAXParser
      * @throws java.lang.NullPointerException If the handler argument is null
      */
     public void setContentHandler(ContentHandler poHandler) {
-	if (poHandler == null) {
-	    throw new 
+    if (poHandler == null) {
+        throw new 
              java.lang.NullPointerException("ContentHandler is null");
-	}
-	oHandler = poHandler;
+    }
+    oHandler = poHandler;
     }
     /**
      * Return the content handler.
@@ -121,7 +124,7 @@ abstract class AbstractNativeAppSAXParser
      * or null if none has been registered.
      */
     public ContentHandler getContentHandler() {
-	return oHandler;
+    return oHandler;
     }
     /**
      * Do-nothing implementation of interface method
@@ -129,76 +132,76 @@ abstract class AbstractNativeAppSAXParser
      */
     public void parse(InputSource input)
            throws java.io.IOException,
-	SAXException {
-
+    SAXException {
+    
     }
     /**
      * Full implementation of interface method.
      */
     public void parse(java.lang.String poSystemId)
-	throws java.io.IOException,
-	SAXException {
+    throws java.io.IOException,
+    SAXException {
 
-	this.parse(new InputSource(poSystemId));
+    this.parse(new InputSource(poSystemId));
     }
     /**
      * Do-nothing implementation of interface method
      *
      */
     public boolean getFeature(String poName)
-	throws SAXNotRecognizedException,SAXNotSupportedException {
+    throws SAXNotRecognizedException,SAXNotSupportedException {
 
-
-	//if get here, throw exception
-	throw (new SAXNotSupportedException("The feature \"" + poName + 
-		    "\" is not supported "+ 
-		    "in the biojava native SAX2 parsing framework."));
+    //if get here, throw exception
+    throw (new SAXNotSupportedException("The feature \"" + poName + 
+            "\" is not supported "+ 
+            "in the biojava native SAX2 parsing framework."));
    }
     /**
      * Handles support for Namespaces and Namespace-prefixes
      *
      */
     public void setFeature(java.lang.String poName,
-			   boolean value)
-	throws SAXNotRecognizedException,
-	SAXNotSupportedException {
+               boolean value)
+    throws SAXNotRecognizedException,
+    SAXNotSupportedException {
 
-	//handle namespaces
-	if (poName.equals("http://xml.org/features/namespaces")) {
-	    this.setNamespaces(value);
-	    //check if features combination is supported
-	    if ((!this.getNamespaces()) && (!this.getNamespacePrefixes())) {
-		throw (new SAXNotSupportedException(
- 		       "Illegal feature combination"));
-	    }
+    //handle namespaces
+    if (poName.equals("http://xml.org/sax/features/namespaces")) { 
+        this.setNamespaces(value);
+        //check if features combination is supported
+        if ((!this.getNamespaces()) && (!this.getNamespacePrefixes())) {
+        throw (new SAXNotSupportedException(
+               "Illegal feature combination"));
+        }
 
-	    return;
-	}
+        return;
+    }
 
-	if (poName.equals("http://xml.org/features/namespace-prefixes")) {
-	    this.setNamespacePrefixes(value);
-	    if ((!this.getNamespaces()) && (!this.getNamespacePrefixes())) {
-		throw (new SAXNotSupportedException(
- 		       "Illegal feature combination"));
-	    }
-	    return;
-	}
+    
+    if (poName.equals("http://xml.org/sax/features/namespace-prefixes")) {
+        this.setNamespacePrefixes(value);
+        if ((!this.getNamespaces()) && (!this.getNamespacePrefixes())) {
+        throw (new SAXNotSupportedException(
+               "Illegal feature combination"));
+        }
+        return;
+    }
 
-	//if get here, throw exception
-	throw (new SAXNotSupportedException("The feature \"" + poName + 
-		    "\" is not supported "+
-		    "in the biojava native SAX2 parsing framework."));
+    //if get here, throw exception
+    throw (new SAXNotSupportedException("The feature \"" + poName + 
+            "\" is not supported "+
+            "in the biojava native SAX2 parsing framework."));
     }
     /**
      * Do-nothing implementation of interface method
      *
      */
     public Object getProperty(String name)
-	throws SAXNotRecognizedException,
-	SAXNotSupportedException {
+    throws SAXNotRecognizedException,
+    SAXNotSupportedException {
 
-	throw (new SAXNotSupportedException("This method is not supported" +
-			    "in the biojava native SAX2 parser."));
+    throw (new SAXNotSupportedException("This method is not supported" +
+                "in the biojava native SAX2 parser."));
     }
 
     /**
@@ -208,10 +211,10 @@ abstract class AbstractNativeAppSAXParser
     public void setProperty(java.lang.String name,
                         java.lang.Object value)
                  throws SAXNotRecognizedException,
-	SAXNotSupportedException {
+    SAXNotSupportedException {
 
-	throw (new SAXNotSupportedException("This method is not supported"+
-				    "in the biojava native SAX2 parser."));
+    throw (new SAXNotSupportedException("This method is not supported"+
+                    "in the biojava native SAX2 parser."));
     }
 
 
@@ -227,7 +230,7 @@ abstract class AbstractNativeAppSAXParser
      *
      */
     public EntityResolver getEntityResolver() {
-	return null;
+    return null;
     }
     /**
      * Do-nothing implementation of interface method
@@ -241,7 +244,7 @@ abstract class AbstractNativeAppSAXParser
      *
      */
     public DTDHandler getDTDHandler() {
-	return null;
+    return null;
     }
 
     /**
@@ -256,7 +259,7 @@ abstract class AbstractNativeAppSAXParser
      *
      */
     public ErrorHandler getErrorHandler() {
-	return null;
+    return null;
     }
     //----------------------------------------
     /**
@@ -270,65 +273,65 @@ abstract class AbstractNativeAppSAXParser
     protected void startElement(QName poQName, Attributes atts) 
     throws SAXException{
 
-	oHandler.startElement(poQName.getURI(),
-			      poQName.getLocalName(),
-			      poQName.getQName(),atts);
+    oHandler.startElement(poQName.getURI(),
+                  poQName.getLocalName(),
+                  poQName.getQName(),atts);
     }
     /**
      * Utility method to centralize the sending of a SAX endElement
      * message a document handler.
      *
-     * @param name	 -
+     * @param name   -
      * @exception SAXException thrown if
      * @exception  thrown if
      */
     protected void endElement(QName poQName)
     throws SAXException {
 
-	oHandler.endElement(poQName.getURI(),
-			    poQName.getLocalName(),
-			    poQName.getQName());
+    oHandler.endElement(poQName.getURI(),
+                poQName.getLocalName(),
+                poQName.getQName());
     }
     /**
      * Utility method to centralize the sending of a SAX characters
      * message a document handler.
      *
-     * @param []ch	 -
-     * @param start	 -
-     * @param length	 -
+     * @param []ch   -
+     * @param start  -
+     * @param length     -
      * @exception SAXException thrown if
      * @exception  thrown if
      */
     protected void characters(char []ch, int start, int length)
     throws SAXException {
 
-	oHandler.characters(ch,start,length);
+    oHandler.characters(ch,start,length);
     }
 
     /**
      * Support SAX2 configuration of namespace support of parser.
      */
     private void setNamespaces(boolean ptNamespaces) {
-	tNamespaces = ptNamespaces;
+    tNamespaces = ptNamespaces;
     }
 
     /**
      * Support SAX2 configuration of namespace support of parser.
      */
     public boolean getNamespaces() {
-	return tNamespaces;
+    return tNamespaces;
     }
     /**
      * Support SAX2 configuration of namespace support of parser.
      */
     private void setNamespacePrefixes(boolean ptNamespacePrefixes) {
-	tNamespacePrefixes = ptNamespacePrefixes;
+    tNamespacePrefixes = ptNamespacePrefixes;
     }
     /**
      * Support SAX2 configuration of namespace support of parser.
      */
     public boolean getNamespacePrefixes() {
-	return tNamespacePrefixes;
+    return tNamespacePrefixes;
     }
     /**
      * Adds a namespace prefix to URI mapping as (key,value) pairs.
@@ -343,7 +346,7 @@ abstract class AbstractNativeAppSAXParser
      */
     public void addPrefixMapping(String poPrefix, String poURI) {
 
-	oPrefixMap.put(poPrefix,poURI);
+    oPrefixMap.put(poPrefix,poURI);
     }
 
     /**
@@ -354,19 +357,20 @@ abstract class AbstractNativeAppSAXParser
      */
     public String getURIFromPrefix(String poPrefix) {
 
-	if (oPrefixMap.containsKey(poPrefix)) {
-	    return (String)oPrefixMap.get(poPrefix);
-	} else {
-	    return null;
-	}
+    if (oPrefixMap.containsKey(poPrefix)) {
+        return (String)oPrefixMap.get(poPrefix);
+    } else {
+        //return an empty string, null makes XSLT processors unhappy
+        return "";
+    }
     }
     /**
      *
      * @param poPrefix a <code>String</code> value
      */
     public void setNamespacePrefix(String poPrefix) {
-	oNamespacePrefix = poPrefix;
-	oFullNamespacePrefix = oNamespacePrefix.concat(":");
+    oNamespacePrefix = poPrefix;
+    oFullNamespacePrefix = oNamespacePrefix.concat(":");
     }
     /**
      * Describe <code>getNamespacePrefix</code> method here.
@@ -374,7 +378,7 @@ abstract class AbstractNativeAppSAXParser
      * @return a <code>String</code> value
      */
     public String getNamespacePrefix() {
-	return oNamespacePrefix;
+    return oNamespacePrefix;
     }
     /**
      * Given an unprefixed element name, returns
@@ -383,7 +387,7 @@ abstract class AbstractNativeAppSAXParser
      * @return a <code>String</code> value
      */
     public String prefix(String poElementName) {
-	return oFullNamespacePrefix.concat(poElementName);
+    return oFullNamespacePrefix.concat(poElementName);
     }
 
     /**
@@ -396,59 +400,67 @@ abstract class AbstractNativeAppSAXParser
     protected BufferedReader getContentStream(InputSource poSource) {
 
 
-	InputSource               oSource;
-	BufferedReader            oContents;
-	FileInputStream           oInputFileStream;
-	int                       iBuffSize          = 8192;
+    InputSource               oSource;
+    BufferedReader            oContents;
+    FileInputStream           oInputFileStream;
+    int                       iBuffSize          = 8192;
 
 
-	oSource = poSource;
+    oSource = poSource;
 
-	//Check contents InputSource in order of precedence
+    //Check contents InputSource in order of precedence
 
-	//Highest - Character stream
+    //Highest - Character stream
 
-	if (oSource.getCharacterStream() != null) {
-	    
-	    oContents = new BufferedReader(oSource.getCharacterStream(),
-					   iBuffSize);
-	    return oContents;
-	}
+    if (oSource.getCharacterStream() != null) {
+        
+        oContents = new BufferedReader(oSource.getCharacterStream(),
+                       iBuffSize);
+        return oContents;
+    }
 
-	//Next to lowest -  Byte stream
+    //Next to lowest -  Byte stream
 
 
-	if ( (oSource.getByteStream() != null) ) {
-	    
-	    oContents = new BufferedReader(
-		   new InputStreamReader(oSource.getByteStream()),
-					 iBuffSize);
+    if ( (oSource.getByteStream() != null) ) {
+        
+        oContents = new BufferedReader(
+           new InputStreamReader(oSource.getByteStream()),
+                     iBuffSize);
 
-	    return oContents;
-	}
+        return oContents;
+    }
 
-	//Lowest precedence - System URI
+    //Lowest precedence - System URI
 
-	if ( (oSource.getSystemId() != null) ) {
+    if ( (oSource.getSystemId() != null) ) {
 
-	    try {
-		oInputFileStream = new FileInputStream(oSource.getSystemId());
-		// Create input stream
-		oContents = new
-		    BufferedReader(new InputStreamReader(oInputFileStream),
-				   iBuffSize);
-	    
-		return oContents;
-		
-	    } catch (java.io.FileNotFoundException x) {
-		System.out.println(x.getMessage());
-		System.out.println("Couldn't open file");
-		System.exit(0);
-	    }
-	}
+        try {
+        //URL handles file URI's and URL's, which might be sent in 
+        //by an XSLT processor.  Handles things like file:\C:\file.txt
+        URL IORUrl = new java.net.URL(oSource.getSystemId());
+        BufferedInputStream inStr = 
+                new BufferedInputStream(IORUrl.openStream());
+        // Create input stream
+        oContents = new
+            BufferedReader(new InputStreamReader(inStr),
+                   iBuffSize);
+        
+        return oContents;
+        //catch Malfromed URL and IOException
+        } catch (MalformedURLException x) {
+        System.out.println(x.getMessage());
+        System.out.println("Couldn't open file");
+        System.exit(0);
+        } catch (IOException x) {
+        System.out.println(x.getMessage());
+        System.out.println("Couldn't open file");
+        System.exit(0);
+        }   
+    }
 
-	//should throw an exception to say couldn't get stream
-	return null;
+    //should throw an exception to say couldn't get stream
+    return null;
     }
 
     /**
@@ -459,7 +471,7 @@ abstract class AbstractNativeAppSAXParser
      * @param piState an <code>int</code> value
      */
     protected void changeState(int piState) {
-	iState = piState;
+    iState = piState;
     }
 
 

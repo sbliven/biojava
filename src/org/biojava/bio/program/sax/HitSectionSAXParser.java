@@ -39,6 +39,7 @@ import org.xml.sax.helpers.AttributesImpl;
  *                 Tim Dilks          (CAT)
  *                 Colin Hardman      (CAT)
  *                 Stuart Johnston    (CAT)
+ *                 Mathieu Wiepert    (Mayo Foundation)
  *
  * Copyright 2000 Cambridge Antibody Technology Group plc.
  * All Rights Reserved.
@@ -81,353 +82,355 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
 
 
     HitSectionSAXParser(BlastLikeVersionSupport poVersion,
-			String poNamespacePrefix) {
-	oVersion = poVersion;
-	this.setNamespacePrefix(poNamespacePrefix);
-
-	this.changeState(STARTUP);
-	aoLineSeparator = System.getProperty("line.separator").toCharArray();
+            String poNamespacePrefix) {
+    oVersion = poVersion;
+    this.setNamespacePrefix(poNamespacePrefix);
+    //For XSLT Parser Compliance
+    this.addPrefixMapping("biojava","http://www.biojava.org");
+    
+    this.changeState(STARTUP);
+    aoLineSeparator = System.getProperty("line.separator").toCharArray();
     }
 
     public void parse(BufferedReader poContents, String poLine,
-		      String poEndSignal) 
-	throws SAXException {
+              String poEndSignal) 
+    throws SAXException {
 
         oLine = null;
 
-	oContents = poContents;
-	oGlobalEndSignal = poEndSignal;
+    oContents = poContents;
+    oGlobalEndSignal = poEndSignal;
 
-	//return immediately if this is not the start
-	//of a hit...
-	if (!poLine.startsWith(">")) return;
+    //return immediately if this is not the start
+    //of a hit...
+    if (!poLine.startsWith(">")) return;
 
-	try {
+    try {
 
-	    oLine = poLine;
-	    while ((oLine != null) &&
-		   (!(oLine.trim().startsWith(oGlobalEndSignal))) &&
-		   (!(iState == DONE)) )
-		{
-		    //interpret line and send messages accordingly
-		    this.interpret(oLine);
-		    //check for End again cos stream read elsewhere
+        oLine = poLine;
+        while ((oLine != null) &&
+           (!(oLine.trim().startsWith(oGlobalEndSignal))) &&
+           (!(iState == DONE)) )
+        {
+            //interpret line and send messages accordingly
+            this.interpret(oLine);
+            //check for End again cos stream read elsewhere
 
-		    if (oLine.trim().startsWith(oGlobalEndSignal)) {
-			this.changeState(DONE);
-			break;
-		    }
+            if (oLine.trim().startsWith(oGlobalEndSignal)) {
+            this.changeState(DONE);
+            break;
+            }
 
 
-		    oLine = oContents.readLine();
-		
-		} // end while
+            oLine = oContents.readLine();
+        
+        } // end while
 
-	} catch (java.io.IOException x) {
-	    System.out.println(x.getMessage());
-	    System.out.println("File read interupted");
-	} // end try/catch
+    } catch (java.io.IOException x) {
+        System.out.println(x.getMessage());
+        System.out.println("File read interupted");
+    } // end try/catch
     } 
     /**
      * Typically parse a single line, and return
      *
-     * @param poLine	 -
+     * @param poLine     -
      * @exception SAXException thrown if
      * @exception  thrown if
      */
     private void interpret(String poLine) throws SAXException {
 
 
-	if (poLine.startsWith(">")) {
-	    //start of hit, accumulate title into buffer.
-	    //omit intial ">" character
-	    oStringBuffer.setLength(0);
+    if (poLine.startsWith(">")) {
+        //start of hit, accumulate title into buffer.
+        //omit intial ">" character
+        oStringBuffer.setLength(0);
 
-	    oStringBuffer.append(poLine.substring(1));
-	    this.changeState(CAPTURING_HIT_SUMMARY);
-	    return;
-	}
+        oStringBuffer.append(poLine.substring(1));
+        this.changeState(CAPTURING_HIT_SUMMARY);
+        return;
+    }
 
-	if (iState == CAPTURING_HIT_SUMMARY) {
+    if (iState == CAPTURING_HIT_SUMMARY) {
 
-	    if (poLine.trim().startsWith("Length =")) {
-		//here when HitSummary is complete
+        if (poLine.trim().startsWith("Length =")) {
+        //here when HitSummary is complete
 
-		//get sequenceLength, and then startElement
-		StringTokenizer oSt = new StringTokenizer(poLine);
+        //get sequenceLength, and then startElement
+        StringTokenizer oSt = new StringTokenizer(poLine);
 
-		//zip through tokens up to last one
-	    int iTmpTokenCount = oSt.countTokens() - 1;
-		for (int i = 0; i < iTmpTokenCount; i++) {
-		    oSt.nextToken();
-		}
-		//last token is the length
-		String oLength = oSt.nextToken();
+        //zip through tokens up to last one
+        int iTmpTokenCount = oSt.countTokens() - 1;
+        for (int i = 0; i < iTmpTokenCount; i++) {
+            oSt.nextToken();
+        }
+        //last token is the length
+        String oLength = oSt.nextToken();
 
-		oAtts.clear();
-		oAttQName.setQName("sequenceLength");
-		oAtts.addAttribute(oAttQName.getURI(),
-				   oAttQName.getLocalName(),
-				   oAttQName.getQName(),
-				   "CDATA",oLength);
+        oAtts.clear();
+        oAttQName.setQName("sequenceLength");
+        oAtts.addAttribute(oAttQName.getURI(),
+                   oAttQName.getLocalName(),
+                   oAttQName.getQName(),
+                   "CDATA",oLength);
 
-		this.startElement(new QName(this,this.prefix("Hit")),
-				  (Attributes)oAtts);
+        this.startElement(new QName(this,this.prefix("Hit")),
+                  (Attributes)oAtts);
 
-		//Here, oStringBuffer contains ID + Description
-		oSt = new StringTokenizer(oStringBuffer.toString());
+        //Here, oStringBuffer contains ID + Description
+        oSt = new StringTokenizer(oStringBuffer.toString());
 
-		int iCount = oSt.countTokens();
+        int iCount = oSt.countTokens();
 
-		String oId = oSt.nextToken(); //get Id
+        String oId = oSt.nextToken(); //get Id
 
-		oAtts.clear();
-		oAttQName.setQName("id");
-		oAtts.addAttribute(oAttQName.getURI(),
-				   oAttQName.getLocalName(),
-				   oAttQName.getQName(),
-				   "CDATA",oId);
+        oAtts.clear();
+        oAttQName.setQName("id");
+        oAtts.addAttribute(oAttQName.getURI(),
+                   oAttQName.getLocalName(),
+                   oAttQName.getQName(),
+                   "CDATA",oId);
 
-		oAttQName.setQName("metaData");
-		oAtts.addAttribute(oAttQName.getURI(),
-				   oAttQName.getLocalName(),
-				   oAttQName.getQName(),
-				   "CDATA","none");
+        oAttQName.setQName("metaData");
+        oAtts.addAttribute(oAttQName.getURI(),
+                   oAttQName.getLocalName(),
+                   oAttQName.getQName(),
+                   "CDATA","none");
 
-		this.startElement(new QName(this,this.prefix("HitId")),
-				  (Attributes)oAtts);
+        this.startElement(new QName(this,this.prefix("HitId")),
+                  (Attributes)oAtts);
 
-		this.endElement(new QName(this,this.prefix("HitId")));
+        this.endElement(new QName(this,this.prefix("HitId")));
 
-		oDescription.setLength(0);
+        oDescription.setLength(0);
 
-		if (iCount > 0) {
-		    //deal with hit description if one available
+        if (iCount > 0) {
+            //deal with hit description if one available
 
-		    while (oSt.hasMoreTokens()) {
-			//construct description
-			oDescription.append(oSt.nextToken() + " ");
-			//System.out.println(oDescription);
-		    }
-		    oAtts.clear();
-		    this.startElement(new QName(this,this.prefix("HitDescription")),
-					  (Attributes)oAtts);
+            while (oSt.hasMoreTokens()) {
+            //construct description
+            oDescription.append(oSt.nextToken() + " ");
+            //System.out.println(oDescription);
+            }
+            oAtts.clear();
+            this.startElement(new QName(this,this.prefix("HitDescription")),
+                      (Attributes)oAtts);
 
-		    aoChars = oDescription.toString().trim().toCharArray();
-		    this.characters(aoChars,0,aoChars.length);
+            aoChars = oDescription.toString().trim().toCharArray();
+            this.characters(aoChars,0,aoChars.length);
 
-		    this.endElement(new QName(this,this.prefix("HitDescription")));
+            this.endElement(new QName(this,this.prefix("HitDescription")));
 
-		} //end if there is a hit description
+        } //end if there is a hit description
 
-		//Here when we have HitId and HitDescription
+        //Here when we have HitId and HitDescription
 
-		this.changeState(IN_HSP_COLLECTION);
+        this.changeState(IN_HSP_COLLECTION);
 
-		return;
-	    } else {
-		//here if collating multi-line hit descriptions
-		oStringBuffer.append(" " + poLine.trim());
-		return;
-	    }
-	} //end capturingHitSummary
+        return;
+        } else {
+        //here if collating multi-line hit descriptions
+        oStringBuffer.append(" " + poLine.trim());
+        return;
+        }
+    } //end capturingHitSummary
 
-	//parse HSPs
-	if (iState == IN_HSP_COLLECTION) {
-	    //Look for start of a new HSP
-	    if (poLine.trim().startsWith("Score")) {
-		//here if on a new HSP
-		oAtts.clear();
-		this.startElement(new QName(this,this.prefix("HSPCollection")),
-				  (Attributes)oAtts);
+    //parse HSPs
+    if (iState == IN_HSP_COLLECTION) {
+        //Look for start of a new HSP
+        if (poLine.trim().startsWith("Score")) {
+        //here if on a new HSP
+        oAtts.clear();
+        this.startElement(new QName(this,this.prefix("HSPCollection")),
+                  (Attributes)oAtts);
 
-		//Note, this method will have changed
-		//the State when it returns
-		this.firstHSPEvent(poLine);
-		this.endElement(new QName(this,this.prefix("HSPCollection")));
-		this.endElement(new QName(this,this.prefix("Hit")));
-		this.changeState(CAPTURING_HIT_SUMMARY);
-	    }
-	}
+        //Note, this method will have changed
+        //the State when it returns
+        this.firstHSPEvent(poLine);
+        this.endElement(new QName(this,this.prefix("HSPCollection")));
+        this.endElement(new QName(this,this.prefix("Hit")));
+        this.changeState(CAPTURING_HIT_SUMMARY);
+        }
+    }
     }
 
     /**
      * Deal with parsing of all HSPs in a Hit.
      * Continue until a new Hit is reached...
      *
-     * @param poLine	 The first line of the HSP
+     * @param poLine     The first line of the HSP
      *
      */
     private void firstHSPEvent(String poLine) throws SAXException {
 
-	this.changeState(ON_FIRST_HSP);
+    this.changeState(ON_FIRST_HSP);
 
 
-	try {
+    try {
 
-	    oLine = poLine;
-	    while ((oLine != null) &&
-		   (!oLine.trim().startsWith(">")) &&
-		   (!oLine.trim().startsWith(oGlobalEndSignal)) )
+        oLine = poLine;
+        while ((oLine != null) &&
+           (!oLine.trim().startsWith(">")) &&
+           (!oLine.trim().startsWith(oGlobalEndSignal)) )
 
-		{
-		    //interpret line and send messages accordingly
-		    this.interpretHSP(oLine);
-		    oLine = oContents.readLine();
-		
-		} // end while
+        {
+            //interpret line and send messages accordingly
+            this.interpretHSP(oLine);
+            oLine = oContents.readLine();
+        
+        } // end while
 
-	    //output final HSP of collection
-	    if (!(iState == ON_FIRST_HSP)) {
-		//output previous HSP-related data
-		this.outputHSPInfo();
-		this.endElement(new QName(this,this.prefix("HSP")));
-	    }
-	    
-	} catch (java.io.IOException x) {
-	    System.out.println(x.getMessage());
-	    System.out.println("File read interupted");
-	} // end try/catch
-	
-	//Here at the end of dealing with HSPCollection
-	//Could go on to next hit, or on to trailer...
+        //output final HSP of collection
+        if (!(iState == ON_FIRST_HSP)) {
+        //output previous HSP-related data
+        this.outputHSPInfo();
+        this.endElement(new QName(this,this.prefix("HSP")));
+        }
+        
+    } catch (java.io.IOException x) {
+        System.out.println(x.getMessage());
+        System.out.println("File read interupted");
+    } // end try/catch
+    
+    //Here at the end of dealing with HSPCollection
+    //Could go on to next hit, or on to trailer...
 
-	if (oLine.startsWith(">")) {
-	    //here when a new Hit is starting...
+    if (oLine.startsWith(">")) {
+        //here when a new Hit is starting...
 
 
-	    //start of new hit, accumulate title into buffer.
-	    //omit intial ">" character
+        //start of new hit, accumulate title into buffer.
+        //omit intial ">" character
 
-	    oStringBuffer.setLength(0);
+        oStringBuffer.setLength(0);
 
-	    oStringBuffer.append(oLine.substring(1));
+        oStringBuffer.append(oLine.substring(1));
 
-	    return;
-	}
+        return;
+    }
 
-	if (oLine.trim().startsWith(oGlobalEndSignal)) {
-	    //here when we've hit the trailer...
+    if (oLine.trim().startsWith(oGlobalEndSignal)) {
+        //here when we've hit the trailer...
 
-	    //this.endElement(this.prefix("HSP"));
-	    this.changeState(DONE);
-	    return;
-	}
+        //this.endElement(this.prefix("HSP"));
+        this.changeState(DONE);
+        return;
+    }
 
     }
     /**
      * Deal with a line of an HSP
      *
-     * @param poLine	 A String representation of the line
+     * @param poLine     A String representation of the line
      */
     private void interpretHSP(String poLine) throws SAXException {
 
-	//System.out.println("HSPLine:>".concat(poLine));
-	//System.out.println("GlobalState:>".concat(iState));
+    //System.out.println("HSPLine:>".concat(poLine));
+    //System.out.println("GlobalState:>".concat(iState));
 
-	if (!tClearOfWarning) {
-	    //look for white space to indicate we're passed a multi-line
-	    //warning (in WU-BLAST);
-	    if (poLine.trim().equals("")) {
-		//here when clear
-		tClearOfWarning = true;
-	    }
-	    return;
-	}
-
-
-	//ignore Minus Strand HSP and Plus Strand HSP (WuBlast)
-
-	if (poLine.trim().toLowerCase().startsWith("minus strand")) return;
-	if (poLine.trim().toLowerCase().startsWith("plus strand")) return;
-
-	if (poLine.trim().toLowerCase().startsWith("warning")) {
-	    tClearOfWarning = false;
-	    return;
-	}
+    if (!tClearOfWarning) {
+        //look for white space to indicate we're passed a multi-line
+        //warning (in WU-BLAST);
+        if (poLine.trim().equals("")) {
+        //here when clear
+        tClearOfWarning = true;
+        }
+        return;
+    }
 
 
+    //ignore Minus Strand HSP and Plus Strand HSP (WuBlast)
 
-	if (poLine.trim().startsWith("Score")) {
-	    if (!(iState == ON_FIRST_HSP)) {
-		//output previous HSP-related data
-		this.outputHSPInfo();
-		this.endElement(new QName(this,this.prefix("HSP")));
+    if (poLine.trim().toLowerCase().startsWith("minus strand")) return;
+    if (poLine.trim().toLowerCase().startsWith("plus strand")) return;
 
-	    }
-	    oAtts.clear();
-	    this.startElement(new QName(this,this.prefix("HSP")),
-			      (Attributes)oAtts);
-
-	    //Start accumulating all HSP summary information
-	    //into buffer...
-	    
-	    oStringBuffer.setLength(0);
-	    oStringBuffer.append(poLine);
-
-	    //and raw info
-
-	    oBuffer.clear();
-	    oBuffer.add(poLine);
-	    this.changeState(IN_HSP_SUMMARY);
-	    
-	    return;
-	}
-	//continue to accumulate summary info
-	//until an alignment is reached...
-	if (iState == IN_HSP_SUMMARY) {
-	    //check for end of summary (Query: is end signal)
-	    if (poLine.startsWith("Query:")) {
-
-		//System.out.println(oStringBuffer);
-
-		//at this point, all available summary info
-		//complete for current HSP (may need
-		//extra info derived from alignment, so
-		//so don't output HSPSummary element info yet
-
-		//Put available HSPSummary info into a Map
-		HSPSummaryHelper.parse(oStringBuffer.toString(),oMap,
-				       oVersion);
-
-		//really need to get alignment parsed before outputing
-		//suummary info - not all programs output
-		//alignment size (e.g. DBA).
-
-		//change state 'cos hit a Blast-like alignment
-		this.changeState(IN_ALIGNMENT);
-
-		//get information for first alignment line
-
-		oAlignmentBuffer.clear();
-		oAlignmentBuffer.add(poLine);
-		
-		return;
-	    } //end if found first line of alignment
-	    //append summary 
-	    
-	    //ignore blank lines
-	    if (poLine.trim().equals("")) return;
+    if (poLine.trim().toLowerCase().startsWith("warning")) {
+        tClearOfWarning = false;
+        return;
+    }
 
 
 
-	    oBuffer.add(poLine); //keep raw info
+    if (poLine.trim().startsWith("Score")) {
+        if (!(iState == ON_FIRST_HSP)) {
+        //output previous HSP-related data
+        this.outputHSPInfo();
+        this.endElement(new QName(this,this.prefix("HSP")));
 
-	    oStringBuffer.append(", ");
-	    oStringBuffer.append(poLine);
+        }
+        oAtts.clear();
+        this.startElement(new QName(this,this.prefix("HSP")),
+                  (Attributes)oAtts);
 
-	    return;
-	} //end if state is inHSPSummary
+        //Start accumulating all HSP summary information
+        //into buffer...
+        
+        oStringBuffer.setLength(0);
+        oStringBuffer.append(poLine);
+
+        //and raw info
+
+        oBuffer.clear();
+        oBuffer.add(poLine);
+        this.changeState(IN_HSP_SUMMARY);
+        
+        return;
+    }
+    //continue to accumulate summary info
+    //until an alignment is reached...
+    if (iState == IN_HSP_SUMMARY) {
+        //check for end of summary (Query: is end signal)
+        if (poLine.startsWith("Query:")) {
+
+        //System.out.println(oStringBuffer);
+
+        //at this point, all available summary info
+        //complete for current HSP (may need
+        //extra info derived from alignment, so
+        //so don't output HSPSummary element info yet
+
+        //Put available HSPSummary info into a Map
+        HSPSummaryHelper.parse(oStringBuffer.toString(),oMap,
+                       oVersion);
+
+        //really need to get alignment parsed before outputing
+        //suummary info - not all programs output
+        //alignment size (e.g. DBA).
+
+        //change state 'cos hit a Blast-like alignment
+        this.changeState(IN_ALIGNMENT);
+
+        //get information for first alignment line
+
+        oAlignmentBuffer.clear();
+        oAlignmentBuffer.add(poLine);
+        
+        return;
+        } //end if found first line of alignment
+        //append summary 
+        
+        //ignore blank lines
+        if (poLine.trim().equals("")) return;
 
 
-	//keep appending alignment info
-	if (iState == IN_ALIGNMENT) {
-	    //ignore blank lines
-	    if (poLine.trim().equals("")) return;
 
-	    oAlignmentBuffer.add(poLine);
-	    return;
-	}
+        oBuffer.add(poLine); //keep raw info
+
+        oStringBuffer.append(", ");
+        oStringBuffer.append(poLine);
+
+        return;
+    } //end if state is inHSPSummary
+
+
+    //keep appending alignment info
+    if (iState == IN_ALIGNMENT) {
+        //ignore blank lines
+        if (poLine.trim().equals("")) return;
+
+        oAlignmentBuffer.add(poLine);
+        return;
+    }
 
     }
 
@@ -435,78 +438,78 @@ final class HitSectionSAXParser extends AbstractNativeAppSAXParser {
     /**
      * Describe 'outputHSPInfo' method here.
      *
-     * @param nil	 -
+     * @param nil    -
      * @exception SAXException thrown if
      * @exception  thrown if
      */
     private void outputHSPInfo() throws SAXException {
-	//Output HSP Summary info
+    //Output HSP Summary info
 
-	//detailed info
-	aoKeys = (String[])(oMap.keySet().toArray(aoArrayType));
+    //detailed info
+    aoKeys = (String[])(oMap.keySet().toArray(aoArrayType));
 
-	oAtts.clear();
+    oAtts.clear();
 
-	for (int i = 0; i < aoKeys.length; i++) {
-	    if ( (aoKeys[i].equals("queryFrame"))  ||
-		 (aoKeys[i].equals("hitFrame"))    ||
-		 (aoKeys[i].equals("queryStrand")) ||
-		 (aoKeys[i].equals("hitStrand")) ) {
-		//nametoken if an enumeration
+    for (int i = 0; i < aoKeys.length; i++) {
+        if ( (aoKeys[i].equals("queryFrame"))  ||
+         (aoKeys[i].equals("hitFrame"))    ||
+         (aoKeys[i].equals("queryStrand")) ||
+         (aoKeys[i].equals("hitStrand")) ) {
+        //nametoken if an enumeration
 
 
-		oAttQName.setQName(aoKeys[i]);
-		oAtts.addAttribute(oAttQName.getURI(),
-				   oAttQName.getLocalName(),
-				   oAttQName.getQName(),
-				   "NMTOKEN",(String)oMap.get(aoKeys[i]));
-	    } else {
-		//CDATA if regular attribute
+        oAttQName.setQName(aoKeys[i]);
+        oAtts.addAttribute(oAttQName.getURI(),
+                   oAttQName.getLocalName(),
+                   oAttQName.getQName(),
+                   "NMTOKEN",(String)oMap.get(aoKeys[i]));
+        } else {
+        //CDATA if regular attribute
 
-		oAttQName.setQName(aoKeys[i]);
-		oAtts.addAttribute(oAttQName.getURI(),
-				   oAttQName.getLocalName(),
-				   oAttQName.getQName(),
-				   "CDATA",(String)oMap.get(aoKeys[i]));
-	    }
-	    //System.out.print(aoKeys[i] + ": ");
-	    //System.out.println(oMap.get(aoKeys[i]));
-	}
+        oAttQName.setQName(aoKeys[i]);
+        oAtts.addAttribute(oAttQName.getURI(),
+                   oAttQName.getLocalName(),
+                   oAttQName.getQName(),
+                   "CDATA",(String)oMap.get(aoKeys[i]));
+        }
+        //System.out.print(aoKeys[i] + ": ");
+        //System.out.println(oMap.get(aoKeys[i]));
+    }
 
-	
-	this.startElement(new QName(this,this.prefix("HSPSummary")),
-			  (Attributes)oAtts);
-	//Raw HSPSummary Data
-	oAtts.clear();
-	oAttQName.setQName("xml:space");
-	oAtts.addAttribute(oAttQName.getURI(),
-			   oAttQName.getLocalName(),
-			   oAttQName.getQName(),
-			   "NMTOKEN","preserve");
-	this.startElement(new QName(this,this.prefix("RawOutput")),
-			  (Attributes)oAtts);
+    
+    this.startElement(new QName(this,this.prefix("HSPSummary")),
+              (Attributes)oAtts);
+    //Raw HSPSummary Data
+    oAtts.clear();
+    oAttQName.setQName("xml:space");
+    oAtts.addAttribute(oAttQName.getURI(),
+               oAttQName.getLocalName(),
+               oAttQName.getQName(),
+               "NMTOKEN","preserve");
+    this.startElement(new QName(this,this.prefix("RawOutput")),
+              (Attributes)oAtts);
 
-	int iTmpBufferSize = oBuffer.size();
-	for (int i = 0; i < iTmpBufferSize;i++) {
-	    //aoChars = ((String)oBuffer.get(i)).trim().toCharArray();
-	    aoChars = ((String)oBuffer.get(i)).toCharArray();
-	    this.characters(aoChars,0,aoChars.length);
-	    this.characters(aoLineSeparator,0,1);
+    int iTmpBufferSize = oBuffer.size();
+    for (int i = 0; i < iTmpBufferSize;i++) {
+        //aoChars = ((String)oBuffer.get(i)).trim().toCharArray();
+        aoChars = ((String)oBuffer.get(i)).toCharArray();
+        this.characters(aoChars,0,aoChars.length);
+        this.characters(aoLineSeparator,0,1);
 
-	}
-	this.endElement(new QName(this,this.prefix("RawOutput")));
+    }
+    this.endElement(new QName(this,this.prefix("RawOutput")));
 
-	this.endElement(new QName(this,this.prefix("HSPSummary")));
+    this.endElement(new QName(this,this.prefix("HSPSummary")));
 
-	//Output Alignment info via delegation to
-	//a BlastLikeAlignmentSAXParser
+    //Output Alignment info via delegation to
+    //a BlastLikeAlignmentSAXParser
 
-	oAlignmentParser = 
-	    new BlastLikeAlignmentSAXParser(this.getNamespacePrefix());
+    oAlignmentParser = 
+        new BlastLikeAlignmentSAXParser(this.getNamespacePrefix());
 
-	oAlignmentParser.setContentHandler(oHandler);
+    oAlignmentParser.setContentHandler(oHandler);
 
-	oAlignmentParser.parse(oAlignmentBuffer);
+    oAlignmentParser.parse(oAlignmentBuffer);
     }
 
 }

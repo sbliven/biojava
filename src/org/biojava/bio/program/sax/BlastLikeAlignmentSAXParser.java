@@ -28,8 +28,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-
-
 /**
  * A reusable class for SAX parsing Blast-alignments...
  *
@@ -39,6 +37,7 @@ import org.xml.sax.helpers.AttributesImpl;
  *                 Tim Dilks          (CAT)
  *                 Colin Hardman      (CAT)
  *                 Stuart Johnston    (CAT)
+ *                 Mathieu Wiepert    (Mayo Foundation)
  *
  * Copyright 2000 Cambridge Antibody Technology Group plc.
  * All Rights Reserved.
@@ -82,296 +81,292 @@ final class BlastLikeAlignmentSAXParser extends AbstractNativeAppSAXParser {
 
 
     public BlastLikeAlignmentSAXParser(String poNamespacePrefix) {
-	this.changeState(STARTUP);
-	this.setNamespacePrefix(poNamespacePrefix);
+    this.changeState(STARTUP);
+    this.setNamespacePrefix(poNamespacePrefix);
+    this.addPrefixMapping("biojava", "http://www.biojava.org");
 
     }
 
-    /**
-     * Describe 'parse' method here.
-     *
-     * @param poAlignment	 -
-     */
     public void parse(ArrayList poAlignment)
-	throws SAXException {
+    throws SAXException {
 
-	oAlignment = poAlignment;
+    oAlignment = poAlignment;
 
-	oAtts.clear();
-	this.startElement(new QName(this,this.prefix("BlastLikeAlignment")),
-			  (Attributes)oAtts);
+    oAtts.clear();
+    this.startElement(new QName(this,this.prefix("BlastLikeAlignment")),
+              (Attributes)oAtts);
 
-	this.changeState(ON_FIRST_SEGMENT);
+    this.changeState(ON_FIRST_SEGMENT);
 
-	//for a new alignment initialise
+    //for a new alignment initialise
 
-	oQuery.setLength(0);
-	oQueryStartId.setLength(0);
-	oQueryStopId.setLength(0);
-	oHit.setLength(0);
-	oHitStartId.setLength(0);
-	oHitStopId.setLength(0);
-	oMatchConsensus.setLength(0);
+    oQuery.setLength(0);
+    oQueryStartId.setLength(0);
+    oQueryStopId.setLength(0);
+    oHit.setLength(0);
+    oHitStartId.setLength(0);
+    oHitStopId.setLength(0);
+    oMatchConsensus.setLength(0);
 
-	tJustDoneQuery     = false;
-	tJustDoneConsensus = false;
-	tJustDoneHit       = false;
-	//Loop over all alignment lines
-	int iAlSize = oAlignment.size();
-	for (int i = 0; i < iAlSize;i++) {
-	    //System.out.println(oAlignment.get(i));
-	    oLine = (String)oAlignment.get(i);
-	    this.parseLine(oLine);
+    tJustDoneQuery     = false;
+    tJustDoneConsensus = false;
+    tJustDoneHit       = false;
+    //Loop over all alignment lines
+    int iAlSize = oAlignment.size();
+    for (int i = 0; i < iAlSize;i++) {
+        //System.out.println(oAlignment.get(i));
+        oLine = (String)oAlignment.get(i);
+        this.parseLine(oLine);
 
-	}
+    }
 
-	//at this point alignment is parsed
+    //at this point alignment is parsed
 
-// 	System.out.println("QueryStart:"+oQueryStartId);
-// 	System.out.println("QueryStop:"+oQueryStopId);
-// 	System.out.println("HitStart:"+oHitStartId);
-// 	System.out.println("HitStop:"+oHitStopId);
-// 	System.out.println("Query:"+oQuery);
-// 	System.out.println("Match:"+oMatchConsensus);
-// 	System.out.println("Hit  :"+oHit);
-
-
-	//output elements
-	//QuerySequence
-
-	oAtts.clear();
-	oAttQName.setQName("startPosition");
-	oAtts.addAttribute(oAttQName.getURI(),
-			   oAttQName.getLocalName(),
-			   oAttQName.getQName(),
-			   "CDATA",oQueryStartId.toString());
-
-	oAttQName.setQName("stopPosition");
-	oAtts.addAttribute(oAttQName.getURI(),
-			   oAttQName.getLocalName(),
-			   oAttQName.getQName(),
-			   "CDATA",oQueryStopId.toString());
-
-	this.startElement(new QName(this,this.prefix("QuerySequence")),
-			  (Attributes)oAtts);
-	aoChars = oQuery.toString().toCharArray();
-	this.characters(aoChars,0,aoChars.length);
-	this.endElement(new QName(this,this.prefix("QuerySequence")));
+//  System.out.println("QueryStart:"+oQueryStartId);
+//  System.out.println("QueryStop:"+oQueryStopId);
+//  System.out.println("HitStart:"+oHitStartId);
+//  System.out.println("HitStop:"+oHitStopId);
+//  System.out.println("Query:"+oQuery);
+//  System.out.println("Match:"+oMatchConsensus);
+//  System.out.println("Hit  :"+oHit);
 
 
-	//Match consensus
-	oAtts.clear();
-	oAttQName.setQName("xml:space");
-	oAtts.addAttribute(oAttQName.getURI(),
-			   oAttQName.getLocalName(),
-			   oAttQName.getQName(),
-			   "NMTOKEN","preserve");
-	this.startElement(new QName(this,this.prefix("MatchConsensus")),
-			  (Attributes)oAtts);
-	aoChars = oMatchConsensus.toString().toCharArray();
-	this.characters(aoChars,0,aoChars.length);
+    //output elements
+    //QuerySequence
 
-	this.endElement(new QName(this,this.prefix("MatchConsensus")));
+    oAtts.clear();
+    oAttQName.setQName("startPosition");
+    oAtts.addAttribute(oAttQName.getURI(),
+               oAttQName.getLocalName(),
+               oAttQName.getQName(),
+               "CDATA",oQueryStartId.toString());
 
-	//HitSequence
+    oAttQName.setQName("stopPosition");
+    oAtts.addAttribute(oAttQName.getURI(),
+               oAttQName.getLocalName(),
+               oAttQName.getQName(),
+               "CDATA",oQueryStopId.toString());
 
-	oAtts.clear();
-	oAttQName.setQName("startPosition");
-	oAtts.addAttribute(oAttQName.getURI(),
-			   oAttQName.getLocalName(),
-			   oAttQName.getQName(),
-			   "CDATA",oHitStartId.toString());
-
-	oAttQName.setQName("stopPosition");
-	oAtts.addAttribute(oAttQName.getURI(),
-			   oAttQName.getLocalName(),
-			   oAttQName.getQName(),
-			   "CDATA",oHitStopId.toString());
-
-	this.startElement(new QName(this,this.prefix("HitSequence")),
-			  (Attributes)oAtts);
-	aoChars = oHit.toString().toCharArray();
-	this.characters(aoChars,0,aoChars.length);
-	this.endElement(new QName(this,this.prefix("HitSequence")));
+    this.startElement(new QName(this,this.prefix("QuerySequence")),
+              (Attributes)oAtts);
+    aoChars = oQuery.toString().toCharArray();
+    this.characters(aoChars,0,aoChars.length);
+    this.endElement(new QName(this,this.prefix("QuerySequence")));
 
 
-	//end Alignment
-	this.endElement(new QName(this,
-				  this.prefix(this.prefix("BlastLikeAlignment"))));
+    //Match consensus
+    oAtts.clear();
+    oAttQName.setQName("xml:space");
+    oAtts.addAttribute(oAttQName.getURI(),
+               oAttQName.getLocalName(),
+               oAttQName.getQName(),
+               "NMTOKEN","preserve");
+    this.startElement(new QName(this,this.prefix("MatchConsensus")),
+              (Attributes)oAtts);
+    aoChars = oMatchConsensus.toString().toCharArray();
+    this.characters(aoChars,0,aoChars.length);
+
+    this.endElement(new QName(this,this.prefix("MatchConsensus")));
+
+    //HitSequence
+
+    oAtts.clear();
+    oAttQName.setQName("startPosition");
+    oAtts.addAttribute(oAttQName.getURI(),
+               oAttQName.getLocalName(),
+               oAttQName.getQName(),
+               "CDATA",oHitStartId.toString());
+
+    oAttQName.setQName("stopPosition");
+    oAtts.addAttribute(oAttQName.getURI(),
+               oAttQName.getLocalName(),
+               oAttQName.getQName(),
+               "CDATA",oHitStopId.toString());
+
+    this.startElement(new QName(this,this.prefix("HitSequence")),
+              (Attributes)oAtts);
+    aoChars = oHit.toString().toCharArray();
+    this.characters(aoChars,0,aoChars.length);
+    this.endElement(new QName(this,this.prefix("HitSequence")));
+
+
+    //end Alignment
+    this.endElement(new QName(this,
+                  this.prefix(this.prefix("BlastLikeAlignment"))));
     } 
     /**
      * Describe 'parseLine' method here.
      *
-     * @param poLine	 -
+     * @param poLine     -
      */
     private void parseLine(String poLine) throws SAXException{
 
-	poLine = poLine.toUpperCase();
+    poLine = poLine.toUpperCase();
 
-	if ( (poLine.startsWith("QUERY:")) ||
+    if ( (poLine.startsWith("QUERY:")) ||
              (poLine.startsWith("SBJCT:")) ) {
-	    oSt = new StringTokenizer(poLine,":");
+        oSt = new StringTokenizer(poLine,":");
 
-	    //there should be two tokens at this point
-	    if (oSt.countTokens() != 2) {
-		throw (new SAXException(
-		"Failed to parse a line in a BlastLikeAlignment" +
-		" due it having an unexpected format." +
-		" The line is shown below.\n" +
-		poLine));
-	    }
+        //there should be two tokens at this point
+        if (oSt.countTokens() != 2) {
+        throw (new SAXException(
+        "Failed to parse a line in a BlastLikeAlignment" +
+        " due it having an unexpected format." +
+        " The line is shown below.\n" +
+        poLine));
+        }
 
-	    //get here if Query line OK
+        //get here if Query line OK
 
-	    //skip first token (i.e. "Query")
-	    oSt.nextToken();
+        //skip first token (i.e. "Query")
+        oSt.nextToken();
 
-	    //next token is the alignment - make it uppercase.
-	    oSeq = oSt.nextToken().trim();
+        //next token is the alignment - make it uppercase.
+        oSeq = oSt.nextToken().trim();
 
-	   //System.out.println(oSeq);
-	   //To get numbers robustly, tokenize on letters, gaps, and unknowns
-	   
-	   oSt = new StringTokenizer(oSeq," ABCDEFGHIJKLMNOPQRSTUVWXYZ-*");
+       //System.out.println(oSeq);
+       //To get numbers robustly, tokenize on letters, gaps, and unknowns
+       
+       oSt = new StringTokenizer(oSeq," ABCDEFGHIJKLMNOPQRSTUVWXYZ-*");
 
-	   //System.out.println("Token Count----->" + oSt.countTokens());
+       //System.out.println("Token Count----->" + oSt.countTokens());
 
-	   //throw exception if there number of tokens is not two
-	   //(these correspond to start and stop ids
-	   if (oSt.countTokens() != 2) {
-	       throw (new SAXException(
-	       "Failed to parse a line of an alignment due to it having" +
-		" an unexpected character."));
-	   }
-	   //here if tokens for start and stop OK
-	   
-	   oStartId.setLength(0);
-	   oStartId.append(oSt.nextToken().trim());
-	   
-	   oStopId.setLength(0);
-	   oStopId.append(oSt.nextToken().trim());
+       //throw exception if there number of tokens is not two
+       //(these correspond to start and stop ids
+       if (oSt.countTokens() != 2) {
+           throw (new SAXException(
+           "Failed to parse a line of an alignment due to it having" +
+        " an unexpected character."));
+       }
+       //here if tokens for start and stop OK
+       
+       oStartId.setLength(0);
+       oStartId.append(oSt.nextToken().trim());
+       
+       oStopId.setLength(0);
+       oStopId.append(oSt.nextToken().trim());
 
-    	   //System.out.println("StartId="+oStartId+" : "+"StopId="+oStopId);
-
-
-	   //To get sequence robustly, tokenize on numbers only
-	   
-	   oSt = new StringTokenizer(oSeq,"0123456789");
-
-	   //System.out.println("Token Count----->" + oSt.countTokens());
-
-	   if (oSt.countTokens() != 1) {
-	       throw (new SAXException(
-	       "Failed to parse a line of an alignment due to it having" +
-		" an unexpected character."));
-	   }
-
-	   oParsedSeq = oSt.nextToken().trim();
-
-	   //System.out.println(oParsedSeq);
-
-	   //get info for consensus only on Query: lines
-
-	   iOffset = poLine.indexOf(oParsedSeq);
-	   iEnd = iOffset + oParsedSeq.length();
+           //System.out.println("StartId="+oStartId+" : "+"StopId="+oStopId);
 
 
-	   //System.out.println("Offset="+iOffset+" : End="+iEnd);
-	   //end if this is a query or sbjct line
-	} else {
-	    //here if on a consensus sequence line
-	    //only time should get here is if
-	    //a Query: line has just been parsed.
+       //To get sequence robustly, tokenize on numbers only
+       
+       oSt = new StringTokenizer(oSeq,"0123456789");
 
-	    //deal with software that doesn't output spaces to end of
-	    //consensus line
+       //System.out.println("Token Count----->" + oSt.countTokens());
 
-	    if (iEnd <= poLine.length()) {
-		oParsedSeq = poLine.substring(iOffset,iEnd);
-	    } else {
-		//could fix this by padding with white-space
-		//currently this problem is a known BUG/FEATURE.
-		throw (new SAXException(
-		"Failed to parse what the framework supposes " +
-		" to be a consensus line in an alignment due to " +
-	       "the source program not outputing expected white space." +
-		" Tried to access character " + iEnd + " in a String " +
-		"of length " + poLine.length() + ". The String is show " +
-		"below. If it is not a consensus line, the parser " +
-		"has become confused due to the presense of unknown " +
-		"content in the output.\n" + poLine));
-	    }
-	    //System.out.println("|"+oParsedSeq+"|");
-	}
-	
-	//get startIds for query and subject
-	if (iState == ON_FIRST_SEGMENT) {
-	    //here if on first block of an alignment
-	    if (poLine.startsWith("QUERY:")) {
-		oQueryStartId.append(oStartId);
-		oQueryStopId.append(oStopId);
-		oQuery.append(oParsedSeq);
-		tJustDoneQuery     = true;
-		tJustDoneConsensus = false;
-		tJustDoneHit       = false;
-		return;
-	    }
-	    if (poLine.startsWith("SBJCT:")) {
-		oHitStartId.append(oStartId);
-		oHitStopId.append(oStopId);
-		oHit.append(oParsedSeq);
+       if (oSt.countTokens() != 1) {
+           throw (new SAXException(
+           "Failed to parse a line of an alignment due to it having" +
+        " an unexpected character."));
+       }
 
-		if (!tJustDoneConsensus) {
+       oParsedSeq = oSt.nextToken().trim();
 
-		    //handle rare case of a totally blank
-		    //consensus line -- currently known BUG/FEATURE
+       //System.out.println(oParsedSeq);
 
-		    //implement this with StringBuffer(char[],int,int)
-		    //and a template array of blanks
-		    throw (new SAXException(
-  	        "Failed parsing the consensus line of an alignment." +
-		" Cannot currently deal with consensus lines that" +
-		" are blank."));
+       //get info for consensus only on Query: lines
 
-		}
+       iOffset = poLine.indexOf(oParsedSeq);
+       iEnd = iOffset + oParsedSeq.length();
 
-		tJustDoneQuery     = false;
-		tJustDoneConsensus = false;
-		tJustDoneHit       = true;
 
-		//here finished with block
-		this.changeState(DONE_FIRST_SEGMENT);
-		return;
-	    }
-	    oMatchConsensus.append(oParsedSeq);
+       //System.out.println("Offset="+iOffset+" : End="+iEnd);
+       //end if this is a query or sbjct line
+    } else {
+        //here if on a consensus sequence line
+        //only time should get here is if
+        //a Query: line has just been parsed.
 
-	    tJustDoneQuery     = false;
-	    tJustDoneConsensus = true;
-	    tJustDoneHit       = false;
-	    
-	} //end if onFirstSegment
+        //deal with software that doesn't output spaces to end of
+        //consensus line
 
-	//if inside the alignment, set the stopids each time
-	//so that they are correct for multi-block alignments
-	if (iState == DONE_FIRST_SEGMENT) {
-	    
-	    if (poLine.startsWith("QUERY:")) {
-		oQueryStopId.setLength(0);
-		oQueryStopId.append(oStopId);
-		oQuery.append(oParsedSeq);
-		return;
-	    }
-	    if (poLine.startsWith("SBJCT:")) {
-		oHitStopId.setLength(0);
-		oHitStopId.append(oStopId);
-		oHit.append(oParsedSeq);
-		//here finished with block
-		return;
-	    }
-	    //get here if on a match consensus
-	    oMatchConsensus.append(oParsedSeq);
-	    return;
-	} //end if inAlignment
+        if (iEnd <= poLine.length()) {
+        oParsedSeq = poLine.substring(iOffset,iEnd);
+        } else {
+        //could fix this by padding with white-space
+        //currently this problem is a known BUG/FEATURE.
+        throw (new SAXException(
+        "Failed to parse what the framework supposes " +
+        " to be a consensus line in an alignment due to " +
+           "the source program not outputing expected white space." +
+        " Tried to access character " + iEnd + " in a String " +
+        "of length " + poLine.length() + ". The String is show " +
+        "below. If it is not a consensus line, the parser " +
+        "has become confused due to the presense of unknown " +
+        "content in the output.\n" + poLine));
+        }
+        //System.out.println("|"+oParsedSeq+"|");
+    }
+    
+    //get startIds for query and subject
+    if (iState == ON_FIRST_SEGMENT) {
+        //here if on first block of an alignment
+        if (poLine.startsWith("QUERY:")) {
+        oQueryStartId.append(oStartId);
+        oQueryStopId.append(oStopId);
+        oQuery.append(oParsedSeq);
+        tJustDoneQuery     = true;
+        tJustDoneConsensus = false;
+        tJustDoneHit       = false;
+        return;
+        }
+        if (poLine.startsWith("SBJCT:")) {
+        oHitStartId.append(oStartId);
+        oHitStopId.append(oStopId);
+        oHit.append(oParsedSeq);
+
+        if (!tJustDoneConsensus) {
+
+            //handle rare case of a totally blank
+            //consensus line -- currently known BUG/FEATURE
+
+            //implement this with StringBuffer(char[],int,int)
+            //and a template array of blanks
+            throw (new SAXException(
+            "Failed parsing the consensus line of an alignment." +
+        " Cannot currently deal with consensus lines that" +
+        " are blank."));
+
+        }
+
+        tJustDoneQuery     = false;
+        tJustDoneConsensus = false;
+        tJustDoneHit       = true;
+
+        //here finished with block
+        this.changeState(DONE_FIRST_SEGMENT);
+        return;
+        }
+        oMatchConsensus.append(oParsedSeq);
+
+        tJustDoneQuery     = false;
+        tJustDoneConsensus = true;
+        tJustDoneHit       = false;
+        
+    } //end if onFirstSegment
+
+    //if inside the alignment, set the stopids each time
+    //so that they are correct for multi-block alignments
+    if (iState == DONE_FIRST_SEGMENT) {
+        
+        if (poLine.startsWith("QUERY:")) {
+        oQueryStopId.setLength(0);
+        oQueryStopId.append(oStopId);
+        oQuery.append(oParsedSeq);
+        return;
+        }
+        if (poLine.startsWith("SBJCT:")) {
+        oHitStopId.setLength(0);
+        oHitStopId.append(oStopId);
+        oHit.append(oParsedSeq);
+        //here finished with block
+        return;
+        }
+        //get here if on a match consensus
+        oMatchConsensus.append(oParsedSeq);
+        return;
+    } //end if inAlignment
     }
 
 }

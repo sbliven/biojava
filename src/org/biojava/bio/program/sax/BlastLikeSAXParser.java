@@ -94,6 +94,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * <li>Tim Dilks          (CAT)
  * <li>Colin Hardman      (CAT)
  * <li>Stuart Johnston    (CAT)
+ * <li>Mathieu Wiepert    (Mayo Foundation)
  *</ul>
  *
  * @author Cambridge Antibody Technology (CAT)
@@ -120,11 +121,12 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
      *
      */
     public BlastLikeSAXParser() {
-	this.changeState(STARTUP);
+    this.changeState(STARTUP);
 
-	//centralised setting of namespace prefix
-	//the setting is cascaded everywhere else
-	this.setNamespacePrefix("biojava");
+    //centralised setting of namespace prefix
+    //the setting is cascaded everywhere else
+    this.setNamespacePrefix("biojava");
+    this.addPrefixMapping("biojava","http://www.biojava.org");
 
     }
 
@@ -136,43 +138,45 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
      * @exception SAXException if an error occurs
      */
     public void parse(InputSource poSource ) 
-	throws IOException, SAXException {
+    throws IOException, SAXException {
 
-	BufferedReader            oContents;
-	String                    oLine;
+    BufferedReader            oContents;
+    String                    oLine;
 
-	//Use method form superclass
-	oContents = this.getContentStream(poSource);
+    //Use method form superclass
+    oContents = this.getContentStream(poSource);
+    //This sets contentHandler document for XSLT
+    this.getContentHandler().startDocument();
 
-	try {
-	    // loop over file
-	    oLine = oContents.readLine();
-	    while (oLine != null) {
+    try {
+        // loop over file
+        oLine = oContents.readLine();
+        while (oLine != null) {
 
-		//System.out.println(oLine);
+        //System.out.println(oLine);
 
-		//interpret line and send messages accordingly
-		
-		this.interpret(oContents,oLine);
-		oLine = oContents.readLine();
-		
-	    } // end while
-	} catch (java.io.IOException x) {
-	    System.out.println(x.getMessage());
-	    System.out.println("File read interupted");
-	} // end try/catch
+        //interpret line and send messages accordingly
+        
+        this.interpret(oContents,oLine);
+        oLine = oContents.readLine();
+        
+        } // end while
+    } catch (IOException x) {
+        System.out.println(x.getMessage());
+        System.out.println("File read interrupted");
+    } // end try/catch
 
-	//at end of file...
-	oContents.close();
+    //at end of file...
+    oContents.close();
 
-	if (!tValidFormat) {
-	    throw (new SAXException("Could not recognised the format " +
-		    "of this file as one supported by the framework."));
-	    }
-	
-	    this.endElement(new QName(this,
-			      this.prefix("BlastLikeDataSetCollection")));
-	    
+    if (!tValidFormat) {
+        throw (new SAXException("Could not recognise the format " +
+            "of this file as one supported by the framework."));
+        }
+    
+        this.endElement(new QName(this,
+                  this.prefix("BlastLikeDataSetCollection")));
+        
     }
     /**
      * This is the default, parsing will be attempted only if both
@@ -181,7 +185,7 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
      *
      */
     public void setModeStrict() {
-	oVersion.setMode(BlastLikeVersionSupport.STRICT);
+    oVersion.setMode(BlastLikeVersionSupport.STRICT);
     }
 
     /**
@@ -193,77 +197,90 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
      *
      */
     public void setModeLazy() {
-	oVersion.setMode(BlastLikeVersionSupport.LAZY);
+    oVersion.setMode(BlastLikeVersionSupport.LAZY);
     }
 
     /**
      * Deal with line according to state parser is in.
      *
-     * @param poLine	 A line of Blast output
+     * @param poLine     A line of Blast output
      */
     private void interpret(BufferedReader poContents, String poLine)
-	throws SAXException {
+    throws SAXException {
 
-	//For a brand new collection,
-	//check for the start of a new BlastDataSet
-	if (iState == STARTUP) {
-	    //look for characteristic of start of dataset
-	    if (oVersion.isStartOfDataSet(poLine)) {
+    //For a brand new collection,
+    //check for the start of a new BlastDataSet
+    if (iState == STARTUP) {
+        //look for characteristic of start of dataset
+        if (oVersion.isStartOfDataSet(poLine)) {
+            //For GCG, oVersion is set as an indicator to get 
+            //program info from the second line
+            if (oVersion.getProgram() == oVersion.GCG) { 
+                //if GCG, skip to next line to get program info
+                try {
+                    poLine = poContents.readLine ();
+                } catch (java.io.IOException x) {
+                    System.out.println(x.getMessage());
+                    System.out.println("File read interrupted");
+                    throw (new SAXException(
+                    "Error parsing GCG File"));
+                } // end try/catch
+            }
+            
+        tValidFormat = oVersion.assignProgramAndVersion(poLine);
 
-		tValidFormat = oVersion.assignProgramAndVersion(poLine);
+        if (!oVersion.isSupported()) {
+            throw (new SAXException(
+            "Program " + 
+            oVersion.getProgramString() + " Version " +
+            oVersion.getVersionString() +
+            " is not supported by the biojava blast-like " +
+            "parsing framework"));
 
-		if (!oVersion.isSupported()) {
-		    throw (new SAXException(
-		    "Program " + 
-		    oVersion.getProgramString() + " Version " +
-		    oVersion.getVersionString() +
-		    " is not supported by the biojava blast-like " +
-		    "parsing framework"));
+        }
 
-		}
+        oAtts.clear();
+        oAttQName.setQName("xmlns");
+        //check if namespace configuration means attribute
+        //should not be reported.
+        if (!oAttQName.getLocalName().equals("")) {
+            oAtts.addAttribute(oAttQName.getURI(),
+                   oAttQName.getLocalName(),
+                   oAttQName.getQName(),
+                   "CDATA","");
+        }
 
-		oAtts.clear();
-		oAttQName.setQName("xmlns");
-		//check if namespace configuration means attribute
-		//should not be reported.
-		if (!oAttQName.getLocalName().equals("")) {
-		    oAtts.addAttribute(oAttQName.getURI(),
-				   oAttQName.getLocalName(),
-				   oAttQName.getQName(),
-				   "CDATA","");
-		}
+        oAttQName.setQName("xmlns:biojava");
+        //check if namespace configuration means attribute
+        //should not be reported.
+        if (!oAttQName.getLocalName().equals("")) {
+            oAtts.addAttribute(oAttQName.getURI(),
+                   oAttQName.getLocalName(),
+                   oAttQName.getQName(),
+                   "CDATA","http://www.biojava.org");
+        }
+        this.startElement(
+              new QName(this,
+                    this.prefix("BlastLikeDataSetCollection")),
+                  (Attributes)oAtts);
 
-		oAttQName.setQName("xmlns:biojava");
-		//check if namespace configuration means attribute
-		//should not be reported.
-		if (!oAttQName.getLocalName().equals("")) {
-		    oAtts.addAttribute(oAttQName.getURI(),
-				   oAttQName.getLocalName(),
-				   oAttQName.getQName(),
-				   "CDATA","http://www.biojava.org");
-		}
-		this.startElement(
-			  new QName(this,
-				    this.prefix("BlastLikeDataSetCollection")),
-				  (Attributes)oAtts);
-
-		this.onNewDataSet(poContents,poLine);
-		return;
-	    }
-	}	//End check for the start of a new BlastDataSet
+        this.onNewDataSet(poContents,poLine);
+        return;
+        }
+    }   //End check for the start of a new BlastDataSet
 
 
-	if (iState == INSIDE_FILE) {
-	    //look for characteristic of start of dataset
-	    if (oVersion.isStartOfDataSet(poLine)) {
+    if (iState == INSIDE_FILE) {
+        //look for characteristic of start of dataset
+        if (oVersion.isStartOfDataSet(poLine)) {
 
-		tValidFormat = oVersion.assignProgramAndVersion(poLine);
+        tValidFormat = oVersion.assignProgramAndVersion(poLine);
 
-		this.onNewDataSet(poContents,poLine);
+        this.onNewDataSet(poContents,poLine);
 
-		return;
-	    }
-	}	//End check for the start of a new BlastDataSet
+        return;
+        }
+    }   //End check for the start of a new BlastDataSet
 
     }
     /**
@@ -274,31 +291,31 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
      *
      * The above would be parsed to program blastn, and version number.
      *
-     * @param poLine	 -
+     * @param poLine     -
      */
     private void onNewDataSet(BufferedReader poContents, String poLine)
-	throws SAXException {
+    throws SAXException {
 
-	//choose according to version...
+    //choose according to version...
 
-	oBlast = new BlastSAXParser(oVersion,this.getNamespacePrefix());
-	String oLine;
+    oBlast = new BlastSAXParser(oVersion,this.getNamespacePrefix());
+    String oLine;
 
-	//Parse Contents stream up to end of a single BlastDataSet.
-	oBlast.setContentHandler(oHandler);
-	oLine = oBlast.parse(poContents,poLine);
+    //Parse Contents stream up to end of a single BlastDataSet.
+    oBlast.setContentHandler(oHandler);
+    oLine = oBlast.parse(poContents,poLine);
 
-	//System.out.println("Returned from a BlastSAXParser with line:\n" +
-	//			   oLine);
+    //System.out.println("Returned from a BlastSAXParser with line:\n" +
+    //             oLine);
 
-	this.changeState(INSIDE_FILE);
-	//now interpret the line the BlastSAXParser returned from
-	if (oLine != null) {
-	    this.interpret(poContents,oLine);
-	} else {
-	    //here if at the EOF
-	    return;
-	}
+    this.changeState(INSIDE_FILE);
+    //now interpret the line the BlastSAXParser returned from
+    if (oLine != null) {
+        this.interpret(poContents,oLine);
+    } else {
+        //here if at the EOF
+        return;
+    }
     }
     
 }

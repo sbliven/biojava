@@ -38,6 +38,7 @@ import java.util.*;
  *                 Tim Dilks          (CAT)
  *                 Colin Hardman      (CAT)
  *                 Stuart Johnston    (CAT)
+ *                 Mathieu Wiepert    (Mayo Foundation)
  *
  * Copyright 2000 Cambridge Antibody Technology Group plc.
  * All Rights Reserved.
@@ -67,8 +68,15 @@ final class BlastLikeVersionSupport {
 
     public static final int    HMMER             = 21;
 
+    public static final int    GCG               = 31; 
+    public static final int    GCG_BLASTN        = 32; 
+
     public static final int    V2_0_11           = 100;
 
+    public static final int    V2_0_10           = 101;
+    
+    public static final int    V2_1_2            = 102;
+    
     public static final int    V2_0A19MP_WASHU   = 200;
 
     public static final int    V2_0              = 300;
@@ -96,105 +104,132 @@ final class BlastLikeVersionSupport {
      * Given a program name, and a version checks if the software
      * is supported. Returns true if it is, false if not.
      *
-     * @param poProgram	 A String representation of the program name
-     * @param poVersion	 A String representation of the version
-     * @return boolean	 -
+     * @param poProgram  A String representation of the program name
+     * @param poVersion  A String representation of the version
+     * @return boolean   -
      */
      public boolean isSupported() {
 
-	 //Check version support for NCBI Blast
+     //Check version support for NCBI Blast
 
-	 if ( (iProgram == NCBI_BLASTN) ||
-	      (iProgram == NCBI_BLASTX) ||
-	      (iProgram == NCBI_BLASTP) ||
-	      (iProgram == NCBI_TBLASTN) ||
-	      (iProgram == NCBI_TBLASTX) ) {
+     if ( (iProgram == NCBI_BLASTN) ||
+          (iProgram == NCBI_BLASTX) ||
+          (iProgram == NCBI_BLASTP) ||
+          (iProgram == NCBI_TBLASTN) ||
+          (iProgram == NCBI_TBLASTX) ) {
 
-	     if (iVersion == V2_0_11) {
-		 return true;
-	     }
+         if (iVersion == V2_0_11) {
+         return true;
+         }
 
-	     //if get here, program version is unsupported
-	     //return false if mode is strict, true if LAZY
+         //if get here, program version is unsupported
+         //return false if mode is strict, true if LAZY
 
-	     if (this.getMode() == BlastLikeVersionSupport.STRICT) {
-		 return false; 
-	     }
-	     if (this.getMode() == BlastLikeVersionSupport.LAZY) {
-		 return true; 
-	     }
-	     
-	 } //end if NCBI Blast
-
-
-	 //Check version support for WU_BLAST
-
-	 if ( (iProgram == WU_BLASTN) ||
-	      (iProgram == WU_BLASTX) ||
-	      (iProgram == WU_BLASTP) ||
-	      (iProgram == WU_TBLASTN) ||
-	      (iProgram == WU_TBLASTX) ) {
-
-	     if (iVersion == V2_0A19MP_WASHU) {
-		 return true;
-	     }
-	 }
+         if (this.getMode() == BlastLikeVersionSupport.STRICT) {
+         return false; 
+         }
+         if (this.getMode() == BlastLikeVersionSupport.LAZY) {
+         return true; 
+         }
+         
+     } //end if NCBI Blast
 
 
-	 //Check version support for HMMER
+     //Check version support for WU_BLAST
 
-	 if (iProgram == HMMER) {
-	     if (iVersion == V2_0) {
-		 return true;
-	     }
-	 }
+     if ( (iProgram == WU_BLASTN) ||
+          (iProgram == WU_BLASTX) ||
+          (iProgram == WU_BLASTP) ||
+          (iProgram == WU_TBLASTN) ||
+          (iProgram == WU_TBLASTX) ) {
+
+         if (iVersion == V2_0A19MP_WASHU) {
+         return true;
+         }
+     }
 
 
-	 //if get here, the program version is unsupported
-	 //return false if mode is strict, true if LAZY
+     //Check version support for HMMER
 
-	 if (this.getMode() == BlastLikeVersionSupport.STRICT) {
-	     return false; 
-	 }
-	 if (this.getMode() == BlastLikeVersionSupport.LAZY) {
-	     return true; 
-	 }
+     if (iProgram == HMMER) {
+         if (iVersion == V2_0) {
+         return true;
+         }
+     }
 
-	//if get here, program is unsupported because
-	//program type is not recognized
-	return false;
+
+    //Check version support for GCG
+    if (iProgram == GCG_BLASTN) {
+         if ((iVersion == V2_0_10)||
+             (iVersion == V2_1_2)){
+         return true;
+         }
+
+         //if get here, program version is unsupported
+         //return false if mode is strict, true if LAZY
+
+         if (this.getMode() == BlastLikeVersionSupport.STRICT) {
+         return false; 
+         }
+         if (this.getMode() == BlastLikeVersionSupport.LAZY) {
+         return true; 
+         }
+         
+     } //end if GCG Blast
+
+
+     
+     //if get here, the program version is unsupported
+     //return false if mode is strict, true if LAZY
+
+     if (this.getMode() == BlastLikeVersionSupport.STRICT) {
+         return false; 
+     }
+     if (this.getMode() == BlastLikeVersionSupport.LAZY) {
+         return true; 
+     }
+
+    //if get here, program is unsupported because
+    //program type is not recognized
+    return false;
 
     }
     /**
      * Describe 'isStartOfDataSet' method here.
      *
-     * @return boolean	 -
+     * @return boolean   -
      */
     public boolean isStartOfDataSet(String poLine) {
 
-	    if ( (poLine.startsWith("BLAST")) ||
-	         (poLine.startsWith("HMMER")) || 
-	         (poLine.startsWith("TBLAST")) )
-		{
-		    return true;
-		}		    
+        if ( (poLine.startsWith("BLAST")) ||
+             (poLine.startsWith("HMMER")) || 
+             (poLine.startsWith("TBLAST")) ||
+             (poLine.startsWith("!!")) ) {  //GCG check  
+            if (poLine.startsWith("!!")) {
+                //Flag to indicate program type, not needed for
+                //other programs
+                iProgram = GCG;
+            }
+            
+            return true;
+        }           
 
-	//if get here, not the start of a new dataset
-	return false;
+    //if get here, not the start of a new dataset
+    return false;
 
     }
     public int getProgram() {
-	return iProgram;
+    return iProgram;
     }
 
     public int getVersion() {
-	return iVersion;
+    return iVersion;
     }
     public String getProgramString() {
-	return oProgramString;
+    return oProgramString;
     }
     public String getVersionString() {
-	return oVersionString;
+    return oVersionString;
     }
     /**
      * Assign program and version from by parsing a line
@@ -205,113 +240,133 @@ final class BlastLikeVersionSupport {
      */
     public boolean assignProgramAndVersion(String poLine) {
 
-	//Take first two tokens only (this is OK for current programs)
-	boolean tFormatFound = false;
+    //Take first two tokens only (this is OK for current programs)
+    boolean tFormatFound = false;
 
-	StringTokenizer oSt = new StringTokenizer(poLine);
+    StringTokenizer oSt = new StringTokenizer(poLine);
 
-	//deal with Blast, WU-blast and HMMER
+    //deal with Blast, WU-blast, GCG and HMMER
 
-	//first potentially identify program e.g. blastn
-	oProgramStub   = oSt.nextToken().toLowerCase();
-	oVersionString = oSt.nextToken().toLowerCase();
+    //first potentially identify program e.g. blastn
+    oProgramStub   = oSt.nextToken().toLowerCase();
+    oVersionString = oSt.nextToken().toLowerCase();
 
-	//if it's a blast, then choose ncbi-blast, or wu-blast
-	if (oProgramStub.indexOf("blast") != -1) {
-	    if ((oVersionString.indexOf("washu") == -1)) {
-		//here if NCBI-BLAST
-		oProgramString = "ncbi-".concat(oProgramStub);
+    //if it's a blast, then choose ncbi-blast, wu-blast or GCG
+    if (oProgramStub.indexOf("blast") != -1) {
+        if ((oVersionString.indexOf("washu") == -1)) {
+        //here if GCG or NCBI-BLAST
+            if (iProgram==GCG) { 
+            oProgramString = "gcg-".concat(oProgramStub);
+            } else {
+                oProgramString = "ncbi-".concat(oProgramStub);
+            }
 
-	    } else {
-		//here if WU-BLAST
-		oProgramString = "wu-".concat(oProgramStub);
-	    }
-	}
-	if (oProgramStub.indexOf("hmmer") != -1) {
-	    oProgramString = oProgramStub;
-	}
+        } else {
+        //here if WU-BLAST
+        oProgramString = "wu-".concat(oProgramStub);
+        }
+    }
+    if (oProgramStub.indexOf("hmmer") != -1) {
+        oProgramString = oProgramStub;
+    }
 
-	//if it's hmmer
-
-
-	//NCBI blast
-	if (oProgramString.equals("ncbi-blastn")) {
-	    iProgram = NCBI_BLASTN;
-	    tFormatFound = true;
-	}
-	if (oProgramString.equals("ncbi-blastx")) {
-	    iProgram = NCBI_BLASTX;
-	    tFormatFound = true;
-	}
-	if (oProgramString.equals("ncbi-blastp")) {
-	    iProgram = NCBI_BLASTP;
-	    tFormatFound = true;
-	}
-	if (oProgramString.equals("ncbi-tblastn")) {
-	    iProgram = NCBI_TBLASTN;
-	    tFormatFound = true;
-	}
-	if (oProgramString.equals("ncbi-tblastx")) {
-	    iProgram = NCBI_TBLASTX;
-	    tFormatFound = true;
-	}
-
-	if (oVersionString.equals("2.0.11")) {
-	    iVersion = V2_0_11;
-	}
-	//wu-blast
-	if (oProgramString.equals("wu-blastn")) {
-	    iProgram = WU_BLASTN;
-	    tFormatFound = true;
-	}
-	if (oProgramString.equals("wu-blastx")) {
-	    iProgram = WU_BLASTX;
-	    tFormatFound = true;
-	}
-	if (oProgramString.equals("wu-blastp")) {
-	    iProgram = WU_BLASTP;
-	    tFormatFound = true;
-	}
-	if (oProgramString.equals("wu-tblastn")) {
-	    iProgram = WU_TBLASTN;
-	    tFormatFound = true;
-	}
-	if (oProgramString.equals("wu-tblastx")) {
-	    iProgram = WU_TBLASTX;
-	    tFormatFound = true;
-	}
-	if (oVersionString.equals("2.0a19mp-washu")) {
-	    iVersion = V2_0A19MP_WASHU;
-	    tFormatFound = true;
-	}
+    //if it's hmmer
 
 
-	//hmmer
-	if (oProgramString.equals("hmmer")) {
-	    iProgram = HMMER;
-	    tFormatFound = true;
-	}
+    //NCBI blast
+    if (oProgramString.equals("ncbi-blastn")) {
+        iProgram = NCBI_BLASTN;
+        tFormatFound = true;
+    }
+    if (oProgramString.equals("ncbi-blastx")) {
+        iProgram = NCBI_BLASTX;
+        tFormatFound = true;
+    }
+    if (oProgramString.equals("ncbi-blastp")) {
+        iProgram = NCBI_BLASTP;
+        tFormatFound = true;
+    }
+    if (oProgramString.equals("ncbi-tblastn")) {
+        iProgram = NCBI_TBLASTN;
+        tFormatFound = true;
+    }
+    if (oProgramString.equals("ncbi-tblastx")) {
+        iProgram = NCBI_TBLASTX;
+        tFormatFound = true;
+    }
 
-	if (oVersionString.equals("2.0")) {
-	    iVersion = V2_0;
-	    tFormatFound = true;
-	}
+    if (oVersionString.equals("2.0.11")) {
+        iVersion = V2_0_11;
+    }
+    //wu-blast
+    if (oProgramString.equals("wu-blastn")) {
+        iProgram = WU_BLASTN;
+        tFormatFound = true;
+    }
+    if (oProgramString.equals("wu-blastx")) {
+        iProgram = WU_BLASTX;
+        tFormatFound = true;
+    }
+    if (oProgramString.equals("wu-blastp")) {
+        iProgram = WU_BLASTP;
+        tFormatFound = true;
+    }
+    if (oProgramString.equals("wu-tblastn")) {
+        iProgram = WU_TBLASTN;
+        tFormatFound = true;
+    }
+    if (oProgramString.equals("wu-tblastx")) {
+        iProgram = WU_TBLASTX;
+        tFormatFound = true;
+    }
+    if (oVersionString.equals("2.0a19mp-washu")) {
+        iVersion = V2_0A19MP_WASHU;
+        tFormatFound = true;
+    }
+
+
+    //hmmer
+    if (oProgramString.equals("hmmer")) {
+        iProgram = HMMER;
+        tFormatFound = true;
+    }
+
+    if (oVersionString.equals("2.0")) {
+        iVersion = V2_0;
+        tFormatFound = true;
+    }
+
+    //GCG
+    if (oProgramString.equals("gcg-blastn")) {
+        iProgram = GCG_BLASTN;  //First pass assigned this to GCG
+                                //Second pass is more specific.
+        tFormatFound = true;
+    }
+
+    //GCG Version
+    if (oVersionString.equals("2.0.10")) {
+        iVersion = V2_0_10;
+    }
+    //GCG Version
+    if (oVersionString.equals("2.1.2")) {
+        iVersion = V2_1_2;
+    }
 
 
 
-	if (!tFormatFound) {
-	    return false;
-	}
-	return true;
+    if (!tFormatFound) {
+        return false;
+    }
+    return true;
     }
     /**
      * Set the parsing mode to STRICT or LAZY.
      *
-     * @param piMode	 Should be one of ParsingMode.STRICT
+     * @param piMode     Should be one of ParsingMode.STRICT
      * or ParsingMode.LAZY.
      */
     public void setMode(int piMode) {
-	iMode = piMode;
+    iMode = piMode;
     }
 
     /**
@@ -319,10 +374,10 @@ final class BlastLikeVersionSupport {
      * ParsingMode.STRICT or ParsingMode.LAZY to
      * see if parsing should continue or not.
      *
-     * @return int	 The current parsing mode.
+     * @return int   The current parsing mode.
      */
     public int getMode() {
-	return iMode;
+    return iMode;
     }
 
 }

@@ -50,6 +50,7 @@ import java.io.*;
  * <li>Tim Dilks          (CAT)
  * <li>Colin Hardman      (CAT)
  * <li>Stuart Johnston    (CAT)
+ * <li>Mathieu Wiepert    (Mayo Foundation)
  *</ul>
  */
 final class QName  {
@@ -66,7 +67,7 @@ final class QName  {
      * @param poNamespace a <code>NamespaceConfigurationIF</code> value
      */
     public QName(NamespaceConfigurationIF poNamespace) {
-	oNamespace = poNamespace;
+    oNamespace = poNamespace;
     }
     /**
      * Sets the qName for the object. When the qName is set,
@@ -78,49 +79,59 @@ final class QName  {
      */
     
     public QName(NamespaceConfigurationIF poNamespace,String poQName) {
-	oNamespace = poNamespace;
-	this.setQName(poQName);
+    oNamespace = poNamespace;
+    this.setQName(poQName);
     }
     /**
      * Sets the qName for the object. When the qName is set,
      * local names and namespace prefixes are automatically
-     * accessibly from calling relevant methods on th object.
+     * accessible from calling relevant methods on the object.
      *
      * @param poQName a <code>String</code> value of qName. For
      * example, it could be &quot;biojava:MyElement&quot;
      */
     public void setQName(String poQName) {
-	this.reset();
-	oQName = poQName;
-
-	if (poQName.indexOf(':') != -1) {
-	    //if name contains a colon, get prefix and loca name
-	    oTokenizer  = new StringTokenizer(oQName,":");
-	    oPrefixName = oTokenizer.nextToken();
-	    //System.out.println(oPrefixName);
-
-	    if ( (oPrefixName.equals("xmlns")) && 
-		  (!oNamespace.getNamespacePrefixes()) )  {
-		//leave LocalName as empty string
-
-	    } else {
-		oLocalName  = oTokenizer.nextToken();
-	    }
-	    //System.out.println(oLocalName);
-
-	    oURI = oNamespace.getURIFromPrefix(oPrefixName);
-	} else {
-	    //if name or attribute does not have a namespace,
-	    //local name is QName.
-	    oPrefixName = "";
-	    if ( (oQName.equals("xmlns")) &&
-		  (!oNamespace.getNamespacePrefixes()) )  {
-		//leave LocalName as empty string
-	    
-	    } else {
-		oLocalName =  oQName;
-	    }
-	}
+    this.reset();
+    oQName = poQName;
+    if (poQName.indexOf(':') != -1) {
+        //if name contains a colon, get prefix and local name
+        oTokenizer  = new StringTokenizer(oQName,":");
+        oPrefixName = oTokenizer.nextToken();
+        if ( (oPrefixName.equals("xmlns")) && 
+          (!oNamespace.getNamespacePrefixes()) ) {  
+            //prefix != "xmlns" and getNameSpacePrefixes=true
+            //leave LocalName as empty string
+        } else {
+            //special case for xml:space 
+            oLocalName  = oTokenizer.nextToken();
+        }
+        if (oPrefixName.equals("xml")) {
+            //Set up namespace correctly for XSLT
+            oURI = "http://www.w3.org/XML/1998/namespace"; 
+        }
+        else if (oPrefixName.equals("xmlns")) {
+            //means that oNamespace.getNamespacePrefixes() = true
+            if (oTokenizer.hasMoreTokens()) {
+                if (oTokenizer.nextToken().equals("biojava")) {
+                    //looking for xmlns:biojava and processing 
+                    //namespace prefixes
+                    oURI = oNamespace.getURIFromPrefix("biojava");
+                }
+            }
+        } else {
+            oURI = oNamespace.getURIFromPrefix(oPrefixName);
+        }
+    } else {
+        //if name or attribute does not have a namespace,
+        //local name is QName.
+        oPrefixName = "";
+        if ( (oQName.equals("xmlns")) &&
+          (!oNamespace.getNamespacePrefixes()) ) {
+            //leave LocalName as empty string
+        } else {
+            oLocalName =  oQName;
+        }
+    }
     }
     /**
      * Gets the raw QName - Parser writers should
@@ -129,7 +140,7 @@ final class QName  {
      * @return a <code>String</code> value
      */
     public String  getQName() {
-	return oQName;
+    return oQName;
     }
     /**
      * Gets the raw Prefix - Parser writers should
@@ -140,7 +151,7 @@ final class QName  {
      * @return a <code>String</code> value
      */
     public String  getPrefixName() {
-	return oPrefixName;
+    return oPrefixName;
     }
     /**
      * Gets the raw LocalName - Parser writers should
@@ -149,12 +160,12 @@ final class QName  {
      * @return a <code>String</code> value
      */
     public String  getLocalName() {
-	return oLocalName;
+    return oLocalName;
     }
 
 
     public String getURI() {
-	return oURI;
+    return oURI;
     }
 
     /**
@@ -162,8 +173,8 @@ final class QName  {
      *
      */
     private void reset() {
-	oLocalName          = "";      
-	oPrefixName         = "";     
-        oURI                = "";     
+    oLocalName          = "";      
+    oPrefixName         = "";     
+    oURI                = "";     
     }
 }
