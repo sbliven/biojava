@@ -38,7 +38,7 @@ import org.biojava.bio.seq.*;
  * Added GenBank header	info to	the sequence annotation. The ACCESSION header
  * tag is not included.	Stored in sequence.getName().
  * @author Greg	Cox
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @author Matthew Pocock
  * @author Ron Kuhn
  */
