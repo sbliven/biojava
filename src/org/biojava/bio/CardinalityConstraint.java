@@ -20,7 +20,8 @@
  */
 package org.biojava.bio;
 
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.RangeLocation;
 
 /**
  * A constraint on the number of values a property can have.

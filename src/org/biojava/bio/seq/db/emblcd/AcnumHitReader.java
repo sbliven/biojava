@@ -21,8 +21,8 @@
 
 package org.biojava.bio.seq.db.emblcd;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * <code>AcnumHitReader</code> reads the "acnum.hit" file of an EMBL

@@ -22,10 +22,9 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
-
-import org.biojava.bio.seq.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Suffix tree implementation.  The interface is a bit strange, as it

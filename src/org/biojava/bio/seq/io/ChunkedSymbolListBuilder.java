@@ -21,10 +21,13 @@
 
 package org.biojava.bio.seq.io;
 
-import java.util.*;
-import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * @author Thomas Down

@@ -21,18 +21,19 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.geom.*;
-import java.awt.font.*;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.gui.*;
-
-import java.util.List;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * @author Matthew Pocock
@@ -59,7 +60,7 @@ implements LabelRenderer{
   ) {
     Shape s;
     
-    if (src.getDirection() == src.HORIZONTAL) {
+    if (src.getDirection() == SequenceRenderContext.HORIZONTAL) {
       if(labelGlyphH == null) {
         Font font = src.getFont();
         labelGlyphH = font.createGlyphVector(frc, label).getOutline();
@@ -143,15 +144,15 @@ implements LabelRenderer{
       Rectangle2D bounds = gv.getBounds2D();
       double along = 0.0;
       double across = 0.0;
-      if (sp.getDirection() == sp.HORIZONTAL) {
+      if (sp.getDirection() == SequenceRenderContext.HORIZONTAL) {
         across = labelBox.getCenterY() - bounds.getCenterY();
 	int balign = border.getAlignment();
         
-        if (balign == border.LEADING) 
+        if (balign == SequenceRenderContext.Border.LEADING) 
             along = labelBox.getMinX() - bounds.getMinX();
-        else if (balign == border.TRAILING)
+        else if (balign == SequenceRenderContext.Border.TRAILING)
             along = labelBox.getMaxX() - bounds.getMaxX();
-        else if (balign == border.CENTER)
+        else if (balign == SequenceRenderContext.Border.CENTER)
             along = labelBox.getCenterX() - bounds.getCenterX();
 
         AffineTransform at = g.getTransform();
@@ -163,11 +164,11 @@ implements LabelRenderer{
         across = labelBox.getCenterX() - bounds.getCenterX();
 	int balign = border.getAlignment();
 
-	if (balign == border.LEADING)
+	if (balign == SequenceRenderContext.Border.LEADING)
             along = labelBox.getMinY() - bounds.getMinY();
-        else if (balign == border.TRAILING)
+        else if (balign == SequenceRenderContext.Border.TRAILING)
             along = labelBox.getMaxY() - bounds.getMaxY();
-        else if (balign == border.CENTER)
+        else if (balign == SequenceRenderContext.Border.CENTER)
             along = labelBox.getCenterY() - bounds.getCenterY();
 
         AffineTransform at = g.getTransform();

@@ -20,7 +20,7 @@
  */
 package org.biojava.bio.program.sax;
 
-import java.util.*;
+import java.util.HashMap;
 
 import org.xml.sax.SAXException;
 

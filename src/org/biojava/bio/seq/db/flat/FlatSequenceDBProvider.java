@@ -21,7 +21,6 @@
 
 package org.biojava.bio.seq.db.flat;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 

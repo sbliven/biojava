@@ -21,11 +21,10 @@
 
 package org.biojava.stats.svm.tools;
 
+import java.io.Serializable;
 import java.util.BitSet;
-import java.io.*;
 
-//import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.SuffixTree;
 import org.biojava.stats.svm.SVMKernel;
 
 /**

@@ -20,14 +20,22 @@
  */
 package org.biojava.bio.gui;
 
-import java.awt.*;
-import java.awt.geom.*;
-import java.awt.font.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.dist.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.IllegalSymbolException;
 
 /**
  * A BlockPainter that renders letters in proportion to the size of the signal.

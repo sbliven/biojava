@@ -21,12 +21,23 @@
 
 package org.biojava.bio.program.indexdb;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
-import org.biojava.bio.*;
-import org.biojava.utils.*;
-import org.biojava.utils.io.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioException;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.CommitFailure;
+import org.biojava.utils.SmallMap;
+import org.biojava.utils.io.RAF;
 
 /**
  * <code>BioStore</code>s represent directory and file structures

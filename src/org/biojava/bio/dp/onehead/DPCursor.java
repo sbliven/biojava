@@ -22,7 +22,8 @@
 
 package org.biojava.bio.dp.onehead;
 
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * Encapsulates the dynamic programmming matrix, and the context within algorithms work.

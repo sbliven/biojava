@@ -20,8 +20,10 @@
  */
 package org.biojava.bio.program.blast2html;
 
-import java.util.*;
-import java.io.*;
+import java.io.FileInputStream;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Simple implementation for specifying markup styles.

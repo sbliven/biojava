@@ -1,17 +1,24 @@
 package org.biojava.bio.program.ssaha;
 
-import java.io.*;
-import java.nio.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.RandomAccessFile;
+import java.nio.IntBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 
-import java.nio.channels.*;
-import java.util.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.seq.io.*;
-
+import org.biojava.bio.BioException;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.io.ParseException;
+import org.biojava.bio.seq.io.SeqIOAdapter;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Packing;
+import org.biojava.bio.symbol.Symbol;
 import org.biojava.utils.Constants;
 
 /**

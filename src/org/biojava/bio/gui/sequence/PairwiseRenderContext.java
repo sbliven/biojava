@@ -23,10 +23,9 @@ package org.biojava.bio.gui.sequence;
 
 import java.awt.Point;
 
-import org.biojava.utils.ChangeType;
-import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * <code>PairwiseRenderContext</code> encapsulates information

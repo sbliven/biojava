@@ -22,8 +22,9 @@
 
 package org.biojava.bio.dist;
 
-import org.biojava.utils.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p>

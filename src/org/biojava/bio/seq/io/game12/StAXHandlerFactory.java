@@ -21,7 +21,7 @@
 
 package org.biojava.bio.seq.io.game12;
 
-import org.biojava.utils.stax.*;
+import org.biojava.utils.stax.StAXContentHandler;
 
 /**
  *  Factory for StAX content handlers.

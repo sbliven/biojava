@@ -21,14 +21,33 @@
 
 package org.biojava.bio.seq.impl;
 
-import java.lang.reflect.*;
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioException;
+import org.biojava.bio.SimpleAnnotation;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.FeatureRealizer;
+import org.biojava.bio.seq.RealizingFeatureHolder;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SimpleFeatureHolder;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.Edit;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * A basic implementation of the <code>Sequence</code> interface.

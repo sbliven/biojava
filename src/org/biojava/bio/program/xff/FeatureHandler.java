@@ -21,16 +21,18 @@
 
 package org.biojava.bio.program.xff;
 
-import java.util.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-
-import org.biojava.utils.*;
-import org.biojava.utils.stax.*;
-import org.xml.sax.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.SmallAnnotation;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.io.ParseException;
+import org.biojava.bio.symbol.Location;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.stax.DelegationManager;
+import org.biojava.utils.stax.StAXContentHandler;
+import org.biojava.utils.stax.StAXContentHandlerBase;
+import org.biojava.utils.stax.StringElementHandlerBase;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * StAX handler for the basic <code>feature</code> type of XFF.

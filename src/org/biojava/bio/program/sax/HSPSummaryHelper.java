@@ -20,8 +20,10 @@
  */
 package org.biojava.bio.program.sax;
 
+import java.util.HashMap;
+import java.util.StringTokenizer;
+
 import org.xml.sax.SAXException;
-import java.util.*;
 
 
 /**

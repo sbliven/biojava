@@ -20,9 +20,12 @@
 
 package org.biojava.utils;
 
-import java.io.Serializable;
-import java.util.*;
-import java.lang.ref.*;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * <p>

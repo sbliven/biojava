@@ -21,10 +21,13 @@
 
 package org.biojava.bio.program.indexdb;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 
-import org.biojava.utils.*;
+import org.biojava.utils.FileAsList;
 
 /**
  * <code>SearchableFileAsList</code> is an abstract base class which

@@ -21,8 +21,6 @@
 
 package org.biojava.bio.program.gff;
 
-import java.io.*;
-import org.biojava.bio.*;
 
 /**
  * An object that filters a stream of GFF, forwarding some

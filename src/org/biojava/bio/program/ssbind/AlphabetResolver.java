@@ -21,8 +21,8 @@
 
 package org.biojava.bio.program.ssbind;
 
-import org.biojava.bio.BioException;
 import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.symbol.FiniteAlphabet;

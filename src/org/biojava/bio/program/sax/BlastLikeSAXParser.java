@@ -20,12 +20,12 @@
  */
 package org.biojava.bio.program.sax;
 
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
 
-import org.xml.sax.SAXException;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -224,7 +224,7 @@ public class BlastLikeSAXParser extends AbstractNativeAppSAXParser {
             if (oVersion.isStartOfDataSet(poLine)) {
                 //For GCG, oVersion is set as an indicator to get 
                 //program info from the second line
-                if (oVersion.getProgram() == oVersion.GCG) { 
+                if (oVersion.getProgram() == BlastLikeVersionSupport.GCG) { 
                     //if GCG, skip to next line to get program info
                     try {
                         poLine = poContents.readLine ();

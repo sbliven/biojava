@@ -21,13 +21,13 @@
 
 package org.biojava.bio.chromatogram;
 
-import org.biojava.bio.program.scf.SCF;
-import org.biojava.bio.program.abi.ABIFChromatogram;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.biojava.bio.program.abi.ABIFChromatogram;
+import org.biojava.bio.program.scf.SCF;
 import org.biojava.utils.io.CachingInputStream;
 
 /**

@@ -20,13 +20,20 @@
  */
 package org.biojava.bio.program.das;
 
-import java.net.*;
-import java.util.*;
+import java.net.URL;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.seq.distributed.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.distributed.DistDataSource;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
 
 /**
  * Reflects a reference server on the DAS network.

@@ -21,11 +21,11 @@
 
 package org.biojava.bio.seq.db;
 
-import java.util.*;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.SequenceIterator;
 
 /**
  * A database of sequences with accessible keys and iterators over all

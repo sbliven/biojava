@@ -20,9 +20,19 @@
  */
 package org.biojava.bio.seq;
 
-import java.util.*;
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.SimpleAnnotation;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.SmallMap;
 
 /**
  * Registry of known types of features.

@@ -20,14 +20,15 @@
  */
 package org.biojava.bio.program.sax;
 
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-import org.xml.sax.SAXException;
-import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
-import org.xml.sax.helpers.AttributesImpl;
+import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * A SAX2 parser for dealing with a sequence alignments.  The format

@@ -20,8 +20,9 @@
  */
 package org.biojava.bio.gui.sequence;
 
-import java.util.*;
-import java.awt.event.*;
+import java.awt.event.MouseEvent;
+import java.util.EventObject;
+import java.util.List;
 
 /**
  * An event indicating that a mouse gesture was recognised within a widget that

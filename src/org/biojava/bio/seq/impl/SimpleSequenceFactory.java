@@ -23,9 +23,11 @@ package org.biojava.bio.seq.impl;
 
 import java.io.Serializable;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.seq.FeatureRealizer;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceFactory;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * A no-frills implementation of SequenceFactory that produces SimpleSequence

@@ -21,8 +21,9 @@
 
 package org.biojava.utils.cache;
 
-import java.util.*;
-import java.lang.ref.*;
+import java.lang.ref.WeakReference;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Cache which stores up to <code>limit</code> Objects.

@@ -22,8 +22,8 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.symbol.Alphabet;
 
 /**
  * A log odds weight matrix.

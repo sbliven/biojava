@@ -21,11 +21,16 @@
 package org.biojava.bio.seq.io;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
-import org.biojava.bio.seq.*;
-import org.biojava.bio.taxa.*;
-import org.biojava.utils.*;
+import org.biojava.bio.taxa.CircularReferenceException;
+import org.biojava.bio.taxa.EbiFormat;
+import org.biojava.bio.taxa.Taxon;
+import org.biojava.bio.taxa.TaxonFactory;
+import org.biojava.bio.taxa.TaxonParser;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * A parser that is able to generate Taxon entries for sequence

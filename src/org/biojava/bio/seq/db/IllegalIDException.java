@@ -21,7 +21,7 @@
 
 package org.biojava.bio.seq.db;
 
-import org.biojava.bio.*;
+import org.biojava.bio.BioException;
 
 /**
  * @author Matthew Pocock

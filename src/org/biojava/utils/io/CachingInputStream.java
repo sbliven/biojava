@@ -21,9 +21,9 @@
 
 package org.biojava.utils.io;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.EOFException;
 
 /** 
  * A wrapper around {@link java.io.InputStream} that provides in-memory

@@ -1,12 +1,20 @@
 package org.biojava.bio.program.ssaha;
 
-import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.nio.LongBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 
 import org.biojava.bio.BioError;
-import org.biojava.bio.symbol.*;
-
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Packing;
+import org.biojava.bio.symbol.PackingFactory;
+import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.Constants;
 import org.biojava.utils.io.LargeBuffer;
 

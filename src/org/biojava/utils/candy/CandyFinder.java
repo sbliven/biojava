@@ -26,8 +26,7 @@
  */
 package org.biojava.utils.candy;
 
-import org.biojava.utils.*;
-import java.beans.*;
+import java.beans.PropertyChangeListener;
 
 /**
  * <p>

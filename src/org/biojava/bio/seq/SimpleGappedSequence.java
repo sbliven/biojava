@@ -21,13 +21,15 @@
 
 package org.biojava.bio.seq;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.seq.projection.*;
-import org.biojava.utils.*;
+import java.util.Iterator;
 
-import java.util.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.impl.FeatureImpl;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.SimpleGappedSymbolList;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Simple implementation of GappedSequence.

@@ -21,8 +21,8 @@
 
 package org.biojava.bio.dp.twohead;
 
-import org.biojava.bio.*;
-import org.biojava.bio.dp.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.dp.DP;
 
 /**
  * The interface for all functions that can calculate the 'scores' array for

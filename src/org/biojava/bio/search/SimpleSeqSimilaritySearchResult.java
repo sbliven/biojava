@@ -25,12 +25,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.biojava.bio.Annotatable.AnnotationForwarder;
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.db.SequenceDB;
-import org.biojava.utils.*;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ObjectUtil;
 
 /**
  * <code>SimpleSeqSimilaritySearchResult</code> objects represent a

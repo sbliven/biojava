@@ -20,7 +20,6 @@
  */
 package org.biojava.bio.search;
 
-import org.biojava.bio.BioException;
 
 /**
  * <p>

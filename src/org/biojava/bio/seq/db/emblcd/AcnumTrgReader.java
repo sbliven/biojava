@@ -21,8 +21,8 @@
 
 package org.biojava.bio.seq.db.emblcd;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * <code>AcnumTrgReader</code> reads the "acnum.trg" file of an EMBL

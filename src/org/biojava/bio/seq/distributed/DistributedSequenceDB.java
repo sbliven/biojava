@@ -21,12 +21,25 @@
 
 package org.biojava.bio.seq.distributed;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.MergeFeatureHolder;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.db.AbstractSequenceDB;
+import org.biojava.bio.seq.db.IllegalIDException;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Sequence database from the meta-DAS system.

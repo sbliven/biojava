@@ -21,13 +21,10 @@
 
 package org.biojava.bio.seq.db;
 
-import java.util.*;
-import java.lang.ref.*;
-
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeForwarder;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
 
 /**
  * An abstract implementation of SequenceDB that wraps up another database.

@@ -21,9 +21,12 @@
 
 package org.biojava.bio.seq.projection;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * Internal class used by ProjectedFeatureHolder to wrap StrandedFeatures.

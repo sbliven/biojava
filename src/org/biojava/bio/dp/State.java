@@ -22,7 +22,7 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.AtomicSymbol;
 
 /**
  * A state in a markov process.

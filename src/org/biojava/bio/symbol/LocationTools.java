@@ -21,8 +21,15 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import org.biojava.bio.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
 
 /**
  * Tools class containing a number of operators for working with <code>Location</code> objects.

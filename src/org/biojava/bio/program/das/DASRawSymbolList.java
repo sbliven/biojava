@@ -21,25 +21,38 @@
 
 package org.biojava.bio.program.das;
 
-import java.util.*;
-import java.util.zip.*;
-import java.net.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
 
-import org.biojava.utils.*;
-import org.biojava.utils.cache.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.symbol.*;
-
-import javax.xml.parsers.*;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
-import org.biojava.utils.stax.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.seq.RNATools;
+import org.biojava.bio.seq.io.SequenceBuilder;
+import org.biojava.bio.seq.io.SimpleSequenceBuilder;
+import org.biojava.bio.seq.io.StreamParser;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.Edit;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Unchangeable;
+import org.biojava.utils.stax.DelegationManager;
+import org.biojava.utils.stax.SAX2StAXAdaptor;
+import org.biojava.utils.stax.StAXContentHandler;
+import org.biojava.utils.stax.StAXContentHandlerBase;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  * A segment of DNA fetched for a DAS reference server.

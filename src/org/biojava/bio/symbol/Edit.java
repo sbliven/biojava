@@ -22,7 +22,8 @@
 package org.biojava.bio.symbol;
 
 import java.io.Serializable;
-import org.biojava.utils.*;
+
+import org.biojava.utils.SingletonList;
 
 /**
  * <p>

@@ -22,7 +22,11 @@
 
 package org.biojava.bio;
 
-import org.biojava.utils.*;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeForwarder;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.Changeable;
 
 /**
  * <p>Indicates that an object has an associated annotation.</p>

@@ -21,7 +21,8 @@
 
 package org.biojava.bio.program.blast2html;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**

@@ -21,17 +21,10 @@
 
 package org.biojava.bio.seq.db.biosql;
 
-import java.sql.*;
-import java.util.*;
-
-import org.biojava.utils.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.RealizingFeatureHolder;
+import org.biojava.bio.seq.Sequence;
 
 /**
  * Sequence keyed off a BioSQL biosequence.

@@ -21,16 +21,14 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-
-import org.biojava.utils.*;
-import org.biojava.bio.gui.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-
+import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
 import java.util.List;
+
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeForwarder;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
 
 /**
  * The interface for things that can render a line of information about a

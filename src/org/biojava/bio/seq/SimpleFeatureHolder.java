@@ -21,10 +21,13 @@
 
 package org.biojava.bio.seq;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * A no-frills implementation of FeatureHolder.

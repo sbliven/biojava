@@ -25,7 +25,6 @@
 
 package org.biojava.bio.seq.db;
 
-import java.net.*;
 
 /**
  * @author Lei Lai

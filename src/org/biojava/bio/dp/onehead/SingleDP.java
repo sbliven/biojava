@@ -22,14 +22,38 @@
 
 package org.biojava.bio.dp.onehead;
 
-import java.util.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.dp.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.dp.BackPointer;
+import org.biojava.bio.dp.DP;
+import org.biojava.bio.dp.DPMatrix;
+import org.biojava.bio.dp.DotState;
+import org.biojava.bio.dp.EmissionState;
+import org.biojava.bio.dp.IllegalTransitionException;
+import org.biojava.bio.dp.MagicalState;
+import org.biojava.bio.dp.MarkovModel;
+import org.biojava.bio.dp.ScoreType;
+import org.biojava.bio.dp.SimpleStatePath;
+import org.biojava.bio.dp.State;
+import org.biojava.bio.dp.StatePath;
+import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.DoubleAlphabet;
+import org.biojava.bio.symbol.GappedSymbolList;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleAlignment;
+import org.biojava.bio.symbol.SimpleGappedSymbolList;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * An implementation of DP that aligns a single sequence against a single model.

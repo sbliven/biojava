@@ -21,16 +21,24 @@
 
 package org.biojava.bio.seq.io.filterxml;
 
-import java.io.*;
-import java.util.*;
-import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.utils.xml.*;
-import org.biojava.utils.stax.*;
-import org.xml.sax.*;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FramedFeature;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.LocationTools;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.stax.DelegationManager;
+import org.biojava.utils.stax.StAXContentHandler;
+import org.biojava.utils.stax.StAXContentHandlerBase;
+import org.biojava.utils.stax.StringElementHandlerBase;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * Factory producing content handlers for parsing FilterXML elements.

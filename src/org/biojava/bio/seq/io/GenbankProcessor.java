@@ -21,12 +21,13 @@
 
 package org.biojava.bio.seq.io;
 
-import java.util.*;
-import java.io.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Vector;
 
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.*;
+import org.biojava.bio.BioException;
 import org.biojava.utils.ParseErrorEvent;
 import org.biojava.utils.ParseErrorListener;
 import org.biojava.utils.ParseErrorSource;

@@ -21,11 +21,17 @@
 
 package org.biojava.bio.program.phred;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.utils.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.impl.SimpleSequence;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.IntegerAlphabet;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p>PhredSequence is an extension of SimpleSequence that implements

@@ -21,13 +21,17 @@
 
 package org.biojava.bio.search;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.StrandedFeature.Strand;
-import org.biojava.utils.*;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ObjectUtil;
 
 /**
  * <p><code>SequenceDBSearchHit</code> objects represent a similarity

@@ -42,13 +42,19 @@
 
 package org.biojava.bio.proteomics;
 
-import java.io.*;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.SymbolList;
 
 
 

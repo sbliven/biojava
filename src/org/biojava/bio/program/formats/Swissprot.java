@@ -1,12 +1,23 @@
 package org.biojava.bio.program.formats;
 
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.biojava.utils.*;
-import org.biojava.utils.lsid.*;
-import org.biojava.bio.*;
+import org.biojava.bio.AnnotationType;
+import org.biojava.bio.CardinalityConstraint;
+import org.biojava.bio.PropertyConstraint;
+import org.biojava.bio.program.tagvalue.LineSplitParser;
+import org.biojava.bio.program.tagvalue.ParserListener;
+import org.biojava.bio.program.tagvalue.RegexFieldFinder;
+import org.biojava.bio.program.tagvalue.RegexSplitter;
+import org.biojava.bio.program.tagvalue.TagDelegator;
+import org.biojava.bio.program.tagvalue.TagValueContext;
+import org.biojava.bio.program.tagvalue.TagValueListener;
+import org.biojava.bio.program.tagvalue.TagValueWrapper;
+import org.biojava.bio.program.tagvalue.ValueChanger;
 import org.biojava.bio.symbol.Location;
-import org.biojava.bio.program.tagvalue.*;
+import org.biojava.utils.ParserException;
+import org.biojava.utils.lsid.LifeScienceIdentifier;
 
 public class Swissprot
 implements Format {

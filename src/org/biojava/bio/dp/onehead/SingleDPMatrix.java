@@ -24,8 +24,11 @@ package org.biojava.bio.dp.onehead;
 
 import java.io.Serializable;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dp.*;
+import org.biojava.bio.dp.DP;
+import org.biojava.bio.dp.DPMatrix;
+import org.biojava.bio.dp.MarkovModel;
+import org.biojava.bio.dp.State;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * The dynamic programming matrix for a single sequence.

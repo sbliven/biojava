@@ -21,13 +21,10 @@
 
 package org.biojava.bio.seq.io;
 
-import java.io.*;
-import java.util.*;
-
-import org.biojava.bio.*;
-import org.biojava.utils.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.SimpleAnnotation;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.StrandedFeature;
 
 /**
  * Simple parser for feature tables. This is shared between the EMBL
@@ -71,7 +68,7 @@ public class FeatureTableParser {
     FeatureTableParser(SeqIOListener listener, String source) {
         this.listener      = listener;
         this.featureSource = source;
-        this.seqID = seqID;
+        //this.seqID = seqID;
 
         featureBuf = new StringBuffer();
         locParser  = new EmblLikeLocationParser(seqID);

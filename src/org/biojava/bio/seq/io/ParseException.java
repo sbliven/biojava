@@ -21,7 +21,7 @@
 
 package org.biojava.bio.seq.io;
 
-import org.biojava.bio.*;
+import org.biojava.bio.BioException;
 
 /**
  * ParseException should be thrown to indicate that there was a problem with

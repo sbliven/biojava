@@ -21,10 +21,15 @@
 
 package org.biojava.bio.program.indexdb;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
 
-import org.biojava.bio.*;
+import org.biojava.bio.AbstractAnnotation;
+import org.biojava.bio.BioError;
 import org.biojava.utils.Commitable;
 
 /**

@@ -21,12 +21,7 @@
 
 package org.biojava.bio.dist;
 
-import java.util.*;
-import java.io.*;
-
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.FiniteAlphabet;
 
 /**
  * A distribution which does not interact with the training framework.

@@ -21,13 +21,13 @@
 
 package org.biojava.bio.seq.io.game;
 
-import java.util.*;
-
-import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.seq.io.StreamParser;
-import org.biojava.utils.stax.*;
-import org.biojava.utils.*;
-import org.xml.sax.*;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.utils.stax.DelegationManager;
+import org.biojava.utils.stax.StAXContentHandler;
+import org.biojava.utils.stax.StAXContentHandlerBase;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * StAX handler for elements containing sequence

@@ -1,17 +1,35 @@
 package org.biojava.bio.program.unigene;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.regex.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.biojava.utils.*;
-import org.biojava.utils.io.*;
-import org.biojava.bio.*;
-import org.biojava.bio.program.indexdb.*;
-import org.biojava.bio.program.tagvalue.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.program.indexdb.BioStore;
+import org.biojava.bio.program.indexdb.BioStoreFactory;
+import org.biojava.bio.program.indexdb.IndexStore;
+import org.biojava.bio.program.tagvalue.Indexer;
+import org.biojava.bio.program.tagvalue.Parser;
+import org.biojava.bio.program.tagvalue.ParserListener;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.io.FastaFormat;
+import org.biojava.bio.seq.io.SeqIOAdapter;
+import org.biojava.bio.seq.io.SequenceBuilder;
+import org.biojava.bio.seq.io.SequenceBuilderFactory;
+import org.biojava.bio.seq.io.StreamReader;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.utils.CommitFailure;
+import org.biojava.utils.ParserException;
+import org.biojava.utils.io.CountedBufferedReader;
+import org.biojava.utils.io.RAF;
 
 /**
  * <p>A UnigeneFactory that will use flat-file indexing of the unigene ascii-art

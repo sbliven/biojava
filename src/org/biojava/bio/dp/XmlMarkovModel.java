@@ -22,16 +22,29 @@
 
 package org.biojava.bio.dp;
 
-import java.io.*;
-import java.util.*;
+import java.io.PrintStream;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
-import org.w3c.dom.*;
-
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.dist.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.dist.DistributionFactory;
+import org.biojava.bio.dist.OrderNDistributionFactory;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.utils.ChangeVetoException;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Matthew Pocock

@@ -21,26 +21,31 @@
 
 package org.biojava.bio.program.das;
 
-import java.util.*;
-import java.util.zip.*;
-import java.net.*;
-import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
 
-import org.biojava.utils.*;
-import org.biojava.utils.cache.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.symbol.*;
-
-import javax.xml.parsers.*;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
-import org.w3c.dom.*;
-import org.biojava.utils.stax.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioException;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.seq.ComponentFeature;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.FeatureRealizer;
+import org.biojava.bio.seq.FilterUtils;
+import org.biojava.bio.seq.db.IllegalIDException;
+import org.biojava.bio.seq.impl.FeatureImpl;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.DummySymbolList;
+import org.biojava.bio.symbol.Edit;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Unchangeable;
 
 /**
  * Sequence reflecting a DAS reference sequence, possibly

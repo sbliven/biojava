@@ -21,7 +21,6 @@
 
 package org.biojava.bio.program.das;
 
-import java.net.*;
 
 /**
  * A memento class for storing a link.  This is just a URL and a string

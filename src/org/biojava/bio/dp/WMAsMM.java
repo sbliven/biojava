@@ -22,13 +22,23 @@
 
 package org.biojava.bio.dp;
 
-import java.util.*;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.dist.UniformDistribution;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleAlphabet;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Wraps a weight matrix up so that it appears to be a very simple HMM.
@@ -182,7 +192,7 @@ public class WMAsMM
             this.states[i] = new SimpleEmissionState(
               i + "",
               Annotation.EMPTY_ANNOTATION,
-              this.advance,
+              WMAsMM.advance,
               wm.getColumn(i)
             )
           );

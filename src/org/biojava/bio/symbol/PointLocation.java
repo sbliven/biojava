@@ -21,9 +21,7 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
-import org.biojava.bio.*;
+import java.io.Serializable;
 
 /**
  * A location representing a single point.  This can be considered as

@@ -21,14 +21,29 @@
  
 package org.biojava.bio.gui.sequence;
 
-import org.biojava.utils.*;
-import java.awt.*;
-import java.awt.geom.*;
-import java.text.*;
-import java.awt.font.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
+
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeForwarder;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
 
 
 /**
@@ -245,7 +260,7 @@ public class LabelledSequenceRenderer extends AbstractChangeable implements Sequ
         FontRenderContext   fRC             = g.getFontRenderContext();
 
 
-        if( sRC.getDirection() == sRC.VERTICAL ) {
+        if( sRC.getDirection() == SequenceRenderContext.VERTICAL ) {
             // rotate the drawing 
             g.rotate( - java.lang.Math.PI / 2 );
             g.translate( -width, 0 );

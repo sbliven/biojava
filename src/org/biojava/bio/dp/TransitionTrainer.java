@@ -22,7 +22,7 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.IllegalSymbolException;
 
 /**
  * An object that can be used to train the transitions within a MarkovModel.

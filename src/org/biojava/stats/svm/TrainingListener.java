@@ -22,7 +22,7 @@
 
 package org.biojava.stats.svm;
 
-import java.util.*;
+import java.util.EventListener;
 
 /**
  * @author Thomas Down

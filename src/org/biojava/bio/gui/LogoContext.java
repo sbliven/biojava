@@ -22,6 +22,7 @@ package org.biojava.bio.gui;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+
 import org.biojava.bio.dist.Distribution;
 
 /**

@@ -21,12 +21,13 @@
  
 package org.biojava.bio.seq.io.game;
 
-import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.stax.*; 
-import org.xml.sax.*; 
-
 import java.util.List;
 import java.util.Vector;
+
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.stax.StAXContentHandler;
+import org.biojava.utils.stax.StringElementHandlerBase;
+import org.xml.sax.SAXException;
 
 /**
  * Deals with database crossreferences

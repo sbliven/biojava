@@ -21,9 +21,10 @@
 
 package org.biojava.bio.alignment;
 
-import java.util.*;
-import java.io.*;
-import org.biojava.bio.symbol.*;
+import java.util.List;
+
+import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.symbol.Location;
 
 /**
  * <p>UnequalLengthAlignment has the following behavior.  Two or more

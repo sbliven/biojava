@@ -21,17 +21,12 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.util.*;
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
 import java.util.List;
-
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.gui.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
 
 /**
  * <code>LayeredRenderer</code> handles the lane offsets for
@@ -173,7 +168,7 @@ public class LayeredRenderer {
 
             // Added +1 to these as the outer edge of features was
             // being clipped off
-            if (dir == src.HORIZONTAL) {
+            if (dir == SequenceRenderContext.HORIZONTAL) {
                 clip.setFrame(minP, 0.0, maxP - minP + 1, depth + 1);
                 g.translate(0.0, offset);
             } else {
@@ -186,7 +181,7 @@ public class LayeredRenderer {
             sRend.paint(g, src);
             g.setClip(oldClip);
 
-            if (dir == src.HORIZONTAL) {
+            if (dir == SequenceRenderContext.HORIZONTAL) {
                 g.translate(0.0, -offset);
             } else {
                 g.translate(-offset, 0.0);
@@ -222,7 +217,7 @@ public class LayeredRenderer {
             double depth = sRend.getDepth(src);
 
             SequenceViewerEvent sve = null;
-            if (src.getDirection() == src.HORIZONTAL) {
+            if (src.getDirection() == SequenceRenderContext.HORIZONTAL) {
                 if ((me.getY() >= offset) && (me.getY() < offset + depth)) {
                     me.translatePoint(0, (int) -offset);
                     sve = sRend.processMouseEvent(src, me, path);

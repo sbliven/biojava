@@ -22,13 +22,47 @@
 
 package org.biojava.stats.svm.tools;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.util.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Set;
 
-import org.biojava.stats.svm.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+
+import org.biojava.stats.svm.PolynomialKernel;
+import org.biojava.stats.svm.RadialBaseKernel;
+import org.biojava.stats.svm.SMOTrainer;
+import org.biojava.stats.svm.SVMClassifierModel;
+import org.biojava.stats.svm.SVMKernel;
+import org.biojava.stats.svm.SVMTarget;
+import org.biojava.stats.svm.SimpleSVMTarget;
 
 /**
  * A simple toy example that allows you to put points on a canvas, and find a
@@ -98,9 +132,9 @@ public class ClassifierExample {
         if(e.getStateChange() == ItemEvent.SELECTED) {
           Object o = e.getItem();
           if(o.equals("polynomeal")) {
-            pc.setKernel(pc.polyKernel);
+            pc.setKernel(PointClassifier.polyKernel);
           } else if(o.equals("rbf")) {
-            pc.setKernel(pc.rbfKernel);
+            pc.setKernel(PointClassifier.rbfKernel);
           }
         }
       }

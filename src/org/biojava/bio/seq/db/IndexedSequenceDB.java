@@ -21,15 +21,33 @@
 
 package org.biojava.bio.seq.db;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Vector;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-import org.biojava.utils.io.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.seq.io.SequenceBuilder;
+import org.biojava.bio.seq.io.SequenceBuilderFactory;
+import org.biojava.bio.seq.io.SequenceBuilderFilter;
+import org.biojava.bio.seq.io.SequenceFormat;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.ParseErrorListener;
+import org.biojava.utils.ParseErrorSource;
+import org.biojava.utils.io.CountedBufferedReader;
+import org.biojava.utils.io.RandomAccessReader;
 
 /**
  * <p>

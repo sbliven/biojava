@@ -21,7 +21,6 @@
 
 package org.biojava.bio.program.gff3;
 
-import org.biojava.bio.*;
 
 /**
  * The interface for things that listen to GFF event streams.

@@ -21,9 +21,15 @@
 
 package org.biojava.bio.seq.projection;
 
-import java.util.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.LocationTools;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.RangeLocation;
 
 /**
  * @author Thomas Down

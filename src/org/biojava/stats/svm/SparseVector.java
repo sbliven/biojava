@@ -22,8 +22,10 @@
 
 package org.biojava.stats.svm;
 
-import java.util.*;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * An implementation of a sparse vector.

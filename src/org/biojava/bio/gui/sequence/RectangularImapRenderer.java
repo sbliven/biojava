@@ -144,7 +144,7 @@ public class RectangularImapRenderer
         max = loc.getMax();
         dif = max - min;
 
-        if (context.getDirection() == context.HORIZONTAL)
+        if (context.getDirection() == SequenceRenderContext.HORIZONTAL)
         {
             posXW  = context.sequenceToGraphics(min);
             posYN  = beadDisplacement;

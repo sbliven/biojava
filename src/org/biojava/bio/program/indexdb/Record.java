@@ -21,9 +21,7 @@
 
 package org.biojava.bio.program.indexdb;
 
-import java.io.*;
-
-import org.biojava.utils.io.*;
+import org.biojava.utils.io.RAF;
 
 /**
  * <code>Record</code> represents a record within an indexed flat file

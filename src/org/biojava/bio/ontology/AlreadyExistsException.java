@@ -21,9 +21,6 @@
 
 package org.biojava.bio.ontology;
 
-import java.util.*;
-import org.biojava.bio.*;
-import org.biojava.utils.*;
 
 /**
  * Thrown to indicate that a term or triple can't be added to an ontology

@@ -20,7 +20,7 @@
 
 package org.biojava.utils;
 
-import java.util.*;
+import java.util.EventObject;
 
 /**
  *  Event which signals a bad line when parsing a record.

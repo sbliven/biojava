@@ -20,11 +20,17 @@
  */
 package org.biojava.bio.seq.db;
 
-import java.net.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.biojava.bio.BioException;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.seq.io.FastaFormat;
+import org.biojava.bio.seq.io.GenbankFormat;
+import org.biojava.bio.seq.io.SequenceFormat;
+import org.biojava.bio.symbol.Alphabet;
 
 /** 
  * @author Matthew Pocock

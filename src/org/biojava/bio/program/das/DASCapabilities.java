@@ -21,21 +21,20 @@
 
 package org.biojava.bio.program.das;
 
-import java.util.*;
-import java.net.*;
-import java.io.*;
-import org.biojava.utils.*;
-import org.biojava.utils.cache.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.symbol.*;
+import javax.xml.parsers.DocumentBuilder;
 
-import javax.xml.parsers.*;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
-import org.w3c.dom.*;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 
 /**
  * Discover the capabilities of a given DAS server

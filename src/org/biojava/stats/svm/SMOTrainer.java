@@ -22,7 +22,8 @@
 
 package org.biojava.stats.svm;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Train a support vector machine using the Sequential Minimal

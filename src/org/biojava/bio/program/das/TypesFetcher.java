@@ -21,22 +21,33 @@
 
 package org.biojava.bio.program.das;
 
-import java.util.*;
-import java.util.zip.*;
-import java.net.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.zip.GZIPInputStream;
 
-import org.biojava.bio.*;
-import org.biojava.utils.*;
-import org.biojava.utils.stax.*;
-
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.program.xff.*;
-
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.seq.io.ParseException;
+import org.biojava.utils.stax.DelegationManager;
+import org.biojava.utils.stax.SAX2StAXAdaptor;
+import org.biojava.utils.stax.StAXContentHandler;
+import org.biojava.utils.stax.StAXContentHandlerBase;
+import org.biojava.utils.stax.StringElementHandlerBase;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  * Encapsulate a single batch of types requests to a DAS server.

@@ -1,7 +1,7 @@
 package org.biojava.bio.ontology;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.ontology.io.TabDelimParser;

@@ -1,6 +1,5 @@
 package org.biojava.bio.ontology;
 
-import java.util.Set;
 
 /**
  * This is a mix-in interface for optimizing ontology operators.

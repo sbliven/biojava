@@ -22,7 +22,6 @@
 
 package org.biojava.stats.svm;
 
-import java.util.*;
 
 /**
  * <p>

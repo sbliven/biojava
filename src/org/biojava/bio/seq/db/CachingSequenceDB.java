@@ -21,13 +21,15 @@
 
 package org.biojava.bio.seq.db;
 
-import java.io.*;
-import java.util.*;
-import java.lang.ref.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.lang.ref.SoftReference;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Sequence;
 
 /**
  * SequenceDB implementation that caches the results of another SequenceDB.

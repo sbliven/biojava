@@ -21,13 +21,6 @@
 
 package org.biojava.bio.symbol;
 
-import org.biojava.bio.*;
-import org.biojava.utils.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.seq.io.*;
-
-import java.util.*;
 
 /**
  * Between view onto an underlying Location instance.

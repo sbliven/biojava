@@ -22,18 +22,30 @@
 package org.biojava.bio.proteomics;
 
 
-import java.io.*;
-import java.util.*;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.Set;
 
-import javax.xml.parsers.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.biojava.bio.*;
-import org.biojava.bio.proteomics.*;
-import org.biojava.bio.symbol.*;
-import org.w3c.dom.*;
-import org.xml.sax.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.SymbolList;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 /**
  * Registry and utility methods for Proteases.

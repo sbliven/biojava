@@ -21,7 +21,8 @@
 
 package org.biojava.bio.symbol;
 
-import org.biojava.utils.*;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.Changeable;
 
 /**
  * <p>

@@ -20,11 +20,12 @@
  */
 package org.biojava.bio.seq;
  
-import java.io.*;
-import java.lang.reflect.*;
+import java.io.NotSerializableException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.StaticMemberPlaceHolder;
 
 /**
  * Adds the concept of 'strand' to features.

@@ -21,18 +21,26 @@
 
 package org.biojava.bio.program.das;
 
-import java.util.*;
-import java.net.*;
-import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-
-import org.biojava.utils.*;
-import org.biojava.utils.stax.*;
-import org.xml.sax.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.SmallAnnotation;
+import org.biojava.bio.seq.ComponentFeature;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.io.SeqIOListener;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.stax.DelegationManager;
+import org.biojava.utils.stax.IntElementHandlerBase;
+import org.biojava.utils.stax.StAXContentHandler;
+import org.biojava.utils.stax.StAXContentHandlerBase;
+import org.biojava.utils.stax.StringElementHandlerBase;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * StAX handler for parsing a single DASGFF feature.

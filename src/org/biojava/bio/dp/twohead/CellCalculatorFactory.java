@@ -22,8 +22,11 @@
 
 package org.biojava.bio.dp.twohead;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dp.*;
+import org.biojava.bio.dp.BackPointer;
+import org.biojava.bio.dp.IllegalTransitionException;
+import org.biojava.bio.dp.ScoreType;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
 
 /**
  * @author Matthew Pocock

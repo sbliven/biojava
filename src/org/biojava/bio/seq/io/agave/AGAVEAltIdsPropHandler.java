@@ -19,9 +19,10 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.biojava.utils.ChangeVetoException;
-import org.xml.sax.*;
-import java.util.*;
 
 /**
  * Deals with alternate sequence IDs

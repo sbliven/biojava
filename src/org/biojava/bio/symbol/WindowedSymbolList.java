@@ -21,11 +21,10 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
+import java.io.Serializable;
+import java.util.Collections;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.BioError;
 
 /**
  * A view of windows onto another SymbolList.

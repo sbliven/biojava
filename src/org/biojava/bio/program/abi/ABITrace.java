@@ -22,18 +22,24 @@
  
 package org.biojava.bio.program.abi;
 
-import java.io.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.awt.*;
-import java.awt.image.*;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.symbol.AtomicSymbol;
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SymbolList;
 
 
 /**

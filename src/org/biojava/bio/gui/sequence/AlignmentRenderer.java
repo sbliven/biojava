@@ -21,16 +21,15 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.util.*;
+import java.awt.Graphics2D;
 
-import java.awt.*;
-import java.awt.geom.*;
-
-import org.biojava.utils.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
-
-import java.util.List;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * @author Matthew Pocock

@@ -22,8 +22,6 @@
 
 package org.biojava.bio.symbol;
 
-import org.biojava.utils.*;
-import org.biojava.bio.seq.*;
 
 /**
  * This class makes SimpleSymbolLists.

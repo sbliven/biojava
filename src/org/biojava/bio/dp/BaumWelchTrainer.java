@@ -25,10 +25,14 @@ package org.biojava.bio.dp;
 import java.io.Serializable;
 
 import org.biojava.bio.BioError;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.dp.onehead.*;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.dp.onehead.SingleDP;
+import org.biojava.bio.dp.onehead.SingleDPMatrix;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * <p>

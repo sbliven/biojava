@@ -21,11 +21,11 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collections;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.BioError;
 
 /**
  * An n-th order view of another SymbolList.

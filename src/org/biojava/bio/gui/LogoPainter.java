@@ -22,7 +22,6 @@
 
 package org.biojava.bio.gui;
 
-import java.awt.Graphics;
 
 /**
  * The interface for something that will draw the sequence logo for a state.

@@ -21,17 +21,50 @@
 
 package org.biojava.bio.program.phred;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.dist.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.utils.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.dist.DistributionFactory;
+import org.biojava.bio.dist.DistributionTools;
+import org.biojava.bio.dist.DistributionTrainerContext;
+import org.biojava.bio.dist.SimpleDistributionTrainerContext;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.seq.db.HashSequenceDB;
+import org.biojava.bio.seq.db.IDMaker;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.impl.SimpleSequence;
+import org.biojava.bio.seq.io.FastaDescriptionLineParser;
+import org.biojava.bio.seq.io.FastaFormat;
+import org.biojava.bio.seq.io.SeqIOTools;
+import org.biojava.bio.seq.io.SequenceBuilderFactory;
+import org.biojava.bio.seq.io.SimpleSequenceBuilder;
+import org.biojava.bio.seq.io.StreamReader;
+import org.biojava.bio.seq.io.StreamWriter;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.BasisSymbol;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.IntegerAlphabet;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.AssertionFailure;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.ListTools;
 
 /**
  * <p>PhredTools contains static methods for working with phred

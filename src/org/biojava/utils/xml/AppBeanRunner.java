@@ -21,10 +21,13 @@
 
 package org.biojava.utils.xml;
 
-import org.w3c.dom.*;
-import org.xml.sax.*;
-import java.io.*;
-import javax.xml.parsers.*;
+import java.io.FileInputStream;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 /**
  * Create a bean from an XML file, then attempt to enter it.

@@ -22,15 +22,24 @@
 
 package org.biojava.bio.program;
 
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StreamTokenizer;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
-import org.biojava.bio.dp.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.dist.DistributionFactory;
+import org.biojava.bio.dp.SimpleWeightMatrix;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * The results of a meme run.
@@ -67,23 +76,23 @@ public class Meme {
    ALPHABET:
     while( true ) {
       int nt = st.nextToken();
-      if (nt == st.TT_EOF) {
+      if (nt == StreamTokenizer.TT_EOF) {
           return;
-      } else if (nt == st.TT_WORD) {
+      } else if (nt == StreamTokenizer.TT_WORD) {
           if(st.sval.startsWith("ALPHABET")) {
-            while(st.nextToken() != st.TT_WORD) {}
+            while(st.nextToken() != StreamTokenizer.TT_WORD) {}
             sym = new SimpleSymbolList(symParser, st.sval);
             break ALPHABET;
           }
       }
     }
 
-    while(st.nextToken() != st.TT_EOL) {}
-    while(st.nextToken() != st.TT_EOL) {}
+    while(st.nextToken() != StreamTokenizer.TT_EOL) {}
+    while(st.nextToken() != StreamTokenizer.TT_EOL) {}
 
    SEQLIST:
     while( true ) {
-      if(st.nextToken() == st.TT_WORD) {
+      if(st.nextToken() == StreamTokenizer.TT_WORD) {
           if(st.sval != null && st.sval.startsWith("*"))
             break SEQLIST;
           seqIDs.add(st.sval.intern());
@@ -98,13 +107,13 @@ public class Meme {
      FINDMOTIF:
       while( true ) {
 	int nt = st.nextToken();
-	if (nt == st.TT_EOF) {
+	if (nt == StreamTokenizer.TT_EOF) {
             break OUTER;
-	} else if (nt == st.TT_WORD) {
+	} else if (nt == StreamTokenizer.TT_WORD) {
             if(st.sval.startsWith("MOTIF")) {
               st.nextToken();			// MOTIF x
               motifNo = (int) st.nval;	// x
-              while(st.nextToken() != st.TT_NUMBER) {} // width = w
+              while(st.nextToken() != StreamTokenizer.TT_NUMBER) {} // width = w
               width = (int) st.nval;		// w
               break FINDMOTIF;
             }
@@ -114,11 +123,11 @@ public class Meme {
      FINDWEIGHTS:
       while( true ) {
 	int nt = st.nextToken();
-	if (nt == st.TT_EOF) {
+	if (nt == StreamTokenizer.TT_EOF) {
             break OUTER;
-	} else if (nt == st.TT_WORD) {
+	} else if (nt == StreamTokenizer.TT_WORD) {
             if(st.sval.startsWith("log")) {
-              while(st.nextToken() != st.TT_EOL) {}
+              while(st.nextToken() != StreamTokenizer.TT_EOL) {}
               break FINDWEIGHTS;
             }
         }
@@ -135,14 +144,14 @@ public class Meme {
      READMOTIF:
       while( true ) {
 	int nt = st.nextToken();
-	if (nt == st.TT_EOF) {
+	if (nt == StreamTokenizer.TT_EOF) {
             break OUTER;
-        } else if (nt == st.TT_EOL) {
+        } else if (nt == StreamTokenizer.TT_EOL) {
             r = 0;
             c++;
             if(c == width)
               break READMOTIF;
-        } else if (nt == st.TT_NUMBER) {
+        } else if (nt == StreamTokenizer.TT_NUMBER) {
           try {
             matrix.getColumn(c).setWeight(sym.symbolAt(r+1), st.nval);
             r++;

@@ -21,9 +21,6 @@
 
 package org.biojava.bio.search;
 
-import java.util.Map;
-
-import org.biojava.bio.BioException;
 
 /**
  * <code>SearchContentHandler</code> is a notification interface for

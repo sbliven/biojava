@@ -20,9 +20,13 @@
 
 package org.biojava.utils;
 
-import java.io.*;
-import java.util.*;
-import java.lang.reflect.*;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  *  

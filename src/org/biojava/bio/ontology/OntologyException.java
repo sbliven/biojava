@@ -21,7 +21,6 @@
 
 package org.biojava.bio.ontology;
 
-import org.biojava.bio.BioException;
 
 /**
  * Thrown to indicate an error in an Ontology object

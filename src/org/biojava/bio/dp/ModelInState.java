@@ -22,8 +22,6 @@
 
 package org.biojava.bio.dp;
 
-import java.util.*;
-import org.biojava.bio.symbol.*;
 
 /**
  * A state that contains an entire sub-model.

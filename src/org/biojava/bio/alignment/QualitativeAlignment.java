@@ -27,9 +27,7 @@ package org.biojava.bio.alignment;
  * @author David Waring
  */
 
-import java.util.*;
-import java.io.*;
-import org.biojava.bio.symbol.*;
+import java.util.List;
 
 public interface QualitativeAlignment {
         

@@ -21,7 +21,6 @@
 
 package org.biojava.bio.search;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 

@@ -20,16 +20,41 @@
  */
 package org.biojava.bio.dist;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-import org.xml.sax.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.impl.SimpleSequence;
+import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.AlphabetIndex;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.BasisSymbol;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.LocationTools;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.SymbolListViews;
+import org.biojava.utils.AssertionFailure;
+import org.biojava.utils.ChangeVetoException;
+import org.xml.sax.SAXException;
 
 /**
  * Title:        DistributionTools.java

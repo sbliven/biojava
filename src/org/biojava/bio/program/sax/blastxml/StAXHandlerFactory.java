@@ -21,7 +21,7 @@
 
 package org.biojava.bio.program.sax.blastxml;
 
-import org.biojava.utils.stax.*;
+import org.biojava.utils.stax.StAXContentHandler;
 
 /**
  *  Factory for StAX content handlers.

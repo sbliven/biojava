@@ -21,11 +21,15 @@
 
 package org.biojava.bio.seq.distributed;
 
-import java.util.*;
+import java.util.Set;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.FilterUtils;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.db.IllegalIDException;
+import org.biojava.bio.seq.db.SequenceDB;
 
 /**
  * Turn an entire SequenceDB instance into a DistDataSource.

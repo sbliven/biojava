@@ -21,11 +21,9 @@
 
 package org.biojava.bio.seq.io;
 
-import java.util.Comparator;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-
-import org.biojava.bio.seq.Feature;
 
 /**
  * <p><code>GenEmblPropertyComparator</code> compares Genbank/EMBL

@@ -20,10 +20,11 @@
  */
 package org.biojava.bio.taxa;
 
-import java.util.*;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.bio.Annotatable;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p>A taxon within a classification.</p>

@@ -21,12 +21,15 @@
 
 package org.biojava.bio.seq;
 
-import java.util.*;
+import java.util.Iterator;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.impl.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.impl.RevCompSequence;
+import org.biojava.bio.seq.impl.SimpleSequence;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Methods for manipulating sequences.

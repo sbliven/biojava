@@ -1,6 +1,8 @@
 package org.biojava.bio.program.ssaha;
 
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * A repository that can be searched with a sequence.

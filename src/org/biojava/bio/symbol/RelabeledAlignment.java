@@ -21,10 +21,17 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.seq.*;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Unchangeable;
 
 /**
  * An alignment that relabels another alignment.

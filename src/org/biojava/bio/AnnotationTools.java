@@ -21,9 +21,14 @@
 
 package org.biojava.bio;
 
-import java.util.*;
-import org.biojava.utils.*;
-import org.biojava.bio.symbol.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.LocationTools;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p><code>AnnotationTools</code> is a set of static utility methods for

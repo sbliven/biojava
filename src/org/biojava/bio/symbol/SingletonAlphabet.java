@@ -23,11 +23,14 @@
 package org.biojava.bio.symbol;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.io.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.utils.SingletonList;
 
 /**
  * An alphabet that contains a single atomic symbol.

@@ -1,12 +1,13 @@
 package org.biojava.bio.program.formats;
 
-import java.util.regex.*;
-
-import org.biojava.utils.*;
-import org.biojava.utils.lsid.*;
-import org.biojava.bio.*;
+import org.biojava.bio.AnnotationType;
+import org.biojava.bio.CardinalityConstraint;
+import org.biojava.bio.PropertyConstraint;
+import org.biojava.bio.program.tagvalue.LineSplitParser;
+import org.biojava.bio.program.tagvalue.ParserListener;
+import org.biojava.bio.program.tagvalue.TagValueListener;
 import org.biojava.bio.symbol.Location;
-import org.biojava.bio.program.tagvalue.*;
+import org.biojava.utils.lsid.LifeScienceIdentifier;
 
 public class Embl
 implements Format {

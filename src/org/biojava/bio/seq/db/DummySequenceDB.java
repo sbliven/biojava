@@ -31,13 +31,8 @@ import org.biojava.bio.BioException;
 import org.biojava.bio.seq.DummySequence;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
-import org.biojava.bio.seq.db.IllegalIDException;
-import org.biojava.bio.seq.db.SequenceDB;
-import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.Changeable;
 
 /**
  * <code>DummySequenceDB</code> is an implementation which contains

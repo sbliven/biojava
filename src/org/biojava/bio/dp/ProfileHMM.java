@@ -22,10 +22,13 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.dist.DistributionFactory;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * @author Matthew Pocock

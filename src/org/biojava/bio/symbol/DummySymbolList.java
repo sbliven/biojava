@@ -21,13 +21,7 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.lang.reflect.*;
-import java.io.*;
-
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.io.*;
+import java.io.Serializable;
 
 /**  
  * Symbol list which just consists of non-informative symbols.

@@ -21,18 +21,24 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Shape;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Area;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Rectangle2D;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.gui.*;
-
-import java.util.List;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.Location;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * @author Matthew Pocock
@@ -193,7 +199,7 @@ implements FeatureRenderer {
     float minBounds = (float) src.sequenceToGraphics(src.getRange().getMin() - 1);
     float maxBounds = (float) src.sequenceToGraphics(src.getRange().getMax() + 1);
     Shape bounds;
-    if (src.getDirection() == src.HORIZONTAL) {
+    if (src.getDirection() == SequenceRenderContext.HORIZONTAL) {
 	bounds = new Rectangle2D.Double(minBounds, 0, maxBounds - minBounds, depth);
     } else {
 	bounds = new Rectangle2D.Double(0, minBounds, depth, maxBounds - minBounds);
@@ -205,7 +211,7 @@ implements FeatureRenderer {
     if( (max - min) >= arrowSize) {
       if (f instanceof StrandedFeature) {
         StrandedFeature.Strand strand = ((StrandedFeature) f).getStrand();
-        if(src.getDirection() == src.HORIZONTAL) {
+        if(src.getDirection() == SequenceRenderContext.HORIZONTAL) {
           float minY = 0.0f;
           float maxY = depth;
           float minYS = minY + (float) arrowScoop;
@@ -275,7 +281,7 @@ implements FeatureRenderer {
       }
     }
     if(s == null) {
-      if(src.getDirection() == src.HORIZONTAL) {
+      if(src.getDirection() == SequenceRenderContext.HORIZONTAL) {
         s = new Rectangle2D.Double(min, 0, Math.max(1.0, max-min), 2.0*arrowScoop + arrowSize);
       } else {
         s = new Rectangle2D.Double(0, min, 2.0*arrowScoop + arrowSize, Math.max(1.0, max-min));

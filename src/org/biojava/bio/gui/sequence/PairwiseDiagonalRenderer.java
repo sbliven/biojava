@@ -32,16 +32,17 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.biojava.bio.BioError;
-import org.biojava.bio.gui.sequence.SequenceViewerEvent;
-import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.homol.SimilarityPairFeature;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
-import org.biojava.utils.*;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p><code>PairwiseDiagonalRenderer</code> renders a region of
@@ -141,7 +142,7 @@ public class PairwiseDiagonalRenderer extends AbstractChangeable
     {
         FeatureHolder fh;
 
-        if (context.getDirection() == context.HORIZONTAL)
+        if (context.getDirection() == PairwiseRenderContext.HORIZONTAL)
         {
             fh = context.getFeatures().filter(new
                 FeatureFilter.And(new FeatureFilter.OverlapsLocation(context.getRange()),
@@ -171,7 +172,7 @@ public class PairwiseDiagonalRenderer extends AbstractChangeable
             int min2 = loc2.getMin();
             int max2 = loc2.getMax();
 
-            if (context.getDirection() == context.HORIZONTAL)
+            if (context.getDirection() == PairwiseRenderContext.HORIZONTAL)
             {
                 float posX1 = (float) context.sequenceToGraphics(min1);
                 float posY1 = (float) context.secondarySequenceToGraphics(min2);
@@ -268,7 +269,7 @@ public class PairwiseDiagonalRenderer extends AbstractChangeable
 
         double gPos;
 
-        if (context.getDirection() == context.HORIZONTAL)
+        if (context.getDirection() == PairwiseRenderContext.HORIZONTAL)
             gPos = me.getPoint().getX();
         else
             gPos = me.getPoint().getY();

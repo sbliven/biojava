@@ -22,9 +22,10 @@
 
 package org.biojava.bio.dp.onehead;
 
-import java.util.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dp.*;
+import java.util.Iterator;
+
+import org.biojava.bio.dp.State;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * Constant-memory implementation of single-head DP cursor.

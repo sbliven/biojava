@@ -20,10 +20,20 @@
  */
 package org.biojava.bio.symbol;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeAdapter;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeForwarder;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /*
  * Implementatoin of AlphabetIndex that stores the symbols in an array and does

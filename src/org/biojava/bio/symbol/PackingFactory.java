@@ -20,9 +20,10 @@
  */
 package org.biojava.bio.symbol;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.DNATools;
 
 /**
  * <p>

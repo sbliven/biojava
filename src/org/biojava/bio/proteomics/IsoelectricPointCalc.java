@@ -21,12 +21,19 @@
 
 package org.biojava.bio.proteomics;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-import org.biojava.bio.*;
-import org.biojava.utils.math.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.SymbolPropertyTable;
+import org.biojava.utils.math.BinarySearch;
+import org.biojava.utils.math.ComputeObject;
 
 /**
  * class that computes isoelectric point for proteins

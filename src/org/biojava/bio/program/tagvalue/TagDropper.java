@@ -22,8 +22,9 @@
 package org.biojava.bio.program.tagvalue;
 
 import java.util.Set;
-import org.biojava.utils.SmallSet;
+
 import org.biojava.utils.ParserException;
+import org.biojava.utils.SmallSet;
 
 /**
  * Silently drop all tags except those specified, and pass the rest onto a

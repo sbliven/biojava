@@ -25,13 +25,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.biojava.bio.seq.io.game.GAMEHandler;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.io.SequenceBuilder;
-
-import org.xml.sax.*;
-import org.biojava.utils.stax.*;
-import javax.xml.parsers.*;
+import org.biojava.bio.seq.io.game.GAMEHandler;
+import org.biojava.utils.stax.SAX2StAXAdaptor;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  * Ragbag FileParser class for handling GAME formatted files.

@@ -21,17 +21,12 @@
 
 package org.biojava.bio.seq.io.game;
 
-import java.util.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.program.xff.*;
-
-import org.biojava.utils.*;
-import org.biojava.utils.stax.*;
-import org.xml.sax.*;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.stax.DelegationManager;
+import org.biojava.utils.stax.StAXContentHandler;
+import org.biojava.utils.stax.StringElementHandlerBase;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * StAX handler for GAME &lt;description&gt; elements.

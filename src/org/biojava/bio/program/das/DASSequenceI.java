@@ -21,8 +21,8 @@
 
 package org.biojava.bio.program.das;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.RealizingFeatureHolder;
+import org.biojava.bio.seq.Sequence;
 
 /**
  * Sequence reflecting a DAS reference sequence, possibly

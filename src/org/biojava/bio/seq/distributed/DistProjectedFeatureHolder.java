@@ -21,17 +21,18 @@
 
 package org.biojava.bio.seq.distributed;
 
-import java.util.*;
-import java.lang.reflect.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.biojava.utils.*;
-import org.biojava.utils.bytecode.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.seq.projection.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.program.das.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.MergeAnnotation;
+import org.biojava.bio.seq.ComponentFeature;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.ProjectedFeatureHolder;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Projection for MetaDAS.

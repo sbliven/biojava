@@ -21,12 +21,7 @@
 
 package org.biojava.bio.seq.homol;
  
-import java.io.*;
-import java.lang.reflect.*;
-
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.StrandedFeature;
 
 /**
  * @author Matthew Pocock

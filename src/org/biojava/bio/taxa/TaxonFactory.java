@@ -20,8 +20,7 @@
  */
 package org.biojava.bio.taxa;
 
-import java.util.*;
-import org.biojava.utils.*;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Factory for handling a particular implementation of a Taxon.

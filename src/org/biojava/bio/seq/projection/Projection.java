@@ -21,7 +21,7 @@
 
 package org.biojava.bio.seq.projection;
 
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.Feature;
 
 /**
  * Interface implemented by all projected feature objects.

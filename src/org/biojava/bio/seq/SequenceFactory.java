@@ -21,8 +21,8 @@
 
 package org.biojava.bio.seq;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * The interface for objects that will manufacture sequences.

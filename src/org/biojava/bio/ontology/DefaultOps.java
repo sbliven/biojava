@@ -1,9 +1,5 @@
 package org.biojava.bio.ontology;
 
-import java.util.*;
-
-import org.biojava.utils.ChangeVetoException;
-import org.biojava.bio.BioError;
 
 /**
  * Default implementation of OntologyOps.

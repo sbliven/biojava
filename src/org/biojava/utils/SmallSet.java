@@ -20,7 +20,10 @@
  */
 package org.biojava.utils;
 
-import java.util.*;
+import java.util.AbstractSet;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Lightweight implementation of Set which uses little memory to store a small

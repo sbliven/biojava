@@ -22,9 +22,8 @@
 package org.biojava.bio.seq.ragbag;
 
 import java.io.File;
-import java.lang.String;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.biojava.bio.BioException;
 

@@ -22,12 +22,17 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.io.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ListTools;
 
 /**
  * Cross product of a list of arbitrary alphabets.  This is the

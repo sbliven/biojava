@@ -21,12 +21,18 @@
 
 package org.biojava.bio.structure;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
-
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.BasisSymbol;
+import org.biojava.bio.symbol.DoubleAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.utils.ListTools;
 
 
 /**

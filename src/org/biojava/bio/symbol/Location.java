@@ -21,12 +21,7 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
-import java.lang.reflect.*;
-
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import java.util.Iterator;
 
 /**
  * A set of integers, often used to represent positions on biological sequences.

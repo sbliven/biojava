@@ -21,15 +21,22 @@
 
 package org.biojava.bio.seq.db;
 
-import java.util.*;
-import java.net.*;
-import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.utils.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.seq.io.SeqIOTools;
+import org.biojava.bio.seq.io.SequenceBuilder;
+import org.biojava.bio.seq.io.SequenceBuilderFactory;
+import org.biojava.bio.seq.io.SequenceFormat;
+import org.biojava.bio.seq.io.StreamReader;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Functions for access to a web based database that returns sequences

@@ -21,8 +21,6 @@
 
 package org.biojava.bio.ontology;
 
-import java.util.*;
-import org.biojava.utils.*;
 
 /**
  * A triple in an ontology.  This is two terms and a relationship between

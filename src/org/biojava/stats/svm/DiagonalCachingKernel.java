@@ -20,7 +20,8 @@
  */
 package org.biojava.stats.svm;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Caches the leading diagonal of a kernel matrix.

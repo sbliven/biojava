@@ -22,11 +22,9 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.symbol.IllegalSymbolException;
 
 /**
  * @author Matthew Pocock

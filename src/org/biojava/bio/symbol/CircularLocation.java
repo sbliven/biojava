@@ -20,11 +20,12 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.ListIterator;
 
-
-import org.biojava.bio.*;
-import org.biojava.utils.*;
+import org.biojava.bio.BioError;
 
 
 

@@ -24,11 +24,9 @@ package org.biojava.bio.molbio;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceAnnotator;
 import org.biojava.bio.seq.ViewSequence;
-import org.biojava.utils.SimpleThreadPool;
 import org.biojava.utils.ThreadPool;
 
 /**

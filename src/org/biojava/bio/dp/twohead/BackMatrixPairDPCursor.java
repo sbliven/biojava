@@ -21,14 +21,9 @@
 
 package org.biojava.bio.dp.twohead;
 
-import java.util.*;
-import java.io.Serializable;
-
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
-import org.biojava.utils.*;
-import org.biojava.bio.dp.*;
+import org.biojava.bio.dp.BackPointer;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * @author Matthew Pocock

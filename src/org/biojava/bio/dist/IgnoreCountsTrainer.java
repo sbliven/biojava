@@ -22,7 +22,8 @@
 
 package org.biojava.bio.dist;
 
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.IllegalSymbolException;
 
 /**
  * A distribution trainer that just ignores all counts.

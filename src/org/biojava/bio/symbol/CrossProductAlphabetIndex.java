@@ -21,13 +21,16 @@
 package org.biojava.bio.symbol;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.utils.*;
-
-import java.util.*;
-import java.lang.*;
+import org.biojava.bio.BioError;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Implementation of AlphabetIndex that handles CrossProductAlphabets

@@ -21,13 +21,23 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.lang.reflect.*;
-import java.io.*;
+import java.io.Serializable;
+import java.util.AbstractList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.io.*;
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioException;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeForwarder;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p>

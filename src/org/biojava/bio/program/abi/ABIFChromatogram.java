@@ -21,25 +21,24 @@
 
 package org.biojava.bio.program.abi;
 
-import org.biojava.bio.chromatogram.Chromatogram;
-import org.biojava.bio.chromatogram.AbstractChromatogram;
-import org.biojava.bio.chromatogram.UnsupportedChromatogramFormatException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.BioError;
+import org.biojava.bio.chromatogram.AbstractChromatogram;
+import org.biojava.bio.chromatogram.Chromatogram;
+import org.biojava.bio.chromatogram.UnsupportedChromatogramFormatException;
+import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.symbol.AtomicSymbol;
-import org.biojava.bio.symbol.IntegerAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.seq.DNATools;
-import org.biojava.bio.BioError;
+import org.biojava.bio.symbol.IntegerAlphabet;
+import org.biojava.bio.symbol.Symbol;
 import org.biojava.utils.SmallMap;
-
-import java.io.File;
-import java.io.InputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * An implementation of {@link org.biojava.bio.chromatogram.Chromatogram} to

@@ -20,17 +20,33 @@
  */
 package org.biojava.bio.seq.db;
 
-import java.net.*;
-import java.io.*;
-import java.util.Set;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.Socket;
+import java.net.URL;
 import java.util.Iterator;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.DNATools;
-import org.biojava.bio.BioError;
-import org.biojava.bio.seq.Sequence;
+import java.util.Set;
+
 import org.biojava.bio.BioException;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.seq.io.GenbankFormat;
+import org.biojava.bio.seq.io.GenbankProcessor;
+import org.biojava.bio.seq.io.SeqIOTools;
+import org.biojava.bio.seq.io.SequenceBuilder;
+import org.biojava.bio.seq.io.SequenceBuilderFactory;
+import org.biojava.bio.seq.io.SequenceFormat;
+import org.biojava.bio.seq.io.SimpleSequenceBuilder;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.Alphabet;
 import org.biojava.utils.ChangeVetoException;
 
 /**

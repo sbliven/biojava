@@ -22,19 +22,31 @@
 
 package org.biojava.bio.seq.db.biosql;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
-import org.biojava.utils.*;
-import org.biojava.utils.cache.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.taxa.*;
-import org.biojava.bio.ontology.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.ontology.AlreadyExistsException;
+import org.biojava.bio.ontology.OntoTools;
+import org.biojava.bio.ontology.Ontology;
+import org.biojava.bio.ontology.OntologyException;
+import org.biojava.bio.ontology.OntologyTerm;
+import org.biojava.bio.ontology.RemoteTerm;
+import org.biojava.bio.ontology.Term;
+import org.biojava.bio.ontology.Triple;
+import org.biojava.bio.ontology.TripleTerm;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Behind-the-scenes adaptor to the features sub-schema of BioSQL.

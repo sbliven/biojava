@@ -21,18 +21,31 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.util.*;
+import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.utils.cache.*;
-import org.biojava.bio.*;
-import org.biojava.bio.gui.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.SimpleFeatureHolder;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.AssertionFailure;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
+import org.biojava.utils.cache.CacheMap;
+import org.biojava.utils.cache.FixedSizeMap;
 
 /**
  * @author Matthew Pocock

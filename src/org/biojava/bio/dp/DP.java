@@ -22,13 +22,32 @@
 
 package org.biojava.bio.dp;
 
-import java.util.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.symbol.DoubleAlphabet;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p>
@@ -138,7 +157,7 @@ public abstract class DP {
         int insertPos = -1;
         while (checkOld.hasNext() && insertPos == -1) {
           Object oldState = checkOld.next();
-          if (comp.compare(state, oldState) == comp.LESS_THAN) {
+          if (comp.compare(state, oldState) == HMMOrderByTransition.LESS_THAN) {
             insertPos = checkOld.nextIndex() - 1;
           }
         }

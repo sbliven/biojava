@@ -21,13 +21,21 @@
 
 package org.biojava.bio.ontology.io; 
  
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.ontology.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.ontology.AlreadyExistsException;
+import org.biojava.bio.ontology.OntoTools;
+import org.biojava.bio.ontology.Ontology;
+import org.biojava.bio.ontology.OntologyException;
+import org.biojava.bio.ontology.OntologyFactory;
+import org.biojava.bio.ontology.Term;
 import org.biojava.bio.seq.io.ParseException;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Simple parser for the Gene Ontology (GO) flatfile format.

@@ -20,7 +20,9 @@
  */
 package org.biojava.utils.io;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
 
 /**
  * @author Thomas Down

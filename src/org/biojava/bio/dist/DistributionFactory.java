@@ -22,13 +22,14 @@
 
 package org.biojava.bio.dist;
 
-import java.util.*;
-import java.io.*;
-import java.lang.reflect.*;
+import java.io.NotSerializableException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.DNATools;
-import org.biojava.utils.*;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.utils.StaticMemberPlaceHolder;
 
 /**
  * <p>

@@ -21,11 +21,17 @@
 
 package org.biojava.bio.seq.io;
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.biojava.utils.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.AbstractSymbolList;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeListener;
 
 /**
  * General purpose SymbolList implementation which can efficiently capture

@@ -24,8 +24,11 @@ package org.biojava.bio.dp.twohead;
 
 import java.io.Serializable;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dp.*;
+import org.biojava.bio.dp.DP;
+import org.biojava.bio.dp.DPMatrix;
+import org.biojava.bio.dp.MarkovModel;
+import org.biojava.bio.dp.State;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * Storage structure for intermediate values from a pairwise

@@ -20,7 +20,7 @@
  */
 package org.biojava.bio.program.sax;
 
-import java.util.*;
+import java.util.StringTokenizer;
 
 /**
  * A Helper class for checking Blast-like program version support.

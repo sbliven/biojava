@@ -21,8 +21,7 @@
 
 package org.biojava.bio.seq;
 
-import org.biojava.bio.*;
-import java.util.*;
+import org.biojava.bio.BioException;
 
 /**
  * Interface for <code>FeatureHolder</code> objects which know how to

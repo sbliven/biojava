@@ -22,7 +22,6 @@
 package org.biojava.bio.gui.sequence;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Point;
@@ -30,9 +29,14 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
 import java.util.List;
+
 import javax.swing.SwingUtilities;
 
-import org.biojava.utils.*;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p>
@@ -130,7 +134,7 @@ public class CrosshairRenderer extends AbstractChangeable
         double gPosY = context.secondarySequenceToGraphics(sPosY);
         gPosY += residueCentre;
 
-        if (context.getDirection() == context.HORIZONTAL)
+        if (context.getDirection() == PairwiseRenderContext.HORIZONTAL)
         {
             xHair.setLine(gPosX, yMin, gPosX, yMax);
             yHair.setLine(xMin, gPosY, xMax, gPosY);
@@ -258,7 +262,7 @@ public class CrosshairRenderer extends AbstractChangeable
         {
             double gPosX, gPosY;
 
-            if (context.getDirection() == context.HORIZONTAL)
+            if (context.getDirection() == PairwiseRenderContext.HORIZONTAL)
             {
                 gPosX = me.getPoint().getX();
                 gPosY = me.getPoint().getY();

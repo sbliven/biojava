@@ -22,7 +22,6 @@
 
 package org.biojava.bio.seq.io.game;
 
-import java.lang.String;
 
 /**
  * An interface that can be tested for by nested handlers

@@ -22,7 +22,7 @@
 
 package org.biojava.bio.symbol;
 
-import org.biojava.bio.*;
+import org.biojava.bio.BioException;
 
 /**
  * <p>

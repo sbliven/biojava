@@ -22,12 +22,9 @@
 
 package org.biojava.bio.seq.io;
 
-import java.util.*;
-import java.io.*;
-
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.IntegerAlphabet;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * @author Thomas Down

@@ -21,10 +21,8 @@
 
 package org.biojava.bio;
 
-import java.util.*;
-import java.io.*;
-
-import org.biojava.utils.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>A no-frills implementation of Annotation that is just a wrapper

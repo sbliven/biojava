@@ -21,12 +21,12 @@
 
 package org.biojava.bio.seq;
 
-import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.db.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.db.IllegalIDException;
+import org.biojava.bio.symbol.Location;
 
 /**
  * A feature that indicates that there is some remote feature that can't be

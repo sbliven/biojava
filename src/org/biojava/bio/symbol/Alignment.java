@@ -21,10 +21,12 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.seq.*;
+import org.biojava.utils.ChangeType;
 
 /**
  * An alignment containing multiple <span class="type">SymbolList</span>s.

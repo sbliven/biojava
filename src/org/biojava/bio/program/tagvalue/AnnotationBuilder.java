@@ -21,10 +21,16 @@
 
 package org.biojava.bio.program.tagvalue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.biojava.bio.*;
-import org.biojava.utils.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.AnnotationType;
+import org.biojava.bio.CollectionConstraint;
+import org.biojava.bio.PropertyConstraint;
+import org.biojava.bio.SmallAnnotation;
+import org.biojava.utils.AssertionFailure;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p>

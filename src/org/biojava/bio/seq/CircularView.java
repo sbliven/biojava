@@ -21,13 +21,15 @@
 
 package org.biojava.bio.seq;
 
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.utils.*;
-
-import java.util.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.symbol.CircularLocation;
+import org.biojava.bio.symbol.Edit;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p>

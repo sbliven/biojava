@@ -21,14 +21,19 @@
 
 package org.biojava.bio.seq.io.filterxml;
 
-import java.io.*;
-import java.util.*;
-import java.lang.reflect.*;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.utils.xml.*;
+import org.biojava.bio.AnnotationType;
+import org.biojava.bio.BioError;
+import org.biojava.bio.CardinalityConstraint;
+import org.biojava.bio.CollectionConstraint;
+import org.biojava.bio.PropertyConstraint;
+import org.biojava.bio.symbol.Location;
+import org.biojava.utils.xml.XMLWriter;
 
 /**
  * Main class for writing AnnotationTypes as XML.  Knows about all the builtin

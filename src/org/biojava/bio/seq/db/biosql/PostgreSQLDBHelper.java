@@ -26,8 +26,10 @@
 
 package org.biojava.bio.seq.db.biosql;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class PostgreSQLDBHelper extends DBHelper {
     public int getInsertID(Connection conn,

@@ -22,14 +22,21 @@
 package org.biojava.bio.seq.io;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.biojava.bio.BioException;
 import org.biojava.bio.BioError;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.RemoteFeature;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.BetweenLocation;
+import org.biojava.bio.symbol.FuzzyLocation;
+import org.biojava.bio.symbol.FuzzyPointLocation;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.LocationTools;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.SmallMap;
 

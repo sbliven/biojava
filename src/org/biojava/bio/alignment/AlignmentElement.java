@@ -23,11 +23,9 @@
 package org.biojava.bio.alignment;
 
 
-import java.util.*;
-import java.io.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.SymbolList;
 
 /** 
  * <p>AlignmentElement is a class which represents a SymbolList and its

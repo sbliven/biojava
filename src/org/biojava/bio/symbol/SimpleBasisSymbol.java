@@ -22,11 +22,12 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
+import java.util.Collections;
+import java.util.List;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.utils.ListTools;
 
 /**
  * A basic implementation of BasisSymbol.

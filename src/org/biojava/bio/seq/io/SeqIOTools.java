@@ -21,14 +21,34 @@
 
 package org.biojava.bio.seq.io;
 
-import java.io.*;
-import java.util.regex.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.utils.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.NucleotideTools;
+import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.seq.RNATools;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.seq.db.HashSequenceDB;
+import org.biojava.bio.seq.db.IDMaker;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.utils.AssertionFailure;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * A set of convenience methods for handling common file formats.

@@ -21,13 +21,21 @@
 
 package org.biojava.bio.program.gff;
 
-import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioException;
+import org.biojava.bio.SmallAnnotation;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FramedFeature;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceAnnotator;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.FramedFeature.Template;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * A set of entries and comments as a representation of a GFF file.
@@ -169,11 +177,11 @@ es
                 framed.source = rec.getSource();
                 framed.strand = rec.getStrand();
                 switch (rec.getFrame()) {
-                    case 0: framed.readingFrame = FramedFeature.FRAME_0;
+                    case 0: Template.readingFrame = FramedFeature.FRAME_0;
                       break;
-                    case 1: framed.readingFrame = FramedFeature.FRAME_1;
+                    case 1: Template.readingFrame = FramedFeature.FRAME_1;
                       break;
-                    case 2: framed.readingFrame = FramedFeature.FRAME_2;
+                    case 2: Template.readingFrame = FramedFeature.FRAME_2;
                       break;
                 }
 		thisTemplate = framed;

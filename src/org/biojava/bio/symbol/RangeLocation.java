@@ -21,8 +21,7 @@
 
 package org.biojava.bio.symbol;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
 
 /**
  * A simple implementation of Location that contains all points between

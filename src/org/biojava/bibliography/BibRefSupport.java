@@ -26,9 +26,10 @@
  */
 package org.biojava.bibliography;
 
-import org.biojava.utils.candy.*;
-import org.biojava.utils.*;
-import java.util.*;
+import java.util.Hashtable;
+
+import org.biojava.utils.candy.CandyFinder;
+import org.biojava.utils.candy.CandyVocabulary;
 
 /**
  * <p>

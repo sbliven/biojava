@@ -21,17 +21,22 @@
 
 package org.biojava.bio.program.hmmer;
 
-import org.biojava.bio.dp.*;
-import org.biojava.bio.dp.onehead.*;
-import java.io.*; 
-import java.util.*; 
-import org.biojava.bio.dist.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.seq.io.*; 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.dist.DistributionFactory;
+import org.biojava.bio.dp.DotState;
+import org.biojava.bio.dp.EmissionState;
+import org.biojava.bio.dp.State;
+import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.Symbol;
 
 
 

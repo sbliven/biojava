@@ -1,9 +1,8 @@
 package org.biojava.bio.annodb;
 
-import java.util.*;
+import java.util.Iterator;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.bio.AnnotationType;
 
 /**
  * <p>A database of Annotation instances.</p>

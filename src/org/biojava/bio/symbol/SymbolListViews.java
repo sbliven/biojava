@@ -29,11 +29,16 @@ package org.biojava.bio.symbol;
  * @since 1.1
  */
  
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
 import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Unchangeable;
 
 /**
  * Tools class for constructing views of <code>SymbolList</code> objects.

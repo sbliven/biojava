@@ -20,8 +20,11 @@
  */
 package org.biojava.bio.taxa;
 
-import java.util.*;
-import org.biojava.utils.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.biojava.utils.SmallSet;
 
 /**
  * A no-frills implementation of TaxaFactory that builds an in-memory Taxa tree.

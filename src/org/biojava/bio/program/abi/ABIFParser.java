@@ -21,20 +21,20 @@
 
 package org.biojava.bio.program.abi;
 
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
 import org.biojava.utils.io.CachingInputStream;
 import org.biojava.utils.io.Seekable;
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.seq.DNATools;
-
-import java.io.InputStream;
-import java.io.DataInputStream;
-import java.io.DataInput;
-import java.io.File;
-import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  * A general base parser for files produced by ABI software.  This includes

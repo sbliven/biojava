@@ -21,21 +21,26 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.util.*;
-import java.lang.reflect.*;
-import java.beans.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.awt.font.*;
-
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.gui.*;
-
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.util.Iterator;
 import java.util.List;
+
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.AssertionFailure;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeForwarder;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
 
 /**
  * <code>FeatureBlockSequenceRenderer</code> forms a bridge between

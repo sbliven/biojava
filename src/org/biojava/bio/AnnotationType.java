@@ -21,11 +21,17 @@
 
 package org.biojava.bio;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-import org.biojava.utils.*;
 import org.biojava.bio.symbol.Location;
-import org.biojava.bio.symbol.LocationTools;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.SmallMap;
 
 /**
  * A set of constraints on the data contained in an <code>Annotation</code>.

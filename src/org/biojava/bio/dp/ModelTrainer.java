@@ -22,11 +22,7 @@
 
 package org.biojava.bio.dp;
 
-import java.util.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
+import org.biojava.bio.dist.DistributionTrainerContext;
 
 /**
  * Encapsulates the training of an entire model.

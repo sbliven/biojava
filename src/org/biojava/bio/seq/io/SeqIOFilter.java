@@ -21,9 +21,10 @@
 
 package org.biojava.bio.seq.io;
 
-import java.io.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * Base-class for listeners that pass filtered events onto another listener.

@@ -21,19 +21,13 @@
  
 package org.biojava.bio.seq.ragbag;
  
-import java.io.*;
-import java.util.*;
- 
-import org.xml.sax.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
-import org.biojava.bio.Annotation;
-import org.biojava.bio.SimpleAnnotation;
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.io.game.*;
-import org.biojava.utils.*;
+import org.biojava.utils.ChangeVetoException;
+import org.xml.sax.SAXException;
  
 /**
  * object that instantiates a sequence when given

@@ -21,20 +21,27 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.event.MouseEvent;
+import java.util.Arrays;
+import java.util.Iterator;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.gui.*;
-
-import org.biojava.bio.seq.impl.*;
-
-import java.util.List;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.ComponentFeature;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SimpleAssembly;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * A feature renderer that computes the data necessary to render

@@ -22,15 +22,16 @@
 
 package org.biojava.bio.gui;
 
-import java.awt.*;
-import java.awt.font.*;
-import java.awt.geom.*;
-import java.beans.*;
-import java.util.*;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
 
 /**
  * A logo painter that paints in bars. The total height of the bars is

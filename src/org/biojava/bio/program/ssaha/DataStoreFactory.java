@@ -1,17 +1,12 @@
 package org.biojava.bio.program.ssaha;
 
-import java.io.*;
-import java.nio.*;
+import java.io.File;
+import java.io.IOException;
 
-import java.nio.channels.*;
-import java.util.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
-
-import org.biojava.utils.Constants;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.Packing;
 
 /**
  * <p>

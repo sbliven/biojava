@@ -1,11 +1,17 @@
 package org.biojava.bio.program.formats;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-import org.biojava.utils.*;
-import org.biojava.utils.lsid.*;
-import org.biojava.bio.*;
-import org.biojava.bio.program.tagvalue.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.EcNumber;
+import org.biojava.bio.program.tagvalue.ChangeTable;
+import org.biojava.bio.program.tagvalue.Formats;
+import org.biojava.bio.program.tagvalue.Parser;
+import org.biojava.utils.Services;
+import org.biojava.utils.lsid.LifeScienceIdentifier;
+import org.biojava.utils.lsid.LifeScienceIdentifierParseException;
 
 public class FormatTools {
   private FormatTools() {}

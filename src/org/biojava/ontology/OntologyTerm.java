@@ -21,9 +21,12 @@
 
 package org.biojava.bio.ontology; 
  
-import java.util.*;
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.bio.Annotation;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeForwarder;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
 
 /**
  * A term in an ontology which identifies another ontology.

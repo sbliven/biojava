@@ -21,10 +21,6 @@
 
 package org.biojava.bio.program.tagvalue;
 
-import java.io.*;
-import java.util.*;
-
-import org.biojava.utils.ParserException;
 
 /**
  * <p>

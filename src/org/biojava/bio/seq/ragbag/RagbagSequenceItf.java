@@ -21,16 +21,10 @@
  
 package org.biojava.bio.seq.ragbag;
  
-import java.io.*;
-import java.util.*;
- 
-import org.biojava.bio.Annotation;
+import java.io.File;
+
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.io.game.*;
-import org.biojava.utils.*;
+import org.biojava.bio.seq.Sequence;
  
 /**
  * object that instantiates a sequence in Ragbag.

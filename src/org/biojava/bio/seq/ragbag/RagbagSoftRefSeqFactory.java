@@ -21,8 +21,8 @@
  
 package org.biojava.bio.seq.ragbag;
 
-import org.biojava.utils.cache.*;
-import java.lang.String;
+import org.biojava.utils.cache.Cache;
+import org.biojava.utils.cache.SoftReferenceCache;
 
 /**
  * class that is passed to a RagbagAssembly to use

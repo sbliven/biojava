@@ -21,10 +21,9 @@
 
 package org.biojava.bio.program.indexdb;
 
-import java.io.*;
-import java.util.*;
-
-import org.biojava.utils.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Comparator;
 
 /**
  * @author Matthew Pocock

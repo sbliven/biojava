@@ -21,14 +21,25 @@
 
 package org.biojava.bio.seq.distributed;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.program.gff.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.program.gff.GFFEntrySet;
+import org.biojava.bio.program.gff.GFFRecord;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.FilterUtils;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.impl.SimpleSequence;
+import org.biojava.bio.symbol.DummySymbolList;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Use a GFFEntrySet as a DataSource for adding annotation to sequences.

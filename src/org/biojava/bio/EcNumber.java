@@ -1,6 +1,7 @@
 package org.biojava.bio;
 
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * An ec (enzyme classification) number.

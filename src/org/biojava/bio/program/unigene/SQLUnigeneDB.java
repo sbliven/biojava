@@ -1,10 +1,12 @@
 package org.biojava.bio.program.unigene;
 
-import java.util.*;
+import java.util.Map;
 
-import org.biojava.utils.*;
-import org.biojava.utils.cache.*;
-import org.biojava.bio.*;
+import org.biojava.bio.BioException;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.JDBCConnectionPool;
+import org.biojava.utils.cache.WeakValueHashMap;
 
 /**
  * An implementation of UnigeneDB that fetches data from an SQL database.

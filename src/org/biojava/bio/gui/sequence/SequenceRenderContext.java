@@ -21,13 +21,15 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.Font;
+import java.awt.Point;
 
-import org.biojava.utils.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.gui.*;
+import javax.swing.SwingConstants;
+
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeType;
 
 /**
  * A context within which sequence information may be rendered. It

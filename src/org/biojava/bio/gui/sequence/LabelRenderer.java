@@ -21,11 +21,7 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.awt.*;
-import java.awt.geom.*;
-import org.biojava.utils.*;
-import org.biojava.bio.gui.*;
-import org.biojava.bio.seq.*;
+import java.awt.Graphics2D;
 
 /**
  * The interface for things that can render labels for a line of information

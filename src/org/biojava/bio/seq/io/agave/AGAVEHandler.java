@@ -19,13 +19,13 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
-import java.util.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-import org.xml.sax.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.biojava.bio.seq.Sequence;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * Handles the root AGAVE element

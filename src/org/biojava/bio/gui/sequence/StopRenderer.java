@@ -21,18 +21,15 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.gui.*;
-
-import java.util.List;
+import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
 import java.util.Iterator;
+import java.util.List;
+
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.SymbolList;
 
 // The graphics model in Java
 // drawing space -> applet space -> device space

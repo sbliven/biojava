@@ -22,10 +22,7 @@
 
 package org.biojava.bio.symbol;
 
-import java.io.*;
-
 import org.biojava.bio.BioError;
-import org.biojava.bio.seq.*;
 
 /**
  * Provides a 'translated' view of an underlying SymbolList.

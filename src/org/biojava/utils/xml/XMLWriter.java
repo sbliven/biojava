@@ -21,7 +21,7 @@
 
 package org.biojava.utils.xml;
 
-import java.io.*;
+import java.io.IOException;
 
 /**
  * Simple interface for building XML documents.

@@ -21,19 +21,45 @@
 
 package org.biojava.bio.seq.db.biosql;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.utils.cache.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.taxa.*;
-import org.biojava.bio.ontology.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.ontology.Ontology;
+import org.biojava.bio.seq.ComponentFeature;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.seq.SimpleFeatureHolder;
+import org.biojava.bio.seq.db.IDMaker;
+import org.biojava.bio.seq.db.IllegalIDException;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.io.OrganismParser;
+import org.biojava.bio.seq.io.ParseException;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.JDBCConnectionPool;
+import org.biojava.utils.cache.Cache;
+import org.biojava.utils.cache.FixedSizeCache;
+import org.biojava.utils.cache.WeakValueHashMap;
 
 /**
  * SequenceDB keyed off a BioSQL database.  This is an almost-complete

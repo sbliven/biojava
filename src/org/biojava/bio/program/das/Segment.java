@@ -21,18 +21,6 @@
 
 package org.biojava.bio.program.das;
 
-import java.util.*;
-import java.net.*;
-import java.io.*;
-
-import org.biojava.bio.*;
-import org.biojava.utils.*;
-import org.biojava.utils.stax.*;
-
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.program.xff.*;
 
 /**
  * Segment to request from DAS

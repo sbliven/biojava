@@ -21,13 +21,23 @@
 
 package org.biojava.bio.program.gff;
 
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.db.IllegalIDException;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.ParserException;
 
 /**
  * @author Mark Schreiber

@@ -22,7 +22,7 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * @author Matthew Pocock

@@ -22,7 +22,7 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.*;
+import org.biojava.bio.BioException;
 
 /**
  * This exception indicates that there is no transition between two states.

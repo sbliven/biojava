@@ -21,17 +21,23 @@
  
 package org.biojava.bio.gui.sequence;
  
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
- 
-import org.biojava.utils.*;
-import org.biojava.bio.gui.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
- 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.Vector;
+
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
  
 /**
  * Class that handles drawing in six frames for other
@@ -224,7 +230,7 @@ public class SixFrameRenderer
       terminalDrawCoord = offset + 0.5 * blockWidth;
 
       Point2D.Double midpoint, terminal;
-      if (src.getDirection() == src.HORIZONTAL) {
+      if (src.getDirection() == SequenceRenderContext.HORIZONTAL) {
         // horizontal axis
         midpointSeqCoord = 0.5*(zigOriginP.getX() + terminalSeqCoord);
         midpoint = new Point2D.Double(midpointSeqCoord, midpointOffset);
@@ -260,7 +266,7 @@ public class SixFrameRenderer
 
     // draw the block
     Rectangle2D.Double block = new Rectangle2D.Double();
-    if (src.getDirection() == src.HORIZONTAL) {
+    if (src.getDirection() == SequenceRenderContext.HORIZONTAL) {
       block.setFrame(
         minP, offset,
         maxP-minP, blockWidth);
@@ -298,7 +304,7 @@ public class SixFrameRenderer
     zigOriginS = maxS;
     offsetPrevBlock = offset;
   
-    if (src.getDirection() == src.HORIZONTAL) {
+    if (src.getDirection() == SequenceRenderContext.HORIZONTAL) {
       zigOriginP = new Point2D.Double(seqCoord, drawCoord);
     }
     else {
@@ -352,7 +358,7 @@ public class SixFrameRenderer
     int lineP = (int) src.sequenceToGraphics(base);
 
     // draw the line
-    if (src.getDirection() == src.HORIZONTAL) {
+    if (src.getDirection() == SequenceRenderContext.HORIZONTAL) {
       g.drawLine(lineP, (int) offset,
                  lineP, (int) (offset + blockWidth));
     }

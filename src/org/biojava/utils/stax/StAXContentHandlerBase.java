@@ -20,7 +20,9 @@
  */
 package org.biojava.utils.stax;
 
-import org.xml.sax.*;
+import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 
 /**
  * Simple implementation of the <code>StAXContentHandler</code>

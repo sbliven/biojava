@@ -21,11 +21,12 @@
 
 package org.biojava.bio.seq.db;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Serializable;
 
+import org.biojava.bio.BioError;
+import org.biojava.bio.seq.Sequence;
 import org.biojava.utils.StaticMemberPlaceHolder;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
 
 /**
  * Interface for objects that define how to make an ID for a sequence.

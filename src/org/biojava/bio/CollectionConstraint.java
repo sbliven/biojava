@@ -21,9 +21,10 @@
 
 package org.biojava.bio;
 
-import java.util.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
+import java.util.Collection;
+import java.util.Iterator;
+
+import org.biojava.bio.symbol.Location;
 
 /**
  * Used by <code>AnnotationType</code> to represent the constraint on

@@ -21,8 +21,8 @@
 
 package org.biojava.utils.cache;
 
-import java.util.*;
-import java.lang.ref.*;
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 
 /**
  * Cache which is cleared according to memory pressure.  This

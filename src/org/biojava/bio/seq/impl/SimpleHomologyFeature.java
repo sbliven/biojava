@@ -20,12 +20,12 @@
  */
 package org.biojava.bio.seq.impl;
  
-import java.io.*;
-
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.homol.*;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.homol.Homology;
+import org.biojava.bio.seq.homol.HomologyFeature;
+import org.biojava.bio.symbol.IllegalAlphabetException;
 
 /**
  * @author Matthew Pocock

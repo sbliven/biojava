@@ -20,8 +20,8 @@
 
 package org.biojava.utils;
 
-import java.io.*;
-import java.util.*;
+import java.io.PrintStream;
+import java.util.EventListener;
 
 /**
  *  Interface for objects which listen to ChangeEvents. 

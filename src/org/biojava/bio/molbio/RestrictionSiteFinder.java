@@ -24,14 +24,11 @@ package org.biojava.bio.molbio;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.biojava.bio.Annotation;
-import org.biojava.bio.BioException;
 import org.biojava.bio.BioRuntimeException;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.io.SymbolListCharSequence;
 import org.biojava.bio.symbol.RangeLocation;
-import org.biojava.utils.ChangeVetoException;
 
 /**
  * <code>RestrictionSiteFinder</code>s do the work of finding sites

@@ -21,8 +21,11 @@
 
 package org.biojava.bio.program.tagvalue;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.biojava.utils.ParserException;
 

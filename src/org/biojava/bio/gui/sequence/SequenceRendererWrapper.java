@@ -21,18 +21,18 @@
 
 package org.biojava.bio.gui.sequence;
 
+import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
 import java.io.Serializable;
-import java.util.*;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-
-import org.biojava.utils.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
-
 import java.util.List;
+
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeForwarder;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
 
 /**
  * @author Matthew Pocock

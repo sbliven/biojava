@@ -44,32 +44,19 @@ package org.biojava.bio.proteomics;
 
 
 
-import org.biojava.bio.seq.Sequence;
-
-import org.biojava.bio.seq.Feature;
-
-import org.biojava.bio.seq.io.SymbolTokenization;
-
-import org.biojava.bio.symbol.Location;
-
-import org.biojava.bio.symbol.RangeLocation;
-
-import org.biojava.bio.symbol.Symbol;
-
-import org.biojava.bio.Annotation;
-
-
-
-import org.biojava.bio.BioException;
-
-import org.biojava.utils.ChangeVetoException;
-
+import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 
-import java.util.LinkedList;
-
-import java.util.List;
-import org.biojava.bio.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioException;
+import org.biojava.bio.SmallAnnotation;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.utils.ChangeVetoException;
 
 
 

@@ -25,11 +25,7 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
-import javax.swing.JComponent;
 
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.symbol.Location;
@@ -112,7 +108,7 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
 
 	Shape shape;
 
-	if (context.getDirection() == context.HORIZONTAL)
+	if (context.getDirection() == SequenceRenderContext.HORIZONTAL)
 	{
 	    double  posXW = context.sequenceToGraphics(min);
 	    double  posYN = beadDisplacement;

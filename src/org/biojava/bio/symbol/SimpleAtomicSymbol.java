@@ -22,11 +22,9 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
+import java.util.List;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.bio.Annotation;
 
 /**
  * A basic implementation of AtomicSymbol.

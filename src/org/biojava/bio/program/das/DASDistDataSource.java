@@ -21,27 +21,16 @@
 
 package org.biojava.bio.program.das;
 
-import java.util.*;
-import java.util.zip.*;
-import java.net.*;
-import java.io.*;
+import java.net.URL;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.utils.cache.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.seq.distributed.*;
-import org.biojava.bio.symbol.*;
-
-import javax.xml.parsers.*;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
-import org.w3c.dom.*;
-import org.biojava.utils.stax.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.FilterUtils;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.db.IllegalIDException;
+import org.biojava.bio.seq.distributed.DistDataSource;
 
 /**
  * View of DAS data suitable for integration via the

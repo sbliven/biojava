@@ -22,7 +22,6 @@
 package org.biojava.bio.program.ssbind;
 
 import org.biojava.bio.program.xff.ElementRecognizer;
-import org.biojava.utils.stax.StAXContentHandler;
 
 /**
  * <code>StAXHandlerBinding</code>s associates an

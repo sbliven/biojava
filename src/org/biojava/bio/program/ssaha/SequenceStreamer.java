@@ -21,14 +21,22 @@
 
 package org.biojava.bio.program.ssaha;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.io.SeqIOListener;
+import org.biojava.bio.seq.io.SequenceFormat;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.Symbol;
 
 public interface SequenceStreamer {
     public boolean hasNext();

@@ -25,23 +25,24 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-import org.biojava.bio.Annotation;
-import org.biojava.bio.BioException;
-import org.biojava.bio.gui.sequence.FeatureRenderer;
-import org.biojava.bio.gui.sequence.SequenceRenderContext;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.OptimizableFilter;
-import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.bio.symbol.Location;
-import org.biojava.utils.*;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p><code>AbstractBeadRenderer</code> is a an abstract base class

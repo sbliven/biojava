@@ -21,17 +21,12 @@
 
 package org.biojava.bio.program.xff;
 
-import java.util.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.program.xff.*;
-
-import org.biojava.utils.*;
-import org.biojava.utils.stax.*;
-import org.xml.sax.*;
+import org.biojava.bio.seq.io.ParseException;
+import org.biojava.utils.stax.DelegationManager;
+import org.biojava.utils.stax.StAXContentHandler;
+import org.biojava.utils.stax.StringElementHandlerBase;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * StAX handler for xff:prop detail elements.  prop details are simple

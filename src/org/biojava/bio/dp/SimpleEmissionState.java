@@ -23,12 +23,21 @@
 package org.biojava.bio.dp;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.SingletonAlphabet;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.SingletonList;
 
 /**
  * @author Matthew Pocock

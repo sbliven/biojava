@@ -21,18 +21,12 @@
 
 package org.biojava.bio.program.ssbind;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.biojava.bio.search.SearchContentHandler;
+import org.biojava.utils.stax.SAX2StAXAdaptor;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
-
-import org.biojava.bio.search.SearchContentHandler;
-import org.biojava.utils.stax.SAX2StAXAdaptor;
 
 /**
  * A <code>SeqSimilarityAdapter</code> converts SAX events into method

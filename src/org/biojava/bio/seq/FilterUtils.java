@@ -21,14 +21,14 @@
 
 package org.biojava.bio.seq;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
-import org.biojava.bio.AnnotationType;
 import org.biojava.bio.AnnotationTools;
-import org.biojava.bio.PropertyConstraint;
+import org.biojava.bio.AnnotationType;
 import org.biojava.bio.CardinalityConstraint;
-import org.biojava.utils.ChangeVetoException;
-import org.biojava.bio.BioException;
+import org.biojava.bio.PropertyConstraint;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.LocationTools;
 

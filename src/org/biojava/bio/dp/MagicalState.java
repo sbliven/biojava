@@ -22,14 +22,14 @@
 
 package org.biojava.bio.dp;
 
-import java.util.*;
-import java.io.*;
-import java.lang.reflect.*;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.dist.GapDistribution;
+import org.biojava.bio.symbol.Alphabet;
 
 /**
  * Start/end state for HMMs.

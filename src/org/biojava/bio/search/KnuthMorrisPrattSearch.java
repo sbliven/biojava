@@ -23,11 +23,16 @@
 package org.biojava.bio.search;
 
 
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.seq.CircularView;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * An object to find exact subsequences within a sequence.

@@ -21,13 +21,28 @@
 
 package org.biojava.bio.seq;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.seq.projection.*;
-import org.biojava.utils.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
-import java.util.*;
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.impl.LazyFilterFeatureHolder;
+import org.biojava.bio.seq.impl.SimpleRemoteFeature;
+import org.biojava.bio.seq.projection.Projection;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.Edit;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.LocationTools;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * View a sub-section of a given sequence object, including all the

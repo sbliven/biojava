@@ -21,10 +21,10 @@
 
 package org.biojava.directory;
 
-import java.io.*;
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
 
-import org.biojava.utils.*;
+import org.biojava.utils.OverlayMap;
 
 /**
  * <p>The BioDirectory Registry is a simple system for specifying

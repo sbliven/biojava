@@ -22,13 +22,21 @@
 package org.biojava.bio.seq;
 
 import java.io.Serializable;
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Comparator;
+import java.util.Iterator;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-import org.biojava.bio.ontology.*;
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.ontology.InvalidTermException;
+import org.biojava.bio.ontology.Term;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * A feature within a sequence, or nested within another feature.

@@ -22,9 +22,12 @@
 
 package org.biojava.bio.seq.db.biosql;
 
-import org.biojava.utils.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.IndexedChangeHub;
 
 /**
  * Handles ChangeEvents for BioSQLFeature instances.

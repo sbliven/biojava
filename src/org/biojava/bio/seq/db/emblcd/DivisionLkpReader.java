@@ -21,8 +21,8 @@
 
 package org.biojava.bio.seq.db.emblcd;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * <code>DivisionLkpReader</code> reads the "division.lkp" file of an

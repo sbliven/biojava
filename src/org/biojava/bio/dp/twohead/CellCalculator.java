@@ -21,8 +21,9 @@
 
 package org.biojava.bio.dp.twohead;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dp.*;
+import org.biojava.bio.dp.IllegalTransitionException;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
 
 /**
  * <p>

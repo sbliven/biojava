@@ -21,9 +21,8 @@
 
 package org.biojava.bio.program.indexdb;
 
-import java.util.Map;
 import java.util.List;
-import java.io.RandomAccessFile;
+import java.util.Map;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;

@@ -21,17 +21,40 @@
 
 package org.biojava.bio.seq;
 
-import java.io.*;
-import java.util.*;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-import javax.xml.parsers.*;
-import org.w3c.dom.*;
-import org.xml.sax.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.SimpleAnnotation;
+import org.biojava.bio.seq.impl.SimpleSequenceFactory;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.ReversibleTranslationTable;
+import org.biojava.bio.symbol.SimpleReversibleTranslationTable;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.SimpleTranslationTable;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.SymbolListViews;
+import org.biojava.bio.symbol.TranslationTable;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 /**
  * Useful functionality for processing DNA and RNA sequences.

@@ -20,7 +20,8 @@
  */
 package org.biojava.stats.svm;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Adds a class specific constant to k(x, x).

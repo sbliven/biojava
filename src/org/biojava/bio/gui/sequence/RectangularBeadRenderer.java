@@ -23,7 +23,6 @@ package org.biojava.bio.gui.sequence;
 
 import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Rectangle2D;
 
@@ -114,7 +113,7 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
 
         double posXW, posYN, width, height;
 
-        if (context.getDirection() == context.HORIZONTAL)
+        if (context.getDirection() == SequenceRenderContext.HORIZONTAL)
         {
             posXW  = context.sequenceToGraphics(min);
             posYN  = beadDisplacement;

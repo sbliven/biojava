@@ -21,9 +21,15 @@
 
 package org.biojava.bio.seq;
 
-import java.util.*;
-import org.biojava.utils.*;
-import org.biojava.bio.symbol.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * FeatureHolder which exposes all the features in a set

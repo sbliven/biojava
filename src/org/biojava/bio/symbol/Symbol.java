@@ -22,9 +22,7 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-
-import org.biojava.bio.*;
+import org.biojava.bio.Annotatable;
 
 /**
  * A single symbol.

@@ -20,7 +20,7 @@
  */
 package org.biojava.bio.taxa;
 
-import org.biojava.utils.*;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Encapsulate the mapping between Taxon and stringified

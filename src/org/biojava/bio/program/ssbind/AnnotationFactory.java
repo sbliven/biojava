@@ -25,10 +25,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.biojava.bio.BioError;
 import org.biojava.bio.Annotation;
-import org.biojava.bio.SmallAnnotation;
+import org.biojava.bio.BioError;
 import org.biojava.bio.SimpleAnnotation;
+import org.biojava.bio.SmallAnnotation;
 import org.biojava.utils.ChangeVetoException;
 
 /**

@@ -20,7 +20,6 @@
  */
 package org.biojava.bio.program.sax;
 
-import java.util.*;
 
 
 /**

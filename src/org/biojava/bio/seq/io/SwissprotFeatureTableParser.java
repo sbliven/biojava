@@ -22,13 +22,18 @@
 
 package org.biojava.bio.seq.io;
 
-import java.io.*;
-import java.util.*;
+import java.util.StringTokenizer;
 
-import org.biojava.bio.*;
-import org.biojava.utils.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioException;
+import org.biojava.bio.SimpleAnnotation;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.symbol.FuzzyLocation;
+import org.biojava.bio.symbol.FuzzyPointLocation;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Simple parser for swissprot feature tables.

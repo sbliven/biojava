@@ -22,19 +22,18 @@
 package org.biojava.bio.seq.io;
 
 import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringTokenizer;
 
-import org.biojava.bio.BioException;
-import org.biojava.bio.BioError;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.bio.seq.StrandedFeature.Strand;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * <p><code>EmblFileFormer</code> performs the detailed formatting of

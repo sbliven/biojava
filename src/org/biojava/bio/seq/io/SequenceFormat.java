@@ -21,13 +21,13 @@
 
 package org.biojava.bio.seq.io;
 
-import java.util.*;
-import java.io.*;
-import java.lang.String;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintStream;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.IllegalSymbolException;
 
 /**
  * Defines what a sequence format does.

@@ -21,9 +21,9 @@
 
 package org.biojava.bio;
 
-import java.util.*;
-
-import org.biojava.utils.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * <p><code>PropertyConstraint</code>s describes a constraint applied

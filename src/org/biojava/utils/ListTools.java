@@ -20,8 +20,13 @@
  */
 package org.biojava.utils;
 
-import java.util.*;
-import java.io.*;
+import java.io.Serializable;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Matthew Pocock

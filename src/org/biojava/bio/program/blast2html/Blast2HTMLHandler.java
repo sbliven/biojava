@@ -20,16 +20,13 @@
  */
 package org.biojava.bio.program.blast2html;
 
-import org.xml.sax.ContentHandler;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import org.biojava.bio.program.sax.BlastLikeSAXParser;
-
-import java.io.*;
-
-import java.util.*;
 
 /**
  * Takes a SAX event stream and a HTMLRenderer to produce

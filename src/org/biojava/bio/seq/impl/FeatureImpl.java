@@ -21,14 +21,18 @@
 
 package org.biojava.bio.seq.impl;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
-import org.biojava.bio.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
 import org.biojava.bio.molbio.RestrictionSite;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.homol.*;
-import org.biojava.utils.*;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureRealizer;
+import org.biojava.bio.seq.FramedFeature;
+import org.biojava.bio.seq.RemoteFeature;
+import org.biojava.bio.seq.SimpleFeatureRealizer;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.homol.HomologyFeature;
+import org.biojava.bio.seq.homol.SimilarityPairFeature;
+import org.biojava.utils.StaticMemberPlaceHolder;
 
 /**
  * Wrap up default sets of Feature implementations.

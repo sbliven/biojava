@@ -21,20 +21,22 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.awt.geom.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Shape;
+import java.awt.event.MouseEvent;
+import java.awt.geom.GeneralPath;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.gui.*;
-
-import java.util.List;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.Location;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * @author Thomas Down
@@ -159,7 +161,7 @@ implements FeatureRenderer {
 
     if (f instanceof StrandedFeature) {
         StrandedFeature.Strand strand = ((StrandedFeature) f).getStrand();
-        if(src.getDirection() == src.HORIZONTAL) {
+        if(src.getDirection() == SequenceRenderContext.HORIZONTAL) {
 	    if(strand == StrandedFeature.POSITIVE) {
 		GeneralPath path = new GeneralPath();
 		path.moveTo(pos, 0.0F);

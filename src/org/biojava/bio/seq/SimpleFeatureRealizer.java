@@ -21,11 +21,14 @@
 
 package org.biojava.bio.seq;
 
-import java.util.*;
-import java.io.*;
-import java.lang.reflect.*;
-import org.biojava.bio.*;
-import org.biojava.utils.*;
+import java.io.Serializable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.biojava.bio.BioException;
 
 /**
  * FeatureRealizer which uses a lookup table to map template classes

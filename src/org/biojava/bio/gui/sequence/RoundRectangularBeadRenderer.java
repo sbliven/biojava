@@ -23,10 +23,8 @@ package org.biojava.bio.gui.sequence;
 
 import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.RoundRectangle2D;
-import java.io.Serializable;
 
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.symbol.Location;
@@ -103,7 +101,7 @@ public class RoundRectangularBeadRenderer extends AbstractBeadRenderer
         int max = loc.getMax();
         int dif = max - min;
 
-        if (context.getDirection() == context.HORIZONTAL)
+        if (context.getDirection() == SequenceRenderContext.HORIZONTAL)
         {
             double  posXW = context.sequenceToGraphics(min);
             double  posYN = beadDisplacement;

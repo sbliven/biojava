@@ -21,9 +21,9 @@
 
 package org.biojava.bio.seq;
 
-import java.util.*;
-import java.io.IOException;
-import org.biojava.bio.*;
+import java.util.NoSuchElementException;
+
+import org.biojava.bio.BioException;
 
 /**
  * An iterator over a bag of sequences.

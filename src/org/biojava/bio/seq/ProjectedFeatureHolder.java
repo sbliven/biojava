@@ -21,14 +21,27 @@
  
 package org.biojava.bio.seq;
 
-import java.util.*;
-import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.seq.projection.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.impl.LazyFilterFeatureHolder;
+import org.biojava.bio.seq.projection.ProjectionContext;
+import org.biojava.bio.seq.projection.ProjectionEngine;
+import org.biojava.bio.seq.projection.ProjectionUtils;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.LocationTools;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Helper class for projecting Feature objects into an alternative

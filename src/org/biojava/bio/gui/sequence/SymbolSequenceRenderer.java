@@ -21,24 +21,17 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.util.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.gui.*;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.Line2D;
+import java.util.List;
 
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.SymbolList;
 
 /**

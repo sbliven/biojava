@@ -21,12 +21,18 @@
 
 package org.biojava.bio.program.gff;
 
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
 
-import org.biojava.bio.*;
+import org.biojava.bio.BioException;
 import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.utils.*;
+import org.biojava.utils.ParserException;
+import org.biojava.utils.SmallMap;
 
 /**
  * Parse a stream of GFF text into a stream of records and comments.

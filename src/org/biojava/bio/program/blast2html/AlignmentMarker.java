@@ -20,9 +20,6 @@
  */
 package org.biojava.bio.program.blast2html;
 
-import java.io.*;
-import java.util.*;
-import java.awt.Color;
 
 /**
  * <p>

@@ -30,12 +30,28 @@
 
 package org.biojava.bio.alignment;
 
-import java.util.*;
-import java.io.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.utils.*;
+import java.io.Serializable;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.Vector;
+
+import org.biojava.bio.BioError;
+import org.biojava.bio.symbol.AbstractSymbolList;
+import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.LocationTools;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 
 
 public abstract class AbstractULAlignment extends AbstractSymbolList implements UnequalLengthAlignment{

@@ -21,8 +21,9 @@
 
 package org.biojava.bio.seq.io;
 
-import java.io.*;
-import org.biojava.bio.symbol.*;
+import java.io.BufferedReader;
+
+import org.biojava.bio.symbol.Alignment;
 
 /**
  * @author Matthew Pocock

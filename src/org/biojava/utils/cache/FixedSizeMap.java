@@ -21,7 +21,9 @@
 
 package org.biojava.utils.cache;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * A cache that only remembers a given number of keys.

@@ -22,7 +22,8 @@
 
 package org.biojava.stats.svm;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This kernel computes the sum of the dot products between items of two lists

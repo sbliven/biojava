@@ -22,9 +22,8 @@
 
 package org.biojava.bio.seq.io.game;
 
-import java.lang.String;
-import org.biojava.bio.symbol.Location;
 import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.Location;
 /**
  * An interface that can be tested for by nested handlers
  * when trying to do a callback.

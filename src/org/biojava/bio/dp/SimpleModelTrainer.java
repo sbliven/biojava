@@ -22,12 +22,15 @@
 
 package org.biojava.bio.dp;
 
-import java.util.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.dist.SimpleDistributionTrainerContext;
+import org.biojava.bio.symbol.IllegalSymbolException;
 
 /**
  * @author Matthew Pocock

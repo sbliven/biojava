@@ -21,12 +21,14 @@
 
 package org.biojava.bio.program.ssbind;
 
-import java.util.*;
+import java.util.Map;
 
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.ViewSequence;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.db.SequenceDBInstallation;
+import org.biojava.bio.seq.db.SequenceDBLite;
 
 /**
  * <code>ViewSequenceFactory</code> is a base class for creating

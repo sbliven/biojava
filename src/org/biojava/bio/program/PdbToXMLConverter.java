@@ -20,13 +20,10 @@
  */
 package org.biojava.bio.program;
 
-import org.xml.sax.ContentHandler;
-import org.xml.sax.XMLReader;
-import org.xml.sax.SAXException;
-import java.util.*;
-
 import org.biojava.bio.program.sax.PdbSAXParser;
 import org.biojava.bio.program.xml.SimpleXMLEmitter;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.XMLReader;
 
 /**
  * <p>

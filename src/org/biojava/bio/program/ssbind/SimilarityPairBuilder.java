@@ -22,19 +22,14 @@
 package org.biojava.bio.program.ssbind;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
-import org.biojava.bio.SmallAnnotation;
-
 import org.biojava.bio.search.SearchContentHandler;
-import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.bio.seq.homol.SimilarityPairFeature;
 import org.biojava.bio.seq.io.SymbolTokenization;
@@ -225,7 +220,7 @@ public class SimilarityPairBuilder extends ViewSequenceFactory
             else
                 throw new BioException("Failed to determine sequence type");
 
-            FiniteAlphabet alpha = alphaResolver.resolveAlphabet(identifier);
+            FiniteAlphabet alpha = AlphabetResolver.resolveAlphabet(identifier);
             tokenParser = alpha.getTokenization("token");
         }
 

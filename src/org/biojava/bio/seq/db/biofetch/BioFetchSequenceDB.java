@@ -21,16 +21,21 @@
 
 package org.biojava.bio.seq.db.biofetch;
 
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.StringTokenizer;
 
-import org.biojava.utils.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.seq.io.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.seq.db.IllegalIDException;
+import org.biojava.bio.seq.db.SequenceDBLite;
+import org.biojava.bio.seq.io.SeqIOTools;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Unchangeable;
 
 /**
  * Simple SequenceDB implementation backed by a BioFetch (HTTP)

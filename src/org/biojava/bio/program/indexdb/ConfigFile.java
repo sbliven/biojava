@@ -21,11 +21,20 @@
 
 package org.biojava.bio.program.indexdb;
 
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-import org.biojava.bio.*;
-import org.biojava.utils.*;
+import org.biojava.bio.AbstractAnnotation;
+import org.biojava.utils.AssertionFailure;
+import org.biojava.utils.CommitFailure;
+import org.biojava.utils.Commitable;
 
 /**
  * <code>ConfigFile</code> implements reading, updating and writing

@@ -21,13 +21,14 @@
 
 package org.biojava.bio.seq.impl;
 
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.*;
-import java.util.Iterator;
-import org.biojava.bio.Annotation;
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeType;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.Frame;
+import org.biojava.bio.seq.FramedFeature;
+import org.biojava.bio.seq.RNATools;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.IllegalAlphabetException;
 
 /**
  * Title:        SimpleFramedFeature.<p>
@@ -44,7 +45,7 @@ public class SimpleFramedFeature extends SimpleStrandedFeature implements Framed
   public SimpleFramedFeature(Sequence sourceSeq, FeatureHolder parent, FramedFeature.Template template)
     throws IllegalAlphabetException {
     super(sourceSeq,parent,template);
-    this.readingFrame = template.readingFrame;
+    this.readingFrame = FramedFeature.Template.readingFrame;
     if (sourceSeq.getAlphabet() == RNATools.getRNA() && template.strand == NEGATIVE) {
       throw new IllegalAlphabetException("Cannot create a FramedFeature on the negative strand of an RNA");
     }
@@ -69,7 +70,7 @@ public class SimpleFramedFeature extends SimpleStrandedFeature implements Framed
 
   protected void fillTemplate(FramedFeature.Template ft){
     super.fillTemplate(ft);
-    ft.readingFrame = getReadingFrame();
+	FramedFeature.Template.readingFrame = getReadingFrame();
   }
   public String toString(){
    return super.toString() + " "+getStrand().getToken()+""

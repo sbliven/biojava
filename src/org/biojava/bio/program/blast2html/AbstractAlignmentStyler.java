@@ -21,8 +21,8 @@
 
 package org.biojava.bio.program.blast2html;
 
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 
 /**

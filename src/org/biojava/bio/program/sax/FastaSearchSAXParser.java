@@ -30,15 +30,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.biojava.bio.BioException;
+import org.biojava.bio.search.SearchContentHandler;
+import org.biojava.utils.ParserException;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-
-import org.biojava.bio.BioException;
-import org.biojava.utils.ParserException;
-
-import org.biojava.bio.search.SearchContentHandler;
 
 /**
  * <p><code>FastaSearchSAXParser</code> is a SAX2 compliant parser for

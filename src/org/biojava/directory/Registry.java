@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.db.SequenceDBLite;
 import org.biojava.utils.Services;
 

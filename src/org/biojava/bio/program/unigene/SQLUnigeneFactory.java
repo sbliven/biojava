@@ -1,11 +1,13 @@
 package org.biojava.bio.program.unigene;
 
-import java.io.*;
-import java.net.*;
-import java.sql.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.sql.SQLException;
+import java.sql.Statement;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.bio.BioException;
+import org.biojava.utils.JDBCConnectionPool;
 
 /**
  * <p>An implementatoin of UnigeneFactory that manages it's data in an SQL

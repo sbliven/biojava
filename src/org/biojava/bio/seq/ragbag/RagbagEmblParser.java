@@ -21,18 +21,18 @@
  
 package org.biojava.bio.seq.ragbag;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.DNATools;
-import org.biojava.bio.seq.io.EmblProcessor;
 import org.biojava.bio.seq.io.EmblLikeFormat;
-import org.biojava.bio.seq.io.SequenceBuilder;
+import org.biojava.bio.seq.io.EmblProcessor;
 import org.biojava.bio.seq.io.SeqIOListener;
+import org.biojava.bio.seq.io.SequenceBuilder;
 import org.biojava.bio.seq.io.SequenceFormat;
 import org.biojava.bio.seq.io.SymbolTokenization;
 

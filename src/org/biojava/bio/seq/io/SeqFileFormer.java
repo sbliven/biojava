@@ -23,8 +23,8 @@ package org.biojava.bio.seq.io;
 
 import java.io.PrintStream;
 
-import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.symbol.Location;
 
 /**

@@ -22,10 +22,9 @@
 package org.biojava.bio;
 
 import java.beans.IntrospectionException;
-import java.util.*;
-import java.io.*;
+import java.util.Map;
 
-import org.biojava.utils.*;
+import org.biojava.utils.BeanAsMap;
 
 /**
  * Create an Annotation with properties matching those of a JavaBean instance.

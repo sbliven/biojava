@@ -21,20 +21,18 @@
 
 package org.biojava.bio.seq.io;
 
-import java.io.*;
-import java.util.*;
-import java.net.*;
-import javax.xml.parsers.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintStream;
 
-import org.xml.sax.*;
-import org.biojava.utils.stax.*;
+import javax.xml.parsers.SAXParserFactory;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.io.game12.*;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.io.game12.GAMEHandler;
+import org.biojava.utils.stax.SAX2StAXAdaptor;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  * A rudimentary read-only GAME 1.2 Format object.

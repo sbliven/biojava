@@ -22,12 +22,18 @@
 
 package org.biojava.bio.seq.io;
 
-import java.util.*;
-import java.io.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.BasisSymbol;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * Tokenization for cross-product alphabets.  This class handles

@@ -22,12 +22,14 @@
 package org.biojava.bio.seq.db;
 
 import java.io.Serializable;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import java.util.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceAnnotator;
+import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * SequenceDB implementation which lazily applies a SequenceAnnotator

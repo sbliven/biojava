@@ -21,8 +21,8 @@
 
 package org.biojava.bio.seq.io;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Sequence;
 
 /**
  * Interface for objects which accumulate state via SeqIOListener,

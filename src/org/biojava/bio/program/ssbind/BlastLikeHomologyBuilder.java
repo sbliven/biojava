@@ -26,19 +26,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
-import org.biojava.bio.SmallAnnotation;
 import org.biojava.bio.search.SearchContentHandler;
-import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.homol.Homology;
 import org.biojava.bio.seq.homol.HomologyFeature;
 import org.biojava.bio.seq.homol.SimpleHomology;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.SimpleAlignment;
+import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.utils.ChangeVetoException;
 
 /**

@@ -21,16 +21,10 @@
 
 package org.biojava.bio.seq.io.game;
 
-import java.util.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-
-import org.biojava.utils.*;
-import org.biojava.utils.stax.*;
-import org.xml.sax.*;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.stax.StAXContentHandler;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * Handles the GAME &lt;gene&gt; element

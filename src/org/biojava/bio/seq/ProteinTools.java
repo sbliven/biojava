@@ -21,26 +21,32 @@
 
 package org.biojava.bio.seq;
 
-import java.util.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.symbol.*;
-import javax.xml.parsers.*;
-
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-import org.w3c.dom.Element;
-
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.ResourceBundle;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.MissingResourceException;
-import java.net.URL;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.SimpleAnnotation;
+import org.biojava.bio.seq.impl.SimpleSequenceFactory;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.SimpleSymbolPropertyTable;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.SymbolPropertyTable;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 /**
  * The central port-of-call for all information and functionality specific to

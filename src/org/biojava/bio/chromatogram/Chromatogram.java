@@ -22,9 +22,7 @@
 package org.biojava.bio.chromatogram;
 
 import org.biojava.bio.symbol.Alignment;
-import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.AtomicSymbol;
-import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.IllegalSymbolException;
 
 /** 

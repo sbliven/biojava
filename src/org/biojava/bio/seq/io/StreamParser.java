@@ -22,7 +22,7 @@
 
 package org.biojava.bio.seq.io;
 
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.IllegalSymbolException;
 
 /**
  * Parse a stream of characters into BioJava symbols.

@@ -1,8 +1,8 @@
 package org.biojava.bio.program.unigene;
 
-import java.io.*;
-import java.net.*;
-import org.biojava.bio.*;
+import java.net.URL;
+
+import org.biojava.bio.BioException;
 
 /**
  * <p>Objects that can be used to produce a <code>UnigeneDB</code> instance

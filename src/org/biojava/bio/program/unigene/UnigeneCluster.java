@@ -1,6 +1,5 @@
 package org.biojava.bio.program.unigene;
 
-import org.biojava.bio.Annotation;
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.db.SequenceDB;

@@ -21,18 +21,11 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
+import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.gui.*;
-
-import java.util.List;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureHolder;
 
 /**
  * @author Thomas Down

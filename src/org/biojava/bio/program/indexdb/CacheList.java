@@ -21,8 +21,14 @@
 
 package org.biojava.bio.program.indexdb;
 
-import java.util.*;
-import org.biojava.utils.*;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+
+import org.biojava.utils.CommitFailure;
+import org.biojava.utils.Commitable;
 
 /**
  * <code>CacheList</code> is a decorator for

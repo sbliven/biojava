@@ -21,9 +21,13 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
-import org.biojava.bio.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
+import org.biojava.bio.BioError;
 
 /**
  * <p>

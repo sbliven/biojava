@@ -20,7 +20,9 @@
  */
 package org.biojava.bio.gui.sequence;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Encapsulates the rendering info for a single line of the display.

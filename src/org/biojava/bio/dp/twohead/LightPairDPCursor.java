@@ -21,14 +21,14 @@
 
 package org.biojava.bio.dp.twohead;
 
-import java.util.*;
-import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
-import org.biojava.utils.*;
-import org.biojava.bio.dp.*;
+import org.biojava.bio.dp.BackPointer;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * A LIGHT implementation of PairDPCursor.

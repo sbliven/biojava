@@ -22,10 +22,6 @@
 
 package org.biojava.utils;
 
-import java.util.*;
-import java.lang.ref.*;
-
-import org.biojava.utils.*;
 
 /**
  * Interface implemented by ChangeHubs, i.e.

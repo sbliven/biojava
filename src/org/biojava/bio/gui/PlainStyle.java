@@ -22,9 +22,10 @@
 
 package org.biojava.bio.gui;
 
-import java.awt.Paint;
 import java.awt.Color;
-import org.biojava.bio.symbol.*;
+import java.awt.Paint;
+
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * A simple implementation of SymbolStyle that just uses a single paint for

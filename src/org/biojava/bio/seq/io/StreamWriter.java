@@ -22,13 +22,12 @@
 
 package org.biojava.bio.seq.io;
 
-import java.io.*;
-import java.util.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.SequenceIterator;
 
 /**
  * Writes all of the sequences from a SequenceIterator to a stream with a

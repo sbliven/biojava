@@ -20,8 +20,13 @@
  */
 package org.biojava.utils.stax;
 
-import org.xml.sax.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 
 /**
  * Lightweight adaptor which translates SAX content events into

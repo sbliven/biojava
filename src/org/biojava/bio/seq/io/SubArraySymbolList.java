@@ -21,11 +21,12 @@
 
 package org.biojava.bio.seq.io;
 
-import java.util.*;
-import java.io.*;
+import java.io.Serializable;
 
-import org.biojava.utils.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.AbstractSymbolList;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.utils.ChangeListener;
 
 /**
  * Really simple SymbolList which exposes any part of an array of Symbols

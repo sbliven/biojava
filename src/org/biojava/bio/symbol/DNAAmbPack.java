@@ -21,10 +21,12 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.utils.AssertionFailure;
+import org.biojava.utils.SmallSet;
 
 /**
  * Packing utility class for DNA.  Also represents

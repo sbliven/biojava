@@ -20,7 +20,7 @@
  */
 package org.biojava.bio.gui.sequence;
 
-import java.util.*;
+import java.util.EventListener;
 
 /**
  * @author Matthew Pocock

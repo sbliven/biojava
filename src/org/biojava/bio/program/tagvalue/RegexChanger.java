@@ -1,7 +1,7 @@
 package org.biojava.bio.program.tagvalue;
 
-import java.util.*;
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.biojava.utils.ParserException;
 

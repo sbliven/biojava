@@ -21,9 +21,8 @@
 
 package org.biojava.bio.program.gff;
 
-import org.biojava.bio.*;
 import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.utils.*;
+import org.biojava.utils.ParserException;
 
 /**
  * Interface which captures any errors which occur when parsing

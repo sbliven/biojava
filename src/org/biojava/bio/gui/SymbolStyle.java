@@ -23,7 +23,9 @@
 package org.biojava.bio.gui;
 
 import java.awt.Paint;
-import org.biojava.bio.symbol.*;
+
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * The interface for things that say how to paint a symbol.

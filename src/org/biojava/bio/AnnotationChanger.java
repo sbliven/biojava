@@ -21,9 +21,14 @@
 
 package org.biojava.bio;
 
-import java.util.*;
-import org.biojava.utils.*;
+import java.util.AbstractMap;
+import java.util.AbstractSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import org.biojava.bio.program.tagvalue.ChangeTable;
+import org.biojava.utils.ParserException;
 
 /**
  * <code>AnnotationChanger</code> remaps the values of an

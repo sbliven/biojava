@@ -21,10 +21,6 @@
  
 package org.biojava.bio.seq.ragbag;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.lang.String;
-
 import org.biojava.bio.seq.ComponentFeature;
 
 /**

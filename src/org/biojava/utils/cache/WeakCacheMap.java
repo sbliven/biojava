@@ -21,8 +21,10 @@
 
 package org.biojava.utils.cache;
 
-import java.util.*;
-import java.lang.ref.*;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A cache which retains weak references to objects

@@ -21,10 +21,9 @@
 
 package org.biojava.bio;
 
-import java.util.*;
-import java.io.*;
+import java.util.Map;
 
-import org.biojava.utils.*;
+import org.biojava.utils.SmallMap;
 
 /**
  * Annotation that is optimized for memory usage.  Access time

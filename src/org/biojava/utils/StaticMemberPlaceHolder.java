@@ -20,8 +20,10 @@
  */
 package org.biojava.utils;
 
-import java.io.*;
-import java.lang.reflect.*;
+import java.io.InvalidObjectException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+import java.lang.reflect.Field;
 
 /**
  * @author Matthew Pocock
@@ -39,7 +41,7 @@ public class StaticMemberPlaceHolder implements Serializable {
   
   public Object readResolve() throws ObjectStreamException {
     try {
-      Class c = getClass().forName(className);
+      Class c = Class.forName(className);
       Field f = c.getDeclaredField(fieldName);
       return f.get(null);
     } catch (Exception e) {

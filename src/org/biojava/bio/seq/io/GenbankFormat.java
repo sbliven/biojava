@@ -21,13 +21,16 @@
 
 package	org.biojava.bio.seq.io;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.Serializable;
+import java.util.Vector;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.utils.ParseErrorEvent;
+import org.biojava.utils.ParseErrorListener;
 
 /**
  * Format reader for GenBank files. Converted from the old style io to

@@ -20,10 +20,13 @@
  */
 package org.biojava.bio.gui.sequence;
 
-import java.awt.*;
+import java.awt.Font;
+import java.awt.Point;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * <p>

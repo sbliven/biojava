@@ -21,8 +21,10 @@
 
 package org.biojava.bio.program.blast2html;
 
-import java.io.*;
-import java.util.*;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Renders HTML version of blast-like output.<p>

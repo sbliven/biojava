@@ -21,9 +21,10 @@
 
 package org.biojava.bio.program.xff;
 
-import java.io.*;
-import org.biojava.bio.seq.*;
-import org.biojava.utils.xml.*;
+import java.io.IOException;
+
+import org.biojava.bio.seq.Feature;
+import org.biojava.utils.xml.XMLWriter;
 
 /**
  * @author Thomas Down

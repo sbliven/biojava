@@ -28,7 +28,6 @@ import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.symbol.Alignment;
-import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;

@@ -21,18 +21,25 @@
 
 package org.biojava.bio.seq.io;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.bio.seq.Feature;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.BioError;
-
 import java.io.PrintStream;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.StringTokenizer;
+
+import org.biojava.bio.BioError;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.FuzzyLocation;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * Formats a sequence into Swissprot/TrEMBL format.  Modeled after

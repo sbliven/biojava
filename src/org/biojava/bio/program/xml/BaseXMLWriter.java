@@ -21,6 +21,7 @@
 package org.biojava.bio.program.xml;
 
 import java.util.Stack;
+
 import org.xml.sax.Attributes;
 
 /**

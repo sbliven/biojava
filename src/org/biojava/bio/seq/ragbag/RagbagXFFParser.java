@@ -25,14 +25,19 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.biojava.bio.program.xff.FeatureHandler;
-import org.biojava.bio.program.xff.XFFFeatureSetHandler;
-import org.biojava.bio.BioException;
-import org.biojava.bio.seq.io.SequenceBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 
-import org.xml.sax.*;
-import org.biojava.utils.stax.*;
-import javax.xml.parsers.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.program.xff.XFFFeatureSetHandler;
+import org.biojava.bio.seq.io.SequenceBuilder;
+import org.biojava.utils.stax.DelegationManager;
+import org.biojava.utils.stax.SAX2StAXAdaptor;
+import org.biojava.utils.stax.StAXContentHandlerBase;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  * Ragbag FileParser class for handling XFF formatted files.

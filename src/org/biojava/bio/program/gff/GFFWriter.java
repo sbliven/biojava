@@ -21,10 +21,10 @@
 
 package org.biojava.bio.program.gff;
 
-import java.io.*;
-import java.util.*;
+import java.io.PrintWriter;
+import java.util.Map;
 
-import org.biojava.bio.*;
+import org.biojava.bio.BioException;
 import org.biojava.bio.seq.StrandedFeature;
 
 /**

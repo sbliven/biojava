@@ -1,9 +1,12 @@
 package org.biojava.bio.annodb;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.bio.AnnotationTools;
+import org.biojava.bio.AnnotationType;
 
 /**
  * <p>An AnnotationDB that provides a merged view of a list of underlying DBs.</p>

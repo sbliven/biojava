@@ -12,8 +12,7 @@
 package org.biojava.bio.program.sax.blastxml;
 
 import org.biojava.bio.seq.io.game.ElementRecognizer;
-import org.biojava.utils.stax.*;
-import org.xml.sax.*;
+import org.biojava.utils.stax.StAXContentHandler;
 
 class BlastOutputIterationsHandler
     extends StAXFeatureHandler

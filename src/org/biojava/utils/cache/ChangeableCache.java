@@ -21,9 +21,14 @@
 
 package org.biojava.utils.cache;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.biojava.utils.*;
+import org.biojava.utils.ChangeAdapter;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.Changeable;
 
 /**
  * A cache that clears values as the keys fire ChangeEvents of a given type.

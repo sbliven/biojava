@@ -21,13 +21,16 @@
 
 package org.biojava.bio.dist;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.Iterator;
 
-import java.util.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.dist.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
 
 
 /**

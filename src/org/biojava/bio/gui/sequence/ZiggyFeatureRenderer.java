@@ -21,18 +21,23 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.gui.*;
-
-import java.util.List;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.Location;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * A feature renderer that draws non-contiguous features as a set of boxes
@@ -138,7 +143,7 @@ implements FeatureRenderer, java.io.Serializable {
     Rectangle2D.Double block = new Rectangle2D.Double();
     double min = context.sequenceToGraphics(loc.getMin());
     double max = context.sequenceToGraphics(loc.getMax()+1);
-    if(context.getDirection() == context.HORIZONTAL) {
+    if(context.getDirection() == SequenceRenderContext.HORIZONTAL) {
       block.setFrame(
         min, 0.0,
         max - min, blockDepth
@@ -181,7 +186,7 @@ implements FeatureRenderer, java.io.Serializable {
     Point2D midP;
     Point2D endP;
     double half = blockDepth * 0.5;
-    if(context.getDirection() == context.HORIZONTAL) {
+    if(context.getDirection() == SequenceRenderContext.HORIZONTAL) {
       if(getStrand(f) == StrandedFeature.NEGATIVE) {
         double start = context.sequenceToGraphics(dest.getMin());
         double end = context.sequenceToGraphics(source.getMax()+1);

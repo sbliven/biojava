@@ -22,13 +22,19 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.lang.reflect.*;
-import java.io.*;
+import java.io.NotSerializableException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.io.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.utils.StaticMemberPlaceHolder;
+import org.biojava.utils.Unchangeable;
 
 /**
  * @author Matthew Pocock

@@ -20,8 +20,11 @@
  */
 package org.biojava.bio.seq.io;
 
-import org.biojava.bio.symbol.*;
-import java.io.*;
+import java.io.IOException;
+
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * Encapsulate a stream of Symbols being parsed from some input

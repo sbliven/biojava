@@ -21,22 +21,27 @@
  
 package org.biojava.bio.seq.ragbag;
  
-import java.io.*;
-import java.util.*;
- 
-import org.xml.sax.*;
-import org.biojava.utils.stax.*;
-import javax.xml.parsers.*;
- 
-import org.biojava.bio.Annotation;
-import org.biojava.bio.SimpleAnnotation;
-import org.biojava.bio.BioException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Enumeration;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.biojava.bio.BioError;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.io.game.*;
-import org.biojava.utils.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.SimpleAnnotation;
+import org.biojava.bio.seq.ComponentFeature;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.io.SimpleAssemblyBuilder;
+import org.biojava.bio.seq.io.game.GAMEHandler;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.stax.SAX2StAXAdaptor;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  * Builds a SimpleAssembly from sequence files

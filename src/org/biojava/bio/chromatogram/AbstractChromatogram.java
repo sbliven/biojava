@@ -21,28 +21,26 @@
 
 package org.biojava.bio.chromatogram;
 
-import org.biojava.bio.BioError;
-import org.biojava.bio.seq.DNATools;
-import org.biojava.bio.symbol.Alphabet;
-import org.biojava.bio.symbol.Alignment;
-import org.biojava.bio.symbol.SimpleAlignment;
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.symbol.AtomicSymbol;
-import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.SymbolListViews;
-import org.biojava.bio.symbol.SimpleSymbolList;
-import org.biojava.bio.symbol.IntegerAlphabet;
-import org.biojava.bio.symbol.IllegalAlphabetException;
-import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.utils.ListTools;
-import org.biojava.utils.ChangeListener;
-
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.NoSuchElementException;
+
+import org.biojava.bio.BioError;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.IntegerAlphabet;
+import org.biojava.bio.symbol.SimpleAlignment;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.SymbolListViews;
+import org.biojava.utils.ChangeListener;
 
 /** 
  * A basic, abstract implementation of {@link Chromatogram}.  Provides

@@ -22,14 +22,24 @@
 
 package org.biojava.bio.gui;
 
-import java.awt.*;
-import java.beans.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Iterator;
-import javax.swing.*;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
+import javax.swing.JComponent;
+
+import org.biojava.bio.BioError;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * The GUI component for rendering a DistributionLogo. By default, this uses the text

@@ -1,7 +1,8 @@
 package org.biojava.bio.program.unigene;
 
-import org.biojava.bio.*;
-import org.biojava.utils.*;
+import org.biojava.bio.BioException;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
 
 /**
  * A database of Unigene clusters.

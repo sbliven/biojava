@@ -22,14 +22,25 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
-import java.lang.reflect.*;
+import java.io.NotSerializableException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
-import org.biojava.bio.*;
-import org.biojava.utils.*;
-import org.biojava.utils.cache.*;
-import org.biojava.bio.seq.io.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.io.DoubleTokenization;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.utils.SingletonList;
+import org.biojava.utils.StaticMemberPlaceHolder;
+import org.biojava.utils.Unchangeable;
+import org.biojava.utils.cache.WeakValueHashMap;
 
 /**
  * <p>
@@ -308,7 +319,7 @@ public final class DoubleAlphabet
     protected DoubleRange(double minVal, double maxVal) {
       this.minVal = minVal;
       this.maxVal = maxVal;
-      this.matches = getInstance().getSubAlphabet(minVal, maxVal);
+      this.matches = DoubleAlphabet.getSubAlphabet(minVal, maxVal);
     }
   }
 

@@ -21,13 +21,17 @@
 
 package org.biojava.bio.dp;
 
-import java.util.*;
 import java.io.Serializable;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.SimpleAnnotation;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceAnnotator;
+import org.biojava.bio.seq.ViewSequence;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Annotates a sequence with hits to a weight-matrix.

@@ -22,7 +22,8 @@
 
 package org.biojava.utils.cache;
 
-import java.lang.ref.*;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 
 /**
  * Subclass of WeakReference which includes and extra field (the key)

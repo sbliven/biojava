@@ -21,8 +21,8 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -31,10 +31,6 @@ import java.util.Stack;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.FiniteAlphabet;
-import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.symbol.SymbolList;
 
 /**
  * <code>MotifTools</code> contains utility methods for sequence

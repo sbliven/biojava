@@ -21,10 +21,12 @@
 
 package org.biojava.bio.seq;
 
-import java.util.*;
+import java.util.Iterator;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * An abstract implementation of FeatureHolder.

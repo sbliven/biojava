@@ -22,15 +22,17 @@
 //package org.biojava.bio.program.hmmer;
 package org.biojava.bio.program.hmmer;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.program.hmmer.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
-import org.biojava.bio.dp.*;
-
-import java.util.*; 
-import java.io.*; 
+import org.biojava.bio.Annotation;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.dp.EmissionState;
+import org.biojava.bio.dp.IllegalTransitionException;
+import org.biojava.bio.dp.ModelInState;
+import org.biojava.bio.dp.SimpleEmissionState;
+import org.biojava.bio.dp.SimpleMarkovModel;
+import org.biojava.bio.dp.SimpleModelInState;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.utils.ChangeVetoException;
 
 /** 
  * This is a class for representing the full HMMER generated Profile HMM (including loop

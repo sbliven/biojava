@@ -20,8 +20,8 @@
  */
 package org.biojava.utils.xml;
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * Simple implementation of XMLWriter, optimized for speed.  The output is

@@ -20,7 +20,11 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import org.biojava.bio.BioException;
 

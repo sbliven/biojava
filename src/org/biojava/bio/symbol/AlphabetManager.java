@@ -22,20 +22,49 @@
 
 package org.biojava.bio.symbol;
 
-import java.lang.reflect.*;
-import java.io.*;
-import java.util.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InvalidObjectException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
-import org.w3c.dom.*;
-import javax.xml.parsers.*;
-import org.xml.sax.*;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.utils.*;
-import org.biojava.utils.bytecode.*;
-import org.biojava.utils.stax.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.SmallAnnotation;
+import org.biojava.bio.seq.io.CharacterTokenization;
+import org.biojava.bio.seq.io.NameTokenization;
+import org.biojava.bio.seq.io.SeqIOListener;
+import org.biojava.bio.seq.io.StreamParser;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.OverlayMap;
+import org.biojava.utils.Unchangeable;
+import org.biojava.utils.stax.DelegationManager;
+import org.biojava.utils.stax.SAX2StAXAdaptor;
+import org.biojava.utils.stax.StAXContentHandler;
+import org.biojava.utils.stax.StAXContentHandlerBase;
+import org.biojava.utils.stax.StringElementHandlerBase;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  * Utility methods for working with Alphabets.  Also acts as a registry for

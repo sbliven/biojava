@@ -22,10 +22,14 @@
 
 package org.biojava.bio.seq.db.biosql;
 
-import org.biojava.utils.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.*;
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.BioException;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.IndexedChangeHub;
 
 /**
  * Handles ChangeEvents for BioSQLEntryAnnotation instances.

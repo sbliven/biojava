@@ -21,11 +21,17 @@
 
 package org.biojava.bio.dist;
 
-import java.util.*;
-import java.io.*;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-import org.biojava.utils.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * @author Thomas Down

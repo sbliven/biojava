@@ -21,21 +21,31 @@
 
 package org.biojava.bio.program.ssbind;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
-import org.biojava.bio.search.*;
+import org.biojava.bio.search.SearchBuilder;
+import org.biojava.bio.search.SeqSimilaritySearchHit;
+import org.biojava.bio.search.SeqSimilaritySearchResult;
+import org.biojava.bio.search.SeqSimilaritySearchSubHit;
+import org.biojava.bio.search.SimpleSeqSimilaritySearchHit;
+import org.biojava.bio.search.SimpleSeqSimilaritySearchResult;
+import org.biojava.bio.search.SimpleSeqSimilaritySearchSubHit;
 import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.db.SequenceDBInstallation;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.ChangeVetoException;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.SimpleAlignment;
+import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.utils.SmallMap;
-import org.biojava.bio.seq.db.*;
 
 /**
  * <p><code>BlastLikeSearchBuilder</code> will create

@@ -21,9 +21,7 @@
 
 package org.biojava.utils.math;
 
-import java.util.*;
-
-import org.biojava.bio.*;
+import org.biojava.bio.BioException;
 
 /**
  * solves y = f(x) = 0 by binary search.

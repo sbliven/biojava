@@ -22,11 +22,18 @@
 package org.biojava.bio.seq;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.AnnotationTools;
+import org.biojava.bio.AnnotationType;
+import org.biojava.bio.CardinalityConstraint;
+import org.biojava.bio.CollectionConstraint;
+import org.biojava.bio.PropertyConstraint;
 import org.biojava.bio.seq.homol.SimilarityPairFeature;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.RangeLocation;
 
 /**
  * A filter for accepting or rejecting a feature.

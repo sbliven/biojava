@@ -21,11 +21,12 @@
 
 package org.biojava.bio.seq.db.biofetch;
 
-import java.util.*;
+import java.util.Map;
 
-import org.biojava.directory.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.db.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.db.SequenceDBLite;
+import org.biojava.directory.RegistryException;
+import org.biojava.directory.SequenceDBProvider;
 
 /**
  * Directory-services plugin for biofetch databases.

@@ -21,8 +21,8 @@
  
 package org.biojava.bio.seq.ragbag;
 
-import org.biojava.bio.seq.io.SequenceBuilder;
 import org.biojava.bio.BioException;
+import org.biojava.bio.seq.io.SequenceBuilder;
 
 /**
  * Interface for classes that implement format-specific behaviour

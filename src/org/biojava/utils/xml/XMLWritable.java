@@ -20,8 +20,7 @@
  */
 package org.biojava.utils.xml;
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
 
 /**
  * Object which knows how to represent itself as an XML element.

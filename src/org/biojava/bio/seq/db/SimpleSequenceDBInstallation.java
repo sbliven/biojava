@@ -21,9 +21,13 @@
 
 package org.biojava.bio.seq.db;
 
-import org.biojava.utils.ObjectUtil;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-import java.util.*;
+import org.biojava.utils.ObjectUtil;
 
 /**
  * This class is an implementation of interface SequenceDBInstallation

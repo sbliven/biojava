@@ -22,8 +22,12 @@
 
 package org.biojava.bio.seq.io;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * Encapsulate a mapping between BioJava Symbol objects and

@@ -21,18 +21,15 @@
 
 package org.biojava.bio.program.xff;
 
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.util.Iterator;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.db.*;
-
-import org.biojava.utils.xml.*;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
+import org.biojava.bio.seq.ComponentFeature;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.Location;
+import org.biojava.utils.xml.XMLWriter;
 
 /**
  * Simple XFF writing code, ripped off from Dazzle 0.08.  It probably

@@ -21,18 +21,12 @@
 
 package org.biojava.bio.program.ssbind;
 
-import java.util.StringTokenizer;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-
-import org.biojava.bio.BioException;
 import org.biojava.bio.program.xff.ElementRecognizer;
-import org.biojava.bio.search.SearchContentHandler;
 import org.biojava.utils.stax.DelegationManager;
 import org.biojava.utils.stax.StAXContentHandler;
 import org.biojava.utils.stax.StAXContentHandlerBase;
-import org.biojava.utils.stax.StringElementHandlerBase;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * <code>HeaderStAXHandler</code> handles the Header element of

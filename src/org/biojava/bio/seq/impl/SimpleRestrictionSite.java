@@ -25,7 +25,6 @@ import org.biojava.bio.molbio.RestrictionEnzyme;
 import org.biojava.bio.molbio.RestrictionSite;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.symbol.IllegalAlphabetException;
 
 /**
  * <code>SimpleRestrictionSite</code> represents the recognition site

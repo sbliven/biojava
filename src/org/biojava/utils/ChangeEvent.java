@@ -20,7 +20,7 @@
 
 package org.biojava.utils;
 
-import java.util.*;
+import java.util.EventObject;
 
 /**
  *  Event which encapsulates a change in any mutable BioJava object.

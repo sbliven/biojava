@@ -21,7 +21,7 @@
 
 package org.biojava.stats.svm;
 
-import java.util.*;
+import java.util.NoSuchElementException;
 
 /**
  *

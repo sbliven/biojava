@@ -1,11 +1,10 @@
 package org.biojava.bio.program.hmmer;
 
-import org.biojava.bio.dp.*;
-import org.biojava.bio.dist.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-import java.util.*; 
-import org.biojava.bio.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.dp.SimpleEmissionState;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * A state in a HMMer model.

@@ -21,12 +21,15 @@
 
 package org.biojava.bio.search;
 
-import org.biojava.bio.Annotatable.AnnotationForwarder;
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Alignment;
-import org.biojava.utils.*;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ObjectUtil;
 
 /**
  * <p><code>SimpleSeqSimilaritySearchSubHit</code> objects represent

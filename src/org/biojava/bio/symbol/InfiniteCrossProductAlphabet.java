@@ -26,12 +26,18 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.io.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.io.CrossProductTokenization;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.utils.Unchangeable;
 
 class InfiniteCrossProductAlphabet
   extends

@@ -21,11 +21,7 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
+import java.io.Serializable;
 
 /**
  * An reverse view of another SymbolList.

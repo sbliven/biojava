@@ -21,6 +21,7 @@
 package org.biojava.bio.gui;
 
 import java.awt.geom.Rectangle2D;
+
 import org.biojava.bio.symbol.AtomicSymbol;
 
 public interface BlockPainter {

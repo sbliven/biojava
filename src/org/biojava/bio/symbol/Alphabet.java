@@ -22,13 +22,13 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.lang.reflect.*;
-import java.io.*;
+import java.util.List;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.io.*;
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.utils.ChangeType;
 
 /**
  * <p>

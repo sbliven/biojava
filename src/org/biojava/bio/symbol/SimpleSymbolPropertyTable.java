@@ -25,7 +25,8 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Class that implements the SymbolPropertyTable interface

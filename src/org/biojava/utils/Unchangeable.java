@@ -20,7 +20,8 @@
 
 package org.biojava.utils;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * This is a utility implementation of Changeable that doesn't fire any events

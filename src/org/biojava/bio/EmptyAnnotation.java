@@ -22,11 +22,18 @@
 
 package org.biojava.bio;
 
-import java.util.*;
-import java.io.*;
-import java.lang.reflect.*;
+import java.io.NotSerializableException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
-import org.biojava.utils.*;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.StaticMemberPlaceHolder;
+import org.biojava.utils.Unchangeable;
 
 /**
  * @author Matthew Pocock

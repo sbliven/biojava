@@ -19,14 +19,14 @@
  *
  */
 package org.biojava.bio.seq.io.agave;
-import java.util.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.program.das.*;
-import org.biojava.utils.*;
-import org.xml.sax.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+
+import org.biojava.bio.seq.Sequence;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  *

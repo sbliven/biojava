@@ -20,15 +20,15 @@
  */
 package org.biojava.bio.program;
 
-import org.xml.sax.ContentHandler;
-import org.xml.sax.XMLReader;
-import org.xml.sax.SAXException;
-import org.xml.sax.InputSource;
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 
 import org.biojava.bio.program.sax.BlastLikeSAXParser;
 import org.biojava.bio.program.xml.SimpleXMLEmitter;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 /**
  * <p>

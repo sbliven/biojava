@@ -21,15 +21,20 @@
 
 package org.biojava.bio.program.phred;
 
-import java.io.*;
-import java.util.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.Serializable;
+import java.util.NoSuchElementException;
 
-import org.biojava.utils.StaticMemberPlaceHolder;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.io.ParseException;
+import org.biojava.bio.seq.io.SeqIOListener;
+import org.biojava.bio.seq.io.SequenceFormat;
+import org.biojava.bio.seq.io.StreamParser;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.IntegerAlphabet;
 
 /**
  * Format object representing Phred Quality files.
@@ -83,7 +88,7 @@ public class PhredFormat implements SequenceFormat, Serializable {
      */
 
     public void setLineWidth(int width) {
-        this.lineWidth = lineWidth;
+        this.lineWidth = width;
     }
 
     public boolean readSequence(BufferedReader reader,

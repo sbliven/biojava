@@ -21,17 +21,12 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.awt.*;
-import java.awt.geom.*;
-import java.beans.*;
-import java.util.*;
-import java.util.List;
+import java.awt.Font;
+import java.awt.Point;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.gui.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * @author Matthew Pocock

@@ -1,7 +1,12 @@
 package org.biojava.bio.annodb;
 
-import java.util.*;
-import org.biojava.bio.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.biojava.bio.Annotation;
+import org.biojava.bio.AnnotationTools;
+import org.biojava.bio.AnnotationType;
 
 public class LazyFilteredAnnotationDB
 implements AnnotationDB {

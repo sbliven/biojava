@@ -21,16 +21,12 @@
 
 package org.biojava.bio.seq.io.game;
 
-import java.util.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-
-import org.biojava.utils.*;
-import org.biojava.utils.stax.*;
-import org.xml.sax.*;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.PointLocation;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.stax.IntElementHandlerBase;
+import org.biojava.utils.stax.StAXContentHandler;
 
 /**
  * Handles the GAME &lt;span&gt; element

@@ -21,14 +21,20 @@
 
 package org.biojava.bio.seq.io.filterxml;
 
-import java.io.*;
-import java.util.*;
-import java.lang.reflect.*;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.utils.xml.*;
+import org.biojava.bio.AnnotationType;
+import org.biojava.bio.BioError;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FramedFeature;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.Location;
+import org.biojava.utils.xml.XMLWriter;
 
 /**
  * Write FeatureFilters in XML format.

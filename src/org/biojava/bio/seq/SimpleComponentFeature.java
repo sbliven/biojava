@@ -21,12 +21,17 @@
 
 package org.biojava.bio.seq;
 
-import java.util.*;
+import java.util.Iterator;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.ontology.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioException;
+import org.biojava.bio.ontology.OntoTools;
+import org.biojava.bio.ontology.Term;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Unchangeable;
 
 /**
  * ComponentFeature implementation used by SimpleAssembly.

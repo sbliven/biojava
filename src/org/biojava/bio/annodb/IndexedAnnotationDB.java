@@ -1,24 +1,49 @@
 package org.biojava.bio.annodb;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
-import java.beans.*;
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Iterator;
+import java.util.List;
 
-import org.biojava.utils.*;
-import org.biojava.utils.io.*;
-import org.biojava.utils.xml.*;
-import org.biojava.bio.*;
-import org.biojava.bio.program.tagvalue.*;
-import org.biojava.bio.program.indexdb.*;
-import org.biojava.bio.seq.io.filterxml.*;
-
-import javax.xml.parsers.*;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
-import org.biojava.utils.stax.*;
-
+import org.biojava.bio.Annotation;
+import org.biojava.bio.AnnotationTools;
+import org.biojava.bio.AnnotationType;
+import org.biojava.bio.BioException;
+import org.biojava.bio.program.indexdb.BioStore;
+import org.biojava.bio.program.indexdb.BioStoreFactory;
+import org.biojava.bio.program.indexdb.Record;
+import org.biojava.bio.program.tagvalue.AnnotationBuilder;
+import org.biojava.bio.program.tagvalue.Index2Model;
+import org.biojava.bio.program.tagvalue.Indexer2;
 import org.biojava.bio.program.tagvalue.Parser;
+import org.biojava.bio.program.tagvalue.ParserListener;
+import org.biojava.bio.program.tagvalue.TagValueListener;
+import org.biojava.bio.seq.io.filterxml.XMLAnnotationTypeHandler;
+import org.biojava.bio.seq.io.filterxml.XMLAnnotationTypeWriter;
+import org.biojava.utils.AssertionFailure;
+import org.biojava.utils.CommitFailure;
+import org.biojava.utils.ParserException;
+import org.biojava.utils.io.RandomAccessReader;
+import org.biojava.utils.stax.SAX2StAXAdaptor;
+import org.biojava.utils.xml.PrettyXMLWriter;
+import org.biojava.utils.xml.XMLWriter;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * <p>A database of Annotation instances backed by an indexed file set.</p>

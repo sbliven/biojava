@@ -26,8 +26,7 @@
  */
 package org.biojava.bibliography;
 
-import org.biojava.utils.*;
-import java.util.*;
+import java.util.Hashtable;
 
 /**
  * <p>

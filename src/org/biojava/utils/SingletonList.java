@@ -20,8 +20,8 @@
  */
 package org.biojava.utils;
 
-import java.util.*;
 import java.io.Serializable;
+import java.util.AbstractList;
 
 /**
  * @author Matthew Pocock

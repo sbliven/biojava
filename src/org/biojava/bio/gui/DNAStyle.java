@@ -22,13 +22,15 @@
 
 package org.biojava.bio.gui;
 
-import java.awt.Paint;
 import java.awt.Color;
-import java.util.*;
+import java.awt.Paint;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.BioError;
 import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * A simple implementation of SymbolStyle optimized for DNA.

@@ -20,9 +20,10 @@
  */
 package org.biojava.bio.program.sax;
 
-import java.util.*;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.StringTokenizer;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

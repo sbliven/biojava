@@ -20,11 +20,12 @@
  */
 package org.biojava.utils;
 
-import java.util.*;
-import java.sql.*;
-import java.lang.reflect.*;
-
-import java.util.Date; // TIE-BREAK
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Really simple connection pool for JDBC databases

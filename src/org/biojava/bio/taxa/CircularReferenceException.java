@@ -20,7 +20,7 @@
  */
 package org.biojava.bio.taxa;
 
-import org.biojava.bio.*;
+import org.biojava.bio.BioException;
 
 public class CircularReferenceException extends BioException {
   public CircularReferenceException() {

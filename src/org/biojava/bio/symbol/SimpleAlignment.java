@@ -21,11 +21,18 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
+import java.io.Serializable;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.BioError;
 
 /**
  * A simple implementation of an Alignment.

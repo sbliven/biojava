@@ -22,11 +22,13 @@
 
 package org.biojava.bio;
 
-import java.util.*;
-import java.io.*;
-import java.lang.reflect.*;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
-import org.biojava.utils.*;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
 
 /**
  * <p>

@@ -21,7 +21,7 @@
 
 package org.biojava.bio.program.xff;
 
-import org.xml.sax.*;
+import org.xml.sax.Attributes;
 
 /**
  * Simple interface for filtering SAX/StAX startElement events

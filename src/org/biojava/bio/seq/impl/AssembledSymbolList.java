@@ -21,12 +21,22 @@
 
 package org.biojava.bio.seq.impl;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.utils.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.seq.ComponentFeature;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.AbstractSymbolList;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * Support class for applications which need to patch together sections

@@ -21,13 +21,12 @@
 
 package org.biojava.bio.seq.db;
 
-import java.io.*;
-import java.util.*;
+import java.util.Set;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.io.SequenceBuilderFactory;
+import org.biojava.bio.seq.io.SequenceFormat;
+import org.biojava.bio.seq.io.SymbolTokenization;
 
 /**
  * This defines the objects that IndexedSequenceDB uses to store all of the

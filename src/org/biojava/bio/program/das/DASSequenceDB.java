@@ -21,21 +21,39 @@
 
 package org.biojava.bio.program.das;
 
-import java.util.*;
-import java.net.*;
-import java.io.*;
-import org.biojava.utils.*;
-import org.biojava.utils.cache.*;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.symbol.*;
+import javax.xml.parsers.DocumentBuilder;
 
-import javax.xml.parsers.*;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
-import org.w3c.dom.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.MergeFeatureHolder;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.seq.db.IllegalIDException;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.db.SequenceDBLite;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Unchangeable;
+import org.biojava.utils.cache.Cache;
+import org.biojava.utils.cache.FixedSizeCache;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * <p>

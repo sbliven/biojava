@@ -12,19 +12,13 @@
 
 package org.biojava.bio.seq.io.game12;
 
-import java.util.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.program.das.*;
-
-import org.biojava.utils.*;
-import org.biojava.utils.stax.*;
-import org.xml.sax.*;
-
+import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.io.game.ElementRecognizer;
+import org.biojava.bio.symbol.Location;
+import org.biojava.utils.stax.StAXContentHandler;
+import org.biojava.utils.stax.StringElementHandlerBase;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  *  Handles the GAME &lt;<seq_relationship>&gt; element

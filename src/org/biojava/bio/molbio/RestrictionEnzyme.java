@@ -22,7 +22,6 @@
 package org.biojava.bio.molbio;
 
 import java.io.Serializable;
-import java.util.Iterator;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;

@@ -22,7 +22,7 @@
 
 package org.biojava.stats.svm;
 
-import java.util.*;
+import java.util.Set;
 
 /**
  * An SVM classifier model.

@@ -21,10 +21,12 @@
 
 package org.biojava.bio.seq.distributed;
 
-import java.util.*;
+import java.util.Set;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.Sequence;
 
 /**
  * <p>Object which contributes data to a DistributedSequenceDB.</p>

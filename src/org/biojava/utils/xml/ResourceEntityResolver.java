@@ -21,9 +21,15 @@
 
 package org.biojava.utils.xml;
 
-import org.xml.sax.*;
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * SAX EntityResolve which looks up system IDs as resources
@@ -76,7 +82,7 @@ public class ResourceEntityResolver implements EntityResolver {
 
     public ResourceEntityResolver(String[] path, ClassLoader classLoader) {
 	this.path = path;
-	this.classLoader = this.classLoader;
+	this.classLoader = classLoader;
     }
 
     /**

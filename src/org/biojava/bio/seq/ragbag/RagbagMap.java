@@ -22,26 +22,31 @@
 
 package org.biojava.bio.seq.ragbag;
 
-import java.lang.String;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Vector;
 import java.util.NoSuchElementException;
+import java.util.Vector;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.FileReader;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 
-import org.xml.sax.*;
-import javax.xml.parsers.*;
-
-import org.biojava.utils.stax.*;
-import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.stax.DelegationManager;
+import org.biojava.utils.stax.SAX2StAXAdaptor;
+import org.biojava.utils.stax.StAXContentHandler;
+import org.biojava.utils.stax.StAXContentHandlerBase;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  * This class is an object that encapsulates all information 

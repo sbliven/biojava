@@ -21,17 +21,20 @@
 
 package org.biojava.bio.seq.io;
 
-import java.util.*;
-import java.io.*;
+import java.util.Iterator;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.impl.*;
-
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.seq.db.biosql.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.DummySequence;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.db.IllegalIDException;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.db.biosql.BioSQLSequenceDB;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * This SequenceBuilder has a variety of modes of operation.

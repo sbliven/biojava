@@ -21,10 +21,8 @@
 
 package org.biojava.utils.stax;
 
-import java.util.*;
-
-import org.biojava.utils.*;
-import org.xml.sax.*;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * StAX handler for any element which just contains a string.  This class

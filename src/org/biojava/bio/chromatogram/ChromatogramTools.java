@@ -21,10 +21,8 @@
 
 package org.biojava.bio.chromatogram;
 
-import org.biojava.bio.chromatogram.Chromatogram;
-
-import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.IntegerAlphabet;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * Utility class for dealing with {@link Chromatogram}s.

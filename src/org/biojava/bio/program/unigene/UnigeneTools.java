@@ -1,13 +1,32 @@
 package org.biojava.bio.program.unigene;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.regex.*;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.program.tagvalue.*;
+import org.biojava.bio.AnnotationType;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.CardinalityConstraint;
+import org.biojava.bio.PropertyConstraint;
+import org.biojava.bio.program.tagvalue.ChangeTable;
+import org.biojava.bio.program.tagvalue.LineSplitParser;
+import org.biojava.bio.program.tagvalue.ParserListener;
+import org.biojava.bio.program.tagvalue.RegexParser;
+import org.biojava.bio.program.tagvalue.RegexSplitter;
+import org.biojava.bio.program.tagvalue.TagDelegator;
+import org.biojava.bio.program.tagvalue.TagValueContext;
+import org.biojava.bio.program.tagvalue.TagValueListener;
+import org.biojava.bio.program.tagvalue.TagValueParser;
+import org.biojava.bio.program.tagvalue.TagValueWrapper;
+import org.biojava.bio.program.tagvalue.ValueChanger;
+import org.biojava.utils.ParserException;
 
 /**
  * <p>Usefull tools for working with Unigene.</p>

@@ -21,33 +21,29 @@
 
 package org.biojava.bio.chromatogram.graphic;
 
-import org.biojava.bio.chromatogram.Chromatogram;
-import org.biojava.bio.chromatogram.ChromatogramTools;
-
-import org.biojava.bio.BioError;
-import org.biojava.bio.seq.DNATools;
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.symbol.AtomicSymbol;
-import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.SimpleSymbolList;
-import org.biojava.bio.symbol.IllegalSymbolException;
-
-import java.awt.Shape;
-import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Area;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.AffineTransform;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.Stroke;
-import java.awt.BasicStroke;
-import java.util.Map;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+
+import org.biojava.bio.BioError;
+import org.biojava.bio.chromatogram.Chromatogram;
+import org.biojava.bio.chromatogram.ChromatogramTools;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * Encapsulates a configurable method for drawing a {@link Chromatogram} 

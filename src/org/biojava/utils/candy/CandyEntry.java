@@ -26,7 +26,7 @@
  */
 package org.biojava.utils.candy;
 
-import java.util.*;
+import java.util.Hashtable;
 
 /**
  * <p>

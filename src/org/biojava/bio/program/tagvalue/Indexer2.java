@@ -21,12 +21,20 @@
 
 package org.biojava.bio.program.tagvalue;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
-import org.biojava.utils.*;
-import org.biojava.utils.io.*;
-import org.biojava.bio.program.indexdb.*;
+import org.biojava.bio.program.indexdb.IndexStore;
+import org.biojava.utils.ParserException;
+import org.biojava.utils.SmallMap;
+import org.biojava.utils.SmallSet;
+import org.biojava.utils.io.CountedBufferedReader;
+import org.biojava.utils.io.RAF;
 
 /**
  * <p>

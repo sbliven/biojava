@@ -21,14 +21,22 @@
 
 package org.biojava.bio.seq.impl;
 
-import java.util.*;
-import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.RemoteFeature;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SimpleAssembly;
+import org.biojava.bio.seq.db.SequenceDB;
 
 /**
  * A no-frills implementation of a remote feature.

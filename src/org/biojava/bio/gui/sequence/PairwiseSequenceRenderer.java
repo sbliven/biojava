@@ -25,10 +25,9 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-import org.biojava.bio.gui.sequence.SequenceViewerEvent;
-import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeForwarder;
+import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeType;
 
 /**

@@ -20,10 +20,13 @@
  */
 package org.biojava.bio.symbol;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.bio.BioError;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeListener;
 
 /**
  * Uses Arrays.binarySearch to retrieve indecies for symbols. To save on CPU,

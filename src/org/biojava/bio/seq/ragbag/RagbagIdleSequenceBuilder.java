@@ -21,15 +21,14 @@
 
 package org.biojava.bio.seq.ragbag;
 
-import java.util.*;
-import java.io.*;
-
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.seq.impl.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.io.ParseException;
+import org.biojava.bio.seq.io.SequenceBuilder;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * A breakfast cereal of a SequenceBuilder,

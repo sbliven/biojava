@@ -20,13 +20,25 @@
  */
 package org.biojava.bio.program.abi;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.io.CharacterTokenization;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.AbstractAlphabet;
+import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IntegerAlphabet;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.SymbolListViews;
+import org.biojava.utils.ListTools;
 
 /**
  * Useful functionality for working with fasta files where the quality of the

@@ -21,10 +21,14 @@
 
 package org.biojava.bio.seq;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.bio.BioException;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
+import org.biojava.utils.Unchangeable;
 
 /**
  * The interface for objects that contain features.

@@ -22,11 +22,12 @@
 
 package org.biojava.bio.dp;
 
-import java.util.*;
 import java.io.Serializable;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.dist.DistributionFactory;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
 
 /**
  * @author Matthew Pocock

@@ -21,11 +21,22 @@
 
 package org.biojava.bio.seq.io;
 
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
+import java.io.BufferedReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.biojava.bio.BioException;
-import java.io.*;
-import java.util.*;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceIterator;
+import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleAlignment;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * This class implements the AlignmentFormat interface to read FASTA alignments.

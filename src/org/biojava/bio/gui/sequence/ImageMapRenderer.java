@@ -21,16 +21,9 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.net.URL;
-import java.util.Set;
 
-import org.biojava.bio.Annotation;
-import org.biojava.bio.AnnotationType;
-import org.biojava.bio.PropertyConstraint;
 import org.biojava.bio.seq.Feature;
-import org.biojava.utils.ChangeVetoException;
 
 /**
  * <code>ImageMapRenderer</code>s create strings representing

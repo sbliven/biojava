@@ -28,10 +28,21 @@
 
 package org.biojava.stats.svm.tools;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.Iterator;
 
-import org.biojava.stats.svm.*;
+import org.biojava.stats.svm.CachingKernel;
+import org.biojava.stats.svm.DiagonalCachingKernel;
+import org.biojava.stats.svm.NormalizingKernel;
+import org.biojava.stats.svm.PolynomialKernel;
+import org.biojava.stats.svm.SMOTrainer;
+import org.biojava.stats.svm.SVMClassifierModel;
+import org.biojava.stats.svm.SVMTarget;
+import org.biojava.stats.svm.SimpleSVMTarget;
+import org.biojava.stats.svm.SparseVector;
+import org.biojava.stats.svm.TrainingEvent;
+import org.biojava.stats.svm.TrainingListener;
 
 /**
  * @author Ewan Birney

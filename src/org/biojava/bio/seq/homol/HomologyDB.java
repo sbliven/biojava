@@ -20,12 +20,7 @@
  */
 package org.biojava.bio.seq.homol;
  
-import java.io.*;
-import java.util.*;
-
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-import org.biojava.bio.seq.db.*;
+import java.util.List;
 
 /**
  * @author Matthew Pocock

@@ -21,11 +21,9 @@
 
 
 package org.biojava.bio.dp;
-import java.io.Serializable;
-
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * This class computes the score that is used to be used

@@ -20,12 +20,10 @@
  */
 package org.biojava.bio.program.tagvalue;
 
-import java.util.Map;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 import org.biojava.utils.ParserException;
-import org.biojava.utils.SmallMap;
 
 /**
  * <p>

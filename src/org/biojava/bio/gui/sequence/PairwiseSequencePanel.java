@@ -22,12 +22,12 @@
 package org.biojava.bio.gui.sequence;
 
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Point;
-import java.awt.Shape;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -38,18 +38,20 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.util.ArrayList;
+
 import javax.swing.JComponent;
 
-import org.biojava.bio.gui.sequence.SequenceViewerEvent;
-import org.biojava.bio.gui.sequence.SequenceViewerListener;
-import org.biojava.bio.gui.sequence.SequenceViewerMotionListener;
-import org.biojava.bio.gui.sequence.SequenceViewerMotionSupport;
-import org.biojava.bio.gui.sequence.SequenceViewerSupport;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.utils.*;
+import org.biojava.utils.ChangeAdapter;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
 
 /**
  * <p>A <code>PairwiseSequencePanel</code> is a panel that displays a

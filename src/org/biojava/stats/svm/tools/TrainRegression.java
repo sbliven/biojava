@@ -28,10 +28,15 @@
 
 package org.biojava.stats.svm.tools;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.biojava.stats.svm.*;
+import org.biojava.stats.svm.PolynomialKernel;
+import org.biojava.stats.svm.SMORegressionTrainer;
+import org.biojava.stats.svm.SVMRegressionModel;
+import org.biojava.stats.svm.SparseVector;
 
 /**
  * @author Ewan Birney

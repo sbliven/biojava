@@ -22,8 +22,12 @@
 
 package org.biojava.bio.dist;
 
-import org.biojava.bio.symbol.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.IllegalAlphabetException;
 
 /**
  * Default factory for Order-N distributions.

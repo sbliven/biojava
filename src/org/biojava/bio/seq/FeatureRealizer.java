@@ -21,7 +21,7 @@
 
 package org.biojava.bio.seq;
 
-import org.biojava.bio.*;
+import org.biojava.bio.BioException;
 
 /**
  * Interface for translators which map from Feature.Template

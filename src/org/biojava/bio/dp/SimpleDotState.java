@@ -24,8 +24,8 @@ package org.biojava.bio.dp;
 
 import java.io.Serializable;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.symbol.FundamentalAtomicSymbol;
 
 /**
  * A Dot state that you can make and use.

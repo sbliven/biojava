@@ -21,9 +21,12 @@
 
 package org.biojava.bio.program.gff;
 
-import java.util.*;
-import org.biojava.utils.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.utils.SmallMap;
 
 /**
  * A no-frills implementation of a <span class="type">GFFRecord</span>.

@@ -20,9 +20,8 @@
  */
 package org.biojava.bio.taxa;
 
-import java.util.*;
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * A no-frills implementatation of Taxon.

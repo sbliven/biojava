@@ -22,13 +22,19 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
-import org.biojava.bio.*;
-import org.biojava.utils.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.seq.io.SeqIOAdapter;
+import org.biojava.bio.seq.io.StreamParser;
+import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Basic implementation of SymbolList.  This

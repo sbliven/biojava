@@ -24,14 +24,12 @@ package org.biojava.bio.program.ssbind;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-
 import org.biojava.bio.program.xff.ElementRecognizer;
-import org.biojava.bio.search.SearchContentHandler;
 import org.biojava.utils.stax.DelegationManager;
 import org.biojava.utils.stax.StAXContentHandler;
 import org.biojava.utils.stax.StAXContentHandlerBase;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * <code>SeqSimilarityStAXHandler</code> is a base class for creating

@@ -26,9 +26,21 @@
 
 package org.biojava.stats.svm.tools;
 
-import java.io.*;
-import java.util.*;
-import org.biojava.stats.svm.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+
+import org.biojava.stats.svm.CachingKernel;
+import org.biojava.stats.svm.PolynomialKernel;
+import org.biojava.stats.svm.RadialBaseKernel;
+import org.biojava.stats.svm.SVMClassifierModel;
+import org.biojava.stats.svm.SVMKernel;
+import org.biojava.stats.svm.SimpleSVMClassifierModel;
+import org.biojava.stats.svm.SparseVector;
 
 /**
  * @author Thomas Down

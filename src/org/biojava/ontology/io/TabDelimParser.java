@@ -1,11 +1,17 @@
 package org.biojava.bio.ontology.io;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.StringTokenizer;
 
-import org.biojava.utils.ChangeVetoException;
 import org.biojava.bio.BioError;
-import org.biojava.bio.ontology.*;
+import org.biojava.bio.ontology.AlreadyExistsException;
+import org.biojava.bio.ontology.Ontology;
+import org.biojava.bio.ontology.OntologyException;
+import org.biojava.bio.ontology.OntologyFactory;
+import org.biojava.bio.ontology.Term;
+import org.biojava.bio.ontology.Triple;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Parse tab-delimited ontology files into Ontology objects.

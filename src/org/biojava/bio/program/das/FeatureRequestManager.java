@@ -21,18 +21,20 @@
 
 package org.biojava.bio.program.das;
 
-import java.util.*;
-import java.net.*;
-import java.io.*;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.biojava.bio.*;
-import org.biojava.utils.*;
-import org.biojava.utils.stax.*;
-
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.program.xff.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.io.ParseException;
+import org.biojava.bio.seq.io.SeqIOListener;
+import org.biojava.bio.symbol.Location;
 
 /**
  * Queue and schedule requests for DAS features.

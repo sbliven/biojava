@@ -21,16 +21,15 @@
 
 package org.biojava.bio.seq.io.game;
 
-import java.util.*;
+import java.util.ListIterator;
 
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-
-import org.biojava.utils.*;
-import org.biojava.utils.stax.*;
-import org.xml.sax.*;
+import org.biojava.bio.SmallAnnotation;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.stax.StAXContentHandler;
+import org.xml.sax.Attributes;
 
 /**
  * Handles the &lt;feature_span&gt; element

@@ -21,11 +21,20 @@
 
 package org.biojava.bio.program.indexdb;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-import org.biojava.bio.*;
-import org.biojava.utils.*;
+import org.biojava.bio.AnnotationType;
+import org.biojava.bio.BioException;
+import org.biojava.bio.CardinalityConstraint;
+import org.biojava.bio.PropertyConstraint;
+import org.biojava.utils.AssertionFailure;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.CommitFailure;
+import org.biojava.utils.SmallMap;
 import org.biojava.utils.lsid.LifeScienceIdentifier;
 
 /**

@@ -1,12 +1,14 @@
 package org.biojava.bio.program.gff3;
 
-import java.util.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.ontology.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.program.gff.*;
-import org.biojava.utils.*;
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.SmallAnnotation;
+import org.biojava.bio.ontology.OntoTools;
+import org.biojava.bio.ontology.Term;
+import org.biojava.bio.program.gff.GFFTools;
+import org.biojava.bio.seq.StrandedFeature;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeListener;
 
 /**
  * A record in a GFF3 formatted file.

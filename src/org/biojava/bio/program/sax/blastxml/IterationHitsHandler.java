@@ -12,11 +12,10 @@
 package org.biojava.bio.program.sax.blastxml;
 
 import org.biojava.bio.seq.io.game.ElementRecognizer;
-import org.biojava.utils.stax.*;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
-
-import java.util.*;
+import org.biojava.utils.stax.StAXContentHandler;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 
 class IterationHitsHandler
     extends StAXFeatureHandler

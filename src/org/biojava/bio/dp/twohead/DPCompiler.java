@@ -22,16 +22,49 @@
 
 package org.biojava.bio.dp.twohead;
 
-import java.util.*;
-import java.lang.reflect.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-import org.biojava.utils.*;
-import org.biojava.utils.bytecode.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
-import org.biojava.bio.dp.*;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.dp.BackPointer;
+import org.biojava.bio.dp.DP;
+import org.biojava.bio.dp.EmissionState;
+import org.biojava.bio.dp.IllegalTransitionException;
+import org.biojava.bio.dp.MagicalState;
+import org.biojava.bio.dp.MarkovModel;
+import org.biojava.bio.dp.ScoreType;
+import org.biojava.bio.dp.State;
+import org.biojava.bio.symbol.AlphabetIndex;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.utils.bytecode.ByteCode;
+import org.biojava.utils.bytecode.CodeClass;
+import org.biojava.utils.bytecode.CodeException;
+import org.biojava.utils.bytecode.CodeField;
+import org.biojava.utils.bytecode.CodeGenerator;
+import org.biojava.utils.bytecode.CodeMethod;
+import org.biojava.utils.bytecode.CodeUtils;
+import org.biojava.utils.bytecode.GeneratedClassLoader;
+import org.biojava.utils.bytecode.GeneratedCodeClass;
+import org.biojava.utils.bytecode.GeneratedCodeMethod;
+import org.biojava.utils.bytecode.IfExpression;
+import org.biojava.utils.bytecode.InstructionVector;
+import org.biojava.utils.bytecode.IntrospectedCodeClass;
+import org.biojava.utils.bytecode.LocalVariable;
 
 /**
  * This is an implementation of CellCalculatorFactoryMaker that compiles the

@@ -21,17 +21,38 @@
 
 package org.biojava.bio.program.das;
 
-import java.util.*;
-import java.net.*;
-import java.io.*;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.biojava.bio.*;
-import org.biojava.utils.*;
-import org.biojava.utils.cache.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.program.xff.*;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.BioRuntimeException;
+import org.biojava.bio.SmallAnnotation;
+import org.biojava.bio.program.xff.XFFFeatureSetHandler;
+import org.biojava.bio.seq.ComponentFeature;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.FilterUtils;
+import org.biojava.bio.seq.MergeFeatureHolder;
+import org.biojava.bio.seq.RealizingFeatureHolder;
+import org.biojava.bio.seq.SimpleFeatureHolder;
+import org.biojava.bio.seq.io.ParseException;
+import org.biojava.bio.seq.io.SeqIOAdapter;
+import org.biojava.bio.seq.io.SeqIOListener;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.LocationTools;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Unchangeable;
+import org.biojava.utils.cache.CacheReference;
 
 /**
  * FeatureHolder reflecting features provided by a DAS annotation

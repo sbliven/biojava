@@ -22,11 +22,6 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
 
 /**
  * This extends SymbolList with API for manipulating, inserting and deleting

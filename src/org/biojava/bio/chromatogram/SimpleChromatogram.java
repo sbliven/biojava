@@ -21,13 +21,13 @@
 
 package org.biojava.bio.chromatogram;
 
-import org.biojava.bio.symbol.AtomicSymbol;
-import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.symbol.IllegalAlphabetException;
-import org.biojava.utils.SmallMap;
-
 import java.util.Map;
+
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.SmallMap;
 
 /**
  * A basic chromatogram implementation which provides public mutators 

@@ -21,7 +21,9 @@
 
 package org.biojava.bio.seq.db;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <code>DummySequenceDBInstallation</code> is an implementation which

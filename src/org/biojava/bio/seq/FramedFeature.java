@@ -21,9 +21,7 @@
 
 package org.biojava.bio.seq;
 
-import java.io.*;
-
-import org.biojava.bio.symbol.*;
+import java.io.Serializable;
 
 /**
  * Title:         FramedFeature.<p>

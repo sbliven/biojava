@@ -21,8 +21,7 @@
 
 package org.biojava.bio.seq;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.*;
+import org.biojava.bio.symbol.Location;
 
 /**
  * Feature which represents a component in an assembly (contig).

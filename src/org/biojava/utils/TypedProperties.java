@@ -20,8 +20,15 @@
  */
 package org.biojava.utils;
 
-import java.util.*;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.StringTokenizer;
 
 /**
  * a sub-class of java.util.Properties that provides the same constructors, adds two convenient load methods to load

@@ -1,6 +1,9 @@
 package org.biojava.bio.program.ssaha;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A listener that merges overlapping hits and culls all hits under a given

@@ -1,19 +1,34 @@
 package org.biojava.bio.program.unigene;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.AbstractSet;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-import org.biojava.utils.*;
-import org.biojava.utils.cache.*;
-import org.biojava.utils.io.*;
-import org.biojava.bio.*;
-import org.biojava.bio.program.indexdb.*;
-import org.biojava.bio.program.tagvalue.*;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.db.*;
-import org.biojava.bio.seq.io.*;
-
-import org.biojava.bio.program.indexdb.IndexStore;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.program.indexdb.BioStore;
+import org.biojava.bio.program.indexdb.Record;
+import org.biojava.bio.program.tagvalue.AnnotationBuilder;
+import org.biojava.bio.program.tagvalue.Parser;
+import org.biojava.bio.program.tagvalue.ParserListener;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.db.AbstractSequenceDB;
+import org.biojava.bio.seq.db.CachingSequenceDB;
+import org.biojava.bio.seq.db.IllegalIDException;
+import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.io.FastaFormat;
+import org.biojava.bio.seq.io.SeqIOTools;
+import org.biojava.bio.seq.io.SequenceFormat;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.ParserException;
+import org.biojava.utils.Unchangeable;
+import org.biojava.utils.cache.WeakValueHashMap;
+import org.biojava.utils.io.RandomAccessReader;
 
 /**
  * A UnigeneDB that uses flat-file indexing.

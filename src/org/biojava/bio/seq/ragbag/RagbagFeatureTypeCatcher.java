@@ -21,15 +21,14 @@
  
 package org.biojava.bio.seq.ragbag;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.seq.io.SequenceBuilder;
 import org.biojava.bio.seq.io.SequenceBuilderFilter;
-import org.biojava.bio.seq.io.SeqIOListener;
-
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Collections;
 
 /**
  * A class that assists in wrapping a feature filter

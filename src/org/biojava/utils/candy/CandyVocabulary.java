@@ -26,9 +26,8 @@
  */
 package org.biojava.utils.candy;
 
-import org.biojava.utils.*;
-import java.util.*;
-import java.beans.*;
+import java.beans.PropertyChangeListener;
+import java.util.Enumeration;
 
 /**
  * <p>

@@ -20,12 +20,8 @@
  */
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
-import java.lang.reflect.*;
-
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import java.util.Collections;
+import java.util.Iterator;
 
 /**
  * Base class for simple contiguous Location implementations.

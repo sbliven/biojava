@@ -20,9 +20,7 @@
  */
 package org.biojava.bio.symbol;
 
-import java.util.*;
-
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.DNATools;
 
 /**
  * A <code>Packing</code> implementation which handles the DNA alphabet, without any

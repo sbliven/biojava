@@ -21,9 +21,8 @@
 
 package org.biojava.bio.ontology; 
  
-import java.util.*;
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.bio.Annotation;
+import org.biojava.utils.ChangeForwarder;
 
 /**
  * A term in another ontology.

@@ -21,11 +21,7 @@
 
 package org.biojava.bio.program.gff;
 
-import java.io.*;
-import java.util.*;
-
-import org.biojava.bio.*;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.StrandedFeature;
 
 /**
  * A filter that will accept or reject a <span class="type">GFFEntry</span>.

@@ -1,9 +1,8 @@
 package org.biojava.utils.io;
 
-import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
-import java.util.*;
+import java.io.IOException;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 
 import org.biojava.utils.Constants;
 

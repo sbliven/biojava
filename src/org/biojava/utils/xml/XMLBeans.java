@@ -21,9 +21,18 @@
 
 package org.biojava.utils.xml;
 
-import java.util.*;
-import java.beans.*;
-import org.w3c.dom.*;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * Construct java beans from XML elements

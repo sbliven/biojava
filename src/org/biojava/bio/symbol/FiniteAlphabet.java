@@ -23,11 +23,8 @@
 package org.biojava.bio.symbol;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.io.*;
-import java.lang.reflect.*;
 
-import org.biojava.utils.*;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * An alphabet over a finite set of Symbols.

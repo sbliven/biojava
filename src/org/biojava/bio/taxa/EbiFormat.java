@@ -20,9 +20,10 @@
  */
 package org.biojava.bio.taxa;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.StringTokenizer;
 
-import org.biojava.utils.*;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Encapsulate the 'EBI' species format used in Embl, Genbank and Swissprot

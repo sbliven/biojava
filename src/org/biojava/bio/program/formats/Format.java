@@ -1,8 +1,9 @@
 package org.biojava.bio.program.formats;
 
-import org.biojava.utils.lsid.*;
-import org.biojava.bio.*;
-import org.biojava.bio.program.tagvalue.*;
+import org.biojava.bio.AnnotationType;
+import org.biojava.bio.program.tagvalue.ParserListener;
+import org.biojava.bio.program.tagvalue.TagValueListener;
+import org.biojava.utils.lsid.LifeScienceIdentifier;
 
 /**
  * A file format supported by the tag-value event-based parsing system.

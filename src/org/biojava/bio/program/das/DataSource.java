@@ -20,12 +20,10 @@
  */
 package org.biojava.bio.program.das;
 
-import java.net.*;
-import java.util.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.utils.*;
-import org.biojava.bio.seq.distributed.*;
+import java.net.URL;
+
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.distributed.DistDataSource;
 
 /**
  * Reflect a datasource (reference or annotation) in the DAS1 network.

@@ -21,12 +21,14 @@
 
 package org.biojava.bio.program.das;
 
-import java.util.*;
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Map;
 
-import org.biojava.directory.*;
-import org.biojava.bio.*;
-import org.biojava.bio.seq.db.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.db.SequenceDBLite;
+import org.biojava.directory.RegistryException;
+import org.biojava.directory.SequenceDBProvider;
 
 /**
  * Hook DAS into the OBDA directory system.  Not for end users.

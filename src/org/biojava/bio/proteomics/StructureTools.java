@@ -20,9 +20,11 @@
  */
 package org.biojava.bio.proteomics;
 
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.BioError;
 import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.AtomicSymbol;
+import org.biojava.bio.symbol.FiniteAlphabet;
 
 /**
  * Simple access to protein seccondary structure assignments.

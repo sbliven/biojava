@@ -20,9 +20,13 @@
  */
 package org.biojava.bio.taxa;
 
-import java.util.*;
-import java.lang.ref.*;
-import org.biojava.utils.*;
+import java.lang.ref.WeakReference;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
+
+import org.biojava.utils.SmallSet;
 
 /**
  * <p>An implementation of TaxonFactory that builds a weak in-memory

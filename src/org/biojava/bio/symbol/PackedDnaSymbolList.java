@@ -21,11 +21,10 @@
 
 package org.biojava.bio.symbol;
 
-import org.biojava.bio.BioException;
+import java.io.Serializable;
 
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.*;
-import java.io.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.DNATools;
 
 /**
  * a class that implements storage of symbols

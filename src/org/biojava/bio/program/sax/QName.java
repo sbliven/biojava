@@ -20,9 +20,7 @@
  */
 package org.biojava.bio.program.sax;
 
-import java.util.*;
-
-import java.io.*;
+import java.util.StringTokenizer;
 
 /**
  * A utility class with package level visibility for dealing 

@@ -21,10 +21,17 @@
 
 package org.biojava.bio;
 
-import java.util.*;
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
-import org.biojava.utils.*;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * A utility class to ease the problem of implementing an Annotation to that of

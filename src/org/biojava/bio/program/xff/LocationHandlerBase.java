@@ -21,12 +21,13 @@
 
 package org.biojava.bio.program.xff;
 
-import java.util.*;
-
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
-import org.biojava.utils.stax.*;
-import org.xml.sax.*;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.utils.stax.DelegationManager;
+import org.biojava.utils.stax.StAXContentHandler;
+import org.biojava.utils.stax.StAXContentHandlerBase;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * Handler to the XFF location type.  To use this, write a simple

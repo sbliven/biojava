@@ -21,9 +21,10 @@
 
 package org.biojava.bio.ontology; 
  
-import java.util.*;
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.Annotation;
+import org.biojava.bio.SmallAnnotation;
+import org.biojava.utils.ChangeType;
 
 /**
  * A term in an ontology.  This has an {@link org.biojava.bio.Annotation Annotation}

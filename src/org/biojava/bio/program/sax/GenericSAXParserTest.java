@@ -23,10 +23,6 @@ package org.biojava.bio.program.sax;
 
 import org.xml.sax.ContentHandler;
 import org.xml.sax.XMLReader;
-import org.xml.sax.SAXException;
-import org.xml.sax.InputSource;
-import java.util.*;
-import java.io.*;
 
 /**
  * Test application for use by SAX Parser writers.  Allows simple functions

@@ -21,10 +21,7 @@
 
 package org.biojava.bio.program.tagvalue;
 
-import java.util.Map;
-
 import org.biojava.utils.ParserException;
-import org.biojava.utils.SmallMap;
 
 /**
  * <p>

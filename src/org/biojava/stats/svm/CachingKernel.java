@@ -26,7 +26,8 @@
 
 package org.biojava.stats.svm;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>

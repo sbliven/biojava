@@ -21,12 +21,8 @@
 
 package org.biojava.bio.seq.io;
 
-import java.util.*;
-import java.io.*;
-
-import org.biojava.bio.seq.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.*;
+import java.io.Serializable;
+import java.util.StringTokenizer;
 
 /**
  * Simple filter which performs a default extraction of data from

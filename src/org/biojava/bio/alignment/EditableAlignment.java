@@ -22,11 +22,10 @@
 
 package org.biojava.bio.alignment;
 
-import java.util.*;
-import java.io.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.utils.*;
+import org.biojava.bio.symbol.Edit;
+import org.biojava.bio.symbol.Location;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * <p>EditableAlignment is an interface that defines methods for

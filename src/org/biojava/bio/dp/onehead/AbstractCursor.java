@@ -22,9 +22,10 @@
 
 package org.biojava.bio.dp.onehead;
 
-import java.util.*;
+import java.util.Iterator;
 
-import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.Symbol;
 
 /**
  * An abstract instance of a single-head DP cursor.

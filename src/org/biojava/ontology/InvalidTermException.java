@@ -21,7 +21,6 @@
 
 package org.biojava.bio.ontology;
 
-import org.biojava.bio.BioException;
 
 /**
  * Thrown to indicate that an ontology term is not acceptable or

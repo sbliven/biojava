@@ -20,8 +20,9 @@
  */
 package org.biojava.bio.taxa;
 
-import java.util.*;
-import java.lang.ref.*;
+import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * <p>An implementation of Taxon that keeps only weak references to

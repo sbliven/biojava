@@ -21,11 +21,12 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import org.biojava.utils.*;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.utils.Unchangeable;
 
 /**
  * a simple indexer for a full DNA alphabet including

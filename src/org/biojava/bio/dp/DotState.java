@@ -22,7 +22,6 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.symbol.*;
 
 /**
  * <p>

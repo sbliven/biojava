@@ -21,9 +21,16 @@
 
 package org.biojava.bio.seq.impl;
 
-import org.biojava.utils.*;
-import org.biojava.bio.seq.*;
-import java.util.*;
+import java.util.Iterator;
+
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * FeatureHolder which lazily applies a specified filter to another FeatureHolder.

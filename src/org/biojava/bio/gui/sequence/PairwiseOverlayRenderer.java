@@ -21,15 +21,21 @@
 
 package org.biojava.bio.gui.sequence;
 
+import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.io.Serializable;
-import java.awt.Graphics2D;
-import java.awt.event.MouseEvent;
 
-import org.biojava.utils.*;
+import org.biojava.utils.AbstractChangeable;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeForwarder;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeType;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.Changeable;
 
 /**
  * <code>PairwiseOverlayRenderer</code> allows a list of other

@@ -21,7 +21,7 @@
 
 package org.biojava.bio.program.gff;
 
-import java.util.*;
+import java.util.Map;
 
 import org.biojava.bio.seq.StrandedFeature;
 

@@ -21,14 +21,19 @@
 
 package org.biojava.bio.program.hmmer;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.dist.*;
-import org.biojava.bio.dp.*;
-
-import java.util.*; 
-import java.io.*; 
+import org.biojava.bio.Annotation;
+import org.biojava.bio.dist.Distribution;
+import org.biojava.bio.dist.DistributionFactory;
+import org.biojava.bio.dp.DotState;
+import org.biojava.bio.dp.EmissionState;
+import org.biojava.bio.dp.IllegalTransitionException;
+import org.biojava.bio.dp.ProfileHMM;
+import org.biojava.bio.dp.State;
+import org.biojava.bio.symbol.Alphabet;
+import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.utils.ChangeVetoException;
  
 
 

@@ -1,9 +1,13 @@
 package org.biojava.bio.program.tagvalue;
 
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.biojava.utils.*;
-import org.biojava.bio.*;
+import org.biojava.bio.AnnotationType;
+import org.biojava.bio.CardinalityConstraint;
+import org.biojava.bio.CollectionConstraint;
+import org.biojava.bio.PropertyConstraint;
+import org.biojava.utils.ParserException;
 
 /**
  * This is intended as a repository for tag-value and AnnotationType information

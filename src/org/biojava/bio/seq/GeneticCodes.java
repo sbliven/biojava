@@ -21,8 +21,8 @@
 
 package org.biojava.bio.seq;
 
-import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * Collects the references to translation methods in one place.  Right now this

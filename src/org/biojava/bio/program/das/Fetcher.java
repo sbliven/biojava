@@ -21,22 +21,11 @@
 
 package org.biojava.bio.program.das;
 
-import java.util.*;
-import java.util.zip.*;
-import java.net.*;
-import java.io.*;
+import java.net.URL;
+import java.util.List;
 
-import org.biojava.bio.*;
-import org.biojava.utils.*;
-import org.biojava.utils.stax.*;
-
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.io.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.program.xff.*;
-
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.io.ParseException;
 
 /**
  * Encapsulate a single batch of feature requests to a DAS server.

@@ -22,17 +22,27 @@
 
 package  org.biojava.bio.seq.io;
 
-import  org.biojava.bio.seq.io.AlignmentFormat;
-import  org.biojava.bio.symbol.Alignment;
-import  org.biojava.bio.symbol.*;
-import  org.biojava.bio.BioException;
-import  java.io.BufferedReader;
-import  org.biojava.bio.seq.*;
-import  org.biojava.bio.seq.io.*;
-import  java.lang.Integer;
-import  java.io.*;
-import  java.util.*;
-import  java.util.regex.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.biojava.bio.BioException;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.ProteinTools;
+import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.symbol.FiniteAlphabet;
+import org.biojava.bio.symbol.IllegalSymbolException;
+import org.biojava.bio.symbol.SimpleAlignment;
+import org.biojava.bio.symbol.SimpleSymbolList;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * @author raemig

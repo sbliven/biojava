@@ -20,9 +20,12 @@
  */
 package org.biojava.bio.program.blast2html;
 
-import java.util.*;
-import java.io.*;
 import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.StringTokenizer;
 
 /**
  * <p>

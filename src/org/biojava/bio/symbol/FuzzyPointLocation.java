@@ -21,10 +21,11 @@
 
 package org.biojava.bio.symbol;
 
-import java.util.*;
-import java.io.*;
+import java.util.AbstractList;
+import java.util.Collections;
+import java.util.Iterator;
 
-import org.biojava.bio.*;
+import org.biojava.bio.BioError;
 
 /**
  * <code>FuzzyPointLocation</code> represents two types of EMBL-style

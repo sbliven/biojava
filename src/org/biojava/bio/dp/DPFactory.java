@@ -22,10 +22,11 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.*;
-
+import org.biojava.bio.BioException;
 import org.biojava.bio.dp.onehead.SingleDP;
-import org.biojava.bio.dp.twohead.*;
+import org.biojava.bio.dp.twohead.CellCalculatorFactoryMaker;
+import org.biojava.bio.dp.twohead.DPInterpreter;
+import org.biojava.bio.dp.twohead.PairwiseDP;
 
 /**
  * The interface for objects that can generate a DP object for a MarkovModel.

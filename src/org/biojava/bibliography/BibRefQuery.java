@@ -26,9 +26,9 @@
  */
 package org.biojava.bibliography;
 
-import org.biojava.utils.*;
-import java.util.*;
-import java.io.*;
+import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  * <p>
