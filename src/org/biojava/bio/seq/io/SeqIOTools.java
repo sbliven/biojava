@@ -84,6 +84,14 @@ public final class SeqIOTools  {
         }
     }
 
+    private static SymbolTokenization getNucleotideParser() {
+        try {
+            return NucleotideTools.getNucleotide().getTokenization("token");
+        } catch (BioException ex) {
+            throw new BioError(ex, "Assertion failing: Couldn't get nucleotide token parser");
+        }
+    }
+
     private static SymbolTokenization getProteinParser() {
         try {
             return ProteinTools.getTAlphabet().getTokenization("token");
@@ -120,6 +128,16 @@ public final class SeqIOTools  {
         return new StreamReader(br,
                                 new EmblLikeFormat(),
                                 getRNAParser(),
+                                getEmblBuilderFactory());
+    }
+
+    /**
+     * Iterate over the sequences in an EMBL-format stream.
+     */
+    public static SequenceIterator readEmblNucleotide(BufferedReader br) {
+        return new StreamReader(br,
+                                new EmblLikeFormat(),
+                                getNucleotideParser(),
                                 getEmblBuilderFactory());
     }
 
@@ -206,7 +224,7 @@ public final class SeqIOTools  {
                                 getDNAParser(),
                                 getFastaBuilderFactory());
     }
-    
+
     /**
      * Iterate over the sequences in an FASTA-format stream of RNA sequences.
      */
@@ -374,7 +392,7 @@ public final class SeqIOTools  {
             }
         } catch (RESyntaxException e) {
             // FIXME (kj): don't just swallow exceptions and don't print from lib
-            System.out.println("guessFileType -- Problem with regular expression matching for:" + seqFile);            
+            System.out.println("guessFileType -- Problem with regular expression matching for:" + seqFile);
         }
 
         //Reads the file to guess based on content
