@@ -66,7 +66,7 @@ public class Formats {
     td.setParserListener("FT", ftParser, ftListener);
     td.setListener("ID", new RegexFieldFinder(
       listener,
-      Pattern.compile("(\\w+)\\s+(\\w+);\\s+(\\w+);\\s+(\\w+);\\s+(\\d+)\\s+BP\\."),
+      Pattern.compile("(\\w+)\\s+(\\w+);\\s+(.*?);\\s+(\\w+);\\s+(\\d+)\\s+BP\\."),
       new String[] { "ID", "TYPE", "MOLECULE", "DIVISION", "SIZE" },
       true
     ));

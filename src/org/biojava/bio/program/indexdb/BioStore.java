@@ -232,7 +232,7 @@ public class BioStore implements IndexStore {
                 Map.Entry me = (Map.Entry) mei.next();
                 String sid = (String) me.getKey();
                 List sfl = (List) idToList.get(sid);
-                List svals = (List) me.getValue();
+                Collection svals = (Collection) me.getValue();
                 for (Iterator i = svals.iterator(); i.hasNext(); ) {
                     String sval = (String) i.next();
                     sfl.add(new KeyPair.Impl(sval, id));

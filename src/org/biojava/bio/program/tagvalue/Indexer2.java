@@ -138,17 +138,21 @@ implements TagValueListener {
       Frame top = (Frame) stack.peek();
       Frame frame = new Frame();
       
+      //System.out.println("Tag: " + tag);
+      //System.out.println("Deth: " + depth);
+      //System.out.println("Top: " + top);
+
       for(Iterator ki = top.paths.iterator(); ki.hasNext(); ) {
         Object[] keyPath = (Object[]) ki.next();
-        if(keyPath[depth].equals(tag)) {
-          if(keyPath.length == depth + 1) {
+        if(keyPath[depth-1].equals(tag)) {
+          if((keyPath.length-1) == depth) {
             frame.addKey(keyPath);
           } else {
             frame.paths.add(keyPath);
           }
         }
       }
-      
+      //System.out.println("Pushing new stack frame: " + top + " <- " + frame);
       stack.push(frame);
     }
     
@@ -157,18 +161,21 @@ implements TagValueListener {
   
   public void startTag(Object tag) {
     this.tag = tag;
+    //if(depth >= 2) System.out.println("tag: " + tag);
   }
   
   public void value(TagValueContext ctxt, Object value) {
     Frame frame = (Frame) stack.peek();
     Object[] keyPath = (Object []) frame.getKeyPath(tag);
-    
     if(keyPath != null) {
+      //if(depth >= 2) System.out.println("Interested in: " + tag + " -> " + value);
       KeyState ks = (KeyState) keyValues.get(keyPath);
       if(ks == null) {
-        keyValues.put(tag, ks = new KeyState(keys.get(keyPath).toString()));
+        //if(depth >= 2) System.out.println("Allocating stoorage");
+        keyValues.put(keyPath, ks = new KeyState(keys.get(keyPath).toString()));
       }
       ks.values.add(value);
+      //if(depth >= 2) System.out.println(keyValues);
     }
   }
   
@@ -181,6 +188,7 @@ implements TagValueListener {
     if(depth == 0) {
       int length = (int) (reader.getFilePointer() - offset);
 
+      //System.out.println("keyValues: " + keyValues);
       String primaryKeyValue = null;
       Map secKeys = new SmallMap();
       for(Iterator i = keyValues.keySet().iterator(); i.hasNext(); ) {
@@ -197,13 +205,14 @@ implements TagValueListener {
         } else {
           secKeys.put(ks.keyName, ks.values);
         }
-        
-        ks.values.clear();
       }
       
       if(primaryKeyValue == null) {
         throw new NullPointerException("No primary key");
       }
+
+      //System.out.println("Primary: " + primaryKeyValue);
+      //System.out.println("Secondaries: " + secKeys);
 
       indexStore.writeRecord(
         file,
@@ -214,6 +223,10 @@ implements TagValueListener {
       );
       
       stack.clear();
+      for(Iterator i = keyValues.values().iterator(); i.hasNext(); ) {
+        KeyState ks = (KeyState) i.next();
+        ks.values.clear();
+      }
     } else {
       stack.pop();
     }
@@ -227,8 +240,13 @@ implements TagValueListener {
       keys.put(keyPath[keyPath.length - 1], keyPath);
     }
     
+    
     public Object[] getKeyPath(Object tag) {
       return (Object []) keys.get(tag);
+    }
+
+    public String toString() {
+      return this.getClass() + ": (" + keys + "\t" + paths + " )";
     }
   }
   
@@ -238,6 +256,10 @@ implements TagValueListener {
     
     public KeyState(String keyName) {
       this.keyName = keyName;
+    }
+
+    public String toString() {
+      return this.getClass() + ": (" + keyName + " " + values + ")";
     }
   }
 }

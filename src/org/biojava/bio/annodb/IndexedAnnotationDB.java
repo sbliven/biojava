@@ -47,6 +47,7 @@ implements AnnotationDB {
     BioStoreFactory bsf = new BioStoreFactory();
     bsf.setStoreName(dbName);
     bsf.setPrimaryKey(model.getPrimaryKeyName());
+    bsf.setStoreLocation(storeLoc);
     
     for(Iterator i = model.getKeys().iterator(); i.hasNext(); ) {
       String key = (String) i.next();
@@ -195,18 +196,18 @@ implements AnnotationDB {
     return annBuilder.getLast();
   }
   
-  public interface ParserListenerFactory
+  public static interface ParserListenerFactory
   extends Serializable {
     public ParserListener getParserListener(TagValueListener listener);
   }
   
-  public class StaticMethodRPFactory
+  public static class StaticMethodRPFactory
   implements ParserListenerFactory {
     private final  Method method;
     
     public StaticMethodRPFactory(Method method)
     throws IllegalArgumentException {
-      if(method.getModifiers() != Modifier.STATIC) {
+      if( (method.getModifiers() & Modifier.STATIC) != Modifier.STATIC ) {
         throw new IllegalArgumentException("Method must be static");
       }
       

@@ -40,13 +40,17 @@ extends TagValueWrapper {
 
   public void value(TagValueContext ctxt, Object val)
   throws ParserException {
-    Matcher m = pattern.matcher(val.toString());
-    m.find();
-
-    for(int i = 0; i < tags.length; i++) {
-      super.startTag(tags[i]);
-      super.value(ctxt, m.group(i + 1));
-      super.endTag();
+    try {
+      Matcher m = pattern.matcher(val.toString());
+      m.find();
+      
+      for(int i = 0; i < tags.length; i++) {
+        super.startTag(tags[i]);
+        super.value(ctxt, m.group(i + 1));
+        super.endTag();
+      }
+    } catch (IllegalStateException ise) {
+      throw new ParserException("Problem matching " + pattern.pattern() + " to " + val);
     }
   }
 }   
