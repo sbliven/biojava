@@ -181,16 +181,25 @@ public final class LifeScienceIdentifier
     {
 	try 
 	{
-	    StringTokenizer st = new StringTokenizer(lsid, ":");
-	    
-	    if (st.countTokens() >= 4)
+	    StringTokenizer st = new StringTokenizer(lsid, ":", true);
+
+	    int count = st.countTokens();
+	    if (count >= 7)
 	    {
 		String authority = st.nextToken();
+		st.nextToken();
 		String namespace = st.nextToken();
-		String objectId = st.nextToken();
+		st.nextToken();
+		String objectId = st.nextToken(); 
+		st.nextToken();
 		int version = Integer.parseInt(st.nextToken());
 		
 		String security = null;
+		if (count >= 8)
+		{
+		    st.nextToken();
+		    security = "";
+		}
 		if (st.hasMoreTokens())
 		{
 		    security = st.nextToken();
