@@ -746,8 +746,6 @@ public class TranslatedSequencePanel extends JComponent
 
         if (! isActive())
         {
-            leadingBorder.setSize(0.0);
-            trailingBorder.setSize(0.0);
             d = new Dimension(0, 0);
         }
         else
