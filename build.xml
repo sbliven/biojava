@@ -206,7 +206,7 @@
 />
        <group title="Experimental/New Packages"
               
-packages="org.biojava.bio.proteomics:org.biojava.stats.svm:org.biojava.stats.svm.tools:org.biojava.bio.seq.homol:org.biojava.bio.program.ragbag"
+packages="org.biojava.bio.proteomics:org.biojava.stats.svm:org.biojava.stats.svm.tools:org.biojava.bio.seq.homol:org.biojava.bio.seq.ragbag"
 />
        <group title="User Interface Components"
               packages="org.biojava.bio.gui:org.biojava.bio.gui.sequence" />
