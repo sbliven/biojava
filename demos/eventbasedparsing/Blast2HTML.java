@@ -107,7 +107,7 @@ public class Blast2HTML {
 	HTMLRenderer oRenderer = new HTMLRenderer
 	    ( poOut,
 	      Blast2HTML.oStyleDefinition,
-	      60,
+	      50,
 	      new DefaultURLGeneratorFactory(),
 	      oAlignmentMarker,
 	      oProps );
