@@ -375,7 +375,7 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
 	    if (mark < 0)
 		throw new IOException("The mark is not currently in scope");
 
-	    position = position - mark + buffPos;
+	    position = position - buffPos + mark;
 	    buffPos = mark;
 	}
 
