@@ -83,7 +83,7 @@ public class  AGAVEXrefs{
        Iterator it = db_ids.iterator() ;
        while( it.hasNext() )
        {
-           tmp.append( (String)it.next() ) ;
+           tmp.append(it.next().toString() ) ;
        }
        it = xrefs.iterator() ;
        while( it.hasNext() )
