@@ -36,6 +36,7 @@ import org.biojava.bio.BioException;
 import org.biojava.bio.SimpleAnnotation;
 import org.biojava.bio.seq.impl.SimpleSequenceFactory;
 import org.biojava.bio.seq.io.SymbolTokenization;
+import org.biojava.bio.symbol.AbstractReversibleTranslationTable;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.AtomicSymbol;
@@ -466,63 +467,20 @@ public final class RNATools {
     }
   }
 
-  private abstract static class AbstractTT
-  implements ReversibleTranslationTable {
-    protected abstract AtomicSymbol doTranslate(AtomicSymbol sym)
-    throws IllegalSymbolException;
-    protected abstract AtomicSymbol doUntranslate(AtomicSymbol sym)
-    throws IllegalSymbolException;
-
-
-    public Symbol translate(Symbol s)
-    throws IllegalSymbolException {
-      if(s instanceof AtomicSymbol) {
-        return doTranslate((AtomicSymbol) s);
-      } else {
-        Set syms = new HashSet();
-        for(
-          Iterator i = ((FiniteAlphabet) s.getMatches()).iterator();
-          i.hasNext();
-        ) {
-          AtomicSymbol is = (AtomicSymbol) i.next();
-          syms.add(doTranslate(is));
-        }
-        return getTargetAlphabet().getAmbiguity(syms);
-      }
-    }
-
-    public Symbol untranslate(Symbol s)
-    throws IllegalSymbolException {
-      if(s instanceof AtomicSymbol) {
-        return doUntranslate((AtomicSymbol) s);
-      } else {
-        Set syms = new HashSet();
-        for(
-          Iterator i = ((FiniteAlphabet) s.getMatches()).iterator();
-          i.hasNext();
-        ) {
-          AtomicSymbol is = (AtomicSymbol) i.next();
-          syms.add(doUntranslate(is));
-        }
-        return getSourceAlphabet().getAmbiguity(syms);
-      }
-    }
-  }
-
   /**
    * Sneaky class for complementing RNA bases.
    */
 
   private static class RNAComplementTranslationTable
-  extends AbstractTT {
-    public AtomicSymbol doTranslate(AtomicSymbol s)
+  extends AbstractReversibleTranslationTable {
+    public Symbol doTranslate(Symbol s)
           throws IllegalSymbolException {
-            return (AtomicSymbol) RNATools.complement(s);
+            return (Symbol) RNATools.complement(s);
           }
 
-          public AtomicSymbol doUntranslate(AtomicSymbol s)
+          public Symbol doUntranslate(Symbol s)
           throws IllegalSymbolException {
-            return (AtomicSymbol) RNATools.complement(s);
+            return (Symbol) RNATools.complement(s);
     }
 
           public Alphabet getSourceAlphabet() {
