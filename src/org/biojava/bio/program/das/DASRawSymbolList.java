@@ -65,45 +65,45 @@ class DASRawSymbolList
     }
 
     public Alphabet getAlphabet() {
-	return DNATools.getDNA();
+        return getRawSymbols().getAlphabet();
     }
 
     public int length() {
-	if (segment.isBounded()) {
-	    return segment.getStop() - segment.getStart() + 1;
-	} else {
-	    return getRawSymbols().length();
-	}
+        if (segment.isBounded()) {
+            return segment.getStop() - segment.getStart() + 1;
+        } else {
+            return getRawSymbols().length();
+        }
     }
 
     public Iterator iterator() {
-	return getRawSymbols().iterator();
+        return getRawSymbols().iterator();
     }
 
     public Symbol symbolAt(int i) {
-	return getRawSymbols().symbolAt(i);
+        return getRawSymbols().symbolAt(i);
     }
 
     public SymbolList subList(int start, int end) {
-	return getRawSymbols().subList(start, end);
+        return getRawSymbols().subList(start, end);
     }
 
     public List toList() {
-	return getRawSymbols().toList();
+        return getRawSymbols().toList();
     }
 
     public String seqString() {
-	return getRawSymbols().seqString();
+        return getRawSymbols().seqString();
     }
 
     public String subStr(int start, int end) {
-	return getRawSymbols().subStr(start, end);
+        return getRawSymbols().subStr(start, end);
     }
 
     public void edit(Edit edit)
         throws ChangeVetoException
     {
-	throw new ChangeVetoException("Can't edit sequence");
+        throw new ChangeVetoException("Can't edit sequence");
     }
 
     protected SymbolList getRawSymbols() {
@@ -111,8 +111,15 @@ class DASRawSymbolList
 	    try {
 		DAS.startedActivity(this);
 
-		StringBuffer qb = new StringBuffer();
-		qb.append("dna?segment=");
+        String seqRequest = "dna";
+        if (DASCapabilities.checkCapable(new URL(sequence.getDataSourceURL(), ".."),
+                                         DASCapabilities.CAPABILITY_SEQUENCE)) 
+        {
+            seqRequest = "sequence";
+        }
+        StringBuffer qb = new StringBuffer();
+        qb.append(seqRequest);
+        qb.append("?segment=");
 		qb.append(segment.getID());
 		if (segment.isBounded()) {
 		    qb.append(':');
@@ -136,10 +143,7 @@ class DASRawSymbolList
 		SequenceBuilder sb = new SimpleSequenceBuilder();
 		sb.setURI(dnaURL.toString());
 		sb.setName(sequence.getName());
-		SymbolTokenization sparser = DNATools.getDNA().getTokenization("token");
-		StreamParser ssparser = sparser.parseStream(sb);
-
-		StAXContentHandler dnaHandler = new DNAHandler(ssparser);
+		StAXContentHandler seqHandler = new SequenceHandler(sb, seqRequest);
 
 		// determine if I'm getting a gzipped reply
 		String contentEncoding = huc.getContentEncoding();
@@ -156,7 +160,7 @@ class DASRawSymbolList
 		InputSource is = new InputSource(inStream);
 		is.setSystemId(dnaURL.toString());
 		XMLReader parser = DASSequence.nonvalidatingSAXParser();
-		parser.setContentHandler(new SAX2StAXAdaptor(dnaHandler));
+		parser.setContentHandler(new SAX2StAXAdaptor(seqHandler));
 		parser.parse(is);
 		rawSymbols = sb.makeSequence();
 	    } catch (SAXException ex) {
@@ -173,24 +177,53 @@ class DASRawSymbolList
 	return rawSymbols;
     }
 
-    private class DNAHandler extends StAXContentHandlerBase {
-	private StreamParser ssparser;
+    private class SequenceHandler extends StAXContentHandlerBase {
+        private SequenceBuilder sbuilder;
+        private String requestType;
 
-	DNAHandler(StreamParser ssparser) {
-	    this.ssparser = ssparser;
-	}
+        SequenceHandler(SequenceBuilder sbuilder, String requestType) {
+            this.sbuilder = sbuilder;
+            this.requestType = requestType;
+        }
 
-	public void startElement(String nsURI,
-				 String localName,
-				 String qName,
-				 Attributes attrs,
-				 DelegationManager dm)
-	    throws SAXException
-	{
-	    if (localName.equals("DNA")) {
-		dm.delegate(new SymbolsHandler(ssparser));
-	    }
-	}
+        public void startElement(String nsURI,
+		                		 String localName,
+                                 String qName,
+                                 Attributes attrs,
+                                 DelegationManager dm)
+	        throws SAXException
+	    {
+            if (localName.equals("DNA")) {
+                SymbolTokenization toke;
+                try {
+                    toke = DNATools.getDNA().getTokenization("token");
+                } catch (Exception ex) {
+                    throw new SAXException("Couldn't get DNA tokenization");
+                }
+                StreamParser sparser = toke.parseStream(sbuilder);
+                dm.delegate(new SymbolsHandler(sparser));
+            } else if ("sequence".equals(requestType) && "SEQUENCE".equals(localName)) {
+                String moltype = attrs.getValue("moltype");
+                Alphabet alpha = null;
+                if ("DNA".equalsIgnoreCase(moltype)) {
+                    alpha = DNATools.getDNA();
+                } else if ("ssRNA".equalsIgnoreCase(moltype) || "dsRNA".equalsIgnoreCase(moltype)) {
+                    alpha = RNATools.getRNA();
+                } else if ("Protein".equalsIgnoreCase(moltype)) {
+                    alpha = ProteinTools.getTAlphabet();
+                } else {
+                    throw new SAXException("Unknown moltype " + moltype);
+                }
+                SymbolTokenization toke;
+                try {
+                    toke = alpha.getTokenization("token");
+                } catch (Exception ex) {
+                    throw new SAXException("Couldn't get tokenization for " + moltype);
+                }
+                StreamParser sparser = toke.parseStream(sbuilder);
+                dm.delegate(new SymbolsHandler(sparser));
+            }
+        }
     }
 
     private class SymbolsHandler extends StAXContentHandlerBase {

@@ -55,6 +55,8 @@ class DASCapabilities {
     public static final String CAPABILITY_EXTENDED_FEATURES = "features";
 
     public static final String CAPABILITY_INDEX = "index";
+    
+    public static final String CAPABILITY_SEQUENCE = "sequence";
 
     private static final Map DEFAULT_CAPABILITIES;
     
@@ -91,40 +93,49 @@ class DASCapabilities {
 	// System.out.println("Getting capabilities for: " + dasURL);
 
 	try {
+        Map caps = new HashMap();
+        
 	    URL capURL = new URL(dasURL, "capabilities");
 	    HttpURLConnection huc = (HttpURLConnection) capURL.openConnection();
 	    huc.connect();
 	    int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
-	    if (status == 0) {
-		throw new BioException("Not a DAS server");
-	    } else if (status != 200) {
-		throw new BioException("DAS error (status code = " + status +
-				       ") connecting to " + dasURL);
-	    }
+        
+        String capHeader = huc.getHeaderField("X-DAS-Capabilities");
+        if (capHeader != null) {
+            StringTokenizer capToke = new StringTokenizer(capHeader, "; ");
+            while (capToke.hasMoreTokens()) {
+                String capString = capToke.nextToken();
+                int slash = capString.indexOf('/');
+                if (slash >= 0) {
+                    caps.put(capString.substring(0, slash).toLowerCase(), capString.substring(slash + 1));
+                }
+            }
+        }
 
-	    InputSource is = new InputSource(huc.getInputStream());
-	    DocumentBuilder parser = DASSequence.nonvalidatingParser();
-	    Element el = parser.parse(is).getDocumentElement();
-
-	    Map caps = new HashMap();
-	    Node n = el.getFirstChild();
-	    while (n != null) {
-		if (n instanceof Element) {
-		    Element capEl = (Element) n;
-		    if (capEl.getTagName().equals("capability")) {
-			String type = capEl.getAttribute("type");
-			String value = capEl.getAttribute("value");
-			if (caps.containsKey(type)) {
-			    ((List) caps.get(type)).add(value);
-			} else {
-			    List l = new ArrayList();
-			    l.add(value);
-			    caps.put(type, l);
-			}
-		    }
-		}
-		n = n.getNextSibling();
-	    }
+        if (status == 200) {
+            InputSource is = new InputSource(huc.getInputStream());
+            DocumentBuilder parser = DASSequence.nonvalidatingParser();
+            Element el = parser.parse(is).getDocumentElement();
+ 
+    	    Node n = el.getFirstChild();
+            while (n != null) {
+                if (n instanceof Element) {
+                    Element capEl = (Element) n;
+                    if (capEl.getTagName().equals("capability")) {
+                        String type = capEl.getAttribute("type");
+                        String value = capEl.getAttribute("value");
+                        if (caps.containsKey(type)) {
+                            ((List) caps.get(type)).add(value);
+                        } else {
+                            List l = new ArrayList();
+                            l.add(value);
+                            caps.put(type, l);
+                        }
+                    }
+                }
+                n = n.getNextSibling();
+            }
+        }
 
 	    return Collections.unmodifiableMap(caps);
 	} catch (Exception ex) {

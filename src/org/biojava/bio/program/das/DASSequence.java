@@ -93,7 +93,6 @@ public class DASSequence
     protected transient AnnotationForwarder annotationForwarder;
 
     private DASSequenceDB parentdb;
-    private Alphabet alphabet = DNATools.getDNA();
     private URL dataSourceURL;
     private String seqID;
     private String version = null;
@@ -443,7 +442,11 @@ public class DASSequence
     //
 
     public Alphabet getAlphabet() {
-	return alphabet;
+        try {
+            return getSymbols().getAlphabet();
+        } catch (BioException be) {
+            throw new BioRuntimeException(be);
+        }
     }
 
     public Iterator iterator() {
