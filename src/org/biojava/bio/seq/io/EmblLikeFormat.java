@@ -57,6 +57,7 @@ import org.biojava.utils.ParseErrorSource;
  * @author Thomas Down
  * @author Greg Cox
  * @author Keith James
+ * @author Len Trigg
  * @since 1.1
  */
 

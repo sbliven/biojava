@@ -37,6 +37,7 @@ import org.biojava.utils.ChangeVetoException;
  * </pre>
  *
  * @author Matthew Pocock
+ * @author Len Trigg
  */
 public class EbiFormat implements TaxonParser {
   public static final String PROPERTY_NCBI_TAXON = EbiFormat.class + ":NCBI_TAXON";
