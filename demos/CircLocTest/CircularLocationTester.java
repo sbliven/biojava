@@ -39,7 +39,7 @@ import java.awt.*;
  * the ideal may not be realized in all situations.
  */
 public class CircularLocationTester {
-  boolean packFrame = false;
+  boolean packFrame = true;
 
   //Construct the application
   public CircularLocationTester() {

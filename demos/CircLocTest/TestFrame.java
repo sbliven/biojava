@@ -49,7 +49,6 @@ public class TestFrame extends JFrame {
   JPanel jPanel3 = new JPanel();
   JButton TestButton = new JButton();
   JButton jButton2 = new JButton();
-  JCheckBox circCheckBox = new JCheckBox();
   JPanel jPanel4 = new JPanel();
   Border border5;
   GridLayout gridLayout1 = new GridLayout();
@@ -57,7 +56,7 @@ public class TestFrame extends JFrame {
   JLabel jLabel6 = new JLabel();
   JTextField aib = new JTextField();
   JTextField aeb = new JTextField();
-  JTextField bea = new JTextField();
+  JTextField aub = new JTextField();
   JLabel jLabel7 = new JLabel();
   JLabel jLabel8 = new JLabel();
   JLabel jLabel9 = new JLabel();
@@ -106,7 +105,7 @@ public class TestFrame extends JFrame {
     border6 = BorderFactory.createEmptyBorder(10,10,10,10);
     border7 = BorderFactory.createCompoundBorder(new EtchedBorder(EtchedBorder.RAISED,Color.white,new Color(178, 178, 178)),BorderFactory.createEmptyBorder(15,5,15,5));
     contentPane.setLayout(borderLayout1);
-    this.setSize(new Dimension(400, 300));
+    this.setSize(new Dimension(400, 323));
     this.setTitle("Circular Location Test");
     jPanel1.setLayout(borderLayout2);
     jLabel1.setText("MinA");
@@ -135,10 +134,7 @@ public class TestFrame extends JFrame {
         jButton2_actionPerformed(e);
       }
     });
-    circCheckBox.setSelected(true);
-    circCheckBox.setText("Circ");
-    circCheckBox.setForeground(new Color(102, 102, 102));
-    contentPane.setPreferredSize(new Dimension(520, 86));
+    contentPane.setPreferredSize(new Dimension(590, 300));
     jPanel4.setLayout(gridLayout1);
     jPanel3.setBorder(BorderFactory.createEtchedBorder());
     jLabel5.setHorizontalAlignment(SwingConstants.CENTER);
@@ -148,7 +144,6 @@ public class TestFrame extends JFrame {
     jLabel6.setText("A.intersection(B)");
     aib.setBorder(null);
     aib.setEditable(false);
-    aib.setText("yes");
     aib.setHorizontalAlignment(SwingConstants.CENTER);
     gridLayout1.setColumns(4);
     gridLayout1.setRows(5);
@@ -156,15 +151,15 @@ public class TestFrame extends JFrame {
     aeb.setEditable(false);
     aeb.setText("yes");
     aeb.setHorizontalAlignment(SwingConstants.CENTER);
-    bea.setBorder(null);
-    bea.setEditable(false);
-    bea.setText("yes");
-    bea.setHorizontalAlignment(SwingConstants.CENTER);
+    aub.setBorder(null);
+    aub.setEditable(false);
+    aub.setHorizontalAlignment(SwingConstants.CENTER);
     jLabel7.setHorizontalAlignment(SwingConstants.CENTER);
     jLabel7.setText("Length");
+    jLabel8.setToolTipText("");
     jLabel8.setHorizontalAlignment(SwingConstants.CENTER);
     jLabel8.setHorizontalTextPosition(SwingConstants.CENTER);
-    jLabel8.setText("B.equals(A)");
+    jLabel8.setText("A.union(B)");
     jLabel9.setHorizontalAlignment(SwingConstants.CENTER);
     jLabel9.setHorizontalTextPosition(SwingConstants.CENTER);
     jLabel9.setText("A.equals(B)");
@@ -206,6 +201,7 @@ public class TestFrame extends JFrame {
     bca.setText("yes");
     jPanel4.setBorder(border6);
     lengthField.setHorizontalAlignment(SwingConstants.RIGHT);
+    jPanel1.setMinimumSize(new Dimension(500, 255));
     contentPane.add(jPanel1, BorderLayout.CENTER);
     jPanel1.add(jPanel3, BorderLayout.SOUTH);
     jPanel3.add(TestButton, null);
@@ -219,7 +215,6 @@ public class TestFrame extends JFrame {
     jPanel2.add(minBField, null);
     jPanel2.add(jLabel4, null);
     jPanel2.add(maxBField, null);
-    jPanel2.add(circCheckBox, null);
     jPanel1.add(jPanel4, BorderLayout.CENTER);
     jPanel4.add(jLabel11, null);
     jPanel4.add(acb, null);
@@ -236,7 +231,7 @@ public class TestFrame extends JFrame {
     jPanel4.add(jLabel5, null);
     jPanel4.add(boa, null);
     jPanel4.add(jLabel8, null);
-    jPanel4.add(bea, null);
+    jPanel4.add(aub, null);
     jPanel4.add(jLabel7, null);
     jPanel4.add(jPanel5, null);
     jPanel5.add(lengthField, null);
@@ -276,22 +271,16 @@ public class TestFrame extends JFrame {
                                     JOptionPane.ERROR_MESSAGE);
       return;
     }
-    CircularRangeLocation a = new CircularRangeLocation(minA, maxA, length);
-
-    if(circCheckBox.isSelected()){
-       CircularRangeLocation b = new CircularRangeLocation(minB, maxB, length);
-       test(a,b);
-    }else{
-       RangeLocation b = new RangeLocation(minB, maxB);
-       test(a,b);
-    }
+    CircularLocation a = LocationTools.makeCircularLocation(minA, maxA, length);
+    CircularLocation b = LocationTools.makeCircularLocation(minB, maxB, length);
+    test(a,b);
   }
 
   void jButton2_actionPerformed(ActionEvent e) {
     System.exit(0);
   }
 
-  private void test(CircularRangeLocation a, Location b){
+  private void test(CircularLocation a, CircularLocation b){
       minAField.setText(String.valueOf(a.getMin()));
       maxAField.setText(String.valueOf(a.getMax()));
       minBField.setText(String.valueOf(b.getMin()));
@@ -301,30 +290,22 @@ public class TestFrame extends JFrame {
       else{acb.setText(n);}
       if(b.contains(a)){bca.setText(y);}
       else{bca.setText(n);}
+
       if(a.equals(b)) aeb.setText(y);
       else aeb.setText(n);
-      if(b.getClass().isInstance(a)){
-        CircularRangeLocation cb = (CircularRangeLocation)b;
-        if (cb.equals(a)) bea.setText(y);
-        else bea.setText(n);
-      }
-      else if(b.equals(a))bea.setText(y);
-      else bea.setText(n);
+
+      aub.setText(LocationTools.union(a,b).toString());
+
       if(a.overlaps(b)) aob.setText(y);
       else aob.setText(n);
       if(b.overlaps(a)) boa.setText(y);
       else boa.setText(n);
+
       if(a.overlapsOrigin())aoo.setText(y);
       else aoo.setText(n);
-      if(b.getClass().isInstance(a)){
-        CircularRangeLocation cb = (CircularRangeLocation)b;
-        if(cb.overlapsOrigin()) boo.setText(y);
-        else boo.setText(n);
-      }else boo.setText(n);
-      if(b.getClass().isInstance(a)){
-        CircularRangeLocation cb = (CircularRangeLocation)b;
-        aib.setText(a.intersection(cb).toString());
-      }
-      else aib.setText(a.intersection((RangeLocation)b).toString());
+      if(b.overlapsOrigin()) boo.setText(y);
+      else boo.setText(n);
+
+      aib.setText((LocationTools.intersection(a,b)).toString());
     }
 }
