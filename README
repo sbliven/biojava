@@ -38,9 +38,9 @@ source tree.  For more information, see:
 
   http://jakarta.apache.org/
 
-BioJava uses the DBCP & Pool components of the Jakarta Commons project for its
+BioJava uses the DBCP, Pool & Collections components of the Jakarta Commons project for its
 database connection pooling components.  We currently include CVS versions from 
-June, 5, 2003 of DBCP & Pool in the source tree.  Note releases DBCP-1.0 and Pool-1.0.1
+June, 5, 2003 of DBCP & Pool and Collections 2.1 in the source tree.  Note releases DBCP-1.0 and Pool-1.0.1
 don't work correctly.  For more information, see:
 
   http://jakarta.apache.org/
