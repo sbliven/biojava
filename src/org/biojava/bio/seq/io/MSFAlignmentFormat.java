@@ -26,7 +26,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -105,9 +105,9 @@ public class MSFAlignmentFormat
             }
             //read each name (between Name:   and Len:
             while ((line.indexOf("//") == -1) && ((line.trim()).length() !=
-                    0)) 
+                    0))
             {
-                Matcher matcher = mtc.matcher(line);  
+                Matcher matcher = mtc.matcher(line);
                 if (!matcher.find()) {
                     break;
                 }               //end of sequence names
@@ -180,7 +180,7 @@ public class MSFAlignmentFormat
             st = new StringTokenizer(testString.toString().toLowerCase(), "u");
             agct += st.countTokens();
             //now parse through them and create gapped symbol lists
-            HashMap sequenceDataMap = new HashMap();
+            LinkedHashMap sequenceDataMap = new LinkedHashMap();
             Symbol sym = null;
             FiniteAlphabet alph = null;
             /*if ((agct/testString.length()) > 0.90) {            //if DNA alph
@@ -220,7 +220,8 @@ public class MSFAlignmentFormat
                 sequenceDataMap.put((String)sequenceNames.get(currSeqCount),
                         new SimpleSymbolList(parse, sd));
             }
-            return  (new SimpleAlignment(sequenceDataMap));
+            SimpleAlignment sa=new SimpleAlignment(sequenceDataMap);
+            return  (sa);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("MSFFormatReader " + e.getMessage());

@@ -24,7 +24,7 @@ package org.biojava.bio.seq.io;
 import java.io.BufferedReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -78,7 +78,7 @@ public class FastaAlignmentFormat implements AlignmentFormat {
                 seqs = SeqIOTools.readFastaDNA(br);
             }
 
-            Map seqMap = new HashMap();
+            Map seqMap = new LinkedHashMap();
             Sequence curSeq = null;
             while (seqs.hasNext()) {
                 curSeq = seqs.nextSequence();

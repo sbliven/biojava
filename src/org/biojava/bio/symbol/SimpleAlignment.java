@@ -25,7 +25,7 @@ import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +47,7 @@ import org.biojava.bio.BioError;
  */
 public class SimpleAlignment
 extends AbstractSymbolList implements Alignment, Serializable {
-  private Map labelToSymbolList;
+  private LinkedHashMap labelToSymbolList;
   private List labels;
   private Alphabet alphabet;
   private int length;
@@ -86,7 +86,7 @@ extends AbstractSymbolList implements Alignment, Serializable {
 
   public Alignment subAlignment(Set labels, Location loc)
   throws NoSuchElementException {
-    Map labelsToResList = new HashMap();
+    Map labelsToResList = new LinkedHashMap();
     Iterator i;
     if(labels != null) {
       i = labels.iterator();
@@ -129,7 +129,7 @@ extends AbstractSymbolList implements Alignment, Serializable {
     };
 
     this.labels = Collections.unmodifiableList(new ArrayList(labelToResList.keySet()));
-    this.labelToSymbolList = labelToResList;
+    this.labelToSymbolList =new LinkedHashMap( labelToResList);
 
     int length = -1;
     List alphaList = new ArrayList();
