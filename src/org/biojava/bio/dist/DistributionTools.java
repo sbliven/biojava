@@ -156,7 +156,8 @@ public class DistributionTools {
     for(Iterator i = ent.values().iterator(); i.hasNext();){
       totalEntropy -= ((Double)i.next()).doubleValue();
     }
-    return 2.0 - totalEntropy;
+    int size = ((FiniteAlphabet)observed.getAlphabet()).size();
+    return Math.log((double)size)/Math.log(2.0) - totalEntropy;
   }
 
   /**
