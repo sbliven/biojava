@@ -51,7 +51,7 @@ public abstract class DP {
 		if (insertPos >= 0)
 		    dotStates.add(insertPos, state);
 		else
-		    dotStates.add(0, state);
+		    dotStates.add(state);
 	    }
 	}
 
