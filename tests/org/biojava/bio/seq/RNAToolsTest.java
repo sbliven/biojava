@@ -240,6 +240,7 @@ public class RNAToolsTest extends TestCase {
 
                 // get the List of codons that yield this amino-acid
                 Set codons = geneticCode.untranslate(residue);
+                assertNotNull(codons);
 
                 // iterate thru the list confirming that they correspond
                 // to the expected amino-acid
