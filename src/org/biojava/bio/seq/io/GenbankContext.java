@@ -71,7 +71,8 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
 
 	this.symParser = theSymbolParser;
 	this.streamParser = symParser.parseStream(listener);
-        ((ParseErrorSource)(this.listener)).addParseErrorListener(this);
+         if (this.listener instanceof ParseErrorSource)
+           ((ParseErrorSource)(this.listener)).addParseErrorListener(this);
     }
 
     /**
