@@ -18,8 +18,8 @@ public class Dice
 	}  
   
   int [] advance = { 1 };
-	AbstractState fair   = StateFactory.createState(diceAlphabet, advance, "fair");
-	AbstractState loaded = StateFactory.createState(diceAlphabet, advance, "loaded");
+	EmissionState fair   = StateFactory.DEFAULT.createState(diceAlphabet, advance, "fair");
+	EmissionState loaded = StateFactory.DEFAULT.createState(diceAlphabet, advance, "loaded");
 	
 	SimpleMarkovModel casino=new SimpleMarkovModel(1, diceAlphabet);
 	casino.addState(fair);
