@@ -77,9 +77,9 @@ public class HSPSummaryStAXHandler extends SeqSimilarityStAXHandler
         if (attr != null)
             sch.addSubHitProperty("pValue", attr);
 
-        attr = attrs.getValue("numberOfPositives");
+        attr = attrs.getValue("numberOfIdentities");
         if (attr != null)
-            sch.addSubHitProperty("numberOfPositives", attr);
+            sch.addSubHitProperty("numberOfIdentities", attr);
 
         attr = attrs.getValue("numberOfPositives");
         if (attr != null)
