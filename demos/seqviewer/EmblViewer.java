@@ -1,4 +1,4 @@
-package seqviewer;
+//package seqviewer;
 
 import java.io.*;
 import java.util.*;
@@ -43,7 +43,7 @@ public class EmblViewer {
     FeatureFilter repeatFilter = new FeatureFilter.ByType("repeat_region");
     FeatureFilter miscFilter = new FeatureFilter.ByType("misc_feature");
     
-    f = new JFrame("Sequence test");
+    f = new JFrame("EMBL View");
     sp = new SequencePanel();
     sp.setSequence(seq);
     sp.setScale(20.0);
@@ -53,7 +53,7 @@ public class EmblViewer {
     split = new CompoundFeatureRenderer();
     FeatureRenderer frChooser = new FeatureRenderer() {
       public void renderFeature(
-        Graphics2D g, Feature f, Rectangle2D box, SequencePanel context
+        Graphics2D g, Feature f, Rectangle2D box, SequenceRenderContext context
       ) {
         if(f.getLocation().isContiguous()) {
           fr.renderFeature(g, f, box, context);
@@ -156,7 +156,7 @@ public class EmblViewer {
     private Paint fill = Color.yellow;
     private double borderDepth = 3.0;
     public void renderFeature(
-      Graphics2D g, Feature f, Rectangle2D box, SequencePanel context
+      Graphics2D g, Feature f, Rectangle2D box, SequenceRenderContext context
     ) {
       Location loc = f.getLocation();
       Iterator i = loc.blockIterator();
@@ -174,7 +174,7 @@ public class EmblViewer {
     }
     
     private void renderLocation(
-      Graphics2D g, Location loc, Rectangle2D box, SequencePanel context
+      Graphics2D g, Location loc, Rectangle2D box, SequenceRenderContext context
     ) {
       Rectangle2D.Double block = new Rectangle2D.Double();
       double min = sp.sequenceToGraphics(loc.getMin());
@@ -198,7 +198,7 @@ public class EmblViewer {
     
     private void renderLink(
       Graphics2D g, Feature f, Location source, Location dest,
-      Rectangle2D box, SequencePanel context
+      Rectangle2D box, SequenceRenderContext context
     ) {
       Line2D line = new Line2D.Double();
       Point2D startP;
