@@ -215,17 +215,18 @@ public class XMLAnnotationTypeWriter {
         Set propKeys = at.getProperties();
         
         xw.openTag(XML_ANNOTATIONTYPE_NS, "propertyDefault");
-        writeCardinality(at.getDefaultCardinalityConstraint(), xw);
-        writePropertyConstraint(at.getDefaultPropertyConstraint(), xw);
+        CollectionConstraint.AllValuesIn defaultcc = (CollectionConstraint.AllValuesIn) at.getDefaultConstraint();
+        writeCardinality(defaultcc.getCardinalityConstraint(), xw);
+        writePropertyConstraint(defaultcc.getPropertyConstraint(), xw);
         xw.closeTag(XML_ANNOTATIONTYPE_NS, "propertyDefault");
         
         for (Iterator pi = propKeys.iterator(); pi.hasNext(); ) {
             Object propKey = pi.next();
             xw.openTag(XML_ANNOTATIONTYPE_NS, "property");
             xw.attribute(XML_ANNOTATIONTYPE_NS, "name", propKey.toString());
-            writeCardinality(at.getCardinalityConstraint(propKey), xw);
-            writePropertyConstraint(at.getPropertyConstraint(propKey),
-                                    xw);
+            CollectionConstraint.AllValuesIn cc = (CollectionConstraint.AllValuesIn) at.getConstraint(propKey);
+            writeCardinality(cc.getCardinalityConstraint(), xw);
+            writePropertyConstraint(cc.getPropertyConstraint(), xw);
             xw.closeTag(XML_ANNOTATIONTYPE_NS, "property");
         }
         xw.closeTag(XML_ANNOTATIONTYPE_NS, "annotationType");

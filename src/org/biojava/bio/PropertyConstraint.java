@@ -34,14 +34,14 @@ import org.biojava.utils.*;
  * of annotations by the values of their properties. In this way, you
  * can generate controlled vocabularies over Java objects.</p>
  *
- * <p>The constraints accept or reject individual objects and provide
- * an accessor method to appropriately manipulate properties of their
- * type. In general, it is not possible to get back a set of all items
+ * <p>The constraints accept or reject individual objects.
+ * In general, it is not possible to get back a set of all items
  * that would be accepted by a particular constraint.</p>
  *
  * @since 1.3
  * @author Matthew Pocock
- * @author Keith James.
+ * @author Keith James
+ * @author Thomas Down
  *
  * @for.powerUser Instantiate PropertyConstraint classes when populating an
  *            AnnotationType instance
@@ -95,32 +95,6 @@ public interface PropertyConstraint {
      * general or the more specific constraint only.
      */
     public boolean subConstraintOf(PropertyConstraint subConstraint);
-
-    /**
-     * <p><code>setProperty</code> sets a property in the Annotation
-     * such that it conforms to the constraint.</p>
-     *
-     * @param ann an <code>Annotation</code> to populate.
-     * @param property an <code>Object</code> under which to add the
-     * value.
-     * @param value an <code>Object</code> to add.
-     * @exception ChangeVetoException if an error occurs
-     *
-     * @for.developer Use for implementing setProperty() on AnnotationType
-     */
-    public void setProperty(Annotation ann, Object property, Object value)
-        throws ChangeVetoException;
-
-    /**
-     * <p>Adds a value to the collection.</p>
-     *
-     * @param coll the Collection to modufy to include value
-     * @param value  the value to add
-     * @throws ChangeVetoException if the value can not be added
-     * @for.developer Use for implementing setProperty() on AnnotationType
-     */
-    public void addValue(Collection coll, Object value)
-        throws ChangeVetoException;
         
     /**
      * <code>ANY</code> is a constraint which accepts a property for
@@ -191,30 +165,6 @@ public interface PropertyConstraint {
 
             return false;
         }
-
-        public void setProperty(Annotation ann, Object property, Object value)
-            throws ChangeVetoException {
-            if (accept(value)) {
-                ann.setProperty(property, value);
-            } else {
-                throw new ChangeVetoException(
-                  "Incorrect class: expecting " + cl +
-                  " but got " + value.getClass()
-                );
-            }
-        }
-        
-        public void addValue(Collection coll, Object value)
-        throws ChangeVetoException {
-          if(accept(value)) {
-            coll.add(value);
-          } else {
-            throw new ChangeVetoException(
-              "Incorrect class: expecting " + cl +
-              " but got " + value.getClass()
-            );
-          }
-        }
         
         public String toString() {
           return "Class:" + cl.toString();
@@ -270,30 +220,6 @@ public interface PropertyConstraint {
 
             return false;
         }
- 
-        public void setProperty(Annotation ann, Object property, Object value)
-            throws ChangeVetoException {
-            if (accept(value)) {
-                ann.setProperty(property, value);
-            } else {
-              throw new ChangeVetoException(
-                "value: " + value +
-                " is not an annotation implementing " + annType.getProperties()
-              );
-            }
-        }
-        
-        public void addValue(Collection coll, Object value)
-        throws ChangeVetoException {
-          if(accept(value)) {
-            coll.add(value);
-          } else {
-            throw new ChangeVetoException(
-              "value: " + value +
-              " is not an annotation implementing " + annType.getProperties()
-            );
-          }
-        }
         
         public String toString() {
           return "AnnotationType:" + annType.getProperties();
@@ -348,30 +274,6 @@ public interface PropertyConstraint {
         }
         
         return false;
-      }
-      
-      public void setProperty(Annotation ann, Object prop, Object val)
-      throws ChangeVetoException {
-        if(accept(val)) {
-          ann.setProperty(prop, val);
-        } else {
-          throw new ChangeVetoException(
-            "Can't set property " + prop +
-            " to " + val + " as it is not " + value
-          );
-        }
-      }
-      
-      public void addValue(Collection coll, Object val)
-      throws ChangeVetoException {
-        if(accept(val)) {
-          coll.add(val);
-        } else {
-          throw new ChangeVetoException(
-            "Can't set property to " + val +
-            " as it is not " + value
-          );
-        }
       }
       
       public String toString() {
@@ -444,30 +346,6 @@ public interface PropertyConstraint {
 
             return false;
         }
-
-        public void setProperty(Annotation ann, Object property, Object value)
-            throws ChangeVetoException {
-            if (accept(value)) {
-                ann.setProperty(property, value);
-            } else {
-                throw new ChangeVetoException(
-                  "Value not accepted: '" + value + "'" +
-                  " not in " + values
-                );
-            }
-        }
-        
-        public void addValue(Collection coll, Object value)
-        throws ChangeVetoException {
-          if(accept(value)) {
-            coll.add(value);
-          } else {
-            throw new ChangeVetoException(
-              "Value not accepted: '" + value + "'" +
-              " not in " + values
-            );
-          }
-        }
         
         public String toString() {
           return "Enumeration:" + values;
@@ -530,22 +408,6 @@ public interface PropertyConstraint {
         return c1.subConstraintOf(pc) && c2.subConstraintOf(pc);
       }
       
-      public void setProperty(Annotation ann, Object key, Object val)
-      throws ChangeVetoException {
-        if(!accept(val)) {
-          throw new ChangeVetoException("Can't accept value: " + this + ": " + val);
-        }
-        c1.setProperty(ann, key, val);
-      }
-      
-      public void addValue(Collection coll, Object val)
-      throws ChangeVetoException {
-        if(!accept(val)) {
-          throw new ChangeVetoException("Can't accept value: " + this + ": " + val);
-        }
-        c1.addValue(coll, val);
-      }
-      
       public String toString() {
         return "And(" + c1 + ", " + c2 + ")";
       }
@@ -605,22 +467,6 @@ public interface PropertyConstraint {
         return c1.subConstraintOf(pc) || c2.subConstraintOf(pc);
       }
       
-      public void setProperty(Annotation ann, Object key, Object val)
-      throws ChangeVetoException {
-        if(!accept(val)) {
-          throw new ChangeVetoException("Can't accept value: " + this + ": " + val);
-        }
-        c1.setProperty(ann, key, val);
-      }
-      
-      public void addValue(Collection coll, Object val)
-      throws ChangeVetoException {
-        if(!accept(val)) {
-          throw new ChangeVetoException("Can't accept value: " + this + ": " + val);
-        }
-        c1.addValue(coll, val);
-      }
-      
       public String toString() {
         return "Or(" + c1 + ", " + c2 + ")";
       }
@@ -643,16 +489,6 @@ class AnyPropertyConstraint implements PropertyConstraint  {
         return true;
     }
     
-    public void setProperty(Annotation ann, Object property, Object value)
-        throws ChangeVetoException {
-        ann.setProperty(property, value);
-    }
-    
-    public void addValue(Collection coll, Object value)
-    throws ChangeVetoException {
-      coll.add(value);
-    }
-    
     public String toString() {
       return "ANY";
     }
@@ -672,22 +508,6 @@ class NonePropertyConstraint implements PropertyConstraint {
   
   public boolean subConstraintOf(PropertyConstraint subConstraint) {
     return subConstraint instanceof NonePropertyConstraint;
-  }
-  
-  public void setProperty(Annotation ann, Object property, Object value)
-        throws ChangeVetoException {
-    throw new ChangeVetoException(
-      "There are no values that could match this property constraint: " +
-      ann + ", " + property + " -> " + value
-    );
-  }
-  
-  public void addValue(Collection coll, Object value)
-        throws ChangeVetoException {
-    throw new ChangeVetoException(
-      "There are no values that could match this property constraint: " +
-      value
-    );
   }
   
   public String toString() {

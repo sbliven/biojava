@@ -28,11 +28,10 @@ import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.LocationTools;
 
 /**
- * <p>A type to constrain annotation bundles.</p>
- *
- * <p><code>AnnotationType</code> instances can be used to validate an
+ * A set of constraints on the data contained in an <code>Annotation</code>.
+ * <code>AnnotationType</code> instances can be used to validate an
  * <code>Annotation</code> to check that it has the appropriate
- * properties and that they are of the right type.</p>
+ * properties and that they are of the right type.
  *
  * <h2>Common Usage</h2>
  *
@@ -70,40 +69,64 @@ import org.biojava.bio.symbol.LocationTools;
  *
  * <h2>Description</h2>
  *
- * <p>AnnotationType is a powerful constraint-based language for describing
+ * <p>AnnotationType is a  constraint-based language for describing
  * sets of Annotation bundles. It works by assuming that any given Annotation
  * may have any set of properties defined. If it matches a particular
  * AnnotationType instance, then each defined property must be of a value
  * that is acceptable to the type, and each undefined property must
  * be allowed to be absend in the type.</p>
  *
- * <p>The constraint on any given property is two-fold. Firstly, there is the
- * PropertyConstraint associated with it. This is an interface that will
- * accept or reject any given Java object. Effectively, this can be thought of
- * as a set membership operator over all objects. Seccondly,
- * CardinalityConstrait defines a legal number of values that the property can
- * hold. For example, if you had a car Annotation, you may wish to associate it
- * with exactly 4 values under the Wheel property. CardinalityConstraint is a
- * simple wrapper arround org.biojava.bio.symbol.Location, and it is Location
- * that is used to represent the legal range of cardinalities.
- * CardinalityConstraint provides some usefull standard Location instances such
- * as ZERO, ONE and ANY.</p>
+ * <p>
+ * <code>AnnotationType</code> imposes a data model on <code>Annotations</code>
+ * where the value of each `slot' is considered as a <code>Collection</code>.
+ * Values which aren't actually <code>Collection</code> instances are treated
+ * as singleton sets.  Undefined properties are treated as <code>Collection.EMPTY_SET</code>.
+ * The logic to validate a complete slot in an <code>Annotation</code> is
+ * encapsulated by a <code>CollectionConstraint</code> object.  In the common case,
+ * slots are validated by <code>CollectionConstraint.AllValuesIn</code> which
+ * ensures that all members of the collection match a specified <code>PropertyConstraint</code>,
+ * and that the size of the collection matches a cardinality constraint.  This is the
+ * most important type of constraint when defining datatypes.  However, when using
+ * <code>AnnotationTypes</code> to specify a query over a set of Annotations, it may be more 
+ * useful to ask whether a slot <em>contains</em> a given value:  For example
+ * </p>
  *
+ * <pre>
+ * // Test that gene_name contains the value "BRCA2", ignoring other values (synonyms)
+ * // which might be present in that slot.
+ * AnnotationType at = new AnnotationType.Impl();
+ * at.setConstraint(
+ *      "gene_name",
+ *      new CollectionConstraint.Contains(
+ *          new PropertyConstraint.ExactValue("BRCA2"),
+ *          CardinalityConstraint.ONE
+ *      )
+ * );
+ * </pre>
+ * 
  * <p>It is usually left up to the AnnotationType instance to work out how
  * multiple values should be packed into a single property slot in an Annotation
  * instance. Commonly, things that are allowed a cardinality of 1 will store one
  * value directly in the slot. Things that allow multiple values (and optionaly
  * things with one value) will usualy store them within a Collection in the
  * slot. This complexity is hidden from you if you use the accessor methods
- * built into AnnotationType, setProperty() and getProperty().
+ * built into AnnotationType, setProperty(), addProperty(), removeProperty() and getProperty().
+ * </p>
  *
  * @since 1.3
  * @author Matthew Pocock
  * @author Keith James (docs)
+ * @author Thomas Down
  *
  * @for.user
  * Using AnnotationType instances that you have been provided with
  * e.g. from UnigeneTools.LIBRARY_ANNOTATION
+ *
+ * @for.user
+ * <code>AnnotationType</code> instances can be used as queries
+ * to select from a set of Annotations based on the value of one
+ * or more properties.  Commonly, this is used in conjunction
+ * with <code>FeatureFilter.ByAnnotationType</code>. 
  *
  * @for.powerUser
  * Make AnnotationType instances that describe what should and
@@ -192,25 +215,14 @@ public interface AnnotationType {
      * @for.powerUser If you want to find out exactly what constraints will be
      * applied to a particular propery key
      */
-    public PropertyConstraint getPropertyConstraint(Object key);
+    public CollectionConstraint getConstraint(Object key);
 
     /**
-     * <p>Retrieve the cardinality constraint associated with properties.</p>
-     *
-     * <p>For an annotation to be acceptable, the property must have a number
-     * of values that matches the cardinality constraint. Common values are
-     * represented by static fields of Location.</p>
-     *
-     * @param key the property to be validated
-     * @return a Location giving the number of values assocated
-     *         with the property
-     * @for.powerUser If you want to find out exactly what constraints will be
-     * applied to a particular propery key
-     */
-    public Location getCardinalityConstraint(Object key);
-
-    /**
-     * Set the constraints associated with a property.
+     * Set the constraints associated with a property.  This method constrains
+     * the value of the specified property such that all members must match
+     * <code>con</code>, and the number of members must match <code>card</code>.
+     * It implicitly constructs a <code>CollectionConstraint.AllValuesIn</code>
+     * instance.
      *
      * @param key  the name of the property to constrain
      * @param con  the PropertyConstraint to enforce
@@ -225,8 +237,26 @@ public interface AnnotationType {
     );
 
     /**
+     * Specifies the constraint to apply to the specified property.
+     *
+     * @param key    the name of the property to constrain
+     * @param con    the constraint to apply to this slot.
+     *
+     * @for.powerUser When you are building your own AnnotationType
+     */
+     
+    public void setConstraint(
+        Object key,
+        CollectionConstraint con
+    );
+    
+    /**
      * Set the constraints that will apply to all properties without an
-     * explicitly defined set of constraints.
+     * explicitly defined set of constraints.  This method constrains
+     * the value of the specified property such that all members must match
+     * <code>con</code>, and the number of members must match <code>card</code>.
+     * It implicitly constructs a <code>CollectionConstraint.AllValuesIn</code>
+     * instance.
      *
      * @param pc  the default PropertyConstraint
      * @param cc the default CardinalityConstraint
@@ -236,31 +266,28 @@ public interface AnnotationType {
     public void setDefaultConstraints(PropertyConstraint pc, Location cc);
     
     /**
-     * Get the PropertyConstraint that will be applied to all properties without
-     * an explicit binding. This defaults to PropertyConstraint.ALL.
+     * Specifies the default constraint to apply to properties where no
+     * other constraint is specified.
      *
-     * @return the default PropertyConstraint
+     * @param cc The default constraint.
+     * @for.powerUser When you are building your own AnnotationType
+     */
+     
+    public void setDefaultConstraint(CollectionConstraint cc);
+    
+    /**
+     * Get the CollectionConstraint that will be applied to all properties without
+     * an explicit binding. This defaults to CollectionConstraint.ALL.
+     *
+     * @return the default CollectionConstraint
      *
      * @for.powerUser If you want to find out exactly what constraint will be
      * applied to properties with no explicitly defined constraints
      */
-    public PropertyConstraint getDefaultPropertyConstraint();
+    public CollectionConstraint getDefaultConstraint();
 
     /**
-     * Get the CardinalityConstraint that will be applied to all properties without
-     * an explicit binding. This defaults to CardinalityConstraint.ALL.
-     *
-     * @return the default CardinalityConstraint
-     *
-     * @for.powerUser If you want to find out exactly what constraint will be
-     * applied to properties with no explicitly defined constraints
-     */
-    public Location getDefaultCardinalityConstraint();
-
-    /**
-     * <p>Retrieve the complete set of properties that must be present for
-     * an <code>Annotation</code> to be accepted by this
-     * <code>AnnotationType</code>.</p>
+     * Retrieve the set of properties for which constraints have been explicity specified.
      *
      * @return the Set of properties to validate.
      *
@@ -285,6 +312,22 @@ public interface AnnotationType {
      */
     public void setProperty(Annotation ann, Object property, Object value)
         throws ChangeVetoException;
+        
+    /**
+     * Add a value to the specified property slot.
+     *
+     * @param ann  the Annotation to modify
+     * @param property  the property key Object
+     * @param value  the property value Object
+     * @throws ChangeVetoException  if the value could not be accepted by this
+     *         annotation type for that property key, or if the Annotation could
+     *         not be modified
+     *
+     * @for.user Edit an Annotation bundle in a way compattible with this
+     * AnnotationType
+     */
+    public void addProperty(Annotation ann, Object property, Object value)
+        throws ChangeVetoException;
 
     /**
      * Get the Collection of values associated with an Annotation bundle
@@ -292,7 +335,7 @@ public interface AnnotationType {
      * neccisary packing or unpacking to Collections. Properties with no values
      * will return empty Collections.
      *
-     * @param ann  the Annotatoin to modify
+     * @param ann  the Annotation to access
      * @param property  the property key Object
      * @return a Collection of values
      * @throws ChangeVetoException  if the value could not be removed
@@ -304,8 +347,7 @@ public interface AnnotationType {
         throws ChangeVetoException;
         
     /**
-     * Remove a property key, value pair from an Annotaiton instance. This will
-     * take care of any neccisary packing or unpacking to Collections.
+     * Remove a value from the specified property slot.
      *
      * @param ann  the Annotation to modify
      * @param property  the property key Object
@@ -320,7 +362,7 @@ public interface AnnotationType {
         throws ChangeVetoException;
     
     /**
-     * <p>An abstract base class useful for retrieving AnnotationType
+     * <p>An abstract base class useful for implementing AnnotationType
      * instances.</p>
      *
      * <p>This provides deffinitions for the logical operators (validate(),
@@ -330,11 +372,20 @@ public interface AnnotationType {
      *
      * @since 1.3
      * @author Matthew Pocock
+     * @author Thomas Down
      *
      * @for.developer  When implementing AnnotationType
      */
     public abstract class Abstract
     implements AnnotationType {
+        public void setConstraints(Object key, PropertyConstraint pc, Location cc) {
+            setConstraint(key, new CollectionConstraint.AllValuesIn(pc, cc));
+        }
+        
+        public void setDefaultConstraints(PropertyConstraint pc, Location cc) {
+            setDefaultConstraint(new CollectionConstraint.AllValuesIn(pc, cc));
+        }
+        
         public boolean instanceOf(Annotation ann) {
           Set props = new HashSet();
           props.addAll(getProperties());
@@ -342,91 +393,33 @@ public interface AnnotationType {
 
           for (Iterator i = getProperties().iterator(); i.hasNext();) {
             Object key = i.next();
-            PropertyConstraint con = getPropertyConstraint(key);
-            Location card = getCardinalityConstraint(key);
-
-            if(!validate(ann, key, con, card)) {
-              return false;
+            CollectionConstraint con = getConstraint(key);
+            Object value;
+            if (ann.containsProperty(key)) {
+                value = ann.getProperty(key);
+            } else {
+                value = Collections.EMPTY_SET;
+            }
+            if (!con.accept(value)) {
+                return false;
             }
           }
 
           return true;
         }
 
-        private boolean validate(
-          Annotation ann,
-          Object key,
-          PropertyConstraint con,
-          Location card
-        ) {
-          if(
-            CardinalityConstraint.ZERO.equals(card) &&
-            !ann.containsProperty(key)
-          ) {
-            return true;
-          } else if(
-            CardinalityConstraint.ONE.equals(card) &&
-            ann.containsProperty(key) &&
-            con.accept(ann.getProperty(key))
-          ) {
-            return true;
-          } else if(
-            CardinalityConstraint.ZERO_OR_ONE.equals(card) && (
-              !ann.containsProperty(key) ||
-              con.accept(ann.getProperty(key))
-            )
-          ) {
-            return true;
-          } else {
-            if(!ann.containsProperty(key)) {
-              return card.contains(0);
-            } else {
-              Object val = ann.getProperty(key);
-              if(val instanceof Collection) {
-                Collection vals = (Collection) val;
-                if(!card.contains(vals.size())) {
-                  return false;
-                }
-                for(Iterator i = vals.iterator(); i.hasNext(); ) {
-                  if(!con.accept(i.next())) {
-                    return false;
-                  }
-                }
-                return true;
-              } else {
-                  if (card.contains(1)) {
-                      return con.accept(val);
-                  } else {
-                      return false;
-                  }
-              }
-            }
-          }
-        }
-
         public final void setProperty(
           Annotation ann,
           Object property,
           Object value
-        ) throws ChangeVetoException {
-          try {
-            PropertyConstraint prop = getPropertyConstraint(property);
-            Location card = getCardinalityConstraint(property);
-            if(card.getMax() > 1) {
-              Collection vals = null;
-              if(ann.containsProperty(property)) {
-                vals = (Collection) ann.getProperty(property);
-              } else {
-                vals = new ArrayList();
-                ann.setProperty(property, vals);
-              }
-              prop.addValue(vals, value);
+        ) throws ChangeVetoException 
+        {
+            CollectionConstraint cons = getConstraint(property);
+            if (cons.accept(value)) {
+                ann.setProperty(property, value);
             } else {
-              prop.setProperty(ann, property, value);
+                throw new ChangeVetoException("Setting property " + property + " to " + value + " would violate constraints");
             }
-          } catch (ChangeVetoException cve) {
-            throw new ChangeVetoException(cve, "Failed to change property " + property);
-          }
         }
         
         public final Collection getProperty(Annotation ann, Object property)
@@ -436,37 +429,77 @@ public interface AnnotationType {
           if(!ann.containsProperty(property)) {
             vals = Collections.EMPTY_SET;
           } else {
-            Location card = getCardinalityConstraint(property);
             Object val = ann.getProperty(property);
-            if(card.getMax() > 1 && val instanceof Collection) {
+            if(val instanceof Collection) {
               vals = (Collection) val;
             } else {
-              vals = Collections.singleton(ann.getProperty(property));
+              vals = Collections.singleton(val);
             }
           }
           
           return vals;
         }
         
+        public final void addProperty(
+          Annotation ann,
+          Object key,
+          Object value
+        ) throws ChangeVetoException 
+        {
+            CollectionConstraint cons = getConstraint(key);
+            Collection oldValue;
+            if (ann.containsProperty(key)) {
+                Object ov = ann.getProperty(key);
+                if (ov instanceof Collection) {
+                    oldValue = (Collection) ov;
+                } else {
+                    oldValue = new ArrayList();
+                    oldValue.add(ov);
+                }
+            } else {
+                oldValue = new ArrayList();
+            }
+            if (cons.validateAddValue(oldValue, value)) {
+                oldValue.add(value);
+                ann.setProperty(key, oldValue);
+            } else {
+                throw new ChangeVetoException("Adding value " + value + " to " + key + " would violate constraints");
+            }
+        }
+        
         public final void removeProperty(
           Annotation ann,
           Object key,
           Object value
-        ) throws ChangeVetoException {
-          if(!ann.containsProperty(key)) {
-            throw new ChangeVetoException("No values associated with " + key +
-              " in " + ann);
-          }
-          
-          Object val = ann.getProperty(key);
-          if(val == value) {
-            ann.removeProperty(key);
-          } else if(val instanceof Collection) {
-            ((Collection) val).remove(value);
-          } else {
-            throw new ChangeVetoException("Don't know how to remove " +
-              value + " from " + val);
-          }
+        ) throws ChangeVetoException 
+        {
+            CollectionConstraint cons = getConstraint(key);
+            Collection oldValue;
+            if (ann.containsProperty(key)) {
+                Object ov = ann.getProperty(key);
+                if (ov instanceof Collection) {
+                    oldValue = (Collection) ov;
+                } else {
+                    oldValue = new ArrayList();
+                    oldValue.add(ov);
+                }
+            } else {
+                oldValue = new ArrayList();
+            }
+            if (!oldValue.contains(value)) {
+                throw new ChangeVetoException("Property " + key + " does not have value " + value);
+            } else {
+                if (cons.validateRemoveValue(oldValue, value)) {
+                    oldValue.remove(value);
+                    if (oldValue.size() > 0) {
+                        ann.setProperty(key, oldValue);
+                    } else {
+                        ann.removeProperty(key);
+                    }
+                } else {
+                    throw new ChangeVetoException("Adding value " + value + " to " + key + " would violate constraints");
+                }
+            }
         }
         
         public String toString() {
@@ -474,12 +507,11 @@ public interface AnnotationType {
           
           for(Iterator i = getProperties().iterator(); i.hasNext(); ) {
             Object key = i.next();
-            PropertyConstraint pc = getPropertyConstraint(key);
-            Location cc = getCardinalityConstraint(key);
+            CollectionConstraint cc = getConstraint(key);
             
-            sb.append(" [" + key + ", " + pc + ", " + cc + "]");
+            sb.append(" [" + key + ", " + cc + "]");
           }
-          sb.append(" [*, " + getDefaultPropertyConstraint() + ", " + getDefaultCardinalityConstraint() + "]");
+          sb.append(" [*, " + getDefaultConstraint() + "]");
           
           sb.append(" }");
           
@@ -494,16 +526,10 @@ public interface AnnotationType {
             for (Iterator i = props.iterator(); i.hasNext();) {
                 Object key = i.next();
          
-                PropertyConstraint thisPC = getPropertyConstraint(key);
-                PropertyConstraint subPC = subType.getPropertyConstraint(key);
+                CollectionConstraint thisPC = getConstraint(key);
+                CollectionConstraint subPC = subType.getConstraint(key);
                 if (! thisPC.subConstraintOf(subPC)) {
                     return false;
-                }
-
-                Location thisCC = getCardinalityConstraint(key);
-                Location subCC = subType.getCardinalityConstraint(key);
-                if (!LocationTools.contains(thisCC, subCC)) {
-                  return false;
                 }
             }
 
@@ -521,25 +547,22 @@ public interface AnnotationType {
      *
      * @since 1.3
      * @author Matthew Pocock
+     * @author Thomas Down
      *
      * @for.powerUser A convenient class for when you need an AnnotationType
      * instance and don't want to write your own
      */
+     
     public class Impl extends AnnotationType.Abstract {
         private Map cons;
-        private Map cards;
-        
-        private PropertyConstraint unknownPC;
-        private Location unknownCC;
+        private CollectionConstraint unknown;
 
         /**
          * Create a new Impl with no constraints.
          */
         public Impl() {
             cons = new SmallMap();
-            cards = new SmallMap();
-            unknownPC = PropertyConstraint.ANY;
-            unknownCC = CardinalityConstraint.ANY;
+            unknown = CollectionConstraint.ANY;
         }
 
         /**
@@ -552,43 +575,39 @@ public interface AnnotationType {
             this();
             setDefaultConstraints(defaultPC, defaultCC);
         }
-
-        public void setDefaultConstraints(PropertyConstraint pc, Location cc) {
-          unknownPC = pc;
-          unknownCC = cc;
-        }
         
-        public PropertyConstraint getDefaultPropertyConstraint() {
-          return unknownPC;
-        }
-        
-        public Location getDefaultCardinalityConstraint() {
-          return unknownCC;
+        /**
+         * Create a new Impl with a default collection constraint.
+         *
+         * @param defaultPC  the default PropertyConstraint
+         * @param defaultCC  the default CardinalityConstraint
+         */
+        public Impl(CollectionConstraint unknown) {
+            this();
+            setDefaultConstraint(unknown);
         }
 
-        public PropertyConstraint getPropertyConstraint(Object key) {
-            PropertyConstraint pc = (PropertyConstraint) cons.get(key);
+        public void setDefaultConstraint(CollectionConstraint cc) {
+            this.unknown = cc;
+        }
+        
+        public CollectionConstraint getDefaultConstraint() {
+            return unknown;
+        }
+
+        public CollectionConstraint getConstraint(Object key) {
+            CollectionConstraint pc = (CollectionConstraint) cons.get(key);
             if (pc == null) {
-                pc = unknownPC;
+                pc = unknown;
             }
             return pc;
         }
 
-        public Location getCardinalityConstraint(Object key) {
-            Location card = (Location) cards.get(key);
-            if (card == null) {
-                card = unknownCC;
-            }
-            return card;
-        }
-
-        public void setConstraints(
+        public void setConstraint(
           Object key,
-          PropertyConstraint con,
-          Location card
+          CollectionConstraint cc
         ) {
-            cons.put(key, con);
-            cards.put(key, card);
+            cons.put(key, cc);
         }
 
         public Set getProperties() {
