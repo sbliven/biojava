@@ -32,7 +32,7 @@ import java.util.*;
  * the addSequenceDB() method. This SequenceDBInstallation is then
  * able to serve the SequenceDB objects in this set.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @author <a href="mailto:Gerald.Loeffler@vienna.at">Gerald
  * Loeffler</a> (primary author) for the <a//href=
  * "http://www.imp.univie.ac.at">IMP</a>

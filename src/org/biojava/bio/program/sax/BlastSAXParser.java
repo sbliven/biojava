@@ -51,6 +51,7 @@ import org.xml.sax.helpers.AttributesImpl;
  *                 Colin Hardman      (CAT)
  *                 Stuart Johnston    (CAT)
  *                 Mathieu Wiepert    (Mayo Foundation)
+ *                 Keith James        (Sanger Institute)
  *
  * Copyright 2000 Cambridge Antibody Technology Group plc.
  * All Rights Reserved.
@@ -194,8 +195,12 @@ final class BlastSAXParser extends AbstractNativeAppSAXParser {
             //start of detail section
 
             if (poLine.startsWith("Query=")) {
-                int i = poLine.indexOf("=");
-                oQueryId = poLine.substring(i + 1).trim();
+                StringTokenizer st = new StringTokenizer(poLine);
+                // Skip the first token
+                st.nextToken();
+
+                if (st.hasMoreTokens())
+                    oQueryId = st.nextToken();
             }
 
             if (poLine.startsWith("Database:")) {

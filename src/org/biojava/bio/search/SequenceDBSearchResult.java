@@ -42,7 +42,7 @@ import org.biojava.utils.ObjectUtil;
  * loosely formatted details which vary from one search program to
  * another (and between versions of those programs).
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Keith James
  * @since 1.1
  * @see AbstractChangeable
  * @see SeqSimilaritySearchResult
@@ -51,69 +51,104 @@ import org.biojava.utils.ObjectUtil;
 public class SequenceDBSearchResult extends AbstractChangeable
     implements SeqSimilaritySearchResult, Annotatable
 {
-    private SequenceDB sequenceDB;
+    private String     queryID;
+    private String     databaseID;
     private Map        searchParameters;
-    private SymbolList querySeq;
     private List       hits;
     private Annotation annotation;
+
+    // Hashcode is cached after first calculation because the data on
+    // which is is based do not change
+    private int hc;
+    private boolean hcCalc;
 
     /**
      * Creates a new <code>SequenceDBSearchResult</code>.
      *
-     * @param sequenceDB a <code>SequenceDB</code>.
+     * @param queryID a <code>String</code>.
+     * @param databaseID a <code>String</code>.
      * @param searchParameters a <code>Map</code>.
-     * @param querySeq a <code>SymbolList</code>.
-     * @param annotation an <code>Annotation</code>.
      * @param hits a <code>List</code>.
+     * @param annotation an <code>Annotation</code>.
      */
-    public SequenceDBSearchResult(SequenceDB sequenceDB,
+    public SequenceDBSearchResult(String     queryID,
+                                  String     databaseID,
                                   Map        searchParameters,
-                                  SymbolList querySeq,
-                                  Annotation annotation,
-                                  List       hits)
+                                  List       hits,
+                                  Annotation annotation)
     {
-        if (querySeq  == null)
+        if (queryID  == null)
         {
-            throw new IllegalArgumentException("querySeq was null");
+            throw new IllegalArgumentException("queryID was null");
         }
-        if (sequenceDB == null)
+
+        if (databaseID == null)
         {
-            throw new IllegalArgumentException("sequenceDB was null");
+            throw new IllegalArgumentException("databaseID was null");
         }
+
         // searchParameters may be null
         if (annotation == null)
         {
             throw new IllegalArgumentException("annotation was null");
         }
+
         if (hits == null)
         {
             throw new IllegalArgumentException("hits was null");
         }
 
-        this.sequenceDB       = sequenceDB;
+        this.queryID          = queryID;
+        this.databaseID       = databaseID;
         this.searchParameters = searchParameters;
-        this.querySeq         = querySeq;
-        this.hits             = hits;
+        this.hits             = Collections.unmodifiableList(hits);
         this.annotation       = annotation;
-
-        // Lock the sequenceDB by vetoing all changes
-        this.sequenceDB.addChangeListener(ChangeListener.ALWAYS_VETO);
-
-        // Lock the querySeq by vetoing all changes
-        this.querySeq.addChangeListener(ChangeListener.ALWAYS_VETO);
 
         // Lock the annotation by vetoing all changes to properties
         this.annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
     }
 
-    public SymbolList getQuerySequence()
+    public String getQueryID()
     {
-        return querySeq;
+        return queryID;
     }
 
+    public String getDatabaseID()
+    {
+        return databaseID;
+    }
+
+    /**
+     * Return the query sequence which was used to perform the search.
+     *
+     * @return the <code>SymbolList</code> object used to search the
+     * <code>SequenceDB</code>. Never returns null.
+     *
+     * @deprecated use <code>getQueryID</code> to obtain a database
+     * identifier which may then be used to locate the query
+     * <code>SymbolList</code> in the appropriate
+     * <code>SequenceDB</code>.
+     */
+    public SymbolList getQuerySequence()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Return the sequence database against which the search that
+     * produced this search result was performed.
+     *
+     * @return the <code>SequenceDB</code> object against which the
+     * search was carried out. Never returns null.
+     *
+     * @deprecated use <code>getDatabaseID</code> to obtain a database
+     * identifier which may then be used to locate a
+     * <code>SequenceDB</code> in the appropriate
+     * <code>SequenceDBInstallation</code>.
+     */
     public SequenceDB getSequenceDB()
     {
-        return sequenceDB;
+        throw new UnsupportedOperationException();
     }
 
     public Map getSearchParameters()
@@ -142,15 +177,13 @@ public class SequenceDBSearchResult extends AbstractChangeable
         if (other == this) return true;
         if (other == null) return false;
 
-        // Eliminate other if its class is not the same
         if (! other.getClass().equals(this.getClass())) return false;
 
-        // Downcast and compare fields
         SequenceDBSearchResult that = (SequenceDBSearchResult) other;
 
-        if (! ObjectUtil.equals(this.querySeq, that.querySeq))
+        if (! ObjectUtil.equals(this.queryID, that.queryID))
             return false;
-        if (! ObjectUtil.equals(this.sequenceDB, that.sequenceDB))
+        if (! ObjectUtil.equals(this.databaseID, that.databaseID))
             return false;
         if (! ObjectUtil.equals(this.searchParameters, that.searchParameters))
             return false;
@@ -164,20 +197,22 @@ public class SequenceDBSearchResult extends AbstractChangeable
 
     public int hashCode()
     {
-        int hc = 0;
-
-        hc = ObjectUtil.hashCode(hc, querySeq);
-        hc = ObjectUtil.hashCode(hc, sequenceDB);
-        hc = ObjectUtil.hashCode(hc, searchParameters);
-        hc = ObjectUtil.hashCode(hc, hits);
-        hc = ObjectUtil.hashCode(hc, annotation);
+        if (! hcCalc)
+        {
+            hc = ObjectUtil.hashCode(hc, queryID);
+            hc = ObjectUtil.hashCode(hc, databaseID);
+            hc = ObjectUtil.hashCode(hc, searchParameters);
+            hc = ObjectUtil.hashCode(hc, hits);
+            hc = ObjectUtil.hashCode(hc, annotation);
+            hcCalc = true;
+        }
 
         return hc;
     }
 
     public String toString()
     {
-        return "SequenceDBSearchResult of " + getQuerySequence()
-            + " against " + getSequenceDB();
+        return "SequenceDBSearchResult of " + queryID
+            + " against " + databaseID;
     }
 }

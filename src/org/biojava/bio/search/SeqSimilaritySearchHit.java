@@ -35,16 +35,18 @@ import org.biojava.bio.seq.StrandedFeature.Strand;
  */
 public interface SeqSimilaritySearchHit
 {
-  /**
-   * Return the overall score of this hit in the units defined by the
-   * search algorithm.
-   * @return the overall score of this hit. This is a mandatory piece
-   * of information and hence may not be NaN.
-   */
+    /**
+     * Return the overall score of this hit in the units defined by the
+     * search algorithm.
+     *
+     * @return the overall score of this hit. This is a mandatory piece
+     * of information and hence may not be NaN.
+     */
     public double getScore();
 
     /**
      * Return the overall P-value of this hit.
+     *
      * @return the overall P-value of this hit. This is an optional
      * (but desired) piece of information and implementations of this
      * interface may return NaN if a P-value is not available for this
@@ -54,6 +56,7 @@ public interface SeqSimilaritySearchHit
   
     /**
      * Return the overall E-value of this hit.
+     *
      * @return the overall E-value of this hit. This is an optional
      * (but desired) piece of information and implementations of this
      * interface may return NaN if an E-value is not available for
@@ -65,7 +68,7 @@ public interface SeqSimilaritySearchHit
      * Return the start position of the first sub-hit in the query
      * sequence.
      *
-     * @return an <code>int</code> value.
+     * @return an <code>int</code>.
      */
     public int getQueryStart();
 
@@ -73,7 +76,7 @@ public interface SeqSimilaritySearchHit
      * Return the end position of the last sub-hit in the query
      * sequence.
      *
-     * @return an <code>int</code> value.
+     * @return an <code>int</code>.
      */
     public int getQueryEnd();
 
@@ -83,7 +86,7 @@ public interface SeqSimilaritySearchHit
      * should return the unknown strand. This may be null for protein
      * sequences.
      *
-     * @return a <code>Strand</code> value.
+     * @return a <code>Strand</code>.
      */
     public Strand getQueryStrand();
 
@@ -91,7 +94,7 @@ public interface SeqSimilaritySearchHit
      * Return the start position of the first sub-hit in the subject
      * sequence.
      *
-     * @return an <code>int</code> value.
+     * @return an <code>int</code>.
      */
     public int getSubjectStart();
 
@@ -99,7 +102,7 @@ public interface SeqSimilaritySearchHit
      * Return the end position of the last sub-hit in the subject
      * sequence.
      *
-     * @return an <code>int</code> value.
+     * @return an <code>int</code>.
      */
     public int getSubjectEnd();
 
@@ -109,19 +112,32 @@ public interface SeqSimilaritySearchHit
      * should return the unknown strand. This may be null for protein
      * sequences.
      *
-     * @return a <code>Strand</code> value.
+     * @return a <code>Strand</code>.
      */
     public Strand getSubjectStrand();
 
     /**
      * The sequence identifier of this hit within the sequence
      * database against which the search was performed.
+     *
+     * @return the (unique) sequence identifier for this hit, valid
+     * within the sequence database against which this search was
+     * performed. Never returns null.
+     *
+     * @deprecated use <code>getSubjectID</code>.
+     */
+    public String getSequenceID();
+
+    /**
+     * The sequence identifier of this hit within the sequence
+     * database against which the search was performed.
+     *
      * @return the (unique) sequence identifier for this hit, valid
      * within the sequence database against which this search was
      * performed. Never returns null.
      */
-    public String getSequenceID();
-  
+    public String getSubjectID();
+
     /**
      * Return all sub-hits for this sequence similarity search
      * hit. The sub-hits contain concrete alignments (and scores) for

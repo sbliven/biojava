@@ -78,7 +78,7 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
      * hit, which may be NaN.
      * @param alignment an <code>Alignment</code> object containing
      * the alignment described by the subhit region, which may not be
-     * null. 
+     * null.
      */
     public SequenceDBSearchSubHit(double    score,
                                   double    eValue,
@@ -95,6 +95,7 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
         {
             throw new IllegalArgumentException("score was NaN");
         }
+
         // pValue may be NaN
         // eValue may be NaN
         if (alignment == null)
@@ -174,10 +175,8 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
         if (other == this) return true;
         if (other == null) return false;
 
-        // Eliminate other if its class is not the same
         if (! other.getClass().equals(this.getClass())) return false;
-    
-        // Downcast and compare fields
+
         SequenceDBSearchSubHit that = (SequenceDBSearchSubHit) other;
 
         if (! ObjectUtil.equals(this.score, that.score))

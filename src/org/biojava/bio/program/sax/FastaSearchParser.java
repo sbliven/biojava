@@ -170,35 +170,6 @@ class FastaSearchParser
             switch (searchStatus)
             {
                 case NODATA:
-                    // Prior to the >>> line there is some information
-                    // about the query sequence ID which is normally
-                    // redundant. However, when there are no hits this
-                    // is the only place we can get this ID. I think
-                    // this is a deficiency in the format. If there
-                    // are long query sequence IDs, this is the only
-                    // place where they are not truncated.
-
-                    if (line.startsWith(" >"))
-                    {
-                        String trimmed = line.trim();
-
-                        // Index of first space
-                        int i = trimmed.indexOf(" ");
-
-                        // If there was a space in the line
-                        // e.g. '>foo : bar baz'
-                        if (i > 0)
-                        {
-                            handler.setQuerySeq(trimmed.substring(1, i));
-                        }
-                        // If there was no space
-                        // e.g. '>foo'
-                        else
-                        {
-                            handler.setQuerySeq(trimmed.substring(1));
-                        }
-                    }
-
                     // This token marks the line describing the query
                     // sequence file and database searched. It is
                     // followed by header lines containing data about
@@ -207,7 +178,8 @@ class FastaSearchParser
                     {
                         searchStatus = INHEADER;
 
-                        handler.setSubjectDB(parseDB(line));
+                        handler.setQueryID(parseQueryID(line));
+                        handler.setDatabaseID(parseDatabaseID(line));
 
                         handler.startSearch();
                         handler.startHeader();
@@ -251,7 +223,7 @@ class FastaSearchParser
                         subjectSeqTokens.setLength(0);
                         matchTokens.setLength(0);
 
-                        handler.addHitProperty("id",   parseId(line));
+                        handler.addHitProperty("id",   parseID(line));
                         handler.addHitProperty("desc", parseDesc(line));
                     }
                     else
@@ -322,7 +294,7 @@ class FastaSearchParser
                         subjectSeqTokens.setLength(0);
                         matchTokens.setLength(0);
 
-                        handler.addHitProperty("id",   parseId(line));
+                        handler.addHitProperty("id",   parseID(line));
                         handler.addHitProperty("desc", parseDesc(line));
                     }
                     else
@@ -348,7 +320,7 @@ class FastaSearchParser
                         subjectSeqTokens.setLength(0);
                         matchTokens.setLength(0);
 
-                        handler.addHitProperty("id",   parseId(line));
+                        handler.addHitProperty("id",   parseID(line));
                         handler.addHitProperty("desc", parseDesc(line));
                     }
                     else if (line.startsWith(">>><<<"))
@@ -401,7 +373,7 @@ class FastaSearchParser
     }
 
     /**
-     * The <code>parseId</code> method parses sequence IDs from
+     * The <code>parseID</code> method parses sequence IDs from
      * lines starting with '>' and '>>'.
      *
      * @param line a <code>String</code> to be parsed.
@@ -410,7 +382,7 @@ class FastaSearchParser
      *
      * @exception ParserException if an error occurs.
      */
-    private String parseId(final String line)
+    private String parseID(String line)
         throws ParserException
     {
         String trimmed = line.trim();
@@ -466,41 +438,58 @@ class FastaSearchParser
     }
 
     /**
-     * The <code>parseDB</code> method parses a database filename from
-     * the relevant output line.
+     * Creates a new <code>parseQueryID</code> instance.
      *
      * @param line a <code>String</code> to be parsed.
      *
-     * @return a <code>String</code> containing the filename.
+     * @return a <code>String</code>.
      *
-     * @exception ParserException if an error occurs.
+     * @exception ParserException if an error occurs
      */
-    private String parseDB(String line)
+    private String parseQueryID(String line)
         throws ParserException
     {
-        StringTokenizer st = new StringTokenizer(line);
-        String db;
-        String previous = null;
-        String  current = null;
+        int firstComma = line.indexOf(",");
 
-        // The database filename is the second-to-last token on the line
-        while (st.hasMoreTokens())
-        {
-            if (current == null)
-                current = st.nextToken();
-            else
-            {
-                previous = current;
-                current = st.nextToken();
-            }
-        }
-
-        if (previous == null)
-            throw new ParserException("Fasta parser failed to parse a database filename",
+        if (firstComma == -1)
+            throw new ParserException("Fasta parser failed to parse a query ID",
                                       null,
                                       lineNumber,
                                       line);
-        return previous;
+
+        // return string between >>> and ,
+        return line.substring(3, firstComma).trim();
+    }
+
+    /**
+     * The <code>parseDatabaseID</code> method parses a database
+     * filename from the relevant output line.
+     *
+     * @param line a <code>String</code> to be parsed.
+     *
+     * @return a <code>String</code>.
+     *
+     * @exception ParserException if an error occurs.
+     */
+    private String parseDatabaseID(String line)
+        throws ParserException
+    {
+        StringTokenizer st = new StringTokenizer(line);
+        String id = null;
+
+        int count = st.countTokens();
+
+        for (int i = 0; i < count - 1; i++)
+        {
+            id = st.nextToken();
+        }
+
+        if (id == null)
+            throw new ParserException("Fasta parser failed to parse a database ID",
+                                      null,
+                                      lineNumber,
+                                      line);
+        return id;
     }
 
     private boolean parseHeaderLine(String line,

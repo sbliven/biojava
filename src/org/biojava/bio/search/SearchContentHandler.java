@@ -136,28 +136,50 @@ public interface SearchContentHandler
     public void addSubHitProperty(Object key, Object value);
 
     /**
-     * <code>setQuerySeq</code> identifies the query sequence as being
-     * known by a particular name, ID or URN.
+     * <code>setQuerySeq</code> identifies the query sequence by a
+     * name, ID or URN.
      *
      * @param identifier a <code>String</code> which should be an
-     * unambiguous identifer for the sequence.
+     * unique identifer for the sequence.
      *
      * @exception BioException if the sequence cannot be obtained from
      * the identifier.
+     *
+     * @deprecated use <code>setQueryID</code> instead.
      */
     public void setQuerySeq(String identifier)
 	throws BioException;
 
     /**
-     * <code>setSubjectDB</code> identifies the database searched
-     * by means of a name, ID or URN.
+     * <code>setSubjectDB</code> identifies the database searched by a
+     * name, ID or URN.
      *
-     * @param id a <code>String</code> which should be an unambiguous
-     * identifier for the database searched.
+     * @param identifier a <code>String</code> which should be an
+     * unique identifier for the database searched.
      *
      * @exception BioException if the database cannot be obtained from
      * the identifier.
+     *
+     * @deprecated use <code>setDatabaseID</code> instead.
      */
     public void setSubjectDB(String identifier)
 	throws BioException;
+
+    /**
+     * <code>setQueryID</code> identifies the query sequence by a
+     * name, ID or URN.
+     *
+     * @param queryID a <code>String</code> which should be an unique
+     * identifer for the sequence.
+     */
+    public void setQueryID(String queryID);
+
+    /**
+     * <code>setDatabaseID</code> identifies the database searched by
+     * a name, ID or URN.
+     *
+     * @param databaseID a <code>String</code> which should be an unique
+     * identifier for the database searched.
+     */
+    public void setDatabaseID(String databaseID);
 }

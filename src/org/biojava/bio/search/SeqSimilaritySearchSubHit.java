@@ -38,13 +38,14 @@ public interface SeqSimilaritySearchSubHit
 {
     /**
      * This object is used as the label for the query sequence in the
-     * alignment of the query sequence with this sub-hit sequence
+     * alignment of the query sequence with this sub-hit sequence.
      */
     public static final String QUERY_LABEL = "Query";
   
     /**
      * Return the score of this sub-hit in the units defined by the
      * search algorithm.
+     *
      * @return the score of this sub-hit. This is a mandatory piece of
      * information and hence may not be NaN.
      */
@@ -52,6 +53,7 @@ public interface SeqSimilaritySearchSubHit
 
     /**
      * Return the P-value of this sub-hit.
+     *
      * @return the P-value of this sub-hit. This is an optional (but
      * desired) piece of information and implementations of this
      * interface may return NaN if a P-value is not available for this
@@ -61,6 +63,7 @@ public interface SeqSimilaritySearchSubHit
   
     /**
      * Return the E-value of this sub-hit.
+     *
      * @return the E-value of this sub-hit. This is an optional (but
      * desired) piece of information and implementations of this
      * interface may return NaN if an E-value is not available for
@@ -71,14 +74,14 @@ public interface SeqSimilaritySearchSubHit
     /**
      * Return the start position of the sub-hit in the query sequence.
      *
-     * @return an <code>int</code> value.
+     * @return an <code>int</code>.
      */
     public int getQueryStart();
 
     /**
      * Return the end position of the sub-hit in the query sequence.
      *
-     * @return an <code>int</code> value.
+     * @return an <code>int</code>.
      */
     public int getQueryEnd();
 
@@ -86,7 +89,7 @@ public interface SeqSimilaritySearchSubHit
      * Return the strand of the sub-hit with respect to the query
      * sequence. This may be null for protein sequences.
      *
-     * @return a <code>Strand</code> value.
+     * @return a <code>Strand</code>.
      */
     public Strand getQueryStrand();
 
@@ -94,7 +97,7 @@ public interface SeqSimilaritySearchSubHit
      * Return the start position of the sub-hit in the subject
      * sequence.
      *
-     * @return an <code>int</code> value.
+     * @return an <code>int</code>.
      */
     public int getSubjectStart();
 
@@ -102,7 +105,7 @@ public interface SeqSimilaritySearchSubHit
      * Return the start position of the sub-hit in the subject
      * sequence.
      *
-     * @return an <code>int</code> value.
+     * @return an <code>int</code>.
      */
     public int getSubjectEnd();
 
@@ -110,7 +113,7 @@ public interface SeqSimilaritySearchSubHit
      * Return the strand of the sub-hit with respect to the subject
      * sequence. This may be null for protein sequences.
      *
-     * @return a <code>Strand</code> value.
+     * @return a <code>Strand</code>.
      */
     public Strand getSubjectStrand();
 
@@ -119,6 +122,7 @@ public interface SeqSimilaritySearchSubHit
      * against (possibly part of) this hit sequence. In this
      * alignment, the query is identified by the label given by the
      * static field QUERY_LABEL.
+     *
      * @return the alignment of the query sequence against this hit
      * sequence.
      */

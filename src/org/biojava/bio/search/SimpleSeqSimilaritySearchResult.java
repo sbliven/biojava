@@ -31,8 +31,8 @@ import org.biojava.utils.ObjectUtil;
 
 /**
  * A class that implements the trivial (housekeeping) responsibilities
- * of interface SeqSimilaritySearchResult. Objects of this class are
- * immutable.
+ * of interface <code>SeqSimilaritySearchResult</code>. Objects of
+ * this class are immutable.
  *
  * @author Gerald Loeffler
  * @author Keith James
@@ -40,111 +40,130 @@ import org.biojava.utils.ObjectUtil;
 public class SimpleSeqSimilaritySearchResult
     implements SeqSimilaritySearchResult, Cloneable
 {
-    private SymbolList querySequence;
-    private SequenceDB sequenceDB;
-    private Map        searchParameters;
-    private List       hits;
+    private String queryID;
+    private String databaseID;
+    private Map    searchParameters;
+    private List   hits;
 
     // Hashcode is cached after first calculation because the data on
     // which is is based do not change
     private int hc;
     private boolean hcCalc;
 
-  /** 
-   * Construct an immutable object by giving all its properties.
-   * @param searcher the sequence similarity searcher that produced
-   * this search result, which may not be null.
-   * @param querySequence the query sequence that gave rise to this
-   * search result, which may not be null.
-   * @param sequenceDB the sequence database against which the search
-   * was conducted, which may not be null.
-   * @param searchParameters the search parameters used in the search
-   * that produced this result, which may be null. If not null, the
-   * getter for this property returns an unmodifiable view of this
-   * object.
-   * @param hits the list of SeqSimilaritySearchHit objects that make
-   * up this result, which may not null. The getter for this property
-   * returns an unmodifiable view of this object.
-   */
-    public SimpleSeqSimilaritySearchResult(SymbolList querySequence,
-                                           SequenceDB sequenceDB,
-                                           Map        searchParameters,
-                                           List       hits)
+    /** 
+     * 
+     * @param queryID the ID of the query sequence that gave rise to
+     * this search result, which may not be null.
+     * @param databaseID the ID of the sequence database against which
+     * the search was conducted, which may not be null.
+     * @param searchParameters the search parameters used in the search
+     * that produced this result, which may be null. If not null, the
+     * getter for this property returns an unmodifiable view of this
+     * object.
+     * @param hits the list of SeqSimilaritySearchHit objects that make
+     * up this result, which may not null. The getter for this property
+     * returns an unmodifiable view of this object.
+     */
+    public SimpleSeqSimilaritySearchResult(String queryID,
+                                           String databaseID,
+                                           Map    searchParameters,
+                                           List   hits)
     {
-        if (querySequence == null)
+        if (queryID == null)
         {
-            throw new IllegalArgumentException("querySequence was null");
+            throw new IllegalArgumentException("queryID was null");
         }
-        if (sequenceDB == null)
+
+        if (databaseID == null)
         {
-            throw new IllegalArgumentException("sequenceDB was null");
+            throw new IllegalArgumentException("databaseID was null");
         }
+
         // searchParameters may be null
         if (hits == null)
         {
             throw new IllegalArgumentException("hits was null");
         }
 
-        this.querySequence    = querySequence;
-        this.sequenceDB       = sequenceDB;
+        this.queryID          = queryID;
+        this.databaseID       = databaseID;
         this.searchParameters = searchParameters;
-        this.hits             = hits;
+        this.hits             = Collections.unmodifiableList(hits);
 
         hcCalc = false;
     }
 
-    public SymbolList getQuerySequence()
+    public String getQueryID()
     {
-        return querySequence;
+        return queryID;
     }
 
-    public SequenceDB getSequenceDB()
+    public String getDatabaseID()
     {
-        return sequenceDB;
+        return databaseID;
     }
 
     /**
-     * Return an unmodifiable view of the search parameters map.
+     * Return the query sequence which was used to perform the search.
+     *
+     * @return the <code>SymbolList</code> object used to search the
+     * <code>SequenceDB</code>. Never returns null.
+     *
+     * @deprecated use <code>getQueryID</code> to obtain a database
+     * identifier which may then be used to locate the query
+     * <code>SymbolList</code> in the appropriate
+     * <code>SequenceDB</code>.
      */
+    public SymbolList getQuerySequence()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Return the sequence database against which the search that
+     * produced this search result was performed.
+     *
+     * @return the <code>SequenceDB</code> object against which the
+     * search was carried out. Never returns null.
+     *
+     * @deprecated use <code>getDatabaseID</code> to obtain a database
+     * identifier which may then be used to locate a
+     * <code>SequenceDB</code> in the appropriate
+     * <code>SequenceDBInstallation</code>.
+     */
+    public SequenceDB getSequenceDB()
+    {
+        throw new UnsupportedOperationException();
+    }
+
     public Map getSearchParameters()
     {
         return (searchParameters == null ? null : Collections.unmodifiableMap(searchParameters));
     }
 
-    /**
-     * return an unmodifiable view of the hits list.
-     */
     public List getHits()
     {
         return Collections.unmodifiableList(hits);
-    }
-
-    public String toString()
-    {
-        return "SimpleSeqSimilaritySearchResult of " + getQuerySequence() + " against " + getSequenceDB();
     }
   
     public boolean equals(Object o)
     {
         if (o == this) return true;
-    
-        // if this class is a direct sub-class of Object:
         if (o == null) return false;
+
         if (! o.getClass().equals(this.getClass())) return false;
 
         SimpleSeqSimilaritySearchResult that = (SimpleSeqSimilaritySearchResult) o;
 
-        // only compare fields of this class (not of super-classes):
-        if (! ObjectUtil.equals(this.querySequence, that.querySequence))
+        if (! ObjectUtil.equals(this.queryID, that.queryID))
             return false;
-        if (! ObjectUtil.equals(this.sequenceDB, that.sequenceDB))
+        if (! ObjectUtil.equals(this.databaseID, that.databaseID))
             return false;
         if (! ObjectUtil.equals(this.searchParameters, that.searchParameters))
             return false;
         if (! ObjectUtil.equals(this.hits, that.hits))
             return false;
-    
-        // this and that are identical if we made it 'til here
+
         return true;
     }
   
@@ -152,8 +171,8 @@ public class SimpleSeqSimilaritySearchResult
     {
         if (! hcCalc)
         {
-            hc = ObjectUtil.hashCode(hc, querySequence);
-            hc = ObjectUtil.hashCode(hc, sequenceDB);
+            hc = ObjectUtil.hashCode(hc, queryID);
+            hc = ObjectUtil.hashCode(hc, databaseID);
             hc = ObjectUtil.hashCode(hc, searchParameters);
             hc = ObjectUtil.hashCode(hc, hits);
             hcCalc = true;
@@ -161,10 +180,15 @@ public class SimpleSeqSimilaritySearchResult
 
         return hc;
     }
-  
-  public Object clone()
+
+    public String toString()
     {
-        // this is an immutable class so we can return ourselves
+        return "SimpleSeqSimilaritySearchResult of " + getQueryID() +
+            " against " + getDatabaseID();
+    }
+  
+    public Object clone()
+    {
         return this;
     }
 }

@@ -65,7 +65,7 @@ public class HitStAXHandler extends SeqSimilarityStAXHandler
                    {
                        public StAXContentHandler getHandler(SeqSimilarityStAXAdapter ssContext)
                        {
-                           return new HitIdStAXHandler();
+                           return new HitIDStAXHandler();
                        }
                    });
 
@@ -75,7 +75,7 @@ public class HitStAXHandler extends SeqSimilarityStAXHandler
                    {
                        public StAXContentHandler getHandler(SeqSimilarityStAXAdapter ssContext)
                        {
-                           return new QueryIdStAXHandler();
+                           return new QueryIDStAXHandler();
                        }
                    });
 
@@ -125,9 +125,9 @@ public class HitStAXHandler extends SeqSimilarityStAXHandler
     }
 
     /**
-     * <code>HitIdStAXHandler</code> handles the hit ID.
+     * <code>HitIDStAXHandler</code> handles the hit ID.
      */
-    private class HitIdStAXHandler extends StAXContentHandlerBase
+    private class HitIDStAXHandler extends StAXContentHandlerBase
     {
         public void startElement(String            uri,
                                  String            localName,
@@ -141,9 +141,9 @@ public class HitStAXHandler extends SeqSimilarityStAXHandler
     }
 
     /**
-     * <code>QueryIdStAXHandler</code> handles the query ID.
+     * <code>QueryIDStAXHandler</code> handles the query ID.
      */
-    private class QueryIdStAXHandler extends StAXContentHandlerBase
+    private class QueryIDStAXHandler extends StAXContentHandlerBase
     {
         public void startElement(String            uri,
                                  String            localName,
@@ -152,15 +152,7 @@ public class HitStAXHandler extends SeqSimilarityStAXHandler
                                  DelegationManager dm)
         throws SAXException
         {
-             try
-             {
-                 ssContext.getSearchContentHandler().setQuerySeq(attr.getValue("id"));
-             }
-             catch (BioException be)
-             {
-                 throw new SAXException("Received a query sequence ID which fails: "
-                                        + be.getMessage());
-             }
+            ssContext.getSearchContentHandler().setQueryID(attr.getValue("id"));
         }
     }
 

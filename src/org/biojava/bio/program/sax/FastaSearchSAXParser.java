@@ -51,7 +51,7 @@ import org.biojava.bio.search.SearchContentHandler;
  *
  * <ul>
  *   <li>33t07</li>
- *   <li>33t08 (current tests are against output from this version</li>
+ *   <li>33t08 (current tests are against output from this version)</li>
  * </ul>
  *
  * <p>The SAX2 events produced are as if the input to the parser was
@@ -69,8 +69,8 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
     private Map               searchProperties;
     private Map               hitProperties;
 
-    private String  querySeqIdentifier;
-    private String subjectDBIdentifier;
+    private String queryID;
+    private String databaseID;
 
     private AttributesImpl  attributes;
     private QName                qName;
@@ -170,14 +170,42 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
         moreSearchesAvailable = value;
     }
 
+    /**
+     * <code>setQuerySeq</code> identifies the query sequence by a
+     * name, ID or URN.
+     *
+     * @param identifier a <code>String</code> which should be an
+     * unique identifer for the sequence.
+     *
+     * @deprecated use <code>setQueryID</code> instead.
+     */
     public void setQuerySeq(String identifier)
     {
-        querySeqIdentifier = identifier;
+        setQueryID(identifier);
     }
 
+    public void setQueryID(String queryID)
+    {
+        this.queryID = queryID;
+    }
+
+    /**
+     * <code>setSubjectDB</code> identifies the database searched by a
+     * name, ID or URN.
+     *
+     * @param id a <code>String</code> which should be an unique
+     * identifier for the database searched.
+     *
+     * @deprecated use <code>setDatabaseID</code> instead.
+     */
     public void setSubjectDB(String identifier)
     {
-        subjectDBIdentifier = identifier;
+        setDatabaseID(identifier);
+    }
+
+    public void setDatabaseID(String databaseID)
+    {
+        this.databaseID = databaseID;
     }
 
     public void startSearch()
@@ -246,13 +274,36 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
                          (Attributes) attributes);
 
             attributes.clear();
+            // Query id attribute
+            qName.setQName("id");
+            attributes.addAttribute(qName.getURI(),
+                                    qName.getLocalName(),
+                                    qName.getQName(),
+                                    "CDATA",
+                                    queryID);
+
+            // metaData attribute for QueryId
+            qName.setQName("metaData");
+            attributes.addAttribute(qName.getURI(),
+                                    qName.getLocalName(),
+                                    qName.getQName(),
+                                    "CDATA",
+                                    "none");
+
+            // Start the QueryId
+            startElement(new QName(this, this.prefix("QueryId")),
+                         (Attributes) attributes);
+            // End the QueryId
+            endElement(new QName(this, this.prefix("QueryId")));
+
+            attributes.clear();
             // id attribute for DatabaseId
             qName.setQName("id");
             attributes.addAttribute(qName.getURI(),
                                     qName.getLocalName(),
                                     qName.getQName(),
                                     "CDATA",
-                                    subjectDBIdentifier);
+                                    databaseID);
 
             // metaData attribute for DatabaseId
             qName.setQName("metaData");
@@ -392,29 +443,6 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
                          (Attributes) attributes);
             // End the HitId
             endElement(new QName(this, this.prefix("HitId")));
-
-            attributes.clear();
-            // Query id attribute
-            qName.setQName("id");
-            attributes.addAttribute(qName.getURI(),
-                                    qName.getLocalName(),
-                                    qName.getQName(),
-                                    "CDATA",
-                                    querySeqIdentifier);
-
-            // metaData attribute for QueryId
-            qName.setQName("metaData");
-            attributes.addAttribute(qName.getURI(),
-                                    qName.getLocalName(),
-                                    qName.getQName(),
-                                    "CDATA",
-                                    "none");
-
-            // Start the QueryId
-            startElement(new QName(this, this.prefix("QueryId")),
-                         (Attributes) attributes);
-            // End the QueryId
-            endElement(new QName(this, this.prefix("QueryId")));
 
             attributes.clear();
             // Start the HitDescription

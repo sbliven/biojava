@@ -18,7 +18,7 @@ import org.biojava.bio.BioException;
  *
  * <h2>Example</h2>
  * <pre>
- * // a very booring handler
+ * // a very boring handler
  * SearchContentHanlder ignoreEverything = new SearchContentAdapter();
  *
  * // just respond to sub hit properties
@@ -49,7 +49,8 @@ implements SearchContentHandler {
   public void endSubHit() {}
   public void setQuerySeq(String seqID) throws BioException {}
   public void setSubjectDB(String dbID) throws BioException {}
-
+  public void setQueryID(String queryID) {}
+  public void setDatabaseID(String databaseID) {}
 
   public boolean getMoreSearches() {
     return moreSearches;

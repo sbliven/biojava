@@ -64,7 +64,6 @@ import org.biojava.utils.ObjectUtil;
 public class SequenceDBSearchHit extends AbstractChangeable
     implements SeqSimilaritySearchHit, Annotatable
 {
-    private String     sequenceID;
     private double     score;
     private double     pValue;
     private double     eValue;
@@ -74,8 +73,9 @@ public class SequenceDBSearchHit extends AbstractChangeable
     private int        subjectStart;
     private int        subjectEnd;
     private Strand     subjectStrand;
-    private List       subHits;
+    private String     subjectID;
     private Annotation annotation;
+    private List       subHits;
 
     // Hashcode is cached after first calculation because the data on
     // which is is based do not change
@@ -85,9 +85,6 @@ public class SequenceDBSearchHit extends AbstractChangeable
     /**
      * Creates a new <code>SequenceDBSearchHit</code> object.
      *
-     * @param sequenceID a <code>String</code> representing the ID in
-     * the SequenceDB of the sequence which was hit, which may not be
-     * null.
      * @param score a <code>double</code> value; the score of the hit,
      * which may not be NaN.
      * @param eValue a <code>double</code> value; the E-value of the
@@ -110,11 +107,14 @@ public class SequenceDBSearchHit extends AbstractChangeable
      * sequence, which may be null for protein similarities. If they
      * are not all positive or all negative, then this should be the
      * unknown strand.
+     * @param subjectID a <code>String</code> representing the ID in
+     * the SequenceDB of the sequence which was hit, which may not be
+     * null.
+     * @param annotation an <code>Annotation</code> object, which may
+     * not be null.
      * @param subHits a <code>List</code> object containing the
      * subhits, which may not be null. They should be sorted in the
      * order specified by the search program.
-     * @param annotation an <code>Annotation</code> object, which may
-     * not be null.
      */
     public SequenceDBSearchHit(double     score,
                                double     eValue,
@@ -125,7 +125,7 @@ public class SequenceDBSearchHit extends AbstractChangeable
                                int        subjectStart,
                                int        subjectEnd,
                                Strand     subjectStrand,
-                               String     sequenceID,
+                               String     subjectID,
                                Annotation annotation,
                                List       subHits)
     {
@@ -133,22 +133,24 @@ public class SequenceDBSearchHit extends AbstractChangeable
         {
             throw new IllegalArgumentException("score was NaN");
         }
+
         // pValue may be NaN
         // eValue may be NaN
-        if (sequenceID == null)
+        if (subjectID == null)
         {
-            throw new IllegalArgumentException("sequenceID was null");
+            throw new IllegalArgumentException("subjectID was null");
         }
+
         if (annotation == null)
         {
             throw new IllegalArgumentException("annotation was null");
         }
+
         if (subHits == null)
         {
             throw new IllegalArgumentException("subHits was null");
         }
 
-        this.sequenceID    = sequenceID;
         this.score         = score;
         this.eValue        = eValue;
         this.pValue        = pValue;
@@ -158,8 +160,9 @@ public class SequenceDBSearchHit extends AbstractChangeable
         this.subjectStart  = subjectStart;
         this.subjectEnd    = subjectEnd;
         this.subjectStrand = subjectStrand;
-        this.subHits       = subHits;
+        this.subjectID     = subjectID;
         this.annotation    = annotation;
+        this.subHits       = Collections.unmodifiableList(subHits);
 
         // Lock the annotation by vetoing all changes
         this.annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
@@ -212,9 +215,24 @@ public class SequenceDBSearchHit extends AbstractChangeable
         return subjectStrand;
     }
 
+    public String getSubjectID()
+    {
+        return subjectID;
+    }
+
+    /**
+     * The identifier of the hit within the sequence database which
+     * was searched.
+     *
+     * @return the (unique) sequence identifier for this hit, valid
+     * within the sequence database against which this search was
+     * performed. Never returns null.
+     *
+     * @deprecated use <code>getSubjectID</code>.
+     */
     public String getSequenceID()
     {
-        return sequenceID;
+        return getSubjectID();
     }
 
     public List getSubHits()
@@ -226,7 +244,7 @@ public class SequenceDBSearchHit extends AbstractChangeable
      * <code>getAnnotation</code> returns the Annotation associated
      * with this hit.
      *
-     * @return an <code>Annotation</code> object.
+     * @return an <code>Annotation</code>.
      */
     public Annotation getAnnotation()
     {
@@ -238,10 +256,8 @@ public class SequenceDBSearchHit extends AbstractChangeable
         if (other == this) return true;
         if (other == null) return false;
 
-        // Eliminate other if its class is not the same
         if (! other.getClass().equals(this.getClass())) return false;
-    
-        // Downcast and compare fields
+
         SequenceDBSearchHit that = (SequenceDBSearchHit) other;
 
         if (! ObjectUtil.equals(this.score, that.score))
@@ -250,7 +266,7 @@ public class SequenceDBSearchHit extends AbstractChangeable
             return false;
         if (! ObjectUtil.equals(this.eValue, that.eValue))
             return false;
-        if (! ObjectUtil.equals(this.sequenceID, that.sequenceID))
+        if (! ObjectUtil.equals(this.subjectID, that.subjectID))
             return false;
         if (! ObjectUtil.equals(this.subHits, that.subHits))
             return false;
@@ -265,7 +281,7 @@ public class SequenceDBSearchHit extends AbstractChangeable
             hc = ObjectUtil.hashCode(hc, score);
             hc = ObjectUtil.hashCode(hc, pValue);
             hc = ObjectUtil.hashCode(hc, eValue);
-            hc = ObjectUtil.hashCode(hc, sequenceID);
+            hc = ObjectUtil.hashCode(hc, subjectID);
             hc = ObjectUtil.hashCode(hc, subHits);
             hcCalc = true;
         }
@@ -275,7 +291,7 @@ public class SequenceDBSearchHit extends AbstractChangeable
 
     public String toString()
     {
-        return "SequenceDBSearchHit to " + getSequenceID()
+        return "SequenceDBSearchHit to " + getSubjectID()
             + " with score " + getScore();
     }
 }

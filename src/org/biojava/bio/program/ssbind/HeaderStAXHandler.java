@@ -62,15 +62,6 @@ public class HeaderStAXHandler extends SeqSimilarityStAXHandler
     HeaderStAXHandler(SeqSimilarityStAXAdapter ssContext)
     {
         super(ssContext);
-        addHandler(new ElementRecognizer.ByNSName(SeqSimilarityStAXAdapter.NAMESPACE,
-                                                  "RawOutput"),
-                   new StAXHandlerFactory()
-                   {
-                       public StAXContentHandler getHandler(SeqSimilarityStAXAdapter ssContext)
-                       {
-                           return new BlastDBQueryStAXHandler();
-                       }
-                   });
 
         addHandler(new ElementRecognizer.ByNSName(SeqSimilarityStAXAdapter.NAMESPACE,
                                                   "QueryId"),
@@ -78,7 +69,7 @@ public class HeaderStAXHandler extends SeqSimilarityStAXHandler
                    {
                        public StAXContentHandler getHandler(SeqSimilarityStAXAdapter ssContext)
                        {
-                           return new QueryIdStAXHandler();
+                           return new QueryIDStAXHandler();
                        }
                    });
 
@@ -88,84 +79,15 @@ public class HeaderStAXHandler extends SeqSimilarityStAXHandler
                    {
                        public StAXContentHandler getHandler(SeqSimilarityStAXAdapter ssContext)
                        {
-                           return new DatabaseIdStAXHandler();
+                           return new DatabaseIDStAXHandler();
                        }
                    });
     }
 
     /**
-     * <code>BlastDBQueryStAXHandler</code> workaround class which
-     * parses DB and Query info from the RawOutput element. The DTD
-     * has specific elements for these data, but the current parser
-     * does not populate them. When those elements are present, the
-     * other two handlers in the enclosing class will be used.
+     * <code>QueryIDStAXHandler</code> handles the query sequence ID.
      */
-    private class BlastDBQueryStAXHandler extends StringElementHandlerBase
-    {
-        private SearchContentHandler sch;
-
-        protected void setStringValue(String s) throws SAXException
-        {
-            // Check that we are dealing with Blast output
-            String program = ssContext.getProgram().toUpperCase();
-
-            if (program.indexOf("BLAST") == -1 )
-                return;
-
-            sch = ssContext.getSearchContentHandler();
-
-            StringTokenizer st = new StringTokenizer(s.trim());
-
-            String    query = null;
-            String database = null;
-
-            while (st.hasMoreTokens())
-            {
-                String t = st.nextToken();
-
-                if (t.equals("Query="))
-                {
-                    query = st.nextToken();
-                    continue;
-                }
-                else if (t.equals("Database:"))
-                {
-                    database = st.nextToken();
-                    continue;
-                }
-            }
-
-            if (query == null)
-                throw new SAXException("Failed to parse query sequence ID");
-            else if (database == null)
-                throw new SAXException("Failed to parse database ID");
-
-            try
-            {
-                sch.setQuerySeq(query);
-            }
-            catch (BioException be)
-            {
-                throw new SAXException("Received a query sequence ID which fails: "
-                                       + be.getMessage());
-            }
-
-            try
-            {
-                sch.setSubjectDB(database);
-            }
-            catch (BioException be)
-            {
-                throw new SAXException("Received a database ID which fails: "
-                                       + be.getMessage());
-            }
-        }
-    }
-
-    /**
-     * <code>QueryIdStAXHandler</code> handles the query sequence ID.
-     */
-    private class QueryIdStAXHandler extends StAXContentHandlerBase
+    private class QueryIDStAXHandler extends StAXContentHandlerBase
     {
         public void startElement(String            uri,
                                  String            localName,
@@ -174,22 +96,14 @@ public class HeaderStAXHandler extends SeqSimilarityStAXHandler
                                  DelegationManager dm)
         throws SAXException
         {
-             try
-             {
-                 ssContext.getSearchContentHandler().setQuerySeq(attr.getValue("id"));
-             }
-             catch (BioException be)
-             {
-                 throw new SAXException("Received a query sequence ID which fails: "
-                                        + be.getMessage());
-             }
+            ssContext.getSearchContentHandler().setQueryID(attr.getValue("id"));
         }
     }
 
     /**
-     * <code>DatabaseIdStAXHandler</code> handles the database ID.
+     * <code>DatabaseIDStAXHandler</code> handles the database ID.
      */
-    private class DatabaseIdStAXHandler extends StAXContentHandlerBase
+    private class DatabaseIDStAXHandler extends StAXContentHandlerBase
     {
         public void startElement(String            uri,
                                  String            localName,
@@ -198,15 +112,7 @@ public class HeaderStAXHandler extends SeqSimilarityStAXHandler
                                  DelegationManager dm)
         throws SAXException
         {
-             try
-             {
-                 ssContext.getSearchContentHandler().setSubjectDB(attr.getValue("id"));
-             }
-             catch (BioException be)
-             {
-                 throw new SAXException("Received a database ID which fails: "
-                                        + be.getMessage());
-             }
+            ssContext.getSearchContentHandler().setDatabaseID(attr.getValue("id"));
         }
     }
 }

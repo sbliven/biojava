@@ -51,7 +51,7 @@ public class SimpleSeqSimilaritySearchHit
     private int    sStart;
     private int    sEnd;
     private Strand sStrand;
-    private String sequenceID;
+    private String subjectID;
     private List   subHits;
 
     // Hashcode is cached after first calculation because the data on
@@ -84,7 +84,7 @@ public class SimpleSeqSimilaritySearchHit
      * sequence, which may be null for protein similarities. If they
      * are no all positive or all negative, then this should be the
      * unknown strand.
-     * @param sequenceID the (unique) sequence identifier for this
+     * @param subjectID the (unique) sequence identifier for this
      * hit, valid within the sequence database against which this
      * search was performed, which may not be null.
      * @param subHits a List of SeqSimilaritySearchSubHit objects
@@ -99,19 +99,21 @@ public class SimpleSeqSimilaritySearchHit
                                         int    sStart,
                                         int    sEnd,
                                         Strand sStrand,
-                                        String sequenceID,
+                                        String subjectID,
                                         List   subHits)
     {
         if (Double.isNaN(score))
         {
             throw new IllegalArgumentException("score was NaN");
         }
+
         // pValue may be NaN
         // eValue may be NaN
-        if (sequenceID == null)
+        if (subjectID == null)
         {
-            throw new IllegalArgumentException("sequenceID was null");
+            throw new IllegalArgumentException("subjectID was null");
         }
+
         if (subHits == null)
         {
             throw new IllegalArgumentException("subHits was null");
@@ -120,14 +122,14 @@ public class SimpleSeqSimilaritySearchHit
         this.score      = score;
         this.pValue     = pValue;
         this.eValue     = eValue;
-        this.sequenceID = sequenceID;
         this.qStart     = qStart;
         this.qEnd       = qEnd;
         this.qStrand    = qStrand;
         this.sStart     = sStart;
         this.sEnd       = sEnd;
         this.sStrand    = sStrand;
-        this.subHits    = subHits;
+        this.subjectID  = subjectID;
+        this.subHits    = Collections.unmodifiableList(subHits);
 
         hcCalc = false;
     }
@@ -177,51 +179,54 @@ public class SimpleSeqSimilaritySearchHit
         return sStrand;
     }
 
+    public String getSubjectID()
+    {
+        return subjectID;
+    }
+
+    /**
+     * The identifier of the hit within the sequence database which
+     * was searched.
+     *
+     * @return the (unique) sequence identifier for this hit, valid
+     * within the sequence database against which this search was
+     * performed. Never returns null.
+     *
+     * @deprecated use <code>getSubjectID</code>.
+     */
     public String getSequenceID()
     {
-        return sequenceID;
+        return getSubjectID();
     }
   
-    /**
-     * Return an unmodifiable view of the sub-hits list.
-     */
     public List getSubHits()
     {
         return Collections.unmodifiableList(subHits);
-    }
-
-    public String toString()
-    {
-        return "SequenceDBSearchHit to " + getSequenceID()
-            + " with score " + getScore();
     }
   
     public boolean equals(Object o)
     {
         if (o == this) return true;
-    
-        // if this class is a direct sub-class of Object:
         if (o == null) return false;
+
         if (! o.getClass().equals(this.getClass())) return false;
-    
+
         SimpleSeqSimilaritySearchHit that = (SimpleSeqSimilaritySearchHit) o;
-    
-        // only compare fields of this class (not of super-classes):
+
         if (! ObjectUtil.equals(this.score, that.score))
             return false;
         if (! ObjectUtil.equals(this.pValue, that.pValue))
             return false;
         if (! ObjectUtil.equals(this.eValue, that.eValue))
             return false;
-        if (! ObjectUtil.equals(this.sequenceID, that.sequenceID))
+        if (! ObjectUtil.equals(this.subjectID, that.subjectID))
             return false;
         if (! ObjectUtil.equals(this.subHits, that.subHits))
             return false;
-    
-        // this and that are identical if we made it 'til here
+
         return true;
     }
-  
+
     public int hashCode()
     {
         if (! hcCalc)
@@ -229,17 +234,22 @@ public class SimpleSeqSimilaritySearchHit
             hc = ObjectUtil.hashCode(hc, score);
             hc = ObjectUtil.hashCode(hc, pValue);
             hc = ObjectUtil.hashCode(hc, eValue);
-            hc = ObjectUtil.hashCode(hc, sequenceID);
+            hc = ObjectUtil.hashCode(hc, subjectID);
             hc = ObjectUtil.hashCode(hc, subHits);
             hcCalc = true;
         }
 
         return hc;
     }
-  
+
+    public String toString()
+    {
+        return "SequenceDBSearchHit to " + getSubjectID()
+            + " with score " + getScore();
+    }
+
     public Object clone()
     {
-        // this is an immutable class so we can return ourselves
         return this;
     }
 }

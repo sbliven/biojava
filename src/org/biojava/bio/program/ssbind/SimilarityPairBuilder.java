@@ -34,10 +34,7 @@ import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.bio.seq.ViewSequence;
 import org.biojava.bio.seq.db.IllegalIDException;
-import org.biojava.bio.seq.db.SequenceDB;
-import org.biojava.bio.seq.db.SequenceDBInstallation;
 import org.biojava.bio.seq.homol.SimilarityPairFeature;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alignment;
@@ -74,7 +71,8 @@ import org.biojava.utils.ChangeVetoException;
  * @author Greg Cox
  * @since 1.2
  */
-public class SimilarityPairBuilder implements SearchContentHandler
+public class SimilarityPairBuilder extends ViewSequenceFactory
+    implements SearchContentHandler
 {
     /**
      * Constant <code>SIMILARITY_PAIR_FEATURE_TYPE</code> the type
@@ -85,22 +83,9 @@ public class SimilarityPairBuilder implements SearchContentHandler
      */
     public static final String SIMILARITY_PAIR_FEATURE_TYPE = "similarity";
 
-    // Supplier of instances of searched databases
-    private SequenceDBInstallation subjectDBs;
-    // The specific database searched
-    private SequenceDB subjectDB;
-    // Holder for all query sequences
-    private SequenceDB querySeqHolder;
-    // View of query sequence instance
-    private Sequence queryView;
-
-    // Cache which holds view(s) of query sequence(s) which have
-    // been instantiated for annotation
-    private Map queryViewCache;
-
-    // Cache which holds view(s) of subject sequence(s) which have
-    // been instantiated for annotation
-    private Map subjectViewCache;
+    // Identifiers for query and database
+    private String queryID;
+    private String databaseID;
 
     // Data holders for search result properties
     private Map resultData;
@@ -125,109 +110,64 @@ public class SimilarityPairBuilder implements SearchContentHandler
         tokenBuffer      = new StringBuffer(1024);
     }
 
-    public Sequence getAnnotatedQuerySeq(String queryId)
+    public Sequence getAnnotatedQuerySeq(String queryID)
         throws IllegalIDException
     {
-        if (! queryViewCache.containsKey(queryId))
+        if (! queryViewCache.containsKey(queryID))
             throw new IllegalIDException("Failed to retrieve annotated query sequence from cache using ID '"
-                                         + queryId
+                                         + queryID
                                          + "' (unknown ID");
 
-        return (Sequence) queryViewCache.get(queryId);
+        return (Sequence) queryViewCache.get(queryID);
     }
 
-    public Sequence getAnnotatedSubjectSeq(String subjectId)
+    public Sequence getAnnotatedSubjectSeq(String subjectID)
         throws IllegalIDException
     {
-        if (! subjectViewCache.containsKey(subjectId))
+        if (! subjectViewCache.containsKey(subjectID))
             throw new IllegalIDException("Failed to retrieve annotated subject sequence from cache using ID '"
-                                         + subjectId
+                                         + subjectID
                                          + "' (unknown ID");
 
-        return (Sequence) subjectViewCache.get(subjectId);
+        return (Sequence) subjectViewCache.get(subjectID);
     }
 
     /**
-     * <code>getQuerySeqHolder</code> returns the database of query
-     * sequences used to retrieve sequences for creation of the
-     * various result objects.
+     * <code>setQuerySeq</code> identifies the query sequence by a
+     * name, ID or URN.
      *
-     * @return a <code>SequenceDB</code> value.
+     * @param identifier a <code>String</code> which should be an
+     * unique identifer for the sequence.
+     *
+     * @deprecated use <code>setQueryID</code> instead.
      */
-    public SequenceDB getQuerySeqHolder()
+    public void setQuerySeq(String identifier)
     {
-        return querySeqHolder;
+        setQueryID(identifier);
+    }
+
+    public void setQueryID(String queryID)
+    {
+        this.queryID = queryID;
     }
 
     /**
-     * <code>setQuerySeqHolder</code> sets the query sequence holder
-     * to a specific database.
+     * <code>setSubjectDB</code> identifies the database searched by a
+     * name, ID or URN.
      *
-     * @param querySeqHolder a <code>SequenceDB</code> containing the
-     * query sequence(s).
-     */
-    public void setQuerySeqHolder(SequenceDB querySeqHolder)
-    {
-        this.querySeqHolder = querySeqHolder;
-    }
-
-    /**
-     * <code>getSubjectDBInstallation</code> returns the installation
-     * in which all the databases searched may be
-     * found. <code>SequenceDB</code>s are retrieved for creation of
-     * the various result objects.
+     * @param identifier a <code>String</code> which should be an
+     * unique identifier for the database searched.
      *
-     * @return a <code>SequenceDBInstallation</code> containing the
-     * subject database(s).
+     * @deprecated use <code>setDatabaseID</code> instead.
      */
-    public SequenceDBInstallation getSubjectDBInstallation()
+    public void setSubjectDB(String identifier)
     {
-        return subjectDBs;
+        setDatabaseID(identifier);
     }
 
-    /**
-     * <code>setSubjectDBInstallation</code> sets the subject database
-     * holder to a specific installation.
-     *
-     * @param subjectDBs a <code>SequenceDBInstallation</code>
-     * containing the subject database(s)
-     */
-    public void setSubjectDBInstallation(SequenceDBInstallation subjectDBs)
+    public void setDatabaseID(String databaseID)
     {
-        this.subjectDBs = subjectDBs;
-    }
-
-    public void setQuerySeq(String querySeqId)
-        throws BioException
-    {
-        if (querySeqHolder == null)
-            throw new BioException("Running SimilarityPairBuilder with null query SequenceDB");
-
-        Sequence temp = querySeqHolder.getSequence(querySeqId);
-
-        // It shouldn't happen, but it can with some implementations
-        // of SequenceDB
-        if (temp == null)
-	    throw new BioException("Failed to retrieve query sequence from holder using ID '"
-				   + querySeqId
-                                   + " (sequence was null)");
-
-        queryView = new ViewSequence(temp);
-        queryViewCache.put(querySeqId, queryView);
-    }
-
-    public void setSubjectDB(String subjectDBName)
-        throws BioException
-    {
-        if (subjectDBs == null)
-            throw new BioException("Running SimilarityPairBuilder with null subject SequenceDBInstallation");
-
-        subjectDB = subjectDBs.getSequenceDB(subjectDBName);
-
-	if (subjectDB == null)
-	    throw new BioException("Failed to retrieve database from installation using ID '"
-				   + subjectDBName
-                                   + "'");
+        this.databaseID = databaseID;
     }
 
     public boolean getMoreSearches()
@@ -364,34 +304,10 @@ public class SimilarityPairBuilder implements SearchContentHandler
             sEnd   = swap;
         }
 
-        String subjectSeqId = (String) subHitData.get("HitId");
+        String subjectID = (String) subHitData.get("HitId");
 
-        Sequence subjectView;
-        // If we have already instantiated a subjectView for this sequence
-        if (subjectViewCache.containsKey(subjectSeqId))
-        {
-            subjectView = (Sequence) subjectViewCache.get(subjectSeqId);
-        }
-        else
-        {
-            try
-            {
-                Sequence subjectSeq = subjectDB.getSequence(subjectSeqId);
-                if (subjectSeq == null)
-                    throw new BioException("Failed to retrieve subject sequence from subjectDB using ID '"
-                                           + subjectSeqId
-                                           + "' (sequence was null)");
-
-                subjectView = new ViewSequence(subjectSeq);
-            }
-            catch (IllegalIDException iie)
-            {
-                throw new BioException(iie, "Failed to retrieve subject sequence from subjectDB using ID '"
-                                       + subjectSeqId
-                                       +  "'");
-            }
-            subjectViewCache.put(subjectSeqId, subjectView);
-        }
+        Sequence   queryView = makeQueryViewSequence(queryID);
+        Sequence subjectView = makeSubjectViewSequence(subjectID);
 
         // Map of Alignment sequences
         Map labelMap = new HashMap();

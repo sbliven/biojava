@@ -30,7 +30,7 @@ import org.biojava.bio.BioException;
  *
  * // now we are going to mutate all "score" notifications to Double instances
  * // from strings
- * SearchContentHanlder filter = new SearchContentFilter() {
+ * SearchContentHandler filter = new SearchContentFilter() {
  *   public void addHitProperty(Object key, Object value) {
  *     if("score".equals(key)) {
  *       if(value instanceof String) {
@@ -106,6 +106,14 @@ implements SearchContentHandler {
   throws BioException {
     delegate.setSubjectDB(dbID);
   }
+
+    public void setQueryID(String queryID) {
+        delegate.setQueryID(queryID);
+    }
+
+    public void setDatabaseID(String databaseID) {
+        delegate.setDatabaseID(databaseID);
+    }
 
   public boolean getMoreSearches() {
     return delegate.getMoreSearches();

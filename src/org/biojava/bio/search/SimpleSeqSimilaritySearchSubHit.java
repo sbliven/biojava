@@ -23,6 +23,7 @@ package org.biojava.bio.search;
 
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Alignment;
+import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ObjectUtil;
 
 /**
@@ -56,6 +57,12 @@ public class SimpleSeqSimilaritySearchSubHit
      * Construct an immutable object of this class by providing all
      * properties.
      *
+     * @param score a <code>double</code> value; the score of the
+     * subhit, which may not be NaN.
+     * @param eValue a <code>double</code> the E-value of the
+     * subhit, which may be NaN.
+     * @param pValue a <code>double</code> value; the P-value of the
+     * hit, which may be NaN.
      * @param queryStart an <code>int</code> value indicating the
      * start coordinate of the hit on the query sequence.
      * @param queryEnd an <code>int</code> value indicating the end
@@ -70,12 +77,6 @@ public class SimpleSeqSimilaritySearchSubHit
      * @param subjectStrand a <code>Strand</code> object indicating
      * the strand of the hit with respect to the query sequence, which
      * may be null for protein similarities.
-     * @param score a <code>double</code> value; the score of the
-     * subhit, which may not be NaN.
-     * @param eValue a <code>double</code> the E-value of the
-     * subhit, which may be NaN.
-     * @param pValue a <code>double</code> value; the P-value of the
-     * hit, which may be NaN.
      * @param alignment an <code>Alignment</code> object containing
      * the alignment described by the subhit region, which may not be
      * null.
@@ -95,6 +96,7 @@ public class SimpleSeqSimilaritySearchSubHit
         {
             throw new IllegalArgumentException("score was NaN");
         }
+
         // pValue may be NaN
         // eValue may be NaN
         if (alignment == null)
@@ -112,6 +114,9 @@ public class SimpleSeqSimilaritySearchSubHit
         this.subjectEnd    = subjectEnd;
         this.subjectStrand = subjectStrand;
         this.alignment     = alignment;
+
+        // Lock alignment by vetoing all changes
+        this.alignment.addChangeListener(ChangeListener.ALWAYS_VETO);
 
         hcCalc = false;
     }
@@ -166,22 +171,15 @@ public class SimpleSeqSimilaritySearchSubHit
         return alignment;
     }
 
-    public String toString()
-    {
-        return "SimpleSeqSimilaritySearchSubHit with score " + getScore();
-    }
-  
     public boolean equals(Object o)
     {
         if (o == this) return true;
-    
-        // if this class is a direct sub-class of Object:
         if (o == null) return false;
+
         if (! o.getClass().equals(this.getClass())) return false;
-    
+
         SimpleSeqSimilaritySearchSubHit that = (SimpleSeqSimilaritySearchSubHit) o;
-    
-        // only compare fields of this class (not of super-classes):
+
         if (! ObjectUtil.equals(this.score, that.score))
             return false;
         if (! ObjectUtil.equals(this.pValue, that.pValue))
@@ -200,8 +198,7 @@ public class SimpleSeqSimilaritySearchSubHit
             return false;
         if (! ObjectUtil.equals(this.subjectStrand, that.subjectStrand))
             return false;
-    
-        // this and that are identical if we made it 'til here
+
         return true;
     }
   
@@ -223,10 +220,14 @@ public class SimpleSeqSimilaritySearchSubHit
 
         return hc;
     }
-  
+
+    public String toString()
+    {
+        return "SimpleSeqSimilaritySearchSubHit with score " + getScore();
+    }
+
     public Object clone()
     {
-        // this is an immutable class so we can return ourselves
         return this;
     }
 }

@@ -36,7 +36,6 @@ import org.biojava.bio.search.*;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.db.SequenceDB;
-import org.biojava.bio.seq.db.SequenceDBInstallation;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.*;
 import org.biojava.utils.ChangeVetoException;
@@ -79,14 +78,10 @@ import org.biojava.utils.ChangeVetoException;
  */
 public class BlastLikeSearchBuilder implements SearchBuilder
 {
-    // Supplier of instances of searched databases
-    private SequenceDBInstallation subjectDBs;
-    // The specific database searched
-    private SequenceDB subjectDB;
-    // Holder for all query sequences
-    private SequenceDB querySeqHolder;
-    // The specific query sequence instance
-    private SymbolList querySeq;
+    // The ID of the database searched
+    private String databaseID;
+    // The ID of the query sequence
+    private String queryID;
 
     // Hit and Result annotation
     private Annotation hitAnnotation;
@@ -132,95 +127,49 @@ public class BlastLikeSearchBuilder implements SearchBuilder
     public SeqSimilaritySearchResult makeSearchResult()
         throws BioException
     {
-        return new SequenceDBSearchResult(subjectDB,
+        return new SequenceDBSearchResult(queryID,
+                                          databaseID,
 					  searchParameters,
-					  querySeq,
-					  resultAnnotation,
-					  hits);
+                                          hits,
+					  resultAnnotation);
     }
 
     /**
-     * <code>getQuerySeqHolder</code> returns the database of query
-     * sequences used to retrieve sequences for creation of the
-     * various result objects.
+     * <code>setQuerySeq</code> identifies the query sequence by a
+     * name, ID or URN.
      *
-     * @return a <code>SequenceDB</code> value.
+     * @param identifier a <code>String</code> which should be an
+     * unique identifer for the sequence.
+     *
+     * @deprecated use <code>setQueryID</code> instead.
      */
-    public SequenceDB getQuerySeqHolder()
+    public void setQuerySeq(String identifier)
     {
-        return querySeqHolder;
+        setQueryID(identifier);
+    }
+
+    public void setQueryID(String queryID)
+    {
+        this.queryID = queryID;
     }
 
     /**
-     * <code>setQuerySeqHolder</code> sets the query sequence holder
-     * to a specific database.
+     * <code>setSubjectDB</code> identifies the database searched by a
+     * name, ID or URN.
      *
-     * @param querySeqHolder a <code>SequenceDB</code> containing the
-     * query sequence(s).
-     */
-    public void setQuerySeqHolder(SequenceDB querySeqHolder)
-    {
-        this.querySeqHolder = querySeqHolder;
-    }
-
-    /**
-     * <code>getSubjectDBInstallation</code> returns the installation
-     * in which all the databases searched may be
-     * found. <code>SequenceDB</code>s are retrieved for creation of
-     * the various result objects.
+     * @param id a <code>String</code> which should be an unique
+     * identifier for the database searched.
      *
-     * @return a <code>SequenceDBInstallation</code> containing the
-     * subject database(s).
+     * @deprecated use <code>setDatabaseID</code> instead.
      */
-    public SequenceDBInstallation getSubjectDBInstallation()
+    public void setSubjectDB(String identifier)
     {
-        return subjectDBs;
+        setDatabaseID(identifier);
     }
 
-    /**
-     * <code>setSubjectDBInstallation</code> sets the subject database
-     * holder to a specific installation.
-     *
-     * @param subjectDBs a <code>SequenceDBInstallation</code>
-     * containing the subject database(s)
-     */
-    public void setSubjectDBInstallation(SequenceDBInstallation subjectDBs)
+    public void setDatabaseID(String databaseID)
     {
-        this.subjectDBs = subjectDBs;
-    }
-
-    public void setQuerySeq(String querySeqId)
-        throws BioException
-    {
-        if (querySeqHolder == null)
-            throw new BioException("Running BlastLikeSearchBuilder with null query SequenceDB");
-
-        SymbolList temp = (SymbolList) querySeqHolder.getSequence(querySeqId);
-
-        // It shouldn't happen, but it can with some implementations
-        // of SequenceDB
-        if (temp == null)
-	    throw new BioException("Failed to retrieve query sequence from holder using ID '"
-				   + querySeqId
-                                   + "' (sequence was null)");
-
-        querySeq = temp;
-    }
-
-    public void setSubjectDB(String subjectDBName)
-        throws BioException
-    {
-        if (subjectDBs == null)
-            throw new BioException("Running BlastLikeSearchBuilder with null subject SequenceDBInstallation");
-
-        subjectDB = subjectDBs.getSequenceDB(subjectDBName);
-
-        // It shouldn't happen, but it can with some implementations
-        // of SequenceDBInstallation
-	if (subjectDB == null)
-	    throw new BioException("Failed to retrieve database from installation using ID '"
-				   + subjectDBName
-                                   + "' (sequence was null)");
+        this.databaseID = databaseID;
     }
 
     public boolean getMoreSearches()
@@ -383,7 +332,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         if (nullSubjectStrand)
             sStrand = null;
 
-        String hitId = (String) hitData.get("HitId");
+        String subjectID = (String) hitData.get("HitId");
 
         return new SequenceDBSearchHit(sc, ev, pv,
                                        qStart,
@@ -392,7 +341,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
                                        sStart,
                                        sEnd,
                                        sStrand,
-                                       hitId,
+                                       subjectID,
                                        AnnotationFactory.makeAnnotation(hitData),
                                        subHits);
     }

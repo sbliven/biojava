@@ -38,34 +38,74 @@ import org.biojava.bio.symbol.SymbolList;
 public interface SeqSimilaritySearchResult
 {
     /**
-     * Return the query sequence which was used to perform the search.
-     * @return the SymbolList object used to search the
-     * SequenceDB. Never returns null.
+     * <code>getQueryID</code> returns an identifier for the query
+     * sequence which was used to perform the search. This may be used
+     * to locate the query <code>SymbolList</code> in the appropriate
+     * <code>SequenceDB</code>.
+     *
+     * @return a <code>String</code> identifier.
+     *
+     * @see org.biojava.bio.symbol.SymbolList
+     * @see org.biojava.bio.seq.db.SequenceDB
      */
-    SymbolList getQuerySequence();
+    public String getQueryID();
+
+    /**
+     * <code>getDatabaseID</code> returns an identifier for the
+     * sequence database against which the search was conducted. This
+     * may be used to locate a <code>SequenceDB</code> in the
+     * appropriate <code>SequenceDBInstallation</code>.
+     *
+     * @return a <code>String</code> identifier.
+     *
+     * @see org.biojava.bio.seq.db.SequenceDBInstallation
+     */
+    public String getDatabaseID();
+
+    /**
+     * Return the query sequence which was used to perform the search.
+     *
+     * @return the <code>SymbolList</code> object used to search the
+     * <code>SequenceDB</code>. Never returns null.
+     *
+     * @deprecated use <code>getQueryID</code> to obtain a database
+     * identifier which may then be used to locate the query
+     * <code>SymbolList</code> in the appropriate
+     * <code>SequenceDB</code>.
+     */
+    public SymbolList getQuerySequence();
 
     /**
      * Return the sequence database against which the search that
      * produced this search result was performed.
-     * @return the SequenceDB object against which the search was
-     * carried out. Never returns null.
+     *
+     * @return the <code>SequenceDB</code> object against which the
+     * search was carried out. Never returns null.
+     *
+     * @deprecated use <code>getDatabaseID</code> to obtain a database
+     * identifier which may then be used to locate a
+     * <code>SequenceDB</code> in the appropriate
+     * <code>SequenceDBInstallation</code>.
      */
-    SequenceDB getSequenceDB();
+    public SequenceDB getSequenceDB();
 
     /**
      * Return the search parameters used in the search that produced
      * this search result.
-     * @return the (immutable) search parameter Map object. May return
-     * null.
+     *
+     * @return the (immutable) search parameter <code>Map</code>
+     * object. May return null.
      */
-    Map getSearchParameters();
+    public Map getSearchParameters();
 
     /**
      * Return all hits in this sequence similarity search result. The
      * hits are sorted from best to worst.
-     * @return an (immutable) List of SeqSimilaritySearchHit objects
-     * containing all hits in the search result. Never returns null
-     * but may return an empty list.
+     *
+     * @return an (immutable) <code>List</code> of
+     * <code>SeqSimilaritySearchHit</code> objects containing all hits
+     * in the search result. Never returns null but may return an
+     * empty list.
      */
-    List getHits();
+    public List getHits();
 }
