@@ -41,6 +41,7 @@ import org.biojava.bio.symbol.*;
  * @author Matthew Pocock
  * @author Thomas Down
  */
+
 public interface FeatureFilter extends Serializable {
   /**
    * This method determines whether a feature is to be accepted.
@@ -64,7 +65,7 @@ public interface FeatureFilter extends Serializable {
    * @author Matthew Pocock
    * @since 1.0
    */
-  public final static class AcceptAllFilter implements OptimizableFilter {
+  public final static class AcceptAllFilter implements FeatureFilter {
     public boolean accept(Feature f) { return true; }
 
     public boolean equals(Object o) {
@@ -101,7 +102,7 @@ public interface FeatureFilter extends Serializable {
    * @author Matthew Pocock
    * @since 1.2
    */
-  public final static class AcceptNoneFilter implements OptimizableFilter {
+  public final static class AcceptNoneFilter implements FeatureFilter {
     public boolean accept(Feature f) { return false; }
 
     public boolean equals(Object o) {
@@ -278,8 +279,8 @@ public interface FeatureFilter extends Serializable {
       if(feat instanceof ByClass) {
         Class featC = ((ByClass) feat).getClass();
         return
-          ! (featC.isAssignableFrom(getClass())) &&
-          ! (getClass().isAssignableFrom(featC));
+          ! (featC.isAssignableFrom(getTestClass())) &&
+          ! (getTestClass().isAssignableFrom(featC));
       }
 
       return (feat instanceof AcceptNoneFilter);
@@ -424,7 +425,7 @@ public interface FeatureFilter extends Serializable {
    * @author Matthew Pocock
    * @since 1.0
    */
-  public final static class Not implements OptimizableFilter {
+  public final static class Not implements FeatureFilter {
     FeatureFilter child;
 
     public FeatureFilter getChild() {
@@ -473,7 +474,7 @@ public interface FeatureFilter extends Serializable {
    * @author Matthew Pocock
    * @since 1.0
    */
-  public final static class And implements OptimizableFilter {
+  public final static class And implements FeatureFilter {
     FeatureFilter c1, c2;
 
     public FeatureFilter getChild1() {
@@ -576,7 +577,7 @@ public interface FeatureFilter extends Serializable {
    * @author Matthew Pocock
    * @since 1.0
    */
-  public final static class Or implements OptimizableFilter {
+  public final static class Or implements FeatureFilter {
     FeatureFilter c1, c2;
 
     public FeatureFilter getChild1() {

@@ -28,61 +28,116 @@ import org.biojava.bio.BioException;
 import org.biojava.bio.symbol.Location;
 
 /**
- * A utils class for FeatureFilter algebraic operations.
+ * A set of FeatureFilter algebraic operations.
  *
  * @since 1.2
  * @author Matthew Pocock
+ * @author Thomas Down
  */
-public class FilterUtils {
-  /**
-   * Returns wether the set of features matched by sub can be proven to be a
-   * propper subset of the features matched by sup.
-   * <P>
-   * If the filter sub matches only features that are matched by sup, then it is
-   * a propper subset. It is still a propper subset if it does not match every
-   * feature in sup, as long as no feature matches sub that is rejected by sup.
-   *
-   * @param sub  the subset filter
-   * @param sup  the superset filter
-   * @return boolean true if sub is a proper subset of sup
-   */
-  public static boolean areProperSubset(FeatureFilter sub, FeatureFilter sup) {
-    if(sub.equals(sup)) {
-      return true;
-    }
-    
-    if(sub instanceof OptimizableFilter) {
-      return ((OptimizableFilter) sub).isProperSubset(sup);
-    }
-    
-    return false;
-  }
-  
-  /**
-   * Returns wether the two queries can be proven to be disjoint.
-   * <P>
-   * They are disjoint if there is no element that is matched by both filters
-   * - that is, they have an empty intersection.
-   *
-   * @param a   the first FeatureFilter
-   * @param b   the second FeatureFilter
-   * @return true if they a proved to be disjoint, false otherwise
-   */
-  public static boolean areDisjoint(FeatureFilter a, FeatureFilter b) {
-      return areDisjointOneWay(a, b) || areDisjointOneWay(b, a);
-  }
 
-  private static boolean areDisjointOneWay(FeatureFilter a, FeatureFilter b) {
-    if(a.equals(b)) {
-      return false;
-    }
+public class FilterUtils {
+    /**
+     * Determines if the set of features matched by sub can be <code>proven</code> to be a
+     * proper subset of the features matched by sup.
+     * <p>
+     * If the filter sub matches only features that are matched by sup, then it is
+     * a proper subset. It is still a proper subset if it does not match every
+     * feature in sup, as long as no feature matches sub that is rejected by sup.
+     * </p>
+     *
+     * @param sub the subset filter
+     * @param sup the superset filter
+     * @return <code>true</code> if <code>sub</code> is a proper subset of <code>sup</code>
+     */
+
+    public static boolean areProperSubset(FeatureFilter sub, FeatureFilter sup) {
+	if(sub.equals(sup)) {
+	    return true;
+	}
+	
+	if (sup instanceof FeatureFilter.AcceptAllFilter) {
+	    return true;
+	} else if (sub instanceof FeatureFilter.AcceptAllFilter) {
+	    return false;
+	} else if (sub instanceof FeatureFilter.AcceptNoneFilter) {
+	    return false;
+	} else if (sup instanceof FeatureFilter.AcceptNoneFilter) {
+	    return false;
+	} else if (sup instanceof FeatureFilter.And) {
+	    FeatureFilter.And and_sup = (FeatureFilter.And) sup;
+	    return areProperSubset(sub, and_sup.getChild1()) && areProperSubset(sub, and_sup.getChild2());
+	} else if (sub instanceof FeatureFilter.And) {
+	    // is this sufficient for complex and/or structures?
+
+	    FeatureFilter.And and_sub = (FeatureFilter.And) sub;
+	    return areProperSubset(and_sub.getChild1(), sup) || areProperSubset(and_sub.getChild2(), sup);
+	} else if (sub instanceof FeatureFilter.Or) {
+	    FeatureFilter.Or or_sub = (FeatureFilter.Or) sub;
+	    return areProperSubset(or_sub.getChild1(), sup) && areProperSubset(or_sub.getChild2(), sup);
+	} else if (sup instanceof FeatureFilter.Or) {
+	    FeatureFilter.Or or_sup = (FeatureFilter.Or) sup;
+	    return areProperSubset(sub, or_sup.getChild1()) || areProperSubset(sub, or_sup.getChild2());
+	} else if (sup instanceof FeatureFilter.Not) {
+	    FeatureFilter not_sup = ((FeatureFilter.Not) sup).getChild();
+	    return areDisjoint(sub, not_sup);
+	} else if (sub instanceof FeatureFilter.Not) {
+	    // How do we prove this one?
+	} else if (sub instanceof OptimizableFilter) {
+	    return ((OptimizableFilter) sub).isProperSubset(sup);
+	}
     
-    if(a instanceof OptimizableFilter) {
-      return ((OptimizableFilter) a).isDisjoint(b);
+	return false;
     }
-    
-    return false;
-  }
+  
+    /**
+     * Determines the two queries can be proven to be disjoint.
+     * <p>
+     * They are disjoint if there is no element that is matched by both filters
+     * - that is, they have an empty intersection.
+     * </p>
+     *
+     * @param a   the first FeatureFilter
+     * @param b   the second FeatureFilter
+     * @return <code>true</code> if they a proved to be disjoint, <code>false</code> otherwise
+     */
+
+    public static boolean areDisjoint(FeatureFilter a, FeatureFilter b) {
+	if(a.equals(b)) {
+	    return false;
+	}
+	
+	if (a instanceof FeatureFilter.AcceptAllFilter || b instanceof FeatureFilter.AcceptAllFilter) {
+	    return false;
+	} else if (a instanceof FeatureFilter.AcceptNoneFilter || b instanceof FeatureFilter.AcceptNoneFilter) {
+	    return true;
+	} if (a instanceof FeatureFilter.And) {
+	    FeatureFilter.And and_a = (FeatureFilter.And) a;
+	    return areDisjoint(and_a.getChild1(), b) || areDisjoint(and_a.getChild2(), b);
+	} else if (b instanceof FeatureFilter.And) {
+	    FeatureFilter.And and_b = (FeatureFilter.And) b;
+	    return areDisjoint(a, and_b.getChild1()) || areDisjoint(a, and_b.getChild2());
+	} else if (a instanceof FeatureFilter.Or) {
+	    FeatureFilter.Or or_a = (FeatureFilter.Or) a;
+	    return areDisjoint(or_a.getChild1(), b) && areDisjoint(or_a.getChild2(), b);
+	} else if (b instanceof FeatureFilter.Or) {
+	    FeatureFilter.Or or_b = (FeatureFilter.Or) b;
+	    return areDisjoint(a, or_b.getChild1()) && areDisjoint(a, or_b.getChild2());
+	} else if (a instanceof FeatureFilter.Not) {
+	    FeatureFilter not_a = ((FeatureFilter.Not) a).getChild();
+	    return areProperSubset(b, not_a);
+	} else if (b instanceof FeatureFilter.Not) {
+	    FeatureFilter not_b = ((FeatureFilter.Not) b).getChild();
+	    return areProperSubset(a, not_b);
+	} else if (a instanceof OptimizableFilter) {
+	    return ((OptimizableFilter) a).isDisjoint(b);
+	} else if (b instanceof OptimizableFilter) {
+	    return ((OptimizableFilter) b).isDisjoint(a);
+	}
+
+	// *SIGH* we don't have a proof here...
+
+	return false;
+    }
   
   /**
    * Takes a feature filter and returns the reverse-polish representation of the
