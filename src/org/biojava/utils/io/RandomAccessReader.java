@@ -113,8 +113,8 @@ public class RandomAccessReader extends Reader
      * <code>read</code> reads one byte from the underlying
      * <code>RandomAccessFile</code>.
      *
-     * @return an <code>int</code>number of chars read, or -1 if the
-     * end of the stream has been reached.
+     * @return an <code>int</code>, -1 if the end of the stream has
+     * been reached.
      *
      * @exception IOException if an error occurs.
      */
@@ -172,7 +172,9 @@ public class RandomAccessReader extends Reader
             int c = read();
 
             if (c != -1)
+            {
                 cbuf[off + i] = (char) c;
+            }
             else
 	    {
 		// Need to remember that EOF was reached to return -1
