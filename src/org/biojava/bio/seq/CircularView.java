@@ -69,6 +69,8 @@ public class CircularView extends ViewSequence{
    * Note that base zero is the base immediately before base 1 which is of course
    * the last base of the sequence.
    * </p>
+   * @param index the index of the <code>Symbol </code>requested.
+   * @return the <code>Symbol </code>specified by the <code>index.</code>
    */
   public Symbol symbolAt(int index){
     return super.symbolAt(realValue(index));
@@ -84,7 +86,9 @@ public class CircularView extends ViewSequence{
    * <p>
    * Will return a linear String which can, if nescessary, span the origin.
    * </p>
-   *
+   * @param start the index of the fist base
+   * @param end the index of the last base
+   * @return a <code>String </code>representation of the tokenized <code>Symbol</code>s
    */
   public String subStr(int start, int end){
 
@@ -109,6 +113,10 @@ public class CircularView extends ViewSequence{
    * @since 1.2
    * @throws BioException if a non circular location is added that exceeds the
    * 'boundaries' of the sequence.
+   * @throws ChangeVetoException if the sequence is locked.
+   * @param template the template of the feature to be created.
+   * @return the feature created you can use the template of the returned feature
+   * to create another of the same type.
    */
   public Feature createFeature(Feature.Template template)
         throws ChangeVetoException, BioException
@@ -132,6 +140,10 @@ public class CircularView extends ViewSequence{
    * <p>
    * Will return a linear SymbolList which can ,if nescessary, span the origin.
    * </p>
+   * @param start the first base of the sublist
+   * @param end the last base of the sublist
+   * @return a <code>SymbolList </code>containing the <code>Symbols</code> from
+   * <code>start</code> to <code>end</code> inclusive
    */
   public SymbolList subList(int start, int end){
 
