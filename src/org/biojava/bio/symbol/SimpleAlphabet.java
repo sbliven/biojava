@@ -41,25 +41,26 @@ implements Serializable {
   private Annotation annotation;
   private final Set symbols;
   private final Set ambig;
+  protected transient Annotatable.AnnotationForwarder annotationForwarder;
 
     //BE SURE TO CHANGE THIS VALUE IF YOU CHANGE THE IMPLEMENTATION
     //SUCH THAT SERIALIZATION WILL FAIL.
   private static final long serialVersionUID = 216254146;
-  
+
   /**
    * A list of alphabets that make up this one - a singleton list containing
    * this.
    */
   private List alphabets;
-  
+
   public Iterator iterator() {
     return symbols.iterator();
   }
-  
+
   public String getName() {
     return name;
   }
-  
+
   /**
    * Assign a name to the alphabet
    * @param name the name you wish to give this alphabet
@@ -67,7 +68,7 @@ implements Serializable {
   public void setName(String name) {
     this.name = name;
   }
-    
+
   public Annotation getAnnotation() {
     if(annotation == null)
       annotation = new SimpleAnnotation();
@@ -77,7 +78,7 @@ implements Serializable {
   public int size() {
     return symbols.size();
   }
-  
+
   public SymbolList symbols() {
     try {
       return new SimpleSymbolList(this, new ArrayList(symbols));
@@ -97,7 +98,7 @@ implements Serializable {
   throws IllegalSymbolException, ChangeVetoException {
     symbols.add(s);
   }
-  
+
   public void removeSymbol(Symbol s)
   throws IllegalSymbolException {
     validate(s);
@@ -119,21 +120,21 @@ implements Serializable {
     }
     return this.alphabets;
   }
-  
+
   protected AtomicSymbol getSymbolImpl(List symL)
   throws IllegalSymbolException {
     AtomicSymbol s = (AtomicSymbol) symL.get(0);
     return s;
   }
-  
+
   public SimpleAlphabet() {
     this(new HashSet(), null);
   }
-  
+
   public SimpleAlphabet(Set symbols) {
     this(symbols, null);
   }
-  
+
   public SimpleAlphabet(String name) {
     this(new HashSet(), name);
   }
@@ -143,7 +144,7 @@ implements Serializable {
     this.ambig = new HashSet();
     this.name = name;
     this.alphabets = null;
-    
+
     // this costs, but I am tracking down a ClassCast exception.
     // roll on parameterised types.
     for(Iterator i = symbols.iterator(); i.hasNext(); ) {
@@ -151,4 +152,20 @@ implements Serializable {
       this.symbols.add(a);
     }
   }
+
+  protected ChangeSupport getChangeSupport(ChangeType ct){
+    ChangeSupport cs = super.getChangeSupport(ct);
+
+    if(annotationForwarder == null &&
+      (ct == null || ct == Annotatable.ANNOTATION)){
+      annotationForwarder = new Annotatable.AnnotationForwarder(
+          this,
+          cs);
+      getAnnotation().addChangeListener(
+          annotationForwarder,
+          Annotatable.ANNOTATION);
+    }
+    return cs;
+  }
+
 }

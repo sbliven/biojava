@@ -21,15 +21,13 @@
 
 package org.biojava.bio.search;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
-import org.biojava.bio.Annotatable;
-import org.biojava.bio.Annotation;
+
+import org.biojava.bio.*;
+import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.StrandedFeature.Strand;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ObjectUtil;
+import org.biojava.utils.*;
 
 /**
  * <p><code>SequenceDBSearchHit</code> objects represent a similarity
@@ -64,6 +62,7 @@ import org.biojava.utils.ObjectUtil;
 public class SequenceDBSearchHit extends AbstractChangeable
     implements SeqSimilaritySearchHit, Annotatable
 {
+    protected transient AnnotationForwarder annotationForwarder;
     private double     score;
     private double     pValue;
     private double     eValue;
@@ -270,10 +269,10 @@ public class SequenceDBSearchHit extends AbstractChangeable
             return false;
         if (! ObjectUtil.equals(this.subHits, that.subHits))
             return false;
-    
+
         return true;
     }
-  
+
     public int hashCode()
     {
         if (! hcCalc)
@@ -294,4 +293,20 @@ public class SequenceDBSearchHit extends AbstractChangeable
         return "SequenceDBSearchHit to " + getSubjectID()
             + " with score " + getScore();
     }
+
+    protected ChangeSupport getChangeSupport(ChangeType ct){
+      ChangeSupport cs = super.getChangeSupport(ct);
+
+      if(annotationForwarder == null &&
+        (ct == null || ct == Annotatable.ANNOTATION)){
+        annotationForwarder = new Annotatable.AnnotationForwarder(
+            this,
+            cs);
+        getAnnotation().addChangeListener(
+            annotationForwarder,
+            Annotatable.ANNOTATION);
+      }
+      return cs;
+    }
+
 }

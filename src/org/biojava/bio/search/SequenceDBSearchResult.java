@@ -21,17 +21,13 @@
 
 package org.biojava.bio.search;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
 
-import org.biojava.bio.Annotatable;
-import org.biojava.bio.Annotation;
-import org.biojava.bio.seq.db.SequenceDB;
-import org.biojava.bio.symbol.SymbolList;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ObjectUtil;
+
+import org.biojava.bio.*;
+import org.biojava.bio.seq.db.*;
+import org.biojava.bio.symbol.*;
+import org.biojava.utils.*;
 
 /**
  * <code>SequenceDBSearchResult</code> objects represent a result of a
@@ -56,6 +52,7 @@ public class SequenceDBSearchResult extends AbstractChangeable
     private Map        searchParameters;
     private List       hits;
     private Annotation annotation;
+    protected transient AnnotationForwarder annotationForwarder;
 
     // Hashcode is cached after first calculation because the data on
     // which is is based do not change
@@ -215,4 +212,20 @@ public class SequenceDBSearchResult extends AbstractChangeable
         return "SequenceDBSearchResult of " + queryID
             + " against " + databaseID;
     }
+
+    protected ChangeSupport getChangeSupport(ChangeType ct){
+      ChangeSupport cs = super.getChangeSupport(ct);
+
+      if(annotationForwarder == null &&
+        (ct == null || ct == Annotatable.ANNOTATION)){
+        annotationForwarder = new Annotatable.AnnotationForwarder(
+            this,
+            cs);
+        getAnnotation().addChangeListener(
+            annotationForwarder,
+            Annotatable.ANNOTATION);
+      }
+      return cs;
+    }
+
 }

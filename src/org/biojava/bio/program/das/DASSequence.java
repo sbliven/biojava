@@ -89,7 +89,9 @@ public class DASSequence
 
     private static final int SYMBOL_TILE_THRESHOLD = 100000;
     private static final int SYMBOL_TILE_SIZE = 20000;
-    
+
+    protected transient AnnotationForwarder annotationForwarder;
+
     private DASSequenceDB parentdb;
     private Alphabet alphabet = DNATools.getDNA();
     private URL dataSourceURL;
@@ -119,14 +121,14 @@ public class DASSequence
             }
         }
     }
-    
-    DASSequence(DASSequenceDB db, URL dataSourceURL, String seqID, Set dataSources) 
+
+    DASSequence(DASSequenceDB db, URL dataSourceURL, String seqID, Set dataSources)
         throws BioException, IllegalIDException
     {
 	this.parentdb = db;
 	this.dataSourceURL = dataSourceURL;
 	this.seqID = seqID;
-	
+
 	//
 	// Check for deep structure.  This also checks that the sequence
 	// really exists, and hopefully picks up the length along the way.
@@ -139,7 +141,7 @@ public class DASSequence
         features.addFeatureHolder(new StructureWrapper(), new FeatureFilter.ByClass(ComponentFeature.class));
     } catch (ChangeVetoException cve) {
 		throw new BioError(cve);
-	}    
+	}
 
 	//
 	// Pick up some annotations
@@ -174,7 +176,7 @@ public class DASSequence
 		// } catch (ChangeVetoException cve) {
 		//    throw new BioError(cve);
 		// }
-	    // } 
+	    // }
 	}
 
 	public void addSequenceProperty(Object key, Object value)
@@ -201,19 +203,19 @@ public class DASSequence
 	{
 	    if (temp instanceof ComponentFeature.Template) {
 		String id = (String) temp.annotation.getProperty("sequence.id");
-		
+
 		try {
 		    ComponentFeature.Template ctemp = (ComponentFeature.Template) temp;
 		    ComponentFeature cf = new DASComponentFeature(DASSequence.this,
 								  ctemp);
 		    structureF.addFeature(cf);
-		    
+
 		    length = Math.max(length, ctemp.location.getMax());
 		} catch (BioException ex) {
 		    throw new ParseException(ex, "Error instantiating DASComponent");
 		} catch (ChangeVetoException ex) {
 		    throw new BioError(ex, "Immutable FeatureHolder when trying to build structure");
-		}					  
+		}
 	    } else {
 		// Server seems not to honour category=
 		// This hurts performance, but we can just elide the unwanted
@@ -229,16 +231,16 @@ public class DASSequence
     public DASSequenceDB getParentDB() {
 	return parentdb;
     }
-    
+
     FeatureHolder getStructure() throws BioException {
 	if(!this.structureTicket.isFetched()) {
-	    this.structureTicket.doFetch();   
+	    this.structureTicket.doFetch();
 	}
-      
+
 	return this.structure;
     }
 
-    private void _addAnnotationSource(URL dataSourceURL) 
+    private void _addAnnotationSource(URL dataSourceURL)
         throws BioException, ChangeVetoException
     {
         FeatureHolder structure = getStructure();
@@ -254,12 +256,12 @@ public class DASSequence
 	featureSets.put(dataSourceURL, fs);
 	features.addFeatureHolder(fs);
     }
-    
+
     public Set dataSourceURLs() {
       return Collections.unmodifiableSet(featureSets.keySet());
     }
 
-    public void addAnnotationSource(URL dataSourceURL) 
+    public void addAnnotationSource(URL dataSourceURL)
         throws BioException, ChangeVetoException
     {
       if(!featureSets.containsKey(dataSourceURL)) {
@@ -282,7 +284,22 @@ public class DASSequence
       }
     }
 
-    private void _removeAnnotationSource(URL dataSourceURL) 
+    protected ChangeSupport getChangeSupport(ChangeType ct){
+      ChangeSupport cs = super.getChangeSupport(ct);
+
+      if(annotationForwarder == null &&
+        (ct == null || ct == Annotatable.ANNOTATION)){
+        annotationForwarder = new Annotatable.AnnotationForwarder(
+            this,
+            cs);
+        getAnnotation().addChangeListener(
+            annotationForwarder,
+            Annotatable.ANNOTATION);
+      }
+      return cs;
+    }
+
+    private void _removeAnnotationSource(URL dataSourceURL)
         throws ChangeVetoException, BioException
     {
         FeatureHolder structure = getStructure();
@@ -301,7 +318,7 @@ public class DASSequence
         }
     }
 
-    public void removeAnnotationSource(URL dataSourceURL) 
+    public void removeAnnotationSource(URL dataSourceURL)
         throws ChangeVetoException, BioException
     {
       if (featureSets.containsKey(dataSourceURL)) {
@@ -383,7 +400,7 @@ public class DASSequence
 	}
 
 	int num = featureSets.size();
-	
+
         FeatureHolder structure = getStructure();
 	if (structure.countFeatures() > 0) {
 	    FeatureHolder componentsBelow = structure.filter(new FeatureFilter.OverlapsLocation(l), false);
@@ -441,14 +458,14 @@ public class DASSequence
 	try {
 	    if (length < 0 && !structureTicket.isFetched()) {
 		// Hope that the length is set when we get the structure
-		
-		structureTicket.doFetch();    
+
+		structureTicket.doFetch();
 	    }
 
 	    if (length < 0) {
 		throw new BioError("Assertion Failure: structure fetch didn't get length");
 	    }
-		
+
 	    return length;
 	} catch (BioException be) {
 	    throw new BioRuntimeException(be, "Can't calculate length");
@@ -495,13 +512,13 @@ public class DASSequence
 	}
     }
 
-    public void edit(Edit e) 
+    public void edit(Edit e)
         throws ChangeVetoException
     {
 	throw new ChangeVetoException("/You/ try implementing read-write DAS");
     }
 
-    // 
+    //
     // DNA fetching stuff
     //
 
@@ -564,7 +581,7 @@ public class DASSequence
 
 	return sl;
     }
-    
+
     //
     // Identification stuff
     //
@@ -597,11 +614,11 @@ public class DASSequence
     public boolean containsFeature(Feature f) {
 	return features.containsFeature(f);
     }
-    
+
     public FeatureHolder filter(FeatureFilter ff) {
         return filter(ff, !FilterUtils.areProperSubset(ff, new FeatureFilter.IsTopLevel()));
     }
-    
+
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
 	try {
 	    //
@@ -609,7 +626,7 @@ public class DASSequence
 	    // which improves the scalability of the Dazzle server (and probably
 	    // other applications, too)
 	    //
-	    
+
 	    FeatureHolder structure = getStructure();
 	    FeatureFilter structureMembershipFilter = new FeatureFilter.ByClass(ComponentFeature.class);
 
@@ -617,8 +634,8 @@ public class DASSequence
 		if (recurse) {
 		    for (Iterator fi = structure.features(); fi.hasNext(); ) {
 			ComponentFeature cf = (ComponentFeature) fi.next();
-			Sequence cseq = cf.getComponentSequence(); 
-			// Just ensuring that the sequence is instantiated should be sufficient. 
+			Sequence cseq = cf.getComponentSequence();
+			// Just ensuring that the sequence is instantiated should be sufficient.
 		    }
 		}
 		return structure.filter(ff, recurse);
@@ -627,7 +644,7 @@ public class DASSequence
 	    //
 	    // Otherwise they want /real/ features, I'm afraid...
 	    //
-	    
+
 	    Location ffl = extractInterestingLocation(ff);
 	    if (recurse) {
 		int numComponents = 1;
@@ -645,7 +662,7 @@ public class DASSequence
 		    registerLocalFeatureFetchers(ff);
 		}
 	    }
-	    
+
 	    return features.filter(ff, recurse);
 	} catch (BioException be) {
 	    throw new BioRuntimeException(be, "Can't filter");
@@ -682,12 +699,12 @@ public class DASSequence
 
 	return null;
     }
-    
+
     public int countFeatures() {
 	return features.countFeatures();
     }
-    
-    public Feature createFeature(Feature.Template temp) 
+
+    public Feature createFeature(Feature.Template temp)
         throws ChangeVetoException
     {
 	throw new ChangeVetoException("Can't create features on DAS sequences.");
@@ -725,7 +742,7 @@ public class DASSequence
             temp.location = LocationTools.intersection(temp.location,
 	                                               new RangeLocation(1, length()) );
 	}
-	
+
 	return featureRealizer.realizeFeature(this, dest, temp);
     }
 
@@ -754,7 +771,7 @@ public class DASSequence
 	    return dbf.newDocumentBuilder();
 	} catch (Exception ex) {
 	    throw new BioError(ex);
-	} 
+	}
     }
 
     static XMLReader nonvalidatingSAXParser() {

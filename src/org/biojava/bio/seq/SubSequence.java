@@ -52,6 +52,7 @@ public class SubSequence implements Sequence {
 
     private transient ChangeSupport changeSupport;
     private transient ChangeListener seqListener;
+    protected transient AnnotationForwarder annotationForwarder;
 
     private void allocChangeSupport() {
 	if (seqListener == null) {
@@ -98,11 +99,11 @@ public class SubSequence implements Sequence {
 
     public SubSequence(Sequence seq,
 		       final int start,
-		       final int end) 
+		       final int end)
     {
         this(seq, start, end, null, false);
     }
-    
+
     /**
      * Construct a new SubSequence of the specified sequence.
      *
@@ -115,7 +116,7 @@ public class SubSequence implements Sequence {
     public SubSequence(Sequence seq,
 		       final int start,
 		       final int end,
-               final String name) 
+               final String name)
     {
         this(seq, start, end, null, false, name);
     }
@@ -135,11 +136,11 @@ public class SubSequence implements Sequence {
 		       final int start,
 		       final int end,
 		       final FeatureFilter ff,
-		       final boolean recurse) 
+		       final boolean recurse)
     {
         this(seq, start, end, ff, recurse, seq.getName() + " (" + start + " - " + end + ")");
     }
-    
+
     /**
      * Construct a new SubSequence of the specified sequence with a new name.
      *
@@ -157,7 +158,7 @@ public class SubSequence implements Sequence {
 		       final int end,
 		       final FeatureFilter ff,
 		       final boolean recurse,
-               final String name) 
+               final String name)
     {
         this.parent = seq;
 	this.start = start;
@@ -234,7 +235,7 @@ public class SubSequence implements Sequence {
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
         return getFeatures().filter(ff, recurse);
     }
-    
+
     public FeatureHolder filter(FeatureFilter ff) {
         return getFeatures().filter(ff);
     }
@@ -249,7 +250,7 @@ public class SubSequence implements Sequence {
 	return createFeatureTranslated(parent, templ);
     }
 
-    public void removeFeature(Feature f) 
+    public void removeFeature(Feature f)
         throws ChangeVetoException
     {
 	removeProjectedFeature(parent, f);
@@ -294,7 +295,7 @@ public class SubSequence implements Sequence {
     // Guts
     //
 
-    private Feature createFeatureTranslated(FeatureHolder creatrix, Feature.Template templ) 
+    private Feature createFeatureTranslated(FeatureHolder creatrix, Feature.Template templ)
         throws BioException, ChangeVetoException
     {
 	Location oldLoc = templ.location;
@@ -375,7 +376,7 @@ public class SubSequence implements Sequence {
 		{
 		    return createFeatureTranslated(f, templ);
 		}
-		    
+
 		public void removeFeature(Feature f, Feature f2)
 		    throws ChangeVetoException
 		{
@@ -397,7 +398,7 @@ public class SubSequence implements Sequence {
 			rft.type = f.getType();
 			rft.source = f.getSource();
 			rft.annotation = f.getAnnotation();
-			rft.location = LocationTools.intersection(l.translate(1 - start), 
+			rft.location = LocationTools.intersection(l.translate(1 - start),
 								  new RangeLocation(1, end - start + 1));
 			if (f instanceof StrandedFeature) {
 			    rft.strand = ((StrandedFeature) f).getStrand();
@@ -410,11 +411,11 @@ public class SubSequence implements Sequence {
 				}
 			    } ;
 			rft.regions = Collections.nCopies(1, new RemoteFeature.Region(f.getLocation(), f.getSequence().getName(), true));
-			
+
 			results.addFeature(new SSRemoteFeature(SubSequence.this, featureParent, rft, f));
 		    }
 		}
-		
+
 		return results;
 	    } catch (ChangeVetoException cve) {
 		throw new BioError("Assertion failure: can't modify newly created feature holder");
@@ -429,7 +430,7 @@ public class SubSequence implements Sequence {
 
     private class SSRemoteFeature extends SimpleRemoteFeature implements RemoteFeature {
 	private FeatureHolder childFeatures;
-	
+
 	private SSRemoteFeature(Sequence seq,
 				FeatureHolder parent,
 				RemoteFeature.Template templ,
@@ -453,31 +454,39 @@ public class SubSequence implements Sequence {
 	public boolean containsFeature(Feature f) {
 	    return getFeatures().containsFeature(f);
 	}
-	
+
 	public Feature createFeature(Feature.Template templ)
 	    throws BioException, ChangeVetoException
 	{
 	    throw new ChangeVetoException("Can't create features on SubSequence");
 	}
-	
-	public void removeFeature(Feature f) 
+
+	public void removeFeature(Feature f)
 	    throws ChangeVetoException
 	{
 	    throw new ChangeVetoException("Can't remove features from SubSequence");
 	}
-	
+
 	protected FeatureHolder getFeatures() {
 	    return childFeatures;
 	}
     }
-    
+
     public void addChangeListener(ChangeListener cl, ChangeType ct) {
 	if (changeSupport == null) {
 	    allocChangeSupport();
 	}
+
+        if(annotationForwarder == null && ct == Annotatable.ANNOTATION){
+          annotationForwarder = new Annotatable.AnnotationForwarder(
+              this, changeSupport);
+          getAnnotation().addChangeListener(annotationForwarder,
+              Annotatable.ANNOTATION);
+        }
+
 	changeSupport.addChangeListener(cl, ct);
     }
-    
+
     public void addChangeListener(ChangeListener cl) {
 	addChangeListener(cl, ChangeType.UNKNOWN);
     }
@@ -491,7 +500,7 @@ public class SubSequence implements Sequence {
     public void removeChangeListener(ChangeListener cl) {
 	removeChangeListener(cl, ChangeType.UNKNOWN);
     }
-    
+
     public boolean isUnchanging(ChangeType ct) {
       return false;
     }

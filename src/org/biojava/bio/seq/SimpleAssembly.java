@@ -47,7 +47,7 @@ public class SimpleAssembly
     AbstractChangeable
   implements
     Sequence,
-    RealizingFeatureHolder 
+    RealizingFeatureHolder
 {
     private String name;
     private String uri;
@@ -56,6 +56,7 @@ public class SimpleAssembly
     private AssembledSymbolList assembly;
 
     private FeatureRealizer featureRealizer = org.biojava.bio.seq.impl.FeatureImpl.DEFAULT;
+    protected transient AnnotationForwarder annotationForwarder;
 
     {
 	assembly = new AssembledSymbolList();
@@ -130,7 +131,7 @@ public class SimpleAssembly
 	return assembly.toList();
     }
 
-    public void edit(Edit e) 
+    public void edit(Edit e)
         throws IllegalAlphabetException, ChangeVetoException
     {
 	assembly.edit(e);
@@ -171,16 +172,16 @@ public class SimpleAssembly
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
 	    return features.filter(ff, recurse);
     }
-    
+
     public FeatureHolder filter(FeatureFilter ff) {
 	    return features.filter(ff);
     }
-    
+
     public boolean containsFeature(Feature f) {
       return features.containsFeature(f);
     }
 
-    public Feature createFeature(Feature.Template temp) 
+    public Feature createFeature(Feature.Template temp)
         throws BioException, ChangeVetoException
     {
 	if (temp.location.getMin() < 1)
@@ -219,7 +220,7 @@ public class SimpleAssembly
     // Feature realization
     //
 
-    public Feature realizeFeature(FeatureHolder fh, Feature.Template temp) 
+    public Feature realizeFeature(FeatureHolder fh, Feature.Template temp)
         throws BioException
     {
 	if (temp instanceof ComponentFeature.Template) {
@@ -239,4 +240,20 @@ public class SimpleAssembly
 	    return featureRealizer.realizeFeature(this, fh, temp);
 	}
     }
+
+    protected ChangeSupport getChangeSupport(ChangeType ct){
+      ChangeSupport cs = super.getChangeSupport(ct);
+
+      if(annotationForwarder == null &&
+        (ct == null || ct == Annotatable.ANNOTATION)){
+        annotationForwarder = new Annotatable.AnnotationForwarder(
+            this,
+            cs);
+        getAnnotation().addChangeListener(
+            annotationForwarder,
+            Annotatable.ANNOTATION);
+      }
+      return cs;
+    }
+
 }
