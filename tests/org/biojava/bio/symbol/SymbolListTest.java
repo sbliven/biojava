@@ -22,6 +22,7 @@ package org.biojava.bio.symbol;
 
 import org.biojava.utils.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.io.*;
 import org.biojava.bio.dist.*;
 
 import java.util.*;
@@ -37,7 +38,7 @@ import junit.framework.TestCase;
 public class SymbolListTest extends TestCase
 {
     // SymbolList lengths to run tests at.
-    int testLengths[] = {100, 16384, 32000};
+    int testLengths[] = {100, 16384, 32000, 100000};
 
     // number of times to repeat each test to deal with chance
     // matches in last symbol.
@@ -317,6 +318,44 @@ public class SymbolListTest extends TestCase
 
         // exercise the PackedSymbolList implementation
         assertTrue(runRepeatedSymbolListTests(symListAlpha, symListAlpha, factory));
+    }
+
+    /**
+     * test for SimpleSymbolList that implements ambiguity symbols.
+     */
+    public void testChunkedPackedSymbolListWithAmbiguitySymbols()
+        throws Exception
+    {
+        // create an alphabet with ambiguity symbols
+        FiniteAlphabet symListAlpha = (FiniteAlphabet) DNATools.getDNA();
+        FiniteAlphabet arrayAlpha = generateAmbiguousDNA();
+        assertNotNull(arrayAlpha);
+        assertNotNull(symListAlpha);
+
+        // create a SimpleSymbolList that supports ambiguity symbols
+        SymListFactory factory = new SymListFactory () {
+                public SymbolList createSymbolList(Symbol [] array, FiniteAlphabet alpha, int length)
+                {
+                    assertNotNull(array);
+                    assertNotNull(alpha);
+                    assertTrue(length > 0);
+
+                    try {
+                        // create the factory that will make our sequence
+                        ChunkedSymbolListFactory chunker = new ChunkedSymbolListFactory(new PackedSymbolListFactory(true));
+
+                        // add symbols to it.
+                        chunker.addSymbols(alpha, array, 0, length);
+                        return chunker.makeSymbolList();
+                    }
+                        catch (IllegalAlphabetException iae) {
+                        return null;
+                    }
+                }
+            };
+
+        // exercise the PackedSymbolList implementation
+        assertTrue(runRepeatedSymbolListTests(arrayAlpha, symListAlpha, factory));
     }
 
     // creates a suite
