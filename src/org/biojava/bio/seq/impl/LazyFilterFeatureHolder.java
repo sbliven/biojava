@@ -19,7 +19,7 @@
  *
  */
 
-package ensembl;
+package org.biojava.bio.seq.impl;
 
 import org.biojava.utils.*;
 import org.biojava.bio.seq.*;
