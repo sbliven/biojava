@@ -98,7 +98,10 @@ public class EmblLikeFormat
                                 SeqIOListener      listener)
         throws IllegalSymbolException, IOException, ParseException
     {
-        ((ParseErrorSource)(listener)).addParseErrorListener(this);
+	if (listener instanceof ParseErrorSource) {
+	    ((ParseErrorSource)(listener)).addParseErrorListener(this);
+	}
+
         String            line;
         StreamParser    sparser       = null;
         boolean hasMoreSequence       = true;
