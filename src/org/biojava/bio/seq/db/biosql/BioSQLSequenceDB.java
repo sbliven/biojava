@@ -638,8 +638,9 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    Set _ids = new HashSet();
 	    Connection conn = pool.takeConnection();
 
-	    Statement st = conn.createStatement();
-	    ResultSet rs = st.executeQuery("select bioentry.accession from bioentry");
+	    PreparedStatement st = conn.prepareStatement("select bioentry.accession from bioentry where bioentry.biodatabase_id = ?");
+	    st.setInt(1, dbid);
+	    ResultSet rs = st.executeQuery();
 	    while (rs.next()) {
 		_ids.add(rs.getString(1));
 	    }
