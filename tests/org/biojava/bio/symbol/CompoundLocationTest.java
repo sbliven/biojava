@@ -38,10 +38,18 @@ public class CompoundLocationTest extends TestCase
     protected Location r1;
     protected Location r2;
     protected Location r3;
+    protected Location r4;
+    protected Location r5;
+    protected Location r6;
+    protected Location r7;
 
     private   List     locs1;
     private   List     locs2;
     private   List     locs3;
+    private   List     locs4;
+    private   List     locs5;
+    private   List     locs6;
+    private   List     locs7;
 
     public CompoundLocationTest(String name)
     {
@@ -62,9 +70,25 @@ public class CompoundLocationTest extends TestCase
 	locs3.add(new RangeLocation(250, 300));
 	locs3.add(new RangeLocation(350, 400));
 
+	locs4 = new ArrayList();
+	locs5 = new ArrayList();
+	locs6 = new ArrayList();
+	locs7 = new ArrayList();
+	for (int i = 0; i < 173; ++i) {
+	    int j = i * 17;
+	    locs4.add(new RangeLocation(j, j + 6));
+	    locs5.add(new RangeLocation(j + 5, j + 8));
+	    locs6.add(new RangeLocation(j + 5, j + 6));
+	    locs7.add(new RangeLocation(j + 10, j + 11));
+	}
+
 	r1 = LocationTools.buildLoc(locs1);
 	r2 = LocationTools.buildLoc(locs2);
 	r3 = LocationTools.buildLoc(locs3);
+	r4 = LocationTools.buildLoc(locs4);
+	r5 = LocationTools.buildLoc(locs5);
+	r6 = LocationTools.buildLoc(locs6);
+	r7 = LocationTools.buildLoc(locs7);
     }
 
     /**
@@ -162,5 +186,23 @@ public class CompoundLocationTest extends TestCase
 	Location contig = LocationTools.buildLoc(single);
 
 	assertTrue(contig.isContiguous());
+    }
+
+    public void testOverlapsBig()
+    {
+	assertTrue(LocationTools.overlaps(r4, r5));
+	assertTrue(!LocationTools.overlaps(r4, r7));
+    }
+    
+    public void testContainsBig()
+    {
+	assertTrue(LocationTools.contains(r4, r6));
+	assertTrue(!LocationTools.contains(r4, r5));
+	assertTrue(!LocationTools.contains(r4, r7));
+    }
+
+    public void testIntersectionBig() {
+	assertEquals(LocationTools.intersection(r4, r5), r6);
+	assertEquals(LocationTools.intersection(r4, r7), Location.empty);
     }
 }
