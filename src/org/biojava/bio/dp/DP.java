@@ -82,73 +82,72 @@ import org.biojava.utils.ChangeVetoException;
  */
 public abstract class DP {
   private static List NO_ADVANCE = new ArrayList();
-  
+
   private int[] getNoAdvance() {
     int heads = getModel().advance().length;
     int[] no_advance = (int[]) NO_ADVANCE.get(heads);
-    
-    if(no_advance == null) {
+
+    if (no_advance == null) {
       no_advance = new int[heads];
-      for(int i = 0; i < heads; i++) {
+      for (int i = 0; i < heads; i++) {
         no_advance[i] = 0;
       }
-      
+
       NO_ADVANCE.add(heads, no_advance);
     }
-    
+
     return no_advance;
   }
 
   /**
-    * Scores the SymbolList from symbol start to symbol (start+columns) with a
-    * weight matrix.
-    *
-    * @param matrix  the weight matrix used to evaluate the sequences
-    * @param symList the SymbolList to assess
-    * @param start   the index of the first symbol in the window to evaluate
-    * @return  the log probability or likelyhood of this weight matrix
-    *          having generated symbols start to (start + columns) of symList
-    */
+   * Scores the SymbolList from symbol start to symbol (start+columns) with a
+   * weight matrix.
+   *
+   * @param matrix  the weight matrix used to evaluate the sequences
+   * @param symList the SymbolList to assess
+   * @param start   the index of the first symbol in the window to evaluate
+   * @return  the log probability or likelyhood of this weight matrix
+   *          having generated symbols start to (start + columns) of symList
+   */
   public static double scoreWeightMatrix(
-    WeightMatrix matrix, SymbolList symList, int start)
-  throws IllegalSymbolException {
+          WeightMatrix matrix, SymbolList symList, int start)
+          throws IllegalSymbolException {
     double score = 0;
     int cols = matrix.columns();
 
     for (int c = 0; c < cols; c++) {
       score += Math.log(matrix.getColumn(c).getWeight(symList.symbolAt(c + start)));
     }
-    
+
     return score;
   }
-  
+
   public static MarkovModel flatView(MarkovModel model)
-  throws IllegalAlphabetException, IllegalSymbolException {
-    for(Iterator i = model.stateAlphabet().iterator(); i.hasNext(); ) {
+          throws IllegalAlphabetException, IllegalSymbolException {
+    for (Iterator i = model.stateAlphabet().iterator(); i.hasNext();) {
       State s = (State) i.next();
-      if(
-        !(s instanceof DotState) &&
-        !(s instanceof EmissionState)
+      if (
+              !(s instanceof DotState) &&
+              !(s instanceof EmissionState)
       ) {
         return new FlatModel(model);
       }
     }
-    
+
     return model;
   }
-  
+
   public State[] stateList(MarkovModel mm)
-  throws IllegalSymbolException, IllegalTransitionException,
-  BioException
-  {
+          throws IllegalSymbolException, IllegalTransitionException,
+          BioException {
     FiniteAlphabet alpha = mm.stateAlphabet();
 
     List emissionStates = new ArrayList();
     HMMOrderByTransition comp = new HMMOrderByTransition(mm);
     List dotStates = new LinkedList();
-    for (Iterator addStates = alpha.iterator(); addStates.hasNext(); ) {
+    for (Iterator addStates = alpha.iterator(); addStates.hasNext();) {
       Object state = addStates.next();
-      if(state instanceof MagicalState) {
+      if (state instanceof MagicalState) {
         emissionStates.add(0, state);
       } else if (state instanceof EmissionState) {
         emissionStates.add(state);
@@ -168,79 +167,77 @@ public abstract class DP {
         }
       }
     }
-    
     Collections.sort(emissionStates, new Comparator() {
       public int compare(Object o1, Object o2) {
         State s = (State) o1;
         State t = (State) o2;
-        
+
         // sort by advance
         int[] sa;
-        if(s instanceof EmissionState) {
+        if (s instanceof EmissionState) {
           sa = ((EmissionState) s).getAdvance();
         } else {
           sa = getNoAdvance();
         }
-        
+
         int[] ta;
-        if(t instanceof EmissionState) {
+        if (t instanceof EmissionState) {
           ta = ((EmissionState) t).getAdvance();
         } else {
           ta = getNoAdvance();
         }
-        
-        for(int i = 0; i < sa.length; i++) {
-          if(sa[i] > ta[i]) {
+
+        for (int i = 0; i < sa.length; i++) {
+          if (sa[i] > ta[i]) {
             return -1;
-          } else if(sa[i] < ta[i]) {
+          } else if (sa[i] < ta[i]) {
             return +1;
           }
         }
-        
+
         // give up - sort by name
         return s.getName().compareTo(t.getName());
       }
     });
-    
     State[] sl = new State[emissionStates.size() + dotStates.size()];
     int i = 0;
-    for (Iterator si = emissionStates.iterator(); si.hasNext(); ) {
+    for (Iterator si = emissionStates.iterator(); si.hasNext();) {
       EmissionState ex = (EmissionState) si.next();
-      int [] ad = ex.getAdvance();
-      if(ad.length != mm.advance().length) {
+      int[] ad = ex.getAdvance();
+      if (ad.length != mm.advance().length) {
         throw new BioException(
-          "State " + ex.getName() + " advances " + ad.length + " heads. " +
-          " however, the model " + mm.stateAlphabet().getName() +
-          " advances " + mm.advance().length + " heads."
+                "State " + ex.getName() + " advances " + ad.length + " heads. " +
+                " however, the model " + mm.stateAlphabet().getName() +
+                " advances " + mm.advance().length + " heads."
         );
       }
-      for(int adi = 0; ad != null && adi < ad.length; adi++) {
-        if(ad[adi] != 0) {
+      for (int adi = 0; ad != null && adi < ad.length; adi++) {
+        if (ad[adi] != 0) {
           ad = null;
         }
       }
-      if(ad != null) {
+      if (ad != null) {
         throw new Error(
-          "State " + ex.getName() + " has advance " + ad
+                "State " + ex.getName() + " has advance " + ad
         );
       }
       sl[i++] = ex;
     }
-    for (Iterator si = dotStates.iterator(); si.hasNext(); ) {
+    for (Iterator si = dotStates.iterator(); si.hasNext();) {
       sl[i++] = (State) si.next();
     }
     return sl;
   }
 
-  public static int [][] forwardTransitions(
-    MarkovModel model,
-    State [] states
-  ) throws IllegalSymbolException {
+  public static int[][] forwardTransitions(
+          MarkovModel model,
+          State[] states
+          ) throws IllegalSymbolException {
     int stateCount = states.length;
-    int [][] transitions = new int[stateCount][];
+    int[][] transitions = new int[stateCount][];
 
     for (int i = 0; i < stateCount; i++) {
-      int [] tmp = new int[stateCount];
+      int[] tmp = new int[stateCount];
       int len = 0;
       FiniteAlphabet trans = model.transitionsTo(states[i]);
       for (int j = 0; j < stateCount; j++) {
@@ -248,7 +245,7 @@ public abstract class DP {
           tmp[len++] = j;
         }
       }
-      int [] tmp2 = new int[len];
+      int[] tmp2 = new int[len];
       for (int j = 0; j < len; j++) {
         tmp2[j] = tmp[j];
       }
@@ -258,14 +255,14 @@ public abstract class DP {
     return transitions;
   }
 
-  public static double [][] forwardTransitionScores(
-    MarkovModel model,
-    State [] states,
-    int [][] transitions,
-    ScoreType scoreType
-  ) {
+  public static double[][] forwardTransitionScores(
+          MarkovModel model,
+          State[] states,
+          int[][] transitions,
+          ScoreType scoreType
+          ) {
     int stateCount = states.length;
-    double [][] scores = new double[stateCount][];
+    double[][] scores = new double[stateCount][];
 
     for (int i = 0; i < stateCount; i++) {
       State is = states[i];
@@ -273,8 +270,8 @@ public abstract class DP {
       for (int j = 0; j < scores[i].length; j++) {
         try {
           scores[i][j] = Math.log(scoreType.calculateScore(
-            model.getWeights(states[transitions[i][j]]),
-            is
+                  model.getWeights(states[transitions[i][j]]),
+                  is
           ));
           /*System.out.println(
             states[transitions[i][j]] + "\t-> " +
@@ -287,8 +284,8 @@ public abstract class DP {
           );*/
         } catch (IllegalSymbolException ite) {
           throw new BioError(
-            "Transition listed in transitions array has dissapeared.",
-            ite);
+                  "Transition listed in transitions array has dissapeared.",
+                  ite);
         }
       }
     }
@@ -296,15 +293,15 @@ public abstract class DP {
     return scores;
   }
 
-  public static int [][] backwardTransitions(
-    MarkovModel model,
-    State [] states
-  ) throws IllegalSymbolException {
+  public static int[][] backwardTransitions(
+          MarkovModel model,
+          State[] states
+          ) throws IllegalSymbolException {
     int stateCount = states.length;
-    int [][] transitions = new int[stateCount][];
+    int[][] transitions = new int[stateCount][];
 
     for (int i = 0; i < stateCount; i++) {
-      int [] tmp = new int[stateCount];
+      int[] tmp = new int[stateCount];
       int len = 0;
       FiniteAlphabet trans = model.transitionsFrom(states[i]);
       for (int j = 0; j < stateCount; j++) {
@@ -312,7 +309,7 @@ public abstract class DP {
           tmp[len++] = j;
         }
       }
-      int [] tmp2 = new int[len];
+      int[] tmp2 = new int[len];
       for (int j = 0; j < len; j++) {
         tmp2[j] = tmp[j];
       }
@@ -322,13 +319,13 @@ public abstract class DP {
     return transitions;
   }
 
-  public static double [][] backwardTransitionScores(MarkovModel model,
-    State [] states,
-    int [][] transitions,
-    ScoreType scoreType
-  ) {
+  public static double[][] backwardTransitionScores(MarkovModel model,
+                                                    State[] states,
+                                                    int[][] transitions,
+                                                    ScoreType scoreType
+                                                    ) {
     int stateCount = states.length;
-    double [][] scores = new double[stateCount][];
+    double[][] scores = new double[stateCount][];
 
     for (int i = 0; i < stateCount; i++) {
       State is = states[i];
@@ -336,13 +333,13 @@ public abstract class DP {
       for (int j = 0; j < scores[i].length; j++) {
         try {
           scores[i][j] = Math.log(scoreType.calculateScore(
-            model.getWeights(is),
-            states[transitions[i][j]]
+                  model.getWeights(is),
+                  states[transitions[i][j]]
           ));
         } catch (IllegalSymbolException ite) {
           throw new BioError(
-            "Transition listed in transitions array has dissapeared",
-            ite);
+                  "Transition listed in transitions array has dissapeared",
+                  ite);
         }
       }
     }
@@ -352,11 +349,11 @@ public abstract class DP {
 
   private MarkovModel model;
   private State[] states;
-  private int [][] forwardTransitions;
-  private int [][] backwardTransitions;
+  private int[][] forwardTransitions;
+  private int[][] backwardTransitions;
   private int dotStatesIndex;
   private int lockCount = 0;
-  
+
   public int getDotStatesIndex() {
     return dotStatesIndex;
   }
@@ -364,135 +361,138 @@ public abstract class DP {
   public MarkovModel getModel() {
     return model;
   }
-  
+
   public State[] getStates() {
     return states;
   }
-  
-  public int [][] getForwardTransitions() {
+
+  public int[][] getForwardTransitions() {
     return forwardTransitions;
   }
-  
+
   private Map forwardTransitionScores;
   private Map backwardTransitionScores;
-  
-  public double [][] getForwardTransitionScores(ScoreType scoreType) {
-    double [][] ts = (double [][]) forwardTransitionScores.get(scoreType);
-    if(ts == null) {
+
+  public double[][] getForwardTransitionScores(ScoreType scoreType) {
+    double[][] ts = (double[][]) forwardTransitionScores.get(scoreType);
+    if (ts == null) {
       forwardTransitionScores.put(scoreType, ts = forwardTransitionScores(
-        getModel(), getStates(), forwardTransitions, scoreType
+              getModel(), getStates(), forwardTransitions, scoreType
       ));
     }
     return ts;
   }
-  
-  public int [][] getBackwardTransitions() {
+
+  public int[][] getBackwardTransitions() {
     return backwardTransitions;
   }
-  
-  public double [][] getBackwardTransitionScores(ScoreType scoreType) {
-    double [][] ts = (double [][]) backwardTransitionScores.get(scoreType);
-    if(ts == null) {
+
+  public double[][] getBackwardTransitionScores(ScoreType scoreType) {
+    double[][] ts = (double[][]) backwardTransitionScores.get(scoreType);
+    if (ts == null) {
       backwardTransitionScores.put(scoreType, ts = backwardTransitionScores(
-        getModel(), getStates(), backwardTransitions, scoreType
+              getModel(), getStates(), backwardTransitions, scoreType
       ));
     }
     return ts;
   }
-  
+
   public void lockModel() {
-    if(lockCount++ == 0) {
+    if (lockCount++ == 0) {
       getModel().addChangeListener(ChangeListener.ALWAYS_VETO);
     }
   }
-  
+
   public void unlockModel() {
-    if(--lockCount == 0) {
+    if (--lockCount == 0) {
       getModel().removeChangeListener(ChangeListener.ALWAYS_VETO);
     }
   }
-  
+
   public void update() {
     try {
-      this.states = stateList(model);
-      this.forwardTransitions = forwardTransitions(model, states);
-      this.forwardTransitionScores.clear();
-      this.backwardTransitions = backwardTransitions(model, states);
-      this.backwardTransitionScores.clear();
+      if(this.states == null) {
+        this.states = stateList(model);
+        this.forwardTransitions = forwardTransitions(model, states);
+        this.backwardTransitions = backwardTransitions(model, states);
 
-      // Find first dot state
-      int i;
-      for (i = 0; i < states.length; ++i) {
-        if (! (states[i] instanceof EmissionState)) {
-          break;
+        // Find first dot state
+        int i;
+        for (i = 0; i < states.length; ++i) {
+          if (!(states[i] instanceof EmissionState)) {
+            break;
+          }
         }
+        dotStatesIndex = i;
       }
-      dotStatesIndex = i;
+
+      this.forwardTransitionScores.clear();
+      this.backwardTransitionScores.clear();
     } catch (Exception e) {
       throw new BioError("Something is seriously wrong with the DP code", e);
     }
   }
-  
+
   public DP(MarkovModel model)
-  throws IllegalSymbolException, IllegalTransitionException, BioException {
+          throws IllegalSymbolException, IllegalTransitionException, BioException {
     this.model = model;
     this.forwardTransitionScores = new HashMap();
     this.backwardTransitionScores = new HashMap();
     update();
-    
+
     model.addChangeListener(UPDATER);
   }
 
-  public abstract double forward(SymbolList [] symList, ScoreType scoreType)
-  throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;
-  
-  public abstract double backward(SymbolList [] symList, ScoreType scoreType)
-  throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;
+  public abstract double forward(SymbolList[] symList, ScoreType scoreType)
+          throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;
 
-  public abstract DPMatrix forwardMatrix(SymbolList [] symList, ScoreType scoreType)
-  throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;
-  
-  public abstract DPMatrix backwardMatrix(SymbolList [] symList, ScoreType scoreType)
-  throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;
+  public abstract double backward(SymbolList[] symList, ScoreType scoreType)
+          throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;
 
-  public abstract DPMatrix forwardMatrix(SymbolList [] symList, DPMatrix matrix, ScoreType scoreType)
-  throws IllegalArgumentException, IllegalSymbolException,
-  IllegalAlphabetException, IllegalTransitionException;
-  
-  public abstract DPMatrix backwardMatrix(SymbolList [] symList, DPMatrix matrix, ScoreType scoreType)
-  throws IllegalArgumentException, IllegalSymbolException,
-  IllegalAlphabetException, IllegalTransitionException;
-    
-  public abstract StatePath viterbi(SymbolList [] symList, ScoreType scoreType)
-  throws IllegalSymbolException, IllegalArgumentException, IllegalAlphabetException, IllegalTransitionException;
-  
-  public DPMatrix forwardsBackwards(SymbolList [] symList, ScoreType scoreType)
-  throws BioException {
+  public abstract DPMatrix forwardMatrix(SymbolList[] symList, ScoreType scoreType)
+          throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;
+
+  public abstract DPMatrix backwardMatrix(SymbolList[] symList, ScoreType scoreType)
+          throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException;
+
+  public abstract DPMatrix forwardMatrix(SymbolList[] symList, DPMatrix matrix, ScoreType scoreType)
+          throws IllegalArgumentException, IllegalSymbolException,
+          IllegalAlphabetException, IllegalTransitionException;
+
+  public abstract DPMatrix backwardMatrix(SymbolList[] symList, DPMatrix matrix, ScoreType scoreType)
+          throws IllegalArgumentException, IllegalSymbolException,
+          IllegalAlphabetException, IllegalTransitionException;
+
+  public abstract StatePath viterbi(SymbolList[] symList, ScoreType scoreType)
+          throws IllegalSymbolException, IllegalArgumentException, IllegalAlphabetException, IllegalTransitionException;
+
+  public DPMatrix forwardsBackwards(SymbolList[] symList, ScoreType scoreType)
+          throws BioException {
     try {
       System.out.println("Making backward matrix");
       final DPMatrix bMatrix = backwardMatrix(symList, scoreType);
       System.out.println("Making forward matrix");
       final DPMatrix fMatrix = forwardMatrix(symList, scoreType);
-    
+
       System.out.println("Making forward/backward matrix");
       return new DPMatrix() {
-        public double getCell(int [] index) {
+        public double getCell(int[] index) {
           return fMatrix.getCell(index) + bMatrix.getCell(index);
         }
-      
+
         public double getScore() {
           return fMatrix.getScore();
         }
-      
+
         public MarkovModel model() {
           return fMatrix.model();
         }
-      
-        public SymbolList [] symList() {
+
+        public SymbolList[] symList() {
           return fMatrix.symList();
         }
-      
-        public State [] states() {
+
+        public State[] states() {
           return fMatrix.states();
         }
       };
@@ -517,7 +517,7 @@ public abstract class DP {
    * @return  a StatePath generated at random
    */
   public StatePath generate(int length)
-  throws IllegalSymbolException, BioException {
+          throws IllegalSymbolException, BioException {
     List tokenList = new ArrayList();
     List stateList = new ArrayList();
     List scoreList = new ArrayList();
@@ -545,7 +545,7 @@ public abstract class DP {
 
     while (i != 0) {
       State newState = null;
-      Distribution dist = model.getWeights(oldState); 
+      Distribution dist = model.getWeights(oldState);
       do {
         newState = (State) dist.sampleSymbol();
       } while (newState == model.magicalState() && i > 0);
@@ -553,8 +553,8 @@ public abstract class DP {
         symScore += dist.getWeight(newState);
       } catch (IllegalSymbolException ise) {
         throw new BioError(
-          "Transition returned from sampleTransition is invalid",
-          ise);
+                "Transition returned from sampleTransition is invalid",
+                ise);
       }
 
       if (newState == model.magicalState()) {
@@ -580,10 +580,10 @@ public abstract class DP {
     SymbolList scores = new SimpleSymbolList(dAlpha, scoreList);
 
     return new SimpleStatePath(
-      totScore,
-      tokens,
-      states,
-      scores
+            totScore,
+            tokens,
+            states,
+            scores
     );
   }
 
@@ -611,12 +611,17 @@ public abstract class DP {
 
   private final ChangeListener UPDATER = new ChangeListener() {
     public void preChange(ChangeEvent ce)
-    throws ChangeVetoException {}
-  
+            throws ChangeVetoException {
+    }
+
     public void postChange(ChangeEvent ce) {
-      if(
-        (ce.getType() == MarkovModel.ARCHITECTURE) ||
-        (ce.getType() == MarkovModel.PARAMETER)
+      if (ce.getType().isMatchingType(MarkovModel.ARCHITECTURE)) {
+        states = null;
+      }
+
+      if (
+              (ce.getType().isMatchingType(MarkovModel.ARCHITECTURE)) ||
+              (ce.getType().isMatchingType(MarkovModel.PARAMETER))
       ) {
         update();
       }
@@ -632,54 +637,54 @@ public abstract class DP {
     private MarkovModel mm;
 
     private HMMOrderByTransition(MarkovModel mm) {
-	    this.mm = mm;
+      this.mm = mm;
     }
 
     public Object compare(Object o1, Object o2)
-    throws IllegalTransitionException, IllegalSymbolException {
-	    if (o1 == o2) {
-       return EQUAL;
+            throws IllegalTransitionException, IllegalSymbolException {
+      if (o1 == o2) {
+        return EQUAL;
       }
-	    State s1 = (State) o1;
-	    State s2 = (State) o2;
-        
-	    if (transitionsTo(s1, s2)) {
+      State s1 = (State) o1;
+      State s2 = (State) o2;
+
+      if (transitionsTo(s1, s2)) {
         return LESS_THAN;
       }
-	    if (transitionsTo(s2, s1)) {
+      if (transitionsTo(s2, s1)) {
         return GREATER_THAN;
       }
-      
-	    return DISJOINT;
+
+      return DISJOINT;
     }
 
     private boolean transitionsTo(State from, State to)
-	  throws IllegalTransitionException, IllegalSymbolException {
-	    Set checkedSet = new HashSet();
-	    Set workingSet = new HashSet();
-            for(
+            throws IllegalTransitionException, IllegalSymbolException {
+      Set checkedSet = new HashSet();
+      Set workingSet = new HashSet();
+      for (
               Iterator i = mm.transitionsFrom(from).iterator();
               i.hasNext();
-            ) {
-              workingSet.add(i);
-            }
+              ) {
+        workingSet.add(i.next());
+      }
 
-	    while (workingSet.size() > 0) {
+      while (workingSet.size() > 0) {
         Set newWorkingSet = new HashSet();
-        for (Iterator i = workingSet.iterator(); i.hasNext(); ) {
+        for (Iterator i = workingSet.iterator(); i.hasNext();) {
           State s = (State) i.next();
           if (s instanceof EmissionState) {
             continue;
           }
           if (s == from) {
             throw new IllegalTransitionException(
-              from, from, "Loop in dot states."
+                    from, from, "Loop in dot states."
             );
           }
           if (s == to) {
             return true;
           }
-          for (Iterator j = mm.transitionsFrom(s).iterator(); j.hasNext(); ) {
+          for (Iterator j = mm.transitionsFrom(s).iterator(); j.hasNext();) {
             State s2 = (State) j.next();
             if (!workingSet.contains(s2) && !checkedSet.contains(s2)) {
               newWorkingSet.add(s2);
@@ -688,9 +693,8 @@ public abstract class DP {
           checkedSet.add(s);
         }
         workingSet = newWorkingSet;
-	    }
-
-	    return false;
+      }
+      return false;
     }
   }
 }
