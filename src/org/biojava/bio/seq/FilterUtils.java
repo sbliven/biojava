@@ -52,6 +52,17 @@ public class FilterUtils {
      */
 
     public static boolean areProperSubset(FeatureFilter sub, FeatureFilter sup) {
+        // Preconditions
+        
+        if (sub == null) {
+            throw new NullPointerException("Null FeatureFilter: sub");
+        }
+        if (sup == null) {
+            throw new NullPointerException("Null FeatureFilter: sup");
+        }
+        
+        // Body
+        
         if(sub.equals(sup)) {
             return true;
         }
@@ -102,6 +113,17 @@ public class FilterUtils {
      */
 
     public static boolean areDisjoint(FeatureFilter a, FeatureFilter b) {
+        // Preconditions
+        
+        if (a == null) {
+            throw new NullPointerException("Null FeatureFilter: a");
+        }
+        if (b == null) {
+            throw new NullPointerException("Null FeatureFilter: b");
+        }
+        
+        // Body
+        
         if(a.equals(b)) {
             return false;
         }

@@ -147,7 +147,10 @@ public interface FeatureFilter extends Serializable {
      * @param type  the String to match type fields against
      */
     public ByType(String type) {
-      this.type = type;
+        if (type == null) {
+            throw new NullPointerException("Type may not be null");
+        }
+        this.type = type;
     }
 
     /**
@@ -203,7 +206,10 @@ public interface FeatureFilter extends Serializable {
      * @param source  the String to match source fields against
      */
     public BySource(String source) {
-      this.source = source;
+        if (source == null) {
+            throw new NullPointerException("Source may not be null");
+        }
+        this.source = source;
     }
 
     public boolean accept(Feature f) { return source.equals(f.getSource()); }
@@ -247,7 +253,10 @@ public interface FeatureFilter extends Serializable {
     private Class clazz;
 
     public ByClass(Class clazz) {
-      this.clazz = clazz;
+        if (clazz == null) {
+            throw new NullPointerException("Clazz may not be null");
+        }
+        this.clazz = clazz;
     }
 
     public boolean accept(Feature f) {
@@ -313,7 +322,10 @@ public interface FeatureFilter extends Serializable {
      * @param loc  the location that will contain the accepted features
      */
     public ContainedByLocation(Location loc) {
-      this.loc = loc;
+        if (loc == null) {
+            throw new NullPointerException("Loc may not be null");
+        }
+        this.loc = loc;
     }
 
     /**
@@ -380,7 +392,10 @@ public interface FeatureFilter extends Serializable {
      * @param loc  the location that will overlap the accepted features
      */
     public OverlapsLocation(Location loc) {
-      this.loc = loc;
+        if (loc == null) {
+            throw new NullPointerException("Loc may not be null");
+        }
+        this.loc = loc;
     }
 
     /**
