@@ -228,11 +228,11 @@ public class LayeredRenderer implements SequenceRenderer {
       return seq;
     }
     
-    public Border getLeadingBorder() {
+    public SequenceRenderContext.Border getLeadingBorder() {
       return src.getLeadingBorder();
     }
     
-    public Border getTrailingBorder() {
+    public SequenceRenderContext.Border getTrailingBorder() {
       return src.getTrailingBorder();
     }
     
