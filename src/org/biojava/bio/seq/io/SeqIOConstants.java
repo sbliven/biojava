@@ -21,6 +21,8 @@
 
 package org.biojava.bio.seq.io;
 
+import org.biojava.utils.lsid.LifeScienceIdentifier;
+
 /**
  * <code>SeqIOConstants</code> contains constants used to identify
  * sequence formats, alphabets etc, in the context of reading and
@@ -226,4 +228,67 @@ public final class SeqIOConstants
      * <code>FASTA_AA</code> premade FASTA | AA.
      */
     public static final int FASTA_AA = FASTA | AA;
+
+    /**
+     * <code>LSID_FASTA_DNA</code> sequence format LSID for Fasta DNA.
+     */
+    public static final LifeScienceIdentifier LSID_FASTA_DNA =
+        LifeScienceIdentifier.valueOf("open-bio.org", "fasta", "dna");
+
+    /**
+     * <code>LSID_FASTA_RNA</code> sequence format LSID for Fasta RNA.
+     */
+    public static final LifeScienceIdentifier LSID_FASTA_RNA =
+        LifeScienceIdentifier.valueOf("open-bio.org", "fasta", "rna");
+
+    /**
+     * <code>LSID_FASTA_AA</code> sequence format LSID for Fasta AA.
+     */
+    public static final LifeScienceIdentifier LSID_FASTA_AA =
+        LifeScienceIdentifier.valueOf("open-bio.org", "fasta", "protein");
+
+    /**
+     * <code>LSID_EMBL_DNA</code> sequence format LSID for EMBL DNA.
+     */
+    public static final LifeScienceIdentifier LSID_EMBL_DNA =
+        LifeScienceIdentifier.valueOf("open-bio.org", "embl", "dna");
+
+    /**
+     * <code>LSID_EMBL_RNA</code> sequence format LSID for EMBL RNA.
+     */
+    public static final LifeScienceIdentifier LSID_EMBL_RNA =
+        LifeScienceIdentifier.valueOf("open-bio.org", "embl", "rna");
+
+    /**
+     * <code>LSID_EMBL_AA</code> sequence format LSID for EMBL AA.
+     */
+    public static final LifeScienceIdentifier LSID_EMBL_AA =
+        LifeScienceIdentifier.valueOf("open-bio.org", "embl", "protein");
+
+    /**
+     * <code>LSID_GENBANK_DNA</code> sequence format LSID for Genbank
+     * DNA.
+     */
+    public static final LifeScienceIdentifier LSID_GENBANK_DNA =
+        LifeScienceIdentifier.valueOf("open-bio.org", "genbank", "dna");
+
+    /**
+     * <code>LSID_GENBANK_RNA</code> sequence format LSID for Genbank
+     * RNA.
+     */
+    public static final LifeScienceIdentifier LSID_GENBANK_RNA =
+        LifeScienceIdentifier.valueOf("open-bio.org", "genbank", "rna");
+
+    /**
+     * <code>LSID_GENBANK_AA</code> sequence format LSID for Genbank
+     * AA.
+     */
+    public static final LifeScienceIdentifier LSID_GENBANK_AA =
+        LifeScienceIdentifier.valueOf("open-bio.org", "genbank", "protein");
+
+    /**
+     * <code>LSID_SWISSPROT</code> sequence format LSID for Swissprot.
+     */
+    public static final LifeScienceIdentifier LSID_SWISSPROT =
+        LifeScienceIdentifier.valueOf("open-bio.org", "swiss", "protein");
 }

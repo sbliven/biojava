@@ -85,19 +85,13 @@ public class IndexTools
         switch (alphabetIdentifier)
         {
             case (SeqIOConstants.DNA):
-                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
-                                                                    "fasta",
-                                                                    "dna" ));
+                bsf.setSequenceFormat(SeqIOConstants.LSID_FASTA_DNA);
                 break;
             case (SeqIOConstants.RNA):
-                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
-                                                                    "fasta",
-                                                                    "rna" ));
+                bsf.setSequenceFormat(SeqIOConstants.LSID_FASTA_RNA);
                 break;
             case (SeqIOConstants.AA):
-                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
-                                                                    "fasta",
-                                                                    "protein" ));
+                bsf.setSequenceFormat(SeqIOConstants.LSID_FASTA_AA);
                 break;
 
             default:
@@ -135,19 +129,13 @@ public class IndexTools
         switch (alphabetIdentifier)
         {
             case (SeqIOConstants.DNA):
-                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
-                                                                    "embl",
-                                                                    "dna" ));
+                bsf.setSequenceFormat(SeqIOConstants.LSID_EMBL_DNA);
                 break;
             case (SeqIOConstants.RNA):
-                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
-                                                                    "embl",
-                                                                    "rna" ));
+                bsf.setSequenceFormat(SeqIOConstants.LSID_EMBL_RNA);
                 break;
             case (SeqIOConstants.AA):
-                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
-                                                                    "embl",
-                                                                    "protein" ));
+                bsf.setSequenceFormat(SeqIOConstants.LSID_EMBL_AA);
                 break;
 
             default:
@@ -186,19 +174,13 @@ public class IndexTools
         switch (alphabetIdentifier)
         {
             case (SeqIOConstants.DNA):
-                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
-                                                                    "genbank",
-                                                                    "dna" ));
+                bsf.setSequenceFormat(SeqIOConstants.LSID_GENBANK_DNA);
                 break;
             case (SeqIOConstants.RNA):
-                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
-                                                                    "genbank",
-                                                                    "rna" ));
+                bsf.setSequenceFormat(SeqIOConstants.LSID_GENBANK_RNA);
                 break;
             case (SeqIOConstants.AA):
-                bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
-                                                                    "genbank",
-                                                                    "protein" ));
+                bsf.setSequenceFormat(SeqIOConstants.LSID_GENBANK_AA);
                 break;
 
             default:
