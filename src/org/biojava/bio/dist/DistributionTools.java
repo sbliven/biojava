@@ -29,8 +29,8 @@ import java.util.*;
 
 /**
  * Title:        DistributionTools.java
- * Description:  A static class to hold static methods for calculations and
- * maniputlations using Distributions.
+ * Description:  A class to hold static methods for calculations and
+ * manipulations using Distributions.
  * @author Mark Schreiber
  */
 
