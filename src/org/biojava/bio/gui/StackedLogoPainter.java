@@ -29,6 +29,7 @@ import java.beans.*;
 import java.util.*;
 
 import org.biojava.bio.*;
+import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 
@@ -38,11 +39,7 @@ import org.biojava.bio.dist.*;
  * @author Matthew Pocock
  */
 public class StackedLogoPainter implements LogoPainter {
-  /**
-   * A comparator to set up our letters & information scores nicely.
-   */
-  private static final Comparator COMP = new ResValComparator();
-  
+    
   /**
    * Supports the bean property logoFont.
    */
@@ -87,13 +84,19 @@ public class StackedLogoPainter implements LogoPainter {
   public void paintLogo(LogoContext lCtxt) {
     Distribution dis = lCtxt.getDistribution();
     SymbolStyle style = lCtxt.getStyle();
-    
+    SymbolTokenization toke = null;
+    try {
+	toke = dis.getAlphabet().getTokenization("token");
+    } catch (BioException ex) {
+	throw new BioRuntimeException(ex);
+    }
+
     Rectangle bounds = lCtxt.getBounds();
     double width = bounds.getWidth();
     double height = bounds.getHeight();
     double base = height;
 
-    SortedSet info = new TreeSet(COMP);
+    SortedSet info = new TreeSet(new ResValComparator(toke));
     
     try {
       for(
@@ -150,6 +153,12 @@ public class StackedLogoPainter implements LogoPainter {
    * The comparator for comparing symbol/information tuples.
    */
   private static class ResValComparator implements Comparator {
+      private SymbolTokenization toke;
+
+      public ResValComparator(SymbolTokenization toke) {
+	  this.toke = toke;
+      }
+
     public final int compare(Object o1, Object o2) {
       ResVal rv1 = (ResVal) o1;
       ResVal rv2 = (ResVal) o2;
@@ -157,7 +166,11 @@ public class StackedLogoPainter implements LogoPainter {
       double diff = rv1.getValue() - rv2.getValue();
       if(diff < 0) return -1;
       if(diff > 0) return +1;
-      return rv1.getToken().getToken() - rv2.getToken().getToken();
+      try {
+	  return toke.tokenizeSymbol(rv1.getToken()).compareTo(toke.tokenizeSymbol(rv2.getToken()));
+      } catch (IllegalSymbolException ex) {
+	  throw new BioError(ex, "Couldn't tokenize symbols");
+      }
     }
   }
 }

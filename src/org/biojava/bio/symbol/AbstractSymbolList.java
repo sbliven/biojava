@@ -27,6 +27,7 @@ import java.io.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
+import org.biojava.bio.seq.io.*;
 
 /**  
  * Abstract helper implementation of the SymbolList core interface.
@@ -74,17 +75,16 @@ implements SymbolList {
   }
 
   public String seqString() {
-    return subStr(1, length());
+      try {
+	  SymbolTokenization toke = getAlphabet().getTokenization("token");
+	  return toke.tokenizeSymbolList(this);
+      } catch (BioException ex) {
+	  throw new BioRuntimeException(ex, "Couldn't tokenize sequence");
+      }
   }
 
   public String subStr(int start, int end) {
-    StringBuffer sb = new StringBuffer();
-
-    for (int i = start; i <= end; i++) {
-      sb.append(symbolAt(i).getToken());
-    }
-
-    return sb.toString();
+      return subList(start, end).seqString();
   }
   
   public void edit(Edit edit)
@@ -202,19 +202,19 @@ implements SymbolList {
       return new SubList(sstart + start - 1, send + start - 1);
     }
 
-    public String seqString() {
-      return subStr(1, length());
-    }
 
-    public String subStr(int start, int end) throws IndexOutOfBoundsException {
-      if (start < 1 || start > this.end || 
-          end < 1 || end > this.end || 
-          start > end) {
-        throw new IndexOutOfBoundsException();
+      public String seqString() {
+	  try {
+	      SymbolTokenization toke = getAlphabet().getTokenization("token");
+	      return toke.tokenizeSymbolList(this);
+	  } catch (BioException ex) {
+	      throw new BioRuntimeException(ex, "Couldn't tokenize sequence");
+	  }
       }
 
-      return AbstractSymbolList.this.subStr(start + this.start - 1, end + this.start - 1);
-    }
+      public String subStr(int start, int end) {
+	  return subList(start, end).seqString();
+      }
 
     public List toList() {
       return new ListView(this);

@@ -28,12 +28,16 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.biojava.bio.BioException;
+import org.biojava.bio.BioError;
+import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.IllegalAlphabetException;
+import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
 
 /**
@@ -57,6 +61,16 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
     private StringBuffer qb = new StringBuffer();
     // Utility formatting buffer
     private StringBuffer ub = new StringBuffer();
+
+    private SymbolTokenization dnaTokenization;
+
+    {
+	try {
+	    dnaTokenization = DNATools.getDNA().getTokenization("token");
+	} catch (Exception ex) {
+	    throw new BioError(ex, "Couldn't initialize tokenizer for the DNA alphabet");
+	}
+    }
 
     static
     {
@@ -112,105 +126,110 @@ public class EmblFileFormer extends AbstractGenEmblFileFormer
                            final int       length)
         throws IllegalAlphabetException
     {
-        int aCount = 0;
-        int cCount = 0;
-        int gCount = 0;
-        int tCount = 0;
-        int oCount = 0;
-
-	int end = start + length - 1;
-
-        for (int i = start; i <= end; i++)
-        {
-            char c = syms[i].getToken();
-
-            switch (c)
-            {
-                case 'a': case 'A':
-                    aCount++;
-                    break;
-                case 'c': case 'C':
-                    cCount++;
-                    break;
-                case 'g': case 'G':
-                    gCount++;
-                    break;
-                case 't': case 'T':
-                    tCount++;
-                    break;
-                    
-                default:
-                    oCount++;
-            }
-        }
-
-	// Get separator for system
-	String nl = System.getProperty("line.separator");
-
-	sq.setLength(0);
-        sq.append("XX");
-	sq.append(nl);
-	sq.append("SQ   Sequence ");
-        sq.append(length + " BP; ");
-        sq.append(aCount + " A; ");
-        sq.append(cCount + " C; ");
-        sq.append(gCount + " G; ");
-        sq.append(tCount + " T; ");
-        sq.append(oCount + " other;");
-
-        // Print sequence summary header
-        stream.println(sq);
-
-        int fullLine = length / 60;
-        int partLine = length % 60;
-
-        int lineCount = fullLine;
-        if (partLine > 0)
-            lineCount++;
-
-        int lineLens [] = new int [lineCount];
-
-        // All lines are 60, except last (if present)
-        Arrays.fill(lineLens, 60);
-        lineLens[lineCount - 1] = partLine;
-
-	// Prepare line 80 characters wide, sequence is subset of this
-	char [] emptyLine = new char [80];
-
-        for (int i = 0; i < lineLens.length; i++)
-        {
-	    // Empty the sequence buffer
-	    sq.setLength(0);
-	    // Empty the utility buffer
-	    ub.setLength(0);
+	try {
+	    int aCount = 0;
+	    int cCount = 0;
+	    int gCount = 0;
+	    int tCount = 0;
+	    int oCount = 0;
 	    
-            // How long is this chunk?
-            int len = lineLens[i];
+	    int end = start + length - 1;
 
-	    // Prep the whitespace
-            Arrays.fill(emptyLine, ' ');
-            sq.append(emptyLine);
+	
+	    for (int i = start; i <= end; i++)
+		{
+		    char c = dnaTokenization.tokenizeSymbol(syms[i]).charAt(0);
+		    
+		    switch (c)
+			{
+			case 'a': case 'A':
+			    aCount++;
+			    break;
+			case 'c': case 'C':
+			    cCount++;
+			    break;
+			case 'g': case 'G':
+			    gCount++;
+			    break;
+			case 't': case 'T':
+			    tCount++;
+			    break;
+			    
+			default:
+			    oCount++;
+			}
+		}
+	
+	    // Get separator for system
+	    String nl = System.getProperty("line.separator");
 
-            // Prepare a Symbol array same length as chunk
-            Symbol [] sa = new Symbol [len];
+	    sq.setLength(0);
+	    sq.append("XX");
+	    sq.append(nl);
+	    sq.append("SQ   Sequence ");
+	    sq.append(length + " BP; ");
+	    sq.append(aCount + " A; ");
+	    sq.append(cCount + " C; ");
+	    sq.append(gCount + " G; ");
+	    sq.append(tCount + " T; ");
+	    sq.append(oCount + " other;");
+	    
+	    // Print sequence summary header
+	    stream.println(sq);
+	    
+	    int fullLine = length / 60;
+	    int partLine = length % 60;
 
-            // Get symbols and format into blocks of tokens
-            System.arraycopy(syms, start + (i * 60), sa, 0, len);
+	    int lineCount = fullLine;
+	    if (partLine > 0)
+		lineCount++;
 
-            String blocks = (formatTokenBlock(ub, sa, 10)).toString();
+	    int lineLens [] = new int [lineCount];
+	    
+	    // All lines are 60, except last (if present)
+	    Arrays.fill(lineLens, 60);
+	    lineLens[lineCount - 1] = partLine;
 
-            sq.replace(5, blocks.length() + 5, blocks);
+	    // Prepare line 80 characters wide, sequence is subset of this
+	    char [] emptyLine = new char [80];
 
-            // Calculate the running residue count and add to the line
-            String count = Integer.toString((i * 60) + len);
-            sq.replace((80 - count.length()), 80, count);
+	    for (int i = 0; i < lineLens.length; i++)
+		{
+		    // Empty the sequence buffer
+		    sq.setLength(0);
+		    // Empty the utility buffer
+		    ub.setLength(0);
+		    
+		    // How long is this chunk?
+		    int len = lineLens[i];
+		    
+		    // Prep the whitespace
+		    Arrays.fill(emptyLine, ' ');
+		    sq.append(emptyLine);
+		    
+		    // Prepare a Symbol array same length as chunk
+		    Symbol [] sa = new Symbol [len];
+		    
+		    // Get symbols and format into blocks of tokens
+		    System.arraycopy(syms, start + (i * 60), sa, 0, len);
+		    
+		    String blocks = (formatTokenBlock(ub, sa, 10, dnaTokenization)).toString();
+		    
+		    sq.replace(5, blocks.length() + 5, blocks);
 
-            // Print formatted sequence line
-            stream.println(sq);
-        }
-
-        // Print end of entry
-        stream.println("//");
+		    // Calculate the running residue count and add to the line
+		    String count = Integer.toString((i * 60) + len);
+		    sq.replace((80 - count.length()), 80, count);
+		    
+		    // Print formatted sequence line
+		    stream.println(sq);
+		}
+	    
+	    // Print end of entry
+	    stream.println("//");
+	} catch (IllegalSymbolException ex) {
+	    throw new IllegalAlphabetException(ex, "DNA not tokenizing");
+	}
     }
 
     public void addSequenceProperty(final Object key, final Object value)

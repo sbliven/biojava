@@ -25,6 +25,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
@@ -44,6 +46,7 @@ public class ProteinRefSeqFileFormer extends GenbankFileFormer
 
 // Member variables
 
+    
 // Constructors and initialization
     static
     {
@@ -114,15 +117,21 @@ public class ProteinRefSeqFileFormer extends GenbankFileFormer
 	 *                                  alphabet.
 	 */
 	protected List breakSymbolArray(Alphabet theAlphabet,
-									Symbol[] theSymbols,
-									int theStart,
-									int theLength)
+					Symbol[] theSymbols,
+					int theStart,
+					int theLength)
 		throws IllegalAlphabetException
 	{
 		List returnList = new ArrayList(theLength / 60 + 1);
 		int blockCount = 0;
 		int blockIndex = 0;
 		StringBuffer tempString = new StringBuffer();
+		SymbolTokenization tokenization;
+		try {
+		    tokenization = theAlphabet.getTokenization("token");
+		} catch (BioException ex) {
+		    throw new BioError(ex, "Expected tokenization");
+		}
 		for(int i = theStart; i < theStart + theLength; i++)
 		{
 			try
@@ -149,7 +158,14 @@ public class ProteinRefSeqFileFormer extends GenbankFileFormer
 				blockCount = 0;
 				blockIndex = 0;
 			}
-			tempString.append(theSymbols[i].getToken());
+			try
+			{
+				tempString.append(tokenization.tokenizeSymbol(theSymbols[i]));
+			}
+			catch (IllegalSymbolException e)
+			{
+				throw new IllegalAlphabetException(e);
+			}
 			blockIndex++;
 		}
 

@@ -67,10 +67,6 @@ implements Serializable {
     return symbols.iterator();
   }
   
-  public Iterator ambiguities() {
-    return ambig.iterator();
-  }
-  
   public String getName() {
     return name;
   }
@@ -123,7 +119,7 @@ implements Serializable {
    * @throws IllegalSymbolException if aSym contains an AtomicSymbol not found
    *         within this alphabet
    */
-  public void addAmbiguity(Symbol aSym)
+  private void addAmbiguity(Symbol aSym)
   throws IllegalSymbolException {
     validate(aSym);
     if (ambig.contains(aSym))

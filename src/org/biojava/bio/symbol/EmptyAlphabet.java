@@ -48,7 +48,7 @@ class EmptyAlphabet implements FiniteAlphabet, Serializable {
 					 "The empty alphabet does not contain symbol " + sym.getName());
     }
 
-    public SymbolParser getParser(String name) throws NoSuchElementException {
+    public SymbolTokenization getTokenization(String name) throws NoSuchElementException {
       throw new NoSuchElementException("There is no parser for the empty alphabet. Attempted to retrieve " + name);
     }
 

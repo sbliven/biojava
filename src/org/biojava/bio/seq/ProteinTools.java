@@ -23,6 +23,7 @@ package org.biojava.bio.seq;
 
 import java.util.*;
 import org.biojava.bio.*;
+import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
 import javax.xml.parsers.*;
 
@@ -46,6 +47,7 @@ import java.net.URL;
  *
  * @author Matthew Pocock
  * @author Greg Cox
+ * @author Thomas Down
  */
 public class ProteinTools {
     private static final FiniteAlphabet proteinAlpha;
@@ -92,88 +94,51 @@ public class ProteinTools {
         }
 
         try {
-            SimpleSymbolPropertyTable simplePropertyTable = new SimpleSymbolPropertyTable(
+            SimpleSymbolPropertyTable monoMassPropertyTable = new SimpleSymbolPropertyTable(
             getAlphabet(),
             SymbolPropertyTable.MONO_MASS
             );
-            Iterator it = getAlphabet().iterator();
-            NodeList children = doc.getDocumentElement().getChildNodes();
-
-            while(it.hasNext()){
-                Symbol s = (Symbol)it.next();
-                //  simplePropertyTable.setDoubleProperty(s, "1202.00");
-                for(int i = 0; i < children.getLength(); i++) {
-                    Node cnode = (Node) children.item(i);
-                    if(! (cnode instanceof Element)) {
-                        continue;
-                    }
-                    Element child = (Element) cnode;
-                    if(child.getNodeName().equals("residue")) {
-
-                        if(child.getAttribute("token").equals(s.getToken()+"")){
-
-                            NodeList properyNodes = child.getChildNodes();
-                            for(int j = 0; j < properyNodes.getLength(); j++)
-                            {
-                                cnode = (Node) properyNodes.item(j);
-                                if(! (cnode instanceof Element)) {
-                                    continue;
-                                }
-                                Element el = (Element) cnode;
-                                String name = el.getAttribute("name");
-                                if(name.equals(SymbolPropertyTable.MONO_MASS)) {
-                                    String value = el.getAttribute("value");
-                                    simplePropertyTable.setDoubleProperty(s, value);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            propertyTableMap.put(SymbolPropertyTable.MONO_MASS, (SymbolPropertyTable) simplePropertyTable);
-
-            //Build AVG_MASS table
-            simplePropertyTable = new SimpleSymbolPropertyTable(
+	    
+	    SimpleSymbolPropertyTable avgMassPropertyTable = new SimpleSymbolPropertyTable(
             getAlphabet(),
             SymbolPropertyTable.AVG_MASS
             );
-            it = getAlphabet().iterator();
+ 
+	    SymbolTokenization tokens = getAlphabet().getTokenization("token");
 
-            while(it.hasNext()){
-                Symbol s = (Symbol)it.next();
-                //  simplePropertyTable.setDoubleProperty(s, "1202.00");
-                for(int i = 0; i < children.getLength(); i++) {
-                     Node cnode = (Node) children.item(i);
-                    if(! (cnode instanceof Element)) {
-                        continue;
-                    }
-                    Element child = (Element) cnode;
+            NodeList children = doc.getDocumentElement().getChildNodes();
+	    for(int i = 0; i < children.getLength(); i++) {
+		Node cnode = (Node) children.item(i);
+		if(! (cnode instanceof Element)) {
+		    continue;
+		}
+		Element child = (Element) cnode;
+		if(child.getNodeName().equals("residue")) {
+		    String token = child.getAttribute("token");
+		    Symbol s = tokens.parseToken(token);
+			
+		    NodeList properyNodes = child.getChildNodes();
+		    for(int j = 0; j < properyNodes.getLength(); j++) {
+			cnode = (Node) properyNodes.item(j);
+			if(! (cnode instanceof Element)) {
+			    continue;
+			}
+			Element el = (Element) cnode;
+			String name = el.getAttribute("name");
+			if(name.equals(SymbolPropertyTable.MONO_MASS)) {
+			    String value = el.getAttribute("value");
+			    monoMassPropertyTable.setDoubleProperty(s, value);
+			} else if (name.equals(SymbolPropertyTable.AVG_MASS)) {
+			    String value = el.getAttribute("value");
+			    avgMassPropertyTable.setDoubleProperty(s, value);
+			    break;
+			}
+		    }
+		}
+	    }
 
-                    if(child.getNodeName().equals("residue")) {
-                        if(child.getAttribute("token").equals(s.getToken()+"")){
-                            NodeList properyNodes = child.getChildNodes();
-                            for(int j = 0; j < properyNodes.getLength(); j++)
-                            {
-                                cnode = (Node) properyNodes.item(j);
-                                if(! (cnode instanceof Element)) {
-                                    continue;
-                                }
-                                Element el = (Element) cnode;
-                                String name = el.getAttribute("name");
-
-                                if(name.equals(SymbolPropertyTable.AVG_MASS)) {
-                                    String value = el.getAttribute("value");
-                                    simplePropertyTable.setDoubleProperty(s, value);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            propertyTableMap.put(SymbolPropertyTable.AVG_MASS, (SymbolPropertyTable) simplePropertyTable);
+            propertyTableMap.put(SymbolPropertyTable.MONO_MASS, (SymbolPropertyTable) monoMassPropertyTable);
+            propertyTableMap.put(SymbolPropertyTable.AVG_MASS, (SymbolPropertyTable) avgMassPropertyTable);
         } catch (Exception e) {
             throw new BioError(e, " Could not initialize ProteinTools");
         }
@@ -212,8 +177,8 @@ public class ProteinTools {
 	{
 		try
 		{
-			org.biojava.bio.seq.io.SymbolParser p = getTAlphabet().getParser("token");
-			return p.parse(theProtein);
+			org.biojava.bio.seq.io.SymbolTokenization p = getTAlphabet().getTokenization("token");
+			return new SimpleSymbolList(p, theProtein);
 		}
 		catch (BioException se)
 		{

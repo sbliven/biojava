@@ -141,11 +141,11 @@ class InfiniteCrossProductAlphabet implements Alphabet, Serializable {
     return AlphabetManager.getGapSymbol(getAlphabets());
   }
   
-  public SymbolParser getParser(String name)
+  public SymbolTokenization getTokenization(String name)
   throws NoSuchElementException, BioException {
-    if(name == "name") {
-      return new CrossProductSymbolNameParser(this);
-    }
+      if(name == "name") {
+          return new CrossProductTokenization(this);
+      }
     throw new NoSuchElementException(
       "No parser for " + name + " is defined for " + getName()
     );

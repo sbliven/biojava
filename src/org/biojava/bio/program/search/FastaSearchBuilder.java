@@ -45,12 +45,14 @@ import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.db.SequenceDBInstallation;
-import org.biojava.bio.seq.io.TokenParser;
+import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.AlphabetManager;
+import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.utils.ChangeVetoException;
 
 /**
@@ -86,7 +88,7 @@ public class FastaSearchBuilder implements SearchBuilder
     private StringBuffer            querySeqPrep;
     private StringBuffer            subjectSeqPrep;
 
-    private TokenParser             tokenParser;
+    private SymbolTokenization      tokenParser;
 
     // Hits are appended to this ArrayList as they are parsed from a
     // stream. The Fasta program pre-sorts the hits in order of
@@ -307,7 +309,7 @@ public class FastaSearchBuilder implements SearchBuilder
 	    alpha = ProteinTools.getTAlphabet();
 
         if (tokenParser == null)
-            tokenParser = new TokenParser(alpha);
+            tokenParser = alpha.getTokenization("token");
 
 	// There is only ever one subhit in a Fasta hit
 	List subHits = new ArrayList();
@@ -428,16 +430,16 @@ public class FastaSearchBuilder implements SearchBuilder
     private Alignment makeAlignment(final String       subjectSeqID,
                                     final StringBuffer querySeqBuf,
                                     final StringBuffer subjectSeqBuf,
-                                    final TokenParser  tokenParser)
+                                    final SymbolTokenization  tokenParser)
 	throws IllegalSymbolException
     {
 	Map labelMap = new HashMap();
 
 	labelMap.put(SeqSimilaritySearchSubHit.QUERY_LABEL, 
-                     tokenParser.parse(querySeqBuf.toString()));
+                     new SimpleSymbolList(tokenParser, querySeqBuf.toString()));
 
 	labelMap.put(subjectSeqID,
-                     tokenParser.parse(querySeqBuf.toString()));
+                     new SimpleSymbolList(tokenParser, querySeqBuf.toString()));
 
 	return new SimpleAlignment(labelMap);
     }

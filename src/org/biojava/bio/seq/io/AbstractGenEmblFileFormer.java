@@ -56,6 +56,7 @@ import org.biojava.bio.symbol.PointLocation;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.BetweenLocation;
 import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.IllegalSymbolException;
 
 /**
  * <code>AbstractGenEmblFileFormer</code> contain file formatting code
@@ -254,13 +255,15 @@ class AbstractGenEmblFileFormer
      *
      * @return a <code>StringBuffer</code>.
      */
-    StringBuffer formatTokenBlock(final StringBuffer sb,
-				  final Symbol []    syms,
-				  final int          blockSize)
+    StringBuffer formatTokenBlock(final StringBuffer       sb,
+				  final Symbol []          syms,
+				  final int                blockSize,
+				  final SymbolTokenization tokenization)
+	throws IllegalSymbolException
     {
 	for (int i = 0; i < syms.length; i++)
 	{
-	    sb.append(syms[i].getToken());
+	    sb.append(tokenization.tokenizeSymbol(syms[i]));
 	    if ((i > 0) && ((i + 1) % blockSize == 0))
 		sb.append(' ');
 	}

@@ -47,10 +47,11 @@ public class AssembledSymbolList extends AbstractSymbolList {
     private List componentList;
 
     private final static Symbol N;
+    private final static char nChar = 'n';
 
     static {
 	try {
-	    N = DNATools.getDNA().getParser("token").parseToken("n");
+	    N = DNATools.getDNA().getTokenization("token").parseToken("" + nChar);
         } catch (BioException ex) {
             throw new BioError(ex);
         }
@@ -231,7 +232,7 @@ public class AssembledSymbolList extends AbstractSymbolList {
 		    pos = end + 1;
 		}
 		for (int i = 0; i < numNs; ++i) {
-		    sb.append(N.getToken());
+		    sb.append(nChar);
 		}
 	    }
 	}

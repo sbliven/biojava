@@ -10,7 +10,9 @@ package org.biojava.bio.proteomics;
 import org.biojava.bio.seq.*;
 //import java.io.*;
 
+import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.io.*;
 
 
 import java.util.Iterator;
@@ -102,13 +104,14 @@ public class MassCalc {
         //Iterator symbolList = ProteinTools.getAlphabet().symbols().iterator();
         
         Iterator symbolList = ProteinTools.getAlphabet().iterator();
+	// SymbolTokenization toke = ProteinTools.getAlphabet().getTokenization("token");
         
         for(; symbolList.hasNext(); )
         {
             
             Symbol sym = (Symbol)symbolList.next();
             try{
-                System.out.println(sym.getName() + ":" + sym.getToken());
+                // System.out.println(sym.getName() + ":" + toke.tokenizeSymbol(sym));
                 try{
                 Double value = new Double(symbolPropertyTable.getDoubleValue(sym));
                 
@@ -139,13 +142,15 @@ public class MassCalc {
         //Iterator list = ProteinTools.getAlphabet().symbols().iterator();
         
         Iterator list = ProteinTools.getAlphabet().iterator();
-        for(; list.hasNext(); )
-        {
-            Symbol sym = (Symbol)list.next();
-            if(sym.getToken() == symbolToken) 
-                    mSymbolPropertyHash.put(sym, new Double(mass));
-        }
-        
+	SymbolTokenization toke;
+	try {
+	    toke = ProteinTools.getAlphabet().getTokenization("token");
+	} catch (BioException ex) {
+	    throw new BioError(ex, "Expected a tokenization");
+	}
+
+	Symbol sym = toke.parseToken("" + symbolToken);
+	mSymbolPropertyHash.put(sym, new Double(mass));
     }
     
  

@@ -40,7 +40,7 @@ import org.biojava.bio.seq.db.emblcd.EntryNamIdxReader;
 import org.biojava.bio.seq.db.emblcd.EntryNamRandomAccess;
 import org.biojava.bio.seq.io.SequenceBuilderFactory;
 import org.biojava.bio.seq.io.SequenceFormat;
-import org.biojava.bio.seq.io.SymbolParser;
+import org.biojava.bio.seq.io.SymbolTokenization;
 
 /**
  * <p><code>EmblCDROMIndexStore</code>s implement a read-only
@@ -78,7 +78,7 @@ public class EmblCDROMIndexStore implements IndexStore
 
     private final SequenceFormat         format;
     private final SequenceBuilderFactory factory;
-    private final SymbolParser           parser;
+    private final SymbolTokenization     parser;
 
     // Maps the file numbers used in the indices to the real file names
     private Map seqFiles;
@@ -109,7 +109,7 @@ public class EmblCDROMIndexStore implements IndexStore
      * IDs and offsets.
      * @param format a <code>SequenceFormat</code>.
      * @param factory a <code>SequenceBuilderFactory</code>.
-     * @param parser a <code>SymbolParser</code>.
+     * @param parser a <code>SymbolTokenization</code>.
      *
      * @exception IOException if an error occurs.
      */
@@ -117,7 +117,7 @@ public class EmblCDROMIndexStore implements IndexStore
                                final File                   entryNamIdx,
                                final SequenceFormat         format,
                                final SequenceBuilderFactory factory,
-                               final SymbolParser           parser)
+                               final SymbolTokenization     parser)
         throws IOException
     {
         // Set to the empty abstract path
@@ -138,7 +138,7 @@ public class EmblCDROMIndexStore implements IndexStore
      * IDs and offsets.
      * @param format a <code>SequenceFormat</code>.
      * @param factory a <code>SequenceBuilderFactory</code>.
-     * @param parser a <code>SymbolParser</code>.
+     * @param parser a <code>SymbolTokenization</code>.
      *
      * @exception IOException if an error occurs.
      */
@@ -147,7 +147,7 @@ public class EmblCDROMIndexStore implements IndexStore
                                final File                   entryNamIdx,
                                final SequenceFormat         format,
                                final SequenceBuilderFactory factory,
-                               final SymbolParser           parser)
+                               final SymbolTokenization     parser)
         throws IOException
     {
         this.divisionLkp = divisionLkp;
@@ -328,7 +328,7 @@ public class EmblCDROMIndexStore implements IndexStore
         return factory;
     }
 
-    public SymbolParser getSymbolParser()
+    public SymbolTokenization getSymbolParser()
     {
         return parser;
     }

@@ -339,15 +339,21 @@ public class SwissprotFileFormer implements SeqFileFormer
 	 *                                  alphabet.
 	 */
 	protected List breakSymbolArray(Alphabet theAlphabet,
-									Symbol[] theSymbols,
-									int theStart,
-									int theLength)
+					Symbol[] theSymbols,
+					int theStart,
+					int theLength)
 		throws IllegalAlphabetException
 	{
 		List returnList = new ArrayList(theLength / 60 + 1);
 		int blockCount = 0;
 		int blockIndex = 0;
 		StringBuffer tempString = new StringBuffer();
+		SymbolTokenization tokenization;
+		try {
+		    tokenization = theAlphabet.getTokenization("token");
+		} catch (Exception ex) {
+		    throw new IllegalAlphabetException(ex, "Couldn't get tokenization for this alphabet");
+		}
 		for(int i = theStart; i < theStart + theLength; i++)
 		{
 			try
@@ -374,7 +380,11 @@ public class SwissprotFileFormer implements SeqFileFormer
 				blockCount = 0;
 				blockIndex = 0;
 			}
-			tempString.append(theSymbols[i].getToken());
+			try {
+			    tempString.append(tokenization.tokenizeSymbol(theSymbols[i]));
+			} catch (IllegalSymbolException ex) {
+			    throw new IllegalAlphabetException(ex, "Couldn't tokenize symbols");
+			}
 			blockIndex++;
 		}
 

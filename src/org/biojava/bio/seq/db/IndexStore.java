@@ -125,5 +125,5 @@ public interface IndexStore {
    *
    * @return the associated SymbolParser
    */
-  SymbolParser getSymbolParser();
+  SymbolTokenization getSymbolParser();
 }

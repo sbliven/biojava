@@ -140,9 +140,9 @@ public class IntegerAlphabet implements Alphabet, Serializable {
    * @return an IntegerParser.
    * @author Mark Schreiber 3 May 2001.
    */
-  public SymbolParser getParser(String name) {
+  public SymbolTokenization getTokenization(String name) {
     if(name.equals("token")){
-      return new IntegerParser();
+      return new IntegerTokenization();
     }else{
       throw new NoSuchElementException(name + " parser not supported by IntegerAlphabet yet");
     }

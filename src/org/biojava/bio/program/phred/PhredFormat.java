@@ -93,7 +93,7 @@ public class PhredFormat implements SequenceFormat, Serializable {
     }
 
     public boolean readSequence(BufferedReader reader,
-                                SymbolParser symParser,
+                                SymbolTokenization symParser,
                                 SeqIOListener siol)
         throws IllegalSymbolException, IOException, ParseException
     {
@@ -117,7 +117,7 @@ public class PhredFormat implements SequenceFormat, Serializable {
     }
 
     private boolean readSequenceData(BufferedReader br,
-                                     SymbolParser parser,
+                                     SymbolTokenization parser,
                                      SeqIOListener listener)
         throws IOException, IllegalSymbolException
     {

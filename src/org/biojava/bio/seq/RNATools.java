@@ -37,6 +37,7 @@ import org.biojava.bio.symbol.*;
  *
  * @author Matthew Pocock
  * @author Keith James (docs)
+ * @author Thomas Down
  * @author Greg Cox
  */
 public final class RNATools {
@@ -55,7 +56,8 @@ public final class RNATools {
   static {
     try {
       rna = (FiniteAlphabet) AlphabetManager.alphabetForName("RNA");
-      SymbolList syms = rna.getParser("token").parse("agcu");
+
+      SymbolList syms = new SimpleSymbolList(rna.getTokenization("token"), "agcu");
       a = (AtomicSymbol) syms.symbolAt(1);
       g = (AtomicSymbol) syms.symbolAt(2);
       c = (AtomicSymbol) syms.symbolAt(3);
@@ -68,14 +70,16 @@ public final class RNATools {
       symbolToComplement.put(gap, gap);
 
       // add all other ambiguity symbols
-      for(Iterator i = ((SimpleAlphabet) rna).ambiguities(); i.hasNext();) {
-        Symbol as = (Symbol) i.next();
-        Set l = new HashSet();
-        FiniteAlphabet fa = (FiniteAlphabet) as.getMatches();
-        for(Iterator j = fa.iterator(); j.hasNext(); ) {
-          l.add(complement((Symbol) j.next()));
-        }
-        symbolToComplement.put(as, rna.getAmbiguity(l));
+      for(Iterator i = AlphabetManager.getAllSymbols(rna).iterator(); i.hasNext();) {
+	  Symbol as = (Symbol) i.next();
+	  FiniteAlphabet matches = (FiniteAlphabet) as.getMatches();
+	  if (matches.size() > 1) {   // We've hit an ambiguous symbol.
+	      Set l = new HashSet();
+	      for(Iterator j = matches.iterator(); j.hasNext(); ) {
+		  l.add(complement((Symbol) j.next()));
+	      }
+	      symbolToComplement.put(as, rna.getAmbiguity(l));
+	  }
       }
       complementTable = new RNAComplementTranslationTable();
       transcriptionTable = new TranscriptionTable();
@@ -114,8 +118,8 @@ public final class RNATools {
   public static SymbolList createRNA(String rna)
   throws IllegalSymbolException {
     try {
-      SymbolParser p = getRNA().getParser("token");
-      return p.parse(rna);
+      SymbolTokenization p = getRNA().getTokenization("token");
+      return new SimpleSymbolList(p, rna);
     } catch (BioException se) {
       throw new BioError(se, "Something has gone badly wrong with RNA");
     }
@@ -353,8 +357,8 @@ public final class RNATools {
             (FiniteAlphabet) AlphabetManager.alphabetForName(source);
           FiniteAlphabet targetA =
             (FiniteAlphabet) AlphabetManager.alphabetForName(target);
-          SymbolParser sourceP = sourceA.getParser("name");
-          SymbolParser targetP = targetA.getParser("name");
+          SymbolTokenization sourceP = sourceA.getTokenization("name");
+          SymbolTokenization targetP = targetA.getTokenization("name");
           SimpleTranslationTable table = new SimpleTranslationTable(
             sourceA,
             targetA

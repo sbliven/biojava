@@ -396,7 +396,7 @@ Changeable {
    * This calls the paint method of the currently registered SequenceRenderer
    * after setting up the graphics appropriately.
    */
-  public void paintComponent(Graphics g) {
+  public synchronized void paintComponent(Graphics g) {
     if(!isActive()) {
       return;
     }

@@ -136,23 +136,6 @@ implements Serializable {
     return name.toString();
   }
 
-  public SymbolParser getParser(String name)
-  throws NoSuchElementException {
-    if(name == "name") {
-      try {
-        return new CrossProductSymbolNameParser(this);
-      } catch (BioException be) {
-        throw new NoSuchElementException(
-          "Couldn't build parser for " + name + ": " + be.getMessage()
-        );
-      }
-
-    }
-    throw new NoSuchElementException(
-      "No parser for " + name + " is defined for " + getName()
-    );
-  }
-
   public SymbolList symbols() {
       try {
 	  return new SimpleSymbolList(this, new ArrayList(ourSymbols.values()));

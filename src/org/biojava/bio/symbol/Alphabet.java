@@ -163,9 +163,10 @@ public interface Alphabet extends Annotatable {
    * @return  a parser for that name
    * @throws NoSuchElementException if the name is unknown
    * @throws BioException if for any reason the parser could not be built
+   * @since 1.2
    */
-  SymbolParser getParser(String name)
-  throws NoSuchElementException, BioException;
+    
+    public SymbolTokenization getTokenization(String name) throws BioException;
   
   /**
    * A really useful static alphabet that is always empty.

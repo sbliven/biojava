@@ -59,7 +59,7 @@ implements FiniteAlphabet, Serializable {
     return sym.getName() + "-alphabet";
   }
   
-  public SymbolParser getParser(String name)
+  public SymbolTokenization getTokenization(String name)
   throws NoSuchElementException {
     throw new NoSuchElementException(
       "No parsers associated with " + getName() +

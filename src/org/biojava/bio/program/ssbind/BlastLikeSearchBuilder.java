@@ -45,11 +45,13 @@ import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.db.SequenceDBInstallation;
-import org.biojava.bio.seq.io.TokenParser;
+import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.SimpleAlignment;
+import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.utils.ChangeVetoException;
 
 /**
@@ -108,7 +110,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
     private Map                    hitData;
     private Map                    subHitData;
 
-    private TokenParser            tokenParser;
+    private SymbolTokenization     tokenParser;
     private StringBuffer           tokenBuffer;
 
     private List                   hits;
@@ -432,7 +434,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
                 throw new BioException("Failed to determine sequence type");
 
             FiniteAlphabet alpha = AlphabetResolver.resolveAlphabet(identifier);
-            tokenParser = new TokenParser(alpha);
+            tokenParser = alpha.getTokenization("token");
         }
 
         // BLASTP output has the strands set null (protein sequences)
@@ -519,13 +521,13 @@ public class BlastLikeSearchBuilder implements SearchBuilder
 
         tokenBuffer.setLength(0);
         tokenBuffer.append((String) subHitData.get("querySequence"));
-        labelMap.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
-                     tokenParser.parse(tokenBuffer.toString()));
+        labelMap.put(SeqSimilaritySearchSubHit.QUERY_LABEL, 
+                     new SimpleSymbolList(tokenParser, tokenBuffer.toString()));
 
         tokenBuffer.setLength(0);
         tokenBuffer.append((String) subHitData.get("subjectSequence"));
-        labelMap.put(hitData.get("HitId"),
-                     tokenParser.parse(tokenBuffer.toString()));
+        labelMap.put(hitData.get("HitId"), 
+                     new SimpleSymbolList(tokenParser, tokenBuffer.toString()));
 
         return new SequenceDBSearchSubHit(sc, ev, pv,
                                           qStart, qEnd, qStrand,

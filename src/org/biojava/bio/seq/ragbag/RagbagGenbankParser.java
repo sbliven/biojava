@@ -34,7 +34,7 @@ import org.biojava.bio.seq.io.GenbankFormat;
 import org.biojava.bio.seq.io.SequenceBuilder;
 import org.biojava.bio.seq.io.SeqIOListener;
 import org.biojava.bio.seq.io.SequenceFormat;
-import org.biojava.bio.seq.io.SymbolParser;
+import org.biojava.bio.seq.io.SymbolTokenization;
 
 /**
  * Ragbag FileParser class for handling Genbank formatted files.
@@ -88,7 +88,7 @@ class RagbagGenbankParser implements RagbagFileParser
     // open the file
     BufferedReader file = new BufferedReader(new FileReader(inputFile));
     SequenceFormat parser = new GenbankFormat();
-    SymbolParser dnaParser = DNATools.getDNA().getParser("token");
+    SymbolTokenization dnaParser = DNATools.getDNA().getTokenization("token");
 
     // set up listener chain
     SeqIOListener chain = new GenbankProcessor(builder);

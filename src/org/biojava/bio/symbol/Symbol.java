@@ -76,13 +76,6 @@ import org.biojava.bio.*;
  */
 public interface Symbol extends Annotatable {
   /**
-   * The token for the symbol.
-   *
-   * @return  the token
-   */
-  char getToken();
-
-  /**
    * The long name for the symbol.
    *
    * @return  the long name

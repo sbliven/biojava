@@ -42,6 +42,12 @@ public interface ActivityListener {
     public void completedActivity(Object source);
 
     /**
+     * Notification of errors behind the scenes.
+     */
+
+    public void activityFailed(Object source, Exception ex);
+
+    /**
      * Estimated progress of an activity.  This indicated that
      * <code>current</code> parts of the activity have been completed,
      * out of a target <code>target</code>.

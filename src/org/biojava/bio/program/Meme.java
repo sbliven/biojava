@@ -54,7 +54,7 @@ public class Meme {
     return seqIDs;
   }
 
-  public Meme(InputStream is, SymbolParser symParser)
+  public Meme(InputStream is, SymbolTokenization symParser)
          throws IOException, IllegalSymbolException, IllegalAlphabetException {
     StreamTokenizer st = new StreamTokenizer(
       new BufferedReader(new InputStreamReader(is)));
@@ -72,7 +72,7 @@ public class Meme {
       } else if (nt == st.TT_WORD) {
           if(st.sval.startsWith("ALPHABET")) {
             while(st.nextToken() != st.TT_WORD) {}
-            sym = symParser.parse(st.sval);
+            sym = new SimpleSymbolList(symParser, st.sval);
             break ALPHABET;
           }
       }

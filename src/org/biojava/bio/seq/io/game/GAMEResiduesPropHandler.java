@@ -53,7 +53,6 @@ public class GAMEResiduesPropHandler extends SequenceContentHandlerBase {
             } ;
 
   private StAXFeatureHandler staxenv;
-  private TokenParser tokenParser;
 
   public GAMEResiduesPropHandler(StAXFeatureHandler staxenv) {
     super();
@@ -70,8 +69,12 @@ public class GAMEResiduesPropHandler extends SequenceContentHandlerBase {
     super.startElement(nsURI, localName, qName, attrs, dm);
 
     // set up StreamParser
-    tokenParser = new TokenParser(DNATools.getDNA());    
-    super.setStreamParser(tokenParser.parseStream(staxenv.featureListener));
+    try {
+	SymbolTokenization tokens = DNATools.getDNA().getTokenization("token");
+	super.setStreamParser(tokens.parseStream(staxenv.featureListener));
+    } catch (BioException ex) {
+	throw new BioError("Assertion failed: couldn't get tokenization from DNA alphabet");
+    }
   }
 
 }

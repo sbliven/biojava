@@ -21,6 +21,14 @@
 
 package org.biojava.bio.gui.sequence;
 
+import java.util.*;
+
+import org.biojava.bio.*;
+import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.io.*;
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.gui.*;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -30,7 +38,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Line2D;
-import java.util.List;
+
 
 import org.biojava.bio.symbol.SymbolList;
 
@@ -84,7 +92,7 @@ public class SymbolSequenceRenderer implements SequenceRenderer
 
         if (scale >= (maxCharBounds.getWidth() * 0.3) &&
             scale >= (maxCharBounds.getHeight() * 0.3))
-        {
+	{
             double xFontOffset = 0.0;
             double yFontOffset = 0.0;
 
@@ -107,21 +115,32 @@ public class SymbolSequenceRenderer implements SequenceRenderer
             int min = context.getRange().getMin();
             int max = context.getRange().getMax();
             SymbolList seq = context.getSymbols();
+	    SymbolTokenization toke = null;
+	    try {
+		toke = seq.getAlphabet().getTokenization("token");
+	    } catch (Exception ex) {
+		throw new BioRuntimeException(ex);
+	    }
 
             for (int sPos = min; sPos <= max; sPos++)
             {
                 double gPos = context.sequenceToGraphics(sPos);
-                char c = seq.symbolAt(sPos).getToken();
+                String s = "?";
+		try {
+		    s = toke.tokenizeSymbol(seq.symbolAt(sPos));
+		} catch (Exception ex) {
+		    // We'll ignore the case of not being able to tokenize it
+		}
 
                 if (context.getDirection() == SequenceRenderContext.HORIZONTAL)
                 {
-                    g2.drawString(String.valueOf(c),
+                    g2.drawString(s,
                                   (float) (gPos + xFontOffset),
                                   (float) yFontOffset);
                 }
                 else
                 {
-                    g2.drawString(String.valueOf(c),
+                    g2.drawString(s,
                                   (float) xFontOffset,
                                   (float) (gPos + yFontOffset));
                 }

@@ -39,11 +39,12 @@ import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.db.SequenceDBInstallation;
 import org.biojava.bio.seq.homol.SimilarityPairFeature;
-import org.biojava.bio.seq.io.TokenParser;
+import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SimpleAlignment;
+import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.utils.ChangeVetoException;
 
 /**
@@ -92,7 +93,7 @@ public class SimilarityPairBuilder implements SearchContentHandler
     private Map                    subHitData;
 
     private AlphabetResolver       alphaResolver;
-    private TokenParser            tokenParser;
+    private SymbolTokenization     tokenParser;
     private StringBuffer           tokenBuffer;
 
     // Flag indicating whether there are more results in the stream
@@ -296,7 +297,7 @@ public class SimilarityPairBuilder implements SearchContentHandler
                 throw new BioException("Failed to determine sequence type");
 
             FiniteAlphabet alpha = alphaResolver.resolveAlphabet(identifier);
-            tokenParser = new TokenParser(alpha);
+            tokenParser = alpha.getTokenization("token");
         }
 
         // Set strands of hit on query and subject
@@ -390,12 +391,12 @@ public class SimilarityPairBuilder implements SearchContentHandler
             tokenBuffer.setLength(0);
             tokenBuffer.append((String) subHitData.get("querySequence"));
             labelMap.put(SimilarityPairFeature.QUERY_LABEL,
-                         tokenParser.parse(tokenBuffer.toString()));
+                         new SimpleSymbolList(tokenParser, tokenBuffer.toString()));
 
             tokenBuffer.setLength(0);
             tokenBuffer.append((String) subHitData.get("subjectSequence"));
             labelMap.put(SimilarityPairFeature.SUBJECT_LABEL,
-                         tokenParser.parse(tokenBuffer.toString()));
+                         new SimpleSymbolList(tokenParser, tokenBuffer.toString()));
 
             double score = 0.0;
             if (subHitData.containsKey("score"))

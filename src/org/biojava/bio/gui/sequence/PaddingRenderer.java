@@ -186,4 +186,8 @@ extends SequenceRendererWrapper {
     }
     return sve;
   }
+
+    public String toString() {
+	return "PaddingRenderer(" + getRenderer().toString() + ")";
+    }
 }

@@ -141,8 +141,8 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
      * @throws IllegalSymbolException if a Symbol is not in the specified alphabet.
      */
 
-    public SimpleSymbolList(SymbolParser parser, String seqString) 
-        throws IllegalSymbolException,BioException
+    public SimpleSymbolList(SymbolTokenization parser, String seqString) 
+        throws IllegalSymbolException 
     { 
         symbols = new Symbol[length];
         char[] charArray = new char[20];
@@ -156,8 +156,8 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
             seqString.getChars(charCount, charCount + chunkLength, charArray, 0);
             stParser.characters(charArray, 0, chunkLength);
             charCount += chunkLength;
-            this.length += chunkLength;
-        }
+	}
+	stParser.close();
 
         this.alphabet = parser.getAlphabet();
         this.isView = false;
@@ -393,7 +393,7 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
     
     private class SSLIOListener extends SeqIOAdapter {
 	public void addSymbols(Alphabet alpha,Symbol[] syms,int start, int length){
-	    if(symbols.length < SimpleSymbolList.this.length + length){
+	    if(symbols.length < SimpleSymbolList.this.length + length) {
 		Symbol[] dest;
 		dest = new Symbol [SimpleSymbolList.this.length+length+INCREMENT];
 		System.arraycopy(symbols, 0, dest, 0, SimpleSymbolList.this.length);
@@ -402,6 +402,8 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
 	    }else{
 		System.arraycopy(syms, start, symbols, SimpleSymbolList.this.length, length);
 	    }   
+
+	    SimpleSymbolList.this.length += length;
 	}
     }
 }

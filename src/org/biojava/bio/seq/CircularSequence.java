@@ -143,19 +143,17 @@ public class CircularSequence extends SimpleSequence {
       return super.subList(start, end);
     }
     else{
-      String toEnd = super.subStr(start,super.length());
-      String fromStart = super.subStr(1,end);
-      String s = toEnd + fromStart;
+      SymbolList toEnd = super.subList(start,super.length());
+      SymbolList fromStart = super.subList(1,end);
      try{
-        Alphabet alpha = super.getAlphabet();
-        SymbolParser sp = alpha.getParser("token");
-        SymbolList seq = sp.parse(s);
-        return seq;
-     }catch(BioException be){
-        System.err.println(// This should never happen
+	 List all = new ArrayList();
+	 all.addAll(toEnd.toList());
+	 all.addAll(fromStart.toList());
+	 return new SimpleSymbolList(getAlphabet(), all);
+     }catch(BioException ex){
+	 throw new BioError(ex,
           "A serious error has occured during the reconstruction of " +
-          super.getName());
-          return null;
+			    super.getName());
      }
     }
   }

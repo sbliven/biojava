@@ -46,23 +46,6 @@ import org.biojava.bio.seq.io.*;
  */
 public class DoubleAlphabet implements Alphabet, Serializable {
   private static final DoubleAlphabet INSTANCE = new DoubleAlphabet();
-  private static final SymbolParser PARSER = new SymbolParser() {
-    public Alphabet getAlphabet() {
-      return INSTANCE;
-    }
-    
-    public Symbol parseToken(String token) {
-      return INSTANCE.getSymbol(Double.parseDouble(token));
-    }
-    
-    public SymbolList parse(String seq) {
-      throw new BioError("Pants - haven't implemented this yet");
-    }
-
-    public StreamParser parseStream(SeqIOListener l) {
-	throw new BioError("Not implemented yet");
-    }
-  };
   
   private Object writeReplace() throws ObjectStreamException {
     try {
@@ -163,13 +146,13 @@ public class DoubleAlphabet implements Alphabet, Serializable {
     return "Alphabet of all doubles.";
   }
   
-  public SymbolParser getParser(String name) {
+  public SymbolTokenization getTokenization(String name) {
     if(!name.equals("name")) {
     	throw new NoSuchElementException(
 	  "No parsers supported by DoubleAlphabet called " + name
 	);
     }
-    return PARSER;    
+    return new DoubleTokenization();
   }
 
   public void addChangeListener(ChangeListener cl) {}

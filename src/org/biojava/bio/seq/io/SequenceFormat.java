@@ -125,9 +125,9 @@ public interface SequenceFormat
      * @throws BioException if there is an error in the format of the
      * stream.
      */
-    public boolean readSequence(BufferedReader reader,
-				SymbolParser   symParser,
-				SeqIOListener  listener)
+    public boolean readSequence(BufferedReader      reader,
+				SymbolTokenization  symParser,
+				SeqIOListener       listener)
 	throws BioException, IllegalSymbolException, IOException;
 
     /**

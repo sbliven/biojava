@@ -83,7 +83,7 @@ public class GenbankFormat
      * otherwise
      */
     public boolean readSequence(BufferedReader reader,
-				SymbolParser symParser,
+				SymbolTokenization symParser,
 				SeqIOListener listener)
 	throws IllegalSymbolException, IOException, ParseException
     {
@@ -285,7 +285,7 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
     private final static int TAG_LENGTH = 12;
 
     private int status;
-    private SymbolParser symParser;
+    private SymbolTokenization symParser;
     private StreamParser streamParser;
     private List symbols;
     private String accession;
@@ -301,7 +301,7 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
      * @param theSymbolParser Symbol parser to use in processing the file
      * @param theListener Listener to notify when field has been processed
      */
-    protected GenbankContext(SymbolParser theSymbolParser,
+    protected GenbankContext(SymbolTokenization theSymbolParser,
 			     SeqIOListener theListener)
     {
 	this.symbols = new ArrayList();

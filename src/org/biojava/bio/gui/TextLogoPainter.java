@@ -29,6 +29,7 @@ import java.beans.*;
 import java.util.*;
 
 import org.biojava.bio.*;
+import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 
@@ -116,6 +117,12 @@ public class TextLogoPainter implements LogoPainter {
     Graphics2D g2 = ctxt.getGraphics();
     Distribution dist = ctxt.getDistribution();
     SymbolStyle style = ctxt.getStyle();
+    SymbolTokenization toke = null;
+    try {
+	toke = dist.getAlphabet().getTokenization("token");
+    } catch (BioException ex) {
+	throw new BioRuntimeException(ex);
+    }
     
     Rectangle bounds = ctxt.getBounds();
     double width = bounds.getWidth();
@@ -144,7 +151,13 @@ public class TextLogoPainter implements LogoPainter {
     for(Iterator i = info.iterator(); i.hasNext();) {
       ResVal rv = (ResVal) i.next();
       
-      GlyphVector gv = logoFont.createGlyphVector(frc, rv.getToken().getToken() + "");
+      String s = null;
+      try {
+	  s = toke.tokenizeSymbol(rv.getToken());
+      } catch (IllegalSymbolException ex) {
+	  throw new BioRuntimeException(ex);
+      }
+      GlyphVector gv = logoFont.createGlyphVector(frc, s);
       Shape outline = gv.getOutline();
       Rectangle2D oBounds = outline.getBounds2D();
       
@@ -209,7 +222,7 @@ public class TextLogoPainter implements LogoPainter {
       double diff = rv1.getValue() - rv2.getValue();
       if(diff < 0) return -1;
       if(diff > 0) return +1;
-      return rv1.getToken().getToken() - rv2.getToken().getToken();
+      return rv1.getToken().getName().compareTo(rv2.getToken().getName());
     }
   }
 }

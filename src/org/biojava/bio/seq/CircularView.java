@@ -144,8 +144,8 @@ public class CircularView extends ViewSequence{
       String s = toEnd + fromStart;
      try{
         Alphabet alpha = super.getAlphabet();
-        SymbolParser sp = alpha.getParser("token");
-        SymbolList seq = sp.parse(s);
+        SymbolTokenization sp = alpha.getTokenization("token");
+        SymbolList seq = new SimpleSymbolList(sp, s);
         return seq;
      }catch(BioException be){
         System.err.println(// This should never happen

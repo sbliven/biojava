@@ -46,8 +46,8 @@ public class XmlMarkovModel {
       );
     }
     FiniteAlphabet seqAlpha = (FiniteAlphabet) sa;
-    SymbolParser symParser = seqAlpha.getParser("token");
-    SymbolParser nameParser = seqAlpha.getParser("name");
+    SymbolTokenization symParser = seqAlpha.getTokenization("token");
+    SymbolTokenization nameParser = seqAlpha.getTokenization("name");
     
     int columns = 0;
     NodeList colL = root.getElementsByTagName("col");
@@ -100,16 +100,16 @@ public class XmlMarkovModel {
       advance[i] = 1;
     }
       
-    SymbolParser nameParser = null;
-    SymbolParser symbolParser = null;
+    SymbolTokenization nameParser = null;
+    SymbolTokenization symbolParser = null;
     
     try {
-      nameParser = seqAlpha.getParser("name");
+      nameParser = seqAlpha.getTokenization("name");
     } catch (NoSuchElementException nsee) {
     }
     
     try {
-      symbolParser = seqAlpha.getParser("token");
+      symbolParser = seqAlpha.getTokenization("token");
     } catch (NoSuchElementException nsee) {
     }
     

@@ -98,7 +98,7 @@ public class FastaFormat implements SequenceFormat,
     }
 
     public boolean readSequence(BufferedReader reader,
-				SymbolParser symParser,
+				SymbolTokenization symParser,
 				SeqIOListener siol)
 	throws IllegalSymbolException, IOException, ParseException
     {
@@ -125,7 +125,7 @@ public class FastaFormat implements SequenceFormat,
     }
 
     private boolean readSequenceData(BufferedReader r,
-				     SymbolParser parser,
+				     SymbolTokenization parser,
 				     SeqIOListener listener)
         throws IOException, IllegalSymbolException
     {

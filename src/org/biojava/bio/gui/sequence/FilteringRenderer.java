@@ -235,4 +235,8 @@ extends SequenceRendererWrapper {
       return src.hashCode() ^ filter.hashCode();
     }
   }
+
+    public String toString() {
+	return "FilteringRenderer(" + filter + ", " + recurse + ", " + getRenderer() + ")";
+    }
 }

@@ -41,11 +41,13 @@ import org.biojava.bio.seq.db.SequenceDBInstallation;
 import org.biojava.bio.seq.homol.Homology;
 import org.biojava.bio.seq.homol.HomologyFeature;
 import org.biojava.bio.seq.homol.SimpleHomology;
-import org.biojava.bio.seq.io.TokenParser;
+import org.biojava.bio.seq.io.*;
+import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.symbol.SimpleAlignment;
+import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.utils.ChangeVetoException;
 
 /**
@@ -98,7 +100,9 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
     private Map                    hitData;
     private Map                    subHitData;
 
-    private TokenParser            tokenParser;
+    private AlphabetResolver       alphaResolver;
+    private SymbolTokenization     tokenParser;
+
     private StringBuffer           tokenBuffer;
 
     // List for holding homologies from current search. There may be
@@ -310,7 +314,7 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
                 throw new BioException("Failed to determine sequence type");
 
             FiniteAlphabet alpha = AlphabetResolver.resolveAlphabet(identifier);
-            tokenParser = new TokenParser(alpha);
+            tokenParser = alpha.getTokenization("token");
         }
 
         // Set strands of hit on query and subject
@@ -412,7 +416,7 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
 
             // Map the new feature to the alignment SymbolList
             labelMap.put(queryView.createFeature(qt),
-                         tokenParser.parse(tokenBuffer.toString()));
+                         new SimpleSymbolList(tokenParser, tokenBuffer.toString()));
 
             tokenBuffer.setLength(0);
             tokenBuffer.append((String) subHitData.get("subjectSequence"));
@@ -428,7 +432,7 @@ public class BlastLikeHomologyBuilder implements SearchContentHandler
 
             // Map the new feature to the alignment SymbolList
             labelMap.put(subjectView.createFeature(st),
-                         tokenParser.parse(tokenBuffer.toString()));
+                         new SimpleSymbolList(tokenParser, tokenBuffer.toString()));
 
             Alignment a = new SimpleAlignment(labelMap);
             homology.setAlignment(a);

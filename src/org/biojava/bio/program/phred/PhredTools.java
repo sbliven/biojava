@@ -118,8 +118,8 @@ public class PhredTools {
   /**
    * returns the IntegerAlphabet parser
    */
-  private static SymbolParser getQualityParser() {
-    return IntegerAlphabet.getInstance().getParser("token");
+  private static SymbolTokenization getQualityParser() {
+    return IntegerAlphabet.getInstance().getTokenization("token");
   }
 
   /**

@@ -93,9 +93,9 @@ public class EmblLikeFormat
         return elideSymbols;
     }
 
-    public boolean readSequence(BufferedReader reader,
-                                SymbolParser   symParser,
-                                SeqIOListener  listener)
+    public boolean readSequence(BufferedReader     reader,
+                                SymbolTokenization symParser,
+                                SeqIOListener      listener)
         throws IllegalSymbolException, IOException, ParseException
     {
         ((ParseErrorSource)(listener)).addParseErrorListener(this);

@@ -130,7 +130,7 @@ class DASRawSymbolList implements SymbolList {
 		SequenceBuilder sb = new SimpleSequenceBuilder();
 		sb.setURI(dnaURL.toString());
 		sb.setName(sequence.getName());
-		SymbolParser sparser = DNATools.getDNA().getParser("token");
+		SymbolTokenization sparser = DNATools.getDNA().getTokenization("token");
 		StreamParser ssparser = sparser.parseStream(sb);
 		
 		StAXContentHandler dnaHandler = new DNAHandler(ssparser);

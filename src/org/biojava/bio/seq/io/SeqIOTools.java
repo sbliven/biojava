@@ -43,17 +43,17 @@ public class SeqIOTools  {
     private SeqIOTools() {
     }
 
-    private static SymbolParser getDNAParser() {
+    private static SymbolTokenization getDNAParser() {
         try {
-            return DNATools.getDNA().getParser("token");
+            return DNATools.getDNA().getTokenization("token");
         } catch (BioException ex) {
             throw new BioError(ex, "Assertion failing: Couldn't get DNA token parser");
         }
     }
 
-    private static SymbolParser getProteinParser() {
+    private static SymbolTokenization getProteinParser() {
         try {
-            return ProteinTools.getTAlphabet().getParser("token");
+            return ProteinTools.getTAlphabet().getTokenization("token");
         } catch (BioException ex) {
             throw new BioError(ex, "Assertion failing: Couldn't get PROTEIN token parser");
         }
@@ -174,7 +174,7 @@ public class SeqIOTools  {
     HashSequenceDB db = new HashSequenceDB(IDMaker.byName);
     SequenceBuilderFactory sbFact = new FastaDescriptionLineParser.Factory(SimpleSequenceBuilder.FACTORY);
     FastaFormat fFormat = new FastaFormat();
-    for(SequenceIterator seqI = new StreamReader(seqFile,fFormat,alpha.getParser("token"),sbFact);seqI.hasNext();){
+    for(SequenceIterator seqI = new StreamReader(seqFile,fFormat,alpha.getTokenization("token"),sbFact);seqI.hasNext();){
       Sequence seq = seqI.nextSequence();
       try{
         db.addSequence(seq);

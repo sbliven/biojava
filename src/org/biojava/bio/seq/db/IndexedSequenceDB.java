@@ -120,7 +120,7 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
         seqFile = seqFile.getAbsoluteFile();
         CountedBufferedReader bReader = new CountedBufferedReader(new FileReader(seqFile));
         SequenceFormat format = indexStore.getFormat();
-        SymbolParser symParser = indexStore.getSymbolParser();
+        SymbolTokenization symParser = indexStore.getSymbolParser();
         SequenceBuilderFactory sbFact = indexStore.getSBFactory();
         long pos = bReader.getFilePointer();
         boolean hasNextSequence = true;

@@ -4,7 +4,9 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.awt.font.*;
 
+import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.io.*;
 import org.biojava.bio.dist.*;
 
 public class TextBlock implements BlockPainter {
@@ -31,33 +33,45 @@ public class TextBlock implements BlockPainter {
   public void paintBlock(LogoContext ctxt, Rectangle2D block, AtomicSymbol sym) {
     Graphics2D g2 = ctxt.getGraphics();
     SymbolStyle style = ctxt.getStyle();
+    Distribution dist = ctxt.getDistribution();
+    SymbolTokenization toke = null;
+    try {
+	toke = dist.getAlphabet().getTokenization("token");
+    } catch (BioException ex) {
+	throw new BioRuntimeException(ex);
+    }
     
     FontRenderContext frc = g2.getFontRenderContext();
-    GlyphVector gv = logoFont.createGlyphVector(frc, sym.getToken() + "");
-    Shape outline = gv.getOutline();
-    Rectangle2D oBounds = outline.getBounds2D();
-    
-    AffineTransform at = new AffineTransform();
-    at.setToTranslation(block.getX(), block.getY());
-    at.scale(
-      block.getWidth() / oBounds.getWidth(),
-      block.getHeight() / oBounds.getHeight()
-    );
-    at.translate(-oBounds.getMinX(), -oBounds.getMinY());
-    outline = at.createTransformedShape(outline);
-    
     try {
-      g2.setPaint(style.fillPaint(sym));
-    } catch (IllegalSymbolException ire) {
-      g2.setPaint(Color.black);
-    }
-    g2.fill(outline);
+	GlyphVector gv = logoFont.createGlyphVector(frc, toke.tokenizeSymbol(sym));
     
-    try {
-      g2.setPaint(style.outlinePaint(sym));
-    } catch (IllegalSymbolException ire) {
-      g2.setPaint(Color.gray);
+	Shape outline = gv.getOutline();
+	Rectangle2D oBounds = outline.getBounds2D();
+    
+	AffineTransform at = new AffineTransform();
+	at.setToTranslation(block.getX(), block.getY());
+	at.scale(
+		 block.getWidth() / oBounds.getWidth(),
+		 block.getHeight() / oBounds.getHeight()
+		 );
+	at.translate(-oBounds.getMinX(), -oBounds.getMinY());
+	outline = at.createTransformedShape(outline);
+	
+	try {
+	    g2.setPaint(style.fillPaint(sym));
+	} catch (IllegalSymbolException ire) {
+	    g2.setPaint(Color.black);
+	}
+	g2.fill(outline);
+	
+	try {
+	    g2.setPaint(style.outlinePaint(sym));
+	} catch (IllegalSymbolException ire) {
+	    g2.setPaint(Color.gray);
+	}
+	g2.draw(outline);
+    } catch (IllegalSymbolException ex) {
+	throw new BioError(ex, "Couldn't tokenize symbol");
     }
-    g2.draw(outline);
   }
 }

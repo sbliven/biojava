@@ -166,7 +166,7 @@ public class MSFAlignmentFormat
             else {
                 alph = ProteinTools.getTAlphabet();
             }
-            SymbolParser parse = alph.getParser("token");
+            SymbolTokenization parse = alph.getTokenization("token");
             for (currSeqCount = 0; currSeqCount < sequenceNames.size(); currSeqCount++) {
                 String sd = null;
                 //change stop codons to specified symbols
@@ -175,7 +175,7 @@ public class MSFAlignmentFormat
                 StringBuffer sb = new StringBuffer();
                 SymbolList sl = null;
                 sequenceDataMap.put((String)sequenceNames.get(currSeqCount),
-                        parse.parse(sd));
+                        new SimpleSymbolList(parse, sd));
             }
             return  (new SimpleAlignment(sequenceDataMap));
         } catch (Exception e) {

@@ -101,22 +101,6 @@ implements Serializable {
   public Iterator iterator() {
     return new SparseIterator(this);
   }
-  
-  public SymbolParser getParser(String name)
-  throws NoSuchElementException {
-    if(name == "name") {
-      try {
-        return new CrossProductSymbolNameParser(this);
-      } catch (BioException be) {
-        throw new NoSuchElementException(
-          "Couldn't create parser: " + be.getMessage()
-        );
-      }
-    }
-    throw new NoSuchElementException(
-      "No parser for " + name + " is defined for " + getName()
-    );
-  }
 
   protected AtomicSymbol getSymbolImpl(List sList)
   throws IllegalSymbolException {

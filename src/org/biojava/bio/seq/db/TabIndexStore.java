@@ -70,7 +70,7 @@ public class TabIndexStore implements IndexStore, Serializable {
 
   private final SequenceFormat format;
   private final SequenceBuilderFactory sbFactory;
-  private final SymbolParser symbolParser;
+  private final SymbolTokenization symbolParser;
   
   public TabIndexStore(
     File storeFile,
@@ -78,7 +78,7 @@ public class TabIndexStore implements IndexStore, Serializable {
     String name,
     SequenceFormat format,
     SequenceBuilderFactory sbFactory,
-    SymbolParser symbolParser
+    SymbolTokenization symbolParser
   ) throws IOException, BioException {
     if(storeFile.exists() || indexFile.exists()) {
       throw new BioException("Files already exist");
@@ -172,7 +172,7 @@ public class TabIndexStore implements IndexStore, Serializable {
     return sbFactory;
   }
   
-  public SymbolParser getSymbolParser() {
+  public SymbolTokenization getSymbolParser() {
     return symbolParser;
   }
   

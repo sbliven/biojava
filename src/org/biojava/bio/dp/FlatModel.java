@@ -312,10 +312,6 @@ class FlatModel implements MarkovModel, Serializable {
     private final Alphabet matches;
     
     protected transient ChangeSupport changeSupport = null;
-
-    public char getToken() {
-      return wrapped.getToken();
-    }
     
     public String getName() {
       return wrapped.getName() + "-" + extra;

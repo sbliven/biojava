@@ -23,6 +23,7 @@ package org.biojava.bio.proteomics;
 
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.bio.Annotation;
@@ -101,17 +102,18 @@ public class Digest {
         boolean endoProtease = protease.isEndoProtease();
         String notCleave = protease.getNotCleaveResidues();
         int nTerm = 1;
+	SymbolTokenization toke = sequence.getAlphabet().getTokenization("token"); // FIXME THOMASD
 
         if(cleaveSites == null || notCleave == null){
             throw new BioException("Protease contains null parameter");
         }
         for (int j = 1; j < sequence.length(); j++) {
                 for (int i = 0; i < cleaveSites.length(); i++) {
-                        if (sequence.symbolAt(j).getToken() == cleaveSites.charAt(i)) {
+                        if (toke.tokenizeSymbol(sequence.symbolAt(j)).charAt(0) == cleaveSites.charAt(i)) {
                                 if (endoProtease) {
                                         boolean cleave = true;
-                                        if (j < sequence.length() - 1)  {
-                                                if (notCleave.indexOf(sequence.symbolAt(j + 1).getToken()) != -1) {
+                                        if (j < sequence.length())  {
+                                                if (notCleave.indexOf(toke.tokenizeSymbol(sequence.symbolAt(j + 1)).charAt(0) - 1) != -1) {
                                                         cleave = false;
                                                 }
                                         }

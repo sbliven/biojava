@@ -32,6 +32,7 @@ import javax.xml.parsers.*;
 import org.xml.sax.*;
 
 import org.biojava.bio.*;
+import org.biojava.bio.seq.io.*;
 import org.biojava.utils.*;
 import org.biojava.utils.bytecode.*;
 
@@ -48,6 +49,77 @@ import org.biojava.utils.bytecode.*;
  * @author Thomas Down
  */
 public final class AlphabetManager {
+
+    /**
+     * Parse a stringified representation of a sequence into a <code>SymbolList</code>
+     * using the specified <code>SymbolTokenization</code>
+     *
+     * @since 1.2
+     */
+
+    /*
+
+    public static SymbolList parse(SymbolTokenization toke, String str)
+        throws IllegalSymbolException
+    {
+	final ChunkedSymbolListBuilder slb = new ChunkedSymbolListBuilder();
+	SeqIOListener siol = new SeqIOAdapter() {
+		public void addSymbols(Alphabet alpha,
+			   Symbol[] syms,
+			   int pos,
+			   int len)
+		    throws IllegalAlphabetException
+		{
+		    slb.addSymbols(alpha, syms, pos, len);
+		}
+	    } ;
+	StreamParser sp = toke.parseStream(siol);
+
+	char[] chs = str.toCharArray();
+	sp.characters(chs, 0, chs.length);
+	sp.close();
+	
+	return slb.makeSymbolList();
+    }
+
+    */
+
+    /**
+     * Return a set containing all possible symbols which can be
+     * considered members of a given alphabet, including ambiguous
+     * symbols.  Warning, this method can return large sets!
+     *
+     * @since 1.2
+     */
+
+    public static Set getAllSymbols(FiniteAlphabet alpha) {
+	Set allSymbols = new HashSet();
+	List orderedAlpha = new ArrayList(alpha.size());
+	for (Iterator i = alpha.iterator(); i.hasNext(); ) {
+	    orderedAlpha.add(i.next());
+	}
+
+	int atomicSyms = alpha.size();
+	int totalSyms = 1 << atomicSyms;
+	
+	for (int cnt = 0; cnt < totalSyms; ++cnt) {
+	    Set matchSet = new HashSet();
+	    for (int atom = 0; atom < atomicSyms; ++atom) {
+		if ((cnt & (1 << atom)) != 0) {
+		    matchSet.add(orderedAlpha.get(atom));
+		}
+	    }
+
+	    try {
+		allSymbols.add(alpha.getAmbiguity(matchSet));
+	    } catch (IllegalSymbolException ex) {
+		throw new BioError(ex, "Assertion failed: couldn't get ambiguity symbol");
+	    }
+	}
+
+	return allSymbols;
+    }
+
   /**
    * Singleton instance.
    */
@@ -658,21 +730,14 @@ public final class AlphabetManager {
           String alphaName = child.getAttribute("name");
           String parentName = child.getAttribute("parent");
           try {
-            SimpleAlphabet alpha = alphabetFromXML(child, nameToSymbol);
-            if(parentName != null && parentName.length() != 0) {
-              alphaName = parentName + "-" + alphaName;
-              FiniteAlphabet pa = (FiniteAlphabet) alphabetForName(parentName);
-              for(Iterator j = pa.iterator(); j.hasNext(); ) {
-                alpha.addSymbol((Symbol) j.next());
-              }
-              if (pa instanceof SimpleAlphabet) {
-              for(Iterator j = ((SimpleAlphabet)pa).ambiguities(); j.hasNext(); ) {
-                alpha.addAmbiguity((Symbol) j.next());
-                }
-              }
-            }
-            alpha.setName(alphaName);
-            registerAlphabet(alphaName, alpha);
+	      FiniteAlphabet parentAlpha = null;
+	      if(parentName != null && parentName.length() != 0) {
+		  alphaName = parentName + "-" + alphaName;
+		  parentAlpha = (FiniteAlphabet) alphabetForName(parentName);
+	      }
+	      SimpleAlphabet alpha = alphabetFromXML(child, nameToSymbol, parentAlpha);
+	      alpha.setName(alphaName);
+	      registerAlphabet(alphaName, alpha);
           } catch (Exception e) {
             throw new BioError(e, "Couldn't construct alphabet " + alphaName);
           }
@@ -698,8 +763,8 @@ public final class AlphabetManager {
   static private AtomicSymbol symbolFromXML(
     Element symE, WellKnownAlphabet alpha
   ) {
+    String name = symE.getAttribute("name");
     char token = '\0';
-    String name = null;
     String description = null;
 
     NodeList children = symE.getChildNodes();
@@ -711,12 +776,8 @@ public final class AlphabetManager {
       Element el = (Element) n;
       String nodeName = el.getNodeName();
       String content = el.getFirstChild().getNodeValue();
-      if(nodeName.equals("short")) {
-        token = content.charAt(0);
-      } else if(nodeName.equals("long")) {
-        name = content;
-      } else if(nodeName.equals("description")) {
-        description = content;
+      if(nodeName.equals("description")) {
+	  description = content;
       }
     }
 
@@ -802,10 +863,22 @@ public final class AlphabetManager {
    * @return a new Alphabet
    * @throws BioException if anything goes wrong
    */
-  static private SimpleAlphabet alphabetFromXML(Element alph, Map nameToSym)
+  static private SimpleAlphabet alphabetFromXML(Element alph, Map nameToSym, FiniteAlphabet parent)
   throws BioException {
     nameToSym = new HashMap(nameToSym);
     WellKnownAlphabet alphabet = new WellKnownAlphabet();
+    
+    if (parent != null) {
+	for (Iterator i = parent.iterator(); i.hasNext(); ) {
+	    Symbol sym = (Symbol) i.next();
+	    try {
+		alphabet.addSymbol(sym);
+	    } catch (Exception ex) {
+		throw new BioException(ex, "Couldn't initialize alphabet from parent");
+	    }
+	    nameToSym.put(sym.getName(), sym);   // This doesn't quite fit ATM -- but should later...
+	}
+    }
 
     NodeList children = alph.getChildNodes();
     for(int i = 0; i < children.getLength(); i++) {
@@ -826,10 +899,13 @@ public final class AlphabetManager {
           }
           alphabet.addSymbol(sym);
         } else if(name.equals("symbolref")) {
-          alphabet.addSymbol((Symbol) nameToSym.get(el.getAttribute("name")));
+	    alphabet.addSymbol((Symbol) nameToSym.get(el.getAttribute("name")));
         } else if(name.equals("ambiguity")) {
-          alphabet.addAmbiguity(ambiguityFromXML(alphabet, el, nameToSym));
-        }
+	    throw new BioException("AlphabetManager.xml should no longer contain ambiguity records");
+        } else if (name.equals("characterTokenization")) {
+	    SymbolTokenization toke = characterTokenizationFromXML(alphabet, el, nameToSym);
+	    alphabet.putTokenization(el.getAttribute("name"), toke);
+	}
       } catch (Exception e) {
         throw new BioException(e, "Couldn't parse element " + el);
       }
@@ -838,6 +914,41 @@ public final class AlphabetManager {
     return alphabet;
   }
 
+
+    private static SymbolTokenization characterTokenizationFromXML(Alphabet alpha, Element el, Map nameToSym)
+        throws BioException
+    {
+	boolean caseSensitive = ("true".equals(el.getAttribute("caseSensitive")));
+	CharacterTokenization toke = new CharacterTokenization(alpha, caseSensitive);
+	
+	NodeList children = el.getChildNodes();
+	for (int i = 0; i < children.getLength(); i++) {
+	    Node n = children.item(i);
+	    if (! (n instanceof Element))
+		continue;
+	    
+	    Element child = (Element) n;
+
+	    char tokenChar = child.getAttribute("char").charAt(0);
+	    Set matchSet = new HashSet();
+	    NodeList symbolRefs = child.getChildNodes();
+	    for (int j = 0; j < symbolRefs.getLength(); ++j) {
+		Node nj = symbolRefs.item(j);
+		if (! (nj instanceof Element)) {
+		    continue;
+		}
+
+		Element symbolRef = (Element) nj;
+		Symbol sym = (Symbol) nameToSym.get(symbolRef.getAttribute("name"));
+		matchSet.add(sym);
+	    }
+
+	    Symbol ambiSym = alpha.getAmbiguity(matchSet);
+	    toke.bindSymbol(ambiSym, tokenChar);
+	}
+
+	return toke;
+    }
 
     /**
      * A well-known alphabet.  In principle this is just like
@@ -904,10 +1015,10 @@ public final class AlphabetManager {
           this.name = name;
         }
 
-              private Object readResolve() throws ObjectStreamException {
+	private Object readResolve() throws ObjectStreamException {
           try {
             if(alpha != null) {
-              return alpha.getParser("name").parseToken(name);
+		return alpha.getTokenization("name").parseToken(name);
             } else {
               return symbolForName(name);
             }
@@ -915,7 +1026,7 @@ public final class AlphabetManager {
             throw new InvalidObjectException(
               "Couldn't resolve symbol " + name + " as there was no parser"
             );
-          } catch (IllegalSymbolException ise) {
+          } catch (BioException ise) {
             throw new InvalidObjectException(
               "Couldn't resolve symbol " + name + ": " + ise.getMessage()
             );

@@ -36,22 +36,27 @@ import org.biojava.bio.symbol.*;
 public final class DNATools {
   private static final ReversibleTranslationTable complementTable;
   static private final FiniteAlphabet dna;
+    private static final SymbolTokenization dnaTokens;  
   
   static private final AtomicSymbol a;
   static private final AtomicSymbol g;
   static private final AtomicSymbol c;
   static private final AtomicSymbol t;
+  static private final Symbol n;
+
     
   static private Map symbolToComplement;
 
   static {
     try {
       dna = (FiniteAlphabet) AlphabetManager.alphabetForName("DNA");
-      SymbolList syms = dna.getParser("token").parse("agct");
+      dnaTokens = dna.getTokenization("token");
+      SymbolList syms = new SimpleSymbolList(dnaTokens, "agctn");
       a = (AtomicSymbol) syms.symbolAt(1);
       g = (AtomicSymbol) syms.symbolAt(2);
       c = (AtomicSymbol) syms.symbolAt(3);
       t = (AtomicSymbol) syms.symbolAt(4);
+      n = syms.symbolAt(5);
       
       symbolToComplement = new HashMap();
 
@@ -60,15 +65,19 @@ public final class DNATools {
       symbolToComplement.put(gap, gap);
       
       // add all other ambiguity symbols
-      for(Iterator i = ((SimpleAlphabet) dna).ambiguities(); i.hasNext();) {
-        Symbol as = (Symbol) i.next();
-        Set l = new HashSet();
-        FiniteAlphabet fa = (FiniteAlphabet) as.getMatches();
-        for(Iterator j = fa.iterator(); j.hasNext(); ) {
-          l.add(complement((Symbol) j.next()));
-        }
-        symbolToComplement.put(as, dna.getAmbiguity(l));
+      for(Iterator i = AlphabetManager.getAllSymbols(dna).iterator(); i.hasNext();) {
+	  Symbol as = (Symbol) i.next();
+	  FiniteAlphabet matches = (FiniteAlphabet) as.getMatches();
+	  if (matches.size() > 1) {   // We've hit an ambiguous symbol.
+	      Set l = new HashSet();
+	      for(Iterator j = matches.iterator(); j.hasNext(); ) {
+		  l.add(complement((Symbol) j.next()));
+	      }
+	      symbolToComplement.put(as, dna.getAmbiguity(l));
+	  }
       }
+
+
       complementTable = new DNAComplementTranslationTable();
     } catch (Throwable t) {
       throw new BioError(t, "Unable to initialize DNATools");
@@ -102,8 +111,8 @@ public final class DNATools {
   public static SymbolList createDNA(String dna)
   throws IllegalSymbolException {
     try {
-      SymbolParser p = getDNA().getParser("token");
-      return p.parse(dna);
+      SymbolTokenization p = getDNA().getTokenization("token");
+      return new SimpleSymbolList(p, dna);
     } catch (BioException se) {
       throw new BioError(se, "Something has gone badly wrong with DNA");
     }
@@ -246,6 +255,18 @@ public final class DNATools {
     return complementTable;
   }
     
+    /**
+     * Get a single-character token for a DNA symbol
+     *
+     * @throws IllegalSymbolException if <code>sym</code> is not a member of the DNA alphabet
+     */
+
+    public static char dnaToken(Symbol sym)
+        throws IllegalSymbolException
+    {
+	return dnaTokens.tokenizeSymbol(sym).charAt(0);
+    }
+
   /**
    * Sneaky class for complementing DNA bases.
    */
@@ -271,3 +292,4 @@ public final class DNATools {
 	  }
   }
 }
+

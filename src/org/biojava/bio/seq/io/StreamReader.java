@@ -55,8 +55,8 @@ public class StreamReader implements SequenceIterator, org.biojava.utils.ParseEr
     /**
      * The symbol parser.
      */
-    private SymbolParser symParser;
-
+    private SymbolTokenization symParser;
+  
     /**
      * The sequence format.
      */
@@ -110,7 +110,7 @@ public class StreamReader implements SequenceIterator, org.biojava.utils.ParseEr
 
     public StreamReader(InputStream is,
 			SequenceFormat format,
-			SymbolParser symParser,
+			SymbolTokenization symParser,
 			SequenceBuilderFactory sf)  {
 	this.reader = new BufferedReader(new InputStreamReader(is));
 	this.format = format;
@@ -120,7 +120,7 @@ public class StreamReader implements SequenceIterator, org.biojava.utils.ParseEr
 
     public StreamReader(BufferedReader reader,
 			SequenceFormat format,
-			SymbolParser symParser,
+			SymbolTokenization symParser,
 			SequenceBuilderFactory sf)  {
 	this.reader = reader;
 	this.format = format;

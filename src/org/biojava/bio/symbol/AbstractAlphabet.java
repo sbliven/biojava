@@ -39,11 +39,11 @@ import org.biojava.bio.seq.io.*;
  * @author Matthew Pocock
  */
 public abstract class AbstractAlphabet implements FiniteAlphabet {
-  private Map parserByName;
+  private Map tokenizationsByName;
   private ChangeSupport changeSupport;
 
   {
-    parserByName = new HashMap();
+    tokenizationsByName = new HashMap();
   }
   
   protected boolean hasListeners() {
@@ -66,39 +66,49 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
    * @param name Name of the string to associate with a parser
    * @param parser The parser to associate your String with
    */
-  public void putParser(String name, SymbolParser parser) {
-    parserByName.put(name, parser);
+  public void putTokenization(String name, SymbolTokenization parser) {
+    tokenizationsByName.put(name, parser);
   }
 
-  public SymbolParser getParser(String name)
-         throws NoSuchElementException {
-    SymbolParser parser = (SymbolParser) parserByName.get(name);
-    if(parser == null) {
-      if(name.equals("token")) {
-        parser = new TokenParser(this);
-        putParser(name, parser);
-      } else if(name.equals("name")) {
-        parser = new NameParser(this);
-        putParser(name, parser);
-      } else {
-        throw new NoSuchElementException("There is no parser '" + name +
-                                         "' defined in alphabet " + getName());
-      }
+    public SymbolTokenization getTokenization(String name)
+	throws NoSuchElementException, BioException
+    {
+	SymbolTokenization toke = (SymbolTokenization) tokenizationsByName.get(name);
+	if(toke == null) {
+	    if(name.equals("name")) {
+		if (getAlphabets().size() == 1) {
+		    toke = new NameTokenization(this);
+		} else {
+		    toke = new CrossProductTokenization(this);
+		}
+		putTokenization(name, toke);
+	    } else {
+		throw new NoSuchElementException("There is no tokenization '" + name +
+						 "' defined in alphabet " + getName());
+	    }
+	}
+	return toke;
     }
-    return parser;
-  }
 
   public Symbol getAmbiguity(Set syms)
       throws IllegalSymbolException 
   {
-      for (Iterator i = syms.iterator(); i.hasNext(); ) {
-	  validate((Symbol) i.next());
+      if (syms.size() == 0) {
+	  return getGapSymbol();
+      } else if (syms.size() == 1) {
+	  Symbol sym = (Symbol) syms.iterator().next();
+	  validate(sym);
+	  return sym;
+      } else {
+	  for (Iterator i = syms.iterator(); i.hasNext(); ) {
+	      validate((Symbol) i.next());
+	  }
+	  
+	  return AlphabetManager.createSymbol(
+					      '*', Annotation.EMPTY_ANNOTATION,
+					      syms, this
+					      );
       }
-
-    return AlphabetManager.createSymbol(
-      '*', Annotation.EMPTY_ANNOTATION,
-      syms, this
-    );
   }
   
   public final Symbol getSymbol(List syms)
