@@ -20,6 +20,7 @@
  */
 
 package org.biojava.utils.automata;
+import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -224,9 +225,9 @@ public class FiniteAutomaton
             this.sym = sym;
         }
 
-        private Node getSource() { return source; }
-        private Node getDest() { return dest; }
-        private Symbol getSymbol() { return sym; }
+        Node getSource() { return source; }
+        Node getDest() { return dest; }
+        Symbol getSymbol() { return sym; }
 
         /**
          * Sets the source Node.
@@ -357,6 +358,18 @@ public class FiniteAutomaton
         return node;
     }
 
+    int nodeCount() { return nodes.size(); }
+
+    /**
+     * get all Nodes within this instance.
+     */
+    NodeSet getNodes()
+    {
+        NodeSet nodeSet = createNodeSet();
+        nodeSet.addAll(nodes);
+        return nodeSet;
+    }
+
     /**
      * What is the Set of Nodes reachable from source
      * Node by transitions associated with Symbol.
@@ -393,6 +406,14 @@ public class FiniteAutomaton
         }
 
         return symbolSet;
+    }
+
+    /**
+     * retrieve Set of all transitions in instance.
+     */
+    Set getTransitions()
+    {
+        return Collections.unmodifiableSet(transitions);
     }
 
     /**
