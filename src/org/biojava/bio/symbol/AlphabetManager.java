@@ -384,22 +384,32 @@ public final class AlphabetManager {
       }
     }
 
-    if(atomC == symList.size()) {
-      return new SimpleAtomicSymbol(annotation, symList);
-    } else if(basis == symList.size()) {
-      return new SimpleBasisSymbol(
+    try {
+      if(atomC == symList.size()) {
+        return new SimpleAtomicSymbol(annotation, symList);
+      } else if(basis == symList.size()) {
+        return new SimpleBasisSymbol(
         annotation,
         symList,
         new SimpleAlphabet(
-          expandMatches(alpha, symList, new ArrayList())
+        expandMatches(alpha, symList, new ArrayList())
         )
-      );
-    } else {
-      return new SimpleSymbol(
+        );
+      } else {
+        return new SimpleSymbol(
         annotation,
         new SimpleAlphabet(
-          expandBasis(alpha, symList, new ArrayList())
+        expandBasis(alpha, symList, new ArrayList())
         )
+        );
+      }
+    } catch (IllegalSymbolException ise) {
+      throw new IllegalSymbolException(
+        ise,
+        "Could not create a new symbol with: " +
+        annotation + "\t" +
+        symList + "\t" +
+        alpha
       );
     }
   }
@@ -691,6 +701,10 @@ public final class AlphabetManager {
   static public Alphabet getCrossProductAlphabet(
     List aList, Alphabet parent
   ) {
+    if(aList.size() == 0) {
+      return Alphabet.EMPTY_ALPHABET;
+    }
+    
     // This trap means that the `product' operator can be
     // safely applied to a single alphabet.
 
@@ -717,7 +731,7 @@ public final class AlphabetManager {
       }
       if(cpa == null) {
         try {
-          if(size >= 0 && size < 1000) {
+          if(size > 0 && size < 1000) {
             cpa = new SimpleCrossProductAlphabet(aList, parent);
           } else {
             cpa = new SparseCrossProductAlphabet(aList);

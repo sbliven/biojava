@@ -58,6 +58,12 @@ implements Serializable {
 
   public SimpleCrossProductAlphabet(List a, Alphabet parent)
   throws IllegalAlphabetException {
+    if(a.size() == 0) {
+      throw new IllegalAlphabetException(
+        "Can't create alphabet for empty list. Use Alphabet.EMPTY_ALPHABET"
+      );
+    }
+
     this.parent = parent;
     for(Iterator i = a.iterator(); i.hasNext(); ) {
       Alphabet aa = (Alphabet) i.next();
@@ -89,7 +95,7 @@ implements Serializable {
 
   private void populateSymbols(List symList) {
     if (symList.size() == alphas.size()) {
-    putSymbol(symList);
+      putSymbol(symList);
     } else {
       int indx = symList.size();
       FiniteAlphabet a = (FiniteAlphabet) alphas.get(indx);
@@ -122,7 +128,7 @@ implements Serializable {
       } catch (IllegalSymbolException ise) {
         throw new BioError(
           ise,
-          "Assertion Failure: Should have a legal symbol."
+          "Assertion Failure: Should have a legal symbol: " + s
         );
       }
     }
