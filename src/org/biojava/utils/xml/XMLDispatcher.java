@@ -10,7 +10,7 @@ import java.util.*;
 import org.xml.sax.*;
 
 /**
- * Simple implemntation of XMLPeerFactory which delegates object-
+ * Simple implementation of XMLPeerFactory which delegates object-
  * construction on the basis of tag name.
  *
  * @author Thomas Down

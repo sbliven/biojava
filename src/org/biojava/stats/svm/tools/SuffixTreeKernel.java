@@ -33,7 +33,7 @@ import org.biojava.stats.svm.SVMKernel;
  * of the counts of all nodes they have in common.
  * <P>
  * This implementation allows you to scale the sub-space for each word length
- * independantly.
+ * independently.
  *
  * @author Matthew Pocock
  */
@@ -162,7 +162,7 @@ public class SuffixTreeKernel implements SVMKernel, Serializable {
   }
   
   /**
-   * Scale using a <span class="type">BitSet</span> to allow/dissalow depths.
+   * Scale using a <span class="type">BitSet</span> to allow/disallow depths.
    *
    * @author Matthew Pocock
    */

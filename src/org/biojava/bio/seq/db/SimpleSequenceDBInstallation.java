@@ -24,7 +24,7 @@ public class SimpleSequenceDBInstallation implements SequenceDBInstallation {
   /**
    * this method creates a new (and empty) HashSequenceDB with the given name that will be accessible through this
    * sequence db installation through this name and all given other identifiers.
-   * @param name the name of the SequenceDB to create. Not null. If this name is lready used by this sequence db
+   * @param name the name of the SequenceDB to create. Not null. If this name is already used by this sequence db
    *             installation, an IllegalArgumentException is thrown.
    * @param otherIdentifiers a set of String objects that also serve as identifiers for the newly created SequenceDB
    *                         object. This set should not contain the name of the SequenceDB - but if if does, it is just

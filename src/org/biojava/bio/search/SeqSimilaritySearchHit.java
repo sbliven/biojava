@@ -8,7 +8,7 @@ import org.biojava.bio.symbol.Alignment;
 import java.util.List;
 
 /**
- * objects of this type represent one particular hit (i.e. sequence and associated information) from a sequence
+ * objects of this type represent one particular hit (sequence and associated information) from a sequence
  * similarity search.
  *
  * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A> for the 
@@ -50,7 +50,7 @@ public interface SeqSimilaritySearchHit extends Cloneable {
   String getSequenceID();
   
   /**
-   * return all sub-hits for this sequence similarity search hit. The sub-hits contain conrete alignments (and scores)
+   * return all sub-hits for this sequence similarity search hit. The sub-hits contain concrete alignments (and scores)
    * for sequence stretches from the sequence of this hit. The sub-hits in the list returned by this method are sorted
    * from best to worst.
    * @return a List of SeqSimilaritySearchSubHit objects containing all sub-hits for this hit.

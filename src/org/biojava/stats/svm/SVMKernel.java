@@ -26,7 +26,7 @@ package org.biojava.stats.svm;
  * Kernel for support vector machines and related methods.
  * <P>
  * It is hoped that all implementations of SVMKernel will be serializable,
- * as this will allow models to be stoored and retrieved without inventing
+ * as this will allow models to be stored and retrieved without inventing
  * complex data formats.
  *
  * @author Thomas Down.

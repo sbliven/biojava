@@ -30,8 +30,8 @@ package org.biojava.stats.svm;
  * term a-b can be represented in an arbitrary feature space by using a nested
  * kernel k, and becomes <code>k(a, a) + k(b, b) - 2 * k(a, b)</code>.
  * <P>
- * As k(x, x) is required repeatedly, I sudgest using a DiagonalCachingKernel as
- * the emediately nested kernel function.
+ * As k(x, x) is required repeatedly, I suggest using a DiagonalCachingKernel as
+ * the immediately nested kernel function.
  *
  * @author Matthew Pocock
  */

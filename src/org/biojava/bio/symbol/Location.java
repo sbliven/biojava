@@ -106,7 +106,7 @@ public interface Location {
    */
   Location intersection(Location l);
   /**
-   * Return a Loctaion containing all points in either ranges.
+   * Return a Location containing all points in either ranges.
    *
    * @param l	the Location to union with
    * @return	a Location representing the union
@@ -149,7 +149,7 @@ public interface Location {
    * This method should return an Iterator over these maximally contiguous blocks
    * starting with the left-most block, and finnishing at the right-most block.
    *
-   * @return an Iterator over Location objects that are the maximaly contiguous
+   * @return an Iterator over Location objects that are the maximally contiguous
    *         set of locations contained within this location
    */
   Iterator blockIterator();

@@ -42,7 +42,7 @@ import org.biojava.bio.seq.*;
  * format can handle.
  * <P>
  * Sequences are instantiated when they are requested by nextSequence, not
- * before, so it is safe to use this object to parse a giggabite fasta file, and
+ * before, so it is safe to use this object to parse a gigabyte fasta file, and
  * do sequence-by-sequence processing, while being guaranteed that StreamReader
  * will not require you to keep any of the sequences in memory.
  *

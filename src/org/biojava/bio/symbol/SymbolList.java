@@ -57,7 +57,7 @@ public interface SymbolList {
   /**
    * Return the symbol at index, counting from 1.
    *
-   * @param index the ofset into this SymbolList
+   * @param index the offset into this SymbolList
    * @return  the Symbol at that index
    * @throws IndexOutOfBoundsException if index is less than 1, or greater than
    *                                   the length of the symbol list

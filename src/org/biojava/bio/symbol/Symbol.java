@@ -28,7 +28,7 @@ import org.biojava.bio.*;
  * A single symbol.
  * <P>
  * This is the atomic unit of a SymbolList, or a sequence. It allows
- * for fine-train fly-weighting, so that there can be one instance
+ * for fine-grain fly-weighting, so that there can be one instance
  * of each symbol that is referenced multiple times.
  *
  * @author Matthew Pocock

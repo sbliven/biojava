@@ -6,7 +6,7 @@ import org.biojava.bio.BioException;
 import org.biojava.bio.symbol.Alignment;
 
 /**
- * objects of this type represent one particular sub-hit (i.e. one concrete sequence stretch within a sequence and
+ * objects of this type represent one particular sub-hit (one concrete sequence stretch within a sequence and
  * associated information) from a sequence similarity search hit.
  *
  * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A> for the 
@@ -20,7 +20,7 @@ public interface SeqSimilaritySearchSubHit extends Cloneable {
   public static final String QUERY_LABEL = "Query";
 
   /**
-   * return the ssequence similarity search hit to which this sequence similarity search sub-hit belongs.
+   * return the sequence similarity search hit to which this sequence similarity search sub-hit belongs.
    * @return the SeqSimilaritySearchHit object of which this object is a part. Never returns null.
    */
   SeqSimilaritySearchHit getHit();

@@ -55,7 +55,7 @@ public interface Alphabet extends Annotatable {
    * Returns whether or not this Alphabet contains the symbol.
    * <P>
    * An alphabet contains an ambiguity symbol iff the ambiguity symbol's
-   * getMemberAlphabet() returns an alphabe that is a propper sub-set of this
+   * getMemberAlphabet() returns an alphabet that is a proper sub-set of this
    * alphabet. That means that every one of the symbols that could mach the
    * ambiguity symbol is also a member of this alphabet.
    *

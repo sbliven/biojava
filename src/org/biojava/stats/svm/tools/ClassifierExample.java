@@ -32,7 +32,7 @@ import org.biojava.stats.svm.*;
 
 /**
  * A simple toy example that allows you to put points on a canvas, and find a
- * polynomeal hyperplane to seperate them.
+ * polynomial hyperplane to seperate them.
  */
 public class ClassifierExample {
   /**
@@ -188,7 +188,7 @@ public class ClassifierExample {
      * Set a flag so that newly added points will be in the positive class or
      * negative class, depending on wether addPos is true or false respectively.
      *
-     * @param addPos  boolean to flag which class to add new points to0
+     * @param addPos  boolean to flag which class to add new points to
      */
     public void setAddPos(boolean addPos) {
       firePropertyChange("addPos", this.addPos, addPos);

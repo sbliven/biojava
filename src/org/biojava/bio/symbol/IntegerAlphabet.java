@@ -39,7 +39,7 @@ import org.biojava.utils.*;
  * processed as per any other SymbolList object.
  * <P>
  * Object identity can not be used to decide if two IntegerResidue objects are
- * the same. You must use the equals method, or compare intValue manualy.
+ * the same. You must use the equals method, or compare intValue manually.
  *
  * @author Matthew Pocock
  */

@@ -219,7 +219,7 @@ public class SparseVector implements Serializable {
     
     /**
      * A version of the standard dot-product kernel that scales each column
-     * independantly.
+     * independently.
      *
      * @author Matthew Pocock
      */

@@ -7,7 +7,7 @@ import java.io.*;
 
 /**
  * a sub-class of java.util.Properties that provides the same constructors, adds two convenient load methods to load
- * the properties from files and, most importantly, adds getPropertyAsXXX() methods to get a property as an objcet of
+ * the properties from files and, most importantly, adds getPropertyAsXXX() methods to get a property as an object of
  * type XXX.
  *
  * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A> for the 
