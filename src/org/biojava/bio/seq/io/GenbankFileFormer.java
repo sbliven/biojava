@@ -71,7 +71,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
     private StringBuffer osb = null;
     private StringBuffer ocb = null;
     private StringBuffer ccb = null;
-    private StringBuffer ftb = null;
+    private StringBuffer ftb = new StringBuffer();
 
     // Locusline buffers
     private StringBuffer typeb = new StringBuffer();
@@ -133,8 +133,7 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
     }
 
     public void setName(String id) throws ParseException {
-        idb = new StringBuffer();
-	idb.append("LOCUS       " + id);
+        idb = new StringBuffer("LOCUS       " + id);
     }
 
     public void startSequence() throws ParseException { }
@@ -200,10 +199,11 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 
 	    sq.setLength(0);
 	    sq.append("BASE COUNT    ");
-	    sq.append(aCount + " a    ");
-	    sq.append(cCount + " c    ");
-	    sq.append(gCount + " g    ");
-	    sq.append(tCount + " t");
+	    sq.append(aCount + " a   ");
+	    sq.append(cCount + " c   ");
+	    sq.append(gCount + " g   ");
+	    sq.append(tCount + " t    ");
+            sq.append(oCount + " others");
 	    sq.append(nl);
 	    sq.append("ORIGIN");
 
@@ -350,7 +350,6 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
         idb.insert(64, divb);
         idb.insert(68, mdatb);
         idb.setLength(79);
-        // System.out.println("idb length: " + idb.length());
     }
 
     public void addSequenceProperty(Object key, Object value)
@@ -441,9 +440,6 @@ public class GenbankFileFormer extends AbstractGenEmblFileFormer
 
 	lb.replace(5, 5 + templ.type.length(), templ.type);
 
-	if (ftb == null) {
-	    ftb = new StringBuffer();
-	}
         ftb.append(lb + nl);
     }
 
