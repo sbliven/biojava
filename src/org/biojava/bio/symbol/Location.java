@@ -61,18 +61,18 @@ public interface Location {
   
   /**
    * Checks the decorator chain for an instance of <class>decoratorClass</class>
-   * and return true if found.
+   * and return it if found.
    * <P>
-   * The default behavior is to return false. If the current object is a
+   * The default behavior is to return null. If the current object is a
    * decorator and is an instance of <class>decoratorClass</class> it should
-   * return true. Otherwise, the decorator should chain this method onto the
+   * return itself. Otherwise, the decorator should chain this method onto the
    * instance it wraps.
    *
    * @param decoratorClass  the Class to check
-   * @return true if an instance of this class is present in the decorator chain
-   *         and false otherwise.
+   * @return a Location if an instance of this class is present in the decorator
+   *         chain and null otherwise.
    */
-  boolean hasDecorator(Class decoratorClass);
+  Location getDecorator(Class decoratorClass);
   /**
    * The minimum position contained.
    *
@@ -210,8 +210,12 @@ public interface Location {
    * @author Matthew Pocock
    */
   static final class EmptyLocation implements Location, Serializable {
-    public boolean hasDecorator(Class decoratorClass) {
-      return decoratorClass.isInstance(this);
+    public Location getDecorator(Class decoratorClass) {
+      if(decoratorClass.isInstance(this)) {
+        return this;
+      } else {
+        return null;
+      }
     }
     public Location newInstance(Location loc) { return loc; }
     public int getMin() { return Integer.MAX_VALUE; }

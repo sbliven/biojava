@@ -34,8 +34,12 @@ import org.biojava.bio.*;
  */
 public abstract class AbstractLocation
 implements Location, Serializable {
-  public boolean hasDecorator(Class decoratorClass) {
-    return decoratorClass.isInstance(this);
+  public Location getDecorator(Class decoratorClass) {
+    if(decoratorClass.isInstance(this)) {
+      return this;
+    } else {
+      return null;
+    }
   }
   
   public Location newInstance(Location loc) {

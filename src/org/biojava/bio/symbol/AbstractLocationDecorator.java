@@ -28,29 +28,33 @@ import java.lang.reflect.*;
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 
-public abstract class AbstractDecorator implements Location {
+public abstract class AbstractLocationDecorator implements Location {
   private final Location wrapped;
   
-  protected AbstractDecorator(Location wrapped) {
+  protected AbstractLocationDecorator(Location wrapped) {
     this.wrapped = wrapped;
   }
   
-  public final Location getWrapped() {
+  protected final Location getWrapped() {
     return wrapped;
   }
   
   protected abstract Location decorate(Location loc);
   
   public Location newInstance(Location loc) {
-    if(loc instanceof AbstractDecorator) {
-      Location wrapped = ((AbstractDecorator) loc).getWrapped();
+    if(loc instanceof AbstractLocationDecorator) {
+      Location wrapped = ((AbstractLocationDecorator) loc).getWrapped();
       loc = wrapped.newInstance(wrapped);
     }
     return decorate(loc);
   }
   
-  public boolean hasDecorator(Class decoratorClass) {
-    return decoratorClass.isInstance(this);
+  public Location getDecorator(Class decoratorClass) {
+    if(decoratorClass.isInstance(this)) {
+      return this;
+    } else {
+      return getWrapped().getDecorator(decoratorClass);
+    }
   }
   
   public int getMin() {

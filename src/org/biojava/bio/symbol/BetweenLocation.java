@@ -33,23 +33,15 @@ import java.util.*;
  * Between view onto an underlying Location instance.
  *
  * @author Matthew Pocock
- * @author Mark Schreiber
  * @since 1.2
  */
 public class BetweenLocation
-extends AbstractDecorator {
-  private final int length;
-  
-  public final int getLength() {
-    return length;
-  }
-
-  public BetweenLocation(Location wrapped, int length) {
+extends AbstractLocationDecorator {
+  public BetweenLocation(Location wrapped) {
     super(wrapped);
-    this.length = length;
   }
   
   protected Location decorate(Location loc) {
-    return new BetweenLocation(loc, getLength());
+    return new BetweenLocation(loc);
   }
 }

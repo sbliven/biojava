@@ -37,7 +37,7 @@ import java.util.*;
  * @since 1.2
  */
 public class CircularLocation
-extends AbstractDecorator {
+extends AbstractLocationDecorator {
   private final int length;
   
   public final int getLength() {
