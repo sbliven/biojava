@@ -33,7 +33,6 @@ import org.biojava.utils.ParserException;
  * SearchContentHandler of significant events.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
- * @version 1.0
  * @since 1.1
  */
 public interface SearchParser

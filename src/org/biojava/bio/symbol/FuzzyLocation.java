@@ -105,7 +105,7 @@ implements Serializable {
   /**
    * Retrieve the Location that this decorates.
    *
-   * @return the Location instance that stores all of the Loctaion interface
+   * @return the Location instance that stores all of the Location interface
    *         data
    */
 

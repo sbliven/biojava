@@ -51,10 +51,11 @@ import org.biojava.bio.seq.*;
 public interface SequenceFormat
 {
     /**
-     * <p>This is where the various SequenceFormat implementations
-     * should register the names of the formats they are able to
-     * write. The Map key should be the implementation's classname and
-     * the values a Set of Strings describing the formats.</p>
+     * <p>This is where the various <code>SequenceFormat</code>
+     * implementations should register the names of the formats they
+     * are able to write. The Map key should be the implementation's
+     * classname and the values a Set of Strings describing the
+     * formats.</p>
      *
      * <p>E.g. org.biojava.bio.seq.io.EmblLikeFormat</p>
      *
@@ -86,7 +87,7 @@ public interface SequenceFormat
 
     /**
      * <code>writeSequence</code> writes a sequence to the specified
-     * PrintStream, using the specified format.
+     * <code>PrintStream</code>, using the specified format.
      *
      * @param seq a <code>Sequence</code> to write out.
      * @param format a <code>String</code> indicating which sub-format
@@ -129,7 +130,21 @@ public interface SequenceFormat
 				SeqIOListener  listener)
 	throws BioException, IllegalSymbolException, IOException;
 
+    /**
+     * <code>getFormats</code> returns a set of String identifiers for
+     * the format(s) written by a <code>SequenceFormat</code>
+     * implementation.
+     *
+     * @return a <code>Set</code> of Strings.
+     */
     public Set getFormats();
 
+    /**
+     * <code>getDefaultFormat</code> returns the String identifier for
+     * the default format written by a <code>SequenceFormat</code>
+     * implementation.
+     *
+     * @return a <code>String</code>.
+     */
     public String getDefaultFormat();
 }

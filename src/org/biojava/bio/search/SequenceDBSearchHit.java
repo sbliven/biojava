@@ -38,7 +38,6 @@ import org.biojava.utils.contract.*;
  * versions of those programs).
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
- * @version 1.0
  * @since 1.1
  * @see AbstractChangeable
  * @see SeqSimilaritySearchHit

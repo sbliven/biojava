@@ -27,7 +27,13 @@ import java.lang.*;
 import java.util.*;
 
 /**
- * <code>SeqFileFormerFactory</code>.
+ * <code>SeqFileFormerFactory</code> is an abstract base class for
+ * factories which create instances of <code>SeqFileFormer</code>. A
+ * <code>SeqFileFormer</code> is dynamically loaded by a
+ * <code>SequenceFormat</code> when it needs to write a complex file
+ * format to a <code>PrintStream</code>. Factories subclassed from
+ * <code>SeqFileFormerFactory</code> are present as inner classes
+ * within <code>SeqFileFormer</code> implementations.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2

@@ -38,7 +38,6 @@ import org.biojava.bio.symbol.*;
  * formatting operations required when writing flat files.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
- * @version 1.2
  * @since 1.2
  */
 public class SeqFormatTools
@@ -175,7 +174,28 @@ public class SeqFormatTools
 
     /**
      * <code>formatLocationBlock</code> creates an EMBL/Genbank style
-     * representation of a <code>Location</code>.
+     * representation of a <code>Location</code>. Supported location
+     * forms:
+     *     
+     * <pre>
+     *   123
+     *  (123.567)..789
+     *   123..(567.789)
+     *  (123.345)..(567.789)
+     *   123..456
+     *  <123..567 or 123..>567 or <123..>567
+     * </pre>
+     *
+     * Specifically not supported are:
+     * <pre>
+     *  (123.567)
+     *  <123 or >123 or <>123
+     *   123^567
+     *   AL123465:(123..567)
+     * </pre>
+     *
+     * Use of 'order' rather than 'join' is not retained over a
+     * read/write cycle. i.e. 'order' is converted to 'join'.
      *
      * @param loc a <code>Location</code> object to use as a template.
      * @param strand an <code>int</code> value indicating the
@@ -208,18 +228,22 @@ public class SeqFormatTools
 
 	StringBuffer sb = new StringBuffer(leader);
 
-	if (strand == -1)
-	{
-	    complement = true;
-	    sb.append("complement(");
-	    position += 11;
-	}
-
+	// There are issues here about choosing various forms:
+	// join(complement(...),complement(...))
+	// join(complement(...,...))
+	// complement(join(...,...))
 	if (loc instanceof CompoundLocation)
 	{
 	    join = true;
 	    sb.append("join(");
 	    position += 5;
+	}
+
+	if (strand == -1)
+	{
+	    complement = true;
+	    sb.append("complement(");
+	    position += 11;
 	}
 
 	int pre, post;
@@ -232,24 +256,55 @@ public class SeqFormatTools
 	    boolean fuzzy = (FuzzyLocation.class.isInstance(la[i])) ? true : false;
 
 	    if (point)
-	    {
-		if (fuzzy && ! ((FuzzyLocation) la[i]).hasBoundedMin())
-		    sb.append("<");
-		if (fuzzy && ! ((FuzzyLocation) la[i]).hasBoundedMax())
-		    sb.append(">");
-
+	    {		
+		// Fuzzy point locations are not supported yet
 		sb.append(la[i].getMin());
 	    }
-	    else
+	    else if (fuzzy)
 	    {
-		if (fuzzy && ! ((FuzzyLocation) la[i]).hasBoundedMin())
+		FuzzyLocation fl = (FuzzyLocation) la[i];
+
+		if (! fl.hasBoundedMin())
+		{
+		    // <123
 		    sb.append("<");
-		sb.append(la[i].getMin());
+		    sb.append(fl.getMin());
+		}
+		else if (fl.getOuterMin() != fl.getInnerMin())
+		{
+		    // (123.567)
+		    sb.append("(" + fl.getOuterMin());
+		    sb.append(".");
+		    sb.append(fl.getInnerMin() + ")");
+		}
+		else
+		    // 123
+		    sb.append(fl.getMin());
 
 		sb.append("..");
 
-		if (fuzzy && ! ((FuzzyLocation) la[i]).hasBoundedMax())
+		if (! ((FuzzyLocation) la[i]).hasBoundedMax())
+		{
+		    // >567
 		    sb.append(">");
+		    sb.append(la[i].getMax());
+		}
+		else if (fl.getInnerMax() != fl.getOuterMax())
+		{
+		    // (567.789)
+		    sb.append("(" + fl.getInnerMax());
+		    sb.append(".");
+		    sb.append(fl.getOuterMax() + ")");
+		}
+		else
+		    // 567
+		    sb.append(la[i].getMax());
+	    }
+	    else
+	    {
+		// 123..567
+		sb.append(la[i].getMin());
+		sb.append("..");
 		sb.append(la[i].getMax());
 	    }
 
@@ -271,14 +326,14 @@ public class SeqFormatTools
 		position = leader.length() + diff;
 	    }
 	    else
-	    {
 		position += diff;
-	    }
 	}
 
 	if (join)
 	{
 	    sb.append(")");
+	    // If adding the ")" has made the line too long, move the
+	    // last range to the next line
 	    if ((position + 1) > wrapWidth)
 	    {
 		sb.insert((sb.length() - diff), "\n" + leader);
@@ -290,12 +345,13 @@ public class SeqFormatTools
 	if (complement)
 	{
 	    sb.append(")");
+	    // If adding the ")" has made the line too long, move the
+	    // last range to the next line
 	    if ((position + 1) > wrapWidth)
 	    {
 		sb.insert((sb.length() - diff), "\n" + leader);
 	    }
 	}
-
 	return sb;
     }
 
@@ -368,7 +424,6 @@ public class SeqFormatTools
 			    qualifierData.put(qualifier.getAttribute("name"), qData);
 			}
 		    }
-
 		    featureData.put(featureKey, qualifierData.keySet());
 		}
 	    }

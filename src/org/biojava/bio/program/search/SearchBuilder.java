@@ -30,7 +30,6 @@ import org.biojava.bio.BioException;
  * construct a SeqSimilaritySearchResult object.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
- * @version 1.0
  * @since 1.1
  * @see SearchContentHandler
  */

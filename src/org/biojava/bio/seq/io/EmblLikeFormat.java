@@ -185,16 +185,18 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
     public void writeSequence(Sequence seq, PrintStream os)
 	throws IOException
     {
+	String defaultFormat = getDefaultFormat();
+
 	try
 	{
-	    String defaultFormat = getDefaultFormat();
 	    SeqFileFormer former = SeqFileFormerFactory.makeFormer(defaultFormat);
-	    
+	    former.setPrintStream(os);
+
 	    SeqIOEventEmitter.getSeqIOEvents(seq, former);
 	}
 	catch (BioException bex)
 	{
-	    bex.printStackTrace();
+	    throw new IOException(bex.getMessage());
 	}
     }
 
@@ -204,25 +206,25 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
 	String requestedFormat = new String(format);
 	boolean          found = false;
 
+	String [] formats = (String []) getFormats().toArray(new String[0]);
+
+	// Allow client programmers to use whichever case they like	    
+	for (int i = 0; i < formats.length; i++)
+	{
+	    if (formats[i].equalsIgnoreCase(format))
+	    {
+		requestedFormat = formats[i];
+		found = true;
+	    }
+	}
+
+	if (! found)
+	    throw new IOException("Unable to write: an invalid file format '"
+				  + format
+				  + "' was requested");
+
 	try
 	{
-	    String [] formats = (String []) getFormats().toArray(new String[0]);
-
-	    // Allow client programmers to use whichever case they like	    
-	    for (int i = 0; i < formats.length; i++)
-	    {
-		if (formats[i].equalsIgnoreCase(format))
-		{
-		    requestedFormat = formats[i];
-		    found = true;
-		}
-	    }
-
-	    if (! found)
-		throw new BioException("An invalid file format '"
-				       + format
-				       + "' was requested");
-
 	    SeqFileFormer former = SeqFileFormerFactory.makeFormer(requestedFormat);
 	    former.setPrintStream(os);
 
@@ -230,7 +232,7 @@ public class EmblLikeFormat implements SequenceFormat, Serializable
 	}
 	catch (BioException bex)
 	{
-	    bex.printStackTrace();
+	    throw new IOException(bex.getMessage());
 	}
     }
 

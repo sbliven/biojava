@@ -38,7 +38,6 @@ import org.biojava.bio.symbol.IllegalSymbolException;
  * ("-") is supported.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
- * @version 1.0
  * @since 1.1
  */
 class GappedSymbolListBuilder

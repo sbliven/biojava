@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.biojava.bio.seq.io;
 
 import java.io.*;
@@ -31,41 +30,50 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 /**
- * Simple parser for feature tables.  This is shared between
- * the EMBL and GENBANK format readers.
+ * Simple parser for feature tables. This is shared between the EMBL
+ * and GENBANK format readers.
  *
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Greg Cox
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  */
 
 /*
  * Greg Cox: Changed private fields and methods to protected so that
- * SwissProtFeatureTableParser could subclass and snag the implementation
+ *           SwissProtFeatureTableParser could subclass and snag the *
+ *           implementation.
  *
  * Thomas Down: Post 1.1, finally got round to refactoring this to be
  *              a `nice' player in the newio world.  Needless to say,
- *              this simplified things quite a bit...
+ *              this simplified things quite a bit.
+ * 
+ * Keith James: Added support for reading fuzzy i.e. (123.567)
+ *              locations in addition to unbounded i.e. <123..567
+ *              locations.
  */
 
 class FeatureTableParser {
-    private final static int WITHOUT=0;
-    private final static int WITHIN=1;
-    private final static int LOCATION=2;
-    private final static int ATTRIBUTE=3;
+    private final static int   WITHOUT = 0;
+    private final static int    WITHIN = 1;
+    private final static int  LOCATION = 2;
+    private final static int ATTRIBUTE = 3;
 
     private int featureStatus = WITHOUT;
     private StringBuffer featureBuf;
     private StrandedFeature.Template featureTemplate;
 
-    private String featureSource;
-    private SeqIOListener listener;
+    private String                 featureSource;
+    private SeqIOListener          listener;
+    private EmblLikeLocationParser locParser;
 
-    FeatureTableParser(SeqIOListener listener, String source) {
-	this.listener = listener;
+    FeatureTableParser(SeqIOListener listener, String source)
+    {
+	this.listener      = listener;
 	this.featureSource = source;
 
 	featureBuf = new StringBuffer();
+	locParser  = new EmblLikeLocationParser();
     }
 
     //
@@ -133,139 +141,29 @@ class FeatureTableParser {
 	return (featureStatus != WITHOUT);
     }
 
-    //
-    // Internal stuff
-    //
-
     /**
      * Parse an EMBL location and fill in the location and strand fields of the
-     * template.  This is still a bit simplistic.
+     * template. Updated to support a wider range of location types.
      */
-
     private void parseLocation(String loc, StrandedFeature.Template fillin) 
 	throws BioException 
     {
-	    boolean joining = false;
-	    boolean complementing = false;
-	    boolean isComplement = false;
-	    boolean ranging = false;
-	    boolean fuzzyMin = false;
-	    boolean fuzzyMax = false;
+	Object [] locStruct = locParser.parseLocation(loc);
 
-	    int start = -1;
-
-	    Location result = null;
-	    List locationList = null;
-
-	    StringTokenizer toke = new StringTokenizer(loc, "(),. ><", true);
-	    int level = 0;
-	    while (toke.hasMoreTokens()) {
-	        String t = toke.nextToken();
-	        // System.err.println(t);
-	        if (t.equals("join") || t.equals("order")) {
-		        joining = true;
-	            locationList = new ArrayList();
-	        } else if (t.equals("complement")) {
-		        complementing = true;
-		        isComplement = true;
-	        } else if (t.equals("(")) {
-		        ++level;
-	        } else if (t.equals(")")) {
-		        --level;
-	        } else if (t.equals(".")) {
-	        } else if (t.equals(",")) {
-	        } else if (t.equals(">")) {
-                if (ranging) {
-                    fuzzyMax = true;
-                } else {
-                    fuzzyMin = true;
-                }
-	        } else if (t.equals("<")) {
-                if (ranging) {
-                    fuzzyMax = true;
-                } else {
-                    fuzzyMin = true;
-                }
-	        } else if (t.equals(" ")) {
-	        } else {
-		// System.err.println("Range! " + ranging);
-		// This ought to be an actual coordinate.
-		int pos = -1;
-		try {
-		    pos = Integer.parseInt(t);
-		} catch (NumberFormatException ex) {
-		    throw new BioException("bad locator: " + t + " " + loc);
-		}
-
-		if (ranging == false) {
-		    start = pos;
-		    ranging = true;
-		} else {
-		    Location rl = new RangeLocation(start, pos);
-		    if (fuzzyMin || fuzzyMax) {
-			rl = new FuzzyLocation(fuzzyMin ? Integer.MIN_VALUE : start,
-					       fuzzyMax ? Integer.MAX_VALUE : pos,
-					       start,
-					       pos,
-					       FuzzyLocation.RESOLVE_INNER);
-		    } else {
-			rl = new RangeLocation(start, pos);
-		    }
-
-		    if (joining) {
-			locationList.add(rl);
-		    } else {
-			if (result != null) {
-			    throw new BioException(
-						   "Tried to set result to " + rl +
-						   " when it was alredy set to " + result
-						   );
-			}
-			result = rl;
-		    }
-		    ranging = false;
-		    complementing = false;
-            fuzzyMin = fuzzyMax = false;
-		}
-	    }
-	}
-	if (level != 0) {
-	    throw new BioException("Mismatched parentheses: " + loc);
-	}
-
-	if (ranging) {
-	    Location rl = new PointLocation(start);
-	    if (joining) {
-		locationList.add(rl);
-	    } else {
-		if (result != null) {
-		    throw new BioException();
-		}
-		result = rl;
-	    }
-	}
-
-	if (isComplement) {
+	if (((Boolean) locStruct[1]).booleanValue())
+	{
 	    fillin.strand = StrandedFeature.NEGATIVE;
 	} else {
 	    fillin.strand = StrandedFeature.POSITIVE;
 	}
 
-	if (result == null) {
-	    if(locationList == null) {
-		throw new BioException("Location null: " + loc);
-	    }
-	    result = new CompoundLocation(locationList);
-	}
-
-	fillin.location = result;
+	fillin.location = (Location) locStruct[0];
     }
 
     /**
-     * Process the a string corresponding to a feature-table attribute, and fire
-     * it off to our listener.
+     * Process the a string corresponding to a feature-table
+     * attribute, and fire it off to our listener.
      */
-
     private void processAttribute(String attr) throws BioException {
 	// System.err.println(attr);
 	int eqPos = attr.indexOf('=');

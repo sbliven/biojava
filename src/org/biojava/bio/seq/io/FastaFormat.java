@@ -179,7 +179,9 @@ public class FastaFormat implements SequenceFormat, Serializable {
 	return description;
     }
 
-    public void writeSequence(Sequence seq, PrintStream os) {
+    public void writeSequence(Sequence seq, PrintStream os) 
+	throws IOException
+    {
 	os.print(">");
 	os.println(describeSequence(seq));
 
@@ -201,7 +203,17 @@ public class FastaFormat implements SequenceFormat, Serializable {
     public void writeSequence(Sequence seq, String format, PrintStream os)
 	throws IOException
     {
+	String requestedFormat = new String(format);
+	boolean          found = false;
 
+	String [] formats = (String []) getFormats().toArray(new String[0]);
+
+	if (! found)
+	    throw new IOException("Unable to wrtie: an invalid file format '"
+				  + format
+				  + "' was requested");
+
+	writeSequence(seq, os);
     }
 
     public Set getFormats()

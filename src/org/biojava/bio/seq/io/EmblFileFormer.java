@@ -33,7 +33,6 @@ import org.biojava.bio.symbol.*;
  * EMBL entries for writing to a PrintStream.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
- * @version 1.2
  * @since 1.2
  */
 public class EmblFileFormer implements SeqFileFormer
@@ -41,7 +40,7 @@ public class EmblFileFormer implements SeqFileFormer
     private static String featureDataFile =
 	"org/biojava/bio/seq/io/FeatureQualifier.xml";
 
-    private static Map featureData   = new HashMap();
+    private static Map   featureData = new HashMap();
     private static Map qualifierData = new HashMap();
 
     private PrintStream stream;
@@ -130,20 +129,16 @@ public class EmblFileFormer implements SeqFileFormer
 
 	    switch (c)
 	    {
-		case 'a':
-		case 'A':
+		case 'a': case 'A':
 		    aCount++;
 		    break;
-		case 'c':
-		case 'C':
+		case 'c': case 'C':
 		     cCount++;
 		     break;
-		case 'g':
-		case 'G':
+		case 'g': case 'G':
 		     gCount++;
 		     break;
-		case 't':
-		case 'T':
+		case 't': case 'T':
 		     tCount++;
 		     break;
 
@@ -256,9 +251,13 @@ public class EmblFileFormer implements SeqFileFormer
     {
 	// There are 19 spaces in the leader
 	String   leader = "FT                   ";
+	// Default is to quote unknown qualifiers
+	String     form = "quoted";
+
 	StringBuffer tb = new StringBuffer("/" + key);
 
-        String form = (String) ((Map) qualifierData.get(key)).get("form");
+	if (qualifierData.containsKey(key))
+	    form = (String) ((Map) qualifierData.get(key)).get("form");
 
 	// This is a slight simplification. There are some types of
 	// qualifier which are unquoted unless they contain

@@ -29,12 +29,45 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.*;
 
 /**
- * Simple filter which handles attribute lines from an EMBL file
+ * Simple filter which handles attribute lines from an EMBL file. This
+ * class delegates creation of <code>Feature</code>s to a
+ * <code>FeatureTableParser</code>, which in turn delegates creation
+ * of <code>Locations</code> to an <code>EmblLikeLocationParser</code>
+ * which is shared with the <code>GenbankProcessor</code>.
+ *
+ * An <code>EmblLikeLocationParser</code> parses EMBL/Genbank style
+ * locations. Supported location forms:
+ *
+ * <pre>
+ *   123
+ *  <123 or >123 or <>123
+ *  (123.567)..789
+ *   123..(567.789)
+ *  (123.345)..(567.789)
+ *   123..456
+ *  <123..567 or 123..>567 or <123..>567
+ * </pre>
+ *
+ * Specifically not supported are:
+ * <pre>
+ *  (123.567)
+ *  <123 or >123 or <>123
+ *   123^567
+ *   AL123465:(123..567)
+ * </pre> 
+ *
+ * Use of 'order' rather than 'join' is not retained over a read/write
+ * cycle. i.e. 'order' is converted to 'join'. At some point we will
+ * need to store this information in the <code>Feature</code>'s
+ * annotation bundle.
+ *
+ * The only EMBL header information retained over a read/write cycle
+ * is the accession number (all numbers).
  *
  * @author Thomas Down
  * @author Greg Cox
- * @since 1.1
- */
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @since 1.1 */
 
 public class EmblProcessor extends SequenceBuilderFilter {
     public static final String PROPERTY_EMBL_ACCESSIONS = "embl_accessions";

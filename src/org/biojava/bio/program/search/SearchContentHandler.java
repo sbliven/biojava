@@ -31,7 +31,6 @@ package org.biojava.bio.program.search;
  * of which may, or may not, have subhits.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
- * @version 1.0
  * @since 1.1
  */
 public interface SearchContentHandler

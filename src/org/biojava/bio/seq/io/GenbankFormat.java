@@ -38,6 +38,8 @@ import org.biojava.bio.seq.*;
  * Added GenBank header	info to	the sequence annotation. The ACCESSION header
  * tag is not included.	Stored in sequence.getName().
  * @author Greg	Cox
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * (writeSequence)
  */
 
 public class GenbankFormat implements SequenceFormat, Serializable
@@ -124,9 +126,10 @@ public class GenbankFormat implements SequenceFormat, Serializable
     public void	writeSequence(Sequence seq, PrintStream os)
 	throws IOException
     {
+	String defaultFormat = getDefaultFormat();
+
 	try
 	{
-	    String defaultFormat = getDefaultFormat();
 	    SeqFileFormer former = SeqFileFormerFactory.makeFormer(defaultFormat);
 	    former.setPrintStream(os);
 
@@ -134,7 +137,7 @@ public class GenbankFormat implements SequenceFormat, Serializable
 	}
 	catch (BioException bex)
 	{
-	    bex.printStackTrace();
+	    throw new IOException(bex.getMessage());
 	}
     }
 
@@ -144,32 +147,35 @@ public class GenbankFormat implements SequenceFormat, Serializable
 	String requestedFormat = new String(format);
 	boolean          found = false;
 
-	try
+	String [] formats = (String []) getFormats().toArray(new String[0]);
+
+	// Allow client programmers to use whichever case they like	    
+	for (int i = 0; i < formats.length; i++)
 	{
-	    String [] formats = (String []) getFormats().toArray(new String[0]);
-
-	    // Allow client programmers to use whichever case they like	    
-	    for (int i = 0; i < formats.length; i++)
+	    if (formats[i].equalsIgnoreCase(format))
 	    {
-		if (formats[i].equalsIgnoreCase(format))
-		{
-		    requestedFormat = formats[i];
-		    found = true;
-		}
+		requestedFormat = formats[i];
+		found = true;
 	    }
+	}
 
-	    if (! found)
-		throw new BioException("An invalid file format '"
-				       + format
-				       + "' was requested");
+	if (! found)
+	{
+	    throw new IOException("Unable to write: an invalid file format '"
+				  + format
+				  + "' was requested");
+	}
 
+	try
+	{   
 	    SeqFileFormer former = SeqFileFormerFactory.makeFormer(requestedFormat);
+	    former.setPrintStream(os);
 
 	    SeqIOEventEmitter.getSeqIOEvents(seq, former);
 	}
 	catch (BioException bex)
 	{
-	    bex.printStackTrace();
+	    throw new IOException(bex.getMessage());
 	}
     }
 

@@ -23,6 +23,7 @@ package org.biojava.bio.seq.io;
 
 import java.util.*;
 
+import org.biojava.bio.BioException;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
@@ -35,7 +36,6 @@ import org.biojava.bio.symbol.*;
  * events.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
- * @version 1.2
  * @since 1.2
  */
 public class SeqIOEventEmitter
@@ -55,6 +55,7 @@ public class SeqIOEventEmitter
      * @param listener a <code>SeqIOListener</code> object.
      */
     public static void getSeqIOEvents(Sequence seq, SeqIOListener listener)
+	throws BioException
     {
 	try
 	{
@@ -113,11 +114,19 @@ public class SeqIOEventEmitter
 	}
 	catch (ParseException pe)
 	{
-	    pe.printStackTrace();
+	    // This should never happen as we are not actually parsing
+	    // anything, but the exception may theoretically be thrown
+	    throw new BioException("An internal error occurred processing "
+				   + seq.toString()
+				   + " into SeqIO events");
 	}
 	catch (IllegalAlphabetException iae)
 	{
-	    iae.printStackTrace();
+	    // This should never happen as the alphabet is being used
+	    // by this Sequence instance
+	    throw new BioException("An internal error occurred processing "
+				   + seq.toString()
+				   + " into SeqIO events");
 	}
     }
 

@@ -31,7 +31,6 @@ import org.biojava.utils.contract.Contract;
  * <code>SequenceDBSearchSubHit</code> objects.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
- * @version 1.0
  * @since 1.1
  * @see SeqSimilaritySearchSubHit
  */
