@@ -22,29 +22,40 @@
 package org.biojava.bio.seq;
 
 import java.util.*;
+import java.io.Serializable;
 
 /**
  * An implementation of SequenceDB that uses an underlying HashMap to stoor the
  * sequence objects.
  *
  * @author Matthew Pocock
+ * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A>
  */
-public class HashSequenceDB implements SequenceDB {
+public class HashSequenceDB implements SequenceDB, Serializable {
   /**
    * The sequence-by-id map.
    */
-  private Map sequenceByID;
+  final private Map sequenceByID;
   
   /**
    * An object to extract an ID for a sequence.
    */
-  private IDMaker idMaker;
-  
+  final private IDMaker idMaker;
+
+  /** 
+   * The name of this sequence database.
+   */
+  private String name;
+
   /**
    * Initialize sequenceByID.
    */
   {
     sequenceByID = new HashMap();
+  }
+
+  public String getName() {
+    return name;
   }
 
   public Sequence getSequence(String id) {
@@ -92,20 +103,45 @@ public class HashSequenceDB implements SequenceDB {
   }
 
   /**
+   * Generate a HashSequenceDB object that will use byName to generate ids for
+   * sequences and have a null name.
+   */
+  public HashSequenceDB() {
+    this(byName, null);
+  }
+  
+  /**
    * Generate a HashSequenceDB object that will use idMaker to generate ids for
-   * sequences.
+   * sequences and have a null name.
    *
    * @param idMaker the object that will work out the default id for a sequence
    */
   public HashSequenceDB(IDMaker idMaker) {
+    this(idMaker, null);
+  }
+  
+  /**
+   * Generate a HashSequenceDB object that will use byName to generate ids and
+   * will have the requested name.
+   *
+   * @param name the name for this database
+   */
+  public HashSequenceDB(String name) {
+    this(byName, name);
+  }
+  
+  /**
+   * Generate a HashSequenceDB object that will use idMaker to generate ids for
+   * sequences and have the requested name.
+   *
+   * @param idMaker the object that will work out the default id for a sequence
+   * @param name the name for this database
+   */
+  public HashSequenceDB(IDMaker idMaker, String name) {
     this.idMaker = idMaker;
+    this.name = name;
   }
 
-  /**
-   * No-args constructor for beany stuff.
-   */
-  protected HashSequenceDB() {}
-  
   /**
    * Interface for objects that define how to make an ID for a sequence.
    * <P>

@@ -1,3 +1,24 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package org.biojava.bridge.Biocorba.Seqcore;
 
 import java.util.*;
@@ -8,6 +29,10 @@ import org.biojava.bio.seq.*;
 
 import org.Biocorba.Seqcore.*;
 
+/**
+ * @author Matthew Pocock
+ * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A>
+ */
 public class SequenceDBAdapter implements SequenceDB {
   private PrimarySeqDB primarySeqDB;
   
@@ -17,6 +42,10 @@ public class SequenceDBAdapter implements SequenceDB {
   
   public SequenceDBAdapter(PrimarySeqDB primarySeqDB) {
     this.primarySeqDB = primarySeqDB;
+  }
+
+  public String getName() {
+    return getPrimarySeqDB().database_name();
   }
   
   public Sequence getSequence(String id)

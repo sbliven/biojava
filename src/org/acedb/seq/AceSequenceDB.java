@@ -29,11 +29,20 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 
 /**
+ * An implementation of SequenceDB that lets either an entire ACeDB database,
+ * or some sub-set of its sequences be viewed as a native BioJava sequence
+ * database.
+ *
  * @author Matthew Pocock
+ * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A>
  */
 
 public class AceSequenceDB implements SequenceDB {
   protected AceSet seqSet;
+  
+  public String getName() {
+    return seqSet.getName();
+  }
   
   public Sequence getSequence(String id) throws BioException {
     try {

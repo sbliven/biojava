@@ -11,23 +11,17 @@ public class PrimarySeqDBImpl
 extends UnknownImpl
 implements _PrimarySeqDB_Operations {
   private SequenceDB sequenceDB;
-  private String name;
   
   public SequenceDB getSequenceDB() {
     return sequenceDB;
   }
   
-  public String getName() {
-    return name;
-  }
-  
-  public PrimarySeqDBImpl(SequenceDB sequenceDB, String name) {
+  public PrimarySeqDBImpl(SequenceDB sequenceDB) {
     this.sequenceDB = sequenceDB;
-    this.name = name;
   }
   
   public String database_name(org.omg.CORBA.portable.ObjectImpl primarySeqDB) {
-    return name;
+    return getSequenceDB().getName();
   }
 
   public short database_version(org.omg.CORBA.portable.ObjectImpl primarySeqDB) {
@@ -46,7 +40,7 @@ implements _PrimarySeqDB_Operations {
   throws UnableToProcess {
     try {
       Sequence seq = getSequenceDB().getSequence(primary_id);
-      PrimarySeqImpl psi = new PrimarySeqImpl(seq, seq.getName(), seq.toString(), name + ":" + primary_id);
+      PrimarySeqImpl psi = new PrimarySeqImpl(seq, seq.getName(), seq.toString(), database_name(primarySeqDB) + ":" + primary_id);
       _PrimarySeq_Tie pst = new _PrimarySeq_Tie(psi);
       primarySeqDB._orb().connect(pst);
       return pst;

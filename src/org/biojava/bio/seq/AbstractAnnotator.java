@@ -30,12 +30,13 @@ import org.biojava.bio.symbol.*;
  * step for you.
  *
  * @author Matthew Pocock
+ * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A>
  */
 public abstract class AbstractAnnotator implements Annotator {
 
   public SequenceDB annotate(SequenceDB sdb)
         throws IllegalSymbolException, BioException {
-    HashSequenceDB hitDB = new HashSequenceDB(null);
+    HashSequenceDB hitDB = new HashSequenceDB();
 
     for(Iterator i = sdb.ids().iterator(); i.hasNext(); ) {
       String id = (String) i.next();

@@ -60,7 +60,7 @@ public class ServeAceAsCorba {
         System.out.println("\t" + i.next());
       }
       
-      SeqDBImpl seqDBImpl = new SeqDBImpl(seqDB, dbURL.toString());
+      SeqDBImpl seqDBImpl = new SeqDBImpl(seqDB);
       _SeqDB_Tie seqDBTie = new _SeqDB_Tie(seqDBImpl);
       ORB orb = ORB.init(new String[0], null);
       orb.connect(seqDBTie);

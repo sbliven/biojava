@@ -32,8 +32,16 @@ import org.biojava.bio.*;
  * database contains a finite number of sequences stoored under unique keys.
  *
  * @author Matthew Pocock
+ * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A>
  */
 public interface SequenceDB {
+  /**
+   * Get the name of this sequence database.
+   *
+   * @return the name of the sequence database, which may be null.
+   */
+  String getName();
+
   /**
    * Retrieve a single sequence by its id.
    *

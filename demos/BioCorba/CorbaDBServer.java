@@ -31,7 +31,9 @@ public class CorbaDBServer {
     
     // load it
     System.out.println("Loading fasta database: " + seqDBFile);
-    HashSequenceDB seqDB = new HashSequenceDB(HashSequenceDB.byURN);
+    HashSequenceDB seqDB = new HashSequenceDB(
+      HashSequenceDB.byURN, seqDBFile.toString()
+    );
     SequenceFormat sFormat = new FastaFormat();
     InputStream seqDBI = new FileInputStream(seqDBFile);
     SequenceIterator seqI = new StreamReader(seqDBI,
@@ -45,7 +47,7 @@ public class CorbaDBServer {
     }
     
     // serve it as a corba server
-    SeqDBImpl seqDBImpl = new SeqDBImpl(seqDB, seqDBFile.toString());
+    SeqDBImpl seqDBImpl = new SeqDBImpl(seqDB);
     _SeqDB_Tie seqDBTie = new _SeqDB_Tie(seqDBImpl);
     ORB orb = ORB.init(new String[0], null);
     orb.connect(seqDBTie);
