@@ -32,7 +32,7 @@ import org.xml.sax.helpers.*;
  * @author David Huen
  */
 public class BlastXMLParser
-    extends StAXFeatureHandlerMod
+    extends StAXFeatureHandler
 {
     boolean firstTime = true;
 
@@ -106,7 +106,30 @@ public class BlastXMLParser
         }
 
         // now invoke delegation
-        super.startElement(nsURI, localName, qName, attrs, dm);
+//        super.startElement(nsURI, localName, qName, attrs, dm);
+
+        level++;
+
+        // perform delegation
+        // we must delegate only on features that are directly attached.
+        // if I do not check that that's so, any element of a kind I delegate
+        // on will be detected any depth within unrecognized tags.
+        if (level == 1) {
+//        System.out.println("StaxFeaturehandler.startElement starting. localName: " + localName + " " + level);
+            for (int i = handlers.size() - 1; i >= 0; --i) {
+                Binding b = (Binding) handlers.get(i);
+                if (b.recognizer.filterStartElement(nsURI, localName, qName, attrs)) {
+                    dm.delegate(b.handlerFactory.getHandler(this));
+                    return;
+                }
+            }
+        }
+
+        // call the element specific handler now.
+        // remember that if we we have a delegation failure we pass here too!
+        if (level == 1) {
+            startElementHandler(nsURI, localName, qName, attrs);
+        }
     }
 
     public void endElementHandler(
