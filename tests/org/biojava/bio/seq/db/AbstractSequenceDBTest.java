@@ -82,6 +82,20 @@ public abstract class AbstractSequenceDBTest extends TestCase {
         Feature noTS = seq.createFeature(template);
         assertTrue(seq.countFeatures() == 1);
     }
+        
+    // This is a simple test that BioSQLSequenceDB failed.
+    public void testAddRemoveSequence() throws Exception {
+        String name = "dna_1";
+        assertTrue(!mSequenceDB.ids().contains(name));
+        mSequenceDB.addSequence(DNATools.createDNASequence("atgctgatgatgatg", name));
+        assertTrue(mSequenceDB.ids().contains(name));
+
+        Sequence seq = mSequenceDB.getSequence(name);
+        seq = null;
+
+        mSequenceDB.removeSequence(name);
+        assertTrue(!mSequenceDB.ids().contains(name));
+    }
  
 
     // A test that does a bit of feature editing
