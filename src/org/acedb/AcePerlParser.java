@@ -108,10 +108,19 @@ public class AcePerlParser {
       String s = t.nextToken();
       if(s.equals(",")) {
       } else if (s.startsWith("ty=>")) {
+        if(ty != null) {
+          throw new AceError("Resetting old ty value " + ty + " with " + s);
+        }
         ty = s.substring(4).trim();
 	    } else if (s.startsWith("va=>")) {
+        if(va != null) {
+          throw new AceError("Resetting old ty value " + va + " with " + s);
+        }
         va = Ace.encode(s.substring(4).trim());
 	    } else if (s.startsWith("cl=>")) {
+        if(ty != null) {
+          throw new AceError("Resetting old ty value " + cl + " with " + s);
+        }
         cl = s.substring(4).trim();
 	    } else if (s.equals("Pn=>")) {
         if (! t.nextToken().equals("[")) {
@@ -123,6 +132,9 @@ public class AcePerlParser {
         System.out.println("Constructing node with " + parent + ", " + ty + ", " + va + ", " + cl);
         obj = constructNode(parent, ty, va, cl);
         getChildren(obj, t);
+        ty = null;
+        va = null;
+        cl = null;
       } else /* { */ if (s.equals("}")) {
         if (obj != null) {
           return obj;
