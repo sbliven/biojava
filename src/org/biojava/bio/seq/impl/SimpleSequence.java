@@ -61,7 +61,7 @@ import org.biojava.utils.ChangeVetoException;
  * </p>
  *
  * <p>
- * By default, features attached to a SimpleSequence are 
+ * By default, features attached to a SimpleSequence are
  * realized as simple in-memory implementations using
  * <code>SimpleFeatureRealizer.DEFAULT</code>.  If you need
  * alternative feature realization behaviour, any
@@ -93,109 +93,109 @@ public class SimpleSequence
     private SymbolList symList;
 
     public Alphabet getAlphabet() {
-	return symList.getAlphabet();
+        return symList.getAlphabet();
     }
 
     public Iterator iterator() {
-	return symList.iterator();
+        return symList.iterator();
     }
 
     public int length() {
-	return symList.length();
+        return symList.length();
     }
 
     public String seqString() {
-	return symList.seqString();
+        return symList.seqString();
     }
 
     public String subStr(int start, int end) {
-	return symList.subStr(start, end);
+        return symList.subStr(start, end);
     }
 
     public SymbolList subList(int start, int end) {
-	return symList.subList(start, end);
+        return symList.subList(start, end);
     }
 
     public Symbol symbolAt(int index) {
-	return symList.symbolAt(index);
+        return symList.symbolAt(index);
     }
 
     public List toList() {
-	return symList.toList();
+        return symList.toList();
     }
 
     //
     // Extra stuff which is unique to Sequences
     //
-  
+
     private String urn;
     private String name;
     private Annotation annotation;
-    private SimpleSequenceFeatureHolder featureHolder;
+    private SimpleFeatureHolder featureHolder;
     private transient FeatureRealizer featureRealizer;
 
-    private void readObject(ObjectInputStream s)throws IOException, ClassNotFoundException{
-	s.defaultReadObject();
-	this.featureRealizer = FeatureImpl.DEFAULT;
-    }
+//    private void readObject(ObjectInputStream s)throws IOException, ClassNotFoundException{
+//        s.defaultReadObject();
+//        this.featureRealizer = FeatureImpl.DEFAULT;
+//    }
 
     protected SimpleFeatureHolder getFeatureHolder() {
         if(featureHolder == null) {
-            featureHolder = new SimpleSequenceFeatureHolder(FeatureFilter.top_level);
+            featureHolder = new SimpleFeatureHolder(FeatureFilter.top_level);
         }
         return featureHolder;
     }
-    
+
     protected boolean featureHolderAllocated() {
-	return featureHolder != null;
+        return featureHolder != null;
     }
 
     public String getURN() {
-	return urn;
+        return urn;
     }
-    
+
     /**
     *Provide the URN for this sequence
     */
-    
+
     public void setURN(String urn) {
-	this.urn = urn;
+        this.urn = urn;
     }
 
     public String getName() {
-	return name;
+        return name;
     }
-    
+
     /**
     *Assign a name to this sequence
     */
-    
+
     public void setName(String name) {
-	this.name = name;
+        this.name = name;
     }
 
     public Annotation getAnnotation() {
-	if(annotation == null)
-	    annotation = new SimpleAnnotation();
-	return annotation;
+        if(annotation == null)
+            annotation = new SimpleAnnotation();
+        return annotation;
     }
 
     public int countFeatures() {
-	if(featureHolderAllocated())
-	    return getFeatureHolder().countFeatures();
-	return 0;
+        if(featureHolderAllocated())
+            return getFeatureHolder().countFeatures();
+        return 0;
     }
 
     public Iterator features() {
-	if(featureHolderAllocated())
-	    return getFeatureHolder().features();
-	return Collections.EMPTY_LIST.iterator();
+        if(featureHolderAllocated())
+            return getFeatureHolder().features();
+        return Collections.EMPTY_LIST.iterator();
     }
 
     public FeatureHolder filter(FeatureFilter filter) {
         return getFeatureHolder().filter(filter);
     }
-    
+
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
         if(featureHolderAllocated()) {
             return getFeatureHolder().filter(ff, recurse);
@@ -210,22 +210,22 @@ public class SimpleSequence
         return false;
       }
     }
-    
+
     public Feature realizeFeature(FeatureHolder parent, Feature.Template template)
         throws BioException
     {
-	return featureRealizer.realizeFeature(this, parent, template);
+        return featureRealizer.realizeFeature(this, parent, template);
     }
 
     public Feature createFeature(Feature.Template template)
-	throws BioException, ChangeVetoException 
+        throws BioException, ChangeVetoException
     {
-	Feature f = realizeFeature(this, template);
-	SimpleFeatureHolder fh = this.getFeatureHolder();
-	fh.addFeature(f);
-	return f;
+        Feature f = realizeFeature(this, template);
+        SimpleFeatureHolder fh = this.getFeatureHolder();
+        fh.addFeature(f);
+        return f;
     }
-    
+
     public FeatureFilter getSchema() {
         return getFeatureHolder().getSchema();
     }
@@ -238,9 +238,9 @@ public class SimpleSequence
      */
 
     public Feature createFeature(FeatureHolder fh, Feature.Template template)
-	throws BioException, ChangeVetoException 
+        throws BioException, ChangeVetoException
     {
-	return fh.createFeature(template);
+        return fh.createFeature(template);
     }
 
     /**
@@ -271,12 +271,12 @@ public class SimpleSequence
      * @param annotation the annotation object to use or null
      */
     public SimpleSequence(SymbolList sym, String urn, String name, Annotation annotation) {
-	symList = sym;
-	
-	setURN(urn);
-	setName(name);
-	this.annotation = annotation;
-	this.featureRealizer = FeatureImpl.DEFAULT;
+        symList = sym;
+
+        setURN(urn);
+        setName(name);
+        this.annotation = annotation;
+        this.featureRealizer = FeatureImpl.DEFAULT;
     }
 
     /**
@@ -288,18 +288,18 @@ public class SimpleSequence
      * @param annotation the annotation object to use or null
      * @param realizer the FeatureRealizer implemetation to use when adding features
      */
-    public SimpleSequence(SymbolList sym, 
-			  String urn,
-			  String name,
-			  Annotation annotation,
-			  FeatureRealizer realizer) 
+    public SimpleSequence(SymbolList sym,
+                          String urn,
+                          String name,
+                          Annotation annotation,
+                          FeatureRealizer realizer)
     {
-	symList = sym;
-	
-	setURN(urn);
-	setName(name);
-	this.annotation = annotation;
-	this.featureRealizer = realizer;
+        symList = sym;
+
+        setURN(urn);
+        setName(name);
+        this.annotation = annotation;
+        this.featureRealizer = realizer;
     }
 
     //
@@ -307,15 +307,15 @@ public class SimpleSequence
     //
 
     private transient ChangeListener featureForwarder;
- 
+
     protected ChangeSupport getChangeSupport(ChangeType ct) {
       ChangeSupport changeSupport = super.getChangeSupport(ct);
-      
+
       if (featureForwarder == null && featureHolder != null) {
         featureForwarder = new FeatureForwarder();
         featureHolder.addChangeListener(featureForwarder, ChangeType.UNKNOWN);
       }
-      
+
       return changeSupport;
     }
 
@@ -325,19 +325,9 @@ public class SimpleSequence
       {
         getChangeSupport(cev.getType()).firePreChangeEvent(cev);
       }
-      
+
       public void postChange(ChangeEvent cev) {
         getChangeSupport(cev.getType()).firePostChangeEvent(cev);
       }
-    }
-    /**
-     * this class is implemented for serialization purposes all methods delegate to super
-     */
-    private class SimpleSequenceFeatureHolder extends SimpleFeatureHolder implements Serializable{
-        private static final long serialVersionUID = 12687044;
-        
-        public SimpleSequenceFeatureHolder(FeatureFilter schema) {
-            super(schema);
-        }
     }
 }

@@ -21,6 +21,7 @@
 
 package org.biojava.bio.seq;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -36,7 +37,7 @@ import org.biojava.utils.ListTools;
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public class SimpleFeatureHolder extends AbstractFeatureHolder {
+public class SimpleFeatureHolder extends AbstractFeatureHolder implements Serializable{
   /**
    * The child features.
    */
@@ -46,19 +47,19 @@ public class SimpleFeatureHolder extends AbstractFeatureHolder {
   /**
    * Construct a new SimpleFeatureHolder with a non-informative schema.
    */
-  
+
   public SimpleFeatureHolder() {
       this.schema = FeatureFilter.all;
   }
-  
+
   /**
    * Construct a new SimpleFeatureHolder with the specified schema.
    */
-   
+
   public SimpleFeatureHolder(FeatureFilter schema) {
       this.schema = schema;
   }
-  
+
   /**
    * Initialize features.
    */
@@ -72,7 +73,7 @@ public class SimpleFeatureHolder extends AbstractFeatureHolder {
   protected List getFeatures() {
     return features;
   }
-  
+
   public int countFeatures() {
     return features.size();
   }
@@ -120,11 +121,11 @@ public class SimpleFeatureHolder extends AbstractFeatureHolder {
       }
     }
   }
-  
+
   public boolean containsFeature(Feature f) {
     return features.contains(f);
   }
-  
+
   public FeatureFilter getSchema() {
       return schema;
   }

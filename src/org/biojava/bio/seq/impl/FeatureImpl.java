@@ -59,7 +59,7 @@ public class FeatureImpl {
         SimpleFeatureRealizer d  = new SimpleFeatureRealizer() {
             public Object writeReplace() {
                 try {
-                    return new StaticMemberPlaceHolder(SimpleFeatureRealizer.class.getField("DEFAULT"));
+                    return new StaticMemberPlaceHolder(FeatureImpl.class.getField("DEFAULT"));
                 } catch (NoSuchFieldException ex) {
                     throw new BioError(ex);
                 }

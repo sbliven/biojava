@@ -21,6 +21,7 @@
 
 package org.biojava.bio.seq.projection;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
 import org.biojava.bio.BioException;
@@ -52,9 +53,9 @@ import org.biojava.utils.*;
 
 public final class ProjectedFeatureHolder
         extends AbstractFeatureHolder
-        implements FeatureHolder {
+        implements FeatureHolder, Serializable {
     private final ProjectionContext context;
-    private final ChangeListener underlyingFeaturesChange;
+    private transient final ChangeListener underlyingFeaturesChange;
     private FeatureHolder topLevelFeatures;
 
   // don't ask why we need an initializer - blame it on the statics
@@ -132,9 +133,9 @@ public final class ProjectedFeatureHolder
 
     public void removeFeature(Feature dyingChild)
         throws ChangeVetoException, BioException
-	{
+        {
     context.removeFeature(dyingChild);
-	}
+        }
 
     public FeatureFilter getSchema() {
         return getTopLevelFeatures().getSchema();

@@ -21,6 +21,7 @@
 
 package org.biojava.bio.seq;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -42,7 +43,9 @@ import org.biojava.utils.ChangeVetoException;
  * @author Matthew Pocock
  */
 
-public class MergeFeatureHolder extends AbstractFeatureHolder {
+public class MergeFeatureHolder extends AbstractFeatureHolder
+  implements Serializable{
+
     private List featureHolders;
 
     /**
@@ -76,7 +79,7 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
      * </p>
      */
 
-    public void addFeatureHolder(FeatureHolder fh) 
+    public void addFeatureHolder(FeatureHolder fh)
         throws ChangeVetoException
     {
         if(!hasListeners()) {
@@ -97,7 +100,7 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
      * are merged.
      */
 
-     public void removeFeatureHolder(FeatureHolder fh) 
+     public void removeFeatureHolder(FeatureHolder fh)
      throws ChangeVetoException
      {
        if(!hasListeners()) {
@@ -120,7 +123,7 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
         }
         return fc;
     }
-    
+
     public boolean containsFeature(Feature f) {
         for (Iterator i = featureHolders.iterator(); i.hasNext(); ) {
             FeatureHolder subFH = (FeatureHolder) i.next();
@@ -132,7 +135,7 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
                 }
             }
         }
-      
+
         return false;
     }
 
@@ -159,20 +162,20 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
             FeatureFilter mf = fh.getSchema();
             if (recurse && !FilterUtils.areProperSubset(mf, FeatureFilter.leaf)) {
                 if (FilterUtils.areDisjoint(new FeatureFilter.Or(mf, new FeatureFilter.ByAncestor(mf)),
-                                            ff)) 
+                                            ff))
                 {
                     continue;
-                }            
+                }
             } else {
                 if (FilterUtils.areDisjoint(mf, ff)) {
                     continue;
                 }
             }
-            
+
             FeatureHolder filterResult = fh.filter(ff, recurse);
             results.add(filterResult);
         }
-        
+
         if (results.size() == 0) {
             return FeatureHolder.EMPTY_FEATURE_HOLDER;
         } else if (results.size() == 1) {
@@ -189,41 +192,41 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
         }
         return FilterUtils.or(filters);
     }
-    
+
     private class MFHIterator implements Iterator {
-	private Iterator fhIterator;
-	private Iterator fIterator;
+        private Iterator fhIterator;
+        private Iterator fIterator;
 
-	public MFHIterator() {
-	    fhIterator = featureHolders.iterator();
-	    if (fhIterator.hasNext())
-		fIterator = ((FeatureHolder) fhIterator.next()).features();
-	    else
-		fIterator = Collections.EMPTY_SET.iterator();
-	}
+        public MFHIterator() {
+            fhIterator = featureHolders.iterator();
+            if (fhIterator.hasNext())
+                fIterator = ((FeatureHolder) fhIterator.next()).features();
+            else
+                fIterator = Collections.EMPTY_SET.iterator();
+        }
 
-	public boolean hasNext() {
-	    if (fIterator.hasNext())
-		return true;
-	    if (fhIterator.hasNext()) {
-		fIterator = ((FeatureHolder) fhIterator.next()).features();
-		return hasNext();
-	    }
-	    return false;
-	}
+        public boolean hasNext() {
+            if (fIterator.hasNext())
+                return true;
+            if (fhIterator.hasNext()) {
+                fIterator = ((FeatureHolder) fhIterator.next()).features();
+                return hasNext();
+            }
+            return false;
+        }
 
-	public Object next() {
-	    if (fIterator.hasNext())
-		return fIterator.next();
-	    if (fhIterator.hasNext()) {
-		fIterator = ((FeatureHolder) fhIterator.next()).features();
-		return next();
-	    }
-	    throw new NoSuchElementException();
-	}
+        public Object next() {
+            if (fIterator.hasNext())
+                return fIterator.next();
+            if (fhIterator.hasNext()) {
+                fIterator = ((FeatureHolder) fhIterator.next()).features();
+                return next();
+            }
+            throw new NoSuchElementException();
+        }
 
-	public void remove() {
-	    throw new UnsupportedOperationException();
-	}
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
     }
 }

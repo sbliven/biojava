@@ -31,10 +31,16 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.OverlayAnnotation;
-import org.biojava.bio.seq.impl.FeatureImpl;
-import org.biojava.bio.seq.*;
-import org.biojava.bio.seq.projection.ReparentContext;
+import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.FeatureFilter;
+import org.biojava.bio.seq.FeatureHolder;
+import org.biojava.bio.seq.FeatureRealizer;
+import org.biojava.bio.seq.MergeFeatureHolder;
+import org.biojava.bio.seq.RealizingFeatureHolder;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.seq.projection.ProjectedFeatureHolder;
+import org.biojava.bio.seq.projection.ReparentContext;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.Edit;
 import org.biojava.bio.symbol.Location;
@@ -74,22 +80,8 @@ public class ViewSequence
     /**
      * FeatureHolder support
      */
-    private ViewSeqMergeFeatureHolder exposedFeatures;
-    /**
-     * For serialization support, all methods delegated to super
-     */
-    private class ViewSeqMergeFeatureHolder extends MergeFeatureHolder implements Serializable {
-        private static final long serialVersionUID = 68065743;
-    }
-
-
-    private ViewSeqSimpleFeatureHolder addedFeatures;
-    /**
-     * For serialization support, all methods delegated to super
-     */
-    private class ViewSeqSimpleFeatureHolder extends SimpleFeatureHolder implements Serializable {
-        private static final long serialVersionUID = 38475932;
-    }
+    private MergeFeatureHolder exposedFeatures;
+    private SimpleFeatureHolder addedFeatures;
 
     /**
      * IDs
@@ -121,8 +113,8 @@ public class ViewSequence
     this.name = name;
 
     seqDelegate = seq;
-    addedFeatures = new ViewSeqSimpleFeatureHolder();
-    exposedFeatures = new ViewSeqMergeFeatureHolder();
+    addedFeatures = new SimpleFeatureHolder();
+    exposedFeatures = new MergeFeatureHolder();
     try {
       exposedFeatures.addFeatureHolder(new ProjectedFeatureHolder(
               new ReparentContext(this, seqDelegate)));

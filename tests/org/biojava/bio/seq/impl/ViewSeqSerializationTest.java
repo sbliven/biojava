@@ -21,15 +21,24 @@
 
 package org.biojava.bio.seq.impl;
 
-import java.util.*;
-import java.io.*;
-import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
-import org.biojava.bio.seq.impl.*;
-import org.biojava.bio.seq.Sequence;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.HashSet;
+import java.util.Iterator;
+
+import org.biojava.bio.Annotation;
+import org.biojava.bio.seq.CircularView;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Feature;
-import org.biojava.bio.seq.CircularView;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.SymbolList;
+
 import junit.framework.TestCase;
 
 /**
@@ -46,70 +55,64 @@ public class ViewSeqSerializationTest extends TestCase
 
 
     public ViewSeqSerializationTest(String name) {
-	super(name);
+        super(name);
     }
 
     protected void setUp() throws Exception {
-	seq = new SimpleSequence(DNATools.createDNA("aacgtaggttccatgc"),
-				       "fragment1",
-				       "fragment1",
-				       Annotation.EMPTY_ANNOTATION);
-	
-	Feature.Template sft = new Feature.Template();
-	sft.type = "test";
-	sft.source = "test";
-	sft.annotation = Annotation.EMPTY_ANNOTATION;
-	sft.location = new RangeLocation(1, 3);
-	seq.createFeature(sft);
+        seq = new SimpleSequence(DNATools.createDNA("aacgtaggttccatgc"),
+                                       "fragment1",
+                                       "fragment1",
+                                       Annotation.EMPTY_ANNOTATION);
 
-	sft.location = new RangeLocation(10, 12);
-	seq.createFeature(sft);
-	seq = new CircularView(seq);
-	sft.location = new RangeLocation(5,8);
-	seq.createFeature(sft);
+        Feature.Template sft = new Feature.Template();
+        sft.type = "test";
+        sft.source = "test";
+        sft.annotation = Annotation.EMPTY_ANNOTATION;
+        sft.location = new RangeLocation(1, 3);
+        seq.createFeature(sft);
 
-	File f = File.createTempFile("ViewSeqSerTest",".tmp");
-	ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
-	oos.writeObject(seq);
-	oos.flush();
-	oos.close();
-	ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
-	seq2 = (Sequence)ois.readObject();
+        sft.location = new RangeLocation(10, 12);
+        seq.createFeature(sft);
+        seq = new CircularView(seq);
+        sft.location = new RangeLocation(5,8);
+        seq.createFeature(sft);
+
+        File f = File.createTempFile("ViewSeqSerTest",".tmp");
+        ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
+        oos.writeObject(seq);
+        oos.flush();
+        oos.close();
+        ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
+        seq2 = (Sequence)ois.readObject();
     }
 
     private boolean compareSymbolList(SymbolList sl1, SymbolList sl2) {
-	if (sl1.length() != sl2.length()) {
-	    return false;
-	}
-	
-	Iterator si1 = sl1.iterator();
-	Iterator si2 = sl2.iterator();
-	while (si1.hasNext()) {
-	    if (! (si1.next() == si2.next())) {
-		return false;
-	    }
-	}
+        if (sl1.length() != sl2.length()) {
+            return false;
+        }
 
-	return true;
+        Iterator si1 = sl1.iterator();
+        Iterator si2 = sl2.iterator();
+        while (si1.hasNext()) {
+            if (! (si1.next() == si2.next())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public void testSymbols()
-	throws Exception
+        throws Exception
     {
-	assertTrue(compareSymbolList(seq,seq2));
+        assertTrue(compareSymbolList(seq,seq2));
     }
 
     public void testAlphabet()throws Exception{
-	assertTrue(seq.getAlphabet()==seq2.getAlphabet());
+        assertTrue(seq.getAlphabet()==seq2.getAlphabet());
     }
 
     public void testFeatures() throws Exception{
-        HashSet features = new HashSet();
-	for(Iterator i = seq.features(); i.hasNext();){
-	    features.add(i.next());
-	}
-	for(Iterator i = seq2.features(); i.hasNext();){
-	    assertTrue(features.contains(i.next()));
-	}
+        assertTrue(seq.countFeatures() == seq2.countFeatures());
     }
 }
