@@ -71,7 +71,7 @@ class RagbagParsedCachedSequence extends RagbagCachedSequence
 
     // screen files without instantiating sequence object
     try {
-      RagbagSequenceItf seq = new RagbagSequence("", "", filterFactory.wrap(new IdleSequenceBuilder()));
+      RagbagSequenceItf seq = new RagbagSequence("", "", filterFactory.wrap(new RagbagIdleSequenceBuilder()));
  
       seq.addSequenceFile(new File(seqFilename));
  
