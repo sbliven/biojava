@@ -38,7 +38,7 @@ public class SimpleSymbol implements Symbol, Serializable {
   private String name;
   private Alphabet matches;
   
-  protected ChangeSupport changeSupport = null;
+  protected transient ChangeSupport changeSupport = null;
   protected Annotatable.AnnotationForwarder annotationForwarder = null;
   
   protected void generateChangeSupport(ChangeType ct) {

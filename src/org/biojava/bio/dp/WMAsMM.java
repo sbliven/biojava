@@ -45,7 +45,7 @@ public class WMAsMM implements MarkovModel, Serializable {
   private final Map transTo;
   private final Map transWeights;
   
-  private final ChangeSupport changeSupport;
+  private final transient ChangeSupport changeSupport;
   private final MarkovModel.DistributionForwarder distForwarder;
   
   public Alphabet emissionAlphabet() {

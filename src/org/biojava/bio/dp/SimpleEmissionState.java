@@ -36,7 +36,7 @@ implements EmissionState, Serializable {
   private Annotation ann;
   private int [] advance;
   private Alphabet matches;
-  private ChangeSupport changeSupport = null;
+  private transient ChangeSupport changeSupport = null;
   
   public final Annotation getAnnotation() {
     return this.ann;

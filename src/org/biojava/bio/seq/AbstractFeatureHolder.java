@@ -35,7 +35,7 @@ import org.biojava.bio.*;
  * @author Matthew Pocock
  */
 public abstract class AbstractFeatureHolder implements FeatureHolder {
-  protected ChangeSupport changeSupport = null;
+  protected transient ChangeSupport changeSupport = null;
   
   protected void generateChangeSupport(ChangeType changeType) {
     if(changeSupport == null) {

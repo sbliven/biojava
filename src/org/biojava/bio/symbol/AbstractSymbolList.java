@@ -52,7 +52,7 @@ import org.biojava.bio.*;
  */
 
 public abstract class AbstractSymbolList implements SymbolList {
-  protected ChangeSupport changeSupport = null;
+  protected transient ChangeSupport changeSupport = null;
   
   protected AbstractSymbolList() {
   }
@@ -206,7 +206,7 @@ that will return the symbols from
    */
   private class SubList implements SymbolList, Serializable {
     private int start, end;
-    private ChangeSupport changeSupport = null;
+    private transient ChangeSupport changeSupport = null;
     private EditTranslater editTranslater = null;
     private Annotatable.AnnotationForwarder annotationForwarder = null;
 

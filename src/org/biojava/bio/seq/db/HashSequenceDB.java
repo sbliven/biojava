@@ -51,7 +51,7 @@ public class HashSequenceDB implements SequenceDB, Serializable {
    */
   private String name;
 
-  protected ChangeSupport changeSupport = null;
+  protected transient ChangeSupport changeSupport = null;
   
   /**
    * Initialize sequenceByID.

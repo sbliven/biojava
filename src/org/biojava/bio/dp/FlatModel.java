@@ -43,7 +43,7 @@ class FlatModel implements MarkovModel, Serializable {
   private final MarkovModel source;
   private final MarkovModel delegate;
   
-  protected ChangeSupport changeSupport;
+  protected transient ChangeSupport changeSupport;
   
   protected void generateChangeSupport(ChangeType ct) {
     if(changeSupport == null) {
@@ -306,7 +306,7 @@ class FlatModel implements MarkovModel, Serializable {
     private final String extra;
     private final Alphabet matches;
     
-    protected ChangeSupport changeSupport = null;
+    protected transient ChangeSupport changeSupport = null;
 
     public char getToken() {
       return wrapped.getToken();

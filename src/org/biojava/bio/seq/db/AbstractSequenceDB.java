@@ -36,7 +36,7 @@ import org.biojava.bio.seq.*;
  * @author Matthew Pocock
  */
 public abstract class AbstractSequenceDB implements SequenceDB {
-  protected ChangeSupport changeSupport = null;
+  protected transient ChangeSupport changeSupport = null;
 
   protected void generateChangeSupport(ChangeType changeType) {
     if(changeSupport == null) {

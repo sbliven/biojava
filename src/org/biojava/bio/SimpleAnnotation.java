@@ -39,7 +39,7 @@ public class SimpleAnnotation implements Annotation, Serializable {
   /**
    * The object to do the hard work of informing others of changes.
    */
-  protected ChangeSupport changeSupport = null;
+  protected transient ChangeSupport changeSupport = null;
   
   /**
    * The properties map.

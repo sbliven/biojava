@@ -47,7 +47,7 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
   private String name;
   private Annotation annotation;
   
-  protected ChangeSupport changeSupport = null;
+  protected transient ChangeSupport changeSupport = null;
   protected Annotatable.AnnotationForwarder annotationForwarder = null;
 
   /**

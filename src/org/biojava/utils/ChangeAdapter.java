@@ -30,7 +30,7 @@ package org.biojava.utils;
  */
 public abstract class ChangeAdapter implements ChangeListener {
   private final Object source;
-  private final ChangeSupport changeSupport;
+  private final transient ChangeSupport changeSupport;
   
   public ChangeAdapter(Object source, ChangeSupport changeSupport) {
     this.source = source;
