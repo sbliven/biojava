@@ -18,8 +18,13 @@ public class GFFEntrySet {
   
   public GFFEntrySet(GFFParser parser, BufferedReader bReader)
   throws IOException, BioException {
+    this(parser, bReader, GFFRecordFilter.ACCEPT_ALL);
+  }
+  
+  public GFFEntrySet(GFFParser parser, BufferedReader bReader, GFFRecordFilter filter)
+  throws IOException, BioException {
     this();
-    parser.parse(bReader, new DocumentHandler());
+    parser.parse(bReader, new DocumentHandler(), filter);
   }
   
   public Iterator lineIterator() {
@@ -32,6 +37,10 @@ public class GFFEntrySet {
   
   public void add(GFFRecord record) {
     lines.add(record);
+  }
+  
+  public int size() {
+    return lines.size();
   }
   
   public Annotator getAnnotator() {
@@ -72,6 +81,21 @@ public class GFFEntrySet {
         return addedAny;
       }
     };
+  }
+  
+  public GFFEntrySet filter(GFFRecordFilter filter) {
+    GFFEntrySet accepted = new GFFEntrySet();
+    for(Iterator i = lineIterator(); i.hasNext(); ) {
+      Object o = i.next();
+      if(o instanceof GFFRecord) {
+        GFFRecord record = (GFFRecord) o;
+        if(filter.accept(record)) {
+          accepted.add(record);
+        }
+      }
+    }
+    
+    return accepted;
   }
   
   private class DocumentHandler implements GFFDocumentHandler {

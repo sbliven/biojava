@@ -6,7 +6,7 @@ import java.io.*;
 import org.biojava.bio.*;
 
 public class GFFParser {
-  public void parse(BufferedReader bReader, GFFDocumentHandler handler)
+  public void parse(BufferedReader bReader, GFFDocumentHandler handler, GFFRecordFilter filter)
   throws IOException, BioException {
     handler.startDocument();
     ArrayList aList = new ArrayList();
@@ -35,7 +35,10 @@ public class GFFParser {
             rest = rest.substring(0, ci);
           }
         }
-        handler.recordLine(createRecord(handler, aList, rest, comment));
+        GFFRecord record = createRecord(handler, aList, rest, comment);
+        if(filter.accept(record)) {
+          handler.recordLine(record);
+        }
       }
     }
     handler.endDocument();
