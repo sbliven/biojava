@@ -94,5 +94,38 @@ public class OntologyTest extends TestCase {
       
       onto.getTriples(null, null, null);
     }
+    
+    public void testCoreISA()
+    throws OntologyException {
+      Ontology onto = OntoTools.getCoreOntology();
+      
+      doIsaTest(OntoTools.IS_A, OntoTools.IS_A, true);
+      doIsaTest(OntoTools.HAS_A, OntoTools.IS_A, false);
+      doIsaTest(OntoTools.RELATION, OntoTools.ANY, true);
+      doIsaTest(OntoTools.REFLEXIVE, OntoTools.RELATION, true);
+      doIsaTest(OntoTools.EQUIVALENCE, OntoTools.REFLEXIVE, true);
+      doIsaTest(OntoTools.EQUIVALENCE, OntoTools.RELATION, true);
+      doIsaTest(OntoTools.EQUIVALENCE, OntoTools.ANY, true);
+      doIsaTest(OntoTools.EQUIVALENCE, OntoTools.PARTIAL_ORDER, true);
+    }
+    
+    private void doIsaTest(Term t1, Term t2, boolean yesno)
+    throws OntologyException {
+      boolean res = OntoTools.isa(t1, t2);
+      assertEquals(
+        "Terms: " + t1 + " , " + t2,
+        yesno, res
+      );
+    }
+    
+    public void testSimpleISA()
+    throws OntologyException{
+      Ontology onto = OntoTools.getDefaultFactory().createOntology(
+        "is-a tester",
+        "Lets just get this is-a relationship stuff tested across ontologies"
+      );
+      
+      
+    }
 }
 

@@ -19,7 +19,11 @@ public final class OntoTools {
   public static final Term HAS_A;
   public static final Term ANY;
   public static final Term REMOTE_TERM;
-  public static final Term TUPLE_TERM;
+  public static final Term TRIPLE_TERM;
+  public static final Term RELATION;
+  public static final Term REFLEXIVE;
+  public static final Term EQUIVALENCE;
+  public static final Term PARTIAL_ORDER;
   
   static {
     DEFAULT_FACTORY = new OntologyFactory() {
@@ -44,7 +48,11 @@ public final class OntoTools {
       HAS_A = CORE_ONTOLOGY.getTermByName("has-a");
       ANY = CORE_ONTOLOGY.getTermByName("any");
       REMOTE_TERM = CORE_ONTOLOGY.getTermByName("remote-term");
-      TUPLE_TERM = CORE_ONTOLOGY.getTermByName("tuple-term");
+      TRIPLE_TERM = CORE_ONTOLOGY.getTermByName("triple-term");
+      RELATION = CORE_ONTOLOGY.getTermByName("relation");
+      REFLEXIVE = CORE_ONTOLOGY.getTermByName("reflexive");
+      EQUIVALENCE = CORE_ONTOLOGY.getTermByName("equivalence");
+      PARTIAL_ORDER = CORE_ONTOLOGY.getTermByName("partial-order");
     } catch (Exception e) {
       throw new BioError(e, "Could not initialize OntoTools");
     }
@@ -65,6 +73,14 @@ public final class OntoTools {
    */
   public static Ontology getCoreOntology() {
     return CORE_ONTOLOGY;
+  }
+  
+  public static OntologyFactory getDefaultFactory() {
+    return DEFAULT_FACTORY;
+  }
+  
+  public OntologyOps getDefaultOps() {
+    return DEFAULT_OPS;
   }
   
   /**
@@ -119,6 +135,43 @@ public final class OntoTools {
     
     public boolean isa(Term subject, Term object)
     throws OntologyException {
+      if(subject.getOntology() != object.getOntology()) {
+        throw new IllegalArgumentException(
+          "isa must be called with two terms from the same ontology: " +
+          subject.toString() + " , " + object.toString()
+        );
+      }
+      
+      Set visited = new HashSet();
+      
+      return recurseIsa(subject, object, visited);
+    }
+    
+    private boolean recurseIsa(Term subject, Term object, Set visited) {
+      System.out.println("Checking " + subject + " and " + object);
+      if(subject == object) {
+        System.out.println("equal");
+        return true;
+      }
+      
+      if(visited.contains(subject)) {
+        System.out.println("seen before");
+        return false;
+      }
+      
+      visited.add(subject);
+      
+      Set trips = subject.getOntology().getTriples(subject, null, IS_A);
+      
+      for(Iterator i = trips.iterator(); i.hasNext(); ) {
+        Triple trip = (Triple) i.next();
+        Term tobj = trip.getObject();
+        
+        if(recurseIsa(tobj, object, visited)) {
+          return true;
+        }
+      }
+      
       return false;
     }
   }
