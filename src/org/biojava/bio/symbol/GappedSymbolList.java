@@ -671,4 +671,50 @@ extends AbstractSymbolList implements Serializable {
         " view=" + viewStart + "," + viewEnd;
     }
   }
+
+    /**
+     * Translate a Location onto the gapped view, splitting blocks if necessary
+     *
+     * @since 1.3
+     */
+
+    public Location locationToGapped(Location l) {
+	if (l.isContiguous()) {
+	    return blockToGapped(l);
+	} else {
+	    List lblocks = new ArrayList();
+	    for (Iterator i = l.blockIterator(); i.hasNext(); ) {
+		lblocks.add(blockToGapped((Location) i.next()));
+	    }
+	    return LocationTools.union(lblocks);
+	}
+    }
+
+    private Location blockToGapped(Location l) {
+	int start = l.getMin();
+	int end = l.getMax();
+
+	List lblocks = new ArrayList();
+
+	while (start <= end) {
+	    int containingBlockIdx = findSourceBlock(start);
+	    Block containingBlock = (Block) blocks.get(containingBlockIdx);
+	    int gbstart = start - containingBlock.sourceStart + containingBlock.viewStart;
+	    int gbend = Math.min(end - start + gbstart, containingBlock.viewEnd);
+	    lblocks.add(new RangeLocation(gbstart, gbend));
+	    start = gbend + 1;
+	}
+
+	return LocationTools.union(lblocks);
+    }
+
+    /**
+     * Return the underlying (ungapped) SymbolList.
+     *
+     * @since 1.3
+     */
+
+    public SymbolList getSourceSymbolList() {
+	return source;
+    }
 }
