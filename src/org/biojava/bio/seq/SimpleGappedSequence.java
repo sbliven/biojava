@@ -43,7 +43,7 @@ implements GappedSequence {
   private Sequence sequence;
   
   private MergeFeatureHolder features;
-  private FeatureHolder localFeatures;
+  private SimpleFeatureHolder localFeatures;
   private FeatureHolder projectedFeatures;
   
   private boolean createOnUnderlying;
@@ -107,7 +107,7 @@ implements GappedSequence {
         return FeatureHolder.EMPTY_FEATURE_HOLDER;
       }
       
-      public Feature createFeature(Feature f, Feature.Template templ)
+      public Feature createFeature(Feature.Template templ)
       throws ChangeVetoException, BioException
       {
         templ.location = gappedToLocation(templ.location);
@@ -172,10 +172,13 @@ implements GappedSequence {
   public Feature createFeature(Feature.Template templ)
   throws ChangeVetoException, BioException
   {
+    getFeatures();
     if(createOnUnderlying) {
       return projectedFeatures.createFeature(templ);
     } else {
-      return localFeatures.createFeature(templ);
+      Feature f = FeatureImpl.DEFAULT.realizeFeature(this, this, templ);
+      localFeatures.addFeature(f);
+      return f;
     }
   }
 }

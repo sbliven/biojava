@@ -619,9 +619,13 @@ implements GappedSymbolList, Serializable {
       
       if(startBlockI < 0) { // in a gap
         int sb = -startBlockI - 1;
-        Block startBlock = (Block) blocks.get(sb);
+        if(sb == blocks.size()) {
+          start = Integer.MAX_VALUE;
+        } else {
+          Block startBlock = (Block) blocks.get(sb);
         
-        start = startBlock.sourceStart;
+          start = startBlock.sourceStart;
+        }
       } else {
         Block startBlock = (Block) blocks.get(startBlockI);
         start = start - startBlock.viewStart + startBlock.sourceStart;
@@ -629,9 +633,13 @@ implements GappedSymbolList, Serializable {
       
       if(endBlockI < 0) { // in a gap
         int eb = -endBlockI - 1;
-        Block endBlock = (Block) blocks.get(eb - 1);
+        if(eb == 0) {
+          end = Integer.MIN_VALUE;
+        } else {
+          Block endBlock = (Block) blocks.get(eb - 1);
         
-        end = endBlock.sourceEnd;
+          end = endBlock.sourceEnd;
+        }
       } else {
         Block endBlock = (Block) blocks.get(endBlockI);
         end = end - endBlock.viewEnd + endBlock.sourceEnd;

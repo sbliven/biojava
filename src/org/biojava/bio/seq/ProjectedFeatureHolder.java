@@ -179,7 +179,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
     }
     
     public Feature createFeature(Feature.Template templ) 
-	        throws ChangeVetoException
+	        throws ChangeVetoException, BioException
     {
         throw new ChangeVetoException("Can't create features in this projection");
     }

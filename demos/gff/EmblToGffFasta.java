@@ -79,7 +79,20 @@ public class EmblToGffFasta {
         
       while(seqI.hasNext()) {
         Sequence seq = seqI.nextSequence();
-        String de = (String) seq.getAnnotation().getProperty("DE");
+        String de;
+        Object desc = seq.getAnnotation().getProperty("DE");
+        if(desc instanceof String) {
+          de = (String) desc;
+        } else {
+          de = null;
+          for(Iterator i = ((Collection) desc).iterator(); i.hasNext(); ) {
+            if(de == null) {
+              de = i.next().toString();
+            } else {
+              de = de + " " + i.next().toString();
+            }
+          }
+        }
         seq.getAnnotation().setProperty(FastaFormat.PROPERTY_DESCRIPTIONLINE, de);
         fFormat.writeSequence(seq, new PrintStream(fastaOut));
         seqsAsGFF.processSequence(seq, writer);
