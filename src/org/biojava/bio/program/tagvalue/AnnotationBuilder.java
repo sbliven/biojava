@@ -6,9 +6,12 @@ import org.biojava.bio.*;
 import org.biojava.utils.*;
 
 /**
+ * <p>
  * Builds an Annotation tree from TagValue events using an AnnotationType to
  * work out which fields are of what type.
+ * </p>
  *
+ * @since 1.2
  * @author Matthew pocock
  */
 public class AnnotationBuilder
@@ -18,11 +21,42 @@ public class AnnotationBuilder
   private AnnotationType type;
   private Annotation last;
   
+  /**
+   * <p>
+   * Make a new AnnotationBuilder that will build Annotation instances of a
+   * given type.
+   * </p>
+   *
+   * <p>
+   * The type is used to provide appropreate accessors for properties. As tag
+   * -value events stream through this TagValueListener, they will be matched
+   * against the properties of the annotation type. As sub-trees of events are
+   * pushed, child annotation bundles will be pushed into the apropreate
+   * properties. If any of the tag-value events are of a type that are not
+   * accepted by the annoataion type, a ClassCastException will be thrown.
+   * </p>
+   *
+   * @param type  the AnnotationType stating what will be built and how
+   * @throws ClassCastException if any of the tag-value events are of
+   *         inapropreate type
+   */
   public AnnotationBuilder(AnnotationType type) {
     this.type = type;
     this.annotationStack = new ArrayList();
   }
   
+  /**
+   * <p>
+   * Get the last complete annotation built.
+   * </p>
+   *
+   * <p>
+   * The value of this is undefined before the first annotation has been built
+   * and during the parsing of an event stream.
+   * </p>
+   *
+   * @return the Annotation that was last built
+   */
   public Annotation getLast() {
     return last;
   }

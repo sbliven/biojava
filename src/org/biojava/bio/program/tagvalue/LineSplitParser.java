@@ -5,11 +5,46 @@ import java.util.*;
 
 import org.biojava.utils.ParserException;
 
+/**
+ * <p>
+ * A parser that splits a line into tag/value at a given column number. The
+ * GENBANK and EMBL constants are parsers pre-configured for genbank and embl
+ * style files respectively.
+ * </p>
+ *
+ * <p>
+ * There are many properties of the parser that can be set to change how lines
+ * are split, and how the tag and value is produced from that split.
+ * <ul>
+ * <li>endOfRecord - string starting lines that mark record boundaries
+ * e.g. "//"</li>
+ * <li>splitOffset - column index of the first character of the value, and the
+ * length of the raw tag e.g. 5 for embl files</li>
+ * <li>trimTag - trim white-space from tags</li>
+ * <li>trimValue - trim white-space from values</li>
+ * <li>continueOnEmptyTag - if the tag is empty, use the previous tag e.g. this
+ * is true for GENBANK files and fase for EMBL files</li>
+ * <li>mergeSameTag - if two consecutive tags have the same value, consider
+ * their values to be a continuation of a single value so don't fire start/end
+ * tag events e.g. true for EMBL</li>
+ * </ul>
+ * </p>
+ *
+ * @author Matthew Pocock
+ * @since 1.2
+ */
 public class LineSplitParser
   implements
     TagValueParser
 {
+  /**
+   * A LineSplitParser pre-configured to process EMBL-stye flat files.
+   */
   public static final LineSplitParser EMBL;
+
+  /**
+   * A LineSplitParser pre-configured to process GENBANK-stye flat files.
+   */
   public static final LineSplitParser GENBANK;
   
   static {
@@ -46,49 +81,115 @@ public class LineSplitParser
   
   public LineSplitParser() {}
   
+  /**
+   * Set the string indicating that a record has ended.
+   *
+   * @param endOfRecord the new String delimiting records
+   */
   public void setEndOfRecord(String endOfRecord) {
     this.endOfRecord = endOfRecord;
   }
   
+  /**
+   * Get the current string indicating that a record has ended.
+   *
+   * @return the current string delimiting records.
+   */
   public String getEndOfRecord() {
     return endOfRecord;
   }
   
+  /**
+   * Set the offset to split lines at.
+   *
+   * @param splitOffset the new offset to split at
+   */
   public void setSplitOffset(int splitOffset) {
     this.splitOffset = splitOffset;
   }
   
+  /**
+   * Get the current offset at which lines are split.
+   *
+   * @return the offset to split at
+   */
   public int getSplitOffset() {
     return splitOffset;
   }
   
+  /**
+   * Enable or dissable trimming of tags.
+   *
+   * @param trimTag  true if tags should be trimmed, otherwise false
+   */
   public void setTrimTag(boolean trimTag) {
     this.trimTag = trimTag;
   }
   
+  /**
+   * See if tag trimming is enabled.
+   *
+   * @return true if tags are trimmed, otherwise false
+   */
   public boolean getTrimTag() {
     return trimTag;
   }
+  
+  /**
+   * Enable or dissable trimming of values.
+   *
+   * @param trimValue  true if values should be trimmed, otherwise false
+   */
   public void setTrimValue(boolean trimValue) {
     this.trimValue = trimValue;
   }
   
+  /**
+   * See if value trimming is enabled.
+   *
+   * @return true if values are trimmed, otherwise false
+   */
   public boolean getTrimValue() {
     return trimValue;
   }
   
+  /**
+   * Chose wether to treat empty tags as a continuation of previous tags or as a
+   * new tag with the value of the empty string.
+   *
+   * @param continueOnEmptyTag true to enable empty tags to be treated as a
+   *        coninuation of the previous tag, false otherwise
+   */
   public void setContinueOnEmptyTag(boolean continueOnEmptyTag) {
     this.continueOnEmptyTag = continueOnEmptyTag;
   }
   
+  /**
+   * See if empty tags are treated as a continuation of previous tags or as a
+   * new tag with the value of the empty string.
+   *
+   * @return true if continuation is enabled, false otherwise
+   */
   public boolean getContinueOnEmptyTag() {
     return continueOnEmptyTag;
   }
   
+  /**
+   * Enable or dissable treating runs of identical tags as a single tag start
+   * event with multiple values or each as a sepreate tag start, value, and tag
+   * end.
+   *
+   * @param mergeSameTag true if tags should be merged, false otherwise
+   */
   public void setMergeSameTag(boolean mergeSameTag) {
     this.mergeSameTag = mergeSameTag;
   }
   
+  /**
+   * See if tags are being merged.
+   *
+   * @return true if merging is enabled, false otherwise
+   */
   public boolean getMergeSameTag() {
     return mergeSameTag;
   }

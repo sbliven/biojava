@@ -6,9 +6,22 @@ import org.biojava.utils.ParserException;
 import org.biojava.utils.SmallMap;
 
 /**
+ * <p>
  * Pushes a new parser and listener depending on the tag.
+ * </p>
+ *
+ * <p>
+ * setParserListener() is used to associate a tag with a TagValueParser and
+ * TagValueListener. When this tag is encountered, the pair will be pushed onto
+ * the parser processing stack and will gain control of the stream untill that
+ * tag has ended.
+ * The delegator is constructed with a default TagValueListener that will be
+ * informed of all events for which there are no explicit delegate pairs
+ * registered.
+ * </p>
  *
  * @author Matthew Pocock
+ * @since 1.2
  */
 public class TagDelegator
   extends

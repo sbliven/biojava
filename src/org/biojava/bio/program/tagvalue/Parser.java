@@ -5,6 +5,21 @@ import java.util.*;
 
 import org.biojava.utils.ParserException;
 
+/**
+ * <p>
+ * Encapsulate the parsing of lines from a buffered reader into tag-value
+ * events.
+ * </p>
+ *
+ * <p>
+ * Scripts will usualy construct a parser object, a BufferedReader, a
+ * TagValueParser and TagValueListener, and then set up a loop that processes
+ * each record in the reader by calling Parser.read() untill it returns false.
+ * </p>
+ *
+ * @since 1.2
+ * @author Matthew Pocock
+ */
 public class Parser {
   public boolean read(
     BufferedReader reader,

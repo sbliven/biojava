@@ -25,8 +25,17 @@ import java.util.Map;
 import org.biojava.utils.SmallMap;
 
 /**
+ * <p>
  * <code>TagMapper</code> maps arbitrary object keys to new keys.
+ * </p>
  *
+ * <p>
+ * If there is no explicit mapping from old to new keys, then the old key will
+ * be used.
+ * </p>
+ *
+ * @since 1.2
+ * @author Matthew Pocock
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a> (docs).
  */
 public class TagMapper {
@@ -51,15 +60,26 @@ public class TagMapper {
     }
 
     /**
+     * <p>
      * <code>getNewTag</code> returns the tag which substitutes the
      * specified value.
+     * </p>
+     *
+     * <p>
+     * If there is no mapping associated with this tag, it is returned
+     * unchanged.
+     * </p>
      *
      * @param oldTag an <code>Object</code> to substitute.
      *
      * @return an <code>Object</code>.
      */
     public Object getNewTag(Object oldTag) {
-        return tags.get(oldTag);
+      Object newTag = tags.get(oldTag);
+      if(newTag == null) {
+        newTag = oldTag;
+      }
+      return newTag;
     }
 }
 
