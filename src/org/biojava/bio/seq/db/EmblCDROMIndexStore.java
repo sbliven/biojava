@@ -217,7 +217,9 @@ public class EmblCDROMIndexStore implements IndexStore
     public void store(Index index)
         throws IllegalIDException, BioException
     {
-        throw new BioException("Failed to add Index: store is read-only. To add sequences use the dbi programs supplied in EMBOSS");
+        throw new BioException("Failed to add Index: store is read-only."
+                               + " To add sequences use the dbi programs"
+                               + " supplied in EMBOSS");
     }
 
     /**
@@ -229,7 +231,9 @@ public class EmblCDROMIndexStore implements IndexStore
      */
     public void commit() throws BioException
     {
-        throw new BioException("Failed to commit: store is read-only. To add sequences use the dbi programs supplied in EMBOSS");
+        throw new BioException("Failed to commit: store is read-only."
+                               + " To add sequences use the dbi programs"
+                               + " supplied in EMBOSS");
     }
 
     /**
@@ -251,10 +255,12 @@ public class EmblCDROMIndexStore implements IndexStore
                 throw new IllegalIDException("Failed to find ID: " + id);
 
 	    // Append current pathPrefix
-            index = new SimpleIndex(new File(pathPrefix, (String) seqFiles.get((Integer) enRecord[3])),
-                                    ((Long) enRecord[1]).longValue(),
-                                    entryRecordLength,
-                                    id);
+            index =
+                new SimpleIndex(new File(pathPrefix,
+                                         (String) seqFiles.get((Integer)
+                                                               enRecord[3])),
+                                ((Long) enRecord[1]).longValue(),
+                                entryRecordLength, id);
         }
         catch (IOException ioe)
         {
@@ -274,7 +280,8 @@ public class EmblCDROMIndexStore implements IndexStore
 
             try
             {
-                bis = new BufferedInputStream(new FileInputStream(entryNamIdx));
+                bis =
+                    new BufferedInputStream(new FileInputStream(entryNamIdx));
                 EmblCDROMIndexReader ent = new EntryNamIdxReader(bis);
 
                 for (long i = 0; i < entryRecordCount; i++)
