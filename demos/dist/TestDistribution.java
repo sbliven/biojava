@@ -6,6 +6,7 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
@@ -56,6 +57,8 @@ public class TestDistribution {
       dtc.train();
     } catch (IllegalSymbolException ise) {
       throw new BioError(ise, "This should be impossible");
+    } catch (ChangeVetoException cve) {
+      throw new BioError(cve, "This should be impossible");
     }
   }
 }
