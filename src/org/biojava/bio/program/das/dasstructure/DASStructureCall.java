@@ -72,6 +72,7 @@ public class DASStructureCall {
     {
 	/* now connect to DAS server */
 	String connstr = serverurl + pdb_code ;
+	System.out.println(connstr);
 	URL dasUrl = null ;
 	try {
 	    dasUrl = new URL(connstr);
@@ -129,14 +130,14 @@ public class DASStructureCall {
     {
 	
 	
-	System.setProperty("org.xml.sax.driver", 
-			   "org.apache.crimson.parser.XMLReaderImpl");
+	// System.setProperty("org.xml.sax.driver", 
+	// "org.apache.crimson.parser.XMLReaderImpl");
 
 
-	SAXParserFactory spfactory =
-	    SAXParserFactory.newInstance();
-	
+	SAXParserFactory spfactory =  SAXParserFactory.newInstance();	
 	spfactory.setValidating(false);
+	spfactory.setNamespaceAware(false);
+	
 	/*
 	  try {
 	  spfactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false);
@@ -162,22 +163,26 @@ public class DASStructureCall {
 
 	// try to deactivate validation
 	
+	xmlreader.setFeature("http://xml.org/sax/features/validation", false);
+	xmlreader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false); 
 	
+	/*
 	try {
 	    //System.out.println("deactivating validation");
-	    xmlreader.setFeature("http://xml.org/sax/features/validation", false);
-	    //System.out.println("done...");
+	    	    //System.out.println("done...");
 	} catch (SAXException e) {
 	    System.err.println("Cannot deactivate validation."); 
 	}
        	
 	try {
-	    xmlreader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false);
+	    xmlreader.setLoadDTDGrammar(false);
+	    // otherwise :java.io.FileNotFoundException: http://www.sanger.ac.uk/Users/ap3/DAS/XML/protodas.dtd
+	    //	    xmlreader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false);
 	} catch (SAXNotRecognizedException e){
 	    e.printStackTrace();
 	    //System.out.println("continuing ...");
 	}
-	
+	*/
 	//System.out.println("DASStructureCall setting DASStructureXMLResponseParser");
 
 	DASStructureXMLResponseParser cont_handle = new DASStructureXMLResponseParser() ;

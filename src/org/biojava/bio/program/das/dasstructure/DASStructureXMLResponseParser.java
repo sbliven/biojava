@@ -259,10 +259,10 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
     
     public void characters (char ch[], int start, int length){
 	//System.out.println("characters");
-	for (int i = start; i < start + length; i++) {
+	//for (int i = start; i < start + length; i++) {
 	    
 	    //characterdata += ch[i];
-	}
+	//}
 	
     }
     
