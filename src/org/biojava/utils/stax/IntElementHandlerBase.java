@@ -30,7 +30,7 @@ import org.xml.sax.*;
  * StAX handler for any element which just contains a string representation of
  * an integer.
  * <P>
- * This calss collects the string data, and when it is complete, passes it to
+ * This class collects the string data, and when it is complete, passes it to
  * the (abstract) setIntValue method.  Typical use of this class is as
  * a base for a small (often anonymous) class which takes the int value
  * and stores it in some variable.
@@ -65,7 +65,7 @@ public abstract class IntElementHandlerBase extends StAXContentHandlerBase {
     level--;
     if (level == 0) {
       try {
-        setIntValue(Integer.parseInt(data.toString()));
+        setIntValue(Integer.parseInt((data.toString()).trim()));
       } catch (NumberFormatException nfe) {
         throw new SAXException(nfe);
       }

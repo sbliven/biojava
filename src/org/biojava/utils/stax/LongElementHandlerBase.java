@@ -65,7 +65,7 @@ public abstract class LongElementHandlerBase extends StAXContentHandlerBase {
     level--;
     if (level == 0) {
       try {
-        setLongValue(Long.parseLong(data.toString()));
+        setLongValue(Long.parseLong((data.toString()).trim()));
       } catch (NumberFormatException nfe) {
         throw new SAXException(nfe);
       }

@@ -65,7 +65,7 @@ public abstract class DoubleElementHandlerBase extends StAXContentHandlerBase {
     level--;
     if (level == 0) {
       try {
-        setDoubleValue(Double.parseDouble(data.toString()));
+        setDoubleValue(Double.parseDouble((data.toString()).trim()));
       } catch (NumberFormatException nfe) {
         throw new SAXException(nfe);
       }

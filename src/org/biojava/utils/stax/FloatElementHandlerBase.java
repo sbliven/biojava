@@ -65,7 +65,7 @@ public abstract class FloatElementHandlerBase extends StAXContentHandlerBase {
     level--;
     if (level == 0) {
       try {
-        setFloatValue(Float.parseFloat(data.toString()));
+        setFloatValue(Float.parseFloat((data.toString()).trim()));
       } catch (NumberFormatException nfe) {
         throw new SAXException(nfe);
       }
