@@ -75,4 +75,63 @@ public class FilterUtils {
     
     return false;
   }
+  
+  /**
+   * Takes a feature filter and returns the reverse-polish representation of the
+   * tree.
+   * <P>
+   * The list is traversed from left to right. Each atomic filter can be
+   * evaluated directly to be replaced by a set of features. Each logical
+   * operator grabs the required number of result sets from emediately before it
+   * in the list and replaces itself and these with the result of it acting
+   * upon these sets. In the end, the list should be left with a sing result
+   * set which contains all matching features.
+   * <P>
+   * By definition, the attomic filter operations can be performed in any order.
+   *
+   * @param filt the FeatureFilter to flatten
+   * @return a List of FeatureFilter instances
+   */
+  public static List reversePolish(FeatureFilter filt) {
+    List polish = new ArrayList();
+    
+    reversePolish(polish, filt);
+    
+    return polish;
+  }
+  
+  /**
+   * Recurse over the tree in filt, adding things to polish as we go.
+   */
+  private static reversePolish(List polish, filt) {
+    if(filt instanceof FeatureFilter.And) {
+      FeatureFilter.And and = (FeatureFilter.And) filt;
+      FeatureFilter c1 = and.getChild1();
+      FeatureFilter c2 = and.getChild2();
+      
+      reversePolish(polish, c1);
+      reversePolish(polish, c2);
+    } else if(filt instanceof FeatureFilter.AndNot) {
+      FeatureFilter.AndNot andNot = (FeatureFilter.AndNot) filt;
+      FeatureFilter c1 = andNot.getChild1();
+      FeatureFilter c2 = andNot.getChild2();
+      
+      reversePolish(polish, c1);
+      reversePolish(polish, c2);
+    } else if(filt instanceof FeatureFilter.Or) {
+      FeatureFilter.Or or = (FeatureFilter.AndNot) filt;
+      FeatureFilter c1 = or.getChild1();
+      FeatureFilter c2 = or.getChild2();
+      
+      reversePolish(polish, c1);
+      reversePolish(polish, c2);
+    } else if(filt instanceof FeatureFilter.Not) {
+      FeatureFilter.Not not = (FeatureFilter.Not) filt;
+      FeatureFilter c = not.getChild();
+      
+      reversePolish(polish, c);
+    }
+
+    polish.add(filt);
+  }
 }
