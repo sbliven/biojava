@@ -7,7 +7,22 @@ import java.sql.*;
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 
-class SQLUnigeneFactory
+/**
+ * <p>An implementatoin of UnigeneFactory that manages it's data in an SQL
+ * database.</p>
+ *
+ * <p><em>This class is for developers and power-users.</em> Usually you will
+ * not use this class directly, but rather use UnigeneTools.loadDatabase() with
+ * a jdbc URL.</p>
+ *
+ * <p>This class will store unigene data in a relational database with a schema
+ * defined by the resource src/org/biojava/bio/program/unigene/createUnigene.sql
+ * and currently only realy supports mysql. To import data to a newly created
+ * database, repeatedly call addCluster() on the UnigeneDB you get back.</p>
+ *
+ * @author Matthew Pocock
+ */
+public class SQLUnigeneFactory
 implements UnigeneFactory {
   private static String CREATE_DB_STATEMENT;
 
@@ -25,6 +40,9 @@ implements UnigeneFactory {
     return CREATE_DB_STATEMENT;
   }
 
+  /**
+   * Accepts all URLs that are of the jdbc protocol.
+   */
   public boolean canAccept(URL dbURL) {
     return dbURL.getProtocol().equals("jdbc");
   }

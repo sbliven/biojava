@@ -13,13 +13,33 @@ import org.biojava.bio.program.tagvalue.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 
-class FlatFileUnigeneFactory
+/**
+ * <p>A UnigeneFactory that will use flat-file indexing of the unigene ascii-art
+ * files.</p>
+ *
+ * <p><em>This class is for developers and power-users.</em> Usually you will
+ * not use this class directly, but rather use UnigeneTools.loadDatabase() with
+ * a file URL.</p>
+ *
+ * <p>This will create all the index files necisary to look up records in a timely
+ * manner. It requires read/write access to the unigene directory. No files
+ * will be deleted during this opperation. The indexing strategy used is
+ * compattible with the OBDA flat-file indexing spec and uses the package
+ * org.biojava.bio.program.indexdb and parsers that are compattible with the
+ * tag-value API.</p>
+ *
+ * @author Matthew Pocock
+ */
+public class FlatFileUnigeneFactory
 implements UnigeneFactory {
   private static final String DATA_INDEX = "data.index";
   private static final String LIB_INFO_INDEX = "libInfo.index";
   private static final String UNIQUE_INDEX = "unique.index";
   private static final String ALL_INDEX = "all.index";
   
+  /**
+   * Accepts all URLs that are of the file protocol.
+   */
   public boolean canAccept(URL unigeneLoc) {
     return unigeneLoc.getProtocol().equals("file");
   }

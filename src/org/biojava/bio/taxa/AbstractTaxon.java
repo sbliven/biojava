@@ -24,8 +24,16 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
+ * <p>An abstract implementation of Taxon.</p>
+ *
+ * <p>It is left up to the impementor to provide methods for accessing the
+ * parent and children. All other state is provided for here. A common pattern
+ * would be to route any Taxon.getParent() call back via a method on the
+ * TaxonFactory used to generate this instance.</p>
+ *
  * @author Matthew Pocock
- * @author Keith James`
+ * @author Keith James
+ * @since 1.3
  */
 public abstract class AbstractTaxon
   extends

@@ -9,8 +9,67 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.program.tagvalue.*;
 
+/**
+ * <p>Usefull tools for working with Unigene.</p>
+ *
+ * <p>This class is the main port-of-call for users of the Unigene package. It
+ * provides the core APIs for finding a Unigene database as well as registering
+ * your own Unigene drivers. Additionaly, it contains methods to return parsers
+ * for each of the main Unigene flat-file types. If you wish to bypass the
+ * biojava object model entirely, you can chose to use these parsers instead.
+ * </p>
+ *
+ * <h2>Example use</h2>
+ *
+ * <p>Creating a unigene instance from your local unigene directory (assuming
+ * that you have read/write privilages to the directory)</p>
+ *
+ * <pre>
+ * UnigeneDB unigene = UnigeneTools.createUnigene(
+ *   new URL("file:///usr/local/biodata/unigene") );
+ * </pre>
+ *
+ * <p>Fetch a unigene cluster</p>
+ *
+ * <pre>
+ * UnigeneDB unigene = UnigeneTools.loadUnigene(
+ *   new URL("file:///usr/local/biodata/unigene") );
+ * UnigeneCluster cluster = unigenge.getCluster("Aga001");
+ * System.out.println("Title: " + cluster.getTitle());
+ * </pre>
+ *
+ * <p>Parse a data file yourself</p>
+ *
+ * <pre>
+ * BufferedReader br = new BufferedReader(new FileReader(unigeneFile));
+ * Parser = new Parser();
+ * TagValueListener echo = new Echo();
+ * ParserListener pl = UnigeneTools.buildDataParser(echo);
+ *
+ * while(parser.read(br, pl.getParser(), pl.getListener())) {
+ *   // read an entry
+ * }
+ * </pre>
+ *
+ * @author Matthew Pocock
+ */
 public class UnigeneTools {
+  /**
+   * <p>
+   * Annotation schema for all UnigeneCluster instances. This states what
+   * propperties can be expected to be associated with a cluster and how many
+   * values they may have.
+   * </p>
+   */
   public static final AnnotationType UNIGENE_ANNOTATION;
+  
+  /**
+   * <p>
+   * Annotation schema for all Unigene libraries. This states what propperties
+   * can be expected to be associated with a library and how many values they
+   * may have.
+   * </p>
+   */
   public static final AnnotationType LIBRARY_ANNOTATION;
 
   private static final List factories;
@@ -104,10 +163,24 @@ public class UnigeneTools {
     LIBRARY_ANNOTATION = library;
   }
   
+  /**
+   * Converts short species names (like Hs) to long species names (like Homo
+   * Sapiens).
+   *
+   * @param name  the short name
+   * @return the long name
+   */
   public static String getSpeciesForShortName(String name) {
     return (String) shortName2SpeciesName.get(name);
   }
   
+  /**
+   * Generate a tag-value parser for unigene data files that will pass all
+   * parsing events on to your listener.
+   *
+   * @param listener the TagValueListener to pass events onto
+   * @return a ParserListener that is ready to consume unigene data documents
+   */
   public static ParserListener buildDataParser(TagValueListener listener)
   throws ParserException {
     try {
@@ -140,6 +213,12 @@ public class UnigeneTools {
     }
   }
   
+  /**
+   * Generate a tag-value parser for the library info unigene files.
+   *
+   * @param listener the TagValueListener to pass events onto
+   * @return a ParserListener that is ready to consume unigene lib.info files
+   */
   public static ParserListener buildLibInfoParser(TagValueListener listener)
   throws IOException, ParserException{
     RegexParser parser = new RegexParser();
@@ -219,25 +298,72 @@ public class UnigeneTools {
     }
   }
 
+  /**
+   * <p>Register a UnigeneFactory.</p>
+   *
+   * <p>This method is for developers who have written their own UnigeneFactory
+   * implementations. By default, jdbc and file URLs are handled by built-in
+   * factories.</p>
+   *
+   * <p>When you register a factory, it will be used for all URLs that is can
+   * accept. If a factory is registered afterwards that can accept the same URL,
+   * the first factory registered will be used.</p>
+   *
+   * @param factory  the UnigeneFactory to register
+   */
   public static void registerFactory(UnigeneFactory factory) {
     factories.add(factory);
   }
 
+  /**
+   * <p>Register a UnigeneFactory.</p>
+   *
+   * <p>This method is for developers who wish to unregister a factory.</p>
+   *
+   * @param factory  the UnigeneFactory to unregister
+   */
   public static void unregisterFactory(UnigeneFactory factory) {
     factories.remove(factory);
   }
 
+  /**
+   * Load a UnigeneDB instance referred to by a URL.
+   *
+   * @param dbURL the URL location the database
+   * @return a UnigeneDB instance
+   * @throws BioException if there was no UnigeneFactory able to process that
+   *         URL or if there was some error connecting
+   */
   public static UnigeneDB loadUnigene(URL dbURL)
   throws BioException {
     return findFactory(dbURL).loadUnigene(dbURL);
   }
 
+  /**
+   * Create a new UnigeneDB instance referred to by a URL.
+   *
+   * @param dbURL the URL location the database
+   * @return a UnigeneDB instance
+   * @throws BioException if there was no UnigeneFactory able to process that
+   *         URL or if there was some error creating it
+   */
   public static UnigeneDB createUnigene(URL dbURL)
   throws BioException {
     return findFactory(dbURL).createUnigene(dbURL);
   }
 
-  private static UnigeneFactory findFactory(URL dbURL)
+  /**
+   * Find the UnigeneFactory that can accept a URL.
+   *
+   * <p><em>This method is for developers only.</em> The normal way to interact
+   * with factories is to call UnigeneTools.loadUnigene() and
+   * UnigeneTools.createUnigene()</p>
+   *
+   * @param dbURL  the URL to find a factory for
+   * @return the UnigeneFactory that accepts that URL
+   * @throws BioException if there is no factory for that type of URL
+   */
+  public static UnigeneFactory findFactory(URL dbURL)
   throws BioException {
     for(Iterator i = factories.iterator(); i.hasNext(); ) {
       UnigeneFactory factory = (UnigeneFactory) i.next();

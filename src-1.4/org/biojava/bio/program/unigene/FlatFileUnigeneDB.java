@@ -15,6 +15,11 @@ import org.biojava.bio.seq.io.*;
 
 import org.biojava.bio.program.indexdb.IndexStore;
 
+/**
+ * A UnigeneDB that uses flat-file indexing.
+ *
+ * @author Matthew Pocock
+ */
 class FlatFileUnigeneDB
 extends Unchangeable
 implements UnigeneDB {

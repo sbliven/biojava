@@ -4,6 +4,21 @@ import java.io.*;
 import java.net.*;
 import org.biojava.bio.*;
 
+/**
+ * <p>Objects that can be used to produce a <code>UnigeneDB</code> instance
+ * given a URL.</p>
+ *
+ * <p><em>This class is intended for implementers of the Unigene
+ * functionality</em></p>
+ *
+ * <p>The URL is used to locate the unigene data, as well as potentialy deciding
+ * upon the access mechanism. Factory implementations are provided for
+ * <code>file</code> and <code>jdbc</code> URLs. You can add another stoorage
+ * mechanism to the system by writing an implementation of
+ * <code>UnigeneFactory</code> and registering it with UnigeneTools.</p>
+ *
+ * @author Matthew Pocock
+ */
 public interface UnigeneFactory {
   public UnigeneDB loadUnigene(URL unigeneURL)
   throws BioException;

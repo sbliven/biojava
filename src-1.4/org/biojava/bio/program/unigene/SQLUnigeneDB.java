@@ -6,6 +6,11 @@ import org.biojava.utils.*;
 import org.biojava.utils.cache.*;
 import org.biojava.bio.*;
 
+/**
+ * An implementation of UnigeneDB that fetches data from an SQL database.
+ *
+ * @author Matthew Pocock
+ */
 class SQLUnigeneDB
 extends AbstractChangeable
 implements UnigeneDB {

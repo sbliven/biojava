@@ -29,7 +29,7 @@ import org.biojava.utils.io.*;
  * <code>Record</code> represents a record within an indexed flat file
  * databank as defined by the OBDA indexing standard.
  *
- * @author Unknown
+ * @author Matthew Pocock
  * @author Keith James
  */
 public interface Record {
@@ -67,7 +67,9 @@ public interface Record {
     public int getLength();
   
     /**
-     * <code>Impl</code> is the default implementation.
+     * <code>Impl</code> is the default implementation of Record.
+     *
+     * @author Matthew Pocock
      */
     public static class Impl
         implements Record {

@@ -49,6 +49,10 @@ public interface AnnotationType {
       CardinalityConstraint.ANY
     );
     
+    /**
+     * The type that accepts no annotations at all and is the subtype of all
+     * other annotations.
+     */
     public static final AnnotationType NONE = new Impl(
       PropertyConstraint.NONE,
       CardinalityConstraint.NONE
@@ -117,8 +121,29 @@ public interface AnnotationType {
       Location card
     );
 
+    /**
+     * Set the constraints that will apply to all properties without an
+     * explicitly defined set of constraints.
+     *
+     * @param pc  the default PropertyConstraint
+     * @param cc the default CardinalityConstraint
+     */
     public void setDefaultConstraints(PropertyConstraint pc, Location cc);
+    
+    /**
+     * Get the PropertyConstraint that will be applied to all properties without
+     * an explicit binding. This defaults to PropertyConnstraint.ALL.
+     *
+     * @return the default PropertyConstraint
+     */
     public PropertyConstraint getDefaultPropertyConstraint();
+
+    /**
+     * Get the CardinalityConstraint that will be applied to all properties without
+     * an explicit binding. This defaults to CardinalityConstraint.ALL.
+     *
+     * @return the default CardinalityConstraint
+     */
     public Location getDefaultCardinalityConstraint();
 
     /**
@@ -130,6 +155,10 @@ public interface AnnotationType {
      */
     public Set getProperties();
 
+    /**
+     * Set the property in an annotation bundle according to the type we believe
+     * it should be.
+     */
     public void setProperty(Annotation ann, Object property, Object value)
         throws ChangeVetoException;
 

@@ -31,9 +31,11 @@ import org.biojava.utils.io.RAF;
 
 /**
  * <code>IndexStore</code> is an interface for indexing flatfiles
- * according to the OBDA specification.
+ * according to the OBDA specification. It represents a map of Record instances
+ * by a primary ID and any number of Records associated with an ID in some
+ * seccondary namespace.
  *
- * @author Unknown
+ * @author Matthew Pocock
  * @author Keith James
  */
 public interface IndexStore {
@@ -46,7 +48,8 @@ public interface IndexStore {
      *
      * @return a <code>Record</code>.
      *
-     * @exception BioException if an error occurs.
+     * @exception BioException if an error occurs or if there is no Record
+     *            associated with the id
      */
     public Record get(String id) throws BioException;
 
@@ -54,7 +57,8 @@ public interface IndexStore {
      * <code>get</code> returns a list of <code>Record</code>s by
      * searching against the primary identifiers if the namespace
      * argument is equal to the primary namespace or otherwise by
-     * searching the secondary namespaces.
+     * searching the secondary namespaces. The list of Record instances retuned
+     * may be empty, but is never null.
      *
      * @param id a <code>String</code> primary ID.
      * @param namespace a <code>String</code>.

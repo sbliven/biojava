@@ -243,6 +243,15 @@ public interface PropertyConstraint {
         }
     }
 
+    /**
+     * <p>Matches properties if they have exactly this one value.</p>
+     *
+     * <p>This is like the extreme case of an Enumeration which has just one
+     * member. It is most usefull for selecting annotations with a particular
+     * property set to a particular value e.g. ID="01234".</p>
+     *
+     * @author Matthew Pocock
+     */
     public class ExactValue implements PropertyConstraint {
       private Object value;
       
@@ -385,19 +394,42 @@ public interface PropertyConstraint {
         }
     }
     
+    /**
+     * A property constraint that accpepts items iff they are accepted by both
+     * child constraints. This effectively matches the intersection of the items
+     * matched by the two constraints.
+     *
+     * @author Matthew Pocock
+     */
     public class And implements PropertyConstraint {
       private PropertyConstraint c1;
       private PropertyConstraint c2;
       
+      /**
+       * Create a new <code>And</code> from two child constraints.
+       *
+       * @param c1 the first child
+       * @param c2 the seccond child
+       */
       public And(PropertyConstraint c1, PropertyConstraint c2) {
         this.c1 = c1;
         this.c2 = c2;
       }
       
+      /**
+       * Get the first child PropertyConstraint.
+       *
+       * @return the first child PropertyConstraint
+       */
       public PropertyConstraint getChild1() {
         return c1;
       }
       
+      /**
+       Get the seccond child PropertyConstraint.
+       *
+       * @return the seccond child PropertyConstraint
+       */
       public PropertyConstraint getChild2() {
         return c2;
       }
@@ -431,19 +463,42 @@ public interface PropertyConstraint {
       }
     }
     
+    /**
+     * A property constraint that accepts items iff they are accepted by either
+     * child constraints. This effectively matches the union of the items
+     * matched by the two constraints.
+     *
+     * @author Matthew Pocock
+     */
     public class Or implements PropertyConstraint {
       private PropertyConstraint c1;
       private PropertyConstraint c2;
       
+      /**
+       * Create a new <code>Or</code> from two child constraints.
+       *
+       * @param c1 the first child
+       * @param c2 the seccond child
+       */
       public Or(PropertyConstraint c1, PropertyConstraint c2) {
         this.c1 = c1;
         this.c2 = c2;
       }
       
+      /**
+       * Get the first child PropertyConstraint.
+       *
+       * @return the first child PropertyConstraint
+       */
       public PropertyConstraint getChild1() {
         return c1;
       }
       
+      /**
+       Get the seccond child PropertyConstraint.
+       *
+       * @return the seccond child PropertyConstraint
+       */
       public PropertyConstraint getChild2() {
         return c2;
       }
