@@ -293,7 +293,7 @@ private class Forward {
 
     // VITERBI!
 
-    public double viterbi(MarkovModel mm, ResidueList s0, ResidueList s1) 
+    public StatePath viterbi(MarkovModel mm, ResidueList s0, ResidueList s1) 
         throws Exception
     {
 	Viterbi v = new Viterbi();
@@ -308,7 +308,7 @@ private class Viterbi {
     private PairDPCursor cursor;
     private CrossProductAlphabet alpha;
 
-    public double runViterbi(MarkovModel mm,
+    public StatePath runViterbi(MarkovModel mm,
 			      ResidueList seq0,
 			      ResidueList seq1) 
         throws Exception
@@ -356,25 +356,30 @@ private class Viterbi {
 	    ++l;
 
 	// Traceback...  
-
-	/*
 	
 	BackPointer[] bpCol = (BackPointer[]) cursor.getBackPointers(colId);
 	BackPointer bp = bpCol[l];
 	List statel = new ArrayList();
+	List resl = new ArrayList();
+	List scorel = new ArrayList();
 	while (bp != null) {
 	    statel.add(bp.state);
+	    resl.add(bp.residue);
+	    scorel.add(DoubleAlphabet.getResidue(bp.score));
 	    bp = bp.back;
 	}
-	
-	System.out.println("*** Viterbi traceback ***");
-	for (int tb = statel.size() - 1; tb >= 0; --tb)
-	    System.out.println(((State) statel.get(tb)).getName());
-	System.out.println("*** End ***");
-
-	*/
-
-	return col[l];
+	Collections.reverse(statel);
+	Collections.reverse(resl);
+	Collections.reverse(scorel);
+	Map labelToList = new HashMap();
+	labelToList.put(StatePath.SEQUENCE,
+			new SimpleResidueList(alpha, resl));
+	labelToList.put(StatePath.STATES, 
+			new SimpleResidueList(mm.stateAlphabet(), statel));
+	labelToList.put(StatePath.SCORES,
+			new SimpleResidueList(DoubleAlphabet.getInstance(),
+					      scorel));
+	return new SimpleStatePath(col[l], labelToList);
     }
 
     private List ress = new ArrayList();
@@ -488,7 +493,7 @@ private class Viterbi {
 		}
 		curCol[l] = weight + score;
 		if (bestKC >= 0) {
-		    curBPs[l] = new BackPointer(states[l], oldBPs[bestKC], curCol[l]);
+		    curBPs[l] = new BackPointer(states[l], oldBPs[bestKC], curCol[l], res);
 		} else {
 		    curBPs[l] = null;
 		}
@@ -549,21 +554,22 @@ private class Viterbi {
 	    return advance;
 	}
     }    
-}
 
-class BackPointer {
+private static class BackPointer {
     State state;
     BackPointer back;
     double score;
+    Residue residue;
     
-    BackPointer(State state, BackPointer back, double score) {
+    BackPointer(State state, BackPointer back, double score, Residue residue) {
 	this.state = state;
 	this.back = back;
 	this.score = score;
+	this.residue = residue;
     }
 }
 
-class PairDPCursor {
+private static class PairDPCursor {
     private Object[] s1cur;
     private Object[] s1prev;
     private Object[] s2cur;
@@ -697,7 +703,7 @@ class PairDPCursor {
     	if (coords[0] == pos[0] && (s1cur[coords[1]] != null)) {
   	    // System.out.println("??? s1cur");
     	    return (double[]) s1cur[coords[1]];
-    	} else if (coords[1] == pos[1]) {
+    	} else if (coords[1] == pos[1] && (s2cur[coords[0]] != null)) {
   	    // System.out.println("??? s2cur");
     	    return (double[]) s2cur[coords[0]];
     	} else if (coords[0] == pos[0] - 1 && (s1prev[coords[1]] != null)) {
@@ -722,7 +728,7 @@ class PairDPCursor {
 
     	if (coords[0] == pos[0] && (s1curBP[coords[1]] != null)) {
     	    return (BackPointer[]) s1curBP[coords[1]];
-    	} else if (coords[1] == pos[1]) {
+    	} else if (coords[1] == pos[1] && (s2curBP[coords[0]] != null)) {
     	    return (BackPointer[]) s2curBP[coords[0]];
     	} else if (coords[0] == pos[0] - 1 && (s1prevBP[coords[1]] != null)) {
     	    return (BackPointer[]) s1prevBP[coords[1]];
@@ -733,4 +739,5 @@ class PairDPCursor {
    	throw new NoSuchElementException();
     }
     
+}
 }

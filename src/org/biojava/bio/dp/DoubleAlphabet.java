@@ -28,6 +28,11 @@ import org.biojava.bio.seq.*;
 
 public class DoubleAlphabet implements Alphabet {
   public static final DoubleAlphabet INSTANCE = new DoubleAlphabet();
+
+    public static DoubleAlphabet getInstance() {
+	return INSTANCE;
+    }
+
   public static DoubleResidue getResidue(double val) {
     return new DoubleResidue(val);
   }
