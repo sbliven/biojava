@@ -53,7 +53,7 @@ import org.biojava.bio.seq.*;
  *              locations.
  */
 
-class FeatureTableParser {
+public class FeatureTableParser {
     private final static int   WITHOUT = 0;
     private final static int    WITHIN = 1;
     private final static int  LOCATION = 2;
