@@ -519,7 +519,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
             // determine if I'm getting a gzipped reply
             String contentEncoding = huc.getContentEncoding();
             InputStream inStream = huc.getInputStream();
- 
+	     
             if (contentEncoding != null) {
                 if (contentEncoding.indexOf("gzip") != -1) {
 		    // we have gzip encoding
@@ -529,6 +529,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
             }
 
 	    InputSource is = new InputSource(inStream);
+	    is.setSystemId(epURL.toString());
 	    XMLReader parser = nonvalidatingSAXParser();
 	    parser.setContentHandler(new SAX2StAXAdaptor(dnaHandler));
 	    parser.parse(is);

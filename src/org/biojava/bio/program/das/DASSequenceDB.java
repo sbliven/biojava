@@ -207,6 +207,7 @@ public class DASSequenceDB implements SequenceDB {
 
 
 		InputSource is = new InputSource(huc.getInputStream());
+		is.setSystemId(epURL.toString());
 		DocumentBuilder parser = DASSequence.nonvalidatingParser();
 		Element el = parser.parse(is).getDocumentElement();
 		

@@ -121,6 +121,7 @@ public class DAS extends AbstractChangeable {
       }
       
       InputSource is = new InputSource(huc.getInputStream());
+      is.setSystemId(dsnURL.toString());
       DocumentBuilder parser = DASSequence.nonvalidatingParser();
       NodeList nl = parser
 	.parse(is)

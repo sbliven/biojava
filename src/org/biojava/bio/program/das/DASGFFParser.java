@@ -61,11 +61,10 @@ class DASGFFParser {
 	return doneTickets;
     }
 
-    void parseStream(InputStream data)
+    void parseStream(InputSource is)
         throws BioException, ParseException, IOException, SAXException
     {
-	    InputSource is = new InputSource(data);
-	    DocumentBuilder parser = DASSequence.nonvalidatingParser();
+      	    DocumentBuilder parser = DASSequence.nonvalidatingParser();
 	    Element el = parser.parse(is).getDocumentElement();
 	    NodeList gffl = el.getElementsByTagName("GFF");
 	    if (gffl.getLength() != 1)

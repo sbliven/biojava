@@ -204,13 +204,13 @@ class FeatureFetcher {
                 }
             }
 
+	    InputSource is = new InputSource(inStream);
+	    is.setSystemId(fURL.toString());
 	    if (fetchEncoding.equals("dasgff")) {
 		DASGFFParser gffParser = new DASGFFParser(ticketsByID);
-		gffParser.parseStream(inStream);
-
+		gffParser.parseStream(is);
 		doneTickets = gffParser.getDoneTickets();
 	    } else if (fetchEncoding.equals("xff")) {
-		InputSource is = new InputSource(inStream);
 		DASFeaturesHandler dfh = new DASFeaturesHandler(ticketsByID, this);
 		XMLReader parser = DASSequence.nonvalidatingSAXParser();
 		parser.setContentHandler(new SAX2StAXAdaptor(dfh));
