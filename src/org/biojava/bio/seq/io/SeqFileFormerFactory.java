@@ -36,6 +36,7 @@ import org.biojava.bio.BioException;
  * within <code>SeqFileFormer</code> implementations.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
+ * @author Greg Cox
  * @since 1.2
  */
 public abstract class SeqFileFormerFactory
@@ -48,7 +49,8 @@ public abstract class SeqFileFormerFactory
      * factories hash, indexed by file format name. This method is
      * called from within a static block in each implementation of
      * <code>SeqFileFormer</code>. Thus, when the class is dynamically
-     * loaded its factory is automatically installed.
+     * loaded its factory is automatically installed.  The valid arguments
+     * are Embl or Genbank (capitalization is important).
      *
      * @param format a <code>String</code> identifer which specifies
      * the file format name.
