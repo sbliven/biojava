@@ -42,7 +42,7 @@ extends SequenceRendererWrapper {
   }
   
   public double getDepth(SequenceRenderContext src, RangeLocation pos) {
-    List layers = layer(src);
+    List layers = layer(src, pos);
     return LayeredRenderer.INSTANCE.getDepth(
       layers,
       pos,
@@ -50,18 +50,20 @@ extends SequenceRendererWrapper {
     );
   }
   
-  public double getMinimumLeader(SequenceRenderContext src) {
-    List layers = layer(src);
+  public double getMinimumLeader(SequenceRenderContext src, RangeLocation pos) {
+    List layers = layer(src, pos);
     return LayeredRenderer.INSTANCE.getMinimumLeader(
       layers,
+      pos,
       Collections.nCopies(layers.size(), getRenderer())
     );
   }
   
-  public double getMinimumTrailer(SequenceRenderContext src) {
-    List layers = layer(src);
+  public double getMinimumTrailer(SequenceRenderContext src, RangeLocation pos) {
+    List layers = layer(src, pos);
     return LayeredRenderer.INSTANCE.getMinimumTrailer(
       layers,
+      pos,
       Collections.nCopies(layers.size(), getRenderer())
     );
   }
@@ -71,7 +73,7 @@ extends SequenceRendererWrapper {
     SequenceRenderContext src,
     RangeLocation pos
   ) {
-    List layers = layer(src);
+    List layers = layer(src, pos);
     LayeredRenderer.INSTANCE.paint(
       g,
       layers,
@@ -87,7 +89,7 @@ extends SequenceRendererWrapper {
     RangeLocation pos
   ) {
     path.add(this);
-    List layers = layer(src);
+    List layers = layer(src, pos);
     SequenceViewerEvent sve = LayeredRenderer.INSTANCE.processMouseEvent(
       layers,
       me,
@@ -109,12 +111,17 @@ extends SequenceRendererWrapper {
     return sve;
   }
   
-  protected List layer(SequenceRenderContext src) {
+  protected List layer(SequenceRenderContext src, RangeLocation pos) {
     Sequence seq = (Sequence) src.getSequence();
     List layers = new ArrayList();
     List layerLocs = new ArrayList();
     
-    for(Iterator fi = seq.features(); fi.hasNext(); ) {
+    for(
+      Iterator fi = seq.filter(
+        new FeatureFilter.OverlapsLocation(pos), false
+      ).features();
+      fi.hasNext();
+    ) {
       Feature f = (Feature) fi.next();
       Location fLoc = f.getLocation();
       if(!fLoc.isContiguous()) {

@@ -42,11 +42,11 @@ public class RulerRenderer implements SequenceRenderer {
     return depth + 1.0;
   }
   
-  public double getMinimumLeader(SequenceRenderContext src) {
+  public double getMinimumLeader(SequenceRenderContext src, RangeLocation pos) {
     return 0.0;
   }
   
-  public double getMinimumTrailer(SequenceRenderContext src) {
+  public double getMinimumTrailer(SequenceRenderContext src, RangeLocation pos) {
     String lengthString = String.valueOf(src.getSequence().length());
     Font f = src.getFont();
     FontRenderContext frc = new FontRenderContext(null, true, true);

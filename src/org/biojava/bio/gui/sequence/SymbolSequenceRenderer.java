@@ -40,11 +40,11 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
       return depth + 1.0;
     }
 
-    public double getMinimumLeader(SequenceRenderContext sp) {
+    public double getMinimumLeader(SequenceRenderContext sp, RangeLocation pos) {
       return 0.0;
     }
 
-    public double getMinimumTrailer(SequenceRenderContext sp) {
+    public double getMinimumTrailer(SequenceRenderContext sp, RangeLocation pos) {
       return 0.0;
     }
 

@@ -117,12 +117,12 @@ extends SequenceRendererWrapper {
     return super.getDepth(getContext(src), pos);
   }    
   
-  public double getMinimumLeader(SequenceRenderContext src) {
-    return super.getMinimumLeader(getContext(src));
+  public double getMinimumLeader(SequenceRenderContext src, RangeLocation pos) {
+    return super.getMinimumLeader(getContext(src), pos);
   }
   
-  public double getMinimumTrailer(SequenceRenderContext src) {
-    return super.getMinimumTrailer(getContext(src));
+  public double getMinimumTrailer(SequenceRenderContext src, RangeLocation pos) {
+    return super.getMinimumTrailer(getContext(src), pos);
   }
   
   public void paint(

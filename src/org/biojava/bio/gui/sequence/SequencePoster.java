@@ -43,42 +43,49 @@ import java.util.List; // usefull trick to 'hide' javax.swing.List
 /**
  * A panel that visualy displays a Sequence.
  * <P>
- * A SequencePanel can either display the sequence from left-to-right
+ * A SequencePoster can either display the sequence from left-to-right
  * (HORIZONTAL) or from top-to-bottom (VERTICAL). It has an associated scale
  * which is the number of pixels per symbol. It also has a lines property that
  * controls how to wrap the sequence off one end and onto the other.
  * <P>
- * Each line in the SequencePanel is broken down into a list of strips,
+ * Each line in the SequencePoster is broken down into a list of strips,
  * each rendered by an individual SequenceRenderer object.
  * You could add a SequenceRenderer that draws on genes, another that
  * draws repeats and another that prints out the DNA sequence. They are
  * responsible for rendering their view of the sequence in the place that the
- * SequencePanel positions them.  
+ * SequencePoster positions them.  
  *
  * @author Thomas Down
  * @author Matthew Pocock
  */
-public class SequencePanel
+public class SequencePoster
 extends JComponent
 implements SwingConstants,
 SequenceRenderContext,
 Changeable {
   public static final ChangeType RENDERER = new ChangeType(
-    "The renderer for this SequencePanel has changed",
-    "org.biojava.bio.gui.sequence.SequencePanel",
+    "The renderer for this SequencePoster has changed",
+    "org.biojava.bio.gui.sequence.SequencePoster",
     "RENDERER",
     SequenceRenderContext.LAYOUT
   );
 
   private SymbolList sequence;
-  private RangeLocation range;
   private int direction;
   private double scale;
+  private int lines;
+  private int spacer; 
   
   private SequenceRenderContext.Border leadingBorder;
   private SequenceRenderContext.Border trailingBorder;
 
   private SequenceRenderer renderer;
+  private double[] offsets;
+  private int realLines;
+  private double alongDim = 0.0;
+  private double acrossDim = 0.0;
+  private int symbolsPerLine = 0;
+
   private RendererMonitor theMonitor;
 
   private transient ChangeSupport changeSupport = null;
@@ -89,12 +96,15 @@ Changeable {
       if(!isActive()) {
         return;
       }
+      int[] lineExtent = calcLineExtent(me);
+      me.translatePoint(-lineExtent[2], -lineExtent[3]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
-        SequencePanel.this,
+        SequencePoster.this,
         me,
         new ArrayList(),
-        range
+        new RangeLocation(lineExtent[0], lineExtent[1])
       );
+      me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svSupport.fireMouseClicked(sve);
     }
     
@@ -102,12 +112,15 @@ Changeable {
       if(!isActive()) {
         return;
       }
+      int[] lineExtent = calcLineExtent(me);
+      me.translatePoint(-lineExtent[2], -lineExtent[3]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
-        SequencePanel.this,
+        SequencePoster.this,
         me,
         new ArrayList(),
-        range
+        new RangeLocation(lineExtent[0], lineExtent[1])
       );
+      me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svSupport.fireMousePressed(sve);
     }
     
@@ -115,12 +128,15 @@ Changeable {
       if(!isActive()) {
         return;
       }
+      int[] lineExtent = calcLineExtent(me);
+      me.translatePoint(-lineExtent[2], -lineExtent[3]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
-        SequencePanel.this,
+        SequencePoster.this,
         me,
         new ArrayList(),
-        range
+        new RangeLocation(lineExtent[0], lineExtent[1])
       );
+      me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svSupport.fireMouseReleased(sve);
     }
   };
@@ -137,12 +153,15 @@ Changeable {
       if(!isActive()) {
         return;
       }
+      int[] lineExtent = calcLineExtent(me);
+      me.translatePoint(-lineExtent[2], -lineExtent[3]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
-        SequencePanel.this,
+        SequencePoster.this,
         me,
         new ArrayList(),
-        range
+        new RangeLocation(lineExtent[0], lineExtent[1])
       );
+      me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svmSupport.fireMouseDragged(sve);
     }
     
@@ -150,12 +169,15 @@ Changeable {
       if(!isActive()) {
         return;
       }
+      int[] lineExtent = calcLineExtent(me);
+      me.translatePoint(-lineExtent[2], -lineExtent[3]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
-        SequencePanel.this,
+        SequencePoster.this,
         me,
         new ArrayList(),
-        range
+        new RangeLocation(lineExtent[0], lineExtent[1])
       );
+      me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svmSupport.fireMouseMoved(sve);
     }
   };
@@ -218,6 +240,8 @@ Changeable {
   {
     direction = HORIZONTAL;
     scale = 12.0;
+    lines = 1;
+    spacer = 0;
 
     theMonitor = new RendererMonitor();
     leadingBorder = new SequenceRenderContext.Border();
@@ -227,7 +251,7 @@ Changeable {
   /**
    * Create a new SeqeuncePanel.
    */
-  public SequencePanel() {
+  public SequencePoster() {
     super();
     if(getFont() == null) {
       setFont(new Font("Times New Roman", Font.PLAIN, 12));
@@ -239,7 +263,7 @@ Changeable {
   
   /**
    * Set the SymboList to be rendered. This symbol list will be passed onto the
-   * SequenceRenderer instances registered with this SequencePanel.
+   * SequenceRenderer instances registered with this SequencePoster.
    *
    * @param s  the SymboList to render
    */
@@ -264,16 +288,8 @@ Changeable {
     return sequence;
   }
 
-  public void setRange(RangeLocation range) {
-    this.range = range;
-  }
-  
-  public RangeLocation getRange() {
-    return this.range;
-  }
-  
   /**
-   * Set the direction that this SequencePanel renders in. The direction can be
+   * Set the direction that this SequencePoster renders in. The direction can be
    * one of HORIZONTAL or VERTICAL. Once the direction is set, the display will
    * redraw. HORIZONTAL represents left-to-right rendering. VERTICAL represents
    * AceDB-style vertical rendering.
@@ -301,6 +317,33 @@ Changeable {
   public int getDirection() {
     return direction;
   }
+
+  /**
+   * Set the number of pixles to leave blank between each block of sequence
+   * information.
+   * <P>
+   * If the SeqeuncePanel chooses to display the sequence information split
+   * across multiple lines, then the spacer parameter indicates how many pixles
+   * will seperate each line.
+   *
+   * @param spacer  the number of pixles seperating each line of sequence
+   * information
+   */
+  public void setSpacer(int spacer) {
+    int oldSpacer = this.spacer;
+    this.spacer = spacer;
+    resizeAndValidate();
+    firePropertyChange("spacer", oldSpacer, spacer);
+  }
+  
+  /**
+   * Retrieve the current spacer value
+   *
+   * @return the number of pixles between each line of sequence information
+   */
+  public int getSpacer() {
+    return spacer;
+  }
   
   /**
    * Set the scale.
@@ -326,6 +369,32 @@ Changeable {
    */
   public double getScale() {
     return scale;
+  }
+
+  /**
+   * Set the absolute number of lines that the sequence will be rendered on. If
+   * this is set to 0, then the number of lines will be calculated according to
+   * how many lines will be needed to render the sequence in the currently
+   * available space. If it is set to any positive non-zero value, the sequence
+   * will be rendered using that many lines, and the SequencePoster will request
+   * enough space to accomplish this.
+   *
+   * @param lines  the number of lines to split the sequence information over
+   */
+  public void setLines(int lines) {
+    int oldLines = this.lines;
+    this.lines = lines;
+    resizeAndValidate();
+    firePropertyChange("lines", oldLines, lines);
+  }
+  
+  /**
+   * Retrieve the number of lines that the sequence will be rendered over.
+   *
+   * @return the current number of lines (0 if autocalculated)
+   */
+  public int getLines() {
+    return lines;
   }
   
   /**
@@ -361,30 +430,79 @@ Changeable {
     
     Graphics2D g2 = (Graphics2D) g;
     Rectangle2D currentClip = g2.getClip().getBounds2D();
+    double minPos;
+    double maxPos;
+    if(direction == HORIZONTAL) {
+      minPos = currentClip.getMinY();
+      maxPos = currentClip.getMaxY();
+    } else {
+      minPos = currentClip.getMinX();
+      maxPos = currentClip.getMaxX();
+    }
     
-    double minAcross = sequenceToGraphics(range.getMin());
-    double maxAcross = sequenceToGraphics(range.getMax());
-    double alongDim = maxAcross - minAcross;
-    double depth = renderer.getDepth(this, range);
+    //System.out.println("minPos: " + minPos);
+    int minOffset = Arrays.binarySearch(offsets, minPos);
+    if(minOffset < 0) {
+      minOffset = -minOffset - 1;
+    }
+    //System.out.println("minOffset: " + minOffset);
+    double minCoord = (minOffset == 0) ? 0.0 : offsets[minOffset-1];
+    //System.out.println("minCoord: " + minCoord);
+    int minP = 1 + (int) ((double) minOffset * symbolsPerLine);
+    //System.out.println("minP: " + minP);
+    
     Rectangle2D.Double clip = new Rectangle2D.Double();
     if (direction == HORIZONTAL) {
-      clip.x = minAcross;
-      clip.y = 0.0;
-      clip.width = alongDim;
-      clip.height = depth;
-      g2.translate(leadingBorder.getSize(), 0.0);
+        clip.width = alongDim;
+        clip.height = acrossDim;
+        g2.translate(leadingBorder.getSize() - alongDim * minOffset, minCoord);
     } else {
-      clip.x = 0.0;
-      clip.y = minAcross;
-      clip.width = depth;
-      clip.height = alongDim;
-      g2.translate(0.0, leadingBorder.getSize());
+        clip.width = acrossDim;
+        clip.height = alongDim;
+        g2.translate(minCoord, leadingBorder.getSize() - alongDim * minOffset);
     }
+    
+    int min = minP;
+    for(int l = minOffset; l < realLines; l++) {
+      int max = Math.min(min + symbolsPerLine - 1, sequence.length());
+      RangeLocation pos = new RangeLocation(min, max);
+      
+      if (direction == HORIZONTAL) {
+          clip.x = l * alongDim;
+          clip.y = 0.0;
+      } else {
+          clip.x = 0.0;
+          clip.y = l * alongDim;
+      }
+      
+      double depth = offsets[l] - spacer;
+      if(l != 0) {
+        depth -= offsets[l-1];
+      }
+      
+      if (direction == HORIZONTAL) {
+          clip.height = depth;
+      } else {
+          clip.width = depth;
+      }
+      
+      Shape oldClip = g2.getClip();
+      g2.clip(clip);
+      renderer.paint(g2, this, pos);
+      g2.setClip(oldClip);
+      
+      if (direction == HORIZONTAL) {
+          g2.translate(-alongDim, spacer + depth);
+      } else {
+          g2.translate(spacer + depth, -alongDim);
+      }
+      
+      min += symbolsPerLine;
 
-    Shape oldClip = g2.getClip();
-    g2.clip(clip);
-    renderer.paint(g2, this, range);
-    g2.setClip(oldClip);
+      if( (min > sequence.length()) || (offsets[l] > maxPos)) {
+        break;
+      }
+    }
   }
 
   public void setRenderer(SequenceRenderer r)
@@ -443,19 +561,101 @@ Changeable {
   public void resizeAndValidate() {
     //System.out.println("resizeAndValidate starting");
     Dimension d = null;
+    double acrossDim;
     
     if(!isActive()) {
       System.out.println("No sequence");
       // no sequence - collapse down to no size at all
+      alongDim = 0.0;
+      acrossDim = 0.0;
+      realLines = 0;
       leadingBorder.setSize(0.0);
       trailingBorder.setSize(0.0);
       d = new Dimension(0, 0);
     } else {
-      double minAcross = sequenceToGraphics(range.getMin());
-      double maxAcross = sequenceToGraphics(range.getMax());
-      double alongDim = maxAcross - minAcross;
-      double depth = renderer.getDepth(this, range);
-      d = new Dimension((int) Math.ceil(alongDim), (int) Math.ceil(depth));
+      System.out.println("Fitting to sequence");
+
+      int width;
+      Dimension parentSize = (getParent() != null)
+                ? getParent().getSize()
+                : new Dimension(500, 400);
+      if (direction == HORIZONTAL) {
+        width = parentSize.width;
+      } else {
+        width = parentSize.height;
+      }
+      
+      System.out.println("Initial width: " + width);
+      // got a sequence - fit the size according to sequence length & preferred
+      // number of lines.
+      alongDim = scale * sequence.length();
+      System.out.println("alongDim (pixles needed for sequence only): "
+      + alongDim);
+      acrossDim = 0.0;
+      
+      RangeLocation range = new RangeLocation(1, sequence.length());
+      double insetBefore = renderer.getMinimumLeader(this, range);
+      double insetAfter = renderer.getMinimumTrailer(this, range);
+
+      leadingBorder.setSize(insetBefore);
+      trailingBorder.setSize(insetAfter);
+      double insets = insetBefore + insetAfter;
+      //System.out.println("insetBefore: " + insetBefore);
+      //System.out.println("insetAfter: " + insetAfter);
+      
+      if(lines > 0) {
+        // Fixed number of lines. Calculate width needed to lay out rectangle.
+        realLines = lines;
+        width = (int) Math.ceil(
+          insets +
+          alongDim / (double) lines
+        );
+      } else {
+        // Calculated number of lines for a fixed width
+        double dWidth = (double) width;
+        dWidth -= insets; // leave space for insets
+        realLines = (int) Math.ceil(alongDim / (double) width);
+        width = (int) Math.ceil(
+          insets +
+          alongDim / (double) realLines
+        );
+      }
+      
+      acrossDim = 0.0;
+      symbolsPerLine = (int) Math.ceil((double) width / (double) scale);
+      //System.out.println("symbolsPerLine: " + symbolsPerLine);
+      //System.out.println("width: " + width);
+      //System.out.println("lines: " + lines);
+      //System.out.println("realLines: " + realLines);
+      if(symbolsPerLine < 1) {
+        throw new Error("Pants");
+      }
+      int min = 1;
+      this.offsets = new double[realLines];
+      int li = 0;
+      while(min <= sequence.length()) {
+        int max = min + symbolsPerLine - 1;
+        RangeLocation pos = new RangeLocation(min, max);
+        double depth = renderer.getDepth(this, pos);
+        acrossDim += depth + spacer;
+        offsets[li] = acrossDim;
+        min = max + 1;
+        li++;
+      }
+      
+      acrossDim += spacer * (realLines - 1);
+      alongDim = /* Math.ceil((double) width); */ symbolsPerLine * scale;
+      if (direction == HORIZONTAL) {
+        d = new Dimension(
+          (int) Math.ceil(alongDim + insetBefore + insetAfter),
+          (int) acrossDim
+        );
+      } else {
+        d = new Dimension(
+          (int) acrossDim,
+          (int) Math.ceil(alongDim + insetBefore + insetAfter)
+        );
+      }
     }
     
     setMinimumSize(d);
@@ -470,11 +670,46 @@ Changeable {
     }
   }
   
+  protected int[] calcLineExtent(MouseEvent me) {
+    int pos;
+    if(direction == HORIZONTAL) {
+      pos = me.getY();
+    } else {
+      pos = me.getX();
+    }
+    
+    int minOffset = Arrays.binarySearch(offsets, pos);
+    if(minOffset < 0) {
+      minOffset = -minOffset - 1;
+    }
+    int min = 1 + (int) ((double) minOffset * symbolsPerLine);
+    int max = min + symbolsPerLine - 1;
+    double minPos;
+    if(minOffset > 0) {
+      minPos = offsets[minOffset - 1];
+    } else {
+      minPos = 0.0;
+    }
+    
+    double ad = alongDim * minOffset;
+    
+    int xdiff;
+    int ydiff;
+    if(direction == HORIZONTAL) {
+      xdiff = (int) -ad;
+      ydiff = (int) minPos;
+    } else {
+      xdiff = (int) minPos;
+      ydiff = (int) -ad;
+    }
+    
+    return new int[] { min, max, xdiff, ydiff };
+  }
+  
   protected boolean isActive() {
     return
       (sequence != null) &&
-      (renderer != null) &&
-      (range != null);
+      (renderer != null);
   }
   
   public class Border

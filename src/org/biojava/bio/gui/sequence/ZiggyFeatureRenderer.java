@@ -127,7 +127,7 @@ implements FeatureRenderer, java.io.Serializable {
     return zigDepth;
   }
   
-  public double getDepth(SequenceRenderContext src) {
+  public double getDepth(SequenceRenderContext src, RangeLocation pos) {
     return 2.0 * zigDepth + blockDepth + 1.0;
   }
   

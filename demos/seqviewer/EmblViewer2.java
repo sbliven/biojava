@@ -17,8 +17,8 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.gui.*;
 import org.biojava.bio.gui.sequence.*;
 
-public class EmblViewer {
-  public static SequencePoster sp;
+public class EmblViewer2 {
+  public static SequencePanel sp;
   static JFrame f;
 
   public static void main(String[] args) throws Exception {
@@ -48,11 +48,11 @@ public class EmblViewer {
     FeatureFilter miscFilter = new FeatureFilter.ByType("misc_feature");
     
     f = new JFrame("EMBL View");
-    sp = new SequencePoster();
+    sp = new SequencePanel();
     sp.setSequence(seq);
-    sp.setScale(20.0);
-    sp.setSpacer(10);
-    sp.setDirection(SequencePoster.HORIZONTAL);
+    sp.setRange(new RangeLocation(1, seq.length()));
+    sp.setScale(0.2);
+    sp.setDirection(SequencePanel.HORIZONTAL);
     
     fr = new BasicFeatureRenderer();
     split = new ZiggyFeatureRenderer();
@@ -146,13 +146,13 @@ public class EmblViewer {
     JButton vert = new JButton("Vertical");
     vert.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent ae) {
-        sp.setDirection(SequencePoster.VERTICAL);
+        sp.setDirection(SequencePanel.VERTICAL);
 	    }
     } );
     JButton horiz = new JButton("Horizontal");
     horiz.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent ae) {
-        sp.setDirection(SequencePoster.HORIZONTAL);
+        sp.setDirection(SequencePanel.HORIZONTAL);
 	    }
     } );
     JButton blue = new JButton("Blue");
@@ -186,21 +186,12 @@ public class EmblViewer {
         }
       } 
     );
-    JScrollBar lines = new JScrollBar(JScrollBar.HORIZONTAL, 1, 1, 0, 5);
-    lines.addAdjustmentListener(
-      new AdjustmentListener() {
-        public void adjustmentValueChanged(AdjustmentEvent e) {
-          sp.setLines(e.getValue());
-        }
-      } 
-    );
     
     panel.add(vert);
     panel.add(horiz);
     panel.add(blue);
     panel.add(red);
     panel.add(scale);
-    panel.add(lines);
 
     f.setSize(500, 500);
     f.setVisible(true);

@@ -103,12 +103,12 @@ implements SequenceRenderer, Serializable {
     return getRenderer().getDepth(src, pos);
   }
   
-  public double getMinimumLeader(SequenceRenderContext src) {
-    return getRenderer().getMinimumLeader(src);
+  public double getMinimumLeader(SequenceRenderContext src, RangeLocation pos) {
+    return getRenderer().getMinimumLeader(src, pos);
   }
   
-  public double getMinimumTrailer(SequenceRenderContext src) {
-    return getRenderer().getMinimumTrailer(src);
+  public double getMinimumTrailer(SequenceRenderContext src, RangeLocation pos) {
+    return getRenderer().getMinimumTrailer(src, pos);
   }
   
   public void paint(

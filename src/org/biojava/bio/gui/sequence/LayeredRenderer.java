@@ -58,7 +58,7 @@ public class LayeredRenderer {
     return depth;
   }
   
-  public double getMinimumLeader(List srcL, List renderers) {
+  public double getMinimumLeader(List srcL, RangeLocation pos, List renderers) {
     if(srcL.size() != renderers.size()) {
       throw new IllegalArgumentException(
         "srcL and renderers must be the same size: " +
@@ -71,12 +71,12 @@ public class LayeredRenderer {
     while(srcI.hasNext() && i.hasNext()) {
       SequenceRenderContext src = (SequenceRenderContext) srcI.next();
       SequenceRenderer sRend = (SequenceRenderer) i.next();
-      max = Math.max(max, sRend.getMinimumLeader(src));
+      max = Math.max(max, sRend.getMinimumLeader(src, pos));
     }
     return max;
   }
   
-  public double getMinimumTrailer(List srcL, List renderers) {
+  public double getMinimumTrailer(List srcL, RangeLocation pos, List renderers) {
     if(srcL.size() != renderers.size()) {
       throw new IllegalArgumentException(
         "srcL and renderers must be the same size: " +
@@ -89,7 +89,7 @@ public class LayeredRenderer {
     while(srcI.hasNext() && i.hasNext()) {
       SequenceRenderContext src = (SequenceRenderContext) srcI.next();
       SequenceRenderer sRend = (SequenceRenderer) i.next();
-      max = Math.max(max, sRend.getMinimumTrailer(src));
+      max = Math.max(max, sRend.getMinimumTrailer(src, pos));
     }
     return max;
   }

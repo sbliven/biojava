@@ -28,6 +28,7 @@ import java.awt.geom.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.gui.*;
 
@@ -40,7 +41,7 @@ public interface FeatureRenderer {
     SequenceRenderContext context
   );
   
-  double getDepth(SequenceRenderContext src);
+  double getDepth(SequenceRenderContext src, RangeLocation pos);
   
   public FeatureHolder processMouseEvent(
     FeatureHolder hits,

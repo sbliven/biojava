@@ -161,16 +161,18 @@ implements SequenceRenderer, Serializable {
     );
   }
   
-  public double getMinimumLeader(SequenceRenderContext src) {
+  public double getMinimumLeader(SequenceRenderContext src, RangeLocation pos) {
     return LayeredRenderer.INSTANCE.getMinimumLeader(
       Collections.nCopies(renderers.size(), src),
+      pos,
       renderers
     );
   }
 
-  public double getMinimumTrailer(SequenceRenderContext src) {
+  public double getMinimumTrailer(SequenceRenderContext src, RangeLocation pos) {
     return LayeredRenderer.INSTANCE.getMinimumTrailer(
       Collections.nCopies(renderers.size(), src),
+      pos,
       renderers
     );
   }

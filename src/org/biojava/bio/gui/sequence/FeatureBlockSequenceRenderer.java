@@ -111,17 +111,17 @@ implements SequenceRenderer {
       new FeatureFilter.OverlapsLocation(pos);
     FeatureHolder fh = sp.filter(filter, false);
     if(fh.countFeatures() > 0) {
-      return renderer.getDepth(src);
+      return renderer.getDepth(src, pos);
     } else {
       return 0.0;
     }
   }
   
-  public double getMinimumLeader(SequenceRenderContext src) {
+  public double getMinimumLeader(SequenceRenderContext src, RangeLocation pos) {
     return 0.0;
   }
   
-  public double getMinimumTrailer(SequenceRenderContext src) {
+  public double getMinimumTrailer(SequenceRenderContext src, RangeLocation pos) {
     return 0.0;
   }
   

@@ -92,7 +92,7 @@ v   * all of the data that would fall within seqBox.
    * @param sp the SequencePanel to return info for
    * @return the leading distance of the renderer for that sequence panel
    */
-  double getMinimumLeader(SequenceRenderContext sp);
+  double getMinimumLeader(SequenceRenderContext sp, RangeLocation pos);
     
   /**
    * Retrieve the minimum trailing distance for this renderer when rendering sp.
@@ -103,7 +103,7 @@ v   * all of the data that would fall within seqBox.
    * @param sp the SequencePanel to return info for
    * @return the trailing distance of the renderer for that sequence panel
    */
-  double getMinimumTrailer(SequenceRenderContext sp);
+  double getMinimumTrailer(SequenceRenderContext sp, RangeLocation pos);
   
   /**
    * Produce a SequenceViewerEvent in response to a mouse gesture.

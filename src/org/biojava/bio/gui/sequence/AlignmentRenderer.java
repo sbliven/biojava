@@ -72,18 +72,18 @@ extends SequenceRendererWrapper {
     return super.getDepth(subctx, pos);
   }
   
-  public double getMinimumLeader(SequenceRenderContext ctx) {
+  public double getMinimumLeader(SequenceRenderContext ctx, RangeLocation pos) {
     SequenceRenderContext subctx = new SequenceRenderContextForLabel(
       ctx, getLabel()
     );
-    return super.getMinimumLeader(subctx);
+    return super.getMinimumLeader(subctx, pos);
   }
   
-  public double getMinimumTrailer(SequenceRenderContext ctx) {
+  public double getMinimumTrailer(SequenceRenderContext ctx, RangeLocation pos) {
     SequenceRenderContext subctx = new SequenceRenderContextForLabel(
       ctx, getLabel()
     );
-    return super.getMinimumTrailer(subctx);
+    return super.getMinimumTrailer(subctx, pos);
   }
   
   public void paint(
