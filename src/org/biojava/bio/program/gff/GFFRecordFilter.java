@@ -73,6 +73,9 @@ public interface GFFRecordFilter {
      * The sequence name to accept.
      */
     private String seqName;
+
+    public SequenceFilter() {}
+    public SequenceFilter(String seqName) { setSeqName(seqName); }
     
     /**
      * Retrieve the current sequence name.
@@ -101,6 +104,25 @@ public interface GFFRecordFilter {
       return record.getSeqName().equals(seqName);
     }
   }
+
+  public static class StrandFilter implements GFFRecordFilter {
+    private StrandedFeature.Strand strand;
+
+    public StrandFilter() {}
+    public StrandFilter(StrandedFeature.Strand strand) { setStrand(strand); }
+
+    public void setStrand(StrandedFeature.Strand strand) {
+      this.strand = strand;
+    }
+
+    public StrandedFeature.Strand getStrand() {
+      return this.strand;
+    }
+
+    public boolean accept(GFFRecord record) {
+      return record.getStrand().equals(strand);
+    }
+  }
   
   /**
    * Implementation of <span class="type">GFFRecordFilter</span> that accepts
@@ -108,9 +130,12 @@ public interface GFFRecordFilter {
    *
    * @author Matthew Pocock
    */
-  public class SourceFilter implements GFFRecordFilter {
+  public static class SourceFilter implements GFFRecordFilter {
     private String source;
     
+    public SourceFilter() {}
+    public SourceFilter(String source) { setSource(source); }
+
     /**
      * Retrieve the current source.
      *
@@ -148,6 +173,9 @@ public interface GFFRecordFilter {
   public class FeatureFilter implements GFFRecordFilter {
     private String feature;
     
+    public FeatureFilter() {}
+    public FeatureFilter(String feature) { setFeature(feature); }
+
     /**
      * Set the feature to <span class="arg">feature</span>.
      *
@@ -174,5 +202,25 @@ public interface GFFRecordFilter {
     public boolean accept(GFFRecord record) {
       return record.getFeature().equals(feature);
     }
+  }
+
+  public static class NotFilter implements GFFRecordFilter {
+    private GFFRecordFilter filter;
+
+    public NotFilter() {}
+    public NotFilter(GFFRecordFilter filter) { setFilter(filter); }
+
+    public void setFilter(GFFRecordFilter filter) {
+      this.filter = filter;
+    }
+
+    public GFFRecordFilter getFilter() {
+      return filter;
+    }
+
+    public boolean accept(GFFRecord record) {
+      return !filter.accept(record);
+    }
+
   }
 }
