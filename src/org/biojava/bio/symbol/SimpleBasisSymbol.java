@@ -37,7 +37,7 @@ class SimpleBasisSymbol extends SimpleSymbol
 implements BasisSymbol {
   protected List symbols;
   
-  public SimpleBasisSymbol(
+  protected SimpleBasisSymbol(
     char token, String name, Annotation annotation,
     List symbols
   ) throws IllegalSymbolException {
@@ -64,6 +64,7 @@ implements BasisSymbol {
     Alphabet matches
   ) {
     this(token, name, annotation);
+    this.matches = matches;
   }
   
   public SimpleBasisSymbol(
@@ -72,6 +73,7 @@ implements BasisSymbol {
   ) throws IllegalSymbolException {
     this(token, name, annotation, symbols);
     this.symbols = symbols;
+    this.matches = matches;
   }
   
   public final List getSymbols() {
@@ -92,9 +94,5 @@ implements BasisSymbol {
   
   protected List createSymbols() {
     throw new BioError("Assertion Failure: Symbols list is null");
-  }
-  
-  protected Set createBases() {
-    return Collections.singleton(this);
   }
 }

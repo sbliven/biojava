@@ -188,7 +188,7 @@ public final class AlphabetManager {
       return new SimpleSymbol(
         token, name, Annotation.EMPTY_ANNOTATION,
         new SimpleAlphabet(
-          expandBases(alpha, symList, new ArrayList())
+          expandBasis(alpha, symList, new ArrayList())
         )
       );
     }
@@ -198,13 +198,13 @@ public final class AlphabetManager {
    * Expands a list of BasisSymbols into the set of AtomicSymbol instances
    * it matches.
    */
-  private static Set expandBases(Alphabet alpha, List symList, List built) {
+  private static Set expandBasis(Alphabet alpha, List symList, List built) {
     int indx = built.size();
     if(indx < symList.size()) {
       Symbol s = (Symbol) symList.get(indx);
       if(s instanceof BasisSymbol) {
         built.add(s);
-        return expandBases(alpha, symList, built);
+        return expandBasis(alpha, symList, built);
       } else {
         Set res = new HashSet();
         Iterator i = ((FiniteAlphabet) s.getMatches()).iterator();
@@ -212,7 +212,7 @@ public final class AlphabetManager {
           AtomicSymbol as = (AtomicSymbol) i.next();
           List built2 = new ArrayList(built);
           built2.add(as);
-          res.addAll(expandBases(alpha, symList, built2));
+          res.addAll(expandBasis(alpha, symList, built2));
         }
         return res;
       }
@@ -302,7 +302,9 @@ public final class AlphabetManager {
         } else {
           return new SimpleBasisSymbol(
             token, name, annotation,
-            fs
+            fs, new SimpleAlphabet(
+              expandBasis(alpha, fs, new ArrayList())
+            )
           );
         }
       }

@@ -82,6 +82,8 @@ implements Symbol, Serializable {
   }
   
   protected Alphabet createMatches() {
-    throw new BioError("Assertion Failure: Matches alphabet is null");
+    throw new BioError(
+      "Assertion Failure: Matches alphabet is null in " + this
+    );
   }
 }
