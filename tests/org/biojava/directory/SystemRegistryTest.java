@@ -60,7 +60,7 @@ public class SystemRegistryTest extends TestCase
 
         if (numElements == 3)
         {
-            assertEquals("file:///"
+            assertEquals("file://"
                          + System.getProperty("user.home")
                          + "/.bioinformatics/seqdatabase.ini",
                          registryPath.get(0));

@@ -159,8 +159,7 @@ public class BioStoreFactory {
      * be one of those mandated by the OBDA flatfile indexing
      * specification.
      */
-    public void setSequenceFormat(LifeScienceIdentifier format)
-    {
+    public void setSequenceFormat(LifeScienceIdentifier format) {
         this.format = format;
     }
 
@@ -216,8 +215,6 @@ public class BioStoreFactory {
         keys.remove(keyName);
     }
 
-    
-
     /**
      * <code>createBioStore</code> creates a <code>BioStore</code>
      * reflecting the current state of the factory and returns a
@@ -240,11 +237,11 @@ public class BioStoreFactory {
                                        + primaryKey);
             }
 
-            if(name == null) {
+            if (name == null) {
               throw new BioException("Store does not have a anme set");
             }
 
-            if(format == null) {
+            if (format == null) {
               throw new BioException("Format not set");
             }
 
@@ -252,10 +249,8 @@ public class BioStoreFactory {
             ConfigFile ann = new ConfigFile(makeConfigFile(storeLoc));
             ann.setProperty("index", "flat/1");
 
-            if (name != null) {
-                ann.setProperty(STORE_NAME, name);
-            }
-
+            // database name
+            ann.setProperty(STORE_NAME, name);
             // sequence format
             ann.setProperty(SEQUENCE_FORMAT, format.toString());
             // primary key data

@@ -70,17 +70,20 @@ public class IndexTools
      * type of sequence to be indexed. May be one of
      * <code>SeqIOConstants.DNA SeqIOConstants.RNA
      * SeqIOConstants.AA</code>.
+     * @param name a <code>String</code> arbitrary database name.
+     *
      * @exception FileNotFoundException if an error occurs.
      * @exception IOException if an error occurs.
      * @exception ParserException if an error occurs.
      * @exception BioException if an error occurs.
      */
-    public static void indexFasta(File location, File [] seqFiles,
+    public static void indexFasta(String name, File location, File [] seqFiles,
                                   int alphabetIdentifier)
         throws FileNotFoundException, IOException, ParserException,
                BioException
     {
         BioStoreFactory bsf = new BioStoreFactory();
+        bsf.setStoreName(name);
 
         switch (alphabetIdentifier)
         {
@@ -114,17 +117,20 @@ public class IndexTools
      * type of sequence to be indexed. May be one of
      * <code>SeqIOConstants.DNA SeqIOConstants.RNA
      * SeqIOConstants.AA</code>.
+     * @param name a <code>String</code> arbitrary database name.
+     *
      * @exception FileNotFoundException if an error occurs.
      * @exception IOException if an error occurs.
      * @exception ParserException if an error occurs.
      * @exception BioException if an error occurs.
      */
-    public static void indexEmbl(File location, File [] seqFiles,
+    public static void indexEmbl(String name, File location, File [] seqFiles,
                                  int alphabetIdentifier)
         throws FileNotFoundException, IOException, ParserException,
                BioException
     {
         BioStoreFactory bsf = new BioStoreFactory();
+        bsf.setStoreName(name);
 
         switch (alphabetIdentifier)
         {
@@ -159,17 +165,20 @@ public class IndexTools
      * type of sequence to be indexed. May be one of
      * <code>SeqIOConstants.DNA SeqIOConstants.RNA
      * SeqIOConstants.AA</code>.
+     * @param name a <code>String</code> arbitrary database name.
+     *
      * @exception FileNotFoundException if an error occurs.
      * @exception IOException if an error occurs.
      * @exception ParserException if an error occurs.
      * @exception BioException if an error occurs.
      */
-    public static void indexGenbank(File location, File [] seqFiles,
+    public static void indexGenbank(String name, File location, File [] seqFiles,
                                     int alphabetIdentifier)
         throws FileNotFoundException, IOException, ParserException,
                BioException
     {
         BioStoreFactory bsf = new BioStoreFactory();
+        bsf.setStoreName(name);
 
         switch (alphabetIdentifier)
         {
@@ -205,11 +214,12 @@ public class IndexTools
      * @exception ParserException if an error occurs.
      * @exception BioException if an error occurs.
      */
-    public static void indexSwissprot(File location, File [] seqFiles)
+    public static void indexSwissprot(String name, File location, File [] seqFiles)
         throws FileNotFoundException, IOException, ParserException,
                BioException
     {
         BioStoreFactory bsf = new BioStoreFactory();
+        bsf.setStoreName(name);
         bsf.setSequenceFormat(LifeScienceIdentifier.valueOf("open-bio.org",
                                                             "swiss",
                                                             "protein" ));

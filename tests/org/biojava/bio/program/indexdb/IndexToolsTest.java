@@ -61,7 +61,8 @@ public class IndexToolsTest extends TestCase
     {
         File [] files = getDBFiles(new String [] { "dna1.fasta",
                                                    "dna2.fasta" });
-        IndexTools.indexFasta(new File(location), files, SeqIOConstants.DNA);
+        IndexTools.indexFasta("test", new File(location),
+                              files, SeqIOConstants.DNA);
 
         SequenceDBLite db = new FlatSequenceDB(location, "dna");
 
@@ -83,7 +84,8 @@ public class IndexToolsTest extends TestCase
     {
         File [] files = getDBFiles(new String [] { "rna1.fasta",
                                                    "rna2.fasta" });
-        IndexTools.indexFasta(new File(location), files, SeqIOConstants.RNA);
+        IndexTools.indexFasta("test", new File(location),
+                              files, SeqIOConstants.RNA);
 
         SequenceDBLite db = new FlatSequenceDB(location, "rna");
 
@@ -101,7 +103,8 @@ public class IndexToolsTest extends TestCase
     {
         File [] files = getDBFiles(new String [] { "protein1.fasta",
                                                    "protein2.fasta" });
-        IndexTools.indexFasta(new File(location), files, SeqIOConstants.AA);
+        IndexTools.indexFasta("test", new File(location),
+                              files, SeqIOConstants.AA);
 
         SequenceDBLite db = new FlatSequenceDB(location, "protein");
 
@@ -119,7 +122,8 @@ public class IndexToolsTest extends TestCase
     {
         File [] files = getDBFiles(new String [] { "part1.embl",
                                                    "part2.embl" });
-        IndexTools.indexEmbl(new File(location), files, SeqIOConstants.DNA);
+        IndexTools.indexEmbl("test", new File(location),
+                             files, SeqIOConstants.DNA);
 
         SequenceDBLite db = new FlatSequenceDB(location, "embl");
 
@@ -142,7 +146,8 @@ public class IndexToolsTest extends TestCase
     {
         File [] files = getDBFiles(new String [] { "part1.gb",
                                                    "part2.gb" });
-        IndexTools.indexGenbank(new File(location), files, SeqIOConstants.DNA);
+        IndexTools.indexGenbank("test", new File(location),
+                                files, SeqIOConstants.DNA);
 
         SequenceDBLite db = new FlatSequenceDB(location, "genbank");
 
@@ -165,7 +170,7 @@ public class IndexToolsTest extends TestCase
     {
         File [] files = getDBFiles(new String [] { "part1.swiss",
                                                    "part2.swiss" });
-        IndexTools.indexSwissprot(new File(location), files);
+        IndexTools.indexSwissprot("test", new File(location), files);
 
         SequenceDBLite db = new FlatSequenceDB(location, "swiss");
 
