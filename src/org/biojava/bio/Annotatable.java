@@ -25,11 +25,41 @@ package org.biojava.bio;
 import org.biojava.utils.*;
 
 /**
- * Flags an object as having associated annotation.
+ * Inidcates that an object has an associated annotation.
  * <P>
- * This interface was introduced in retrospect so that UI code could interrogate
- * an object to see if it was Annotatable, and if so pop up a suitable GUI for
- * browsing the annotation.
+ * Many BioJava objects will have associated unstructured data. This should be
+ * stored in an Annotation instance. However, the BioJava object itself will
+ * probably not want to extend the Annotation interface directly, but rather
+ * delegate off that functionality to an Annotation property. The Annotatable
+ * interface indicates that there is an Annoation porperty. It also provides
+ * an inner class called AnnotationForwarder. When implementing Annotatable, you
+ * should always create a protected or private field containing an instance of
+ * AnnotationForwarder, and register it as a ChangeListener with the associated
+ * Annotation delegate instance.
+ *
+ * <pre>
+ * public class Foo extends AbstractChangeable implements Annotatable {
+ *   private Annotation ann; // the associated annotation delegate
+ *   protected ChangeListener annFor; // the event forwarder
+ *
+ *   public Foo() {
+ *     // make the ann delegate
+ *     ann = new SimpleAnnotation();
+ *
+ *     annFor = new Annotatable.AnnotationForwarder(
+ *       this, // this is the source of the new events
+ *       getChangeSupport(Changeable.ANNOTATION) // the type of the events
+ *     );
+ *
+ *     // add the forwarder to our ann delegate
+ *     ann.addChangeListener(annFor, Changeable.ANNOTATION);
+ *   }
+ *
+ *   public Annotation getAnnotation() {
+ *     return ann;
+ *   }
+ * }
+ * </pre>
  *
  * @author  Matthew Pocock
  */
@@ -44,14 +74,14 @@ public interface Annotatable extends Changeable {
     "org.biojava.bio.Annotatable",
     "ANNOTATION"
   );
-    
+
   /**
    * Should return the associated annotation object.
    *
    * @return	an Annotation object, never null
    */
   Annotation getAnnotation();
-  
+
   /**
    * A helper class so that you don't have to worry about forwarding events from
    * the Annotaion object to the Annotatable one.
@@ -67,7 +97,7 @@ public interface Annotatable extends Changeable {
     public AnnotationForwarder(Object source, ChangeSupport cs) {
       super(source, cs);
     }
-    
+
     protected ChangeEvent generateEvent(ChangeEvent ce) {
       ChangeType ct = ce.getType();
       if(ct == Annotation.PROPERTY) {
