@@ -6,9 +6,9 @@ import java.io.*;
 import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
 
-class IndexedNthOrderDistribution extends NthOrderDistribution {
+class IndexedNthOrderDistribution extends NthOrderDistribution implements ObjectInputValidation {
     private Distribution[] dists;
-    private AlphabetIndex index;
+    private transient AlphabetIndex index;
 
     IndexedNthOrderDistribution(CrossProductAlphabet alpha, DistributionFactory df) 
         throws IllegalAlphabetException
@@ -20,6 +20,14 @@ class IndexedNthOrderDistribution extends NthOrderDistribution {
 
 	for(int i = 0; i < index.size(); ++i) {
 	    dists[i] = df.createDistribution(getConditionedAlphabet());
+	}
+    }
+
+    public void validateObject() throws InvalidObjectException {
+	try {
+	    index = AlphabetManager.getAlphabetIndex(getConditioningAlphabet(), false);
+	} catch (IllegalAlphabetException ex) {
+	    throw new InvalidObjectException("Couldn't regenerate index");
 	}
     }
 
