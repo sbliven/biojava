@@ -31,6 +31,7 @@ import org.biojava.bio.symbol.*;
 
 /**
 * An implementation of an uniform distribution
+* @serial WARNING serialized versions of this class may be incompatible with future versions of BioJava
 */
 
 public class UniformDistribution
@@ -38,6 +39,7 @@ extends AbstractDistribution
 implements Serializable {
   private final FiniteAlphabet alphabet;
   private Distribution nullModel;
+  private static final long serialVersionUID = 88454038;
 
   public Alphabet getAlphabet() {
     return alphabet;

@@ -39,8 +39,9 @@ import org.biojava.bio.symbol.*;
  *
  * @author Matthew Pocock
  */
-public class GapDistribution implements Distribution {
+public class GapDistribution implements Distribution, Serializable {
   private final Alphabet alpha;
+    private static final long serialVersionUID = 88622317;
     
   public double getWeight(Symbol sym) throws IllegalSymbolException {
     return 1.0;

@@ -31,6 +31,7 @@ import org.biojava.bio.*;
 /**
  * A simple no-frills implementation of the FiniteAlphabet interface.
  *
+ * @serial WARNING the serialized version of this class may not be compatible with future versions
  * @author Matthew Pocock
  */
 public class SimpleAlphabet
@@ -40,6 +41,10 @@ implements Serializable {
   private Annotation annotation;
   private final Set symbols;
   private final Set ambig;
+
+    //BE SURE TO CHANGE THIS VALUE IF YOU CHANGE THE IMPLEMENTATION
+    //SUCH THAT SERIALIZATION WILL FAIL.
+  private static final long serialVersionUID = 216254146;
   
   /**
    * A list of alphabets that make up this one - a singleton list containing

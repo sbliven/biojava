@@ -47,7 +47,7 @@ public class DistributionTools {
    * @throws BioException if one or both of the Distributions are over infinite alphabets.
    * @since 1.2
    */
-  public static boolean areEmissionSpectraEqual(Distribution a, Distribution b)
+  public static final boolean areEmissionSpectraEqual(Distribution a, Distribution b)
     throws BioException{
       //are either of the Dists infinite
       if(a.getAlphabet() instanceof FiniteAlphabet == false
@@ -73,7 +73,7 @@ public class DistributionTools {
    * @return  - A HashMap mapping Symbol to <code>(Double)</code> relative entropy.
    * @since 1.2
    */
-  public static HashMap KLDistance(Distribution observed,
+  public static final HashMap KLDistance(Distribution observed,
                                    Distribution expected,
                                    double logBase){
     Iterator alpha = ((FiniteAlphabet)observed.getAlphabet()).iterator();
@@ -104,7 +104,7 @@ public class DistributionTools {
    * @return  - A HashMap mapping Symbol to <code>(Double)</code> entropy.
    * @since 1.2
    */
-  public static HashMap shannonEntropy(Distribution observed, double logBase){
+  public static final HashMap shannonEntropy(Distribution observed, double logBase){
     Iterator alpha = ((FiniteAlphabet)observed.getAlphabet()).iterator();
     HashMap entropy = new HashMap(((FiniteAlphabet)observed.getAlphabet()).size());
 
@@ -129,7 +129,7 @@ public class DistributionTools {
    * Calculates the total bits of information for a distribution.
    * @since 1.2
    */
-  public static double bitsOfInformation(Distribution observed){
+  public static final double bitsOfInformation(Distribution observed){
     HashMap ent = shannonEntropy(observed, 2.0);
     double totalEntropy = 0.0;
 
@@ -146,7 +146,7 @@ public class DistributionTools {
    * @param nullWeight the number of pseudo counts to add to each distribution
    * @since 1.2
    */
-  public static Distribution[] distOverAlignment(Alignment a,
+  public static final Distribution[] distOverAlignment(Alignment a,
                                                  boolean countGaps,
                                                  double nullWeight){
 
@@ -195,7 +195,7 @@ public class DistributionTools {
    *
    * @since 1.2
    */
-  public static Distribution[] distOverAlignment(Alignment a,
+  public static final Distribution[] distOverAlignment(Alignment a,
                                                  boolean countGaps){
     return distOverAlignment(a,countGaps,0.0);
   }
@@ -204,7 +204,7 @@ public class DistributionTools {
    * Averages two or more distributions. NOTE the current implementation ignore the null model.
    * @since 1.2
    */
-  public static Distribution average (Distribution [] dists){
+  public static final Distribution average (Distribution [] dists){
 
     Alphabet alpha = dists[0].getAlphabet();
     //check if all alphabets are the same

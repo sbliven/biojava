@@ -23,6 +23,7 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
@@ -50,11 +51,36 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
   private final Map ambCache;
   private ChangeSupport changeSupport;
 
+
   {
     tokenizationsByName = new HashMap();
     ambCache = new HashMap();
   }
   
+
+  /**
+   * To prevent duplication of a what should be a
+   * single instance of an existing alphabet. This method
+   * was written as protected so that subclasses even from 
+   * other packages will inherit it. It should only be overridden
+   * with care.
+   */
+  protected Object readResolve() throws ObjectStreamException{
+    try{
+      return AlphabetManager.alphabetForName(this.getName());
+    }catch(NoSuchElementException nse){
+      //a custom alphabet has been sent to your VM, register it.
+      AlphabetManager.registerAlphabet(this.getName(), this);
+      return this;
+    }
+
+  }
+
+
+
+
+
+
   protected boolean hasListeners() {
     return changeSupport != null;
   }

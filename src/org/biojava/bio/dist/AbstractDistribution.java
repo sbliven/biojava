@@ -49,16 +49,14 @@ import org.biojava.bio.symbol.*;
  * @author Mark Schreiber (serialization support)
  */
 
-public abstract class AbstractDistribution implements Distribution, Serializable {
+public abstract class AbstractDistribution implements Distribution{
   protected transient ChangeSupport changeSupport = null;
   protected transient Distribution.NullModelForwarder nullModelForwarder = null;
 
   protected Map symbolIndices = null;//used for serialization
-  protected String alphaName = null;//used for serialization
 
   private void writeObject(ObjectOutputStream stream)throws IOException{
     AlphabetIndex index = AlphabetManager.getAlphabetIndex((FiniteAlphabet)getAlphabet());
-    alphaName = index.getAlphabet().getName();
     int size = ((FiniteAlphabet)getAlphabet()).size();
     symbolIndices = new HashMap(size);
     for(int i = 0; i < size; i++){
@@ -272,7 +270,7 @@ public abstract class AbstractDistribution implements Distribution, Serializable
     } catch (IllegalSymbolException ire) {
       throw new BioError(
         ire,
-        "Unable to itterate over all symbols in alphabet - " +
+        "Unable to iterate over all symbols in alphabet - " +
         "things changed beneath me!"
       );
     }

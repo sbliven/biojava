@@ -1,41 +1,22 @@
 /*
-
  *                    BioJava development code
-
  *
-
  * This code may be freely distributed and modified under the
-
  * terms of the GNU Lesser General Public Licence.  This should
-
  * be distributed with the code.  If you do not have a copy,
-
  * see:
-
  *
-
  *      http://www.gnu.org/copyleft/lesser.html
-
  *
-
  * Copyright for this code is held jointly by the individual
-
  * authors.  These should be listed in @author doc comments.
-
  *
-
  * For more information on the BioJava project and its aims,
-
  * or to join the biojava-l mailing list, visit the home page
-
  * at:
-
  *
-
  *      http://www.biojava.org/
-
  *
-
  */
 
 
@@ -44,52 +25,38 @@
 
 package org.biojava.bio.dist;
 
-
-
 import java.util.*;
-
 import java.io.*;
 
-
-
 import org.biojava.utils.*;
-
 import org.biojava.bio.*;
-
 import org.biojava.bio.symbol.*;
 
-
-
 /**
-
  * A simple implementation of a distribution, which works with any finite alphabet.
-
  *
-
  * @author Matthew Pocock
-
  * @author Thomas Down
-
  * @author Mark Schreiber
-
+ * @serial WARNING serilized versions of this class may not be compatible with later versions of BioJava
  */
 
 
 
 public class SimpleDistribution
 
-extends AbstractDistribution {
+extends AbstractDistribution implements Serializable{
 
   private transient AlphabetIndex indexer;
   private transient double[] weights = null;//because indexer is transient.
   private Distribution nullModel;
   private FiniteAlphabet alpha;
-
+    //Change this value if you change this class substantially
+  private static final long serialVersionUID = 899744356;
 
   private void readObject(ObjectInputStream stream)
     throws IOException, ClassNotFoundException{
     stream.defaultReadObject();
-    alpha = (FiniteAlphabet)AlphabetManager.alphabetForName(alphaName);
     indexer = AlphabetManager.getAlphabetIndex(alpha);
     indexer.addChangeListener(
       new ChangeAdapter(){

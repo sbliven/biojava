@@ -51,6 +51,8 @@ public class IntegerAlphabet implements Alphabet, Serializable {
    */
   private static final IntegerAlphabet INSTANCE = new IntegerAlphabet();
 
+
+
   private Object writeReplace() throws ObjectStreamException {
     try {
       return new StaticMemberPlaceHolder(IntegerAlphabet.class.getField("INSTANCE"));
@@ -58,6 +60,8 @@ public class IntegerAlphabet implements Alphabet, Serializable {
       throw new NotSerializableException(nsfe.getMessage());
     }
   }
+
+
 
   /**
    * Retrieve a SymbolList view of an array of integers.
@@ -227,4 +231,5 @@ public class IntegerAlphabet implements Alphabet, Serializable {
       this.iArray = iArray;
     }
   }
+
 }

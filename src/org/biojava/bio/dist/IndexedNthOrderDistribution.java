@@ -14,9 +14,12 @@ import org.biojava.bio.symbol.*;
  * @since      1.1 
  */
 class IndexedNthOrderDistribution
-extends AbstractOrderNDistribution {
+extends AbstractOrderNDistribution implements Serializable{
   private transient Distribution[] dists;
   private transient AlphabetIndex index;
+  private static final long serialVersionUID = 3847329;
+
+
   IndexedNthOrderDistribution(Alphabet alpha, DistributionFactory df)
        throws IllegalAlphabetException {
     super(alpha);

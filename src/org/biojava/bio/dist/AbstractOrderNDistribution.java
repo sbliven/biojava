@@ -15,7 +15,7 @@ import org.biojava.bio.symbol.*;
  */
 public abstract class AbstractOrderNDistribution
 extends AbstractDistribution
-implements OrderNDistribution, Serializable {
+implements OrderNDistribution{
   private Alphabet alphabet;
   private Alphabet firstA;
   private Alphabet lastA;

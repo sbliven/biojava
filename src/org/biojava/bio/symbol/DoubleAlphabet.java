@@ -247,4 +247,5 @@ public class DoubleAlphabet implements Alphabet, Serializable {
       this.dArray = dArray;
     }
   }
+
 }

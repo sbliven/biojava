@@ -6,8 +6,9 @@ import java.io.*;
 import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
 
-class GeneralNthOrderDistribution extends AbstractOrderNDistribution {
+class GeneralNthOrderDistribution extends AbstractOrderNDistribution implements Serializable{
     private Map dists;
+    private static final long serialVersionUID = 45688921; //Change this value if internal implementation changes significantly
 
     GeneralNthOrderDistribution(Alphabet alpha, DistributionFactory df) 
         throws IllegalAlphabetException

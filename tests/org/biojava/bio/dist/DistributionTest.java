@@ -1,6 +1,7 @@
 package org.biojava.bio.dist;
 
 import java.util.*;
+import java.io.*;
 
 import junit.framework.*;
 
@@ -12,6 +13,7 @@ import org.biojava.bio.seq.*;
  * Tests that simple distributions work as advertised.
  *
  * @author Matthew Pocock
+ * @author Mark Schreiber
  * @since 1.2
  */
 public class DistributionTest extends TestCase {
@@ -133,5 +135,26 @@ public class DistributionTest extends TestCase {
       throw new AssertionFailedError("Can't retrieve weight: "
       + ise.getMessage());
     }
+  }
+
+    //Test that Serialization works
+  public void testSerialization(){
+      try{
+          File f = File.createTempFile("DistTest",".tmp");
+	  ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
+          oos.writeObject(dist);
+	  oos.flush();          
+          oos.close();
+
+          ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
+          Distribution dist2 = (Distribution)ois.readObject();
+	  ois.close();
+
+          assertTrue(DistributionTools.areEmissionSpectraEqual(dist,dist2));
+
+      }catch(Throwable t){
+	  throw new AssertionFailedError("Cannot Serialize: "+
+					 t.getMessage());
+      }  
   }
 }
