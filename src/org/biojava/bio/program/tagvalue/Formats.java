@@ -118,7 +118,7 @@ public class Formats {
   }
 
   private static class FeatureTableListener
-  extends TagValueWrapper {
+  extends SimpleTagValueWrapper {
     private TagValueParser featurePropertyParser = new FeaturePropertyParser();
     private int depth = 0;
 
@@ -211,7 +211,7 @@ public class Formats {
   }
 
   private static class TopRecordDropper
-  extends TagValueWrapper {
+  extends SimpleTagValueWrapper {
     private int depth = 0;
 
     public TopRecordDropper(TagValueListener delegate) {
@@ -238,7 +238,7 @@ public class Formats {
   }
 
   private static class SPFeatureTableListener
-  extends TagValueWrapper {
+  extends SimpleTagValueWrapper {
     private Pattern pat = Pattern.compile("(\\w+)\\s+(\\d+)\\s+(\\d+)");
     private int depth = 0;
     private Object tag;

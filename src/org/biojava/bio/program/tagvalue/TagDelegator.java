@@ -49,7 +49,7 @@ import org.biojava.utils.SmallMap;
  */
 public class TagDelegator
   extends
-    TagValueWrapper
+    SimpleTagValueWrapper
 {
   private Map parsers;
   private Map listeners;

@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import org.biojava.utils.ParserException;
 
 public class RegexFieldFinder
-extends TagValueWrapper {
+extends SimpleTagValueWrapper {
   private final Pattern pattern;
   private final String[] tags;
   private final boolean inLine;

@@ -10,6 +10,7 @@ import org.biojava.bio.program.tagvalue.LineSplitParser;
 import org.biojava.bio.program.tagvalue.ParserListener;
 import org.biojava.bio.program.tagvalue.RegexFieldFinder;
 import org.biojava.bio.program.tagvalue.RegexSplitter;
+import org.biojava.bio.program.tagvalue.SimpleTagValueWrapper;
 import org.biojava.bio.program.tagvalue.TagDelegator;
 import org.biojava.bio.program.tagvalue.TagValueContext;
 import org.biojava.bio.program.tagvalue.TagValueListener;
@@ -119,7 +120,7 @@ implements Format {
   }
 
   private static class SPFeatureTableListener
-  extends TagValueWrapper {
+  extends SimpleTagValueWrapper {
     private Pattern pat = Pattern.compile("(\\w+)\\s+((<?\\d+)|(?))\\s+((>?\\d+)|(\\?))");
     private int depth = 0;
     private Object tag;

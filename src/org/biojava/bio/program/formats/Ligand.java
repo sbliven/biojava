@@ -225,7 +225,7 @@ public class Ligand {
     }
   }
   private static class DollarStringCatter
-  extends TagValueWrapper {
+  extends SimpleTagValueWrapper {
     private StringBuffer sBuff;
 
     public DollarStringCatter(TagValueListener listener) {

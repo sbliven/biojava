@@ -53,7 +53,7 @@ import org.biojava.utils.ParserException;
  */
 public class ValueChanger
   extends
-    TagValueWrapper
+    SimpleTagValueWrapper
 {
   private ChangeTable.Changer defaultC;
   private ChangeTable.Splitter defaultS;

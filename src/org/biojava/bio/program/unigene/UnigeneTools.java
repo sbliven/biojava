@@ -20,6 +20,7 @@ import org.biojava.bio.program.tagvalue.LineSplitParser;
 import org.biojava.bio.program.tagvalue.ParserListener;
 import org.biojava.bio.program.tagvalue.RegexParser;
 import org.biojava.bio.program.tagvalue.RegexSplitter;
+import org.biojava.bio.program.tagvalue.SimpleTagValueWrapper;
 import org.biojava.bio.program.tagvalue.TagDelegator;
 import org.biojava.bio.program.tagvalue.TagValueContext;
 import org.biojava.bio.program.tagvalue.TagValueListener;
@@ -252,7 +253,7 @@ public class UnigeneTools {
   }  
   
   private static class SplitAndProp
-  extends TagValueWrapper {
+  extends SimpleTagValueWrapper {
     private Pattern splitPattern;
     
     public SplitAndProp(TagValueListener delegate, Pattern splitPattern) {
@@ -282,7 +283,7 @@ public class UnigeneTools {
   }
   
   private static class HandleMapInterval
-  extends TagValueWrapper {
+  extends SimpleTagValueWrapper {
     private Pattern pattern;
     public HandleMapInterval(TagValueListener tvl) {
       super(tvl);

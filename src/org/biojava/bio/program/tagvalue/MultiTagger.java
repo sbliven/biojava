@@ -24,7 +24,7 @@ import org.biojava.utils.ParserException;
  * @since 1.4
  * @author Matthew Pocock
  */
-public class MultiTagger extends TagValueWrapper {
+public class MultiTagger extends SimpleTagValueWrapper {
   private final BoundaryFinder observer;
 
   // state

@@ -34,7 +34,7 @@ import org.biojava.utils.SmallSet;
  * @since 1.2
  */
 public class TagDropper
-extends TagValueWrapper {
+extends SimpleTagValueWrapper {
   private final Set tags;
   private boolean retain;
   private boolean propagate;

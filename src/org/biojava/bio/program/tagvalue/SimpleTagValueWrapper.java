@@ -25,7 +25,7 @@ import org.biojava.utils.ParserException;
 
 /**
  * <p>
- * Interface for TagValueListeners that wrap other TagValueListeners
+ * Helper class to wrap one TagValueListener inside another one.
  * </p>
  *
  * <p>
@@ -37,21 +37,58 @@ import org.biojava.utils.ParserException;
  * </p>
  *
  * @author Matthew Pocock
- * @author David Huen (conversion to interface)
  * @since 1.2
  */
-public interface TagValueWrapper
-  extends
-    TagValueListener
+public abstract class SimpleTagValueWrapper
+  implements
+    TagValueWrapper
 {
+  private TagValueListener delegate;
+  
   /**
-   * get listener to which all calls will be delegated
-   */  
-  public TagValueListener getDelegate();
-
-  /**
-   * set listener to which all calls will be delegated
+   * Build a SimpleTagValueWrapper that will forward everything to a delegate.
+   *
+   * @param delegate the SimpleTagValueWrapper to forward events to
    */
-  public void setDelegate(TagValueListener delegate);
+  public SimpleTagValueWrapper(TagValueListener delegate) {
+    this.delegate = delegate;
+  }
+
+  public SimpleTagValueWrapper() {
+    delegate = null;
+  }
+  
+  public TagValueListener getDelegate() {
+    return delegate;
+  }
+
+  public void setDelegate(TagValueListener delegate) {
+    this.delegate = delegate;
+  }
+  
+  public void startRecord()
+  throws ParserException {
+    delegate.startRecord();
+  }
+  
+  public void endRecord()
+  throws ParserException {
+    delegate.endRecord();
+  }
+  
+  public void startTag(Object tag)
+  throws ParserException {
+    delegate.startTag(tag);
+  }
+  
+  public void endTag()
+  throws ParserException {
+    delegate.endTag();
+  }
+  
+  public void value(TagValueContext ctxt, Object value)
+  throws ParserException {
+    delegate.value(ctxt, value);
+  }
 }
 

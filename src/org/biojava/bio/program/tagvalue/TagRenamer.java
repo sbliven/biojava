@@ -37,7 +37,7 @@ import org.biojava.utils.ParserException;
  * @author Matthew Pocock
  * @since 1.2
  */
-public class TagRenamer extends TagValueWrapper {
+public class TagRenamer extends SimpleTagValueWrapper {
   private PropertyChanger mapper;
   
   /**
