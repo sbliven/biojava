@@ -103,7 +103,7 @@ public class RestrictionEnzyme
 
     /**
      * Creates a new <code>RestrictionEnzyme</code> of the unusual
-     * time which cuts both upstream and downstream of its recognition
+     * type which cuts both upstream and downstream of its recognition
      * site. The cut position indices are <strong>always</strong> in
      * the same coordinate space as the recognition site.
      *

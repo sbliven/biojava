@@ -62,8 +62,8 @@ import org.biojava.utils.SmallSet;
  * static <code>RestrictionEnzyme</code> instances. A properties file
  * should be placed in the CLASSPATH containing a key
  * "rebase.data.file" and a corresponding value of a REBASE file
- * (standard REBASE format conventially named withrefm.### where ###
- * is the version number). This file will be loaded by the
+ * (standard REBASE format #31 conventially named withrefm.### where
+ * ### is the version number). This file will be loaded by the
  * <code>RestrictionEnzymeManager</code> <code>ClassLoader</code>. The
  * properties are loaded as a ResourceBundle, so the file should be
  * named "RestrictionEnzymeManager.properties".</p>
@@ -226,8 +226,8 @@ public final class RestrictionEnzymeManager
      *
      * @param enzyme a <code>RestrictionEnzyme</code>.
      *
-     * @return a <code>Pattern []</code> array with the forward
-     * strand.
+     * @return a <code>Pattern []</code> array with the forward strand
+     * <code>Pattern</code> at index 0 and the reverse at index 1.
      *
      * @exception BioException if the enzyme is unknown to the
      * manager (such as a custom enzyme).
