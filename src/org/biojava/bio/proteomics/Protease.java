@@ -21,18 +21,22 @@
 
 package org.biojava.bio.proteomics;
 
+//import com.sun.xml.parser.Resolver;
+//import com.sun.xml.tree.XmlDocument;
+import org.biojava.bio.BioError;
 
-import com.sun.xml.parser.Resolver;
-import com.sun.xml.tree.XmlDocument;
+import org.apache.xerces.parsers.DOMParser;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
 import org.w3c.dom.Element;
-import java.io.IOException;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ResourceBundle;
 import java.util.MissingResourceException;
 import java.net.URL;
@@ -46,19 +50,28 @@ import java.util.ArrayList;
  */
 public class Protease {
     
-    static URL proteaseManagerURL;
+    static Document doc = null;
     
     static {
-        try {
-            proteaseManagerURL = Protease.class.getClassLoader().getResource(
+         
+          try {
+              InputStream tablesStream = Protease.class.getClassLoader().getResourceAsStream(
                 "org/biojava/bio/proteomics/ProteaseManager.xml"
-            );  
-            //If I try and do this here on compile it says "An exception can't be thrown by an initializer"
-            //InputSource is = Resolver.createInputSource(proteaseManagerURL, true);
-            //Document doc = XmlDocument.createXmlDocument(is, true);
-        }catch (MissingResourceException mre) {
-            System.err.println(mre.getMessage());
-        }
+              );
+              if(tablesStream == null ) {
+                throw new BioError("Couldn't locate ResidueProperties.xml.");
+              }
+
+              InputSource is = new InputSource(tablesStream);
+              DOMParser parser = new DOMParser();
+              parser.parse(is);
+              doc = parser.getDocument();
+
+            }catch (MissingResourceException mre) {
+                System.err.println(mre.getMessage());
+            }catch(Exception e){//err
+                e.printStackTrace();
+            }
     }
     
     public static String TRYPSIN = "Trypsin";
@@ -112,21 +125,21 @@ public class Protease {
      * @return An array of protease names
      */
     public static String[] getProteaseList(){
-        ArrayList list = new ArrayList();
-        try{
-            InputSource is = Resolver.createInputSource(proteaseManagerURL, true);
-            Document doc = XmlDocument.createXmlDocument(is, true);
-       
-            NodeList children = doc.getDocumentElement().getChildNodes();
-            for(int i = 0; i < children.getLength(); i++) {
-                Element child = (Element) children.item(i);
-                if(child.getNodeName().equals("protease")) {
-                    String name = child.getAttribute("name");
-                    list.add(name);
-                }
+      ArrayList list = new ArrayList();
+
+          NodeList children = doc.getDocumentElement().getChildNodes();
+          for(int i = 0; i < children.getLength(); i++) {
+            Node cnode = (Node) children.item(i); 
+            if(! (cnode instanceof Element)) {
+                continue;
             }
-        }catch(IOException ioe){ioe.printStackTrace();}
-        catch(SAXException sax){sax.printStackTrace();}
+            Element child = (Element) cnode;
+            if(child.getNodeName().equals("protease")) {
+                String name = child.getAttribute("name");
+                list.add(name);
+            }
+         }
+
         String[] names = new String[list.size()];
         return (String[])list.toArray(names);
     }
@@ -138,13 +151,13 @@ public class Protease {
      */
     public static Protease getProteaseByName(String proteaseName){
         Protease protease = null;
-        try{
-            InputSource is = Resolver.createInputSource(proteaseManagerURL, true);
-            Document doc = XmlDocument.createXmlDocument(is, true);
-            
             NodeList children = doc.getDocumentElement().getChildNodes();
             for(int i = 0; i < children.getLength(); i++) {
-                Element child = (Element) children.item(i);
+                Node cnode = (Node) children.item(i); 
+                if(! (cnode instanceof Element)) {
+                    continue;
+                }
+                Element child = (Element) cnode;
                 if(child.getNodeName().equals("protease")) {
                     if(child.getAttribute("name").equals(proteaseName))
                     {
@@ -155,7 +168,11 @@ public class Protease {
                         NodeList proteaseNodes = child.getChildNodes();
                         for(int j = 0; j < proteaseNodes.getLength(); j++)
                         {
-                            Element el = (Element) proteaseNodes.item(j);
+                            Node cnode2 = (Node) children.item(j); 
+                            if(! (cnode2 instanceof Element)) {
+                                continue;
+                            }
+                            Element el = (Element) cnode2;
                             String name = el.getNodeName();
                             String content = el.getFirstChild().getNodeValue();
                             if(name.equals("cleaveRes")) {
@@ -174,8 +191,6 @@ public class Protease {
                     }
                 }
             }
-        }catch(IOException ioe){ioe.printStackTrace();}
-        catch(SAXException sax){sax.printStackTrace();}
         return protease;
     }        
 }
