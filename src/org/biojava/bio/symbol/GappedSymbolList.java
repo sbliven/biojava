@@ -577,12 +577,6 @@ extends AbstractSymbolList implements Serializable {
     blocks.add(b);
   }
 
-  protected GappedSymbolList() {
-    this.source = null;
-    this.alpha = null;
-    this.blocks = null;
-  }
-  
   public void dumpBlocks() {
     for(Iterator i = blocks.iterator(); i.hasNext(); ) {
       Block b = (Block) i.next();
@@ -608,7 +602,5 @@ extends AbstractSymbolList implements Serializable {
       this.viewStart = viewStart;
       this.viewEnd = viewEnd;
     }
-    
-    protected Block() {}
   }
 }

@@ -22,9 +22,11 @@
 
 package org.biojava.bio.dp;
 
+import java.io.Serializable;
+
 import org.biojava.bio.symbol.*;
 
-class SingleDPMatrix implements DPMatrix {
+class SingleDPMatrix implements DPMatrix, Serializable {
   private final State [] states;
   private final MarkovModel model;
   private final SymbolList [] resList;

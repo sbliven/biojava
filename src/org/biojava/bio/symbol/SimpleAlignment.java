@@ -146,8 +146,6 @@ extends AbstractSymbolList implements Alignment, Serializable {
     this.alphabet = AlphabetManager.instance().getCrossProductAlphabet(alphaList);
     this.length = length;
   }
- 
-  protected SimpleAlignment() {}
   
   /** 
    * Makes a column of the alignment behave like a list.

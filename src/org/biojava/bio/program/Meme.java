@@ -51,7 +51,7 @@ public class Meme {
   }
 
   public Meme(InputStream is, SymbolParser resParser)
-         throws IOException, IllegalSymbolException {
+         throws IOException, IllegalSymbolException, IllegalAlphabetException {
     StreamTokenizer st = new StreamTokenizer(
       new BufferedReader(new InputStreamReader(is)));
     st.eolIsSignificant(true);
@@ -127,7 +127,8 @@ public class Meme {
 
       SimpleWeightMatrix matrix = new SimpleWeightMatrix(
         (FiniteAlphabet) resParser.alphabet(),
-        width
+        width,
+        StateFactory.DEFAULT
       );
 
       int r = 0;
@@ -144,7 +145,7 @@ public class Meme {
               break READMOTIF;
             break;
           case st.TT_NUMBER:
-            matrix.setWeight(res.symbolAt(r+1), c, st.nval);
+            matrix.getColumn(c).setWeight(res.symbolAt(r+1), st.nval);
             r++;
             break;
         }

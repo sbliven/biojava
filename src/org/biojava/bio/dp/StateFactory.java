@@ -23,8 +23,12 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.*;
+import java.lang.reflect.*;
+
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.DNATools;
+import org.biojava.utils.*;
 
 /**
  * A thing that can make states.
@@ -64,7 +68,7 @@ public interface StateFactory {
    *
    * @author Matthew Pocock
    */
-  class DefaultStateFactory implements StateFactory {
+  class DefaultStateFactory implements StateFactory, Serializable {
     public EmissionState createState(Alphabet alpha, int [] advance, String name)
     throws IllegalAlphabetException {
       AbstractState state;
@@ -95,7 +99,15 @@ public interface StateFactory {
     
       return state;
     }
-  };
+    
+    private Object writeReplace() throws ObjectStreamException {
+      try {
+        return new StaticMemberPlaceHolder(StateFactory.class.getField("DEFAULT"));
+      } catch (NoSuchFieldException nsfe) { 
+        throw new NotSerializableException(nsfe.getMessage());
+      }
+    }
+  }
 }
 
 

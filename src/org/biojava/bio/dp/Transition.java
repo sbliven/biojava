@@ -22,11 +22,13 @@
 
 package org.biojava.bio.dp;
 
+import java.io.Serializable;
+
 /**
  * This is a small and ugly class for storing a transition. It is hash-code-able,
  * and has a sensible equality operator.
  */
-public class Transition {
+public class Transition implements Serializable {
   public State from;
   public State to;
   

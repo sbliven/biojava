@@ -75,6 +75,4 @@ public class PointLocation implements Location, Serializable {
   public PointLocation(int point) {
     this.point = point;
   }
-  
-  protected PointLocation() {}
 }

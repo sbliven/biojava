@@ -53,10 +53,6 @@ extends AbstractSymbolList implements Serializable {
   public ReverseSymbolList(SymbolList source) {
     this.source = source;
   }
-  
-  protected ReverseSymbolList() {
-    this(null);
-  }
 
   public Alphabet alphabet() {
     return source.alphabet();

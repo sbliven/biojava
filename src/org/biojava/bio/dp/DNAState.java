@@ -23,6 +23,7 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.Serializable;
 
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.DNATools;
@@ -32,14 +33,13 @@ import org.biojava.bio.seq.DNATools;
  * <P>
  * This implementation is optimized for DNA.
  */
-public class DNAState extends AbstractState {
-  private final double [] scores;
+public class DNAState extends AbstractState implements Serializable {
   private final static int[] advance = { 1 };
+  private final double [] scores;
 
   {
     scores = new double[4];
   }
-
   
   public int [] getAdvance() {
     return advance;
@@ -47,7 +47,7 @@ public class DNAState extends AbstractState {
 
   public double getWeight(Symbol r)
   throws IllegalSymbolException {
-    if(r == MagicalState.MAGICAL_RESIDUE)
+    if(r == MagicalState.MAGICAL_SYMBOL)
       return Double.NEGATIVE_INFINITY;
     alphabet().validate(r);
     return scores[DNATools.index(r)];
@@ -55,7 +55,7 @@ public class DNAState extends AbstractState {
 
   public void setWeight(Symbol r, double score)
   throws IllegalSymbolException {
-    if(r == MagicalState.MAGICAL_RESIDUE)
+    if(r == MagicalState.MAGICAL_SYMBOL)
       return;
     alphabet().validate(r);
     scores[DNATools.index(r)] = score;
@@ -72,7 +72,7 @@ public class DNAState extends AbstractState {
     }
   }
 
-  private class DNAStateTrainer implements StateTrainer {
+  private class DNAStateTrainer implements StateTrainer, Serializable {
     double c [] = new double[4];
       
     public void addCount(Symbol res, double counts)

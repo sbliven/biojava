@@ -61,11 +61,6 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
     ourSymbols = new HashMap();
     populateSymbols(new ArrayList());
   }
-
-  protected SimpleCrossProductAlphabet() {
-    this.alphas = null;
-    this.ourSymbols = null;
-  }
   
   public Iterator iterator() {
     return ourSymbols.values().iterator();

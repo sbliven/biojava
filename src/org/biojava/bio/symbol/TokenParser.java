@@ -87,6 +87,4 @@ public class TokenParser implements SymbolParser, Serializable {
       tokenToSymbol.put(Character.toUpperCase(c) + "", res);
     }
   }
-  
-  protected TokenParser() {}
 }

@@ -23,11 +23,13 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.Serializable;
+
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
-class SingleDP extends DP {
+class SingleDP extends DP implements Serializable {
   public SingleDP(MarkovModel flat)
   throws IllegalSymbolException, IllegalTransitionException, BioException {
     super(flat);

@@ -22,11 +22,13 @@
 
 package org.biojava.bio.dp;
 
+import java.io.Serializable;
+
 import org.biojava.bio.BioError;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
-public class BaumWelchSampler extends AbstractTrainer {
+public class BaumWelchSampler extends AbstractTrainer implements Serializable {
   protected double singleSequenceIteration(
     ModelTrainer trainer,
     SymbolList resList
@@ -66,7 +68,7 @@ public class BaumWelchSampler extends AbstractTrainer {
     // transition trainer
     for (int i = 0; i <= resList.length(); i++) {
       Symbol res = (i < resList.length()) ? resList.symbolAt(i + 1) :
-                    MagicalState.MAGICAL_RESIDUE;
+                    MagicalState.MAGICAL_SYMBOL;
       for (int s = 0; s < states.length; s++) {
         int [] ts = backwardTransitions[s];
         double [] tss = backwardTransitionScores[s];

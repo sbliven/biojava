@@ -23,6 +23,7 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+
 import org.biojava.bio.symbol.*;
 
 /**
@@ -45,18 +46,21 @@ abstract class AbstractCursor implements DPCursor {
   }
   
   public boolean canAdvance() {
-    return resIterator.hasNext() || currentRes != MagicalState.MAGICAL_RESIDUE;
+    return resIterator.hasNext() || currentRes != MagicalState.MAGICAL_SYMBOL;
   }
   
   public void advance() {
     lastRes = currentRes;
     currentRes = (resIterator.hasNext()) ? (Symbol) resIterator.next()
-                                         : MagicalState.MAGICAL_RESIDUE;
+                                         : MagicalState.MAGICAL_SYMBOL;
   }
   
   public AbstractCursor(Iterator resIterator) {
     this.resIterator = resIterator;
-    this.currentRes = MagicalState.MAGICAL_RESIDUE;
-    this.lastRes = MagicalState.MAGICAL_RESIDUE;
+    this.currentRes = MagicalState.MAGICAL_SYMBOL;
+    this.lastRes = MagicalState.MAGICAL_SYMBOL;
+  }
+  
+  protected AbstractCursor() {
   }
 }

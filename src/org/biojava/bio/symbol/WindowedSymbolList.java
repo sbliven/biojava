@@ -80,12 +80,6 @@ extends AbstractSymbolList implements Serializable {
     this.width = width;
   }
   
-  protected WindowedSymbolList() {
-    this.source = null;
-    this.alpha = null;
-    this.width = 0;
-  }
-  
   public Alphabet alphabet() {
     return alpha;
   }

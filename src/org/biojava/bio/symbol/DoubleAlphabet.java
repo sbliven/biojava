@@ -51,7 +51,7 @@ public class DoubleAlphabet implements Alphabet, Serializable {
   
   private Object writeReplace() throws ObjectStreamException {
     try {
-      return new StaticMemberPlaceHolder(getClass().getField("INSTANCE"));
+      return new StaticMemberPlaceHolder(DoubleAlphabet.class.getField("INSTANCE"));
     } catch (NoSuchFieldException nsfe) {
       throw new NotSerializableException(nsfe.getMessage());
     }
@@ -115,9 +115,6 @@ public class DoubleAlphabet implements Alphabet, Serializable {
     throw new NoSuchElementException("No parsers supported by DoubleAlphabet yet");
   }
   
-  protected DoubleAlphabet() {
-  }
-  
   /**
    * A single double value.
    * <P>
@@ -145,10 +142,6 @@ public class DoubleAlphabet implements Alphabet, Serializable {
     protected DoubleSymbol(double val) {
       this.val = val;
     }
-    
-    protected DoubleSymbol() {
-      this.val = 0;
-    }
   }
   
   /**
@@ -175,10 +168,6 @@ public class DoubleAlphabet implements Alphabet, Serializable {
     
     public DoubleArray(double [] dArray) {
       this.dArray = dArray;
-    }
-    
-    protected DoubleArray() {
-      this.dArray = null;
     }
   }
 }

@@ -23,6 +23,8 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.Serializable;
+
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
@@ -33,7 +35,7 @@ import org.biojava.bio.symbol.*;
  * @author Matthew Pocock
  */
 
-public class UniformGapState implements EmissionState {
+public class UniformGapState implements EmissionState, Serializable {
     private final static Symbol GAP;
 
     static {

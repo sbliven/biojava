@@ -102,8 +102,6 @@ public interface Annotation {
    * The empty and immutable implementation.
    */
   class EmptyAnnotation implements Annotation, Serializable {
-    protected EmptyAnnotation() {}
-    
     public Object getProperty(Object key) throws NoSuchElementException {
       throw new NoSuchElementException("There are no keys in the Empty Annotaion object: " + key);
     }
@@ -124,11 +122,10 @@ public interface Annotation {
     
     private Object writeReplace() throws ObjectStreamException {
       try {
-        return new StaticMemberPlaceHolder(getClass().getField("EMPTY_ANNOTATION"));
+        return new StaticMemberPlaceHolder(Annotation.class.getField("EMPTY_ANNOTATION"));
       } catch (NoSuchFieldException nsfe) {
         throw new NotSerializableException(nsfe.getMessage());
       }
     }
-
   }
 }

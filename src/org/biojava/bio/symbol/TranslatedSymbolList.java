@@ -77,11 +77,6 @@ extends AbstractSymbolList implements SymbolList {
     this.transTable = transTable;
   }
   
-  protected TranslatedSymbolList() {
-    this.source = null;
-    this.transTable = null;
-  }
-  
   public int length() {
     return source.length();
   }

@@ -175,8 +175,6 @@ public class SuffixTreeKernel implements SVMKernel, Serializable {
       this.bSet.or(bSet);
     }
     
-    protected SelectionScalar() {}
-    
     /**
      * @return 1.0 or 0.0 depending on whether the bit at
      *         <span class="arg">depth</span> is set or not
@@ -203,8 +201,6 @@ public class SuffixTreeKernel implements SVMKernel, Serializable {
       this.a = a;
       this.b = b;
     }
-    
-    protected MultipleScalar() {}
     
     public double getScale(int depth) {
       return a.getScale(depth) * b.getScale(depth);

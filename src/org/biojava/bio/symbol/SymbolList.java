@@ -130,8 +130,6 @@ public interface SymbolList {
    * The empty immutable implementation.
    */
   class EmptySymbolList implements SymbolList, Serializable {
-    protected EmptySymbolList() {}
-    
     public Alphabet alphabet() {
       return Alphabet.EMPTY_ALPHABET;
     }
@@ -169,7 +167,7 @@ public interface SymbolList {
 
     private Object writeReplace() throws ObjectStreamException {
       try {
-        return new StaticMemberPlaceHolder(getClass().getField("EMPTY_LIST"));
+        return new StaticMemberPlaceHolder(SymbolList.class.getField("EMPTY_LIST"));
       } catch (NoSuchFieldException nsfe) {
         throw new NotSerializableException(nsfe.getMessage());
       }

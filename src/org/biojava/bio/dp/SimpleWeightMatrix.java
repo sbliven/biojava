@@ -23,45 +23,33 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.Serializable;
+
 import org.biojava.bio.symbol.*;
 
-public class SimpleWeightMatrix implements WeightMatrix {
-  private int cols;
-  private Map weights;
-  private FiniteAlphabet alpha;
+public class SimpleWeightMatrix implements WeightMatrix, Serializable {
+  private EmissionState [] columns;
+  private Alphabet alpha;
 
-  {
-    weights = new HashMap();
-  }
-
-  public FiniteAlphabet alphabet() {
+  public Alphabet alphabet() {
     return alpha;
   }
 
-  public double getWeight(Symbol res, int column)
-         throws IllegalSymbolException {
-    alphabet().validate(res);
-    double [] w = (double []) weights.get(res);
-    return w[column];
-  }
-
-  public void setWeight(Symbol res, int column, double val)
-         throws IllegalSymbolException {
-    alphabet().validate(res);
-    double [] w = (double []) weights.get(res);
-    w[column] = val;
-  }
-
   public int columns() {
-    return cols;
+    return this.columns.length;
+  }
+  
+  public EmissionState getColumn(int column) {
+    return columns[column];
   }
 
-  public SimpleWeightMatrix(FiniteAlphabet alpha, int cols) {
+  public SimpleWeightMatrix(Alphabet alpha, int columns, StateFactory sFact)
+  throws IllegalAlphabetException {
     this.alpha = alpha;
-    this.cols = cols;
-    SymbolList res = alpha.symbols();
-    for(int i = 0; i < res.length(); i++) {
-      weights.put(res.symbolAt(i+1), new double[cols]);
+    this.columns = new EmissionState[columns];
+    int [] advance = { 1 };
+    for(int i = 0; i < columns; i++) {
+      this.columns[i] = sFact.createState(alpha, advance, i + "");
     }
   }
 }

@@ -74,6 +74,10 @@ public abstract class AbstractState implements EmissionState {
     this.alpha = alpha;
   }
 
+  protected AbstractState() {
+    this.alpha = null;
+  }
+  
   public Symbol sampleSymbol()
   throws BioError {
     double p = Math.random();

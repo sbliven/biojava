@@ -22,13 +22,16 @@
 
 package org.biojava.bio.dp;
 
+import java.io.Serializable;
 import java.util.Map;
+
 import org.biojava.bio.symbol.*;
 
 /**
  * A no-frills implementation of StatePath.
  */
-public class SimpleStatePath extends SimpleAlignment implements StatePath {
+public class SimpleStatePath
+extends SimpleAlignment implements StatePath, Serializable {
   private double score;
   
   public double getScore() {

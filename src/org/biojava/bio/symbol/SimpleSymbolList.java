@@ -121,6 +121,4 @@ public class SimpleSymbolList implements SymbolList, Serializable {
     this.alphabet = alpha;
     this.symbols = rList;
   }
-  
-  protected SimpleSymbolList() {}
 }

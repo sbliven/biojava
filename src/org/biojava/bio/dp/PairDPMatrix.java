@@ -22,6 +22,8 @@
 
 package org.biojava.bio.dp;
 
+import java.io.Serializable;
+
 import org.biojava.bio.symbol.*;
 
 /**
@@ -31,7 +33,7 @@ import org.biojava.bio.symbol.*;
  * @author Thomas Down
  */
 
-public class PairDPMatrix implements DPMatrix {
+public class PairDPMatrix implements DPMatrix, Serializable {
     private State[] states;
     private SymbolList[] seqs;
     private double[][][] scores;

@@ -23,6 +23,7 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.Serializable;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
@@ -36,7 +37,7 @@ import org.biojava.bio.symbol.*;
  * @author Matthew Pocock
  */
 
-public class PairwiseDP extends DP {
+public class PairwiseDP extends DP implements Serializable {
     private EmissionState magicalState;
     private Symbol magicalSymbol;
 
@@ -46,7 +47,7 @@ public class PairwiseDP extends DP {
     {
 	super(mm);
 	magicalState = mm.magicalState();
-	magicalSymbol = MagicalState.MAGICAL_RESIDUE;
+	magicalSymbol = MagicalState.MAGICAL_SYMBOL;
     }
 
     private final static int[] ia00 = {0, 0};
@@ -323,14 +324,14 @@ public class PairwiseDP extends DP {
 	if (l.contains(null))
 	    return null;
 
-        if (l.contains(MagicalState.MAGICAL_RESIDUE)) {
+        if (l.contains(MagicalState.MAGICAL_SYMBOL)) {
 	    Symbol gr = AlphabetManager.instance().getGapSymbol();
 
 	    gappedResList.clear();
 	    boolean gotOther = false;
             for (Iterator i = l.iterator(); i.hasNext(); ) {
 		Object o = i.next();
-		if (o == MagicalState.MAGICAL_RESIDUE || o == gr) {
+		if (o == MagicalState.MAGICAL_SYMBOL || o == gr) {
 		    gappedResList.add(gr);
 		} else {
 		    gappedResList.add(o);
@@ -340,7 +341,7 @@ public class PairwiseDP extends DP {
 	    if (gotOther)
 		return a.getSymbol(gappedResList);
 	    else
-		return MagicalState.MAGICAL_RESIDUE;
+		return MagicalState.MAGICAL_SYMBOL;
         }
         return a.getSymbol(l);
     }
@@ -464,7 +465,7 @@ public class PairwiseDP extends DP {
 		
       		if (res == null) {
             weight = Double.NEGATIVE_INFINITY;
-          } else if (res == MagicalState.MAGICAL_RESIDUE) {
+          } else if (res == MagicalState.MAGICAL_SYMBOL) {
             try {
               weight = ((EmissionState) states[l]).getWeight(res);
             } catch (Exception ex) {}
@@ -687,7 +688,7 @@ private class Viterbi {
 		weight = Double.NEGATIVE_INFINITY;
 	    } else if (! (states[l] instanceof EmissionState)) {
 		weight = 0.0;
-	    } else if (res == MagicalState.MAGICAL_RESIDUE) {
+	    } else if (res == MagicalState.MAGICAL_SYMBOL) {
 		try {
 		    weight = ((EmissionState) states[l]).getWeight(res);
 		} catch (Exception ex) {}
@@ -900,7 +901,7 @@ private class Viterbi {
 
     public Symbol symbol(int dim, int poz) {
       if (poz == 0 || poz > seqs[dim].length()) {
-        return MagicalState.MAGICAL_RESIDUE;
+        return MagicalState.MAGICAL_SYMBOL;
       } else {
         return seqs[dim].symbolAt(poz);
       }
@@ -1021,7 +1022,7 @@ private class Viterbi {
 
     public Symbol symbol(int dim, int poz) {
       if (poz == 0 || poz > seqs[dim].length()) {
-        return MagicalState.MAGICAL_RESIDUE;
+        return MagicalState.MAGICAL_SYMBOL;
       } else {
         return seqs[dim].symbolAt(poz);
       }
@@ -1107,7 +1108,7 @@ private class Viterbi {
         return null;
       }
       if (poz == 0 || poz > seqs[dim].length()) {
-        return MagicalState.MAGICAL_RESIDUE;
+        return MagicalState.MAGICAL_SYMBOL;
       }
       return seqs[dim].symbolAt(poz);
     }

@@ -23,26 +23,30 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.*;
+import java.lang.reflect.*;
+
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.utils.*;
 
 /**
  * Start/end state for HMMs.
  * <P>
  * All MagicalState objects emit over MAGICAL_ALPHABET, which only contains
- * MAGICAL_RESIDUE.
+ * MAGICAL_STATE.
  *
  * @author Matthew Pocock
  */
-public class MagicalState implements EmissionState {
+public class MagicalState implements EmissionState, Serializable {
   /**
    * The symbol that implicitly exists at the beginning and end of every
    * SymbolList (index 0 and length+1).
    */
-  public static final Symbol MAGICAL_RESIDUE;
+  public static final Symbol MAGICAL_SYMBOL;
 
   /**
-   * The alphabet that contains only MAGICAL_RESIDUE.
+   * The alphabet that contains only MAGICAL_STATE.
    */
   public static final Alphabet MAGICAL_ALPHABET;
 
@@ -53,11 +57,11 @@ public class MagicalState implements EmissionState {
   protected static final Map stateCache;
   
   static {
-    MAGICAL_RESIDUE = new SimpleSymbol('!', "mMagical", null);
-    MAGICAL_ALPHABET = new SimpleAlphabet();
+    MAGICAL_SYMBOL = new MagicalSymbol('!', "mMagical", null);
+    MAGICAL_ALPHABET = new MagicalAlphabet();
 
     try {
-      ((SimpleAlphabet) MAGICAL_ALPHABET).addSymbol(MAGICAL_RESIDUE);
+      ((SimpleAlphabet) MAGICAL_ALPHABET).addSymbol(MAGICAL_SYMBOL);
       ((SimpleAlphabet) MAGICAL_ALPHABET).setName("Magical Alphabet");
     } catch (IllegalSymbolException ire) {
       throw new BioError(
@@ -88,6 +92,10 @@ public class MagicalState implements EmissionState {
     }
   }
 
+  private Object writeReplace() throws ObjectStreamException {
+    return new PlaceHolder(advance.length);
+  }
+  
   public char getToken() {
     return '!';
   }
@@ -105,7 +113,7 @@ public class MagicalState implements EmissionState {
   }
 
   public double getWeight(Symbol r) throws IllegalSymbolException {
-    if (r != MAGICAL_RESIDUE)
+    if (r != MAGICAL_SYMBOL)
       return Double.NEGATIVE_INFINITY;
     return 0.0;
   }
@@ -118,7 +126,7 @@ public class MagicalState implements EmissionState {
   }
 
   public Symbol sampleSymbol() {
-    return MAGICAL_RESIDUE;
+    return MAGICAL_SYMBOL;
   }
 
   public void registerWithTrainer(ModelTrainer modelTrainer) {
@@ -127,4 +135,40 @@ public class MagicalState implements EmissionState {
   public int[] getAdvance() {
     return advance;
   }
-}
+}  
+  class PlaceHolder implements Serializable {
+    private int heads;
+    
+    public PlaceHolder(int heads) {
+      this.heads = heads;
+    }
+    
+    private Object readReplace() throws ObjectStreamException {
+      return MagicalState.getMagicalState(heads);
+    }
+  }
+
+  class MagicalSymbol extends SimpleSymbol {
+    public MagicalSymbol(char token, String name, Annotation ann) {
+      super(token, name, ann);
+    }
+    
+    private Object writeReplace() throws ObjectStreamException {
+      try {
+        return new StaticMemberPlaceHolder(MagicalState.class.getField("MAGICAL_SYMBOL"));
+      } catch (NoSuchFieldException nsfe) { 
+        throw new NotSerializableException(nsfe.getMessage());
+      }
+    }
+  }
+
+  class MagicalAlphabet extends SimpleAlphabet {
+    private Object writeReplace() throws ObjectStreamException {
+      try {
+        return new StaticMemberPlaceHolder(MagicalState.class.getField("MAGICAL_ALPHABET"));
+      } catch (NoSuchFieldException nsfe) { 
+        throw new NotSerializableException(nsfe.getMessage());
+      }
+    }
+  }
+

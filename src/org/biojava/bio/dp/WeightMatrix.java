@@ -30,9 +30,6 @@ import org.biojava.bio.symbol.*;
  * The weight matrix uses computer-coordinates. Thus, a 10 column weight matrix
  * has columns (0 - 9). I guess that if you try to access columns outside the
  * logical range, the implementation may throw an IndexOutOfBoundsException.
- * <P>
- * A weight matrix is always over a finite alphabet of symbols, so that you can think
- * of each row of the matrix as being for a different symbol.
  */
 public interface WeightMatrix {
   /**
@@ -40,40 +37,25 @@ public interface WeightMatrix {
    *
    * @return  the Alphabet
    */
-  FiniteAlphabet alphabet();
-  
-  /**
-   * Return the weight for a given symbol at a given column.
-   * <P>
-   * This is the log-probability or log-odds of observing a given symbol
-   * at a given position.
-   *
-   * @param res the Symbol
-   * @param column  the column
-   * @return  the weight
-   * @throws  IllegalSymbolException if the symbol is not part of the alphabet
-   */
-  double getWeight(Symbol res, int column) throws IllegalSymbolException;
-  
-  /**
-   * Sets the weight for a given symbol at a given column.
-   * <P>
-   * This is the log-probability or log-odds of observing a given symbol
-   * at a given position.
-   *
-   * @param res the Symbol
-   * @param column  the column
-   * @param weight  the new weight
-   * @throws  IllegalSymbolException if the symbol is not part of the alphabet
-   * @throws UnsupportedOperationException if the weight-matrix is read-only
-   */
-  void setWeight(Symbol res, int column, double weight)
-         throws IllegalSymbolException, UnsupportedOperationException;
+  Alphabet alphabet();
   
   /**
    * The number of columns modeled by the weight matrix.
    *
    * @return the number of columns
    */
-  int columns();  
+  int columns();
+  
+  /**
+   * Retrieve a column as an EmissionState.
+   * <P>
+   * To find the emission probability for Symbol sym at column col use:
+   * <code>wm.getColumn(col).getWeight(sym)</code>.
+   *
+   * @param column  the weight matrix column to retrieve
+   * @throws IndexOutOfBoundsException if column is not between 0 and
+   *         columns()-1
+   * @return the EmissionState that represents the individual column
+   */
+  EmissionState getColumn(int column) throws IndexOutOfBoundsException;
 }

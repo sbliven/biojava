@@ -98,6 +98,4 @@ public class NameParser implements SymbolParser, Serializable {
   public NameParser(Map nameToSymbol) {
     this.nameToSymbol = nameToSymbol;
   }
-  
-  protected NameParser() {}
 }

@@ -46,4 +46,8 @@ public class IllegalTransitionException extends Exception {
   public IllegalTransitionException(State from, State to) {
     this(from, to, "");
   }
+  
+  public IllegalTransitionException() {
+    super();
+  }
 }

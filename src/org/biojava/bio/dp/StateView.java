@@ -23,6 +23,7 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.Serializable;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
@@ -124,7 +125,11 @@ public abstract class StateView implements EmissionState {
     this.source = source;
   }
   
-  private class Trainer implements StateTrainer {
+  protected StateView() {
+    source = null;
+  }
+  
+  private class Trainer implements StateTrainer, Serializable {
     private final StateTrainer st;
     
     public void addCount(Symbol res, double times)
@@ -143,6 +148,10 @@ public abstract class StateView implements EmissionState {
     
     public Trainer(StateTrainer st) {
       this.st = st;
+    }
+    
+    protected Trainer() {
+      this.st = null;
     }
   }
 }

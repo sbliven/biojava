@@ -137,6 +137,4 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
     this.tokenToSymbol = new HashMap();
     this.nameToSymbol = new HashMap();
   }
-  
-  protected AllTokensAlphabet() {}
 }

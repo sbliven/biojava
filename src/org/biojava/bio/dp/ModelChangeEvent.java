@@ -1,6 +1,7 @@
 package org.biojava.bio.dp;
 
 import java.util.EventObject;
+import java.io.Serializable;
 
 public class ModelChangeEvent extends EventObject {
   public MarkovModel getSourceModel() {

@@ -93,7 +93,7 @@ public interface FiniteAlphabet extends Alphabet {
     
     private Object writeReplace() throws ObjectStreamException {
       try {
-        return new StaticMemberPlaceHolder(getClass().getField("EMPTY_ALPHABET"));
+        return new StaticMemberPlaceHolder(FiniteAlphabet.class.getField("EMPTY_ALPHABET"));
       } catch (NoSuchFieldException nsfe) {
         throw new NotSerializableException(nsfe.getMessage());
       }

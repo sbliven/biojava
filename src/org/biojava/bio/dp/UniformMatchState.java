@@ -23,6 +23,8 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.Serializable;
+
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
@@ -32,7 +34,7 @@ import org.biojava.bio.symbol.*;
  * @author Thomas Down
  */
 
-public class UniformMatchState implements EmissionState {
+public class UniformMatchState implements EmissionState, Serializable {
     private CrossProductAlphabet alpha;
     private FiniteAlphabet subAlpha;
     private int ungappedSize;
@@ -67,6 +69,8 @@ public class UniformMatchState implements EmissionState {
 	for (int l = 0; l < advance.length; ++l)
 	    advance[l] = 1;
     }
+    
+    protected UniformMatchState() {}
 
     public int[] getAdvance() {
 	return advance;

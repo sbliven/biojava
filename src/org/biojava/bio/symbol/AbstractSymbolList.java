@@ -123,8 +123,6 @@ public abstract class AbstractSymbolList implements SymbolList {
      */
     private class SubList implements SymbolList, Serializable {
 	private int start, end;
-
-  protected SubList() {}
   
 	public SubList(int start, int end) {
 	    this.start = start;
@@ -179,8 +177,6 @@ public abstract class AbstractSymbolList implements SymbolList {
      */
     private static class ListView extends AbstractList implements Serializable {
 	private SymbolList rl;
-
-  protected ListView() {}
   
 	ListView(SymbolList rl) {
 	    this.rl = rl;

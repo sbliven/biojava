@@ -54,12 +54,6 @@ implements FiniteAlphabet, CrossProductAlphabet, Serializable {
     this.size = size;
   }
   
-  protected SparseCrossProductAlphabet() {
-    this.alphas = null;
-    this.knownSymbols = null;
-    this.size = 0;
-  }
-  
   public SymbolList symbols() {
     return null;
   }

@@ -23,12 +23,13 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.Serializable;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.DNATools;
 
-public class ComplementaryState implements EmissionState {
+public class ComplementaryState implements EmissionState, Serializable {
   private EmissionState other;
   private EmissionState cache; // don't know if this speeds things up
   
@@ -102,7 +103,7 @@ public class ComplementaryState implements EmissionState {
     }
   }
   
-  private class ComplementaryTrainer implements StateTrainer {
+  private class ComplementaryTrainer implements StateTrainer, Serializable {
     private StateTrainer st;
     
     public void addCount(Symbol r, double count)

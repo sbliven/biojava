@@ -23,10 +23,11 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.Serializable; 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
-public class SimpleMarkovModel implements MarkovModel {
+public class SimpleMarkovModel implements MarkovModel, Serializable {
   private final Alphabet emissionAlpha;
   private final FiniteAlphabet stateAlpha;
   private final MagicalState magicalState;
@@ -304,7 +305,7 @@ public class SimpleMarkovModel implements MarkovModel {
     transFrom.put(magicalState, new HashSet());
     transTo.put(magicalState, new HashSet());
   }
-
+  
   public void registerWithTrainer(ModelTrainer modelTrainer)
   throws BioException {
     if(modelTrainer.getTrainerForModel(this) == null) {

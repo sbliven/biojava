@@ -35,10 +35,6 @@ class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable
     this.alphas = alphas;
   }
   
-  protected InfiniteCrossProductAlphabet() {
-    this.alphas = null;
-  }
-  
   public String getName() {
     StringBuffer name = new StringBuffer("(");
     for (int i = 0; i < alphas.size(); ++i) {

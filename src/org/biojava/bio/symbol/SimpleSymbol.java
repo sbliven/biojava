@@ -79,8 +79,6 @@ public class SimpleSymbol implements Symbol, Serializable {
     this.annotation = annotation;
   }
 
-  protected SimpleSymbol() {}
-  
   public String toString() {
     return super.toString() + " " + token;
   }

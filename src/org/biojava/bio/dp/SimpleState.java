@@ -23,10 +23,12 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.Serializable;
+
 import org.biojava.bio.BioError;
 import org.biojava.bio.symbol.*;
 
-public class SimpleState extends AbstractState {
+public class SimpleState extends AbstractState implements Serializable {
   private Map symbolToProb = new HashMap();
   public final int [] advance;
   
@@ -35,7 +37,7 @@ public class SimpleState extends AbstractState {
   }
   
   public double getWeight(Symbol r) throws IllegalSymbolException {
-    if(r == MagicalState.MAGICAL_RESIDUE) {
+    if(r == MagicalState.MAGICAL_SYMBOL) {
       return Double.NEGATIVE_INFINITY;
     }
     try {

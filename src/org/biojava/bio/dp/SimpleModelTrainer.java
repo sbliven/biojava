@@ -23,10 +23,12 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.Serializable;
+
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
-public class SimpleModelTrainer implements ModelTrainer {
+public class SimpleModelTrainer implements ModelTrainer, Serializable {
   private Transition _tran;
   
   /**

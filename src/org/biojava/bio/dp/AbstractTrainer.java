@@ -81,4 +81,6 @@ public abstract class AbstractTrainer implements TrainingAlgorithm {
   public AbstractTrainer(DP dp) {
     this.dp = dp;
   }
+  
+  protected AbstractTrainer() {}
 }

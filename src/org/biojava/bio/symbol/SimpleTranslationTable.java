@@ -87,12 +87,6 @@ public class SimpleTranslationTable implements TranslationTable, Serializable {
     this.target = target;
     this.transMap = new HashMap();
   }
-
-  protected SimpleTranslationTable() {
-    this.source = null;
-    this.target = null;
-    this.transMap = null;
-  }
   
   /**
    * Create a new translation table that will translate symbols from source to

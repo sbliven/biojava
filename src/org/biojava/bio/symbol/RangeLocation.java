@@ -100,8 +100,6 @@ public class RangeLocation implements Location, Serializable {
     this.max = max;
   }
 
-  protected RangeLocation() {}
-  
   public String toString() {
     return getMin() + ", " + getMax();
   }

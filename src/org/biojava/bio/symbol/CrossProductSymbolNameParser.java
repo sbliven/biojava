@@ -156,9 +156,4 @@ public class CrossProductSymbolNameParser implements SymbolParser, Serializable 
       }
     }
   }
-
-  protected CrossProductSymbolNameParser() {
-    this.alpha = null;
-    this.parser = null;
-  }
 }

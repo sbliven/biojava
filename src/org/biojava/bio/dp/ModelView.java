@@ -23,6 +23,7 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.Serializable;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
@@ -211,7 +212,7 @@ public abstract class ModelView implements MarkovModel {
   }
   
   
-  private static class ModelTransition {
+  private static class ModelTransition implements Serializable {
     public final MarkovModel model;
     public final State from;
     public final State to;
@@ -230,7 +231,7 @@ public abstract class ModelView implements MarkovModel {
     }
   }
   
-  public class ViewTransitionTrainer implements TransitionTrainer {
+  public class ViewTransitionTrainer implements TransitionTrainer, Serializable {
     public void addCount(State from, State to, double count)
     throws IllegalSymbolException, IllegalTransitionException {
       return;

@@ -23,6 +23,7 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.Serializable;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
@@ -45,7 +46,7 @@ public abstract class DP {
     int cols = matrix.columns();
 
     for (int c = 0; c < cols; c++)
-      score += matrix.getWeight(symList.symbolAt(c + start), c);
+      score += matrix.getColumn(c).getWeight(symList.symbolAt(c + start));
 
     return score;
   }
@@ -564,7 +565,7 @@ public abstract class DP {
     return new SimpleStatePath(totScore, labelToResList);
   }
 
-  public static class ReverseIterator implements Iterator {
+  public static class ReverseIterator implements Iterator, Serializable {
     private SymbolList res;
     private int index;
 

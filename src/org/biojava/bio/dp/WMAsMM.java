@@ -23,19 +23,20 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.Serializable;
+
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
  * Wraps a weight matrix up so that it appears to be a very simple hmm.
  */
-public class WMAsMM implements MarkovModel {
+public class WMAsMM implements MarkovModel, Serializable {
   private static final int [] advance = {1};
-  private static MagicalState magicalState = MagicalState.getMagicalState(1);
+  private static final MagicalState magicalState = MagicalState.getMagicalState(1);
   
-  private WeightMatrix wm;
-  private FiniteAlphabet stateAlpha;
-  private WMState [] stateList;
+  private final WeightMatrix wm;
+  private final FiniteAlphabet stateAlpha;
   
   public Alphabet emissionAlphabet() {
     return wm.alphabet();
@@ -74,13 +75,12 @@ public class WMAsMM implements MarkovModel {
     sAlpha.validate(from);
     
     if(from == magicalState)
-      return stateList[0];
+      return wm.getColumn(0);
       
-    if(from == stateList[wm.columns()-1])
+    if(from == wm.getColumn(wm.columns()-1))
       return magicalState;
 
-    WMState fromWM = (WMState) from;
-    return stateList[fromWM.index()+1];
+    return wm.getColumn(index((EmissionState) from)+1);
   }
   
   public Set transitionsFrom(State from)
@@ -89,13 +89,12 @@ public class WMAsMM implements MarkovModel {
     sAlpha.validate(from);
 
     if(from == magicalState)
-      return Collections.singleton(stateList[0]);
+      return Collections.singleton(wm.getColumn(0));
       
-    if(from == stateList[wm.columns()-1])
+    if(from == wm.getColumn(wm.columns()-1))
       return Collections.singleton(magicalState);
     
-    WMState fromWM = (WMState) from;
-    return Collections.singleton(stateList[fromWM.index()+1]);
+    return Collections.singleton(wm.getColumn(index((EmissionState) from)+1));
   }
     
   public Set transitionsTo(State to)
@@ -104,13 +103,12 @@ public class WMAsMM implements MarkovModel {
     sAlpha.validate(to);
 
     if(to == magicalState)
-      return Collections.singleton(stateList[wm.columns()-1]);
+      return Collections.singleton(wm.getColumn(wm.columns()-1));
       
-    if(to == stateList[0])
+    if(to == wm.getColumn(0))
       return Collections.singleton(magicalState);
 
-    WMState toWM = (WMState) to;
-    return Collections.singleton(stateList[toWM.index()-1]);
+    return Collections.singleton(wm.getColumn(index((EmissionState) to)-1));
   }
   
   public void registerWithTrainer(ModelTrainer modelTrainer)
@@ -159,16 +157,13 @@ public class WMAsMM implements MarkovModel {
     sAlpha.validate(to);
     
     if((from == magicalState) &&
-       (to == stateList[0]))
+       (to == wm.getColumn(0)))
        return true;
-    if((from == stateList[wm.columns()-1]) &&
+    if((from == wm.getColumn(wm.columns()-1)) &&
        (to == magicalState))
        return true;
 
-    WMState fromWM = (WMState) from;
-    WMState toWM = (WMState) to;
-    
-    if(fromWM.index() == toWM.index() - 1)
+    if(index((EmissionState) from) == index((EmissionState) to) - 1)
       return true;    
 
     return false;
@@ -177,59 +172,24 @@ public class WMAsMM implements MarkovModel {
   public void addTransitionListener(TransitionListener tl) {}
   public void removeTransitionListener(TransitionListener tl) {}
   
+  protected int index(EmissionState es) {
+    for(int i = 0; i < wm.columns(); i++) {
+      if(es == wm.getColumn(i)) {
+        return i;
+      }
+    }
+    
+    return -1;
+  }
+
   public WMAsMM(WeightMatrix wm) throws IllegalSymbolException {
     this.wm = wm;
-    this.stateList = new WMState[wm.columns()];
     SimpleAlphabet sa = new SimpleAlphabet();
     sa.addSymbol(magicalState);
     this.stateAlpha = sa;
     for(int i = 0; i < wm.columns(); i++) {
-      stateList[i] = new WMState(wm.alphabet(), i);
-      sa.addSymbol(stateList[i]);
-      stateList[i].setName( "" + (i+1) );
+      sa.addSymbol(wm.getColumn(i));
     }
     sa.setName("Weight Matrix columns");
-  }
-  
-  private class WMState extends AbstractState {
-    private final int index;
-    
-    public int index() {
-      return index;
-    }
-    
-    public final int [] getAdvance() {
-      return advance;
-    }
-    
-    public double getWeight(Symbol res)
-    throws IllegalSymbolException {
-      return wm.getWeight(res, index());
-    }
-    
-    public void setWeight(Symbol res, double weight)
-    throws IllegalSymbolException {
-      wm.setWeight(res, index(), weight);
-    }
-    
-    public void registerWithTrainer(ModelTrainer modelTrainer) {
-      Set trainerSet = modelTrainer.trainersForState(this);
-      if(trainerSet.isEmpty()) {
-        try {
-          modelTrainer.registerTrainerForState(
-            this, new SimpleStateTrainer(this)
-          );
-        } catch (IllegalAlphabetException iae) {
-          throw new BioError(
-            iae, "I am sure that I am over a finite alphabet - the world is mad."
-          );
-        }
-      }
-    }
-    
-    public WMState(FiniteAlphabet alpha, int index) {
-      super(alpha);
-      this.index = index;
-    }
   }
 }

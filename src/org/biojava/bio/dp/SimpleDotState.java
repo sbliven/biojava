@@ -22,6 +22,8 @@
 
 package org.biojava.bio.dp;
 
+import java.io.Serializable;
+
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
@@ -32,7 +34,8 @@ import org.biojava.bio.symbol.*;
  * of the model look neater, and to cut down the number of combinatorial
  * transitions that can so easily swamp models.
  */
-public class SimpleDotState extends SimpleSymbol implements DotState {
+public class SimpleDotState
+extends SimpleSymbol implements DotState, Serializable {
   public SimpleDotState(char symbol, String name, Annotation annotation) {
     super(symbol, name, annotation);
   }

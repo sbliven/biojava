@@ -74,12 +74,6 @@ extends AbstractSymbolList implements Serializable {
     this.order = order;
   }
   
-  protected OrderNSymbolList() {
-    this.source = null;
-    this.alpha = null;
-    this.order = 0;
-  }
-  
   public Alphabet alphabet() {
     return alpha;
   }

@@ -113,8 +113,6 @@ public class SuffixTree implements Serializable {
     this.root = new SimpleNode(alphabet.size());
   }
   
-  protected SuffixTree() {}
-  
   public Symbol resForIndex(int i) {
     return (Symbol) resList.get(i);
   }
@@ -132,8 +130,6 @@ public class SuffixTree implements Serializable {
    * @author Matthe Pocock
    */
   public static abstract class SuffixNode implements Serializable {
-    protected SuffixNode() {}
-    
     abstract public boolean isTerminal();
     abstract public boolean hasChild(int i);
     abstract public float getNumber();
@@ -181,7 +177,5 @@ public class SuffixTree implements Serializable {
     SimpleNode(int c) {
       child = new SuffixNode[c];
     }
-    
-    protected SimpleNode() {}
   }
 }

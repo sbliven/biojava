@@ -23,6 +23,7 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.Serializable;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
@@ -30,7 +31,8 @@ import org.biojava.bio.symbol.*;
 /**
  * A simple implementation of a TransitionTrainer.
  */
-public class SimpleTransitionTrainer implements TransitionTrainer {
+public class SimpleTransitionTrainer
+implements TransitionTrainer, Serializable {
   private MarkovModel model;
   private Transition _tran = new Transition(null, null);
   private Map transCounts = new HashMap();

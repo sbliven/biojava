@@ -103,8 +103,6 @@ public interface Alphabet extends Annotatable {
    * The class that implements Alphabet and is empty.
    */
   public class EmptyAlphabet implements Alphabet, Serializable {
-    protected EmptyAlphabet() {}
-    
     public String getName() {
       return "Empty Alphabet";
     }
@@ -128,7 +126,7 @@ public interface Alphabet extends Annotatable {
     
     private Object writeReplace() throws ObjectStreamException {
       try {
-        return new StaticMemberPlaceHolder(getClass().getField("EMPTY_ALPHABET"));
+        return new StaticMemberPlaceHolder(Alphabet.class.getField("EMPTY_ALPHABET"));
       } catch (NoSuchFieldException nsfe) {
         throw new NotSerializableException(nsfe.getMessage());
       }

@@ -23,6 +23,7 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.Serializable;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
@@ -36,7 +37,7 @@ import org.biojava.bio.symbol.*;
  * <P>
  * You can train the resulting flat model, and the underlying models will be altered.
  */
-class FlatModel extends ModelView {
+class FlatModel extends ModelView implements Serializable {
   private MarkovModel source;
   private SimpleAlphabet stateAlpha;
   
@@ -296,7 +297,7 @@ class FlatModel extends ModelView {
     public State getWrapped();
   }
   
-  private static class DotStateWrapper implements Wrapper, DotState {
+  private static class DotStateWrapper implements Wrapper, DotState, Serializable {
     private final State wrapped;
     private final String extra;
     
@@ -333,7 +334,7 @@ class FlatModel extends ModelView {
 
   private static class EmissionWrapper
   extends StateView
-  implements Wrapper {
+  implements Wrapper, Serializable {
     public Symbol sourceToView(Symbol r) {
       return r;
     }
@@ -364,7 +365,7 @@ class FlatModel extends ModelView {
     }
   }
   
-  private class TransitionForwarder implements TransitionListener {
+  private class TransitionForwarder implements TransitionListener, Serializable {
     public void preCreateTransition(TransitionEvent te)
     throws ModelVetoException {
       synchronized(transitionListeners) {

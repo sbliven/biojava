@@ -50,11 +50,6 @@ implements CrossProductSymbol, Serializable {
     this.l = l;
     this.token = token;
   }
-  
-  protected SimpleCrossProductSymbol() {
-    this.l = null;
-    this.token = 0;
-  }
 
   public List getSymbols() {
     return l;

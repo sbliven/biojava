@@ -89,6 +89,4 @@ public class FixedWidthParser implements SymbolParser, Serializable {
     this.alpha = alpha;
     this.tokenLength = tokenLength;
   }
-  
-  protected FixedWidthParser() {}
 }

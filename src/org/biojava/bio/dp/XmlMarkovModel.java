@@ -53,7 +53,7 @@ public class XmlMarkovModel {
       columns = Math.max(columns, indx);
     }
     
-    WeightMatrix wm = new SimpleWeightMatrix(seqAlpha, columns);
+    WeightMatrix wm = new SimpleWeightMatrix(seqAlpha, columns, StateFactory.DEFAULT);
 
     colL = root.getElementsByTagName("col");
     for(int i = 0; i < colL.getLength(); i++) {
@@ -68,7 +68,7 @@ public class XmlMarkovModel {
           res = nameParser.parseToken(resName);
         else
           res = symParser.parseToken(resName);
-        wm.setWeight(res, indx, Math.log(Double.parseDouble(weightE.getAttribute("prob"))));
+        wm.getColumn(indx).setWeight(res, Math.log(Double.parseDouble(weightE.getAttribute("prob"))));
       }      
     }
     
@@ -174,7 +174,7 @@ public class XmlMarkovModel {
   }
  
   public static void writeMatrix(WeightMatrix matrix, PrintStream out) throws Exception {
-    FiniteAlphabet resA = matrix.alphabet();
+    FiniteAlphabet resA = (FiniteAlphabet) matrix.alphabet();
     
     out.println("<MarkovModel>\n  <alphabet name=\"" + resA.getName() + "\"/>");
     
@@ -183,7 +183,7 @@ public class XmlMarkovModel {
       for(Iterator ri = resA.iterator(); ri.hasNext(); ) {
         Symbol r = (Symbol) ri.next();
         out.println("    <weight res=\"" + r.getName() +
-                             "\" prob=\"" + matrix.getWeight(r, i) + "\"/>");
+                             "\" prob=\"" + matrix.getColumn(i).getWeight(r) + "\"/>");
         }
       out.println("  </col>");
     }

@@ -26,7 +26,7 @@ import org.biojava.bio.symbol.*;
 
 /**
  * Encapsulates the dynamic programmming matrix, and the context within algorithms work.
- * The cursor should put DP.MAGICAL_STATE symbols at either end of the sequence.
+ * The cursor should put DP.MAGICAL_SYMBOL symbols at either end of the sequence.
  */
 interface DPCursor {
   /**

@@ -23,11 +23,17 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import java.io.Serializable;
+
 import org.biojava.bio.symbol.*;
 
-public class SimpleStateTrainer implements StateTrainer {
+public class SimpleStateTrainer implements StateTrainer, Serializable {
   private final EmissionState state;
   private final Map c;
+
+  {
+    this.c = new HashMap();
+  }
 
   public void addCount(Symbol res, double count) throws IllegalSymbolException {
     Double d = (Double) c.get(res);
@@ -107,7 +113,6 @@ public class SimpleStateTrainer implements StateTrainer {
         a.getName() + " of type " + a.getClass()
       );
     }
-    this.c = new HashMap();
     this.state = s;
     for (Iterator i = ((FiniteAlphabet) a).iterator(); i.hasNext();) {
       c.put(i.next(), new Double(0.0));
