@@ -132,7 +132,7 @@ public class LayeredRenderer {
       }
       
       Shape oldClip = g.getClip();
-      g.setClip(clip);
+      g.clip(clip);
       sRend.paint(g, src, pos);
       g.setClip(oldClip);
       

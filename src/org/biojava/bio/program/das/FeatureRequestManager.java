@@ -117,6 +117,10 @@ class FeatureRequestManager {
 		}
 	    }
 
+            if(matchingTickets.size() <= 1) {
+              return false;
+            }
+            
 	    System.err.println("Wheee, extended fetch of " + matchingTickets.size() + " requests (" + triggerType + "," + triggerCategory + ")");
 
 	    URL fURL = new URL(dataSourceURL, "features");
