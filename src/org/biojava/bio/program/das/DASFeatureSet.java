@@ -28,6 +28,7 @@ import java.io.*;
 import org.biojava.bio.*;
 import org.biojava.utils.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
 
 import org.apache.xerces.parsers.*;
@@ -62,155 +63,38 @@ class DASFeatureSet implements FeatureHolder {
 	    return realFeatures;
 
 	try {
-	    URL epURL = new URL(dataSource, "features?ref=" + sourceID);
-	    HttpURLConnection huc = (HttpURLConnection) epURL.openConnection();
-	    huc.connect();
-	    int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
-	    if (status == 0)
-		throw new BioError("Not a DAS server");
-	    else if (status != 200)
-		throw new BioError("DAS error (status code = " + status + ")");
-
-	    InputSource is = new InputSource(huc.getInputStream());
-	    DOMParser parser = new DOMParser();
-	    parser.parse(is);
-	    Element el = parser.getDocument().getDocumentElement();
-	    NodeList gffl = el.getElementsByTagName("GFF");
-	    if (gffl.getLength() != 1)
-		throw new BioError("Couldn't find GFF element");
-	    el = (Element) gffl.item(0);
-	    String version = el.getAttribute("version");
-	    if (version == null || !version.equals("0.95"))
-		throw new BioError("Unrecognized DASGFF version " + version);
-	    NodeList segl = el.getElementsByTagName("SEGMENT");
-	    if (segl.getLength() != 1)
-		throw new BioError("DASGFF documents must contain one SEGMENT");
-	    el = (Element) segl.item(0); 
-	    
 	    realFeatures = new SimpleFeatureHolder();
-	    
-	    Node segChld = el.getFirstChild();
-	    while (segChld != null) {
-		if (segChld instanceof Element) {
-		    Element featureEl = (Element) segChld;
-		    if (featureEl.getTagName().equals("FEATURE")) {
-			Feature.Template temp = parseDASFeature(featureEl);
-			realFeatures.addFeature(((RealizingFeatureHolder) refSequence).realizeFeature(refSequence, temp));
+
+	    URL fURL = new URL(dataSource, "features?ref=" + sourceID);
+	    DASGFFParser.INSTANCE.parseURL(fURL, new SeqIOAdapter() {
+		    public void startFeature(Feature.Template temp) 
+		        throws ParseException
+		    {
+			if (temp instanceof ComponentFeature.Template) {
+			    // I'm not convinced there's an easy, safe, way to say we don't
+			    // want these server side, so we'll elide them here instead.
+
+			    return;
+			}
+
+			try {
+			    Feature f = ((RealizingFeatureHolder) refSequence).realizeFeature(refSequence, temp);
+			    realFeatures.addFeature(f);
+			} catch (Exception ex) {
+			    throw new ParseException(ex, "Couldn't realize feature in DAS");
+			}
 		    }
-		}
-		segChld = segChld.getNextSibling();
-	    }
+		} );
 	    
-	} catch (SAXException ex) {
-	    throw new BioError(ex, "Exception parsing DAS XML");
 	} catch (IOException ex) {
 	    throw new BioError(ex, "Error connecting to DAS server");
-	} catch (NumberFormatException ex) {
-	    throw new BioError(ex);
+	} catch (ParseException ex) {
+	    throw new BioError(ex, "Error parsing feature table");
 	} catch (BioException ex) {
 	    throw new BioError(ex);
-	} catch (ChangeVetoException ex) {
-	    throw new BioError(ex, "Assertion failed: Uncooperative hidden FeatureHolder");
 	}
 
 	return realFeatures;
-    }
-
-    private Feature.Template parseDASFeature(Element fe) 
-        throws NumberFormatException
-    {
-	String type = "unknown";
-	String method = "unknown";
-	int start = -1, end = -1;
-	String orientation="0";
-	String phase="-";
-	Location loc = null;
-
-	Node n = fe.getFirstChild();
-	while (n != null) {
-	    if (n instanceof Element) {
-		Element nel = (Element) n;
-		String tag = nel.getTagName();
-		if (tag.equals("TYPE"))
-		    type = getChildText(nel);
-		else if (tag.equals("METHOD"))
-		    method = getChildText(nel);
-		else if (tag.equals("START"))
-		    start = Integer.parseInt(getChildText(nel));
-		else if (tag.equals("END"))
-		    end = Integer.parseInt(getChildText(nel));
-		else if (tag.equals("COMPOUNDLOCATION")) 
-		    loc = parseCompoundLocation(getChildText(nel).trim());
-		else if (tag.equals("ORIENTATION"))
-		    orientation = getChildText(nel);
-		else if (tag.equals("PHASE"))
-		    phase = getChildText(nel);
-		
-	    }
-	    n = n.getNextSibling();
-	}
-
-	Feature.Template temp = null;
-	if (orientation.equals("+") || orientation.equals("-")) {
-	    StrandedFeature.Template stemp = new StrandedFeature.Template();
-	    stemp.strand = orientation.equals("+") ? StrandedFeature.POSITIVE :
-	                                             StrandedFeature.NEGATIVE;
-	    temp = stemp;
-	} else {
-	    temp = new Feature.Template();
-	}
-
-	temp.type = type;
-	temp.source = method;
-	if (loc == null) {
-	    temp.location = new RangeLocation(start, end);
-	} else {
-	    temp.location = loc;
-	}
-	temp.annotation = Annotation.EMPTY_ANNOTATION;
-
-	return temp;
-    }
-
-    private Location parseCompoundLocation(String loc) 
-        throws NumberFormatException
-    {
-	boolean ranging = false;
-	int from = 0;
-	Location result = Location.empty;
-
-	    StringTokenizer toke = new StringTokenizer(loc, ",.", true);
-	    while (toke.hasMoreTokens()) {
-		String t = toke.nextToken();
-		if (t.equals(".")) {
-		    ranging = true;
-		} else if (t.equals(",")) {
-		    ranging = false;
-		} else {
-		    if (ranging) {
-			int to = Integer.parseInt(t);
-			Location segment = new RangeLocation(from, to);
-			result = result.union(segment);
-		    } else {
-			from = Integer.parseInt(t);
-		    }
-		}
-	    }
-	
-	    System.out.println(result.toString());
-
-	return result;
-    }
-
-    private String getChildText(Element el) {
-	StringBuffer sb = new StringBuffer();
-	Node n = el.getFirstChild();
-	while (n != null) {
-	    if (n instanceof Text) 
-	        sb.append(((Text) n).getData());
-	    n = n.getNextSibling();
-	}
-	return sb.toString().trim();
     }
 
     public Iterator features() {

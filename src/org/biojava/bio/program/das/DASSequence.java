@@ -73,7 +73,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     private final FeatureRealizer featureRealizer = FeatureImpl.DEFAULT;
 
     private CacheReference refSymbols;
-    private int length;
+    private int length = -1;
 
     private Map featureSets;
     private FeatureHolder structure;
@@ -101,93 +101,70 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	
 	try {
 	    //
-	    // Check existance, and get length
+	    // Check for deep structure.  This also checks that the sequence
+	    // really exists, and hopefully picks up the length along the way.
 	    //
-	    
-	    URL epURL = (parentID == null) ?
-		    new URL(dataSourceURL, "entry_points") :
-		    new URL(dataSourceURL, "entry_points?ref=" + parentID);
-	    HttpURLConnection huc = (HttpURLConnection) epURL.openConnection();
-	    huc.connect();
-	    int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
-	    if (status == 0)
-		throw new BioException("Not a DAS server");
-	    else if (status != 200)
-		throw new BioException("DAS error (status code = " + status + ")");
 
-	    InputSource is = new InputSource(huc.getInputStream());
-	    DOMParser parser = nonvalidatingParser();
-	    parser.parse(is);
-	    Element el = parser.getDocument().getDocumentElement();
-	    NodeList segl = el.getElementsByTagName("SEGMENT");
-	    Element segment = null;
-	    for (int i = 0; i < segl.getLength(); ++i) {
-		el = (Element) segl.item(i);
-		if (el.getAttribute("id").equals(seqID)) {
-		    segment = el;
-		    break;
-		}
+	    structure = new SimpleFeatureHolder();
+
+	    URL fUrl = new URL(dataSourceURL, "features?ref=" + seqID + ";category=component");
+	    DASGFFParser.INSTANCE.parseURL(fUrl, new SeqIOAdapter() {
+		    public void addSequenceProperty(Object key, Object value)
+		        throws ParseException
+		    {
+			try {
+			    if (key.equals("sequence.start")) {
+				int start = Integer.parseInt(value.toString());
+				if (start != 1) {
+				    throw new ParseException("Server doesn't think sequence starts at 1.  Wierd.");
+				}
+			    } else if (key.equals("sequence.stop")) {
+				length = Integer.parseInt(value.toString());
+			    }
+			} catch (NumberFormatException ex) {
+			    throw new ParseException(ex, "Expect numbers for segment start and stop");
+			}
+		    }
+
+		    public void startFeature(Feature.Template temp)
+		        throws ParseException
+		    {
+			if (temp instanceof ComponentFeature.Template) {
+			    String id = (String) temp.annotation.getProperty("sequence.id");
+
+			    try {
+				ComponentFeature.Template ctemp = (ComponentFeature.Template) temp;
+				ComponentFeature cf = new DASComponentFeature(DASSequence.this,
+									      ctemp);
+				((SimpleFeatureHolder) structure).addFeature(cf);
+
+				length = Math.max(length, ctemp.location.getMax());
+			    } catch (BioException ex) {
+				throw new ParseException(ex, "Error instantiating DASComponent");
+			    } catch (ChangeVetoException ex) {
+				throw new BioError(ex, "Immutable FeatureHolder when trying to build structure");
+			    }					  
+			} else {
+			    // Server seems not to honour category=
+			    // This hurts performance, but we can just elide the unwanted
+			    // features on the client side.
+			}
+		    }
+		} );
+	    if (structure.countFeatures() > 0) {
+		features.addFeatureHolder(structure);
 	    }
-	    if (segment == null)
-		throw new BioException("Couldn't find requested segment " + seqID);
-
-	    int start = Integer.parseInt(segment.getAttribute("start"));
-	    int stop = Integer.parseInt(segment.getAttribute("stop"));
-	    length = stop - start + 1;
 
 	    //
-	    // Pick up features
+	    // Pick up the default annotation set (this should maybe be optional)
 	    //
 
 	    features.addFeatureHolder(new DASFeatureSet(this, dataSourceURL, seqID));
-
-	    //
-	    // Check for deep structure
-	    //
-
-	    epURL = new URL(dataSourceURL, "entry_points?ref=" + seqID);
-	    huc = (HttpURLConnection) epURL.openConnection();
-	    huc.connect();
-	    status = huc.getHeaderFieldInt("X-DAS-Status", 0);
-	    if (status == 0)
-		throw new BioException("Not a DAS server");
-	    else if (status != 200)
-		throw new BioException("DAS error (status code = " + status + ")");
-
-	    is = new InputSource(huc.getInputStream());
-	    parser = nonvalidatingParser();
-	    parser.parse(is);
-	    el = parser.getDocument().getDocumentElement();
-
-	    segl = el.getElementsByTagName("SEGMENT");	    
-	    if (segl.getLength() != 0) {
-	        structure = new SimpleFeatureHolder();
-		for (int i = 0; i < segl.getLength(); ++i) {
-		    Element seg = (Element) segl.item(i);
-		    String segId = seg.getAttribute("id");
-		    int segStart = Integer.parseInt(seg.getAttribute("start"));
-		    int segStop = Integer.parseInt(seg.getAttribute("stop"));
-
-		    DASComponentFeature dcf = new DASComponentFeature(this,
-								      new RangeLocation(segStart, segStop),
-								      StrandedFeature.POSITIVE,
-								      segId);
-		    
-		    ((SimpleFeatureHolder) structure).addFeature(dcf);
-		}
-		features.addFeatureHolder(structure);
-	    } else {
-		structure = FeatureHolder.EMPTY_FEATURE_HOLDER;
-	    }
-	} catch (SAXException ex) {
-	    throw new BioException(ex, "Exception parsing DAS XML");
 	} catch (IOException ex) {
 	    throw new BioException(ex, "Error connecting to DAS server");
 	} catch (NumberFormatException ex) {
 	    throw new BioException(ex);
-	} catch (ChangeVetoException ex) {
-	    throw new BioError("Assertion failed: we should be able to add to hidden FeatureHolders");
-	}
+	} 
     }
 
     URL getDataSourceURL() {
@@ -273,6 +250,13 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     }
 
     public int length() {
+	// If the sequence isn't an assembly we're actually in a kind-of bad
+	// way for getting the length.  Right now I'm getting the DNA.
+
+	if (length < 0) {
+	    length = getSymbols().length();
+	}
+
 	return length;
     }
 
@@ -354,8 +338,10 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 		throw new BioError("Didn't find DNA element");
 	    el = (Element) dnal.item(0);
 	    int len = Integer.parseInt(el.getAttribute("length"));
-	    if (len != length())
-		throw new BioError("Returned DNA length incorrect: expecting " + length() + " but got " + len);
+	    if (length >= 0) {
+		if (len != length())
+		    throw new BioError("Returned DNA length incorrect: expecting " + length() + " but got " + len);
+	    }
 	    // el.normalize();
 	    CharacterData t = (CharacterData) el.getFirstChild();
 	    String seqstr = t.getData();

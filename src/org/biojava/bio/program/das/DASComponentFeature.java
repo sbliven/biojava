@@ -41,31 +41,45 @@ class DASComponentFeature implements ComponentFeature {
 
     private final Location location;
     private final StrandedFeature.Strand strand;
+    private final String type;
+    private final String source;
+
     private final String componentID;
 
     private Sequence componentSequence;
+    private Location componentLocation;
 
     public DASComponentFeature(DASSequence parent,
-			       Location loc,
-			       StrandedFeature.Strand strand,
-			       String id)
+			       ComponentFeature.Template temp)
         throws BioException
     {
-//      if (locationContent(temp.location) != 
-//  	    locationContent(temp.componentLocation))
-//  	{
-//  	    throw new BioException("Component and container locations must contain an equal number of symbols.");
-//  	}
+	if (locationContent(temp.location) != locationContent(temp.componentLocation))
+  	{
+  	    throw new BioException("Component and container locations must contain an equal number of symbols.");
+  	}
 
-//  	if (!temp.location.isContiguous() || temp.componentLocation.isContiguous()) {
-//  	    throw new BioException("Can only include contiguous segments in an assembly [may change in future]");
-//  	}
+  	if (!temp.location.isContiguous() || !temp.componentLocation.isContiguous()) {
+  	    throw new BioException("Can only include contiguous segments in an assembly");
+  	}
 
 	this.parent = parent;
 	
-	this.location = loc;
-	this.strand = strand;
-	this.componentID = id;
+	this.location = temp.location;
+	this.componentLocation = temp.componentLocation;
+	this.strand = temp.strand;
+	this.type = temp.type;
+	this.source = temp.source;
+
+	if (temp.componentSequence != null) {
+	    componentSequence = temp.componentSequence;
+	    componentID = componentSequence.getName();
+	} else {
+	    try {
+		componentID = (String) temp.annotation.getProperty("sequence.id");
+	    } catch (NoSuchElementException ex) {
+		throw new BioError("No sequence.id property");
+	    }
+	}
 
 	if (strand != StrandedFeature.NEGATIVE && strand != StrandedFeature.POSITIVE) {
 	    throw new BioException("Strand must be specified when creating a ComponentFeature");
@@ -100,11 +114,11 @@ class DASComponentFeature implements ComponentFeature {
     }
 
     public String getSource() {
-	return "Dazzle_Client";
+	return source;
     }
 
     public String getType() {
-	return "SubSequence";
+	return type;
     }
 
     public Annotation getAnnotation() {
@@ -112,7 +126,7 @@ class DASComponentFeature implements ComponentFeature {
     }
 
     public SymbolList getSymbols() {
-	SymbolList syms = getComponentSequence();  /* componentLocation.symbols(getComponentSequence()); */
+	SymbolList syms = componentLocation.symbols(getComponentSequence()); 
 	if (strand == StrandedFeature.NEGATIVE) {
 	    try {
 		syms = DNATools.reverseComplement(syms);
@@ -135,16 +149,16 @@ class DASComponentFeature implements ComponentFeature {
     }
 
     public Location getComponentLocation() {
-	return new RangeLocation(1, location.getMax() - location.getMin() + 1);
+	return componentLocation;
     }
 
     protected FeatureHolder getProjectedFeatures() {
 	if (projectedFeatures == null) {
 	    if (strand == StrandedFeature.NEGATIVE) {
-		int translation = location.getMax() + 1;
+		int translation = location.getMax() + componentLocation.getMin();
 		this.projectedFeatures = new ProjectedFeatureHolder(getComponentSequence(), this, translation, true);
 	    } else  if (strand == StrandedFeature.POSITIVE) {
-		int translation = location.getMin() - 1;
+		int translation = location.getMin() - componentLocation.getMin();
 		this.projectedFeatures = new ProjectedFeatureHolder(getComponentSequence(), this, translation, false);
 	    } 
 	}
@@ -160,6 +174,19 @@ class DASComponentFeature implements ComponentFeature {
     }
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+	Location l = null;
+
+	if (ff instanceof FeatureFilter.ContainedByLocation) {
+	    l = ((FeatureFilter.ContainedByLocation) ff).getLocation();
+	} else if (ff instanceof FeatureFilter.OverlapsLocation) {
+	    l = ((FeatureFilter.OverlapsLocation) ff).getLocation();
+	}
+
+	if (l != null && !l.overlaps(getLocation())) {
+	    // None of our children are of interest...
+	    return FeatureHolder.EMPTY_FEATURE_HOLDER;
+	}
+
 	return getProjectedFeatures().filter(ff, recurse);
     }
 

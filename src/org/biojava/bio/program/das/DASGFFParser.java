@@ -1,0 +1,244 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
+package org.biojava.bio.program.das;
+
+import java.util.*;
+import java.net.*;
+import java.io.*;
+
+import org.biojava.utils.*;
+import org.biojava.utils.cache.*;
+
+import org.biojava.bio.*;
+import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.io.*;
+import org.biojava.bio.seq.impl.*;
+import org.biojava.bio.symbol.*;
+
+import org.apache.xerces.parsers.*;
+import org.xml.sax.*;
+import org.xml.sax.helpers.*;
+import org.w3c.dom.*;
+
+/**
+ * Parse a DASGFF document and build suitable Feature.Templates
+ *
+ * @author Thomas Down
+ */
+
+class DASGFFParser {
+    final static DASGFFParser INSTANCE;
+
+    static {
+	INSTANCE = new DASGFFParser();
+    }
+
+    private DASGFFParser() {
+    }
+
+    public void parseURL(URL fUrl, SeqIOListener siol)
+        throws BioException, ParseException, IOException
+    {
+	try {
+	    HttpURLConnection huc = (HttpURLConnection) fUrl.openConnection();
+	    huc.connect();
+	    int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
+	    if (status == 0)
+		throw new BioError("Not a DAS server: " + fUrl.toString());
+	    else if (status != 200)
+		throw new BioError("DAS error (status code = " + status + ")");
+	    
+	    InputSource is = new InputSource(huc.getInputStream());
+	    DOMParser parser = new DOMParser();
+	    parser.parse(is);
+	    Element el = parser.getDocument().getDocumentElement();
+	    NodeList gffl = el.getElementsByTagName("GFF");
+	    if (gffl.getLength() != 1)
+		throw new BioException("Couldn't find GFF element");
+	    el = (Element) gffl.item(0);
+	    String version = el.getAttribute("version");
+	    if (version == null || !version.equals("0.95"))
+		throw new BioException("Unrecognized DASGFF version " + version);
+	    NodeList segl = el.getElementsByTagName("SEGMENT");
+	    if (segl.getLength() != 1)
+		throw new BioException("DASGFF documents must contain one SEGMENT");
+	    el = (Element) segl.item(0); 
+	    
+	    siol.startSequence();
+	    
+	    String segStart = el.getAttribute("start");
+	    if (segStart != null) {
+		siol.addSequenceProperty("sequence.start", segStart);
+	    }
+	    String segStop = el.getAttribute("stop");
+	    if (segStop != null) {
+		siol.addSequenceProperty("sequence.stop", segStop);
+	    }
+
+	    Node segChld = el.getFirstChild();
+	    while (segChld != null) {
+		if (segChld instanceof Element) {
+		    Element featureEl = (Element) segChld;
+		    if (featureEl.getTagName().equals("FEATURE")) {
+			Feature.Template temp = parseDASFeature(featureEl);
+			siol.startFeature(temp);
+			siol.endFeature();
+		    }
+		}
+		segChld = segChld.getNextSibling();
+	    }
+
+	    siol.endSequence();
+	} catch (SAXException ex) {
+	    throw new ParseException(ex);
+	}
+    }
+
+    private Feature.Template parseDASFeature(Element fe) 
+        throws NumberFormatException, ParseException
+    {
+	String type = "unknown";
+	String method = "unknown";
+	int start = -1, end = -1;
+	String orientation="0";
+	String phase="-";
+	Location loc = null;
+	boolean isReferenceFeature = false;
+	String category = null;
+	String refName = null;
+	int refStart = -1;
+	int refStop = -1;
+
+	//
+	// Phase one: get stuff out of the XML
+	//
+
+	Node n = fe.getFirstChild();
+	while (n != null) {
+	    if (n instanceof Element) {
+		Element nel = (Element) n;
+		String tag = nel.getTagName();
+		if (tag.equals("TYPE")) {
+		    type = getChildText(nel);
+		    String reference = nel.getAttribute("reference");
+		    if ("yes".equals(reference)) {
+			isReferenceFeature = true;
+		    }
+		    category = nel.getAttribute("category");
+		} else if (tag.equals("METHOD")) {
+		    method = getChildText(nel);
+		} else if (tag.equals("START")) {
+		    start = Integer.parseInt(getChildText(nel));
+		} else if (tag.equals("END")) {
+		    end = Integer.parseInt(getChildText(nel));
+		} else if (tag.equals("ORIENTATION")) {
+		    orientation = getChildText(nel);
+		} else if (tag.equals("PHASE")) {
+		    phase = getChildText(nel);
+		} else if (tag.equals("GROUP")) {
+		    Node gn = nel.getFirstChild();
+		    while (gn != null) {
+			if (gn instanceof Element) {
+			    Element gel = (Element) gn;
+			    String gtag = gel.getTagName();
+			    if (gtag.equals("TARGET")) {
+				refName = gel.getAttribute("ref");
+				refStart = Integer.parseInt(gel.getAttribute("start"));
+				refStop = Integer.parseInt(gel.getAttribute("stop"));
+			    } else {
+				// Right now the target is all we care about.
+				// I didn't design this protocol, 'kay?
+			    }
+			}
+			gn = gn.getNextSibling();
+		    }
+		} else {
+		    // Unknown element ought to be an error in DASGFF0.95, but the
+		    // standard may still be evolving, so we'll be flexible in what
+		    // we accept, at least for now.
+		}
+		
+	    }
+	    n = n.getNextSibling();
+	}
+
+	//
+	// Phase two: see what kind of template we can make
+	//
+
+	Feature.Template temp = null;
+	if (isReferenceFeature && category.equals("component")) {
+	    if (refName == null) {
+		throw new ParseException("Can't template componentFeature without a specified TARGET");
+	    }
+
+	    ComponentFeature.Template ctemp = new ComponentFeature.Template();
+	    ctemp.componentLocation = new RangeLocation(refStart, refStop);
+	    ctemp.strand = orientation.equals("+") ? StrandedFeature.POSITIVE :
+	                                             StrandedFeature.NEGATIVE;
+
+	    // Right now we're not going to do the sequence instantiation here -- trust it to
+	    // the listener instead.
+
+	    ctemp.annotation = new SimpleAnnotation();
+	    try {
+		ctemp.annotation.setProperty("sequence.id", refName);
+	    } catch (ChangeVetoException ex) {
+		throw new BioError(ex);
+	    }
+
+	    temp = ctemp;
+	} else if (orientation.equals("+") || orientation.equals("-")) {
+	    StrandedFeature.Template stemp = new StrandedFeature.Template();
+	    stemp.strand = orientation.equals("+") ? StrandedFeature.POSITIVE :
+	                                             StrandedFeature.NEGATIVE;
+	    temp = stemp;
+	} else {
+	    temp = new Feature.Template();
+	}
+
+	temp.type = type;
+	temp.source = method;
+	if (loc == null) {
+	    temp.location = new RangeLocation(start, end);
+	} else {
+	    temp.location = loc;
+	}
+
+	if (temp.annotation == null) {
+	    temp.annotation = Annotation.EMPTY_ANNOTATION;
+	}
+
+	return temp;
+    }
+
+    private String getChildText(Element el) {
+	StringBuffer sb = new StringBuffer();
+	Node n = el.getFirstChild();
+	while (n != null) {
+	    if (n instanceof Text) 
+	        sb.append(((Text) n).getData());
+	    n = n.getNextSibling();
+	}
+	return sb.toString().trim();
+    }
+}
