@@ -23,6 +23,10 @@
 package org.biojava.bio;
 
 import java.util.*;
+import java.io.*;
+import java.lang.reflect.*;
+
+import org.biojava.utils.*;
 
 /**
  * Arbitrary annotation associated with one or more objects.
@@ -97,7 +101,9 @@ public interface Annotation {
   /**
    * The empty and immutable implementation.
    */
-  class EmptyAnnotation implements Annotation {
+  class EmptyAnnotation implements Annotation, Serializable {
+    protected EmptyAnnotation() {}
+    
     public Object getProperty(Object key) throws NoSuchElementException {
       throw new NoSuchElementException("There are no keys in the Empty Annotaion object: " + key);
     }
@@ -115,5 +121,14 @@ public interface Annotation {
       //return Collections.EMPTY_MAP; 1.3
       return new HashMap();
     }
+    
+    private Object writeReplace() throws ObjectStreamException {
+      try {
+        return new StaticMemberPlaceHolder(getClass().getField("EMPTY_ANNOTATION"));
+      } catch (NoSuchFieldException nsfe) {
+        throw new NotSerializableException(nsfe.getMessage());
+      }
+    }
+
   }
 }

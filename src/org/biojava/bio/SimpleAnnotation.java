@@ -23,8 +23,7 @@
 package org.biojava.bio;
 
 import java.util.*;
-
-import org.biojava.bio.*;
+import java.io.*;
 
 /**
  * A no-frills implementation of Annotation that is just a wrapper around a Map.
@@ -34,7 +33,7 @@ import org.biojava.bio.*;
  *
  * @author Matthew Pocock
  */
-public class SimpleAnnotation implements Annotation {
+public class SimpleAnnotation implements Annotation, Serializable {
   /**
    * The properties map.
    * <P>
