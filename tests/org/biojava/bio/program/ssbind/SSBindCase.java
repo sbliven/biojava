@@ -128,7 +128,7 @@ public class SSBindCase extends TestCase
         SeqSimilaritySearchResult result =
             (SeqSimilaritySearchResult) searchResults.get(0);
 
-        assertEquals(2, result.getAnnotation().keys().size());
+        assertEquals(4, result.getAnnotation().keys().size());
     }
 
     public void testTopHit()

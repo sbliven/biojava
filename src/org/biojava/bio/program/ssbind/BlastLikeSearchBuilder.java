@@ -86,6 +86,11 @@ import org.biojava.bio.seq.db.*;
  *       acceptable to AlphabetResolver. These are BLASTN, BLASTP, BLASTX, TBLASTN,
  *       TBLASTX, DNA and PROTEIN. </td>
  * </tr>
+ *
+ * <tr>
+ *   <td>databaseId</td>
+ *   <td>Identifier of database searched (in SequenceDBInstallation).</td>
+ * </tr>
  * <tr>
  *   <td>subjectSequenceType</td>
  *   <td>type of sequence that hit is. Can be DNA or PROTEIN.</td>
@@ -273,11 +278,13 @@ public class BlastLikeSearchBuilder implements SearchBuilder
     public void setQueryID(String queryID)
     {
         this.queryID = queryID;
+        addSearchProperty("queryId", queryID);
     }
 
     public void setDatabaseID(String databaseID)
     {
         this.databaseID = databaseID;
+        addSearchProperty("databaseId", databaseID);
     }
 
     public boolean getMoreSearches()
