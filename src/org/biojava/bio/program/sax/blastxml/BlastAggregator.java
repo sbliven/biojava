@@ -34,7 +34,7 @@ import org.xml.sax.helpers.*;
  *
  * @author David Huen
  */
-public class BlastAggregator
+class BlastAggregator
     extends StAXFeatureHandler
 {
     // constructor

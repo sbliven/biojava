@@ -61,7 +61,7 @@ import org.xml.sax.helpers.*;
  *
  * @author David Huen
  */
-public class BlastOutputHandler
+class BlastOutputHandler
     extends StAXFeatureHandler
 {
     // create static factory class that makes an instance
