@@ -52,12 +52,13 @@ public class AceURL {
 	this.authority = authority;
     }
 
-    public AceURL(URL old, String userInfo, String authority) {
+    public AceURL(URL old, String userInfo, String authority, String query) {
 	this.protocol = old.getProtocol();
 	this.host = old.getHost();
 	this.port = old.getPort();
 	this.file = old.getFile();
-	this.query = old.getQuery();
+	//this.query = old.getQuery();
+  this.query = query;
 	this.ref = old.getRef();
 	this.userInfo = userInfo;
 	this.authority = authority;
@@ -129,31 +130,33 @@ public class AceURL {
     }
 
     public String toString() {
-	StringBuffer sb = new StringBuffer();
-	sb.append(protocol);
-	sb.append("://");
-	if (userInfo != null) {
-	    sb.append(userInfo);
-	    if (authority != null) {
-		sb.append(':');
-		sb.append(authority);
-	    }
-	    sb.append('@');
-	}
-	sb.append(host);
-	sb.append(':');
-	sb.append(port);
-	if (file != null) {
-	    sb.append('/');
-	    sb.append(file);
-	}
-	if (query != null) {
-	    sb.append('?');
-	    sb.append(query);
-	}
-	if (ref != null) {
-	    sb.append('#');
-	    sb.append(ref);
-	}
+      StringBuffer sb = new StringBuffer();
+      sb.append(protocol);
+      sb.append("://");
+      if (userInfo != null) {
+        sb.append(userInfo);
+        if (authority != null) {
+          sb.append(':');
+          sb.append(authority);
+        }
+        sb.append('@');
+      }
+      sb.append(host);
+      sb.append(':');
+      sb.append(port);
+      if (file != null) {
+        sb.append('/');
+        sb.append(file);
+      }
+      if (query != null) {
+        sb.append('?');
+        sb.append(query);
+      }
+      if (ref != null) {
+        sb.append('#');
+        sb.append(ref);
+      }
+      
+      return sb.toString();
     }
 }
