@@ -88,7 +88,7 @@ class DASFeatureSet implements FeatureHolder {
 				if (temp.annotation == Annotation.EMPTY_ANNOTATION) {
 				    temp.annotation = new SimpleAnnotation();
 				}
-				temp.annotation.setProperty(DASSequence.PROPERTY_ANNOTATIONSERVER, dataSourceString);
+				temp.annotation.setProperty(DASSequence.PROPERTY_ANNOTATIONSERVER, dataSource);
 
 				if (stackTop == null) {
 				    f = ((RealizingFeatureHolder) refSequence).realizeFeature(refSequence, temp);
