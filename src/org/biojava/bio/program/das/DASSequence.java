@@ -483,6 +483,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	DOMParser dp = new DOMParser();
 	try {
 	    dp.setFeature("http://xml.org/sax/features/validation", false);
+	    // dp.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 	    dp.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
 	} catch (SAXNotRecognizedException ex) {
 	    ex.printStackTrace();
