@@ -151,22 +151,6 @@ public class FastaSearchParser implements SearchParser
 	    switch (searchStatus)
 	    {
 		case NODATA:
-                    // First we try to pick up the query ID from the
-                    // unformatted pre-header. This is a stop-gap
-                    // until the DTD has a place for the query
-                    // sequence id. There's a second check to get this
-                    // value from the HIT section. When we get DTD
-                    // support this block can be removed and no other
-                    // changes will be needed.
-                    if (! parsedQueryId)
-                    {
-                        if (line.startsWith(" >"))
-                        {
-                            handler.setQuerySeq(line.substring(2));
-                            parsedQueryId = true;
-                        }
-                    }
-
 		    // This token marks the line describing the query
 		    // sequence file and database searched. It is
 		    // followed by header lines containing data about
@@ -560,7 +544,7 @@ public class FastaSearchParser implements SearchParser
 	    }
 	    else if (line.equals("; sq_type: D"))
 	    {
-		return new String [] { "_sq_type", "DNA"};
+		return new String [] { "_sq_type", "dna"};
 	    }
 
 	    // Record the coordinates and offset of the alignment

@@ -439,11 +439,11 @@ public class FastaSearchBuilder implements SearchBuilder
      *
      * @param name a <code>StringBuffer</code> containing the
      * unprepared sequence tokens.
-     * @param alStart an <code>Integer</code> indicating the start
+     * @param alStart an <code>int</code> indicating the start
      * position of the alignment in the original sequence.
-     * @param alStop an <code>Integer</code> indicating the stop
+     * @param alStop an <code>int</code> indicating the stop
      * position of the alignment in the original sequence.
-     * @param alDispStart an <code>Integer</code> indicating the start
+     * @param alDispStart an <code>int</code> indicating the start
      * of a flanking context in the original sequence.
      *
      * @return a <code>String</code> value consisting of a subsequence

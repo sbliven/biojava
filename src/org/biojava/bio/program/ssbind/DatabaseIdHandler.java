@@ -26,37 +26,39 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import org.biojava.bio.BioException;
+
 /**
- * <code>HitIdHandler</code>s collate hit database IDs and inform the
- * <code>SearchContentHandler</code>.
+ * <code>DatabaseIdHandler</code>s extract the database name/ID and
+ * inform the <code>SearchContentHandler</code>.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @version 1.2
  */
-public class HitIdHandler extends DefaultHandler
+public class DatabaseIdHandler extends DefaultHandler
 {
     /**
      * Static factory to which creates new
      * <code>ContentHandler</code>s of this type.
      */
-    public static final SSPropHandlerFactory HIT_ID_HANDLER_FACTORY =
+    public static final SSPropHandlerFactory DATABASE_ID_HANDLER_FACTORY =
         new SSPropHandlerFactory()
         {
             public ContentHandler getHandler(SeqSimilarityAdapter context)
             {
-                return new HitIdHandler(context);
+                return new DatabaseIdHandler(context);
             }
         };
 
     private SeqSimilarityAdapter context;
 
     /**
-     * Creates a new <code>HitIdHandler</code> object with a
+     * Creates a new <code>DatabaseIdHandler</code> object with a
      * reference to a parent context.
      *
      * @param context a <code>SeqSimilarityAdapter</code>.
      */
-    HitIdHandler(SeqSimilarityAdapter context)
+    DatabaseIdHandler(SeqSimilarityAdapter context)
     {
         super();
         this.context = context;
@@ -78,6 +80,14 @@ public class HitIdHandler extends DefaultHandler
                              Attributes attr)
         throws SAXException
     {
-        context.scHandler.addHitProperty("HitId", attr.getValue("id"));
+        try
+        {
+            context.scHandler.setSubjectDB(attr.getValue("id"));
+        }
+        catch (BioException be)
+        {
+            throw new SAXException("Received a database ID which fails: "
+                                   + be.getMessage());
+        }
     }
 }

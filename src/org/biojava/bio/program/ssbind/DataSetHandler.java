@@ -62,6 +62,16 @@ public class DataSetHandler extends DefaultHandler
         this.context = context;
     }
 
+    /**
+     * <code>startElement</code> notifies of the start of an element.
+     *
+     * @param uri a <code>String</code>.
+     * @param localName a <code>String</code>.
+     * @param qName a <code>String</code>.
+     * @param attr an <code>Attributes</code> object.
+     *
+     * @exception SAXException if an error occurs.
+     */
     public void startElement(String     uri,
                              String     localName,
                              String     qName,

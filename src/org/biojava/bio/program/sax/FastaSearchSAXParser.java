@@ -85,6 +85,8 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
     private String nl;
 
     // For creating character events
+    private StringBuffer props;
+    private StringBuffer seqTokens;
     private String stringOut;
     private char [] charOut;
 
@@ -100,10 +102,13 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	attributes  = new AttributesImpl();
 	qName       = new QName(this);
 	nFormat     = new DecimalFormat("###.0");
+        props       = new StringBuffer(1024);
+        seqTokens   = new StringBuffer(2048);
 	nl          = System.getProperty("line.separator");
     }
 
-    public void parse(final InputSource source) throws IOException, SAXException
+    public void parse(final InputSource source)
+        throws IOException, SAXException
     {
 	BufferedReader content = getContentStream(source);
 
@@ -198,7 +203,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	}
 	catch (SAXException se)
 	{
-	    System.err.println("An error occurred while creating an endElement() SAX event: "
+	    System.err.println("An error occurred while creating an endElement SAX event: "
 			       + se.getMessage());
 	}
     }
@@ -235,6 +240,30 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	    startElement(new QName(this, this.prefix("Header")),
 			 (Attributes) attributes);
 
+            attributes.clear();
+            // id attribute for DatabaseId
+            qName.setQName("id");
+	    attributes.addAttribute(qName.getURI(),
+				    qName.getLocalName(),
+				    qName.getQName(),
+				    "CDATA",
+				    subjectDBIdentifier);
+
+            // metaData attribute for DatabaseId
+            qName.setQName("metaData");
+	    attributes.addAttribute(qName.getURI(),
+				    qName.getLocalName(),
+				    qName.getQName(),
+				    "CDATA",
+				    "none");
+
+            // Start the DatabaseId
+            startElement(new QName(this, this.prefix("DatabaseId")),
+			 (Attributes) attributes);
+            // End the DatabaseId
+            endElement(new QName(this, this.prefix("DatabaseId")));
+
+            attributes.clear();
 	    // Whitespace attribute for raw data
 	    qName.setQName("xml:space");
 	    attributes.addAttribute(qName.getURI(),
@@ -254,7 +283,8 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 		(String []) spKeys.toArray(new String [spKeys.size() - 1]);
 	    Arrays.sort(searchPropKeys);
 
-	    StringBuffer props = new StringBuffer(2048);
+            // Clear StringBuffer
+            props.setLength(0);
 
 	    props.append(nl);
 	    for (int i = 0; i < searchPropKeys.length; i++)
@@ -262,18 +292,6 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 		props.append(searchPropKeys[i] + ": ");
 		props.append((String) searchProperties.get(searchPropKeys[i]) + nl);
 	    }
-
-            // Append the query sequence and database identifiers to
-            // the raw header. This may appear odd, but there is no
-            // place in the DTD for these data! We are reduced to
-            // putting them into the raw field and then parsing them
-            // out again later. I'll propose a change to the DTD to
-            // support these fields.
-            //
-            // Blast output has these fields in the RawOutput element
-            // of the Header element (using the current parser).
-            props.append("Query= "    + querySeqIdentifier  + nl);
-            props.append("Database: " + subjectDBIdentifier + nl);
 
 	    charOut = new char [props.length()];
 	    props.getChars(0, props.length(), charOut, 0);
@@ -310,7 +328,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	    }
 	    catch (SAXException se)
 	    {
-		System.err.println("An error occurred while creating startElement() SAX event from hit data: "
+		System.err.println("An error occurred while creating startElement SAX event from hit data: "
 				   + se.getMessage());
 	    }
 	}
@@ -334,8 +352,6 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 
     public void endSubHit()
     {
-	// System.out.println("Using: " + hitProperties);
-
 	attributes.clear();
 	// Query sequence length attribute
 	qName.setQName("sequenceLength");
@@ -369,9 +385,31 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	    // Start the HitId
 	    startElement(new QName(this, this.prefix("HitId")),
 			 (Attributes) attributes);
-
 	    // End the HitId
 	    endElement(new QName(this, this.prefix("HitId")));
+
+            attributes.clear();
+            // Query id attribute
+            qName.setQName("id");
+	    attributes.addAttribute(qName.getURI(),
+				    qName.getLocalName(),
+				    qName.getQName(),
+				    "CDATA",
+				    querySeqIdentifier);
+
+            // metaData attribute for QueryId
+            qName.setQName("metaData");
+	    attributes.addAttribute(qName.getURI(),
+				    qName.getLocalName(),
+				    qName.getQName(),
+				    "CDATA",
+				    "none");
+
+            // Start the QueryId
+            startElement(new QName(this, this.prefix("QueryId")),
+			 (Attributes) attributes);
+            // End the QueryId
+            endElement(new QName(this, this.prefix("QueryId")));
 
 	    attributes.clear();
 	    // Start the HitDescription
@@ -398,12 +436,10 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 			 (Attributes) attributes);
 
 	    String score;
-	    if (hitProperties.containsKey("fp_score"))
-		score = (String) hitProperties.get("fp_score");
-	    else if (hitProperties.containsKey("sw_score"))
-		score = (String) hitProperties.get("sw_score");
+	    if (hitProperties.containsKey("fa_z-score"))
+		score = (String) hitProperties.get("fa_z-score");
 	    else
-		score = "none";
+		throw new SAXException("Unable to retrieve hit z-score from search data");
 
 	    // Score attribute
 	    qName.setQName("score");
@@ -431,7 +467,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	    if (hitProperties.containsKey("fa_overlap"))
 		overlap = hitProperties.get("fa_overlap").toString();
 	    else
-		overlap = hitProperties.get("sw_overlap").toString();
+                throw new SAXException("Unable to retrieve hit overlap from search data");
 
 	    // alignmentSize attribute
 	    qName.setQName("alignmentSize");
@@ -470,12 +506,41 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 		strand = "minus";
 
 	    // hitStrand attribute (may be minus for Fasta vs. nt sequence)
-	    qName.setQName("subjectStrand");
+	    qName.setQName("hitStrand");
 	    attributes.addAttribute(qName.getURI(),
 				    qName.getLocalName(),
 				    qName.getQName(),
 				    "CDATA",
 				    strand);
+
+            // Maybe proper RNA check?
+            String seqType;
+            if (hitProperties.get("query_sq_type").equals("dna"))
+                seqType = "dna";
+            else
+                seqType = "protein";
+
+            // querySequenceType attribute
+            qName.setQName("querySequenceType");
+            attributes.addAttribute(qName.getURI(),
+				    qName.getLocalName(),
+				    qName.getQName(),
+				    "CDATA",
+				    seqType);
+
+            // Maybe proper RNA check?
+            if (hitProperties.get("subject_sq_type").equals("dna"))
+                seqType = "dna";
+            else
+                seqType = "protein";
+
+            // hitSequenceType attribute
+            qName.setQName("hitSequenceType");
+            attributes.addAttribute(qName.getURI(),
+				    qName.getLocalName(),
+				    qName.getQName(),
+				    "CDATA",
+				    seqType);
 
 	    // Start the HSPSummary
 	    startElement(new QName(this, this.prefix("HSPSummary")),
@@ -493,8 +558,8 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 		(String []) hpKeys.toArray(new String [hpKeys.size() - 1]);
 	    Arrays.sort(hitPropKeys);
 
-	    StringBuffer props = new StringBuffer(2048);
-
+            // Clear StringBuffer
+            props.setLength(0);
 	    props.append(nl);
 	    for (int i = 0; i < hitPropKeys.length; i++)
 	    {
@@ -521,13 +586,17 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	    startElement(new QName(this, this.prefix("BlastLikeAlignment")),
 			 (Attributes) attributes);
 
+            String alStart     = (String) hitProperties.get("query_al_start");
+            String alStop      = (String) hitProperties.get("query_al_stop");
+            String alDispStart = (String) hitProperties.get("query_al_display_start");
+
 	    // Query sequence startPosition attribute
 	    qName.setQName("startPosition");
 	    attributes.addAttribute(qName.getURI(),
 				    qName.getLocalName(),
 				    qName.getQName(),
 				    "CDATA",
-				    (String) hitProperties.get("query_al_start"));
+				    alStart);
 
 	    // Query sequence stopPosition attribute
 	    qName.setQName("stopPosition");
@@ -535,13 +604,20 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 				    qName.getLocalName(),
 				    qName.getQName(),
 				    "CDATA",
-				    (String) hitProperties.get("query_al_stop"));
+				    alStop);
 
 	    // Start the QuerySequence
 	    startElement(new QName(this, this.prefix("QuerySequence")),
 			 (Attributes) attributes);
-	    
-	    stringOut = (String) hitProperties.get("querySeqTokens");
+
+	    seqTokens.setLength(0);
+	    seqTokens.append((String) hitProperties.get("querySeqTokens"));
+
+            // Fasta includes context sequence which we need to trim
+            stringOut = prepSeqTokens(seqTokens,
+                                      Integer.parseInt(alStart),
+                                      Integer.parseInt(alStop),
+                                      Integer.parseInt(alDispStart));
 
 	    charOut = new char [stringOut.length()];
 	    stringOut.getChars(0, stringOut.length(), charOut, 0);
@@ -565,7 +641,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	    startElement(new QName(this, this.prefix("MatchConsensus")),
 			 (Attributes) attributes);
 
-	    stringOut = (String) hitProperties.get("matchTokens");
+	    stringOut = ((String) hitProperties.get("matchTokens")).trim();
 
 	    charOut = new char [stringOut.length()];
 	    stringOut.getChars(0, stringOut.length(), charOut, 0);
@@ -574,7 +650,11 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 	    characters(charOut, 0, charOut.length);
 
 	    // End the MatchConsensus
-	    endElement(new QName(this, this.prefix("QuerySequence")));
+	    endElement(new QName(this, this.prefix("MatchConsensus")));
+
+            alStart     = (String) hitProperties.get("subject_al_start");
+            alStop      = (String) hitProperties.get("subject_al_stop");
+            alDispStart = (String) hitProperties.get("subject_al_display_start");
 
 	    attributes.clear();
 	    // Hit sequence startPosition attribute
@@ -583,7 +663,7 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 				    qName.getLocalName(),
 				    qName.getQName(),
 				    "CDATA",
-				    (String) hitProperties.get("subject_al_start"));
+				    alStart);
 
 	    // Hit sequence stopPosition attribute
 	    qName.setQName("stopPosition");
@@ -591,13 +671,20 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
 				    qName.getLocalName(),
 				    qName.getQName(),
 				    "CDATA",
-				    (String) hitProperties.get("subject_al_stop"));
+				    alStop);
 
 	    // Start the HitSequence
 	    startElement(new QName(this, this.prefix("HitSequence")),
 			 (Attributes) attributes);
 
-	    stringOut = (String) hitProperties.get("subjectSeqTokens");
+            seqTokens.setLength(0);
+	    seqTokens.append((String) hitProperties.get("subjectSeqTokens"));
+
+            // Fasta includes context sequence which we need to trim
+            stringOut = prepSeqTokens(seqTokens,
+                                      Integer.parseInt(alStart),
+                                      Integer.parseInt(alStop),
+                                      Integer.parseInt(alDispStart));
 
 	    charOut = new char [stringOut.length()];
 	    stringOut.getChars(0, stringOut.length(), charOut, 0);
@@ -640,11 +727,57 @@ public class FastaSearchSAXParser extends AbstractNativeAppSAXParser
     private String countTokens(final char token, final String string)
     {
 	int count = 0;
-	for (int i = 0; i < string.length(); i++)
+	for (int i = string.length(); --i >= 0;)
 	{
 	    if (string.charAt(i) == token)
 		count++;
 	}
 	return String.valueOf(count);
+    }
+
+    /**
+     * The <code>prepSeqTokens</code> method prepares the sequence
+     * data extracted from the Fasta output. Two things need to be
+     * done; firstly, the leading gaps are removed from the sequence
+     * (these are just format padding and not really part of the
+     * alignment) and secondly, as Fasta supplies some flanking
+     * sequence context for its alignments, this must be removed
+     * too. See the Fasta documentation for an explanation of the
+     * format.
+     *
+     * @param name a <code>StringBuffer</code> containing the
+     * unprepared sequence tokens.
+     * @param alStart an <code>int</code> indicating the start
+     * position of the alignment in the original sequence.
+     * @param alStop an <code>int</code> indicating the stop
+     * position of the alignment in the original sequence.
+     * @param alDispStart an <code>int</code> indicating the start
+     * of a flanking context in the original sequence.
+     *
+     * @return a <code>String</code> value consisting of a subsequence
+     * containing only the interesting alignment.
+     */
+    private String prepSeqTokens(final StringBuffer seqTokens,
+				 final int          alStart,
+				 final int          alStop,
+				 final int          alDispStart)
+    {
+	// Strip leading gap characters
+	while (seqTokens.charAt(0) == '-')
+	    seqTokens.deleteCharAt(0);
+
+	int gapCount = 0;
+	// Count gaps to add to number of chars returned
+	for (int i = seqTokens.length(); --i >= 0;)
+	{
+	    if (seqTokens.charAt(i) == '-')
+		gapCount++;
+	}
+
+	// Calculate the position at which the real alignment
+	// starts/stops, allowing for the gaps, which are not counted
+	// in the numbering system
+	return seqTokens.substring(alStart - alDispStart,
+				   alStop  - alDispStart + gapCount + 1);
     }
 }

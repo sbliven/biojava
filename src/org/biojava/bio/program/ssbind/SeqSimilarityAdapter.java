@@ -71,7 +71,9 @@ public class SeqSimilarityAdapter extends DefaultHandler
     {
         // Associate SAX ContentHandler factories with elements
         hFactories.put("BlastLikeDataSet", DataSetHandler.DATASET_HANDLER_FACTORY);
-        hFactories.put("RawOutput",        DBQueryHandler.DBQUERY_HANDLER_FACTORY);
+        hFactories.put("RawOutput",        BlastDBQueryHandler.BLAST_DBQUERY_HANDLER_FACTORY);
+        hFactories.put("DatabaseId",       DatabaseIdHandler.DATABASE_ID_HANDLER_FACTORY);
+        hFactories.put("QueryId",          QueryIdHandler.QUERY_ID_HANDLER_FACTORY);
         hFactories.put("HitId",            HitIdHandler.HIT_ID_HANDLER_FACTORY);
         hFactories.put("HitDescription",   HitDescHandler.HIT_DESC_HANDLER_FACTORY);
         hFactories.put("HSPSummary",       SubHitSummaryHandler.SUBHIT_SUMMARY_HANDLER_FACTORY);
@@ -79,10 +81,14 @@ public class SeqSimilarityAdapter extends DefaultHandler
         hFactories.put("HitSequence",      AlignmentHandler.ALIGNMENT_HANDLER_FACTORY);
 
         // For elements which occur in more than one context, specify
-        // which context we are interested in
-        hContext.put("HitId",          "Hit");
-        hContext.put("HitDescription", "Hit");
+        // which context we are interested in:
+
+        // RawOutput only within Header
         hContext.put("RawOutput",      "Header");
+        // HitId only within Hit
+        hContext.put("HitId",          "Hit");
+        // HitDescription only within Hit
+        hContext.put("HitDescription", "Hit");
     }
 
     /**
@@ -121,6 +127,16 @@ public class SeqSimilarityAdapter extends DefaultHandler
         this.scHandler = scHandler;
     }
 
+    /**
+     * <code>startElement</code> notifies of the start of an element.
+     *
+     * @param uri a <code>String</code>.
+     * @param localName a <code>String</code>.
+     * @param qName a <code>String</code>.
+     * @param attr an <code>Attributes</code> object.
+     *
+     * @exception SAXException if an error occurs.
+     */
     public void startElement(String     uri,
 			     String     localName,
 			     String     qName,
@@ -156,6 +172,15 @@ public class SeqSimilarityAdapter extends DefaultHandler
         bStack.add(currentBinding);
     }
 
+    /**
+     * <code>endElement</code> notifies of the end of an element.
+     *
+     * @param uri a <code>String</code>.
+     * @param localName a <code>String</code>.
+     * @param qName a <code>String</code>.
+     *
+     * @exception SAXException if an error occurs.
+     */
     public void endElement(String uri,
 			   String localName,
 			   String qName)
@@ -176,6 +201,15 @@ public class SeqSimilarityAdapter extends DefaultHandler
             scHandler.setMoreSearches(false);
     }
 
+    /**
+     * <code>characters</code> notifies of character data.
+     *
+     * @param ch a <code>char []</code> array.
+     * @param start an <code>int</code>.
+     * @param length an <code>int</code>.
+     *
+     * @exception SAXException if an error occurs.
+     */
     public void characters(char[] ch, int start, int length)
 	throws SAXException
     {

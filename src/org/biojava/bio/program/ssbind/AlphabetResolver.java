@@ -28,7 +28,8 @@ import org.biojava.bio.symbol.FiniteAlphabet;
 
 /**
  * <code>AlphabetResolver</code> objects are helpers which determine
- * which type of <code>Alphabet</code> to expect from a search result.
+ * which type of sequence <code>Alphabet</code> to expect from a
+ * search result.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
@@ -57,7 +58,7 @@ class AlphabetResolver
         // For Fasta
         else if (identifier.equalsIgnoreCase("dna"))
             return DNATools.getDNA();
-        else if (identifier.equalsIgnoreCase("p"))
+        else if (identifier.equalsIgnoreCase("protein"))
             return ProteinTools.getAlphabet();
         else
             throw new BioException("Unable to resolve sequence type from identifier '"

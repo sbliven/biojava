@@ -128,7 +128,7 @@ public class FastaSearchParse
                         System.out.println("     Query strand: " + subHit.getQueryStrand());
                         System.out.println("    Subject start: " + subHit.getSubjectStart());
                         System.out.println("      Subject end: " + subHit.getSubjectEnd());
-                        System.out.println("    Subjec strand: " + subHit.getSubjectStrand());
+                        System.out.println("   Subject strand: " + subHit.getSubjectStrand());
 
 			Alignment al = subHit.getAlignment();
 			List  labels = al.getLabels();

@@ -67,12 +67,12 @@ public class SequenceDBSearchHit extends AbstractChangeable
     private double     score;
     private double     pValue;
     private double     eValue;
-    private int        qStart;
-    private int        qEnd;
-    private Strand     qStrand;
-    private int        sStart;
-    private int        sEnd;
-    private Strand     sStrand;
+    private int        queryStart;
+    private int        queryEnd;
+    private Strand     queryStrand;
+    private int        subjectStart;
+    private int        subjectEnd;
+    private Strand     subjectStrand;
     private List       subHits;
     private Annotation annotation;
 
@@ -111,12 +111,12 @@ public class SequenceDBSearchHit extends AbstractChangeable
     public SequenceDBSearchHit(final double     score,
 			       final double     eValue,
 			       final double     pValue,
-                               final int        qStart,
-                               final int        qEnd,
-                               final Strand     qStrand,
-                               final int        sStart,
-                               final int        sEnd,
-                               final Strand     sStrand,
+                               final int        queryStart,
+                               final int        queryEnd,
+                               final Strand     queryStrand,
+                               final int        subjectStart,
+                               final int        subjectEnd,
+                               final Strand     subjectStrand,
                                final String     sequenceID,
 			       final Annotation annotation,
                                final List       subHits)
@@ -124,23 +124,23 @@ public class SequenceDBSearchHit extends AbstractChangeable
         Contract.pre(! Double.isNaN(score), "score was NaN");
 	// pValue may be NaN
 	// eValue may be NaN
-	Contract.pre(sequenceID != null, "sequenceID was null");
-        Contract.pre(qStrand    != null, "query strand was null");
-        Contract.pre(sStrand    != null, "subject strand was null");
-	Contract.pre(subHits    != null, "subHits was null");
+	Contract.pre(sequenceID    != null, "sequenceID was null");
+        Contract.pre(queryStrand   != null, "query strand was null");
+        Contract.pre(subjectStrand != null, "subject strand was null");
+	Contract.pre(subHits       != null, "subHits was null");
 
-	this.sequenceID = sequenceID;
-	this.score      = score;
-	this.eValue     = eValue;
-	this.pValue     = pValue;
-        this.qStart     = qStart;
-        this.qEnd       = qEnd;
-        this.qStrand    = qStrand;
-        this.sStart     = sStart;
-        this.sEnd       = sEnd;
-        this.sStrand    = sStrand;
-	this.subHits    = subHits;
-	this.annotation = annotation;
+	this.sequenceID    = sequenceID;
+	this.score         = score;
+	this.eValue        = eValue;
+	this.pValue        = pValue;
+        this.queryStart    = queryStart;
+        this.queryEnd      = queryEnd;
+        this.queryStrand   = queryStrand;
+        this.subjectStart  = subjectStart;
+        this.subjectEnd    = subjectEnd;
+        this.subjectStrand = subjectStrand;
+	this.subHits       = subHits;
+	this.annotation    = annotation;
 
 	// Lock the annotation by vetoing all changes
 	this.annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
@@ -163,32 +163,32 @@ public class SequenceDBSearchHit extends AbstractChangeable
 
     public int getQueryStart()
     {
-        return qStart;
+        return queryStart;
     }
 
     public int getQueryEnd()
     {
-        return qEnd;
+        return queryEnd;
     }
 
     public Strand getQueryStrand()
     {
-        return qStrand;
+        return queryStrand;
     }
 
     public int getSubjectStart()
     {
-        return sStart;
+        return subjectStart;
     }
 
     public int getSubjectEnd()
     {
-        return sEnd;
+        return subjectEnd;
     }
 
     public Strand getSubjectStrand()
     {
-        return sStrand;
+        return subjectStrand;
     }
 
     public String getSequenceID()

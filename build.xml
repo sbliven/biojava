@@ -136,6 +136,7 @@
       classpath="${classpath}"
       deprecation="false"
       depend="no"
+      debug="true"
     />
   </target>
 
@@ -205,8 +206,7 @@
               packages="org.biojava.bio:org.biojava.bio.dist:org.biojava.bio.search:org.biojava.bio.seq:org.biojava.bio.seq.db:org.biojava.bio.seq.genomic:org.biojava.bio.seq.io:org.biojava.bio.symbol"
 />
        <group title="Experimental/New Packages"
-              
-packages="org.biojava.bio.proteomics:org.biojava.stats.svm:org.biojava.stats.svm.tools:org.biojava.bio.seq.homol:org.biojava.bio.seq.ragbag"
+              packages="org.biojava.bio.proteomics:org.biojava.stats.svm:org.biojava.stats.svm.tools:org.biojava.bio.seq.homol:org.biojava.bio.seq.ragbag:org.biojava.bio.seq.db.emblcd"
 />
        <group title="User Interface Components"
               packages="org.biojava.bio.gui:org.biojava.bio.gui.sequence" />
@@ -214,8 +214,7 @@ packages="org.biojava.bio.proteomics:org.biojava.stats.svm:org.biojava.stats.svm
               packages="org.biojava.bio.seq.impl:org.biojava.utils:org.biojava.utils.cache:org.biojava.utils.contract:org.biojava.utils.xml:org.biojava.utils.query:org.biojava.utils.stax"
 />
        <group title="External Tools"
-              
-packages="org.biojava.bio.program:org.biojava.bio.program.das:org.biojava.bio.program.gff:org.biojava.bio.program.sax:org.biojava.bio.program.seach:org.biojava.bio.program.xml:org.biojava.bio.seq.io.game:org.biojava.bio.program.search:org.biojava.bio.program.xff"
+              packages="org.biojava.bio.program:org.biojava.bio.program.das:org.biojava.bio.program.gff:org.biojava.bio.program.sax:org.biojava.bio.program.seach:org.biojava.bio.program.xml:org.biojava.bio.seq.io.game:org.biojava.bio.program.search:org.biojava.bio.program.xff:org.biojava.bio.program.ssbind"
 />
        <group title="Dynamic Programming Packages"
               packages="org.biojava.bio.dp:org.biojava.bio.dp.onehead:org.biojava.bio.dp.twohead"

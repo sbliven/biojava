@@ -31,29 +31,29 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.biojava.bio.BioException;
 
 /**
- * <code>DBQueryHandler</code>s parse the query sequence name and
+ * <code>BlastDBQueryHandler</code>s parse the query sequence name and
  * database name from the raw header output contained within the
  * RawOutput element of the Header element and inform the
- * <code>SearchContentHandler</code>. There should really be dedicated
- * Elements in the DTD for these data. The Fasta search parser fakes a
- * RawOutput element containing these values as a kludge until this is
- * resolved.
+ * <code>SearchContentHandler</code>. This means of setting the query
+ * sequence name and database name will be deprecated if and when the
+ * BlastLikeSAXParser begins to use the new QueryId and DatabaseId
+ * elements recently added to the DTD.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
  */
-public class DBQueryHandler extends DefaultHandler
+public class BlastDBQueryHandler extends DefaultHandler
 {
     /**
      * Static factory to which creates new
      * <code>ContentHandler</code>s of this type.
      */
-    public static final SSPropHandlerFactory DBQUERY_HANDLER_FACTORY =
+    public static final SSPropHandlerFactory BLAST_DBQUERY_HANDLER_FACTORY =
         new SSPropHandlerFactory()
         {
             public ContentHandler getHandler(SeqSimilarityAdapter context)
             {
-                return new DBQueryHandler(context);
+                return new BlastDBQueryHandler(context);
             }
         };
 
@@ -63,12 +63,12 @@ public class DBQueryHandler extends DefaultHandler
     private int                  level = 0;
 
     /**
-     * Creates a new <code>DBQueryHandler</code> object with a
+     * Creates a new <code>BlastDBQueryHandler</code> object with a
      * reference to a parent context.
      *
      * @param context a <code>SeqSimilarityAdapter</code>.
      */
-    DBQueryHandler(SeqSimilarityAdapter context)
+    BlastDBQueryHandler(SeqSimilarityAdapter context)
     {
         super();
         this.context = context;
@@ -76,6 +76,16 @@ public class DBQueryHandler extends DefaultHandler
         data = new StringBuffer();
     }
 
+    /**
+     * <code>startElement</code> notifies of the start of an element.
+     *
+     * @param uri a <code>String</code>.
+     * @param localName a <code>String</code>.
+     * @param qName a <code>String</code>.
+     * @param attr an <code>Attributes</code> object.
+     *
+     * @exception SAXException if an error occurs.
+     */
     public void startElement(String     uri,
                              String     localName,
                              String     qName,
@@ -87,6 +97,15 @@ public class DBQueryHandler extends DefaultHandler
 	    throw new SAXException("Found child element when expecting character data");
     }
 
+    /**
+     * <code>endElement</code> notifies of the end of an element.
+     *
+     * @param uri a <code>String</code>.
+     * @param localName a <code>String</code>.
+     * @param qName a <code>String</code>.
+     *
+     * @exception SAXException if an error occurs.
+     */
     public void endElement(String nsURI,
 			   String localName,
 			   String qName)
@@ -98,13 +117,22 @@ public class DBQueryHandler extends DefaultHandler
 	    setStringValue(data.toString());
     }
 
+    /**
+     * <code>characters</code> notifies of character data.
+     *
+     * @param ch a <code>char []</code> array.
+     * @param start an <code>int</code>.
+     * @param length an <code>int</code>.
+     *
+     * @exception SAXException if an error occurs.
+     */
     public void characters(char[] ch, int start, int length) 
         throws SAXException
     {
 	data.append(ch, start, length);
     }
-    /**
 
+    /**
      * <code>setStringValue</code> informs the
      * <code>SearchContentHandler</code> of the data.
      *
@@ -114,6 +142,10 @@ public class DBQueryHandler extends DefaultHandler
      */
     private void setStringValue(String s) throws SAXException
     {
+        // Check that we are dealing with Blast output
+        if (! (s.startsWith("BLAST") || s.startsWith("TBLAST")))
+            return;
+
         StringTokenizer st = new StringTokenizer(s);
 
         String    query = null;
@@ -136,18 +168,28 @@ public class DBQueryHandler extends DefaultHandler
         }
 
         if (query == null)
-            throw new SAXException("Unable to parse query sequence Id");
+            throw new SAXException("Unable to parse query sequence ID");
         else if (database == null)
-            throw new SAXException("Unable to parse database name");
+            throw new SAXException("Unable to parse database ID");
 
         try
         {
             context.scHandler.setQuerySeq(query);
+        }
+        catch (BioException be)
+        {
+            throw new SAXException("Received a query sequence ID which fails: "
+                                   + be.getMessage());
+        }
+
+        try
+        {
             context.scHandler.setSubjectDB(database);
         }
         catch (BioException be)
         {
-            be.printStackTrace();
+            throw new SAXException("Received a database ID which fails: "
+                                   + be.getMessage());
         }
     }
 }

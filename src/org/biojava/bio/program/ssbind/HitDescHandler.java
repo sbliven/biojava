@@ -67,6 +67,16 @@ public class HitDescHandler extends DefaultHandler
         data = new StringBuffer();
     }
 
+    /**
+     * <code>startElement</code> notifies of the start of an element.
+     *
+     * @param uri a <code>String</code>.
+     * @param localName a <code>String</code>.
+     * @param qName a <code>String</code>.
+     * @param attr an <code>Attributes</code> object.
+     *
+     * @exception SAXException if an error occurs.
+     */
     public void startElement(String     uri,
                              String     localName,
                              String     qName,
@@ -78,12 +88,30 @@ public class HitDescHandler extends DefaultHandler
 	    throw new SAXException("Found child element when expecting character data");
     }
 
+    /**
+     * <code>characters</code> notifies of character data.
+     *
+     * @param ch a <code>char []</code> array.
+     * @param start an <code>int</code>.
+     * @param length an <code>int</code>.
+     *
+     * @exception SAXException if an error occurs.
+     */
     public void characters(char[] ch, int start, int length) 
         throws SAXException
     {
 	data.append(ch, start, length);
     }
 
+    /**
+     * <code>endElement</code> notifies of the end of an element.
+     *
+     * @param uri a <code>String</code>.
+     * @param localName a <code>String</code>.
+     * @param qName a <code>String</code>.
+     *
+     * @exception SAXException if an error occurs.
+     */
     public void endElement(String nsURI,
 			   String localName,
 			   String qName)

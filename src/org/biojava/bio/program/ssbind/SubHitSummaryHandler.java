@@ -63,6 +63,16 @@ public class SubHitSummaryHandler extends DefaultHandler
         this.context = context;
     }
 
+    /**
+     * <code>startElement</code> notifies of the start of an element.
+     *
+     * @param uri a <code>String</code>.
+     * @param localName a <code>String</code>.
+     * @param qName a <code>String</code>.
+     * @param attr an <code>Attributes</code> object.
+     *
+     * @exception SAXException if an error occurs.
+     */
     public void startElement(String     uri,
                              String     localName,
                              String     qName,
@@ -78,6 +88,16 @@ public class SubHitSummaryHandler extends DefaultHandler
         if (attr.getValue("pValue") != null)
             context.scHandler.addSubHitProperty("pValue",
                                                 attr.getValue("pValue"));
+
+        // These are only really important for Fasta as the sequence
+        // types can be resolved from the program name for Blast
+        if (attr.getValue("querySequenceType") != null)
+            context.scHandler.addSubHitProperty("querySequenceType",
+                                                attr.getValue("querySequenceType"));
+
+        if (attr.getValue("hitSequenceType") != null)
+            context.scHandler.addSubHitProperty("hitSequenceType",
+                                                attr.getValue("hitSequenceType"));
 
         context.scHandler.addSubHitProperty("queryStrand", attr.getValue("queryStrand"));
         context.scHandler.addSubHitProperty("hitStrand", attr.getValue("hitStrand"));

@@ -61,7 +61,7 @@ import org.biojava.utils.ChangeVetoException;
  * supplied to the constructor.
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
- * @since1.2
+ * @since 1.2
  */
 public class BlastLikeSearchBuilder implements SearchBuilder
 {
@@ -188,11 +188,12 @@ public class BlastLikeSearchBuilder implements SearchBuilder
     {
         try
         {
+            resultAnnotation = makeAnnotation(resultPreAnnotation);
             target.add(makeSearchResult());
         }
         catch (BioException be)
         {
-            System.err.println("Failed to build SeqSimilaritySearchResult:");
+            System.err.println("Failed to build SeqSimilaritySearchResult: ");
             be.printStackTrace();
         }
     }
@@ -203,10 +204,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         searchParameters.clear();
     }
 
-    public void endHeader()
-    {
-        resultAnnotation = makeAnnotation(resultPreAnnotation);
-    }
+    public void endHeader() { }
 
     public void startHit()
     {
@@ -232,7 +230,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         }
         catch (BioException be)
         {
-            System.err.println("SubHit construction failed:");
+            System.err.println("SubHit construction failed: ");
             be.printStackTrace();
         }
     }
@@ -321,7 +319,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
      * <code>makeSubHit</code> creates a new sub-hit.
      *
      * @return a <code>SeqSimilaritySearchSubHit</code>.
-     *.
+     *
      * @exception BioException if an error occurs.
      */
     private SeqSimilaritySearchSubHit makeSubHit() throws BioException
@@ -349,16 +347,21 @@ public class BlastLikeSearchBuilder implements SearchBuilder
 
         if (tokenParser == null)
         {
-            String id;
+            String identifier;
 
-            if (subHitData.containsKey("seqType"))
-                id = (String) subHitData.get("seqType");
+            // Try explicit sequence type first
+            if (subHitData.containsKey("hitSequenceType"))
+            {
+                identifier = (String) subHitData.get("hitSequenceType");
+            }
+            // Otherwise try to resolve from the program name (only
+            // works for Blast)
             else if (resultPreAnnotation.containsKey("program"))
-                id = (String) resultPreAnnotation.get("program");
+                identifier = (String) resultPreAnnotation.get("program");
             else
                 throw new BioException("Unable to determine sequence type");
 
-            FiniteAlphabet alpha = alphaResolver.resolveAlphabet(id);
+            FiniteAlphabet alpha = alphaResolver.resolveAlphabet(identifier);
             tokenParser = new TokenParser(alpha);
         }
 
@@ -409,16 +412,34 @@ public class BlastLikeSearchBuilder implements SearchBuilder
 	return annotation;
     }
 
+    /**
+     * <code>hitQueryStart</code> resolves the start of the hit on the
+     * query sequence from the underlying sub-hits.
+     *
+     * @return an <code>int</code>.
+     */
     private int hitQueryStart()
     {
         return subs[0].getQueryStart();
     }
 
+    /**
+     * <code>hitQueryEnd</code> resolves the end of the hit on the
+     * query sequence from the underlying sub-hits.
+     *
+     * @return an <code>int</code>.
+     */
     private int hitQueryEnd()
     {
         return subs[subs.length - 1].getQueryEnd();
     }
 
+    /**
+     * <code>hitQueryStrand</code> resolves the strand of the hit on
+     * the query sequence from the underlying sub-hits.
+     *
+     * @return a <code>Strand</code>.
+     */
     private Strand hitQueryStrand()
     {
         int posCount = 0;
@@ -445,16 +466,34 @@ public class BlastLikeSearchBuilder implements SearchBuilder
             return StrandedFeature.UNKNOWN;
     }
 
+    /**
+     * <code>hitSubjectStart</code> resolves the start of the hit on
+     * the subject sequence from the underlying sub-hits.
+     *
+     * @return an <code>int</code>.
+     */
     private int hitSubjectStart()
     {
         return subs[0].getSubjectStart();
     }
 
+    /**
+     * <code>hitSubjectEnd</code> resolves the end of the hit on the
+     * subject sequence from the underlying sub-hits.
+     *
+     * @return an <code>int</code>.
+     */
     private int hitSubjectEnd()
     {
         return subs[subs.length - 1].getSubjectEnd();
     }
 
+    /**
+     * <code>hitSubjectStrand</code> resolves the strand of the hit on
+     * the subject sequence from the underlying sub-hits.
+     *
+     * @return a <code>Strand</code>.
+     */
     private Strand hitSubjectStrand()
     {
         int posCount = 0;

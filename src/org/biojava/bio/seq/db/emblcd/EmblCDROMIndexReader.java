@@ -64,7 +64,7 @@ public abstract class EmblCDROMIndexReader
      * <code>headerParsed</code> is a flag indicating that the 300
      * byte header has been parsed and the contents cached.
      */
-    protected boolean headerParsed = false;
+    private boolean headerParsed = false;
 
     // Header fields
     private byte []      int4 = new byte [4];
@@ -221,7 +221,12 @@ public abstract class EmblCDROMIndexReader
      */
     public byte [] readRawRecord() throws IOException
     {
-        input.read(record);
+        int eof = input.read(record);
+        if (eof == -1)
+        {
+            input.close();
+            throw new IOException("Failed to read a record; the InputStream was closed because of this.");
+        }
 
         return record;
     }
@@ -324,31 +329,61 @@ public abstract class EmblCDROMIndexReader
      */
     private void parseHeader() throws IOException
     {
-        input.read(int4);
+        int eof = 0;
+
+        eof = input.read(int4);
+        if (eof == -1)
+        {
+            input.close();
+            throw new IOException("Failed to read full header; the InputStream was closed because of this.");
+        }
         fileLength = parseInt4(int4);
 
-        input.read(int4);
+        eof = input.read(int4);
+        if (eof == -1)
+        {
+            input.close();
+            throw new IOException("Failed to read full header; the InputStream was closed because of this.");
+        }
         recordCount = parseInt4(int4);
 
-        input.read(int2);
+        eof = input.read(int2);
+        if (eof == -1)
+        {
+            input.close();
+            throw new IOException("Failed to read full header; the InputStream was closed because of this.");
+        }
         recordLength = parseInt2(int2);
-
-	System.err.println("Got record length: " + recordLength);
 
         // Set up array for reading records now that we know their
         // length
         record = new byte [recordLength];
 
-        input.read(dbName);
-        sb.delete(0, sb.length());
+        eof = input.read(dbName);
+        if (eof == -1)
+        {
+            input.close();
+            throw new IOException("Failed to read full header; the InputStream was closed because of this.");
+        }
+        sb.setLength(0);
         name = parseString(sb, dbName);
 
-        input.read(dbRelease);
-        sb.delete(0, sb.length());
+        eof = input.read(dbRelease);
+        if (eof == -1)
+        {
+            input.close();
+            throw new IOException("Failed to read full header; the InputStream was closed because of this.");
+        }
+        sb.setLength(0);
         release = parseString(sb, dbRelease);
 
-        input.read(dbDate);
-        sb.delete(0, sb.length());
+        eof = input.read(dbDate);
+        if (eof == -1)
+        {
+            input.close();
+            throw new IOException("Failed to read full header; the InputStream was closed because of this.");
+        }
+        sb.setLength(0);
         date = parseDate(sb, dbDate);
 
         // Skip the remainder of the header (padding)
