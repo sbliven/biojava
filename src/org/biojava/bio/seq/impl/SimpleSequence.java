@@ -23,6 +23,7 @@ package org.biojava.bio.seq.impl;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.io.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.*;
@@ -51,8 +52,10 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ * @author Mark Schreiber
+ * @serial WARNING serialized versions of this class may not be compatable with future versions of Biojava
  */
-public class SimpleSequence implements Sequence, RealizingFeatureHolder, java.io.Serializable
+public class SimpleSequence implements Sequence, RealizingFeatureHolder, Serializable
 {
     //
     // This section is for the SymbolList implementation-by-delegation
@@ -103,12 +106,17 @@ public class SimpleSequence implements Sequence, RealizingFeatureHolder, java.io
     private String urn;
     private String name;
     private Annotation annotation;
-    private SimpleFeatureHolder featureHolder;
-    private FeatureRealizer featureRealizer;
+    private SimpleSequenceFeatureHolder featureHolder;
+    private transient FeatureRealizer featureRealizer;
+
+    private void readObject(ObjectInputStream s)throws IOException, ClassNotFoundException{
+	s.defaultReadObject();
+	this.featureRealizer = FeatureImpl.DEFAULT;
+    }
 
     protected SimpleFeatureHolder getFeatureHolder() {
 	if(featureHolder == null) {
-	    featureHolder = new SimpleFeatureHolder();
+	    featureHolder = new SimpleSequenceFeatureHolder();
 	    registerFeatureForwarder();
 	}
 	return featureHolder;
@@ -307,5 +315,12 @@ public class SimpleSequence implements Sequence, RealizingFeatureHolder, java.io
 	public void postChange(ChangeEvent cev) {
 	    changeSupport.firePostChangeEvent(cev);
 	}
+    }
+    /**
+     * this class is implemented for serialization purposes all methods delegate to super
+     */
+    private class SimpleSequenceFeatureHolder extends SimpleFeatureHolder implements Serializable{
+
+	private static final long serialVersionUID = 12687044;
     }
 }
