@@ -40,7 +40,46 @@ extends AbstractChangeable implements AlphabetIndex {
         throw new IllegalSymbolException("Symbol must be atomic to be indexed.");
       }
     }
-    return indx;
+    
+    // we hit the correct symbol first time
+    if(symbols[indx] == s) {
+      return indx;
+    }
+    
+    // it may have the same hash code and be after
+    for(
+      int i = indx;
+      i < symbols.length && hashes[i] == hashes[indx];
+      i++
+    ) {
+      if(symbols[i].equals(s)) {
+        return i;
+      }
+    }
+    
+    // in some strange parallel universe, it may have the same hashcode and
+    // be before
+    for(
+      int i = indx-1;
+      i >= 0 && hashes[i] == hashes[indx];
+      i--
+    ) {
+      if(symbols[i].equals(s)) {
+        return i;
+      }
+    }
+    
+    // it has the same hash code, but isn't in the alphabet
+    getAlphabet().validate(s);
+    if(s instanceof AtomicSymbol) {
+      throw new BioError(
+        "Assertion Failure: " +
+        "Symbol " + s.getName() + " was not an indexed member of the alphabet " +
+        getAlphabet().getName() + " despite being in the alphabet."
+      );
+    } else {
+      throw new IllegalSymbolException("Symbol must be atomic to be indexed.");
+    }
   }
   
   public Symbol symbolForIndex(int i) throws IndexOutOfBoundsException {
