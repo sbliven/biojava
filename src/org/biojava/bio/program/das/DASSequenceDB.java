@@ -51,15 +51,37 @@ public class DASSequenceDB implements SequenceDB {
     private URL dataSourceURL;
     private Map sequences;
     private Cache symbolsCache;
+    private FixedSizeCache featuresCache;
     private boolean gotAllIDs = false;
+    private FeatureRequestManager frm;
 
     {
 	sequences = new HashMap();
 	symbolsCache = new FixedSizeCache(20);
+	featuresCache = new FixedSizeCache(50);
     }
 
     Cache getSymbolsCache() {
 	return symbolsCache;
+    }
+
+    void ensureFeaturesCacheCapacity(int min) {
+	if (featuresCache.getLimit() < min) {
+	    System.err.println("Setting cache limit up to " + min);
+	    featuresCache.setLimit(min);
+	}
+    }
+
+    Cache getFeaturesCache() {
+	return featuresCache;
+    }
+
+    FeatureRequestManager getFeatureRequestManager() {
+	if (frm == null) {
+	    frm = new FeatureRequestManager(this);
+	}
+
+	return frm;
     }
 
     public DASSequenceDB(URL dataSourceURL) 

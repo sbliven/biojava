@@ -47,28 +47,30 @@ import org.w3c.dom.*;
  */
 
 class FeatureRequestManager {
-    private static Map requestManagers;
+//      private static Map requestManagers;
 
-    static {
-	requestManagers = new HashMap();
-    }
+//      static {
+//  	requestManagers = new HashMap();
+//      }
 
-    public static FeatureRequestManager getManager(URL dataSource) {
-	FeatureRequestManager frm = (FeatureRequestManager) requestManagers.get(dataSource);
-	if (frm == null) {
-	    frm = new FeatureRequestManager();
-	    requestManagers.put(dataSource, frm);
-	}
-	return frm;
-    }
+//      public static FeatureRequestManager getManager(URL dataSource) {
+//  	FeatureRequestManager frm = (FeatureRequestManager) requestManagers.get(dataSource);
+//  	if (frm == null) {
+//  	    frm = new FeatureRequestManager();
+//  	    requestManagers.put(dataSource, frm);
+//  	}
+//  	return frm;
+//      }
 
     private Set openTickets;
+    private DASSequenceDB seqDB;
 
     {
 	openTickets = new HashSet();
     }
 
-    private FeatureRequestManager() {
+    FeatureRequestManager(DASSequenceDB seqDB) {
+	this.seqDB = seqDB;
     }
 
     public Ticket requestFeatures(URL ds, String id, SeqIOListener l) {
@@ -110,6 +112,8 @@ class FeatureRequestManager {
     private synchronized void fetch(Ticket trigger) 
         throws ParseException, BioException
     {
+	seqDB.ensureFeaturesCacheCapacity(openTickets.size() * 3);
+
 	String triggerType = trigger.getType();
 	String triggerCategory = trigger.getCategory();
 	Map fetchers = new HashMap();

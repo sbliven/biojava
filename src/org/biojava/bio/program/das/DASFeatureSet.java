@@ -27,6 +27,7 @@ import java.io.*;
 
 import org.biojava.bio.*;
 import org.biojava.utils.*;
+import org.biojava.utils.cache.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
@@ -48,7 +49,7 @@ import org.w3c.dom.*;
 
 class DASFeatureSet implements FeatureHolder {
     private FeatureRequestManager.Ticket featureTicket;
-    private SimpleFeatureHolder realFeatures;
+    private CacheReference realFeatures;
 
     private DASSequence refSequence;
     private URL dataSource;
@@ -65,16 +66,26 @@ class DASFeatureSet implements FeatureHolder {
     }
 
     void registerFeatureFetcher() {
+	if (realFeatures != null && realFeatures.get() == null) {
+	    realFeatures = null;
+	    featureTicket = null;
+	    // System.err.println("*** Real features got cleared out");
+	}
+
 	if (featureTicket == null) {
 	    SeqIOListener listener = new DASFeatureSetPopulator();
-	    FeatureRequestManager frm = FeatureRequestManager.getManager(refSequence.getDataSourceURL());
+	    FeatureRequestManager frm = refSequence.getParentDB().getFeatureRequestManager();
 	    featureTicket = frm.requestFeatures(dataSource, sourceID, listener);
 	}
     }
 
     protected FeatureHolder getFeatures() {
-	if (realFeatures != null)
-	    return realFeatures;
+	if (realFeatures != null) {
+	    FeatureHolder fh = (FeatureHolder) realFeatures.get();
+	    if (fh != null) {
+		return fh;
+	    }
+	}
 
 	try {
 	    registerFeatureFetcher();
@@ -89,7 +100,12 @@ class DASFeatureSet implements FeatureHolder {
 	    throw new BioError("Assertion failure: features didn't get fetched.");
 	}
 
-	return realFeatures;
+	FeatureHolder fh = (FeatureHolder) realFeatures.get();
+	if (fh == null) {
+	    throw new BioError("Assertion failure: cache is stupidly small...");
+	}
+
+	return fh;
     }
 
     public Iterator features() {
@@ -143,7 +159,7 @@ class DASFeatureSet implements FeatureHolder {
 	}
 
 	public void endSequence() {
-	    realFeatures = holder;
+	    realFeatures = refSequence.getParentDB().getFeaturesCache().makeReference(holder);
 	}
 
 	public void startFeature(Feature.Template temp) 

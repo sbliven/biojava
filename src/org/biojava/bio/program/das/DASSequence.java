@@ -112,7 +112,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	this.structure = new SimpleFeatureHolder();
 	
 	SeqIOListener listener = new SkeletonListener();
-	FeatureRequestManager frm = FeatureRequestManager.getManager(dataSourceURL);
+	FeatureRequestManager frm = getParentDB().getFeatureRequestManager();
 	this.structureTicket = frm.requestFeatures(dataSourceURL, seqID, listener, null, "component");
 
 	//
@@ -289,15 +289,17 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	}
     }
 
-    private void registerLocalFeatureFetchers() {
+    private int registerLocalFeatureFetchers() {
 	for (Iterator i = featureSets.values().iterator(); i.hasNext(); ) {
 	    DASFeatureSet dfs = (DASFeatureSet) i.next();
 	    dfs.registerFeatureFetcher();
 	}
+
+	return featureSets.size();
     }
 
-    void registerFeatureFetchers() throws BioException {
-	registerLocalFeatureFetchers();
+    int registerFeatureFetchers() throws BioException {
+	int num = registerLocalFeatureFetchers();
 
         FeatureHolder structure = getStructure();
 	if (length() < SIZE_THRESHOLD && structure.countFeatures() > 0) {
@@ -312,13 +314,15 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 
 	    for (Iterator si = sequences.iterator(); si.hasNext(); ) {
 		DASSequence cseq = (DASSequence) si.next();
-		cseq.registerFeatureFetchers();
+		num += cseq.registerFeatureFetchers();
 	    }
 	}
+
+	return num;
     }
 
-    void registerFeatureFetchers(Location l) throws BioException {
-	registerLocalFeatureFetchers();
+    int registerFeatureFetchers(Location l) throws BioException {
+	int num = registerLocalFeatureFetchers();
 	
         FeatureHolder structure = getStructure();
 	if (structure.countFeatures() > 0) {
@@ -347,12 +351,14 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 		DASSequence cseq = (DASSequence) srme.getKey();
 		Location partNeeded = (Location) srme.getValue();
 		if (partNeeded != null) {
-		    cseq.registerFeatureFetchers(partNeeded);
+		    num += cseq.registerFeatureFetchers(partNeeded);
 		} else {
-		    cseq.registerFeatureFetchers();
+		    num += cseq.registerFeatureFetchers();
 		}
 	    }
 	}
+
+	return num;
     }
 
     //
@@ -580,11 +586,13 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    
 	    if (recurse) {
 		Location ffl = extractInterestingLocation(ff);
+		int numComponents = 1;
 		if (ffl != null) {
-		    registerFeatureFetchers(ffl);
+		    numComponents = registerFeatureFetchers(ffl);
 		} else {
-		    registerFeatureFetchers();
+		    numComponents = registerFeatureFetchers();
 		}
+		getParentDB().ensureFeaturesCacheCapacity(numComponents * 3);
 	    } else {
 		registerLocalFeatureFetchers();
 	    }
