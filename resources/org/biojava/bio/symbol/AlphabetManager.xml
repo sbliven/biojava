@@ -163,8 +163,6 @@
     </characterTokenization>
   </alphabet>
 
-
-
   <alphabet name="RNA">
     <description>Ribose Nucleic Acid. Intermediate between genomic DNA and protein.</description>
     <symbolref name="adenine"/>	
@@ -201,6 +199,116 @@
     </characterTokenization>
   </alphabet>
 
+  <alphabet name="NUCLEOTIDE">
+    <description>All nucleic acids.</description>
+    <symbolref name="adenine"/>
+    <symbolref name="guanine"/>
+    <symbolref name="cytosine"/>
+    <symbolref name="thymine"/>
+    <symbolref name="uracil"/>
+    
+    <characterTokenization name="token" caseSensitive="false">
+      <atomicMapping token="a">
+        <symbolref name="adenine"/>
+      </atomicMapping>
+
+      <atomicMapping token="g">
+        <symbolref name="guanine"/>
+      </atomicMapping>
+
+      <atomicMapping token="c">
+        <symbolref name="cytosine"/>
+      </atomicMapping>
+
+      <atomicMapping token="t">
+        <symbolref name="thymine"/>
+      </atomicMapping>
+
+      <atomicMapping token="u">
+        <symbolref name="uracil"/>
+      </atomicMapping>
+	  
+      <ambiguityMapping token="r">
+        <symbolref name="adenine" />
+        <symbolref name="guanine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="y">
+        <symbolref name="cytosine" />
+	    <symbolref name="thymine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="m">
+        <symbolref name="cytosine" />
+        <symbolref name="adenine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="k">
+        <symbolref name="guanine" />
+	<symbolref name="thymine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="s">
+        <symbolref name="guanine" />
+	<symbolref name="cytosine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="w">
+        <symbolref name="adenine" />
+	<symbolref name="thymine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="h">
+        <symbolref name="adenine" />
+	<symbolref name="cytosine" />
+	<symbolref name="thymine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="b">
+        <symbolref name="guanine" />
+	<symbolref name="cytosine" />
+	<symbolref name="thymine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="v">
+        <symbolref name="guanine" />
+	<symbolref name="adenine" />
+	<symbolref name="cytosine" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="d">
+        <symbolref name="guanine" />
+	<symbolref name="adenine" />
+	<symbolref name="thymine" />
+      </ambiguityMapping>
+    
+      <ambiguityMapping token="n">
+        <symbolref name="guanine" />
+		<symbolref name="adenine" />
+		<symbolref name="cytosine" />
+	    <symbolref name="thymine" />
+	    <symbolref name="uracil" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="x">
+        <symbolref name="guanine" />
+	    <symbolref name="adenine" />
+	    <symbolref name="cytosine" />
+	    <symbolref name="thymine" />
+	    <symbolref name="uracil" />
+      </ambiguityMapping>
+
+      <ambiguityMapping token="-">
+        <!-- Gap is the empty set -->
+      </ambiguityMapping>
+
+      <ambiguityMapping token="~">
+      </ambiguityMapping>
+
+      <ambiguityMapping token=".">
+      </ambiguityMapping>
+    </characterTokenization>
+  </alphabet>
 
   <alphabet name="PROTEIN">
     <description>Unmodified Amino-acids commonly found in proteins</description>
