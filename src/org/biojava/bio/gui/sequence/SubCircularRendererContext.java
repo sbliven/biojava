@@ -69,10 +69,18 @@ implements CircularRendererContext {
   }
 
   public SymbolList getSymbols() {
-    return symbols;
+    if(symbols == null) {
+      return delegate.getSymbols();
+    } else {
+      return symbols;
+    }
   }
 
   public FeatureHolder getFeatures() {
-    return features;
+    if(features == null) {
+      return delegate.getFeatures();
+    } else {
+      return features;
+    }
   }
 }

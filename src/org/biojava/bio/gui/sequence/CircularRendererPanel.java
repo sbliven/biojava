@@ -16,6 +16,12 @@ import java.awt.geom.AffineTransform;
  * property and the depth of the renderer.
  * </p>
  *
+ * <p>
+ * All angles are measured in radians. Some java gui classes use radians and
+ * some use degrees. Be carefull to use the right one. Math has a couple
+ * of methods for conversions.
+ * </p>
+ *
  * @author Matthew Pocock
  * @since 1.4
  */

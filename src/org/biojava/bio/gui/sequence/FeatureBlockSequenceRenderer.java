@@ -32,7 +32,6 @@ import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.bio.seq.FilterUtils;
-import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.AssertionFailure;
@@ -214,14 +213,15 @@ public class FeatureBlockSequenceRenderer extends AbstractChangeable
     }
 
   public void paint(Graphics2D g, SequenceRenderContext src) {
-    FeatureFilter filt = FilterUtils.overlapsLocation(GUITools.getVisibleRange(src, g));
+    FeatureFilter filt = FilterUtils.overlapsLocation(
+            GUITools.getVisibleRange(src, g) );
     FeatureHolder feats = src.getFeatures().filter(filt, false);
+    
     for (Iterator i =feats.features(); i.hasNext();) {
       Shape clip = g.getClip();
       AffineTransform at = g.getTransform();
 
       Feature f = (Feature) i.next();
-      Location l = f.getLocation();
       renderer.renderFeature(g, f, src);
 
       g.setTransform(at);

@@ -33,13 +33,13 @@ import org.biojava.bio.seq.FeatureHolder;
  */
 public interface FeatureRenderer {
   void renderFeature(
-    Graphics2D g,
-    Feature f,
+    Graphics2D g2,
+    Feature feat,
     SequenceRenderContext context
   );
-  
+
   double getDepth(SequenceRenderContext src);
-  
+
   public FeatureHolder processMouseEvent(
     FeatureHolder hits,
     SequenceRenderContext src,
