@@ -34,6 +34,21 @@ import java.util.List;
  * @author Mark Schreiber
  */
 public class ListTools implements Serializable{
+  public static Iterator nonRemoveIterator(Iterator i) {
+    final Iterator it = i;
+    return new Iterator() {
+      public boolean hasNext() {
+        return it.hasNext();
+      }
+      public Object next() {
+        return it.next();
+      }
+      public void remove() {
+        throw new UnsupportedOperationException();
+      }
+    };
+  }
+
   public static List createList(List l) {
     switch (l.size()) {
       case 0:
