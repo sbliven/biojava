@@ -118,14 +118,17 @@ public class AlphabetManagerTest extends TestCase {
       }
   }
 
-    public void testGapInCrossProductAlphabet() throws Exception{
-	Alphabet alph = AlphabetManager.alphabetForName("(PROTEIN x PROTEIN)");	
-	List s = new ArrayList();
-	s.add(AlphabetManager.getGapSymbol());
-	s.add(ProteinTools.createProtein("V").symbolAt(1));
-	Symbol sym = alph.getSymbol(s);
-	List l  = ((BasisSymbol)sym ).getSymbols();
-	assertEquals(s.get(0), l.get(0));
-	assertEquals(s.get(1), l.get(1));
+    public void testGapInCrossProductAlphabet() 
+        throws Exception
+    {
+        Alphabet protein = ProteinTools.getAlphabet();
+        Alphabet alph = AlphabetManager.getCrossProductAlphabet(Collections.nCopies(2, protein));
+        List s = new ArrayList();
+        s.add(protein.getGapSymbol());
+        s.add(ProteinTools.createProtein("V").symbolAt(1));
+        Symbol sym = alph.getSymbol(s);
+        List l  = ((BasisSymbol)sym ).getSymbols();
+        assertEquals(s.get(0), l.get(0));
+        assertEquals(s.get(1), l.get(1));
     }
 }
