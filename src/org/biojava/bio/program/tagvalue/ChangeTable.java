@@ -37,6 +37,12 @@ import org.biojava.utils.SmallMap;
  * @since 1.3
  */
 public class ChangeTable {
+  public static final Changer STRING_TO_INT = new Changer() {
+    public Object change(Object val) {
+      return new Integer((String) val);
+    }
+  };
+
   private Changer defaultC;
   private Splitter defaultS;
   private final Map changers;

@@ -56,7 +56,8 @@ import org.biojava.utils.ParserException;
  */
 public class LineSplitParser
   implements
-    TagValueParser
+    TagValueParser,
+    Cloneable
 {
   /**
    * A LineSplitParser pre-configured to process EMBL-style flat files.
@@ -263,5 +264,10 @@ public class LineSplitParser
     } else {
       return new TagValue(this.tag = tag, value, true);
     }
+  }
+  
+  public Object clone()
+  throws CloneNotSupportedException {
+    return super.clone();
   }
 }
