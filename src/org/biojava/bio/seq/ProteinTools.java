@@ -191,29 +191,28 @@ public class ProteinTools {
         return (SymbolPropertyTable)propertyTableMap.get(name);
     }
 
-        /**
-         * Return a new Protein <span class="type">SymbolList</span> for
-         * <span class="arg">protein</span>.
-         *
-         * @param theProtein a <span class="type">String</span> to parse into Protein
-         * @return a <span class="type">SymbolList</span> created form
-         *         <span class="arg">Protein</span>
-         * @throws IllegalSymbolException if  <span class="arg">dna</span> contains
-         *         any non-Amino Acid characters.
-         */
-        public static SymbolList createProtein(String theProtein)
-                throws IllegalSymbolException
-        {
-                try
-                {
-                        org.biojava.bio.seq.io.SymbolTokenization p = getTAlphabet().getTokenization("token");
-                        return new SimpleSymbolList(p, theProtein);
-                }
-                catch (BioException se)
-                {
-                        throw new BioError("Something has gone badly wrong with Protein", se);
-                }
-        }
+  /**
+   * Return a new Protein <span class="type">SymbolList</span> for <span
+   * class="arg">protein</span>.
+   *
+   * @param theProtein a <span class="type">String</span> to parse into Protein
+   * @return a <span class="type">SymbolList</span> created form <span
+   *         class="arg">Protein</span>
+   * @throws IllegalSymbolException if  <span class="arg">dna</span> contains
+   *                                any non-Amino Acid characters.
+   */
+  public static SymbolList createProtein(String theProtein)
+          throws IllegalSymbolException
+  {
+    SymbolTokenization p = null;
+    try {
+      p = getTAlphabet().getTokenization("token");
+    } catch (BioException e) {
+      throw new BioError("Something has gone badly wrong with Protein", e);
+    }
+    return new SimpleSymbolList(p, theProtein);
+  }
+
     /** Get a new protein as a GappedSequence */
     public static GappedSequence createGappedProteinSequence(String theProtein, String name) throws IllegalSymbolException{
         String theProtein1 = theProtein.replaceAll("-", "");
