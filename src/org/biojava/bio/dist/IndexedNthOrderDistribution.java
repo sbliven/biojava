@@ -28,11 +28,11 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
 /**
- *  Description of the Class 
+ *  Description of the Class
  *
  * @author     Thomas Down
- * @author     Matthew Pocock 
- * @since      1.1 
+ * @author     Matthew Pocock
+ * @since      1.1
  */
 class IndexedNthOrderDistribution
 extends AbstractOrderNDistribution implements Serializable{
@@ -59,20 +59,20 @@ extends AbstractOrderNDistribution implements Serializable{
   }
 
   /**
-   *  Sets the Distribution attribute of the IndexedNthOrderDistribution 
-   *  object 
+   *  Sets the Distribution attribute of the IndexedNthOrderDistribution
+   *  object
    *
-   * @param  sym                           The new Distribution value 
-   * @param  dist                          The new Distribution value 
-   * @exception  IllegalSymbolException    Description of Exception 
-   * @exception  IllegalAlphabetException  Description of Exception 
+   * @param  sym                           The new Distribution value
+   * @param  dist                          The new Distribution value
+   * @exception  IllegalSymbolException    Description of Exception
+   * @exception  IllegalAlphabetException  Description of Exception
    */
   public void setDistribution(Symbol sym, Distribution dist)
        throws IllegalSymbolException, IllegalAlphabetException {
     int indx = index.indexForSymbol(sym);
     if(dist.getAlphabet() != getConditionedAlphabet()) {
       throw new IllegalAlphabetException(
-          "The distribution must be over " + getConditionedAlphabet() + 
+          "The distribution must be over " + getConditionedAlphabet() +
           ", not " + dist.getAlphabet());
     }
 
@@ -89,12 +89,12 @@ extends AbstractOrderNDistribution implements Serializable{
   }
 
   /**
-   *  Gets the Distribution attribute of the IndexedNthOrderDistribution 
-   *  object 
+   *  Gets the Distribution attribute of the IndexedNthOrderDistribution
+   *  object
    *
-   * @param  sym                         Description of Parameter 
-   * @return                             The Distribution value 
-   * @exception  IllegalSymbolException  Description of Exception 
+   * @param  sym                         Description of Parameter
+   * @return                             The Distribution value
+   * @exception  IllegalSymbolException  Description of Exception
    */
   public Distribution getDistribution(Symbol sym)
        throws IllegalSymbolException {
@@ -102,23 +102,23 @@ extends AbstractOrderNDistribution implements Serializable{
   }
 
   /**
-   *  Description of the Method 
+   *  Description of the Method
    *
-   * @return    Description of the Returned Value 
+   * @return    Description of the Returned Value
    */
   public Collection conditionedDistributions() {
     return Arrays.asList(dists);
   }
 
 
-  private void writeObject(ObjectOutputStream stream)throws IOException{
+  protected void writeObject(ObjectOutputStream stream)throws IOException{
     int size = ((FiniteAlphabet)getConditioningAlphabet()).size();
     symbolIndices = new HashMap(size);
     for(int i = 0; i < size; i++){
-      
+
         symbolIndices.put(index.symbolForIndex(i).getName(),
         dists[i]);
- 
+
     }
     stream.defaultWriteObject();
   }
@@ -135,15 +135,15 @@ extends AbstractOrderNDistribution implements Serializable{
     dists = new Distribution[len];
     try{
       for(int i  = 0; i < len; i++) {
-	  Symbol s = index.symbolForIndex(i);   
+          Symbol s = index.symbolForIndex(i);
           Distribution d  = (Distribution)(symbolIndices.get(s));
-	  if(d == null) d = df.createDistribution(getConditionedAlphabet());
-	  dists[index.indexForSymbol(s)] = d;
+          if(d == null) d = df.createDistribution(getConditionedAlphabet());
+          dists[index.indexForSymbol(s)] = d;
       }
     }catch(IllegalSymbolException ise){
-	throw new BioError(ise);
+        throw new BioError(ise);
     }catch(IllegalAlphabetException iae){
-	throw new BioError(iae);
+        throw new BioError(iae);
     }
   }
 }
