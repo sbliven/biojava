@@ -38,8 +38,22 @@ import org.biojava.utils.*;
  */
 public abstract class AbstractAlphabet implements FiniteAlphabet {
   private Map parserByName;
+  private ChangeSupport changeSupport;
+
   {
     parserByName = new HashMap();
+  }
+  
+  protected boolean hasListeners() {
+    return changeSupport == null;
+  }
+  
+  protected ChangeSupport getChangeSupport(ChangeType ct) {
+    if(changeSupport == null) {
+      changeSupport = new ChangeSupport();
+    }
+    
+    return changeSupport;
   }
   
   /**
@@ -70,10 +84,21 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
     return parser;
   }
 
-  public void addChangeListener(ChangeListener cl) {}
-  public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-  public void removeChangeListener(ChangeListener cl) {}
-  public void removeChangeListener(ChangeListener cl, ChangeType ct) {} 
+  public void addChangeListener(ChangeListener cl) {
+    getChangeSupport(null).addChangeListener(cl);
+  }
+  
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+    getChangeSupport(ct).addChangeListener(cl);
+  }
+  
+  public void removeChangeListener(ChangeListener cl) {
+    getChangeSupport(null).removeChangeListener(cl);
+  }
+  
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+    getChangeSupport(ct).removeChangeListener(cl);
+  } 
   
   protected AbstractAlphabet() {}
 }
