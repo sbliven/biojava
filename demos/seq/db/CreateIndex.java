@@ -48,7 +48,7 @@ public class CreateIndex {
       String formatName = args[1];
       String alphaName = args[2];
       Alphabet alpha = resolveAlphabet(alphaName);
-      SymbolParser sParser = alpha.getParser("token");
+      SymbolTokenization sParser = alpha.getTokenization("token");
       
       SequenceFormat sFormat = null;
       SequenceBuilderFactory sFact = null;
