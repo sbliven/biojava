@@ -510,20 +510,16 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
     {
         if(line.startsWith(GenbankFormat.LOCUS_TAG))
         {
-          // the LOCUS line is a special case because it contains the
-          // locus, size, molecule type, GenBank division, and the date
-          // of last modification.
-          if (line.length() < 73) {
-            throw new ParseException("LOCUS line too short [" + line + "]");
+          // Genbank changed the format of the Locus line for release 127.
+          // The new format is incompatible with the old.
+          if(this.isLocusLinePre127(line))
+          {
+          	this.parseLocusLinePre127(line);
           }
-          
-          saveSeqAnno2(GenbankFormat.LOCUS_TAG, line.substring(12, 22));
-          saveSeqAnno2(GenbankFormat.SIZE_TAG, line.substring(22, 29));
-          saveSeqAnno2(GenbankFormat.STRAND_NUMBER_TAG, line.substring(33, 35));
-          saveSeqAnno2(GenbankFormat.TYPE_TAG, line.substring(36, 41));
-          saveSeqAnno2(GenbankFormat.CIRCULAR_TAG, line.substring(42, 52));
-          saveSeqAnno2(GenbankFormat.DIVISION_TAG, line.substring(52, 55));
-          saveSeqAnno2(GenbankFormat.DATE_TAG, line.substring(62, 73));
+          else
+          {
+          	this.parseLocusLinePost127(line);
+          }
         }
         else if (line.startsWith(GenbankFormat.VERSION_TAG))
         {
@@ -557,6 +553,87 @@ class GenbankContext implements org.biojava.utils.ParseErrorListener, org.biojav
         {	// keep	appending tag text value
             headerTagText.append(" " + line.substring(TAG_LENGTH));
         }
+    }
+
+    /**
+     * Checks which version of the locus line format is used.  The algorithm
+     * switches on the size of the line; <75 means pre-127, otherwise it's 127.
+     *
+     * @param theLine the line to check the format of.
+     * @return TRUE if the line is in Genbank release 126 or earlier format.
+     * FALSE otherwise
+     */
+    private boolean isLocusLinePre127(String theLine)
+    {
+    	return (theLine.length() < 75);
+    }
+
+    /**
+     * Parses the locus line assuming it is in pre release 127 format.
+     *
+     * @param theLine Locus line to parse.
+     * @throws ParseException If the line is too short.
+     */
+    private void parseLocusLinePre127(String theLine)
+    	throws ParseException
+    {
+		if (theLine.length() < 73)
+		{
+			throw new ParseException("LOCUS line too short [" + theLine + "]");
+		}
+
+		saveSeqAnno2(GenbankFormat.LOCUS_TAG, theLine.substring(12, 22));
+		saveSeqAnno2(GenbankFormat.SIZE_TAG, theLine.substring(22, 29));
+		saveSeqAnno2(GenbankFormat.STRAND_NUMBER_TAG, theLine.substring(33, 35));
+		saveSeqAnno2(GenbankFormat.TYPE_TAG, theLine.substring(36, 41));
+		saveSeqAnno2(GenbankFormat.CIRCULAR_TAG, theLine.substring(42, 52));
+		saveSeqAnno2(GenbankFormat.DIVISION_TAG, theLine.substring(52, 55));
+		saveSeqAnno2(GenbankFormat.DATE_TAG, theLine.substring(62, 73));
+    }
+
+    /**
+     * Parses the locus line assuming it is in post release 127 format.
+     *
+     * @param theLine Locus line to parse.
+     * @throws ParseException If the line is too short.
+     */
+    private void parseLocusLinePost127(String theLine)
+    	throws ParseException
+    {
+		if (theLine.length() < 79)
+		{
+			throw new ParseException("LOCUS line too short [" + theLine + "]");
+		}
+
+		StringTokenizer locusTokens = new StringTokenizer(theLine);
+		if(locusTokens.countTokens() != 8)
+		{
+			throw new ParseException("LOCUS line incorrectly tokenized [" + theLine + "]");
+		}
+		// LOCUS tag; not stored
+		locusTokens.nextToken();
+		// Locus name
+		saveSeqAnno2(GenbankFormat.LOCUS_TAG, locusTokens.nextToken());
+		// Sequence length
+		saveSeqAnno2(GenbankFormat.SIZE_TAG, locusTokens.nextToken());
+		// "bp"; not stored
+		locusTokens.nextToken();
+		// Strand information
+		// Both the strand and type are in the same token.  The strand
+		// information is an optional part, so this is a bit hairy
+		String strandString = locusTokens.nextToken();
+		StringTokenizer strandTokens = new StringTokenizer(strandString, "-");
+		if(strandTokens.countTokens() > 1)
+		{
+			saveSeqAnno2(GenbankFormat.STRAND_NUMBER_TAG, strandTokens.nextToken());
+		}
+		saveSeqAnno2(GenbankFormat.TYPE_TAG, strandTokens.nextToken());
+		// Circularity
+		saveSeqAnno2(GenbankFormat.CIRCULAR_TAG, locusTokens.nextToken());
+		// Division code
+		saveSeqAnno2(GenbankFormat.DIVISION_TAG, locusTokens.nextToken());
+		// Date in dd-MMM-yyyy format
+		saveSeqAnno2(GenbankFormat.DATE_TAG, locusTokens.nextToken());
     }
 
     /**
