@@ -157,7 +157,7 @@ extends TestCase {
       assertEquals("All architecture events allowed: " + archC + "\n\t" + everything, archC.getPreCounts(), archC.getPostCounts());
       assertEquals("All parameter events allowed: " + paraC + "\n\t" + everything, paraC.getPreCounts(), paraC.getPostCounts());
       assertEquals("No architecture event: " + archC + "\n\t" + everything, 0, archC.getPostCounts());
-      assertEquals("Two parameter events: " + paraC + "\n\t" + everything, 1, paraC.getPostCounts());
+      assertEquals("Two parameter events: " + paraC + "\n\t" + everything, 2, paraC.getPostCounts());
     } catch (IllegalAlphabetException iae) {
       throw (AssertionError) new AssertionError("Could not create distributions.").initCause(iae);
     } catch (ChangeVetoException cve) {
@@ -168,41 +168,4 @@ extends TestCase {
   }
 
 
-  private class EventCounter
-  implements ChangeListener {
-    private final String name;
-    private final List preList;
-    private final List postList;
-
-    public EventCounter(String name) {
-      this.name = name;
-      this.preList = new ArrayList();
-      this.postList = new ArrayList();
-    }
-
-    public void preChange(ChangeEvent cev) throws ChangeVetoException {
-      preList.add(cev);
-    }
-
-    public void postChange(ChangeEvent cev) {
-      postList.add(cev);
-    }
-
-    public int getPreCounts() {
-      return preList.size();
-    }
-
-    public int getPostCounts() {
-      return postList.size();
-    }
-
-    public void zeroCounts() {
-      preList.clear();
-      postList.clear();
-    }
-
-    public String toString() {
-      return "EventCounter(" + name + ")\n\t" + preList + "\n\t" + postList;
-    }
-  }
 }

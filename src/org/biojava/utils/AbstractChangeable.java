@@ -47,7 +47,25 @@ public abstract class AbstractChangeable implements Changeable {
   }
   
   /**
-   * Called to retrieve the ChangeSupport for this object
+   * Called to retrieve the ChangeSupport for this object.
+   *
+   * <p>
+   * Your implementation of this method should have the following structure:
+   * <code><pre>
+   * ChangeSupport cs = super.getChangeSupport(ct);
+   *
+   * if(someForwarder == null && ct.isMatching(SomeInterface.SomeChangeType)) {
+   *   someForwarder = new ChangeForwarder(...
+   *
+   *   this.stateVariable.addChangeListener(someForwarder, VariableInterface.AChange);
+   * }
+   *
+   * return cs;
+   * </pre></code>
+   *
+   * It is usual for the forwarding listeners (someForwarder in this example) to
+   * be transient and lazily instantiated. Be sure to register & unregister the
+   * forwarder in the code that does the ChangeEvent handling in setter methods.
    */
   
   protected ChangeSupport getChangeSupport(ChangeType ct) {

@@ -32,7 +32,13 @@ package org.biojava.utils;
 public class ChangeForwarder implements ChangeListener {
   private final Object source;
   private final transient ChangeSupport changeSupport;
-  
+
+  /**
+   * Create a new ChangeForwarder for forwarding events.
+   *
+   * @param source        the new source Object
+   * @param changeSupport the ChangeSupport managing the listeners
+   */
   public ChangeForwarder(Object source, ChangeSupport changeSupport) {
     this.source = source;
     this.changeSupport = changeSupport;
@@ -101,6 +107,43 @@ public class ChangeForwarder implements ChangeListener {
         "Assertion Failure: Change was vetoed after it had been accepted by preChange",
         cve
       );
+    }
+  }
+
+  /**
+   * A ChangeForwarder that systematically uses a given type and wraps the old
+   * event.
+   *
+   * @author Matthew Pocock
+   * @since 1.4
+   */
+  public static class Retyper
+  extends ChangeForwarder{
+    private final ChangeType type;
+
+    /**
+     * Create a new Retyper for forwarding events.
+     *
+     * @param source        the new source Object
+     * @param changeSupport the ChangeSupport managing the listeners
+     * @param type          the new ChangeType
+     */
+    public Retyper(Object source,
+                   ChangeSupport changeSupport,
+                   ChangeType type)
+    {
+      super(source, changeSupport);
+
+      this.type = type;
+    }
+
+    public ChangeType getType() {
+      return type;
+    }
+
+    protected ChangeEvent generateEvent(ChangeEvent ce)
+            throws ChangeVetoException {
+      return new ChangeEvent(getSource(), getType(), null, null, ce);
     }
   }
 }

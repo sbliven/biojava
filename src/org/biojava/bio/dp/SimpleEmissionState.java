@@ -32,12 +32,7 @@ import org.biojava.bio.Annotation;
 import org.biojava.bio.dist.Distribution;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.SingletonAlphabet;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeVetoException;
-import org.biojava.utils.SingletonList;
+import org.biojava.utils.*;
 
 /**
  * @author Matthew Pocock
@@ -57,7 +52,8 @@ public class SimpleEmissionState
   private int [] advance;
   private Alphabet matches;
 
-  protected transient AnnotationForwarder annotationForwarder;
+  protected transient ChangeForwarder annotationForwarder;
+  protected transient ChangeForwarder distForwarder;
 
   public final Annotation getAnnotation() {
     return this.ann;
@@ -75,6 +71,8 @@ public class SimpleEmissionState
       ChangeSupport changeSupport = getChangeSupport(EmissionState.ANNOTATION);
       synchronized(changeSupport) {
         changeSupport.firePreChangeEvent(ce);
+        this.ann.removeChangeListener(annotationForwarder, Annotation.PROPERTY);
+        ann.addChangeListener(annotationForwarder, Annotation.PROPERTY);
         this.ann = ann;
         changeSupport.firePostChangeEvent(ce);
       }
@@ -97,6 +95,14 @@ public class SimpleEmissionState
       ChangeSupport changeSupport = getChangeSupport(EmissionState.DISTRIBUTION);
       synchronized(changeSupport) {
         changeSupport.firePreChangeEvent(ce);
+        if(this.dis != null) {
+          this.dis.addChangeListener(distForwarder, Distribution.WEIGHTS);
+          this.dis.addChangeListener(distForwarder, Distribution.NULL_MODEL);
+        }
+        if(dis != null) {
+          dis.addChangeListener(distForwarder, Distribution.WEIGHTS);
+          dis.addChangeListener(distForwarder, Distribution.NULL_MODEL);
+        }
         this.dis = dis;
         changeSupport.firePostChangeEvent(ce);
       }
@@ -116,7 +122,7 @@ public class SimpleEmissionState
         this, EmissionState.ADVANCE,
         this.advance, advance
       );
-      ChangeSupport changeSupport = getChangeSupport(EmissionState.DISTRIBUTION);
+      ChangeSupport changeSupport = getChangeSupport(EmissionState.ADVANCE);
       synchronized(changeSupport) {
         changeSupport.firePreChangeEvent(ce);
         this.advance = advance;
@@ -169,17 +175,28 @@ public class SimpleEmissionState
   protected ChangeSupport getChangeSupport(ChangeType ct){
     ChangeSupport cs = super.getChangeSupport(ct);
 
-    if(annotationForwarder == null &&
-      (Annotatable.ANNOTATION.isMatchingType(ct) || ct.isMatchingType(Annotatable.ANNOTATION)))
+    if(
+            annotationForwarder == null &&
+            ct.isMatchingType(Annotatable.ANNOTATION))
     {
-      annotationForwarder = new Annotatable.AnnotationForwarder(
-          this,
-          cs);
+      annotationForwarder = new Annotatable.AnnotationForwarder(this, cs);
       getAnnotation().addChangeListener(
           annotationForwarder,
           Annotatable.ANNOTATION);
     }
+
+    if(
+            distForwarder == null &&
+            ct.isMatchingType(EmissionState.DISTRIBUTION))
+    {
+      distForwarder = new ChangeForwarder.Retyper(this, cs, EmissionState.DISTRIBUTION);
+      getDistribution().addChangeListener(
+              distForwarder,
+              Distribution.WEIGHTS);
+      getDistribution().addChangeListener(
+              distForwarder,
+              Distribution.NULL_MODEL);
+    }
     return cs;
   }
-
 }

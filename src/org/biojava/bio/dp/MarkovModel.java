@@ -27,9 +27,6 @@ import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeForwarder;
-import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
@@ -244,30 +241,4 @@ public interface MarkovModel extends Changeable {
   void removeState(State toGo)
   throws IllegalTransitionException,
   IllegalSymbolException, ChangeVetoException;
-  
-  /**
-   * Add this as a listener to each distribution in a model. It will pump the
-   * WEIGHTS and NULL_MODEL events on the distribitions over to the HMM.
-   *
-   * @author Matthew Pocock
-   * @since 1.1
-   */
-  public class DistributionForwarder extends ChangeForwarder {
-    public DistributionForwarder(Object source, ChangeSupport cs) {
-      super(source, cs);
-    }
-    
-    protected ChangeEvent generateEvent(ChangeEvent ce) {
-      ChangeType ct = ce.getType();
-      if( (ct == Distribution.WEIGHTS) || (ct == Distribution.NULL_MODEL) ) {
-        return new ChangeEvent(
-          getSource(),
-          PARAMETER,
-          null, null,
-          ce
-        );
-      }
-      return null;
-    }
-  }
 }

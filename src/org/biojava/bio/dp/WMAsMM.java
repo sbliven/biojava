@@ -35,10 +35,7 @@ import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleAlphabet;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.*;
 
 /**
  * Wraps a weight matrix up so that it appears to be a very simple HMM.
@@ -64,7 +61,7 @@ public class WMAsMM
   private final Map transTo;
   private final Map transWeights;
 
-  private final transient MarkovModel.DistributionForwarder distForwarder;
+  private final transient ChangeForwarder distForwarder;
 
   public int[] advance() {
     return new int[] { 1 }; // fixme: this should be cleverer:x
@@ -176,7 +173,7 @@ public class WMAsMM
   public WMAsMM(WeightMatrix wm) throws IllegalSymbolException {
     try {
       ChangeSupport changeSupport = getChangeSupport(ChangeType.UNKNOWN);
-      distForwarder = new MarkovModel.DistributionForwarder(this, changeSupport);
+      distForwarder = new ChangeForwarder.Retyper(this, changeSupport, MarkovModel.PARAMETER);
       transFrom = new HashMap();
       transTo = new HashMap();
       transWeights = new HashMap();

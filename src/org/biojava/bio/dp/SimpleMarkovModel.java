@@ -35,11 +35,7 @@ import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleAlphabet;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeEvent;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.*;
 
 /**
  * @author Matthew Pocock
@@ -48,12 +44,11 @@ import org.biojava.utils.ChangeVetoException;
  * @author Keith James
  */
 public class SimpleMarkovModel
-  extends
-    AbstractChangeable
-  implements
-    MarkovModel,
-    Serializable
-{
+        extends
+        AbstractChangeable
+        implements
+        MarkovModel,
+        Serializable {
   public static final long serialVersionUID = -3043028839927615753l;
   private final Alphabet emissionAlpha;
   private final FiniteAlphabet stateAlpha;
@@ -62,9 +57,7 @@ public class SimpleMarkovModel
   private final Map transFrom;
   private final Map transTo;
   private final Map transWeights;
-  private transient MarkovModel.DistributionForwarder distForwarder;
-
-  private Transition _tran = new Transition(null, null);
+  private transient ChangeForwarder distForwarder;
 
   {
     transFrom = new HashMap();
@@ -75,22 +68,19 @@ public class SimpleMarkovModel
   protected ChangeSupport getChangeSupport(ChangeType ct) {
     ChangeSupport changeSupport = super.getChangeSupport(ct);
 
-        if(
-            (MarkovModel.PARAMETER.isMatchingType(ct) || ct.isMatchingType(MarkovModel.PARAMETER))  &&
+    if (
+            (MarkovModel.PARAMETER.isMatchingType(ct) ||
+            ct.isMatchingType(MarkovModel.PARAMETER)) &&
             distForwarder == null
-        ) {
-            distForwarder = new MarkovModel.DistributionForwarder(
-              this,
-        changeSupport
-            );
-      for(Iterator si = stateAlpha.iterator(); si.hasNext(); ) {
+    ) {
+      distForwarder = new ChangeForwarder.Retyper(
+              this, changeSupport, MarkovModel.PARAMETER);
+      for (Iterator si = stateAlpha.iterator(); si.hasNext();) {
         State s = (State) si.next();
-        if(s instanceof EmissionState) {
+        if (s instanceof EmissionState) {
           EmissionState es = (EmissionState) s;
-          Distribution dist = es.getDistribution();
           es.addChangeListener(distForwarder, EmissionState.DISTRIBUTION);
-          dist.addChangeListener(distForwarder, Distribution.WEIGHTS);
-          dist.addChangeListener(distForwarder, Distribution.NULL_MODEL);
+          es.addChangeListener(ChangeListener.ALWAYS_VETO, EmissionState.ADVANCE);
         }
       }
     }
@@ -98,23 +88,34 @@ public class SimpleMarkovModel
     return changeSupport;
   }
 
-  public Alphabet emissionAlphabet() { return emissionAlpha; }
-  public FiniteAlphabet stateAlphabet() { return stateAlpha; }
-  public int heads() { return magicalState().getAdvance().length; }
-  public MagicalState magicalState() { return magicalState; }
+  public Alphabet emissionAlphabet() {
+    return emissionAlpha;
+  }
+
+  public FiniteAlphabet stateAlphabet() {
+    return stateAlpha;
+  }
+
+  public int heads() {
+    return magicalState().getAdvance().length;
+  }
+
+  public MagicalState magicalState() {
+    return magicalState;
+  }
 
   public int[] advance() {
     int[] advances = new int[heads()];
 
-    for(int i = 0; i < advances.length; i++) {
+    for (int i = 0; i < advances.length; i++) {
       advances[i] = 0;
     }
 
-    for(Iterator si = stateAlphabet().iterator(); si.hasNext(); ) {
+    for (Iterator si = stateAlphabet().iterator(); si.hasNext();) {
       State s = (State) si.next();
-      if(s instanceof EmissionState) {
+      if (s instanceof EmissionState) {
         int[] adv = ((EmissionState) s).getAdvance();
-        for(int i = 0; i < advances.length; i++) {
+        for (int i = 0; i < advances.length; i++) {
           advances[i] = Math.max(advances[i], adv[i]);
         }
       }
@@ -124,14 +125,14 @@ public class SimpleMarkovModel
   }
 
   public Distribution getWeights(State source)
-  throws IllegalSymbolException {
+          throws IllegalSymbolException {
     stateAlphabet().validate(source);
 
     Distribution dist = (Distribution) transWeights.get(source);
-    if(dist == null) {
+    if (dist == null) {
       throw new BioError(
-        "Model does contain " + source.getName() +
-        " but the associated transition distribution is missing."
+              "Model does contain " + source.getName() +
+              " but the associated transition distribution is missing."
       );
     }
     return dist;
@@ -154,21 +155,21 @@ public class SimpleMarkovModel
    * @throws ChangeVetoException if a listener vetoed this change
    */
   public void setWeights(State source, Distribution dist)
-  throws IllegalSymbolException, IllegalAlphabetException, ChangeVetoException {
+          throws IllegalSymbolException, IllegalAlphabetException, ChangeVetoException {
     FiniteAlphabet ta = transitionsFrom(source);
-    if(!dist.getAlphabet().equals(ta)) {
+    if (!dist.getAlphabet().equals(ta)) {
       throw new IllegalAlphabetException(
-        "Can't set distribution from state " + source.getName() +
-        " as the distribution alphabet is not the alphabet of transitions: " +
-        ta.getName() + " and " + dist.getAlphabet().getName()
+              "Can't set distribution from state " + source.getName() +
+              " as the distribution alphabet is not the alphabet of transitions: " +
+              ta.getName() + " and " + dist.getAlphabet().getName()
       );
     }
 
-    if(!hasListeners()) {
+    if (!hasListeners()) {
       transWeights.put(source, dist);
     } else {
       ChangeSupport cs = getChangeSupport(MarkovModel.PARAMETER);
-      synchronized(cs) {
+      synchronized (cs) {
         ChangeEvent ce = new ChangeEvent(this,
                                          MarkovModel.PARAMETER,
                                          dist,
@@ -181,79 +182,78 @@ public class SimpleMarkovModel
   }
 
   public void createTransition(State from, State to)
-  throws IllegalSymbolException, ChangeVetoException {
+          throws IllegalSymbolException, ChangeVetoException {
     stateAlphabet().validate(from);
     stateAlphabet().validate(to);
 
     ChangeEvent ce = new ChangeEvent(
-      this, MarkovModel.ARCHITECTURE,
-      new Object[] { from, to },
-      null
+            this, MarkovModel.ARCHITECTURE,
+            new Object[]{from, to},
+            null
     );
 
     FiniteAlphabet f = transitionsFrom(from);
     FiniteAlphabet t = transitionsTo(to);
 
-    if(f.contains(to)) {
+    if (f.contains(to)) {
       throw new ChangeVetoException(
-        ce,
-        "Transition already exists: " + from.getName() + " -> " + to.getName()
+              ce,
+              "Transition already exists: " + from.getName() + " -> " + to.getName()
       );
     }
 
-        if (!hasListeners()) {
-          f.addSymbol(to);
-          t.addSymbol(from);
-        } else {
-    ChangeSupport changeSupport = getChangeSupport(MarkovModel.ARCHITECTURE);
-      synchronized(changeSupport) {
+    if (!hasListeners()) {
+      f.addSymbol(to);
+      t.addSymbol(from);
+    } else {
+      ChangeSupport changeSupport = getChangeSupport(MarkovModel.ARCHITECTURE);
+      synchronized (changeSupport) {
         changeSupport.firePreChangeEvent(ce);
 
         f.addSymbol(to);
         t.addSymbol(from);
 
         changeSupport.firePostChangeEvent(ce);
-          }
+      }
     }
   }
 
   public void destroyTransition(State from, State to)
-  throws IllegalSymbolException, ChangeVetoException {
+          throws IllegalSymbolException, ChangeVetoException {
     stateAlphabet().validate(from);
     stateAlphabet().validate(to);
 
     FiniteAlphabet f = transitionsFrom(from);
-    FiniteAlphabet t = transitionsTo(to);
 
     ChangeEvent ce = new ChangeEvent(
-      this, MarkovModel.ARCHITECTURE,
-      null,
-      new Object[] { from, to }
+            this, MarkovModel.ARCHITECTURE,
+            null,
+            new Object[]{from, to}
     );
 
-    if(!f.contains(to)) {
+    if (!f.contains(to)) {
       throw new ChangeVetoException(
-        ce,
-        "Transition does not exists: " + from.getName() + " -> " + to.getName()
+              ce,
+              "Transition does not exists: " + from.getName() + " -> " + to.getName()
       );
     }
 
     Distribution dist = getWeights(from);
     double w = dist.getWeight(to);
-    if(w != 0.0 && !Double.isNaN(w)) {
+    if (w != 0.0 && !Double.isNaN(w)) {
       throw new ChangeVetoException(
-        ce,
-        "Can't remove transition as its weight is not zero or NaN: " +
-        from.getName() + " -> " + to.getName() + " = " + w
+              ce,
+              "Can't remove transition as its weight is not zero or NaN: " +
+              from.getName() + " -> " + to.getName() + " = " + w
       );
     }
 
-    if(!hasListeners()) {
+    if (!hasListeners()) {
       transitionsFrom(from).removeSymbol(to);
       transitionsTo(to).removeSymbol(from);
-        } else {
-    ChangeSupport changeSupport = getChangeSupport(MarkovModel.ARCHITECTURE);
-      synchronized(changeSupport) {
+    } else {
+      ChangeSupport changeSupport = getChangeSupport(MarkovModel.ARCHITECTURE);
+      synchronized (changeSupport) {
         changeSupport.firePreChangeEvent(ce);
 
         transitionsFrom(from).removeSymbol(to);
@@ -261,90 +261,95 @@ public class SimpleMarkovModel
 
         changeSupport.firePostChangeEvent(ce);
       }
-        }
+    }
   }
 
   public boolean containsTransition(State from, State to)
-  throws IllegalSymbolException {
+          throws IllegalSymbolException {
     stateAlphabet().validate(to);
     return transitionsFrom(from).contains(to);
   }
 
   public FiniteAlphabet transitionsFrom(State from)
-  throws IllegalSymbolException {
+          throws IllegalSymbolException {
     stateAlphabet().validate(from);
 
     FiniteAlphabet s = (FiniteAlphabet) transFrom.get(from);
-    if(s == null) {
+    if (s == null) {
       throw new BioError(
-        "State " + from.getName() +
-        " is known in states " +
-        stateAlphabet().getName() +
-        " but is not listed in the transFrom table"
+              "State " + from.getName() +
+              " is known in states " +
+              stateAlphabet().getName() +
+              " but is not listed in the transFrom table"
       );
     }
     return s;
   }
 
   public FiniteAlphabet transitionsTo(State to)
-  throws IllegalSymbolException {
+          throws IllegalSymbolException {
     stateAlphabet().validate(to);
 
     FiniteAlphabet s = (FiniteAlphabet) transTo.get(to);
-    if(s == null) {
+    if (s == null) {
       throw new BioError(
-        "State " + to +
-        " is known in states " +
-        stateAlphabet().getName() +
-        " but is not listed in the transTo table"
+              "State " + to +
+              " is known in states " +
+              stateAlphabet().getName() +
+              " but is not listed in the transTo table"
       );
     }
     return s;
   }
 
   public void addState(State toAdd)
-  throws IllegalSymbolException, ChangeVetoException {
-    if(toAdd instanceof MagicalState && toAdd != magicalState) {
+          throws IllegalSymbolException, ChangeVetoException {
+    if (toAdd instanceof MagicalState && toAdd != magicalState) {
       throw new IllegalSymbolException("Can not add a MagicalState");
     }
 
-    if(stateAlphabet().contains(toAdd)) {
+    if (stateAlphabet().contains(toAdd)) {
       throw new IllegalSymbolException("We already contain " + toAdd.getName());
     }
 
-    if(toAdd instanceof EmissionState) {
+    if (toAdd instanceof EmissionState) {
       int esh = ((EmissionState) toAdd).getAdvance().length;
-      if(esh != heads()) {
+      if (esh != heads()) {
         throw new IllegalSymbolException(
-          "This model " + stateAlphabet().getName() +
-          " has " + heads() + " heads, but the state " +
-          toAdd.getName() + " has " + esh + " heads"
+                "This model " + stateAlphabet().getName() +
+                " has " + heads() + " heads, but the state " +
+                toAdd.getName() + " has " + esh + " heads"
         );
       }
     }
 
-    if(toAdd instanceof ModelInState) {
+    if (toAdd instanceof ModelInState) {
       int esh = ((ModelInState) toAdd).getModel().advance().length;
-      if(esh != heads()) {
+      if (esh != heads()) {
         throw new IllegalSymbolException(
-          "This model " + stateAlphabet().getName() +
-          " has " + heads() + " heads, but the model-in-state " +
-          toAdd.getName() + " has " + esh + " heads"
+                "This model " + stateAlphabet().getName() +
+                " has " + heads() + " heads, but the model-in-state " +
+                toAdd.getName() + " has " + esh + " heads"
         );
       }
     }
 
-    if(!hasListeners()) {
+    if (!hasListeners()) {
       doAddState(toAdd);
     } else {
       ChangeSupport changeSupport = getChangeSupport(MarkovModel.ARCHITECTURE);
-      synchronized(changeSupport) {
+      synchronized (changeSupport) {
         ChangeEvent ce = new ChangeEvent(
-          this, MarkovModel.ARCHITECTURE,
-          toAdd,
-          null
+                this, MarkovModel.ARCHITECTURE,
+                toAdd,
+                null
         );
         changeSupport.firePreChangeEvent(ce);
+        if (toAdd instanceof EmissionState) {
+          EmissionState eState = (EmissionState) toAdd;
+          eState.addChangeListener(distForwarder, EmissionState.DISTRIBUTION);
+          eState.addChangeListener(ChangeListener.ALWAYS_VETO, EmissionState.ADVANCE);
+        }
         doAddState(toAdd);
         changeSupport.firePostChangeEvent(ce);
       }
@@ -352,78 +357,66 @@ public class SimpleMarkovModel
   }
 
   private void doAddState(State toAdd)
-  throws IllegalSymbolException, ChangeVetoException {
-    ((SimpleAlphabet) stateAlphabet()).addSymbol(toAdd);
+          throws IllegalSymbolException, ChangeVetoException {
+    stateAlphabet().addSymbol(toAdd);
     FiniteAlphabet fa = new SimpleAlphabet("Transitions from " + toAdd.getName());
     transFrom.put(toAdd, fa);
     transTo.put(toAdd, new SimpleAlphabet("Transitions to " + toAdd.getName()));
     transWeights.put(toAdd, new SimpleDistribution(fa));
-    ((SimpleAlphabet) stateAlphabet()).addSymbol(toAdd);
-
-    if (toAdd instanceof EmissionState) {
-      EmissionState eState = (EmissionState) toAdd;
-      Distribution dist = eState.getDistribution();
-      if (distForwarder != null) {
-        eState.addChangeListener(distForwarder, EmissionState.DISTRIBUTION);
-        dist.addChangeListener(distForwarder, Distribution.WEIGHTS);
-        dist.addChangeListener(distForwarder, Distribution.NULL_MODEL);
-      }
-    }
+    stateAlphabet().addSymbol(toAdd);
   }
 
   public void removeState(State toGo)
-  throws IllegalSymbolException, IllegalTransitionException, ChangeVetoException {
+          throws IllegalSymbolException, IllegalTransitionException, ChangeVetoException {
     stateAlphabet().validate(toGo);
-    if(toGo instanceof MagicalState) {
+    if (toGo instanceof MagicalState) {
       throw new IllegalSymbolException("You can not remove the MagicalState");
     }
     FiniteAlphabet t;
-    if((t = transitionsFrom(toGo)).size() != 0) {
+    if ((t = transitionsFrom(toGo)).size() != 0) {
       throw new IllegalTransitionException(
-        toGo, (State) t.iterator().next(),
-        "You can not remove a state untill all transitions to and from it " +
-        "have been destroyed"
+              toGo, (State) t.iterator().next(),
+              "You can not remove a state untill all transitions to and from it " +
+              "have been destroyed"
       );
     }
 
-    if((t = transitionsTo(toGo)).size() != 0) {
+    if ((t = transitionsTo(toGo)).size() != 0) {
       throw new IllegalTransitionException(
-        (State) t.iterator().next(), toGo,
-        "You can not remove a state untill all transitions to and from it " +
-        "have been destroyed"
+              (State) t.iterator().next(), toGo,
+              "You can not remove a state untill all transitions to and from it " +
+              "have been destroyed"
       );
     }
 
-    if(!hasListeners()) {
+    if (!hasListeners()) {
       doRemoveState(toGo);
     } else {
       ChangeSupport changeSupport = getChangeSupport(MarkovModel.ARCHITECTURE);
-      synchronized(changeSupport) {
+      synchronized (changeSupport) {
         ChangeEvent ce = new ChangeEvent(
-          this, MarkovModel.ARCHITECTURE,
-          null,
-          toGo
+                this, MarkovModel.ARCHITECTURE,
+                null,
+                toGo
         );
         changeSupport.firePreChangeEvent(ce);
+        if (toGo instanceof EmissionState) {
+          EmissionState eState = (EmissionState) toGo;
+          eState.removeChangeListener(distForwarder, EmissionState.DISTRIBUTION);
+          eState.removeChangeListener(ChangeListener.ALWAYS_VETO, EmissionState.ADVANCE);
+        }
         doRemoveState(toGo);
         changeSupport.firePostChangeEvent(ce);
       }
     }
   }
 
-  private void doRemoveState(State toGo) throws IllegalSymbolException {
-    ((SimpleAlphabet) stateAlphabet()).removeSymbol(toGo);
+  private void doRemoveState(State toGo)
+          throws IllegalSymbolException, ChangeVetoException
+  {
+    stateAlphabet().removeSymbol(toGo);
     transFrom.remove(toGo);
     transTo.remove(toGo);
-    if(toGo instanceof EmissionState) {
-      EmissionState eState = (EmissionState) toGo;
-      Distribution dist = eState.getDistribution();
-      if (distForwarder != null) {
-        eState.removeChangeListener(distForwarder, EmissionState.DISTRIBUTION);
-        dist.removeChangeListener(distForwarder, Distribution.WEIGHTS);
-        dist.removeChangeListener(distForwarder, Distribution.NULL_MODEL);
-      }
-    }
   }
 
   public SimpleMarkovModel(int heads, Alphabet emissionAlpha, String name) {
