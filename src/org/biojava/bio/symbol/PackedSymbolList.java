@@ -126,25 +126,20 @@ public class PackedSymbolList
       wordsize = packing.wordSize();
       
       // pack the body of the sequence
-      int ii = 0;
       for(int i = 0; i < (syms.length - 1); i++) {
-//        int ii = i * symsPerElement;
+        int ii = i * symsPerElement;
         long l = 0;
-        int jj = 0;
         for(int j = 0; j < symsPerElement; j++) {
-//          int jj = j * packing.wordSize();
+          int jj = j * packing.wordSize();
           long p = packing.pack(symList.symbolAt(ii + j + 1));
           l |= (long) ((long) p << (long) jj);
-          jj += wordsize;
         }
         syms[i] = l;
-        ii += symsPerElement;
       }
-
       // pack the final word
       if(syms.length > 0) {
         long l = 0;
-        ii = (syms.length - 1) * symsPerElement;
+        int ii = (syms.length - 1) * symsPerElement;
         int jMax = symList.length() % symsPerElement;
         if(jMax == 0) {
           jMax = symsPerElement;
@@ -207,21 +202,6 @@ public class PackedSymbolList
       wordsize = packing.wordSize();
       
       // pack the body of the sequence
-      int ii = 0;
-      for(int i = 0; i < syms.length; i++) {
-//        int ii = i * symsPerElement;
-        long l = 0;
-        int jj = 0;
-        for(int j = 0; j < symsPerElement; j++) {
-//          int jj = j * packing.wordSize();
-          long p = packing.pack(symbols[ii + j]);
-          l |= (long) ((long) p << (long) jj);
-          jj += wordsize;
-        }
-        syms[i] = l;
-        ii += symsPerElement;
-      }
-/*
       for(int i = 0; i < (syms.length - 1); i++) {
         int ii = i * symsPerElement;
         long l = 0;
@@ -232,12 +212,10 @@ public class PackedSymbolList
         }
         syms[i] = l;
       }
-*/
       // pack the final word
       if(syms.length > 0) {
         long l = 0;
-        ii = (syms.length - 1) * symsPerElement;
-//        int ii = (syms.length - 1) * symsPerElement;
+        int ii = (syms.length - 1) * symsPerElement;
         int jMax = length % symsPerElement;
         if(jMax == 0) {
           jMax = symsPerElement;
