@@ -123,6 +123,12 @@ public class FastaSearchParse
 		    {
 			SeqSimilaritySearchSubHit subHit = (SeqSimilaritySearchSubHit) shi.next();
 			System.out.println("--> SubHit: " + subHit);
+                        System.out.println("      Query start: " + subHit.getQueryStart());
+                        System.out.println("        Query end: " + subHit.getQueryEnd());
+                        System.out.println("     Query strand: " + subHit.getQueryStrand());
+                        System.out.println("    Subject start: " + subHit.getSubjectStart());
+                        System.out.println("      Subject end: " + subHit.getSubjectEnd());
+                        System.out.println("    Subjec strand: " + subHit.getSubjectStrand());
 
 			Alignment al = subHit.getAlignment();
 			List  labels = al.getLabels();
