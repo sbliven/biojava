@@ -44,6 +44,7 @@ public class DistributionLogo extends JComponent {
    * The default logo painter.
    */
   private static final LogoPainter DEFAULT_LOGO_PAINTER = new TextLogoPainter();
+  private static final BlockPainter DEFAULT_BLOCK_PAINTER = new PlainBlock();
   
   /**
    * A usefull constant to keep arround.
@@ -64,6 +65,13 @@ public class DistributionLogo extends JComponent {
    * The style property.
    */
   private SymbolStyle style = new PlainStyle(Color.black, Color.gray);
+  
+  /**
+   * The information/plain property
+   */
+  boolean scaleByInformation = false;
+  
+  private BlockPainter blockPainter = DEFAULT_BLOCK_PAINTER;
   
   /**
    * Retrieve the currently rendered dist.
@@ -130,6 +138,22 @@ public class DistributionLogo extends JComponent {
     this.style = style;
   }
   
+  public boolean isScaleByInformation() {
+    return scaleByInformation;
+  }
+  
+  public void setScaleByInformation(boolean scale) {
+    this.scaleByInformation = scale;
+  }
+  
+  public BlockPainter getBlockPainter() {
+    return blockPainter;
+  }
+  
+  public void setBlockPainter(BlockPainter blockPainter) {
+    this.blockPainter = blockPainter;
+  }
+  
   /**
    * Create a new DistributionLogo object. It will set up all the properties except the
    * dist to render.
@@ -158,8 +182,7 @@ public class DistributionLogo extends JComponent {
    * @param r the symbol to calculate for
    * @throws IllegalSymbolException if r is not within the dist.
    */
-  public double entropy(Symbol s) throws IllegalSymbolException {
-    Distribution dist = getDistribution();
+  public static double entropy(Distribution dist, Symbol s) throws IllegalSymbolException {
     double p = dist.getWeight(s);
     double lp = Math.log(p);
     
@@ -171,8 +194,8 @@ public class DistributionLogo extends JComponent {
    *
    * @return maximum bits as a double
    */
-  public double totalBits() {
-    return Math.log(((FiniteAlphabet) getDistribution().getAlphabet()).size()) / bits;
+  public static double totalBits(Distribution dist) {
+    return Math.log(((FiniteAlphabet) dist.getAlphabet()).size()) / bits;
   }
   
   /**
@@ -182,17 +205,16 @@ public class DistributionLogo extends JComponent {
    *
    * @return  the total information in the dist
    */
-  public double totalInformation() {
-    double inf = totalBits();
-    Distribution eDistribution = getDistribution();
+  public static double totalInformation(Distribution dist) {
+    double inf = totalBits(dist);
     
     for(
-      Iterator i = ((FiniteAlphabet) eDistribution.getAlphabet()).iterator();
+      Iterator i = ((FiniteAlphabet) dist.getAlphabet()).iterator();
       i.hasNext();
     ) {
       Symbol s = (Symbol) i.next();
       try {
-        inf -= entropy(s);
+        inf -= entropy(dist, s);
       } catch (IllegalSymbolException ire) {
         throw new BioError(ire,
         "Symbol evaporated while calculating information");
@@ -207,7 +229,7 @@ public class DistributionLogo extends JComponent {
    * and then requests the logo painter to fill the area.
    */
   public void paintComponent(Graphics g) {    
-    Graphics2D g2 = (Graphics2D) g;
+    final Graphics2D g2 = (Graphics2D) g;
     Rectangle clip = g2.getClipBounds();
     if(isOpaque()) {
       g2.clearRect(clip.x, clip.y, clip.width, clip.height);
@@ -215,7 +237,32 @@ public class DistributionLogo extends JComponent {
     if(getDistribution() == null) {
       return;
     }
-
-    getLogoPainter().paintLogo(g, this);
+    
+    final Rectangle bounds = getBounds();
+    if(isScaleByInformation()) {
+      int height = bounds.height;
+      double scale = height * (totalInformation(getDistribution()) / totalBits(getDistribution()));
+      bounds.height = (int) scale;
+      bounds.y = (int) (height - scale);
+    }
+    
+    LogoContext ctxt = new LogoContext() {
+      public Graphics2D getGraphics() {
+        return g2;
+      }
+      public Distribution getDistribution() {
+        return DistributionLogo.this.getDistribution();
+      }
+      public Rectangle getBounds() {
+        return bounds;
+      }
+      public SymbolStyle getStyle() {
+        return DistributionLogo.this.getStyle();
+      }
+      public BlockPainter getBlockPainter() {
+        return DistributionLogo.this.getBlockPainter();
+      }
+    };
+    getLogoPainter().paintLogo(ctxt);
   }
 }

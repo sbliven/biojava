@@ -108,18 +108,20 @@ public class SuffixTree implements Serializable {
      * Add a count for all motifs with length of up to <code>window</code>
      * to this tree.
      *
-     * @param rList a SymbolList whose motifs should be added to the
+     * @param sList a SymbolList whose motifs should be added to the
      *              tree.
      * @param window The maximum motif length to count.
      */
 
-  public void addSymbols(SymbolList rList, int window) {
+  public void addSymbols(SymbolList sList, int window) {
     SuffixNode [] buf = new SuffixNode[window];
     int [] counts = new int[window];
-    for(int i = 0; i < window; i++)
+    for(int i = 0; i < window; i++) {
       buf[i] = getRoot();
-    for(int p = 1; p <= rList.length(); p++) {
-      Symbol s = rList.symbolAt(p);
+    }
+    
+    for(int p = 1; p <= sList.length(); p++) {
+      Symbol s = sList.symbolAt(p);
       buf[p % window] = getRoot();
       for(int i = 0; i < window; i++) {
         int pi = (p + i) % window;
@@ -132,6 +134,7 @@ public class SuffixTree implements Serializable {
         }
       }
     }
+    
     for(int i = 0; i < window; i++) {
       incCounts(i+1, counts[i]);
     } 

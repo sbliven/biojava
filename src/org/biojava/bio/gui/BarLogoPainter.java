@@ -39,46 +39,39 @@ import org.biojava.bio.dist.*;
  * @author Matthew Pocock
  */
 public class BarLogoPainter implements LogoPainter {
-  public void paintLogo(Graphics g, DistributionLogo sl) {
-    Graphics2D g2 = (Graphics2D) g;
-    Distribution dis = sl.getDistribution();
-    SymbolStyle style = sl.getStyle();
+  public void paintLogo(LogoContext lCtxt) {
+    Graphics2D g2 = lCtxt.getGraphics();
+    Distribution dis = lCtxt.getDistribution();
+    SymbolStyle style = lCtxt.getStyle();
+    BlockPainter blockPainter = lCtxt.getBlockPainter();
     
-    Rectangle bounds = sl.getBounds();
+    Rectangle bounds = lCtxt.getBounds();
     double width = bounds.getWidth();
     double stepWidth = width / (double) ((FiniteAlphabet) dis.getAlphabet()).size();
     double height = bounds.getHeight();
-    double scale = height * (sl.totalInformation() / sl.totalBits());
 
     double w = 0.0;    
     for(
       Iterator i = ((FiniteAlphabet) dis.getAlphabet()).iterator();
       i.hasNext();
     ) {
-      Symbol s = (Symbol) i.next();
+      AtomicSymbol s = (AtomicSymbol) i.next();
       double rh = 0.0;
      
       try {
-        rh = dis.getWeight(s) * scale;
+        rh = dis.getWeight(s) * height;
       } catch (IllegalSymbolException ire) {
         throw new BioError(ire, "State alphabet has changed while painting");
       }
       
-      Shape outline = new Rectangle2D.Double(w, height - rh, stepWidth, rh);
+      Rectangle2D outline = new Rectangle2D.Double(
+        bounds.getX() + w,
+        bounds.getY() + height - rh,
+        stepWidth,
+        rh
+      );
       
-      try {
-        g2.setPaint(style.fillPaint(s));
-      } catch (IllegalSymbolException ire) {
-        g2.setPaint(Color.black);
-      }
-      g2.fill(outline);
-      
-      try {
-        g2.setPaint(style.outlinePaint(s));
-      } catch (IllegalSymbolException ire) {
-        g2.setPaint(Color.gray);
-      }
-      g2.draw(outline);
+      blockPainter.paintBlock(lCtxt, outline, s);
       
       w += stepWidth;
     }

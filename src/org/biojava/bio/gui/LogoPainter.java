@@ -38,8 +38,7 @@ public interface LogoPainter {
   /**
    * Render the state from sl onto the graphics object g.
    *
-   * @param g the target Graphics
-   * @param sl the StateLogo to render
+   * @param lCtxt the LogoContext to render
    */
-  public void paintLogo(Graphics g, DistributionLogo dl);
+  public void paintLogo(LogoContext lCtxt);
 }

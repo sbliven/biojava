@@ -1,9 +1,9 @@
 /*
  *                    BioJava development code
  *
- * This code may be freely distributed and modified under the
+ * This code may be freely disttributed and modified under the
  * terms of the GNU Lesser General Public Licence.  This should
- * be distributed with the code.  If you do not have a copy,
+ * be disttributed with the code.  If you do not have a copy,
  * see:
  *
  *      http://www.gnu.org/copyleft/lesser.html
@@ -112,29 +112,32 @@ public class TextLogoPainter implements LogoPainter {
     return pcs.hasListeners(propertyName);
   }
   
-  public void paintLogo(Graphics g, DistributionLogo sl) {
-    Graphics2D g2 = (Graphics2D) g;
-    Distribution dis = sl.getDistribution();
-    SymbolStyle style = sl.getStyle();
+  public void paintLogo(LogoContext ctxt) {
+    Graphics2D g2 = ctxt.getGraphics();
+    Distribution dist = ctxt.getDistribution();
+    SymbolStyle style = ctxt.getStyle();
     
-    Rectangle bounds = sl.getBounds();
+    Rectangle bounds = ctxt.getBounds();
     double width = bounds.getWidth();
     double height = bounds.getHeight();
     double base = height;
-    double scale = height * (sl.totalInformation() / sl.totalBits());
+    double scale = height * (
+      DistributionLogo.totalInformation(dist) /
+      DistributionLogo.totalBits(dist)
+    );
 
     SortedSet info = new TreeSet(COMP);
     
     try {
       for(
-        Iterator i = ((FiniteAlphabet) dis.getAlphabet()).iterator();
+        Iterator i = ((FiniteAlphabet) dist.getAlphabet()).iterator();
         i.hasNext();
       ) {
         Symbol s = (Symbol) i.next();
-        info.add(new ResVal(s, dis.getWeight(s) * scale));
+        info.add(new ResVal(s, dist.getWeight(s) * scale));
       }
     } catch (IllegalSymbolException ire) {
-      throw new BioError(ire, "Symbol dissapeared from dis alphabet");
+      throw new BioError(ire, "Symbol distsapeared from dist alphabet");
     }
     
     FontRenderContext frc = g2.getFontRenderContext();
