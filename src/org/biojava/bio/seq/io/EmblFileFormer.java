@@ -53,6 +53,7 @@ import org.biojava.bio.taxa.Taxon;
  * calls.</p>
  *
  * @author Keith James
+ * @author Len Trigg (Taxon output)
  * @since 1.2
  */
 public class EmblFileFormer extends AbstractGenEmblFileFormer
