@@ -48,6 +48,19 @@ public class DoubleAlphabet implements Alphabet, Serializable {
    * The singleton instance of the DoubleAlphabet class.
    */
   private static final DoubleAlphabet INSTANCE = new DoubleAlphabet();
+  private static final SymbolParser PARSER = new SymbolParser() {
+    public Alphabet getAlphabet() {
+      return INSTANCE;
+    }
+    
+    public Symbol parseToken(String token) {
+      return INSTANCE.getSymbol(Double.parseDouble(token));
+    }
+    
+    public SymbolList parse(String seq) {
+      throw new BioError("Pants - haven't implemented this yet");
+    }
+  };
   
   private Object writeReplace() throws ObjectStreamException {
     try {
@@ -115,7 +128,12 @@ public class DoubleAlphabet implements Alphabet, Serializable {
   }
   
   public SymbolParser getParser(String name) {
-    throw new NoSuchElementException("No parsers supported by DoubleAlphabet yet");
+    if(!name.equals("name")) {
+    	throw new NoSuchElementException(
+	  "No parsers supported by DoubleAlphabet called " + name
+	);
+    }
+    return PARSER;    
   }
   
   /**
