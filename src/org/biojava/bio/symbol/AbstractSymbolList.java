@@ -109,9 +109,7 @@ implements SymbolList {
       return subList(start, end).seqString();
   }
 
-  public void edit(Edit edit)
-  throws IndexOutOfBoundsException, IllegalAlphabetException,
-  ChangeVetoException {
+  public void edit(Edit edit) throws IllegalAlphabetException, ChangeVetoException {
     throw new ChangeVetoException(
       "AbstractSymbolList is immutable"
     );
@@ -291,9 +289,7 @@ implements SymbolList {
     }
 
     // fixme: doesn't do range checking on edit object
-    public void edit(Edit edit)
-    throws IndexOutOfBoundsException, IllegalAlphabetException,
-    ChangeVetoException {
+    public void edit(Edit edit) throws IllegalAlphabetException, ChangeVetoException {
       AbstractSymbolList.this.edit(new Edit(
         edit.pos + this.start - 1, edit.length, edit.replacement
       ));
