@@ -25,16 +25,14 @@ import java.util.Iterator;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
+import org.biojava.bio.SmallAnnotation;
 import org.biojava.bio.seq.impl.DummySequence;
 import org.biojava.bio.seq.impl.RevCompSequence;
 import org.biojava.bio.seq.impl.SimpleSequence;
 import org.biojava.bio.seq.impl.SimpleGappedSequence;
-import org.biojava.bio.seq.impl.SimpleSequence;
 import org.biojava.bio.seq.impl.SubSequence;
 import org.biojava.bio.seq.impl.ViewSequence;
-import org.biojava.bio.symbol.IllegalAlphabetException;
-import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.*;
 import org.biojava.utils.ChangeVetoException;
 
 /**
@@ -241,6 +239,28 @@ public final class SequenceTools {
    */
   public static Sequence createDummy(String uri, String name) {
     return new DummySequence(uri, name);
+  }
+
+  /**
+   * Create a new Sequence that contains a single symbol repeated over and over.
+   *
+   * @param alpha   the Alphabet this sequence is over
+   * @param length  the length of the sequence
+   * @param sym     the symbol returned by every call to symbolAt
+   * @param uri     the URI of the sequence
+   * @param name    the name of the sequence
+   * @return  a new sequence of the right length
+   * @throws IllegalSymbolException if sym is not in alpha
+   *
+   * @since 1.4
+   */
+  public static Sequence createDummy(
+          Alphabet alpha, int length, Symbol sym,
+          String uri, String name)
+          throws IllegalSymbolException
+  {
+    return createSequence(new DummySymbolList(alpha, length, sym),
+                          uri, name, new SmallAnnotation());
   }
 
   /**
