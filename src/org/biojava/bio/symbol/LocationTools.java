@@ -22,7 +22,7 @@ final public class LocationTools {
   public static Location union(Location locA, Location locB) {
   	if(isDecorated(locA) || isDecorated(locB))
   	{
-  		return(handleDecorations());
+  		handleDecorations();
   	}
 
     if(
@@ -108,7 +108,7 @@ final public class LocationTools {
   public static Location intersection(Location locA, Location locB) {
   	if(isDecorated(locA) || isDecorated(locB))
   	{
-  		return(handleDecorations());
+  		handleDecorations();
   	}
     if(locA.isContiguous() && locB.isContiguous()) {
       // handle easy case of solid locations
@@ -331,8 +331,10 @@ final public class LocationTools {
 		throw new org.biojava.bio.BioError("CircularLocation or BetweenLocation could not be found");
 	}
 
-  	return(theLocation.hasDecorator(circularDecoratorClass) ||
-  		(theLocation.hasDecorator(betweenDecoratorClass)));
+	boolean hasCircular = theLocation.getDecorator(circularDecoratorClass) == null;
+	boolean hasBetween = theLocation.getDecorator(betweenDecoratorClass) == null;
+
+  	return(hasCircular || hasBetween);
   }
 
   /**
