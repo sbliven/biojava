@@ -229,7 +229,7 @@ public class CompoundLocation implements Location, Serializable {
     }
     
     Location loc = (Location) o;
-    if(loc.isContiguous())       { return false; }
+
     if(loc.getMin() != getMin()) { return false; }
     if(loc.getMax() != getMax()) { return false; }
     

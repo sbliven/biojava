@@ -60,7 +60,7 @@ public abstract class AbstractRangeLocation implements Location {
       return getMin() == l.getMin() &&
              getMax() == l.getMax() && l.isContiguous();
     } else {
-      return false;
+	return false;
     }
   }
 

@@ -84,7 +84,7 @@ public interface Annotation extends Changeable {
   throws IllegalArgumentException, ChangeVetoException;
   
   /**
-   * Returns wether there is any property under that key in this Annotation.
+   * Returns whether there is any property under that key in this Annotation.
    *
    * @param key the key Object to search for
    * @return true if this Annotation knows about the key, false otherwise
