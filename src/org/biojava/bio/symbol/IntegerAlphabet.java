@@ -383,7 +383,7 @@ public final class IntegerAlphabet
       }
 
       AtomicSymbol s = (AtomicSymbol) symL.get(0);
-      validate(s);
+      this.validate(s);
       return s;
     }
 
