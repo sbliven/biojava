@@ -242,5 +242,17 @@ class DistProjectedFeatureHolder extends AbstractFeatureHolder {
 	public FeatureHolder projectChildFeatures(Feature f, FeatureHolder parent) {
 	    return projectFeatureHolder(f, parent);
 	}
+
+	public Feature createFeature(Feature f, Feature.Template templ) 
+	    throws ChangeVetoException
+	{
+	    throw new ChangeVetoException("Can't create features in this projection");
+	}
+
+	public void removeFeature(Feature f, Feature f2) 
+	    throws ChangeVetoException
+	{
+	    throw new ChangeVetoException("Can't create features in this projection");
+	}
     }
 }
