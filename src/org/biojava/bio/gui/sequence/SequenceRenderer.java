@@ -27,6 +27,7 @@ import java.awt.geom.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.gui.*;
+import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 import java.util.List;
@@ -61,7 +62,7 @@ v   * all of the data that would fall within seqBox.
    */
   void paint(
     Graphics2D g, SequenceRenderContext sp,
-    int min, int max
+    RangeLocation pos
   );
   
   /**
@@ -80,7 +81,7 @@ v   * all of the data that would fall within seqBox.
    & @param max the last symbol rendered (inclusive)
    * @return the depth of the renderer for that sequence panel
    */
-  double getDepth(SequenceRenderContext sp, int min, int max);
+  double getDepth(SequenceRenderContext sp, RangeLocation pos);
 
   /**
    * Retrieve the minimum leading distance for this renderer when rendering sp.
@@ -128,7 +129,7 @@ v   * all of the data that would fall within seqBox.
     SequenceRenderContext src,
     MouseEvent me,
     List path,
-    int min, int max
+    RangeLocation pos
   );
   
   public static class RendererForwarder extends ChangeForwarder {

@@ -105,10 +105,10 @@ implements SequenceRenderer {
     }
   }
   
-  public double getDepth(SequenceRenderContext src, int min, int max) {
+  public double getDepth(SequenceRenderContext src, RangeLocation pos) {
     Sequence sp = (Sequence) src.getSequence();
     FeatureFilter filter =
-      new FeatureFilter.OverlapsLocation(new RangeLocation(min, max));
+      new FeatureFilter.OverlapsLocation(pos);
     FeatureHolder fh = sp.filter(filter, false);
     if(fh.countFeatures() > 0) {
       return renderer.getDepth(src);
@@ -128,7 +128,7 @@ implements SequenceRenderer {
   public void paint(
       Graphics2D g,
       SequenceRenderContext sp, 
-      int min, int max
+      RangeLocation pos
   ) {
     Shape oldClip = g.getClip();
     
@@ -137,7 +137,7 @@ implements SequenceRenderer {
     
     for(
       Iterator i = ((Sequence) sp.getSequence()).filter(
-        new FeatureFilter.OverlapsLocation(new RangeLocation(min, max)), false
+        new FeatureFilter.OverlapsLocation(pos), false
       ).features();
       i.hasNext();
     ) {
@@ -152,13 +152,13 @@ implements SequenceRenderer {
     SequenceRenderContext src,
     MouseEvent me,
     List path,
-    int min, int max
+    RangeLocation pos
   ) {
     path.add(this);
-    int pos = src.graphicsToSequence(me.getPoint());
+    int sPos = src.graphicsToSequence(me.getPoint());
     
     FeatureHolder hits = ((Sequence) src.getSequence()).filter(
-      new FeatureFilter.OverlapsLocation(new PointLocation(pos)), false
+      new FeatureFilter.OverlapsLocation(new PointLocation(sPos)), false
     );
     
     hits = renderer.processMouseEvent(hits, src, me);
@@ -166,7 +166,7 @@ implements SequenceRenderer {
     return new SequenceViewerEvent(
       this,
       hits,
-      pos,
+      sPos,
       me,
       path
     );

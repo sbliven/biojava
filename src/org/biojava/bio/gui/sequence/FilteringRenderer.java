@@ -22,6 +22,7 @@
 package org.biojava.bio.gui.sequence;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.*;
 import java.util.*;
 import java.util.List;
@@ -112,8 +113,8 @@ extends SequenceRendererWrapper {
     return this.recurse;
   }
 
-  public double getDepth(SequenceRenderContext src, int min, int max) {
-    return super.getDepth(getContext(src), min, max);
+  public double getDepth(SequenceRenderContext src, RangeLocation pos) {
+    return super.getDepth(getContext(src), pos);
   }    
   
   public double getMinimumLeader(SequenceRenderContext src) {
@@ -127,9 +128,23 @@ extends SequenceRendererWrapper {
   public void paint(
     Graphics2D g,
     SequenceRenderContext src,
-    int min, int max
+    RangeLocation pos
   ) {
-    super.paint(g, getContext(src), min, max);
+    super.paint(g, getContext(src), pos);
+  }
+  
+  public SequenceViewerEvent processMouseEvent(
+    SequenceRenderContext src,
+    MouseEvent me,
+    List path,
+    RangeLocation pos
+  ) {
+    return super.processMouseEvent(
+      getContext(src),
+      me,
+      path,
+      pos
+    );
   }
   
   protected SequenceRenderContext getContext(SequenceRenderContext src) {

@@ -99,8 +99,8 @@ implements SequenceRenderer, Serializable {
     return this.renderer;
   }
   
-  public double getDepth(SequenceRenderContext src, int min, int max) {
-    return getRenderer().getDepth(src, min, max);
+  public double getDepth(SequenceRenderContext src, RangeLocation pos) {
+    return getRenderer().getDepth(src, pos);
   }
   
   public double getMinimumLeader(SequenceRenderContext src) {
@@ -114,19 +114,19 @@ implements SequenceRenderer, Serializable {
   public void paint(
     Graphics2D g,
     SequenceRenderContext src,
-    int min, int max
+    RangeLocation pos
   ) {
-    getRenderer().paint(g, src, min, max);
+    getRenderer().paint(g, src, pos);
   }
   
   public SequenceViewerEvent processMouseEvent(
     SequenceRenderContext src,
     MouseEvent me,
     List path,
-    int min, int max
+    RangeLocation pos
   ) {
     path.add(this);
-    return getRenderer().processMouseEvent(src, me, path, min, max);
+    return getRenderer().processMouseEvent(src, me, path, pos);
   }
 }
 

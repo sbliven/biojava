@@ -113,15 +113,27 @@ public class EmblViewer {
     sp.setRenderer(mlRend);
     sp.addSequenceViewerListener(new SequenceViewerListener() {
       public void mouseClicked(SequenceViewerEvent sve) {
-        System.out.println("clicked: " + sve);
+        System.out.println(sve.getMouseEvent().getPoint() + "\t" + sve.getSource());
+        Object t = sve.getTarget();
+        for(Iterator ri = sve.getPath().iterator(); ri.hasNext(); ) {
+          SequenceRenderer sr = (SequenceRenderer) ri.next();
+          System.out.println("\t" + sr);
+        }
+        if(t instanceof FeatureHolder) {
+          FeatureHolder fh = (FeatureHolder) t;
+          for(Iterator fi = fh.features(); fi.hasNext(); ) {
+            Feature f = (Feature) fi.next();
+            System.out.println("\t" + f.getType() + "\t: " + f.getLocation());
+          }
+        }
       }
       
       public void mousePressed(SequenceViewerEvent sve) {
-        System.out.println("pressed: " + sve);
+        //System.out.println("pressed: " + sve);
       }
       
       public void mouseReleased(SequenceViewerEvent sve) {
-        System.out.println("released: " + sve);
+        //System.out.println("released: " + sve);
       }
     });
     

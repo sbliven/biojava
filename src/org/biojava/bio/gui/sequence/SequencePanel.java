@@ -93,44 +93,50 @@ Changeable {
   private SequenceViewerSupport svSupport = new SequenceViewerSupport();
   private MouseListener mouseListener = new MouseAdapter() {
     public void mouseClicked(MouseEvent me) {
-      if(renderer == null) {
+      if(!active()) {
         return;
       }
       int[] lineExtent = calcLineExtent(me);
+      me.translatePoint(-lineExtent[2], -lineExtent[3]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
         SequencePanel.this,
         me,
         new ArrayList(),
-        lineExtent[0], lineExtent[1]
+        new RangeLocation(lineExtent[0], lineExtent[1])
       );
+      me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svSupport.fireMouseClicked(sve);
     }
     
     public void mousePressed(MouseEvent me) {
-      if(renderer == null) {
+      if(!active()) {
         return;
       }
       int[] lineExtent = calcLineExtent(me);
+      me.translatePoint(-lineExtent[2], -lineExtent[3]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
         SequencePanel.this,
         me,
         new ArrayList(),
-        lineExtent[0], lineExtent[1]
+        new RangeLocation(lineExtent[0], lineExtent[1])
       );
+      me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svSupport.fireMousePressed(sve);
     }
     
     public void mouseReleased(MouseEvent me) {
-      if(renderer == null) {
+      if(!active()) {
         return;
       }
       int[] lineExtent = calcLineExtent(me);
+      me.translatePoint(-lineExtent[2], -lineExtent[3]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
         SequencePanel.this,
         me,
         new ArrayList(),
-        lineExtent[0], lineExtent[1]
+        new RangeLocation(lineExtent[0], lineExtent[1])
       );
+      me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svSupport.fireMouseReleased(sve);
     }
   };
@@ -144,30 +150,34 @@ Changeable {
   private SequenceViewerMotionSupport svmSupport = new SequenceViewerMotionSupport();
   private MouseMotionListener mouseMotionListener = new MouseMotionListener() {
     public void mouseDragged(MouseEvent me) {
-      if(renderer == null) {
+      if(!active()) {
         return;
       }
       int[] lineExtent = calcLineExtent(me);
+      me.translatePoint(-lineExtent[2], -lineExtent[3]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
         SequencePanel.this,
         me,
         new ArrayList(),
-        lineExtent[0], lineExtent[1]
+        new RangeLocation(lineExtent[0], lineExtent[1])
       );
+      me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svmSupport.fireMouseDragged(sve);
     }
     
     public void mouseMoved(MouseEvent me) {
-      if(renderer == null) {
+      if(!active()) {
         return;
       }
       int[] lineExtent = calcLineExtent(me);
+      me.translatePoint(-lineExtent[2], -lineExtent[3]);
       SequenceViewerEvent sve = renderer.processMouseEvent(
         SequencePanel.this,
         me,
         new ArrayList(),
-        lineExtent[0], lineExtent[1]
+        new RangeLocation(lineExtent[0], lineExtent[1])
       );
+      me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svmSupport.fireMouseMoved(sve);
     }
   };
@@ -414,7 +424,7 @@ Changeable {
    * after setting up the graphics apropreately.
    */
   public void paintComponent(Graphics g) {
-    if( (sequence == null) || (renderer == null) ) {
+    if(!active()) {
       return;
     }
     
@@ -455,6 +465,7 @@ Changeable {
     int min = minP;
     for(int l = minOffset; l < realLines; l++) {
       int max = Math.min(min + symbolsPerLine - 1, sequence.length());
+      RangeLocation pos = new RangeLocation(min, max);
       
       if (direction == HORIZONTAL) {
           clip.x = l * alongDim;
@@ -477,7 +488,7 @@ Changeable {
       
       Shape oldClip = g2.getClip();
       g2.clip(clip);
-      renderer.paint(g2, this, min, max);
+      renderer.paint(g2, this, pos);
       g2.setClip(oldClip);
       
       if (direction == HORIZONTAL) {
@@ -552,7 +563,7 @@ Changeable {
     Dimension d = null;
     double acrossDim;
     
-    if( (sequence == null) || (renderer == null) ) {
+    if(!active()) {
       System.out.println("No sequence");
       // no sequence - collapse down to no size at all
       alongDim = 0.0;
@@ -623,7 +634,8 @@ Changeable {
       int li = 0;
       while(min <= sequence.length()) {
         int max = min + symbolsPerLine - 1;
-        double depth = renderer.getDepth(this, min, max);
+        RangeLocation pos = new RangeLocation(min, max);
+        double depth = renderer.getDepth(this, pos);
         acrossDim += depth + spacer;
         offsets[li] = acrossDim;
         min = max + 1;
@@ -660,9 +672,9 @@ Changeable {
   protected int[] calcLineExtent(MouseEvent me) {
     int pos;
     if(direction == HORIZONTAL) {
-      pos = me.getX();
-    } else {
       pos = me.getY();
+    } else {
+      pos = me.getX();
     }
     
     int minOffset = Arrays.binarySearch(offsets, pos);
@@ -671,8 +683,32 @@ Changeable {
     }
     int min = 1 + (int) ((double) minOffset * symbolsPerLine);
     int max = min + symbolsPerLine - 1;
+    double minPos;
+    if(minOffset > 0) {
+      minPos = offsets[minOffset - 1];
+    } else {
+      minPos = 0.0;
+    }
     
-    return new int[] { min, max };
+    double ad = alongDim * minOffset;
+    
+    int xdiff;
+    int ydiff;
+    if(direction == HORIZONTAL) {
+      xdiff = (int) -ad;
+      ydiff = (int) minPos;
+    } else {
+      xdiff = (int) minPos;
+      ydiff = (int) -ad;
+    }
+    
+    return new int[] { min, max, xdiff, ydiff };
+  }
+  
+  protected boolean active() {
+    return
+      (sequence != null) &&
+      (renderer != null);
   }
   
   public class Border

@@ -36,7 +36,7 @@ import java.util.List;
 public class SymbolSequenceRenderer implements SequenceRenderer {
     private double depth = 25.0;
     
-    public double getDepth(SequenceRenderContext sp, int min, int max) {
+    public double getDepth(SequenceRenderContext sp, RangeLocation pos) {
       return depth + 1.0;
     }
 
@@ -50,7 +50,7 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
 
     public void paint(
       Graphics2D g, SequenceRenderContext sp,
-      int min, int max
+      RangeLocation pos
     ) {
       SymbolList seq = sp.getSequence();
       int direction = sp.getDirection();
@@ -86,12 +86,12 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
           leading = sp.graphicsToSequence(clip.getMinY());
           trailing = sp.graphicsToSequence(clip.getMaxY());
         }
-        min = Math.max(min, leading);
-        max = Math.min(max, trailing+1);
+        int min = Math.max(pos.getMin(), leading);
+        int max = Math.min(pos.getMax(), trailing+1);
         
-        for (int pos = min; pos <= max; ++pos) {
-          double gPos = sp.sequenceToGraphics(pos);
-          char c = seq.symbolAt(pos).getToken();
+        for (int sPos = min; sPos <= max; ++sPos) {
+          double gPos = sp.sequenceToGraphics(sPos);
+          char c = seq.symbolAt(sPos).getToken();
           if (direction == SequencePanel.HORIZONTAL) {
             //charBox.x = gPos;
             g.drawString("" + c, (int) (gPos + fudgeAcross), (int) fudgeDown);
@@ -108,10 +108,10 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
     SequenceRenderContext src,
     MouseEvent me,
     List path,
-    int min, int max
+    RangeLocation pos
   ) {
     path.add(this);
-    int pos = src.graphicsToSequence(me.getPoint());
-    return new SequenceViewerEvent(this, null, pos, me, path);
+    int sPos = src.graphicsToSequence(me.getPoint());
+    return new SequenceViewerEvent(this, null, sPos, me, path);
   }
 }

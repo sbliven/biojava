@@ -41,11 +41,11 @@ extends SequenceRendererWrapper {
     super(renderer);
   }
   
-  public double getDepth(SequenceRenderContext src, int min, int max) {
+  public double getDepth(SequenceRenderContext src, RangeLocation pos) {
     List layers = layer(src);
     return LayeredRenderer.INSTANCE.getDepth(
       layers,
-      min, max,
+      pos,
       Collections.nCopies(layers.size(), getRenderer())
     );
   }
@@ -69,13 +69,13 @@ extends SequenceRendererWrapper {
   public void paint(
     Graphics2D g,
     SequenceRenderContext src,
-    int min, int max
+    RangeLocation pos
   ) {
     List layers = layer(src);
     LayeredRenderer.INSTANCE.paint(
       g,
       layers,
-      min, max,
+      pos,
       Collections.nCopies(layers.size(), getRenderer())
     );
   }
@@ -84,7 +84,7 @@ extends SequenceRendererWrapper {
     SequenceRenderContext src,
     MouseEvent me,
     List path,
-    int min, int max
+    RangeLocation pos
   ) {
     path.add(this);
     List layers = layer(src);
@@ -92,7 +92,7 @@ extends SequenceRendererWrapper {
       layers,
       me,
       path,
-      min, max,
+      pos,
       Collections.nCopies(layers.size(), getRenderer())
     );
     

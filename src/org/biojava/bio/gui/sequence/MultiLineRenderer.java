@@ -153,10 +153,10 @@ implements SequenceRenderer, Serializable {
   }
    
   
-  public double getDepth(SequenceRenderContext src, int min, int max) {
+  public double getDepth(SequenceRenderContext src, RangeLocation pos) {
     return LayeredRenderer.INSTANCE.getDepth(
       Collections.nCopies(renderers.size(), src),
-      min, max,
+      pos,
       renderers
     );
   }
@@ -178,12 +178,12 @@ implements SequenceRenderer, Serializable {
   public void paint(
     Graphics2D g,
     SequenceRenderContext src,
-    int min, int max
+    RangeLocation pos
   ) {
     LayeredRenderer.INSTANCE.paint(
       g,
       Collections.nCopies(renderers.size(), src),
-      min, max,
+      pos,
       renderers
     );
   }
@@ -192,14 +192,14 @@ implements SequenceRenderer, Serializable {
     SequenceRenderContext src,
     MouseEvent me,
     List path,
-    int min, int max
+    RangeLocation pos
   ) {
     path.add(this);
     SequenceViewerEvent sve = LayeredRenderer.INSTANCE.processMouseEvent(
       Collections.nCopies(renderers.size(), src),
       me,
       path,
-      min, max,
+      pos,
       renderers
     );
     

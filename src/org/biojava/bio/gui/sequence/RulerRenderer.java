@@ -38,7 +38,7 @@ import java.util.List;
 public class RulerRenderer implements SequenceRenderer {
   private double depth = 25.0;
   
-  public double getDepth(SequenceRenderContext src, int min, int max) {
+  public double getDepth(SequenceRenderContext src, RangeLocation pos) {
     return depth + 1.0;
   }
   
@@ -56,8 +56,10 @@ public class RulerRenderer implements SequenceRenderer {
   
   public void paint(
     Graphics2D g, SequenceRenderContext src,
-    int min, int max
+    RangeLocation pos
   ) {
+    int min = pos.getMin();
+    int max = pos.getMax();
     double minX = src.sequenceToGraphics(min);
     double maxX = src.sequenceToGraphics(max);
     double scale = src.getScale();
@@ -98,10 +100,10 @@ public class RulerRenderer implements SequenceRenderer {
     SequenceRenderContext src,
     MouseEvent me,
     List path,
-    int min, int max
+    RangeLocation pos
   ) {
     path.add(this);
-    int pos = src.graphicsToSequence(me.getPoint());
-    return new SequenceViewerEvent(this, null, pos, me, path);
+    int sPos = src.graphicsToSequence(me.getPoint());
+    return new SequenceViewerEvent(this, null, sPos, me, path);
   }
 }

@@ -65,11 +65,11 @@ extends SequenceRendererWrapper {
     return this.label;
   }
   
-  public double getDepth(SequenceRenderContext ctx, int min, int max) {
+  public double getDepth(SequenceRenderContext ctx, RangeLocation pos) {
     SequenceRenderContext subctx = new SequenceRenderContextForLabel(
       ctx, getLabel()
     );
-    return super.getDepth(subctx, min, max);
+    return super.getDepth(subctx, pos);
   }
   
   public double getMinimumLeader(SequenceRenderContext ctx) {
@@ -89,13 +89,12 @@ extends SequenceRendererWrapper {
   public void paint(
         Graphics2D g,
         SequenceRenderContext ctx,
-        int min,
-        int max
+        RangeLocation pos
   ) {
     SequenceRenderContext subctx = new SequenceRenderContextForLabel(
       ctx, getLabel()
     );
-    super.paint(g, subctx, min, max);
+    super.paint(g, subctx, pos);
   }
 
   private class SequenceRenderContextForLabel implements SequenceRenderContext {
