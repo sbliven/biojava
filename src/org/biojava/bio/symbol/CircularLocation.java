@@ -120,4 +120,10 @@ extends AbstractLocationDecorator {
       return super.getMin();
     }
   }
+
+  public String toString(){
+    StringBuffer sb = new StringBuffer(getWrapped().toString());
+    sb.append("  (circular)");
+    return sb.toString();
+  }
 }
