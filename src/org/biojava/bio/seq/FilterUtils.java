@@ -438,7 +438,7 @@ public class FilterUtils {
    * </p>
    *
    * @param filter  the FeatureFilter to optimize
-   * @param an optimized version
+   * @return an optimized version
    */
   public final static FeatureFilter optimize(FeatureFilter filter) {
     depth++;
