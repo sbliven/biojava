@@ -43,7 +43,7 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 
 /**
- * @author Thomas Downe
+ * @author Thomas Down
  * @author David Allen
  */
 public class DummySequence extends AbstractChangeable
