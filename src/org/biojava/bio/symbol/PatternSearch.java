@@ -28,8 +28,7 @@ import java.util.ArrayList;
  * Class to perform arbitrary regex-like searches on
  * any FiniteAlphabet.
  * <p>
- * The API is still influx.  Most likely, most of the
- * methods will become static soon.
+ * The API is still in flux.
  *
  * @author David Huen
  * @since 1.4
@@ -147,6 +146,12 @@ public class PatternSearch
         }
     }
 
+    /**
+     * Attempts to match a pattern starting at specified position in SymbolList.
+     * @param p Pattern to match.
+     * @param sl SymbolList to find match in.
+     * @param pos position to look for match at.
+     */
     public static boolean match(Pattern p, SymbolList sl, int pos)
     {
         MatchState state = new MatchState();
