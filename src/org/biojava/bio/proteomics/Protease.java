@@ -23,7 +23,10 @@ package org.biojava.bio.proteomics;
 
 //import com.sun.xml.parser.Resolver;
 //import com.sun.xml.tree.XmlDocument;
-import org.biojava.bio.BioError;
+import org.biojava.bio.BioException;
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.io.SymbolTokenization;
+//import org.biojava.bio.seq.*
 
 import javax.xml.parsers.*;
 
@@ -59,7 +62,7 @@ public class Protease {
                 "org/biojava/bio/proteomics/ProteaseManager.xml"
               );
               if(tablesStream == null ) {
-                throw new BioError("Couldn't locate ProteaseManager.xml.");
+                throw new BioException("Couldn't locate ProteaseManager.xml.");
               }
 
               InputSource is = new InputSource(tablesStream);
@@ -81,34 +84,51 @@ public class Protease {
     public static String CHYMOTRYP = "Chymostrypsin";
     public static String CNBr = "CNBr"; 
     
-    private static String cleavageResidues = "";
-    private static String notCleaveResidues = "";
+    private static SymbolList cleavageResidues;
+    private static SymbolList notCleaveResidues;
     private static boolean endoProtease = true;
     
     /** Creates new Protease */
-    public Protease(String cleavageResidues, boolean endoProtease, String notCleaveResidues) {
-        this.cleavageResidues = cleavageResidues;
+    public Protease(SymbolList cleaveRes, 
+                    boolean endoProtease, 
+                    SymbolList notCleaveRes) 
+                                   throws IllegalSymbolException, BioException {
+        this.cleavageResidues = cleaveRes;
         this.endoProtease = endoProtease;
-        this.notCleaveResidues = notCleaveResidues;
+        this.notCleaveResidues = notCleaveRes;
+    }
+    
+    
+    public Protease(String cleaveRes, 
+                    boolean endoProtease, 
+                    String notCleaveRes) 
+                                   throws IllegalSymbolException, BioException {
+        this.cleavageResidues = createSymbolList(cleaveRes);
+        this.endoProtease = endoProtease;
+        this.notCleaveResidues = createSymbolList(notCleaveRes);
     }
     
     /** Creates new Protease */
-    public Protease(String cleavageResidues, boolean endoProtease) {
-        this.cleavageResidues = cleavageResidues;
+    public Protease(String cleavageRes, boolean endoProtease) 
+                                  throws IllegalSymbolException, BioException {
+        this.cleavageResidues = createSymbolList(cleavageRes);
         this.endoProtease = endoProtease;
-        this.notCleaveResidues = "";
+        this.notCleaveResidues = createSymbolList("");
     }
     
-    public Protease() {
-
+    public Protease() 
+            throws IllegalSymbolException, BioException {
+        String seqString = ""; 
+        cleavageResidues = createSymbolList(seqString);
+        notCleaveResidues = createSymbolList(seqString);
     }
     
-    public String getCleaveageResidues()
+    public SymbolList getCleaveageResidues()
     {
         return cleavageResidues;
     }
     
-    public String getNotCleaveResidues()
+    public SymbolList getNotCleaveResidues()
     {
         return notCleaveResidues;
     }
@@ -147,7 +167,8 @@ public class Protease {
      * @param proteaseName A protease name that is defined in the ProteaseManager.xml
      * @return A protease instance for the given protease name.
      */
-    public static Protease getProteaseByName(String proteaseName){
+    public static Protease getProteaseByName(String proteaseName) 
+                                 throws IllegalSymbolException, BioException {
         Protease protease = null;
         
             NodeList children = doc.getDocumentElement().getChildNodes();
@@ -193,5 +214,14 @@ public class Protease {
                 }
             }
         return protease;
-    }        
+    }    
+    
+    private SymbolList createSymbolList(String seq) 
+                                  throws IllegalSymbolException, BioException {
+        FiniteAlphabet prot 
+                 = (FiniteAlphabet)AlphabetManager.alphabetForName("PROTEIN");
+        //SymbolParser parser = prot.getParser("token"); 
+        SymbolTokenization tokenization = prot.getTokenization("token");
+        return new SimpleSymbolList (tokenization, seq); 
+    }
 }
