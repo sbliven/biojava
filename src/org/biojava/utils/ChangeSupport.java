@@ -118,17 +118,15 @@ public class ChangeSupport {
    * @param cl  the ChangeListener
    * @param ct  the ChangeType it is to be informed of
    */
-  public synchronized void addChangeListener(ChangeListener cl, ChangeType ct) {
-      // Needed to synchronize this method in case multiple threads attempt to add a change listener at the same time.
-      // Richard J. Fox  05/30/2001
-      if (ct == null) {
-	  throw new NestedError("Since 1.2, listeners registered for the null changetype are not meaningful.  Please register a listener for ChangeType.UNKNOWN instead");
-      }
-
-      growIfNecessary();
-      types[listenerCount] = ct;
-      listeners[listenerCount] = new WeakReference(cl);
-      listenerCount++;
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+    if (ct == null) {
+      throw new NestedError("Since 1.2, listeners registered for the null changetype are not meaningful.  Please register a listener for ChangeType.UNKNOWN instead");
+    }
+    
+    growIfNecessary();
+    types[listenerCount] = ct;
+    listeners[listenerCount] = new WeakReference(cl);
+    listenerCount++;
   }
 
   /**
