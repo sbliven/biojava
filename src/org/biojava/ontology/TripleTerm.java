@@ -61,15 +61,24 @@ public interface TripleTerm extends Term {
      */
     
     public final static class Impl extends AbstractChangeable implements TripleTerm {
+        private final Ontology ontology;
         private final Term subject;
         private final Term object;
         private final Term relation;
         private transient ChangeForwarder forwarder;
         
-        public Impl(Term subject, Term object, Term relation) {
+        public Impl(Ontology ontology, Term subject, Term object, Term relation) {
+            if (ontology == null) {
+                throw new NullPointerException("Ontology must not be null");
+            }
+            this.ontology = ontology;
             this.subject = subject;
             this.object = object;
             this.relation = relation;
+        }
+        
+        public Ontology getOntology() {
+            return ontology;
         }
         
         public String getName() {
@@ -104,13 +113,25 @@ public interface TripleTerm extends Term {
             ChangeSupport cs = super.getChangeSupport(ct);
             forwarder = new ChangeForwarder(this, cs) {
                 protected ChangeEvent generateEvent(ChangeEvent cev) {
-                    return new ChangeEvent(
-                        getSource(),
-                        cev.getType(),
-                        cev.getChange(),
-                        cev.getPrevious(),
-                        cev
-                    );
+                    if (cev.getSource() instanceof Ontology) {
+                        return new ChangeEvent(
+                            getSource(),
+                            Term.ONTOLOGY,
+                            getOntology(),
+                            null,
+                            cev
+                        );
+                    } else if (cev.getSource() instanceof Term) {
+                        return new ChangeEvent(
+                            getSource(),
+                            ChangeType.UNKNOWN,
+                            cev.getSource(),
+                            null,
+                            cev
+                       );
+                    } else {
+                        throw new BioRuntimeException("Unknown event");
+                    }
                 }
             } ;
             subject.addChangeListener(forwarder, ChangeType.UNKNOWN);

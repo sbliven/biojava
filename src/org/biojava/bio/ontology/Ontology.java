@@ -107,10 +107,12 @@ public interface Ontology extends Changeable {
     public TripleTerm createTripleTerm(Term subject, Term object, Term relation) throws AlreadyExistsException, ChangeVetoException, IllegalArgumentException;
     
     /**
-     * Create a view of a term from another ontology
+     * Create a view of a term from another ontology.  If the requested term
+     * has already been imported, this method returns the existing RemoteTerm
+     * object.
      */
    
-    public RemoteTerm importTerm(Ontology o, Term t) throws AlreadyExistsException, ChangeVetoException, IllegalArgumentException;
+    public RemoteTerm importTerm(Term t) throws AlreadyExistsException, ChangeVetoException, IllegalArgumentException;
    
     /**
      * Create a new triple in this ontology
@@ -147,6 +149,8 @@ public interface Ontology extends Changeable {
         private Map subjectTriples;
         private Map objectTriples;
         private Map relationTriples;
+        private Map remoteTerms;
+        
         private final String name;
         private final String description;
         
@@ -156,6 +160,7 @@ public interface Ontology extends Changeable {
             subjectTriples = new HashMap();
             objectTriples = new HashMap();
             relationTriples = new HashMap();
+            remoteTerms = new HashMap();
         }
         
         public Impl(String name, String description) {
@@ -200,15 +205,10 @@ public interface Ontology extends Changeable {
         
         private Set filterTriples(Set base, Term subject, Term object, Term relation) {
             if (base == null) {
-                System.err.println("Null set");
                 return Collections.EMPTY_SET;
             } else if (subject == null && object == null && relation == null) {
-                System.err.println("Optimized return");
-                return base;
-                // return Collections.unmodifiableSet(base);
+                return Collections.unmodifiableSet(base);
             } 
-            
-            System.err.println("Filtering explicitly");
             
             Set retval = new HashSet();
             for (Iterator i = base.iterator(); i.hasNext(); ) {
@@ -255,7 +255,7 @@ public interface Ontology extends Changeable {
         public Term createTerm(String name, String description) 
             throws AlreadyExistsException, IllegalArgumentException, ChangeVetoException
         {
-            Term t = new Term.Impl(name, description);
+            Term t = new Term.Impl(this, name, description);
             addTerm(t);
             return t;
         }
@@ -263,7 +263,7 @@ public interface Ontology extends Changeable {
         public TripleTerm createTripleTerm(Term subject, Term object, Term relation)
             throws AlreadyExistsException, ChangeVetoException
         {
-            TripleTerm tt = new TripleTerm.Impl(subject, object, relation);
+            TripleTerm tt = new TripleTerm.Impl(this, subject, object, relation);
             if (!containsTerm(subject)) {
                 throw new IllegalArgumentException("Term " + subject.getName() + " is not contained in this ontology");
             }
@@ -280,17 +280,21 @@ public interface Ontology extends Changeable {
         public OntologyTerm createOntologyTerm(Ontology o)
             throws AlreadyExistsException, ChangeVetoException
         { 
-            OntologyTerm ot = new OntologyTerm.Impl(o);
+            OntologyTerm ot = new OntologyTerm.Impl(this, o);
             addTerm(ot);
             return ot;
         }
             
         
-        public RemoteTerm importTerm(Ontology o, Term t)
+        public RemoteTerm importTerm(Term t)
             throws AlreadyExistsException, IllegalArgumentException, ChangeVetoException
         {
-            RemoteTerm rt = new RemoteTerm.Impl(o, t);
-            addTerm(rt);
+            RemoteTerm rt = (RemoteTerm) remoteTerms.get(t);
+            if (rt == null) {
+                rt = new RemoteTerm.Impl(this, t);
+                addTerm(rt);
+                remoteTerms.put(t, rt);
+            }
             return rt;
         }
         

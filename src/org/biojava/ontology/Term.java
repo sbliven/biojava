@@ -37,6 +37,17 @@ import org.biojava.bio.*;
 
 public interface Term extends Annotatable {
     /**
+     * ChangeType which indicates that this term's ontology has been
+     * alterred
+     */
+    
+    public static final ChangeType ONTOLOGY = new ChangeType(
+      "This term's ontology has been changed",
+      "org.biojava.bio.ontology.Term",
+      "ONTOLOGY"
+    );
+    
+    /**
      * Return the name of this term.
      */
     
@@ -54,23 +65,33 @@ public interface Term extends Annotatable {
      *
      * @for.developer This can be used to implement Ontology.createTerm
      */
+     
+    /**
+     * Return the ontology in which this term exists.
+     */
+     
+    public Ontology getOntology();
     
-    public final static class Impl extends AbstractChangeable implements Term {
+    public final static class Impl extends AbstractTerm implements Term {
         private final String name;
         private final String description;
-        private transient ChangeForwarder forwarder;
+        private final Ontology ontology;
         private Annotation annotation;
         
-        public Impl(String name, String description) {
+        public Impl(Ontology ontology, String name, String description) {
             if (name == null) {
-                throw new IllegalArgumentException("Name must not be null");
+                throw new NullPointerException("Name must not be null");
             }
             if (description == null) {
-                throw new IllegalArgumentException("Description must not be null");
+                throw new NullPointerException("Description must not be null");
+            }
+            if (ontology == null) {
+                throw new NullPointerException("Ontology must not be null");
             }
             
             this.name = name;
             this.description = description;
+            this.ontology = ontology;
         }
         
         public String getName() {
@@ -79,6 +100,10 @@ public interface Term extends Annotatable {
         
         public String getDescription() {
             return description;
+        }
+        
+        public Ontology getOntology() {
+            return ontology;
         }
         
         public String toString() {
@@ -92,21 +117,6 @@ public interface Term extends Annotatable {
             return annotation;
         }
         
-        public ChangeSupport getChangeSupport(ChangeType ct) {
-            ChangeSupport cs = super.getChangeSupport(ct);
-            forwarder = new ChangeForwarder(this, cs) {
-                protected ChangeEvent generateEvent(ChangeEvent cev) {
-                    return new ChangeEvent(
-                        getSource(),
-                        Annotatable.ANNOTATION,
-                        annotation,
-                        null,
-                        cev
-                    );
-                }
-            } ;
-            getAnnotation().addChangeListener(forwarder, ChangeType.UNKNOWN);
-            return cs;
-        }
+        
     }
 }

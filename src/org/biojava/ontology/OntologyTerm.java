@@ -46,26 +46,35 @@ public interface OntologyTerm extends Term {
      */
     
     public final static class Impl extends AbstractChangeable implements OntologyTerm {
-        private final Ontology onto;
+        private final Ontology ontology;
+        private final Ontology target;
         private transient ChangeForwarder forwarder;
         
-        public Impl(Ontology onto) {
-            if (onto == null) {
+        public Impl(Ontology ontology, Ontology target) {
+            if (ontology == null) {
+                throw new NullPointerException("The ontology may not be null");
+            }
+            if (target == null) {
                 throw new NullPointerException("The targetted ontology may not be null");
             }
-            this.onto = onto;
+            this.ontology = ontology;
+            this.target = target;
         }
         
         public String getName() {
-            return onto.getName();
+            return target.getName();
         }
         
         public String getDescription() {
-            return onto.getDescription();
+            return target.getDescription();
         }
         
         public Ontology getOntology() {
-            return onto;
+            return ontology;
+        }
+        
+        public Ontology getTargetOntology() {
+            return target;
         }
         
         public String toString() {
@@ -83,13 +92,13 @@ public interface OntologyTerm extends Term {
                     return new ChangeEvent(
                         getSource(),
                         ChangeType.UNKNOWN,
-                        onto,
+                        target,
                         null,
                         cev
                     );
                 }
             } ;
-            onto.addChangeListener(forwarder, ChangeType.UNKNOWN);
+            target.addChangeListener(forwarder, ChangeType.UNKNOWN);
             return cs;
         }
     }
