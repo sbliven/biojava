@@ -9,7 +9,7 @@ import org.biojava.bio.seq.io.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.program.ragbag.*;
 
-public class TestRagbagDirectory {
+public class TestVirtualRagbag {
     public static void main(String[] args) 
         throws Exception
     {
