@@ -108,7 +108,8 @@ public class SequenceDBSearchHitTest extends TestCase
                                                  subjectStart,
                                                  subjectEnd,
                                                  subjectSeqStrand,
-                                                 al1));
+                                                 al1,
+                                                 Annotation.EMPTY_ANNOTATION));
 
          subHits2 = new ArrayList();
          subHits2.add(new SequenceDBSearchSubHit(score,
@@ -120,7 +121,8 @@ public class SequenceDBSearchHitTest extends TestCase
                                                  subjectStart,
                                                  subjectEnd,
                                                  subjectSeqStrand,
-                                                 al2));
+                                                 al2,
+                                                 Annotation.EMPTY_ANNOTATION));
 
          h1 = new SequenceDBSearchHit(score,
                                       eValue,

@@ -31,7 +31,6 @@ import junit.framework.TestCase;
 
 import org.biojava.bio.search.SeqSimilaritySearchResult;
 import org.biojava.bio.search.SeqSimilaritySearchHit;
-import org.biojava.bio.search.SequenceDBSearchResult;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.db.DummySequenceDB;
 import org.biojava.bio.seq.db.DummySequenceDBInstallation;
@@ -126,8 +125,8 @@ public class SSBindCase extends TestCase
 
     public void testResultGetAnnotation()
     {
-        SequenceDBSearchResult result =
-            (SequenceDBSearchResult) searchResults.get(0);
+        SeqSimilaritySearchResult result =
+            (SeqSimilaritySearchResult) searchResults.get(0);
 
         assertEquals(2, result.getAnnotation().keys().size());
     }

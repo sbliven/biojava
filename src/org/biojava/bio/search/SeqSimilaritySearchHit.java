@@ -24,6 +24,7 @@ package org.biojava.bio.search;
 import java.util.Comparator;
 import java.util.List;
 
+import org.biojava.bio.Annotatable;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 
 /**
@@ -33,7 +34,7 @@ import org.biojava.bio.seq.StrandedFeature.Strand;
  * @author Gerald Loeffler
  * @author Keith James
  */
-public interface SeqSimilaritySearchHit
+public interface SeqSimilaritySearchHit extends Annotatable
 {
     /**
      * Return the overall score of this hit in the units defined by the

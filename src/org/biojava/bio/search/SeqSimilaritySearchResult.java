@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.biojava.bio.Annotatable;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.symbol.SymbolList;
 
@@ -35,7 +36,7 @@ import org.biojava.bio.symbol.SymbolList;
  * @author Gerald Loeffler
  * @author Keith James
  */
-public interface SeqSimilaritySearchResult
+public interface SeqSimilaritySearchResult extends Annotatable
 {
     /**
      * Returns the query sequence which was used to perform the search.

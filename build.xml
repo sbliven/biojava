@@ -393,7 +393,7 @@
 
   <!-- Runs tests if the Ant optional JUnit support is available -->
   <target name="runtests" depends="init,compile-tests" >
-    <junit printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
+    <junit maxmemory="128m" printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
       <formatter type="plain" usefile="true" />
       <classpath>
         <!-- main classes from build -->

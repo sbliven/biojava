@@ -83,14 +83,17 @@ public class SeqSimilarityStAXAdapter extends StAXContentHandlerBase
                 scHandler.addSearchProperty("version", attrs.getValue("version"));
                 return;
             }
-            else if (localName.equals("Hit"))
-            {
-                dm.delegate(HitStAXHandler.HIT_HANDLER_FACTORY.getHandler(this));
-                return;
-            }
             else if (localName.equals("Header"))
             {
+                // Capture Header element and subtree
                 dm.delegate(HeaderStAXHandler.HEADER_HANDLER_FACTORY.getHandler(this));
+                return;
+            }
+            else if (localName.equals("Hit"))
+            {
+                // Drop through the Detail element to the Hit elements
+                // and their subtrees
+                dm.delegate(HitStAXHandler.HIT_HANDLER_FACTORY.getHandler(this));
             }
         }
     }

@@ -21,17 +21,10 @@
 
 package org.biojava.bio.program.ssbind;
 
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
-import org.biojava.bio.SmallAnnotation;
 import org.biojava.bio.search.*;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.StrandedFeature.Strand;
@@ -41,6 +34,7 @@ import org.biojava.bio.seq.db.SequenceDBInstallation;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.*;
 import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.SmallMap;
 import org.biojava.bio.seq.db.*;
 
 /**
@@ -173,7 +167,6 @@ public class BlastLikeSearchBuilder implements SearchBuilder
     private Map subHitData;
 
     private SymbolTokenization tokenParser;
-    private StringBuffer       tokenBuffer;
 
     private List hits;
     private List subHits;
@@ -200,7 +193,6 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         searchParameters    = new HashMap();
         hitData             = new HashMap();
         subHitData          = new HashMap();
-        tokenBuffer         = new StringBuffer(1024);
     }
 
     /**
@@ -237,17 +229,17 @@ public class BlastLikeSearchBuilder implements SearchBuilder
                                    + queryID
                                    + "' (sequence was null)");
 
-        SequenceDB subjectDB = (SequenceDB)subjectDBs.getSequenceDB(databaseID);
+        SequenceDB subjectDB = (SequenceDB) subjectDBs.getSequenceDB(databaseID);
         if (subjectDB == null)
             throw new BioException("Failed to retrieve database from installation using ID '"
                                    + databaseID
                                    + "' (database was null)");
 
-        return new SequenceDBSearchResult(query,
-                                          subjectDB,
-                                          searchParameters,
-                                          hits,
-                                          resultAnnotation);
+        return new SimpleSeqSimilaritySearchResult(query,
+                                                   subjectDB,
+                                                   searchParameters,
+                                                   hits,
+                                                   resultAnnotation);
     }
 
     /**
@@ -345,7 +337,6 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         }
         catch (BioException be)
         {
-            System.err.println("Failed to build SubHit:");
             be.printStackTrace();
         }
     }
@@ -409,7 +400,7 @@ public class BlastLikeSearchBuilder implements SearchBuilder
             nullSubjectStrand = true;
 
         // Compare all other values. Note --i > 0 as we are comparing
-        // all the the index 0 value
+        // all the index 0 value
         for (int i = subs.length; --i > 0;)
         {
             Strand qS = subs[i].getQueryStrand();
@@ -446,16 +437,12 @@ public class BlastLikeSearchBuilder implements SearchBuilder
 
         String subjectID = (String) hitData.get("HitId");
 
-        return new SequenceDBSearchHit(sc, ev, pv,
-                                       qStart,
-                                       qEnd,
-                                       qStrand,
-                                       sStart,
-                                       sEnd,
-                                       sStrand,
-                                       subjectID,
-                                       AnnotationFactory.makeAnnotation(hitData),
-                                       subHits);
+        return new SimpleSeqSimilaritySearchHit(sc, ev, pv,
+                                                qStart, qEnd, qStrand,
+                                                sStart, sEnd, sStrand,
+                                                subjectID,
+                                                AnnotationFactory.makeAnnotation(hitData),
+                                                subHits);
     }
 
     /**
@@ -566,21 +553,23 @@ public class BlastLikeSearchBuilder implements SearchBuilder
         if (subHitData.containsKey("pValue"))
             pv = Double.parseDouble((String) subHitData.get("pValue"));
 
-        Map labelMap = new HashMap();
+        Map labelMap = new SmallMap();
 
-        tokenBuffer.setLength(0);
-        tokenBuffer.append((String) subHitData.get("querySequence"));
+        // Note that the following is removing the raw sequences
+        StringBuffer tokenBuffer = new StringBuffer(1024);
+        tokenBuffer.append((String) subHitData.remove("querySequence"));
         labelMap.put(SeqSimilaritySearchSubHit.QUERY_LABEL,
                      new SimpleSymbolList(tokenParser, tokenBuffer.substring(0)));
 
-        tokenBuffer.setLength(0);
-        tokenBuffer.append((String) subHitData.get("subjectSequence"));
+        tokenBuffer = new StringBuffer(1024);
+        tokenBuffer.append((String) subHitData.remove("subjectSequence"));
         labelMap.put(hitData.get("HitId"),
                      new SimpleSymbolList(tokenParser, tokenBuffer.substring(0)));
 
-        return new SequenceDBSearchSubHit(sc, ev, pv,
-                                          qStart, qEnd, qStrand,
-                                          sStart, sEnd, sStrand,
-                                          new SimpleAlignment(labelMap));
+        return new SimpleSeqSimilaritySearchSubHit(sc, ev, pv,
+                                                   qStart, qEnd, qStrand,
+                                                   sStart, sEnd, sStrand,
+                                                   new SimpleAlignment(labelMap),
+                                                   AnnotationFactory.makeAnnotation(subHitData));
     }
 }

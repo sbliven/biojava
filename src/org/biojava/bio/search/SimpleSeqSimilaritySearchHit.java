@@ -24,35 +24,60 @@ package org.biojava.bio.search;
 import java.util.Collections;
 import java.util.List;
 
+import org.biojava.bio.Annotatable.AnnotationForwarder;
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.StrandedFeature.Strand;
-import org.biojava.utils.ObjectUtil;
+import org.biojava.utils.*;
 
 /**
- * <p>A simple implementation of interface SeqSimilaritySearchHit
- * that takes care of all the housekeeping. Objects of this class are
- * immutable.</p>
+ * <p><code>SimpleSeqSimilaritySearchHit</code> objects represent a
+ * similarity search hit of a query sequence to a sequence referenced
+ * in a SequenceDB object. The core data (score, E-value, P-value)
+ * have accessors, while supplementary data are stored in the
+ * Annotation object. Supplementary data are typically the more
+ * loosely formatted details which vary from one search program to
+ * another (and between versions of those programs).</p>
  *
  * <p>It is up to the user to define the meaning of the hit's
  * query/subject start/end/strand with respect to its constituent
- * sub-hits.</p>
- * 
- * @author Gerald Loeffler
+ * sub-hits. One approach could be:</p>
+ *
+ * <ul>
+ * <li>Hit query/subject start == start of first sub-hit</li>
+ * <li>Hit query/subject   end == end of last sub-hit</li>
+ * <li>Hit strand == POSITIVE if all sub-hits have strand POSITIVE</li>
+ * <li>Hit strand == NEGATIVE if all sub-hits have strand NEGATIVE</li>
+ * <li>Hit strand == UNKNOWN if sub-hits have either mixed or any UNKNOWN
+ *     strands</li>
+ * <li>Hit strand == null if the concept of strandedness is inappropriate
+ *     for the sequence type i.e. for protein</li>
+ * </ul>
+ *
  * @author Keith James
+ * @author Gerald Loeffler
+ * @since 1.1
+ *
+ * @see AbstractChangeable
+ * @see SeqSimilaritySearchHit
+ * @see Annotatable
  */
-public class SimpleSeqSimilaritySearchHit
-    implements SeqSimilaritySearchHit, Cloneable
+public class SimpleSeqSimilaritySearchHit extends AbstractChangeable
+    implements SeqSimilaritySearchHit
 {
-    private double score;
-    private double pValue;
-    private double eValue;
-    private int    qStart;
-    private int    qEnd;
-    private Strand qStrand;
-    private int    sStart;
-    private int    sEnd;
-    private Strand sStrand;
-    private String subjectID;
-    private List   subHits;
+    protected transient AnnotationForwarder annotationForwarder;
+    private double     score;
+    private double     pValue;
+    private double     eValue;
+    private int        queryStart;
+    private int        queryEnd;
+    private Strand     queryStrand;
+    private int        subjectStart;
+    private int        subjectEnd;
+    private Strand     subjectStrand;
+    private String     subjectID;
+    private Annotation annotation;
+    private List       subHits;
 
     // Hashcode is cached after first calculation because the data on
     // which is is based do not change
@@ -60,14 +85,14 @@ public class SimpleSeqSimilaritySearchHit
     private boolean hcCalc;
 
     /**
-     * Construct an immutable object from the values of all properties.
+     * Creates a new <code>SimpleSeqSimilaritySearchHit</code> object.
      *
-     * @param score the overall score of this hit. This is a mandatory
-     * piece of information and may hence not be NaN.
-     * @param pValue the overall P-value of this hit, which may be
-     * NaN.
-     * @param eValue the overall E-value of this hit, which may be
-     * NaN.
+     * @param score a <code>double</code> value; the score of the hit,
+     * which may not be NaN.
+     * @param eValue a <code>double</code> value; the E-value of the
+     * hit, which may be NaN.
+     * @param pValue a <code>double</code> value; the P-value of the
+     * hit, which may be NaN.
      * @param qStart the start of the first sub-hit on the query
      * sequence.
      * @param qEnd the end of the last sub-hit on the query
@@ -82,25 +107,29 @@ public class SimpleSeqSimilaritySearchHit
      * sequence.
      * @param sStrand the strand of the sub-hits on the subject
      * sequence, which may be null for protein similarities. If they
-     * are no all positive or all negative, then this should be the
+     * are not all positive or all negative, then this should be the
      * unknown strand.
-     * @param subjectID the (unique) sequence identifier for this
-     * hit, valid within the sequence database against which this
-     * search was performed, which may not be null.
-     * @param subHits a List of SeqSimilaritySearchSubHit objects
-     * containing all sub-hits for this hit, which may not be null.
+     * @param subjectID a <code>String</code> representing the ID in
+     * the SequenceDB of the sequence which was hit, which may not be
+     * null.
+     * @param annotation an <code>Annotation</code> object, which may
+     * not be null.
+     * @param subHits a <code>List</code> object containing the
+     * subhits, which may not be null. They should be sorted in the
+     * order specified by the search program.
      */
-    public SimpleSeqSimilaritySearchHit(double score,
-                                        double eValue,
-                                        double pValue,
-                                        int    qStart,
-                                        int    qEnd,
-                                        Strand qStrand,
-                                        int    sStart,
-                                        int    sEnd,
-                                        Strand sStrand,
-                                        String subjectID,
-                                        List   subHits)
+    public SimpleSeqSimilaritySearchHit(double     score,
+                                        double     eValue,
+                                        double     pValue,
+                                        int        queryStart,
+                                        int        queryEnd,
+                                        Strand     queryStrand,
+                                        int        subjectStart,
+                                        int        subjectEnd,
+                                        Strand     subjectStrand,
+                                        String     subjectID,
+                                        Annotation annotation,
+                                        List       subHits)
     {
         if (Double.isNaN(score))
         {
@@ -114,22 +143,31 @@ public class SimpleSeqSimilaritySearchHit
             throw new IllegalArgumentException("subjectID was null");
         }
 
+        if (annotation == null)
+        {
+            throw new IllegalArgumentException("annotation was null");
+        }
+
         if (subHits == null)
         {
             throw new IllegalArgumentException("subHits was null");
         }
 
-        this.score      = score;
-        this.pValue     = pValue;
-        this.eValue     = eValue;
-        this.qStart     = qStart;
-        this.qEnd       = qEnd;
-        this.qStrand    = qStrand;
-        this.sStart     = sStart;
-        this.sEnd       = sEnd;
-        this.sStrand    = sStrand;
-        this.subjectID  = subjectID;
-        this.subHits    = Collections.unmodifiableList(subHits);
+        this.score         = score;
+        this.eValue        = eValue;
+        this.pValue        = pValue;
+        this.queryStart    = queryStart;
+        this.queryEnd      = queryEnd;
+        this.queryStrand   = queryStrand;
+        this.subjectStart  = subjectStart;
+        this.subjectEnd    = subjectEnd;
+        this.subjectStrand = subjectStrand;
+        this.subjectID     = subjectID;
+        this.annotation    = annotation;
+        this.subHits       = Collections.unmodifiableList(subHits);
+
+        // Lock the annotation by vetoing all changes
+        this.annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
 
         hcCalc = false;
     }
@@ -143,7 +181,7 @@ public class SimpleSeqSimilaritySearchHit
     {
         return pValue;
     }
-  
+
     public double getEValue()
     {
         return eValue;
@@ -151,52 +189,64 @@ public class SimpleSeqSimilaritySearchHit
 
     public int getQueryStart()
     {
-        return qStart;
+        return queryStart;
     }
 
     public int getQueryEnd()
     {
-        return qEnd;
+        return queryEnd;
     }
 
     public Strand getQueryStrand()
     {
-        return qStrand;
+        return queryStrand;
     }
 
     public int getSubjectStart()
     {
-        return sStart;
+        return subjectStart;
     }
 
     public int getSubjectEnd()
     {
-        return sEnd;
+        return subjectEnd;
     }
 
     public Strand getSubjectStrand()
     {
-        return sStrand;
+        return subjectStrand;
     }
 
     public String getSubjectID()
     {
         return subjectID;
     }
-  
+
     public List getSubHits()
     {
         return subHits;
     }
-  
-    public boolean equals(Object o)
+
+    /**
+     * <code>getAnnotation</code> returns the Annotation associated
+     * with this hit.
+     *
+     * @return an <code>Annotation</code>.
+     */
+    public Annotation getAnnotation()
     {
-        if (o == this) return true;
-        if (o == null) return false;
+        return annotation;
+    }
 
-        if (! o.getClass().equals(this.getClass())) return false;
+    public boolean equals(Object other)
+    {
+        if (other == this) return true;
+        if (other == null) return false;
 
-        SimpleSeqSimilaritySearchHit that = (SimpleSeqSimilaritySearchHit) o;
+        if (! other.getClass().equals(this.getClass())) return false;
+
+        SimpleSeqSimilaritySearchHit that =
+            (SimpleSeqSimilaritySearchHit) other;
 
         if (! ObjectUtil.equals(this.score, that.score))
             return false;
@@ -229,12 +279,23 @@ public class SimpleSeqSimilaritySearchHit
 
     public String toString()
     {
-        return "SequenceDBSearchHit to " + getSubjectID()
+        return "SimpleSeqSimilaritySearchHit to " + getSubjectID()
             + " with score " + getScore();
     }
 
-    public Object clone()
+    protected ChangeSupport getChangeSupport(ChangeType ct)
     {
-        return this;
+        ChangeSupport cs = super.getChangeSupport(ct);
+
+        if (annotationForwarder == null &&
+            (ct.isMatchingType(Annotatable.ANNOTATION) || Annotatable.ANNOTATION.isMatchingType(ct)))
+        {
+            annotationForwarder =
+                new Annotatable.AnnotationForwarder(this, cs);
+            getAnnotation().addChangeListener(annotationForwarder,
+                                              Annotatable.ANNOTATION);
+        }
+
+        return cs;
     }
 }

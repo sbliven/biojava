@@ -25,24 +25,40 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.biojava.bio.Annotatable.AnnotationForwarder;
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.symbol.SymbolList;
-import org.biojava.utils.ObjectUtil;
+import org.biojava.utils.*;
 
 /**
- * A class that implements the trivial (housekeeping) responsibilities
- * of interface SeqSimilaritySearchResult. Objects of this class are
- * immutable.
+ * <code>SimpleSeqSimilaritySearchResult</code> objects represent a
+ * result of a search of a <code>SymbolList</code> against the
+ * sequences within a <code>SequenceDB</code> object. The core data
+ * (query sequence, database, search parameters, hits) have accessors,
+ * while supplementary data are stored in the <code>Annotation</code>
+ * object. Supplementary data are typically the more loosely formatted
+ * details which vary from one search program to another (and between
+ * versions of those programs).
  *
- * @author Gerald Loeffler
  * @author Keith James
+ * @author Gerald Loeffler
+ * @since 1.1
+ *
+ * @see AbstractChangeable
+ * @see SeqSimilaritySearchResult
+ * @see Annotatable
  */
-public class SimpleSeqSimilaritySearchResult
-    implements SeqSimilaritySearchResult, Cloneable
+public class SimpleSeqSimilaritySearchResult extends AbstractChangeable
+    implements SeqSimilaritySearchResult
 {
+    protected transient AnnotationForwarder annotationForwarder;
+
     private SymbolList querySequence;
     private SequenceDB sequenceDB;
     private Map        searchParameters;
+    private Annotation annotation;
     private List       hits;
 
     // Hashcode is cached after first calculation because the data on
@@ -50,26 +66,20 @@ public class SimpleSeqSimilaritySearchResult
     private int hc;
     private boolean hcCalc;
 
-  /** 
-   * Construct an immutable object by giving all its properties.
-   * @param searcher the sequence similarity searcher that produced
-   * this search result, which may not be null.
-   * @param querySequence the query sequence that gave rise to this
-   * search result, which may not be null.
-   * @param sequenceDB the sequence database against which the search
-   * was conducted, which may not be null.
-   * @param searchParameters the search parameters used in the search
-   * that produced this result, which may be null. If not null, the
-   * getter for this property returns an unmodifiable view of this
-   * object.
-   * @param hits the list of SeqSimilaritySearchHit objects that make
-   * up this result, which may not null. The getter for this property
-   * returns an unmodifiable view of this object.
-   */
+    /**
+     * Creates a new <code>SimpleSeqSimilaritySearchResult</code>.
+     *
+     * @param querySequence a <code>SymbolList</code>.
+     * @param sequenceDB a <code>SequenceDB</code>.
+     * @param searchParameters a <code>Map</code>.
+     * @param annotation an <code>Annotation</code>.
+     * @param hits a <code>List</code>.
+     */
     public SimpleSeqSimilaritySearchResult(SymbolList querySequence,
                                            SequenceDB sequenceDB,
                                            Map        searchParameters,
-                                           List       hits)
+                                           List       hits,
+                                           Annotation annotation)
     {
         if (querySequence == null)
         {
@@ -87,13 +97,28 @@ public class SimpleSeqSimilaritySearchResult
                 Collections.unmodifiableMap(searchParameters);
         }
 
+        if (annotation == null)
+        {
+            throw new IllegalArgumentException("annotation was null");
+        }
+
         if (hits == null)
         {
             throw new IllegalArgumentException("hits was null");
         }
 
+        // Lock the sequenceDB by vetoing all changes
+        sequenceDB.addChangeListener(ChangeListener.ALWAYS_VETO);
+
+        // Lock the querySeq by vetoing all changes
+        querySequence.addChangeListener(ChangeListener.ALWAYS_VETO);
+
+        // Lock the annotation by vetoing all changes to properties
+        annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
+
         this.querySequence = querySequence;
         this.sequenceDB    = sequenceDB;
+        this.annotation    = annotation;
         this.hits          = Collections.unmodifiableList(hits);
 
         hcCalc = false;
@@ -109,38 +134,36 @@ public class SimpleSeqSimilaritySearchResult
         return sequenceDB;
     }
 
-    /**
-     * Return an unmodifiable view of the search parameters map.
-     */
     public Map getSearchParameters()
     {
         return searchParameters;
     }
 
-    /**
-     * return an unmodifiable view of the hits list.
-     */
     public List getHits()
     {
         return hits;
     }
 
-    public String toString()
+    /**
+     * <code>getAnnotation</code> returns the Annotation associated
+     * with this hit.
+     *
+     * @return an <code>Annotation</code>.
+     */
+    public Annotation getAnnotation()
     {
-        return "SimpleSeqSimilaritySearchResult of "
-            + getQuerySequence()
-            + " against "
-            + getSequenceDB().getName();
+        return annotation;
     }
-  
-    public boolean equals(Object o)
+
+    public boolean equals(Object other)
     {
-        if (o == this) return true;
-        if (o == null) return false;
+        if (other == this) return true;
+        if (other == null) return false;
 
-        if (! o.getClass().equals(this.getClass())) return false;
+        if (! other.getClass().equals(this.getClass())) return false;
 
-        SimpleSeqSimilaritySearchResult that = (SimpleSeqSimilaritySearchResult) o;
+        SimpleSeqSimilaritySearchResult that =
+            (SimpleSeqSimilaritySearchResult) other;
 
         if (! ObjectUtil.equals(this.querySequence, that.querySequence))
             return false;
@@ -148,12 +171,14 @@ public class SimpleSeqSimilaritySearchResult
             return false;
         if (! ObjectUtil.equals(this.searchParameters, that.searchParameters))
             return false;
+        if (! ObjectUtil.equals(this.annotation, that.annotation))
+            return false;
         if (! ObjectUtil.equals(this.hits, that.hits))
             return false;
 
         return true;
     }
-  
+
     public int hashCode()
     {
         if (! hcCalc)
@@ -162,14 +187,32 @@ public class SimpleSeqSimilaritySearchResult
             hc = ObjectUtil.hashCode(hc, sequenceDB);
             hc = ObjectUtil.hashCode(hc, searchParameters);
             hc = ObjectUtil.hashCode(hc, hits);
+            hc = ObjectUtil.hashCode(hc, annotation);
             hcCalc = true;
         }
 
         return hc;
     }
-  
-    public Object clone()
+
+    public String toString()
     {
-        return this;
+        return "SimpleSeqSimilaritySearchResult of " + getQuerySequence()
+            + " against " + getSequenceDB().getName();
+    }
+
+    protected ChangeSupport getChangeSupport(ChangeType ct)
+    {
+        ChangeSupport cs = super.getChangeSupport(ct);
+
+        if (annotationForwarder == null &&
+            (ct.isMatchingType(Annotatable.ANNOTATION) || Annotatable.ANNOTATION.isMatchingType(ct)))
+        {
+            annotationForwarder =
+                new Annotatable.AnnotationForwarder(this, cs);
+            getAnnotation().addChangeListener(annotationForwarder,
+                                              Annotatable.ANNOTATION);
+        }
+
+        return cs;
     }
 }

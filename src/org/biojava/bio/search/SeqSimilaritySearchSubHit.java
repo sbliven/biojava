@@ -23,6 +23,7 @@ package org.biojava.bio.search;
 
 import java.util.Comparator;
 
+import org.biojava.bio.Annotatable;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Alignment;
 
@@ -34,7 +35,7 @@ import org.biojava.bio.symbol.Alignment;
  * @author Gerald Loeffler
  * @author Keith James
  */
-public interface SeqSimilaritySearchSubHit
+public interface SeqSimilaritySearchSubHit extends Annotatable
 {
     /**
      * This object is used as the label for the query sequence in the

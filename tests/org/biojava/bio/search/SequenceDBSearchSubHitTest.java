@@ -26,6 +26,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.StrandedFeature;
@@ -97,7 +98,8 @@ public class SequenceDBSearchSubHitTest extends TestCase
                                          subjectStart,
                                          subjectEnd,
                                          subjectSeqStrand,
-                                         al1);
+                                         al1,
+                                         Annotation.EMPTY_ANNOTATION);
 
         sh2 = new SequenceDBSearchSubHit(score,
                                          eValue,
@@ -108,7 +110,8 @@ public class SequenceDBSearchSubHitTest extends TestCase
                                          subjectStart,
                                          subjectEnd,
                                          subjectSeqStrand,
-                                         al2);
+                                         al2,
+                                         Annotation.EMPTY_ANNOTATION);
     }
 
     public void testEquals()

@@ -21,22 +21,27 @@
 
 package org.biojava.bio.search;
 
+import org.biojava.bio.Annotatable.AnnotationForwarder;
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Alignment;
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ObjectUtil;
+import org.biojava.utils.*;
 
 /**
- * A simple implementation of interface SeqSimilaritySearchSubHit that
- * takes care of all the house-keeping. Objects of this class are
- * immutable.
- * 
- * @author Gerald Loeffler
+ * <p><code>SimpleSeqSimilaritySearchSubHit</code> objects represent
+ * sub-hits which make up a hit. In the case of Blast these correspond
+ * to HSPs.</p>
+ *
  * @author Keith James
+ * @author Gerald Loeffler
+ * @since 1.1
  */
-public class SimpleSeqSimilaritySearchSubHit
-    implements SeqSimilaritySearchSubHit, Cloneable
+public class SimpleSeqSimilaritySearchSubHit extends AbstractChangeable
+    implements SeqSimilaritySearchSubHit
 {
+    protected transient AnnotationForwarder annotationForwarder;
+
     private double    score;
     private double    pValue;
     private double    eValue;
@@ -47,6 +52,7 @@ public class SimpleSeqSimilaritySearchSubHit
     private int       subjectEnd;
     private Strand    subjectStrand;
     private Alignment alignment;
+    private Annotation annotation;
 
     // Hashcode is cached after first calculation because the data on
     // which is is based do not change
@@ -54,15 +60,9 @@ public class SimpleSeqSimilaritySearchSubHit
     private boolean hcCalc;
 
     /**
-     * Construct an immutable object of this class by providing all
-     * properties.
+     * Creates a new <code>SimpleSeqSimilaritySearchSubHit</code>
+     * object.
      *
-     * @param score a <code>double</code> value; the score of the
-     * subhit, which may not be NaN.
-     * @param eValue a <code>double</code> the E-value of the
-     * subhit, which may be NaN.
-     * @param pValue a <code>double</code> value; the P-value of the
-     * hit, which may be NaN.
      * @param queryStart an <code>int</code> value indicating the
      * start coordinate of the hit on the query sequence.
      * @param queryEnd an <code>int</code> value indicating the end
@@ -77,20 +77,27 @@ public class SimpleSeqSimilaritySearchSubHit
      * @param subjectStrand a <code>Strand</code> object indicating
      * the strand of the hit with respect to the query sequence, which
      * may be null for protein similarities.
+     * @param score a <code>double</code> value; the score of the
+     * subhit, which may not be NaN.
+     * @param eValue a <code>double</code> the E-value of the
+     * subhit, which may be NaN.
+     * @param pValue a <code>double</code> value; the P-value of the
+     * hit, which may be NaN.
      * @param alignment an <code>Alignment</code> object containing
      * the alignment described by the subhit region, which may not be
      * null.
      */
-    public SimpleSeqSimilaritySearchSubHit(double    score,
-                                           double    eValue,
-                                           double    pValue,
-                                           int       queryStart,
-                                           int       queryEnd,
-                                           Strand    queryStrand,
-                                           int       subjectStart,
-                                           int       subjectEnd,
-                                           Strand    subjectStrand,
-                                           Alignment alignment)
+    public SimpleSeqSimilaritySearchSubHit(double     score,
+                                           double     eValue,
+                                           double     pValue,
+                                           int        queryStart,
+                                           int        queryEnd,
+                                           Strand     queryStrand,
+                                           int        subjectStart,
+                                           int        subjectEnd,
+                                           Strand     subjectStrand,
+                                           Alignment  alignment,
+                                           Annotation annotation)
     {
         if (Double.isNaN(score))
         {
@@ -104,9 +111,14 @@ public class SimpleSeqSimilaritySearchSubHit
             throw new IllegalArgumentException("alignment was null");
         }
 
+        if (annotation == null)
+        {
+            throw new IllegalArgumentException("annotation was null");
+        }
+
         this.score         = score;
-        this.pValue        = pValue;
         this.eValue        = eValue;
+        this.pValue        = pValue;
         this.queryStart    = queryStart;
         this.queryEnd      = queryEnd;
         this.queryStrand   = queryStrand;
@@ -118,9 +130,12 @@ public class SimpleSeqSimilaritySearchSubHit
         // Lock alignment by vetoing all changes
         this.alignment.addChangeListener(ChangeListener.ALWAYS_VETO);
 
+        // Lock the annotation by vetoing all changes to properties
+        annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
+
         hcCalc = false;
     }
-  
+
     public double getScore()
     {
         return score;
@@ -130,7 +145,7 @@ public class SimpleSeqSimilaritySearchSubHit
     {
         return pValue;
     }
-  
+
     public double getEValue()
     {
         return eValue;
@@ -171,14 +186,26 @@ public class SimpleSeqSimilaritySearchSubHit
         return alignment;
     }
 
-    public boolean equals(Object o)
+    /**
+     * <code>getAnnotation</code> returns the Annotation associated
+     * with this sub-hit.
+     *
+     * @return an <code>Annotation</code>.
+     */
+    public Annotation getAnnotation()
     {
-        if (o == this) return true;
-        if (o == null) return false;
+        return annotation;
+    }
 
-        if (! o.getClass().equals(this.getClass())) return false;
+    public boolean equals(Object other)
+    {
+        if (other == this) return true;
+        if (other == null) return false;
 
-        SimpleSeqSimilaritySearchSubHit that = (SimpleSeqSimilaritySearchSubHit) o;
+        if (! other.getClass().equals(this.getClass())) return false;
+
+        SimpleSeqSimilaritySearchSubHit that =
+            (SimpleSeqSimilaritySearchSubHit) other;
 
         if (! ObjectUtil.equals(this.score, that.score))
             return false;
@@ -198,6 +225,8 @@ public class SimpleSeqSimilaritySearchSubHit
             return false;
         if (! ObjectUtil.equals(this.subjectStrand, that.subjectStrand))
             return false;
+        if (! ObjectUtil.equals(this.annotation, that.annotation))
+            return false;
 
         return true;
     }
@@ -215,6 +244,7 @@ public class SimpleSeqSimilaritySearchSubHit
             hc = ObjectUtil.hashCode(hc, subjectStart);
             hc = ObjectUtil.hashCode(hc, subjectEnd);
             hc = ObjectUtil.hashCode(hc, subjectStrand);
+            hc = ObjectUtil.hashCode(hc, annotation);
             hcCalc = true;
         }
 
@@ -226,8 +256,19 @@ public class SimpleSeqSimilaritySearchSubHit
         return "SimpleSeqSimilaritySearchSubHit with score " + getScore();
     }
 
-    public Object clone()
+    protected ChangeSupport getChangeSupport(ChangeType ct)
     {
-        return this;
+        ChangeSupport cs = super.getChangeSupport(ct);
+
+        if (annotationForwarder == null &&
+            (ct.isMatchingType(Annotatable.ANNOTATION) || Annotatable.ANNOTATION.isMatchingType(ct)))
+        {
+            annotationForwarder =
+                new Annotatable.AnnotationForwarder(this, cs);
+            getAnnotation().addChangeListener(annotationForwarder,
+                                              Annotatable.ANNOTATION);
+        }
+
+        return cs;
     }
 }

@@ -21,10 +21,12 @@
 
 package org.biojava.bio.search;
 
+import org.biojava.bio.Annotatable.AnnotationForwarder;
+import org.biojava.bio.Annotatable;
+import org.biojava.bio.Annotation;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Alignment;
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ObjectUtil;
+import org.biojava.utils.*;
 
 /**
  * <p><code>SequenceDBSearchSubHit</code> objects represent sub-hits
@@ -35,18 +37,22 @@ import org.biojava.utils.ObjectUtil;
  * @since 1.1
  * @see SeqSimilaritySearchSubHit
  */
-public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
+public class SequenceDBSearchSubHit  extends AbstractChangeable
+    implements SeqSimilaritySearchSubHit
 {
-    private double    score;
-    private double    pValue;
-    private double    eValue;
-    private int       queryStart;
-    private int       queryEnd;
-    private Strand    queryStrand;
-    private int       subjectStart;
-    private int       subjectEnd;
-    private Strand    subjectStrand;
-    private Alignment alignment;
+    protected transient AnnotationForwarder annotationForwarder;
+
+    private double     score;
+    private double     pValue;
+    private double     eValue;
+    private int        queryStart;
+    private int        queryEnd;
+    private Strand     queryStrand;
+    private int        subjectStart;
+    private int        subjectEnd;
+    private Strand     subjectStrand;
+    private Alignment  alignment;
+    private Annotation annotation;
 
     // Hashcode is cached after first calculation because the data on
     // which is is based do not change
@@ -79,6 +85,8 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
      * @param alignment an <code>Alignment</code> object containing
      * the alignment described by the subhit region, which may not be
      * null.
+     * @param annotation an <code>Annotation</code> object, which may
+     * not be null.
      */
     public SequenceDBSearchSubHit(double    score,
                                   double    eValue,
@@ -89,7 +97,8 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
                                   int       subjectStart,
                                   int       subjectEnd,
                                   Strand    subjectStrand,
-                                  Alignment alignment)
+                                  Alignment alignment,
+                                  Annotation annotation)
     {
         if (Double.isNaN(score))
         {
@@ -103,6 +112,11 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
             throw new IllegalArgumentException("alignment was null");
         }
 
+        if (annotation == null)
+        {
+            throw new IllegalArgumentException("annotation was null");
+        }
+
         this.score         = score;
         this.eValue        = eValue;
         this.pValue        = pValue;
@@ -113,9 +127,13 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
         this.subjectEnd    = subjectEnd;
         this.subjectStrand = subjectStrand;
         this.alignment     = alignment;
+        this.annotation    = annotation;
 
         // Lock alignment by vetoing all changes
         this.alignment.addChangeListener(ChangeListener.ALWAYS_VETO);
+
+        // Lock the annotation by vetoing all changes to properties
+        annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
 
         hcCalc = false;
     }
@@ -170,7 +188,12 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
         return alignment;
     }
 
-    public boolean equals(final Object other)
+    public Annotation getAnnotation()
+    {
+        return annotation;
+    }
+
+    public boolean equals(Object other)
     {
         if (other == this) return true;
         if (other == null) return false;
@@ -197,6 +220,8 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
             return false;
         if (! ObjectUtil.equals(this.subjectStrand, that.subjectStrand))
             return false;
+        if (! ObjectUtil.equals(this.annotation, that.annotation))
+            return false;
 
         return true;
     }
@@ -214,6 +239,7 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
             hc = ObjectUtil.hashCode(hc, subjectStart);
             hc = ObjectUtil.hashCode(hc, subjectEnd);
             hc = ObjectUtil.hashCode(hc, subjectStrand);
+            hc = ObjectUtil.hashCode(hc, annotation);
             hcCalc = true;
         }
 
@@ -223,5 +249,21 @@ public class SequenceDBSearchSubHit implements SeqSimilaritySearchSubHit
     public String toString()
     {
         return "SequenceDBSearchSubHit with score " + getScore();
+    }
+
+    protected ChangeSupport getChangeSupport(ChangeType ct)
+    {
+        ChangeSupport cs = super.getChangeSupport(ct);
+
+        if (annotationForwarder == null &&
+            (ct.isMatchingType(Annotatable.ANNOTATION) || Annotatable.ANNOTATION.isMatchingType(ct)))
+        {
+            annotationForwarder =
+                new Annotatable.AnnotationForwarder(this, cs);
+            getAnnotation().addChangeListener(annotationForwarder,
+                                              Annotatable.ANNOTATION);
+        }
+
+        return cs;
     }
 }
