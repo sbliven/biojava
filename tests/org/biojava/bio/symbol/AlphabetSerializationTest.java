@@ -41,6 +41,7 @@ import java.util.*;
 public class AlphabetSerializationTest extends TestCase {
     IntegerAlphabet integer;
     IntegerAlphabet.SubIntegerAlphabet subint;
+    DoubleAlphabet.SubDoubleAlphabet subdoub;
     DoubleAlphabet doub;
     FiniteAlphabet phred;
     FiniteAlphabet dna;
@@ -55,6 +56,7 @@ public class AlphabetSerializationTest extends TestCase {
 
         integer = IntegerAlphabet.getInstance();
         subint = IntegerAlphabet.getSubAlphabet(20,99);
+        subdoub = DoubleAlphabet.getInstance().getSubAlphabet(20.0,99.0);
         doub = DoubleAlphabet.getInstance();
         phred = PhredTools.getPhredAlphabet();
         dna = DNATools.getDNA();
@@ -112,6 +114,18 @@ public class AlphabetSerializationTest extends TestCase {
         assertTrue(subint.getSymbol(81)!= subint2.getSymbol(80));
         assertTrue(subint.size() == subint2.size());
     }
+
+    public void testSubDouble()throws Exception{
+    DoubleAlphabet.SubDoubleAlphabet subdoub2 =
+        (DoubleAlphabet.SubDoubleAlphabet)serialize(subdoub);
+    assertTrue(subdoub == subdoub2);
+    assertTrue(subdoub.equals(subdoub2));
+    assertTrue(doub.getSymbol(80.0)== subdoub2.getSymbol(80.0));
+    assertTrue(subdoub.getSymbol(80.3)== subdoub2.getSymbol(80.3));
+    assertTrue(subdoub.getSymbol(80.3).equals(subdoub2.getSymbol(80.3)));
+    assertTrue(subdoub.getSymbol(81.9)!= subdoub2.getSymbol(80.0));
+   }
+
 
     public void testDNASerialization()throws Exception{
         FiniteAlphabet dna2 = (FiniteAlphabet)serialize(dna);

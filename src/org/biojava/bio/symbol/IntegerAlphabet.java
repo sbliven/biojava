@@ -144,8 +144,8 @@ public final class IntegerAlphabet
       Integer i = new Integer(val);
       IntegerSymbol sym = (IntegerSymbol) intToSym.get(i);
       if(sym == null) {
-	  sym = new IntegerSymbol(val);
-	  intToSym.put(i, sym);
+          sym = new IntegerSymbol(val);
+          intToSym.put(i, sym);
       }
       return sym;
   }
@@ -372,9 +372,19 @@ public final class IntegerAlphabet
       return new SingletonList(this);
     }
 
-    protected AtomicSymbol getSymbolImpl(List symL)
-    throws IllegalSymbolException {
-      return (AtomicSymbol) symL.get(0);
+
+    protected AtomicSymbol getSymbolImpl(List symL) throws
+        IllegalSymbolException {
+
+      if (symL.size() != 1) {
+        throw new IllegalSymbolException(
+            "SubDoubleAlphabet is one-dimensional: " + this.getName() +
+            " : " + symL);
+      }
+
+      AtomicSymbol s = (AtomicSymbol) symL.get(0);
+      validate(s);
+      return s;
     }
 
     protected void addSymbolImpl(AtomicSymbol sym)

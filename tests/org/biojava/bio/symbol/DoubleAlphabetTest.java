@@ -36,7 +36,7 @@ public class DoubleAlphabetTest extends TestCase
   public DoubleAlphabetTest(String name) {
     super(name);
   }
-  
+
   public void testCanonicalSymbols() {
     Symbol[] syms = new Symbol[10];
     for(int i = 0; i < syms.length; i++) {
@@ -49,5 +49,20 @@ public class DoubleAlphabetTest extends TestCase
         DoubleAlphabet.getInstance().getSymbol(0.5 + i)
       );
     }
+  }
+
+  public void testCanonicalSubAlphabets(){
+    assertTrue(DoubleAlphabet.getSubAlphabet(1.0,2.5) ==
+               DoubleAlphabet.getSubAlphabet(1.0,2.5));
+
+    assertFalse(DoubleAlphabet.getSubAlphabet(1.0,2.5) ==
+               DoubleAlphabet.getSubAlphabet(1.00001,2.5));
+  }
+
+  public void testSubAlphabetSymbolsCanonical() throws Exception{
+    DoubleAlphabet d = DoubleAlphabet.getInstance();
+    DoubleAlphabet.SubDoubleAlphabet sd = DoubleAlphabet.getSubAlphabet(2.0,99.0);
+
+    assertTrue(d.getSymbol(3.0) == sd.getSymbol(3.0));
   }
 }

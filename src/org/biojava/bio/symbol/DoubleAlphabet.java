@@ -46,7 +46,7 @@ import org.biojava.bio.seq.io.*;
  *
  * <p>
  * Object identity should be used to decide if two DoubleResidue objects are
- * the same. DoubleAlpabet ensures that all DoubleAlphabet instances are
+ * the same. DoubleAlphabet ensures that all DoubleAlphabet instances are
  * canonicalized.
  * </p>
  *
@@ -107,7 +107,7 @@ public final class DoubleAlphabet
     private WeakValueHashMap doubleToSym;
 
     private DoubleAlphabet() {
-	doubleToSym = new WeakValueHashMap();
+        doubleToSym = new WeakValueHashMap();
     }
 
   /**
@@ -120,12 +120,12 @@ public final class DoubleAlphabet
       Double d = new Double(val);
       DoubleSymbol sym = (DoubleSymbol) doubleToSym.get(d);
       if (sym== null) {
-	  sym = new DoubleSymbol(val);
-	  doubleToSym.put(d, sym);
+          sym = new DoubleSymbol(val);
+          doubleToSym.put(d, sym);
       }
       return sym;
   }
-  
+
   /**
    * Retrieve the symbol for a range of doubles.
    *
@@ -137,10 +137,13 @@ public final class DoubleAlphabet
     // fixme: we should probably fly-weight these
     return new DoubleRange(minVal, maxVal);
   }
-  
-  public SubDoubleAlphabet getSubAlphabet(double min, double max) {
-    // fixme: we should fly-weight these a-la SubIntegerAlphabet
-    return new SubDoubleAlphabet(min, max);
+
+  public static SubDoubleAlphabet getSubAlphabet(double min, double max) {
+    String name = "SubDoubleAlphabet["+ min +".."+ max +"]";
+    if(! AlphabetManager.registered(name)){
+      AlphabetManager.registerAlphabet(name, new SubDoubleAlphabet(min, max));
+    }
+    return (SubDoubleAlphabet)AlphabetManager.alphabetForName(name);
   }
 
   public Annotation getAnnotation() {
@@ -201,9 +204,9 @@ public final class DoubleAlphabet
 
   public SymbolTokenization getTokenization(String name) {
     if(!name.equals("name")) {
-    	throw new NoSuchElementException(
-	  "No parsers supported by DoubleAlphabet called " + name
-	);
+        throw new NoSuchElementException(
+          "No parsers supported by DoubleAlphabet called " + name
+        );
     }
     return new DoubleTokenization();
   }
@@ -258,7 +261,7 @@ public final class DoubleAlphabet
       this.matches = new SingletonAlphabet(this);
     }
   }
-  
+
   /**
    * A range of double values.
    *
@@ -277,31 +280,31 @@ public final class DoubleAlphabet
     private final double minVal;
     private final double maxVal;
     private final Alphabet matches;
-    
+
     public Annotation getAnnotation() {
       return Annotation.EMPTY_ANNOTATION;
     }
-    
+
     public String getName() {
-      return "DoubleRange[" + minVal + " .. " + maxVal + "]";
+      return "DoubleRange["+ minVal +".."+ maxVal +"]";
     }
-    
+
     public Alphabet getMatches() {
       return matches;
     }
-    
+
     public List getSymbols() {
       return Arrays.asList(new Symbol[] { this });
     }
-    
+
     public double getMinValue() {
       return minVal;
     }
-    
+
     public double getMaxValue() {
       return maxVal;
     }
-    
+
     protected DoubleRange(double minVal, double maxVal) {
       this.minVal = minVal;
       this.maxVal = maxVal;
@@ -349,28 +352,49 @@ public final class DoubleAlphabet
   extends
     Unchangeable
   implements
-    Alphabet
+    Alphabet, Serializable
   {
     private final double min;
     private final double max;
-    
+    private final String name;
+
     private SubDoubleAlphabet(double min, double max) {
       this.min = min;
       this.max = max;
+      this.name = "SubDoubleAlphabet["+ min +".."+ max +"]";
     }
-    
+
+    /**
+     * To prevent duplication of a what should be a
+     * single instance of an existing alphabet. This method
+     * was written as protected so that subclasses even from
+     * other packages will inherit it. It should only be overridden
+     * with care.
+     */
+    protected Object readResolve() throws ObjectStreamException {
+      try {
+        return AlphabetManager.alphabetForName(this.getName());
+      }
+      catch (NoSuchElementException nse) {
+        //a custom alphabet has been sent to your VM, register it.
+        AlphabetManager.registerAlphabet(this.getName(), this);
+        return this;
+      }
+    }
+
+
     public String getName() {
-      return "SubDoubleAlphabet[" + min + "-" + max + "]";
+      return name;
     }
-    
+
     public Annotation getAnnotation() {
       return Annotation.EMPTY_ANNOTATION;
     }
-    
+
     public List getAlphabets() {
       return Arrays.asList(new Alphabet[] { this });
     }
-    
+
     public Symbol getSymbol(List rl)
     throws IllegalSymbolException {
       if(rl.size() != 1) {
@@ -378,14 +402,27 @@ public final class DoubleAlphabet
           "SubDoubleAlphabet is one-dimensional: " + this.getName() +
           " : " + rl );
       }
-      
+
       Symbol s = (Symbol) rl.get(0);
-      
+
       validate(s);
-      
+
       return s;
     }
-    
+
+    public DoubleSymbol getSymbol(double val) throws IllegalSymbolException {
+      if (val < min || val > max) {
+        throw new IllegalSymbolException(
+            "Could not get Symbol for value " +
+            val + " as it is not in the range " +
+            min + " : " + max
+            );
+      }
+
+      return DoubleAlphabet.getInstance().getSymbol(val);
+}
+
+
     public Symbol getAmbiguity(Set syms) {
       throw new BioError("Operation not implemented");
     }
@@ -393,7 +430,7 @@ public final class DoubleAlphabet
     public Symbol getGapSymbol() {
       return getInstance().getGapSymbol();
     }
-    
+
     public boolean contains(Symbol s) {
       if(s instanceof DoubleSymbol) {
         double val = ((DoubleSymbol) s).doubleValue();
@@ -401,17 +438,17 @@ public final class DoubleAlphabet
           return true;
         }
       }
-      
+
       if(s instanceof DoubleRange) {
         DoubleRange dr = (DoubleRange) s;
         if(dr.getMinValue() >= min || dr.getMaxValue() <= max) {
           return true;
         }
       }
-      
+
       return false;
     }
-    
+
     public void validate(Symbol sym)
     throws IllegalSymbolException {
       if(!contains(sym)) {
@@ -420,7 +457,7 @@ public final class DoubleAlphabet
           " does not contain the symbol " + sym );
       }
     }
-    
+
     public SymbolTokenization getTokenization(String name)
     throws BioException {
       return getInstance().getTokenization(name);
