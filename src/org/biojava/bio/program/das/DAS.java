@@ -111,7 +111,8 @@ public class DAS extends AbstractChangeable {
       URL dsnURL = new URL(dasURL, "dsn");
       HttpURLConnection huc = (HttpURLConnection) dsnURL.openConnection();
       huc.connect();
-      int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
+      int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
+      // int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
       if(status == 0) {
         throw new BioException("Not a DAS server: " + dsnURL);
       } else if(status != 200) {

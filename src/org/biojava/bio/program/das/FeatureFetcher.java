@@ -166,7 +166,8 @@ class FeatureFetcher {
 	    }
 
 	    huc.connect();
-	    int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
+	    // int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
+	    int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
 	    if (status == 0) {
 		throw new BioError("Not a DAS server: " + fURL.toString());
 	    } else if (status != 200) {
@@ -181,7 +182,7 @@ class FeatureFetcher {
 	    } else if (fetchEncoding.equals("xff")) {
 		InputSource is = new InputSource(huc.getInputStream());
 		DASFeaturesHandler dfh = new DASFeaturesHandler(ticketsByID, this);
-		SAXParser parser = new SAXParser();
+		SAXParser parser = DASSequence.nonvalidatingSAXParser();
 		parser.setContentHandler(new SAX2StAXAdaptor(dfh));
 		parser.parse(is);
 

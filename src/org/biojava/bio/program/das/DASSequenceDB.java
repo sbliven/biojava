@@ -182,7 +182,8 @@ public class DASSequenceDB implements SequenceDB {
 		} catch (Exception e) {
 		    throw new BioException(e, "Can't connect to " + epURL);
 		}
-		int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
+		// int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
+		int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
 		if (status == 0)
 		    throw new BioException("Not a DAS server: " + dataSourceURL);
 		else if (status != 200)
@@ -243,6 +244,21 @@ public class DASSequenceDB implements SequenceDB {
 		return getSequence((String) i.next());
 	    }
 	} ;
+    }
+
+    static int tolerantIntHeader(HttpURLConnection huc, String name)
+    {
+	try {
+	    String header = huc.getHeaderField(name);
+	    if (header == null) {
+		return 0;
+	    }
+
+	    String firstToken = new StringTokenizer(header).nextToken();
+	    return Integer.parseInt(firstToken);
+	} catch (NumberFormatException ex) {
+	    return 0;
+	}
     }
 
     // 

@@ -475,7 +475,8 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    URL epURL = new URL(dataSourceURL, "dna?ref=" + seqID);
 	    HttpURLConnection huc = (HttpURLConnection) epURL.openConnection();
 	    huc.connect();
-	    int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
+	    // int status = huc.getHeaderFieldInt("X-DAS-Status", 0);
+	    int status = DASSequenceDB.tolerantIntHeader(huc, "X-DAS-Status");
 	    if (status == 0)
 		throw new BioError("Not a DAS server");
 	    else if (status != 200)
@@ -712,6 +713,24 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	    dp.setFeature("http://xml.org/sax/features/validation", false);
 	    // dp.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 	    dp.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+	    dp.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+	    dp.setFeature("http://xml.org/sax/features/namespaces", true);
+	} catch (SAXNotRecognizedException ex) {
+	    ex.printStackTrace();
+	} catch (SAXNotSupportedException ex) {
+	    ex.printStackTrace();
+	} 
+
+	return dp;
+    }
+
+    static SAXParser nonvalidatingSAXParser() {
+	SAXParser dp = new SAXParser();
+	try {
+	    dp.setFeature("http://xml.org/sax/features/validation", false);
+	    // dp.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+	    dp.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+	    dp.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 	    dp.setFeature("http://xml.org/sax/features/namespaces", true);
 	} catch (SAXNotRecognizedException ex) {
 	    ex.printStackTrace();
