@@ -574,14 +574,14 @@ public class SeqIOTools  {
         }
     }
 
-    public static void main(String[] args) throws Exception {
-        BufferedReader br = new BufferedReader(new FileReader("U:/prot.msf.txt"));
-        Alignment align = (Alignment) fileToBiojava(MSF, br);
-        SequenceIterator seqIt = align.sequenceIterator();
-        while (seqIt.hasNext()) {
-            Sequence seq = seqIt.nextSequence();
-            System.out.println(seq.getName() + ": " + seq.seqString());
-        }
-    }
+//    public static void main(String[] args) throws Exception {
+//        BufferedReader br = new BufferedReader(new FileReader("U:/prot.msf.txt"));
+//        SimpleAlignment align = (SimpleAlignment) fileToBiojava(MSF, br);
+//        SequenceIterator seqIt = align.sequenceIterator();
+//        while (seqIt.hasNext()) {
+//            Sequence seq = seqIt.nextSequence();
+//            System.out.println(seq.getName() + ": " + seq.seqString());
+//        }
+//    }
 
 }

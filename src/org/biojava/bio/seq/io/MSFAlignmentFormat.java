@@ -1,6 +1,22 @@
 /*
- * put your module comment here
- * formatted with JxBeauty (c) johann.langhofer@nextra.at
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
  */
 
 
@@ -19,22 +35,14 @@ import  java.io.*;
 import  java.util.*;
 
 
-/**
- * Title:
- * Description:
- * Copyright:    Copyright (c) 2000
- * Company:
- * @version 1.0
- */
+
 public class MSFAlignmentFormat
        implements AlignmentFormat {
     private static final boolean DEBUGPRINT = false;
     private static final int DNA = 1;
     private static final int PROTEIN = 2;
 
-    /**
-     * put your documentation comment here
-     */
+
     public MSFAlignmentFormat () {
     }
 
@@ -58,9 +66,9 @@ public class MSFAlignmentFormat
     }
 
     /**
-     * put your documentation comment here
-     * @param reader
-     * @return Alignment
+     * Reads an MSF Alignment File
+     * @param reader The file reader
+     * @return Alignment A SimpleAlignment consisting of the sequences in the file.
      */
     public Alignment read (BufferedReader reader) {
         Vector sequenceNames = new Vector();
