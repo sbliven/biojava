@@ -144,8 +144,12 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
     public SimpleSymbolList(SymbolTokenization parser, String seqString) 
         throws IllegalSymbolException 
     { 
-        symbols = new Symbol[length];
-        char[] charArray = new char[20];
+	if (parser.getTokenType() == SymbolTokenization.CHARACTER) {
+	    symbols = new Symbol[seqString.length()];
+	} else {
+	    symbols = new Symbol[INCREMENT];
+	}
+        char[] charArray = new char[1024];
         int segLength = seqString.length();
         StreamParser stParser = parser.parseStream(new SSLIOListener());
         int charCount = 0;
@@ -395,7 +399,7 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
 	public void addSymbols(Alphabet alpha,Symbol[] syms,int start, int length){
 	    if(symbols.length < SimpleSymbolList.this.length + length) {
 		Symbol[] dest;
-		dest = new Symbol [SimpleSymbolList.this.length+length+INCREMENT];
+		dest = new Symbol [((int) (1.5 * SimpleSymbolList.this.length)) + length];
 		System.arraycopy(symbols, 0, dest, 0, SimpleSymbolList.this.length);
 		System.arraycopy(syms, start, dest, SimpleSymbolList.this.length, length);
 		symbols = dest;
