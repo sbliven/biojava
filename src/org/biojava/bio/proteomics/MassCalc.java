@@ -89,13 +89,14 @@ public class MassCalc {
     
     //Save values here so that modifications are not global
     private HashMap mSymbolPropertyHash;
+
     
     /**
      * If instance methods are being used this will store the 
-     * isotopic type to be used for calculation. Write now just worry about 
-     * hydroxMass
+     * isotopicly and MH_PLUS correct treminal mass to be created. 
+     * Need to be able to handle N and C term mods in the future. 
      */
-     private double hydroxMass;
+     private double termMass;
 
     
     /** Creates new MassCalc 
@@ -107,17 +108,9 @@ public class MassCalc {
      * or average isotopic. It realy is the name of SymbolProperty
      * table. Ex. SymbolPropertyTable.AVG_MASS or SymbolPropertyTable.MONO_MASS
      */
-    public MassCalc(String isotopicType) {
+    public MassCalc(String isotopicType, boolean MH_PLUS) {
         //Calculate hydroxyl mass
-        hydroxMass = 0.0;
-        if(isotopicType.equals(SymbolPropertyTable.AVG_MASS)){
-           hydroxMass = Havg + Oavg;
-        }
-        else if(isotopicType.equals(SymbolPropertyTable.MONO_MASS)){
-           hydroxMass = Hmono + Omono; 
-        }
-        
-        
+        termMass = calcTermMass(isotopicType,MH_PLUS); 
         mSymbolPropertyHash = new HashMap();
         
         SymbolPropertyTable symbolPropertyTable = 
@@ -223,23 +216,10 @@ public class MassCalc {
         }
         
         //Calculate hydroxyl mass
-        double hydroxMass = 0.0;
-        if(isotopicType.equals(SymbolPropertyTable.AVG_MASS)){
-           hydroxMass = Havg + Oavg;
-        }
-        else if(isotopicType.equals(SymbolPropertyTable.MONO_MASS)){
-           hydroxMass = Hmono + Omono; 
-        }
-        if (pepMass != 0.0)
-        {
-                if (MH_PLUS)
-                {
-                   pepMass = pepMass + 3 * hydroxMass;
-                }
-                else
-                {
-                   pepMass = pepMass + 2 * hydroxMass;
-                }
+	double termMass = calcTermMass(isotopicType,MH_PLUS); 
+        
+        if (pepMass != 0.0){
+	    pepMass += termMass;
         }
 
         return pepMass;
@@ -259,25 +239,13 @@ public class MassCalc {
         
         double pepMass = 0.0;
         
-      //  SymbolPropertyTable sPT = getSymbolPropertyTable();
         HashMap symbolPropertyMap = getSymbolPropertyMap();
 
         for(Iterator it = proteinSeq.iterator(); it.hasNext(); ){
             Double mass = (Double)symbolPropertyMap.get((Symbol)it.next());
             pepMass += mass.doubleValue();
         }
-        
-        if (pepMass != 0.0)
-        {
-                if (MH_PLUS)
-                {
-                   pepMass = pepMass + 3 * hydroxMass;
-                }
-                else
-                {
-                   pepMass = pepMass + 2 * hydroxMass;
-                }
-        }
+        pepMass += getTermMass();
 
         return pepMass;
     }
@@ -285,5 +253,35 @@ public class MassCalc {
     private HashMap getSymbolPropertyMap()
     {
         return mSymbolPropertyHash;// = ProteinTools.getSymbolPropertyTable(name);
+    }
+
+    /**
+     * Use this method to double check the aded teminal masses. 
+     *
+     */
+    public double getTermMass(){
+	return termMass;
+    }
+
+    private static double calcTermMass(String isotopicType, boolean MH_PLUS){
+	double termMass = 0.0;
+	if(isotopicType.equals(SymbolPropertyTable.AVG_MASS)){
+	    //Add the C-terminal OH and N-Term H
+	    termMass += Havg + Oavg + Havg;
+	    //Add the extra H
+	    if(MH_PLUS){
+	      termMass += Havg;	
+	    }
+        }
+        else if(isotopicType.equals(SymbolPropertyTable.MONO_MASS)){
+	    //Add the C-terminal OH and N-Term H
+	    termMass += Hmono + Omono + Hmono;
+	    //Add the extra H
+	    if(MH_PLUS){
+	      termMass += Hmono;	
+	    }
+        }
+	System.out.println(termMass);
+	return termMass;
     }
 }
