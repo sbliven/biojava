@@ -22,6 +22,9 @@ public interface XMLPeerFactory {
      * @param children a List (may be empty) of objects reflecting
      *                 child nodes.
      * @param attrs attribute list for the tag.
+     *
+     * @return a Java object to reflect the XML tag, or <code>null</code> if
+     *         this element should be silently ignored.
      */
 
     public Object getXMLPeer(String tag, List children,

@@ -10,6 +10,21 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 import java.util.*;
 
+/**
+ * SAX DocumentHandler which uses an XMLPeerFactory to construct
+ * Java objects reflecting an XML document.  The XMLPeerBuilder
+ * system takes a depth-first approach to constructing the Object
+ * tree.  This means that, before attempting to construct an
+ * Object to represent a particular element, it first constructs
+ * Objects for all child elelments.
+ *
+ * Currently, Text nodes are automatically converted to Java strings
+ * and treated as normal children.  Treatment of Text may be
+ * configurable in a future release.
+ *
+ * @author Thomas Down
+ */
+
 public class XMLPeerBuilder implements DocumentHandler {
     private static AttributeList emptyAttributes = new AttributeListImpl();
 
@@ -19,10 +34,23 @@ public class XMLPeerBuilder implements DocumentHandler {
     private StackEntry stackTop = null;
     private Object topLevel = null;
 
+    /**
+     * Construct a new XMLPeerBuilder, using the specified XMLPeerFactory
+     *
+     */
+
     public XMLPeerBuilder(XMLPeerFactory f) {
 	peerFactory = f;
 	stack = new LinkedList();
     }
+
+    /**
+     * Once the XMLPeerBuilder has been used, return an Object
+     * which represents the whole document.
+     *
+     * @return an Object reflecting the document, or <code>null</code>
+     *         if none is available.
+     */
 
     public Object getTopLevelObject() {
 	if (isComplete)
@@ -31,6 +59,8 @@ public class XMLPeerBuilder implements DocumentHandler {
     }
 
     public void characters(char[] ch, int start, int len) {
+	String child = new String(ch, start, len);
+	stacktop.objs.add(child);
     }
 
     public void ignorableWhitespace(char[] ch, int start, int len) {
