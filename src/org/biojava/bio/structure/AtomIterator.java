@@ -113,21 +113,23 @@ public class AtomIterator implements Iterator {
 	    }
 	    if ( groupiter.hasNext() ) {
 		group = (Group) groupiter.next() ;
-		current_atom_pos = 0 ;
+		current_atom_pos = -1 ;
+		return next();
 	    } else {
 		throw new NoSuchElementException("no more atoms found in structure!");
 	    }
 	} 
 
-	
 	Atom a ;
+	
 	try {
 	    a = group.getAtom(current_atom_pos);
 	} catch (StructureException e) {
+	    System.out.println("current_atom_pos " + current_atom_pos + " group " + group + "size:" + group.size());
 	    e.printStackTrace();
 	    throw new NoSuchElementException("error wile trying to retrieve atom");
 	}
-	    
+	
 	return a ;
 	
     }
