@@ -54,7 +54,7 @@ public interface Query {
     }
     
     public Map getArcsToOperators() {
-      return Collections.EMPTY_MAP;
+      return new HashMap();
     }
     
     public Set getOperations(Arc arc) {
