@@ -527,7 +527,7 @@ implements GappedSymbolList, Serializable {
    * with a corresponding pair of start-stop pairs in the gapped view, the
    * entire gapped list can be reconstructed.
    *
-   * @return a List of GappedSymbolList.Block instances
+   * @return a List of Block instances
    */
   public List BlockIterator() {
     return Collections.unmodifiableList(blocks);
@@ -653,17 +653,21 @@ implements GappedSymbolList, Serializable {
         return new RangeLocation(start, end);
       }
     }
-    
-    /**
-     * Return the underlying (ungapped) SymbolList.
-     *
-     * @since 1.3
-     */
 
-    public SymbolList getSourceSymbolList() {
-	return source;
+  public SymbolList getSourceSymbolList() {
+    return source;
+  }
+
+  public Location getUngappedLocation() {
+    List locList = new ArrayList(blocks.size());
+    for(Iterator i = blocks.iterator(); i.hasNext(); ) {
+      Block block = (Block) i.next();
+      locList.add(new RangeLocation(block.viewStart, block.viewEnd));
     }
-  
+
+    return LocationTools.union(locList);
+  }
+
   /**
    * An aligned block.
    * <p>
@@ -673,17 +677,26 @@ implements GappedSymbolList, Serializable {
    *
    * @author Matthew Pocock
    */
-  public final class Block implements Serializable {
-    public int sourceStart, sourceEnd;
-    public int viewStart, viewEnd;
-    
+  protected static final class Block implements Serializable {
+    public int sourceStart;
+    public int sourceEnd;
+    public int viewStart;
+    public int viewEnd;
+
     public Block(int sourceStart, int sourceEnd, int viewStart, int viewEnd) {
       this.sourceStart = sourceStart;
       this.sourceEnd = sourceEnd;
       this.viewStart = viewStart;
       this.viewEnd = viewEnd;
     }
-    
+
+    public Block(Block block) {
+      this.sourceStart = block.sourceStart;
+      this.sourceEnd = block.sourceEnd;
+      this.viewStart = block.viewStart;
+      this.viewEnd = block.viewEnd;
+    }
+
     public String toString() {
       return
         "Block: source=" + sourceStart + "," + sourceEnd +

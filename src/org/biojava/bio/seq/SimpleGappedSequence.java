@@ -24,12 +24,12 @@ package org.biojava.bio.seq;
 import java.util.Iterator;
 
 import org.biojava.bio.Annotation;
-import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.impl.FeatureImpl;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.SimpleGappedSymbolList;
 import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.AssertionFailure;
 
 /**
  * Simple implementation of GappedSequence.
@@ -135,7 +135,7 @@ implements GappedSequence {
       features.addFeatureHolder(projectedFeatures);
       features.addFeatureHolder(localFeatures);
     } catch (ChangeVetoException cve) {
-      throw new BioError(cve, "Assertion Failure: Should be able to do this");
+      throw new AssertionFailure("Assertion Failure: Should be able to do this", cve);
     }
     
     return features;

@@ -22,6 +22,8 @@
 
 package org.biojava.bio.symbol;
 
+import java.io.Serializable;
+
 
 /**
  * This extends SymbolList with API for manipulating, inserting and deleting
@@ -43,12 +45,11 @@ package org.biojava.bio.symbol;
  */
 public interface GappedSymbolList
 extends SymbolList {
-    /**
-     * Return the underlying (ungapped) SymbolList.
-     *
-     * @since 1.3
-     */
-
+  /**
+   * Return the underlying (ungapped) SymbolList.
+   *
+   * @since 1.4
+   */
     public SymbolList getSourceSymbolList();
 
   /**
@@ -164,4 +165,18 @@ extends SymbolList {
    * @return the index of the last character not to be a gap
    */
   public int lastNonGap();
+
+  /**
+   * Get a Location that contains exactly those positions that are not gaps.
+   *
+   * <p>
+   * This will be a Location that contains every symbol in the underlying
+   * ungapped sequence. Every symbol not in the Location is not from the
+   * underlying sequence and is a gap.
+   * </p>
+   *
+   * @return a new Location that contains all non-gap symbols
+   */
+  public Location getUngappedLocation();
+
 }

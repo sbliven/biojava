@@ -37,37 +37,49 @@ implements SequenceRenderContext {
   private final SymbolList symbols;
   private final FeatureHolder features;
   private final RangeLocation range;
-  
+  private final int symOffset;
+
   public SubSequenceRenderContext(
     SequenceRenderContext src,
     SymbolList symbols,
     FeatureHolder features,
     RangeLocation range
   ) {
+    this(src, symbols, features, range, 0);
+  }
+
+  public SubSequenceRenderContext(
+          SequenceRenderContext src,
+          SymbolList symbols,
+          FeatureHolder features,
+          RangeLocation range,
+          int symOffset
+  ) {
     this.src = src;
     this.symbols = symbols;
     this.features = features;
     this.range = range;
+    this.symOffset = symOffset;
   }
-  
+
   public int getDirection() {
     return src.getDirection();
   }
-  
+
   public double getScale() {
     return src.getScale();
   }
-  
+
   public double sequenceToGraphics(int i) {
-    return src.sequenceToGraphics(i);
+    return src.sequenceToGraphics(i + symOffset);
   }
-  
+
   public int graphicsToSequence(double d) {
-    return src.graphicsToSequence(d);
+    return src.graphicsToSequence(d) - symOffset;
   }
-  
+
   public int graphicsToSequence(Point point) {
-    return src.graphicsToSequence(point);
+    return src.graphicsToSequence(point) - symOffset;
   }
 
   public SymbolList getSymbols() {
@@ -85,7 +97,7 @@ implements SequenceRenderContext {
       return features;
     }
   }
-  
+
   public RangeLocation getRange() {
     if(range == null) {
       return src.getRange();
@@ -93,15 +105,15 @@ implements SequenceRenderContext {
       return range;
     }
   }
-  
+
   public SequenceRenderContext.Border getLeadingBorder() {
     return src.getLeadingBorder();
   }
-  
+
   public SequenceRenderContext.Border getTrailingBorder() {
     return src.getTrailingBorder();
   }
-  
+
   public Font getFont() {
     return src.getFont();
   }

@@ -35,6 +35,15 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 
 /**
+ * An implementation of SequenceRenderer that delegates rendering to another
+ * renderer.
+ * 
+ * <p>
+ * This takes care of all event notification and method invocation for you.
+ * Subclass this and over-ride methods, and then possibly call the method on
+ * super to forward the call on to the wrapped renderer.
+ * </p>
+ *
  * @author Matthew Pocock
  */
 public class SequenceRendererWrapper
@@ -49,8 +58,21 @@ implements SequenceRenderer, Serializable {
   
   private SequenceRenderer renderer;
   private transient ChangeForwarder rendForwarder;
-  
+
+  /**
+   *  Create a new renderer with no wrapped renderer.
+   *
+   * @for.user
+   * It is important that you call setRenderer() on this instance before
+   * trying to use it to display anything.
+   */
   public SequenceRendererWrapper() {}
+
+  /**
+   * Create a new wrapper with a wrapped renderer
+   *
+   * @param renderer  the SequenceRenderer to wrap up
+   */
   public SequenceRendererWrapper(SequenceRenderer renderer) {
     this.renderer = renderer;
   }
