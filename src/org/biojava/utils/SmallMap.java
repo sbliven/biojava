@@ -1,5 +1,6 @@
 package org.biojava.utils;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -15,7 +16,7 @@ import java.util.*;
  * @author Thomas Down
  */
 
-public class SmallMap extends AbstractMap {
+public class SmallMap extends AbstractMap implements Serializable {
     private Object[] mappings;
     private int numMappings = 0;
 
