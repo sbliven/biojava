@@ -535,6 +535,33 @@ public class GappedResidueList extends AbstractResidueList {
   }
 
   /**
+   * Return the index of the first Residue that is not a Gap character.
+   * <P>
+   * All residues before firstNonGap are leading gaps. firstNonGap is effectively
+   * the index in the view of residue 1 in the original sequence.
+   *
+   * @return the index of the first character not to be a gap
+   */
+  public int firstNonGap() {
+    int first = ((Block) blocks.get(0)).viewStart;
+    return first;
+  }
+  
+  /**
+   * Return the index of the last Residue that is not a Gap character.
+   * <P>
+   * All residues after lastNonGap untill length are trailing gaps.
+   * lastNonGap is effectively the index in the view of residue length
+   * in the original sequence.
+   *
+   * @return the index of the last character not to be a gap
+   */
+  public int lastNonGap() {
+    int last = ((Block) blocks.get(blocks.size() - 1)).viewEnd;
+    return last;
+  }
+  
+  /**
    * Create a new GappedResidueList that will view source.
    *
    * @param source  the underlying sequence

@@ -265,7 +265,7 @@ public class FlatModel implements MarkovModel {
     for(Iterator i = stateAlpha.residues().iterator(); i.hasNext(); ) {
       State s = (State) i.next();
 
-      System.out.println("Processing transitions from " + s.getName());
+      //System.out.println("Processing transitions from " + s.getName());
 
       if(s instanceof MagicalState) { // from magic
         for(Iterator j = model.transitionsFrom(s).iterator(); j.hasNext(); ) {

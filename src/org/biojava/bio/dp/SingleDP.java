@@ -23,6 +23,7 @@
 package org.biojava.bio.dp;
 
 import java.util.*;
+import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.tools.*;
 
@@ -388,12 +389,15 @@ class SingleDP extends DP {
 
     // initialize
     for (int l = 0; l < stateCount; l++) {
-      double [] v = dpCursor.currentCol();
-      //if(states[l] == getModel().magicalState()) {
+      double [] vc = dpCursor.currentCol();
+      double [] vl = dpCursor.lastCol();
+      if(states[l] == getModel().magicalState()) {
         //System.out.println("Initializing start state to 0.0");
-      //}
-      v[l] = (states[l] == getModel().magicalState()) ? 0.0 : Double.NEGATIVE_INFINITY;
-      oldPointers[l] = newPointers[l] = new BackPointer(states[l], null, 1.0);
+        vc[l] = vl[l] = 0.0;
+        oldPointers[l] = newPointers[l] = new BackPointer(states[l], 1.0);
+      } else {
+        vc[l] = vl[l] = Double.NEGATIVE_INFINITY;
+      }
     }
 
     // viterbi
@@ -403,8 +407,13 @@ class SingleDP extends DP {
       //System.out.println(res.getName());
       double [] currentCol = dpCursor.currentCol();
       double [] lastCol = dpCursor.lastCol();
-      for (int l = 0; l < getDotStatesIndex(); l++) { // emission states
-        double emission = ((EmissionState) states[l]).getWeight(res);
+      for (int l = 0; l < states.length; l++) {
+        double emission;
+        if(l < getDotStatesIndex()) {
+          emission = ((EmissionState) states[l]).getWeight(res);
+        } else {
+          emission = 0.0;
+        }
         int [] tr = transitions[l];
         //System.out.println("Considering " + tr.length + " alternatives");
         double [] trs = transitionScore[l];
@@ -419,81 +428,39 @@ class SingleDP extends DP {
           for (int kc = 0; kc < tr.length; kc++) {
             int k = tr[kc];
             double t = trs[kc];
-            double p = t + lastCol[k];
+            double s = (l < getDotStatesIndex()) ? lastCol[k] : currentCol[k];
+            double p = t + s;
+            /*System.out.println("Looking at scores from " + states[k].getName());
+            System.out.println("Old = " + lastCol[k]);
+            System.out.println("New = " + currentCol[k]);
+            System.out.println(
+              "Considering " + states[k].getName() + " -> " +
+              states[l].getName() + ", " + t + " + " + s + " = " + p
+            );*/
             if (p > transProb) {
               transProb = p;
               prev = k;
               trans = t;
             }
           }
-          currentCol[l] = transProb + emission;
           if(prev != -1) {
-            //System.out.println(states[prev].getName() + "->" + states[l].getName());
-            newPointers[l] = new BackPointer(states[l], oldPointers[prev],
-                                             trans + emission);
+            currentCol[l] = transProb + emission;
+            /*System.out.println(
+              states[prev].getName() + "->" + states[l].getName() + ", " +
+              (trans + emission)
+            );*/
+            newPointers[l] = new BackPointer(
+              states[l],
+              (l < getDotStatesIndex()) ? oldPointers[prev] : newPointers[prev],
+              trans + emission
+            );
+            /*System.out.println("Succesfully completed " + states[l].getName());
+            System.out.println("Old = " + lastCol[l]);
+            System.out.println("New = " + currentCol[l]);*/
           } else {
             //System.out.println(states[l].getName() + ": Nowhere to come from");
-          }
-        }
-      }
-      for(int l = getDotStatesIndex(); l < states.length; l++) { // emission -> dot
-        int [] tr = transitions[l];
-        double [] trs = transitionScore[l];
-        double transProb = Double.NEGATIVE_INFINITY;
-        double trans = Double.NEGATIVE_INFINITY;
-        int prev = -1;
-        for (int kc = 0; kc < tr.length; kc++) {
-          int k = tr[kc];
-          if(k >= getDotStatesIndex()) {
-            break;
-          }
-          double t = trs[kc];
-          double p = t + currentCol[k];
-          if (p > transProb) {
-            transProb = p;
-            prev = k;
-            trans = t;
-          }
-          currentCol[l] = transProb;
-          if(prev != -1) {
-            //System.out.println(states[prev].getName() + "->" + states[l].getName());
-            newPointers[l] = new BackPointer(
-              states[l],
-              newPointers[prev],
-              trans
-            );
-          }
-        }
-      }
-      for(int l = getDotStatesIndex(); l < states.length; l++) { // dot -> dot
-        int [] tr = transitions[l];
-        double [] trs = transitionScore[l];
-        double transProb = Double.NEGATIVE_INFINITY;
-        double trans = Double.NEGATIVE_INFINITY;
-        int prev = -1;
-        for (int kc = 0; kc < tr.length; kc++) {
-          int k = tr[kc];
-          if(k < getDotStatesIndex()) {
-            continue;
-          }
-          if(k >= l) {
-            break;
-          }
-          double t = trs[kc];
-          double p = t + currentCol[k];
-          if (p > transProb) {
-            transProb = p;
-            prev = k;
-            trans = t;
-          }
-          currentCol[l] = transProb;
-          if(prev != -1) {
-            //System.out.println(states[prev].getName() + "->" + states[l].getName());
-            newPointers[l] = new BackPointer(
-              states[l],
-              newPointers[prev],
-              trans
-            );
+            currentCol[l] = Double.NEGATIVE_INFINITY;
+            newPointers[l] = null;
           }
         }
       }
@@ -516,15 +483,18 @@ class SingleDP extends DP {
 
     int len = 0;
     BackPointer b2 = best;
+    int dotC = 0;
+    int emC = 0;
     // trace back ruit to check out size of path
-    while(b2 != null) {
-      if(! (b2.state instanceof MagicalState)) {
-        len++;
+    while(b2.back != b2) {
+      len++;
+      if(b2.state instanceof EmissionState) {
+        emC++;
+      } else {
+        dotC++;
       }
       b2 = b2.back;
     };
-    
-    //System.out.println("Counted backpointers. Alignment of length " + len);
 
     GappedResidueList resView = new GappedResidueList(dpCursor.resList());
     double [] scores = new double[len];
@@ -535,22 +505,31 @@ class SingleDP extends DP {
 
     b2 = best;
     int ri = dpCursor.resList().length()+1;
-    while(b2 != null) {
-      len--;
-      //System.out.println("At " + len + " state=" + b2.state.getName() + ", score=" + b2.score + ", back=" + b2.back);
+    int lc = len;
+    int gaps = 0;
+    while(b2.back != b2) {
+      lc--;
+      //System.out.println("At " + lc + " state=" + b2.state.getName() + ", score=" + b2.score + ", back=" + b2.back);
       if(b2.state instanceof MagicalState) {
         b2 = b2.back;
         continue;
       }
-      stateList.set(len, b2.state);
+      stateList.set(lc, b2.state);
       if(b2.state instanceof DotState) {
         resView.addGapInSource(ri);
+        gaps++;
       } else {
         ri--;
       }
-      scores[len] = b2.score;
+      scores[lc] = b2.score;
       b2 = b2.back;
     }
+
+    /*System.out.println("Counted " + emC + " emissions and " + dotC + " dots");
+    System.out.println("Counted backpointers. Alignment of length " + len);
+    System.out.println("Input list had length " + dpCursor.resList().length());
+    System.out.println("Added gaps: " + gaps);
+    System.out.println("Gapped view has length " + resView.length());*/
 
     Map labelToResList = new HashMap();
     labelToResList.put(StatePath.SEQUENCE, resView);
@@ -567,9 +546,21 @@ class SingleDP extends DP {
     public double score;
 
     public BackPointer(State state, BackPointer back, double score) {
+      if(back == null) {
+        throw new BioError(
+          "Attempted to make a backpointer with a null 'back' from state " +
+          state.getName() + ", " + score
+        );
+      }
       this.state = state;
       this.back = back;
       this.score = score;
+    }
+    
+    public BackPointer(State state, double score) {
+      this.state = state;
+      this.score = score;
+      this.back = this;
     }
   }
 }

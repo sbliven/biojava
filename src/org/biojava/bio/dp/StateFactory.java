@@ -29,6 +29,7 @@ import org.biojava.bio.seq.tools.*;
 public class StateFactory {
   public static AbstractState createState(
     Alphabet alpha,
+    int [] advance,
     String name
   ) {
     AbstractState state;
@@ -38,7 +39,7 @@ public class StateFactory {
     } else if(alpha == DNATools.getAmbiguity()) {
       state = new AmbiguityState();
     } else {
-      state = new SimpleState(alpha);
+      state = new SimpleState(alpha, advance);
     }
     state.setName(name);
     

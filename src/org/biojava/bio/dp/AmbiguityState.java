@@ -35,8 +35,9 @@ import org.biojava.bio.seq.tools.DNATools;
  * residues.
  */
 public class AmbiguityState extends AbstractState {
+  private static int[] advance = {1};
+
   private double [] score;
-    private int[] advance = {1};
   
   {
     score = new double[16];
@@ -72,6 +73,10 @@ public class AmbiguityState extends AbstractState {
     return index;
   }
   
+  public int [] getAdvance() {
+    return advance;
+  }
+  
   public AmbiguityState() {
     super(DNATools.getAmbiguity());
   }
@@ -83,10 +88,6 @@ public class AmbiguityState extends AbstractState {
     }
   }
   
-    public int[] getAdvance() {
-	return advance;
-    }
-
   private class AmbiguousStateTrainer implements StateTrainer {
     double c [] =  new double[4];
       

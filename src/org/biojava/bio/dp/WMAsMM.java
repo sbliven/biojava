@@ -185,11 +185,15 @@ public class WMAsMM implements MarkovModel {
   }
   
   private class WMState extends AbstractState {
+    private int [] advance = {1};
     private int index;
-      private int[] advance = {1};
     
     public int index() {
       return index;
+    }
+    
+    public final int [] getAdvance() {
+      return advance;
     }
     
     public double getWeight(Residue res)
@@ -209,13 +213,10 @@ public class WMAsMM implements MarkovModel {
       }
     }
     
-    public int[] getAdvance() {
-      return advance;
-    }
-      
     public WMState(int index) {
       super(emissionAlphabet());
       this.index = index;
+      this.advance = advance;
     }
   }
 }

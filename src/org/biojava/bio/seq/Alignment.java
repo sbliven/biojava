@@ -78,13 +78,18 @@ public interface Alignment extends ResidueList {
   
   /**
    * Make a view onto this alignment.
+   * <P>
+   * If labels is null, then each label will be kept. Otherwise, only those in
+   * labels will be kept.
+   * If loc is null, then the entire length of the alignment will be kept.
+   * If loc is not null, then only the columns within the location will be kept.
    *
-   * @param residueLists the set of sequences to include
+   * @param labels the Set of sequences to include by label
    * @param loc the Location to include
    * @return  a sub Alignment
    * @throws  NoSuchElementException if labels contains any item that is not a label
    */
-  Alignment subAlignment(List labels, Location loc)
+  Alignment subAlignment(Set labels, Location loc)
   throws NoSuchElementException;
   
   /**

@@ -33,11 +33,16 @@ import org.biojava.bio.seq.tools.DNATools;
  * This implementation is optimized for DNA.
  */
 public class DNAState extends AbstractState {
-  private double [] scores;
-  private int[] advance = {1};
+  private final double [] scores;
+  private final static int[] advance = { 1 };
 
   {
     scores = new double[4];
+  }
+
+  
+  public int [] getAdvance() {
+    return advance;
   }
 
   public double getWeight(Residue r)
@@ -65,10 +70,6 @@ public class DNAState extends AbstractState {
     if(trainerSet.isEmpty()) {
       modelTrainer.registerTrainerForState(this, new DNAStateTrainer());
     }
-  }
-  
-  public int[] getAdvance() {
-    return advance;
   }
 
   private class DNAStateTrainer implements StateTrainer {

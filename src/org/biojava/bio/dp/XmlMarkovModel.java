@@ -81,6 +81,10 @@ public class XmlMarkovModel {
       alphaE.getAttribute("name")
     );
     SimpleMarkovModel model = new SimpleMarkovModel(heads, seqAlpha);
+    int [] advance = new int[heads];
+    for(int i = 0; i < heads; i++) {
+      advance[i] = 1;
+    }
       
     ResidueParser symParser = seqAlpha.getParser("symbol");
     ResidueParser nameParser = seqAlpha.getParser("name");
@@ -94,7 +98,7 @@ public class XmlMarkovModel {
     for(int i = 0; i < states.getLength(); i++) {
       Element stateE = (Element) states.item(i);
       String name = stateE.getAttribute("name");
-      AbstractState state = StateFactory.createState(seqAlpha, name);
+      AbstractState state = StateFactory.createState(seqAlpha, advance, name);
       nameToState.put(name, state);
       NodeList weights = stateE.getElementsByTagName("weight");
       for(int j = 0; j < weights.getLength(); j++) {

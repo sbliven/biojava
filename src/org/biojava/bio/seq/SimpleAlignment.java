@@ -55,12 +55,21 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
     return residueListForLabel(label).residueAt(column);
   }
   
-  public Alignment subAlignment(List residueLists, Location loc)
+  public Alignment subAlignment(Set labels, Location loc)
   throws NoSuchElementException {
     Map labelsToResList = new HashMap();
-    for(Iterator i = getLabels().iterator(); i.hasNext(); ) {
+    Iterator i;
+    if(labels != null) {
+      i = labels.iterator();
+    } else {
+      i = getLabels().iterator();
+    }
+    while(i.hasNext()) {
       Object label = i.next();
       ResidueList res = residueListForLabel(label);
+      if(loc != null) {
+        res = loc.residues(res);
+      }
       labelsToResList.put(label, res);
     }
     return new SimpleAlignment(labelsToResList);
@@ -99,9 +108,13 @@ public class SimpleAlignment extends AbstractResidueList implements Alignment {
           length = rl.length();
         } else {
           if(rl.length() != length) {
+            StringBuffer sb = new StringBuffer();
+            for(Iterator labI = labels.iterator(); labI.hasNext(); ) {
+              Object lab = labI.next();
+              sb.append("\n\t" + lab + " (" + residueListForLabel(lab).length() + ")");
+            }
             throw new IllegalArgumentException(
-              "All ResidueLists must be the same length (" + length +
-              "), not " + rl.length()
+              "All ResidueLists must be the same length: " + sb.toString()
             );
           }
         }

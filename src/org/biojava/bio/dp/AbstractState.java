@@ -30,16 +30,17 @@ import org.biojava.bio.seq.*;
 /**
  * An abstract implementation of the State interface.
  * <P>
- * You only need to define the methods getWeight, setWeight, getTrainer.
+ * You only need to define the methods getWeight, setWeight, getTrainer
+ * and advance.
  * If you know a lot about the probability distribution of your residues,
  * you may wish to override sampleResidue as well.
  *
  * @author Matthew Pocock
  */
 public abstract class AbstractState implements EmissionState {
-  private String name;
-  private Alphabet alpha;
+  private final Alphabet alpha;
   private Annotation annotation;
+  private String name;
   
   public char getSymbol() {
     return name.charAt(0);
@@ -66,7 +67,8 @@ public abstract class AbstractState implements EmissionState {
 
   public abstract void setWeight(Residue res, double weight) throws IllegalResidueException;
   
-  public AbstractState(Alphabet alpha) throws IllegalArgumentException {
+  public AbstractState(Alphabet alpha)
+  throws IllegalArgumentException {
     if(alpha == null)
       throw new IllegalArgumentException("alpha can not be null");
     this.alpha = alpha;
