@@ -26,12 +26,19 @@ import java.io.*;
 import java.util.*;
 
 import org.biojava.bio.*;
+import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 /**
  * Simple parser for feature tables.  This is shared between
  * the EMBL and GENBANK format readers.
+ *
+ * <p>
+ * This has been partially re-written for newio, but would probably
+ * benefit from a few more changes.  In particular, it should notify
+ * startFeature as early as possible, then use addFeatureProperty.
+ * </p>
  *
  * @author Thomas Down
  * @author Matthew Pocock
@@ -44,7 +51,6 @@ class FeatureTableParser {
     private final static int ATTRIBUTE=3;
 
     private int featureStatus = WITHOUT;
-    private List features;
     private StringBuffer featureBuf;
     
     private String featureType;
@@ -52,11 +58,10 @@ class FeatureTableParser {
     private Map featureAttributes;
     private StrandedFeature.Strand featureStrand;
 
-    private FeatureBuilder fb;
+    private SeqIOListener listener;
 
-    FeatureTableParser(FeatureBuilder fb) {
-	this.fb = fb;
-	features = new ArrayList();
+    FeatureTableParser(SeqIOListener listener) {
+	this.listener = listener;
 	featureBuf = new StringBuffer();
 	featureAttributes = new HashMap();
     }
@@ -103,108 +108,137 @@ class FeatureTableParser {
 	}
     }
 
-    public void endFeature() throws BioException {
-	features.add(fb.buildFeatureTemplate(featureType, 
-					     featureLocation,
-					     featureStrand,
-					     featureAttributes));
+    public void endFeature() 
+	throws BioException 
+    {
+	listener.startFeature(buildFeatureTemplate(featureType,
+						   featureLocation,
+						   featureStrand,
+						   featureAttributes));
+	listener.endFeature();
 	featureStatus = WITHOUT;
-	
     }
 
-  private Location parseLocation(String loc) throws BioException {
-    boolean joining = false;
-    boolean complementing = false;
-    boolean isComplement = false;
-    boolean ranging = false;
-	
-	  int start = -1;
-
-    Location result = null;
-    List locationList = null;
-	
-    StringTokenizer toke = new StringTokenizer(loc, "(),. ><", true);
-    int level = 0;
-    while (toke.hasMoreTokens()) {
-	String t = toke.nextToken();
-	// System.err.println(t);
-	if (t.equals("join") || t.equals("order")) {
-	    joining = true;
-	    locationList = new ArrayList();
-	} else if (t.equals("complement")) {
-	    complementing = true;
-	    isComplement = true;
-	} else if (t.equals("(")) {
-	    ++level;
-	} else if (t.equals(")")) {
-	    --level;
-	} else if (t.equals(".")) {
-	} else if (t.equals(",")) {
-	} else if (t.equals(">")) {
-	} else if (t.equals("<")) {
-	} else if (t.equals(" ")) {
-	} else {
-	    // System.err.println("Range! " + ranging);
-	    // This ought to be an actual coordinate.
-	    int pos = -1;
-	    try {  
-		pos = Integer.parseInt(t);
-	    } catch (NumberFormatException ex) {
-		throw new BioException("bad locator: " + t + " " + loc);
-	    }
-
-	    if (ranging == false) {
-		start = pos;
-		ranging = true;
-	    } else {
-		Location rl = new RangeLocation(start, pos);
-		if (joining) {
-		    locationList.add(rl);
-		} else {
-		    if (result != null) {
-			throw new BioException(
-					       "Tried to set result to " + rl +
-					       " when it was alredy set to " + result
-					       );
-		    }
-		    result = rl;
-		}
-		ranging = false;
-		complementing = false;
+    protected Feature.Template buildFeatureTemplate(String type,
+						    Location loc,
+						    StrandedFeature.Strand strandHint,
+						    Map attrs) 
+    {
+	StrandedFeature.Template t = new StrandedFeature.Template();
+	t.annotation = new SimpleAnnotation();
+	for (Iterator i = attrs.entrySet().iterator(); i.hasNext(); ) {
+	    Map.Entry e = (Map.Entry) i.next();
+	    try {
+		t.annotation.setProperty(e.getKey(), e.getValue());
+	    } catch (ChangeVetoException cve) {
+		throw new BioError(
+				   cve,
+				   "Assertion Failure: Couldn't set up the annotation"
+				   );
 	    }
 	}
+
+	t.location = loc;
+	t.type = type;
+	t.source = "EMBL";
+	t.strand = strandHint;
+
+	return t;
     }
-    if (level != 0) {
+
+    private Location parseLocation(String loc) throws BioException {
+	boolean joining = false;
+	boolean complementing = false;
+	boolean isComplement = false;
+	boolean ranging = false;
+	
+	int start = -1;
+
+	Location result = null;
+	List locationList = null;
+	
+	StringTokenizer toke = new StringTokenizer(loc, "(),. ><", true);
+	int level = 0;
+	while (toke.hasMoreTokens()) {
+	    String t = toke.nextToken();
+	    // System.err.println(t);
+	    if (t.equals("join") || t.equals("order")) {
+		joining = true;
+	    locationList = new ArrayList();
+	    } else if (t.equals("complement")) {
+		complementing = true;
+		isComplement = true;
+	    } else if (t.equals("(")) {
+		++level;
+	    } else if (t.equals(")")) {
+		--level;
+	    } else if (t.equals(".")) {
+	    } else if (t.equals(",")) {
+	    } else if (t.equals(">")) {
+	    } else if (t.equals("<")) {
+	    } else if (t.equals(" ")) {
+	    } else {
+		// System.err.println("Range! " + ranging);
+		// This ought to be an actual coordinate.
+		int pos = -1;
+		try {  
+		    pos = Integer.parseInt(t);
+		} catch (NumberFormatException ex) {
+		    throw new BioException("bad locator: " + t + " " + loc);
+		}
+
+		if (ranging == false) {
+		    start = pos;
+		    ranging = true;
+		} else {
+		    Location rl = new RangeLocation(start, pos);
+		    if (joining) {
+			locationList.add(rl);
+		    } else {
+			if (result != null) {
+			    throw new BioException(
+						   "Tried to set result to " + rl +
+						   " when it was alredy set to " + result
+						   );
+			}
+			result = rl;
+		    }
+		    ranging = false;
+		    complementing = false;
+		}
+	    }
+	}
+	if (level != 0) {
 	    throw new BioException("Mismatched parentheses: " + loc);
-    }
+	}
     
-	  if (ranging) {
+	if (ranging) {
 	    Location rl = new PointLocation(start);
-      if (joining) {
-        locationList.add(rl);
-      } else {
-        if (result != null) {
-          throw new BioException();
-        }
-        result = rl;
-      }
-    }
-
-    if (isComplement) {
+	    if (joining) {
+		locationList.add(rl);
+	    } else {
+		if (result != null) {
+		    throw new BioException();
+		}
+		result = rl;
+	    }
+	}
+	
+	if (isComplement) {
 	    featureStrand = StrandedFeature.NEGATIVE;
-    } else { 
+	} else { 
 	    featureStrand = StrandedFeature.POSITIVE;
-    }
+	}
     
-    if (result == null) {
-      if(locationList == null) {
-   	    throw new BioException("Location null: " + loc);
-      }
-      result = new CompoundLocation(locationList);
-    }
+	if (result == null) {
+	    if(locationList == null) {
+		throw new BioException("Location null: " + loc);
+	    }
+	    result = new CompoundLocation(locationList);
+	}
 
-    return result;
-  }
+	return result;
+    }
 
     private void processAttribute(String attr) throws BioException {
 	// System.err.println(attr);
@@ -238,10 +272,6 @@ class FeatureTableParser {
 	    }
 	    featureAttributes.put(tag, val);
 	}
-    }
-
-    public Collection getFeatures() {
-	return features;
     }
 
     public boolean inFeature() {

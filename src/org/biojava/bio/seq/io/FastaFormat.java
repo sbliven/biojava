@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.biojava.bio.seq.io;
 
 import java.io.*;
@@ -30,152 +29,207 @@ import org.biojava.utils.StaticMemberPlaceHolder;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.io.*;
+
 
 /**
  * Format for Fasta files.
  * <P>
  * The description lines often include complicated annotation for sequences.
- * The parsing of these is handled by a FastaDescriptionReader object.
+ * The parsing of these is handled by a FastaDescriptionReader object.</p>
+ * 
+ * <p>This version included the experimental new input system by thomasd</p>
  *
+ * @author Thomas Down
  * @author Matthew Pocock
  */
+
 public class FastaFormat implements SequenceFormat, Serializable {
-  private final static int MAX_LINELENGTH = 1024;
+    /**
+     * Constant string which is the property key used to notify
+     * listeners of the description lines of FASTA sequences.
+     */
 
-  /**
-   * The default description reader.
-   */
-  public static final FastaDescriptionReader DEFAULT_DESCRIPTION_READER;
+    public final static String PROPERTY_DESCRIPTIONLINE = "description_line";
   
-  static {
-    DEFAULT_DESCRIPTION_READER = new DefaultDescriptionReader() {
-      public Object writeReplace() throws IOException {
-        try {
-          return new StaticMemberPlaceHolder(
-            FastaFormat.class.getField("DEFAULT_DESCRIPTION_READER")
-          );
-        } catch (NoSuchFieldException nsfe) {
-          throw new BioError(
-            nsfe,
-            "Could not find field while serializing"
-          );
-        }
-      }
-    };
-  }
-  
-  /**
-   * The description reader.
-   */
-  private FastaDescriptionReader fdr = DEFAULT_DESCRIPTION_READER;
-  
-  /**
-   * The line width for output.
-   */
-  private int lineWidth = 60;
+    /**
+     * The line width for output.
+     */
+    private int lineWidth = 60;
 
-  /**
-   * Set the descripiton reader.
-   *
-   * @param dfr the new description reader
-   */
-  public void setDescriptionReader(FastaDescriptionReader fdr) {
-    this.fdr = fdr;
-  }
-  
-  /**
-   * Retrieve the current description reader.
-   *
-   * @return the current description reader
-   */
-  public FastaDescriptionReader getDescriptionReader() {
-    return fdr;
-  }
-  
-  /**
-   * Retrive the current line width.
-   *
-   * @return the line width
-   */
-  public int getLineWidth() {
-    return lineWidth;
-  }
+    /**
+     * Retrive the current line width.
+     *
+     * @return the line width
+     */
 
-  /**
-   * Set the line width.
-   * <P>
-   * When writing, the lines of sequence will never be longer than the line
-   * width.
-   *
-   * @param width the new line width
-   */
-  public void setLineWidth(int width) {
-    this.lineWidth = lineWidth;
-  }
+    public int getLineWidth() {
+	return lineWidth;
+    }
 
-  public Sequence readSequence(StreamReader.Context context,
-                               SymbolParser resParser,
-                               SequenceFactory sf)
-         throws IllegalSymbolException, IOException {
-    final BufferedReader in = context.getReader();
-    StringBuffer sb = new StringBuffer();
+    /**
+     * Set the line width.
+     * <P>
+     * When writing, the lines of sequence will never be longer than the line
+     * width.
+     *
+     * @param width the new line width
+     */
 
-    String line;
+    public void setLineWidth(int width) {
+	this.lineWidth = lineWidth;
+    }
 
-    // find >
+    public void readSequence(StreamReader.Context context,
+			     SymbolParser resParser,
+			     SeqIOListener siol)
+	throws IllegalSymbolException, IOException 
+    {
+	final BufferedReader in = context.getReader();
     
-    for(line = in.readLine(); line != null; line = in.readLine()) {
-      if(line.startsWith(">")) {
-        break;
-      }
-    }
+	String line = in.readLine();
+	if(line == null) {
+	    throw new IOException("File ended prematurely");
+	}
+
+	siol.startSequence();
     
-    if(line == null) {
-      throw new IOException("File ended prematurely");
-    }
+	String description = line.substring(1).trim();
+	siol.addSequenceProperty(PROPERTY_DESCRIPTIONLINE, description);
+
+	FASymbolReader fasr = new FASymbolReader(resParser, in);
+	siol.addSymbols(fasr);
+
+	siol.endSequence();
     
-    String description = line.substring(1).trim();
-
-    // read in all the sequence up untill > or eof
-    ArrayList resList = new ArrayList();
-    in.mark(MAX_LINELENGTH);
-    line = in.readLine();
-    while(line != null && !line.startsWith(">")) {
-      StringTokenizer st = new StringTokenizer(line, " ", false);
-      while(st.hasMoreTokens()) {
-        String token = st.nextToken();
-        resList.ensureCapacity(resList.size() + getLineWidth());
-        resList.addAll(resParser.parse(token).toList());
-      }
-      in.mark(MAX_LINELENGTH);
-      line = in.readLine();
-    }
-    
-    if(line == null) {
-      context.streamEmpty();
-    } else {
-      in.reset();
+	if (fasr.hasSeenEOF()) {
+	    context.streamEmpty();
+	} 
     }
 
-    String [] urnName = fdr.parseURNName(description);
-    Sequence seq = sf.createSequence(new SimpleSymbolList(resParser.getAlphabet(),
-                                                           resList), 
-                                     urnName[0], urnName[1], null);
-    fdr.parseAnnotation(description, seq.getAnnotation());
-    return seq;
-  }
+    private class FASymbolReader implements SymbolReader {
+	private char[] cache;
+	private int cacheMax;
+	private int cacheMark;
 
-  public void writeSequence(Sequence seq, PrintStream os) {
-    os.print(">");
-    os.println(fdr.writeDescription(seq).trim());
+	private boolean theEnd;
+	private boolean seenEOF;
 
-    int length = seq.length();
-    for(int i = 1; i <= length; i++) {
-      os.print(seq.symbolAt(i).getToken());
-      if( (i % lineWidth) == 0)
-        os.println();
+	private SymbolParser parser;
+	private BufferedReader br;
+
+	public FASymbolReader(SymbolParser p, BufferedReader br) {
+	    parser = p;
+	    this.br = br;
+
+	    cache = new char[256];
+	    cacheMax = cacheMark = 0;
+	}
+
+	public boolean hasSeenEOF() {
+	    return seenEOF;
+	}
+
+	public Alphabet getAlphabet() {
+	    return parser.getAlphabet();
+	}
+
+	public Symbol readSymbol() throws IOException, IllegalSymbolException {
+	    if (cacheMark >= cacheMax)
+		readMoreSymbols();
+	    if (cacheMark >= cacheMax)
+		throw new IOException("Attempting to read beyond end of FASTA sequence.");
+	    Symbol s = parser.parseToken(new String(cache, cacheMark, 1));
+	    cacheMark += 1;
+	    return s;
+	}
+
+	public int readSymbols(Symbol[] buffer,
+			       int pos,
+			       int length)
+	    throws IOException, IllegalSymbolException
+	{
+	    if (cacheMark >= cacheMax)
+		readMoreSymbols();
+	    if (cacheMark >= cacheMax)
+		throw new IOException("Attempting to read beyond end of FASTA sequence.");
+	    int i = 0;
+	    int scl = cacheMax - cacheMark;
+	    while (i < length && i < scl) {
+		buffer[pos + i] = parser.parseToken(new String(cache, cacheMark + i, 1));
+		++i;
+	    }
+	    cacheMark += i;
+
+	    return i;
+	}
+
+	public boolean hasMoreSymbols() {
+	    try {
+		if (cacheMark >= cacheMax)
+		    readMoreSymbols();
+		return !(cacheMark >= cacheMax);
+	    } catch (IOException ex) {
+		return false;
+	    }
+	}
+
+	private void readMoreSymbols()
+	    throws IOException
+	{
+	    cacheMark = cacheMax = 0;
+	    if (theEnd)
+		return;
+
+	    char[] tempCache = new char[256];
+	    br.mark(cache.length);
+	    int bytesRead = br.read(tempCache, 0, tempCache.length);
+	    if (bytesRead < 0) {
+		theEnd = seenEOF = true;
+		cacheMax = 0;
+		return;
+	    } 
+
+	    for (int i = 0; i < bytesRead; ++i) {
+		char c = tempCache[i];
+
+		if (c == '>') {
+		    theEnd = true;
+		    br.reset();
+		    if (br.skip(i) != i)
+			throw new IOException("Couldn't reset to start of next sequence");
+		    return;
+		} else if (c != '\n') {
+		    cache[cacheMax++] = c;
+		}
+	    }
+
+	    if (cacheMax == 0 && !theEnd)
+		readMoreSymbols();
+	}
     }
-    if( (length % lineWidth) != 0)
-      os.println();
-  }
+
+    protected String writeDescription(Sequence seq) {
+	String description = null;
+	try {
+	    description = seq.getAnnotation().getProperty(PROPERTY_DESCRIPTIONLINE).toString();
+	} catch (NoSuchElementException ex) {
+	    description = seq.getName();
+	}
+	return description;
+    }
+
+    public void writeSequence(Sequence seq, PrintStream os) {
+	os.print(">");
+	os.println(writeDescription(seq));
+
+	int length = seq.length();
+	for(int i = 1; i <= length; i++) {
+	    os.print(seq.symbolAt(i).getToken());
+	    if( (i % lineWidth) == 0)
+		os.println();
+	}
+	if( (length % lineWidth) != 0)
+	    os.println();
+    }
 }

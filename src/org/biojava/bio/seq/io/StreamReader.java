@@ -47,6 +47,7 @@ import org.biojava.bio.seq.*;
  * will not require you to keep any of the sequences in memory.
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
 public class StreamReader implements SequenceIterator {
   /**
@@ -60,53 +61,59 @@ public class StreamReader implements SequenceIterator {
   private SymbolParser resParser;
   
   /**
-   * The sequenc format.
+   * The sequence format.
    */
   private SequenceFormat format;
   
-  /**
-   * The sequence factory.
-   */
-  private SequenceFactory sf;
+    /**
+     * The sequence-builder factory.
+     */
+    private SequenceBuilderFactory sf;
 
-  /**
-   * Pull the next sequence out of the stream.
-   * <P>
-   * This method will delegate parsing from the stream to a SequenceFormat
-   * object, and then return the resulting sequence.
-   *
-   * @return the next Sequence
-   * @throws NoSuchElementException if the end of the stream has been hit
-   * @throws BioException if for any reason the next sequence could not be read
-   */
-  public Sequence nextSequence()
-         throws NoSuchElementException, BioException  {
-    if(context.isStreamEmpty())
-      throw new NoSuchElementException("Stream is empty");
+    /**
+     * Pull the next sequence out of the stream.
+     * <P>
+     * This method will delegate parsing from the stream to a SequenceFormat
+     * object, and then return the resulting sequence.
+     *
+     * @return the next Sequence
+     * @throws NoSuchElementException if the end of the stream has been hit
+     * @throws BioException if for any reason the next sequence could not be read
+     */
 
-    try {
-      return format.readSequence(context, resParser, sf);
-    } catch (Exception e) {
-      throw new BioException(e, "Could not read sequence");
+    public Sequence nextSequence()
+	throws NoSuchElementException, BioException  
+    {
+	if(context.isStreamEmpty())
+	    throw new NoSuchElementException("Stream is empty");
+
+	try {
+	    SequenceBuilder builder = sf.makeSequenceBuilder();
+	    format.readSequence(context, resParser, builder);
+	    return builder.makeSequence();
+	} catch (Exception e) {
+	    throw new BioException(e, "Could not read sequence");
+	}
     }
-  }
 
-  public boolean hasNext() {
-    return !context.isStreamEmpty();
-  }
+    public boolean hasNext() {
+	return !context.isStreamEmpty();
+    }
 
-  public StreamReader(InputStream is, SequenceFormat format,
+  public StreamReader(InputStream is,
+		      SequenceFormat format,
                       SymbolParser resParser,
-                      SequenceFactory sf)  {
+                      SequenceBuilderFactory sf)  {
     context = new Context(is);
     this.format = format;
     this.resParser = resParser;
     this.sf = sf;
   }
 
-  public StreamReader(BufferedReader reader, SequenceFormat format,
+  public StreamReader(BufferedReader reader,
+		      SequenceFormat format,
                       SymbolParser resParser,
-                      SequenceFactory sf)  {
+                      SequenceBuilderFactory sf)  {
     context = new Context(reader);
     this.format = format;
     this.resParser = resParser;

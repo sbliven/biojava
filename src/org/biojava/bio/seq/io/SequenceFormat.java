@@ -43,6 +43,7 @@ import org.biojava.bio.seq.*;
  * ensembl SequenceFactory.
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
 public interface SequenceFormat {
   /**
@@ -60,10 +61,6 @@ public interface SequenceFormat {
    * @param sf the sequence factory for generating a full sequence
    * @return the resulting sequence
    */
-  Sequence readSequence(StreamReader.Context context,
-                        SymbolParser resParser,
-                        SequenceFactory sf)
-         throws BioException, IllegalSymbolException, IOException;
 
     /**
     *Write out a sequence to the specified printstream
@@ -72,4 +69,13 @@ public interface SequenceFormat {
     */
 
   void writeSequence(Sequence seq, PrintStream os) throws IOException;
+    
+    /**
+     * Read a sequence and pass it to a SeqIOListener
+     */
+
+    public void readSequence(StreamReader.Context context,
+			     SymbolParser symParser,
+			     SeqIOListener listener)
+	throws BioException, IllegalSymbolException, IOException;
 }
