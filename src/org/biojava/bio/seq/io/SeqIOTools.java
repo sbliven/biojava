@@ -51,7 +51,7 @@ public class SeqIOTools  {
 
     private static SymbolParser getProteinParser() {
 	try {
-	    return DNATools.getDNA().getParser("token");
+	    return ProteinTools.getTAlphabet().getParser("token");
 	} catch (BioException ex) {
 	    throw new BioError(ex, "Assertion failing: Couldn't get PROTEIN token parser");
 	}
