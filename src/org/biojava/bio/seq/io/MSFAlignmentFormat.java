@@ -94,10 +94,10 @@ public class MSFAlignmentFormat
             }
             //read each name (between Name:   and Len:
             while ((line.indexOf("//") == -1) && ((line.trim()).length() !=
-                    0)) {
-                Matcher matcher = mtc.matcher(line);
-                sequenceName = matcher.group(1).trim();
-                if (sequenceName == null) {
+                    0)) 
+            {
+                Matcher matcher = mtc.matcher(line);  
+                if (!matcher.find()) {
                     break;
                 }               //end of sequence names
                 //sequenceName = line.substring(rem.getSubStartIndex(1),
@@ -105,7 +105,9 @@ public class MSFAlignmentFormat
                 if ((line.trim()).length() == 0) {
                     break;
                 }
+                sequenceName = matcher.group(1).trim();
                 sequenceNames.add(sequenceName);
+
                 line = reader.readLine();
             }
             sequenceData = new String[sequenceNames.size()];
@@ -209,6 +211,7 @@ public class MSFAlignmentFormat
             }
             return  (new SimpleAlignment(sequenceDataMap));
         } catch (Exception e) {
+            e.printStackTrace();
             System.err.println("MSFFormatReader " + e.getMessage());
             // throw (e);
         }
