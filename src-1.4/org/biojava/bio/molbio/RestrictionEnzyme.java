@@ -45,6 +45,19 @@ import org.biojava.bio.symbol.SymbolList;
 public class RestrictionEnzyme implements Serializable
 {
     /**
+     * <code>CUT_SIMPLE</code> a cut type where the enzyme cuts in one
+     * position relative to the recognition site i.e. the vast
+     * majority of cases.
+     */
+    public static final int CUT_SIMPLE = 0;
+
+    /**
+     * <code>CUT_COMPOUND</code> a cut type where the enzyme cuts in
+     * two positions relative to the recognition site.
+     */
+    public static final int CUT_COMPOUND = 1;
+
+    /**
      * <code>OVERHANG_5PRIME</code> the sticky end type created by
      * enzymes which leave a 5' overhang.
      */
@@ -64,6 +77,7 @@ public class RestrictionEnzyme implements Serializable
 
     protected String name;
     protected SymbolList site;
+    protected int cutType;
     protected int [] dsCutPositions;
     protected int [] usCutPositions;
 
@@ -101,6 +115,7 @@ public class RestrictionEnzyme implements Serializable
         this(name, site,
              null,
              new int [] { dsForward, dsReverse });
+        cutType = CUT_SIMPLE;
     }
 
     /**
@@ -142,6 +157,7 @@ public class RestrictionEnzyme implements Serializable
         this(name, site,
              new int [] { usForward, usReverse },
              new int [] { dsForward, dsReverse });
+        cutType = CUT_COMPOUND;
     }
 
     /**
@@ -185,10 +201,11 @@ public class RestrictionEnzyme implements Serializable
 
         StringBuffer sb = new StringBuffer();
         sb.append(name);
+        sb.append(" ");
 
         if (usCutPositions != null)
         {
-            sb.append(" (");
+            sb.append("(");
             sb.append(usCutPositions[0]);
             sb.append("/");
             sb.append(usCutPositions[1]);
@@ -198,7 +215,7 @@ public class RestrictionEnzyme implements Serializable
         try
         {
             for (int i = 1; i <= site.length(); i++)
-                sb.append(DNATools.dnaToken(site.symbolAt(i)));
+                sb.append(Character.toUpperCase(DNATools.dnaToken(site.symbolAt(i))));
         }
         catch (IllegalSymbolException ise)
         {
@@ -258,6 +275,31 @@ public class RestrictionEnzyme implements Serializable
     }
 
     /**
+     * <code>isPalindromic</code> returns true if the recognition site
+     * is palindromic.
+     *
+     * @return a <code>boolean</code>.
+     */
+    public boolean isPalindromic()
+    {
+        return forwardRegex.equals(reverseRegex);
+    }
+
+    /**
+     * <code>getCutType</code> returns the type of cut produced by the
+     * enzyme. This will be one of either RestrictionEnzyme.CUT_SIMPLE
+     * (where it cuts in one position relative to the recognition site
+     * i.e. the vast majority of cases) or
+     * RestrictionEnzyme.CUT_COMPOUND (where it cuts in two positions).
+     *
+     * @return an <code>int</code>.
+     */
+    public int getCutType()
+    {
+        return cutType;
+    }
+
+    /**
      * <code>getDownstreamCut</code> returns the cut site within or
      * downstream of the recognition site.
      *
@@ -281,7 +323,7 @@ public class RestrictionEnzyme implements Serializable
      */
     public int [] getUpstreamCut() throws BioException
     {
-        if (usCutPositions == null)
+        if (cutType == CUT_SIMPLE)
             throw new BioException(name + " does not cut upstream of the recognition site");
 
         return usCutPositions;
@@ -317,7 +359,7 @@ public class RestrictionEnzyme implements Serializable
      */
     public int getUpstreamEndType() throws BioException
     {
-        if (usCutPositions == null)
+        if (cutType == CUT_SIMPLE)
             throw new BioException(name + " does not cut upstream of the recognition site");
 
         if (usCutPositions[0] > usCutPositions[1])

@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
 import junit.framework.TestCase;
 
 import org.biojava.bio.BioError;
-import org.biojava.bio.BioException;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
@@ -47,24 +46,24 @@ public class RestrictionEnzymeManagerTest extends TestCase
         assertEquals(40, allEnz.size());
     }
 
-    public void testGetEnzyme() throws BioException
+    public void testGetEnzyme()
     {
-        RestrictionEnzyme ecoRi = RestrictionEnzymeManager.getEnzyme("EcoRI");
-        assertEquals("EcoRI", ecoRi.getName());
+        RestrictionEnzyme ecoRI = RestrictionEnzymeManager.getEnzyme("EcoRI");
+        assertEquals("EcoRI", ecoRI.getName());
 
         try
         {
             RestrictionEnzyme invalid = RestrictionEnzymeManager.getEnzyme("xxxx");
         }
-        catch (BioException be)
+        catch (IllegalArgumentException iae)
         {
             return;
         }
 
-        fail("Expected BioException");
+        fail("Expected IllegalArgumentException");
     }
 
-    public void testGetIsoschizomers() throws BioException
+    public void testGetIsoschizomers()
     {
         Set isoAvaI = RestrictionEnzymeManager.getIsoschizomers("AvaI");
         assertEquals(1, isoAvaI.size());
@@ -82,12 +81,12 @@ public class RestrictionEnzymeManagerTest extends TestCase
         {
             Set invalid = RestrictionEnzymeManager.getIsoschizomers("xxxx");
         }
-        catch (BioException be)
+        catch (IllegalArgumentException iae)
         {
             return;
         }
 
-        fail("Expected BioException");
+        fail("Expected IllegalArgumentException");
     }
 
     public void testGetNCutters()
@@ -102,10 +101,10 @@ public class RestrictionEnzymeManagerTest extends TestCase
         }
     }
 
-    public void testGetPatterns() throws BioException
+    public void testGetPatterns()
     {
-        RestrictionEnzyme ecoRi = RestrictionEnzymeManager.getEnzyme("EcoRI");
-        Pattern [] pat = RestrictionEnzymeManager.getPatterns(ecoRi);
+        RestrictionEnzyme ecoRI = RestrictionEnzymeManager.getEnzyme("EcoRI");
+        Pattern [] pat = RestrictionEnzymeManager.getPatterns(ecoRI);
 
         assertEquals("ga{2}t{2}c", pat[0].pattern());
         assertEquals("ga{2}t{2}c", pat[1].pattern());
@@ -134,11 +133,11 @@ public class RestrictionEnzymeManagerTest extends TestCase
         {
             pat = RestrictionEnzymeManager.getPatterns(custom);
         }
-        catch (BioException be)
+        catch (IllegalArgumentException iae)
         {
             return;
         }
 
-        fail("Expected BioException");
+        fail("Expected IllegalArgumentException");
     }
 }

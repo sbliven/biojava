@@ -68,6 +68,24 @@ public class RestrictionEnzymeTest extends TestCase
         }
     }
 
+    public void testIsPalindromic()
+    {
+        RestrictionEnzyme ecoRI = RestrictionEnzymeManager.getEnzyme("EcoRI");
+        assertTrue(ecoRI.isPalindromic());
+
+        RestrictionEnzyme bsp24I = RestrictionEnzymeManager.getEnzyme("Bsp24I");
+        assertTrue(! bsp24I.isPalindromic());
+    }
+
+    public void testGetCutType()
+    {
+        RestrictionEnzyme ecoRI = RestrictionEnzymeManager.getEnzyme("EcoRI");
+        assertEquals(RestrictionEnzyme.CUT_SIMPLE, ecoRI.getCutType());
+
+        RestrictionEnzyme bsp24I = RestrictionEnzymeManager.getEnzyme("Bsp24I");
+        assertEquals(RestrictionEnzyme.CUT_COMPOUND, bsp24I.getCutType());
+    }
+
     public void testGetDownstreamCut() throws BioException
     {
         RestrictionEnzyme ecoRI = RestrictionEnzymeManager.getEnzyme("EcoRI");
@@ -82,7 +100,7 @@ public class RestrictionEnzymeTest extends TestCase
         RestrictionEnzyme bsp24I = RestrictionEnzymeManager.getEnzyme("Bsp24I");
         int [] us = bsp24I.getUpstreamCut();
 
-        assertEquals(8, us[0]);
+        assertEquals(8,  us[0]);
         assertEquals(13, us[1]);
 
         RestrictionEnzyme ecoRI = RestrictionEnzymeManager.getEnzyme("EcoRI");

@@ -26,34 +26,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
+import org.biojava.bio.Annotation;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
-import org.biojava.bio.program.tagvalue.ChangeTable;
-import org.biojava.bio.program.tagvalue.LineSplitParser;
-import org.biojava.bio.program.tagvalue.Parser;
-import org.biojava.bio.program.tagvalue.RegexSplitter;
-import org.biojava.bio.program.tagvalue.RegexpParser;
-import org.biojava.bio.program.tagvalue.TagDropper;
-import org.biojava.bio.program.tagvalue.TagValueContext;
-import org.biojava.bio.program.tagvalue.TagValueListener;
-import org.biojava.bio.program.tagvalue.TagValueParser;
-import org.biojava.bio.program.tagvalue.ValueChanger;
+import org.biojava.bio.SmallAnnotation;
+import org.biojava.bio.program.tagvalue.*;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.MotifTools;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeVetoException;
+
 import org.biojava.utils.ParserException;
 import org.biojava.utils.SmallSet;
 
@@ -62,11 +50,11 @@ import org.biojava.utils.SmallSet;
  * static <code>RestrictionEnzyme</code> instances. A properties file
  * should be placed in the CLASSPATH containing a key
  * "rebase.data.file" and a corresponding value of a REBASE file
- * (standard REBASE format #31 conventially named withrefm.### where
+ * (standard REBASE format #31 conventionally named withrefm.### where
  * ### is the version number). This file will be loaded by the
  * <code>RestrictionEnzymeManager</code> <code>ClassLoader</code>. The
- * properties are loaded as a ResourceBundle, so the file should be
- * named "RestrictionEnzymeManager.properties".</p>
+ * properties are loaded as a <code>ResourceBundle</code>, so the file
+ * should be named "RestrictionEnzymeManager.properties".</p>
  *
  * @author Keith James
  */
@@ -140,6 +128,7 @@ public final class RestrictionEnzymeManager
     private static Map nameToIsoschizomers;
     private static Map sizeToCutters;
     private static Map enzymeToPattern;
+    private static Map enzymeToAnnotation;
 
     /**
      * <code>RestrictionEnzymeManager</code> is a static utility
@@ -165,16 +154,13 @@ public final class RestrictionEnzymeManager
      * sensitive.
      *
      * @return a <code>RestrictionEnzyme</code>.
-     *
-     * @exception BioException if there is no such enzyme.
      */
     public static RestrictionEnzyme getEnzyme(String name)
-        throws BioException
     {
         if (! nameToEnzyme.containsKey(name))
-            throw new BioException("Unknown RestrictionEnzyme name '"
-                                   + name
-                                   + "'");
+            throw new IllegalArgumentException("Unknown RestrictionEnzyme name '"
+                                               + name
+                                               + "'");
 
         return (RestrictionEnzyme) nameToEnzyme.get(name);
     }
@@ -187,15 +173,13 @@ public final class RestrictionEnzymeManager
      * sensitive.
      *
      * @return a <code>Set</code> of <code>RestrictionEnzyme</code>s.
-     *
-     * @exception BioException if there is no such enzyme.
      */
-    public static Set getIsoschizomers(String name) throws BioException
+    public static Set getIsoschizomers(String name)
     {
         if (! nameToIsoschizomers.containsKey(name))
-            throw new BioException("Unknown RestrictionEnzyme name '"
-                                   + name
-                                   + "'");
+            throw new IllegalArgumentException("Unknown RestrictionEnzyme name '"
+                                               + name
+                                               + "'");
         
         return Collections.unmodifiableSet((Set) nameToIsoschizomers.get(name));
     }
@@ -204,7 +188,8 @@ public final class RestrictionEnzymeManager
      * <code>getNCutters</code> returns an unmodifable set of all
      * enzymes with a cut site of size n.
      *
-     * @param n an <code>int</code> cut .
+     * @param n an <code>int</code> cut site size.
+     *
      * @return a <code>Set</code> of <code>RestrictionEnzyme</code>s.
      */
     public static Set getNCutters(int n)
@@ -228,19 +213,95 @@ public final class RestrictionEnzymeManager
      *
      * @return a <code>Pattern []</code> array with the forward strand
      * <code>Pattern</code> at index 0 and the reverse at index 1.
-     *
-     * @exception BioException if the enzyme is unknown to the
-     * manager (such as a custom enzyme).
      */
     public static Pattern [] getPatterns(RestrictionEnzyme enzyme)
-        throws BioException
     {
         if (! enzymeToPattern.containsKey(enzyme))
-            throw new BioException("RestrictionEnzyme '"
-                                   + enzyme.getName()
-                                   + "' is not registered. No precompiled Pattern is available");
+            throw new IllegalArgumentException("RestrictionEnzyme '"
+                                               + enzyme.getName()
+                                               + "' is not registered. No precompiled Pattern is available");
 
         return (Pattern []) enzymeToPattern.get(enzyme);
+    }
+
+    /**
+     * <code>getAnnotation</code> returns an immutable annotation
+     * describing the enzyme. This is suitable for adding to
+     * <code>Feature</code>s which represent restriction sites as a
+     * flyweight object.
+     *
+     * @param enzyme a <code>RestrictionEnzyme</code>.
+     *
+     * @return an <code>Annotation</code>.
+     */
+    public static Annotation getAnnotation(RestrictionEnzyme enzyme)
+    {
+        if (! enzymeToAnnotation.containsKey(enzyme))
+            throw new IllegalArgumentException("RestrictionEnzyme '"
+                                               + enzyme.getName()
+                                               + "' is not registered. No Annotation is available");
+
+        return (Annotation) enzymeToAnnotation.get(enzyme);
+    }
+
+    /**
+     * <code>register</code> regisiters a new
+     * <code>RestrictionEnzyme</code> with the manager.
+     *
+     * @param enzyme a <code>RestrictionEnzyme</code> to register.
+     *
+     * @param isoschizomers a <code>Set</code> of
+     * <code>String</code>s which are names of isoschizomers.
+     */
+    public synchronized static void register(RestrictionEnzyme enzyme,
+                                             Set               isoschizomers)
+    {
+        for (Iterator ii = isoschizomers.iterator(); ii.hasNext();)
+        {
+            Object o = ii.next();
+
+            if (! (o instanceof String))
+            {
+                throw new IllegalArgumentException("Isoschizomers set may contain only String names. Found '"
+                                                   + o
+                                                   + "'");
+            }
+        }
+
+        String name = enzyme.getName();
+        nameToEnzyme.put(name, enzyme);
+        nameToIsoschizomers.put(name, isoschizomers);
+
+        Integer sizeKey = new Integer(enzyme.getRecognitionSite().length());
+        if (sizeToCutters.containsKey(sizeKey))
+        {
+            Set s = (Set) sizeToCutters.get(sizeKey);
+            s.add(enzyme);
+        }
+        else
+        {
+            Set s = new HashSet();
+            s.add(enzyme);
+            sizeToCutters.put(sizeKey, s);
+        }
+
+        Pattern forward = Pattern.compile(enzyme.getForwardRegex());
+        Pattern reverse = Pattern.compile(enzyme.getReverseRegex());
+        enzymeToPattern.put(enzyme, new Pattern [] { forward, reverse });
+
+        Annotation annotation = new SmallAnnotation();
+        try
+        {
+            annotation.setProperty("name", name);
+        }
+        catch (ChangeVetoException cve)
+        {
+            throw new BioError(cve, "Assertion Failure: failed to modify Annotation");
+        }
+
+        annotation.addChangeListener(ChangeListener.ALWAYS_VETO);
+
+        enzymeToAnnotation.put(enzyme, annotation);
     }
 
     private static void loadData(InputStream is)
@@ -249,6 +310,7 @@ public final class RestrictionEnzymeManager
         nameToIsoschizomers = new HashMap();
         sizeToCutters       = new HashMap();
         enzymeToPattern     = new HashMap();
+        enzymeToAnnotation  = new HashMap();
 
         try
         {
@@ -371,26 +433,8 @@ public final class RestrictionEnzymeManager
                 isoschizomers = new HashSet(isoBuffer);
             }
 
-            RestrictionEnzyme enz = createEnzyme();
-            nameToEnzyme.put(name, enz);
-            nameToIsoschizomers.put(name, isoschizomers);
-
-            Integer sizeKey = new Integer(site.length());
-            if (sizeToCutters.containsKey(sizeKey))
-            {
-                Set s = (Set) sizeToCutters.get(sizeKey);
-                s.add(enz);
-            }
-            else
-            {
-                Set s = new HashSet();
-                s.add(enz);
-                sizeToCutters.put(sizeKey, s);
-            }
-
-            Pattern forward = Pattern.compile(enz.getForwardRegex());
-            Pattern reverse = Pattern.compile(enz.getReverseRegex());
-            enzymeToPattern.put(enz, new Pattern [] { forward, reverse });
+            RestrictionEnzyme enzyme = createEnzyme();
+            register(enzyme, isoschizomers);
         }
 
         public void startTag(Object tag) throws ParserException
