@@ -58,9 +58,9 @@ import org.xml.sax.helpers.DefaultHandler;
  * # encapsulates the multiple &lt;BlastOutput&gt; elements into &lt;blast_aggregator&gt;
  *
  * sed '/&gt;?xml/d' $1 | sed '/&lt;!DOCTYPE/d' | sed '1i\
- * &lt;blast_aggregator&gt;
+ * &lt;blast_aggregate&gt;
  * $a\
- * &lt;/blast_aggregator&gt;' > $2
+ * &lt;/blast_aggregate&gt;' > $2
  *</pre>
 
  * @author David Huen
