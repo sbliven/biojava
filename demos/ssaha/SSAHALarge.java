@@ -9,13 +9,13 @@ import org.biojava.bio.seq.db.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.program.ssaha.*;
 
-public class SSAHA {
+public class SSAHALarge {
   public static void main(String[] args)
   throws Throwable {
     File dataStoreFile = new File(args[0]);
     File seqFile = new File(args[1]);
     
-    final DataStore ds = new MappedDataStoreFactory().getDataStore(
+    final DataStore ds = new NIODataStoreFactory().getDataStore(
       dataStoreFile
     );
     

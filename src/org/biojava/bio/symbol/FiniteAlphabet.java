@@ -84,7 +84,7 @@ public interface FiniteAlphabet extends Alphabet {
    * If the symbol matches multiple AtomicSymbols, then each matching symbol it
    * will be removed.
    *
-   * @param s the Symbol to remove
+   * @param s the Symbol to removeintGot 
    * @throws IllegalSymbolException if the symbol is null, or if for any reason
    *         it can't be removed
    * @throws ChangeVetoException  if either the alphabet doesn't allow symbols

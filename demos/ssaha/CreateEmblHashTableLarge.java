@@ -10,7 +10,7 @@ import org.biojava.bio.seq.db.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.program.ssaha.*;
 
-public class CreateEmblHashTable {
+public class CreateEmblHashTableLarge {
   public static void main(String[] args)
   throws Throwable {
     File dataStoreFile = new File(args[0]);
@@ -20,7 +20,7 @@ public class CreateEmblHashTable {
     }
     SequenceDB seqDB = new FilesWrapper(seqFiles);
     
-    DataStore ds = new MappedDataStoreFactory().buildDataStore(
+    DataStore ds = new NIODataStoreFactory().buildDataStore(
       dataStoreFile,
       seqDB,
       new DNANoAmbPack(DNATools.t()),

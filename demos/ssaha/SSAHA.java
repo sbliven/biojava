@@ -15,7 +15,7 @@ public class SSAHA {
     File dataStoreFile = new File(args[0]);
     File seqFile = new File(args[1]);
     
-    final DataStore ds = new DataStoreFactory().getDataStore(
+    final DataStore ds = new MappedDataStoreFactory().getDataStore(
       dataStoreFile
     );
     

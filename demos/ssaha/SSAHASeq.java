@@ -16,7 +16,7 @@ public class SSAHASeq {
     File dataStoreFile = new File(args[0]);
     String seqStr = args[1];
     
-    final DataStore ds = new DataStoreFactory().getDataStore(
+    final DataStore ds = new MappedDataStoreFactory().getDataStore(
       dataStoreFile
     );
     

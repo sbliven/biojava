@@ -44,7 +44,7 @@ public class DistributionTools {
   /**
    * Compares the emission spectra of two distributions
    * @return true if alphabets and symbol weights are equal for the two distributions.
-   * @throws BioException if one or both of the Distributions are over infinite alphabets.
+   * @throws IllegalAlphabetException if one or both of the Distributions are over infinite alphabets.
    * @since 1.2
    */
   public static final boolean areEmissionSpectraEqual(Distribution a, Distribution b)
@@ -52,7 +52,7 @@ public class DistributionTools {
       //are either of the Dists infinite
       if(a.getAlphabet() instanceof FiniteAlphabet == false
           || b.getAlphabet() instanceof FiniteAlphabet == false){
-        throw new BioException("Cannot compare emission spectra over infinite alphabet");
+        throw new IllegalAlphabetException("Cannot compare emission spectra over infinite alphabet");
       }
       //are alphabets equal?
       if(!(a.getAlphabet().equals(b.getAlphabet()))){
@@ -162,21 +162,22 @@ public class DistributionTools {
 
   /**
    * Creates an array of distributions, one for each column of the alignment
-   * @throws BioRuntimeException if all sequences don't use the same alphabet
+   * @throws IllegalAlphabetException if all sequences don't use the same alphabet
    * @param countGaps if true gaps will be included in the distributions
    * @param nullWeight the number of pseudo counts to add to each distribution
    * @since 1.2
    */
   public static final Distribution[] distOverAlignment(Alignment a,
                                                  boolean countGaps,
-                                                 double nullWeight){
+                                                 double nullWeight)
+  throws IllegalAlphabetException {
 
     List seqs = a.getLabels();
     FiniteAlphabet alpha = (FiniteAlphabet)((SymbolList)a.symbolListForLabel(seqs.get(0))).getAlphabet();
     for(int i = 1; i < seqs.size();i++){
         FiniteAlphabet test = (FiniteAlphabet)((SymbolList)a.symbolListForLabel(seqs.get(i))).getAlphabet();
         if(test != alpha){
-          throw new BioRuntimeException("Cannot Calculate distOverAlignment() for alignments with"+
+          throw new IllegalAlphabetException("Cannot Calculate distOverAlignment() for alignments with"+
           "mixed alphabets");
         }
     }
@@ -213,11 +214,14 @@ public class DistributionTools {
    * Creates an array of distributions, one for each column of the alignment.
    * No pseudo counts are used.
    * @param countGaps if true gaps will be included in the distributions
+   * @throws IllegalAlphabetException if the alignment is not composed from sequences all
+   *         with the same alphabet
    *
    * @since 1.2
    */
   public static final Distribution[] distOverAlignment(Alignment a,
-                                                 boolean countGaps){
+                                                 boolean countGaps)
+  throws IllegalAlphabetException {
     return distOverAlignment(a,countGaps,0.0);
   }
 

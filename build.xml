@@ -170,6 +170,11 @@
         <exclude name="**/CVS/**" />
       </fileset>
     </copy>
+    <copy todir="${build.src.demos}">
+      <fileset dir="${demos14.dir}">
+        <exclude name="**/CVS/**" />
+      </fileset>
+    </copy>
   </target>
 
   <target name="prepare-14demos" if="java14">

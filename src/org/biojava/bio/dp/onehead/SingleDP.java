@@ -374,7 +374,7 @@ public class SingleDP extends DP implements Serializable {
           }
         }
         currentCol[l] = Math.log(score) + constant;
-        System.out.println("currentCol[" + states[l].getName() + "]=" + currentCol[l]);
+        //System.out.println("currentCol[" + states[l].getName() + "]=" + currentCol[l]);
       }
     }
   }

@@ -240,20 +240,23 @@ extends AbstractDistribution implements Serializable{
 
 
     protected void trainImpl(DistributionTrainerContext dtc, double weight) {
+      System.out.println("Training");
       try {
         Distribution nullModel = getNullModel();
         double[] weights = getWeights();
-        double []total = new double[weights.length];
+        double[] total = new double[weights.length];
         double sum = 0.0;
 
         for(int i = 0; i < total.length; i++) {
           AtomicSymbol s = (AtomicSymbol) indexer.symbolForIndex(i);
-          sum += total[i] =
-            getCount(dtc, s) +
-            nullModel.getWeight(s) * weight;
+          sum +=
+            total[i] =
+              getCount(dtc, s) +
+              nullModel.getWeight(s) * weight;
         }
         double sum_inv = 1.0 / sum;
         for(int i = 0; i < total.length; i++) {
+          System.out.println("\t" + weights[i] + "\t" + total[i] * sum_inv);
           weights[i] = total[i] * sum_inv;
         }
       } catch (IllegalSymbolException ise) {

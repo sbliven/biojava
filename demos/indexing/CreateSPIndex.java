@@ -24,7 +24,7 @@ public class CreateSPIndex {
       File spFile = new File(args[i]);
       Indexer indexer = new Indexer(spFile, store);
       indexer.setPrimaryKeyName("ID");
-      indexer.addSeccondaryKey("AC");
+      indexer.addSecondaryKey("AC");
       
       ChangeTable changeTable = new ChangeTable();
       

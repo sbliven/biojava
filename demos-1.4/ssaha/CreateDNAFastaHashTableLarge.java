@@ -10,7 +10,7 @@ import org.biojava.bio.seq.db.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.bio.program.ssaha.*;
 
-public class CreateEmblHashTable {
+public class CreateDNAFastaHashTableLarge {
   public static void main(String[] args)
   throws Throwable {
     File dataStoreFile = new File(args[0]);
@@ -20,7 +20,7 @@ public class CreateEmblHashTable {
     }
     SequenceDB seqDB = new FilesWrapper(seqFiles);
     
-    DataStore ds = new MappedDataStoreFactory().buildDataStore(
+    DataStore ds = new NIODataStoreFactory().buildDataStore(
       dataStoreFile,
       seqDB,
       new DNANoAmbPack(DNATools.t()),
@@ -56,7 +56,7 @@ public class CreateEmblHashTable {
         {
           try {
             indx = 0;
-            si = SeqIOTools.readEmbl(
+            si = SeqIOTools.readFastaDNA(
               new BufferedReader(
                 new FileReader(
                   files[indx]
@@ -80,7 +80,7 @@ public class CreateEmblHashTable {
             indx++;
             if(indx < files.length) {
               try {
-                si = SeqIOTools.readEmbl(
+                si = SeqIOTools.readFastaDNA(
                   new BufferedReader(
                     new FileReader(
                       files[indx]
