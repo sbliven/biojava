@@ -10,7 +10,7 @@ import java.io.*;
  * @author Thomas Down
  */
 
-public class FastXMLWriter implements XMLWriter {
+public class FastXMLWriter /* implements XMLWriter */ {
     private PrintWriter writer;
     private boolean isOpeningTag = false;
 
