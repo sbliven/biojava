@@ -32,6 +32,7 @@ import java.net.Socket ;
 /** reads a PDB file from a local SRS installation using getz Actually
  * is the same as PDBFileReader, but instead of reading from a file stream, reads from a
  * buffered stream.
+ * if no matching PDB code found, returns null
  *
  * @author Andreas Prlic
  *
@@ -104,6 +105,7 @@ public class PDBSRSReader implements StructureIO {
 
 
      /** load a structure from from SRS installation using wgetz
+      * returns null if no structure found
      */
     public  Structure getStructureById(String pdbId) 
 	throws IOException
@@ -111,7 +113,13 @@ public class PDBSRSReader implements StructureIO {
 	
 	BufferedReader buf ;
 	//inStream = getInputStream();
-	buf = getBufferedReader(pdbId) ;
+	try {
+	    buf = getBufferedReader(pdbId) ;
+	}
+	catch (IOException e) {
+	    // no pdb code found that is suitable ;
+	    return null ;
+	}
 	/*String line = buf.readLine ();	
 	while (line != null) {
 	    System.out.println (line);
