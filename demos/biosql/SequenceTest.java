@@ -84,6 +84,15 @@ public class SequenceTest {
 	temp.location = new RangeLocation(2, 4);
 	Feature cf = f.createFeature(temp);
 
+	System.out.println("Changing feature type");
+	f.setType("this_is_a_changed_type");
+
+	System.out.println("Changing feature source");
+	f.setSource("this_is_a_changed_source");
+
+	System.out.println("Changing feature location");
+	f.setLocation(new RangeLocation(1, 5));
+
 	System.out.println("Checking event system (feature level)");
 
 	f.addChangeListener(ChangeListener.ALWAYS_VETO, ChangeType.UNKNOWN);
