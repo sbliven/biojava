@@ -365,7 +365,7 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
 		    stepCounter = stepSize;
 		    if (lengthFromUnknown >= wordLength) {
 			try {
-			    processWord(word, pos - wordLength);
+			    processWord(word, pos - wordLength + 1);
 			} catch (ParseException ex) {
 			    throw new BioRuntimeException(ex);
 			}
