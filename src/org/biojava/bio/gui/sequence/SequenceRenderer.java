@@ -35,31 +35,48 @@ import org.biojava.bio.seq.*;
  * multiple times to the same panel. The renderer is required to request how
  * much leading and trailing space it requires, as well as the depth (space
  * orthoganal to the direction that the sequence is rendered).
+ * <P>
+ * The leading and trailing distances are the number of pixles overhang needed
+ * to cleanly render any line of sequence information. For example, a ruler will
+ * need trailing space to render the total sequence length at the end.
  *
  * @author Thomas Down
  * @author Matthew Pocock
  */
 public interface SequenceRenderer {
+  
   /**
    * Render a portion (possibly all) of the information for sp to g, displaying
-   * all of the data that would fall within seqBox.
+v   * all of the data that would fall within seqBox.
    *
    * @param g the Graphics2D to render to
    * @param sp the SequencePanel that encapsulates the information to render
-   * @param seqBox the rectangle within which to render sequence stuff
+   * @param min the minimum symbol to render (inclusive)
+   * @param max the maximum symbol to render (inclusive)
    */
-  void paint(Graphics2D g, SequenceRenderContext sp, Rectangle2D seqBox);
+  void paint(
+    Graphics2D g, SequenceRenderContext sp,
+    int min, int max
+  );
   
   /**
    * Retrieve the depth of this renderer when rendering sp.
    * <P>
    * The depth may vary between sequence panels - for example based upon
-   * sequence length.
+   * sequence length. Each line of information in the SequenceRendererContext
+   * only renders a region of the sequence. The depth for one complete line may
+   * be different from that for another due to the sequence having more or less
+   * information in that region to show. For example, a feature renderer
+   * implementation may chose to collapse down to a depth of zero pixles if
+   * there are no features to render within a region.
    *
    * @param sp the SequencePanel to return info for
+   * @param min the first symbol rendered (inclusive)
+   & @param max the last symbol rendered (inclusive)
    * @return the depth of the renderer for that sequence panel
    */
-    double getDepth(SequenceRenderContext sp);
+  double getDepth(SequenceRenderContext sp, int min, int max);
+
   /**
    * Retrieve the minimum leading distance for this renderer when rendering sp.
    * <P>
@@ -69,7 +86,8 @@ public interface SequenceRenderer {
    * @param sp the SequencePanel to return info for
    * @return the leading distance of the renderer for that sequence panel
    */
-    double getMinimumLeader(SequenceRenderContext sp);
+  double getMinimumLeader(SequenceRenderContext sp);
+    
   /**
    * Retrieve the minimum trailing distance for this renderer when rendering sp.
    * <P>
@@ -79,5 +97,5 @@ public interface SequenceRenderer {
    * @param sp the SequencePanel to return info for
    * @return the trailing distance of the renderer for that sequence panel
    */
-    double getMinimumTrailer(SequenceRenderContext sp);
+  double getMinimumTrailer(SequenceRenderContext sp);
 }

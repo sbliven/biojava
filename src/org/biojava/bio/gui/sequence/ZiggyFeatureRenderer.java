@@ -22,7 +22,8 @@
 package org.biojava.bio.gui.sequence;
 
 import java.util.*;
-import java.beans.*;
+
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
@@ -42,90 +43,141 @@ import java.util.List;
  *
  * @author Matthew Pocock
  */
-public class ZiggyFeatureRenderer extends AbstractFeatureRenderer
+public class ZiggyFeatureRenderer extends AbstractForwarder
 implements FeatureRenderer, java.io.Serializable {
   private Paint outline = Color.black;
   private Paint fill = Color.yellow;
-  private double borderDepth = 3.0;
-
-
-  public void setFill(Paint p) {
-    Paint oldFill = fill;
-    fill = p;
-    pcs.firePropertyChange("fill", oldFill, fill);
+  private double blockDepth = 10.0;
+  private double zigDepth = 5.0;
+  
+  public void setFill(Paint p)
+  throws ChangeVetoException {
+    if(hasListeners()) {
+      ChangeSupport cs = getChangeSupport(SequenceRenderContext.REPAINT);
+      synchronized(cs) {
+        ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.REPAINT);
+        cs.firePreChangeEvent(ce);
+        this.fill = p;
+        cs.firePostChangeEvent(ce);
+      }
+    } else {
+      this.fill = p;
+    }
   }
 
   public Paint getFill() {
     return fill;
   }
 
-  public void setOutline(Paint p) {
-    Paint oldOutline = outline;
-    outline = p;
-    pcs.firePropertyChange("outline", oldOutline, outline);
+  public void setOutline(Paint p)
+  throws ChangeVetoException {
+    if(hasListeners()) {
+      ChangeSupport cs = getChangeSupport(SequenceRenderContext.REPAINT);
+      synchronized(cs) {
+        ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.REPAINT);
+        cs.firePreChangeEvent(ce);
+        this.outline = p;
+        cs.firePostChangeEvent(ce);
+      }
+    } else {
+      this.outline = p;
+    }
   }
 
   public Paint getOutline() {
     return outline;
   }
   
-  public void setBorderDepth(double depth) {
-    double oldDepth = borderDepth;
-    borderDepth = depth;
-    pcs.firePropertyChange(
-      "borderDepth",
-      new Double(oldDepth), new Double(depth)
-    );
+  public void setBlockDepth(double depth)
+  throws ChangeVetoException {
+    if(hasListeners()) {
+      ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
+      synchronized(cs) {
+        ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.LAYOUT);
+        cs.firePreChangeEvent(ce);
+        this.blockDepth = depth;
+        cs.firePostChangeEvent(ce);
+      }
+    } else {
+      this.blockDepth = depth;
+    }
   }
   
-  public double getBorderDepth() {
-    return borderDepth;
+  public double getBlockDepth() {
+    return blockDepth;
+  }
+  
+  public void setZigDepth(double depth)
+  throws ChangeVetoException {
+    if(hasListeners()) {
+      ChangeSupport cs = getChangeSupport(SequenceRenderContext.LAYOUT);
+      synchronized(cs) {
+        ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.LAYOUT);
+        cs.firePreChangeEvent(ce);
+        this.zigDepth = depth;
+        cs.firePostChangeEvent(ce);
+      }
+    } else {
+      this.zigDepth = depth;
+    }
+  }
+  
+  public double getZigDepth() {
+    return zigDepth;
+  }
+  
+  public double getDepth(SequenceRenderContext src) {
+    return 2.0 * zigDepth + blockDepth + 1.0;
   }
   
   public void renderFeature(
-    Graphics2D g, Feature f, Rectangle2D box, SequenceRenderContext context
+    Graphics2D g, Feature f, SequenceRenderContext context
   ) {
     Location loc = f.getLocation();
     Iterator i = loc.blockIterator();
     Location last = null;
     if(i.hasNext()) {
       last = (Location) i.next();
-      renderLocation(g, last, box, context);
+      renderLocation(g, last, context);
     }
     while(i.hasNext()) {
       Location next = (Location) i.next();
-      renderLink(g, f, last, next, box, context);
-      renderLocation(g, next, box, context);
+      renderLink(g, f, last, next, context);
+      renderLocation(g, next, context);
       last = next;
     }
   }
     
   private void renderLocation(
-    Graphics2D g, Location loc, Rectangle2D box, SequenceRenderContext context
+    Graphics2D g, Location loc, SequenceRenderContext context
   ) {
     Rectangle2D.Double block = new Rectangle2D.Double();
     double min = context.sequenceToGraphics(loc.getMin());
     double max = context.sequenceToGraphics(loc.getMax()+1);
     if(context.getDirection() == context.HORIZONTAL) {
       block.setFrame(
-        min, box.getMinY() + borderDepth,
-        max - min, box.getHeight() - 2.0 * borderDepth
+        min, zigDepth,
+        max - min, blockDepth
       );
     } else {
       block.setFrame(
-        box.getMinX() + borderDepth, min,
-        box.getHeight() - 2.0 * borderDepth, max - min
+        zigDepth, min,
+        blockDepth, max - min
       );
     }
-    g.setPaint(fill);
-    g.fill(block);
-    g.setPaint(outline);
-    g.draw(block);
+    if(fill != null) {
+      g.setPaint(fill);
+      g.fill(block);
+    }
+    if(outline != null) {
+      g.setPaint(outline);
+      g.draw(block);
+    }
   }
     
   private void renderLink(
     Graphics2D g, Feature f, Location source, Location dest,
-    Rectangle2D box, SequenceRenderContext context
+    SequenceRenderContext context
   ) {
     Line2D line = new Line2D.Double();
     Point2D startP;
@@ -139,16 +191,16 @@ implements FeatureRenderer, java.io.Serializable {
         double start = context.sequenceToGraphics(dest.getMin());
         double end = context.sequenceToGraphics(source.getMax()+1);
         double mid = (start + end) * 0.5;
-        startP = new Point2D.Double(start, box.getHeight() - borderDepth);
-        midP   = new Point2D.Double(mid,   box.getHeight());
-        endP   = new Point2D.Double(end,   box.getHeight() - borderDepth);
+        startP = new Point2D.Double(start, zigDepth + blockDepth);
+        midP   = new Point2D.Double(mid,   zigDepth + blockDepth + zigDepth);
+        endP   = new Point2D.Double(end,   zigDepth + blockDepth);
       } else {
         double start = context.sequenceToGraphics(source.getMax());
         double end = context.sequenceToGraphics(dest.getMin()+1);
         double mid = (start + end) * 0.5;
-        startP = new Point2D.Double(start, borderDepth);
-        midP   = new Point2D.Double(mid,   0);
-        endP   = new Point2D.Double(end,   borderDepth);
+        startP = new Point2D.Double(start, zigDepth);
+        midP   = new Point2D.Double(mid,   0.0);
+        endP   = new Point2D.Double(end,   zigDepth);
       }
     } else {
       if(
@@ -158,16 +210,16 @@ implements FeatureRenderer, java.io.Serializable {
         double start = context.sequenceToGraphics(dest.getMin());
         double end = context.sequenceToGraphics(source.getMax()+1);
         double mid = (start + end) * 0.5;
-        startP = new Point2D.Double(box.getHeight() - borderDepth, start);
-        midP   = new Point2D.Double(box.getHeight(),               mid);
-        endP   = new Point2D.Double(box.getHeight() - borderDepth, end);
+        startP = new Point2D.Double(zigDepth + blockDepth,              start);
+        midP   = new Point2D.Double(zigDepth + blockDepth + zigDepth,   mid);
+        endP   = new Point2D.Double(zigDepth + blockDepth,              end);
       } else {
         double start = context.sequenceToGraphics(source.getMax());
         double end = context.sequenceToGraphics(dest.getMin()+1);
         double mid = (start + end) * 0.5;
-        startP = new Point2D.Double(borderDepth, start);
-        midP   = new Point2D.Double(0,           mid);
-        endP   = new Point2D.Double(borderDepth, end);
+        startP = new Point2D.Double(zigDepth, start);
+        midP   = new Point2D.Double(0.0,      mid);
+        endP   = new Point2D.Double(zigDepth, end);
       }
     }
     line.setLine(startP, midP);

@@ -23,7 +23,6 @@ package org.biojava.bio.gui.sequence;
 
 import java.awt.*;
 import java.awt.geom.*;
-import java.beans.*;
 import java.util.*;
 import java.util.List;
 
@@ -33,50 +32,66 @@ import org.biojava.bio.gui.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
-public class LayeredRenderer implements SequenceRenderer {
-  protected PropertyChangeSupport pcs;
+public class LayeredRenderer
+extends AbstractForwarder
+implements SequenceRenderer {
+  public static final ChangeType RENDERER = new ChangeType(
+    "The renderer has changed.",
+    "org.biojava.bio.gui.sequence.LayeredRenderer",
+    "RENDERER"
+  );
+  
   private SequenceRenderer lineRenderer;
 
   public LayeredRenderer() {
-    pcs = new PropertyChangeSupport(this);
   }
   
   public LayeredRenderer(SequenceRenderer lineRenderer) {
-    this();
-    setLineRenderer(lineRenderer);
+    try {
+      setLineRenderer(lineRenderer);
+    } catch (ChangeVetoException cve) {
+      throw new BioError(cve, "Assertion Failure: Should have no listeners");
+    }
   }
   
-  public void addPropertyChangeListener(PropertyChangeListener l) {
-    pcs.addPropertyChangeListener(l);
-  }
-
-  public void addPropertyChangeListener(String p, PropertyChangeListener l) {
-    pcs.addPropertyChangeListener(l);
-  }
-
-  public void removePropertyChangeListener(PropertyChangeListener l) {
-    pcs.removePropertyChangeListener(l);
-  }
-
-  public void removePropertyChangeListener(
-    String p, PropertyChangeListener l
-  ) {
-	  pcs.removePropertyChangeListener(p, l);
-  }
-
-  public void setLineRenderer(SequenceRenderer lineRenderer) {
-    SequenceRenderer old = this.lineRenderer;
-    this.lineRenderer = lineRenderer;
-    pcs.firePropertyChange("lineRenderer", old, lineRenderer);
+  public void setLineRenderer(SequenceRenderer lineRenderer)
+  throws ChangeVetoException {
+    if(hasListeners()) {
+      ChangeSupport cs = getChangeSupport(RENDERER);
+      synchronized(cs) {
+        ChangeEvent ce = new ChangeEvent(
+          this, SequenceRenderContext.LAYOUT,
+          null, null, new ChangeEvent(
+            this, RENDERER, lineRenderer, this.lineRenderer
+          )
+        );
+        cs.firePreChangeEvent(ce);
+        this.lineRenderer = lineRenderer;
+        cs.firePostChangeEvent(ce);
+      }
+    } else {
+      this.lineRenderer = lineRenderer;
+    }
   }
   
   public SequenceRenderer getLineRenderer() {
     return this.lineRenderer;
   }
   
-  public double getDepth(SequenceRenderContext src) {
+  public double getDepth(SequenceRenderContext src, int min, int max) {
+    double depth = 0.0;
     List layers = layer((Sequence) src.getSequence());
-    return getLineRenderer().getDepth(src) * ((double) layers.size());
+
+    for(Iterator i = layers.iterator(); i.hasNext(); ) {
+      FeatureHolder layer = (FeatureHolder) i.next();
+      SequenceRenderContext subsrc = new SubSequenceRenderContext(
+        src,
+        layer
+      );
+      depth += getLineRenderer().getDepth(subsrc, min, max);
+    }
+    
+    return depth;
   }
   
   public double getMinimumLeader(SequenceRenderContext src) {
@@ -90,13 +105,12 @@ public class LayeredRenderer implements SequenceRenderer {
   public void paint(
     Graphics2D g,
     SequenceRenderContext src,
-    Rectangle2D seqBox
+    int min, int max
   ) {
     List layers = layer((Sequence) src.getSequence());
     SequenceRenderer sr = getLineRenderer();
     double offset = 0.0;
-    double depth = sr.getDepth(src);
-    Rectangle2D subSeqBox = new Rectangle2D.Double();
+    double depth = sr.getDepth(src, min, max);
     
     for(Iterator i = layers.iterator(); i.hasNext(); ) {
       FeatureHolder layer = (FeatureHolder) i.next();
@@ -109,19 +123,11 @@ public class LayeredRenderer implements SequenceRenderer {
       int dir = src.getDirection();
       if(dir == src.HORIZONTAL) {
         g.translate(0.0, offset);
-        subSeqBox.setRect(
-          seqBox.getX(), seqBox.getY(),
-          seqBox.getWidth(), depth
-        );
       } else {
         g.translate(offset, 0.0);
-        subSeqBox.setRect(
-          seqBox.getX(), seqBox.getY(),
-          depth, seqBox.getHeight()
-        );
       }
       
-      sr.paint(g, subsrc, subSeqBox);
+      sr.paint(g, subsrc, min, max);
       
       if(dir == src.HORIZONTAL) {
         g.translate(0.0, -offset);

@@ -64,20 +64,28 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
   private double scale;
   private int lines;
   private int spacer; 
-
-  private double alongDim = 0.0;
-  private double acrossDim = 0.0;
-  private double lineDepth = 0.0;
-  private int realLines = 0;
   
   private SequenceRenderContext.Border leadingBorder;
   private SequenceRenderContext.Border trailingBorder;
 
   private List views;
-  private Map depths;
+  private List lineInfos = new ArrayList();
+  private double[] offsets;
+  private double alongDim = 0.0;
+  private double acrossDim = 0.0;
+  private int symbolsPerLine = 0;
 
   private RendererMonitor theMonitor;
-  private ChangeListener seqListener;
+  private ChangeListener layoutListener = new ChangeAdapter() {
+    public void postChange(ChangeEvent ce) {
+      resizeAndValidate();
+    }
+  };
+  private ChangeListener repaintListener = new ChangeAdapter() {
+    public void postChange(ChangeEvent ce) {
+      repaint();
+    }
+  };
 
   /**
    * Initializer.
@@ -85,7 +93,6 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
 
   {
     views = new ArrayList();
-    depths = new HashMap();
     direction = HORIZONTAL;
     scale = 12.0;
     lines = 1;
@@ -94,15 +101,8 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
     theMonitor = new RendererMonitor();
     leadingBorder = new SequenceRenderContext.Border();
     trailingBorder = new SequenceRenderContext.Border();
-    leadingBorder.addPropertyChangeListener(theMonitor);
-    trailingBorder.addPropertyChangeListener(theMonitor);
-    
-    seqListener = new ChangeAdapter() {
-      public void postChange(ChangeEvent e) {
-        resizeAndValidate();
-        repaint();
-      }
-    };
+//    leadingBorder.addPropertyChangeListener(theMonitor);
+//    trailingBorder.addPropertyChangeListener(theMonitor);
   }
 
   /**
@@ -123,16 +123,16 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
    * @param s  the SymboList to render
    */
   public void setSequence(SymbolList s) {
+    System.out.println("Setting sequence");
     SymbolList oldSequence = sequence;
-    if(oldSequence instanceof Changeable) {
-      ((Changeable) oldSequence).removeChangeListener(seqListener);
+    if(oldSequence != null) {
+      oldSequence.removeChangeListener(layoutListener);
     }
     this.sequence = s;
+    sequence.addChangeListener(layoutListener);
+    
     resizeAndValidate();
     firePropertyChange("sequence", oldSequence, s);
-    if(s instanceof Changeable) {
-      ((Changeable) s).addChangeListener(seqListener);
-    }
   }
 
   /**
@@ -285,76 +285,69 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
     }
     
     Graphics2D g2 = (Graphics2D) g;
-    //System.out.println("Transform: " + g2.getTransform());
-    
-    Rectangle2D.Double boxClip = new Rectangle2D.Double();
-    if (direction == HORIZONTAL) {
-        boxClip.width = alongDim + leadingBorder.getSize() + trailingBorder.getSize();
-        boxClip.height = acrossDim;
+    Rectangle2D currentClip = g2.getClip().getBounds2D();
+    double minPos;
+    double maxPos;
+    if(direction == HORIZONTAL) {
+      minPos = currentClip.getMinY();
+      maxPos = currentClip.getMaxY();
     } else {
-        boxClip.width = acrossDim;
-        boxClip.height = alongDim + leadingBorder.getSize() + trailingBorder.getSize();
+      minPos = currentClip.getMinX();
+      maxPos = currentClip.getMaxX();
     }
-    //g2.clip(boxClip); // removed because it fucked things up.
-    Rectangle2D newClip = g2.getClip().getBounds2D();
+    System.out.println("Clipping in range: " + minPos + "-" + maxPos);
     
-    int minLine = 0; 
-    int maxLine = realLines;
+    int minOffset = Arrays.binarySearch(offsets, minPos);
+    if(minOffset < 0) {
+      minOffset = -minOffset - 1;
+    }
+    System.out.println("minOffset for " + minPos + " is " + minOffset);
+    double minCoord = (minOffset == 0) ? 0.0 : offsets[minOffset-1];
+    int minP = 1 + (int) ((double) minOffset * symbolsPerLine);
+    System.out.println("minP: " + minP);
+    
     Rectangle2D.Double clip = new Rectangle2D.Double();
-    Rectangle2D.Double seqBox = new Rectangle2D.Double();
-    
-    double totalLength =  
-      leadingBorder.getSize() +
-      trailingBorder.getSize() +
-      scale * sequence.length();
-    double realDepth = lineDepth + spacer;
     if (direction == HORIZONTAL) {
-        clip.width = totalLength;
-        seqBox.width = alongDim; 
-        minLine = (int) Math.max(minLine, Math.floor(newClip.getMinY()/realDepth));
-        maxLine = (int) Math.min(maxLine, Math.ceil(newClip.getMaxY()/realDepth));
-        g2.translate(
-          -minLine * alongDim + leadingBorder.getSize(),
-          minLine * realDepth
-        );
+        clip.width = alongDim;
+        clip.height = acrossDim;
+        g2.translate(leadingBorder.getSize(), minCoord);
     } else {
-        clip.height = totalLength;
-        seqBox.height = alongDim;
-        minLine = (int) Math.max(minLine, Math.floor(newClip.getMinX()/realDepth));
-        maxLine = (int) Math.min(maxLine, Math.ceil(newClip.getMaxX()/realDepth));
-        g2.translate(
-          minLine * realDepth,
-          -minLine * alongDim + leadingBorder.getSize()
-        );
+        clip.width = acrossDim;
+        clip.height = alongDim;
+        g2.translate(minCoord, leadingBorder.getSize());
     }
-
-    for(int l = minLine; l < maxLine; l++) {
+    
+    LineInfo currentLI;
+    int min = minP;
+    for(int l = minOffset; l < lineInfos.size(); l++) {
+      int max = Math.min(min + symbolsPerLine - 1, sequence.length());
+      currentLI = (LineInfo) lineInfos.get(l);
+      
+      System.out.println("Painting " + min + ".." + max);
       if (direction == HORIZONTAL) {
           clip.x = l * alongDim - leadingBorder.getSize();
-          seqBox.x = l * alongDim;
           clip.y = 0.0;
       } else {
           clip.x = 0.0;
           clip.y = l * alongDim - leadingBorder.getSize();
-          seqBox.y = l * alongDim;
       }
+      
       for (Iterator i = views.iterator(); i.hasNext(); ) {
         SequenceRenderer r = (SequenceRenderer) i.next();
-        double depth = ((Double) depths.get(r)).doubleValue();
-	if (direction == HORIZONTAL) {
+        double depth = currentLI.getDepth(r);
+        if (direction == HORIZONTAL) {
             clip.height = depth;
-            seqBox.height = depth;
-	} else {
+        } else {
             clip.width = depth;
-            seqBox.width = depth;
         }
         
         Shape oldClip = g2.getClip();
         g2.clip(clip);
-        r.paint(g2, this, seqBox);
+        r.paint(g2, this, min, max);
         g2.setClip(oldClip);
+        g2.draw(clip);
 
-	if (direction == HORIZONTAL) {
+        if (direction == HORIZONTAL) {
             g2.translate(0.0, depth);
         } else {
             g2.translate(depth, 0.0);
@@ -365,24 +358,23 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
       } else {
           g2.translate(spacer, -alongDim);
       }
+      
+      min += symbolsPerLine;
+
+      if(offsets[l] > maxPos) {
+        System.out.println("Stopping as " + offsets[l] + " is larger than "
+        + maxPos);
+        break;
+      }
     }
   }
 
   public void addRenderer(SequenceRenderer r) {
-    try {
-	    BeanInfo bi = Introspector.getBeanInfo(r.getClass());
-	    EventSetDescriptor[] esd = bi.getEventSetDescriptors();
-	    for (int i = 0; i < esd.length; ++i) {
-        if (esd[i].getListenerType() == PropertyChangeListener.class) {
-          Method alm = esd[i].getAddListenerMethod();
-          Object[] args = { theMonitor };
-          alm.invoke(r, args);
-        }
-	    }
-    } catch (Exception ex) {
-	    ex.printStackTrace();
+    if(r instanceof Changeable) {
+      Changeable c = (Changeable) r;
+      c.addChangeListener(layoutListener, SequenceRenderContext.LAYOUT);
+      c.addChangeListener(repaintListener, SequenceRenderContext.REPAINT);
     }
-
     views.add(r);
     resizeAndValidate();
   }
@@ -396,87 +388,129 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
   }
 
   public void resizeAndValidate() {
-    Dimension d = null;    
+    System.out.println("resizeAndValidate starting");
+    Dimension d = null;
+    int realLines;
+    double acrossDim;
+    
     if(sequence == null) {
+      System.out.println("No sequence");
+      // no sequence - collapse down to no size at all
       alongDim = 0.0;
       acrossDim = 0.0;
-      lineDepth = 0.0;
       realLines = 0;
       leadingBorder.setSize(0.0);
       trailingBorder.setSize(0.0);
       d = new Dimension(0, 0);
     } else {
+      System.out.println("Fitting to sequence");
+
+      int width;
+      Dimension parentSize = (getParent() != null)
+                ? getParent().getSize()
+                : new Dimension(500, 400);
+      if (direction == HORIZONTAL) {
+        width = parentSize.width;
+      } else {
+        width = parentSize.height;
+      }
+      
+      System.out.println("Initial width: " + width);
+      // got a sequence - fit the size according to sequence length & preferred
+      // number of lines.
       alongDim = scale * sequence.length();
+      System.out.println("alongDim (pixles needed for sequence only): "
+      + alongDim);
       acrossDim = 0.0;
+      
       double insetBefore = 0.0;
       double insetAfter = 0.0;
       for (Iterator i = views.iterator(); i.hasNext(); ) {
         SequenceRenderer r = (SequenceRenderer) i.next();
-        double depth = r.getDepth(this);
-        depths.put(r, new Double(depth));
-        acrossDim += depth;
+        System.out.println("Renderer: " + r);
         insetBefore = Math.max(insetBefore, r.getMinimumLeader(this));
         insetAfter = Math.max(insetAfter, r.getMinimumTrailer(this));
       }
-      lineDepth = acrossDim;
       leadingBorder.setSize(insetBefore);
       trailingBorder.setSize(insetAfter);
+      double insets = insetBefore + insetAfter;
+      System.out.println("insetBefore: " + insetBefore);
+      System.out.println("insetAfter: " + insetAfter);
       
-      if(lines < 1) {
-        // fit to component size for across, and wrap as many times as is needed
-        // to accomodate whole sequence;
-        Dimension parentSize = (getParent() != null)
-                ? getParent().getSize()
-                : new Dimension();
-        int width = 0;
-        if (direction == HORIZONTAL) {
-	  width = parentSize.width;
-        } else {
-          width = parentSize.height;
-        }
-        // set width to something that takes whole numbers of 'scale'
-        width = (int) Math.ceil((Math.ceil((double) width / scale)) * scale);
-        // set width to include leading/trailing space
-        width = (int) Math.ceil((double) width - insetBefore - insetAfter);
-        realLines = (int) Math.ceil((double) alongDim / (double) width);
-        acrossDim = acrossDim * realLines + spacer * (realLines - 1);
-        alongDim = Math.ceil((double) width);
-        if (direction == HORIZONTAL) {
-          d = new Dimension(
-            (int) Math.ceil(alongDim + insetBefore + insetAfter),
-            (int) acrossDim
-          );
-        } else {
-          d = new Dimension(
-            (int) acrossDim,
-            (int) Math.ceil(alongDim + insetBefore + insetAfter)
-          );
-        }
-      } else {
-        // fit depth to lines*acrossDim and make as wide as necisary to 
-        // accomodoate the whole sequence
+      if(lines > 0) {
+        // Fixed number of lines. Calculate width needed to lay out rectangle.
         realLines = lines;
-        alongDim = Math.ceil(alongDim / (double) lines);
-        // alongDim must be multiple of scale
-        alongDim = Math.ceil((Math.ceil(alongDim / scale)) * scale);
-        acrossDim = Math.ceil((double) lines * acrossDim + (double) (lines-1) * spacer);  
-        if (direction == HORIZONTAL) {
-          d = new Dimension(
-            (int) Math.ceil(alongDim + insetBefore + insetAfter),
-            (int) acrossDim
-          );
-        } else {
-          d = new Dimension(
-            (int) acrossDim,
-            (int) Math.ceil(alongDim + insetBefore + insetAfter)
-          );
+        width = (int) Math.ceil(
+          insets +
+          alongDim / (double) lines
+        );
+      } else {
+        // Calculated number of lines for a fixed width
+        double dWidth = (double) width;
+        dWidth -= insets; // leave space for insets
+        realLines = (int) Math.ceil(alongDim / (double) width);
+        width = (int) Math.ceil(
+          insets +
+          alongDim / (double) realLines
+        );
+      }
+      
+      acrossDim = 0.0;
+      symbolsPerLine = (int) Math.ceil((double) width / (double) scale);
+      //System.out.println("symbolsPerLine: " + symbolsPerLine);
+      //System.out.println("width: " + width);
+      //System.out.println("lines: " + lines);
+      //System.out.println("realLines: " + realLines);
+      if(symbolsPerLine < 1) {
+        throw new Error("Pants");
+      }
+      int min = 1;
+      lineInfos.clear();
+      while(min <= sequence.length()) {
+        //System.out.println("LineInfor for line starting: " + min);
+        LineInfo li = new LineInfo();
+        int max = min + symbolsPerLine - 1;
+        for(Iterator i = views.iterator(); i.hasNext(); ) {
+          SequenceRenderer sr = (SequenceRenderer) i.next();
+          li.setDepth(sr, sr.getDepth(this, min, max));
         }
+        acrossDim += li.getTotalDepth();
+        lineInfos.add(li);
+        min = max + 1;
+      }
+      offsets = new double[lineInfos.size()];
+      {
+        int i = 0;
+        double totDepth = 0.0;
+        Iterator lii = lineInfos.iterator();
+        while(lii.hasNext()) {
+          LineInfo li = (LineInfo) lii.next();
+          totDepth += li.getTotalDepth();
+          totDepth += spacer;
+          offsets[i] = totDepth;
+          i++;
+        }
+      }
+      
+      acrossDim += spacer * (realLines - 1);
+      alongDim = Math.ceil((double) width);
+      if (direction == HORIZONTAL) {
+        d = new Dimension(
+          (int) Math.ceil(alongDim + insetBefore + insetAfter),
+          (int) acrossDim
+        );
+      } else {
+        d = new Dimension(
+          (int) acrossDim,
+          (int) Math.ceil(alongDim + insetBefore + insetAfter)
+        );
       }
     }
     
     setMinimumSize(d);
     setPreferredSize(d);
     revalidate();
+    System.out.println("resizeAndValidate ending");
   }
 
   private class RendererMonitor implements PropertyChangeListener {

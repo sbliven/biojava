@@ -8,6 +8,7 @@ import java.awt.geom.*;
 import javax.swing.*;
 import java.util.List;  // Tie-breaker
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
@@ -57,30 +58,34 @@ public class EmblViewer {
     split = new ZiggyFeatureRenderer();
     FeatureRenderer frChooser = new FeatureRenderer() {
       public void renderFeature(
-        Graphics2D g, Feature f, Rectangle2D box, SequenceRenderContext context
+        Graphics2D g, Feature f, SequenceRenderContext context
       ) {
         if(f.getLocation().isContiguous()) {
-          fr.renderFeature(g, f, box, context);
+          fr.renderFeature(g, f, context);
         } else {
-          split.renderFeature(g, f, box, context);
+          split.renderFeature(g, f, context);
         }
+      }
+      
+      public double getDepth(SequenceRenderContext context) {
+        return Math.max(fr.getDepth(context), split.getDepth(context));
       }
     };
     FeatureBlockSequenceRenderer features = new FeatureBlockSequenceRenderer();
     FeatureBlockSequenceRenderer repeats = new FeatureBlockSequenceRenderer();
     FeatureBlockSequenceRenderer misc = new FeatureBlockSequenceRenderer();
     
-    features.setDepth(15);
-    repeats.setDepth(10);
-    misc.setDepth(10);
+//    features.setDepth(15);
+//    repeats.setDepth(10);
+//    misc.setDepth(10);
     
     features.setFeatureRenderer(frChooser);
     repeats.setFeatureRenderer(fr);
     misc.setFeatureRenderer(frChooser);
     
-    features.setLabel("features");
-    repeats.setLabel("repeats");
-    misc.setLabel("misc");
+//    features.setLabel("features");
+//    repeats.setLabel("repeats");
+//    misc.setLabel("misc");
     
     FeatureFilter featuresFilter = new FeatureFilter.And(
       new FeatureFilter.Not(repeatFilter),
@@ -90,9 +95,9 @@ public class EmblViewer {
     LayeredRenderer lsr = new LayeredRenderer();
     lsr.setLineRenderer(features);
     
-    sp.addRenderer(new FilteringRenderer(repeats, repeatFilter));
-    sp.addRenderer(new FilteringRenderer(misc, miscFilter));
-    sp.addRenderer(new FilteringRenderer(lsr, featuresFilter));
+    sp.addRenderer(new FilteringRenderer(repeats, repeatFilter, false));
+    sp.addRenderer(new FilteringRenderer(misc, miscFilter, false));
+    sp.addRenderer(new FilteringRenderer(lsr, featuresFilter, false));
     sp.addRenderer(new SymbolSequenceRenderer());
     f.getContentPane().setLayout(new BorderLayout());
     f.getContentPane().add(new JScrollPane(sp), BorderLayout.CENTER);
@@ -114,15 +119,23 @@ public class EmblViewer {
     } );
     JButton blue = new JButton("Blue");
     blue.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent ae) {
-        fr.setFill(Color.blue);
-	    }
+      public void actionPerformed(ActionEvent ae) {
+        try {
+          fr.setFill(Color.blue);
+        } catch (ChangeVetoException cve) {
+          throw new BioError(cve, "oops");
+        }
+      }
     } );
     JButton red = new JButton("Red");
     red.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent ae) {
-        fr.setFill(Color.red);
-	    }
+      public void actionPerformed(ActionEvent ae) {
+        try {
+          fr.setFill(Color.red);
+        } catch (ChangeVetoException cve) {
+          throw new BioError(cve, "oops");
+        }
+      }
     } );
     JScrollBar scale = new JScrollBar(JScrollBar.HORIZONTAL);
     scale.addAdjustmentListener(

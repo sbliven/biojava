@@ -95,7 +95,12 @@
         
   <!-- Compiles the source directory -->
   <target name="compile" depends="init,prepare-src">
-    <javac srcdir="${build.src}" destdir="${build.dest}" classpath="${classpath}"/>
+    <javac
+      srcdir="${build.src}"
+      destdir="${build.dest}"
+      classpath="${classpath}"
+      depend="yes"
+    />
   </target>
         
   <!-- Creates the class package -->
@@ -153,6 +158,12 @@
     <delete file="${name}-${version}.tar.gz"/>
     <delete file="${name}-${version}.tar"/>
     <delete file="${name}-${version}.zip"/>
+  </target>
+
+  <target name="sync">
+    <cvs command="update" />
+    <AntCall target="package"/>
+    <cvs command="commit" />
   </target>
 
 </project>

@@ -23,20 +23,55 @@ package org.biojava.bio.gui.sequence;
 
 import java.awt.*;
 import javax.swing.*;
-import java.beans.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.gui.*;
 
 /**
  * A context within sequence information may be rendered. It encapsulates the
- * rendering direction,  
+ * rendering direction, the size of the leading and trailing (header/footer
+ *, left/right areas), scale and the currently rendered sequence.
  *
  * @author     Thomas Down
  * @author     Matthew Pocock
  */
 public interface SequenceRenderContext extends SwingConstants {
+  public static final ChangeType REPAINT = new ChangeType(
+    "Something that affects rendering has changed",
+    "org.biojava.bio.gui.sequence.SequenceRenderContext",
+    "REPAINT"
+  );
+
+  public static final ChangeType LAYOUT = new ChangeType(
+    "Something that affects layout has changed",
+    "org.biojava.bio.gui.sequence.SequenceRenderContext",
+    "LAYOUT"
+  );
+  
+  public static class RepaintForwarder extends ChangeForwarder {
+    public RepaintForwarder(Object source, ChangeSupport cs) {
+      super(source, cs);
+    }
+    
+    protected ChangeEvent generateEvent(ChangeEvent ce) {
+      ChangeEvent ce2 = new ChangeEvent(getSource(), REPAINT, null, null, ce);
+      return ce2;
+    }
+  }
+  
+  public static class LayoutForwarder extends ChangeForwarder {
+    public LayoutForwarder(Object source, ChangeSupport cs) {
+      super(source, cs);
+    }
+    
+    protected ChangeEvent generateEvent(ChangeEvent ce) {
+      ChangeEvent ce2 = new ChangeEvent(getSource(), LAYOUT, null, null, ce);
+      return ce2;
+    }
+  }
+  
   /**
    *  Gets the direction in which this context expects sequences to be rendered
    * - HORIZONTAL or VERTICAL.
@@ -80,8 +115,7 @@ public interface SequenceRenderContext extends SwingConstants {
   /**
    *  Gets the LeadingBorder attribute of the SequenceRenderContext object.
    * This represents the space between the beginning of the redering area and
-   * the beginning
- of the sequence.
+   * the beginning of the sequence.
    *
    * @return    The LeadingBorder value 
    */
@@ -107,21 +141,18 @@ public interface SequenceRenderContext extends SwingConstants {
    * The metric object for the 'border' area - the area between the extent of
    * the rendered area and the beginning or end of the sequence. This provides
    * information about its size, and hints about how to align information within
-   *
- the borders.
+   * the borders.
    *
    * @author     mrp 
    * @created    01 November 2000 
    */
   public static class Border
   implements java.io.Serializable, SwingConstants {
-    protected final PropertyChangeSupport pcs;
     private double size = 0.0;
     private int alignment = CENTER;
 
     public Border() {
       alignment = CENTER;
-      pcs = new PropertyChangeSupport(this);
     }
 
     /**
@@ -134,8 +165,7 @@ public interface SequenceRenderContext extends SwingConstants {
     }
 
     /**
-     *  Sets the Alignment attribute of the Border object
-. This will be one of
+     *  Sets the Alignment attribute of the Border object. This will be one of
      * the values LEADING, TRAILING or CENTER.
      *
      * @param  alignment                     The new Alignment value 
@@ -149,7 +179,6 @@ public interface SequenceRenderContext extends SwingConstants {
         case CENTER:
           int old = this.alignment;
           this.alignment = alignment;
-          pcs.firePropertyChange("alignment", old, alignment);
           break;
         default:
           throw new IllegalArgumentException(
@@ -175,26 +204,5 @@ public interface SequenceRenderContext extends SwingConstants {
     public int getAlignment() {
       return alignment;
     }
-
-    /**
-     *  Adds a listener to this border. It will be informed when either the size
-     * or alignment changes.
-     *
-     * @param  listener  The feature to be added to the 
-     *      PropertyChangeListener attribute 
-     */
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-      pcs.addPropertyChangeListener(listener);
-    }
-
-    /**
-     *  Remove a listener from this border.
-     *
-     * @param  listener  The listener to remove 
-     */
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-      pcs.removePropertyChangeListener(listener);
-    }
   }
 }
-

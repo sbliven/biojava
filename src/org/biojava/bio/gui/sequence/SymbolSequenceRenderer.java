@@ -35,8 +35,8 @@ import java.util.List;
 public class SymbolSequenceRenderer implements SequenceRenderer {
     private double depth = 25.0;
     
-    public double getDepth(SequenceRenderContext sp) {
-      return depth;
+    public double getDepth(SequenceRenderContext sp, int min, int max) {
+      return depth + 1.0;
     }
 
     public double getMinimumLeader(SequenceRenderContext sp) {
@@ -47,30 +47,15 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
       return 0.0;
     }
 
-    public void paint(Graphics2D g, SequenceRenderContext sp, Rectangle2D seqBox) {
-      Shape oldClip = g.getClip();
-
+    public void paint(
+      Graphics2D g, SequenceRenderContext sp,
+      int min, int max
+    ) {
       SymbolList seq = sp.getSequence();
       int direction = sp.getDirection();
-      int minP;
-      int maxP;
       
       g.setFont(sp.getFont());
-      g.clip(seqBox);
       Rectangle2D clip = g.getClipBounds();
-      //Rectangle2D.Double charBox = new Rectangle2D.Double();
-
-      if(direction == sp.HORIZONTAL) {
-        minP = Math.max(1,            sp.graphicsToSequence(clip.getMinX()));
-        maxP = Math.min(seq.length(), sp.graphicsToSequence(clip.getMaxX()));
-        //charBox.width = sp.getScale() - 1.0;
-        //charBox.height = seqBox.getHeight() - 1.0;
-      } else {
-        minP = Math.max(1,            sp.graphicsToSequence(clip.getMinY()));
-        maxP = Math.min(seq.length(), sp.graphicsToSequence(clip.getMaxY()));
-        //charBox.width = seqBox.getWidth() - 1.0;
-        //charBox.height = sp.getScale() - 1.0;
-      }
       
       g.setColor(Color.black);
       
@@ -85,12 +70,12 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
         double fudgeDown = 0.0;
         if (direction == sp.HORIZONTAL) {
           fudgeAcross = 0.0 /*- maxBounds.getCenterX()*/;
-          fudgeDown = seqBox.getCenterY() - maxBounds.getCenterY();
+          fudgeDown = depth * 0.5 - maxBounds.getCenterY();
         } else {
-          fudgeAcross = seqBox.getCenterX() - maxBounds.getCenterX();
+          fudgeAcross = depth * 0.5 - maxBounds.getCenterX();
           fudgeDown = scale * 0.5 - maxBounds.getCenterY();
         }
-        for (int pos = minP; pos <= maxP; ++pos) {
+        for (int pos = min; pos <= max; ++pos) {
           double gPos = sp.sequenceToGraphics(pos);
           char c = seq.symbolAt(pos).getToken();
           if (direction == SequencePanel.HORIZONTAL) {
@@ -103,7 +88,5 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
           //g.draw(charBox);
         }
       }
-
-      g.setClip(oldClip);
     }
 }

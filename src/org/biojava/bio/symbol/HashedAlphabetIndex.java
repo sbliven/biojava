@@ -13,7 +13,7 @@ import org.biojava.bio.*;
  * @author Matthew Pocock
  * @since 1.1
  */ 
-public class HashedAlphabetIndex
+class HashedAlphabetIndex
 extends AbstractChangeable implements AlphabetIndex {
   private static final Comparator cmp = new HashComparator();
   

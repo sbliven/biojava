@@ -23,7 +23,6 @@ package org.biojava.bio.gui.sequence;
 
 import java.awt.*;
 import java.awt.geom.*;
-import java.beans.*;
 import java.util.*;
 import java.util.List;
 
@@ -33,78 +32,132 @@ import org.biojava.bio.gui.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
-public class FilteringRenderer implements SequenceRenderer {
-  protected PropertyChangeSupport pcs;
+public class FilteringRenderer
+extends AbstractForwarder
+implements SequenceRenderer {
+  public static ChangeType RENDERER = new ChangeType(
+    "The renderer used to render the filtered features has changed",
+    "org.biojava.bio.gui.sequence.FilteringRenderer",
+    "RENDERER"
+  );
+  
+  public static ChangeType FILTER = new ChangeType(
+    "The filter has changed",
+    "org.biojava.bio.gui.sequence.FilteringRenderer",
+    "FILTER"
+  );
+  
+  public static ChangeType RECURSE = new ChangeType(
+    "The recurse for the filter has changed",
+    "org.biojava.bio.gui.sequence.FilteringRenderer",
+    "RECURSE"
+  );
+  
   protected SequenceRenderer lineRenderer;
   protected FeatureFilter filter;
   protected boolean recurse;
 
   public FilteringRenderer() {
-    pcs = new PropertyChangeSupport(this);
     filter = FeatureFilter.all;
     recurse = false;
   }
   
   public FilteringRenderer(
     SequenceRenderer lineRenderer,
-    FeatureFilter filter
+    FeatureFilter filter,
+    boolean recurse
   ) {
-    this();
-    setLineRenderer(lineRenderer);
-    setFilter(filter);
+    try {
+      setLineRenderer(lineRenderer);
+      setFilter(filter);
+      setRecurse(recurse);
+    } catch (ChangeVetoException cve) {
+      throw new NestedError(cve, "Assertion Failure: Should have no listeners");
+    }
   }
   
-  public void addPropertyChangeListener(PropertyChangeListener l) {
-    pcs.addPropertyChangeListener(l);
-  }
-
-  public void addPropertyChangeListener(String p, PropertyChangeListener l) {
-    pcs.addPropertyChangeListener(l);
-  }
-
-  public void removePropertyChangeListener(PropertyChangeListener l) {
-    pcs.removePropertyChangeListener(l);
-  }
-
-  public void removePropertyChangeListener(
-    String p, PropertyChangeListener l
-  ) {
-	  pcs.removePropertyChangeListener(p, l);
+  public void setLineRenderer(SequenceRenderer lineRenderer)
+  throws ChangeVetoException {
+    if(hasListeners()) {
+      ChangeSupport cs = getChangeSupport(RENDERER);
+      synchronized(cs) {
+        ChangeEvent ce = new ChangeEvent(
+          this, SequenceRenderContext.LAYOUT,
+          null, null, new ChangeEvent(
+            this, RENDERER, lineRenderer, this.lineRenderer
+          )
+        );
+        cs.firePreChangeEvent(ce);
+        setLineRendererImpl(lineRenderer);
+        cs.firePostChangeEvent(ce);
+      }
+    } else {
+      setLineRendererImpl(lineRenderer);
+    }
   }
   
-
-  public void setLineRenderer(SequenceRenderer lineRenderer) {
-    SequenceRenderer old = this.lineRenderer;
+  protected void setLineRendererImpl(SequenceRenderer lineRenderer) {
+    unregisterLayout(this.lineRenderer, SequenceRenderContext.LAYOUT);
+    unregisterRepaint(this.lineRenderer, SequenceRenderContext.REPAINT);
     this.lineRenderer = lineRenderer;
-    pcs.firePropertyChange("lineRenderer", old, lineRenderer);
+    registerLayout(this.lineRenderer, SequenceRenderContext.LAYOUT);
+    registerRepaint(this.lineRenderer, SequenceRenderContext.REPAINT);
   }
   
   public SequenceRenderer getLineRenderer() {
     return this.lineRenderer;
   }
-
-  public void setFilter(FeatureFilter filter) {
-    FeatureFilter old = this.filter;
-    this.filter = filter;
-    pcs.firePropertyChange("filter", old, filter);
+  
+  public void setFilter(FeatureFilter filter)
+  throws ChangeVetoException {
+    if(hasListeners()) {
+      ChangeSupport cs = getChangeSupport(FILTER);
+      synchronized(cs) {
+        ChangeEvent ce = new ChangeEvent(
+          this, SequenceRenderContext.LAYOUT,
+          null, null, new ChangeEvent(
+            this, FILTER, this.filter, filter
+          )
+        );
+        cs.firePreChangeEvent(ce);
+        this.filter = filter;
+        cs.firePostChangeEvent(ce);
+      }
+    } else {
+      this.filter = filter;
+    }
   }
   
   public FeatureFilter getFilter() {
     return this.filter;
   }
   
-  public void setRecurse(boolean recurse) {
-    boolean old = this.recurse;
-    this.recurse = recurse;
-    pcs.firePropertyChange("recurse", old, recurse);
+  public void setRecurse(boolean recurse)
+  throws ChangeVetoException {
+    if(hasListeners()) {
+      ChangeSupport cs = getChangeSupport(RECURSE);
+      synchronized(cs) {
+        ChangeEvent ce = new ChangeEvent(
+          this, SequenceRenderContext.LAYOUT,
+          null, null, new ChangeEvent(
+            this, RECURSE, this.filter, filter
+          )
+        );
+        cs.firePreChangeEvent(ce);
+        this.filter = filter;
+        cs.firePostChangeEvent(ce);
+      }
+    } else {
+      this.filter = filter;
+    }
   }
   
   public boolean getRecurse() {
     return this.recurse;
   }
 
-  public double getDepth(SequenceRenderContext src) {
-    return getLineRenderer().getDepth(getContext(src));
+  public double getDepth(SequenceRenderContext src, int min, int max) {
+    return getLineRenderer().getDepth(getContext(src), min, max);
   }    
   
   public double getMinimumLeader(SequenceRenderContext src) {
@@ -118,9 +171,9 @@ public class FilteringRenderer implements SequenceRenderer {
   public void paint(
     Graphics2D g,
     SequenceRenderContext src,
-    Rectangle2D seqBox
+    int min, int max
   ) {
-    getLineRenderer().paint(g, getContext(src), seqBox);
+    getLineRenderer().paint(g, getContext(src), min, max);
   }
   
   protected SequenceRenderContext getContext(SequenceRenderContext src) {

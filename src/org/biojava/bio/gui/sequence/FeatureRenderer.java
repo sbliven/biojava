@@ -22,7 +22,8 @@
 package org.biojava.bio.gui.sequence;
 
 import java.util.*;
-import java.beans.*;
+
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.gui.*;
@@ -33,6 +34,11 @@ import java.awt.geom.*;
 import java.util.List;
 
 public interface FeatureRenderer {
-    public void renderFeature(Graphics2D g, Feature f, Rectangle2D box,
-			      SequenceRenderContext context);
+    public void renderFeature(
+        Graphics2D g,
+        Feature f,
+        SequenceRenderContext context
+    );
+    
+    public double getDepth(SequenceRenderContext src);
 }

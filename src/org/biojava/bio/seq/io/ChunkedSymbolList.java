@@ -68,10 +68,16 @@ class ChunkedSymbolList extends AbstractSymbolList {
     }
 
     public Symbol symbolAt(int pos) {
-	pos -= 1; // the inevitable...
+      try {
+	--pos; // the inevitable...
 	int chnk = pos / chunkSize;
 	int spos = pos % chunkSize;
 	return chunks[chnk][spos];
+      } catch (IndexOutOfBoundsException ioobe) {
+        ++pos;
+        throw new IndexOutOfBoundsException("Attempted to access symbol at "
+        + pos + " of ChunkedSymbolList length " + length);
+      }
     }
 
     public SymbolList subList(int from, int to) {
