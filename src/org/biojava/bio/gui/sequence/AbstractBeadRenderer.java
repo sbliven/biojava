@@ -29,13 +29,7 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
@@ -124,8 +118,10 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
     protected Paint          beadFill;
     protected Stroke       beadStroke;
 
-    protected Map           delegates;
-    protected Cache             cache;
+    // Map of FeatureFilter -> FeatureRenderer
+    protected Map delegates;
+    // Map of Feature -> FeatureRenderer
+    protected Map delegationCache;
 
     /**
      * Creates a new <code>AbstractBeadRenderer</code> with no
@@ -158,8 +154,8 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
         this.beadFill         = beadFill;
         this.beadStroke       = beadStroke;
 
-        delegates = new HashMap();
-        cache     = new Cache();
+        delegates       = new HashMap();
+        delegationCache = new HashMap();
     }
 
     /**
@@ -193,12 +189,12 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
                               SequenceRenderContext context)
     {
         // Check the cache first
-        if (cache.containsKey(f))
+        if (delegationCache.containsKey(f))
         {
             // System.err.println("Used cache for: " + f);
 
             BeadFeatureRenderer cachedRenderer =
-                (BeadFeatureRenderer) cache.get(f);
+                (BeadFeatureRenderer) delegationCache.get(f);
 
             cachedRenderer.renderBead(g2, f, context);
             return;
@@ -220,7 +216,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
             }
         }
 
-        cache.put(f, this);
+        delegationCache.put(f, this);
         // System.err.println("Rendering: " + f);
         renderBead(g2, f, context);
     }
@@ -244,8 +240,8 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
                                     BeadFeatureRenderer renderer)
         throws IllegalArgumentException
     {
-	// Ensure the cache doesn't hide the new delegate
-	cache.clear();
+        // Ensure the cache doesn't hide the new delegate
+        delegationCache.clear();
 	
         Set delegateFilters = delegates.keySet();
 
@@ -283,9 +279,9 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      */
     public void removeDelegateRenderer(OptimizableFilter   filter)
     {
-	// Ensure the cache doesn't hide the change of delegate
-	cache.clear();
-	delegates.remove(filter);
+        // Ensure the cache doesn't hide the change of delegate
+        delegationCache.clear();
+        delegates.remove(filter);
     }
 
     /**
@@ -477,7 +473,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
                 ChangeEvent ce = new ChangeEvent(this, SequenceRenderContext.LAYOUT,
                                                  null, null,
                                                  new ChangeEvent(this, STROKE,
-								 stroke,
+                                                                 stroke,
                                                                  beadStroke));
                 cs.firePreChangeEvent(ce);
                 beadStroke = stroke;
@@ -541,61 +537,4 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
     public abstract void renderBead(Graphics2D            g2,
                                     Feature               f,
                                     SequenceRenderContext context);
-
-    /**
-     * <p><code>Cache</code> to hold the direct mapping of
-     * <code>Feature</code>s to their renderers. This is used to
-     * bypass recursion through the delegate renderers once the
-     * relationship has been established by an initial recursive
-     * search.</p>
-     *
-     * <p>The <code>Feature</code>s register themselves with a
-     * <code>ChangeListener</code> in the cache. When a feature
-     * changes its rendered representation may need to be updated, so
-     * the listener removes the feature from the cache. Currently
-     * features are immutable, apart from their Annotation, so the
-     * cache only listens for changes there. Features forward
-     * ChangeEvents from their Annotation.</p>
-     *
-     * @author Keith James
-     * @since 1.2
-     */
-    private class Cache
-    {
-        private WeakHashMap map = new WeakHashMap();
-
-        private ChangeListener listener = new ChangeAdapter()
-        {
-            public void postChange(ChangeEvent cev)
-            {
-                Changeable changedFeature = (Changeable) cev.getSource();
-                map.remove(changedFeature);
-                changedFeature.removeChangeListener(listener);
-            }
-        };
-
-        public void put(Object key, Object value)
-        {
-            map.put(key, value);
-            if (Changeable.class.isInstance(key))
-            {
-                ((Changeable) key).addChangeListener(listener,
-                                                     Annotation.PROPERTY);
-            }
-        }
-
-        public Object get(Object key)
-        {
-            return map.get(key);
-        }
-
-        public boolean containsKey(Object key)
-        {
-            return map.containsKey(key);
-        }
-
-	protected void clear() {
-	    map.clear();
-	}
-    }
 }
