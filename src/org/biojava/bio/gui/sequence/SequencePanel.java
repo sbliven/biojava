@@ -253,7 +253,7 @@ Changeable {
   }
 
   /**
-   * Create a new SeqeuncePanel.
+   * Create a new SequencePanel.
    */
   public SequencePanel() {
     super();

@@ -30,13 +30,13 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.gui.*;
 
 /**
- * A context within sequence information may be rendered. It encapsulates the
- * rendering direction, the size of the leading and trailing (header/footer,
- * left/right areas), scale and the currently rendered symbols, features and
- * region.
+ * A context within sequence which information may be rendered. It
+ * encapsulates the rendering direction, the size of the leading and
+ * trailing (header/footer, left/right areas), scale and the currently
+ * rendered symbols, features and region.
  *
- * @author     Thomas Down
- * @author     Matthew Pocock
+ * @author Thomas Down
+ * @author Matthew Pocock
  */
 public interface SequenceRenderContext extends SwingConstants {
   public static final ChangeType REPAINT = new ChangeType(

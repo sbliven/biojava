@@ -231,18 +231,6 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
     }
 
     /**
-     * <code>renderBead</code> should be overridden by the concrete
-     * <code>BeadRenderer</code>.
-     *
-     * @param g a <code>Graphics2D</code> contevt.
-     * @param f a <code>Feature</code> to render.
-     * @param context a <code>SequenceRenderContext</code> context.
-     */
-    protected abstract void renderBead(final Graphics2D            g,
-				       final Feature               f,
-				       final SequenceRenderContext context);
-
-    /**
      * <code>setDelegateRenderer</code> associates an
      * <code>OptimizableFilter</code> with a
      * <code>FeatureRenderer</code>. Any feature accepted by the
@@ -529,6 +517,18 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 	    beadFill = fill;
 	}
     }
+
+    /**
+     * <code>renderBead</code> should be overridden by the concrete
+     * <code>BeadRenderer</code>.
+     *
+     * @param g a <code>Graphics2D</code> contevt.
+     * @param f a <code>Feature</code> to render.
+     * @param context a <code>SequenceRenderContext</code> context.
+     */
+    protected abstract void renderBead(final Graphics2D            g,
+				       final Feature               f,
+				       final SequenceRenderContext context);
 
     /**
      * <p><code>Cache</code> to hold the direct mapping of

@@ -26,6 +26,7 @@ import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.RoundRectangle2D;
+import javax.swing.JComponent;
 
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.symbol.Location;
@@ -97,43 +98,51 @@ public class RoundRectangularBeadRenderer extends AbstractBeadRenderer
     {
 	Location loc = f.getLocation();
 
-	float min = (float) context.sequenceToGraphics(loc.getMin());
-	float max = (float) context.sequenceToGraphics(loc.getMax());
+	double min = context.sequenceToGraphics(loc.getMin());
+	double max = context.sequenceToGraphics(loc.getMax());
 
 	Shape shape;
 
-	float  arcWidth = 10.0f;
-	float arcHeight = 10.0f;
+	double  arcWidth = 10.0f;
+	double arcHeight = 10.0f;
 
 	if (context.getDirection() == context.HORIZONTAL)
 	{
-	    float  posXW = min;
-	    float  posYN = (float) beadDisplacement;
-	    float  width = max - posXW + 1.0f;
-	    float height = Math.min((float) beadDepth, width / 2.0f) - 1.0f;
+	    double  posXW = min;
+	    double  posYN = beadDisplacement;
+	    double  width = max - posXW + 1.0f;
+	    double height = Math.min(beadDepth, width / 2.0f) - 1.0f;
+
+	    if (JComponent.class.isInstance(context))
+		if (! ((JComponent) context).getVisibleRect().intersects(posXW, posYN, width, height))
+		    return;
 
 	    // If the bead height occupies less than the full height
 	    // of the renderer, move it down so that it is central
 	    if (height < beadDepth)
 		posYN += ((beadDepth - height) / 2.0f);
 
-	    shape = new RoundRectangle2D.Float(posXW, posYN,
-					       width, height,
-					       arcWidth, arcHeight);
+	    shape = new RoundRectangle2D.Double(posXW, posYN,
+						width, height,
+						arcWidth, arcHeight);
 	}
 	else
 	{
-	    float  posXW = (float) beadDisplacement;
-	    float  posYN = min;
-	    float height = max - posYN + 1.0f;
-	    float  width = Math.min((float) beadDepth, height / 2.0f) - 1.0f;
+	    double  posXW = beadDisplacement;
+	    double  posYN = min;
+	    double height = max - posYN + 1.0f;
+	    double  width = Math.min(beadDepth, height / 2.0f) - 1.0f;
+
+	    if (JComponent.class.isInstance(context))
+		if (! ((JComponent) context).getVisibleRect().intersects(posXW, posYN, width, height))
+		    return;
 
 	    if (width < beadDepth)
-		posXW += ((beadDepth - height) /  2.0f);
+		posXW += ((beadDepth - width) /  2.0f);
 
-	    shape = new RoundRectangle2D.Float(posXW, posYN,
-					       width, height,
-					       arcWidth, arcHeight);
+	    shape = new RoundRectangle2D.Double(posXW, posYN,
+						width, height,
+						arcWidth, arcHeight);
 	}
 
 	g.setPaint(beadFill);
