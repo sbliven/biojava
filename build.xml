@@ -500,7 +500,7 @@
               packages="org.biojava.bio.seq.impl:org.biojava.bio.seq.projection:org.biojava.utils:org.biojava.utils.cache:org.biojava.utils.xml:org.biojava.utils.stax:org.biojava.utils.io:org.biojava.utils.math:org.biojava.utils.net:org.biojava.bio.seq.distributed:org.biojava.bio.seq.io.filterxml:org.biojava.bio.program.tagvalue" />
 
        <group title="Experimental/New Packages"
-              packages="org.biojava.bio.proteomics:org.biojava.bio.molbio:org.biojava.stats.svm:org.biojava.stats.svm.tools:org.biojava.bio.seq.homol:org.biojava.directory:org.biojava.utils.lsid:org.biojava.bio.program.unigene:org.biojava.bio.program.ssaha" />
+              packages="org.biojava.bio.proteomics:org.biojava.bio.molbio:org.biojava.stats.svm:org.biojava.stats.svm.tools:org.biojava.bio.seq.homol:org.biojava.directory:org.biojava.utils.lsid:org.biojava.bio.program.unigene:org.biojava.bio.program.ssaha:org.biojava.bio.annodb" />
 	      
        <taglet name="UserLevel" path="${build.dest.taglets}" />
     </javadoc>

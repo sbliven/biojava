@@ -47,11 +47,14 @@ import org.biojava.bio.program.indexdb.*;
  *
  * <pre>
  * File fileToIndex; // get this from somewhere
- * BioStore store = bsf.createBioStore();
- * Indexer indexer = new Indexer(fileToIndex, store);
- * indexer.setPrimaryKeyName("foo");
- * indexer.addSecondaryKey("bar");
- * indexer.addSecondaryKey("baz");
+ *
+ * // don't forget to register all the apropreate keys to the factory first.
+ * BioIndexStore indexStore = bioIndxStrFact.createBioStore();
+ *
+ * Indexer indexer = new Indexer(fileToIndex, indexStore);
+ * indexer.setPrimaryKeyName("foo", new String[] { "foo" });
+ * indexer.addSecondaryKey("bar", new String[] { "x", "y", "bar"});
+ * indexer.addSecondaryKey("baz", new String[] { "z" });
  *
  * TagValueParser tvParser; // make this appropriate for your format
  * TagValueListener listener; // make this appropriate for your format
@@ -95,7 +98,7 @@ implements TagValueListener {
     this.keys = new SmallMap();
     this.keyValues = new SmallMap();
     this.depth = 0;
-    stack = new Stack();
+    this.stack = new Stack();
   }
   
   /**
@@ -152,7 +155,7 @@ implements TagValueListener {
    * @param keyName  the name of the secondary key to add
    * @param path  the names of each tag to follow to reach the value of the key
    */
-  public void addKey(String keyName, Object[] path) {
+  public void addKeyPath(String keyName, Object[] path) {
     keys.put(path, new KeyState(keyName));
   }
   
@@ -161,8 +164,12 @@ implements TagValueListener {
    *
    * @param keyName  the name of the key to remove
    */
-  public void removeKey(String keyName) {
+  public void removeKeyPath(String keyName) {
     keys.remove(keyName);
+  }
+  
+  public Object[] getKeyPath(String keyName) {
+    return (Object []) keys.get(keyName);
   }
   
   public void startRecord() {

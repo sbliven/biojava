@@ -1,4 +1,4 @@
-package org.biojava.bio.ann;
+package org.biojava.bio.annodb;
 
 import java.util.*;
 
