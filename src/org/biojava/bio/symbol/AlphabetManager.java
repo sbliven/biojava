@@ -62,7 +62,10 @@ public final class AlphabetManager {
      */
 
     public static Symbol getAllAmbiguitySymbol(FiniteAlphabet alpha) {
-	Set allSymbols = getAllSymbols(alpha);
+	Set allSymbols = new HashSet();
+	for (Iterator i = alpha.iterator(); i.hasNext(); ) {
+	    allSymbols.add(i.next());
+	}
 	try {
 	    return alpha.getAmbiguity(allSymbols);
 	} catch (IllegalSymbolException ex) {
@@ -1165,22 +1168,26 @@ public final class AlphabetManager {
    * @return an AlphabetIndex instance
    * @since 1.1
    */
-  public static AlphabetIndex getAlphabetIndex(
-    FiniteAlphabet alpha
-  ) {
-    final int generateIndexSize = 160;
-    AlphabetIndex ai = (AlphabetIndex) alphabetToIndex.get(alpha);
-    if(ai == null) {
-      int size = alpha.size();
-      if(size <= generateIndexSize) {
-        ai = new LinearAlphabetIndex(alpha);
-      } else {
-        ai = new HashedAlphabetIndex(alpha);
-      }
-      alphabetToIndex.put(alpha, ai);
+
+    public static AlphabetIndex getAlphabetIndex(FiniteAlphabet alpha) 
+    {
+	final int generateIndexSize = 10;   // THOMASD -- wrong!
+	AlphabetIndex ai = (AlphabetIndex) alphabetToIndex.get(alpha);
+	if(ai == null) {
+	    int size = alpha.size();
+	    if(size <= generateIndexSize) {
+		ai = new LinearAlphabetIndex(alpha);
+	    } else {
+		if (alpha.getAlphabets().size() > 1) {
+		    ai = new CrossProductAlphabetIndex(alpha);
+		} else {
+		    ai = new HashedAlphabetIndex(alpha);
+		}
+	    }
+	    alphabetToIndex.put(alpha, ai);
+	}
+	return ai;
     }
-    return ai;
-  }
 
   /**
    * Get an indexer for an array of symbols.
