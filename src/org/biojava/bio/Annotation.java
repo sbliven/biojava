@@ -109,9 +109,9 @@ public interface Annotation extends Changeable {
   Map asMap();
    
   /**
-   * A realy useful empty and immutable annotation object.
+   * A really useful empty and immutable annotation object.
    * <P>
-   * Use this instead of null when you realy don't want an object or an
+   * Use this instead of null when you really don't want an object or an
    * implementation to have annotation even though it should implement
    * Annotatable.
    */
@@ -123,7 +123,7 @@ public interface Annotation extends Changeable {
   class EmptyAnnotation implements Annotation, Serializable {
     public Object getProperty(Object key) throws NoSuchElementException {
       throw new NoSuchElementException(
-        "There are no keys in the Empty Annotaion object: " +
+        "There are no keys in the Empty Annotation object: " +
         key
       );
     }
@@ -131,7 +131,7 @@ public interface Annotation extends Changeable {
     public void setProperty(Object key, Object value)
     throws ChangeVetoException {
       throw new ChangeVetoException(
-        "You can not add propertys to the Empy Annotaion object: " +
+        "You can not add properties to the Empty Annotation object: " +
         key + " -> " + value
       );
     }
