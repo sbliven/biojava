@@ -24,6 +24,38 @@ public interface Operation {
   public Class getOutputClass();
   
   /**
+   * Return wether this operation selects a propper subset of the items selected
+   * by op.
+   * <P>
+   * Given any queryable, you can apply both op and this to it to produce two
+   * sets of items. If the items returned by this is always guaranteed to be a
+   * propper subset of the items returned by super regardless of the input set,
+   * then return true. Otherwise return false. The empty set is vicariously a
+   * propper subset of all sets. The set of everything is clearly a propper
+   * superset of all sets. Any set is a propper subset of itself.
+   *
+   * @param op  the prospective subset operator
+   * @return true if sub returns a propper subset of items returned by super
+   */
+  public boolean isPropperSubsetOf(Operation op);
+  
+  /**
+   * Return wether the two operations are guaranteed to return disjoint items.
+   * <P>
+   * Given any queryable, you can apply both operations to it to produce two
+   * sets of items. If the items returned by the two operations have an empty 
+   * intersection given any input set then return true. Otherwise return false.
+   * The empty set is disjoint from itself as the intersection is empty.
+   * <P>
+   * Trivialy, given two sets A and B, A is disjoint from B if A is some propper
+   * subset of C and B is some propper subset of not(C).
+   *
+   * @param op  the seccond Operation
+   * @return true if the two operations are disjoint
+   */
+  public boolean isDisjoint(Operation op);
+  
+  /**
    * Return a Queryable by applying this Operation to <code>items</code>.
    * The items set should be castable to getInputClass and the result set should
    * be castable to getOutputClass.

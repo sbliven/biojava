@@ -20,6 +20,14 @@ public abstract class Follow implements Operation {
     return result;
   }
   
+  public boolean isPropperSubsetOf(Operation op) {
+    return op.equals(this);
+  }
+  
+  public boolean isDisjoint(Operation op) {
+    return false;
+  }
+  
   /**
    * This method should implement the process of following a single item to its
    * result set.
