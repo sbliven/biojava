@@ -29,6 +29,7 @@ import junit.framework.TestCase;
  * Tests for Ontology.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.4
  */
 public class OntologyTest extends TestCase {
@@ -119,13 +120,16 @@ public class OntologyTest extends TestCase {
     }
     
     public void testSimpleISA()
-    throws OntologyException{
+    throws OntologyException, org.biojava.utils.ChangeVetoException {
       Ontology onto = OntoTools.getDefaultFactory().createOntology(
         "is-a tester",
         "Lets just get this is-a relationship stuff tested across ontologies"
       );
       
+      Term local_isa = onto.importTerm(OntoTools.IS_A);
       
+      doIsaTest(local_isa, OntoTools.IS_A, true);
+      doIsaTest(local_isa, OntoTools.HAS_A, false);
     }
 }
 

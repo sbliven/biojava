@@ -99,6 +99,14 @@ public final class OntoTools {
     Term subject,
     Term object
   ) throws OntologyException {
+    String _prefix = "isa(" + subject + "," + object + ") ";
+    System.err.println(_prefix + "Starting");
+    
+    if(subject == object) {
+      System.err.println(_prefix + "Ending true");
+      return true;
+    }
+    
     OntologyOps oo;
     if(subject.getOntology() instanceof OntologyOps) {
       oo = (OntologyOps) subject.getOntology();
@@ -107,77 +115,58 @@ public final class OntoTools {
     }
     
     if(subject.getOntology() == object.getOntology()) {
+      System.err.println(_prefix + "Delegating to ontology tools");
       return oo.isa(subject, object);
     } else {
-      Set remoteTriples = oo.transitiveClosure(
+      System.err.println(_prefix + "Computing transitive closure");
+      Ontology remoteTriples = oo.transitiveClosure(
         REMOTE_TERM, ANY, IS_A
       );
-    
-      for(Iterator i = remoteTriples.iterator(); i.hasNext(); ) {
+      System.err.println(_prefix + "Searching closure for " + subject);
+      for(
+        Iterator i = remoteTriples.getTriples(null, null, null).iterator();
+        i.hasNext();
+      ) {
         Triple triple = (Triple) i.next();
         RemoteTerm rt = (RemoteTerm) triple.getSubject();
+        System.err.println(_prefix + "Following to " + rt.getRemoteTerm() + "," + object);
         if(!isa(
           rt.getRemoteTerm(),
           object
         )) {
+          System.err.println(_prefix + "Ending true");
           return true;
         }
       }
       
+      System.err.println(_prefix + "Ending false");
       return false;
     }
   }
-  
-  private static class DefaultOps
-  implements OntologyOps {
-    public Set transitiveClosure(
-      Term subject,
-      Term object,
-      Term relation
-    ) throws OntologyException {
-      return null;
+    
+  public static Set getTriples(
+    Ontology ontology,
+    Term subject,
+    Term object,
+    Term relation
+  ) throws OntologyException {
+    Set res = new HashSet();
+    
+    for(
+      Iterator tripI = ontology.getTriples(null, null, null).iterator();
+      tripI.hasNext();
+    ) {
+      Triple trip = (Triple) tripI.next();
+      
+      if(
+        (subject == ANY || isa(trip.getSubject(), subject)) &&
+        (object == ANY || isa(trip.getObject(), object)) &&
+        isa(trip.getRelation(), relation)
+      ) {
+        res.add(trip);
+      }
     }
     
-    public boolean isa(Term subject, Term object)
-    throws OntologyException {
-      if(subject.getOntology() != object.getOntology()) {
-        throw new IllegalArgumentException(
-          "isa must be called with two terms from the same ontology: " +
-          subject.toString() + " , " + object.toString()
-        );
-      }
-      
-      Set visited = new HashSet();
-      
-      return recurseIsa(subject, object, visited);
-    }
-    
-    private boolean recurseIsa(Term subject, Term object, Set visited) {
-      System.out.println("Checking " + subject + " and " + object);
-      if(subject == object) {
-        System.out.println("equal");
-        return true;
-      }
-      
-      if(visited.contains(subject)) {
-        System.out.println("seen before");
-        return false;
-      }
-      
-      visited.add(subject);
-      
-      Set trips = subject.getOntology().getTriples(subject, null, IS_A);
-      
-      for(Iterator i = trips.iterator(); i.hasNext(); ) {
-        Triple trip = (Triple) i.next();
-        Term tobj = trip.getObject();
-        
-        if(recurseIsa(tobj, object, visited)) {
-          return true;
-        }
-      }
-      
-      return false;
-    }
+    return res;
   }
 }

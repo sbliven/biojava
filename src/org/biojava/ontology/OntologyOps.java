@@ -56,13 +56,13 @@ public interface OntologyOps {
    * @param subject   the Term that all subjects must inherit from
    * @param object    the Term that all objects must inherit from
    * @param relation  the Term that all relations must inherit from
-   * @return a Set of TripleTerm instances representing the complete transitive
+   * @return an Ontolgy representing the transitive closure of the relation
    *         closure of this sub-ontology
    * @throws OntologyException if there was some error in accessing the ontology
    * @throws NullPointerException if any of the parameters are null - use
    *         the <code>any</code> core type to represent a catch-all
    */
-  public Set transitiveClosure(
+  public Ontology transitiveClosure(
     Term subject,
     Term object,
     Term relation
