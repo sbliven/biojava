@@ -21,9 +21,11 @@
 package org.biojava.utils;
 
 import java.util.AbstractSet;
+import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Lightweight implementation of Set which uses little memory to store a small
@@ -52,12 +54,13 @@ public class SmallSet extends AbstractSet {
     numItems = 0;
   }
   
-  public SmallSet(Set set) {
-    numItems = 0;
-    items = new Object[numItems];
-    for(Iterator i = set.iterator(); i.hasNext(); ) {
-      items[numItems++] = i.next();
-    }
+  public SmallSet(Collection col) {
+      if (! (col instanceof Set)) {
+          col = new HashSet(col);
+      }
+      numItems = col.size();
+      items = new Object[numItems];
+      items = col.toArray(items);
   }
   
   public boolean contains(Object o) {
