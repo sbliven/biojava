@@ -304,18 +304,6 @@
 
     </ambiguity>
 
-    <ambiguity>
-
-      <symbol>
-
-        <short>-</short>
-
-        <long>gap</long>
-
-      </symbol>
-
-    </ambiguity>
-
   </alphabet>
 
 
@@ -631,18 +619,6 @@
       <symbolref name="E"/>
 
       <symbolref name="Q"/>
-
-    </ambiguity>
-
-    <ambiguity>
-
-      <symbol>
-
-        <short>-</short>
-
-        <long>gap</long>
-
-      </symbol>
 
     </ambiguity>
 
