@@ -1,106 +1,70 @@
-/*
- *                    BioJava development code
- *
- * This code may be freely distributed and modified under the
- * terms of the GNU Lesser General Public Licence.  This should
- * be distributed with the code.  If you do not have a copy,
- * see:
- *
- *      http://www.gnu.org/copyleft/lesser.html
- *
- * Copyright for this code is held jointly by the individual
- * authors.  These should be listed in @author doc comments.
- *
- * For more information on the BioJava project and its aims,
- * or to join the biojava-l mailing list, visit the home page
- * at:
- *
- *      http://www.biojava.org/
- *
- */
-
-
 package org.biojava.bio.symbol;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.biojava.bio.Annotation;
-import org.biojava.bio.BioError;
-import org.biojava.utils.ListTools;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.io.Serializable;
+import java.io.ObjectStreamException;
+import java.io.InvalidObjectException;
 
 /**
- * A basic implementation of BasisSymbol.
+ * Provides custom serialization hooks.
  *
- * @for.user
- * If you wish to construct new Symbols, you should normally do so via utility methods
- * on <code>AlphabetManager</code>.
- *
- * @for.developer
- * This may be a useful base class for custom implementations.
- *
+ * @since 1.4
  * @author Matthew Pocock
  */
- 
-class SimpleBasisSymbol extends SimpleSymbol
-implements BasisSymbol {
-  protected List symbols;
-  
-  protected SimpleBasisSymbol(
-    Annotation annotation, List symbols
-  ) throws IllegalSymbolException {
-    this(annotation);
-    if(symbols == null) {
-      throw new NullPointerException("symbols can't be null");
-    }
-    if(symbols.size() == 0) {
-      throw new IllegalSymbolException(
-        "Can't create BasisSymbol for an empty list. Use the Gap symbol."
-      );
-    }
-    this.symbols = ListTools.createList(symbols);
+class SimpleBasisSymbol
+        extends AbstractSimpleBasisSymbol
+        implements Serializable
+{
+  public SimpleBasisSymbol(Annotation annotation, List symbols)
+          throws IllegalSymbolException
+  {
+    super(annotation, symbols);
   }
-  
-  protected SimpleBasisSymbol(
-    Annotation annotation
-  ) {
+
+  public SimpleBasisSymbol(Annotation annotation)
+  {
     super(annotation);
   }
-  
-  public SimpleBasisSymbol(
-    Annotation annotation,
-    Alphabet matches
-  ) {
-    this(annotation);
-    this.matches = matches;
-    this.symbols = Collections.nCopies(1, this);
+
+  public SimpleBasisSymbol(Annotation annotation, Alphabet matches)
+  {
+    super(annotation, matches);
   }
-  
-  public SimpleBasisSymbol(
-    Annotation annotation,
-    List symbols,
-    Alphabet matches
-  ) throws IllegalSymbolException {
-    this(annotation, symbols);
-    this.matches = matches;
+
+  public SimpleBasisSymbol(Annotation annotation, List symbols, Alphabet matches)
+          throws IllegalSymbolException
+  {
+    super(annotation, symbols, matches);
   }
-  
-  public final List getSymbols() {
-    if(symbols == null) {
-      symbols = createSymbols();
+
+  private Object writeReplace()
+  {
+    return new SBSH(this);
+  }
+
+  private static class SBSH
+          implements Serializable
+  {
+    private List syms;
+    private Annotation ann;
+
+    public SBSH(SimpleBasisSymbol sym)
+    {
+      syms = sym.getSymbols();
+      ann = sym.getAnnotation();
     }
-    if(symbols.size() == 0) {
-      throw new BioError(
-        "Assertion Failure: symbols array is of length 0 in " + this +
-        "\n\tname: " + getName() +
-        "\n\tsymbols: " + this.symbols +
-        "\n\tmatches: " + this.matches
-      );
+
+    public Object readResolve()
+            throws ObjectStreamException
+    {
+      try {
+        return AlphabetManager.createSymbol(ann, syms, null);
+      } catch (IllegalSymbolException ex) {
+        throw new InvalidObjectException("Couldn't resolve symbol:" + syms);
+      }
     }
-    return symbols;
-  }
-  
-  protected List createSymbols() {
-    throw new BioError("Assertion Failure: Symbols list is null");
   }
 }

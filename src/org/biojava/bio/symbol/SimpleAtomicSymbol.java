@@ -23,6 +23,9 @@
 package org.biojava.bio.symbol;
 
 import java.util.List;
+import java.io.Serializable;
+import java.io.ObjectStreamException;
+import java.io.InvalidObjectException;
 
 import org.biojava.bio.Annotation;
 
@@ -38,8 +41,10 @@ import org.biojava.bio.Annotation;
  *
  * @author Matthew Pocock
  */
-public class SimpleAtomicSymbol extends SimpleBasisSymbol
-implements AtomicSymbol {  
+public class SimpleAtomicSymbol
+        extends AbstractSimpleBasisSymbol
+        implements AtomicSymbol, Serializable
+{
   protected SimpleAtomicSymbol(
     Annotation annotation, List syms
   ) throws IllegalSymbolException {
@@ -48,5 +53,36 @@ implements AtomicSymbol {
 
   protected Alphabet createMatches() {
     return new SingletonAlphabet(this);
+  }
+
+  private Object writeReplace()
+  {
+    return new SBSH(this);
+  }
+
+  private static class SBSH
+          implements Serializable
+  {
+    private List syms;
+    private Annotation ann;
+
+    public SBSH(SimpleAtomicSymbol sym)
+    {
+      syms = sym.getSymbols();
+      ann = sym.getAnnotation();
+      System.out.println("made SBSH for " + sym.hashCode() + " " + sym);
+    }
+
+    public Object readResolve()
+            throws ObjectStreamException
+    {
+      try {
+        Symbol sym = AlphabetManager.createSymbol(ann, syms, null);
+        System.out.println("read SBSH for " + sym.hashCode() + " " + sym);
+        return sym;
+      } catch (IllegalSymbolException ex) {
+        throw new InvalidObjectException("Couldn't resolve symbol:" + syms);
+      }
+    }
   }
 }

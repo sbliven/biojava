@@ -57,6 +57,7 @@ import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.OverlayMap;
 import org.biojava.utils.Unchangeable;
+import org.biojava.utils.cache.WeakValueHashMap;
 import org.biojava.utils.lsid.Identifiable;
 import org.biojava.utils.lsid.LifeScienceIdentifier;
 import org.biojava.utils.lsid.LifeScienceIdentifierParseException;
@@ -169,6 +170,7 @@ public final class AlphabetManager {
   static private GapSymbol gapSymbol;
   static private Map gapBySize;
   static private Map alphabetToIndex = new WeakHashMap();
+  static private Map symListToSymbol;
 
   /**
    * Retrieve the alphabet for a specific name.
@@ -413,10 +415,22 @@ public final class AlphabetManager {
       return createSymbol(annotation, symList, alpha);
   }
 
+  static private Symbol readFromCache(List symList)
+  {
+    System.out.println("Reading symbol: " + symList + " -> " + symListToSymbol.get(symList));
+    return (Symbol) symListToSymbol.get(symList);
+  }
+
+  static private void writeToCache(List symList, Symbol sym)
+  {
+    System.out.println("Writing symbol: " + symList + " -> " + sym);
+    symListToSymbol.put(new ArrayList(symList), sym);
+  }
+
   /**
    * <p>
    * Generates a new Symbol instance that represents the tuple of Symbols in
-   * symList.
+   * symList. This will attempt to return the same symbol for the same list.
    * </p>
    *
    * <p>
@@ -433,6 +447,11 @@ public final class AlphabetManager {
     List symList, Alphabet alpha)
           throws IllegalSymbolException
   {
+    Symbol cs = readFromCache(symList);
+    if(cs != null) {
+      return cs;
+    }
+
     Iterator i = symList.iterator();
     int basis = 0;
     int atomC = 0;
@@ -456,18 +475,24 @@ public final class AlphabetManager {
 
     try {
       if(atomC == symList.size()) {
-        return new SimpleAtomicSymbol(annotation, symList);
+        Symbol sym = new SimpleAtomicSymbol(annotation, symList);
+        writeToCache(symList, sym);
+        return sym;
       } else if((gaps + basis) == symList.size()) {
-        return new SimpleBasisSymbol(
+        Symbol sym = new SimpleBasisSymbol(
                 annotation,
                 symList,
                 new SimpleAlphabet(
                         expandMatches(alpha, symList, new ArrayList())));
+        writeToCache(symList, sym);
+        return sym;
       } else {
-        return new SimpleSymbol(
+        Symbol sym = new SimpleSymbol(
                 annotation,
                 new SimpleAlphabet(
                         expandBasis(alpha, symList, new ArrayList())));
+        writeToCache(symList,  sym);
+        return sym;
       }
     } catch (IllegalSymbolException ise) {
       throw new IllegalSymbolException(
@@ -919,6 +944,8 @@ public final class AlphabetManager {
 
     nameToAlphabet.put("INTEGER", IntegerAlphabet.getInstance());
     nameToAlphabet.put("DOUBLE", DoubleAlphabet.getInstance());
+
+    symListToSymbol = new WeakValueHashMap();
 
     try {
       gapBySize.put(
@@ -1597,7 +1624,10 @@ public final class AlphabetManager {
         }
     }
 
-    private static class WellKnownBasisSymbol extends Unchangeable implements BasisSymbol, Serializable {
+    private static class WellKnownBasisSymbol
+            extends Unchangeable
+            implements BasisSymbol, Serializable
+    {
         protected BasisSymbol symbol;
         private Set matches;
 
