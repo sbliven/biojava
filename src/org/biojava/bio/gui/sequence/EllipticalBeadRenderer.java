@@ -43,7 +43,7 @@ import org.biojava.utils.ChangeVetoException;
  * <code>EllipticalBeadRenderer</code> renders features as
  * simple ellipses. Their outline and fill <code>Paint</code>,
  * <code>Stroke</code>, feature depth, Y-axis displacement are
- * configurable. Also configurable is the maximum ratio of long axis
+ * configurable. Also configurable is the minimum ratio of long axis
  * to short axis of the ellipse - this prevents long features also
  * becoming ever wider and obscuring neighbours.
  *
@@ -117,34 +117,6 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
 	    double  width = Math.max(((double) (dif + 1)) * context.getScale(), 1.0f);
 	    double height = Math.min(beadDepth, width / dimensionRatio);
 
-	    // This is an optimization for cases where the
-	    // SequenceRenderContext also extend a JComponent and can
-	    // inform us of their visible area
-	    if (JComponent.class.isInstance(context))
-	    {
-		Rectangle visible = ((JComponent) context).getVisibleRect();
-		
-		// Hack! Compensates for offset in SequencePanel
-
-		// Remove the contribution of any scroll offset from the
-		// transform
-		AffineTransform t = g.getTransform();
-		t.translate(visible.getX(), visible.getY());
-
-		// Invert the remainder and apply to cancel out the
-		// remaining offset to visible
-		try
-		{
-		    if (! t.createInverse().createTransformedShape(visible)
-			.intersects(posXW, posYN, width, height))
-			return;
-  		}
-    		catch (NoninvertibleTransformException ni)
-    		{
-    		    ni.printStackTrace();
-    		}
-  	    }
-
 	    // If the bead height occupies less than the full height
 	    // of the renderer, move it down so that it is central
 	    if (height < beadDepth)
@@ -158,25 +130,6 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
 	    double  posYN = context.sequenceToGraphics(min);
 	    double height = Math.max(((double) dif + 1) * context.getScale(), 1.0f);
 	    double  width = Math.min(beadDepth, height / dimensionRatio);
-
-	    if (JComponent.class.isInstance(context))
-	    {
-		Rectangle visible = ((JComponent) context).getVisibleRect();
-
-		AffineTransform t = g.getTransform();
-		t.translate(visible.getX(), visible.getY());
-
-		try
-		{
-		    if (! t.createInverse().createTransformedShape(visible)
-			.intersects(posXW, posYN, width, height))
-			return;
-  		}
-    		catch (NoninvertibleTransformException ni)
-    		{
-    		    ni.printStackTrace();
-    		}
-  	    }
 
 	    if (width < beadDepth)
 		posXW += ((beadDepth - width) /  dimensionRatio);
@@ -220,7 +173,7 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
     }
 
     /**
-     * <code>setDimensionRatio</code> sets the maximum ratio of
+     * <code>setDimensionRatio</code> sets the minimum ratio of
      * long dimension to short dimension of the bead. This should be
      * equal, or greater than 1.
      *

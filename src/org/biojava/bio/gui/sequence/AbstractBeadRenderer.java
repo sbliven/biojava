@@ -388,7 +388,6 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 								 new Double(displacement)));
 		cs.firePreChangeEvent(ce);
 		beadDisplacement = displacement;
-		
 		cs.firePostChangeEvent(ce);
 	    }
 	}

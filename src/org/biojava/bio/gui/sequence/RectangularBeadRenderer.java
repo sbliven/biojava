@@ -51,7 +51,7 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
     implements FeatureRenderer
 {
     /**
-     * Creates a new <code>RectangulerBeadRenderer</code> object.
+     * Creates a new <code>RectangularBeadRenderer</code> object.
      *
      * @param beadDepth a <code>double</code> value.
      * @param beadDisplacement a <code>double</code> value.
@@ -94,40 +94,14 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
 	    double  width = Math.max(((double) (dif + 1)) * context.getScale(), 1.0f);
 	    double height = Math.min(beadDepth, width / 2.0f);
 
-	    // This is an optimization for cases where the
-	    // SequenceRenderContext also extend a JComponent and can
-	    // inform us of their visible area
-	    if (JComponent.class.isInstance(context))
-	    {
-		Rectangle visible = ((JComponent) context).getVisibleRect();
-		
-		// Hack! Compensates for offset in SequencePanel
-
-		// Remove the contribution of any scroll offset from the
-		// transform
-		AffineTransform t = g.getTransform();
-		t.translate(visible.getX(), visible.getY());
-
-		// Invert the remainder and apply to cancel out the
-		// remaining offset to visible
-		try
-		{
-		    if (! t.createInverse().createTransformedShape(visible)
-			.intersects(posXW, posYN, width, height))
-			return;
-  		}
-    		catch (NoninvertibleTransformException ni)
-    		{
-    		    ni.printStackTrace();
-    		}
-  	    }
-
 	    // If the bead height occupies less than the full height
 	    // of the renderer, move it down so that it is central
 	    if (height < beadDepth)
 		posYN += ((beadDepth - height) / 2.0f);
 
-	    shape = new Rectangle2D.Double(posXW, posYN, width, height);
+	    shape = new Rectangle2D.Double(posXW, posYN,
+                                           Math.floor(width),
+                                           Math.floor(height));
 	}
 	else
 	{
@@ -136,29 +110,12 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
 	    double height = Math.max(((double) dif + 1) * context.getScale(), 1.0f);
 	    double  width = Math.min(beadDepth, height / 2.0f);
 
-	    if (JComponent.class.isInstance(context))
-	    {
-		Rectangle visible = ((JComponent) context).getVisibleRect();
-
-		AffineTransform t = g.getTransform();
-		t.translate(visible.getX(), visible.getY());
-
-		try
-		{
-		    if (! t.createInverse().createTransformedShape(visible)
-			.intersects(posXW, posYN, width, height))
-			return;
-  		}
-    		catch (NoninvertibleTransformException ni)
-    		{
-    		    ni.printStackTrace();
-    		}
-  	    }
-
 	    if (width < beadDepth)
 		posXW += ((beadDepth - width) /  2.0f);
 
-	    shape = new Rectangle2D.Double(posXW, posYN, width, height);
+	    shape = new Rectangle2D.Double(posXW, posYN,
+                                           Math.floor(width),
+                                           Math.floor(height));
 	}
 
 	g.setPaint(beadFill);
