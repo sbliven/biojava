@@ -57,6 +57,7 @@ import java.util.List; // usefull trick to 'hide' javax.swing.List
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author David Huen
  */
 public class SequencePanel
 extends JComponent
@@ -74,6 +75,7 @@ Changeable {
   private RangeLocation range;
   private int direction;
   private double scale;
+    private double pixelOffset;
   
   private SequenceRenderContext.Border leadingBorder;
   private SequenceRenderContext.Border trailingBorder;
@@ -228,6 +230,7 @@ Changeable {
   {
     direction = HORIZONTAL;
     scale = 12.0;
+    pixelOffset = 0.0;
 
     theMonitor = new RendererMonitor();
     leadingBorder = new SequenceRenderContext.Border();
@@ -240,7 +243,7 @@ Changeable {
   public SequencePanel() {
     super();
     if(getFont() == null) {
-      setFont(new Font("Times New Roman", Font.PLAIN, 12));
+      setFont(new Font("serif", Font.PLAIN, 12));
     }
     this.addPropertyChangeListener(theMonitor);
     this.addMouseListener(mouseListener);
@@ -385,6 +388,10 @@ Changeable {
     AffineTransform oldTransform = g2.getTransform();
     Rectangle2D currentClip = g2.getClip().getBounds2D();
     
+    // do a transform to offset drawing to the neighbourhood of zero.
+    // the 50 here is pretty arbitrary.  The precise value doesn't matter
+    setGraphicsOrigin(50.0-sequenceToGraphics(range.getMin()));
+
     double minAcross = sequenceToGraphics(range.getMin()) -
                        renderer.getMinimumLeader(this);
     double maxAcross = sequenceToGraphics(range.getMax()) + 1 +
@@ -451,11 +458,11 @@ Changeable {
   }
 
   public double sequenceToGraphics(int seqPos) {
-    return ((double) (seqPos-1)) * scale;
+    return ((double) (seqPos-1)) * scale + pixelOffset;
   }
 
   public int graphicsToSequence(double gPos) {
-    return ((int) (gPos / scale)) + 1;
+    return ((int) ((gPos - pixelOffset) / scale)) + 1;
   }
   
   public int graphicsToSequence(Point point) {
@@ -465,6 +472,12 @@ Changeable {
       return graphicsToSequence(point.getY());
     }
   }
+
+ public void setGraphicsOrigin(double displacement) {
+     // System.out.println("setGraphicsOrigin: " + displacement);  
+     this.pixelOffset += displacement;
+  }
+
 
   public void resizeAndValidate() {
     //System.out.println("resizeAndValidate starting");

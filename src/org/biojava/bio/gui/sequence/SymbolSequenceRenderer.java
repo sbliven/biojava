@@ -33,6 +33,20 @@ import org.biojava.bio.gui.*;
 
 import java.util.List;
 
+// The graphics model in Java
+// drawing space -> applet space -> device space
+// All operations are cumulative, including translates
+// translates will move drawing rightward/downward for any supplied value
+
+/**
+ * Render the symbols of a sequence.
+ *
+ * @author Matthew Pocock
+ * @author Thomas Down
+ * @author David Huen
+ */ 
+
+
 public class SymbolSequenceRenderer implements SequenceRenderer {
     private double depth = 25.0;
     
@@ -57,7 +71,7 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
       
       g.setFont(src.getFont());
       Rectangle2D oldClip = g.getClipBounds();
-      AffineTransform oldTrans = g.getTransform();
+      // AffineTransform oldTrans = g.getTransform();
       
       g.setColor(Color.black);
       
@@ -65,10 +79,13 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
       Rectangle2D maxBounds =
         g.getFont().getMaxCharBounds(g.getFontRenderContext());
       if(
+        // symbol must be larger than 30% of char size
+        // attempting to render
         src.getScale() >= maxBounds.getWidth()*0.3 &&
         src.getScale() >= maxBounds.getHeight()*0.3
       ) {
         double fudgeAcross = 0.0;
+	// intended to center text in band
         double fudgeDown = 0.0;
         if (direction == src.HORIZONTAL) {
           fudgeAcross = 0.0 /*- maxBounds.getCenterX()*/;
@@ -78,29 +95,42 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
           fudgeDown = scale * 0.5 - maxBounds.getCenterY();
         }
         
-        int leading;
-        int trailing;
-        int symOffset = src.getRange().getMin();
-        double graphOffset = src.sequenceToGraphics(symOffset);
+        int leading;       // these correspond to the symbol index value
+        int trailing;      // of the ends of the clip region
+        int symOffset = src.getRange().getMin();    // first symbol by base index value
+        double graphOffset = src.sequenceToGraphics(symOffset);   // by pixels
         if(src.getDirection() == src.HORIZONTAL) {
+	  // compute base nos. associated with ends of clip region
           leading = src.graphicsToSequence(oldClip.getMinX());
           trailing = src.graphicsToSequence(oldClip.getMaxX());
-          g.translate(-graphOffset, 0.0);
-          g.setClip(AffineTransform.getTranslateInstance(-graphOffset, 0.0)
-            .createTransformedShape(oldClip));
+	  // A transform to render the symbols is setup in 
+          // SequencePanel.paintComponent().
+          // start of leader will place you at leftmost edge of draw area.
+
+          // the default clip region from SequencePanel.paintComponent()
+          // spans the leader, sequence range and trailer.
+          // it is adequate for this method although we could further
+          // restrict it to the sequence region itself 
+
+          // g.translate(-graphOffset, 0.0);
+          // g.setClip(AffineTransform.getTranslateInstance(-graphOffset, 0.0)
+          //  .createTransformedShape(oldClip));
         } else {
           leading = src.graphicsToSequence(oldClip.getMinY());
           trailing = src.graphicsToSequence(oldClip.getMaxY());
-          g.translate(0.0, -graphOffset);
-          g.setClip(AffineTransform.getTranslateInstance(0.0, -graphOffset)
-            .createTransformedShape(oldClip));
+
+          // g.translate(0.0, -graphOffset);
+          // g.setClip(AffineTransform.getTranslateInstance(0.0, -graphOffset)
+          //   .createTransformedShape(oldClip));
         }
-        Rectangle2D clip = g.getClipBounds();
+	//        Rectangle2D clip = g.getClipBounds();
         
+	// can this ever happen? leading > pos.getMin?, 
+        //                      pos.getMax() > trailing?        
         int min = Math.max(src.getRange().getMin(), leading);
         int max = Math.min(src.getRange().getMax(), trailing+1);
-        
-        System.out.println("oldTrans: " + oldTrans);
+
+        /* System.out.println("oldTrans: " + oldTrans);
         System.out.println("pos: " + src.getRange());
         System.out.println("symOffset: " + symOffset);
         System.out.println("graphOffset: " + graphOffset);
@@ -108,21 +138,21 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
         System.out.println("trailing: " + trailing);
         System.out.println("min: " + min);
         System.out.println("max: " + max);
-        System.out.println("-");
+        System.out.println("-"); */
         
         for (int sPos = min; sPos <= max; ++sPos) {
-          double gPos = src.sequenceToGraphics(sPos - symOffset + 1);
+	  double gPos = src.sequenceToGraphics(sPos /* - symOffset */ + 1);
           char c = seq.symbolAt(sPos).getToken();
           if (direction == SequencePanel.HORIZONTAL) {
             //charBox.x = gPos;
-            //g.drawString(
-            //  String.valueOf(c),
-            //  (int) (gPos + fudgeAcross), (int) fudgeDown
-            //);
             g.drawString(
-              String.valueOf(sPos).substring(0, 1),
+              String.valueOf(c),
               (int) (gPos + fudgeAcross), (int) fudgeDown
             );
+            // g.drawString(
+            //  String.valueOf(sPos).substring(0, 1),
+            //  (int) (gPos + fudgeAcross), (int) fudgeDown
+            // );
             if(sPos == 10) {
               g.draw(new Rectangle2D.Double(gPos, 0.0, src.getScale(), 10.0));
             }
@@ -137,8 +167,8 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
         }
       }
       
-      g.setTransform(oldTrans);
-      g.setClip(oldClip);
+//      g.setTransform(oldTrans);
+//      g.setClip(oldClip);
     }
   
   public SequenceViewerEvent processMouseEvent(

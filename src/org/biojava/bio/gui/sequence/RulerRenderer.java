@@ -35,6 +35,14 @@ import java.awt.geom.*;
 
 import java.util.List;
 
+/**
+ * Draw a `ruler' showing sequence coordinates.
+ *
+ * @author Matthew Pocock
+ * @author Thomas Down
+ * @author David Huen
+ */
+
 public class RulerRenderer implements SequenceRenderer {
   private double depth = 25.0;
   
@@ -66,6 +74,13 @@ public class RulerRenderer implements SequenceRenderer {
     double scale = src.getScale();
     double halfScale = scale * 0.5;
     Line2D line;
+    Rectangle2D activeClip = g.getClipBounds();
+
+    // dump some info
+    //System.out.println("ruler transform: " + g.getTransform());
+    //System.out.println("ruler min max: " + min + " " + max);
+    //System.out.println("ruler minX maxX: " + minX + " " + maxX);
+    //System.out.println("ruler activeClip:" + activeClip);
     
     if(src.getDirection() == src.HORIZONTAL) {
       line = new Line2D.Double(minX - halfScale, 0.0, maxX + halfScale, 0.0);
@@ -75,22 +90,44 @@ public class RulerRenderer implements SequenceRenderer {
     
     g.draw(line);
     
-    // we want ticks no closer than 40 pixles appart
+    // tick spacing should be decided by the size of the text needed
+    // to display the largest coordinate value and some
+    // minimum spacing limit.
+    // we want ticks no closer than 40 pixels appart
     double ten = Math.log(10);
-    double minGap = Math.log(max) / ten * 7.0;
-    int realSymsPerGap = src.graphicsToSequence(minGap + 5.0);
-    //System.out.println("Real syms: " + realSymsPerGap);
-    int snapSymsPerGap = (int) Math.exp(
-      Math.ceil(Math.log(realSymsPerGap) / ten) * ten
-    );
-    //System.out.println("Snapped syms: " + snapSymsPerGap);
+FontMetrics myFontMetrics = g.getFontMetrics();    
+    int coordWidth = myFontMetrics.stringWidth(Integer.toString(max));
+    // System.out.println("coordWidth: " + coordWidth);
+    double minGap = (double) Math.max(coordWidth, 40);
+    int realSymsPerGap = (int) Math.ceil(((minGap + 5.0) / src.getScale()));
+    // System.out.println("Real syms: " + realSymsPerGap);
+
+    // we need to snap to a value beginning 1, 2 or 5.
+    double exponent =  Math.floor(Math.log(realSymsPerGap) / ten);
+    double characteristic = realSymsPerGap 
+                            / Math.pow(10.0, exponent);
+    int snapSymsPerGap;
+    if (characteristic > 5.0) {
+      // use unit ticks
+      snapSymsPerGap = (int) Math.pow(10.0, exponent + 1.0);
+    } else if (characteristic > 2.0) {
+      // use ticks of 5
+      snapSymsPerGap = (int)(5.0 * Math.pow(10.0, exponent));
+    } else {
+      snapSymsPerGap = (int)(2.0 * Math.pow(10.0, exponent)); 
+    }
+    // System.out.println("Snapped syms: " + snapSymsPerGap);
     
     int minP = min + (snapSymsPerGap - min) % snapSymsPerGap;
     for(int indx = minP; indx <= max; indx += snapSymsPerGap) {
       double offset = src.sequenceToGraphics(indx);
+      // System.out.println("ruler indx offset: " + indx + " " +  offset);
       if(src.getDirection() == src.HORIZONTAL) {
         line.setLine(offset + halfScale, 0.0, offset + halfScale, 5.0);
-        g.drawString(String.valueOf(indx), (float) (offset + halfScale), 20.0f);
+	String labelString = String.valueOf(indx);
+        int halfLabelWidth = myFontMetrics.stringWidth(labelString) / 2;
+        g.drawString(String.valueOf(indx), 
+                     (float) (offset + halfScale - halfLabelWidth), 20.0f);
       } else {
         line.setLine(0.0, offset + halfScale, 5.0, offset + halfScale);
       }
