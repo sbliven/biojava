@@ -96,7 +96,7 @@ implements UnigeneDB {
       synchronized(db) {
         db = (SequenceDB) allCache.get(clusterID);
         if(db == null) {
-          allCache.put(clusterID, db = new AllDB(clusterID));
+          allCache.put(clusterID, db = new AllDB(getCluster(clusterID), allStore));
         }
       }
     }
@@ -197,9 +197,43 @@ implements UnigeneDB {
   }
   
   private static class AllDB
-  extends DummySequenceDB {
-    public AllDB(String name) {
-      super("All:" + name);
+  extends AbstractSequenceDB {
+    private final Set ids;
+    private final BioStore store;
+    private final String name;
+    
+    public AllDB(UnigeneCluster cluster, BioStore store) {
+      this.name = "All:" + cluster.getID();
+      ids = new HashSet();
+      this.store = store;
+      
+      Annotation ann = cluster.getAnnotation();
+      Set seqs = (Set) ann.getProperty("SEQUENCES");
+      for(Iterator i = seqs.iterator(); i.hasNext(); ) {
+        Annotation sa = (Annotation) i.next();
+        ids.add(sa.getProperty("ACC"));
+      }
+    }
+    
+    public Set ids() {
+      return ids;
+    }
+    
+    public String getName() {
+      return name;
+    }
+    
+    public Sequence getSequence(String id)
+    throws BioException {
+      try {
+        Record rec = store.get(id);
+        RandomAccessReader rar = new RandomAccessReader(rec.getFile());
+        rar.seek(rec.getOffset());
+        BufferedReader reader = new BufferedReader(rar);
+        return SeqIOTools.readFastaDNA(reader).nextSequence();
+      } catch (IOException ioe) {
+        throw new BioException(ioe);
+      }
     }
   }
 }
