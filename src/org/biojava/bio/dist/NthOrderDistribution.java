@@ -18,6 +18,22 @@ public class NthOrderDistribution extends AbstractDistribution {
   private Map dists;
   private Distribution nullModel;
   
+  protected WeigthForwarder weightForwarder = null;
+  
+  protected void generateChangeSupport(ChangeType ct) {
+    super.generateChangeSupport(ct);
+    if(
+      ( (ct == null) || (ct == Distribution.WEIGHTS) ) &&
+      weightForwarder == null
+    ) {
+      weightForwarder = new WeigthForwarder(this, changeSupport);
+      for(Iterator i = dists.values().iterator(); i.hasNext(); ) {
+        Distribution dist = (Distribution) i.next();
+        dist.addChangeListener(weightForwarder, Distribution.WEIGHTS);
+      }
+    }
+  }
+  
   public NthOrderDistribution(CrossProductAlphabet alpha, DistributionFactory df)
   throws IllegalAlphabetException  {
     this.alphabet = alpha;
@@ -42,6 +58,15 @@ public class NthOrderDistribution extends AbstractDistribution {
         "The distribution must be over " + lastA +
         ", not " + dist.getAlphabet()
       );
+    }
+    
+    Distribution old = (Distribution) dists.get(sym);
+    if( (old != null) && (weightForwarder != null) ) {
+      old.removeChangeListener(weightForwarder);
+    }
+    
+    if(weightForwarder != null) {
+      dist.addChangeListener(weightForwarder);
     }
     
     dists.put(sym, dist);
@@ -145,6 +170,23 @@ public class NthOrderDistribution extends AbstractDistribution {
       throw new ChangeVetoException(
         "Can't set the null model for NthOrderDistribution.UniformNullModel"
       );
+    }
+  }
+  
+  private class WeigthForwarder extends ChangeAdapter {
+    public WeigthForwarder(Object source, ChangeSupport cs) {
+      super(source, cs);
+    }
+    
+    protected ChangeEvent generateEvent(ChangeEvent ce) {
+      if(ce.getType() == Distribution.WEIGHTS) {
+        return new ChangeEvent(
+          getSource(),
+          Distribution.WEIGHTS,
+          ce
+        );
+      }
+      return null;
     }
   }
 }

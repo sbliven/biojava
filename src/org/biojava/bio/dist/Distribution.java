@@ -146,4 +146,29 @@ public interface Distribution extends Changeable {
    * @param dtc the DistributionTrainerContext with witch to register a trainer
    */
   void registerWithTrainer(DistributionTrainerContext dtc);
+  
+  /**
+   * This listens to the null model distribution events and converts them into
+   * NULL_MODEL events.
+   *
+   * @author Matthew Pocock
+   * @since 1.1
+   */
+  public class NullModelForwarder extends ChangeAdapter {
+    public NullModelForwarder(Object source, ChangeSupport cs) {
+      super(source, cs);
+    }
+    
+    protected ChangeEvent generateEvent(ChangeEvent ce) {
+      if(ce.getType() == WEIGHTS) {
+        return new ChangeEvent(
+          getSource(),
+          NULL_MODEL,
+          null, null,
+          ce
+        );
+      }
+      return null;
+    }
+  }
 }

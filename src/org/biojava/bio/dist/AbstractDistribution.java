@@ -48,27 +48,32 @@ import org.biojava.bio.symbol.*;
  */
 
 public abstract class AbstractDistribution implements Distribution {
-  protected ChangeSupport changeSupport;
+  protected ChangeSupport changeSupport = null;
+  protected Distribution.NullModelForwarder nullModelForwarder = null;
   
-  {
-    changeSupport = new ChangeSupport();
-  }
-  
-  public void addChangeListener(ChangeListener cl) {
+  protected void generateChangeSupport(ChangeType ct) {
     if(changeSupport == null) {
       changeSupport = new ChangeSupport();
     }
     
+    if(
+      ((ct == null) || (ct == Distribution.NULL_MODEL)) &&
+      nullModelForwarder == null
+    ) {
+      nullModelForwarder = new Distribution.NullModelForwarder(this, changeSupport);
+      getNullModel().addChangeListener(nullModelForwarder);
+    }
+  }
+  
+  public void addChangeListener(ChangeListener cl) {
+    generateChangeSupport(null);
     synchronized(changeSupport) {
       changeSupport.addChangeListener(cl);
     }
   }
   
   public void addChangeListener(ChangeListener cl, ChangeType ct) {
-    if(changeSupport == null) {
-      changeSupport = new ChangeSupport();
-    }
-
+    generateChangeSupport(ct);
     synchronized(changeSupport) {
       changeSupport.addChangeListener(cl, ct);
     }
