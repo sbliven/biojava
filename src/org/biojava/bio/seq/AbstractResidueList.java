@@ -60,7 +60,15 @@ public abstract class AbstractResidueList implements ResidueList {
 	return new ListView(this);
     }
 
-    class ResidueIterator implements Iterator {
+    /**
+     * An Iterator over each residue in a ResidueList.
+     * <P>
+     * Objects of this type are returned by 
+     * <code>AbstractResidueList.iterator</code>.
+     *
+     * @author Thomas Down
+     */
+    private class ResidueIterator implements Iterator {
 	private int min, max;
         private int pos;
 	    
@@ -85,7 +93,15 @@ public abstract class AbstractResidueList implements ResidueList {
 	}
     }
 
-    class SubList implements ResidueList {
+    /**
+     * Implements a list view of a ResidueList.
+     * <P>
+     * Objects of this type are instantiated by
+     * <code>AbstractResidueList.subList</code>.
+     *
+     * @author Thomas Down
+     */
+    private class SubList implements ResidueList {
 	private int start, end;
 
 	public SubList(int start, int end) {
@@ -118,6 +134,14 @@ public abstract class AbstractResidueList implements ResidueList {
 	}
     }
 
+    /**
+     * Implements a list view of a ResidueList.
+     * <P>
+     * Objects of this type are instantiated by
+     * <code>AbstractResidueList.asList</code>.
+     *
+     * @author Thomas Down
+     */
     private static class ListView extends AbstractList {
 	private ResidueList rl;
 
