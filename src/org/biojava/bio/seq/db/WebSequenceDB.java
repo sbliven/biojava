@@ -58,7 +58,7 @@ abstract public class WebSequenceDB implements SequenceDBLite {
       FastaDescriptionLineParser sFact =
         new FastaDescriptionLineParser(sbuilder);
       Alphabet alpha = DNATools.getDNA();
-      SymbolParser rParser = alpha.getParser("token");
+      SymbolTokenization rParser = alpha.getTokenization("token");
       System.err.println("got data from "+ queryURL);
       SequenceIterator seqI = new
         StreamReader(connection.getInputStream(),

@@ -39,11 +39,13 @@ import org.biojava.bio.seq.io.*;
  * @author Matthew Pocock
  */
 public abstract class AbstractAlphabet implements FiniteAlphabet {
-  private Map tokenizationsByName;
+  private final Map tokenizationsByName;
+  private final Map ambCache;
   private ChangeSupport changeSupport;
 
   {
     tokenizationsByName = new HashMap();
+    ambCache = new HashMap();
   }
   
   protected boolean hasListeners() {
@@ -90,7 +92,7 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
 	return toke;
     }
 
-  public Symbol getAmbiguity(Set syms)
+  public final Symbol getAmbiguity(Set syms)
       throws IllegalSymbolException 
   {
       if (syms.size() == 0) {
@@ -100,14 +102,19 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
 	  validate(sym);
 	  return sym;
       } else {
-	  for (Iterator i = syms.iterator(); i.hasNext(); ) {
-	      validate((Symbol) i.next());
-	  }
-	  
-	  return AlphabetManager.createSymbol(
+        Symbol s = (Symbol) ambCache.get(syms);
+        if(s == null) {
+          for (Iterator i = syms.iterator(); i.hasNext(); ) {
+            validate((Symbol) i.next());
+          }
+          
+          s = AlphabetManager.createSymbol(
 					      '*', Annotation.EMPTY_ANNOTATION,
 					      syms, this
 					      );
+          ambCache.put(new HashSet(syms), s);
+        }
+        return s;
       }
   }
   
