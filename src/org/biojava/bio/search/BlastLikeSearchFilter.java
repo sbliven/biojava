@@ -77,6 +77,7 @@ import org.biojava.utils.walker.WalkerFactory;
  * <td>software version</td>
  * </tr>
  * </table>
+ * <p>
  * <u>HitProperties</u><br>
  * <table border="1" > 
 * <tr>
@@ -96,10 +97,11 @@ import org.biojava.utils.walker.WalkerFactory;
  * <td></td>
  * </tr>
  * </table>
+ * <p>
  * <u>SubHitProperties</u><br>
  * <table border="1" >
  * <tr>
- * <td>bitScore></td>
+ * <td>bitScore</td>
  * <td>String representation of real value</td>
  * </tr>
  * <tr>
