@@ -167,13 +167,42 @@ class SingleDP extends DP {
     throws IllegalSymbolException {
     double [] v = dpCursor.currentCol();
     State [] states = getStates();
-
-    for (int l = 0; l < states.length; l++) {
+    
+    for (int l = 0; l < getDotStatesIndex(); l++) {
       if(states[l] == getModel().magicalState()) {
         v[l] = 0.0;
       } else {
         v[l] = Double.NEGATIVE_INFINITY;
       }
+    }
+    
+    int [][] transitions = getForwardTransitions();
+    double [][] transitionScore = getForwardTransitionScores();
+    double [] currentCol = dpCursor.currentCol();
+    for (int l = getDotStatesIndex(); l < states.length; l++) {
+      double score = 0.0;
+      int [] tr = transitions[l];
+      double [] trs = transitionScore[l];
+        
+      int ci = 0;
+      while(
+        ci < tr.length  &&
+        currentCol[tr[ci]] == Double.NEGATIVE_INFINITY
+      ) {
+        ci++;
+      }
+      double constant = (ci < tr.length) ? currentCol[tr[ci]] : 0.0;
+        
+      for(int kc = 0; kc < tr.length; kc++) {
+        int k = tr[kc];
+
+        if(currentCol[k] != Double.NEGATIVE_INFINITY) {
+          double t = trs[kc];
+          score += Math.exp(t + (currentCol[k] - constant));
+        } else {
+        }
+      }
+      currentCol[l] = Math.log(score) + constant;
     }
   }
 
