@@ -18,10 +18,10 @@
  *      http://www.biojava.org/
  *
  */
+package org.acedb;
+
 
 import java.net.*;
-
-package org.acedb;
 
 public class AceURL {
     private String authority;
