@@ -116,6 +116,52 @@ public class SubSequenceTest extends TestCase
 	assertEquals(cfl.getMax(), 3);
     }
 
+    public void testCreateOnSubsequence()
+        throws Exception
+    {
+	Feature.Template templ = new Feature.Template();
+	templ.type = "create_on_subsequence";
+	templ.source = "test";
+	templ.location = new RangeLocation(2, 3);
+	templ.annotation = Annotation.EMPTY_ANNOTATION;
+	subseq.createFeature(templ);
+	
+	Feature f = (Feature) seq.filter(new FeatureFilter.ByType("create_on_subsequence"), false).features().next();
+	Location fl = f.getLocation();
+	assertEquals(fl.getMin(), 9);
+	assertEquals(fl.getMax(), 10);
+    }
+
+    public void testCreateOnSubsequenceFeature()
+        throws Exception
+    {
+	Feature.Template templ = new Feature.Template();
+	templ.type = "create_on_subsequence_feature";
+	templ.source = "test";
+	templ.location = new RangeLocation(3, 4);
+	templ.annotation = Annotation.EMPTY_ANNOTATION;
+
+	Feature subf = (Feature) subseq.filter(new FeatureFilter.Not(new FeatureFilter.ByClass(RemoteFeature.class)), false).features().next();
+	subf.createFeature(templ);
+
+	Feature f = (Feature) seq.filter(new FeatureFilter.ByType("create_on_subsequence_feature"), true).features().next();
+	Location fl = f.getLocation();
+	assertEquals(fl.getMin(), 10);
+	assertEquals(fl.getMax(), 11);
+    }
+
+    public void testRemoveFeatureFromSubsequence()
+        throws Exception
+    {
+	FeatureHolder fh = subseq.filter(new FeatureFilter.Not(new FeatureFilter.ByClass(RemoteFeature.class)), false);
+	assertEquals(fh.countFeatures(), 1);
+	Feature f = (Feature) fh.features().next();
+	subseq.removeFeature(f);
+
+	fh = subseq.filter(new FeatureFilter.Not(new FeatureFilter.ByClass(RemoteFeature.class)), false);
+	assertEquals(fh.countFeatures(), 0);
+    }
+
     private boolean compareSymbolList(SymbolList sl1, SymbolList sl2) {
 	if (sl1.length() != sl2.length()) {
 	    return false;
