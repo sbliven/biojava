@@ -192,6 +192,71 @@ public interface AnnotationType {
             getPropertyConstraint(property).setProperty(ann, property, value);
         }
     }
+    /**
+     * This, like any, will accept empty annotations. If keys do exist, it will
+     * expect all values to conform to a single type.
+     *
+     * @author Matthew Pocock
+     */
+    public class AnyOfType
+    implements AnnotationType {
+        private PropertyConstraint constraint;
+    
+        /**
+         * Create a new Impl with no constraints.
+         */
+        public AnyOfType(PropertyConstraint constraint) {
+            this.constraint = constraint;
+        }
+
+        public PropertyConstraint getPropertyConstraint(Object key) {
+            return constraint;
+        }
+
+        /**
+         * Sets a constraint for a property.
+         *
+         * @param key the property to constrain.
+         * @param con the PropertyConstraint to constrain the property.
+         */
+        public void setPropertyConstraint(Object key, PropertyConstraint con) {
+            constraint = con;
+        }
+
+        public Set getProperties() {
+            return Collections.EMPTY_SET;
+        }
+
+        public boolean instanceOf(Annotation ann) {
+            for (Iterator i = ann.asMap().values().iterator(); i.hasNext();) {
+                Object val = i.next();
+                if(!constraint.accept(val)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        
+        public boolean exactInstanceOf(Annotation ann) {
+          return ann.keys().isEmpty();
+        }
+    
+        public boolean subTypeOf(AnnotationType subType) {
+          for(Iterator pi = subType.getProperties().iterator(); pi.hasNext(); ) {
+            if(!constraint.subConstraintOf(subType.getPropertyConstraint(pi.next()))) {
+              return false;
+            }
+          }
+          
+          return true;
+        }
+
+        public void setProperty(Annotation ann, Object property, Object value)
+            throws ChangeVetoException {
+            getPropertyConstraint(property).setProperty(ann, property, value);
+        }
+    }
 }
 
 class AnyAnnotationType implements AnnotationType {

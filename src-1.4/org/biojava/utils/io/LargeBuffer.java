@@ -33,9 +33,9 @@ public class LargeBuffer {
   
   public LargeBuffer(
     FileChannel channel,
+    FileChannel.MapMode mode,
     long pos,
-    long size,
-    FileChannel.MapMode mode
+    long size
   ) throws IOException {
     buffers = new ArrayList();
     

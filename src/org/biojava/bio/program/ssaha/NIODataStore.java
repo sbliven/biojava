@@ -104,6 +104,7 @@ class NIODataStore implements DataStore {
     hitTable_MB.position(0);
     long hitTableSize = hitTable_MB.getLong();
     hitTable = new LargeBuffer(
+      channel,
       FileChannel.MapMode.READ_ONLY,
       hitTablePos + Constants.BYTES_IN_LONG,
       hitTableSize - Constants.BYTES_IN_LONG

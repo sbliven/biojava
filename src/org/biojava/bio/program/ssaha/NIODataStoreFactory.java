@@ -186,9 +186,9 @@ implements DataStoreFactory {
     
     final LargeBuffer hitTable = new LargeBuffer(
       channel,
+      FileChannel.MapMode.READ_WRITE,
       hitTablePos,
-      hitTableSize,
-      FileChannel.MapMode.READ_WRITE
+      hitTableSize
     );
     hitTable.position(0);
     hitTable.putLong(hitTableSize);
