@@ -48,6 +48,7 @@ import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.ChangeType;
 
 /**
  * <p>
@@ -122,6 +123,39 @@ public abstract class DP {
     return score;
   }
 
+  /**
+   * Scores the SymbolList from symbol start to symbol (start+columns) with a
+   * weight matrix using a particular ScoreType.
+   *
+   * <p>
+   * This method allows you to use score types such as ScoreType.ODDS. The other
+   * scoreWeightMatrix methods gives a result similar or identical to
+   * ScoreType.PROBABILITY.
+   * </p>
+   *
+   * @param matrix  the weight matrix used to evaluate the sequences
+   * @param symList the SymbolList to assess
+   * @param scoreType the score type to apply
+   * @param start   the index of the first symbol in the window to evaluate
+   * @return  the sum of log scores of this weight matrix
+   *          having generated symbols start to (start + columns) of symList
+   * @since 1.4
+   */
+  public static double scoreWeightMatrix(
+          WeightMatrix matrix,
+          SymbolList symList,
+          ScoreType scoreType,
+          int start)
+          throws IllegalSymbolException {
+    double score = 0;
+    int cols = matrix.columns();
+
+    for (int c = 0; c < cols; c++) {
+      score += scoreType.calculateScore(matrix.getColumn(c), symList.symbolAt(c + start));
+    }
+
+    return score;
+  }
   public static MarkovModel flatView(MarkovModel model)
           throws IllegalAlphabetException, IllegalSymbolException {
     for (Iterator i = model.stateAlphabet().iterator(); i.hasNext();) {
@@ -400,13 +434,13 @@ System.out.println("forwardTransitionScores");
 
   public void lockModel() {
     if (lockCount++ == 0) {
-      getModel().addChangeListener(ChangeListener.ALWAYS_VETO);
+      getModel().addChangeListener(ChangeListener.ALWAYS_VETO, ChangeType.UNKNOWN);
     }
   }
 
   public void unlockModel() {
     if (--lockCount == 0) {
-      getModel().removeChangeListener(ChangeListener.ALWAYS_VETO);
+      getModel().removeChangeListener(ChangeListener.ALWAYS_VETO, ChangeType.UNKNOWN);
     }
   }
 
@@ -441,7 +475,7 @@ System.out.println("forwardTransitionScores");
     this.backwardTransitionScores = new HashMap();
     update();
 
-    model.addChangeListener(UPDATER);
+    model.addChangeListener(UPDATER, ChangeType.UNKNOWN);
   }
 
   public abstract double forward(SymbolList[] symList, ScoreType scoreType)

@@ -45,39 +45,61 @@ import org.biojava.utils.ChangeVetoException;
  * @author Thomas Down
  */
 public class WeightMatrixAnnotator implements SequenceAnnotator, Serializable {
-    private WeightMatrix matrix;
-    private double threshold;
+  private final WeightMatrix matrix;
+  private final double threshold;
+  private final ScoreType scoreType;
 
-    public Sequence annotate(Sequence seq)
-	throws IllegalAlphabetException, BioException, ChangeVetoException
-    {
-	seq = new ViewSequence(seq);
-    
-	int cols = matrix.columns();
-	Feature.Template template = new Feature.Template();
-	template.source = "WeightMatrixAnnotator";
-	template.type = "hit";
-	for(int offset = 1;
-	    offset <= seq.length() - cols + 1;
-	    offset++) {
-	    double score = DP.scoreWeightMatrix(matrix, seq, offset);
-	    double q = Math.exp(score);
-	    if(q >= threshold) {
-		template.location = new RangeLocation(offset, offset+cols-1);
-		SimpleAnnotation ann = new SimpleAnnotation();
-		ann.setProperty("score", new Double(q));
-		ann.setProperty("weightMatrix", matrix);
-		template.annotation = ann;
-		seq.createFeature(template);
-	    }
-	}
-	return seq;
-    }
+  public Sequence annotate(Sequence seq)
+          throws IllegalAlphabetException, BioException, ChangeVetoException
+  {
+    seq = new ViewSequence(seq);
 
-    public WeightMatrixAnnotator(WeightMatrix wm, double threshold) {
-	this.matrix = wm;
-	this.threshold = threshold;
+    int cols = matrix.columns();
+    Feature.Template template = new Feature.Template();
+    template.source = "WeightMatrixAnnotator";
+    template.type = "hit";
+    for(int offset = 1;
+        offset <= seq.length() - cols + 1;
+        offset++) {
+      double score = DP.scoreWeightMatrix(matrix, seq, scoreType, offset);
+      double q = Math.exp(score);
+      if(q >= threshold) {
+        template.location = new RangeLocation(offset, offset+cols-1);
+        SimpleAnnotation ann = new SimpleAnnotation();
+        ann.setProperty("score", new Double(q));
+        ann.setProperty("weightMatrix", matrix);
+        template.annotation = ann;
+        seq.createFeature(template);
+      }
     }
+    return seq;
+  }
+
+  /**
+   * Create a new annotator that uses the PROBABILITY score type.
+   *
+   * @param wm        the weight matrix
+   * @param threshold the threshold
+   */
+  public WeightMatrixAnnotator(WeightMatrix wm, double threshold) {
+    this.matrix = wm;
+    this.threshold = threshold;
+    this.scoreType = ScoreType.PROBABILITY;
+  }
+
+  /**
+   * Create a new annotator that uses a specific score type.
+   *
+   * @param wm        the weigth matrix
+   * @param scoreType the score type
+   * @param threshold the threshold
+   * @since 1.4
+   */
+  public WeightMatrixAnnotator(WeightMatrix wm, ScoreType scoreType, double threshold) {
+    this.matrix = wm;
+    this.scoreType = scoreType;
+    this.threshold = threshold;
+  }
 }
 
 
