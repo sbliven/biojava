@@ -139,8 +139,12 @@ public interface PropertyConstraint {
             if (accept(value)) {
                 ann.setProperty(property, value);
             } else {
-                throw new ChangeVetoException("Incorrect class: " + cl + " not " + value.getClass());
+                throw new ChangeVetoException("Incorrect class: expecting " + cl + " but got " + value.getClass());
             }
+        }
+        
+        public String toString() {
+          return "Class:" + cl.toString();
         }
     }
 
@@ -184,8 +188,15 @@ public interface PropertyConstraint {
             if (accept(value)) {
                 ann.setProperty(property, value);
             } else {
-                throw new ChangeVetoException("Incorrect annotation type");
+              throw new ChangeVetoException(
+                "value: " + value +
+                " is not an annotation implementing " + annType.getProperties()
+              );
             }
+        }
+        
+        public String toString() {
+          return "AnnotationType:" + annType.getProperties();
         }
     }
 
@@ -361,8 +372,16 @@ public interface PropertyConstraint {
 
                 c.add(value);
             } else {
-                throw new ChangeVetoException("Incorrect element type");
+                throw new ChangeVetoException(
+                  "Incorrect element type. Got: " + value.getClass() + " " + 
+                  value.toString() + " but expected " + getElementType().toString()
+                );
             }
+        }
+        
+        public String toString() {
+          return "Collection(" + clazz + ", " + minTimes + "-" + maxTimes +
+            ")<" + getElementType() + ">";
         }
     }
 
@@ -380,10 +399,23 @@ public interface PropertyConstraint {
          * Creates a new <code>Enumeration</code> using the members of
          * the specified set as a constraint.
          *
-         * @param values a <code>Set</code>.
+         * @param values a <code>Set</code> of all possible values
          */
         public Enumeration(Set values) {
             this.values = values;
+        }
+        
+        /**
+         * Creates a new <code>Enumeration</code> using the elements of the
+         * specified array as a constraint.
+         *
+         * @param values an <code>Array</code> of all possible values
+         */
+        public Enumeration(Object[] values) {
+          this.values = new HashSet();
+          for(int i = 0; i < values.length; i++) {
+            this.values.add(values[i]);
+          }
         }
 
         /**
@@ -415,8 +447,15 @@ public interface PropertyConstraint {
             if (accept(value)) {
                 ann.setProperty(property, value);
             } else {
-                throw new ChangeVetoException("Value not accepted");
+                throw new ChangeVetoException(
+                  "Value not accepted: '" + value + "'" +
+                  " not in " + values
+                );
             }
+        }
+        
+        public String toString() {
+          return "Enumeration:" + values;
         }
     }
 }

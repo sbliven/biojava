@@ -188,8 +188,12 @@ public interface AnnotationType {
         }
 
         public void setProperty(Annotation ann, Object property, Object value)
-            throws ChangeVetoException {
+        throws ChangeVetoException {
+          try {
             getPropertyConstraint(property).setProperty(ann, property, value);
+          } catch (ChangeVetoException cve) {
+            throw new ChangeVetoException(cve, "Failed to change property " + property);
+          }
         }
     }
     /**
@@ -253,8 +257,12 @@ public interface AnnotationType {
         }
 
         public void setProperty(Annotation ann, Object property, Object value)
-            throws ChangeVetoException {
+        throws ChangeVetoException {
+          try {
             getPropertyConstraint(property).setProperty(ann, property, value);
+          } catch (ChangeVetoException cve) {
+            throw new ChangeVetoException(cve, "Failed to change property " + property);
+          }
         }
     }
 }
@@ -281,7 +289,11 @@ class AnyAnnotationType implements AnnotationType {
     }
 
     public void setProperty(Annotation ann, Object property, Object value)
-        throws ChangeVetoException {
+    throws ChangeVetoException {
+      try {
         getPropertyConstraint(property).setProperty(ann, property, value);
+      } catch (ChangeVetoException cve) {
+        throw new ChangeVetoException(cve, "Failed to change property " + property);
+      }
     }
 }
