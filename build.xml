@@ -640,6 +640,8 @@
       <classpath>
         <!-- main classes from build -->
         <pathelement path="${build.dest.biojava}" />
+        <!-- resources -->
+        <pathelement path="${resources.dir}" />
         <!-- test classes from build -->
         <pathelement path="${build.dest.tests}" />
         <!-- test data from build -->
