@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.biojava.bio.*;
+import org.biojava.bio.BioException;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
 
@@ -105,7 +105,7 @@ class EmblLikeLocationParser
      *
      * @exception BioException if an error occurs.
      */
-    void parseLocation(String location, Feature.Template theTemplate)
+    Feature.Template parseLocation(String location, Feature.Template theTemplate)
 		throws BioException
     {
         this.location = location;
@@ -118,6 +118,7 @@ class EmblLikeLocationParser
 
         instructStack.clear();
         subLocations.clear();
+        subRegions.clear();
 
         thisToken = lexer.getNextToken();
         while (thisToken != null)
@@ -148,11 +149,16 @@ class EmblLikeLocationParser
 
                 switch (toke)
                 {
-                    case '(': case ':':
+                    case '(':
                         break;
+
+					case ':':
+						processInstructs();
+						break;
 
                     case '^':
                         isBetweenLocation = true;
+                        break;
 
                     case '<':
                         unboundMin = true;
@@ -169,7 +175,6 @@ class EmblLikeLocationParser
 
                     case ',':
                         processCoords();
-                        // processInstructs();
                         break;
 
                     case ')':
@@ -213,17 +218,21 @@ class EmblLikeLocationParser
 			((StrandedFeature.Template)theTemplate).strand = mStrandType;
 		}
 
-		if(subRegions.size() != 0)
+		if(subRegions.size() > subLocations.size())
 		{
 			// This is a remote feature, so a new template has to be made
 			RemoteFeature.Template newTemplate = new RemoteFeature.Template(theTemplate);
-			newTemplate.regions = subRegions;
+			newTemplate.regions = new ArrayList(subRegions);
 // FIXME:
 // I don't know how to create an appropriate resolver, so I'm leaving it
 // blank.  No doubt this will break things.
 // -- Gcox
 			newTemplate.resolver = null;
+
+			theTemplate = newTemplate;
 		}
+
+		return theTemplate;
     }
 
     /**

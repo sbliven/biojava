@@ -117,8 +117,7 @@ public class FeatureTableParser {
 					   + featureBuf);
 		}
 
-		locParser.parseLocation(featureBuf.toString(), featureTemplate);
-
+		featureTemplate = locParser.parseLocation(featureBuf.toString(), featureTemplate);
 		listener.startFeature(featureTemplate);
 		featureStatus = WITHIN;
 	    }
