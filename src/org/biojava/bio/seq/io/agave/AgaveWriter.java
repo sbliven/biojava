@@ -893,7 +893,7 @@ public class AgaveWriter
        }
     }
 
-    /**
+    /*
     <!ELEMENT comp_result  (note? , match_desc? , match_align? , query_region? ,
                         match_region? , result_property* , result_group* ,
                         related_annot*)>
@@ -906,7 +906,7 @@ public class AgaveWriter
                        confidence           NMTOKEN  #IMPLIED
                        align_length         NMTOKEN  #IMPLIED
                        align_units          (bp | AA) #IMPLIED >
-    **/
+    */
     protected
     void writeCompResult(Annotatable f) throws IOException
     {

@@ -150,7 +150,7 @@ public class AGAVEBioSeqHandler
   }
 
 
-   /**
+   /*
    protected Feature.Template createTemplate() {
     // create Gene Template for this
     StrandedFeature.Template st = new StrandedFeature.Template();
@@ -167,7 +167,7 @@ public class AGAVEBioSeqHandler
         staxenv. subFeatures .add( this ) ;
 
     return st;
-  }**/
+  }*/
 
 
   public void endElementHandler(

@@ -99,7 +99,7 @@ public class AGAVESeqFeatureHandler
   }
 
 
-  /**
+  /*
    protected Feature.Template createTemplate() {
     // create Gene Template for this
     StrandedFeature.Template st = new StrandedFeature.Template();
@@ -114,7 +114,7 @@ public class AGAVESeqFeatureHandler
         staxenv. subFeatures .add( this ) ;
 
     return st;
-  }**/
+  }*/
 
 
    public void addProperty(AGAVEProperty prop) {

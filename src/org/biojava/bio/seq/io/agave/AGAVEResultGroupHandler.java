@@ -54,7 +54,7 @@ public class AGAVEResultGroupHandler
       AGAVECompResultHandler.AGAVE_COMP_RESULT_HANDLER_FACTORY);
 
  }
-  /**
+  /*
   protected Feature.Template createTemplate() {
     // create Gene Template for this
     Feature.Template st = new Feature.Template();
@@ -68,7 +68,7 @@ public class AGAVEResultGroupHandler
         staxenv. subFeatures .add( this ) ;
 
     return st;
-  }**/
+  }*/
 
   public void startElementHandler(
                 String nsURI,

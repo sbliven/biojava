@@ -64,7 +64,7 @@ public class AGAVEEvidenceHandler
          element_ids = new ArrayList(1) ;
       element_ids.add( id ) ;
   }
-  /**
+  /*
   protected Feature.Template createTemplate() {
     Feature.Template st = new Feature.Template();
     st.type = "evidence";
@@ -73,7 +73,7 @@ public class AGAVEEvidenceHandler
         staxenv. subFeatures .add( this ) ;
 
     return st;
-  } **/
+  } */
   public void endElementHandler(
                 String nsURI,
                 String localName,

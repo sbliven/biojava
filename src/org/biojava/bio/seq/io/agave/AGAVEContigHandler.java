@@ -123,7 +123,7 @@ public class AGAVEContigHandler
       }
   }
 
-   /**
+   /*
    protected Feature.Template createTemplate() {
     // create Gene Template for this
     StrandedFeature.Template st = new StrandedFeature.Template();
@@ -138,7 +138,7 @@ public class AGAVEContigHandler
         staxenv. subFeatures .add( this ) ;
 
     return st;
-  }**/
+  }*/
 
   public void endElementHandler(
                 String nsURI,
