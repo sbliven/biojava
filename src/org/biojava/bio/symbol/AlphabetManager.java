@@ -38,7 +38,7 @@ import org.biojava.utils.bytecode.*;
 /**
  * The first port of call for retrieving standard alphabets.
  * <P>
- * The alphabet interfaces themselves don't give you a lot of help in actualy
+ * The alphabet interfaces themselves don't give you a lot of help in actually
  * getting an alphabet instance. This is where the AlphabetManager comes in
  * handy. It helps out in serialization, generating derived alphabets and
  * building CrossProductAlphabet instances. It also contains limited support for

@@ -9,12 +9,12 @@ import org.biojava.bio.symbol.Alignment;
 
 /**
  * A simple implementation of interface SeqSimilaritySearchSubHit that
- * takes care of all the house-keeping.  Objects of this class are
+ * takes care of all the house-keeping. Objects of this class are
  * immutable.
  * 
  * @author <a href="mailto:Gerald.Loeffler@vienna.at">Gerald
  * Loeffler</a> for the <a href="http://www.imp.univie.ac.at">IMP</a>
- *
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  */
 public class SimpleSeqSimilaritySearchSubHit
     implements SeqSimilaritySearchSubHit, Cloneable

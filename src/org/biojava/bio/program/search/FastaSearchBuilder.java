@@ -47,21 +47,21 @@ import org.biojava.utils.*;
  */
 public class FastaSearchBuilder implements SearchBuilder
 {
-    private SearchParser           parser;
+    private SearchParser            parser;
 
-    private SequenceDBInstallation subjectDBs;
-    private SequenceDB             subjectDB;
+    private SequenceDBInstallation  subjectDBs;
+    private SequenceDB              subjectDB;
 
-    private SequenceDB             querySeqHolder;
-    private SymbolList             querySeq;
+    private SequenceDB              querySeqHolder;
+    private SymbolList              querySeq;
 
-    private Annotation             hitAnnotation;
-    private Annotation             resultAnnotation;
+    private Annotation              hitAnnotation;
+    private Annotation              resultAnnotation;
 
-    private Map                    resultPreAnnotation;
-    private Map                    searchParameters;
-    private Map                    hitPreAnnotation;
-    private Map                    hitData;
+    private Map                     resultPreAnnotation;
+    private Map                     searchParameters;
+    private Map                     hitPreAnnotation;
+    private Map                     hitData;
 
     // Hits are appended to this ArrayList as they are parsed from a
     // stream. The Fasta program pre-sorts the hits in order of
@@ -244,17 +244,17 @@ public class FastaSearchBuilder implements SearchBuilder
 					     Annotation hitAnnotation)
 	throws BioException
     {
-	String subjectID  = (String) dataMap.get("id");
-	Double score      = (Double) dataMap.get("fa_z-score");
-	Double eValue     = (Double) dataMap.get("fa_expect");
-	Double pValue     = (Double) dataMap.get("fa_expect");
+	String subjectSeqID  = (String) dataMap.get("id");
+	Double score         = (Double) dataMap.get("fa_z-score");
+	Double eValue        = (Double) dataMap.get("fa_expect");
+	Double pValue        = (Double) dataMap.get("fa_expect");
 
 	// There is only ever one subhit in a Fasta hit
 	List subHits = new ArrayList();
 
 	try
 	{
-	    Alignment alignment = createAlignment(dataMap);
+	    Alignment alignment = createAlignment(subjectSeqID, dataMap);
 
 	    SeqSimilaritySearchSubHit subHit =
 		new SequenceDBSearchSubHit(score.doubleValue(),
@@ -267,10 +267,10 @@ public class FastaSearchBuilder implements SearchBuilder
 	catch (IllegalSymbolException ise)
 	{
 	    throw new BioException("Failed to create alignment for hit to "
-				   + subjectID);
+				   + subjectSeqID);
 	}
 
-	return new SequenceDBSearchHit(subjectID,
+	return new SequenceDBSearchHit(subjectSeqID,
 				       score.doubleValue(),
 				       eValue.doubleValue(),
 				       pValue.doubleValue(),
@@ -311,11 +311,16 @@ public class FastaSearchBuilder implements SearchBuilder
      * The <code>createAlignment</code> method creates an Alignment
      * object from the sequence Strings parsed from the Fasta output.
      *
+     * @param subjectSeqID a <code>String</code> which will be used to
+     * set the label of the subject sequence. The query label is a
+     * static field in the SeqSimilaritySearchSubHit interface.
      * @param dataMap a <code>Map</code> object.
      * @return an <code>Alignment</code> object.
-     * @exception IllegalSymbolException if an error occurs.
+     * @exception IllegalSymbolException if tokens from the sequence
+     * are not recognised in the chosen alphabet.
      */
-    private Alignment createAlignment(Map dataMap)
+    private Alignment createAlignment(String subjectSeqID,
+				      Map dataMap)
 	throws IllegalSymbolException
     {
 	String seqType = (String) dataMap.get("query");
@@ -328,27 +333,73 @@ public class FastaSearchBuilder implements SearchBuilder
 	else
 	    alpha = ProteinTools.getAlphabet();
 
-	TokenParser tp = new TokenParser(alpha);
-
-	StringBuffer querySeqTokens   =
-	    new StringBuffer((String) dataMap.get("querySeqTokens"));
+	StringBuffer querySeqTokens =
+	    new StringBuffer(prepSeqTokens("query",   dataMap));
 	StringBuffer subjectSeqTokens =
-	    new StringBuffer((String) dataMap.get("querySeqTokens"));
-
-	StringBuffer ungappedQuerySeqTokens   = new StringBuffer();
-	StringBuffer ungappedSubjectSeqTokens = new StringBuffer();
+	    new StringBuffer(prepSeqTokens("subject", dataMap));
 
 	Map labelMap = new HashMap();
 
-	// Alignment handling code to go here; currently the alignment
-	// is empty. Perhaps separate class to build gapped symbol list
-	// from sequence String containing 'gap' characters such as "-",
-	// "." or " "
+	// System.out.println("Passing query: "   + querySeqTokens);
+	// System.out.println("Passing subject: " + subjectSeqTokens);
 
-	// Query label is static field in interface
-	labelMap.put("query",   tp.parse(""));
-	labelMap.put("subject", tp.parse(""));
+	GappedSymbolListBuilder gslBuilder =
+	    new GappedSymbolListBuilder(alpha);
+
+	labelMap.put(SeqSimilaritySearchSubHit.QUERY_LABEL, 
+		     gslBuilder.makeGappedSymbolList(querySeqTokens));
+	labelMap.put(subjectSeqID,
+		     gslBuilder.makeGappedSymbolList(subjectSeqTokens));
 
 	return new SimpleAlignment(labelMap);
+    }
+
+    /**
+     * The <code>prepSeqTokens</code> method prepares the sequence
+     * data extracted from the Fasta output. Two things need to be
+     * done; firstly, the leading gaps are removed from the sequence
+     * (these are just format padding and not really part of the
+     * alignment) and secondly, as Fasta supplies some flanking
+     * sequence context for its alignments, this must be removed
+     * too. See the Fasta documentation for an explanation of the
+     * format.
+     *
+     * @param name a <code>String</code> value (either "query" or
+     * "subject" indicating which sequence to grab from the
+     * accompanying Map object.
+     * @param dataMap a <code>Map</code> object containing the data to
+     * process.
+     * @return a <code>String</code> value consisting of a subsequence
+     * containing only the interesting alignment.
+     */
+    private String prepSeqTokens(String name, Map dataMap)
+    {
+	// System.out.println("dataMap: " + dataMap);
+
+	Integer alDispStart = (Integer) dataMap.get(name + "AlDispStart");
+	Integer alStart     = (Integer) dataMap.get(name + "AlStart");
+	Integer alStop      = (Integer) dataMap.get(name + "AlStop");    
+
+	StringBuffer seqTokens =
+	    new StringBuffer((String) dataMap.get(name + "SeqTokens"));
+
+	// Strip leading gap characters
+	while (seqTokens.charAt(0) == '-')
+	    seqTokens.deleteCharAt(0);
+
+	int gapCount = 0;
+	// Count gaps to add to number of chars returned
+	for (int i = 0; i < seqTokens.length(); i++)
+	{
+	    if (seqTokens.charAt(i) == '-')
+		gapCount++;
+	}
+
+	// Calculate the position at which the real alignment
+	// starts/stops, allowing for the gaps, which are not counted
+	// in the numbering system
+	return seqTokens.substring(alStart.intValue() - alDispStart.intValue(),
+				   alStop.intValue()  - alDispStart.intValue()
+				   + gapCount + 1);
     }
 }

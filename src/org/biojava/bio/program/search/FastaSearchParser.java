@@ -529,7 +529,7 @@ public class FastaSearchParser implements SearchParser
 		return true;
 	    }
 
-	    // Record the coordinates of the alignment
+	    // Record the coordinates and offset of the alignment
 	    if (line.startsWith("; al_start:"))
 	    {
 		dataMap.put(name + "AlStart", parseCoord(line));
@@ -538,6 +538,11 @@ public class FastaSearchParser implements SearchParser
 	    else if (line.startsWith("; al_stop:"))
 	    {
 		dataMap.put(name + "AlStop", parseCoord(line));
+		return true;
+	    }
+	    else if (line.startsWith("; al_display_start:"))
+	    {
+		dataMap.put(name + "AlDispStart", parseCoord(line));
 		return true;
 	    }
 

@@ -129,7 +129,7 @@ public final class DNATools {
       return 3;
     }
     getDNA().validate(sym);
-    throw new IllegalSymbolException("Realy confused. Can't find index for " +
+    throw new IllegalSymbolException("Really confused. Can't find index for " +
                                       sym.getName());
   }
   
@@ -179,7 +179,7 @@ public final class DNATools {
     } else {
       getDNA().validate(sym);
       throw new BioError(
-        "Realy confused. Can't find symbol " +
+        "Really confused. Can't find symbol " +
         sym.getName()
       );
     }

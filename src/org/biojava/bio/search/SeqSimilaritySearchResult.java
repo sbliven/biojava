@@ -13,6 +13,7 @@ import java.util.*;
  *
  * @author <a href="mailto:Gerald.Loeffler@vienna.at">Gerald
  * Loeffler</a> for the <a href="http://www.imp.univie.ac.at">IMP</a>
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  */
 public interface SeqSimilaritySearchResult extends Cloneable
 {

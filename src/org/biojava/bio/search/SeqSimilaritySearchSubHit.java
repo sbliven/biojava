@@ -12,6 +12,7 @@ import org.biojava.bio.symbol.Alignment;
  *
  * @author <a href="mailto:Gerald.Loeffler@vienna.at">Gerald
  * Loeffler</a> for the <a href="http://www.imp.univie.ac.at">IMP</a>
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  */
 public interface SeqSimilaritySearchSubHit extends Cloneable
 {
