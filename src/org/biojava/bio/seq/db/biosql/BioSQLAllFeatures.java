@@ -46,6 +46,7 @@ import org.biojava.utils.ChangeVetoException;
  * @author Thomas Down
  * @author Matthew Pocock
  * @author David Huen
+ * @author Len Trigg
  * @since 1.3
  */
 
@@ -92,13 +93,21 @@ class BioSQLAllFeatures implements FeatureHolder, RealizingFeatureHolder
         throws ChangeVetoException, BioException
     {
 	Feature f = realizeFeature(seq, ft);
-	
 	BioSQLEntryChangeHub entryHub = ((BioSQLSequenceI) seq).getSequenceDB().getEntryChangeHub();
 	ChangeEvent cev = new ChangeEvent(seq, FeatureHolder.FEATURES, f);
 	synchronized (entryHub) {
 	    entryHub.firePreChange(cev);
 	    seqDB.getFeaturesSQL().persistFeature(f, -1, bioentry_id); // No parent
-	    getFeatures().addFeature(f);
+            if (features != null) {
+                // Add to the in-memory representation
+                getFeatures().addFeature(f);
+
+                // Note: if features == null when getFeatures() is
+                // called, the features are retrieved from the
+                // database (in this case, it would already include
+                // the feature just added from the persistFeature()
+                // call immediately above).
+            }
 	    entryHub.firePostChange(cev);
 	}
 
