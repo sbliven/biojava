@@ -161,7 +161,8 @@ public class SimpleEmissionState
     ChangeSupport cs = super.getChangeSupport(ct);
 
     if(annotationForwarder == null &&
-      (ct == null || ct == Annotatable.ANNOTATION)){
+      Annotatable.ANNOTATION.isMatchingType(ChangeType.UNKNOWN))
+    {
       annotationForwarder = new Annotatable.AnnotationForwarder(
           this,
           cs);
