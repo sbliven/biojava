@@ -72,7 +72,9 @@ public class WalkerFactory {
    * @param type  the Class of the type with children
    */
   public synchronized void addTypeWithParent(Class type) {
-    typesWithParents.add(type);
+    if (!typesWithParents.contains(type)) {
+        typesWithParents.add(type);
+    }
   }
 
   /**
