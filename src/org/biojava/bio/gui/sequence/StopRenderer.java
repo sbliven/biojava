@@ -81,6 +81,9 @@ public class StopRenderer implements SequenceRenderer {
       // the triplet is either base, +1, +2 or -1, -2
       // depending on the strand searched
       if (strand == StrandedFeature.POSITIVE) {
+        // check that search does not exceed bounds
+        if (base + 2 > seq.length()) return false;
+
         // search top strand
         // first base must be t
         if (seq.symbolAt(base) != DNATools.t()) return false;
@@ -103,6 +106,9 @@ public class StopRenderer implements SequenceRenderer {
         return true;
 
       } else {
+        // check bounds
+        if (base - 2 < 1) return false;
+
         // search bottom strand
         // first base must be t
         if (seq.symbolAt(base) != DNATools.a()) return false;
