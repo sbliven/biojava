@@ -57,7 +57,7 @@ public class GappedSymbolListTest extends TestCase {
   
   public void testIndividualInsertBlockRemove()
   throws Exception {
-    GappedSymbolList gsl = new GappedSymbolList(symList);
+    GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
     assertTrue(SymbolUtils.compareSymbolLists(gsl, symList));
 
     gsl.addGapInSource(4);
@@ -78,7 +78,7 @@ public class GappedSymbolListTest extends TestCase {
   
   public void testBlockedInsertIndividualRemove()
   throws Exception {
-    GappedSymbolList gsl = new GappedSymbolList(symList);
+    GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
     assertTrue("Gapped same as ungapped:\n" + gsl.seqString() + "\n" + symList.seqString(), SymbolUtils.compareSymbolLists(gsl, symList));
 
     gsl.addGapsInSource(4,4);
@@ -99,7 +99,7 @@ public class GappedSymbolListTest extends TestCase {
   
   public void testBlockedInsertBlockRemove()
   throws Exception {
-    GappedSymbolList gsl = new GappedSymbolList(symList);
+    GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
     assertTrue(SymbolUtils.compareSymbolLists(gsl, symList));
 
     gsl.addGapsInSource(4,4);
@@ -111,7 +111,7 @@ public class GappedSymbolListTest extends TestCase {
   
   public void testBeginningGap()
   throws Exception {
-    GappedSymbolList gsl = new GappedSymbolList(symList);
+    GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
     gsl.addGapInSource(1);
     assertTrue(
       "Begining gap is the empty gap: " +
@@ -123,7 +123,7 @@ public class GappedSymbolListTest extends TestCase {
   
   public void testBeginningGaps()
   throws Exception {
-    GappedSymbolList gsl = new GappedSymbolList(symList);
+    GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
     gsl.addGapsInSource(1, 4);
     for(int i = 1; i <=4; i++) {
       assertTrue(
@@ -137,7 +137,7 @@ public class GappedSymbolListTest extends TestCase {
   
   public void testTrailingGap()
   throws Exception {
-    GappedSymbolList gsl = new GappedSymbolList(symList);
+    GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
     gsl.addGapInSource(symList.length() + 1);
     assertTrue(
       "Trailing gap is the empty gap: " +
@@ -149,7 +149,7 @@ public class GappedSymbolListTest extends TestCase {
   
   public void testTrailingGaps()
   throws Exception {
-    GappedSymbolList gsl = new GappedSymbolList(symList);
+    GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
     gsl.addGapsInSource(symList.length() + 1, 4);
     for(int i = 1; i <=4; i++) {
       assertTrue(
@@ -163,7 +163,7 @@ public class GappedSymbolListTest extends TestCase {
   
   public void testInternalGap()
   throws Exception {
-    GappedSymbolList gsl = new GappedSymbolList(symList);
+    GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
     gsl.addGapInSource(4);
     assertTrue(
       "Internal gap is the apropreate gap: " +
@@ -175,7 +175,7 @@ public class GappedSymbolListTest extends TestCase {
   
   public void testInternalGaps()
   throws Exception {
-    GappedSymbolList gsl = new GappedSymbolList(symList);
+    GappedSymbolList gsl = new SimpleGappedSymbolList(symList);
     gsl.addGapsInSource(4, 4);
     for(int i = 4; i < 8; i++) {
       assertTrue(

@@ -61,7 +61,7 @@ public class GappedSequenceTest extends TestCase
 	sft.location = new RangeLocation(2, 10);
 	seq.createFeature(sft);
 
-	gappedSeq = new GappedSequence(seq);
+	gappedSeq = new SimpleGappedSequence(seq);
 	gappedSeq.addGapsInSource(5, 2);
     }
 
