@@ -63,7 +63,7 @@ public class GFFParser {
      * @param bReader the <span class="type">BufferedReader</span> to parse
      * @param handler the <span class="type">GFFDocumentHandler</span> that will
      *                listen for 'stuff'
-     * 
+     *
      * @throws <span class="type">IOException</span> if for any reason
      *         <span class="arg">bReader</span> throws one
      * @throws <span class="type">BioException</span> if
@@ -83,7 +83,7 @@ public class GFFParser {
      * @param bReader the <span class="type">BufferedReader</span> to parse
      * @param handler the <span class="type">GFFDocumentHandler</span> that will
      *                listen for 'stuff'
-     * 
+     *
      * @throws <span class="type">IOException</span> if for any reason
      *         <span class="arg">bReader</span> throws one
      * @throws <span class="type">BioException</span> if
@@ -139,7 +139,7 @@ public class GFFParser {
 	}
 	handler.endDocument();
     }
-  
+
   /**
    * Actually turns a list of tokens, some value string and a comment into a
    * <span class="type">GFFRecord</span> and informs
@@ -155,18 +155,18 @@ public class GFFParser {
    * @throws <span class="type">BioException</span> if <span class="arg">handler</span>
    *         could not correct a parse error
    */
-    protected GFFRecord createRecord(GFFDocumentHandler handler, 
-				     List aList, 
+    protected GFFRecord createRecord(GFFDocumentHandler handler,
+				     List aList,
 				     String rest,
 				     String comment)
 	throws BioException, ParserException, IgnoreRecordException
     {
 	SimpleGFFRecord record = new SimpleGFFRecord();
-    
+
 	record.setSeqName((String) aList.get(0));
 	record.setSource((String) aList.get(1));
 	record.setFeature((String) aList.get(2));
-    
+
 	int start = -1;
 	try {
 	    start = Integer.parseInt( (String) aList.get(3));
@@ -174,7 +174,7 @@ public class GFFParser {
 	    start = errors.invalidStart((String) aList.get(3));
 	}
 	record.setStart(start);
-    
+
 	int end = -1;
 	try {
 	    end = Integer.parseInt( (String) aList.get(4));
@@ -182,7 +182,7 @@ public class GFFParser {
 	    end = errors.invalidEnd((String) aList.get(3));
 	}
 	record.setEnd(end);
-    
+
 	String score = (String) aList.get(5);
 	if(score == null     ||
 	   score.equals("")  ||
@@ -199,7 +199,7 @@ public class GFFParser {
 	    }
 	    record.setScore(sc);
 	}
-    
+
 	String strand = (String) aList.get(6);
 	if(strand == null || strand.equals("") || strand.equals(".")) {
 	    record.setStrand(StrandedFeature.UNKNOWN);
@@ -212,7 +212,7 @@ public class GFFParser {
 		record.setStrand(errors.invalidStrand(strand));
 	    }
 	}
-    
+
 	String frame = (String) aList.get(7);
 	if(frame.equals(".")) {
 	    record.setFrame(GFFRecord.NO_FRAME);
@@ -225,13 +225,13 @@ public class GFFParser {
 	    }
 	    record.setFrame(fr);
 	}
-    
+
 	if (rest != null)
 	    record.setGroupAttributes(parseAttribute(rest));
 	else
 	    record.setGroupAttributes(new HashMap());
 	record.setComment(comment);
-	
+
 	return record;
     }
 
@@ -252,7 +252,7 @@ public class GFFParser {
 
     protected Map parseAttribute(String attValList) {
 	Map attMap = new HashMap();
-	
+
 	StringTokenizer sTok = new StringTokenizer(attValList, ";", false);
 	while(sTok.hasMoreTokens()) {
 	    String attVal = sTok.nextToken().trim();
@@ -272,8 +272,13 @@ public class GFFParser {
 			    quoteIndx++;
 			    quoteIndx = attValList.indexOf("\"", quoteIndx);
 			} while(quoteIndx != -1 && attValList.charAt(quoteIndx-1) == '\\');
-			valList.add(attValList.substring(1, quoteIndx));
-			attValList = attValList.substring(quoteIndx+1).trim();
+			if(quoteIndx > 0){
+                          valList.add(attValList.substring(1, quoteIndx));
+			  attValList = attValList.substring(quoteIndx+1).trim();
+			}else{
+                          valList.add(attValList);
+                          attValList = "";
+			}
 		    } else {
 			spaceIndx = attValList.indexOf(" ");
 			if(spaceIndx == -1) {
@@ -288,7 +293,7 @@ public class GFFParser {
 	    }
 	    attMap.put(attName, valList);
 	}
-    
+
 	return attMap;
     }
 }
