@@ -46,7 +46,7 @@ import java.util.LinkedList;
  */
 public class SimpleThreadPool implements ThreadPool
 {
-    private PooledThread [] threads;
+    protected PooledThread [] threads;
     private LinkedList queue;
     private boolean daemon;
     private boolean waiting;
