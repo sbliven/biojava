@@ -301,6 +301,7 @@ public class StAXFeatureHandler extends StAXContentHandlerBase
                 String localName,
                 String qName,
                 StAXContentHandler handler)
+              throws SAXException
   {
   }
 

@@ -61,6 +61,9 @@ public class GAMEGenePropHandler
     // setup handlers
     super.addHandler(new ElementRecognizer.ByLocalName("name"),
       GAMENamePropHandler.GAME_NAME_PROP_HANDLER_FACTORY);
+    // <dbxref>
+    super.addHandler(new ElementRecognizer.ByLocalName("dbxref"),
+      GAMEDbxrefPropHandler.GAME_DBXREF_PROP_HANDLER_FACTORY);
   }
 
   public void NameSetStringValue(String s) {

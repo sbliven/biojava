@@ -38,7 +38,7 @@ import org.xml.sax.*;
  * Handles the GAME &lt;annotation&gt; element
  *
  * @author David Huen
- * @since 1.8
+ * @since 1.2
  */
 public class GAMEAnnotationHandler 
                extends StAXFeatureHandler 
@@ -74,6 +74,9 @@ public class GAMEAnnotationHandler
        // <feature_set>
        super.addHandler(new ElementRecognizer.ByLocalName("feature_set"),
          GAMEFeatureSetHandler.GAME_FEATURESET_HANDLER_FACTORY);
+       // <dbxref>
+       super.addHandler(new ElementRecognizer.ByLocalName("dbxref"),
+         GAMEDbxrefPropHandler.GAME_DBXREF_PROP_HANDLER_FACTORY);
        // <Aspect>
 //       super.addHandler(new ElementRecognizer.ByLocalName("aspect"),
 //         GAMEAspectPropHandler.GAME_ASPECT_PROP_HANDLER_FACTORY);
@@ -113,18 +116,19 @@ public class GAMEAnnotationHandler
                 String qName,
                 Attributes attrs)
   {
-/*    String annotationId =  attrs.getValue("id");
+    String annotationId =  attrs.getValue("id");
     if (annotationId != null) {
       // stuff Gadfly annotation id into our annotation bundle for info.
-      System.out.println("GAMEAnnotationHandler is setting id to " + annotationId);
+//      System.out.println("GAMEAnnotationHandler is setting id to " + annotationId);
       try {
          featureTemplate.annotation.setProperty(
-                          "id", annotationId);
+                          "annotation_id", annotationId);
       }
       catch (ChangeVetoException cae) {
         System.err.println("GAMEAnnotationHandler: veto exception caught.");
       }
-    }*/
+    }
+//    System.out.println("GAMEAnnotationHandler.startElementHandler: leaving.");
   }
 
   public void endElementHandler(
