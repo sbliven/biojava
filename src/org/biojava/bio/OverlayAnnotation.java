@@ -38,6 +38,11 @@ import org.biojava.utils.*;
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Greg Cox
+ *
+ * @for.powerUser
+ * In the case where you wish to wrap an underlying Annotation in a view that
+ * will allow it to be edited without altering the original object, but also
+ * reflect changes in the original object.
  */
 
 public class OverlayAnnotation

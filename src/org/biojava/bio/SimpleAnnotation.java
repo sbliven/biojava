@@ -35,6 +35,10 @@ import org.biojava.utils.*;
  *
  * @author Matthew Pocock
  * @author Greg Cox
+ *
+ * @for.user
+ * When you need to make a new Annotation instance and will want to populate
+ * it with properties, use this class.
  */
 public class SimpleAnnotation extends AbstractAnnotation {
   /**
@@ -54,15 +58,29 @@ public class SimpleAnnotation extends AbstractAnnotation {
     return properties != null;
   }
 
+  /**
+   * Create a new, empty SimpleAnnotation instance.
+   */
   public SimpleAnnotation() {
     super();
   }
   
+  /**
+   * Create a new SimpleAnnotation by copying the properties from another
+   * one. The new Annotation instance will be independant of the original.
+   *
+   * @param ann  the Annotation to copy
+   */
   public SimpleAnnotation(Annotation ann)
   throws IllegalArgumentException {
     super(ann);
   }
   
+  /**
+   * Create a new SimpleAnnotation using the values in a Map.
+   *
+   * @param map  the Map to copy properties out of
+   */
   public SimpleAnnotation(Map map) {
     super(map);
   }

@@ -34,20 +34,50 @@ import org.biojava.utils.NestedError;
  * A nestable biological error.
  *
  * @author Matthew Pocock
+ *
+ * @for.powerUser
+ * Catch this whenever it, or one of it's sub-classes are thrown and you know
+ * what to do once you've got it. Note: in general, you should not be catching
+ * errors. However, there are cases where it is necisary e.g. for logging. You
+ * will nearly always want to either re-throw the Error, throw a new Error
+ * or exit the current thread.
+ *
+ * @for.developer
+ * Throw this when something has gone wrong and in general people should not be
+ * handeling it.
  */
 public class BioError extends NestedError {
+  /**
+   * Create a new BioError with a message.
+   *
+   * @param message  the message
+   */
   public BioError(String message) {
 	  super(message);
   }
 
+  /**
+   * Create a new BioError with a cause.
+   *
+   * @param ex  the Throwable that caused this BioError
+   */
   public BioError(Throwable ex) {
     super(ex);
   }
 
+  /**
+   * Create a new BioError with a cause and a message.
+   *
+   * @param ex  the Throwable that caused this BioError
+   * @param message  the message
+   */
   public BioError(Throwable ex, String message) {
     super(ex, message);
   }
   
+  /**
+   * Create a new BioError.
+   */
   public BioError() {
 	  super();
   }

@@ -28,7 +28,8 @@ import java.io.*;
 import org.biojava.utils.*;
 
 /**
- * Create an Annotation with properties matching those of a JavaBean intance.
+ * Create an Annotation with properties matching those of a JavaBean instance.
+ * <em>Note: this class is experimental and only partialy implemented.</em>
  *
  * @since 1.3
  * @author Matthew Pocock

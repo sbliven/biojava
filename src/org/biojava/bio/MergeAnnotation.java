@@ -28,12 +28,19 @@ import org.biojava.utils.*;
 
 /**
  * Merged view onto a list of underlying Annotation objects.
- * Currently immutable (but reflects changes to underlying objects).
+ * Currently immutable (but reflects changes to underlying objects). Annotations
+ * near the beginning of the list will have properties that take precedence.
+ * This Annotation implementation is immutable.
  *
  * @author Thomas Down
  * @author Matthew Pocock
  * @author Greg Cox
  * @since 1.2
+ *
+ * @for.developer Use these when you have a list of Annotation instances that
+ * need to be viewed as one. For example, if you have annotation for a feature
+ * from a local database, in-memory objects and a web-page, you could build
+ * three Annotation instances and merge them using a MergeAnnotation.
  */
 
 public class MergeAnnotation
@@ -51,6 +58,12 @@ public class MergeAnnotation
     mergeSet = new ArrayList();
   }
   
+  /**
+   * Add a new Annotation to the list to be merged.
+   *
+   * @param ann  the Annotation to add
+   * @for.powerUser  Use this to alter the Annotations being merged
+   */
   public void addAnnotation(Annotation ann)
   throws ChangeVetoException
   {

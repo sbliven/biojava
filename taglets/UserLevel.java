@@ -2,6 +2,11 @@ import com.sun.tools.doclets.Taglet;
 import com.sun.javadoc.*;
 import java.util.Map;
 
+/**
+ * Taglet providing the for.developer, for.powerUser and for.User tags.
+ *
+ * @author Matthew Pocock
+ */
 public class UserLevel implements Taglet {
   public static void register(Map tagletMap) {
     register(tagletMap, "for.developer", "Developers");

@@ -26,12 +26,33 @@ import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
 
 /**
- * <code>AnnotationTools</code> is a set of static utility methods for
- * manipulating <code>Annotation</code>s.
+ * <p><code>AnnotationTools</code> is a set of static utility methods for
+ * manipulating <code>Annotation</code>s and <code>AnnotationType</code>s.</p>
+ *
+ * <p>The methods allIn() and allOut() let you compare an Annotation to an
+ * AnnotationType and produce a new Annotation with only those properties
+ * explicitly constrained by or not constrained by the type. This could be
+ * of use when using an Annotation as a template for some object. You could use
+ * allOut to make an Annotation that has all the properties that do not fit into
+ * normal constructor properties, and pass that in as the Annotation bundle.</p>
+ *
+ * <p>intersection(AnnotationType) and union(AnnotationType) return new
+ * AnnotationType instances that will accept every Annotation instance that is
+ * accepted by both or either respectively. It is particularly informative to
+ * compare the result of this to the AnnotationType.NONE to see if the two types
+ * are mutualy disjoint.</p>
+ *
+ * <p>intersection(PropertyConstraint) and union(PropertyConstraint) return new
+ * PropertyConstraint instances that will accept every Object that is accepted
+ * by both or either one respectively.</p>
  *
  * @since 1.3
  * @author Matthew Pocock
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a> (docs).
+ *
+ * @for.powerUser
+ * Comparing types and annotations. For example, FilterTools uses these methods
+ * when comparing filters on features by their Annotation bundles.
  */
 public final class AnnotationTools {
     /**
@@ -50,6 +71,8 @@ public final class AnnotationTools {
      * @param annType an <code>AnnotationType</code>.
      *
      * @return an <code>Annotation</code>.
+     *
+     * @for.powerUser When disecting an Annotation
      */
     public static Annotation allIn(Annotation annotation, AnnotationType annType) {
         Annotation res;
@@ -81,6 +104,8 @@ public final class AnnotationTools {
      * @param annType an <code>AnnotationType</code>.
      *
      * @return an <code>Annotation</code> value.
+     *
+     * @for.powerUser When disecting an Annotation
      */
     public static Annotation allOut(Annotation annotation, AnnotationType annType) {
         Annotation res;
@@ -105,6 +130,18 @@ public final class AnnotationTools {
         return res;
     }
     
+    /**
+     * Calculate an AnnotationType that matches all Annotation instances matched
+     * by both types.
+     *
+     * @param ann1  the first AnnotationType
+     * @param ann1  the seccond AnnotationType
+     * @return the intersection AnnotationType
+     *
+     * @for.powerUser
+     * Usually you will either use this value blind or compare it to
+     * AnnotationType.NONE.
+     */
     public static AnnotationType intersection(
       AnnotationType ann1,
       AnnotationType ann2
@@ -148,6 +185,18 @@ public final class AnnotationTools {
       }
     }
     
+    /**
+     * Calculate the intersection of two PropertyConstraint instances.
+     *
+     * @param pc1 the first PropertyConstraint
+     * @param pc2 the seccond PropertyConstraint
+     * @return the intersection PropertyConstraint
+     *
+     * @for.powerUser
+     * This method is realy only interesting when comparing each property in an
+     * AnnotationType in turn. Usually the return value is either compared to
+     * PropertyConstraint.NONE or is used blindly.
+     */
     public static PropertyConstraint intersection(
       PropertyConstraint pc1,
       PropertyConstraint pc2
@@ -234,6 +283,18 @@ public final class AnnotationTools {
       return new PropertyConstraint.And(pc1, pc2);
     }
     
+    /**
+     * Create an AnnotationType that matches all Anntotations that are accepted
+     * by two others.
+     *
+     * @param ann1  the first AnnotationType
+     * @param ann2  the seccond AnnotationType
+     * @return an AnnotationType that represents their unions
+     *
+     * @for.powerUser
+     * This method is realy not very usefull in most cases. You may wish to
+     * compare the result of this to AnnotationType.ANY, or use it blindly.
+     */
     public static AnnotationType union(
       AnnotationType ann1,
       AnnotationType ann2
@@ -266,6 +327,21 @@ public final class AnnotationTools {
       }
     }
     
+    /**
+     * Create a PropertyConstraint that matches all Objects that are accepted
+     * by two others.
+     *
+     * @param pc1 the first PropertyConstraint
+     * @param pc2 the seccond PropertyConstraint
+     * @return the union PropertyConstraint
+     *
+     * @for.powerUser
+     * In the general case, there is no clean way to represent the union of two
+     * PropertyConstraint instances. You may get back a PropertyConstraint.Or
+     * instance, or perhaps PropertyConstraint.ANY. Alternatively, there may be
+     * some comparrison possible. It is a thankless task introspecting this in
+     * code. You have been warned.
+     */
     public static PropertyConstraint union(
       PropertyConstraint pc1,
       PropertyConstraint pc2

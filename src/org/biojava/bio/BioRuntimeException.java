@@ -34,21 +34,58 @@ import org.biojava.utils.NestedRuntimeException;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ *
+ * @for.powerUser
+ * Occasionaly methods will document that the object they return may emit
+ * BioRuntimeExceptions. If you know what you are doing, you can catch these
+ * and do something sensible with them. An example would be an iterator() method
+ * that returns an Iterator where next() could fail due to a database connection
+ * flaking out. This could raise a BioRuntimeException wrapping the real cause.
+ * It would then not be unreasonable for the code calling next() to catch this
+ * BioRuntimeException and extract the cause.
+ *
+ * @for.developer
+ * Occasionaly it is necisary to abuse the exception system by throwing BioError
+ * to get arround limitations in APIs that you do not control. For example, when
+ * implementing Iterator.next(), you may need to call a method that can fail.
+ * Catch the failure and throw it as a BioError. If you want people to handle
+ * this gracefully in their scripts, then document this behavior and hope they
+ * catch the error.
  */
 
 public class BioRuntimeException extends NestedRuntimeException {
+  /**
+   * Create a new BioRuntimeException with a message.
+   *
+   * @param message  the message
+   */
   public BioRuntimeException(String message) {
 	  super(message);
   }
 
+
+  /**
+   * Create a new BioRuntimeException with a cause.
+   *
+   * @param ex  the Throwable that caused this BioRuntimeException
+   */
   public BioRuntimeException(Throwable ex) {
     super(ex);
   }
 
+  /**
+   * Create a new BioRuntimeException with a cause and a message.
+   *
+   * @param ex  the Throwable that caused this BioRuntimeException
+   * @param message  the message
+   */
   public BioRuntimeException(Throwable ex, String message) {
     super(ex, message);
   }
   
+  /**
+   * Create a new BioRuntimeException.
+   */
   public BioRuntimeException() {
 	  super();
   }
