@@ -55,7 +55,6 @@ public class RestrictionEnzyme
      */
     public static final int OVERHANG_3PRIME = 1;
 
-
     /**
      * <code>BLUNT</code> the end type created by enzymes which leave
      * a blunt end.
@@ -80,26 +79,26 @@ public class RestrictionEnzyme
      *
      * @param name a <code>String</code> such as EcoRI.
      * @param site a <code>SymbolList</code> recognition site.
-     * @param ds5Prime an <code>int</code> index in the forward strand
-     * (the strand conventionally written <strong>5'</strong>-3',
-     * hence the name ds5Prime) of the recognition site at which the
+     * @param dsForward an <code>int</code> index in the forward
+     * strand (the strand conventionally written
+     * <strong>5'</strong>-3') of the recognition site at which the
      * cut occurs. The cut occurs between this base and the following
      * one.
-     * @param ds3Prime an <code>int</code> index in the reverse strand
-     * (the strand conventionally written <strong>3'</strong>-5',
-     * hence the name ds3Prime) of the recognition site at which the
+     * @param dsReverse an <code>int</code> index in the reverse
+     * strand (the strand conventionally written
+     * <strong>3'</strong>-5') of the recognition site at which the
      * cut occurs. The cut occurs between this base and the following
      * one.
      *
      * @exception IllegalAlphabetException if an error occurs.
      */
     public RestrictionEnzyme(String name, SymbolList site,
-                             int ds5Prime, int ds3Prime)
+                             int dsForward, int dsReverse)
         throws IllegalAlphabetException
     {
         this(name, site,
              null,
-             new int [] { ds5Prime, ds3Prime });
+             new int [] { dsForward, dsReverse });
     }
 
     /**
@@ -110,37 +109,37 @@ public class RestrictionEnzyme
      *
      * @param name a <code>String</code> such as Bsp24I.
      * @param site a <code>SymbolList</code> recognition site.
-     * @param us5Prime an <code>int</code> index in the forward strand
-     * (the strand conventionally written <strong>5'</strong>-3',
-     * hence the name ds5Prime) upstream of the recognition site at
+     * @param usForward an <code>int</code> index in the forward
+     * strand (the strand conventionally written
+     * <strong>5'</strong>-3' upstream of the recognition site at
      * which the cut occurs. The cut occurs between this base and the
      * following one.
-     * @param us3Prime an <code>int</code> index in the reverse strand
-     * (the strand conventionally written <strong>3'</strong>-5',
-     * hence the name ds3Prime) upstream of the recognition site at
+     * @param usReverse an <code>int</code> index in the reverse
+     * strand (the strand conventionally written
+     * <strong>3'</strong>-5) upstream of the recognition site at
      * which the cut occurs. The cut occurs between this base and the
      * following one.
-     * @param ds5Prime an <code>int</code> index in the forward strand
-     * (the strand conventionally written <strong>5'</strong>-3',
-     * hence the name ds5Prime) downstream of the recognition site at
+     * @param dsForward an <code>int</code> index in the forward
+     * strand (the strand conventionally written
+     * <strong>5'</strong>-3') downstream of the recognition site at
      * which the cut occurs. The cut occurs between this base and the
      * following one.
-     * @param ds3Prime an <code>int</code> index in the reverse strand
-     * (the strand conventionally written <strong>3'</strong>-5',
-     * hence the name ds3Prime) downstream of the recognition site at
+     * @param dsReverse an <code>int</code> index in the reverse
+     * strand (the strand conventionally written
+     * <strong>3'</strong>-5') downstream of the recognition site at
      * which the cut occurs. The cut occurs between this base and the
      * following one.
      *
      * @exception IllegalAlphabetException if an error occurs.
      */
     public RestrictionEnzyme(String name, SymbolList site,
-                             int us5Prime, int us3Prime,
-                             int ds5Prime, int ds3Prime)
+                             int usForward, int usReverse,
+                             int dsForward, int dsReverse)
         throws IllegalAlphabetException
     {
         this(name, site,
-             new int [] { us5Prime, us3Prime },
-             new int [] { ds5Prime, ds3Prime });
+             new int [] { usForward, usReverse },
+             new int [] { dsForward, dsReverse });
     }
 
     /**
@@ -319,9 +318,9 @@ public class RestrictionEnzyme
         if (usCutPositions == null)
             throw new BioException(name + " does not cut upstream of the recognition site");
 
-        if (usCutPositions[0] < usCutPositions[1])
+        if (usCutPositions[0] > usCutPositions[1])
             return OVERHANG_5PRIME;
-        else if (usCutPositions[0] > usCutPositions[1])
+        else if (usCutPositions[0] < usCutPositions[1])
             return OVERHANG_3PRIME;
         else
             return BLUNT;

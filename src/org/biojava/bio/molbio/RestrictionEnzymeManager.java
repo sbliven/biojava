@@ -22,8 +22,9 @@
 package org.biojava.bio.molbio;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,9 +63,10 @@ import org.biojava.utils.SmallSet;
  * should be placed in the CLASSPATH containing a key
  * "rebase.data.file" and a corresponding value of a REBASE file
  * (standard REBASE format conventially named withrefm.### where ###
- * is the version number). The properties are loaded as a
- * ResourceBundle, so should be named
- * "RestrictionEnzymeManager.properties"</p>
+ * is the version number). This file will be loaded by the
+ * <code>RestrictionEnzymeManager</code> <code>ClassLoader</code>. The
+ * properties are loaded as a ResourceBundle, so the file should be
+ * named "RestrictionEnzymeManager.properties".</p>
  *
  * @author Keith James
  */
@@ -130,13 +132,20 @@ public final class RestrictionEnzymeManager
     static
     {
         String rebaseDataFileName = bundle.getString(REBASE_DATA_KEY);
-        loadDataFile(rebaseDataFileName);
+        InputStream is = RestrictionEnzymeManager.class.getResourceAsStream(rebaseDataFileName);
+        loadData(is);
     }
 
     private static Map nameToEnzyme;
     private static Map nameToIsoschizomers;
     private static Map sizeToCutters;
     private static Map enzymeToPattern;
+
+    /**
+     * <code>RestrictionEnzymeManager</code> is a static utility
+     * method class and no instances should be created.
+     */
+    private RestrictionEnzymeManager() { }
 
     /**
      * <code>getAllEnzymes</code> returns an unmodifable set of all
@@ -181,8 +190,7 @@ public final class RestrictionEnzymeManager
      *
      * @exception BioException if there is no such enzyme.
      */
-    public static Set getIsoschizomers(String name)
-        throws BioException
+    public static Set getIsoschizomers(String name) throws BioException
     {
         if (! nameToIsoschizomers.containsKey(name))
             throw new BioException("Unknown RestrictionEnzyme name '"
@@ -235,7 +243,7 @@ public final class RestrictionEnzymeManager
         return (Pattern []) enzymeToPattern.get(enzyme);
     }
 
-    private static void loadDataFile(String fileName)
+    private static void loadData(InputStream is)
     {
         nameToEnzyme        = new HashMap();
         nameToIsoschizomers = new HashMap();
@@ -244,7 +252,7 @@ public final class RestrictionEnzymeManager
 
         try
         {
-            BufferedReader br = new BufferedReader(new FileReader(fileName));
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
             // Basic linesplit parser
             LineSplitParser lsParser = new LineSplitParser();
@@ -282,6 +290,30 @@ public final class RestrictionEnzymeManager
             {
                 continue;
             }
+
+            // Replace isoschizomer names with RestrictionEnzymes
+            Map tempMap = new HashMap();
+            Set tempSet = null;
+            for (Iterator ni = nameToIsoschizomers.keySet().iterator(); ni.hasNext();)
+            {
+                Object name = ni.next();
+                Set isoschizomers = (Set) nameToIsoschizomers.get(name);
+
+                if (isoschizomers.size() == 0)
+                    tempSet = Collections.EMPTY_SET;
+                else
+                    tempSet = (Set) isoschizomers.getClass().newInstance();
+
+                tempMap.put(name, tempSet);
+
+                for (Iterator ii = isoschizomers.iterator(); ii.hasNext();)
+                {
+                    String isoName = (String) ii.next();
+                    tempSet.add(nameToEnzyme.get(isoName));
+                }
+            }
+
+            nameToIsoschizomers = tempMap;
         }
         catch (Exception e)
         {
@@ -303,6 +335,7 @@ public final class RestrictionEnzymeManager
         private int [] dsCutPositions;
 
         private String tagState;
+        private boolean unknownSite;
         private StringBuffer sb;
 
         RebaseEnzymeBuilder()
@@ -313,22 +346,21 @@ public final class RestrictionEnzymeManager
         public void startRecord() throws ParserException
         {
             isoBuffer = new ArrayList(30);
-            dsCutPositions = new int [2];
-            usCutPositions = new int [2];
+            site           = null;
+            dsCutPositions = null;
+            usCutPositions = null;
+            unknownSite = false;
         }
 
         public void endRecord() throws ParserException
         {
             if (! getRecordState())
                 return;
+            if (unknownSite || site == null)
+                return;
 
             int isoCount = isoBuffer.size();
-
-            if (isoCount == 0)
-            {
-                isoschizomers = Collections.EMPTY_SET;
-            }
-            else if (isoCount < 30)
+            if (isoCount < 30)
             {
                 isoschizomers = new SmallSet(isoCount);
                 for (int i = 0; i < isoCount; i++)
@@ -394,7 +426,7 @@ public final class RestrictionEnzymeManager
 
             try
             {
-                if (usCutPositions.length > 0)
+                if (usCutPositions != null)
                 {
                     enzyme = new RestrictionEnzyme(name, site,
                                                    usCutPositions[0],
@@ -423,6 +455,13 @@ public final class RestrictionEnzymeManager
             sb.append((String) value);
             int div, forIdx, revIdx;
 
+            // REBASE marks enzymes whose site is not known with '?'
+            if (sb.charAt(0) == '?')
+            {
+                unknownSite = true;
+                return;
+            }
+
             if (sb.charAt(0) == '(')
             {
                 // Index separator
@@ -442,11 +481,13 @@ public final class RestrictionEnzymeManager
                 // Indices before the site indicate a double cutter
                 if (site == null)
                 {
+                    usCutPositions = new int [2];
                     usCutPositions[0] = forIdx;
                     usCutPositions[1] = revIdx;
                 }
                 else
                 {
+                    dsCutPositions = new int [2];
                     dsCutPositions[0] = forIdx + site.length();
                     dsCutPositions[1] = revIdx + site.length();
                 }
@@ -455,6 +496,7 @@ public final class RestrictionEnzymeManager
             {
                 // Explicit cut site marker
                 int cut = sb.indexOf("^");
+                dsCutPositions = new int [2];
 
                 try
                 {
