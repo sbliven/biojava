@@ -34,10 +34,10 @@ import org.biojava.bio.seq.impl.*;
 import org.biojava.utils.*;
 
 /**
- * Title:        PhredTools
- * Description:  Static methods for working with phred quality data
- * Copyright:    Copyright (c) 2001
- * Company:      AgResearch
+ * Title:        PhredTools<p>
+ * Description:  Static methods for working with phred quality data<p>
+ * Copyright (c) 2001<p>
+ * Company:      AgResearch<p>
  * @author Mark Schreiber
  * @since 1.1
  *

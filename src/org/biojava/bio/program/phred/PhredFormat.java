@@ -38,9 +38,9 @@ import org.biojava.bio.seq.io.*;
  * sequence's description line (the line starting with a '>'
  * character).
  *
- * Essentially a rework of FastaFormat to cope with the quirks of Phred Quality data.
- * Copyright:    Copyright (c) 2001
- * Company:      AgResearch
+ * Essentially a rework of FastaFormat to cope with the quirks of Phred Quality data.<p>
+ * Copyright (c) 2001<p>
+ * Company:      AgResearch<p>
  *
  * @author Mark Schreiber
  * @since 1.1
