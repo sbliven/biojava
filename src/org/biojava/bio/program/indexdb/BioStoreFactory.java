@@ -319,7 +319,7 @@ public class BioStoreFactory {
      */
     public static File makePrimaryKeyFile(File storeLoc, String key)
         throws IOException {
-        return new File(storeLoc, "key_" + key + ".dat");
+        return new File(storeLoc, "key_" + key + ".key");
     }
 
     /**
