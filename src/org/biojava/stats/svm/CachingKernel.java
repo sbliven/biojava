@@ -18,6 +18,7 @@ public class CachingKernel implements SVMKernel {
 
     public void setNestedKernel(SVMKernel k) {
 	parent = k;
+  cache.clear();
     }
 
     public SVMKernel getNestedKernel() {
