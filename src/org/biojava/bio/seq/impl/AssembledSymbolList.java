@@ -180,7 +180,7 @@ public class AssembledSymbolList extends AbstractSymbolList {
 		loc = locationUpstreamOfPoint(pos);
 		int numNs;
 		if (loc != null) {
-		    numNs = Math.min(loc.getMin(), end) - pos;
+		    numNs = Math.min(loc.getMin(), end + 1) - pos;
 		    pos = loc.getMin();
 		} else {
 		    numNs = end - pos + 1;
