@@ -36,14 +36,14 @@ public class TestAmbiguity {
   public static void main(String [] args) {
 
     try {
-      
+
       {
         final String dnaText = "agctrymkswhbvdn-AGCTRYMKSWHBVDN";
-        final FiniteAlphabet dna = DNATools.getDNA(); 	
-        
+        final FiniteAlphabet dna = DNATools.getDNA();
+
         final SymbolTokenization sParser = dna.getTokenization("token");
         final SymbolList dnaList = new SimpleSymbolList(sParser, dnaText);
-        
+
         for(int i = 1; i <= dnaList.length(); i++) {
           final Symbol s = dnaList.symbolAt(i);
           System.out.print(s.getName() + " -> {");
@@ -57,21 +57,21 @@ public class TestAmbiguity {
           System.out.println("}");
         }
       }
-  	
+
 
       {
-        System.out.println("Now Testing Prot"); 
+        System.out.println("Now Testing Prot");
         final String protText = "agctrymkswhvdn-AGCTRYMKSWHVDN";
-        final FiniteAlphabet protein = ProteinTools.getAlphabet(); 
+        final FiniteAlphabet protein = ProteinTools.getAlphabet();
         //dna.addSymbol(AlphabetManager.getGapSymbol());//problem here, even when explicitly adding the gap symbol it doesn't parse
-<<<<<<< TestAmbiguity.java
-        final SymbolTokenization protParser = protein.getTokenization("token");
-        final SymbolList protList = protParser.parse(protText);
-=======
+//<<<<<<< TestAmbiguity.java
+//        final SymbolTokenization protParser = protein.getTokenization("token");
+//        final SymbolList protList = protParser.parse(protText);
+//=======
         final SymbolTokenization protParser = protein.getTokenization("token");
         final SymbolList protList = new SimpleSymbolList(protParser, protText);
->>>>>>> 1.7
-        
+//>>>>>>> 1.7
+
         for(int i = 1; i <= protList.length(); i++) {
           final Symbol s = protList.symbolAt(i);
           System.out.print(s.getName() + " -> {");
@@ -87,18 +87,18 @@ public class TestAmbiguity {
       }
 
       {
-        System.out.println("Now Testing Prot-Term"); 
+        System.out.println("Now Testing Prot-Term");
         final String protTText = "agctrymkswhvdn-AGCTRYMKSWHVDN*";
-        final FiniteAlphabet proteinT = ProteinTools.getTAlphabet(); 
+        final FiniteAlphabet proteinT = ProteinTools.getTAlphabet();
         //dna.addSymbol(AlphabetManager.getGapSymbol());//problem here, even when explicitly adding the gap symbol it doesn't parse
-<<<<<<< TestAmbiguity.java
-        final SymbolTokenization protTParser = proteinT.getTokenization("token");
-        final SymbolList protTList = protTParser.parse(protTText);
-=======
+//<<<<<<< TestAmbiguity.java
+//        final SymbolTokenization protTParser = proteinT.getTokenization("token");
+//        final SymbolList protTList = protTParser.parse(protTText);
+//=======
         final SymbolTokenization protTParser = proteinT.getTokenization("token");
         final SymbolList protTList = new SimpleSymbolList(protTParser, protTText);
->>>>>>> 1.7
-        
+//>>>>>>> 1.7
+
         for(int i = 1; i <= protTList.length(); i++) {
           final Symbol s = protTList.symbolAt(i);
           System.out.print(s.getName() + " -> {");
