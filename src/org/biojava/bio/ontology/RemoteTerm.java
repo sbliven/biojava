@@ -62,7 +62,9 @@ public interface RemoteTerm extends Term {
      * @for.developer This can be used to implement Ontology.importTerm
      */
     
-    public final static class Impl extends AbstractTerm implements RemoteTerm {
+    public final static class Impl
+    extends AbstractTerm
+    implements RemoteTerm, java.io.Serializable {
         private final Ontology ontology;
         private final Term remoteTerm;
         private transient ChangeForwarder forwarder;

@@ -74,7 +74,9 @@ public interface TripleTerm extends Term {
      * @for.developer This can be used to implement Ontology.importTerm
      */
     
-    public final static class Impl extends AbstractChangeable implements TripleTerm {
+    public final static class Impl
+    extends AbstractChangeable
+    implements TripleTerm, java.io.Serializable {
         private final Ontology ontology;
         private final Term subject;
         private final Term object;

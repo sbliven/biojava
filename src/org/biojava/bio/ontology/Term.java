@@ -84,7 +84,9 @@ public interface Term extends Annotatable {
      * @for.developer This can be used to implement Ontology.createTerm
      */
     
-    public final static class Impl extends AbstractTerm implements Term {
+    public final static class Impl
+    extends AbstractTerm
+    implements Term, java.io.Serializable {
         private final String name;
         private final String description;
         private final Ontology ontology;

@@ -151,7 +151,7 @@ public interface Ontology extends Changeable {
     
     public final class Impl
     extends AbstractChangeable
-    implements Ontology, OntologyOps {
+    implements Ontology, OntologyOps, java.io.Serializable {
         private Map terms;
         private Set triples;
         private Map subjectTriples;

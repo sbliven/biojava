@@ -65,7 +65,9 @@ public class Services {
             String implName;
 
             while ((implName = serviceReader.readLine()) != null) {
+              if(implName.length() > 0) {
                 names.add(implName);
+              }
             }
         }
 

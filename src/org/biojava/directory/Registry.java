@@ -103,13 +103,21 @@ public class Registry {
                 Services.getImplementationNames(SequenceDBProvider.class, loader).iterator();
 
             while (implNames.hasNext()) {
-                String className = (String) implNames.next();
+              String className = (String) implNames.next();
+              try {
                 Class clazz = loader.loadClass(className);
                 SequenceDBProvider seqDB =
                     (SequenceDBProvider) clazz.newInstance();
                 if (seqDB.getName().equals(providerName)) {
                     return seqDB;
                 }
+              } catch (ClassNotFoundException ce) {
+                throw new RegistryException(
+                  ce,
+                  "Could not find class: " + className +
+                  " for service provider " + providerName
+                );
+              }
             }
 
             throw new ProviderNotFoundException("No such provider exists: "

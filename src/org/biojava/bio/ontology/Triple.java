@@ -95,7 +95,8 @@ public interface Triple {
      * @for.developer This can be used to implement Ontology.createTriple
      */
     
-    public static final class Impl implements Triple {
+    public static final class Impl
+    implements Triple, java.io.Serializable {
         private final Term subject;
         private final Term object;
         private final Term relation;

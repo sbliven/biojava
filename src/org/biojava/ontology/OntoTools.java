@@ -92,14 +92,9 @@ public final class OntoTools {
     Term subject,
     Term object
   ) throws OntologyException {
-    String _prefix = "isa(" + subject + "," + object + ") ";
-    System.err.println(_prefix + "Starting");
-    
     if(subject == object) {
-      System.err.println(_prefix + "Ending true: identical");
       return true;
     } else if(object == ANY) {
-      System.err.println(_prefix + "Ending true: any");
       return true;
     }
     
@@ -132,22 +127,17 @@ public final class OntoTools {
     }
     
     if(subject.getOntology() == object.getOntology()) {
-      System.err.println(_prefix + "Delegating to ontology tools");
       return oo.isa(subject, object);
     } else {
-      System.err.println(_prefix + "Computing transitive closure for " + subject);
       Ontology remoteTriples = oo.transitiveClosure(
         subject, ANY, IS_A
       );
-      System.err.println(_prefix + "Searching closure for " + subject + " " + remoteTriples);
       for(
         Iterator i = remoteTriples.getTriples(null, null, null).iterator();
         i.hasNext();
       ) {
         Triple triple = (Triple) i.next();
-        System.err.println(_prefix + "Evaluating " + triple);
         RemoteTerm rt = (RemoteTerm) triple.getObject();
-        System.err.println(_prefix + "Following to " + rt.getRemoteTerm() + "," + object);
         if(
           rt.getRemoteTerm() != subject &&
           !isa(
@@ -155,12 +145,10 @@ public final class OntoTools {
             object
           )
         ) {
-          System.err.println(_prefix + "Ending true");
           return true;
         }
       }
       
-      System.err.println(_prefix + "Ending false");
       return false;
     }
   }
@@ -190,19 +178,16 @@ public final class OntoTools {
   ) throws OntologyException {
     Set res = new HashSet();
     
-    System.err.println("Searching triples");
     for(
       Iterator tripI = ontology.getTriples(null, null, null).iterator();
       tripI.hasNext();
     ) {
       Triple trip = (Triple) tripI.next();
-      System.err.println("evaluating: " + trip);
       if(
         (subject == ANY || isa(trip.getSubject(), subject)) &&
         (object == ANY || isa(trip.getObject(), object)) &&
         isa(trip.getRelation(), relation)
       ) {
-        System.err.println("accepted");
         res.add(trip);
       }
     }

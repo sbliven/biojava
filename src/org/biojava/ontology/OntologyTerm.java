@@ -56,7 +56,9 @@ public interface OntologyTerm extends Term {
      * @for.developer This can be used to implement Ontology.importTerm
      */
     
-    public final static class Impl extends AbstractChangeable implements OntologyTerm {
+    public final static class Impl
+    extends AbstractChangeable
+    implements OntologyTerm, java.io.Serializable {
         private final Ontology ontology;
         private final Ontology target;
         private transient ChangeForwarder forwarder;

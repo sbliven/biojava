@@ -6,15 +6,13 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojava.bio.BioError;
 
 abstract class DefaultOps
-implements OntologyOps {
+implements OntologyOps, java.io.Serializable {
   Set trueThings;
   Set falseThings;
 
   {
     trueThings = new HashSet();
     falseThings = new HashSet();
-    
-    System.err.println("Creating a DefaultOps for: " + getOntology());
   }
   
   public abstract Ontology getOntology();
@@ -33,7 +31,6 @@ implements OntologyOps {
           ""
         );
         Term ourRel = onto.importTerm(relation);
-        System.err.println("Transitive closure: " + onto);
         
         for(Iterator i = getOntology().getTerms().iterator(); i.hasNext(); ) {
           Term t = (Term) i.next();
@@ -49,11 +46,9 @@ implements OntologyOps {
           OntoTools.ANY,
           relation
         );
-        System.err.println("tuples: " + tups.size());
         
         for(Iterator i = tups.iterator(); i.hasNext(); ) {
           Triple trip = (Triple) i.next();
-          System.err.println("Evaluating: " + trip);
           
           if(OntoTools.isa(trip.getSubject(), subject)) {
             Set seen = new HashSet();
@@ -126,10 +121,8 @@ implements OntologyOps {
       TripleStruct ts = new TripleStruct(subject, object, OntoTools.IS_A);
       
       if(trueThings.contains(ts)) {
-        System.err.println("True from cache");
         return true;
       } else if(falseThings.contains(ts)) {
-        System.err.println("False from cache");
         return false;
       }
       
@@ -145,14 +138,11 @@ implements OntologyOps {
     }
     
     private boolean recurseIsa(Term subject, Term object, Set visited) {
-      System.err.println("Checking " + subject + " and " + object);
       if(subject == object) {
-        System.err.println("equal");
         return true;
       }
       
       if(visited.contains(subject)) {
-        System.err.println("seen before");
         return false;
       }
       
@@ -172,7 +162,8 @@ implements OntologyOps {
       return false;
     }
     
-  private static class TripleStruct {
+  private static class TripleStruct
+  implements java.io.Serializable {
     public final Term subject;
     public final Term object;
     public final Term relation;
