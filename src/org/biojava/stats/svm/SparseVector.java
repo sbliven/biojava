@@ -188,7 +188,11 @@ public class SparseVector implements Serializable {
       return n;
     }
 
-    public static final SVMKernel kernel = new SVMKernel() {
+    public static final SVMKernel kernel = new SparseVectorKernel();
+    
+
+    
+    private static class SparseVectorKernel implements SVMKernel, Serializable {
       public double evaluate(Object o1, Object o2) {
         SparseVector a = (SparseVector) o1;
         SparseVector b = (SparseVector) o2;

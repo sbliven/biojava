@@ -270,7 +270,7 @@ public class ClassifierExample {
           model = trainer.trainModel(target, kernel, null);
 
           System.out.println("Threshold = " + model.getThreshold());
-          for(Iterator i = target.items().iterator(); i.hasNext(); ) {
+          for(Iterator i = model.items().iterator(); i.hasNext(); ) {
             Object item = i.next();
             System.out.println(item + "\t" +
                                target.getTarget(item) + "\t" +
