@@ -77,9 +77,10 @@ implements Location, Serializable {
    */
   CompoundLocation(List locs) {
     Location minL = (Location) locs.get(0);
-    Location maxL = (Location) locs.get(locs.size() - 1);
-    
+    Location maxL = (Location) locs.get(locs.size() - 1);    
     this.locations.addAll(locs);
+    Collections.sort(locations, Location.naturalOrder);
+
     this.min = minL.getMin();
     this.max = maxL.getMax();;
   }
@@ -97,9 +98,19 @@ implements Location, Serializable {
     if(p < min || p > max)
       return false;
 
-    for(Iterator i = locations.iterator(); i.hasNext(); ) {
-      if( ((Location) i.next()).contains(p) )
-        return true;
+    int m = locations.size();
+    int n = 0;
+    while (m >= n) {
+	int i = (m + n) / 2;
+	Location l = (Location) locations.get(i);
+	
+	if (p < l.getMin()) {
+	    m = i - 1;
+	} else if (p > l.getMax()) {
+	    n = i + 1;
+	} else {
+	    return true;
+	}
     }
 
     return false;
