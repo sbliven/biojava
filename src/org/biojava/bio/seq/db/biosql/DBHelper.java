@@ -65,6 +65,8 @@ public abstract class DBHelper {
 		return new PostgreSQLDBHelper();
  	    } else if (protocol.equals("oracle")) {
  		return new OracleDBHelper();
+ 	    } else if (protocol.equals("hsqldb")) {
+ 		return new HypersonicDBHelper();
 	    }
 	}
 
@@ -83,16 +85,30 @@ public abstract class DBHelper {
 	}
     }
 
-    public final static DeleteStyle DELETE_POSTGRESQL = new DeleteStyle("Postgresql");;
-    public final static DeleteStyle DELETE_MYSQL4 = new DeleteStyle("Mysql 4.02 or later");
-    public final static DeleteStyle DELETE_GENERIC = new DeleteStyle("Portable SQL");
+    public static final DeleteStyle DELETE_POSTGRESQL = new DeleteStyle("Postgresql");
+    public static final DeleteStyle DELETE_MYSQL4 = new DeleteStyle("Mysql 4.02 or later");
+    public static final DeleteStyle DELETE_GENERIC = new DeleteStyle("Portable SQL");
 
-    public abstract int getInsertID(Connection conn,
-			   String table,
-			   String columnName)
-	throws SQLException;
 
+    /**
+     * Returns the id value created during the last insert
+     * command. This is for tables that have an auto increment column.
+     * 
+     * @return the last id assigned, or -1 if the id could not be
+     * found.
+     */
+    public abstract int getInsertID(Connection conn, String table, 
+                                    String columnName) throws SQLException;
+
+
+    /**
+     * Returns the an object indicating the style of deletion that
+     * this database should employ.
+     * 
+     * @return the preferred deletion style.
+     */
     public abstract DeleteStyle getDeleteStyle();
+
 
     /**
      * Detects whether a particular table is present in the database.
@@ -113,14 +129,17 @@ public abstract class DBHelper {
         try {
             boolean present;
             Connection conn = pool.takeConnection();
-            PreparedStatement ps = conn.prepareStatement("select * from " + tablename + " limit 1");
+            PreparedStatement ps = null;
             try {
+                ps = conn.prepareStatement("select * from " + tablename + " limit 1");
                 ps.executeQuery();
                 present = true;
             } catch (SQLException ex) {
                 present = false;
             }
-            ps.close();
+            if (ps != null) {
+                ps.close();
+            }
             pool.putConnection(conn);
             return present;
         } catch (SQLException ex) {
