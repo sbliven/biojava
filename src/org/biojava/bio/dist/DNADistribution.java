@@ -43,36 +43,7 @@ extends AbstractDistribution implements Serializable {
   
   {
     scores = new double[4];
-    nullModelListener = new ChangeListener() {
-      public void preChange(ChangeEvent ce) throws ChangeVetoException {
-        if(changeSupport != null) {
-          // make a new change event that chains back to the source one
-          ChangeEvent nce = new ChangeEvent(
-            this,
-            NULL_MODEL,
-            null, null,
-            ce
-          );
-          synchronized(changeSupport) {
-            changeSupport.firePreChangeEvent(nce);
-          }
-        }
-      }
-      public void postChange(ChangeEvent ce) {
-        if(changeSupport != null) {
-          // make a new change event that chains back to the source one
-          ChangeEvent nce = new ChangeEvent(
-            this,
-            NULL_MODEL,
-            null, null,
-            ce
-          );
-          synchronized(changeSupport) {
-            changeSupport.firePostChangeEvent(nce);
-          }
-        }
-      }
-    };
+    nullModelListener = new Distribution.NullModelForwarder(this, changeSupport);
   }
   
   public Alphabet getAlphabet() {
@@ -106,9 +77,11 @@ extends AbstractDistribution implements Serializable {
         nullModel,
         this.nullModel
       );
+      if(this.nullModel != null) {
+        this.nullModel.removeChangeListener(nullModelListener);
+      }
       synchronized(changeSupport) {
         changeSupport.firePreChangeEvent(ce);
-        this.nullModel.removeChangeListener(nullModelListener);
         this.nullModel = nullModel;
         nullModel.addChangeListener(nullModelListener);
         changeSupport.firePostChangeEvent(ce);
