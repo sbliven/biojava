@@ -22,8 +22,9 @@
  *
  */
 
-package org.biojava.bio.program.das.dasalignment ;
+package org.biojava.bio.program.das.dasalignment;
 
+import org.biojava.bio.program.ssbind.AnnotationFactory;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.Attributes;
 
@@ -78,7 +79,7 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
 	//System.out.println("endElement >" + qName + "< >" + name + "<") ;
 	if (qName.equals("OBJECT")) {
 	    try {
-		alignment.addObject(current_object);
+		alignment.addObject(AnnotationFactory.makeAnnotation(current_object));
 	    } catch ( DASException  e) {
 		e.printStackTrace() ;
 	    }
@@ -90,11 +91,11 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
 	    
 	}
 	if (qName.equals("BLOCK")) {
-	    try {
-		alignment.addBlock(current_block);
-	    } catch ( DASException  e) {
-		e.printStackTrace() ;
-	    }
+	    //try {
+		// alignment.addBlock(current_block);
+	    //} catch ( DASException  e) {
+		//e.printStackTrace() ;
+	    //}
 	    current_block = new ArrayList() ;
 	}
 	if (qName.equals("ALIGNMENT")){

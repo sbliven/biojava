@@ -23,6 +23,7 @@
  */
 package org.biojava.bio.program.das.dasalignment;
 
+import org.biojava.bio.program.ssbind.AnnotationFactory;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.Attributes;
 import java.util.* ;
@@ -94,7 +95,7 @@ public class MSD_Mapping_ContentHandler extends DefaultHandler {
 	    for ( int i =0 ; i<current_objects.size(); i++ ) {
 		HashMap object = (HashMap) current_objects.get(i);
 		try {
-		    alignment.addObject(object);
+		    alignment.addObject(AnnotationFactory.makeAnnotation(object));
 		} catch ( DASException e) {
 		    e.printStackTrace() ;
 		}
@@ -206,13 +207,13 @@ public class MSD_Mapping_ContentHandler extends DefaultHandler {
     }
 	
     private void handle_residue_end(String uri, String name, String qName){
-	try{
+	//try{
 	   
-	    alignment.addBlock(current_block);
+	    // alignment.addBlock(current_block);
 	    
-	} catch ( DASException e) {
-	    e.printStackTrace() ;
-	}
+	//} catch ( DASException e) {
+	//    e.printStackTrace() ;
+	//}
 		
     }
 
