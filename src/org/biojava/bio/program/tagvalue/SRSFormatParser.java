@@ -1,4 +1,4 @@
-package org.biojava.bio.program.tagValue;
+package org.biojava.bio.program.tagvalue;
 
 import java.io.*;
 import java.util.*;

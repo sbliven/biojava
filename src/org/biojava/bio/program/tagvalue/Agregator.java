@@ -1,4 +1,4 @@
-package org.biojava.bio.program.srs;
+package org.biojava.bio.program.tagvalue;
 
 import java.util.List;
 import java.util.ArrayList;
