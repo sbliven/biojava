@@ -32,6 +32,7 @@ import org.biojava.bio.CardinalityConstraint;
 import org.biojava.bio.CollectionConstraint;
 import org.biojava.bio.PropertyConstraint;
 import org.biojava.bio.seq.homol.SimilarityPairFeature;
+import org.biojava.bio.seq.filter.WalkerFactory;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.RangeLocation;
 
@@ -87,6 +88,8 @@ public interface FeatureFilter extends Serializable {
    * @since 1.0
    */
   public final static class Not implements FeatureFilter {
+    static { WalkerFactory.getInstance().addFilterWithParent(Not.class); }
+
     FeatureFilter child;
 
     public FeatureFilter getChild() {
@@ -124,6 +127,8 @@ public interface FeatureFilter extends Serializable {
    * @since 1.0
    */
   public final static class And implements FeatureFilter {
+    static { WalkerFactory.getInstance().addFilterWithParent(And.class); }
+
     FeatureFilter c1, c2;
 
     public FeatureFilter getChild1() {
@@ -168,6 +173,8 @@ public interface FeatureFilter extends Serializable {
    * @since 1.0
    */
   public final static class Or implements FeatureFilter {
+    static { WalkerFactory.getInstance().addFilterWithParent(Or.class); }
+
     FeatureFilter c1, c2;
 
     public FeatureFilter getChild1() {
@@ -1052,6 +1059,8 @@ public interface FeatureFilter extends Serializable {
      */
 
     public static class ByParent implements OptimizableFilter, Up {
+      static { WalkerFactory.getInstance().addFilterWithParent(ByParent.class); }
+
         private FeatureFilter filter;
 
         public ByParent(FeatureFilter ff) {
@@ -1140,6 +1149,8 @@ public interface FeatureFilter extends Serializable {
      */
 
     public static class ByAncestor implements OptimizableFilter, Up {
+      static { WalkerFactory.getInstance().addFilterWithParent(ByAncestor.class); }
+
         private FeatureFilter filter;
 
         public ByAncestor(FeatureFilter ff) {
@@ -1256,6 +1267,8 @@ public interface FeatureFilter extends Serializable {
      */
      
     public static class OnlyChildren implements OptimizableFilter, ByHierarchy {
+      static { WalkerFactory.getInstance().addFilterWithParent(OnlyChildren.class); }
+
         private FeatureFilter filter;
         
         public OnlyChildren(FeatureFilter ff) {
@@ -1332,6 +1345,8 @@ public interface FeatureFilter extends Serializable {
      */
      
     public static class OnlyDescendants implements OptimizableFilter, ByHierarchy {
+      static { WalkerFactory.getInstance().addFilterWithParent(OnlyDescendants.class); }
+
         private FeatureFilter filter;
         
         public OnlyDescendants(FeatureFilter ff) {
@@ -1400,6 +1415,8 @@ public interface FeatureFilter extends Serializable {
      */
 
     public static class ByChild implements OptimizableFilter, Down {
+      static { WalkerFactory.getInstance().addFilterWithParent(ByChild.class); }
+
         private FeatureFilter filter;
 
         public ByChild(FeatureFilter ff) {
@@ -1481,6 +1498,8 @@ public interface FeatureFilter extends Serializable {
      */
 
     public static class ByDescendant implements OptimizableFilter, Down {
+      static { WalkerFactory.getInstance().addFilterWithParent(ByDescendant.class); }
+
         private FeatureFilter filter;
 
         public ByDescendant(FeatureFilter ff) {
