@@ -17,8 +17,11 @@
 -- See biosql schema documentation for general documentation regarding the 
 -- schema. This file contains documetation specific to the hsqldb schema.
 
--- Tested with HSQLDB 1.7.2 alpha N. 
--- (HSQLDB 1.7.0 has a problems with null values in columns with UNIQUE constraints)
+-- HSQLDB Version compatibility notes:
+-- HSQLDB 1.7.1 has problems with null values in columns with UNIQUE constraints, several of these
+-- constraints have been commented out for compatibility.
+-- HSQLDB 1.7.2 alpha N. has problem with PreparedStatements that affect the BioJava binding (these 
+-- will apparently be addressed by the 1.7.2 release)
 
 CREATE TABLE biodatabase (
   	biodatabase_id 	INT NOT NULL IDENTITY,
@@ -42,7 +45,7 @@ CREATE TABLE taxon (
        right_value	INT,
        UNIQUE (ncbi_taxon_id)
 );
--- HSQLDB UNIQUE BUG
+-- HSQLDB 1.7.1 UNIQUE BUG
 --       UNIQUE (left_value),
 --       UNIQUE (right_value)
 
@@ -77,8 +80,7 @@ CREATE TABLE term (
 	ontology_id	   INT NOT NULL,
 	UNIQUE (name,ontology_id)
 );
--- Hypersonic interprets UNIQUE constraints as not allowing null to occur more than once :-)
--- HSQLDB UNIQUE BUG
+-- HSQLDB 1.7.1 UNIQUE BUG
 --	UNIQUE (identifier)
 
 CREATE INDEX term_ont ON term(ontology_id);
@@ -143,7 +145,7 @@ CREATE TABLE bioentry (
   	version 	SMALLINT NOT NULL, 
   	UNIQUE (accession,biodatabase_id,version)
 );
--- HSQLDB UNIQUE BUG
+-- HSQLDB 1.7.1 UNIQUE BUG
 --  	UNIQUE (identifier)
 
 CREATE INDEX bioentry_name ON bioentry(name);
