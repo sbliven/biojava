@@ -95,5 +95,6 @@ public interface Sequence extends ResidueList, FeatureHolder, Annotatable {
    * @throws  UnsupportedOperationException if this Sequence is immutable
    */
   Feature createFeature(MutableFeatureHolder fh, Location loc,
-                        String type, String source, Annotation annotation);
+                        String type, String source, Annotation annotation)
+  throws UnsupportedOperationException;
 }
