@@ -24,6 +24,7 @@ implements UnigeneDB {
   private final Map clusterCache;
   private final ParserListener dataPL;
   private final Parser dataParser;
+  private final AnnotationBuilder dataBuilder;
   
   public FlatFileUnigeneDB(
     IndexStore dataStore,
@@ -38,9 +39,10 @@ implements UnigeneDB {
     
     try {
       clusterCache = new WeakValueHashMap();
-      dataPL = UnigeneTools.buildDataParser(new AnnotationBuilder(
+      dataBuilder = new AnnotationBuilder(
         UnigeneTools.UNIGENE_ANNOTATION
-      ));
+      );
+      dataPL = UnigeneTools.buildDataParser(dataBuilder);
       dataParser = new Parser();
     } catch (ParserException pe) {
       throw new BioException(pe, "Could not initialize unigene DB");
@@ -66,9 +68,7 @@ implements UnigeneDB {
             throw new BioException(pe, "Failed to parse cluster: " + clusterID);
           }
         }
-        cluster = new AnnotationCluster(
-          ((AnnotationBuilder) dataPL.getListener()).getLast()
-        );
+        cluster = new AnnotationCluster(dataBuilder.getLast());
         clusterCache.put(clusterID, cluster);
       }
     }
