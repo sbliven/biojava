@@ -39,7 +39,7 @@ import org.biojava.bio.symbol.*;
  * @author Matthew Pocock
  * @since 1.4
  */
-public class SeqContentPattern {
+public class SeqContentPattern implements BioPattern {
   private final AlphabetIndex index;
   private final int[] minCounts;
   private final int[] maxCounts;
@@ -133,20 +133,7 @@ public class SeqContentPattern {
     }
   }
 
-  /**
-   * Get a matcher that will use these parameters to search a SymbolList.
-   *
-   * <p>
-   * The resulting SeqContentMatcher is independant of this SeqContentPattern.
-   * In particular, calling any mutator methods on this pattern will not affect
-   * the matcher.
-   * </p>
-   *
-   * @param symList  the SymbolList to match against
-   * @return a SeqContentMatcher that will perform the search
-   * @throws IllegalAlphabetException if symList is not over the right alphabet
-   */
-  public SeqContentMatcher matcher(SymbolList symList)
+  public BioMatcher matcher(SymbolList symList)
   throws IllegalAlphabetException {
     if(symList.getAlphabet() != index.getAlphabet()) {
       throw new IllegalAlphabetException(
@@ -158,7 +145,7 @@ public class SeqContentPattern {
     int[] maxCounts = new int[this.maxCounts.length];
     for(int i = 0; i < minCounts.length; i++) {
       minCounts[i] = this.minCounts[i];
-      
+
       int c = this.maxCounts[i];
       maxCounts[i] = (c == -1) ? length : c;
     }

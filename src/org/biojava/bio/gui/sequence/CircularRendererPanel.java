@@ -5,7 +5,6 @@ import org.biojava.bio.seq.FeatureHolder;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 
 /**
  * Renders a sequence as a circle using a CircularRenderer.

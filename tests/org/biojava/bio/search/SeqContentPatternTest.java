@@ -7,7 +7,7 @@ import org.biojava.bio.seq.*;
 
 public class SeqContentPatternTest
 extends TestCase {
-  public void testTooShort() 
+  public void testTooShort()
   throws IllegalSymbolException, IllegalAlphabetException {
     SymbolList zero = DNATools.createDNA("");
     SymbolList one = DNATools.createDNA("a");
@@ -18,13 +18,13 @@ extends TestCase {
     SymbolList sevenMatch2 = DNATools.createDNA("taaaaaa");
     SymbolList sevenMatchAll = DNATools.createDNA("aaaaaaa");
     SymbolList sevenNoMatch = DNATools.createDNA("ttttttt");
-    
+
 
     SeqContentPattern scp = new SeqContentPattern(DNATools.getDNA());
     scp.setLength(6);
     scp.setMinCounts(DNATools.a(), 6);
 
-    SeqContentMatcher scm;
+    BioMatcher scm;
 
     scm = scp.matcher(zero);
     assertFalse("No hits of length 6 in seq length 0", scm.find());

@@ -22,7 +22,8 @@ import org.biojava.bio.symbol.*;
  * @since 1.4
  * @see SeqContentPattern
  */
-public class SeqContentMatcher {
+class SeqContentMatcher
+implements BioMatcher {
   // constants
   private final AlphabetIndex index;
   private final SymbolList symList;
@@ -53,22 +54,6 @@ public class SeqContentMatcher {
     pos = 0;
   }
 
-  /**
-   * Attempt to find the next match.
-   *
-   * <p>
-   * If the pattern can be found, then this will return true. If it could not,
-   * then it will return false. This is convenient within for or while loops.
-   * </p>
-   *
-   * <p>
-   * Each time this is called, the next match will be found. The start() and
-   * end() values will increase each time, regardless of wether you called any
-   * other methods.
-   * </p>
-   *
-   * @return true if there is another match
-   */
   public boolean find() {
     try {
       // are we doing the 1st find?
@@ -160,12 +145,6 @@ public class SeqContentMatcher {
     return true;
   }
 
-  /**
-   * Get the first symbol index that matches the pattern.
-   * 
-   * @return the start of the current match
-   * @throws IllegalStateException if there is no current match
-   */
   public int start() {
     if(pos == 0) {
       throw new IllegalStateException("Can't call start() before find()");
@@ -178,16 +157,10 @@ public class SeqContentMatcher {
     return pos;
   }
 
-  /**
-   * Get the last symbol index that matches the pattern.
-   *
-   * @return the end of the current match
-   * @throws IllegalStateException if there is no current match
-   */
   public int end() {
-    if(pos == 0) { 
-      throw new IllegalStateException("Can't call end() before find()"); 
-    } 
+    if(pos == 0) {
+      throw new IllegalStateException("Can't call end() before find()");
+    }
 
     if(pos > symList.length()) {
       throw new IllegalStateException("Can't call end() after find() has returned false");
@@ -196,16 +169,10 @@ public class SeqContentMatcher {
     return pos + length - 1;
   }
 
-  /**
-   * Get the matching region as a SymbolList.
-   *
-   * @return the matching symbols
-   * @throws IllegalStateException if there is no current match
-   */
   public SymbolList group() {
-    if(pos == 0) { 
-      throw new IllegalStateException("Can't call group() before find()"); 
-    } 
+    if(pos == 0) {
+      throw new IllegalStateException("Can't call group() before find()");
+    }
 
     if(pos > symList.length()) {
       throw new IllegalStateException("Can't call group() after find() has returned false");
