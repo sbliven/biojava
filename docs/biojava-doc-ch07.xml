@@ -17,7 +17,7 @@
       overview of the APIs provided by these packages, please consult
       the <ulink url="api/index.html">JavaDoc
       documentation</ulink>.</para>
-  </abstract>
+    </abstract>
 
     <sect1 id="bd-motifs-types">
       <title>Types of motif search</title>
@@ -36,8 +36,8 @@
       (Decorator design pattern <xref linkend="bd-biblio-GoF98"/>) for
       <classname>java.lang.CharSequence</classname>,
       <classname>org.biojava.bio.seq.io.SymbolListCharSequence</classname>,
-      is provided to allow classname>SymbolList</classname>s efficient
-      access to these classes. More on this in <xref
+      is provided to allow <classname>SymbolList</classname>s
+      efficient access to these classes. More on this in <xref
       linkend="bd-motifs-regex"/>.</para>
     </sect1>
 

@@ -204,7 +204,7 @@
 
   <!-- This demonstrates the id convention for appendices -->
   <appendix label="A" id="bd-apdx-javadoc">
-    <title>BioJava API JavaDoc</title>
+  <title>BioJava API JavaDoc</title>
 
     <itemizedlist>
       <listitem>
@@ -374,13 +374,18 @@
         <itemizedlist>
           <listitem>
             <para>The <ulink
-            url="http://www.oasis-open.org/docbook/sgml/4.1">DocBook
+            url="http://www.oasis-open.org/committees/docbook/sgml/4.2/index.shtml">DocBook
             SGML 4.1</ulink> DTD.</para>
           </listitem>
           <listitem>
             <para>The <ulink
-            url="http://www.oasis-open.org/xml/4.2">DocBook XML
+            url="http://www.oasis-open.org/committees/docbook/xml/4.2/index.shtml">DocBook XML
             4.2</ulink> DTD.</para>
+          </listitem>
+          <listitem>
+            <para>The <ulink
+             url="http://unc.dl.sourceforge.net/sourceforge/docbook/docbook-xsl-1.44.tar.gz">DocBook
+             XSL</ulink> stylesheets.</para>
           </listitem>
           <listitem>
             <para>The <ulink
@@ -388,7 +393,7 @@
             rendering program which creates HTML, RTF and
             PostScript output from DocBook SGML and XML.</para>
           </listitem>
-      </itemizedlist>
+        </itemizedlist>
       </sect2>
 
       <sect2 id="bd-apdx-docbook-doc">
