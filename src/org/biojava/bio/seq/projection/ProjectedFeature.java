@@ -36,178 +36,211 @@ import org.biojava.bio.seq.*;
  * @since 1.1
  */
 
-class ProjectedFeature implements Feature, Projection {
-    private transient ChangeSupport changeSupport;
-
-    private final Feature feature;
-    private final ProjectionContext context;
-    private Location newLocation;
-    private FeatureHolder projectedFeatures;
-
-    public ProjectedFeature(Feature f,
-			    ProjectionContext ctx)
-    {
-	this.feature = f;
-	this.context = ctx;
-	// this.newLocation = holder.getProjectedLocation(f.getLocation());
+class ProjectedFeature
+implements
+  Feature,
+  Projection
+{
+  private transient ChangeSupport changeSupport;
+  private ChangeListener propertyForwarder; 
+  private ChangeListener locationClearer;
+  
+  private final Feature feature;
+  private final ProjectionContext context;
+  private Location newLocation;
+  private FeatureHolder projectedFeatures;
+  
+  public ProjectedFeature(
+    Feature f,
+    ProjectionContext ctx
+  ) {
+    this.feature = f;
+    this.context = ctx;
+  }
+  
+  protected ChangeSupport getChangeSupport() {
+    return changeSupport;
+  }
+  
+  protected void instantiateChangeSupport() {
+    if (changeSupport == null) {
+      changeSupport = new ChangeSupport();
+      propertyForwarder = new ChangeForwarder(this, changeSupport);
+      feature.addChangeListener(propertyForwarder, ChangeType.UNKNOWN);
     }
-
-    protected ChangeSupport getChangeSupport() {
-	return changeSupport;
+  }
+  
+  public Feature getViewedFeature() {
+    return feature;
+  }
+  
+  public ProjectionContext getProjectionContext() {
+    return context;
+  }
+  
+  public Feature.Template makeTemplate() {
+    Feature.Template ft = getViewedFeature().makeTemplate();
+    ft.location = getLocation();
+    ft.annotation = getAnnotation();
+    return ft;
+  }
+  
+  public Location getLocation() {
+    if (newLocation == null) {
+      if(locationClearer == null) {
+        // listener to clear location to null if the underlying location changes
+        feature.addChangeListener(
+          locationClearer = new ChangeAdapter() {
+            public void postChange(ChangeEvent ce) {
+              newLocation = null;
+            }
+          },
+          LOCATION
+        );
+      }
+      newLocation = context.getLocation(feature);
     }
-
-    protected void instantiateChangeSupport() {
-	if (changeSupport == null) {
-	    changeSupport = new ChangeSupport();
-	}
-    }
-
-    public Feature getViewedFeature() {
-	return feature;
-    }
-
-    public ProjectionContext getProjectionContext() {
-	return context;
-    }
-
-    public Feature.Template makeTemplate() {
-	Feature.Template ft = getViewedFeature().makeTemplate();
-	ft.location = getLocation();
-	ft.annotation = getAnnotation();
-	return ft;
-    }
-
-    public Location getLocation() {
-	if (newLocation == null) {
-	    newLocation = context.getLocation(feature);
-	}
-	return newLocation;
-    }
-
-    public FeatureHolder getParent() {
-	return context.getParent(feature);
-    }
-
-    public Sequence getSequence() {
-//  	FeatureHolder fh = getParent();
-//  	while (fh instanceof Feature) {
-//  	    fh = ((Feature) fh).getParent();
-//  	}
-	//  	return (Sequence) fh;
-	return context.getSequence(feature);
-    }
-
-    public String getType() {
-	return feature.getType();
-    }
-
-    public String getSource() {
-	return feature.getSource();
-    }
-
-    public Annotation getAnnotation() {
-	return context.getAnnotation(feature);
-    }
-
-        
-    public SymbolList getSymbols() {
-        Location loc = getLocation();
-        Sequence seq = context.getSequence(this);
-        if (loc.isContiguous())
-	        return seq.subList(loc.getMin(),loc.getMax());
-
-        List res = new ArrayList();
-        for (Iterator i = loc.blockIterator(); i.hasNext(); ) {
-    	    Location l = (Location) i.next();
-    	    res.add(seq.subList(l.getMin(),l.getMax()));
-        }
+    return newLocation;
+  }
+  
+  public void setLocation(Location loc)
+  throws ChangeVetoException {
+    throw new ChangeVetoException(new ChangeEvent(
+      this, LOCATION, this.newLocation, loc
+    ));
     
-        try {
-          return new SimpleSymbolList(seq.getAlphabet(), res);
-        } catch (IllegalSymbolException ex) {
-          throw new BioError(ex);
-        }
+    // fixme: loc should get reverse-projected through the context
+  }
+  
+  public FeatureHolder getParent() {
+    return context.getParent(feature);
+  }
+  
+  public Sequence getSequence() {
+    return context.getSequence(feature);
+  }
+  
+  public String getType() {
+    return feature.getType();
+  }
+  
+  public void setType(String type)
+  throws ChangeVetoException {
+    feature.setType(type);
+  }
+  
+  public String getSource() {
+    return feature.getSource();
+  }
+  
+  public void setSource(String source)
+  throws ChangeVetoException {
+    feature.setSource(source);
+  }
+  
+  public Annotation getAnnotation() {
+    return context.getAnnotation(feature);
+  }
+  
+  
+  public SymbolList getSymbols() {
+    Location loc = getLocation();
+    Sequence seq = context.getSequence(this);
+    if (loc.isContiguous())
+      return seq.subList(loc.getMin(),loc.getMax());
+      
+      List res = new ArrayList();
+      for (Iterator i = loc.blockIterator(); i.hasNext(); ) {
+        Location l = (Location) i.next();
+        res.add(seq.subList(l.getMin(),l.getMax()));
+      }
+      
+      try {
+        return new SimpleSymbolList(seq.getAlphabet(), res);
+      } catch (IllegalSymbolException ex) {
+        throw new BioError(ex);
+      }
+  }
+  
+  public int countFeatures() {
+    return feature.countFeatures();
+  }
+  
+  public boolean containsFeature(Feature f) {
+    if(countFeatures() > 0) {
+      return getProjectedFeatures().containsFeature(f);
+    } else {
+      return false;
     }
-
-    public int countFeatures() {
-	return feature.countFeatures();
+  }
+  
+  protected FeatureHolder getProjectedFeatures() {
+    if (projectedFeatures == null) {
+      projectedFeatures = context.projectChildFeatures(feature, this);
+    }
+    return projectedFeatures;
+  }
+  
+  public Iterator features() {
+    return getProjectedFeatures().features();
+  }
+  
+  public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+    FeatureFilter membershipFilter = new FeatureFilter.ContainedByLocation(getLocation());
+    if (FilterUtils.areDisjoint(ff, membershipFilter)) { 
+      // System.err.println("Wheeeee! Disjunction in ProjectedFeatureWrapper");
+      
+      return FeatureHolder.EMPTY_FEATURE_HOLDER;
     }
     
-    public boolean containsFeature(Feature f) {
-	if(countFeatures() > 0) {
-	    return getProjectedFeatures().containsFeature(f);
-	} else {
-	    return false;
-	}
+    return getProjectedFeatures().filter(ff, recurse);
+  }
+  
+  public Feature createFeature(Feature.Template temp)
+  throws ChangeVetoException, BioException
+  {
+    return context.createFeature(feature, temp);
+  }
+  
+  public void removeFeature(Feature f) 
+  throws ChangeVetoException
+  {
+    context.removeFeature(feature, f);
+  }
+  
+  public void addChangeListener(ChangeListener cl) {
+    instantiateChangeSupport();
+    getChangeSupport().addChangeListener(cl);
+  }
+  
+  public void addChangeListener(ChangeListener cl, ChangeType ct) {
+    instantiateChangeSupport();
+    getChangeSupport().addChangeListener(cl, ct);
+  }
+  
+  public void removeChangeListener(ChangeListener cl) {
+    ChangeSupport cs = getChangeSupport();
+    if (cs != null)
+      cs.removeChangeListener(cl);
+  }
+  
+  public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+    ChangeSupport cs = getChangeSupport();
+    if (cs != null)
+      cs.removeChangeListener(cl, ct);
+  }
+  
+  public int hashCode() {
+    return makeTemplate().hashCode();
+  }
+  
+  public boolean equals(Object o) {
+    if (o instanceof Feature) {
+      Feature fo = (Feature) o;
+      if (fo.getSequence().equals(getSequence())) {
+        return makeTemplate().equals(fo.makeTemplate());
+      }
     }
-
-    protected FeatureHolder getProjectedFeatures() {
-	if (projectedFeatures == null) {
-	    projectedFeatures = context.projectChildFeatures(feature, this);
-	}
-	return projectedFeatures;
-    }
-
-    public Iterator features() {
-	return getProjectedFeatures().features();
-    }
-
-    public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	FeatureFilter membershipFilter = new FeatureFilter.ContainedByLocation(getLocation());
-	if (FilterUtils.areDisjoint(ff, membershipFilter)) { 
-	    // System.err.println("Wheeeee! Disjunction in ProjectedFeatureWrapper");
-
-	    return FeatureHolder.EMPTY_FEATURE_HOLDER;
-	}
-
-	return getProjectedFeatures().filter(ff, recurse);
-    }
-
-    public Feature createFeature(Feature.Template temp)
-        throws ChangeVetoException, BioException
-    {
-	return context.createFeature(feature, temp);
-    }
-
-    public void removeFeature(Feature f) 
-        throws ChangeVetoException
-    {
-	context.removeFeature(feature, f);
-    }
-        
-    public void addChangeListener(ChangeListener cl) {
-	instantiateChangeSupport();
-	getChangeSupport().addChangeListener(cl);
-    }
-
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {
-	instantiateChangeSupport();
-	getChangeSupport().addChangeListener(cl, ct);
-    }
-
-    public void removeChangeListener(ChangeListener cl) {
-	ChangeSupport cs = getChangeSupport();
-	if (cs != null)
-	    cs.removeChangeListener(cl);
-    }
-
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
-	ChangeSupport cs = getChangeSupport();
-	if (cs != null)
-	    cs.removeChangeListener(cl, ct);
-    }
-
-    public int hashCode() {
-	return makeTemplate().hashCode();
-    }
-
-    public boolean equals(Object o) {
-	if (o instanceof Feature) {
-	    Feature fo = (Feature) o;
-	    if (fo.getSequence().equals(getSequence())) {
-		return makeTemplate().equals(fo.makeTemplate());
-	    }
-	}
-	return false;
-    }
+    return false;
+  }
 }

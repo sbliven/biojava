@@ -38,8 +38,13 @@ import org.biojava.bio.seq.*;
  */
 
 public class SimpleFeature
-extends AbstractChangeable
-implements Feature, RealizingFeatureHolder, java.io.Serializable {
+extends
+ AbstractChangeable
+implements
+ Feature,
+ RealizingFeatureHolder,
+ java.io.Serializable
+{
   private transient ChangeListener annotationForwarder;
   private transient ChangeListener featureForwarder;
   
@@ -132,21 +137,66 @@ implements Feature, RealizingFeatureHolder, java.io.Serializable {
     return cs;
   }
   
-    public Location getLocation() {
-	return loc;
+  public Location getLocation() {
+    return loc;
+  }
+  
+  public void setLocation(Location loc)
+  throws ChangeVetoException {
+    if(hasListeners()) {
+      ChangeSupport cs = getChangeSupport(LOCATION);
+      synchronized(cs) {
+        ChangeEvent ce = new ChangeEvent(this, LOCATION, loc, this.loc);
+        cs.firePreChangeEvent(ce);
+        this.loc = loc;
+        cs.firePostChangeEvent(ce);
+      }
+    } else {
+      this.loc = loc;
     }
-    
-    public String getType() {
-	return type;
+  }
+  
+  public String getType() {
+    return type;
+  }
+  
+  public void setType(String type)
+  throws ChangeVetoException {
+    if(hasListeners()) {
+      ChangeSupport cs = getChangeSupport(TYPE);
+      synchronized(cs) {
+        ChangeEvent ce = new ChangeEvent(this, TYPE, type, this.type);
+        cs.firePreChangeEvent(ce);
+        this.type = type;
+        cs.firePostChangeEvent(ce);
+      }
+    } else {
+      this.type = type;
     }
+  }
+  
+  public String getSource() {
+    return source;
+  }
+  
+  public FeatureHolder getParent() {
+    return parent;
+  }
 
-    public String getSource() {
-	return source;
+  public void setSource(String source)
+  throws ChangeVetoException {
+    if(hasListeners()) {
+      ChangeSupport cs = getChangeSupport(SOURCE);
+      synchronized(cs) {
+        ChangeEvent ce = new ChangeEvent(this, SOURCE, this.source, source);
+        cs.firePreChangeEvent(ce);
+        this.source = source;
+        cs.firePostChangeEvent(ce);
+      }
+    } else {
+      this.source = source;
     }
-
-    public FeatureHolder getParent() {
-	return parent;
-    }
+  }
 
     public Sequence getSequence() {
 	FeatureHolder fh = this;
