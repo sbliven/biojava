@@ -31,8 +31,9 @@ public class Search
          * @param pattern Pattern object used to conduct search.
          * @param start start coordinate of match.
          * @param end end of match plus one.
+         * @return if false, it indicates the Listener will not accept further data.
          */
-        public void reportMatch(SymbolList seq, Pattern pattern, int start, int end);
+        public boolean reportMatch(SymbolList seq, Pattern pattern, int start, int end);
     }
 
     private class PatternInfo
@@ -127,7 +128,8 @@ public class Search
                 // got a hit
                 int start = info.matcher.start();
                 int end = info.matcher.end();
-                if ((listener != null) && (start <= hiLimit)) listener.reportMatch(seq, info.pattern, start, end);
+                if ((listener != null) && (start <= hiLimit)) 
+                    if (!listener.reportMatch(seq, info.pattern, start, end)) return;
                 // compute where next search begins
                 if (info.overlap)
                     begin = start + 1;
