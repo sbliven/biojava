@@ -133,7 +133,7 @@ implements AlphabetIndex, ChangeListener, Serializable
 				int		curAlpSize 	= curAlpIndex.getAlphabet().size();
 				int		curSymIndValue 	= index % curAlpSize;
 				index = index / curAlpSize;
-				symbols.add( 0, curAlpIndex.symbolForIndex( curSymIndValue ) );
+				symbols.add( curAlpIndex.symbolForIndex( curSymIndValue ) );
 			}
 		
 			return( Alpha.getSymbol( symbols ) );
