@@ -53,7 +53,7 @@ import java.util.List; // useful trick to 'hide' javax.swing.List
  * You could add a SequenceRenderer that draws on genes, another that
  * draws repeats and another that prints out the DNA sequence. They are
  * responsible for rendering their view of the sequence in the place that the
- * SequencePanel positions them.  
+ * SequencePanel positions them.
  *
  * @author Thomas Down
  * @author Matthew Pocock
@@ -79,16 +79,34 @@ public class SequencePanel
   private int direction;
   private double scale;
   private double pixelOffset;
-  
+
   private SequenceRenderContext.Border leadingBorder;
   private SequenceRenderContext.Border trailingBorder;
 
   private SequenceRenderer renderer;
   private RendererMonitor theMonitor;
 
+  private RenderingHints hints = null;
+
   private transient ChangeSupport changeSupport = null;
-  
+
   private SequenceViewerSupport svSupport = new SequenceViewerSupport();
+
+  /**
+   * Use this to switch on effects like Anti-aliasing etc
+   * @param hints the desired rendering properties
+   */
+  public void setRenderingHints(RenderingHints hints){
+    this.hints = hints;
+  }
+
+  /**
+   * @return the current rendering properties
+   */
+  public RenderingHints getRenderingHints(){
+    return hints;
+  }
+
   private MouseListener mouseListener = new MouseAdapter() {
     public void mouseClicked(MouseEvent me) {
       if(!isActive()) {
@@ -105,7 +123,7 @@ public class SequencePanel
       me.translatePoint(-dist[0], -dist[1]);
       svSupport.fireMouseClicked(sve);
     }
-    
+
     public void mousePressed(MouseEvent me) {
       if(!isActive()) {
         return;
@@ -121,7 +139,7 @@ public class SequencePanel
       me.translatePoint(-dist[0], -dist[1]);
       svSupport.fireMousePressed(sve);
     }
-    
+
     public void mouseReleased(MouseEvent me) {
       if(!isActive()) {
         return;
@@ -162,7 +180,7 @@ public class SequencePanel
       me.translatePoint(-dist[0], -dist[1]);
       svmSupport.fireMouseDragged(sve);
     }
-    
+
     public void mouseMoved(MouseEvent me) {
       if(!isActive()) {
         return;
@@ -185,49 +203,49 @@ public class SequencePanel
   public void removeSequenceViewerMotionListener(SequenceViewerMotionListener svml) {
     svmSupport.removeSequenceViewerMotionListener(svml);
   }
-  
+
   protected boolean hasChangeListeners() {
     return changeSupport != null;
   }
-  
+
   protected ChangeSupport getChangeSupport(ChangeType ct) {
     if(changeSupport != null) {
       return changeSupport;
     }
-    
+
     synchronized(this) {
       if(changeSupport == null) {
         changeSupport = new ChangeSupport();
       }
-    
+
       return changeSupport;
     }
   }
-  
+
   protected boolean hasListeners() {
     return changeSupport != null;
   }
-  
+
   public void addChangeListener(ChangeListener cl) {
     addChangeListener(cl, ChangeType.UNKNOWN);
   }
-  
+
   public void addChangeListener(ChangeListener cl, ChangeType ct) {
     ChangeSupport cs = getChangeSupport(ct);
     cs.addChangeListener(cl, ct);
   }
-  
+
   public void removeChangeListener(ChangeListener cl) {
     removeChangeListener(cl, ChangeType.UNKNOWN);
   }
-  
+
   public void removeChangeListener(ChangeListener cl, ChangeType ct) {
     if(hasListeners()) {
       ChangeSupport cs = getChangeSupport(ct);
       cs.removeChangeListener(cl, ct);
     }
   }
-  
+
   public boolean isUnchanging(ChangeType ct) {
     ChangeSupport cs = getChangeSupport(ct);
     return cs.isUnchanging(ct);
@@ -270,7 +288,7 @@ public class SequencePanel
     this.addMouseListener(mouseListener);
     this.addMouseMotionListener(mouseMotionListener);
   }
-  
+
   /**
    * Set the SymboList to be rendered. This symbol list will be passed onto the
    * SequenceRenderer instances registered with this SequencePanel.
@@ -286,7 +304,7 @@ public class SequencePanel
     if(s != null) {
       sequence.addChangeListener(layoutListener);
     }
-    
+
     resizeAndValidate();
     firePropertyChange("sequence", oldSequence, s);
   }
@@ -294,7 +312,7 @@ public class SequencePanel
   public Sequence getSequence() {
     return sequence;
   }
-  
+
   /**
    * Retrieve the currently rendered SymbolList
    *
@@ -303,7 +321,7 @@ public class SequencePanel
   public SymbolList getSymbols() {
     return sequence;
   }
-  
+
   public FeatureHolder getFeatures() {
     return sequence;
   }
@@ -314,11 +332,11 @@ public class SequencePanel
     resizeAndValidate();
     firePropertyChange("range", oldRange, range);
   }
-  
+
   public RangeLocation getRange() {
     return this.range;
   }
-  
+
   /**
    * Set the direction that this SequencePanel renders in. The direction can be
    * one of HORIZONTAL or VERTICAL. Once the direction is set, the display will
@@ -327,7 +345,7 @@ public class SequencePanel
    *
    * @param dir  the new rendering direction
    */
-  public void setDirection(int dir) 
+  public void setDirection(int dir)
   throws IllegalArgumentException {
     if(dir != HORIZONTAL && dir != VERTICAL) {
       throw new IllegalArgumentException(
@@ -348,7 +366,7 @@ public class SequencePanel
   public int getDirection() {
     return direction;
   }
-  
+
   /**
    * Set the scale.
    * <p>
@@ -374,7 +392,7 @@ public class SequencePanel
   public double getScale() {
     return scale;
   }
-  
+
   /**
    * Retrieve the object that encapsulates the leading border area - the space
    * before sequence information is rendered.
@@ -384,7 +402,7 @@ public class SequencePanel
   public SequenceRenderContext.Border getLeadingBorder() {
     return leadingBorder;
   }
-  
+
   /**
    * Retrieve the object that encapsulates the trailing border area - the space
    * after sequence information is rendered.
@@ -394,7 +412,7 @@ public class SequencePanel
   public SequenceRenderContext.Border getTrailingBorder() {
     return trailingBorder;
   }
-  
+
   /**
    * Paint this component.
    * <p>
@@ -402,53 +420,57 @@ public class SequencePanel
    * after setting up the graphics appropriately.
    */
   public synchronized void paintComponent(Graphics g) {
-	  if(!isActive()) {
-		  return;
-	  }
+          if(!isActive()) {
+                  return;
+          }
 
-	  super.paintComponent(g);
+          Graphics2D g2 = (Graphics2D) g;
+          if(hints != null){
+            g2.setRenderingHints(hints);
+          }
+          super.paintComponent(g);
 
-	  Graphics2D g2 = (Graphics2D) g;
-	  AffineTransform oldTransform = g2.getTransform();
-	  //Rectangle2D currentClip = g2.getClip().getBounds2D();
 
-	  Insets insets = getInsets();
+          AffineTransform oldTransform = g2.getTransform();
+          //Rectangle2D currentClip = g2.getClip().getBounds2D();
 
-	  if (isOpaque())
-	  {
-		  g2.setPaint(getBackground());
-		  g2.fillRect(0, 0, getWidth(), getHeight());
-	  }
+          Insets insets = getInsets();
 
-	  // do a transform to offset drawing to the neighbourhood of zero.
-	  adjustOffset(sequenceToGraphics(range.getMin()));
+          if (isOpaque())
+          {
+                  g2.setPaint(getBackground());
+                  g2.fillRect(0, 0, getWidth(), getHeight());
+          }
 
-	  double minAcross = sequenceToGraphics(range.getMin()) -
-		  renderer.getMinimumLeader(this);
-	  double maxAcross = sequenceToGraphics(range.getMax()) + 1 +
-		  renderer.getMinimumTrailer(this);
-	  double alongDim = maxAcross - minAcross;
-	  double depth = renderer.getDepth(this);
-	  Rectangle2D.Double clip = new Rectangle2D.Double();
-	  if (direction == HORIZONTAL) {
-		  clip.x = minAcross;
-		  clip.y = 0.0;
-		  clip.width = alongDim;
-		  clip.height = depth;
-		  g2.translate(leadingBorder.getSize() - minAcross + insets.left, insets.top);
-	  } else {
-		  clip.x = 0.0;
-		  clip.y = minAcross;
-		  clip.width = depth;
-		  clip.height = alongDim;
-		  g2.translate(insets.left, leadingBorder.getSize() - minAcross + insets.top);
-	  }
+          // do a transform to offset drawing to the neighbourhood of zero.
+          adjustOffset(sequenceToGraphics(range.getMin()));
 
-	  Shape oldClip = g2.getClip();
-	  g2.clip(clip);
-	  renderer.paint(g2, this);
-	  g2.setClip(oldClip);
-	  g2.setTransform(oldTransform);
+          double minAcross = sequenceToGraphics(range.getMin()) -
+                  renderer.getMinimumLeader(this);
+          double maxAcross = sequenceToGraphics(range.getMax()) + 1 +
+                  renderer.getMinimumTrailer(this);
+          double alongDim = maxAcross - minAcross;
+          double depth = renderer.getDepth(this);
+          Rectangle2D.Double clip = new Rectangle2D.Double();
+          if (direction == HORIZONTAL) {
+                  clip.x = minAcross;
+                  clip.y = 0.0;
+                  clip.width = alongDim;
+                  clip.height = depth;
+                  g2.translate(leadingBorder.getSize() - minAcross + insets.left, insets.top);
+          } else {
+                  clip.x = 0.0;
+                  clip.y = minAcross;
+                  clip.width = depth;
+                  clip.height = alongDim;
+                  g2.translate(insets.left, leadingBorder.getSize() - minAcross + insets.top);
+          }
+
+          Shape oldClip = g2.getClip();
+          g2.clip(clip);
+          renderer.paint(g2, this);
+          g2.setClip(oldClip);
+          g2.setTransform(oldTransform);
   }
 
   public void setRenderer(SequenceRenderer r)
@@ -471,7 +493,7 @@ public class SequencePanel
     }
     resizeAndValidate();
   }
-  
+
   protected void _setRenderer(SequenceRenderer r) {
     if( (this.renderer != null) && (this.renderer instanceof Changeable) ) {
       Changeable c = (Changeable) this.renderer;
@@ -491,7 +513,7 @@ public class SequencePanel
   private void adjustOffset(double newOrigin) {
     pixelOffset -= newOrigin;
   }
-  
+
   public double sequenceToGraphics(int seqPos) {
     return ((double) (seqPos-1)) * scale + pixelOffset;
   }
@@ -499,7 +521,7 @@ public class SequencePanel
   public int graphicsToSequence(double gPos) {
     return ((int) ((gPos - pixelOffset) / scale)) + 1;
   }
-  
+
   public int graphicsToSequence(Point point) {
     if(direction == HORIZONTAL) {
       return graphicsToSequence(point.getX());
@@ -512,7 +534,7 @@ public class SequencePanel
     //System.out.println("resizeAndValidate starting");
     Dimension mind = null;
     Dimension maxd = null;
-    
+
     if(!isActive()) {
       // System.out.println("No sequence");
       // no sequence - collapse down to no size at all
@@ -528,8 +550,8 @@ public class SequencePanel
       double alongDim =
         (maxAcross - minAcross) +
         lb + tb;
-      double alongDropDim = 
-    (maxDropAcross - minAcross) + 
+      double alongDropDim =
+    (maxDropAcross - minAcross) +
     lb + tb;
       double depth = renderer.getDepth(this);
       if(direction == HORIZONTAL) {
@@ -540,7 +562,7 @@ public class SequencePanel
       maxd = new Dimension((int) Math.ceil(depth), (int) Math.ceil(alongDim));
       }
     }
-    
+
     setMinimumSize(mind);
     setPreferredSize(maxd);
     setMaximumSize(maxd);
@@ -553,7 +575,7 @@ public class SequencePanel
       repaint();
     }
   }
-  
+
     protected int [] calcDist() {
         double minAcross = sequenceToGraphics(range.getMin()) -
             renderer.getMinimumLeader(this);
@@ -567,37 +589,37 @@ public class SequencePanel
             dist[0] = -insets.left;
             dist[1] = (int) minAcross - insets.top;
         }
-    
+
         return dist;
     }
-  
+
   protected boolean isActive() {
     return
       (sequence != null) &&
       (renderer != null) &&
       (range != null);
   }
-  
+
   public class Border
   implements Serializable, SwingConstants {
     protected final PropertyChangeSupport pcs;
     private double size = 0.0;
     private int alignment = CENTER;
-    
+
     public double getSize() {
       return size;
     }
-    
+
     private void setSize(double size) {
       this.size = size;
     }
-    
+
     public int getAlignment() {
       return alignment;
     }
-    
+
     public void setAlignment(int alignment)
-        throws IllegalArgumentException 
+        throws IllegalArgumentException
     {
     if (alignment == LEADING || alignment == TRAILING || alignment == CENTER) {
         int old = this.alignment;
@@ -609,16 +631,16 @@ public class SequencePanel
             );
     }
     }
-    
+
     private Border() {
       alignment = CENTER;
       pcs = new PropertyChangeSupport(this);
     }
-    
+
     public void addPropertyChangeListener(PropertyChangeListener listener) {
       pcs.addPropertyChangeListener(listener);
     }
-    
+
     public void removePropertyChangeListener(PropertyChangeListener listener) {
       pcs.removePropertyChangeListener(listener);
     }
@@ -631,7 +653,7 @@ public class SequencePanel
         return a.equals(b);
     }
     }
-    
+
 
     public boolean equals(Object o) {
     if (! (o instanceof SequencePanel)) {

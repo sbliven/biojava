@@ -53,7 +53,7 @@ import java.util.List; // useful trick to 'hide' javax.swing.List
  * You could add a SequenceRenderer that draws on genes, another that
  * draws repeats and another that prints out the DNA sequence. They are
  * responsible for rendering their view of the sequence in the place that the
- * SequencePoster positions them.  
+ * SequencePoster positions them.
  *
  * @author Thomas Down
  * @author Matthew Pocock
@@ -77,8 +77,8 @@ public class SequencePoster
   private int direction;
   private double scale;
   private int lines;
-  private int spacer; 
-  
+  private int spacer;
+
   private SequenceRenderContext.Border leadingBorder;
   private SequenceRenderContext.Border trailingBorder;
 
@@ -90,9 +90,10 @@ public class SequencePoster
   private int symbolsPerLine = 0;
 
   private RendererMonitor theMonitor;
+  private RenderingHints renderingHints = null;
 
   private transient ChangeSupport changeSupport = null;
-  
+
   private SequenceViewerSupport svSupport = new SequenceViewerSupport();
   private MouseListener mouseListener = new MouseAdapter() {
     public void mouseClicked(MouseEvent me) {
@@ -105,14 +106,14 @@ public class SequencePoster
         new SubSequenceRenderContext(
           SequencePoster.this, null, null,
           new RangeLocation(lineExtent[0], lineExtent[1])
-        ), 
+        ),
         me,
         new ArrayList()
       );
       me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svSupport.fireMouseClicked(sve);
     }
-    
+
     public void mousePressed(MouseEvent me) {
       if(!isActive()) {
         return;
@@ -123,14 +124,14 @@ public class SequencePoster
         new SubSequenceRenderContext(
           SequencePoster.this, null, null,
           new RangeLocation(lineExtent[0], lineExtent[1])
-        ), 
+        ),
         me,
         new ArrayList()
       );
       me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svSupport.fireMousePressed(sve);
     }
-    
+
     public void mouseReleased(MouseEvent me) {
       if(!isActive()) {
         return;
@@ -141,7 +142,7 @@ public class SequencePoster
         new SubSequenceRenderContext(
           SequencePoster.this, null, null,
           new RangeLocation(lineExtent[0], lineExtent[1])
-        ), 
+        ),
         me,
         new ArrayList()
       );
@@ -168,14 +169,14 @@ public class SequencePoster
         new SubSequenceRenderContext(
           SequencePoster.this, null, null,
           new RangeLocation(lineExtent[0], lineExtent[1])
-        ), 
+        ),
         me,
         new ArrayList()
       );
       me.translatePoint(+lineExtent[2], +lineExtent[3]);
       svmSupport.fireMouseDragged(sve);
     }
-    
+
     public void mouseMoved(MouseEvent me) {
       if(!isActive()) {
         return;
@@ -186,7 +187,7 @@ public class SequencePoster
         new SubSequenceRenderContext(
           SequencePoster.this, null, null,
           new RangeLocation(lineExtent[0], lineExtent[1])
-        ), 
+        ),
         me,
         new ArrayList()
       );
@@ -200,44 +201,44 @@ public class SequencePoster
   public void removeSequenceViewerMotionListener(SequenceViewerMotionListener svml) {
     svmSupport.removeSequenceViewerMotionListener(svml);
   }
-  
+
   protected boolean hasChangeListeners() {
     return changeSupport != null;
   }
-  
+
   protected ChangeSupport getChangeSupport(ChangeType ct) {
     if(changeSupport != null) {
       return changeSupport;
     }
-    
+
     synchronized(this) {
       if(changeSupport == null) {
         changeSupport = new ChangeSupport();
       }
-      
+
       return changeSupport;
     }
   }
-  
+
   public void addChangeListener(ChangeListener cl) {
     addChangeListener(cl, ChangeType.UNKNOWN);
   }
-  
+
   public void addChangeListener(ChangeListener cl, ChangeType ct) {
     ChangeSupport cs = getChangeSupport(ct);
     cs.addChangeListener(cl, ct);
   }
-  
+
   public void removeChangeListener(ChangeListener cl) {
     removeChangeListener(cl, ChangeType.UNKNOWN);
   }
-  
+
   public void removeChangeListener(ChangeListener cl, ChangeType ct) {
     if(hasChangeListeners()) {
       getChangeSupport(ct).removeChangeListener(cl, ct);
     }
   }
-  
+
   public boolean isUnchanging(ChangeType ct) {
     return getChangeSupport(ct).isUnchanging(ct);
   }
@@ -280,7 +281,7 @@ public class SequencePoster
     this.addMouseListener(mouseListener);
     this.addMouseMotionListener(mouseMotionListener);
   }
-  
+
   /**
    * Set the SymboList to be rendered. This symbol list will be passed onto the
    * SequenceRenderer instances registered with this SequencePoster.
@@ -294,7 +295,7 @@ public class SequencePoster
     }
     this.sequence = s;
     sequence.addChangeListener(layoutListener);
-    
+
     resizeAndValidate();
     firePropertyChange("sequence", oldSequence, s);
   }
@@ -302,7 +303,7 @@ public class SequencePoster
   public Sequence getSequence() {
     return sequence;
   }
-  
+
   /**
    * Retrieve the currently rendered SymbolList
    *
@@ -315,11 +316,11 @@ public class SequencePoster
   public FeatureHolder getFeatures() {
     return sequence;
   }
-  
+
   public RangeLocation getRange() {
     return new RangeLocation(1, sequence.length());
   }
-  
+
   /**
    * Set the direction that this SequencePoster renders in. The direction can be
    * one of HORIZONTAL or VERTICAL. Once the direction is set, the display will
@@ -328,7 +329,7 @@ public class SequencePoster
    *
    * @param dir  the new rendering direction
    */
-  public void setDirection(int dir) 
+  public void setDirection(int dir)
   throws IllegalArgumentException {
     if(dir != HORIZONTAL && dir != VERTICAL) {
       throw new IllegalArgumentException(
@@ -367,7 +368,7 @@ public class SequencePoster
     resizeAndValidate();
     firePropertyChange("spacer", oldSpacer, spacer);
   }
-  
+
   /**
    * Retrieve the current spacer value
    *
@@ -376,7 +377,7 @@ public class SequencePoster
   public int getSpacer() {
     return spacer;
   }
-  
+
   /**
    * Set the scale.
    * <p>
@@ -419,7 +420,7 @@ public class SequencePoster
     resizeAndValidate();
     firePropertyChange("lines", oldLines, lines);
   }
-  
+
   /**
    * Retrieve the number of lines that the sequence will be rendered over.
    *
@@ -428,7 +429,7 @@ public class SequencePoster
   public int getLines() {
     return lines;
   }
-  
+
   /**
    * Retrieve the object that encapsulates the leading border area - the space
    * before sequence information is rendered.
@@ -438,7 +439,7 @@ public class SequencePoster
   public SequenceRenderContext.Border getLeadingBorder() {
     return leadingBorder;
   }
-  
+
   /**
    * Retrieve the object that encapsulates the trailing border area - the space
    * after sequence information is rendered.
@@ -448,7 +449,7 @@ public class SequencePoster
   public SequenceRenderContext.Border getTrailingBorder() {
     return trailingBorder;
   }
-  
+
   /**
    * Paint this component.
    * <p>
@@ -459,8 +460,12 @@ public class SequencePoster
     if(!isActive()) {
       return;
     }
-    
+
     Graphics2D g2 = (Graphics2D) g;
+    if(renderingHints != null){
+      g2.setRenderingHints(renderingHints);
+    }
+
     Rectangle2D currentClip = g2.getClip().getBounds2D();
     double minPos;
     double maxPos;
@@ -471,7 +476,7 @@ public class SequencePoster
       minPos = currentClip.getMinX();
       maxPos = currentClip.getMaxX();
     }
-    
+
     //System.out.println("minPos: " + minPos);
     int minOffset = Arrays.binarySearch(offsets, minPos);
     if(minOffset < 0) {
@@ -482,7 +487,7 @@ public class SequencePoster
     //System.out.println("minCoord: " + minCoord);
     int minP = 1 + (int) ((double) minOffset * symbolsPerLine);
     //System.out.println("minP: " + minP);
-    
+
     Rectangle2D.Double clip = new Rectangle2D.Double();
     if (direction == HORIZONTAL) {
         clip.width = alongDim;
@@ -493,12 +498,12 @@ public class SequencePoster
         clip.height = alongDim;
         g2.translate(minCoord, leadingBorder.getSize() - alongDim * minOffset);
     }
-    
+
     int min = minP;
     for(int l = minOffset; l < realLines; l++) {
       int max = Math.min(min + symbolsPerLine - 1, sequence.length());
       RangeLocation pos = new RangeLocation(min, max);
-      
+
       if (direction == HORIZONTAL) {
           clip.x = l * alongDim;
           clip.y = 0.0;
@@ -506,29 +511,29 @@ public class SequencePoster
           clip.x = 0.0;
           clip.y = l * alongDim;
       }
-      
+
       double depth = offsets[l] - spacer;
       if(l != 0) {
         depth -= offsets[l-1];
       }
-      
+
       if (direction == HORIZONTAL) {
           clip.height = depth;
       } else {
           clip.width = depth;
       }
-      
+
       Shape oldClip = g2.getClip();
       g2.clip(clip);
       renderer.paint(g2, this);
       g2.setClip(oldClip);
-      
+
       if (direction == HORIZONTAL) {
           g2.translate(-alongDim, spacer + depth);
       } else {
           g2.translate(spacer + depth, -alongDim);
       }
-      
+
       min += symbolsPerLine;
 
       if( (min > sequence.length()) || (offsets[l] > maxPos)) {
@@ -557,7 +562,7 @@ public class SequencePoster
     }
     resizeAndValidate();
   }
-  
+
   protected void _setRenderer(SequenceRenderer r) {
     if( (this.renderer != null) && (this.renderer instanceof Changeable) ) {
       Changeable c = (Changeable) this.renderer;
@@ -581,7 +586,7 @@ public class SequencePoster
   public int graphicsToSequence(double gPos) {
     return (int) (gPos / scale) + 1;
   }
-  
+
   public int graphicsToSequence(Point point) {
     if(direction == HORIZONTAL) {
       return graphicsToSequence(point.getX());
@@ -594,7 +599,7 @@ public class SequencePoster
     //System.out.println("resizeAndValidate starting");
     Dimension d = null;
     double acrossDim;
-    
+
     if(!isActive()) {
       System.out.println("No sequence");
       // no sequence - collapse down to no size at all
@@ -616,7 +621,7 @@ public class SequencePoster
       } else {
         width = parentSize.height;
       }
-      
+
       System.out.println("Initial width: " + width);
       // got a sequence - fit the size according to sequence length & preferred
       // number of lines.
@@ -624,7 +629,7 @@ public class SequencePoster
       System.out.println("alongDim (pixles needed for sequence only): "
       + alongDim);
       acrossDim = 0.0;
-      
+
       RangeLocation range = new RangeLocation(1, sequence.length());
       double insetBefore = renderer.getMinimumLeader(this);
       double insetAfter = renderer.getMinimumTrailer(this);
@@ -634,7 +639,7 @@ public class SequencePoster
       double insets = insetBefore + insetAfter;
       //System.out.println("insetBefore: " + insetBefore);
       //System.out.println("insetAfter: " + insetAfter);
-      
+
       if(lines > 0) {
         // Fixed number of lines. Calculate width needed to lay out rectangle.
         realLines = lines;
@@ -652,7 +657,7 @@ public class SequencePoster
           alongDim / (double) realLines
         );
       }
-      
+
       acrossDim = 0.0;
       symbolsPerLine = (int) Math.ceil((double) width / (double) scale);
       //System.out.println("symbolsPerLine: " + symbolsPerLine);
@@ -674,7 +679,7 @@ public class SequencePoster
         min = max + 1;
         li++;
       }
-      
+
       acrossDim += spacer * (realLines - 1);
       alongDim = /* Math.ceil((double) width); */ symbolsPerLine * scale;
       if (direction == HORIZONTAL) {
@@ -689,7 +694,7 @@ public class SequencePoster
         );
       }
     }
-    
+
     setMinimumSize(d);
     setPreferredSize(d);
     revalidate();
@@ -701,7 +706,7 @@ public class SequencePoster
       repaint();
     }
   }
-  
+
   protected int[] calcLineExtent(MouseEvent me) {
     int pos;
     if(direction == HORIZONTAL) {
@@ -709,7 +714,7 @@ public class SequencePoster
     } else {
       pos = me.getX();
     }
-    
+
     int minOffset = Arrays.binarySearch(offsets, pos);
     if(minOffset < 0) {
       minOffset = -minOffset - 1;
@@ -722,9 +727,9 @@ public class SequencePoster
     } else {
       minPos = 0.0;
     }
-    
+
     double ad = alongDim * minOffset;
-    
+
     int xdiff;
     int ydiff;
     if(direction == HORIZONTAL) {
@@ -734,57 +739,71 @@ public class SequencePoster
       xdiff = (int) minPos;
       ydiff = (int) -ad;
     }
-    
+
     return new int[] { min, max, xdiff, ydiff };
   }
-  
+
   protected boolean isActive() {
     return
       (sequence != null) &&
       (renderer != null);
   }
-  
+
+  /**
+   * @return the current rendering properties
+   */
+  public RenderingHints getRenderingHints() {
+    return renderingHints;
+  }
+  /**
+   * Use this to switch on effects like Anti-aliasing etc
+   * @param hints the desired rendering properties
+   */
+  public void setRenderingHints(RenderingHints renderingHints) {
+    this.renderingHints = renderingHints;
+  }
+
   public class Border
   implements Serializable, SwingConstants {
     protected final PropertyChangeSupport pcs;
     private double size = 0.0;
     private int alignment = CENTER;
-    
+
     public double getSize() {
       return size;
     }
-    
+
     private void setSize(double size) {
       this.size = size;
     }
-    
+
     public int getAlignment() {
       return alignment;
     }
-    
+
     public void setAlignment(int alignment)
-        throws IllegalArgumentException 
+        throws IllegalArgumentException
     {
-	if (alignment == LEADING || alignment == TRAILING || alignment == CENTER) {
-	    int old = this.alignment;
-	    this.alignment = alignment;
-	    pcs.firePropertyChange("alignment", old, alignment);
-	} else {
-	    throw new IllegalArgumentException(
-		  "Alignment must be one of the constants LEADING, TRAILING or CENTER"
+        if (alignment == LEADING || alignment == TRAILING || alignment == CENTER) {
+            int old = this.alignment;
+            this.alignment = alignment;
+            pcs.firePropertyChange("alignment", old, alignment);
+        } else {
+            throw new IllegalArgumentException(
+                  "Alignment must be one of the constants LEADING, TRAILING or CENTER"
             );
-	}
+        }
     }
-    
+
     private Border() {
       alignment = CENTER;
       pcs = new PropertyChangeSupport(this);
     }
-    
+
     public void addPropertyChangeListener(PropertyChangeListener listener) {
       pcs.addPropertyChangeListener(listener);
     }
-    
+
     public void removePropertyChangeListener(PropertyChangeListener listener) {
       pcs.removePropertyChangeListener(listener);
     }

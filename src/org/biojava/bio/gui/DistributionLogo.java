@@ -45,17 +45,17 @@ public class DistributionLogo extends JComponent {
    */
   private static final LogoPainter DEFAULT_LOGO_PAINTER = new TextLogoPainter();
   private static final BlockPainter DEFAULT_BLOCK_PAINTER = new PlainBlock();
-  
+
   /**
    * A usefull constant to keep arround.
    */
   private static double bits = Math.log(2.0);
-  
+
   /**
    * The dist to render.
    */
   private Distribution dist;
-  
+
   /**
    * The logoPainter property.
    */
@@ -65,14 +65,15 @@ public class DistributionLogo extends JComponent {
    * The style property.
    */
   private SymbolStyle style = new PlainStyle(Color.black, Color.gray);
-  
+
   /**
    * The information/plain property
    */
   boolean scaleByInformation = false;
-  
+
   private BlockPainter blockPainter = DEFAULT_BLOCK_PAINTER;
-  
+  private RenderingHints renderingHints = null;
+
   /**
    * Retrieve the currently rendered dist.
    *
@@ -81,7 +82,7 @@ public class DistributionLogo extends JComponent {
   public Distribution getDistribution() {
     return dist;
   }
-  
+
   /**
    * <p>
    * Set the dist to render.
@@ -99,7 +100,7 @@ public class DistributionLogo extends JComponent {
     firePropertyChange("dist", this.dist, dist);
     this.dist = dist;
   }
-  
+
   /**
    * Retrieve the current logo painter.
    *
@@ -108,7 +109,7 @@ public class DistributionLogo extends JComponent {
   public LogoPainter getLogoPainter() {
     return logoPainter;
   }
-  
+
   /**
    * <p>
    * Set the logo painter.
@@ -124,7 +125,7 @@ public class DistributionLogo extends JComponent {
     firePropertyChange("logoPainter", this.logoPainter, logoPainter);
     this.logoPainter = logoPainter;
   }
-  
+
   /**
    * Retrieve the current style.
    *
@@ -133,7 +134,7 @@ public class DistributionLogo extends JComponent {
   public SymbolStyle getStyle() {
     return style;
   }
-  
+
   /**
    * <p>
    * Set the symbol style.
@@ -149,23 +150,23 @@ public class DistributionLogo extends JComponent {
     firePropertyChange("style", this.style, style);
     this.style = style;
   }
-  
+
   public boolean isScaleByInformation() {
     return scaleByInformation;
   }
-  
+
   public void setScaleByInformation(boolean scale) {
     this.scaleByInformation = scale;
   }
-  
+
   public BlockPainter getBlockPainter() {
     return blockPainter;
   }
-  
+
   public void setBlockPainter(BlockPainter blockPainter) {
     this.blockPainter = blockPainter;
   }
-  
+
   /**
    * Create a new DistributionLogo object. It will set up all the properties except the
    * dist to render.
@@ -182,12 +183,12 @@ public class DistributionLogo extends JComponent {
         }
       }
     });
-    
+
     Dimension d = new Dimension(20, 20);
     setMinimumSize(d);
     setPreferredSize(d);
   }
-  
+
   /**
    * Calculate the information content of a symbol in bits.
    *
@@ -197,10 +198,10 @@ public class DistributionLogo extends JComponent {
   public static double entropy(Distribution dist, Symbol s) throws IllegalSymbolException {
     double p = dist.getWeight(s);
     double lp = Math.log(p);
-    
+
     return -p * lp / bits;
   }
-  
+
   /**
    * Retrieve the maximal number of bits possible for this type of dist.
    *
@@ -209,7 +210,7 @@ public class DistributionLogo extends JComponent {
   public static double totalBits(Distribution dist) {
     return Math.log(((FiniteAlphabet) dist.getAlphabet()).size()) / bits;
   }
-  
+
   /**
    * <p>
    * Calculates the total information of the dist in bits.
@@ -223,7 +224,7 @@ public class DistributionLogo extends JComponent {
    */
   public static double totalInformation(Distribution dist) {
     double inf = totalBits(dist);
-    
+
     for(
       Iterator i = ((FiniteAlphabet) dist.getAlphabet()).iterator();
       i.hasNext();
@@ -236,16 +237,21 @@ public class DistributionLogo extends JComponent {
         "Symbol evaporated while calculating information");
       }
     }
-    
+
     return inf;
   }
-  
+
   /**
    * Transforms the graphics context so that it is in bits space,
    * and then requests the logo painter to fill the area.
    */
-  public void paintComponent(Graphics g) {    
+  public void paintComponent(Graphics g) {
     final Graphics2D g2 = (Graphics2D) g;
+
+    if(renderingHints != null){
+      g2.setRenderingHints(renderingHints);
+    }
+
     Rectangle clip = g2.getClipBounds();
     if(isOpaque()) {
       g2.clearRect(clip.x, clip.y, clip.width, clip.height);
@@ -253,7 +259,7 @@ public class DistributionLogo extends JComponent {
     if(getDistribution() == null) {
       return;
     }
-    
+
     final Rectangle bounds = getBounds();
     if(isScaleByInformation()) {
       int height = bounds.height;
@@ -261,7 +267,7 @@ public class DistributionLogo extends JComponent {
       bounds.height = (int) scale;
       bounds.y = (int) (height - scale);
     }
-    
+
     LogoContext ctxt = new LogoContext() {
       public Graphics2D getGraphics() {
         return g2;
@@ -280,5 +286,13 @@ public class DistributionLogo extends JComponent {
       }
     };
     getLogoPainter().paintLogo(ctxt);
+  }
+
+  public RenderingHints getRenderingHints() {
+    return renderingHints;
+  }
+
+  public void setRenderingHints(RenderingHints renderingHints) {
+    this.renderingHints = renderingHints;
   }
 }

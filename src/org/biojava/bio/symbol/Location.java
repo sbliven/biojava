@@ -34,7 +34,7 @@ import org.biojava.bio.*;
  * <p>
  * The location will contain some indices between getMin and getMax inclusive.
  * It is not required to contain all indices within this range. It is meant
- * to contain the indices returned by the getMin or getMax. In the event that 
+ * to contain the indices returned by the getMin or getMax. In the event that
  * an operation would produce an
  * invalid or nonsensical range, <code>Location.empty</code> should be returned.
  * </p>
@@ -60,7 +60,7 @@ import org.biojava.bio.*;
  * @author Matthew Pocock
  * @author Thomas Down
  */
- 
+
 public interface Location {
   /**
    * Create a new instance of Location with all of the same decorators as this
@@ -75,7 +75,7 @@ public interface Location {
    *         current instance
    */
   Location newInstance(Location loc);
-  
+
   /**
    * Checks the decorator chain for an instance of <class>decoratorClass</class>
    * and return it if found.
@@ -111,7 +111,7 @@ public interface Location {
    *
    * @param l	the Location to check
    * @return	true if they overlap, otherwise false
-   * @deprecated use LocationTools.overlaps(Location a, Location b)
+   *
    */
   boolean overlaps(Location l);
   /**
@@ -122,7 +122,7 @@ public interface Location {
    *
    * @param l	the Location to check
    * @return	true if this contains l, otherwise false
-   * @deprecated use LocationTools.contains(Location a, Location b)
+   *
    */
   boolean contains(Location l);
   /**
@@ -132,7 +132,7 @@ public interface Location {
    * @return	true if this contains p, otherwise false
    */
   boolean contains(int p);
-  
+
   /**
    * Checks if this location is equivalent to the other.
    * <p>
@@ -148,11 +148,11 @@ public interface Location {
 
   /**
    * Returns a Location that contains all points common to both ranges.
-   * 
+   *
    * @param l	the Location to intersect with
    * @return	a Location containing all points common to both, or
    *              the empty range if there are no such points
-   * @deprecated use LocationTools.intersection(Location a, Location b)
+   *
    */
   Location intersection(Location l);
   /**
@@ -160,7 +160,7 @@ public interface Location {
    *
    * @param l	the Location to union with
    * @return	a Location representing the union
-   * @deprecated use LocationTools.union(Location a, Location b)
+   *
    */
   Location union(Location l);
 
@@ -169,8 +169,7 @@ public interface Location {
    *
    * @param seq	the SymbolList to process
    * @return	the SymbolList containing the symbols in seq in this range
-   * @deprecated this is not been necessary since the introduction of
-   *              blockIterator()
+   *
    */
   SymbolList symbols(SymbolList seq);
 
@@ -180,7 +179,7 @@ public interface Location {
    * @param dist  the distance to translate (to the right)
    */
   Location translate(int dist);
-   
+
   /**
    * Determine if a Location is contiguous.
    *
@@ -189,7 +188,7 @@ public interface Location {
    *         <code>max</code> inclusive.
    */
   boolean isContiguous();
-  
+
   /**
    * Return an Iterator over the set of maximal contiguous sub-locations.
    * <p>
@@ -219,14 +218,14 @@ public interface Location {
    * Every day, in every way, empty becomes more and more boring.
    */
   static final Location empty = new EmptyLocation();
-  
+
   /**
    * Comparator which orders Locations naturally.  Locations
    * are sorted primarily on the basis of their <code>getMin()</code>
    * value.  In cases where that is equal, they are secondarily sorted
    * by <code>getMax()</code> value.
    */
-  
+
   static final LocationComparator naturalOrder = new LocationComparator();
 }
 
@@ -278,21 +277,21 @@ class EmptyLocation implements Location, Serializable {
       return "{}";
     }
 }
-  
+
 class LocationComparator implements Comparator, Serializable {
     public int compare(Object o1, Object o2) {
       int d = 0;
-        
+
       Location l1 = (Location) o1;
       Location l2 = (Location) o2;
-        
+
       Iterator i1 = l1.blockIterator();
       Iterator i2 = l2.blockIterator();
 
       while(i1.hasNext() && i2.hasNext()) {
         Location li1 = (Location) i1.next();
         Location li2 = (Location) i2.next();
-          
+
         d = li1.getMin() - li2.getMin();
         if(d != 0) {
           return d;
@@ -307,14 +306,14 @@ class LocationComparator implements Comparator, Serializable {
       } else if(i1.hasNext()) {
         return -1;
       }
-        
+
       return 0;
     }
-    
+
     public boolean equals(Object obj) {
       return obj == this;
     }
-    
+
     /**
     *Test whether two locations are equal or not
     */
@@ -327,14 +326,14 @@ class LocationComparator implements Comparator, Serializable {
           return false;
         }
       }
-      
+
       if(!i1.hasNext() && !i2.hasNext()) {
         return false;
       }
-      
+
       return true;
     }
-    
+
     private Object writeReplace() throws ObjectStreamException {
       try {
         return new StaticMemberPlaceHolder(Location.class.getField("naturalOrder"));
