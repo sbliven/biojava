@@ -29,13 +29,19 @@ import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.tools.*;
 
 /**
- * First pass at pairwise dynamic programming.
+ * Algorithms for dynamic programming (alignments) between pairs
+ * of ResidueLists.
  * Based on a single-head DP implementation by Matt Pocock.
  *
  * @author Thomas Down
  */
 
 public class PairwiseDP {
+    /**
+     * Magical state for use with pairwise DP (NOTE: this is different
+     * from DP.MAGICAL_STATE).
+     */
+
     public final static State MAGICAL_STATE =  new MagicalState('?', DP.MAGICAL_RESIDUE);
 
     public static EmissionState [] stateList(Alphabet alpha)
@@ -296,14 +302,20 @@ private class Forward {
 
 
 private class Viterbi { 
+    private int[][] transitions;
+    private double[][] transitionScores;
+    private EmissionState[] states;
+    private PairDPCursor cursor;
+    private CrossProductAlphabet alpha;
+
     public double runViterbi(MarkovModel mm,
 			      ResidueList seq0,
 			      ResidueList seq1) 
         throws Exception
     {
-	EmissionState[] states = stateList(mm.stateAlphabet());
-	PairDPCursor cursor = new PairDPCursor(seq0, seq1, states.length, true);
-	CrossProductAlphabet alpha = (CrossProductAlphabet) mm.queryAlphabet();
+	states = stateList(mm.stateAlphabet());
+	cursor = new PairDPCursor(seq0, seq1, states.length, true);
+	alpha = (CrossProductAlphabet) mm.queryAlphabet();
 
 	// Forward initialization
 
@@ -314,25 +326,21 @@ private class Viterbi {
 
 	// Recurse
 
-	int[][] transitions = forwardTransitions(mm, states);
-	double[][] transitionScores = forwardTransitionScores(mm, states, transitions);
+	transitions = forwardTransitions(mm, states);
+	transitionScores = forwardTransitionScores(mm, states, transitions);
 
 	while (cursor.canAdvance(0) || cursor.canAdvance(1)) {
 	    if (cursor.canAdvance(0)) {
 		cursor.advance(0);
 		for (int i = 0; i <= cursor.getPos(1); ++i) {
-		    viterbiPrepareCol(cursor, cursor.getPos(0), i,
-					 states, transitions,
-					 transitionScores, alpha);
+		    viterbiPrepareCol(cursor.getPos(0), i);
 		}
 	    }
 
 	    if (cursor.canAdvance(1)) {
 		cursor.advance(1);
 		for (int i = 0; i <= cursor.getPos(0); ++i) {
-		    viterbiPrepareCol(cursor, i, cursor.getPos(1),
-					 states, transitions,
-					 transitionScores, alpha);
+		    viterbiPrepareCol(i, cursor.getPos(1));
 		}
 	    }
 	}  
@@ -348,6 +356,8 @@ private class Viterbi {
 	    ++l;
 
 	// Traceback...  
+
+	/*
 	
 	BackPointer[] bpCol = (BackPointer[]) cursor.getBackPointers(colId);
 	BackPointer bp = bpCol[l];
@@ -362,25 +372,23 @@ private class Viterbi {
 	    System.out.println(((State) statel.get(tb)).getName());
 	System.out.println("*** End ***");
 
+	*/
+
 	return col[l];
     }
 
-    private void viterbiPrepareCol(PairDPCursor cursor,
-				   int i, int j,
-				   EmissionState[] states,
-				   int[][] transitions,
-				   double[][] transitionScores,
-				   CrossProductAlphabet alpha)
+    private List ress = new ArrayList();
+    private Object[][] matrix = new Object[2][2];
+    private Object[][] bpMatrix = new Object[2][2];
+    private Residue[][] resMatrix = new Residue[2][2];
+    private int[] colId = new int[2];
+
+    private void viterbiPrepareCol(int i, int j)
 	throws Exception
     {
-	List ress = new ArrayList();
-	Object[][] stepMatrix = new Object[2][2];
-	Object[][] bpMatrix = new Object[2][2];
-	Residue[][] resMatrix = new Residue[2][2];
-	int[] colId = new int[2];
-
 	// System.out.println("*** (" + i + "," + j + ")");
 
+	ress.clear();
 	ress.add(cursor.residue(0, i));
 	ress.add(cursor.residue(1, j));
 	// resMatrix[1][1] = alpha.getResidue(ress);
@@ -398,28 +406,22 @@ private class Viterbi {
 
 	colId[0] = i;
 	colId[1] = j;
-	stepMatrix[0][0] = cursor.getColumn(colId);
+	matrix[0][0] = cursor.getColumn(colId);
 	bpMatrix[0][0] = cursor.getBackPointers(colId);
 	colId[0]--;
-	stepMatrix[1][0] = cursor.getColumn(colId);
+	matrix[1][0] = cursor.getColumn(colId);
 	bpMatrix[1][0] = cursor.getBackPointers(colId);
 	colId[1]--;
-	stepMatrix[1][1] = cursor.getColumn(colId);
+	matrix[1][1] = cursor.getColumn(colId);
 	bpMatrix[1][1] = cursor.getBackPointers(colId);
 	colId[0]++;
-	stepMatrix[0][1] = cursor.getColumn(colId);
+	matrix[0][1] = cursor.getColumn(colId);
 	bpMatrix[0][1] = cursor.getBackPointers(colId);
 
-	viterbiCalcStepMatrix(stepMatrix, states, resMatrix, bpMatrix,
-			      transitions, transitionScores);
+	viterbiCalcStepMatrix();
     }
 
-    private void viterbiCalcStepMatrix(Object[][] matrix,
-				       EmissionState[] states,
-				       Residue[][] resMatrix,
-				       Object[][] bpMatrix,
-				       int[][] transitions,
-				       double[][] transitionScores)
+    private void viterbiCalcStepMatrix()
 	throws Exception
     {
 	double[] curCol = (double[]) matrix[0][0];

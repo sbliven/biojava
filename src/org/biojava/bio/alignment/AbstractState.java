@@ -73,7 +73,8 @@ public abstract class AbstractState implements EmissionState {
     try {
       for(Iterator i = alphabet().residues().iterator(); i.hasNext(); ) {
         Residue r = (Residue) i.next();
-        if( (p -= Math.exp(getWeight(r))) <= 0)
+	p -= Math.exp(getWeight(r));
+        if( p <= 0)
           return r;
       }
     

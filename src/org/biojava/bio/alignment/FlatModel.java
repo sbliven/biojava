@@ -161,7 +161,7 @@ public class FlatModel implements MarkovModel {
     try {
       for(Iterator i = transitionsFrom(from).iterator(); i.hasNext();) {
         State to = (State) i.next();
-        p -= getTransitionScore(from, to);
+        p -= Math.exp(getTransitionScore(from, to));
         if(p <= 0) {
           return to;
         }
