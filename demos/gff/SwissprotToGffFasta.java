@@ -67,7 +67,7 @@ public class SwissprotToGffFasta
 				new InputStreamReader(new FileInputStream(swissprotFile)));
 			SequenceBuilderFactory sFact = new SwissprotProcessor.Factory(SimpleSequenceBuilder.FACTORY);
 			Alphabet alpha = ProteinTools.getAlphabet();
-			SymbolParser rParser = alpha.getParser("token");
+			SymbolTokenization rParser = alpha.getTokenization("token");
 
 			// fasta stuff
 			SequenceFormat fFormat = new FastaFormat();

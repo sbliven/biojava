@@ -36,21 +36,93 @@ import org.biojava.bio.seq.db.*;
  */
 
 public class DistributedSequenceDB extends AbstractSequenceDB implements SequenceDB {
+    public static final ChangeType DATASOURCE = new ChangeType(
+	    "Data sources have changes in a Distributed Sequence DB",
+	    "org.biojava.bio.seq.distributed.DistributedSequenceDB",
+	    "DATASOURCE",
+	    ChangeType.UNKNOWN
+    );
+
+    public static final ChangeType DATASOURCE_SELECTION = new ChangeType(
+	    "The set of available data sources has changes in a Distributed Sequence DB",
+	    "org.biojava.bio.seq.distributed.DistributedSequenceDB",
+	    "DATASOURCE_SELECTION",
+	    DistributedSequenceDB.DATASOURCE
+    );
+
     private Set datasources;
+    private transient ChangeSupport changeSupport;
+
+    protected boolean hasChangeSupport() {
+	return (changeSupport != null);
+    }
+
+    protected ChangeSupport getChangeSupport() {
+	if (changeSupport == null) {
+	    changeSupport = new ChangeSupport();
+	}
+	return changeSupport;
+    }
 
     {
 	datasources = new HashSet();
     }
 
+    public Set getDataSources() {
+	return Collections.unmodifiableSet(datasources);
+    }
+
     public void addDataSource(DistDataSource dds) 
         throws ChangeVetoException
     {
+	if (datasources.contains(dds)) {
+	    return;
+	}
+
+	if (hasChangeSupport()) {
+	    ChangeSupport cs = getChangeSupport();
+	    synchronized (cs) {
+		ChangeEvent cev = new ChangeEvent(this,
+						  DATASOURCE_SELECTION,
+						  dds,
+						  null);
+		cs.firePreChangeEvent(cev);
+		_addDataSource(dds);
+		cs.firePostChangeEvent(cev);
+	    }
+	} else {
+	    _addDataSource(dds);
+	}
+    }
+
+    private void _addDataSource(DistDataSource dds) {
 	datasources.add(dds);
     }
 
     public void removeDataSource(DistDataSource dds) 
         throws ChangeVetoException
     {
+	if (!datasources.contains(dds)) {
+	    throw new ChangeVetoException("That datasource isn't currently installed");
+	}
+
+	if (hasChangeSupport()) {
+	    ChangeSupport cs = getChangeSupport();
+	    synchronized (cs) {
+		ChangeEvent cev = new ChangeEvent(this,
+						  DATASOURCE_SELECTION,
+						  null,
+						  dds);
+		cs.firePreChangeEvent(cev);
+		_removeDataSource(dds);
+		cs.firePostChangeEvent(cev);
+	    }
+	} else {
+	    _removeDataSource(dds);
+	}
+    }
+
+    private void _removeDataSource(DistDataSource dds) {
 	datasources.remove(dds);
     }
 
@@ -107,11 +179,22 @@ public class DistributedSequenceDB extends AbstractSequenceDB implements Sequenc
     }
 
     // 
-    // Changeable stuff (which we'll cheat on for now...)
+    // Changeable stuff
     //
 
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
+    public void addChangeListener(ChangeListener cl) {
+	getChangeSupport().addChangeListener(cl);
+    }
+
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {
+	getChangeSupport().addChangeListener(cl, ct);
+    }
+
+    public void removeChangeListener(ChangeListener cl) {
+	getChangeSupport().removeChangeListener(cl);
+    }
+
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+	getChangeSupport().removeChangeListener(cl, ct);
+    }
 }

@@ -24,7 +24,6 @@ package org.biojava.bio.search;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.symbol.Alignment;
 import org.biojava.utils.ObjectUtil;
-import org.biojava.utils.contract.Contract;
 
 /**
  * A simple implementation of interface SeqSimilaritySearchSubHit that
@@ -88,10 +87,14 @@ public class SimpleSeqSimilaritySearchSubHit
 					   Strand    subjectStrand,
 					   Alignment alignment)
     {
-        Contract.pre(! Double.isNaN(score), "score was NaN");
+        if(Double.isNaN(score)) {
+	    throw new IllegalArgumentException("score was NaN");
+	}
         // pValue may be NaN
 	// eValue may be NaN
-	Contract.pre(alignment     != null, "alignment was null");
+	if(alignment == null) {
+	    throw new IllegalArgumentException("alignment was null");
+	}
 
 	this.score         = score;
 	this.pValue        = pValue;

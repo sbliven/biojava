@@ -45,6 +45,20 @@ class DistributedSequence implements Sequence{
     private SymbolList symbols;
     private MergeFeatureHolder mfh;
 
+    private transient ChangeListener dsListener;
+    private transient ChangeSupport changeSupport;
+
+    protected boolean hasChangeSupport() {
+	return (changeSupport != null);
+    }
+
+    protected ChangeSupport getChangeSupport() {
+	if (changeSupport == null) {
+	    changeSupport = new ChangeSupport();
+	}
+	return changeSupport;
+    }
+
     DistributedSequence(String id,
 			DistributedSequenceDB db,
 			DistDataSource seqSource,
@@ -56,9 +70,52 @@ class DistributedSequence implements Sequence{
 	this.seqSource = seqSource;
 	this.featureSources = featureSources;
 	this.db = db;
+	installListener();
     }
 
-    DistributedSequenceDB getSequenceDB() {
+    private void installListener() {
+	dsListener = new ChangeListener() {
+		public void preChange(ChangeEvent cev)
+		    throws ChangeVetoException
+		{
+		    if (cev.getPrevious() == seqSource) {
+			throw new ChangeVetoException(cev, "Can't remove this datasource, since it is providing sequence data");
+		    }
+
+		    if (hasChangeSupport()) {
+			getChangeSupport().firePreChangeEvent(makeChainedEvent(cev));
+		    }
+		}
+
+		public void postChange(ChangeEvent cev) {
+		    if (cev.getType() == DistributedSequenceDB.DATASOURCE_SELECTION) {
+			if (cev.getChange() != null && cev.getPrevious() == null) {
+			    DistDataSource added = (DistDataSource) cev.getChange();
+			    featureSources.add(added);
+			} else if (cev.getChange() == null && cev.getPrevious() != null) {
+			    DistDataSource removed = (DistDataSource) cev.getChange();
+			    featureSources.remove(removed);
+			}
+		    }
+
+		    mfh = null;  // C'mon, we can do better than that...
+
+		    if (hasChangeSupport()) {
+			getChangeSupport().firePostChangeEvent(makeChainedEvent(cev));
+		    }
+		}
+
+		private ChangeEvent makeChainedEvent(ChangeEvent cev) {
+		    return new ChangeEvent(DistributedSequence.this,
+					   FeatureHolder.FEATURES,
+					   null, null,
+					   cev);
+		}
+	    };
+	db.addChangeListener(dsListener, DistributedSequenceDB.DATASOURCE);    
+    }
+
+    public DistributedSequenceDB getSequenceDB() {
 	return db;
     }
 
@@ -174,11 +231,22 @@ class DistributedSequence implements Sequence{
 	
 
     // 
-    // Changeable stuff (which we'll cheat on for now...)
+    // Changeable stuff
     //
 
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
+    public void addChangeListener(ChangeListener cl) {
+	getChangeSupport().addChangeListener(cl);
+    }
+
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {
+	getChangeSupport().addChangeListener(cl, ct);
+    }
+
+    public void removeChangeListener(ChangeListener cl) {
+	getChangeSupport().removeChangeListener(cl);
+    }
+
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+	getChangeSupport().removeChangeListener(cl, ct);
+    }
 }

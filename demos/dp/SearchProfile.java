@@ -69,11 +69,11 @@ public class SearchProfile {
         );
         for(int i = 0; i <= statePath.length() / 60; i++) {
           for(int j = i*60; j < Math.min((i+1)*60, statePath.length()); j++) {
-            System.out.print(statePath.symbolAt(StatePath.SEQUENCE, j+1).getToken()); 
+            System.out.print(statePath.symbolAt(StatePath.SEQUENCE, j+1).getName().charAt(0)); 
           }
           System.out.print("\n");
           for(int j = i*60; j < Math.min((i+1)*60, statePath.length()); j++) {
-            System.out.print(statePath.symbolAt(StatePath.STATES, j+1).getToken()); 
+            System.out.print(statePath.symbolAt(StatePath.STATES, j+1).getName().charAt(0)); 
           }
           System.out.print("\n");
           System.out.print("\n");
@@ -116,7 +116,7 @@ public class SearchProfile {
       SequenceIterator seqI = new StreamReader(
         new FileInputStream(seqFile),
         fFormat,
-        alpha.getParser("token"),
+        alpha.getTokenization("token"),
         sbFact
       );
       seqI.hasNext();

@@ -68,7 +68,7 @@ SymbolListViews.orderNSymbolList(s,order.intValue());
       }
 
       //train the distribution.
-      dt.train(0.0); //No pseudo-counts
+      context.train();
 
       //return the list of nmer symbols in the alphabet
       SymbolList nOrderSymbols = nOrderAlpha.symbols();
@@ -115,7 +115,7 @@ SymbolListViews.orderNSymbolList(s,order.intValue());
       SequenceIterator seqI = new StreamReader(
         new FileInputStream(seqFile),
         fFormat,
-        alpha.getParser("token"),
+        alpha.getTokenization("token"),
         sbFact
       );
       seqI.hasNext();
@@ -129,13 +129,16 @@ SymbolListViews.orderNSymbolList(s,order.intValue());
 
   public static void output(Double d, AtomicSymbol s){
      //get the symbols that make up the atomic symbol
-     List syms = ((BasisSymbol)s).getSymbols();
-     //print the symbol
-     Iterator iter = syms.iterator();
-     while (iter.hasNext()) {
-       Symbol subSymbol = (Symbol)iter.next();
-       System.out.print(subSymbol.getToken());
-     }
+     //  List syms = ((BasisSymbol)s).getSymbols();
+//       //print the symbol
+//       Iterator iter = syms.iterator();
+//       while (iter.hasNext()) {
+//         Symbol subSymbol = (Symbol)iter.next();
+//         System.out.print(subSymbol.getToken());
+//       }
+
+      System.out.print(s.getName());
+
      //print the double value
      System.out.println("\t" + d.doubleValue());
   }

@@ -25,7 +25,7 @@ public class TestSwissprot
 			SequenceBuilderFactory sbFact =
 					new SwissprotProcessor.Factory(SimpleSequenceBuilder.FACTORY);
 			Alphabet alpha = ProteinTools.getAlphabet();
-			SymbolParser rParser = alpha.getParser("token");
+			SymbolTokenization rParser = alpha.getTokenization("token");
 			SequenceIterator seqI =
 					new	StreamReader(sReader, sFormat, rParser,	sbFact);
 

@@ -1,7 +1,5 @@
 package org.biojava.utils;
 
-import org.biojava.utils.contract.Contract;
-
 import java.util.*;
 import java.io.*;
 
@@ -43,7 +41,9 @@ public class TypedProperties extends Properties {
    *                        name.
    */
   public void load(String fileName) throws FileNotFoundException, IOException {
-    Contract.pre(fileName != null, "fileName not null");
+    if (fileName == null) {
+	throw new IllegalArgumentException("fileName not null");
+    }
 
     load(new BufferedInputStream(new FileInputStream(fileName)));
   }
@@ -78,11 +78,15 @@ public class TypedProperties extends Properties {
     if (clazz == null) {
       // load resource as system resource
       is = ClassLoader.getSystemResourceAsStream(resourceName);
-      Contract.pre(is != null, "system reource " + resourceName + " must exist");
+      if (is == null) {
+	  throw new IllegalArgumentException("system reource " + resourceName + " must exist");
+      }
     } else {
       // load resource as class resource
       is = clazz.getResourceAsStream(resourceName);
-      Contract.pre(is != null, "reource " + resourceName + " associated with class " + clazz + " must exist");
+      if (is == null) {
+	  throw new IllegalArgumentException("resource " + resourceName + " associated with class " + clazz + " must exist");
+      }
     }
     load(is);
   }
@@ -185,7 +189,9 @@ public class TypedProperties extends Properties {
    *         consists only of white space.
    */
   public List getPropertyAsStringList(String key, String delims) {
-    Contract.pre(delims != null && delims.length() > 0, "delims != null && delims.length() > 0");
+    if (delims == null || delims.length() == 0) {
+	throw new IllegalArgumentException("delims != null && delims.length() > 0");
+    }
 
     String v = getProperty(key);
     if (v == null) return null;

@@ -92,6 +92,10 @@ public class DASSequenceDB implements SequenceDB {
 	return frm;
     }
 
+    DASSequenceDB() {
+	// Constructor for dummy objects.  Ugh.
+    }
+
     public DASSequenceDB(URL dataSourceURL) 
 	throws BioException 
     {

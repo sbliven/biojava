@@ -67,7 +67,7 @@ public class GenbankToGffFasta
 				new InputStreamReader(new FileInputStream(genbankFile)));
 			SequenceBuilderFactory sFact = new GenbankProcessor.Factory(SimpleSequenceBuilder.FACTORY);
 			Alphabet alpha = DNATools.getDNA();
-			SymbolParser rParser = alpha.getParser("token");
+			SymbolTokenization rParser = alpha.getTokenization("token");
 
 			// fasta stuff
 			SequenceFormat fFormat = new FastaFormat();

@@ -21,7 +21,6 @@
 
 package org.biojava.bio.seq.db;
 
-import org.biojava.utils.contract.Contract;
 import org.biojava.utils.ObjectUtil;
 
 import java.util.*;
@@ -66,7 +65,9 @@ public class SimpleSequenceDBInstallation implements SequenceDBInstallation
    */
     public synchronized void addSequenceDB(String name, Set otherIdentifiers)
     {
-	Contract.pre(name != null, "name was null");
+	if (name == null) {
+	    throw new IllegalArgumentException("name was null");
+	}
 	// otherIdentifiers may only contain String objects - but this is checked later
 
 	// create set of all identifiers for the to-be-created SequenceDB
@@ -79,8 +80,12 @@ public class SimpleSequenceDBInstallation implements SequenceDBInstallation
 	for (Iterator i = allIdentifiers.iterator(); i.hasNext();)
 	{
 	    Object o = i.next();
-	    Contract.pre(o instanceof String, "otherIdentifiers must be a Set of String objects");
-	    Contract.pre(! (currentIdentifiers.contains(o)), "name and otherIdentifiers must not already be in use");
+	    if (! (o instanceof String)) {
+		throw new IllegalArgumentException("otherIdentifiers must be a Set of String objects");
+	    }
+	    if (currentIdentifiers.contains(o)) {
+		throw new IllegalArgumentException("name and otherIdentifiers must not already be in use");
+	    }
 	}
 
 	// create new HashSequenceDB and at it to the map under all its identifiers
@@ -118,11 +123,12 @@ public class SimpleSequenceDBInstallation implements SequenceDBInstallation
     public synchronized void addSequenceDB(SequenceDB sequenceDB,
 					   Set        otherIdentifiers)
     {
-	Contract.pre(sequenceDB != null, "SequenceDB was null");
-
+	if (sequenceDB == null) {
+	    throw new IllegalArgumentException("SequenceDB was null");
+	}
+	
 	// The SequenceDB name may not be null
 	String name = sequenceDB.getName();
-	Contract.pre(name       != null, "SequenceDB name was null");
 
 	// Create set of all identifiers for the to-be-added SequenceDB
 	Set allIdentifiers = new HashSet();
@@ -134,8 +140,12 @@ public class SimpleSequenceDBInstallation implements SequenceDBInstallation
 	for (Iterator i = allIdentifiers.iterator(); i.hasNext();)
 	{
 	    Object o = i.next();
-	    Contract.pre(o instanceof String, "otherIdentifiers must be a set of String objects");
-	    Contract.pre(! (currentIdentifiers.contains(o)), "name and otherIdentifiers must not already be in use");
+	    if (! (o instanceof String)) {
+		throw new IllegalArgumentException("otherIdentifiers must be a set of String objects");
+	    }
+	    if (currentIdentifiers.contains(o)) {
+		throw new IllegalArgumentException("name and otherIdentifiers must not already be in use");
+	    }
 	}
 
 	// Add the SequenceDB to the map under all its identifiers
@@ -169,7 +179,9 @@ public class SimpleSequenceDBInstallation implements SequenceDBInstallation
    */
     public synchronized SequenceDB getSequenceDB(String identifier)
     {
-	Contract.pre(identifier != null, "identifier was null");
+	if (identifier == null) {
+	    throw new IllegalArgumentException("identifier was null");
+	}
 
 	return (SequenceDB) this.sequenceDBByIdentifier.get(identifier);
     }

@@ -21,7 +21,7 @@ public class TestSubSequence {
         new InputStreamReader(new FileInputStream(emblFile)));
       SequenceBuilderFactory sFact = new EmblProcessor.Factory(SimpleSequenceBuilder.FACTORY);
       Alphabet alpha = DNATools.getDNA();
-      SymbolParser rParser = alpha.getParser("token");
+      SymbolTokenization rParser = alpha.getTokenization("token");
       SequenceIterator seqI =
         new StreamReader(eReader, eFormat, rParser, sFact);
         

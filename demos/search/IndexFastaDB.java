@@ -58,7 +58,7 @@ public class IndexFastaDB
 	String                 dbName;
 
 	Alphabet               alpha;
-	SymbolParser           parser;
+	SymbolTokenization     parser;
 	SequenceFormat         seqFormat;
 	IDMaker                idMaker;
 	SequenceBuilderFactory sbFactory;
@@ -93,7 +93,7 @@ public class IndexFastaDB
 
 	try
 	{
-	    parser = alpha.getParser("token");
+	    parser = alpha.getTokenization("token");
 
 	    String fastaFileName = args[0];
 

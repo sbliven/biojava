@@ -17,7 +17,7 @@ public class GCContent {
 	// Set up stream reader
 
 	Alphabet dna = DNATools.getDNA();
-	SymbolParser dnaParser = dna.getParser("token");
+	SymbolTokenization dnaParser = dna.getTokenization("token");
 	BufferedReader br = new BufferedReader(
 			        new FileReader(fileName));
 	SequenceBuilderFactory fact = new FastaDescriptionLineParser.Factory(

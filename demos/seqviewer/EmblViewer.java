@@ -36,7 +36,7 @@ public class EmblViewer {
     SequenceBuilderFactory sf = new EmblProcessor.Factory(SimpleSequenceBuilder.FACTORY);
     InputStream is = new FileInputStream(seqFile);
 	    
-    StreamReader sr = new StreamReader(is, ef, DNATools.getDNA().getParser("token"), sf);
+    StreamReader sr = new StreamReader(is, ef, DNATools.getDNA().getTokenization("token"), sf);
     Sequence seq = sr.nextSequence();
 
     Feature source = (Feature) seq.filter(

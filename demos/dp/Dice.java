@@ -59,15 +59,15 @@ public class Dice
       //print out obs_sequence, output, state symbols.
       for(int i = 1; i <= obs_rolls.length()/60; i++) {
         for(int j=i*60; j<Math.min((i+1)*60, obs_rolls.length()); j++)  {
-          System.out.print(obs_rolls.symbolAt(StatePath.SEQUENCE, j+1).getToken());
+          System.out.print(obs_rolls.symbolAt(StatePath.SEQUENCE, j+1).getName());
         }
         System.out.print("\n");
         for(int j=i*60; j<Math.min((i+1)*60, obs_rolls.length()); j++)  {
-          System.out.print(obs_rolls.symbolAt(StatePath.STATES, j+1).getToken());
+          System.out.print(obs_rolls.symbolAt(StatePath.STATES, j+1).getName().charAt(0));
         }
         System.out.print("\n");
         for(int j=i*60; j<Math.min((i+1)*60, obs_rolls.length()); j++)  {
-          System.out.print(v.symbolAt(StatePath.STATES, j+1).getToken());
+          System.out.print(v.symbolAt(StatePath.STATES, j+1).getName().charAt(0));
         }
         System.out.print("\n\n");
       }

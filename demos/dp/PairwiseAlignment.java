@@ -67,7 +67,7 @@ public class PairwiseAlignment {
       
       DP aligner = fact.createDP(model);
       
-      SymbolParser rParser = alpha.getParser("token");
+      SymbolTokenization rParser = alpha.getTokenization("token");
       SequenceBuilderFactory sFact = new FastaDescriptionLineParser.Factory(SimpleSequenceBuilder.FACTORY);
       SequenceFormat sFormat = new FastaFormat();
     

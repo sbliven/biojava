@@ -53,12 +53,12 @@ class DASFeatureSet implements FeatureHolder, DASOptimizableFeatureHolder {
     private FeatureRequestManager.Ticket   typesTicket;
     private FeatureFilter                  allTypesFilter;   
 
-    private DASSequence                    refSequence;
+    private DASSequenceI                   refSequence;
     private URL                            dataSource;
     private String                         sourceID;
     private String                         dataSourceString;
 
-    DASFeatureSet(DASSequence seq, URL ds, String id)
+    DASFeatureSet(DASSequenceI seq, URL ds, String id)
         throws BioException
     {
 	refSequence = seq;

@@ -24,7 +24,7 @@ public class TestGenbank {
 			SequenceBuilderFactory sbFact =
 					new GenbankProcessor.Factory(SimpleSequenceBuilder.FACTORY);
 			Alphabet alpha = DNATools.getDNA();
-			SymbolParser rParser = alpha.getParser("token");
+			SymbolTokenization rParser = alpha.getTokenization("token");
 			SequenceIterator seqI =
 					new	StreamReader(gReader, gFormat, rParser,	sbFact);
 

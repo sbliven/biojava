@@ -47,6 +47,7 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
     private int biosequence_id;
     private ChangeSupport changeSupport;
     private Annotation annotation;
+    private Alphabet alphabet;
 
     private void initChangeSupport() {
 	changeSupport = new ChangeSupport();
@@ -59,12 +60,20 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
     BioSQLSequence(BioSQLSequenceDB seqDB,
 		   String name,
 		   int bioentry_id,
-		   int biosequence_id)
+		   int biosequence_id,
+		   String alphaName)
+	throws BioException
     {
 	this.seqDB = seqDB;
 	this.name = name;
 	this.bioentry_id = bioentry_id;
 	this.biosequence_id = biosequence_id;
+
+	try {
+	    this.alphabet = AlphabetManager.alphabetForName(alphaName.toUpperCase());
+	} catch (NoSuchElementException ex) {
+	    throw new BioException(ex, "Can't load sequence with unknown alphabet " + alphaName);
+	}
     }
 
     public String getName() {
@@ -92,7 +101,7 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
     //
 
     public Alphabet getAlphabet() {
-	return getSymbols().getAlphabet();
+	return alphabet;
     }
 
     public int length() {
@@ -138,28 +147,26 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
 	    try {
 		Connection conn = seqDB.getPool().takeConnection();
 		
-		PreparedStatement get_symbols = conn.prepareStatement("select molecule, biosequence_str " +
+		PreparedStatement get_symbols = conn.prepareStatement("select biosequence_str " +
 								      "from biosequence " +
 								      "where biosequence_id = ?");
 		get_symbols.setInt(1, biosequence_id);
 		ResultSet rs = get_symbols.executeQuery();
-		String alphaName  = null;
 		String seqString = null;
 		if (rs.next()) {
-		    alphaName = rs.getString(1).toUpperCase(); // FIXME
-		    seqString = rs.getString(2);  // FIXME should do something stream-y
+		    seqString = rs.getString(1);  // FIXME should do something stream-y
 		}
 		get_symbols.close();
 
 		seqDB.getPool().putConnection(conn);
 
-		if (alphaName != null) {
+		if (seqString != null) {
 		    try {
-			Alphabet alpha = AlphabetManager.alphabetForName(alphaName);
+			Alphabet alpha = getAlphabet();
 			SymbolTokenization toke = alpha.getTokenization("token");
 			symbols = new SimpleSymbolList(toke, seqString);
 		    } catch (Exception ex) {
-			throw new BioRuntimeException(ex, "Couldn't parse tokenized symbols of type " + alphaName);
+			throw new BioRuntimeException(ex, "Couldn't parse tokenized symbols");
 		    }
 		} else {
 		    throw new BioRuntimeException("Sequence " + name + " has gone missing!");

@@ -20,7 +20,7 @@ public class TestEmbl {
         new InputStreamReader(new FileInputStream(emblFile)));
       SequenceBuilderFactory sFact = new EmblProcessor.Factory(SimpleSequenceBuilder.FACTORY);
       Alphabet alpha = DNATools.getDNA();
-      SymbolParser rParser = alpha.getParser("token");
+      SymbolTokenization rParser = alpha.getTokenization("token");
       SequenceIterator seqI =
         new StreamReader(eReader, eFormat, rParser, sFact);
         
@@ -28,7 +28,6 @@ public class TestEmbl {
         Sequence seq = seqI.nextSequence();
         System.out.println(seq.getName() + " has " + seq.countFeatures() + " features");
         eFormat.writeSequence(seq, System.out);
-        System.out.println("pigs");
       }
     } catch (Throwable t) {
       t.printStackTrace();

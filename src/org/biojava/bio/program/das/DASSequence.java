@@ -59,7 +59,7 @@ import org.biojava.utils.stax.*;
  * @author David Huen
  */
 
-public class DASSequence implements Sequence, RealizingFeatureHolder, DASOptimizableFeatureHolder {
+public class DASSequence implements DASSequenceI, DASOptimizableFeatureHolder {
     /**
      * Change type which indicates that the set of annotation servers used
      * by this DASSequence has been changed. This extends Feature.FEATURES as
@@ -207,7 +207,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder, DASOptimiz
 	return dataSourceURL;
     }
 
-    DASSequenceDB getParentDB() {
+    public DASSequenceDB getParentDB() {
 	return parentdb;
     }
     

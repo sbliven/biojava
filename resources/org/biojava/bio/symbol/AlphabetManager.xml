@@ -140,7 +140,7 @@
 	<symbolref name="cytosine" />
 	<symbolref name="thymine" />
       </ambiguityMapping>
-    
+
       <ambiguityMapping char="x">
         <symbolref name="guanine" />
 	<symbolref name="adenine" />

@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.utils.ObjectUtil;
-import org.biojava.utils.contract.Contract;
 
 /**
  * <p>A simple implementation of interface SeqSimilaritySearchHit that
@@ -99,11 +98,17 @@ public class SimpleSeqSimilaritySearchHit
                                         String sequenceID,
 					List   subHits)
     {
-	Contract.pre(! Double.isNaN(score), "score was NaN");
+	if (Double.isNaN(score)) {
+	    throw new IllegalArgumentException("score was NaN");
+	}
 	// pValue may be NaN
 	// eValue may be NaN
-	Contract.pre(sequenceID != null, "sequenceID was null");
-	Contract.pre(subHits    != null, "subHits was null");
+	if (sequenceID == null) {
+	    throw new IllegalArgumentException("sequenceID was null");
+	}
+	if (subHits == null) {
+	    throw new IllegalArgumentException("subHits was null");
+	}
 
 	this.score      = score;
 	this.pValue     = pValue;

@@ -32,7 +32,6 @@ import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeListener;
 import org.biojava.utils.ObjectUtil;
-import org.biojava.utils.contract.Contract;
 
 /**
  * <code>SequenceDBSearchResult</code> objects represent a result of a
@@ -73,11 +72,19 @@ public class SequenceDBSearchResult extends AbstractChangeable
 				  final Annotation annotation,
 				  final List       hits)
     {
-	Contract.pre(querySeq   != null, "querySeq was null");
-	Contract.pre(sequenceDB != null, "sequenceDB was null");
+	if (querySeq  == null) {
+	    throw new IllegalArgumentException("querySeq was null");
+	}
+	if (sequenceDB == null) {
+	    throw new IllegalArgumentException("sequenceDB was null");
+	}
 	// searchParameters may be null
-	Contract.pre(annotation != null, "annotation was null");
-	Contract.pre(hits       != null, "hits was null");
+	if (annotation == null) {
+	    throw new IllegalArgumentException("annotation was null");
+	}
+	if(hits == null) {
+	    throw new IllegalArgumentException("hits was null");
+	}
 
 	this.sequenceDB       = sequenceDB;
 	this.searchParameters = searchParameters;

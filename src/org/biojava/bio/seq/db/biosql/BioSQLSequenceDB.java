@@ -183,7 +183,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	try {
 	    Connection conn = pool.takeConnection();
 
-	    PreparedStatement get_sequence = conn.prepareStatement("select bioentry.bioentry_id, biosequence.biosequence_id " +
+	    PreparedStatement get_sequence = conn.prepareStatement("select bioentry.bioentry_id, biosequence.biosequence_id, biosequence.molecule " +
 								   "from bioentry, biosequence " +
 								   "where bioentry.accession = ? and " +
 								   "      biosequence.bioentry_id = bioentry.bioentry_id");
@@ -192,8 +192,9 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    if (rs.next()) {
 		int bioentry_id = rs.getInt(1);
 		int biosequence_id = rs.getInt(2);
+		String molecule = rs.getString(3);
 
-		seq = new BioSQLSequence(this, id, bioentry_id, biosequence_id);
+		seq = new BioSQLSequence(this, id, bioentry_id, biosequence_id, molecule);
 	    } 
 	    get_sequence.close();
 

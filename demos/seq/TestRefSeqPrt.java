@@ -24,7 +24,7 @@ public class TestRefSeqPrt {
 			SequenceBuilderFactory sbFact =
 					new ProteinRefSeqProcessor.Factory(SimpleSequenceBuilder.FACTORY);
 			Alphabet alpha = ProteinTools.getTAlphabet();
-			SymbolParser rParser = alpha.getParser("token");
+			SymbolTokenization rParser = alpha.getTokenization("token");
 			SequenceIterator seqI =
 					new	StreamReader(gReader, gFormat, rParser,	sbFact);
 

@@ -60,7 +60,7 @@ public class EmblToGffFasta {
         new InputStreamReader(new FileInputStream(emblFile)));
       SequenceBuilderFactory sFact = new EmblProcessor.Factory(SimpleSequenceBuilder.FACTORY);
       Alphabet alpha = DNATools.getDNA();
-      SymbolParser rParser = alpha.getParser("token");
+      SymbolTokenization rParser = alpha.getTokenization("token");
 
       // fasta stuff
       SequenceFormat fFormat = new FastaFormat();

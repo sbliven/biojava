@@ -28,7 +28,6 @@ import java.util.Map;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ObjectUtil;
-import org.biojava.utils.contract.Contract;
 
 /**
  * A class that implements the trivial (housekeeping) responsibilities
@@ -68,10 +67,16 @@ public class SimpleSeqSimilaritySearchResult
 					   Map        searchParameters,
 					   List       hits)
     {
-	Contract.pre(querySequence != null, "querySequence was null");
-	Contract.pre(sequenceDB    != null, "sequenceDB was null");
+	if (querySequence == null) {
+	    throw new IllegalArgumentException("querySequence was null");
+	}
+	if (sequenceDB == null) {
+	    throw new IllegalArgumentException("sequenceDB was null");
+	}
 	// searchParameters may be null
-	Contract.pre(hits          != null, "hits was null");
+	if (hits == null) {
+	    throw new IllegalArgumentException("hits was null");
+	}
 
 	this.querySequence    = querySequence;
 	this.sequenceDB       = sequenceDB;

@@ -51,7 +51,7 @@ public class TestDigestIO extends Object {
         
         //Get the Sequence Iterator
         Alphabet alpha = ProteinTools.getAlphabet();
-        SymbolParser protParser = alpha.getParser("token");
+        SymbolTokenization protParser = alpha.getTokenization("token");
         BufferedReader br = new BufferedReader(
                                new FileReader(fileName));
 

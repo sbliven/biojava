@@ -6,6 +6,7 @@ import java.util.*;
 import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.db.*;
+import org.biojava.bio.seq.distributed.*;
 
 public class ReferenceServer
 extends DataSource
@@ -75,5 +76,11 @@ implements Changeable {
   public SequenceDB getDB() throws BioException {
     return new DASSequenceDB(getURL());
   }
+
+    public DistDataSource getDistDataSource() 
+        throws BioException
+    {
+	return new DASDistDataSource(getURL());
+    }
 }
 

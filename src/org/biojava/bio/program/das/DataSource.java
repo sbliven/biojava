@@ -5,6 +5,7 @@ import java.util.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.utils.*;
+import org.biojava.bio.seq.distributed.*;
 
 /**
  * Reflect a datasource (reference or annotation) in the DAS1 network.
@@ -61,6 +62,12 @@ public class DataSource {
     
 	DataSource od = (DataSource) other;
 	return od.getURL().equals(this.getURL());
+    }
+
+    public DistDataSource getDistDataSource() 
+        throws BioException
+    {
+	return new DASAnnotationDistDataSource(getURL());
     }
 }
 
