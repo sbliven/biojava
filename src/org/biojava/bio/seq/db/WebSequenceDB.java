@@ -43,41 +43,45 @@ public abstract class WebSequenceDB
 extends AbstractChangeable
 implements SequenceDBLite {
   protected abstract SequenceFormat getSequenceFormat();
-  
+
   protected abstract URL getAddress(String id)
   throws MalformedURLException;
-  
+
   protected abstract Alphabet getAlphabet();
-  
+
   public Sequence getSequence(String id)
   throws BioException {
     if( id.equals("") ) {
       throw new BioException("did not specify a valid id for getSequence");
     }
-    
+
     try {
-      URL queryURL = getAddress(id);      
+      URL queryURL = getAddress(id);
       System.err.println("query is "+ queryURL.toString());
       URLConnection connection = queryURL.openConnection();
       SequenceFormat sFormat = getSequenceFormat();
-      SequenceBuilder sbuilder = new SimpleSequenceBuilder();
-      FastaDescriptionLineParser sFact =
-        new FastaDescriptionLineParser(sbuilder);
+
+//      SequenceBuilder sbuilder = new SimpleSequenceBuilder();
+//      FastaDescriptionLineParser sFact =
+//        new FastaDescriptionLineParser(sbuilder);
+
       Alphabet alpha = getAlphabet();
+      SequenceBuilderFactory sFact = SeqIOTools.formatToFactory(sFormat,alpha);
+      SequenceBuilder sbuilder = sFact.makeSequenceBuilder();
       SymbolTokenization rParser = alpha.getTokenization("token");
       System.err.println("got data from "+ queryURL);
       SequenceIterator seqI = new StreamReader(
         connection.getInputStream(),
-        (SequenceFormat)sFormat, rParser, 
-        (SequenceBuilderFactory)sFact
+        sFormat, rParser, sFact
       );
-      
+
       return seqI.nextSequence();
     } catch ( Exception e ){
       throw new BioException(e);
-    } 
+    }
   }
-  
+
+
   public void addSequence(Sequence seq)
   throws ChangeVetoException {
     throw new ChangeVetoException(
@@ -85,7 +89,7 @@ implements SequenceDBLite {
       seq.getName()
     );
   }
-  
+
   public void removeSequence(String id)
   throws ChangeVetoException {
     throw new ChangeVetoException(

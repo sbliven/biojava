@@ -263,7 +263,7 @@ public final class SeqIOTools  {
       StreamWriter sw = new StreamWriter(os,new FastaFormat());
       sw.writeStream(in);
    }
-   
+
    public static void writeFasta(OutputStream os, Sequence seq)
    throws IOException {
      writeFasta(os, new SingleSeqIterator(seq));
@@ -276,7 +276,7 @@ public final class SeqIOTools  {
         StreamWriter sw = new StreamWriter(os, new EmblLikeFormat());
         sw.writeStream(in);
     }
-    
+
     public static void writeEmbl(OutputStream os, Sequence seq) throws IOException {
       writeEmbl(os, new SingleSeqIterator(seq));
     }
@@ -288,7 +288,7 @@ public final class SeqIOTools  {
             former.writeSequence(in.nextSequence(), "Swissprot", ps);
         }
     }
-    
+
     public static void writeSwissprot(OutputStream os, Sequence seq)
     throws IOException, BioException {
       writeSwissprot(os, new SingleSeqIterator(seq));
@@ -301,7 +301,7 @@ public final class SeqIOTools  {
             former.writeSequence(in.nextSequence(), "Genpept", ps);
         }
     }
-    
+
     public static void writeGenpept(OutputStream os, Sequence seq)
     throws IOException, BioException {
       writeGenpept(os, new SingleSeqIterator(seq));
@@ -311,7 +311,7 @@ public final class SeqIOTools  {
         StreamWriter sw = new StreamWriter(os, new GenbankFormat());
         sw.writeStream(in);
     }
-    
+
     public static void writeGenbank(OutputStream os, Sequence seq)
     throws IOException {
       writeGenbank(os, new SingleSeqIterator(seq));
@@ -477,7 +477,7 @@ public final class SeqIOTools  {
         }
         return GENBANK;
     }
-    
+
     public static SequenceBuilderFactory fileToFactory(int fileType)
     throws BioException {
       switch(fileType) {
@@ -498,6 +498,52 @@ public final class SeqIOTools  {
       }
     }
 
+    /**
+     * Attempts to retreive the most appropriate SequenceBuilder object
+     * for some combination of <code>Alphabet</code> and
+     * <code>SequenceFormat</code>
+     * @param format currently supports <code>FastaFormat</code>, <code>GenbankFormat</code>, <code>EmblLikeFormat</code>
+     * @param alpha currently only supports the DNA and Protein alphabets
+     * @return the <code>SequenceBuilderFactory</code>
+     * @throws BioException if the combination of alpha and format is unrecognized.
+     */
+    public static SequenceBuilderFactory formatToFactory(
+        SequenceFormat format, Alphabet alpha)
+        throws BioException{
+
+      if((format instanceof FastaFormat) &&
+         (alpha == DNATools.getDNA() || alpha == ProteinTools.getAlphabet())){
+
+        return getFastaBuilderFactory();
+      }
+
+      else if(format instanceof GenbankFormat &&
+              alpha == DNATools.getDNA()){
+
+        return getGenbankBuilderFactory();
+      }
+
+      else if(format instanceof GenbankFormat &&
+              alpha == ProteinTools.getAlphabet()){
+
+        return getGenpeptBuilderFactory();
+      }
+
+      else if(format instanceof EmblLikeFormat &&
+              alpha == DNATools.getDNA()){
+        return getEmblBuilderFactory();
+      }
+
+      else if(format instanceof EmblLikeFormat &&
+              alpha == ProteinTools.getAlphabet()){
+        return getSwissprotBuilderFactory();
+      }
+
+      else{
+        throw new BioException("Unknown combination of Alphabet and Format");
+      }
+    }
+
     public static SequenceFormat fileToFormat(int fileType)
     throws BioException {
       switch(fileType) {
@@ -515,6 +561,8 @@ public final class SeqIOTools  {
               throw new BioException("Unknown format: " + fileType);
       }
     }
+
+
 
     /**
      * Reads a file and returns the corresponding Biojava object.  You need to cast it as
@@ -658,18 +706,18 @@ public final class SeqIOTools  {
                 System.out.println("seqToFile -- File type not recognized.");
         }
     }
-    
+
   private static final class SingleSeqIterator
   implements SequenceIterator {
     private Sequence seq;
     SingleSeqIterator(Sequence seq) {
       this.seq = seq;
     }
-    
+
     public boolean hasNext() {
       return seq != null;
     }
-    
+
     public Sequence nextSequence() {
       Sequence seq = this.seq;
       this.seq = null;
