@@ -3,6 +3,7 @@ package biosql;
 import java.io.*;
 import java.util.*;
 
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.impl.*;
@@ -82,7 +83,91 @@ public class SequenceTest {
 	temp.type = "child";
 	temp.location = new RangeLocation(2, 4);
 	Feature cf = f.createFeature(temp);
+
+	System.out.println("Checking event system (feature level)");
+
+	f.addChangeListener(ChangeListener.ALWAYS_VETO, ChangeType.UNKNOWN);
+	{
+	    boolean vetoed = false;
+	    try {
+		f.createFeature(temp);
+	    } catch (ChangeVetoException ex) {
+		vetoed = true;
+	    }
+	    if (!vetoed) {
+		throw new Exception("Create feature event didn't get vetoed!");
+	    }
+	}
+	{
+	    boolean vetoed = false;
+	    try {
+		f.removeFeature(cf);
+	    } catch (ChangeVetoException ex) {
+		vetoed = true;
+	    }
+	    if (!vetoed) {
+		throw new Exception("Remove feature event didn't get vetoed!");
+	    }
+	}
+	f.removeChangeListener(ChangeListener.ALWAYS_VETO, ChangeType.UNKNOWN);
         
+	System.out.println("Checking event system (sequence level)");
+	seq.addChangeListener(ChangeListener.ALWAYS_VETO, ChangeType.UNKNOWN);
+	{
+	    boolean vetoed = false;
+	    try {
+		f.createFeature(temp);
+	    } catch (ChangeVetoException ex) {
+		vetoed = true;
+	    }
+	    if (!vetoed) {
+		throw new Exception("Create feature event didn't get vetoed!");
+	    }
+	}
+	seq.removeChangeListener(ChangeListener.ALWAYS_VETO, ChangeType.UNKNOWN);
+
+	System.out.println("Checking event system (database level)");
+	seqDB.addChangeListener(ChangeListener.ALWAYS_VETO, ChangeType.UNKNOWN);
+	{
+	    boolean vetoed = false;
+	    try {
+		f.createFeature(temp);
+	    } catch (ChangeVetoException ex) {
+		vetoed = true;
+	    }
+	    if (!vetoed) {
+		throw new Exception("Create feature event didn't get vetoed!");
+	    }
+	}
+	
+	System.out.println("Checking event system (forwarding from feature annotations)");
+	{
+	    boolean vetoed = false;
+	    try {
+		f.getAnnotation().setProperty("foo", "bar");
+	    } catch (ChangeVetoException ex) {
+		vetoed = true;
+	    }
+	    if (!vetoed) {
+		throw new Exception("Set property event didn't get vetoed!");
+	    }
+	}
+
+	System.out.println("Checking event system (forwarding from sequence annotations)");
+	{
+	    boolean vetoed = false;
+	    try {
+		f.getSequence().getAnnotation().setProperty("foo", "bar");
+	    } catch (ChangeVetoException ex) {
+		vetoed = true;
+	    }
+	    if (!vetoed) {
+		throw new Exception("Set property event didn't get vetoed!");
+	    }
+	}
+	
+	seqDB.removeChangeListener(ChangeListener.ALWAYS_VETO, ChangeType.UNKNOWN);
+
 	System.out.println("Removing a child feature");
 
 	f.removeFeature(cf);
