@@ -76,6 +76,7 @@ public interface RemoteFeature extends Feature {
 	public Template()
 	{
 		super();
+		location = new Location.EmptyLocation();
 		regions = new ArrayList();
 		resolver = null;
 	}
@@ -91,6 +92,10 @@ public interface RemoteFeature extends Feature {
 	  public Template(Feature.Template theTemplate)
 	  {
 	    location = theTemplate.location;
+	    if(location == null)
+	    {
+	    	location = new Location.EmptyLocation();
+	    }
 	    type = theTemplate.type;
 	    source = theTemplate.source;
     	annotation = theTemplate.annotation;
