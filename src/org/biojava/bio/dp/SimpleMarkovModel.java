@@ -88,6 +88,7 @@ public class SimpleMarkovModel
         if(s instanceof EmissionState) {
           EmissionState es = (EmissionState) s;
           Distribution dist = es.getDistribution();
+          es.addChangeListener(distForwarder, EmissionState.DISTRIBUTION);
           dist.addChangeListener(distForwarder, Distribution.WEIGHTS);
           dist.addChangeListener(distForwarder, Distribution.NULL_MODEL);
         }
@@ -150,9 +151,10 @@ public class SimpleMarkovModel
    * @throws IllegalSymbolException if source is not a member of this model
    * @throws IllegalAlphabetException if dist is not a distribution over the
    *         states returned by model.transitionsFrom(source)
+   * @throws ChangeVetoException if a listener vetoed this change
    */
   public void setWeights(State source, Distribution dist)
-  throws IllegalSymbolException, IllegalAlphabetException {
+  throws IllegalSymbolException, IllegalAlphabetException, ChangeVetoException {
     FiniteAlphabet ta = transitionsFrom(source);
     if(!dist.getAlphabet().equals(ta)) {
       throw new IllegalAlphabetException(
@@ -162,7 +164,20 @@ public class SimpleMarkovModel
       );
     }
 
-    transWeights.put(source, dist);
+    if(!hasListeners()) {
+      transWeights.put(source, dist);
+    } else {
+      ChangeSupport cs = getChangeSupport(MarkovModel.PARAMETER);
+      synchronized(cs) {
+        ChangeEvent ce = new ChangeEvent(this,
+                                         MarkovModel.PARAMETER,
+                                         dist,
+                                         transWeights.get(source));
+        cs.firePreChangeEvent(ce);
+        transWeights.put(source, dist);
+        cs.firePostChangeEvent(ce);
+      }
+    }
   }
 
   public void createTransition(State from, State to)
@@ -225,10 +240,10 @@ public class SimpleMarkovModel
 
     Distribution dist = getWeights(from);
     double w = dist.getWeight(to);
-    if(w != 0.0) {
+    if(w != 0.0 && !Double.isNaN(w)) {
       throw new ChangeVetoException(
         ce,
-        "Can't remove transition as its weight is not zero: " +
+        "Can't remove transition as its weight is not zero or NaN: " +
         from.getName() + " -> " + to.getName() + " = " + w
       );
     }
@@ -345,12 +360,14 @@ public class SimpleMarkovModel
     transWeights.put(toAdd, new SimpleDistribution(fa));
     ((SimpleAlphabet) stateAlphabet()).addSymbol(toAdd);
 
-    if(toAdd instanceof EmissionState) {
-      Distribution dist = ((EmissionState) toAdd).getDistribution();
-          if(distForwarder != null) {
-            dist.addChangeListener(distForwarder, Distribution.WEIGHTS);
+    if (toAdd instanceof EmissionState) {
+      EmissionState eState = (EmissionState) toAdd;
+      Distribution dist = eState.getDistribution();
+      if (distForwarder != null) {
+        eState.addChangeListener(distForwarder, EmissionState.DISTRIBUTION);
+        dist.addChangeListener(distForwarder, Distribution.WEIGHTS);
         dist.addChangeListener(distForwarder, Distribution.NULL_MODEL);
-          }
+      }
     }
   }
 
@@ -399,10 +416,12 @@ public class SimpleMarkovModel
     transFrom.remove(toGo);
     transTo.remove(toGo);
     if(toGo instanceof EmissionState) {
-      Distribution dist = ((EmissionState) toGo).getDistribution();
-      if(distForwarder != null) {
-        toGo.removeChangeListener(distForwarder, Distribution.NULL_MODEL);
-        toGo.removeChangeListener(distForwarder, Distribution.WEIGHTS);
+      EmissionState eState = (EmissionState) toGo;
+      Distribution dist = eState.getDistribution();
+      if (distForwarder != null) {
+        eState.removeChangeListener(distForwarder, EmissionState.DISTRIBUTION);
+        dist.removeChangeListener(distForwarder, Distribution.WEIGHTS);
+        dist.removeChangeListener(distForwarder, Distribution.NULL_MODEL);
       }
     }
   }
@@ -427,5 +446,9 @@ public class SimpleMarkovModel
     } catch (ChangeVetoException cve) {
       throw new BioError("Assertion failure: Couldn't add magical state", cve);
     }
+  }
+
+  public String toString() {
+    return this.getClass().getName() + ":" + stateAlpha.getName();
   }
 }

@@ -185,7 +185,15 @@ extends Changeable {
    */
   public boolean isTrue(Term subject, Term object, Term relation)
   throws InvalidTermException;
-  
+
+  /**
+   * Get all terms by name in the domain.
+   *
+   * @param name  the name of the term
+   * @return      a Set containing all terms with local names that match
+   */
+  public Set getTerms(String name);
+
   /**
    * An implementation of ReasoningDomain.
    *
@@ -627,6 +635,19 @@ extends Changeable {
     private boolean isa(Term subject, Term object)
     throws InvalidTermException {
       return isTrue(subject, object, OntoTools.IS_A);
+    }
+
+    public Set getTerms(String name) {
+      Set hits = new SmallSet();
+
+      for(Iterator i = getOntologies().iterator(); i.hasNext(); ) {
+        Ontology o = (Ontology) i.next();
+        if(o.containsTerm(name)) {
+          hits.add(o.getTerm(name));
+        }
+      }
+
+      return hits;
     }
   }
   

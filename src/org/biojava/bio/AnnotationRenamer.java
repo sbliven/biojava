@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.biojava.bio.program.tagvalue.TagMapper;
+import org.biojava.bio.program.tagvalue.PropertyChanger;
 
 /**
  * <code>AnnotationRenamer</code> remaps the keys of an
@@ -45,7 +45,7 @@ import org.biojava.bio.program.tagvalue.TagMapper;
 public class AnnotationRenamer extends AbstractAnnotation
 {
     private final Annotation wrapped;
-    private final TagMapper mapper;
+    private final PropertyChanger mapper;
     private final Map properties;
   
     /**
@@ -55,7 +55,7 @@ public class AnnotationRenamer extends AbstractAnnotation
      * @param wrapped an <code>Annotation</code>.
      * @param mapper a <code>TagMapper</code>.
      */
-    public AnnotationRenamer(Annotation wrapped, TagMapper mapper) {
+    public AnnotationRenamer(Annotation wrapped, PropertyChanger mapper) {
         this.wrapped = wrapped;
         this.mapper = mapper;
         this.properties = new MappedHash();
@@ -77,7 +77,7 @@ public class AnnotationRenamer extends AbstractAnnotation
      *
      * @return a <code>TagMapper</code>.
      */
-    public TagMapper getMapper() {
+    public PropertyChanger getMapper() {
         return mapper;
     }
 

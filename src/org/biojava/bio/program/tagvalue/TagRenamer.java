@@ -38,7 +38,7 @@ import org.biojava.utils.ParserException;
  * @since 1.2
  */
 public class TagRenamer extends TagValueWrapper {
-  private TagMapper mapper;
+  private PropertyChanger mapper;
   
   /**
    * Build a new TagRenamer with a delegate and mapper.
@@ -46,7 +46,7 @@ public class TagRenamer extends TagValueWrapper {
    * @param delegate TagValueListener to pass mapped events onto
    * @param mapper TagMapper used to rename tags
    */
-  public TagRenamer(TagValueListener delegate, TagMapper mapper) {
+  public TagRenamer(TagValueListener delegate, PropertyChanger mapper) {
     super(delegate);
     this.mapper = mapper;
   }
@@ -56,7 +56,7 @@ public class TagRenamer extends TagValueWrapper {
    *
    * @return the current mapper
    */
-  public TagMapper getMapper() {
+  public PropertyChanger getMapper() {
     return mapper;
   }
   

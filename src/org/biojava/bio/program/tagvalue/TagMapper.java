@@ -39,7 +39,7 @@ import org.biojava.utils.SmallMap;
  * @author Matthew Pocock
  * @author Keith James (docs).
  */
-public class TagMapper {
+public class TagMapper implements PropertyChanger {
     private Map tags;
 
     /**
@@ -60,21 +60,6 @@ public class TagMapper {
         tags.put(oldTag, newTag);
     }
 
-    /**
-     * <p>
-     * <code>getNewTag</code> returns the tag which substitutes the
-     * specified value.
-     * </p>
-     *
-     * <p>
-     * If there is no mapping associated with this tag, it is returned
-     * unchanged.
-     * </p>
-     *
-     * @param oldTag an <code>Object</code> to substitute.
-     *
-     * @return an <code>Object</code>.
-     */
     public Object getNewTag(Object oldTag) {
       Object newTag = tags.get(oldTag);
       if(newTag == null) {
