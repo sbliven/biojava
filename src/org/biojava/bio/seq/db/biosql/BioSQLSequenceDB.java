@@ -56,9 +56,22 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	return pool;
     }
 
-    public DBHelper getDBHelper() {
+    DBHelper getDBHelper() {
 	return helper;
     }
+
+    /**
+     * Connect to a BioSQL database.
+     *
+     * @param dbURL A JDBC database URL.  For example, <code>jdbc:postgresql://localhost/thomasd_biosql</code>
+     * @param dbUser The username to use when connecting to the database (or an empty string).
+     * @param dbPass The password to use when connecting to the database (or an empty string).
+     * @param biodatabase The identifier of a namespace within the physical BioSQL database.
+     * @param create If the requested namespace doesn't exist, and this flag is <code>true</code>,
+     *               a new namespace will be created.
+     *
+     * @throws BioException if an error occurs communicating with the database
+     */
 
     public BioSQLSequenceDB(String dbURL,
 			    String dbUser,
@@ -410,7 +423,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	for (Iterator fi = features.features(); fi.hasNext(); ) {
 	    Feature f = (Feature) fi.next();
 	    
-	    if (! (f instanceof ComponentFeature) && !(f.getType().equals("similarity")) ) {
+	    if (! (f instanceof ComponentFeature) /* && !(f.getType().equals("similarity")) */ ) {
 		int id = persistFeature(conn, bioentry_id, f, parent);
 		if (isHierarchySupported()) {
 		    persistFeatures(conn, bioentry_id, f, id);
@@ -1174,7 +1187,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 			int level = rs.getInt(1);
 			if (level >= 2) {
 			    spaSupported = true;
-			    System.err.println("*** Accelerators present in the database: level " + level);
+			    // System.err.println("*** Accelerators present in the database: level " + level);
 			} 
 		    }
 		} catch (SQLException ex) {
