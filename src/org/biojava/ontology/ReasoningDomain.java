@@ -3,6 +3,14 @@ package org.biojava.ontology;
 import java.util.*;
 
 import org.biojava.utils.*;
+import org.biojava.bio.dp.State;
+import org.biojava.ontology.vm.*;
+import org.biojava.ontology.vm.Action;
+
+import javax.swing.*;
+import javax.crypto.Mac;
+
+import com.sun.jdi.Value;
 
 /**
  * A domain over which we are reasoning.
@@ -22,28 +30,28 @@ import org.biojava.utils.*;
  * @since 1.4
  */
 public interface ReasoningDomain
-extends Changeable {
+        extends Changeable {
   public static final ChangeType ONTOLOGIES = new ChangeType(
-    "Set of ontologies in this domain are changing",
-    "org.biojava.ontology.ReasoningDomain",
-    "ONTOLOGIES" );
+          "Set of ontologies in this domain are changing",
+          "org.biojava.ontology.ReasoningDomain",
+          "ONTOLOGIES" );
 
   public static final ChangeType TERMS = new ChangeType(
-    "Terms in ontologies in this domain are changing",
-    "org.biojava.ontology.ReasoningDomain",
-    "TERMS" );
+          "Terms in ontologies in this domain are changing",
+          "org.biojava.ontology.ReasoningDomain",
+          "TERMS" );
 
   public static final ChangeType ADD_ONTOLOGY = new ChangeType(
-    "Adding an ontology to this domain",
-    "org.biojava.ontology.ReasoningDomain",
-    "ADD_ONTOLOGY",
-    ONTOLOGIES );
+          "Adding an ontology to this domain",
+          "org.biojava.ontology.ReasoningDomain",
+          "ADD_ONTOLOGY",
+          ONTOLOGIES );
 
   public static final ChangeType REMOVE_ONTOLOGY = new ChangeType(
-    "Removing an ontology to this domain",
-    "org.biojava.ontology.ReasoningDomain",
-    "REMOVE_ONTOLOGY",
-    ONTOLOGIES );
+          "Removing an ontology to this domain",
+          "org.biojava.ontology.ReasoningDomain",
+          "REMOVE_ONTOLOGY",
+          ONTOLOGIES );
 
   /**
    * Get back the complete set of ontologies contributing to this domain.
@@ -84,7 +92,7 @@ extends Changeable {
    * @throws ChangeVetoException  if onto could not be added
    */
   public void addOntology(Ontology onto)
-  throws ChangeVetoException;
+          throws ChangeVetoException;
 
   /**
    * Remove an ontology from this domain.
@@ -108,7 +116,7 @@ extends Changeable {
    * @throws ChangeVetoException  if onto could not be removed
    */
   public void removeOntology(Ontology onto)
-  throws ChangeVetoException;
+          throws ChangeVetoException;
 
   /**
    * Decide if two terms are linked by a given predicate.
@@ -173,6 +181,24 @@ extends Changeable {
    * <p>This lets you make inferences about a based upon the truth of b.</p>
    *
    * @for.developer
+   *
+   * <p>If we have a proposition P and a seccond proposition P, we can decide
+   * several things:</p>
+   * <ol>
+   * <li><tt>P -> P</tt></li>
+   * <li><tt>P & Q -> P</tt></li>
+   * <li><tt>P -> P || Q</tt></li>
+   * </ol>
+   *
+   * <p>If we have a proposition P and an axiom A, we can decide:</p>
+   * <ol>
+   * <li><tt>(A = P) -> P</tt></li>
+   * <li><tt>(A -> P) -> P</tt></li>
+   * <li><tt>(A -> P & Q) -> P</tt></li>
+   * <li><tt>(A || B -> P) -> (A -> P)</tt></li>
+   * </ol>
+   *
+   * @for.developer
    * You will almost certainly want to maintain some cache of things you have
    * proved so far. This will both help in performance, and also make any
    * reasoning recursions global to the ReasoningDomain instance it is acting
@@ -185,7 +211,7 @@ extends Changeable {
    * @throws InvalidTermException  if the predicate term is not a predicate
    */
   public Iterator getMatching(Term subject, Term object, Term predicate)
-  throws InvalidTermException;
+          throws InvalidTermException;
 
   /**
    * Get all ontologies by name within the domain.
@@ -205,14 +231,16 @@ extends Changeable {
 
   public Variable createVariable(String name);
 
+  public Triple createVirtualTerm(Term subject, Term object, Term predicate,
+                                  String name, String description);
   /**
    * An implementation of ReasoningDomain.
    *
    * @author Matthew Pocock
    */
   public class Impl
-  extends AbstractChangeable
-  implements ReasoningDomain
+          extends AbstractChangeable
+          implements ReasoningDomain
   {
     private final Set explicitOntologies;
     private final Map allOntologies;
@@ -240,7 +268,7 @@ extends Changeable {
     }
 
     public void addOntology(Ontology onto)
-    throws ChangeVetoException {
+            throws ChangeVetoException {
       Set all = recSearch(onto, false);
 
       if(all.size() == 0) {
@@ -254,17 +282,17 @@ extends Changeable {
           for(Iterator i = all.iterator(); i.hasNext(); ) {
             Ontology o = (Ontology) i.next();
             cs.firePreChangeEvent(new ChangeEvent(
-              this,
-              ReasoningDomain.ADD_ONTOLOGY,
-              o ));
+                    this,
+                    ReasoningDomain.ADD_ONTOLOGY,
+                    o ));
           }
           doAdd(onto, all);
           for(Iterator i = all.iterator(); i.hasNext(); ) {
             Ontology o = (Ontology) i.next();
             cs.firePostChangeEvent(new ChangeEvent(
-              this,
-              ReasoningDomain.ADD_ONTOLOGY,
-              o ));
+                    this,
+                    ReasoningDomain.ADD_ONTOLOGY,
+                    o ));
           }
         }
       } else {
@@ -285,7 +313,7 @@ extends Changeable {
     }
 
     public void removeOntology(Ontology onto)
-    throws ChangeVetoException {
+            throws ChangeVetoException {
       if(!allOntologies.containsKey(onto)) {
         return;
       }
@@ -303,17 +331,17 @@ extends Changeable {
           for(Iterator i = all.iterator(); i.hasNext(); ) {
             Ontology o = (Ontology) i.next();
             cs.firePreChangeEvent(new ChangeEvent(
-              this,
-              ReasoningDomain.REMOVE_ONTOLOGY,
-              o ));
+                    this,
+                    ReasoningDomain.REMOVE_ONTOLOGY,
+                    o ));
           }
           doRemove(onto, all);
           for(Iterator i = all.iterator(); i.hasNext(); ) {
             Ontology o = (Ontology) i.next();
             cs.firePostChangeEvent(new ChangeEvent(
-              this,
-              ReasoningDomain.REMOVE_ONTOLOGY,
-              o ));
+                    this,
+                    ReasoningDomain.REMOVE_ONTOLOGY,
+                    o ));
           }
         }
       } else {
@@ -391,16 +419,14 @@ extends Changeable {
       Triple virtualTerm = createVirtualTerm(subject, object, predicate, null, null);
       //System.out.println("Getting all matches for: " + virtualTerm);
       Set propTerms = new HashSet();
-      //extractTerms(virtualTerm, propTerms);
+      extractTerms(virtualTerm, propTerms);
 
-      return new MatchIterator(virtualTerm,
-                               getConstantAxioms(),
-                               getVariableAxioms(),
-                               propTerms);
+      return new MatchIterator(virtualTerm);
+      //return Collections.EMPTY_SET.iterator();
     }
 
     void extractTerms(Term term, Set terms) {
-      term = resolveRemote(term);
+      term = ReasoningTools.resolveRemote(term);
 
       if(term instanceof Triple) {
         Triple trip = (Triple) term;
@@ -511,8 +537,8 @@ extends Changeable {
       return _variableAxioms;
     }
 
-    Triple createVirtualTerm(Term subject, Term object, Term predicate,
-                             String name, String description) {
+    public Triple createVirtualTerm(Term subject, Term object, Term predicate,
+                                    String name, String description) {
       try {
         if(subject.getOntology() != scratchOnto)
           subject = scratchOnto.importTerm(subject, null);
@@ -527,62 +553,12 @@ extends Changeable {
       return new Triple.Impl(subject, object, predicate, name, description);
     }
 
-    boolean areTriplesEqual(Triple a, Triple b)
-    {
-      //System.out.println("areTriplesEqual:\n\t: " + a + "\n\t: " + b);
-
-      if(a == b) {
-        //System.out.println("areTriplesEqual: Identical refferences");
-        return true;
-      }
-
-      if(!areTermsEqual(a.getPredicate(), b.getPredicate())) {
-        //System.out.println("areTriplesEqual: different relations");
-        return false;
-      }
-
-      if(!areTermsEqual(a.getSubject(), b.getSubject())) {
-        //System.out.println("areTriplesEqual: different subjects");
-        return false;
-      }
-
-      if(!areTermsEqual(a.getObject(), b.getObject())) {
-        //System.out.println("areTriplesEqual: different objects");
-        return false;
-      }
-
-      //System.out.println("Same subject, object and predicate");
-      return true;
-    }
-
-    boolean areTermsEqual(Term a, Term b)
-    {
-      //System.out.println("areTermsEqual:\n\t: " + a + "\n\t: " + b);
-      a = resolveRemote(a);
-      b = resolveRemote(b);
-
-      //System.out.println("areTermsEqual resolved:\n\t: " + a + "\n\t: " + b);
-
-      if(a == b) {
-        //System.out.println("areTermsEqual: Identical terms");
-        return true;
-      }
-
-      if(a instanceof Triple & b instanceof Triple) {
-        //System.out.println("areTermsEqual: Triples - calling areTriplesEqual");
-        return areTriplesEqual((Triple) a, (Triple) b);
-      }
-
-      //System.out.println("Terms are not equal");
-      return false;
-    }
-
     boolean evaluateExpression(Term expr)
     {
       //System.out.println("evaluateExpression: " + expr);
       if(expr instanceof Triple) expr = evaluateTriple((Triple) expr);
 
-      if(areTermsEqual(expr, OntoTools.TRUE)) {
+      if(ReasoningTools.areTermsEqual(expr, OntoTools.TRUE)) {
         //System.out.println("evaluateExpression: true <- " + expr);
         return true;
       } else {
@@ -633,7 +609,7 @@ extends Changeable {
       for(Iterator i = getAxioms().iterator();
           i.hasNext(); ) {
         Term t = (Term) i.next();
-        if(areTermsEqual(t, expr)) {
+        if(ReasoningTools.areTermsEqual(t, expr)) {
           //System.out.println("evaluateTriple: this is an axiom, so is true");
           resultCache.put(expr, OntoTools.TRUE);
           return OntoTools.TRUE;
@@ -641,9 +617,9 @@ extends Changeable {
       }
 
       // we need to do some real evaluation - first resolve our terms
-      Term sub = resolveRemote(expr.getSubject());
-      Term obj = resolveRemote(expr.getObject());
-      Term rel = resolveRemote(expr.getPredicate());
+      Term sub = ReasoningTools.resolveRemote(expr.getSubject());
+      Term obj = ReasoningTools.resolveRemote(expr.getObject());
+      Term rel = ReasoningTools.resolveRemote(expr.getPredicate());
 
 
       // let's evaluate the 3 components
@@ -652,14 +628,14 @@ extends Changeable {
 
       // bit hairy here - doing some funkey recursive shit
       /*try {
-        //System.out.println("evaluateTriple: Recursive call for: " + depth + " " + expr);
-        Iterator mi = getMatching(sub, obj, rel);
-        Term value = (mi.hasNext()) ? OntoTools.TRUE : OntoTools.FALSE;
-        //System.out.println("evaluateTriple: Evaluated: " + expr + " to " + value);
-        resultCache.put(expr, value);
-        return value;
+      //System.out.println("evaluateTriple: Recursive call for: " + depth + " " + expr);
+      Iterator mi = getMatching(sub, obj, rel);
+      Term value = (mi.hasNext()) ? OntoTools.TRUE : OntoTools.FALSE;
+      //System.out.println("evaluateTriple: Evaluated: " + expr + " to " + value);
+      resultCache.put(expr, value);
+      return value;
       } catch (InvalidTermException ie) {
-        throw new AssertionFailure(ie);
+      throw new AssertionFailure(ie);
       }*/
 
       //System.out.println("evaluateTriple: Unable to prove proposition");
@@ -667,39 +643,8 @@ extends Changeable {
       return OntoTools.FALSE;
     }
 
-    Term resolveRemote(Term t)
-    {
-      while(t instanceof RemoteTerm) {
-        t = ((RemoteTerm) t).getRemoteTerm();
-      }
-
-      return t;
-    }
-
-    Term substitute(Term expr, Term origVal, Term newVal)
-    {
-      //System.out.println("substitute: expression: " + expr + " origVal: " + origVal + " newVal: " + newVal);
-      if(areTermsEqual(expr, origVal)) {
-        //System.out.println("substitute: expression and origVal are equal");
-        return newVal;
-      }
-
-      if(expr instanceof Triple) {
-        Triple trip = (Triple) expr;
-        Term res = createVirtualTerm(substitute(trip.getSubject(), origVal, newVal),
-                                     substitute(trip.getObject(), origVal, newVal),
-                                     substitute(trip.getPredicate(), origVal, newVal),
-                                     null,
-                                     null);
-        //System.out.println("substitute: transformed " + expr + " into " + res);
-        return res;
-      }
-      //System.out.println("substitute: not changed " + expr);
-      return expr;
-    }
-
     Variable findFirstVariable(Term term) {
-      term = resolveRemote(term);
+      term = ReasoningTools.resolveRemote(term);
 
       if(term instanceof Variable)
         return (Variable) term;
@@ -732,7 +677,7 @@ extends Changeable {
 
         for(Iterator i = _values.iterator(); i.hasNext(); ) {
           Term t = (Term) i.next();
-          Term rt = resolveRemote(t);
+          Term rt = ReasoningTools.resolveRemote(t);
           if(rt instanceof Triple) {
             i.remove();
           }
@@ -753,10 +698,10 @@ extends Changeable {
         try {
           Set types = new HashSet();
           populateMembership(term, var, types);
-          //System.out.println("Variable: " + var + " should be of types: " + types + "\n\t" + term);
+          System.out.println("Variable: " + var + " should be of types: " + types + "\n\t" + term);
 
           if(types.isEmpty()) {
-            //System.out.println("Unable to work out the type of " + var + " in " + term);
+            System.out.println("Unable to work out the type of " + var + " in " + term);
             types.add(OntoTools.ANY);
           }
 
@@ -768,21 +713,21 @@ extends Changeable {
           Term type = ioC.importTerm((Term) typeI.next(), null);
 
           values.addAll(ioC.getTriples(null, type, io));
-          //System.out.println("\tvalues: " + type + " " + values);
+          System.out.println("\tvalues: " + type + " " + values);
           while(typeI.hasNext()) {
             type = ioC.importTerm((Term) typeI.next(), null);
             values.retainAll(ioC.getTriples(null, type, io));
-            //System.out.println("\tvalues: " + type + " " + values);
+            System.out.println("\tvalues: " + type + " " + values);
           }
 
           vals = new HashSet();
           for(Iterator i = values.iterator(); i.hasNext(); )  {
             Triple trip = (Triple) i.next();
-            vals.add(trip.getSubject());
+            vals.add(ReasoningTools.resolveRemote(trip.getSubject()));
           }
 
           //_knownVals.put(var, vals);
-          //System.out.println("Final values: " + vals.size() + " " + vals);
+          System.out.println("Final values: " + vals.size() + " " + vals);
         } catch (ChangeVetoException e) {
           throw new AssertionFailure(e);
         }
@@ -968,8 +913,8 @@ extends Changeable {
           if(object   != null) object   = o.importTerm(object,   null);
           if(predicate != null) predicate = o.importTerm(predicate, null);
           triples.addAll(o.getTriples(subject,
-                                     object,
-                                     predicate));
+                                      object,
+                                      predicate));
         } catch (ChangeVetoException e) {
           throw new AssertionFailure(e);
         }
@@ -982,9 +927,9 @@ extends Changeable {
     {
       if(term instanceof Triple) {
         Triple trip = (Triple) term;
-        Term sub = resolveRemote(trip.getSubject());
-        Term obj = resolveRemote(trip.getObject());
-        Term rel = resolveRemote(trip.getPredicate());
+        Term sub = ReasoningTools.resolveRemote(trip.getSubject());
+        Term obj = ReasoningTools.resolveRemote(trip.getObject());
+        Term rel = ReasoningTools.resolveRemote(trip.getPredicate());
 
         if(sub == var) {
           //System.out.println("Variable used as subject: " + var + " " + trip);
@@ -1040,8 +985,6 @@ extends Changeable {
       }
     }
 
-    private static int depth = 0;
-
     /**
      * An Iterator that implements the state-machine that matches a given
      * predicate against all the things proveable by the ontology.
@@ -1049,309 +992,525 @@ extends Changeable {
      * @author Matthew Pocock
      */
     final class MatchIterator
-            implements Iterator {
-      private final Set constExps;
-      private final Set varExps;
-      private final Set extraVals;
-      private Iterator constI;
-      private Iterator varI;
-      private final Iterator propI;
-      private final Triple proposition;
+            implements Iterator
+ {
+      private final Interpreter interpreter;
+      private final Action EACH_AXIOM;
+      private final Action EVALUATE_AXIOM;
+      private final Action EVALUATE_IF_TRUE;
+      private final Action EVALUATE;
+      private final Action CHECK_IMPLICATION;
+      private final Action SUBSTITUTE;
+      private final Action EXPAND_VARIABLES;
+      private final Action ON_SOLUTION;
+      private final Action CHECK_TRUE_FALSE;
 
-      private Triple nextProposition;
-      private Triple nextResult;
+      private Term result;
 
-      public MatchIterator(Triple proposition, Set constExps, Set varExps, Set extraVals)
       {
-        depth++;
-        this.proposition = proposition;
-        this.constExps = constExps;
-        this.varExps = varExps;
-        this.extraVals = extraVals;
 
-        this.constI = constExps.iterator();
-        this.varI = new ExpressionIterator(extraVals, varExps);
-
-        if(findFirstVariable(proposition) != null) {
-          propI = new ExpressionIterator(extraVals, Collections.singleton(proposition));
-        } else {
-          propI = Collections.singleton(proposition).iterator();
-        }
-        nextProposition = (Triple) propI.next();
-
-        //System.out.println("matchIterator: Matcher for: " + proposition);
-        //System.out.println("matchIterator: Propositioning: " + nextProposition);
-
-        nextResult = findNextMatch();
-        //System.out.println("Created: " + this + ": " + depth);
-        if(depth > 400) throw new Error("Depth exceeded: " + depth);
+        EACH_AXIOM = new EachAxiom(getAxioms().iterator());
+        EVALUATE = new Evaluate();
+        EVALUATE_IF_TRUE = new LogicalActions.ConditionalAction(
+                EVALUATE,
+                LogicalActions.NULL_OP);
+        EVALUATE_AXIOM = new EvaluateAxiom();
+        CHECK_IMPLICATION = new CheckImplication();
+        SUBSTITUTE = new Substitute();
+        EXPAND_VARIABLES = new ExpandVariables();
+        ON_SOLUTION = new Action() {
+          public void evaluate(Interpreter interpreter)
+          {
+            Frame frame = interpreter.popFrame();
+            result = frame.getAxiom();
+          }
+        };
+        CHECK_TRUE_FALSE = new CheckTrueFalse(ON_SOLUTION, LogicalActions.NULL_OP);
       }
 
-      public Object next() {
-        Triple res = nextResult;
-        nextResult = findNextMatch();
+      MatchIterator(Term proposition) {
+        Set debugOn = new HashSet();
+        //debugOn.add(SUBSTITUTE);
+        //debugOn.add(CHECK_TRUE_FALSE);
+        //debugOn.add(ValueIterator.class);
+        debugOn.add(ON_SOLUTION);
+        //debugOn.add(LogicalActions.EqualsValue.class);
+        debugOn.add(StackActions.BindValue.class);
+        //debugOn.add(EvaluateFully.class);
+        Interpreter.Debug interp = new Interpreter.Debug();
+        interp.setDebugOn(debugOn);
+        interp.setMaxDepth(20);
+        interp.setStacksToKeep(5);
+        interp.setMaxTries(100000);
+
+        interpreter = interp;
+        interpreter.pushFrame(new Frame(EACH_AXIOM, null, proposition));
+        result = null;
+        findNext();
+      }
+
+      public boolean hasNext()
+      {
+        return result != null;
+      }
+
+      public Object next()
+      {
+        if(result == null) {
+          throw new NoSuchElementException();
+        }
+
+        Term res = result;
+        findNext();
+
         return res;
       }
 
-      public boolean hasNext() {
-        return nextResult != null;
-      }
-
-      public void remove() {
+      public void remove()
+      {
         throw new UnsupportedOperationException();
       }
 
-      public String toString() {
-        return "MatchIterator for: " + proposition;
+      void findNext() {
+        result = null;
+        while(interpreter.canAdvance() && result == null) {
+          interpreter.advance();
+        }
       }
 
-      Triple findNextMatch() {
-        //System.out.println("findNextMatch in " + this.toString());
-        while(true) {
-          Triple next;
-          if(constI.hasNext()) {
-            next = (Triple) constI.next();
-          } else if(varI.hasNext()) {
-            next = (Triple) varI.next();
-          } else if(propI.hasNext()) {
-            nextProposition = (Triple) propI.next();
-            constI = constExps.iterator();
-            varI = varI = new ExpressionIterator(extraVals, varExps);
-            //System.out.println("findNextMatch: Propositioning: " + nextProposition);
-            continue;
+      private class EachAxiom
+              implements Action
+ {
+        Iterator axI;
+
+        EachAxiom(Iterator axI)
+        {
+          this.axI = axI;
+        }
+
+        public void evaluate(Interpreter interpreter)
+        {
+          if(axI.hasNext()) {
+            Triple axiom = (Triple) axI.next();
+
+            // got a new axiom to process - push it on to the stack
+            Frame frame = interpreter.getFrame();
+            interpreter.pushFrame(frame = frame
+                                          .changeAction(EVALUATE_AXIOM)
+                                          .changeAxiom(axiom));
           } else {
-            //System.out.println("findNextMatch: Found no matches");
-            depth--;
-            return null;
+            // no more axioms - pop me
+            interpreter.popFrame();
           }
+        }
 
-          //if(tries % 10000 == 0) //System.out.println("Iteration: " + tries + "\n\t" + next);
-
-          //System.out.println("findNextMatch: Proposition: " + nextProposition);
-          //System.out.println("findNextMatch: Evaluating: " + next);
-
-          Term ifTrue = substitute(next, nextProposition, OntoTools.TRUE);
-          if(evaluateExpression(ifTrue) == false) continue;
-
-          Term ifFalse = substitute(next, nextProposition, OntoTools.FALSE);
-          if(evaluateExpression(ifFalse) == true) continue;
-
-          //System.out.println("findNextMatch: Accepted: " + next);
-
-          return next;
+        public String toString()
+        {
+          return "EACH_AXIOM";
         }
       }
-    }
 
-    final class ExpressionIterator
-    implements Iterator {
-      private final Iterator axI;
-      private final Stack stack;
-      private final Set propTerms;
-
-      private Triple nextExpr;
-
-      ExpressionIterator(Set propTerms, Set toExpand) {
-        this.axI = toExpand.iterator();
-        this.stack = new Stack();
-        this.propTerms = propTerms;
-
-        nextExpr = findNext();
-      }
-
-      public boolean hasNext()
+      private class EvaluateAxiom
+              implements Action
       {
-        return nextExpr != null;
+        public void evaluate(Interpreter interpreter)
+        {
+          Frame frame = interpreter.popFrame();
+          interpreter.pushFrame(frame.changeAction(EVALUATE_IF_TRUE));
+          interpreter.pushFrame(frame.changeAction(CHECK_IMPLICATION));
+        }
+
+        public String toString()
+        {
+          return "EVALUATE_AXIOM";
+        }
       }
 
-      public Object next()
-      {
-        Triple val = nextExpr;
-        nextExpr = findNext();
-        return val;
+      private class Evaluate implements Action {
+        public void evaluate(Interpreter interpreter)
+        {
+          Frame frame = interpreter.popFrame();
+
+          interpreter.pushFrame(frame.changeAction(EXPAND_VARIABLES));
+          interpreter.pushFrame(frame.changeAction(SUBSTITUTE));
+        }
+
+        public String toString()
+        {
+          return "EVALUATE";
+        }
       }
 
-      public void remove()
-      {
-        throw new UnsupportedOperationException();
-      }
+      private class CheckImplication implements Action {
+        final Action EA_Object;
+        final Action EA_Subject;
+        final Action EA_S_or_O;
+        final Action EA_S_and_O;
+        final Action IMPL;
 
-      Triple findNext() {
-        //System.out.println("findNext: Finding next term to evaluate");
+        {
+          EA_Object = new StackActions.Macro(Arrays.asList(new Action[]{
+            EVALUATE_AXIOM,
+            StackActions.AXIOM_OBJECT}));
+          EA_Subject = new StackActions.Macro(Arrays.asList(new Action[]{
+            EVALUATE_AXIOM,
+            StackActions.AXIOM_SUBJECT}));
+          EA_S_or_O = new StackActions.Macro(Arrays.asList(new Action[]{
+            new LogicalActions.Or(EA_Subject, EA_Object, false)}));
+          EA_S_and_O = new StackActions.Macro(Arrays.asList(new Action[]{
+            new LogicalActions.And(EA_Subject, EA_Object, false)}));
+          IMPL = new StackActions.Macro(Arrays.asList(new Action[]{
+            new LazyRef() { protected Action getDelegate() { return CHECK_IMPLICATION; } },
+            StackActions.AXIOM_OBJECT }));
+        }
 
-        if(stack.size() == 0) {
-          //System.out.println("findNext: Nothing left in subs");
-          while(true) {
-            if(!axI.hasNext()) {
-              //System.out.println("findNext: No more axioms");
-              return null;
+        public void evaluate(Interpreter interpreter)
+        {
+          //
+          // check for
+          // - axiom = prop
+          // - axiom -> prop
+          // - axiom = x & y, x -> prop or y -> prop
+          // - axiom = x || y, x -> prop and y -> prop
+          //
+          // push in reverse order so they get popped in the correct one
+
+          Frame frame = interpreter.popFrame();
+          Term axiom = ReasoningTools.resolveRemote(frame.getAxiom());
+
+          if(!(axiom instanceof Triple)) {
+            // if we've walked to a non-triple, things are bad
+            throw new IllegalStateException("Term must be a triple: " + axiom);
+          }
+
+          Triple trip = (Triple) axiom;
+          Term predicate = ReasoningTools.resolveRemote(trip.getPredicate());
+          Action toPush = null;
+
+          // (x & y) -> prop, x -> prop or y -> prop
+          if(predicate == OntoTools.AND) {
+            Term tripO = ReasoningTools.resolveRemote(trip.getObject());
+            Term tripS = ReasoningTools.resolveRemote(trip.getSubject());
+
+            boolean tto = tripO instanceof Triple;
+            boolean tts = tripS instanceof Triple;
+
+            if(tto && tts) {
+              toPush = EA_S_or_O;
             }
 
-            Triple expr = (Triple) axI.next();
-            //System.out.println("findNext: Testing next axiom: " + expr);
-            Variable var = findFirstVariable(expr);
-
-            //System.out.println("findNext: First variable is: " + var);
-
-            Set vals = findValues(expr, var);
-            //if(var.getName().equals("_x:76")) System.out.println("Values for " + var + " = " + vals);
-            vals.addAll(propTerms);
-            for(Iterator i = vals.iterator(); i.hasNext(); ) {
-              Term t = resolveRemote((Term) i.next());
-              if(t instanceof Variable) i.remove();
-              if(t instanceof Triple) i.remove();
-            }
-            //System.out.println("Possible values: " + var + " " + vals);
-
-            // got one
-            OptionSearcher subs = new OptionSearcher(expr, var, vals.iterator());
-            //System.out.println("findNext: Created new option searcher: " + subs);
-            stack.push(subs);
-            //System.out.println("findNext: Pushing a new frame: " + stack);
-            break;
-          }
-        }
-
-        OptionSearcher subs = (OptionSearcher) stack.peek();
-
-        while(true) {
-          if(!subs.hasNext()) {
-            stack.pop();
-            //System.out.println("findNext: Run out of options: " + stack);
-            if(stack.isEmpty()) {
-              //System.out.println("findNext: Empty stack - out of options");
-              return findNext();
+            if(tripO instanceof Triple) {
+              toPush = EA_Object;
             }
 
-            subs = (OptionSearcher) stack.peek();
-            continue;
+            if(tripS instanceof Triple) {
+              toPush = EA_Subject;
+            }
           }
 
-          Triple expr = (Triple) subs.next();
+          // (x || y) -> prop, x -> prop and y -> prop
+          if(predicate == OntoTools.OR) {
+            Term tripO = ReasoningTools.resolveRemote(trip.getObject());
+            Term tripS = ReasoningTools.resolveRemote(trip.getSubject());
 
-          //System.out.println("findNext: expanding expression: " + expr);
-          Variable var = findFirstVariable(expr);
-          //System.out.println("findNext: First variable: " + var);
-          if(var == null) return wrap(expr, stack);        // this contains no variables
+            boolean tto = tripO instanceof Triple;
+            boolean tts = tripS instanceof Triple;
 
-          Set vals = findValues(expr, var);
-          //if(var.getName().equals("_x:76")) System.out.println("Values for " + var + " = " + vals);
-          vals.addAll(propTerms);
-          for(Iterator i = vals.iterator(); i.hasNext();) {
-            Term t = resolveRemote((Term) i.next());
-            if(t instanceof Variable) i.remove();
-            if(t instanceof Triple) i.remove();
+            if(tto && tts) {
+              toPush = EA_S_and_O;
+            }
+
+            if(tripO instanceof Triple) {
+              toPush = EA_Object;
+            }
+
+            if(tripS instanceof Triple) {
+              toPush = EA_Subject;
+            }
           }
-          //System.out.println("Possible values: " + var + " " + vals);
 
-          subs = new OptionSearcher(expr, var, vals.iterator());
-          //System.out.println("findNext: Creating new option searcher: " + subs + " " + vals);
-          stack.push(subs);
-          //System.out.println("findNext: Pushing a new frame: " + stack);
-          if(stack.size() > 10) throw new Error("Stack too deep: " + stack);
+          // axiom -> prop
+          if(predicate == OntoTools.IMPLIES) {
+            toPush = IMPL;
+          }
+
+          // axiom = prop
+          if(toPush == null) {
+            interpreter.pushFrame(frame.changeAction(EqualActions.EQUIVALENT));
+          } else {
+            interpreter.pushFrame(frame.changeAction(
+                    new LogicalActions.Or(EqualActions.EQUIVALENT,
+                                          toPush,
+                                          false)));
+          }
+        }
+
+        public String toString()
+        {
+          return "CHECK_IMPLICATION";
         }
       }
 
-      private Triple wrap(Triple expr, Stack stack) {
-        StringBuffer name = new StringBuffer(((OptionSearcher) stack.get(0)).getExpr().getName());
+      public class Substitute implements Action {
+        public void evaluate(Interpreter interpreter)
+        {
+          Frame frame = interpreter.popFrame();
+          SymbolTable symTab = frame.getSymbolTable();
+          Term axiom = frame.getAxiom();
+          Term prop = frame.getProp();
 
-        name.append("[");
-        for(Iterator i = stack.iterator(); i.hasNext(); ) {
-          OptionSearcher os = (OptionSearcher) i.next();
-          name.append(os.getVar());
-          name.append(" <- ");
-          name.append(os.getNewVal());
-          if(i.hasNext()) {
-            name.append(", ");
+          for(Iterator i = symTab.variables().iterator(); i.hasNext(); ) {
+            Variable var = (Variable) i.next();
+            Term val = symTab.getValue(var);
+
+            axiom = ReasoningTools.substitute(axiom,
+                                              var,
+                                              val,
+                                              ReasoningDomain.Impl.this);
+            prop = ReasoningTools.substitute(prop,
+                                             var,
+                                             val,
+                                             ReasoningDomain.Impl.this);
+          }
+
+          Frame parent = interpreter.popFrame();
+          interpreter.pushFrame(parent
+                                .changeAxiom(axiom)
+                                .changeProp(prop)
+                                .changeSymbolTable(SymbolTable.EMPTY));
+        }
+
+        public String toString()
+        {
+          return "SUBSTITUTE";
+        }
+      }
+
+      private class ExpandVariables
+              implements Action {
+        public void evaluate(Interpreter interpreter)
+        {
+          Frame frame = interpreter.popFrame();
+          Term axiom = frame.getAxiom();
+          Term prop = frame.getProp();
+
+          Variable var = findFirstVariable(axiom);
+          if(var == null) {
+            var = findFirstVariable(prop);
+          }
+
+          if(var == null) {
+            interpreter.pushFrame(frame.changeAction(CHECK_TRUE_FALSE));
+          } else {
+            //Set vals = findValues(axiom, var);
+            //vals.addAll(findValues(prop, var));
+
+            interpreter.pushFrame(frame.changeAction(
+                    new ValueIterator(var, getTerms().iterator())));
           }
         }
-        name.append("]");
 
-        return createVirtualTerm(expr.getSubject(),
-                                 expr.getObject(),
-                                 expr.getPredicate(),
-                                 name.toString(),
-                                 null);
-      }
-    }
-
-    final class OptionSearcher
-            implements Iterator
-    {
-      private final Term expr;
-      private final Term var;
-      private final Iterator vals;
-      private Term newVal;
-
-      public OptionSearcher() {
-        expr = null;
-        var = null;
-        vals = Collections.EMPTY_SET.iterator();
+        public String toString()
+        {
+          return "EXPAND_VARIABLES";
+        }
       }
 
-      public OptionSearcher(Term expr, Term var, Iterator vals) {
-        this.expr = expr;
-        this.var = var;
-        this.vals = vals;
+      public class ValueIterator
+              implements Action {
+        private final Variable var;
+        private final Iterator vals;
+
+        ValueIterator(Variable var, Iterator vals) {
+          this.var = var;
+          this.vals = vals;
+        }
+
+        public void evaluate(Interpreter interpreter)
+        {
+          while(vals.hasNext()) {
+            Term val = (Term) vals.next();
+            if(val instanceof Variable || val instanceof Triple || val instanceof RemoteTerm) {
+              continue;
+            }
+
+            Frame frame = interpreter.getFrame();
+            interpreter.pushFrame(frame.changeAction(EXPAND_VARIABLES));
+            interpreter.pushFrame(frame.changeAction(SUBSTITUTE));
+            interpreter.pushFrame(frame.changeAction(
+                    new StackActions.BindValue(var, val)));
+            return;
+          }
+
+          interpreter.popFrame();
+        }
+
+        public String toString()
+        {
+          return "VALUE_ITERATOR(" + var + ")";
+        }
       }
 
-      public Term getExpr() {
-        return expr;
+      public class CheckTrueFalse
+              implements Action {
+        private final Action onSuccess;
+        private final Action onFailure;
+
+        private final Action SUBSTITUTE_PROP_TRUE;
+        private final Action SUBSTITUTE_PROP_FALSE;
+        private final Action TRUE_EVAL;
+        private final Action FALSE_EVAL;
+        private final Action AND_EVAL;
+        private final Action EVALUATE_FULLY;
+        private final Action CONDITIONAL;
+
+        CheckTrueFalse(Action onSuccess, Action onFailure) {
+          this.onSuccess = onSuccess;
+          this.onFailure = onFailure;
+
+          SUBSTITUTE_PROP_TRUE = new SubstituteProposition(OntoTools.TRUE);
+          SUBSTITUTE_PROP_FALSE = new SubstituteProposition(OntoTools.FALSE);
+
+          EVALUATE_FULLY = new EvaluateFully();
+
+          TRUE_EVAL = new StackActions.Macro(Arrays.asList(new Action[] {
+            LogicalActions.TRUE_VALUE,
+            EVALUATE_FULLY,
+            SUBSTITUTE_PROP_TRUE
+          }));
+
+          FALSE_EVAL = new StackActions.Macro(Arrays.asList(new Action[]{
+            LogicalActions.FALSE_VALUE,
+            EVALUATE_FULLY,
+            SUBSTITUTE_PROP_FALSE
+          }));
+
+          AND_EVAL = new LogicalActions.And(TRUE_EVAL, FALSE_EVAL, false);
+          CONDITIONAL = new LogicalActions.ConditionalAction(onSuccess, onFailure);
+        }
+
+        public void evaluate(Interpreter interpreter)
+        {
+          // we will do this:
+          //
+          // if( and( (prop -> true, evaluate, is True),
+          //          (prop -> false, evaluate, isFalse) ) )
+          //    onSuccess
+          // else
+          //    onFailure
+
+          Frame frame = interpreter.popFrame();
+          interpreter.pushFrame(frame.changeAction(CONDITIONAL));
+          interpreter.pushFrame(frame.changeAction(AND_EVAL));
+        }
+
+        public String toString()
+        {
+          return "CHECK_TRUE_FALSE(" + onSuccess + ", " + onFailure + ")";
+        }
       }
 
-      public Term getVar() {
-        return var;
+      class SubstituteProposition implements Action {
+        Term val;
+
+        SubstituteProposition(Term val) {
+          this.val = val;
+        }
+
+        public void evaluate(Interpreter interpreter)
+        {
+          Frame frame = interpreter.popFrame();
+          Frame parent = interpreter.popFrame();
+
+          Term axiom = frame.getAxiom();
+          Term prop = frame.getProp();
+
+          axiom = ReasoningTools.substitute(axiom,
+                                            prop,
+                                            val,
+                                            ReasoningDomain.Impl.this);
+          interpreter.pushFrame(parent
+                                .changeAxiom(axiom)
+                                .changeProp(val));
+        }
+
+        public String toString()
+        {
+          return "SUBSTITUTE_PROPOSITION";
+        }
       }
 
-      public Term getNewVal() {
-        return newVal;
-      }
+      class EvaluateFully implements Action {
+        private Action EF_SUB;
+        private Action EF_OBJ;
+        private Action EF_EVAL;
 
-      public boolean hasNext()
-      {
-        return vals.hasNext();
-      }
+        private Action RECURSIVE_EVAL = new LazyRef() {
+          protected Action getDelegate()
+          {
+            return LogicalActions.NULL_OP;
+          }
+        };
 
-      public Object next()
-      {
-        newVal = (Term) vals.next();
-        //System.out.println("OptionSearcher.newVal(): Binding " + getVar() + " to " + newVal);
-        return substitute(expr, var, newVal);
-      }
+        {
+          EF_SUB = new StackActions.Macro(Arrays.asList(new Action[] {
+            new StackActions.AxiomSubjectReplace(ReasoningDomain.Impl.this),
+            this,
+            StackActions.AXIOM_SUBJECT,
+          }));
 
-      public void remove()
-      {
-        throw new UnsupportedOperationException();
+          EF_OBJ = new StackActions.Macro(Arrays.asList(new Action[]{
+            new StackActions.AxiomObjectReplace(ReasoningDomain.Impl.this),
+            this,
+            StackActions.AXIOM_OBJECT,
+          }));
+
+          EF_EVAL = new StackActions.Macro(Arrays.asList(new Action[]{
+            RECURSIVE_EVAL,
+            EF_OBJ,
+            EF_SUB
+          }));
+        }
+
+        public void evaluate(Interpreter interpreter)
+        {
+          // Atom -> Atom
+          //
+          // Triple ->
+          //  t'.subject = EF:Triple.subject
+          //  t'.object = EF:Triple.object
+          //  discover if (t') is supported by this ontology (recursive call)
+
+          Frame frame = interpreter.popFrame();
+          Term axiom = frame.getAxiom();
+
+          if(axiom instanceof Triple) {
+            interpreter.pushFrame(frame.changeAction(EF_EVAL));
+          } else {
+            Frame parent = interpreter.popFrame();
+            interpreter.pushFrame(parent.changeResult(axiom));
+          }
+        }
       }
 
       public String toString()
       {
-        return "@" + hashCode() + " " + getVar();
+        return "EVALUATE_FULLY";
       }
     }
-  }
 
-  static class Expression {
-    private final Term term;
-    private final Term value;
-    private final Term reason;
+    private abstract class LazyRef implements Action {
+      protected abstract Action getDelegate();
 
-    public Expression(Term term, Term value, Term reason) {
-      this.term = term;
-      this.value = value;
-      this.reason = reason;
-    }
+      public void evaluate(Interpreter interpreter)
+      {
+        getDelegate().evaluate(interpreter);
+      }
 
-    public Term getTerm() {
-      return term;
-    }
-
-    public Term getValue() {
-      return value;
-    }
-
-    public Term getReason() {
-      return reason;
+      public String toString()
+      {
+        return getDelegate().toString();
+      }
     }
   }
 }
