@@ -42,8 +42,8 @@ import org.biojava.bio.dp.*;
  * @since 1.1
  */ 
 public class DPCompiler implements CellCalculatorFactoryMaker {
-  private final boolean debug = false;
-  //private final boolean debug = true;
+  //private final boolean debug = false;
+  private final boolean debug = true;
   
   private final boolean dumpToDisk;
   
@@ -137,7 +137,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
           name,
           _Object,
           new CodeClass[] {_CellCalculator},
-          CodeUtils.ACC_PUBLIC
+          CodeUtils.ACC_PUBLIC | CodeUtils.ACC_STRICT
         );
       
         State[] states = dp.getStates();
@@ -272,7 +272,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
       MarkovModel model = dp.getModel();
 
       String name = makeName("org.biojava.bio.dp.twohead.Backward", model);
-      if(!classLoader.hasGeneratedClass(name)) {    
+      if(!classLoader.hasGeneratedClass(name)) {
         CodeClass _Object = IntrospectedCodeClass.forClass(Object.class);
         CodeClass _DP = IntrospectedCodeClass.forClass(DP.class);
         CodeClass _ScoreType = IntrospectedCodeClass.forClass(ScoreType.class);
@@ -284,7 +284,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
           name,
           _Object,
           new CodeClass[] {_CellCalculator},
-          CodeUtils.ACC_PUBLIC
+          CodeUtils.ACC_PUBLIC | CodeUtils.ACC_STRICT
         );
       
         State[] states = dp.getStates();
@@ -427,7 +427,7 @@ public class DPCompiler implements CellCalculatorFactoryMaker {
         name,
         _Object,
         new CodeClass[] {_CellCalculator},
-        CodeUtils.ACC_PUBLIC
+        CodeUtils.ACC_PUBLIC | CodeUtils.ACC_STRICT
       );
       
       State[] states = dp.getStates();
