@@ -1,4 +1,4 @@
-package ssearch;
+package ssbind;
 
 import org.biojava.bio.search.*;
 
@@ -11,6 +11,7 @@ import org.biojava.bio.search.*;
  * </pre>
  *
  * @author Matthew Pocock
+ * @author Rahul Karnik
  */
 public class CountHits
 extends SearchContentAdapter {
