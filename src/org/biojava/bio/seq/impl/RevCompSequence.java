@@ -42,7 +42,7 @@ import org.biojava.bio.seq.projection.*;
  * @author Thomas Down
  */
 public class RevCompSequence
-        extends SimpleSequence
+    extends SimpleSequence
 {
     private ProjectedFeatureHolder pfh;
     protected Sequence origSeq;
@@ -53,14 +53,16 @@ public class RevCompSequence
     *  the other contructor that sets these.
     */
     
-    public RevCompSequence(Sequence seq)throws IllegalAlphabetException{
+    public RevCompSequence(Sequence seq)
+        throws IllegalAlphabetException
+    {
         this(seq,seq.getURN(),seq.getName(),seq.getAnnotation());
     }
     
     
     public RevCompSequence(Sequence seq, String urn, String name, Annotation annotation)throws IllegalAlphabetException {
         super(DNATools.reverseComplement(seq),urn,name,annotation);
-        pfh = new ProjectedFeatureHolder(new TranslateFlipContext(seq,this,seq.length()+1,true));
+        pfh = new ProjectedFeatureHolder(new TranslateFlipContext(this,seq,seq.length()+1,true));
         origSeq = seq;
     }
     
@@ -87,8 +89,17 @@ public class RevCompSequence
     public Iterator features(){
         return pfh.features();
     }
+    
     public int countFeatures(){
         return pfh.countFeatures();
+    }
+    
+    public FeatureHolder filter(FeatureFilter ff) {
+        return pfh.filter(ff);
+    }
+    
+    public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+        return pfh.filter(ff, recurse);
     }
     
     /**
