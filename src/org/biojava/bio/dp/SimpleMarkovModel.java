@@ -241,6 +241,23 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
       }
     }
 
+    if(changeSupport == null) {
+      doAddState(toAdd);
+    } else {
+      synchronized(changeSupport) {
+        ChangeEvent ce = new ChangeEvent(
+          this, MarkovModel.ARCHITECTURE,
+          toAdd,
+          null
+        );
+        changeSupport.firePreChangeEvent(ce);
+        doAddState(toAdd);
+        changeSupport.firePostChangeEvent(ce);
+      }
+    }
+  }
+  
+  private void doAddState(State toAdd) throws IllegalSymbolException {
     ((SimpleAlphabet) stateAlphabet()).addSymbol(toAdd);
     FiniteAlphabet fa = new SimpleAlphabet("Transitions from " + toAdd.getName());
     transFrom.put(toAdd, fa);
@@ -256,7 +273,7 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
   }
   
   public void removeState(State toGo)
-  throws IllegalSymbolException, IllegalTransitionException {
+  throws IllegalSymbolException, IllegalTransitionException, ChangeVetoException {
     stateAlphabet().validate(toGo);
     if(toGo instanceof MagicalState) {
       throw new IllegalSymbolException("You can not remove the MagicalState");
@@ -278,6 +295,23 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
       );
     }
 
+    if(changeSupport == null) {
+      doRemoveState(toGo);
+    } else {
+      synchronized(changeSupport) {
+        ChangeEvent ce = new ChangeEvent(
+          this, MarkovModel.ARCHITECTURE,
+          null,
+          toGo
+        );
+        changeSupport.firePreChangeEvent(ce);
+        doRemoveState(toGo);
+        changeSupport.firePostChangeEvent(ce);
+      }
+    }
+  }
+  
+  private void doRemoveState(State toGo) throws IllegalSymbolException {
     ((SimpleAlphabet) stateAlphabet()).removeSymbol(toGo);
     transFrom.remove(toGo);
     transTo.remove(toGo);
