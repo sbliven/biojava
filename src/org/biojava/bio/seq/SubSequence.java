@@ -40,10 +40,11 @@ public class SubSequence implements Sequence {
 
     public SubSequence(Sequence seq, int start, int end) {
 	symbols = seq.subList(start, end);
-	FeatureHolder overlappingFeatures = seq.filter(new FeatureFilter.OverlapsLocation(new RangeLocation(start, end)), false);
-	features = new ProjectedFeatureHolder(overlappingFeatures,
+	FeatureFilter overlapping = new FeatureFilter.OverlapsLocation(new RangeLocation(start, end));
+	features = new ProjectedFeatureHolder(seq,
+					      overlapping,
 					      this,
-					      start - 1,
+					      1 - start,
 					      false);
 
 	name = seq.getName() + " (" + start + " - " + end + ")";
@@ -145,8 +146,60 @@ public class SubSequence implements Sequence {
     // Changeable
     //
 
-    public void addChangeListener(ChangeListener cl) {}
-    public void addChangeListener(ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(ChangeListener cl) {}
-    public void removeChangeListener(ChangeListener cl, ChangeType ct) {}   
+    protected transient ChangeSupport changeSupport;
+    private transient ChangeListener forwarder;
+
+    protected void allocChangeSupport() {
+	forwarder = new ChangeListener() {
+		public void preChange(ChangeEvent ev)
+		    throws ChangeVetoException
+		{
+		    if (changeSupport != null) {
+			changeSupport.firePreChangeEvent(new ChangeEvent(this,
+									 ev.getType(),
+									 ev.getChange(),
+									 ev.getPrevious(),
+									 ev));
+		    }
+		}
+		
+		public void postChange(ChangeEvent ev) {
+		    if (changeSupport != null) {
+			changeSupport.firePostChangeEvent(new ChangeEvent(this,
+									  ev.getType(),
+									  ev.getChange(),
+									  ev.getPrevious(),
+									  ev));
+		    }
+		}
+	    } ;
+	symbols.addChangeListener(forwarder);
+	features.addChangeListener(forwarder);
+    }
+
+    public void addChangeListener(ChangeListener cl) {
+	if (changeSupport == null)
+	    allocChangeSupport();
+	changeSupport.addChangeListener(cl);
+    }
+
+    public void addChangeListener(ChangeListener cl, ChangeType ct) {
+	if (changeSupport == null)
+	    allocChangeSupport();
+	changeSupport.addChangeListener(cl, ct);
+    }
+
+    public void removeChangeListener(ChangeListener cl) {
+	if (changeSupport != null) {
+	    changeSupport.removeChangeListener(cl);
+	}
+    }
+
+
+    public void removeChangeListener(ChangeListener cl, ChangeType ct) {
+	if (changeSupport != null) {
+	    changeSupport.removeChangeListener(cl, ct);
+	}
+    }
+    
 }

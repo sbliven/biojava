@@ -58,6 +58,8 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
     private FeatureHolder projectedFeatures;
     private boolean oppositeStrand;
 
+    private FeatureFilter filter;
+
     private ChangeListener underlyingFeaturesChange;
 
     /**
@@ -67,6 +69,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
      * are simply reparented without any transformation.
      *
      * @param fh The set of features to project.
+     * @param filter A FeatureFilter to apply to the set of features before projection.
      * @param parent The FeatureHolder which is to act as parent
      *               for the projected features.
      * @param translation The translation to apply to map locations into
@@ -78,7 +81,8 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
      *                       the <code>strand</code> property of StrandedFeatures.
      */
 
-    public ProjectedFeatureHolder(FeatureHolder fh, 
+    public ProjectedFeatureHolder(FeatureHolder fh,
+				  FeatureFilter filter,
 				  FeatureHolder parent, 
 				  int translation,
 				  boolean oppositeStrand) 
@@ -87,6 +91,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 	this.parent = parent;
 	this.translate = translation;
 	this.oppositeStrand = oppositeStrand;
+	this.filter = filter;
 
 	underlyingFeaturesChange = new ChangeListener() {
 	    public void preChange(ChangeEvent e)
@@ -118,10 +123,41 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 	wrapped.addChangeListener(underlyingFeaturesChange, FeatureHolder.FEATURES);
     }
 
+        /**
+     * Construct a new FeatureHolder which projects a set of features
+     * into a new coordinate system.  If <code>translation</code> is 0
+     * and <code>oppositeStrand</code> is <code>false</code>, the features
+     * are simply reparented without any transformation.
+     *
+     * @param fh The set of features to project.
+     * @param parent The FeatureHolder which is to act as parent
+     *               for the projected features.
+     * @param translation The translation to apply to map locations into
+     *                    the projected coordinate system.  This is the point
+     *                    in the destination coordinate system which is equivalent
+     *                    to 0 in the source coordinate system.
+     * @param oppositeStrand <code>true</code> if translating into the opposite coordinate system.
+     *                       This alters the transformation applied to locations, and also flips
+     *                       the <code>strand</code> property of StrandedFeatures.
+     */
+
+    public ProjectedFeatureHolder(FeatureHolder fh,
+				  FeatureHolder parent, 
+				  int translation,
+				  boolean oppositeStrand) 
+    {
+	this(fh, null, parent, translation, oppositeStrand);
+    }
+
     protected FeatureHolder getProjectedFeatures() {
 	if (projectedFeatures == null) {
+	    FeatureHolder toProject = wrapped;
+	    if (filter != null) {
+		toProject = toProject.filter(filter, false);
+	    }
+
 	    SimpleFeatureHolder sfh = new SimpleFeatureHolder();
-	    for (Iterator i = wrapped.features(); i.hasNext(); ) {
+	    for (Iterator i = toProject.features(); i.hasNext(); ) {
 		Feature f = (Feature) i.next();
 		Feature wf = projectFeature(f);
 		try {
@@ -165,7 +201,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
     }
 
     public int countFeatures() {
-	return wrapped.countFeatures();
+	return getProjectedFeatures().countFeatures();
     }
 
     public Iterator features() {
@@ -209,8 +245,6 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder {
 		  new CodeClass[] { faceClassC },
 			CodeUtils.ACC_PUBLIC | CodeUtils.ACC_SUPER
     );
-
-		System.err.println("*** Generating " + pclass.getName());
 
 		List baseInitArgsList = new ArrayList();
 		baseInitArgsList.add(baseClass == ProjectedStrandedFeatureWrapper.class ?
