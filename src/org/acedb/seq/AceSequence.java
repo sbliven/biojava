@@ -29,6 +29,8 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.genomic.*;
+import org.biojava.bio.seq.impl.*;
 
 /**
  * Sequence extracted from an ACeDB database.
@@ -176,7 +178,7 @@ public class AceSequence implements Sequence {
               template.location = new RangeLocation(start.toInt(), end.toInt());
               template.source = "ACeDB";
               template.type = name;
-              Feature f = SimpleFeatureRealizer.DEFAULT.realizeFeature(this, this, template);
+              Feature f = FeatureImpl.DEFAULT.realizeFeature(this, this, template);
               fHolder.addFeature(f);
             }
           }
@@ -209,7 +211,7 @@ public class AceSequence implements Sequence {
               template.source = "ACeDB";
               template.type = name;
               template.annotation = fAnn;
-              Feature f = SimpleFeatureRealizer.DEFAULT.realizeFeature(this, this, template);
+              Feature f = FeatureImpl.DEFAULT.realizeFeature(this, this, template);
               fHolder.addFeature(f);
             }
           }
