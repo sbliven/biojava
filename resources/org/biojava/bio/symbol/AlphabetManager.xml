@@ -514,6 +514,31 @@
         <symbolref name="VAL"/>
       </ambiguityMapping>
 
+      <ambiguityMapping char="X">
+        <symbolref name="ALA"/>
+        <symbolref name="ARG"/>
+        <symbolref name="ASN"/>
+        <symbolref name="ASP"/>
+        <symbolref name="CYS"/>
+        <symbolref name="GLN"/>
+        <symbolref name="GLU"/>
+        <symbolref name="GLY"/>
+        <symbolref name="HIS"/>
+        <symbolref name="ILE"/>
+        <symbolref name="LEU"/>
+        <symbolref name="LYS"/>
+        <symbolref name="MET"/>
+        <symbolref name="PHE"/>
+        <symbolref name="PRO"/>
+        <symbolref name="SER"/>
+        <symbolref name="THR"/>
+        <symbolref name="SEC"/>
+        <symbolref name="TRP"/>
+        <symbolref name="TYR"/>
+        <symbolref name="VAL"/>
+	<symbolref name="TER" />
+      </ambiguityMapping>
+
       <ambiguityMapping char="B">
         <symbolref name="ASP" />
 	<symbolref name="ASN" />
