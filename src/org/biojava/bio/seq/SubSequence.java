@@ -232,7 +232,11 @@ public class SubSequence implements Sequence {
     }
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	return getFeatures().filter(ff, recurse);
+        return getFeatures().filter(ff, recurse);
+    }
+    
+    public FeatureHolder filter(FeatureFilter ff) {
+        return getFeatures().filter(ff);
     }
 
     public boolean containsFeature(Feature f) {

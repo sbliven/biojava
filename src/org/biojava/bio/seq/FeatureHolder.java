@@ -67,12 +67,24 @@ public interface FeatureHolder extends Changeable {
      * Return a new FeatureHolder that contains all of the children of this one
      * that passed the filter fc.
      *
+     * This method is scheduled for deprecation.  Use the 1-arg filter
+     * instead.
+     *
      * @param fc  the FeatureFilter to apply
      * @param recurse true if all features-of-features should be scanned, and a
      *                single flat collection of features returned, or false if
      *                just immediate children should be filtered.
      */
     FeatureHolder filter(FeatureFilter fc, boolean recurse);
+  
+    /**
+     * Query this set of features using a supplied <code>FeatureFilter</code>.
+     *
+     * @param filter the <code>FeatureFilter</code> to apply.
+     * @return all features in this container which match <code>filter</code>.
+     */
+     
+    FeatureHolder filter(FeatureFilter filter);
   
     /**
      * Create a new Feature, and add it to this FeatureHolder.  This
@@ -119,6 +131,10 @@ public interface FeatureHolder extends Changeable {
       }
       
       public FeatureHolder filter(FeatureFilter fc, boolean recurse) {
+        return this;
+      }
+      
+      public FeatureHolder filter(FeatureFilter fc) {
         return this;
       }
       

@@ -216,18 +216,32 @@ class DistComponentFeature
       return getProjectedFeatures().containsFeature(f);
     }
     
-    public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	if (FilterUtils.areDisjoint(ff, new FeatureFilter.ByParent(new FeatureFilter.ByClass(ComponentFeature.class)))) {
-	    return FeatureHolder.EMPTY_FEATURE_HOLDER;
-	} 
+    public FeatureHolder filter(FeatureFilter ff) {
+        if (FilterUtils.areDisjoint(ff, new FeatureFilter.ByParent(new FeatureFilter.ByClass(ComponentFeature.class)))) {
+            return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        } 
 	    
-	Location loc = FilterUtils.extractOverlappingLocation(ff);
-	if (loc != null && !LocationTools.overlaps(loc, getLocation())) {
-	    // They're looking in another direction.  That's good.
-	    return FeatureHolder.EMPTY_FEATURE_HOLDER;
-	}
+        Location loc = FilterUtils.extractOverlappingLocation(ff);
+        if (loc != null && !LocationTools.overlaps(loc, getLocation())) {
+            // They're looking in another direction.  That's good.
+            return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        }
 
-	return getProjectedFeatures().filter(ff, recurse);
+        return getProjectedFeatures().filter(ff);
+    }
+    
+    public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+        if (FilterUtils.areDisjoint(ff, new FeatureFilter.ByParent(new FeatureFilter.ByClass(ComponentFeature.class)))) {
+            return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        } 
+	    
+        Location loc = FilterUtils.extractOverlappingLocation(ff);
+        if (loc != null && !LocationTools.overlaps(loc, getLocation())) {
+            // They're looking in another direction.  That's good.
+            return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        }
+
+        return getProjectedFeatures().filter(ff, recurse);
     }
 
     public Feature createFeature(Feature.Template temp)

@@ -235,8 +235,12 @@ class BioSQLSequence
 	return getFeatures().containsFeature(f);
     }
 
+    public FeatureHolder filter(FeatureFilter ff) {
+        return getFeatures().filter(ff);
+    }
+    
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	return getFeatures().filter(ff, recurse);
+        return getFeatures().filter(ff, recurse);
     }
 
     public Feature createFeature(Feature.Template ft)

@@ -174,10 +174,15 @@ public class SimpleSequence
 	return Collections.EMPTY_LIST.iterator();
     }
 
+    public FeatureHolder filter(FeatureFilter filter) {
+        return getFeatureHolder().filter(filter);
+    }
+    
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	if(featureHolderAllocated())
-	    return getFeatureHolder().filter(ff, recurse);
-	return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        if(featureHolderAllocated()) {
+            return getFeatureHolder().filter(ff, recurse);
+        }
+        return FeatureHolder.EMPTY_FEATURE_HOLDER;
     }
 
     public boolean containsFeature(Feature f) {

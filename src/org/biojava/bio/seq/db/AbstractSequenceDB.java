@@ -34,6 +34,7 @@ import org.biojava.bio.seq.*;
  * method.
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
 public abstract class AbstractSequenceDB
   extends
@@ -53,6 +54,24 @@ public abstract class AbstractSequenceDB
         return getSequence((String) pID.next());
       }
     };
+  }
+  
+  public FeatureHolder filter(FeatureFilter ff) {
+      MergeFeatureHolder results = new MergeFeatureHolder();
+      try {
+          for (SequenceIterator si = sequenceIterator(); si.hasNext(); ) {
+              Sequence seq = si.nextSequence();
+              FeatureHolder fh = seq.filter(ff);
+              if (fh != FeatureHolder.EMPTY_FEATURE_HOLDER) {
+                  results.addFeatureHolder(fh);
+              }
+          }
+      } catch (BioException ex) {
+          throw new BioRuntimeException(ex);
+      } catch (ChangeVetoException cve) {
+          throw new BioError(cve, "Assertion failed: couldn't modify newly created MergeFeatureHolder");
+      }
+      return results;
   }
   
   public void addSequence(Sequence seq)

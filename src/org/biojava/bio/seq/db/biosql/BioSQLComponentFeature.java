@@ -197,6 +197,17 @@ class BioSQLComponentFeature
 	    return getProjectedFeatures().filter(ff, recurse);
 	}
     }
+    
+    public FeatureHolder filter(FeatureFilter ff) {
+        FeatureFilter childFilter = new FeatureFilter.And(new FeatureFilter.ByParent(new FeatureFilter.ByClass(ComponentFeature.class)),
+                                                          new FeatureFilter.Not(new FeatureFilter.IsTopLevel()));
+                                                          
+        if (FilterUtils.areDisjoint(ff, childFilter)) {
+            return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        } else {
+            return getProjectedFeatures().filter(ff);
+        }
+    }
 
     public Iterator features() {
 	return getProjectedFeatures().features();

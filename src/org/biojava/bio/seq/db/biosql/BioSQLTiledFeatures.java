@@ -93,8 +93,12 @@ class BioSQLTiledFeatures implements FeatureHolder, RealizingFeatureHolder
 	return getFeatures().containsFeature(f);
     }
 
+    public FeatureHolder filter(FeatureFilter ff) {
+        return getFeatures().filter(ff);
+    }
+    
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	return getFeatures().filter(ff, recurse);
+        return getFeatures().filter(ff, recurse);
     }
 
     private void _addFeature(Feature f) 
@@ -226,6 +230,10 @@ class BioSQLTiledFeatures implements FeatureHolder, RealizingFeatureHolder
 
 	public boolean containsFeature(Feature f) {
 	    return getTileFeatures().containsFeature(f);
+	}
+    
+    public FeatureHolder filter(FeatureFilter ff) {
+	    return getTileFeatures().filter(ff);
 	}
 
 	public FeatureHolder filter(FeatureFilter ff, boolean recurse) {

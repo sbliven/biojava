@@ -105,6 +105,25 @@ public class DASSequenceDB
 	// Constructor for dummy objects.  Ugh.
     }
 
+    
+  public FeatureHolder filter(FeatureFilter ff) {
+      MergeFeatureHolder results = new MergeFeatureHolder();
+      try {
+          for (SequenceIterator si = sequenceIterator(); si.hasNext(); ) {
+              Sequence seq = si.nextSequence();
+              FeatureHolder fh = seq.filter(ff);
+              if (fh != FeatureHolder.EMPTY_FEATURE_HOLDER) {
+                  results.addFeatureHolder(fh);
+              }
+          }
+      } catch (BioException ex) {
+          throw new BioRuntimeException(ex);
+      } catch (ChangeVetoException cve) {
+          throw new BioError(cve, "Assertion failed: couldn't modify newly created MergeFeatureHolder");
+      }
+      return results;
+  }
+    
     public DASSequenceDB(URL dataSourceURL) 
 	throws BioException 
     {
@@ -299,4 +318,3 @@ public class DASSequenceDB
 	}
     }
 }
-

@@ -312,6 +312,11 @@ class RagbagCachedSequence implements RagbagSequenceItf
     Sequence tempSeq = instantiateSequence();
     return tempSeq.filter(ff, recurse);
   }
+  public FeatureHolder filter(FeatureFilter ff) 
+  {
+    Sequence tempSeq = instantiateSequence();
+    return tempSeq.filter(ff);
+  }
   public void removeFeature(Feature f) 
     throws ChangeVetoException 
   {

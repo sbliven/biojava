@@ -169,7 +169,11 @@ public class SimpleAssembly
     }
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	return features.filter(ff, recurse);
+	    return features.filter(ff, recurse);
+    }
+    
+    public FeatureHolder filter(FeatureFilter ff) {
+	    return features.filter(ff);
     }
     
     public boolean containsFeature(Feature f) {

@@ -80,8 +80,12 @@ public abstract class LazyFeatureHolder
 	return getFeatureHolder().countFeatures();
     }
 
+    public FeatureHolder filter(FeatureFilter ff) {
+        return getFeatureHolder().filter(ff);
+    }
+    
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	return getFeatureHolder().filter(ff, recurse);
+        return getFeatureHolder().filter(ff, recurse);
     }
 
     public Feature createFeature(Feature.Template template) 

@@ -199,9 +199,13 @@ public class ViewSequence
     }
 
     public FeatureHolder filter(FeatureFilter fc, boolean recurse) {
-	return exposedFeatures.filter(fc, recurse);
+        return exposedFeatures.filter(fc, recurse);
     }
 
+    public FeatureHolder filter(FeatureFilter fc) {
+        return exposedFeatures.filter(fc);
+    }
+    
     //
     // MutableFeatureHolder methods -- delegate to addedFeatures
     //

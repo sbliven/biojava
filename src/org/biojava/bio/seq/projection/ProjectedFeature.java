@@ -191,15 +191,23 @@ class ProjectedFeature
     return getProjectedFeatures().features();
   }
   
-  public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-    FeatureFilter membershipFilter = new FeatureFilter.ContainedByLocation(getLocation());
-    if (FilterUtils.areDisjoint(ff, membershipFilter)) { 
-      // System.err.println("Wheeeee! Disjunction in ProjectedFeatureWrapper");
-      
-      return FeatureHolder.EMPTY_FEATURE_HOLDER;
-    }
+  public FeatureHolder filter(FeatureFilter ff) {
+      FeatureFilter membershipFilter = new FeatureFilter.And(new FeatureFilter.Not(new FeatureFilter.IsTopLevel()),
+                                                             new FeatureFilter.ContainedByLocation(getLocation()));
+      if (FilterUtils.areDisjoint(ff, membershipFilter)) { 
+          return FeatureHolder.EMPTY_FEATURE_HOLDER;
+      }
     
-    return getProjectedFeatures().filter(ff, recurse);
+      return getProjectedFeatures().filter(ff);
+  }
+  
+  public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+      FeatureFilter membershipFilter = new FeatureFilter.ContainedByLocation(getLocation());
+      if (FilterUtils.areDisjoint(ff, membershipFilter)) { 
+          return FeatureHolder.EMPTY_FEATURE_HOLDER;
+      }
+    
+      return getProjectedFeatures().filter(ff, recurse);
   }
   
   public Feature createFeature(Feature.Template temp)

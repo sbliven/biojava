@@ -78,7 +78,7 @@ public interface FeatureFilter extends Serializable {
     }
 
     public boolean isProperSubset(FeatureFilter sup) {
-      return sup.equals(this);
+      return sup instanceof AcceptAllFilter;
     }
 
     public boolean isDisjoint(FeatureFilter filt) {
@@ -122,8 +122,8 @@ public interface FeatureFilter extends Serializable {
       return true;
     }
 
-       public String toString() {
-	  return "None";
+      public String toString() {
+          return "None";
       }
   }
 
@@ -453,18 +453,6 @@ public interface FeatureFilter extends Serializable {
       return getChild().hashCode();
     }
 
-    public boolean isProperSubset(FeatureFilter sup) {
-      if(sup instanceof Not) {
-        FeatureFilter supC = ((Not) sup).getChild();
-        FilterUtils.areProperSubset(supC, this.getChild());
-      }
-      return (sup instanceof AcceptAllFilter);
-    }
-
-    public boolean isDisjoint(FeatureFilter filt) {
-      return FilterUtils.areProperSubset(filt, getChild());
-    }
-
     public String toString() {
       return "Not(" + child + ")";
     }
@@ -510,19 +498,6 @@ public interface FeatureFilter extends Serializable {
 
     public int hashCode() {
       return getChild1().hashCode() ^ getChild2().hashCode();
-    }
-
-    public boolean isProperSubset(FeatureFilter sup) {
-      return
-        FilterUtils.areProperSubset(getChild1(), sup) ||
-        FilterUtils.areProperSubset(getChild2(), sup);
-    }
-
-    public boolean isDisjoint(FeatureFilter filt) {
-      return (filt instanceof AcceptNoneFilter) || (
-        FilterUtils.areDisjoint(getChild1(), filt) ||
-        FilterUtils.areDisjoint(getChild2(), filt)
-      );
     }
 
       public String toString() {
@@ -613,19 +588,6 @@ public interface FeatureFilter extends Serializable {
 
     public int hashCode() {
       return getChild1().hashCode() ^ getChild2().hashCode();
-    }
-
-    public boolean isProperSubset(FeatureFilter sup) {
-      return
-        FilterUtils.areProperSubset(getChild1(), sup) &&
-        FilterUtils.areProperSubset(getChild2(), sup);
-    }
-
-    public boolean isDisjoint(FeatureFilter filt) {
-      return (filt instanceof AcceptNoneFilter) || (
-        FilterUtils.areDisjoint(getChild1(), filt) &&
-        FilterUtils.areDisjoint(getChild2(), filt)
-      );
     }
 
     public String toString() {
@@ -850,65 +812,69 @@ public interface FeatureFilter extends Serializable {
      */
 
     public static class ByParent implements OptimizableFilter {
-	private FeatureFilter filter;
+        private FeatureFilter filter;
 
-	public ByParent(FeatureFilter ff) {
-	    filter = ff;
-	}
+        public ByParent(FeatureFilter ff) {
+            filter = ff;
+        }
 
-	public FeatureFilter getFilter() {
-	    return filter;
-	}
+        public FeatureFilter getFilter() {
+            return filter;
+        }
 
-	public boolean accept(Feature f) {
-	    FeatureHolder fh = f.getParent();
-	    if (fh instanceof Feature) {
-		return filter.accept((Feature) fh);
-	    }
+        public boolean accept(Feature f) {
+            FeatureHolder fh = f.getParent();
+            if (fh instanceof Feature) {
+                return filter.accept((Feature) fh);
+            }
 
-	    return false;
-	}
+            return false;
+        }
 
-	public int hashCode() {
-	    return filter.hashCode() + 173;
-	}
+        public int hashCode() {
+            return filter.hashCode() + 173;
+        }
 
-	public boolean equals(Object o) {
-	    if (! (o instanceof FeatureFilter.ByParent)) {
-		return false;
-	    }
+        public boolean equals(Object o) {
+            if (! (o instanceof FeatureFilter.ByParent)) {
+                return false;
+            }
 
-	    FeatureFilter.ByParent ffbp = (FeatureFilter.ByParent) o;
-	    return ffbp.getFilter().equals(filter);
-	}
+            FeatureFilter.ByParent ffbp = (FeatureFilter.ByParent) o;
+            return ffbp.getFilter().equals(filter);
+        }
 
-	public boolean isProperSubset(FeatureFilter ff) {
-	    FeatureFilter ancFilter = null;
-	    if (ff instanceof FeatureFilter.ByParent) {
-		ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
-	    } else if (ff instanceof FeatureFilter.ByAncestor) {
-		ancFilter = ((FeatureFilter.ByAncestor) ff).getFilter();
-	    }
+        public boolean isProperSubset(FeatureFilter ff) {
+            FeatureFilter ancFilter = null;
+            if (ff instanceof FeatureFilter.ByParent) {
+                ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
+            } else if (ff instanceof FeatureFilter.ByAncestor) {
+                ancFilter = ((FeatureFilter.ByAncestor) ff).getFilter();
+            }
 
-	    if (ancFilter != null) {
-		return FilterUtils.areProperSubset(ancFilter, filter);
-	    } else {
-		return false;
-	    }
-	}
+            if (ancFilter != null) {
+                return FilterUtils.areProperSubset(ancFilter, filter);
+            } else {
+                return false;
+            }
+        } 
 
-	public boolean isDisjoint(FeatureFilter ff) {
-	    FeatureFilter ancFilter = null;
-	    if (ff instanceof FeatureFilter.ByParent) {
-		ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
-	    }
+        public boolean isDisjoint(FeatureFilter ff) {
+            if (ff instanceof IsTopLevel) {
+                return true;
+            }
+            
+            FeatureFilter ancFilter = null;
+            if (ff instanceof FeatureFilter.ByParent) {
+                ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
+            }
 
-	    if (ancFilter != null) {
-		return FilterUtils.areDisjoint(ancFilter, filter);
-	    } else {
-		return false;
-	    }
-	}
+            if (ancFilter != null) {
+                return FilterUtils.areDisjoint(ancFilter, filter);
+            } else {
+                return false;
+            }
+        }
     }
 
     /**
@@ -923,71 +889,74 @@ public interface FeatureFilter extends Serializable {
      */
 
     public static class ByAncestor implements OptimizableFilter {
-	private FeatureFilter filter;
+        private FeatureFilter filter;
 
-	public ByAncestor(FeatureFilter ff) {
-	    filter = ff;
-	}
+        public ByAncestor(FeatureFilter ff) {
+            filter = ff;
+        }
 
-	public FeatureFilter getFilter() {
-	    return filter;
-	}
+        public FeatureFilter getFilter() {
+            return filter;
+        }
 
-	public boolean accept(Feature f) {
-	    do {
-		FeatureHolder fh = f.getParent();
-		if (fh instanceof Feature) {
-		    f = (Feature) fh;
-		    if (filter.accept(f)) {
-			return true;
-		    }
-		} else {
-		    return false;
-		}
-	    } while (true);
-	}
+        public boolean accept(Feature f) {
+            do {
+                FeatureHolder fh = f.getParent();
+                if (fh instanceof Feature) {
+                    f = (Feature) fh;
+                    if (filter.accept(f)) {
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+            } while (true);
+        }
 
-	public int hashCode() {
-	    return filter.hashCode() + 186;
-	}
+        public int hashCode() {
+            return filter.hashCode() + 186;
+        }
 
-	public boolean equals(Object o) {
-	    if (! (o instanceof FeatureFilter.ByAncestor)) {
-		return false;
-	    }
+        public boolean equals(Object o) {
+            if (! (o instanceof FeatureFilter.ByAncestor)) {
+                return false;
+            }
 
-	    FeatureFilter.ByAncestor ffba = (FeatureFilter.ByAncestor) o;
-	    return ffba.getFilter().equals(filter);
-	}
+            FeatureFilter.ByAncestor ffba = (FeatureFilter.ByAncestor) o;
+            return ffba.getFilter().equals(filter);
+        }
 
+        public boolean isProperSubset(FeatureFilter ff) {
+            FeatureFilter ancFilter = null;
+            if (ff instanceof FeatureFilter.ByAncestor) {
+                ancFilter = ((FeatureFilter.ByAncestor) ff).getFilter();
+            }
 
-	public boolean isProperSubset(FeatureFilter ff) {
-	    FeatureFilter ancFilter = null;
-	    if (ff instanceof FeatureFilter.ByAncestor) {
-		ancFilter = ((FeatureFilter.ByAncestor) ff).getFilter();
-	    }
+            if (ancFilter != null) {
+                return FilterUtils.areProperSubset(ancFilter, filter);
+            } else {
+                return false;
+            }
+        }
 
-	    if (ancFilter != null) {
-		return FilterUtils.areProperSubset(ancFilter, filter);
-	    } else {
-		return false;
-	    }
-	}
+        public boolean isDisjoint(FeatureFilter ff) {
+            if (ff instanceof IsTopLevel) {
+                return true;
+            }
+            
+            FeatureFilter ancFilter = null;
+            if (ff instanceof FeatureFilter.ByParent) {
+                ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
+            } else if (ff instanceof FeatureFilter.ByParent) {
+                ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
+            }
 
-	public boolean isDisjoint(FeatureFilter ff) {
-	    FeatureFilter ancFilter = null;
-	    if (ff instanceof FeatureFilter.ByParent) {
-		ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
-	    } else if (ff instanceof FeatureFilter.ByParent) {
-		ancFilter = ((FeatureFilter.ByParent) ff).getFilter();
-	    }
-
-	    if (ancFilter != null) {
-		return FilterUtils.areDisjoint(ancFilter, filter);
-	    } else {
-		return false;
-	    }
-	}
+            if (ancFilter != null) {
+                return FilterUtils.areDisjoint(ancFilter, filter);
+            } else {
+                return false;
+            }
+        }
     }
 
   /**
@@ -1137,8 +1106,8 @@ public interface FeatureFilter extends Serializable {
         public boolean isProperSubset(FeatureFilter sup) {
             if (sup instanceof ByPairwiseScore) {
                 ByPairwiseScore psf = (ByPairwiseScore) sup;
-                return (psf.getMinScore() >= minScore &&
-                        psf.getMaxScore() <= maxScore);
+                return (psf.getMinScore() <= minScore &&
+                        psf.getMaxScore() >= maxScore);
             }
             return false;
         }
@@ -1189,7 +1158,7 @@ public interface FeatureFilter extends Serializable {
 
         public boolean equals(Object o) {
             return (o instanceof ByComponentName) && ((ByComponentName) o).getComponentName().equals(cname);
-	}
+        }
 
         public int hashCode() {
             return getComponentName().hashCode();
@@ -1198,28 +1167,62 @@ public interface FeatureFilter extends Serializable {
         public boolean isProperSubset(FeatureFilter sup) {
             if (sup instanceof ByComponentName) {
                 return equals(sup);
-	    } else if (sup instanceof ByClass) {
-		return ((ByClass) sup).getTestClass().isAssignableFrom(ComponentFeature.class);
-	    } else {
-		return (sup instanceof AcceptAllFilter);
-	    }
-	}
+            } else if (sup instanceof ByClass) {
+                return ((ByClass) sup).getTestClass().isAssignableFrom(ComponentFeature.class);
+            } else {    
+                return (sup instanceof AcceptAllFilter);
+            }
+        }
 
+        public boolean isDisjoint(FeatureFilter feat) {
+            if (feat instanceof ByComponentName) {
+                return !equals(feat);
+            } else if (feat instanceof ByClass) {
+                Class featC = ((ByClass) feat).getTestClass();
+                return ! (featC.isAssignableFrom(ComponentFeature.class));
+            } else {
+                return (feat instanceof AcceptNoneFilter);
+            }
+        }
 
-	public boolean isDisjoint(FeatureFilter feat) {
-	    if (feat instanceof ByComponentName) {
-		return !equals(feat);
-	    } else if (feat instanceof ByClass) {
-		Class featC = ((ByClass) feat).getTestClass();
-		return
-		    ! (featC.isAssignableFrom(ComponentFeature.class));
-	    } else {
-		return (feat instanceof AcceptNoneFilter);
-	    }
-	}
-
-	public String toString() {
-	    return "ByComponentName(" + cname + ")";
-	}
+        public String toString() {
+            return "ByComponentName(" + cname + ")";
+        }
+    }
+    
+    /**
+     * Accept features which are top-level sequence features.  This is implemented
+     * by the logic that the <code>parent</code> property of top-level features
+     * will implement the <code>Sequence</code> interface.
+     *
+     * @since 1.3
+     */
+    
+    public static final class IsTopLevel implements OptimizableFilter {
+        public boolean accept(Feature f) {
+            return f.getParent() instanceof Sequence;
+        }
+        
+        public int hashCode() {
+            return 42;
+        }
+        
+        /**
+         * All instances are equal (this should really be a singleton, but
+         * that doesn't quite fit current </code>FeatureFilter</code>
+         * patterns.
+         */
+        
+        public boolean equals(Object o) {
+            return (o instanceof FeatureFilter.IsTopLevel);
+        }
+       
+        public boolean isProperSubset(FeatureFilter ff) {
+            return (ff instanceof IsTopLevel) || (ff instanceof AcceptAllFilter);
+        }
+        
+        public boolean isDisjoint(FeatureFilter ff) {
+            return (ff instanceof ByParent) || (ff instanceof ByAncestor);
+        }
     }
 }

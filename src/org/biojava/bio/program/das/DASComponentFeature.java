@@ -258,15 +258,21 @@ class DASComponentFeature
     }
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	// System.err.println("In DASComponentFeature.filter(" + ff.toString() + ", " + recurse + ")");
+	    if (FilterUtils.areDisjoint(ff, membershipFilter)) { 
+            // System.err.println("Wheeeee! Disjunction in DASComponentFeature");
 
-	if (FilterUtils.areDisjoint(ff, membershipFilter)) { 
-	    // System.err.println("Wheeeee! Disjunction in DASComponentFeature");
+            return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        }
 
-	    return FeatureHolder.EMPTY_FEATURE_HOLDER;
-	}
+        return getProjectedFeatures().filter(ff, recurse);
+    }
+    
+    public FeatureHolder filter(FeatureFilter ff) {
+	    if (FilterUtils.areDisjoint(ff, membershipFilter)) { 
+            return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        }
 
-	return getProjectedFeatures().filter(ff, recurse);
+        return getProjectedFeatures().filter(ff);
     }
 
     public Feature createFeature(Feature.Template temp)

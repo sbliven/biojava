@@ -259,20 +259,24 @@ class DASFeatureSet
       return getFeatures().containsFeature(f);
     }
 
+    public FeatureHolder filter(FeatureFilter ff) {
+        return filter(ff, !FilterUtils.areProperSubset(ff, new FeatureFilter.IsTopLevel()));
+    }
+    
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	if (FilterUtils.areDisjoint(ff,
+        if (FilterUtils.areDisjoint(ff,
 				    new FeatureFilter.ByAnnotation(DASSequence.PROPERTY_ANNOTATIONSERVER,
 								   dataSource)
-				   )) 
-	{
-	    return FeatureHolder.EMPTY_FEATURE_HOLDER;
-	}
+           )) 
+        {    
+            return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        }
 
-	if (FilterUtils.areDisjoint(ff, getAllTypesFilter())) {
-	    return FeatureHolder.EMPTY_FEATURE_HOLDER;
-	}
+        if (FilterUtils.areDisjoint(ff, getAllTypesFilter())) {
+            return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        }
 
-	return getFeatures().filter(ff, recurse);
+        return getFeatures().filter(ff, recurse);
     }
     
     public int countFeatures() {
@@ -512,6 +516,10 @@ class DASFeatureSet
 	    return getFeatures().filter(ff, recurse);
 	}
 
+    public FeatureHolder filter(FeatureFilter ff) {
+        return getFeatures().filter(ff);
+    }
+    
 	public Feature createFeature(Feature.Template templ)
 	    throws ChangeVetoException
 	{

@@ -40,6 +40,11 @@ public abstract class AbstractFeatureHolder
   implements
     FeatureHolder
 {
+    public FeatureHolder filter(FeatureFilter filter) {
+        boolean recurse = FilterUtils.areProperSubset(filter, new FeatureFilter.IsTopLevel());
+        return filter(filter, recurse);
+    }
+    
   public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
     SimpleFeatureHolder res = new SimpleFeatureHolder();
     for(Iterator f = features(); f.hasNext();) {

@@ -73,6 +73,7 @@ class RagbagAbstractSequence implements Sequence
   public Feature createFeature(Feature.Template ft) throws BioException, ChangeVetoException
     {return sequence.createFeature(ft);}
   public Iterator features() {return sequence.features();}
+  public FeatureHolder filter(FeatureFilter ff) {return sequence.filter(ff);}
   public FeatureHolder filter(FeatureFilter ff, boolean recurse) {return sequence.filter(ff, recurse);}
   public void removeFeature(Feature f) throws ChangeVetoException {sequence.removeFeature(f);}
  

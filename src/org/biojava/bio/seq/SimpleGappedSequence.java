@@ -123,8 +123,12 @@ implements GappedSequence {
 	return getFeatures().features();
     }
 
+    public FeatureHolder filter(FeatureFilter ff) {
+        return getFeatures().filter(ff);
+    }
+    
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	return getFeatures().filter(ff, recurse);
+	    return getFeatures().filter(ff, recurse);
     }
 
     public int countFeatures() {

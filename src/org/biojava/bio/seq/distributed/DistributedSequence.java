@@ -169,9 +169,13 @@ class DistributedSequence
     }
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	return getFeatures().filter(ff, recurse);
+        return getFeatures().filter(ff, recurse);
     }
 
+    public FeatureHolder filter(FeatureFilter ff) {
+        return getFeatures().filter(ff);
+    }
+    
     public void removeFeature(Feature f) 
         throws ChangeVetoException
     {

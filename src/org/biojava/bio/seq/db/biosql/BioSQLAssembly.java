@@ -250,9 +250,13 @@ class BioSQLAssembly
     }
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	return getAllFeatures().filter(ff, recurse);
+        return getAllFeatures().filter(ff, recurse);
     }
 
+    public FeatureHolder filter(FeatureFilter ff) {
+        return getAllFeatures().filter(ff);
+    }
+    
     public Feature createFeature(Feature.Template ft)
         throws ChangeVetoException, BioException
     {

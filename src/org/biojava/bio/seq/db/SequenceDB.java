@@ -55,4 +55,15 @@ public interface SequenceDB extends SequenceDBLite {
    * @return  a SequenceIterator over all sequences
    */
   SequenceIterator sequenceIterator();
+
+  /**
+   * Query features attached to all sequences in this database.
+   * This is equivalent to applying <code>filter</code> to all
+   * sequences then merging the results.
+   *
+   * @param filter a <code>FeatureFilter</code>.
+   * @since 1.3
+   */
+
+   public FeatureHolder filter(FeatureFilter filter);
 }

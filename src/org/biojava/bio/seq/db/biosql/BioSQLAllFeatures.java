@@ -69,9 +69,12 @@ class BioSQLAllFeatures implements FeatureHolder, RealizingFeatureHolder
     }
 
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	return getFeatures().filter(ff, recurse);
+        return getFeatures().filter(ff, recurse);
     }
 
+    public FeatureHolder filter(FeatureFilter ff) {
+        return getFeatures().filter(ff);
+    }
 
     public Feature createFeature(Feature.Template ft)
         throws ChangeVetoException, BioException

@@ -34,7 +34,7 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  * @author Thomas Down
- * @author Kalle Näslund
+ * @author Kalle Nï¿½slund
  */
 
 public class SimpleFeature
@@ -245,6 +245,19 @@ implements
       }
     }
 
+    
+    public FeatureHolder filter(FeatureFilter ff) {
+        FeatureFilter childFilter = new FeatureFilter.Not(new FeatureFilter.IsTopLevel());
+                                                          
+        if (FilterUtils.areDisjoint(ff, childFilter)) {
+            return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        } else if (featureHolderAllocated()) {
+            return getFeatureHolder().filter(ff);
+        } else {
+            return FeatureHolder.EMPTY_FEATURE_HOLDER;
+        }
+    }
+    
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
 	if(featureHolderAllocated())
 	    return getFeatureHolder().filter(ff, recurse);

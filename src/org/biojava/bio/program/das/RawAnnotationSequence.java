@@ -189,6 +189,10 @@ class RawAnnotationSequence
 	return features.containsFeature(f);
     }
     
+    public FeatureHolder filter(FeatureFilter ff) {
+        return filter(ff, !FilterUtils.areProperSubset(ff, new FeatureFilter.IsTopLevel()));
+    }
+    
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
 	try {
 	    //
