@@ -31,28 +31,10 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  */
-public class WeightMatrixAnnotator implements Annotator {
+public class WeightMatrixAnnotator extends AbstractAnnotator {
   private WeightMatrix matrix;
   private double prior;
   private double threshold;
-
-  public SequenceDB annotate(SequenceDB sdb)
-        throws IllegalResidueException, java.io.IOException {
-    HashSequenceDB hitDB = new HashSequenceDB(null);
-
-    for(Iterator i = sdb.ids().iterator(); i.hasNext(); ) {
-      try {
-        String id = (String) i.next();
-        Sequence seq = sdb.getSequence(id);
-        if(annotate(seq)) {
-          hitDB.addSequence(id, seq);
-        }
-      } catch (SeqException se){
-      }
-    }
-
-    return hitDB;
-  }
 
   public boolean annotate(Sequence seq)
          throws IllegalResidueException {
