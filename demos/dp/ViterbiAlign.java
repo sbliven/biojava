@@ -18,7 +18,7 @@
  *      http://www.biojava.org/
  *
  */
-package dp;
+//package dp;
 
 import java.util.*;
 import java.net.*;
@@ -107,6 +107,7 @@ public class ViterbiAlign {
         Sequence seq = seqI.nextSequence();
         SymbolList [] rl = { seq };
         StatePath statePath = dp.viterbi(rl);
+		
         double fScore = dp.forward(rl);
         double bScore = dp.backward(rl);
       
@@ -118,7 +119,8 @@ public class ViterbiAlign {
         );
         for(int i = 0; i <= statePath.length() / 60; i++) {
           for(int j = i*60; j < Math.min((i+1)*60, statePath.length()); j++) {
-            System.out.print(statePath.symbolAt(StatePath.SEQUENCE, j+1).getToken()); 
+            CrossProductSymbol x = (CrossProductSymbol) statePath.symbolAt(StatePath.SEQUENCE, j+1);
+	    System.out.print(((Symbol) x.getSymbols().get(0)).getToken());
           }
           System.out.print("\n");
           for(int j = i*60; j < Math.min((i+1)*60, statePath.length()); j++) {
