@@ -171,15 +171,15 @@ public class ProjectionEngine {
         Class baseClass = ProjectedFeature.class;
 
         String faceName = face.getName()
-                .replaceAll("\\.", "").replaceAll("\\$", "");
+                .replaceAll("\\.", "_").replaceAll("\\$", "__");
         String ctxtName = ctxtClass.getName()
-                .replaceAll("\\.", "").replaceAll("\\$", "");
+                .replaceAll("\\$", "_");
 
         CodeClass baseClassC = IntrospectedCodeClass.forClass(baseClass);
         CodeClass faceClassC = IntrospectedCodeClass.forClass(face);
 
         GeneratedCodeClass pclass = new GeneratedCodeClass(
-                "scratch_." + ctxtName + "." + faceName,
+                ctxtName + "__" + faceName,
                 baseClassC,
                 new CodeClass[]{faceClassC},
                 CodeUtils.ACC_PUBLIC | CodeUtils.ACC_SUPER
@@ -434,15 +434,15 @@ public class ProjectionEngine {
     if(projection == null) {
       try {
         String tpltName = templateClass.getName()
-                .replaceAll("\\.", "").replaceAll("\\$", "");
+                .replaceAll("\\.", "_").replaceAll("\\$", "__");
         String ctxtName = ctxtClass.getName()
-                .replaceAll("\\.", "").replaceAll("\\$", "");
+                .replaceAll("\\$", "_");
 
         CodeClass c_baseClass = CodeUtils.TYPE_OBJECT;
         CodeClass c_tpClass = IntrospectedCodeClass.forClass(TemplateProjector.class);
 
         GeneratedCodeClass pclass = new GeneratedCodeClass(
-                "scratch_." + ctxtName + "." + tpltName,
+                ctxtName + "__" + tpltName,
                 c_baseClass,
                 new CodeClass[] { c_tpClass },
                 CodeUtils.ACC_PUBLIC | CodeUtils.ACC_SUPER);
@@ -600,12 +600,21 @@ public class ProjectionEngine {
    * Internal helper class.
    */
 
-  public static class InstantiatorImpl implements Instantiator {
+  static class InstantiatorImpl implements Instantiator {
     public Object newInstance(Constructor c, Object[] args) throws Exception {
       return c.newInstance(args);
     }
   }
 
+  /**
+   * This is an interface for things that project feature templates.
+   *
+   * <p><em>Note:</em> This is implementation guts that has to be public to bind
+   * contexts to features. It is not intended for users.</p>
+   *
+   * @author Matthew Pocock
+   * @since 1.4
+   */
   public static interface TemplateProjector {
     public Feature.Template revertTemplate(ProjectionContext ctxt,
                                            Feature.Template projTempl)

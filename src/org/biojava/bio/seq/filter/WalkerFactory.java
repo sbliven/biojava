@@ -63,8 +63,8 @@ public class WalkerFactory {
   private Class generateWalker(Class visitorClass)
   throws BioException {
     try {
-      String vcn = visitorClass.getName().replaceAll("\\.", "");
-      String walkerClassName = "scratch_.walker_" + vcn;
+      String vcn = visitorClass.getName().replaceAll("\\$", "_");
+      String walkerClassName = vcn + "_walker";
 
       CodeClass c_Visitor = IntrospectedCodeClass.forClass(Visitor.class);
       CodeClass c_ourVisitor = IntrospectedCodeClass.forClass(visitorClass);

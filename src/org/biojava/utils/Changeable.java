@@ -32,6 +32,7 @@ public interface Changeable {
    * Add a listener that will be informed of all changes.
    *
    * @param cl  the ChangeListener to add
+   * @deprecated  use addChangeListener(cl, ChangeType.UNKNOWN)
    */
   public void addChangeListener(ChangeListener cl);
   
@@ -47,6 +48,7 @@ public interface Changeable {
    * Remove a listener that was interested in all types of changes.
    *
    * @param cl  a ChangeListener to remove
+   * @deprecated  use removeChangeListener(cl, ChangeType.UNKNOWN)
    */
   public void removeChangeListener(ChangeListener cl);
 
@@ -69,6 +71,7 @@ public interface Changeable {
    * Changeable instance. If it returns false, that does not mean that this type
    * of event will or even can be raised, but that it is worth registering
    * listeners incase.
+   * </p>
    *
    * @param ct  the ChangeType to check
    * @return true if ChangeEvents of this type are guaranteed to never be fired

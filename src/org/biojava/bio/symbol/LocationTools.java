@@ -708,15 +708,20 @@ final public class LocationTools {
 
     /**
      * Subtract one location from another.  This methods calculates the set of
-     * points which are contains in location <code>x</code> but not in <code>y</code>.
+     * points which are contains in location <code>keep</code> but not in
+     * <code>remove</code>.
      *
-     * @param x A location
-     * @param y A location
+     * @param keep A location
+     * @param remove A location
      * @return a location containing all points which are in x but not y
      * @since 1.3
      */
 
-    public static Location subtract(Location x, Location y) {
+    public static Location subtract(Location keep, Location remove) {
+        // fixme: documentation hack - I should re-factor this method
+        Location x = keep;
+        Location y = remove;
+        
         if (isDecorated(x) || isDecorated(y)) {
             handleDecorations(x, y);
         }

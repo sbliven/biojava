@@ -1,98 +1,114 @@
 package org.biojava.bio.program.tagvalue;
 
+import java.lang.StringBuffer;
 import org.biojava.utils.ParserException;
 
 /**
- * Agregates multiple values for a tag into their own tag groups.
+ * Joins multipel values into single values.
  *
- * <p>With tag-value files, it is not uncommon for information about logical
- * blocks of data to be encoded in the values as well as tags of the document.
- * For example, in swissprot entries, the comment block may be punctuated by
- * lines that clearly seperate one logical comment from another, but there may
- * be no change in the pattern of tags to indicate this. Some fields, such as
- * alternate names in Enzyme, are a ist of values but some of the values are
- * longer than a single line. Each value is terminated with a period ".", but
- * again there is no way from the tags to know the logical grouping.</p>
+ * <p>
+ * Some properties have values spread across multiple lines. For example,
+ * the properties on EMBL features can be spread across multiple lines.</p>
  *
- * <p>This class provides callbacks to allow event streams to be re-written
- * so that they contain this information. A single CC tag with multiple values
- * can be re-written as multiple CC tags with values for each logical comment.
- * This is done by presenting each value to an instance of Agregator.Observer
- * that indicates if the current value signals the end of a logcal block.
+ * <p>
+ * This class provides callbacks to allow event streams to be re-written
+ * so that they contain this information.
  * </p>
  *
  * @since 1.4
  * @author Matthew Pocock
  */
-public class Agregator
-extends TagValueWrapper {
-  private final Observer observer;
+public class Agregator extends TagValueWrapper {
+  private BoundaryFinder observer;
+  private String joiner;
 
   // state
   //
-  boolean inTag;
-  boolean seenValues;
-  Object tag;
+  private Object tag;
+  private StringBuffer value;
+  private boolean inValue;
 
-  public Agregator(TagValueListener listener, Observer observer) {
+  public Agregator(TagValueListener listener, BoundaryFinder observer, String joiner) {
     super(listener);
     this.observer = observer;
+    this.joiner = joiner;
+    this.value = new StringBuffer();
   }
 
+  public BoundaryFinder getBoundaryFinder() {
+    return observer;
+  }
+  
+  public void setBoundaryFinder(BoundaryFinder finder) {
+    this.observer = finder;
+  }
+  
+  public String getJoiner() {
+    return joiner;
+  }
+  
+  public void setJoiner(String joiner) {
+    this.joiner = joiner;
+  }
+  
   public void startTag(Object tag)
   throws ParserException {
-    this.tag = tag;
-    inTag = false;
-    seenValues = false;
+    super.startTag(tag);
+    inValue = false;
+    value.setLength(0);
   }
-
+  
   public void value(TagValueContext ctxt, Object value)
   throws ParserException {
-    seenValues = true;
-
-    if(observer.isBoundaryStart(value)) {
-      if(inTag) {
-        super.endTag();
+    boolean isStart = observer.isBoundaryStart(value);
+    boolean isEnd = observer.isBoundaryEnd(value);
+    boolean dbv = observer.dropBoundaryValues();
+    
+    if(isStart && isEnd) {
+      if(inValue) {
+        super.value(ctxt, this.value.toString());
+        this.value.setLength(0);
+        inValue = false;
       }
-      super.startTag(tag);
-      if(!observer.dropBoundaryValues()) {
+      
+      if(!dbv) {
         super.value(ctxt, value);
       }
-      inTag = true;
-    } else if(observer.isBoundaryEnd(value)) {
-      if(!inTag) {
-        super.startTag(tag);
+    }
+    
+    if(isStart && !isEnd) {
+      if(inValue) {
+        super.value(ctxt, this.value.toString());
+        this.value.setLength(0);
       }
-      if(!observer.dropBoundaryValues()) {
-        super.value(ctxt, value);
+      this.value.append(value);
+      inValue = true;
+    }
+    
+    if(!isStart && isEnd) {
+      if(!dbv) {
+        this.value.append(joiner);
+        this.value.append(value);
       }
-      super.endTag();
-      inTag = false;
-    } else {
-      if(!inTag) {
-        super.startTag(tag);
-        inTag = true;
-      }
-      super.value(ctxt, value);
+      
+      super.value(ctxt, this.value.toString());
+      inValue = false;
+      this.value.setLength(0);
+    }
+    
+    if(!isStart && !isEnd) {
+      this.value.append(joiner);
+      this.value.append(value);
+      inValue = true;
     }
   }
 
   public void endTag()
   throws ParserException {
-    if(inTag) {
-      super.endTag();
-    } else if(!seenValues) {
-      // bounary condition where there are no values associated with a tag
-      super.startTag(tag);
-      super.endTag();
+    if(inValue) {
+      super.value(null, this.value.toString());
+      inValue = false;
     }
-    inTag = false;
-    seenValues = false;
-  }
-
-  public interface Observer {
-    public boolean dropBoundaryValues();
-    public boolean isBoundaryStart(Object value);
-    public boolean isBoundaryEnd(Object value);
+    super.endTag();
   }
 }

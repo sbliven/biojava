@@ -90,10 +90,27 @@ public class DistributedSequenceDB extends AbstractSequenceDB implements Sequenc
 	datasources = new HashSet();
     }
 
+    /**
+     * Get the current set of all currently registered data sources.
+     *
+     * <p>
+     * The returned Set is totaly independant of any future changes made to the
+     * distributed sequence DB.
+     * </p>
+     *
+     * @return a new Set containing all DistDataSource instances registered at
+     *    the time
+     */ 
     public Set getDataSources() {
-	return Collections.unmodifiableSet(datasources);
+	return new HashSet(datasources);
     }
 
+    /**
+     * Add a distributed data source.
+     *
+     * @param dds  the DistDataSource to add
+     * @throws ChangeVetoException if the data source could not be added
+     */
     public void addDataSource(DistDataSource dds) 
         throws ChangeVetoException
     {
@@ -121,6 +138,12 @@ public class DistributedSequenceDB extends AbstractSequenceDB implements Sequenc
 	datasources.add(dds);
     }
 
+    /**
+     * Remove a distributed data source.
+     *
+     * @param dds  the DistributedDataSource to remove
+     * @throws ChangeVetoException  if the data source could not be removed
+     */
     public void removeDataSource(DistDataSource dds) 
         throws ChangeVetoException
     {

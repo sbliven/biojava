@@ -102,7 +102,7 @@ public class FilterUtils {
     }
 
     /**
-     * Determines is two queries can be proven to be disjoint.
+     * Determines if two queries can be proven to be disjoint.
      * <p>
      * They are disjoint if there is no element that is matched by both filters
      * - that is, they have an empty intersection.  Order of arguments to this
@@ -231,6 +231,26 @@ public class FilterUtils {
 	return null;
     }
 
+  /**
+   * Decide if two feature filters accept exactly the same set of features.
+   *
+   * <p>
+   * Two feature filters are equal if it can be proven that
+   * <code>f1.accept(feature) == f2.accept(feature)</code> for all values of
+   * <code>feature</code>. If areEqual returns false, this may indicate that
+   * they accept clearly different sets of features. It may also, howerver,
+   * indicate that the method was unable to prove that they were equal.
+   * </p>
+   *
+   * <p>
+   * Note that given a finite set of features, f1 and f2 may match the same
+   * sub-set of those features even if they are not equal.
+   * </p>
+   *
+   * @param f1  the first filter
+   * @param f2  the second filter
+   * @return true if they can be proven to be equivalent
+   */
   public final static boolean areEqual(FeatureFilter f1, FeatureFilter f2) {
     if(f1 instanceof FeatureFilter.And && f2 instanceof FeatureFilter.And) {
       List f1f = new ArrayList();
@@ -398,6 +418,28 @@ public class FilterUtils {
 
   private static int depth = 0;
 
+  /**
+   * Attempts to reduce a FeatureFilter to an equivalent FeatureFilter with
+   * fewer terms.
+   *
+   * <p>
+   * This will attempt to push all leaf constraints as far from the root of the
+   * filter expression as possible, in an attept to prove an empty or universal
+   * set. It will then propogate these through the logical operators in an
+   * attempt to reduce the entire expression to the empty or universal set. If
+   * filters can be combined (for example, overlapping constraints), then this
+   * will happen on the way.
+   * </p>
+   *
+   * <p>
+   * The resulting filter is guaranteed to accept exactly the same set of\
+   * features that is accepted by the argument. In particular,
+   * <code>areEqual(filter, optimize(filter))</code> is always true.
+   * </p>
+   *
+   * @param filter  the FeatureFilter to optimize
+   * @param an optimized version
+   */
   public final static FeatureFilter optimize(FeatureFilter filter) {
     depth++;
     //System.out.println(depth + ":" + "Optimizing " + filter);

@@ -37,12 +37,13 @@ import java.io.Serializable;
  * and create features. on that.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.2
  */
 
 public class DummySymbolList extends AbstractSymbolList implements Serializable {
     private final Symbol sym;
-    private final FiniteAlphabet alpha;
+    private final Alphabet alpha;
     private final int length;
 
     public DummySymbolList(FiniteAlphabet alpha, int length) {
@@ -50,6 +51,15 @@ public class DummySymbolList extends AbstractSymbolList implements Serializable 
         this.alpha = alpha;
         this.length = length;
         sym = AlphabetManager.getAllAmbiguitySymbol(alpha);
+    }
+    
+    public DummySymbolList(Alphabet alpha, int length, Symbol sym)
+    throws IllegalSymbolException {
+        alpha.validate(sym);
+        
+        this.alpha = alpha;
+        this.length = length;
+        this.sym = sym;
     }
 
     public Alphabet getAlphabet() {

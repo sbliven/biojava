@@ -22,6 +22,7 @@
 package org.biojava.bio.program.gff;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -34,6 +35,7 @@ import java.util.Set;
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.db.IllegalIDException;
 import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.utils.ChangeVetoException;
@@ -57,15 +59,17 @@ public class GFFTools {
    */
   public static int NO_FRAME = -1;
 
- /**
-  * Reads a <code>GFFEntrySet</code> from a file with no filtering
-  * @param fileName the file containing the GFF
-  * @throws FileNotFoundException if file is not found
-  * @throws ParserException if format is wrong
-  * @throws BioException if format is wrong
-  * @throws IOException if file reading error occurs
-  * @return a <code>GFFEntrySet</code> encapsulating the records read from the file
-  */
+  /**
+   * Reads a <code>GFFEntrySet</code> from a file with no filtering.
+   *
+   * @param fileName the file containing the GFF
+   * @throws FileNotFoundException if file is not found
+   * @throws ParserException if format is wrong
+   * @throws BioException if format is wrong
+   * @throws IOException if file reading error occurs
+   * @return a <code>GFFEntrySet</code> encapsulating the records read from the file
+   * @deprecated use: readGff(File)
+   */
   public static GFFEntrySet readGFF(String fileName)
     throws FileNotFoundException, ParserException, BioException, IOException
   {
@@ -73,7 +77,8 @@ public class GFFTools {
   }
 
   /**
-   * Reads a GFFEntrySet from a file with the specified filter
+   * Reads a GFFEntrySet from a file with the specified filter.
+   *
    * @param fileName the file containing the GFF
    * @param recFilt the filter to use
    * @throws FileNotFoundException if file is not found
@@ -81,6 +86,7 @@ public class GFFTools {
    * @throws BioException if format is wrong
    * @throws IOException if file reading error occurs
    * @return a <code>GFFEntrySet</code> encapsulating the records read from the file
+   * @deprecated use: readGff(File,GFFRecordFilter)
    */
   public static GFFEntrySet readGFF(String fileName, GFFRecordFilter recFilt)
     throws FileNotFoundException, ParserException, BioException, IOException
@@ -91,13 +97,72 @@ public class GFFTools {
     parser.parse(new BufferedReader(new FileReader(fileName)),filterer);
     return gffEntries;
   }
+  
+ /**
+  * Reads a <code>GFFEntrySet</code> from a file with no filtering.
+  *
+  * @param inFile the File containing the GFF
+  * @throws FileNotFoundException if file is not found
+  * @throws ParserException if format is wrong
+  * @throws BioException if format is wrong
+  * @throws IOException if file reading error occurs
+  * @return a <code>GFFEntrySet</code> encapsulating the records read from the file
+  */
+  public static GFFEntrySet readGFF(File inFile)
+    throws FileNotFoundException, ParserException, BioException, IOException
+  {
+    return readGFF(inFile, GFFRecordFilter.ACCEPT_ALL);
+  }
 
+  /**
+   * Reads a GFFEntrySet from a file with the specified filter.
+   *
+   * @param inFile the File containing the GFF
+   * @param recFilt the filter to use
+   * @throws FileNotFoundException if file is not found
+   * @throws ParserException if format is wrong
+   * @throws BioException if format is wrong
+   * @throws IOException if file reading error occurs
+   * @return a <code>GFFEntrySet</code> encapsulating the records read from the file
+   */
+  public static GFFEntrySet readGFF(File inFile, GFFRecordFilter recFilt)
+    throws FileNotFoundException, ParserException, BioException, IOException
+  {
+    GFFEntrySet gffEntries = new GFFEntrySet();
+    GFFFilterer filterer = new GFFFilterer(gffEntries.getAddHandler(),recFilt);
+    GFFParser parser = new GFFParser();
+    parser.parse(new BufferedReader(new FileReader(inFile)),filterer);
+    return gffEntries;
+  }
+
+  /**
+   * Read all GFF entries from a buffered reader.
+   *
+   * This will read up untill the end of the reader.
+   *
+   * @param gffIn  the BufferedReader to read text from
+   * @return a GFFEntrySet containing all of the GFF that could be read
+   * @throws parserException  if the text could not be parsed as GFF
+   * @throws BioException if there was some error reading the GFF
+   * @throws IOException if there was an error with the reader
+   */
   public static GFFEntrySet readGFF(BufferedReader gffIn)
     throws ParserException, BioException, IOException
   {
     return readGFF(gffIn, GFFRecordFilter.ACCEPT_ALL);
   }
 
+  /**
+   * Read all GFF entries matching a filter from a buffered reader.
+   *
+   * This will read up untill the end of the reader.
+   *
+   * @param gffIn  the BufferedReader to read text from
+   * @return a GFFEntrySet containing all of the GFF that could be read
+   * @throws parserException  if the text could not be parsed as GFF
+   * @throws BioException if there was some error reading the GFF
+   * @throws IOException if there was an error with the reader
+   */
   public static GFFEntrySet readGFF(BufferedReader gffIn, GFFRecordFilter recFilt)
     throws ParserException, BioException, IOException
   {
@@ -109,7 +174,8 @@ public class GFFTools {
   }
 
   /**
-   * Writes a GFFEntrySet to a file
+   * Writes a GFFEntrySet to a file.
+   *
    * @param fileName the file to write to
    * @param ents the entries to write
    * @throws IOException if file writing fails
@@ -121,9 +187,25 @@ public class GFFTools {
     writeGFF(pw, ents);
     pw.close();
   }
+  
+  /**
+   * Writes a GFFEntrySet to a file.
+   *
+   * @param outFile  the file to write to
+   * @param ents  the entry set to write
+   * @throws IOException if writing to the file fails
+   */
+  public static void writeGFF(File outFile, GFFEntrySet ents)
+    throws IOException
+  {
+    PrintWriter pw = new PrintWriter(new FileWriter(outFile));
+    writeGFF(pw, ents);
+    pw.close();
+  }
 
   /**
-   * Writes a GFFEntrySet to a PrintWriter
+   * Writes a GFFEntrySet to a PrintWriter.
+   *
    * @param pw  the PrintWriter to write to
    * @param ents the entries to write
    * @throws IOException if file writing fails
@@ -233,6 +315,30 @@ public class GFFTools {
     SequencesAsGFF sagff = new SequencesAsGFF();
     GFFEntrySet gffES = new GFFEntrySet();
     sagff.processSequence(seq, gffES.getAddHandler());
+    return gffES;
+  }
+  
+  /**
+   * Creates a GFFEntrySet containing one entry for each feature on each
+   * sequence of a SequenceDB.
+   *
+   * <p><em>Note:</em> This converts all features in the whole database to
+   * in-memorey GFFRecord instances. This will take up considerable memory for
+   * large databases.</p>
+   *
+   * @param seqDB  the SequenceDB to create features for
+   * @return  a new GFFEntrySet with gff records for each feature on the database
+   * @throws BioException if something went wrong GFF-ifying the sequences
+   *         features
+   */
+public static GFFEntrySet gffFromSeqDB(SequenceDB seqDB)
+  throws BioException {
+    GFFEntrySet gffES = new GFFEntrySet();
+    for(SequenceIterator si = seqDB.sequenceIterator(); si.hasNext(); ) {
+      Sequence seq = si.nextSequence();
+      SequencesAsGFF sagff = new SequencesAsGFF();
+      sagff.processSequence(seq, gffES.getAddHandler());
+    }
     return gffES;
   }
 }

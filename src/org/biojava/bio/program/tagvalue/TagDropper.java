@@ -35,11 +35,13 @@ import org.biojava.utils.SmallSet;
  */
 public class TagDropper
 extends TagValueWrapper {
-  private Set tags;
-  boolean propagate;
+  private final Set tags;
+  private boolean retain;
+  private boolean propagate;
 
   {
     tags = new SmallSet();
+    retain = true;
   }
 
   public TagDropper() {
@@ -74,13 +76,42 @@ extends TagValueWrapper {
     tags.remove(tag);
   }
 
+  /**
+   * Get the complete set of tags that are currently recognized.
+   *
+   * @return the Set of known tags
+   */
   public Set getTags() {
     return tags;
   }
   
+  /**
+   * Set wether known tags are to be retained or dropped.
+   *
+   * <p>
+   * If retain is true, then all known tags will be passed on and all other tags
+   * will be discarded. If retain is true, then all known tags will be dropped
+   * and all others passed on.
+   * </p>
+   *
+   * @param retain  true if the tags are to be retained
+   */
+  public void setRetain(boolean retain) {
+    this.retain = retain;
+  }
+  
+  /**
+   * Find out if known tags are retained or dropped.
+   *
+   * @return true if values are retained
+   */
+  public boolean doRetain() {
+    return retain;
+  }
+  
   public void startTag(Object tag)
   throws ParserException {
-    propagate = tags.contains(tag);
+    propagate = retain == tags.contains(tag);
     
     if(propagate) {
       super.startTag(tag);

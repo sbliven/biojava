@@ -223,6 +223,17 @@ public interface Location {
    * Every day, in every way, empty becomes more and more boring.
    */
   static final Location empty = new EmptyLocation();
+  
+  /**
+   * The <code>Location</code> which contains all points.
+   *
+   * <p>
+   * This object contains every point. It's minimum value is Integer.MIN_VALUE,
+   * and it's maximum value is Integer.MAX_VALUE. It overlaps and contains
+   * everything.
+   * </p>
+   */
+  static final Location full = new RangeLocation(Integer.MIN_VALUE, Integer.MAX_VALUE);
 
   /**
    * Comparator which orders Locations naturally.  Locations

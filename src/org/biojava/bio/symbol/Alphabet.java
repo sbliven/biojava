@@ -209,5 +209,5 @@ public interface Alphabet extends Annotatable {
   /**
    * A really useful static alphabet that is always empty.
    */
-  static final Alphabet EMPTY_ALPHABET = new EmptyAlphabet();
+  static final FiniteAlphabet EMPTY_ALPHABET = new EmptyAlphabet();
 }

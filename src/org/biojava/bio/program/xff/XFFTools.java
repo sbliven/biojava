@@ -159,6 +159,20 @@ public class XFFTools {
     }
 
 
+    public static Sequence readXFF(File xffFile, String seqID)
+
+    throws IOException, SAXException, BioException {
+
+        SymbolList dummy = new DummySymbolList(Alphabet.EMPTY_ALPHABET, Integer.MAX_VALUE);
+
+        Sequence ourSeq = new SimpleSequence(dummy, seqID, seqID, new SmallAnnotation());
+
+        annotateXFF(xffFile, ourSeq);
+
+        return ourSeq;
+
+    }
+        
 
     public static void writeXFF(File xffFile, FeatureHolder features)
 
