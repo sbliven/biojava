@@ -26,6 +26,8 @@ import java.io.*;
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.symbol.*;
+import org.biojava.bio.seq.db.*;
+import org.biojava.utils.*;
 
 /**
  * A set of convenience methods for handling common file formats.
@@ -42,120 +44,165 @@ public class SeqIOTools  {
     }
 
     private static SymbolParser getDNAParser() {
-	try {
-	    return DNATools.getDNA().getParser("token");
-	} catch (BioException ex) {
-	    throw new BioError(ex, "Assertion failing: Couldn't get DNA token parser");
-	}
+        try {
+            return DNATools.getDNA().getParser("token");
+        } catch (BioException ex) {
+            throw new BioError(ex, "Assertion failing: Couldn't get DNA token parser");
+        }
     }
 
     private static SymbolParser getProteinParser() {
-	try {
-	    return ProteinTools.getTAlphabet().getParser("token");
-	} catch (BioException ex) {
-	    throw new BioError(ex, "Assertion failing: Couldn't get PROTEIN token parser");
-	}
+        try {
+            return ProteinTools.getTAlphabet().getParser("token");
+        } catch (BioException ex) {
+            throw new BioError(ex, "Assertion failing: Couldn't get PROTEIN token parser");
+        }
     }
 
     private static SequenceBuilderFactory _emblBuilderFactory;
 
-    /** 
+    /**
      * Get a default SequenceBuilderFactory for handling EMBL
      * files.
      */
     public static SequenceBuilderFactory getEmblBuilderFactory() {
-	if (_emblBuilderFactory == null) {
-	    _emblBuilderFactory = new EmblProcessor.Factory(SimpleSequenceBuilder.FACTORY);
-	}
-	return _emblBuilderFactory;
+        if (_emblBuilderFactory == null) {
+            _emblBuilderFactory = new EmblProcessor.Factory(SimpleSequenceBuilder.FACTORY);
+        }
+        return _emblBuilderFactory;
     }
 
     /**
      * Iterate over the sequences in an EMBL-format stream.
      */
     public static SequenceIterator readEmbl(BufferedReader br) {
-	return new StreamReader(br,
-				new EmblLikeFormat(),
-				getDNAParser(),
-				getEmblBuilderFactory());
+        return new StreamReader(br,
+                                new EmblLikeFormat(),
+                                getDNAParser(),
+                                getEmblBuilderFactory());
     }
 
     private static SequenceBuilderFactory _genbankBuilderFactory;
 
-    /** 
+    /**
      * Get a default SequenceBuilderFactory for handling GenBank
      * files.
      */
     public static SequenceBuilderFactory getGenbankBuilderFactory() {
-	if (_genbankBuilderFactory == null) {
-	    _genbankBuilderFactory = new GenbankProcessor.Factory(SimpleSequenceBuilder.FACTORY);
-	}
-	return _genbankBuilderFactory;
+        if (_genbankBuilderFactory == null) {
+            _genbankBuilderFactory = new GenbankProcessor.Factory(SimpleSequenceBuilder.FACTORY);
+        }
+        return _genbankBuilderFactory;
     }
 
     /**
      * Iterate over the sequences in an GenBank-format stream.
      */
     public static SequenceIterator readGenbank(BufferedReader br) {
-	return new StreamReader(br,
-				new GenbankFormat(),
-				getDNAParser(),
-				getGenbankBuilderFactory());
+        return new StreamReader(br,
+                                new GenbankFormat(),
+                                getDNAParser(),
+                                getGenbankBuilderFactory());
     }
 
     private static SequenceBuilderFactory _swissprotBuilderFactory;
 
-    /** 
+    /**
      * Get a default SequenceBuilderFactory for handling Swissprot
      * files.
      */
     public static SequenceBuilderFactory getSwissprotBuilderFactory() {
-	if (_swissprotBuilderFactory == null) {
-	    _swissprotBuilderFactory = new SwissprotProcessor.Factory(SimpleSequenceBuilder.FACTORY);
-	}
-	return _swissprotBuilderFactory;
+        if (_swissprotBuilderFactory == null) {
+            _swissprotBuilderFactory = new SwissprotProcessor.Factory(SimpleSequenceBuilder.FACTORY);
+        }
+        return _swissprotBuilderFactory;
     }
 
     /**
      * Iterate over the sequences in an Swissprot-format stream.
      */
     public static SequenceIterator readSwissprot(BufferedReader br) {
-	return new StreamReader(br,
-				new EmblLikeFormat(),
-				getProteinParser(),
-				getSwissprotBuilderFactory());
+        return new StreamReader(br,
+                                new EmblLikeFormat(),
+                                getProteinParser(),
+                                getSwissprotBuilderFactory());
     }
 
     private static SequenceBuilderFactory _fastaBuilderFactory;
 
-    /** 
+    /**
      * Get a default SequenceBuilderFactory for handling FASTA
      * files.
      */
     public static SequenceBuilderFactory getFastaBuilderFactory() {
-	if (_fastaBuilderFactory == null) {
-	    _fastaBuilderFactory = new FastaDescriptionLineParser.Factory(SimpleSequenceBuilder.FACTORY);
-	}
-	return _fastaBuilderFactory;
+        if (_fastaBuilderFactory == null) {
+            _fastaBuilderFactory = new FastaDescriptionLineParser.Factory(SimpleSequenceBuilder.FACTORY);
+        }
+        return _fastaBuilderFactory;
     }
 
     /**
      * Iterate over the sequences in an FASTA-format stream of DNA sequences.
      */
     public static SequenceIterator readFastaDNA(BufferedReader br) {
-	return new StreamReader(br,
-				new FastaFormat(),
-				getDNAParser(),
-				getFastaBuilderFactory());
+        return new StreamReader(br,
+                                new FastaFormat(),
+                                getDNAParser(),
+                                getFastaBuilderFactory());
     }
 
     /**
      * Iterate over the sequences in an FASTA-format stream of Protein sequences.
      */
     public static SequenceIterator readFastaProtein(BufferedReader br) {
-	return new StreamReader(br,
-				new FastaFormat(),
-				getProteinParser(),
-				getFastaBuilderFactory());
+        return new StreamReader(br,
+                                new FastaFormat(),
+                                getProteinParser(),
+                                getFastaBuilderFactory());
     }
+
+  /**
+   * Create a sequence database from a fasta file provided as an input stream.
+   * Note this somewhat duplicates functionality in the readFastaDNA and readFastaProtein methods but
+   * uses a stream rather than a reader and returns a SequenceDB rather than a SequenceIterator. If
+   * the returned DB is likely to be large then the above mentioned methods should be used.
+   * @author Mark Schreiber
+   * @throws BioException if problems occur during reading of the stream.
+   * @since 1.2
+   */
+  public static SequenceDB readFasta(InputStream seqFile, Alphabet alpha) throws BioException{
+    HashSequenceDB db = new HashSequenceDB(IDMaker.byName);
+    SequenceBuilderFactory sbFact = new FastaDescriptionLineParser.Factory(SimpleSequenceBuilder.FACTORY);
+    FastaFormat fFormat = new FastaFormat();
+    for(SequenceIterator seqI = new StreamReader(seqFile,fFormat,alpha.getParser("token"),sbFact);seqI.hasNext();){
+      Sequence seq = seqI.nextSequence();
+      try{
+        db.addSequence(seq);
+      }catch(ChangeVetoException cve){
+        throw new NestedError(cve,"Could not successfully add sequence "+seq.getName()+" to sequence database");
+      }
+    }
+    return db;
+  }
+
+  /**
+   * Write a sequenceDB to an output stream in fasta format
+   * @author Mark Schreiber
+   * @since 1.2
+   */
+  public static void writeFasta(OutputStream os, SequenceDB db) throws IOException{
+    StreamWriter sw = new StreamWriter(os,new FastaFormat());
+    sw.writeStream(db.sequenceIterator());
+  }
+  /**
+   * Writes sequences from a SequenceIterator to an OutputStream in Fasta Format.
+   * This makes for a useful format filter where a StreamReader can be sent to the
+   * StreamWriter after formatting.
+   * @author Mark Schreiber
+   * @since 1.2
+   */
+   public static void writeFasta(OutputStream os, SequenceIterator in) throws IOException{
+      StreamWriter sw = new StreamWriter(os,new FastaFormat());
+      sw.writeStream(in);
+   }
 }
