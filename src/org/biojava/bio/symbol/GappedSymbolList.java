@@ -702,7 +702,7 @@ extends AbstractSymbolList implements Serializable {
 	    int gbstart = start - containingBlock.sourceStart + containingBlock.viewStart;
 	    int gbend = Math.min(end - start + gbstart, containingBlock.viewEnd);
 	    lblocks.add(new RangeLocation(gbstart, gbend));
-	    start = gbend + 1;
+	    start = start + gbend - gbstart + 1;
 	}
 
 	return LocationTools.union(lblocks);
