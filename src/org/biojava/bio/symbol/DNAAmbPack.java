@@ -50,7 +50,7 @@ public class DNAAmbPack
   
   private Symbol _unpack(byte b) {
     Set syms = new SmallSet();
-    if(false) {
+/*    if(false) {
     } else if(0 != (b & 1)) {
       syms.add(DNATools.a());
     } else if(0 != (b & 2)) {
@@ -58,6 +58,18 @@ public class DNAAmbPack
     } else if(0 != (b & 4)) {
       syms.add(DNATools.c());
     } else if(0 != (b & 8)) {
+      syms.add(DNATools.t());
+    }*/
+    if(0 != (b & 1)) {
+      syms.add(DNATools.a());
+    }
+    if(0 != (b & 2)) {
+      syms.add(DNATools.g());
+    }
+    if(0 != (b & 4)) {
+      syms.add(DNATools.c());
+    }
+    if(0 != (b & 8)) {
       syms.add(DNATools.t());
     }
     try {
