@@ -37,8 +37,6 @@ public class SimpleSymbolListFactory
 {
     /**
      * Create a factory for SimpleSymbolLists.
-     *
-     * @param is ambiguity to be supported by the encoding?
      */
 
     public SymbolList makeSymbolList(Symbol [] symbolArray, int size, Alphabet alfa)

@@ -417,6 +417,15 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
           }
       }
 
+    /**
+     * Return the Java Symbol[] array that backs this object.
+     * primarily used to accelerate reconstruction of symbol lists
+     * in the packed chunked symbol list implementation.
+     */
+    public Symbol [] getSymbolArray()
+    {
+        return symbols;
+    }
 
     /**
      * Simple inner class for channelling sequence notifications from
