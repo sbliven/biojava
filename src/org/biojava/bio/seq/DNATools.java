@@ -157,12 +157,13 @@ public final class DNATools {
    */
   public static SymbolList createDNA(String dna)
   throws IllegalSymbolException {
+    SymbolTokenization p = null;
     try {
-      SymbolTokenization p = getDNA().getTokenization("token");
-      return new SimpleSymbolList(p, dna);
-    } catch (BioException se) {
-      throw new BioError( "Something has gone badly wrong with DNA", se);
+      p = getDNA().getTokenization("token");
+    } catch (BioException e) {
+      throw new BioError("Something has gone badly wrong with DNA", e);
     }
+    return new SimpleSymbolList(p, dna);
   }
 
   /**
@@ -426,7 +427,7 @@ public final class DNATools {
    * @param fractionGC1 (G+C) content of second sequence as a fraction.
    */
   public static Distribution getDNAxDNADistribution(
-    double fractionGC0, 
+    double fractionGC0,
     double fractionGC1
     )
   {
@@ -446,7 +447,7 @@ public final class DNATools {
    * @param range Range to be searched.  If null, whole sequence will be searched.  Features that merely overlap
    *            the range are rejected.
    */
-  public static boolean match(Pattern pattern, Sequence seq, 
+  public static boolean match(Pattern pattern, Sequence seq,
     StrandedFeature.Template ft, RangeLocation range, boolean bothStrands)
     throws IllegalAlphabetException, ChangeVetoException, BioException
   {
@@ -484,7 +485,7 @@ public final class DNATools {
       hasHit = PatternSearch.match(pattern, seq, ft, range);
 
       if (bothStrands) {
-        hasHit = hasHit || PatternSearch.match(pattern, SequenceTools.reverseComplement(seq), ft, 
+        hasHit = hasHit || PatternSearch.match(pattern, SequenceTools.reverseComplement(seq), ft,
           new RangeLocation(seq.length() + 1 - range.getMax(), seq.length() + 1 - range.getMin()));
       }
 
