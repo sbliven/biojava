@@ -38,33 +38,33 @@ import java.util.HashMap;
 
 /**
  * A general base parser for files produced by ABI software.  This includes
- * chromatograms derived from ABI sequencers and potentially other data files 
- * as well. The format was described by Clark Tibbetts in his paper "Raw Data 
- * File Formats, and the Digital and Analog Raw Data Streams of the ABI PRISM 
- * 377 DNA Sequencer."  Available online 
+ * chromatograms derived from ABI sequencers and potentially other data files
+ * as well. The format was described by Clark Tibbetts in his paper "Raw Data
+ * File Formats, and the Digital and Analog Raw Data Streams of the ABI PRISM
+ * 377 DNA Sequencer."  Available online
  * <kbd><a href="http://www-2.cs.cmu.edu/afs/cs/project/genome/WWW/Papers/clark.html">
  * http://www-2.cs.cmu.edu/afs/cs/project/genome/WWW/Papers/clark.html</a></kbd>
  * <p>
- * Briefly, the format consists of a set of named fixed-length "tagged data 
- * records" which may contain data themselves, or pointers to data elsewhere 
- * in the file.  This class reads these records and exposes them to subclasses 
+ * Briefly, the format consists of a set of named fixed-length "tagged data
+ * records" which may contain data themselves, or pointers to data elsewhere
+ * in the file.  This class reads these records and exposes them to subclasses
  * through the {@link #getDataRecord} method.  The attributes of the records as
- * described in Tibbets' paper are exposed through public (final) fields of 
+ * described in Tibbets' paper are exposed through public (final) fields of
  * {@link TaggedDataRecord} instances.
  * </p>
  * <p>
- * If a record only contains a pointer to the desired data, subclasses may get 
+ * If a record only contains a pointer to the desired data, subclasses may get
  * at the raw data by:
  * </p>
  * <ol>
- *   <li>Acquiring the appropriate {@link DataAccess} object by calling 
+ *   <li>Acquiring the appropriate {@link DataAccess} object by calling
  *       {#link getDataAccess}</li>
  *   <li>Seeking in it to the appropriate offset ({@link DataAccess#seek})</li>
- *   <li>Using the {@link java.io.DataInput} methods to read bytes, ints, 
+ *   <li>Using the {@link java.io.DataInput} methods to read bytes, ints,
  *       etc.</li>
  * </ol>
  * <p>
- * This parser provides methods and classes for dealing with the files as 
+ * This parser provides methods and classes for dealing with the files as
  * streams or local files (local files being more memory-efficient).
  * </p>
  *
@@ -77,12 +77,12 @@ public class ABIFParser {
 
     private final int RECORD_COUNT_OFFSET  = 18;
     private final int RECORD_OFFSET_OFFSET = 26;
-    
+
     /** Creates a new ABIFParser for a file. */
     public ABIFParser(File f) throws IOException {
         this(new ABIFParser.RandomAccessFile(f));
     }
-    
+
     /**
      * Creates a new ABIFParser for an input stream.  Note that the stream
      * will be wrapped in a {@link CachingInputStream} if it isn't one already.
@@ -102,14 +102,14 @@ public class ABIFParser {
         din = toParse;
         readDataRecords();
     }
-    
+
     /**
      * Returns the accessor for the raw data being parsed by this parser.
      */
     public final ABIFParser.DataAccess getDataAccess() {
         return din;
     }
-    
+
     private final void readDataRecords() throws IOException {
         parsed = false;
         din.seek(RECORD_COUNT_OFFSET);
@@ -127,12 +127,12 @@ public class ABIFParser {
         }
         parsed = true;
     }
-    
+
     /**
      * Decodes a character into a {@link Symbol} in the DNA alphabet.
      * Uses a definition of characters that is compatible with the ABI format.
      * @param token the character to decode
-     * @throws IllegalSymbolException when token isn't in 
+     * @throws IllegalSymbolException when token isn't in
      *         <code>{ a, A, c, C, g, G, t, T, n, N, - }</code>
      */
     public static Symbol decodeDNAToken(char token) throws IllegalSymbolException {
@@ -163,13 +163,13 @@ public class ABIFParser {
      * @throws IllegalStateException if the initial parsing is not complete
      * @return the requested data record, or null if no such record exists
      */
-    public ABIFParser.TaggedDataRecord getDataRecord(String tagName, int tagNumber) 
+    public ABIFParser.TaggedDataRecord getDataRecord(String tagName, int tagNumber)
     throws IllegalArgumentException, IllegalStateException {
         if (!parsed)
             throw new IllegalStateException("parsing is not complete");
-        if (tagNumber < 1) 
+        if (tagNumber < 1)
             throw new IllegalArgumentException("tagNumber must be positive");
-        if (tagName.length() != 4) 
+        if (tagName.length() != 4)
             throw new IllegalArgumentException("tagName must be 4 characters long");
         return (ABIFParser.TaggedDataRecord) records.get(tagName + tagNumber);
     }
@@ -197,7 +197,7 @@ public class ABIFParser {
         public final long   crypticVariable;
 
         /**
-         * Creates a new TaggedDataRecord from the next 28 bytes of 
+         * Creates a new TaggedDataRecord from the next 28 bytes of
          * <code>din</code>.
          * @param din the source of the raw data to be parsed
          * @throws IOException if there's a problem with <code>din</code>
@@ -219,7 +219,7 @@ public class ABIFParser {
         }
 
         /**
-         * A very verbose <code>toString</code> that dumps all of the 
+         * A very verbose <code>toString</code> that dumps all of the
          * data in this record in a human-readable format.
          */
         public String toString() {
@@ -243,7 +243,7 @@ public class ABIFParser {
             sb.append("  dataRecord      = ");
             if (recordLength <= 4) {
                 switch (dataType) {
-                case DATA_TYPE_ASCII_ARRAY: 
+                case DATA_TYPE_ASCII_ARRAY:
                     if (elementLength > 3)
                         sb.append((char) ((dataRecord >>> 24) & 0xFF));
                     if (elementLength > 2)
@@ -252,7 +252,7 @@ public class ABIFParser {
                         sb.append((char) ((dataRecord >>> 8 ) & 0xFF));
                     sb.append((char) ((dataRecord) & 0xFF));
                     break;
-                case DATA_TYPE_DATE: 
+                case DATA_TYPE_DATE:
                     sb.append((dataRecord >>> 16) & 0xffff).append('/');
                     sb.append((dataRecord >>> 8 ) & 0xff).append('/');
                     sb.append((dataRecord) & 0xff);
@@ -265,7 +265,7 @@ public class ABIFParser {
                 case DATA_TYPE_INTEGER:
                     sb.append(dataRecord >>> (4 - recordLength)*8);
                     break;
-                default: 
+                default:
                     hexStringify((int)dataRecord, sb);
                 }
             }
@@ -287,12 +287,12 @@ public class ABIFParser {
         }
     }
 
-    /** 
+    /**
      * Concatenation of the {@link Seekable} and {@link DataInput} interfaces.
      */
     public static interface DataAccess extends Seekable, DataInput { }
 
-    private static class RandomAccessFile 
+    private static class RandomAccessFile
     extends java.io.RandomAccessFile implements DataAccess {
         public RandomAccessFile(File f) throws FileNotFoundException {
             super(f, "r");
@@ -327,7 +327,7 @@ public class ABIFParser {
         public float   readFloat()   throws IOException { return din.readFloat();   }
         public double  readDouble()  throws IOException { return din.readDouble();  }
         public String  readUTF()     throws IOException { return din.readUTF();     }
-        
+
         public int readUnsignedByte()  throws IOException { return din.readUnsignedByte();  }
         public int readUnsignedShort() throws IOException { return din.readUnsignedShort(); }
 
@@ -344,7 +344,7 @@ public class ABIFParser {
         }
 
         public int skipBytes(int count) throws IOException { return din.skipBytes(count); }
-        
+
         public void seek(long pos) throws IOException {
             cin.seek(pos);
         }

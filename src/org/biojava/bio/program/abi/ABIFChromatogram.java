@@ -41,15 +41,15 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 
-/** 
- * An implementation of {@link org.biojava.bio.chromatogram.Chromatogram} to 
- * encapulsulate chromatogram data extracted from the files produced by ABI 
- * sequencers, such as the the 377 and the 3700.  The format was described by 
- * Clark Tibbetts in his paper "Raw Data File Formats, and the Digital and 
- * Analog Raw Data Streams of the ABI PRISM 377 DNA Sequencer."  Available 
+/**
+ * An implementation of {@link org.biojava.bio.chromatogram.Chromatogram} to
+ * encapulsulate chromatogram data extracted from the files produced by ABI
+ * sequencers, such as the the 377 and the 3700.  The format was described by
+ * Clark Tibbetts in his paper "Raw Data File Formats, and the Digital and
+ * Analog Raw Data Streams of the ABI PRISM 377 DNA Sequencer."  Available
  * online <kbd><a href="http://www-2.cs.cmu.edu/afs/cs/project/genome/WWW/Papers/clark.html">
  * http://www-2.cs.cmu.edu/afs/cs/project/genome/WWW/Papers/clark.html</a></kbd>
- * 
+ *
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
  * @see ABIFParser
  */
@@ -57,20 +57,20 @@ public class ABIFChromatogram extends AbstractChromatogram {
     public ABIFChromatogram() {
         super();
     }
-    
+
     /** Create a new ABIF object from a file.
      *  <p>
      *  This method is more efficent than {@link #create(InputStream)}.
      *  </p>
      */
-    public static ABIFChromatogram create(File f) 
+    public static ABIFChromatogram create(File f)
     throws IOException, UnsupportedChromatogramFormatException {
         ABIFChromatogram newOne = new ABIFChromatogram();
         newOne.load(f);
         return newOne;
     }
 
-    /** 
+    /**
      * Create a new ABIF object from a stream of bytes.
      * <p>
      * Due to the non-single-pass design of the ABI format, this method will
@@ -81,42 +81,42 @@ public class ABIFChromatogram extends AbstractChromatogram {
      * @return a new ABIFChromatogram object
      * @throws IOException if there is a problem with the underlying stream
      */
-    public static ABIFChromatogram create(InputStream in) 
+    public static ABIFChromatogram create(InputStream in)
     throws IOException, UnsupportedChromatogramFormatException {
         ABIFChromatogram newOne = new ABIFChromatogram();
         newOne.load(in);
         return newOne;
     }
-    
-    protected ABIFChromatogram load(File f) 
+
+    protected ABIFChromatogram load(File f)
     throws IOException, UnsupportedChromatogramFormatException {
         new Parser(f);
         return this;
     }
-    
-    protected ABIFChromatogram load(InputStream in) 
+
+    protected ABIFChromatogram load(InputStream in)
     throws IOException, UnsupportedChromatogramFormatException {
         new Parser(in);
         return this;
     }
-    
+
     protected AbstractChromatogram reverseComplementInstance() {
         return new ABIFChromatogram();
     }
-    
+
     /**
      * An extension of {@link ABIFParser} that reads the particular fields from
      * the ABIF that contain the chromatogram data and initializes the fields
      * in its enclosing <code>ABIFChromatogram</code> instance.
      */
     protected class Parser extends ABIFParser {
-        public Parser(InputStream in) 
+        public Parser(InputStream in)
         throws IOException, UnsupportedChromatogramFormatException {
             super(in);
             parse();
         }
 
-        public Parser(File f) 
+        public Parser(File f)
         throws IOException, UnsupportedChromatogramFormatException {
             super(f);
             parse();
@@ -176,12 +176,12 @@ public class ABIFChromatogram extends AbstractChromatogram {
             else {
                 throw new UnsupportedChromatogramFormatException("Only 8- and 16-bit trace samples are supported");
             }
-            
+
             try {
                 setTrace(sym, trace, max);
             } catch (IllegalSymbolException ise) {
                 throw new BioError(ise, "Can't happen");
-            } 
+            }
         }
 
         private void parseBaseCalls() throws IOException, UnsupportedChromatogramFormatException {

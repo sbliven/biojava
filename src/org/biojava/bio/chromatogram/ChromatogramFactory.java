@@ -21,8 +21,8 @@
 
 package org.biojava.bio.chromatogram;
 
-import org.biojava.bio.programs.scf.SCF;
-import org.biojava.bio.programs.abi.ABIFChromatogram;
+import org.biojava.bio.program.scf.SCF;
+import org.biojava.bio.program.abi.ABIFChromatogram;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +34,7 @@ import org.biojava.utils.io.CachingInputStream;
  * A factory that creates {@link Chromatogram} objects from files or streams.
  * In either case, the type of object to create is determined from the first
  * four bytes of the stream (the magic number).
- * 
+ *
  * @author Rhett Sutphin (<a href="http://genome.uiowa.edu/">UI CBCB</a>)
  */
 public class ChromatogramFactory {
@@ -48,20 +48,20 @@ public class ChromatogramFactory {
                                       + (((byte) 'B') << 16)
                                       + (((byte) 'I') << 8)
                                       + (((byte) 'F'));
-    
-    /** 
+
+    /**
      * Creates a new <code>Chromatogram</code> object from the named file.
      * @param f the file to read
      * @throws IOException when the file can't be read or some other I/O error occurs
-     * @throws UnsupportedChromatogramFormatException when the file doesn't 
+     * @throws UnsupportedChromatogramFormatException when the file doesn't
      *         contain a chromatogram in a supported format
      */
-    public static Chromatogram create(File f) 
+    public static Chromatogram create(File f)
     throws IOException, UnsupportedChromatogramFormatException {
         FileInputStream fin = new FileInputStream(f);
         int magic = magicFromStream(fin);
         fin.close();
-        
+
         switch (magic) {
         case SCF_MAGIC:
             return SCF.create(f);
@@ -71,32 +71,32 @@ public class ChromatogramFactory {
             throw new UnsupportedChromatogramFormatException("File "+f+" with magic "+magic+" has an unsupported format");
         }
     }
-    
+
     /**
      * Creates a new <code>Chromatogram</code> object from the supplied stream.
-     * Note that for some chromatogram formats, this can be much more 
+     * Note that for some chromatogram formats, this can be much more
      * memory-intensive than reading from a file.
      * <p>
-     * Note also that if the provided stream is a 
-     * {@link org.biojava.utils.io.CachingInputStream}, it will be seeked 
-     * back to 0 before being passed to the parser.  This is because the 
+     * Note also that if the provided stream is a
+     * {@link org.biojava.utils.io.CachingInputStream}, it will be seeked
+     * back to 0 before being passed to the parser.  This is because the
      * parsers that use <code>CachingInputStream</code> assume that the
      * "file" starts at 0.
      * </p>
      *
      * @param in the stream from which to read the chromatogram.
      * @throws IOException when there's a problem with the stream
-     * @throws UnsupportedChromatogramFormatException when the file doesn't 
+     * @throws UnsupportedChromatogramFormatException when the file doesn't
      *         contain a chromatogram in a supported format
      */
-    public static Chromatogram create(InputStream in) 
+    public static Chromatogram create(InputStream in)
     throws IOException, UnsupportedChromatogramFormatException {
         CachingInputStream cin;
         if (in instanceof CachingInputStream)
             cin = (CachingInputStream) in;
         else
             cin = new CachingInputStream(in);
-        // parsers assume that the image of the file in the stream starts at 
+        // parsers assume that the image of the file in the stream starts at
         // the beginning of the stream-as-provided.  If the stream
         // was a CachingInputStream, it needs to go to zero.
         cin.seek(0);
@@ -111,9 +111,9 @@ public class ChromatogramFactory {
         default:
             throw new UnsupportedChromatogramFormatException("The provided input stream with magic "+magic+" has an unsupported format");
         }
-        
+
     }
-    
+
     private static int makeMagic(byte[] magic) {
         return (magic[0] << 24) | (magic[1] << 16) | (magic[2] << 8) | (magic[3]);
     }
