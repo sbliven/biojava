@@ -38,39 +38,39 @@ extends AbstractDistribution
 implements Serializable {
   private final FiniteAlphabet alphabet;
   private Distribution nullModel;
-  
+
   public Alphabet getAlphabet() {
     return alphabet;
   }
-  
+
   public Distribution getNullModel() {
     return nullModel;
   }
    /**
   *Assign a background distribution
   *@param nullModel the background distribution to assign
-  */  
+  */
   protected void setNullModelImpl(Distribution nullModel)
   throws IllegalAlphabetException {
     this.nullModel = nullModel;
   }
-  
+
   protected double getWeightImpl(AtomicSymbol s)
   throws IllegalSymbolException {
     return (1.0 / alphabet.size());
   }
-  
+
   protected void setWeightImpl(AtomicSymbol sym, double weight)
   throws ChangeVetoException {
     throw new ChangeVetoException(
       "Can't change the weights in a UniformDistribution"
     );
   }
-  
+
   public void registerWithTrainer(DistributionTrainerContext dtc) {
     dtc.registerTrainer(this, IgnoreCountsTrainer.getInstance());
   }
-  
+
   public UniformDistribution(FiniteAlphabet alphabet) {
     this.alphabet = alphabet;
     this.nullModel = this;

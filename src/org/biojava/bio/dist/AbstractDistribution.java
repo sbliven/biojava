@@ -50,12 +50,12 @@ import org.biojava.bio.symbol.*;
 public abstract class AbstractDistribution implements Distribution {
   protected transient ChangeSupport changeSupport = null;
   protected transient Distribution.NullModelForwarder nullModelForwarder = null;
-  
+
   protected void generateChangeSupport(ChangeType ct) {
     if(changeSupport == null) {
       changeSupport = new ChangeSupport();
     }
-    
+
     if(
       ((ct == null) || (ct == Distribution.NULL_MODEL)) &&
       nullModelForwarder == null
@@ -64,21 +64,21 @@ public abstract class AbstractDistribution implements Distribution {
       getNullModel().addChangeListener(nullModelForwarder, Distribution.WEIGHTS);
     }
   }
-  
+
   public void addChangeListener(ChangeListener cl) {
     generateChangeSupport(null);
     synchronized(changeSupport) {
       changeSupport.addChangeListener(cl);
     }
   }
-  
+
   public void addChangeListener(ChangeListener cl, ChangeType ct) {
     generateChangeSupport(ct);
     synchronized(changeSupport) {
       changeSupport.addChangeListener(cl, ct);
     }
   }
-  
+
   public void removeChangeListener(ChangeListener cl) {
     if(changeSupport != null) {
       synchronized(changeSupport) {
@@ -86,7 +86,7 @@ public abstract class AbstractDistribution implements Distribution {
       }
     }
   }
-  
+
   public void removeChangeListener(ChangeListener cl, ChangeType ct) {
     if(changeSupport != null) {
       synchronized(changeSupport) {
@@ -97,7 +97,7 @@ public abstract class AbstractDistribution implements Distribution {
 
   abstract protected void setWeightImpl(AtomicSymbol sym, double weight)
   throws IllegalSymbolException, ChangeVetoException;
-  
+
   /**
    * Set the weight of a given symbol in this distribution.
    * <P>
@@ -123,7 +123,7 @@ public abstract class AbstractDistribution implements Distribution {
       }
     }
   }
-  
+
   private void doSetWeight(Symbol sym, double weight)
   throws IllegalSymbolException, ChangeVetoException {
     if(sym instanceof AtomicSymbol) {
@@ -136,10 +136,10 @@ public abstract class AbstractDistribution implements Distribution {
       }
     }
   }
-  
+
   abstract protected void setNullModelImpl(Distribution nullModel)
   throws IllegalAlphabetException, ChangeVetoException;
-  
+
   final public void setNullModel(Distribution nullModel)
   throws IllegalAlphabetException, ChangeVetoException {
     if(nullModel.getAlphabet() != getAlphabet()) {
@@ -173,9 +173,9 @@ public abstract class AbstractDistribution implements Distribution {
         setNullModelImpl(nullModel);
         changeSupport.firePostChangeEvent(ce);
       }
-    }    
+    }
   }
-  
+
   /**
    * Retrieve the weight for this distribution.
    * <P>
@@ -192,7 +192,7 @@ public abstract class AbstractDistribution implements Distribution {
   throws IllegalSymbolException {
     if(sym instanceof AtomicSymbol) {
       return getWeightImpl((AtomicSymbol) sym);
-    } else {  
+    } else {
       Alphabet ambA = sym.getMatches();
       if(ambA instanceof FiniteAlphabet) {
         FiniteAlphabet fa = (FiniteAlphabet) ambA;
@@ -223,12 +223,11 @@ public abstract class AbstractDistribution implements Distribution {
       }
     }
   }
-  
+
   protected abstract double getWeightImpl(AtomicSymbol sym)
   throws IllegalSymbolException;
-  
-  public Symbol sampleSymbol()
-  throws BioError {
+
+  public Symbol sampleSymbol() {
     double p = Math.random();
     try {
       for(Iterator i = ((FiniteAlphabet) getAlphabet()).iterator(); i.hasNext(); ) {
@@ -238,7 +237,7 @@ public abstract class AbstractDistribution implements Distribution {
           return s;
         }
       }
-    
+
       StringBuffer sb = new StringBuffer();
       for(Iterator i = ((FiniteAlphabet) this.getAlphabet()).iterator(); i.hasNext(); ) {
         AtomicSymbol s = (AtomicSymbol) i.next();
@@ -257,7 +256,7 @@ public abstract class AbstractDistribution implements Distribution {
       );
     }
   }
-  
+
   /**
    * Register an IgnoreCountsTrainer instance as the trainer for this
    * distribution.  Override this if you wish to implement a trainable
