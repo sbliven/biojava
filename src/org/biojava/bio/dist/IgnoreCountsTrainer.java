@@ -32,8 +32,13 @@ import org.biojava.bio.symbol.*;
 public class IgnoreCountsTrainer implements DistributionTrainer {
   public void addCount(DistributionTrainerContext dtc, AtomicSymbol sym, double times) 
     throws IllegalSymbolException {}
-  public void train(double weight) {}
-  public void clearCounts() {}
+  public double getCount(DistributionTrainerContext dtc, AtomicSymbol sym)
+  throws IllegalSymbolException {
+    return 0.0;
+  }
+  
+  public void train(DistributionTrainerContext dtc, double weight) {}
+  public void clearCounts(DistributionTrainerContext dtc) {}
   
   protected IgnoreCountsTrainer() {}
   

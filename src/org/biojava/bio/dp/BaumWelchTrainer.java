@@ -28,15 +28,21 @@ import org.biojava.bio.BioError;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.dist.*;
 import org.biojava.bio.seq.*;
-import org.biojava.bio.dp.onehead.SingleDPMatrix;
+import org.biojava.bio.dp.onehead.*;
 
+/**
+ * Train a hidden markov model using maximum likelyhood.
+ * 
+ * <p>Note: this class currently only works for one-head models.
+ * </p>
+ */
 public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
   protected double singleSequenceIteration(
     ModelTrainer trainer,
     SymbolList symList
   ) throws IllegalSymbolException, IllegalTransitionException, IllegalAlphabetException {
     ScoreType scoreType = ScoreType.PROBABILITY;
-    DP dp = getDP();
+    SingleDP dp = (SingleDP) getDP();
     State [] states = dp.getStates();
     int [][] forwardTransitions = dp.getForwardTransitions();
     double [][] forwardTransitionScores = dp.getForwardTransitionScores(scoreType);    
@@ -46,20 +52,24 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
     
     SymbolList [] rll = { symList };
     
+    System.out.print("Forward...  ");
     SingleDPMatrix fm = (SingleDPMatrix) dp.forwardMatrix(rll, scoreType);
     double fs = fm.getScore();
-    
+    System.out.println("Score = " + fs);
+
+    System.out.print("Backward... ");
     SingleDPMatrix bm = (SingleDPMatrix) dp.backwardMatrix(rll, scoreType);
     double bs = bm.getScore();
+    System.out.println("Score = " + bs);
 
     Symbol gap = AlphabetManager.getGapSymbol();
     
     // state trainer
     for (int i = 1; i <= symList.length(); i++) {
       Symbol sym = symList.symbolAt(i);
+      double [] fsc = fm.scores[i];
+      double [] bsc = bm.scores[i];
       for (int s = 0; s < dp.getDotStatesIndex(); s++) {
-        double [] fsc = fm.scores[i];
-        double [] bsc = bm.scores[i];
         if (! (states[s] instanceof MagicalState)) {
           trainer.addCount(
             ((EmissionState) states[s]).getDistribution(),
@@ -72,10 +82,12 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
 
     // transition trainer
     for (int i = 0; i <= symList.length(); i++) {
-      Symbol sym = (i < symList.length()) ? symList.symbolAt(i + 1) :
-                    gap;
+      Symbol sym = (i < symList.length())
+            ? symList.symbolAt(i + 1)
+            : gap;
       double [] fsc = fm.scores[i];
       double [] bsc = bm.scores[i+1];
+      double[] weightVector = dp.getEmission(sym, scoreType); 
       for (int s = 0; s < states.length; s++) {  // any -> emission transitions
         int [] ts = backwardTransitions[s];
         double [] tss = backwardTransitionScores[s];
@@ -83,7 +95,7 @@ public class BaumWelchTrainer extends AbstractTrainer implements Serializable {
         for (int tc = 0; tc < ts.length; tc++) {
           int t = ts[tc];
           double weight = (states[t] instanceof EmissionState)
-            ? ((EmissionState) states[t]).getDistribution().getWeight(sym)
+            ? Math.exp(weightVector[t])
             : 1.0;
           if (weight != 0.0) {
             try {

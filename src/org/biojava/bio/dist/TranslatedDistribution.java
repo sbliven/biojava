@@ -38,62 +38,8 @@ import org.biojava.bio.symbol.*;
  */
 public class TranslatedDistribution
 implements Distribution, Serializable {
-  private static Map cache;
-  
-  static {
-    cache = new HashMap();
-  }
-  
-  private static ListWrapper gopher = new ListWrapper();
-  
-  public static TranslatedDistribution getDistribution(
-    FiniteAlphabet alphabet, Distribution source
-  ) throws IllegalAlphabetException {
-    Alphabet oa = source.getAlphabet();
-    if(! (oa instanceof FiniteAlphabet) ) {
-      throw new IllegalAlphabetException(
-        "Source distribution must have a finite alphabet: " + oa.getName()
-      );
-    }
-    return getDistribution(
-      new SimpleReversibleTranslationTable(
-        alphabet, (FiniteAlphabet) oa
-      ),
-      source
-    );
-  }
-
-  public static TranslatedDistribution getDistribution(
-    ReversibleTranslationTable table, Distribution source
-  ) {
-    synchronized(cache) {
-      List get = Arrays.asList(new Object[] { table, source });
-      gopher.setList(get);
-      SoftReference ref = (SoftReference) cache.get(get);
-      TranslatedDistribution dist;
-      try {
-        if(ref == null) {
-          dist = new TranslatedDistribution(table, source);
-          cache.put(new ListWrapper(get), new SoftReference(dist));
-        } else {
-          dist = (TranslatedDistribution) ref.get();
-          if(dist == null) {
-            dist = new TranslatedDistribution(table, source);
-            cache.put(new ListWrapper(get), new SoftReference(dist));
-          }
-        }
-      } catch (IllegalAlphabetException iae) {
-        throw new BioError(
-          iae,
-          "The parent's null distribution is not complementable, " +
-          "but the parent is. Something is wrong with the parent"
-        );
-      }
-      return dist;
-    }
-  }
-
   private final Distribution other;
+  private final Distribution delegate;
   private final ReversibleTranslationTable table;
   protected transient ChangeSupport changeSupport = null;
   private transient ChangeListener forwarder = new Forwarder();
@@ -137,8 +83,10 @@ implements Distribution, Serializable {
   /**
    * Users should make these thigs via getDistribuiton.
    */     
-  private TranslatedDistribution(
-    ReversibleTranslationTable table, Distribution other
+  public TranslatedDistribution(
+    ReversibleTranslationTable table,
+    Distribution other,
+    DistributionFactory distFact
   ) throws IllegalAlphabetException {
     if(table.getTargetAlphabet() != other.getAlphabet()) {
       throw new IllegalAlphabetException(
@@ -149,8 +97,36 @@ implements Distribution, Serializable {
     }
     this.other = other;
     this.table = table;
+    this.delegate = distFact.createDistribution(table.getSourceAlphabet());
   }
 
+  public Alphabet getAlphabet() {
+    return table.getSourceAlphabet();
+  }
+  
+  public double getWeight(Symbol sym)
+  throws IllegalSymbolException {
+    return delegate.getWeight(sym);
+  }
+  
+  public void setWeight(Symbol sym, double weight)
+  throws IllegalSymbolException, ChangeVetoException {
+    delegate.setWeight(sym, weight);
+  }
+  
+  public Symbol sampleSymbol() {
+    return delegate.sampleSymbol();
+  }
+  
+  public Distribution getNullModel() {
+    return delegate.getNullModel();
+  }
+  
+  public void setNullModel(Distribution dist)
+  throws IllegalAlphabetException, ChangeVetoException {
+    delegate.setNullModel(dist);
+  }
+  
   /**
    * Retrieve the translation table encapsulating the map from this emission
    * spectrum to the underlying one.
@@ -161,50 +137,51 @@ implements Distribution, Serializable {
     return table;
   }
   
-  public double getWeight(Symbol s) throws IllegalSymbolException {
-    return other.getWeight(table.translate(s));
-  }
-  
-  public void setWeight(Symbol s, double score)
-  throws IllegalSymbolException, ChangeVetoException {
-    other.setWeight(table.translate(s), score);
-  }
-  
-  public Alphabet getAlphabet() {
-    return table.getSourceAlphabet();
-  }
-  
-  public Symbol sampleSymbol() {
-    try {
-      return table.untranslate(other.sampleSymbol());
-    } catch (IllegalSymbolException ise) {
-      throw new BioError(
-        ise,
-        "Somehow, I have been unable to untranslate a symbol"
-      );
-    }
-  }
-  
-  public Distribution getNullModel() {
-    return getDistribution(table, other.getNullModel()); 
-  }
-  
-  public void setNullModel(Distribution nullModel)
-  throws IllegalAlphabetException, ChangeVetoException {
-    throw new ChangeVetoException(
-      "TranslatedDistribution objects can't have their null models changed."
-    );
-  }
-  
   public void registerWithTrainer(DistributionTrainerContext dtc) {
     dtc.registerDistribution(other);
-    dtc.registerTrainer(this, new IgnoreCountsTrainer() {
+    
+    dtc.registerTrainer(this, new DistributionTrainer() {
       public void addCount(
         DistributionTrainerContext dtc,
         AtomicSymbol s,
         double count
       ) throws IllegalSymbolException {
         dtc.addCount(other, table.translate(s), count);
+      }
+      
+      public double getCount(
+        DistributionTrainerContext dtc,
+        AtomicSymbol s
+      ) throws IllegalSymbolException {
+        return dtc.getCount(other, table.translate(s));
+      }
+      
+      public void train(DistributionTrainerContext dtc, double weight)
+      throws ChangeVetoException {
+        DistributionTrainerContext subCtxt
+          = new SimpleDistributionTrainerContext();
+        subCtxt.setNullModelWeight(weight);
+        subCtxt.registerDistribution(delegate);
+
+        for(
+          Iterator i = ((FiniteAlphabet) other.getAlphabet()).iterator();
+          i.hasNext();
+        ) {
+          AtomicSymbol sym = (AtomicSymbol) i.next();
+          try {
+            subCtxt.addCount(
+                delegate,
+                table.translate(sym),
+                dtc.getCount(other, sym)
+            );
+          } catch (IllegalSymbolException ise) {
+            throw new BioError(ise, "Assertion Failed: Can't train");
+          }
+        }
+        subCtxt.train();
+      }
+      
+      public void clearCounts(DistributionTrainerContext dtc) {
       }
     });
   }

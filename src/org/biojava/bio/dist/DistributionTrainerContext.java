@@ -86,6 +86,9 @@ public interface DistributionTrainerContext {
   void addCount(Distribution dist, Symbol sym, double times)
   throws IllegalSymbolException;
   
+  double getCount(Distribution dist, Symbol sym)
+  throws IllegalSymbolException;
+  
   /**
    * Trains the Distribution, given a null model.
    * <P>

@@ -36,7 +36,7 @@ import org.biojava.bio.symbol.*;
  * @author Thomas Down
  */
 
-public final class SimpleDistribution
+public class SimpleDistribution
 extends AbstractDistribution
 implements Serializable {
   private transient AlphabetIndex indexer;
@@ -123,7 +123,7 @@ implements Serializable {
    dtc.registerTrainer(this, new Trainer());
   }
   
-  private class Trainer implements DistributionTrainer {
+  protected class Trainer implements DistributionTrainer {
     private final Count counts;
     
     public Trainer() {
@@ -141,7 +141,12 @@ implements Serializable {
       }
     }
     
-    public void clearCounts() {
+    public double getCount(DistributionTrainerContext dtc, AtomicSymbol sym)
+    throws IllegalSymbolException {
+      return counts.getCount(sym);
+    }
+    
+    public void clearCounts(DistributionTrainerContext dtc) {
       try {
         int size = ((FiniteAlphabet) counts.getAlphabet()).size();
         for(int i = 0; i < size; i++) {
@@ -154,10 +159,10 @@ implements Serializable {
       }
     }
     
-    public void train(double weight)
+    public void train(DistributionTrainerContext dtc, double weight)
     throws ChangeVetoException {
       if(changeSupport == null)  {
-        trainImpl(weight);
+        trainImpl(dtc, weight);
       } else {
         synchronized(changeSupport) {
           ChangeEvent ce = new ChangeEvent(
@@ -165,13 +170,13 @@ implements Serializable {
             Distribution.WEIGHTS
           );
           changeSupport.firePreChangeEvent(ce);
-          trainImpl(weight);
+          trainImpl(dtc, weight);
           changeSupport.firePostChangeEvent(ce);
         }
       }
     }
     
-    protected void trainImpl(double weight) {
+    protected void trainImpl(DistributionTrainerContext dtc, double weight) {
       try {
         Distribution nullModel = getNullModel();
 		double[] weights = getWeights();
@@ -180,7 +185,7 @@ implements Serializable {
         for(int i = 0; i < total.length; i++) {
           AtomicSymbol s = (AtomicSymbol) indexer.symbolForIndex(i);
           sum += total[i] = 
-            counts.getCount(s) +
+            getCount(dtc, s) +
             nullModel.getWeight(s) * weight;
         }
         double sum_inv = 1.0 / sum;

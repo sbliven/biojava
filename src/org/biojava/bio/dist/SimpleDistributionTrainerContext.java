@@ -1,12 +1,12 @@
 /*
- *                    BioJava development code
+ *              BioJava development code
  *
  * This code may be freely distributed and modified under the
  * terms of the GNU Lesser General Public Licence.  This should
  * be distributed with the code.  If you do not have a copy,
  * see:
  *
- *      http://www.gnu.org/copyleft/lesser.html
+ *    http://www.gnu.org/copyleft/lesser.html
  *
  * Copyright for this code is held jointly by the individual
  * authors.  These should be listed in @author doc comments.
@@ -15,7 +15,7 @@
  * or to join the biojava-l mailing list, visit the home page
  * at:
  *
- *      http://www.biojava.org/
+ *    http://www.biojava.org/
  *
  */
 
@@ -39,7 +39,7 @@ implements DistributionTrainerContext, Serializable {
   private final Set trainers;
   
   private double nullModelWeight;
-    
+  
   /**
   * Retrieve the weight of the background distribution
   */   
@@ -73,8 +73,7 @@ implements DistributionTrainerContext, Serializable {
   }
 
   public void addCount(Distribution dist, Symbol sym, double times)
-      throws IllegalSymbolException 
-  {
+  throws IllegalSymbolException {
     DistributionTrainer dt = getTrainer(dist);
     if(dt == null) {
       throw new NullPointerException(
@@ -82,29 +81,55 @@ implements DistributionTrainerContext, Serializable {
       );
     }
     if (sym instanceof AtomicSymbol) {
-	dt.addCount(this, (AtomicSymbol) sym, times);
+      dt.addCount(this, (AtomicSymbol) sym, times);
     } else {
-	Distribution nullModel = dist.getNullModel();
-	double totWeight = nullModel.getWeight(sym);
-	for (Iterator asi = ((FiniteAlphabet) sym.getMatches()).iterator();
-	     asi.hasNext(); )
-	{
-	    AtomicSymbol as = (AtomicSymbol) asi.next();
-	    dt.addCount(this, as, times * (nullModel.getWeight(as) / totWeight));
-	}
+//      Distribution nullModel = dist.getNullModel();
+//      double totWeight = nullModel.getWeight(sym);
+      for (
+        Iterator asi = ((FiniteAlphabet) sym.getMatches()).iterator();
+        asi.hasNext();
+      ) {
+        AtomicSymbol as = (AtomicSymbol) asi.next();
+        //dt.addCount(this, as, times * (nullModel.getWeight(as) / totWeight));
+        dt.addCount(this, as, times);
+      }
+    }
+  }
+  
+  public double getCount(Distribution dist, Symbol sym)
+  throws IllegalSymbolException {
+    DistributionTrainer dt = getTrainer(dist);
+    if(dt == null) {
+      throw new NullPointerException(
+        "No trainer associated with distribution " + dist
+      );
+    }
+    if (sym instanceof AtomicSymbol) {
+      return dt.getCount(this, (AtomicSymbol) sym);
+    } else {
+      double totWeight = 0.0;
+      Distribution nullModel = dist.getNullModel();
+      for (
+        Iterator asi = ((FiniteAlphabet) sym.getMatches()).iterator();
+        asi.hasNext();
+      ) {
+        AtomicSymbol as = (AtomicSymbol) asi.next();
+        totWeight += dt.getCount(this, as);
+      }
+      return totWeight;
     }
   }
   
   public void train()
   throws ChangeVetoException {
     for(Iterator i = trainers.iterator(); i.hasNext(); ) {
-      ((DistributionTrainer) i.next()).train(getNullModelWeight());
+      ((DistributionTrainer) i.next()).train(this, getNullModelWeight());
     }
   }
   
   public void clearCounts() {
     for(Iterator i = trainers.iterator(); i.hasNext(); ) {
-      ((DistributionTrainer) i.next()).clearCounts();
+      ((DistributionTrainer) i.next()).clearCounts(this);
     }
   }
   

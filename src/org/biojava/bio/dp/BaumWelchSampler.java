@@ -36,7 +36,6 @@ import org.biojava.bio.dp.onehead.*;
  * <p>Note: this class currently only works for one-head models.
  * </p>
  */
-
 public class BaumWelchSampler extends AbstractTrainer implements Serializable {
   protected double singleSequenceIteration(
     ModelTrainer trainer,
@@ -53,7 +52,7 @@ public class BaumWelchSampler extends AbstractTrainer implements Serializable {
     
     SymbolList [] rll = { symList };
     
-    System.out.print("Forward... ");
+    System.out.print("Forward...  ");
     SingleDPMatrix fm = (SingleDPMatrix) dp.forwardMatrix(rll, scoreType);
     double fs = fm.getScore();
     System.out.println("Score = " + fs);
@@ -68,14 +67,17 @@ public class BaumWelchSampler extends AbstractTrainer implements Serializable {
     // state trainer
     for (int i = 1; i <= symList.length(); i++) {
       Symbol sym = symList.symbolAt(i);
+      double [] fsc = fm.scores[i];
+      double [] bsc = bm.scores[i];
       double p = Math.random();
       for (int s = 0; s < dp.getDotStatesIndex(); s++) {
         if (! (states[s] instanceof MagicalState)) {
-          p -= Math.exp(fm.scores[i][s] + bm.scores[i][s] - fs);
+          p -= Math.exp(fsc[s] + bsc[s] - fs);
           if (p <= 0.0) {
             trainer.addCount(
               ((EmissionState) states[s]).getDistribution(),
-              sym, 1.0
+              sym,
+              1.0
             );
             break;
           }
@@ -85,28 +87,35 @@ public class BaumWelchSampler extends AbstractTrainer implements Serializable {
 
     // transition trainer
     for (int i = 0; i <= symList.length(); i++) {
-      Symbol sym = (i < symList.length()) ? symList.symbolAt(i + 1) :
-                   gap;
-      for (int s = 0; s < states.length; s++) {
+      Symbol sym = (i < symList.length())
+            ? symList.symbolAt(i + 1)
+            : gap;
+      double [] fsc = fm.scores[i];
+      double [] bsc = bm.scores[i+1];
+      double[] weightVector = dp.getEmission(sym, scoreType);
+      for (int s = 0; s < states.length; s++) {  // any -> emission transitions
         int [] ts = backwardTransitions[s];
         double [] tss = backwardTransitionScores[s];
-        double p = Math.random();
         Distribution dist = model.getWeights(states[s]);
-	double[] weightVector = dp.getEmission(sym, scoreType);
+        double p = Math.random();
         for (int tc = 0; tc < ts.length; tc++) {
           int t = ts[tc];
           // double weight = (states[t] instanceof EmissionState)
           //   ? ((EmissionState) states[t]).getDistribution().getWeight(sym)
           //  : 1.0;
-	  double weight = 1.0;
-	  if (states[t] instanceof EmissionState) {
-	      weight = Math.exp(weightVector[t]);
-	  }
+          double weight = 1.0;
+          if (states[t] instanceof EmissionState) {
+            weight = Math.exp(weightVector[t]);
+          }
           if (weight != 0.0) {
-            p -= Math.exp(fm.scores[i][s] + tss[tc] + bm.scores[i+1][t] - fs) * weight;
+            p -= Math.exp(fsc[s] + tss[tc] + bsc[t] - fs) * weight;
             if (p <= 0.0) {
               try {
-                trainer.addCount(dist, (State) states[t], 1.0);
+                trainer.addCount(
+                  dist,
+                  states[t],
+                  1.0
+                );
               } catch (IllegalSymbolException ise) {
                 throw new BioError(ise,
                   "Transition in backwardTransitions dissapeared");

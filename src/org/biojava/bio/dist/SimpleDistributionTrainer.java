@@ -68,7 +68,21 @@ implements DistributionTrainer, Serializable {
     c.put(sym, new Double(d.doubleValue() + count));
   }
 
-  public void train(double weight)
+  public double getCount(
+    DistributionTrainerContext dtc,
+    AtomicSymbol sym
+  ) throws IllegalSymbolException {
+    Double d = (Double) c.get(sym);
+    if (d == null) {
+      throw new IllegalSymbolException(
+        "Symbol " + sym.getName() +
+        " not found in " + dis.getAlphabet().getName()
+      );
+    }
+    return ((Double) c.get(sym)).doubleValue();
+  }
+
+  public void train(DistributionTrainerContext dtc, double weight)
   throws ChangeVetoException {
     Distribution nullModel = dis.getNullModel();
     double sum = 0.0;
@@ -101,7 +115,7 @@ implements DistributionTrainer, Serializable {
     }
   }
 
-  public void clearCounts() {
+  public void clearCounts(DistributionTrainerContext dtc) {
     for(
       Iterator i = ((FiniteAlphabet) dis.getAlphabet()).iterator();
       i.hasNext();
@@ -120,6 +134,5 @@ implements DistributionTrainer, Serializable {
       );
     }
     this.dis = dis;
-    this.clearCounts();
   }
 }

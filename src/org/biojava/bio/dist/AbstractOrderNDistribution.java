@@ -148,6 +148,22 @@ implements OrderNDistribution, Serializable {
         Distribution dist = getDistribution(firstS);
         dtc.addCount(dist, (Symbol) symL.get(lb1), count);
       }
+      
+      public double getCount(
+        DistributionTrainerContext dtc,
+        AtomicSymbol sym
+      ) throws IllegalSymbolException {
+        List symL = ((BasisSymbol) sym).getSymbols();
+        int lb1 = symL.size() - 1;
+        Symbol firstS;
+        if(lb1 == 1) {
+          firstS = (Symbol) symL.get(0);
+        } else {
+          firstS = firstA.getSymbol(symL.subList(0, lb1));
+        }
+        Distribution dist = getDistribution(firstS);
+        return dtc.getCount(dist, (AtomicSymbol) symL.get(lb1));
+      }
     });
   }
   

@@ -46,6 +46,20 @@ public interface DistributionTrainer {
   throws IllegalSymbolException;
   
   /**
+   * Get the current count for this state.
+   * <P>
+   * This method may be called multiple times with the same symbol. Each time
+   * it should return the agregate of the counts added with addCount since the
+   * last invocation of clearCounts.
+   *
+   * @param dtc the DistributionTrainerContext within which the count was added
+   * @param sym the Symbol seen
+   * @return the agregate of the counts
+   */
+  double getCount(DistributionTrainerContext dtc, AtomicSymbol sym)
+  throws IllegalSymbolException;
+  
+  /**
    * Trains the Distribution, given a null model.
    * <P>
    * This will use the information collected with multiple addCount calls, and
@@ -57,11 +71,11 @@ public interface DistributionTrainer {
    * @throws ChangeVetoException if the distribution could not have its weights
    *         modified
    */
-  void train(double weight)
+  void train(DistributionTrainerContext dtc, double weight)
   throws ChangeVetoException;
   
   /**
    * Clears all of the counts to zero.
    */
-  void clearCounts();
+  void clearCounts(DistributionTrainerContext dtc);
 }

@@ -144,6 +144,20 @@ implements Serializable, Distribution {
   private class PairTrainer
   extends IgnoreCountsTrainer
   implements Serializable {
+    public double getCount(DistributionTrainerContext dtc, AtomicSymbol as)
+    throws IllegalSymbolException {
+      getAlphabet().validate(as);
+      
+      List symL = as.getSymbols();
+      Symbol f = (Symbol) symL.get(0);
+      Symbol s = (Symbol) symL.get(1);
+      
+      // I don't think this is correct. Pants!
+      return 
+        (dtc.getCount(first, f) + dtc.getCount(second, s)) * 0.5;
+      
+    }
+    
     public void addCount(
       DistributionTrainerContext dtc, Symbol sym, double times
     ) throws IllegalSymbolException {
