@@ -23,6 +23,8 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
+
 import org.biojava.bio.*;
 
 /**
@@ -31,7 +33,7 @@ import org.biojava.bio.*;
  *
  * @author Matthew Pocock
  */
-public class CrossProductSymbolNameParser implements SymbolParser {
+public class CrossProductSymbolNameParser implements SymbolParser, Serializable {
   private final CrossProductAlphabet alpha;
   private final SymbolParser [] parser;
   
@@ -153,5 +155,10 @@ public class CrossProductSymbolNameParser implements SymbolParser {
         );
       }
     }
+  }
+
+  protected CrossProductSymbolNameParser() {
+    this.alpha = null;
+    this.parser = null;
   }
 }

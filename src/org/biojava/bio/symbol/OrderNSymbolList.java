@@ -22,6 +22,7 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
@@ -34,7 +35,8 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  */
-public class OrderNSymbolList extends AbstractSymbolList {
+public class OrderNSymbolList
+extends AbstractSymbolList implements Serializable {
   /**
    * The source sequence that we will transliterate.
    */
@@ -70,6 +72,12 @@ public class OrderNSymbolList extends AbstractSymbolList {
       Collections.nCopies(order, a)
     );
     this.order = order;
+  }
+  
+  protected OrderNSymbolList() {
+    this.source = null;
+    this.alpha = null;
+    this.order = 0;
   }
   
   public Alphabet alphabet() {

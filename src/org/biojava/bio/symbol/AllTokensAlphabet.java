@@ -23,6 +23,8 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
+
 import org.biojava.bio.*;
 
 /**
@@ -37,7 +39,7 @@ import org.biojava.bio.*;
  *
  * @author Matthew Pocock
  */
-public class AllTokensAlphabet implements FiniteAlphabet {
+public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
   private Map tokenToSymbol; // token->Symbol
   private Map nameToSymbol; // name->Symbol
   private Set symbols;
@@ -135,4 +137,6 @@ public class AllTokensAlphabet implements FiniteAlphabet {
     this.tokenToSymbol = new HashMap();
     this.nameToSymbol = new HashMap();
   }
+  
+  protected AllTokensAlphabet() {}
 }

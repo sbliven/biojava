@@ -23,8 +23,11 @@
 package org.biojava.bio.symbol;
 
 import java.util.NoSuchElementException;
+import java.io.*;
+import java.lang.reflect.*;
 
 import org.biojava.bio.*;
+import org.biojava.utils.*;
 
 /**
  * An efficient implementation of an Alphabet over the infinite set of double
@@ -40,11 +43,19 @@ import org.biojava.bio.*;
  *
  * @author Matthew Pocock
  */
-public class DoubleAlphabet implements Alphabet {
+public class DoubleAlphabet implements Alphabet, Serializable {
   /**
    * The singleton instance of the DoubleAlphabet class.
    */
   private static final DoubleAlphabet INSTANCE = new DoubleAlphabet();
+  
+  private Object writeReplace() throws ObjectStreamException {
+    try {
+      return new StaticMemberPlaceHolder(getClass().getField("INSTANCE"));
+    } catch (NoSuchFieldException nsfe) {
+      throw new NotSerializableException(nsfe.getMessage());
+    }
+  }
   
   /**
    * Retrieve a SymbolList view of an array of doubles.
@@ -104,7 +115,7 @@ public class DoubleAlphabet implements Alphabet {
     throw new NoSuchElementException("No parsers supported by DoubleAlphabet yet");
   }
   
-  private DoubleAlphabet() {
+  protected DoubleAlphabet() {
   }
   
   /**
@@ -112,7 +123,7 @@ public class DoubleAlphabet implements Alphabet {
    * <P>
    * @author Matthew Pocock
    */
-  public static class DoubleSymbol implements Symbol {
+  public static class DoubleSymbol implements Symbol, Serializable {
     private final double val;
     
     public Annotation getAnnotation() {
@@ -134,6 +145,10 @@ public class DoubleAlphabet implements Alphabet {
     protected DoubleSymbol(double val) {
       this.val = val;
     }
+    
+    protected DoubleSymbol() {
+      this.val = 0;
+    }
   }
   
   /**
@@ -142,7 +157,8 @@ public class DoubleAlphabet implements Alphabet {
    *
    * @author Matthew Pocock
    */
-  private static class DoubleArray extends AbstractSymbolList {
+  private static class DoubleArray
+  extends AbstractSymbolList implements Serializable {
     private final double [] dArray;
     
     public Alphabet alphabet() {
@@ -159,6 +175,10 @@ public class DoubleAlphabet implements Alphabet {
     
     public DoubleArray(double [] dArray) {
       this.dArray = dArray;
+    }
+    
+    protected DoubleArray() {
+      this.dArray = null;
     }
   }
 }

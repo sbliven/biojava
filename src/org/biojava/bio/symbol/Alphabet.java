@@ -23,6 +23,10 @@
 package org.biojava.bio.symbol;
 
 import java.util.NoSuchElementException;
+import java.lang.reflect.*;
+import java.io.*;
+
+import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
@@ -98,7 +102,9 @@ public interface Alphabet extends Annotatable {
   /**
    * The class that implements Alphabet and is empty.
    */
-  public class EmptyAlphabet implements Alphabet {
+  public class EmptyAlphabet implements Alphabet, Serializable {
+    protected EmptyAlphabet() {}
+    
     public String getName() {
       return "Empty Alphabet";
     }
@@ -118,6 +124,14 @@ public interface Alphabet extends Annotatable {
     
     public SymbolParser getParser(String name) throws NoSuchElementException {
       throw new NoSuchElementException("There is no parser for the empty alphabet. Attempted to retrieve " + name);
+    }
+    
+    private Object writeReplace() throws ObjectStreamException {
+      try {
+        return new StaticMemberPlaceHolder(getClass().getField("EMPTY_ALPHABET"));
+      } catch (NoSuchFieldException nsfe) {
+        throw new NotSerializableException(nsfe.getMessage());
+      }
     }
   }  
 }

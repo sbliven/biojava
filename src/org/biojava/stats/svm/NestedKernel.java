@@ -1,13 +1,14 @@
 package org.biojava.stats.svm;
 
 import java.util.*;
+import java.io.Serializable;
 
 /**
  * Encapsulates a kernel that wraps another kernel up.
  *
  * @author Matthew Pocock
  */
-public abstract class NestedKernel implements SVMKernel {
+public abstract class NestedKernel implements SVMKernel, Serializable {
   /**
    * The <span class="type">SVMKernel</span> being wrapped.
    */

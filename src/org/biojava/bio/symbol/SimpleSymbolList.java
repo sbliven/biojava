@@ -23,13 +23,14 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
 
 /**
  * A no-frills implementation of SymbolList, backed by a java.util.List.
  *
  * @author Matthew Pocock
  */
-public class SimpleSymbolList implements SymbolList {
+public class SimpleSymbolList implements SymbolList, Serializable {
   /**
    * The alphabet over which this symbol list is taken.
    */
@@ -120,4 +121,6 @@ public class SimpleSymbolList implements SymbolList {
     this.alphabet = alpha;
     this.symbols = rList;
   }
+  
+  protected SimpleSymbolList() {}
 }

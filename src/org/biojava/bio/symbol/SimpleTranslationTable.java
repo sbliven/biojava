@@ -23,6 +23,7 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
 
 /**
  * A no-frills implementation of TranslationTable that uses a Map to map from
@@ -30,7 +31,7 @@ import java.util.*;
  *
  * @author Matthew Pocock
  */
-public class SimpleTranslationTable implements TranslationTable {
+public class SimpleTranslationTable implements TranslationTable, Serializable {
   private final Map transMap;
   private final FiniteAlphabet source;
   private final Alphabet target;
@@ -87,6 +88,12 @@ public class SimpleTranslationTable implements TranslationTable {
     this.transMap = new HashMap();
   }
 
+  protected SimpleTranslationTable() {
+    this.source = null;
+    this.target = null;
+    this.transMap = null;
+  }
+  
   /**
    * Create a new translation table that will translate symbols from source to
    * target.

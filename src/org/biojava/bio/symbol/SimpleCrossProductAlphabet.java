@@ -23,6 +23,7 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
 
 import org.biojava.bio.*;
 
@@ -36,7 +37,8 @@ import org.biojava.bio.*;
  * @author Matthew Pocock
  */
 
-class SimpleCrossProductAlphabet implements FiniteAlphabet, CrossProductAlphabet {
+class SimpleCrossProductAlphabet
+implements FiniteAlphabet, CrossProductAlphabet, Serializable {
   private final List alphas;
   private final HashMap ourSymbols;
   private char tokenSeed = 'A';
@@ -60,6 +62,11 @@ class SimpleCrossProductAlphabet implements FiniteAlphabet, CrossProductAlphabet
     populateSymbols(new ArrayList());
   }
 
+  protected SimpleCrossProductAlphabet() {
+    this.alphas = null;
+    this.ourSymbols = null;
+  }
+  
   public Iterator iterator() {
     return ourSymbols.values().iterator();
   }

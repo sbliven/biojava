@@ -23,6 +23,7 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
@@ -39,7 +40,8 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  */
-public class GappedSymbolList extends AbstractSymbolList {
+public class GappedSymbolList
+extends AbstractSymbolList implements Serializable {
   /**
    * The Alphabet - the same as source but guaranteed to include the gap character.
    */
@@ -575,6 +577,12 @@ public class GappedSymbolList extends AbstractSymbolList {
     blocks.add(b);
   }
 
+  protected GappedSymbolList() {
+    this.source = null;
+    this.alpha = null;
+    this.blocks = null;
+  }
+  
   public void dumpBlocks() {
     for(Iterator i = blocks.iterator(); i.hasNext(); ) {
       Block b = (Block) i.next();
@@ -590,7 +598,7 @@ public class GappedSymbolList extends AbstractSymbolList {
    *
    * @author Matthew Pocock
    */
-  private final class Block {
+  private final class Block implements Serializable {
     public int sourceStart, sourceEnd;
     public int viewStart, viewEnd;
     
@@ -600,5 +608,7 @@ public class GappedSymbolList extends AbstractSymbolList {
       this.viewStart = viewStart;
       this.viewEnd = viewEnd;
     }
+    
+    protected Block() {}
   }
 }

@@ -22,6 +22,8 @@
 
 package org.biojava.bio.symbol;
 
+import java.io.*;
+
 import org.biojava.bio.*;
 
 /**
@@ -29,7 +31,7 @@ import org.biojava.bio.*;
  *
  * @author Matthew Pocock
  */
-public class SimpleSymbol implements Symbol {
+public class SimpleSymbol implements Symbol, Serializable {
   /**
    * The annotation for this object.
    */
@@ -77,6 +79,8 @@ public class SimpleSymbol implements Symbol {
     this.annotation = annotation;
   }
 
+  protected SimpleSymbol() {}
+  
   public String toString() {
     return super.toString() + " " + token;
   }

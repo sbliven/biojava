@@ -22,6 +22,10 @@
 package org.biojava.bio.symbol;
 
 import java.util.ArrayList;
+import java.io.*;
+import java.lang.reflect.*;
+
+import org.biojava.utils.*;
 
 /**
  * A biological location.
@@ -133,7 +137,8 @@ public interface Location {
    *
    * @author Matthew Pocock
    */
-  static final class EmptyLocation implements Location {
+  static final class EmptyLocation implements Location, Serializable {
+    protected EmptyLocation() {}
     public int getMin() { return Integer.MAX_VALUE; }
     public int getMax() { return Integer.MIN_VALUE; }
     public boolean overlaps(Location l) { return false; }
@@ -146,5 +151,12 @@ public interface Location {
       return new SimpleSymbolList(seq.alphabet(), new ArrayList());
     }
     public Location translate(int dist) { return this; }
+    private Object writeReplace() throws ObjectStreamException {
+      try {
+        return new StaticMemberPlaceHolder(getClass().getField("empty"));
+      } catch (NoSuchFieldException nsfe) {
+        throw new NotSerializableException(nsfe.getMessage());
+      }
+    }
   }
 }

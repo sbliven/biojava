@@ -22,6 +22,8 @@
 
 package org.biojava.bio.symbol;
 
+import java.io.*;
+
 import org.biojava.bio.BioError;
 import org.biojava.bio.seq.*;
 
@@ -41,7 +43,8 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  */
-public class TranslatedSymbolList extends AbstractSymbolList {
+public class TranslatedSymbolList
+extends AbstractSymbolList implements SymbolList {
   /**
    * The source symbol list to translate.
    */
@@ -72,6 +75,11 @@ public class TranslatedSymbolList extends AbstractSymbolList {
     
     this.source = source;
     this.transTable = transTable;
+  }
+  
+  protected TranslatedSymbolList() {
+    this.source = null;
+    this.transTable = null;
   }
   
   public int length() {

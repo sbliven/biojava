@@ -22,6 +22,8 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
+
 import org.biojava.bio.*;
 
 /**
@@ -39,13 +41,19 @@ import org.biojava.bio.*;
  * @author Matthew Pocock
  */
 
-public class SimpleCrossProductSymbol implements CrossProductSymbol {
+public class SimpleCrossProductSymbol
+implements CrossProductSymbol, Serializable {
   private final List l;
   private final char token;
 
   public SimpleCrossProductSymbol(List l, char token) {
     this.l = l;
     this.token = token;
+  }
+  
+  protected SimpleCrossProductSymbol() {
+    this.l = null;
+    this.token = 0;
   }
 
   public List getSymbols() {

@@ -22,6 +22,7 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
 
 /**
  * A single symbol.
@@ -30,7 +31,7 @@ import java.util.*;
  *
  * @author Matthew Pocock
  */
-public class PointLocation implements Location {
+public class PointLocation implements Location, Serializable {
   /**
    * The actual index contained.
    */
@@ -74,4 +75,6 @@ public class PointLocation implements Location {
   public PointLocation(int point) {
     this.point = point;
   }
+  
+  protected PointLocation() {}
 }

@@ -61,4 +61,6 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
     }
     return parser;
   }
+  
+  protected AbstractAlphabet() {}
 }

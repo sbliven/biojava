@@ -23,6 +23,7 @@
 package org.biojava.stats.svm;
 
 import java.util.*;
+import java.io.Serializable;
 
 /**
  * An implementation of a sparse vector.
@@ -32,13 +33,13 @@ import java.util.*;
  * @author Thomas Down
  * @author Matthew Pocock
  */
-public class SparseVector {
+public class SparseVector implements Serializable {
     int size;
     int[] keys;
     double[] values;
 
     public SparseVector() {
-      this(100);
+      this(1);
     }
 
     public SparseVector(int capacity) {
@@ -218,7 +219,7 @@ public class SparseVector {
      *
      * @author Matthew Pocock
      */
-    public static class NormalizingKernel implements SVMKernel {
+    public static class NormalizingKernel implements SVMKernel, Serializable {
       /**
        * The sparse vector that performes the normalization.
        */

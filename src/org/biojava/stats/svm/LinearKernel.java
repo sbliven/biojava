@@ -22,12 +22,14 @@
 
 package org.biojava.stats.svm;
 
+import java.io.Serializable;
+
 /**
  * Classic linear kernel. It actualy just delegates to SparseVector.kernel.
  *
  * @deprecated Just use SparseVector.kernel instead...
  */
-public class LinearKernel implements SVMKernel {
+public class LinearKernel implements SVMKernel, Serializable {
     /**
      * The linear kernel is equal to the dot product of a and b.
      */

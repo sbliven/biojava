@@ -24,6 +24,10 @@ package org.biojava.bio.symbol;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.io.*;
+import java.lang.reflect.*;
+
+import org.biojava.utils.*;
 
 /**
  * An alphabet over a finite set of Symbols.
@@ -73,6 +77,8 @@ public interface FiniteAlphabet extends Alphabet {
    */
   public class EmptyAlphabet
   extends Alphabet.EmptyAlphabet implements FiniteAlphabet {
+    protected EmptyAlphabet() {}
+    
     public int size() {
       return 0;
     }
@@ -83,6 +89,14 @@ public interface FiniteAlphabet extends Alphabet {
     
     public SymbolList symbols() {
       return SymbolList.EMPTY_LIST;
+    }
+    
+    private Object writeReplace() throws ObjectStreamException {
+      try {
+        return new StaticMemberPlaceHolder(getClass().getField("EMPTY_ALPHABET"));
+      } catch (NoSuchFieldException nsfe) {
+        throw new NotSerializableException(nsfe.getMessage());
+      }
     }
   }  
 }

@@ -23,13 +23,14 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
 
 /**
  * This uses symbol token to parse characters into Symbols.
  *
  * @author Matthew Pocock
  */
-public class TokenParser implements SymbolParser {
+public class TokenParser implements SymbolParser, Serializable {
   /**
    * The alphabet to parse into.
    */
@@ -86,4 +87,6 @@ public class TokenParser implements SymbolParser {
       tokenToSymbol.put(Character.toUpperCase(c) + "", res);
     }
   }
+  
+  protected TokenParser() {}
 }

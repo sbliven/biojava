@@ -24,16 +24,18 @@ package org.biojava.stats.svm;
 
 /**
  * Kernel for support vector machines and related methods.
+ * <P>
+ * It is hoped that all implementations of SVMKernel will be serializable,
+ * as this will allow models to be stoored and retrieved without inventing
+ * complex data formats.
  *
  * @author Thomas Down.
  */
-
 public interface SVMKernel {
     /**
      * Return the dot product of two vectors in an arbitrary
      * feature space.  In this implementation, the `vectors'
      * can actually be arbitrary objects.
      */
-
     public double evaluate(Object a, Object b);
 }

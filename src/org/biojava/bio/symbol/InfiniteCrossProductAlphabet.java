@@ -23,15 +23,20 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
+
 import org.biojava.bio.*;
 
-
-class InfiniteCrossProductAlphabet implements CrossProductAlphabet {
+class InfiniteCrossProductAlphabet implements CrossProductAlphabet, Serializable {
   private final List alphas;
   private char tokenSeed = 'A';
 
   InfiniteCrossProductAlphabet(List alphas) {
     this.alphas = alphas;
+  }
+  
+  protected InfiniteCrossProductAlphabet() {
+    this.alphas = null;
   }
   
   public String getName() {

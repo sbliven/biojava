@@ -133,10 +133,9 @@ public abstract class DP {
       int [] ad = ex.getAdvance();
       if(ad.length != mm.heads()) {
         throw new BioException(
-          "Advance (" + ad.length +
-          ") is not the same size as the number of heads (" + mm.heads() +
-          " for state " + ex.getName() + " in model "
-          + mm.stateAlphabet().getName()
+          "State " + ex.getName() + " advances " + ad.length + " heads. " +
+          " however, the model " + mm.stateAlphabet().getName() +
+          " advances " + mm.heads() + " heads."
         );
       }
       for(int adi = 0; ad != null && adi < ad.length; adi++) {

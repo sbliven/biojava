@@ -22,6 +22,7 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
 
 /**
  * A comlex location. It is made up from multiple sub-locations and is essential
@@ -32,7 +33,7 @@ import java.util.*;
  *
  * @author Matthew Pocock
  */
-public class CompoundLocation implements Location {
+public class CompoundLocation implements Location, Serializable {
   /**
    * The list of child locations in no particular order.
    */

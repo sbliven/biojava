@@ -21,6 +21,8 @@
 
 package org.biojava.bio.symbol;
 
+import java.io.*;
+
 /**
  * A simple implementation of Location that contains all points between
  * getMin and getMax inclusive.
@@ -29,7 +31,7 @@ package org.biojava.bio.symbol;
  *
  * @author Matthew Pocock
  */
-public class RangeLocation implements Location {
+public class RangeLocation implements Location, Serializable {
   /**
    * The minimum point contained.
    */
@@ -98,6 +100,8 @@ public class RangeLocation implements Location {
     this.max = max;
   }
 
+  protected RangeLocation() {}
+  
   public String toString() {
     return getMin() + ", " + getMax();
   }

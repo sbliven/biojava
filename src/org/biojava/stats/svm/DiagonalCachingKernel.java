@@ -21,7 +21,7 @@ public class DiagonalCachingKernel extends NestedKernel {
   /**
    * The cache of values.
    */
-  private Map cache;
+  transient private Map cache;
 
   {
     cache = new HashMap();

@@ -21,7 +21,7 @@ import java.util.*;
  * @author Matthew Pocock
  */
 public class CachingKernel extends NestedKernel {
-    private Map cache;
+    transient private Map cache;
 
     {
       cache = new HashMap();

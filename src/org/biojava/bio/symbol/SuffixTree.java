@@ -23,6 +23,7 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
 
 import org.biojava.bio.seq.*;
 
@@ -34,7 +35,7 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  */
-public class SuffixTree {
+public class SuffixTree implements Serializable {
   private FiniteAlphabet alphabet;
   private SuffixNode root;
   private List resList;
@@ -112,6 +113,8 @@ public class SuffixTree {
     this.root = new SimpleNode(alphabet.size());
   }
   
+  protected SuffixTree() {}
+  
   public Symbol resForIndex(int i) {
     return (Symbol) resList.get(i);
   }
@@ -128,7 +131,9 @@ public class SuffixTree {
    *
    * @author Matthe Pocock
    */
-  public static abstract class SuffixNode {
+  public static abstract class SuffixNode implements Serializable {
+    protected SuffixNode() {}
+    
     abstract public boolean isTerminal();
     abstract public boolean hasChild(int i);
     abstract public float getNumber();
@@ -176,5 +181,7 @@ public class SuffixTree {
     SimpleNode(int c) {
       child = new SuffixNode[c];
     }
+    
+    protected SimpleNode() {}
   }
 }

@@ -23,13 +23,14 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
 
 /**
  * This uses Symbol names to parse characters into symbols.
  *
  * @author Matthew Pocock
  */
-public class NameParser implements SymbolParser {
+public class NameParser implements SymbolParser, Serializable {
   /**
    * The alphabet to parse names to.
    */
@@ -97,4 +98,6 @@ public class NameParser implements SymbolParser {
   public NameParser(Map nameToSymbol) {
     this.nameToSymbol = nameToSymbol;
   }
+  
+  protected NameParser() {}
 }

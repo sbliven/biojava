@@ -22,6 +22,9 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.lang.reflect.*;
+import java.io.*;
+
 import org.biojava.bio.*;
 
 /**
@@ -73,6 +76,8 @@ public abstract class AbstractSymbolList implements SymbolList {
       return sb.toString();
     }
 
+    protected AbstractSymbolList() {}
+    
     /**
      * An Iterator over each Symbol in a SymbolList.
      * <P>
@@ -81,10 +86,12 @@ public abstract class AbstractSymbolList implements SymbolList {
      *
      * @author Thomas Down
      */
-    private class SymbolIterator implements Iterator {
+    private class SymbolIterator implements Iterator, Serializable {
 	private int min, max;
         private int pos;
 	    
+      protected SymbolIterator() {}
+      
 	public SymbolIterator(int min, int max) {
 	    this.min = min;
 	    this.max = max;
@@ -114,9 +121,11 @@ public abstract class AbstractSymbolList implements SymbolList {
      *
      * @author Thomas Down
      */
-    private class SubList implements SymbolList {
+    private class SubList implements SymbolList, Serializable {
 	private int start, end;
 
+  protected SubList() {}
+  
 	public SubList(int start, int end) {
 	    this.start = start;
 	    this.end = end;
@@ -168,9 +177,11 @@ public abstract class AbstractSymbolList implements SymbolList {
      *
      * @author Thomas Down
      */
-    private static class ListView extends AbstractList {
+    private static class ListView extends AbstractList implements Serializable {
 	private SymbolList rl;
 
+  protected ListView() {}
+  
 	ListView(SymbolList rl) {
 	    this.rl = rl;
 	}

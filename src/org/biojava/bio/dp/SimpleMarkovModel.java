@@ -224,6 +224,28 @@ public class SimpleMarkovModel implements MarkovModel {
       throw new IllegalSymbolException("We already contain " + toAdd.getName());
     }
     
+    if(toAdd instanceof EmissionState) {
+      int esh = ((EmissionState) toAdd).getAdvance().length;
+      if(esh != heads()) {
+        throw new IllegalSymbolException(
+          "This model " + stateAlphabet().getName() +
+          " has " + heads() + " heads, but the state " +
+          toAdd.getName() + " has " + esh + " heads"
+        );
+      }
+    }
+    
+    if(toAdd instanceof ModelInState) {
+      int esh = ((ModelInState) toAdd).getModel().heads();
+      if(esh != heads()) {
+        throw new IllegalSymbolException(
+          "This model " + stateAlphabet().getName() +
+          " has " + heads() + " heads, but the model-in-state " +
+          toAdd.getName() + " has " + esh + " heads"
+        );
+      }
+    }
+      
     ((SimpleAlphabet) stateAlphabet()).addSymbol(toAdd);
     transFrom.put(toAdd, new HashSet());
     transTo.put(toAdd, new HashSet());
@@ -262,6 +284,9 @@ public class SimpleMarkovModel implements MarkovModel {
     ((SimpleAlphabet) stateAlpha).setName(name);
   }
   
+  /**
+   * @depricated
+   */
   public SimpleMarkovModel(int heads, Alphabet emissionAlpha) {
     this.emissionAlpha = emissionAlpha;
     this.stateAlpha = new SimpleAlphabet();

@@ -22,6 +22,7 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
@@ -34,7 +35,8 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  */
-public class WindowedSymbolList extends AbstractSymbolList {
+public class WindowedSymbolList
+extends AbstractSymbolList implements Serializable {
   /**
    * The source sequence that we will transliterate.
    */
@@ -76,6 +78,12 @@ public class WindowedSymbolList extends AbstractSymbolList {
       Collections.nCopies(width, a)
     );
     this.width = width;
+  }
+  
+  protected WindowedSymbolList() {
+    this.source = null;
+    this.alpha = null;
+    this.width = 0;
   }
   
   public Alphabet alphabet() {

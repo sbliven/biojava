@@ -23,6 +23,10 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
+import java.lang.reflect.*;
+
+import org.biojava.utils.*;
 
 /**
  * A sequence of symbols that belong to an alphabet.
@@ -125,7 +129,9 @@ public interface SymbolList {
   /**
    * The empty immutable implementation.
    */
-  class EmptySymbolList implements SymbolList {
+  class EmptySymbolList implements SymbolList, Serializable {
+    protected EmptySymbolList() {}
+    
     public Alphabet alphabet() {
       return Alphabet.EMPTY_ALPHABET;
     }
@@ -160,5 +166,14 @@ public interface SymbolList {
         "You can not retrieve part of an empty symbol list"
       );
     }
+
+    private Object writeReplace() throws ObjectStreamException {
+      try {
+        return new StaticMemberPlaceHolder(getClass().getField("EMPTY_LIST"));
+      } catch (NoSuchFieldException nsfe) {
+        throw new NotSerializableException(nsfe.getMessage());
+      }
+    }
+
   }
 }

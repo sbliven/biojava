@@ -22,8 +22,9 @@
 package org.biojava.bio.symbol;
 
 import java.util.BitSet;
+import java.io.*;
 
-import org.biojava.bio.seq.*;
+//import org.biojava.bio.seq.*;
 import org.biojava.stats.svm.SVMKernel;
 
 /**
@@ -35,7 +36,7 @@ import org.biojava.stats.svm.SVMKernel;
  *
  * @author Matthew Pocock
  */
-public class SuffixTreeKernel implements SVMKernel {
+public class SuffixTreeKernel implements SVMKernel, Serializable {
   /**
    * The <span class="type">DepthScaler</span> that will scale each sub-space.
    * This defaults to <span class="type">UniformScaler</type>.
@@ -138,7 +139,7 @@ public class SuffixTreeKernel implements SVMKernel {
    *
    * @author Matthew Pocock
    */
-  public static class NullModelScaler implements DepthScaler {
+  public static class NullModelScaler implements DepthScaler, Serializable {
     public double getScale(int depth) {
       return Math.pow(4.0, (double) depth);
     }
@@ -149,7 +150,7 @@ public class SuffixTreeKernel implements SVMKernel {
    *
    * @author Matthew Pocock
    */
-  public static class UniformScaler implements DepthScaler {
+  public static class UniformScaler implements DepthScaler, Serializable {
     public double getScale(int depth) {
       return 1.0;
     }
@@ -160,7 +161,7 @@ public class SuffixTreeKernel implements SVMKernel {
    *
    * @author Matthew Pocock
    */
-  public static class SelectionScalar implements DepthScaler {
+  public static class SelectionScalar implements DepthScaler, Serializable {
     private BitSet bSet;
     
     /**
@@ -173,6 +174,8 @@ public class SuffixTreeKernel implements SVMKernel {
       this.bSet = new BitSet();
       this.bSet.or(bSet);
     }
+    
+    protected SelectionScalar() {}
     
     /**
      * @return 1.0 or 0.0 depending on whether the bit at
@@ -192,7 +195,7 @@ public class SuffixTreeKernel implements SVMKernel {
    *
    * @author Matthew Pocock
    */
-  public static class MultipleScalar implements DepthScaler {
+  public static class MultipleScalar implements DepthScaler, Serializable {
     private DepthScaler a;
     private DepthScaler b;
     
@@ -200,6 +203,8 @@ public class SuffixTreeKernel implements SVMKernel {
       this.a = a;
       this.b = b;
     }
+    
+    protected MultipleScalar() {}
     
     public double getScale(int depth) {
       return a.getScale(depth) * b.getScale(depth);

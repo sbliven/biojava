@@ -23,6 +23,8 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
+
 import org.biojava.bio.*;
 
 /**
@@ -34,7 +36,8 @@ import org.biojava.bio.*;
  * @author Matthew Pocock
  */
 
-class SparseCrossProductAlphabet implements FiniteAlphabet, CrossProductAlphabet {
+class SparseCrossProductAlphabet
+implements FiniteAlphabet, CrossProductAlphabet, Serializable {
   private final int size;
   private final List alphas;
   private final Map knownSymbols;
@@ -49,6 +52,12 @@ class SparseCrossProductAlphabet implements FiniteAlphabet, CrossProductAlphabet
       size *= a.size();
     }
     this.size = size;
+  }
+  
+  protected SparseCrossProductAlphabet() {
+    this.alphas = null;
+    this.knownSymbols = null;
+    this.size = 0;
   }
   
   public SymbolList symbols() {

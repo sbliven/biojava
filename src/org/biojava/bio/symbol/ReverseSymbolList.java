@@ -22,6 +22,7 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
@@ -31,7 +32,8 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  */
-public class ReverseSymbolList extends AbstractSymbolList {
+public class ReverseSymbolList
+extends AbstractSymbolList implements Serializable {
   /**
    * The source sequence that we will transliterate.
    */
@@ -50,6 +52,10 @@ public class ReverseSymbolList extends AbstractSymbolList {
    */
   public ReverseSymbolList(SymbolList source) {
     this.source = source;
+  }
+  
+  protected ReverseSymbolList() {
+    this(null);
   }
 
   public Alphabet alphabet() {

@@ -23,6 +23,8 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
+
 import org.biojava.bio.*;
 
 /**
@@ -30,7 +32,7 @@ import org.biojava.bio.*;
  *
  * @author Matthew Pocock
  */
-public class SimpleAlphabet extends AbstractAlphabet {
+public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
   /**
    * The name of this alphabet.
    */
@@ -108,4 +110,6 @@ public class SimpleAlphabet extends AbstractAlphabet {
       }
     }
   }
+  
+  public SimpleAlphabet() {}
 }

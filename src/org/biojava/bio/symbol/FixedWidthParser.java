@@ -23,6 +23,7 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
 
 /**
  * A parser that uses a fixed with window of characters to look up the
@@ -33,7 +34,7 @@ import java.util.*;
  *
  * @author Matthew Pocock
  */
-public class FixedWidthParser implements SymbolParser {
+public class FixedWidthParser implements SymbolParser, Serializable {
   /**
    * The alphabet for this parser.
    */
@@ -88,4 +89,6 @@ public class FixedWidthParser implements SymbolParser {
     this.alpha = alpha;
     this.tokenLength = tokenLength;
   }
+  
+  protected FixedWidthParser() {}
 }

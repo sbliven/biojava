@@ -22,6 +22,7 @@
 package org.biojava.bio.symbol;
 
 import java.util.*;
+import java.io.*;
 
 import org.biojava.bio.*;
 
@@ -34,7 +35,8 @@ import org.biojava.bio.*;
  *
  * @author Matthew Pocock
  */
-public class SimpleAlignment extends AbstractSymbolList implements Alignment {
+public class SimpleAlignment
+extends AbstractSymbolList implements Alignment, Serializable {
   private Map labelToSymbolList;
   private List labels;
   private CrossProductAlphabet alphabet;
@@ -145,16 +147,22 @@ public class SimpleAlignment extends AbstractSymbolList implements Alignment {
     this.length = length;
   }
  
+  protected SimpleAlignment() {}
+  
   /** 
    * Makes a column of the alignment behave like a list.
    *
    * @author Matthew Pocock
    */
-  private final class ColAsList extends AbstractList {
+  private final class ColAsList extends AbstractList implements Serializable {
     private final int col;
     
     public ColAsList(int col) {
       this.col = col;
+    }
+    
+    protected ColAsList() {
+      this.col = 0;
     }
     
     public Object get(int indx) {
