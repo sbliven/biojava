@@ -490,7 +490,9 @@ public final class AlphabetManager {
       }
     }
 
-    AtomicSymbol res = new WellKnownSymbol(alpha, token, name, (Annotation) null);
+    AtomicSymbol res = new WellKnownSymbol(
+      alpha, token, name, Annotation.EMPTY_ANNOTATION
+    );
     try {
       res.getAnnotation().setProperty("description", description);
     } catch (ChangeVetoException cve) {

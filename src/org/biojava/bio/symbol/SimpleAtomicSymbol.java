@@ -40,6 +40,9 @@ public class SimpleAtomicSymbol implements AtomicSymbol {
   protected Annotatable.AnnotationForwarder annotationForwarder = null;
   
   public SimpleAtomicSymbol(char token, String name, Annotation annotation) {
+    if(annotation == null) {
+      throw new IllegalArgumentException("Can't use null Annotation");
+    }
     this.token = token;
     this.name = name;
     this.annotation = annotation;
