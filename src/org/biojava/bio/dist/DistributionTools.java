@@ -20,13 +20,16 @@
  */
 package org.biojava.bio.dist;
 
-import org.biojava.utils.*;
+import java.io.*;
+import java.util.*;
+
+
 import org.biojava.bio.*;
-import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.impl.*;
-
-import java.util.*;
+import org.biojava.bio.symbol.*;
+import org.biojava.utils.*;
+import org.xml.sax.*;
 
 /**
  * Title:        DistributionTools.java
@@ -35,12 +38,27 @@ import java.util.*;
  * @author Mark Schreiber
  */
 
-public class DistributionTools {
+public final class DistributionTools {
 
   /**
    * Overide the constructer to prevent subclassing
    */
   private DistributionTools(){}
+
+  /**
+   * Writes a Distribution to XML that can be read with the readFromXML method.
+   * @param d the Distribution to write.
+   * @param os where to write it to.
+   * @throws IOException if writing fails
+   */
+  public static void writeToXML(Distribution d, OutputStream os) throws IOException{
+    new XMLDistributionWriter().writeDistribution(d, os);
+  }
+
+  public static Distribution readFromXML(InputStream is)throws IOException, SAXException{
+    XMLDistributionReader writer = new XMLDistributionReader();
+    return writer.parseXML(is);
+  }
 
   /**
    * Randomizes the weights of a <code>Distribution</code>

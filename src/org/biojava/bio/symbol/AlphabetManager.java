@@ -284,7 +284,27 @@ public final class AlphabetManager {
     AtomicSymbol as = new FundamentalAtomicSymbol(name, annotation);
     return as;
   }
-  
+
+  /**
+   * <p>
+   * Generate a new AtomicSymbol instance with a name and an Empty Annotation.
+   * </p>
+   *
+   * <p>
+   * Use this method if you wish to create an AtomicSymbol instance. Initially it
+   * will not be a member of any alphabet.
+   * </p>
+   *
+   * @param name  the String returned by getName()
+   * @return a new AtomicSymbol instance
+   */
+  static public AtomicSymbol createSymbol(
+      String name
+      ) {
+    AtomicSymbol as = new FundamentalAtomicSymbol(name, Annotation.EMPTY_ANNOTATION);
+    return as;
+  }
+
   /**
    * <p>
    * Generate a new AtomicSymbol instance with a token, name and Annotation.
@@ -331,7 +351,7 @@ public final class AlphabetManager {
   ) throws IllegalSymbolException {
       return createSymbol(annotation, symList, alpha);
   }
-  
+
   /**
    * <p>
    * Generates a new Symbol instance that represents the tuple of Symbols in
@@ -442,7 +462,7 @@ public final class AlphabetManager {
   ) throws IllegalSymbolException {
       return createSymbol(annotation, symSet, alpha);
   }
-  
+
   /**
    * <p>
    * Generates a new Symbol instance that represents the tuple of Symbols in
@@ -999,7 +1019,7 @@ public final class AlphabetManager {
              public void endTree() {
                  alpha.addChangeListener(ChangeListener.ALWAYS_VETO, ChangeType.UNKNOWN);
              }
-             
+
              public AlphabetHandler(String name, FiniteAlphabet parent) {
                  this.name = name;
                  localSymbols = new OverlayMap(nameToSymbol);
@@ -1194,9 +1214,9 @@ public final class AlphabetManager {
          }
     }
 
-    private static class WellKnownTokenizationWrapper 
+    private static class WellKnownTokenizationWrapper
         extends Unchangeable
-        implements SymbolTokenization, Serializable 
+        implements SymbolTokenization, Serializable
     {
         private String name;
         private Alphabet alphabet;
@@ -1212,37 +1232,37 @@ public final class AlphabetManager {
         public Alphabet getAlphabet() {
             return alphabet;
         }
-        
+
         public TokenType getTokenType() {
             return toke.getTokenType();
         }
-        
+
         public StreamParser parseStream(SeqIOListener listener) {
             return toke.parseStream(listener);
         }
-        
+
         public Symbol parseToken(String s)
             throws IllegalSymbolException
         {
             return toke.parseToken(s);
         }
-        
+
         public String tokenizeSymbol(Symbol s)
             throws IllegalSymbolException
         {
             return toke.tokenizeSymbol(s);
         }
-        
+
         public String tokenizeSymbolList(SymbolList sl)
             throws IllegalAlphabetException, IllegalSymbolException
         {
             return toke.tokenizeSymbolList(sl);
         }
-        
+
         public Annotation getAnnotation() {
             return toke.getAnnotation();
         }
-        
+
         public Object writeReplace() {
             return new OPH(getAlphabet().getName(), name);
         }
@@ -1273,42 +1293,42 @@ public final class AlphabetManager {
 
     private static class WellKnownAlphabet
         extends SimpleAlphabet
-    { 
+    {
         public WellKnownAlphabet() {
             super();
         }
-        
+
         public WellKnownAlphabet(Set s) {
             super(s);
         }
-        
+
         protected Symbol getAmbiguityImpl(Set s)
             throws IllegalSymbolException
         {
             return getWellKnownAmbiguitySymbol(s);
         }
     }
-    
+
     /**
      * A wrapper which makes an Alphabet unchangable, and also fixes serialization
      */
-     
+
     private static class ImmutableWellKnownAlphabetWrapper
-        extends Unchangeable 
-        implements FiniteAlphabet, Serializable 
+        extends Unchangeable
+        implements FiniteAlphabet, Serializable
     {
         private FiniteAlphabet alpha;
         private Map tokenizationsByName = new HashMap();
-        
+
         public ImmutableWellKnownAlphabetWrapper(FiniteAlphabet alpha) {
             super();
             this.alpha = alpha;
         }
-        
+
         private Object writeReplace() {
             return new OPH(getName());
         }
-        
+
         public SymbolTokenization getTokenization(String name)
             throws BioException
         {
@@ -1323,7 +1343,7 @@ public final class AlphabetManager {
             }
             return toke;
         }
-      
+
         /**
          * Placeholder for a WellKnownAlphabet in a serialized
          * object stream.
@@ -1331,11 +1351,11 @@ public final class AlphabetManager {
 
          private static class OPH implements Serializable {
              private String name;
-             
+
              public OPH(String name) {
                  this.name = name;
              }
-             
+
              private Object readResolve() throws ObjectStreamException {
                  try {
                      Alphabet a = AlphabetManager.alphabetForName(name);
@@ -1345,65 +1365,65 @@ public final class AlphabetManager {
                  }
              }
          }
-      
+
         public boolean contains(Symbol s) {
             return alpha.contains(s);
         }
-        
+
         public List getAlphabets() {
             return alpha.getAlphabets();
         }
-        
-        public Symbol getAmbiguity(Set s) 
+
+        public Symbol getAmbiguity(Set s)
             throws IllegalSymbolException
         {
             return alpha.getAmbiguity(s);
         }
-        
+
         public Symbol getGapSymbol() {
             return alpha.getGapSymbol();
         }
-        
+
         public String getName() {
             return alpha.getName();
         }
-        
-        public Symbol getSymbol(List l) 
+
+        public Symbol getSymbol(List l)
             throws IllegalSymbolException
         {
             return alpha.getSymbol(l);
         }
-        
+
         public void validate(Symbol s)
             throws IllegalSymbolException
         {
                 alpha.validate(s);
         }
-        
+
         public void addSymbol(Symbol s)
             throws ChangeVetoException
         {
             throw new ChangeVetoException("Can't add symbols to Well Known Alphabets");
         }
-        
+
         public void removeSymbol(Symbol s)
             throws ChangeVetoException
         {
             throw new ChangeVetoException("Can't remove symbols from Well Known Alphabets");
         }
-        
+
         public Iterator iterator() {
             return  alpha.iterator();
         }
-        
+
         public int size() {
             return alpha.size();
         }
-        
+
         public SymbolList symbols() {
             return alpha.symbols();
         }
-        
+
         public Annotation getAnnotation() {
             return alpha.getAnnotation();
         }
@@ -1418,22 +1438,22 @@ public final class AlphabetManager {
         WellKnownAtomicSymbol(AtomicSymbol symbol) {
             super(symbol);
         }
-        
+
         public Alphabet getMatches() {
             return new SingletonAlphabet(this);
         }
-        
+
         private Object writeReplace() {
             return new OPH(getName());
         }
-        
+
         private static class OPH implements Serializable {
             private String name;
-            
+
             public OPH(String name) {
                 this.name = name;
             }
-            
+
             private Object readResolve() throws ObjectStreamException {
                 try {
                     return symbolForName(name);
@@ -1441,15 +1461,15 @@ public final class AlphabetManager {
                     throw new InvalidObjectException(
                         "Couldn't resolve symbol:" + name
                     );
-                } 
+                }
             }
         }
     }
-     
+
     private static class WellKnownBasisSymbol extends Unchangeable implements BasisSymbol, Serializable {
         protected BasisSymbol symbol;
         private Set matches;
-        
+
         WellKnownBasisSymbol(BasisSymbol symbol) {
             super();
             symbol.addChangeListener(ChangeListener.ALWAYS_VETO, ChangeType.UNKNOWN); // Immutable
@@ -1459,15 +1479,15 @@ public final class AlphabetManager {
                 matches.add(i.next());
             }
         }
-        
+
         Symbol getSymbol() {
             return symbol;
         }
-        
+
         public int hashCode() {
             return symbol.hashCode();
         }
-        
+
         public boolean equals(Object o) {
             if (o instanceof WellKnownBasisSymbol) {
                 return symbol.equals(((WellKnownBasisSymbol) o).getSymbol());
@@ -1475,35 +1495,35 @@ public final class AlphabetManager {
                 return false;
             }
         }
-        
+
         public String getName() {
             return symbol.getName();
         }
-        
+
         public Alphabet getMatches() {
             return symbol.getMatches();
         }
-        
+
         public List getSymbols() {
             return symbol.getSymbols();
         }
-        
+
         public Annotation getAnnotation() {
             return symbol.getAnnotation();
         }
-        
+
         private Object writeReplace() {
             return new OPH(matches);
         }
 
-        
+
         private static class OPH implements Serializable {
             private Set matches;
-            
+
             public OPH(Set matches) {
                 OPH.this.matches = matches;
             }
-            
+
             private Object readResolve() /* throws ObjectStreamException */ {
                 return getWellKnownAmbiguitySymbol(matches);
             }
@@ -1618,7 +1638,7 @@ public final class AlphabetManager {
       }
     }
   }
-  
+
   private static Symbol getWellKnownAmbiguitySymbol(Set s) {
       Symbol sym = (Symbol) ambiguitySymbols.get(s);
       if (sym == null) {

@@ -56,11 +56,11 @@ import org.biojava.utils.io.*;
  */
 
 public final class IndexedSequenceDB extends AbstractSequenceDB
-    implements SequenceDB, Serializable 
+    implements SequenceDB, Serializable
 {
     private final IDMaker idMaker;
     private final IndexStore indexStore;
-    
+
     /**
      * Create an IndexedSequenceDB by specifying both the IDMaker and
      * IndexStore used.
@@ -77,7 +77,7 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
       this.idMaker = idMaker;
       this.indexStore = indexStore;
     }
-    
+
     /**
      * Create an IndexedSequenceDB by specifying IndexStore used.
      *
@@ -91,7 +91,7 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
     public IndexedSequenceDB(IndexStore indexStore) {
       this(IDMaker.byName, indexStore);
     }
-    
+
     /**
      * Retrieve the IndexStore.
      *
@@ -100,7 +100,7 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
     public IndexStore getIndexStore() {
       return indexStore;
     }
-    
+
     /**
      * Add sequences from a file to the sequence database. This method
      * works on an "all or nothing" principle. If it can successfully
@@ -116,9 +116,9 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
      * @throws ChangeVetoException if there is a listener that vetoes adding
      *         the files
      */
-  
+
     public void addFile(File seqFile)
-	throws IllegalIDException, BioException, ChangeVetoException 
+        throws IllegalIDException, BioException, ChangeVetoException
     {
       boolean completed = false; // initially assume that we will fail
       try {
@@ -138,7 +138,7 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
           pos = bReader.getFilePointer();
           indexStore.store(new SimpleIndex(seqFile, oldPos, (int) (pos - oldPos), id));
         }
-        
+
         if(!hasListeners()) {
           indexStore.commit();
         } else {
@@ -168,19 +168,36 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
      *
      * @author Thomas Down
      * @author Matthew Pocock
+     * @author Mark Schreiber
      */
-    private static class ElideSymbolsSequenceBuilder extends SequenceBuilderFilter {
-	public ElideSymbolsSequenceBuilder(SequenceBuilder delegate) {
-	    super(delegate);
-	}
-        
+    private static class ElideSymbolsSequenceBuilder
+        extends SequenceBuilderFilter
+        implements ParseErrorSource {
+
+        private Vector listeners = new Vector();
+
+        public synchronized void removeParseErrorListener(ParseErrorListener p){
+          if(listeners.contains(p))
+            listeners.remove(p);
+        }
+
+        public synchronized void addParseErrorListener(ParseErrorListener p){
+          if(! listeners.contains(p)){
+            listeners.add(p);
+          }
+        }
+
+        public ElideSymbolsSequenceBuilder(SequenceBuilder delegate) {
+            super(delegate);
+        }
+
         /**
          * Just ignore the symbols
          */
-	public void addSymbols(Alphabet alpha, Symbol[] syms, int start, int length) {
-	}
+        public void addSymbols(Alphabet alpha, Symbol[] syms, int start, int length) {
+        }
     }
-  
+
     /**
      * Get the name of this sequence database. The name is retrieved
      * from the IndexStore delegate.
@@ -188,58 +205,58 @@ public final class IndexedSequenceDB extends AbstractSequenceDB
      * @return the name of the sequence database, which may be null.
      */
     public String getName() {
-	return indexStore.getName();
+        return indexStore.getName();
     }
-  
+
     public Sequence getSequence(String id)
     throws IllegalIDException, BioException
     {
-	try
+        try
         {
-	    Index indx = indexStore.fetch(id);
+            Index indx = indexStore.fetch(id);
 
             RandomAccessReader rar =
-		new RandomAccessReader(new RandomAccessFile(indx.getFile(), "r"));
+                new RandomAccessReader(new RandomAccessFile(indx.getFile(), "r"));
 
-	    long toSkip = indx.getStart();
-	    if (toSkip > rar.length())
-		throw new BioException("Reached end of file");
-	    rar.seek(toSkip);
+            long toSkip = indx.getStart();
+            if (toSkip > rar.length())
+                throw new BioException("Reached end of file");
+            rar.seek(toSkip);
 
-	    SequenceBuilder sb =
-		indexStore.getSBFactory().makeSequenceBuilder();
+            SequenceBuilder sb =
+                indexStore.getSBFactory().makeSequenceBuilder();
 
-	    indexStore.getFormat().readSequence(new BufferedReader(rar),
-						indexStore.getSymbolParser(),
-						sb);
-	    Sequence seq = sb.makeSequence();
+            indexStore.getFormat().readSequence(new BufferedReader(rar),
+                                                indexStore.getSymbolParser(),
+                                                sb);
+            Sequence seq = sb.makeSequence();
 
-	    rar.close();
-	    return seq;
-	}
+            rar.close();
+            return seq;
+        }
         catch (IOException ioe)
         {
-	    throw new BioException(ioe, "Couldn't grab region of file"); 
-	}
+            throw new BioException(ioe, "Couldn't grab region of file");
+        }
     }
-  
+
     public SequenceIterator sequenceIterator() {
-	return new SequenceIterator() {
-	    private Iterator idI = indexStore.getIDs().iterator();
-	    
-	    public boolean hasNext() {
-		return idI.hasNext();
-	    }
-	    
-	    public Sequence nextSequence() throws BioException {
-		return getSequence((String) idI.next());
-	    }
-	};
+        return new SequenceIterator() {
+            private Iterator idI = indexStore.getIDs().iterator();
+
+            public boolean hasNext() {
+                return idI.hasNext();
+            }
+
+            public Sequence nextSequence() throws BioException {
+                return getSequence((String) idI.next());
+            }
+        };
     }
-  
+
     public Set ids() {
-	return indexStore.getIDs();
+        return indexStore.getIDs();
     }
-  
+
 
 }
