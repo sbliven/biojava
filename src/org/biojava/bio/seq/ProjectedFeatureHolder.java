@@ -241,7 +241,7 @@ public class ProjectedFeatureHolder extends AbstractFeatureHolder implements Fea
     
         public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
             ff = transformFilter(ff);
-            FeatureHolder toProject = wrapped.filter(ff, recurse);
+            FeatureHolder toProject = baseSet.filter(ff, recurse);
             return new ProjectionSet(toProject);
         }
     
