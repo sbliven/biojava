@@ -36,7 +36,7 @@ import org.biojava.bio.symbol.*;
  * @since 1.1
  */
 
-class SubArraySymbolList extends AbstractSymbolList {
+class SubArraySymbolList extends AbstractSymbolList implements Serializable{
     private final Alphabet alpha;
     private final int length;
     private final int offset;
