@@ -86,6 +86,22 @@ public class PatternFactory
     }
 
     /**
+     * Returns a Pattern object that applies the specified regex
+     * against SymbolLists in the Alphabet that this PatternFactory
+     * was defined against.
+     *
+     * @param pattern regex pattern expressed as a String.
+     * @param label A String label assigned to the Pattern object.  Can be retrieved later with getName().
+     */
+    public org.biojava.utils.regex.Pattern compile(String pattern, String label)
+    {
+        // validate the pattern is from this alphabet
+        // we only accept RE tokens and characters from
+        // the alphabet itself.
+        return new org.biojava.utils.regex.Pattern(java.util.regex.Pattern.compile(pattern), alfa, label);
+    }
+
+    /**
      * Returns the character that represents the specified Symbol in
      * the Alphabet that this PatternFactory was defined for.
      * <p>

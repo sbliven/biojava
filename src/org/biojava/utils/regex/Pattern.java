@@ -15,12 +15,26 @@ public class Pattern
 {
     private FiniteAlphabet alfa;
     private java.util.regex.Pattern pattern;
+    private String label;
 
     Pattern(java.util.regex.Pattern pattern, FiniteAlphabet alfa)
     {
         this.pattern = pattern;
         this.alfa = alfa;
+        label = "";
     }
+
+    Pattern(java.util.regex.Pattern pattern, FiniteAlphabet alfa, String label)
+    {
+        this.pattern = pattern;
+        this.alfa = alfa;
+        this.label = label;
+    }
+
+    /**
+     * return the String label associated with this pattern.
+     */
+    public String getName() { return label; }
 
     /**
      * Creates a matcher that will match the given input against this pattern.
