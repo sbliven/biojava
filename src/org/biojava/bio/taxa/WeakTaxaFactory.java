@@ -42,76 +42,6 @@ public class WeakTaxaFactory implements TaxaFactory {
     return name;
   }
   
-  public Taxa parseTaxa(String name)
-  throws ChangeVetoException {
-    name = name.trim();
-    if(name.endsWith(".")) {
-      name = name.substring(0, name.length() - 1);
-    }
-    
-    Taxa taxa = root;
-    StringTokenizer sTok = new StringTokenizer(name, ";");
-    
-    String tok = null;
-    CLIMB_TREE:
-    while(sTok.hasMoreTokens()) {
-      tok = sTok.nextToken().trim();
-      int obi = tok.indexOf("(");
-      if(obi != -1) {
-        tok = tok.substring(0, obi - 1).trim();
-      }
-      for(Iterator i = taxa.getChildren().iterator(); i.hasNext(); ) {
-        Taxa child = (Taxa) i.next();
-        if(child.getScientificName().equals(tok)) {
-          taxa = child;
-          continue CLIMB_TREE; // found child by name - go through loop again
-        }
-      }
-      
-      break; // couldn't finda child by than name - stop this and move on
-    }
-    
-    while(sTok.hasMoreTokens()) {
-      if(tok == null) {
-        tok = sTok.nextToken();
-      }
-      String sci;
-      String common;
-      int obi = tok.indexOf("(");
-      if(obi != -1) {
-        sci = tok.substring(0, obi - 1).trim();
-        common = tok.substring(obi + 1, tok.indexOf(")") - 1).trim();
-      } else {
-        sci = tok.trim();
-        common = null;
-      }
-      
-      taxa = addChild(taxa, createTaxa(sci, common));
-      
-      tok = null; // 1st time through flag - sorry
-    }
-    
-    return taxa;
-  }
-  
-  public String completeName(Taxa taxa) {
-    String name = "";
-    
-    while(taxa != root && taxa != null) {
-      String sci = taxa.getScientificName();
-      String common = taxa.getCommonName();
-      if(common == null) {
-        name = sci + "; " + name;
-      } else {
-        name = sci + " (" + common + ")" + ", " + name;
-      }
-      
-      taxa = taxa.getParent();
-    }
-    
-    return name;
-  }
-  
   public Taxa importTaxa(Taxa taxa) {
     WeakTaxa can = canonicallize(taxa);
     if(can == null) {
@@ -135,11 +65,7 @@ public class WeakTaxaFactory implements TaxaFactory {
   }
   
   public Taxa addChild(Taxa parent, Taxa child) {
-    if(canonicallize(parent) == null) {
-      throw new IllegalArgumentException("Parent taxa not owned by this TaxaFactory");
-    }
-    
-    WeakTaxa sparent = (WeakTaxa) parent;
+    WeakTaxa sparent = (WeakTaxa) importTaxa(parent);
     WeakTaxa schild = (WeakTaxa) importTaxa(child);
     
     Set children = sparent.getChildrenRaw();

@@ -1,7 +1,9 @@
 package org.biojava.bio.taxa;
 
 import java.util.*;
+
 import org.biojava.utils.*;
+import org.biojava.bio.*;
 
 /**
  * A taxa within a classification.
@@ -11,7 +13,25 @@ import org.biojava.utils.*;
  *
  * @author Matthew Pocock
  */
-public interface Taxa {
+public interface Taxa extends Annotatable {
+  /**
+   * Change type to indicate that the common name of this Taxa is changing.
+   */
+  public final static ChangeType CHANGE_COMMON_NAME = new ChangeType(
+    "Common name change",
+    Taxa.class,
+    "CHANGE_COMMON_NAME"
+  );
+  
+  /**
+   * Change type to indicate that the scientific name of this Taxa is changing.
+   */
+  public final static ChangeType CHANGE_SCIENTIFIC_NAME = new ChangeType(
+    "Scientific name change",
+    Taxa.class,
+    "CHANGE_SCIENTIFIC_NAME"
+  );
+
   /**
    * The common name of the Taxa.
    * <P>
@@ -20,6 +40,15 @@ public interface Taxa {
    * @return a String representing this taxa's common name
    */
   public String getCommonName();
+  
+  /**
+   * Set the new common name of this Taxa.
+   *
+   * @param commonName  the new common name
+   * @throws ChangeVetoException if the name can't be changed at this time
+   */
+  public void setCommonName(String commonName)
+  throws ChangeVetoException;
   
   /**
    * The scientific name of this species.
@@ -31,6 +60,16 @@ public interface Taxa {
    */
   public String getScientificName();
 
+  /**
+   * Change the scientific name of this species.
+   *
+   * @param scientificName  the new scientific name
+   * @throws ChangeVetoException if the scientific name can't be changed at this
+   *         time
+   */
+  public void setScientificName(String scientificName)
+  throws ChangeVetoException;
+  
   /**
    * The parent of this Taxa.
    * <P>

@@ -18,32 +18,6 @@ public interface TaxaFactory {
   public String getName();
   
   /**
-   * Return the apropreate (possibly normalized) taxa object for a
-   * fully-qualified taxa name.
-   *
-   * @param name  fully qualified taxa name
-   * @return the Taxa representing this name
-   * @throws ParserException if the name can't be parsed
-   * @throws NoSuchElementException if the name refers to an unknown taxa and
-   *         the factory is unable to generate a new taxa for it
-   * @throws ChangeVetoException if parsing this Taxa would result in a Taxa
-   *          being added that can't be added
-   */
-  public Taxa parseTaxa(String name)
-  throws ParserException,
-  NoSuchElementException,
-  ChangeVetoException;
-  
-  /**
-   * Return the fully qualified name of a taxa using this factory's notion of
-   * naming.
-   *
-   * @param taxa the Taxa to name
-   * @return a String containing the complete name
-   */
-  public String completeName(Taxa taxa);
-  
-  /**
    * Import a Taxa and all its children into the implementation provided by
    * this factory.
    *

@@ -16,26 +16,17 @@ import org.biojava.bio.*;
  * @author Matthew Pocock
  */
 public class SimpleTaxa extends AbstractTaxa {
-  private String commonName;
-  private String scientificName;
   protected Taxa parent;
   protected Set children;
+  
+  protected SimpleTaxa() { super(); }
   
   /**
    * Create a new instance with no parent, no children and a given scientific
    * and common names.
    */
   protected SimpleTaxa(String scientificName, String commonName) {
-    this.scientificName = scientificName;
-    this.commonName = commonName;
-  }
-  
-  public String getCommonName() {
-    return commonName;
-  }
-  
-  public String getScientificName() {
-    return scientificName;
+    super(scientificName, commonName);
   }
   
   public Taxa getParent() {
@@ -51,14 +42,6 @@ public class SimpleTaxa extends AbstractTaxa {
       return children;
     } else {
       return Collections.EMPTY_SET;
-    }
-  }
-  
-  public String toString() {
-    if(parent != null) {
-      return parent.toString() + " -> " + scientificName;
-    } else {
-      return scientificName;
     }
   }
 }

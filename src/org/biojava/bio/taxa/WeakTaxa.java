@@ -29,22 +29,15 @@ import java.lang.ref.*;
  * @author Matthew Pocock
  */
 public class WeakTaxa extends AbstractTaxa {
-  private String commonName;
-  private String scientificName;
   protected Taxa parent;
   private WeakReference /*Set*/ children;
   
+  public WeakTaxa() {
+    super();
+  }
+  
   public WeakTaxa(String scientificName, String commonName) {
-    this.scientificName = scientificName;
-    this.commonName = commonName;
-  }
-  
-  public String getCommonName() {
-    return commonName;
-  }
-  
-  public String getScientificName() {
-    return scientificName;
+    super(scientificName, commonName);
   }
   
   public Taxa getParent() {
@@ -77,13 +70,5 @@ public class WeakTaxa extends AbstractTaxa {
   
   public void setChildrenRaw(Set children) {
     this.children = new WeakReference(children);
-  }
-  
-  public String toString() {
-    if(parent != null) {
-      return parent.toString() + " -> " + scientificName;
-    } else {
-      return scientificName;
-    }
   }
 }
