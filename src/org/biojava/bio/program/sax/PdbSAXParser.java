@@ -35,22 +35,20 @@ import org.xml.sax.helpers.AttributesImpl;
  * step.  That is, events are generated that call methods
  * on an XML document handler.
  * <p>
- * Currently memory usage whilst parsing is at the level of a single model.
- * <p>
- * <b>Note this code is experimental, in development and subject 
- * to change without notice - please do not use unless you're in
- * contact with the primary author preferably via the biojava-l
- * mailing list.
+ * <b>Note this code is experimental, and may change without notice.
+ *
  * </b>
  * <p>
  *
- * Copyright &copy; 2000,2001 Cambridge Antibody Technology.
+ * Copyright &copy; 2000 - 2002 Cambridge Antibody Technology.
  * All Rights Reserved.
  * <p>
  * Primary author -<ul>
  * <li>Simon Brocklehurst (CAT)
  * </ul>
  * Other authors  -<ul>
+ * <li>Neil Benn          (CAT)
+ * <li>Derek Crockford    (CAT)
  * <li>Tim Dilks          (CAT)
  * <li>Colin Hardman      (CAT)
  * <li>Stuart Johnston    (CAT)
@@ -58,7 +56,7 @@ import org.xml.sax.helpers.AttributesImpl;
  *
  *
  * @author Cambridge Antibody Technology (CAT)
- * @version 0.2
+ * @version 0.8
  *
  */
 public class PdbSAXParser extends AbstractNativeAppSAXParser {
@@ -80,7 +78,10 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
     public PdbSAXParser() {
 	this.setNamespacePrefix("biojava");
     }
-
+  
+    public void parse (String poURI) throws IOException,SAXException {
+	this.parse(new InputSource(poURI));
+    }
     /**
      * Describe 'parse' method here.
      *
@@ -100,9 +101,9 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 	    // loop over file
 	    oLine = oContents.readLine();
 	    while (oLine != null) {
-		
-		// put line into ArrayList
-		oRecordList.add(oLine);
+		String oPadLine = this.padLine(oLine);
+		// put padded line into ArrayList
+		oRecordList.add(oPadLine);
 		//System.out.println(oLine);
 		oLine = oContents.readLine();
 	    } // end while
@@ -113,7 +114,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 	    //Now parse it and fire of relevant events
 	    
 	    //First preprocess file
-	    
+
 	    //Rule
 	    //If there are no model records, then insert records
 	    //for a single model.  MODEL record before first ATOM,
@@ -134,8 +135,9 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 		//System.out.println("No MODEL records");
 		for (int i = 0; i < oRecordList.size(); i++) {
 		    oRecord = (String)oRecordList.get(i);
-		    
-		    if ((oRecord.startsWith("ATOM  ")) &&
+	  
+		    if ( ((oRecord.startsWith("ATOM  ")) ||
+			  (oRecord.startsWith("HETATM")))  &&
 			(!tFoundFirstAtom))             {
 			tFoundFirstAtom = true;
 
@@ -149,7 +151,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 		boolean tFoundLastAtom = false;
 		for (int i = oRecordList.size() - 1; i > 0; i--) {
 		    oRecord = (String)oRecordList.get(i);
-			
+	  
 		    if ( ((oRecord.startsWith("ATOM  ")) ||
 			  (oRecord.startsWith("HETATM")) ||
 			  (oRecord.startsWith("TER")  )) &&
@@ -167,103 +169,122 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 	    } //end if tIsModel == false
 
 
-		//End preprocess file
+	    //End preprocess file
 
-		//At this point, the PDB records should be
-		//in a suitable state for parsing...
-
-
-		oAtts.clear();
-		this.startElement(new QName(this,
-			    this.prefix("MacromolecularStructure")),
-			  (Attributes)oAtts);
+	    //At this point, the PDB records should be
+	    //in a suitable state for parsing...
 
 
-		//Start at beginning of RecordList and progress
-		//through to end using global iPos variable
-		//to keep track of position
-
-		iPos = 0;
-
-		//keep track of start pos of model -
-		//need this for multiple passes through
-		//to get protein, dna, solvent etc.
-
-		iModelStart = 0;  
-		iModelStop = 0;  
-		String oModelId;
-
-		while (iPos < oRecordList.size()) {
-		    //System.out.println("Line: "+iPos);
-		    oRecord = (String)oRecordList.get(iPos);
-		    if (oRecord.startsWith("MODEL")) {
-			iModelStart = iPos;
-			oModelId = oRecord.substring(10,14).trim();
-
-			oAtts.clear();
-			oAttQName.setQName("modelId");
-			oAtts.addAttribute(oAttQName.getURI(),
-					   oAttQName.getLocalName(),
-					   oAttQName.getQName(),
-					   "CDATA",oModelId);
-
-			this.startElement(new QName(this,this.prefix("Model")),
-					  (Attributes)oAtts);
-
-		    }
-
-		    if (oRecord.startsWith("ENDMDL")) {
-			//keep position of the end of this model
-			iModelStop = iPos;
-
-			//at this point have start and end positions
-			//of current model
-			
-			//do multiple passes for each type of molecule
-
-			//parse protein for this model...
-
-			oAtts.clear();
-			this.startElement(new QName(this,this.prefix("Protein")),
-					  (Attributes)oAtts);
+	    oAtts.clear();
+	    this.startElement(new QName(this,
+					this.prefix("MolecularStructureList")),
+			      (Attributes)oAtts);
 
 
-			oAtts.clear();
-			this.startElement(new QName(this,
-					    this.prefix("ProteinChainList")),
-					  (Attributes)oAtts);
+	    //Start at beginning of RecordList and progress
+	    //through to end using global iPos variable
+	    //to keep track of position
 
+	    iPos = 0;
 
-			this.parseProtein(iModelStart,iModelStop);
-			//close final Atom Residue and ProteinChain
+	    //keep track of start pos of model -
+	    //need this for multiple passes through
+	    //to get protein, dna, solvent etc.
 
-			this.endElement(new QName(this,this.prefix("Atom")));
-			this.endElement(new QName(this,this.prefix("Residue")));
-			this.endElement(new QName(this,
-						  this.prefix("ProteinChain")));
-			this.endElement(new QName(this,
-						  this.prefix("ProteinChainList")));
+	    iModelStart = 0;  
+	    iModelStop = 0;  
+	    String oModelId;
+	    String oStructureId;
+	    while (iPos < oRecordList.size()) {
+		//System.out.println("Line: "+iPos);
+		oRecord = (String)oRecordList.get(iPos);
 
+		if (oRecord.startsWith("HEADER")) {
+		    oStructureId = oRecord.substring(62,66).trim();
+		    System.out.println(oStructureId);
 
-			//todo parse solvent, dna etc.
-			
-			//having parsed all content, end model
-			this.endElement(new QName(this,this.prefix("Model")));
+		    oAtts.clear();
+		    oAttQName.setQName("id");
+		    oAtts.addAttribute(oAttQName.getURI(),
+				       oAttQName.getLocalName(),
+				       oAttQName.getQName(),
+				       "CDATA",oStructureId);
 
-		    }
-		    iPos++;
+		    //TODO EMPTY ELEMENT
+		    this.startElement(new QName(this,this.prefix("PdbCode")),
+				      (Attributes)oAtts);
+		    this.endElement(new QName(this,this.prefix("PdbCode")));
+
 		}
 
-		this.endElement(new QName(this,
-					  this.prefix("MacromolecularStructure")));
 
-		//System.out.println("Finished parsing");
+		if (oRecord.startsWith("MODEL")) {
+		    iModelStart = iPos;
+		    oModelId = oRecord.substring(10,14).trim();
+
+		    oAtts.clear();
+		    oAttQName.setQName("modelId");
+		    oAtts.addAttribute(oAttQName.getURI(),
+				       oAttQName.getLocalName(),
+				       oAttQName.getQName(),
+				       "CDATA",oModelId);
+
+		    this.startElement(new QName(this,this.prefix("MolecularStructure")),
+				      (Attributes)oAtts);
+
+		}
+
+		if (oRecord.startsWith("ENDMDL")) {
+		    //keep position of the end of this model
+		    iModelStop = iPos;
+	  
+		    //at this point have start and end positions
+		    //of current model
+			
+		    //do multiple passes for each type of molecule
+
+		    //parse protein for this model...
+
+		    oAtts.clear();
+		    this.startElement(new QName(this,this.prefix("Protein")),
+				      (Attributes)oAtts);
 
 
-            } catch (java.io.IOException x) {
-                System.out.println(x.getMessage());
-                System.out.println("File read interupted");
-            } // end try/catch
+		    oAtts.clear();
+		    this.startElement(new QName(this,
+						this.prefix("ProteinChainList")),
+				      (Attributes)oAtts);
+
+
+		    this.parseProtein(iModelStart,iModelStop);
+		    //close final Atom Residue and ProteinChain
+
+		    this.endElement(new QName(this,this.prefix("Atom")));
+
+		    this.endElement(
+				    new QName(this,this.prefix("AminoAcidResidue")));
+		    this.endElement(new QName(this,
+					      this.prefix("ProteinChain")));
+		    this.endElement(new QName(this,
+					      this.prefix("ProteinChainList")));
+
+		    //todo parse solvent, dna etc.
+			
+		    //having parsed all content, end model
+		    this.endElement(new QName(this,this.prefix("MolecularStructure")));
+
+		}
+		iPos++;
+	    }
+	    this.endElement(new QName(this,
+				      this.prefix("MolecularStructureList")));
+
+	    //System.out.println("Finished parsing");
+
+	} catch (java.io.IOException x) {
+	    System.out.println(x.getMessage());
+	    System.out.println("File read interupted");
+	} // end try/catch
 
     }
     //==================================================================
@@ -276,13 +297,13 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
      * @param nil	 -
      */
     private void parseProtein(int piStart, int piStop) 
-    throws SAXException {
-
+	throws SAXException {
+    
 	String oChainId;
-	
+    
 	String oAtomId;
 	String oAtomType;
-
+    
 	String  oResidueId;
 	String  oResidueType;
 
@@ -290,8 +311,8 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 	String oY;
 	String oZ;
 	String oOccupancy;
-	String oBFactor;
-
+	String oTemperatureFactor;
+	String oElement;
 
 	String oCurrentChainId;
 	String oCurrentResidueId;
@@ -307,9 +328,10 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 	    oRecord = (String)oRecordList.get(i);
 	    //System.out.println("parsing protein>" + oRecord);
 
-	    if (oRecord.startsWith("ATOM  ")) {
+	    if ( (oRecord.startsWith("ATOM  ")) ||
+		 (oRecord.startsWith("HETATM"))  ) {
 		//System.out.println(">"+oRecord.substring(17,20)+"<");
-
+	
 		oAtomId = oRecord.substring(6,11).trim();
 		oAtomType = oRecord.substring(12,16).trim();
 
@@ -324,23 +346,26 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 
 		oX = oRecord.substring(30,38).trim();
 		oY = oRecord.substring(38,46).trim();
-		oZ = oRecord.substring(47,53).trim();
-		
+		oZ = oRecord.substring(46,54).trim();
 
+		oOccupancy = oRecord.substring(54,60).trim();
+		oTemperatureFactor = oRecord.substring(60,66).trim();
+		
+		oElement = oRecord.substring(76,78).trim();
 
 		//check new residue event
 
 		if (!oResidueId.equals(oCurrentResidueId)) {
 		    if (!tFirstResidue) {
 			this.endElement(new QName(this,
-					  this.prefix("Residue")));
+						  this.prefix("AminoAcidResidue")));
 
 		    }
 		    if (!oChainId.equals(oCurrentChainId)) {
 			if (!tFirstChain) {
 
-			this.endElement(new QName(this,
-					  this.prefix("ProteinChain")));
+			    this.endElement(new QName(this,
+						      this.prefix("ProteinChain")));
 
 			}
 			//check new chain event
@@ -352,7 +377,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 					   "CDATA",oChainId);
 
 			this.startElement(new QName(this,
-      				          this.prefix("ProteinChain")),
+						    this.prefix("ProteinChain")),
 					  (Attributes)oAtts);
 
 
@@ -372,8 +397,9 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 				       oAttQName.getQName(),
 				       "CDATA",oResidueType);
 
-		    this.startElement(new QName(this,this.prefix("Residue")),
-					  (Attributes)oAtts);
+		    this.startElement(
+				      new QName(this,this.prefix("AminoAcidResidue")),
+				      (Attributes)oAtts);
 
 		    tFirstResidue = false; //a bit ugly to set all the time.
 		    oCurrentResidueId = oResidueId;
@@ -393,8 +419,29 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 				   oAttQName.getQName(),
 				   "CDATA",oAtomType);
 		
+		if ( ! oElement.equals("") ) {
+		    oAttQName.setQName("element");
+		    oAtts.addAttribute(oAttQName.getURI(),
+				       oAttQName.getLocalName(),
+				       oAttQName.getQName(),
+				       "CDATA", oElement);
+		}
+
+		oAttQName.setQName("occupancy");
+		oAtts.addAttribute(oAttQName.getURI(),
+				   oAttQName.getLocalName(),
+				   oAttQName.getQName(),
+				   "CDATA",oOccupancy);
+		
+		oAttQName.setQName("temperatureFactor");
+		oAtts.addAttribute(oAttQName.getURI(),
+				   oAttQName.getLocalName(),
+				   oAttQName.getQName(),
+				   "CDATA", oTemperatureFactor);
+
+
 		this.startElement(new QName(this,this.prefix("Atom")),
-					  (Attributes)oAtts);
+				  (Attributes)oAtts);
 
 
 		oAtts.clear();
@@ -414,9 +461,10 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 				   oAttQName.getLocalName(),
 				   oAttQName.getQName(),
 				   "CDATA",oZ);
-		
+
+
 		this.startElement(new QName(this,this.prefix("Coordinates")),
-					  (Attributes)oAtts);
+				  (Attributes)oAtts);
 
 
 		this.endElement(new QName(this,this.prefix("Coordinates")));
@@ -424,7 +472,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 
 	    }
 	}
-
+    
     }
 
 
@@ -439,7 +487,7 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
     private void parseAtomRecord(String poRecord) {
 
 	String oChainId;
-
+    
 	String oAtomId;
 	String oAtomType;
 
@@ -480,6 +528,63 @@ public class PdbSAXParser extends AbstractNativeAppSAXParser {
 
 	return true;
     }
+    /**
+     * Avoid returning empty strings in the output.
+     * If an empty string, return "missing", else
+     * return back the input value unchanged.
+     *
+     * @param poValue a <code>String</code> value
+     * @return a <code>String</code> value
+     */
+    private String checkMissing(String poValue) {
 
+	if (poValue.equals("")) {
+	    return "missing";
+	} 
 
+	return poValue;
+    }
+
+    /**
+     * Takes a a line. If shorted that 80 characters
+     * returns a new version of the line, with spaces
+     * appended so that it is 80 characers.
+     *
+     * @param poLine a <code>String</code> value
+     * @return a <code>String</code> value
+     */
+    private String padLine(String poLine) {
+
+	int iLength = poLine.length();
+
+	int iDesiredLength = 80;
+	char cPadChar = ' ';
+
+	//do nothing if line length more than or equals to 80
+
+	if (iLength >= 80) {
+	    return poLine;
+	}
+
+	//else pad with spaces
+
+	//System.out.println("Length: " + poLine.length());
+
+	StringBuffer oBuff = new StringBuffer(poLine);
+
+	int iInsertLength = iDesiredLength - iLength;
+
+	char[] aoInsert = new char[iInsertLength];
+
+	//	System.out.println("Insert Length: " + iInsertLength);
+
+	for (int i = 0; i < iInsertLength; i++) {
+	    aoInsert[i] = cPadChar;
+	}
+
+	oBuff.append(aoInsert);
+
+	return oBuff.toString();
+    }
+  
 }

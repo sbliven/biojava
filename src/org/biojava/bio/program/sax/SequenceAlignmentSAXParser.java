@@ -1,0 +1,174 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+package org.biojava.bio.program.sax;
+
+import java.util.*;
+import java.io.*;
+
+import org.xml.sax.SAXException;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.helpers.AttributesImpl;
+import org.xml.sax.XMLReader;
+
+/**
+ * A SAX2 parser for dealing with a sequence alignments.  The format
+ * of any given alignment is automatically detected (e.g. ClustalW,
+ * Needle).
+ *
+ * Supported alignment formats are:
+ * <ul>
+ * <li>ClustalW
+ * <li>Needle
+ * </ul>
+ *
+ * Copyright &copy; 2000-2002 Cambridge Antibody Technology.
+ * All Rights Reserved.
+ * <p>
+ * Primary author -<ul>
+ * <li>Simon Brocklehurst (CAT)
+ * </ul>
+ * Other authors  -<ul>
+ * <li>Neil Benn          (CAT)
+ * <li>Lawrence Bower     (CAT)
+ * <li>Derek Crockford    (CAT)
+ * <li>Tim Dilks          (CAT)
+ * <li>Colin Hardman      (CAT)
+ * <li>Stuart Johnston    (CAT)
+ *</ul>
+ *
+ * @author Cambridge Antibody Technology (CAT)
+ * @version 1.0
+ *
+ */
+public class SequenceAlignmentSAXParser extends AbstractNativeAppSAXParser {
+
+
+    private AttributesImpl          oAtts      = new AttributesImpl();
+    private ArrayList               oHeader    = new ArrayList();
+    private QName                   oAttQName  = new QName(this);     
+    private char[]                  aoChars;
+
+    private String                  oSeqName;
+    private String                  oTmpSeq;
+    private StringBuffer            oSeq         = new StringBuffer();
+    private HashMap                 oAlignment   = new HashMap();
+    private ArrayList               oSeqNameList = new ArrayList();
+
+    private static final int        STARTUP            = 0;
+    private static final int        IN_STREAM          = 1;
+
+    private static final int        CLUSTALW           = 2;
+    private static final int        NEEDLE             = 3;
+
+    private int                     iAlignmentType     = -1;
+    /**
+     * Initialises internal state
+     * Sets namespace prefix to "biojava"
+     */
+    public SequenceAlignmentSAXParser() {
+	this.setNamespacePrefix("biojava");
+    }
+
+    /**
+     * Describe 'parse' method here.
+     *
+     * @param nil	 -
+     */
+    public void parse(InputSource poSource ) 
+	throws IOException,SAXException {
+
+	BufferedReader            oContents;
+	String                    oLine = null;
+
+	//Use method form superclass
+	oContents = this.getContentStream(poSource);
+
+	oContents.mark(500);
+
+	oLine = null;
+	try {
+	    oLine = oContents.readLine();
+	} catch (java.io.IOException x) {
+	    System.out.println(x.getMessage());
+	    System.out.println("Stream read interupted");
+	} // end try/catch
+
+	//at end of stream...
+
+        //System.out.println(oLine);
+	//Choose SAX Parser
+
+	XMLReader oChosenSAXParser = null;
+
+	if (oLine.startsWith("CLUSTAL W")) {
+	    iAlignmentType = CLUSTALW;
+	}
+
+	if (oLine.startsWith("Global: ")) {
+	    iAlignmentType = NEEDLE;
+
+	}
+
+	switch (iAlignmentType) {
+	case CLUSTALW:
+	    //	    System.out.println("FOUND CLUSTALW");
+	    oChosenSAXParser = new ClustalWAlignmentSAXParser();
+	    break;
+	case NEEDLE:
+	    //System.out.println("FOUND NEEDLE");
+	    oChosenSAXParser = new NeedleAlignmentSAXParser();
+	    break;
+	default:
+	    //	    System.out.println("ALIGNMENT TYPE NOT FOUND");
+	    //TODO SHOULD THROW AN EXCEPTION!
+	    break;
+	}
+
+	oContents.reset();
+
+	XMLReader oParser = oChosenSAXParser;
+
+	oParser.setContentHandler(oHandler);
+
+	/*
+	 * Parse stream with appropriate parser
+	*/
+        oParser.parse(new InputSource(oContents));
+	
+	oContents.close();
+
+    }
+
+    /**
+     * Describe <code>interpret</code> method here.
+     *
+     * @param poContents a <code>BufferedReader</code> value
+     * @param poLine a <code>String</code> value
+     * @exception SAXException if an error occurs
+     */
+    private void interpret(BufferedReader poContents, String poLine)
+	throws SAXException {
+
+
+
+    }
+}
