@@ -160,6 +160,10 @@ public final class KnuthMorrisPrattSearch {
   protected int[] getKmpNextTable(){
     return kmpNext;
   }
+  
+  public SymbolList getPattern() {
+      return pattern;
+  }
 
   /**
    * Demo and Test method
