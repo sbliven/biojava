@@ -99,8 +99,7 @@ public class DASAlignmentCall {
 	try {
 	    dasUrl = new URL(serverurl);
 	} catch (Exception e) {
-	    e.printStackTrace();
-	    return null;
+	    throw new IOException("error during creation of URL " + e.getMessage());
 	}
 	System.out.println("connecting to "+serverurl);
 	InputStream inStream = connectDASServer(dasUrl);
@@ -110,7 +109,7 @@ public class DASAlignmentCall {
 	try{
 	    ali =  parseDASResponse(inStream) ;
 	} catch (Exception e) {
-	    e.printStackTrace() ;
+	    throw new IOException("error during creation of URL " + e.getMessage());
 	}
 	return ali;	
     }
@@ -131,8 +130,7 @@ public class DASAlignmentCall {
 	try {
 	    dasUrl = new URL(connstr);
 	} catch (Exception e) {
-	    e.printStackTrace();
-	    return null;
+	    throw new IOException("error during creation of URL " + e.getMessage());
 	}
 	System.out.println("connecting to "+connstr);
 	InputStream inStream = connectDASServer(dasUrl);
@@ -142,7 +140,7 @@ public class DASAlignmentCall {
 	try{
 	    ali =  parseDASResponse(inStream) ;
 	} catch (Exception e) {
-	    e.printStackTrace() ;
+	    throw new IOException("error during creation of URL " + e.getMessage());
 	}
 	return ali;
 	
@@ -157,22 +155,28 @@ public class DASAlignmentCall {
     {
 	InputStream inStream = null ;
 				
+	System.out.println("opening connection to "+url);
+	HttpURLConnection huc = null;
+	huc = (HttpURLConnection) url.openConnection();	    
+	 
+
+	//System.out.println("temporarily disabled: accepting gzip encoding ");
+	// should make communication much faster!
+	huc.setRequestProperty("Accept-Encoding", "gzip");
 	
-	    HttpURLConnection huc = null;
-	    huc = (HttpURLConnection) url.openConnection();	    
-	    // should make communication much faster!
-	    huc.setRequestProperty("Accept-Encoding", "gzip");
-	
-	    System.out.println("response code " +huc.getResponseCode());
-	    String contentEncoding = huc.getContentEncoding();
-	    inStream = huc.getInputStream(); 
-	    if (contentEncoding != null) {
-                if (contentEncoding.indexOf("gzip") != -1) {
-		    // we have gzip encoding
-		    inStream = new GZIPInputStream(inStream);
-		    System.out.println("using gzip encoding!");
-                }
-            }
+	System.out.println("response code " +huc.getResponseCode());
+	String contentEncoding = huc.getContentEncoding();
+	System.out.println("getting InputStream");
+	inStream = huc.getInputStream();
+	if (contentEncoding != null) {
+	    if (contentEncoding.indexOf("gzip") != -1) {
+		// we have gzip encoding
+		inStream = new GZIPInputStream(inStream);
+		System.out.println("using gzip encoding!");
+	    }
+	}
+	System.out.println("got InputStream from  DAS Alignment server");
+	System.out.println("encoding: " + contentEncoding);
 
 	return inStream;
 	

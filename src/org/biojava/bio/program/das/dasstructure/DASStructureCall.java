@@ -119,13 +119,14 @@ public class DASStructureCall {
     {
 	/* now connect to DAS server */
 	String connstr = serverurl + pdb_code ;
-	System.out.println(connstr);
+	System.out.println("DASStructureCall: connstr" + connstr);
 	URL dasUrl = null ;
 	try {
 	    dasUrl = new URL(connstr);
 	} catch (Exception e) {
-	    e.printStackTrace();
-	    return null;
+	    throw new IOException("error during creation of URL " + e.getMessage());
+	    //e.printStackTrace();
+	    //return null;
 	}
 	//System.out.println("connecting to "+connstr);
 	InputStream inStream = connectDASServer(dasUrl);
@@ -138,9 +139,12 @@ public class DASStructureCall {
 	    structure = parseDASResponse(inStream) ;
 	} catch (Exception e) {
 	    e.printStackTrace() ;
+	    throw new IOException("error during parsing of DAS response " + e.getMessage());
+	    
 	}
 	//System.out.println("finished parsing DAS structure response");
 	//System.out.println(getTimeStamp());
+	//System.out.println(structure.toPDB());
 	return structure;
 	
     }
@@ -160,30 +164,34 @@ public class DASStructureCall {
 	//System.out.println("opening "+url);
 	
 	huc = (HttpURLConnection) url.openConnection();
-	
+	System.out.println(huc);
+	//System.out.println("deacactivated encoding temporarily");
 	// should make communication much faster!
 	huc.setRequestProperty("Accept-Encoding", "gzip");
 	
 	//System.out.println(huc.getResponseMessage());
 	
 	
+
+	
+	System.out.println("getContentEncoding");
 	String contentEncoding = huc.getContentEncoding();
-	
-	InputStream inStream = huc.getInputStream();
-	
+	System.out.println("getInputStream");
+	InputStream inStream = huc.getInputStream();	
+
 	if (contentEncoding != null) {
 	    if (contentEncoding.indexOf("gzip") != -1) {
 		// we have gzip encoding
 		inStream = new GZIPInputStream(inStream);
-		//System.out.println("using gzip encoding!");
+		System.out.println("using gzip encoding!");
 	    }
 	}
-	    
-			
+	
+	
 	System.out.println(getTimeStamp() );
 	System.out.println("got InputStream from  DAS Structure server");
-	//System.out.println("encoding: " + contentEncoding);
-	//System.out.println("code:" + huc.getResponseCode());
+	System.out.println("encoding: " + contentEncoding);
+	System.out.println("code:" + huc.getResponseCode());
 	//System.out.println("message:" + huc.getResponseMessage());
 	//inStream = huc.getInputStream();
 	
@@ -223,9 +231,9 @@ public class DASStructureCall {
 	    e.printStackTrace();
 	}
 	
-	
-
+       
 	XMLReader xmlreader = saxParser.getXMLReader();
+	
 	//http://apache.org/xml/features/nonvalidating/load-external-dtd
 
 	//XMLReader xmlreader = XMLReaderFactory.createXMLReader();	
