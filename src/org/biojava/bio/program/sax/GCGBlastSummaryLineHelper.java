@@ -52,6 +52,9 @@ import org.xml.sax.SAXException;
  */
 final class GCGBlastSummaryLineHelper implements SummaryLineHelperIF {
     private StringBuffer oHitDescription;
+    private String previousHitID;
+    private String previousScore;
+    private String previousEValue;
     public GCGBlastSummaryLineHelper() {
     }
 
@@ -87,7 +90,7 @@ final class GCGBlastSummaryLineHelper implements SummaryLineHelperIF {
     public void parse(String poLine, HashMap poMap,
               BlastLikeVersionSupport poVersion) throws SAXException {
 
-        int iGrab = 2; //numbe of tokens to take from the right
+        int iGrab = 2; //number of tokens to take from the right
         int iCount;
         boolean firstLine; //state variable
         if (poLine.startsWith("!")) {
@@ -102,12 +105,16 @@ final class GCGBlastSummaryLineHelper implements SummaryLineHelperIF {
         //first is score
         //next is Evalue
         //These tokens are on the seocnd line.  
+        //NOTE:  For GCG, if the next match is for the same
+        //Accession number then, the score and evalue are not 
+        //repeated
         
         if (!firstLine) {
             //populate Map...
             iCount = oSt.countTokens() - iGrab - 1;
             //first token is the hit id
-            poMap.put("hitId",oSt.nextToken());
+            String hitID = oSt.nextToken();
+            poMap.put("hitId",hitID);
             //oHitDescription.setLength(0);
     
             for (int i = 0; i < iCount; i++) {
@@ -116,9 +123,20 @@ final class GCGBlastSummaryLineHelper implements SummaryLineHelperIF {
             }
             poMap.put("hitDescription",oHitDescription.toString());
     
+            //If the Previous hitID is the same as this, then 
+            //GCG does not repeat the evalue.  So use the previous e-value
             //now collect score and e-value
-            poMap.put("score",oSt.nextToken());
-            poMap.put("expectValue",oSt.nextToken());
+            if (hitID.equals(previousHitID)) {
+            System.out.println("curr: " + hitID + " prev: " + previousHitID); 
+	            poMap.put("score",previousScore);
+    	        poMap.put("expectValue",previousEValue);
+    	    } else {
+    	    	previousHitID = hitID;
+    	    	previousScore = oSt.nextToken();
+    	    	previousEValue = oSt.nextToken();
+            	poMap.put("score",previousScore);
+            	poMap.put("expectValue",previousEValue);
+            }
     
         } else {
             //initalize description

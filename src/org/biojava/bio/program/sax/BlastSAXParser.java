@@ -50,7 +50,7 @@ import org.xml.sax.helpers.AttributesImpl;
  *                 Tim Dilks          (CAT)
  *                 Colin Hardman      (CAT)
  *                 Stuart Johnston    (CAT)
- *                 Mathieu Wiepert    (CAT)
+ *                 Mathieu Wiepert    (Mayo Foundation)
  *
  * Copyright 2000 Cambridge Antibody Technology Group plc.
  * All Rights Reserved.
