@@ -634,6 +634,24 @@ public class FilterUtilsTest extends TestCase
         );
     }
     
+    public void testDisjointAnnotationTypes() {
+        AnnotationType atype = new AnnotationType.Impl();
+        atype.setDefaultConstraints(PropertyConstraint.NONE, CardinalityConstraint.ZERO);
+        atype.setConstraints(
+            "foo",
+            PropertyConstraint.ANY,
+            CardinalityConstraint.ONE
+        );
+        assertTrue(FilterUtils.areDisjoint(
+            new FeatureFilter.ByAnnotationType(atype),
+            new FeatureFilter.ByAnnotation("bar", "some_value")
+        ));
+        assertTrue(!FilterUtils.areDisjoint(
+            new FeatureFilter.ByAnnotationType(atype),
+            new FeatureFilter.ByAnnotation("foo", "some_value")
+        ));
+    }
+    
     private void optimizeExact(FeatureFilter raw, FeatureFilter target) {
       FeatureFilter result = FilterUtils.optimize(raw);
       assertTrue("optimize: " + raw + " should be " + target + " but is " + result, result == target);
