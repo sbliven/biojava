@@ -174,12 +174,24 @@ class BioSQLComponentFeature implements ComponentFeature {
 
     protected FeatureHolder getProjectedFeatures() {
 	if (projectedFeatures == null) {
+	    int translation;
+	    boolean flip;
+	    if (strand == StrandedFeature.NEGATIVE) {
+		translation = location.getMax() + componentLocation.getMin();
+		flip = true;
+	    } else  if (strand == StrandedFeature.POSITIVE) {
+		translation = location.getMin() - componentLocation.getMin();
+		flip = false;
+	    } else {
+		throw new BioError("No strand -- erk!");
+	    }
+
 	    FeatureHolder child = getComponentSequence();
 	    if (child != null) {
 		projectedFeatures = new ProjectedFeatureHolder(getComponentSequence(),
 							       this,
-							       getLocation().getMin() - 1,
-							       false);
+							       translation,
+							       flip);
 	    } else {
 		projectedFeatures = FeatureHolder.EMPTY_FEATURE_HOLDER;
 	    }

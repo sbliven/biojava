@@ -43,12 +43,14 @@ import org.biojava.bio.symbol.*;
 class BioSQLSequence implements Sequence, RealizingFeatureHolder, BioSQLSequenceI {
     private BioSQLSequenceDB seqDB;
     private String name;
-    private int bioentry_id;
+    private int bioentry_id = -1;
+    private int dummy_id = -1;
     private int biosequence_id;
     private ChangeSupport changeSupport;
     private Annotation annotation;
     private Alphabet alphabet;
     private BioEntryFeatureSet features;
+    private SymbolList symbols;
 
     private void initChangeSupport() {
 	changeSupport = new ChangeSupport();
@@ -58,11 +60,36 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder, BioSQLSequence
 	return seqDB.getDBHelper();
     }
 
-    BioSQLSequence(BioSQLSequenceDB seqDB,
-		   String name,
-		   int bioentry_id,
-		   int biosequence_id,
-		   String alphaName)
+    static BioSQLSequence reflectBiosequence(BioSQLSequenceDB seqDB,
+					     String name,
+					     int bioentry_id,
+					     int biosequence_id,
+					     String alphaName)
+	throws BioException
+    {
+	BioSQLSequence seq = new BioSQLSequence(seqDB, name, bioentry_id, alphaName);
+	seq.biosequence_id = biosequence_id;
+	return seq;
+    }
+
+    static BioSQLSequence reflectDummy(BioSQLSequenceDB seqDB,
+				       String name,
+				       int bioentry_id,
+				       int dummy_id,
+				       int length,
+				       String alphaName)
+	 throws BioException
+    {
+	BioSQLSequence seq = new BioSQLSequence(seqDB, name, bioentry_id, alphaName);
+	seq.dummy_id = dummy_id;
+	seq.symbols = new DummySymbolList((FiniteAlphabet) seq.alphabet, length);
+	return seq;
+    }
+
+    private BioSQLSequence(BioSQLSequenceDB seqDB,
+			   String name,
+			   int bioentry_id,
+			   String alphaName)
 	throws BioException
     {
 	this.seqDB = seqDB;
@@ -141,12 +168,14 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder, BioSQLSequence
 	throw new ChangeVetoException("Can't edit sequence in BioSQL -- or at least not yet...");
     }    
 
-    private SymbolList symbols;
-
     protected synchronized SymbolList getSymbols()
         throws BioRuntimeException
     {
 	if (symbols == null) {
+	    if (biosequence_id < 0) {
+		throw new BioError("Assertion failed: can only lazy-fetch sequence if from a biosequence entry");
+	    }
+
 	    try {
 		Connection conn = seqDB.getPool().takeConnection();
 		

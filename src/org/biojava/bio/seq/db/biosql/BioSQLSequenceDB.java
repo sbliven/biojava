@@ -35,7 +35,9 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.taxa.*;
 
 /**
- * SequenceDB keyed off a BioSQL database.
+ * SequenceDB keyed off a BioSQL database.  This is an almost-complete
+ * implementation of the BioJava Sequence, SequenceDB, and Feature interfaces,
+ * and can be used in a wide range of applications.
  *
  * @author Thomas Down
  * @author Matthew Pocock
@@ -114,6 +116,77 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 
     public String getName() {
 	return name;
+    }
+
+    public void createDummySequence(String id,
+				    Alphabet alphabet,
+				    int length)
+	throws IllegalIDException, ChangeVetoException, BioException
+    {
+	if (changeSupport == null) {
+	    _createDummySequence(id, alphabet, length);
+	} else {
+	    synchronized (changeSupport) {
+		ChangeEvent cev = new ChangeEvent(this, SequenceDB.SEQUENCES, null);
+		changeSupport.firePreChangeEvent(cev);
+		_createDummySequence(id, alphabet, length);
+		changeSupport.firePostChangeEvent(cev);
+	    }
+	}
+    }
+
+    private void _createDummySequence(String id,
+				      Alphabet seqAlpha,
+				      int length)
+        throws IllegalIDException, ChangeVetoException, BioException
+    {
+	int version = 1;
+
+	Connection conn = null;
+	try {
+	    conn = pool.takeConnection();
+	    conn.setAutoCommit(false);
+	    ResultSet rs;
+
+	    PreparedStatement create_bioentry = conn.prepareStatement(
+                    "insert into bioentry " +
+                    "(biodatabase_id, display_id, accession, entry_version, division) " +
+		    "values (?, ?, ?, ?, ?)");
+	    create_bioentry.setInt(1, dbid);
+	    create_bioentry.setString(2, id);
+	    create_bioentry.setString(3, id);
+	    create_bioentry.setInt(4, version);
+	    create_bioentry.setString(5, "?");
+	    create_bioentry.executeUpdate();
+	    create_bioentry.close();
+
+	    // System.err.println("Created bioentry");
+
+	    int bioentry_id = getDBHelper().getInsertID(conn, "bioentry", "bioentry_id");
+	    
+	    PreparedStatement create_dummy = conn.prepareStatement("insert into dummy " +
+								   "       (bioentry_id, seq_version, molecule, length) " +
+								   "values (?, ?, ?, ?)");
+	    create_dummy.setInt(1, bioentry_id);
+	    create_dummy.setInt(2, version);
+	    create_dummy.setString(3, seqAlpha.getName());
+	    create_dummy.setInt(4, length);
+	    create_dummy.executeUpdate();
+	    create_dummy.close();
+	    int dummy_id = getDBHelper().getInsertID(conn, "dummy", "dummy_id");
+
+	    conn.commit();
+	    pool.putConnection(conn);
+	} catch (SQLException ex) {
+	    boolean rolledback = false;
+	    if (conn != null) {
+		try {
+		    conn.rollback();
+		    rolledback = true;
+		} catch (SQLException ex2) {}
+	    }
+	    throw new BioRuntimeException(ex, "Error adding BioSQL tables" + (rolledback ? " (rolled back successfully)" : ""));
+	}
     }
 
     public void addSequence(Sequence seq)
@@ -361,7 +434,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 		if (rs.next()) {
 		    int biosequence_id = rs.getInt(1);
 		    String molecule = rs.getString(2);
-		    seq = new BioSQLSequence(this, id, bioentry_id, biosequence_id, molecule);
+		    seq = BioSQLSequence.reflectBiosequence(this, id, bioentry_id, biosequence_id, molecule);
 		}
 		get_biosequence.close();
 	    }
@@ -381,6 +454,21 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 		get_assembly.close();
 	    }
 
+	    if (seq == null && isDummySupported()) {
+		PreparedStatement get_dummy = conn.prepareStatement("select dummy_id, molecule, length " +
+								    "  from dummy " + 
+								    " where bioentry_id = ?");
+		get_dummy.setInt(1, bioentry_id);
+		rs = get_dummy.executeQuery();
+		if (rs.next()) {
+		    int dummy_id = rs.getInt(1);
+		    String molecule = rs.getString(2);
+		    int length = rs.getInt(3);
+		    seq = BioSQLSequence.reflectDummy(this, id, bioentry_id, dummy_id, length, molecule);
+		}
+		get_dummy.close();
+	    }
+
 	    pool.putConnection(conn);
 
 	    if (seq != null) {
@@ -391,7 +479,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    throw new BioException(ex, "Error accessing BioSQL tables");
 	}
 
-	throw new BioException("BioEntry " + id + " has unknown sequence type");
+	throw new BioException("BioEntry " + id + " exists with unknown sequence type");
     }
 
     public void removeSequence(String id)
@@ -788,6 +876,31 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	}
 
 	return assemblySupported;
+    }
+
+    private boolean dummyChecked = false;
+    private boolean dummySupported = false;
+
+    boolean isDummySupported() {
+	if (!dummyChecked) {
+	    try {
+		Connection conn = pool.takeConnection();
+		PreparedStatement ps = conn.prepareStatement("select * from dummy limit 1");
+		try {
+		    ps.executeQuery();
+		    dummySupported = true;
+		} catch (SQLException ex) {
+		    dummySupported = false;
+		}
+		ps.close();
+		pool.putConnection(conn);
+	    } catch (SQLException ex) {
+		throw new BioRuntimeException(ex);
+	    }
+	    dummyChecked = true;
+	}
+
+	return dummySupported;
     }
 
     private boolean spaChecked = false;
