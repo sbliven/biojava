@@ -54,12 +54,12 @@ public class RadialBaseKernel extends NestedKernel {
       return width;
     }
 
-    public void setWidth(double w) {
+    public void setWidth(double width) {
       this.width = width;
     }
     
     public String toString() {
-      return "Radial base kernel K(x, k) = exp(-abs(k(x,x) - k(y,y)) / ("
+      return "Radial base kernel K(x, k) = exp(-abs(k(x,x) - k(y,y)) / (2*"
         + getWidth() + "^2)"
         + "; k = " + getNestedKernel().toString();
     }
