@@ -1,11 +1,7 @@
 package org.biojava.bio.symbol;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioRuntimeException;
 import org.biojava.bio.BioError;
@@ -105,6 +101,7 @@ public class UkkonenSuffixTree{
       list = new TerminatedSymbolList(list);
     
     CharSequence seq =new SymbolListCharSequence(list);
+    System.out.println("Adding symbol list " + seq.toString());
     //if (!doNotTerminate)
       
     //if(!doNotTerminate)
@@ -634,7 +631,7 @@ public class UkkonenSuffixTree{
     
     
     public boolean isTerminal(){return children==null;}
-    public boolean hasChild(Character x){return getChild(x)==null;}
+    public boolean hasChild(Character x){return getChild(x)!=null;}
     public SuffixNode getChild(Character x){
       return (children==null)?null:(SuffixNode)children.get(x);
     }
@@ -677,19 +674,27 @@ public class UkkonenSuffixTree{
    * the original, one that does will have an alphabet that includes the
    * termination symbol.
    *
+   * Now includes some ugly hacks by Thomas Down to make ambiguities work
+   * nicer.
+   *
    */
   private class TerminatedSymbolList implements SymbolList
   {
     private SymbolList unterminated;
     final Symbol TERMINATION_SYMBOL;
     private AbstractAlphabet alpha;
+    private Map translationTable = new HashMap();
         
     public TerminatedSymbolList(SymbolList unterminated)
     {
       this.unterminated=unterminated;
       TERMINATION_SYMBOL = AlphabetManager.createSymbol("Termination");
       FiniteAlphabet oldAlphabet = (FiniteAlphabet)unterminated.getAlphabet();
-      Set set=AlphabetManager.getAllSymbols(oldAlphabet);
+      // Set set = AlphabetManager.getAllSymbols(oldAlphabet);
+      Set set = new HashSet();
+      for (Iterator i = oldAlphabet.iterator(); i.hasNext(); ) {
+          set.add(i.next());
+      }
       set.add(TERMINATION_SYMBOL);
       alpha = new SimpleAlphabet(set);
       CharacterTokenization tokenizer =new CharacterTokenization(alpha, true);
@@ -705,10 +710,26 @@ public class UkkonenSuffixTree{
         throw new IllegalArgumentException("Only FiniteAlphabets using a char token are supported by UkkonenSuffixTree");
       try{
         for (Iterator i= AlphabetManager.getAllSymbols(oldAlphabet).iterator();i.hasNext();){
-          Symbol s = (Symbol) i.next();
+          Symbol oldSymbol = (Symbol) i.next();
+          Symbol newSymbol;
+          if (oldSymbol instanceof AtomicSymbol) {
+              // The atomic symbols are identical between the two alphabets
+              newSymbol = oldSymbol;
+          } else {
+              // Port ambiguous symbols across
+              Set s = new HashSet();
+              for (Iterator si = ((FiniteAlphabet) oldSymbol.getMatches()).iterator(); si.hasNext(); ) {
+                  s.add(si.next());
+              }
+              newSymbol = alpha.getAmbiguity(s);
+          }
           //takes first char of String, should work because we checked
           //getTokenType above
-          tokenizer.bindSymbol(s,sToke.tokenizeSymbol(s).charAt(0));
+          
+          char c = sToke.tokenizeSymbol(oldSymbol).charAt(0);
+          // System.err.println("Binding " + c);
+          tokenizer.bindSymbol(newSymbol, c);
+          translationTable.put(oldSymbol, newSymbol);
         }
         //This is really hacky, ambiguous symbols containing
         //TERMINATION_SYMBOL are impossible at this point, so I just define
@@ -783,7 +804,7 @@ public class UkkonenSuffixTree{
 
     public Symbol symbolAt(int n) throws IndexOutOfBoundsException {
       if (n!=length())
-        return unterminated.symbolAt(n);
+        return (Symbol) translationTable.get(unterminated.symbolAt(n));
       else
         return TERMINATION_SYMBOL;
     }
