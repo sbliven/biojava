@@ -305,6 +305,9 @@ class FeatureRequestManager {
 		    xffh.setFeatureListener(siol);
 		    xffh.addFeatureHandler(new ElementRecognizer.ByLocalName("componentFeature"),
 					   ComponentFeatureHandler.COMPONENTFEATURE_HANDLER_FACTORY);
+		    xffh.addDetailHandler(new ElementRecognizer.ByNSName("http://www.biojava.org/dazzle",
+									 "links"),
+					  DASLinkHandler.LINKDETAIL_HANDLER_FACTORY);
 		    dm.delegate(xffh);
 		} else {
 		    throw new SAXException("Expecting an XFF featureSet and got " + localName);

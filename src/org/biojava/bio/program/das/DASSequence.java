@@ -72,6 +72,7 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
     public static final String PROPERTY_ANNOTATIONSERVER = "org.biojava.bio.program.das.annotation_server";
     public static final String PROPERTY_FEATUREID = "org.biojava.bio.program.das.feature_id";
     public static final String PROPERTY_FEATURELABEL = "org.biojava.bio.program.das.feature_label";
+    public static final String PROPERTY_LINKS = "org.biojava.bio.program.das.links";
 
     public static final int SIZE_THRESHOLD = 5000000;
     

@@ -179,6 +179,7 @@ class DASFeatureSet implements FeatureHolder {
 		    featureStack.add(f);
 		    stackTop = f;
 		} catch (Exception ex) {
+		    ex.printStackTrace();
 		    throw new ParseException(ex, "Couldn't realize feature in DAS");
 		}
 	    }
@@ -187,6 +188,11 @@ class DASFeatureSet implements FeatureHolder {
 	public void addFeatureProperty(Object key, Object value)
 	    throws ParseException
 	{
+	    if (stackTop == null) {
+		// Feature we're skipping
+		return;
+	    }
+
 	    try {
 		if (key.equals(XFFFeatureSetHandler.PROPERTY_XFF_ID)) {
 		    stackTop.getAnnotation().setProperty(DASSequence.PROPERTY_FEATUREID, value);
@@ -195,6 +201,8 @@ class DASFeatureSet implements FeatureHolder {
 		}
 	    } catch (ChangeVetoException ex) {
 		throw new ParseException(ex, "Couldn't set feature property");
+	    } catch (NullPointerException ex) {
+		ex.printStackTrace();
 	    }
 	}
 
