@@ -110,7 +110,7 @@ public class PairwiseDP extends DP {
 	    boolean gotOther = false;
             for (Iterator i = l.iterator(); i.hasNext(); ) {
 		Object o = i.next();
-		if (i.next() == MagicalState.MAGICAL_RESIDUE) {
+		if (o == MagicalState.MAGICAL_RESIDUE) {
 		    gappedResList.add(AlphabetManager.instance().getGapResidue());
 		} else {
 		    gappedResList.add(o);
