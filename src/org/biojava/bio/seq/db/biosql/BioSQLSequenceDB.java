@@ -149,10 +149,16 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 			    boolean create)
 	throws BioException
     {
-	helper = DBHelper.getDBHelperForURL(dbURL);
-        //System.err.println(dbURL + " " + dbUser + " " + dbPass);
 	pool = new JDBCConnectionPool(dbURL, dbUser, dbPass);
-	
+
+        try {
+            Connection conn = pool.takeConnection();
+            helper = DBHelper.getDBHelper(conn);
+            pool.putConnection(conn);
+        } catch (SQLException se) {
+            throw new BioException("Error connecting to the database", se);
+        }
+
 	// Check that BioSQL database schema is post-Singapore
 	if (! isDbSchemaSupported()) {
 		throw new BioException("This database appears to be an old (pre-Singapore) BioSQL."
@@ -621,12 +627,15 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                 delete_reference.executeUpdate();
                 delete_reference.close();
 
-                // XXX this won't work with oracle (where comment is a reserved word)
-                // Hilmar has said this table will be renamed to anncomment post-1.0
-                PreparedStatement delete_comment = conn.prepareStatement("delete from comment where bioentry_id = ?");
-                delete_comment.setInt(1, bioentry_id);
-                delete_comment.executeUpdate();
-                delete_comment.close();
+                boolean commentSupported = getDBHelper().containsTable(getPool(), "comment");
+                String commentTableName = getCommentTableName();
+                if (commentTableName != null) {
+                    PreparedStatement delete_comment = conn.prepareStatement("delete from " + commentTableName 
+                                                                             + " where bioentry_id = ?");
+                    delete_comment.setInt(1, bioentry_id);
+                    delete_comment.executeUpdate();
+                    delete_comment.close();
+                }
 
                 PreparedStatement delete_qv = conn.prepareStatement("delete from bioentry_qualifier_value where bioentry_id = ?");
                 delete_qv.setInt(1, bioentry_id);
@@ -635,49 +644,92 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
 		DBHelper.DeleteStyle dstyle = getDBHelper().getDeleteStyle();
 
+                ArrayList generic_ids = null;  // default delete style will cache seqfeature_id's that need to be deleted
                 PreparedStatement delete_locs;
-		if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
-		    delete_locs = conn.prepareStatement("delete from location " +
-							" where location.seqfeature_id = seqfeature.seqfeature_id and " +
-							"       seqfeature.bioentry_id = ?");
+		if (dstyle ==  DBHelper.DELETE_MYSQL4) {
+		    delete_locs = conn.prepareStatement("delete from location" +
+							" using location, seqfeature" + 
+							" where location.seqfeature_id = seqfeature.seqfeature_id and" +
+							" seqfeature.bioentry_id = ?");
+                    delete_locs.setInt(1, bioentry_id);
+                    delete_locs.executeUpdate();
+                    delete_locs.close();
+                } else if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
+		    delete_locs = conn.prepareStatement("delete from location" +
+							" where location.seqfeature_id = seqfeature.seqfeature_id and" +
+							" seqfeature.bioentry_id = ?");
+                    delete_locs.setInt(1, bioentry_id);
+                    delete_locs.executeUpdate();
+                    delete_locs.close();
 		} else {
-		    delete_locs = conn.prepareStatement("delete from location " +
-							" using location, seqfeature " + 
-							" where location.seqfeature_id = seqfeature.seqfeature_id and " +
-							"       seqfeature.bioentry_id = ?");
+		    delete_locs = conn.prepareStatement("delete from location where seqfeature_id = ?");
+
+                    PreparedStatement get_seqfeats = conn.prepareStatement("select seqfeature_id" 
+                                                                           + " from seqfeature" 
+                                                                           + " where bioentry_id = ?"
+                                                                           );
+                    get_seqfeats.setInt(1, bioentry_id);
+                    ResultSet sfids = get_seqfeats.executeQuery();
+                    generic_ids = new ArrayList();
+                    while (sfids.next()) {
+                        int sfid = sfids.getInt(1);
+                        generic_ids.add(new Integer(sfid));
+                        delete_locs.setInt(1, sfid);
+                        delete_locs.executeUpdate();
+                    }
+                    sfids.close();
+                    get_seqfeats.close();
 		}
-                delete_locs.setInt(1, bioentry_id);
-                delete_locs.executeUpdate();
                 delete_locs.close();
 
                 PreparedStatement delete_fqv;
-		if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
-		    delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value " +
-						       " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id " +
-						       "   and seqfeature.bioentry_id = ?");
+		if (dstyle ==  DBHelper.DELETE_MYSQL4) {
+		    delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value" +
+						       " using seqfeature_qualifier_value, seqfeature" + 
+						       " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id" +
+						       " and seqfeature.bioentry_id = ?");
+                    delete_fqv.setInt(1, bioentry_id);
+                    delete_fqv.executeUpdate();
+                } else if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
+		    delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value" +
+						       " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id" +
+						       " and seqfeature.bioentry_id = ?");
+                    delete_fqv.setInt(1, bioentry_id);
+                    delete_fqv.executeUpdate();
 		} else {
-		    delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value " +
-						       " using seqfeature_qualifier_value, seqfeature " + 
-						       " where seqfeature_qualifier_value.seqfeature_id = seqfeature.seqfeature_id " +
-						       "   and seqfeature.bioentry_id = ?");
+		    delete_fqv = conn.prepareStatement("delete from seqfeature_qualifier_value" 
+                                                       + " where seqfeature_qualifier_value.seqfeature_id = ?");
+                    for (int i = 0; i < generic_ids.size(); i++) {
+                        int sfid = ((Integer) generic_ids.get(i)).intValue();
+                        delete_fqv.setInt(1, sfid);
+                        delete_fqv.executeUpdate();
+                    }
 		}
-                delete_fqv.setInt(1, bioentry_id);
-                delete_fqv.executeUpdate();
                 delete_fqv.close();
 
                 PreparedStatement delete_rel;
-		if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
-		    delete_rel = conn.prepareStatement("delete from seqfeature_relationship " +
-						       " where object_seqfeature_id = seqfeature.seqfeature_id " +
-						       "   and seqfeature.bioentry_id = ?");
+		if (dstyle ==  DBHelper.DELETE_MYSQL4) {
+		    delete_rel = conn.prepareStatement("delete from seqfeature_relationship" +
+						       " using seqfeature_relationship, seqfeature" + 
+						       " where object_seqfeature_id = seqfeature.seqfeature_id" +
+						       " and seqfeature.bioentry_id = ?");
+                    delete_rel.setInt(1, bioentry_id);
+                    delete_rel.executeUpdate();
+                } else if (dstyle ==  DBHelper.DELETE_POSTGRESQL) {
+		    delete_rel = conn.prepareStatement("delete from seqfeature_relationship" +
+						       " where object_seqfeature_id = seqfeature.seqfeature_id" +
+						       " and seqfeature.bioentry_id = ?");
+                    delete_rel.setInt(1, bioentry_id);
+                    delete_rel.executeUpdate();
 		} else {
-		    delete_rel = conn.prepareStatement("delete from seqfeature_relationship " +
-						       " using seqfeature_relationship, seqfeature " + 
-						       " where object_seqfeature_id = seqfeature.seqfeature_id " +
-						       "   and seqfeature.bioentry_id = ?");
+		    delete_rel = conn.prepareStatement("delete from seqfeature_relationship" 
+                                                       + " where object_seqfeature_id = ?");
+                    for (int i = 0; i < generic_ids.size(); i++) {
+                        int sfid = ((Integer) generic_ids.get(i)).intValue();
+                        delete_rel.setInt(1, sfid);
+                        delete_rel.executeUpdate();
+                    }
 		}
-                delete_rel.setInt(1, bioentry_id);
-                delete_rel.executeUpdate();
                 delete_rel.close();
 
                 PreparedStatement delete_features = conn.prepareStatement("delete from seqfeature " +
@@ -931,6 +983,26 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 
 	return dbSchemaSupported;
     }
+
+    private boolean commentTableNameChecked = false;
+    private String commentTableName = null;
+
+    // Get the name of the table used for comments.
+    // "comment" isn't allowed in oracle (where comment is a reserved word)
+    // Hilmar has said this table will be renamed to anncomment post-1.0 BioSQLe
+    // We support both "comment" and "anncomment"
+    String getCommentTableName() {
+	if (!commentTableNameChecked) {
+            if (getDBHelper().containsTable(getPool(), "comment")) {
+                commentTableName = "comment";
+            } else if (getDBHelper().containsTable(getPool(), "anncomment")) {
+                commentTableName = "anncomment";
+            }
+	    commentTableNameChecked = true;
+	}
+	return commentTableName;
+    }
+
 
     private boolean dbxrefQualifierValueChecked = false;
     private boolean dbxrefQualifierValueSupported = false;
