@@ -197,6 +197,7 @@ extends Changeable {
   {
     private Set explicitOntologies;
     private Map allOntologies;
+    private boolean debug = false;
     
     /**
      * Working values for relations.
@@ -206,6 +207,25 @@ extends Changeable {
      * Relation->null means that we are in the process of proving things
      */
     private Map knownTrue;
+    
+    private int level = 0;
+    
+    private void upLevel() {
+        ++level;
+    }
+    
+    private void downLevel() {
+        --level;
+    }
+    
+    private void println(String s) {
+        if (debug) {
+            for (int i = 0; i < level; ++i) {
+                System.err.print('\t');
+            }
+            System.err.println(s);
+        }
+    }
     
     public Impl() {
       explicitOntologies = new HashSet();
@@ -313,20 +333,30 @@ extends Changeable {
     
     // fixme: we just assume that relation is a relation term for now
     public boolean isTrue(Term subject, Term object, Term relation)
-    throws InvalidTermException {
+      throws InvalidTermException 
+    {
       Relation rel = new Relation(subject, object, relation);
       
-      System.err.println("isTrue(" + rel + ")");
-      
+      println("isTrue(" + rel + ")");
+      upLevel();
+      boolean result = _isTrue(subject, object, relation, rel);
+      downLevel();
+      return result;
+    }
+    
+    
+    private boolean _isTrue(Term subject, Term object, Term relation, Relation rel)
+      throws InvalidTermException
+    {
       // see if we know anything about this one
-      System.err.println("Check proven facts: " + rel);
+      println("Check proven facts: " + rel);
       if(knownTrue.containsKey(rel)) {
         Boolean val = (Boolean) knownTrue.get(rel);
         if(val == Boolean.TRUE) {
-          System.err.println("We already know this is true: " + rel);
+          println("We already know this is true: " + rel);
           return true;
         } else {
-          System.err.println("We already know this is false, or unproven: " + rel);
+          println("We already know this is false, or unproven: " + rel);
           return false;
         }
       }
@@ -335,10 +365,10 @@ extends Changeable {
       knownTrue.put(rel, null);
       
       // for every Term x, x IS_A x
-      System.err.println("Check for self-isa: " + rel);
+      println("Check for self-isa: " + rel);
       if(subject == object && relation == OntoTools.IS_A) {
         knownTrue.put(rel, Boolean.TRUE);
-        System.err.println("For every term x, x IS_A x holds");
+        println("For every term x, x IS_A x holds");
         return true;
       }
       
@@ -346,13 +376,13 @@ extends Changeable {
       //               or (x, y, S) implies (a, b, R) and true(x, y, S)
       
       // do (a, b, R) member_of triples
-      System.err.println("Check for direct support: " + rel);
+      println("Check for direct support: " + rel);
       if(subject.getOntology() == object.getOntology() &&
          subject.getOntology() == relation.getOntology() &&
          subject.getOntology().containsTriple(subject, object, relation)
       ) {
         knownTrue.put(rel, Boolean.TRUE);
-        System.err.println("Directly supported by the ontology: " + rel);
+        println("Directly supported by the ontology: " + rel);
         return true;
       }
       
@@ -362,81 +392,102 @@ extends Changeable {
       // 1st case - implicit identity due to imports
       
       // subject import
-      System.err.println("Check for subject imports");
+      println("Check for subject imports");
       for(Iterator ti = findIdentities(subject).iterator(); ti.hasNext(); ) {
         Term t = (Term) ti.next();
-        System.err.println("Trying identity of the subject: " + t + ", " + rel);
+        println("Trying identity of the subject: " + t + ", " + rel);
         if(isTrue(t, object, relation) )
         {
           knownTrue.put(rel, Boolean.TRUE);
-          System.err.println("True of an identity of the subject: " + rel);
+          println("True of an identity of the subject: " + rel);
           return true;
         }
       }
       // object import
-      System.err.println("Check for object imports");
+      println("Check for object imports");
       for(Iterator ti = findIdentities(object).iterator(); ti.hasNext(); ) {
         Term t = (Term) ti.next();
-        System.err.println("Trying identity of the object: " + t + ", " + rel);
+        println("Trying identity of the object: " + t + ", " + rel);
         if(isTrue(subject, t, relation) )
         {
           knownTrue.put(rel, Boolean.TRUE);
-          System.err.println("True of an identity of the object: " + rel);
+          println("True of an identity of the object: " + rel);
           return true;
         }
       }
       // relation import
-      System.err.println("Check for relation imports");
+      println("Check for relation imports");
       for(Iterator ti = findIdentities(relation).iterator(); ti.hasNext(); ) {
         Term t = (Term) ti.next();
-        System.err.println("Trying identity of the relation: " + t + ", " + rel);
+        println("Trying identity of the relation: " + t + ", " + rel);
         if(isTrue(subject, object, t) )
         {
           knownTrue.put(rel, Boolean.TRUE);
-          System.err.println("True of an identity of the relation: " + rel);
+          println("True of an identity of the relation: " + rel);
           return true;
         }
       }
       
       // checking for reflexive relation: i R i
-      System.err.println("Checking for reflexive relation: " + rel);
+      println("Checking for reflexive relation: " + rel);
       if(object.equals(subject) && isReflexive(relation)) {
         knownTrue.put(rel, Boolean.TRUE);
-        System.err.println("Reflexive proposition true: " + rel);
+        println("Reflexive proposition true: " + rel);
         return true;
       }
       
       // checking for symmetric relation: a R b => b R a
-      System.err.println("Checking for symmetric relation: " + rel);
+      println("Checking for symmetric relation: " + rel);
       if(isSymmetric(relation)) {
         if(isTrue(object, subject, relation)) {
           knownTrue.put(rel, Boolean.TRUE);
-          System.err.println("Symmetric proposition true: " + rel);
+          println("Symmetric proposition true: " + rel);
           return true;
         }
       }
       
       // checking for transitive relation: x R y && y R z => x R z
       // we have a potential x & z - search for a suitable y.
-      System.err.println("Checking for transitive relation: " + rel);
+      println("Checking for transitive relation: " + rel);
       if(isTransitive(relation)) {
         // this brute-force search should be replaced by something more
         // optimised
         for(Iterator ti = getAllTerms().iterator(); ti.hasNext(); ) {
           Term t = (Term) ti.next();
-          System.err.println("Checking transitive possibility for: " + t + ", " + rel);
+          println("Checking transitive possibility for: " + t + ", " + rel);
           if(isTrue(subject, t, relation) &&
              isTrue(t, object, relation) )
           {
             knownTrue.put(rel, Boolean.TRUE);
-            System.err.println("Transitive proposition true: " + rel);
+            println("Transitive proposition true: " + rel);
             return true;
           }
         }
       }
       
+      // Special case handling for HAS_A.  This should actually cover
+      // some other types of relation, but I can't remember the generic
+      // term for things that follow this pattern.  Just playing
+      // around for now --thomasd.
+      
+      if (isTrue(relation, OntoTools.HAS_A, OntoTools.IS_A)) {
+          println("Special case for HAS_A.  Checking through transitive closure (slowly)");
+          for (Iterator ti = getAllTerms().iterator(); ti.hasNext(); ) {
+              Term t = (Term) ti.next();
+              if (isTrue(subject, t, OntoTools.IS_A) && isTrue(t, object, relation)) {
+                  return true;
+              }
+              if (isTrue(t, object, OntoTools.IS_A) && isTrue(subject, t, relation)) {
+                  return true;
+              }
+              if (isTrue(t, relation, OntoTools.IS_A) && isTrue(subject, object, t)) {
+                  return true;
+              }
+          }
+      }
+      
       // not able to prove this proposition.
-      System.err.println("Unable to prove: " + rel);
+      println("Unable to prove: " + rel);
       knownTrue.put(rel, Boolean.FALSE);
       return false;
     }

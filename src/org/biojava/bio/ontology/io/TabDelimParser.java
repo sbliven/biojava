@@ -1,6 +1,7 @@
 package org.biojava.bio.ontology.io;
 
 import java.io.*;
+import java.util.*;
 
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.bio.BioError;
@@ -97,12 +98,21 @@ public class TabDelimParser {
             
             // build a tripple
             
+            /*
+            
             int t1 = line.indexOf("\t");
             int t2 = line.indexOf("\t", t1 + 1);
             
             String subject  = line.substring(0, t1);
             String relation = line.substring(t1 + 1, t2);
             String object   = line.substring(t2 + 1);
+            
+            */
+            
+            StringTokenizer toke = new StringTokenizer(line);
+            String subject = toke.nextToken();
+            String relation = toke.nextToken();
+            String object = toke.nextToken();
             
             Term subT = resolveTerm(subject, onto);
             Term objT = resolveTerm(object, onto);
