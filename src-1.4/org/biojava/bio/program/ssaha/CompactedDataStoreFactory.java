@@ -10,6 +10,7 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.db.*;
+import org.biojava.bio.seq.io.*;
 
 import org.biojava.utils.Constants;
 
@@ -85,6 +86,24 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
     IOException,
     BioException
   {
+      return this.buildDataStore(storeFile,
+				 new SequenceStreamer.SequenceDBStreamer(seqDB),
+				 packing,
+				 wordLength,
+				 threshold);
+  }
+
+  public DataStore buildDataStore(
+    File storeFile,
+    SequenceStreamer streamer,
+    Packing packing,
+    int wordLength,
+    int threshold
+  ) throws
+    IllegalAlphabetException,
+    IOException,
+    BioException
+  { 
     ByteArrayOutputStream packingStream = new ByteArrayOutputStream();
     ObjectOutputStream packingSerializer = new ObjectOutputStream(packingStream);
     packingSerializer.writeObject(packing);
@@ -137,29 +156,17 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
     // writes counts as ints for each k-tuple
     // count up the space required for sequence names
     //
-    int seqCount = 0;
-    int nameChars = 0;
-    for(SequenceIterator i = seqDB.sequenceIterator(); i.hasNext(); ) {
-      Sequence seq = i.nextSequence();
-      if(seq.length() > wordLength) {
-        seqCount++;
-        nameChars += seq.getName().length();
-        
-        int word = PackingFactory.primeWord(seq, wordLength, packing);
-        //PackingFactory.binary(word);
-        addCount(hashTable, word);
-        for(int j = wordLength+1; j <= seq.length(); j++) {
-          word = PackingFactory.nextWord(seq, word, j, wordLength, packing);
-          //PackingFactory.binary(word);
-          addCount(hashTable, word);
-        }
-      }
+
+    FirstPassListener fpl = new FirstPassListener(packing, wordLength, hashTable);
+    streamer.reset();
+    while (streamer.hasNext()) {
+	streamer.streamNext(fpl);
     }
     
     // map the space for sequence index->name
     //
     nameArrayPos = hashTablePos + hashTableSize;
-    int nameArraySize = ((seqCount * 2) + 1) * Constants.BYTES_IN_INT;
+    int nameArraySize = ((fpl.seqCount * 2) + 1) * Constants.BYTES_IN_INT;
     //System.out.println("seqCount:\t" + seqCount);
     //System.out.println("nameArraySize:\t" + nameArraySize);
     final MappedByteBuffer nameArray_MB = channel.map(
@@ -175,8 +182,8 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
     nameTablePos = nameArrayPos + nameArraySize;
     int nameTableSize =
       Constants.BYTES_IN_INT +
-      seqCount * Constants.BYTES_IN_INT +
-      nameChars * Constants.BYTES_IN_CHAR;
+      fpl.seqCount * Constants.BYTES_IN_INT +
+      fpl.nameChars * Constants.BYTES_IN_CHAR;
     //System.out.println("nameTableSize:\t" + nameTableSize);
     final MappedByteBuffer nameTable = channel.map(
       FileChannel.MapMode.READ_WRITE,
@@ -251,43 +258,16 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
     // 2nd parse
     // write sequence array and names
     // write hitTable
-    int seqNumber = 0;
-    nameTable.position(Constants.BYTES_IN_INT);
-    int concatOffset = 0;
-    for(SequenceIterator i = seqDB.sequenceIterator(); i.hasNext(); ) {
-      Sequence seq = i.nextSequence();
-      
-      if(seq.length() > wordLength) {
-        try {
-          
-          // write sequence name reference and concatomer offset into nameArray
-	  nameArray.put((seqNumber * 2) + 1, nameTable.position()-Constants.BYTES_IN_INT);
-	  nameArray.put((seqNumber * 2) + 2, concatOffset);
-          
-          // write sequence name length and chars into nameTable
-          String name = seq.getName();
-          nameTable.putInt(name.length());
-          for(int j = 0; j < name.length(); j++) {
-            nameTable.putChar((char) name.charAt(j));
-          }
-          
-          // write k-mer seq,offset
-          int word = PackingFactory.primeWord(seq, wordLength, packing);
-          writeRecord(hashTable, hitTable, 1 + concatOffset, seqNumber, word);
-          for(int j = wordLength+1; j <= seq.length(); j++) {
-            word = PackingFactory.nextWord(seq, word, j, wordLength, packing);
-            writeRecord(hashTable, hitTable, j - wordLength + 1 + concatOffset, seqNumber, word);
-          }
-        } catch (BufferOverflowException e) {
-          System.out.println("name:\t" + seq.getName());
-          System.out.println("seqNumber:\t" + seqNumber);
-          System.out.println("na pos:\t" + nameArray.position());
-          System.out.println("nt pos:\t" + nameTable.position());
-          throw e;
-        }
-        seqNumber++;
-	concatOffset += (seq.length() + 100);
-      }
+    
+    SecondPassListener spl = new SecondPassListener(packing,
+						    wordLength,
+						    hashTable,
+						    nameArray,
+						    nameTable,
+						    hitTable);
+    streamer.reset();
+    while (streamer.hasNext()) {
+	streamer.streamNext(spl);
     }
     
     //validateNames(seqCount, nameArray, nameTable);
@@ -316,6 +296,157 @@ public class CompactedDataStoreFactory implements DataStoreFactory {
     return getDataStore(storeFile);
   }
   
+    private abstract class PackingListener extends SeqIOAdapter {
+	private final Packing packing;
+	private final int wordLength;
+	private int pos = -1;
+	private int word = 0;
+
+	public PackingListener(Packing packing, int wordLength) {
+	    this.packing = packing;
+	    this.wordLength = wordLength;
+	}
+
+	public void startSequence() 
+	    throws ParseException
+	{
+	    pos = 0;
+	    word = 0;
+	}
+
+	public void endSequence()
+	    throws ParseException
+	{
+	    foundLength(pos);
+	    pos = -1;
+	}
+
+	public void foundLength(int length)
+	    throws ParseException
+	{
+	}
+
+	public abstract void processWord(int word, int pos)
+	    throws ParseException;
+
+	public void addSymbols(Alphabet alpha, Symbol[] syms, int start, int length)
+	    throws IllegalAlphabetException
+	{
+	    if (alpha != packing.getAlphabet()) {
+		throw new IllegalAlphabetException("Alphabet " + alpha.getName() + " doesn't match packing");
+	    }
+
+	    for (int i = start; i < (start + length); ++i) {
+		word = word >> (int) packing.wordSize();
+		try {
+		    int p = packing.pack(syms[i]);
+		    word |= (int) p << ((int) (wordLength - 1) * packing.wordSize());
+		} catch (IllegalSymbolException ex) {
+		    throw new BioRuntimeException(ex);
+		}
+
+		++pos;
+		if (pos > wordLength) {
+		    try {
+			processWord(word, pos - wordLength);
+		    } catch (ParseException ex) {
+			throw new BioRuntimeException(ex);
+		    }
+		}
+	    }
+	}
+    }
+
+    private class FirstPassListener extends PackingListener {
+	private final IntBuffer hashTable;
+        int seqCount = 0;
+	int nameChars = 0;
+
+	FirstPassListener(Packing packing, int wordLength, IntBuffer hashTable) {
+	    super(packing, wordLength);
+	    this.hashTable = hashTable;
+	}
+
+	public void startSequence()
+	    throws ParseException
+	{
+	    super.startSequence();
+	    ++seqCount;
+	}
+
+	public void setName(String name) 
+	    throws ParseException
+	{
+	    nameChars += name.length();
+	}
+
+	public void processWord(int word, int pos)
+	    throws ParseException
+	{
+	    addCount(hashTable, word);
+	}
+    }
+
+    private class SecondPassListener extends PackingListener {
+	private final IntBuffer hashTable;
+	private final IntBuffer nameArray;
+	private final MappedByteBuffer nameTable;
+	private final MappedByteBuffer hitTable;
+
+	private int seqNumber = 0;
+	private int concatOffset = 0;
+
+	private String name = null;
+	private int length = -1;
+
+	SecondPassListener(Packing packing, 
+			   int wordLength, 
+			   IntBuffer hashTable,
+			   IntBuffer nameArray,
+			   MappedByteBuffer nameTable,
+			   MappedByteBuffer hitTable) 
+	{
+	    super(packing, wordLength);
+	    this.hashTable = hashTable;
+	    this.nameArray = nameArray;
+	    this.nameTable = nameTable;
+	    this.hitTable = hitTable;
+
+	    nameTable.position(Constants.BYTES_IN_INT);
+	}
+
+	public void setName(String name) {
+	    this.name = name;
+	}
+
+	public void foundLength(int length) {
+	    this.length = length;
+	}
+
+	public void endSequence() 
+	    throws ParseException
+	{
+	    super.endSequence();
+	    
+	    nameArray.put((seqNumber * 2) + 1, nameTable.position()-Constants.BYTES_IN_INT);
+	    nameArray.put((seqNumber * 2) + 2, concatOffset);
+	    // write sequence name length and chars into nameTable
+	    nameTable.putInt(name.length());
+	    for(int j = 0; j < name.length(); j++) {
+		nameTable.putChar((char) name.charAt(j));
+	    }
+
+	    ++seqNumber;
+	    concatOffset += (length + 100);
+	}
+
+	public void processWord(int word, int pos)
+	    throws ParseException
+	{
+	    writeRecord(hashTable, hitTable, pos + concatOffset, seqNumber, word);
+	}
+    }
+
   private void addCount(IntBuffer buffer, int word) {
     int count = buffer.get(word+1);
     count++;
