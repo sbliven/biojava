@@ -163,7 +163,7 @@ class SocketDatabase implements Database {
 		return null; // FIXME?
 	    int numFound = Integer.parseInt(new StringTokenizer(
                                result.substring(mpos + 9)).nextToken());
-	    System.out.println("found "+numFound);
+	    // System.out.println("found "+numFound);
 
 	    result = sock.transact("list -j");
 	    StringTokenizer listToke = new StringTokenizer(result, "\r\n");
@@ -179,7 +179,7 @@ class SocketDatabase implements Database {
 		}
 	    }
 
-	    System.out.println("Actually got :" + nameList.size());
+	    // System.out.println("Actually got :" + nameList.size());
 	    
 	    return new SocketResultSet(this, clazz, nameList);
 	} finally {
@@ -204,8 +204,8 @@ class SocketDatabase implements Database {
 	AceSocket sock = null;
 	try {
 	    sock = takeSocket();
-      System.out.println("Class " + clazz);
-      System.out.println("Socket " + sock);
+	    // System.out.println("Class " + clazz);
+	    // System.out.println("Socket " + sock);
 	    String result = sock.transact("find " + clazz.getName() + " " +
 					  name);
 	    if (result.indexOf("// Found 1 object") < 0) {

@@ -34,7 +34,7 @@ import java.security.*;
  * @author Thomas Down
  */
 
-public class AceSocket implements Connection {
+class AceSocket implements Connection {
     private final static int OK_MAGIC = 0x12345678;
     
     private final static String MSGREQ = "ACESERV_MSGREQ";
@@ -79,11 +79,11 @@ public class AceSocket implements Connection {
     }
 
     public String transact(String s) throws AceException {
-	System.err.println(">>> " + s);
+	// System.err.println(">>> " + s);
 	try {
 	    writeMessage(MSGREQ, s);
 	    String reply = readMessage();
-	    System.err.println("<<< " + reply);
+	    // System.err.println("<<< " + reply);
 	    return reply;
 	} catch (IOException ex) {
 	    throw new AceException(ex);
