@@ -105,7 +105,7 @@ public interface Distribution extends Changeable {
     
   /**
    * <p>
-   * Return the probability that Symbol s is emited by this spectrum.
+   * Return the probability that Symbol s is emitted by this spectrum.
    * </p>
    *
    * <p>
@@ -120,7 +120,7 @@ public interface Distribution extends Changeable {
   double getWeight(Symbol s) throws IllegalSymbolException;
   
   /**
-   * Set the probability or odds that Symbol s is emited by this state.
+   * Set the probability or odds that Symbol s is emitted by this state.
    *
    * @param s the Symbol emitted
    * @param w  the probability of emitting that symbol

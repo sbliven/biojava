@@ -94,7 +94,7 @@ public interface Count extends Changeable {
   
   
   /**
-   * Set the probability or odds that Symbol s is emited by this state.
+   * Set the probability or odds that Symbol s is emitted by this state.
    *
    * @param s the Symbol emitted
    * @param c  the delta to add to the count for the Symbol
