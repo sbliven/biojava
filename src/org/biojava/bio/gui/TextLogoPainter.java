@@ -142,11 +142,16 @@ public class TextLogoPainter implements LogoPainter {
     Rectangle bounds = ctxt.getBounds();
     double width = bounds.getWidth();
     double height = bounds.getHeight();
-    double base = height;
-    double scale = height * (
-      DistributionLogo.totalInformation(dist) /
-      DistributionLogo.totalBits(dist)
-    );
+    double base = bounds.getY() + bounds.getHeight();
+    
+    /* This used to have some built-in scaling support, but I've disabled this because
+     * DistributionLogo does scaling too!
+     */
+    
+    // double scale = height * (
+    //  DistributionLogo.totalInformation(dist) /
+    //  DistributionLogo.totalBits(dist)
+    // );
 
     SortedSet info = new TreeSet(COMP);
 
@@ -156,7 +161,7 @@ public class TextLogoPainter implements LogoPainter {
         i.hasNext();
       ) {
         Symbol s = (Symbol) i.next();
-        info.add(new ResVal(s, dist.getWeight(s) * scale));
+        info.add(new ResVal(s, dist.getWeight(s) * height));
       }
     } catch (IllegalSymbolException ire) {
       throw new BioError("Symbol distsapeared from dist alphabet", ire);

@@ -79,7 +79,7 @@ public class DistributionLogo extends JComponent {
   /**
    * The information/plain property
    */
-  boolean scaleByInformation = false;
+  boolean scaleByInformation = true;
 
   private BlockPainter blockPainter = DEFAULT_BLOCK_PAINTER;
   private RenderingHints renderingHints = null;
@@ -278,8 +278,8 @@ public class DistributionLogo extends JComponent {
       int height = bounds.height;
       double scale = height * (totalInformation(getDistribution()) / totalBits(getDistribution()));
       bounds.height = (int) scale;
-      bounds.y = (int) (height - scale);
-    }
+      bounds.y += (int) (height - scale);
+    } 
 
     LogoContext ctxt = new LogoContext() {
       public Graphics2D getGraphics() {
