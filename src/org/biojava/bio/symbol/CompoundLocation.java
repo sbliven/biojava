@@ -33,6 +33,7 @@ import org.biojava.bio.*;
  * it, and sort stuff out.
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
 public class CompoundLocation implements Location, Serializable {
   /**
@@ -183,11 +184,14 @@ public class CompoundLocation implements Location, Serializable {
   }
 
   public SymbolList symbols(SymbolList s) {
-    List res = new ArrayList();
+      if (isContiguous())
+	  return s.subList(min, max);
 
-    for(int p = min; p <= max; p++)
-      if(this.contains(p))
-        res.add(s.symbolAt(p));
+    List res = new ArrayList();
+    for (Iterator i = blockIterator(); i.hasNext(); ) {
+	Location l = (Location) i.next();
+	res.addAll(l.symbols(s).toList());
+    }
 
     try {
       return new SimpleSymbolList(s.getAlphabet(), res);
