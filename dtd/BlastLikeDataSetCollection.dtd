@@ -18,7 +18,7 @@
      This DTD is Copyright 1999, 2000 Cambridge Antibody Technology   
      Group plc (CAT). All Rights Reserved.                            
                                                                       
-     Version 1.0
+     Version 1.01
 
      Author List:                                                     
        Primary Author: Simon Brocklehurst (CAT)                       
@@ -81,8 +81,10 @@
 <!ELEMENT biojava:HitSummary (biojava:HitId,biojava:HitDescription?)>
 <!ATTLIST biojava:HitSummary
                 score                    CDATA #REQUIRED
-                expectValue              CDATA #REQUIRED 
+                expectValue              CDATA #IMPLIED
                 numberOfHSPs             CDATA #IMPLIED
+                numberOfContributingHSPs CDATA #IMPLIED
+                smallestSumProbability   CDATA #IMPLIED
                 readingFrame             CDATA #IMPLIED 
                 numberOfDomains          CDATA #IMPLIED  >
 
