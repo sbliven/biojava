@@ -162,9 +162,9 @@ implements SequenceRenderer {
   ) {
     double pos;
     if(src.getDirection() == SequenceRenderContext.HORIZONTAL) {
-      pos = me.getPoint().getY();
-    } else {
       pos = me.getPoint().getX();
+    } else {
+      pos = me.getPoint().getY();
     }
     
     int sMin = src.graphicsToSequence(pos);
