@@ -1,10 +1,38 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package org.biojava.bio.symbol;
 
 import java.util.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.seq.*;
-  
+
+/**
+ * Packing utility class for DNA.  Also represents
+ * ambiguity.
+ *
+ * @author Matthew Pocock
+ * @author David Huen (bugfix)
+ */  
 public class DNAAmbPack
   implements
     Packing,
@@ -50,16 +78,6 @@ public class DNAAmbPack
   
   private Symbol _unpack(byte b) {
     Set syms = new SmallSet();
-/*    if(false) {
-    } else if(0 != (b & 1)) {
-      syms.add(DNATools.a());
-    } else if(0 != (b & 2)) {
-      syms.add(DNATools.g());
-    } else if(0 != (b & 4)) {
-      syms.add(DNATools.c());
-    } else if(0 != (b & 8)) {
-      syms.add(DNATools.t());
-    }*/
     if(0 != (b & 1)) {
       syms.add(DNATools.a());
     }
