@@ -61,6 +61,7 @@ public class SequencePanel extends JComponent implements SwingConstants {
   private int direction;
   private double scale;
   private int lines;
+  private int spacer; 
 
   private double alongDim = 0.0;
   private double acrossDim = 0.0;
@@ -85,6 +86,7 @@ public class SequencePanel extends JComponent implements SwingConstants {
     direction = HORIZONTAL;
     scale = 12.0;
     lines = 1;
+    spacer = 0;
 
     theMonitor = new RendererMonitor();
     leadingBorder = new Border();
@@ -129,6 +131,17 @@ public class SequencePanel extends JComponent implements SwingConstants {
     return direction;
   }
 
+  public void setSpacer(int spacer) {
+    int oldSpacer = this.spacer;
+    this.spacer = spacer;
+    resizeAndValidate();
+    firePropertyChange("spacer", oldSpacer, spacer);
+  }
+  
+  public int getSpacer() {
+    return spacer;
+  }
+  
   public void setScale(double scale) {
     double oldScale = this.scale;
     this.scale = scale;
@@ -186,24 +199,25 @@ public class SequencePanel extends JComponent implements SwingConstants {
       leadingBorder.getSize() +
       trailingBorder.getSize() +
       scale * sequence.length();
+    double realDepth = lineDepth + spacer;
     switch (direction) {
       case HORIZONTAL:
         clip.width = totalLength;
         seqBox.width = alongDim; 
-        minLine = (int) Math.max(minLine, Math.floor(newClip.getMinY()/lineDepth));
-        maxLine = (int) Math.min(maxLine, Math.ceil(newClip.getMaxY()/lineDepth));
+        minLine = (int) Math.max(minLine, Math.floor(newClip.getMinY()/realDepth));
+        maxLine = (int) Math.min(maxLine, Math.ceil(newClip.getMaxY()/realDepth));
         g2.translate(
           -minLine * alongDim + leadingBorder.getSize(),
-          minLine * lineDepth
+          minLine * realDepth
         );
         break;
       case VERTICAL:
         clip.height = totalLength;
         seqBox.height = alongDim;
-        minLine = (int) Math.max(minLine, Math.floor(newClip.getMinX()/lineDepth));
-        maxLine = (int) Math.min(maxLine, Math.ceil(newClip.getMaxX()/lineDepth));
+        minLine = (int) Math.max(minLine, Math.floor(newClip.getMinX()/realDepth));
+        maxLine = (int) Math.min(maxLine, Math.ceil(newClip.getMaxX()/realDepth));
         g2.translate(
-          minLine * lineDepth,
+          minLine * realDepth,
           -minLine * alongDim + leadingBorder.getSize()
         );
         break;
@@ -252,10 +266,10 @@ public class SequencePanel extends JComponent implements SwingConstants {
       }
       switch (direction) {
         case HORIZONTAL:
-          g2.translate(-alongDim, 0.0);
+          g2.translate(-alongDim, spacer);
           break;
         case VERTICAL:
-          g2.translate(0.0, -alongDim);
+          g2.translate(spacer, -alongDim);
           break;
       }
     }
@@ -321,8 +335,8 @@ public class SequencePanel extends JComponent implements SwingConstants {
           break;
       }
       width = (int) Math.ceil((double) width - insetBefore - insetAfter);
-      realLines = (int) Math.ceil((double) alongDim / (double) width);
-      acrossDim = acrossDim * realLines;
+      realLines = (int) Math.ceil((double) alongDim / (double) width / scale);
+      acrossDim = acrossDim * realLines + spacer * (realLines - 1);
       alongDim = Math.ceil((double) width);
       switch (direction) {
         case HORIZONTAL:
@@ -343,7 +357,7 @@ public class SequencePanel extends JComponent implements SwingConstants {
       // accomodoate the whole sequence
       realLines = lines;
       alongDim = Math.ceil(alongDim / (double) lines);
-      acrossDim = Math.ceil((double) lines * acrossDim);  
+      acrossDim = Math.ceil((double) lines * acrossDim + (double) (lines-1) * spacer);  
       switch (direction) {
         case HORIZONTAL:
           d = new Dimension(

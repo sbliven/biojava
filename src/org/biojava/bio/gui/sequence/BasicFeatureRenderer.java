@@ -160,7 +160,7 @@ public class BasicFeatureRenderer implements FeatureRenderer {
               path.closePath();
               s = path;
             } else if(strand == StrandedFeature.NEGATIVE) {
-              float midY = maxY - arrowSize;
+              float midY = minX + arrowSize;
               GeneralPath path = new GeneralPath();
               path.moveTo(minXS, maxY);
               path.lineTo(minXS, midY);
