@@ -237,7 +237,9 @@ public class SeqIOToolsTest extends TestCase
         /******* test readSwissProt **********/
 
         // get access to the test file
-        inputS = this.getClass().getResourceAsStream("/files/AAL039263.em");
+        System.out.println("Testing SP read");
+        System.out.println("Testing SP read");
+        inputS = this.getClass().getResourceAsStream("/files/AAC4_HUMAN.sp");
         assertNotNull(inputS);
 
         // get SequenceIterator
@@ -246,23 +248,20 @@ public class SeqIOToolsTest extends TestCase
 
         // get sequence
         assertTrue(seqI.hasNext());
-        Sequence emblProteinSeq = null;
+        Sequence swissProteinSeq = null;
         try {
-            emblProteinSeq = seqI.nextSequence();
+            swissProteinSeq = seqI.nextSequence();
         }
         catch (BioException be) {}
 
-        assertNotNull(emblProteinSeq);
+        assertNotNull(swissProteinSeq);
 
         // is its length correct?
-        assertEquals("SwissProt sequence AAL39263.em had incorrect length", emblProteinSeq.length(), 370);
-
-        // compare with fasta reference
-        assertTrue(compareSymbolLists(fastaProteinSeq, emblProteinSeq));
+        assertEquals("SwissProt sequence AAC4_HUMAN.sp had incorrect length", swissProteinSeq.length(), 911);
 
         baos = new ByteArrayOutputStream();
         try {
-          SeqIOTools.writeSwissprot(baos, emblProteinSeq);
+          SeqIOTools.writeSwissprot(baos, swissProteinSeq);
         }
         catch (Exception ex) {
           fail(ex.getMessage());

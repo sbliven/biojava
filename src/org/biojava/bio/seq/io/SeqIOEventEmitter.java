@@ -93,7 +93,13 @@ class SeqIOEventEmitter
 
                     if (a.getProperty(key) instanceof ArrayList) {
                        references = ((ArrayList)a.getProperty(key));
-                    }
+                     }
+                    else if (a.getProperty(key) instanceof ReferenceAnnotation){
+                        //mark_s: if only one ReferenceAnnotation
+                        references = new ArrayList();
+                        references.add(a.getProperty(key));
+                     }
+
 
                     if (references != null) {
 
