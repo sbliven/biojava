@@ -14,6 +14,7 @@ import org.biojava.utils.ParserException;
  * </p>
  *
  * @author Matthew Pocock
+ * @author Keith James (enabled empty line EOR)
  * @since 1.3
  */
 public class RegexpParser
@@ -62,7 +63,7 @@ public class RegexpParser
   }
   
   /**
-   * Set the group numer that will match the tag.
+   * Set the group number that will match the tag.
    *
    * @param group the tag group number
    */
@@ -80,7 +81,7 @@ public class RegexpParser
   }
 
   /**
-   * Set the group numer that will match the value.
+   * Set the group number that will match the value.
    *
    * @param group the value group number
    */
@@ -152,7 +153,7 @@ public class RegexpParser
   }
 
   /**
-   * Decide wether to treat empty tags as continuations of the previous non
+   * Decide whether to treat empty tags as continuations of the previous non
    * -empty tag.
    *
    * @param continueOnEmptyTag  true if empty tags should be replaced, false
@@ -163,7 +164,7 @@ public class RegexpParser
   }
   
   /**
-   * Report wether empty tags will be treated as continuations of the last non
+   * Report whether empty tags will be treated as continuations of the last non
    * -empty tag.
    *
    * @return true if empty tags will be replaced, false otherwise
@@ -184,7 +185,7 @@ public class RegexpParser
   }
   
   /**
-   * Report wether empty tags will be treated as continuations of the last non
+   * Report whether empty tags will be treated as continuations of the last non
    * -empty tag.
    *
    * @return true if tags will be merged, false otherwise
@@ -196,8 +197,20 @@ public class RegexpParser
   public TagValue parse(Object o) {
     String line = o.toString();
     
-    if(endOfRecord != null && line.startsWith(endOfRecord)) {
-      return null;
+    // Use of the special value for the EOR marker allows a blank line
+    // to be used to delimit records. Many file formats are like this.
+    if (endOfRecord != null) {
+        if (endOfRecord == TagValueParser.BLANK_LINE_EOR) {
+            if (line.equals(TagValueParser.BLANK_LINE_EOR)) {
+                return null;
+            }
+        }
+        else
+        {
+            if (line.startsWith(endOfRecord)) {
+                return null;
+            }
+        }
     }
     
     Matcher matcher = pattern.matcher(line);
