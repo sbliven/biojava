@@ -42,10 +42,10 @@ import org.biojava.bio.seq.io.*;
 public interface Alphabet extends Annotatable {
   /** 
    * This ChangeType indicates that some symbols have been added or removed from
-   * the alphabet. The churrent and previous fields should indicate what symbols
-   * were there originaly, and what they have been replaced with.
+   * the alphabet. The current and previous fields should indicate what symbols
+   * were there originally, and what they have been replaced with.
    * <P>
-   * If the alphabet wishes to propogate that the sybmol has changed state, then
+   * If the alphabet wishes to propagate that the symbol has changed state, then
    * previous and current should be null, but the chainedEvent property should
    * rever to the ChangeEvent on the unerlying Symbol.
    */
