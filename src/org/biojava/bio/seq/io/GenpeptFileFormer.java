@@ -1,13 +1,3 @@
-
-/**
- * Title:        File2Biojava
- * Description:  This project will take in a file of any common bioinformatics file formats and convert it to the appropriate Biojava object.  It will also convert the Biojava object back into the corresponding file format.
- * Copyright:    Copyright (c) 2002
- * Company:      Maxygen
- * @author
- * @version 1.0
- */
-
 /*
  *                    BioJava development code
  *
@@ -52,13 +42,11 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Symbol;
 
 /**
- * <code>GenbankFileFormer</code> performs the detailed formatting of
- * Genbank entries for writing to a <code>PrintStream</code>. There is
- * some code dupication with <code>EmblFileFormer</code> which could
- * be factored out.
+ * <code>GenpeptFileFormer</code> performs the detailed formatting of
+ * Genpept entries for writing to a <code>PrintStream</code>. It is based
+ * on GenbankFileFormer.
  *
- * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
- * @since 1.2
+ * @author Nimesh Singh</a>
  */
 public class GenpeptFileFormer extends AbstractGenEmblFileFormer
     implements SeqFileFormer
@@ -356,10 +344,20 @@ public class GenpeptFileFormer extends AbstractGenEmblFileFormer
             deb = new StringBuffer(sequenceBufferCreator("DEFINITION ", value));
         }
         else if (key.equals("SV") || key.equals("VERSION")) {
-            svb.insert(0, "VERSION     " + (String) value);
+            if (svb != null) {
+                svb.insert(11, (String) value);
+            }
+            else {
+                svb = new StringBuffer("VERSION     " + (String) value);
+            }
         }
         else if (key.equals("GI")) {
-            svb.append("  GI:" + (String) value);
+            if (svb != null) {
+                svb.append("  GI:" + (String) value);
+            }
+            else {
+                svb = new StringBuffer("VERSION       GI:" + (String) value);
+            }
         }
         else if (key.equals("KW") || key.equals("KEYWORDS")) {
             kwb = new StringBuffer(sequenceBufferCreator("KEYWORDS   ", value));
