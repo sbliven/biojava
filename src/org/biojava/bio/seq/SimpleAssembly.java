@@ -43,7 +43,7 @@ import org.biojava.bio.symbol.*;
 public class SimpleAssembly extends AbstractSymbolList 
     implements Sequence, RealizingFeatureHolder 
 {
-    private int length;
+    private int length = 0;
     private String name;
     private String uri;
     private Annotation annotation;
@@ -123,6 +123,21 @@ public class SimpleAssembly extends AbstractSymbolList
 	this.uri = uri;
     }
 
+    /**
+     * Construct a new SimpleAssembly using the DNA alphabet.
+     * Initially, the sequence will just contain a list of `N's.
+     * Sequence data can be added by adding one or more
+     * ComponentFeatures.
+     *
+     * @param name The name of the sequence (returned by getName())
+     * @param uri The identifier of the sequence (returned by getURN());
+     */
+
+    public SimpleAssembly(String name, String uri) {
+	this.name = name;
+	this.uri = uri;
+    }
+
     //
     // SymbolList
     //
@@ -198,7 +213,7 @@ public class SimpleAssembly extends AbstractSymbolList
     public Feature createFeature(Feature.Template temp) 
         throws BioException, ChangeVetoException
     {
-	if (temp.location.getMin() < 1 || temp.location.getMax() > length)
+	if (temp.location.getMin() < 1)
 	    throw new BioException("Coordinates out of range");
 
 	if (temp instanceof ComponentFeature.Template) {
@@ -216,6 +231,7 @@ public class SimpleAssembly extends AbstractSymbolList
 	    Location loc = cf.getLocation();
 	    SymbolList cfsyms = cf.getSymbols();
 	    putComponent(loc, cfsyms);
+	    length = Math.max(length, loc.getMax());
 	}
 	return f;
     }
