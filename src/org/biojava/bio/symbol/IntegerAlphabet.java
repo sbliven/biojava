@@ -24,12 +24,12 @@ package org.biojava.bio.symbol;
 
 import java.util.*;
 import java.io.*;
-import java.lang.ref.*;
 import java.lang.reflect.*;
 
 import org.biojava.bio.*;
 import org.biojava.bio.seq.io.*;
 import org.biojava.utils.*;
+import org.biojava.utils.cache.*;
 
 /**
  ( <p>
@@ -127,12 +127,10 @@ public final class IntegerAlphabet
   /**
    * Canonicalization map for ints and references to symbols.
    */
-    private Map intToSymRef;
-    private ReferenceQueue queue;
+    private WeakValueHashMap intToSym;
   
   private IntegerAlphabet() {
-      intToSymRef = new HashMap();
-      queue = new ReferenceQueue();
+      intToSym = new WeakValueHashMap();
   }
   
   /**
@@ -141,25 +139,15 @@ public final class IntegerAlphabet
    * @param val  the int to view
    * @return a IntegerSymbol embodying val
    */
-  public synchronized IntegerSymbol getSymbol(int val) {
-      KeyedWeakReference qref;
-      while ((qref = (KeyedWeakReference) queue.poll()) != null) {
-	  intToSymRef.remove(qref.getKey());
-	  qref.clear();
-      }
 
+  public synchronized IntegerSymbol getSymbol(int val) {
       Integer i = new Integer(val);
-      Reference ref = (Reference) intToSymRef.get(i);
-      IntegerSymbol sym; // stop premature reference clearup
-    
-      if(ref == null || ref.get() == null) {
+      IntegerSymbol sym = (IntegerSymbol) intToSym.get(i);
+      if(sym == null) {
 	  sym = new IntegerSymbol(val);
-	  ref = new KeyedWeakReference(i, sym, queue);
-	  intToSymRef.put(i, ref);
-	  return sym;
-      } else {
-	  return (IntegerSymbol) ref.get();
-      }
+	  intToSym.put(i, sym);
+      } 
+      return sym;
   }
 
   public Symbol getGapSymbol() {

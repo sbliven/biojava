@@ -24,11 +24,11 @@ package org.biojava.bio.symbol;
 
 import java.util.*;
 import java.io.*;
-import java.lang.ref.*;
 import java.lang.reflect.*;
 
 import org.biojava.bio.*;
 import org.biojava.utils.*;
+import org.biojava.utils.cache.*;
 import org.biojava.bio.seq.io.*;
 
 /**
@@ -103,12 +103,10 @@ public final class DoubleAlphabet
   }
 
     private List alphabets = null;
-    private Map doubleToSymRef;
-    private ReferenceQueue queue;
+    private WeakValueHashMap doubleToSym;
   
     private DoubleAlphabet() {
-	doubleToSymRef = new HashMap();
-	queue = new ReferenceQueue();
+	doubleToSym = new WeakValueHashMap();
     }
 
   /**
@@ -118,24 +116,13 @@ public final class DoubleAlphabet
    * @return a DoubleSymbol embodying val
    */
   public DoubleSymbol getSymbol(double val) {
-      KeyedWeakReference qref;
-      while ((qref = (KeyedWeakReference) queue.poll()) != null) {
-	  doubleToSymRef.remove(qref.getKey());
-	  qref.clear();
-      }
-
       Double d = new Double(val);
-      Reference ref = (Reference) doubleToSymRef.get(d);
-      DoubleSymbol sym; 
-      
-      if(ref == null || ref.get() == null) {
+      DoubleSymbol sym = (DoubleSymbol) doubleToSym.get(d);
+      if (sym== null) {
 	  sym = new DoubleSymbol(val);
-	  ref = new KeyedWeakReference(d, sym, queue);
-	  doubleToSymRef.put(d, ref);
-	  return sym;
-      } else {
-	  return (DoubleSymbol) ref.get();
+	  doubleToSym.put(d, sym);
       }
+      return sym;
   }
  
   public Annotation getAnnotation() {
