@@ -26,7 +26,9 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.biojava.bio.BioException;
 import org.biojava.bio.BioError;
+import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.AlphabetIndex;
@@ -105,6 +107,7 @@ public class FiniteAutomaton
 
         public FiniteAutomaton parent() { return FiniteAutomaton.this; }
         public int hashCode() { return nodeID; }
+        public String toString() { return "Node: " + nodeID; }
     }
 
     /**
@@ -260,10 +263,31 @@ public class FiniteAutomaton
         public int hashCode() 
         { 
             try {
-                return source.getID() + dest.getID() + alfaIdx.indexForSymbol(sym); 
+                return (source.getID() << 20) + (dest.getID() << 10) 
+                    + ((sym == null)?999:alfaIdx.indexForSymbol(sym)); 
             }
             catch (IllegalSymbolException ise) {
                 throw new BioError("Fatal error: Unexpected IllegalSymbolException on computing indexForSymbol.");
+            }
+        }
+
+        public String toString()
+        {
+            StringBuffer output = new StringBuffer();
+            try {
+                SymbolTokenization toke = alfa.getTokenization("token");
+                output.append(source.getID());
+                output.append("\t");
+                output.append(dest.getID());
+                output.append("\t");
+                output.append((sym == null)?"EPSILON":toke.tokenizeSymbol(sym));
+                return output.toString();
+            }
+            catch (IllegalSymbolException ise) {
+                throw new AssertionError(ise);
+            }
+            catch (BioException be) {
+                throw new AssertionError(be);
             }
         }
     }
@@ -377,5 +401,39 @@ public class FiniteAutomaton
     }
 
     NodeSet createNodeSet() { return new NodeSet(); }
+
+    public String toString()
+    {
+        StringBuffer output = new StringBuffer();
+
+        // dump nodes
+        output.append("Nodes: ");
+        int count = 0;
+        for (Iterator nodeI = nodes.iterator(); nodeI.hasNext(); ) {
+            Node node = (Node) nodeI.next();
+            if (count++ != 0) output.append(", ");
+            output.append(node.getID());
+        }
+
+        output.append("\n");
+
+        // dump transitions
+        try {
+            SymbolTokenization toke = alfa.getTokenization("token");
+            output.append("Transitions: source, dest, symbol\n");
+            for (Iterator tranI = transitions.iterator(); tranI.hasNext(); ) {
+                Transition trans = (Transition) tranI.next();
+                output.append(trans.toString());
+                output.append("\n");
+            }
+        }
+        catch (IllegalSymbolException ise) {
+            throw new AssertionError(ise);
+        }
+        catch (BioException be) {
+            throw new AssertionError(be);
+        }
+        return output.toString();
+    }
 }
 
