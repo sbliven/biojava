@@ -22,6 +22,7 @@
 package org.biojava.bio;
 
 import java.util.*;
+import java.io.*;
 
 import org.biojava.utils.*;
 
@@ -38,7 +39,7 @@ import org.biojava.utils.*;
  * @author Matthew Pocock
  */
 
-public class OverlayAnnotation implements Annotation {
+public class OverlayAnnotation implements Annotation, Serializable {
   /**
    * The object to do the hard work of informing others of changes.
    */
@@ -46,7 +47,7 @@ public class OverlayAnnotation implements Annotation {
   private transient ChangeListener propertyForwarder = null;
 
   private Annotation parent;
-  private Map overlay;
+  private Map overlay = null;
   
   protected void generateChangeSupport(ChangeType changeType) {
     if(changeSupport == null) {
@@ -68,6 +69,12 @@ public class OverlayAnnotation implements Annotation {
     }
   }
 
+    protected Map getOverlay() {
+	if (overlay == null)
+	    overlay = new HashMap();
+	return overlay;
+    }
+
   /**
    * Construct an annotation which can overlay new key-value
    * pairs onto an underlying annotation.
@@ -78,13 +85,12 @@ public class OverlayAnnotation implements Annotation {
 
   public OverlayAnnotation(Annotation par) {
     parent = par;
-    overlay = new HashMap();
   }
 
   public void setProperty(Object key, Object value)
   throws ChangeVetoException {
     if(changeSupport == null) {
-      overlay.put(key, value);
+      getOverlay().put(key, value);
     } else {
       ChangeEvent ce = new ChangeEvent(
         this,
@@ -94,18 +100,20 @@ public class OverlayAnnotation implements Annotation {
       );
       synchronized(changeSupport) {
         changeSupport.firePreChangeEvent(ce);
-        overlay.put(key, value);
+        getOverlay().put(key, value);
         changeSupport.firePostChangeEvent(ce);
       }
     }
   }
 
   public Object getProperty(Object key) {
-    Object val = overlay.get(key);
-    if (val != null) {
-	    return val;
-    }
-    return parent.getProperty(key);
+      Object val = null;
+      if (overlay != null)
+	  val = overlay.get(key);
+      if (val != null) {
+	  return val;
+      }
+      return parent.getProperty(key);
   }
 
   /**
@@ -170,7 +178,8 @@ public class OverlayAnnotation implements Annotation {
      
      public Iterator iterator() {
        return new Iterator() {
-         Iterator oi = overlay.keySet().iterator();
+         Iterator oi = (overlay != null) ? overlay.keySet().iterator() 
+	                                 : Collections.EMPTY_SET.iterator();
          Iterator pi = parentKeys.iterator();
          Object peek = null;
          
@@ -199,7 +208,7 @@ public class OverlayAnnotation implements Annotation {
            Object po = null;
            while (po == null && pi.hasNext()) {
              po = pi.next();
-             if (overlay.containsKey(po)) {
+             if (overlay != null && overlay.containsKey(po)) {
                po = null;
              }
            }
@@ -223,7 +232,7 @@ public class OverlayAnnotation implements Annotation {
      }
      
      public boolean contains(Object o) {
-       return overlay.containsKey(o) || parentKeys.contains(o);
+       return (overlay != null && overlay.containsKey(o)) || parentKeys.contains(o);
      }
   }
 
