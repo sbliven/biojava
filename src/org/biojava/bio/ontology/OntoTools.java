@@ -103,6 +103,22 @@ public final class OntoTools {
       return true;
     }
     
+    if(subject instanceof RemoteTerm) {
+      RemoteTerm srt = (RemoteTerm) subject;
+      
+      if(OntoTools.isa(srt.getRemoteTerm(), object)) {
+        return true;
+      }
+    }
+    
+    if(object instanceof RemoteTerm) {
+      RemoteTerm ort = (RemoteTerm) object;
+      
+      if(OntoTools.isa(subject, ort.getRemoteTerm())) {
+        return true;
+      }
+    }
+    
     OntologyOps oo;
     if(subject.getOntology() instanceof OntologyOps) {
       oo = (OntologyOps) subject.getOntology();
@@ -119,7 +135,7 @@ public final class OntoTools {
       System.err.println(_prefix + "Delegating to ontology tools");
       return oo.isa(subject, object);
     } else {
-      System.err.println(_prefix + "Computing transitive closure for ");
+      System.err.println(_prefix + "Computing transitive closure for " + subject);
       Ontology remoteTriples = oo.transitiveClosure(
         subject, ANY, IS_A
       );
@@ -130,7 +146,7 @@ public final class OntoTools {
       ) {
         Triple triple = (Triple) i.next();
         System.err.println(_prefix + "Evaluating " + triple);
-        RemoteTerm rt = (RemoteTerm) triple.getSubject();
+        RemoteTerm rt = (RemoteTerm) triple.getObject();
         System.err.println(_prefix + "Following to " + rt.getRemoteTerm() + "," + object);
         if(!isa(
           rt.getRemoteTerm(),

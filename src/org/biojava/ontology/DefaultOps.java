@@ -7,6 +7,17 @@ import org.biojava.bio.BioError;
 
 abstract class DefaultOps
 implements OntologyOps {
+  Set trueThings;
+  Set falseThings;
+
+  {
+    trueThings = new HashSet();
+    falseThings = new HashSet();
+    
+    System.err.println("Creating a DefaultOps for: " + getOntology());
+    new Error().printStackTrace(System.err);
+  }
+  
   public abstract Ontology getOntology();
   
     public Ontology transitiveClosure(
@@ -29,7 +40,7 @@ implements OntologyOps {
           Term t = (Term) i.next();
           if(OntoTools.isa(t, subject) && OntoTools.isa(t, object)) {
             Term it = onto.importTerm(t);
-            onto.createTriple(it, it, relation);
+            onto.createTriple(it, it, ourRel);
           }
         }
         
@@ -109,18 +120,40 @@ implements OntologyOps {
       
       Set visited = new HashSet();
       
-      return recurseIsa(subject, object, visited);
+      return recurseIsaC(subject, object, visited);
+    }
+    
+    private boolean recurseIsaC(Term subject, Term object, Set visited) {
+      TripleStruct ts = new TripleStruct(subject, object, OntoTools.IS_A);
+      
+      if(trueThings.contains(ts)) {
+        System.err.println("True from cache");
+        return true;
+      } else if(falseThings.contains(ts)) {
+        System.err.println("False from cache");
+        return false;
+      }
+      
+      boolean isa = recurseIsa(subject, object, visited);
+      
+      if(isa) {
+        trueThings.add(ts);
+      } else {
+        falseThings.add(ts);
+      }
+      
+      return isa;
     }
     
     private boolean recurseIsa(Term subject, Term object, Set visited) {
-      System.out.println("Checking " + subject + " and " + object);
+      System.err.println("Checking " + subject + " and " + object);
       if(subject == object) {
-        System.out.println("equal");
+        System.err.println("equal");
         return true;
       }
       
       if(visited.contains(subject)) {
-        System.out.println("seen before");
+        System.err.println("seen before");
         return false;
       }
       
@@ -132,11 +165,40 @@ implements OntologyOps {
         Triple trip = (Triple) i.next();
         Term tobj = trip.getObject();
         
-        if(recurseIsa(tobj, object, visited)) {
+        if(recurseIsaC(tobj, object, visited)) {
           return true;
         }
       }
       
       return false;
     }
+    
+  private static class TripleStruct {
+    public final Term subject;
+    public final Term object;
+    public final Term relation;
+    
+    public TripleStruct(Term subject, Term object, Term relation) {
+      this.subject = subject;
+      this.object = object;
+      this.relation = relation;
+    }
+    
+    public boolean equals(Object o) {
+      if(o instanceof TripleStruct) {
+        TripleStruct ts = (TripleStruct) o;
+        return ts.subject == subject &&
+               ts.object == object &&
+               ts.relation == relation;
+      }
+      
+      return false;
+    }
+    
+    public int hashCode() {
+      return subject.hashCode() +
+             object.hashCode() * 37 +
+             relation.hashCode() * 37 * 37;
+    }
   }
+}

@@ -170,14 +170,14 @@ public interface Ontology extends Changeable {
             objectTriples = new HashMap();
             relationTriples = new HashMap();
             remoteTerms = new HashMap();
-            ops = new DefaultOps() {
-              public Ontology getOntology() { return Ontology.Impl.this; }
-            };
         }
         
         public Impl(String name, String description) {
             this.name = name;
             this.description = description;
+            ops = new DefaultOps() {
+              public Ontology getOntology() { return Ontology.Impl.this; }
+            };
         }
         
         public String getName() {
