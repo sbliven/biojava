@@ -233,8 +233,8 @@ class EmblLikeLocationParser
 	    if (unboundMin || unboundMax)
 	    {
 		// Range of form: <123 or >123 or <>123
-		throw new BioException("Unbounded point locations currently not supported: "
-				       + location);
+  		throw new BioException("Unbounded point locations currently not supported: "
+  				       + location);
 	    }
 	    else if (isPointLoc)
 	    {
@@ -251,8 +251,8 @@ class EmblLikeLocationParser
 	// Range of form: (123.567)
 	else if (startCoords.size() == 2 && endCoords.isEmpty())
 	{
-	    throw new BioException("Fuzzy point locations currently not supported: "
-				   + location);
+  	    throw new BioException("Fuzzy point locations currently not supported: "
+  				   + location);
 	}
 	// Range of form: 123..567 or <123..567 or 123..>567 or <123..>567
 	else if (startCoords.size() == 1 && endCoords.size() == 1)
@@ -317,8 +317,8 @@ class EmblLikeLocationParser
 	{
 	    // I'm really sorry about this exception message! This
 	    // should not happen
-	    throw new BioException("Internal error in location parsing; parser became confused; "
-				   + location);
+  	    throw new BioException("Internal error in location parsing; parser became confused; "
+  				   + location);
 	}
 
 	startCoords.clear();
@@ -360,8 +360,8 @@ class EmblLikeLocationParser
 	{
 	    // This is a primary accession number
 	    // e.g. J00194:(100..202)
-	    throw new BioException("Remote locations are not supported: "
-				   + location);
+  	     throw new BioException("Remote locations are not supported: "
+	      		       + location);
 	}
     }
 

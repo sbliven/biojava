@@ -96,8 +96,6 @@ class FeatureTableParser {
 	    featureBuf.append(line);
 	    if (countChar(featureBuf, '(') == countChar(featureBuf, ')'))
 	    {
-		parseLocation(featureBuf.toString(), featureTemplate);
-
 		// Save the original location in the feature's
 		// annotation bundle
 		try
@@ -109,6 +107,8 @@ class FeatureTableParser {
 		    throw new BioException("Unable to add location string to feature annotation: "
 					   + featureBuf);
 		}
+
+		parseLocation(featureBuf.toString(), featureTemplate);
 
 		listener.startFeature(featureTemplate);
 		featureStatus = WITHIN;

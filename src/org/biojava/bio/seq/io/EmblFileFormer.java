@@ -266,6 +266,8 @@ public class EmblFileFormer implements SeqFileFormer
 	    tb.append("=\"" + value + "\"");
 	else if (form.equals("bare"))
 	    tb.append("=" + value);
+	else if (form.equals("paren"))
+		 tb.append("(" + value + ")");
 	else if (! form.equals("empty"))
 	    throw new ParseException("Unrecognised qualifier format: " + form);
 

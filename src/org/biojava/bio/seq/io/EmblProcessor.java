@@ -122,13 +122,16 @@ public class EmblProcessor extends SequenceBuilderFilter {
 	    if (mBadFeature)
 	    {
 		// If this feature is bad in some way, ignore it.
-		String featureLine = value.toString();
-		if((key.equals("FT")) && (featureLine.charAt(0) != ' '))
+		if (value != null)
 		{
-		    // If the offending feature is past, start reading data again
-		    mBadFeature = false;
-		    features.startFeature(featureLine.substring(0, 15).trim());
-		    features.featureData(featureLine.substring(16));
+		    String featureLine = value.toString();
+		    if((key.equals("FT")) && (featureLine.charAt(0) != ' '))
+		    {
+			// If the offending feature is past, start reading data again
+			mBadFeature = false;
+			features.startFeature(featureLine.substring(0, 15).trim());
+			features.featureData(featureLine.substring(16));
+		    }
 		}
 	    }
 	    else
