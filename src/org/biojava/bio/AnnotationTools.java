@@ -159,27 +159,19 @@ public final class AnnotationTools {
         AnnotationType.Impl intersect = new AnnotationType.Impl();
         for(Iterator i = props.iterator(); i.hasNext(); ) {
           Object key = i.next();
-
-          Location cc1 = ann1.getCardinalityConstraint(key);
-          Location cc2 = ann2.getCardinalityConstraint(key);
-          Location cc = LocationTools.intersection(cc1, cc2);
-          if(cc == Location.empty) {
+          
+          CollectionConstraint pc1 = ann1.getConstraint(key);
+          CollectionConstraint pc2 = ann2.getConstraint(key);
+          CollectionConstraint pc = intersection(pc1, pc2);
+          if (pc == CollectionConstraint.NONE) {
             return AnnotationType.NONE;
           }
           
-          PropertyConstraint pc1 = ann1.getPropertyConstraint(key);
-          PropertyConstraint pc2 = ann2.getPropertyConstraint(key);
-          PropertyConstraint pc = intersection(pc1, pc2);
-          if (pc == PropertyConstraint.NONE && !cc.contains(0)) {
-            return AnnotationType.NONE;
-          }
-          
-          intersect.setConstraints(key, pc, cc);
+          intersect.setConstraint(key, pc);
         }
 
-        intersect.setDefaultConstraints(
-          intersection(ann1.getDefaultPropertyConstraint(), ann2.getDefaultPropertyConstraint()),
-          LocationTools.intersection(ann1.getDefaultCardinalityConstraint(), ann2.getDefaultCardinalityConstraint())
+        intersect.setDefaultConstraint(
+          intersection(ann1.getDefaultConstraint(), ann2.getDefaultConstraint())
         );
         
         return intersect;
@@ -325,15 +317,11 @@ public final class AnnotationTools {
         for(Iterator i = props.iterator(); i.hasNext(); ) {
           Object key = i.next();
           
-          Location cc1 = ann1.getCardinalityConstraint(key);
-          Location cc2 = ann2.getCardinalityConstraint(key);
-          Location cc = LocationTools.intersection(cc1, cc2);
+          CollectionConstraint pc1 = ann1.getConstraint(key);
+          CollectionConstraint pc2 = ann2.getConstraint(key);
+          CollectionConstraint pc = union(pc1, pc2);
           
-          PropertyConstraint pc1 = ann1.getPropertyConstraint(key);
-          PropertyConstraint pc2 = ann2.getPropertyConstraint(key);
-          PropertyConstraint pc = intersection(pc1, pc2);
-          
-          union.setConstraints(key, pc, cc);
+          union.setConstraint(key, pc);
         }
         
         return union;
@@ -345,7 +333,7 @@ public final class AnnotationTools {
      * by two others.
      *
      * @param pc1 the first PropertyConstraint
-     * @param pc2 the seccond PropertyConstraint
+     * @param pc2 the second PropertyConstraint
      * @return the union PropertyConstraint
      *
      * @for.powerUser
@@ -416,5 +404,85 @@ public final class AnnotationTools {
       }
       
       return new PropertyConstraint.Or(pc1, pc2);
+    }
+    
+    /**
+     * Return the CollectionConstraint which accept only collections accepted by both
+     * of those specified.
+     */
+    
+    public static CollectionConstraint intersection(CollectionConstraint cc1, CollectionConstraint cc2) {
+        if (cc1.subConstraintOf(cc2)) {
+            return cc2;
+        } else if (cc2.subConstraintOf(cc1)) {
+            return cc1;
+        } else if (cc1 instanceof CollectionConstraint.AllValuesIn &&
+                   cc2 instanceof CollectionConstraint.AllValuesIn) 
+        {
+            PropertyConstraint pc1 = ((CollectionConstraint.AllValuesIn) cc1).getPropertyConstraint();
+            PropertyConstraint pc2 = ((CollectionConstraint.AllValuesIn) cc2).getPropertyConstraint();
+            Location card1 = ((CollectionConstraint.AllValuesIn) cc1).getCardinalityConstraint();
+            Location card2 = ((CollectionConstraint.AllValuesIn) cc2).getCardinalityConstraint();
+            Location card = LocationTools.intersection(card1, card2);
+            if (card == Location.empty) {
+                return CollectionConstraint.NONE;
+            } 
+            PropertyConstraint pc = intersection(pc1, pc2);
+            if (pc == PropertyConstraint.NONE && !card.contains(0)) {
+                return CollectionConstraint.NONE;
+            } else {
+                return new CollectionConstraint.AllValuesIn(pc, card);
+            }
+        } else if (cc1 instanceof CollectionConstraint.Contains &&
+                   cc2 instanceof CollectionConstraint.Contains) 
+        {
+            PropertyConstraint pc1 = ((CollectionConstraint.Contains) cc1).getPropertyConstraint();
+            PropertyConstraint pc2 = ((CollectionConstraint.Contains) cc2).getPropertyConstraint();
+            Location card1 = ((CollectionConstraint.Contains) cc1).getCardinalityConstraint();
+            Location card2 = ((CollectionConstraint.Contains) cc2).getCardinalityConstraint();
+            Location card = LocationTools.intersection(card1, card2);
+            if (card == Location.empty) {
+                return CollectionConstraint.NONE;
+            } 
+            PropertyConstraint pc = intersection(pc1, pc2);
+            if (pc == PropertyConstraint.NONE && !card.contains(0)) {
+                return CollectionConstraint.NONE;
+            } else {
+                return new CollectionConstraint.Contains(pc, card);
+            }
+        } else if (cc1 instanceof CollectionConstraint.Contains &&
+                   cc2 instanceof CollectionConstraint.AllValuesIn) 
+        {
+            PropertyConstraint pc1 = ((CollectionConstraint.Contains) cc1).getPropertyConstraint();
+            PropertyConstraint pc2 = ((CollectionConstraint.AllValuesIn) cc2).getPropertyConstraint();
+            Location card1 = ((CollectionConstraint.Contains) cc1).getCardinalityConstraint();
+            Location card2 = ((CollectionConstraint.AllValuesIn) cc2).getCardinalityConstraint();
+            if (card1.getMin() > card2.getMax()) {
+                // Requires too many values.
+                return CollectionConstraint.NONE;
+            }
+            PropertyConstraint pc = intersection(pc1, pc2);
+            if (pc == PropertyConstraint.NONE && !card1.contains(0)) {
+                return CollectionConstraint.NONE;
+            } else {
+                return new CollectionConstraint.Contains(pc, card1);
+            }
+        } else if (cc1 instanceof CollectionConstraint.AllValuesIn &&
+                   cc2 instanceof CollectionConstraint.Contains) 
+        {
+            return intersection(cc2, cc1);
+        } else {
+            return new CollectionConstraint.And(cc1, cc2);
+        }
+    }
+    
+    public static CollectionConstraint union(CollectionConstraint cc1, CollectionConstraint cc2) {
+        if (cc1.subConstraintOf(cc2)) {
+            return cc1;
+        } else if (cc2.subConstraintOf(cc1)) {
+            return cc2;
+        } else {
+            return new CollectionConstraint.Or(cc1, cc2);
+        }
     }
 }
