@@ -214,7 +214,8 @@ packages="org.biojava.bio.proteomics:org.biojava.stats.svm:org.biojava.stats.svm
               packages="org.biojava.bio.seq.impl:org.biojava.utils:org.biojava.utils.cache:org.biojava.utils.contract:org.biojava.utils.xml:org.biojava.utils.query:org.biojava.utils.stax"
 />
        <group title="External Tools"
-              packages="org.biojava.bio.program:org.biojava.bio.program.das:org.biojava.bio.program.gff:org.biojava.bio.program.sax:org.biojava.bio.program.seach:org.biojava.bio.program.xml:org.biojava.bio.program.game:org.biojava.bio.program.search:org.biojava.bio.program.xff"
+              
+packages="org.biojava.bio.program:org.biojava.bio.program.das:org.biojava.bio.program.gff:org.biojava.bio.program.sax:org.biojava.bio.program.seach:org.biojava.bio.program.xml:org.biojava.bio.seq.io.game:org.biojava.bio.program.search:org.biojava.bio.program.xff"
 />
        <group title="Dynamic Programming Packages"
               packages="org.biojava.bio.dp:org.biojava.bio.dp.onehead:org.biojava.bio.dp.twohead"
