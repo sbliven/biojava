@@ -65,6 +65,7 @@ import org.xml.sax.InputSource;
  * @author Thomas Down
  * @author Greg Cox
  * @author Mark Schreiber
+ * @author David Huen (refactoring)
  */
 public final class RNATools {
   private static final ReversibleTranslationTable complementTable;
@@ -193,7 +194,7 @@ public final class RNATools {
   /**
    * Return an integer index for a symbol - compatible with forIndex.
    * <p>
-   * The index for a symbol is stable accross virtual machines & invocations.
+   * The index for a symbol is stable across virtual machines & invocations.
    *
    * @param sym  the Symbol to index
    * @return     the index for that symbol
@@ -241,7 +242,7 @@ public final class RNATools {
    *
    * @param sym  the symbol to complement
    * @return a Symbol that is the complement of sym
-   * @throws IllegalSymbolException if sym is not a member of the DNA alphabet
+   * @throws IllegalSymbolException if sym is not a member of the RNA alphabet
    */
   static public Symbol complement(Symbol sym)
   throws IllegalSymbolException {
