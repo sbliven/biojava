@@ -66,8 +66,15 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
       return d.doubleValue();
     } else {
       alphabet.validate(s);
-      AmbiguitySymbol as = (AmbiguitySymbol) s;
-      return getAmbiguityWeight(as);
+      if(s instanceof AmbiguitySymbol) {
+        AmbiguitySymbol as = (AmbiguitySymbol) s;
+        return getAmbiguityWeight(as);
+      } else {
+        throw new BioError(
+          "Requested weight for " + s.getName() +
+          " but something is odd & I can't find its weight"
+        );
+      }
     }
   }
   

@@ -70,7 +70,7 @@ public final class AlphabetManager {
   private Map gappedAlphabets;
   private Map crossProductAlphabets;
   private Map ambiguitySymbols;
-  private AmbiguitySymbol gapSymbol;
+  private GapSymbol gapSymbol;
 
   /**
    * Initialize nameToAlphabet.
@@ -137,7 +137,7 @@ public final class AlphabetManager {
    * <P>
    * @return the system-wide symbol that represents a gap
    */
-  public AmbiguitySymbol getGapSymbol() {
+  public GapSymbol getGapSymbol() {
     return gapSymbol;
   }
 
@@ -301,7 +301,7 @@ public final class AlphabetManager {
    * and builds a basic set of alphabets.
    */
   private AlphabetManager() {
-    gapSymbol = new SimpleAmbiguitySymbol('-', "gap", null, Alphabet.EMPTY_ALPHABET);
+    gapSymbol = new GapSymbol();
     ambiguitySymbols.put(new HashSet(), gapSymbol);
     try {
       URL alphabetURL =
@@ -581,6 +581,70 @@ public final class AlphabetManager {
         c += i.next().hashCode();
       }
       return c;
+    }
+  }
+  
+  /** 
+   * The class representing the Gap symbol.
+   * <P>
+   * The gap is quite special. It is an ambiguity symbol with an empty alphabet.
+   * This means that it notionaly represents an unfilled slot in a sequence. It
+   * is identical to gap^n, so it is a CrossProductSymbol with an infinite list
+   * of child symbols, each being itself. It should be a singleton, hence the
+   * placement in AlphabetManager and also the method normalize.
+   * <P>
+   * Basicaly, this is a bit of a mess. We need to put our head together and
+   * figure out what is going on.
+   *
+   * @author Matthew Pocock
+   */
+  public static class GapSymbol
+  extends SimpleAmbiguitySymbol
+  implements CrossProductSymbol {
+    public GapSymbol() {
+      super('-', "gap", null, Alphabet.EMPTY_ALPHABET);
+    }
+    
+    /**
+     * Returns an infinitely long list of itself.
+     *
+     * @return a List of length Integer.MAX_VALUE with every slot filled with
+     *         this gap symbol
+     */
+    public List getSymbols() {
+      return new AbstractList() {
+        public int size() {
+          return Integer.MAX_VALUE;
+        }
+        
+        public Object get(int index) {
+          return GapSymbol.this;
+        }
+      };
+    }
+    
+    /**
+     * Takes a symbol, and returns a symbol that will be this Gap symbol iff
+     * s fulfills the gap criteria (a gap, or a cross-product symbol of gaps
+     * only).
+     *
+     * @param s the Symbol to normalize
+     * @return  the normalized view of s - either s, or gap
+     */
+    public Symbol normalize(Symbol s) {
+      if(s instanceof GapSymbol) {
+        return this;
+      } else if(s instanceof CrossProductSymbol) {
+        Iterator i = ((CrossProductSymbol) s).getSymbols().iterator();
+        while(i.hasNext()) {
+          if(!(i.next() instanceof GapSymbol)) {
+            return s;
+          }
+        }
+        return this;
+      } else {
+        return s;
+      }
     }
   }
 }

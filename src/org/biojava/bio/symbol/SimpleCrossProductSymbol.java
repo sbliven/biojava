@@ -47,7 +47,7 @@ implements CrossProductSymbol, Serializable {
   private final char token;
 
   public SimpleCrossProductSymbol(List l, char token) {
-    this.l = l;
+    this.l = Collections.unmodifiableList(new ArrayList(l));
     this.token = token;
   }
 

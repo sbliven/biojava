@@ -64,12 +64,12 @@ extends AbstractDistribution implements Serializable {
 
   public double getWeight(Symbol sym) throws IllegalSymbolException {
     getAlphabet().validate(sym);
-    if(sym instanceof AmbiguitySymbol) {
+    /*if(sym instanceof AmbiguitySymbol) {
       throw new IllegalSymbolException(
-        "Can't add counts for ambiguity symbols. Got: " +
+        "Can't get weight ambiguity symbols. Got: " +
         sym.getName()
       );
-    }
+    }*/
     CrossProductSymbol cps = (CrossProductSymbol) sym;
     List symL = cps.getSymbols();
     Symbol f = (Symbol) symL.get(0);

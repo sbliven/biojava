@@ -40,7 +40,7 @@ import org.biojava.bio.dist.*;
 
 public class PairwiseDP extends DP implements Serializable {
     private EmissionState magicalState;
-    //private Symbol magicalSymbol;
+    //private HashMap emissions;
 
     public PairwiseDP(MarkovModel mm) throws IllegalSymbolException,
                                            IllegalTransitionException,
@@ -48,7 +48,7 @@ public class PairwiseDP extends DP implements Serializable {
     {
 	super(mm);
 	magicalState = mm.magicalState();
-	//magicalSymbol = MagicalState.MAGICAL_SYMBOL;
+  //emissions = new HashMap();
     }
 
     private final static int[] ia00 = {0, 0};
@@ -56,6 +56,31 @@ public class PairwiseDP extends DP implements Serializable {
     //
     // BACKWARD
     //
+
+  /*public void updateTransitions() {
+    super.updateTransitions();
+    // workaround for bug in vm
+    if(emissions != null) {
+      emissions.clear();
+    }
+  }*/
+  
+  /*protected double [] getEmission(Symbol sym)
+  throws IllegalSymbolException {
+    double [] em = (double []) emissions.get(sym);
+    if(em == null) {
+      int dsi = getDotStatesIndex();
+      em = new double[dsi];
+      State [] states = getStates();
+      for(int i = 0; i < dsi; i++) {
+        EmissionState es = (EmissionState) states[i];
+        Distribution dis = es.getDistribution();
+        em[i] = Math.log(dis.getWeight(sym));
+      }
+      emissions.put(sym, em);
+    }
+    return em;
+  }*/
 
     public double backward(SymbolList[] seqs) 
         throws IllegalSymbolException, IllegalAlphabetException, IllegalTransitionException
@@ -194,7 +219,7 @@ public class PairwiseDP extends DP implements Serializable {
       for(int l = 0; l < getDotStatesIndex(); l++) {
         EmissionState es = (EmissionState) states[l];
         int [] advance = es.getAdvance();
-        curECol[l] = es.getDistribution().getWeight(symMatrixF[advance[0]][advance[1]]);
+        curECol[l] = Math.log(es.getDistribution().getWeight(symMatrixF[advance[0]][advance[1]]));
       }
 
       backwardCalcStepMatrix();
@@ -309,40 +334,6 @@ public class PairwiseDP extends DP implements Serializable {
 
     private static List gappedResList = new ArrayList();
 
-/*    private static Symbol getResWrapper(CrossProductAlphabet a, List l) 
-        throws IllegalSymbolException
-    {
-//      System.out.println(a.getName() + " getting:");
-//      for (Iterator i = l.iterator(); i.hasNext(); ) {
-//          Symbol blah = (Symbol) i.next();
-//          System.out.println(blah.getName());
-//      }
-
-	if (l.contains(null))
-	    return null;
-
-        if (l.contains(MagicalState.MAGICAL_SYMBOL)) {
-	    Symbol gr = AlphabetManager.instance().getGapSymbol();
-
-	    gappedResList.clear();
-	    boolean gotOther = false;
-            for (Iterator i = l.iterator(); i.hasNext(); ) {
-		Object o = i.next();
-		if (o == MagicalState.MAGICAL_SYMBOL || o == gr) {
-		    gappedResList.add(gr);
-		} else {
-		    gappedResList.add(o);
-		    gotOther = true;
-		}   
-	    }
-	    if (gotOther)
-		return a.getSymbol(gappedResList);
-	    else
-		return MagicalState.MAGICAL_SYMBOL;
-        }
-        return a.getSymbol(l);
-    }
-*/
   private class Forward {
     private int[][] transitions;
     private double[][] transitionScores;
@@ -455,7 +446,7 @@ public class PairwiseDP extends DP implements Serializable {
         if (states[l] instanceof EmissionState) {
           advance = ((EmissionState) states[l]).getAdvance();
           Symbol res = symMatrix[advance[0]][advance[1]];
-          weight = ((EmissionState) states[l]).getDistribution().getWeight(res);
+          weight = Math.log(((EmissionState) states[l]).getDistribution().getWeight(res));
         } else {
           advance = ia00;
           weight = 0.0;
@@ -533,8 +524,12 @@ private class Viterbi {
 	states = getStates();
 	cursor = new LightPairDPCursor(seq0, seq1, states.length, true);
 	alpha = (CrossProductAlphabet) getModel().emissionAlphabet();
-
+  symMatrix[0][0] = AlphabetManager.instance().getGapSymbol();
+  
 	// Forward initialization
+
+	transitions = getForwardTransitions();
+	transitionScores = getForwardTransitionScores();
 
 	double[] col = cursor.getColumn(ia00);
 	for (int l = 0; l < states.length; ++l)
@@ -544,10 +539,7 @@ private class Viterbi {
   initializationHack = false;
   
 	// Recurse
-
-	transitions = getForwardTransitions();
-	transitionScores = getForwardTransitionScores();
-
+  
 	while (cursor.canAdvance(0) || cursor.canAdvance(1)) {
 	    if (cursor.canAdvance(0)) {
 		cursor.advance(0);
@@ -619,12 +611,15 @@ private class Viterbi {
 	symL.add(cursor.symbol(0, i));
 	symL.add(cursor.symbol(1, j));
 	symMatrix[1][1] = alpha.getSymbol(symL);
+  //System.out.println("Got symbol " + symMatrix[1][1].getName() + " for 1, 1");
 	symL.set(0, cursor.symbol(0, i));
 	symL.set(1, gap);
 	symMatrix[1][0] = alpha.getSymbol(symL);
+  //System.out.println("Got symbol " + symMatrix[1][0].getName() + " for 1, 0");
 	symL.set(0, gap);
 	symL.set(1, cursor.symbol(1, j));
 	symMatrix[0][1] = alpha.getSymbol(symL);
+  //System.out.println("Got symbol " + symMatrix[0][1].getName() + " for 0, 1");
 
 	colId[0] = i;
 	colId[1] = j;
@@ -640,7 +635,13 @@ private class Viterbi {
 	matrix[0][1] = cursor.getColumn(colId);
 	bpMatrix[0][1] = cursor.getBackPointers(colId);
 
+  try {
 	viterbiCalcStepMatrix();
+  } catch (Exception e) {
+    throw new BioError(e, "Couldn't calculate dp cell " + i + ", " + j);
+  } catch (BioError e) {
+    throw new BioError(e, "Error calculating dp cell " + i + ", " + j);
+  }
     }
 
     private void viterbiCalcStepMatrix()
@@ -650,90 +651,99 @@ private class Viterbi {
       int[] advance;
       BackPointer[] curBPs = bpMatrix[0][0];
       for (int l = 0; l < states.length; ++l) {
-        if (initializationHack && states[l] == magicalState) {
-          continue;
-        }
+        try {
+          if (initializationHack && states[l] == magicalState) {
+            continue;
+          }
     
-  	    // System.out.println("State = " + states[l].getName());
+  	      // System.out.println("State = " + states[l].getName());
 
-        if (states[l] instanceof EmissionState) {
-          advance = ((EmissionState) states[l]).getAdvance();
-        } else {
-          advance = ia00;
-        }
+          if (states[l] instanceof EmissionState) {
+            advance = ((EmissionState) states[l]).getAdvance();
+          } else {
+            advance = ia00;
+          }
         
-	    Symbol res = symMatrix[advance[0]][advance[1]];
-	    double weight = Double.NEGATIVE_INFINITY;
-	    if (res == null) {
-		weight = Double.NEGATIVE_INFINITY;
-	    } else if (! (states[l] instanceof EmissionState)) {
-		weight = 0.0;
-	    } else {
-		weight = ((EmissionState) states[l]).getDistribution().getWeight(res);
-	    }
+          Symbol res = symMatrix[advance[0]][advance[1]];
+          /*System.out.println(
+            "Got symbol " + res.getName() +
+            " for state " + states[l].getName() +
+            " with advance " +
+            advance[0] + ", " + advance[1]
+          );*/
+          double weight = Double.NEGATIVE_INFINITY;
+          if (! (states[l] instanceof EmissionState)) {
+            weight = 0.0;
+          } else {
+            weight = Math.log(((EmissionState) states[l]).getDistribution().getWeight(res));
+          }
 
-	    if (weight == Double.NEGATIVE_INFINITY) {
-		curCol[l] = Double.NEGATIVE_INFINITY;
-		curBPs[l] = null;
-	    } else {
-		// System.out.println("weight = " + weight);
-		double score = Double.NEGATIVE_INFINITY;
-		int [] tr = transitions[l];
-		double[] trs = transitionScores[l];
+          if (weight == Double.NEGATIVE_INFINITY) {
+            curCol[l] = Double.NEGATIVE_INFINITY;
+            curBPs[l] = null;
+          } else {
+            // System.out.println("weight = " + weight);
+            double score = Double.NEGATIVE_INFINITY;
+            int [] tr = transitions[l];
+            double[] trs = transitionScores[l];
 
-		// Calculate probabilities for states with transitions
-		// here.
-		
-//		double[] lastCol = new double[states.length];
-//  		for (int ci = 0; ci < states.length; ++ci) {
-//  		    advance = states[ci].getAdvance();
-//  		    double[] sCol = (double[]) matrix[advance[0]][advance[1]];
-//  		    lastCol[ci] = sCol[ci];
-//  		}
+        // Calculate probabilities for states with transitions
+        // here.
 
-		double[] sourceScores = new double[tr.length];
-		BackPointer[] oldBPs = new BackPointer[tr.length];
-		for (int ci = 0; ci < tr.length; ++ci) {
-		    double[] sCol;
-		    BackPointer[] bpCol;
-		    if (states[tr[ci]] instanceof EmissionState) {
-			advance = ((EmissionState)states[tr[ci]]).getAdvance();
-		        sCol = matrix[advance[0]][advance[1]];
-			bpCol = bpMatrix[advance[0]][advance[1]];
-		    } else {
-			sCol = matrix[0][0];
-			bpCol = bpMatrix[0][0];
-		    }
-		    sourceScores[ci] = sCol[tr[ci]];
-		    oldBPs[ci] = bpCol[tr[ci]];
-		}
+		        double[] sourceScores = new double[tr.length];
+            BackPointer[] oldBPs = new BackPointer[tr.length];
+            for (int ci = 0; ci < tr.length; ++ci) {
+              double[] sCol;
+              BackPointer[] bpCol;
+              if (states[tr[ci]] instanceof EmissionState) {
+                advance = ((EmissionState)states[tr[ci]]).getAdvance();
+                sCol = matrix[advance[0]][advance[1]];
+                bpCol = bpMatrix[advance[0]][advance[1]];
+              } else {
+                sCol = matrix[0][0];
+                bpCol = bpMatrix[0][0];
+              }
+              sourceScores[ci] = sCol[tr[ci]];
+              oldBPs[ci] = bpCol[tr[ci]];
+            }
 
-		int bestKC = -1;
-		for (int kc = 0; kc < tr.length; ++kc) {
-		    // System.out.println("In from " + states[kc].getName());
-		    // System.out.println("prevScore = " + sourceScores[kc]);
-
-		    int k = tr[kc];
-		    if (sourceScores[kc] != Double.NEGATIVE_INFINITY) {
-			double t = trs[kc];
-			double newScore = t + sourceScores[kc];
-			if (newScore > score) {
-			    score = newScore;
-			    bestKC = kc;
-			}
-		    }
-		}
-		curCol[l] = weight + score;
-		if (bestKC >= 0) {
-		    curBPs[l] = new BackPointer(states[l], oldBPs[bestKC], curCol[l], res);
-		} else {
-		    curBPs[l] = null;
-		}
-		// System.out.println(curCol[l]);
-	    }
-	}
+            int bestKC = -1;
+            for (int kc = 0; kc < tr.length; ++kc) {
+              // System.out.println("In from " + states[kc].getName());
+              // System.out.println("prevScore = " + sourceScores[kc]);
+              
+              int k = tr[kc];
+              if (sourceScores[kc] != Double.NEGATIVE_INFINITY) {
+                double t = trs[kc];
+                double newScore = t + sourceScores[kc];
+                if (newScore > score) {
+                  score = newScore;
+                  bestKC = kc;
+                }
+              }
+            }
+            curCol[l] = weight + score;
+            if (bestKC >= 0) {
+              curBPs[l] = new BackPointer(states[l], oldBPs[bestKC], curCol[l], res);
+            } else {
+              curBPs[l] = null;
+            }
+            // System.out.println(curCol[l]);
+          }
+        } catch (Exception e) {
+          throw new BioError(
+            e,
+            "Problem with state " + l + " -> " + states[l].getName()
+          );
+        } catch (BioError e) {
+          throw new BioError(
+            e,
+            "Error  with state " + l + " -> " + states[l].getName()
+          );
+        }
+      }
     }
-}
+  }
 
   private static class BackPointer {
     State state;
