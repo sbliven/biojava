@@ -35,7 +35,7 @@ import org.biojava.bio.seq.*;
  * @author Thomas Down
  */
 
-public class EmblFormat implements SequenceFormat {
+public class EmblFormat implements SequenceFormat, Serializable {
     private FeatureBuilder featureBuilder;
 
     /**

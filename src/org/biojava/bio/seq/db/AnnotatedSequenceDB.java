@@ -21,6 +21,8 @@
 
 package org.biojava.bio.seq.db;
 
+import java.io.Serializable;
+
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.*;
@@ -33,46 +35,50 @@ import java.util.*;
  * @author Thomas Down
  */
 
-public class AnnotatedSequenceDB implements SequenceDB {
-    private SequenceDB parent;
-    private SequenceAnnotator annotator;
+public class AnnotatedSequenceDB implements SequenceDB, Serializable {
+  private final SequenceDB parent;
+  private final SequenceAnnotator annotator;
 
-    public AnnotatedSequenceDB(SequenceDB parent, SequenceAnnotator a) {
-	this.parent = parent;
-	this.annotator = a;
-    }
+  public AnnotatedSequenceDB(SequenceDB parent, SequenceAnnotator a) {
+    this.parent = parent;
+    this.annotator = a;
+  }
 
-    public String getName() {
-	return parent.getName() + " (" + annotator.toString() + ")";
-    }
+  public SequenceDB getParent() {
+    return this.parent;
+  }
+  
+  public String getName() {
+    return parent.getName() + " (" + annotator.toString() + ")";
+  }
 
-    public Sequence getSequence(String id) throws BioException {
-	return doAnnotation(parent.getSequence(id));
-    }
+  public Sequence getSequence(String id) throws BioException {
+    return doAnnotation(parent.getSequence(id));
+  }
 
-    public Set ids() {
-	return parent.ids();
-    }
+  public Set ids() {
+    return parent.ids();
+  }
 
-    public SequenceIterator sequenceIterator() {
-	return new SequenceIterator() {
-	    SequenceIterator pi = parent.sequenceIterator();
+  public SequenceIterator sequenceIterator() {
+    return new SequenceIterator() {
+      SequenceIterator pi = parent.sequenceIterator();
 
 	    public boolean hasNext() {
-		return pi.hasNext();
+        return pi.hasNext();
 	    }
 
 	    public Sequence nextSequence() throws BioException {
-		return doAnnotation(pi.nextSequence());
+        return doAnnotation(pi.nextSequence());
 	    }
-	} ;
-    }
+    };
+  }
 
-    protected Sequence doAnnotation(Sequence seq) throws BioException {
-	try {
+  protected Sequence doAnnotation(Sequence seq) throws BioException {
+    try {
 	    return annotator.annotate(seq);
-	} catch (IllegalAlphabetException ex) {
+    } catch (IllegalAlphabetException ex) {
 	    throw new BioException(ex, "Couldn't apply annotator " + annotator.toString() + " to " + seq.getURN());
-	}
     }
+  }
 }

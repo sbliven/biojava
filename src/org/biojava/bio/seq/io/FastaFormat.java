@@ -26,6 +26,7 @@ import java.io.*;
 import java.util.*;
 import java.net.*;
 
+import org.biojava.utils.StaticMemberPlaceHolder;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
@@ -38,14 +39,27 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  */
-public class FastaFormat implements SequenceFormat {
+public class FastaFormat implements SequenceFormat, Serializable {
   /**
    * The default description reader.
    */
-  private static final FastaDescriptionReader DEFAULT_DESCRIPTION_READER;
+  public static final FastaDescriptionReader DEFAULT_DESCRIPTION_READER;
   
   static {
-    DEFAULT_DESCRIPTION_READER = new DefaultDescriptionReader();
+    DEFAULT_DESCRIPTION_READER = new DefaultDescriptionReader() {
+      public Object writeReplace() throws IOException {
+        try {
+          return new StaticMemberPlaceHolder(
+            FastaFormat.class.getField("DEFAULT_DESCRIPTION_READER")
+          );
+        } catch (NoSuchFieldException nsfe) {
+          throw new BioError(
+            nsfe,
+            "Could not find field while serializing"
+          );
+        }
+      }
+    };
   }
   
   /**

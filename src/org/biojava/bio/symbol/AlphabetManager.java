@@ -403,7 +403,7 @@ public final class AlphabetManager {
         String name = child.getNodeName();
         if(name.equals("symbol")) {
           nameToSymbol.put(child.getAttribute("name"),
-                            symbolFromXML(child));
+                            symbolFromXML(child, null));
         } else if(name.equals("alphabet")) {
           String alphaName = child.getAttribute("name");
           String parentName = child.getAttribute("parent");
@@ -440,7 +440,9 @@ public final class AlphabetManager {
    * @param resE an XML Element specifying the element
    * @return the new AtomicSymbol object
    */
-  static private AtomicSymbol symbolFromXML(Element resE) {
+  static private AtomicSymbol symbolFromXML(
+    Element resE, WellKnownAlphabet alpha
+  ) {
     char token = '\0';
     String name = null;
     String description = null;
@@ -459,7 +461,7 @@ public final class AlphabetManager {
       }
     }
 
-    AtomicSymbol res = new WellKnownSymbol(token, name, (Annotation) null);
+    AtomicSymbol res = new WellKnownSymbol(alpha, token, name, (Annotation) null);
     res.getAnnotation().setProperty("description", description);
     return res;
   }
@@ -523,7 +525,7 @@ public final class AlphabetManager {
   static private SimpleAlphabet alphabetFromXML(Element alph, Map nameToSym)
   throws BioException {
     nameToSym = new HashMap(nameToSym);
-    SimpleAlphabet alphabet = new WellKnownAlphabet();
+    WellKnownAlphabet alphabet = new WellKnownAlphabet();
 
     NodeList children = alph.getChildNodes();
     for(int i = 0; i < children.getLength(); i++) {
@@ -533,7 +535,7 @@ public final class AlphabetManager {
         if(name.equals("description")) {
           alphabet.getAnnotation().setProperty("description", el.getFirstChild().getNodeValue());
         } else if(name.equals("symbol")) {
-          Symbol sym = symbolFromXML(el);
+          Symbol sym = symbolFromXML(el, alphabet);
           String symName = el.getAttribute("name");
           if(symName != null) {
             nameToSym.put(symName, sym);
@@ -599,34 +601,43 @@ public final class AlphabetManager {
     private static class WellKnownSymbol extends SimpleAtomicSymbol
                                           implements Serializable
     {
-	public WellKnownSymbol(char token, String name, Annotation a) {
-	    super(token, name, a);
-	}
+      WellKnownAlphabet alpha;
+      public WellKnownSymbol(WellKnownAlphabet alpha, char token, String name, Annotation a) {
+        super(token, name, a);
+        this.alpha = alpha;
+      }
 
-	private Object writeReplace() {
-	    return new OPH(getName());
-	}
+      private Object writeReplace() {
+        return new OPH(alpha, getName());
+      }
 
-	private static class OPH implements Serializable {
-	    private String name;
+      private static class OPH implements Serializable {
+        private WellKnownAlphabet alpha;
+        private String name;
 
-	    public OPH(String name) {
-		this.name = name;
-	    }
+        public OPH(WellKnownAlphabet alpha, String name) {
+          this.alpha = alpha;
+          this.name = name;
+        }
 	
-	    public OPH() {
-	    }
-
-	    private Object readResolve() throws ObjectStreamException {
-		try {
-		    Symbol a = AlphabetManager.
-                                    symbolForName(name);
-		    return a;
-		} catch (NoSuchElementException ex) {
-		    throw new InvalidObjectException("Couldn't resolve symbol " + name);
-		}
-	    }
-	}
+	      private Object readResolve() throws ObjectStreamException {
+          try {
+            if(alpha != null) {
+              return alpha.getParser("name").parseToken(name);
+            } else {
+              return symbolForName(name);
+            }
+          } catch (NoSuchElementException ex) {
+            throw new InvalidObjectException(
+              "Couldn't resolve symbol " + name + " as there was no parser"
+            );
+          } catch (IllegalSymbolException ise) {
+            throw new InvalidObjectException(
+              "Couldn't resolve symbol " + name + ": " + ise.getMessage()
+            );
+          }
+        }
+      }
     }
    
   /**

@@ -23,6 +23,8 @@
 package org.biojava.bio.seq.io;
 
 import java.util.NoSuchElementException;
+import java.io.Serializable;
+
 import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 
@@ -31,7 +33,8 @@ import org.biojava.bio.seq.*;
  *
  * @author Matthew Pocock
  */
-public class DefaultDescriptionReader implements FastaDescriptionReader {
+public class DefaultDescriptionReader
+implements FastaDescriptionReader, Serializable {
   /**
    * Parses the description line, extracting the names for the URI and name fields.
    * <P>

@@ -35,7 +35,7 @@ import org.biojava.bio.seq.*;
  * @author Thomas Down
  */
 
-public class SimpleFeatureBuilder implements FeatureBuilder {
+public class SimpleFeatureBuilder implements FeatureBuilder, Serializable {
     public Feature.Template buildFeatureTemplate(String type,
 						 Location loc,
 						 int strandHint,

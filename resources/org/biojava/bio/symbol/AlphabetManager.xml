@@ -325,30 +325,41 @@
       <description>The structure here is undetermined</description>
     </symbol>
     <symbol>
+      <short>c</short>
+      <long>coil</long>
+      <description>Random coil</description>
+    </symbol>
+    <symbol>
+      <short>h</short>
+      <long>alpha-helix</long>
+      <description>part of an alpha-helix</description>
+    </symbol>
+    <symbol>
       <short>g</short>
+      <long>3(10) helix</long>
+    </symbol>
+    <symbol>
+      <short>i</short>
+      <long>Pi-helix</long>
     </symbol>
     <symbol>
       <short>e</short>
       <long>sheet</long>
-      <description>part of an extended beta-sheet</description>
+      <description>part of an extended hydrogen bonded beta-strand (extended strand, logs of Bs)</description>
     </symbol>
     <symbol>
-      <short>h</short>
-      <long>helix</long>
-      <description>part of an alpha-helix</description>
+      <short>b</short>
+      <long>beta-bridge</long>
+      <description>like a lone E</description>
     </symbol>
     <symbol>
       <short>t</short>
       <long>turn</long>
     </symbol>
     <symbol>
-      <short>b</short>
-    </symbol>
-    <symbol>
       <short>s</short>
-    </symbol>
-    <symbol>
-      <short>i</short>
+      <long>bend</long>
+      <description>five-residue bend centred at residue i</description>
     </symbol>
   </alphabet>
 </alphabetManager>

@@ -22,8 +22,11 @@
 package org.biojava.bio.seq.db;
 
 import java.util.*;
+import java.io.*;
+
+import org.biojava.utils.StaticMemberPlaceHolder;
+import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
-import java.io.Serializable;
 
 /**
  * An implementation of SequenceDB that uses an underlying HashMap to stoor the
@@ -168,9 +171,21 @@ public class HashSequenceDB implements SequenceDB, Serializable {
    *
    * @author Matthew Pocock
    */
-  public final static IDMaker byURN = new IDMaker() {
+  public final static IDMaker byURN = new SerializableIDMaker() {
     public String calcID(Sequence seq) {
       return seq.getURN();
+    }
+    public Object writeReplace() throws IOException {
+      try {
+        return new StaticMemberPlaceHolder(
+          HashSequenceDB.class.getField("byURN")
+        );
+      } catch (NoSuchFieldException nsfe) {
+        throw new BioError(
+          nsfe,
+          "Could not find field while serializing"
+        );
+      }
     }
   };
   
@@ -179,9 +194,23 @@ public class HashSequenceDB implements SequenceDB, Serializable {
    *
    * @author Matthew Pocock
    */
-  public final static IDMaker byName = new IDMaker() {
+  public final static IDMaker byName = new SerializableIDMaker() {
     public String calcID(Sequence seq) {
       return seq.getName();
     }
+    public Object writeReplace() throws IOException {
+      try {
+        return new StaticMemberPlaceHolder(
+          HashSequenceDB.class.getField("byName")
+        );
+      } catch (NoSuchFieldException nsfe) {
+        throw new BioError(
+          nsfe,
+          "Could not find field while serializing"
+        );
+      }
+    }
   };
+  
+  private interface SerializableIDMaker extends IDMaker, Serializable {}
 }

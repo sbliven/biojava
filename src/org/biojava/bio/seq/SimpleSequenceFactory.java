@@ -21,6 +21,8 @@
 
 package org.biojava.bio.seq;
 
+import java.io.Serializable;
+
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
@@ -30,7 +32,7 @@ import org.biojava.bio.symbol.*;
  *
  * @author Matthew Pocock
  */
-public class SimpleSequenceFactory implements SequenceFactory {
+public class SimpleSequenceFactory implements SequenceFactory, Serializable {
   public Sequence createSequence(SymbolList resList,
                                  String uri, String name, Annotation annotation) {
     return new SimpleSequence(resList, uri, name, annotation);

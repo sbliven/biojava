@@ -35,7 +35,7 @@ import org.biojava.bio.seq.*;
  * @author Thomas Down
  */
 
-public class GenbankFormat implements SequenceFormat {
+public class GenbankFormat implements SequenceFormat, Serializable {
   private FeatureBuilder featureBuilder;
 
   /**

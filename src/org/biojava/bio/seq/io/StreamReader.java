@@ -116,14 +116,15 @@ public class StreamReader implements SequenceIterator {
   static public class Context {
     private BufferedReader reader;
 
-    BufferedReader getReader() {
+    public BufferedReader getReader() {
       return reader;
     }
 
-    void streamEmpty() {
+    public void streamEmpty() {
       reader = null;
     }
-    boolean isStreamEmpty() {
+    
+    public boolean isStreamEmpty() {
       return reader == null;
     }
 
