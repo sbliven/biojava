@@ -147,7 +147,10 @@ class SocketDatabase implements Database {
 		    if (line.charAt(0) <= 32) {
 			StringTokenizer lineToke = new StringTokenizer(line);
 			String name = lineToke.nextToken();
-			set.add(name, new SocketClassSet(dbURL.relative(name + '/'), set));
+			set.add(
+        name,
+        new SocketClazzSet(dbURL.relativeURL(name + '/'), set)
+      );
 		    }
 		}
 		allClassesSet = set;
@@ -193,7 +196,7 @@ class SocketDatabase implements Database {
         this,
         allClasses().retrieve(clazz),
         nameList,
-				dbURL.relative(clazz + '?' + namePattern)
+				dbURL.relativeURL(clazz + '?' + namePattern)
       );
 	} finally {
 	    if (sock != null)
@@ -208,7 +211,7 @@ class SocketDatabase implements Database {
     public AceObject getObject(String clazz, String name) 
             throws AceException
     {
-	String cacheName = clazz.getName() + ":" + name;
+	String cacheName = clazz + ":" + name;
 	AceObject o = (AceObject) getFromCache(cacheName);
 	if (o != null)
 	    return o;

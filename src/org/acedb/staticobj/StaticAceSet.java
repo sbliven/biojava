@@ -72,7 +72,7 @@ public class StaticAceSet implements AceSet {
   	    result = (AceSet) subSets.get(name);
       if(result == null)
         throw new AceException("Could not find child with the name '" +
-                               name + "'" + " in object " + getName()
+                               name
         );
       return result;
     }

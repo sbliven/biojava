@@ -53,6 +53,10 @@ class SocketClazzSet implements AceSet {
 	return allMembers().nameIterator();
     }
 
+    public Iterator iterator() throws AceException {
+	return allMembers().iterator();
+    }
+
     public boolean contains(String name) throws AceException {
 	return allMembers().contains(name);
     }
