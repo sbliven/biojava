@@ -196,7 +196,7 @@ public interface Feature extends FeatureHolder, Annotatable {
             // necessary.
             if (f1.getLocation().getMin() > f2.getLocation().getMin())
                 return 1;
-            else if ( f1.getLocation().getMin() < f2.getLocation().getMin())
+            else if (f1.getLocation().getMin() < f2.getLocation().getMin())
                 return -1;
             else
                 return 0;

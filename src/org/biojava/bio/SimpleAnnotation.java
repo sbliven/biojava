@@ -194,7 +194,7 @@ public class SimpleAnnotation implements Annotation, Serializable {
       } catch (IllegalArgumentException iae) {
         throw new BioError(
           iae,
-          "Property was there and then dissapeared: " + key
+          "Property was there and then disappeared: " + key
         );
       }
     }

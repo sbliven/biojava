@@ -104,7 +104,7 @@ public interface ChangeListener extends EventListener {
     public void postChange(ChangeEvent cev) {
       throw new NestedError(
         new ChangeVetoException(
-          cev, "This object sas been locked"
+          cev, "This object has been locked"
         ),
         "Assertion failure: A locked object has been modified"
       );

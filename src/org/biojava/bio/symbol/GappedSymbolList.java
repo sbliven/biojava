@@ -62,7 +62,7 @@ extends AbstractSymbolList implements Serializable {
   private final ArrayList blocks;
   
   /**
-   * The total length of the alignment - necisary to allow leading & trailing gaps.
+   * The total length of the alignment - necessary to allow leading & trailing gaps.
    */
   private int length;
   

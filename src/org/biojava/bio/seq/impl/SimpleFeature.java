@@ -58,7 +58,7 @@ implements Feature, RealizingFeatureHolder, java.io.Serializable {
    */
   private String type;
   /**
-   * The source of this feature - the program that generated it.,
+   * The source of this feature - the program that generated it.
    * This is included for cheap interoperability with GFF.
    */
   private String source;
@@ -74,7 +74,7 @@ implements Feature, RealizingFeatureHolder, java.io.Serializable {
  
   /**
    * A utility function to retrieve the feature holder delegate, creating it if
-   * necisary.
+   * necessary.
    *
    * @return  the FeatureHolder delegate
    */

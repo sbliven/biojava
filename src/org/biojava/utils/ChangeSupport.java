@@ -114,7 +114,7 @@ public class ChangeSupport {
 	  throw new NestedError("Since 1.2, listeners registered for the null changetype are not meaningful.  Please register a listener for ChangeType.UNKNOWN instead");
       }
 
-      growIfNecisary();
+      growIfNecessary();
       types[listenerCount] = ct;
       listeners[listenerCount] = new WeakReference(cl);
       listenerCount++;
@@ -124,7 +124,7 @@ public class ChangeSupport {
    * Grows the internal resources if by adding one more listener they would be
    * full.
    */
-  protected void growIfNecisary() {
+  protected void growIfNecessary() {
     if(listenerCount == listeners.length) {
       int newLength = listenerCount + delta;
       Reference[] newList = new Reference[newLength];
