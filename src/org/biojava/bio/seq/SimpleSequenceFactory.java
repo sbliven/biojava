@@ -31,10 +31,26 @@ import org.biojava.bio.symbol.*;
  * objects.
  *
  * @author Matthew Pocock
+ * @author Thomas Down
  */
 public class SimpleSequenceFactory implements SequenceFactory, Serializable {
-  public Sequence createSequence(SymbolList resList,
-                                 String uri, String name, Annotation annotation) {
-    return new SimpleSequence(resList, uri, name, annotation);
-  }
+    private FeatureRealizer realizer = SimpleFeatureRealizer.DEFAULT;
+
+    public FeatureRealizer getFeatureRealizer() {
+	return realizer;
+    }
+
+    /**
+     * Set the FeatureRealizer used by new sequences created by this
+     * factory.
+     */
+
+    public void setFeatureRealizer(FeatureRealizer fr) {
+	realizer = fr;
+    }
+
+    public Sequence createSequence(SymbolList resList,
+				   String uri, String name, Annotation annotation) {
+	return new SimpleSequence(resList, uri, name, annotation, realizer);
+    }
 }
