@@ -40,25 +40,29 @@ implements FeatureRenderer {
   public static final ChangeType FILL = new ChangeType(
     "The fill paint has changed",
     "org.biojava.bio.gui.sequence.BasicFeatureRenderer",
-    "FILL"
+    "FILL",
+    SequenceRenderContext.REPAINT
   );
   
   public static final ChangeType OUTLINE = new ChangeType(
     "The outline paint has changed",
     "org.biojava.bio.gui.sequence.BasicFeatureRenderer",
-    "OUTLINE"
+    "OUTLINE",
+    SequenceRenderContext.REPAINT
   );
   
   public static final ChangeType SIZE = new ChangeType(
     "The size of the arrow has changed",
     "org.biojava.bio.gui.sequence.BasicFeatureRenderer",
-    "SIZE"
+    "SIZE",
+    SequenceRenderContext.LAYOUT
   );
   
   public static final ChangeType SCOOP = new ChangeType(
     "The scoop of the arror has changed",
     "org.biojava.bio.gui.sequence.BasicFeatureRenderer",
-    "SCOOP"
+    "SCOOP",
+    SequenceRenderContext.REPAINT
   );
 
   private Paint fill;

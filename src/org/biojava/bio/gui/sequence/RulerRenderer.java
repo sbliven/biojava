@@ -69,9 +69,9 @@ public class RulerRenderer implements SequenceRenderer {
     Line2D line;
     
     if(src.getDirection() == src.HORIZONTAL) {
-      line = new Line2D.Double(minX + halfScale, 0.0, maxX + halfScale, 0.0);
+      line = new Line2D.Double(minX - halfScale, 0.0, maxX + halfScale, 0.0);
     } else {
-      line = new Line2D.Double(0.0, minX + halfScale, 0.0, maxX + halfScale);
+      line = new Line2D.Double(0.0, minX - halfScale, 0.0, maxX + halfScale);
     }
     
     g.draw(line);

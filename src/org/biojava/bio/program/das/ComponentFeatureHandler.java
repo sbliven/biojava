@@ -86,7 +86,7 @@ public class ComponentFeatureHandler extends StrandedFeatureHandler {
 		    throws SAXException
 		{
 		    try {
-			setFeatureProperty("sequence.id", s);
+			ComponentFeatureHandler.this.setFeatureProperty("sequence.id", s);
 		    } catch (Exception ex) {
 			throw new SAXException("Couldn't set property", ex);
 		    }
