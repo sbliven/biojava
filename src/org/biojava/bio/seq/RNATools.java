@@ -45,10 +45,10 @@ public final class RNATools {
   static private final FiniteAlphabet rna;
   static private final Map geneticCodes;
 
-  static private final Symbol a;
-  static private final Symbol g;
-  static private final Symbol c;
-  static private final Symbol u;
+  static private final AtomicSymbol a;
+  static private final AtomicSymbol g;
+  static private final AtomicSymbol c;
+  static private final AtomicSymbol u;
 
   static private Map symbolToComplement;
 
@@ -56,10 +56,10 @@ public final class RNATools {
     try {
       rna = (FiniteAlphabet) AlphabetManager.alphabetForName("RNA");
       SymbolList syms = rna.getParser("token").parse("agcu");
-      a = syms.symbolAt(1);
-      g = syms.symbolAt(2);
-      c = syms.symbolAt(3);
-      u = syms.symbolAt(4);
+      a = (AtomicSymbol) syms.symbolAt(1);
+      g = (AtomicSymbol) syms.symbolAt(2);
+      c = (AtomicSymbol) syms.symbolAt(3);
+      u = (AtomicSymbol) syms.symbolAt(4);
 
       symbolToComplement = new HashMap();
 
@@ -87,10 +87,10 @@ public final class RNATools {
     }
   }
 
-  public static Symbol a() { return a; }
-  public static Symbol g() { return g; }
-  public static Symbol c() { return c; }
-  public static Symbol u() { return u; }
+  public static AtomicSymbol a() { return a; }
+  public static AtomicSymbol g() { return g; }
+  public static AtomicSymbol c() { return c; }
+  public static AtomicSymbol u() { return u; }
 
   /**
    * Return the RNA alphabet.
@@ -393,22 +393,64 @@ public final class RNATools {
       throw new BioError(e, "Couldn't parse TranslationTables.xml");
     }
   }
-}
-
+  
+  private abstract static class AbstractTT
+  implements ReversibleTranslationTable {
+    protected abstract AtomicSymbol doTranslate(AtomicSymbol sym)
+    throws IllegalSymbolException;
+    protected abstract AtomicSymbol doUntranslate(AtomicSymbol sym)
+    throws IllegalSymbolException;
+    
+    
+    public Symbol translate(Symbol s)
+    throws IllegalSymbolException {
+      if(s instanceof AtomicSymbol) {
+        return doTranslate((AtomicSymbol) s);
+      } else {
+        Set syms = new HashSet();
+        for(
+          Iterator i = ((FiniteAlphabet) s.getMatches()).iterator();
+          i.hasNext();
+        ) {
+          AtomicSymbol is = (AtomicSymbol) i.next();
+          syms.add(doTranslate(is));
+        }
+        return getTargetAlphabet().getAmbiguity(syms);
+      }
+    }
+    
+    public Symbol untranslate(Symbol s)
+    throws IllegalSymbolException {
+      if(s instanceof AtomicSymbol) {
+        return doUntranslate((AtomicSymbol) s);
+      } else {
+        Set syms = new HashSet();
+        for(
+          Iterator i = ((FiniteAlphabet) s.getMatches()).iterator();
+          i.hasNext();
+        ) {
+          AtomicSymbol is = (AtomicSymbol) i.next();
+          syms.add(doUntranslate(is));
+        }
+        return getSourceAlphabet().getAmbiguity(syms);
+      }
+    }
+  }
+  
   /**
    * Sneaky class for complementing RNA bases.
    */
 
-  /*private static*/ class RNAComplementTranslationTable
-  implements ReversibleTranslationTable {
-    public Symbol translate(Symbol s)
+  private static class RNAComplementTranslationTable
+  extends AbstractTT {
+    public AtomicSymbol doTranslate(AtomicSymbol s)
 	  throws IllegalSymbolException {
-	    return RNATools.complement(s);
+	    return (AtomicSymbol) RNATools.complement(s);
 	  }
 
-	  public Symbol untranslate(Symbol s)
+	  public AtomicSymbol doUntranslate(AtomicSymbol s)
 	  throws IllegalSymbolException {
-	    return RNATools.complement(s);
+	    return (AtomicSymbol) RNATools.complement(s);
     }
 
 	  public Alphabet getSourceAlphabet() {
@@ -424,9 +466,9 @@ public final class RNATools {
    * Sneaky class for converting DNA->RNA.
    */
 
-  /*private static*/ class TranscriptionTable
-  implements ReversibleTranslationTable {
-    public Symbol translate(Symbol s)
+  private static class TranscriptionTable
+  extends AbstractTT {
+    public AtomicSymbol doTranslate(AtomicSymbol s)
     throws IllegalSymbolException {
       if(s == DNATools.t()) {
         return RNATools.u();
@@ -435,7 +477,7 @@ public final class RNATools {
       return s;
     }
 
-    public Symbol untranslate(Symbol s)
+    public AtomicSymbol doUntranslate(AtomicSymbol s)
     throws IllegalSymbolException {
       if(s == RNATools.u()) {
         return DNATools.t();
@@ -452,4 +494,5 @@ public final class RNATools {
       return RNATools.getRNA();
     }
   }
+}
 

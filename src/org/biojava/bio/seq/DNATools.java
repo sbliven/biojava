@@ -37,10 +37,10 @@ public final class DNATools {
   private static final ReversibleTranslationTable complementTable;
   static private final FiniteAlphabet dna;
   
-  static private final Symbol a;
-  static private final Symbol g;
-  static private final Symbol c;
-  static private final Symbol t;
+  static private final AtomicSymbol a;
+  static private final AtomicSymbol g;
+  static private final AtomicSymbol c;
+  static private final AtomicSymbol t;
     
   static private Map symbolToComplement;
 
@@ -48,10 +48,10 @@ public final class DNATools {
     try {
       dna = (FiniteAlphabet) AlphabetManager.alphabetForName("DNA");
       SymbolList syms = dna.getParser("token").parse("agct");
-      a = syms.symbolAt(1);
-      g = syms.symbolAt(2);
-      c = syms.symbolAt(3);
-      t = syms.symbolAt(4);
+      a = (AtomicSymbol) syms.symbolAt(1);
+      g = (AtomicSymbol) syms.symbolAt(2);
+      c = (AtomicSymbol) syms.symbolAt(3);
+      t = (AtomicSymbol) syms.symbolAt(4);
       
       symbolToComplement = new HashMap();
 
@@ -75,10 +75,10 @@ public final class DNATools {
     }
   }
   
-  public static Symbol a() { return a; }
-  public static Symbol g() { return g; }
-  public static Symbol c() { return c; }
-  public static Symbol t() { return t; }
+  public static AtomicSymbol a() { return a; }
+  public static AtomicSymbol g() { return g; }
+  public static AtomicSymbol c() { return c; }
+  public static AtomicSymbol t() { return t; }
 
   /**
    * Return the DNA alphabet.

@@ -40,6 +40,7 @@ import org.biojava.bio.symbol.*;
  */
 
 public class AssembledSymbolList extends AbstractSymbolList {
+  private boolean autoLength = true;
     private int length = 0;
 
     private SortedMap components;
@@ -61,6 +62,7 @@ public class AssembledSymbolList extends AbstractSymbolList {
     }
 
     public void setLength(int len) {
+    autoLength = false;
 	length = len;
     }
 
@@ -71,6 +73,9 @@ public class AssembledSymbolList extends AbstractSymbolList {
     }
 
     public void putComponent(Location l, SymbolList sl) {
+      if(sl == this) {
+        throw new NestedError("Circular reference");
+      }
 	components.put(l, sl);
 	componentList.clear();
 	componentList.addAll(components.keySet());
@@ -82,15 +87,15 @@ public class AssembledSymbolList extends AbstractSymbolList {
 	componentList.addAll(components.keySet());
     }
 
-    public SymbolList getComponentSymbols(Location loc) {
-	Object o = components.get(loc);
-	if (o instanceof ComponentFeature) {
-	    ComponentFeature cf = (ComponentFeature) o;
-	    return cf.getSymbols();
-	} else {
-	    return (SymbolList) o;
-	}
+  public SymbolList getComponentSymbols(Location loc) {
+    Object o = components.get(loc);
+    if (o instanceof ComponentFeature) {
+      ComponentFeature cf = (ComponentFeature) o;
+      return cf.getSymbols();
+    } else {
+      return (SymbolList) o;
     }
+  }
 
     public Set getComponentLocationSet() {
 	return components.keySet();
@@ -103,29 +108,31 @@ public class AssembledSymbolList extends AbstractSymbolList {
 
     private Location lastLocation = Location.empty;
 
-    public Location locationOfPoint(int p) {
-	if (lastLocation.contains(p))
-	    return lastLocation;
-
-	int first = 0;
-	int last = componentList.size() - 1;
-	
-	while (first <= last) {
-	    int check = (first + last) / 2;
-	    Location checkL = (Location) componentList.get(check);
-	    if (checkL.contains(p)) {
-		lastLocation = checkL;
-		return checkL;
-	    }
-
-	    if (p < checkL.getMin())
-		last = check - 1;
-	    else
-		first = check + 1;
-	}
-	
-	return null;
+  public Location locationOfPoint(int p) {
+    if (lastLocation.contains(p)) {
+      return lastLocation;
     }
+
+    int first = 0;
+    int last = componentList.size() - 1;
+
+    while (first <= last) {
+      int check = (first + last) / 2;
+      Location checkL = (Location) componentList.get(check);
+      if (checkL.contains(p)) {
+        lastLocation = checkL;
+        return checkL;
+      }
+
+      if (p < checkL.getMin()) {
+        last = check - 1;
+      } else {
+        first = check + 1;
+      }
+    }
+
+    return null;
+  }
 
     public Location locationUpstreamOfPoint(int p) {
 	int first = 0;
@@ -163,35 +170,42 @@ public class AssembledSymbolList extends AbstractSymbolList {
     }
 
     public int length() {
-	return length;
+      if(autoLength) {
+        Location last = (Location) componentList.get(componentList.size() - 1);
+        return last.getMax();
+      } else {
+        return length;
+      }
     }
 
-    public Symbol symbolAt(int pos) {
-	Location l = locationOfPoint(pos);
-	if (l != null) {
-	    SymbolList syms = getComponentSymbols(l);
-	    return syms.symbolAt(pos - l.getMin() + 1);
-	}
-
-	return N;
+  public Symbol symbolAt(int pos) {
+    System.out.println(this + "  symbolAt(" + pos + ")");
+    Location l = locationOfPoint(pos);
+    if (l != null) {
+      SymbolList syms = getComponentSymbols(l);
+      return syms.symbolAt(pos - l.getMin() + 1);
     }
 
-    public SymbolList subList(int start, int end) {
-	Location l = locationOfPoint(start);
-	if (l != null && l.contains(end)) {
-	    SymbolList symbols = getComponentSymbols(l);
-	    int tstart = start - l.getMin() + 1;
-	    int tend = end - l.getMin() + 1;
-	    return symbols.subList(tstart, tend);
-	}
+    return N;
+  }
 
-	// All is lost.  Fall back onto `view' subList from AbstractSymbolList
-
-	return super.subList(start, end);
+  public SymbolList subList(int start, int end) {
+    System.out.println(this + "  subList(" + start + ", " + end + ")");
+    Location l = locationOfPoint(start);
+    if (l != null && l.contains(end)) {
+      SymbolList symbols = getComponentSymbols(l);
+      int tstart = start - l.getMin() + 1;
+      int tend = end - l.getMin() + 1;
+      return symbols.subList(tstart, tend);
     }
+
+    // All is lost.  Fall back onto `view' subList from AbstractSymbolList
+
+    return super.subList(start, end);
+  }
 
     public String subStr(int start, int end) {
-	if (start < 1 || end > length) {
+	if (start < 1 || end > length()) {
 	    throw new IndexOutOfBoundsException("Range out of bounds: " + start + " - " + end);
 	}
 

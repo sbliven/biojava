@@ -25,10 +25,11 @@ package org.biojava.bio.symbol;
  * Factory methods for constructing useful views onto SymbolLists.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.1
  */
 
-public class SymbolListViews {
+public final class SymbolListViews {
   private SymbolListViews() {}
   
     /**
