@@ -32,12 +32,15 @@ import java.net.Socket ;
 /** reads a PDB file from a local SRS installation using getz Actually
  * is the same as PDBFileReader, but instead of reading from a file stream, reads from a
  * buffered stream.
+ *
+ * @author Andreas Prlic
+ *
 */
 
 public class PDBSRSReader extends PDBFileReader {  
     
 
-    private BufferedReader getBufferedReader() 
+    private  BufferedReader getBufferedReader() 
 	throws IOException
     {
 	// getz -view PDBdata '[pdb:5pti] 
@@ -78,15 +81,21 @@ public class PDBSRSReader extends PDBFileReader {
 	input  = new DataInputStream(client.getInputStream());
 	BufferedReader buf = new BufferedReader (new InputStreamReader (input));
 	
+	System.out.println("sending: --pdb " + pdb_code.toLowerCase());
 	output = new PrintStream(client.getOutputStream());	  
-	output.println("--pdb "+ pdb_code);
+	output.println("--pdb "+ pdb_code.toLowerCase());
 	output.flush();
 	
-	// get its output (your input) stream
+	// check if return is O.K.
+	buf.mark(100);
+	String line = buf.readLine();
+
+	buf.reset();
+	if ( line.equals("no match")) {
+	    System.out.println("first line: " + line );
+	    throw new IOException("no pdb with code "+pdb_code.toLowerCase() +" found");	    
+	}
 	
-	//DataInputStream instr = new DataInputStream(proc.getInputStream());
-	//InputStream instr = proc.getInputStream() ;
-	//BufferedReader buf = new BufferedReader (new InputStreamReader (instr));
 	return buf ;
 
 
@@ -96,7 +105,7 @@ public class PDBSRSReader extends PDBFileReader {
      /** load a structure from from SRS installation using wgetz
      * requires pdb_code to be set earlier...
      */
-    public Structure getStructure() 
+    public synchronized Structure getStructure() 
 	throws IOException
     {
 	
@@ -111,22 +120,24 @@ public class PDBSRSReader extends PDBFileReader {
 	}
 	return null ;
 	*/
+	Structure s = null ;
 	try{	    
-	    System.out.println("Starting to parse PDB file " + getTimeStamp());
-	    parsePDBFile(buf) ;
-	    System.out.println("Done parsing PDB file " + getTimeStamp());
+	    //System.out.println("Starting to parse PDB file " + getTimeStamp());
+	    s = parsePDBFile(buf) ;
+	    //System.out.println("Done parsing PDB file " + getTimeStamp());
 	} catch(Exception ex){
 	    ex.printStackTrace();
 	}
 
-	return structure ;
+	notifyAll();
+	return s ;
 	
     }
 
     /** open filename (does not support compressed files!) and returns
      * a PDBStructure object 
      */
-    public Structure getStructure(String filename) 
+    public synchronized Structure getStructure(String filename) 
 	throws IOException
     {
 	
@@ -139,6 +150,7 @@ public class PDBSRSReader extends PDBFileReader {
 	    throw new IOException();
 	}
 
+	notifyAll();
 	return s ;
 
 
