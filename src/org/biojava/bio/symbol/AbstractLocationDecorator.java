@@ -36,21 +36,21 @@ import java.util.Iterator;
  */
 public abstract class AbstractLocationDecorator implements Location {
   private final Location wrapped;
-  
+
   /**
    * Construct a new decorator wrapping the specified Location.
    */
-  
+
   protected AbstractLocationDecorator(Location wrapped) {
     this.wrapped = wrapped;
   }
-  
+
   protected final Location getWrapped() {
     return wrapped;
   }
-  
+
   protected abstract Location decorate(Location loc);
-  
+
   public Location newInstance(Location loc) {
     if(loc instanceof AbstractLocationDecorator) {
       Location wrapped = ((AbstractLocationDecorator) loc).getWrapped();
@@ -58,7 +58,7 @@ public abstract class AbstractLocationDecorator implements Location {
     }
     return decorate(loc);
   }
-  
+
   public Location getDecorator(Class decoratorClass) {
     if(decoratorClass.isInstance(this)) {
       return this;
@@ -66,7 +66,7 @@ public abstract class AbstractLocationDecorator implements Location {
       return getWrapped().getDecorator(decoratorClass);
     }
   }
-  
+
   public int getMin() {
     return getWrapped().getMin();
   }
@@ -74,43 +74,43 @@ public abstract class AbstractLocationDecorator implements Location {
   public int getMax() {
     return getWrapped().getMax();
   }
-  
+
   public boolean overlaps(Location l) {
     return getWrapped().overlaps(l);
   }
-  
+
   public boolean contains(Location l) {
-    return getWrapped().contains(l); 
+    return getWrapped().contains(l);
   }
-  
+
   public boolean contains(int p) {
     return getWrapped().contains(p);
   }
-  
+
   public boolean equals(Object o) {
     return getWrapped().equals(o);
   }
-  
+
   public Location intersection(Location l) {
     return getWrapped().intersection(l);
   }
-  
+
   public Location union(Location l) {
     return getWrapped().union(l);
   }
-  
+
   public SymbolList symbols(SymbolList seq) {
     return getWrapped().symbols(seq);
   }
-  
+
   public Location translate(int dist) {
     return decorate(getWrapped().translate(dist));
   }
-  
+
   public boolean isContiguous() {
     return getWrapped().isContiguous();
   }
-  
+
   public Iterator blockIterator() {
     return getWrapped().blockIterator();
   }

@@ -121,11 +121,13 @@ extends ReparentContext {
   }
 
   public Location projectLocation(Location oldLoc) {
-    return ProjectionUtils.transformLocation(oldLoc, translation, oppositeStrand);
+    return oldLoc.newInstance(ProjectionUtils.transformLocation(
+            oldLoc, translation, oppositeStrand));
   }
 
   public final Location revertLocation(Location oldLoc) {
-    return ProjectionUtils.revertLocation(oldLoc, translation, oppositeStrand);
+    return oldLoc.newInstance(ProjectionUtils.revertLocation(
+            oldLoc, translation, oppositeStrand));
   }
 
   public final StrandedFeature.Strand projectStrand(StrandedFeature.Strand strand) {

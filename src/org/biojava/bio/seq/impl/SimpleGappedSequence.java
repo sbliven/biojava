@@ -46,94 +46,94 @@ public class SimpleGappedSequence
 extends SimpleGappedSymbolList
 implements GappedSequence {
   private Sequence sequence;
-  
+
   private MergeFeatureHolder features;
   private SimpleFeatureHolder localFeatures;
   private FeatureHolder projectedFeatures;
-  
+
   private boolean createOnUnderlying;
-  
+
   public SimpleGappedSequence(Sequence seq) {
     super(seq);
     this.sequence = seq;
     createOnUnderlying = false;
   }
-  
+
   public boolean getCreateOnUnderlyingSequence() {
     return createOnUnderlying;
   }
-  
+
   public void setCreateOnUnderlyingSequence(boolean underlying) {
     this.createOnUnderlying = underlying;
   }
-  
+
   public Annotation getAnnotation() {
     return sequence.getAnnotation();
   }
-  
+
   public String getName() {
     return sequence.getName();
   }
-  
+
   public String getURN() {
     return sequence.getURN();
   }
-  
+
   private FeatureHolder getFeatures() {
     if (features == null) {
       features = makeFeatures();
     }
     return features;
   }
-  
+
   private MergeFeatureHolder makeFeatures() {
     projectedFeatures = new ProjectedFeatureHolder(
             new GappedContext());
-    
+
     localFeatures = new SimpleFeatureHolder();
-    
+
     features = new MergeFeatureHolder();
-    
+
     try {
       features.addFeatureHolder(projectedFeatures);
       features.addFeatureHolder(localFeatures);
     } catch (ChangeVetoException cve) {
       throw new AssertionFailure("Assertion Failure: Should be able to do this", cve);
     }
-    
+
     return features;
   }
-  
+
   public Iterator features() {
     return getFeatures().features();
   }
-  
+
   public FeatureHolder filter(FeatureFilter ff) {
     return getFeatures().filter(ff);
   }
-  
+
   public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
     return getFeatures().filter(ff, recurse);
   }
-  
+
   public int countFeatures() {
     return getFeatures().countFeatures();
   }
-  
+
   public boolean containsFeature(Feature f) {
     return getFeatures().containsFeature(f);
   }
-  
+
   public FeatureFilter getSchema() {
     return getFeatures().getSchema();
   }
-  
+
   public void removeFeature(Feature f)
   throws ChangeVetoException, BioException
   {
     getFeatures().removeFeature(f);
   }
-  
+
   public Feature createFeature(Feature.Template templ)
   throws ChangeVetoException, BioException
   {
@@ -153,11 +153,11 @@ implements GappedSequence {
     }
 
     public Location projectLocation(Location loc) {
-      return locationToGapped(loc);
+      return loc.newInstance(locationToGapped(loc));
     }
 
     public Location mapLocation(Location loc) {
-      return locationToGapped(loc);
+      return loc.newInstance(locationToGapped(loc));
     }
 
     public Location revertLocation(Location oldLoc) {

@@ -128,6 +128,12 @@ import org.biojava.utils.*;
  * do a lot of complex work for you.
  *
  * @for.developer
+ * When projecting an original location <code>origLoc</code> to your new
+ * location <code>yourLoc</code>, be sure to make sure the decorations match.
+ * The easiest way to do this is return
+ * <code>origLoc.newInstance(yourLoc)</code>. 
+ *
+ * @for.developer
  * Every ProjectionContext implementation must be a public or package-private
  * class. This is
  * because ProjectionEngine wires method calls from the projected features back
