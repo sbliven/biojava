@@ -124,40 +124,12 @@ class BioSQLFeatureAnnotation implements Annotation {
     private void persistProperty(Object key, Object value)
         throws ChangeVetoException
     {
-	String keyString = key.toString();
-
-	System.err.println("*** in persistProperty for " + keyString);
-
 	Connection conn = null;
 	try {
 	    conn = seqDB.getPool().takeConnection();
 	    conn.setAutoCommit(false);
 
-	    int id = seqDB.intern_seqfeature_qualifier(conn, keyString);
-
-	    PreparedStatement remove_old_value = conn.prepareStatement("delete from seqfeature_qualifier_value " +
-								       " where seqfeature_id = ? and seqfeature_qualifier_id = ?");
-	    remove_old_value.setInt(1, feature_id);
-	    remove_old_value.setInt(2, id);
-	    remove_old_value.executeUpdate();
-	    remove_old_value.close();
-
-	    PreparedStatement insert_new = conn.prepareStatement("insert into seqfeature_qualifier_value (seqfeature_id, seqfeature_qualifier_id, seqfeature_qualifier_rank, qualifier_value) values (?, ?, ?, ?)");
-	    insert_new.setInt(1, feature_id);
-	    insert_new.setInt(2, id);
-	    if (value instanceof Collection) {
-		int cnt = 0;
-		for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
-		    insert_new.setInt(3, ++cnt);
-		    insert_new.setString(4, i.next().toString());
-		    insert_new.executeUpdate();
-		}
-	    } else {
-		insert_new.setInt(3, 1);
-		insert_new.setString(4, value.toString());
-		insert_new.executeUpdate();
-	    }
-	    insert_new.close();
+	    seqDB.persistProperty(conn, feature_id, key, value, true);
 
 	    conn.commit();
 	    seqDB.getPool().putConnection(conn);
