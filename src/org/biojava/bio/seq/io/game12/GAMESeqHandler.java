@@ -43,20 +43,16 @@ public class GAMESeqHandler
     // this means that I can safely omit the duplicate entry without
     // risking that some nested element within it goes wrong.
 
-    private static String tableName = "seq";
-    private static int tableId = -32767;
-
     //database columns
     private String release;
-    private String id;
-    private String name;
-    private String type;
+    private String seqId;
+    private String seqName;
     private String description;
 
     private int seqLength = 0;
-    private byte[] buffer = null;
-    private boolean hasResidues = false;
-    private boolean nonUniqueEntry = false;
+//    private byte[] buffer = null;
+//    private boolean hasResidues = false;
+//    private boolean nonUniqueEntry = false;
 
     // set up factory method
     /**
@@ -118,7 +114,7 @@ public class GAMESeqHandler
          *@param  s  The new stringValue value
          */
         protected void setStringValue(String s) {
-            name = s.trim();
+            seqName = s.trim();
         }
     }
 
@@ -166,7 +162,20 @@ public class GAMESeqHandler
             String localName,
             String qName,
             Attributes attrs)
-             throws SAXException {
+             throws SAXException 
+    {
+        // pick up attributes
+        seqId = attrs.getValue("id").trim();        
+        String length = attrs.getValue("length").trim();        
+
+        // return results
+        try {
+            listener.setName(seqId);
+            listener.addSequenceProperty("length", length);
+        }
+        catch (ParseException pe) {
+            throw new SAXException("could not set sequence properties.");
+        }
     }
 
 

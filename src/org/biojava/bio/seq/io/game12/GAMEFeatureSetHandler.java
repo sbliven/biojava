@@ -161,8 +161,8 @@ public class GAMEFeatureSetHandler
             }
         );
         // <seq>
-        super.addHandler(new ElementRecognizer.ByLocalName("seq"),
-                GAMESeqHandler.GAME_SEQ_HANDLER_FACTORY);
+//        super.addHandler(new ElementRecognizer.ByLocalName("seq"),
+//                GAMESeqHandler.GAME_SEQ_HANDLER_FACTORY);
     }
 
     private class NameHandler extends StringElementHandlerBase {
