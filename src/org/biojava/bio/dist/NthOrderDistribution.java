@@ -1,6 +1,7 @@
 package org.biojava.bio.dist;
 
 import java.util.*;
+import java.io.*;
 
 import org.biojava.utils.*;
 import org.biojava.bio.symbol.*;
@@ -11,7 +12,7 @@ import org.biojava.bio.symbol.*;
  * @author Samiul Hasan
  * @author Matthew Pocock
  */
-public class NthOrderDistribution extends AbstractDistribution {
+public class NthOrderDistribution extends AbstractDistribution implements Serializable {
   private CrossProductAlphabet alphabet;
   private Alphabet firstA;
   private Alphabet lastA;
