@@ -73,7 +73,8 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
     protected static String DB_USER = "sa";
     protected static String DB_PW = "";
     protected static String DB_BIODB = "biosql";
-    protected static String DB_CREATE_RESOURCE = "files/biosqldb-hsqldb.sql";
+    protected static String DB_CREATE_RESOURCE = "biosqldb-hsqldb.sql";
+    protected static String DB_DROP_RESOURCE = "drop-biosqldb-hsqldb.sql";
 
 
 
@@ -154,10 +155,10 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
 
     protected void loadSchema(Connection connection) throws IOException, SQLException {
         if (CREATE_SQL == null) {
-            InputStream res = ClassLoader.getSystemClassLoader()
+            InputStream res = getClass().getClassLoader()
                     .getResourceAsStream(DB_CREATE_RESOURCE);
-            assertNotNull("Resource must not be null: " + DB_CREATE_RESOURCE,
-                          res);
+            assert res != null
+                    : "Resource " + DB_CREATE_RESOURCE + " could not be located";
             BufferedReader br = new BufferedReader(new InputStreamReader(res));
             CREATE_SQL = readAll(br);
             br.close();
@@ -170,11 +171,10 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
 
     protected void dropSchema(Connection connection) throws IOException, SQLException {
         if (DROP_SQL == null) {
-            String dropResource = "files/drop-biosqldb-hsqldb.sql";
-            InputStream res = ClassLoader.getSystemClassLoader()
-                    .getResourceAsStream(dropResource);
-            assertNotNull("Resource must not be null: " + dropResource,
-                          res);
+            InputStream res = getClass().getClassLoader()
+                    .getResourceAsStream(DB_DROP_RESOURCE);
+            assert res != null
+                    : "Resource " + DB_DROP_RESOURCE + " could not be located";
             BufferedReader br = new BufferedReader(new InputStreamReader(res));
             DROP_SQL = readAll(br);
             br.close();
