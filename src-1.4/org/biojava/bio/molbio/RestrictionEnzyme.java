@@ -21,6 +21,7 @@
 
 package org.biojava.bio.molbio;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
 import org.biojava.bio.BioError;
@@ -34,14 +35,14 @@ import org.biojava.bio.symbol.SymbolList;
 /**
  * <code>RestrictionEnzyme</code> represents a restriction enzyme
  * according to the REBASE standard. The cut positions are indicated
- * relative to the 5' end of the recognition site and occur to the
- * right of the given residue. Note that some enzmyes cut in more than
- * one position and that cut positions may occur outside the
- * recognition site.
+ * relative to the 5' end of the recognition site and occur downstream
+ * of the given residue. Note that some enzmyes cut in more than one
+ * position and that cut positions may occur outside the recognition
+ * site.
  *
  * @author Keith James
  */
-public class RestrictionEnzyme
+public class RestrictionEnzyme implements Serializable
 {
     /**
      * <code>OVERHANG_5PRIME</code> the sticky end type created by
@@ -75,7 +76,8 @@ public class RestrictionEnzyme
      * Creates a new <code>RestrictionEnzyme</code> which cuts with or
      * downstream of the recognition site. The cut position indices
      * are <strong>always</strong> in the same coordinate space as the
-     * recognition site.
+     * recognition site. <code>RestrictionEnzyme</code>s are
+     * immutable.
      *
      * @param name a <code>String</code> such as EcoRI.
      * @param site a <code>SymbolList</code> recognition site.
@@ -268,7 +270,7 @@ public class RestrictionEnzyme
     }
 
     /**
-     * <code>getDownstreamCut</code> returns the cut site upstream of
+     * <code>getUpstreamCut</code> returns the cut site upstream of
      * the recognition site.
      *
      * @return an <code>int []</code> array with the position in the
