@@ -1036,8 +1036,9 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
 	    try {
 		spaSupported = false;
 		Connection conn = pool.takeConnection();
-		PreparedStatement ps = conn.prepareStatement("select biosql_accelerators_level()");
+		PreparedStatement ps = null;
 		try {
+                    ps = conn.prepareStatement("select biosql_accelerators_level()");
 		    ResultSet rs = ps.executeQuery();
 		    if (rs.next()) {
 			int level = rs.getInt(1);
@@ -1049,7 +1050,9 @@ public class BioSQLSequenceDB extends AbstractChangeable implements SequenceDB {
                     rs.close();
 		} catch (SQLException ex) {
 		}
-		ps.close();
+                if (ps != null) {
+                    ps.close();
+                }
 		pool.putConnection(conn);
 
 		spaChecked = true;
