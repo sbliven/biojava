@@ -4,7 +4,7 @@ package org.biojava.utils;
  * utility methods for implementing the equals() and hashCode() methods of Objects.
  * All credit for this class goes to Mark Davis (Java Report 5(1), 46; Java Report 5(4), 60).
  * <p>
- * All equals() methods in this class take the two fields to compare for equaility as arguments and return whether they
+ * All equals() methods in this class take the two fields to compare for equality as arguments and return whether they
  * are equal. Consequently, the equals() method of class AClass should be implemented (taking advantage of the equals() 
  * methods in this class) as follows:
  * <pre>
