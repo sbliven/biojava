@@ -18,11 +18,24 @@ import org.biojava.bio.seq.impl.*;
  */
 
 public class SimpleSequenceBuilder implements SequenceBuilder {
-    public final static SequenceBuilderFactory FACTORY = new SequenceBuilderFactory() {
+    public final static SequenceBuilderFactory FACTORY = new SSBFactory();
+
+    private static class SSBFactory implements SequenceBuilderFactory, Serializable {
+	private SSBFactory() {
+	}
+
 	public SequenceBuilder makeSequenceBuilder() {
 	    return new SimpleSequenceBuilder();
 	}
-    } ;
+
+	private Object writeReplace() throws ObjectStreamException {
+	    try {
+		return new StaticMemberPlaceHolder(SimpleSequenceBuilder.class.getField("FACTORY"));
+	    } catch (NoSuchFieldException nsfe) {
+		throw new NotSerializableException(nsfe.getMessage());
+	    }
+	}
+    }
 
     //
     // State

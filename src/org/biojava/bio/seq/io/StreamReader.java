@@ -49,26 +49,34 @@ import org.biojava.bio.seq.*;
  * @author Matthew Pocock
  * @author Thomas Down
  */
+
 public class StreamReader implements SequenceIterator {
-  /**
-   * The context object for parsing from.
-   */
-  private Context context;
+    /**
+     * The symbol parser.
+     */
+    private SymbolParser symParser;
   
-  /**
-   * The symbol parser.
-   */
-  private SymbolParser symParser;
-  
-  /**
-   * The sequence format.
-   */
-  private SequenceFormat format;
+    /**
+     * The sequence format.
+     */
+    private SequenceFormat format;
   
     /**
      * The sequence-builder factory.
      */
     private SequenceBuilderFactory sf;
+
+    /**
+     * The stream of data to parse.
+     */
+
+    private BufferedReader reader;
+
+    /**
+     * Flag indicating if more sequences are available.
+     */
+
+    private boolean moreSequenceAvailable = true;
 
     /**
      * Pull the next sequence out of the stream.
@@ -84,12 +92,11 @@ public class StreamReader implements SequenceIterator {
     public Sequence nextSequence()
 	throws NoSuchElementException, BioException  
     {
-	if(context.isStreamEmpty())
+	if(!moreSequenceAvailable)
 	    throw new NoSuchElementException("Stream is empty");
-
 	try {
 	    SequenceBuilder builder = sf.makeSequenceBuilder();
-	    format.readSequence(context, symParser, builder);
+	    moreSequenceAvailable = format.readSequence(reader, symParser, builder);
 	    return builder.makeSequence();
 	} catch (Exception e) {
 	    throw new BioException(e, "Could not read sequence");
@@ -97,73 +104,26 @@ public class StreamReader implements SequenceIterator {
     }
 
     public boolean hasNext() {
-	return !context.isStreamEmpty();
+	return moreSequenceAvailable;
     }
 
-  public StreamReader(InputStream is,
-		      SequenceFormat format,
-                      SymbolParser symParser,
-                      SequenceBuilderFactory sf)  {
-    context = new Context(is);
-    this.format = format;
-    this.symParser = symParser;
-    this.sf = sf;
-  }
-
-  public StreamReader(BufferedReader reader,
-		      SequenceFormat format,
-                      SymbolParser symParser,
-                      SequenceBuilderFactory sf)  {
-    context = new Context(reader);
-    this.format = format;
-    this.symParser = symParser;
-    this.sf = sf;
-  }
-
-    /**
-     * Encapsulate a stream for reading sequence data.  This
-     * is the object which gets passed to SequenceFormats.
-     */
-
-  static public class Context {
-    private BufferedReader reader;
-
-      /**
-       * Get a Reader object for accessing data from the
-       * stream.
-       *
-       * @return A <code>Reader</code> object, or <code>null</code>
-       *         if the stream contains no more sequences.
-       */
-
-    public BufferedReader getReader() {
-      return reader;
+    public StreamReader(InputStream is,
+			SequenceFormat format,
+			SymbolParser symParser,
+			SequenceBuilderFactory sf)  {
+	this.reader = new BufferedReader(new InputStreamReader(is));
+	this.format = format;
+	this.symParser = symParser;
+	this.sf = sf;
     }
 
-      /**
-       * Signal that the stream contains no more sequence data.
-       * This may or may not correspond to reaching the end of
-       * the stream.
-       */
-
-    public void streamEmpty() {
-      reader = null;
+    public StreamReader(BufferedReader reader,
+			SequenceFormat format,
+			SymbolParser symParser,
+			SequenceBuilderFactory sf)  {
+	this.reader = reader;
+	this.format = format;
+	this.symParser = symParser;
+	this.sf = sf;
     }
-    
-      /**
-       * Check if the stream is empty.
-       */
-
-    public boolean isStreamEmpty() {
-      return reader == null;
-    }
-
-    public Context(InputStream is) {
-      reader = new BufferedReader(new InputStreamReader(is));
-    }
-    
-    public Context(BufferedReader reader) {
-      this.reader = reader;
-    }
-  }
 }

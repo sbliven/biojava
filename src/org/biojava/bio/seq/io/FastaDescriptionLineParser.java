@@ -44,7 +44,7 @@ public class FastaDescriptionLineParser implements SequenceBuilder {
      * @author Thomas Down
      */
 
-    public static class Factory implements SequenceBuilderFactory {
+    public static class Factory implements SequenceBuilderFactory, Serializable {
 	private SequenceBuilderFactory delegateFactory;
 
 	public Factory(SequenceBuilderFactory delegateFactory) {

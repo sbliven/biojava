@@ -80,19 +80,17 @@ public class FastaFormat implements SequenceFormat, Serializable {
 	this.lineWidth = lineWidth;
     }
 
-    public void readSequence(StreamReader.Context context,
-			     SymbolParser symParser,
-			     SeqIOListener siol)
+    public boolean readSequence(BufferedReader reader,
+				SymbolParser symParser,
+				SeqIOListener siol)
 	throws IllegalSymbolException, IOException 
     {
-	final BufferedReader in = context.getReader();
-    
-	String line = in.readLine();
+	String line = reader.readLine();
 	if (line == null) {
 	    throw new IOException("Premature stream end");
 	}
 	if (!line.startsWith(">")) {
-	    throw new IOException("Stream does not appear to contain FASTA formatted data");
+	    throw new IOException("Stream does not appear to contain FASTA formatted data: " + line);
 	}
 
 	siol.startSequence();
@@ -100,13 +98,10 @@ public class FastaFormat implements SequenceFormat, Serializable {
 	String description = line.substring(1).trim();
 	siol.addSequenceProperty(PROPERTY_DESCRIPTIONLINE, description);
 
-	boolean seenEOF = readSequenceData(in, symParser, siol);
-
+	boolean seenEOF = readSequenceData(reader, symParser, siol);
 	siol.endSequence();
     
-	if (seenEOF) {
-	    context.streamEmpty();
-	} 
+	return !seenEOF;
     }
 
     private boolean readSequenceData(BufferedReader r, 

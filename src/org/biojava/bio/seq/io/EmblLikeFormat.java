@@ -55,18 +55,18 @@ import org.biojava.bio.seq.*;
  */
 
 public class EmblLikeFormat implements SequenceFormat, Serializable {
-    public void readSequence(StreamReader.Context context,
+    public boolean readSequence(BufferedReader reader,
 			     SymbolParser symParser,
 			     SeqIOListener listener)
 	throws IllegalSymbolException, IOException
     {
-	final BufferedReader in = context.getReader();
 	String line;
 	StreamParser sparser = null;
+	boolean hasMoreSequence = true;
 
 	listener.startSequence();
 	
-	while ((line = in.readLine()) != null) {
+	while ((line = reader.readLine()) != null) {
 	    if (line.startsWith("//")) {
 		if (sparser != null) {
 		    // End of symbol data
@@ -74,14 +74,14 @@ public class EmblLikeFormat implements SequenceFormat, Serializable {
 		    sparser = null;
 		}
 
-		in.mark(2);
-		if (in.read() == -1)
-		    context.streamEmpty();
+		reader.mark(2);
+		if (reader.read() == -1)
+		    hasMoreSequence = false;
 		else
-		    in.reset();
+		    reader.reset();
 		
 		listener.endSequence();
-		return;
+		return hasMoreSequence;
 	    } else if (line.startsWith("SQ")) {
 		sparser = symParser.parseStream(listener);
 	    } else {

@@ -45,24 +45,10 @@ import org.biojava.bio.seq.*;
  * @author Matthew Pocock
  * @author Thomas Down
  */
-public interface SequenceFormat {
-  /**
-   * Read in a single sequence.
-   * <P>
-   * The format is responsible for converting characters in a stream into a
-   * complete sequence. It should read from the stream contained in 
-   * <code>context</code>, parse the symbol characters using
-   * <code>resParser</code> and generate a sequence from the resulting
-   * symbol list using <code>sf</code>. Any non-sequence information within
-   * the format should be read in either as features, or as annotation.
-   *
-   * @param context the context to parse from
-   * @param symParser the parser to parse chars to Symbol objects
-   * @param sf the sequence factory for generating a full sequence
-   * @return the resulting sequence
-   */
 
-    /**
+public interface SequenceFormat {
+
+   /**
     *Write out a sequence to the specified printstream
     *@param seq the sequence to write out 
     *@param os the printstream to write to
@@ -71,11 +57,28 @@ public interface SequenceFormat {
   void writeSequence(Sequence seq, PrintStream os) throws IOException;
     
     /**
-     * Read a sequence and pass it to a SeqIOListener
+     * Read a sequence and pass data on to a SeqIOListener.
+     *
+     * @param reader The stream of data to parse
+     * @param symParser A SymbolParser defining a mapping from character
+     *                 data to Symbols
+     * @param listener A listener to notify when data is extracted from
+     *                 the stream.
+     *
+     * @returns a boolean indicating whether or not the stream contains
+     *          any more sequences.
+     *
+     * @throws IOException if an error occurs while reading from the
+     *                     stream
+     * @throws IllegalSymbolException if it is not possible to translate
+     *                                character data from the stream into
+     *                                valid BioJava symbols
+     * @throws BioException if there is an error in the format of the
+     *                      stream.
      */
 
-    public void readSequence(StreamReader.Context context,
-			     SymbolParser symParser,
-			     SeqIOListener listener)
+    public boolean readSequence(BufferedReader reader,
+				SymbolParser symParser,
+				SeqIOListener listener)
 	throws BioException, IllegalSymbolException, IOException;
 }

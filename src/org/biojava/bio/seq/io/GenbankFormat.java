@@ -124,9 +124,9 @@ public class GenbankFormat implements  Serializable {
 
 
 
-  public Sequence readSequence(
+  public boolean readSequence(
 
-    StreamReader.Context context,
+    BufferedReader reader,
 
 		SymbolParser symParser,
 
