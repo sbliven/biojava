@@ -20,7 +20,7 @@ identity	is-a	equivalence
 #
 triple	is-a	any
 triple	has-a	source
-triple	has-a	target
+triple	has-a	object
 triple	has-a	relation
 (triple,has-a,any)	size	3
 

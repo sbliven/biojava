@@ -20,6 +20,9 @@ public final class OntoTools {
   public static final Term ANY;
   public static final Term REMOTE_TERM;
   public static final Term TRIPLE_TERM;
+  public static final Term TRIPLE;
+  public static final Term SOURCE;
+  public static final Term OBJECT;
   public static final Term RELATION;
   public static final Term REFLEXIVE;
   public static final Term SYMMETRIC;
@@ -53,6 +56,9 @@ public final class OntoTools {
       ANY = CORE_ONTOLOGY.getTerm("any");
       REMOTE_TERM = CORE_ONTOLOGY.getTerm("remote-term");
       TRIPLE_TERM = CORE_ONTOLOGY.getTerm("triple-term");
+      TRIPLE = CORE_ONTOLOGY.getTerm("triple");
+      SOURCE = CORE_ONTOLOGY.getTerm("source");
+      OBJECT = CORE_ONTOLOGY.getTerm("object");
       RELATION = CORE_ONTOLOGY.getTerm("relation");
       REFLEXIVE = CORE_ONTOLOGY.getTerm("reflexive");
       EQUIVALENCE = CORE_ONTOLOGY.getTerm("equivalence");
