@@ -95,7 +95,8 @@ public class SequencesAsGFF {
   public void setRecurse(boolean recurse) {
     this.recurse = recurse;
   }
-  
+
+
   /**
    * Internal method to process an individual <span class="type">Sequence</span>.
    *
@@ -113,51 +114,68 @@ public class SequencesAsGFF {
     Iterator fi = seq.filter(getFeatureFilter(), getRecurse()).features();
       
     while (fi.hasNext()) {
-      Feature f = (Feature) fi.next();
-      SimpleGFFRecord record = new SimpleGFFRecord();
-      record.setSeqName(id);
-      record.setSource(f.getSource());
-      record.setFeature(f.getType());
-      Location loc = f.getLocation();
-      record.setStart(loc.getMin());
-      record.setEnd(loc.getMax());
-      record.setScore(GFFTools.NO_SCORE);
-      record.setStrand(StrandedFeature.UNKNOWN);
-      if (f instanceof StrandedFeature) {
-        StrandedFeature sf = (StrandedFeature) f;
-        if (sf.getStrand() == StrandedFeature.POSITIVE) {
-          record.setStrand(StrandedFeature.POSITIVE);
-        } else if (sf.getStrand() == StrandedFeature.NEGATIVE) {
-          record.setStrand(StrandedFeature.NEGATIVE);
-        }
-      }
-      record.setFrame(GFFTools.NO_FRAME);
-      Map fMap = f.getAnnotation().asMap();
-      Map fMap2 = new HashMap();
-      for (Iterator ki = fMap.keySet().iterator(); ki.hasNext(); ) {
-        Object key = ki.next();
-        Object value = fMap.get(key);
-        String keyS = key.toString();
-        List valueList;
-        if (value instanceof Collection) {
-          valueList = new ArrayList((Collection) value);
-        } else {
-          //valueList = Collections.singletonList(value); 1.3?
-          valueList = new ArrayList();
-          valueList.add(value);
-        }
-        for (int i = 0; i < valueList.size(); i++) {
-          Object o = valueList.get(i);
-          valueList.set(i, o.toString());
-        }
-        fMap2.put(keyS, valueList);
-      }
-      record.setGroupAttributes(fMap2);
-      record.setComment(null);
-        
-      handler.recordLine(record);
+      doProcessFeature((Feature) fi.next(), handler, id);
     }
   }
+
+
+  /**
+   * Internal method to process an individual <span class="type">Feature</span>.
+   *
+   * @param feature  the <span class="type">Feature</span> to GFFify
+   * @param handler the <span class="type">GFFDocumentHandler</span> that will
+   *                receive the GFF for this feature
+   * @param id the value of the <span class="method">seqName</span> field in any
+   *           <span class="type">GFFRecord</span>s produced
+   */
+  protected void doProcessFeature(Feature feature,
+                                  GFFDocumentHandler handler,
+                                  String id) 
+    throws BioException {
+
+    SimpleGFFRecord record = new SimpleGFFRecord();
+    record.setSeqName(id);
+    record.setSource(feature.getSource());
+    record.setFeature(feature.getType());
+    Location loc = feature.getLocation();
+    record.setStart(loc.getMin());
+    record.setEnd(loc.getMax());
+    record.setScore(GFFTools.NO_SCORE);
+    record.setStrand(StrandedFeature.UNKNOWN);
+    if (feature instanceof StrandedFeature) {
+      StrandedFeature sf = (StrandedFeature) feature;
+      if (sf.getStrand() == StrandedFeature.POSITIVE) {
+        record.setStrand(StrandedFeature.POSITIVE);
+      } else if (sf.getStrand() == StrandedFeature.NEGATIVE) {
+        record.setStrand(StrandedFeature.NEGATIVE);
+      }
+    }
+    record.setFrame(GFFTools.NO_FRAME);
+    Map fMap = feature.getAnnotation().asMap();
+    Map fMap2 = new HashMap();
+    for (Iterator ki = fMap.keySet().iterator(); ki.hasNext(); ) {
+      Object key = ki.next();
+      Object value = fMap.get(key);
+      String keyS = key.toString();
+      List valueList;
+      if (value instanceof Collection) {
+        valueList = new ArrayList((Collection) value);
+      } else {
+        //valueList = Collections.singletonList(value); 1.3?
+        valueList = new ArrayList();
+        valueList.add(value);
+      }
+      for (int i = 0; i < valueList.size(); i++) {
+        Object o = valueList.get(i);
+        valueList.set(i, o.toString());
+      }
+      fMap2.put(keyS, valueList);
+    }
+    record.setGroupAttributes(fMap2);
+    record.setComment(null);        
+    handler.recordLine(record);
+  }
+
 
   /**
    * Process an individual <span class="type">Sequence</span>, informing
