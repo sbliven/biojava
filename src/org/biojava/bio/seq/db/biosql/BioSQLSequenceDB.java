@@ -282,7 +282,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    } else {
 		PreparedStatement create_biosequence = conn.prepareStatement("insert into biosequence " +
 									     "(bioentry_id, seq_version, seq_length, biosequence_str, molecule) " +
-									     "values (?, ?, ?, ?)");
+									     "values (?, ?, ?, ?, ?)");
 		create_biosequence.setInt(1, bioentry_id);
 		create_biosequence.setInt(2, version);
 		create_biosequence.setInt(3, seq.length());
@@ -764,7 +764,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	PreparedStatement insert_new;
 	if (isSPASupported()) {
 	    insert_new= conn.prepareStatement("insert into seqfeature_qualifier_value " +
-                                              "       (seqfeature_id, ontology_term_id, seqfeature_qualifier_rank, qualifier_value) " +
+                                              "       (seqfeature_id, ontology_term_id, qualifier_rank, qualifier_value) " +
 					      "values (?, intern_ontology_term( ? ), ?, ?)");
 	    if (value instanceof Collection) {
 		int cnt = 0;
@@ -785,7 +785,7 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    insert_new.close();
 	} else {
 	    insert_new = conn.prepareStatement("insert into seqfeature_qualifier_value " +
-                                               "       (seqfeature_id, ontology_term_id, seqfeature_qualifier_rank, qualifier_value) " +
+                                               "       (seqfeature_id, ontology_term_id, qualifier_rank, qualifier_value) " +
 			  	 	      "values (?, ?, ?, ?)");
 	    int sfq = intern_ontology_term(conn, keyString);
 	    if (value instanceof Collection) {
@@ -846,27 +846,47 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    insert_new= conn.prepareStatement("insert into bioentry_qualifier_value " +
                                               "       (bioentry_id, ontology_term_id, qualifier_value) " +
 					      "values (?, intern_ontology_term( ? ), ?)");
-	    insert_new.setString(2, keyString);
-	} else {
-	    insert_new= conn.prepareStatement("insert into seqfeature_qualifier_value " +
-                                              "       (bioentry_id, seqfeature_qualifier_id, qualifier_value) " +
-					      "values (?, ?, ?)");
-	    insert_new.setInt(2, intern_ontology_term(conn, keyString));
-	}
-
-	insert_new.setInt(1, bioentry_id);	
-	if (value instanceof Collection) {
-	    int cnt = 0;
-	    for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
-		// insert_new.setInt(3, ++cnt);
-		insert_new.setString(3, i.next().toString());
+	    if (value instanceof Collection) {
+		int cnt = 0;
+		for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+		    insert_new.setInt(1, bioentry_id);
+		    insert_new.setString(2, keyString);
+		    // insert_new.setInt(3, ++cnt);
+		    insert_new.setString(3, i.next().toString());
+		    insert_new.executeUpdate();
+		}
+	    } else {
+		insert_new.setInt(1, bioentry_id);
+		insert_new.setString(2, keyString);
+		// insert_new.setInt(3, 1);
+		insert_new.setString(3, value.toString());
 		insert_new.executeUpdate();
 	    }
 	} else {
-	    // insert_new.setInt(3, 1);
-	    insert_new.setString(3, value.toString());
-	    insert_new.executeUpdate();
+	    insert_new= conn.prepareStatement("insert into bioentry_qualifier_value " +
+                                              "       (bioentry_id, ontology_term_id, qualifier_value) " +
+					      "values (?, ?, ?)");
+	    int termID = intern_ontology_term(conn, keyString);
+	    if (value instanceof Collection) {
+		int cnt = 0;
+		for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+		    insert_new.setInt(1, bioentry_id);
+		    insert_new.setInt(2, termID);
+		    // insert_new.setInt(3, ++cnt);
+		    insert_new.setString(3, i.next().toString());
+		    insert_new.executeUpdate();
+		}
+	    } else {
+		insert_new.setInt(1, bioentry_id);
+		insert_new.setInt(2, termID);
+		// insert_new.setInt(3, 1);
+		insert_new.setString(3, value.toString());
+		insert_new.executeUpdate();
+	    }
 	}
+
+		
+	
 	insert_new.close();
     }
 
