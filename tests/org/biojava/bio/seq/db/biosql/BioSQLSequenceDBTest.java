@@ -1,3 +1,4 @@
+/* -*- c-basic-offset: 4; indent-tabs-mode: nil -*- */
 /*
  *                    BioJava development code
  *
@@ -31,8 +32,17 @@ import java.sql.Statement;
 import java.util.Iterator;
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import org.biojava.bio.SimpleAnnotation;
+import org.biojava.bio.seq.DNATools;
+import org.biojava.bio.seq.Sequence;
+import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.db.AbstractSequenceDBTest;
 import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.impl.SimpleSequence;
+import org.biojava.bio.symbol.BetweenLocation;
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.RangeLocation;
+import org.biojava.bio.symbol.SymbolList;
 
 /**
  * Really rudimentary test case for biosql sequencedb. We could make
@@ -40,6 +50,7 @@ import org.biojava.bio.seq.db.SequenceDB;
  * RDBMS.
  * 
  * @author Len Trigg
+ * @author Frederik Decouttere
  */
 public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
     
@@ -134,11 +145,11 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
         return sb.toString();
     }
 
-    protected static Connection getConnection() throws SQLException {
+    protected Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, DB_USER, DB_PW);
     }
     
-    protected static void loadSchema(Connection connection) throws IOException, SQLException {
+    protected void loadSchema(Connection connection) throws IOException, SQLException {
         if (CREATE_SQL == null) {
             BufferedReader br = new BufferedReader(new InputStreamReader(ClassLoader.getSystemClassLoader().getResourceAsStream(DB_CREATE_RESOURCE)));
             CREATE_SQL = readAll(br);
@@ -150,7 +161,7 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
     }
     
 
-    protected static void dropSchema(Connection connection) throws IOException, SQLException {
+    protected void dropSchema(Connection connection) throws IOException, SQLException {
         if (DROP_SQL == null) {
             BufferedReader br = new BufferedReader(new InputStreamReader(ClassLoader.getSystemClassLoader().getResourceAsStream("files/drop-biosqldb-hsqldb.sql")));
             DROP_SQL = readAll(br);
@@ -192,6 +203,55 @@ public class BioSQLSequenceDBTest extends AbstractSequenceDBTest {
             assertNotNull("Couldn't access " + TABLES[i], st.executeQuery("SELECT * FROM " + TABLES[i]));
             st.close();
         }
+    }
+
+    /**
+     * Demonstrates the switch from between to range location after
+     * persistence code
+     */
+    public void testFeaturePersistence() throws Exception {
+        mSequenceDB.addSequence(getSequence());
+                
+        Sequence seq = mSequenceDB.getSequence("test_seq");
+        for (Iterator iter = seq.features(); iter.hasNext();) {
+            StrandedFeature f = (StrandedFeature) iter.next();
+            Location loc = f.getLocation();
+                        
+            /*
+             * ERROR: Location is now a RangeLocation and not a
+             * BetweenLocation !
+             */
+            assertTrue("[feature] location is now an instance of: " + loc.getClass().getName(), 
+                       loc instanceof BetweenLocation);
+        }
+    }
+        
+
+    public void testOntologyPersistence() throws Exception {
+        BioSQLSequenceDB db2 = new BioSQLSequenceDB(DB_DRIVER, DB_URL, DB_USER, DB_PW, "testbiosqldb_2", true);
+        mSequenceDB.addSequence(getSequence()) ;
+        db2.addSequence(getSequence());
+    }
+
+        
+    public static Sequence getSequence() throws Exception {
+        SymbolList sl = DNATools.createDNA("ACTGGTGTACCCCAATGGGAATATC") ;
+        Sequence sequence = new SimpleSequence(sl, null, "test_seq", null);
+        sequence.createFeature(getFeature());
+        return sequence ;
+    }
+        
+    private static StrandedFeature.Template getFeature() throws Exception {
+        SimpleAnnotation annotation = new SimpleAnnotation();
+        annotation.setProperty("Comment", "comment line");
+        StrandedFeature.Template templ = new StrandedFeature.Template();
+        templ.annotation = annotation;
+        templ.location = new BetweenLocation(new RangeLocation(3, 4));
+        templ.strand = StrandedFeature.POSITIVE;
+        templ.type = "ATYPE";
+        templ.source = "ASRC";
+                
+        return templ ;
     }
 
 
