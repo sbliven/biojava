@@ -87,14 +87,14 @@ public interface Location {
   int getMax();
 
   /**
-   * Checks if these two locations overlap, using this locations's
-   * concept of overlaping.
+   * Checks if these two locations overlap, using this location's
+   * concept of overlapping.
    * <P>
    * Abstractly, two locations overlap if they both contain any point.
    *
    * @param l	the Location to check
    * @return	true if they overlap, otherwise false
-   * @deprecated use LocationTools.areOverlapping(Location a, Location b)
+   * @deprecated use LocationTools.overlaps(Location a, Location b)
    */
   boolean overlaps(Location l);
   /**
@@ -105,7 +105,7 @@ public interface Location {
    *
    * @param l	the Location to check
    * @return	true if this contains l, otherwise false
-   * @deprecated use LocationTools.isContainedBy(Location a, Location b)
+   * @deprecated use LocationTools.contains(Location a, Location b)
    */
   boolean contains(Location l);
   /**

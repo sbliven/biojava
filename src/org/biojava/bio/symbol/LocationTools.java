@@ -123,7 +123,7 @@ final public class LocationTools {
       // One or other of the locations is compound. Build a list of all
       // locations created by finding intersection of all pairwise combinations
       // of blocks in locA and locB. Ignore all Location.empty. Create the
-      // apropreate Location instance.
+      // appropriate Location instance.
       List locList = new ArrayList();
       Iterator aI = locA.blockIterator();
       while(aI.hasNext()) {
@@ -210,7 +210,7 @@ final public class LocationTools {
   }
 
   /**
-   * Return wether two locations are equal.
+   * Return whether two locations are equal.
    * <P>
    * They are equal if both a contains b and b contains a. Equivalently, they
    * are equal if for every point p, locA.contains(p) == locB.contains(p).
