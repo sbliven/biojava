@@ -33,7 +33,6 @@ import org.biojava.bio.symbol.SymbolList;
 /**
  * JUnit test for SymbolListCharSequence.
  *
- * @author Ido Tamir
  * @author Keith James
  */
 public class SymbolListCharSequenceTest extends TestCase
@@ -67,10 +66,10 @@ public class SymbolListCharSequenceTest extends TestCase
         CharSequence charSeq =
             new SymbolListCharSequence(DNATools.createDNA("GCAT"));
 
-        assertEquals("g",  charSeq.subSequence(0, 1));
-        assertEquals("t",  charSeq.subSequence(3, 4));
-        assertEquals("gc", charSeq.subSequence(0, 2));
-        assertEquals("ca", charSeq.subSequence(1, 3));
-        assertEquals("at", charSeq.subSequence(2, 4));
+        assertEquals("g",  charSeq.subSequence(0, 1).toString());
+        assertEquals("t",  charSeq.subSequence(3, 4).toString());
+        assertEquals("gc", charSeq.subSequence(0, 2).toString());
+        assertEquals("ca", charSeq.subSequence(1, 3).toString());
+        assertEquals("at", charSeq.subSequence(2, 4).toString());
     }
 }
