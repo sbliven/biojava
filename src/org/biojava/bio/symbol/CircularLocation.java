@@ -178,14 +178,28 @@ extends AbstractLocationDecorator {
   }
 
 
-  public String toString(){
-    //fixme to use 5' iterator
+  public String toString() {
+    if (fivePrimeSortedBlocks.size() > 1) {
 
-    StringBuffer sb = new StringBuffer(getWrapped().toString());
+      StringBuffer sb = new StringBuffer();
+      sb.append(get5PrimeEnd() + ", " +
+               ((Location)fivePrimeSortedBlocks.getLast()).getMax() + " {");
+      Iterator i = fivePrimeSortedBlocks.iterator();
+      if(i.hasNext())
+        sb.append("(" + i.next() + ")");
 
-    sb.append("  (circular)");
+      while(i.hasNext())
+        sb.append(", (" + i.next() + ")");
 
-    return sb.toString();
+      sb.append("}");
+
+      sb.append("  (circular)");
+      return sb.substring(0);
+
+    }else{
+      return getWrapped().toString() + " (circular)";
+    }
+
 
   }
 

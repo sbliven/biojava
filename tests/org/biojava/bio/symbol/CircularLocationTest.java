@@ -82,7 +82,15 @@ public class CircularLocationTest extends TestCase
         assertEquals(r1, LocationTools.makeCircularLocation(1, 100, 200));
     }
 
-
+    public void testToString(){
+      assertEquals(r1.toString(), "[1,100] (circular)");
+      assertEquals(r2.toString(), "[1,200] (circular)");
+      assertEquals(r3.toString(), "105, 100 {([105,200]), ([1,100])}  (circular)");
+      assertEquals(r4.toString(), "150, 20 {([150,200]), ([1,20])}  (circular)");
+      assertEquals(r5.toString(), "[90,110] (circular)");
+      assertEquals(r6.toString(), "18, 4 {([18,20]), ([1,4])}  (circular)");
+      assertEquals(r7.toString(),"[2,8] (circular)");
+    }
 
     /**
      * <code>testAreEqual</code> tests equality via
@@ -171,6 +179,8 @@ public class CircularLocationTest extends TestCase
         locs[2] = (CircularLocation)LocationTools.union(locs[0], locs[1]);
 
         assertTrue(locs[2].get5PrimeEnd() == 13);
+        assertEquals(locs[2].toString(),
+                     "13, 4 {([13,14]), ([18,20]), ([1,4])}  (circular)");
 
 
         //test a more complex union
