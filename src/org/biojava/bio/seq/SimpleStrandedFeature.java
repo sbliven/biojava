@@ -59,11 +59,6 @@ class SimpleStrandedFeature extends SimpleFeature implements StrandedFeature {
 	throws IllegalArgumentException, IllegalAlphabetException 
     {
 	super(sourceSeq, parent, template);
-	if(template.strand != POSITIVE && template.strand != NEGATIVE) {
-	    throw new IllegalArgumentException(
-			     "strand was not POSITIVE or NEGATIVE but " + template.strand
-					       );
-	}
 	this.strand = template.strand;
 	if(!ComplementSymbolList.isComplementable(sourceSeq.getAlphabet())) {
 	    throw new IllegalAlphabetException (

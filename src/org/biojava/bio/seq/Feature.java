@@ -21,6 +21,8 @@
 
 package org.biojava.bio.seq;
 
+import java.io.Serializable;
+
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
@@ -114,10 +116,10 @@ public interface Feature extends FeatureHolder, Annotatable {
      * the constructor or factory methods should make a particular feature
      * implementation from the template.
      */
-    public static class Template {
-	public Location location;
-	public String type;
-	public String source;
-	public Annotation annotation;
+    public static class Template implements Serializable {
+      public Location location;
+      public String type;
+      public String source;
+      public Annotation annotation;
     }
 }

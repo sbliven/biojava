@@ -18,10 +18,13 @@
  *      http://www.biojava.org/
  *
  */
- 
 package org.biojava.bio.seq;
+ 
+import java.io.*;
+import java.lang.reflect.*;
 
 import org.biojava.bio.symbol.*;
+import org.biojava.utils.*;
 
 /**
  * Adds the concept of 'strand' to features.
@@ -94,7 +97,7 @@ public interface StrandedFeature extends Feature {
    *
    * @author Matthew Pocock
    */
-  public static class Strand {
+  public static class Strand implements Serializable {
     private final String text;
     private final int value;
     private final char token;
@@ -114,6 +117,13 @@ public interface StrandedFeature extends Feature {
     }
     public char getToken() {
       return token;
+    }
+    private Object writeReplace() throws ObjectStreamException {
+      try {
+        return new StaticMemberPlaceHolder(StrandedFeature.class.getField(text));
+      } catch (NoSuchFieldException nsfe) {
+        throw new NotSerializableException(nsfe.getMessage());
+      }
     }
   }
 }

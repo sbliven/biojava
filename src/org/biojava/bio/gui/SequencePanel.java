@@ -173,6 +173,10 @@ public class SequencePanel extends JComponent implements SwingConstants {
   }
   
   public void paintComponent(Graphics g) {
+    if(sequence == null) {
+      return;
+    }
+    
     Graphics2D g2 = (Graphics2D) g;
 
     Rectangle2D.Double boxClip = new Rectangle2D.Double();
@@ -303,8 +307,9 @@ public class SequencePanel extends JComponent implements SwingConstants {
   }
 
   public void resizeAndValidate() {
-    alongDim = 
-      scale * sequence.length();
+    alongDim = (sequence == null)
+      ? 0.0
+      : scale * sequence.length();
     acrossDim = 0.0;
     double insetBefore = 0.0;
     double insetAfter = 0.0;
@@ -324,7 +329,9 @@ public class SequencePanel extends JComponent implements SwingConstants {
     if(lines < 1) {
       // fit to component size for across, and wrap as many times as is needed
       // to accomodate whole sequence;
-      Dimension parentSize = getParent().getSize();
+      Dimension parentSize = (getParent() != null)
+        ? getParent().getSize()
+        : new Dimension();
       int width = 0;
       switch (direction) {
         case HORIZONTAL:

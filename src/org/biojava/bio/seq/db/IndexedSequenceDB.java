@@ -172,6 +172,7 @@ public final class IndexedSequenceDB implements SequenceDB, Serializable {
   
   public void addFile(File seqFile)
   throws IOException, BioException {
+    seqFile = seqFile.getAbsoluteFile();
     HackedBufferedReader bReader = new HackedBufferedReader(seqFile); 
     StreamReader.Context context = new StreamReader.Context(bReader);
     HashMap index = new HashMap();
