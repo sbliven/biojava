@@ -42,6 +42,7 @@ import org.biojava.bio.symbol.Location;
  *
  * @author Matthew Pocock
  * @author Thomas Down
+ * @author Len Trigg
  */
 public class SequencesAsGFF {
   /**
@@ -132,7 +133,25 @@ public class SequencesAsGFF {
                                   GFFDocumentHandler handler,
                                   String id) 
     throws BioException {
+    GFFRecord record = createGFFRecord(feature, id);
+    handler.recordLine(record);
+  }
 
+
+  /**
+   * Internal method to create a <span class="type">GFFRecord</span>
+   * from an individual <span class="type">Feature</span>.
+   *
+   * @param feature  the <span class="type">Feature</span> to GFFify
+   * @param handler the <span class="type">GFFDocumentHandler</span> that will
+   *                receive the GFF for this feature
+   * @param id the value of the <span class="method">seqName</span> field in any
+   *           <span class="type">GFFRecord</span>s produced
+   */
+  protected SimpleGFFRecord createGFFRecord(Feature feature,
+                                            String id) 
+    throws BioException {
+    
     SimpleGFFRecord record = new SimpleGFFRecord();
     record.setSeqName(id);
     record.setSource(feature.getSource());
@@ -173,7 +192,8 @@ public class SequencesAsGFF {
     }
     record.setGroupAttributes(fMap2);
     record.setComment(null);        
-    handler.recordLine(record);
+
+    return record;
   }
 
 
