@@ -24,6 +24,7 @@ package org.biojava.bio.program.xff;
 import org.biojava.bio.Annotation;
 import org.biojava.bio.SmallAnnotation;
 import org.biojava.bio.MergeAnnotation;
+import org.biojava.bio.OverlayAnnotation;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojava.bio.symbol.Location;
@@ -119,45 +120,59 @@ public class FeatureHandler extends StAXContentHandlerBase {
 	return new Feature.Template();
     }
 
-    /**
-     * Fire the startFeature event.  You should wrap this method if you want
-     * to perform any validation on the Feature.Template before the
-     * startFeature is fired.
-     *
-     * @throws ParseException if the startFeature notification fails, or if
-     *                        it has already been made.
-     */
+  /**
+   * Fire the startFeature event.  You should wrap this method if you want
+   * to perform any validation on the Feature.Template before the
+   * startFeature is fired.
+   *
+   * @throws ParseException if the startFeature notification fails, or if
+   *                        it has already been made.
+   */
 
-    protected void fireStartFeature() 
-        throws ParseException
-    {
-	if (startFired) {
-	    throw new ParseException("startFeature event has already been fired for this feature");
-	}
-
-	Feature.Template templ = getFeatureTemplate();
-        Annotation ann = getXFFEnvironment().getMergeAnnotation();
-	if (templ.annotation == null) {
-	    templ.annotation = ann;
-	} else if(ann != Annotation.EMPTY_ANNOTATION) {
-            try {
-                MergeAnnotation ma = new MergeAnnotation();
-                ma.addAnnotation(templ.annotation);
-                ma.addAnnotation(ann);
-                templ.annotation = ma;
-            } catch (ChangeVetoException cve) {
-                throw new AssertionFailure(cve);
-            }
-        }
-	getXFFEnvironment().getFeatureListener().startFeature(templ);
-	startFired = true;
+  protected void fireStartFeature()
+          throws ParseException
+  {
+    if (startFired) {
+      throw new ParseException("startFeature event has already been fired for this feature");
     }
+
+    Feature.Template templ = getFeatureTemplate();
+    Annotation ann = getXFFEnvironment().getMergeAnnotation();
+    Annotation orig = templ.annotation;
+    Annotation res = null;
+
+    if(ann != null && orig != null) {
+      try {
+        MergeAnnotation ma = new MergeAnnotation();
+        ma.addAnnotation(templ.annotation);
+        ma.addAnnotation(ann);
+        res = ma;
+      } catch (ChangeVetoException cve) {
+        throw new AssertionFailure(cve);
+      }
+    } else if(ann != null) {
+      res = ann;
+    } else if(orig != null) {
+      res = orig;
+    }
+
+    if(res == null) {
+      res = new SmallAnnotation();
+    } else {
+      res = new OverlayAnnotation(res);
+    }
+
+    templ.annotation = res;
+
+    getXFFEnvironment().getFeatureListener().startFeature(templ);
+    startFired = true;
+  }
 
     /**
      * Fire the endFeature event.
      */
 
-    protected void fireEndFeature() 
+    protected void fireEndFeature()
         throws ParseException
     {
 	if (!startFired) {
@@ -178,7 +193,7 @@ public class FeatureHandler extends StAXContentHandlerBase {
      * template, otherwise an addFeatureProperty event is generated.
      */
 
-    protected void setFeatureProperty(Object key, Object value) 
+    protected void setFeatureProperty(Object key, Object value)
         throws ChangeVetoException, ParseException
     {
 	if (startFired) {
@@ -191,7 +206,7 @@ public class FeatureHandler extends StAXContentHandlerBase {
 	    ft.annotation.setProperty(key, value);
 	}
     }
-    
+
     /**
      * StAX callback for element starts.  Wrap this method to handle extra
      * elements within your own feature types.
@@ -247,7 +262,7 @@ public class FeatureHandler extends StAXContentHandlerBase {
 
 		dm.delegate(xffenv);
 	    } else {
-		// throw new SAXException("Couldn't recognize element " + localName + " in namespace " + nsURI); 
+		// throw new SAXException("Couldn't recognize element " + localName + " in namespace " + nsURI);
 	    }
 	}
     }
@@ -272,7 +287,7 @@ public class FeatureHandler extends StAXContentHandlerBase {
 		if (!startFired) {
 		    fireStartFeature();
 		}
-		
+
 		if (!endFired) {
 		    fireEndFeature();
 		}
@@ -300,7 +315,7 @@ public class FeatureHandler extends StAXContentHandlerBase {
 
     protected StAXContentHandler getOldIDHandler() {
 	return new StringElementHandlerBase() {
-		protected void setStringValue(String s) 
+		protected void setStringValue(String s)
 		    throws SAXException
 		{
 		    try {

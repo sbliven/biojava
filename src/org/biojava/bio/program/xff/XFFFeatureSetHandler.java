@@ -156,7 +156,7 @@ public class XFFFeatureSetHandler extends StAXContentHandlerBase {
                            DelegationManager dm)
           throws SAXException
   {
-    System.err.println("Processing startElement(" + nsURI + ", " + localName + ", " + qName + ", " + pretify(attrs));
+    //System.err.println("Processing startElement(" + nsURI + ", " + localName + ", " + qName + ", " + pretify(attrs));
     if (localName.equals("featureSet")) {
       inFeatureSet = true;
       return;
@@ -164,9 +164,9 @@ public class XFFFeatureSetHandler extends StAXContentHandlerBase {
 
     for (int i = featureHandlers.size() - 1; i >= 0; --i) {
       Binding b = (Binding) featureHandlers.get(i);
-      System.err.println("Binding: " + b);
+      //System.err.println("Binding: " + b);
       if (b.recognizer.filterStartElement(nsURI, localName, qName, attrs)) {
-        System.err.println("Accepting binding");
+        //System.err.println("Accepting binding");
         dm.delegate(b.handlerFactory.getPartHandler(this));
         return;
       }
