@@ -58,50 +58,38 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Changeable;
 
 /**
- * <p>
- * A <code>PairwiseSequencePanel</code> is a panel that displays a
+ * <p>A <code>PairwiseSequencePanel</code> is a panel that displays a
  * pair of sequences; one sequence (the primary) may be either
  * left-to-right (HORIZONTAL) or from top-to-bottom (VERTICAL). The
  * other sequence (secondary) will then occupy the remaining
  * direction. It has an associated scale which is the number of pixels
  * per symbol and applies to both sequences. The leading and trailing
- * borders apply to the primary sequence only.
- * </p>
+ * borders apply to the primary sequence only.</p>
  *
- * <p>
- * The primary purpose of this component is to provide a means for
+ * <p>The primary purpose of this component is to provide a means for
  * representing graphically comparisons between two sequences. This
  * could be anything from traditional dotplots (or variants created
  * with lines) to a more complex layered plot involving superimposed
- * renderers.
- * </p>
+ * renderers.</p>
  *
- * <p>
- * Each sequence has a translation which is the number of
+ * <p>Each sequence has a translation which is the number of
  * <code>Symbol</code>s to skip before rendering starts. In order to
  * produce a scrolling effect, the <code>setSymbolTranslation</code>
  * or <code>setSecondarySymbolTranslation</code> method may be hooked
  * up to an <code>Adjustable</code> such as <code>JScrollBar</code> or
- * to an event listener.
- * </p>
+ * to an event listener.</p>
  *
- * <p>
- * The exact number of <code>Symbol</code>s rendered in each
+ * <p>The exact number of <code>Symbol</code>s rendered in each
  * sequence depends on the dimensions of the panel and the
  * scale. Resizing the panel will cause the number of
- * <code>Symbol</code>s rendered to change accordingly.
- * </p>
+ * <code>Symbol</code>s rendered to change accordingly.</p>
  *
- * <p>
- * The panel will fill its background to the <code>Color</code>
- * defined by the <code>setBackground()</code> method provided that
- * it has been defined as opaque using <code>setOpaque()</code>.
- * </p>
+ * <p>The panel will fill its background to the <code>Color</code>
+ * defined by the <code>setBackground()</code> method provided that it
+ * has been defined as opaque using <code>setOpaque()</code>.</p>
  *
- * <p>
- * The change event handling code is based on the original panel
- * and other BioJava components by Matthew and Thomas.
- * </p>
+ * <p>The change event handling code is based on the original panel
+ * and other BioJava components by Matthew and Thomas.</p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2

@@ -1035,30 +1035,30 @@ public interface FeatureFilter extends Serializable {
   }
 
     /**
-     * <code>PairwiseScoreFilter</code> is used to filter
+     * <code>ByPairwiseScore</code> is used to filter
      * <code>SimilarityPairFeature</code>s by their score. Features
      * are accepted if their score falls between the filter's minimum
      * and maximum values, inclusive. Features are rejected if they
      * are not <code>SimilarityPairFeature</code>s. The minimum value
-     * acceptedmust be less than the maximum value.
+     * accepted must be less than the maximum value.
      *
      * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
      * @since 1.3
      */
-    public static final class PairwiseScoreFilter implements OptimizableFilter {
+    public static final class ByPairwiseScore implements OptimizableFilter {
         private double minScore;
         private double maxScore;
         private double score;
         private int    hashCode;
 
         /**
-         * Creates a new <code>ScoreFilter</code>.
+         * Creates a new <code>ByPairwiseScore</code>.
          *
          * @param minScore a <code>double</code>.
          * @param maxScore a <code>double</code>.
          */
-        public PairwiseScoreFilter(double minScore, double maxScore) {
-            if (minScore >= maxScore)
+        public ByPairwiseScore(double minScore, double maxScore) {
+            if (minScore > maxScore)
                 throw new IllegalArgumentException("Filter minimum score must be less than maximum score");
 
             this.minScore = minScore;
@@ -1107,8 +1107,8 @@ public interface FeatureFilter extends Serializable {
         }
 
         public boolean equals(Object o) {
-            if (o instanceof PairwiseScoreFilter) {
-                PairwiseScoreFilter psf = (PairwiseScoreFilter) o;
+            if (o instanceof ByPairwiseScore) {
+                ByPairwiseScore psf = (ByPairwiseScore) o;
                 if (psf.getMinScore() == minScore &&
                     psf.getMaxScore() == maxScore) {
                     return true;
@@ -1122,8 +1122,8 @@ public interface FeatureFilter extends Serializable {
         }
 
         public boolean isProperSubset(FeatureFilter sup) {
-            if (sup instanceof PairwiseScoreFilter) {
-                PairwiseScoreFilter psf = (PairwiseScoreFilter) sup;
+            if (sup instanceof ByPairwiseScore) {
+                ByPairwiseScore psf = (ByPairwiseScore) sup;
                 return (psf.getMinScore() >= minScore &&
                         psf.getMaxScore() <= maxScore);
             }
@@ -1134,8 +1134,8 @@ public interface FeatureFilter extends Serializable {
             if (filt instanceof AcceptNoneFilter)
                 return true;
 
-            if (filt instanceof PairwiseScoreFilter) {
-                PairwiseScoreFilter psf = (PairwiseScoreFilter) filt;
+            if (filt instanceof ByPairwiseScore) {
+                ByPairwiseScore psf = (ByPairwiseScore) filt;
                 return (psf.getMaxScore() < minScore ||
                         psf.getMinScore() > maxScore);
             }
