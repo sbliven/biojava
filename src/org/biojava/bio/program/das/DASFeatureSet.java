@@ -49,6 +49,7 @@ class DASFeatureSet implements FeatureHolder {
     private final Sequence refSequence;
     private final URL dataSource;
     private final String sourceID;
+    private final String dataSourceString;
 
     DASFeatureSet(Sequence seq, URL ds, String id)
         throws BioException
@@ -56,6 +57,7 @@ class DASFeatureSet implements FeatureHolder {
 	refSequence = seq;
 	dataSource = ds;
 	sourceID = id;
+	dataSourceString = dataSource.toString();
     }
 
     protected FeatureHolder getFeatures() {
@@ -81,7 +83,11 @@ class DASFeatureSet implements FeatureHolder {
 			} else {
 			    try {
 				Feature f = null;
-				
+				if (temp.annotation == Annotation.EMPTY_ANNOTATION) {
+				    temp.annotation = new SimpleAnnotation();
+				}
+				temp.annotation.setProperty(DASSequence.PROPERTY_ANNOTATIONSERVER, dataSourceString);
+
 				if (stackTop == null) {
 				    f = ((RealizingFeatureHolder) refSequence).realizeFeature(refSequence, temp);
 				    realFeatures.addFeature(f);
