@@ -51,6 +51,9 @@ class DASCapabilities {
     public static final String CAPABILITY_FEATURETABLE_DASGFF = "dasgff";
     public static final String CAPABILITY_FEATURETABLE_XFF = "xff";
 
+    public static final String CAPABILITY_EXTENDED = "dasExtendedRequest";
+    public static final String CAPABILITY_EXTENDED_FEATURES = "features";
+
     public static final String CAPABILITY_INDEX = "index";
 
     private static final Map DEFAULT_CAPABILITIES;

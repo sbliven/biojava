@@ -75,37 +75,43 @@ class DASXFFParser {
 	    Element el = parser.getDocument().getDocumentElement();
 	    NodeList segl = el.getElementsByTagName("SEGMENT");
 	    if (segl.getLength() != 1)
-		throw new BioException("DASFEATURES documents must contain one SEGMENT");
+		throw new BioException("Non-extended DASFEATURES documents must contain one SEGMENT");
 	    el = (Element) segl.item(0); 
 	    
-	    siol.startSequence();
-	    
-	    String segStart = el.getAttribute("start");
-	    if (segStart != null) {
-		siol.addSequenceProperty("sequence.start", segStart);
-	    }
-	    String segStop = el.getAttribute("stop");
-	    if (segStop != null) {
-		siol.addSequenceProperty("sequence.stop", segStop);
-	    }
-
-	    Node segChld = el.getFirstChild();
-	    while (segChld != null) {
-		if (segChld instanceof Element) {
-		    Element featureEl = (Element) segChld;
-		    if (featureEl.getTagName().equals("featureSet")) {
-			parseXFFFeatureSet(featureEl, siol);
-		    }
-		}
-		segChld = segChld.getNextSibling();
-	    }
-
-	    siol.endSequence();
+	    parseSegment(el, siol);
 	} catch (SAXException ex) {
 	    throw new ParseException(ex);
 	}
     }
     
+    public void parseSegment(Element el, SeqIOListener siol) 
+        throws ParseException
+    {
+	siol.startSequence();
+	    
+	String segStart = el.getAttribute("start");
+	if (segStart != null) {
+	    siol.addSequenceProperty("sequence.start", segStart);
+	}
+	String segStop = el.getAttribute("stop");
+	if (segStop != null) {
+	    siol.addSequenceProperty("sequence.stop", segStop);
+	}
+
+	Node segChld = el.getFirstChild();
+	while (segChld != null) {
+	    if (segChld instanceof Element) {
+		Element featureEl = (Element) segChld;
+		if (featureEl.getTagName().equals("featureSet")) {
+		    parseXFFFeatureSet(featureEl, siol);
+		}
+	    }
+	    segChld = segChld.getNextSibling();
+	}
+
+	siol.endSequence();
+    }
+
     public void parseXFFFeatureSet(Element fe, SeqIOListener siol) 
         throws ParseException
     {

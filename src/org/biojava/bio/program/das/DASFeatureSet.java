@@ -45,11 +45,13 @@ import org.w3c.dom.*;
  */
 
 class DASFeatureSet implements FeatureHolder {
+    private FeatureRequestManager.Ticket featureTicket;
     private SimpleFeatureHolder realFeatures;
-    private final Sequence refSequence;
-    private final URL dataSource;
-    private final String sourceID;
-    private final String dataSourceString;
+
+    private Sequence refSequence;
+    private URL dataSource;
+    private String sourceID;
+    private String dataSourceString;
 
     DASFeatureSet(Sequence seq, URL ds, String id)
         throws BioException
@@ -60,85 +62,29 @@ class DASFeatureSet implements FeatureHolder {
 	dataSourceString = dataSource.toString();
     }
 
+    void registerFeatureFetcher() {
+	if (featureTicket == null) {
+	    SeqIOListener listener = new DASFeatureSetPopulator();
+	    FeatureRequestManager frm = FeatureRequestManager.getManager(dataSource);
+	    featureTicket = frm.requestFeatures(sourceID, listener);
+	}
+    }
+
     protected FeatureHolder getFeatures() {
 	if (realFeatures != null)
 	    return realFeatures;
 
 	try {
-	    realFeatures = new SimpleFeatureHolder();
-
-	    
-	    SeqIOListener listener = new SeqIOAdapter() {
-		    private List featureStack = new ArrayList();
-		    private Feature stackTop = null;
-
-		    public void startFeature(Feature.Template temp) 
-		        throws ParseException
-		    {
-			if (temp instanceof ComponentFeature.Template) {
-			    // I'm not convinced there's an easy, safe, way to say we don't
-			    // want these server side, so we'll elide them here instead.
-			    // We push a null onto the stack so that we don't get confused
-			    // over endFeature().
-
-			    featureStack.add(null);
-			} else {
-			    try {
-				Feature f = null;
-				if (temp.annotation == Annotation.EMPTY_ANNOTATION) {
-				    temp.annotation = new SimpleAnnotation();
-				}
-				temp.annotation.setProperty(DASSequence.PROPERTY_ANNOTATIONSERVER, dataSource);
-
-				if (stackTop == null) {
-				    f = ((RealizingFeatureHolder) refSequence).realizeFeature(refSequence, temp);
-				    realFeatures.addFeature(f);
-				} else {
-				    f = stackTop.createFeature(temp);
-				}
-				
-				featureStack.add(f);
-				stackTop = f;
-			    } catch (Exception ex) {
-				throw new ParseException(ex, "Couldn't realize feature in DAS");
-			    }
-			}
-		    }
-
-		    public void endFeature()
-		        throws ParseException
-		    {
-			if (featureStack.size() < 1) {
-			    throw new BioError("Missmatched endFeature()");
-			} else {
-			    featureStack.remove(featureStack.size() - 1);
-			    int pos = featureStack.size() - 1;
-			    stackTop = null;
-			    while (stackTop == null && pos >= 0) {
-				stackTop = (Feature) featureStack.get(pos--);
-			    }
-			}
-		    }
-		} ;
-
-	    boolean useXFF = DASCapabilities.checkCapable(new URL(dataSource, ".."),
-							  DASCapabilities.CAPABILITY_FEATURETABLE,
-							  DASCapabilities.CAPABILITY_FEATURETABLE_XFF);
-
-	    if (useXFF) {
-		URL fURL = new URL(dataSource, "features?encoding=xff;ref=" + sourceID);
-		DASXFFParser.INSTANCE.parseURL(fURL, listener);
-	    } else {
-		URL fURL = new URL(dataSource, "features?ref=" + sourceID);
-		DASGFFParser.INSTANCE.parseURL(fURL, listener);
-	    }
-	   
-	} catch (IOException ex) {
-	    throw new BioError(ex, "Error connecting to DAS server");
+	    registerFeatureFetcher();
+	    featureTicket.doFetch();
 	} catch (ParseException ex) {
 	    throw new BioError(ex, "Error parsing feature table");
 	} catch (BioException ex) {
 	    throw new BioError(ex);
+	}
+
+	if (realFeatures == null) {
+	    throw new BioError("Assertion failure: features didn't get fetched.");
 	}
 
 	return realFeatures;
@@ -176,4 +122,70 @@ class DASFeatureSet implements FeatureHolder {
     public void addChangeListener(ChangeListener cl, ChangeType ct) {}
     public void removeChangeListener(ChangeListener cl) {}
     public void removeChangeListener(ChangeListener cl, ChangeType ct) {}
+
+    //
+    // Listener which is responsible for populating this FeatureSet
+    //
+
+    private class DASFeatureSetPopulator extends SeqIOAdapter {
+	private SimpleFeatureHolder holder;
+	private List featureStack = new ArrayList();
+	private Feature stackTop = null;
+	
+	public void startSequence() {
+	    holder = new SimpleFeatureHolder();
+	}
+
+	public void endSequence() {
+	    realFeatures = holder;
+	}
+
+	public void startFeature(Feature.Template temp) 
+	    throws ParseException
+	{
+	    if (temp instanceof ComponentFeature.Template) {
+		// I'm not convinced there's an easy, safe, way to say we don't
+		// want these server side, so we'll elide them here instead.
+		// We push a null onto the stack so that we don't get confused
+		// over endFeature().
+		
+		featureStack.add(null);
+	    } else {
+		try {
+		    Feature f = null;
+		    if (temp.annotation == Annotation.EMPTY_ANNOTATION) {
+			temp.annotation = new SimpleAnnotation();
+		    }
+		    temp.annotation.setProperty(DASSequence.PROPERTY_ANNOTATIONSERVER, dataSource);
+		    
+		    if (stackTop == null) {
+			f = ((RealizingFeatureHolder) refSequence).realizeFeature(refSequence, temp);
+			holder.addFeature(f);
+		    } else {
+			f = stackTop.createFeature(temp);
+		    }
+		    
+		    featureStack.add(f);
+		    stackTop = f;
+		} catch (Exception ex) {
+		    throw new ParseException(ex, "Couldn't realize feature in DAS");
+		}
+	    }
+	}
+	
+	public void endFeature()
+	    throws ParseException
+	{
+	    if (featureStack.size() < 1) {
+		throw new BioError("Missmatched endFeature()");
+	    } else {
+		featureStack.remove(featureStack.size() - 1);
+		int pos = featureStack.size() - 1;
+		stackTop = null;
+		while (stackTop == null && pos >= 0) {
+		    stackTop = (Feature) featureStack.get(pos--);
+		}
+	    }
+	}
+    }
 }

@@ -111,6 +111,8 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 
 	    structure = new SimpleFeatureHolder();
 
+	    System.err.println("Doing a skeleton fetch...");
+
 	    SeqIOListener listener = new SeqIOAdapter() {
 		    public void addSequenceProperty(Object key, Object value)
 		        throws ParseException
@@ -251,6 +253,13 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 		_removeAnnotationSource(dataSourceURL);
 		changeSupport.firePostChangeEvent(ce);
 	    }
+	}
+    }
+
+    void registerFeatureFetchers() {
+	for (Iterator i = featureSets.values().iterator(); i.hasNext(); ) {
+	    DASFeatureSet dfs = (DASFeatureSet) i.next();
+	    dfs.registerFeatureFetcher();
 	}
     }
 
@@ -436,6 +445,24 @@ public class DASSequence implements Sequence, RealizingFeatureHolder {
 	//
 	// Otherwise they want /real/ features, I'm afraid...
 	//
+
+	registerFeatureFetchers();
+	if (structure.countFeatures() > 0 && 
+	    (ff instanceof FeatureFilter.OverlapsLocation || ff instanceof FeatureFilter.ContainedByLocation))
+	{
+	    Location l = null;
+	    if (ff instanceof FeatureFilter.OverlapsLocation) {
+		l = ((FeatureFilter.OverlapsLocation) ff).getLocation();
+	    } else {
+		l = ((FeatureFilter.ContainedByLocation) ff).getLocation();
+	    }
+	    FeatureHolder componentsBelow = structure.filter(new FeatureFilter.OverlapsLocation(l), false);
+	    for (Iterator fi = componentsBelow.features(); fi.hasNext(); ) {
+		ComponentFeature cf = (ComponentFeature) fi.next();
+		DASSequence cseq = (DASSequence) cf.getComponentSequence();
+		cseq.registerFeatureFetchers();
+	    }
+	}
 
 	return features.filter(ff, recurse);
     }
