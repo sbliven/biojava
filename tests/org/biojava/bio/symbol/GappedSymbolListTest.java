@@ -55,36 +55,135 @@ public class GappedSymbolListTest extends TestCase {
     symList4 = new SimpleSymbolList(tok,"gtg----tggga");
   }
   
+  public void testIndividualInsertBlockRemove()
+  throws Exception {
+    GappedSymbolList gsl = new GappedSymbolList(symList);
+    assertTrue(SymbolUtils.compareSymbolLists(gsl, symList));
+
+    gsl.addGapInSource(4);
+    assertTrue(SymbolUtils.compareSymbolLists(gsl, symList1));
+
+    gsl.addGapInSource(4);
+    assertTrue(SymbolUtils.compareSymbolLists(gsl, symList2));
+
+    gsl.addGapInSource(4);
+    assertTrue(SymbolUtils.compareSymbolLists(gsl, symList3));
+
+    gsl.addGapInSource(4);
+    assertTrue(SymbolUtils.compareSymbolLists(gsl, symList4));
+    
+    gsl.removeGaps(4,4);
+    assertTrue(SymbolUtils.compareSymbolLists(gsl, symList));
+  }
+  
   public void testBlockedInsertIndividualRemove()
   throws Exception {
-    GappedSymbolList gll = new GappedSymbolList(symList);
-    assertTrue("Gapped same as ungapped:\n" + gll.seqString() + "\n" + symList.seqString(), SymbolUtils.compareSymbolLists(gll, symList));
+    GappedSymbolList gsl = new GappedSymbolList(symList);
+    assertTrue("Gapped same as ungapped:\n" + gsl.seqString() + "\n" + symList.seqString(), SymbolUtils.compareSymbolLists(gsl, symList));
 
-    gll.addGapsInSource(4,4);
-    assertTrue("Four gaps:\n" + gll.seqString() + "\n" + symList4.seqString(), SymbolUtils.compareSymbolLists(gll, symList4));
+    gsl.addGapsInSource(4,4);
+    assertTrue("Four gaps:\n" + gsl.seqString() + "\n" + symList4.seqString(), SymbolUtils.compareSymbolLists(gsl, symList4));
     
-    gll.removeGap(4);
-    assertTrue("Three gaps:\n" + gll.seqString() + "\n" + symList3.seqString(), SymbolUtils.compareSymbolLists(gll, symList3));
+    gsl.removeGap(4);
+    assertTrue("Three gaps:\n" + gsl.seqString() + "\n" + symList3.seqString(), SymbolUtils.compareSymbolLists(gsl, symList3));
     
-    gll.removeGap(4);
-    assertTrue("Two gaps:\n" + gll.seqString() + "\n" + symList2.seqString(), SymbolUtils.compareSymbolLists(gll, symList2));
+    gsl.removeGap(4);
+    assertTrue("Two gaps:\n" + gsl.seqString() + "\n" + symList2.seqString(), SymbolUtils.compareSymbolLists(gsl, symList2));
     
-    gll.removeGap(4);
-    assertTrue("One gap:\n" + gll.seqString() + "\n" + symList1.seqString(), SymbolUtils.compareSymbolLists(gll, symList1));
+    gsl.removeGap(4);
+    assertTrue("One gap:\n" + gsl.seqString() + "\n" + symList1.seqString(), SymbolUtils.compareSymbolLists(gsl, symList1));
     
-    gll.removeGap(4);
-    assertTrue("All gaps removed:\n" + gll.seqString() + "\n" + symList.seqString(), SymbolUtils.compareSymbolLists(gll, symList));
+    gsl.removeGap(4);
+    assertTrue("All gaps removed:\n" + gsl.seqString() + "\n" + symList.seqString(), SymbolUtils.compareSymbolLists(gsl, symList));
   }
   
   public void testBlockedInsertBlockRemove()
   throws Exception {
-    GappedSymbolList gll = new GappedSymbolList(symList);
-    assertTrue(SymbolUtils.compareSymbolLists(gll, symList));
+    GappedSymbolList gsl = new GappedSymbolList(symList);
+    assertTrue(SymbolUtils.compareSymbolLists(gsl, symList));
 
-    gll.addGapsInSource(4,4);
-    assertTrue(SymbolUtils.compareSymbolLists(gll, symList4));
+    gsl.addGapsInSource(4,4);
+    assertTrue(SymbolUtils.compareSymbolLists(gsl, symList4));
     
-    gll.removeGaps(4,4);
-    assertTrue(SymbolUtils.compareSymbolLists(gll, symList));
+    gsl.removeGaps(4,4);
+    assertTrue(SymbolUtils.compareSymbolLists(gsl, symList));
+  }
+  
+  public void testBeginningGap()
+  throws Exception {
+    GappedSymbolList gsl = new GappedSymbolList(symList);
+    gsl.addGapInSource(1);
+    assertTrue(
+      "Begining gap is the empty gap: " +
+      Alphabet.EMPTY_ALPHABET.getGapSymbol() + " vs " +
+      gsl.symbolAt(1),
+      Alphabet.EMPTY_ALPHABET.getGapSymbol() == gsl.symbolAt(1)
+    );
+  }
+  
+  public void testBeginningGaps()
+  throws Exception {
+    GappedSymbolList gsl = new GappedSymbolList(symList);
+    gsl.addGapsInSource(1, 4);
+    for(int i = 1; i <=4; i++) {
+      assertTrue(
+        "Begining gap " + i + " is the empty gap: " +
+        Alphabet.EMPTY_ALPHABET.getGapSymbol() + " vs " +
+        gsl.symbolAt(i),
+        Alphabet.EMPTY_ALPHABET.getGapSymbol() == gsl.symbolAt(i)
+      );
+    }
+  }
+  
+  public void testTrailingGap()
+  throws Exception {
+    GappedSymbolList gsl = new GappedSymbolList(symList);
+    gsl.addGapInSource(symList.length() + 1);
+    assertTrue(
+      "Trailing gap is the empty gap: " +
+      Alphabet.EMPTY_ALPHABET.getGapSymbol() + " vs " +
+      gsl.symbolAt(gsl.length()),
+      Alphabet.EMPTY_ALPHABET.getGapSymbol() == gsl.symbolAt(gsl.length())
+    );
+  }
+  
+  public void testTrailingGaps()
+  throws Exception {
+    GappedSymbolList gsl = new GappedSymbolList(symList);
+    gsl.addGapsInSource(symList.length() + 1, 4);
+    for(int i = 1; i <=4; i++) {
+      assertTrue(
+        "Trailing gap " + i + " is the empty gap: " +
+        Alphabet.EMPTY_ALPHABET.getGapSymbol() + " vs " +
+        gsl.symbolAt(gsl.length() + 1 - i),
+        Alphabet.EMPTY_ALPHABET.getGapSymbol() == gsl.symbolAt(gsl.length() + 1 - i)
+      );
+    }
+  }
+  
+  public void testInternalGap()
+  throws Exception {
+    GappedSymbolList gsl = new GappedSymbolList(symList);
+    gsl.addGapInSource(4);
+    assertTrue(
+      "Internal gap is the apropreate gap: " +
+      gsl.getAlphabet().getGapSymbol() + " vs " +
+      gsl.symbolAt(4),
+      gsl.getAlphabet().getGapSymbol() == gsl.symbolAt(4)
+    );
+  }
+  
+  public void testInternalGaps()
+  throws Exception {
+    GappedSymbolList gsl = new GappedSymbolList(symList);
+    gsl.addGapsInSource(4, 4);
+    for(int i = 4; i < 8; i++) {
+      assertTrue(
+        "Internal gap " + i + " is the apropreate gap: " +
+        gsl.getAlphabet().getGapSymbol() + " vs " +
+        gsl.symbolAt(i),
+        gsl.getAlphabet().getGapSymbol() == gsl.symbolAt(i)
+      );
+    }
   }
 }
