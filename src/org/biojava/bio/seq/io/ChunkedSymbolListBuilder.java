@@ -27,7 +27,7 @@ import java.io.*;
 import org.biojava.bio.symbol.*;
 
 class ChunkedSymbolListBuilder {
-    private final static int CHUNK_SIZE = 1<<14;
+    private final static int CHUNK_SIZE = 1<<12;
 
     private List chunkL = new ArrayList();
     private Symbol[] headChunk = new Symbol[CHUNK_SIZE];
