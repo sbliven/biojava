@@ -85,132 +85,76 @@ public class SimpleSequence implements Sequence, MutableFeatureHolder
 	return symList.toList();
     }
 
-  /**
-   * List of magic for working out what types of features to create.
-   */
-  protected static List templateClassToFeatureClass;
+    //
+    // Extra stuff which is unique to Sequences
+    //
   
-  /**
-   * Add some magic to boot-strap in a feature impl for a template type.
-   *
-   * @param tf  the TemplateFeature describing the feature impl & template type
-   */
-  public static void addFeatureImplementation(TemplateFeature tf) {
-    templateClassToFeatureClass.add(0, tf);
-  }
-  
-  /**
-   * Create a feature of the apropreate type for a template.
-   *
-   * @param parent   the parent Sequence
-   * @param template the Feature.Template that defines what to make
-   */
-  protected static Feature createFeatureFromTemplate(Sequence parent, Feature.Template template)
-  throws BioException {
-    for(Iterator i = templateClassToFeatureClass.iterator(); i.hasNext(); ) {
-      TemplateFeature tf = (TemplateFeature) i.next();
-      if(tf.templateClass.isInstance(template)) {
-        try {
-          Object [] args = { parent, template };
-          return (Feature) tf.con.newInstance(args);
-        } catch (InstantiationException ie) {
-          throw new BioException(ie);
-        } catch (IllegalAccessException iae) {
-          throw new BioException(iae);
-        } catch (InvocationTargetException ite) {
-          throw new BioException(ite);
-        }
-      }
+    private String urn;
+    private String name;
+    private Annotation annotation;
+    private MutableFeatureHolder featureHolder;
+    private FeatureRealizer featureRealizer;
+
+    protected MutableFeatureHolder getFeatureHolder() {
+	if(featureHolder == null)
+	    featureHolder = new SimpleMutableFeatureHolder();
+	return featureHolder;
     }
-    throw new BioException("Could not find feature associated with " + template);
-  }
-  
-  /**
-   * Initialize the magical feature factory stuff.
-   * <P>
-   * This is bruit-force - it knows what features to use. Later on, this should
-   * be moved out into a preference file.
-   */
-  static {
-    templateClassToFeatureClass = new ArrayList();
-
-    try {
-	addFeatureImplementation(new TemplateFeature(
-						     Feature.Template.class, SimpleFeature.class
-						     ));
-	addFeatureImplementation(new TemplateFeature(
-						     StrandedFeature.Template.class, SimpleStrandedFeature.class
-						     ));
-    } catch (Exception ex) {
-	throw new BioError("Couldn't register feature impls");
+    
+    protected boolean featureHolderAllocated() {
+	return featureHolder != null;
     }
-  }
-  
-  private String urn;
-  private String name;
-  private Annotation annotation;
-  private MutableFeatureHolder featureHolder;
 
-  
-  protected MutableFeatureHolder getFeatureHolder() {
-    if(featureHolder == null)
-      featureHolder = new SimpleMutableFeatureHolder();
-    return featureHolder;
-  }
-
-  protected boolean featureHolderAllocated() {
-    return featureHolder != null;
-  }
-
-  public String getURN() {
-    return urn;
-  }
-
-  public void setURN(String urn) {
-    this.urn = urn;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public Annotation getAnnotation() {
-    if(annotation == null)
-      annotation = new SimpleAnnotation();
-    return annotation;
-  }
-
-  public int countFeatures() {
-    if(featureHolderAllocated())
-      return getFeatureHolder().countFeatures();
-    return 0;
-  }
-
-  public Iterator features() {
-    if(featureHolderAllocated())
-      return getFeatureHolder().features();
-    return Collections.EMPTY_LIST.iterator();
-  }
-
-  public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-    if(featureHolderAllocated())
-      return getFeatureHolder().filter(ff, recurse);
-    return FeatureHolder.EMPTY_FEATURE_HOLDER;
-  }
-
-  public Feature createFeature(MutableFeatureHolder fh, Feature.Template template)
-  throws BioException {
-    Feature f = createFeatureFromTemplate(this, template);
-    if(fh == this) {
-      fh = this.getFeatureHolder();
+    public String getURN() {
+	return urn;
     }
-    fh.addFeature(f);
-    return f;
-  }
+
+    public void setURN(String urn) {
+	this.urn = urn;
+    }
+
+    public String getName() {
+	return name;
+    }
+
+    public void setName(String name) {
+	this.name = name;
+    }
+
+    public Annotation getAnnotation() {
+	if(annotation == null)
+	    annotation = new SimpleAnnotation();
+	return annotation;
+    }
+
+    public int countFeatures() {
+	if(featureHolderAllocated())
+	    return getFeatureHolder().countFeatures();
+	return 0;
+    }
+
+    public Iterator features() {
+	if(featureHolderAllocated())
+	    return getFeatureHolder().features();
+	return Collections.EMPTY_LIST.iterator();
+    }
+
+    public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+	if(featureHolderAllocated())
+	    return getFeatureHolder().filter(ff, recurse);
+	return FeatureHolder.EMPTY_FEATURE_HOLDER;
+    }
+
+    public Feature createFeature(MutableFeatureHolder fh, Feature.Template template)
+	throws BioException 
+    {
+	Feature f = featureRealizer.realizeFeature(this, template);
+	if(fh == this) {
+	    fh = this.getFeatureHolder();
+	}
+	fh.addFeature(f);
+	return f;
+    }
 
     public void addFeature(Feature f) {
 	throw new UnsupportedOperationException();
@@ -220,39 +164,44 @@ public class SimpleSequence implements Sequence, MutableFeatureHolder
 	featureHolder.removeFeature(f);
     }
 
-  /**
-   * Create a SimpleSequence with the symbols and alphabet of res, and the
-   * sequence properties listed.
-   *
-   * @param res the SymbolList to wrap as a sequence
-   * @param urn the URN
-   * @param name the name - should be unique if practical
-   * @param annotation the annotation object to use or null
-   */
-  public SimpleSequence(SymbolList res, String urn, String name, Annotation annotation) {
-      symList = res;
+    /**
+     * Create a SimpleSequence with the symbols and alphabet of res, and the
+     * sequence properties listed.
+     *
+     * @param res the SymbolList to wrap as a sequence
+     * @param urn the URN
+     * @param name the name - should be unique if practical
+     * @param annotation the annotation object to use or null
+     */
+    public SimpleSequence(SymbolList res, String urn, String name, Annotation annotation) {
+	symList = res;
+	
+	setURN(urn);
+	setName(name);
+	this.annotation = annotation;
+	this.featureRealizer = SimpleFeatureRealizer.DEFAULT;
+    }
 
-      setURN(urn);
-      setName(name);
-      this.annotation = annotation;
-  }
-  
-
-    public static class TemplateFeature {
-	public Class templateClass;
-	public Class featureClass;
-	public Constructor con;
-    
-	public TemplateFeature(Class templateClass, Class featureClass)
-	    throws NoSuchMethodException 
-	{
-	    Class[] conTypes = new Class[2];
-	    conTypes[0] = Sequence.class;
-	    conTypes[1] = templateClass;
-
-	    this.templateClass = templateClass;
-	    this.featureClass = featureClass;
-	    this.con = featureClass.getConstructor(conTypes);
-	}
+    /**
+     * Create a SimpleSequence using a specified FeatureRealizer.
+     *
+     * @param res the SymbolList to wrap as a sequence
+     * @param urn the URN
+     * @param name the name - should be unique if practical
+     * @param annotation the annotation object to use or null
+     * @param realizer the FeatureRealizer implemetation to use when adding features
+     */
+    public SimpleSequence(SymbolList res, 
+			  String urn,
+			  String name,
+			  Annotation annotation,
+			  FeatureRealizer realizer) 
+    {
+	symList = res;
+	
+	setURN(urn);
+	setName(name);
+	this.annotation = annotation;
+	this.featureRealizer = realizer;
     }
 }

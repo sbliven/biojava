@@ -67,6 +67,12 @@ public class ViewSequence implements Sequence, MutableFeatureHolder {
     private Annotation anno;
 
     /**
+     * The FeatureRealizer we use.
+     */
+
+    private FeatureRealizer featureRealizer;
+
+    /**
      * Construct a view onto an existing sequence.
      */
 
@@ -85,6 +91,17 @@ public class ViewSequence implements Sequence, MutableFeatureHolder {
 	    urn = urn + "?view=" + hashCode();
 
 	anno = new OverlayAnnotation(seqDelegate.getAnnotation());
+	
+	featureRealizer = SimpleFeatureRealizer.DEFAULT;
+    }
+
+    /**
+     * Construct a view onto a sequence, using a specific FeatureRealizer
+     */
+
+    public ViewSequence(Sequence seq, FeatureRealizer fr) {
+	this(seq);
+	this.featureRealizer = fr;
     }
 
     //
@@ -192,7 +209,7 @@ public class ViewSequence implements Sequence, MutableFeatureHolder {
 	    if (! (containsRecurse(addedFeatures, (Feature) fh)))
 		throw new BioException("fh is not a child which has been added to this ListSequence");
 	}
-	Feature f = createFeatureFromTemplate(this, template);
+	Feature f = featureRealizer.realizeFeature(this, template);
 	fh.addFeature(f);
 	return f;
     }
@@ -208,84 +225,5 @@ public class ViewSequence implements Sequence, MutableFeatureHolder {
 		return true;
 	}
 	return false;
-    }
-
-  /**
-   * List of magic for working out what types of features to create.
-   */
-  protected static List templateClassToFeatureClass;
-  
-  /**
-   * Add some magic to boot-strap in a feature impl for a template type.
-   *
-   * @param tf  the TemplateFeature describing the feature impl & template type
-   */
-  public static void addFeatureImplementation(TemplateFeature tf) {
-    templateClassToFeatureClass.add(0, tf);
-  }
-  
-  /**
-   * Create a feature of the apropreate type for a template.
-   *
-   * @param parent   the parent Sequence
-   * @param template the Feature.Template that defines what to make
-   */
-  protected static Feature createFeatureFromTemplate(Sequence parent, Feature.Template template)
-  throws BioException {
-    for(Iterator i = templateClassToFeatureClass.iterator(); i.hasNext(); ) {
-      TemplateFeature tf = (TemplateFeature) i.next();
-      if(tf.templateClass.isInstance(template)) {
-        try {
-          Object [] args = { parent, template };
-          return (Feature) tf.con.newInstance(args);
-        } catch (InstantiationException ie) {
-          throw new BioException(ie);
-        } catch (IllegalAccessException iae) {
-          throw new BioException(iae);
-        } catch (InvocationTargetException ite) {
-          throw new BioException(ite);
-        }
-      }
-    }
-    throw new BioException("Could not find feature associated with " + template);
-  }
-  
-  /**
-   * Initialize the magical feature factory stuff.
-   * <P>
-   * This is bruit-force - it knows what features to use. Later on, this should
-   * be moved out into a preference file.
-   */
-  static {
-    templateClassToFeatureClass = new ArrayList();
-
-    try {
-	addFeatureImplementation(new TemplateFeature(
-						     Feature.Template.class, SimpleFeature.class
-						     ));
-	addFeatureImplementation(new TemplateFeature(
-						     StrandedFeature.Template.class, SimpleStrandedFeature.class
-						     ));
-    } catch (Exception ex) {
-	throw new BioError("Couldn't register feature impls");
-    }
-  }
-
-    public static class TemplateFeature {
-	public Class templateClass;
-	public Class featureClass;
-	public Constructor con;
-    
-	public TemplateFeature(Class templateClass, Class featureClass)
-	    throws NoSuchMethodException 
-	{
-	    Class[] conTypes = new Class[2];
-	    conTypes[0] = Sequence.class;
-	    conTypes[1] = templateClass;
-
-	    this.templateClass = templateClass;
-	    this.featureClass = featureClass;
-	    this.con = featureClass.getConstructor(conTypes);
-	}
     }
 }

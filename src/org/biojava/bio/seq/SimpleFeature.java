@@ -30,7 +30,7 @@ import org.biojava.bio.symbol.*;
  *
  * @author Matthew Pocock
  */
-public class SimpleFeature implements Feature, MutableFeatureHolder {
+class SimpleFeature implements Feature, MutableFeatureHolder {
   /**
    * The FeatureHolder that we will delegate the FeatureHolder interface too.
    * This is lazily instantiated.

@@ -29,9 +29,7 @@ import org.biojava.bio.symbol.*;
  *
  * @author Matthew Pocock
  */
-public class SimpleStrandedFeature
-extends SimpleFeature
-implements StrandedFeature {
+class SimpleStrandedFeature extends SimpleFeature implements StrandedFeature {
   private int strand;
     
   public int getStrand() {
