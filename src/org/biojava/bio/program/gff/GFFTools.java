@@ -31,6 +31,7 @@ import org.biojava.bio.seq.db.*;
 
 /**
  * @author Mark Schreiber
+ * @author Matthew Pocock
  * @since 1.2
  */
 
@@ -68,6 +69,22 @@ public class GFFTools {
     GFFFilterer filterer = new GFFFilterer(gffEntries.getAddHandler(),recFilt);
     GFFParser parser = new GFFParser();
     parser.parse(new BufferedReader(new FileReader(fileName)),filterer);
+    return gffEntries;
+  }
+
+  public static GFFEntrySet readGFF(BufferedReader gffIn)
+    throws ParserException, BioException, IOException
+  {
+    return readGFF(gffIn, GFFRecordFilter.ACCEPT_ALL);
+  }
+
+  public static GFFEntrySet readGFF(BufferedReader gffIn, GFFRecordFilter recFilt)
+    throws ParserException, BioException, IOException
+  {
+    GFFEntrySet gffEntries = new GFFEntrySet();
+    GFFFilterer filterer = new GFFFilterer(gffEntries.getAddHandler(),recFilt);
+    GFFParser parser = new GFFParser();
+    parser.parse(gffIn, filterer);
     return gffEntries;
   }
 

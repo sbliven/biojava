@@ -547,7 +547,23 @@ public final class AlphabetManager {
    * @return a CrossProductAlphabet that is over the alphabets in aList
    */
   static public Alphabet getCrossProductAlphabet(List aList) {
-    return getCrossProductAlphabet(aList, null);
+    return getCrossProductAlphabet(aList, (Alphabet) null);
+  }
+
+  static public Alphabet getCrossProductAlphabet(List aList, String name) 
+  throws IllegalAlphabetException {
+    Alphabet currentAlpha = (Alphabet) nameToAlphabet.get(name);
+    if(currentAlpha != null) {
+      if(currentAlpha.getAlphabets().equals(aList)) {
+        return currentAlpha;
+      } else {
+        throw new IllegalAlphabetException(name + " already registered");
+      }
+    } else {
+      Alphabet alpha = getCrossProductAlphabet(aList);
+      registerAlphabet(name, alpha);
+      return alpha;
+    }
   }
 
   /**

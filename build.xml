@@ -340,6 +340,33 @@
     </junit>
   </target>
 
+  <!-- Runs tests if the Ant optional JUnit support is available -->
+  <target name="runmosttests" depends="init,compile-tests" >
+    <junit printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
+      <formatter type="plain" usefile="true" />
+      <classpath>
+        <!-- main classes from build -->
+        <pathelement path="${build.dest.main}" />
+        <!-- test classes from build -->
+        <pathelement path="${build.dest.tests}" />
+        <!-- test data from build -->
+        <pathelement path="${build.src.tests}" />
+        <!-- classes specified in this file -->
+        <pathelement path="${classpath}" />
+        <!-- classes specified in system classpath -->
+        <pathelement path="${java.class.path}" />
+      </classpath>
+      <!-- The junit task doesn't support 'if' so we test for JUnit here -->
+      <batchtest fork="yes" todir="${reports.tests}" if="junit.present">
+        <fileset dir="${build.dest.tests}">
+          <include name="**/*Test*" />
+          <exclude name="**/*$*" />
+          <exclude name="**/ssbind/*Test*" />
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+
   <target name="seqtests" depends="init,compile-tests" if="junit.support">
     <junit printsummary="yes" haltonfailure="no" dir="${build.dest.tests}">
       <formatter type="plain" usefile="true" />

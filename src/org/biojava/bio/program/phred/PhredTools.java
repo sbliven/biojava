@@ -41,6 +41,7 @@ import org.biojava.utils.*;
  * <p>Company:      AgResearch</p>
  *
  * @author Mark Schreiber
+ * @author Matthew Pocock
  * @since 1.1
  *
  * Note that Phred is a copyright of CodonCode Corporation.
@@ -49,15 +50,14 @@ import org.biojava.utils.*;
 public final class PhredTools {
 
    static{
-     List l = new ArrayList(2);
-     l.add(DNATools.getDNA());
-     l.add(IntegerAlphabet.getSubAlphabet(0,99));
-     SimpleAlphabet a = new SimpleAlphabet(
-       new HashSet(
-         ((FiniteAlphabet)AlphabetManager.getCrossProductAlphabet(l)).symbols().toList()
-        ),"PHRED"
-     );
-     AlphabetManager.registerAlphabet("PHRED",a);
+     try {
+       List l = new ArrayList(2);
+       l.add(DNATools.getDNA());
+       l.add(IntegerAlphabet.getSubAlphabet(0,99));
+       AlphabetManager.getCrossProductAlphabet(l, "PHRED");
+     } catch (IllegalAlphabetException iae) {
+       throw new BioError(iae, "Could not create phred alphabet");
+     }
    }
 
   /**
@@ -158,13 +158,7 @@ public final class PhredTools {
    */
   public static final Symbol getPhredSymbol(Symbol dna, Symbol integer)
     throws IllegalSymbolException{
-    try{
-      SymbolTokenization toke = getPhredAlphabet().getTokenization("name");
-      String word = "("+dna.getName()+" "+integer.getName()+")";
-      return toke.parseToken(word);
-    }catch(BioException e){
-      throw new NestedError(e);
-    }
+    return getPhredAlphabet().getSymbol(new ListTools.Doublet(dna, integer));
   }
 
   /**
