@@ -101,7 +101,7 @@ public class FeatureBlockSequenceRenderer implements SequenceRenderer {
 
 	    Rectangle2D box = null;
 	    if (sp.getDirection() == SequencePanel.HORIZONTAL)
-		box = new Rectangle2D.Double(min, 5, max-min, 20);
+		box = new Rectangle2D.Double(min, 5, max-min, 15);
 	    else
 		box = new Rectangle2D.Double(5, min, 15, max-min);
 	    g.setPaint(fill);
