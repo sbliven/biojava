@@ -42,12 +42,11 @@ public class TokenParser implements SymbolParser, Serializable {
      */
     private FiniteAlphabet alphabet;
  
-    // private transient char[] tokens;
-    // private transient Symbol[] symbols;
     private transient Symbol[] symbolsByChar;
   
     private void generateTable() {
 	Set tokenSymbols = new HashSet();
+	tokenSymbols.add(AlphabetManager.getGapSymbol());
 	for (Iterator si = alphabet.iterator(); si.hasNext(); ) {
 	    Symbol sym = (Symbol) si.next();
 	    tokenSymbols.add(sym);
