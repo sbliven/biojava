@@ -74,9 +74,10 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	int colon = ourURL.indexOf(':');
 	if (colon > 0) {
 	    String protocol = ourURL.substring(0, colon);
-	    if (protocol.equals("mysql")) {
+	    if (protocol.indexOf("mysql") >= 0) {
+		// Accept any string containing `mysql', to cope with Caucho driver
 		helper = new MySQLDBHelper();
-	    } else {
+	    } else if (protocol.equals("postgresql")) {
 		helper = new PostgreSQLDBHelper();
 	    }
 	}
@@ -677,25 +678,29 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	            "       (seqfeature_id, seq_start, seq_end, seq_strand, location_rank) " +
     		    "values (?, ?, ?, ?, ?)"
 	    );
-	    add_locationspan.setInt(1, id);
+	    
+	    int strandNum;
+
 	    if (f instanceof StrandedFeature) {
 		StrandedFeature.Strand s = ((StrandedFeature) f).getStrand();
 		if (s == StrandedFeature.POSITIVE) {
-		    add_locationspan.setInt(4, 1);
+		    strandNum = 1;
 		} else if (s== StrandedFeature.NEGATIVE) {
-		    add_locationspan.setInt(4, -1);
+		    strandNum = -1;
 		} else {
-		    add_locationspan.setInt(4, 0);
+		    strandNum = 0;
 		}
 	    } else {
-		add_locationspan.setInt(4, 0);
+		strandNum = 0;
 	    }
 
 	    int rank = 0;
 	    for (Iterator i = f.getLocation().blockIterator(); i.hasNext(); ) {
 		Location bloc = (Location) i.next();
+		add_locationspan.setInt(1, id);
 		add_locationspan.setInt(2, bloc.getMin());
 		add_locationspan.setInt(3, bloc.getMax());
+		add_locationspan.setInt(4, strandNum);
 		add_locationspan.setInt(5, ++rank);
 		add_locationspan.executeUpdate();
 	    }
@@ -754,28 +759,48 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	    insert_new= conn.prepareStatement("insert into seqfeature_qualifier_value " +
                                               "       (seqfeature_id, seqfeature_qualifier_id, seqfeature_qualifier_rank, qualifier_value) " +
 					      "values (?, intern_seqfeature_qualifier( ? ), ?, ?)");
-	    insert_new.setString(2, keyString);
-	} else {
-	    insert_new= conn.prepareStatement("insert into seqfeature_qualifier_value " +
-                                              "       (seqfeature_id, seqfeature_qualifier_id, seqfeature_qualifier_rank, qualifier_value) " +
-					      "values (?, ?, ?, ?)");
-	    insert_new.setInt(2, intern_seqfeature_qualifier(conn, keyString));
-	}
-
-	insert_new.setInt(1, feature_id);	
-	if (value instanceof Collection) {
-	    int cnt = 0;
-	    for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
-		insert_new.setInt(3, ++cnt);
-		insert_new.setString(4, i.next().toString());
+	    if (value instanceof Collection) {
+		int cnt = 0;
+		for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+		    insert_new.setInt(1, feature_id);
+		    insert_new.setString(2, keyString);
+		    insert_new.setInt(3, ++cnt);
+		    insert_new.setString(4, i.next().toString());
+		    insert_new.executeUpdate();
+		}
+	    } else {
+		insert_new.setInt(1, feature_id);
+		insert_new.setString(2, keyString);
+		insert_new.setInt(3, 1);
+		insert_new.setString(4, value.toString());
 		insert_new.executeUpdate();
 	    }
+	    insert_new.close();
 	} else {
-	    insert_new.setInt(3, 1);
-	    insert_new.setString(4, value.toString());
-	    insert_new.executeUpdate();
+	    insert_new = conn.prepareStatement("insert into seqfeature_qualifier_value " +
+                                               "       (seqfeature_id, seqfeature_qualifier_id, seqfeature_qualifier_rank, qualifier_value) " +
+			  	 	      "values (?, ?, ?, ?)");
+	    int sfq = intern_seqfeature_qualifier(conn, keyString);
+	    if (value instanceof Collection) {
+		int cnt = 0;
+		for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
+		    insert_new.setInt(1, feature_id);
+		    insert_new.setInt(2, sfq);
+		    insert_new.setInt(3, ++cnt);
+		    insert_new.setString(4, i.next().toString());
+		    insert_new.executeUpdate();
+		}
+	    } else {
+		insert_new.setInt(1, feature_id);
+		insert_new.setInt(2, sfq);
+		insert_new.setInt(3, 1);
+		insert_new.setString(4, value.toString());
+		insert_new.executeUpdate();
+	    }
+	    insert_new.close();
 	}
-	insert_new.close();
+
+
     }
 
     void persistBioentryProperty(Connection conn,
@@ -812,13 +837,13 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	PreparedStatement insert_new;
 	if (isSPASupported()) {
 	    insert_new= conn.prepareStatement("insert into bioentry_property " +
-                                              "       (bioentry_id, seqfeature_qualifier_id, property_value) " +
-					      "values (?, intern_seqfeature_qualifier( ? ), ?)");
+                                              "       (bioentry_id, seqfeature_qualifier_id, property_rank, property_value) " +
+					      "values (?, intern_seqfeature_qualifier( ? ), ?, ?)");
 	    insert_new.setString(2, keyString);
 	} else {
 	    insert_new= conn.prepareStatement("insert into seqfeature_qualifier_value " +
-                                              "       (bioentry_id, seqfeature_qualifier_id, property_value) " +
-					      "values (?, ?, ?)");
+                                              "       (bioentry_id, seqfeature_qualifier_id, property_rank, property_value) " +
+					      "values (?, ?, ?, ?)");
 	    insert_new.setInt(2, intern_seqfeature_qualifier(conn, keyString));
 	}
 
@@ -826,13 +851,13 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
 	if (value instanceof Collection) {
 	    int cnt = 0;
 	    for (Iterator i = ((Collection) value).iterator(); i.hasNext(); ) {
-		// insert_new.setInt(3, ++cnt);
-		insert_new.setString(3, i.next().toString());
+		insert_new.setInt(3, ++cnt);
+		insert_new.setString(4, i.next().toString());
 		insert_new.executeUpdate();
 	    }
 	} else {
-	    // insert_new.setInt(3, 1);
-	    insert_new.setString(3, value.toString());
+	    insert_new.setInt(3, 1);
+	    insert_new.setString(4, value.toString());
 	    insert_new.executeUpdate();
 	}
 	insert_new.close();
@@ -983,25 +1008,27 @@ public class BioSQLSequenceDB extends AbstractSequenceDB implements SequenceDB {
     private boolean locationQualifierSupported = false;
 
     boolean isLocationQualifierSupported() {
-	if (!locationQualifierChecked) {
-	    try {
-		Connection conn = pool.takeConnection();
-		PreparedStatement ps = conn.prepareStatement("select * from location_qualifier_value limit 1");
-		try {
-		    ps.executeQuery();
-		    locationQualifierSupported = true;
-		} catch (SQLException ex) {
-		    locationQualifierSupported = false;
-		}
-		ps.close();
-		pool.putConnection(conn);
-	    } catch (SQLException ex) {
-		throw new BioRuntimeException(ex);
-	    }
-	    locationQualifierChecked = true;
-	}
+//  	if (!locationQualifierChecked) {
+//  	    try {
+//  		Connection conn = pool.takeConnection();
+//  		PreparedStatement ps = conn.prepareStatement("select * from location_qualifier_value limit 1");
+//  		try {
+//  		    ps.executeQuery();
+//  		    locationQualifierSupported = true;
+//  		} catch (SQLException ex) {
+//  		    locationQualifierSupported = false;
+//  		}
+//  		ps.close();
+//  		pool.putConnection(conn);
+//  	    } catch (SQLException ex) {
+//  		throw new BioRuntimeException(ex);
+//  	    }
+//  	    locationQualifierChecked = true;
+//  	}
 
-	return locationQualifierSupported;
+//  	return locationQualifierSupported;
+
+	return false;
     }
 
     private boolean bioentryPropertyChecked = false;

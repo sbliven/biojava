@@ -103,16 +103,30 @@ class BioSQLSequenceAnnotation implements Annotation {
 
 	    if (seqDB.isBioentryPropertySupported()) {
 		PreparedStatement get_properties = conn.prepareStatement(
-			"select seqfeature_qualifier.qualifier_name, bioentry_property.property_value " +
+			"select seqfeature_qualifier.qualifier_name as qn, bioentry_property.property_value, bioentry_property.property_rank as rank " +
 			"  from bioentry_property, seqfeature_qualifier " +
 			" where bioentry_property.bioentry_id = ? " +
-			"   and seqfeature_qualifier.seqfeature_qualifier_id = bioentry_property.seqfeature_qualifier_id");
+			"   and seqfeature_qualifier.seqfeature_qualifier_id = bioentry_property.seqfeature_qualifier_id " +
+			" order by qn, rank");
 		get_properties.setInt(1, bioentry_id);
 		rs = get_properties.executeQuery();
 		while (rs.next()) {
 		    String key = rs.getString(1);
 		    String value = rs.getString(2);
-		    underlyingAnnotation.setProperty(key, value);
+		    if (underlyingAnnotation.containsProperty(key)) {
+			Object current = underlyingAnnotation.getProperty(key);
+			Collection coll;
+			if (! (current instanceof Collection)) {
+			    coll = new ArrayList();
+			    coll.add(current);
+			    underlyingAnnotation.setProperty(key, coll);
+			} else {
+			    coll = (Collection) current;
+			}
+			coll.add(value);
+		    } else {
+			underlyingAnnotation.setProperty(key, value);
+		    }
 		}
 	    }
 	    

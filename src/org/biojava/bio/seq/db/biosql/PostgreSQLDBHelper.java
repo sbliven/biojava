@@ -31,6 +31,9 @@ public class PostgreSQLDBHelper implements DBHelper {
 	throws SQLException
     {
 	StringBuffer sequenceName = new StringBuffer();
+
+	/* Old style
+
 	int totalLength = table.length() + columnName.length();
 
 	if (totalLength > 26 && table.length() > 13) {
@@ -45,6 +48,11 @@ public class PostgreSQLDBHelper implements DBHelper {
 	    sequenceName.append(columnName);
 	}
 	sequenceName.append("_seq");
+
+	*/
+
+	sequenceName.append(table);
+	sequenceName.append("_pkey_seq");
 
 	Statement st = conn.createStatement();
 	ResultSet rs = st.executeQuery("select currval('" + sequenceName.toString() + "')");

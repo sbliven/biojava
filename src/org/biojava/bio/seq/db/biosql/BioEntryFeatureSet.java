@@ -201,7 +201,9 @@ class BioEntryFeatureSet implements FeatureHolder, RealizingFeatureHolder {
 		    }
 		    StrandedFeature.Template templ = (StrandedFeature.Template) fmap.get(fid);
 		    if (templ.strand != null && templ.strand != strand) {
-			throw new BioRuntimeException("Feature strands don't match");
+			// throw new BioRuntimeException("Feature strands don't match");
+			// Really don't want to support these at all, but...
+			templ.strand = StrandedFeature.UNKNOWN;
 		    } else {
 			templ.strand = strand;
 		    }
