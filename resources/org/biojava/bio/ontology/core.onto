@@ -53,3 +53,6 @@ partial-order	is-a	transitive
 is-a	is-a	partial-order
 has-a	is-a	partial-order
 
+part-of	is-a	transitive
+part-of	is-a	partial-order
+part-of	inverse	has-a
