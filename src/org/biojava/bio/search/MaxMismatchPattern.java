@@ -26,10 +26,11 @@ import org.biojava.bio.symbol.IllegalAlphabetException;
 
 /**
  * This class permits searching a SymbolList with another SymbolList while
- * permitting a specified number of mismatches.
+ * permitting a specified number of mismatches.  The search pattern can
+ * include ambiguity Symbols.
  *
  * @author Matthew Pocock (wrote original MaxMissmatchPattern class)
- @ @author David Huen (debugging and reimplementation to use MaxMismatchMatcher class)
+ @ @author David Huen (debugging and extension to permit ambiguity symbols)
  */
 public class MaxMismatchPattern
 implements BioPattern {
