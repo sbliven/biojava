@@ -147,4 +147,10 @@ public class FilterXMLTest extends TestCase
     {
         roundTripFilter(new FeatureFilter.ByParent(new FeatureFilter.ByType("foo")));
     }
+    
+    public void testAnnotationContains()
+        throws Exception
+    {
+        roundTripFilter(new FeatureFilter.AnnotationContains("foo.bar", "baz"));
+    }
 }
