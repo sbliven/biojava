@@ -49,7 +49,7 @@ public final class PhredTools {
    static{
      List l = new ArrayList(2);
      l.add(DNATools.getDNA());
-     l.add(IntegerAlphabet.getSubAlphabet(0,60));
+     l.add(IntegerAlphabet.getSubAlphabet(0,90));
      SimpleAlphabet a = new SimpleAlphabet(
        new HashSet(
          ((FiniteAlphabet)AlphabetManager.getCrossProductAlphabet(l)).symbols().toList()
@@ -60,13 +60,10 @@ public final class PhredTools {
 
   /**
    * Retrieves the PHRED alphabet from the AlphabetManager. The Phred alphabet
-   * is a cross product of a subset of the IntegerAlphabet from 0...60 and the
-   * DNA alphabet. The Phred alphabet is finite. It is assumed that no Phred
-   * score would ever exceed 60 which equates to 1 error in a million base pairs.
-   * This seems reasonable as no single sequence run could be expected to exceed
-   * this level of accuracy.
+   * is a cross product of a subset of the IntegerAlphabet from 0...90 and the
+   * DNA alphabet. The Phred alphabet is finite.
    *
-   * The Phred Alphabet contains 244 BasisSymbols named, for example, (guanine 47).
+   * The Phred Alphabet contains 364 BasisSymbols named, for example, (guanine 47).
    * The BasisSymbols can be fragmented into their component AtomicSymbols using
    * the <code>getSymbols()</code> method of BasisSymbol.
    */
@@ -108,7 +105,7 @@ public final class PhredTools {
 
   /**
    * Merges a Symbol List from the DNA alphabet with a SymbolList from the
-   * [0..60] subset of the IntegerAlphabet into a SymbolList from
+   * [0..90] subset of the IntegerAlphabet into a SymbolList from
    * the PHRED alphabet.
    * @throws IllegalAlphabetException if the alphabets are not of the required alphabets
    * @throws IllegalArgumentException if the two SymbolLists are not of equal length.
@@ -127,7 +124,7 @@ public final class PhredTools {
         "Expecting SymbolList 'dna' to use the DNA alphabet, uses "
         +dna.getAlphabet().getName());
     }
-    Alphabet subint = IntegerAlphabet.getSubAlphabet(0,60);
+    Alphabet subint = IntegerAlphabet.getSubAlphabet(0,90);
     if(quality.getAlphabet() != subint && quality.getAlphabet() != IntegerAlphabet.getInstance()){
       throw new IllegalAlphabetException(
         "Expecting SymbolList quality to use the "+subint.getName()+" alphabet"+
