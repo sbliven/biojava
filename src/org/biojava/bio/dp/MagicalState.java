@@ -66,7 +66,7 @@ public final class MagicalState extends SimpleEmissionState {
       "!-" + heads,
       Annotation.EMPTY_ANNOTATION,
       new int[heads],
-      new MagicalDistribution(alpha)
+      new GapDistribution(alpha)
     );
     int [] advance = getAdvance();
     for(int i = 0; i < heads; i++) {
@@ -94,40 +94,6 @@ public final class MagicalState extends SimpleEmissionState {
     
     public int hashCode() {
       return alpha.hashCode() ^ heads;
-    }
-  }
-  
-  private static class MagicalDistribution implements Distribution {
-    private final Alphabet alpha;
-    
-    public double getWeight(Symbol sym) throws IllegalSymbolException {
-      return sym == AlphabetManager.instance().getGapSymbol()
-        ? 1.0
-        : 0.0;
-    }
-
-    public void setWeight(Symbol s, double w) throws IllegalSymbolException,
-    UnsupportedOperationException {
-      getAlphabet().validate(s);
-      throw new UnsupportedOperationException(
-        "The weights are immutable: " + s.getName() + " -> " + w
-      );
-    }
-
-    public Alphabet getAlphabet() {
-      return alpha;
-    }
-    
-    public Symbol sampleSymbol() {
-      return AlphabetManager.instance().getGapSymbol();
-    }
-
-    public void registerWithTrainer(DistributionTrainerContext dtc) {
-      dtc.registerDistributionTrainer(this, IgnoreCountsTrainer.getInstance());
-    }
-    
-    public MagicalDistribution(Alphabet alpha) {
-      this.alpha = alpha;
     }
   }
   

@@ -73,7 +73,8 @@ extends AbstractDistribution implements Serializable {
     return weight;
   }
   
-  public void registerWithTrainer(org.biojava.bio.dp.ModelTrainer trainer) {
+  public void registerWithTrainer(DistributionTrainerContext dtc) {
+    dtc.registerDistributionTrainer(this, IgnoreCountsTrainer.getInstance());
   }
   
   private UniformDistribution(FiniteAlphabet alphabet) {
