@@ -330,8 +330,6 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
 			Integer parent = new Integer(rs.getInt(1));
 			Integer child = new Integer(rs.getInt(2));
 
-			System.err.println("Got hierarchy entry: " + parent + " : " + child);
-
 			toplevelFeatures.remove(child);
 			List cl = (List) featureHierarchy.get(parent);
 			if (cl == null) {
@@ -369,13 +367,9 @@ class BioSQLSequence implements Sequence, RealizingFeatureHolder {
     private Feature reRealizeFeature(Integer fid, Map fmap, Map featureHierarchy, FeatureHolder parent)
         throws BioException, ChangeVetoException
     {
-	System.err.println("ReRealizeFeature " + fid);
-
 	Feature.Template templ = (Feature.Template) fmap.get(fid);
 	Feature f = realizeFeature(parent, templ);
 	if (f instanceof BioSQLFeatureI) {
-	    System.err.println("Doing magical bits");
-
 	    ((BioSQLFeatureI) f)._setInternalID(fid.intValue());
 	    ((BioSQLFeatureI) f)._setAnnotation(new BioSQLFeatureAnnotation(seqDB, fid.intValue()));
 	    List children = (List) featureHierarchy.get(fid);
