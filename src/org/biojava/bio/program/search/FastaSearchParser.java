@@ -131,7 +131,15 @@ public class FastaSearchParser implements SearchParser
 	    // tokens, so we need to check here as well as INALIGN
 	    if (line.startsWith(">>><<<"))
 	    {
-		searchStatus = NODATA;
+		// If we got here while INHEADER then the search had
+		// no hits
+		if (searchStatus == INHEADER)
+		{
+		    searchStatus = NODATA;
+		    continue LINE;
+		}
+		else
+		    searchStatus = NODATA;
 
 		// Pass final data to handler
 		handler.addSubHitProperty("querySeqTokens",   querySeqTokens.toString());
