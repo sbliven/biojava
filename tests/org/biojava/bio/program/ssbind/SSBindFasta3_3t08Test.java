@@ -55,12 +55,12 @@ public class SSBindFasta3_3t08Test extends SSBindCase
         super.setUp();
 
         setTopHitValues(3266.4d, "CISY_ECOLI",
-                        1, 427, StrandedFeature.POSITIVE,
-                        1, 427, StrandedFeature.POSITIVE);
+                        1, 427, null,
+                        1, 427, null);
 
         setBotHitValues(2032.3d, "CISY_RICCN",
-                        6, 422, StrandedFeature.POSITIVE,
-                        12, 430, StrandedFeature.POSITIVE);
+                        6, 422, null,
+                        12, 430, null);
 
         String fastaOutputFileName = "fasta_3.3t08.out.gz";
 

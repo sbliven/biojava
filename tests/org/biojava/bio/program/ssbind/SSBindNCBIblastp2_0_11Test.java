@@ -56,12 +56,12 @@ public class SSBindNCBIblastp2_0_11Test extends SSBindCase
         super.setUp();
 
         setTopHitValues(326d, "P07155;P27109;P27428",
-                        1, 168, StrandedFeature.POSITIVE,
-                        1, 168, StrandedFeature.POSITIVE);
+                        1, 168, null,
+                        1, 168, null);
 
         setBotHitValues(29d, "P19375",
-                        2, 97, StrandedFeature.POSITIVE,
-                        72, 169, StrandedFeature.POSITIVE);
+                        2, 97, null,
+                        72, 169, null);
 
         String blastOutputFileName = "ncbi_blastp_2.0.11.out.gz";
 

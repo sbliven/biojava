@@ -56,12 +56,12 @@ public class SSBindWUblastp2_0a19Test extends SSBindCase
         super.setUp();
 
         setTopHitValues(1144d, "sp|P09429|HMG1_HUMAN",
-                        1, 214, StrandedFeature.POSITIVE,
-                        1, 214, StrandedFeature.POSITIVE);
+                        1, 214, null,
+                        1, 214, null);
 
         setBotHitValues(1135d, "sp|P12682|HMG1_PIG",
-                        1, 214, StrandedFeature.POSITIVE,
-                        1, 214, StrandedFeature.POSITIVE);
+                        1, 214, null,
+                        1, 214, null);
 
         String blastOutputFileName = "wu_blastp_2.0a19.out.gz";
 

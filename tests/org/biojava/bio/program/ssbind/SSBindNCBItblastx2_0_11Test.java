@@ -56,8 +56,8 @@ public class SSBindNCBItblastx2_0_11Test extends SSBindCase
         super.setUp();
 
         setTopHitValues(1596d, "U51677",
-                        1, 2575, StrandedFeature.POSITIVE,
-                        1, 2575, StrandedFeature.POSITIVE);
+                        1, 2575, StrandedFeature.UNKNOWN,
+                        1, 2575, StrandedFeature.UNKNOWN);
 
         setBotHitValues(34.1d, "U36384",
                         674, 733, StrandedFeature.POSITIVE,

@@ -56,11 +56,11 @@ public class SSBindWUtblastn2_0a19Test extends SSBindCase
         super.setUp();
 
         setTopHitValues(1144d, "X12597",
-                        1, 214, StrandedFeature.POSITIVE,
+                        1, 214, null,
                         56, 697, StrandedFeature.POSITIVE);
 
         setBotHitValues(126d, "AF025664",
-                        47, 214, StrandedFeature.POSITIVE,
+                        47, 214, null,
                         304, 866, StrandedFeature.POSITIVE);
 
         String blastOutputFileName = "wu_tblastn_2.0a19.out.gz";
