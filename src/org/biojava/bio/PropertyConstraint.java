@@ -101,18 +101,28 @@ public interface PropertyConstraint {
   
   public class IsCollectionOf implements PropertyConstraint {
     private PropertyConstraint elementType;
+    private Class clazz;
     private int minTimes;
     private int maxTimes;
     
-    protected IsCollectionOf(PropertyConstraint elementType) {
-      this(elementType, 0, Integer.MAX_VALUE);
+    public IsCollectionOf(Class clazz, PropertyConstraint elementType) {
+      this(clazz, elementType, 0, Integer.MAX_VALUE);
     }
     
-    protected IsCollectionOf(
+    public IsCollectionOf(
+      Class clazz,
       PropertyConstraint elementType,
       int minTimes,
       int maxTimes
-    ) {
+    ) throws IllegalArgumentException {
+      if(
+        !Collection.class.isAssignableFrom(clazz) ||
+        java.lang.reflect.Modifier.isAbstract(clazz.getModifiers()) ||
+        java.lang.reflect.Modifier.isInterface(clazz.getModifiers())
+      ) {
+        throw new IllegalArgumentException("Class must be a non-virtual collection");
+      }
+      this.clazz = clazz;
       this.elementType = elementType;
       this.minTimes = minTimes;
       this.maxTimes = maxTimes;
@@ -131,7 +141,7 @@ public interface PropertyConstraint {
     }
     
     protected Class getCollectionClass() {
-      return Collection.class;
+      return clazz;
     }
     
     public boolean accept(Object item) {
@@ -165,7 +175,7 @@ public interface PropertyConstraint {
       if(getElementType().accept(value)) {
         Collection c;
         if(ann.containsProperty(property)) {
-          c = (Collection) ann.getProperty(value);
+          c = (Collection) ann.getProperty(property);
         } else {
           try {
             c = (Collection) getCollectionClass().newInstance();
@@ -178,34 +188,6 @@ public interface PropertyConstraint {
       } else {
         throw new ChangeVetoException("Incorrect element type");
       }
-    }
-  }
-  
-  public class IsList extends IsCollectionOf {
-    public IsList(PropertyConstraint con) {
-      super(con);
-    }
-    
-    public IsList(PropertyConstraint con, int minTimes, int maxTimes) {
-      super(con, minTimes, maxTimes);
-    }
-    
-    protected Class getCollectionClass() {
-      return List.class;
-    }
-  }
-  
-  public class IsSet extends IsCollectionOf {
-    public IsSet(PropertyConstraint con) {
-      super(con);
-    }
-    
-    public IsSet(PropertyConstraint con, int minTimes, int maxTimes) {
-      super(con, minTimes, maxTimes);
-    }
-    
-    protected Class getCollectionClass() {
-      return Set.class;
     }
   }
   
