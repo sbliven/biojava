@@ -76,7 +76,7 @@ public class HypersonicDBHelper extends DBHelper {
             conn = ds.getConnection();
             PreparedStatement ps = null;
             try {
-                ps = conn.prepareStatement("select top 0 * from " + tablename);
+                ps = conn.prepareStatement("select top 1 * from " + tablename);
                 ps.executeQuery();
                 present = true;
             } catch (SQLException ex) {
