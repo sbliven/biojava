@@ -36,7 +36,7 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
   private final Map transTo;
   private final Map transitionScores;
   
-  private final List transitionListeners;
+  private transient List transitionListeners;
 
   private Transition _tran = new Transition(null, null);
   
@@ -44,9 +44,15 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     transFrom = new HashMap();
     transTo = new HashMap();
     transitionScores = new HashMap();
-    transitionListeners = new ArrayList();
   }
 
+  protected List getTransitionListeners() {
+    if(transitionListeners == null) {
+      transitionListeners = new ArrayList();
+    }
+    return transitionListeners;
+  }
+  
   public Alphabet emissionAlphabet() { return emissionAlpha; }
   public FiniteAlphabet stateAlphabet() { return stateAlpha; }
   public int heads() { return magicalState().getAdvance().length; }
@@ -108,6 +114,7 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     TransitionEvent te = new TransitionEvent(
       this, from, to, getTransitionScore(from, to), value
     );
+    List transitionListeners = getTransitionListeners();
     List tl;
     synchronized(transitionListeners) {
       tl = new ArrayList(transitionListeners);
@@ -140,6 +147,7 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     stateAlphabet().validate(to);
 
     TransitionEvent te = new TransitionEvent(this, from, to);
+    List transitionListeners = getTransitionListeners();
     List tl;
     synchronized(transitionListeners) {
       tl = new ArrayList(transitionListeners);
@@ -167,6 +175,7 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
     stateAlphabet().validate(to);
 
     TransitionEvent te = new TransitionEvent(this, from, to);
+    List transitionListeners = getTransitionListeners();
     List tl;
     synchronized(transitionListeners) {
       tl = new ArrayList(transitionListeners);
@@ -334,12 +343,14 @@ public class SimpleMarkovModel implements MarkovModel, Serializable {
   }
   
   public void addTransitionListener(TransitionListener tl) {
+    List transitionListeners = getTransitionListeners();
     synchronized(transitionListeners) {
       transitionListeners.add(tl);
     }
   }
   
   public void removeTransitionListener(TransitionListener tl) {
+    List transitionListeners = getTransitionListeners();
     synchronized(transitionListeners) {
       transitionListeners.remove(tl);
     }

@@ -54,10 +54,19 @@ extends AbstractSymbolList implements SymbolList {
    * The TranslationTable that will be used to translate source->view symbols
    */
   private final TranslationTable transTable;
+
+    /**
+*Obtain the translation table associated with this symbol list
+*/
+
   
   public TranslationTable getTranslationTable() {
     return transTable;
   }
+
+    /**
+*Returns the symbol list associated with this translated symbol list.
+*/  
   
   public SymbolList getSource() {
     return source;

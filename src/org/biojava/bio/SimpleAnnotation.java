@@ -62,6 +62,7 @@ public class SimpleAnnotation implements Annotation, Serializable {
   }
 
   /**
+   * @param key The key whose property to retrieve.
    * @throws NoSuchElementException if the property 'key' does not exist
    */
   public Object getProperty(Object key) throws NoSuchElementException {
@@ -74,8 +75,8 @@ public class SimpleAnnotation implements Annotation, Serializable {
     throw new NoSuchElementException("Property " + key + " unknown");
   }
 
-  public void setProperty(Object name, Object value) {
-    getProperties().put(name, value);
+  public void setProperty(Object key, Object value) {
+    getProperties().put(key, value);
   }
 
   public Set keys() {

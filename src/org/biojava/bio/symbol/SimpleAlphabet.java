@@ -65,6 +65,10 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
     return name;
   }
 
+    /**
+*Assign a name to the alphabet
+*@param name the name you wish to give this alphabet
+*/
   public void setName(String name) {
     this.name = name;
   }
@@ -90,17 +94,17 @@ public class SimpleAlphabet extends AbstractAlphabet implements Serializable {
       }
   }
 
-  public boolean contains(Symbol s) {
-    if(s == null) {
+  public boolean contains(Symbol r) {
+    if(r == null) {
       return false;
-    } else if(symbols.contains(s)) {
+    } else if(symbols.contains(r)) {
       return true;
     } else  {
-      Alphabet sa = s.getMatches();
+      Alphabet sa = r.getMatches();
       if(!(sa instanceof FiniteAlphabet)) {
         return false;
       } else {
-        Iterator i = ((FiniteAlphabet) s.getMatches()).iterator();
+        Iterator i = ((FiniteAlphabet) r.getMatches()).iterator();
         while(i.hasNext()) {
           Symbol sym = (Symbol) i.next();
           if(!symbols.contains(sym)) {

@@ -37,7 +37,7 @@ import org.biojava.bio.symbol.*;
  * classical statistics, this would be just the sum of the probabiltiy of
  * emitting each matching symbol. However, in our domain, only one symbol can
  * actualy be produced, and the ambiguity symbol means 'one of these', not
- * 'each of these', you should take a weightet average:<code>
+ * 'each of these', you should take a weighted average:<code>
  * <pre>P(A|S, Null) = [ sum_i P(a_i|S) * P(a_i|Null) ] / [ sum_i P(a_i|Null) ]</pre>
  * </code>
  *

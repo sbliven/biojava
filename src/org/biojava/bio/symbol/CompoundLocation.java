@@ -26,7 +26,7 @@ import java.io.*;
 import org.biojava.bio.*;
 
 /**
- * A comlex location. It is made up from multiple sub-locations and is essential
+ * A complex location. It is made up from multiple sub-locations and is essentially
  * the point-wise union of the child locations.
  * <P>
  * Currently this is implemented very badly. I need a maths person to look over
@@ -63,7 +63,7 @@ public class CompoundLocation implements Location, Serializable {
    * Generate a new CompoundLocation from a list of locations.
    * <P>
    * The generated location will contain exactly those points that are within
-   * at least one of the loctaions in the list.
+   * at least one of the Locations in the list.
    *
    * @param locations a list of Location instances to combine into a single
    *        compound location
@@ -151,9 +151,9 @@ public class CompoundLocation implements Location, Serializable {
     return false;
   }
 
-  public boolean equals(Object o) {
-    if(o instanceof Location) {
-      return Location.naturalOrder.areEqual(this, (Location) o);
+  public boolean equals(Object l) {
+    if(l instanceof Location) {
+      return Location.naturalOrder.areEqual(this, (Location) l);
     } else {
       return false;
     }
@@ -189,18 +189,18 @@ public class CompoundLocation implements Location, Serializable {
     return new CompoundLocation(res);
   }
 
-  public SymbolList symbols(SymbolList s) {
+  public SymbolList symbols(SymbolList seq) {
       if (isContiguous())
-	  return s.subList(min, max);
+	  return seq.subList(min, max);
 
     List res = new ArrayList();
     for (Iterator i = blockIterator(); i.hasNext(); ) {
 	Location l = (Location) i.next();
-	res.addAll(l.symbols(s).toList());
+	res.addAll(l.symbols(seq).toList());
     }
 
     try {
-      return new SimpleSymbolList(s.getAlphabet(), res);
+      return new SimpleSymbolList(seq.getAlphabet(), res);
     } catch (IllegalSymbolException ex) {
       throw new BioError(ex);
     }

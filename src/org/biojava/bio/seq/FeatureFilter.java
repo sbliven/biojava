@@ -57,7 +57,7 @@ public interface FeatureFilter extends Serializable {
    * <P>
    * Use the FeatureFilter.all member.
    */
-  static class AcceptAllFilter implements FeatureFilter {
+  public static class AcceptAllFilter implements FeatureFilter {
     public boolean accept(Feature f) { return true; }
   };
 
@@ -66,7 +66,7 @@ public interface FeatureFilter extends Serializable {
    *
    * @author Matthew Pocock
    */
-  static class ByType implements FeatureFilter {
+  public static class ByType implements FeatureFilter {
     private String type;
     
     public String getType() {
@@ -86,7 +86,9 @@ public interface FeatureFilter extends Serializable {
     /**
      * Returns true if the feature has a matching type property.
      */
-    public boolean accept(Feature f) { return f.getType().equals(type); }
+    public boolean accept(Feature f) {
+      return type.equals(f.getType());
+    }
   }
 
   /**
@@ -94,7 +96,7 @@ public interface FeatureFilter extends Serializable {
    *
    * @author Matthew Pocock
    */
-  static class BySource implements FeatureFilter {
+  public static class BySource implements FeatureFilter {
     private String source;
     
     public String getSource() {
@@ -110,7 +112,7 @@ public interface FeatureFilter extends Serializable {
     public BySource(String source) {
       this.source = source;
     }
-    public boolean accept(Feature f) { return f.getSource().equals(source); }
+    public boolean accept(Feature f) { return source.equals(f.getSource()); }
   }
 
   /**
@@ -118,7 +120,7 @@ public interface FeatureFilter extends Serializable {
    *
    * @author Matthew Pocock
    */
-  static class ContainedByLocation implements FeatureFilter {
+  public static class ContainedByLocation implements FeatureFilter {
     private Location loc;
 
     public Location getLocation() {
@@ -147,7 +149,7 @@ public interface FeatureFilter extends Serializable {
    *
    * @author Matthew Pocock
    */
-  static class OverlapsLocation implements FeatureFilter {
+  public static class OverlapsLocation implements FeatureFilter {
     private Location loc;
     
     public Location getLocation() {
@@ -177,7 +179,7 @@ public interface FeatureFilter extends Serializable {
    * @author Thomas Down
    * @author Matthew Pocock
    */
-  static class Not implements FeatureFilter {
+  public static class Not implements FeatureFilter {
     FeatureFilter child;
 
     public FeatureFilter getChild() {
@@ -199,7 +201,7 @@ public interface FeatureFilter extends Serializable {
    * @author Thomas Down
    * @author Matthew Pocock
    */
-  static class And implements FeatureFilter {
+  public static class And implements FeatureFilter {
     FeatureFilter c1, c2;
 
     public FeatureFilter getChild1() {
@@ -226,7 +228,7 @@ public interface FeatureFilter extends Serializable {
    * @author Thomas Down
    * @author Matthew Pocock
    */
-  static class Or implements FeatureFilter {
+  public static class Or implements FeatureFilter {
     FeatureFilter c1, c2;
 
     public FeatureFilter getChild1() {

@@ -52,7 +52,7 @@ implements CrossProductSymbol, Serializable {
     char token, List l, CrossProductAlphabet parent
   ) {
     this.l = Collections.unmodifiableList(new ArrayList(l));
-    this.token = token;
+    this.token = (l.size() == 1) ? ((Symbol) l.get(0)).getToken() : token;
     this.parent = parent;
   }
   
@@ -65,16 +65,20 @@ implements CrossProductSymbol, Serializable {
   }
 
   public String getName() {
-    StringBuffer name = new StringBuffer("(");
-    for (int i = 0; i < l.size(); ++i) {
-      Symbol r = (Symbol) l.get(i);
-      name.append(r.getName());
-      if (i < l.size() - 1) {
-        name.append(", ");
+    if(l.size() == 1) {
+      return ((Symbol) l.get(0)).getName();
+    } else {
+      StringBuffer name = new StringBuffer("(");
+      for (int i = 0; i < l.size(); ++i) {
+        Symbol r = (Symbol) l.get(i);
+        name.append(r.getName());
+        if (i < l.size() - 1) {
+          name.append(", ");
+        }
       }
+      name.append(")");
+      return name.toString();
     }
-    name.append(")");
-    return name.toString();
   }
 
   public char getToken() {

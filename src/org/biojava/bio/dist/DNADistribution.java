@@ -51,6 +51,13 @@ extends AbstractDistribution implements Serializable {
     return this.nullModel;
   }
   
+  /**
+  *Assign a background probability distribution to the DNA distribution.
+  *
+  *
+  *@param nullModel the Distribution to be added as the background distribution.
+  */
+  
   public void setNullModel(Distribution nullModel)
   throws IllegalAlphabetException {
     if(nullModel.getAlphabet() != getAlphabet()) {

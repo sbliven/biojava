@@ -193,7 +193,6 @@ implements ModelTrainer, Serializable {
     Distribution nullModel, double nullModelWeight,
     double transCounts, double transCountWeight
   ) throws BioException {
-    System.out.println("Making " + this + " for " + model);
     this.model = model;
     setNullModel(nullModel);
     setNullModelWeight(nullModelWeight);

@@ -54,7 +54,7 @@ public abstract class AbstractSymbolList implements SymbolList {
 
     public abstract int length();
 
-    public abstract Symbol symbolAt(int pos);
+    public abstract Symbol symbolAt(int index);
 
     public SymbolList subList(int start, int end) {
 	return new SubList(start, end);
@@ -142,10 +142,26 @@ public abstract class AbstractSymbolList implements SymbolList {
 	}
 
 	public Symbol symbolAt(int pos) {
+    if(pos < 1 || pos > length()) {
+      throw new IndexOutOfBoundsException(
+        "Symbol index out of bounds " + length() + ":" + pos
+      );
+    }
 	    return AbstractSymbolList.this.symbolAt(pos + start - 1);
 	}
 
 	public SymbolList subList(int sstart, int send) {
+    if(sstart < 1 || send > length() || send < 1 || send > length()) {
+      throw new IndexOutOfBoundsException(
+        "Sublist index out of bounds " + length() + ":" + start + "," + send
+      );
+    }
+    if(send < sstart) {
+      throw new IndexOutOfBoundsException(
+        "send must not be lower than sstart: sstart=" + start + ", send=" + send
+      );
+    }
+      
 	    return new SubList(sstart + start - 1, send + start - 1);
 	}
 

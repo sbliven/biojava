@@ -146,7 +146,7 @@ public interface Location {
    * A non-contiguous location is composed from contiguous blocks seperated by
    * gaps.
    * <P>
-   * This method should return an Iterator over these maximaly contiguous blocks
+   * This method should return an Iterator over these maximally contiguous blocks
    * starting with the left-most block, and finnishing at the right-most block.
    *
    * @return an Iterator over Location objects that are the maximaly contiguous
@@ -162,7 +162,7 @@ public interface Location {
    * equal to nothing. Intersection results in the empty range. Union
    * results in the argument range. Symbols returns an empty array.
    * <P>
-   * Every day, in every way, empty becomes more and more booring.
+   * Every day, in every way, empty becomes more and more boring.
    */
   static final Location empty = new EmptyLocation();
   
@@ -243,6 +243,9 @@ public interface Location {
       return obj == this;
     }
     
+    /**
+    *Test whether two locations are equal or not
+    */
     public boolean areEqual(Location l1, Location l2) {
       Iterator i1 = l1.blockIterator();
       Iterator i2 = l2.blockIterator();

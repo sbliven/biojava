@@ -30,7 +30,7 @@ import java.util.*;
  * model.  For instance, in a pair HMM intended for aligning DNA
  * sequence, the emmision alphabet will be (DNA, gap) x (DNA, gap).
  *
- * To actualy make a CrossProductAlphabet, either roll your own, or us
+ * To actualy make a CrossProductAlphabet, either roll your own, or use
  * the CrossProductAlphabetFactory object.
  *
  * @author Thomas Down
@@ -39,7 +39,7 @@ import java.util.*;
 public interface CrossProductAlphabet extends Alphabet {
     /**
      * Return an ordered List of the alphabets which make up this
-     * compound alphabet.  The returned List should be immutable.
+     * compound alphabet.  The returned list should be immutable.
      *
      */
 

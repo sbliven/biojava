@@ -201,9 +201,15 @@ public class ViewSequence implements Sequence, RealizingFeatureHolder {
     public Feature createFeature(Feature.Template template)
         throws BioException
     {
-	Feature f = realizeFeature(this, template);
-	addedFeatures.addFeature(f);
-	return f;
+      Location loc = template.location;
+      if(loc.getMin() < 1 || loc.getMax() > this.length()) {
+        throw new BioException(
+          "Can't create a feature that is outside this sequence: " + loc
+        );
+      }
+      Feature f = realizeFeature(this, template);
+      addedFeatures.addFeature(f);
+      return f;
     }
 
     /**

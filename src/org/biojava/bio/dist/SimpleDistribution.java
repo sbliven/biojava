@@ -27,6 +27,9 @@ import java.io.Serializable;
 
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
+/**
+*A simple implementation of a distribution
+*/
 
 public final class SimpleDistribution extends AbstractDistribution implements Serializable {
   private final FiniteAlphabet alphabet;
@@ -40,6 +43,11 @@ public final class SimpleDistribution extends AbstractDistribution implements Se
   public Distribution getNullModel() {
     return this.nullModel;
   }
+  
+  /**
+  *Assign a distribution to be the background null model.
+  *@param nullModel the distribution to act as the null model.
+  */
   
   public void setNullModel(Distribution nullModel)
   throws IllegalAlphabetException {

@@ -29,10 +29,10 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 
 /**
- * This implementation of SymbolList wrappes another one, allowing you to insert gaps.
+ * This implementation of SymbolList wraps another one, allowing you to insert gaps.
  * <P>
  * You could make a SymbolList that contains gaps directly. However, this
- * leaves you with a nasty problem if you wish to support gap-edit opperations. Also, the orriginal
+ * leaves you with a nasty problem if you wish to support gap-edit operations. Also, the original
  * SymbolList must either be coppied or lost.
  * <P>
  * GappedSymbolList solves these problems. It wraps up a source sequence, and views it through
@@ -580,7 +580,11 @@ extends AbstractSymbolList implements Serializable {
     Block b = new Block(1, length, 1, length);
     blocks.add(b);
   }
-
+    
+  /**Debugging method  
+  *  
+  */ 
+    
   public void dumpBlocks() {
     for(Iterator i = blocks.iterator(); i.hasNext(); ) {
       Block b = (Block) i.next();

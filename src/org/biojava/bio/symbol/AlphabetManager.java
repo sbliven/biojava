@@ -90,7 +90,11 @@ public final class AlphabetManager {
     }
     return alpha;
   }
-
+    /**
+    *Retrieve the symbol represented a String object
+    *@param name of the string whose symbol you want to get
+    * @throws NoSuchElementException if the string name is invalid.
+    */
   static public Symbol symbolForName(String name) 
   throws NoSuchElementException {
     Symbol s = (Symbol) nameToSymbol.get(name);
@@ -332,12 +336,24 @@ public final class AlphabetManager {
     return cpa;
   }
 
+    /**
+    *Obtain the default ambiguity symbol to represent the symbols passed in as parameters e.g. using the IUPAC ambiguity code, the symbol W will be returned for the collection [AT]. 
+    *@param syms the collection of symbols
+    *@throws IllegalSymbolException if the symbols are not recognized.
+    */
   static public Symbol getAmbiguitySymbol(Collection syms)
   throws IllegalSymbolException {
     return getAmbiguitySymbol('\0', "", null, syms);
   }
-  
-  static public Symbol getAmbiguitySymbol(
+    /**
+    *Create a specific ambiguity symbol for a collection of symbols.
+    *@param token the ambiguity character's designated token
+    *@param name a name for this ambiguity symbol.
+    *@param ann Annotation to associate with the ambiguity symbol
+    *@param syms the collection of symbols which will be represented by this ambiguity symbol
+    *@throws IllegalSymbolException if the symbols are not recognized.
+    */
+    static public Symbol getAmbiguitySymbol(
     char token,
     String name,
     Annotation ann,
@@ -655,7 +671,15 @@ public final class AlphabetManager {
 
     public ListWrapper() {
     }
-
+    
+    /**
+    *Assigns a list of objects to a different list of objects.
+    *This aids in comparison purposes, especially while doing hash lookups etc.
+    *Please note that once a list has been assigned with setList, this 
+    *function should not be re-called.
+    *
+    *@param l the list to assign to the current list.
+    */
     public void setList(List l) {
       this.l = l;
     }

@@ -28,6 +28,11 @@ import java.io.Serializable;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
+/**
+*Class for pairing up two unique distributions.
+*/
+
+
 public class PairDistribution
 extends AbstractDistribution implements Serializable {
   private Distribution first;
@@ -44,6 +49,11 @@ extends AbstractDistribution implements Serializable {
     return nullModel;
   }
   
+  /**
+  *Set a null background distribution.
+  *@param nullModel the distribution to act as the background distribution.
+  */
+  
   public void setNullModel(Distribution nullModel)
   throws IllegalAlphabetException {
     if(nullModel.getAlphabet() != this.getAlphabet()) {
@@ -54,6 +64,11 @@ extends AbstractDistribution implements Serializable {
     }
     this.nullModel = nullModel;
   }
+  
+  /**
+  *Register this paired distribution with a model trainer.
+  *@param trainer the trainer to register this distribution with.
+  */
   
   public void registerWithTrainer(org.biojava.bio.dp.ModelTrainer trainer) {
     trainer.registerDistribution(first);

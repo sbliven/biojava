@@ -40,6 +40,12 @@ public abstract class AbstractAlphabet implements FiniteAlphabet {
     parserByName = new HashMap();
   }
   
+  /**
+  *Assigns a symbol parser to a string object.  Afterwards, the parser can be retrieved using the getParser method.
+  *
+  *@param name Name of the string to associate with a parser.
+  *@param parser The parser to associate your string with.
+  */
   public void putParser(String name, SymbolParser parser) {
     parserByName.put(name, parser);
   }

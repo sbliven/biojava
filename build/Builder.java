@@ -203,6 +203,15 @@ public class Builder {
 	    }
 	}
 
+	List groupsOrder = new ArrayList();
+	for (Iterator i = pkgGroups.keySet().iterator(); i.hasNext(); ) {
+	    String s = (String) i.next();
+	    if (s.startsWith("Core "))
+		groupsOrder.add(0, s);
+	    else
+		groupsOrder.add(s);
+	}
+
 	System.out.println("Running Javadoc...");
 	String[] command = new String[11 + pkgGroups.size() * 3 + pkgNames.size()];
 	command[0] = "javadoc";
@@ -217,12 +226,12 @@ public class Builder {
 	command[9] = "-windowtitle";
 	command[10] = "Biojava Public API documentation";
 	int indx = 11;
-	for (Iterator i = pkgGroups.entrySet().iterator(); i.hasNext(); ) {
-	    Map.Entry me = (Map.Entry) i.next();
+	for (Iterator i = groupsOrder.iterator(); i.hasNext(); ) {
+	    String gname = (String) i.next();
 	    command[indx++] = "-group";
-	    command[indx++] = (String) me.getKey();
+	    command[indx++] = gname;
 	    StringBuffer sb = new StringBuffer();
-	    List grp = (List) me.getValue();
+	    List grp = (List) pkgGroups.get(gname);
 	    for (Iterator gi = grp.iterator(); gi.hasNext(); ) {
 		if (sb.length() != 0)
 		    sb.append(':');

@@ -52,7 +52,7 @@ public interface Symbol extends Annotatable {
    * The alphabet containing the symbols matched by this ambiguity symbol.
    * <P>
    * This alphabet contains all of, and only, the symbols matched by this
-   * symobl. For example, the symbol representing the DNA
+   * symbol. For example, the symbol representing the DNA
    * ambiguity code for W would contain the symbol for A and T from the DNA
    * alphabet.
    *

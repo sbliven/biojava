@@ -30,7 +30,7 @@ import org.biojava.bio.seq.*;
  * <P>
  * This may have several implementations with rich behaviour, but basicaly most
  * of the time you will just use the interface methods to do stuff. A sequence
- * database contains a finite number of sequences stoored under unique keys.
+ * database contains a finite number of sequences stored under unique keys.
  *
  * @author Matthew Pocock
  * @author <A href="mailto:Gerald.Loeffler@vienna.at">Gerald Loeffler</A>

@@ -41,7 +41,7 @@ public class OverlayAnnotation implements Annotation {
 
     /**
      * Construct an annotation which can overlay new key-value
-     * pairs onto an underlyin annotation.
+     * pairs onto an underlying annotation.
      *
      * @param par The `parent' annotation, on which new
      *            key-value pairs can be layered.

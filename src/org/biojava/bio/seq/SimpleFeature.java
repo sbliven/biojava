@@ -167,7 +167,7 @@ class SimpleFeature implements Feature, RealizingFeatureHolder {
 
     public String toString() {
 	return "Feature " + getType() + " " +
-	    getSource() + " (" + getLocation() + ")";
+	    getSource() + " " + getLocation();
     }
 
     public Feature realizeFeature(FeatureHolder fh, Feature.Template templ)

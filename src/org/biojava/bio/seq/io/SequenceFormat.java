@@ -65,5 +65,11 @@ public interface SequenceFormat {
                         SequenceFactory sf)
          throws BioException, IllegalSymbolException, IOException;
 
+    /**
+    *Write out a sequence to the specified printstream
+    *@param seq the sequence to write out 
+    *@param os the printstream to write to
+    */
+
   void writeSequence(Sequence seq, PrintStream os) throws IOException;
 }

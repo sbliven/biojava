@@ -28,7 +28,7 @@ import java.util.*;
  * A simple implementation of Location that contains all points between
  * getMin and getMax inclusive.
  * <P>
- * This will in practice bee the most commonly used pure-java implementation.
+ * This will in practice be the most commonly used pure-java implementation.
  *
  * @author Matthew Pocock
  */
@@ -65,7 +65,12 @@ public class RangeLocation implements Location, Serializable {
     return getMin() <= p &&
            getMax() >= p;
   }
-
+    
+    
+  /**
+  *Tests for object equality against another location
+  *@param l the location to compare against
+  */  
   public boolean equals(Location l) {
     return getMin() == l.getMin() &&
            getMax() == l.getMax() && l.isContiguous();
@@ -105,7 +110,12 @@ public class RangeLocation implements Location, Serializable {
     return Collections.singleton(this).iterator();
   }
 
-  public RangeLocation(int min, int max) {
+  public RangeLocation(int min, int max) throws IndexOutOfBoundsException {
+    if(max < min) {
+      throw new IndexOutOfBoundsException(
+        "max must exceed min: min=" + min + ", max=" + max
+      );
+    }
     this.min = min;
     this.max = max;
   }

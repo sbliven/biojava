@@ -94,8 +94,8 @@ public class IntegerAlphabet implements Alphabet, Serializable {
     return Annotation.EMPTY_ANNOTATION;
   }
   
-  public boolean contains(Symbol s) {
-    if(s instanceof IntegerSymbol) {
+  public boolean contains(Symbol r) {
+    if(r instanceof IntegerSymbol) {
       return true;
     }
     return false;

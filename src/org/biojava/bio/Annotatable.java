@@ -25,7 +25,7 @@ package org.biojava.bio;
 /**
  * Flags an object as having associated annotation.
  * <P>
- * This interface was introduced in retrospect so that UI code could interogate
+ * This interface was introduced in retrospect so that UI code could interrogate
  * an object to see if it was Annotatable, and if so pop up a suitable GUI for
  * browsing the annotation.
  *

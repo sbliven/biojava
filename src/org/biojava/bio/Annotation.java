@@ -32,7 +32,7 @@ import org.biojava.utils.*;
  * Arbitrary annotation associated with one or more objects.
  * <P>
  * Biological information often does not fit design patterns very well, and can
- * be a jumble of facts and relationships. Annotation object provide a standard
+ * be a jumble of facts and relationships. Annotation objects provide a standard
  * way for you to store this mess as a property of an object.
  * <P>
  * Annotations may contain keys that have Annotations as values. In this way,
@@ -91,7 +91,7 @@ public interface Annotation {
   Map asMap();
    
   /**
-   * A realy usefull empty and immutable annotation object.
+   * A realy useful empty and immutable annotation object.
    * <P>
    * Use this instead of null when you realy don't want an object or an
    * implementation to have annotation even though it should implement

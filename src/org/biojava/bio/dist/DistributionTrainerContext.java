@@ -30,10 +30,22 @@ import org.biojava.bio.symbol.*;
  * @author Matthew Pocock
  */
 public interface DistributionTrainerContext {
+/**
+*Register a distribution object
+*/
   void registerDistribution(Distribution dist);
+/**
+*Register a distribution and an associated distributiontrainer object
+*@param dist the distribution to be registered.
+*@param trainer the distribution's trainer object to be registered.
+*/  
   void registerDistributionTrainer(Distribution dist, DistributionTrainer trainer);
   
-  DistributionTrainer getDistributionTrainer(Distribution dist);
+  /**
+  *Return the Distribution trainer object from the current context.
+  *@param dist the Distribution whose trainer is required.
+  */
+   DistributionTrainer getDistributionTrainer(Distribution dist);
   
   /**
    * Registers that sym was counted in this state.

@@ -29,6 +29,10 @@ import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.DNATools;
 
+/**
+*Creates a complementary distribution from a given distribution.
+*/
+
 public class ComplementaryDistribution
 implements Distribution, Serializable {
   private Distribution other;

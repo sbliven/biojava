@@ -30,10 +30,10 @@ import org.biojava.utils.*;
 import org.biojava.bio.*;
 
 /**
- * The set of AtomicSymbols which can be concatinated together to make a
+ * The set of AtomicSymbols which can be concatanated together to make a
  * SymbolList.
  * <P>
- * A non-atomic symbol is considered to be contained within this alpahbet if
+ * A non-atomic symbol is considered to be contained within this alphabet if
  * all of the atomic symbols that it could match are members of this alphabet.
  * <P>
  * The alphabet concept may need to be widened to include alphabets that extend
@@ -52,7 +52,7 @@ public interface Alphabet extends Annotatable {
   String getName();
 
   /**
-   * Returns wether or not this Alphabet contains the symbol.
+   * Returns whether or not this Alphabet contains the symbol.
    * <P>
    * An alphabet contains an ambiguity symbol iff the ambiguity symbol's
    * getMemberAlphabet() returns an alphabe that is a propper sub-set of this
@@ -70,7 +70,7 @@ public interface Alphabet extends Annotatable {
    * <P>
    * This function is used all over the code to validate symbols as they enter
    * a method. Also, the code is littered with catches for
-   * IllegalSymbolException. There is a preferred style of handeling this,
+   * IllegalSymbolException. There is a preferred style of handling this,
    * which should be covererd in the package documentation.
    *
    * @param r the Symbol to validate
@@ -100,7 +100,7 @@ public interface Alphabet extends Annotatable {
 ;
   
   /**
-   * A realy useful static alphabet that is always empty.
+   * A really useful static alphabet that is always empty.
    */
   static final Alphabet EMPTY_ALPHABET = new EmptyAlphabet();
   

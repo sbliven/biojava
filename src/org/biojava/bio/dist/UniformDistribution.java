@@ -28,6 +28,10 @@ import java.io.Serializable;
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 
+/**
+*An implementation of an uniform distribution
+*/
+
 public class UniformDistribution
 extends AbstractDistribution implements Serializable {
   private final FiniteAlphabet alphabet;
@@ -41,7 +45,10 @@ extends AbstractDistribution implements Serializable {
   public Distribution getNullModel() {
     return nullModel;
   }
-  
+   /**
+  *Assign a background distribution
+  *@param nullModel the background distribution to assign
+  */  
   public void setNullModel(Distribution nullModel)
   throws IllegalAlphabetException {
     if(nullModel.getAlphabet() != this.getAlphabet()) {

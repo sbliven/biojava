@@ -112,9 +112,19 @@ public interface StrandedFeature extends Feature {
     public String toString() {
       return text;
     }
+    
+    /**
+    *Returns the integer label for strandedness, i.e. "+1", "-1", or "0" for positive, negative, and unknown strands respectively. 
+    */
+    
     public int getValue() {
       return value;
     }
+    
+    /**
+    *Returns the token for strandedness, i.e. "+","-","." for positive, negative and unknown strands respectively.
+    */
+    
     public char getToken() {
       return token;
     }

@@ -26,7 +26,7 @@ import java.util.*;
 /**
  * An alignment containing multiple <span class="type">SymbolList</span>s.
  * <P>
- * The alignment can be thought of a rectangular array of
+ * The alignment can be thought of as a rectangular array of
  * <span class="type">Symbol</span>s. Each
  * row is indexed by a label and each column is indexed by offset (counting from
  * 0).
@@ -55,7 +55,7 @@ public interface Alignment extends SymbolList {
   /**
    * Retrieve a symbol by label and column.
    *
-   * @param res the SymbolList to retrieve from
+   * @param label the SymbolList to retrieve from
    * @param column  the index of the column to retrieve
    * @return  the symbol in the symbol list associated with the label at the given column
    * @throws NoSuchElementException if there is no row for 'label'
@@ -66,6 +66,7 @@ public interface Alignment extends SymbolList {
   /**
    * Retrieve a single row of the alignment by label.
    *
+   * @param label the object from which to retrieve the symbol list
    * @return  a SymbolList that contains each token in a row of the alignment
    * @throws NoSuchElementException if there is no row for 'label'
    */

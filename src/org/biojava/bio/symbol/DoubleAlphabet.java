@@ -94,8 +94,8 @@ public class DoubleAlphabet implements Alphabet, Serializable {
     return Annotation.EMPTY_ANNOTATION;
   }
   
-  public boolean contains(Symbol s) {
-    if(s instanceof DoubleSymbol) {
+  public boolean contains(Symbol r) {
+    if(r instanceof DoubleSymbol) {
       return true;
     }
     return false;
@@ -138,6 +138,10 @@ public class DoubleAlphabet implements Alphabet, Serializable {
     public char getToken() {
       return '#';
     }
+    
+    /**
+    *@return the double value associated with this double symbol
+    */
     
     public double doubleValue() {
       return val;

@@ -50,6 +50,10 @@ public class SimpleSymbol implements Symbol, Serializable {
   public String getName() {
     return this.name;
   }
+    /**
+*Assign a name to the symbol
+*@param name the name you wish to give this symbol
+*/
 
   public void setName(String name) {
     this.name = name;

@@ -17,7 +17,7 @@ public class TestDistribution {
   public static void main(String [] args) {
     try {
     FiniteAlphabet dna = DNATools.getDNA();
-    nullModel = UniformDistribution.createInstance(dna);
+    nullModel = new UniformDistribution(dna);
     final Distribution dist = DistributionFactory.DEFAULT.createDistribution(dna);
     randomize(dist);
     

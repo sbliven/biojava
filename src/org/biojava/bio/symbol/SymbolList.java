@@ -67,7 +67,7 @@ public interface SymbolList {
   /**
    * Returns a List of symbols.
    * <p>
-   * This is an imutable list of symbols. Do not edit it.
+   * This is an immutable list of symbols. Do not edit it.
    *
    * @return  a List of Symbols
    */
@@ -119,7 +119,7 @@ public interface SymbolList {
   String subStr(int start, int end) throws IndexOutOfBoundsException;
   
   /**
-   * A usefull object that represents an empty symbol list, to avoid returning
+   * A useful object that represents an empty symbol list, to avoid returning
    * null.
    *
    * @author Matthew Pocock

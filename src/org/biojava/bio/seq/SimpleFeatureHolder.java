@@ -41,6 +41,9 @@ public class SimpleFeatureHolder extends AbstractFeatureHolder {
     features = new ArrayList();
   }
 
+  /**
+  *Returns the list of features in this featureholder.
+  */
   protected List getFeatures() {
     return features;
   }
@@ -52,6 +55,10 @@ public class SimpleFeatureHolder extends AbstractFeatureHolder {
   public Iterator features() {
     return features.iterator();
   }
+
+    /**
+    *Add a feature to the featureholder
+    */
 
   public void addFeature(Feature f) {
     features.add(f);

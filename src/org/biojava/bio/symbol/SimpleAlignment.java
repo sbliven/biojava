@@ -50,13 +50,13 @@ extends AbstractSymbolList implements Alignment, Serializable {
     return alphabet;
   }
   
-  public Symbol symbolAt(int col) {
+  public Symbol symbolAt(int index) {
     try {
-      return alphabet.getSymbol(new ColAsList(col));
+      return alphabet.getSymbol(new ColAsList(index));
     } catch (IllegalSymbolException ire) {
       throw new BioError(
         ire,
-        "Somehow my crossproduct alphabet is incompatible with column " + col
+        "Somehow my crossproduct alphabet is incompatible with column " + index
       );
     }
   }

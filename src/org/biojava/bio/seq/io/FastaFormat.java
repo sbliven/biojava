@@ -164,8 +164,8 @@ public class FastaFormat implements SequenceFormat, Serializable {
   }
 
   public void writeSequence(Sequence seq, PrintStream os) {
-    os.print("> ");
-    os.println(fdr.writeDescription(seq));
+    os.print(">");
+    os.println(fdr.writeDescription(seq).trim());
 
     int length = seq.length();
     for(int i = 1; i <= length; i++) {

@@ -34,7 +34,7 @@ import org.biojava.utils.*;
  * <P>
  * This interface makes the distinction between an alphabet over a finite (and
  * possibly small) number of symbols and an Alphabet over an infinite
- * (or extreemely large) set of symbols. Within a FiniteAlphabet, the == operator
+ * (or extremely large) set of symbols. Within a FiniteAlphabet, the == operator
  * should be sufficient to decide upon equality for all AtomicSymbol instances.
  * <P>
  * The alphabet functions as the repository of objects in the fly-weight design

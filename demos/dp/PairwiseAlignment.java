@@ -123,7 +123,7 @@ public class PairwiseAlignment {
       
     MarkovModel model = new SimpleMarkovModel(2, dna2, "pair-wise aligner");
     
-    Distribution nullModel = UniformDistribution.createInstance(dna);
+    Distribution nullModel = new UniformDistribution(dna);
     Distribution gap = new GapDistribution(dna);
     Distribution matchDist = generateMatchDist((FiniteAlphabet) dna2);
     Distribution nullModel2 = new PairDistribution(nullModel, nullModel);

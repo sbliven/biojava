@@ -38,6 +38,10 @@ public class IgnoreCountsTrainer implements DistributionTrainer {
   protected IgnoreCountsTrainer() {}
   
   private static IgnoreCountsTrainer instance = new IgnoreCountsTrainer();
+  /**
+  *Returns the global singleton instance of the IgnoreCountsTrainer
+  */
+  
   public static IgnoreCountsTrainer getInstance() {
     return instance;
   }

@@ -26,7 +26,7 @@ import java.util.*;
 import java.io.*;
 
 /**
- * A parser that uses a fixed with window of characters to look up the
+ * A parser that uses a fixed width window of characters to look up the
  * associated symbol.
  * <P>
  * The string will be chunked up into substrings the size of the window, and
@@ -76,6 +76,11 @@ public class FixedWidthParser implements SymbolParser, Serializable {
     return res;
   }
 
+    /**
+    *Maps a string (one or more characters) onto a symbol
+    *@param token the string to be mapped
+    *@param symbol the symbol to be mapped onto
+    */
   public void addTokenMap(String token, Symbol symbol)
          throws IllegalSymbolException, IllegalArgumentException {
     getAlphabet().validate(symbol);

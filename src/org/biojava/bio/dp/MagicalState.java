@@ -106,7 +106,7 @@ public final class MagicalState extends SimpleEmissionState {
       this.heads = heads;
     }
     
-    private Object readReplace() throws ObjectStreamException {
+    public Object readResolve() throws ObjectStreamException {
       return MagicalState.getMagicalState(alpha, heads);
     }
   }

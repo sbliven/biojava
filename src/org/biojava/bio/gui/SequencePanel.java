@@ -178,7 +178,7 @@ public class SequencePanel extends JComponent implements SwingConstants {
     }
     
     Graphics2D g2 = (Graphics2D) g;
-    System.out.println("Transform: " + g2.getTransform());
+    //System.out.println("Transform: " + g2.getTransform());
     
     Rectangle2D.Double boxClip = new Rectangle2D.Double();
     switch (direction) {
@@ -341,6 +341,9 @@ public class SequencePanel extends JComponent implements SwingConstants {
           width = parentSize.height;
           break;
       }
+      // set width to something that takes whole numbers of 'scale'
+      width = (int) Math.ceil((Math.ceil((double) width / scale)) * scale);
+      // set width to include leading/trailing space
       width = (int) Math.ceil((double) width - insetBefore - insetAfter);
       realLines = (int) Math.ceil((double) alongDim / (double) width);
       acrossDim = acrossDim * realLines + spacer * (realLines - 1);
@@ -364,6 +367,8 @@ public class SequencePanel extends JComponent implements SwingConstants {
       // accomodoate the whole sequence
       realLines = lines;
       alongDim = Math.ceil(alongDim / (double) lines);
+      // alongDim must be multiple of scale
+      alongDim = Math.ceil((Math.ceil(alongDim / scale)) * scale);
       acrossDim = Math.ceil((double) lines * acrossDim + (double) (lines-1) * spacer);  
       switch (direction) {
         case HORIZONTAL:

@@ -52,7 +52,7 @@ public interface SymbolParser {
    *
    * @param token the token to retrieve a Symbol for
    * @return the Symbol for that token
-   * @throws an IllegalSymbolException if there is no Symbol for the token
+   * @throws IllegalSymbolException if there is no Symbol for the token
    */
   Symbol parseToken(String token) throws IllegalSymbolException;
 }

@@ -44,6 +44,10 @@ public class PointLocation implements Location, Serializable {
   public boolean contains(Location l)	{ return (this.point == l.getMin()) &&
                                                    (this.point == l.getMax()); }
   public boolean contains(int p)	{ return this.point == p; }
+  /**
+  *Test for equality with another Location object
+  *@param l location to compare with
+  */
   public boolean equals(Location l)	{ return this.contains(l) && l.contains(this); }
   public Location intersection(Location l) {
     return l.contains(this)

@@ -84,7 +84,7 @@ public abstract class AbstractDistribution implements Distribution {
   /**
    * Retrieve the null model Distribution that this Distribution recognizes.
    *
-   * @return  the apropreate null model
+   * @return  the apropriate null model
    */
   public abstract Distribution getNullModel();
   

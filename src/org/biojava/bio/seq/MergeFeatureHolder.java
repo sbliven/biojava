@@ -79,6 +79,7 @@ public class MergeFeatureHolder extends AbstractFeatureHolder {
 	    FeatureHolder fh = (FeatureHolder) fhi.next();
 	    mfh.addFeatureHolder(fh.filter(ff, recurse));
 	}
+	return mfh;
     }
 
     private class MFHIterator implements Iterator {

@@ -43,11 +43,16 @@ public class ProteinTools {
       throw new BioError(e, " Could not initialize ProteinTools");
     }
   }
-  
+  /**
+  *Gets the protein alphabet
+  */
   public static final FiniteAlphabet getAlphabet() {
     return proteinAlpha;
   }
   
+  /**
+  *Gets the protein alphabet including the translation termination symbols
+  */
   public static final FiniteAlphabet getTAlphabet() {
     return proteinTAlpha;
   }

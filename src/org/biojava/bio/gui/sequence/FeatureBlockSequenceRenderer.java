@@ -38,7 +38,7 @@ import java.util.List;
 public class FeatureBlockSequenceRenderer
 implements SequenceRenderer, PropertyChangeListener {
   private static final AffineTransform FLIP =
-    new AffineTransform(0.0, 1.1, 1.1, 0.0, 0.0, 0.0); 
+    new AffineTransform(0.0, 1.0, -1.0, 0.0, 0.0, 0.0); 
   private FeatureFilter filter;
   private Map featureCache;
   private double depth = 25.0;

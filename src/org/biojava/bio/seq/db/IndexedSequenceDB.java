@@ -29,9 +29,14 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 import org.biojava.bio.seq.io.*;
 
+/**This class reads in a file or a set of files containing sequence data.  It
+* contains methods for automatically indexing these sequences.
+*/
+
+
 public final class IndexedSequenceDB implements SequenceDB, Serializable {
   private final String name;
-  private final HashSequenceDB.IDMaker idMaker;
+  private final IDMaker idMaker;
   private final File indexFile;
   private final Set files;
   private final SequenceFormat format;
@@ -51,7 +56,7 @@ public final class IndexedSequenceDB implements SequenceDB, Serializable {
    * If indexFile exists, it will just load the indexes from there. If it
    * does not exist, a new index file will be created.
    *
-   * @param the File to use for persistantly stooring the indexes
+   * @param the File to use for persistantly storing the indexes
    * @throws IOException if for any reason indexFile can't be used
    */
   public static IndexedSequenceDB openDB(File indexFile)
@@ -75,13 +80,22 @@ public final class IndexedSequenceDB implements SequenceDB, Serializable {
     }
   }
   
+  /**
+  *Create a sequence database
+  *@param name a name for the database
+  *@param indexFile the indexed file of sequences
+  *@param format the kind of format being read in e.g. EMBL/FASTA
+  *@param sFact the sequence factory object for generating sequence objects from the file.
+  *@param symParser the SymbolParser object for the sequences read in e.g. DNA or RNA parsers.
+  *@param idMaker sets the idMaker to map the set of sequences encountered.      
+  */
   public static IndexedSequenceDB createDB(
     String name,
     File indexFile,  
     SequenceFormat format,
     SequenceFactory sFact,
     SymbolParser symParser,
-    HashSequenceDB.IDMaker idMaker
+    IDMaker idMaker
   ) throws IOException, BioException {
     if(!indexFile.exists()) {
       try {
@@ -118,7 +132,7 @@ public final class IndexedSequenceDB implements SequenceDB, Serializable {
     SequenceFormat format,
     SequenceFactory sFact,
     SymbolParser symParser,
-    HashSequenceDB.IDMaker idMaker
+    IDMaker idMaker
   ) {
     this.name = name;
     this.indexFile = indexFile;
@@ -129,7 +143,7 @@ public final class IndexedSequenceDB implements SequenceDB, Serializable {
     this.files = new HashSet();
   }
 
-  public RandomAccessFile getReader(File f) throws IOException {
+  private RandomAccessFile getReader(File f) throws IOException {
     if(fileToReaders == null) {
       fileToReaders = new HashMap();
     }
@@ -148,7 +162,13 @@ public final class IndexedSequenceDB implements SequenceDB, Serializable {
     }
   }
 
-  public void putReader(File f, RandomAccessFile raf) {
+
+/**
+*set a reading context to the database.
+*@param f the file which will be read.
+*@param raf the random access file object for the reader
+*/
+  private void putReader(File f, RandomAccessFile raf) {
     if(fileToReaders == null) {
       fileToReaders = new HashMap();
     }
@@ -169,6 +189,11 @@ public final class IndexedSequenceDB implements SequenceDB, Serializable {
   public Set getFiles() {
     return Collections.unmodifiableSet(files);
   }
+  
+  /**
+  *Add sequences from a file to the sequence database.  This method works on an "all or nothing" principle.  If it can successfully interpret the entire file, all the sequences will be read in.  However, if it encounters any problems, it will abandon the whole file; an IOException will be thrown.  A bioexception will be thrown if it has problems understanding the sequences.
+  *@param seqFile the file containing the sequence or set of sequences
+  */
   
   public void addFile(File seqFile)
   throws IOException, BioException {
@@ -201,7 +226,11 @@ public final class IndexedSequenceDB implements SequenceDB, Serializable {
     idToSource.putAll(index);
     commit();
   }
-  
+
+  /**
+  *Remove a file from the database
+  *@param seqFile the file to remove
+  */
   public void removeFile(File seqFile) throws IOException {
     files.remove(seqFile);
     commit();
@@ -225,6 +254,9 @@ public final class IndexedSequenceDB implements SequenceDB, Serializable {
   public Sequence getSequence(String id) throws BioException {
     try {
       Source s = (Source) idToSource.get(id);
+      if(s == null) {
+        throw new BioException("Couldn't find sequence for id " + id);
+      }
       RandomAccessFile raf = getReader(s.file);
       raf.seek(s.start);
       HackedBufferedReader hbr = new HackedBufferedReader(raf);
@@ -256,7 +288,7 @@ public final class IndexedSequenceDB implements SequenceDB, Serializable {
   }
   
   /**
-   * A usefull tuple to locate an individual record.
+   * A useful tuple to locate an individual record.
    */
   private final class Source implements Serializable {
     public final File file;

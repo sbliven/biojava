@@ -27,7 +27,7 @@ import org.biojava.bio.symbol.*;
 /**
  * An object which adds some additional information to a Sequence.
  *
- * <p>There are two approached which can be taken to adding features
+ * <p>There are two approaches which can be taken to adding features
  * to a sequence:
  *
  * <ol><li>Directly adding features to a Sequence which implements

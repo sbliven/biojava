@@ -27,6 +27,10 @@ import java.io.Serializable;
 
 import org.biojava.bio.symbol.*;
 
+/**
+*An implemenation of a simple distribution trainer
+*/
+
 public final class SimpleDistributionTrainer
 implements DistributionTrainer, Serializable {
   private final Distribution dis;

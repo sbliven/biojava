@@ -47,6 +47,12 @@ public class AllTokensAlphabet implements FiniteAlphabet, Serializable {
   
   private Annotation annotation;
 
+    /*
+    *Adds a symbol to the alphabet
+    *
+    *@param r the symbol to add
+    */
+
   protected void addSymbol(Symbol r) {
     symbols.add(r);
     Character token = new Character(r.getToken());

@@ -84,8 +84,8 @@ public class SimpleSequence implements Sequence, RealizingFeatureHolder
 	return symList.subList(start, end);
     }
 
-    public Symbol symbolAt(int indx) {
-	return symList.symbolAt(indx);
+    public Symbol symbolAt(int index) {
+	return symList.symbolAt(index);
     }
 
     public List toList() {
@@ -115,7 +115,11 @@ public class SimpleSequence implements Sequence, RealizingFeatureHolder
     public String getURN() {
 	return urn;
     }
-
+    
+    /**
+    *Provide the URN for this sequence
+    */
+    
     public void setURN(String urn) {
 	this.urn = urn;
     }
@@ -123,7 +127,11 @@ public class SimpleSequence implements Sequence, RealizingFeatureHolder
     public String getName() {
 	return name;
     }
-
+    
+    /**
+    *Assign a name to this sequence
+    */
+    
     public void setName(String name) {
 	this.name = name;
     }

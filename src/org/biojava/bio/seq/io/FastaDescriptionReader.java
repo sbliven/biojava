@@ -26,12 +26,12 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 
 /**
- * Converts the description line of a fasta entry into usefull information.
+ * Converts the description line of a fasta entry into useful information.
  * <P>
  * Fasta files can have rich information shoe-horned into the description. This
  * is unpredictable, and it would be fruitless to write a single routine for
  * decoding all description formats. This interface lets you pop in your own
- * parser, as apropreate.
+ * parser, as apropriate.
  * 
  * @author Matthew Pocock
  */

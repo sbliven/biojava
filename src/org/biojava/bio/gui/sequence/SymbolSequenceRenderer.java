@@ -55,13 +55,18 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
       g.setFont(sp.getFont());
       g.clip(seqBox);
       Rectangle2D clip = g.getClipBounds();
+      //Rectangle2D.Double charBox = new Rectangle2D.Double();
 
       if(direction == sp.HORIZONTAL) {
         minP = Math.max(1,            sp.graphicsToSequence(clip.getMinX()));
         maxP = Math.min(seq.length(), sp.graphicsToSequence(clip.getMaxX()));
+        //charBox.width = sp.getScale() - 1.0;
+        //charBox.height = seqBox.getHeight() - 1.0;
       } else {
         minP = Math.max(1,            sp.graphicsToSequence(clip.getMinY()));
         maxP = Math.min(seq.length(), sp.graphicsToSequence(clip.getMaxY()));
+        //charBox.width = seqBox.getWidth() - 1.0;
+        //charBox.height = sp.getScale() - 1.0;
       }
       
       g.setColor(Color.black);
@@ -70,28 +75,31 @@ public class SymbolSequenceRenderer implements SequenceRenderer {
       Rectangle2D maxBounds =
         g.getFont().getMaxCharBounds(g.getFontRenderContext());
       if(
-        sp.getScale() < maxBounds.getWidth()*0.5 ||
-        sp.getScale() < maxBounds.getHeight()*0.5
+        sp.getScale() < maxBounds.getWidth()*0.4 ||
+        sp.getScale() < maxBounds.getHeight()*0.4
       ) {
         g.fill(seqBox);
       } else {
         double fudgeAcross = 0.0;
         double fudgeDown = 0.0;
         if (direction == sp.HORIZONTAL) {
-          fudgeAcross = scale * 0.5 - maxBounds.getCenterX();
+          fudgeAcross = 0.0 /*- maxBounds.getCenterX()*/;
           fudgeDown = seqBox.getCenterY() - maxBounds.getCenterY();
         } else {
-          fudgeAcross = scale * 0.5 - maxBounds.getCenterY();
-          fudgeDown = seqBox.getCenterX() - maxBounds.getCenterX();
+          fudgeAcross = seqBox.getCenterX() - maxBounds.getCenterX();
+          fudgeDown = scale * 0.5 - maxBounds.getCenterY();
         }
         for (int pos = minP; pos <= maxP; ++pos) {
           double gPos = sp.sequenceToGraphics(pos);
           char c = seq.symbolAt(pos).getToken();
           if (direction == SequencePanel.HORIZONTAL) {
+            //charBox.x = gPos;
             g.drawString("" + c, (int) (gPos + fudgeAcross), (int) fudgeDown);
           } else {
-            g.drawString("" + c, (int) fudgeDown, (int) (gPos + fudgeAcross));
+            //charBox.y = gPos;
+            g.drawString("" + c, (int) fudgeAcross, (int) (gPos + fudgeDown));
           }
+          //g.draw(charBox);
         }
       }
     }

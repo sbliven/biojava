@@ -20,7 +20,7 @@ public class SearchProfile {
       File seqFile = new File(args[0]);
 
       FiniteAlphabet PROTEIN = ProteinTools.getAlphabet();
-      nullModel = UniformDistribution.createInstance(PROTEIN);
+      nullModel = new UniformDistribution(PROTEIN);
       
       System.out.println("Loading sequences");
       SequenceDB seqDB = readSequenceDB(seqFile, PROTEIN);

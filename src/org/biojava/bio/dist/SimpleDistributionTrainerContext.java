@@ -39,19 +39,32 @@ implements DistributionTrainerContext, Serializable {
   
   private Distribution nullModel;
   private double nullModelWeight;
-
+    
+  /**
+  *Retrieve the background distribution
+  */  
   public Distribution getNullModel() {
     return this.nullModel;
   }
   
+  /**
+  *Assign a background distribution
+  *@param nullModel the background distribution to assign
+  */     
   public void setNullModel(Distribution nullModel) {
     this.nullModel = nullModel;
   }
-
+  /**
+  *Retrieve the weight of the background distribution
+  */   
   public double getNullModelWeight() {
     return this.nullModelWeight;
   }
-  
+
+  /**
+  *Assign a weight to the background distribution
+  *@param nullModelWeight the weight of the null model to assign.
+  */ 
   public void setNullModelWeight(double nullModelWeight) {
     this.nullModelWeight = nullModelWeight;
   }

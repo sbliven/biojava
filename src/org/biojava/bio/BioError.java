@@ -32,11 +32,11 @@ import java.io.*;
 import java.util.*;
 
 /**
- * A general perpous Error that can wrap another Throwable object.
+ * A general purpose Error that can wrap another Throwable object.
  * <P>
  * BioError is an Error that should be thrown whenever some exceptional and
  * unforseable event takes place. For example, sometimes exceptions can be
- * thrown by a given method, but not when the calling method is a memeber of
+ * thrown by a given method, but not when the calling method is a member of
  * the same class. In this case, the try-catch block would collect the
  * 'impossible' exception and throw a BioError that wraps it.
  *
@@ -66,6 +66,9 @@ public class BioError extends Error {
   }
 
   public Throwable getWrappedException() {
+    /**
+    *sends a Throwable object to standard out if encountered in the stack trace or returns null.
+    */
     return subException;
   }
   

@@ -63,7 +63,7 @@ public abstract class AbstractTrainer implements TrainingAlgorithm {
   throws IllegalSymbolException, BioException {
     try {
       ModelTrainer trainer =
-        new SimpleModelTrainer(dp.getModel(), nullModel, nullWeight, 0.000001, 1.0);
+        new SimpleModelTrainer(dp.getModel(), nullModel, nullWeight, 5.0, 1.0);
       do {
         cycle++;
         lastScore = currentScore;

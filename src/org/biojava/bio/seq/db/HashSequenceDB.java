@@ -29,7 +29,7 @@ import org.biojava.bio.*;
 import org.biojava.bio.seq.*;
 
 /**
- * An implementation of SequenceDB that uses an underlying HashMap to stoor the
+ * An implementation of SequenceDB that uses an underlying HashMap to store the
  * sequence objects.
  *
  * @author Matthew Pocock
@@ -44,7 +44,7 @@ public class HashSequenceDB implements SequenceDB, Serializable {
   /**
    * An object to extract an ID for a sequence.
    */
-  final private IDMaker idMaker;
+  final private org.biojava.bio.seq.db.IDMaker idMaker;
 
   /** 
    * The name of this sequence database.
@@ -93,7 +93,7 @@ public class HashSequenceDB implements SequenceDB, Serializable {
    *
    * @return the current IDMaker object
    */
-  public IDMaker getIDMaker() {
+  public org.biojava.bio.seq.db.IDMaker getIDMaker() {
     return idMaker;
   }
   
@@ -111,7 +111,7 @@ public class HashSequenceDB implements SequenceDB, Serializable {
    * sequences and have a null name.
    */
   public HashSequenceDB() {
-    this(byName, null);
+    this(IDMaker.byName, null);
   }
   
   /**
@@ -120,7 +120,7 @@ public class HashSequenceDB implements SequenceDB, Serializable {
    *
    * @param idMaker the object that will work out the default id for a sequence
    */
-  public HashSequenceDB(IDMaker idMaker) {
+  public HashSequenceDB(org.biojava.bio.seq.db.IDMaker idMaker) {
     this(idMaker, null);
   }
   
@@ -131,7 +131,7 @@ public class HashSequenceDB implements SequenceDB, Serializable {
    * @param name the name for this database
    */
   public HashSequenceDB(String name) {
-    this(byName, name);
+    this(IDMaker.byName, name);
   }
   
   /**
@@ -141,76 +141,8 @@ public class HashSequenceDB implements SequenceDB, Serializable {
    * @param idMaker the object that will work out the default id for a sequence
    * @param name the name for this database
    */
-  public HashSequenceDB(IDMaker idMaker, String name) {
+  public HashSequenceDB(org.biojava.bio.seq.db.IDMaker idMaker, String name) {
     this.idMaker = idMaker;
     this.name = name;
   }
-
-  /**
-   * Interface for objects that define how to make an ID for a sequence.
-   * <P>
-   * Nine times out of ten, you will use one of HashSequenceDB.byURN or
-   * HashSequenceDB.byName, but once in a blue-moon, you will want some other
-   * systematic way of retrieveing Sequences. This interface is here to allow
-   * you to plug in this funcitonality if you need it.
-   */
-  public static interface IDMaker {
-    /**
-     * Calculate the id for a sequence.
-     * <P>
-     * Each unique sequence should return a unique ID.
-     *
-     * @param seq the sequence to ID
-     * @return the id for the sequence
-     */
-    String calcID(Sequence seq);
-  }
-  
-  /**
-   * A simple implementation of IDMaker that hashes by URN.
-   *
-   * @author Matthew Pocock
-   */
-  public final static IDMaker byURN = new SerializableIDMaker() {
-    public String calcID(Sequence seq) {
-      return seq.getURN();
-    }
-    public Object writeReplace() throws IOException {
-      try {
-        return new StaticMemberPlaceHolder(
-          HashSequenceDB.class.getField("byURN")
-        );
-      } catch (NoSuchFieldException nsfe) {
-        throw new BioError(
-          nsfe,
-          "Could not find field while serializing"
-        );
-      }
-    }
-  };
-  
-  /**
-   * A simple implementation of IDMaker that hashes by sequence name.
-   *
-   * @author Matthew Pocock
-   */
-  public final static IDMaker byName = new SerializableIDMaker() {
-    public String calcID(Sequence seq) {
-      return seq.getName();
-    }
-    public Object writeReplace() throws IOException {
-      try {
-        return new StaticMemberPlaceHolder(
-          HashSequenceDB.class.getField("byName")
-        );
-      } catch (NoSuchFieldException nsfe) {
-        throw new BioError(
-          nsfe,
-          "Could not find field while serializing"
-        );
-      }
-    }
-  };
-  
-  private interface SerializableIDMaker extends IDMaker, Serializable {}
 }
