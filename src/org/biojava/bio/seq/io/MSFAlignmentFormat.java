@@ -22,7 +22,6 @@ import  java.util.*;
  * Description:
  * Copyright:    Copyright (c) 2000
  * Company:
- * @author
  * @version 1.0
  */
 public class MSFAlignmentFormat
@@ -57,7 +56,7 @@ implements AlignmentFormat {
     /**
      * put your documentation comment here
      * @param reader
-     * @return
+     * @return Alignment
      */
     public Alignment read (BufferedReader reader) {
         Vector sequenceNames = new Vector();

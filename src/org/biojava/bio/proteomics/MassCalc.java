@@ -19,7 +19,6 @@ import java.util.HashMap;
 /**
  *
  * @author  mjones
- * @version 
  */
 public class MassCalc {
     

@@ -11,7 +11,6 @@ import java.util.*;
 /**
  *
  * @author  mjones
- * @version 
  */
 public class SimpleSymbolPropertyTable implements SymbolPropertyTable {
 
