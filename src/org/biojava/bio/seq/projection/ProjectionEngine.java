@@ -123,10 +123,10 @@ public class ProjectionEngine {
 	loader = new PEClassLoader(ProjectionEngine.class.getClassLoader());
 	_projectionClasses = new HashMap();
 	try {
-	    _projectionClasses.put(Feature.class, loader.loadClassMagick("org.biojava.bio.seq.projection.ProjectedFeature"));
-	    _projectionClasses.put(StrandedFeature.class, loader.loadClassMagick("org.biojava.bio.seq.projection.ProjectedStrandedFeature"));
+	    _projectionClasses.put(Feature.class, ProjectedFeature.class); //loader.loadClassMagick("org.biojava.bio.seq.projection.ProjectedFeature"));
+	    _projectionClasses.put(StrandedFeature.class, ProjectedStrandedFeature.class); //loader.loadClassMagick("org.biojava.bio.seq.projection.ProjectedStrandedFeature"));
 
-	    instantiator = (Instantiator) loader.loadClassMagick("org.biojava.bio.seq.projection.ProjectionEngine$InstantiatorImpl").newInstance();
+	    instantiator = new InstantiatorImpl(); //(Instantiator) loader.loadClassMagick("org.biojava.bio.seq.projection.ProjectionEngine$InstantiatorImpl").newInstance();
 	} catch (Exception ex) {
 	    throw new BioError(ex, "Assertion failure: can't initialize projection system");
 	}

@@ -29,14 +29,14 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 /**
- * Class used by ProjectionEngine to wrap Feature objects.
+ * Internal class used by ProjectionEngine to wrap Feature objects.
  *
  * @author Thomas Down
  * @author Matthew Pocock
  * @since 1.1
  */
 
-class ProjectedFeature
+public class ProjectedFeature
   extends
     AbstractChangeable
   implements

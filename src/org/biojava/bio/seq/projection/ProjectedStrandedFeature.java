@@ -26,14 +26,16 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
 
 /**
- * Class used by ProjectedFeatureHolder to wrap StrandedFeatures.
+ * Internal class used by ProjectedFeatureHolder to wrap StrandedFeatures.
  *
  * @author Thomas Down
+ * @author Matthew Pocock
  * @since 1.1
  */
 
-class ProjectedStrandedFeature extends ProjectedFeature 
-                 implements StrandedFeature 
+public class ProjectedStrandedFeature
+  extends ProjectedFeature 
+  implements StrandedFeature 
 {
     public ProjectedStrandedFeature(StrandedFeature f,
 				    ProjectionContext ctx)
