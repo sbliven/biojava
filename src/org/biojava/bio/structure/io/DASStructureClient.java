@@ -48,10 +48,6 @@ public class DASStructureClient implements StructureIO {
      * Constructs a DASStructureClient object.
      */
 
-    public DASStructureClient() {
-
-	serverurl = "http://127.0.0.1:8080/dazzle/mystruc/structure?query=";
-    }
 
     /**
      * Constructs a DASStructureClient object.
