@@ -28,7 +28,7 @@ public class CreateDNAFastaHashTableCompact {
 	DataStore ds = new CompactedDataStoreFactory().buildDataStore(
     		dataStoreFile,
 		streamer,
-		new DNANoAmbPack(DNATools.t()),
+		new DNANoAmbPack((byte) -1),
 		10,
 		10000
 	);
