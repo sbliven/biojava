@@ -34,28 +34,22 @@ import org.biojava.bio.symbol.*;
 import org.biojava.bio.program.das.*;
 
 /**
- * Projection for MetaDAS
+ * Projection for MetaDAS.
+ *
+ * <p>
+ * In this new version, most of the functionality is inherited from the normal
+ * ProjectedFeatureHolder
+ * </p>
  *
  * @author Thomas Down
  * @since 1.2
  */
 
 
-class DistProjectedFeatureHolder extends AbstractFeatureHolder {
-    private final FeatureHolder wrapped;
-    private final FeatureHolder parent;
-    private final Annotation annotation;
-    private FeatureHolder projectedFeatures;
-    private boolean cachingProjections = true;
-    private ChangeListener underlyingFeaturesChange;
-    private PFHContext projectionContext;
-
-    public FeatureHolder projectFeatureHolder(FeatureHolder fh,
-					      FeatureHolder parent)
-    {
-	return new DistProjectedFeatureHolder(fh, parent, annotation);
-    }
-
+class DistProjectedFeatureHolder extends ProjectedFeatureHolder {
+    private Annotation annotation;
+    private Map componentFeatureCache = new HashMap();
+    
     /**
      * Construct a new FeatureHolder which projects a set of features
      * into a new coordinate system.  If <code>translation</code> is 0
@@ -68,194 +62,55 @@ class DistProjectedFeatureHolder extends AbstractFeatureHolder {
      */
 
     public DistProjectedFeatureHolder(FeatureHolder fh,
-				      FeatureHolder parent,
-				      Annotation annotation)
+				                      FeatureHolder parent,
+                                      Annotation annotation)
     {
-	this.wrapped = fh;
-	this.parent = parent;
-	this.annotation = annotation;
-
-	this.projectionContext = new PFHContext();
-
-	underlyingFeaturesChange = new ChangeListener() {
-	    public void preChange(ChangeEvent e)
-		throws ChangeVetoException 
-	    {
-		if (hasListeners()) {
-		    getChangeSupport(FeatureHolder.FEATURES).firePreChangeEvent(new ChangeEvent(this,
-								     FeatureHolder.FEATURES,
-								     e.getChange(),
-								     e.getPrevious(),
-								     e));
-		}
-	    }
-
-	    public void postChange(ChangeEvent e) {
-		projectedFeatures = null; // Flush all the cached projections --
-		                          // who knows what might have changed.
-
-		if (hasListeners()) {
-		    getChangeSupport(FeatureHolder.FEATURES).firePostChangeEvent(new ChangeEvent(this,
-								      FeatureHolder.FEATURES,
-								      e.getChange(),
-								      e.getPrevious(),
-								      e));
-		}
-	    }
-	} ;
-
-	wrapped.addChangeListener(underlyingFeaturesChange);
-    }
-
-    public boolean isCachingProjections() {
-	return cachingProjections;
-    }
-
-    /**
-     * Determine whether or not the projected features should be cached.
-     * This is a temporary optimization, and might go away once feature
-     * filtering is more intelligent.
-     *
-     * @since 1.2
-     */
-
-    public void setIsCachingProjections(boolean b) {
-	cachingProjections = b;
-	projectedFeatures = null;
-    }
-
-    protected FeatureHolder getProjectedFeatures() {
-	if (projectedFeatures != null) {
-	    return projectedFeatures;
-	}
-
-	FeatureHolder toProject = wrapped;
-
-	SimpleFeatureHolder sfh = new SimpleFeatureHolder();
-	for (Iterator i = toProject.features(); i.hasNext(); ) {
-	    Feature f = (Feature) i.next();
-	    Feature wf;
-	    if (f instanceof ComponentFeature) {
-		if (parent instanceof DistributedSequence) {
-		    // We currently don't use the projection engine for this case.  Extend
-		    // the ProjectionContext interface?
-		    
-		    ComponentFeature.Template cft = (ComponentFeature.Template) ((ComponentFeature) f).makeTemplate();
-		    if (cft.componentSequenceName == null) {
-			cft.componentSequenceName = cft.componentSequence.getName();
-		    }
-		    cft.componentSequence = null;    // We need to go back though the DistDB for the
-		                                     // proper component sequence to use here.
-		    if (cft.componentSequenceName == null) {
-			throw new NullPointerException("Can't get component sequence name");
-		    }
-
-		    try {
-			wf = new DistComponentFeature((DistributedSequence) parent,
-						      cft);
-		    } catch (Exception ex) {
-			throw new BioRuntimeException(ex, "Error instantiating DistComponentFeature");
-		    }
-		} else {
-		    throw new BioRuntimeException("MetaDAS currently doesn't handle ComponentFeatures which aren't top-level features.  Any idea what these mean?");
-		}
-	    } else {
-		// Everything else goes through a fairly standard projection
-		
-		wf = ProjectionEngine.DEFAULT.projectFeature(f, projectionContext);
-	    }
-	    try {
-		sfh.addFeature(wf);
-	    } catch (ChangeVetoException cve) {
-		throw new BioError(
-				   cve,
-				   "Assertion failure: Should be able to manipulate this FeatureHolder"
-				   );
-	    }
-	}
-
-	if (cachingProjections) {
-	    projectedFeatures = sfh;
-	}
-
-	return sfh;
-    }
-
-    public int countFeatures() {
-	return wrapped.countFeatures();
-    }
-
-    public Iterator features() {
-	return getProjectedFeatures().features();
+        super(fh, parent, 0, false);
+        this.annotation = annotation;
     }
     
-    public boolean containsFeature(Feature f) {
-      return getProjectedFeatures().containsFeature(f);
-    }
+    public Feature projectFeature(Feature f) {
+	    if (f instanceof ComponentFeature && getParent() instanceof DistributedSequence) {
+            ComponentFeature pcf = (ComponentFeature) componentFeatureCache.get(f);
+            if (pcf != null) {
+                ComponentFeature.Template cft = (ComponentFeature.Template) ((ComponentFeature) f).makeTemplate();
+                if (cft.componentSequenceName == null) {
+                    cft.componentSequenceName = cft.componentSequence.getName();
+                }
+                cft.componentSequence = null;    // We need to go back though the DistDB for the
+		                                         // proper component sequence to use here.
+                if (cft.componentSequenceName == null) {
+                    throw new NullPointerException("Can't get component sequence name");
+                }
 
-    public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-	return getProjectedFeatures().filter(ff, recurse);
-    }
-
-    public FeatureHolder getParent() {
-	return parent;
-    }
-
-    /**
-     * ProjectionContext implementation tied to a given ProjectedFeatureHolder
-     */
-
-    private class PFHContext implements ProjectionContext {
-	public FeatureHolder getParent(Feature f) {
-	    return parent;
-	}
-
-	public Sequence getSequence(Feature f) {
-	    FeatureHolder fh = parent;
-	    while (fh instanceof Feature) {
-		fh = ((Feature) fh).getParent();
+                try {
+                    pcf = new DistComponentFeature((DistributedSequence) getParent(),
+						                           cft);
+                } catch (Exception ex) {
+                    throw new BioRuntimeException(ex, "Error instantiating DistComponentFeature");
+                }
+                componentFeatureCache.put(f, pcf);
+            } 
+            return pcf;
+	    } else {
+            // Default: generate a throwaway ProjectedFeature
+            
+            return super.projectFeature(f);
 	    }
-	    return (Sequence) fh;
-	}
-
-	public Location getLocation(Feature f) {
-	    return f.getLocation();
-	}
-
-	public StrandedFeature.Strand getStrand(StrandedFeature sf) {
-	    return sf.getStrand();
 	}
 
 	public Annotation getAnnotation(Feature f) {
-	    MergeAnnotation ma = new MergeAnnotation();
-	    try {
-		ma.addAnnotation(f.getAnnotation());
-		if (annotation != null) {
-		    ma.addAnnotation(annotation);
-		}
-	    } catch (ChangeVetoException cve) {
-		throw new BioError(cve);
-	    }
-	    return ma;
+        if (annotation != null) {
+            try {
+                MergeAnnotation ma = new MergeAnnotation();
+                ma.addAnnotation(f.getAnnotation());
+                ma.addAnnotation(annotation);
+                return ma;
+            } catch (ChangeVetoException cve) {
+                throw new BioError(cve);
+            }
+        } else {
+            return f.getAnnotation();
+        }
 	}
-
-	public FeatureHolder projectChildFeatures(Feature f, FeatureHolder parent) {
-	    return projectFeatureHolder(f, parent);
-	}
-
-	public Feature createFeature(Feature f, Feature.Template templ) 
-	    throws ChangeVetoException
-	{
-	    throw new ChangeVetoException("Can't create features in this projection");
-	}
-
-	public void removeFeature(Feature f, Feature f2) 
-	    throws ChangeVetoException
-	{
-	    throw new ChangeVetoException("Can't create features in this projection");
-	}
-        
-    public void addChangeListener(Feature f, ChangeListener cl, ChangeType ct) {}
-    public void removeChangeListener(Feature f, ChangeListener cl, ChangeType ct) {}
-    }
 }
