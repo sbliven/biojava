@@ -72,7 +72,6 @@ implements BasisSymbol {
     List symbols, Alphabet matches
   ) throws IllegalSymbolException {
     this(token, annotation, symbols);
-    this.symbols = symbols;
     this.matches = matches;
   }
   

@@ -173,12 +173,19 @@ implements Serializable {
     return alphas;
   }
 
-  private ListWrapper gopher =
-    new ListWrapper();
+  private transient ListWrapper gopher;
+  
+  private ListWrapper getGopher() {
+    if(gopher == null) {
+      gopher = new ListWrapper();
+    }
+    return gopher;
+  }
 
   public AtomicSymbol getSymbolImpl(List l)
   throws IllegalSymbolException {
     AtomicSymbol cps;
+    ListWrapper gopher = getGopher();
     synchronized(gopher) {
       gopher.setList(l);
       cps = (AtomicSymbol) ourSymbols.get(gopher);

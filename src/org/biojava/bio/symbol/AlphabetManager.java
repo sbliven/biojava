@@ -176,7 +176,7 @@ public final class AlphabetManager {
     } else if(basis == symList.size()) {
       return new SimpleBasisSymbol(
         token, annotation,
-        new ArrayList(symList),
+        symList,
         new SimpleAlphabet(
           expandMatches(alpha, symList, new ArrayList())
         )
