@@ -1,21 +1,7 @@
 <body>
-Support Vector Machine classification and regression.
+Library of common statistical code.
 <P>
-These classes are experimental. They implement support vector machines
-for classification and regression. Support vector machines are
-powerfull artificial inteligence engines which utilize kernel
-functions to compute dod-products in very high dimensional feature
-spaces using time and memory related to the number of training
-examples, not the size of the feature space.
-<P>
-The design philosophy for kernels is as follows. There are basic
-kernels that calculate a type-specific dot product. These will
-normaly be found by looking for a static final method named Kernel
-of type SVMKernel within a class. Then there are permutation
-kernels. These include PolynomialKernel and RadialBaseKernel. These
-use a primary kernel to calculate the dot product in the natural
-space for the objects, and then performs some function on that
-which produces a result equivalent to doing the same dot-product in
-a very much higher dimensional feature space. As far as possible,
-kernels are java beans.
+In biology we all need to run tests to analyse numbers, to look for outliers and
+to classify or perform regression or clustering. This code should be independant
+of the actual data being processed where ever practical.
 </body>

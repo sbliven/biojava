@@ -10,7 +10,10 @@ Computationaly, the most natural way to represent a string is as a
 list of tokens from some alphabet. This representation gives us
 great freedom in defining the tokens within an alphabet, without
 restricting us to a single set of tokens. It also decouples the
-representation of the string from the alphabet it is over.
+representation of the string from the alphabet it is over. Since
+every appearance of a given token with all sequences is
+indistinguishable, we can reuse these objects and reference them
+multiple times using the flyweight design pattern.
 <P>
 The model we use is as follows:
 <br>
@@ -18,7 +21,7 @@ Residue - A token
 <br>
 Alphabet - A set of tokens
 <br>
-ResidueList - A string over a set of tokens
+ResidueList - A string over an alphabet of tokens
 <p>
 Throughout the seq package, Annotation and Annotatable are used
 to stoor and retrieve annotations. These apply to the entire

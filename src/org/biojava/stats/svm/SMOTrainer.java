@@ -77,8 +77,10 @@ public class SMOTrainer implements TrainingContext {
 	    L = Math.max(0, alpha1 + alpha2 - C);
 	    H = Math.min(C, alpha1 + alpha2);
 	}
-	if (L == H)
-	    return false;
+	if (L == H) {
+    //System.out.print("h");
+    return false;
+  }
 
 	// double k11 = kernel.evaluate(model.getVector(i1), model.getVector(i1));
 	// double k12 = kernel.evaluate(model.getVector(i1), model.getVector(i2));
@@ -89,7 +91,10 @@ public class SMOTrainer implements TrainingContext {
 	double eta = 2 * k12 - k11 - k22;
 	
 	double a1 = 0, a2 = 0;
-
+  if (eta > 0 && eta < epsilon) {
+    eta = 0.0;
+  }
+  
 	if (eta < 0) {
 	    a2 = alpha2 - y2 * (E1 - E2) / eta;
 	    if (a2 < L)
@@ -97,7 +102,7 @@ public class SMOTrainer implements TrainingContext {
 	    else if (a2 > H)
 		a2 = H;
 	} else {
-	    System.out.println("Positive eta!");
+	    //System.out.println("Positive eta!");
 
 	    /*
 
@@ -115,12 +120,15 @@ public class SMOTrainer implements TrainingContext {
 		a2 = alpha2;
 
 	    */
+      //System.out.print("+");
 	    return false;
 	}
 	
 	a1 = alpha1 + s*(alpha2 - a2);
-	if (Math.abs(a1 - alpha1) < epsilon * (a1 + alpha1+1 +epsilon))
-	    return false;
+	if (Math.abs(a1 - alpha1) < epsilon * (a1 + alpha1+1 +epsilon)) {
+//    System.out.print("s");
+    return false;
+  }
 
 	// Calculate new threshold
 	
@@ -144,22 +152,24 @@ public class SMOTrainer implements TrainingContext {
 	    b = (b1 + b2) / 2.0;
 	}
 	model.setThreshold(b);
+	model.setAlpha(i1, a1*y1);
+	model.setAlpha(i2, a2*y2);
 
 	// Update error cache
 
-  	E[i1] = 0;
-  	E[i2] = 0;
-  	for (int l = 0; l < E.length; ++l) {
-  	    if (l==i1 || l==i2)
-  		continue;
-  	    if (!(isBound(model.getAlpha(l)))) {
-  		// E[l] += y1*(a1-alpha1)*kernel.evaluate(model.getVector(i1), model.getVector(l)) + y2*(a2-alpha2)*kernel.evaluate(model.getVector(i2), model.getVector(l)) + bOLD - b;
-  		E[l] += y1*(a1-alpha1)*model.getKernelValue(i1, l) + y2*(a2-alpha2)*model.getKernelValue(i2, l) + bOLD - b;
-  	    }
-  	}
+  E[i1] = model.internalClassify(i1) - target[i1];
+  E[i2] = model.internalClassify(i2) - target[i2];
 
-	model.setAlpha(i1, a1*y1);
-	model.setAlpha(i2, a2*y2);
+  for (int l = 0; l < E.length; ++l) {
+    if (l==i1 || l==i2) {
+  		continue;
+    }
+    if (!(isBound(model.getAlpha(l)))) {
+  		E[l] += y1*(a1-alpha1)*model.getKernelValue(i1, l)
+           +  y2*(a2-alpha2)*model.getKernelValue(i2, l)
+           +  bOLD - b;
+    }
+ 	}
 
 	return true;
     }
@@ -206,7 +216,9 @@ public class SMOTrainer implements TrainingContext {
 			return 1;
 		}
 	    }
-	} 
+	} else {
+    //System.out.print("/");
+  }
 	return 0;
     }
 
@@ -215,15 +227,11 @@ public class SMOTrainer implements TrainingContext {
     }
 
     private double getError(int i) {
-        // double alpha = model.getAlpha(i) / target[i];
-        // if (alpha==0 || alpha==C)
-	     return model.internalClassify(i) - target[i];
-	// return E[i];
-
-	// if (E[i] == Double.NEGATIVE_INFINITY || 
-	//     isBound(model.getAlpha(i) * target[i]))
-	//    E[i] = model.internalClassify(i) - target[i];
-	// return E[i];
+      double alpha = model.getAlpha(i) / target[i];
+      if (isBound(alpha)) {
+        return E[i] = model.internalClassify(i) - target[i];
+      }
+      return E[i];
     }
 
     public synchronized void trainModel(SVMModel m, double[] t, 
@@ -238,9 +246,9 @@ public class SMOTrainer implements TrainingContext {
 	cycle = 0;
 
 	E = new double[model.size()];
-	for (int i = 0; i < t.length; ++i)
-	    E[i] = -t[i];
-
+	for (int i = 0; i < model.size(); ++i) {
+	    E[i] = model.internalClassify(i) - t[i];
+  }
 	int numChanged = 0;
 	boolean examineAll = true;
 

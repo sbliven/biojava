@@ -91,23 +91,72 @@ public class SparseVector {
     }
 
     public static final SVMKernel kernel = new SVMKernel() {
-	public double evaluate(Object o1, Object o2) {
-	    SparseVector a = (SparseVector) o1;
-	    SparseVector b = (SparseVector) o2;
+      public double evaluate(Object o1, Object o2) {
+        SparseVector a = (SparseVector) o1;
+        SparseVector b = (SparseVector) o2;
         
-	    int ai=0, bi=0;
-	    double total = 0.0;
+        int ai=0, bi=0;
+        double total = 0.0;
 	    
-	    while (ai < a.size && bi < b.size) {
-		if (a.keys[ai] > b.keys[bi]) {
-		    ++bi;
-		} else if (a.keys[ai] < b.keys[bi]) {
-		    ++ai;
-		} else {
-		    total += a.values[ai++] * b.values[bi++];
-		}
-	    }
-	    return total;
-	}
+  	    while (ai < a.size && bi < b.size) {
+          if (a.keys[ai] > b.keys[bi]) {
+            ++bi;
+          } else if (a.keys[ai] < b.keys[bi]) {
+            ++ai;
+          } else {
+            total += a.values[ai++] * b.values[bi++];
+          }
+        }
+        return total;
+      }
     };
+    
+    /**
+     * A version of the standard dot-product kernel that scales each column
+     * independantly.
+     *
+     * @author Matthew Pocock
+     */
+    public static class NormalizingKernel implements SVMKernel {
+      private SparseVector s;
+      public double evaluate(Object o1, Object o2) {
+        SparseVector a = (SparseVector) o1;
+        SparseVector b = (SparseVector) o2;
+        
+        int ai=0, bi=0, si=0;
+        double total = 0.0;
+	    
+  	    while (ai < a.size && bi < b.size && si < s.size) {
+          if (a.keys[ai] < b.keys[bi] && a.keys[ai] < s.keys[si]) {
+            ++ai;
+          } else if (b.keys[bi] < a.keys[ai] && b.keys[ai] < s.keys[si]) {
+            ++bi;
+          } else if (s.keys[si] < a.keys[ai] && s.keys[si] < b.keys[bi]) {
+            ++si;
+          } else {
+            total += a.values[ai++] * b.values[bi++] * s.valuse[si++];
+          }
+        }
+        return total;
+      }
+      
+      public NormalizingKernel(SparseVector s) {
+        this.s = s;
+      }
+      
+      public NormalizingKernel(List vectors) {
+        this.s = new SparseVector();
+        
+        for(Iterator i = vectors.iterator(); i.hasNext(); ) {
+          SparseVector v = (SparseVector) i.next();
+          for(int j = 0; j < v.size(); j++) {
+            s.put(v.keys[j], s.get(v.keys[j]) + v.values[j]);
+          }
+        }
+        
+        for(int j = 0; j < s.size(); j++j) {
+          s.put(1.0 / s.values[j]);
+        }
+      }
+    }
 }
