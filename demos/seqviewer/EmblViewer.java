@@ -38,9 +38,11 @@ public class EmblViewer {
     StreamReader sr = new StreamReader(is, ef, DNATools.getDNA().getParser("token"), sf);
     Sequence seq = sr.nextSequence();
 
-    FeatureFilter notSource = new FeatureFilter.Not(
-      new FeatureFilter.ByType("source")
-    );
+    Feature source = (Feature) seq.filter(
+      new FeatureFilter.ByType("source"), false
+    ).features().next();
+    seq.removeFeature(source);
+    
     FeatureFilter repeatFilter = new FeatureFilter.ByType("repeat_region");
     FeatureFilter miscFilter = new FeatureFilter.ByType("misc_feature");
     
@@ -50,6 +52,7 @@ public class EmblViewer {
     sp.setScale(20.0);
     sp.setSpacer(10);
     sp.setDirection(SequencePanel.HORIZONTAL);
+    
     fr = new BasicFeatureRenderer();
     split = new ZiggyFeatureRenderer();
     FeatureRenderer frChooser = new FeatureRenderer() {
@@ -66,37 +69,31 @@ public class EmblViewer {
     FeatureBlockSequenceRenderer features = new FeatureBlockSequenceRenderer();
     FeatureBlockSequenceRenderer repeats = new FeatureBlockSequenceRenderer();
     FeatureBlockSequenceRenderer misc = new FeatureBlockSequenceRenderer();
+    
     features.setDepth(15);
     repeats.setDepth(10);
     misc.setDepth(10);
+    
     features.setFeatureRenderer(frChooser);
     repeats.setFeatureRenderer(fr);
     misc.setFeatureRenderer(frChooser);
+    
     features.setLabel("features");
     repeats.setLabel("repeats");
     misc.setLabel("misc");
-    features.setFilter(
-      new FeatureFilter.And(
-        new FeatureFilter.And(
-          new FeatureFilter.Not(repeatFilter),
-          new FeatureFilter.Not(miscFilter)
-        ),
-        notSource
-      )
+    
+    FeatureFilter featuresFilter = new FeatureFilter.And(
+      new FeatureFilter.Not(repeatFilter),
+      new FeatureFilter.Not(miscFilter)
     );
-    repeats.setFilter(repeatFilter);
-    misc.setFilter(miscFilter);
 
     LayeredRenderer lsr = new LayeredRenderer();
-    lsr.setFilter(notSource);
-    lsr.setRecurse(false);
     lsr.setLineRenderer(features);
     
-    sp.addRenderer(repeats);
-    sp.addRenderer(misc);
-    sp.addRenderer(features);
+    sp.addRenderer(new FilteringRenderer(repeats, repeatFilter));
+    sp.addRenderer(new FilteringRenderer(misc, miscFilter));
+    sp.addRenderer(new FilteringRenderer(lsr, featuresFilter));
     sp.addRenderer(new SymbolSequenceRenderer());
-    sp.addRenderer(lsr);
     f.getContentPane().setLayout(new BorderLayout());
     f.getContentPane().add(new JScrollPane(sp), BorderLayout.CENTER);
     JPanel panel = new JPanel();

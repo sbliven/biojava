@@ -41,6 +41,11 @@ public class LayeredRenderer implements SequenceRenderer {
     pcs = new PropertyChangeSupport(this);
   }
   
+  public LayeredRenderer(SequenceRenderer lineRenderer) {
+    this();
+    setLineRenderer(lineRenderer);
+  }
+  
   public void addPropertyChangeListener(PropertyChangeListener l) {
     pcs.addPropertyChangeListener(l);
   }

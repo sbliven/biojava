@@ -113,7 +113,7 @@ public class EmblProcessor implements SequenceBuilder {
 		    if (features.inFeature())
 			features.endFeature();
 		    
-		    features.startFeature(featureLine.substring(0, 15));
+		    features.startFeature(featureLine.substring(0, 15).trim());
 		}
 		features.featureData(featureLine.substring(16));
 	    } else {

@@ -45,6 +45,15 @@ public class FilteringRenderer implements SequenceRenderer {
     recurse = false;
   }
   
+  public FilteringRenderer(
+    SequenceRenderer lineRenderer,
+    FeatureFilter filter
+  ) {
+    this();
+    setLineRenderer(lineRenderer);
+    setFilter(filter);
+  }
+  
   public void addPropertyChangeListener(PropertyChangeListener l) {
     pcs.addPropertyChangeListener(l);
   }

@@ -31,6 +31,8 @@ import java.awt.geom.*;
 import java.awt.event.*;
 import javax.swing.*;
 
+import org.biojava.utils.*;
+
 import org.biojava.bio.*;
 import org.biojava.bio.symbol.*;
 import org.biojava.bio.seq.*;
@@ -75,6 +77,7 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
   private Map depths;
 
   private RendererMonitor theMonitor;
+  private ChangeListener seqListener;
 
   /**
    * Initializer.
@@ -93,6 +96,13 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
     trailingBorder = new SequenceRenderContext.Border();
     leadingBorder.addPropertyChangeListener(theMonitor);
     trailingBorder.addPropertyChangeListener(theMonitor);
+    
+    seqListener = new ChangeAdapter() {
+      public void postChange(ChangeEvent e) {
+        resizeAndValidate();
+        repaint();
+      }
+    };
   }
 
   public SequencePanel() {
@@ -105,9 +115,15 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
     
   public void setSequence(SymbolList s) {
     SymbolList oldSequence = sequence;
+    if(oldSequence instanceof Changeable) {
+      ((Changeable) oldSequence).removeChangeListener(seqListener);
+    }
     this.sequence = s;
     resizeAndValidate();
     firePropertyChange("sequence", oldSequence, s);
+    if(s instanceof Changeable) {
+      ((Changeable) s).addChangeListener(seqListener);
+    }
   }
 
   public SymbolList getSequence() {
@@ -366,7 +382,7 @@ public class SequencePanel extends JComponent implements SwingConstants, Sequenc
 
   private class RendererMonitor implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent ev) {
-	    repaint();
+      repaint();
     }
   }
   
