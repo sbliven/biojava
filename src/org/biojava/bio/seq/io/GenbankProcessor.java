@@ -37,6 +37,7 @@ import org.biojava.bio.*;
 public class GenbankProcessor extends SequenceBuilderFilter
 {
 	public static final String PROPERTY_GENBANK_ACCESSIONS = "genbank_accessions";
+	private boolean mBadFeature = false;
 
 	/**
 	 * Factory which wraps sequence builders in a GenbankProcessor
@@ -68,7 +69,7 @@ public class GenbankProcessor extends SequenceBuilderFilter
 	public GenbankProcessor(SequenceBuilder theDelegate)
 	{
 		super(theDelegate);
-		features = new FeatureTableParser(this, "GENBANK");
+		features = new FeatureTableParser(this, "GenBank");
 	}
 
 	public void endSequence() throws ParseException
@@ -87,37 +88,54 @@ public class GenbankProcessor extends SequenceBuilderFilter
 	{
 		try
 		{
-			if (features.inFeature() && !(key.equals(GenbankFormat.FEATURE_FLAG)))
+			if(mBadFeature)
 			{
-				features.endFeature();
-			}
-
-			if(key.equals(GenbankFormat.FEATURE_FLAG))
-			{
+				// If this feature is bad in some way, ignore it.
 				String featureLine = value.toString();
-				if (featureLine.charAt(0) != ' ')
+				if((key.equals(GenbankFormat.FEATURE_FLAG)) && (featureLine.charAt(0) != ' '))
 				{
-					// This is a featuretype field
-					if (features.inFeature())
-					{
-						features.endFeature();
-					}
+					// If the offending feature is past, start reading data again
+					mBadFeature = false;
 					features.startFeature(featureLine.substring(0, 16).trim());
+					features.featureData(featureLine.substring(16));
 				}
-				features.featureData(featureLine.substring(16));
 			}
 			else
 			{
-				getDelegate().addSequenceProperty(key, value);
-				if (key.equals(GenbankFormat.ACCESSION_TAG))
+				if (features.inFeature() && !(key.equals(GenbankFormat.FEATURE_FLAG)))
 				{
-					accessions.add(value);
+					features.endFeature();
+				}
+
+				if(key.equals(GenbankFormat.FEATURE_FLAG))
+				{
+					String featureLine = value.toString();
+					if (featureLine.charAt(0) != ' ')
+					{
+						// This is a featuretype field
+						if (features.inFeature())
+						{
+							features.endFeature();
+						}
+						features.startFeature(featureLine.substring(0, 16).trim());
+					}
+					features.featureData(featureLine.substring(16));
+				}
+				else
+				{
+					getDelegate().addSequenceProperty(key, value);
+					if (key.equals(GenbankFormat.ACCESSION_TAG))
+					{
+						accessions.add(value);
+					}
 				}
 			}
 		}
 		catch (BioException ex)
 		{
-			throw new BioError(ex, "FIXME");
+			// If an exception is thrown, read past the offending feature
+			mBadFeature = true;
+			System.err.println(ex);
 		}
 	}
 }

@@ -32,11 +32,14 @@ import org.biojava.bio.*;
  * Simple filter which handles attribute lines from an EMBL file
  *
  * @author Thomas Down
+ * @author Greg Cox
  * @since 1.1
  */
 
 public class EmblProcessor extends SequenceBuilderFilter {
     public static final String PROPERTY_EMBL_ACCESSIONS = "embl_accessions";
+
+	private boolean mBadFeature = false;
 
     /**
      * Factory which wraps SequenceBuilders in an EmblProcessor
@@ -79,36 +82,68 @@ public class EmblProcessor extends SequenceBuilderFilter {
 	accessions = new ArrayList();
     }
 
-    public void addSequenceProperty(Object key, Object value) throws ParseException {
-	try {
-	    // Tidy up any end-of-block jobbies
+    public void addSequenceProperty(Object key, Object value) throws ParseException
+    {
+		try
+		{
+			if(mBadFeature)
+			{
+				// If this feature is bad in some way, ignore it.
+				String featureLine = value.toString();
+				if((key.equals("FT")) && (featureLine.charAt(0) != ' '))
+				{
+					// If the offending feature is past, start reading data again
+					mBadFeature = false;
+					features.startFeature(featureLine.substring(0, 15).trim());
+					features.featureData(featureLine.substring(16));
+				}
+			}
+			else
+			{
+			    // Tidy up any end-of-block jobbies
 
-	    if (features.inFeature() && !key.equals("FT")) {
-		features.endFeature();
-	    }
+			    if (features.inFeature() && !key.equals("FT"))
+			    {
+					features.endFeature();
+		    	}
 
-	    if (key.equals("FT")) {
-		String featureLine = value.toString();
-		if (featureLine.charAt(0) != ' ') {
-		    // This is a featuretype field
-		    if (features.inFeature())
-			features.endFeature();
+			    if (key.equals("FT"))
+			    {
+					String featureLine = value.toString();
+					if (featureLine.charAt(0) != ' ')
+					{
+					    // This is a featuretype field
+					    if (features.inFeature())
+					    {
+							features.endFeature();
+						}
 
-		    features.startFeature(featureLine.substring(0, 15).trim());
+					    features.startFeature(featureLine.substring(0, 15).trim());
+					}
+					features.featureData(featureLine.substring(16));
+		    	}
+		    	else
+		    	{
+					getDelegate().addSequenceProperty(key, value);
+
+					if (key.equals("AC"))
+					{
+					    String acc= value.toString();
+					    StringTokenizer toke = new StringTokenizer(acc, "; ");
+					    while (toke.hasMoreTokens())
+					    {
+							accessions.add(toke.nextToken());
+						}
+					}
+		    	}
+		    }
 		}
-		features.featureData(featureLine.substring(16));
-	    } else {
-		getDelegate().addSequenceProperty(key, value);
+		catch (BioException ex)
+		{
+			// If an exception is thrown, read past the offending feature
+			mBadFeature = true;
+			System.err.println(ex);
 
-		if (key.equals("AC")) {
-		    String acc= value.toString();
-		    StringTokenizer toke = new StringTokenizer(acc, "; ");
-		    while (toke.hasMoreTokens())
-			accessions.add(toke.nextToken());
 		}
-	    }
-	} catch (BioException ex) {
-	    throw new BioError(ex, "FIXME");
-	}
     }
 }

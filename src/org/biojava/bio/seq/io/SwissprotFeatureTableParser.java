@@ -56,46 +56,46 @@ class SwissprotFeatureTableParser extends FeatureTableParser
 
 	public void featureData(String line) throws BioException
 	{
-//System.out.println("In feature data");
 		boolean newFeature = false;
 		// Check if there is a location section.
 		if(line.charAt(5) != ' ')
 		{
 			StringTokenizer tokens = new StringTokenizer(line);
-			String startLocation = tokens.nextToken();
-			boolean startIsFuzzy = false;
-			if(startLocation.indexOf('<') != -1)
-			{
-				startLocation = startLocation.substring(1);
-				startIsFuzzy = true;
-			}
-			Integer startIndex = new Integer(startLocation);
-
-			String endLocation = tokens.nextToken();
-			boolean endIsFuzzy = false;
-			if(endLocation.indexOf('<') != -1)
-			{
-				endLocation = endLocation.substring(1);
-				endIsFuzzy = true;
-			}
-			Integer endIndex = new Integer(endLocation);
-
-			Location theLocation;
-			if(endIndex.equals(startIndex))
-			{
-				theLocation = new PointLocation(startIndex.intValue());
-			}
-			else
-			{
-				theLocation = new RangeLocation(startIndex.intValue(), endIndex.intValue());
-			}
-
-			if(startIsFuzzy || endIsFuzzy)
-			{
-				theLocation = new FuzzyLocation(theLocation, startIsFuzzy, endIsFuzzy);
-			}
-
-			super.featureLocation = theLocation;
+			super.featureLocation = this.getLocation(tokens);
+//			String startLocation = tokens.nextToken();
+//			boolean startIsFuzzy = false;
+//			if(startLocation.indexOf('<') != -1)
+//			{
+//				startLocation = startLocation.substring(1);
+//				startIsFuzzy = true;
+//			}
+//			Integer startIndex = new Integer(startLocation);
+//
+//			String endLocation = tokens.nextToken();
+//			boolean endIsFuzzy = false;
+//			if(endLocation.indexOf('<') != -1)
+//			{
+//				endLocation = endLocation.substring(1);
+//				endIsFuzzy = true;
+//			}
+//			Integer endIndex = new Integer(endLocation);
+//
+//			Location theLocation;
+//			if(endIndex.equals(startIndex))
+//			{
+//				theLocation = new PointLocation(startIndex.intValue());
+//			}
+//			else
+//			{
+//				theLocation = new RangeLocation(startIndex.intValue(), endIndex.intValue());
+//			}
+//
+//			if(startIsFuzzy || endIsFuzzy)
+//			{
+//				theLocation = new FuzzyLocation(theLocation, startIsFuzzy, endIsFuzzy);
+//			}
+//
+//			super.featureLocation = theLocation;
 
 			if(line.length() >= 20)
 			{
@@ -155,5 +155,87 @@ class SwissprotFeatureTableParser extends FeatureTableParser
 	public boolean inFeature()
 	{
 		return super.inFeature();
+	}
+
+	/**
+	 * Returns the next location contained in theTokens
+	 *
+	 * @exception bioException Thrown if a non-location is first in theTokens
+	 * @param theTokens The tokens to process
+	 * @return The location at the front of theTokens
+	 */
+	private Location getLocation(StringTokenizer theTokens)
+		throws BioException
+	{
+		Index startIndex = this.getIndex(theTokens);
+		Index endIndex = this.getIndex(theTokens);
+		Integer startPoint = startIndex.point;
+		Integer endPoint = endIndex.point;
+		boolean startIsFuzzy = startIndex.isFuzzy;
+		boolean endIsFuzzy = endIndex.isFuzzy;
+
+		Location theLocation;
+		if(endPoint.equals(startPoint))
+		{
+			theLocation = new PointLocation(startPoint.intValue());
+		}
+		else
+		{
+			theLocation = new RangeLocation(startPoint.intValue(), endPoint.intValue());
+		}
+
+		if(startIsFuzzy || endIsFuzzy)
+		{
+			theLocation = new FuzzyLocation(theLocation, startIsFuzzy, endIsFuzzy);
+		}
+
+		return theLocation;
+	}
+
+	/**
+	 * Returns the Integer value of the next token and its fuzzyness
+	 *
+	 * @exception BioException Thrown if a non-number token is passed in
+	 * (fuzzy locations are handled)
+	 * @param theTokens The tokens to be processed
+	 * @return Index The integer in the next token and if it is a fuzzy integer
+	 */
+	private Index getIndex(StringTokenizer theTokens)
+		throws BioException
+	{
+		String returnIndex = theTokens.nextToken();
+		boolean indexIsFuzzy = false;
+		if((returnIndex.indexOf('<') != -1) && (returnIndex.indexOf('>') != -1))
+		{
+			returnIndex = returnIndex.substring(1);
+			indexIsFuzzy = true;
+		}
+
+		Index returnValue;
+		try
+		{
+			returnValue = new Index(new Integer(returnIndex), indexIsFuzzy);
+		}
+		catch (NumberFormatException ex)
+		{
+			throw new BioException("bad locator: " + returnIndex);
+		}
+		return returnValue;
+	}
+
+	/**
+	 * This inner class is a struct so that a boolean and an Int can be passed
+	 * around in location parsing
+	 */
+	private class Index
+	{
+		public boolean isFuzzy;
+		public Integer point;
+
+		public Index(Integer thePoint, boolean theFuzzyness)
+		{
+			point = thePoint;
+			isFuzzy = theFuzzyness;
+		}
 	}
 }

@@ -49,6 +49,8 @@ public class SwissprotProcessor extends SequenceBuilderFilter
 	public static final String PROPERTY_SWISSPROT_ACCESSIONS = "swissprot.accessions";
 	public static final String PROPERTY_SWISSPROT_COMMENT = "swissprot.comment";
 
+	private boolean mBadFeature = false;
+
 	/**
 	 * Factory which wraps SequenceBuilders in a SwissprotProcessor
 	 *
@@ -101,45 +103,62 @@ public class SwissprotProcessor extends SequenceBuilderFilter
 	{
 		try
 		{
-	    	// Tidy up any end-of-block jobbies
-			if (features.inFeature() && !key.equals("FT"))
+			if(mBadFeature)
 			{
-				features.endFeature();
-			}
-
-			if (key.equals("FT"))
-			{
+				// If this feature is bad in some way, ignore it.
 				String featureLine = value.toString();
-				if (featureLine.charAt(0) != ' ')
+				if((key.equals("FT")) && (featureLine.charAt(0) != ' '))
 				{
-					// This is a featuretype field
-					if (features.inFeature())
-					{
-						features.endFeature();
-					}
-
-		    		features.startFeature(featureLine.substring(0, 8).trim());
+					// If the offending feature is past, start reading data again
+					mBadFeature = false;
+					features.startFeature(featureLine.substring(0, 8).trim());
+					features.featureData(featureLine.substring(9));
 				}
-				features.featureData(featureLine.substring(9));
 			}
 			else
 			{
-				getDelegate().addSequenceProperty(key, value);
-
-				if (key.equals("AC"))
+		    	// Tidy up any end-of-block jobbies
+				if (features.inFeature() && !key.equals("FT"))
 				{
-					String acc= value.toString();
-					StringTokenizer toke = new StringTokenizer(acc, "; ");
-					while (toke.hasMoreTokens())
+					features.endFeature();
+				}
+
+				if (key.equals("FT"))
+				{
+					String featureLine = value.toString();
+					if (featureLine.charAt(0) != ' ')
 					{
-						accessions.add(toke.nextToken());
+						// This is a featuretype field
+						if (features.inFeature())
+						{
+							features.endFeature();
+						}
+
+			    		features.startFeature(featureLine.substring(0, 8).trim());
+					}
+					features.featureData(featureLine.substring(9));
+				}
+				else
+				{
+					getDelegate().addSequenceProperty(key, value);
+
+					if (key.equals("AC"))
+					{
+						String acc= value.toString();
+						StringTokenizer toke = new StringTokenizer(acc, "; ");
+						while (toke.hasMoreTokens())
+						{
+							accessions.add(toke.nextToken());
+						}
 					}
 				}
 			}
 		}
 		catch (BioException ex)
 		{
-	    	throw new BioError(ex, "FIXME");
+			// If an exception is thrown, read past the offending feature
+			mBadFeature = true;
+			System.err.println(ex);
 	    }
 	}
 }
