@@ -35,6 +35,11 @@ import java.util.*;
  */
 
 public class DistributionTools {
+ 
+  /**
+   * Overide the constructer to prevent subclassing
+   */
+  private DistributionTools(){}
 
   /**
    * Compares the emission spectra of two distributions
