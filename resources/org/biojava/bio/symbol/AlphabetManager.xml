@@ -36,7 +36,7 @@
 
     parent IDREF #IMPLIED>
 
-    
+
 
   <!ELEMENT name (#PCDATA)>
 
@@ -318,7 +318,7 @@
 
   </alphabet>
 
-  
+
 
   <alphabet name="RNA">
 
@@ -346,7 +346,7 @@
 
     </symbol>
 
-  
+
 
     <symbol name="R">
 
@@ -356,7 +356,7 @@
 
     </symbol>
 
-  
+
 
     <symbol name="N">
 
@@ -366,7 +366,7 @@
 
     </symbol>
 
-  
+
 
     <symbol name="D">
 
@@ -376,7 +376,7 @@
 
     </symbol>
 
-  
+
 
     <symbol name="C">
 
@@ -386,7 +386,7 @@
 
     </symbol>
 
-  
+
 
     <symbol name="Q">
 
@@ -396,7 +396,7 @@
 
     </symbol>
 
-  
+
 
     <symbol name="E">
 
@@ -416,7 +416,7 @@
 
     </symbol>
 
-  
+
 
     <symbol name="H">
 
@@ -426,7 +426,7 @@
 
     </symbol>
 
-  
+
 
     <symbol name="I">
 
@@ -436,7 +436,7 @@
 
     </symbol>
 
-  
+
 
     <symbol name="L">
 
@@ -446,7 +446,7 @@
 
     </symbol>
 
-  
+
 
     <symbol name="K">
 
@@ -456,7 +456,7 @@
 
     </symbol>
 
-  
+
 
     <symbol name="M">
 
@@ -466,7 +466,7 @@
 
     </symbol>
 
-  
+
 
     <symbol name="F">
 
@@ -476,7 +476,7 @@
 
     </symbol>
 
-  
+
 
     <symbol name="P">
 
@@ -486,7 +486,7 @@
 
     </symbol>
 
-  
+
 
     <symbol name="S">
 
@@ -496,7 +496,7 @@
 
     </symbol>
 
-  
+
 
     <symbol name="T">
 
@@ -506,7 +506,17 @@
 
     </symbol>
 
-  
+
+
+    <symbol name="U">
+
+      <short>U</short>
+
+      <long>SEC</long>
+
+    </symbol>
+
+
 
     <symbol name="W">
 
@@ -516,7 +526,7 @@
 
     </symbol>
 
-  
+
 
     <symbol name="Y">
 
@@ -526,7 +536,7 @@
 
     </symbol>
 
-  
+
 
     <symbol name="V">
 
@@ -536,7 +546,7 @@
 
     </symbol>
 
-    
+
 
     <ambiguity>
 
@@ -581,6 +591,8 @@
       <symbolref name="S"/>
 
       <symbolref name="T"/>
+
+      <symbolref name="U"/>
 
       <symbolref name="W"/>
 
