@@ -46,6 +46,7 @@ import org.biojava.bio.symbol.SymbolPropertyTable;
  *
  * @author M. Jones sdfsd
  * @author Keith James (minor changes)
+ * @author Mark Schreiber
  */
 public class MassCalc {
     //Possibly these should be put in a configurable table somewhere
@@ -269,9 +270,10 @@ public class MassCalc {
                                        boolean MH_PLUS)
         throws IllegalSymbolException
     {
-        if (! proteinSeq.getAlphabet().getName().equals("PROTEIN")) {
-            throw new IllegalSymbolException("The SymbolList was not using the protein alphabet");
-        }
+//        if ((! proteinSeq.getAlphabet().getName().equals("PROTEIN"))&&
+//            (! proteinSeq.getAlphabet().getName().equals("PROTEIN-TERM"))) {
+//            throw new IllegalSymbolException("The SymbolList was not using the protein alphabet");
+//        }
 
         double pepMass = 0.0;
 
@@ -304,9 +306,9 @@ public class MassCalc {
     public double getMass(SymbolList proteinSeq)
         throws IllegalSymbolException
     {
-        if (! proteinSeq.getAlphabet().getName().equals("PROTEIN")){
-            throw new IllegalSymbolException("The SymbolList was not using the protein alphabet");
-        }
+//        if (! proteinSeq.getAlphabet().getName().equals("PROTEIN")){
+//            throw new IllegalSymbolException("The SymbolList was not using the protein alphabet");
+//        }
 
         double pepMass = 0.0;
 

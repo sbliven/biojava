@@ -31,6 +31,7 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.bio.symbol.SymbolPropertyTable;
+import org.biojava.bio.seq.ProteinTools;
 
 /**
  * <code>MassCalcTest</code> tests molecular mass calculation.
@@ -187,5 +188,18 @@ public class MassCalcTest extends TestCase
         mCalc.setSymbolModification('A', newAla);
         assertEquals(newAla + (avgO + avgH) + avgH + avgH,
                      mCalc.getMass(syms1), delta);
+    }
+
+    /**
+     * Checks the MassCalc can use PROTEIN and PROTEIN-TERM
+     */
+    public void testAlphabetTolerance(){
+      try {
+        SymbolList syms = ProteinTools.createProtein("achtyilqw");
+        MassCalc mCalc = new MassCalc(SymbolPropertyTable.MONO_MASS, false);
+        mCalc.getMass(syms);
+      } catch (IllegalSymbolException ex) {
+        fail(ex.getMessage());
+      }
     }
 }
