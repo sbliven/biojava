@@ -65,6 +65,9 @@ public class TestGappedSymbolList {
 //      gl.dumpBlocks();
       System.out.println(gl.seqString());
     }
+    for(int i = 1; i <= gl.length(); i++) {
+      System.out.println(gl.viewToSource(i));
+    }
     } catch (Throwable t) {
       t.printStackTrace();
       System.exit(1);

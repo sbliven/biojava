@@ -102,19 +102,22 @@ extends AbstractSymbolList implements Serializable {
    * Finds the index of the Block containing indx within the view ranges.
    * <P>
    * If indx is not within a view block, then it is the index of a gap. The method will
-   * return -1.
+   * return -(indx+1) where indx is the block emediately following the gap.
    *
    * @param indx  the index to find within a view range.
-   * @return  the index of the block containing index, or -1 if no block contains it
+   * @return  the index of the block containing index or one less than the negative
+   *           of the index of the block following the gap
    */
   protected final int findViewBlock(int indx) {
     int i = blocks.size() / 2;
     int imin = 0;
     int imax = blocks.size() - 1;
     //System.out.println("Searching for " + indx);
+    
+    Block b;
     do {
       //System.out.println(imin + " < " + i + " < " + imax);
-      Block b = (Block) blocks.get(i);
+      b = (Block) blocks.get(i);
       //System.out.println("Checking " + b.viewStart + ".." + b.viewEnd);
       if(b.viewStart <= indx && b.viewEnd >= indx) {
         //System.out.println("hit");
@@ -132,7 +135,29 @@ extends AbstractSymbolList implements Serializable {
       }
     } while(imin <= imax);
     
-    return -1;
+    if(i >= blocks.size()) {
+      return -blocks.size() - 1;
+    }
+    
+    if(blocks.get(i) != b) {
+      if(blocks.get(i-1) == b) {
+        --i;
+      } else if(blocks.get(i+1) == b) {
+        ++i;
+      }
+    }
+    
+    //System.out.println("Finding block for: " + indx + " in " + blocks);
+    //System.out.println("\ti=" + i);
+    //System.out.println("\t" + blocks.get(i));
+    if(indx > b.viewStart) { // block before gap - move to block after gap
+      //System.out.println("\tAdvancing i");
+      i++;
+      if(i < blocks.size()) {
+        //System.out.println("\t" + blocks.get(i));
+      }
+    }
+    return -i - 1; 
   }
 
   /**
@@ -224,6 +249,12 @@ extends AbstractSymbolList implements Serializable {
   
   /**
    * Coordinate conversion from view to source.
+   * <P>
+   * If the index can be projected onto the source, the index it projects onto
+   * is returned. If it falls within a gap, then the index of the first symbol
+   * after the run of gaps is negated and returned. If the index is after the
+   * last block of symbols (and therefore in the trailing list of gaps), then it
+   * returns -(length + 1).
    *
    * @param   indx the index to project
    * @return the position of indx projected from view to source
@@ -237,8 +268,17 @@ extends AbstractSymbolList implements Serializable {
       );
     }
     int j = findViewBlock(indx);
-    if(j == -1) {
-      return -1;
+    if(j < 0) {
+      int nj = -j-1;
+      //System.out.println("Converted: " + indx + ":" + j + " to " + nj);
+      if(nj < blocks.size()) {
+        Block b = (Block) blocks.get(nj);
+        //System.out.println("Has a following block: " + b);
+        return -b.sourceStart;
+      } else {
+        //System.out.println("Has no following block");
+        return -(source.length()+1);
+      }
     } else {
       return viewToSource(
         (Block) blocks.get(j),
@@ -356,7 +396,7 @@ extends AbstractSymbolList implements Serializable {
     // extending an already existing run of gaps;
     if(i < blocks.size()) {
       Block b = (Block) blocks.get(i);
-      if(b.viewStart <= pos) {
+      if(pos <= b.viewStart) {
         i--;
       }
     } else {
@@ -532,7 +572,7 @@ extends AbstractSymbolList implements Serializable {
       );
     }
     int i = findViewBlock(indx);
-    if(i == -1) {
+    if(i < 0) {
       return getAlphabet().getGapSymbol();
     } else {
       Block b = (Block) blocks.get(i);
@@ -623,6 +663,12 @@ extends AbstractSymbolList implements Serializable {
       this.sourceEnd = sourceEnd;
       this.viewStart = viewStart;
       this.viewEnd = viewEnd;
+    }
+    
+    public String toString() {
+      return
+        "Block: source=" + sourceStart + "," + sourceEnd +
+        " view=" + viewStart + "," + viewEnd;
     }
   }
 }
