@@ -27,13 +27,21 @@ import java.text.NumberFormat;
 public class TestDigestIO extends Object {
     
     private MassCalc massCalc;
+
+
+    NumberFormat nf = NumberFormat.getInstance();
+
+
     /** Creates new TestDigest2 */
-    public TestDigestIO(String fileName) throws BioException, 
+    public TestDigestIO(String fileName, String mode) throws BioException, 
                                                 ChangeVetoException, 
                                                 IOException {
+	nf.setMaximumFractionDigits(2);
+	nf.setMinimumFractionDigits(2);
+	
         //Initiate Digest
         Digest bioJavaDigest = new Digest();
-        bioJavaDigest.setMaxMissedCleavages(2);
+        bioJavaDigest.setMaxMissedCleavages(1);
 
         massCalc = new MassCalc(SymbolPropertyTable.AVG_MASS);
 	try{
@@ -66,28 +74,52 @@ public class TestDigestIO extends Object {
         sFact
       );
       
-      ArrayList list  = new ArrayList();
+      // ArrayList list  = new ArrayList();
+      long startTime = System.currentTimeMillis();
       while(sourceI.hasNext()) {
          Sequence sourceSeq = sourceI.nextSequence();
          bioJavaDigest.setSequence(sourceSeq);
          bioJavaDigest.addDigestFeatures();
-         list.add(sourceSeq);
-         printFeatures(sourceSeq.features(), sourceSeq.getName() + " " );
+	 if(mode.equals("p")){
+	     printFeatures(sourceSeq.features(), sourceSeq.getName() + " " );
+	 }
+	 else if(mode.equals("m")){
+	     calcMasses(sourceSeq.features(), sourceSeq.getName() + " " );
+	 }
       }
-      
-      
+      long endTime = System.currentTimeMillis();                       
+      System.err.println("Total Time: " + (endTime - startTime));      
         
     }
+
+    
+
+     private  void calcMasses(Iterator i, String prefix)
+    {
+	                                     
+       for (; i.hasNext(); ) {
+        Feature f = (Feature) i.next();
+        //System.out.print(prefix);
+        //System.out.print(f.getType());
+        //System.out.print(f.getLocation().toString()+ " ");
+                   
+	try{
+	    double mass = massCalc.getMass(f.getSymbols(),true);
+                    
+	    System.out.print(mass);
+                  
+	    System.out.println();
+                
+	}
+	catch(Exception ise){
+	    System.out.println(ise.getMessage());
+	}
+       }
+    
+  }
     
     private  void printFeatures(Iterator i, String prefix)
-    {
-       NumberFormat nf = NumberFormat.getInstance();
-
-       nf.setMaximumFractionDigits(2);
-       nf.setMinimumFractionDigits(2);
-		
-       
-                              
+    {                                     
        for (; i.hasNext(); ) {
         Feature f = (Feature) i.next();
         System.out.print(prefix);
@@ -126,19 +158,37 @@ public class TestDigestIO extends Object {
     * @param args the command line arguments
     */
     public static void main (String args[]) {
-        if(args.length < 1){
-            System.out.println("Usage: java prot.TestDigest <fastaFile>");
-            System.exit(-1);
+        if(args.length < 3){
+            usage();
         }
-        try{
-           new TestDigestIO(args[0]); 
-        }catch (BioException bioe){
+	
+	String fastaFile = args[0];
+	String mode = "";
+	if(!args[1].equals("-mode")){
+	    usage();
+	}
+	else{
+	    mode = args[2];
+	}
+	
+        try{	   
+           new TestDigestIO(fastaFile, mode); 
+        }
+	catch (BioException bioe){
             bioe.printStackTrace();
-        }catch (IOException ioe){
+        }
+	catch (IOException ioe){
             ioe.printStackTrace();
-        }catch (ChangeVetoException cve){
+        }
+	catch (ChangeVetoException cve){
             cve.printStackTrace();
         }
+    }
+
+    private static void usage(){
+	System.out.println("Usage: java prot.TestDigest <fastaFile> -mode [p|m|n]");
+	System.out.println("mode p = print, m = get masses, n=just calculate features");
+        System.exit(-1);
     }
 
 }
