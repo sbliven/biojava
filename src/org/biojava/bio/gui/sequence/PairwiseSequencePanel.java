@@ -37,6 +37,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Serializable;
 import java.util.ArrayList;
 import javax.swing.JComponent;
 
@@ -95,7 +96,7 @@ import org.biojava.utils.Changeable;
  * @since 1.2
  */
 public class PairwiseSequencePanel extends JComponent
-    implements PairwiseRenderContext, Changeable
+    implements PairwiseRenderContext, Changeable, Serializable
 {
     /**
      * Constant <code>RENDERER</code> is a <code>ChangeType</code>

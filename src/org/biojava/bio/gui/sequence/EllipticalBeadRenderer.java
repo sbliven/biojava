@@ -29,7 +29,6 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.NoninvertibleTransformException;
 import javax.swing.JComponent;
 
 import org.biojava.bio.seq.Feature;
@@ -51,7 +50,6 @@ import org.biojava.utils.ChangeVetoException;
  * @since 1.2
  */
 public class EllipticalBeadRenderer extends AbstractBeadRenderer
-    implements FeatureRenderer
 {
     /**
      * Constant <code>RATIO</code> indicating a change to the minimum
@@ -102,9 +100,9 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
      * @param f a <code>Feature</code> to render.
      * @param context a <code>SequenceRenderContext</code> context.
      */
-    protected void renderBead(final Graphics2D            g,
-			      final Feature               f,
-			      final SequenceRenderContext context)
+    public void renderBead(final Graphics2D            g2,
+                           final Feature               f,
+                           final SequenceRenderContext context)
     {
 	Location loc = f.getLocation();
 
@@ -141,12 +139,12 @@ public class EllipticalBeadRenderer extends AbstractBeadRenderer
 	    shape = new Ellipse2D.Double(posXW, posYN, width, height);
 	}
 
-	g.setPaint(beadFill);
-	g.fill(shape);
+	g2.setPaint(beadFill);
+	g2.fill(shape);
 
-	g.setStroke(beadStroke);
-	g.setPaint(beadOutline);
-	g.draw(shape);
+	g2.setStroke(beadStroke);
+	g2.setPaint(beadOutline);
+	g2.draw(shape);
     }
 
     /**

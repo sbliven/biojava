@@ -1,230 +1,361 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
 package org.biojava.bio;
 
 import java.util.*;
 
 import org.biojava.utils.*;
 
+/**
+ * <code>PropertyConstraint</code>s describes a constraint applied to
+ * the members of an annotation bundle.
+ *
+ * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a> (docs).
+ */
 public interface PropertyConstraint {
-  public boolean accept(Object value);
-  
-  public boolean subConstraintOf(PropertyConstraint subConstraint);
-  
-  public void setProperty(Annotation ann, Object property, Object value)
-  throws ChangeVetoException;
-  
-  public static final PropertyConstraint ANY = new AnyPropertyConstraint();
-  
-  public class ByClass implements PropertyConstraint {
-    private Class cl;
-    
-    public ByClass(Class cl) {
-      this.cl = cl;
-    }
-    
-    public Class getPropertyClass() {
-      return cl;
-    }
-    
-    public boolean accept(Object value) {
-      return cl.isInstance(value);
-    }
-    
-    public boolean subConstraintOf(PropertyConstraint subConstraint) {
-      if(subConstraint instanceof ByClass) {
-        ByClass sc = (ByClass) subConstraint;
-        return cl.isAssignableFrom(sc.getPropertyClass());
-      }
-      
-      return false;
-    }
-    
+    /**
+     * <code>accept</code> returns true if the value fulfills the
+     * constraint.
+     *
+     * @param value an <code>Object</code> to check.
+     * @return a <code>boolean</code>.
+     */
+    public boolean accept(Object value);
+
+    /**
+     * <code>subConstraintOf</code> returns true if the constraint is
+     * a sub-constraint. <strong>Javadoc FIXME - I don't know how to
+     * define this <KJ></strong>
+     *
+     * @param subConstraint a <code>PropertyConstraint</code> to check.
+     * @return a <code>boolean</code>.
+     */
+    public boolean subConstraintOf(PropertyConstraint subConstraint);
+
+    /**
+     * <code>setProperty</code> sets a property in the Annotation such
+     * that it conforms to the constraint.
+     *
+     * @param ann an <code>Annotation</code> to populate.
+     * @param property an <code>Object</code> under which to add the
+     * value.
+     * @param value an <code>Object</code> to add.
+     * @exception ChangeVetoException if an error occurs.
+     */
     public void setProperty(Annotation ann, Object property, Object value)
-    throws ChangeVetoException {
-      if(accept(value)) {
-        ann.setProperty(property, value);
-      } else {
-        throw new ChangeVetoException("Incorrect class: " + cl + " not " + value.getClass());
-      }
-    }
-  }
+        throws ChangeVetoException;
+
+    /**
+     * <code>ANY</code> is a constraint which accepts a property for
+     * addition under all conditions.
+     */
+    public static final PropertyConstraint ANY = new AnyPropertyConstraint();
   
-  public class ByAnnotationType implements PropertyConstraint {
-    private AnnotationType annType;
-    
-    public ByAnnotationType(AnnotationType annType) {
-      this.annType = annType;
-    }
-    
-    public AnnotationType getAnnotationType() {
-      return annType;
-    }
-    
-    public boolean accept(Object value) {
-      if(value instanceof Annotation) {
-        return annType.instanceOf((Annotation) value);
-      }
-      
-      return false;
-    }
-    
-    public boolean subConstraintOf(PropertyConstraint subConstraint) {
-      if(subConstraint instanceof ByAnnotationType) {
-        ByAnnotationType at = (ByAnnotationType) subConstraint;
-        return annType.subTypeOf(at.getAnnotationType());
-      }
-      
-      return false;
-    }
-    
-    public void setProperty(Annotation ann, Object property, Object value)
-    throws ChangeVetoException {
-      if(accept(value)) {
-        ann.setProperty(property, value);
-      } else {
-        throw new ChangeVetoException("Incorrect annotation type");
-      }
-    }
-  }
-  
-  public class IsCollectionOf implements PropertyConstraint {
-    private PropertyConstraint elementType;
-    private Class clazz;
-    private int minTimes;
-    private int maxTimes;
-    
-    public IsCollectionOf(Class clazz, PropertyConstraint elementType) {
-      this(clazz, elementType, 0, Integer.MAX_VALUE);
-    }
-    
-    public IsCollectionOf(
-      Class clazz,
-      PropertyConstraint elementType,
-      int minTimes,
-      int maxTimes
-    ) throws IllegalArgumentException {
-      if(
-        !Collection.class.isAssignableFrom(clazz) ||
-        java.lang.reflect.Modifier.isAbstract(clazz.getModifiers()) ||
-        java.lang.reflect.Modifier.isInterface(clazz.getModifiers())
-      ) {
-        throw new IllegalArgumentException("Class must be a non-virtual collection");
-      }
-      this.clazz = clazz;
-      this.elementType = elementType;
-      this.minTimes = minTimes;
-      this.maxTimes = maxTimes;
-    }
-    
-    public PropertyConstraint getElementType() {
-      return elementType;
-    }
-    
-    public int getMinTimes() {
-      return minTimes;
-    }
-    
-    public int getMaxTimes() {
-      return maxTimes;
-    }
-    
-    protected Class getCollectionClass() {
-      return clazz;
-    }
-    
-    public boolean accept(Object item) {
-      if(item instanceof Collection) {
-        Collection c = (Collection) item;
-        int size = c.size();
-        return
-          (size >= minTimes) &&
-          (size <= maxTimes) &&
-          getCollectionClass().isInstance(item);
-      }
-      
-      return false;
-    }
-    
-    public boolean subConstraintOf(PropertyConstraint subC) {
-      if(subC instanceof IsCollectionOf) {
-        IsCollectionOf ico = (IsCollectionOf) subC;
-        return
-          (minTimes <= ico.getMinTimes()) &&
-          (maxTimes >= ico.getMaxTimes()) &&
-          (elementType.subConstraintOf(ico.getElementType())) &&
-          (getCollectionClass().isAssignableFrom(ico.getCollectionClass()));
-      }
-      
-      return false;
-    }
-    
-    public void setProperty(Annotation ann, Object property, Object value)
-    throws ChangeVetoException {
-      if(getElementType().accept(value)) {
-        Collection c;
-        if(ann.containsProperty(property)) {
-          c = (Collection) ann.getProperty(property);
-        } else {
-          try {
-            c = (Collection) getCollectionClass().newInstance();
-            ann.setProperty(property, c);
-          } catch (Exception e) {
-            throw new ChangeVetoException(e, "Can't create collection resource");
-          }
+    /**
+     * <code>ByClass</code> accepts a property value if it is an
+     * instance of a specific Java class.
+     */
+    public class ByClass implements PropertyConstraint {
+        private Class cl;
+
+        public ByClass(Class cl) {
+            this.cl = cl;
         }
-        c.add(value);
-      } else {
-        throw new ChangeVetoException("Incorrect element type");
-      }
+
+        public Class getPropertyClass() {
+            return cl;
+        }
+
+        public boolean accept(Object value) {
+            return cl.isInstance(value);
+        }
+
+        public boolean subConstraintOf(PropertyConstraint subConstraint) {
+            if (subConstraint instanceof ByClass) {
+                ByClass sc = (ByClass) subConstraint;
+                return cl.isAssignableFrom(sc.getPropertyClass());
+            }
+
+            return false;
+        }
+
+        public void setProperty(Annotation ann, Object property, Object value)
+            throws ChangeVetoException {
+            if (accept(value)) {
+                ann.setProperty(property, value);
+            } else {
+                throw new ChangeVetoException("Incorrect class: " + cl + " not " + value.getClass());
+            }
+        }
     }
-  }
-  
-  public class Enumeration implements PropertyConstraint {
-    private Set values;
-    
-    public Enumeration(Set values) {
-      this.values = values;
+
+    /**
+     * <code>ByAnnotationType</code> accepts a property value if it
+     * belongs to type defined by AnnotationType.
+     */
+    public class ByAnnotationType implements PropertyConstraint {
+        private AnnotationType annType;
+
+        public ByAnnotationType(AnnotationType annType) {
+            this.annType = annType;
+        }
+
+        public AnnotationType getAnnotationType() {
+            return annType;
+        }
+
+        public boolean accept(Object value) {
+            if (value instanceof Annotation) {
+                return annType.instanceOf((Annotation) value);
+            }
+
+            return false;
+        }
+
+        public boolean subConstraintOf(PropertyConstraint subConstraint) {
+            if (subConstraint instanceof ByAnnotationType) {
+                ByAnnotationType at = (ByAnnotationType) subConstraint;
+                return annType.subTypeOf(at.getAnnotationType());
+            }
+
+            return false;
+        }
+ 
+        public void setProperty(Annotation ann, Object property, Object value)
+            throws ChangeVetoException {
+            if (accept(value)) {
+                ann.setProperty(property, value);
+            } else {
+                throw new ChangeVetoException("Incorrect annotation type");
+            }
+        }
     }
-    
-    public Set getValues() {
-      return values;
+
+    /**
+     * <code>IsCollectionOf</code> accepts a property value if it is a
+     * collection of objects which themselves conform to a specified
+     * constraint.
+     */
+    public class IsCollectionOf implements PropertyConstraint {
+        private PropertyConstraint elementType;
+        private Class clazz;
+        private int minTimes;
+        private int maxTimes;
+
+        /**
+         * Creates a new <code>IsCollectionOf</code> which accepts a
+         * collection of 0 - Integer.MAX_VALUE elements which
+         * themselves conform to the specified constraint.
+         *
+         * @param clazz a <code>Class</code> of collection..
+         * @param elementType a <code>PropertyConstraint</code> to
+         * constrain members of the collection.
+         */
+        public IsCollectionOf(Class clazz, PropertyConstraint elementType) {
+            this(clazz, elementType, 0, Integer.MAX_VALUE);
+        }
+
+        /**
+         * Creates a new <code>IsCollectionOf</code> which accepts a
+         * collection of minTimes - maxTimes elements which themselves
+         * conform to the specified constraint.
+         *
+         * @param clazz a <code>Class</code> of collection.
+         * @param elementType a <code>PropertyConstraint</code> to
+         * constrain members of the collection.
+         * @param minTimes an <code>int</code> which is the minimum
+         * number of conforming elements for the collection to be
+         * accepted.
+         * @param maxTimes an <code>int</code> which is the maximum
+         * number of conforming elements for the collection to be
+         * accepted.
+         *
+         * @exception IllegalArgumentException if an error occurs.
+         */
+        public IsCollectionOf(Class clazz,
+                              PropertyConstraint elementType,
+                              int minTimes,
+                              int maxTimes) throws IllegalArgumentException {
+            if (! Collection.class.isAssignableFrom(clazz) ||
+                java.lang.reflect.Modifier.isAbstract(clazz.getModifiers()) ||
+                java.lang.reflect.Modifier.isInterface(clazz.getModifiers())) {
+                throw new IllegalArgumentException("Class must be a non-virtual collection");
+            }
+            this.clazz = clazz;
+            this.elementType = elementType;
+            this.minTimes = minTimes;
+            this.maxTimes = maxTimes;
+        }
+ 
+        /**
+         * <code>getElementType</code> returns the constraint on
+         * element type in the collection.
+         *
+         * @return a <code>PropertyConstraint</code>.
+         */
+        public PropertyConstraint getElementType() {
+            return elementType;
+        }
+
+        /**
+         * <code>getMinTimes</code> returns the minumum number of
+         * conforming elements for the collection to be accepted.
+         *
+         * @return an <code>int</code>.
+         */
+        public int getMinTimes() {
+            return minTimes;
+        }
+
+        /**
+         * <code>getMaxTimes</code> returns the maximum number of
+         * conforming elements for the collection to be accepted.
+         *
+         * @return an <code>int</code> value.
+         */
+        public int getMaxTimes() {
+            return maxTimes;
+        }
+
+        /**
+         * <code>getCollectionClass</code> returns the Java class of
+         * the conforming collection.
+         *
+         * @return a <code>Class</code>.
+         */
+        protected Class getCollectionClass() {
+            return clazz;
+        }
+
+        public boolean accept(Object item) {
+            if (item instanceof Collection) {
+                Collection c = (Collection) item;
+                int size = c.size();
+                return
+                    (size >= minTimes) &&
+                    (size <= maxTimes) &&
+                    getCollectionClass().isInstance(item);
+            }
+
+            return false;
+        }
+
+        public boolean subConstraintOf(PropertyConstraint subC) {
+            if (subC instanceof IsCollectionOf) {
+                IsCollectionOf ico = (IsCollectionOf) subC;
+                return
+                    (minTimes <= ico.getMinTimes()) &&
+                    (maxTimes >= ico.getMaxTimes()) &&
+                    (elementType.subConstraintOf(ico.getElementType())) &&
+                    (getCollectionClass().isAssignableFrom(ico.getCollectionClass()));
+            }
+
+            return false;
+        }
+
+        public void setProperty(Annotation ann, Object property, Object value)
+            throws ChangeVetoException {
+            if (getElementType().accept(value)) {
+                Collection c;
+                if (ann.containsProperty(property)) {
+                    c = (Collection) ann.getProperty(property);
+                } else {
+                    try {
+                        c = (Collection) getCollectionClass().newInstance();
+                        ann.setProperty(property, c);
+                    } catch (Exception e) {
+                        throw new ChangeVetoException(e, "Can't create collection resource");
+                    }
+                }
+                c.add(value);
+            } else {
+                throw new ChangeVetoException("Incorrect element type");
+            }
+        }
     }
-    
-    public boolean accept(Object value) {
-      return values.contains(value);
+
+    /**
+     * <code>Enumeration</code> accepts a property if it is present
+     * in the specified set of values.
+     */
+    public class Enumeration implements PropertyConstraint {
+        private Set values;
+
+        /**
+         * Creates a new <code>Enumeration</code> using the members of
+         * the specified set as a constraint.
+         *
+         * @param values a <code>Set</code>.
+         */
+        public Enumeration(Set values) {
+            this.values = values;
+        }
+
+        /**
+         * <code>getValues</code> returns the set of values which
+         * constrain the property.
+         *
+         * @return a <code>Set</code> value.
+         */
+        public Set getValues() {
+            return values;
+        }
+
+        public boolean accept(Object value) {
+            return values.contains(value);
+        }
+
+        public boolean subConstraintOf(PropertyConstraint subConstraint) {
+            if (subConstraint instanceof Enumeration) {
+                Enumeration subE = (Enumeration) subConstraint;
+
+                return values.containsAll(subE.getValues());
+            }
+
+            return false;
+        }
+
+        public void setProperty(Annotation ann, Object property, Object value)
+            throws ChangeVetoException {
+            if (accept(property)) {
+                ann.setProperty(property, value);
+            } else {
+                throw new ChangeVetoException("Value not accepted");
+            }
+        }
     }
-    
-    public boolean subConstraintOf(PropertyConstraint subConstraint) {
-      if(subConstraint instanceof Enumeration) {
-        Enumeration subE = (Enumeration) subConstraint;
-        
-        return values.containsAll(subE.getValues());
-      }
-      
-      return false;
-    }
-    
-    public void setProperty(Annotation ann, Object property, Object value)
-    throws ChangeVetoException {
-      if(accept(property)) {
-        ann.setProperty(property, value);
-      } else {
-        throw new ChangeVetoException("Value not accepted");
-      }
-    }
-  }
 }
 
 class AnyPropertyConstraint implements PropertyConstraint  {
     public boolean accept(Object value) {
-      return true;
+        return true;
     }
     
     public boolean subConstraintOf(PropertyConstraint subConstraint) {
-      return true;
+        return true;
     }
     
     public void setProperty(Annotation ann, Object property, Object value)
-    throws ChangeVetoException {
-      ann.setProperty(property, value);
+        throws ChangeVetoException {
+        ann.setProperty(property, value);
     }
 }

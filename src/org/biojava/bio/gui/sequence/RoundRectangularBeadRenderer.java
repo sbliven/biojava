@@ -26,6 +26,7 @@ import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.RoundRectangle2D;
+import java.io.Serializable;
 
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.symbol.Location;
@@ -40,7 +41,6 @@ import org.biojava.bio.symbol.Location;
  * @since 1.2
  */
 public class RoundRectangularBeadRenderer extends AbstractBeadRenderer
-    implements FeatureRenderer
 {
     protected RoundRectangle2D rect;
     protected double arcWidth;
@@ -71,13 +71,13 @@ public class RoundRectangularBeadRenderer extends AbstractBeadRenderer
      * @param arcHeight a <code>double</code> value which sets the arc
      * height of the corners.
      */
-    public RoundRectangularBeadRenderer(final double beadDepth,
-					final double beadDisplacement,
-					final Paint  beadOutline,
-					final Paint  beadFill,
-					final Stroke beadStroke,
-					final double arcWidth,
-					final double arcHeight)
+    public RoundRectangularBeadRenderer(double beadDepth,
+					double beadDisplacement,
+					Paint  beadOutline,
+                                        Paint  beadFill,
+					Stroke beadStroke,
+					double arcWidth,
+					double arcHeight)
     {
 	super(beadDepth, beadDisplacement, beadOutline, beadFill, beadStroke);
         rect = new RoundRectangle2D.Double();
@@ -93,9 +93,9 @@ public class RoundRectangularBeadRenderer extends AbstractBeadRenderer
      * @param f a <code>Feature</code> to render.
      * @param context a <code>SequenceRenderContext</code> context.
      */
-    protected void renderBead(final Graphics2D            g2,
-			      final Feature               f,
-			      final SequenceRenderContext context)
+    public void renderBead(final Graphics2D            g2,
+                           final Feature               f,
+                           final SequenceRenderContext context)
     {
 	Location loc = f.getLocation();
 

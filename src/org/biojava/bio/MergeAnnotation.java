@@ -72,7 +72,6 @@ public class MergeAnnotation implements Annotation, Serializable {
 	}
     }
 
-
     public void setProperty(Object key, Object value) throws ChangeVetoException {
 	throw new ChangeVetoException("MergeAnnotations don't allow property setting at the moment");
     }
@@ -163,7 +162,6 @@ public class MergeAnnotation implements Annotation, Serializable {
 	    }
 	}
     }
-
 
     private class MAEntrySet extends AbstractSet {
 	private MAEntrySet() {

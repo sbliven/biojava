@@ -21,14 +21,6 @@
 
 package org.biojava.bio.gui.sequence;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.WeakHashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -36,7 +28,14 @@ import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
-import java.awt.geom.GeneralPath;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
@@ -65,20 +64,20 @@ import org.biojava.utils.Changeable;
  * method <code>renderBead()</code> and provide the drawing routine
  * for its particular bead type.</p>
  *
- * <p>A concrete <code>BeadRenderer</code> may render a series of
- * features in more than one style by delegating to other
- * <code>BeadRenderer</code>s for the additional style(s). This is
- * achieved using the <code>setDelegateRenderer()</code> method which
- * associates an <code>OptimizableFilter</code> with a
- * <code>FeatureRenderer</code>. Any feature accepted by the filter is
- * rendered with the renderer while the remainder are rendered by the
- * current renderer.</p>
+ * <p>A concrete <code>BeadFeatureRenderer</code> may render a series
+ * of features in more than one style by delegating to other
+ * <code>BeadFeatureRenderer</code>s for the additional style(s). This
+ * is achieved using the <code>setDelegateRenderer()</code> method
+ * which associates an <code>OptimizableFilter</code> with another
+ * <code>BeadFeatureRenderer</code>. Any feature accepted by the
+ * filter is rendered with that renderer, while the remainder are
+ * rendered by the current renderer.</p>
  *
  * @author <a href="mailto:kdj@sanger.ac.uk">Keith James</a>
  * @since 1.2
  */
 public abstract class AbstractBeadRenderer extends AbstractChangeable
-    implements FeatureRenderer
+    implements BeadFeatureRenderer, Serializable
 {
     /**
      * Constant <code>DISPLACEMENT</code> indicating a change to the
@@ -153,11 +152,11 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * @param beadFill a <code>Paint</code>.
      * @param beadStroke a <code>Stroke</code>.
      */
-    AbstractBeadRenderer(double beadDepth,
-			 double beadDisplacement,
-			 Paint  beadOutline,
-			 Paint  beadFill,
-			 Stroke beadStroke)
+    public AbstractBeadRenderer(double beadDepth,
+                                double beadDisplacement,
+                                Paint  beadOutline,
+                                Paint  beadFill,
+                                Stroke beadStroke)
     {
 	this.beadDepth        = beadDepth;
 	this.beadDisplacement = beadDisplacement;
@@ -204,8 +203,8 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 	{
 	    // System.err.println("Used cache for: " + f);
 
-	    AbstractBeadRenderer cachedRenderer =
-		(AbstractBeadRenderer) cache.get(f);
+	    BeadFeatureRenderer cachedRenderer =
+		(BeadFeatureRenderer) cache.get(f);
 
 	    cachedRenderer.renderBead(g2, f, context);
 	    return;
@@ -220,7 +219,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 		// System.err.println(filter + " accepted " + f);
 
 		FeatureRenderer delegate =
-		    (AbstractBeadRenderer) delegates.get(filter);
+		    (FeatureRenderer) delegates.get(filter);
 
 		delegate.renderFeature(g2, f, context);
 		return;
@@ -235,20 +234,20 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
     /**
      * <code>setDelegateRenderer</code> associates an
      * <code>OptimizableFilter</code> with a
-     * <code>FeatureRenderer</code>. Any feature accepted by the
+     * <code>BeadFeatureRenderer</code>. Any feature accepted by the
      * filter will be passed to the associated renderer for
      * drawing. The <code>OptimizableFilter</code>s should be disjoint
      * with respect to each other (a feature may not be rendered more
      * than once).
      *
      * @param filter an <code>OptimizableFilter</code>.
-     * @param renderer a <code>FeatureRenderer</code>.
+     * @param renderer a <code>BeadFeatureRenderer</code>.
      *
      * @exception IllegalArgumentException if the filter is not
      * disjoint with existing delegate filters.
      */
-    public void setDelegateRenderer(final OptimizableFilter filter,
-				    final FeatureRenderer   renderer)
+    public void setDelegateRenderer(final OptimizableFilter   filter,
+				    final BeadFeatureRenderer renderer)
 	throws IllegalArgumentException
     {
 	Set delegateFilters = delegates.keySet();
@@ -304,7 +303,7 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
 	{
 	    for (Iterator ri = delegateRenderers.iterator(); ri.hasNext();)
 	    {
-		maxDepth = Math.max(maxDepth, ((AbstractBeadRenderer) ri.next()).getDepth(context));
+		maxDepth = Math.max(maxDepth, ((FeatureRenderer) ri.next()).getDepth(context));
 	    }
 
 	    return maxDepth + 1.0;
@@ -528,9 +527,9 @@ public abstract class AbstractBeadRenderer extends AbstractChangeable
      * @param f a <code>Feature</code> to render.
      * @param context a <code>SequenceRenderContext</code> context.
      */
-    protected abstract void renderBead(final Graphics2D            g2,
-				       final Feature               f,
-				       final SequenceRenderContext context);
+    public abstract void renderBead(final Graphics2D            g2,
+                                    final Feature               f,
+                                    final SequenceRenderContext context);
 
     /**
      * <p> <code>Cache</code> to hold the direct mapping of

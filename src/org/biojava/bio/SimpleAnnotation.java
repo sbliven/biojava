@@ -27,19 +27,19 @@ import java.io.*;
 import org.biojava.utils.*;
 
 /**
- * A no-frills implementation of Annotation that is just a wrapper around a Map.
- * <p>
- * It will allow you to set any property, but will throw exceptions if you try
- * to retrieve a property that is not set.
+ * <p>A no-frills implementation of Annotation that is just a wrapper
+ * around a Map.</p>
+ *
+ * <p>It will allow you to set any property, but will throw exceptions
+ * if you try to retrieve a property that is not set.</p>
  *
  * @author Matthew Pocock
  * @author Greg Cox
  */
 public class SimpleAnnotation extends AbstractAnnotation {
   /**
-   * The properties map.
-   * <p>
-   * This may be null if no property values have yet been set.
+   * The properties map. This may be null if no property values have
+   * yet been set.
    */
   private Map properties;
 

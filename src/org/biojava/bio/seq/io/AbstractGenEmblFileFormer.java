@@ -439,7 +439,7 @@ class AbstractGenEmblFileFormer
      *
      * To preserve the join/order distinction; and to format locations like
      * AL123465:(123..567), use the formatLocation(Feature) method.
-	 *
+     *
      * @param loc a <code>Location</code> to use as a template.
      * @param strand an <code>int</code> indicating the
      * <code>Location</code>'s strand.
@@ -456,8 +456,8 @@ class AbstractGenEmblFileFormer
 				     final String       leader,
 				     final int          wrapWidth)
     {
-		return this.formatLocationBlock(sb, loc, strand, leader, wrapWidth, "join");
-	}
+        return this.formatLocationBlock(sb, loc, strand, leader, wrapWidth, "join");
+    }
 
     /**
      * <code>formatLocationBlock</code> creates an EMBL/Genbank style
@@ -481,7 +481,7 @@ class AbstractGenEmblFileFormer
 				     final int          strand,
 				     final String       leader,
 				     final int          wrapWidth,
-				     final String		joinType)
+				     final String	joinType)
     {
 	// Get separator for system
 	String nl = System.getProperty("line.separator");

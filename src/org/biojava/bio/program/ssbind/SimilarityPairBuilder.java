@@ -64,7 +64,7 @@ import org.biojava.utils.ChangeVetoException;
  * subject sequences are created.</p>
  *
  * <p><strong>The current implementation should be used with care on
- * streams containing more than one search output.</strong>. This is
+ * streams containing more than one search output</strong>. This is
  * because the builder will not stop after each report has been
  * processed and as a result all the subject sequences get
  * instantiated and a large object network could be created during

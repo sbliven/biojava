@@ -44,7 +44,6 @@ import org.biojava.utils.ChangeVetoException;
  * @since 1.2
  */
 public class RectangularBeadRenderer extends AbstractBeadRenderer
-    implements FeatureRenderer
 {
     protected Rectangle2D rect;
 
@@ -57,11 +56,11 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
      * @param beadFill a <code>Paint</code>.
      * @param beadStroke a <code>Stroke</code>.
      */
-    public RectangularBeadRenderer(final double beadDepth,
-                                   final double beadDisplacement,
-                                   final Paint  beadOutline,
-                                   final Paint  beadFill,
-                                   final Stroke beadStroke)
+    public RectangularBeadRenderer(double beadDepth,
+                                   double beadDisplacement,
+                                   Paint  beadOutline,
+                                   Paint  beadFill,
+                                   Stroke beadStroke)
     {
 	super(beadDepth, beadDisplacement, beadOutline, beadFill, beadStroke);
         rect = new Rectangle2D.Double();
@@ -74,9 +73,9 @@ public class RectangularBeadRenderer extends AbstractBeadRenderer
      * @param f a <code>Feature</code> to render.
      * @param context a <code>SequenceRenderContext</code> context.
      */
-    protected void renderBead(final Graphics2D            g2,
-                              final Feature               f,
-                              final SequenceRenderContext context)
+    public void renderBead(final Graphics2D            g2,
+                           final Feature               f,
+                           final SequenceRenderContext context)
     {
         Location loc = f.getLocation();
 

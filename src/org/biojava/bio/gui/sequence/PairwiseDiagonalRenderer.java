@@ -27,6 +27,7 @@ import java.awt.Paint;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -79,7 +80,7 @@ import org.biojava.utils.Changeable;
  * @since 1.2
  */
 public class PairwiseDiagonalRenderer extends AbstractChangeable
-    implements PairwiseSequenceRenderer 
+    implements PairwiseSequenceRenderer, Serializable
 {    
     /**
      * Constant <code>OUTLINE</code> indicating a change to the fill of

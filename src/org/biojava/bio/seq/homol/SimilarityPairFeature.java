@@ -74,6 +74,7 @@ public interface SimilarityPairFeature extends StrandedFeature
      * for all query sequences.
      */
     public static final String QUERY_LABEL = "query";
+
     /**
      * Constant <code>SUBJECT_LABEL</code> is the alignment label used
      * for all subject sequences.

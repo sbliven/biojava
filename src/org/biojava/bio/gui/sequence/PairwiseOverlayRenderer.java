@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.io.Serializable;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 
@@ -48,7 +49,7 @@ import org.biojava.utils.ChangeVetoException;
  * @since 1.2
  */
 public class PairwiseOverlayRenderer extends AbstractChangeable
-    implements PairwiseSequenceRenderer
+    implements PairwiseSequenceRenderer, Serializable
 {
     /**
      * Constant <code>RENDERERS</code> indicating a change to the
