@@ -152,7 +152,8 @@ public class ViewSequence
     }
 
     /**
-     * Construct a view onto a sequence, using a specific FeatureRealizer
+     * Construct a view onto a sequence, using a specific FeatureRealizer.
+     *
      * <p>The prefered method is SequenceTools.view(Sequence seq, FeatureRealizer fr)
      */
     public ViewSequence(Sequence seq, FeatureRealizer fr) {

@@ -31,48 +31,49 @@ import org.biojava.utils.ChangeVetoException;
  * data from the Homologene dataset.
  *
  * @author David Huen
+ * @author Matthew Pocock
  */
 public interface HomologeneDB
 {
     /**
-     * create a orthologue
+     * Create an orthologue.
      */
     public Orthologue createOrthologue(Taxon taxon, String locusID, String homologeneID, String accession)
         throws ChangeVetoException;
 
     /**
-     * create a orthologue
+     * Create an orthologue.
      */
     public Orthologue createOrthologue(int taxonID, String locusID, String homologeneID, String accession)
         throws ChangeVetoException;
 
     /**
-     * returns an orthologue of specified ID
+     * Returns an orthologue of specified ID.
      */
     public Orthologue getOrthologue(String homologeneID);
 
     /**
-     * create a computed orthology entry
+     * Create a computed orthology entry.
      */
     public OrthoPair createOrthoPair(Orthologue first, Orthologue second, SimilarityType type, double percentIdentity);
 
     /**
-     * create a curated orthology entry
+     * Create a curated orthology entry.
      */
     public OrthoPair createOrthoPair(Orthologue first, Orthologue second, String ref);
 
     /**
-     * create a Homologene Group
+     * Create a Homologene Group.
      */
     public OrthoPairSet createOrthoPairSet();    
 
     /**
-     * get the HomologeneGroups in this database
+     * Get the HomologeneGroups in this database.
      */
     public OrthoPairCollection getOrthoPairSets();
 
     /**
-     * filter the database for a specified group
+     * Filter the database for a specified group.
      */
     public OrthoPairCollection filter(OrthoPairSetFilter filters);
 }

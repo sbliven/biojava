@@ -25,13 +25,14 @@ import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.ChangeType;
 
 /**
- * interface for classes that store and manipulate
+ * Interface for classes that store and manipulate
  * orthologues.
  * <p>
  * You cannot create Orthologues here, just
  * work with them.
  *
  * @author David Huen
+ * * @author Matthew Pocock
  */
 public interface OrthologueSet
 {
@@ -42,8 +43,8 @@ public interface OrthologueSet
             "MODIFY");
 
     /**
-     * an iterator for the contents of
-     * an OrthologueSet
+     * An iterator for the contents of
+     * an OrthologueSet.
      */
     public interface Iterator
     {
@@ -52,27 +53,27 @@ public interface OrthologueSet
     }
 
     /*
-     * retrieve an orthologue from the set
+     * Retrieve an orthologue from the set.
      */
     public Orthologue getOrthologue(String homologeneID);
 
     /**
-     * add an orthologue to the set
+     * Add an orthologue to the set.
      */
     public void addOrthologue(Orthologue ortho) throws ChangeVetoException;
 
     /**
-     * remove an orthologue from the set
+     * Remove an orthologue from the set.
      */
     public void removeOrthologue(Orthologue ortho) throws ChangeVetoException;
 
     /**
-     * return an iterator to the contents of the set
+     * Return an iterator to the contents of the set.
      */
     public Iterator iterator();
 
     /**
-     * filter the contents of a set
+     * Filter the contents of a set.
      */
     public OrthologueSet filter(OrthologueFilter filter);
 }
