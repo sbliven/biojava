@@ -40,6 +40,13 @@ public class Nfa
         super(name, alfa);
     }
 
+    protected int alphaIndex(Symbol sym)
+    {
+        if (sym == LAMBDA) return 998;
+        else
+            return super.alphaIndex(sym);
+    }
+
     public boolean containsNode(Node node)
     {
         return nodes.contains(node);

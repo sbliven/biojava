@@ -279,11 +279,12 @@ public class FiniteAutomaton
         }
 
         public FiniteAutomaton parent() { return FiniteAutomaton.this; }
+
         public int hashCode() 
         { 
             try {
                 return (source.getID() << 20) + (dest.getID() << 10) 
-                    + ((sym == null)?999:alfaIdx.indexForSymbol(sym)); 
+                    + alphaIndex(sym); 
             }
             catch (IllegalSymbolException ise) {
                 throw new BioError("Fatal error: Unexpected IllegalSymbolException on computing indexForSymbol.");
@@ -490,6 +491,14 @@ public class FiniteAutomaton
             throw new AssertionError(be);
         }
         return output.toString();
+    }
+
+    protected int alphaIndex(Symbol sym)
+        throws IllegalSymbolException
+    {
+        if (sym == null) return 999;
+        else
+            return alfaIdx.indexForSymbol(sym);
     }
 }
 

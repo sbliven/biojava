@@ -2,9 +2,11 @@
 
 package org.biojava.utils.automata;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import org.biojava.bio.BioException;
+import org.biojava.bio.symbol.AtomicSymbol;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.FiniteAlphabet;
@@ -46,6 +48,15 @@ public class PatternMaker
         {
             if (hasNext())
                  return packedTxt.charAt(ptr++);
+            else
+                throw new IndexOutOfBoundsException("text length: " + packedTxt.length() + " index: " + ptr);
+        }
+
+        private char peekToken()
+            throws IndexOutOfBoundsException
+        {
+            if (hasNext())
+                 return packedTxt.charAt(ptr);
             else
                 throw new IndexOutOfBoundsException("text length: " + packedTxt.length() + " index: " + ptr);
         }
@@ -146,8 +157,9 @@ public class PatternMaker
         // complete linking up model to the start/end.
         nfa.addEpsilonTransition(nfa.getStart(), result.getStart());
         nfa.addEpsilonTransition(result.getEnd(), nfa.getEnd());
+        //System.out.println(nfa.toString());
         nfa.doEpsilonClosure();
-
+        //System.out.println(nfa.toString());
         return new DfaBuilder(nfa).getDFA();
     }    
 
@@ -174,6 +186,7 @@ public class PatternMaker
 
             switch (tokenType) {
                 case Tokenizer.LEFT_BRACKET:
+                    //System.out.println("processing left bracket" + toke.peekToken());
                     gotContent = true;
                     currSubModel = parseSubPattern(branchSubModel);
                     times = parseIterations();
@@ -181,6 +194,7 @@ public class PatternMaker
                     branchSubModel.append(currSubModel);
                     break;
                 case Tokenizer.SYMBOL_TOKEN:
+                    //System.out.println("processing symbol " + toke.peekToken());
                     gotContent = true;
                     currSubModel = parseSymbol(branchSubModel);
                     times = parseIterations();
@@ -190,8 +204,10 @@ public class PatternMaker
 //                    System.out.println("after\n" + branchSubModel);
                     break;
                 case Tokenizer.VERT_BAR:
+                    //System.out.println("processing bar" + toke.peekToken());
                     // link current branch into return value
                     if (!gotContent) throw new AutomatonException("no content in this branch!");
+                    System.out.println(returnSubModel.getStart().getID() + " " + branchSubModel.getStart().getID());
                     returnSubModel.addEpsilonTransition(
                         returnSubModel.getStart(),
                         branchSubModel.getStart());
@@ -199,21 +215,25 @@ public class PatternMaker
                         branchSubModel.getEnd(),
                         returnSubModel.getEnd());
                     // start new branch
-                    branchSubModel = new NfaSubModel(nfa);
+                    branchSubModel = new NfaSubModel(returnSubModel);
+                    branchSubModel.addEpsilonTransition(branchSubModel.getStart(), branchSubModel.getEnd());
                     gotContent = false;
-                    
+                    toke.getToken();
+                    break;
                 case Tokenizer.RIGHT_BRACKET:
+                    //System.out.println("processing right bracket" + toke.peekToken());
                     // link current branch into return value
                     if (!gotContent) throw new AutomatonException("no content in this branch!");
+                    //System.out.println(returnSubModel.getStart().getID() + " " + branchSubModel.getStart().getID());
                     returnSubModel.addEpsilonTransition(
                         returnSubModel.getStart(),
                         branchSubModel.getStart());
                     returnSubModel.addEpsilonTransition(
                         branchSubModel.getEnd(),
                         returnSubModel.getEnd());
-                    return returnSubModel;
+                    return returnSubModel; // note that the right bracket is consumed by caller.
                 default:
-                    throw new AutomatonException("Illegal symbol encountered.");
+                    throw new AutomatonException("Illegal symbol encountered: " + toke.peekToken());
             }
         }
 
@@ -243,6 +263,8 @@ public class PatternMaker
         // consume the right bracket
         if (toke.nextTokenType() != Tokenizer.RIGHT_BRACKET)
             throw new AutomatonException("Missing right bracket!");
+        else
+            toke.getToken();
 
         return returnSubModel;
     }
@@ -262,9 +284,21 @@ public class PatternMaker
 
         FiniteAutomaton.Node pre = returnSubModel.addNode(false);
         FiniteAutomaton.Node post = returnSubModel.addNode(false);
-        returnSubModel.addTransition(pre, post, sym);
-        returnSubModel.addEpsilonTransition(returnSubModel.getStart(), pre);
-        returnSubModel.addEpsilonTransition(post, returnSubModel.getEnd());
+        if (sym instanceof AtomicSymbol) {
+            returnSubModel.addTransition(pre, post, sym);
+            returnSubModel.addEpsilonTransition(returnSubModel.getStart(), pre);
+            returnSubModel.addEpsilonTransition(post, returnSubModel.getEnd());
+        }
+        else {
+            for (Iterator symI = ((FiniteAlphabet) sym.getMatches()).iterator();
+                symI.hasNext(); ) {
+                Symbol atomicSym = (Symbol) symI.next();
+
+                returnSubModel.addTransition(pre, post, atomicSym);
+                returnSubModel.addEpsilonTransition(returnSubModel.getStart(), pre);
+                returnSubModel.addEpsilonTransition(post, returnSubModel.getEnd());
+            }
+        }
 
         return returnSubModel;
     }
@@ -281,6 +315,7 @@ public class PatternMaker
                 toke.getToken();
                 return new Range(1, Integer.MAX_VALUE);
             case Tokenizer.ASTERISK:
+                toke.getToken();
                 return new Range(0, Integer.MAX_VALUE);
             default:
                 return new Range(1, 1);
@@ -314,7 +349,10 @@ public class PatternMaker
                     toke.getToken();
                     if (!onSecondArg) {
                         //System.out.println("numString is " + numString);
-                        min = Integer.parseInt(numString.toString());
+                        if (numString.length() > 0)
+                            min = Integer.parseInt(numString.toString());
+                        else
+                            min = 0;
                         numString = null;
                         onSecondArg = true;
                     }
