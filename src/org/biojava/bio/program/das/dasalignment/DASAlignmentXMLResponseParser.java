@@ -52,20 +52,22 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
 
     ArrayList vectors ;
     ArrayList matrices ;
-
+    
     String intObjectId ;
+    String cigar ;
     public DASAlignmentXMLResponseParser() {
 	super() ;
 	//System.out.println("in init DASAlignmentXMLResponseParser");
 
-	current_position = "start";
-
+	current_position = "start"   ;
+	cigar            = ""        ;
 	alignment  = new Alignment() ;
 
 	alignments = new ArrayList() ;
 	segments   = new ArrayList() ;
 	vectors    = new ArrayList() ;
 	matrices   = new ArrayList() ;
+	
 	
     }
 
@@ -147,6 +149,11 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
 
 	    
 	}
+	if (qName.equals("cigar")) {
+	    cigar = cigar.trim();
+	    current_segment.put("cigar",cigar);
+	    cigar = "" ;
+	}
 	
 	    
     }
@@ -172,6 +179,7 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
     
     private void CIGARhandler(Attributes atts) {
 	current_position = "cigar" ;
+	cigar = "" ;
     }
     private void BLOCKhandler(Attributes atts) {
 	current_block = new HashMap();
@@ -327,7 +335,8 @@ public class DASAlignmentXMLResponseParser  extends DefaultHandler{
 	    txt += ch[i] ;
 	}
 	if ( current_position == "cigar"){
-	    current_segment.put("cigar",txt);
+	    cigar += txt ;
+	    
 	}
 	if (current_position == "sequence"){
 	    //System.out.println(txt);
