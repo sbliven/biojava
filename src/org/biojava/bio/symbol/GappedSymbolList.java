@@ -48,6 +48,14 @@ import org.biojava.bio.seq.*;
  */
 public interface GappedSymbolList
 extends SymbolList {
+    /**
+     * Return the underlying (ungapped) SymbolList.
+     *
+     * @since 1.3
+     */
+
+    public SymbolList getSourceSymbolList();
+
   /**
    * Coordinate conversion from view to source.
    * <p>

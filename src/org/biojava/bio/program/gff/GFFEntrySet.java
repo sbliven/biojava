@@ -113,6 +113,30 @@ public class GFFEntrySet {
    * @return an <span class="type">SequenceAnnotator</span> that adds GFF features
    */
   public SequenceAnnotator getAnnotator() {
+    return getAnnotator(true);
+  }
+
+  /**
+   * Get an annotator that can add GFF features to a
+   * <span class="type">Sequence</span> using the features in this
+   * <span class="type">GFFEntrySet</span>.  The SequenceAnnotator
+   * returned by this method currently adds new features to an
+   * existing sequence (assuming it implements MutableFeatureHolder).
+   *
+   * <p>
+   * If checkSeqName is set to true,
+   * Sequences are only annotated if their getName() method returns
+   * a name equal to the sequence name field of one or more records
+   * in this GFFEntrySet. If checkSeqName is false, then all features are
+   * added to the sequence regardless of name.
+   * </p>
+   *
+   * @param checkSeqName  boolean to indicate if only records with names
+   *        matching the sequences name should be added
+   * @return an <span class="type">SequenceAnnotator</span> that adds GFF featur
+es
+   */
+  public SequenceAnnotator getAnnotator(final boolean checkSeqName) {
     return new SequenceAnnotator() {
       public Sequence annotate(Sequence seq) throws BioException, ChangeVetoException {
         Feature.Template plain = new Feature.Template();
@@ -125,7 +149,7 @@ public class GFFEntrySet {
           Object o = i.next();
           if(o instanceof GFFRecord) {
             GFFRecord rec = (GFFRecord) o;
-            if(rec.getSeqName().equals(seq.getName())) {
+            if(!checkSeqName || rec.getSeqName().equals(seq.getName())) {
 		Feature.Template thisTemplate;		
 
               if(rec.getStrand() == StrandedFeature.UNKNOWN) {

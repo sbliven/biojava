@@ -62,7 +62,16 @@ public final class SequenceTools {
   public static Sequence view(Sequence seq, String name) {
     return new ViewSequence(seq, name);
   }
-  
+
+  /**
+   * Add features to a sequence that contain the same information as all
+   * those in a feature holder.
+   *
+   * @param seq  the Sequence to add features to
+   * @param fh  the features to add
+   * @throws ChangeVetoException if the sequence could not be modified
+   * @throws BioException if there was an error creating the features
+   */  
   public static void addAllFeatures(Sequence seq, FeatureHolder fh)
   throws
     ChangeVetoException,

@@ -155,12 +155,12 @@ implements GappedSequence {
     public void removeFeature(Feature f)
         throws ChangeVetoException
     {
-	throw new ChangeVetoException("NO");
+	getFeatures().removeFeature(f);
     }
 
     public Feature createFeature(Feature.Template templ)
         throws ChangeVetoException, BioException
     {
-	throw new ChangeVetoException("NO");
+	return getFeatures().createFeature(templ);
     }
 }

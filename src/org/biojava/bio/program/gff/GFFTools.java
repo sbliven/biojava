@@ -97,12 +97,28 @@ public class GFFTools {
   public static void writeGFF(String fileName, GFFEntrySet ents)
     throws IOException
   {
-    GFFWriter writer = new GFFWriter(new PrintWriter(new FileWriter(fileName)));
+    PrintWriter pw = new PrintWriter(new FileWriter(fileName));
+    writeGFF(pw, ents);
+    pw.close();
+  }
+
+  /**
+   * Writes a GFFEntrySet to a PrintWriter
+   * @param pw  the PrintWriter to write to
+   * @param ents the entries to write
+   * @throws IOException if file writing fails
+   */
+  public static void writeGFF(PrintWriter pw, GFFEntrySet ents)
+    throws IOException
+  {
+    GFFWriter writer = new GFFWriter(pw);
     ents.streamRecords(writer);
   }
 
   /**
-   * Annotates a sequence with the features from a GFF entry set
+   * Annotates a sequence with the features from a GFF entry set with sequence
+   * name matching this sequence.
+   *
    * @param seq the <code>Sequence</code> to annotate.
    * @param ents the the GFF features to annotate it with.
    * @return a reference to a newly annotated sequence.
@@ -120,6 +136,40 @@ public class GFFTools {
     return annotated;
   }
 
+  /**
+   * Annotates a sequence with the features from a GFF entry set.
+   *
+   * @param seq the <code>Sequence</code> to annotate.
+   * @param ents the the GFF features to annotate it with.
+   * @param matchSeqName  boolean flat, if true only annotte sequence with
+   *        features that have matching sequence names, otherwise annotate
+   *        all features
+   * @return a reference to a newly annotated sequence.
+   */
+  public static Sequence annotateSequence(
+    Sequence seq,
+    GFFEntrySet ents,
+    boolean checkSeqName
+  ) {
+    Sequence annotated;
+    try {
+      annotated = ents.getAnnotator(checkSeqName).annotate(seq);
+    }
+    catch (ChangeVetoException ex) {
+      throw new BioError(ex,"Assertion Error: Unable to annotate sequence");
+    }catch (BioException ex) {
+      throw new BioError(ex,"Assertion Error: Unable to annotate sequence");
+    }
+    return annotated;
+  }
+
+  /**
+   * Annotates all sequences in a sequence DB with features from a GFF entry set.
+   *
+   * @param seqs  the SequenceDB to annotate
+   * @param ents  the GFFEntrySet to annote with
+   * @return a SequenceDB with all the annotations on
+   */
   public static SequenceDB annotateSequences(SequenceDB seqs, GFFEntrySet ents)
     throws IllegalIDException, BioException{
     Set names = new HashSet();
@@ -148,5 +198,21 @@ public class GFFTools {
     }
 
     return seqs;
+  }
+
+  /**
+   * Creates a GFFEntrySet containing one entry for each feature on a sequence.
+   *
+   * @param seq  the Sequence to create features for
+   * @return a new GFFEntrySet with gff records for each featre on the sequence
+   * @throws BioException if something went wrong GFF-ifying the sequences
+   *         features
+   */
+  public static GFFEntrySet gffFromSequence(Sequence seq)
+  throws BioException {
+    SequencesAsGFF sagff = new SequencesAsGFF();
+    GFFEntrySet gffES = new GFFEntrySet();
+    sagff.processSequence(seq, gffES.getAddHandler());
+    return gffES;
   }
 }

@@ -163,7 +163,7 @@ public class CharacterTokenization
 	    sym = tokenTable[c];
 	}
 	if (sym == null) {
-	    throw new IllegalSymbolException("This tokenization doesn't contain character: " + c);
+	    throw new IllegalSymbolException("This tokenization doesn't contain character: '" + c + "'");
 	}
 
 	return sym;
