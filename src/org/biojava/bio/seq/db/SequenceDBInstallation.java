@@ -109,7 +109,7 @@ public interface SequenceDBInstallation {
      * identifier identifies more than one sequence db, this method
      * should throw a RuntimeException.)
      */
-    public SequenceDB getSequenceDB(String identifier);
+    public SequenceDBLite getSequenceDB(String identifier);
 
     /**
      * <code>addSequenceDB</code> adds a new <code>SequenceDB</code>
@@ -120,5 +120,5 @@ public interface SequenceDBInstallation {
      * @param sequenceDB a <code>SequenceDB</code>.
      * @param otherIdentifiers a <code>Set</code>.
      */
-    public void addSequenceDB(SequenceDB sequenceDB, Set otherIdentifiers);
+    public void addSequenceDB(SequenceDBLite sequenceDB, Set otherIdentifiers);
 }

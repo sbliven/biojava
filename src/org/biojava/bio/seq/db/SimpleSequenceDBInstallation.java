@@ -65,36 +65,36 @@ public class SimpleSequenceDBInstallation implements SequenceDBInstallation
    */
     public synchronized void addSequenceDB(String name, Set otherIdentifiers)
     {
-	if (name == null) {
-	    throw new IllegalArgumentException("name was null");
-	}
-	// otherIdentifiers may only contain String objects - but this is checked later
+        if (name == null) {
+            throw new IllegalArgumentException("name was null");
+        }
+        // otherIdentifiers may only contain String objects - but this is checked later
 
-	// create set of all identifiers for the to-be-created SequenceDB
-	Set allIdentifiers = new HashSet();
-	allIdentifiers.add(name);
-	if (otherIdentifiers != null) allIdentifiers.addAll(otherIdentifiers);
+        // create set of all identifiers for the to-be-created SequenceDB
+        Set allIdentifiers = new HashSet();
+        allIdentifiers.add(name);
+        if (otherIdentifiers != null) allIdentifiers.addAll(otherIdentifiers);
 
-	// none of the identifiers may already be in use
-	Set currentIdentifiers = this.sequenceDBByIdentifier.keySet();
-	for (Iterator i = allIdentifiers.iterator(); i.hasNext();)
-	{
-	    Object o = i.next();
-	    if (! (o instanceof String)) {
-		throw new IllegalArgumentException("otherIdentifiers must be a Set of String objects");
-	    }
-	    if (currentIdentifiers.contains(o)) {
-		throw new IllegalArgumentException("name and otherIdentifiers must not already be in use");
-	    }
-	}
+        // none of the identifiers may already be in use
+        Set currentIdentifiers = this.sequenceDBByIdentifier.keySet();
+        for (Iterator i = allIdentifiers.iterator(); i.hasNext();)
+        {
+            Object o = i.next();
+            if (! (o instanceof String)) {
+                throw new IllegalArgumentException("otherIdentifiers must be a Set of String objects");
+            }
+            if (currentIdentifiers.contains(o)) {
+                throw new IllegalArgumentException("name and otherIdentifiers must not already be in use");
+            }
+        }
 
-	// create new HashSequenceDB and at it to the map under all its identifiers
-	SequenceDB db = new HashSequenceDB(name);
-	for (Iterator i = allIdentifiers.iterator(); i.hasNext();)
-	{
-	    String identifier = (String) i.next();
-	    this.sequenceDBByIdentifier.put(identifier, db);
-	}
+        // create new HashSequenceDB and at it to the map under all its identifiers
+        SequenceDB db = new HashSequenceDB(name);
+        for (Iterator i = allIdentifiers.iterator(); i.hasNext();)
+        {
+            String identifier = (String) i.next();
+            this.sequenceDBByIdentifier.put(identifier, db);
+        }
     }
 
     /**
@@ -120,40 +120,40 @@ public class SimpleSequenceDBInstallation implements SequenceDBInstallation
      * sequence db installation, an IllegalArgumentException is
      * thrown.
      */
-    public synchronized void addSequenceDB(SequenceDB sequenceDB,
-					   Set        otherIdentifiers)
+    public synchronized void addSequenceDB(SequenceDBLite sequenceDB,
+                                           Set        otherIdentifiers)
     {
-	if (sequenceDB == null) {
-	    throw new IllegalArgumentException("SequenceDB was null");
-	}
-	
-	// The SequenceDB name may not be null
-	String name = sequenceDB.getName();
+        if (sequenceDB == null) {
+            throw new IllegalArgumentException("SequenceDB was null");
+        }
 
-	// Create set of all identifiers for the to-be-added SequenceDB
-	Set allIdentifiers = new HashSet();
-	allIdentifiers.add(name);
-	if (otherIdentifiers != null) allIdentifiers.addAll(otherIdentifiers);
+        // The SequenceDB name may not be null
+        String name = sequenceDB.getName();
 
-	// None of the identifiers may already be in use
-	Set currentIdentifiers = this.sequenceDBByIdentifier.keySet();
-	for (Iterator i = allIdentifiers.iterator(); i.hasNext();)
-	{
-	    Object o = i.next();
-	    if (! (o instanceof String)) {
-		throw new IllegalArgumentException("otherIdentifiers must be a set of String objects");
-	    }
-	    if (currentIdentifiers.contains(o)) {
-		throw new IllegalArgumentException("name and otherIdentifiers must not already be in use");
-	    }
-	}
+        // Create set of all identifiers for the to-be-added SequenceDB
+        Set allIdentifiers = new HashSet();
+        allIdentifiers.add(name);
+        if (otherIdentifiers != null) allIdentifiers.addAll(otherIdentifiers);
 
-	// Add the SequenceDB to the map under all its identifiers
-	for (Iterator i = allIdentifiers.iterator(); i.hasNext();)
-	{
-	    String identifier = (String) i.next();
-	    this.sequenceDBByIdentifier.put(identifier, sequenceDB);
-	}
+        // None of the identifiers may already be in use
+        Set currentIdentifiers = this.sequenceDBByIdentifier.keySet();
+        for (Iterator i = allIdentifiers.iterator(); i.hasNext();)
+        {
+            Object o = i.next();
+            if (! (o instanceof String)) {
+                throw new IllegalArgumentException("otherIdentifiers must be a set of String objects");
+            }
+            if (currentIdentifiers.contains(o)) {
+                throw new IllegalArgumentException("name and otherIdentifiers must not already be in use");
+            }
+        }
+
+        // Add the SequenceDB to the map under all its identifiers
+        for (Iterator i = allIdentifiers.iterator(); i.hasNext();)
+        {
+            String identifier = (String) i.next();
+            this.sequenceDBByIdentifier.put(identifier, sequenceDB);
+        }
     }
 
   /**
@@ -165,10 +165,10 @@ public class SimpleSequenceDBInstallation implements SequenceDBInstallation
    */
     public synchronized Set getSequenceDBs()
     {
-	Set allDBs = new HashSet();
-	allDBs.addAll(this.sequenceDBByIdentifier.values());
+        Set allDBs = new HashSet();
+        allDBs.addAll(this.sequenceDBByIdentifier.values());
 
-	return allDBs;
+        return allDBs;
     }
 
   /**
@@ -177,48 +177,48 @@ public class SimpleSequenceDBInstallation implements SequenceDBInstallation
    * method returns the SequenceDB associated with this
    * identifier. Otherwise, null is returned.
    */
-    public synchronized SequenceDB getSequenceDB(String identifier)
+    public synchronized SequenceDBLite getSequenceDB(String identifier)
     {
-	if (identifier == null) {
-	    throw new IllegalArgumentException("identifier was null");
-	}
+        if (identifier == null) {
+            throw new IllegalArgumentException("identifier was null");
+        }
 
-	return (SequenceDB) this.sequenceDBByIdentifier.get(identifier);
+        return (SequenceDB) this.sequenceDBByIdentifier.get(identifier);
     }
 
     public String toString()
     {
-	return "SimpleSequenceDBInstallation: " 
-	    + this.sequenceDBByIdentifier.values();
+        return "SimpleSequenceDBInstallation: "
+            + this.sequenceDBByIdentifier.values();
     }
-  
+
     public synchronized boolean equals(Object o)
     {
-	if (o == this) return true;
-    
-	// if this class is a direct sub-class of Object:
-	if (o == null) return false;
-	if (! o.getClass().equals(this.getClass())) return false;
-    
-	SimpleSequenceDBInstallation that = (SimpleSequenceDBInstallation) o;
-    
-	// only compare fields of this class (not of super-classes):
-	if (! ObjectUtil.equals(this.sequenceDBByIdentifier,
-				that.sequenceDBByIdentifier)) return false;
-    
-	// this and that are identical if we made it 'til here
-	return true;
+        if (o == this) return true;
+
+        // if this class is a direct sub-class of Object:
+        if (o == null) return false;
+        if (! o.getClass().equals(this.getClass())) return false;
+
+        SimpleSequenceDBInstallation that = (SimpleSequenceDBInstallation) o;
+
+        // only compare fields of this class (not of super-classes):
+        if (! ObjectUtil.equals(this.sequenceDBByIdentifier,
+                                that.sequenceDBByIdentifier)) return false;
+
+        // this and that are identical if we made it 'til here
+        return true;
     }
-  
+
     public synchronized int hashCode()
     {
-	// if this class is a direct sub-class of Object:
-	int hc = 0;
+        // if this class is a direct sub-class of Object:
+        int hc = 0;
 
-	// only take into account fields of this class (not of super-class):
-	hc = ObjectUtil.hashCode(hc, sequenceDBByIdentifier);
+        // only take into account fields of this class (not of super-class):
+        hc = ObjectUtil.hashCode(hc, sequenceDBByIdentifier);
 
-	return hc;
+        return hc;
     }
 
     /**
@@ -226,25 +226,25 @@ public class SimpleSequenceDBInstallation implements SequenceDBInstallation
      */
     public static void main(String[] args)
     {
-	System.out.println("Create sequence db installation");
-	SimpleSequenceDBInstallation dbInst = new SimpleSequenceDBInstallation();
-	System.out.println("Sequence db installation serves " + dbInst.getSequenceDBs().size() + " sequence dbs");
-	System.out.println("add swissprot (aka sprot, sp) and genbank (aka gb) do sequence db installation");
-	Set swissprotIDs = new HashSet();
-	swissprotIDs.add("sprot");
-	swissprotIDs.add("sp");
-	dbInst.addSequenceDB("swissprot", swissprotIDs);
-	Set genbankIDs = new HashSet();
-	genbankIDs.add("gb");
-	genbankIDs.add("genbank"); // this is not correct but should be ignored
-	dbInst.addSequenceDB("genbank", genbankIDs);
-	System.out.println("Sequence db installation serves " + dbInst.getSequenceDBs().size() + " sequence dbs");
-	System.out.println("Sequence db associated with identifier \"sprot\" is: " + dbInst.getSequenceDB("sprot"));
-	System.out.println("Sequence db associated with identifier \"swissprot\" is: " + dbInst.getSequenceDB("swissprot"));
-	System.out.println("Sequence db associated with identifier \"sp\" is: " + dbInst.getSequenceDB("sp"));
-	System.out.println("Sequence db associated with identifier \"willi\" is: " + dbInst.getSequenceDB("willi"));
-	System.out.println("Sequence db associated with identifier \"gb\" is: " + dbInst.getSequenceDB("gb"));
-	System.out.println("Sequence db associated with identifier \"genbank\" is: " + dbInst.getSequenceDB("genbank"));
-	System.out.println("Sequence db associated with identifier \"genebank\" is: " + dbInst.getSequenceDB("genebank"));
+        System.out.println("Create sequence db installation");
+        SimpleSequenceDBInstallation dbInst = new SimpleSequenceDBInstallation();
+        System.out.println("Sequence db installation serves " + dbInst.getSequenceDBs().size() + " sequence dbs");
+        System.out.println("add swissprot (aka sprot, sp) and genbank (aka gb) do sequence db installation");
+        Set swissprotIDs = new HashSet();
+        swissprotIDs.add("sprot");
+        swissprotIDs.add("sp");
+        dbInst.addSequenceDB("swissprot", swissprotIDs);
+        Set genbankIDs = new HashSet();
+        genbankIDs.add("gb");
+        genbankIDs.add("genbank"); // this is not correct but should be ignored
+        dbInst.addSequenceDB("genbank", genbankIDs);
+        System.out.println("Sequence db installation serves " + dbInst.getSequenceDBs().size() + " sequence dbs");
+        System.out.println("Sequence db associated with identifier \"sprot\" is: " + dbInst.getSequenceDB("sprot"));
+        System.out.println("Sequence db associated with identifier \"swissprot\" is: " + dbInst.getSequenceDB("swissprot"));
+        System.out.println("Sequence db associated with identifier \"sp\" is: " + dbInst.getSequenceDB("sp"));
+        System.out.println("Sequence db associated with identifier \"willi\" is: " + dbInst.getSequenceDB("willi"));
+        System.out.println("Sequence db associated with identifier \"gb\" is: " + dbInst.getSequenceDB("gb"));
+        System.out.println("Sequence db associated with identifier \"genbank\" is: " + dbInst.getSequenceDB("genbank"));
+        System.out.println("Sequence db associated with identifier \"genebank\" is: " + dbInst.getSequenceDB("genebank"));
     }
 }

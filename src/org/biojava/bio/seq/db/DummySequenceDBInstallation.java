@@ -21,9 +21,7 @@
 
 package org.biojava.bio.seq.db;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <code>DummySequenceDBInstallation</code> is an implementation which
@@ -45,7 +43,7 @@ public class DummySequenceDBInstallation implements SequenceDBInstallation
         sequenceDBs.add(dummyDB);
     }
 
-    public SequenceDB getSequenceDB(String identifier)
+    public SequenceDBLite getSequenceDB(String identifier)
     {
         return dummyDB;
     }
@@ -58,5 +56,5 @@ public class DummySequenceDBInstallation implements SequenceDBInstallation
     /**
      * As this is a dummy implementation adding a sequenceDB doesn't do anything
      */
-    public void addSequenceDB(SequenceDB sequenceDB, Set otherIdentifiers){}
+    public void addSequenceDB(SequenceDBLite sequenceDB, Set otherIdentifiers){}
 }

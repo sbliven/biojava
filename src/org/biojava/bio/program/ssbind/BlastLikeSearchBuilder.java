@@ -41,6 +41,7 @@ import org.biojava.bio.seq.db.SequenceDBInstallation;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.*;
 import org.biojava.utils.ChangeVetoException;
+import org.biojava.bio.seq.db.*;
 
 /**
  * <p><code>BlastLikeSearchBuilder</code> will create
@@ -77,7 +78,7 @@ import org.biojava.utils.ChangeVetoException;
  * <p>
  * This class has special meanings for particular keys: if you want to
  * adapt this class for another parser, you will need to be aware of
- * this. These originate from and are fully described in the 
+ * this. These originate from and are fully described in the
  * BlastLikeDataSetCollection DTD.
  * </p>
  * <table>
@@ -87,7 +88,7 @@ import org.biojava.utils.ChangeVetoException;
  * </tr>
  * <tr>
  *   <td>program</td>
- *   <td>either this value or the hitSequenceType value must be set. This can take values 
+ *   <td>either this value or the hitSequenceType value must be set. This can take values
  *       acceptable to AlphabetResolver. These are BLASTN, BLASTP, BLASTX, TBLASTN,
  *       TBLASTX, DNA and PROTEIN. </td>
  * </tr>
@@ -236,17 +237,17 @@ public class BlastLikeSearchBuilder implements SearchBuilder
                                    + queryID
                                    + "' (sequence was null)");
 
-        SequenceDB subjectDB = subjectDBs.getSequenceDB(databaseID);
+        SequenceDB subjectDB = (SequenceDB)subjectDBs.getSequenceDB(databaseID);
         if (subjectDB == null)
-	    throw new BioException("Failed to retrieve database from installation using ID '"
-				   + databaseID
+            throw new BioException("Failed to retrieve database from installation using ID '"
+                                   + databaseID
                                    + "' (database was null)");
 
         return new SequenceDBSearchResult(query,
                                           subjectDB,
-					  searchParameters,
+                                          searchParameters,
                                           hits,
-					  resultAnnotation);
+                                          resultAnnotation);
     }
 
     /**

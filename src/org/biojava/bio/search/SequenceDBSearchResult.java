@@ -21,20 +21,13 @@
 
 package org.biojava.bio.search;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
 
-import org.biojava.bio.Annotatable;
-import org.biojava.bio.Annotation;
-import org.biojava.bio.seq.db.SequenceDB;
-import org.biojava.bio.symbol.SymbolList;
-import org.biojava.utils.AbstractChangeable;
-import org.biojava.utils.ChangeListener;
-import org.biojava.utils.ChangeSupport;
-import org.biojava.utils.ChangeType;
-import org.biojava.utils.ObjectUtil;
-import org.biojava.bio.seq.db.SequenceDBInstallation;
+
+import org.biojava.bio.*;
+import org.biojava.bio.seq.db.*;
+import org.biojava.bio.symbol.*;
+import org.biojava.utils.*;
 
 /**
  * <code>SequenceDBSearchResult</code> objects represent a result of a

@@ -21,13 +21,12 @@
 
 package org.biojava.bio.program.ssbind;
 
-import java.util.Map;
+import java.util.*;
 
-import org.biojava.bio.BioException;
-import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.seq.ViewSequence;
-import org.biojava.bio.seq.db.SequenceDB;
-import org.biojava.bio.seq.db.SequenceDBInstallation;
+
+import org.biojava.bio.*;
+import org.biojava.bio.seq.*;
+import org.biojava.bio.seq.db.*;
 
 /**
  * <code>ViewSequenceFactory</code> is a base class for creating
@@ -134,13 +133,13 @@ public abstract class ViewSequenceFactory
         if (subjectDBs == null)
             throw new BioException("Running BlastLikeHomologyBuilder with null subject SequenceDB installation");
 
-        SequenceDB subjectDB = subjectDBs.getSequenceDB(subjectID);
+        SequenceDBLite subjectDB = subjectDBs.getSequenceDB(subjectID);
 
         // It shouldn't happen, but it can with some implementations
         // of SequenceDBInstallation
-	if (subjectDB == null)
-	    throw new BioException("Failed to retrieve database from installation using ID '"
-				   + subjectID
+        if (subjectDB == null)
+            throw new BioException("Failed to retrieve database from installation using ID '"
+                                   + subjectID
                                    + "' (sequence was null)");
 
         if (subjectViewCache.containsKey(subjectID))
