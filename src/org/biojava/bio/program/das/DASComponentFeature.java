@@ -140,6 +140,14 @@ class DASComponentFeature
 	return strand;
     }
 
+    public void setStrand(Strand strand)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        new ChangeEvent(this, STRAND, strand, this.strand),
+        "Can't change strand as it is immutable"
+      );
+    }
+
     public Location getLocation() {
 	return location;
     }

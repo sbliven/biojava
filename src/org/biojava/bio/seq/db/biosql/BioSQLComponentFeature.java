@@ -88,15 +88,23 @@ class BioSQLComponentFeature
     }
 
     public Sequence getSequence() {
-	return parent;
+        return parent;
     }
 
     public FeatureHolder getParent() {
-	return parent;
+        return parent;
     }
 
     public Strand getStrand() {
-	return strand;
+        return strand;
+    }
+
+    public void setStrand(Strand strand)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        new ChangeEvent(this, STRAND, strand, this.strand),
+        "Can't change strand as it is immutable"
+      );
     }
 
     public SymbolList getSymbols() {
@@ -112,7 +120,7 @@ class BioSQLComponentFeature
     }
 
     public Location getLocation() {
-	return location;
+        return location;
     }
     
     public void setLocation(Location loc)
@@ -124,15 +132,15 @@ class BioSQLComponentFeature
     }
 
     public Location getComponentLocation() {
-	return componentLocation;
+        return componentLocation;
     }
 
     public boolean isComponentResolvable() {
-	return (getComponentSequence() != null);
+        return (getComponentSequence() != null);
     }
 
     public String getComponentSequenceName() {
-	return componentName;
+        return componentName;
     }
 
     public Sequence getComponentSequence() {
@@ -149,7 +157,7 @@ class BioSQLComponentFeature
     }
 
     public String getType() {
-	return type;
+        return type;
     }
     
     public Term getTypeTerm() {
@@ -195,19 +203,19 @@ class BioSQLComponentFeature
     }
     
     public Feature.Template makeTemplate() {
-	throw new BioError("FIXME");
+        throw new BioError("FIXME");
     }
 
     public Annotation getAnnotation() {
-	return Annotation.EMPTY_ANNOTATION;
+        return Annotation.EMPTY_ANNOTATION;
     }
 
     public int countFeatures() {
-	return getProjectedFeatures().countFeatures();
+        return getProjectedFeatures().countFeatures();
     }
 
     public boolean containsFeature(Feature f) {
-	return getProjectedFeatures().containsFeature(f);
+        return getProjectedFeatures().containsFeature(f);
     }
 
     public Feature createFeature(Feature.Template temp)
@@ -248,7 +256,7 @@ class BioSQLComponentFeature
     }
     
     public Iterator features() {
-	return getProjectedFeatures().features();
+        return getProjectedFeatures().features();
     }
 
     protected FeatureHolder getProjectedFeatures() {

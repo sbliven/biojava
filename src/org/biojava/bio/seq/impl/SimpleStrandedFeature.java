@@ -29,6 +29,9 @@ import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeSupport;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * A no-frills implementation of StrandedFeature.
@@ -40,25 +43,41 @@ public class SimpleStrandedFeature extends SimpleFeature implements StrandedFeat
     private StrandedFeature.Strand strand;
     
     public StrandedFeature.Strand getStrand() {
-	return strand;
+        return strand;
     }
   
     public SymbolList getSymbols() {
-	SymbolList symList = super.getSymbols();
-	if(getStrand() == NEGATIVE) {
-	    try {
-		symList = DNATools.reverseComplement(symList);
-	    } catch (IllegalAlphabetException iae) {
-		throw new BioError(
-				   iae,
-				   "Could not retrieve symbols for feature as " +
-				   "the alphabet can not be complemented."
-				   );
-	    }
-	}
-	return symList;
+        SymbolList symList = super.getSymbols();
+        if (getStrand() == NEGATIVE) {
+            try {
+                symList = DNATools.reverseComplement(symList);
+            } catch (IllegalAlphabetException iae) {
+                throw new BioError(
+				       iae,
+				       "Could not retrieve symbols for feature as " +
+				       "the alphabet can not be complemented."
+				       );
+            }
+        }
+        return symList;
     }
   
+    public void setStrand(Strand strand)
+        throws ChangeVetoException {
+        if (hasListeners()) {
+            ChangeSupport cs = getChangeSupport(STRAND);
+            synchronized(cs) {
+                ChangeEvent ce =
+                    new ChangeEvent(this, STRAND, strand, this.strand);
+                cs.firePreChangeEvent(ce);
+                this.strand = strand;
+                cs.firePostChangeEvent(ce);
+            }
+        } else {
+            this.strand = strand;
+        }
+    }
+
   public Feature.Template makeTemplate() {
     StrandedFeature.Template ft = new StrandedFeature.Template();
     fillTemplate(ft);
@@ -71,28 +90,28 @@ public class SimpleStrandedFeature extends SimpleFeature implements StrandedFeat
   }
   
     public SimpleStrandedFeature(Sequence sourceSeq,
-				 FeatureHolder parent,
-				 StrandedFeature.Template template)
-	throws IllegalArgumentException
+                                 FeatureHolder parent,
+                                 StrandedFeature.Template template)
+        throws IllegalArgumentException
                //, IllegalAlphabetException 
     {
-	super(sourceSeq, parent, template);
-	this.strand = template.strand;
-	if(sourceSeq.getAlphabet() != DNATools.getDNA()) {
-	    // throw new IllegalAlphabetException (
-	    // "Can not create a stranded feature within a sequence of type " +
-	    //			sourceSeq.getAlphabet().getName()
-	    //					);
-	}
+        super(sourceSeq, parent, template);
+        this.strand = template.strand;
+        if (sourceSeq.getAlphabet() != DNATools.getDNA()) {
+            // throw new IllegalAlphabetException (
+            // "Can not create a stranded feature within a sequence of type " +
+            //			sourceSeq.getAlphabet().getName()
+            //					);
+        }
     }
   
     public String toString() {
-	String pm;
-	if(getStrand() == POSITIVE) {
-	    pm = "+";
-	} else {
-	    pm = "-";
-	}
-	return super.toString() + " " + pm;
+        String pm;
+        if(getStrand() == POSITIVE) {
+            pm = "+";
+        } else {
+            pm = "-";
+        }
+        return super.toString() + " " + pm;
     }
 }

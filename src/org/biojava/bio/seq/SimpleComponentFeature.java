@@ -136,19 +136,27 @@ class SimpleComponentFeature
      */
 
     public boolean isComponentResolvable() {
-	return true;
+        return true;
     }
 
     public String getComponentSequenceName() {
-	return getComponentSequence().getName();
+        return getComponentSequence().getName();
     }
 
     public StrandedFeature.Strand getStrand() {
-	return strand;
+        return strand;
+    }
+
+    public void setStrand(Strand strand)
+    throws ChangeVetoException {
+      throw new ChangeVetoException(
+        new ChangeEvent(this, STRAND, strand, this.strand),
+        "Can't change strand as it is immutable"
+      );
     }
 
     public Location getLocation() {
-	return location;
+        return location;
     }
     
     public void setLocation(Location loc)

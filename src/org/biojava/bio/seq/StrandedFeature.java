@@ -25,6 +25,8 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeVetoException;
+import org.biojava.utils.ChangeType;
 import org.biojava.utils.StaticMemberPlaceHolder;
 
 /**
@@ -37,6 +39,13 @@ import org.biojava.utils.StaticMemberPlaceHolder;
  * @author Matthew Pocock
  */
 public interface StrandedFeature extends Feature {
+
+  /**
+   * The strand of this feature is being altered.
+   */
+  public static final ChangeType STRAND =
+      new ChangeType("Strand has altered", StrandedFeature.class, "STRAND");
+
   /**
    * Retrieve the strand that this feature lies upon.
    * <p>
@@ -45,7 +54,19 @@ public interface StrandedFeature extends Feature {
    * @return one of the Strand constants
    */
   Strand getStrand();
-  
+
+  /**
+   * Set the strand that this feature lies upon.
+   * <p>
+   * This will be one of StrandedFeature.POSITIVE or NEGATIVE.
+   *
+   * @param strand a <code>Strand</code>.
+   *
+   * @exception ChangeVetoException if the strand may not be
+   * changed.
+   */
+  void setStrand(Strand strand) throws ChangeVetoException;
+
   /**
    * Return a list of symbols that are contained in this feature.
    * <p>

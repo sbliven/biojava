@@ -21,7 +21,10 @@
 
 package org.biojava.bio.seq.db.biosql;
 
+import java.sql.SQLException;
+
 import org.biojava.bio.BioError;
+import org.biojava.bio.BioRuntimeException;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.FeatureHolder;
@@ -29,6 +32,8 @@ import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * @author Thomas Down
@@ -37,59 +42,82 @@ class BioSQLStrandedFeature extends BioSQLFeature implements StrandedFeature {
     private StrandedFeature.Strand strand;
     
     public StrandedFeature.Strand getStrand() {
-	return strand;
+        return strand;
     }
   
+    public void setStrand(Strand strand)
+        throws ChangeVetoException
+    {
+        BioSQLFeatureChangeHub featureHub =
+            ((BioSQLSequenceI) getSequence()).getSequenceDB().getFeatureChangeHub();
+        ChangeEvent cev =
+            new ChangeEvent(this, StrandedFeature.STRAND, getStrand(), strand);
+
+        // As location and strand are stored in the same row, we set
+        // the whole location
+        synchronized (featureHub) {
+            featureHub.firePreChange(cev);
+            try {
+                ((BioSQLSequenceI) getSequence()).getSequenceDB().getFeaturesSQL()
+                    .setFeatureLocation(_getInternalID(), getLocation(), strand);
+            } catch (SQLException ex) {
+                throw new BioRuntimeException("Error updating feature in database", ex);
+            }
+            this.strand = strand;
+            featureHub.firePostChange(cev);
+        }
+    }
+
     public SymbolList getSymbols() {
-	SymbolList symList = super.getSymbols();
-	if(getStrand() == NEGATIVE) {
-	    try {
-		symList = DNATools.reverseComplement(symList);
-	    } catch (IllegalAlphabetException iae) {
-		throw new BioError(
+        SymbolList symList = super.getSymbols();
+        if(getStrand() == NEGATIVE) {
+            try {
+                symList = DNATools.reverseComplement(symList);
+            } catch (IllegalAlphabetException iae) {
+                throw new BioError(
 				   "Could not retrieve symbols for feature as " +
 				   "the alphabet can not be complemented.", iae
 				   );
-	    }
-	}
-	return symList;
+            }
+        }
+        return symList;
     }
   
     public Feature.Template makeTemplate() {
-	StrandedFeature.Template ft = new StrandedFeature.Template();
-	fillTemplate(ft);
-	return ft;
+        StrandedFeature.Template ft = new StrandedFeature.Template();
+        fillTemplate(ft);
+        return ft;
     }
     
     protected void fillTemplate(StrandedFeature.Template ft) {
-	super.fillTemplate(ft);
-	ft.strand = getStrand();
+        super.fillTemplate(ft);
+        ft.strand = getStrand();
     }
   
     public BioSQLStrandedFeature(Sequence sourceSeq,
-				 FeatureHolder parent,
-				 StrandedFeature.Template template)
+                                 FeatureHolder parent,
+                                 StrandedFeature.Template template)
 	throws IllegalArgumentException, IllegalAlphabetException 
     {
-	super(sourceSeq, parent, template);
-	this.strand = template.strand;
+        super(sourceSeq, parent, template);
+        this.strand = template.strand;
     }
 
     public BioSQLStrandedFeature(Sequence sourceSeq,
-				 StrandedFeature.Template template)
+                                 StrandedFeature.Template template)
 	throws IllegalArgumentException, IllegalAlphabetException 
     {
-	super(sourceSeq, template);
-	this.strand = template.strand;
+        super(sourceSeq, template);
+        this.strand = template.strand;
     }
   
     public String toString() {
-	String pm;
-	if(getStrand() == POSITIVE) {
-	    pm = "+";
-	} else {
-	    pm = "-";
-	}
-	return super.toString() + " " + pm;
+        String pm;
+        if(getStrand() == POSITIVE) {
+            pm = "+";
+        } else {
+            pm = "-";
+        }
+        return super.toString() + " " + pm;
     }
 } 

@@ -27,6 +27,8 @@ import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.SymbolList;
+import org.biojava.utils.ChangeEvent;
+import org.biojava.utils.ChangeVetoException;
 
 /**
  * Internal class used by ProjectedFeatureHolder to wrap StrandedFeatures.
@@ -41,19 +43,26 @@ public class ProjectedStrandedFeature
   implements StrandedFeature 
 {
     public ProjectedStrandedFeature(StrandedFeature f,
-				    ProjectionContext ctx)
+                                    ProjectionContext ctx)
     {
-	super(f, ctx);
+        super(f, ctx);
     }
 
     public StrandedFeature.Strand getStrand() {
-	return getProjectionContext().getStrand((StrandedFeature) getViewedFeature());
+        return getProjectionContext().getStrand((StrandedFeature) getViewedFeature());
+    }
+
+    public void setStrand(Strand strand) throws ChangeVetoException {
+        throw new ChangeVetoException(new ChangeEvent(
+           this, STRAND, getStrand(), strand));
+
+        // fixme: strand should get reverse-projected through the context
     }
 
     public Feature.Template makeTemplate() {
-	StrandedFeature.Template sft = (StrandedFeature.Template) super.makeTemplate();
-	sft.strand = getStrand();
-	return sft;
+        StrandedFeature.Template sft = (StrandedFeature.Template) super.makeTemplate();
+        sft.strand = getStrand();
+        return sft;
     }
 
     public String toString() {
