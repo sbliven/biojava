@@ -247,7 +247,7 @@ public class PDBFileReader implements StructureIOFile {
 		
     }
 
-    /* initiale new group, either Hetatom or AminoAcid */
+    /** initiale new group, either Hetatom or AminoAcid */
     private Group getNewGroup(String recordName,Character aminoCode1) {
 
 	Group group;
@@ -411,28 +411,7 @@ public class PDBFileReader implements StructureIOFile {
     }
 
     
-    /** test if the chain is already known (is in current_model
-     * ArrayList) and if yes, returns the chain 
-     */
-    private Chain isKnownChain(String chainID){
-	Chain testchain =null;
-	Chain retchain =null;
-	//System.out.println("isKnownCHain: >"+chainID+"< current_chains:"+current_model.size());
-
-	for (int i = 0; i< current_model.size();i++){
-	    testchain = (Chain) current_model.get(i);
-	    //System.out.println("comparing chainID >"+chainID+"< against testchain " + i+" >" +testchain.getName()+"<");
-	    if (chainID.equals(testchain.getName())) {
-		//System.out.println("chain "+ chainID+" already known ...");
-		retchain = testchain;
-		break ;
-	    }
-	}
-	//if (retchain == null) {
-	//    System.out.println("unknownCHain!");
-	//}
-	return retchain;
-    }
+    
 
     /**
       Handler for
@@ -573,7 +552,7 @@ public class PDBFileReader implements StructureIOFile {
 	// check if residue number is the same ...
 	// insertion code is part of residue number
 	if ( ! residueNumber.equals(current_group.getPDBCode())) {	    
-	    //System.out.println("end of residue: "+current_group.get_PDB_code()+" "+residueNumber);
+	    //System.out.println("end of residue: "+current_group.getPDBCode()+" "+residueNumber);
 	    current_chain.addGroup(current_group);
 
 	    current_group = getNewGroup(recordName,aminoCode1);
@@ -685,7 +664,12 @@ public class PDBFileReader implements StructureIOFile {
 	    if (current_group != null) {
 		current_chain.addGroup(current_group);
 	    }
-	    current_model.add(current_chain);
+	    //System.out.println("starting new model "+(structure.nrModels()+1));
+
+	    Chain ch = isKnownChain(current_chain.getName()) ;
+	    if ( ch == null ) {
+		current_model.add(current_chain);
+	    }
 	    structure.addModel(current_model);
 	    current_model = new ArrayList();
 	    current_chain = null;
@@ -694,6 +678,29 @@ public class PDBFileReader implements StructureIOFile {
 
     }
     
+    /** test if the chain is already known (is in current_model
+     * ArrayList) and if yes, returns the chain 
+     */
+    private Chain isKnownChain(String chainID){
+	Chain testchain =null;
+	Chain retchain =null;
+	//System.out.println("isKnownCHain: >"+chainID+"< current_chains:"+current_model.size());
+
+	for (int i = 0; i< current_model.size();i++){
+	    testchain = (Chain) current_model.get(i);
+	    //System.out.println("comparing chainID >"+chainID+"< against testchain " + i+" >" +testchain.getName()+"<");
+	    if (chainID.equals(testchain.getName())) {
+		//System.out.println("chain "+ chainID+" already known ...");
+		retchain = testchain;
+		break ;
+	    }
+	}
+	//if (retchain == null) {
+	//    System.out.println("unknownCHain!");
+	//}
+	return retchain;
+    }
+
 
     /** parse a PDB file and return a datastructure implementing
      * PDBStructure interface.

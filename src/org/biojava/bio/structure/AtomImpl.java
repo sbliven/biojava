@@ -24,22 +24,23 @@
 package org.biojava.bio.structure;
 
 /**
- * Im[plementation of an Atom of a PDB file.
+ * Implementation of an Atom of a PDB file.
+ * currently the coordinates of an atom are represented by a doubl[3] array.
  */
 public class AtomImpl implements Atom {
 
-    String name ;
+    String name     ;
     String fullName ;
     double[] coords ;
-    String pdbline ;
-
-    int pdbserial;
+    String pdbline  ;
+    int pdbserial   ;
 
     public AtomImpl () {
 	name     = null        ;
 	fullName = null        ;
 	coords   = new double[3];
 	pdbline  = ""          ;  
+
     }
 
     /* trimmed version of atom name, e.g. "CA" */
@@ -55,7 +56,10 @@ public class AtomImpl implements Atom {
     public int  getPDBserial()      { return pdbserial ; }
 
     /* the coordinates */    
-    public void    setCoords( double[] c ) { coords = c; } 
+    public void     setCoords( double[] c ) {
+	coords = c; 
+
+    } 
     public double[] getCoords()            { return coords ; }
 
     public double getX() { return coords[0]; }

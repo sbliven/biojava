@@ -40,13 +40,20 @@ import java.io.*;
  */
 public class DASStructureClient implements StructureIO { 
 
-    String pdb_code                 ;
-
+    String pdb_code              ;
+    String serverurl             ;
     StructureImpl structure      ;
     
     public DASStructureClient() {
 	pdb_code = null ;
+	serverurl = "http://127.0.0.1:8080/dazzle/mystruc/structure?query=";
     }
+    public DASStructureClient(String url) {
+	pdb_code = null ;
+	serverurl = url;
+    }
+
+    
 
     /* the interfaced procedures: */
     
@@ -87,7 +94,7 @@ public class DASStructureClient implements StructureIO {
 
 	/* now connect to DAS server */
 
-	DASStructureCall dasstructure = new DASStructureCall();
+	DASStructureCall dasstructure = new DASStructureCall(serverurl);
 
 	Structure structure = dasstructure.getStructure(pdb_code);
 

@@ -56,28 +56,39 @@ public class StructureImpl implements Structure {
 
     }
 
+    /**
+     *
+     * set PDB code of structure 
+     */
     public void setPDBCode (String pdb_id_) {
 	pdb_id = pdb_id_ ;
     }
+    /**
+     *
+     * get PDB code of structure 
+     */
     public String  getPDBCode () {
 	return pdb_id ;
     }
 	
 	
-    /* (non-Javadoc)
-     * @see org.biojava.bio3d.PDB_Container#set_name(java.lang.String)
-     */
+  
+    /** set biological name of Structure */
     public void   setName(String nam) { name = nam; }
+    /** get biological name of Structure */
     public String getName()           { return name;  }
     
-    /* set the Header data */
+    /** set the Header data */
     public void    setHeader(HashMap h){ header = h;    }
+    /** get Header data */
     public HashMap getHeader()         { return header ;}
 
+    /** @see Structure interface */
     public void      setConnections(ArrayList conns) { connections = conns ; }
+    /** @see Structure interface */
     public ArrayList getConnections()                { return connections ;}
 
-
+    /** add a new chain */
     public void addChain(Chain chain) {
 	// TODO Auto-generated method stub
 	int modelnr = 0 ;
@@ -90,7 +101,7 @@ public class StructureImpl implements Structure {
 	model.add(chain);
     }
     
-
+    /** retrieve a chain by it's position within the Structure */
     public Chain getChain(int number) {
 	// TODO Auto-generated method stub
 	int modelnr = 0 ;
@@ -115,6 +126,7 @@ public class StructureImpl implements Structure {
 	models.add(model);
     }
 
+    /** string representation */
     public String toString(){
 	String str = "structure "+name+ " " + pdb_id ;
 	if ( isNmr() ) str += " models: "+nrModels()+"\n" ;
@@ -147,11 +159,18 @@ public class StructureImpl implements Structure {
     /** return number of chains in this container 
      * 
      */
-    public int size(){
+    public int size() {
 	int modelnr = 0 ;
-	ArrayList model = (ArrayList)models.get(modelnr);
-	return models.size() ;
-    }
+	ArrayList model = null ;
+	if ( models.size() > 0) {
+	    model = (ArrayList)models.get(modelnr);
+	}
+	else {
+	    return 0 ;
+	}
+
+	return model.size() ; 
+    } 
     
     /** return number of chains of of model */
     public int size(int modelnr) { return getChains(modelnr).length;   }
@@ -179,12 +198,13 @@ public class StructureImpl implements Structure {
 
     /** retrieve all Chains belonging to a model */
     public Chain[] getModel(int modelnr) {
+
 	ArrayList model = (ArrayList)models.get(modelnr);
 	
 	Chain[] chains = (Chain[])model.toArray(new Chain[model.size()]);
 	return chains ;
     }
 
-
+   
     
 }

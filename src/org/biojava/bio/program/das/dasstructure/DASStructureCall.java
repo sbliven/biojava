@@ -48,14 +48,20 @@ public class DASStructureCall {
 
 
     public DASStructureCall() {
-	serverurl = "http://127.0.0.1:8080/dazzle/mystruc/structure?query=" ;
+	serverurl = "" ;
     }
     
-    /*
+    
     public DASStructureCall(String url){
 	serverurl = url;
     }
-    */
+    
+    /** set url of structure service */
+    public void   setServerurl(String s) { serverurl=s;     }
+
+    /** get url of structure service */
+    public String getServerurl(        ) { return serverurl;}
+    
 
     /** connect to a DAS structure service and retreive 3D data.
 	return a biojava Structure object
@@ -73,7 +79,7 @@ public class DASStructureCall {
 	    e.printStackTrace();
 	    return null;
 	}
-	System.out.println("connecting to "+connstr);
+	//System.out.println("connecting to "+connstr);
 	InputStream inStream = connectDASServer(dasUrl);
 	
 
@@ -158,9 +164,9 @@ public class DASStructureCall {
 	
 	
 	try {
-	    System.out.println("deactivating validation");
+	    //System.out.println("deactivating validation");
 	    xmlreader.setFeature("http://xml.org/sax/features/validation", false);
-	    System.out.println("done...");
+	    //System.out.println("done...");
 	} catch (SAXException e) {
 	    System.err.println("Cannot deactivate validation."); 
 	}
@@ -169,10 +175,10 @@ public class DASStructureCall {
 	    xmlreader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false);
 	} catch (SAXNotRecognizedException e){
 	    e.printStackTrace();
-	    System.out.println("continuing ...");
+	    //System.out.println("continuing ...");
 	}
 	
-	System.out.println("DASStructureCall setting DASStructureXMLResponseParser");
+	//System.out.println("DASStructureCall setting DASStructureXMLResponseParser");
 
 	DASStructureXMLResponseParser cont_handle = new DASStructureXMLResponseParser() ;
 	xmlreader.setContentHandler(cont_handle);
@@ -180,7 +186,7 @@ public class DASStructureCall {
 	InputSource insource = new InputSource() ;
 	insource.setByteStream(inStream);
 
-	System.out.println("DASStructureCall parse XML response ...");
+	//System.out.println("DASStructureCall parse XML response ...");
 	xmlreader.parse(insource);
 
 	/*

@@ -57,10 +57,10 @@ public interface Structure {
     /** get biological name of Structure */
     public String getName();
 
-    /* set the Header data */
+    /** set the Header data */
     public void setHeader(HashMap h) ;
 
-    /* get Header data */
+    /** get Header data */
     public HashMap getHeader() ;
 
     /** CONECT data 
@@ -104,10 +104,15 @@ public interface Structure {
     /** return number of Chains in file */
     public int size() ;
 
-    /** return number of chains of of model */
+    /** return number of chains of model */
     public int size(int modelnr);
 
-    /** return number of models */
+    /** return number of models 
+     * in this implementation also XRAY structures have "1 model", since
+     * model is the container for the chains.
+     * to test if a Structure is an NMR structure use @see isNMR ,
+     * since this is based on the info in the PDB file header.
+     */
     public int nrModels() ;
 
     /** test if this structure is an nmr structure */

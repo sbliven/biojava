@@ -27,7 +27,9 @@ package org.biojava.bio.structure ;
 
 import org.biojava.bio.structure.StructureException ;
 
-/** utility operations on Atoms, AminoAcids, etc.  Currently the
+/** utility operations on Atoms, AminoAcids, etc. 
+ * <p>
+ * Currently the
  * coordinates of an Atom are stored as an array of size 3
  * (double[3]). It would be more powerful to use Point3D from
  * javax.vecmath.  but unfortunately this is not a part of standard
@@ -36,6 +38,7 @@ import org.biojava.bio.structure.StructureException ;
  * structure part of biojava becomes more powerful it could be moved
  * out of the core - biojava and the dependency on java3d could be
  * introduced.
+ * @author Andreas Prlic
  */
 
 public class Calc {
@@ -47,10 +50,8 @@ public class Calc {
     static double RADIAN = 57.29577951 ;
 
     /**
-     * utility (static) methods for calculations on Atoms,etc.
-     * usually atoms are used here alternatively to vectors.
-     *
-     * @author Andreas Prlic
+    
+     *    
      */
 
     /**

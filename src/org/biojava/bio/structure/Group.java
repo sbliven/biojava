@@ -69,10 +69,14 @@ public interface Group {
     /** get list of atoms */
     public Atom[] getAtoms();
     
+    /** get an atom */
+    public Atom getAtom(String name);
     
     /** set the PDB 3 character name for this group
      * 
      */
     public String getPDBName();
+
+    /** get the PDB 3 character name for this group */
     public void setPDBName(String s) throws PDBParseException;
 }

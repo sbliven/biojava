@@ -74,7 +74,7 @@ public class Hetatom implements Group {
 	pdb_code = pdb ;
     }
 
-    /* set three character name of Amino acid */
+    /** set three character name of Amino acid */
     public void setPDBName(String s) 
 	throws PDBParseException
     {
@@ -86,7 +86,7 @@ public class Hetatom implements Group {
 
     public String getPDBName() { return pdb_name;}
 
-    /* add an atom to this group */
+    /** add an atom to this group */
     public void addAtom(Atom atom){
 	atoms.add(atom);
 	if (atom.getCoords() != null){
@@ -97,11 +97,24 @@ public class Hetatom implements Group {
 
     public int size(){ return atoms.size();   }
     
+    /** get all atoms of this group */
     public Atom[] getAtoms(){
 	Atom[] atms = (Atom[])atoms.toArray(new Atom[atoms.size()]);
 	return atms ;
     }
 
+    /** get an Atom or null, if Atom not in this group */
+    public Atom getAtom(String name){
+
+	for (int i=0;i<atoms.size();i++){
+	    Atom atom = (Atom)atoms.get(i);
+	    if (atom.getName().equals(name)){
+		return atom;
+	    }
+	}
+	return null;
+	
+    }
     public String getType(){ return type;}
 
     public String toString(){

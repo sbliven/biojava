@@ -46,20 +46,7 @@ public class Nucleotide extends Hetatom {
 
     public String getType(){ return type;}
 
-    /* browse through atoms and find the right one*/
-    public Atom findAtom(String name){
-
-	for (int i=0;i<atoms.size();i++){
-	    Atom atom = (Atom)atoms.get(i);
-	    if (atom.getName().equals(name)){
-		return atom;
-	    }
-	}
-	return null;
-	
-    }
-
-	
+    	
     public String toString(){
 		
 	String str = "PDB: "+ pdb_name + " " + pdb_code +  " "+ pdb_flag;

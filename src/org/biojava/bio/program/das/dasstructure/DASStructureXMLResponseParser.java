@@ -94,14 +94,24 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
 	structure.setPDBCode(id);
     }
     
-    private void MODELhandler(Attributes atts){
-	current_model= new ArrayList();
 
-    }
 
     private void CHAINhandler(Attributes atts){
 
+	String model_nr = atts.getValue("model");
+	if ( model_nr != null ) {
+	    int modnr = Integer.parseInt(model_nr);
+	    //System.out.println("modnr: " + modnr) ;
+	    // if DAS server sets modelnr -> a NMR structure ...
+	    structure.setNmr(true);
 
+	    if ( modnr > structure.nrModels() ) {
+		// a new model starts !
+		structure.addModel(current_model);
+		current_model = new ArrayList();	    
+	    }
+	}
+	
 	String chain_id = atts.getValue("id");
 	//System.out.println("new chain "+chain_id);
 	if ( current_chain ==null) {
@@ -115,9 +125,9 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
 	// paranoic: check if we had it already ..
 	
 	Chain testchain = isKnownChain(chain_id);
-
+	
 	if (testchain != null) {
-	    //System.out.println("already known..."+ chain_id);
+	    //System.out.println("already known..."+ chain_id + testchain.getLength());
 	    current_chain = (ChainImpl)testchain ;
 	    
 	} else {
@@ -207,7 +217,6 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
     public void startElement (String uri, String name, String qName, Attributes atts){
 	//System.out.println("new element uri: >"+uri+"< name:>"+name+"< qname:>" +qName+"<");
 	if      (qName.equals("OBJECT")) OBJECThandler(atts) ;
-	else if (qName.equals("MODEL") ) MODELhandler (atts) ;
 	else if (qName.equals("CHAIN") ) CHAINhandler (atts) ;
 	else if (qName.equals("ATOM")  ) ATOMhandler  (atts) ;
 	else if (qName.equals("GROUP") ) GROUPhandler (atts) ;
@@ -225,9 +234,8 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
 	
     public void endDocument ()	{
 	//features.add(feature);		
-	if (structure.nrModels() == 0){
-	    structure.addModel(current_model);
-	}
+	structure.addModel(current_model);
+	
     }
 
     public void endElement(String uri, String name, String qName) {
@@ -236,11 +244,14 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
 	if ( qName.equals("GROUP")){
 	    current_chain.addGroup(current_group);
 	}
+
 	if ( qName.equals("CHAIN")) {
-	    current_model.add(current_chain);
-	}
-	if (qName.equals("MODEL")){
-	    structure.addModel(current_model);
+	    // check if chain is already known ...
+
+	    Chain ch = isKnownChain(current_chain.getName());
+	    if ( ch == null) {
+		current_model.add(current_chain);
+	    }
 	}
 
 	
@@ -260,8 +271,8 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
      * @see PDBFileReader
      */
     private Chain isKnownChain(String chainID){
-	Chain testchain =null;
-	Chain retchain =null;
+	Chain testchain = null;
+	Chain retchain  = null;
 	//System.out.println("isKnownCHain: >"+chainID+"< current_chains:"+current_model.size());
 
 	for (int i = 0; i< current_model.size();i++){
@@ -274,10 +285,11 @@ public class DASStructureXMLResponseParser  extends DefaultHandler{
 	    }
 	}
 	//if (retchain == null) {
-	//    System.out.println("unknownCHain!");
+	//  System.out.println("unknownCHain!");
 	//}
 	return retchain;
     }
+  
 
     /** convert three character amino acid codes into single character
      *  e.g. convert CYS to C 

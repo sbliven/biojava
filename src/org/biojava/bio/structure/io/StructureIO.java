@@ -28,12 +28,7 @@ package org.biojava.bio.structure.io;
 import org.biojava.bio.structure.Structure;
 import java.io.IOException ;
 
-/**
- * @author andreas
- *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
- */
+
 public interface StructureIO {
     
     /* set PDB id */

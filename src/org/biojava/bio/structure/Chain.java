@@ -70,4 +70,6 @@ public interface Chain {
 
     /** get the Swissprot id of this chains */
     public String getSwissprotId() ;
+
+
 }

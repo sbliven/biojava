@@ -54,29 +54,18 @@ public class AminoAcid extends Hetatom {
     
     public String getType(){ return type;}
     
-    /** browse through atoms and find the right one*/
-    private Atom findAtom(String name){
-
-	for (int i=0;i<atoms.size();i++){
-	    Atom atom = (Atom)atoms.get(i);
-	    if (atom.getName().equals(name)){
-		return atom;
-	    }
-	}
-	return null;
-	
-    }
+   
 
     /** get N atom*/
-    public Atom getN()  {return findAtom("N");  }
+    public Atom getN()  {return getAtom("N");  }
     /** get CA atom*/
-    public Atom getCA() {return findAtom("CA"); }
+    public Atom getCA() {return getAtom("CA"); }
     /** get C atom*/
-    public Atom getC()  {return findAtom("C");  }
+    public Atom getC()  {return getAtom("C");  }
     /** get O atom*/
-    public Atom getO()  {return findAtom("O");  }
+    public Atom getO()  {return getAtom("O");  }
     /** get CB atom*/
-    public Atom getCB() {return findAtom("CB"); }
+    public Atom getCB() {return getAtom("CB"); }
 
     
 
