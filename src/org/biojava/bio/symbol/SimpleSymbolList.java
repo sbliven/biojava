@@ -95,11 +95,11 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
     private static synchronized int incCount() {
         return ++instanceCount;
     }
-    
+
     private static synchronized int decCount() {
         return --instanceCount;
     }
-    
+
     protected void finalize() throws Throwable {
         super.finalize();
         // System.err.println("Finalizing a SimpleSymbolList: " + decCount());
@@ -155,7 +155,7 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
      * Construct a SymbolList from a string.
      *
      * @param parser A SymbolParser for whatever your string is -- e.g. alphabet.getParser("token").
-     * @param rList A Java List of symbols.
+     * @param seqString A Java List of symbols.
      *
      * @throws IllegalSymbolException if a Symbol is not in the specified alphabet.
      */
@@ -172,7 +172,6 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
         int segLength = seqString.length();
         StreamParser stParser = parser.parseStream(new SSLIOListener());
         int charCount = 0;
-        int bcnt = 0;
         int chunkLength;
         while (charCount < segLength) {
             chunkLength = Math.min(charArray.length, segLength - charCount);
@@ -290,7 +289,7 @@ public class SimpleSymbolList extends AbstractSymbolList implements ChangeListen
                 "end must not be lower than start: start=" + start + ", end=" + end
                 );
         }
-        
+
         SimpleSymbolList sl = new SimpleSymbolList(this,viewOffset+start,viewOffset+end);
         if (isView){
             referenceSymbolList.addChangeListener(sl);

@@ -24,10 +24,7 @@ package org.biojava.bio.seq.io;
 import java.io.NotSerializableException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
-import java.util.List;
-import java.util.Set;
 
-import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.ComponentFeature;
 import org.biojava.bio.seq.Sequence;
@@ -66,21 +63,6 @@ public class SimpleAssemblyBuilder extends SequenceBuilderBase {
 	}
     }
 
-    //
-    // State
-    //
-
-    private String name;
-    private String uri;
-    private ChunkedSymbolListBuilder slBuilder;
-    private Annotation annotation;
-
-    private Set rootFeatures;
-    private List featureStack;
-
-    {
-    }
-
     private void checkSeq()
     {
       // check that seq exists: if not, create it.
@@ -107,10 +89,11 @@ public class SimpleAssemblyBuilder extends SequenceBuilderBase {
         return (ComponentFeature) seq.createFeature(cft);
     }
 
-    public Sequence makeSequence() 
-    {
-        checkSeq();
+  public Sequence makeSequence()
+          throws BioException
+  {
+    checkSeq();
 
-	return super.makeSequence();
-    }
+    return super.makeSequence();
+  }
 }

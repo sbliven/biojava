@@ -39,6 +39,7 @@ import org.biojava.utils.ChangeListener;
  *
  * @author Thomas Down
  * @since 1.1 [newio proposal]
+ * @deprecated use org.biojava.bio.symbol.ChunkedSymbolList instead
  */
 
 class ChunkedSymbolList extends AbstractSymbolList implements Serializable {

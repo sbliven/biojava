@@ -1,23 +1,23 @@
 /*
- *                    BioJava development code
- *
- * This code may be freely distributed and modified under the
- * terms of the GNU Lesser General Public Licence.  This should
- * be distributed with the code.  If you do not have a copy,
- * see:
- *
- *      http://www.gnu.org/copyleft/lesser.html
- *
- * Copyright for this code is held jointly by the individual
- * authors.  These should be listed in @author doc comments.
- *
- * For more information on the BioJava project and its aims,
- * or to join the biojava-l mailing list, visit the home page
- * at:
- *
- *      http://www.biojava.org/
- *
- */
+*                    BioJava development code
+*
+* This code may be freely distributed and modified under the
+* terms of the GNU Lesser General Public Licence.  This should
+* be distributed with the code.  If you do not have a copy,
+* see:
+*
+*      http://www.gnu.org/copyleft/lesser.html
+*
+* Copyright for this code is held jointly by the individual
+* authors.  These should be listed in @author doc comments.
+*
+* For more information on the BioJava project and its aims,
+* or to join the biojava-l mailing list, visit the home page
+* at:
+*
+*      http://www.biojava.org/
+*
+*/
 
 package org.biojava.bio.program.xff;
 
@@ -44,182 +44,219 @@ import org.xml.sax.SAXException;
  */
 
 public class XFFFeatureSetHandler extends StAXContentHandlerBase {
-    public final static String PROPERTY_XFF_ID = "org.biojava.bio.program.xff.id";
+  public final static String PROPERTY_XFF_ID = "org.biojava.bio.program.xff.id";
 
-    private List featureHandlers;
-    private List detailHandlers;
-    private SeqIOListener featureListener;
-    private Annotation mergeAnnotation;
+  private List featureHandlers;
+  private List detailHandlers;
+  private SeqIOListener featureListener;
+  private Annotation mergeAnnotation;
 
+  {
+    featureHandlers = new ArrayList();
+    detailHandlers = new ArrayList();
+    mergeAnnotation = Annotation.EMPTY_ANNOTATION;
+  }
+
+  //
+  // Current parse status
+  //
+
+  private boolean inFeatureSet = false;
+
+  /**
+   * Construct a new XFFFeatureSetHandler with the default set of handlers.
+   */
+
+  public XFFFeatureSetHandler() {
+    addFeatureHandler(ElementRecognizer.ALL, FeatureHandler.FEATURE_HANDLER_FACTORY);
+    addFeatureHandler(new ElementRecognizer.HasAttribute("strand"),
+                      StrandedFeatureHandler.STRANDEDFEATURE_HANDLER_FACTORY);
+
+    addDetailHandler(new ElementRecognizer.ByLocalName("prop"),
+                     PropDetailHandler.PROPDETAIL_HANDLER_FACTORY);
+  }
+
+  /**
+   * Set the object which receives startFeature/endFeature notifications.
+   */
+
+  public void setFeatureListener(SeqIOListener siol)
+  {
+    featureListener = siol;
+  }
+
+  /**
+   * Return the object which receives startFeature/endFeature notifications.
+   */
+
+  public SeqIOListener getFeatureListener() {
+    return featureListener;
+  }
+
+  public void setMergeAnnotation(Annotation ann)
+  {
+    this.mergeAnnotation = ann;
+  }
+
+  public Annotation getMergeAnnotation()
+  {
+    return this.mergeAnnotation;
+  }
+
+  /**
+   * Extend this FeatureSetHandler to delegate certain feature elements
+   * to the specified handler type.
+   *
+   * @param rec A selector for some sub-set of feature elements.
+   * @param handler A factory which returns StAX handlers for matching elements.
+   */
+
+  public void addFeatureHandler(ElementRecognizer rec,
+                                XFFPartHandlerFactory handler)
+  {
+    featureHandlers.add(new Binding(rec, handler));
+  }
+
+  /**
+   * Extend this FeatureSetHandler to delegate certain detail elements
+   * to the specified handler type.
+   *
+   * @param rec A selector for some sub-set of detail elements.
+   * @param handler A factory which returns StAX handlers for matching elements.
+   */
+
+  public void addDetailHandler(ElementRecognizer rec,
+                               XFFPartHandlerFactory handler)
+  {
+    detailHandlers.add(new Binding(rec, handler));
+  }
+
+  class Binding {
+    final ElementRecognizer recognizer;
+    final XFFPartHandlerFactory handlerFactory;
+
+    Binding(ElementRecognizer er,
+            XFFPartHandlerFactory hf)
     {
-	featureHandlers = new ArrayList();
-	detailHandlers = new ArrayList();
-        mergeAnnotation = Annotation.EMPTY_ANNOTATION;
+      recognizer = er;
+      handlerFactory = hf;
     }
 
-    //
-    // Current parse status
-    //
-
-    private boolean inFeatureSet = false;
-
-    /**
-     * Construct a new XFFFeatureSetHandler with the default set of handlers.
-     */
-
-    public XFFFeatureSetHandler() {
-	addFeatureHandler(ElementRecognizer.ALL, FeatureHandler.FEATURE_HANDLER_FACTORY);
-	addFeatureHandler(new ElementRecognizer.HasAttribute("strand"),
-			  StrandedFeatureHandler.STRANDEDFEATURE_HANDLER_FACTORY);
-
-	addDetailHandler(new ElementRecognizer.ByLocalName("prop"),
-			 PropDetailHandler.PROPDETAIL_HANDLER_FACTORY);
-    }
-
-    /**
-     * Set the object which receives startFeature/endFeature notifications.
-     */
-
-    public void setFeatureListener(SeqIOListener siol)
+    public String toString()
     {
-	featureListener = siol;
+      return "Binding[rec=" + recognizer + " fact=" + handlerFactory + "]";
+    }
+  }
+
+
+  public void startElement(String nsURI,
+                           String localName,
+                           String qName,
+                           Attributes attrs,
+                           DelegationManager dm)
+          throws SAXException
+  {
+    System.err.println("Processing startElement(" + nsURI + ", " + localName + ", " + qName + ", " + pretify(attrs));
+    if (localName.equals("featureSet")) {
+      inFeatureSet = true;
+      return;
     }
 
-    /**
-     * Return the object which receives startFeature/endFeature notifications.
-     */
-
-    public SeqIOListener getFeatureListener() {
-	return featureListener;
-    }
-    
-    public void setMergeAnnotation(Annotation ann)
-    {
-        this.mergeAnnotation = ann;
-    }
-    
-    public Annotation getMergeAnnotation()
-    {
-        return this.mergeAnnotation;
+    for (int i = featureHandlers.size() - 1; i >= 0; --i) {
+      Binding b = (Binding) featureHandlers.get(i);
+      System.err.println("Binding: " + b);
+      if (b.recognizer.filterStartElement(nsURI, localName, qName, attrs)) {
+        System.err.println("Accepting binding");
+        dm.delegate(b.handlerFactory.getPartHandler(this));
+        return;
+      }
     }
 
-    /**
-     * Extend this FeatureSetHandler to delegate certain feature elements
-     * to the specified handler type.
-     *
-     * @param rec A selector for some sub-set of feature elements.
-     * @param handler A factory which returns StAX handlers for matching elements.
-     */
+    throw new SAXException("Couldn't handle element " + localName + " in namespace " + nsURI);
+  }
 
-    public void addFeatureHandler(ElementRecognizer rec,
-				  XFFPartHandlerFactory handler)
-    {
-	featureHandlers.add(new Binding(rec, handler));
+  public void endElement(String nsURI,
+                         String localName,
+                         String qName,
+                         StAXContentHandler handler)
+  {
+    if (localName.equals("featureSet")) {
+      inFeatureSet = false;
     }
+  }
 
-    /**
-     * Extend this FeatureSetHandler to delegate certain detail elements
-     * to the specified handler type.
-     *
-     * @param rec A selector for some sub-set of detail elements.
-     * @param handler A factory which returns StAX handlers for matching elements.
-     */
+  /**
+   * Return a handler for the XFF <code>details</code> element.
+   * This handler will, in turn, delegate to the specific detail
+   * handlers provided with <code>addDetailHandler</code>
+   */
 
-    public void addDetailHandler(ElementRecognizer rec,
-				 XFFPartHandlerFactory handler)
-    {
-	detailHandlers.add(new Binding(rec, handler));
-    }
+  public StAXContentHandlerBase getDetailsHandler() {
+    return new XFFDetailsHandler();
+  }
 
-    class Binding {
-	final ElementRecognizer recognizer;
-	final XFFPartHandlerFactory handlerFactory;
-
-	Binding(ElementRecognizer er,
-		XFFPartHandlerFactory hf)
-	{
-	    recognizer = er;
-	    handlerFactory = hf;
-	}
-    }
-
+  private class XFFDetailsHandler extends StAXContentHandlerBase {
+    private boolean inDetails;
 
     public void startElement(String nsURI,
-			     String localName,
-			     String qName,
-			     Attributes attrs,
-			     DelegationManager dm)
-	 throws SAXException
+                             String localName,
+                             String qName,
+                             Attributes attrs,
+                             DelegationManager dm)
+            throws SAXException
     {
-	if (localName.equals("featureSet")) {
-	    inFeatureSet = true;
-	    return;
-	}
+      if (localName.equals("details")) {
+        inDetails = true;
+        return;
+      }
 
-	for (int i = featureHandlers.size() - 1; i >= 0; --i) {
-	    Binding b = (Binding) featureHandlers.get(i);
-	    if (b.recognizer.filterStartElement(nsURI, localName, qName, attrs)) {
-		dm.delegate(b.handlerFactory.getPartHandler(this));
-		return;
-	    }
-	}
+      for (int i = detailHandlers.size() - 1; i >= 0; --i) {
+        Binding b = (Binding) detailHandlers.get(i);
+        if (b.recognizer.filterStartElement(nsURI, localName, qName, attrs)) {
+          dm.delegate(b.handlerFactory.getPartHandler(XFFFeatureSetHandler.this));
+          return;
+        }
+      }
 
-	throw new SAXException("Couldn't handle element " + localName + " in namespace " + nsURI);
+      // Unknown detail types get silently ignored.
     }
 
     public void endElement(String nsURI,
-			   String localName,
-			   String qName,
-			   StAXContentHandler handler)
+                           String localName,
+                           String qName)
     {
-	if (localName.equals("featureSet")) {
-	    inFeatureSet = false;
-	}
+      if (localName.equals("details")) {
+        inDetails = false;
+      }
+    }
+  }
+
+  private static final String pretify(Attributes attr) {
+    StringBuffer res = new StringBuffer();
+    res.append("{");
+
+    if(attr.getLength() > 0) {
+      res.append(attr.getURI(0));
+      res.append("'");
+      res.append(attr.getLocalName(0));
+      res.append("'");
+      res.append(attr.getQName(0));
+      res.append("=>");
+      res.append(attr.getValue(0));
     }
 
-    /**
-     * Return a handler for the XFF <code>details</code> element.
-     * This handler will, in turn, delegate to the specific detail
-     * handlers provided with <code>addDetailHandler</code>
-     */
-
-    public StAXContentHandlerBase getDetailsHandler() {
-	return new XFFDetailsHandler();
+    for(int i = 1; i < attr.getLength(); i++) {
+      res.append(", ");
+      res.append(attr.getURI(i));
+      res.append("'");
+      res.append(attr.getLocalName(i));
+      res.append("'");
+      res.append(attr.getQName(i));
+      res.append("=>");
+      res.append(attr.getValue(i));
     }
 
-    private class XFFDetailsHandler extends StAXContentHandlerBase {
-	private boolean inDetails;
-	
-	public void startElement(String nsURI,
-				 String localName,
-				 String qName,
-				 Attributes attrs,
-				 DelegationManager dm)
-	    throws SAXException
-	{
-	    if (localName.equals("details")) {
-		inDetails = true;
-		return;
-	    }
-
-	    for (int i = detailHandlers.size() - 1; i >= 0; --i) {
-		Binding b = (Binding) detailHandlers.get(i);
-		if (b.recognizer.filterStartElement(nsURI, localName, qName, attrs)) {
-		    dm.delegate(b.handlerFactory.getPartHandler(XFFFeatureSetHandler.this));
-		    return;
-		}
-	    }
-	    
-	    // Unknown detail types get silently ignored.
-	}
-
-	public void endElement(String nsURI,
-			       String localName,
-			       String qName)
-	{
-	    if (localName.equals("details")) {
-		inDetails = false;
-	    }
-	}
-    }
+    res.append("}");
+    return res.toString();
+  }
 }

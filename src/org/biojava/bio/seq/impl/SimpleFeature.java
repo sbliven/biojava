@@ -68,7 +68,7 @@ implements
 {
   private transient ChangeListener annotationForwarder;
   private transient ChangeListener featureForwarder;
-  
+
   /**
    * The FeatureHolder that we will delegate the FeatureHolder interface too.
    * This is lazily instantiated.
@@ -98,10 +98,10 @@ implements
    * This is lazily instantiated.
    */
   private Annotation annotation;
-  
+
   private Term typeTerm;
   private Term sourceTerm;
- 
+
   /**
    * A utility function to retrieve the feature holder delegate, creating it if
    * necessary.
@@ -129,7 +129,7 @@ implements
 
   protected ChangeSupport getChangeSupport(ChangeType ct) {
     ChangeSupport cs = super.getChangeSupport(ct);
-    
+
     if(
       (annotationForwarder == null) &&
       (ct.isMatchingType(Annotatable.ANNOTATION) || Annotatable.ANNOTATION.isMatchingType(ct))
@@ -141,7 +141,7 @@ implements
         Annotatable.ANNOTATION
       );
     }
-    
+
     if(
       (featureForwarder == null) &&
       (ct == null || ct == FeatureHolder.FEATURES)
@@ -155,14 +155,14 @@ implements
         FeatureHolder.FEATURES
       );
     }
-    
+
     return cs;
   }
-  
+
   public Location getLocation() {
     return loc;
   }
-  
+
   public void setLocation(Location loc)
   throws ChangeVetoException {
     if(hasListeners()) {
@@ -177,11 +177,11 @@ implements
       this.loc = loc;
     }
   }
-  
+
   public Term getTypeTerm() {
       return typeTerm;
   }
-  
+
   public String getType() {
     if (typeTerm != OntoTools.ANY) {
         return typeTerm.getName();
@@ -189,7 +189,7 @@ implements
         return type;
     }
   }
-  
+
   public void setType(String type)
   throws ChangeVetoException {
     if(hasListeners()) {
@@ -204,9 +204,9 @@ implements
       this.type = type;
     }
   }
-  
+
     public void setTypeTerm(Term t)
-        throws ChangeVetoException 
+        throws ChangeVetoException
     {
         if(hasListeners()) {
             ChangeSupport cs = getChangeSupport(TYPE);
@@ -223,7 +223,7 @@ implements
             this.typeTerm = typeTerm;
         }
     }
-  
+
   public String getSource() {
     if (sourceTerm != OntoTools.ANY) {
         return sourceTerm.getName();
@@ -231,11 +231,11 @@ implements
         return source;
     }
   }
-  
+
   public Term getSourceTerm() {
       return sourceTerm;
   }
-  
+
   public FeatureHolder getParent() {
     return parent;
   }
@@ -254,10 +254,10 @@ implements
       this.source = source;
     }
   }
-  
-  
+
+
     public void setSourceTerm(Term t)
-        throws ChangeVetoException 
+        throws ChangeVetoException
     {
         if(hasListeners()) {
             ChangeSupport cs = getChangeSupport(TYPE);
@@ -292,7 +292,7 @@ implements
 	    annotation = new SimpleAnnotation();
 	return annotation;
     }
-  
+
     public SymbolList getSymbols() {
 	return getLocation().symbols(getSequence());
     }
@@ -322,10 +322,10 @@ implements
       }
     }
 
-    
+
     public FeatureHolder filter(FeatureFilter ff) {
         FeatureFilter childFilter = new FeatureFilter.Not(FeatureFilter.top_level);
-                                                          
+
         if (FilterUtils.areDisjoint(ff, childFilter)) {
             return FeatureHolder.EMPTY_FEATURE_HOLDER;
         } else if (featureHolderAllocated()) {
@@ -334,7 +334,7 @@ implements
             return FeatureHolder.EMPTY_FEATURE_HOLDER;
         }
     }
-    
+
     public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
 	if(featureHolderAllocated())
 	    return getFeatureHolder().filter(ff, recurse);
@@ -346,46 +346,47 @@ implements
       fillTemplate(ft);
       return ft;
     }
-    
+
     protected void fillTemplate(Feature.Template ft) {
       ft.location = getLocation();
       ft.type = getType();
       ft.source = getSource();
       ft.annotation = getAnnotation();
     }
-    
+
     /**
-     * Create a <code>SimpleFeature</code> on the given sequence. 
+     * Create a <code>SimpleFeature</code> on the given sequence.
      * The feature is created underneath the parent <code>FeatureHolder</code>
      * and populated directly from the template fields. However,
-     * if the template annotation is the <code>Annotation.EMPTY_ANNOTATION</code>, 
+     * if the template annotation is the <code>Annotation.EMPTY_ANNOTATION</code>,
      * an empty <code>SimpleAnnotation</code> is attached to the feature instead.
      * @param sourceSeq the source sequence
      * @param parent the parent sequence or feature
      * @param template the template for the feature
      */
-    public SimpleFeature(Sequence sourceSeq, 
+    public SimpleFeature(Sequence sourceSeq,
                          FeatureHolder parent,
                          Feature.Template template) {
         if (template.location == null) {
             throw new IllegalArgumentException(
-		         "Location can not be null. Did you mean Location.EMPTY_LOCATION?"
+		         "Location can not be null. Did you mean Location.EMPTY_LOCATION? " +
+                 template.toString()
             );
         }
         if(!(parent instanceof Feature) && !(parent instanceof Sequence)) {
             throw new IllegalArgumentException("Parent must be sequence or feature, not: " + parent.getClass() + " " + parent);
         }
-	
-	if (template.location.getMin() < 1 || template.location.getMax() > sourceSeq.length()) {
-	    //throw new IllegalArgumentException("Location " + template.location.toString() + " is outside 1.." + sourceSeq.length());
-	}
 
-	this.parent = parent;
-	this.loc = template.location;
+        if (template.location.getMin() < 1 || template.location.getMax() > sourceSeq.length()) {
+            //throw new IllegalArgumentException("Location " + template.location.toString() + " is outside 1.." + sourceSeq.length());
+        }
+
+        this.parent = parent;
+        this.loc = template.location;
         this.typeTerm = template.typeTerm != null ? template.typeTerm : OntoTools.ANY;
         this.sourceTerm = template.sourceTerm != null ? template.sourceTerm : OntoTools.ANY;
-	this.type = template.type != null ? template.type : typeTerm.getName();
-	this.source = template.source != null ? template.source : sourceTerm.getName();
+        this.type = template.type != null ? template.type : typeTerm.getName();
+        this.source = template.source != null ? template.source : sourceTerm.getName();
         if (this.type == null) {
             throw new NullPointerException("Either type or typeTerm must have a non-null value");
         }
@@ -411,8 +412,8 @@ implements
 	}
     }
 
-    public Feature createFeature(Feature.Template temp) 
-        throws BioException, ChangeVetoException 
+    public Feature createFeature(Feature.Template temp)
+        throws BioException, ChangeVetoException
     {
 	Feature f = realizeFeature(this, temp);
 	getFeatureHolder().addFeature(f);
@@ -429,12 +430,12 @@ implements
 	}
 
 	Feature fo = (Feature) o;
-	if (! fo.getSequence().equals(getSequence())) 
+	if (! fo.getSequence().equals(getSequence()))
 	    return false;
-    
+
 	return makeTemplate().equals(fo.makeTemplate());
     }
-    
+
     public FeatureFilter getSchema() {
         return new FeatureFilter.ByParent(new FeatureFilter.ByFeature(this));
     }

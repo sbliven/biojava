@@ -62,7 +62,7 @@ public interface SymbolReader {
      * @param buffer the destination for read symbols.
      * @param start a start offset within the buffer.
      * @param length the maximum number of Symbols to read.
-     * 
+     *
      * @return the number of Symbols which were actually read.
      *
      * @throws IOException if an error occured on the stream, or the
@@ -71,9 +71,9 @@ public interface SymbolReader {
      */
 
     public int readSymbols(Symbol[] buffer,
-			   int start,
-			   int length) throws IOException, 
-			                       IllegalSymbolException;
+                           int start,
+                           int length)
+            throws IOException, IllegalSymbolException;
 
     /**
      * Determine if there are more symbols left to read in this stream.

@@ -22,21 +22,13 @@
 package org.biojava.bio.seq.io;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.symbol.AbstractSymbolList;
-import org.biojava.bio.symbol.Alphabet;
-import org.biojava.bio.symbol.IllegalAlphabetException;
-import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.symbol.SimpleSymbolList;
-import org.biojava.bio.symbol.SimpleSymbolListFactory;
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.symbol.SymbolList;
-import org.biojava.bio.symbol.SymbolListFactory;
-import org.biojava.utils.ChangeListener;
+
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.symbol.ChunkedSymbolList;
 
 /**
  * class that makes ChunkedSymbolLists with the chunks
@@ -126,98 +118,11 @@ public class ChunkedSymbolListFactory
     private int opMode = SUPPLIED_FACTORY;
     private int threshold = 1<<20;
 
-    // cached info for speedups
-    private static int currentMin = Integer.MAX_VALUE;
-    private static int currentMax = Integer.MIN_VALUE;
-    private static SymbolList currentChunk = null;
-
-
     // interlocks
     // you can only use symbolAt() or make(), not both.
     private boolean canDoMake = true;
 
-    private static class ChunkedSymbolList extends AbstractSymbolList implements Serializable
-    {
-        private SymbolList [] chunks;
-        private final int chunkSize;
-
-        private Alphabet alpha;
-        private int length;
-
-        protected void finalize() throws Throwable {
-            super.finalize();
-            alpha.removeChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
-        }
-
-        public ChunkedSymbolList(SymbolList [] chunks,
-                                 int chunkSize,
-                                 int length,
-                                 Alphabet alpha)
-        {
-            this.chunks = chunks;
-            this.chunkSize = chunkSize;
-            this.length = length;
-            this.alpha = alpha;
-           alpha.addChangeListener(ChangeListener.ALWAYS_VETO, Alphabet.SYMBOLS);
-        }
-
-        public Alphabet getAlphabet() {
-            return alpha;
-        }
-
-        public int length() {
-            return length;
-        }
-
-        public Symbol symbolAt(int pos) {
-            int offset;
-
-            --pos;
-            if ((pos < currentMin) || (pos > currentMax)) {
-                int chnk = pos / chunkSize;
-                offset =  pos % chunkSize;
-
-                currentMin = pos - offset;
-                currentMax = currentMin + chunkSize - 1;
-                currentChunk = chunks[chnk];
-            }
-            else {
-                offset = pos - currentMin;
-            }
-
-            return currentChunk.symbolAt(offset + 1);
-        }
-
-        public SymbolList subList(int start, int end) {
-            if (start < 1 || end > length()) {
-                throw new IndexOutOfBoundsException(
-                    "Sublist index out of bounds " + length() + ":" + start + "," + end
-                    );
-            }
-
-            if (end < start) {
-                throw new IllegalArgumentException(
-                    "end must not be lower than start: start=" + start + ", end=" + end
-                    );
-            }
-
-            //
-            // Mildly optimized for case where from and to are within
-            // the same chunk.
-            //
-
-            int afrom = start - 1;
-            int ato = end - 1;
-            int cfrom = afrom / chunkSize;
-            if (ato / chunkSize == cfrom) {
-                return chunks[cfrom].subList((afrom % chunkSize) + 1, (ato % chunkSize) + 1);
-            } else {
-                return super.subList(start, end);
-            }
-        }
-    }
-
-    /**
+  /**
      * @param symListFactory class which produces the SymbolLists that are used
      *        to store the chunked symbols.
      */
@@ -443,6 +348,8 @@ public class ChunkedSymbolListFactory
 
     /**
      * Method to create a Sequence with a SymbolReader. (does anyone use this???>
+     *
+     * readme: As of 12/11/03, there are no references to this method in the codebase
      */
     public SymbolList make(SymbolReader sr)
         throws IOException, IllegalSymbolException, IllegalAlphabetException, BioException

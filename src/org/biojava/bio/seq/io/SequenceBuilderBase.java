@@ -28,10 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.biojava.bio.Annotation;
-import org.biojava.bio.BioError;
-import org.biojava.bio.SimpleAnnotation;
-import org.biojava.bio.SmallAnnotation;
+import org.biojava.bio.*;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.symbol.Alphabet;
@@ -167,6 +164,7 @@ public abstract class SequenceBuilderBase implements SequenceBuilder {
     }
 
     public Sequence makeSequence()
+            throws BioException
     {
       //	SymbolList symbols = slBuilder.makeSymbolList();
       //	Sequence seq = new SimpleSequence(symbols, uri, name, annotation);

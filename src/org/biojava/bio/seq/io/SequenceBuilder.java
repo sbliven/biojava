@@ -47,5 +47,6 @@ public interface SequenceBuilder extends SeqIOListener {
      * after the endSequence() notifier has been called.
      */
 
-    public Sequence makeSequence() throws BioException;
+    public Sequence makeSequence()
+            throws BioException;
 }

@@ -31,6 +31,7 @@ import org.biojava.bio.symbol.SymbolList;
 
 /**
  * @author Thomas Down
+ * @deprecated use ChunkedSymbolListFactory instead
  */
 public class ChunkedSymbolListBuilder {
     private final static int CHUNK_SIZE = 1<<12;
@@ -40,7 +41,7 @@ public class ChunkedSymbolListBuilder {
     private int headChunkPos = 0;
 
     private Alphabet alpha = null;
-    
+
     public void addSymbols(Alphabet alpha,
 			   Symbol[] syms,
 			   int pos,
@@ -90,7 +91,7 @@ public class ChunkedSymbolListBuilder {
 	    return SymbolList.EMPTY_LIST;
 	} else if (chunkL.size() == 1) {
 	    // Small-sequence optimization
-	    
+
 	    return new SubArraySymbolList((Symbol[]) chunkL.get(0),
 					  headChunkPos,
 					  0,
@@ -101,7 +102,7 @@ public class ChunkedSymbolListBuilder {
 		chunks[cnum] = (Symbol[]) chunkL.get(cnum);
 	    }
 	    int length = (chunkL.size() - 1) * CHUNK_SIZE + headChunkPos;
-	    
+
 	    return new ChunkedSymbolList(chunks,
 					 CHUNK_SIZE,
 					 length,

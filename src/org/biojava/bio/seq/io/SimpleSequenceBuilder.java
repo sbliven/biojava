@@ -27,10 +27,8 @@ import java.io.Serializable;
 
 import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.impl.SimpleSequence;
-import org.biojava.bio.symbol.Alphabet;
-import org.biojava.bio.symbol.IllegalAlphabetException;
-import org.biojava.bio.symbol.Symbol;
-import org.biojava.bio.symbol.SymbolList;
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.BioException;
 import org.biojava.utils.StaticMemberPlaceHolder;
 
 /**
@@ -62,11 +60,11 @@ public class SimpleSequenceBuilder extends SequenceBuilderBase {
 	}
     }
 
-    private ChunkedSymbolListBuilder slBuilder;
+  private ChunkedSymbolListFactory slFactory;
 
-    {
-	slBuilder = new ChunkedSymbolListBuilder();
-    }
+  {
+	 slFactory = new ChunkedSymbolListFactory(new SimpleSymbolListFactory());
+  }
 
     //
     // SeqIOListener
@@ -75,14 +73,15 @@ public class SimpleSequenceBuilder extends SequenceBuilderBase {
     public void addSymbols(Alphabet alpha, Symbol[] syms, int pos, int len)
         throws IllegalAlphabetException
     {
-	slBuilder.addSymbols(alpha, syms, pos, len);
+	slFactory.addSymbols(alpha, syms, pos, len);
     }
 
 
-    public Sequence makeSequence() {
-	SymbolList symbols = slBuilder.makeSymbolList();
+  public Sequence makeSequence()
+          throws BioException {
+	SymbolList symbols = slFactory.makeSymbolList();
 	seq = new SimpleSequence(symbols, uri, name, annotation);
 
-        return super.makeSequence();
-    }
+    return super.makeSequence();
+  }
 }
