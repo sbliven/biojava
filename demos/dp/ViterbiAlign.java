@@ -18,7 +18,7 @@
  *      http://www.biojava.org/
  *
  */
-//package dp;
+package dp;
 
 import java.util.*;
 import java.net.*;
