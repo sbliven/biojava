@@ -257,13 +257,13 @@ implements SymbolList {
     public SymbolList subList(int sstart, int send) {
       if (sstart < 1 || send > length()) {
         throw new IndexOutOfBoundsException(
-            "Sublist index out of bounds " + length() + ":" + start + "," + send
+            "Sublist index out of bounds " + length() + ":" + sstart + "," + send
             );
       }
 
       if (send < sstart) {
         throw new IndexOutOfBoundsException(
-            "send must not be lower than sstart: sstart=" + start + ", send=" + send
+            "Requested end must not be lower than start: start=" + sstart + ", end=" + send
             );
       }
 
