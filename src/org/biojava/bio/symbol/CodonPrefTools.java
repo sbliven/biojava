@@ -63,8 +63,19 @@ import org.biojava.utils.xml.PrettyXMLWriter;
  */
 public class CodonPrefTools
 {
-    public static String JUNIT = "jUnit use only!!!!";
-    public static String DROSOPHILA_MELANOGASTER_NUCLEAR = "Drosophila melanogaster-nuclear";
+    /**
+     * constants for model organisms
+     */
+    static String JUNIT = "jUnit use only!!!!";
+    public static String DROSOPHILA_MELANOGASTER_NUCLEAR = "Drosophila melanogaster";
+    public static String MAN_NUCLEAR = "Homo sapiens";
+    public static String MOUSE_NUCLEAR = "Mus musculus";
+    public static String RAT_NUCLEAR = "Rattus norvegicus";
+    public static String FUGU_NUCLEAR = "Takifugu rubripes";
+    public static String WORM_NUCLEAR = "Caenorhabditis elegans";
+    public static String CEREVISIAE_NUCLEAR = "Saccharomyces cerevisiae";
+    public static String POMBE_NUCLEAR = "Schizosaccharomyces pombe";
+    public static String ECOLI = "Escherichia coli";
 
     private static Map prefMap;
 
@@ -223,6 +234,10 @@ public class CodonPrefTools
      * translate it into our XML format
      * These can be obtained from the 
      * <a href="http://www.kazusa.or.jp/codon/">Codon Usage Database</a>.
+     * <p>
+     * Note that the output assumes that the universal genetic code is
+     * used as that is not encoded in the CUD files.  Edit the output appropriately
+     * to modify the genetic code if necessary.
      */
     public static void translateCUD(InputStream input, OutputStream output)
         throws IOException
