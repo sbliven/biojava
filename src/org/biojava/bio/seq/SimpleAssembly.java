@@ -1,0 +1,201 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ */
+
+package org.biojava.bio.seq;
+
+import java.util.*;
+
+import org.biojava.bio.symbol.*;
+import org.biojava.bio.*;
+
+/**
+ * A Sequence which is assembled from other sequences contained
+ * in a set of ComponentFeature objects.
+ *
+ * <p>
+ * Currently, this class is rather inefficient for bulk
+ * SymbolList operations -- I'll fix it soon.
+ * </p>
+ *
+ * @author Thomas Down
+ * @since 1.1
+ */
+
+public class SimpleAssembly extends AbstractSymbolList 
+    implements Sequence, RealizingFeatureHolder 
+{
+    private int length;
+    private String name;
+    private String uri;
+    private Annotation annotation;
+    private SimpleFeatureHolder features;
+    private SortedMap components;
+    private FeatureRealizer featureRealizer = SimpleFeatureRealizer.DEFAULT;
+
+    private final static Symbol N;
+
+    static {
+	try {
+	    N = DNATools.getDNA().getParser("token").parseToken("n");
+	} catch (BioException ex) {
+	    throw new BioError(ex);
+	}
+    }
+
+    {
+	features = new SimpleFeatureHolder();
+	components = new TreeMap(Location.naturalOrder);
+    }
+
+    /**
+     * Construct a new SimpleAssembly using the DNA alphabet.
+     * Initially, the sequence will just contain a list of `N's.
+     * Sequence data can be added by adding one or more
+     * ComponentFeatures.
+     *
+     * @param length The length of the sequence
+     * @param name The name of the sequence (returned by getName())
+     * @param uri The identifier of the sequence (returned by getURN());
+     */
+
+    public SimpleAssembly(int length, String name, String uri) {
+	this.length = length;
+	this.name = name;
+	this.uri = uri;
+    }
+
+    //
+    // SymbolList (could do with a /lot/ of optimisation)
+    //
+
+    public Alphabet getAlphabet() {
+	return DNATools.getDNA();
+    }
+
+    public int length() {
+	return length;
+    }
+
+    public Symbol symbolAt(int pos) {
+	for (Iterator i = components.entrySet().iterator(); i.hasNext(); ) {
+	    Map.Entry me = (Map.Entry) i.next();
+	    Location l = (Location) me.getKey();
+	    if (l.contains(pos)) {
+		SymbolList syms = (SymbolList) me.getValue();
+		return syms.symbolAt(pos - l.getMin() + 1);
+	    }
+	}
+
+	return N;
+    }
+
+    //
+    // Sequence identification
+    //
+
+    public String getName() {
+	return name;
+    }
+
+    public String getURN() {
+	return uri;
+    }
+
+    //
+    // Annotatable
+    //
+
+    public Annotation getAnnotation() {
+	return annotation;
+    }
+
+    //
+    // FeatureHolder
+    //
+
+    public Iterator features() {
+	return features.features();
+    }
+
+    public int countFeatures() {
+	return features.countFeatures();
+    }
+
+    public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+	return features.filter(ff, recurse);
+    }
+
+    public Feature createFeature(Feature.Template temp) 
+        throws BioException
+    {
+	if (temp.location.getMin() < 1 || temp.location.getMax() > length)
+	    throw new BioException("Coordinates out of range");
+
+	if (temp instanceof ComponentFeature.Template) {
+	    for (Iterator i = components.keySet().iterator(); i.hasNext(); ) {
+		Location l = (Location) i.next();
+		if (l.overlaps(temp.location))
+		    throw new BioError("Can't create overlapping ComponentFeature");
+	    }
+	}
+
+	Feature f = realizeFeature(this, temp);
+	features.addFeature(f);
+	if (f instanceof ComponentFeature) {
+	    ComponentFeature cf = (ComponentFeature) f;
+	    Location loc = cf.getLocation();
+	    SymbolList cfsyms = cf.getSymbols();
+	    components.put(loc, cfsyms);
+	}
+	return f;
+    }
+
+    public void removeFeature(Feature f) {
+	if (f instanceof ComponentFeature)
+	    components.remove(f.getLocation());
+	features.removeFeature(f);
+    }
+
+    //
+    // Feature realization
+    //
+
+    public Feature realizeFeature(FeatureHolder fh, Feature.Template temp) 
+        throws BioException
+    {
+	if (temp instanceof ComponentFeature.Template) {
+	    if (fh != this) {
+		throw new BioException("ComponentFeatures can only be attached directly to SimpleAssembly objects");
+	    }
+	    ComponentFeature.Template cft = (ComponentFeature.Template) temp;
+	    return new SimpleComponentFeature(this, cft);
+	} else {
+	    FeatureHolder gopher = fh;
+	    while (gopher instanceof Feature) {
+		if (gopher instanceof ComponentFeature) {
+		    throw new BioException("Cannot [currently] realize features on components of SimpleAssemblies");
+		}
+		gopher = ((Feature) gopher).getParent();
+	    }
+	    return featureRealizer.realizeFeature(this, fh, temp);
+	}
+    }
+}

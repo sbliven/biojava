@@ -115,6 +115,31 @@ public interface FeatureFilter extends Serializable {
     public boolean accept(Feature f) { return source.equals(f.getSource()); }
   }
 
+    /**
+     * Filter which accepts only those filters which are an instance
+     * of a specific Java class
+     *
+     * @author Thomas Down
+     * @since 1.1
+     */
+
+    public static class ByClass implements FeatureFilter {
+	private Class clazz;
+
+	public ByClass(Class clazz) {
+	    this.clazz = clazz;
+	}
+
+	public boolean accept(Feature f) {
+	    return clazz.isInstance(f);
+	}
+
+	public Class getTestClass() {
+	    return clazz;
+        }
+    }
+
+
   /**
    *  A filter that returns all features contained within a location.
    *
